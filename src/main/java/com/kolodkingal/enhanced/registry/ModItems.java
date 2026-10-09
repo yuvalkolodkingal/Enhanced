@@ -1,0 +1,39 @@
+package com.kolodkingal.enhanced.registry;
+
+import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.item.LokisScepterItem;
+import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
+import com.kolodkingal.enhanced.item.ScarletWitchGeneItem;
+import com.kolodkingal.enhanced.item.WandaCrownItem;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+public final class ModItems {
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Enhanced.MODID);
+
+    /** No durability component, so it never takes damage. */
+    public static final DeferredItem<MagnetoHelmetItem> MAGNETO_HELMET = ITEMS.register("magneto_helmet",
+            () -> new MagnetoHelmetItem(ModArmorMaterials.MAGNETO, ArmorItem.Type.HELMET,
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    public static final DeferredItem<WandaCrownItem> WANDA_CROWN = ITEMS.register("wanda_crown",
+            () -> new WandaCrownItem(ModArmorMaterials.WANDA_CROWN, ArmorItem.Type.HELMET,
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    public static final DeferredItem<ScarletWitchGeneItem> SCARLET_WITCH_GENE = ITEMS.register("scarlet_witch_gene",
+            () -> new ScarletWitchGeneItem(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC)));
+
+    public static final DeferredItem<LokisScepterItem> LOKIS_SCEPTER = ITEMS.register("lokis_scepter",
+            () -> new LokisScepterItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                    .attributes(LokisScepterItem.createAttributes())));
+
+    /** Projectile sprites only; not in the creative tab. */
+    public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");
+    public static final DeferredItem<Item> PHOTON_ORB = ITEMS.registerSimpleItem("photon_orb");
+
+    private ModItems() {
+    }
+}

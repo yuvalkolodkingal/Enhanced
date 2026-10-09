@@ -1,0 +1,105 @@
+package com.kolodkingal.enhanced;
+
+import net.neoforged.neoforge.common.ModConfigSpec;
+
+/**
+ * Server-side balance numbers. Lives in world/serverconfig/enhanced-server.toml and is synced to clients.
+ */
+public final class EnhancedConfig {
+    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+
+    // ---- Magneto ----
+    public static final ModConfigSpec.DoubleValue MAGNETO_FLIGHT_SPEED;
+    public static final ModConfigSpec.IntValue TELEKINESIS_RANGE;
+    public static final ModConfigSpec.DoubleValue THROW_SPEED;
+    public static final ModConfigSpec.DoubleValue SHRAPNEL_DAMAGE;
+    public static final ModConfigSpec.IntValue SHRAPNEL_PIERCE;
+    public static final ModConfigSpec.IntValue SHRAPNEL_FIRE_INTERVAL;
+    public static final ModConfigSpec.IntValue DISARM_RANGE;
+    public static final ModConfigSpec.IntValue DISARM_COOLDOWN;
+    public static final ModConfigSpec.DoubleValue SHIELD_REFLECT_CHANCE;
+
+    // ---- Scarlet Witch ----
+    public static final ModConfigSpec.DoubleValue WANDA_FLIGHT_SPEED;
+    public static final ModConfigSpec.DoubleValue CHAOS_BEAM_DAMAGE;
+    public static final ModConfigSpec.IntValue CHAOS_BEAM_RANGE;
+    public static final ModConfigSpec.IntValue CHAOS_BEAM_NAUSEA_TICKS;
+    public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_EXHAUSTION;
+    public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_EXPLOSION_FACTOR;
+    public static final ModConfigSpec.IntValue BLOCK_LIFT_RANGE;
+    public static final ModConfigSpec.DoubleValue BLOCK_LIFT_MAX_HARDNESS;
+    public static final ModConfigSpec.IntValue HEX_DEFAULT_RADIUS;
+    public static final ModConfigSpec.IntValue HEX_MIN_RADIUS;
+    public static final ModConfigSpec.IntValue HEX_MAX_RADIUS;
+    public static final ModConfigSpec.DoubleValue HEX_DEATH_CHANCE;
+
+    // ---- Photon ----
+    public static final ModConfigSpec.DoubleValue PHOTON_FLIGHT_SPEED;
+    public static final ModConfigSpec.DoubleValue PHOTON_BLAST_DAMAGE;
+    public static final ModConfigSpec.DoubleValue PHOTON_ABSORB_FRACTION;
+    public static final ModConfigSpec.IntValue PHASE_DURATION;
+    public static final ModConfigSpec.IntValue PHASE_COOLDOWN;
+
+    static {
+        BUILDER.push("magneto");
+        MAGNETO_FLIGHT_SPEED = BUILDER.comment("Magneto's flying speed (Creative flight is 0.05).")
+                .defineInRange("flightSpeed", 0.075, 0.01, 0.5);
+        TELEKINESIS_RANGE = BUILDER.comment("How far away (blocks) Magneto and Wanda can grab a target with telekinesis.")
+                .defineInRange("telekinesisRange", 32, 4, 128);
+        THROW_SPEED = BUILDER.comment("Launch speed (blocks per tick) of a telekinetic throw.")
+                .defineInRange("throwSpeed", 2.6, 0.5, 6.0);
+        SHRAPNEL_DAMAGE = BUILDER.comment("Damage of one iron shrapnel shard.")
+                .defineInRange("shrapnelDamage", 4.0, 0.0, 100.0);
+        SHRAPNEL_PIERCE = BUILDER.comment("How many creatures a single shard can pierce through.")
+                .defineInRange("shrapnelPierce", 3, 1, 16);
+        SHRAPNEL_FIRE_INTERVAL = BUILDER.comment("Ticks between shards while the Shrapnel Storm is held (2 = 10 shards/second).")
+                .defineInRange("shrapnelFireInterval", 2, 1, 20);
+        DISARM_RANGE = BUILDER.comment("Range of Armor & Weapon Strip.")
+                .defineInRange("disarmRange", 32, 4, 128);
+        DISARM_COOLDOWN = BUILDER.comment("Cooldown of Armor & Weapon Strip, in ticks.")
+                .defineInRange("disarmCooldown", 60, 0, 6000);
+        SHIELD_REFLECT_CHANCE = BUILDER.comment("Chance that a metal projectile caught by the Magnetic Shield flies back at the shooter (otherwise it drops).")
+                .defineInRange("shieldReflectChance", 0.5, 0.0, 1.0);
+        BUILDER.pop();
+
+        BUILDER.push("scarlet_witch");
+        WANDA_FLIGHT_SPEED = BUILDER.comment("Wanda's flying speed (Creative flight is 0.05).")
+                .defineInRange("flightSpeed", 0.09, 0.01, 0.5);
+        CHAOS_BEAM_DAMAGE = BUILDER.comment("Damage per Chaos Beam hit (5 = 2.5 hearts). Minecraft's damage cooldown allows two hits per second.")
+                .defineInRange("chaosBeamDamage", 5.0, 0.0, 100.0);
+        CHAOS_BEAM_RANGE = BUILDER.comment("Chaos Beam range in blocks.")
+                .defineInRange("chaosBeamRange", 32, 4, 128);
+        CHAOS_BEAM_NAUSEA_TICKS = BUILDER.comment("Duration of the Nausea the Chaos Beam inflicts, in ticks.")
+                .defineInRange("chaosBeamNauseaTicks", 100, 0, 6000);
+        CHAOS_SHIELD_EXHAUSTION = BUILDER.comment("Food exhaustion per tick while the Chaos Shield is held (4.0 exhaustion = 1 food point).")
+                .defineInRange("chaosShieldExhaustion", 0.1, 0.0, 4.0);
+        CHAOS_SHIELD_EXPLOSION_FACTOR = BUILDER.comment("Fraction of explosion damage that still gets through the Chaos Shield.")
+                .defineInRange("chaosShieldExplosionFactor", 0.25, 0.0, 1.0);
+        BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Wanda can tear a block out of the ground.")
+                .defineInRange("blockLiftRange", 24, 2, 128);
+        BLOCK_LIFT_MAX_HARDNESS = BUILDER.comment("Hardest block Wanda can lift (stone = 1.5, iron block = 5, obsidian = 50).")
+                .defineInRange("blockLiftMaxHardness", 5.0, 0.0, 100.0);
+        HEX_DEFAULT_RADIUS = BUILDER.comment("Radius of a newly created Hex.")
+                .defineInRange("hexDefaultRadius", 32, 4, 256);
+        HEX_MIN_RADIUS = BUILDER.defineInRange("hexMinRadius", 8, 4, 256);
+        HEX_MAX_RADIUS = BUILDER.defineInRange("hexMaxRadius", 96, 4, 256);
+        HEX_DEATH_CHANCE = BUILDER.comment("Chance that an unauthorised creature without powers dies when crossing the Hex wall.",
+                        "Survivors who are players become Photon (the Monica Rambeau effect).")
+                .defineInRange("hexDeathChance", 0.95, 0.0, 1.0);
+        BUILDER.pop();
+
+        BUILDER.push("photon");
+        PHOTON_FLIGHT_SPEED = BUILDER.defineInRange("flightSpeed", 0.085, 0.01, 0.5);
+        PHOTON_BLAST_DAMAGE = BUILDER.defineInRange("photonBlastDamage", 6.0, 0.0, 100.0);
+        PHOTON_ABSORB_FRACTION = BUILDER.comment("Fraction of energy damage (fire, lightning, explosions, magic...) Photon absorbs.")
+                .defineInRange("absorbFraction", 0.5, 0.0, 1.0);
+        PHASE_DURATION = BUILDER.defineInRange("phaseShiftTicks", 60, 1, 1200);
+        PHASE_COOLDOWN = BUILDER.defineInRange("phaseShiftCooldown", 240, 0, 12000);
+        BUILDER.pop();
+    }
+
+    public static final ModConfigSpec SPEC = BUILDER.build();
+
+    private EnhancedConfig() {
+    }
+}

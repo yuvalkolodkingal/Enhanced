@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "entries": [
+    "enhanced:gene_from_woodland_mansion",
+    "enhanced:gene_from_stronghold_library",
+    "enhanced:gene_from_stronghold_corridor",
+    "enhanced:gene_from_stronghold_crossing",
+    "enhanced:gene_from_nether_bridge",
+    "enhanced:gene_from_bastion_treasure",
+    "enhanced:gene_from_ancient_city",
+    "enhanced:gene_from_end_city_treasure",
+    "enhanced:gene_from_jungle_temple",
+    "enhanced:gene_from_desert_pyramid",
+    "enhanced:scepter_from_end_city_treasure",
+    "enhanced:scepter_from_stronghold_library",
+    "enhanced:scepter_from_bastion_treasure",
+    "enhanced:scepter_from_ancient_city",
+    "enhanced:scepter_from_woodland_mansion",
+    "enhanced:gene_from_witch",
+    "enhanced:gene_from_evoker"
+  ]
+}
