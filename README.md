@@ -9,6 +9,8 @@ And if you're lucky enough to survive Wanda's Hex wall, **Photon**.
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).
 
+![The heroes](docs/screenshots/all-heroes.png)
+
 | Magneto | Scarlet Witch | The Hex |
 |---|---|---|
 | ![Magneto](docs/screenshots/magneto.png) | ![Scarlet Witch](docs/screenshots/scarlet-witch.png) | ![The Hex](docs/screenshots/hex.png) |
@@ -50,6 +52,8 @@ under *Options → Controls → Enhanced Powers*. The top-left corner of the scr
 shows your abilities, cooldowns and resources.
 
 ## Screenshots
+
+![The Scarlet Witch](docs/screenshots/scarlet-witch-sheet.png)
 
 | | |
 |---|---|
