@@ -7,6 +7,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -21,7 +22,8 @@ public class PcmAudioStream implements AudioStream {
 
     public static PcmAudioStream fromWav(InputStream input) throws IOException {
         try {
-            AudioInputStream source = AudioSystem.getAudioInputStream(input);
+            // The extra buffer keeps AudioSystem's own mark() away from the caller's (which is used for looping).
+            AudioInputStream source = AudioSystem.getAudioInputStream(new BufferedInputStream(input));
             AudioFormat in = source.getFormat();
             AudioFormat pcm16 = new AudioFormat(in.getSampleRate(), 16, in.getChannels(), true, false);
             return new PcmAudioStream(AudioSystem.getAudioInputStream(pcm16, source));

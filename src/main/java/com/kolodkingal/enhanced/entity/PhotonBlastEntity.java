@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.entity;
 
+import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -27,6 +28,8 @@ public class PhotonBlastEntity extends ThrowableItemProjectile {
     private static final EntityDataAccessor<Boolean> DATA_SUPERCHARGED =
             SynchedEntityData.defineId(PhotonBlastEntity.class, EntityDataSerializers.BOOLEAN);
     private static final int MAX_LIFE = 60;
+    /** Ticks lived, in its own (possibly slowed) time. */
+    private double life;
 
     private float damage = 6.0F;
 
@@ -70,7 +73,8 @@ public class PhotonBlastEntity extends ThrowableItemProjectile {
                         getX() + (random.nextDouble() - 0.5) * 0.2, getY() + 0.15 + (random.nextDouble() - 0.5) * 0.2,
                         getZ() + (random.nextDouble() - 0.5) * 0.2, 0, 0, 0);
             }
-        } else if (tickCount > MAX_LIFE) {
+        } else if ((life += SlowMotion.timeScale(this)) > MAX_LIFE) {
+            // Counted in the bolt's own time, so Quicksilver Time doesn't cut its flight short.
             discard();
         }
     }

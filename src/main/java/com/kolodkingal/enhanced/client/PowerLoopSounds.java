@@ -44,7 +44,10 @@ public final class PowerLoopSounds {
     private static final Map<Key, Loop> LOOPS = new HashMap<>();
 
     static void tick(Minecraft mc) {
-        LOOPS.values().removeIf(Loop::isStopped);
+        // The sound engine ticks every playing sound before this runs; a loop it stopped ticking was dropped (sound
+        // reload, too many sounds...) and is replaced below if the power is still in use.
+        boolean paused = mc.isPaused();
+        LOOPS.values().removeIf(loop -> loop.isStopped() || (!paused && ++loop.idleTicks > 2));
         if (mc.level == null) {
             return;
         }
@@ -72,6 +75,7 @@ public final class PowerLoopSounds {
     private static final class Loop extends AbstractTickableSoundInstance {
         private final Player player;
         private final Kind kind;
+        int idleTicks;
 
         Loop(Player player, Kind kind) {
             super(kind.sound.get(), SoundSource.PLAYERS, SoundInstance.createUnseededRandom());
@@ -100,6 +104,7 @@ public final class PowerLoopSounds {
 
         @Override
         public void tick() {
+            idleTicks = 0;
             if (player.isRemoved() || !player.isAlive()) {
                 stop();
                 return;

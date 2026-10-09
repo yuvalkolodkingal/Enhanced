@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.entity;
 
+import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -28,6 +29,8 @@ import net.minecraft.world.phys.EntityHitResult;
  */
 public class IronShrapnelEntity extends ThrowableItemProjectile {
     private static final int MAX_LIFE = 40;
+    /** Ticks lived, in its own (possibly slowed) time. */
+    private double life;
 
     private float damage = 4.0F;
     private int pierce = 3;
@@ -59,7 +62,8 @@ public class IronShrapnelEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide && tickCount > MAX_LIFE) {
+        // Counted in the shard's own time, so Quicksilver Time doesn't cut its flight short.
+        if (!level().isClientSide && (life += SlowMotion.timeScale(this)) > MAX_LIFE) {
             discard();
         }
     }

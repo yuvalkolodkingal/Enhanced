@@ -31,7 +31,9 @@ import java.util.WeakHashMap;
  *
  * <ul>
  *     <li>Creatures and most other entities only get every Nth tick (on the server; clients smooth the movement).</li>
- *     <li>Arrows and thrown projectiles keep ticking but fly at 1/N speed, so they visibly hang in the air.</li>
+ *     <li>Arrows and thrown projectiles keep ticking but fly at 1/N speed, so they visibly hang in the air. Their air drag
+ *     is spread over the slowed time, and they get their full speed back the moment they hit something, so they hit
+ *     exactly as hard as they would have.</li>
  *     <li>Other players can't be slowed tick by tick (their game moves them), so they get heavy Slowness.</li>
  * </ul>
  * Works the same on both sides so clients and server agree on what is slowed.
@@ -100,6 +102,17 @@ public final class SlowMotion {
         return entity instanceof AbstractArrow || entity instanceof ThrowableProjectile;
     }
 
+    /** A trident flying back to its owner (Loyalty) rebuilds its speed every tick, so it can't be slowed. */
+    private static boolean returning(Projectile projectile) {
+        return projectile instanceof AbstractArrow arrow && arrow.isNoPhysics();
+    }
+
+    /** How fast time runs for this entity: 1/N for a slowed projectile, otherwise 1. */
+    public static double timeScale(Entity entity) {
+        CompoundTag data = entity.getPersistentData();
+        return data.contains(SLOWED_TAG) ? 1.0 / Math.max(1, data.getCompound(SLOWED_TAG).getInt("Factor")) : 1.0;
+    }
+
     /**
      * Called from {@code EntityTickEvent.Pre} on both sides.
      *
@@ -124,7 +137,8 @@ public final class SlowMotion {
         for (Vec3 center : zones) {
             AABB box = new AABB(center, center).inflate(radius);
             for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box,
-                    p -> slowedBySpeed(p) && !p.getPersistentData().contains(SLOWED_TAG) && p.position().distanceToSqr(center) < radius * radius)) {
+                    p -> slowedBySpeed(p) && !returning(p) && !p.getPersistentData().contains(SLOWED_TAG)
+                            && p.position().distanceToSqr(center) < radius * radius)) {
                 slow(projectile, factor);
             }
             for (Player player : level.players()) {
@@ -132,6 +146,10 @@ public final class SlowMotion {
                 boolean speedster = data.power() == Power.QUICKSILVER && data.slowMo();
                 if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius) {
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 3, true, false, false));
+                    // Whatever he rides isn't tick-skipped (he steers it), so it is slowed the same way.
+                    if (player.getVehicle() instanceof LivingEntity mount) {
+                        mount.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 3, true, false, false));
+                    }
                 }
             }
         }
@@ -139,8 +157,20 @@ public final class SlowMotion {
         if (!SLOWED.isEmpty()) {
             List<Projectile> leaving = new ArrayList<>();
             for (Projectile projectile : SLOWED) {
-                if (projectile.level() == level && (projectile.isRemoved() || !isInZone(level, projectile.position()))) {
+                if (projectile.level() != level) {
+                    continue;
+                }
+                if (projectile.isRemoved() || !isInZone(level, projectile.position())) {
                     leaving.add(projectile);
+                } else if (returning(projectile)) {
+                    // Loyalty kicked in: let it fly home at its own pace.
+                    SLOWED.remove(projectile);
+                    release(projectile, false);
+                } else if (!projectile.isInWater() && !(projectile instanceof AbstractArrow arrow && arrow.inGround)) {
+                    // Vanilla drag (x0.99) runs every tick; a slowed projectile takes N ticks per normal tick, so give
+                    // back the extra drag to keep its speed, and its hit, the same as without the slow motion.
+                    int n = Math.max(1, projectile.getPersistentData().getCompound(SLOWED_TAG).getInt("Factor"));
+                    projectile.setDeltaMovement(projectile.getDeltaMovement().scale(Math.pow(0.99, 1.0 / n - 1.0)));
                 }
             }
             for (Projectile projectile : leaving) {
@@ -156,11 +186,6 @@ public final class SlowMotion {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("NoGravity", projectile.isNoGravity());
         tag.putInt("Factor", factor);
-        if (projectile instanceof AbstractArrow arrow) {
-            // Arrow damage scales with speed; keep the hit as strong as it would have been.
-            tag.putDouble("BaseDamage", arrow.getBaseDamage());
-            arrow.setBaseDamage(arrow.getBaseDamage() * factor);
-        }
         projectile.getPersistentData().put(SLOWED_TAG, tag);
         projectile.setNoGravity(true);
         projectile.setDeltaMovement(projectile.getDeltaMovement().scale(1.0 / factor));
@@ -170,14 +195,29 @@ public final class SlowMotion {
 
     /** Puts a slowed projectile back to full speed. Also used when a slowed projectile is loaded from disk. */
     public static void restore(Projectile projectile) {
+        release(projectile, true);
+    }
+
+    /**
+     * Server: takes a projectile out of the slow motion right away, at full speed. Called when it hits something (so
+     * the hit is as strong as without the slow motion) and before something else takes over its flight (Magneto's
+     * shield). If it is still in a zone afterwards, the next level tick slows it again.
+     */
+    public static void unslow(Projectile projectile) {
+        if (projectile.getPersistentData().contains(SLOWED_TAG)) {
+            SLOWED.remove(projectile);
+            release(projectile, true);
+        }
+    }
+
+    private static void release(Projectile projectile, boolean speedUp) {
         CompoundTag tag = projectile.getPersistentData().getCompound(SLOWED_TAG);
         projectile.getPersistentData().remove(SLOWED_TAG);
         int factor = Math.max(1, tag.getInt("Factor"));
         projectile.setNoGravity(tag.getBoolean("NoGravity"));
-        if (projectile instanceof AbstractArrow arrow && tag.contains("BaseDamage")) {
-            arrow.setBaseDamage(tag.getDouble("BaseDamage"));
+        if (speedUp) {
+            projectile.setDeltaMovement(projectile.getDeltaMovement().scale(factor));
         }
-        projectile.setDeltaMovement(projectile.getDeltaMovement().scale(factor));
         projectile.hasImpulse = true;
     }
 

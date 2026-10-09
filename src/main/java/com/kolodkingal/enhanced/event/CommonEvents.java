@@ -26,6 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -193,6 +194,14 @@ public final class CommonEvents {
     private static boolean isWandasAttack(DamageSource source) {
         return source.is(ModDamageTypes.CHAOS_BEAM)
                 || (source.is(ModDamageTypes.TELEKINETIC_SLAM) && source.getEntity() instanceof Player thrower && Powers.is(thrower, Power.SCARLET_WITCH));
+    }
+
+    /** A slowed projectile gets its full speed back the moment it hits someone, so it hits as hard as it would have. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onSlowedProjectileImpact(ProjectileImpactEvent event) {
+        if (!event.getProjectile().level().isClientSide && event.getRayTraceResult() instanceof EntityHitResult) {
+            SlowMotion.unslow(event.getProjectile());
+        }
     }
 
     @SubscribeEvent

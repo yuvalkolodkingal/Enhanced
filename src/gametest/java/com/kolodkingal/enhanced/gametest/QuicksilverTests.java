@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -158,8 +159,14 @@ public final class QuicksilverTests {
                 if (tick == 3) {
                     assertNear(arrow.getDeltaMovement().z, 1.0 / factor, 0.05, "the arrow crawls at 1/" + factor + " speed");
                     check(arrow.isNoGravity(), "a slowed arrow doesn't drop out of the air");
-                    assertNear(arrow.getBaseDamage(), baseDamage * factor, 1.0E-6, "it still hits as hard as before");
+                    assertNear(arrow.getBaseDamage(), baseDamage, 1.0E-6, "its damage is untouched");
                 }
+                return false;
+            }
+            if (tick == 4) {
+                // Hitting something gives it its full speed back first, so it hits as hard as it would have.
+                SlowMotion.unslow(arrow);
+                check(arrow.getDeltaMovement().z > 0.7, "a slowed arrow hits at full speed (" + arrow.getDeltaMovement().z + ")");
                 return false;
             }
             run(peter, false);

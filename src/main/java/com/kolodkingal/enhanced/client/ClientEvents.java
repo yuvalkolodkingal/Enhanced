@@ -29,6 +29,7 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.RenderPlayerEvent;
+import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -53,6 +54,14 @@ public final class ClientEvents {
         QuicksilverMusic.tick(mc);
         PowerLoopSounds.tick(mc);
         SlowMotionEffect.tick(mc);
+    }
+
+    /** The game's own music (boss music included) waits while Quicksilver's theme plays. */
+    @SubscribeEvent
+    public static void onSelectMusic(SelectMusicEvent event) {
+        if (QuicksilverMusic.isPlaying()) {
+            event.setMusic(null);
+        }
     }
 
     @SubscribeEvent
@@ -97,6 +106,8 @@ public final class ClientEvents {
         if (player.horizontalCollision && player.zza > 0) {
             player.setDeltaMovement(motion.x, Math.max(motion.y, 0.42), motion.z);
             player.resetFallDistance();
+            // Running into the wall would otherwise cancel the sprint (and with it Quicksilver Time) later this tick.
+            player.minorHorizontalCollision = true;
             return;
         }
         BlockPos below = BlockPos.containing(player.getX(), player.getY() - 0.05, player.getZ());

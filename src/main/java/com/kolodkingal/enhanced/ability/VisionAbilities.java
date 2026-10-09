@@ -15,10 +15,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -95,7 +97,7 @@ public final class VisionAbilities {
                 beamTick(player);
             }
         }
-        if (data.dense() && player.tickCount % 5 == 0) {
+        if (data.dense() && !player.isSpectator() && player.tickCount % 5 == 0) {
             player.serverLevel().sendParticles(ParticleTypes.CRIT, player.getX(), player.getY() + 0.1, player.getZ(), 1, 0.3, 0, 0.3, 0);
         }
     }
@@ -191,7 +193,16 @@ public final class VisionAbilities {
             player.onUpdateAbilities();
         }
         player.resetFallDistance();
-        if (player.tickCount % 4 == 0) {
+        // Lava and fire pass through him like everything else.
+        player.clearFire();
+        // Walls can't hold him, but the world border does.
+        WorldBorder border = player.level().getWorldBorder();
+        if (!border.isWithinBounds(player.getBoundingBox())) {
+            double half = player.getBbWidth() / 2 + 1.0E-3;
+            player.teleportTo(Mth.clamp(player.getX(), border.getMinX() + half, border.getMaxX() - half), player.getY(),
+                    Mth.clamp(player.getZ(), border.getMinZ() + half, border.getMaxZ() - half));
+        }
+        if (!player.isSpectator() && player.tickCount % 4 == 0) {
             player.serverLevel().sendParticles(new EnergyParticleOptions(Power.VISION.glow, 0.9F), player.getX(), player.getY() + 1.0, player.getZ(),
                     1, 0.3, 0.7, 0.3, 0.0);
         }

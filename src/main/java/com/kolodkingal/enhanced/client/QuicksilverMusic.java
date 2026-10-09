@@ -37,7 +37,6 @@ public final class QuicksilverMusic {
         if (shouldPlay) {
             if (playing == null || !mc.getSoundManager().isActive(playing)) {
                 playing = new Theme();
-                mc.getMusicManager().stopPlaying();
                 mc.getSoundManager().play(playing);
             }
             playing.fadeIn();
@@ -47,6 +46,11 @@ public final class QuicksilverMusic {
                 playing = null;
             }
         }
+    }
+
+    /** While the theme plays, the game's own music (boss music included) stays quiet: see ClientEvents.onSelectMusic. */
+    static boolean isPlaying() {
+        return playing != null;
     }
 
     private static boolean speedsterNearby(LocalPlayer listener) {

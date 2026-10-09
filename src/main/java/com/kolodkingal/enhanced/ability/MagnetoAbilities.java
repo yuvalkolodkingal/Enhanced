@@ -272,6 +272,8 @@ public final class MagnetoAbilities {
 
     /** The field catches a metal projectile: 50/50 it drops dead or flies back at whoever shot it. */
     public static void repel(ServerPlayer magneto, Projectile projectile) {
+        // Back to full speed first: the shield takes over its flight from here.
+        SlowMotion.unslow(projectile);
         ServerLevel level = magneto.serverLevel();
         Entity shooter = projectile.getOwner();
         boolean canReturn = shooter instanceof LivingEntity living && living.isAlive() && shooter.level() == level
