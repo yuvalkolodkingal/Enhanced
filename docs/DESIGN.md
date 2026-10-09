@@ -6,11 +6,12 @@ one of the *Enhanced*:
 * **Magneto**, the Master of Magnetism
 * **Wanda Maximoff, the Scarlet Witch**
 * **Photon (Monica Rambeau)**, the rare survivor of Wanda's Hex
+* **Quicksilver (Peter Maximoff)**, the fastest man alive
 
-This document completes the two original concepts by Eilon Kolodkin-Gal. Everything
-the concepts said is kept. Where they left a gap (where an item comes from, what
-key does what, exact numbers), the gap is filled in here, and every addition is
-marked **(added)**.
+This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
+Scarlet Witch, and Quicksilver's slow-motion run). Everything the concepts said is kept.
+Where they left a gap (where an item comes from, what key does what, exact numbers), the
+gap is filled in here, and every addition is marked **(added)**.
 
 ---
 
@@ -18,10 +19,10 @@ marked **(added)**.
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Photon. Powers never stack. |
+| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Photon, Quicksilver. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
 | Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. |
-| Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. |
+| Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
 | Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, the same way vanilla treats them as invulnerable. |
 
@@ -51,7 +52,8 @@ marked **(added)**.
   Beam, pufferfish, etc.). Any Nausea he already has is removed the moment the
   helmet goes on.
 * **No damage immunity:** Magneto still takes the **full physical damage** from the
-  Chaos Beam and all of Wanda's other attacks. Only the Nausea is blocked.
+  Chaos Beam and all of Wanda's other attacks. Even the helmet's armor doesn't soften them.
+  Only the Nausea is blocked.
 
 ### 1.3 Abilities
 
@@ -276,22 +278,71 @@ Monica Rambeau after she crossed the Hex.
 | 1 | R | **Photon Blast** | Fire a bolt of pure light (6 damage). If you have stored energy, the bolt is supercharged (+6 damage, costs 10 energy). Cooldown 0.6 s. |
 | 2 | G (toggle) | **Photon Flight** | Survival flight at 0.085 with a trail of light. |
 | 3 | V | **Energy Absorption** | **Passive:** absorbs **50% of all energy damage** (fire, lava, lightning, explosions, magic, the Chaos Beam, other Photons) and stores it (max 100). **Press V:** release the stored energy as a shockwave that damages and knocks back everything within 6 blocks (needs at least 10 energy). |
-| 4 | B | **Phase Shift** | Become intangible for 3 seconds. You take no damage and projectiles pass through you, but you can't attack. A white energy shimmer covers your body. Cooldown 12 s. |
+| 4 | B | **Phase Shift** | Become intangible for 3 seconds. You take no damage and projectiles pass through you, but you can't attack (no melee, no Photon Blast, no Energy Release). A white energy shimmer covers your body. Cooldown 12 s. |
 | 5 | N (toggle) | **Spectrum Vision** | See in the dark and see every creature within 48 blocks through walls. Your eyes glow. |
 
 ---
 
-## 4. Operator commands **(added)**
+## 4. Quicksilver — the fastest man alive
+
+> The concept: "The X-Men movies' Quicksilver. When he runs, everything slows down, he
+> speeds up, and the world starts playing *Sweet Dreams (Are Made of This)*."
+
+### 4.1 Becoming Quicksilver **(added)**
+
+* Craft **Quicksilver's Goggles** and put them on (like Magneto's Helmet, the first time
+  you wear them you become Quicksilver for good, if you have no other power):
+
+  ```
+  S I S      S = Sugar, I = Iron Ingot
+  G D G      G = Glass Pane, D = Block of Diamond
+  ```
+* While he wears the goggles, Quicksilver's skin becomes Peter Maximoff's outfit from the
+  movies: silver hair, a shiny silver jacket over a grey T-shirt, headphones and jeans.
+* The goggles protect like an iron helmet and never break.
+
+### 4.2 Quicksilver Time (the main power)
+
+**When Quicksilver sprints, time slows down around him:**
+
+* Everything within **32 blocks** runs **5 times slower**: monsters, animals, villagers,
+  falling blocks, TNT fuses, dropped items, and **arrows and thrown things, which hang in
+  the air** and crawl forward. **(added)** An arrow that finally lands still hits as hard as it
+  would have.
+* Other players in range are slowed down heavily (a strong Slowness).
+* **Quicksilver speeds up**: he runs **4 times faster** than normal and steps up whole
+  blocks without jumping. He takes no fall damage while running.
+* **The world starts playing his song**: everyone near him hears the theme from his Walkman,
+  which fades out when he stops running.
+  * The real *Sweet Dreams (Are Made of This)* can't ship inside the mod, because the recording
+    is copyrighted. The mod comes with an original placeholder synth tune. To hear the real song,
+    put your own copy into the ready-made resource pack in
+    [`extras/quicksilver-music-pack`](../extras/quicksilver-music-pack/README.md).
+* A blue tint at the edges of the screen shows that time is slowed, and Quicksilver leaves a
+  silver-blue streak behind him.
+* Cost: it burns hunger while he runs. With an empty hunger bar, he can only run normally.
+
+### 4.3 Abilities
+
+| # | Key | Ability | How it works |
+|---|---|---|---|
+| 1 | R (toggle) | **Quicksilver Time** | On by default: sprinting starts Quicksilver Time. Turn it off to sprint normally. |
+| 2 | G | **Speed Blitz** **(added)** | Look at a creature up to 24 blocks away: Quicksilver is next to it in an instant and lands 6 rapid punches (2 damage each, ignoring the hit cooldown), then knocks it back. Cooldown 4 s. |
+| 3 | V | **Pickpocket** **(added)** | Snatch whatever the creature or player you look at (up to 24 blocks) holds in its hand, straight into your inventory. Cooldown 5 s. |
+| 4 | B (toggle) | **Wall & Water Run** **(added)** | During Quicksilver Time, run straight up walls you run into, and across water as long as you keep running. |
+| 5 | N (toggle) | **Walkman** **(added)** | Turn the theme music on or off. |
+
+## 5. Operator commands **(added)**
 
 | Command | Effect |
 |---|---|
 | `/enhanced power get [player]` | Show a player's power. |
-| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|photon>` | Give or remove a power. |
+| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|photon\|quicksilver>` | Give or remove a power. |
 | `/enhanced hex list` | List all Hexes in the current dimension. |
 | `/enhanced hex clear` | Dissolve every Hex in the current dimension. |
 
-## 5. Server configuration **(added)**
+## 6. Server configuration **(added)**
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
-shrapnel damage, shield reflect chance…) can be changed in
+shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world…) can be changed in
 `world/serverconfig/enhanced-server.toml`.

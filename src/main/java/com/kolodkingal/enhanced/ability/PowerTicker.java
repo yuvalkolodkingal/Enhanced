@@ -22,12 +22,20 @@ public final class PowerTicker {
     /** Called at the end of every server player tick. */
     public static void tick(ServerPlayer player) {
         PowerData data = Powers.get(player);
+        if (!player.isAlive()) {
+            // A dead body must not keep beaming or firing while its player sits on the death screen.
+            stopHoldAbilities(data);
+            Powers.syncIfDirty(player);
+            return;
+        }
         MagnetoAbilities.helmetTick(player, data);
+        QuicksilverAbilities.gogglesTick(player, data);
         applyPassives(player, data);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.tick(player, data);
             case SCARLET_WITCH -> WandaAbilities.tick(player, data);
             case PHOTON -> PhotonAbilities.tick(player, data);
+            case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
             case NONE -> {
             }
         }
@@ -57,6 +65,18 @@ public final class PowerTicker {
             player.onUpdateAbilities();
         }
         WandaAbilities.applyCrown(player, data);
+        if (data.power() != Power.QUICKSILVER) {
+            data.setSlowMo(false);
+            QuicksilverAbilities.applySpeed(player, data);
+        }
+    }
+
+    /** Releases every hold-to-use ability (beam, shrapnel, shield) and stops Quicksilver Time. */
+    public static void stopHoldAbilities(PowerData data) {
+        data.setBeamActive(false);
+        data.setChaosShieldActive(false);
+        data.setShrapnelActive(false);
+        data.setSlowMo(false);
     }
 
     /** The hero's flight key: take off or land, the same as double-tapping Space. */
@@ -80,15 +100,20 @@ public final class PowerTicker {
      * flight are already correct when the player's health and abilities are loaded on login.
      */
     static void setModifier(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id, double amount, boolean present) {
+        setModifier(player, attribute, id, amount, present, AttributeModifier.Operation.ADD_VALUE);
+    }
+
+    static void setModifier(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id, double amount, boolean present,
+                            AttributeModifier.Operation operation) {
         AttributeInstance instance = player.getAttribute(attribute);
         if (instance == null) {
             return;
         }
         AttributeModifier existing = instance.getModifier(id);
         if (present) {
-            if (existing == null || existing.amount() != amount) {
+            if (existing == null || existing.amount() != amount || existing.operation() != operation) {
                 instance.removeModifier(id);
-                instance.addPermanentModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
+                instance.addPermanentModifier(new AttributeModifier(id, amount, operation));
             }
         } else if (existing != null) {
             instance.removeModifier(id);

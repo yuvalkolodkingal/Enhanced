@@ -36,6 +36,10 @@ public final class PhotonAbilities {
         if (!down || player.isSpectator()) {
             return;
         }
+        if (data.isPhased() && (ability == 1 || ability == 3)) {
+            // Intangible: no attacks of any kind until the phase ends.
+            return;
+        }
         switch (ability) {
             case 1 -> blast(player, data);
             case 2 -> PowerTicker.toggleFlight(player);

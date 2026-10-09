@@ -24,12 +24,20 @@ public final class PowerData {
     private int ironCharge;
     /** Photon: absorbed energy (0-100). */
     private float energy;
+    /** Quicksilver: sprinting starts Quicksilver Time. */
+    private boolean quicksilverTime = true;
+    /** Quicksilver: run up walls and across water during Quicksilver Time. */
+    private boolean wallRun = true;
+    /** Quicksilver: his Walkman plays the theme during Quicksilver Time. */
+    private boolean walkman = true;
 
     // ---- runtime (synced, not saved) ----
     private boolean beamActive;
     private boolean chaosShieldActive;
     private boolean shrapnelActive;
     private boolean flying;
+    /** Quicksilver Time is running right now: the world around him is slowed. */
+    private boolean slowMo;
     private int phaseTicks;
     /** Entity currently held with telekinesis, or -1. */
     private int heldEntityId = -1;
@@ -43,14 +51,20 @@ public final class PowerData {
             Codec.BOOL.optionalFieldOf("magnetic_shield", false).forGetter(d -> d.magneticShield),
             Codec.BOOL.optionalFieldOf("spectrum_vision", false).forGetter(d -> d.spectrumVision),
             Codec.INT.optionalFieldOf("iron_charge", 0).forGetter(d -> d.ironCharge),
-            Codec.FLOAT.optionalFieldOf("energy", 0F).forGetter(d -> d.energy)
-    ).apply(i, (power, shield, vision, iron, energy) -> {
+            Codec.FLOAT.optionalFieldOf("energy", 0F).forGetter(d -> d.energy),
+            Codec.BOOL.optionalFieldOf("quicksilver_time", true).forGetter(d -> d.quicksilverTime),
+            Codec.BOOL.optionalFieldOf("wall_run", true).forGetter(d -> d.wallRun),
+            Codec.BOOL.optionalFieldOf("walkman", true).forGetter(d -> d.walkman)
+    ).apply(i, (power, shield, vision, iron, energy, qsTime, wallRun, walkman) -> {
         PowerData d = new PowerData();
         d.power = power;
         d.magneticShield = shield;
         d.spectrumVision = vision;
         d.ironCharge = iron;
         d.energy = energy;
+        d.quicksilverTime = qsTime;
+        d.wallRun = wallRun;
+        d.walkman = walkman;
         return d;
     }));
 
@@ -60,7 +74,8 @@ public final class PowerData {
     private void write(ByteBuf buf) {
         ByteBufCodecs.VAR_INT.encode(buf, power.ordinal());
         int flags = (magneticShield ? 1 : 0) | (spectrumVision ? 2 : 0) | (beamActive ? 4 : 0)
-                | (chaosShieldActive ? 8 : 0) | (shrapnelActive ? 16 : 0) | (flying ? 32 : 0);
+                | (chaosShieldActive ? 8 : 0) | (shrapnelActive ? 16 : 0) | (flying ? 32 : 0)
+                | (quicksilverTime ? 64 : 0) | (wallRun ? 128 : 0) | (walkman ? 256 : 0) | (slowMo ? 512 : 0);
         ByteBufCodecs.VAR_INT.encode(buf, flags);
         ByteBufCodecs.VAR_INT.encode(buf, ironCharge);
         buf.writeFloat(energy);
@@ -83,6 +98,10 @@ public final class PowerData {
         d.chaosShieldActive = (flags & 8) != 0;
         d.shrapnelActive = (flags & 16) != 0;
         d.flying = (flags & 32) != 0;
+        d.quicksilverTime = (flags & 64) != 0;
+        d.wallRun = (flags & 128) != 0;
+        d.walkman = (flags & 256) != 0;
+        d.slowMo = (flags & 512) != 0;
         d.ironCharge = ByteBufCodecs.VAR_INT.decode(buf);
         d.energy = buf.readFloat();
         d.phaseTicks = ByteBufCodecs.VAR_INT.decode(buf);
@@ -106,6 +125,10 @@ public final class PowerData {
         this.spectrumVision = false;
         this.ironCharge = 0;
         this.energy = 0;
+        this.quicksilverTime = true;
+        this.wallRun = true;
+        this.walkman = true;
+        this.slowMo = false;
         this.beamActive = false;
         this.chaosShieldActive = false;
         this.shrapnelActive = false;
@@ -161,6 +184,50 @@ public final class PowerData {
     }
 
     public static final float MAX_ENERGY = 100F;
+
+    public boolean quicksilverTime() {
+        return quicksilverTime;
+    }
+
+    public void setQuicksilverTime(boolean v) {
+        if (quicksilverTime != v) {
+            quicksilverTime = v;
+            dirty = true;
+        }
+    }
+
+    public boolean wallRun() {
+        return wallRun;
+    }
+
+    public void setWallRun(boolean v) {
+        if (wallRun != v) {
+            wallRun = v;
+            dirty = true;
+        }
+    }
+
+    public boolean walkman() {
+        return walkman;
+    }
+
+    public void setWalkman(boolean v) {
+        if (walkman != v) {
+            walkman = v;
+            dirty = true;
+        }
+    }
+
+    public boolean slowMo() {
+        return slowMo;
+    }
+
+    public void setSlowMo(boolean v) {
+        if (slowMo != v) {
+            slowMo = v;
+            dirty = true;
+        }
+    }
 
     public boolean beamActive() {
         return beamActive;

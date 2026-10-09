@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.registry.ModCreativeTab;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModParticles;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -29,6 +30,7 @@ public class Enhanced {
         ModEntities.ENTITIES.register(modBus);
         ModAttachments.ATTACHMENTS.register(modBus);
         ModParticles.PARTICLES.register(modBus);
+        ModSounds.SOUNDS.register(modBus);
         ModCreativeTab.TABS.register(modBus);
         modBus.addListener(ModNetwork::register);
         container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC);

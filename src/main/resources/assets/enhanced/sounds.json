@@ -1,0 +1,11 @@
+{
+  "quicksilver_theme": {
+    "subtitle": "subtitles.enhanced.quicksilver_theme",
+    "sounds": [
+      {
+        "name": "enhanced:quicksilver/theme",
+        "stream": true
+      }
+    ]
+  }
+}

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
+import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -10,7 +11,7 @@ import net.minecraft.client.resources.PlayerSkin;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The hero suits. While Magneto wears his helmet, or the Scarlet Witch her crown, their whole skin (and cape) is
+ * The hero suits. While Magneto wears his helmet, the Scarlet Witch her crown or Quicksilver his goggles, their whole skin (and cape) is
  * replaced by the suit. Hooked into {@link AbstractClientPlayer#getSkin()} by a mixin, so it applies everywhere the
  * skin is drawn: the body, first-person arms and the cape.
  */
@@ -25,6 +26,9 @@ public final class SuitSkins {
             Enhanced.id("textures/entity/suit/scarlet_witch_cape.png"), null,
             PlayerSkin.Model.SLIM, true);
 
+    private static final PlayerSkin QUICKSILVER = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/quicksilver.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+
     /** The suit the player is currently transformed into, or null to keep their own skin. */
     @Nullable
     public static PlayerSkin suitFor(AbstractClientPlayer player) {
@@ -34,6 +38,9 @@ public final class SuitSkins {
         }
         if (power == Power.SCARLET_WITCH && WandaAbilities.wearsCrown(player)) {
             return SCARLET_WITCH;
+        }
+        if (power == Power.QUICKSILVER && QuicksilverAbilities.wearsGoggles(player)) {
+            return QUICKSILVER;
         }
         return null;
     }

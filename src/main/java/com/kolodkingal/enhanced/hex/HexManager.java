@@ -50,6 +50,10 @@ public final class HexManager {
 
     /** Hex id → entity UUID → was inside last tick. In memory only. */
     private static final Map<UUID, Map<UUID, Boolean>> SIDES = new HashMap<>();
+    /** Where an entity was before a random teleport (Chorus Fruit, Enderman); judged once it has landed. */
+    private static final Map<UUID, Vec3> TELEPORTED_FROM = new HashMap<>();
+    /** Most players Wanda can allow into one Hex. */
+    public static final int MAX_ALLOWED = 256;
 
     // ------------------------------------------------------------------------------------------------------------
     // Data access
@@ -120,9 +124,13 @@ public final class HexManager {
         Hex hex = found.get();
         switch (action) {
             case SET_PLAYER -> target.ifPresent(uuid -> {
-                if (!uuid.equals(wanda.getUUID())) {
-                    save(level, data(level).update(hex.id(), h -> h.withAllowed(uuid, value != 0)));
+                boolean allow = value != 0;
+                // Only real, online players can be let in, and the list can't grow without bound.
+                if (uuid.equals(wanda.getUUID()) || (allow && (wanda.server.getPlayerList().getPlayer(uuid) == null
+                        || hex.allowed().size() >= MAX_ALLOWED))) {
+                    return;
                 }
+                save(level, data(level).update(hex.id(), h -> h.withAllowed(uuid, allow)));
             });
             case SET_CREATURES -> save(level, data(level).update(hex.id(), h -> h.withAllowCreatures(value != 0)));
             case SET_RADIUS -> {
@@ -181,6 +189,13 @@ public final class HexManager {
                 seen.add(id);
                 boolean inside = hex.contains(bodyCenter(entity));
                 Boolean before = sides.get(id);
+                if (before == null) {
+                    // First time we see it near this Hex: if it just teleported here, judge where it came from.
+                    Vec3 from = TELEPORTED_FROM.get(id);
+                    if (from != null) {
+                        before = hex.contains(from);
+                    }
+                }
                 if (before == null || before == inside) {
                     sides.put(id, inside);
                     continue;
@@ -201,10 +216,30 @@ public final class HexManager {
             }
             sides.keySet().retainAll(seen);
         }
+        TELEPORTED_FROM.clear();
     }
 
     /**
-     * A teleport (Ender Pearl, Chorus Fruit, Enderman) that would cross a Hex wall.
+     * A random teleport (Chorus Fruit, Enderman) is about to happen. Its final landing spot isn't known yet, so
+     * remember where it started; the next wall check compares the two sides.
+     */
+    public static void rememberTeleportStart(LivingEntity entity) {
+        TELEPORTED_FROM.put(entity.getUUID(), bodyCenter(entity));
+        for (Map<UUID, Boolean> sides : SIDES.values()) {
+            sides.remove(entity.getUUID());
+        }
+    }
+
+    /** Forget which side of every wall a player was on (respawn, login, dimension change). */
+    public static void forget(UUID entity) {
+        for (Map<UUID, Boolean> sides : SIDES.values()) {
+            sides.remove(entity);
+        }
+        TELEPORTED_FROM.remove(entity);
+    }
+
+    /**
+     * An Ender Pearl teleport (exact target known in advance) that would cross a Hex wall.
      *
      * @return false if the teleport must be cancelled
      */
@@ -283,6 +318,8 @@ public final class HexManager {
         Vec3 back = new Vec3(entity.xo, entity.yo, entity.zo);
         Vec3 radial = bodyCenter(entity).subtract(hex.center());
         Vec3 push = radial.lengthSqr() < 1.0E-6 ? Vec3.ZERO : radial.normalize().scale(wasInside ? -0.6 : 0.6);
+        // Get off the boat/minecart first, or the vehicle would carry the rider straight back across.
+        entity.stopRiding();
         if (entity instanceof ServerPlayer player) {
             player.connection.teleport(back.x, back.y, back.z, player.getYRot(), player.getXRot());
             player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);
@@ -307,6 +344,7 @@ public final class HexManager {
 
     public static void clearMemory() {
         SIDES.clear();
+        TELEPORTED_FROM.clear();
     }
 
     private HexManager() {

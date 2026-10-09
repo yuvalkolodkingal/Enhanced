@@ -399,7 +399,8 @@ public final class Telekinesis {
         level.sendParticles(ParticleTypes.EXPLOSION, e.getX(), e.getY() + e.getBbHeight() * 0.5, e.getZ(), 1, 0, 0, 0, 0);
         if (f.heavy) {
             level.playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, 1.0F, 0.6F);
-        } else {
+        } else if (e instanceof LivingEntity || e instanceof VehicleEntity) {
+            // Only bodies and vehicles are hurt by the impact; a thrown item stack must not be destroyed.
             level.playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.GENERIC_BIG_FALL, SoundSource.NEUTRAL, 1.0F, 0.8F);
             float damage = (float) Mth.clamp((impactSpeed - 0.6) * 8.0, 2.0, 16.0);
             e.hurt(ModDamageTypes.source(level, ModDamageTypes.TELEKINETIC_SLAM, thrower, thrower), damage);

@@ -52,6 +52,20 @@ public final class ModArmorMaterials {
             0.0F,
             0.0F));
 
+    /** Quicksilver's goggles: light protection, like an iron helmet. */
+    public static final Holder<ArmorMaterial> QUICKSILVER = ARMOR_MATERIALS.register("quicksilver", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                for (ArmorItem.Type type : ArmorItem.Type.values()) {
+                    map.put(type, 2);
+                }
+            }),
+            15,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            () -> Ingredient.of(Items.IRON_INGOT),
+            List.of(new ArmorMaterial.Layer(Enhanced.id("quicksilver_goggles"))),
+            0.0F,
+            0.0F));
+
     private ModArmorMaterials() {
     }
 }

@@ -1,0 +1,198 @@
+package com.kolodkingal.enhanced.ability;
+
+import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Powers;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.entity.PartEntity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
+/**
+ * Quicksilver Time: while Quicksilver sprints, everything near him runs several times slower.
+ *
+ * <ul>
+ *     <li>Creatures and most other entities only get every Nth tick (on the server; clients smooth the movement).</li>
+ *     <li>Arrows and thrown projectiles keep ticking but fly at 1/N speed, so they visibly hang in the air.</li>
+ *     <li>Other players can't be slowed tick by tick (their game moves them), so they get heavy Slowness.</li>
+ * </ul>
+ * Works the same on both sides so clients and server agree on what is slowed.
+ */
+public final class SlowMotion {
+    private static final String SLOWED_TAG = "enhanced:slowed";
+
+    private record Zones(long gameTime, List<Vec3> centers) {
+    }
+
+    private static final Map<Level, Zones> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
+    /** Projectiles currently flying at reduced speed (server only). */
+    private static final Set<Projectile> SLOWED = Collections.newSetFromMap(new WeakHashMap<>());
+
+    public static int factor() {
+        return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.SLOW_MOTION_FACTOR.get() : 5;
+    }
+
+    public static double radius() {
+        return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.SLOW_MOTION_RADIUS.get() : 32;
+    }
+
+    /** Positions of every Quicksilver in this level whose Quicksilver Time is running (cached per tick). */
+    public static List<Vec3> zones(Level level) {
+        long time = level.getGameTime();
+        Zones cached = CACHE.get(level);
+        if (cached != null && cached.gameTime == time) {
+            return cached.centers;
+        }
+        List<Vec3> centers = new ArrayList<>(1);
+        for (Player player : level.players()) {
+            PowerData data = Powers.get(player);
+            if (data.power() == Power.QUICKSILVER && data.slowMo() && player.isAlive()) {
+                centers.add(player.position());
+            }
+        }
+        CACHE.put(level, new Zones(time, centers));
+        return centers;
+    }
+
+    public static boolean isInZone(Level level, Vec3 pos) {
+        List<Vec3> zones = zones(level);
+        if (zones.isEmpty()) {
+            return false;
+        }
+        double r2 = radius() * radius();
+        for (Vec3 center : zones) {
+            if (center.distanceToSqr(pos) < r2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Whether this entity is slowed by Quicksilver Time at all (players and things they ride are never tick-skipped). */
+    private static boolean affected(Entity entity) {
+        if (entity instanceof Player || entity instanceof PartEntity<?> || entity.getControllingPassenger() instanceof Player
+                || entity.hasPassenger(e -> e instanceof Player)) {
+            return false;
+        }
+        return isInZone(entity.level(), entity.position());
+    }
+
+    /** Arrows and thrown things are slowed by scaling their speed instead of skipping ticks, so they glide smoothly. */
+    private static boolean slowedBySpeed(Entity entity) {
+        return entity instanceof AbstractArrow || entity instanceof ThrowableProjectile;
+    }
+
+    /**
+     * Called from {@code EntityTickEvent.Pre} on both sides.
+     *
+     * @return true if this tick must be skipped
+     */
+    public static boolean skipTick(Entity entity) {
+        if (slowedBySpeed(entity) || !affected(entity)) {
+            return false;
+        }
+        // Clients let creatures tick so their movement between server updates stays smooth.
+        if (entity.level().isClientSide && entity instanceof LivingEntity) {
+            return false;
+        }
+        return Math.floorMod(entity.tickCount + entity.getId(), factor()) != 0;
+    }
+
+    /** Server, once per level tick: slow down projectiles entering the zones, restore the ones that left, slow players. */
+    public static void serverTick(ServerLevel level) {
+        List<Vec3> zones = zones(level);
+        double radius = radius();
+        int factor = factor();
+        for (Vec3 center : zones) {
+            AABB box = new AABB(center, center).inflate(radius);
+            for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box,
+                    p -> slowedBySpeed(p) && !p.getPersistentData().contains(SLOWED_TAG) && p.position().distanceToSqr(center) < radius * radius)) {
+                slow(projectile, factor);
+            }
+            for (Player player : level.players()) {
+                PowerData data = Powers.get(player);
+                boolean speedster = data.power() == Power.QUICKSILVER && data.slowMo();
+                if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius) {
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 3, true, false, false));
+                }
+            }
+        }
+        // Restore projectiles that left every zone (or whose Quicksilver stopped running).
+        if (!SLOWED.isEmpty()) {
+            List<Projectile> leaving = new ArrayList<>();
+            for (Projectile projectile : SLOWED) {
+                if (projectile.level() == level && (projectile.isRemoved() || !isInZone(level, projectile.position()))) {
+                    leaving.add(projectile);
+                }
+            }
+            for (Projectile projectile : leaving) {
+                SLOWED.remove(projectile);
+                if (!projectile.isRemoved()) {
+                    restore(projectile);
+                }
+            }
+        }
+    }
+
+    private static void slow(Projectile projectile, int factor) {
+        CompoundTag tag = new CompoundTag();
+        tag.putBoolean("NoGravity", projectile.isNoGravity());
+        tag.putInt("Factor", factor);
+        if (projectile instanceof AbstractArrow arrow) {
+            // Arrow damage scales with speed; keep the hit as strong as it would have been.
+            tag.putDouble("BaseDamage", arrow.getBaseDamage());
+            arrow.setBaseDamage(arrow.getBaseDamage() * factor);
+        }
+        projectile.getPersistentData().put(SLOWED_TAG, tag);
+        projectile.setNoGravity(true);
+        projectile.setDeltaMovement(projectile.getDeltaMovement().scale(1.0 / factor));
+        projectile.hasImpulse = true;
+        SLOWED.add(projectile);
+    }
+
+    /** Puts a slowed projectile back to full speed. Also used when a slowed projectile is loaded from disk. */
+    public static void restore(Projectile projectile) {
+        CompoundTag tag = projectile.getPersistentData().getCompound(SLOWED_TAG);
+        projectile.getPersistentData().remove(SLOWED_TAG);
+        int factor = Math.max(1, tag.getInt("Factor"));
+        projectile.setNoGravity(tag.getBoolean("NoGravity"));
+        if (projectile instanceof AbstractArrow arrow && tag.contains("BaseDamage")) {
+            arrow.setBaseDamage(tag.getDouble("BaseDamage"));
+        }
+        projectile.setDeltaMovement(projectile.getDeltaMovement().scale(factor));
+        projectile.hasImpulse = true;
+    }
+
+    /** A projectile saved to disk while slowed comes back at full speed (it is slowed again if still in a zone). */
+    public static void onJoin(Entity entity) {
+        if (entity instanceof Projectile projectile && !SLOWED.contains(projectile) && projectile.getPersistentData().contains(SLOWED_TAG)) {
+            restore(projectile);
+        }
+    }
+
+    public static void clear() {
+        SLOWED.clear();
+        CACHE.clear();
+    }
+
+    private SlowMotion() {
+    }
+}

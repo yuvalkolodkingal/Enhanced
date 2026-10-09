@@ -40,6 +40,12 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue PHASE_DURATION;
     public static final ModConfigSpec.IntValue PHASE_COOLDOWN;
 
+    // ---- Quicksilver ----
+    public static final ModConfigSpec.IntValue SLOW_MOTION_FACTOR;
+    public static final ModConfigSpec.IntValue SLOW_MOTION_RADIUS;
+    public static final ModConfigSpec.DoubleValue QUICKSILVER_SPEED_BONUS;
+    public static final ModConfigSpec.DoubleValue QUICKSILVER_EXHAUSTION;
+
     static {
         BUILDER.push("magneto");
         MAGNETO_FLIGHT_SPEED = BUILDER.comment("Magneto's flying speed (Creative flight is 0.05).")
@@ -95,6 +101,17 @@ public final class EnhancedConfig {
                 .defineInRange("absorbFraction", 0.5, 0.0, 1.0);
         PHASE_DURATION = BUILDER.defineInRange("phaseShiftTicks", 60, 1, 1200);
         PHASE_COOLDOWN = BUILDER.defineInRange("phaseShiftCooldown", 240, 0, 12000);
+        BUILDER.pop();
+
+        BUILDER.push("quicksilver");
+        SLOW_MOTION_FACTOR = BUILDER.comment("During Quicksilver Time the world around him runs this many times slower.")
+                .defineInRange("slowMotionFactor", 5, 2, 20);
+        SLOW_MOTION_RADIUS = BUILDER.comment("How far (blocks) from Quicksilver time slows down.")
+                .defineInRange("slowMotionRadius", 32, 4, 128);
+        QUICKSILVER_SPEED_BONUS = BUILDER.comment("Extra movement speed during Quicksilver Time (3.0 = four times as fast).")
+                .defineInRange("speedBonus", 3.0, 0.0, 10.0);
+        QUICKSILVER_EXHAUSTION = BUILDER.comment("Food exhaustion per tick during Quicksilver Time (4.0 = 1 food point).")
+                .defineInRange("exhaustion", 0.03, 0.0, 4.0);
         BUILDER.pop();
     }
 

@@ -21,7 +21,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.EntityHitResult;
@@ -278,7 +280,13 @@ public final class MagnetoAbilities {
             Vec3 dir = target.subtract(projectile.position()).normalize();
             double speed = Math.max(projectile.getDeltaMovement().length(), 1.6);
             projectile.setDeltaMovement(dir.scale(speed));
-            projectile.setOwner(magneto);
+            if (projectile instanceof AbstractArrow arrow && !(projectile instanceof ThrownTrident)) {
+                // Magneto gets the credit, but nobody gains the right to pick up an arrow they couldn't before.
+                AbstractArrow.Pickup pickup = arrow.pickup;
+                arrow.setOwner(magneto);
+                arrow.pickup = pickup;
+            }
+            // Tridents keep their owner, so Loyalty and pickup still belong to whoever threw them.
             level.playSound(null, projectile.getX(), projectile.getY(), projectile.getZ(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.8F, 1.6F);
         } else {
             RandomSource random = magneto.getRandom();

@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.registry;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
 import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
+import com.kolodkingal.enhanced.item.QuicksilverGogglesItem;
 import com.kolodkingal.enhanced.item.ScarletWitchGeneItem;
 import com.kolodkingal.enhanced.item.WandaCrownItem;
 import net.minecraft.world.item.ArmorItem;
@@ -22,6 +23,10 @@ public final class ModItems {
     public static final DeferredItem<WandaCrownItem> WANDA_CROWN = ITEMS.register("wanda_crown",
             () -> new WandaCrownItem(ModArmorMaterials.WANDA_CROWN, ArmorItem.Type.HELMET,
                     new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    public static final DeferredItem<QuicksilverGogglesItem> QUICKSILVER_GOGGLES = ITEMS.register("quicksilver_goggles",
+            () -> new QuicksilverGogglesItem(ModArmorMaterials.QUICKSILVER, ArmorItem.Type.HELMET,
+                    new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
 
     public static final DeferredItem<ScarletWitchGeneItem> SCARLET_WITCH_GENE = ITEMS.register("scarlet_witch_gene",
             () -> new ScarletWitchGeneItem(new Item.Properties().stacksTo(16).rarity(Rarity.EPIC)));

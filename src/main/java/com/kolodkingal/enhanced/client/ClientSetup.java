@@ -72,6 +72,7 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void onRegisterGui(RegisterGuiLayersEvent event) {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("powers"), new PowerHud());
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("slow_motion"), new SlowMotionOverlay());
     }
 
     private ClientSetup() {

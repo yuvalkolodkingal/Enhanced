@@ -18,6 +18,7 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> MIND_STONE = key("mind_stone");
     public static final ResourceKey<DamageType> PHOTON_BLAST = key("photon_blast");
     public static final ResourceKey<DamageType> ENERGY_BURST = key("energy_burst");
+    public static final ResourceKey<DamageType> SPEED_BLITZ = key("speed_blitz");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

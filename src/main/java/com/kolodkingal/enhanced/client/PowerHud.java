@@ -100,6 +100,12 @@ public class PowerHud implements LayeredDraw.Layer {
                 case 5 -> onOff(data.spectrumVision());
                 default -> null;
             };
+            case QUICKSILVER -> switch (ability) {
+                case 1 -> data.slowMo() ? active("hud.enhanced.running") : onOff(data.quicksilverTime());
+                case 4 -> onOff(data.wallRun());
+                case 5 -> onOff(data.walkman());
+                default -> null;
+            };
             case NONE -> null;
         };
     }

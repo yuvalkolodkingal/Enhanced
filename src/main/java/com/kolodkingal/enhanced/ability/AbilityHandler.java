@@ -12,7 +12,8 @@ public final class AbilityHandler {
      * @param down    true when the key was pressed, false when released (hold-to-use abilities need both)
      */
     public static void onKey(ServerPlayer player, int ability, boolean down) {
-        if (ability < 1 || ability > PowerData.ABILITIES || !player.isAlive()) {
+        // Releases always go through, so a hold ability can't get stuck on (e.g. when the player died holding the key).
+        if (ability < 1 || ability > PowerData.ABILITIES || (down && !player.isAlive())) {
             return;
         }
         PowerData data = Powers.get(player);
@@ -20,6 +21,7 @@ public final class AbilityHandler {
             case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down);
             case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down);
             case PHOTON -> PhotonAbilities.onKey(player, data, ability, down);
+            case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down);
             case NONE -> {
             }
         }

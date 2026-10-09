@@ -5,12 +5,15 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.PhotonAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
+import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.command.EnhancedCommand;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,6 +28,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.common.damagesource.DamageContainer;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -33,6 +38,7 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -59,6 +65,7 @@ public final class CommonEvents {
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             HexManager.tickLevel(level);
+            SlowMotion.serverTick(level);
         }
     }
 
@@ -66,6 +73,23 @@ public final class CommonEvents {
     public static void onServerStopped(ServerStoppedEvent event) {
         Telekinesis.clear();
         HexManager.clearMemory();
+        SlowMotion.clear();
+    }
+
+    // ---- Quicksilver Time slows the world around him (runs on both sides) ----
+
+    @SubscribeEvent
+    public static void onEntityTick(EntityTickEvent.Pre event) {
+        if (SlowMotion.skipTick(event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        if (!event.getLevel().isClientSide) {
+            SlowMotion.onJoin(event.getEntity());
+        }
     }
 
     // ---- lifecycle ----
@@ -84,7 +108,18 @@ public final class CommonEvents {
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Telekinesis.release(player, false);
+            HexManager.forget(player.getUUID());
         }
+    }
+
+    @SubscribeEvent
+    public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        HexManager.forget(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        HexManager.forget(event.getEntity().getUUID());
     }
 
     @SubscribeEvent
@@ -134,6 +169,15 @@ public final class CommonEvents {
                 event.setAmount(event.getAmount() * EnhancedConfig.CHAOS_SHIELD_EXPLOSION_FACTOR.get().floatValue());
             }
         }
+        if (MagnetoAbilities.wearsHelmet(player) && isWandasAttack(source)) {
+            // The helmet only blocks Nausea: Magneto takes Wanda's attacks at full strength.
+            event.addReductionModifier(DamageContainer.Reduction.ARMOR, (container, reduction) -> 0F);
+            event.addReductionModifier(DamageContainer.Reduction.ENCHANTMENTS, (container, reduction) -> 0F);
+        }
+        if (source.is(DamageTypeTags.IS_FALL) && QuicksilverAbilities.isRunning(player)) {
+            event.setCanceled(true);
+            return;
+        }
         if (MagnetoAbilities.hasShieldUp(player) && MagnetoAbilities.isMetalProjectile(source.getDirectEntity())
                 && source.getEntity() != player) {
             event.setCanceled(true);
@@ -142,6 +186,12 @@ public final class CommonEvents {
         if (Powers.is(player, Power.PHOTON) && source.is(ModTags.ABSORBABLE_ENERGY) && source.getEntity() != player) {
             event.setAmount(PhotonAbilities.absorb(player, event.getAmount()));
         }
+    }
+
+    /** The Chaos Beam, or anything a Scarlet Witch hurled with telekinesis. */
+    private static boolean isWandasAttack(DamageSource source) {
+        return source.is(ModDamageTypes.CHAOS_BEAM)
+                || (source.is(ModDamageTypes.TELEKINETIC_SLAM) && source.getEntity() instanceof Player thrower && Powers.is(thrower, Power.SCARLET_WITCH));
     }
 
     @SubscribeEvent
@@ -184,12 +234,16 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onChorusFruit(EntityTeleportEvent.ChorusFruit event) {
-        checkHexTeleport(event);
+        if (!event.getEntityLiving().level().isClientSide) {
+            HexManager.rememberTeleportStart(event.getEntityLiving());
+        }
     }
 
     @SubscribeEvent
     public static void onEnderTeleport(EntityTeleportEvent.EnderEntity event) {
-        checkHexTeleport(event);
+        if (!event.getEntityLiving().level().isClientSide) {
+            HexManager.rememberTeleportStart(event.getEntityLiving());
+        }
     }
 
     private static void checkHexTeleport(EntityTeleportEvent event) {
