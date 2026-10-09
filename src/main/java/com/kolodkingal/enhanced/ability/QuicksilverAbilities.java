@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -88,8 +89,8 @@ public final class QuicksilverAbilities {
             player.causeFoodExhaustion(EnhancedConfig.QUICKSILVER_EXHAUSTION.get().floatValue());
             player.resetFallDistance();
             if (!was) {
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BREEZE_WIND_CHARGE_BURST.value(),
-                        SoundSource.PLAYERS, 0.8F, 1.6F);
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_WHOOSH.get(),
+                        SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
         applySpeed(player, data);
@@ -143,7 +144,7 @@ public final class QuicksilverAbilities {
         Vec3 push = target.position().subtract(player.position());
         target.knockback(1.0, -push.x, -push.z);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, SoundSource.PLAYERS, 1.0F, 1.4F);
-        level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 1.8F);
+        level.playSound(null, target.getX(), target.getY(), target.getZ(), ModSounds.QUICKSILVER_DASH.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     /** A free spot right next to the target, on Quicksilver's side, or null if there is no room. */

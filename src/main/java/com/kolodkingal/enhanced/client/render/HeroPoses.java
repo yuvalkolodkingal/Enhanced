@@ -17,7 +17,8 @@ import net.minecraft.world.entity.player.Player;
  *     swaying, legs together, while she floats; one hand raised and twitching while she holds something.</li>
  *     <li>Magneto: an outstretched, steady hand aimed at whatever he controls or shoots; regal, arms-low hover.</li>
  *     <li>Quicksilver: leaning into the run with exaggerated, blurring arm swings.</li>
- *     <li>Vision: upright, composed hover; arms braced while dense.</li>
+ *     <li>Vision: upright, composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
+ *     weightless while phased.</li>
  *     <li>Photon: a fist forward like a superhero in flight.</li>
  * </ul>
  */
@@ -96,7 +97,19 @@ public final class HeroPoses {
                     model.leftArm.zRot = -0.25F;
                     model.rightArm.xRot = -0.15F;
                     model.leftArm.xRot = -0.15F;
-                } else if (airborne && !data.beamActive()) {
+                } else if (data.beamActive()) {
+                    // The beam comes from the stone in his forehead: arms pulled back, chest out, a faint strain.
+                    model.rightArm.xRot = 0.4F + Mth.sin(t * 1.7F) * 0.02F;
+                    model.leftArm.xRot = 0.4F + Mth.cos(t * 1.7F) * 0.02F;
+                    model.rightArm.zRot = 0.35F;
+                    model.leftArm.zRot = -0.35F;
+                } else if (data.visionPhased()) {
+                    // Serene and weightless: open palms slightly forward.
+                    model.rightArm.xRot = -0.35F + Mth.sin(t * 0.05F) * 0.05F;
+                    model.leftArm.xRot = -0.35F + Mth.cos(t * 0.05F) * 0.05F;
+                    model.rightArm.zRot = 0.18F;
+                    model.leftArm.zRot = -0.18F;
+                } else if (airborne) {
                     model.rightArm.xRot = 0.05F;
                     model.leftArm.xRot = 0.05F;
                     model.rightArm.zRot = 0.08F + Mth.sin(t * 0.05F) * 0.03F;

@@ -7,6 +7,7 @@ one of the *Enhanced*:
 * **Wanda Maximoff, the Scarlet Witch**
 * **Photon (Monica Rambeau)**, the rare survivor of Wanda's Hex
 * **Quicksilver (Peter Maximoff)**, the fastest man alive
+* **Vision**, the synthezoid with the Mind Stone in his forehead **(added)**
 
 This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
 Scarlet Witch, and Quicksilver's slow-motion run). Everything the concepts said is kept.
@@ -19,7 +20,7 @@ gap is filled in here, and every addition is marked **(added)**.
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Photon, Quicksilver. Powers never stack. |
+| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Photon, Quicksilver, Vision. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
 | Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
@@ -163,9 +164,11 @@ To touch the stone, hold the scepter and **right-click** (use it):
   powers. Wanda's Crown appears in their inventory **(added)**.
 * **Not holding the gene:** the Mind Stone's energy tears the player apart. They
   **explode and die instantly** (the explosion doesn't break blocks).
-* **(added)** If you are already the Scarlet Witch, touching the stone is safe.
-  If you have a different power, the gene can't bond. Nothing happens and the gene
-  isn't used up.
+* **(added)** **Holding a Synthezoid Core** instead: the Mind Stone brings the synthetic
+  body to life and the player **becomes Vision** (section 5).
+* **(added)** If you are already the Scarlet Witch or Vision, touching the stone is safe.
+  If you have a different power, the gene or core can't bond. Nothing happens, the item
+  isn't used up, and holding it still protects you from the stone.
 * **(added)** The scepter is also a strong melee weapon (8 attack damage, never breaks).
 
 ### 2.2 Wanda's Crown — the transformation
@@ -260,7 +263,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
     mob simply makes it through.
 * **Crossing includes teleporting:** Ender Pearls, Chorus Fruit and Endermen
   teleporting across the wall face the same 95% / 5% roll.
-* **(added)** Anyone **with powers** (Magneto, Photon, another Scarlet Witch) and
+* **(added)** Anyone **with powers** (Magneto, Photon, Quicksilver, Vision, another Scarlet Witch) and
   bosses can't be killed by the wall. They're thrown back as if they hit glass, unless
   Wanda allowed them in.
 * **(added)** Pets owned by an allowed player pass through safely.
@@ -312,12 +315,17 @@ Monica Rambeau after she crossed the Hex.
 * Other players in range are slowed down heavily (a strong Slowness).
 * **Quicksilver speeds up**: he runs **4 times faster** than normal and steps up whole
   blocks without jumping. He takes no fall damage while running.
-* **The world starts playing his song**: everyone near him hears the theme from his Walkman,
-  which fades out when he stops running.
-  * The real *Sweet Dreams (Are Made of This)* can't ship inside the mod, because the recording
-    is copyrighted. The mod comes with an original placeholder synth tune. To hear the real song,
-    put your own copy into the ready-made resource pack in
-    [`extras/quicksilver-music-pack`](../extras/quicksilver-music-pack/README.md).
+* **The world starts playing his song**: everyone near him hears the theme from his Walkman.
+  It fades in when he starts running, keeps playing from where it was if he stops and starts
+  again within 10 seconds, and fades out when he stops.
+  * The song is *Sweet Dreams (Are Made of This)*. The recording is copyrighted, so it is not in
+    this repository. Each player plays **their own copy** of it: put an `.mp3`, `.ogg` or `.wav`
+    file into `config/enhanced/music/` in the Minecraft folder (the mod creates that folder and a
+    short README the first time it starts). The first file in alphabetical order is used.
+  * A personal build can also carry the song inside the jar: put it at
+    `personal/quicksilver_theme.mp3` (or `.ogg` / `.wav`) before building. The `personal/` folder is
+    ignored by git, so the song never ends up in the repository.
+  * With no song anywhere, the mod plays an original synth tune instead.
 * A blue tint at the edges of the screen shows that time is slowed, and Quicksilver leaves a
   silver-blue streak behind him.
 * Cost: it burns hunger while he runs. With an empty hunger bar, he can only run normally.
@@ -332,16 +340,53 @@ Monica Rambeau after she crossed the Hex.
 | 4 | B (toggle) | **Wall & Water Run** **(added)** | During Quicksilver Time, run straight up walls you run into, and across water as long as you keep running. |
 | 5 | N (toggle) | **Walkman** **(added)** | Turn the theme music on or off. |
 
-## 5. Operator commands **(added)**
+## 5. Vision — the Mind Stone in a synthetic body **(added)**
+
+> Wanda's concept mentions the Mind Stone in Loki's Scepter. In the films that same stone gives
+> Vision life, so the mod adds him as the second way to use it.
+
+### 5.1 Becoming Vision
+
+* Craft a **Synthezoid Core** (a synthetic body waiting for a mind):
+
+  ```
+  R N R      R = Block of Redstone
+  N S N      N = Netherite Ingot
+  R N R      S = Nether Star
+  ```
+* Hold **Loki's Scepter** in one hand and the core in the other, and use the scepter. The Mind
+  Stone moves into the body: the core is used up and you **become Vision** for good.
+* Holding the core also protects you from the stone, exactly like the gene does for Wanda.
+
+### 5.2 The synthetic body
+
+* Vision's skin becomes the MCU Vision: red synthetic face and hands, the golden **Mind Stone in
+  his forehead** (it glows in the dark), a green suit with gold trim and a yellow cape.
+* **Max health 30** (15 hearts) and **8 armor** from his vibranium body.
+* He never gets hungry and never runs out of air.
+
+### 5.3 Abilities
+
+| # | Key | Ability | How it works |
+|---|---|---|---|
+| 1 | R (hold) | **Mind Stone Beam** | A golden beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. |
+| 2 | G (toggle) | **Flight** | Survival flight at 0.08, upright and calm. |
+| 3 | V (toggle) | **Phase** | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you're only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
+| 4 | B (toggle) | **Density** | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Turning dense ends phasing, and you can't turn dense while phased. |
+| 5 | N (toggle) | **Human Disguise** | Take on the human look from *WandaVision*: a 1950s sitcom husband in a shirt, tie and cardigan. Only the looks change. |
+
+---
+
+## 6. Operator commands **(added)**
 
 | Command | Effect |
 |---|---|
 | `/enhanced power get [player]` | Show a player's power. |
-| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|photon\|quicksilver>` | Give or remove a power. |
+| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|photon\|quicksilver\|vision>` | Give or remove a power. |
 | `/enhanced hex list` | List all Hexes in the current dimension. |
 | `/enhanced hex clear` | Dissolve every Hex in the current dimension. |
 
-## 6. Server configuration **(added)**
+## 7. Server configuration **(added)**
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world…) can be changed in

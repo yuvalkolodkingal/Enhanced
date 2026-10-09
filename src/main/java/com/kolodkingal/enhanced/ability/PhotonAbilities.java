@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -94,8 +95,8 @@ public final class PhotonAbilities {
         bolt.setPos(origin.x, origin.y, origin.z);
         bolt.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 2.5F, 0.0F);
         level.addFreshEntity(bolt);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.6F,
-                supercharged ? 1.2F : 2.0F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.PHOTON_BLAST.get(), SoundSource.PLAYERS, 0.8F,
+                supercharged ? 0.75F : 1.0F);
     }
 
     // ---- Ability 3: Energy Absorption ----
@@ -135,7 +136,7 @@ public final class PhotonAbilities {
                     Math.cos(angle), 0.05, Math.sin(angle), 0.6);
         }
         level.sendParticles(ParticleTypes.FLASH, center.x, center.y, center.z, 1, 0, 0, 0, 0);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.7F, 1.6F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ENERGY_RELEASE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
     }
 
     // ---- Ability 4: Phase Shift ----

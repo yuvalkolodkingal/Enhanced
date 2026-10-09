@@ -22,7 +22,7 @@ import java.util.Collection;
 
 /**
  * /enhanced power get [player]
- * /enhanced power set &lt;players&gt; &lt;none|magneto|scarlet_witch|photon&gt;
+ * /enhanced power set &lt;players&gt; &lt;none|magneto|scarlet_witch|photon|quicksilver|vision&gt;
  * /enhanced hex list
  * /enhanced hex clear
  */

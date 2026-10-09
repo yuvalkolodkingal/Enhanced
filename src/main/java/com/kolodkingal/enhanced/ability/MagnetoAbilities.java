@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -122,8 +123,8 @@ public final class MagnetoAbilities {
         shard.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.5F, 2.5F);
         shard.configure(EnhancedConfig.SHRAPNEL_DAMAGE.get().floatValue(), EnhancedConfig.SHRAPNEL_PIERCE.get());
         level.addFreshEntity(shard);
-        level.playSound(null, origin.x, origin.y, origin.z, SoundEvents.CHAIN_HIT, SoundSource.PLAYERS, 0.5F,
-                1.6F + player.getRandom().nextFloat() * 0.4F);
+        level.playSound(null, origin.x, origin.y, origin.z, ModSounds.SHRAPNEL_FIRE.get(), SoundSource.PLAYERS, 0.6F,
+                0.9F + player.getRandom().nextFloat() * 0.3F);
     }
 
     /** Shards one iron item is worth, or 0 if it can't be used. */

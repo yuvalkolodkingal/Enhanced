@@ -51,6 +51,7 @@ public final class ClientEvents {
         spawnSpeedTrails(mc.level);
         Afterimages.tick(mc.level);
         QuicksilverMusic.tick(mc);
+        PowerLoopSounds.tick(mc);
         SlowMotionEffect.tick(mc);
     }
 
@@ -58,6 +59,7 @@ public final class ClientEvents {
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         java.util.Arrays.fill(SENT_DOWN, false);
         QuicksilverMusic.stop();
+        PowerLoopSounds.stopAll();
         Afterimages.clear();
         SlowMotionEffect.stop(Minecraft.getInstance());
     }

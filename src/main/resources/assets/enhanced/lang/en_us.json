@@ -160,5 +160,19 @@
   "message.enhanced.disguise.off": "True form",
   "death.attack.enhanced.mind_stone_beam": "%1$s was struck by the Mind Stone",
   "death.attack.enhanced.mind_stone_beam.player": "%1$s was struck by %2$s's Mind Stone beam",
-  "death.attack.enhanced.mind_stone_beam.item": "%1$s was struck by %2$s's Mind Stone beam"
+  "death.attack.enhanced.mind_stone_beam.item": "%1$s was struck by %2$s's Mind Stone beam",
+  "subtitles.enhanced.chaos_beam": "Chaos energy crackles",
+  "subtitles.enhanced.chaos_beam_start": "Chaos Beam ignites",
+  "subtitles.enhanced.hex_rise": "The Hex rises",
+  "subtitles.enhanced.hex_cross": "Someone crosses the Hex",
+  "subtitles.enhanced.magnet_grab": "Metal is seized",
+  "subtitles.enhanced.magnet_hum": "Magnetic hum",
+  "subtitles.enhanced.shrapnel_fire": "Iron shard flies",
+  "subtitles.enhanced.quicksilver_whoosh": "Quicksilver speeds off",
+  "subtitles.enhanced.quicksilver_dash": "Speed Blitz",
+  "subtitles.enhanced.vision_phase": "Vision shifts density",
+  "subtitles.enhanced.mind_stone_beam": "Mind Stone beam hums",
+  "subtitles.enhanced.photon_blast": "Photon Blast fires",
+  "subtitles.enhanced.awaken": "A hero awakens",
+  "subtitles.enhanced.energy_release": "Energy shockwave"
 }

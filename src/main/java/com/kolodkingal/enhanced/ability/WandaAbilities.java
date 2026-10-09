@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -51,7 +52,7 @@ public final class WandaAbilities {
             case 1 -> {
                 boolean start = down && !player.isSpectator();
                 if (start && !data.beamActive()) {
-                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 0.8F, 1.3F);
+                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.CHAOS_BEAM_START.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
                 data.setBeamActive(start);
             }
@@ -133,9 +134,6 @@ public final class WandaAbilities {
         }
         if (hit.getType() == HitResult.Type.BLOCK && player.tickCount % 4 == 0) {
             level.sendParticles(ParticleTypes.SMOKE, end.x, end.y, end.z, 1, 0.05, 0.05, 0.05, 0.01);
-        }
-        if (player.tickCount % 16 == 0) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 1.0F, 1.8F);
         }
     }
 

@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -139,9 +140,6 @@ public final class VisionAbilities {
         if (player.tickCount % 2 == 0) {
             level.sendParticles(new EnergyParticleOptions(Power.VISION.glow, 1.4F), end.x, end.y, end.z, 4, 0.12, 0.12, 0.12, 0.12);
         }
-        if (player.tickCount % 16 == 0) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 1.0F, 2.0F);
-        }
     }
 
     // ---- Ability 3: Phase (intangibility) ----
@@ -170,8 +168,8 @@ public final class VisionAbilities {
             }
             player.displayClientMessage(Component.translatable("message.enhanced.phase.on"), true);
         }
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.0F,
-                data.visionPhased() ? 1.6F : 0.8F);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.VISION_PHASE.get(), SoundSource.PLAYERS, 1.0F,
+                data.visionPhased() ? 1.15F : 0.85F);
     }
 
     /** How far up (0 to 1 block) Vision must rise to stand free of blocks, or null if he is stuck deeper in a wall. */

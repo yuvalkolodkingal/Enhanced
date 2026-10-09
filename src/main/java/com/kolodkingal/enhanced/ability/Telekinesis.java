@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -209,8 +210,8 @@ public final class Telekinesis {
         }
         target.resetFallDistance();
         player.level().playSound(null, target.getX(), target.getY(), target.getZ(),
-                mode == Mode.MAGNETO ? SoundEvents.RESPAWN_ANCHOR_CHARGE : SoundEvents.ILLUSIONER_CAST_SPELL,
-                SoundSource.PLAYERS, 0.8F, mode == Mode.MAGNETO ? 1.6F : 1.2F);
+                mode == Mode.MAGNETO ? ModSounds.MAGNET_GRAB.get() : SoundEvents.ILLUSIONER_CAST_SPELL,
+                SoundSource.PLAYERS, mode == Mode.MAGNETO ? 1.0F : 0.8F, mode == Mode.MAGNETO ? 1.0F : 1.2F);
     }
 
     /** Called every tick for every player. */

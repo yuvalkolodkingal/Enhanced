@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -103,8 +104,8 @@ public final class HexManager {
         Hex hex = new Hex(UUID.randomUUID(), wanda.getUUID(), wanda.getGameProfile().getName(), wanda.position(), radius,
                 Set.of(), false, level.getGameTime());
         save(level, data(level).with(hex));
-        level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 2.0F, 0.5F);
-        level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.PLAYERS, 0.6F, 0.6F);
+        // Volume above 1 widens the range: everyone inside the new Hex hears it rise.
+        level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), ModSounds.HEX_RISE.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 16.0F), 1.0F);
         level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 2.0F), wanda.getX(), wanda.getY() + 1, wanda.getZ(),
                 150, 1.5, 1.5, 1.5, 0.4);
         wanda.displayClientMessage(Component.translatable("message.enhanced.hex.created"), true);
@@ -301,7 +302,7 @@ public final class HexManager {
         if (dies) {
             level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.8F), at.x, at.y, at.z, 40,
                     entity.getBbWidth() * 0.6, entity.getBbHeight() * 0.5, entity.getBbWidth() * 0.6, 0.05);
-            level.playSound(null, at.x, at.y, at.z, SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.HOSTILE, 1.0F, 0.6F);
+            level.playSound(null, at.x, at.y, at.z, ModSounds.HEX_CROSS.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
             entity.hurt(ModDamageTypes.source(level, ModDamageTypes.HEX_WALL), 1.0E6F);
             return false;
         }

@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
@@ -12,7 +13,6 @@ import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 
@@ -72,8 +72,7 @@ public final class Powers {
         player.connection.send(new ClientboundSetSubtitleTextPacket(
                 Component.translatable("power.enhanced." + power.getSerializedName() + ".awaken").withStyle(ChatFormatting.GRAY)));
 
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 1.0F, 0.8F);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 1.0F, 0.6F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.AWAKEN.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
         burst(level, player.getX(), player.getY() + 1.0, player.getZ(), power.color, 120, 1.6);
         burst(level, player.getX(), player.getY() + 1.0, player.getZ(), power.glow, 60, 0.8);
 
