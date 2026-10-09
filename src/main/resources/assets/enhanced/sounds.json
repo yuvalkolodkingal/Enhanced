@@ -1,0 +1,123 @@
+{
+  "quicksilver_theme": {
+    "subtitle": "subtitles.enhanced.quicksilver_theme",
+    "sounds": [
+      {
+        "name": "enhanced:quicksilver/sweet_dreams",
+        "stream": true
+      }
+    ]
+  },
+  "awaken": {
+    "subtitle": "subtitles.enhanced.awaken",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/awaken"
+      }
+    ]
+  },
+  "chaos_beam": {
+    "subtitle": "subtitles.enhanced.chaos_beam",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/chaos_beam_loop"
+      }
+    ]
+  },
+  "chaos_beam_start": {
+    "subtitle": "subtitles.enhanced.chaos_beam_start",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/chaos_beam_start"
+      }
+    ]
+  },
+  "hex_rise": {
+    "subtitle": "subtitles.enhanced.hex_rise",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hex_rise"
+      }
+    ]
+  },
+  "hex_cross": {
+    "subtitle": "subtitles.enhanced.hex_cross",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hex_cross"
+      }
+    ]
+  },
+  "magnet_grab": {
+    "subtitle": "subtitles.enhanced.magnet_grab",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/magnet_grab"
+      }
+    ]
+  },
+  "magnet_hum": {
+    "subtitle": "subtitles.enhanced.magnet_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/magnet_hum_loop"
+      }
+    ]
+  },
+  "shrapnel_fire": {
+    "subtitle": "subtitles.enhanced.shrapnel_fire",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/shrapnel_fire"
+      }
+    ]
+  },
+  "quicksilver_whoosh": {
+    "subtitle": "subtitles.enhanced.quicksilver_whoosh",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/quicksilver_whoosh"
+      }
+    ]
+  },
+  "quicksilver_dash": {
+    "subtitle": "subtitles.enhanced.quicksilver_dash",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/quicksilver_dash"
+      }
+    ]
+  },
+  "vision_phase": {
+    "subtitle": "subtitles.enhanced.vision_phase",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/vision_phase"
+      }
+    ]
+  },
+  "mind_stone_beam": {
+    "subtitle": "subtitles.enhanced.mind_stone_beam",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_stone_beam_loop"
+      }
+    ]
+  },
+  "photon_blast": {
+    "subtitle": "subtitles.enhanced.photon_blast",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/photon_blast"
+      }
+    ]
+  },
+  "energy_release": {
+    "subtitle": "subtitles.enhanced.energy_release",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/energy_release"
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.kolodkingal.enhanced.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "PlayerMixin"
+  ],
+  "client": [
+    "client.AbstractClientPlayerMixin",
+    "client.LivingEntityRendererMixin",
+    "client.MinecraftMixin",
+    "client.ParticleEngineMixin",
+    "client.ParticleMixin",
+    "client.PlayerModelMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
