@@ -333,6 +333,13 @@ public final class Telekinesis {
                 continue;
             }
             ServerPlayer thrower = server.getPlayerList().getPlayer(f.thrower);
+            if (e instanceof Mob mob && mob.isNoAi()) {
+                // Mobs without AI don't run their own physics; fly them ourselves.
+                Vec3 v = e.getDeltaMovement();
+                e.move(MoverType.SELF, v);
+                e.setDeltaMovement(v.x * 0.91, (v.y - 0.08) * 0.98, v.z * 0.91);
+                e.hasImpulse = true;
+            }
             Vec3 pos = e.position();
             double speed = pos.distanceTo(f.lastPos);
             double hitSpeed = Math.max(speed, f.lastSpeed);
@@ -343,7 +350,7 @@ public final class Telekinesis {
                 for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, box,
                         v -> v != e && v != thrower && v.isAlive() && !v.isSpectator() && !f.hit.contains(v.getId()))) {
                     f.hit.add(victim.getId());
-                    float damage = (f.heavy ? 15F : 6F) * (float) Mth.clamp(hitSpeed / 2.0, 0.5, 1.5);
+                    float damage = (f.heavy ? 15F : 6F) * (float) Mth.clamp(hitSpeed / 1.2, 0.6, 1.0);
                     victim.hurt(ModDamageTypes.source(level, ModDamageTypes.TELEKINETIC_SLAM, thrower, e), damage);
                     if (dir.horizontalDistanceSqr() > 1.0E-4) {
                         victim.knockback(1.2, -dir.x, -dir.z);

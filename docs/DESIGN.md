@@ -69,10 +69,11 @@ marked **(added)**.
   or Gold armor**, and **Iron Golems**. **(added)** Minecarts and dropped metal items
   also count, because they are made of metal.
 * **Iron Golem control:** Magneto can lift any Iron Golem and throw it at enemies.
-  A thrown golem hits like a wrecking ball (15 damage to whatever it slams into), takes
-  no damage itself, and never turns on Magneto.
+  A thrown golem hits like a wrecking ball (up to 15 damage to whatever it slams into),
+  takes no damage itself, never turns on Magneto, and starts fighting the monster it hit.
 * **Launch:** launched targets fly at high speed. When they slam into a wall or the
-  floor they take heavy impact damage (up to 16) and hurt any creature they crash into.
+  floor they take heavy impact damage (up to 16) and hurt any creature they crash into
+  (up to 6 damage).
 * One target at a time. The hold breaks automatically if the target dies, leaves the
   dimension or gets more than 48 blocks away. A held *player* is released after
   30 seconds **(added — so nobody is trapped forever)**.
@@ -80,15 +81,17 @@ marked **(added)**.
 #### Ability 2 — Iron Shrapnel Storm
 
 * Requires iron in the inventory. Shards are paid for from an internal *iron charge*.
-  When the charge runs out, one more iron item is melted into shards. Cheapest items
-  are used first:
+  When the charge runs out, one more iron item is melted into shards. Plain iron is
+  used first, smallest first, and tools and armor only when no plain iron is left:
 
   | Item | Shards |
   |---|---|
   | Iron Nugget | 1 |
   | Iron Ingot, Raw Iron | 9 |
-  | Iron tools, weapons and armor (and other items tagged `enhanced:shrapnel_ammo`) | 18 |
   | Block of Iron, Block of Raw Iron | 81 |
+  | Iron tools, weapons and armor (and other items tagged `enhanced:shrapnel_ammo`) | 18 |
+
+  **(added)** Enchanted items are never melted, so a Mending pickaxe is safe.
 * Each shard does **4 damage**, **pierces through up to 3 targets**, and **ignores the
   normal hit cooldown**, so the full stream deals about 40 damage per second before
   armor.

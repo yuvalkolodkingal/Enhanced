@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.screen;
 
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.network.HexActionPayload;
@@ -160,7 +161,8 @@ public class HexScreen extends Screen {
                         width / 2, 36 + ROW * 2 + 14, 0xFFFFFF);
             }
         });
-        graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.hint").withStyle(ChatFormatting.DARK_GRAY),
+        long deathPercent = EnhancedConfig.SPEC.isLoaded() ? Math.round(EnhancedConfig.HEX_DEATH_CHANCE.get() * 100) : 95;
+        graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.hint", deathPercent).withStyle(ChatFormatting.DARK_GRAY),
                 width / 2, height - 72, 0xFFFFFF);
     }
 

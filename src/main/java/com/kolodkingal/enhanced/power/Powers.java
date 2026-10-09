@@ -78,7 +78,7 @@ public final class Powers {
         burst(level, player.getX(), player.getY() + 1.0, player.getZ(), power.glow, 60, 0.8);
 
         player.server.getPlayerList().broadcastSystemMessage(
-                Component.translatable("power.enhanced.broadcast", player.getDisplayName(), power.displayName())
+                Component.translatable("power.enhanced." + power.getSerializedName() + ".broadcast", player.getDisplayName())
                         .withStyle(s -> s.withColor(power.color)), false);
     }
 

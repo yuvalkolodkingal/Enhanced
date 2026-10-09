@@ -78,8 +78,8 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             poseStack.mulPose(Axis.YP.rotationDegrees(t * 9F + i * 60F));
             poseStack.mulPose(Axis.XP.rotationDegrees(t * 6F + i * 45F));
             Matrix4f m = poseStack.last().pose();
-            quad(vc, m, 0.20F * pulse, 0x90FF2A3A);
-            quad(vc, m, 0.10F * pulse, 0xD0FFB0C0);
+            quad(vc, m, 0.28F * pulse, 0x80E0102A);
+            quad(vc, m, 0.13F * pulse, 0xC0FF6A80);
             poseStack.popPose();
         }
         poseStack.popPose();

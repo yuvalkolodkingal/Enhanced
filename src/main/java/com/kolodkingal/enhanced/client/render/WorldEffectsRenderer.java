@@ -50,20 +50,29 @@ public final class WorldEffectsRenderer {
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         float time = level.getGameTime() + partialTick;
 
-        RenderType fieldType = EnhancedRenderTypes.energyField(HEX_TEXTURE);
-        VertexConsumer field = buffers.getBuffer(fieldType);
-        renderHexes(level, pose, field, camera, time, mc.options.getEffectiveRenderDistance() * 16.0);
-
-        for (AbstractClientPlayer player : level.players()) {
-            PowerData data = Powers.get(player);
-            if (data.power() == Power.SCARLET_WITCH && data.chaosShieldActive() && !player.isInvisible()) {
-                Vec3 center = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
-                float flicker = 0.9F + 0.1F * Mth.sin(time * 0.6F);
-                EnergyGeometry.sphere(pose, field, center, (float) WandaAbilities.SHIELD_RADIUS, 32, 16, 6, 3, time * 0.01F,
-                        Power.SCARLET_WITCH.glow, 0.10F * flicker, 0.8F * flicker);
+        double renderDistance = mc.options.getEffectiveRenderDistance() * 16.0;
+        // Two passes for every energy dome: a see-through red veil, then glowing hexagon lines on top.
+        for (int pass = 0; pass < 2; pass++) {
+            boolean lines = pass == 1;
+            RenderType type = lines ? EnhancedRenderTypes.energyField(HEX_TEXTURE) : EnhancedRenderTypes.ENERGY_VEIL;
+            VertexConsumer vc = buffers.getBuffer(type);
+            renderHexes(level, pose, vc, lines, camera, time, renderDistance);
+            for (AbstractClientPlayer player : level.players()) {
+                PowerData data = Powers.get(player);
+                if (data.power() == Power.SCARLET_WITCH && data.chaosShieldActive() && !player.isInvisible()) {
+                    Vec3 center = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
+                    float flicker = 0.9F + 0.1F * Mth.sin(time * 0.6F);
+                    float radius = (float) WandaAbilities.SHIELD_RADIUS;
+                    if (lines) {
+                        EnergyGeometry.sphere(pose, vc, center, radius, 32, 16, 6, 3, time * 0.01F,
+                                Power.SCARLET_WITCH.color, 0.35F * flicker, 0.65F * flicker);
+                    } else {
+                        EnergyGeometry.veil(pose, vc, center, radius, 32, 16, Power.SCARLET_WITCH.color, 0.12F * flicker, 0.45F * flicker);
+                    }
+                }
             }
+            buffers.endBatch(type);
         }
-        buffers.endBatch(fieldType);
 
         VertexConsumer beams = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         for (AbstractClientPlayer player : level.players()) {
@@ -83,7 +92,8 @@ public final class WorldEffectsRenderer {
 
     // ---- The Hex ----
 
-    private static void renderHexes(ClientLevel level, Matrix4f pose, VertexConsumer vc, Vec3 camera, float time, double renderDistance) {
+    private static void renderHexes(ClientLevel level, Matrix4f pose, VertexConsumer vc, boolean lines, Vec3 camera, float time,
+                                    double renderDistance) {
         for (Hex hex : level.getData(ModAttachments.HEXES).hexes()) {
             float grow = Mth.clamp((time - hex.createdAt()) / 50F, 0F, 1F);
             grow = grow * grow * (3 - 2 * grow);
@@ -97,13 +107,18 @@ public final class WorldEffectsRenderer {
                 continue;
             }
             int segments = Mth.clamp((int) (radius * 2), 32, 128);
-            float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 6F));
-            float tilesV = Math.max(3, Math.round(Mth.PI * radius / 6F));
             float pulse = 0.85F + 0.15F * Mth.sin(time * 0.06F);
             // A wall that is still rising glows brighter.
             float rising = 1F + (1F - grow) * 1.5F;
-            EnergyGeometry.sphere(pose, vc, center, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F,
-                    Power.SCARLET_WITCH.color, 0.06F * pulse * rising, 0.6F * pulse * rising);
+            if (lines) {
+                float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 6F));
+                float tilesV = Math.max(3, Math.round(Mth.PI * radius / 6F));
+                EnergyGeometry.sphere(pose, vc, center, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F,
+                        Power.SCARLET_WITCH.color, 0.30F * pulse * rising, 0.6F * pulse * rising);
+            } else {
+                EnergyGeometry.veil(pose, vc, center, radius, segments, segments / 2, 0xB00018,
+                        0.10F * pulse, 0.45F * pulse * rising);
+            }
         }
     }
 
@@ -116,16 +131,16 @@ public final class WorldEffectsRenderer {
         Vec3 start = handPosition(mc, player, partialTick).subtract(camera);
 
         float flicker = 0.85F + 0.15F * Mth.sin(time * 1.7F) * Mth.cos(time * 0.9F);
-        int dark = 0x7A0010;
         int red = Power.SCARLET_WITCH.color;
-        int hot = 0xFF9AAA;
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.60F * flicker, EnergyGeometry.argb(dark, 0.30F), EnergyGeometry.argb(dark, 0.18F));
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.30F * flicker, EnergyGeometry.argb(red, 0.65F), EnergyGeometry.argb(red, 0.45F));
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.10F, EnergyGeometry.argb(hot, 0.95F), EnergyGeometry.argb(hot, 0.8F));
+        int hot = 0xFF6A80;
+        // The beam starts thin at the hand and swells a little towards the target, so it never fills the screen in first person.
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.12F, 0.55F * flicker, EnergyGeometry.argb(red, 0.10F), EnergyGeometry.argb(red, 0.30F));
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.06F, 0.26F * flicker, EnergyGeometry.argb(red, 0.45F), EnergyGeometry.argb(red, 0.55F));
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.02F, 0.08F, EnergyGeometry.argb(hot, 0.75F), EnergyGeometry.argb(hot, 0.85F));
 
         long seed = ((long) time / 2) * 341873128712L + player.getId() * 132897987541L;
         for (int k = 0; k < 3; k++) {
-            EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.28F, EnergyGeometry.argb(0xFF3355, 0.85F), seed + k * 7919L);
+            EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.28F, EnergyGeometry.argb(0xFF2040, 0.8F), seed + k * 7919L);
         }
         // A flare where the beam hits.
         float flare = 0.5F + 0.2F * Mth.sin(time * 2.3F);
@@ -147,8 +162,8 @@ public final class WorldEffectsRenderer {
         Vec3 start = handPosition(mc, player, partialTick).subtract(camera);
         Vec3 end = held.getPosition(partialTick).add(0, held.getBbHeight() * 0.5, 0).subtract(camera);
         long seed = ((long) time / 3) * 6364136223846793005L + player.getId();
-        EnergyGeometry.bolt(pose, vc, start, end, 0.05F, 0.35F, EnergyGeometry.argb(power.glow, 0.55F), seed);
-        EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.5F, EnergyGeometry.argb(power.color, 0.45F), seed + 31);
+        EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.35F, EnergyGeometry.argb(power.color, 0.7F), seed);
+        EnergyGeometry.bolt(pose, vc, start, end, 0.025F, 0.5F, EnergyGeometry.argb(power.glow, 0.4F), seed + 31);
     }
 
     /** Where energy leaves the player's hands: in front of the chest, or bottom-right of the screen in first person. */

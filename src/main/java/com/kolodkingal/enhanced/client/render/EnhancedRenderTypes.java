@@ -23,6 +23,16 @@ public final class EnhancedRenderTypes {
                     .setCullState(RenderStateShard.NO_CULL)
                     .createCompositeState(false));
 
+    /** Untextured, see-through (normal alpha blending), double-sided tint: the red veil of the Hex wall and Chaos Shield. */
+    public static final RenderType ENERGY_VEIL = RenderType.create("enhanced_energy_veil",
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 16384, false, true,
+            RenderType.CompositeState.builder()
+                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
+                    .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .createCompositeState(false));
+
     private static final RenderStateShard.ShaderStateShard POSITION_TEX_COLOR =
             new RenderStateShard.ShaderStateShard(GameRenderer::getPositionTexColorShader);
 

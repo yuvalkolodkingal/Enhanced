@@ -14,6 +14,11 @@ public final class EnergyGeometry {
 
     /** A flat ribbon from {@code a} to {@code b} that always faces the camera. Colour is ARGB. */
     public static void ribbon(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, int colorA, int colorB) {
+        ribbon(pose, vc, a, b, width, width, colorA, colorB);
+    }
+
+    /** A camera-facing ribbon whose width changes from {@code widthA} at {@code a} to {@code widthB} at {@code b}. */
+    public static void ribbon(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float widthA, float widthB, int colorA, int colorB) {
         Vec3 dir = b.subtract(a);
         Vec3 mid = a.add(b).scale(0.5);
         Vec3 side = dir.cross(mid.scale(-1));
@@ -23,11 +28,13 @@ public final class EnergyGeometry {
                 side = new Vec3(1, 0, 0);
             }
         }
-        side = side.normalize().scale(width * 0.5);
-        vertex(pose, vc, a.add(side), colorA);
-        vertex(pose, vc, a.subtract(side), colorA);
-        vertex(pose, vc, b.subtract(side), colorB);
-        vertex(pose, vc, b.add(side), colorB);
+        side = side.normalize();
+        Vec3 sideA = side.scale(widthA * 0.5);
+        Vec3 sideB = side.scale(widthB * 0.5);
+        vertex(pose, vc, a.add(sideA), colorA);
+        vertex(pose, vc, a.subtract(sideA), colorA);
+        vertex(pose, vc, b.subtract(sideB), colorB);
+        vertex(pose, vc, b.add(sideB), colorB);
     }
 
     /**
@@ -93,6 +100,46 @@ public final class EnergyGeometry {
         }
     }
 
+    /** Same sphere as {@link #sphere}, untextured, for a POSITION_COLOR render type. */
+    public static void veil(Matrix4f pose, VertexConsumer vc, Vec3 center, float radius, int segments, int rings,
+                            int rgb, float baseAlpha, float rimAlpha) {
+        float r = ((rgb >> 16) & 0xFF) / 255F;
+        float g = ((rgb >> 8) & 0xFF) / 255F;
+        float b = (rgb & 0xFF) / 255F;
+        for (int ring = 0; ring < rings; ring++) {
+            float lat0 = Mth.PI * ring / rings - Mth.HALF_PI;
+            float lat1 = Mth.PI * (ring + 1) / rings - Mth.HALF_PI;
+            for (int seg = 0; seg < segments; seg++) {
+                float lon0 = Mth.TWO_PI * seg / segments;
+                float lon1 = Mth.TWO_PI * (seg + 1) / segments;
+                veilVertex(pose, vc, center, radius, lat0, lon0, r, g, b, baseAlpha, rimAlpha);
+                veilVertex(pose, vc, center, radius, lat0, lon1, r, g, b, baseAlpha, rimAlpha);
+                veilVertex(pose, vc, center, radius, lat1, lon1, r, g, b, baseAlpha, rimAlpha);
+                veilVertex(pose, vc, center, radius, lat1, lon0, r, g, b, baseAlpha, rimAlpha);
+            }
+        }
+    }
+
+    private static void veilVertex(Matrix4f pose, VertexConsumer vc, Vec3 center, float radius, float lat, float lon,
+                                   float r, float g, float b, float baseAlpha, float rimAlpha) {
+        float cosLat = Mth.cos(lat);
+        float nx = cosLat * Mth.cos(lon);
+        float ny = Mth.sin(lat);
+        float nz = cosLat * Mth.sin(lon);
+        float x = (float) center.x + nx * radius;
+        float y = (float) center.y + ny * radius;
+        float z = (float) center.z + nz * radius;
+        vc.addVertex(pose, x, y, z).setColor(r, g, b, fresnel(nx, ny, nz, x, y, z, baseAlpha, rimAlpha));
+    }
+
+    /** Edge-on surfaces (normal perpendicular to the view direction) glow brightest. */
+    private static float fresnel(float nx, float ny, float nz, float x, float y, float z, float baseAlpha, float rimAlpha) {
+        float viewLen = Mth.sqrt(x * x + y * y + z * z);
+        float facing = viewLen < 1.0E-4F ? 1F : Math.abs((nx * x + ny * y + nz * z) / viewLen);
+        float rim = 1F - facing;
+        return Mth.clamp(baseAlpha + rimAlpha * rim * rim, 0F, 1F);
+    }
+
     private static void sphereVertex(Matrix4f pose, VertexConsumer vc, Vec3 center, float radius, float lat, float lon,
                                      float u, float v, float r, float g, float b, float baseAlpha, float rimAlpha) {
         float cosLat = Mth.cos(lat);
@@ -102,12 +149,7 @@ public final class EnergyGeometry {
         float x = (float) center.x + nx * radius;
         float y = (float) center.y + ny * radius;
         float z = (float) center.z + nz * radius;
-        // Edge-on surfaces (normal perpendicular to the view direction) glow brightest.
-        float viewLen = Mth.sqrt(x * x + y * y + z * z);
-        float facing = viewLen < 1.0E-4F ? 1F : Math.abs((nx * x + ny * y + nz * z) / viewLen);
-        float rim = 1F - facing;
-        float alpha = Mth.clamp(baseAlpha + rimAlpha * rim * rim, 0F, 1F);
-        vc.addVertex(pose, x, y, z).setUv(u, v).setColor(r, g, b, alpha);
+        vc.addVertex(pose, x, y, z).setUv(u, v).setColor(r, g, b, fresnel(nx, ny, nz, x, y, z, baseAlpha, rimAlpha));
     }
 
     private static void vertex(Matrix4f pose, VertexConsumer vc, Vec3 p, int argb) {
