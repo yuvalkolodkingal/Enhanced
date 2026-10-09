@@ -283,6 +283,12 @@ public final class HexManager {
         Vec3 back = new Vec3(entity.xo, entity.yo, entity.zo);
         Vec3 radial = bodyCenter(entity).subtract(hex.center());
         Vec3 push = radial.lengthSqr() < 1.0E-6 ? Vec3.ZERO : radial.normalize().scale(wasInside ? -0.6 : 0.6);
+        // A player's client moves them before the tick starts, so their last-tick position is usually already past
+        // the wall. Then put them back just on their own side of it instead.
+        double halfHeight = entity.getBbHeight() * 0.5;
+        if (hex.contains(back.add(0, halfHeight, 0)) != wasInside && radial.lengthSqr() > 1.0E-6) {
+            back = hex.center().add(radial.normalize().scale(wasInside ? hex.radius() - 1.0 : hex.radius() + 1.0)).subtract(0, halfHeight, 0);
+        }
         if (entity instanceof ServerPlayer player) {
             player.connection.teleport(back.x, back.y, back.z, player.getYRot(), player.getXRot());
             player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);

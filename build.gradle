@@ -37,6 +37,15 @@ base {
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+// GameTests live in their own source set so they never end up in the mod jar.
+// Run them with ./gradlew runGameTestServer (the server exits with an error if a required test fails).
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
 neoForge {
     // Specify the version of NeoForge to use.
     version = project.neo_version
@@ -69,6 +78,7 @@ neoForge {
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
             type = "gameTestServer"
+            sourceSet = sourceSets.gametest
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
@@ -103,9 +113,13 @@ neoForge {
         // multi mod projects should define one per mod
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gametest)
         }
     }
 }
+
+// Minecraft + NeoForge for the GameTest source set.
+neoForge.addModdingDependenciesTo(sourceSets.gametest)
 
 // Sets up a dependency configuration called 'localRuntime'.
 // This configuration should be used instead of 'runtimeOnly' to declare
