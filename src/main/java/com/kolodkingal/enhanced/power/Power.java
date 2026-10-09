@@ -15,7 +15,8 @@ public enum Power implements StringRepresentable {
     MAGNETO(0xB01CFF, 0xC27BFF),
     SCARLET_WITCH(0xE0102A, 0xFF4058),
     PHOTON(0xFFE9A8, 0x9FF3FF),
-    QUICKSILVER(0xC9D3E3, 0x8FD3FF);
+    QUICKSILVER(0xC9D3E3, 0x8FD3FF),
+    VISION(0xE8B83A, 0xFFE66B);
 
     public static final Codec<Power> CODEC = StringRepresentable.fromEnum(Power::values);
 
@@ -57,6 +58,7 @@ public enum Power implements StringRepresentable {
             case MAGNETO -> EnhancedConfig.MAGNETO_FLIGHT_SPEED.get().floatValue();
             case SCARLET_WITCH -> EnhancedConfig.WANDA_FLIGHT_SPEED.get().floatValue();
             case PHOTON -> EnhancedConfig.PHOTON_FLIGHT_SPEED.get().floatValue();
+            case VISION -> EnhancedConfig.VISION_FLIGHT_SPEED.get().floatValue();
             case NONE, QUICKSILVER -> 0.05F;
         };
     }
@@ -65,7 +67,7 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, PHOTON -> 2;
+            case SCARLET_WITCH, PHOTON, VISION -> 2;
             case NONE, QUICKSILVER -> -1;
         };
     }

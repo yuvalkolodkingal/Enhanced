@@ -40,6 +40,10 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue PHASE_DURATION;
     public static final ModConfigSpec.IntValue PHASE_COOLDOWN;
 
+    // ---- Vision ----
+    public static final ModConfigSpec.DoubleValue VISION_FLIGHT_SPEED;
+    public static final ModConfigSpec.DoubleValue MIND_STONE_BEAM_DAMAGE;
+
     // ---- Quicksilver ----
     public static final ModConfigSpec.IntValue SLOW_MOTION_FACTOR;
     public static final ModConfigSpec.IntValue SLOW_MOTION_RADIUS;
@@ -101,6 +105,12 @@ public final class EnhancedConfig {
                 .defineInRange("absorbFraction", 0.5, 0.0, 1.0);
         PHASE_DURATION = BUILDER.defineInRange("phaseShiftTicks", 60, 1, 1200);
         PHASE_COOLDOWN = BUILDER.defineInRange("phaseShiftCooldown", 240, 0, 12000);
+        BUILDER.pop();
+
+        BUILDER.push("vision");
+        VISION_FLIGHT_SPEED = BUILDER.defineInRange("flightSpeed", 0.08, 0.01, 0.5);
+        MIND_STONE_BEAM_DAMAGE = BUILDER.comment("Damage per hit of the Mind Stone beam (two hits per second at most).")
+                .defineInRange("mindStoneBeamDamage", 6.0, 0.0, 100.0);
         BUILDER.pop();
 
         BUILDER.push("quicksilver");

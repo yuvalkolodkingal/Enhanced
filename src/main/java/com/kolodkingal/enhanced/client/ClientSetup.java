@@ -1,7 +1,9 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
+import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.PhotonEyesLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
@@ -18,6 +20,7 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -30,6 +33,11 @@ public final class ClientSetup {
     /** A slightly inflated player model, for energy drawn just above the skin. */
     public static final ModelLayerLocation ENERGY_WIDE = new ModelLayerLocation(Enhanced.id("player_energy"), "wide");
     public static final ModelLayerLocation ENERGY_SLIM = new ModelLayerLocation(Enhanced.id("player_energy"), "slim");
+
+    @SubscribeEvent
+    public static void onClientSetup(FMLClientSetupEvent event) {
+        CustomMusic.prepareFolder();
+    }
 
     @SubscribeEvent
     public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
@@ -60,6 +68,7 @@ public final class ClientSetup {
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim);
                 renderer.addLayer(new PowerAuraLayer(renderer, energy));
                 renderer.addLayer(new PhotonEyesLayer(renderer));
+                renderer.addLayer(new MindStoneLayer(renderer));
             }
         }
     }

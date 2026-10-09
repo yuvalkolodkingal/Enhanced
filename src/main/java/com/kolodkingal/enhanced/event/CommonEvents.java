@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.command.EnhancedCommand;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -156,7 +157,7 @@ public final class CommonEvents {
         DamageSource source = event.getSource();
         boolean unstoppable = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
 
-        if (PhotonAbilities.isPhased(player) && !unstoppable) {
+        if ((PhotonAbilities.isPhased(player) || VisionAbilities.isPhased(player)) && !unstoppable) {
             event.setCanceled(true);
             return;
         }
@@ -201,7 +202,7 @@ public final class CommonEvents {
                 || !(hit.getEntity() instanceof ServerPlayer player) || projectile.getOwner() == player) {
             return;
         }
-        if (PhotonAbilities.isPhased(player)) {
+        if (PhotonAbilities.isPhased(player) || VisionAbilities.isPhased(player)) {
             event.setCanceled(true); // passes straight through
             return;
         }
@@ -220,7 +221,7 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onAttack(AttackEntityEvent event) {
-        if (PhotonAbilities.isPhased(event.getEntity())) {
+        if (PhotonAbilities.isPhased(event.getEntity()) || VisionAbilities.isPhased(event.getEntity())) {
             event.setCanceled(true);
         }
     }

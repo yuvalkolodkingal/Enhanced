@@ -38,3 +38,7 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### Personal music (never committed) ###
+# Put your own song here as quicksilver_theme.mp3/.ogg/.wav to build it into your personal copy of the mod.
+personal/

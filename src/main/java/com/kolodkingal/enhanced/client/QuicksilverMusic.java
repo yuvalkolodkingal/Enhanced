@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client;
 
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SlowMotion;
+import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -11,7 +13,15 @@ import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.Util;
+import net.minecraft.client.resources.sounds.Sound;
+import net.minecraft.client.sounds.AudioStream;
+import net.minecraft.client.sounds.SoundBufferLibrary;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Quicksilver's Walkman. While a Quicksilver with his Walkman on is running Quicksilver Time nearby, the theme plays
@@ -58,9 +68,15 @@ public final class QuicksilverMusic {
         }
     }
 
-    /** The looping theme, heard the same everywhere (not positional), with a short fade in and out. */
+    /**
+     * The looping theme, heard the same everywhere (not positional), with a short fade in and out. After fading out
+     * it keeps playing silently for a while, so if Quicksilver starts running again soon the song simply continues.
+     */
     private static final class Theme extends AbstractTickableSoundInstance {
+        /** How long the song keeps running silently before it really stops (10 seconds). */
+        private static final int SILENT_GRACE_TICKS = 200;
         private boolean fadingOut;
+        private int silentTicks;
 
         Theme() {
             super(ModSounds.QUICKSILVER_THEME.get(), SoundSource.RECORDS, SoundInstance.createUnseededRandom());
@@ -79,15 +95,35 @@ public final class QuicksilverMusic {
             fadingOut = true;
         }
 
+        /** Plays the player's own song if there is one, otherwise the built-in theme. */
+        @Override
+        public CompletableFuture<AudioStream> getStream(SoundBufferLibrary buffers, Sound sound, boolean looping) {
+            return CompletableFuture.supplyAsync(() -> {
+                try {
+                    Optional<AudioStream> song = CustomMusic.openSong(looping);
+                    if (song.isPresent()) {
+                        return song.get();
+                    }
+                } catch (IOException | RuntimeException e) {
+                    Enhanced.LOGGER.warn("Could not play your Quicksilver song; using the built-in theme", e);
+                }
+                return buffers.getStream(sound.getPath(), looping).join();
+            }, Util.nonCriticalIoPool());
+        }
+
         @Override
         public void tick() {
             if (fadingOut) {
-                volume -= 0.04F;
-                if (volume <= 0.0F) {
+                if (volume > 0.0F) {
+                    volume = Math.max(0.0F, volume - 0.04F);
+                } else if (++silentTicks > SILENT_GRACE_TICKS) {
                     stop();
                 }
-            } else if (volume < 1.0F) {
-                volume = Math.min(1.0F, volume + 0.1F);
+            } else {
+                silentTicks = 0;
+                if (volume < 1.0F) {
+                    volume = Math.min(1.0F, volume + 0.1F);
+                }
             }
         }
     }

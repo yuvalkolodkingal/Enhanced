@@ -29,6 +29,13 @@ public final class SuitSkins {
     private static final PlayerSkin QUICKSILVER = new PlayerSkin(
             Enhanced.id("textures/entity/suit/quicksilver.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    private static final PlayerSkin VISION = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/vision.png"), null,
+            Enhanced.id("textures/entity/suit/vision_cape.png"), null, PlayerSkin.Model.WIDE, true);
+
+    private static final PlayerSkin VISION_HUMAN = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/vision_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+
     /** The suit the player is currently transformed into, or null to keep their own skin. */
     @Nullable
     public static PlayerSkin suitFor(AbstractClientPlayer player) {
@@ -41,6 +48,10 @@ public final class SuitSkins {
         }
         if (power == Power.QUICKSILVER && QuicksilverAbilities.wearsGoggles(player)) {
             return QUICKSILVER;
+        }
+        if (power == Power.VISION) {
+            // Vision's body is synthetic, so he is always Vision; in disguise he looks human (WandaVision).
+            return Powers.get(player).disguise() ? VISION_HUMAN : VISION;
         }
         return null;
     }

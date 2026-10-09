@@ -36,6 +36,7 @@ public final class PowerTicker {
             case SCARLET_WITCH -> WandaAbilities.tick(player, data);
             case PHOTON -> PhotonAbilities.tick(player, data);
             case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
+            case VISION -> VisionAbilities.tick(player, data);
             case NONE -> {
             }
         }
@@ -47,11 +48,13 @@ public final class PowerTicker {
     /** Flight permission and speed, plus the Scarlet Witch's crown bonuses. */
     public static void applyPassives(ServerPlayer player, PowerData data) {
         Power power = data.power();
-        setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, power.canFly());
+        // Vision's dense body is too heavy to fly.
+        boolean canFly = power.canFly() && !(power == Power.VISION && data.dense());
+        setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
         boolean survivalLike = !player.isCreative() && !player.isSpectator();
-        float speed = survivalLike && power.canFly() ? power.flightSpeed() : 0.05F;
+        float speed = survivalLike && canFly ? power.flightSpeed() : 0.05F;
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);
@@ -65,6 +68,7 @@ public final class PowerTicker {
             player.onUpdateAbilities();
         }
         WandaAbilities.applyCrown(player, data);
+        VisionAbilities.applyBody(player, data);
         if (data.power() != Power.QUICKSILVER) {
             data.setSlowMo(false);
             QuicksilverAbilities.applySpeed(player, data);

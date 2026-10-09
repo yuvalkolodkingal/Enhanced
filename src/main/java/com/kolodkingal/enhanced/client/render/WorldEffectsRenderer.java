@@ -78,7 +78,10 @@ public final class WorldEffectsRenderer {
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
             if (data.power() == Power.SCARLET_WITCH && data.beamActive()) {
-                renderChaosBeam(mc, player, pose, beams, camera, partialTick, time);
+                renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS, pose, beams, camera, partialTick, time);
+            }
+            if (data.power() == Power.VISION && data.beamActive()) {
+                renderBeam(mc, player, foreheadPosition(mc, player, partialTick), MIND_STONE, pose, beams, camera, partialTick, time);
             }
             if (data.heldEntityId() != -1) {
                 Entity held = level.getEntity(data.heldEntityId());
@@ -122,25 +125,30 @@ public final class WorldEffectsRenderer {
         }
     }
 
-    // ---- Chaos Beam ----
+    // ---- Beams (Chaos Beam, Mind Stone beam) ----
 
-    private static void renderChaosBeam(Minecraft mc, AbstractClientPlayer player, Matrix4f pose, VertexConsumer vc,
-                                        Vec3 camera, float partialTick, float time) {
+    /** Colours of a beam: wide glow, inner glow, hot core, crackling bolts, impact flare. */
+    private record Palette(int glow, int core, int bolt) {
+    }
+
+    private static final Palette CHAOS = new Palette(Power.SCARLET_WITCH.color, 0xFF6A80, 0xFF2040);
+    private static final Palette MIND_STONE = new Palette(0xF2B526, 0xFFF4B0, 0xFFD84A);
+
+    private static void renderBeam(Minecraft mc, AbstractClientPlayer player, Vec3 origin, Palette palette, Matrix4f pose,
+                                   VertexConsumer vc, Vec3 camera, float partialTick, float time) {
         double range = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_BEAM_RANGE.get() : 32;
         Vec3 end = Raycasts.any(player, range, WandaAbilities.BEAM_TARGET, partialTick).getLocation().subtract(camera);
-        Vec3 start = handPosition(mc, player, partialTick).subtract(camera);
+        Vec3 start = origin.subtract(camera);
 
         float flicker = 0.85F + 0.15F * Mth.sin(time * 1.7F) * Mth.cos(time * 0.9F);
-        int red = Power.SCARLET_WITCH.color;
-        int hot = 0xFF6A80;
-        // The beam starts thin at the hand and swells a little towards the target, so it never fills the screen in first person.
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.12F, 0.55F * flicker, EnergyGeometry.argb(red, 0.10F), EnergyGeometry.argb(red, 0.30F));
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.06F, 0.26F * flicker, EnergyGeometry.argb(red, 0.45F), EnergyGeometry.argb(red, 0.55F));
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.02F, 0.08F, EnergyGeometry.argb(hot, 0.75F), EnergyGeometry.argb(hot, 0.85F));
+        // The beam starts thin at its source and swells a little towards the target, so it never fills the screen in first person.
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.12F, 0.55F * flicker, EnergyGeometry.argb(palette.glow, 0.10F), EnergyGeometry.argb(palette.glow, 0.30F));
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.06F, 0.26F * flicker, EnergyGeometry.argb(palette.glow, 0.45F), EnergyGeometry.argb(palette.glow, 0.55F));
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.02F, 0.08F, EnergyGeometry.argb(palette.core, 0.75F), EnergyGeometry.argb(palette.core, 0.85F));
 
         long seed = ((long) time / 2) * 341873128712L + player.getId() * 132897987541L;
         for (int k = 0; k < 3; k++) {
-            EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.28F, EnergyGeometry.argb(0xFF2040, 0.8F), seed + k * 7919L);
+            EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.28F, EnergyGeometry.argb(palette.bolt, 0.8F), seed + k * 7919L);
         }
         // A flare where the beam hits.
         float flare = 0.5F + 0.2F * Mth.sin(time * 2.3F);
@@ -151,8 +159,8 @@ public final class WorldEffectsRenderer {
         }
         side = side.normalize();
         Vec3 up = side.cross(toCamera).normalize();
-        EnergyGeometry.ribbon(pose, vc, end.subtract(side.scale(flare)), end.add(side.scale(flare)), flare, EnergyGeometry.argb(red, 0.7F), EnergyGeometry.argb(red, 0.7F));
-        EnergyGeometry.ribbon(pose, vc, end.subtract(up.scale(flare)), end.add(up.scale(flare)), flare * 0.5F, EnergyGeometry.argb(hot, 0.6F), EnergyGeometry.argb(hot, 0.6F));
+        EnergyGeometry.ribbon(pose, vc, end.subtract(side.scale(flare)), end.add(side.scale(flare)), flare, EnergyGeometry.argb(palette.glow, 0.7F), EnergyGeometry.argb(palette.glow, 0.7F));
+        EnergyGeometry.ribbon(pose, vc, end.subtract(up.scale(flare)), end.add(up.scale(flare)), flare * 0.5F, EnergyGeometry.argb(palette.core, 0.6F), EnergyGeometry.argb(palette.core, 0.6F));
     }
 
     // ---- Telekinesis ----
@@ -164,6 +172,14 @@ public final class WorldEffectsRenderer {
         long seed = ((long) time / 3) * 6364136223846793005L + player.getId();
         EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.35F, EnergyGeometry.argb(power.color, 0.7F), seed);
         EnergyGeometry.bolt(pose, vc, start, end, 0.025F, 0.5F, EnergyGeometry.argb(power.glow, 0.4F), seed + 31);
+    }
+
+    /** Vision's Mind Stone, in the middle of his forehead (just above the screen centre in first person). */
+    public static Vec3 foreheadPosition(Minecraft mc, AbstractClientPlayer player, float partialTick) {
+        Vec3 eye = player.getEyePosition(partialTick);
+        Vec3 look = player.getViewVector(partialTick);
+        boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
+        return eye.add(look.scale(firstPerson ? 0.45 : 0.28)).add(0, firstPerson ? 0.12 : 0.18, 0);
     }
 
     /** Where energy leaves the player's hands: in front of the chest, or bottom-right of the screen in first person. */

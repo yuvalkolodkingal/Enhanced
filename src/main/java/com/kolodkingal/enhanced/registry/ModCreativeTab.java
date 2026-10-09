@@ -20,6 +20,7 @@ public final class ModCreativeTab {
                         output.accept(ModItems.LOKIS_SCEPTER.get());
                         output.accept(ModItems.WANDA_CROWN.get());
                         output.accept(ModItems.QUICKSILVER_GOGGLES.get());
+                        output.accept(ModItems.SYNTHEZOID_CORE.get());
                     })
                     .build());
 

@@ -28,7 +28,8 @@ import java.util.List;
 
 /**
  * Loki's Scepter, with the Mind Stone in its blue gem. Using it means touching the stone: with the Scarlet Witch
- * Gene in your other hand you awaken as the Scarlet Witch; without it, the stone's energy tears you apart.
+ * Gene in your other hand you awaken as the Scarlet Witch, with a Synthezoid Core you become Vision; with neither,
+ * the stone's energy tears you apart.
  */
 public class LokisScepterItem extends Item {
     public LokisScepterItem(Properties properties) {
@@ -59,7 +60,7 @@ public class LokisScepterItem extends Item {
     public static void touchMindStone(ServerPlayer player, InteractionHand scepterHand) {
         ServerLevel level = player.serverLevel();
         Power power = Powers.power(player);
-        if (power == Power.SCARLET_WITCH) {
+        if (power == Power.SCARLET_WITCH || power == Power.VISION) {
             player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.recognizes").withStyle(ChatFormatting.GOLD), true);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 1.0F);
             return;
@@ -87,7 +88,24 @@ public class LokisScepterItem extends Item {
             return;
         }
 
-        // No gene: the Mind Stone's energy is too much for an ordinary body.
+        ItemStack core = player.getItemInHand(otherHand);
+        if (core.is(ModItems.SYNTHEZOID_CORE.get())) {
+            if (power.hasPowers()) {
+                player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.already_powered").withStyle(ChatFormatting.GRAY), true);
+                return;
+            }
+            core.consume(1, player);
+            LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
+            if (bolt != null) {
+                bolt.moveTo(player.getX(), player.getY(), player.getZ());
+                bolt.setVisualOnly(true);
+                level.addFreshEntity(bolt);
+            }
+            Powers.awaken(player, Power.VISION);
+            return;
+        }
+
+        // No gene or synthezoid body: the Mind Stone's energy is too much for an ordinary body.
         level.explode(player, player.getX(), player.getY() + 1.0, player.getZ(), 3.0F, Level.ExplosionInteraction.NONE);
         if (player.isCreative() || player.isSpectator()) {
             player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.creative").withStyle(ChatFormatting.GRAY), true);

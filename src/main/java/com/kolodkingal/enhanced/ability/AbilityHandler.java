@@ -22,6 +22,7 @@ public final class AbilityHandler {
             case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down);
             case PHOTON -> PhotonAbilities.onKey(player, data, ability, down);
             case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down);
+            case VISION -> VisionAbilities.onKey(player, data, ability, down);
             case NONE -> {
             }
         }

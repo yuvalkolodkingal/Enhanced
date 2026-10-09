@@ -106,6 +106,14 @@ public class PowerHud implements LayeredDraw.Layer {
                 case 5 -> onOff(data.walkman());
                 default -> null;
             };
+            case VISION -> switch (ability) {
+                case 1 -> data.beamActive() ? active("hud.enhanced.active") : null;
+                case 2 -> onOff(data.flying());
+                case 3 -> onOff(data.visionPhased());
+                case 4 -> onOff(data.dense());
+                case 5 -> onOff(data.disguise());
+                default -> null;
+            };
             case NONE -> null;
         };
     }

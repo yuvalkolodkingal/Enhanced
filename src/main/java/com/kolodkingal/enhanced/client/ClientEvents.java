@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
+import com.kolodkingal.enhanced.client.render.Afterimages;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -11,8 +12,6 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -50,13 +49,17 @@ public final class ClientEvents {
         handleKeys(mc, player);
         spawnFlightParticles(mc.level);
         spawnSpeedTrails(mc.level);
+        Afterimages.tick(mc.level);
         QuicksilverMusic.tick(mc);
+        SlowMotionEffect.tick(mc);
     }
 
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         java.util.Arrays.fill(SENT_DOWN, false);
         QuicksilverMusic.stop();
+        Afterimages.clear();
+        SlowMotionEffect.stop(Minecraft.getInstance());
     }
 
     /** Quicksilver leaves a silver-blue streak behind him. */
@@ -182,23 +185,28 @@ public final class ClientEvents {
         return player.position().add(x, player.isCrouching() ? 0.6 : 0.75, z);
     }
 
-    /** Arms up and forward while casting: beaming, firing shrapnel or holding something with telekinesis. */
+    /** Players currently drawn with a hover bob (their pose stack was pushed in Pre and must be popped in Post). */
+    private static final java.util.Set<Integer> BOBBING = new java.util.HashSet<>();
+
+    /** Flying heroes float with a gentle up-and-down bob. */
     @SubscribeEvent
-    public static void onRenderPlayer(RenderPlayerEvent.Pre event) {
+    public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
         Player player = event.getEntity();
         PowerData data = Powers.get(player);
-        boolean casting = (data.power() == Power.SCARLET_WITCH && data.beamActive())
-                || (data.power() == Power.MAGNETO && data.shrapnelActive())
-                || data.heldEntityId() != -1;
-        if (!casting) {
-            return;
+        if (data.power().hasPowers() && data.flying() && !player.onGround()) {
+            float t = player.tickCount + event.getPartialTick();
+            event.getPoseStack().pushPose();
+            event.getPoseStack().translate(0.0, Mth.sin(t * 0.08F) * 0.06, 0.0);
+            BOBBING.add(player.getId());
         }
-        PlayerModel<AbstractClientPlayer> model = event.getRenderer().getModel();
-        if (player.getMainArm() == HumanoidArm.RIGHT) {
-            model.rightArmPose = HumanoidModel.ArmPose.BOW_AND_ARROW;
-        } else {
-            model.leftArmPose = HumanoidModel.ArmPose.BOW_AND_ARROW;
+    }
+
+    @SubscribeEvent
+    public static void onRenderPlayerPost(RenderPlayerEvent.Post event) {
+        if (BOBBING.remove(event.getEntity().getId())) {
+            event.getPoseStack().popPose();
         }
+        Afterimages.render(event);
     }
 
     private ClientEvents() {

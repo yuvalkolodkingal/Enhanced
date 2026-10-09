@@ -130,6 +130,11 @@ configurations {
 }
 
 dependencies {
+    // MP3 decoder, so Quicksilver's Walkman can play a song file the player drops into config/enhanced/music.
+    // Shipped inside the mod jar (Jar-in-Jar); also on the run classpath in development.
+    jarJar(implementation("javazoom:jlayer:1.0.1"))
+    additionalRuntimeClasspath "javazoom:jlayer:1.0.1"
+
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
@@ -176,6 +181,15 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 sourceSets.main.resources.srcDir generateModMetadata
 // To avoid having to run "generateModMetadata" manually, make it run on every project reload
 neoForge.ideSyncTask generateModMetadata
+
+// A personal song for Quicksilver's Walkman: if personal/quicksilver_theme.(mp3|ogg|wav) exists (it is git-ignored),
+// it is built into your own copy of the mod and played instead of the built-in theme.
+tasks.named('processResources', ProcessResources).configure {
+    from('personal') {
+        include 'quicksilver_theme.mp3', 'quicksilver_theme.ogg', 'quicksilver_theme.wav'
+        into 'assets/enhanced/sounds/quicksilver/personal'
+    }
+}
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {

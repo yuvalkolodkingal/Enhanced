@@ -30,6 +30,12 @@ public final class PowerData {
     private boolean wallRun = true;
     /** Quicksilver: his Walkman plays the theme during Quicksilver Time. */
     private boolean walkman = true;
+    /** Vision: intangible, passing through walls (saved, so he can't log back in stuck inside a wall). */
+    private boolean visionPhased;
+    /** Vision: super-dense body. */
+    private boolean dense;
+    /** Vision: human disguise from WandaVision. */
+    private boolean disguise;
 
     // ---- runtime (synced, not saved) ----
     private boolean beamActive;
@@ -54,8 +60,11 @@ public final class PowerData {
             Codec.FLOAT.optionalFieldOf("energy", 0F).forGetter(d -> d.energy),
             Codec.BOOL.optionalFieldOf("quicksilver_time", true).forGetter(d -> d.quicksilverTime),
             Codec.BOOL.optionalFieldOf("wall_run", true).forGetter(d -> d.wallRun),
-            Codec.BOOL.optionalFieldOf("walkman", true).forGetter(d -> d.walkman)
-    ).apply(i, (power, shield, vision, iron, energy, qsTime, wallRun, walkman) -> {
+            Codec.BOOL.optionalFieldOf("walkman", true).forGetter(d -> d.walkman),
+            Codec.BOOL.optionalFieldOf("vision_phased", false).forGetter(d -> d.visionPhased),
+            Codec.BOOL.optionalFieldOf("dense", false).forGetter(d -> d.dense),
+            Codec.BOOL.optionalFieldOf("disguise", false).forGetter(d -> d.disguise)
+    ).apply(i, (power, shield, vision, iron, energy, qsTime, wallRun, walkman, phased, dense, disguise) -> {
         PowerData d = new PowerData();
         d.power = power;
         d.magneticShield = shield;
@@ -65,6 +74,9 @@ public final class PowerData {
         d.quicksilverTime = qsTime;
         d.wallRun = wallRun;
         d.walkman = walkman;
+        d.visionPhased = phased;
+        d.dense = dense;
+        d.disguise = disguise;
         return d;
     }));
 
@@ -75,7 +87,8 @@ public final class PowerData {
         ByteBufCodecs.VAR_INT.encode(buf, power.ordinal());
         int flags = (magneticShield ? 1 : 0) | (spectrumVision ? 2 : 0) | (beamActive ? 4 : 0)
                 | (chaosShieldActive ? 8 : 0) | (shrapnelActive ? 16 : 0) | (flying ? 32 : 0)
-                | (quicksilverTime ? 64 : 0) | (wallRun ? 128 : 0) | (walkman ? 256 : 0) | (slowMo ? 512 : 0);
+                | (quicksilverTime ? 64 : 0) | (wallRun ? 128 : 0) | (walkman ? 256 : 0) | (slowMo ? 512 : 0)
+                | (visionPhased ? 1024 : 0) | (dense ? 2048 : 0) | (disguise ? 4096 : 0);
         ByteBufCodecs.VAR_INT.encode(buf, flags);
         ByteBufCodecs.VAR_INT.encode(buf, ironCharge);
         buf.writeFloat(energy);
@@ -102,6 +115,9 @@ public final class PowerData {
         d.wallRun = (flags & 128) != 0;
         d.walkman = (flags & 256) != 0;
         d.slowMo = (flags & 512) != 0;
+        d.visionPhased = (flags & 1024) != 0;
+        d.dense = (flags & 2048) != 0;
+        d.disguise = (flags & 4096) != 0;
         d.ironCharge = ByteBufCodecs.VAR_INT.decode(buf);
         d.energy = buf.readFloat();
         d.phaseTicks = ByteBufCodecs.VAR_INT.decode(buf);
@@ -129,6 +145,9 @@ public final class PowerData {
         this.wallRun = true;
         this.walkman = true;
         this.slowMo = false;
+        this.visionPhased = false;
+        this.dense = false;
+        this.disguise = false;
         this.beamActive = false;
         this.chaosShieldActive = false;
         this.shrapnelActive = false;
@@ -225,6 +244,39 @@ public final class PowerData {
     public void setSlowMo(boolean v) {
         if (slowMo != v) {
             slowMo = v;
+            dirty = true;
+        }
+    }
+
+    public boolean visionPhased() {
+        return visionPhased;
+    }
+
+    public void setVisionPhased(boolean v) {
+        if (visionPhased != v) {
+            visionPhased = v;
+            dirty = true;
+        }
+    }
+
+    public boolean dense() {
+        return dense;
+    }
+
+    public void setDense(boolean v) {
+        if (dense != v) {
+            dense = v;
+            dirty = true;
+        }
+    }
+
+    public boolean disguise() {
+        return disguise;
+    }
+
+    public void setDisguise(boolean v) {
+        if (disguise != v) {
+            disguise = v;
             dirty = true;
         }
     }

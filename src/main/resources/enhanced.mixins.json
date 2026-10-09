@@ -3,10 +3,14 @@
   "minVersion": "0.8",
   "package": "com.kolodkingal.enhanced.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "PlayerMixin"
+  ],
   "client": [
     "client.AbstractClientPlayerMixin",
-    "client.MinecraftMixin"
+    "client.LivingEntityRendererMixin",
+    "client.MinecraftMixin",
+    "client.PlayerModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1
