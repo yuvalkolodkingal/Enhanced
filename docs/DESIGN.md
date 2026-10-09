@@ -309,7 +309,7 @@ Monica Rambeau after she crossed the Hex.
 **When Quicksilver sprints, time slows down around him:**
 
 * Everything within **32 blocks** runs **5 times slower**: monsters, animals, villagers,
-  falling blocks, TNT fuses, dropped items, and **arrows and thrown things, which hang in
+  falling blocks, TNT fuses, dropped items, smoke, sparks and splashes, and **arrows and thrown things, which hang in
   the air** and crawl forward. **(added)** An arrow that finally lands still hits as hard as it
   would have.
 * Other players in range are slowed down heavily (a strong Slowness).

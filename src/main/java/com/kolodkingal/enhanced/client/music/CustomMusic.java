@@ -60,7 +60,14 @@ public final class CustomMusic {
             return Optional.empty();
         }
         Enhanced.LOGGER.info("Quicksilver's Walkman plays {}", file.get().getFileName());
-        return Optional.of(open(typeOf(file.get()), new BufferedInputStream(Files.newInputStream(file.get())), looping));
+        InputStream in = new BufferedInputStream(Files.newInputStream(file.get()));
+        try {
+            return Optional.of(open(typeOf(file.get()), in, looping));
+        } catch (IOException | RuntimeException e) {
+            // Not a song we can play: let go of the file (the caller falls back to Sweet Dreams).
+            in.close();
+            throw e;
+        }
     }
 
     /** The player's song, if they put one in the folder. */
