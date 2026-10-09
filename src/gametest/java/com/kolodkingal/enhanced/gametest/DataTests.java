@@ -1,9 +1,14 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.registry.ModItems;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -21,11 +26,19 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforgespi.locating.IModFile;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -148,6 +161,64 @@ public final class DataTests {
         ItemStack r = new ItemStack(Items.REDSTONE_BLOCK);
         check(recipe.matches(CraftingInput.of(3, 2, List.of(g, r, g, g, ItemStack.EMPTY, g)), level), "gold + redstone block crown shape");
         check(recipe.getResultItem(level.registryAccess()).is(ModItems.WANDA_CROWN.get()), "it makes Wanda's Crown");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void quicksilverGogglesRecipe(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("quicksilver_goggles"));
+        check(holder.isPresent() && holder.get().value() instanceof ShapedRecipe, "recipe enhanced:quicksilver_goggles exists");
+        ShapedRecipe recipe = (ShapedRecipe) holder.get().value();
+        ItemStack sugar = new ItemStack(Items.SUGAR);
+        ItemStack iron = new ItemStack(Items.IRON_INGOT);
+        ItemStack pane = new ItemStack(Items.GLASS_PANE);
+        ItemStack diamonds = new ItemStack(Items.DIAMOND_BLOCK);
+        check(recipe.matches(CraftingInput.of(3, 2, List.of(sugar, iron, sugar, pane, diamonds, pane)), level), "S I S / G D G");
+        check(recipe.getResultItem(level.registryAccess()).is(ModItems.QUICKSILVER_GOGGLES.get()), "it makes Quicksilver's Goggles");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void synthezoidCoreRecipe(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("synthezoid_core"));
+        check(holder.isPresent() && holder.get().value() instanceof ShapedRecipe, "recipe enhanced:synthezoid_core exists");
+        ShapedRecipe recipe = (ShapedRecipe) holder.get().value();
+        ItemStack r = new ItemStack(Items.REDSTONE_BLOCK);
+        ItemStack n = new ItemStack(Items.NETHERITE_INGOT);
+        ItemStack star = new ItemStack(Items.NETHER_STAR);
+        check(recipe.matches(CraftingInput.of(3, 3, List.of(r, n, r, n, star, n, r, n, r)), level), "R N R / N S N / R N R");
+        check(recipe.getResultItem(level.registryAccess()).is(ModItems.SYNTHEZOID_CORE.get()), "it makes a Synthezoid Core");
+        helper.succeed();
+    }
+
+    /**
+     * Every sound the mod defines, Quicksilver's song included, is a registered sound event backed by a real Ogg file
+     * in the mod (not missing, renamed or an LFS pointer).
+     */
+    @GameTest(template = ARENA)
+    public static void everySoundHasItsFile(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        Path soundsJson = mod.findResource("assets", Enhanced.MODID, "sounds.json");
+        check(Files.isRegularFile(soundsJson), "assets/enhanced/sounds.json exists");
+        JsonObject sounds = JsonParser.parseString(Files.readString(soundsJson)).getAsJsonObject();
+        check(sounds.has("quicksilver_theme"), "Quicksilver's song is defined");
+        for (Map.Entry<String, JsonElement> event : sounds.entrySet()) {
+            check(BuiltInRegistries.SOUND_EVENT.containsKey(Enhanced.id(event.getKey())), "sound event enhanced:" + event.getKey() + " is registered");
+            for (JsonElement sound : event.getValue().getAsJsonObject().getAsJsonArray("sounds")) {
+                String name = sound.isJsonObject() ? sound.getAsJsonObject().get("name").getAsString() : sound.getAsString();
+                ResourceLocation id = ResourceLocation.parse(name);
+                Path file = mod.findResource(("assets/" + id.getNamespace() + "/sounds/" + id.getPath() + ".ogg").split("/"));
+                check(Files.isRegularFile(file), name + " has its .ogg file");
+                byte[] head = new byte[4];
+                try (InputStream in = Files.newInputStream(file)) {
+                    check(in.readNBytes(head, 0, 4) == 4 && "OggS".equals(new String(head, StandardCharsets.US_ASCII)), name + " is an Ogg file");
+                }
+            }
+        }
+        Path song = mod.findResource("assets", Enhanced.MODID, "sounds", "quicksilver", "sweet_dreams.ogg");
+        check(Files.size(song) > 1_000_000, "Sweet Dreams is the whole song (" + Files.size(song) + " bytes)");
         helper.succeed();
     }
 

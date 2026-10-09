@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.registries.Registries;
@@ -100,6 +101,30 @@ public final class MagnetoTests {
 
         AbilityHandler.onKey(wanda, 1, false);
         check(!Powers.get(wanda).beamActive(), "releasing R stops the beam");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void wandasTelekinesisAlsoHitsMagnetoInFull(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer magneto = f.player(14.5, FLOOR, 10.5);
+        magneto.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
+        magneto.doTick();
+        check(Powers.is(magneto, Power.MAGNETO), "helmet awakens Magneto");
+        ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer other = f.player(8.5, FLOOR, 4.5, Power.MAGNETO);
+
+        // Something Wanda hurled at him (a block, a creature, or Magneto himself thrown into a wall).
+        float before = magneto.getHealth();
+        magneto.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.TELEKINETIC_SLAM, wanda, wanda), 8.0F);
+        assertNear(before - magneto.getHealth(), 8.0, 0.01, "Wanda's telekinesis hits Magneto in full (armor ignored)");
+
+        // The same slam from anyone else is softened by his armor as usual.
+        magneto.invulnerableTime = 0;
+        before = magneto.getHealth();
+        magneto.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.TELEKINETIC_SLAM, other, other), 8.0F);
+        check(before - magneto.getHealth() < 7.0F, "other telekinetic slams are softened by his armor (took " + (before - magneto.getHealth()) + ")");
         helper.succeed();
     }
 

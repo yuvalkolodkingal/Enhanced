@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,12 +21,17 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -178,6 +184,68 @@ public final class QuicksilverTests {
             }
             return false;
         });
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_trident", timeoutTicks = 40)
+    public static void returningTridentLeavesTheSlowMotion(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 8);
+        ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        run(peter, true);
+
+        // A volley of arrows and two Loyalty tridents, all slowed down together. (Two tridents turning back in the same tick
+        // make sure one of them is let go while others are still being looked at.)
+        List<Arrow> arrows = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            Arrow arrow = new Arrow(EntityType.ARROW, helper.getLevel());
+            Vec3 at = helper.absoluteVec(new Vec3(3.5 + (i % 4), 5.0 + i / 4, 6.5));
+            arrow.moveTo(at.x, at.y, at.z);
+            arrow.setDeltaMovement(0, 0, 0.5);
+            helper.getLevel().addFreshEntity(arrow);
+            arrows.add(arrow);
+        }
+        List<ThrownTrident> tridents = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            ItemStack tridentItem = new ItemStack(Items.TRIDENT);
+            tridentItem.enchant(helper.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.LOYALTY), 3);
+            ThrownTrident trident = new ThrownTrident(helper.getLevel(), peter, tridentItem);
+            Vec3 at = helper.absoluteVec(new Vec3(4.5 + 2 * i, 6.0, 8.5));
+            trident.moveTo(at.x, at.y, at.z);
+            trident.setDeltaMovement(0, 0, 0.5);
+            helper.getLevel().addFreshEntity(trident);
+            tridents.add(trident);
+        }
+
+        f.everyTick(20, tick -> {
+            run(peter, true);
+            if (tick == 2) {
+                check(tridents.stream().allMatch(ThrownTrident::isNoGravity) && arrows.stream().allMatch(Arrow::isNoGravity),
+                        "everything in the air is slowed");
+                // Loyalty kicks in: the tridents turn around and fly home.
+                tridents.forEach(t -> t.setNoPhysics(true));
+            }
+            if (tick == 4) {
+                // The level ticks in between ran without a crash while the trident was let go among the slowed arrows.
+                check(tridents.stream().allMatch(t -> !t.isNoGravity() || t.isRemoved()), "the returning tridents are no longer slowed");
+                check(arrows.stream().allMatch(a -> a.isRemoved() || a.isNoGravity()), "the arrows are still slowed");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void walkmanTogglesTheSong(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        PowerData data = Powers.get(peter);
+        check(data.walkman(), "the Walkman is on from the start");
+        AbilityHandler.onKey(peter, 5, true);
+        AbilityHandler.onKey(peter, 5, false);
+        check(!data.walkman(), "N turns the song off");
+        AbilityHandler.onKey(peter, 5, true);
+        check(data.walkman(), "and on again");
+        helper.succeed();
     }
 
     @GameTest(template = ARENA)

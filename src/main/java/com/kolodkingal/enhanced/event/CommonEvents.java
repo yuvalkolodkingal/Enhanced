@@ -88,6 +88,11 @@ public final class CommonEvents {
     }
 
     @SubscribeEvent
+    public static void onEntityTickDone(EntityTickEvent.Post event) {
+        SlowMotion.afterTick(event.getEntity());
+    }
+
+    @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide) {
             SlowMotion.onJoin(event.getEntity());

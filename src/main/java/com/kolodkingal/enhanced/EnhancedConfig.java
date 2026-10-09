@@ -77,7 +77,7 @@ public final class EnhancedConfig {
                 .defineInRange("flightSpeed", 0.09, 0.01, 0.5);
         CHAOS_BEAM_DAMAGE = BUILDER.comment("Damage per Chaos Beam hit (5 = 2.5 hearts). Minecraft's damage cooldown allows two hits per second.")
                 .defineInRange("chaosBeamDamage", 5.0, 0.0, 100.0);
-        CHAOS_BEAM_RANGE = BUILDER.comment("Chaos Beam range in blocks.")
+        CHAOS_BEAM_RANGE = BUILDER.comment("Range in blocks of the Chaos Beam, and also of Vision's Mind Stone beam.")
                 .defineInRange("chaosBeamRange", 32, 4, 128);
         CHAOS_BEAM_NAUSEA_TICKS = BUILDER.comment("Duration of the Nausea the Chaos Beam inflicts, in ticks.")
                 .defineInRange("chaosBeamNauseaTicks", 100, 0, 6000);

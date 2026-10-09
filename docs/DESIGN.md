@@ -204,8 +204,9 @@ To touch the stone, hold the scepter and **right-click** (use it):
 * **Range:** 32 blocks. The beam stops at the first creature or block.
 * **Damage:** **2.5 hearts (5 HP) per hit** for as long as the beam stays on the target.
   Minecraft lets a creature be hurt at most twice per second, so a target takes about
-  5 hearts per second. The Ender Dragon (100 hearts) survives about 20 seconds of beam:
-  strong, but not a one-shot.
+  5 hearts per second. The Ender Dragon (100 hearts) survives about 20 seconds of beam if
+  every hit lands on its head, and roughly twice as long on its body or wings (it takes less
+  damage there): strong, but not a one-shot.
 * **Debuff:** every creature it hits gets **Nausea** for 5 seconds (Magneto's helmet
   blocks this, but not the damage).
 

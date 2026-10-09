@@ -153,9 +153,11 @@ public final class SlowMotion {
                 }
             }
         }
-        // Restore projectiles that left every zone (or whose Quicksilver stopped running).
+        // Restore projectiles that left every zone (or whose Quicksilver stopped running), and let a Loyalty trident that
+        // started flying home go at its own pace.
         if (!SLOWED.isEmpty()) {
             List<Projectile> leaving = new ArrayList<>();
+            List<Projectile> returningHome = new ArrayList<>();
             for (Projectile projectile : SLOWED) {
                 if (projectile.level() != level) {
                     continue;
@@ -163,14 +165,7 @@ public final class SlowMotion {
                 if (projectile.isRemoved() || !isInZone(level, projectile.position())) {
                     leaving.add(projectile);
                 } else if (returning(projectile)) {
-                    // Loyalty kicked in: let it fly home at its own pace.
-                    SLOWED.remove(projectile);
-                    release(projectile, false);
-                } else if (!projectile.isInWater() && !(projectile instanceof AbstractArrow arrow && arrow.inGround)) {
-                    // Vanilla drag (x0.99) runs every tick; a slowed projectile takes N ticks per normal tick, so give
-                    // back the extra drag to keep its speed, and its hit, the same as without the slow motion.
-                    int n = Math.max(1, projectile.getPersistentData().getCompound(SLOWED_TAG).getInt("Factor"));
-                    projectile.setDeltaMovement(projectile.getDeltaMovement().scale(Math.pow(0.99, 1.0 / n - 1.0)));
+                    returningHome.add(projectile);
                 }
             }
             for (Projectile projectile : leaving) {
@@ -179,7 +174,42 @@ public final class SlowMotion {
                     restore(projectile);
                 }
             }
+            for (Projectile projectile : returningHome) {
+                SLOWED.remove(projectile);
+                release(projectile, false);
+            }
         }
+    }
+
+    /**
+     * Called from {@code EntityTickEvent.Post} on both sides. Vanilla drag (x0.99) runs every tick, and a slowed
+     * projectile takes N ticks per normal tick, so the extra drag is given back to keep its speed (and its hit) the same
+     * as without the slow motion. It only runs when the projectile really ticked (not while the game is frozen), and the
+     * same way on clients, so their copy of the projectile stays in step with the server's.
+     */
+    public static void afterTick(Entity entity) {
+        if (!slowedBySpeed(entity)) {
+            return;
+        }
+        Projectile projectile = (Projectile) entity;
+        int n;
+        if (entity.level().isClientSide) {
+            // Clients don't see the server's tag: a slowed projectile is a weightless one inside a zone.
+            if (!projectile.isNoGravity() || !isInZone(entity.level(), entity.position())) {
+                return;
+            }
+            n = factor();
+        } else {
+            CompoundTag data = projectile.getPersistentData();
+            if (!data.contains(SLOWED_TAG)) {
+                return;
+            }
+            n = Math.max(1, data.getCompound(SLOWED_TAG).getInt("Factor"));
+        }
+        if (n <= 1 || returning(projectile) || projectile.isInWater() || projectile instanceof AbstractArrow arrow && arrow.inGround) {
+            return;
+        }
+        projectile.setDeltaMovement(projectile.getDeltaMovement().scale(Math.pow(0.99, 1.0 / n - 1.0)));
     }
 
     private static void slow(Projectile projectile, int factor) {

@@ -11,7 +11,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.Util;
 import net.minecraft.client.resources.sounds.Sound;
@@ -30,6 +33,8 @@ import java.util.concurrent.CompletableFuture;
 public final class QuicksilverMusic {
     @Nullable
     private static Theme playing;
+    /** Ticks the game's own music still waits after the song ended, like its usual pause between tracks. */
+    private static int musicPause;
 
     static void tick(Minecraft mc) {
         LocalPlayer listener = mc.player;
@@ -44,13 +49,21 @@ public final class QuicksilverMusic {
             playing.fadeOut();
             if (!mc.getSoundManager().isActive(playing)) {
                 playing = null;
+                Music music = mc.getSituationalMusic();
+                musicPause = Mth.nextInt(RandomSource.create(), music.getMinDelay(), Math.max(music.getMinDelay(), music.getMaxDelay()));
             }
+        } else if (musicPause > 0) {
+            musicPause--;
         }
     }
 
-    /** While the theme plays, the game's own music (boss music included) stays quiet: see ClientEvents.onSelectMusic. */
-    static boolean isPlaying() {
-        return playing != null;
+    /**
+     * Whether the game's music must stay quiet (see ClientEvents.onSelectMusic): always while the song plays, and for
+     * the game's usual pause between tracks after it ends. Music that comes back at once (boss music) only waits for
+     * the song.
+     */
+    static boolean holdsGameMusic(Music music) {
+        return playing != null || musicPause > 0 && music.getMinDelay() > 0;
     }
 
     private static boolean speedsterNearby(LocalPlayer listener) {
@@ -70,6 +83,7 @@ public final class QuicksilverMusic {
             Minecraft.getInstance().getSoundManager().stop(playing);
             playing = null;
         }
+        musicPause = 0;
     }
 
     /**

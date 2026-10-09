@@ -56,10 +56,10 @@ public final class ClientEvents {
         SlowMotionEffect.tick(mc);
     }
 
-    /** The game's own music (boss music included) waits while Quicksilver's theme plays. */
+    /** The game's own music waits while Quicksilver's song plays, and for its usual pause after the song ends. */
     @SubscribeEvent
     public static void onSelectMusic(SelectMusicEvent event) {
-        if (QuicksilverMusic.isPlaying()) {
+        if (QuicksilverMusic.holdsGameMusic(event.getOriginalMusic())) {
             event.setMusic(null);
         }
     }

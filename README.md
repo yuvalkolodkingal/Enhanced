@@ -28,7 +28,7 @@ number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs
 | Hero | How |
 |---|---|
 | **Magneto** | Craft **Magneto's Helmet** from 5 Netherite Blocks (helmet shape) and put it on. |
-| **Scarlet Witch** | Find the very rare **Scarlet Witch Gene** (mansions, strongholds, fortresses, bastions, ancient and End cities, witches, evokers). Hold it in one hand and use **Loki's Scepter** (End City treasure and other rare chests) with the other to touch the Mind Stone. **Without the gene, you explode.** |
+| **Scarlet Witch** | Find the very rare **Scarlet Witch Gene** (mansions, strongholds, fortresses, bastions, ancient and End cities, jungle temples, desert pyramids, witches, evokers). Hold it in one hand and use **Loki's Scepter** (End City treasure and other rare chests) with the other to touch the Mind Stone. **Without the gene, you explode.** |
 | **Photon** | Cross a Scarlet Witch's Hex wall without her permission and survive the 5% chance. |
 | **Quicksilver** | Craft **Quicksilver's Goggles** (sugar, iron, glass panes, a Block of Diamond) and put them on. |
 | **Vision** | Craft a **Synthezoid Core** (redstone blocks, netherite ingots, a Nether Star). Hold it in one hand and use **Loki's Scepter** with the other. |
