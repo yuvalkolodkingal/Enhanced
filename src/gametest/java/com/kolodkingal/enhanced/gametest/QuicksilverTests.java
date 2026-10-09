@@ -159,24 +159,31 @@ public final class QuicksilverTests {
         helper.getLevel().addFreshEntity(arrow);
         int factor = EnhancedConfig.SLOW_MOTION_FACTOR.get();
 
+        double[] speedAt3 = new double[1];
         f.everyTick(30, tick -> {
-            if (tick <= 3) {
+            if (tick <= 8) {
                 run(peter, true);
                 if (tick == 3) {
                     assertNear(arrow.getDeltaMovement().z, 1.0 / factor, 0.05, "the arrow crawls at 1/" + factor + " speed");
                     check(arrow.isNoGravity(), "a slowed arrow doesn't drop out of the air");
                     assertNear(arrow.getBaseDamage(), baseDamage, 1.0E-6, "its damage is untouched");
+                    speedAt3[0] = arrow.getDeltaMovement().z;
+                }
+                if (tick == 8) {
+                    // Five slowed ticks are one normal tick: the air slows it down by 1% (x0.99), not 5% (x0.99^5).
+                    double kept = arrow.getDeltaMovement().z / speedAt3[0];
+                    assertNear(kept, Math.pow(0.99, 5.0 / factor), 0.002, "its air drag is spread over the slowed time");
                 }
                 return false;
             }
-            if (tick == 4) {
+            if (tick == 9) {
                 // Hitting something gives it its full speed back first, so it hits as hard as it would have.
                 SlowMotion.unslow(arrow);
                 check(arrow.getDeltaMovement().z > 0.7, "a slowed arrow hits at full speed (" + arrow.getDeltaMovement().z + ")");
                 return false;
             }
             run(peter, false);
-            if (tick == 6) {
+            if (tick == 11) {
                 check(arrow.getDeltaMovement().z > 0.7, "the arrow speeds up again when Quicksilver stops (" + arrow.getDeltaMovement().z + ")");
                 check(!arrow.isNoGravity(), "and falls normally again");
                 assertNear(arrow.getBaseDamage(), baseDamage, 1.0E-6, "and has its normal damage back");
@@ -226,8 +233,8 @@ public final class QuicksilverTests {
             }
             if (tick == 4) {
                 // The level ticks in between ran without a crash while the trident was let go among the slowed arrows.
-                check(tridents.stream().allMatch(t -> !t.isNoGravity() || t.isRemoved()), "the returning tridents are no longer slowed");
-                check(arrows.stream().allMatch(a -> a.isRemoved() || a.isNoGravity()), "the arrows are still slowed");
+                check(tridents.stream().allMatch(t -> !t.isRemoved() && !t.isNoGravity()), "the returning tridents are no longer slowed");
+                check(arrows.stream().allMatch(a -> !a.isRemoved() && a.isNoGravity()), "the arrows are still slowed");
                 return true;
             }
             return false;

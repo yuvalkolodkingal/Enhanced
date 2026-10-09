@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -216,6 +217,9 @@ public final class DataTests {
                     check(in.readNBytes(head, 0, 4) == 4 && "OggS".equals(new String(head, StandardCharsets.US_ASCII)), name + " is an Ogg file");
                 }
             }
+        }
+        for (var registered : ModSounds.SOUNDS.getEntries()) {
+            check(sounds.has(registered.getId().getPath()), registered.getId() + " has an entry in sounds.json");
         }
         Path song = mod.findResource("assets", Enhanced.MODID, "sounds", "quicksilver", "sweet_dreams.ogg");
         check(Files.size(song) > 1_000_000, "Sweet Dreams is the whole song (" + Files.size(song) + " bytes)");

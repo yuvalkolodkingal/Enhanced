@@ -105,7 +105,7 @@ public final class MagnetoTests {
     }
 
     @GameTest(template = ARENA)
-    public static void wandasTelekinesisAlsoHitsMagnetoInFull(GameTestHelper helper) {
+    public static void telekineticSlamFromWandaIgnoresMagnetosArmor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
         ServerPlayer magneto = f.player(14.5, FLOOR, 10.5);

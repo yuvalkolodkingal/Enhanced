@@ -35,6 +35,8 @@ public final class QuicksilverMusic {
     private static Theme playing;
     /** Ticks the game's own music still waits after the song ended, like its usual pause between tracks. */
     private static int musicPause;
+    /** Whether the current song was actually audible (not muted by the volume sliders, and its file loaded). */
+    private static boolean heard;
 
     static void tick(Minecraft mc) {
         LocalPlayer listener = mc.player;
@@ -45,12 +47,16 @@ public final class QuicksilverMusic {
                 mc.getSoundManager().play(playing);
             }
             playing.fadeIn();
+            heard |= mc.getSoundManager().isActive(playing);
         } else if (playing != null) {
             playing.fadeOut();
             if (!mc.getSoundManager().isActive(playing)) {
                 playing = null;
-                Music music = mc.getSituationalMusic();
-                musicPause = Mth.nextInt(RandomSource.create(), music.getMinDelay(), Math.max(music.getMinDelay(), music.getMaxDelay()));
+                if (heard) {
+                    Music music = mc.getSituationalMusic();
+                    musicPause = Mth.nextInt(RandomSource.create(), music.getMinDelay(), Math.max(music.getMinDelay(), music.getMaxDelay()));
+                }
+                heard = false;
             }
         } else if (musicPause > 0) {
             musicPause--;
@@ -59,11 +65,15 @@ public final class QuicksilverMusic {
 
     /**
      * Whether the game's music must stay quiet (see ClientEvents.onSelectMusic): always while the song plays, and for
-     * the game's usual pause between tracks after it ends. Music that comes back at once (boss music) only waits for
-     * the song.
+     * the game's usual pause between tracks after it ends, cut short like the game does for music that wants to start
+     * sooner (boss music comes back at once).
      */
     static boolean holdsGameMusic(Music music) {
-        return playing != null || musicPause > 0 && music.getMinDelay() > 0;
+        if (playing != null) {
+            return true;
+        }
+        musicPause = Math.min(musicPause, music.getMaxDelay());
+        return musicPause > 0;
     }
 
     private static boolean speedsterNearby(LocalPlayer listener) {
@@ -84,6 +94,7 @@ public final class QuicksilverMusic {
             playing = null;
         }
         musicPause = 0;
+        heard = false;
     }
 
     /**

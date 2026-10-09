@@ -25,8 +25,14 @@ public final class ModDamageTypes {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }
 
+    /**
+     * Damage dealt by {@code direct} (what actually hit: a shard, a bolt, a thrown block) and caused by {@code causing}
+     * (who gets the blame: kill credit, PvP rules, death messages, Magneto's helmet rule).
+     */
     public static DamageSource source(Level level, ResourceKey<DamageType> type, @Nullable Entity causing, @Nullable Entity direct) {
-        return level.damageSources().source(type, causing, direct);
+        // Built directly: DamageSources.source(type, a, b) takes the direct entity FIRST (vanilla calls it as
+        // source(ARROW, arrow, shooter)), whatever its parameter names suggest.
+        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(type), direct, causing);
     }
 
     public static DamageSource source(Level level, ResourceKey<DamageType> type) {

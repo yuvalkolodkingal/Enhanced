@@ -1,11 +1,13 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.network.SlowedProjectilePayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -185,31 +188,41 @@ public final class SlowMotion {
      * Called from {@code EntityTickEvent.Post} on both sides. Vanilla drag (x0.99) runs every tick, and a slowed
      * projectile takes N ticks per normal tick, so the extra drag is given back to keep its speed (and its hit) the same
      * as without the slow motion. It only runs when the projectile really ticked (not while the game is frozen), and the
-     * same way on clients, so their copy of the projectile stays in step with the server's.
+     * same way on clients (the server tells them which projectiles are slowed), so their copy stays in step.
      */
     public static void afterTick(Entity entity) {
         if (!slowedBySpeed(entity)) {
             return;
         }
         Projectile projectile = (Projectile) entity;
-        int n;
-        if (entity.level().isClientSide) {
-            // Clients don't see the server's tag: a slowed projectile is a weightless one inside a zone.
-            if (!projectile.isNoGravity() || !isInZone(entity.level(), entity.position())) {
-                return;
-            }
-            n = factor();
-        } else {
-            CompoundTag data = projectile.getPersistentData();
-            if (!data.contains(SLOWED_TAG)) {
-                return;
-            }
-            n = Math.max(1, data.getCompound(SLOWED_TAG).getInt("Factor"));
+        CompoundTag data = projectile.getPersistentData();
+        if (!data.contains(SLOWED_TAG)) {
+            return;
         }
+        int n = data.getCompound(SLOWED_TAG).getInt("Factor");
         if (n <= 1 || returning(projectile) || projectile.isInWater() || projectile instanceof AbstractArrow arrow && arrow.inGround) {
             return;
         }
         projectile.setDeltaMovement(projectile.getDeltaMovement().scale(Math.pow(0.99, 1.0 / n - 1.0)));
+    }
+
+    /** Server: a player started seeing a projectile that is already slowed. */
+    public static void onStartTracking(Entity entity, ServerPlayer player) {
+        if (entity instanceof Projectile projectile && projectile.getPersistentData().contains(SLOWED_TAG)) {
+            int factor = projectile.getPersistentData().getCompound(SLOWED_TAG).getInt("Factor");
+            PacketDistributor.sendToPlayer(player, new SlowedProjectilePayload(projectile.getId(), factor));
+        }
+    }
+
+    /** Client: the server says this projectile is slowed (factor > 1) or flies normally again (0). */
+    public static void onSlowedSync(Entity entity, int factor) {
+        if (factor > 1) {
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("Factor", factor);
+            entity.getPersistentData().put(SLOWED_TAG, tag);
+        } else {
+            entity.getPersistentData().remove(SLOWED_TAG);
+        }
     }
 
     private static void slow(Projectile projectile, int factor) {
@@ -221,6 +234,7 @@ public final class SlowMotion {
         projectile.setDeltaMovement(projectile.getDeltaMovement().scale(1.0 / factor));
         projectile.hasImpulse = true;
         SLOWED.add(projectile);
+        PacketDistributor.sendToPlayersTrackingEntity(projectile, new SlowedProjectilePayload(projectile.getId(), factor));
     }
 
     /** Puts a slowed projectile back to full speed. Also used when a slowed projectile is loaded from disk. */
@@ -243,6 +257,9 @@ public final class SlowMotion {
     private static void release(Projectile projectile, boolean speedUp) {
         CompoundTag tag = projectile.getPersistentData().getCompound(SLOWED_TAG);
         projectile.getPersistentData().remove(SLOWED_TAG);
+        if (!projectile.level().isClientSide) {
+            PacketDistributor.sendToPlayersTrackingEntity(projectile, new SlowedProjectilePayload(projectile.getId(), 0));
+        }
         int factor = Math.max(1, tag.getInt("Factor"));
         projectile.setNoGravity(tag.getBoolean("NoGravity"));
         if (speedUp) {

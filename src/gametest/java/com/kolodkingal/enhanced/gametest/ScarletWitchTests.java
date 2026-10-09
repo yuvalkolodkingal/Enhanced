@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
@@ -15,6 +16,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -301,6 +303,47 @@ public final class ScarletWitchTests {
     }
 
     private static final int LAUNCH_TICK = 6;
+
+    /** The whole chain behind "Magneto takes Wanda's attacks in full": a block she hurls at him hits as if he had no armor. */
+    @GameTest(template = ARENA)
+    public static void wandaHurlsABlockAtMagneto(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer magneto = f.player(12.5, FLOOR, 10.5);
+        magneto.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
+        magneto.doTick();
+        check(Powers.is(magneto, Power.MAGNETO), "helmet awakens Magneto");
+        check(magneto.getAttributeValue(Attributes.ARMOR) >= 20.0, "Magneto's suit protects like netherite");
+        BlockPos stone = new BlockPos(6, 2, 10);
+        helper.setBlock(stone, Blocks.STONE);
+        lookAt(wanda, Vec3.atCenterOf(helper.absolutePos(stone)));
+        AbilityHandler.onKey(wanda, 3, true);
+        check(Telekinesis.isHolding(wanda), "lifted the stone");
+        float before = magneto.getHealth();
+
+        f.everyTick(40, tick -> {
+            if (tick < LAUNCH_TICK) {
+                TestKit.look(wanda, TestKit.EAST, -10.0F);
+            }
+            PowerTicker.tick(wanda);
+            if (tick == LAUNCH_TICK) {
+                lookAt(wanda, magneto);
+                AbilityHandler.onKey(wanda, 3, true);
+                check(!Telekinesis.isHolding(wanda), "launched at Magneto");
+            }
+            if (tick > LAUNCH_TICK && magneto.getHealth() < before) {
+                DamageSource source = magneto.getLastDamageSource();
+                check(source != null && source.is(ModDamageTypes.TELEKINETIC_SLAM) && source.getEntity() == wanda,
+                        "the block hit him and the hit is blamed on Wanda (" + source + ")");
+                // Netherite-level armor would cut it to about a quarter; Wanda's attacks ignore it.
+                float taken = before - magneto.getHealth();
+                check(taken >= TelekineticBlockEntity.BASE_DAMAGE * 0.75F - 0.01F, "the hit lands in full (took " + taken + ")");
+                return true;
+            }
+            return false;
+        });
+    }
 
     @GameTest(template = ARENA)
     public static void heldBlockSetDownGentlyBecomesABlockAgain(GameTestHelper helper) {

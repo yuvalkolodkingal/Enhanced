@@ -46,7 +46,8 @@ public class TelekineticBlockEntity extends Entity {
     private static final EntityDataAccessor<Boolean> DATA_HELD =
             SynchedEntityData.defineId(TelekineticBlockEntity.class, EntityDataSerializers.BOOLEAN);
 
-    private static final float BASE_DAMAGE = 8.0F;
+    /** Damage of a thrown block hitting a creature at normal speed. */
+    public static final float BASE_DAMAGE = 8.0F;
     private static final int MAX_LIFE = 20 * 60;
 
     @Nullable

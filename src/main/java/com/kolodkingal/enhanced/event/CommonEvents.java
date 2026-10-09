@@ -93,6 +93,13 @@ public final class CommonEvents {
     }
 
     @SubscribeEvent
+    public static void onStartTracking(PlayerEvent.StartTracking event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            SlowMotion.onStartTracking(event.getTarget(), player);
+        }
+    }
+
+    @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide) {
             SlowMotion.onJoin(event.getEntity());

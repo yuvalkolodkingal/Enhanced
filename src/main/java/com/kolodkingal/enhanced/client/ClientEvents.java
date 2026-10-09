@@ -16,6 +16,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.Music;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -59,7 +60,8 @@ public final class ClientEvents {
     /** The game's own music waits while Quicksilver's song plays, and for its usual pause after the song ends. */
     @SubscribeEvent
     public static void onSelectMusic(SelectMusicEvent event) {
-        if (QuicksilverMusic.holdsGameMusic(event.getOriginalMusic())) {
+        Music chosen = event.getMusic();
+        if (chosen != null && QuicksilverMusic.holdsGameMusic(chosen)) {
             event.setMusic(null);
         }
     }
