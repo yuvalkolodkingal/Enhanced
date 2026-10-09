@@ -81,10 +81,18 @@ public final class ClientEvents {
             if (data.power() != Power.QUICKSILVER || !data.slowMo() || player.isInvisible()) {
                 continue;
             }
+            // Only while he actually moves, and laid down along the path he just ran (never in his own face).
+            double dx = player.getX() - player.xOld;
+            double dy = player.getY() - player.yOld;
+            double dz = player.getZ() - player.zOld;
+            if (dx * dx + dz * dz < 0.04) {
+                continue;
+            }
             for (int i = 0; i < 3; i++) {
+                double back = 1.0 + random.nextDouble();
                 level.addParticle(new EnergyParticleOptions(i == 0 ? Power.QUICKSILVER.glow : Power.QUICKSILVER.color, 1.1F),
-                        player.getX() + (random.nextDouble() - 0.5) * 0.5, player.getY() + random.nextDouble() * 1.8,
-                        player.getZ() + (random.nextDouble() - 0.5) * 0.5, 0, 0, 0);
+                        player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.5, player.getY() - dy * back + random.nextDouble() * 1.8,
+                        player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.5, 0, 0, 0);
             }
         }
     }

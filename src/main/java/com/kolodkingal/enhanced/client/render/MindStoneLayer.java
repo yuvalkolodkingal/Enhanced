@@ -37,8 +37,8 @@ public class MindStoneLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         diamond(vc, m, 1.3F / 16.0F, 0xFFFFE066);
         diamond(vc, m, 0.7F / 16.0F, 0xFFFFFFE0);
-        square(vc, m, 3.2F / 16.0F * pulse * boost, EnergyGeometry.argb(0xFFD23A, 0.35F * pulse));
-        square(vc, m, 5.5F / 16.0F * pulse * boost, EnergyGeometry.argb(0xFFB020, 0.12F * pulse));
+        halo(vc, m, 3.0F / 16.0F * pulse * boost, EnergyGeometry.argb(0xFFD23A, 0.45F * pulse));
+        halo(vc, m, 5.5F / 16.0F * pulse * boost, EnergyGeometry.argb(0xFFB020, 0.18F * pulse));
         poseStack.popPose();
     }
 
@@ -49,10 +49,17 @@ public class MindStoneLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         vc.addVertex(m, -s, 0, 0).setColor(argb);
     }
 
-    private static void square(VertexConsumer vc, Matrix4f m, float s, int argb) {
-        vc.addVertex(m, -s, -s, -0.001F).setColor(argb);
-        vc.addVertex(m, s, -s, -0.001F).setColor(argb);
-        vc.addVertex(m, s, s, -0.001F).setColor(argb);
-        vc.addVertex(m, -s, s, -0.001F).setColor(argb);
+    /** A soft round glow: full colour in the middle, fading to nothing at the rim (no hard edges in daylight). */
+    private static void halo(VertexConsumer vc, Matrix4f m, float r, int argb) {
+        int rim = argb & 0x00FFFFFF;
+        int segments = 16;
+        for (int i = 0; i < segments; i++) {
+            float a0 = Mth.TWO_PI * i / segments;
+            float a1 = Mth.TWO_PI * (i + 1) / segments;
+            vc.addVertex(m, 0, 0, -0.001F).setColor(argb);
+            vc.addVertex(m, 0, 0, -0.001F).setColor(argb);
+            vc.addVertex(m, Mth.cos(a1) * r, Mth.sin(a1) * r, -0.001F).setColor(rim);
+            vc.addVertex(m, Mth.cos(a0) * r, Mth.sin(a0) * r, -0.001F).setColor(rim);
+        }
     }
 }
