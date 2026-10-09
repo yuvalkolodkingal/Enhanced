@@ -1,11 +1,9 @@
 package com.kolodkingal.enhanced.client.music;
 
 import com.kolodkingal.enhanced.Enhanced;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.JOrbisAudioStream;
 import net.minecraft.client.sounds.LoopingAudioStream;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,21 +19,19 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * Lets the player use their own song for Quicksilver's Walkman: any .mp3, .ogg or .wav file placed in
- * {@code config/enhanced/music} (or built into a personal copy of the mod from the git-ignored {@code personal/}
- * folder) is played instead of the built-in theme. Nothing is downloaded and no song ships with the public mod.
+ * Lets a player swap Quicksilver's song: any .mp3, .ogg or .wav file placed in {@code config/enhanced/music} is played
+ * instead of the built-in "Sweet Dreams (Are Made of This)". Nothing is downloaded.
  */
 public final class CustomMusic {
     private static final String README = """
             Quicksilver's Walkman
             =====================
 
-            Put a song file here (.mp3, .ogg or .wav) and Quicksilver's Walkman plays it
-            whenever he runs in Quicksilver Time, instead of the built-in tune.
-
-            For example, copy your own copy of "Sweet Dreams (Are Made of This)" here as
-            sweet_dreams.mp3. If there is more than one song, the first one in alphabetical
-            order is used. Changes are picked up the next time the music starts.
+            Quicksilver's Walkman plays "Sweet Dreams (Are Made of This)" whenever he runs
+            in Quicksilver Time. To play a different song, put a song file here (.mp3, .ogg
+            or .wav). If there is more than one, the first one in alphabetical order is
+            used. Changes are picked up the next time the music starts. Remove the file to
+            go back to Sweet Dreams.
             """;
 
     public static Path folder() {
@@ -48,7 +44,8 @@ public final class CustomMusic {
             Path folder = folder();
             Files.createDirectories(folder);
             Path readme = folder.resolve("README.txt");
-            if (!Files.exists(readme)) {
+            // Kept up to date: it is the mod's own file, and older versions described the song differently.
+            if (!Files.exists(readme) || !Files.readString(readme, StandardCharsets.UTF_8).equals(README)) {
                 Files.writeString(readme, README, StandardCharsets.UTF_8);
             }
         } catch (IOException e) {
@@ -56,27 +53,14 @@ public final class CustomMusic {
         }
     }
 
-    /** Where a personal build keeps the song from the git-ignored personal/ folder. */
-    private static final String PERSONAL = "sounds/quicksilver/personal";
-
-    /**
-     * Opens the player's own song, if there is one: first a file in config/enhanced/music, then a song built into a
-     * personal copy of the mod. Empty means: use the built-in theme.
-     */
+    /** Opens the song the player put in config/enhanced/music, if any. Empty means: play the built-in song. */
     public static Optional<AudioStream> openSong(boolean looping) throws IOException {
         Optional<Path> file = find();
-        if (file.isPresent()) {
-            Enhanced.LOGGER.info("Quicksilver's Walkman plays {}", file.get().getFileName());
-            return Optional.of(open(typeOf(file.get()), new BufferedInputStream(Files.newInputStream(file.get())), looping));
+        if (file.isEmpty()) {
+            return Optional.empty();
         }
-        var resources = Minecraft.getInstance().getResourceManager()
-                .listResources(PERSONAL, id -> id.getNamespace().equals(Enhanced.MODID) && typeOf(Path.of(id.getPath())) != null);
-        Optional<ResourceLocation> bundled = resources.keySet().stream().min(Comparator.comparing(ResourceLocation::getPath));
-        if (bundled.isPresent()) {
-            InputStream in = new BufferedInputStream(resources.get(bundled.get()).open());
-            return Optional.of(open(typeOf(Path.of(bundled.get().getPath())), in, looping));
-        }
-        return Optional.empty();
+        Enhanced.LOGGER.info("Quicksilver's Walkman plays {}", file.get().getFileName());
+        return Optional.of(open(typeOf(file.get()), new BufferedInputStream(Files.newInputStream(file.get())), looping));
     }
 
     /** The player's song, if they put one in the folder. */

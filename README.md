@@ -56,18 +56,15 @@ shows your abilities, cooldowns and resources.
 
 ## Quicksilver's song
 
-The song is *Sweet Dreams (Are Made of This)*. The recording is copyrighted, so it is not in
-this repository and each player supplies their own copy:
+Quicksilver's Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, which is built into
+the mod (`src/main/resources/assets/enhanced/sounds/quicksilver/sweet_dreams.ogg`).
 
-1. Start the game once with the mod installed. It creates the folder `config/enhanced/music/`
-   in your Minecraft folder.
-2. Put an `.mp3`, `.ogg` or `.wav` file of the song there (the first file in alphabetical order
-   is played).
+The recording is copyrighted, so this repository and the mods built from it are for personal use
+only. Keep the repository private and don't share the built jar publicly.
 
-For a personal build with the song inside the jar, put it at `personal/quicksilver_theme.mp3`
-(or `.ogg` / `.wav`) and build. The `personal/` folder is ignored by git. A song in
-`config/enhanced/music/` always wins over the one in the jar. Without either, an original
-synth tune plays.
+To play a different song, start the game once (this creates the folder `config/enhanced/music/` in
+your Minecraft folder) and put an `.mp3`, `.ogg` or `.wav` file there. The first file in
+alphabetical order is played; remove it to go back to *Sweet Dreams*.
 
 ## Building
 

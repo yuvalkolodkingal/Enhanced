@@ -6,13 +6,13 @@ import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The mod's own sound effects (all original, synthesized) and Quicksilver's theme. */
+/** The mod's own sound effects (all original, synthesized) and Quicksilver's song. */
 public final class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, Enhanced.MODID);
 
     /**
-     * What Quicksilver's Walkman plays during Quicksilver Time. The mod ships an original placeholder track; each player
-     * can play their own copy of the song from config/enhanced/music (see CustomMusic).
+     * What Quicksilver's Walkman plays during Quicksilver Time: "Sweet Dreams (Are Made of This)". A player can play
+     * another song instead from config/enhanced/music (see CustomMusic).
      */
     public static final DeferredHolder<SoundEvent, SoundEvent> QUICKSILVER_THEME = register("quicksilver_theme");
 

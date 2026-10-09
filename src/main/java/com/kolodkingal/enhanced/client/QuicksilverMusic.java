@@ -24,8 +24,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Quicksilver's Walkman. While a Quicksilver with his Walkman on is running Quicksilver Time nearby, the theme plays
- * for everyone close enough to be caught in the slow motion, and fades out when he stops.
+ * Quicksilver's Walkman. While a Quicksilver with his Walkman on is running Quicksilver Time nearby, "Sweet Dreams
+ * (Are Made of This)" plays for everyone close enough to be caught in the slow motion, and fades out when he stops.
  */
 public final class QuicksilverMusic {
     @Nullable
@@ -99,7 +99,7 @@ public final class QuicksilverMusic {
             fadingOut = true;
         }
 
-        /** Plays the player's own song if there is one, otherwise the built-in theme. */
+        /** Plays the song from config/enhanced/music if the player put one there, otherwise Sweet Dreams. */
         @Override
         public CompletableFuture<AudioStream> getStream(SoundBufferLibrary buffers, Sound sound, boolean looping) {
             return CompletableFuture.supplyAsync(() -> {
@@ -109,7 +109,7 @@ public final class QuicksilverMusic {
                         return song.get();
                     }
                 } catch (IOException | RuntimeException e) {
-                    Enhanced.LOGGER.warn("Could not play your Quicksilver song; using the built-in theme", e);
+                    Enhanced.LOGGER.warn("Could not play your Quicksilver song; playing Sweet Dreams instead", e);
                 }
                 return buffers.getStream(sound.getPath(), looping).join();
             }, Util.nonCriticalIoPool());

@@ -318,14 +318,11 @@ Monica Rambeau after she crossed the Hex.
 * **The world starts playing his song**: everyone near him hears the theme from his Walkman.
   It fades in when he starts running, keeps playing from where it was if he stops and starts
   again within 10 seconds, and fades out when he stops.
-  * The song is *Sweet Dreams (Are Made of This)*. The recording is copyrighted, so it is not in
-    this repository. Each player plays **their own copy** of it: put an `.mp3`, `.ogg` or `.wav`
-    file into `config/enhanced/music/` in the Minecraft folder (the mod creates that folder and a
-    short README the first time it starts). The first file in alphabetical order is used.
-  * A personal build can also carry the song inside the jar: put it at
-    `personal/quicksilver_theme.mp3` (or `.ogg` / `.wav`) before building. The `personal/` folder is
-    ignored by git, so the song never ends up in the repository.
-  * With no song anywhere, the mod plays an original synth tune instead.
+  * The song is *Sweet Dreams (Are Made of This)* by Eurythmics, built into the mod.
+  * **(added)** To play a different song, put an `.mp3`, `.ogg` or `.wav` file into
+    `config/enhanced/music/` in the Minecraft folder (the mod creates that folder and a short README
+    the first time it starts). The first file in alphabetical order is used. Remove it to go back
+    to *Sweet Dreams*.
 * A blue tint at the edges of the screen shows that time is slowed, and Quicksilver leaves a
   silver-blue streak behind him.
 * Cost: it burns hunger while he runs. With an empty hunger bar, he can only run normally.
