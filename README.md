@@ -13,6 +13,10 @@ number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs
 |---|---|---|
 | ![Magneto](docs/screenshots/magneto.png) | ![Scarlet Witch](docs/screenshots/scarlet-witch.png) | ![The Hex](docs/screenshots/hex.png) |
 
+| Quicksilver | Vision | Quicksilver Time |
+|---|---|---|
+| ![Quicksilver](docs/screenshots/quicksilver.png) | ![Vision](docs/screenshots/vision.png) | ![Quicksilver Time](docs/screenshots/quicksilver-run.png) |
+
 * **Minecraft** 1.21.1
 * **Mod loader** NeoForge 21.1.x
 * **Install it on** the client, plus the server for multiplayer
@@ -53,6 +57,9 @@ shows your abilities, cooldowns and resources.
 | ![Chaos Beam](docs/screenshots/chaos-beam.png) The Chaos Beam | ![Chaos Shield](docs/screenshots/chaos-shield.png) The Chaos Shield |
 | ![Awakening](docs/screenshots/mind-stone-awakening.png) Touching the Mind Stone with the gene | ![Hex Control](docs/screenshots/hex-control.png) Wanda's Hex Control screen |
 | ![Flight](docs/screenshots/scarlet-witch-flight.png) Red energy around Wanda's hands in flight | ![Photon](docs/screenshots/photon.png) Photon phasing, with Spectrum Vision on |
+| ![Quicksilver Time](docs/screenshots/quicksilver-time.png) Quicksilver Time: sand and arrows hang in the air | ![Running past](docs/screenshots/quicksilver-run.png) Quicksilver running past, as another player sees him |
+| ![Mind Stone beam](docs/screenshots/mind-stone-beam.png) Vision's Mind Stone beam | ![Phasing](docs/screenshots/vision-phase.png) Vision phasing through a wall |
+| ![Disguise](docs/screenshots/vision-disguise.png) Vision and his WandaVision human disguise | |
 
 ## Quicksilver's song
 

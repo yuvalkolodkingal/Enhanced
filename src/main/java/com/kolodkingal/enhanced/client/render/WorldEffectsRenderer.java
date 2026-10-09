@@ -141,10 +141,12 @@ public final class WorldEffectsRenderer {
         Vec3 start = origin.subtract(camera);
 
         float flicker = 0.85F + 0.15F * Mth.sin(time * 1.7F) * Mth.cos(time * 0.9F);
-        // The beam starts thin at its source and swells a little towards the target, so it never fills the screen in first person.
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.12F, 0.55F * flicker, EnergyGeometry.argb(palette.glow, 0.10F), EnergyGeometry.argb(palette.glow, 0.30F));
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.06F, 0.26F * flicker, EnergyGeometry.argb(palette.glow, 0.45F), EnergyGeometry.argb(palette.glow, 0.55F));
-        EnergyGeometry.ribbon(pose, vc, start, end, 0.02F, 0.08F, EnergyGeometry.argb(palette.core, 0.75F), EnergyGeometry.argb(palette.core, 0.85F));
+        // The beam starts thin at its source and swells a little towards the target, so it never fills the screen in first
+        // person; a source right in front of the camera is drawn thinner still.
+        float near = (float) Mth.clamp(start.length() / 1.5, 0.25, 1.0);
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.12F * near, 0.55F * flicker, EnergyGeometry.argb(palette.glow, 0.10F), EnergyGeometry.argb(palette.glow, 0.30F));
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.06F * near, 0.26F * flicker, EnergyGeometry.argb(palette.glow, 0.45F), EnergyGeometry.argb(palette.glow, 0.55F));
+        EnergyGeometry.ribbon(pose, vc, start, end, 0.02F * near, 0.08F, EnergyGeometry.argb(palette.core, 0.75F), EnergyGeometry.argb(palette.core, 0.85F));
 
         long seed = ((long) time / 2) * 341873128712L + player.getId() * 132897987541L;
         for (int k = 0; k < 3; k++) {
@@ -179,7 +181,14 @@ public final class WorldEffectsRenderer {
         Vec3 eye = player.getEyePosition(partialTick);
         Vec3 look = player.getViewVector(partialTick);
         boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
-        return eye.add(look.scale(firstPerson ? 0.45 : 0.28)).add(0, firstPerson ? 0.12 : 0.18, 0);
+        if (firstPerson) {
+            // A little way out from the top of the view, so the beam is seen pouring forward rather than end-on.
+            Vec3 right = look.cross(UP);
+            right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
+            Vec3 up = right.cross(look).normalize();
+            return eye.add(look.scale(0.9)).add(up.scale(0.24));
+        }
+        return eye.add(look.scale(0.28)).add(0, 0.18, 0);
     }
 
     /** Where energy leaves the player's hands: in front of the chest, or bottom-right of the screen in first person. */
