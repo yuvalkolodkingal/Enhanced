@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
+import com.kolodkingal.enhanced.client.render.BodyLean;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
@@ -42,6 +43,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 import net.neoforged.neoforge.client.event.SelectMusicEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -64,6 +66,7 @@ public final class ClientEvents {
         spawnSpeedTrails(mc.level);
         spawnFrostParticles(mc);
         Afterimages.tick(mc.level);
+        BodyLean.tick(mc.level);
         Shapeshifts.tick(mc.level);
         QuicksilverMusic.tick(mc);
         PowerLoopSounds.tick(mc);
@@ -86,12 +89,21 @@ public final class ClientEvents {
         QuicksilverMusic.stop();
         PowerLoopSounds.stopAll();
         Afterimages.clear();
+        BodyLean.clear();
         ThorEffects.clear();
         Shapeshifts.clear();
         SlowMotionEffect.stop(Minecraft.getInstance());
         TheNoise.stop();
         BillyCrownLayer.clear();
         WorldEffectsRenderer.clearHexBolts();
+    }
+
+    /** A new world (a dimension change, say) starts the heroes' lean from scratch. */
+    @SubscribeEvent
+    public static void onLevelUnload(LevelEvent.Unload event) {
+        if (event.getLevel().isClientSide()) {
+            BodyLean.clear();
+        }
     }
 
     /** Frost drifts off a Frost Giant: snowflakes and a faint icy shimmer (not in his own face in first person). */
