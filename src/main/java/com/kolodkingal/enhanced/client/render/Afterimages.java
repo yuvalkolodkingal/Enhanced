@@ -109,10 +109,18 @@ public final class Afterimages {
         // Running pose for the ghosts: the model was last set up for the real player, so set it up again, sprinting.
         model.setupAnim(player, t * 1.6F, 1.0F, t, 0.0F, 0.0F);
         float radius = 2.5F;
+        Vec3 center = player.getPosition(event.getPartialTick());
+        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         for (int k = 0; k < 4; k++) {
             for (int echo = 0; echo < 3; echo++) {
                 float angle = t * 0.55F + k * Mth.HALF_PI - echo * 0.18F;
-                int alpha = (int) ((110 - echo * 35) * (0.85F + 0.15F * Mth.sin(t * 0.9F + k)));
+                // Ghosts racing past right in front of the camera fade out instead of filling the screen.
+                Vec3 at = center.add(Mth.cos(angle) * radius, 1.0, Mth.sin(angle) * radius);
+                float near = (float) Mth.clamp((at.distanceTo(camera) - 1.5) / 2.5, 0.0, 1.0);
+                int alpha = (int) ((110 - echo * 35) * (0.85F + 0.15F * Mth.sin(t * 0.9F + k)) * near);
+                if (alpha < 4) {
+                    continue;
+                }
                 poseStack.pushPose();
                 poseStack.translate(Mth.cos(angle) * radius, 0.05, Mth.sin(angle) * radius);
                 // Facing along the ring (the direction of travel), leaning in.
