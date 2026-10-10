@@ -258,6 +258,7 @@ public final class WorldEffectsRenderer {
     public static void addHexBolt(HexBoltPayload bolt) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level != null) {
+            HeroAnimator.onHexBolt(bolt.caster(), bolt.to());
             HEX_BOLTS.add(new HexBolt(bolt.caster(), bolt.from(), bolt.to(), List.copyOf(bolt.forks()), bolt.seed(), level.getGameTime()));
         }
     }
@@ -362,7 +363,14 @@ public final class WorldEffectsRenderer {
             Vec3 right = look.cross(UP);
             right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
             Vec3 up = right.cross(look).normalize();
-            return eye.add(look.scale(0.55)).add(right.scale(0.2)).add(up.scale(-0.22));
+            // Where the hand is drawn: its resting place, moved with the first-person gesture (the view-space offset is
+            // about 0.8 blocks from the camera, so 0.4 of it is the offset in the world).
+            float[] hand = new float[3];
+            if (player == mc.player) {
+                FirstPersonArms.mainHand(mc.player, hand);
+            }
+            double side = player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT ? 1.0 : -1.0;
+            return eye.add(look.scale(0.55 + 0.4 * hand[2])).add(right.scale(side * (0.2 + 0.4 * hand[0]))).add(up.scale(-0.22 + 0.4 * hand[1]));
         }
         return BodyLean.follow(player, eye, partialTick).add(0, -0.3, 0).add(look.scale(0.75));
     }
