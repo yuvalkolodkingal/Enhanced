@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -9,6 +10,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Hand-made body language for the heroes, applied on top of the vanilla animation every frame:
@@ -70,7 +73,12 @@ public final class HeroPoses {
                 }
             }
             case MAGNETO -> {
-                if (holding || data.shrapnelActive()) {
+                Vec3 caught = data.magneticShield() ? nearestHeldProjectile(player) : null;
+                if (caught != null && !holding && !data.shrapnelActive()) {
+                    // Holding a projectile still in mid-air: the hand points at it.
+                    pointAt(main, player, caught, t);
+                    off.zRot += 0.15F * -side;
+                } else if (holding || data.shrapnelActive()) {
                     aim(model, main, -0.05F * side, t, data.shrapnelActive() ? 0.03F : 0.0F);
                     off.zRot += 0.15F * -side;
                 } else if (airborne) {
@@ -128,6 +136,33 @@ public final class HeroPoses {
             }
         }
         sync(model);
+    }
+
+    /** The nearest projectile hanging in this Magneto's field, or null. */
+    private static Vec3 nearestHeldProjectile(Player player) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 best = null;
+        double bestDist = Double.MAX_VALUE;
+        for (Projectile p : player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(MagnetoAbilities.SHIELD_RADIUS + 2.0),
+                p -> p.isNoGravity() && p.getDeltaMovement().lengthSqr() < 1.0E-6 && MagnetoAbilities.isMetalProjectile(p))) {
+            double d = p.position().distanceToSqr(eye);
+            if (d < bestDist) {
+                bestDist = d;
+                best = p.position();
+            }
+        }
+        return best;
+    }
+
+    /** Points an arm at a spot in the world, relative to the body's facing, with a faint strain. */
+    private static void pointAt(ModelPart arm, Player player, Vec3 target, float t) {
+        Vec3 d = target.subtract(player.getEyePosition());
+        float yaw = (float) (Mth.atan2(d.z, d.x) * Mth.RAD_TO_DEG) - 90.0F;
+        float pitch = (float) -(Mth.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * Mth.RAD_TO_DEG);
+        float relYaw = Mth.wrapDegrees(yaw - player.yBodyRot);
+        arm.xRot = -Mth.HALF_PI + pitch * Mth.DEG_TO_RAD + Mth.sin(t * 1.7F) * 0.02F;
+        arm.yRot = Mth.clamp(relYaw, -80.0F, 80.0F) * Mth.DEG_TO_RAD;
+        arm.zRot = 0.0F;
     }
 
     /** Points an arm along the head's direction, with an optional tremble. */

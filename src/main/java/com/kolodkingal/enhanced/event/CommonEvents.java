@@ -68,6 +68,7 @@ public final class CommonEvents {
         if (event.getLevel() instanceof ServerLevel level) {
             HexManager.tickLevel(level);
             SlowMotion.serverTick(level);
+            MagnetoAbilities.tickHeld(level);
         }
     }
 
@@ -76,6 +77,7 @@ public final class CommonEvents {
         Telekinesis.clear();
         HexManager.clearMemory();
         SlowMotion.clear();
+        MagnetoAbilities.clearHeld();
     }
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----
@@ -103,6 +105,7 @@ public final class CommonEvents {
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide) {
             SlowMotion.onJoin(event.getEntity());
+            MagnetoAbilities.onJoin(event.getEntity());
         }
     }
 

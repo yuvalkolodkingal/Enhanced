@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.hex.Hex;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -88,6 +90,9 @@ public final class WorldEffectsRenderer {
                 if (held != null) {
                     renderTether(mc, player, held, data.power(), pose, beams, camera, partialTick, time);
                 }
+            }
+            if (data.power() == Power.MAGNETO && data.magneticShield() && !player.isInvisible()) {
+                renderMagneticField(mc, player, pose, beams, camera, partialTick, time);
             }
         }
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
@@ -163,6 +168,56 @@ public final class WorldEffectsRenderer {
         Vec3 up = side.cross(toCamera).normalize();
         EnergyGeometry.ribbon(pose, vc, end.subtract(side.scale(flare)), end.add(side.scale(flare)), flare, EnergyGeometry.argb(palette.glow, 0.7F), EnergyGeometry.argb(palette.glow, 0.7F));
         EnergyGeometry.ribbon(pose, vc, end.subtract(up.scale(flare)), end.add(up.scale(flare)), flare * 0.5F, EnergyGeometry.argb(palette.core, 0.6F), EnergyGeometry.argb(palette.core, 0.6F));
+    }
+
+    // ---- Magnetic Shield ----
+
+    /**
+     * Magneto's field while the shield is on: faint looping field lines around him (like iron filings round a magnet),
+     * with a glint running along each, and a shimmer around every projectile hanging in the field.
+     */
+    private static void renderMagneticField(Minecraft mc, AbstractClientPlayer player, Matrix4f pose, VertexConsumer vc, Vec3 camera,
+                                            float partialTick, float time) {
+        Vec3 center = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0);
+        Vec3 c = center.subtract(camera);
+        int lines = 7;
+        int steps = 28;
+        float[] shells = {2.4F, (float) MagnetoAbilities.SHIELD_RADIUS};
+        for (int shell = 0; shell < shells.length; shell++) {
+            float l = shells[shell];
+            for (int k = 0; k < lines; k++) {
+                double phi = Mth.TWO_PI * k / lines + time * (shell == 0 ? 0.006 : -0.004);
+                double cos = Math.cos(phi);
+                double sin = Math.sin(phi);
+                float glint = ((time * 0.015F + k * 0.37F + shell * 0.5F) % 1.0F);
+                Vec3 prev = null;
+                for (int i = 0; i <= steps; i++) {
+                    // A dipole field line: r = L sin^2(theta), from near the top pole round to near the bottom one.
+                    double theta = 0.12 * Math.PI + 0.76 * Math.PI * i / steps;
+                    double r = l * Math.sin(theta) * Math.sin(theta);
+                    Vec3 point = c.add(r * Math.sin(theta) * cos, r * Math.cos(theta), r * Math.sin(theta) * sin);
+                    if (prev != null) {
+                        float t = (float) i / steps;
+                        float fade = Mth.sin(t * Mth.PI); // fades out towards the poles
+                        float near = Math.max(0.0F, 1.0F - Math.abs(t - glint) * 9.0F);
+                        int color = EnergyGeometry.argb(Power.MAGNETO.glow, (0.10F + 0.45F * near) * fade);
+                        EnergyGeometry.ribbon(pose, vc, prev, point, 0.035F + 0.03F * near, color, color);
+                    }
+                    prev = point;
+                }
+            }
+        }
+        // Projectiles hanging in the field: a shimmering ring round each and a faint line of force to his hand.
+        for (Projectile projectile : player.level().getEntitiesOfClass(Projectile.class,
+                player.getBoundingBox().inflate(MagnetoAbilities.SHIELD_RADIUS + 2.0),
+                p -> p.isNoGravity() && p.getDeltaMovement().lengthSqr() < 1.0E-6 && MagnetoAbilities.isMetalProjectile(p))) {
+            Vec3 at = projectile.getPosition(partialTick).add(0, projectile.getBbHeight() * 0.5, 0).subtract(camera);
+            float pulse = 0.28F + 0.06F * Mth.sin(time * 0.5F + projectile.getId());
+            EnergyGeometry.ring(pose, vc, at, at.scale(-1).normalize(), pulse, 0.03F, 16, EnergyGeometry.argb(Power.MAGNETO.glow, 0.7F));
+            long seed = ((long) time / 3) * 2862933555777941757L + projectile.getId();
+            EnergyGeometry.bolt(pose, vc, handPosition(mc, player, partialTick).subtract(camera), at, 0.018F, 0.12F,
+                    EnergyGeometry.argb(Power.MAGNETO.glow, 0.35F), seed);
+        }
     }
 
     // ---- Telekinesis ----

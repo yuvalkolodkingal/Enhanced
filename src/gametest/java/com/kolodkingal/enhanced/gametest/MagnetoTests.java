@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.gametest;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
+import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.power.Power;
@@ -339,6 +340,50 @@ public final class MagnetoTests {
             PowerTicker.tick(magneto);
             check(magneto.getHealth() >= magnetoMax, "the arrow must not hurt Magneto");
             return skeleton.getHealth() < skeletonMax || !skeleton.isAlive();
+        });
+    }
+
+    /** Like the bullets in the films: a caught arrow hangs still in mid-air, then drops or flies back. */
+    @GameTest(template = ARENA, timeoutTicks = 60)
+    public static void magneticShieldHoldsArrowsInMidAir(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SHIELD_REFLECT_CHANCE, 0.0);
+        ServerPlayer magneto = f.player(14.5, FLOOR, 10.5, Power.MAGNETO);
+        AbilityHandler.onKey(magneto, 4, true);
+        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
+        skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
+        skeleton.setNoAi(true);
+        Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
+        Vec3 dir = magneto.position().add(0, 0.9, 0).subtract(arrow.position());
+        arrow.shoot(dir.x, dir.y, dir.z, 2.5F, 0.0F);
+        helper.getLevel().addFreshEntity(arrow);
+        float max = magneto.getHealth();
+        Vec3[] caughtAt = new Vec3[1];
+        int[] caughtTick = {-1};
+
+        f.everyTick(50, tick -> {
+            PowerTicker.tick(magneto);
+            check(magneto.getHealth() >= max, "the arrow must not hurt Magneto");
+            if (caughtTick[0] < 0) {
+                if (MagnetoAbilities.isHeld(arrow)) {
+                    caughtTick[0] = tick;
+                    caughtAt[0] = arrow.position();
+                    check(arrow.distanceTo(magneto) > 1.0, "it is caught before it reaches him");
+                }
+                return false;
+            }
+            int held = tick - caughtTick[0];
+            if (held < MagnetoAbilities.HOLD_TICKS - 1) {
+                check(arrow.position().distanceTo(caughtAt[0]) < 0.01 && arrow.getDeltaMovement().lengthSqr() < 1.0E-6,
+                        "the arrow hangs perfectly still in the air (tick " + held + ")");
+                return false;
+            }
+            if (held > MagnetoAbilities.HOLD_TICKS + 3) {
+                check(!MagnetoAbilities.isHeld(arrow) && !arrow.isNoGravity(), "then it is let go and falls");
+                check(arrow.getY() < caughtAt[0].y, "it drops to the ground");
+                return true;
+            }
+            return false;
         });
     }
 

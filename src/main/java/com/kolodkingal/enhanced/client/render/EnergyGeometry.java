@@ -156,6 +156,24 @@ public final class EnergyGeometry {
         vc.addVertex(pose, (float) p.x, (float) p.y, (float) p.z).setColor(argb);
     }
 
+    /** A thin ring of the given radius round {@code center}, in the plane facing {@code normal}. */
+    public static void ring(Matrix4f pose, VertexConsumer vc, Vec3 center, Vec3 normal, float radius, float width, int segments, int color) {
+        Vec3 n = normal.lengthSqr() < 1.0E-8 ? new Vec3(0, 0, 1) : normal.normalize();
+        Vec3 u = n.cross(new Vec3(0, 1, 0));
+        if (u.lengthSqr() < 1.0E-6) {
+            u = n.cross(new Vec3(1, 0, 0));
+        }
+        u = u.normalize();
+        Vec3 v = n.cross(u).normalize();
+        Vec3 prev = center.add(u.scale(radius));
+        for (int i = 1; i <= segments; i++) {
+            double a = Math.PI * 2 * i / segments;
+            Vec3 next = center.add(u.scale(Math.cos(a) * radius)).add(v.scale(Math.sin(a) * radius));
+            ribbon(pose, vc, prev, next, width, color, color);
+            prev = next;
+        }
+    }
+
     public static int argb(int rgb, float alpha) {
         return ((int) (Mth.clamp(alpha, 0F, 1F) * 255) << 24) | (rgb & 0xFFFFFF);
     }

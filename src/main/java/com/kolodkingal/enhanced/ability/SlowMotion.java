@@ -140,7 +140,7 @@ public final class SlowMotion {
         for (Vec3 center : zones) {
             AABB box = new AABB(center, center).inflate(radius);
             for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box,
-                    p -> slowedBySpeed(p) && !returning(p) && !p.getPersistentData().contains(SLOWED_TAG)
+                    p -> slowedBySpeed(p) && !returning(p) && !p.getPersistentData().contains(SLOWED_TAG) && !MagnetoAbilities.isHeld(p)
                             && p.position().distanceToSqr(center) < radius * radius)) {
                 slow(projectile, factor);
             }
