@@ -2,6 +2,14 @@
 
 The God of Thunder. *"Whosoever holds this hammer, if he be worthy, shall possess the power of Thor."* Thor throws Mjolnir and calls it back, flies by spinning it, fires lightning from his hand (twice as strong through his weapon), shatters Mjolnir into fragments that strike his enemies, and opens the Bifrost to take himself, or anyone who holds his weapons, anywhere in any dimension. With Mjolnir he can also pin someone down.
 
+## The quick version
+
+Three tricks, in plain words. (**Sneak** is the Shift key, unless you changed it. Everyone nearby sees all three.)
+
+* **Hold V: shoot lightning.** A beam of lightning shoots out of your hand and hits whatever you are looking at, for as long as you keep the key down. Let go and it stops. Hold **Mjolnir** or **Stormbreaker** and it shoots out of the hammer instead, flies twice as far and hits twice as hard. Turn on the God of Thunder (**B**) and it hits harder still. It uses up a little food, so you need something in your hunger bar.
+* **Sneak + R with Mjolnir: shatter it.** Mjolnir bursts into glowing pieces. Each piece flies at one enemy near you, hits it and flies back. When the last piece is home, Mjolnir is whole in your hand again (at the latest after 10 seconds). With nobody near, the pieces fly out in a ring and come straight back. Then wait 15 seconds before you do it again. Stormbreaker doesn't shatter.
+* **Sneak + right-click a creature or player with Mjolnir: pin them down.** You put Mjolnir on their chest and they are stuck: they can't walk, jump, fly or teleport, but they can still look around. To let them go, right-click them again (without Sneak). Only Mjolnir's owner can pin someone, and only its owner can lift it off again. It lets go by itself after a minute. The big bosses can't be pinned.
+
 ## Mjolnir
 
 **Forging Mjolnir.** "Forged in the heart of a dying star, from the sacred metal of Uru":
@@ -62,6 +70,7 @@ From *Thor: Love and Thunder*, where Jane's Mjolnir bursts into dozens of glowin
 * Each fragment curves in on its enemy and **strikes it for 6 damage, with knockback**. With the God of Thunder unleashed, lightning arcs from every hit. Then the fragment flies back.
 * When the last fragment is home, **Mjolnir is whole again in his hand**, still bound to its owner (in his inventory if his hand is busy).
 * While it is in pieces Mjolnir is not in his hand, but it counts as a weapon in flight, so Thor keeps flying. **R** calls the fragments home at once.
+* Everyone nearby sees the fragments burst out and fly home, and Thor's arm throw them up and close round them. At the latest after **10 seconds** the pieces are home by themselves.
 * If Thor **dies, logs out, changes dimension or loses his power** while it is in pieces, Mjolnir comes together where he was and falls to the ground, its owner kept. It is kept in Thor's own saved data while it is in pieces, so it can't be lost.
 * **Cooldown: 15 seconds.**
 
@@ -71,6 +80,7 @@ From *The Avengers*, where Thor sets Mjolnir on Loki's chest and Loki can't get 
 
 * **Sneak + right-click** a creature or player with Mjolnir in hand. Only its owner can do it (or any worthy player, if `thor.mjolnirOwnerOnly` is off). Mjolnir is set down on them, lying across their chest.
 * **While it lies there they can't move, jump, fly, swim up, ride, teleport** (Ender Pearls, chorus fruit, Endermen, the Bifrost and the mod's other teleports and dashes) **or glide on an elytra**, and knockback doesn't move them and no telekinesis can lift them. They can still **look around**.
+* Everyone nearby sees Mjolnir lying on them, and Thor's arm bring it down.
 * **Only its owner can lift it again**: right-click the pinned creature or player, or call it back with **R**. Nobody else can, the pinned one included ("It won't budge. Only Steve can lift it.").
 * It lets go by itself after **60 seconds** (`thor.pinDuration`), or when its owner logs out, dies or changes dimension, or when the pinned one dies or leaves. It then drops beside them, still its owner's.
 * **The bosses can't be pinned**: the Ender Dragon, the Wither and the Warden (the `enhanced:pin_immune` tag, see [Server Configuration](Server-Configuration)). A **player** can't be pinned if the server has **PvP off**, nor can one in Creative or Spectator mode.
@@ -102,7 +112,7 @@ Stormbreaker carries no enchantment of worthiness: **anyone can wield it**, and 
 |---|---|---|---|
 | 1 | **R** | Throw / Call Back | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up, or off someone it pins down (never from another player's hands, and never another player's Mjolnir: he calls his own, one nobody owns yet, or Stormbreaker). **Sneak + R** with Mjolnir in hand: it **shatters** into fragments that strike his enemies (see above). |
 | 2 | **G** (toggle) | Flight | Thor flies by spinning his weapon: only with Mjolnir or Stormbreaker in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. You can also double-tap **Space**. |
-| 3 | **V** (hold) | Lightning Beam | While he holds **V**, a crackling beam of lightning pours from his hand, or from the head of the weapon in it (the one in his main hand, if he holds two), to what he looks at, for everyone nearby to see: a white-hot core, electric blue and a deep blue halo, jagged and flickering. Every 5 ticks it hits the first creature in the line (not through walls): bare-handed, 2 damage up to 24 blocks away (8 a second). With **Mjolnir or Stormbreaker** in hand it reaches 48 blocks and hits twice as hard (4), the beam is thicker and brighter, and the first time it hits each creature it also has the usual effects of lightning on it (creepers become charged, pigs turn into zombified piglins, villagers into witches). The **God of Thunder** on top hits 1.5 times as hard, and every hit arcs to the next two creatures nearby. It burns a little hunger while he fires it, and sparks fly where it ends (no fire, no block damage). A Scarlet Witch's complete [Chaos Shield](Scarlet-Witch) stops it at its surface and loses the beam's damage from its strength. |
+| 3 | **V** (hold) | Lightning Beam | While he holds **V**, a crackling beam of lightning pours from his hand, or from the head of the weapon in it (the one in his main hand, if he holds two), to what he looks at, for everyone nearby to see: a white-hot core, electric blue and a deep blue halo, jagged and flickering. Every 5 ticks it hits the first creature in the line (not through walls): bare-handed, 2 damage (one heart) up to 24 blocks away (8 damage a second). With **Mjolnir or Stormbreaker** in hand it reaches 48 blocks and hits twice as hard (4 damage), the beam is thicker and brighter, and the first time it hits each creature it also has the usual effects of lightning on it (creepers become charged, pigs turn into zombified piglins, villagers into witches). The **God of Thunder** on top hits 1.5 times as hard, and every hit arcs to the next two creatures nearby. It burns a little hunger while he fires it (with an empty hunger bar it stops, and it won't start), and sparks fly where it ends (no fire, no block damage). A Scarlet Witch's complete [Chaos Shield](Scarlet-Witch) stops it at its surface and loses the beam's damage from its strength. |
 | 4 | **B** (toggle) | God of Thunder | From *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon and every fragment of a shattered Mjolnir arc too, and the lightning beam hits 1.5 times as hard. It burns hunger; with an empty hunger bar the thunder calms. |
 | 5 | **N** | Bifrost | "Heimdall! Open the Bifrost!" With Mjolnir or Stormbreaker in hand: **N** opens the Bifrost screen (home, his saved places, save this one), **Sneak + N** takes him to the spot he looks at, up to 512 blocks away. |
 
@@ -115,7 +125,7 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue and a deep
   * **Home:** the respawn point (bed or respawn anchor, otherwise the world spawn), in whatever dimension it is;
   * every **saved place**, with how far away it is, or which world it is in (the Overworld, the Nether, the End, or a dimension added by another mod). The **X** button forgets one;
   * a field to **save the place you stand on**, under a name of up to 32 characters, facing the way you face. Saving a name again moves that place. You can save up to **24 places**.
-* **Sneak + N** (or Sneak + right-click with the weapon) takes you to the spot you look at, up to 512 blocks away.
+* **Sneak + N** (or Sneak + right-click with the weapon) takes you to the spot you look at, up to 512 blocks away. (Aimed at a creature or player, Sneak + right-click with Mjolnir pins them instead: see above.)
 * **Any dimension.** A column of swirling rainbow light gathers around the traveller for a second and a half, holding them in place, then takes them, **across dimensions if need be**. They land exactly on the saved spot, facing the saved way. If it has been built over since, they land on the first free spot above it. The Bifrost burns its circle of runes into the ground where it lands and where it left, glowing gold and fading over a minute.
 * Arriving inside a Hex counts as crossing its wall: the Hex judges the traveller as it judges everyone else.
 * **Cooldown: 60 seconds**, the same for everyone, shown on the screen (and on Thor's HUD).
@@ -123,7 +133,7 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue and a deep
 
 ## Looks
 
-*Thor* (2011 and *The Avengers*: black and silver armour with the six chest discs, red cape), *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder* (navy, gold and black armour, bare arms, red cape), *Mighty Thor* (Jane Foster), and *Your own skin*. Press **H** to switch. See [Looks](Looks).
+*Thor* (2011 and *The Avengers*: black and silver armour with the six chest discs, red cape), *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder* (navy, gold and black armour, bare arms, long blond hair and a beard, red cape), *Mighty Thor* (Jane Foster), and *Your own skin*. Press **H** to switch. See [Looks](Looks).
 
 ## Numbers you can change
 

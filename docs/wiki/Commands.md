@@ -1,6 +1,6 @@
 # Commands
 
-All commands start with `/enhanced` and are for **operators** (permission level 2): server owners and players who can use `/gamemode`. Heroes are otherwise permanent, so these commands are also the only way to take a power away.
+All commands start with `/enhanced` and are for **operators** (permission level 2): server owners and players who can use `/gamemode`. Heroes are otherwise permanent, so these commands are also the only way to take a power away. (The one exception is `/enhanced_anim`, for looking at the animations: see below.)
 
 | Command | Effect |
 |---|---|
@@ -53,6 +53,20 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced l
 | `/enhanced look Steve white_vision` | Puts Steve, a Vision, in the White Vision look. |
 | `/enhanced hex list` | Lists the Hexes in your dimension. |
 | `/enhanced hex clear` | Dissolves them all. |
+
+## Looking at the animations: /enhanced_anim
+
+`/enhanced_anim` is a different kind of command. It runs only in your own game, needs no operator rights and changes nothing for anyone else. It is for looking closely at the heroes' animation, for example to take a screenshot of a pose. The commands act on you (as a hero), or on another player in view with `target`.
+
+| Command | What it does |
+|---|---|
+| `/enhanced_anim play <gesture>` | Starts a gesture on you whatever you are doing, for example `THOR_SHATTER`, `THOR_PIN` or `WANDA_SHIELD_RAISE`. The game suggests the names as you type. Add a tick (0 to 100) to freeze the gesture there. |
+| `/enhanced_anim hold <ticks>` | Jumps every gesture that is playing to this tick (0 to 100) and freezes the animation. |
+| `/enhanced_anim release` | Lets the animation run again. |
+| `/enhanced_anim fly <s> <u> <turn>` | Pretends you fly at speed `s` (1 is cruising, 2 a sprint), climbing `u` (-1 diving, 1 climbing) and turning `turn` degrees per tick (-20 to 20), so you can see that pose without flying that fast. `/enhanced_anim fly off` goes back to your real flight. |
+| `/enhanced_anim stance <stance> on` | Forces a stance (a pose that is held, such as `SHIELD_WANDA` or `THOR_BEAM`) on. With `off` it is forced off, with `auto` it is left to the game, and `/enhanced_anim stance off` puts every stance back to normal. |
+| `/enhanced_anim target <name>` | Makes the commands act on another player in view instead of you. `/enhanced_anim target self` goes back to you. |
+| `/enhanced_anim state` | Shows or hides the numbers behind the pose. |
 
 ## Related
 
