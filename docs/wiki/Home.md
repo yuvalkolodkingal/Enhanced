@@ -28,6 +28,10 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki and Thor) are on [Looks](Looks).
 
+## Animations and effects
+
+Every hero moves like the character on screen: each flier has a flight of his own (Thor even whirls Mjolnir on its strap while he hovers, with the handle really in his fist), every ability is acted out, and your own hands move in first person. Flying leaves trails, rings and wind behind you, and Thor and Vision can break the sound barrier. The client options *Animations*, *Reduced motion* and *Flight effects* tone it down or turn it off; the details are in [docs/DESIGN.md](https://github.com/yuvalkolodkingal/enhanced/blob/main/docs/DESIGN.md).
+
 ## Download and install
 
 Every push to `main` builds the mod, runs the in-game tests and publishes the jar on the [Releases](https://github.com/yuvalkolodkingal/enhanced/releases) page. The newest build is always marked *Latest*.
