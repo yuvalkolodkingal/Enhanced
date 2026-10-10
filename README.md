@@ -131,6 +131,6 @@ To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a
   and `/enhanced hex list|clear` (operators only).
 * Balance numbers (beam damage, Hex death chance and radius, flight speeds, shrapnel, how much
   Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
-* Item, block, entity and damage tags under `data/enhanced/tags/` decide what counts as
+* Item, block and entity tags under `data/enhanced/tags/` decide what counts as
   metal, what can be lifted, what the shield repels and which bosses resist the Hex,
   so datapacks can change them.

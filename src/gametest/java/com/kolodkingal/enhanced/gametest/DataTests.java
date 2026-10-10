@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforgespi.locating.IModFile;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -52,6 +54,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
+import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** Data-driven content: loot modifiers and recipes, and what old saves still hold. */
@@ -337,6 +340,32 @@ public final class DataTests {
             saved.putString("power", power.getSerializedName());
             check(PowerData.CODEC.parse(ops, saved).getOrThrow().power() == power, power + " still reads as itself");
         }
+        helper.succeed();
+    }
+
+    /**
+     * The same through the real load path (what a login does): the player file of a Photon, with the fields Photon
+     * kept in the power attachment, loads as a player without powers, and the attachment is not thrown away.
+     */
+    @GameTest(template = ARENA)
+    public static void savedPhotonPlayerLoadsWithoutPowers(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(2.5, FLOOR, 2.5, Power.QUICKSILVER);
+        Powers.get(player).setWallRun(false);
+
+        CompoundTag file = player.saveWithoutId(new CompoundTag());
+        CompoundTag attachment = file.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY)
+                .getCompound(Enhanced.id("power").toString());
+        check(attachment.getString("power").equals("quicksilver") && !attachment.getBoolean("wall_run"),
+                "the player file holds the power attachment: " + attachment);
+        attachment.putString("power", "photon");
+        attachment.putBoolean("spectrum_vision", true);
+        attachment.putFloat("energy", 40.0F);
+
+        player.load(file);
+        PowerData data = Powers.get(player);
+        check(data.power() == Power.NONE, "the saved Photon loads as a player without powers, not " + data.power());
+        check(!data.wallRun(), "and the attachment was read, not dropped (Quicksilver's wall run is still off)");
         helper.succeed();
     }
 
