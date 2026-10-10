@@ -4,12 +4,13 @@ A Minecraft mod where you can become one of the *Enhanced*:
 **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**;
 **Quicksilver**, who runs so fast the world slows down around him (to *Sweet Dreams*);
 **Vision**, the Mind Stone in a synthetic body (or **White Vision**);
-Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki** and his variants, **Sylvie** among them;
+Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief;
 or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
 And if you're lucky enough to survive Wanda's Hex wall, **Photon**.
 
 Every power's look and colour follows the MCU films and shows, and Vision, Tommy, Billy, Loki
-and Thor each have several looks (press **H**).
+(in his Asgardian clothes, the TVA's or the God of Stories') and Thor each have several looks
+(press **H**).
 
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).
@@ -66,7 +67,7 @@ look. In Thor's hands either weapon is thrown, called back, flown with and struc
 | **G** | Disarm Blitz | Flight | Duplicates | Flight (weapon in hand) |
 | **V** | Whirlwind | Telekinesis | Shapeshift | Lightning |
 | **B** | Vibrate Through Walls | Freeze | Vanish | God of Thunder (toggle) |
-| **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant, or the variant's own power | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
+| **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | **H** | Change look | Change look | Change look | Change look |
 
 **Quicksilver Time:** as Quicksilver, just sprint. Everything within 32 blocks slows to a
@@ -131,7 +132,7 @@ To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a
 
 * `/enhanced power get|set …` (`none`, `magneto`, `scarlet_witch`, `photon`, `quicksilver`,
   `vision`, `tommy`, `billy`, `loki`, `thor`, optionally followed by a look), `/enhanced look <players> <look>`
-  and `/enhanced hex list|clear` (operators only).
+  (for example `/enhanced look @a tva`) and `/enhanced hex list|clear` (operators only).
 * Balance numbers (beam damage, Hex death chance and radius, flight speeds, shrapnel, how much
   Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
 * Item, block, entity and damage tags under `data/enhanced/tags/` decide what counts as
