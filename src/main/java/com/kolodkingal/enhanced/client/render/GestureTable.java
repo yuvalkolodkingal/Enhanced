@@ -33,6 +33,8 @@ public final class GestureTable {
     private static final float PREDICTION_WINDOW = 12.0F;
     /** The same gesture is not started again within this many ticks. */
     private static final float DEDUPE = 4.0F;
+    /** Ticks to wait for the weapon to appear in the hand after the data says it came home or was drawn. */
+    private static final int PENDING_TICKS = 5;
 
     /** What was seen of a hero's data last tick. */
     public static final class Memory {
@@ -47,6 +49,9 @@ public final class GestureTable {
         /** What telekinesis just let go of, to be told apart (thrown or set down) a tick later. */
         Entity released;
         int hammer = -1;
+        /** A catch or a draw seen in the data whose weapon has not yet appeared in the hand, and the ticks left to wait for it. */
+        GestureRoutes.Hammer pendingHammer;
+        int pendingWait;
         boolean returning;
         int weaponKind;
         boolean hasHex;
@@ -63,6 +68,7 @@ public final class GestureTable {
             held = -1;
             heldEntity = null;
             released = null;
+            pendingHammer = null;
             hammer = -1;
             returning = false;
             weaponKind = 0;
@@ -169,15 +175,29 @@ public final class GestureTable {
         boolean returning = s.thrownWeapon instanceof ThrownWeaponEntity flying && flying.isReturning();
         boolean armed = s.weaponKind > 0;
         if (m.hammer == -1 && hammer != -1) {
+            m.pendingHammer = null;
             fire(s, p, GestureRoutes.hammer(m.weaponKind > 0 ? GestureRoutes.Hammer.THROWN : GestureRoutes.Hammer.SUMMONED), age);
         } else if (m.hammer != -1 && hammer != -1 && returning && !m.returning) {
             fire(s, p, GestureRoutes.hammer(GestureRoutes.Hammer.RECALLED_IN_FLIGHT), age);
-        } else if (m.hammer != -1 && hammer == -1 && armed) {
-            // It came home: the arm that catches it points back where it came from.
-            s.catchFrom = s.weaponTrail[2] != null ? s.weaponTrail[2] : s.weaponTrail[0];
-            fire(s, p, GestureRoutes.hammer(GestureRoutes.Hammer.CAUGHT), age);
+        } else if (m.hammer != -1 && hammer == -1) {
+            // It came home. The inventory update that puts it in his hand can come a tick after the data: wait a few ticks for it.
+            m.pendingHammer = GestureRoutes.Hammer.CAUGHT;
+            m.pendingWait = PENDING_TICKS;
+        } else if (m.hammer == -1 && hammer == -1 && cooldownRose && !armed && m.weaponKind == 0) {
+            m.pendingHammer = GestureRoutes.Hammer.DRAWN;
+            m.pendingWait = PENDING_TICKS;
         } else if (m.hammer == -1 && hammer == -1 && cooldownRose && armed && m.weaponKind == 0) {
             fire(s, p, GestureRoutes.hammer(GestureRoutes.Hammer.DRAWN), age);
+        }
+        if (m.pendingHammer != null && hammer == -1 && armed) {
+            if (m.pendingHammer == GestureRoutes.Hammer.CAUGHT) {
+                // The arm that catches it points back where it came from.
+                s.catchFrom = s.weaponTrail[2] != null ? s.weaponTrail[2] : s.weaponTrail[0];
+            }
+            fire(s, p, GestureRoutes.hammer(m.pendingHammer), age);
+            m.pendingHammer = null;
+        } else if (m.pendingHammer != null && --m.pendingWait <= 0) {
+            m.pendingHammer = null;
         }
     }
 
