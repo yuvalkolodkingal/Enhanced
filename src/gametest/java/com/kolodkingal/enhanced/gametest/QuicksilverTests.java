@@ -374,18 +374,70 @@ public final class QuicksilverTests {
         check(inSpeed >= normal / 4 - 1 && inSpeed <= normal / 4 + 1, "and so in Super Speed (" + inSpeed + ")");
 
         // The extra ticks are taken off the use; fractions carry over, and a use is never cut below its last tick.
+        ItemStack steak = new ItemStack(Items.COOKED_BEEF);
         f.config(EnhancedConfig.QUICKSILVER_ACTION_SPEED, 2.5);
         int skipped = 0;
         for (int t = 0; t < 10; t++) {
             peter.tickCount = t;
-            skipped += 1000 - QuicksilverAbilities.fasterUse(peter, 1000);
+            skipped += 1000 - QuicksilverAbilities.fasterUse(peter, steak, 1000);
         }
         check(skipped == 15, "2.5 times as fast skips 15 ticks in 10 (skipped " + skipped + ")");
         f.config(EnhancedConfig.QUICKSILVER_ACTION_SPEED, 4.0);
         peter.tickCount = 0;
-        check(QuicksilverAbilities.fasterUse(peter, 3) == 1 && QuicksilverAbilities.fasterUse(peter, 2) == 1
-                && QuicksilverAbilities.fasterUse(peter, 1) == 1, "the use never drops below its last tick, so vanilla ends it");
-        check(QuicksilverAbilities.fasterUse(peter, 0) == 0 && QuicksilverAbilities.fasterUse(peter, -2) == -2, "and a use that is over is left alone");
+        check(QuicksilverAbilities.fasterUse(peter, steak, 3) == 1 && QuicksilverAbilities.fasterUse(peter, steak, 2) == 1
+                && QuicksilverAbilities.fasterUse(peter, steak, 1) == 1, "the use never drops below its last tick, so vanilla ends it");
+        check(QuicksilverAbilities.fasterUse(peter, steak, 0) == 0 && QuicksilverAbilities.fasterUse(peter, steak, -2) == -2,
+                "and a use that is over is left alone");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    public static void brushesSpyglassesAndHornsKeepTheirOwnPace(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        toggle(peter, true);
+        peter.tickCount = 0;
+
+        // A brush strokes when ten ticks of use have passed (the 5th, the 15th...): rushed by four it would never stroke.
+        // (It only goes on while it points at a block, so he looks at the floor.)
+        peter.setXRot(90F);
+        peter.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BRUSH));
+        peter.startUsingItem(InteractionHand.MAIN_HAND);
+        int brushing = peter.getUseItemRemainingTicks();
+        for (int i = 0; i < 10; i++) {
+            peter.doTick();
+        }
+        check(brushing - peter.getUseItemRemainingTicks() == 10, "a brush goes tick by tick in Quicksilver Time (used "
+                + (brushing - peter.getUseItemRemainingTicks()) + " ticks in 10)");
+        peter.stopUsingItem();
+
+        // A spyglass would run out after 15 seconds, and a horn's call would end long before its sound.
+        check(QuicksilverAbilities.fasterUse(peter, new ItemStack(Items.SPYGLASS), 1200) == 1200, "a spyglass keeps its minute");
+        check(QuicksilverAbilities.fasterUse(peter, new ItemStack(Items.GOAT_HORN), 140) == 140, "and a goat horn its call");
+        check(QuicksilverAbilities.fasterUse(peter, new ItemStack(Items.BOW), 72000) < 72000, "while a bow is drawn faster");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    public static void othersAreNotRushedByQuicksilverTime(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        ServerPlayer other = f.player(12.5, FLOOR, 10.5);
+        double attack = other.getAttributeValue(Attributes.ATTACK_SPEED);
+        double mining = other.getAttributeValue(Attributes.BLOCK_BREAK_SPEED);
+        double swimming = other.getAttributeValue(NeoForgeMod.SWIM_SPEED);
+
+        toggle(peter, true);
+        run(peter, false);
+        check(Powers.get(peter).slowMo() && other.distanceTo(peter) < SlowMotion.radius(), "the other player stands in his Quicksilver Time");
+        check(QuicksilverAbilities.isQuick(peter) && !QuicksilverAbilities.isQuick(other), "but only Quicksilver is quicker");
+        assertNear(other.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "he attacks at his own speed");
+        assertNear(other.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "mines at his own speed");
+        assertNear(other.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "and swims at his own speed");
+        int ticks = eatSteak(other);
+        check(ticks >= 30, "and eats a steak in the usual time (took " + ticks + " ticks)");
         helper.succeed();
     }
 

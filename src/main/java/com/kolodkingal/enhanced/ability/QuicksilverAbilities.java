@@ -209,18 +209,31 @@ public final class QuicksilverAbilities {
      * Using an item (eating, drinking, drawing a bow, loading a crossbow...) goes {@link #actionSpeed()} times as fast:
      * each tick takes the extra ticks off what is left of the use. It never goes below 1, so vanilla still ends the
      * use itself, and eaten food is eaten, a bow released, a crossbow loaded as ever. Fractions carry over from tick
-     * to tick.
+     * to tick. A few uses are left at their own pace (see {@link #paced}).
      *
+     * @param stack     the item being used
      * @param remaining ticks left of the use, before this tick
      * @return ticks left after the extra ticks are taken off
      */
-    public static int fasterUse(Player player, int remaining) {
-        if (remaining <= 1 || !isQuick(player)) {
+    public static int fasterUse(Player player, ItemStack stack, int remaining) {
+        if (remaining <= 1 || !isQuick(player) || paced(stack)) {
             return remaining;
         }
         double extra = actionSpeed() - 1.0;
         int skipped = (int) (Math.floor((player.tickCount + 1) * extra) - Math.floor(player.tickCount * extra));
         return Math.max(1, remaining - skipped);
+    }
+
+    /**
+     * Uses whose length is not a wait, so cutting it short would only break them: a brush strokes once every ten ticks
+     * of its use (skipped ticks would step right over the stroke), a spyglass would run out after 15 seconds instead of
+     * a minute, and a goat horn's call plays at its own pace.
+     */
+    private static boolean paced(ItemStack stack) {
+        return switch (stack.getUseAnimation()) {
+            case BRUSH, SPYGLASS, TOOT_HORN -> true;
+            default -> false;
+        };
     }
 
     // ---- Ability 2: Speed Blitz ----

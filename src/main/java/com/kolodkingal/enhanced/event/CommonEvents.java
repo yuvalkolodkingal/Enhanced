@@ -102,11 +102,11 @@ public final class CommonEvents {
 
     // ---- Quicksilver does everything faster (runs on both sides, so the client's use animation keeps up) ----
 
-    /** Eating, drinking, drawing a bow, loading a crossbow: every use of an item goes faster while a mode is on. */
+    /** Eating, drinking, drawing a bow, loading a crossbow: most uses of an item go faster while a mode is on. */
     @SubscribeEvent
     public static void onUseItemTick(LivingEntityUseItemEvent.Tick event) {
         if (event.getEntity() instanceof Player player) {
-            event.setDuration(QuicksilverAbilities.fasterUse(player, event.getDuration()));
+            event.setDuration(QuicksilverAbilities.fasterUse(player, event.getItem(), event.getDuration()));
         }
     }
 

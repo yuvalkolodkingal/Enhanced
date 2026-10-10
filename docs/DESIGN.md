@@ -369,7 +369,7 @@ While Quicksilver Time **or** Super Speed is on, Quicksilver does everything **4
 |---|---|
 | Mining | His block break speed is multiplied by 4: stone with a pickaxe takes a quarter of the time. |
 | Attacking | His attack speed is multiplied by 4, so the attack cooldown recharges 4 times faster. |
-| Eating, drinking, bows, crossbows and everything else you hold the use button for | The use runs 4 times as fast: a steak takes 8 ticks instead of 32, a bow is fully drawn in 5 ticks instead of 20, a crossbow is loaded in 7 instead of 25. Food is still eaten and arrows still fly at full strength. |
+| Eating, drinking, bows, crossbows and everything else you hold the use button for | The use runs 4 times as fast: a steak takes 8 ticks instead of 32, a bow is fully drawn in 5 ticks instead of 20, a crossbow is loaded in 7 instead of 25. Food is still eaten and arrows still fly at full strength. (A spyglass, a brush and a goat horn keep their own pace: there is nothing in them to wait for.) |
 | Swimming | His swim speed is multiplied by 4. |
 | Placing and breaking blocks one after another | On his own screen, the game's built-in pause between one block and the next (after a right click, and after a block is broken) is cut by the same factor, so holding the button places or breaks blocks without waiting. |
 
