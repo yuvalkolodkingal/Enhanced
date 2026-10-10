@@ -4,6 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Variant;
+import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -247,6 +251,83 @@ public final class DataTests {
         Path song = mod.findResource("assets", Enhanced.MODID, "sounds", "quicksilver", "sweet_dreams.ogg");
         check(Files.size(song) > 1_000_000, "Sweet Dreams is the whole song (" + Files.size(song) + " bytes)");
         helper.succeed();
+    }
+
+    /**
+     * Every look of every hero has its skin (64x64) and cape (64x32) in the mod, and every hero, ability, look and
+     * signature ability has a name in both English and Hebrew.
+     */
+    @GameTest(template = ARENA)
+    public static void everyLookHasItsSkinAndEveryNameItsTranslation(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        JsonObject en = lang(mod, "en_us");
+        JsonObject he = lang(mod, "he_il");
+        check(en.keySet().equals(he.keySet()), "en_us and he_il have the same keys; differing: "
+                + symmetricDifference(en.keySet(), he.keySet()));
+        List<String> missing = new ArrayList<>();
+        for (Power power : Power.values()) {
+            if (!power.hasPowers()) {
+                continue;
+            }
+            String id = power.getSerializedName();
+            for (String key : List.of("power.enhanced." + id, "power.enhanced." + id + ".awaken", "power.enhanced." + id + ".broadcast")) {
+                if (!en.has(key)) {
+                    missing.add(key);
+                }
+            }
+            for (int ability = 1; ability <= PowerData.ABILITIES; ability++) {
+                if (!en.has(power.abilityKey(ability))) {
+                    missing.add(power.abilityKey(ability));
+                }
+            }
+            for (Variant look : Variants.of(power)) {
+                if (!en.has(look.translationKey())) {
+                    missing.add(look.translationKey());
+                }
+                for (int ability = 1; ability <= PowerData.ABILITIES; ability++) {
+                    if (look.hasSignature(ability) && !en.has(look.abilityKey(ability))) {
+                        missing.add(look.abilityKey(ability));
+                    }
+                }
+                if (look.skin() != null) {
+                    checkImage(mod, look.skin(), 64, 64);
+                }
+                if (look.cape() != null) {
+                    checkImage(mod, look.cape(), 64, 32);
+                }
+            }
+        }
+        check(missing.isEmpty(), "missing translations: " + missing);
+        helper.succeed();
+    }
+
+    private static JsonObject lang(IModFile mod, String name) throws IOException {
+        Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+        return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+    }
+
+    private static java.util.Set<String> symmetricDifference(java.util.Set<String> a, java.util.Set<String> b) {
+        java.util.Set<String> out = new java.util.TreeSet<>(a);
+        out.addAll(b);
+        java.util.Set<String> both = new java.util.HashSet<>(a);
+        both.retainAll(b);
+        out.removeAll(both);
+        return out;
+    }
+
+    /** The texture exists and is a PNG of the given size. */
+    private static void checkImage(IModFile mod, ResourceLocation texture, int width, int height) throws IOException {
+        Path file = mod.findResource(("assets/" + texture.getNamespace() + "/" + texture.getPath()).split("/"));
+        check(Files.isRegularFile(file), texture + " exists");
+        // The PNG header: the signature, then the IHDR chunk with the width and height (no image library on a server).
+        byte[] head = new byte[24];
+        try (InputStream in = Files.newInputStream(file)) {
+            check(in.readNBytes(head, 0, 24) == 24 && head[1] == 'P' && head[2] == 'N' && head[3] == 'G', texture + " is a PNG");
+        }
+        java.nio.ByteBuffer buffer = java.nio.ByteBuffer.wrap(head);
+        int w = buffer.getInt(16);
+        int h = buffer.getInt(20);
+        check(w == width && h == height, texture + " is " + width + "x" + height + ", not " + w + "x" + h);
     }
 
     private DataTests() {
