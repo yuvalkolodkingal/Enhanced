@@ -4,12 +4,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -55,6 +58,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -336,6 +341,60 @@ public final class DataTests {
         check(missing.isEmpty(), "missing translations: " + missing);
         check(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModDamageTypes.LIGHTNING_BEAM.location()),
                 "the lightning beam's damage type is there");
+        helper.succeed();
+    }
+
+    /**
+     * Every item, block and effect the mod adds, the subtitle of every sound and each client option has a name in
+     * English and in Hebrew, and a Hebrew line takes the same placeholders as its English one (a translation that loses
+     * its "%s" would show the wrong message).
+     */
+    @GameTest(template = ARENA)
+    public static void everyItemBlockEffectSubtitleAndOptionHasANameInBothLanguages(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        JsonObject sounds = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "sounds.json"),
+                StandardCharsets.UTF_8)).getAsJsonObject();
+        List<String> keys = new ArrayList<>();
+        ModItems.ITEMS.getEntries().forEach(item -> keys.add(item.get().getDescriptionId()));
+        ModBlocks.BLOCKS.getEntries().forEach(block -> keys.add(block.get().getDescriptionId()));
+        ModEffects.EFFECTS.getEntries().forEach(effect -> keys.add(effect.get().getDescriptionId()));
+        for (Map.Entry<String, JsonElement> event : sounds.entrySet()) {
+            JsonObject definition = event.getValue().getAsJsonObject();
+            if (definition.has("subtitle")) {
+                keys.add(definition.get("subtitle").getAsString());
+            }
+        }
+        for (var option : List.of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION, EnhancedClientConfig.FLIGHT_EFFECTS)) {
+            String key = option.getSpec().getTranslationKey();
+            check(key != null, "a client option has a translation key");
+            keys.add(key);
+            keys.add(key + ".tooltip");
+        }
+        check(keys.size() > 40, "there are names to check (" + keys.size() + ")");
+        JsonObject en = lang(mod, "en_us");
+        JsonObject he = lang(mod, "he_il");
+        List<String> missing = new ArrayList<>();
+        for (String key : keys) {
+            for (JsonObject lang : List.of(en, he)) {
+                if (!lang.has(key)) {
+                    missing.add((lang == en ? "en_us: " : "he_il: ") + key);
+                }
+            }
+        }
+        check(missing.isEmpty(), "missing translations: " + missing);
+        Pattern placeholder = Pattern.compile("%(\\d+\\$)?[sd]");
+        List<String> differing = new ArrayList<>();
+        for (String key : en.keySet()) {
+            if (!he.has(key)) {
+                continue; // (the keys are compared in everyLookHasItsSkinAndEveryNameItsTranslation)
+            }
+            List<String> inEnglish = placeholder.matcher(en.get(key).getAsString()).results().map(MatchResult::group).sorted().toList();
+            List<String> inHebrew = placeholder.matcher(he.get(key).getAsString()).results().map(MatchResult::group).sorted().toList();
+            if (!inEnglish.equals(inHebrew)) {
+                differing.add(key + " " + inEnglish + " / " + inHebrew);
+            }
+        }
+        check(differing.isEmpty(), "the Hebrew lines take other placeholders than the English ones: " + differing);
         helper.succeed();
     }
 

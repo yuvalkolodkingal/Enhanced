@@ -346,7 +346,7 @@
   "subtitles.enhanced.loki_shapeshift": "לוקי משנה צורה",
   "subtitles.enhanced.frost_giant": "ענק הכפור מתעורר",
   "subtitles.enhanced.tesseract": "הטסרקט נפתח",
-  "item.enhanced.mjolnir.shatter": "התכופפות + R (ת'ור): הוא מתפרק לרסיסים שפוגעים באויביו",
+  "item.enhanced.mjolnir.shatter": "התכופפות + R (ת'ור): הוא מתפוצץ לרסיסים שפוגעים באויבים שלו",
   "item.enhanced.mjolnir.pin": "התכופפות + שימוש על יצור: מצמיד אותו לקרקע; רק הבעלים יכול להרים אותו",
   "entity.enhanced.mjolnir_fragment": "רסיס של מיולניר",
   "entity.enhanced.mjolnir_pin": "מיולניר מצמיד",
@@ -369,5 +369,5 @@
   "config.enhanced.reduced_motion": "תנועה מופחתת",
   "config.enhanced.reduced_motion.tooltip": "בלי נדנוד ריחוף, סחף או רעידות מצלמה, וטבעות עמומות יותר.",
   "config.enhanced.flight_effects": "אפקטי תעופה",
-  "config.enhanced.flight_effects.tooltip": "סרטים, טבעות, קווי רוח וגלי הלם סביב גיבורים שעפים."
+  "config.enhanced.flight_effects.tooltip": "שובלים, טבעות, קווי רוח וגלי הלם סביב גיבורים שעפים."
 }

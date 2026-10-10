@@ -200,7 +200,7 @@ public final class EnhancedConfig {
         THOR_FLIGHT_SPEED = BUILDER.comment("Thor's flying speed while he holds Mjolnir or Stormbreaker (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.11, 0.01, 0.5);
         MJOLNIR_ANYONE_WORTHY = BUILDER.comment("If true, everyone is worthy of Mjolnir. If false (the default), only Thor, Vision,",
-                        "Creative players and those who have earned the Hero of the Village advancement are worthy: they can",
+                        "Creative and Spectator players and those who have earned the Hero of the Village advancement are worthy: they can",
                         "claim a Mjolnir nobody owns yet (see mjolnirOwnerOnly), and lift it.")
                 .define("anyoneWorthy", false);
         MJOLNIR_OWNER_ONLY = BUILDER.comment("If true (the default), each Mjolnir belongs to the first worthy player who lifts it, and",
