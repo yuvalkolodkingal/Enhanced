@@ -29,9 +29,14 @@ public enum GestureId {
 
     RUN_SKID(Group.RUN, 10, 1, 5, false),
 
-    TK_GRAB(Group.TK, 12, 2, 6, false),
+    /** Telekinesis has a style per hero: the grab and the fling of Magneto, the Scarlet Witch and Billy. */
+    TK_GRAB_MAGNETO(Group.TK, 12, 2, 6, false),
+    TK_GRAB_WANDA(Group.TK, 12, 2, 6, false),
+    TK_GRAB_BILLY(Group.TK, 12, 2, 6, false),
     TK_RELEASE(Group.TK, 9, 1, 6, false),
-    TK_FLING(Group.TK, 10, 1, 5, true),
+    TK_FLING_MAGNETO(Group.TK, 10, 1, 5, true),
+    TK_FLING_WANDA(Group.TK, 10, 1, 5, true),
+    TK_FLING_BILLY(Group.TK, 10, 1, 5, true),
 
     MAG_SHRAPNEL_START(Group.CAST, 6, 1, 3, false),
     MAG_DISARM(Group.CAST, 14, 1, 6, false),
@@ -82,7 +87,9 @@ public enum GestureId {
     THOR_SUMMON(Group.THOR_ARM, 10, 2, 5, false),
     THOR_RECALL_DRAW(Group.THOR_ARM, 8, 1, 4, true),
     THOR_CATCH(Group.THOR_ARM, 14, 1, 6, true),
+    /** The kick of the lightning beam with the weapon in a hand (strength 1.7) and bare-handed (strength 1). */
     THOR_BEAM_KICK(Group.THOR_ARM, 8, 1, 5, true),
+    THOR_BEAM_KICK_BARE(Group.THOR_ARM, 8, 1, 5, true),
     THOR_UNLEASH_ON(Group.CAST, 20, 2, 6, false),
     THOR_UNLEASH_OFF(Group.CAST, 10, 1, 5, false),
     /** Reserved for the branch that shatters Mjolnir: it calls {@code HeroAnimator.play(player, THOR_SHATTER, 0)}. */

@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.Gestures.ArmKey;
 import com.kolodkingal.enhanced.client.render.Gestures.Mode;
+import com.kolodkingal.enhanced.client.render.Gestures.Target;
+import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -22,7 +24,7 @@ import net.minecraft.world.entity.player.Player;
  *     <li>locomotion: the flight layer ({@link FlightPoses}), the speedster's run and everyone's walk and sprint
  *     ({@link RunPoses});</li>
  *     <li>the ambient stances, then the aimed and holding stances ({@link Stances});</li>
- *     <li>the playing gestures ({@link Gestures}), oldest first;</li>
+ *     <li>the playing gestures ({@link Gestures}), oldest first, and the jab of Loki's Scepter in place of the swing's chop;</li>
  *     <li>the head, which keeps looking where the camera looks on a leaning body;</li>
  *     <li>the swing put back, and the overlay parts (hat, sleeves, jacket, trousers) copied from what they cover.</li>
  * </ol>
@@ -83,6 +85,9 @@ public final class HeroPoses {
 
         // ---- 5. the head ----
         head(c);
+
+        // ---- the swing of Loki's Scepter: a touch, not a chop ----
+        scepterJab(c);
 
         // ---- 6. the swing, the shoulders, the overlay parts ----
         putBackSwing(c, vanillaTwist);
@@ -231,7 +236,7 @@ public final class HeroPoses {
         c.forceO = force;
         for (int arm = 0; arm < 2; arm++) {
             boolean main = arm == 0;
-            Mode mode = def.sampleArm(main, t, SOLVER, V, TREMBLE);
+            Mode mode = def.sampleArm(main, t, SOLVER, V, TREMBLE, c.mechanical);
             if (mode == null) {
                 continue;
             }
@@ -260,8 +265,56 @@ public final class HeroPoses {
         if (twist != 0.0F) {
             c.twist(twist, w);
         }
+        if (slot.id == GestureId.TOMMY_VIBRATE) {
+            shiver(c, w);
+        }
         c.forceM = false;
         c.forceO = false;
+    }
+
+    /**
+     * Tommy's molecules shiver: every limb jitters a few degrees at 30 Hz, a different jitter each, the same every time for
+     * a given player (so it does not depend on the frame rate or on who looks).
+     */
+    private static void shiver(PoseContext c, float w) {
+        if (EnhancedClientConfig.reducedMotion()) {
+            return;
+        }
+        long k = (long) Math.floor(c.age * 1.5F);
+        int id = c.player.getId();
+        c.armAdd(true, 6.0F * HeroAnimator.noise(k, id), 6.0F * HeroAnimator.noise(k + 1, id), 0.0F, w);
+        c.armAdd(false, 6.0F * HeroAnimator.noise(k + 2, id), 6.0F * HeroAnimator.noise(k + 3, id), 0.0F, w);
+        c.legAdd(true, 6.0F * HeroAnimator.noise(k + 4, id), 0.0F, w);
+        c.legAdd(false, 6.0F * HeroAnimator.noise(k + 5, id), 0.0F, w);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Loki's Scepter
+    // ---------------------------------------------------------------------------------------------------------------
+
+    /**
+     * A swing with Loki's Scepter in the hand is a jab, not a chop: the swinging arm is thrust along the look and the chop
+     * of the vanilla swing is muted by the same amount, over the first 60 percent of the swing (a touch is what takes you over).
+     */
+    private static void scepterJab(PoseContext c) {
+        PlayerModel<?> m = c.model;
+        float f = m.attackTime;
+        if (f <= 0.0F) {
+            return;
+        }
+        Player p = c.player;
+        InteractionHand hand = p.swingingArm == null ? InteractionHand.MAIN_HAND : p.swingingArm;
+        if (!p.getItemInHand(hand).is(ModItems.LOKIS_SCEPTER.get())) {
+            return;
+        }
+        HumanoidArm attack = attackArm(p);
+        boolean main = attack == c.mSide;
+        if (main ? c.yieldM : c.yieldO) {
+            return;
+        }
+        float w = Mth.sin(Mth.PI * Math.min(1.0F, f * 1.7F));
+        c.aim(main, Target.LOOK, -4, 0, 0, w);
+        c.jab = w;
     }
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -315,7 +368,7 @@ public final class HeroPoses {
             HumanoidArm attack = attackArm(c.player);
             boolean attackIsM = attack == c.mSide;
             float occupied = attackIsM ? c.occupiedM : c.occupiedO;
-            float keep = 1.0F - 0.75F * Mth.clamp(occupied, 0.0F, 1.0F);
+            float keep = Math.min(1.0F - 0.75F * Mth.clamp(occupied, 0.0F, 1.0F), 1.0F - c.jab);
             ModelPart arm = attack == HumanoidArm.RIGHT ? m.rightArm : m.leftArm;
             arm.xRot -= (f1 * 1.2F + f2) * keep;
             arm.yRot += vanillaTwist * 2.0F;

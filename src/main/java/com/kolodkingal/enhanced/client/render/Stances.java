@@ -22,21 +22,21 @@ final class Stances {
         float w;
         if ((w = st.stance(Stance.MAG_FIELD)) > 0.001F) {
             // Palms down, the field around him; a slow drift even on the ground.
-            c.arm(true, -6, 0, 20, w);
-            c.arm(false, -6, 0, -20, w);
+            pose(c, StancePoses.MAG_FIELD_M, StancePoses.MAG_FIELD_O, w);
             drift(c, 2.5F, w, true);
         }
         if ((w = st.stance(Stance.VISION_PHASED)) > 0.001F) {
             // Serene and weightless: open palms a little forward.
             boolean white = "white_vision".equals(st.look);
             float sway = white ? 0.0F : 2.9F * Mth.sin(0.05F * c.age);
-            c.arm(true, -20 + sway, 0, 10, w);
-            c.arm(false, -20 + (white ? 0.0F : 2.9F * Mth.cos(0.05F * c.age)), 0, -10, w);
+            float[] m = StancePoses.VISION_PHASED_M;
+            float[] o = StancePoses.VISION_PHASED_O;
+            c.arm(true, m[0] + sway, m[1], m[2], w);
+            c.arm(false, o[0] + (white ? 0.0F : 2.9F * Mth.cos(0.05F * c.age)), o[1], o[2], w);
         }
         if ((w = st.stance(Stance.VISION_DENSE)) > 0.001F) {
             // Heavy: arms braced a little out, a wide stance, the head up.
-            c.arm(true, -9, 0, 14, w);
-            c.arm(false, -9, 0, -14, w);
+            pose(c, StancePoses.VISION_DENSE_M, StancePoses.VISION_DENSE_O, w);
             float ground = w * (1.0F - st.wAir);
             c.leg(true, 0, 4, ground);
             c.leg(false, 0, -4, ground);
@@ -44,16 +44,16 @@ final class Stances {
         }
         if ((w = st.stance(Stance.LOKI_FROST)) > 0.001F) {
             // The Jotun stance: arms a little out, legs a little wider.
-            c.armAdd(true, 0, 0, 11, w);
-            c.armAdd(false, 0, 0, -11, w);
+            c.armAdd(true, 0, 0, StancePoses.LOKI_FROST_Z, w);
+            c.armAdd(false, 0, 0, -StancePoses.LOKI_FROST_Z, w);
             float ground = w * (1.0F - st.wAir);
             c.legAdd(true, 0, 3, ground);
             c.legAdd(false, 0, -3, ground);
         }
         if ((w = st.stance(Stance.THOR_UNLEASHED)) > 0.001F) {
             // Arms held out, crackling; in flight the weapon arm keeps its world pose.
-            c.armAdd(true, 0, 0, 13, w * (1.0F - st.wAir));
-            c.armAdd(false, 0, 0, -13, w);
+            c.armAdd(true, 0, 0, StancePoses.THOR_UNLEASHED_Z, w * (1.0F - st.wAir));
+            c.armAdd(false, 0, 0, -StancePoses.THOR_UNLEASHED_Z, w);
             c.tremble(true, 1.7F, 1.9F, w * (1.0F - st.wAir));
             c.tremble(false, 1.7F, 1.7F, w);
             c.head(-4, 0, 0, w);
@@ -83,25 +83,6 @@ final class Stances {
             }
             c.arm(false, -55, 0, -55, w);
             c.head(-18, 0, 0, w);
-        }
-        if ((w = st.stance(Stance.LOKI_THROW)) > 0.001F) {
-            // The follow-through of a throw: the arm swept forward from over the shoulder.
-            c.aim(true, Target.LOOK, -8, -9, 0, w);
-            c.occupy(true, w);
-        }
-        if ((w = st.stance(Stance.CAST)) > 0.001F) {
-            if (st.power == Power.BILLY) {
-                // The casting hand thrust at the target of the Hex Bolt.
-                c.aim(true, Target.BOLT, 0, -3, 0, w);
-                c.arm(false, -6, 0, -14, w);
-                c.occupy(true, w);
-            } else {
-                // A hand raised, fingers spread, as the spell is cast.
-                c.arm(true, -143, -14, 17, w);
-                c.tremble(true, 2.3F, 0.9F, w);
-                c.arm(false, -20, 0, -25, w);
-                c.occupy(true, w);
-            }
         }
     }
 
@@ -150,8 +131,10 @@ final class Stances {
         if ((w = st.stance(Stance.BILLY_FREEZE)) > 0.001F) {
             // Both hands raised toward the creatures he holds, trembling with the effort.
             float look = 0.5F * c.lookPitch / RAD;
-            c.arm(true, -126 + look, -11, 11, w);
-            c.arm(false, -126 + look, 11, -11, w);
+            float[] m = StancePoses.BILLY_FREEZE_M;
+            float[] o = StancePoses.BILLY_FREEZE_O;
+            c.arm(true, m[0] + look, m[1], m[2], w);
+            c.arm(false, o[0] + look, o[1], o[2], w);
             c.tremble(true, 3.4F, 1.9F, w);
             c.tremble(false, 3.4F, 2.3F, w);
             c.occupy(true, w);
@@ -173,19 +156,20 @@ final class Stances {
         }
         if ((w = st.stance(Stance.BEAM_WANDA)) > 0.001F) {
             // Both hands thrust out along the look, converging a little, trembling.
-            c.aim(true, Target.LOOK, 0, -10, 0, w);
-            c.aim(false, Target.LOOK, 0, 10, 0, w);
+            float[] m = StancePoses.BEAM_WANDA_M_AIM;
+            float[] o = StancePoses.BEAM_WANDA_O_AIM;
+            c.aim(true, Target.LOOK, m[0], m[1], m[2], w);
+            c.aim(false, Target.LOOK, o[0], o[1], o[2], w);
             c.tremble(true, 2.9F, 1.7F, w);
             c.tremble(false, 2.9F, 1.7F, w);
             c.occupy(true, w);
             c.occupy(false, w);
         }
         if ((w = st.stance(Stance.SHIELD_WANDA)) > 0.001F) {
-            c.arm(true, -63, 10, 31, w);
-            c.arm(false, -63, -10, -31, w);
+            pose(c, StancePoses.SHIELD_WANDA_M, StancePoses.SHIELD_WANDA_O, w);
             c.tremble(true, 2.9F, 0.3F, w);
             c.tremble(false, 2.9F, 0.3F, w);
-            c.head(-4, 0, 0, w);
+            c.head(StancePoses.SHIELD_WANDA_HEAD[0], 0, 0, w);
             c.occupy(true, w);
             c.occupy(false, w);
         }
@@ -198,7 +182,7 @@ final class Stances {
                 c.arm(false, 12, -10, -24, w);
                 c.leg(true, -12, 2, w * (1.0F - st.wAir));
                 c.leg(false, 12, -2, w * (1.0F - st.wAir));
-                c.twist(-10, w);
+                c.twist(StancePoses.THOR_BEAM_TWIST, w);
             } else {
                 // Two-handed, like Wanda's beam.
                 c.aim(true, Target.LOOK, 0, -8, 0, w);
@@ -244,6 +228,12 @@ final class Stances {
         c.occupy(true, w);
     }
 
+    /** Both arms at a pose of {@link StancePoses}, by weight {@code w}. */
+    private static void pose(PoseContext c, float[] m, float[] o, float w) {
+        c.arm(true, m[0], m[1], m[2], w);
+        c.arm(false, o[0], o[1], o[2], w);
+    }
+
     /** The slow drift of arms floating on air: a sine on each arm's x and z, a different phase for the off arm. */
     static void drift(PoseContext c, float amp, float w, boolean both) {
         if (amp <= 0.0F || EnhancedClientConfig.reducedMotion()) {
@@ -260,7 +250,7 @@ final class Stances {
         float lean = 0.0F;
         lean += -2.0F * st.stance(Stance.MAG_SHRAPNEL);
         lean += -5.0F * st.stance(Stance.TK_STRAIN);
-        lean += -3.0F * st.stance(Stance.SHIELD_WANDA);
+        lean += StancePoses.SHIELD_WANDA_LEAN * st.stance(Stance.SHIELD_WANDA);
         lean += ("white_vision".equals(st.look) ? -6.0F : -3.0F) * st.stance(Stance.VISION_BEAM);
         lean += (st.weaponKind > 0 ? 6.0F : 4.0F) * st.stance(Stance.THOR_BEAM);
         lean += 10.0F * st.stance(Stance.TOMMY_WHIRL);

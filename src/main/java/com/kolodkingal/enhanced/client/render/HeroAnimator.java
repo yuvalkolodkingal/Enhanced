@@ -72,6 +72,10 @@ public final class HeroAnimator {
     private static float debugU;
     private static float debugTurn;
     private static boolean debugFrozen;
+    /** The player the debugging tools act on: another player's name, or null for the local player. */
+    private static java.util.UUID debugTarget;
+    /** Stances forced on (1) or off (-1) for the debug target by {@code /enhanced_anim stance}; 0 leaves them to the data. */
+    private static final byte[] DEBUG_STANCE = new byte[Stance.COUNT];
 
     /** The state of a player, or null when the animation does not run for them. */
     public static HeroAnimState peek(Player player) {
@@ -119,9 +123,11 @@ public final class HeroAnimator {
             worldReferences(s, player, data, level, now);
             if (!remember) {
                 edges(s, player, data, now);
+                GestureTable.edges(s, player, data, level, now);
             }
             stanceTargets(s, player, data, mc, now);
             rememberData(s, data, now);
+            GestureTable.remember(s, player, data, level);
             s.look = data.variant();
             s.seeded = true;
             // A hero who is not being drawn (the local player in first person) still moves on, once per tick.
@@ -185,8 +191,12 @@ public final class HeroAnimator {
         if (s.thrownWeapon != null) {
             s.lastWeaponPos = s.thrownWeapon.position().add(0.0, 0.3, 0.0);
             s.lastWeaponTick = now;
+            System.arraycopy(s.weaponTrail, 0, s.weaponTrail, 1, s.weaponTrail.length - 1);
+            s.weaponTrail[0] = s.lastWeaponPos;
+            s.catchFrom = null;
         } else if (now - s.lastWeaponTick > 5) {
             s.lastWeaponPos = null;
+            java.util.Arrays.fill(s.weaponTrail, null);
         }
         s.weaponKind = 0;
         if (data.power() == Power.THOR) {
@@ -195,6 +205,7 @@ public final class HeroAnimator {
                 ItemStack stack = p.getItemInHand(hand);
                 s.weaponKind = ThorAbilities.isStormbreaker(stack) ? 2 : 1;
                 s.weaponInMainHand = hand == InteractionHand.MAIN_HAND;
+                s.weaponHandTick = p.tickCount;
             }
         }
         s.caughtCount = 0;
@@ -331,8 +342,6 @@ public final class HeroAnimator {
         on[Stance.WANDA_READY.ordinal()] = power == Power.SCARLET_WITCH && now - s.spellEndedAt <= 60;
         on[Stance.WANDA_HEX_CONTROL.ordinal()] = power == Power.SCARLET_WITCH && p == mc.player && mc.screen instanceof HexScreen;
         on[Stance.THOR_BIFROST.ordinal()] = data.is(Live.BIFROST);
-        on[Stance.LOKI_THROW.ordinal()] = power == Power.LOKI && data.is(Live.THROWING);
-        on[Stance.CAST.ordinal()] = (power == Power.LOKI || power == Power.BILLY) && data.is(Live.CASTING);
         on[Stance.THOR_WAIT.ordinal()] = power == Power.THOR && s.thrownWeapon instanceof ThrownWeaponEntity flying && flying.isReturning()
                 && flying.distanceToSqr(p) < 20 * 20;
         boolean holding = data.heldEntityId() != -1 && s.heldEntity != null && power.hasPowers();
@@ -346,6 +355,13 @@ public final class HeroAnimator {
         on[Stance.SHIELD_WANDA.ordinal()] = power == Power.SCARLET_WITCH && data.chaosShieldActive();
         on[Stance.THOR_BEAM.ordinal()] = power == Power.THOR && data.is(Live.CALLING_LIGHTNING);
         on[Stance.TOMMY_WHIRL.ordinal()] = power == Power.TOMMY && data.is(Live.WHIRLWIND);
+        if (isDebugTarget(p)) {
+            for (int i = 0; i < on.length; i++) {
+                if (DEBUG_STANCE[i] != 0) {
+                    on[i] = DEBUG_STANCE[i] > 0;
+                }
+            }
+        }
     }
 
     // ====================================================================================================================
@@ -363,7 +379,7 @@ public final class HeroAnimator {
             return null;
         }
         double time = player.tickCount + pt;
-        if (debugFrozen && player == Minecraft.getInstance().player && !s.fresh) {
+        if (debugFrozen && isDebugTarget(player) && !s.fresh) {
             // A frozen frame: keep every weight and spring, but stay current.
             s.time = time;
             s.bodyYaw = yBodyRot;
@@ -529,7 +545,7 @@ public final class HeroAnimator {
             s.sH = 0.0F;
             s.u = 0.0F;
         }
-        if (debugFly && p == Minecraft.getInstance().player && profile != null) {
+        if (debugFly && isDebugTarget(p) && profile != null) {
             float vRef = FlightProfile.vRef(flightSpeed(s.power, profile));
             s.s = debugS;
             s.sSide = 0.0F;
@@ -644,8 +660,16 @@ public final class HeroAnimator {
         target.active = true;
     }
 
+    /** A deterministic noise in -1..1 for step {@code n} and an entity: the same on every client, whatever the frame rate. */
+    static float noise(long n, int entityId) {
+        double v = Math.sin(n * 12.9898 + entityId * 78.233) * 43758.5453;
+        return (float) (2.0 * (v - Math.floor(v)) - 1.0);
+    }
+
     /** Plays the slots for this frame: weights, and what they add to the lean, the dip, the turn, the spin and the lead. */
     private static void sampleSlots(HeroAnimState s, float age, float dt) {
+        s.jx = 0.0F;
+        s.jz = 0.0F;
         s.addPitch = 0.0F;
         s.addRoll = 0.0F;
         s.addDrop = 0.0F;
@@ -692,6 +716,12 @@ public final class HeroAnimator {
             s.gestureLead = Math.max(s.gestureLead, def.lead.scalar(t, 0.0F) * weight);
             if (id.group == GestureId.Group.LAND) {
                 s.landWeight = Math.max(s.landWeight, weight);
+            }
+            if (id == GestureId.TOMMY_VIBRATE && !EnhancedClientConfig.reducedMotion()) {
+                // His body shivers at 30 Hz: a few centimetres each way.
+                long k = (long) Math.floor(age * 1.5F);
+                s.jx += 0.035F * noise(k, s.entityId) * weight;
+                s.jz += 0.035F * noise(k + 7, s.entityId) * weight;
             }
         }
     }
@@ -791,18 +821,63 @@ public final class HeroAnimator {
         return s.weaponKind > 0 ? 1.7F : 1.0F;
     }
 
-    /** The Bifrost's arrival: the hero lands on both feet with the weapon planted. */
+    /**
+     * The lightning channelled through Thor's weapon strikes a target (remembered for the arms that aim at it), or the
+     * Bifrost's arrival: the hero lands on both feet with the weapon planted.
+     */
     public static void onThorFx(ThorFxPayload payload) {
         ClientLevel level = Minecraft.getInstance().level;
-        if (level == null || payload.kind() != ThorFxPayload.BIFROST_ARRIVAL
-                || !(level.getEntity(payload.entityId()) instanceof AbstractClientPlayer player)) {
+        if (level == null || !(level.getEntity(payload.entityId()) instanceof AbstractClientPlayer player)) {
             return;
         }
         HeroAnimState s = peek(player);
-        if (s != null) {
+        if (s == null) {
+            return;
+        }
+        if (payload.kind() == ThorFxPayload.CHANNEL && !payload.points().isEmpty()) {
+            s.strikeTarget = payload.points().get(0);
+            s.strikeTick = level.getGameTime();
+        } else if (payload.kind() == ThorFxPayload.BIFROST_ARRIVAL) {
             start(s, GestureId.THOR_ARRIVAL, 0.0F, player.tickCount);
             FlightEffects.impact(player, s, 1.0F);
         }
+    }
+
+    /** A Hex Bolt was cast: the caster's casting hand aims at where it struck. */
+    public static void onHexBolt(int casterId, Vec3 to) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level != null && level.getEntity(casterId) instanceof AbstractClientPlayer caster) {
+            HeroAnimState s = peek(caster);
+            if (s != null) {
+                s.boltTarget = to;
+                s.boltTick = level.getGameTime();
+            }
+        }
+    }
+
+    /**
+     * The local player pressed the key of an ability: start its gesture now instead of a network round trip later, where
+     * the client's own copy of the data says it will work (the shield, the Hex, Billy's bolt, Loki's daggers, Thor's throw).
+     * The change in the data that arrives a moment later is swallowed so the gesture does not play twice.
+     */
+    public static void predict(LocalPlayer player, int ability) {
+        HeroAnimState s = peek(player);
+        if (s == null || s.wVanilla > 0.0F || !EnhancedClientConfig.animations()) {
+            return;
+        }
+        PowerData data = Powers.get(player);
+        boolean ownHex = s.table.hasHex;
+        GestureId id = GestureTable.predicted(s, data, ability, player.level().getGameTime(), ownHex, player.isShiftKeyDown());
+        if (id == null) {
+            return;
+        }
+        start(s, id, 0.0F, player.tickCount);
+        for (HeroAnimState.Slot slot : s.slots) {
+            if (slot.active && slot.id == id && slot.start == player.tickCount) {
+                slot.predicted = true;
+            }
+        }
+        GestureEffects.started(player, s, id);
     }
 
     // ---- the debugging tools ----
@@ -815,9 +890,35 @@ public final class HeroAnimator {
         debugTurn = turn;
     }
 
+    /** Whether the debugging tools act on this player (the local player unless {@link #debugTarget(String)} named another). */
+    private static boolean isDebugTarget(Player player) {
+        return debugTarget == null ? player == Minecraft.getInstance().player : player.getUUID().equals(debugTarget);
+    }
+
+    private static Player debugPlayer() {
+        Minecraft mc = Minecraft.getInstance();
+        return debugTarget == null || mc.level == null ? mc.player : mc.level.getPlayerByUUID(debugTarget);
+    }
+
+    /** Points the debugging tools at another player in view by name (so a second client can photograph a frozen pose from any side). */
+    public static boolean debugTarget(String name) {
+        Minecraft mc = Minecraft.getInstance();
+        if (name == null || name.equals("self")) {
+            debugTarget = null;
+            return true;
+        }
+        for (AbstractClientPlayer player : mc.level.players()) {
+            if (player.getGameProfile().getName().equalsIgnoreCase(name)) {
+                debugTarget = player.getUUID();
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Starts a gesture on the local player, ignoring its trigger. */
     public static void debugPlay(GestureId id) {
-        Player player = Minecraft.getInstance().player;
+        Player player = debugPlayer();
         HeroAnimState s = player == null ? null : peek(player);
         if (s != null) {
             for (HeroAnimState.Slot slot : s.slots) {
@@ -829,7 +930,7 @@ public final class HeroAnimator {
 
     /** Jumps every playing gesture of the local player to this tick and freezes their animation. */
     public static void debugHold(int ticks) {
-        Player player = Minecraft.getInstance().player;
+        Player player = debugPlayer();
         HeroAnimState s = player == null ? null : peek(player);
         if (s == null) {
             return;
@@ -848,6 +949,15 @@ public final class HeroAnimator {
 
     public static void debugRelease() {
         debugFrozen = false;
+    }
+
+    /** Forces a stance of the debug target on or off (or, with {@code null}, hands them all back to the data). */
+    public static void debugStance(Stance stance, Boolean on) {
+        if (stance == null) {
+            java.util.Arrays.fill(DEBUG_STANCE, (byte) 0);
+        } else {
+            DEBUG_STANCE[stance.ordinal()] = (byte) (on == null ? 0 : on ? 1 : -1);
+        }
     }
 
     private HeroAnimator() {

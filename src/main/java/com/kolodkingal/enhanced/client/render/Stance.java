@@ -15,10 +15,6 @@ public enum Stance {
     WANDA_READY(3, 8, false),
     WANDA_HEX_CONTROL(3, 4, false),
     THOR_BIFROST(5, 3, false),
-    /** Loki's follow-through after a thrown dagger (the pose of {@code Live.THROWING}, until the gestures replace it). */
-    LOKI_THROW(1.5F, 3, false),
-    /** A hand raised or thrust out to cast ({@code Live.CASTING}, until the gestures replace it). */
-    CAST(1.5F, 3, false),
 
     THOR_WAIT(2, 3, true),
     TK_HOLD(2.5F, 4, true),

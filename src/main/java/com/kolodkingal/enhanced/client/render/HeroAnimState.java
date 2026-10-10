@@ -138,6 +138,10 @@ public final class HeroAnimState {
     public float gestureSpin;
     public float gestureLead;
 
+    // ---- first person ----
+    /** The age at which the first-person hands last moved the hero's main hand ({@link FirstPersonArms}). */
+    public double fpAge = Double.NEGATIVE_INFINITY;
+
     // ---- gestures ----
     public final Slot[] slots = new Slot[SLOTS];
 
@@ -154,12 +158,18 @@ public final class HeroAnimState {
     public long lastFastAt = Long.MIN_VALUE / 2;
     public boolean lastWasFast;
 
+    /** What the gesture table saw of the data last tick, to find the edges. */
+    public final GestureTable.Memory table = new GestureTable.Memory();
+
     // ---- world references (set each tick) ----
     public Entity heldEntity;
     public Entity thrownWeapon;
     public float heldMass;
     public Vec3 lastWeaponPos;
     public long lastWeaponTick;
+    /** Where the thrown weapon was in the last four ticks (newest first), and where it was just before it came home. */
+    public final Vec3[] weaponTrail = new Vec3[4];
+    public Vec3 catchFrom;
     public final Vec3[] caught = new Vec3[8];
     public int caughtCount;
     public Vec3 boltTarget;
@@ -168,7 +178,9 @@ public final class HeroAnimState {
     public long strikeTick;
     /** Thor holds a weapon: 0 none, 1 Mjolnir, 2 Stormbreaker (as the tick last saw it). */
     public int weaponKind;
-    public boolean weaponInMainHand;
+    public boolean weaponInMainHand = true;
+    /** The tick the weapon was last seen in a hand: for a few ticks after it is thrown, the throwing arm is still the one that held it. */
+    public int weaponHandTick = Integer.MIN_VALUE / 2;
 
     public HeroAnimState(UUID uuid) {
         this.uuid = uuid;
@@ -190,6 +202,8 @@ public final class HeroAnimState {
         }
         java.util.Arrays.fill(stance, 0.0F);
         java.util.Arrays.fill(stanceOn, false);
+        table.clear();
+        catchFrom = null;
         fresh = true;
         seeded = false;
         time = -1.0;

@@ -431,6 +431,11 @@ public final class FlightEffects {
         RINGS.add(new Ring(owner, center, normal, level.getGameTime() + delay, life, r0, r1, width, rgb, a));
     }
 
+    /** A ring for another effect (a gesture's flash): same limits as the flight rings. */
+    static void ring(ClientLevel level, int owner, Vec3 center, Vec3 normal, float life, float r0, float r1, float width, int rgb, float alpha) {
+        addRing(level, owner, center, normal, 0, life, r0, r1, width, rgb, alpha);
+    }
+
     private static void addCrack(ClientLevel level, Vec3 from, Vec3 to, float life, long seed) {
         if (!EnhancedClientConfig.flightEffects()) {
             return;

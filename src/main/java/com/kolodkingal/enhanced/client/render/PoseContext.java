@@ -22,6 +22,8 @@ import org.joml.Vector3f;
  */
 final class PoseContext {
     private static final float RAD = Mth.DEG_TO_RAD;
+    /** Ticks a bolt's or a strike's target is remembered: the length of the gestures that aim at it. */
+    private static final long BOLT_MEMORY = 12;
 
     PlayerModel<?> model;
     Player player;
@@ -55,6 +57,10 @@ final class PoseContext {
     float twist;
     boolean forceM;
     boolean forceO;
+    /** How much the swing of the attack arm is replaced by a jab (0..1); the arm it concerns. */
+    float jab;
+    /** White Vision: his gestures move with one easing only. */
+    boolean mechanical;
     private final float[] tmp3 = new float[3];
 
     void begin(PlayerModel<?> model, Player player, HeroAnimState st, float age, float pt) {
@@ -69,6 +75,9 @@ final class PoseContext {
             var hand = com.kolodkingal.enhanced.ability.ThorAbilities.weaponHand(player);
             if (hand != null) {
                 weaponArm = hand == net.minecraft.world.InteractionHand.MAIN_HAND ? player.getMainArm() : player.getMainArm().getOpposite();
+            } else if (player.tickCount - st.weaponHandTick <= 24) {
+                // Just thrown or shattered: the arm that held it is still the arm that acts.
+                weaponArm = st.weaponInMainHand ? player.getMainArm() : player.getMainArm().getOpposite();
             }
         }
         mSide = weaponArm != null ? weaponArm : player.getMainArm();
@@ -86,6 +95,8 @@ final class PoseContext {
         twist = 0.0F;
         forceM = false;
         forceO = false;
+        jab = 0.0F;
+        mechanical = st.power == com.kolodkingal.enhanced.power.Power.VISION && "white_vision".equals(st.look);
     }
 
     // ---- arms ----
@@ -198,10 +209,10 @@ final class PoseContext {
             case LOOK -> null;
             case HELD -> st.heldEntity == null || st.heldEntity.isRemoved() ? null : center(st.heldEntity);
             case PROJECTILE -> st.caughtCount > 0 ? st.caught[0] : null;
-            case BOLT -> st.boltTarget != null && player.level().getGameTime() - st.boltTick <= 3 ? st.boltTarget : null;
+            case BOLT -> st.boltTarget != null && player.level().getGameTime() - st.boltTick <= BOLT_MEMORY ? st.boltTarget : null;
             case WEAPON -> st.thrownWeapon != null && !st.thrownWeapon.isRemoved() ? center(st.thrownWeapon) : st.lastWeaponPos;
-            case WEAPON_LAST -> st.lastWeaponPos;
-            case STRIKE -> st.strikeTarget != null && player.level().getGameTime() - st.strikeTick <= 3 ? st.strikeTarget : null;
+            case WEAPON_LAST -> st.catchFrom != null ? st.catchFrom : st.lastWeaponPos;
+            case STRIKE -> st.strikeTarget != null && player.level().getGameTime() - st.strikeTick <= BOLT_MEMORY ? st.strikeTarget : null;
         };
     }
 

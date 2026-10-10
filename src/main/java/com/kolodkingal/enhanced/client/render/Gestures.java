@@ -227,9 +227,9 @@ public final class Gestures {
         /**
          * The arm track at {@code t}: {@code out} gets the absolute angles in radians (or, for an additive track, the angles to
          * add), {@code tremble} the amplitude (degrees) and the speed. Returns the mode of the keys, or null when the arm is not
-         * driven.
+         * driven. A {@code mechanical} hero (White Vision) moves between keys with one easing only, the ease-in-out sine.
          */
-        public Mode sampleArm(boolean main, float t, ArmSolver solver, float[] out, float[] tremble) {
+        public Mode sampleArm(boolean main, float t, ArmSolver solver, float[] out, float[] tremble, boolean mechanical) {
             List<ArmKey> keys = main ? m : o;
             int n = keys.size();
             if (n == 0) {
@@ -249,7 +249,7 @@ public final class Gestures {
             tremble[1] = a.trembleSpeed;
             if (i + 1 < n && t > a.t) {
                 ArmKey b = keys.get(i + 1);
-                float u = b.t > a.t ? b.ease.apply((t - a.t) / (b.t - a.t)) : 1.0F;
+                float u = b.t > a.t ? (mechanical ? Ease.E : b.ease).apply((t - a.t) / (b.t - a.t)) : 1.0F;
                 float[] tmp = new float[3];
                 solver.resolve(b, main, tmp);
                 for (int k = 0; k < 3; k++) {
@@ -292,6 +292,15 @@ public final class Gestures {
             return this;
         }
 
+        /** The main arm at a pose of {@link StancePoses} (so a gesture that hands over to a stance ends exactly on it). */
+        public Builder m(float[] pose) {
+            return m(pose[0], pose[1], pose[2]);
+        }
+
+        public Builder o(float[] pose) {
+            return o(pose[0], pose[1], pose[2]);
+        }
+
         public Builder mAdd(float x, float y, float z) {
             def.m.add(arm(Mode.ADD, x, y, z, null, false, 0.0F, 0.0F));
             return this;
@@ -322,6 +331,23 @@ public final class Gestures {
         public Builder oAim(Target target, float x, float y, float z) {
             def.o.add(arm(Mode.AIM, x, y, z, target, false, 0.0F, 0.0F));
             return this;
+        }
+
+        /** Makes the main arm key just written tremble: amplitude in degrees, speed in radians per tick. */
+        public Builder mTremble(float amplitude, float speed) {
+            retremble(def.m, amplitude, speed);
+            return this;
+        }
+
+        /** Makes the off arm key just written tremble. */
+        public Builder oTremble(float amplitude, float speed) {
+            retremble(def.o, amplitude, speed);
+            return this;
+        }
+
+        private static void retremble(List<ArmKey> keys, float amplitude, float speed) {
+            ArmKey k = keys.remove(keys.size() - 1);
+            keys.add(new ArmKey(k.t, k.ease, k.mode, k.x, k.y, k.z, k.target, k.plant, amplitude, speed));
         }
 
         public Builder legs(float right, float left) {
@@ -393,6 +419,10 @@ public final class Gestures {
 
     static {
         FlightGestures.register();
+        FieldGestures.register();
+        WitchGestures.register();
+        SpeedGestures.register();
+        AsgardGestures.register();
     }
 
     private Gestures() {

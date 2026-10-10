@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
 import com.kolodkingal.enhanced.client.render.FlightEffects;
+import com.kolodkingal.enhanced.client.render.GestureEffects;
 import com.kolodkingal.enhanced.client.render.HandTracker;
 import com.kolodkingal.enhanced.client.render.HeroAnimator;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
@@ -62,6 +63,7 @@ public final class ClientEvents {
         }
         HeroAnimator.tick(mc.level);
         FlightEffects.tick(mc.level);
+        GestureEffects.tick(mc.level);
         handleKeys(mc, player);
         QuickHands.tick(mc, player);
         spawnSpeedTrails(mc.level);
@@ -92,6 +94,7 @@ public final class ClientEvents {
         HeroAnimator.clear();
         HandTracker.clear();
         FlightEffects.clear();
+        GestureEffects.clear();
         ThorEffects.clear();
         Shapeshifts.clear();
         SlowMotionEffect.stop(Minecraft.getInstance());
@@ -107,6 +110,7 @@ public final class ClientEvents {
             HeroAnimator.clear();
             HandTracker.clear();
             FlightEffects.clear();
+            GestureEffects.clear();
         }
     }
 
@@ -256,6 +260,7 @@ public final class ClientEvents {
                 }
                 PacketDistributor.sendToServer(new AbilityKeyPayload(i, true));
                 SENT_DOWN[i] = true;
+                HeroAnimator.predict(player, i);
             }
             if (!down && SENT_DOWN[i]) {
                 PacketDistributor.sendToServer(new AbilityKeyPayload(i, false));
