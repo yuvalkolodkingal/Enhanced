@@ -1,0 +1,61 @@
+# Building from Source
+
+The mod's source is at [github.com/yuvalkolodkingal/enhanced](https://github.com/yuvalkolodkingal/enhanced). It is a NeoForge 1.21.1 mod written in Java 21, built with Gradle.
+
+## What you need
+
+* **Java 21** (a JDK).
+* **Git**, to clone the repository.
+* Nothing else: the Gradle wrapper (`./gradlew`) downloads Gradle, NeoForge and the Minecraft mappings the first time.
+
+## Build and run
+
+```sh
+git clone https://github.com/yuvalkolodkingal/enhanced.git
+cd enhanced
+
+./gradlew build              # the mod jar ends up in build/libs/
+./gradlew runClient          # play in a development client
+./gradlew runGameTestServer  # run the automated in-game tests
+```
+
+To install your build, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a NeoForge 1.21.1 instance (see [Installation](Installation)).
+
+The GameTests (`./gradlew runGameTestServer`) start a server, run the mod's in-game tests (every hero, the Hex, the Witches' Road, the data files and so on) and exit with an error if a required test fails.
+
+## Releases
+
+GitHub Actions (`.github/workflows/build.yml`) runs the same build and the GameTests on every push and pull request, and publishes a release for every push to `main` (or a `v*` tag). The jar of the newest build is the one marked *Latest* on the [Releases](https://github.com/yuvalkolodkingal/enhanced/releases) page.
+
+The jar contains a copyrighted song, so builds are for personal use only (see [Credits](Credits)).
+
+## Where things are
+
+| Path | What it holds |
+|---|---|
+| `src/main/java/com/kolodkingal/enhanced/` | The mod: abilities, items, blocks, entities, the client code, the commands and the server config (`EnhancedConfig.java`). |
+| `src/main/resources/` | Textures, models, sounds, language files (`lang/en_us.json`, `lang/he_il.json`), recipes, loot modifiers and tags. |
+| `src/gametest/java/` | The in-game tests. They never end up in the mod jar. |
+| `docs/DESIGN.md`, `docs/DESIGN.he.md` | The full design, in English and in Hebrew, with every rule and number. |
+| `docs/wiki/` | The source of this wiki. |
+| `docs/screenshots/` | The screenshots used by the README and this wiki. |
+
+## Editing this wiki
+
+This wiki is not edited on GitHub. Its pages are Markdown files in **`docs/wiki/`** in the repository, and the *Publish the wiki* GitHub Action (`.github/workflows/wiki.yml`) copies them to the wiki. Edit the files there and open a pull request or push to `main`. Anything changed on the wiki itself is overwritten by the next publish.
+
+* **File name = page name**, with the words joined by hyphens: `docs/wiki/Becoming-a-Hero.md` is the page *Becoming a Hero*. Link to another page as `[Text](Page-Name)`, without `.md`.
+* **Hebrew pages** have the same name with `-HE` at the end (`Thor-HE.md`) and are wrapped in `<div dir="rtl">`.
+* **Screenshots** are the PNG files in `docs/screenshots/`. Use them as `![Text](images/<file>.png)`: the Action copies them to `images/` in the wiki.
+* `_Sidebar.md` and `_Footer.md` are the wiki's sidebar and footer.
+* The Action runs on every push to `main` that changes `docs/wiki/`, `docs/screenshots/` or the workflow file, and it can be run by hand from the *Actions* tab (*Publish the wiki*, *Run workflow*).
+
+### Setting the wiki up (once)
+
+GitHub creates a wiki's git repository only when its first page exists. So, once:
+
+1. In the repository's **Settings, General, Features**, tick **Wikis**.
+2. Open the **Wiki** tab and press **Create the first page**. Save it with any text: the Action replaces it.
+3. Run the *Publish the wiki* workflow, or push a change to `docs/wiki/`.
+
+If the Action fails with "Could not clone the wiki", one of the two steps above is missing. Wikis of **private repositories** need a GitHub Pro, Team or Enterprise plan.
