@@ -8,6 +8,7 @@
   ],
   "client": [
     "client.AbstractClientPlayerMixin",
+    "client.CapeLayerMixin",
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.MinecraftMixin",

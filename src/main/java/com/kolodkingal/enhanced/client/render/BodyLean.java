@@ -12,6 +12,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +35,7 @@ import java.util.UUID;
  *
  * <p>{@link com.kolodkingal.enhanced.mixin.client.PlayerRendererMixin} applies the lean where vanilla applies the
  * elytra and swimming pitch; {@link HeroPoses} reads {@link #pitch} so heads and aimed arms keep pointing where the
- * hero looks.
+ * hero looks, and {@link #follow} moves the places energy leaves a head or a hand to where the lean has put them.
  */
 public final class BodyLean {
     /** Forward pitch at full flight speed (degrees); Thor leans further. */
@@ -67,6 +70,8 @@ public final class BodyLean {
     private static final float EPSILON = 0.05F;
     /** A player whose entity is younger than this many ticks has just come into view. */
     private static final int NEW_ENTITY_TICKS = 5;
+    /** A lean drawn longer ago than this many ticks is not what the body looks like now. */
+    private static final float FRESH_TICKS = 2.0F;
 
     private static final Map<UUID, State> STATES = new HashMap<>();
     /** The player the last lean was applied to, and its pitch: what the model animation that follows needs. */
@@ -110,6 +115,27 @@ public final class BodyLean {
         if (state != null) {
             rotate(poseStack, state.pitch, state.roll);
         }
+    }
+
+    /**
+     * Moves a point of the upright body (a world position, like the eye's) to where the lean has taken it, so that
+     * energy leaves the head or the hand that is drawn. A body that is not drawn leaning, or not drawn lately (the
+     * local player in first person), leaves the point be.
+     */
+    public static Vec3 follow(Player player, Vec3 point, float partialTick) {
+        State state = STATES.get(player.getUUID());
+        if (state == null || Math.abs(player.tickCount + partialTick - state.time) > FRESH_TICKS
+                || (Math.abs(state.pitch) < EPSILON && Math.abs(state.roll) < EPSILON)) {
+            return point;
+        }
+        Vec3 pivot = player.getPosition(partialTick).add(0.0, PIVOT_HEIGHT * player.getScale(), 0.0);
+        // The lean is made in the body's own frame, which is turned to its yaw: turn there, lean, and turn back.
+        Quaternionf yaw = Axis.YP.rotationDegrees(180.0F - Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot));
+        Quaternionf lean = new Quaternionf(yaw).mul(Axis.ZP.rotationDegrees(-state.roll))
+                .mul(Axis.XP.rotationDegrees(-state.pitch)).mul(yaw.conjugate(new Quaternionf()));
+        Vector3f moved = point.subtract(pivot).toVector3f();
+        lean.transform(moved);
+        return pivot.add(moved.x, moved.y, moved.z);
     }
 
     /** The forward pitch (radians) just applied to this player's body, or 0. */

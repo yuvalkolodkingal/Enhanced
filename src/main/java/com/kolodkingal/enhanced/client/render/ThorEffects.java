@@ -199,11 +199,13 @@ public final class ThorEffects {
     /** Short arcs of lightning crawling over the God of Thunder's body, changing every other tick. */
     private static void crackle(Matrix4f pose, VertexConsumer vc, AbstractClientPlayer player, Vec3 camera, float partialTick, float time) {
         RandomSource random = RandomSource.create((long) (time / 2) * 31L + player.getId());
-        Vec3 base = player.getPosition(partialTick).subtract(camera);
+        Vec3 feet = player.getPosition(partialTick);
         for (int i = 0; i < 4; i++) {
             double angle = random.nextDouble() * Mth.TWO_PI;
             double y = 0.2 + random.nextDouble() * 1.6;
-            Vec3 a = base.add(Math.cos(angle) * 0.38, y, Math.sin(angle) * 0.38);
+            // Over the body as it is drawn, leaning into a flight or not.
+            Vec3 a = BodyLean.follow(player, feet.add(Math.cos(angle) * 0.38, y, Math.sin(angle) * 0.38), partialTick)
+                    .subtract(camera);
             Vec3 b = a.add((random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.7, (random.nextDouble() - 0.5) * 0.6);
             EnergyGeometry.bolt(pose, vc, a, b, 0.03F, 0.12F, EnergyGeometry.argb(BLUE, 0.8F), random.nextLong());
             EnergyGeometry.bolt(pose, vc, a, b, 0.012F, 0.12F, EnergyGeometry.argb(CORE, 0.9F), random.nextLong());

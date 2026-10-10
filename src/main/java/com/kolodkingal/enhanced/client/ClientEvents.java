@@ -309,13 +309,13 @@ public final class ClientEvents {
         }
     }
 
-    /** Rough position of a hand of a player standing or flying upright. */
+    /** Rough position of a hand of a player standing or flying, as far as the body leans. */
     private static Vec3 handInWorld(Player player, HumanoidArm arm) {
         float yaw = player.yBodyRot * Mth.DEG_TO_RAD;
         double side = arm == HumanoidArm.RIGHT ? -0.38 : 0.38;
         double x = -Mth.sin(yaw) * 0.05 + Mth.cos(yaw) * side;
         double z = Mth.cos(yaw) * 0.05 + Mth.sin(yaw) * side;
-        return player.position().add(x, player.isCrouching() ? 0.6 : 0.75, z);
+        return BodyLean.follow(player, player.position().add(x, player.isCrouching() ? 0.6 : 0.75, z), 1.0F);
     }
 
     /** Players currently drawn with a hover bob (their pose stack was pushed in Pre and must be popped in Post). */
