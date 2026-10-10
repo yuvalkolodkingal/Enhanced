@@ -32,6 +32,10 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,18 +50,19 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Lifting, carrying and launching things with the mind. Shared by Magneto (metal only) and Wanda (anything,
- * including blocks).
+ * Lifting, carrying and launching things with the mind. Shared by Magneto (metal only), Wanda (anything, including
+ * blocks) and Billy (anything loose, including projectiles in flight: he stops bullets in WandaVision).
  *
  * <p>While held, the target is moved every tick towards the point the holder is looking at. Launched targets are
  * tracked until they slam into something: they hurt every creature they crash into and take heavy impact damage
- * when they hit a wall or the floor.
+ * when they hit a wall or the floor. A launched projectile simply flies again, where the holder looks.
  */
 public final class Telekinesis {
 
     public enum Mode {
         MAGNETO(Power.MAGNETO),
-        WANDA(Power.SCARLET_WITCH);
+        WANDA(Power.SCARLET_WITCH),
+        BILLY(Power.BILLY);
 
         final Power power;
 
@@ -71,6 +76,8 @@ public final class Telekinesis {
     private static final double BREAK_DISTANCE = 48.0;
     private static final double MIN_HOLD_DISTANCE = 3.0;
     private static final double MAX_HOLD_DISTANCE = 12.0;
+    /** A held projectile hangs weightless; this remembers whether it was weightless before (to restore it). */
+    private static final String HELD_PROJECTILE_TAG = "enhanced:telekinesis_held";
 
     private static final class Grip {
         final UUID target;
@@ -127,6 +134,10 @@ public final class Telekinesis {
 
         double range = EnhancedConfig.TELEKINESIS_RANGE.get();
         EntityHitResult hit = Raycasts.entity(player, range, 0.3, e -> canLift(player, e, mode), 1.0F);
+        if (hit == null && mode == Mode.BILLY) {
+            // Arrows are small and fast: aim a little more generously at them.
+            hit = Raycasts.entity(player, range, 1.0, e -> e instanceof Projectile && canLift(player, e, mode), 1.0F);
+        }
         if (hit != null) {
             hold(player, hit.getEntity(), mode);
             return;
@@ -153,9 +164,23 @@ public final class Telekinesis {
         }
         return switch (mode) {
             case MAGNETO -> isMagnetic(e);
-            case WANDA -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof TelekineticBlockEntity
-                    || e instanceof VehicleEntity || e instanceof PrimedTnt || e instanceof FallingBlockEntity;
+            case WANDA -> isLoose(e);
+            case BILLY -> isLoose(e) || (e instanceof Projectile projectile && inFlight(projectile));
         };
+    }
+
+    /** Creatures, dropped items, vehicles, primed TNT, falling (or lifted) blocks: anything not part of the world. */
+    private static boolean isLoose(Entity e) {
+        return e instanceof LivingEntity || e instanceof ItemEntity || e instanceof TelekineticBlockEntity
+                || e instanceof VehicleEntity || e instanceof PrimedTnt || e instanceof FallingBlockEntity;
+    }
+
+    /** A projectile still flying: not stuck in the ground, not a trident flying home, not caught by Magneto. */
+    private static boolean inFlight(Projectile projectile) {
+        if (projectile instanceof AbstractArrow arrow && (arrow.inGround || arrow.isNoPhysics())) {
+            return false;
+        }
+        return !(projectile instanceof FishingHook) && !MagnetoAbilities.isHeld(projectile);
     }
 
     /** Iron Golems, minecarts, dropped metal, and any creature wearing Iron, Chainmail or Gold armor. */
@@ -208,6 +233,13 @@ public final class Telekinesis {
         if (target instanceof TelekineticBlockEntity block) {
             block.grab(player);
         }
+        if (target instanceof Projectile projectile) {
+            // Caught: it stops dead and hangs weightless in front of the holder.
+            SlowMotion.unslow(projectile);
+            projectile.setDeltaMovement(Vec3.ZERO);
+            projectile.getPersistentData().putBoolean(HELD_PROJECTILE_TAG, projectile.isNoGravity());
+            projectile.setNoGravity(true);
+        }
         target.resetFallDistance();
         player.level().playSound(null, target.getX(), target.getY(), target.getZ(),
                 mode == Mode.MAGNETO ? ModSounds.MAGNET_GRAB.get() : SoundEvents.ILLUSIONER_CAST_SPELL,
@@ -250,7 +282,8 @@ public final class Telekinesis {
             held.connection.aboveGroundTickCount = 0;
         } else {
             e.move(MoverType.SELF, clampLength(diff.scale(0.45), 1.6));
-            e.setDeltaMovement(Vec3.ZERO);
+            // A held arrow keeps pointing where the holder looks (an arrow turns to face the way it moves).
+            e.setDeltaMovement(e instanceof AbstractArrow ? player.getLookAngle().scale(1.0E-3) : Vec3.ZERO);
             e.hasImpulse = true; // send the new position to clients every tick, so it glides smoothly
             e.resetFallDistance();
             if (e instanceof Mob mob) {
@@ -282,6 +315,7 @@ public final class Telekinesis {
             return;
         }
         e.resetFallDistance();
+        letGo(e);
         if (e instanceof TelekineticBlockEntity block) {
             block.drop();
         } else {
@@ -305,8 +339,11 @@ public final class Telekinesis {
         }
         double speed = EnhancedConfig.THROW_SPEED.get();
         Vec3 vel = player.getLookAngle().scale(speed);
+        letGo(e);
         if (e instanceof TelekineticBlockEntity block) {
             block.launch(player, vel);
+        } else if (e instanceof Projectile projectile) {
+            launchProjectile(player, projectile, vel);
         } else {
             e.setDeltaMovement(vel);
             e.hurtMarked = true;
@@ -316,6 +353,40 @@ public final class Telekinesis {
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);
         player.level().playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS, 0.9F, 0.7F);
+    }
+
+    /** A held projectile gets its weight back. */
+    private static void letGo(Entity e) {
+        if (e instanceof Projectile projectile && projectile.getPersistentData().contains(HELD_PROJECTILE_TAG)) {
+            projectile.setNoGravity(projectile.getPersistentData().getBoolean(HELD_PROJECTILE_TAG));
+            projectile.getPersistentData().remove(HELD_PROJECTILE_TAG);
+        }
+    }
+
+    /** A caught projectile flies again, where the holder looks, and hits for them. */
+    private static void launchProjectile(ServerPlayer player, Projectile projectile, Vec3 velocity) {
+        if (projectile instanceof AbstractArrow arrow) {
+            arrow.inGround = false;
+            if (!(arrow instanceof ThrownTrident)) {
+                // The holder gets the credit, but nobody gains the right to pick up an arrow they couldn't before.
+                AbstractArrow.Pickup pickup = arrow.pickup;
+                arrow.setOwner(player);
+                arrow.pickup = pickup;
+            }
+            // Tridents keep their owner, so Loyalty and pickup still belong to whoever threw them.
+        } else {
+            projectile.setOwner(player);
+        }
+        projectile.shoot(velocity.x, velocity.y, velocity.z, (float) velocity.length(), 0.0F);
+        projectile.hurtMarked = true;
+        projectile.hasImpulse = true;
+    }
+
+    /** A projectile saved to disk while held comes back as a normal projectile. */
+    public static void onJoin(Entity entity) {
+        if (entity instanceof Projectile projectile && projectile.getPersistentData().contains(HELD_PROJECTILE_TAG) && !isHeld(projectile)) {
+            letGo(projectile);
+        }
     }
 
     // ------------------------------------------------------------------------------------------------------------

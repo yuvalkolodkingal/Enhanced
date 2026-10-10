@@ -52,6 +52,9 @@ public final class EnhancedConfig {
 
     // ---- Billy (Wiccan) ----
     public static final ModConfigSpec.DoubleValue BILLY_FLIGHT_SPEED;
+    public static final ModConfigSpec.DoubleValue HEX_BOLT_DAMAGE;
+    public static final ModConfigSpec.IntValue FREEZE_DURATION;
+    public static final ModConfigSpec.IntValue NOISE_RANGE;
 
     // ---- Tommy (Speed) ----
     public static final ModConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
@@ -136,6 +139,12 @@ public final class EnhancedConfig {
 
         BUILDER.push("billy");
         BILLY_FLIGHT_SPEED = BUILDER.defineInRange("flightSpeed", 0.08, 0.01, 0.5);
+        HEX_BOLT_DAMAGE = BUILDER.comment("Damage of a Hex Bolt to the creature it strikes; each creature it forks to takes half.")
+                .defineInRange("hexBoltDamage", 6.0, 0.0, 100.0);
+        FREEZE_DURATION = BUILDER.comment("How long (ticks) Billy's Freeze holds creatures spellbound.")
+                .defineInRange("freezeDuration", 100, 1, 1200);
+        NOISE_RANGE = BUILDER.comment("How far away (blocks) Billy hears the thoughts of creatures while The Noise is on.")
+                .defineInRange("noiseRange", 32, 4, 64);
         BUILDER.pop();
 
         BUILDER.push("tommy");

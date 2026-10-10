@@ -2,10 +2,12 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.hex.Hex;
+import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -18,6 +20,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
@@ -27,9 +30,13 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Draws the energy effects that live in the world rather than on a body: the Hex walls, the Chaos Beam, the Chaos
- * Shield and the telekinetic tether. Everything is drawn for every player, including yourself in first person.
+ * Shield, the telekinetic tether and Billy's Hex Bolts. Everything is drawn for every player, including yourself in
+ * first person.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class WorldEffectsRenderer {
@@ -95,6 +102,7 @@ public final class WorldEffectsRenderer {
                 renderMagneticField(mc, player, pose, beams, camera, partialTick, time);
             }
         }
+        renderHexBolts(mc, level, pose, beams, camera, partialTick, time);
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
 
@@ -218,6 +226,81 @@ public final class WorldEffectsRenderer {
             EnergyGeometry.bolt(pose, vc, handPosition(mc, player, partialTick).subtract(camera), at, 0.018F, 0.12F,
                     EnergyGeometry.argb(Power.MAGNETO.glow, 0.35F), seed);
         }
+    }
+
+    // ---- Billy's Hex Bolts ----
+
+    /** How long a Hex Bolt stays on screen. */
+    private static final int HEX_BOLT_TICKS = 6;
+
+    private record HexBolt(int caster, Vec3 from, Vec3 to, List<Vec3> forks, long seed, long born) {
+    }
+
+    private static final List<HexBolt> HEX_BOLTS = new ArrayList<>();
+
+    /** The server says a Hex Bolt was cast nearby. */
+    public static void addHexBolt(HexBoltPayload bolt) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level != null) {
+            HEX_BOLTS.add(new HexBolt(bolt.caster(), bolt.from(), bolt.to(), List.copyOf(bolt.forks()), bolt.seed(), level.getGameTime()));
+        }
+    }
+
+    public static void clearHexBolts() {
+        HEX_BOLTS.clear();
+    }
+
+    /**
+     * Every Hex Bolt still crackling: a jagged arc from Billy's hand to what it struck, with short branches, and an arc on
+     * to each creature it forked to. It reshapes every other tick and fades out.
+     */
+    private static void renderHexBolts(Minecraft mc, ClientLevel level, Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick,
+                                       float time) {
+        HEX_BOLTS.removeIf(b -> time - b.born() > HEX_BOLT_TICKS || time < b.born() - 1);
+        for (HexBolt bolt : HEX_BOLTS) {
+            float age = Math.max(0.0F, time - bolt.born());
+            float fade = 1.0F - age / HEX_BOLT_TICKS;
+            Entity caster = level.getEntity(bolt.caster());
+            Vec3 from = (caster instanceof AbstractClientPlayer player ? handPosition(mc, player, partialTick) : bolt.from()).subtract(camera);
+            Vec3 to = bolt.to().subtract(camera);
+            RandomSource random = RandomSource.create(bolt.seed() + (long) (age / 2) * 7919L);
+            // Thinner where it leaves a hand right in front of the camera, so it never fills the screen.
+            float near = (float) Mth.clamp(from.length() / 1.5, 0.3, 1.0);
+            lightning(pose, vc, from, to, near, fade, random, 2 + random.nextInt(3));
+            for (Vec3 fork : bolt.forks()) {
+                lightning(pose, vc, to, fork.subtract(camera), 0.7F, fade, random, 1);
+            }
+            float flare = 0.35F * fade;
+            EnergyGeometry.ring(pose, vc, to, to.scale(-1), flare, 0.12F, 12, EnergyGeometry.argb(BillyAbilities.MAIN, 0.5F * fade));
+            EnergyGeometry.ring(pose, vc, to, to.scale(-1), flare * 0.4F, 0.08F, 8, EnergyGeometry.argb(BillyAbilities.CORE, 0.7F * fade));
+        }
+    }
+
+    /** One arc of Billy's lightning, with a few short branches crackling off it. */
+    private static void lightning(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float scale, float fade, RandomSource random, int branches) {
+        double length = a.distanceTo(b);
+        if (length < 1.0E-3) {
+            return;
+        }
+        List<Vec3> path = EnergyGeometry.lightningPath(a, b, Math.max(0.15, length * 0.08), random);
+        boltLayers(pose, vc, path, scale, fade);
+        Vec3 dir = b.subtract(a).scale(1.0 / length);
+        for (int i = 0; i < branches && path.size() > 2; i++) {
+            Vec3 start = path.get(1 + random.nextInt(path.size() - 2));
+            double reach = 0.4 + random.nextDouble() * Math.min(1.8, length * 0.2);
+            Vec3 side = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5).normalize();
+            Vec3 end = start.add(dir.scale(reach * 0.6)).add(side.scale(reach * 0.8));
+            boltLayers(pose, vc, EnergyGeometry.lightningPath(start, end, reach * 0.2, random), scale * 0.5F, fade * 0.8F);
+        }
+    }
+
+    /** Billy's magic in layers: the dark blue fringe outside, then blue, light blue, and a white-hot core. */
+    private static void boltLayers(Matrix4f pose, VertexConsumer vc, List<Vec3> path, float scale, float fade) {
+        EnergyGeometry.polyline(pose, vc, path, 0.34F * scale, EnergyGeometry.argb(BillyAbilities.FRINGE, 0.22F * fade));
+        EnergyGeometry.polyline(pose, vc, path, 0.18F * scale, EnergyGeometry.argb(BillyAbilities.BODY, 0.45F * fade));
+        EnergyGeometry.polyline(pose, vc, path, 0.09F * scale, EnergyGeometry.argb(BillyAbilities.MAIN, 0.8F * fade));
+        EnergyGeometry.polyline(pose, vc, path, 0.045F * scale, EnergyGeometry.argb(BillyAbilities.INNER, 0.9F * fade));
+        EnergyGeometry.polyline(pose, vc, path, 0.02F * scale, EnergyGeometry.argb(BillyAbilities.CORE, fade));
     }
 
     // ---- Telekinesis ----

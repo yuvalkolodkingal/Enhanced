@@ -3,7 +3,10 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
+import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
+import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
+import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.ChangeLookPayload;
@@ -58,6 +61,7 @@ public final class ClientEvents {
         QuicksilverMusic.tick(mc);
         PowerLoopSounds.tick(mc);
         SlowMotionEffect.tick(mc);
+        TheNoise.tick(mc);
     }
 
     /** The game's own music waits while Quicksilver's song plays, and for its usual pause after the song ends. */
@@ -76,6 +80,9 @@ public final class ClientEvents {
         PowerLoopSounds.stopAll();
         Afterimages.clear();
         SlowMotionEffect.stop(Minecraft.getInstance());
+        TheNoise.stop();
+        BillyCrownLayer.clear();
+        WorldEffectsRenderer.clearHexBolts();
     }
 
     /**
@@ -213,7 +220,10 @@ public final class ClientEvents {
         return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
     }
 
-    /** Wanda's hands trail red energy in flight, Photon leaves a trail of light, Magneto a faint violet field. */
+    /**
+     * Wanda's hands trail red energy in flight, Billy's give off faint blue sparks, Photon leaves a trail of light, Magneto
+     * a faint violet field.
+     */
     private static void spawnFlightParticles(ClientLevel level) {
         RandomSource random = level.random;
         for (AbstractClientPlayer player : level.players()) {
@@ -240,7 +250,16 @@ public final class ClientEvents {
                                 player.getZ() + (random.nextDouble() - 0.5) * 0.8, 0, -0.03, 0);
                     }
                 }
-                case QUICKSILVER, VISION, BILLY, TOMMY, LOKI, THOR, NONE -> {
+                case BILLY -> {
+                    if (player.tickCount % 3 == 0) {
+                        HumanoidArm arm = random.nextBoolean() ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
+                        Vec3 hand = handInWorld(player, arm);
+                        level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? BillyAbilities.CORE : BillyAbilities.MAIN, 0.8F),
+                                hand.x + (random.nextDouble() - 0.5) * 0.2, hand.y + (random.nextDouble() - 0.5) * 0.2,
+                                hand.z + (random.nextDouble() - 0.5) * 0.2, 0, 0.015, 0);
+                    }
+                }
+                case QUICKSILVER, VISION, TOMMY, LOKI, THOR, NONE -> {
                 }
             }
         }

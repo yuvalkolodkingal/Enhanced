@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
+import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.PhotonEyesLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
@@ -70,6 +71,7 @@ public final class ClientSetup {
                 renderer.addLayer(new PowerAuraLayer(renderer, energy));
                 renderer.addLayer(new PhotonEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
+                renderer.addLayer(new BillyCrownLayer(renderer));
             }
         }
     }

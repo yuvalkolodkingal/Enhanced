@@ -24,6 +24,8 @@ import net.minecraft.world.phys.Vec3;
  *     <li>Vision: upright, composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
  *     weightless while phased.</li>
  *     <li>Photon: a fist forward like a superhero in flight.</li>
+ *     <li>Billy: his casting hand thrust forward for a Hex Bolt; both hands raised and trembling while he holds creatures
+ *     spellbound; calm and weightless in flight, hands open.</li>
  * </ul>
  */
 public final class HeroPoses {
@@ -149,7 +151,33 @@ public final class HeroPoses {
                     model.leftArm.xRot = 0.0F;
                 }
             }
-            case BILLY, LOKI, THOR, NONE -> {
+            case BILLY -> {
+                if (data.is(Live.FREEZING)) {
+                    // Both hands raised towards the creatures he holds, trembling with the effort.
+                    model.rightArm.xRot = -2.2F + model.head.xRot * 0.5F + Mth.sin(t * 1.9F) * 0.06F;
+                    model.leftArm.xRot = -2.2F + model.head.xRot * 0.5F + Mth.cos(t * 2.3F) * 0.06F;
+                    model.rightArm.yRot = model.head.yRot - 0.2F;
+                    model.leftArm.yRot = model.head.yRot + 0.2F;
+                    model.rightArm.zRot = 0.2F + Mth.sin(t * 2.7F) * 0.04F;
+                    model.leftArm.zRot = -0.2F - Mth.cos(t * 2.5F) * 0.04F;
+                } else if (data.is(Live.CASTING)) {
+                    aim(model, main, -0.05F * side, t, 0.02F);
+                    off.zRot += 0.25F * -side;
+                } else if (holding) {
+                    aim(model, main, -0.1F * side, t, 0.0F);
+                    main.xRot -= 0.3F;
+                    main.zRot += Mth.sin(t * 0.9F) * 0.05F;
+                } else if (airborne) {
+                    // Calm and weightless: arms a little away from the body, palms open.
+                    model.rightArm.xRot = -0.3F + Mth.sin(t * 0.07F) * 0.06F;
+                    model.leftArm.xRot = -0.3F + Mth.cos(t * 0.07F) * 0.06F;
+                    model.rightArm.yRot = -0.25F;
+                    model.leftArm.yRot = 0.25F;
+                    model.rightArm.zRot = 0.4F + Mth.sin(t * 0.09F) * 0.05F;
+                    model.leftArm.zRot = -0.4F - Mth.sin(t * 0.09F) * 0.05F;
+                }
+            }
+            case LOKI, THOR, NONE -> {
             }
         }
         sync(model);

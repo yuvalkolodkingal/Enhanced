@@ -6,6 +6,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Builds energy shapes in camera-relative coordinates (the camera sits at 0,0,0), so every quad can be turned to
  * face the viewer.
@@ -63,6 +66,45 @@ public final class EnergyGeometry {
             }
             ribbon(pose, vc, prev, next, width, color, color);
             prev = next;
+        }
+    }
+
+    /**
+     * A jagged lightning path from {@code a} to {@code b}, by midpoint displacement: the middle is kinked sideways by up
+     * to {@code jitter}, the middle of each half by half that, and so on, so it zigzags at every scale. The same random
+     * source gives the same path.
+     */
+    public static List<Vec3> lightningPath(Vec3 a, Vec3 b, double jitter, RandomSource random) {
+        List<Vec3> points = new ArrayList<>();
+        points.add(a);
+        int depth = Mth.clamp(Mth.ceillog2(Math.max(2, (int) (a.distanceTo(b) * 3.0))), 1, 6);
+        subdivide(points, a, b, jitter, depth, random);
+        return points;
+    }
+
+    private static void subdivide(List<Vec3> points, Vec3 a, Vec3 b, double jitter, int depth, RandomSource random) {
+        if (depth == 0) {
+            points.add(b);
+            return;
+        }
+        Vec3 dir = b.subtract(a);
+        Vec3 perp1 = dir.cross(new Vec3(0, 1, 0));
+        if (perp1.lengthSqr() < 1.0E-6) {
+            perp1 = dir.cross(new Vec3(1, 0, 0));
+        }
+        perp1 = perp1.normalize();
+        Vec3 perp2 = dir.cross(perp1).normalize();
+        Vec3 mid = a.add(b).scale(0.5)
+                .add(perp1.scale((random.nextDouble() - 0.5) * 2 * jitter))
+                .add(perp2.scale((random.nextDouble() - 0.5) * 2 * jitter));
+        subdivide(points, a, mid, jitter * 0.5, depth - 1, random);
+        subdivide(points, mid, b, jitter * 0.5, depth - 1, random);
+    }
+
+    /** A line through all the given points, as camera-facing ribbons. */
+    public static void polyline(Matrix4f pose, VertexConsumer vc, List<Vec3> points, float width, int color) {
+        for (int i = 1; i < points.size(); i++) {
+            ribbon(pose, vc, points.get(i - 1), points.get(i), width, color, color);
         }
     }
 
