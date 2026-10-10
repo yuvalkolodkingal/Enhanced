@@ -56,7 +56,7 @@ public class PowerHud implements LayeredDraw.Layer {
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
                     .withStyle(ChatFormatting.YELLOW)
-                    .append(Component.translatable(look.abilityKey(i)).withStyle(ChatFormatting.WHITE));
+                    .append(Component.translatable(power.abilityKey(i)).withStyle(ChatFormatting.WHITE));
             Component status = status(player, data, i, now);
             if (status != null) {
                 line.append(Component.literal("  ")).append(status);
@@ -141,9 +141,6 @@ public class PowerHud implements LayeredDraw.Layer {
     }
 
     private static Component loki(LocalPlayer player, PowerData data, int ability) {
-        if (Variants.current(data).hasSignature(ability)) {
-            return null;
-        }
         return switch (ability) {
             case 2 -> data.is(Live.HIDDEN) ? active("hud.enhanced.active") : null;
             case 3 -> LokiForm.of(data).map(form -> (Component) form.displayName().copy().withStyle(ChatFormatting.GREEN)).orElse(null);

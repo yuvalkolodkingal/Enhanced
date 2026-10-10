@@ -9,8 +9,7 @@ one of the *Enhanced*:
 * **Vision**, the synthezoid with the Mind Stone in his forehead, and **White Vision** **(added)**
 * **Tommy Maximoff (Speed)**, Wanda's speedster son **(added)**
 * **Billy Maximoff (Wiccan)**, Wanda's son, the witch who made the Witches' Road real **(added)**
-* **Loki**, the God of Mischief, and his variants: Sylvie, Classic Loki, Kid Loki, President Loki, TVA Loki
-  and the God of Stories **(added)**
+* **Loki**, the God of Mischief, in his Asgardian clothes, as a TVA Variant and as the God of Stories **(added)**
 * **Thor**, the God of Thunder, with **Mjolnir** and **Stormbreaker**, and the **Bifrost** **(added)**
 
 This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
@@ -29,7 +28,7 @@ gap is filled in here, and every addition is marked **(added)**.
 | Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
-| Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, Sylvie, Mighty Thor... Press **H** to change look (**Sneak + H** goes back). Some looks have their own signature ability in place of ability 5. Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
+| Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, the TVA Loki, Mighty Thor... Press **H** to change look (**Sneak + H** goes back). A look changes only how the hero looks and the colour of his energy: the abilities are the same in every look. Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
 | MCU colours **(added)** | Every power's light and colour follows the films and shows (section 10). |
 | Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, the same way vanilla treats them as invulnerable. |
 
@@ -461,6 +460,57 @@ costume), *Wiccan (comics)*, and *Your own skin*.
 
 ---
 
+## 8. Loki — the God of Mischief **(added)**
+
+> "I am Loki of Asgard, and I am burdened with glorious purpose." In *Avengers: Endgame* the
+> Loki of 2012 grabs the Tesseract and vanishes in a swirl of blue light: the escape that
+> starts the whole story of the TVA.
+
+### 8.1 Becoming Loki
+
+* **The Tesseract.** The cube with the Space Stone inside. It has no recipe: it is a very rare
+  find in chests:
+
+  | Source | Chance |
+  |---|---|
+  | End City treasure chest | 8% |
+  | Stronghold library chest | 6% |
+  | Woodland Mansion chest | 5% |
+  | Ancient City chest | 4% |
+
+  It is fireproof, doesn't stack and is never used up.
+* **The escape.** A player **with no power** uses it (right click). The Space Stone swirls
+  round them in a rising spiral of blue light, they vanish in a flash and reappear **100 to 250
+  blocks away**, in the same dimension, on safe ground (solid, with room for the whole body,
+  no liquid, nothing burning, and no Hex wall in between; it tries 12 random spots, and if none
+  is safe they stay where they were). They **awaken as Loki**: a title on screen, a burst of green
+  light and a message to the whole server. The cube needs one second before it can be used again.
+* **A hero's jump.** Someone who already has a power (Loki himself too) isn't changed by the
+  cube: the Space Stone takes them to the block they look at, up to **48 blocks** away, on top of
+  it if there is room. The Hex wall still stops them. Cooldown 5 seconds.
+
+### 8.2 Abilities
+
+Loki is Asgardian-tough: **24 health** (12 hearts). His magic is green. Every look has the same
+five abilities.
+
+| # | Key | Ability | How it works |
+|---|---|---|---|
+| 1 | R | **Daggers** | He throws a conjured dagger from his hand, fast and almost flat, for up to 3 seconds of flight: **5 damage** (`daggerDamage` in the server config). It was never real: whatever it hits, or when its flight ends, it breaks up into green sparks, so it can never be picked up, and it passes through his own duplicates. Cooldown 0.4 seconds. **Sneak + R** throws a **fan of three**, 10° apart. Cooldown 1.5 seconds. |
+| 2 | G | **Duplicates** | *"Surprise!"* He turns invisible for 5 seconds (his held items and name are hidden too) and **three** illusory copies of him, looking exactly like him and holding what he holds, walk off in different directions, 12 blocks each. Every creature within 24 blocks that was after him goes after the nearest copy instead. A copy dissolves in one hit into warm-white streaks of light with a flash of his green, deals no damage, drops nothing and fades after 8 seconds anyway; they all dissolve if he loses his power. Drinking milk brings him back into view early. Cooldown 15 seconds. |
+| 3 | V | **Shapeshift** | He takes the shape of the creature or player he looks at, up to 16 blocks away, in a flash of green light, and every creature of that kind within 48 blocks lets go of him: creatures never pick one of their own kind as a target (a zombie leaves him alone, a husk still comes for him). A player is copied with their skin and their name. Looking at nothing turns him back. The Ender Dragon, the Wither, the Warden, the Elder Guardian and his own duplicates can't be copied. No cooldown. |
+| 4 | B | **Vanish** | Gone in a green flash and back where he looks, up to 20 blocks away: on top of the block he looks at, or right behind the creature, facing its back; with nothing in reach, in mid-air where he looks. Not where there is no room, and not through a Hex wall. Cooldown 3 seconds. |
+| 5 | N (toggle) | **Frost Giant** | His true Jotun form: blue-grey skin with raised ridges and burning red eyes (painted onto whichever look he wears, his own skin included). **+4 armor**, he never freezes and the cold can't hurt him, still water freezes into frosted ice where he walks (within 3 blocks, like Frost Walker), and every blow he lands slows the creature (**Slowness II for 3 seconds**) and freezes it over. Creatures that are immune to the cold aren't affected. Press again to look Asgardian again. |
+
+### 8.3 Looks
+
+*God of Mischief* (the default: black and green leathers with gold, and the cape), *TVA Variant*
+(the beige TVA jacket, no cape; his magic turns sand and amber), *God of Stories* (green and gold,
+with a cape; olive and gold magic), and *Your own skin*. A look changes only how Loki looks and the
+colour of his magic: the abilities are the same in every look, the Frost Giant included.
+
+---
+
 ## 9. Thor — the God of Thunder **(added)**
 
 > "Whosoever holds this hammer, if he be worthy, shall possess the power of Thor."
@@ -569,7 +619,7 @@ Every power's light follows the films and shows:
 | White Vision | A pale cyan-white beam; no Mind Stone | Cyan-white beam; an empty hexagonal socket of copper circuitry; a white phasing aura |
 | Tommy | A teal-green ghost trail | Teal-green trail, ghosts and mist |
 | Billy | Blue magic with a white core, like a Tesla coil | Blue arcs and glows |
-| Loki | Green seidr (Sylvie's enchantment is mint) | Green magic, each variant with its own shade |
+| Loki | Green seidr; the blue skin and red eyes of a Frost Giant | Green magic (sand and amber in the TVA look, olive and gold in the God of Stories'); a blue-grey Frost Giant with burning red eyes and a cold light |
 | Thor | Blue-white lightning; rainbow Bifrost | White-hot core, electric blue, deep blue halo; rainbow Bifrost |
 
 ---
@@ -580,7 +630,7 @@ Every power's light follows the films and shows:
 |---|---|
 | `/enhanced power get [player]` | Show a player's power. |
 | `/enhanced power set <players> <none\|magneto\|scarlet_witch\|quicksilver\|vision\|tommy\|billy\|loki\|thor> [look]` | Give or remove a power, optionally straight into one of its looks. |
-| `/enhanced look <players> <look>` | Change the look of every given player whose hero has that look (e.g. `sylvie`, `white_vision`, `mighty_thor`). |
+| `/enhanced look <players> <look>` | Change the look of every given player whose hero has that look (e.g. `tva`, `white_vision`, `mighty_thor`). |
 | `/enhanced hex list` | List all Hexes in the current dimension. |
 | `/enhanced hex clear` | Dissolve every Hex in the current dimension. |
 
@@ -588,5 +638,5 @@ Every power's light follows the films and shows:
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
-Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's cooldown…) can be changed in
-`world/serverconfig/enhanced-server.toml`.
+Loki's dagger damage, Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's
+cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`.

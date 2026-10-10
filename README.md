@@ -4,11 +4,12 @@ A Minecraft mod where you can become one of the *Enhanced*:
 **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**;
 **Quicksilver**, who runs so fast the world slows down around him (to *Sweet Dreams*);
 **Vision**, the Mind Stone in a synthetic body (or **White Vision**);
-Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; the God of Mischief, **Loki**;
+Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief;
 or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
 
 Every power's look and colour follows the MCU films and shows, and Vision, Tommy, Billy, Loki
-and Thor each have several looks (press **H**).
+(in his Asgardian clothes, the TVA's or the God of Stories') and Thor each have several looks
+(press **H**).
 
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).
@@ -128,7 +129,7 @@ To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a
 
 * `/enhanced power get|set …` (`none`, `magneto`, `scarlet_witch`, `quicksilver`,
   `vision`, `tommy`, `billy`, `loki`, `thor`, optionally followed by a look), `/enhanced look <players> <look>`
-  and `/enhanced hex list|clear` (operators only).
+  (for example `/enhanced look @a tva`) and `/enhanced hex list|clear` (operators only).
 * Balance numbers (beam damage, Hex death chance and radius, flight speeds, shrapnel, how much
   Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
 * Item, block and entity tags under `data/enhanced/tags/` decide what counts as

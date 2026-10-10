@@ -271,45 +271,5 @@
         "name": "enhanced:sfx/tesseract"
       }
     ]
-  },
-  "tempad_door": {
-    "subtitle": "subtitles.enhanced.tempad_door",
-    "sounds": [
-      {
-        "name": "enhanced:sfx/tempad_door"
-      }
-    ]
-  },
-  "enchantment": {
-    "subtitle": "subtitles.enhanced.enchantment",
-    "sounds": [
-      {
-        "name": "enhanced:sfx/enchantment"
-      }
-    ]
-  },
-  "glorious_purpose": {
-    "subtitle": "subtitles.enhanced.glorious_purpose",
-    "sounds": [
-      {
-        "name": "enhanced:sfx/glorious_purpose"
-      }
-    ]
-  },
-  "laevateinn": {
-    "subtitle": "subtitles.enhanced.laevateinn",
-    "sounds": [
-      {
-        "name": "enhanced:sfx/laevateinn"
-      }
-    ]
-  },
-  "time_slip": {
-    "subtitle": "subtitles.enhanced.time_slip",
-    "sounds": [
-      {
-        "name": "enhanced:sfx/time_slip"
-      }
-    ]
   }
 }

@@ -6,11 +6,11 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -75,15 +75,14 @@ public class TesseractItem extends Item {
         swirl(level, player.position());
         Vec3 from = player.position();
         Vec3 to = Teleports.farAway(player, player.getRandom(), ESCAPE_MIN, ESCAPE_MAX, ESCAPE_TRIES);
-        level.playSound(null, from.x, from.y, from.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.6F);
+        level.playSound(null, from.x, from.y, from.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         if (to != null) {
             flash(level, from);
-            level.playSound(null, from.x, from.y, from.z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0F, 0.7F);
             float yaw = (float) (Mth.atan2(-(to.x - from.x), to.z - from.z) * Mth.RAD_TO_DEG);
             player.teleportTo(level, to.x, to.y, to.z, yaw, 0.0F);
             player.resetFallDistance();
             flash(level, to);
-            level.playSound(null, to.x, to.y, to.z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0F, 0.7F);
+            level.playSound(null, to.x, to.y, to.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 0.7F, 1.2F);
         }
         Powers.awaken(player, Power.LOKI);
     }
@@ -111,11 +110,11 @@ public class TesseractItem extends Item {
         }
         Vec3 from = player.position();
         flash(level, from);
-        level.playSound(null, from.x, from.y, from.z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.8F, 1.3F);
+        level.playSound(null, from.x, from.y, from.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 0.8F, 1.3F);
         player.teleportTo(level, to.x, to.y, to.z, player.getYRot(), player.getXRot());
         player.resetFallDistance();
         flash(level, to);
-        level.playSound(null, to.x, to.y, to.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.6F, 1.8F);
+        level.playSound(null, to.x, to.y, to.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 0.6F, 1.5F);
         return true;
     }
 

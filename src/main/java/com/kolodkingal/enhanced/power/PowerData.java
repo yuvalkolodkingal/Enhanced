@@ -275,7 +275,7 @@ public final class PowerData {
         return variant;
     }
 
-    /** Changes the look. Use {@link Powers#setVariant} from game code, which also ends whatever the old look was doing. */
+    /** Changes the look. Use {@link Powers#setVariant} from game code, which also sends the change to the player. */
     void setVariantRaw(String v) {
         if (!variant.equals(v)) {
             variant = v;
