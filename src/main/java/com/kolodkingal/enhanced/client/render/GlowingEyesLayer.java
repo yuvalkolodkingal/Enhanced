@@ -18,13 +18,11 @@ import org.jetbrains.annotations.Nullable;
  * Eyes that glow, drawn full-bright over the skin's eyes:
  * <ul>
  *     <li>the Scarlet Witch's turn red while she wields chaos magic (WandaVision finale, Multiverse of Madness);</li>
- *     <li>Photon's turn azure in Spectrum Vision (WandaVision);</li>
  *     <li>Thor's blaze white-blue when the God of Thunder is unleashed (Ragnarok).</li>
  * </ul>
  */
 public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     private static final RenderType WANDA = RenderType.eyes(Enhanced.id("textures/entity/scarlet_witch_eyes.png"));
-    private static final RenderType PHOTON = RenderType.eyes(Enhanced.id("textures/entity/photon_eyes.png"));
     private static final RenderType THOR = RenderType.eyes(Enhanced.id("textures/entity/thor_eyes.png"));
 
     public GlowingEyesLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
@@ -35,7 +33,6 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
     private static RenderType eyes(PowerData data) {
         return switch (data.power()) {
             case SCARLET_WITCH -> data.beamActive() || data.chaosShieldActive() || data.heldEntityId() != -1 ? WANDA : null;
-            case PHOTON -> data.spectrumVision() ? PHOTON : null;
             case THOR -> data.toggle(Toggle.GOD_OF_THUNDER) ? THOR : null;
             default -> null;
         };

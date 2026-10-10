@@ -18,12 +18,8 @@ public final class PowerData {
     private Power power = Power.NONE;
     /** Magneto: magnetic shield toggle. */
     private boolean magneticShield;
-    /** Photon: spectrum vision toggle. */
-    private boolean spectrumVision;
     /** Magneto: shards left from the last melted iron item. */
     private int ironCharge;
-    /** Photon: absorbed energy (0-100). */
-    private float energy;
     /** Quicksilver: sprinting starts Quicksilver Time. */
     private boolean quicksilverTime = true;
     /** Quicksilver: run up walls and across water during Quicksilver Time. */
@@ -50,7 +46,6 @@ public final class PowerData {
     private boolean flying;
     /** Quicksilver Time is running right now: the world around him is slowed. */
     private boolean slowMo;
-    private int phaseTicks;
     /** Entity currently held with telekinesis, or -1. */
     private int heldEntityId = -1;
     /** Thor: Mjolnir while it is thrown and flying, or -1. */
@@ -65,9 +60,7 @@ public final class PowerData {
     public static final Codec<PowerData> CODEC = RecordCodecBuilder.create(i -> i.group(
             Power.CODEC.optionalFieldOf("power", Power.NONE).forGetter(d -> d.power),
             Codec.BOOL.optionalFieldOf("magnetic_shield", false).forGetter(d -> d.magneticShield),
-            Codec.BOOL.optionalFieldOf("spectrum_vision", false).forGetter(d -> d.spectrumVision),
             Codec.INT.optionalFieldOf("iron_charge", 0).forGetter(d -> d.ironCharge),
-            Codec.FLOAT.optionalFieldOf("energy", 0F).forGetter(d -> d.energy),
             Codec.BOOL.optionalFieldOf("quicksilver_time", true).forGetter(d -> d.quicksilverTime),
             Codec.BOOL.optionalFieldOf("wall_run", true).forGetter(d -> d.wallRun),
             Codec.BOOL.optionalFieldOf("walkman", true).forGetter(d -> d.walkman),
@@ -77,13 +70,11 @@ public final class PowerData {
             Codec.STRING.optionalFieldOf("variant", "").forGetter(d -> d.variant),
             Codec.INT.optionalFieldOf("toggles", 0).forGetter(d -> d.toggles),
             Codec.STRING.optionalFieldOf("form", "").forGetter(d -> d.form)
-    ).apply(i, (power, shield, vision, iron, energy, qsTime, wallRun, walkman, phased, dense, disguise, variant, toggles, form) -> {
+    ).apply(i, (power, shield, iron, qsTime, wallRun, walkman, phased, dense, disguise, variant, toggles, form) -> {
         PowerData d = new PowerData();
         d.power = power;
         d.magneticShield = shield;
-        d.spectrumVision = vision;
         d.ironCharge = iron;
-        d.energy = energy;
         d.quicksilverTime = qsTime;
         d.wallRun = wallRun;
         d.walkman = walkman;
@@ -101,14 +92,12 @@ public final class PowerData {
 
     private void write(ByteBuf buf) {
         ByteBufCodecs.VAR_INT.encode(buf, power.ordinal());
-        int flags = (magneticShield ? 1 : 0) | (spectrumVision ? 2 : 0) | (beamActive ? 4 : 0)
-                | (chaosShieldActive ? 8 : 0) | (shrapnelActive ? 16 : 0) | (flying ? 32 : 0)
-                | (quicksilverTime ? 64 : 0) | (wallRun ? 128 : 0) | (walkman ? 256 : 0) | (slowMo ? 512 : 0)
-                | (visionPhased ? 1024 : 0) | (dense ? 2048 : 0) | (disguise ? 4096 : 0);
+        int flags = (magneticShield ? 1 : 0) | (beamActive ? 2 : 0)
+                | (chaosShieldActive ? 4 : 0) | (shrapnelActive ? 8 : 0) | (flying ? 16 : 0)
+                | (quicksilverTime ? 32 : 0) | (wallRun ? 64 : 0) | (walkman ? 128 : 0) | (slowMo ? 256 : 0)
+                | (visionPhased ? 512 : 0) | (dense ? 1024 : 0) | (disguise ? 2048 : 0);
         ByteBufCodecs.VAR_INT.encode(buf, flags);
         ByteBufCodecs.VAR_INT.encode(buf, ironCharge);
-        buf.writeFloat(energy);
-        ByteBufCodecs.VAR_INT.encode(buf, phaseTicks);
         ByteBufCodecs.VAR_INT.encode(buf, heldEntityId + 1);
         ByteBufCodecs.VAR_INT.encode(buf, hammerEntityId + 1);
         ByteBufCodecs.stringUtf8(64).encode(buf, variant);
@@ -127,21 +116,18 @@ public final class PowerData {
         d.power = ordinal >= 0 && ordinal < values.length ? values[ordinal] : Power.NONE;
         int flags = ByteBufCodecs.VAR_INT.decode(buf);
         d.magneticShield = (flags & 1) != 0;
-        d.spectrumVision = (flags & 2) != 0;
-        d.beamActive = (flags & 4) != 0;
-        d.chaosShieldActive = (flags & 8) != 0;
-        d.shrapnelActive = (flags & 16) != 0;
-        d.flying = (flags & 32) != 0;
-        d.quicksilverTime = (flags & 64) != 0;
-        d.wallRun = (flags & 128) != 0;
-        d.walkman = (flags & 256) != 0;
-        d.slowMo = (flags & 512) != 0;
-        d.visionPhased = (flags & 1024) != 0;
-        d.dense = (flags & 2048) != 0;
-        d.disguise = (flags & 4096) != 0;
+        d.beamActive = (flags & 2) != 0;
+        d.chaosShieldActive = (flags & 4) != 0;
+        d.shrapnelActive = (flags & 8) != 0;
+        d.flying = (flags & 16) != 0;
+        d.quicksilverTime = (flags & 32) != 0;
+        d.wallRun = (flags & 64) != 0;
+        d.walkman = (flags & 128) != 0;
+        d.slowMo = (flags & 256) != 0;
+        d.visionPhased = (flags & 512) != 0;
+        d.dense = (flags & 1024) != 0;
+        d.disguise = (flags & 2048) != 0;
         d.ironCharge = ByteBufCodecs.VAR_INT.decode(buf);
-        d.energy = buf.readFloat();
-        d.phaseTicks = ByteBufCodecs.VAR_INT.decode(buf);
         d.heldEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
         d.hammerEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
         d.variant = ByteBufCodecs.stringUtf8(64).decode(buf);
@@ -164,9 +150,7 @@ public final class PowerData {
     void setPowerRaw(Power power) {
         this.power = power;
         this.magneticShield = false;
-        this.spectrumVision = false;
         this.ironCharge = 0;
-        this.energy = 0;
         this.quicksilverTime = true;
         this.wallRun = true;
         this.walkman = true;
@@ -182,7 +166,6 @@ public final class PowerData {
         this.beamActive = false;
         this.chaosShieldActive = false;
         this.shrapnelActive = false;
-        this.phaseTicks = 0;
         this.heldEntityId = -1;
         java.util.Arrays.fill(cooldownUntil, 0L);
         dirty = true;
@@ -199,17 +182,6 @@ public final class PowerData {
         }
     }
 
-    public boolean spectrumVision() {
-        return spectrumVision;
-    }
-
-    public void setSpectrumVision(boolean v) {
-        if (spectrumVision != v) {
-            spectrumVision = v;
-            dirty = true;
-        }
-    }
-
     public int ironCharge() {
         return ironCharge;
     }
@@ -220,20 +192,6 @@ public final class PowerData {
             dirty = true;
         }
     }
-
-    public float energy() {
-        return energy;
-    }
-
-    public void setEnergy(float v) {
-        float clamped = Math.max(0F, Math.min(MAX_ENERGY, v));
-        if (energy != clamped) {
-            energy = clamped;
-            dirty = true;
-        }
-    }
-
-    public static final float MAX_ENERGY = 100F;
 
     public boolean quicksilverTime() {
         return quicksilverTime;
@@ -413,24 +371,6 @@ public final class PowerData {
         if (flying != v) {
             flying = v;
             dirty = true;
-        }
-    }
-
-    public int phaseTicks() {
-        return phaseTicks;
-    }
-
-    public boolean isPhased() {
-        return phaseTicks > 0;
-    }
-
-    public void setPhaseTicks(int v) {
-        if (phaseTicks != v) {
-            // Only sync the start and the end of a phase, not every tick of the countdown.
-            if (phaseTicks == 0 || v == 0) {
-                dirty = true;
-            }
-            phaseTicks = v;
         }
     }
 

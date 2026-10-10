@@ -33,13 +33,6 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue HEX_MAX_RADIUS;
     public static final ModConfigSpec.DoubleValue HEX_DEATH_CHANCE;
 
-    // ---- Photon ----
-    public static final ModConfigSpec.DoubleValue PHOTON_FLIGHT_SPEED;
-    public static final ModConfigSpec.DoubleValue PHOTON_BLAST_DAMAGE;
-    public static final ModConfigSpec.DoubleValue PHOTON_ABSORB_FRACTION;
-    public static final ModConfigSpec.IntValue PHASE_DURATION;
-    public static final ModConfigSpec.IntValue PHASE_COOLDOWN;
-
     // ---- Vision ----
     public static final ModConfigSpec.DoubleValue VISION_FLIGHT_SPEED;
     public static final ModConfigSpec.DoubleValue MIND_STONE_BEAM_DAMAGE;
@@ -118,18 +111,8 @@ public final class EnhancedConfig {
                 .defineInRange("hexDefaultRadius", 32, 4, 256);
         HEX_MIN_RADIUS = BUILDER.defineInRange("hexMinRadius", 8, 4, 256);
         HEX_MAX_RADIUS = BUILDER.defineInRange("hexMaxRadius", 96, 4, 256);
-        HEX_DEATH_CHANCE = BUILDER.comment("Chance that an unauthorised creature without powers dies when crossing the Hex wall.",
-                        "Survivors who are players become Photon (the Monica Rambeau effect).")
+        HEX_DEATH_CHANCE = BUILDER.comment("Chance that an unauthorised creature without powers dies when crossing the Hex wall.")
                 .defineInRange("hexDeathChance", 0.95, 0.0, 1.0);
-        BUILDER.pop();
-
-        BUILDER.push("photon");
-        PHOTON_FLIGHT_SPEED = BUILDER.defineInRange("flightSpeed", 0.085, 0.01, 0.5);
-        PHOTON_BLAST_DAMAGE = BUILDER.defineInRange("photonBlastDamage", 6.0, 0.0, 100.0);
-        PHOTON_ABSORB_FRACTION = BUILDER.comment("Fraction of energy damage (fire, lightning, explosions, magic...) Photon absorbs.")
-                .defineInRange("absorbFraction", 0.5, 0.0, 1.0);
-        PHASE_DURATION = BUILDER.defineInRange("phaseShiftTicks", 60, 1, 1200);
-        PHASE_COOLDOWN = BUILDER.defineInRange("phaseShiftCooldown", 240, 0, 12000);
         BUILDER.pop();
 
         BUILDER.push("vision");

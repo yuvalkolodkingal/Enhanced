@@ -103,22 +103,25 @@ public final class HexTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_photon")
-    public static void hexSurvivorJustSurvives(GameTestHelper helper) {
+    @GameTest(template = ARENA, batch = "hex_survivor")
+    public static void hexSurvivorSimplySurvives(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 0.0);
         ServerPlayer wanda = raiseHex(f);
         ServerPlayer player = f.player(CENTER, FLOOR, 2.0);
         check(!inside(f, wanda, player), "the player starts outside");
+        check(HexManager.judge(HexManager.ownedBy(f.level(), wanda.getUUID()).orElseThrow(), player) == HexManager.Verdict.GAMBLE,
+                "the wall gambles on a powerless player");
 
         f.everyTick(10, tick -> {
             if (tick == 2) {
                 walkTo(player, abs(helper, CENTER, FLOOR, 2.6));
                 check(inside(f, wanda, player), "walked through the wall");
             }
-            if (tick > 3 && inside(f, wanda, player)) {
+            if (tick >= 6) {
                 check(player.isAlive(), "the survivor lives");
-                check(Powers.is(player, Power.NONE), "and gains no power");
+                check(Powers.is(player, Power.NONE), "and is still just a player");
+                check(inside(f, wanda, player), "and is inside the Hex");
                 return true;
             }
             return false;

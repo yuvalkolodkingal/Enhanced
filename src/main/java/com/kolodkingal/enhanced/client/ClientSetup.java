@@ -56,7 +56,6 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.IRON_SHRAPNEL.get(), ctx -> new ThrownItemRenderer<>(ctx, 0.75F, false));
-        event.registerEntityRenderer(ModEntities.PHOTON_BLAST.get(), ctx -> new ThrownItemRenderer<>(ctx, 1.4F, true));
         event.registerEntityRenderer(ModEntities.TELEKINETIC_BLOCK.get(), TelekineticBlockRenderer::new);
         event.registerEntityRenderer(ModEntities.THROWN_WEAPON.get(), ThrownWeaponRenderer::new);
         event.registerEntityRenderer(ModEntities.LOKI_DAGGER.get(), LokiDaggerRenderer::new);

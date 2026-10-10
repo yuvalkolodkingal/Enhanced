@@ -63,7 +63,6 @@ public final class ModItems {
 
     /** Projectile sprites only; not in the creative tab. */
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");
-    public static final DeferredItem<Item> PHOTON_ORB = ITEMS.registerSimpleItem("photon_orb");
     public static final DeferredItem<Item> LOKI_DAGGER = ITEMS.registerSimpleItem("loki_dagger");
 
     private ModItems() {

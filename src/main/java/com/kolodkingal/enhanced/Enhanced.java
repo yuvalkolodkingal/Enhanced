@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 /**
- * Enhanced: become Magneto, the Scarlet Witch, Quicksilver, Vision, or (if you survive the Hex) Photon.
+ * Enhanced: become an MCU hero.
  */
 @Mod(Enhanced.MODID)
 public class Enhanced {

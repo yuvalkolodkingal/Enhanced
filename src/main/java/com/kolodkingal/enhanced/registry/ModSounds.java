@@ -28,8 +28,6 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> QUICKSILVER_DASH = register("quicksilver_dash");
     public static final DeferredHolder<SoundEvent, SoundEvent> VISION_PHASE = register("vision_phase");
     public static final DeferredHolder<SoundEvent, SoundEvent> MIND_STONE_BEAM = register("mind_stone_beam");
-    public static final DeferredHolder<SoundEvent, SoundEvent> PHOTON_BLAST = register("photon_blast");
-    public static final DeferredHolder<SoundEvent, SoundEvent> ENERGY_RELEASE = register("energy_release");
 
     // Thor
     public static final DeferredHolder<SoundEvent, SoundEvent> MJOLNIR_THROW = register("mjolnir_throw");

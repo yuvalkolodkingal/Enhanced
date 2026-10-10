@@ -6,8 +6,8 @@ import java.util.Map;
 
 /**
  * Every hero's looks, in the order the Change Look key cycles through them. The first one is the default. Heroes
- * without a list (Magneto, the Scarlet Witch, Photon, Quicksilver) keep their single suit, which they put on with
- * their helmet, crown or goggles.
+ * without a list (Magneto, the Scarlet Witch, Quicksilver) keep their single suit, which they put on with their
+ * helmet, crown or goggles.
  */
 public final class Variants {
     private static final Map<Power, List<Variant>> BY_POWER = new EnumMap<>(Power.class);

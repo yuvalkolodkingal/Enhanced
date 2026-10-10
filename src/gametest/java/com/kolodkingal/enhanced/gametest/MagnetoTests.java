@@ -469,23 +469,23 @@ public final class MagnetoTests {
         ServerPlayer nobody = f.player(2.5, FLOOR, 2.5);
         ServerPlayer magneto = f.player(6.5, FLOOR, 2.5, Power.MAGNETO);
         ServerPlayer wanda = f.player(10.5, FLOOR, 2.5, Power.SCARLET_WITCH);
-        ServerPlayer photon = f.player(14.5, FLOOR, 2.5, Power.PHOTON);
-        for (ServerPlayer p : new ServerPlayer[]{nobody, magneto, wanda, photon}) {
+        ServerPlayer vision = f.player(14.5, FLOOR, 2.5, Power.VISION);
+        for (ServerPlayer p : new ServerPlayer[]{nobody, magneto, wanda, vision}) {
             PowerTicker.tick(p);
         }
         check(!nobody.mayFly(), "a player without powers can't fly");
-        check(magneto.mayFly() && wanda.mayFly() && photon.mayFly(), "every hero can fly");
+        check(magneto.mayFly() && wanda.mayFly() && vision.mayFly(), "every hero can fly");
         assertNear(magneto.getAbilities().getFlyingSpeed(), 0.075, 1.0E-4, "Magneto's flight speed");
         assertNear(wanda.getAbilities().getFlyingSpeed(), 0.09, 1.0E-4, "Wanda's flight speed");
-        assertNear(photon.getAbilities().getFlyingSpeed(), 0.085, 1.0E-4, "Photon's flight speed");
+        assertNear(vision.getAbilities().getFlyingSpeed(), 0.08, 1.0E-4, "Vision's flight speed");
         check(magneto.getAbilities().getFlyingSpeed() < wanda.getAbilities().getFlyingSpeed(), "Magneto flies a bit slower than Wanda");
 
         AbilityHandler.onKey(magneto, 5, true);
         check(magneto.getAbilities().flying, "N takes Magneto into the air");
         AbilityHandler.onKey(wanda, 2, true);
         check(wanda.getAbilities().flying, "G takes Wanda into the air");
-        AbilityHandler.onKey(photon, 2, true);
-        check(photon.getAbilities().flying, "G takes Photon into the air");
+        AbilityHandler.onKey(vision, 2, true);
+        check(vision.getAbilities().flying, "G takes Vision into the air");
         AbilityHandler.onKey(magneto, 5, true);
         check(!magneto.getAbilities().flying, "N again lands");
 

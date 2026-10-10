@@ -8,7 +8,6 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -35,7 +34,7 @@ import java.util.UUID;
  *
  * <p>Each tick every living thing near a Hex is checked against which side of the wall it was on last tick.
  * Crossing without Wanda's permission means: bounce off (anyone with powers, and bosses), or a 95% chance of
- * instant death, with the 5% survivors who are players becoming Photon.
+ * instant death (the survivors simply walk on).
  */
 public final class HexManager {
 
@@ -45,7 +44,7 @@ public final class HexManager {
         PASS,
         /** It has powers (or is a boss): it bounces off. */
         BLOCK,
-        /** It must survive the wall: 95% death, 5% Monica Rambeau effect. */
+        /** It must survive the wall: 95% death (by default, see the config). */
         GAMBLE
     }
 
@@ -299,18 +298,15 @@ public final class HexManager {
 
     /** @return true if the entity survived */
     private static boolean gamble(ServerLevel level, Hex hex, LivingEntity entity) {
-        boolean dies = entity.getRandom().nextDouble() < EnhancedConfig.HEX_DEATH_CHANCE.get();
-        Vec3 at = bodyCenter(entity);
-        if (dies) {
-            level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.8F), at.x, at.y, at.z, 40,
-                    entity.getBbWidth() * 0.6, entity.getBbHeight() * 0.5, entity.getBbWidth() * 0.6, 0.05);
-            level.playSound(null, at.x, at.y, at.z, ModSounds.HEX_CROSS.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
-            entity.hurt(ModDamageTypes.source(level, ModDamageTypes.HEX_WALL), 1.0E6F);
-            return false;
+        if (entity.getRandom().nextDouble() >= EnhancedConfig.HEX_DEATH_CHANCE.get()) {
+            return true;
         }
-        // The rare survivor just survives, shaken, in a flash of the Hex's light.
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 2.0F), at.x, at.y, at.z, 80, 0.8, 1.0, 0.8, 0.2);
-        return true;
+        Vec3 at = bodyCenter(entity);
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.8F), at.x, at.y, at.z, 40,
+                entity.getBbWidth() * 0.6, entity.getBbHeight() * 0.5, entity.getBbWidth() * 0.6, 0.05);
+        level.playSound(null, at.x, at.y, at.z, ModSounds.HEX_CROSS.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
+        entity.hurt(ModDamageTypes.source(level, ModDamageTypes.HEX_WALL), 1.0E6F);
+        return false;
     }
 
     /** Pushes something back to the side it came from, as if it walked into glass. */

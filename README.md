@@ -85,10 +85,9 @@ shows your abilities, cooldowns and resources.
 | ![Lifting an Iron Golem](docs/screenshots/magneto-telekinesis.png) Magneto lifting an Iron Golem | ![Disarm](docs/screenshots/magneto-disarm.png) Ripping a zombie's iron gear off |
 | ![Chaos Beam](docs/screenshots/chaos-beam.png) The Chaos Beam | ![Chaos Shield](docs/screenshots/chaos-shield.png) The Chaos Shield |
 | ![Awakening](docs/screenshots/mind-stone-awakening.png) Touching the Mind Stone with the gene | ![Hex Control](docs/screenshots/hex-control.png) Wanda's Hex Control screen |
-| ![Flight](docs/screenshots/scarlet-witch-flight.png) Red energy around Wanda's hands in flight | |
-| ![Quicksilver Time](docs/screenshots/quicksilver-time.png) Quicksilver Time: sand and arrows hang in the air | ![Running past](docs/screenshots/quicksilver-run.png) Quicksilver running past, as another player sees him |
-| ![Mind Stone beam](docs/screenshots/mind-stone-beam.png) Vision's Mind Stone beam | ![Phasing](docs/screenshots/vision-phase.png) Vision phasing through a wall |
-| ![Disguise](docs/screenshots/vision-disguise.png) Vision and his WandaVision human disguise | |
+| ![Flight](docs/screenshots/scarlet-witch-flight.png) Red energy around Wanda's hands in flight | ![Quicksilver Time](docs/screenshots/quicksilver-time.png) Quicksilver Time: sand and arrows hang in the air |
+| ![Running past](docs/screenshots/quicksilver-run.png) Quicksilver running past, as another player sees him | ![Mind Stone beam](docs/screenshots/mind-stone-beam.png) Vision's Mind Stone beam |
+| ![Phasing](docs/screenshots/vision-phase.png) Vision phasing through a wall | ![Disguise](docs/screenshots/vision-disguise.png) Vision and his WandaVision human disguise |
 
 ## Quicksilver's song
 
@@ -132,6 +131,6 @@ To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a
   and `/enhanced hex list|clear` (operators only).
 * Balance numbers (beam damage, Hex death chance and radius, flight speeds, shrapnel, how much
   Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
-* Item, block, entity and damage tags under `data/enhanced/tags/` decide what counts as
-  metal, what can be lifted, what the shield repels and which bosses resist the Hex, so
-  datapacks can change them.
+* Item, block and entity tags under `data/enhanced/tags/` decide what counts as
+  metal, what can be lifted, what the shield repels and which bosses resist the Hex,
+  so datapacks can change them.
