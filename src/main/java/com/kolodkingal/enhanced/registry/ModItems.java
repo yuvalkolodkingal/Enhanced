@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.item.SynthezoidCoreItem;
 import com.kolodkingal.enhanced.item.TesseractItem;
 import com.kolodkingal.enhanced.item.WandaCrownItem;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -48,6 +49,8 @@ public final class ModItems {
     /** The Space Stone in its cube. Using it is how Loki escapes in 2012, so it makes you Loki. */
     public static final DeferredItem<TesseractItem> TESSERACT = ITEMS.register("tesseract",
             () -> new TesseractItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    public static final DeferredItem<BlockItem> WITCHES_ROAD_DOOR = ITEMS.registerSimpleBlockItem(ModBlocks.WITCHES_ROAD_DOOR,
+            new Item.Properties().rarity(Rarity.RARE));
 
     /** Projectile sprites only; not in the creative tab. */
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");

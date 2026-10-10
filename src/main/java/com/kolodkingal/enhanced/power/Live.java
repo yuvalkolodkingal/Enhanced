@@ -17,8 +17,12 @@ public enum Live {
     HIDDEN,
     /** Loki has just thrown a dagger (a brief throwing pose). */
     THROWING,
-    /** Loki has just cast a spell with a raised, open hand (Vanish, Shapeshift). */
-    CASTING;
+    /** Casting a spell: Loki's raised, open hand (Vanish, Shapeshift); Billy's hand thrust forward (Hex Bolt). */
+    CASTING,
+    /** Billy's crown is out: while he flies, and for a moment after each spell. */
+    CROWNED,
+    /** Billy is holding the creatures in front of him spellbound (both hands raised). */
+    FREEZING;
 
     final int bit() {
         return 1 << ordinal();

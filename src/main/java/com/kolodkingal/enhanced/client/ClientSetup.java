@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.client.particle.EnergyParticle;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
+import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
@@ -84,6 +85,7 @@ public final class ClientSetup {
                 renderer.addLayer(new PowerAuraLayer(renderer, energy));
                 renderer.addLayer(new GlowingEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
+                renderer.addLayer(new BillyCrownLayer(renderer));
             }
         }
     }

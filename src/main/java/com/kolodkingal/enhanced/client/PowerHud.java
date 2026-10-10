@@ -141,6 +141,8 @@ public class PowerHud implements LayeredDraw.Layer {
     private static Component billy(LocalPlayer player, PowerData data, int ability) {
         return switch (ability) {
             case 2 -> onOff(data.flying());
+            case 3 -> data.heldEntityId() != -1 ? active("hud.enhanced.holding") : null;
+            case 5 -> onOff(data.toggle(Toggle.THE_NOISE));
             default -> null;
         };
     }

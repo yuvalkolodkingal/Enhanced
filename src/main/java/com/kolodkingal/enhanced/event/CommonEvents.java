@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.event;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
+import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.PhotonAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -19,7 +20,9 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
+import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -79,6 +82,7 @@ public final class CommonEvents {
             HexManager.tickLevel(level);
             SlowMotion.serverTick(level);
             MagnetoAbilities.tickHeld(level);
+            WitchesRoad.tick(level);
         }
     }
 
@@ -91,6 +95,8 @@ public final class CommonEvents {
         TommyAbilities.clear();
         ThorAbilities.clear();
         LokiAbilities.clear();
+        BillyAbilities.clear();
+        WitchesRoad.clear();
     }
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----
@@ -119,6 +125,7 @@ public final class CommonEvents {
         if (!event.getLevel().isClientSide) {
             SlowMotion.onJoin(event.getEntity());
             MagnetoAbilities.onJoin(event.getEntity());
+            Telekinesis.onJoin(event.getEntity());
         }
     }
 
@@ -131,6 +138,7 @@ public final class CommonEvents {
             Powers.get(player).setBeamActive(false);
             Powers.get(player).setChaosShieldActive(false);
             Powers.get(player).setShrapnelActive(false);
+            WitchesRoad.forget(player.getUUID());
         }
     }
 
@@ -167,11 +175,14 @@ public final class CommonEvents {
         EnhancedCommand.register(event.getDispatcher());
     }
 
-    // ---- Magneto's mental immunity ----
+    // ---- Magneto's mental immunity; the few too powerful to be spellbound ----
 
     @SubscribeEvent
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
         if (event.getEffectInstance().is(MobEffects.CONFUSION) && MagnetoAbilities.wearsHelmet(event.getEntity())) {
+            event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+        }
+        if (event.getEffectInstance().is(ModEffects.SPELLBOUND) && event.getEntity().getType().is(ModTags.SPELLBOUND_IMMUNE)) {
             event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
         }
     }
@@ -298,6 +309,10 @@ public final class CommonEvents {
         if (PhotonAbilities.isPhased(event.getEntity()) || VisionAbilities.isPhased(event.getEntity())) {
             event.setCanceled(true);
         }
+        // A spellbound player can't strike anyone (not even with an enchanted weapon).
+        if (event.getEntity().hasEffect(ModEffects.SPELLBOUND)) {
+            event.setCanceled(true);
+        }
     }
 
     /** A blow that landed: a Frost Giant's freezes. */
@@ -311,10 +326,16 @@ public final class CommonEvents {
 
     // ---- who creatures go after ----
 
-    /** A shapeshifted Loki is one of them: creatures of his new kind never go after him. */
+    /**
+     * A spellbound mob can't pick anyone to go after (it may only let go of its target); and a shapeshifted Loki is one
+     * of them: creatures of his new kind never go after him.
+     */
     @SubscribeEvent
     public static void onChangeTarget(LivingChangeTargetEvent event) {
-        if (event.getNewAboutToBeSetTarget() instanceof Player player && LokiAbilities.passesAs(player, event.getEntity().getType())) {
+        LivingEntity target = event.getNewAboutToBeSetTarget();
+        if (target != null && event.getEntity().hasEffect(ModEffects.SPELLBOUND)) {
+            event.setCanceled(true);
+        } else if (target instanceof Player player && LokiAbilities.passesAs(player, event.getEntity().getType())) {
             event.setCanceled(true);
         }
     }

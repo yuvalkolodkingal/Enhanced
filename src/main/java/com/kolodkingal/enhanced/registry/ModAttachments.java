@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.registry;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.hex.HexData;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.road.RoadDoors;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -26,6 +27,12 @@ public final class ModAttachments {
             () -> AttachmentType.builder(() -> HexData.EMPTY)
                     .serialize(HexData.CODEC)
                     .sync(HexData.STREAM_CODEC)
+                    .build());
+
+    /** Every Witches' Road door in a dimension, in the order they were placed. Saved with the level; only the server needs it. */
+    public static final Supplier<AttachmentType<RoadDoors>> ROAD_DOORS = ATTACHMENTS.register("road_doors",
+            () -> AttachmentType.builder(() -> RoadDoors.EMPTY)
+                    .serialize(RoadDoors.CODEC)
                     .build());
 
     private ModAttachments() {
