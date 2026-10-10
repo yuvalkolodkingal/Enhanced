@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.power.Live;
+import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -152,7 +153,15 @@ public class PowerHud implements LayeredDraw.Layer {
     }
 
     private static Component loki(LocalPlayer player, PowerData data, int ability) {
-        return null;
+        if (Variants.current(data).hasSignature(ability)) {
+            return null;
+        }
+        return switch (ability) {
+            case 2 -> data.is(Live.HIDDEN) ? active("hud.enhanced.active") : null;
+            case 3 -> LokiForm.of(data).map(form -> (Component) form.displayName().copy().withStyle(ChatFormatting.GREEN)).orElse(null);
+            case 5 -> onOff(data.toggle(Toggle.FROST_GIANT));
+            default -> null;
+        };
     }
 
     private static Component thor(LocalPlayer player, PowerData data, int ability) {

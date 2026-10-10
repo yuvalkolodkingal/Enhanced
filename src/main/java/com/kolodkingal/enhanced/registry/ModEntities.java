@@ -2,12 +2,15 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
+import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
+import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.PhotonBlastEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -42,6 +45,27 @@ public final class ModEntities {
                     .updateInterval(1)
                     .fireImmune()
                     .build("thrown_mjolnir"));
+    public static final DeferredHolder<EntityType<?>, EntityType<LokiDaggerEntity>> LOKI_DAGGER = ENTITIES.register("loki_dagger",
+            () -> EntityType.Builder.<LokiDaggerEntity>of(LokiDaggerEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build("loki_dagger"));
+
+    /** Never saved: an illusion lasts seconds, and its caster may not be there when the world loads again. */
+    public static final DeferredHolder<EntityType<?>, EntityType<LokiIllusionEntity>> LOKI_ILLUSION = ENTITIES.register("loki_illusion",
+            () -> EntityType.Builder.<LokiIllusionEntity>of(LokiIllusionEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.62F)
+                    .clientTrackingRange(10)
+                    .noSave()
+                    .noSummon()
+                    .build("loki_illusion"));
+
+    /** Mod bus: attributes of the mod's living entities. */
+    public static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
+    }
 
     private ModEntities() {
     }

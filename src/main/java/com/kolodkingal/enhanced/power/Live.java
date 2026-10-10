@@ -12,7 +12,13 @@ public enum Live {
     /** Thor holds Mjolnir up to the sky, calling lightning. */
     CALLING_LIGHTNING,
     /** The Bifrost's light is gathering around Thor, about to take him. */
-    BIFROST;
+    BIFROST,
+    /** Loki is invisible while his duplicates draw every eye: his held items, armour and name tag are hidden too. */
+    HIDDEN,
+    /** Loki has just thrown a dagger (a brief throwing pose). */
+    THROWING,
+    /** Loki has just cast a spell with a raised, open hand (Vanish, Shapeshift). */
+    CASTING;
 
     final int bit() {
         return 1 << ordinal();

@@ -80,6 +80,29 @@ public final class DataTests {
     }
 
     @GameTest(template = ARENA)
+    public static void endCityLootHasTesseract(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        LootTable table = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.END_CITY_TREASURE);
+        LootParams params = new LootParams.Builder(level)
+                .withParameter(LootContextParams.ORIGIN, helper.absoluteVec(new Vec3(10.5, 2, 10.5)))
+                .create(LootContextParamSets.CHEST);
+        RandomSource random = RandomSource.create(20121104L);
+        int rolls = 3000;
+        int tesseracts = 0;
+        for (int i = 0; i < rolls; i++) {
+            for (ItemStack stack : table.getRandomItems(params, random)) {
+                if (stack.is(ModItems.TESSERACT.get())) {
+                    tesseracts += stack.getCount();
+                }
+            }
+        }
+        Enhanced.LOGGER.info("End city treasure x{}: {} Tesseracts", rolls, tesseracts);
+        // Expected 8% (240); the bounds are more than 5 standard deviations wide.
+        check(tesseracts >= 160 && tesseracts <= 320, "the Tesseract should be in ~8% of End City treasure chests, got " + tesseracts + "/" + rolls);
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
     public static void witchDropsGeneOnlyWhenKilledByAPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

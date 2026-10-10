@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
@@ -17,8 +18,9 @@ import java.util.Map;
 /**
  * The hero suits. While Magneto wears his helmet, the Scarlet Witch her crown or Quicksilver his goggles, their whole skin (and cape) is
  * replaced by the suit. Vision and the newer heroes always wear the suit of their current look (unless the look is
- * "your own skin"). Hooked into {@link AbstractClientPlayer#getSkin()} by a mixin, so it applies everywhere the
- * skin is drawn: the body, first-person arms and the cape.
+ * "your own skin"). Loki can also wear another player's skin, or turn his into a Frost Giant's. Hooked into
+ * {@link AbstractClientPlayer#getSkin()} by a mixin, so it applies everywhere the skin is drawn: the body, first-person
+ * arms and the cape (and Loki's illusions, which copy his skin).
  */
 public final class SuitSkins {
     private static final PlayerSkin MAGNETO = new PlayerSkin(
@@ -36,6 +38,25 @@ public final class SuitSkins {
 
     private static final PlayerSkin VISION_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/vision_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+
+    /**
+     * The skin the player is drawn with, given their {@code own}: their suit (or their own skin), then Loki's tricks on
+     * top of it: another player's skin while he wears their shape, or his look turned Frost Giant.
+     */
+    public static PlayerSkin skinFor(AbstractClientPlayer player, PlayerSkin own) {
+        PlayerSkin suit = suitFor(player);
+        PlayerSkin skin = suit != null ? suit : own;
+        if (Powers.power(player) == Power.LOKI) {
+            PlayerSkin copied = Shapeshifts.copiedSkin(player);
+            if (copied != null) {
+                return copied;
+            }
+            if (LokiAbilities.isFrostGiant(player)) {
+                return FrostGiantSkins.of(skin);
+            }
+        }
+        return skin;
+    }
 
     /** The suit the player is currently transformed into, or null to keep their own skin. */
     @Nullable

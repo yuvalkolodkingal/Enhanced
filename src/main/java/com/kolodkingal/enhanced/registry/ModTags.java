@@ -28,6 +28,8 @@ public final class ModTags {
     public static final TagKey<EntityType<?>> TELEKINESIS_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("telekinesis_immune"));
     /** Entities the Hex wall cannot kill (they bounce off instead). */
     public static final TagKey<EntityType<?>> HEX_RESISTANT = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("hex_resistant"));
+    /** Creatures Loki cannot shapeshift into: the bosses, and his own illusions. */
+    public static final TagKey<EntityType<?>> SHAPESHIFT_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("shapeshift_immune"));
 
     /** Blocks Wanda can never tear out of the ground. */
     public static final TagKey<Block> TELEKINESIS_IMMOVABLE = TagKey.create(Registries.BLOCK, Enhanced.id("telekinesis_immovable"));

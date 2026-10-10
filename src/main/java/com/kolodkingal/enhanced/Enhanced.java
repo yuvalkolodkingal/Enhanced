@@ -37,6 +37,7 @@ public class Enhanced {
         ModSounds.SOUNDS.register(modBus);
         ModCreativeTab.TABS.register(modBus);
         modBus.addListener(ModNetwork::register);
+        modBus.addListener(ModEntities::registerAttributes);
         container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC);
     }
 
