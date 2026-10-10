@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.Level;
@@ -275,19 +276,27 @@ public final class ThorEffects {
         Vec3 look = player.getViewVector(partialTick);
         boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         if (firstPerson) {
-            // Where the held weapon's head, or the bare hand, appears: at the right of the screen, moved with the
-            // first-person pose of the beam (the view-space offset is about 0.8 blocks from the camera, so 0.4 of it is
-            // the offset in the world).
+            // Where the head of the held weapon, or the bare fist, is drawn: at the right of the screen (the left, for a
+            // weapon in the off hand), moved with the first-person pose of the beam (the view-space offset is about 0.8
+            // blocks from the camera, so 0.4 of it is the offset in the world). The numbers were measured on screenshots
+            // of the pose, which the hand draws with a field of view of 70 degrees whatever the player's: they are
+            // scaled to the player's own, so the beam leaves the weapon at any field of view.
             Vec3 right = look.cross(new Vec3(0, 1, 0));
             right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
             Vec3 up = right.cross(look).normalize();
-            double side = player.getMainArm() == HumanoidArm.RIGHT ? 1.0 : -1.0;
+            InteractionHand weaponHand = weapon ? ThorAbilities.weaponHand(player) : null;
+            HumanoidArm arm = weaponHand == InteractionHand.OFF_HAND ? player.getMainArm().getOpposite() : player.getMainArm();
+            double side = arm == HumanoidArm.RIGHT ? 1.0 : -1.0;
             float[] hand = new float[3];
             if (player == mc.player) {
-                FirstPersonArms.mainHand(mc.player, hand);
+                FirstPersonArms.hand(mc.player, arm, hand);
             }
-            return player.getEyePosition(partialTick).add(look.scale(0.75 + 0.4 * hand[2])).add(right.scale(side * (0.58 + 0.4 * hand[0])))
-                    .add(up.scale((weapon ? -0.08 : -0.36) + 0.4 * hand[1]));
+            boolean mjolnir = weaponHand != null && ThorAbilities.isMjolnir(player.getItemInHand(weaponHand));
+            double across = mjolnir ? 0.43 : weapon ? 0.45 : 0.42;
+            double high = mjolnir ? -0.01 : weapon ? -0.09 : -0.28;
+            double fov = Math.tan(Math.toRadians(mc.options.fov().get() * 0.5)) / Math.tan(Math.toRadians(35.0));
+            return player.getEyePosition(partialTick).add(look.scale(0.75 + 0.4 * hand[2]))
+                    .add(right.scale(side * (across + 0.4 * hand[0]) * fov)).add(up.scale((high + 0.4 * hand[1]) * fov));
         }
         // Where the body is really drawn: the head of the weapon in his fist, or the fist itself.
         Vec3 tracked = weapon ? HandTracker.weaponHead(player, partialTick) : HandTracker.hand(player, player.getMainArm(), partialTick);
