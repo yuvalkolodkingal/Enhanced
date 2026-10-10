@@ -736,6 +736,46 @@ public final class ScarletWitchTests {
         });
     }
 
+    /**
+     * Mjolnir and Stormbreaker are one of a kind (the hammer exists only inside the thrown entity): a Chaos Shield
+     * that turned one to sparks would destroy it for good. It throws it back to Thor instead, and pays what the blow
+     * would have cost.
+     */
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void chaosShieldTurnsAThrownWeaponBackToThor(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        PowerTicker.tick(thor);
+        AbilityHandler.onKey(wanda, 4, true);
+        boolean[] thrown = {false};
+        f.everyTick(100, tick -> {
+            PowerTicker.tick(thor);
+            PowerTicker.tick(wanda);
+            if (!thrown[0]) {
+                if (WandaAbilities.hasShieldUp(wanda)) {
+                    lookAt(thor, wanda);
+                    AbilityHandler.onKey(thor, 1, true);
+                    AbilityHandler.onKey(thor, 1, false);
+                    check(thor.getMainHandItem().isEmpty(), "Stormbreaker is in flight");
+                    thrown[0] = true;
+                }
+                return false;
+            }
+            if (thor.getMainHandItem().is(ModItems.STORMBREAKER.get())) {
+                assertNear(wanda.getHealth(), 20.0, 1.0E-4, "the axe never touched her");
+                assertNear(Powers.get(wanda).shieldStrength(), 30.0 - EnhancedConfig.STORMBREAKER_THROW_DAMAGE.get(), 1.0E-4,
+                        "the shield paid what the throw would have done (Stormbreaker's, not Mjolnir's)");
+                check(Powers.get(wanda).chaosShieldActive(), "and held");
+                check(helper.getEntities(ModEntities.THROWN_WEAPON.get()).isEmpty(), "nothing is left in flight");
+                return true;
+            }
+            check(tick < 90, "Stormbreaker was destroyed by the shield instead of coming back to Thor");
+            return false;
+        });
+    }
+
     @GameTest(template = ARENA)
     public static void chaosShieldReducesExplosionDamage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);

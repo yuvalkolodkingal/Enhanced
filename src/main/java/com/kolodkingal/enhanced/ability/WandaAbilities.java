@@ -267,7 +267,7 @@ public final class WandaAbilities {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.5F);
         }
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(SHIELD_RADIUS + 4),
-                p -> p.getOwner() != player)) {
+                p -> p.getOwner() != player && !(p instanceof ThrownWeaponEntity weapon && weapon.isReturning()))) {
             Vec3 velocity = projectile.getDeltaMovement();
             Vec3 toPlayer = center.subtract(projectile.position());
             double reach = SHIELD_RADIUS + 0.5 + velocity.length();
@@ -294,8 +294,9 @@ public final class WandaAbilities {
         if (projectile instanceof AbstractHurtingProjectile) {
             return 6.0F;
         }
-        if (projectile instanceof ThrownWeaponEntity) {
-            return EnhancedConfig.MJOLNIR_THROW_DAMAGE.get().floatValue();
+        if (projectile instanceof ThrownWeaponEntity weapon) {
+            return (ThorAbilities.isStormbreaker(weapon.weapon()) ? EnhancedConfig.STORMBREAKER_THROW_DAMAGE
+                    : EnhancedConfig.MJOLNIR_THROW_DAMAGE).get().floatValue();
         }
         if (projectile instanceof LokiDaggerEntity) {
             return EnhancedConfig.LOKI_DAGGER_DAMAGE.get().floatValue();
@@ -306,11 +307,29 @@ public final class WandaAbilities {
         return DEFAULT_PROJECTILE_POWER;
     }
 
-    /** A projectile reaches the shield: it turns to sparks, and the shield pays what it would have cost her. */
+    /**
+     * A projectile reaches the shield: it turns to sparks, and the shield pays what it would have cost her. (Mjolnir
+     * and Stormbreaker are the exception: see {@link #repel}.)
+     */
     public static void block(ServerPlayer player, Projectile projectile) {
         float power = projectilePower(projectile);
-        disintegrate(player.serverLevel(), projectile);
+        if (projectile instanceof ThrownWeaponEntity weapon) {
+            repel(player.serverLevel(), weapon);
+        } else {
+            disintegrate(player.serverLevel(), projectile);
+        }
         wear(player, power);
+    }
+
+    /**
+     * Mjolnir and Stormbreaker are one of a kind (a thrown one holds the only copy of the weapon): the shield turns it
+     * round and it flies home to Thor, instead of being destroyed for good.
+     */
+    private static void repel(ServerLevel level, ThrownWeaponEntity weapon) {
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F), weapon.getX(), weapon.getY(), weapon.getZ(),
+                10, 0.15, 0.15, 0.15, 0.08);
+        level.playSound(null, weapon.getX(), weapon.getY(), weapon.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F, 0.8F);
+        weapon.setReturning(true);
     }
 
     /**

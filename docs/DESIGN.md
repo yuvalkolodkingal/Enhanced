@@ -285,9 +285,10 @@ To touch the stone, hold the scepter and **right-click** (use it):
 * **Blocks every projectile** it meets while it is up: arrows, tridents, Ghast and Blaze
   fireballs, Wither skulls, shulker bullets, potions and snowballs. Projectiles disintegrate
   on the sphere. A projectile costs the shield what it would have done to Wanda: an arrow its
-  damage at its speed (about 4 to 6), a trident 8, a fireball 6, a thrown Mjolnir, dagger or
-  iron shard its own damage, and 2 for anything else. The projectile that breaks the shield
-  is still stopped.
+  damage at its speed (about 4 to 6), a trident 8, a fireball 6, a thrown Mjolnir,
+  Stormbreaker, dagger or iron shard its own damage, and 2 for anything else. The projectile
+  that breaks the shield is still stopped. A thrown Mjolnir or Stormbreaker is one of a kind,
+  so it is not destroyed: the shield turns it round and it flies home to Thor.
 * **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it
   down; if less strength is left than that, the shield shatters and the rest gets through.
   Melee blows are not stopped.
