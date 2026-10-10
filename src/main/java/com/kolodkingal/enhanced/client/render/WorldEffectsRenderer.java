@@ -37,7 +37,7 @@ public final class WorldEffectsRenderer {
     /** The Hex from outside, as in WandaVision: glowing CRT 'cathodic bricks' and scanlines. */
     public static final ResourceLocation HEX_BARRIER = Enhanced.id("textures/entity/hex_barrier.png");
     /** The angry red Hex (WandaVision episodes 5-9): raspberry scanlines over a dark magenta-red body. */
-    private static final int HEX_LINES = 0xCA5473;
+    private static final int HEX_LINES = 0xC03762;
     private static final int HEX_BODY = 0x6F0D28;
     /** The Chaos Shield: a translucent crimson dome with a hot pink rim. */
     private static final int SHIELD_BODY = 0xC72D4B;
@@ -133,10 +133,11 @@ public final class WorldEffectsRenderer {
                 float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 6F));
                 float tilesV = Math.max(3, Math.round(Mth.PI * radius / 6F));
                 EnergyGeometry.sphere(pose, vc, center, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F,
-                        HEX_LINES, 0.30F * pulse * rising, 0.6F * pulse * rising);
+                        HEX_LINES, 0.32F * pulse * rising, 0.68F * pulse * rising);
             } else {
+                // Dense enough to tint the sky behind it raspberry red, as in the show.
                 EnergyGeometry.veil(pose, vc, center, radius, segments, segments / 2, HEX_BODY,
-                        0.12F * pulse, 0.5F * pulse * rising);
+                        0.36F * pulse, 0.72F * pulse * rising);
             }
         }
     }
