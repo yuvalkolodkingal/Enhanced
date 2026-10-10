@@ -45,6 +45,10 @@ No. Anyone can wield Stormbreaker, and anyone who holds it can call the Bifrost.
 
 No. Thor's recall never takes a Mjolnir that is bound to someone else: he calls his own, one nobody owns yet, or Stormbreaker.
 
+### Why won't Mjolnir pin that player or creature?
+
+Mjolnir can't pin the bosses (the Ender Dragon, the Wither and the Warden), players who are in Creative or Spectator mode, or a player at all if the server has PvP off. Only the hammer's owner can pin someone (or any worthy player, with `thor.mjolnirOwnerOnly` off), and only its owner can lift it off again. See [Thor](Thor).
+
 ## Abilities and keys
 
 ### The keys do nothing.

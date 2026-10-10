@@ -110,10 +110,18 @@ Section `[thor]`. The hero's page is [Thor](Thor).
 | `thor.stormbreakerThrowDamage` | `12.0` | 0.0 to 100.0 | Damage of a thrown Stormbreaker, both ways. |
 | `thor.throwRange` | `40` | 4 to 128 | How far (in blocks) a thrown Mjolnir or Stormbreaker flies before it turns back. |
 | `thor.recallRange` | `64` | 4 to 256 | How far away (in blocks) Thor can call Mjolnir or Stormbreaker back from. |
-| `thor.lightningDamage` | `8.0` | 0.0 to 100.0 | Damage of Thor's lightning to whatever it strikes. |
-| `thor.lightningRange` | `64` | 4 to 256 | How far away (in blocks) Thor can call lightning down. |
+| `thor.beamDamage` | `2.0` | 0.0 to 100.0 | Damage of one hit of Thor's lightning beam, bare-handed (2 = one heart). Mjolnir or Stormbreaker in hand multiplies it by `thor.beamWeaponMultiplier`, the God of Thunder by `thor.godOfThunderBeamMultiplier` on top. |
+| `thor.beamInterval` | `5` | 1 to 40 | Ticks between two hits of the lightning beam (5 = four hits a second). The beam ignores the creature's damage cooldown, so every hit lands. |
+| `thor.beamRange` | `24` | 4 to 128 | How far (in blocks) Thor's lightning beam reaches bare-handed. |
+| `thor.beamWeaponRange` | `48` | 4 to 256 | How far (in blocks) the beam reaches with Mjolnir or Stormbreaker in hand. |
+| `thor.beamWeaponMultiplier` | `2.0` | 1.0 to 20.0 | What Mjolnir or Stormbreaker in hand multiplies the beam's damage by. (With one in hand the first hit on each creature also has the usual effects of lightning on it.) |
+| `thor.godOfThunderBeamMultiplier` | `1.5` | 1.0 to 20.0 | What the God of Thunder multiplies the beam's damage by. Every hit also arcs to the next two creatures nearby. |
+| `thor.beamExhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion per tick while the lightning beam is fired (4.0 = 1 food point). |
 | `thor.godOfThunderExhaustion` | `0.04` | 0.0 to 4.0 | Food exhaustion per tick while the God of Thunder is unleashed (4.0 = 1 food point). |
 | `thor.bifrostCooldown` | `1200` | 0 to 72000 | Cooldown of the Bifrost, Thor's or anyone's who wields Stormbreaker or Mjolnir, in ticks (1200 = 60 seconds). |
+| `thor.shatterCooldown` | `300` | 0 to 72000 | Cooldown of shattering Mjolnir (Sneak + R), in ticks, from the moment it shatters (300 = 15 seconds). |
+| `thor.shatterDamage` | `6.0` | 0.0 to 100.0 | Damage of each fragment of a shattered Mjolnir to the enemy it strikes. |
+| `thor.pinDuration` | `1200` | 20 to 72000 | How long (in ticks) Mjolnir pins someone down before it lets go by itself (1200 = a minute). |
 
 ## Datapack tags
 
@@ -131,6 +139,7 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 | `enhanced:telekinesis_immune` | entity type | Creatures too powerful to lift (the Ender Dragon, the Wither, the Warden, the Elder Guardian). |
 | `enhanced:hex_resistant` | entity type | Bosses the Hex wall can't kill: it throws them back instead. |
 | `enhanced:spellbound_immune` | entity type | Creatures Billy's Freeze can't hold (the Ender Dragon, the Wither). |
+| `enhanced:pin_immune` | entity type | Creatures Mjolnir can't pin down (the Ender Dragon, the Wither, the Warden). |
 | `enhanced:shapeshift_immune` | entity type | Creatures Loki can't take the shape of. |
 | `enhanced:telekinesis_immovable` | block | Blocks Wanda can't tear out of the ground. |
 

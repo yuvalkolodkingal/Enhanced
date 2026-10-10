@@ -50,7 +50,9 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 anyone: the hardest-hitting axe there is. Whoever holds Mjolnir or Stormbreaker can **call the Bifrost**:
 right-click for the Bifrost screen, which takes you home or to any place you saved, **in any
 dimension** (save up to 24 places, by name, where you stand), or Sneak + right-click to go where you
-look. In Thor's hands either weapon is thrown, called back, flown with and struck with lightning.
+look. In Thor's hands either weapon is thrown, called back and flown with, and makes his lightning beam
+twice as strong. Mjolnir can also **shatter** into fragments that strike his enemies (Sneak + R), and its
+owner can **pin someone down** with it (Sneak + right-click on a creature or player).
 
 ## Controls
 
@@ -64,9 +66,9 @@ look. In Thor's hands either weapon is thrown, called back, flown with and struc
 
 | Key | Tommy | Billy | Loki | Thor |
 |---|---|---|---|---|
-| **R** | Super Speed on/off (sprint) | Hex Bolt | Daggers (Sneak: three) | Throw Mjolnir or Stormbreaker / call it back |
+| **R** | Super Speed on/off (sprint) | Hex Bolt | Daggers (Sneak: three) | Throw / call back (Sneak: shatter Mjolnir) |
 | **G** | Disarm Blitz | Flight | Duplicates | Flight (weapon in hand) |
-| **V** | Whirlwind | Telekinesis | Shapeshift | Lightning |
+| **V** | Whirlwind | Telekinesis | Shapeshift | Lightning beam (hold) |
 | **B** | Vibrate Through Walls | Freeze | Vanish | God of Thunder (toggle) |
 | **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | **H** | Change look | Change look | Change look | Change look |

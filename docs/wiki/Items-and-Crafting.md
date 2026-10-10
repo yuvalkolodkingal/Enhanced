@@ -93,7 +93,7 @@ H = Heavy Core
 R = Breeze Rod
 ```
 
-Only the worthy can lift it, and it is bound to the first worthy player who does (its tooltip says "Unclaimed" until then, and "Bound to" and the owner's name after). 10 attack damage (slow, like an axe), never breaks, fire and lava can't hurt it. See [Thor](Thor).
+Only the worthy can lift it, and it is bound to the first worthy player who does (its tooltip says "Unclaimed" until then, and "Bound to" and the owner's name after). 10 attack damage (slow, like an axe), never breaks, fire and lava can't hurt it. In Thor's hands it shatters into fragments that strike his enemies (Sneak + R), and its owner can pin someone down with it (Sneak + right-click on a creature or player). See [Thor](Thor).
 
 ### Stormbreaker
 

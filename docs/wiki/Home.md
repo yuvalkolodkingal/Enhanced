@@ -24,7 +24,7 @@ Hebrew: [עברית, דף הבית](Home-HE)
 | [Tommy](Tommy) | Tommy Maximoff (Speed) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Tommy | Super speed, disarm blitz, whirlwind |
 | [Billy](Billy-and-the-Witches-Road) | Billy Maximoff (Wiccan) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Billy | Hex Bolt, flight, freeze, The Noise |
 | [Loki](Loki) | The God of Mischief | Use the Tesseract | Daggers, duplicates, shapeshifting, vanishing, Frost Giant form |
-| [Thor](Thor) | The God of Thunder | Be worthy and lift Mjolnir | Throwing Mjolnir, flight, lightning, the Bifrost |
+| [Thor](Thor) | The God of Thunder | Be worthy and lift Mjolnir | Throwing, shattering and pinning with Mjolnir, flight, the lightning beam, the Bifrost |
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki and Thor) are on [Looks](Looks).
 

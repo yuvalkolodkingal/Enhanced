@@ -13,9 +13,9 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Tommy](Tommy) | Super Speed on/off (sprint) | Disarm Blitz | Whirlwind | Vibrate Through Walls | Molecular Acceleration |
 | [Billy](Billy-and-the-Witches-Road) | Hex Bolt | Flight (toggle) | Telekinesis | Freeze | The Noise (toggle) |
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |
-| [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back | Flight (toggle, weapon in hand) | Lightning | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
+| [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 
-**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam) work for as long as you keep the key down. *Toggle* abilities switch on with one press and off with the next.
+**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam) work for as long as you keep the key down. *Toggle* abilities switch on with one press and off with the next.
 
 The abilities, their cooldowns and costs are explained on each hero's page.
 
@@ -48,6 +48,8 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **N** as the Scarlet Witch | Dissolves your Hex. |
 | Sneak + **R** as Quicksilver | Turns Super Speed on or off, instead of Quicksilver Time. |
 | Sneak + **R** as Loki | Throws a fan of three daggers. |
+| Sneak + **R** as Thor, with Mjolnir in hand | Shatters Mjolnir into fragments that strike his enemies (with Stormbreaker it throws it, as R does). |
+| Sneak + right-click on a creature or player, with Mjolnir in hand | Pins them down under Mjolnir. Right-click them again, without Sneak, to lift it (only its owner can). |
 | Sneak + **N** as Thor | Opens the Bifrost to the spot you look at. |
 | Sneak + **H** | Previous look. |
 

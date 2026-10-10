@@ -583,6 +583,32 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
   claim it and fight with it, but stays Vision.
 * Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava
   can't destroy it. Speedsters can't snatch it and telekinesis can't lift it.
+* **Shattering Mjolnir** (*Thor: Love and Thunder*, where Jane's Mjolnir bursts into dozens of glowing
+  fragments that each strike an enemy, then fly back and reassemble). **Sneak + R** with Mjolnir in
+  Thor's hand (with Stormbreaker, Sneak + R just throws it as R does): it bursts into glowing,
+  crackling fragments, one for each enemy he can see within 16 blocks: hostile monsters, and any
+  creature or player that is going after him or has just hurt him (the nearest 12), or a ring of
+  twelve if nobody is around. Players PvP rules protect, and players in Creative or Spectator mode,
+  are never targets. Each fragment curves in on its enemy, strikes it (6 damage and knockback; with
+  the God of Thunder, lightning arcs from it too) and flies back, and when the last one is home Mjolnir
+  is whole again in his hand (in his inventory if his hand is busy), still bound to its owner and
+  with everything else it carried. While it is in pieces it counts as a weapon in flight, so he keeps
+  flying, and **R** calls the fragments home at once. If Thor dies, logs out, changes dimension or
+  loses his power meanwhile, it comes together where he was and falls to the ground, its owner
+  kept. (While it is in pieces the hammer is kept in Thor's own saved data, so it can't be lost or
+  copied, even if the world closes.) Cooldown 15 seconds.
+* **Pinning someone down** (*The Avengers*, where Thor sets Mjolnir on Loki's chest and Loki can't get
+  up). Its owner (or any worthy player, with `mjolnirOwnerOnly` off) **Sneak + right-clicks** a
+  creature or player with Mjolnir in hand: Mjolnir is set down on them, lying across their chest.
+  While it lies there they **can't move, jump, fly, swim up, ride, teleport** (Ender Pearls,
+  chorus fruit, Endermen, and the mod's own teleports, the Bifrost included) **or glide on an
+  elytra**, and knockback doesn't move them; they can still look around. **Only its owner can lift
+  it again**: right-click the pinned one, or call it back with **R**. Nobody else can, the pinned one
+  included (*"It won't budge. Only Steve can lift it."*). It lets go by itself after **60 seconds**
+  (config), or when its owner logs out, dies or changes dimension, or when the pinned one dies or
+  leaves: then it drops beside them, its owner kept. The bosses (the Ender Dragon, the Wither and
+  the Warden: the `enhanced:pin_immune` tag) can't be pinned, and neither can a player if the server
+  has PvP off (or one in Creative or Spectator mode).
 * **Stormbreaker.** Forged in Nidavellir in the heart of a dying star, its handle grown from
   Groot's arm:
 
@@ -596,7 +622,7 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
   chops wood, strips logs and knocks shields aside) that hits harder than any other (12 attack
   damage), never breaks and can't burn. It doesn't make anyone Thor, but whoever holds it can call
   **the Bifrost** (8.4). In Thor's hands it does everything Mjolnir does: he throws it, calls it
-  back, flies with it and calls lightning down through it. Unlike Mjolnir, a speedster can snatch
+  back, flies with it and fires his lightning beam through it. Unlike Mjolnir, a speedster can snatch
   it out of a hand.
 
 ### 8.2 The Asgardian body
@@ -608,11 +634,11 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R | **Throw / Call Back** | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player, and never another player's Mjolnir: he calls his own, one nobody owns yet, or Stormbreaker). |
+| 1 | R | **Throw / Call Back** (Sneak: shatter Mjolnir) | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player, and never another player's Mjolnir: he calls his own, one nobody owns yet, or Stormbreaker), or off someone it pins down (never off himself). **Sneak + R** with Mjolnir in hand: it shatters into fragments that strike his enemies (see 8.1). |
 | 2 | G (toggle) | **Flight** | Thor flies by spinning his weapon: only with Mjolnir or Stormbreaker in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. |
-| 3 | V | **Lightning** | He raises his weapon and lightning pours down into it from the sky and leaps to what he looks at, up to 64 blocks away: 8 damage there and less to everything within 3 blocks, with the usual effects of lightning on creatures (creepers become charged, pigs turn into zombified piglins), but no fire on blocks. Without a weapon he can still call it, straight from the sky. Cooldown 1.5 seconds. |
-| 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon arcs too, and each Lightning strikes three times. It burns hunger; with an empty hunger bar the thunder calms. |
-| 5 | N | **Bifrost** | "Heimdall! Open the Bifrost!" With Mjolnir or Stormbreaker in hand: **N** opens the Bifrost screen (home, his saved places, save this one), **Sneak + N** takes him to the spot he looks at, up to 512 blocks away. See 9.4. |
+| 3 | V (hold) | **Lightning Beam** | While he holds **V**, a crackling beam of lightning pours from his hand, or from the head of the weapon in it, to what he looks at, for everyone nearby to see: a white-hot core, electric blue and a deep blue halo, jagged and flickering. Every 5 ticks it hits the first creature in the line (not through walls): bare-handed, 2 damage up to 24 blocks away (8 a second). With **Mjolnir or Stormbreaker** in hand it reaches 48 blocks and hits twice as hard (4), the beam is thicker and brighter, and the first time it hits each creature it also has the usual effects of lightning on it (creepers become charged, pigs turn into zombified piglins, villagers into witches). The **God of Thunder** on top hits 1.5 times as hard, and every hit arcs to the next two creatures nearby. The beam leaves no invulnerability frames, so every hit lands. It burns a little hunger while he fires it, and sparks fly where it ends (no fire, no block damage). |
+| 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon and every fragment of a shattered Mjolnir arc too, and his lightning beam hits 1.5 times as hard. It burns hunger; with an empty hunger bar the thunder calms. |
+| 5 | N | **Bifrost** | "Heimdall! Open the Bifrost!" With Mjolnir or Stormbreaker in hand: **N** opens the Bifrost screen (home, his saved places, save this one), **Sneak + N** takes him to the spot he looks at, up to 512 blocks away. See 8.4. |
 
 All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep blue halo.
 
@@ -682,6 +708,8 @@ Every power's light follows the films and shows:
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, how much faster Quicksilver does
-everything, Tommy's speed, Loki's dagger damage, Mjolnir's and Stormbreaker's damage and range, who is worthy of
-Mjolnir and whether it belongs to the first worthy player who lifts it (`mjolnirOwnerOnly`), the Bifrost's
+everything, Tommy's speed, Loki's dagger damage, Mjolnir's and Stormbreaker's damage and range, Thor's lightning
+beam (damage, range, its strength with a weapon and as the God of Thunder, its hunger cost), the cooldown of
+shattering Mjolnir and the damage of its fragments, how long it pins someone down, who is worthy of Mjolnir and
+whether it belongs to the first worthy player who lifts it (`mjolnirOwnerOnly`), the Bifrost's
 cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`.
