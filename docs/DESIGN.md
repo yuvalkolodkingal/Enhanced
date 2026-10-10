@@ -31,7 +31,7 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
 | Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, the TVA Loki, Mighty Thor... Press **H** to change look (**Sneak + H** goes back). A look changes only how the hero looks and the colour of his energy: the abilities are the same in every look. Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
-| MCU colours **(added)** | Every power's light and colour follows the films and shows (section 10). |
+| MCU colours **(added)** | Every power's light and colour follows the films and shows (section 9). |
 | Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, the same way vanilla treats them as invulnerable. |
 
 ---
@@ -176,7 +176,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
 * **Not holding the gene:** the Mind Stone's energy tears the player apart. They
   **explode and die instantly** (the explosion doesn't break blocks).
 * **(added)** **Holding a Synthezoid Core** instead: the Mind Stone brings the synthetic
-  body to life and the player **becomes Vision** (section 5).
+  body to life and the player **becomes Vision** (section 4).
 * **(added)** If you are already the Scarlet Witch or Vision, touching the stone is safe.
   If you have a different power, the gene or core can't bond. Nothing happens, the item
   isn't used up, and holding it still protects you from the stone.
@@ -286,12 +286,12 @@ To touch the stone, hold the scepter and **right-click** (use it):
 
 ---
 
-## 4. Quicksilver — the fastest man alive
+## 3. Quicksilver — the fastest man alive
 
 > The concept: "The X-Men movies' Quicksilver. When he runs, everything slows down, he
 > speeds up, and the world starts playing *Sweet Dreams (Are Made of This)*."
 
-### 4.1 Becoming Quicksilver **(added)**
+### 3.1 Becoming Quicksilver **(added)**
 
 * Craft **Quicksilver's Goggles** and put them on (like Magneto's Helmet, the first time
   you wear them you become Quicksilver for good, if you have no other power):
@@ -304,7 +304,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
   movies: silver hair, a shiny silver jacket over a grey T-shirt, headphones and jeans.
 * The goggles protect like an iron helmet and never break.
 
-### 4.2 Quicksilver Time (the main power)
+### 3.2 Quicksilver Time (the main power)
 
 **When Quicksilver sprints, time slows down around him:**
 
@@ -328,7 +328,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
   coloured glow).
 * Cost: it burns hunger while he runs. With an empty hunger bar, he can only run normally.
 
-### 4.3 Abilities
+### 3.3 Abilities
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
@@ -338,12 +338,12 @@ To touch the stone, hold the scepter and **right-click** (use it):
 | 4 | B (toggle) | **Wall & Water Run** **(added)** | During Quicksilver Time, run straight up walls you run into, and across water as long as you keep running. |
 | 5 | N (toggle) | **Walkman** **(added)** | Turn the theme music on or off. |
 
-## 5. Vision — the Mind Stone in a synthetic body **(added)**
+## 4. Vision — the Mind Stone in a synthetic body **(added)**
 
 > Wanda's concept mentions the Mind Stone in Loki's Scepter. In the films that same stone gives
 > Vision life, so the mod adds him as the second way to use it.
 
-### 5.1 Becoming Vision
+### 4.1 Becoming Vision
 
 * Craft a **Synthezoid Core** (a synthetic body waiting for a mind):
 
@@ -356,7 +356,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
   Stone moves into the body: the core is used up and you **become Vision** for good.
 * Holding the core also protects you from the stone, exactly like the gene does for Wanda.
 
-### 5.2 The synthetic body
+### 4.2 The synthetic body
 
 * Vision's skin becomes the MCU Vision: red synthetic face and hands, the golden **Mind Stone in
   his forehead** (it glows in the dark), a green suit with gold trim and a yellow cape.
@@ -367,7 +367,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
 * **Max health 30** (15 hearts) and **8 armor** from his vibranium body.
 * He never gets hungry and never runs out of air.
 
-### 5.3 Abilities
+### 4.3 Abilities
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
@@ -379,17 +379,17 @@ To touch the stone, hold the scepter and **right-click** (use it):
 
 ---
 
-## 6. Tommy Maximoff (Speed) **(added)**
+## 5. Tommy Maximoff (Speed) **(added)**
 
 > Wanda's son from *WandaVision*. His speed showed up on Halloween night ("Chip off the old
 > Maximoff block! You've got super speed!"), and in the Battle of Westview he crossed the
 > street as a teal-green ghost and disarmed a whole S.W.O.R.D. squad.
 
-### 6.1 Becoming Tommy
+### 5.1 Becoming Tommy
 
-Through the Witches' Road, with a Scarlet Witch Gene, choosing Tommy (section 7.1).
+Through the Witches' Road, with a Scarlet Witch Gene, choosing Tommy (section 6.1).
 
-### 6.2 Abilities
+### 5.2 Abilities
 
 Tommy's speed doesn't slow the world down (that is Quicksilver's trick): he leaves a translucent
 teal-green ghost trail and afterimages, low along the ground, like in the Battle of Westview.
@@ -402,7 +402,7 @@ teal-green ghost trail and afterimages, low along the ground, like in the Battle
 | 4 | B | **Vibrate Through Walls** | He vibrates his molecules and passes straight through the wall in front of him, up to 4 blocks thick (*VisionQuest* trailer; the comics). Not through bedrock or other unbreakable blocks, nor through a Hex he isn't allowed into. Cooldown 2 seconds. |
 | 5 | N | **Molecular Acceleration** | *(comics)* He vibrates whatever he touches (up to 5 blocks away) until it shatters: a block breaks and drops its item (anything up to the hardness of obsidian, never bedrock; it respects spawn protection and claims), a creature takes 6 damage and is blasted back. Cooldown 1 second. |
 
-### 6.3 Looks
+### 5.3 Looks
 
 *Halloween* (his WandaVision costume, a mini-Quicksilver: silver hair teased up, a blue tee with
 a silver lightning bolt), *Battle of Westview* (the green track jacket), *Speed* (the comics
@@ -410,12 +410,12 @@ costume, green and white with amber goggles), and *Your own skin*.
 
 ---
 
-## 7. Billy Maximoff (Wiccan) and the Witches' Road **(added)**
+## 6. Billy Maximoff (Wiccan) and the Witches' Road **(added)**
 
 > Wanda's other son. In *WandaVision* he hears every thought around him and freezes a squad of
 > S.W.O.R.D. soldiers; in *Agatha All Along* his own chaos magic makes the Witches' Road real.
 
-### 7.1 The Witches' Road Door
+### 6.1 The Witches' Road Door
 
 * **Crafting:**
 
@@ -430,7 +430,7 @@ costume, green and white with amber goggles), and *Your own skin*.
 * **Seeking the Road.** A player **with no power** right-clicks the door **holding a Scarlet Witch
   Gene**. A ring of blue-green light runs around the door for two seconds, the doors open onto a
   spiral stair among glowing roots, and the Road asks: **"Seekest thou the Road?"** Choose
-  **Billy: Wiccan** or **Tommy: Speed** (section 6). One gene is used up. Anyone else holding a gene
+  **Billy: Wiccan** or **Tommy: Speed** (section 5). One gene is used up. Anyone else holding a gene
   can join the ritual and choose too. The door closes again five seconds after it opens.
   * Without a gene the door won't open ("The Road only opens for witch blood").
   * A hero already "walks their own road".
@@ -440,7 +440,7 @@ costume, green and white with amber goggles), and *Your own skin*.
   column of light. A door that is gone is skipped. Whatever they hold with telekinesis stays
   behind, and the Hex wall is respected. Cooldown 3 seconds.
 
-### 7.2 Abilities
+### 6.2 Abilities
 
 Billy's magic is blue with a white-hot core, crackling and branching like a Tesla coil.
 
@@ -455,20 +455,20 @@ Billy's magic is blue with a white-hot core, crackling and branching like a Tesl
 **The crown.** While he flies, and for three seconds after each spell, a glowing chrome crown
 forms on his head, in shades from ice-white to deep blue (the *Wiccan* look already has it).
 
-### 7.3 Looks
+### 6.3 Looks
 
 *Wiccan* (*Agatha All Along*), *Teen* (on the Witches' Road), *Halloween* (his *WandaVision*
 costume), *Wiccan (comics)*, and *Your own skin*.
 
 ---
 
-## 8. Loki — the God of Mischief **(added)**
+## 7. Loki — the God of Mischief **(added)**
 
 > "I am Loki of Asgard, and I am burdened with glorious purpose." In *Avengers: Endgame* the
 > Loki of 2012 grabs the Tesseract and vanishes in a swirl of blue light: the escape that
 > starts the whole story of the TVA.
 
-### 8.1 Becoming Loki
+### 7.1 Becoming Loki
 
 * **The Tesseract.** The cube with the Space Stone inside. It has no recipe: it is a very rare
   find in chests:
@@ -491,7 +491,7 @@ costume), *Wiccan (comics)*, and *Your own skin*.
   cube: the Space Stone takes them to the block they look at, up to **48 blocks** away, on top of
   it if there is room. The Hex wall still stops them. Cooldown 5 seconds.
 
-### 8.2 Abilities
+### 7.2 Abilities
 
 Loki is Asgardian-tough: **24 health** (12 hearts). His magic is green. Every look has the same
 five abilities.
@@ -504,7 +504,7 @@ five abilities.
 | 4 | B | **Vanish** | Gone in a green flash and back where he looks, up to 20 blocks away: on top of the block he looks at, or right behind the creature, facing its back; with nothing in reach, in mid-air where he looks. Not where there is no room, and not through a Hex wall. Cooldown 3 seconds. |
 | 5 | N (toggle) | **Frost Giant** | His true Jotun form: blue-grey skin with raised ridges and burning red eyes (painted onto whichever look he wears, his own skin included). **+4 armor**, he never freezes and the cold can't hurt him, still water freezes into frosted ice where he walks (within 3 blocks, like Frost Walker), and every blow he lands slows the creature (**Slowness II for 3 seconds**) and freezes it over. Creatures that are immune to the cold aren't affected. Press again to look Asgardian again. |
 
-### 8.3 Looks
+### 7.3 Looks
 
 *God of Mischief* (the default: black and green leathers with gold, and the cape), *TVA Variant*
 (the beige TVA jacket, no cape; his magic turns sand and amber), *God of Stories* (green and gold,
@@ -513,11 +513,11 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
 
 ---
 
-## 9. Thor — the God of Thunder **(added)**
+## 8. Thor — the God of Thunder **(added)**
 
 > "Whosoever holds this hammer, if he be worthy, shall possess the power of Thor."
 
-### 9.1 Mjolnir, Stormbreaker and the worthy
+### 8.1 Mjolnir, Stormbreaker and the worthy
 
 * **Forging Mjolnir.** "Forged in the heart of a dying star, from the sacred metal of Uru":
 
@@ -565,16 +565,16 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
   Stormbreaker carries no enchantment of worthiness: **anyone can wield it**. It is an axe (it
   chops wood, strips logs and knocks shields aside) that hits harder than any other (12 attack
   damage), never breaks and can't burn. It doesn't make anyone Thor, but whoever holds it can call
-  **the Bifrost** (9.4). In Thor's hands it does everything Mjolnir does: he throws it, calls it
+  **the Bifrost** (8.4). In Thor's hands it does everything Mjolnir does: he throws it, calls it
   back, flies with it and calls lightning down through it. Unlike Mjolnir, a speedster can snatch
   it out of a hand.
 
-### 9.2 The Asgardian body
+### 8.2 The Asgardian body
 
 * **Max health 30** (15 hearts), **6 armor**, half knockback.
 * Lightning never hurts or burns Thor. With Mjolnir or Stormbreaker in hand he takes no fall damage.
 
-### 9.3 Abilities
+### 8.3 Abilities
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
@@ -586,7 +586,7 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
 
 All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep blue halo.
 
-### 9.4 The Bifrost and saved places
+### 8.4 The Bifrost and saved places
 
 * **The Bifrost answers the weapon, not the power.** Thor calls it with **N**; anyone else
   holding **Mjolnir or Stormbreaker** calls it by **using the weapon** (right click). With
@@ -611,7 +611,7 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep bl
   The places and the cooldown are saved with the player and kept on death, and only that player
   sees them.
 
-### 9.5 Looks
+### 8.5 Looks
 
 *Thor* (2011/*The Avengers*: black and silver armour with the six chest discs, red cape),
 *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder*
@@ -619,7 +619,7 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep bl
 
 ---
 
-## 10. MCU colours **(added)**
+## 9. MCU colours **(added)**
 
 Every power's light follows the films and shows:
 
@@ -638,7 +638,7 @@ Every power's light follows the films and shows:
 
 ---
 
-## 11. Operator commands **(added)**
+## 10. Operator commands **(added)**
 
 | Command | Effect |
 |---|---|
@@ -648,7 +648,7 @@ Every power's light follows the films and shows:
 | `/enhanced hex list` | List all Hexes in the current dimension. |
 | `/enhanced hex clear` | Dissolve every Hex in the current dimension. |
 
-## 12. Server configuration **(added)**
+## 11. Server configuration **(added)**
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
