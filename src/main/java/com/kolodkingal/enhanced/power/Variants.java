@@ -21,7 +21,7 @@ public final class Variants {
                 new Variant("wiccan", Power.BILLY, Variant.suit("billy_wiccan"), Variant.suit("billy_wiccan_cape"), false, Power.BILLY.color, Power.BILLY.glow, 0),
                 new Variant("teen", Power.BILLY, Variant.suit("billy_teen"), null, false, Power.BILLY.color, Power.BILLY.glow, 0),
                 new Variant("halloween", Power.BILLY, Variant.suit("billy_halloween"), Variant.suit("billy_halloween_cape"), false, Power.BILLY.color, Power.BILLY.glow, 0),
-                new Variant("kid", Power.BILLY, Variant.suit("billy_kid"), null, false, Power.BILLY.color, Power.BILLY.glow, 0),
+                new Variant("comics", Power.BILLY, Variant.suit("billy_comics"), Variant.suit("billy_comics_cape"), false, Power.BILLY.color, Power.BILLY.glow, 0),
                 own(Power.BILLY));
 
         add(Power.TOMMY,
