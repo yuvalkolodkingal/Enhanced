@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -29,8 +30,9 @@ import java.util.List;
 /**
  * The Tesseract, with the Space Stone inside. In Avengers: Endgame the 2012 Loki grabs it and vanishes in a blue swirl:
  * that escape is where the Loki of the TVA comes from. Used by someone without powers, it does the same: a swirl, a
- * flash, and they are Loki somewhere far away. A hero who uses it is simply taken to the block they look at.
- * The cube itself is never used up.
+ * flash, and they are Loki somewhere far away; unless they hold a Scarlet Witch Gene in their other hand: then it
+ * awakens them as the Scarlet Witch instead, exactly as Loki's Scepter does. A hero who uses it is simply taken to the
+ * block they look at. The cube itself is never used up.
  */
 public class TesseractItem extends Item {
     /** The Space Stone palette: dim, mid, bright, core. */
@@ -59,7 +61,13 @@ public class TesseractItem extends Item {
                 }
                 player.getCooldowns().addCooldown(this, JUMP_COOLDOWN);
             } else {
-                escape(serverPlayer);
+                InteractionHand otherHand = hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+                ItemStack gene = player.getItemInHand(otherHand);
+                if (gene.is(ModItems.SCARLET_WITCH_GENE.get())) {
+                    ScarletWitchGeneItem.awaken(serverPlayer, gene);
+                } else {
+                    escape(serverPlayer);
+                }
                 player.getCooldowns().addCooldown(this, 20);
             }
         }
@@ -143,6 +151,7 @@ public class TesseractItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.enhanced.tesseract.desc").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.enhanced.tesseract.desc2").withStyle(ChatFormatting.DARK_GREEN));
+        tooltip.add(Component.translatable("item.enhanced.tesseract.desc3").withStyle(ChatFormatting.RED));
     }
 
     @Override

@@ -80,8 +80,16 @@ public final class WorldEffectsRenderer {
                 PowerData data = Powers.get(player);
                 if (data.power() == Power.SCARLET_WITCH && data.chaosShieldActive() && !player.isInvisible()) {
                     Vec3 center = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
-                    float flicker = 0.9F + 0.1F * Mth.sin(time * 0.6F);
-                    float radius = (float) WandaAbilities.SHIELD_RADIUS;
+                    // It grows from her hands to its full size while it forms (and is fainter while it does).
+                    float formed = data.chaosShieldProgress(time);
+                    float eased = formed * formed * (3F - 2F * formed);
+                    float radius = (float) WandaAbilities.SHIELD_RADIUS * (0.2F + 0.8F * eased);
+                    float flicker = (0.9F + 0.1F * Mth.sin(time * 0.6F)) * (0.4F + 0.6F * eased);
+                    // Close to shattering, or to the end of its time, it gutters.
+                    float weak = 1F - Mth.clamp(data.shieldStrength() / WandaAbilities.maxShieldStrength() / 0.4F, 0F, 1F);
+                    float ending = Mth.clamp((20F - (data.shieldFormedAt() + WandaAbilities.maxShieldTicks() - time)) / 20F, 0F, 1F);
+                    float failing = formed < 1F ? 0F : Math.max(weak, ending);
+                    flicker *= 1F - failing * 0.5F * (0.5F + 0.5F * Mth.sin(time * 2.2F));
                     if (lines) {
                         EnergyGeometry.sphere(pose, vc, center, radius, 32, 16, 6, 3, time * 0.01F,
                                 Power.SCARLET_WITCH.color, 0.35F * flicker, 0.65F * flicker);

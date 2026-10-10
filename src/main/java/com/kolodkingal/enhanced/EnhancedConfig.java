@@ -26,6 +26,11 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue CHAOS_BEAM_NAUSEA_TICKS;
     public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_EXHAUSTION;
     public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_EXPLOSION_FACTOR;
+    public static final ModConfigSpec.IntValue CHAOS_SHIELD_WIND_UP_TICKS;
+    public static final ModConfigSpec.IntValue CHAOS_SHIELD_MAX_TICKS;
+    public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_STRENGTH;
+    public static final ModConfigSpec.IntValue CHAOS_SHIELD_COOLDOWN;
+    public static final ModConfigSpec.IntValue CHAOS_SHIELD_BROKEN_COOLDOWN;
     public static final ModConfigSpec.IntValue BLOCK_LIFT_RANGE;
     public static final ModConfigSpec.DoubleValue BLOCK_LIFT_MAX_HARDNESS;
     public static final ModConfigSpec.IntValue HEX_DEFAULT_RADIUS;
@@ -56,6 +61,9 @@ public final class EnhancedConfig {
 
     // ---- Loki ----
     public static final ModConfigSpec.DoubleValue LOKI_DAGGER_DAMAGE;
+    public static final ModConfigSpec.IntValue SCEPTER_CONFUSION_TICKS;
+    public static final ModConfigSpec.IntValue SCEPTER_NAUSEA_TICKS;
+    public static final ModConfigSpec.IntValue SCEPTER_SLOWNESS_TICKS;
 
     // ---- Thor ----
     public static final ModConfigSpec.DoubleValue THOR_FLIGHT_SPEED;
@@ -113,6 +121,19 @@ public final class EnhancedConfig {
                 .defineInRange("chaosShieldExhaustion", 0.1, 0.0, 4.0);
         CHAOS_SHIELD_EXPLOSION_FACTOR = BUILDER.comment("Fraction of explosion damage that still gets through the Chaos Shield.")
                 .defineInRange("chaosShieldExplosionFactor", 0.25, 0.0, 1.0);
+        CHAOS_SHIELD_WIND_UP_TICKS = BUILDER.comment("How long the Chaos Shield takes to form after B is pressed, in ticks (15 = 3/4 of a second).",
+                        "It blocks nothing until it is complete.")
+                .defineInRange("chaosShieldWindUpTicks", 15, 0, 200);
+        CHAOS_SHIELD_MAX_TICKS = BUILDER.comment("How long a complete Chaos Shield can be held before it drops, in ticks (160 = 8 seconds).")
+                .defineInRange("chaosShieldMaxTicks", 160, 1, 6000);
+        CHAOS_SHIELD_STRENGTH = BUILDER.comment("Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down:",
+                        "the damage of a projectile, and the explosion damage it takes away.")
+                .defineInRange("chaosShieldStrength", 30.0, 1.0, 1000.0);
+        CHAOS_SHIELD_COOLDOWN = BUILDER.comment("Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds).")
+                .defineInRange("chaosShieldCooldown", 120, 0, 6000);
+        CHAOS_SHIELD_BROKEN_COOLDOWN = BUILDER.comment("Ticks before the Chaos Shield can be raised again after it shattered or was held to its",
+                        "limit (300 = 15 seconds).")
+                .defineInRange("chaosShieldBrokenCooldown", 300, 0, 6000);
         BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Wanda can tear a block out of the ground.")
                 .defineInRange("blockLiftRange", 24, 2, 128);
         BLOCK_LIFT_MAX_HARDNESS = BUILDER.comment("Hardest block Wanda can lift (stone = 1.5, iron block = 5, obsidian = 50).")
@@ -167,6 +188,12 @@ public final class EnhancedConfig {
         BUILDER.push("loki");
         LOKI_DAGGER_DAMAGE = BUILDER.comment("Damage of one of Loki's conjured daggers.")
                 .defineInRange("daggerDamage", 5.0, 0.0, 100.0);
+        SCEPTER_CONFUSION_TICKS = BUILDER.comment("How long a creature stays confused after a melee hit with Loki's Scepter, in ticks (120 = 6 seconds).")
+                .defineInRange("scepterConfusionTicks", 120, 0, 6000);
+        SCEPTER_NAUSEA_TICKS = BUILDER.comment("How long a player gets Nausea after a melee hit with Loki's Scepter, in ticks (160 = 8 seconds).")
+                .defineInRange("scepterNauseaTicks", 160, 0, 6000);
+        SCEPTER_SLOWNESS_TICKS = BUILDER.comment("How long a player gets Slowness I after a melee hit with Loki's Scepter, in ticks (60 = 3 seconds).")
+                .defineInRange("scepterSlownessTicks", 60, 0, 6000);
         BUILDER.pop();
 
         BUILDER.push("thor");

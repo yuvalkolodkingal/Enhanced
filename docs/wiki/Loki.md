@@ -16,8 +16,19 @@ In *Avengers: Endgame* the 2012 Loki grabs the Tesseract and vanishes in a blue 
   | Ancient City chest | 4% |
 
 * **Using it.** A player **with no power** who uses it (right-click) is wrapped in a swirl of Space Stone light, vanishes in a blue flash and reappears **100 to 250 blocks away**, in a random direction, on safe ground in the same dimension (solid ground underfoot, room to stand, no liquid, nothing burning, and no Hex wall in between). They awaken as **Loki**. If the mod does not find a safe spot after 12 tries, you stay where you are, but you still become Loki.
+* **With a Scarlet Witch Gene.** A player with no power who holds a gene in the other hand awakens as the [Scarlet Witch](Scarlet-Witch) instead of Loki, the same way as with Loki's Scepter: the gene is used up, Wanda's Crown appears, and nobody is taken anywhere. Without the gene the cube makes Loki, as above.
 * **The cube is never used up.** After the escape it stays in your inventory.
 * **Heroes use it as a jump.** A hero (Loki included) who uses the Tesseract is not changed: the Space Stone takes them to the block they look at, up to 48 blocks away, standing on top of it if there is room. The cube then needs 5 seconds before it can be used again, and a Hex wall they are not allowed through still stops them.
+
+## Loki's Scepter
+
+Anyone can swing **Loki's Scepter** (a relic found in chests: see [Items and Crafting](Items-and-Crafting)): 8 attack damage, and it never breaks. In the films the Mind Stone in it takes over the mind of whoever it touches. That is too strong for the game, so here a melee hit **confuses**:
+
+* **A player** gets **Nausea** for 8 seconds and **Slowness I** for 3. (Magneto's helmet turns the Nausea away.)
+* **Any other creature** is **Confused** for 6 seconds. It forgets its target and can't pick a new one, and it stumbles about aimlessly: it heads for random spots nearby, a little faster than it wanders when idle, and changes its mind every few ticks. Small blue-green sparks swirl round its head while it lasts.
+* The **Ender Dragon, the Wither and the Warden** are immune (the `enhanced:confused_immune` tag).
+
+Touching the stone itself is another matter: see [Scarlet Witch](Scarlet-Witch).
 
 ## His body
 
@@ -93,4 +104,4 @@ Frost Giant is ability 5 in **every** look.
 
 ## Numbers you can change
 
-The dagger's damage is the one Loki option: `loki.daggerDamage` on [Server Configuration](Server-Configuration). The Tesseract's chances are in the loot modifiers (datapacks can change them), listed on [Items and Crafting](Items-and-Crafting).
+The dagger's damage and how long the Scepter confuses are the Loki options: `loki.daggerDamage`, `loki.scepterConfusionTicks`, `loki.scepterNauseaTicks` and `loki.scepterSlownessTicks` on [Server Configuration](Server-Configuration). The Tesseract's chances are in the loot modifiers (datapacks can change them), listed on [Items and Crafting](Items-and-Crafting).

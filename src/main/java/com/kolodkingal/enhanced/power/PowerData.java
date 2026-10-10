@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Mth;
 
 /**
  * Per-player power state. Attached to every player, saved with the player, kept on death and synced to every
@@ -43,7 +44,12 @@ public final class PowerData {
 
     // ---- runtime (synced, not saved) ----
     private boolean beamActive;
+    /** Scarlet Witch: B is held and the Chaos Shield is forming or up (see {@link #chaosShieldUp}). */
     private boolean chaosShieldActive;
+    /** Chaos Shield: game time B was pressed, game time the shield is complete, and the strength it has left. */
+    private long shieldStart;
+    private long shieldFormedAt;
+    private float shieldStrength;
     private boolean shrapnelActive;
     private boolean flying;
     /** Quicksilver Time is slowing the world around him right now (it is on and he is not a spectator). */
@@ -102,6 +108,11 @@ public final class PowerData {
                 | (quicksilverTime ? 32 : 0) | (wallRun ? 64 : 0) | (walkman ? 128 : 0) | (slowMo ? 256 : 0)
                 | (visionPhased ? 512 : 0) | (dense ? 1024 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0);
         ByteBufCodecs.VAR_INT.encode(buf, flags);
+        if (chaosShieldActive) {
+            ByteBufCodecs.VAR_LONG.encode(buf, shieldStart);
+            ByteBufCodecs.VAR_LONG.encode(buf, shieldFormedAt);
+            ByteBufCodecs.FLOAT.encode(buf, shieldStrength);
+        }
         ByteBufCodecs.VAR_INT.encode(buf, ironCharge);
         ByteBufCodecs.VAR_INT.encode(buf, heldEntityId + 1);
         ByteBufCodecs.VAR_INT.encode(buf, hammerEntityId + 1);
@@ -133,6 +144,11 @@ public final class PowerData {
         d.dense = (flags & 1024) != 0;
         d.disguise = (flags & 2048) != 0;
         d.superSpeed = (flags & 4096) != 0;
+        if (d.chaosShieldActive) {
+            d.shieldStart = ByteBufCodecs.VAR_LONG.decode(buf);
+            d.shieldFormedAt = ByteBufCodecs.VAR_LONG.decode(buf);
+            d.shieldStrength = ByteBufCodecs.FLOAT.decode(buf);
+        }
         d.ironCharge = ByteBufCodecs.VAR_INT.decode(buf);
         d.heldEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
         d.hammerEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
@@ -172,6 +188,9 @@ public final class PowerData {
         this.hammerEntityId = -1;
         this.beamActive = false;
         this.chaosShieldActive = false;
+        this.shieldStart = 0L;
+        this.shieldFormedAt = 0L;
+        this.shieldStrength = 0F;
         this.shrapnelActive = false;
         this.heldEntityId = -1;
         java.util.Arrays.fill(cooldownUntil, 0L);
@@ -366,6 +385,46 @@ public final class PowerData {
     public void setChaosShieldActive(boolean v) {
         if (chaosShieldActive != v) {
             chaosShieldActive = v;
+            dirty = true;
+        }
+    }
+
+    /**
+     * Starts raising the Chaos Shield: it is complete {@code windUp} ticks after {@code now}, and takes
+     * {@code strength} points of damage before it shatters.
+     */
+    public void raiseChaosShield(long now, int windUp, float strength) {
+        chaosShieldActive = true;
+        shieldStart = now;
+        shieldFormedAt = now + windUp;
+        shieldStrength = strength;
+        dirty = true;
+    }
+
+    /** The Chaos Shield is held and complete at game time {@code now}: only then does it stop anything. */
+    public boolean chaosShieldUp(long now) {
+        return chaosShieldActive && now >= shieldFormedAt;
+    }
+
+    /** How far the Chaos Shield has formed at game time {@code now} (fractions of a tick allowed): 0 to 1. */
+    public float chaosShieldProgress(float now) {
+        long span = shieldFormedAt - shieldStart;
+        return span <= 0 ? 1F : Mth.clamp((now - shieldStart) / span, 0F, 1F);
+    }
+
+    /** Game time at which the Chaos Shield is, or will be, complete. */
+    public long shieldFormedAt() {
+        return shieldFormedAt;
+    }
+
+    /** What is left of the Chaos Shield's strength, in points. */
+    public float shieldStrength() {
+        return shieldStrength;
+    }
+
+    public void setShieldStrength(float v) {
+        if (shieldStrength != v) {
+            shieldStrength = v;
             dirty = true;
         }
     }

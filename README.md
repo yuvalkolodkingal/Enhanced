@@ -39,12 +39,16 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | Hero | How |
 |---|---|
 | **Magneto** | Craft **Magneto's Helmet** from 5 Netherite Blocks (helmet shape) and put it on. |
-| **Scarlet Witch** | Find the very rare **Scarlet Witch Gene** (mansions, strongholds, fortresses, bastions, ancient and End cities, jungle temples, desert pyramids, witches, evokers). Hold it in one hand and use **Loki's Scepter** (End City treasure and other rare chests) with the other to touch the Mind Stone. **Without the gene, you explode.** |
+| **Scarlet Witch** | Find the very rare **Scarlet Witch Gene** (mansions, strongholds, fortresses, bastions, ancient and End cities, jungle temples, desert pyramids, witches, evokers). Hold it in one hand and use **Loki's Scepter** (End City treasure and other rare chests) with the other to touch the Mind Stone (**without the gene, you explode**), or use the **Tesseract** with the other hand instead. |
 | **Quicksilver** | Craft **Quicksilver's Goggles** (sugar, iron, glass panes, a Block of Diamond) and put them on. |
 | **Vision** | Craft a **Synthezoid Core** (redstone blocks, netherite ingots, a Nether Star). Hold it in one hand and use **Loki's Scepter** with the other. |
 | **Tommy** or **Billy** | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors, an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
-| **Loki** | Find the **Tesseract** (End City, Stronghold library, Ancient City and Woodland Mansion chests) and use it: you vanish in a blue flash and reappear far away as Loki. |
+| **Loki** | Find the **Tesseract** (End City, Stronghold library, Ancient City and Woodland Mansion chests) and use it: you vanish in a blue flash and reappear far away as Loki. (With a **Scarlet Witch Gene** in your other hand it awakens the Scarlet Witch instead.) |
 | **Thor** | Forge **Mjolnir** (netherite ingots, a Nether Star, a Heavy Core, a Breeze Rod). The first **worthy** player to lift it (Heroes of the Village: save a village from a raid) claims it, and lightning makes you Thor. From then on only its owner can lift it. |
+
+**Loki's Scepter** is a weapon too (8 damage), and a hit confuses whoever it lands on: a creature forgets its
+target and stumbles about for 6 seconds (the Ender Dragon, the Wither and the Warden are immune), and a player gets
+Nausea for 8 seconds and Slowness for 3.
 
 **Stormbreaker** (3 netherite ingots, a Nether Star and any log, shaped like an axe) can be wielded by
 anyone: the hardest-hitting axe there is. Whoever holds Mjolnir or Stormbreaker can **call the Bifrost**:

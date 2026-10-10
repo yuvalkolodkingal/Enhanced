@@ -18,12 +18,12 @@ Hebrew: [עברית, דף הבית](Home-HE)
 | Hero | Who | How you become one | Known for |
 |---|---|---|---|
 | [Magneto](Magneto) | The Master of Magnetism | Craft Magneto's Helmet and put it on | Metal telekinesis, iron shrapnel storm, magnetic shield |
-| [Scarlet Witch](Scarlet-Witch) | Wanda Maximoff | Touch the Mind Stone in Loki's Scepter while holding the Scarlet Witch Gene | Chaos beam, telekinesis, the Hex |
+| [Scarlet Witch](Scarlet-Witch) | Wanda Maximoff | Touch the Mind Stone in Loki's Scepter (or use the Tesseract) while holding the Scarlet Witch Gene | Chaos beam, telekinesis, the Hex |
 | [Quicksilver](Quicksilver) | Peter Maximoff | Craft Quicksilver's Goggles and put them on | Quicksilver Time: the world slows down and plays *Sweet Dreams*; or Super Speed, where only he is fast |
 | [Vision](Vision) | The Mind Stone in a synthetic body | Touch the Mind Stone while holding a Synthezoid Core | Mind Stone beam, phasing through walls, density; White Vision look |
 | [Tommy](Tommy) | Tommy Maximoff (Speed) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Tommy | Super speed, disarm blitz, whirlwind |
 | [Billy](Billy-and-the-Witches-Road) | Billy Maximoff (Wiccan) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Billy | Hex Bolt, flight, freeze, The Noise |
-| [Loki](Loki) | The God of Mischief | Use the Tesseract | Daggers, duplicates, shapeshifting, vanishing, Frost Giant form |
+| [Loki](Loki) | The God of Mischief | Use the Tesseract (without a gene in your other hand) | Daggers, duplicates, shapeshifting, vanishing, Frost Giant form |
 | [Thor](Thor) | The God of Thunder | Be worthy and lift Mjolnir | Throwing, shattering and pinning with Mjolnir, flight, the lightning beam, the Bifrost |
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki and Thor) are on [Looks](Looks).

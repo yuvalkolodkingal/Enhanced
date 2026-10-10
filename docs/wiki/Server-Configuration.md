@@ -41,6 +41,11 @@ Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 | `scarlet_witch.chaosBeamNauseaTicks` | `100` | 0 to 6000 | Duration of the Nausea the Chaos Beam inflicts, in ticks (100 = 5 seconds). |
 | `scarlet_witch.chaosShieldExhaustion` | `0.1` | 0.0 to 4.0 | Food exhaustion per tick while the Chaos Shield is held (4.0 exhaustion = 1 food point, so 0.1 is about 1 food point every 2 seconds). |
 | `scarlet_witch.chaosShieldExplosionFactor` | `0.25` | 0.0 to 1.0 | Fraction of explosion damage that still gets through the Chaos Shield (0.25 = 75% less). |
+| `scarlet_witch.chaosShieldWindUpTicks` | `15` | 0 to 200 | How long the Chaos Shield takes to form after B is pressed, in ticks (15 = 3/4 of a second). It blocks nothing until it is complete. |
+| `scarlet_witch.chaosShieldMaxTicks` | `160` | 1 to 6000 | How long a complete Chaos Shield can be held before it drops, in ticks (160 = 8 seconds). |
+| `scarlet_witch.chaosShieldStrength` | `30.0` | 1.0 to 1000.0 | Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down: the damage of a projectile, and the explosion damage it takes away. |
+| `scarlet_witch.chaosShieldCooldown` | `120` | 0 to 6000 | Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds). |
+| `scarlet_witch.chaosShieldBrokenCooldown` | `300` | 0 to 6000 | Ticks before the Chaos Shield can be raised again after it shattered or was held to its limit (300 = 15 seconds). |
 | `scarlet_witch.blockLiftRange` | `24` | 2 to 128 | How far away (in blocks) Wanda can tear a block out of the ground. |
 | `scarlet_witch.blockLiftMaxHardness` | `5.0` | 0.0 to 100.0 | Hardest block Wanda can lift (stone = 1.5, iron block = 5, obsidian = 50). |
 | `scarlet_witch.hexDefaultRadius` | `32` | 4 to 256 | Radius, in blocks, of a newly created Hex. |
@@ -96,6 +101,9 @@ Section `[loki]`. The hero's page is [Loki](Loki).
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `loki.daggerDamage` | `5.0` | 0.0 to 100.0 | Damage of one of Loki's conjured daggers (5 = 2.5 hearts). |
+| `loki.scepterConfusionTicks` | `120` | 0 to 6000 | How long a creature stays confused after a melee hit with Loki's Scepter, in ticks (120 = 6 seconds). 0 turns it off. |
+| `loki.scepterNauseaTicks` | `160` | 0 to 6000 | How long a player gets Nausea after a melee hit with Loki's Scepter, in ticks (160 = 8 seconds). 0 turns it off. |
+| `loki.scepterSlownessTicks` | `60` | 0 to 6000 | How long a player gets Slowness I after a melee hit with Loki's Scepter, in ticks (60 = 3 seconds). 0 turns it off. |
 
 ## Thor (Mjolnir, Stormbreaker and the Bifrost)
 
@@ -140,6 +148,7 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 | `enhanced:hex_resistant` | entity type | Bosses the Hex wall can't kill: it throws them back instead. |
 | `enhanced:spellbound_immune` | entity type | Creatures Billy's Freeze can't hold (the Ender Dragon, the Wither). |
 | `enhanced:pin_immune` | entity type | Creatures Mjolnir can't pin down (the Ender Dragon, the Wither, the Warden). |
+| `enhanced:confused_immune` | entity type | Creatures Loki's Scepter can't confuse (the Ender Dragon, the Wither, the Warden). |
 | `enhanced:shapeshift_immune` | entity type | Creatures Loki can't take the shape of. |
 | `enhanced:telekinesis_immovable` | block | Blocks Wanda can't tear out of the ground. |
 

@@ -33,6 +33,8 @@ public final class ModTags {
     public static final TagKey<EntityType<?>> SPELLBOUND_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("spellbound_immune"));
     /** The bosses: Mjolnir can't pin them down. */
     public static final TagKey<EntityType<?>> PIN_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("pin_immune"));
+    /** Entities too powerful for the confusion of Loki's Scepter. */
+    public static final TagKey<EntityType<?>> CONFUSED_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("confused_immune"));
 
     /** Blocks Wanda can never tear out of the ground. */
     public static final TagKey<Block> TELEKINESIS_IMMOVABLE = TagKey.create(Registries.BLOCK, Enhanced.id("telekinesis_immovable"));

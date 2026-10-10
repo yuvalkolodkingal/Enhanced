@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
@@ -97,7 +98,7 @@ public class PowerHud implements LayeredDraw.Layer {
                 case 1 -> data.beamActive() ? active("hud.enhanced.active") : null;
                 case 2 -> onOff(data.flying());
                 case 3 -> holding ? active("hud.enhanced.holding") : null;
-                case 4 -> data.chaosShieldActive() ? active("hud.enhanced.active") : null;
+                case 4 -> shield(data, now);
                 case 5 -> player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID())
                         .map(hex -> (Component) Component.translatable("hud.enhanced.hex_radius", hex.radius()).withStyle(ChatFormatting.RED))
                         .orElse(null);
@@ -123,6 +124,26 @@ public class PowerHud implements LayeredDraw.Layer {
             case THOR -> thor(player, data, ability);
             case NONE -> null;
         };
+    }
+
+    /**
+     * The Chaos Shield: "forming" while it grows, then what is left of its strength (green, then yellow, then red as it
+     * wears down) and the seconds it can still be held. Once it has dropped, its cooldown shows instead (see
+     * {@link #status}).
+     */
+    private static Component shield(PowerData data, long now) {
+        if (!data.chaosShieldActive()) {
+            return null;
+        }
+        if (!data.chaosShieldUp(now)) {
+            return Component.translatable("hud.enhanced.shield_forming").withStyle(ChatFormatting.GOLD);
+        }
+        float max = WandaAbilities.maxShieldStrength();
+        float left = data.shieldStrength();
+        ChatFormatting color = left > max * 0.5F ? ChatFormatting.GREEN : left > max * 0.25F ? ChatFormatting.YELLOW : ChatFormatting.RED;
+        double seconds = Math.max(0, data.shieldFormedAt() + WandaAbilities.maxShieldTicks() - now) / 20.0;
+        return Component.translatable("hud.enhanced.shield_strength", (int) Math.ceil(left), (int) Math.ceil(max)).withStyle(color)
+                .append(Component.literal(String.format(Locale.ROOT, "  %.1fs", seconds)).withStyle(ChatFormatting.GRAY));
     }
 
     /** Which of Quicksilver's modes is on ("Time" or "Speed", or OFF), and "running" while he runs in it. */

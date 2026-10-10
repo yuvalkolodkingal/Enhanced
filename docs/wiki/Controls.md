@@ -15,7 +15,7 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |
 | [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 
-**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam) work for as long as you keep the key down. *Toggle* abilities switch on with one press and off with the next.
+**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam) work for as long as you keep the key down (the Chaos Shield also drops by itself after 8 seconds, or when it breaks, and then has to recharge). *Toggle* abilities switch on with one press and off with the next.
 
 The abilities, their cooldowns and costs are explained on each hero's page.
 

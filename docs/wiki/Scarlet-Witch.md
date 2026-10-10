@@ -15,7 +15,9 @@ Wanda Maximoff. Chaos magic in a crimson tangle of energy, with hot pink highlig
 * **Holding a Synthezoid Core** instead: you become [Vision](Vision).
 * If you already are the Scarlet Witch or Vision, touching the stone is safe. If you have a different power, the gene or core can't bond: nothing happens, the item is not used up, and holding it still protects you from the stone.
 
-The scepter is also a strong melee weapon (8 attack damage, never breaks).
+**The Tesseract works too.** Hold the gene in one hand and use the **Tesseract** with the other, instead of the scepter: you awaken as the Scarlet Witch in exactly the same way (the gene is used up, Wanda's Crown appears, everyone on the server gets the message). The Tesseract is not used up and you are not taken anywhere. Without a gene it makes you [Loki](Loki), and a hero who uses it is simply taken to the block they look at.
+
+The scepter is also a strong melee weapon (8 attack damage, never breaks). In the films it takes over the mind of whoever it touches; that would be too strong here, so a hit only **confuses**: a player gets **Nausea** for 8 seconds and **Slowness I** for 3, and any other creature is **Confused** for 6 seconds. A confused creature forgets its target, can't pick a new one and stumbles about aimlessly, with small blue-green sparks swirling round its head. The Ender Dragon, the Wither and the Warden are immune. See [Loki](Loki).
 
 ![Touching the Mind Stone with the gene](images/mind-stone-awakening.png)
 
@@ -49,7 +51,7 @@ On anyone else the crown is just a crown.
 | 1 | **R** (hold) | Chaos Energy Beam | A glowing, crackling red beam from Wanda's hand. |
 | 2 | **G** (toggle) | Enhanced Flight | Fast, smooth flight with red energy around both hands. |
 | 3 | **V** | Telekinesis | Lift creatures, dropped items **or blocks**, move them with your gaze, then launch them. |
-| 4 | **B** (hold) | Chaos Shield | A red glowing sphere that stops all projectiles. |
+| 4 | **B** (hold) | Chaos Shield | A red glowing sphere that stops projectiles and softens explosions. It takes time to form, wears out and can shatter. |
 | 5 | **N** | The Hex | A giant red energy dome that only Wanda controls. |
 
 ### 1. Chaos Energy Beam
@@ -79,10 +81,15 @@ On anyone else the crown is just a crown.
 
 ### 4. Chaos Shield
 
-* Hold **B**. A red, glowing sphere of chaos energy surrounds Wanda.
-* **Blocks 100% of projectiles:** arrows, tridents, Ghast and Blaze fireballs, Wither skulls, shulker bullets, potions and snowballs. Projectiles disintegrate on the sphere.
-* **Explosion damage is reduced by 75%.**
-* **Cost:** it burns hunger quickly while held (about 1 food point every 2 seconds). When the hunger bar is empty, the shield collapses.
+* Hold **B**. A red, glowing sphere of chaos energy grows round Wanda. It is a commitment, not a reflex:
+  * **It takes 3/4 of a second to form.** It grows from her hands to its full size, and it **blocks nothing until it is complete.**
+  * **It holds for at most 8 seconds,** counted from when it is complete. Then it drops.
+  * **It has 30 points of strength.** Everything it stops wears it down by that much. At 0 it **shatters**, in a burst of red shards and with a glassy sound.
+  * **It has to recharge** before she can raise it again: **6 seconds** after it drops (when she lets go of B, or when she is too hungry), **15 seconds** if it shattered or was held to its limit. While it recharges, the HUD counts down and B does nothing.
+* **Blocks every projectile** it meets while it is up: arrows, tridents, Ghast and Blaze fireballs, Wither skulls, shulker bullets, potions and snowballs. Projectiles disintegrate on the sphere. Each one costs the shield what it would have done to Wanda: an arrow its damage at its speed (about 4 to 6 points), a trident 8, a fireball 6, a thrown Mjolnir, Stormbreaker, dagger or iron shard its own damage, and 2 for anything else. The projectile that breaks the shield is still stopped. A thrown Mjolnir or Stormbreaker is one of a kind, so it is not destroyed: the shield turns it round and it flies home to Thor.
+* **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it down. If less strength is left than that, the shield shatters and the rest gets through. Melee blows are not stopped.
+* **Cost:** it burns hunger quickly while held (about 1 food point every 2 seconds), while it forms too. When the hunger bar is empty, the shield collapses and has to recharge.
+* **HUD:** while it forms it shows "forming". Once it is up it shows what is left of its strength (green, then yellow, then red) and the seconds it can still be held, and after it drops it shows the cooldown. The sphere flickers as it weakens or when its time is nearly up.
 
 ![The Chaos Shield](images/chaos-shield.png)
 
@@ -126,4 +133,4 @@ Other rules of the wall:
 
 ## Numbers you can change
 
-Wanda's flight speed, the beam's damage, range and Nausea, the shield's cost and explosion factor, how far she can lift blocks and how hard they may be, and the Hex's default, smallest and largest radius and its death chance are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration).
+Wanda's flight speed, the beam's damage, range and Nausea, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be, and the Hex's default, smallest and largest radius and its death chance are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration).
