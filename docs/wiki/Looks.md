@@ -60,7 +60,7 @@ Frost Giant is ability 5 (**N**) in every look of Loki.
 |---|---|---|
 | **Thor** (default) | `thor` | 2011 and *The Avengers*: black and silver armour with the six chest discs, red cape. |
 | **Ragnarok** | `ragnarok` | The God of Thunder at the end of *Thor: Ragnarok*: short hair, eyepatch. |
-| **Love and Thunder** | `love_and_thunder` | The suit of most of *Thor: Love and Thunder*: navy, gold and black armour with six black discs, bare arms and a red cape. |
+| **Love and Thunder** | `love_and_thunder` | The suit of most of *Thor: Love and Thunder*: navy, gold and black armour with six black discs, bare arms and a red cape, with long blond hair and a full beard. |
 | **Mighty Thor (Jane Foster)** | `mighty_thor` | Jane Foster as the Mighty Thor. |
 | **Your own skin** | `own` | Thor's powers in your own skin. |
 

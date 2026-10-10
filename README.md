@@ -86,7 +86,8 @@ Every hero except Quicksilver, Tommy and Loki can also fly by double-tapping **S
 Mjolnir or Stormbreaker in hand). With telekinesis, press the key again
 to launch what you hold, or **Sneak** + the key to put it down gently. Keys can be changed
 under *Options → Controls → Enhanced Powers*. The top-left corner of the screen always
-shows your abilities, cooldowns and resources.
+shows your abilities, cooldowns and resources. The heroes' animations and flight effects can
+be turned down in `config/enhanced-client.toml`.
 
 ## Screenshots
 

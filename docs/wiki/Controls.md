@@ -55,6 +55,26 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 
 With telekinesis, pressing the key again **launches** what you hold.
 
+## Thor's beam, shatter and pin, step by step
+
+**The lightning beam (hold V)**
+
+1. Look at what you want to hit.
+2. Press **V** and keep holding it. Lightning shoots from your hand (or from the head of Mjolnir or Stormbreaker, if you hold one) and hits the first creature it meets, again and again, for as long as you hold the key.
+3. Let go of **V** to stop. With Mjolnir or Stormbreaker in hand the beam reaches farther and hits harder, and as the God of Thunder (**B**) harder still. It uses a little food, and it stops when your hunger bar is empty.
+
+**Shattering Mjolnir (Sneak + R)**
+
+1. Hold Mjolnir in your hand, and hold **Sneak** (Shift).
+2. Press **R**. Mjolnir bursts into glowing pieces that fly at the enemies near you, hit them and fly back. If nobody is near, they fly out in a ring and come straight back.
+3. When the last piece is home, Mjolnir is whole in your hand again. Press **R** while it is in pieces to call them home at once. You can shatter it again after 15 seconds. (Stormbreaker doesn't shatter: Sneak + **R** just throws it.)
+
+**Pinning someone down (Sneak + right-click)**
+
+1. Hold Mjolnir in your hand, and hold **Sneak**.
+2. Right-click a creature or player. Mjolnir lies down on their chest and they can't move, jump, fly or teleport.
+3. To lift it again, right-click them again without Sneak, or press **R** to call it back. Only Mjolnir's owner can, and it lets go by itself after a minute. Bosses can't be pinned. See [Thor](Thor).
+
 ## The HUD
 
 The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored).

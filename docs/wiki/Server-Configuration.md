@@ -154,6 +154,23 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 
 The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_modifiers/`) are datapack files too: see [Items and Crafting](Items-and-Crafting).
 
+## Client options: animations and effects
+
+Three options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]` section. Change a value in any text editor while the game is closed:
+
+```toml
+[animation]
+    animations = true
+    reducedMotion = false
+    flightEffects = true
+```
+
+| Option | Setting in the file | Default | What it does |
+|---|---|---|---|
+| Hero animations | `animations` | `true` | The heroes' blended poses, flight, running, abilities and Thor's weapon in his fist. Off: only the usual Minecraft poses. |
+| Reduced motion | `reducedMotion` | `false` | A calmer animation: no hover bob, drift or camera shake, and fainter rings. |
+| Flight effects | `flightEffects` | `true` | Ribbons, rings, wind streaks and shockwaves around flying heroes, and the little flourishes of some abilities. Off: only a few trail particles are left. |
+
 ## Related
 
 * [Commands](Commands): `/enhanced power`, `/enhanced look` and `/enhanced hex`, for operators.

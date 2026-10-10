@@ -28,9 +28,20 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki and Thor) are on [Looks](Looks).
 
+## What's new in 2.2
+
+* **Everyone moves like the character on screen.** New poses for every hero, a flight of his own for every flier, every ability acted out (other players see it too), and trails, rings and wind behind flying heroes. See *Animations and effects* below.
+* **Thor's lightning beam.** Hold **V** and lightning pours from his hand, or from the head of Mjolnir or Stormbreaker: longer and twice as strong through the weapon, stronger still as the God of Thunder. See [Thor](Thor).
+* **Shatter Mjolnir.** **Sneak + R** and Mjolnir bursts into glowing pieces that strike his enemies, then fly back and make it whole in his hand again.
+* **Pin someone with Mjolnir.** **Sneak + right-click** a creature or player and Mjolnir pins them down until its owner lifts it.
+* **A harder Chaos Shield.** It takes 3/4 of a second to form, holds for 8 seconds, has 30 points of strength, shatters when those run out, and needs 6 to 15 seconds to recharge. See [Scarlet Witch](Scarlet-Witch).
+* **The Tesseract awakens Wanda too.** Use it with a Scarlet Witch Gene in your other hand and you become the Scarlet Witch instead of Loki.
+* **Loki's Scepter confuses.** A hit makes a creature forget its target and wander about, and gives a player Nausea and Slowness. See [Loki](Loki).
+* **Thor's Love and Thunder suit, redrawn** to match the film: navy, gold and black armour, long blond hair, a red cape. See [Looks](Looks).
+
 ## Animations and effects
 
-Every hero moves like the character on screen: each flier has a flight of his own (Thor even whirls Mjolnir on its strap while he hovers, with the handle really in his fist), every ability is acted out, and your own hands move in first person. Flying leaves trails, rings and wind behind you, and Thor and Vision can break the sound barrier. The client options *Animations*, *Reduced motion* and *Flight effects* tone it down or turn it off; the details are in [docs/DESIGN.md](https://github.com/yuvalkolodkingal/enhanced/blob/main/docs/DESIGN.md).
+Every hero moves like the character on screen: each flier has a flight of his own (Thor even whirls Mjolnir on its strap while he hovers, with the handle really in his fist), every ability is acted out, and your own hands move in first person. Other players see all of it too. Flying leaves trails, rings and wind behind you, and Thor and Vision can break the sound barrier. The client options *Hero animations*, *Reduced motion* and *Flight effects* tone it down or turn it off: they are in `config/enhanced-client.toml`, see [Server Configuration](Server-Configuration#client-options-animations-and-effects). The details are in [docs/DESIGN.md](https://github.com/yuvalkolodkingal/enhanced/blob/main/docs/DESIGN.md).
 
 ## Download and install
 
