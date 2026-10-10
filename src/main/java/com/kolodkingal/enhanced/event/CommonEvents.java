@@ -33,6 +33,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -258,10 +259,11 @@ public final class CommonEvents {
         }
     }
 
-    /** Only the worthy can pick Mjolnir up. */
+    /** Only the worthy can pick Mjolnir up, and only its owner once it has one. */
     @SubscribeEvent
     public static void onItemPickup(ItemEntityPickupEvent.Pre event) {
-        if (ThorAbilities.isMjolnir(event.getItemEntity().getItem()) && !Worthiness.isWorthy(event.getPlayer())) {
+        ItemStack stack = event.getItemEntity().getItem();
+        if (ThorAbilities.isMjolnir(stack) && !Worthiness.canLift(event.getPlayer(), stack)) {
             event.setCanPickup(TriState.FALSE);
         }
     }

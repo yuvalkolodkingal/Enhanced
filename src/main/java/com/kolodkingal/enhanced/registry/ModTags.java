@@ -15,7 +15,7 @@ public final class ModTags {
     public static final TagKey<Item> MAGNETIC_ITEMS = TagKey.create(Registries.ITEM, Enhanced.id("magnetic"));
     /** Weapons: what Tommy's Disarm Blitz snatches from players. */
     public static final TagKey<Item> WEAPONS = TagKey.create(Registries.ITEM, Enhanced.id("weapons"));
-    /** Items no speedster can snatch (Mjolnir is far too heavy for the unworthy). */
+    /** Items no speedster can snatch (Mjolnir is far too heavy for anyone but its owner). */
     public static final TagKey<Item> CANNOT_BE_SNATCHED = TagKey.create(Registries.ITEM, Enhanced.id("cannot_be_snatched"));
     /** Extra items that can be melted into shrapnel (18 shards each). */
     public static final TagKey<Item> SHRAPNEL_AMMO = TagKey.create(Registries.ITEM, Enhanced.id("shrapnel_ammo"));

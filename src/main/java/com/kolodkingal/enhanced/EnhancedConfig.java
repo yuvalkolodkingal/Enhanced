@@ -66,6 +66,7 @@ public final class EnhancedConfig {
     // ---- Thor ----
     public static final ModConfigSpec.DoubleValue THOR_FLIGHT_SPEED;
     public static final ModConfigSpec.BooleanValue MJOLNIR_ANYONE_WORTHY;
+    public static final ModConfigSpec.BooleanValue MJOLNIR_OWNER_ONLY;
     public static final ModConfigSpec.DoubleValue MJOLNIR_THROW_DAMAGE;
     public static final ModConfigSpec.DoubleValue STORMBREAKER_THROW_DAMAGE;
     public static final ModConfigSpec.IntValue MJOLNIR_THROW_RANGE;
@@ -175,8 +176,13 @@ public final class EnhancedConfig {
         THOR_FLIGHT_SPEED = BUILDER.comment("Thor's flying speed while he holds Mjolnir or Stormbreaker (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.11, 0.01, 0.5);
         MJOLNIR_ANYONE_WORTHY = BUILDER.comment("If true, everyone is worthy of Mjolnir. If false (the default), only Thor, Vision,",
-                        "Creative players and those who have earned the Hero of the Village advancement can lift it.")
+                        "Creative players and those who have earned the Hero of the Village advancement are worthy: they can",
+                        "claim a Mjolnir nobody owns yet (see mjolnirOwnerOnly), and lift it.")
                 .define("anyoneWorthy", false);
+        MJOLNIR_OWNER_ONLY = BUILDER.comment("If true (the default), each Mjolnir belongs to the first worthy player who lifts it, and",
+                        "only they can lift it from then on (Creative and Spectator players always can, without taking it).",
+                        "If false, Mjolnirs are never claimed: the old rule, where any worthy player can lift any Mjolnir.")
+                .define("mjolnirOwnerOnly", true);
         MJOLNIR_THROW_DAMAGE = BUILDER.comment("Damage of a thrown Mjolnir, both ways.")
                 .defineInRange("throwDamage", 10.0, 0.0, 100.0);
         STORMBREAKER_THROW_DAMAGE = BUILDER.comment("Damage of a thrown Stormbreaker, both ways.")

@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlockEntities;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModCreativeTab;
+import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -29,6 +30,7 @@ public class Enhanced {
 
     public Enhanced(IEventBus modBus, ModContainer container) {
         ModArmorMaterials.ARMOR_MATERIALS.register(modBus);
+        ModDataComponents.DATA_COMPONENTS.register(modBus);
         ModBlocks.BLOCKS.register(modBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modBus);
         ModItems.ITEMS.register(modBus);

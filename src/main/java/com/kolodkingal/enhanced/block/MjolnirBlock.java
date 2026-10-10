@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.block;
 
 import com.kolodkingal.enhanced.ability.Worthiness;
+import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.mojang.serialization.MapCodec;
@@ -36,7 +37,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Mjolnir at rest, standing on its head with the handle up, like in the crater in New Mexico. Nothing can break it,
- * blow it up or push it; only the worthy can lift it (right click), and it remembers exactly which hammer it is.
+ * blow it up or push it; only its owner can lift it (right click; the first worthy player to lift an unclaimed one
+ * claims it, see {@link Worthiness}), and it remembers exactly which hammer it is, owner and all.
  */
 public class MjolnirBlock extends BaseEntityBlock {
     public static final MapCodec<MjolnirBlock> CODEC = simpleCodec(MjolnirBlock::new);
@@ -78,9 +80,14 @@ public class MjolnirBlock extends BaseEntityBlock {
         return true;
     }
 
-    /** Takes the hammer out of the world (a worthy player lifted it, or Thor called it). */
+    /** The hammer resting at {@code pos}, without lifting it. */
+    public static ItemStack hammerAt(BlockGetter level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof MjolnirBlockEntity be ? be.hammer() : new ItemStack(ModItems.MJOLNIR.get());
+    }
+
+    /** Takes the hammer out of the world (its owner lifted it, or Thor called it). */
     public static ItemStack lift(Level level, BlockPos pos) {
-        ItemStack hammer = level.getBlockEntity(pos) instanceof MjolnirBlockEntity be ? be.hammer() : new ItemStack(ModItems.MJOLNIR.get());
+        ItemStack hammer = hammerAt(level, pos);
         level.removeBlock(pos, false);
         return hammer;
     }
@@ -90,12 +97,16 @@ public class MjolnirBlock extends BaseEntityBlock {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
-        if (!Worthiness.isWorthy(player)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.unworthy").withStyle(ChatFormatting.GRAY), true);
+        ItemStack resting = hammerAt(level, pos);
+        if (!Worthiness.canLift(player, resting)) {
+            MjolnirOwner owner = Worthiness.ownerKeepingFrom(player, resting);
+            player.displayClientMessage((owner != null ? Component.translatable("message.enhanced.mjolnir.not_yours", owner.name())
+                    : Component.translatable("message.enhanced.mjolnir.unworthy")).withStyle(ChatFormatting.GRAY), true);
             level.playSound(null, pos, SoundEvents.ANVIL_PLACE, SoundSource.BLOCKS, 0.3F, 0.5F);
             return InteractionResult.CONSUME;
         }
         ItemStack hammer = lift(level, pos);
+        Worthiness.claim(player, hammer);
         if (player.getMainHandItem().isEmpty()) {
             player.setItemInHand(InteractionHand.MAIN_HAND, hammer);
         } else if (!player.getInventory().add(hammer)) {

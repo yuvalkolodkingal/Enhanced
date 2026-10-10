@@ -163,7 +163,7 @@ public final class Telekinesis {
             return false;
         }
         if (e instanceof ItemEntity item && item.getItem().is(ModTags.CANNOT_BE_SNATCHED)) {
-            // Mjolnir: no power but worthiness can lift it.
+            // Mjolnir: no power can lift it, only its owner's own hands.
             return false;
         }
         return switch (mode) {

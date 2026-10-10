@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.entity;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -200,9 +201,10 @@ public class ThrownWeaponEntity extends Projectile {
                 && Powers.is(player, Power.THOR) ? player : null;
     }
 
-    /** Back in Thor's hand (or his inventory, if his hand is full). */
+    /** Back in Thor's hand (or his inventory, if his hand is full). A Mjolnir nobody owned yet is his from now on. */
     private void catchBy(ServerPlayer thor) {
         ItemStack weapon = weapon().copy();
+        Worthiness.claim(thor, weapon);
         if (thor.getMainHandItem().isEmpty()) {
             thor.setItemInHand(InteractionHand.MAIN_HAND, weapon);
         } else if (!thor.getInventory().add(weapon)) {
