@@ -342,7 +342,7 @@ public final class WorldEffectsRenderer {
             Vec3 up = right.cross(look).normalize();
             return eye.add(look.scale(0.9)).add(up.scale(0.24));
         }
-        return eye.add(look.scale(0.28)).add(0, 0.18, 0);
+        return BodyLean.follow(player, eye, partialTick).add(look.scale(0.28)).add(0, 0.18, 0);
     }
 
     /** Where energy leaves the player's hands: in front of the chest, or bottom-right of the screen in first person. */
@@ -356,7 +356,7 @@ public final class WorldEffectsRenderer {
             Vec3 up = right.cross(look).normalize();
             return eye.add(look.scale(0.55)).add(right.scale(0.2)).add(up.scale(-0.22));
         }
-        return eye.add(0, -0.3, 0).add(look.scale(0.75));
+        return BodyLean.follow(player, eye, partialTick).add(0, -0.3, 0).add(look.scale(0.75));
     }
 
     private WorldEffectsRenderer() {

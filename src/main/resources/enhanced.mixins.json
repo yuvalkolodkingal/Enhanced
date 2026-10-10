@@ -8,12 +8,14 @@
   ],
   "client": [
     "client.AbstractClientPlayerMixin",
+    "client.CapeLayerMixin",
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.MinecraftMixin",
     "client.ParticleEngineMixin",
     "client.ParticleMixin",
-    "client.PlayerModelMixin"
+    "client.PlayerModelMixin",
+    "client.PlayerRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

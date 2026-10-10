@@ -93,6 +93,8 @@ public final class Afterimages {
             poseStack.pushPose();
             poseStack.translate(offset.x, offset.y, offset.z);
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
+            // The ghosts lean into the run like the runner does.
+            BodyLean.transform(poseStack, player);
             poseStack.scale(-0.9375F, -0.9375F, 0.9375F);
             poseStack.translate(0.0F, -1.501F, 0.0F);
             model.renderToBuffer(poseStack, vc, event.getPackedLight(), OverlayTexture.NO_OVERLAY, alpha << 24 | ghostColor(player));

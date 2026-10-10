@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
@@ -24,16 +25,36 @@ import net.minecraft.world.phys.Vec3;
  *     <li>Scarlet Witch: both hands thrust forward and trembling while the Chaos Beam pours out; arms open and
  *     swaying, legs together, while she floats; one hand raised and twitching while she holds something.</li>
  *     <li>Magneto: an outstretched, steady hand aimed at whatever he controls or shoots; regal, arms-low hover.</li>
- *     <li>Quicksilver: leaning into the run with exaggerated, blurring arm swings.</li>
- *     <li>Vision: upright, composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
+ *     <li>Quicksilver: a bigger, faster stride and arm swing while he runs, on top of the lean of
+ *     {@link BodyLean}.</li>
+ *     <li>Tommy: the same stride, bigger and faster than a sprint.</li>
+ *     <li>Vision: composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
  *     weightless while phased.</li>
+ *     <li>Thor: his weapon held to the sky as he hovers, and thrust ahead of him, Superman style, as he leans into the
+ *     flight.</li>
  *     <li>Loki: a throwing arm after each dagger, a raised open hand as he vanishes or changes shape, and arms held
  *     slightly out in his Frost Giant form.</li>
  *     <li>Billy: his casting hand thrust forward for a Hex Bolt; both hands raised and trembling while he holds creatures
  *     spellbound; calm and weightless in flight, hands open.</li>
  * </ul>
+ * A flying hero's whole body leans forward and banks ({@link BodyLean}); the poses that aim at something in the world
+ * make up for the lean, so a hand still points where the hero looks, and the head tilts back to keep looking ahead.
  */
 public final class HeroPoses {
+    /** How much bigger and faster than vanilla's stride a speedster's arms and legs swing at a run. */
+    private static final float RUN_ARM_SWING = 1.7F;
+    private static final float RUN_LEG_SWING = 1.1F;
+    private static final float RUN_CADENCE = 1.4F;
+    /** The part of the body's forward pitch the head tilts back by (vanilla's glide and swim tilt it by half). */
+    private static final float HEAD_COMPENSATION = 0.6F;
+    /** Thor's weapon arm as a world direction, in radians from straight down: to the sky hovering, ahead at speed. */
+    private static final float THOR_ARM_HOVER = 2.75F;
+    private static final float THOR_ARM_FLIGHT = 1.75F;
+    /** The forward pitch of Thor's body at full speed, radians. */
+    private static final float THOR_FULL_PITCH = 80.0F * Mth.DEG_TO_RAD;
+
+    /** The forward pitch (radians) the body is drawn with, for the poses that aim at the world; set by each call. */
+    private static float bodyPitch;
 
     public static void apply(PlayerModel<?> model, LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks) {
         // The first-person hand is drawn with an all-zero animation call: leave it alone.
@@ -52,6 +73,7 @@ public final class HeroPoses {
         boolean airborne = data.flying() && !player.onGround();
         boolean holding = data.heldEntityId() != -1;
         float t = ageInTicks;
+        bodyPitch = BodyLean.pitch(player);
 
         if (airborne) {
             hover(model, t, power);
@@ -98,13 +120,7 @@ public final class HeroPoses {
             }
             case QUICKSILVER -> {
                 if (data.slowMo()) {
-                    lean(model, 0.35F);
-                    // Pumping arms, bigger and faster than a normal sprint.
-                    float swing = Mth.cos(limbSwing * 0.6662F * 1.4F) * 1.6F * Math.max(limbSwingAmount, 0.6F);
-                    model.rightArm.xRot = swing + 0.3F;
-                    model.leftArm.xRot = -swing + 0.3F;
-                    model.rightArm.zRot = 0.1F;
-                    model.leftArm.zRot = -0.1F;
+                    sprintStride(model, limbSwing, limbSwingAmount);
                 }
             }
             case VISION -> {
@@ -134,12 +150,7 @@ public final class HeroPoses {
             }
             case TOMMY -> {
                 if (data.is(Live.SPEEDING)) {
-                    lean(model, 0.3F);
-                    float swing = Mth.cos(limbSwing * 0.6662F * 1.4F) * 1.5F * Math.max(limbSwingAmount, 0.6F);
-                    model.rightArm.xRot = swing + 0.3F;
-                    model.leftArm.xRot = -swing + 0.3F;
-                    model.rightArm.zRot = 0.1F;
-                    model.leftArm.zRot = -0.1F;
+                    sprintStride(model, limbSwing, limbSwingAmount);
                 } else if (data.is(Live.WHIRLWIND)) {
                     // The real Tommy is a blur in the eye of the storm: arms out, spinning.
                     model.rightArm.zRot = 1.3F + Mth.sin(t * 0.8F) * 0.1F;
@@ -152,7 +163,7 @@ public final class HeroPoses {
                 Entity hammer = data.hammerEntityId() != -1 ? player.level().getEntity(data.hammerEntityId()) : null;
                 if (data.is(Live.CALLING_LIGHTNING)) {
                     // His weapon raised to the sky, catching the lightning.
-                    main.xRot = -Mth.PI + 0.1F + Mth.sin(t * 2.1F) * 0.03F;
+                    main.xRot = -Mth.PI + 0.1F - bodyPitch + Mth.sin(t * 2.1F) * 0.03F;
                     main.yRot = 0.0F;
                     main.zRot = 0.1F * side;
                     off.zRot += 0.25F * -side;
@@ -167,12 +178,11 @@ public final class HeroPoses {
                     pointAt(main, player, flying.position(), t);
                     off.zRot += 0.15F * -side;
                 } else if (airborne) {
-                    // Flying behind his weapon: hovering, it is held up to the sky; at speed the arm swings forward to lead
-                    // the way. The other arm trails back.
-                    double dx = player.getX() - player.xOld;
-                    double dz = player.getZ() - player.zOld;
-                    float speed = Mth.clamp((float) Math.sqrt(dx * dx + dz * dz) / 0.6F, 0.0F, 1.0F);
-                    main.xRot = Mth.lerp(speed, -2.75F, -1.85F) + Mth.sin(t * 0.2F) * 0.04F;
+                    // Flying behind his weapon like Superman: hovering, it is held up to the sky; as his body leans
+                    // into the flight the arm stretches out ahead of him to lead the way. The other arm trails back.
+                    float ahead = Mth.clamp(bodyPitch / THOR_FULL_PITCH, 0.0F, 1.0F);
+                    float inWorld = Mth.lerp(ahead, THOR_ARM_HOVER, THOR_ARM_FLIGHT);
+                    main.xRot = -(inWorld + bodyPitch) + Mth.sin(t * 0.2F) * 0.04F;
                     main.yRot = 0.0F;
                     main.zRot = 0.0F;
                     off.xRot = 0.35F;
@@ -230,6 +240,8 @@ public final class HeroPoses {
             case NONE -> {
             }
         }
+        // The head keeps looking ahead as the body tips forward.
+        model.head.xRot -= bodyPitch * HEAD_COMPENSATION;
         sync(model);
     }
 
@@ -249,20 +261,20 @@ public final class HeroPoses {
         return best;
     }
 
-    /** Points an arm at a spot in the world, relative to the body's facing, with a faint strain. */
+    /** Points an arm at a spot in the world, relative to the body's facing and lean, with a faint strain. */
     private static void pointAt(ModelPart arm, Player player, Vec3 target, float t) {
         Vec3 d = target.subtract(player.getEyePosition());
         float yaw = (float) (Mth.atan2(d.z, d.x) * Mth.RAD_TO_DEG) - 90.0F;
         float pitch = (float) -(Mth.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * Mth.RAD_TO_DEG);
         float relYaw = Mth.wrapDegrees(yaw - player.yBodyRot);
-        arm.xRot = -Mth.HALF_PI + pitch * Mth.DEG_TO_RAD + Mth.sin(t * 1.7F) * 0.02F;
+        arm.xRot = -Mth.HALF_PI + pitch * Mth.DEG_TO_RAD - bodyPitch + Mth.sin(t * 1.7F) * 0.02F;
         arm.yRot = Mth.clamp(relYaw, -80.0F, 80.0F) * Mth.DEG_TO_RAD;
         arm.zRot = 0.0F;
     }
 
-    /** Points an arm along the head's direction, with an optional tremble. */
+    /** Points an arm along the way the hero looks (not the way a leaning body faces), with an optional tremble. */
     private static void aim(PlayerModel<?> model, ModelPart arm, float yaw, float t, float tremble) {
-        arm.xRot = -Mth.HALF_PI + model.head.xRot + Mth.sin(t * 1.7F) * tremble;
+        arm.xRot = -Mth.HALF_PI + model.head.xRot - bodyPitch + Mth.sin(t * 1.7F) * tremble;
         arm.yRot = model.head.yRot + yaw;
         arm.zRot = Mth.cos(t * 1.3F) * tremble;
     }
@@ -282,18 +294,28 @@ public final class HeroPoses {
         }
     }
 
-    /** Leans the whole body forward (a lighter version of vanilla's crouch geometry). */
-    private static void lean(PlayerModel<?> model, float amount) {
-        float k = amount / 0.5F;
-        model.body.xRot = amount;
-        model.body.y = 3.2F * k;
-        model.head.y = 4.2F * k;
-        model.rightArm.y = 2.0F + 3.2F * k;
-        model.leftArm.y = 2.0F + 3.2F * k;
-        model.rightLeg.z = 4.0F * k;
-        model.leftLeg.z = 4.0F * k;
-        model.rightLeg.y = 12.0F + 0.2F * k;
-        model.leftLeg.y = 12.0F + 0.2F * k;
+    /**
+     * A speedster's stride: the vanilla swing of the arms and legs, bigger and faster, added on top of whatever else
+     * they are doing (an item in hand halves the swing, as in vanilla). It rides on the vanilla swing's own amount, so
+     * it is still while he stands. The forward lean of the run is the whole body's, see {@link BodyLean}.
+     */
+    private static void sprintStride(PlayerModel<?> model, float limbSwing, float limbSwingAmount) {
+        float slow = limbSwing * 0.6662F;
+        float fast = slow * RUN_CADENCE;
+        // Vanilla swings the right arm with cos(slow + pi) and the left with cos(slow), by 2 * 0.5 * limbSwingAmount;
+        // the right leg with cos(slow) and the left with cos(slow + pi), by 1.4 * limbSwingAmount.
+        float arms = limbSwingAmount;
+        float legs = 1.4F * limbSwingAmount;
+        model.rightArm.xRot += armShare(model.rightArmPose)
+                * (Mth.cos(fast + Mth.PI) * RUN_ARM_SWING - Mth.cos(slow + Mth.PI)) * arms;
+        model.leftArm.xRot += armShare(model.leftArmPose) * (Mth.cos(fast) * RUN_ARM_SWING - Mth.cos(slow)) * arms;
+        model.rightLeg.xRot += (Mth.cos(fast) * RUN_LEG_SWING - Mth.cos(slow)) * legs;
+        model.leftLeg.xRot += (Mth.cos(fast + Mth.PI) * RUN_LEG_SWING - Mth.cos(slow + Mth.PI)) * legs;
+    }
+
+    /** How much of the vanilla swing an arm has: all of it empty-handed, half with an item, none in any other pose. */
+    private static float armShare(ArmPose pose) {
+        return pose == ArmPose.EMPTY ? 1.0F : pose == ArmPose.ITEM ? 0.5F : 0.0F;
     }
 
     /** Overlay parts (hat, sleeves, jacket, trousers) follow the parts they cover. */

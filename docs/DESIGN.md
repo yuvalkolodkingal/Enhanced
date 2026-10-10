@@ -29,6 +29,7 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
 | Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
+| Flight and run animation **(added)** | A flying hero leans into the flight like a superhero: upright while hovering, up to about 60° forward at full speed (Thor up to about 80°, flying behind his weapon), tilting a little further in a dive and back when climbing, and banking up to about 15° into turns. Quicksilver in Quicksilver Time and Tommy at super speed lean forward about 20° and swing their arms and legs bigger and faster. It is all smoothed, so nothing snaps, and other players see it too. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
 | Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, the TVA Loki, Mighty Thor... Press **H** to change look (**Sneak + H** goes back). A look changes only how the hero looks and the colour of his energy: the abilities are the same in every look. Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
 | MCU colours **(added)** | Every power's light and colour follows the films and shows (section 9). |
@@ -372,7 +373,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | R (hold) | **Mind Stone Beam** | A pale gold beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. |
-| 2 | G (toggle) | **Flight** | Survival flight at 0.08, upright and calm. |
+| 2 | G (toggle) | **Flight** | Survival flight at 0.08, calm and composed. |
 | 3 | V (toggle) | **Phase** | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you're only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
 | 4 | B (toggle) | **Density** | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Phasing ends density, and you can't turn dense while phased. |
 | 5 | N (toggle) | **Human Disguise** | Take on the human look from *WandaVision*: a 1950s sitcom husband in a shirt, tie and cardigan. Only the looks change. |
