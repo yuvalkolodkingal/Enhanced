@@ -60,9 +60,9 @@ A hero who uses the Tesseract does not become anyone else: they are simply taken
 
 ### Thor
 
-1. Craft **Mjolnir**. A freshly crafted Mjolnir belongs to nobody.
-2. Be **worthy**: Thor himself, **Vision**, anyone who has proven themselves a hero by **saving a village from a raid** (the *Hero of the Village* advancement), or everyone, if the server option `thor.anyoneWorthy` is on. Creative and Spectator players can always lift any Mjolnir.
-3. **Lift it.** The first worthy player who lifts a Mjolnir **claims it**: from then on only its owner can lift it, and its tooltip says "Bound to" followed by the owner's name.
-4. If you have no other power, lightning strikes and you become **Thor**. A Vision who lifts Mjolnir fights with it but stays Vision.
+1. Craft **Mjolnir**. A Mjolnir nobody has claimed yet belongs to nobody.
+2. Be **worthy**: Thor himself, **Vision**, anyone who has proven themselves a hero by **saving a village from a raid** (the *Hero of the Village* advancement), a player in Creative or Spectator mode, or everyone, if the server option `thor.anyoneWorthy` is on.
+3. **Lift it.** The first worthy player who lifts a Mjolnir **claims it** (a worthy player who forges one claims it at once): from then on only its owner can lift it, and its tooltip says "Bound to" followed by the owner's name.
+4. If you have no other power, lightning strikes and you become **Thor**. A Vision who claims Mjolnir fights with it but stays Vision.
 
 Everyone else finds Mjolnir far too heavy: it slips out of their hands. See [Thor](Thor) for the details, including the server option that turns ownership off.

@@ -1,6 +1,6 @@
 # Items and Crafting
 
-Every item of the mod is in the **Enhanced** creative tab. Seven are crafted, and three are found in chests (or dropped). In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
+Every item you can use is in the **Enhanced** creative tab. Seven are crafted, and three are found in chests (or dropped). In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
 
 ## Crafted items
 
@@ -93,7 +93,7 @@ H = Heavy Core
 R = Breeze Rod
 ```
 
-Only the worthy can lift it, and it is bound to the first worthy player who does. 10 attack damage (slow, like an axe), never breaks, fire and lava can't hurt it. See [Thor](Thor).
+Only the worthy can lift it, and it is bound to the first worthy player who does (its tooltip says "Unclaimed" until then, and "Bound to" and the owner's name after). 10 attack damage (slow, like an axe), never breaks, fire and lava can't hurt it. See [Thor](Thor).
 
 ### Stormbreaker
 

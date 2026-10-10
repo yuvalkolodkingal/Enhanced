@@ -28,14 +28,14 @@ The Tesseract makes you Loki only if you have **no power**. A hero who uses it i
 
 There are two reasons:
 
-1. **You are not worthy.** Only Thor, Vision, anyone with the *Hero of the Village* advancement (save a village from a raid) and Creative or Spectator players can lift it, unless the server turned on `thor.anyoneWorthy`, which makes everybody worthy.
+1. **You are not worthy.** Only Thor, Vision, anyone with the *Hero of the Village* advancement (save a village from a raid) and Creative or Spectator players are worthy, unless the server turned on `thor.anyoneWorthy`, which makes everybody worthy.
 2. **It is bound to someone else.** The first worthy player who lifts a Mjolnir claims it, and from then on only that player can lift it. Its tooltip says "Bound to" followed by the owner's name. Anyone else finds it far too heavy, and it slips out of their hands.
 
-A Mjolnir that you crafted yourself belongs to nobody until a worthy player lifts it, so as soon as you are worthy, it is yours.
+A Mjolnir nobody has claimed yet (its tooltip says "Unclaimed") belongs to the first worthy player who lifts it. If you are worthy and forge one yourself, it is yours the moment you take it from the table. If you are not worthy, it stays unclaimed and slips out of your hands: leave it on the ground for a worthy player to claim.
 
 ### Can I use a Mjolnir that belongs to someone else?
 
-Not in Survival. Creative and Spectator players can always lift any Mjolnir without becoming its owner, so an operator can move one that way. A server that does not want owners at all can set `thor.mjolnirOwnerOnly` to `false` in the [server config](Server-Configuration).
+Not in Survival. Creative and Spectator players can always lift any Mjolnir that has an owner, without taking it over, so an operator can move one that way. A server that does not want owners at all can set `thor.mjolnirOwnerOnly` to `false` in the [server config](Server-Configuration).
 
 ### Is Stormbreaker bound to an owner too?
 
@@ -43,7 +43,7 @@ No. Anyone can wield Stormbreaker, and anyone who holds it can call the Bifrost.
 
 ### Can Thor call back someone else's Mjolnir?
 
-No. Thor's recall never takes a Mjolnir that is bound to someone else.
+No. Thor's recall never takes a Mjolnir that is bound to someone else: he calls his own, one nobody owns yet, or Stormbreaker.
 
 ## Abilities and keys
 

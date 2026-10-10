@@ -19,9 +19,11 @@ on:
 permissions:
   contents: write
 
-# Two runs never push at once: a second run waits for the first (and replaces any run still waiting behind it).
+# Two runs never push at once: a second run of the same branch waits for the first (and replaces any run still waiting
+# behind it, which is fine: the newest run publishes the newest pages). Only main publishes, and a manual run from
+# another branch has a group of its own, so it can never push out a waiting run of main.
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -36,6 +38,9 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v5
+        with:
+          # Nothing here pushes to this repository, so the job's token is not left in its git config.
+          persist-credentials: false
 
       - name: Clone the wiki
         env:

@@ -103,8 +103,8 @@ Section `[thor]`. The hero's page is [Thor](Thor).
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `thor.flightSpeed` | `0.11` | 0.01 to 0.5 | Thor's flying speed while he holds Mjolnir or Stormbreaker (Creative flight is 0.05). |
-| `thor.anyoneWorthy` | `false` | `true` or `false` | If `true`, everyone is worthy of Mjolnir. If `false` (the default), only Thor, Vision and those who have earned the *Hero of the Village* advancement are worthy. (Creative and Spectator players can always lift any Mjolnir.) |
-| `thor.mjolnirOwnerOnly` | `true` | `true` or `false` | If `true` (the default), Mjolnir is bound to the first worthy player who lifts it, and from then on only its owner can lift it. If `false`, nobody owns Mjolnir: any worthy player can lift any Mjolnir. Stormbreaker is never bound to anyone. |
+| `thor.anyoneWorthy` | `false` | `true` or `false` | If `true`, everyone is worthy of Mjolnir. If `false` (the default), only Thor, Vision, Creative and Spectator players and those who have earned the *Hero of the Village* advancement are worthy: they can claim a Mjolnir nobody owns yet, and lift it. |
+| `thor.mjolnirOwnerOnly` | `true` | `true` or `false` | If `true` (the default), each Mjolnir belongs to the first worthy player who lifts it, and only they can lift it from then on (Creative and Spectator players always can, without taking it). If `false`, Mjolnirs are never claimed: the old rule, where any worthy player can lift any Mjolnir. Stormbreaker is never bound to anyone. |
 | `thor.throwDamage` | `10.0` | 0.0 to 100.0 | Damage of a thrown Mjolnir, both ways. |
 | `thor.stormbreakerThrowDamage` | `12.0` | 0.0 to 100.0 | Damage of a thrown Stormbreaker, both ways. |
 | `thor.throwRange` | `40` | 4 to 128 | How far (in blocks) a thrown Mjolnir or Stormbreaker flies before it turns back. |
@@ -122,7 +122,7 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 |---|---|---|
 | `enhanced:magnetic` | item | Items that count as metal: what Magneto's telekinesis can lift when dropped, and what Armor & Weapon Strip takes from a hand. |
 | `enhanced:magnetic_armor` | item | Armor that makes its wearer a target of Magneto's telekinesis, and that Armor & Weapon Strip takes. |
-| `enhanced:shrapnel_ammo` | item | Tools, weapons and armor the Shrapnel Storm can melt into shards (18 each). |
+| `enhanced:shrapnel_ammo` | item | Iron and chainmail tools, weapons and armor, and other iron items (shears, buckets, chains, bars, doors), that the Shrapnel Storm can melt into shards (18 each). |
 | `enhanced:weapons` | item | What Tommy's Disarm Blitz takes from players. |
 | `enhanced:cannot_be_snatched` | item | Items that speedsters can't snatch (Mjolnir). |
 | `enhanced:magnetic_entities` | entity type | Creatures and vehicles made of metal that Magneto can lift (the Iron Golem, minecarts). |

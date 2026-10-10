@@ -57,4 +57,4 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced l
 ## Related
 
 * Balance numbers are in the server config: [Server Configuration](Server-Configuration).
-* Creative and Spectator players are never killed by the Mind Stone or the Hex wall, and can lift any Mjolnir without owning it. See [FAQ](FAQ).
+* Creative and Spectator players are never killed by the Mind Stone or the Hex wall, and can lift any Mjolnir without taking it over. See [FAQ](FAQ).

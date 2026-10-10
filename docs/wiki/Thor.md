@@ -21,38 +21,37 @@ Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire a
 
 ### The worthy
 
-Only the worthy can lift Mjolnir:
+Only the worthy can lift a Mjolnir nobody owns yet:
 
 * **Thor** himself,
 * **Vision**, who lifted it in *Age of Ultron*,
 * anyone who has proven themselves a hero by **saving a village from a raid** (the *Hero of the Village* advancement),
+* players in **Creative or Spectator** mode,
 * or **everyone**, if the server option `thor.anyoneWorthy` is turned on.
-
-Players in Creative or Spectator mode can always lift any Mjolnir (see below).
 
 ### Mjolnir is bound to its owner
 
-* **A freshly crafted Mjolnir belongs to nobody.** The **first worthy player who lifts it claims it**. From then on, **only its owner can lift it**.
-* The tooltip says **"Bound to"** followed by the owner's name.
-* **Anyone else** finds it far too heavy: it slips out of their hands and falls at their feet. They can't pick it up, and they can't lift it from the ground where it rests.
-* **Thor's recall never takes someone else's Mjolnir**, wherever it is.
-* **Creative and Spectator players can always lift any Mjolnir**, and doing so does not make them its owner.
+* **A Mjolnir nobody has claimed yet (a freshly forged one, or one from the Creative tab) belongs to nobody.** The **first worthy player to lift it claims it, for good**: when it comes into their inventory or hand, when they lift it off the ground, when they forge it, or when Thor calls it to himself. "Mjolnir is yours now: only you can lift it." From then on, **only its owner can lift it**: not another Hero of the Village, not Vision, not another Thor.
+* The tooltip says **"Bound to"** followed by the owner's name, or **"Unclaimed: the first worthy hand to lift it claims it"** until someone claims it.
+* **Anyone else** finds it far too heavy: in their inventory it slips out of their hands and falls at their feet ("Mjolnir slips from your grasp: only Steve can lift it", with the owner's name). They can't pick it up, and where it rests as a block it won't budge for them ("It won't budge. Only Steve can lift it.").
+* **Thor's recall never takes someone else's Mjolnir**, wherever it is. He calls his own, a Mjolnir nobody owns yet (he claims it when it reaches him), or Stormbreaker.
+* **Creative and Spectator players can still lift any Mjolnir**, so an operator can move one, but holding someone else's never changes its owner. A Creative player who lifts a Mjolnir that nobody owns claims it like any other worthy player; a Spectator never does.
 * **Stormbreaker is not affected.** Anyone can wield it.
-* A server can turn ownership off with `thor.mjolnirOwnerOnly` (on by default). With it off, Mjolnir is bound to nobody: any worthy player can lift any Mjolnir. See [Server Configuration](Server-Configuration).
+* A server can turn ownership off with `thor.mjolnirOwnerOnly` (on by default). With it off, Mjolnirs are never claimed: any worthy player can lift any Mjolnir. See [Server Configuration](Server-Configuration).
 
 | Who | A Mjolnir nobody owns | A Mjolnir bound to someone else |
 |---|---|---|
 | A worthy player | Lifts it and becomes its owner | Can't lift it |
-| A player who is not worthy | Can't lift it | Can't lift it |
-| A Creative or Spectator player | Lifts it, without becoming its owner | Lifts it |
+| A player who is not worthy | Can't lift it (it slips away unclaimed) | Can't lift it |
+| A Creative player | Lifts it and becomes its owner, like any worthy player | Lifts it, and it stays its owner's |
 
 ### Where Mjolnir rests
 
-A dropped Mjolnir lands and stands on its head, handle up, like in the crater in New Mexico: a block that **nothing can break, blow up or push**. It never despawns before it lands. Only someone who may lift it can pick it up again (right-click). Thor can set it down himself with **Sneak + right-click** on a block.
+A dropped Mjolnir lands and stands on its head, handle up, like in the crater in New Mexico: a block that **nothing can break, blow up or push**, and that remembers whose it is. It never despawns before it lands. Only its owner can lift it again (right-click). Thor can set it down himself with **Sneak + right-click** on a block.
 
 ### Becoming Thor
 
-The first time a worthy player with no other power lifts Mjolnir, lightning strikes and they **become Thor**. Vision can lift it and fight with it, but stays Vision.
+The first time a worthy player with no other power lifts (and so claims) a Mjolnir nobody owned, or lifts their own, lightning strikes and they **become Thor**. Vision can claim it and fight with it, but stays Vision.
 
 ## Stormbreaker
 
@@ -79,7 +78,7 @@ Stormbreaker carries no enchantment of worthiness: **anyone can wield it**, and 
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | **R** | Throw / Call Back | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player, and never a Mjolnir bound to someone else). |
+| 1 | **R** | Throw / Call Back | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player, and never another player's Mjolnir: he calls his own, one nobody owns yet, or Stormbreaker). |
 | 2 | **G** (toggle) | Flight | Thor flies by spinning his weapon: only with Mjolnir or Stormbreaker in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. You can also double-tap **Space**. |
 | 3 | **V** | Lightning | He raises his weapon and lightning pours down into it from the sky and leaps to what he looks at, up to 64 blocks away: 8 damage there and less to everything within 3 blocks, with the usual effects of lightning on creatures (creepers become charged, pigs turn into zombified piglins), but no fire on blocks. Without a weapon he can still call it, straight from the sky. Cooldown 1.5 seconds. |
 | 4 | **B** (toggle) | God of Thunder | From *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon arcs too, and each Lightning strikes three times. It burns hunger; with an empty hunger bar the thunder calms. |

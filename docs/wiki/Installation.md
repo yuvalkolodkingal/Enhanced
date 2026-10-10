@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Minecraft** | Java Edition 1.21.1 |
-| **Mod loader** | NeoForge 21.1.256 or newer (any 21.1.x build for Minecraft 1.21.1) |
+| **Mod loader** | NeoForge 21.1.256 or newer (the 21.1.x line is the one for Minecraft 1.21.1) |
 | **Java** | 21 (the Minecraft launcher already includes it) |
 | **Install it on** | The client, and the server too for multiplayer |
 

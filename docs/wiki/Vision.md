@@ -26,7 +26,7 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 * His second look is **White Vision**: the same body drained of colour, chalk white with glowing pale cyan eyes and no Mind Stone, only an empty hexagonal socket of copper circuitry in his forehead. His beam is pale cyan-white instead of gold, and he phases in a white aura. Press **H** to switch (see [Looks](Looks)).
 * **Max health 30** (15 hearts) and **8 armor** from his vibranium body.
 * He never gets hungry and never runs out of air.
-* Vision is one of the heroes who can lift Mjolnir. He fights with it, but stays Vision. See [Thor](Thor).
+* Vision is one of the worthy: he can claim a Mjolnir nobody owns yet, and fight with it, but he stays Vision. See [Thor](Thor).
 
 ## Abilities
 
