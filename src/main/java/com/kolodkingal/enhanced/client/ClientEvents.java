@@ -81,7 +81,7 @@ public final class ClientEvents {
     }
 
     /**
-     * Quicksilver leaves a silver-blue streak behind him; Tommy a teal-green mist, low along the ground, and a ring of
+     * Quicksilver leaves a grey blur behind him; Tommy a teal-green mist, low along the ground, and a ring of
      * it while he spins a whirlwind.
      */
     private static void spawnSpeedTrails(ClientLevel level) {
@@ -215,7 +215,7 @@ public final class ClientEvents {
         return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
     }
 
-    /** Wanda's hands trail red energy in flight, Photon leaves a trail of light, Magneto a faint violet field. */
+    /** Wanda's hands trail crimson energy in flight, Photon leaves a trail of light, Magneto a faint haze of metal dust. */
     private static void spawnFlightParticles(ClientLevel level) {
         RandomSource random = level.random;
         for (AbstractClientPlayer player : level.players()) {

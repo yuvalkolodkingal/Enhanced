@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 
-/** A cool blue tint at the edges of the screen while time is slowed around you. */
+/** A cool grey shade at the edges of the screen while time is slowed around you. */
 public class SlowMotionOverlay implements LayeredDraw.Layer {
     private float strength;
 
@@ -21,8 +21,8 @@ public class SlowMotionOverlay implements LayeredDraw.Layer {
         }
         int w = graphics.guiWidth();
         int h = graphics.guiHeight();
-        int edge = (int) (0x50 * strength) << 24 | 0x2A4D7A;
-        int mid = (int) (0x10 * strength) << 24 | 0x2A4D7A;
+        int edge = (int) (0x50 * strength) << 24 | 0x34404E;
+        int mid = (int) (0x10 * strength) << 24 | 0x34404E;
         graphics.fillGradient(0, 0, w, h / 3, edge, mid);
         graphics.fill(0, h / 3, w, h - h / 3, mid);
         graphics.fillGradient(0, h - h / 3, w, h, mid, edge);

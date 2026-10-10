@@ -33,6 +33,6 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"),
             index = 4)
     private int enhanced$phaseAlpha(int color, @com.llamalad7.mixinextras.sugar.Local(argsOnly = true) LivingEntity entity) {
-        return enhanced$phased(entity) ? 0x70DDF0FF : color;
+        return enhanced$phased(entity) ? 0x78FFFFFF : color;
     }
 }

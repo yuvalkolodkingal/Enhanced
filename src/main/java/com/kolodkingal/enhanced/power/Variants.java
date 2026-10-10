@@ -15,7 +15,7 @@ public final class Variants {
     static {
         add(Power.VISION,
                 new Variant("vision", Power.VISION, Variant.suit("vision"), Variant.suit("vision_cape"), false, Power.VISION.color, Power.VISION.glow, 0),
-                new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), null, false, 0xF2F6FF, 0xBFD6FF, 0));
+                new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), Variant.suit("white_vision_cape"), false, 0xA6E2F0, 0xE8FBFF, 0));
 
         add(Power.BILLY,
                 new Variant("wiccan", Power.BILLY, Variant.suit("billy_wiccan"), Variant.suit("billy_wiccan_cape"), false, Power.BILLY.color, Power.BILLY.glow, 0),

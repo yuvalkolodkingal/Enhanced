@@ -202,7 +202,7 @@ public final class QuicksilverAbilities {
         return !stack.isEmpty() && !stack.is(ModTags.CANNOT_BE_SNATCHED);
     }
 
-    /** A silver-blue streak between two points. */
+    /** A grey speed blur between two points. */
     private static void streak(ServerLevel level, Vec3 from, Vec3 to) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(80, delta.length() * 3);

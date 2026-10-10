@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Speedster afterimages: fading silver-blue copies of Quicksilver trail behind him while he runs in Quicksilver Time,
+ * Speedster afterimages: fading grey copies of Quicksilver trail behind him while he runs in Quicksilver Time,
  * teal-green ghosts behind Tommy at super speed; and while Tommy spins a whirlwind, ghosts of him race around its ring.
  */
 public final class Afterimages {
@@ -52,7 +52,8 @@ public final class Afterimages {
 
     /** Ghost colour (RGB) of each speedster. */
     private static int ghostColor(AbstractClientPlayer player) {
-        return Powers.power(player) == Power.TOMMY ? 0x7FD8B8 : 0xB8D8FF;
+        // Tommy's trail is teal-green (WandaVision); Fox Quicksilver leaves no coloured glow, only a grey blur.
+        return Powers.power(player) == Power.TOMMY ? 0x7FD8B8 : 0xC8D0D8;
     }
 
     public static void render(RenderPlayerEvent.Post event) {

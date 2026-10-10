@@ -41,7 +41,8 @@ public class PowerHud implements LayeredDraw.Layer {
         long now = mc.level.getGameTime();
         Variant look = Variants.current(data);
         // Heroes with several looks show the current one, and the key that changes it, after their name.
-        MutableComponent title = power.displayName().copy().withStyle(s -> s.withColor(look.color()).withBold(true));
+        int titleColor = Variants.hasChoice(power) ? look.color() : power.titleColor();
+        MutableComponent title = power.displayName().copy().withStyle(s -> s.withColor(titleColor).withBold(true));
         if (Variants.hasChoice(power)) {
             title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
                     .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")

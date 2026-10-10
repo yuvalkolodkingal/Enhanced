@@ -3,9 +3,8 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
-import com.kolodkingal.enhanced.client.render.GodOfThunderLayer;
+import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
-import com.kolodkingal.enhanced.client.render.PhotonEyesLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
 import com.kolodkingal.enhanced.client.render.ThrownMjolnirRenderer;
@@ -71,9 +70,8 @@ public final class ClientSetup {
                 PlayerModel<net.minecraft.client.player.AbstractClientPlayer> energy =
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim);
                 renderer.addLayer(new PowerAuraLayer(renderer, energy));
-                renderer.addLayer(new PhotonEyesLayer(renderer));
+                renderer.addLayer(new GlowingEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
-                renderer.addLayer(new GodOfThunderLayer(renderer));
             }
         }
     }

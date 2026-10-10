@@ -21,8 +21,9 @@ import org.joml.Matrix4f;
 /**
  * Swirling energy drawn over the body:
  * <ul>
- *     <li>the Scarlet Witch in flight: glowing red energy around both hands;</li>
- *     <li>Photon while phased: a white shimmer over her whole body.</li>
+ *     <li>the Scarlet Witch in flight: glowing crimson energy around both hands;</li>
+ *     <li>Photon while phased: a gold shimmer over her whole body (WandaVision episode 9);</li>
+ *     <li>Vision while phased: a greenish-yellow aura (Age of Ultron), white for White Vision.</li>
  * </ul>
  */
 public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
@@ -40,7 +41,9 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
         boolean hands = data.power() == Power.SCARLET_WITCH && data.flying();
-        boolean phased = data.power() == Power.PHOTON && data.isPhased();
+        boolean photonPhased = data.power() == Power.PHOTON && data.isPhased();
+        boolean visionPhased = data.power() == Power.VISION && data.visionPhased();
+        boolean phased = photonPhased || visionPhased;
         if ((!hands && !phased) || player.isInvisible()) {
             return;
         }
@@ -56,7 +59,9 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             model.rightSleeve.visible = false;
             model.leftSleeve.visible = false;
         }
-        int color = phased ? 0xB0E8F6FF : 0x90FF2A3A;
+        int color = photonPhased ? 0xB0E6D59E
+                : visionPhased ? ("white_vision".equals(data.variant()) ? 0x90F4F8FF : 0x90E3DC6E)
+                : 0x90E0193F;
         VertexConsumer swirl = buffer.getBuffer(RenderType.energySwirl(SWIRL, (t * 0.02F) % 1F, (t * 0.013F) % 1F));
         model.renderToBuffer(poseStack, swirl, packedLight, OverlayTexture.NO_OVERLAY, color);
 
@@ -78,8 +83,8 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             poseStack.mulPose(Axis.YP.rotationDegrees(t * 9F + i * 60F));
             poseStack.mulPose(Axis.XP.rotationDegrees(t * 6F + i * 45F));
             Matrix4f m = poseStack.last().pose();
-            quad(vc, m, 0.28F * pulse, 0x80E0102A);
-            quad(vc, m, 0.13F * pulse, 0xC0FF6A80);
+            quad(vc, m, 0.28F * pulse, 0x80E0193F);
+            quad(vc, m, 0.13F * pulse, 0xC0FF6F86);
             poseStack.popPose();
         }
         poseStack.popPose();

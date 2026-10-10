@@ -13,7 +13,10 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
-/** The Mind Stone glowing in Vision's forehead: a bright gem with a slow, breathing halo (hidden in disguise). */
+/**
+ * The Mind Stone glowing in Vision's forehead: an amber gem with a slow, breathing halo (hidden in disguise). White
+ * Vision has no stone: a small hexagonal socket of copper circuitry glows faintly cyan in its place.
+ */
 public class MindStoneLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
     public MindStoneLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
@@ -35,10 +38,16 @@ public class MindStoneLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         poseStack.translate(0.0F, -6.0F / 16.0F, -4.15F / 16.0F);
         Matrix4f m = poseStack.last().pose();
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-        diamond(vc, m, 1.3F / 16.0F, 0xFFFFE066);
-        diamond(vc, m, 0.7F / 16.0F, 0xFFFFFFE0);
-        halo(vc, m, 3.0F / 16.0F * pulse * boost, EnergyGeometry.argb(0xFFD23A, 0.45F * pulse));
-        halo(vc, m, 5.5F / 16.0F * pulse * boost, EnergyGeometry.argb(0xFFB020, 0.18F * pulse));
+        if ("white_vision".equals(data.variant())) {
+            hexagon(vc, m, 1.1F / 16.0F, EnergyGeometry.argb(0xDBC49C, 0.7F));
+            diamond(vc, m, 0.45F / 16.0F, EnergyGeometry.argb(0xE8FBFF, 0.9F));
+            halo(vc, m, 2.6F / 16.0F * pulse * boost, EnergyGeometry.argb(0x8FDFFF, 0.35F * pulse));
+        } else {
+            diamond(vc, m, 1.3F / 16.0F, 0xFFF0CC5A);
+            diamond(vc, m, 0.7F / 16.0F, 0xFFFFF6D5);
+            halo(vc, m, 3.0F / 16.0F * pulse * boost, EnergyGeometry.argb(0xF5D77A, 0.45F * pulse));
+            halo(vc, m, 5.5F / 16.0F * pulse * boost, EnergyGeometry.argb(0xD6A83A, 0.18F * pulse));
+        }
         poseStack.popPose();
     }
 
@@ -47,6 +56,19 @@ public class MindStoneLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         vc.addVertex(m, s, 0, 0).setColor(argb);
         vc.addVertex(m, 0, s, 0).setColor(argb);
         vc.addVertex(m, -s, 0, 0).setColor(argb);
+    }
+
+    /** A flat hexagon outline (White Vision's empty socket). */
+    private static void hexagon(VertexConsumer vc, Matrix4f m, float r, int argb) {
+        float inner = r * 0.7F;
+        for (int i = 0; i < 6; i++) {
+            float a0 = Mth.TWO_PI * i / 6 + Mth.PI / 6;
+            float a1 = Mth.TWO_PI * (i + 1) / 6 + Mth.PI / 6;
+            vc.addVertex(m, Mth.cos(a0) * inner, Mth.sin(a0) * inner, 0).setColor(argb);
+            vc.addVertex(m, Mth.cos(a0) * r, Mth.sin(a0) * r, 0).setColor(argb);
+            vc.addVertex(m, Mth.cos(a1) * r, Mth.sin(a1) * r, 0).setColor(argb);
+            vc.addVertex(m, Mth.cos(a1) * inner, Mth.sin(a1) * inner, 0).setColor(argb);
+        }
     }
 
     /** A soft round glow: full colour in the middle, fading to nothing at the rim (no hard edges in daylight). */

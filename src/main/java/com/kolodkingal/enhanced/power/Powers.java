@@ -73,7 +73,7 @@ public final class Powers {
         setVariant(player, Variants.get(power, variant));
         ServerLevel level = player.serverLevel();
 
-        Component title = power.displayName().copy().withStyle(s -> s.withColor(power.color).withBold(true));
+        Component title = power.displayName().copy().withStyle(s -> s.withColor(power.titleColor()).withBold(true));
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 20));
         player.connection.send(new ClientboundSetTitleTextPacket(title));
         player.connection.send(new ClientboundSetSubtitleTextPacket(
@@ -86,7 +86,7 @@ public final class Powers {
 
         player.server.getPlayerList().broadcastSystemMessage(
                 Component.translatable("power.enhanced." + power.getSerializedName() + ".broadcast", player.getDisplayName())
-                        .withStyle(s -> s.withColor(power.color)), false);
+                        .withStyle(s -> s.withColor(power.titleColor())), false);
     }
 
     /** The player's current look. */

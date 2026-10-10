@@ -34,6 +34,13 @@ import org.joml.Matrix4f;
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class WorldEffectsRenderer {
     public static final ResourceLocation HEX_TEXTURE = Enhanced.id("textures/entity/hex_wall.png");
+    /** The Hex from outside, as in WandaVision: glowing CRT 'cathodic bricks' and scanlines. */
+    public static final ResourceLocation HEX_BARRIER = Enhanced.id("textures/entity/hex_barrier.png");
+    /** The angry red Hex (WandaVision episodes 5-9): raspberry scanlines over a dark magenta-red body. */
+    private static final int HEX_LINES = 0xCA5473;
+    private static final int HEX_BODY = 0x6F0D28;
+    /** The Chaos Shield: a translucent crimson dome with a hot pink rim. */
+    private static final int SHIELD_BODY = 0xC72D4B;
     private static final Vec3 UP = new Vec3(0, 1, 0);
 
     @SubscribeEvent
@@ -53,12 +60,15 @@ public final class WorldEffectsRenderer {
         float time = level.getGameTime() + partialTick;
 
         double renderDistance = mc.options.getEffectiveRenderDistance() * 16.0;
-        // Two passes for every energy dome: a see-through red veil, then glowing hexagon lines on top.
+        // Two passes for every energy dome: a see-through red veil, then glowing lines on top (the Hex's scanlines and
+        // bricks; the Chaos Shield's hexagons).
         for (int pass = 0; pass < 2; pass++) {
             boolean lines = pass == 1;
+            RenderType hexType = lines ? EnhancedRenderTypes.energyField(HEX_BARRIER) : EnhancedRenderTypes.ENERGY_VEIL;
+            renderHexes(level, pose, buffers.getBuffer(hexType), lines, camera, time, renderDistance);
+            buffers.endBatch(hexType);
             RenderType type = lines ? EnhancedRenderTypes.energyField(HEX_TEXTURE) : EnhancedRenderTypes.ENERGY_VEIL;
             VertexConsumer vc = buffers.getBuffer(type);
-            renderHexes(level, pose, vc, lines, camera, time, renderDistance);
             for (AbstractClientPlayer player : level.players()) {
                 PowerData data = Powers.get(player);
                 if (data.power() == Power.SCARLET_WITCH && data.chaosShieldActive() && !player.isInvisible()) {
@@ -69,7 +79,7 @@ public final class WorldEffectsRenderer {
                         EnergyGeometry.sphere(pose, vc, center, radius, 32, 16, 6, 3, time * 0.01F,
                                 Power.SCARLET_WITCH.color, 0.35F * flicker, 0.65F * flicker);
                     } else {
-                        EnergyGeometry.veil(pose, vc, center, radius, 32, 16, Power.SCARLET_WITCH.color, 0.12F * flicker, 0.45F * flicker);
+                        EnergyGeometry.veil(pose, vc, center, radius, 32, 16, SHIELD_BODY, 0.12F * flicker, 0.45F * flicker);
                     }
                 }
             }
@@ -83,7 +93,8 @@ public final class WorldEffectsRenderer {
                 renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS, pose, beams, camera, partialTick, time);
             }
             if (data.power() == Power.VISION && data.beamActive()) {
-                renderBeam(mc, player, foreheadPosition(mc, player, partialTick), MIND_STONE, pose, beams, camera, partialTick, time);
+                Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION : MIND_STONE;
+                renderBeam(mc, player, foreheadPosition(mc, player, partialTick), palette, pose, beams, camera, partialTick, time);
             }
             if (data.heldEntityId() != -1) {
                 Entity held = level.getEntity(data.heldEntityId());
@@ -122,10 +133,10 @@ public final class WorldEffectsRenderer {
                 float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 6F));
                 float tilesV = Math.max(3, Math.round(Mth.PI * radius / 6F));
                 EnergyGeometry.sphere(pose, vc, center, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F,
-                        Power.SCARLET_WITCH.color, 0.30F * pulse * rising, 0.6F * pulse * rising);
+                        HEX_LINES, 0.30F * pulse * rising, 0.6F * pulse * rising);
             } else {
-                EnergyGeometry.veil(pose, vc, center, radius, segments, segments / 2, 0xB00018,
-                        0.10F * pulse, 0.45F * pulse * rising);
+                EnergyGeometry.veil(pose, vc, center, radius, segments, segments / 2, HEX_BODY,
+                        0.12F * pulse, 0.5F * pulse * rising);
             }
         }
     }
@@ -136,8 +147,12 @@ public final class WorldEffectsRenderer {
     private record Palette(int glow, int core, int bolt) {
     }
 
-    private static final Palette CHAOS = new Palette(Power.SCARLET_WITCH.color, 0xFF6A80, 0xFF2040);
-    private static final Palette MIND_STONE = new Palette(0xF2B526, 0xFFF4B0, 0xFFD84A);
+    /** Chaos magic: crimson, hot pink wisps, a near-white core (WandaVision, Multiverse of Madness). */
+    private static final Palette CHAOS = new Palette(Power.SCARLET_WITCH.color, 0xFFE3E6, 0xF07C8D);
+    /** The Mind Stone's beam: pale gold with a cream-white core (Age of Ultron). */
+    private static final Palette MIND_STONE = new Palette(0xF5D77A, 0xFFF6D5, 0xF2C66A);
+    /** White Vision's beam: pale cyan-white (WandaVision episode 9). */
+    private static final Palette WHITE_VISION = new Palette(0x7EBADF, 0xE8FBFF, 0xA6E2F0);
 
     private static void renderBeam(Minecraft mc, AbstractClientPlayer player, Vec3 origin, Palette palette, Matrix4f pose,
                                    VertexConsumer vc, Vec3 camera, float partialTick, float time) {

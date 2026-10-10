@@ -12,11 +12,14 @@ import java.util.Locale;
  */
 public enum Power implements StringRepresentable {
     NONE(0xFFFFFF, 0xFFFFFF),
-    MAGNETO(0xB01CFF, 0xC27BFF),
-    SCARLET_WITCH(0xE0102A, 0xFF4058),
-    PHOTON(0xFFE9A8, 0x9FF3FF),
-    QUICKSILVER(0xC9D3E3, 0x8FD3FF),
-    VISION(0xE8B83A, 0xFFE66B),
+    // Energy colours follow the films and shows: Magneto's magnetism has no glow in the X-Men films (iron-grey metal
+    // dust), the Scarlet Witch's chaos magic is crimson with hot pink highlights, Photon's light is blue-white, Fox
+    // Quicksilver leaves only a grey blur, and the Mind Stone's beam is pale gold.
+    MAGNETO(0x8A9096, 0xD2D6DA),
+    SCARLET_WITCH(0xE0193F, 0xFF6F86),
+    PHOTON(0xA2D4F3, 0xEBF8FD),
+    QUICKSILVER(0x9AA3AD, 0xC8D0D8),
+    VISION(0xF5D77A, 0xFFF6D5),
     BILLY(0x5CC8FF, 0xCFEFFF),
     TOMMY(0x2E9C7E, 0x7FD8B8),
     LOKI(0x76B154, 0xCAF297),
@@ -37,6 +40,11 @@ public enum Power implements StringRepresentable {
     @Override
     public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
+    }
+
+    /** Colour of the hero's name (titles, HUD): the energy colour, except Magneto's, whose power has no colour. */
+    public int titleColor() {
+        return this == MAGNETO ? 0xC8323C : color;
     }
 
     public boolean hasPowers() {
