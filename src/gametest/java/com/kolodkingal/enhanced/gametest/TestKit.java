@@ -12,6 +12,7 @@ import net.minecraft.gametest.framework.GameTestListener;
 import net.minecraft.gametest.framework.GameTestRunner;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -246,16 +247,41 @@ public final class TestKit {
      * within 16 blocks of where it is played, so tests that count sounds only count the ones played in their own arena.
      */
     public static List<HeardSound> heardSounds(ServerPlayer player) {
+        return soundsIn(sentPackets(player));
+    }
+
+    /** Every packet the server has sent this player since the last call to this or to {@link #heardSounds}, oldest first. */
+    public static List<Object> sentPackets(ServerPlayer player) {
         EmbeddedChannel channel = (EmbeddedChannel) player.connection.getConnection().channel();
         // Nothing ticks the fake connection, which is what flushes it: a packet sent later would sit there unseen.
         channel.flush();
+        List<Object> sent = new ArrayList<>();
+        for (Object packet = channel.readOutbound(); packet != null; packet = channel.readOutbound()) {
+            sent.add(packet);
+        }
+        return sent;
+    }
+
+    /** The sounds among {@code packets}. */
+    public static List<HeardSound> soundsIn(List<Object> packets) {
         List<HeardSound> heard = new ArrayList<>();
-        for (Object sent = channel.readOutbound(); sent != null; sent = channel.readOutbound()) {
+        for (Object sent : packets) {
             if (sent instanceof ClientboundSoundPacket packet) {
                 heard.add(new HeardSound(packet.getSound().value().getLocation(), new Vec3(packet.getX(), packet.getY(), packet.getZ())));
             }
         }
         return heard;
+    }
+
+    /** The particle bursts among {@code packets}. */
+    public static List<ClientboundLevelParticlesPacket> particlesIn(List<Object> packets) {
+        List<ClientboundLevelParticlesPacket> particles = new ArrayList<>();
+        for (Object sent : packets) {
+            if (sent instanceof ClientboundLevelParticlesPacket packet) {
+                particles.add(packet);
+            }
+        }
+        return particles;
     }
 
     // ------------------------------------------------------------------------------------------------------------

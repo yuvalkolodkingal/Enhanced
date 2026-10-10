@@ -14,7 +14,7 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +35,8 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -149,6 +150,8 @@ public final class WandaAbilities {
 
     /** What a projectile costs the shield when nothing better is known (a snowball, a potion, a shulker bullet). */
     private static final float DEFAULT_PROJECTILE_POWER = 2.0F;
+    /** How many red shards fly out when the shield shatters. */
+    private static final int SHATTER_SHARDS = 56;
 
     private static boolean canAffordShield(Player player) {
         return player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
@@ -212,12 +215,14 @@ public final class WandaAbilities {
         data.startCooldown(4, level.getGameTime(), EnhancedConfig.CHAOS_SHIELD_BROKEN_COOLDOWN.get());
         Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
         RandomSource random = player.getRandom();
-        BlockParticleOption shard = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.RED_STAINED_GLASS.defaultBlockState());
-        for (int i = 0; i < 48; i++) {
+        // Chips of bright red. (A red stained glass block's own particles are see-through and a dull grey-violet in the
+        // air, and every block's are darkened; the red dye's chips stay a clear red and fly the way they are sent.)
+        ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.RED_DYE));
+        for (int i = 0; i < SHATTER_SHARDS; i++) {
             // Out from a random spot on the sphere, along the way out.
             Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
             Vec3 at = center.add(out.scale(SHIELD_RADIUS));
-            level.sendParticles(shard, at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.45);
+            level.sendParticles(shard, at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             if (i % 2 == 0) {
                 level.sendParticles(new EnergyParticleOptions(i % 4 == 0 ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 1.5F),
                         at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);

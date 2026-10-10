@@ -125,8 +125,8 @@ public class LokisScepterItem extends Item {
      * config.
      */
     public static void confuse(LivingEntity target, LivingEntity attacker) {
-        if (target.level().isClientSide() || target instanceof ArmorStand) {
-            return;
+        if (target.level().isClientSide() || target instanceof ArmorStand || !target.isAlive()) {
+            return; // (a creature the blow just killed is left alone)
         }
         boolean muddled;
         if (target instanceof Player) {

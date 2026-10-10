@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -314,6 +315,48 @@ public final class ScarletWitchTests {
         attacker.attack(helmeted);
         check(!helmeted.hasEffect(MobEffects.CONFUSION), "Magneto's helmet still turns Nausea away");
         check(helmeted.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "but not the Slowness");
+        helper.succeed();
+    }
+
+    /** Each of the three durations can be set to 0, which turns that effect off. */
+    @GameTest(template = ARENA, batch = "scepter_confusion_off")
+    public static void scepterConfusionCanBeTurnedOff(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        f.config(EnhancedConfig.SCEPTER_CONFUSION_TICKS, 0);
+        f.config(EnhancedConfig.SCEPTER_NAUSEA_TICKS, 0);
+        f.config(EnhancedConfig.SCEPTER_SLOWNESS_TICKS, 0);
+        ServerPlayer attacker = withScepter(f, 10.5, 10.5);
+        ServerPlayer victim = f.player(11.5, FLOOR, 10.5);
+        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        zombie.setNoAi(true);
+        float health = zombie.getHealth();
+
+        attacker.attack(victim);
+        attacker.attack(zombie);
+
+        check(zombie.getHealth() < health, "the scepter still hurts");
+        check(victim.getActiveEffects().isEmpty(), "with 0 ticks a player gets neither Nausea nor Slowness, got " + victim.getActiveEffects());
+        check(zombie.getActiveEffects().isEmpty(), "and a creature isn't confused, got " + zombie.getActiveEffects());
+        helper.succeed();
+    }
+
+    /** A blow that kills leaves nothing behind: no effect on the corpse, no chime. */
+    @GameTest(template = ARENA)
+    public static void scepterLeavesAKilledCreatureAlone(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer attacker = withScepter(f, 10.5, 10.5);
+        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        zombie.setNoAi(true);
+        zombie.setHealth(0.1F); // (the scepter's own damage only counts once the player has ticked with it in hand)
+        TestKit.heardSounds(attacker);
+
+        attacker.attack(zombie);
+
+        check(!zombie.isAlive(), "the blow kills the zombie");
+        check(!zombie.hasEffect(ModEffects.CONFUSED), "so it isn't confused");
+        check(TestKit.heardSounds(attacker).stream().noneMatch(s -> s.id().equals(SoundEvents.AMETHYST_BLOCK_CHIME.getLocation())),
+                "and the Mind Stone doesn't chime over it");
         helper.succeed();
     }
 
@@ -796,9 +839,13 @@ public final class ScarletWitchTests {
             assertNear(data.shieldStrength(), 0.0, 1.0E-4, "nothing left");
             long left = cooldownLeft(wanda, helper);
             check(left >= 295 && left <= 300, "a shattered shield needs 15 seconds (300 ticks) before the next, not " + left);
-            List<TestKit.HeardSound> heard = TestKit.heardSounds(wanda);
+            List<Object> packets = TestKit.sentPackets(wanda);
+            List<TestKit.HeardSound> heard = TestKit.soundsIn(packets);
             check(heard.stream().anyMatch(s -> s.id().equals(SoundEvents.GLASS_BREAK.getLocation())),
                     "and it breaks with a glassy sound, heard " + heard.stream().map(TestKit.HeardSound::id).toList());
+            long shards = TestKit.particlesIn(packets).stream()
+                    .filter(p -> p.getParticle() instanceof ItemParticleOption chip && chip.getItem().is(Items.RED_DYE)).count();
+            check(shards >= 40, "and a burst of red shards flies out of it, not just " + shards + " of them");
 
             explode(helper, wanda, 8.0F);
             assertNear(20.0F - wanda.getHealth(), 8.0, 1.0E-4, "without it, explosions hit in full");
