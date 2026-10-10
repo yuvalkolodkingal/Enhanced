@@ -6,8 +6,12 @@ import com.kolodkingal.enhanced.client.render.AnimMath;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.Gestures;
+import com.kolodkingal.enhanced.client.render.GestureRoutes;
 import com.kolodkingal.enhanced.client.render.GripMath;
+import com.kolodkingal.enhanced.client.render.StancePoses;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -283,5 +287,174 @@ public final class AnimationMathTests {
         }
         check(Gestures.get(GestureId.TAKEOFF_BILLY).hasYaw(), "Billy's take-off is a lazy turn that ends facing the way he faces");
         helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // The ability gestures
+
+    /** Every gesture has its keys, a sane envelope, and a table that is in order. */
+    @GameTest(template = ARENA)
+    public static void everyGestureHasWellFormedKeys(GameTestHelper helper) {
+        for (GestureId id : GestureId.values()) {
+            Gestures.Def def = Gestures.get(id);
+            check(def != null, id + " has no keys");
+            check(def.problems().isEmpty(), id + ": " + def.problems());
+            check(id.attack >= 1 && id.release >= 1 && id.attack + id.release <= id.dur, id + ": the attack and the release fit in " + id.dur + " ticks");
+            boolean drives = !def.m.isEmpty() || !def.o.isEmpty() || !def.right.isEmpty() || !def.head.isEmpty() || !def.twist.isEmpty()
+                    || !def.lean.isEmpty() || !def.drop.isEmpty() || !def.yaw.isEmpty() || !def.roll.isEmpty();
+            check(drives, id + " drives nothing");
+            // An arm track is all absolute (or aimed or by world elevation) or all additive: the two cannot be blended.
+            for (java.util.List<Gestures.ArmKey> keys : java.util.List.of(def.m, def.o)) {
+                boolean additive = false;
+                boolean absolute = false;
+                for (Gestures.ArmKey key : keys) {
+                    additive |= key.mode == Gestures.Mode.ADD;
+                    absolute |= key.mode != Gestures.Mode.ADD;
+                }
+                check(!(additive && absolute), id + " mixes added and absolute arm keys");
+            }
+        }
+        helper.succeed();
+    }
+
+    /** A gesture that hands over to a stance ends exactly on that stance's pose, so nothing pops when it lets go. */
+    @GameTest(template = ARENA)
+    public static void gesturesHandOverToStancesWithoutAPop(GameTestHelper helper) {
+        // Both arms at the pose of the stance.
+        Object[][] pairs = {
+                {GestureId.WANDA_SHIELD_RAISE, StancePoses.SHIELD_WANDA_M, StancePoses.SHIELD_WANDA_O},
+                {GestureId.WANDA_SHIELD_SNAP, StancePoses.SHIELD_WANDA_M, StancePoses.SHIELD_WANDA_O},
+                {GestureId.MAG_SHIELD_ON, StancePoses.MAG_FIELD_M, StancePoses.MAG_FIELD_O},
+                {GestureId.VISION_PHASE_IN, StancePoses.VISION_PHASED_M, StancePoses.VISION_PHASED_O},
+                {GestureId.VISION_DENSE_ON, StancePoses.VISION_DENSE_M, StancePoses.VISION_DENSE_O},
+                {GestureId.BILLY_FREEZE_CAST, StancePoses.BILLY_FREEZE_M, StancePoses.BILLY_FREEZE_O},
+        };
+        for (Object[] pair : pairs) {
+            Gestures.Def def = Gestures.get((GestureId) pair[0]);
+            Gestures.ArmKey m = def.m.get(def.m.size() - 1);
+            Gestures.ArmKey o = def.o.get(def.o.size() - 1);
+            float[] stanceM = (float[]) pair[1];
+            float[] stanceO = (float[]) pair[2];
+            float[] mine = {m.x, m.y, m.z, o.x, o.y, o.z};
+            float[] theirs = {stanceM[0], stanceM[1], stanceM[2], stanceO[0], stanceO[1], stanceO[2]};
+            for (int i = 0; i < 6; i++) {
+                assertNear(mine[i], theirs[i], 0.5, def.id + ": the last key is the stance's pose, value " + i);
+            }
+            check(m.mode == Gestures.Mode.ABS && o.mode == Gestures.Mode.ABS, def.id + " ends on absolute arms");
+        }
+        // The stances that spread the arm a little (added to what is below): the gesture ends at the same spread.
+        assertNear(Gestures.get(GestureId.LOKI_FROST_ON).m.get(Gestures.get(GestureId.LOKI_FROST_ON).m.size() - 1).z, StancePoses.LOKI_FROST_Z, 0.5,
+                "the Frost Giant's roar ends in his stance");
+        assertNear(Gestures.get(GestureId.THOR_UNLEASH_ON).m.get(Gestures.get(GestureId.THOR_UNLEASH_ON).m.size() - 1).z, StancePoses.THOR_UNLEASHED_Z, 0.5,
+                "the God of Thunder's roar ends in his stance");
+        // The beams: the arms end aimed along the look at the stance's offsets, the kick's twist is the stance's.
+        Gestures.Def beam = Gestures.get(GestureId.WANDA_BEAM_KICK);
+        Gestures.ArmKey bm = beam.m.get(beam.m.size() - 1);
+        Gestures.ArmKey bo = beam.o.get(beam.o.size() - 1);
+        for (int i = 0; i < 3; i++) {
+            assertNear(new float[]{bm.x, bm.y, bm.z}[i], StancePoses.BEAM_WANDA_M_AIM[i], 0.5, "the Chaos Beam kick ends on the stance, main arm " + i);
+            assertNear(new float[]{bo.x, bo.y, bo.z}[i], StancePoses.BEAM_WANDA_O_AIM[i], 0.5, "the Chaos Beam kick ends on the stance, off arm " + i);
+        }
+        for (GestureId id : new GestureId[]{GestureId.THOR_BEAM_KICK, GestureId.THOR_BEAM_KICK_BARE}) {
+            Gestures.Def kick = Gestures.get(id);
+            assertNear(kick.twist.value(kick.twist.size() - 1)[0], StancePoses.THOR_BEAM_TWIST, 0.5, id + " ends on the beam's twist");
+        }
+        // A gesture and its stance hold the same lean and head: the shield's wind-up ends in them.
+        Gestures.Def raise = Gestures.get(GestureId.WANDA_SHIELD_RAISE);
+        assertNear(raise.lean.value(raise.lean.size() - 1)[0], StancePoses.SHIELD_WANDA_LEAN, 0.5, "the shield's lean");
+        assertNear(raise.head.value(raise.head.size() - 1)[0], StancePoses.SHIELD_WANDA_HEAD[0], 0.5, "the shield's head");
+        helper.succeed();
+    }
+
+    /** Every ability of every hero, every toggle, momentary state and flag is acted by a gesture, or has a reason why not. */
+    @GameTest(template = ARENA)
+    public static void everyAbilityIsActedOrExplained(GameTestHelper helper) {
+        Power[] heroes = {Power.MAGNETO, Power.SCARLET_WITCH, Power.QUICKSILVER, Power.VISION, Power.TOMMY, Power.BILLY, Power.LOKI, Power.THOR};
+        java.util.Set<GestureId> used = new java.util.HashSet<>();
+        for (Power power : heroes) {
+            for (int ability = 1; ability <= 5; ability++) {
+                String how = GestureRoutes.acting(power, ability);
+                String where = power + " ability " + ability + " (" + how + ")";
+                if (how.startsWith("none: ")) {
+                    check(how.length() > 12, where + " needs a reason");
+                } else if (how.equals("cooldown")) {
+                    check(GestureRoutes.cooldown(power, ability, 1) != null || GestureRoutes.cooldown(power, ability, 99) != null, where + " has no gesture");
+                } else if (how.startsWith("flag:")) {
+                    GestureRoutes.Flag flag = GestureRoutes.Flag.valueOf(how.substring(5));
+                    check(GestureRoutes.flag(power, flag, true, false, false) != null, where + " has no gesture");
+                } else if (how.startsWith("toggle:")) {
+                    check(GestureRoutes.toggle(power, Toggle.valueOf(how.substring(7)), true) != null, where + " has no gesture");
+                } else if (how.startsWith("live:")) {
+                    check(GestureRoutes.live(power, Live.valueOf(how.substring(5)), true) != null, where + " has no gesture");
+                } else if (how.equals("held")) {
+                    check(GestureRoutes.grab(power) != null && GestureRoutes.fling(power) != null, where + " has no grab and fling");
+                } else {
+                    check(how.equals("hammer") || how.equals("hex") || how.equals("flight"), where + " is not a known way of acting");
+                }
+            }
+            for (int ability = 1; ability <= 5; ability++) {
+                for (long left : new long[]{1, 99}) {
+                    add(used, GestureRoutes.cooldown(power, ability, left));
+                }
+            }
+            for (Toggle toggle : Toggle.values()) {
+                add(used, GestureRoutes.toggle(power, toggle, true));
+                add(used, GestureRoutes.toggle(power, toggle, false));
+            }
+            for (GestureRoutes.Flag flag : GestureRoutes.Flag.values()) {
+                add(used, GestureRoutes.flag(power, flag, true, false, false));
+                add(used, GestureRoutes.flag(power, flag, false, false, false));
+            }
+            for (Live live : Live.values()) {
+                add(used, GestureRoutes.live(power, live, true));
+                add(used, GestureRoutes.live(power, live, false));
+            }
+            add(used, GestureRoutes.grab(power));
+            add(used, GestureRoutes.fling(power));
+        }
+        for (GestureRoutes.Hammer hammer : GestureRoutes.Hammer.values()) {
+            add(used, GestureRoutes.hammer(hammer));
+        }
+        for (GestureRoutes.HexChange change : GestureRoutes.HexChange.values()) {
+            add(used, GestureRoutes.hex(change));
+        }
+        // Every toggle, flag and state is acted for some hero or explained.
+        for (Toggle toggle : Toggle.values()) {
+            boolean acted = false;
+            for (Power power : heroes) {
+                acted |= GestureRoutes.toggle(power, toggle, true) != null;
+            }
+            check(acted, "the toggle " + toggle + " has no gesture");
+        }
+        for (GestureRoutes.Flag flag : GestureRoutes.Flag.values()) {
+            boolean acted = false;
+            for (Power power : heroes) {
+                acted |= GestureRoutes.flag(power, flag, true, false, false) != null || GestureRoutes.flag(power, flag, false, false, false) != null;
+            }
+            check(acted, "the flag " + flag + " has no gesture");
+        }
+        for (Live live : Live.values()) {
+            boolean acted = false;
+            for (Power power : heroes) {
+                acted |= GestureRoutes.live(power, live, true) != null;
+            }
+            check(acted || GestureRoutes.reason(live) != null, "the state " + live + " has neither a gesture nor a reason");
+        }
+        // No gesture is orphaned: each is started by the table or by something that says so.
+        for (GestureId id : GestureId.values()) {
+            check(used.contains(id) || GestureRoutes.startedElsewhere(id), id + " is started by nothing");
+        }
+        // White Vision and a phased Vision have no temple gesture; a sneaking Loki's long cooldown is a fan.
+        check(GestureRoutes.flag(Power.VISION, GestureRoutes.Flag.BEAM, true, true, false) == null, "White Vision has no temple gesture");
+        check(GestureRoutes.flag(Power.VISION, GestureRoutes.Flag.BEAM, true, false, true) == null, "a phased Vision has no temple gesture");
+        check(GestureRoutes.cooldown(Power.LOKI, 1, 8) == GestureId.LOKI_DAGGER && GestureRoutes.cooldown(Power.LOKI, 1, 30) == GestureId.LOKI_FAN,
+                "Loki's two cooldowns tell a dagger from a fan");
+        helper.succeed();
+    }
+
+    private static void add(java.util.Set<GestureId> used, GestureId id) {
+        if (id != null) {
+            used.add(id);
+        }
     }
 }
