@@ -49,4 +49,4 @@ Quicksilver's Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, and
 | The game says NeoForge is too old | Update NeoForge to 21.1.256 or newer. |
 | The keys do nothing | Keys work only for a hero, with no screen open. See [Becoming a Hero](Becoming-a-Hero), and check the bindings under *Options, Controls, Enhanced Powers*. |
 | I cannot lift Mjolnir | See the [FAQ](FAQ) and [Thor](Thor). |
-| Quicksilver's song does not play | The song plays while Quicksilver runs in Quicksilver Time, and the Walkman key (N) turns it on and off. A song of your own must be an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/`. |
+| Quicksilver's song does not play | The song plays for as long as Quicksilver Time is on (press R), whether Quicksilver runs or not, and the Walkman key (N) turns it on and off. Super Speed (Sneak + R) plays no song. A song of your own must be an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/`. |

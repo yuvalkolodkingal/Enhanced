@@ -1,6 +1,6 @@
 # Enhanced
 
-**Enhanced** is a Minecraft mod (NeoForge, Minecraft 1.21.1) where you can become one of the *Enhanced*: a hero from the Marvel films and shows, with the powers, the look and the colours you know from the screen. You can be **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**; **Quicksilver**, who runs so fast the world slows down around him (to *Sweet Dreams*); **Vision**, the Mind Stone in a synthetic body (or **White Vision**); Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief; or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
+**Enhanced** is a Minecraft mod (NeoForge, Minecraft 1.21.1) where you can become one of the *Enhanced*: a hero from the Marvel films and shows, with the powers, the look and the colours you know from the screen. You can be **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**; **Quicksilver**, who slows the world down around him (to *Sweet Dreams*) or just outruns it; **Vision**, the Mind Stone in a synthetic body (or **White Vision**); Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief; or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
 
 Original hero concepts by Eilon Kolodkin-Gal. This wiki is the player's guide. The full design, with every rule and number, is in [docs/DESIGN.md](https://github.com/yuvalkolodkingal/enhanced/blob/main/docs/DESIGN.md).
 
@@ -19,7 +19,7 @@ Hebrew: [עברית, דף הבית](Home-HE)
 |---|---|---|---|
 | [Magneto](Magneto) | The Master of Magnetism | Craft Magneto's Helmet and put it on | Metal telekinesis, iron shrapnel storm, magnetic shield |
 | [Scarlet Witch](Scarlet-Witch) | Wanda Maximoff | Touch the Mind Stone in Loki's Scepter while holding the Scarlet Witch Gene | Chaos beam, telekinesis, the Hex |
-| [Quicksilver](Quicksilver) | Peter Maximoff | Craft Quicksilver's Goggles and put them on | Quicksilver Time: the world slows down and plays *Sweet Dreams* |
+| [Quicksilver](Quicksilver) | Peter Maximoff | Craft Quicksilver's Goggles and put them on | Quicksilver Time: the world slows down and plays *Sweet Dreams*; or Super Speed, where only he is fast |
 | [Vision](Vision) | The Mind Stone in a synthetic body | Touch the Mind Stone while holding a Synthezoid Core | Mind Stone beam, phasing through walls, density; White Vision look |
 | [Tommy](Tommy) | Tommy Maximoff (Speed) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Tommy | Super speed, disarm blitz, whirlwind |
 | [Billy](Billy-and-the-Witches-Road) | Billy Maximoff (Wiccan) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Billy | Hex Bolt, flight, freeze, The Noise |

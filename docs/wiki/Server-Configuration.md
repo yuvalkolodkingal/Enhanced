@@ -65,8 +65,9 @@ Section `[quicksilver]`. The hero's page is [Quicksilver](Quicksilver).
 |---|---|---|---|
 | `quicksilver.slowMotionFactor` | `5` | 2 to 20 | During Quicksilver Time the world around him runs this many times slower. |
 | `quicksilver.slowMotionRadius` | `32` | 4 to 128 | How far (in blocks) from Quicksilver time slows down. |
-| `quicksilver.speedBonus` | `3.0` | 0.0 to 10.0 | Extra movement speed during Quicksilver Time (3.0 = four times as fast). |
-| `quicksilver.exhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion per tick during Quicksilver Time (4.0 = 1 food point). |
+| `quicksilver.speedBonus` | `3.0` | 0.0 to 10.0 | Extra movement speed while he runs in Quicksilver Time or Super Speed (3.0 = four times as fast). |
+| `quicksilver.exhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion per tick while he runs in Quicksilver Time or Super Speed (4.0 = 1 food point). Quicksilver Time also costs half of this while he is not running. |
+| `quicksilver.actionSpeed` | `4.0` | 1.0 to 10.0 | While Quicksilver Time or Super Speed is on he mines, attacks, eats, drinks, draws bows, loads crossbows, swims and places blocks this many times as fast (4.0 = four times as fast). |
 
 ## Billy (Wiccan)
 

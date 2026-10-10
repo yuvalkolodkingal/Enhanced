@@ -8,7 +8,7 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 |---|---|---|---|---|---|
 | [Magneto](Magneto) | Metal Telekinesis | Iron Shrapnel Storm (hold) | Armor & Weapon Strip | Magnetic Shield (toggle) | Magnetic Flight (toggle) |
 | [Scarlet Witch](Scarlet-Witch) | Chaos Energy Beam (hold) | Enhanced Flight (toggle) | Telekinesis (creatures, items, blocks) | Chaos Shield (hold) | The Hex (again: Hex Control; Sneak: dissolve) |
-| [Quicksilver](Quicksilver) | Quicksilver Time on/off | Speed Blitz | Pickpocket | Wall & Water Run (toggle) | Walkman: music on/off |
+| [Quicksilver](Quicksilver) | Quicksilver Time on/off (Sneak: Super Speed) | Speed Blitz | Pickpocket | Wall & Water Run (toggle) | Walkman: music on/off |
 | [Vision](Vision) | Mind Stone Beam (hold) | Flight (toggle) | Phase through walls (toggle) | Density (toggle) | Human Disguise (toggle) |
 | [Tommy](Tommy) | Super Speed on/off (sprint) | Disarm Blitz | Whirlwind | Vibrate Through Walls | Molecular Acceleration |
 | [Billy](Billy-and-the-Witches-Road) | Hex Bolt | Flight (toggle) | Telekinesis | Freeze | The Noise (toggle) |
@@ -46,6 +46,7 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **R** as Magneto | Sets the metal you hold down gently, instead of throwing it. |
 | Sneak + **V** as the Scarlet Witch or Billy | Sets what you hold with telekinesis down gently. |
 | Sneak + **N** as the Scarlet Witch | Dissolves your Hex. |
+| Sneak + **R** as Quicksilver | Turns Super Speed on or off, instead of Quicksilver Time. |
 | Sneak + **R** as Loki | Throws a fan of three daggers. |
 | Sneak + **N** as Thor | Opens the Bifrost to the spot you look at. |
 | Sneak + **H** | Previous look. |
@@ -64,4 +65,6 @@ All six keys are in the game's key settings: **Options, Controls, Key Binds, Enh
 
 ## Sprinting heroes
 
-Quicksilver Time and Tommy's Super Speed start when you **sprint**. Their key (**R**) turns the ability on or off: with it off, you sprint like anyone else.
+Tommy's Super Speed starts when you **sprint**. His key (**R**) turns the ability on or off: with it off, you sprint like anyone else.
+
+Quicksilver is different. **R** turns Quicksilver Time on or off, and the world slows down around him whether he sprints or not. **Sneak + R** turns Super Speed on or off instead, which speeds up only him (the two modes exclude each other). In both modes he also mines, attacks, swims and uses items faster without sprinting, and only the running speed and the step-up need a sprint. See [Quicksilver](Quicksilver).
