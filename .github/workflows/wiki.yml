@@ -1,0 +1,89 @@
+# Publishes the wiki: the pages are the Markdown files in docs/wiki (and the screenshots in docs/screenshots), and this
+# copies them into the repository's wiki on every push to main that changes them. Never edit the wiki itself: the next
+# run replaces everything in it.
+#
+# One-time setup: enable Wikis in the repository settings and create the wiki's first page by hand in the GitHub UI,
+# because GitHub creates the wiki's git repository only then. Wikis of private repositories need GitHub Pro, Team or
+# Enterprise.
+name: Publish the wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/wiki/**'
+      - 'docs/screenshots/**'
+      - '.github/workflows/wiki.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Two runs never push at once: a second run of the same branch waits for the first (and replaces any run still waiting
+# behind it, which is fine: the newest run publishes the newest pages). Only main publishes, and a manual run from
+# another branch has a group of its own, so it can never push out a waiting run of main.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish the wiki
+    # A manual run from another branch must not publish that branch's pages.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GIT_TERMINAL_PROMPT: '0'
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+        with:
+          # Nothing here pushes to this repository, so the job's token is not left in its git config.
+          persist-credentials: false
+
+      - name: Clone the wiki
+        env:
+          # The token is in this URL (and so in the clone's remote, for the push): git's output is kept out of the log.
+          WIKI_URL: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
+        run: |
+          rm -rf wiki
+          if ! git clone --quiet "$WIKI_URL" wiki 2>/dev/null; then
+            message="Could not clone the wiki of ${GITHUB_REPOSITORY}."
+            message+=" The wiki must be enabled in the repository's settings (Settings, General, Features, Wikis),"
+            message+=" and its first page must be created once by hand in the GitHub UI"
+            message+=" (Wiki tab, Create the first page): GitHub creates the wiki's git repository only then."
+            message+=" Wikis of private repositories need GitHub Pro, Team or Enterprise."
+            echo "::error::${message}"
+            exit 1
+          fi
+
+      - name: Replace the wiki's content
+        run: |
+          # Everything but the git history goes, then docs/wiki and the screenshots (as images/) come in.
+          find wiki -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R docs/wiki/. wiki/
+          mkdir -p wiki/images
+          cp docs/screenshots/*.png wiki/images/
+
+      - name: Commit the changes
+        id: commit
+        run: |
+          cd wiki
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --all
+          if git diff --cached --quiet; then
+            echo "The wiki is already up to date."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit --quiet \
+              --message "Publish docs/wiki from ${GITHUB_SHA::7}" \
+              --message "Source: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+            git show --stat --oneline HEAD
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push the wiki
+        if: steps.commit.outputs.changed == 'true'
+        run: git -C wiki push --quiet origin HEAD

@@ -14,6 +14,9 @@ Every power's look and colour follows the MCU films and shows, and Vision, Tommy
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).
 
+**Wiki:** the player's guide, in English and Hebrew, is on the [wiki](../../wiki). Its pages live in
+[docs/wiki](docs/wiki) and a GitHub Action publishes them, so edit them there.
+
 **Download:** every push to `main` builds the mod, runs the in-game tests and publishes the jar
 on the [Releases](../../releases) page. The newest build is always marked *Latest*.
 

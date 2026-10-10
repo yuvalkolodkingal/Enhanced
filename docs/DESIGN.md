@@ -15,7 +15,9 @@ one of the *Enhanced*:
 This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
 Scarlet Witch, and Quicksilver's slow-motion run). Everything the concepts said is kept.
 Where they left a gap (where an item comes from, what key does what, exact numbers), the
-gap is filled in here, and every addition is marked **(added)**.
+gap is filled in here, and every addition is marked **(added)**. The player's guide to all of
+it (recipes, keys, every server option), in English and Hebrew, is on the
+[wiki](../../../wiki); its pages are in [docs/wiki](wiki/).
 
 ---
 
