@@ -84,19 +84,8 @@ public final class PowerTicker {
         ThorAbilities.applyBody(player, data);
     }
 
-    /**
-     * The player is about to change look: whatever the old look's signature ability left in the world (enchanted
-     * creatures, an army of illusions...) ends.
-     */
-    public static void endLook(ServerPlayer player, PowerData data) {
-        if (data.power() == Power.LOKI) {
-            LokiAbilities.endLook(player, data);
-        }
-    }
-
     /** The player is about to lose this power: everything it left in the world ends. */
     public static void endPower(ServerPlayer player, PowerData data) {
-        endLook(player, data);
         switch (data.power()) {
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);

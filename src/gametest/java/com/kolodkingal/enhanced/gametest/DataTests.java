@@ -254,8 +254,8 @@ public final class DataTests {
     }
 
     /**
-     * Every look of every hero has its skin (64x64) and cape (64x32) in the mod, and every hero, ability, look and
-     * signature ability has a name in both English and Hebrew.
+     * Every look of every hero has its skin (64x64) and cape (64x32) in the mod, and every hero, ability and look has
+     * a name in both English and Hebrew.
      */
     @GameTest(template = ARENA)
     public static void everyLookHasItsSkinAndEveryNameItsTranslation(GameTestHelper helper) throws IOException {
@@ -283,11 +283,6 @@ public final class DataTests {
             for (Variant look : Variants.of(power)) {
                 if (!en.has(look.translationKey())) {
                     missing.add(look.translationKey());
-                }
-                for (int ability = 1; ability <= PowerData.ABILITIES; ability++) {
-                    if (look.hasSignature(ability) && !en.has(look.abilityKey(ability))) {
-                        missing.add(look.abilityKey(ability));
-                    }
                 }
                 if (look.skin() != null) {
                     checkImage(mod, look.skin(), 64, 64);

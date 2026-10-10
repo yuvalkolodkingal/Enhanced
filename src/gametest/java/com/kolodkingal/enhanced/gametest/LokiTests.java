@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.google.gson.JsonObject;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
@@ -13,8 +14,10 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -294,18 +297,71 @@ public final class LokiTests {
         check(!data.toggle(Toggle.FROST_GIANT), "pressed again, he looks Asgardian");
         assertNear(loki.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "the extra armor goes with the form");
 
-        // The looks with a signature ability of their own don't have the Frost Giant form.
+        // Changing look while a Frost Giant keeps the form: it belongs to Loki, not to an outfit.
+        press(loki, 5);
+        check(data.toggle(Toggle.FROST_GIANT), "a Frost Giant again");
         Powers.setVariant(loki, Variants.get(Power.LOKI, "tva"));
-        press(loki, 5);
-        check(!data.toggle(Toggle.FROST_GIANT), "the TVA look's ability 5 is its own");
-
-        Powers.setVariant(loki, Variants.get(Power.LOKI, "loki"));
-        press(loki, 5);
-        check(data.toggle(Toggle.FROST_GIANT), "back in the God of Mischief look it works again");
-        Powers.setVariant(loki, Variants.get(Power.LOKI, "sylvie"));
         PowerTicker.tick(loki);
-        check(!data.toggle(Toggle.FROST_GIANT), "changing to a look with its own ability 5 ends the Frost Giant form");
-        assertNear(loki.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "and its armor");
+        check(data.toggle(Toggle.FROST_GIANT), "changing look doesn't end the Frost Giant form");
+        assertNear(loki.getAttributeValue(Attributes.ARMOR) - armor, LokiAbilities.FROST_ARMOR_BONUS, 1.0E-6, "or its armor");
+        helper.succeed();
+    }
+
+    /** No look has an ability of its own: ability 5 is the Frost Giant form whichever outfit Loki wears. */
+    @GameTest(template = ARENA)
+    public static void frostGiantIsAbilityFiveInEveryLook(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer loki = f.player(5.5, FLOOR, 10.5, Power.LOKI);
+        PowerData data = Powers.get(loki);
+        PowerTicker.tick(loki);
+        double armor = loki.getAttributeValue(Attributes.ARMOR);
+
+        for (String id : List.of("loki", "tva", "god_of_stories", "own")) {
+            Powers.setVariant(loki, Variants.get(Power.LOKI, id));
+            check(Variants.current(data).id().equals(id), "Loki wears the " + id + " look");
+
+            press(loki, 5);
+            check(data.toggle(Toggle.FROST_GIANT), "N reveals the Frost Giant in the " + id + " look");
+            assertNear(loki.getAttributeValue(Attributes.ARMOR) - armor, LokiAbilities.FROST_ARMOR_BONUS, 1.0E-6,
+                    "with its armor in the " + id + " look");
+            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
+            loki.attack(zombie);
+            check(zombie.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "and its blow slows in the " + id + " look");
+            zombie.discard();
+
+            press(loki, 5);
+            check(!data.toggle(Toggle.FROST_GIANT), "N turns him Asgardian again in the " + id + " look");
+            assertNear(loki.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "and takes the armor away");
+            loki.setHealth(loki.getMaxHealth());
+        }
+        helper.succeed();
+    }
+
+    // ---- Looks ----
+
+    /** Only the main MCU Loki: his Asgardian look, the TVA's, the God of Stories' and the player's own skin. */
+    @GameTest(template = ARENA)
+    public static void lokiHasOnlyTheMainLokisLooks(GameTestHelper helper) {
+        List<String> ids = Variants.of(Power.LOKI).stream().map(Variant::id).toList();
+        check(ids.equals(List.of("loki", "tva", "god_of_stories", "own")), "Loki's looks are the main Loki's, not " + ids);
+
+        // A world saved with one of the looks that are gone loads as the default look.
+        for (String gone : List.of("sylvie", "classic", "kid", "president")) {
+            JsonObject saved = new JsonObject();
+            saved.addProperty("power", "loki");
+            saved.addProperty("variant", gone);
+            PowerData data = PowerData.CODEC.parse(JsonOps.INSTANCE, saved).result().orElseThrow();
+            check(Variants.current(data).id().equals("loki"), "a saved " + gone + " look falls back to the God of Mischief");
+        }
+
+        // The Change Look key goes round them and back.
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer loki = f.player(10.5, FLOOR, 10.5, Power.LOKI);
+        PowerData data = Powers.get(loki);
+        for (String expected : List.of("tva", "god_of_stories", "own", "loki")) {
+            check(Powers.cycleVariant(loki, 1), "the look changes");
+            check(Variants.current(data).id().equals(expected), "the next look is " + expected + ", not " + Variants.current(data).id());
+        }
         helper.succeed();
     }
 

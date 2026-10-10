@@ -7,9 +7,9 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -103,7 +103,7 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
         if (level() instanceof ServerLevel server) {
             server.sendParticles(new EnergyParticleOptions(magicColor(), 1.0F), getX(), getY() + 0.1, getZ(), 14, 0.08, 0.08, 0.08, 0.12);
             server.sendParticles(new EnergyParticleOptions(magicGlow(), 0.8F), getX(), getY() + 0.1, getZ(), 6, 0.05, 0.05, 0.05, 0.06);
-            server.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 0.45F, 1.7F);
+            server.playSound(null, getX(), getY(), getZ(), ModSounds.LOKI_DISSOLVE.get(), SoundSource.PLAYERS, 0.45F, 1.6F);
         }
         discard();
     }

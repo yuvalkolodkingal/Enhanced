@@ -14,37 +14,33 @@ public final class Variants {
 
     static {
         add(Power.VISION,
-                new Variant("vision", Power.VISION, Variant.suit("vision"), Variant.suit("vision_cape"), false, Power.VISION.color, Power.VISION.glow, 0),
-                new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), Variant.suit("white_vision_cape"), false, 0xA6E2F0, 0xE8FBFF, 0));
+                new Variant("vision", Power.VISION, Variant.suit("vision"), Variant.suit("vision_cape"), false, Power.VISION.color, Power.VISION.glow),
+                new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), Variant.suit("white_vision_cape"), false, 0xA6E2F0, 0xE8FBFF));
 
         add(Power.BILLY,
-                new Variant("wiccan", Power.BILLY, Variant.suit("billy_wiccan"), Variant.suit("billy_wiccan_cape"), false, Power.BILLY.color, Power.BILLY.glow, 0),
-                new Variant("teen", Power.BILLY, Variant.suit("billy_teen"), null, false, Power.BILLY.color, Power.BILLY.glow, 0),
-                new Variant("halloween", Power.BILLY, Variant.suit("billy_halloween"), Variant.suit("billy_halloween_cape"), false, Power.BILLY.color, Power.BILLY.glow, 0),
-                new Variant("comics", Power.BILLY, Variant.suit("billy_comics"), Variant.suit("billy_comics_cape"), false, Power.BILLY.color, Power.BILLY.glow, 0),
+                new Variant("wiccan", Power.BILLY, Variant.suit("billy_wiccan"), Variant.suit("billy_wiccan_cape"), false, Power.BILLY.color, Power.BILLY.glow),
+                new Variant("teen", Power.BILLY, Variant.suit("billy_teen"), null, false, Power.BILLY.color, Power.BILLY.glow),
+                new Variant("halloween", Power.BILLY, Variant.suit("billy_halloween"), Variant.suit("billy_halloween_cape"), false, Power.BILLY.color, Power.BILLY.glow),
+                new Variant("comics", Power.BILLY, Variant.suit("billy_comics"), Variant.suit("billy_comics_cape"), false, Power.BILLY.color, Power.BILLY.glow),
                 own(Power.BILLY));
 
         add(Power.TOMMY,
-                new Variant("halloween", Power.TOMMY, Variant.suit("tommy_halloween"), null, false, Power.TOMMY.color, Power.TOMMY.glow, 0),
-                new Variant("tracksuit", Power.TOMMY, Variant.suit("tommy_tracksuit"), null, false, Power.TOMMY.color, Power.TOMMY.glow, 0),
-                new Variant("speed", Power.TOMMY, Variant.suit("tommy_speed"), null, false, Power.TOMMY.color, Power.TOMMY.glow, 0),
+                new Variant("halloween", Power.TOMMY, Variant.suit("tommy_halloween"), null, false, Power.TOMMY.color, Power.TOMMY.glow),
+                new Variant("tracksuit", Power.TOMMY, Variant.suit("tommy_tracksuit"), null, false, Power.TOMMY.color, Power.TOMMY.glow),
+                new Variant("speed", Power.TOMMY, Variant.suit("tommy_speed"), null, false, Power.TOMMY.color, Power.TOMMY.glow),
                 own(Power.TOMMY));
 
         add(Power.LOKI,
-                new Variant("loki", Power.LOKI, Variant.suit("loki"), Variant.suit("loki_cape"), false, Power.LOKI.color, Power.LOKI.glow, 0),
-                new Variant("tva", Power.LOKI, Variant.suit("loki_tva"), null, false, 0xC9A56B, 0xC8824B, 5),
-                new Variant("sylvie", Power.LOKI, Variant.suit("loki_sylvie"), Variant.suit("loki_sylvie_cape"), true, 0x3AE271, 0x6FFFC6, 5),
-                new Variant("classic", Power.LOKI, Variant.suit("loki_classic"), Variant.suit("loki_classic_cape"), false, 0x70C77A, 0xA8F6A3, 5),
-                new Variant("kid", Power.LOKI, Variant.suit("loki_kid"), Variant.suit("loki_kid_cape"), false, Power.LOKI.color, 0xFF8A2A, 5),
-                new Variant("president", Power.LOKI, Variant.suit("loki_president"), null, false, Power.LOKI.color, Power.LOKI.glow, 5),
-                new Variant("god_of_stories", Power.LOKI, Variant.suit("loki_god_of_stories"), Variant.suit("loki_god_of_stories_cape"), false, 0x82A659, 0xC9A54A, 5),
+                new Variant("loki", Power.LOKI, Variant.suit("loki"), Variant.suit("loki_cape"), false, Power.LOKI.color, Power.LOKI.glow),
+                new Variant("tva", Power.LOKI, Variant.suit("loki_tva"), null, false, 0xC9A56B, 0xC8824B),
+                new Variant("god_of_stories", Power.LOKI, Variant.suit("loki_god_of_stories"), Variant.suit("loki_god_of_stories_cape"), false, 0x82A659, 0xC9A54A),
                 own(Power.LOKI));
 
         add(Power.THOR,
-                new Variant("thor", Power.THOR, Variant.suit("thor"), Variant.suit("thor_cape"), false, Power.THOR.color, Power.THOR.glow, 0),
-                new Variant("ragnarok", Power.THOR, Variant.suit("thor_ragnarok"), Variant.suit("thor_ragnarok_cape"), false, Power.THOR.color, Power.THOR.glow, 0),
-                new Variant("love_and_thunder", Power.THOR, Variant.suit("thor_love_and_thunder"), Variant.suit("thor_love_and_thunder_cape"), false, Power.THOR.color, Power.THOR.glow, 0),
-                new Variant("mighty_thor", Power.THOR, Variant.suit("thor_mighty"), Variant.suit("thor_mighty_cape"), true, Power.THOR.color, Power.THOR.glow, 0),
+                new Variant("thor", Power.THOR, Variant.suit("thor"), Variant.suit("thor_cape"), false, Power.THOR.color, Power.THOR.glow),
+                new Variant("ragnarok", Power.THOR, Variant.suit("thor_ragnarok"), Variant.suit("thor_ragnarok_cape"), false, Power.THOR.color, Power.THOR.glow),
+                new Variant("love_and_thunder", Power.THOR, Variant.suit("thor_love_and_thunder"), Variant.suit("thor_love_and_thunder_cape"), false, Power.THOR.color, Power.THOR.glow),
+                new Variant("mighty_thor", Power.THOR, Variant.suit("thor_mighty"), Variant.suit("thor_mighty_cape"), true, Power.THOR.color, Power.THOR.glow),
                 own(Power.THOR));
     }
 
@@ -54,7 +50,7 @@ public final class Variants {
 
     /** "Your own skin": the hero's powers and colours, the player's own look. */
     private static Variant own(Power power) {
-        return new Variant("own", power, null, null, false, power.color, power.glow, 0);
+        return new Variant("own", power, null, null, false, power.color, power.glow);
     }
 
     /** The hero's looks, or an empty list if it has only its one suit. */
@@ -98,7 +94,7 @@ public final class Variants {
 
     static {
         for (Power power : Power.values()) {
-            PLAIN.put(power, new Variant("default", power, null, null, false, power.color, power.glow, 0));
+            PLAIN.put(power, new Variant("default", power, null, null, false, power.color, power.glow));
         }
     }
 

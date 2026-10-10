@@ -104,16 +104,12 @@ public final class Powers {
         return variant(player).glow();
     }
 
-    /**
-     * Changes the player's look (no effects). Whatever the old look's signature ability was doing ends first, so
-     * nothing it summoned or enchanted outlives the look.
-     */
+    /** Changes the player's look (no effects). */
     public static void setVariant(ServerPlayer player, Variant variant) {
         PowerData data = get(player);
         if (variant.power() != data.power() || Variants.current(data).equals(variant)) {
             return;
         }
-        PowerTicker.endLook(player, data);
         data.setVariantRaw(variant.id());
         syncIfDirty(player);
     }

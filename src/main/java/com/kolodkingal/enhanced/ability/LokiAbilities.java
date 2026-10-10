@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -54,9 +55,9 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Loki, the God of Mischief, and his variants. Every look shares his tricks: conjured daggers, illusory duplicates,
- * shapeshifting and vanishing. Ability 5 is his true Frost Giant form, except for the looks that bring a signature
- * ability of their own ({@link Variant#signature()}).
+ * Loki, the God of Mischief. Every look (his Asgardian clothes, the TVA's, the God of Stories', his own skin) shares the
+ * same tricks: conjured daggers, illusory duplicates, shapeshifting and vanishing. Ability 5 is his true Frost Giant
+ * form.
  */
 public final class LokiAbilities {
     private static final ResourceLocation BODY_HEALTH = Enhanced.id("loki_body_health");
@@ -105,11 +106,6 @@ public final class LokiAbilities {
         if (!down || player.isSpectator()) {
             return;
         }
-        Variant look = Variants.current(data);
-        if (look.hasSignature(ability)) {
-            signature(player, data, look);
-            return;
-        }
         switch (ability) {
             case 1 -> daggers(player, data);
             case 2 -> duplicates(player, data);
@@ -119,13 +115,6 @@ public final class LokiAbilities {
             default -> {
             }
         }
-    }
-
-    /**
-     * A look's own ability, in place of one of the usual five (the TVA's TemPad, Sylvie's Enchantment, Classic Loki's
-     * Glorious Purpose, Kid Loki's Laevateinn, President Loki's army, the God of Stories' Time Slip).
-     */
-    static void signature(ServerPlayer player, PowerData data, Variant look) {
     }
 
     public static void tick(ServerPlayer player, PowerData data) {
@@ -148,20 +137,12 @@ public final class LokiAbilities {
     /** Keeps Loki's body in step with his Frost Giant form and his shapeshifted form; also called when the power changes. */
     public static void applyForm(ServerPlayer player, PowerData data) {
         boolean loki = data.power() == Power.LOKI;
-        if (loki && data.toggle(Toggle.FROST_GIANT) && Variants.current(data).hasSignature(5)) {
-            // The Frost Giant form belongs to the looks whose ability 5 is still his own.
-            data.setToggle(Toggle.FROST_GIANT, false);
-        }
         boolean frost = loki && data.toggle(Toggle.FROST_GIANT);
         PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, BODY_HEALTH_BONUS, loki);
         PowerTicker.setModifier(player, Attributes.ARMOR, FROST_ARMOR, FROST_ARMOR_BONUS, frost);
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
-    }
-
-    /** Ends whatever the current look's signature ability left in the world (the look is changing). */
-    public static void endLook(ServerPlayer player, PowerData data) {
     }
 
     /** Ends everything this hero left in the world (the power is being taken away). */
@@ -224,8 +205,8 @@ public final class LokiAbilities {
             level.addFreshEntity(dagger);
         }
         gesture(player, data, Live.THROWING, GESTURE_TICKS);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.TRIDENT_THROW.value(), SoundSource.PLAYERS,
-                0.7F, fan ? 1.3F : 1.6F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.LOKI_DAGGER.get(), SoundSource.PLAYERS,
+                0.8F, fan ? 0.9F : 1.0F);
     }
 
     // ---- Ability 2: Duplicates ----
@@ -271,8 +252,7 @@ public final class LokiAbilities {
         }
 
         Powers.burst(level, player.getX(), player.getY() + 1.0, player.getZ(), look.color(), 30, 0.4);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ILLUSIONER_PREPARE_MIRROR, SoundSource.PLAYERS, 1.0F, 1.0F);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.0F, 1.0F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.LOKI_ILLUSION.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         player.displayClientMessage(Component.translatable("message.enhanced.duplicates.surprise").withStyle(s -> s.withColor(look.color())), true);
     }
 
@@ -334,7 +314,7 @@ public final class LokiAbilities {
                 60, 0.35, 0.8, 0.35, 0.03);
         level.sendParticles(new EnergyParticleOptions(look.glow(), 1.2F), player.getX(), player.getY() + 1.0, player.getZ(),
                 24, 0.3, 0.7, 0.3, 0.06);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 0.9F, 1.3F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.LOKI_SHAPESHIFT.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
         gesture(player, data, Live.CASTING, GESTURE_TICKS);
     }
 
@@ -342,7 +322,7 @@ public final class LokiAbilities {
 
     /**
      * Gone in a green flash, and back where he looks (up to 20 blocks): on top of the block, or right behind the
-     * creature, facing its back (Sylvie's sword misses him).
+     * creature, facing its back.
      */
     private static void vanish(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
@@ -384,12 +364,12 @@ public final class LokiAbilities {
         Variant look = Variants.current(data);
         Vec3 from = player.position();
         vanishFlash(level, from, look);
-        level.playSound(null, from.x, from.y, from.z, SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.0F, 1.2F);
+        level.playSound(null, from.x, from.y, from.z, ModSounds.LOKI_VANISH.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         player.teleportTo(level, to.x, to.y, to.z, yaw, pitch);
         player.setYHeadRot(yaw);
         player.resetFallDistance();
         vanishFlash(level, to, look);
-        level.playSound(null, to.x, to.y, to.z, SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.0F, 1.5F);
+        level.playSound(null, to.x, to.y, to.z, ModSounds.LOKI_VANISH.get(), SoundSource.PLAYERS, 1.0F, 1.2F);
         gesture(player, data, Live.CASTING, GESTURE_TICKS);
     }
 
@@ -414,10 +394,12 @@ public final class LokiAbilities {
         if (frost) {
             level.sendParticles(ParticleTypes.SNOWFLAKE, player.getX(), player.getY() + 1.0, player.getZ(), 30, 0.4, 0.8, 0.4, 0.02);
         }
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), frost ? SoundEvents.POWDER_SNOW_BREAK : SoundEvents.AMETHYST_BLOCK_RESONATE,
-                SoundSource.PLAYERS, 1.0F, frost ? 0.6F : 1.4F);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), frost ? SoundEvents.BEACON_POWER_SELECT : SoundEvents.BEACON_DEACTIVATE,
-                SoundSource.PLAYERS, 0.5F, frost ? 0.6F : 1.6F);
+        if (frost) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.FROST_GIANT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        } else {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 1.4F);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.5F, 1.6F);
+        }
         player.displayClientMessage(Component.translatable(frost ? "message.enhanced.frost_giant.on" : "message.enhanced.frost_giant.off")
                 .withStyle(s -> s.withColor(frost ? FROST_GLOW : look.color())), true);
     }

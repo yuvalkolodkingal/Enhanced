@@ -4,12 +4,12 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -46,7 +46,7 @@ import java.util.UUID;
  * <p>What a copy does depends on its {@link Mode}; the Duplicates trick uses {@link Mode#DECOY}.
  */
 public class LokiIllusionEntity extends PathfinderMob {
-    /** What an illusion is for. New modes (copies that fight, an army) are added here. */
+    /** What an illusion is for. New modes (copies that fight) are added here. */
     public enum Mode {
         /** Walks off on its own to draw attention away from Loki; it deals no damage. */
         DECOY
@@ -201,8 +201,7 @@ public class LokiIllusionEntity extends PathfinderMob {
                     Mth.clamp(touched.z, box.minZ, box.maxZ));
             server.sendParticles(new EnergyParticleOptions(color, 2.2F), flash.x, flash.y, flash.z, 14, 0.12, 0.12, 0.12, 0.08);
             server.sendParticles(new EnergyParticleOptions(glow, 1.6F), flash.x, flash.y, flash.z, 8, 0.05, 0.05, 0.05, 0.03);
-            server.playSound(null, getX(), getY(), getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 0.6F, 1.6F);
-            server.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 0.8F);
+            server.playSound(null, getX(), getY(), getZ(), ModSounds.LOKI_DISSOLVE.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
         }
         discard();
     }

@@ -59,11 +59,6 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> LOKI_SHAPESHIFT = register("loki_shapeshift");
     public static final DeferredHolder<SoundEvent, SoundEvent> FROST_GIANT = register("frost_giant");
     public static final DeferredHolder<SoundEvent, SoundEvent> TESSERACT = register("tesseract");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TEMPAD_DOOR = register("tempad_door");
-    public static final DeferredHolder<SoundEvent, SoundEvent> ENCHANTMENT = register("enchantment");
-    public static final DeferredHolder<SoundEvent, SoundEvent> GLORIOUS_PURPOSE = register("glorious_purpose");
-    public static final DeferredHolder<SoundEvent, SoundEvent> LAEVATEINN = register("laevateinn");
-    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_SLIP = register("time_slip");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
