@@ -63,6 +63,7 @@ public final class ThorEffects {
     public static void add(ThorFxPayload payload) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level != null && !payload.points().isEmpty()) {
+            HeroAnimator.onThorFx(payload);
             EFFECTS.add(new Effect(payload.kind(), payload.entityId(), payload.points(), level.dimension(), level.getGameTime()));
         }
     }
@@ -171,6 +172,10 @@ public final class ThorEffects {
 
     /** Where his weapon is when Thor raises it to the sky: above his head, a little forward. */
     private static Vec3 hammerAloft(Minecraft mc, AbstractClientPlayer player, float partialTick) {
+        Vec3 head = HandTracker.weaponHead(player, partialTick);
+        if (head != null) {
+            return head;
+        }
         boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         Vec3 eye = player.getEyePosition(partialTick);
         if (firstPerson) {

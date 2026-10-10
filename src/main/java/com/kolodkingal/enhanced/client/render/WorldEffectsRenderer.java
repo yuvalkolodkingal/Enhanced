@@ -332,6 +332,10 @@ public final class WorldEffectsRenderer {
 
     /** Vision's Mind Stone, in the middle of his forehead (just above the screen centre in first person). */
     public static Vec3 foreheadPosition(Minecraft mc, AbstractClientPlayer player, float partialTick) {
+        Vec3 tracked = HandTracker.forehead(player, partialTick);
+        if (tracked != null) {
+            return tracked;
+        }
         Vec3 eye = player.getEyePosition(partialTick);
         Vec3 look = player.getViewVector(partialTick);
         boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
@@ -347,6 +351,10 @@ public final class WorldEffectsRenderer {
 
     /** Where energy leaves the player's hands: in front of the chest, or bottom-right of the screen in first person. */
     public static Vec3 handPosition(Minecraft mc, AbstractClientPlayer player, float partialTick) {
+        Vec3 tracked = HandTracker.hand(player, player.getMainArm(), partialTick);
+        if (tracked != null) {
+            return tracked;
+        }
         Vec3 eye = player.getEyePosition(partialTick);
         Vec3 look = player.getViewVector(partialTick);
         boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();

@@ -76,6 +76,8 @@ public final class Afterimages {
         float bodyYaw = Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot);
         PoseStack poseStack = event.getPoseStack();
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        HeroAnimState state = HeroAnimator.peek(player);
+        RunPoses.Style style = state == null ? null : RunPoses.style(state);
         int i = 0;
         for (Vec3 old : trail) {
             i++;
@@ -90,6 +92,10 @@ public final class Afterimages {
             int alpha = (int) (120 * fade);
             if (alpha < 4) {
                 continue;
+            }
+            // Each ghost shows the moment of the stride the runner was in then.
+            if (style != null) {
+                RunPoses.ghost(model, style, state.phaseRing[Math.min(i - 1, state.phaseRing.length - 1)], 1.0F);
             }
             poseStack.pushPose();
             poseStack.translate(offset.x, offset.y, offset.z);
@@ -109,8 +115,6 @@ public final class Afterimages {
         PlayerModel<AbstractClientPlayer> model = event.getRenderer().getModel();
         VertexConsumer vc = event.getMultiBufferSource().getBuffer(RenderType.itemEntityTranslucentCull(event.getRenderer().getTextureLocation(player)));
         PoseStack poseStack = event.getPoseStack();
-        // Running pose for the ghosts: the model was last set up for the real player, so set it up again, sprinting.
-        model.setupAnim(player, t * 1.6F, 1.0F, t, 0.0F, 0.0F);
         float radius = 2.5F;
         Vec3 center = player.getPosition(event.getPartialTick());
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
@@ -124,6 +128,8 @@ public final class Afterimages {
                 if (alpha < 4) {
                     continue;
                 }
+                // A sprinting pose for each ghost, a quarter of a stride apart.
+                RunPoses.ghost(model, RunPoses.Style.TOMMY, t * 1.4F + k * Mth.HALF_PI, 1.0F);
                 poseStack.pushPose();
                 poseStack.translate(Mth.cos(angle) * radius, 0.05, Mth.sin(angle) * radius);
                 // Facing along the ring (the direction of travel), leaning in.

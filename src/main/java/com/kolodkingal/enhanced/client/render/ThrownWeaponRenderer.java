@@ -40,6 +40,8 @@ public class ThrownWeaponRenderer extends EntityRenderer<ThrownWeaponEntity> {
         if (entity.isReturning()) {
             // The item model stands handle-down, head-up: lay it so the head leads along the flight.
             poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+            // A gentle roll about its own long axis, so it does not look nailed to its path.
+            poseStack.mulPose(Axis.YP.rotationDegrees((entity.tickCount + partialTick) * 25.0F));
         } else {
             float spin = (entity.tickCount + partialTick) * 40.0F;
             poseStack.mulPose(Axis.XP.rotationDegrees(spin));

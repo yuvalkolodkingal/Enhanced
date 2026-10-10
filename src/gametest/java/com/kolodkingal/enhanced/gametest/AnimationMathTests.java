@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.AimMath;
 import com.kolodkingal.enhanced.client.render.AnimMath;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
+import com.kolodkingal.enhanced.client.render.GestureId;
+import com.kolodkingal.enhanced.client.render.Gestures;
 import com.kolodkingal.enhanced.client.render.GripMath;
 import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.gametest.framework.GameTest;
@@ -242,6 +244,44 @@ public final class AnimationMathTests {
         }
         check(FlightProfile.of(Power.THOR, false).spring, "Thor's lean is a spring");
         check(FlightProfile.of(Power.QUICKSILVER, false) == null && FlightProfile.of(Power.LOKI, false) == null, "runners do not fly");
+        check(!FlightProfile.of(Power.SCARLET_WITCH, false).spring, "only Thor's lean is a spring");
+        helper.succeed();
+    }
+
+    /** Every gesture table is well formed, and each take-off ends exactly on its hero's hover pose: no pop as it hands over. */
+    @GameTest(template = ARENA)
+    public static void flightGesturesAreWellFormedAndHandOverWithoutAPop(GameTestHelper helper) {
+        for (Gestures.Def def : Gestures.all().values()) {
+            check(def.problems().isEmpty(), "gesture " + def.id + ": " + def.problems());
+        }
+        GestureId[] stageA = {GestureId.LOOK_CHANGE, GestureId.TAKEOFF_MAGNETO, GestureId.TAKEOFF_WANDA, GestureId.TAKEOFF_VISION,
+                GestureId.TAKEOFF_BILLY, GestureId.TAKEOFF_THOR, GestureId.BRAKE, GestureId.BRAKE_THOR, GestureId.LAND_SOFT,
+                GestureId.LAND_HERO, GestureId.THOR_ARRIVAL, GestureId.RUN_SKID, GestureId.THOR_SHATTER, GestureId.THOR_REFORM,
+                GestureId.THOR_PIN};
+        for (GestureId id : stageA) {
+            check(Gestures.get(id) != null, id + " has its keys");
+        }
+        GestureId[] ids = {GestureId.TAKEOFF_MAGNETO, GestureId.TAKEOFF_WANDA, GestureId.TAKEOFF_VISION, GestureId.TAKEOFF_BILLY,
+                GestureId.TAKEOFF_THOR};
+        Power[] powers = {Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR};
+        for (int k = 0; k < ids.length; k++) {
+            Gestures.Def def = Gestures.get(ids[k]);
+            FlightProfile profile = FlightProfile.of(powers[k], false);
+            Gestures.ArmKey m = def.m.get(def.m.size() - 1);
+            Gestures.ArmKey o = def.o.get(def.o.size() - 1);
+            float[] mine = {m.x, m.y, m.z, o.x, o.y, o.z};
+            for (int i = 0; i < 6; i++) {
+                assertNear(mine[i], profile.anchor(FlightProfile.HOVER, i), 0.5, def.id + ": the last key is the hover pose, value " + i);
+            }
+            check(m.mode == (profile.mWorld ? Gestures.Mode.WORLD : Gestures.Mode.ABS), def.id + ": the arm mode matches the hover pose");
+            if (!def.right.isEmpty()) {
+                assertNear(def.right.value(def.right.size() - 1)[0], profile.anchor(FlightProfile.HOVER, 6), 0.5,
+                        def.id + ": the right leg ends on the hover pose");
+                assertNear(def.left.value(def.left.size() - 1)[0], profile.anchor(FlightProfile.HOVER, 8), 0.5,
+                        def.id + ": the left leg ends on the hover pose");
+            }
+        }
+        check(Gestures.get(GestureId.TAKEOFF_BILLY).hasYaw(), "Billy's take-off is a lazy turn that ends facing the way he faces");
         helper.succeed();
     }
 }

@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
+import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
@@ -85,6 +86,8 @@ public final class ClientSetup {
                 renderer.addLayer(new GlowingEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
                 renderer.addLayer(new BillyCrownLayer(renderer));
+                // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
+                renderer.addLayer(new HandTrackerLayer(renderer));
             }
         }
     }
@@ -98,6 +101,7 @@ public final class ClientSetup {
     public static void onRegisterGui(RegisterGuiLayersEvent event) {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("powers"), new PowerHud());
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("slow_motion"), new SlowMotionOverlay());
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("anim_state"), new AnimStateOverlay());
     }
 
     private ClientSetup() {

@@ -9,6 +9,7 @@
   "client": [
     "client.AbstractClientPlayerMixin",
     "client.CapeLayerMixin",
+    "client.ItemInHandLayerMixin",
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.MinecraftAccessor",

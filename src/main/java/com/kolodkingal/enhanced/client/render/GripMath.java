@@ -60,8 +60,10 @@ public final class GripMath {
         public final Vector3f position = new Vector3f();
         public final Quaternionf rotation = new Quaternionf();
         public final Vector3f held = new Vector3f();
+        /** Where the strap is fastened: the centre of the whirl, or the fist (the held point is a strap's length from it). */
+        public final Vector3f pivot = new Vector3f();
 
-        /** The matrix that takes an item point in item pixels to H in blocks (pixels over 16). */
+        /** The matrix that takes an item point in blocks (item pixels over 16) to H in blocks (pixels over 16). */
         public Matrix4f matrix() {
             return new Matrix4f().translate(position.x / 16.0F, position.y / 16.0F, position.z / 16.0F).rotate(rotation)
                     .scale(SCALE).translate(-held.x / 16.0F, -held.y / 16.0F, -held.z / 16.0F);
@@ -125,6 +127,7 @@ public final class GripMath {
         out.held.set(kind.grip).lerp(kind.strap, w);
         Vector3f fist = new Vector3f(slim ? -0.5F * m : 0.0F, FIST.y, FIST.z);
         out.position.set(fist).lerp(WHIRL, w);
+        out.pivot.set(out.position);
         if (w > 0.0F && kind.gap != 0.0F) {
             Vector3f out2 = new Vector3f(0.0F, 1.0F, 0.0F);
             out.rotation.transform(out2);

@@ -53,7 +53,7 @@ public final class FlightProfile {
     private final float[][] anchors;
 
     private FlightProfile(float[] pitch, float kClimb, float diveAdd, float maxRoll, float kTurn, float kStrafe, float tauRoll,
-                          float[] dynamics, float[] bob, float armDrift, float legSway, float legFlutter, float lazyRoll,
+                          boolean spring, float[] dynamics, float[] bob, float armDrift, float legSway, float legFlutter, float lazyRoll,
                           boolean noBrake, float defaultSpeed, boolean mWorld, float[][] anchors) {
         this.p1 = pitch[0];
         this.p2 = pitch[1];
@@ -64,7 +64,7 @@ public final class FlightProfile {
         this.kTurn = kTurn;
         this.kStrafe = kStrafe;
         this.tauRoll = tauRoll;
-        this.spring = dynamics.length == 2;
+        this.spring = spring;
         this.springOmega = spring ? dynamics[0] : 0.0F;
         this.springZeta = spring ? dynamics[1] : 0.0F;
         this.tauPitchIn = spring ? 0.0F : dynamics[0];
@@ -86,37 +86,37 @@ public final class FlightProfile {
     }
 
     private static final FlightProfile MAGNETO = new FlightProfile(
-            new float[]{22, 40, -8}, 0.40F, 8, 8, 2.5F, 8, 8, new float[]{7, 7}, new float[]{0.03F, 80}, 2.5F, 1.5F, 2.5F, 0.0F,
+            new float[]{22, 40, -8}, 0.40F, 8, 8, 2.5F, 8, 8, false, new float[]{7, 7}, new float[]{0.03F, 80}, 2.5F, 1.5F, 2.5F, 0.0F,
             true, 0.075F, false, new float[][]{
             pose(-6, 0, 18, -6, 0, -18, 2, 2, 2, -2),
             pose(-18, 0, 24, -18, 0, -24, 8, 2, 8, -2),
             pose(-30, 0, 32, -30, 0, -32, 12, 2, 12, -2)});
     private static final FlightProfile WANDA = new FlightProfile(
-            new float[]{38, 62, -8}, 0.45F, 18, 18, 4.0F, 12, 4, new float[]{4.5F, 4}, new float[]{0.06F, 78}, 4.5F, 3.4F, 2.5F, 0.0F,
+            new float[]{38, 62, -8}, 0.45F, 18, 18, 4.0F, 12, 4, false, new float[]{4.5F, 4}, new float[]{0.06F, 78}, 4.5F, 3.4F, 2.5F, 0.0F,
             false, 0.09F, false, new float[][]{
             pose(-20, 6, 32, -20, -6, -32, 7, 0, 4, 0),
             pose(-108, 8, 10, -108, -8, -10, 12, 2, 7, -2),
             pose(-152, 10, 8, -152, -10, -8, 14, 2, 8, -2)});
     private static final FlightProfile VISION = new FlightProfile(
-            new float[]{36, 66, -6}, 0.30F, 36, 12, 3.0F, 8, 5, new float[]{3.5F, 1.6F}, new float[]{0.015F, 100}, 1.7F, 0.0F, 0.0F, 0.0F,
+            new float[]{36, 66, -6}, 0.30F, 36, 12, 3.0F, 8, 5, false, new float[]{3.5F, 1.6F}, new float[]{0.015F, 100}, 1.7F, 0.0F, 0.0F, 0.0F,
             true, 0.08F, false, new float[][]{
             pose(2, 0, 8, 2, 0, -8, 0, 1, 0, -1),
             pose(8, 0, 6, 8, 0, -6, 3, 1, 3, -1),
             pose(16, 0, 8, 16, 0, -8, 5, 1, 5, -1)});
     private static final FlightProfile WHITE_VISION = new FlightProfile(
-            new float[]{36, 66, -6}, 0.30F, 36, 8, 3.0F, 8, 4, new float[]{3.5F, 1.2F}, new float[]{0.008F, 100}, 0.0F, 0.0F, 0.0F, 0.0F,
+            new float[]{36, 66, -6}, 0.30F, 36, 8, 3.0F, 8, 4, false, new float[]{3.5F, 1.2F}, new float[]{0.008F, 100}, 0.0F, 0.0F, 0.0F, 0.0F,
             true, 0.08F, false, new float[][]{
             pose(2, 0, 8, 2, 0, -8, 0, 1, 0, -1),
             pose(8, 0, 6, 8, 0, -6, 3, 1, 3, -1),
             pose(16, 0, 8, 16, 0, -8, 5, 1, 5, -1)});
     private static final FlightProfile BILLY = new FlightProfile(
-            new float[]{30, 55, -10}, 0.50F, 14, 20, 4.5F, 12, 5, new float[]{6, 6}, new float[]{0.08F, 70}, 3.4F, 5.0F, 2.5F, 2.0F,
+            new float[]{30, 55, -10}, 0.50F, 14, 20, 4.5F, 12, 5, false, new float[]{6, 6}, new float[]{0.08F, 70}, 3.4F, 5.0F, 2.5F, 2.0F,
             false, 0.08F, false, new float[][]{
             pose(-28, -12, 28, -28, 12, -28, 10, 3, -6, -3),
             pose(-50, -10, 38, -50, 10, -38, 14, 3, 6, -3),
             pose(-125, 0, 22, -125, 0, -22, 16, 2, 10, -2)});
     private static final FlightProfile THOR = new FlightProfile(
-            new float[]{72, 88, -6}, 0.35F, 40, 25, 5.0F, 8, 3.5F, new float[]{0.42F, 0.56F}, new float[]{0.04F, 60}, 2.3F, 6.0F, 1.5F, 0.0F,
+            new float[]{72, 88, -6}, 0.35F, 40, 25, 5.0F, 8, 3.5F, true, new float[]{0.42F, 0.56F}, new float[]{0.04F, 60}, 2.3F, 6.0F, 1.5F, 0.0F,
             false, 0.11F, true, new float[][]{
             pose(158, 0, 0, -8, 0, -30, 0, 2, 0, -2),
             pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),

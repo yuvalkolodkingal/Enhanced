@@ -1,332 +1,337 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.ability.LokiAbilities;
-import com.kolodkingal.enhanced.ability.MagnetoAbilities;
-import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
-import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.PowerData;
-import com.kolodkingal.enhanced.power.Powers;
-import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.client.render.Gestures.ArmKey;
+import com.kolodkingal.enhanced.client.render.Gestures.Mode;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.phys.Vec3;
 
 /**
- * Hand-made body language for the heroes, applied on top of the vanilla animation every frame:
- * <ul>
- *     <li>Scarlet Witch: both hands thrust forward and trembling while the Chaos Beam pours out; arms open and
- *     swaying, legs together, while she floats; one hand raised and twitching while she holds something.</li>
- *     <li>Magneto: an outstretched, steady hand aimed at whatever he controls or shoots; regal, arms-low hover.</li>
- *     <li>Quicksilver: a bigger, faster stride and arm swing while he runs, on top of the lean of
- *     {@link BodyLean}.</li>
- *     <li>Tommy: the same stride, bigger and faster than a sprint.</li>
- *     <li>Vision: composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
- *     weightless while phased.</li>
- *     <li>Thor: his weapon held to the sky as he hovers, and thrust ahead of him, Superman style, as he leans into the
- *     flight.</li>
- *     <li>Loki: a throwing arm after each dagger, a raised open hand as he vanishes or changes shape, and arms held
- *     slightly out in his Frost Giant form.</li>
- *     <li>Billy: his casting hand thrust forward for a Hex Bolt; both hands raised and trembling while he holds creatures
- *     spellbound; calm and weightless in flight, hands open.</li>
- * </ul>
- * A flying hero's whole body leans forward and banks ({@link BodyLean}); the poses that aim at something in the world
- * make up for the lean, so a hand still points where the hero looks, and the head tilts back to keep looking ahead.
+ * The body language of the heroes, laid over the vanilla animation every frame. Poses are not assigned, they are
+ * blended: each layer has a weight that eases in and out, so nothing snaps. In order (each blends into what the one before
+ * left):
+ * <ol>
+ *     <li>capture what vanilla made, take the swing of an attack out of the arms (it is put back at the end), and see which
+ *     arms vanilla holds in a pose of their own (a bow, a shield, an eaten item): they are left alone;</li>
+ *     <li>locomotion: the flight layer ({@link FlightPoses}), the speedster's run and everyone's walk and sprint
+ *     ({@link RunPoses});</li>
+ *     <li>the ambient stances, then the aimed and holding stances ({@link Stances});</li>
+ *     <li>the playing gestures ({@link Gestures}), oldest first;</li>
+ *     <li>the head, which keeps looking where the camera looks on a leaning body;</li>
+ *     <li>the swing put back, and the overlay parts (hat, sleeves, jacket, trousers) copied from what they cover.</li>
+ * </ol>
+ * The state (weights, lean, gestures) is made by {@link HeroAnimator}; the whole body's lean is on the pose stack
+ * ({@link BodyLean}). The first-person hand, the inventory preview and every state vanilla owns (swimming, gliding,
+ * riding, sleeping) are left as vanilla draws them.
  */
 public final class HeroPoses {
-    /** How much bigger and faster than vanilla's stride a speedster's arms and legs swing at a run. */
-    private static final float RUN_ARM_SWING = 1.7F;
-    private static final float RUN_LEG_SWING = 1.1F;
-    private static final float RUN_CADENCE = 1.4F;
-    /** The part of the body's forward pitch the head tilts back by (vanilla's glide and swim tilt it by half). */
-    private static final float HEAD_COMPENSATION = 0.6F;
-    /** Thor's weapon arm as a world direction, in radians from straight down: to the sky hovering, ahead at speed. */
-    private static final float THOR_ARM_HOVER = 2.75F;
-    private static final float THOR_ARM_FLIGHT = 1.75F;
-    /** The forward pitch of Thor's body at full speed, radians. */
-    private static final float THOR_FULL_PITCH = 80.0F * Mth.DEG_TO_RAD;
+    private static final float RAD = Mth.DEG_TO_RAD;
+    /** The planting angle of each weapon's arm in a hero landing (degrees of world elevation). */
+    private static final float PLANT_MJOLNIR = 31.0F;
+    private static final float PLANT_STORMBREAKER = 36.0F;
+    private static final float PLANT_BARE = 25.0F;
 
-    /** The forward pitch (radians) the body is drawn with, for the poses that aim at the world; set by each call. */
-    private static float bodyPitch;
+    private static final PoseContext CTX = new PoseContext();
+    private static final float[] V = new float[3];
+    private static final float[] TREMBLE = new float[2];
+    private static final float[] HEAD = new float[3];
+    private static final float[] LEG = new float[1];
+
+    /**
+     * The fields vanilla never resets for the player model, which this layer writes: the head's and the body's roll. The
+     * model is shared by every player with the same arm width (and by Loki's illusions), so they are cleared on every call.
+     */
+    public static void reset(PlayerModel<?> model) {
+        model.head.zRot = 0.0F;
+        model.body.zRot = 0.0F;
+    }
 
     public static void apply(PlayerModel<?> model, LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks) {
         // The first-person hand is drawn with an all-zero animation call: leave it alone.
         if (!(entity instanceof Player player) || ageInTicks == 0.0F) {
             return;
         }
-        PowerData data = Powers.get(player);
-        Power power = data.power();
-        if (!power.hasPowers()) {
+        HeroAnimState st = HeroAnimator.peek(player);
+        float pt = ageInTicks - player.tickCount;
+        if (st == null || pt >= 1.0F || st.wVanilla > 0.0F || Math.abs(st.time - ageInTicks) > 1.5 || !EnhancedClientConfig.animations()) {
             return;
         }
-        boolean rightHanded = player.getMainArm() == HumanoidArm.RIGHT;
-        ModelPart main = rightHanded ? model.rightArm : model.leftArm;
-        ModelPart off = rightHanded ? model.leftArm : model.rightArm;
-        float side = rightHanded ? 1F : -1F;
-        boolean airborne = data.flying() && !player.onGround();
-        boolean holding = data.heldEntityId() != -1;
-        float t = ageInTicks;
-        bodyPitch = BodyLean.pitch(player);
+        PoseContext c = CTX;
+        c.begin(model, player, st, ageInTicks, pt);
 
-        if (airborne) {
-            hover(model, t, power);
-        }
+        // ---- 1. capture ----
+        float vanillaTwist = takeOutSwing(c);
+        yields(c);
+        uprightFromCrouch(c);
 
-        switch (power) {
-            case SCARLET_WITCH -> {
-                if (data.beamActive()) {
-                    aim(model, model.rightArm, -0.18F, t, 0.05F);
-                    aim(model, model.leftArm, 0.18F, t + 7, 0.05F);
-                } else if (holding) {
-                    aim(model, main, -0.1F * side, t, 0.0F);
-                    main.xRot -= 0.35F;
-                    main.zRot += Mth.sin(t * 0.9F) * 0.06F;
-                    off.zRot += 0.3F * side * -1;
-                } else if (data.chaosShieldActive()) {
-                    model.rightArm.xRot = -1.1F + Mth.sin(t * 0.3F) * 0.05F;
-                    model.leftArm.xRot = -1.1F + Mth.cos(t * 0.3F) * 0.05F;
-                    model.rightArm.zRot = 0.55F;
-                    model.leftArm.zRot = -0.55F;
-                } else if (airborne) {
-                    // Arms open, palms glowing, slowly drifting.
-                    model.rightArm.xRot = -0.25F + Mth.sin(t * 0.08F) * 0.08F;
-                    model.leftArm.xRot = -0.25F + Mth.cos(t * 0.08F) * 0.08F;
-                    model.rightArm.zRot = 0.55F + Mth.sin(t * 0.11F) * 0.06F;
-                    model.leftArm.zRot = -0.55F - Mth.sin(t * 0.11F) * 0.06F;
-                }
-            }
-            case MAGNETO -> {
-                Vec3 caught = data.magneticShield() ? nearestHeldProjectile(player) : null;
-                if (caught != null && !holding && !data.shrapnelActive()) {
-                    // Holding a projectile still in mid-air: the hand points at it.
-                    pointAt(main, player, caught, t);
-                    off.zRot += 0.15F * -side;
-                } else if (holding || data.shrapnelActive()) {
-                    aim(model, main, -0.05F * side, t, data.shrapnelActive() ? 0.03F : 0.0F);
-                    off.zRot += 0.15F * -side;
-                } else if (airborne) {
-                    model.rightArm.xRot = -0.1F;
-                    model.leftArm.xRot = -0.1F;
-                    model.rightArm.zRot = 0.3F;
-                    model.leftArm.zRot = -0.3F;
-                }
-            }
-            case QUICKSILVER -> {
-                if (data.is(Live.SPEEDING)) {
-                    // Running, in Quicksilver Time or Super Speed.
-                    sprintStride(model, limbSwing, limbSwingAmount);
-                }
-            }
-            case VISION -> {
-                if (data.dense()) {
-                    model.rightArm.zRot = 0.25F;
-                    model.leftArm.zRot = -0.25F;
-                    model.rightArm.xRot = -0.15F;
-                    model.leftArm.xRot = -0.15F;
-                } else if (data.beamActive()) {
-                    // The beam comes from the stone in his forehead: arms pulled back, chest out, a faint strain.
-                    model.rightArm.xRot = 0.4F + Mth.sin(t * 1.7F) * 0.02F;
-                    model.leftArm.xRot = 0.4F + Mth.cos(t * 1.7F) * 0.02F;
-                    model.rightArm.zRot = 0.35F;
-                    model.leftArm.zRot = -0.35F;
-                } else if (data.visionPhased()) {
-                    // Serene and weightless: open palms slightly forward.
-                    model.rightArm.xRot = -0.35F + Mth.sin(t * 0.05F) * 0.05F;
-                    model.leftArm.xRot = -0.35F + Mth.cos(t * 0.05F) * 0.05F;
-                    model.rightArm.zRot = 0.18F;
-                    model.leftArm.zRot = -0.18F;
-                } else if (airborne) {
-                    model.rightArm.xRot = 0.05F;
-                    model.leftArm.xRot = 0.05F;
-                    model.rightArm.zRot = 0.08F + Mth.sin(t * 0.05F) * 0.03F;
-                    model.leftArm.zRot = -0.08F - Mth.sin(t * 0.05F) * 0.03F;
-                }
-            }
-            case TOMMY -> {
-                if (data.is(Live.SPEEDING)) {
-                    sprintStride(model, limbSwing, limbSwingAmount);
-                } else if (data.is(Live.WHIRLWIND)) {
-                    // The real Tommy is a blur in the eye of the storm: arms out, spinning.
-                    model.rightArm.zRot = 1.3F + Mth.sin(t * 0.8F) * 0.1F;
-                    model.leftArm.zRot = -1.3F - Mth.sin(t * 0.8F) * 0.1F;
-                    model.rightArm.xRot = 0.0F;
-                    model.leftArm.xRot = 0.0F;
-                }
-            }
-            case THOR -> {
-                Entity hammer = data.hammerEntityId() != -1 ? player.level().getEntity(data.hammerEntityId()) : null;
-                if (data.is(Live.CALLING_LIGHTNING)) {
-                    // His weapon raised to the sky, catching the lightning.
-                    main.xRot = -Mth.PI + 0.1F - bodyPitch + Mth.sin(t * 2.1F) * 0.03F;
-                    main.yRot = 0.0F;
-                    main.zRot = 0.1F * side;
-                    off.zRot += 0.25F * -side;
-                } else if (data.is(Live.BIFROST)) {
-                    model.rightArm.xRot = -0.3F;
-                    model.leftArm.xRot = -0.3F;
-                    model.rightArm.zRot = 0.45F;
-                    model.leftArm.zRot = -0.45F;
-                } else if (hammer instanceof ThrownWeaponEntity flying && flying.isReturning()
-                        && flying.distanceToSqr(player) < 20 * 20) {
-                    // Hand out, waiting for his weapon to come home.
-                    pointAt(main, player, flying.position(), t);
-                    off.zRot += 0.15F * -side;
-                } else if (airborne) {
-                    // Flying behind his weapon like Superman: hovering, it is held up to the sky; as his body leans
-                    // into the flight the arm stretches out ahead of him to lead the way. The other arm trails back.
-                    float ahead = Mth.clamp(bodyPitch / THOR_FULL_PITCH, 0.0F, 1.0F);
-                    float inWorld = Mth.lerp(ahead, THOR_ARM_HOVER, THOR_ARM_FLIGHT);
-                    main.xRot = -(inWorld + bodyPitch) + Mth.sin(t * 0.2F) * 0.04F;
-                    main.yRot = 0.0F;
-                    main.zRot = 0.0F;
-                    off.xRot = 0.35F;
-                    off.zRot = 0.12F * -side;
-                } else if (data.toggle(Toggle.GOD_OF_THUNDER)) {
-                    // Unleashed: arms held away from the body, crackling.
-                    model.rightArm.zRot += 0.22F + Mth.sin(t * 1.9F) * 0.03F;
-                    model.leftArm.zRot -= 0.22F + Mth.cos(t * 1.7F) * 0.03F;
-                }
-            }
-            case LOKI -> {
-                if (data.is(Live.THROWING)) {
-                    // The follow-through of a throw: the arm swept forward from over the shoulder.
-                    main.xRot = -1.7F + model.head.xRot * 0.6F;
-                    main.yRot = model.head.yRot * 0.5F - 0.15F * side;
-                    main.zRot = 0.0F;
-                } else if (data.is(Live.CASTING)) {
-                    // A hand raised, fingers spread, as the spell is cast.
-                    main.xRot = -2.5F + Mth.sin(t * 0.9F) * 0.04F;
-                    main.yRot = -0.25F * side;
-                    main.zRot = 0.3F * side;
-                }
-                if (LokiAbilities.isFrostGiant(player)) {
-                    // The Jotun stance: arms held slightly out from the body.
-                    model.rightArm.zRot += 0.2F;
-                    model.leftArm.zRot -= 0.2F;
-                }
-            }
-            case BILLY -> {
-                if (data.is(Live.FREEZING)) {
-                    // Both hands raised towards the creatures he holds, trembling with the effort.
-                    model.rightArm.xRot = -2.2F + model.head.xRot * 0.5F + Mth.sin(t * 1.9F) * 0.06F;
-                    model.leftArm.xRot = -2.2F + model.head.xRot * 0.5F + Mth.cos(t * 2.3F) * 0.06F;
-                    model.rightArm.yRot = model.head.yRot - 0.2F;
-                    model.leftArm.yRot = model.head.yRot + 0.2F;
-                    model.rightArm.zRot = 0.2F + Mth.sin(t * 2.7F) * 0.04F;
-                    model.leftArm.zRot = -0.2F - Mth.cos(t * 2.5F) * 0.04F;
-                } else if (data.is(Live.CASTING)) {
-                    aim(model, main, -0.05F * side, t, 0.02F);
-                    off.zRot += 0.25F * -side;
-                } else if (holding) {
-                    aim(model, main, -0.1F * side, t, 0.0F);
-                    main.xRot -= 0.3F;
-                    main.zRot += Mth.sin(t * 0.9F) * 0.05F;
-                } else if (airborne) {
-                    // Calm and weightless: arms a little away from the body, palms open.
-                    model.rightArm.xRot = -0.3F + Mth.sin(t * 0.07F) * 0.06F;
-                    model.leftArm.xRot = -0.3F + Mth.cos(t * 0.07F) * 0.06F;
-                    model.rightArm.yRot = -0.25F;
-                    model.leftArm.yRot = 0.25F;
-                    model.rightArm.zRot = 0.4F + Mth.sin(t * 0.09F) * 0.05F;
-                    model.leftArm.zRot = -0.4F - Mth.sin(t * 0.09F) * 0.05F;
-                }
-            }
-            case NONE -> {
-            }
-        }
-        // The head keeps looking ahead as the body tips forward.
-        model.head.xRot -= bodyPitch * HEAD_COMPENSATION;
-        sync(model);
+        // ---- 2. locomotion ----
+        FlightPoses.apply(c);
+        RunPoses.apply(c);
+
+        // ---- 3. stances ----
+        Stances.ambient(c);
+        Stances.aimed(c);
+
+        // ---- 4. gestures ----
+        applyGestures(c);
+
+        // ---- 5. the head ----
+        head(c);
+
+        // ---- 6. the swing, the shoulders, the overlay parts ----
+        putBackSwing(c, vanillaTwist);
+        RunPoses.sync(model);
     }
 
-    /** The nearest projectile hanging in this Magneto's field, or null. */
-    private static Vec3 nearestHeldProjectile(Player player) {
-        Vec3 eye = player.getEyePosition();
-        Vec3 best = null;
-        double bestDist = Double.MAX_VALUE;
-        for (Projectile p : player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(MagnetoAbilities.SHIELD_RADIUS + 2.0),
-                p -> p.isNoGravity() && p.getDeltaMovement().lengthSqr() < 1.0E-6 && MagnetoAbilities.isMetalProjectile(p))) {
-            double d = p.position().distanceToSqr(eye);
-            if (d < bestDist) {
-                bestDist = d;
-                best = p.position();
-            }
-        }
-        return best;
-    }
+    // ---------------------------------------------------------------------------------------------------------------
+    // Capture
+    // ---------------------------------------------------------------------------------------------------------------
 
-    /** Points an arm at a spot in the world, relative to the body's facing and lean, with a faint strain. */
-    private static void pointAt(ModelPart arm, Player player, Vec3 target, float t) {
-        Vec3 d = target.subtract(player.getEyePosition());
-        float yaw = (float) (Mth.atan2(d.z, d.x) * Mth.RAD_TO_DEG) - 90.0F;
-        float pitch = (float) -(Mth.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * Mth.RAD_TO_DEG);
-        float relYaw = Mth.wrapDegrees(yaw - player.yBodyRot);
-        arm.xRot = -Mth.HALF_PI + pitch * Mth.DEG_TO_RAD - bodyPitch + Mth.sin(t * 1.7F) * 0.02F;
-        arm.yRot = Mth.clamp(relYaw, -80.0F, 80.0F) * Mth.DEG_TO_RAD;
-        arm.zRot = 0.0F;
-    }
-
-    /** Points an arm along the way the hero looks (not the way a leaning body faces), with an optional tremble. */
-    private static void aim(PlayerModel<?> model, ModelPart arm, float yaw, float t, float tremble) {
-        arm.xRot = -Mth.HALF_PI + model.head.xRot - bodyPitch + Mth.sin(t * 1.7F) * tremble;
-        arm.yRot = model.head.yRot + yaw;
-        arm.zRot = Mth.cos(t * 1.3F) * tremble;
-    }
-
-    /** Floating instead of walking: legs together and gently swaying. */
-    private static void hover(PlayerModel<?> model, float t, Power power) {
-        float sway = Mth.sin(t * 0.07F) * 0.06F;
-        model.rightLeg.xRot = 0.12F + sway;
-        model.leftLeg.xRot = 0.08F + sway;
-        model.rightLeg.zRot = 0.03F;
-        model.leftLeg.zRot = -0.03F;
-        model.rightLeg.yRot = 0.0F;
-        model.leftLeg.yRot = 0.0F;
-        if (power != Power.QUICKSILVER) {
-            model.rightArm.xRot = Mth.sin(t * 0.06F) * 0.05F;
-            model.leftArm.xRot = -Mth.sin(t * 0.06F) * 0.05F;
-        }
+    /** The physical arm that swings for an attack. */
+    private static HumanoidArm attackArm(Player player) {
+        return player.swingingArm == InteractionHand.MAIN_HAND ? player.getMainArm() : player.getMainArm().getOpposite();
     }
 
     /**
-     * A speedster's stride: the vanilla swing of the arms and legs, bigger and faster, added on top of whatever else
-     * they are doing (an item in hand halves the swing, as in vanilla). It rides on the vanilla swing's own amount, so
-     * it is still while he stands. The forward lean of the run is the whole body's, see {@link BodyLean}.
+     * Vanilla added the swing of an attack to the arms (and twisted the body); take it out again, exactly, so the pose
+     * layers see the arms as they were without it. Returns the twist vanilla gave the body.
      */
-    private static void sprintStride(PlayerModel<?> model, float limbSwing, float limbSwingAmount) {
-        float slow = limbSwing * 0.6662F;
-        float fast = slow * RUN_CADENCE;
-        // Vanilla swings the right arm with cos(slow + pi) and the left with cos(slow), by 2 * 0.5 * limbSwingAmount;
-        // the right leg with cos(slow) and the left with cos(slow + pi), by 1.4 * limbSwingAmount.
-        float arms = limbSwingAmount;
-        float legs = 1.4F * limbSwingAmount;
-        model.rightArm.xRot += armShare(model.rightArmPose)
-                * (Mth.cos(fast + Mth.PI) * RUN_ARM_SWING - Mth.cos(slow + Mth.PI)) * arms;
-        model.leftArm.xRot += armShare(model.leftArmPose) * (Mth.cos(fast) * RUN_ARM_SWING - Mth.cos(slow)) * arms;
-        model.rightLeg.xRot += (Mth.cos(fast) * RUN_LEG_SWING - Mth.cos(slow)) * legs;
-        model.leftLeg.xRot += (Mth.cos(fast + Mth.PI) * RUN_LEG_SWING - Mth.cos(slow + Mth.PI)) * legs;
+    private static float takeOutSwing(PoseContext c) {
+        PlayerModel<?> m = c.model;
+        float f = m.attackTime;
+        if (f <= 0.0F) {
+            return 0.0F;
+        }
+        float twist = m.body.yRot;
+        float g = 1.0F - f;
+        g = 1.0F - g * g * g * g;
+        float f1 = Mth.sin(g * Mth.PI);
+        float f2 = Mth.sin(f * Mth.PI) * -(c.lookPitch - 0.7F) * 0.75F;
+        ModelPart attack = attackArm(c.player) == HumanoidArm.RIGHT ? m.rightArm : m.leftArm;
+        attack.xRot += f1 * 1.2F + f2;
+        attack.yRot -= twist * 2.0F;
+        attack.zRot -= Mth.sin(f * Mth.PI) * -0.4F;
+        m.rightArm.yRot -= twist;
+        m.leftArm.yRot -= twist;
+        m.leftArm.xRot -= twist;
+        m.body.yRot = 0.0F;
+        m.rightArm.x = -5.0F;
+        m.rightArm.z = 0.0F;
+        m.leftArm.x = 5.0F;
+        m.leftArm.z = 0.0F;
+        return twist;
     }
 
-    /** How much of the vanilla swing an arm has: all of it empty-handed, half with an item, none in any other pose. */
-    private static float armShare(ArmPose pose) {
-        return pose == ArmPose.EMPTY ? 1.0F : pose == ArmPose.ITEM ? 0.5F : 0.0F;
+    /** Arms that hold a pose of their own (a bow, a shield, a spyglass) or an item in use are left to vanilla. */
+    private static void yields(PoseContext c) {
+        PlayerModel<?> m = c.model;
+        Player p = c.player;
+        boolean right = !(m.rightArmPose == ArmPose.EMPTY || m.rightArmPose == ArmPose.ITEM);
+        boolean left = !(m.leftArmPose == ArmPose.EMPTY || m.leftArmPose == ArmPose.ITEM);
+        if (m.rightArmPose == ArmPose.BOW_AND_ARROW || m.rightArmPose == ArmPose.CROSSBOW_CHARGE || m.rightArmPose == ArmPose.CROSSBOW_HOLD
+                || m.leftArmPose == ArmPose.BOW_AND_ARROW || m.leftArmPose == ArmPose.CROSSBOW_CHARGE || m.leftArmPose == ArmPose.CROSSBOW_HOLD) {
+            right = true;
+            left = true;
+        }
+        if (p.isUsingItem()) {
+            HumanoidArm using = p.getUsedItemHand() == InteractionHand.MAIN_HAND ? p.getMainArm() : p.getMainArm().getOpposite();
+            if (using == HumanoidArm.RIGHT) {
+                right = true;
+            } else {
+                left = true;
+            }
+        }
+        boolean mRight = c.mSide == HumanoidArm.RIGHT;
+        c.yieldM = mRight ? right : left;
+        c.yieldO = mRight ? left : right;
     }
 
-    /** Overlay parts (hat, sleeves, jacket, trousers) follow the parts they cover. */
-    private static void sync(PlayerModel<?> model) {
-        model.hat.copyFrom(model.head);
-        model.jacket.copyFrom(model.body);
-        model.rightSleeve.copyFrom(model.rightArm);
-        model.leftSleeve.copyFrom(model.leftArm);
-        model.rightPants.copyFrom(model.rightLeg);
-        model.leftPants.copyFrom(model.leftLeg);
+    /** In the air vanilla's sneak (the key that descends) must not crouch the body. */
+    private static void uprightFromCrouch(PoseContext c) {
+        PlayerModel<?> m = c.model;
+        float w = c.st.wAir;
+        if (!m.crouching || w <= 0.0F) {
+            return;
+        }
+        float keep = 1.0F - w;
+        m.body.xRot *= keep;
+        m.rightArm.xRot -= 0.4F * w;
+        m.leftArm.xRot -= 0.4F * w;
+        m.rightLeg.z *= keep;
+        m.leftLeg.z *= keep;
+        m.rightLeg.y = Mth.lerp(w, m.rightLeg.y, 12.0F);
+        m.leftLeg.y = Mth.lerp(w, m.leftLeg.y, 12.0F);
+        m.head.y *= keep;
+        m.body.y *= keep;
+        m.rightArm.y = Mth.lerp(w, m.rightArm.y, 2.0F);
+        m.leftArm.y = Mth.lerp(w, m.leftArm.y, 2.0F);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Gestures
+    // ---------------------------------------------------------------------------------------------------------------
+
+    /** Turns the keys of a gesture's arm into absolute angles (radians) for this frame's body. */
+    private static final Gestures.ArmSolver SOLVER = (key, main, out) -> solve(CTX, key, main, out);
+
+    private static void solve(PoseContext c, ArmKey key, boolean main, float[] out) {
+        switch (key.mode) {
+            case AIM -> c.aimAngles(main, key.target, key.x, key.y, key.z, out);
+            case WORLD -> {
+                float phi = key.x + (key.plant ? plantAngle(c.st) : 0.0F);
+                out[0] = c.worldX(phi) * RAD;
+                out[1] = key.y * c.side * RAD;
+                out[2] = key.z * c.side * RAD;
+            }
+            default -> {
+                out[0] = key.x * RAD;
+                out[1] = key.y * c.side * RAD;
+                out[2] = key.z * c.side * RAD;
+            }
+        }
+    }
+
+    private static float plantAngle(HeroAnimState st) {
+        return st.weaponKind == 2 ? PLANT_STORMBREAKER : st.weaponKind == 1 ? PLANT_MJOLNIR : PLANT_BARE;
+    }
+
+    /** Plays the gestures, the oldest first, so the newest wins where they overlap. */
+    private static void applyGestures(PoseContext c) {
+        HeroAnimState.Slot[] slots = c.st.slots;
+        // Three slots at most: pick them oldest first (ties by slot) without allocating.
+        int done = 0;
+        for (int pass = 0; pass < slots.length; pass++) {
+            int next = -1;
+            for (int i = 0; i < slots.length; i++) {
+                HeroAnimState.Slot slot = slots[i];
+                if ((done & (1 << i)) == 0 && slot.active && slot.weight > 0.0F && (next < 0 || slot.start < slots[next].start)) {
+                    next = i;
+                }
+            }
+            if (next < 0) {
+                break;
+            }
+            done |= 1 << next;
+            applyGesture(c, slots[next]);
+        }
+    }
+
+    private static void applyGesture(PoseContext c, HeroAnimState.Slot slot) {
+        Gestures.Def def = Gestures.get(slot.id);
+        float t = slot.t;
+        float w = slot.weight;
+        boolean force = slot.id.force;
+        c.forceM = force;
+        c.forceO = force;
+        for (int arm = 0; arm < 2; arm++) {
+            boolean main = arm == 0;
+            Mode mode = def.sampleArm(main, t, SOLVER, V, TREMBLE);
+            if (mode == null) {
+                continue;
+            }
+            if (mode == Mode.ADD) {
+                c.armAddRad(main, V[0], V[1], V[2], w);
+            } else {
+                c.armRad(main, V[0], V[1], V[2], w);
+                if (force) {
+                    c.occupy(main, w);
+                }
+            }
+            if (TREMBLE[0] > 0.0F) {
+                c.tremble(main, TREMBLE[0], TREMBLE[1], w);
+            }
+        }
+        if (def.right.sample(t, LEG)) {
+            c.legX(true, LEG[0], w);
+        }
+        if (def.left.sample(t, LEG)) {
+            c.legX(false, LEG[0], w);
+        }
+        if (def.head.sample(t, HEAD)) {
+            c.head(HEAD[0], HEAD[1], HEAD[2], w);
+        }
+        float twist = def.twist.scalar(t, 0.0F);
+        if (twist != 0.0F) {
+            c.twist(twist, w);
+        }
+        c.forceM = false;
+        c.forceO = false;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Head
+    // ---------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The head keeps looking where the camera looks even when the body leans: the angles that point it along the look on
+     * this frame's body replace vanilla's, by how much the body leans. What the stances and gestures added to the head stays.
+     */
+    private static void head(PoseContext c) {
+        ModelPart head = c.model.head;
+        float tilt = Math.abs(c.pitch) + Math.abs(c.roll);
+        float addX = head.xRot - c.lookPitch;
+        float addY = head.yRot - c.lookYaw;
+        float addZ = head.zRot;
+        float x = c.lookPitch;
+        float y = c.lookYaw;
+        if (tilt > 0.5F || Math.abs(c.yaw) > 0.5F) {
+            float a = AnimMath.ss(0.5F, 3.0F, tilt + Math.abs(c.yaw));
+            float[] aim = AimMath.head(AimMath.lookDirection(c.lookPitch, c.lookYaw), c.pitch, c.roll, c.yaw * c.bodySide);
+            float ax = Mth.clamp(aim[0], -70.0F * RAD, 60.0F * RAD);
+            float ay = Mth.clamp(aim[1], -75.0F * RAD, 75.0F * RAD);
+            x = Mth.lerp(a, x, ax);
+            y = Mth.lerp(a, y, ay);
+        }
+        // A bank tilts the head back toward upright, a little.
+        float counter = Mth.clamp(0.4F * c.roll, -12.0F, 12.0F) * RAD;
+        head.xRot = x + addX;
+        head.yRot = y + addY;
+        head.zRot = addZ + counter;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // The swing and the shoulders
+    // ---------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Puts the swing of an attack back on the arms, so a sword swing still reads in flight and in every ambient stance,
+     * and is mostly muted while a hand aims a beam; and turns the shoulders with the chest.
+     */
+    private static void putBackSwing(PoseContext c, float vanillaTwist) {
+        PlayerModel<?> m = c.model;
+        float f = m.attackTime;
+        float twist = c.twist * RAD;
+        if (f > 0.0F) {
+            float g = 1.0F - f;
+            g = 1.0F - g * g * g * g;
+            float f1 = Mth.sin(g * Mth.PI);
+            float f2 = Mth.sin(f * Mth.PI) * -(c.lookPitch - 0.7F) * 0.75F;
+            HumanoidArm attack = attackArm(c.player);
+            boolean attackIsM = attack == c.mSide;
+            float occupied = attackIsM ? c.occupiedM : c.occupiedO;
+            float keep = 1.0F - 0.75F * Mth.clamp(occupied, 0.0F, 1.0F);
+            ModelPart arm = attack == HumanoidArm.RIGHT ? m.rightArm : m.leftArm;
+            arm.xRot -= (f1 * 1.2F + f2) * keep;
+            arm.yRot += vanillaTwist * 2.0F;
+            arm.zRot += Mth.sin(f * Mth.PI) * -0.4F * keep;
+            m.rightArm.yRot += vanillaTwist;
+            m.leftArm.yRot += vanillaTwist;
+            m.leftArm.xRot += vanillaTwist;
+            twist += vanillaTwist;
+        }
+        if (twist != 0.0F) {
+            m.body.yRot = twist;
+            m.rightArm.z = Mth.sin(twist) * 5.0F;
+            m.rightArm.x = -Mth.cos(twist) * 5.0F;
+            m.leftArm.z = -Mth.sin(twist) * 5.0F;
+            m.leftArm.x = Mth.cos(twist) * 5.0F;
+        }
     }
 
     private HeroPoses() {

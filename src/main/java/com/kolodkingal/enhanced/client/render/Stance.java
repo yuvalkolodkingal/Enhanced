@@ -1,0 +1,49 @@
+package com.kolodkingal.enhanced.client.render;
+
+/**
+ * A sustained pose that lasts while a synced state holds (a beam is on, something is held): it has an eased weight and
+ * its own pose rows in {@link Stances}. Ambient stances are applied first; aimed and holding ones after, so they win where
+ * they overlap (and their arms count as occupied for the swing restore).
+ */
+public enum Stance {
+    MAG_FIELD(4, 5, false),
+    VISION_PHASED(4, 5, false),
+    VISION_DENSE(3, 5, false),
+    LOKI_FROST(5, 6, false),
+    THOR_UNLEASHED(4, 6, false),
+    NOISE(6, 6, false),
+    WANDA_READY(3, 8, false),
+    WANDA_HEX_CONTROL(3, 4, false),
+    THOR_BIFROST(5, 3, false),
+    /** Loki's follow-through after a thrown dagger (the pose of {@code Live.THROWING}, until the gestures replace it). */
+    LOKI_THROW(1.5F, 3, false),
+    /** A hand raised or thrust out to cast ({@code Live.CASTING}, until the gestures replace it). */
+    CAST(1.5F, 3, false),
+
+    THOR_WAIT(2, 3, true),
+    TK_HOLD(2.5F, 4, true),
+    TK_STRAIN(6, 8, true),
+    MAG_SHRAPNEL(1.5F, 3, true),
+    MAG_CATCH(1, 3, true),
+    BILLY_FREEZE(2, 4, true),
+    VISION_BEAM(2, 3, true),
+    BEAM_WANDA(1.2F, 3, true),
+    SHIELD_WANDA(1.5F, 3, true),
+    THOR_BEAM(1, 3, true),
+    TOMMY_WHIRL(3, 5, true);
+
+    public static final Stance[] VALUES = values();
+    public static final int COUNT = VALUES.length;
+
+    /** Time constants (ticks) of the weight rising and falling. */
+    public final float tauIn;
+    public final float tauOut;
+    /** Aimed and holding stances: their arms are occupied, so the swing of an attack is mostly muted. */
+    public final boolean aimed;
+
+    Stance(float tauIn, float tauOut, boolean aimed) {
+        this.tauIn = tauIn;
+        this.tauOut = tauOut;
+        this.aimed = aimed;
+    }
+}
