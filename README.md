@@ -9,6 +9,9 @@ And if you're lucky enough to survive Wanda's Hex wall, **Photon**.
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).
 
+**Download:** every push to `main` builds the mod, runs the in-game tests and publishes the jar
+on the [Releases](../../releases) page. The newest build is always marked *Latest*.
+
 ![The heroes](docs/screenshots/all-heroes.png)
 
 | Magneto | Scarlet Witch | The Hex |
@@ -81,6 +84,9 @@ alphabetical order is played; remove it to go back to *Sweet Dreams*.
 
 You need Java 21.
 
+GitHub Actions (`.github/workflows/build.yml`) runs the same build and the GameTests on every
+push and pull request, and publishes a release for every push to `main` (or a `v*` tag).
+
 ```sh
 ./gradlew build              # the mod jar ends up in build/libs/
 ./gradlew runClient          # play in a development client
@@ -89,6 +95,13 @@ You need Java 21.
 
 To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a NeoForge
 1.21.1 instance.
+
+## Credits
+
+* Hero concepts: Eilon Kolodkin-Gal.
+* Scarlet Witch skin: the community skin
+  ["Scarlet Witch"](https://www.minecraftskins.com/skin/18465369/scarlet-witch/) from minecraftskins.com.
+* *Sweet Dreams (Are Made of This)*: Eurythmics. Bundled for personal use only.
 
 ## For server owners
 

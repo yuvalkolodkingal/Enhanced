@@ -180,8 +180,11 @@ To touch the stone, hold the scepter and **right-click** (use it):
   G . G      R = Block of Redstone
   ```
 * When the Scarlet Witch wears the crown she **transforms**:
-  * Her skin becomes **Wanda's full suit from *WandaVision*** (crimson and black
-    suit and cape).
+  * Her skin becomes **the Scarlet Witch's suit**: copper hair, glowing red eyes, the
+    burgundy suit and her crown, with a burgundy cape. **(added)** The skin is the community
+    skin ["Scarlet Witch"](https://www.minecraftskins.com/skin/18465369/scarlet-witch/) from
+    minecraftskins.com; it draws its own crown, so the crown model is hidden while she is
+    transformed.
   * **Max health 40** (20 hearts instead of 10).
   * **Armor equal to a full Diamond set** (20 armor, 8 toughness).
   * Never breaks.
