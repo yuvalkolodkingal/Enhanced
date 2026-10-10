@@ -104,7 +104,7 @@ public final class HexTests {
     }
 
     @GameTest(template = ARENA, batch = "hex_photon")
-    public static void hexSurvivorBecomesPhoton(GameTestHelper helper) {
+    public static void hexSurvivorJustSurvives(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 0.0);
         ServerPlayer wanda = raiseHex(f);
@@ -116,9 +116,9 @@ public final class HexTests {
                 walkTo(player, abs(helper, CENTER, FLOOR, 2.6));
                 check(inside(f, wanda, player), "walked through the wall");
             }
-            if (tick > 2 && Powers.is(player, Power.PHOTON)) {
+            if (tick > 3 && inside(f, wanda, player)) {
                 check(player.isAlive(), "the survivor lives");
-                check(inside(f, wanda, player), "and is inside the Hex");
+                check(Powers.is(player, Power.NONE), "and gains no power");
                 return true;
             }
             return false;

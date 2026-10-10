@@ -118,6 +118,8 @@ public final class LokiTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer loki = f.player(4.5, FLOOR, 10.5, Power.LOKI);
         Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        // Out in the daylight it would burn, and a point of fire damage would look like the dagger's.
+        zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1200));
         lookAt(loki, zombie);
         float health = zombie.getHealth();
 
@@ -294,18 +296,10 @@ public final class LokiTests {
         check(!data.toggle(Toggle.FROST_GIANT), "pressed again, he looks Asgardian");
         assertNear(loki.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "the extra armor goes with the form");
 
-        // The looks with a signature ability of their own don't have the Frost Giant form.
+        // Every look of the main Loki has the Frost Giant form, the TVA look too.
         Powers.setVariant(loki, Variants.get(Power.LOKI, "tva"));
         press(loki, 5);
-        check(!data.toggle(Toggle.FROST_GIANT), "the TVA look's ability 5 is its own");
-
-        Powers.setVariant(loki, Variants.get(Power.LOKI, "loki"));
-        press(loki, 5);
-        check(data.toggle(Toggle.FROST_GIANT), "back in the God of Mischief look it works again");
-        Powers.setVariant(loki, Variants.get(Power.LOKI, "sylvie"));
-        PowerTicker.tick(loki);
-        check(!data.toggle(Toggle.FROST_GIANT), "changing to a look with its own ability 5 ends the Frost Giant form");
-        assertNear(loki.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "and its armor");
+        check(data.toggle(Toggle.FROST_GIANT), "the TVA look turns into a Frost Giant too");
         helper.succeed();
     }
 

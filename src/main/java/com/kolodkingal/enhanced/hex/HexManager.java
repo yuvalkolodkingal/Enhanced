@@ -308,11 +308,8 @@ public final class HexManager {
             entity.hurt(ModDamageTypes.source(level, ModDamageTypes.HEX_WALL), 1.0E6F);
             return false;
         }
-        level.sendParticles(new EnergyParticleOptions(Power.PHOTON.glow, 2.0F), at.x, at.y, at.z, 80, 0.8, 1.0, 0.8, 0.2);
-        if (entity instanceof ServerPlayer player && !Powers.power(player).hasPowers()) {
-            Powers.awaken(player, Power.PHOTON);
-            player.sendSystemMessage(Component.translatable("message.enhanced.hex.monica_effect").withStyle(ChatFormatting.AQUA));
-        }
+        // The rare survivor just survives, shaken, in a flash of the Hex's light.
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 2.0F), at.x, at.y, at.z, 80, 0.8, 1.0, 0.8, 0.2);
         return true;
     }
 

@@ -32,12 +32,8 @@ public final class Variants {
 
         add(Power.LOKI,
                 new Variant("loki", Power.LOKI, Variant.suit("loki"), Variant.suit("loki_cape"), false, Power.LOKI.color, Power.LOKI.glow, 0),
-                new Variant("tva", Power.LOKI, Variant.suit("loki_tva"), null, false, 0xC9A56B, 0xC8824B, 5),
-                new Variant("sylvie", Power.LOKI, Variant.suit("loki_sylvie"), Variant.suit("loki_sylvie_cape"), true, 0x3AE271, 0x6FFFC6, 5),
-                new Variant("classic", Power.LOKI, Variant.suit("loki_classic"), Variant.suit("loki_classic_cape"), false, 0x70C77A, 0xA8F6A3, 5),
-                new Variant("kid", Power.LOKI, Variant.suit("loki_kid"), Variant.suit("loki_kid_cape"), false, Power.LOKI.color, 0xFF8A2A, 5),
-                new Variant("president", Power.LOKI, Variant.suit("loki_president"), null, false, Power.LOKI.color, Power.LOKI.glow, 5),
-                new Variant("god_of_stories", Power.LOKI, Variant.suit("loki_god_of_stories"), Variant.suit("loki_god_of_stories_cape"), false, 0x82A659, 0xC9A54A, 5),
+                new Variant("tva", Power.LOKI, Variant.suit("loki_tva"), null, false, 0xC9A56B, 0xC8824B, 0),
+                new Variant("god_of_stories", Power.LOKI, Variant.suit("loki_god_of_stories"), Variant.suit("loki_god_of_stories_cape"), false, 0x82A659, 0xC9A54A, 0),
                 own(Power.LOKI));
 
         add(Power.THOR,
