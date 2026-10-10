@@ -171,8 +171,12 @@ public final class HeroPoses {
                     pointAt(main, player, flying.position(), t);
                     off.zRot += 0.15F * -side;
                 } else if (airborne) {
-                    // Flying behind Mjolnir: hammer arm thrust forward and up, the other arm back.
-                    main.xRot = -2.75F + Mth.sin(t * 0.2F) * 0.04F;
+                    // Flying behind Mjolnir: hovering, it is held up to the sky; at speed the arm swings forward to lead
+                    // the way. The other arm trails back.
+                    double dx = player.getX() - player.xOld;
+                    double dz = player.getZ() - player.zOld;
+                    float speed = Mth.clamp((float) Math.sqrt(dx * dx + dz * dz) / 0.6F, 0.0F, 1.0F);
+                    main.xRot = Mth.lerp(speed, -2.75F, -1.85F) + Mth.sin(t * 0.2F) * 0.04F;
                     main.yRot = 0.0F;
                     main.zRot = 0.0F;
                     off.xRot = 0.35F;

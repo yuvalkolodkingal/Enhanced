@@ -226,7 +226,7 @@ public final class ThorEffects {
             // An inner, brighter sheath.
             Vec3 q0 = feet.add(Math.cos(a0) * radius * 0.45, 0, Math.sin(a0) * radius * 0.45);
             Vec3 q1 = feet.add(Math.cos(a1) * radius * 0.45, 0, Math.sin(a1) * radius * 0.45);
-            quad(pose, vc, q0, q1, height, EnergyGeometry.argb(0xFFFFFF, 0.25F * fade), EnergyGeometry.argb(color, 0.05F * fade));
+            quad(pose, vc, q0, q1, height, EnergyGeometry.argb(0xFFFFFF, 0.16F * fade), EnergyGeometry.argb(color, 0.04F * fade));
         }
     }
 
