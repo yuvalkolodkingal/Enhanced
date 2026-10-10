@@ -5,7 +5,6 @@ one of the *Enhanced*:
 
 * **Magneto**, the Master of Magnetism
 * **Wanda Maximoff, the Scarlet Witch**
-* **Photon (Monica Rambeau)**, the rare survivor of Wanda's Hex
 * **Quicksilver (Peter Maximoff)**, the fastest man alive
 * **Vision**, the synthezoid with the Mind Stone in his forehead, and **White Vision** **(added)**
 * **Tommy Maximoff (Speed)**, Wanda's speedster son **(added)**
@@ -25,7 +24,7 @@ gap is filled in here, and every addition is marked **(added)**.
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Photon, Quicksilver, Vision, Tommy, Billy, Loki, Thor. Powers never stack. |
+| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
 | Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
@@ -276,31 +275,13 @@ To touch the stone, hold the scepter and **right-click** (use it):
   crosses the wall without Wanda's permission:
   * **95%:** instant death ("was rewritten by the Hex"). Armor, Totems of Undying and
     effects don't help.
-  * **5%, the Monica Rambeau effect:** they survive. A player who survives has their
-    **DNA rewritten** and permanently becomes **Photon** (see section 3). A surviving
-    mob simply makes it through.
+  * **5%:** they survive and simply make it through.
 * **Crossing includes teleporting:** Ender Pearls, Chorus Fruit and Endermen
   teleporting across the wall face the same 95% / 5% roll.
-* **(added)** Anyone **with powers** (Magneto, Photon, Quicksilver, Vision, another Scarlet Witch) and
+* **(added)** Anyone **with powers** (Magneto, Quicksilver, Vision, another Scarlet Witch) and
   bosses can't be killed by the wall. They're thrown back as if they hit glass, unless
   Wanda allowed them in.
 * **(added)** Pets owned by an allowed player pass through safely.
-
----
-
-## 3. Photon — the Monica Rambeau effect **(added)**
-
-The concept says a 5% survivor of the Hex wall "permanently unlocks strong
-energy-based superhero abilities." This section defines them, based on
-Monica Rambeau after she crossed the Hex.
-
-| # | Key | Ability | How it works |
-|---|---|---|---|
-| 1 | R | **Photon Blast** | Fire a bolt of pure light (6 damage). If you have stored energy, the bolt is supercharged (+6 damage, costs 10 energy). Cooldown 0.6 s. |
-| 2 | G (toggle) | **Photon Flight** | Survival flight at 0.085 with a trail of light. |
-| 3 | V | **Energy Absorption** | **Passive:** absorbs **50% of all energy damage** (fire, lava, lightning, explosions, magic, the Chaos Beam, other Photons) and stores it (max 100). **Press V:** release the stored energy as a shockwave that damages and knocks back everything within 6 blocks (needs at least 10 energy). |
-| 4 | B | **Phase Shift** | Become intangible for 3 seconds. You take no damage and projectiles pass through you, but you can't attack (no melee, no Photon Blast, no Energy Release). A white energy shimmer covers your body. Cooldown 12 s. |
-| 5 | N (toggle) | **Spectrum Vision** | See in the dark and see every creature within 48 blocks through walls. Your eyes glow. |
 
 ---
 
@@ -464,7 +445,7 @@ Billy's magic is blue with a white-hot core, crackling and branching like a Tesl
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R | **Hex Bolt** | A crackling blue arc from his hand to the first creature he looks at within 24 blocks: 6 damage, and it forks on to the two nearest creatures within 5 blocks of it (3 damage each). Everyone around sees the bolts. Photon can absorb it. Cooldown half a second. |
+| 1 | R | **Hex Bolt** | A crackling blue arc from his hand to the first creature he looks at within 24 blocks: 6 damage, and it forks on to the two nearest creatures within 5 blocks of it (3 damage each). Everyone around sees the bolts. Cooldown half a second. |
 | 2 | G (toggle) | **Flight** | Calm, weightless flight with open hands, like his mother's (speed 0.08). |
 | 3 | V | **Telekinesis** | Wanda's telekinesis, in his blue: creatures, dropped items, minecarts, boats, primed TNT, falling blocks, **and projectiles in flight**: an arrow he catches hangs in front of him, pointing where he looks, and flies off at his command. He doesn't tear blocks out of the ground (that is Wanda's). Press again to launch, **Sneak** + the key to put down gently. |
 | 4 | B | **Freeze** | Every creature and player within 12 blocks in a 90° cone in front of him, in his line of sight, is **spellbound** for 5 seconds: they can't move, jump or attack, can't pick a new target, and blue sparks circle their heads. The Ender Dragon and the Wither are too strong for it. Cooldown 12 seconds. |
@@ -584,7 +565,6 @@ Every power's light follows the films and shows:
 | The Hex | From outside, a translucent wall of glowing raspberry-red "cathodic" bricks and scanlines | Raspberry-red CRT bricks and scanlines that tint the sky |
 | Magneto | No glow at all in the X-Men films: metal just moves | Colourless field lines, iron-grey particles |
 | Quicksilver | Fox Quicksilver: no coloured glow | A grey blur and afterimages |
-| Photon | Blue-white light; gold while intangible; azure eyes | Blue-white blasts, a gold phasing shimmer, azure Spectrum Vision eyes |
 | Vision | Pale gold Mind Stone beam; a greenish-yellow aura while phasing | Pale gold beam and amber stone; greenish-yellow phasing aura |
 | White Vision | A pale cyan-white beam; no Mind Stone | Cyan-white beam; an empty hexagonal socket of copper circuitry; a white phasing aura |
 | Tommy | A teal-green ghost trail | Teal-green trail, ghosts and mist |
@@ -599,7 +579,7 @@ Every power's light follows the films and shows:
 | Command | Effect |
 |---|---|
 | `/enhanced power get [player]` | Show a player's power. |
-| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|photon\|quicksilver\|vision\|tommy\|billy\|loki\|thor> [look]` | Give or remove a power, optionally straight into one of its looks. |
+| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|quicksilver\|vision\|tommy\|billy\|loki\|thor> [look]` | Give or remove a power, optionally straight into one of its looks. |
 | `/enhanced look <players> <look>` | Change the look of every given player whose hero has that look (e.g. `sylvie`, `white_vision`, `mighty_thor`). |
 | `/enhanced hex list` | List all Hexes in the current dimension. |
 | `/enhanced hex clear` | Dissolve every Hex in the current dimension. |
