@@ -7,7 +7,12 @@ one of the *Enhanced*:
 * **Wanda Maximoff, the Scarlet Witch**
 * **Photon (Monica Rambeau)**, the rare survivor of Wanda's Hex
 * **Quicksilver (Peter Maximoff)**, the fastest man alive
-* **Vision**, the synthezoid with the Mind Stone in his forehead **(added)**
+* **Vision**, the synthezoid with the Mind Stone in his forehead, and **White Vision** **(added)**
+* **Tommy Maximoff (Speed)**, Wanda's speedster son **(added)**
+* **Billy Maximoff (Wiccan)**, Wanda's son, the witch who made the Witches' Road real **(added)**
+* **Loki**, the God of Mischief, and his variants: Sylvie, Classic Loki, Kid Loki, President Loki, TVA Loki
+  and the God of Stories **(added)**
+* **Thor**, the God of Thunder, and **Mjolnir** **(added)**
 
 This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
 Scarlet Witch, and Quicksilver's slow-motion run). Everything the concepts said is kept.
@@ -20,11 +25,13 @@ gap is filled in here, and every addition is marked **(added)**.
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Photon, Quicksilver, Vision. Powers never stack. |
+| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Photon, Quicksilver, Vision, Tommy, Billy, Loki, Thor. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
 | Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
+| Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, Sylvie, Mighty Thor... Press **H** to change look (**Sneak + H** goes back). Some looks have their own signature ability in place of ability 5. Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
+| MCU colours **(added)** | Every power's light and colour follows the films and shows (section 10). |
 | Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, the same way vanilla treats them as invulnerable. |
 
 ---
@@ -112,9 +119,13 @@ gap is filled in here, and every addition is marked **(added)**.
 
 * Toggle on and off. While it is on it works automatically.
 * **Metal projectiles** (arrows, spectral arrows, crossbow bolts, tridents and
-  other Magnetos' shrapnel) coming at Magneto are caught by the field. Each one
-  either **loses its momentum and drops to the floor** or **flies straight back at
-  whoever shot it** (50/50).
+  other Magnetos' shrapnel) coming at Magneto are **caught in mid-air** about 4.5 blocks
+  out, like the bullets and missiles he stops in the X-Men films. Each one hangs there,
+  trembling, for almost a second, while Magneto's hand points at it. Then it either
+  **drops to the floor** or **flies straight back at whoever shot it** (50/50).
+* **(added)** You can see the field while it's on: faint, colourless field lines loop around
+  him like iron filings round a magnet, and every caught projectile shimmers with a ring
+  and a line of force to his hand.
 * A metal projectile that would hit Magneto while the shield is on never deals damage.
 * It doesn't stop fireballs, potions or snowballs, because they aren't metal.
 
@@ -202,8 +213,10 @@ To touch the stone, hold the scepter and **right-click** (use it):
 
 #### Ability 1 — Chaos Energy Beam
 
-* **Look:** a bright, shimmering red energy beam with a crackling outer glow and
-  sparks where it hits. It's a real rendered beam, not ordinary redstone particles.
+* **Look:** a bright, shimmering crimson beam with hot pink wisps, a near-white core,
+  a crackling outer glow and sparks where it hits. It's a real rendered beam, not ordinary
+  redstone particles. **(added)** While she wields chaos magic (beam, shield, telekinesis)
+  her eyes glow red, as in the WandaVision finale.
 * **Range:** 32 blocks. The beam stops at the first creature or block.
 * **Damage:** **2.5 hearts (5 HP) per hit** for as long as the beam stays on the target.
   Minecraft lets a creature be hurt at most twice per second, so a target takes about
@@ -249,8 +262,9 @@ To touch the stone, hold the scepter and **right-click** (use it):
 #### Ability 5 — The Hex
 
 * Press **N** to raise the Hex: a **giant red energy dome** (radius 32 blocks,
-  adjustable from 8 to 96) centred on where Wanda stands. The wall shimmers with a
-  hexagon pattern and rises over a couple of seconds.
+  adjustable from 8 to 96) centred on where Wanda stands. It rises over a couple of
+  seconds. **(added)** It looks like the Westview Hex from outside: a raspberry-red wall
+  of glowing TV-static bricks and scanlines that tints the sky behind it.
 * **Only Wanda decides who may enter or leave.** Press **N** again to open the
   **Hex Control** screen:
   * Allow or block each online player.
@@ -327,8 +341,9 @@ Monica Rambeau after she crossed the Hex.
     `config/enhanced/music/` in the Minecraft folder (the mod creates that folder and a short README
     the first time it starts). The first file in alphabetical order is used. Remove it to go back
     to *Sweet Dreams*.
-* A blue tint at the edges of the screen shows that time is slowed, and Quicksilver leaves a
-  silver-blue streak behind him.
+* A cool grey shade at the edges of the screen shows that time is slowed, and Quicksilver
+  leaves a grey blur and fading afterimages behind him (in the X-Men films his speed has no
+  coloured glow).
 * Cost: it burns hunger while he runs. With an empty hunger bar, he can only run normally.
 
 ### 4.3 Abilities
@@ -363,6 +378,10 @@ Monica Rambeau after she crossed the Hex.
 
 * Vision's skin becomes the MCU Vision: red synthetic face and hands, the golden **Mind Stone in
   his forehead** (it glows in the dark), a green suit with gold trim and a yellow cape.
+* **(added)** His second look is **White Vision** (WandaVision episode 9): the same body drained of
+  colour, chalk white with glowing pale cyan eyes and no Mind Stone, only an empty hexagonal
+  socket of copper circuitry in his forehead. His beam is pale cyan-white instead of gold, and
+  he phases in a white aura. Press **H** to switch.
 * **Max health 30** (15 hearts) and **8 armor** from his vibranium body.
 * He never gets hungry and never runs out of air.
 
@@ -370,7 +389,7 @@ Monica Rambeau after she crossed the Hex.
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R (hold) | **Mind Stone Beam** | A golden beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. |
+| 1 | R (hold) | **Mind Stone Beam** | A pale gold beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. |
 | 2 | G (toggle) | **Flight** | Survival flight at 0.08, upright and calm. |
 | 3 | V (toggle) | **Phase** | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you're only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
 | 4 | B (toggle) | **Density** | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Phasing ends density, and you can't turn dense while phased. |
@@ -378,17 +397,124 @@ Monica Rambeau after she crossed the Hex.
 
 ---
 
-## 6. Operator commands **(added)**
+## 6. Tommy Maximoff (Speed) **(added)**
+
+> Wanda's son from *WandaVision*. His speed showed up on Halloween night ("Chip off the old
+> Maximoff block! You've got super speed!"), and in the Battle of Westview he crossed the
+> street as a teal-green ghost and disarmed a whole S.W.O.R.D. squad.
+
+### 6.1 Becoming Tommy
+
+Through the Witches' Road, with a Scarlet Witch Gene, choosing Tommy (section 7.1).
+
+### 6.2 Abilities
+
+Tommy's speed doesn't slow the world down (that is Quicksilver's trick): he leaves a translucent
+teal-green ghost trail and afterimages, low along the ground, like in the Battle of Westview.
+
+| # | Key | Ability | How it works |
+|---|---|---|---|
+| 1 | R (toggle) | **Super Speed** | On from the start: sprinting is super speed, three and a half times as fast, stepping up whole blocks, with no fall damage while running. It burns hunger slowly; with an empty hunger bar he only runs normally. Turn it off to sprint normally. |
+| 2 | G | **Disarm Blitz** | In a blink he circles every armed creature within 12 blocks (up to 8 of them) and is back before they notice, their weapons in his arms: creatures lose whatever they hold, players only their weapon (swords, axes, bows, crossbows, tridents, maces). Everyone disarmed is slowed for 2 seconds. Mjolnir is far too heavy to snatch. Cooldown 8 seconds. |
+| 3 | V | **Whirlwind** | For 3 seconds he runs circles around himself: everything within 8 blocks (creatures, players, arrows in flight) is pulled onto a spinning ring, lifted up to 3 blocks, and flung away when the whirlwind ends. Ghosts of Tommy race round the ring. Cooldown 10 seconds. |
+| 4 | B | **Vibrate Through Walls** | He vibrates his molecules and passes straight through the wall in front of him, up to 4 blocks thick (*VisionQuest* trailer; the comics). Not through bedrock or other unbreakable blocks, nor through a Hex he isn't allowed into. Cooldown 2 seconds. |
+| 5 | N | **Molecular Acceleration** | *(comics)* He vibrates whatever he touches (up to 5 blocks away) until it shatters: a block breaks and drops its item (anything up to the hardness of obsidian, never bedrock; it respects spawn protection and claims), a creature takes 6 damage and is blasted back. Cooldown 1 second. |
+
+### 6.3 Looks
+
+*Halloween* (his WandaVision costume, a mini-Quicksilver: silver hair teased up, a blue tee with
+a silver lightning bolt), *Battle of Westview* (the green track jacket), *Speed* (the comics
+costume, green and white with amber goggles), and *Your own skin*.
+
+---
+
+## 9. Thor — the God of Thunder **(added)**
+
+> "Whosoever holds this hammer, if he be worthy, shall possess the power of Thor."
+
+### 9.1 Mjolnir and the worthy
+
+* **Forging Mjolnir.** "Forged in the heart of a dying star, from the sacred metal of Uru":
+
+  ```
+  N S N      N = Netherite Ingot (Uru)
+  N H N      S = Nether Star (the heart of a dying star)
+    R        H = Heavy Core, R = Breeze Rod (the handle)
+  ```
+* **The worthy.** Only the worthy can lift Mjolnir: Thor himself, **Vision** (who lifted it in
+  *Age of Ultron*), players in Creative or Spectator mode, and anyone who has proven
+  themselves a hero by **saving a village from a raid** (the *Hero of the Village*
+  advancement). The server config can make everyone worthy.
+* **The unworthy can't hold it.** In an unworthy player's inventory (crafted, taken from a
+  chest, anywhere) Mjolnir is far too heavy: it slips to the ground at their feet. They can't
+  pick it up either.
+* **Wherever Mjolnir comes to rest, it stays.** A dropped Mjolnir lands and stands on its
+  head, handle up, like in the crater in New Mexico: a block that **nothing can break, blow up
+  or push**. Only the worthy can lift it (right click). Thor can set it down himself with
+  **Sneak + right click** on a block.
+* **Becoming Thor.** The first time a worthy player with no other power lifts Mjolnir, lightning
+  strikes and they **become Thor**. Vision can lift it and fight with it, but stays Vision.
+* Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava
+  can't destroy it. Speedsters can't snatch it and telekinesis can't lift it.
+
+### 9.2 The Asgardian body
+
+* **Max health 30** (15 hearts), **6 armor**, half knockback.
+* Lightning never hurts or burns Thor. With Mjolnir in hand he takes no fall damage.
+
+### 9.3 Abilities
+
+| # | Key | Ability | How it works |
+|---|---|---|---|
+| 1 | R | **Throw / Call Mjolnir** | With Mjolnir in hand: throw it. It flies straight, tumbling, smashing everything in its path (10 damage and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. Without Mjolnir in hand: **call it**, from his inventory, the air, or the ground anywhere within 64 blocks (dropped, or resting as a block). |
+| 2 | G (toggle) | **Flight** | Thor flies by spinning Mjolnir: only with it in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. |
+| 3 | V | **Lightning** | He raises Mjolnir and lightning pours down into it from the sky and leaps to what he looks at, up to 64 blocks away: 8 damage there and less to everything within 3 blocks, with the usual effects of lightning on creatures (creepers become charged, pigs turn into zombified piglins), but no fire on blocks. Without Mjolnir he can still call it, straight from the sky. Cooldown 1.5 seconds. |
+| 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown Mjolnir arcs too, and each Lightning strikes three times. It burns hunger; with an empty hunger bar the thunder calms. |
+| 5 | N | **Bifrost** | "Heimdall! Open the Bifrost!" A column of swirling rainbow light gathers around him for a second and a half and takes him **home to his respawn point** (bed or respawn anchor, otherwise the world spawn), even in another dimension. **Sneak + N**: to the spot he looks at instead, up to 512 blocks away. It burns its circle of runes into the ground where it lands and where it left, glowing gold and fading over a minute. Cooldown 60 seconds. |
+
+All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep blue halo.
+
+### 9.4 Looks
+
+*Thor* (2011/*The Avengers*: black and silver armour with the six chest discs, red cape),
+*Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder*
+(gold, electric blue and crimson armour), *Mighty Thor* (Jane Foster), and *Your own skin*.
+
+---
+
+## 10. MCU colours **(added)**
+
+Every power's light follows the films and shows:
+
+| Hero | On screen | In the mod |
+|---|---|---|
+| Scarlet Witch | Chaos magic: a crimson tangle of energy with hot pink highlights; her eyes glow red | Crimson beam with pink wisps and a near-white core; red glowing eyes while she wields magic |
+| The Hex | From outside, a translucent wall of glowing raspberry-red "cathodic" bricks and scanlines | Raspberry-red CRT bricks and scanlines that tint the sky |
+| Magneto | No glow at all in the X-Men films: metal just moves | Colourless field lines, iron-grey particles |
+| Quicksilver | Fox Quicksilver: no coloured glow | A grey blur and afterimages |
+| Photon | Blue-white light; gold while intangible; azure eyes | Blue-white blasts, a gold phasing shimmer, azure Spectrum Vision eyes |
+| Vision | Pale gold Mind Stone beam; a greenish-yellow aura while phasing | Pale gold beam and amber stone; greenish-yellow phasing aura |
+| White Vision | A pale cyan-white beam; no Mind Stone | Cyan-white beam; an empty hexagonal socket of copper circuitry; a white phasing aura |
+| Tommy | A teal-green ghost trail | Teal-green trail, ghosts and mist |
+| Billy | Blue magic with a white core, like a Tesla coil | Blue arcs and glows |
+| Loki | Green seidr (Sylvie's enchantment is mint) | Green magic, each variant with its own shade |
+| Thor | Blue-white lightning; rainbow Bifrost | White-hot core, electric blue, deep blue halo; rainbow Bifrost |
+
+---
+
+## 11. Operator commands **(added)**
 
 | Command | Effect |
 |---|---|
 | `/enhanced power get [player]` | Show a player's power. |
-| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|photon\|quicksilver\|vision>` | Give or remove a power. |
+| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|photon\|quicksilver\|vision\|tommy\|billy\|loki\|thor> [look]` | Give or remove a power, optionally straight into one of its looks. |
+| `/enhanced look <players> <look>` | Change the look of every given player whose hero has that look (e.g. `sylvie`, `white_vision`, `mighty_thor`). |
 | `/enhanced hex list` | List all Hexes in the current dimension. |
 | `/enhanced hex clear` | Dissolve every Hex in the current dimension. |
 
-## 7. Server configuration **(added)**
+## 12. Server configuration **(added)**
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
-shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world…) can be changed in
+shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
+Mjolnir's damage and range, who is worthy of Mjolnir, the Bifrost's cooldown…) can be changed in
 `world/serverconfig/enhanced-server.toml`.
