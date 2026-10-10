@@ -5,11 +5,14 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -27,6 +30,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -773,6 +777,170 @@ public final class ScarletWitchTests {
             }
             check(tick < 90, "Stormbreaker was destroyed by the shield instead of coming back to Thor");
             return false;
+        });
+    }
+
+    // ---- the Chaos Shield against Thor ----
+
+    /** A husk (it does not burn in the sun) that takes damage as written: no armour to soften it. */
+    private static Zombie bareHusk(GameTestHelper helper, double x, double z) {
+        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
+        return husk;
+    }
+
+    /** Thor holds V for a single tick (his beam is free to hit at once, whatever tick it is) and lets go. */
+    private static void beamOnce(ServerPlayer thor) {
+        ThorAbilities.forgetBeamPace(thor);
+        AbilityHandler.onKey(thor, 3, true);
+        PowerTicker.tick(thor);
+        AbilityHandler.onKey(thor, 3, false);
+    }
+
+    /**
+     * (These three have batches of their own: they need PvP on for several ticks, and the tests of a batch run side by
+     * side, some of them switching PvP back off when they end.)
+     *
+     * A complete Chaos Shield is solid to Thor's lightning beam as it is to an arrow: the beam ends on the sphere, Wanda
+     * is not touched, nothing beyond is hit and the shield pays the beam's damage (the weapon and the God of Thunder make
+     * it more). A shield that is still forming stops nothing.
+     */
+    @GameTest(template = ARENA, batch = "chaos_shield_beam_pvp", timeoutTicks = 100)
+    public static void chaosShieldStopsThorsLightningBeamAtItsSurfaceAndIsWornDownByIt(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        // Beyond her, a little to the side: the line to it passes through the sphere without touching Wanda herself.
+        Zombie behind = bareHusk(helper, 17.5, 11.5);
+        Zombie beside = bareHusk(helper, 12.5, 14.5);
+        PowerData data = Powers.get(wanda);
+        lookAt(thor, wanda);
+        AbilityHandler.onKey(wanda, 4, true);
+        beamOnce(thor);
+        assertNear(20.0F - wanda.getHealth(), 2.0, 1.0E-4, "a shield that is still forming stops nothing: the beam hurts her");
+        assertNear(data.shieldStrength(), 30.0, 1.0E-4, "and costs it nothing");
+        wanda.setHealth(20.0F);
+
+        helper.runAfterDelay(EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get() + 1, () -> {
+            check(WandaAbilities.hasShieldUp(wanda), "the shield is complete");
+            lookAt(thor, behind);
+            beamOnce(thor);
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "the beam doesn't hurt her");
+            assertNear(data.shieldStrength(), 28.0, 1.0E-4, "the beam's 2 points wore the shield down, though it never touched her");
+            check(behind.getHealth() == behind.getMaxHealth(), "the creature beyond the sphere is not hit");
+            check(data.chaosShieldActive(), "and one hit doesn't break it");
+            lookAt(thor, wanda);
+
+            // Where the beam ends (the same call the client draws it with): on the sphere, on the side Thor is on.
+            Vec3 center = wanda.position().add(0, wanda.getBbHeight() * 0.5, 0);
+            WandaAbilities.ShieldStop stop = WandaAbilities.shieldAcross(helper.getLevel(), thor, thor.getEyePosition(), center, 1.0F);
+            check(stop != null && stop.owner() == wanda, "the beam runs into her shield");
+            assertNear(stop.point().distanceTo(center), WandaAbilities.SHIELD_RADIUS, 1.0E-6, "and ends on its surface");
+            check(stop.point().x < center.x, "on the side of Thor");
+            check(WandaAbilities.shieldAcross(helper.getLevel(), thor, thor.getEyePosition(), center.subtract(5, 0, 0), 1.0F) == null,
+                    "a beam that stops short of the shield doesn't touch it");
+            check(WandaAbilities.shieldAcross(helper.getLevel(), wanda, thor.getEyePosition(), center, 1.0F) == null,
+                    "and nobody's own shield stops their own beam");
+
+            // The weapon doubles it, the God of Thunder adds half again: 6 points, and no lightning leaps past the shield.
+            thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+            AbilityHandler.onKey(thor, 4, true);
+            check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
+            beamOnce(thor);
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "still not a scratch");
+            assertNear(data.shieldStrength(), 22.0, 1.0E-4, "Mjolnir and the God of Thunder: 2 x 2 x 1.5 = 6 points");
+            check(beside.getHealth() == beside.getMaxHealth(), "no lightning arcs to the creature beside her");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * A beam from inside the sphere is not stopped at its surface, but what hits Wanda herself still never gets through,
+     * and neither does the lightning that leaps on from what Thor strikes.
+     */
+    @GameTest(template = ARENA, batch = "chaos_shield_point_blank_pvp", timeoutTicks = 100)
+    public static void chaosShieldStopsAPointBlankBeamFromInsideItToo(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer thor = f.player(11.0, FLOOR, 10.5, Power.THOR);
+        PowerData data = Powers.get(wanda);
+        raiseShield(f, wanda, () -> {
+            lookAt(thor, wanda);
+            Vec3 center = wanda.position().add(0, wanda.getBbHeight() * 0.5, 0);
+            check(thor.getEyePosition().distanceTo(center) < WandaAbilities.SHIELD_RADIUS, "sanity: Thor stands inside her shield");
+            check(WandaAbilities.shieldAcross(helper.getLevel(), thor, thor.getEyePosition(), center, 1.0F) == null,
+                    "so the beam is not stopped at the surface");
+            beamOnce(thor);
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "but it doesn't hurt her");
+            assertNear(data.shieldStrength(), 28.0, 1.0E-4, "and wears the shield down all the same");
+            wanda.hurt(ModDamageTypes.source(helper.getLevel(), DamageTypes.LIGHTNING_BOLT, thor, thor), 4.0F);
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "lightning that leaps from Thor's blow is stopped too");
+            assertNear(data.shieldStrength(), 24.0, 1.0E-4, "and costs 4 points");
+            // The sky's own lightning is nobody's to stop.
+            wanda.invulnerableTime = 0;
+            wanda.hurt(helper.getLevel().damageSources().lightningBolt(), 5.0F);
+            assertNear(20.0F - wanda.getHealth(), 5.0, 1.0E-4, "a bolt from the sky still hurts");
+            helper.succeed();
+        });
+    }
+
+    /** The beam that breaks the shield is stopped too; then the shield is gone, and the next beam hurts her. */
+    @GameTest(template = ARENA, batch = "chaos_shield_strength_5_pvp", timeoutTicks = 100)
+    public static void aShatteredChaosShieldLetsThorsBeamThrough(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        f.config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, 5.0);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        PowerData data = Powers.get(wanda);
+        raiseShield(f, wanda, () -> {
+            lookAt(thor, wanda);
+            beamOnce(thor);
+            beamOnce(thor);
+            assertNear(data.shieldStrength(), 1.0, 1.0E-4, "two beams took 2 points each off the 5");
+            beamOnce(thor);
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "the beam that breaks it is stopped too");
+            check(!data.chaosShieldActive() && !WandaAbilities.hasShieldUp(wanda), "the shield shattered");
+            beamOnce(thor);
+            assertNear(20.0F - wanda.getHealth(), 2.0, 1.0E-4, "and the next beam goes through to her");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * The fragments of a shattered Mjolnir are the hammer itself: the shield turns one that is sent at her round, as it
+     * does a thrown Mjolnir, and pays what its blow would have cost; it does not shred it. A fragment that is already
+     * flying home is let by.
+     */
+    @GameTest(template = ARENA)
+    public static void chaosShieldTurnsAnOutgoingFragmentRoundAndLetsAHomewardOneBy(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        PowerData data = Powers.get(wanda);
+        raiseShield(f, wanda, () -> {
+            Vec3 center = wanda.position().add(0, wanda.getBbHeight() * 0.5, 0);
+            // Homeward first: it was sent for someone else, struck, and is flying back across the sphere.
+            MjolnirFragmentEntity homeward = new MjolnirFragmentEntity(helper.getLevel(), thor, center.add(1.2, 0, 0), new Vec3(-0.5, 0, 0), null, center);
+            homeward.setReturning();
+            helper.getLevel().addFreshEntity(homeward);
+            PowerTicker.tick(wanda);
+            check(!homeward.isRemoved(), "a fragment flying home passes through the shield unharmed");
+            assertNear(data.shieldStrength(), 30.0, 1.0E-4, "and costs it nothing");
+            homeward.discard();
+
+            // Outgoing, at her.
+            MjolnirFragmentEntity outgoing = new MjolnirFragmentEntity(helper.getLevel(), thor, center.add(-1.2, 0, 0), new Vec3(0.5, 0, 0), wanda, center);
+            helper.getLevel().addFreshEntity(outgoing);
+            check(!outgoing.isReturning(), "sanity: it is on its way out");
+            PowerTicker.tick(wanda);
+            check(!outgoing.isRemoved() && outgoing.isReturning(), "the shield turns it round instead of destroying it");
+            assertNear(data.shieldStrength(), 30.0 - EnhancedConfig.MJOLNIR_SHATTER_DAMAGE.get(), 1.0E-4, "and pays what the strike would have done");
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "she is not touched");
+            outgoing.discard();
+            helper.succeed();
         });
     }
 

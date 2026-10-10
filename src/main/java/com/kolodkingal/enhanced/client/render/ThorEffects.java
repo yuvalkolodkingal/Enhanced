@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.power.Live;
@@ -185,6 +186,11 @@ public final class ThorEffects {
                              Vec3 camera, float partialTick, float time) {
         Vec3 origin = beamOrigin(mc, player, weapon, partialTick);
         Vec3 target = Raycasts.any(player, ThorAbilities.beamRange(weapon), ThorAbilities.beamTargets(player), partialTick).getLocation();
+        // A Scarlet Witch's complete Chaos Shield in the way stops it at its surface (as on the server).
+        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(partialTick), target, partialTick);
+        if (shield != null) {
+            target = shield.point();
+        }
         Vec3 a = origin.subtract(camera);
         Vec3 b = target.subtract(camera);
         double length = a.distanceTo(b);

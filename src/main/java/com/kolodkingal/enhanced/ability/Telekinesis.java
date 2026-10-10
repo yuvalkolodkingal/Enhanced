@@ -162,6 +162,10 @@ public final class Telekinesis {
         if (e instanceof Player p && (p.isCreative() || p.isSpectator())) {
             return false;
         }
+        if (MjolnirPin.isPinned(e)) {
+            // Mjolnir lies on them: no power but its owner's can move them, any more than it can lift the hammer.
+            return false;
+        }
         if (e instanceof ItemEntity item && item.getItem().is(ModTags.CANNOT_BE_SNATCHED)) {
             // Mjolnir: no power can lift it, only its owner's own hands.
             return false;
@@ -266,6 +270,7 @@ public final class Telekinesis {
                 || data.power() != grip.mode.power
                 || e.distanceTo(player) > BREAK_DISTANCE
                 || (grip.mode == Mode.MAGNETO && !isMagnetic(e))
+                || MjolnirPin.isPinned(e)
                 || (e instanceof Player p && (p.isCreative() || p.isSpectator() || grip.ticks > MAX_PLAYER_HOLD_TICKS));
         if (lost) {
             release(player, false);

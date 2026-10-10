@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -574,6 +575,15 @@ public final class ThorAbilities {
         HitResult hit = Raycasts.any(thor, beamRange(weapon), beamTargets(thor), 1.0F);
         Vec3 end = hit.getLocation();
         long now = level.getGameTime();
+        // A complete Chaos Shield in the way stops the beam at its surface, and pays for it with its strength.
+        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, thor, thor.getEyePosition(), end, 1.0F);
+        if (shield != null) {
+            if (now >= beam.nextHit) {
+                beam.nextHit = now + EnhancedConfig.THOR_BEAM_INTERVAL.get();
+                beamShielded(level, thor, shield, beamDamage(weapon, thunder));
+            }
+            return;
+        }
         if (hit instanceof EntityHitResult entityHit && now >= beam.nextHit) {
             beam.nextHit = now + EnhancedConfig.THOR_BEAM_INTERVAL.get();
             beamHit(level, thor, beam, entityHit, weapon, thunder);
@@ -586,6 +596,22 @@ public final class ThorAbilities {
             if (now % 6 == 0) {
                 level.playSound(null, end.x, end.y, end.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.25F, 1.9F);
             }
+        }
+    }
+
+    /**
+     * The beam meets a Scarlet Witch's Chaos Shield: it spends itself on the sphere (red sparks, the crackle of the beam
+     * where it ends) and takes {@code damage} points off the shield's strength. Whoever is inside is not touched, and
+     * nothing happens to creatures beyond (no lightning effects, no arcs).
+     */
+    private static void beamShielded(ServerLevel level, ServerPlayer thor, WandaAbilities.ShieldStop shield, float damage) {
+        Vec3 at = shield.point();
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.2F), at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.12);
+        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.3);
+        level.playSound(null, at.x, at.y, at.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.25F, 1.9F);
+        // (With PvP off the beam would not have hurt her: it costs the shield nothing either.)
+        if (shield.owner() instanceof ServerPlayer wanda && thor.canHarmPlayer(wanda)) {
+            WandaAbilities.wear(wanda, damage);
         }
     }
 

@@ -244,6 +244,11 @@ public final class QuicksilverAbilities {
         if (!data.isReady(2, now)) {
             return;
         }
+        if (MjolnirPin.isPinned(player)) {
+            // The blitz is a dash across the room: not with Mjolnir lying on him.
+            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
+            return;
+        }
         EntityHitResult hit = Raycasts.entity(player, BLITZ_RANGE, 0.3,
                 e -> e instanceof LivingEntity living && living.isAlive() && e != player && !e.isSpectator(), 1.0F);
         if (hit == null) {

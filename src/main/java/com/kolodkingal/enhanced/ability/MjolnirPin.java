@@ -174,6 +174,16 @@ public final class MjolnirPin {
         return pin;
     }
 
+    /** The hammer is gone from the world for whatever reason (unloaded, say): it holds nobody any more. */
+    public static void forget(MjolnirPinEntity pin) {
+        BY_TARGET.remove(pin.targetUuid(), pin);
+    }
+
+    /** How many creatures and players Mjolnir holds down right now (server side). */
+    public static int heldCount() {
+        return BY_TARGET.size();
+    }
+
     /** Whether Mjolnir lies on this entity (server side). */
     public static boolean isPinned(Entity entity) {
         return !entity.level().isClientSide && pinOf(entity) != null;

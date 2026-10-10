@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.MjolnirShatter;
 import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
@@ -26,6 +27,7 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
+import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import io.netty.buffer.Unpooled;
@@ -1105,6 +1107,115 @@ public final class ThorTests {
             check(!HexManager.onTeleport(helper.getLevel(), zombie, zombie.position().add(4, 0, 0)), "it can't be teleported");
             return true;
         });
+    }
+
+    /** A pinned player's dashes and jumps are teleports like any other: Quicksilver's Blitz and Loki's escape with the Tesseract. */
+    @GameTest(template = ARENA, timeoutTicks = 60)
+    public static void aPinnedPlayerCantBlitzOrEscapeWithTheTesseract(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer thor = thor(f, 6.5, 6.5);
+        PowerTicker.tick(thor);
+        ServerPlayer peter = f.player(8.5, FLOOR, 6.5, Power.QUICKSILVER);
+        Zombie victim = bareZombie(helper, 8.5, 12.5);
+        lookAt(peter, victim);
+        // Free, he blitzes (a control for the rest).
+        Vec3 start = peter.position();
+        press(peter, 2);
+        check(drift(peter, start) > 1.0 && victim.getHealth() < victim.getMaxHealth(), "free, Quicksilver blitzes the zombie");
+        check(rightClick(thor, peter, true) && MjolnirPin.isPinned(peter), "pinned");
+        PowerTicker.tick(peter);
+        // The zombie is far again, and the blitz is ready again: only the hammer is in the way.
+        Vec3 pinnedAt = peter.position();
+        victim.setPos(pinnedAt.x, pinnedAt.y, pinnedAt.z - 8.0);
+        victim.setHealth(victim.getMaxHealth());
+        Powers.get(peter).startCooldown(2, 0L, 0);
+        lookAt(peter, victim);
+        press(peter, 2);
+        check(drift(peter, pinnedAt) < 0.01 && victim.getHealth() == victim.getMaxHealth(), "pinned, he does not blitz");
+        check(Powers.get(peter).isReady(2, helper.getLevel().getGameTime()), "and the blitz does not cool down for it");
+
+        // Someone with no power, pinned, touches the Tesseract: no escape, and no power.
+        ServerPlayer nobody = f.player(14.5, FLOOR, 6.5);
+        ServerPlayer secondThor = thor(f, 14.5, 12.5);
+        PowerTicker.tick(secondThor);
+        check(rightClick(secondThor, nobody, true) && MjolnirPin.isPinned(nobody), "a powerless player is pinned");
+        nobody.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.TESSERACT.get()));
+        Vec3 held = nobody.position();
+        nobody.getMainHandItem().use(helper.getLevel(), nobody, InteractionHand.MAIN_HAND);
+        check(Powers.is(nobody, Power.NONE) && drift(nobody, held) < 0.01, "the Tesseract takes them nowhere, and makes no Loki of them");
+        helper.succeed();
+    }
+
+    /** Mjolnir lies on them: no telekinesis picks them up (and one that already holds them lets go). */
+    @GameTest(template = ARENA, timeoutTicks = 60)
+    public static void telekinesisCantLiftSomeoneMjolnirPins(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 6.5);
+        PowerTicker.tick(thor);
+        ServerPlayer wanda = f.player(6.5, FLOOR, 14.5, Power.SCARLET_WITCH);
+        Zombie zombie = bareZombie(helper, 10.5, 14.5);
+        Zombie other = bareZombie(helper, 10.5, 12.5);
+        check(Telekinesis.canLift(wanda, zombie, Telekinesis.Mode.WANDA), "a free zombie can be lifted");
+        lookAt(wanda, zombie);
+        press(wanda, 3);
+        check(Telekinesis.isHeld(zombie), "Wanda holds it");
+        check(rightClick(thor, zombie, true) && MjolnirPin.isPinned(zombie), "Mjolnir is set down on it");
+        PowerTicker.tick(wanda);
+        check(!Telekinesis.isHeld(zombie), "her grip lets go of what Mjolnir pins");
+        check(!Telekinesis.canLift(wanda, zombie, Telekinesis.Mode.WANDA), "and she can't pick it up again");
+        check(Telekinesis.canLift(wanda, other, Telekinesis.Mode.WANDA), "though she still lifts a free one");
+        check(ModEntities.MJOLNIR_FRAGMENT.get().is(ModTags.TELEKINESIS_IMMUNE), "nor does anyone catch a fragment of Mjolnir out of the air");
+        helper.succeed();
+    }
+
+    /**
+     * The pin remembers where the hammer lay. If the world is closed with the hammer on someone and opened again, and the
+     * pinned player is not there (they are offline), it falls where it was, not at the world's origin.
+     */
+    @GameTest(template = ARENA, timeoutTicks = 60)
+    public static void aPinLoadedWithoutItsPinnedOneDropsMjolnirWhereItLay(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "pinned");
+        Vec3 where = zombie.position();
+        MjolnirPinEntity pin = pinsNear(zombie).get(0);
+        CompoundTag saved = new CompoundTag();
+        pin.saveWithoutId(saved);
+        // The world closes: the hammer goes to disk inside the pin, and the one it held down is not there when it loads.
+        pin.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
+        zombie.discard();
+        MjolnirPinEntity loaded = new MjolnirPinEntity(ModEntities.MJOLNIR_PIN.get(), level);
+        loaded.load(saved);
+        loaded.setUUID(UUID.randomUUID());
+        level.addFreshEntity(loaded);
+        f.everyTick(10, t -> {
+            if (!level.getEntitiesOfClass(MjolnirPinEntity.class, new AABB(where, where).inflate(2)).isEmpty()) {
+                return false;
+            }
+            List<ItemEntity> fallen = level.getEntitiesOfClass(ItemEntity.class, new AABB(where, where).inflate(2),
+                    e -> e.getItem().is(ModItems.MJOLNIR.get()));
+            check(fallen.size() == 1 && ownedBy(fallen.get(0).getItem(), thor), "Mjolnir lies where it lay, still Thor's");
+            return true;
+        });
+    }
+
+    /** A pin that leaves the world without letting go (unloaded with its chunk) holds nobody any more. */
+    @GameTest(template = ARENA)
+    public static void aPinThatIsUnloadedIsForgotten(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        int before = MjolnirPin.heldCount();
+        check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "pinned");
+        check(MjolnirPin.heldCount() == before + 1, "the pin holds one creature");
+        pinsNear(zombie).get(0).remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
+        check(MjolnirPin.heldCount() == before, "unloaded, it holds nobody, and nothing of it is kept");
+        helper.succeed();
     }
 
     // ------------------------------------------------------------------------------------------------------------

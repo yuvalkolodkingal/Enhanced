@@ -141,6 +141,10 @@ public class MjolnirPinEntity extends Entity {
             MjolnirPin.release(level, this);
             return;
         }
+        if (!level().isClientSide) {
+            // (Unloaded with its chunk: nothing else would ever clear the entry for whoever it pinned.)
+            MjolnirPin.forget(this);
+        }
         super.remove(reason);
     }
 
@@ -160,6 +164,11 @@ public class MjolnirPinEntity extends Entity {
         tag.putUUID("Target", targetUuid);
         tag.put("Hammer", hammer().save(registryAccess()));
         tag.putLong("EndsAt", endsAt);
+        // Where it lay: if the pinned one is not here when it is loaded again (a player who is offline), the hammer
+        // falls there, not at the world's origin.
+        tag.putDouble("HoldX", holdAt.x);
+        tag.putDouble("HoldY", holdAt.y);
+        tag.putDouble("HoldZ", holdAt.z);
     }
 
     @Override
@@ -172,6 +181,7 @@ public class MjolnirPinEntity extends Entity {
         }
         entityData.set(DATA_HAMMER, ItemStack.parseOptional(registryAccess(), tag.getCompound("Hammer")));
         endsAt = tag.getLong("EndsAt");
+        holdAt = tag.contains("HoldX") ? new Vec3(tag.getDouble("HoldX"), tag.getDouble("HoldY"), tag.getDouble("HoldZ")) : position();
         loadedFromDisk = true;
     }
 

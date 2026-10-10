@@ -77,9 +77,14 @@ public class MjolnirFragmentEntity extends Projectile {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
-    /** Turns it around, homeward (Thor called it back). */
+    /** Turns it around, homeward (Thor called it back, or something turned it away). */
     public void setReturning() {
         returning = true;
+    }
+
+    /** Whether it is on its way home already (it struck its enemy, or was called or turned back). Server side. */
+    public boolean isReturning() {
+        return returning;
     }
 
     @Override
