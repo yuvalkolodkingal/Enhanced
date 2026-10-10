@@ -144,7 +144,7 @@ public final class HeroAnimState {
     public float gestureLead;
 
     // ---- first person ----
-    /** The age at which the first-person hands last moved the hero's main hand ({@link FirstPersonArms}). */
+    /** The age at which the first-person hands were last moved ({@link FirstPersonArms}). */
     public double fpAge = Double.NEGATIVE_INFINITY;
 
     // ---- gestures ----

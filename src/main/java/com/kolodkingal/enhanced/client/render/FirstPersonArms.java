@@ -142,10 +142,9 @@ public final class FirstPersonArms {
                     event.getMultiBufferSource(), event.getPackedLight());
         }
         ps.popPose();
-        // Where energy leaves the hand follows the hand (see WorldEffectsRenderer.handPosition).
-        if (hand == InteractionHand.MAIN_HAND || emptyOffHand) {
-            s.fpAge = s.time;
-        }
+        // Where energy leaves the hand follows the hand (see WorldEffectsRenderer.handPosition). Any hand counts: Thor's weapon
+        // may be in the off hand.
+        s.fpAge = s.time;
     }
 
     /** Whether a throw of the weapon is under way (it replaces the punch). */
@@ -163,12 +162,20 @@ public final class FirstPersonArms {
      * telekinetic tether, Billy's bolt. All zero when the hero is not animated or has not been drawn lately.
      */
     public static void mainHand(LocalPlayer player, float[] out) {
+        hand(player, player.getMainArm(), out);
+    }
+
+    /**
+     * The movement of the hand of this arm now, as {@link #mainHand} gives it for the main one: Thor's beam leaves the arm
+     * that holds his weapon, which may be the off hand's.
+     */
+    public static void hand(LocalPlayer player, HumanoidArm arm, float[] out) {
         java.util.Arrays.fill(out, 0.0F);
         HeroAnimState s = HeroAnimator.peek(player);
         if (s == null || s.wVanilla > 0.0F || Math.abs(s.time - s.fpAge) > 2.0 || !EnhancedClientConfig.animations()) {
             return;
         }
-        Offset o = player.getMainArm() == HumanoidArm.RIGHT ? RIGHT : LEFT;
+        Offset o = arm == HumanoidArm.RIGHT ? RIGHT : LEFT;
         float length = o.length();
         float k = length > MAX_OFFSET ? MAX_OFFSET / length : 1.0F;
         out[0] = o.dx * k;

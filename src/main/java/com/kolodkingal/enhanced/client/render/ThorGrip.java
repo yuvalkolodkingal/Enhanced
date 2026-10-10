@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -66,7 +67,8 @@ public final class ThorGrip {
         ps.scale(GripMath.SCALE, GripMath.SCALE, GripMath.SCALE);
         ps.translate(-(p.held.x - 8.0F) / 16.0F, -(p.held.y - 8.0F) / 16.0F, -(p.held.z - 8.0F) / 16.0F);
         renderer.renderItem(entity, stack, ItemDisplayContext.NONE, left, ps, buffer, light);
-        if (posed) {
+        // Only the weapon the arm of the poses holds is the muzzle of the beam, not the one in his other hand.
+        if (posed && arm == weaponArm(player)) {
             HandTracker.recordWeapon(player, (float) state.time, ps, kind.head);
         }
         ps.popPose();
@@ -78,6 +80,14 @@ public final class ThorGrip {
             swoosh(ps, buffer, kind, left, state.spinAngle, whirl);
         }
         return true;
+    }
+
+    /**
+     * The arm of the weapon the poses are built around: of the main hand's weapon, else of the off hand's (see
+     * {@link PoseContext}).
+     */
+    private static HumanoidArm weaponArm(AbstractClientPlayer player) {
+        return ThorAbilities.weaponHand(player) == InteractionHand.OFF_HAND ? player.getMainArm().getOpposite() : player.getMainArm();
     }
 
     /** The leather strap between the fist's pivot and the hammer's own strap: a thin cross of two quads. */

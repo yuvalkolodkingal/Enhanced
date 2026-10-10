@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
+import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -32,12 +33,17 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
@@ -69,6 +75,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -846,6 +853,96 @@ public final class ThorTests {
         });
     }
 
+    /**
+     * While Mjolnir is in pieces the weapon "in flight" that Thor's data names is one of its fragments, alive in the world
+     * (it is what lets him keep flying, and what every client tells the shattering from a throw by); when the last one is
+     * home nothing is in flight and Mjolnir is whole in his hand.
+     */
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void theShatteredHammerIsALiveFragmentInFlightUntilItIsWholeInHisHandAgain(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 10.5, 10.5);
+        PowerTicker.tick(thor);
+        bareZombie(helper, 4.5, 10.5);
+        bareZombie(helper, 16.5, 10.5);
+        PowerData data = Powers.get(thor);
+        check(data.hammerEntityId() == -1, "sanity: nothing is in flight before");
+        sneakPress(thor, 1);
+        check(helper.getLevel().getEntity(data.hammerEntityId()) instanceof MjolnirFragmentEntity fragment && fragment.isAlive(),
+                "the moment it shatters, the weapon in flight is a live fragment");
+        int[] inPieces = {0};
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(thor);
+            if (!holdsMjolnir(thor)) {
+                check(helper.getLevel().getEntity(data.hammerEntityId()) instanceof MjolnirFragmentEntity fragment && fragment.isAlive(),
+                        "at tick " + tick + " the weapon in flight is still a live fragment: " + data.hammerEntityId());
+                check(thor.mayFly(), "and Thor keeps his wings at tick " + tick);
+                inPieces[0]++;
+                return false;
+            }
+            check(inPieces[0] >= 3, "it was in pieces for a while: " + inPieces[0] + " ticks");
+            check(data.hammerEntityId() == -1, "no weapon is in flight once it is whole: " + data.hammerEntityId());
+            check(ownedBy(thor.getMainHandItem(), thor) && fragments(helper).isEmpty(), "Mjolnir is back in his hand, still his, and no fragment is left");
+            return true;
+        });
+    }
+
+    /** R while it is in pieces turns every fragment home at once, before the ones sent far away reach their enemies. */
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void rWhileMjolnirIsInPiecesCallsEveryFragmentHome(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 3.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie far = bareZombie(helper, 18.5, 10.5);
+        sneakPress(thor, 1);
+        check(fragments(helper).size() == 1 && !holdsMjolnir(thor), "shattered, one fragment for the zombie far away");
+        f.everyTick(40, tick -> {
+            PowerTicker.tick(thor);
+            if (tick == 2) {
+                check(!holdsMjolnir(thor), "still in pieces at tick 2");
+                press(thor, 1);
+            }
+            if (!holdsMjolnir(thor)) {
+                return false;
+            }
+            check(tick <= 12, "called home it was back at tick " + tick + ", long before it could have flown out and back");
+            check(far.getHealth() == far.getMaxHealth(), "no fragment reached the zombie");
+            check(ownedBy(thor.getMainHandItem(), thor) && Powers.get(thor).hammerEntityId() == -1, "Mjolnir is whole in his hand, still his");
+            return true;
+        });
+    }
+
+    /**
+     * The burst of sparks as Mjolnir shatters, and the one as it comes together again, are out in front of Thor, not at
+     * his eyes: his own first-person screen would be full of them.
+     */
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void theBurstsOfShatteringAndOfReassemblingAreInFrontOfThorNotInHisFace(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 10.5, 10.5);
+        PowerTicker.tick(thor);
+        TestKit.sentPackets(thor);
+        sneakPress(thor, 1);
+        Vec3 eye = thor.getEyePosition();
+        List<ClientboundLevelParticlesPacket> sparks = TestKit.particlesIn(TestKit.sentPackets(thor)).stream()
+                .filter(p -> p.getParticle().getType() == ParticleTypes.ELECTRIC_SPARK && p.getCount() == 40).toList();
+        check(sparks.size() == 1, "one burst of sparks as it shatters: " + sparks.size());
+        double out = eye.distanceTo(new Vec3(sparks.get(0).getX(), sparks.get(0).getY(), sparks.get(0).getZ()));
+        check(out >= 0.9, "it bursts out of his hand, not his face: " + out + " blocks from his eyes");
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(thor);
+            if (!holdsMjolnir(thor)) {
+                return false;
+            }
+            List<ClientboundLevelParticlesPacket> together = TestKit.particlesIn(TestKit.sentPackets(thor)).stream()
+                    .filter(p -> p.getParticle().getType() == ParticleTypes.ELECTRIC_SPARK && p.getCount() == 24).toList();
+            check(together.size() == 1, "one burst of sparks as it comes together: " + together.size());
+            double near = eye.distanceTo(new Vec3(together.get(0).getX(), together.get(0).getY(), together.get(0).getZ()));
+            check(near >= 0.9, "it comes together in his hand, not his face: " + near + " blocks from his eyes");
+            return true;
+        });
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // Mjolnir pins someone down
 
@@ -912,6 +1009,51 @@ public final class ThorTests {
             }
             return false;
         });
+    }
+
+    /** The Thor effects among the packets a player was sent (they may come in a bundle). */
+    private static List<ThorFxPayload> thorEffects(List<Object> packets) {
+        List<ThorFxPayload> found = new ArrayList<>();
+        for (Object sent : packets) {
+            collectThorEffects(sent, found);
+        }
+        return found;
+    }
+
+    private static void collectThorEffects(Object packet, List<ThorFxPayload> found) {
+        if (packet instanceof ClientboundCustomPayloadPacket custom && custom.payload() instanceof ThorFxPayload effect) {
+            found.add(effect);
+        } else if (packet instanceof ClientboundBundlePacket bundle) {
+            for (Packet<?> inner : bundle.subPackets()) {
+                collectThorEffects(inner, found);
+            }
+        }
+    }
+
+    /**
+     * Setting Mjolnir down on someone tells everyone nearby (and Thor himself) so that their screens show him bring it
+     * down: a PIN effect that names the pinner and the place it lands. Nothing is sent when the click pins nobody.
+     */
+    @GameTest(template = ARENA, timeoutTicks = 100)
+    public static void pinningTellsEveryoneNearbyWhoBroughtTheHammerDownAndWhere(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        ServerPlayer watcher = f.player(14.5, FLOOR, 14.5);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        TestKit.sentPackets(thor);
+        TestKit.sentPackets(watcher);
+        check(!rightClick(thor, zombie, false), "a plain right click doesn't pin");
+        check(thorEffects(TestKit.sentPackets(watcher)).stream().noneMatch(e -> e.kind() == ThorFxPayload.PIN), "and tells nobody anything");
+        check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "Sneak + right click pins");
+        for (ServerPlayer seen : List.of(watcher, thor)) {
+            List<ThorFxPayload> pins = thorEffects(TestKit.sentPackets(seen)).stream().filter(e -> e.kind() == ThorFxPayload.PIN).toList();
+            check(pins.size() == 1, seen.getGameProfile().getName() + " is told once that Mjolnir was brought down: " + pins.size());
+            check(pins.get(0).entityId() == thor.getId(), "it names Thor, who brought it down");
+            check(pins.get(0).points().size() == 1 && pins.get(0).points().get(0).distanceTo(zombie.position()) < zombie.getBbHeight(),
+                    "and the place it landed, on the zombie: " + pins.get(0).points());
+        }
+        helper.succeed();
     }
 
     @GameTest(template = ARENA, timeoutTicks = 200)
