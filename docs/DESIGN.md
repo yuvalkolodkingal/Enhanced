@@ -713,7 +713,8 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep bl
 
 *Thor* (2011/*The Avengers*: black and silver armour with the six chest discs, red cape),
 *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder*
-(gold, electric blue and crimson armour), *Mighty Thor* (Jane Foster), and *Your own skin*.
+(the suit of most of that film: navy, gold and black armour, bare arms, red cape), *Mighty Thor*
+(Jane Foster), and *Your own skin*.
 
 ---
 
