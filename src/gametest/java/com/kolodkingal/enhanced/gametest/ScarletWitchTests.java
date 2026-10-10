@@ -811,7 +811,8 @@ public final class ScarletWitchTests {
             if (Powers.get(wanda).chaosShieldActive()) {
                 return false;
             }
-            check(!Powers.get(wanda).isReady(4, helper.getLevel().getGameTime()), "a shield that starved has to recharge too");
+            long left = cooldownLeft(wanda, helper);
+            check(left > 100 && left <= 120, "a shield that starved has to recharge too, with the short cooldown (6 seconds), not " + left);
             return true;
         });
     }
