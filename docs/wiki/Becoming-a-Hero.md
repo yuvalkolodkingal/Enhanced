@@ -15,11 +15,11 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | Hero | How |
 |---|---|
 | [Magneto](Magneto) | Craft **Magneto's Helmet** from 5 Netherite Blocks (helmet shape) and put it on. |
-| [Scarlet Witch](Scarlet-Witch) | Find the very rare **Scarlet Witch Gene**. Hold it in one hand and use **Loki's Scepter** with the other to touch the Mind Stone. **Without the gene, you explode.** |
+| [Scarlet Witch](Scarlet-Witch) | Find the very rare **Scarlet Witch Gene**. Hold it in one hand and use **Loki's Scepter** with the other to touch the Mind Stone (**without the gene, you explode**), or use the **Tesseract** with the other hand instead. |
 | [Quicksilver](Quicksilver) | Craft **Quicksilver's Goggles** (sugar, iron ingots, glass panes and a Block of Diamond) and put them on. |
 | [Vision](Vision) | Craft a **Synthezoid Core** (Blocks of Redstone, Netherite Ingots and a Nether Star). Hold it in one hand and use **Loki's Scepter** with the other. |
 | [Tommy](Tommy) or [Billy](Billy-and-the-Witches-Road) | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors and an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
-| [Loki](Loki) | Find the **Tesseract** and use it: you vanish in a blue flash and reappear far away, as Loki. |
+| [Loki](Loki) | Find the **Tesseract** and use it: you vanish in a blue flash and reappear far away, as Loki. (With a **Scarlet Witch Gene** in your other hand it makes you the Scarlet Witch instead.) |
 | [Thor](Thor) | Forge **Mjolnir** (Netherite Ingots, a Nether Star, a Heavy Core and a Breeze Rod). Only the worthy can lift it, and the first worthy player who lifts it claims it for good. Lift it, and lightning makes you Thor. |
 
 ## Step by step
@@ -33,6 +33,8 @@ Craft the helmet and wear it. The first time you wear it, all of Magneto's abili
 1. Find a **Scarlet Witch Gene**: a very rare item in the chests of woodland mansions, strongholds, Nether fortresses, bastions, ancient cities, End cities, jungle temples and desert pyramids, and dropped by witches and evokers. On its own it does nothing at all.
 2. Find **Loki's Scepter**, a relic found in End City treasure chests, stronghold libraries, bastion treasure chests, ancient cities and woodland mansions. The Mind Stone sits in its blue gem.
 3. Hold the gene in one hand and **right-click** with the scepter in the other. The gene and the stone's energy fuse, the gene is used up, and you awaken as the Scarlet Witch. Wanda's Crown appears in your inventory: wear it to transform.
+
+The **Tesseract** works too: hold the gene in one hand and **right-click** with the Tesseract in the other, instead of the scepter, and you awaken as the Scarlet Witch in exactly the same way. The gene is used up and Wanda's Crown appears, the Tesseract is not used up, and you are not taken anywhere. Without the gene the Tesseract makes you Loki, as always.
 
 If you touch the Mind Stone **without the gene, it tears you apart**: you explode and die instantly. (Creative and Spectator players survive.) If you already are the Scarlet Witch or Vision, touching the stone is safe. If you have a different power, the gene can't bond and nothing happens.
 
@@ -56,7 +58,9 @@ Without a gene the door won't open ("The Road only opens for witch blood"). A he
 
 Find the **Tesseract**. It is not crafted: it turns up in End City treasure chests, stronghold libraries, woodland mansions and ancient cities (chances are on [Items and Crafting](Items-and-Crafting)). Use it (right-click) as a player with no power: the Space Stone swirls round you, you vanish in a blue flash and reappear 100 to 250 blocks away, on safe ground in the same dimension, as Loki. The cube is never used up. If no safe spot is found, you stay where you are and still become Loki.
 
-A hero who uses the Tesseract does not become anyone else: they are simply taken to the block they look at. See [Loki](Loki).
+Holding a **Scarlet Witch Gene** in your other hand changes that: you awaken as the [Scarlet Witch](Scarlet-Witch) instead, the same way as with Loki's Scepter, and you are not taken anywhere.
+
+A hero who uses the Tesseract does not become anyone else: they are simply taken to the block they look at, even with a gene in the other hand. See [Loki](Loki).
 
 ### Thor
 

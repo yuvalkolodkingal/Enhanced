@@ -20,7 +20,7 @@ A power is permanent: it survives death, logging out and changing dimension. Onl
 
 ### I used the Tesseract and I am not Loki. Why?
 
-The Tesseract makes you Loki only if you have **no power**. A hero who uses it is simply taken to the block they look at, up to 48 blocks away. See [Loki](Loki).
+The Tesseract makes you Loki only if you have **no power**, and no **Scarlet Witch Gene** in your other hand (with the gene it awakens the Scarlet Witch instead). A hero who uses it is simply taken to the block they look at, up to 48 blocks away. See [Loki](Loki).
 
 ## Mjolnir
 

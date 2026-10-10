@@ -115,7 +115,7 @@ These three are never crafted. Each chance is **per chest generated** (or per ki
 
 ### Scarlet Witch Gene
 
-Very rare. On its own it does nothing at all: it is held while touching the Mind Stone ([Scarlet Witch](Scarlet-Witch)) or while opening the Witches' Road Door ([Billy and the Witches' Road](Billy-and-the-Witches-Road)).
+Very rare. On its own it does nothing at all: it is held while touching the Mind Stone or using the Tesseract ([Scarlet Witch](Scarlet-Witch)) or while opening the Witches' Road Door ([Billy and the Witches' Road](Billy-and-the-Witches-Road)).
 
 | Source | Chance |
 |---|---|
@@ -136,7 +136,7 @@ A stack holds up to 16 genes.
 
 ### Loki's Scepter
 
-The Mind Stone sits in the blue gem of its golden blade. Touching it with the gene in your other hand makes you the Scarlet Witch, with a Synthezoid Core makes you Vision, and with neither **kills you**. It is also a strong melee weapon (8 attack damage, never breaks).
+The Mind Stone sits in the blue gem of its golden blade. Touching it with the gene in your other hand makes you the Scarlet Witch, with a Synthezoid Core makes you Vision, and with neither **kills you**. It is also a strong melee weapon (8 attack damage, never breaks), and a hit confuses: a creature forgets its target and stumbles about for 6 seconds, a player gets Nausea and Slowness (see [Scarlet Witch](Scarlet-Witch)).
 
 | Source | Chance |
 |---|---|
@@ -148,7 +148,7 @@ The Mind Stone sits in the blue gem of its golden blade. Touching it with the ge
 
 ### Tesseract
 
-The Space Stone in its cube. Using it as a player with no power makes you [Loki](Loki), far away; a hero who uses it jumps to the block they look at. It is never used up.
+The Space Stone in its cube. Using it as a player with no power makes you [Loki](Loki), far away, unless you hold a Scarlet Witch Gene in your other hand: then you awaken as the [Scarlet Witch](Scarlet-Witch) instead. A hero who uses it jumps to the block they look at. It is never used up.
 
 | Source | Chance |
 |---|---|

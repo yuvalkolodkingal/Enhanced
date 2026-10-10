@@ -181,7 +181,25 @@ To touch the stone, hold the scepter and **right-click** (use it):
 * **(added)** If you are already the Scarlet Witch or Vision, touching the stone is safe.
   If you have a different power, the gene or core can't bond. Nothing happens, the item
   isn't used up, and holding it still protects you from the stone.
-* **(added)** The scepter is also a strong melee weapon (8 attack damage, never breaks).
+* **(added)** **The Tesseract works too.** A player with no power who holds the gene in one
+  hand and uses the **Tesseract** (section 7) with the other awakens as the Scarlet Witch
+  instead of becoming Loki: the same awakening as with the scepter, with the same effects,
+  title and server-wide message, the gene used up in the same way and Wanda's Crown in the
+  inventory. The Tesseract itself is not used up, and nobody is taken anywhere. Without the
+  gene it keeps making Loki, and a hero who uses it is simply taken where they look (even
+  with a gene in the other hand).
+* **(added)** The scepter is also a strong melee weapon (8 attack damage, never breaks). In
+  the films it takes over the mind of whoever it touches; that would be too strong, so a
+  melee hit only **confuses**:
+  * A **player** gets **Nausea** for 8 seconds and **Slowness I** for 3 (Magneto's helmet
+    still turns the Nausea away).
+  * Any other **creature** gets the **Confused** effect for 6 seconds: it forgets its target
+    and can't pick a new one, and it stumbles about aimlessly: it heads for random spots
+    nearby, a little faster than it wanders when idle, and changes its mind every few
+    ticks. Small blue-green sparks, the Mind Stone's colour, swirl round its head while it
+    lasts.
+  * The **Ender Dragon, the Wither and the Warden are immune** (the
+    `enhanced:confused_immune` tag).
 
 ### 2.2 Wanda's Crown — the transformation
 
@@ -209,7 +227,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
 | 1 | R (hold) | **Chaos Energy Beam** | A glowing, crackling red beam from Wanda's hand. |
 | 2 | G (toggle) | **Enhanced Flight** | Fast, smooth flight with red energy around both hands. |
 | 3 | V | **Telekinesis** | Lift creatures, dropped items **or blocks**, move them with your gaze, then launch them. |
-| 4 | B (hold) | **Chaos Shield** | A red glowing sphere that stops all projectiles. |
+| 4 | B (hold) | **Chaos Shield** | A red glowing sphere that stops projectiles and softens explosions. It takes time to form, wears out and can shatter. |
 | 5 | N | **The Hex** | A giant red energy dome that only Wanda controls. |
 
 #### Ability 1 — Chaos Energy Beam
@@ -253,12 +271,31 @@ To touch the stone, hold the scepter and **right-click** (use it):
 
 #### Ability 4 — Chaos Shield
 
-* Hold **B**. A red, glowing sphere of chaos energy surrounds Wanda.
-* **Blocks 100% of projectiles**: arrows, tridents, Ghast and Blaze fireballs, Wither
-  skulls, shulker bullets, potions and snowballs. Projectiles disintegrate on the sphere.
-* **Explosion damage is reduced by 75%.**
-* **Cost:** it burns hunger quickly while held (about 1 food point every 2 seconds).
-  When the hunger bar is empty the shield collapses.
+* Hold **B**. A red, glowing sphere of chaos energy grows round Wanda. **(added)** It is a
+  commitment, not a reflex:
+  * **It takes 3/4 of a second (15 ticks) to form.** It grows from her hands to its full
+    size and **blocks nothing until it is complete.**
+  * **It holds for at most 8 seconds** (160 ticks, counted from when it is complete), then
+    it drops.
+  * **It has 30 points of strength.** Everything it stops wears it down by that much (see
+    below). At 0 it **shatters**: a burst of red shards and a glassy sound.
+  * **It has to recharge** before it can be raised again: **6 seconds** after it drops (B
+    released, or hunger), **15 seconds** if it shattered or was held to its limit. The HUD
+    counts it down, and B does nothing meanwhile.
+* **Blocks every projectile** it meets while it is up: arrows, tridents, Ghast and Blaze
+  fireballs, Wither skulls, shulker bullets, potions and snowballs. Projectiles disintegrate
+  on the sphere. A projectile costs the shield what it would have done to Wanda: an arrow its
+  damage at its speed (about 4 to 6), a trident 8, a fireball 6, a thrown Mjolnir, dagger or
+  iron shard its own damage, and 2 for anything else. The projectile that breaks the shield
+  is still stopped.
+* **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it
+  down; if less strength is left than that, the shield shatters and the rest gets through.
+  Melee blows are not stopped.
+* **Cost:** it burns hunger quickly while held (about 1 food point every 2 seconds), while it
+  forms too. When the hunger bar is empty the shield collapses (and has to recharge).
+* **HUD:** "forming" while it grows; once it is up, what is left of its strength (green, then
+  yellow, then red) and the seconds it can still be held. The sphere flickers as it weakens
+  or when its time is nearly up. Her arms rise as it forms.
 
 #### Ability 5 — The Hex
 
@@ -517,6 +554,10 @@ costume), *Wiccan (comics)*, and *Your own skin*.
   no liquid, nothing burning, and no Hex wall in between; it tries 12 random spots, and if none
   is safe they stay where they were). They **awaken as Loki**: a title on screen, a burst of green
   light and a message to the whole server. The cube needs one second before it can be used again.
+* **(added)** **With a Scarlet Witch Gene in the other hand,** a player with no power awakens
+  as the **Scarlet Witch** instead (section 2.1), exactly as with Loki's Scepter: no swirl, no
+  escape, the gene used up, Wanda's Crown in the inventory. The cube is not used up and needs
+  one second before it can be used again.
 * **A hero's jump.** Someone who already has a power (Loki himself too) isn't changed by the
   cube: the Space Stone takes them to the block they look at, up to **48 blocks** away, on top of
   it if there is room. The Hex wall still stops them. Cooldown 5 seconds.
@@ -681,7 +722,8 @@ Every power's light follows the films and shows:
 ## 11. Server configuration **(added)**
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
-shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, how much faster Quicksilver does
-everything, Tommy's speed, Loki's dagger damage, Mjolnir's and Stormbreaker's damage and range, who is worthy of
+shrapnel damage, shield reflect chance, the Chaos Shield's wind-up, time limit, strength and cooldowns, how much
+Quicksilver Time slows the world, how much faster Quicksilver does everything, Tommy's speed, Loki's dagger damage, how
+long Loki's Scepter confuses, Mjolnir's and Stormbreaker's damage and range, who is worthy of
 Mjolnir and whether it belongs to the first worthy player who lifts it (`mjolnirOwnerOnly`), the Bifrost's
 cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`.
