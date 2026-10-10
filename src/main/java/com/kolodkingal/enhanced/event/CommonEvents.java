@@ -47,6 +47,7 @@ import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -97,6 +98,16 @@ public final class CommonEvents {
         LokiAbilities.clear();
         BillyAbilities.clear();
         WitchesRoad.clear();
+    }
+
+    // ---- Quicksilver does everything faster (runs on both sides, so the client's use animation keeps up) ----
+
+    /** Eating, drinking, drawing a bow, loading a crossbow: most uses of an item go faster while a mode is on. */
+    @SubscribeEvent
+    public static void onUseItemTick(LivingEntityUseItemEvent.Tick event) {
+        if (event.getEntity() instanceof Player player) {
+            event.setDuration(QuicksilverAbilities.fasterUse(player, event.getItem(), event.getDuration()));
+        }
     }
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----

@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -20,17 +21,31 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
-/** Quicksilver (Peter Maximoff): the fastest man alive. */
+/**
+ * Quicksilver (Peter Maximoff): the fastest man alive. He has two ways to be fast, and only one is on at a time:
+ * <ul>
+ *     <li><b>Quicksilver Time</b> (R): everything around him is slowed, whether he runs or not.</li>
+ *     <li><b>Super Speed</b> (Sneak + R): only he is fast, the world runs at its normal pace.</li>
+ * </ul>
+ * In either mode he does everything faster (see {@link #actionSpeed()}), and he runs at super speed while he sprints.
+ */
 public final class QuicksilverAbilities {
     private static final ResourceLocation SPEED_ID = Enhanced.id("quicksilver_speed");
     private static final ResourceLocation STEP_ID = Enhanced.id("quicksilver_step");
+    private static final ResourceLocation MINING_ID = Enhanced.id("quicksilver_mining");
+    private static final ResourceLocation ATTACK_ID = Enhanced.id("quicksilver_attack");
+    private static final ResourceLocation SWIM_ID = Enhanced.id("quicksilver_swim");
+    /** Quicksilver Time while he is not running costs this part of the hunger that running in it costs. */
+    private static final float IDLE_EXHAUSTION = 0.5F;
     public static final int BLITZ_RANGE = 24;
     public static final int BLITZ_HITS = 6;
     public static final float BLITZ_DAMAGE = 2.0F;
@@ -46,9 +61,11 @@ public final class QuicksilverAbilities {
         }
         switch (ability) {
             case 1 -> {
-                data.setQuicksilverTime(!data.quicksilverTime());
-                player.displayClientMessage(Component.translatable(data.quicksilverTime()
-                        ? "message.enhanced.quicksilver_time.on" : "message.enhanced.quicksilver_time.off"), true);
+                if (player.isShiftKeyDown()) {
+                    toggleSuperSpeed(player, data);
+                } else {
+                    toggleTime(player, data);
+                }
             }
             case 2 -> blitz(player, data);
             case 3 -> pickpocket(player, data);
@@ -79,35 +96,144 @@ public final class QuicksilverAbilities {
         }
     }
 
-    // ---- Quicksilver Time ----
+    // ---- Ability 1: Quicksilver Time (R) and Super Speed (Sneak + R) ----
+
+    /** R: Quicksilver Time on or off. Turning it on turns Super Speed off. */
+    private static void toggleTime(ServerPlayer player, PowerData data) {
+        boolean on = !data.quicksilverTime();
+        if (on && !isFed(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.quicksilver_time.starving"), true);
+            return;
+        }
+        data.setQuicksilverTime(on);
+        data.setSuperSpeed(false);
+        player.displayClientMessage(Component.translatable(on
+                ? "message.enhanced.quicksilver_time.on" : "message.enhanced.quicksilver_time.off"), true);
+        if (on) {
+            whoosh(player);
+        }
+    }
+
+    /** Sneak + R: Super Speed on or off. Turning it on turns Quicksilver Time off. */
+    private static void toggleSuperSpeed(ServerPlayer player, PowerData data) {
+        boolean on = !data.superSpeed();
+        data.setSuperSpeed(on);
+        data.setQuicksilverTime(false);
+        player.displayClientMessage(Component.translatable(on
+                ? "message.enhanced.quicksilver_speed.on" : "message.enhanced.quicksilver_speed.off"), true);
+    }
+
+    private static void whoosh(ServerPlayer player) {
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_WHOOSH.get(),
+                SoundSource.PLAYERS, 1.0F, 1.0F);
+    }
+
+    /** Whether he has the strength to run: a full stomach, or no hunger at all (Creative). */
+    private static boolean isFed(ServerPlayer player) {
+        return player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
+    }
 
     static void tick(ServerPlayer player, PowerData data) {
-        boolean canRun = player.isSprinting() && data.quicksilverTime() && !player.isSpectator() && !player.isPassenger()
-                && (player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0);
-        boolean was = data.slowMo();
-        data.setSlowMo(canRun);
-        if (canRun) {
-            player.causeFoodExhaustion(EnhancedConfig.QUICKSILVER_EXHAUSTION.get().floatValue());
+        boolean fed = isFed(player);
+        if (data.quicksilverTime() && !fed) {
+            // Starving: Quicksilver Time runs out of strength and stops by itself.
+            data.setQuicksilverTime(false);
+            player.displayClientMessage(Component.translatable("message.enhanced.quicksilver_time.starving"), true);
+        }
+        // Quicksilver Time slows the world whether he runs or not; Super Speed never does.
+        boolean slowing = data.quicksilverTime() && !player.isSpectator();
+        data.setSlowMo(slowing);
+
+        boolean running = (data.quicksilverTime() || data.superSpeed()) && player.isSprinting() && !player.isSpectator()
+                && !player.isPassenger() && fed;
+        boolean wasRunning = data.is(Live.SPEEDING);
+        data.set(Live.SPEEDING, running);
+        float exhaustion = EnhancedConfig.QUICKSILVER_EXHAUSTION.get().floatValue();
+        if (running) {
+            player.causeFoodExhaustion(exhaustion);
             player.resetFallDistance();
-            if (!was) {
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_WHOOSH.get(),
-                        SoundSource.PLAYERS, 1.0F, 1.0F);
+            if (!wasRunning && data.superSpeed()) {
+                whoosh(player);
             }
+        } else if (slowing) {
+            player.causeFoodExhaustion(exhaustion * IDLE_EXHAUSTION);
         }
         applySpeed(player, data);
     }
 
-    /** Super speed and step-up while Quicksilver Time is running; also called when the power changes. */
+    /**
+     * Super speed and step-up while he runs, and the faster mining, attacking and swimming while a mode is on. Also
+     * called when the power changes, to take it all away again.
+     */
     static void applySpeed(ServerPlayer player, PowerData data) {
-        boolean running = data.power() == Power.QUICKSILVER && data.slowMo();
+        boolean quicksilver = data.power() == Power.QUICKSILVER;
+        boolean running = quicksilver && data.is(Live.SPEEDING);
+        boolean quick = quicksilver && isQuick(data);
+        double faster = actionSpeed() - 1.0;
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SPEED_ID, EnhancedConfig.QUICKSILVER_SPEED_BONUS.get(), running,
-                net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         PowerTicker.setModifier(player, Attributes.STEP_HEIGHT, STEP_ID, 0.65, running);
+        PowerTicker.setModifier(player, Attributes.BLOCK_BREAK_SPEED, MINING_ID, faster, quick,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        PowerTicker.setModifier(player, Attributes.ATTACK_SPEED, ATTACK_ID, faster, quick,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        PowerTicker.setModifier(player, NeoForgeMod.SWIM_SPEED, SWIM_ID, faster, quick,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
+    /**
+     * Whether he is running at super speed right now: a mode is on and he is sprinting. The server decides (on a
+     * client it is the synced state), and it is what fall damage, the field of view, Wall &amp; Water Run, the
+     * running pose, the afterimages and the trails follow.
+     */
     public static boolean isRunning(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.QUICKSILVER && data.slowMo();
+        return data.power() == Power.QUICKSILVER && data.is(Live.SPEEDING);
+    }
+
+    /** Whether a mode (Quicksilver Time or Super Speed) is on: he does everything faster. */
+    public static boolean isQuick(Player player) {
+        return isQuick(Powers.get(player));
+    }
+
+    private static boolean isQuick(PowerData data) {
+        return data.power() == Power.QUICKSILVER && (data.quicksilverTime() || data.superSpeed());
+    }
+
+    /** How many times as fast he does everything while a mode is on (the config's {@code actionSpeed}). */
+    public static double actionSpeed() {
+        return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.QUICKSILVER_ACTION_SPEED.get() : 4.0;
+    }
+
+    /**
+     * Using an item (eating, drinking, drawing a bow, loading a crossbow...) goes {@link #actionSpeed()} times as fast:
+     * each tick takes the extra ticks off what is left of the use. It never goes below 1, so vanilla still ends the
+     * use itself, and eaten food is eaten, a bow released, a crossbow loaded as ever. Fractions carry over from tick
+     * to tick. A few uses are left at their own pace (see {@link #paced}).
+     *
+     * @param stack     the item being used
+     * @param remaining ticks left of the use, before this tick
+     * @return ticks left after the extra ticks are taken off
+     */
+    public static int fasterUse(Player player, ItemStack stack, int remaining) {
+        if (remaining <= 1 || !isQuick(player) || paced(stack)) {
+            return remaining;
+        }
+        double extra = actionSpeed() - 1.0;
+        int skipped = (int) (Math.floor((player.tickCount + 1) * extra) - Math.floor(player.tickCount * extra));
+        return Math.max(1, remaining - skipped);
+    }
+
+    /**
+     * Uses whose length is not a wait, so cutting it short would only break them: a brush strokes once every ten ticks
+     * of its use (skipped ticks would step right over the stroke), a spyglass would run out after 15 seconds instead of
+     * a minute, and a goat horn's call plays at its own pace.
+     */
+    private static boolean paced(ItemStack stack) {
+        return switch (stack.getUseAnimation()) {
+            case BRUSH, SPYGLASS, TOOT_HORN -> true;
+            default -> false;
+        };
     }
 
     // ---- Ability 2: Speed Blitz ----

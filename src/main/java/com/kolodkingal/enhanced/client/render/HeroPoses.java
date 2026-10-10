@@ -119,7 +119,8 @@ public final class HeroPoses {
                 }
             }
             case QUICKSILVER -> {
-                if (data.slowMo()) {
+                if (data.is(Live.SPEEDING)) {
+                    // Running, in Quicksilver Time or Super Speed.
                     sprintStride(model, limbSwing, limbSwingAmount);
                 }
             }

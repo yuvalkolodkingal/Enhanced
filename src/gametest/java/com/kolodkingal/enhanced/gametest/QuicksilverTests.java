@@ -4,15 +4,22 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -20,13 +27,17 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -41,7 +52,8 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /**
  * Quicksilver. Tests that start Quicksilver Time get their own batch and a small slow-motion radius, because the
- * slow motion would otherwise reach into the neighbouring test arenas.
+ * slow motion would otherwise reach into the neighbouring test arenas. (Super Speed slows nothing, so a test that
+ * only uses Super Speed needs no small radius.)
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -71,18 +83,63 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
+    /** Presses (and releases) ability key {@code ability}. */
+    private static void press(ServerPlayer player, int ability) {
+        AbilityHandler.onKey(player, ability, true);
+        AbilityHandler.onKey(player, ability, false);
+    }
+
+    /** Presses ability key {@code ability} while sneaking. */
+    private static void pressSneaking(ServerPlayer player, int ability) {
+        player.setShiftKeyDown(true);
+        press(player, ability);
+        player.setShiftKeyDown(false);
+    }
+
+    /** Turns Quicksilver Time (R) or Super Speed (Sneak + R) on or off. */
+    private static void toggle(ServerPlayer player, boolean time) {
+        if (time) {
+            press(player, 1);
+        } else {
+            pressSneaking(player, 1);
+        }
+    }
+
+    /** A zombie that stands still with a long effect on it: the effect only runs down while the zombie really ticks. */
+    private static Zombie timedZombie(GameTestHelper helper, double x) {
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, 10.5));
+        zombie.addEffect(new MobEffectInstance(MobEffects.LUCK, EFFECT_TICKS));
+        return zombie;
+    }
+
+    /** How many ticks the zombie has really ticked since {@link #timedZombie}. */
+    private static int ticked(Zombie zombie) {
+        return EFFECT_TICKS - zombie.getEffect(MobEffects.LUCK).getDuration();
+    }
+
+    private static final int EFFECT_TICKS = 400;
+
     @GameTest(template = ARENA, batch = "quicksilver_speed")
-    public static void sprintingStartsQuicksilverTime(GameTestHelper helper) {
+    public static void sprintingInQuicksilverTimeIsSuperSpeed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
         ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
         double walking = peter.getAttributeValue(Attributes.MOVEMENT_SPEED);
-
-        run(peter, true);
         PowerData data = Powers.get(peter);
-        check(data.slowMo(), "sprinting starts Quicksilver Time");
+        check(!data.quicksilverTime() && !data.superSpeed(), "both modes are off to begin with");
+
+        // With both modes off, sprinting is only sprinting (it multiplies speed by 1.3).
+        run(peter, true);
+        check(!data.slowMo() && !data.is(Live.SPEEDING), "sprinting alone starts nothing");
+        assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking * 1.3, 1.0E-4, "just a sprint");
+
+        press(peter, 1);
+        check(data.quicksilverTime(), "R turns Quicksilver Time on");
+        run(peter, true);
+        check(data.slowMo(), "Quicksilver Time slows the world");
+        check(data.is(Live.SPEEDING) && QuicksilverAbilities.isRunning(peter), "sprinting in Quicksilver Time is running");
         double bonus = EnhancedConfig.QUICKSILVER_SPEED_BONUS.get();
-        // Sprinting itself multiplies speed by 1.3; Quicksilver Time multiplies it again by (1 + bonus).
+        // Sprinting itself multiplies speed by 1.3; running multiplies it again by (1 + bonus).
         assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking * 1.3 * (1 + bonus), 1.0E-4, "super speed");
         check(peter.getAttributeValue(Attributes.STEP_HEIGHT) >= 1.2, "he runs up whole blocks");
 
@@ -91,16 +148,349 @@ public final class QuicksilverTests {
         peter.hurt(helper.getLevel().damageSources().fall(), 6.0F);
         assertNear(peter.getHealth(), health, 1.0E-4, "no fall damage while running");
 
+        // Stopping ends the run, but not Quicksilver Time: the world stays slowed while he walks or stands.
         run(peter, false);
-        check(!data.slowMo(), "stopping ends Quicksilver Time");
+        check(!data.is(Live.SPEEDING), "stopping ends the run");
+        check(data.slowMo() && data.quicksilverTime(), "but Quicksilver Time stays on");
         assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking, 1.0E-4, "normal speed again");
 
-        // Ability 1 turns the slow motion off, so he can sprint normally.
-        AbilityHandler.onKey(peter, 1, true);
-        AbilityHandler.onKey(peter, 1, false);
+        // Ability 1 again turns it off, so he can sprint normally.
+        press(peter, 1);
         run(peter, true);
-        check(!data.slowMo(), "Quicksilver Time can be switched off");
+        check(!data.quicksilverTime() && !data.slowMo(), "Quicksilver Time can be switched off");
+        check(!data.is(Live.SPEEDING), "and then sprinting is just sprinting");
         helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_standing", timeoutTicks = 100)
+    public static void quicksilverTimeSlowsAZombieWhileHeStandsStill(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
+        ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        Zombie near = timedZombie(helper, 5.5);
+        Zombie far = timedZombie(helper, 19.5);
+        PowerData data = Powers.get(peter);
+        double walking = peter.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        press(peter, 1);
+
+        f.everyTick(30, tick -> {
+            run(peter, false);
+            if (tick < 30) {
+                return false;
+            }
+            check(!peter.isSprinting() && !data.is(Live.SPEEDING), "he is standing still, not running");
+            check(data.slowMo(), "Quicksilver Time slows the world anyway");
+            assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking, 1.0E-6, "and he walks at his normal speed");
+            check(ticked(far) >= 28, "the far zombie ticks normally (" + ticked(far) + " ticks)");
+            check(ticked(near) <= 10, "the zombie next to him is slowed (" + ticked(near) + " ticks of " + ticked(far) + ")");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_super_speed", timeoutTicks = 100)
+    public static void superSpeedSlowsNothing(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        Zombie near = timedZombie(helper, 5.5);
+        Zombie far = timedZombie(helper, 19.5);
+        PowerData data = Powers.get(peter);
+        double walking = peter.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        pressSneaking(peter, 1);
+        check(data.superSpeed() && !data.quicksilverTime(), "Sneak + R turns Super Speed on");
+        float exhaustion = peter.getFoodData().getExhaustionLevel();
+
+        f.everyTick(30, tick -> {
+            run(peter, true);
+            if (tick == 1) {
+                check(data.is(Live.SPEEDING), "sprinting in Super Speed is running");
+                double bonus = EnhancedConfig.QUICKSILVER_SPEED_BONUS.get();
+                assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking * 1.3 * (1 + bonus), 1.0E-4, "super speed");
+                check(peter.getAttributeValue(Attributes.STEP_HEIGHT) >= 1.2, "he runs up whole blocks");
+                peter.fallDistance = 10;
+                float health = peter.getHealth();
+                peter.hurt(helper.getLevel().damageSources().fall(), 6.0F);
+                assertNear(peter.getHealth(), health, 1.0E-4, "no fall damage while running");
+            }
+            check(!data.slowMo(), "Super Speed doesn't slow the world");
+            check(SlowMotion.zones(helper.getLevel()).isEmpty(), "so there is no slow-motion zone");
+            if (tick < 30) {
+                return false;
+            }
+            check(!SlowMotion.isInZone(helper.getLevel(), near.position()), "the zombie next to him is not in any zone");
+            check(ticked(near) >= 28 && ticked(far) >= 28, "no zombie is slowed (" + ticked(near) + " and " + ticked(far) + " ticks)");
+            double cost = EnhancedConfig.QUICKSILVER_EXHAUSTION.get() * 30;
+            assertNear(peter.getFoodData().getExhaustionLevel() - exhaustion, cost, 0.01, "running at super speed costs hunger");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void theTwoModesExcludeEachOther(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        PowerData data = Powers.get(peter);
+
+        press(peter, 1);
+        check(data.quicksilverTime() && !data.superSpeed(), "R: Quicksilver Time");
+        pressSneaking(peter, 1);
+        check(data.superSpeed() && !data.quicksilverTime(), "Sneak + R: Super Speed instead");
+        press(peter, 1);
+        check(data.quicksilverTime() && !data.superSpeed(), "R again: back to Quicksilver Time");
+        pressSneaking(peter, 1);
+        pressSneaking(peter, 1);
+        check(!data.superSpeed() && !data.quicksilverTime(), "Sneak + R twice leaves both modes off");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void bothModesAreSavedAndSynced(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        PowerData data = Powers.get(peter);
+        for (boolean time : new boolean[]{true, false}) {
+            data.setQuicksilverTime(time);
+            data.setSuperSpeed(!time);
+            Tag saved = PowerData.CODEC.encodeStart(NbtOps.INSTANCE, data).getOrThrow();
+            PowerData loaded = PowerData.CODEC.parse(NbtOps.INSTANCE, saved).getOrThrow();
+            check(loaded.quicksilverTime() == time && loaded.superSpeed() == !time, "the mode is saved with the player");
+            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());
+            PowerData.STREAM_CODEC.encode(buf, data);
+            PowerData synced = PowerData.STREAM_CODEC.decode(buf);
+            check(synced.quicksilverTime() == time && synced.superSpeed() == !time, "and synced to the clients");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_hunger")
+    public static void quicksilverTimeCostsHungerAndStopsWhenStarving(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        PowerData data = Powers.get(peter);
+        double cost = EnhancedConfig.QUICKSILVER_EXHAUSTION.get();
+        press(peter, 1);
+
+        // Standing still in Quicksilver Time costs half of what running in it does.
+        float before = peter.getFoodData().getExhaustionLevel();
+        for (int i = 0; i < 20; i++) {
+            run(peter, false);
+        }
+        assertNear(peter.getFoodData().getExhaustionLevel() - before, cost * 20 * 0.5, 0.005, "standing in Quicksilver Time is half price");
+        before = peter.getFoodData().getExhaustionLevel();
+        for (int i = 0; i < 20; i++) {
+            run(peter, true);
+        }
+        assertNear(peter.getFoodData().getExhaustionLevel() - before, cost * 20, 0.005, "running in Quicksilver Time is full price");
+
+        // With nothing left to eat it switches itself off, and can't be started again.
+        peter.getFoodData().setFoodLevel(0);
+        run(peter, true);
+        check(!data.quicksilverTime() && !data.slowMo() && !data.is(Live.SPEEDING), "starving ends Quicksilver Time");
+        press(peter, 1);
+        check(!data.quicksilverTime(), "and he can't start it while starving");
+
+        // Unless he is invulnerable (Creative): hunger doesn't matter to him.
+        peter.getAbilities().invulnerable = true;
+        press(peter, 1);
+        run(peter, true);
+        check(data.quicksilverTime() && data.slowMo() && data.is(Live.SPEEDING), "invulnerable, he is never too hungry");
+        peter.getAbilities().invulnerable = false;
+
+        // Super Speed doesn't switch off, but a starving Quicksilver can't run.
+        pressSneaking(peter, 1);
+        run(peter, true);
+        check(data.superSpeed() && !data.is(Live.SPEEDING), "starving, Super Speed stays chosen but he can't run");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_actions")
+    public static void bothModesDoEverythingFaster(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        double speed = EnhancedConfig.QUICKSILVER_ACTION_SPEED.get();
+        check(speed == 4.0, "everything is four times as fast by default");
+        BlockState stone = Blocks.STONE.defaultBlockState();
+        run(peter, false);
+        double attack = peter.getAttributeValue(Attributes.ATTACK_SPEED);
+        double mining = peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED);
+        double swimming = peter.getAttributeValue(NeoForgeMod.SWIM_SPEED);
+        double digging = peter.getDestroySpeed(stone);
+
+        for (boolean time : new boolean[]{true, false}) {
+            String mode = time ? "Quicksilver Time" : "Super Speed";
+            toggle(peter, time);
+            run(peter, false);
+            assertNear(peter.getAttributeValue(Attributes.ATTACK_SPEED), attack * speed, 1.0E-6, "attack speed in " + mode);
+            assertNear(peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining * speed, 1.0E-6, "block break speed in " + mode);
+            assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming * speed, 1.0E-6, "swim speed in " + mode);
+            assertNear(peter.getDestroySpeed(stone), digging * speed, 1.0E-4, "mining stone in " + mode);
+
+            toggle(peter, time);
+            run(peter, false);
+            assertNear(peter.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "attack speed is normal with " + mode + " off");
+            assertNear(peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "block break speed is normal with " + mode + " off");
+            assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "swim speed is normal with " + mode + " off");
+        }
+
+        // Someone who stops being Quicksilver is not faster at anything.
+        press(peter, 1);
+        run(peter, false);
+        Powers.setPower(peter, Power.TOMMY);
+        assertNear(peter.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "a hero who is no longer Quicksilver attacks normally");
+        assertNear(peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "and mines normally");
+        assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "and swims normally");
+        helper.succeed();
+    }
+
+    /** Eats a steak and counts the ticks it takes. */
+    private static int eatSteak(ServerPlayer player) {
+        player.getFoodData().setFoodLevel(6);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.COOKED_BEEF));
+        player.startUsingItem(InteractionHand.MAIN_HAND);
+        int ticks = 0;
+        while (player.isUsingItem() && ticks < 100) {
+            player.doTick();
+            ticks++;
+        }
+        check(!player.isUsingItem() && player.getMainHandItem().isEmpty(), "the steak was eaten after " + ticks + " ticks");
+        check(player.getFoodData().getFoodLevel() == 14, "and the food was eaten: " + player.getFoodData().getFoodLevel());
+        return ticks;
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    public static void eatingFinishesInAQuarterOfTheTicks(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        int normal = eatSteak(peter);
+        check(normal >= 30, "a steak takes about 32 ticks to eat (took " + normal + ")");
+
+        toggle(peter, true);
+        int inTime = eatSteak(peter);
+        toggle(peter, false);
+        int inSpeed = eatSteak(peter);
+        check(inTime >= normal / 4 - 1 && inTime <= normal / 4 + 1, "in Quicksilver Time eating takes a quarter of the ticks (" + inTime + ")");
+        check(inSpeed >= normal / 4 - 1 && inSpeed <= normal / 4 + 1, "and so in Super Speed (" + inSpeed + ")");
+
+        // The extra ticks are taken off the use; fractions carry over, and a use is never cut below its last tick.
+        ItemStack steak = new ItemStack(Items.COOKED_BEEF);
+        f.config(EnhancedConfig.QUICKSILVER_ACTION_SPEED, 2.5);
+        int skipped = 0;
+        for (int t = 0; t < 10; t++) {
+            peter.tickCount = t;
+            skipped += 1000 - QuicksilverAbilities.fasterUse(peter, steak, 1000);
+        }
+        check(skipped == 15, "2.5 times as fast skips 15 ticks in 10 (skipped " + skipped + ")");
+        f.config(EnhancedConfig.QUICKSILVER_ACTION_SPEED, 4.0);
+        peter.tickCount = 0;
+        check(QuicksilverAbilities.fasterUse(peter, steak, 3) == 1 && QuicksilverAbilities.fasterUse(peter, steak, 2) == 1
+                && QuicksilverAbilities.fasterUse(peter, steak, 1) == 1, "the use never drops below its last tick, so vanilla ends it");
+        check(QuicksilverAbilities.fasterUse(peter, steak, 0) == 0 && QuicksilverAbilities.fasterUse(peter, steak, -2) == -2,
+                "and a use that is over is left alone");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    public static void brushesSpyglassesAndHornsKeepTheirOwnPace(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        toggle(peter, true);
+        peter.tickCount = 0;
+
+        // A brush strokes when ten ticks of use have passed (the 5th, the 15th...): rushed by four it would never stroke.
+        // (It only goes on while it points at a block, so he looks at the floor.)
+        peter.setXRot(90F);
+        peter.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BRUSH));
+        peter.startUsingItem(InteractionHand.MAIN_HAND);
+        int brushing = peter.getUseItemRemainingTicks();
+        for (int i = 0; i < 10; i++) {
+            peter.doTick();
+        }
+        check(brushing - peter.getUseItemRemainingTicks() == 10, "a brush goes tick by tick in Quicksilver Time (used "
+                + (brushing - peter.getUseItemRemainingTicks()) + " ticks in 10)");
+        peter.stopUsingItem();
+
+        // A spyglass would run out after 15 seconds, and a horn's call would end long before its sound.
+        check(QuicksilverAbilities.fasterUse(peter, new ItemStack(Items.SPYGLASS), 1200) == 1200, "a spyglass keeps its minute");
+        check(QuicksilverAbilities.fasterUse(peter, new ItemStack(Items.GOAT_HORN), 140) == 140, "and a goat horn its call");
+        check(QuicksilverAbilities.fasterUse(peter, new ItemStack(Items.BOW), 72000) < 72000, "while a bow is drawn faster");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    public static void othersAreNotRushedByQuicksilverTime(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        ServerPlayer other = f.player(12.5, FLOOR, 10.5);
+        double attack = other.getAttributeValue(Attributes.ATTACK_SPEED);
+        double mining = other.getAttributeValue(Attributes.BLOCK_BREAK_SPEED);
+        double swimming = other.getAttributeValue(NeoForgeMod.SWIM_SPEED);
+
+        toggle(peter, true);
+        run(peter, false);
+        check(Powers.get(peter).slowMo() && other.distanceTo(peter) < SlowMotion.radius(), "the other player stands in his Quicksilver Time");
+        check(QuicksilverAbilities.isQuick(peter) && !QuicksilverAbilities.isQuick(other), "but only Quicksilver is quicker");
+        assertNear(other.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "he attacks at his own speed");
+        assertNear(other.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "mines at his own speed");
+        assertNear(other.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "and swims at his own speed");
+        int ticks = eatSteak(other);
+        check(ticks >= 30, "and eats a steak in the usual time (took " + ticks + " ticks)");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "quicksilver_bows")
+    public static void bowsStillReleaseAndCrossbowsStillCharge(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
+        ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
+        // In the main inventory: the bow and the crossbow take the hotbar slot in his hand.
+        peter.getInventory().setItem(10, new ItemStack(Items.ARROW, 64));
+
+        // Five ticks is a quick tap for a normal archer (a bow takes 20 to draw): a weak shot, and a crossbow that is
+        // nowhere near loaded (it takes 25).
+        check(!shoot(helper, peter, 5).isCritArrow(), "without a mode, five ticks only draw the bow part of the way");
+        check(!loadCrossbow(peter, 7), "and a crossbow takes much longer to load");
+
+        for (boolean time : new boolean[]{true, false}) {
+            String mode = time ? "Quicksilver Time" : "Super Speed";
+            toggle(peter, time);
+            check(!shoot(helper, peter, 4).isCritArrow(), "in " + mode + " four ticks still only draw the bow part of the way");
+            check(shoot(helper, peter, 5).isCritArrow(), "in " + mode + " five ticks draw the bow fully: the arrow flies at full power");
+            check(!loadCrossbow(peter, 6), "in " + mode + " six ticks don't load a crossbow yet");
+            check(loadCrossbow(peter, 7), "but seven ticks do");
+            toggle(peter, time);
+        }
+        helper.succeed();
+    }
+
+    /** Draws a bow for {@code ticks} ticks and lets go; returns the arrow that flies off. */
+    private static AbstractArrow shoot(GameTestHelper helper, ServerPlayer player, int ticks) {
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BOW));
+        player.startUsingItem(InteractionHand.MAIN_HAND);
+        for (int i = 0; i < ticks; i++) {
+            player.doTick();
+        }
+        player.releaseUsingItem();
+        List<AbstractArrow> arrows = helper.getLevel().getEntitiesOfClass(AbstractArrow.class, player.getBoundingBox().inflate(4));
+        check(arrows.size() == 1, "letting go of the bow shoots one arrow (found " + arrows.size() + ")");
+        AbstractArrow arrow = arrows.get(0);
+        arrow.discard();
+        return arrow;
+    }
+
+    /** Charges a crossbow for {@code ticks} ticks and lets go; returns whether it is loaded. */
+    private static boolean loadCrossbow(ServerPlayer player, int ticks) {
+        ItemStack crossbow = new ItemStack(Items.CROSSBOW);
+        player.setItemInHand(InteractionHand.MAIN_HAND, crossbow);
+        player.startUsingItem(InteractionHand.MAIN_HAND);
+        for (int i = 0; i < ticks; i++) {
+            player.doTick();
+        }
+        player.releaseUsingItem();
+        return CrossbowItem.isCharged(crossbow);
     }
 
     @GameTest(template = ARENA, batch = "quicksilver_slow_blocks", timeoutTicks = 100)
@@ -108,6 +498,7 @@ public final class QuicksilverTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
         ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        press(peter, 1);
         run(peter, true);
 
         // Two blocks of sand dropped from the same height: one next to him, one far outside the slow motion.
@@ -149,6 +540,7 @@ public final class QuicksilverTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 8);
         ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        press(peter, 1);
         run(peter, true);
 
         Arrow arrow = new Arrow(EntityType.ARROW, helper.getLevel());
@@ -182,9 +574,12 @@ public final class QuicksilverTests {
                 check(arrow.getDeltaMovement().z > 0.7, "a slowed arrow hits at full speed (" + arrow.getDeltaMovement().z + ")");
                 return false;
             }
+            if (tick == 10) {
+                press(peter, 1);
+            }
             run(peter, false);
             if (tick == 11) {
-                check(arrow.getDeltaMovement().z > 0.7, "the arrow speeds up again when Quicksilver stops (" + arrow.getDeltaMovement().z + ")");
+                check(arrow.getDeltaMovement().z > 0.7, "the arrow speeds up again when Quicksilver Time ends (" + arrow.getDeltaMovement().z + ")");
                 check(!arrow.isNoGravity(), "and falls normally again");
                 assertNear(arrow.getBaseDamage(), baseDamage, 1.0E-6, "and has its normal damage back");
                 return true;
@@ -198,6 +593,7 @@ public final class QuicksilverTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 8);
         ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        press(peter, 1);
         run(peter, true);
 
         // A volley of arrows and two Loyalty tridents, all slowed down together. (Two tridents turning back in the same tick

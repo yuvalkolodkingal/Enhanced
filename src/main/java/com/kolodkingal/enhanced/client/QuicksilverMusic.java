@@ -27,8 +27,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Quicksilver's Walkman. While a Quicksilver with his Walkman on is running Quicksilver Time nearby, "Sweet Dreams
- * (Are Made of This)" plays for everyone close enough to be caught in the slow motion, and fades out when he stops.
+ * Quicksilver's Walkman. While a Quicksilver with his Walkman on has Quicksilver Time on nearby (running or not, but
+ * not in Super Speed, which slows nothing), "Sweet Dreams (Are Made of This)" plays for everyone close enough to be
+ * caught in the slow motion, and fades out when he turns it off.
  */
 public final class QuicksilverMusic {
     @Nullable
@@ -99,7 +100,7 @@ public final class QuicksilverMusic {
 
     /**
      * The looping theme, heard the same everywhere (not positional), with a short fade in and out. After fading out
-     * it keeps playing silently for a while, so if Quicksilver starts running again soon the song simply continues.
+     * it keeps playing silently for a while, so if Quicksilver Time comes back soon the song simply continues.
      */
     private static final class Theme extends AbstractTickableSoundInstance {
         /** How long the song keeps running silently before it really stops (10 seconds). */

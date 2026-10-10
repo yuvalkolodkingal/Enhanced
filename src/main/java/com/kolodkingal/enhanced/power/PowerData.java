@@ -20,9 +20,11 @@ public final class PowerData {
     private boolean magneticShield;
     /** Magneto: shards left from the last melted iron item. */
     private int ironCharge;
-    /** Quicksilver: sprinting starts Quicksilver Time. */
-    private boolean quicksilverTime = true;
-    /** Quicksilver: run up walls and across water during Quicksilver Time. */
+    /** Quicksilver: Quicksilver Time is on (the world around him is slowed, whether he runs or not). */
+    private boolean quicksilverTime;
+    /** Quicksilver: Super Speed is on (only he is fast, the world isn't slowed); never with Quicksilver Time. */
+    private boolean superSpeed;
+    /** Quicksilver: run up walls and across water while he runs (in Quicksilver Time or Super Speed). */
     private boolean wallRun = true;
     /** Quicksilver: his Walkman plays the theme during Quicksilver Time. */
     private boolean walkman = true;
@@ -44,7 +46,7 @@ public final class PowerData {
     private boolean chaosShieldActive;
     private boolean shrapnelActive;
     private boolean flying;
-    /** Quicksilver Time is running right now: the world around him is slowed. */
+    /** Quicksilver Time is slowing the world around him right now (it is on and he is not a spectator). */
     private boolean slowMo;
     /** Entity currently held with telekinesis, or -1. */
     private int heldEntityId = -1;
@@ -61,7 +63,9 @@ public final class PowerData {
             Power.CODEC.optionalFieldOf("power", Power.NONE).forGetter(d -> d.power),
             Codec.BOOL.optionalFieldOf("magnetic_shield", false).forGetter(d -> d.magneticShield),
             Codec.INT.optionalFieldOf("iron_charge", 0).forGetter(d -> d.ironCharge),
-            Codec.BOOL.optionalFieldOf("quicksilver_time", true).forGetter(d -> d.quicksilverTime),
+            // A new key: the old "quicksilver_time" meant "sprinting starts it" and was on for everyone.
+            Codec.BOOL.optionalFieldOf("quicksilver_time_on", false).forGetter(d -> d.quicksilverTime),
+            Codec.BOOL.optionalFieldOf("super_speed_on", false).forGetter(d -> d.superSpeed),
             Codec.BOOL.optionalFieldOf("wall_run", true).forGetter(d -> d.wallRun),
             Codec.BOOL.optionalFieldOf("walkman", true).forGetter(d -> d.walkman),
             Codec.BOOL.optionalFieldOf("vision_phased", false).forGetter(d -> d.visionPhased),
@@ -70,12 +74,13 @@ public final class PowerData {
             Codec.STRING.optionalFieldOf("variant", "").forGetter(d -> d.variant),
             Codec.INT.optionalFieldOf("toggles", 0).forGetter(d -> d.toggles),
             Codec.STRING.optionalFieldOf("form", "").forGetter(d -> d.form)
-    ).apply(i, (power, shield, iron, qsTime, wallRun, walkman, phased, dense, disguise, variant, toggles, form) -> {
+    ).apply(i, (power, shield, iron, qsTime, superSpeed, wallRun, walkman, phased, dense, disguise, variant, toggles, form) -> {
         PowerData d = new PowerData();
         d.power = power;
         d.magneticShield = shield;
         d.ironCharge = iron;
         d.quicksilverTime = qsTime;
+        d.superSpeed = superSpeed;
         d.wallRun = wallRun;
         d.walkman = walkman;
         d.visionPhased = phased;
@@ -95,7 +100,7 @@ public final class PowerData {
         int flags = (magneticShield ? 1 : 0) | (beamActive ? 2 : 0)
                 | (chaosShieldActive ? 4 : 0) | (shrapnelActive ? 8 : 0) | (flying ? 16 : 0)
                 | (quicksilverTime ? 32 : 0) | (wallRun ? 64 : 0) | (walkman ? 128 : 0) | (slowMo ? 256 : 0)
-                | (visionPhased ? 512 : 0) | (dense ? 1024 : 0) | (disguise ? 2048 : 0);
+                | (visionPhased ? 512 : 0) | (dense ? 1024 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0);
         ByteBufCodecs.VAR_INT.encode(buf, flags);
         ByteBufCodecs.VAR_INT.encode(buf, ironCharge);
         ByteBufCodecs.VAR_INT.encode(buf, heldEntityId + 1);
@@ -127,6 +132,7 @@ public final class PowerData {
         d.visionPhased = (flags & 512) != 0;
         d.dense = (flags & 1024) != 0;
         d.disguise = (flags & 2048) != 0;
+        d.superSpeed = (flags & 4096) != 0;
         d.ironCharge = ByteBufCodecs.VAR_INT.decode(buf);
         d.heldEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
         d.hammerEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
@@ -151,7 +157,8 @@ public final class PowerData {
         this.power = power;
         this.magneticShield = false;
         this.ironCharge = 0;
-        this.quicksilverTime = true;
+        this.quicksilverTime = false;
+        this.superSpeed = false;
         this.wallRun = true;
         this.walkman = true;
         this.slowMo = false;
@@ -200,6 +207,17 @@ public final class PowerData {
     public void setQuicksilverTime(boolean v) {
         if (quicksilverTime != v) {
             quicksilverTime = v;
+            dirty = true;
+        }
+    }
+
+    public boolean superSpeed() {
+        return superSpeed;
+    }
+
+    public void setSuperSpeed(boolean v) {
+        if (superSpeed != v) {
+            superSpeed = v;
             dirty = true;
         }
     }
