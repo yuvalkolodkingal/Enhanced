@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
+import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -29,11 +30,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -149,6 +152,8 @@ public final class MjolnirPin {
         level.playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.8F, 0.5F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 30, 0.4, 0.3, 0.4, 0.4);
         level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.4F), at.x, at.y, at.z, 12, 0.3, 0.2, 0.3, 0.1);
+        // Everyone nearby sees him bring it down (the slam of his arm).
+        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, 64, new ThorFxPayload(ThorFxPayload.PIN, pinner.getId(), List.of(at)));
     }
 
     /** The hammer lying on {@code target}, or null if it is not pinned. Works on both sides. */

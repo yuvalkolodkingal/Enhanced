@@ -363,5 +363,11 @@
   "message.enhanced.mjolnir.pinned_cannot": "מיולניר מצמיד אותך לקרקע: אי אפשר ללכת לשום מקום",
   "death.attack.enhanced.lightning_beam": "%1$s הוכה על ידי ברק",
   "death.attack.enhanced.lightning_beam.player": "%1$s הוכה על ידי הברק של %2$s",
-  "death.attack.enhanced.lightning_beam.item": "%1$s הוכה על ידי הברק של %2$s"
+  "death.attack.enhanced.lightning_beam.item": "%1$s הוכה על ידי הברק של %2$s",
+  "config.enhanced.animations": "אנימציות גיבורים",
+  "config.enhanced.animations.tooltip": "תנוחות משולבות, תעופה, ריצה והנשק של ת'ור. כבוי: תנוחות רגילות בלבד.",
+  "config.enhanced.reduced_motion": "תנועה מופחתת",
+  "config.enhanced.reduced_motion.tooltip": "בלי נדנוד ריחוף, סחף או רעידות מצלמה, וטבעות עמומות יותר.",
+  "config.enhanced.flight_effects": "אפקטי תעופה",
+  "config.enhanced.flight_effects.tooltip": "סרטים, טבעות, קווי רוח וגלי הלם סביב גיבורים שעפים."
 }

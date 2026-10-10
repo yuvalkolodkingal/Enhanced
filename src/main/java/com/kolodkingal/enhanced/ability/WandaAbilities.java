@@ -153,7 +153,8 @@ public final class WandaAbilities {
     /** How many red shards fly out when the shield shatters. */
     private static final int SHATTER_SHARDS = 56;
 
-    private static boolean canAffordShield(Player player) {
+    /** Whether the Chaos Shield can be held: it costs hunger, so a hungry Scarlet Witch is refused (the client's animation asks too). */
+    public static boolean canAffordShield(Player player) {
         return player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
     }
 

@@ -1,13 +1,15 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
-import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
-import com.kolodkingal.enhanced.client.render.BodyLean;
+import com.kolodkingal.enhanced.client.render.FlightEffects;
+import com.kolodkingal.enhanced.client.render.GestureEffects;
+import com.kolodkingal.enhanced.client.render.HandTracker;
+import com.kolodkingal.enhanced.client.render.HeroAnimator;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
@@ -32,8 +34,6 @@ import net.minecraft.sounds.Music;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -61,13 +61,14 @@ public final class ClientEvents {
             java.util.Arrays.fill(SENT_DOWN, false);
             return;
         }
+        HeroAnimator.tick(mc.level);
+        FlightEffects.tick(mc.level);
+        GestureEffects.tick(mc.level);
         handleKeys(mc, player);
         QuickHands.tick(mc, player);
-        spawnFlightParticles(mc.level);
         spawnSpeedTrails(mc.level);
         spawnFrostParticles(mc);
         Afterimages.tick(mc.level);
-        BodyLean.tick(mc.level);
         Shapeshifts.tick(mc.level);
         QuicksilverMusic.tick(mc);
         PowerLoopSounds.tick(mc);
@@ -90,7 +91,10 @@ public final class ClientEvents {
         QuicksilverMusic.stop();
         PowerLoopSounds.stopAll();
         Afterimages.clear();
-        BodyLean.clear();
+        HeroAnimator.clear();
+        HandTracker.clear();
+        FlightEffects.clear();
+        GestureEffects.clear();
         ThorEffects.clear();
         Shapeshifts.clear();
         SlowMotionEffect.stop(Minecraft.getInstance());
@@ -103,7 +107,10 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onLevelUnload(LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
-            BodyLean.clear();
+            HeroAnimator.clear();
+            HandTracker.clear();
+            FlightEffects.clear();
+            GestureEffects.clear();
         }
     }
 
@@ -253,6 +260,7 @@ public final class ClientEvents {
                 }
                 PacketDistributor.sendToServer(new AbilityKeyPayload(i, true));
                 SENT_DOWN[i] = true;
+                HeroAnimator.predict(player, i);
             }
             if (!down && SENT_DOWN[i]) {
                 PacketDistributor.sendToServer(new AbilityKeyPayload(i, false));
@@ -265,78 +273,8 @@ public final class ClientEvents {
         return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
     }
 
-    /**
-     * Wanda's hands trail crimson energy in flight, Billy's give off faint blue sparks, Magneto a faint haze of metal
-     * dust.
-     */
-    private static void spawnFlightParticles(ClientLevel level) {
-        RandomSource random = level.random;
-        for (AbstractClientPlayer player : level.players()) {
-            PowerData data = Powers.get(player);
-            if (!data.flying() || player.isInvisible()) {
-                continue;
-            }
-            switch (data.power()) {
-                case SCARLET_WITCH -> {
-                    for (HumanoidArm arm : HumanoidArm.values()) {
-                        Vec3 hand = handInWorld(player, arm);
-                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 1.0F),
-                                hand.x + (random.nextDouble() - 0.5) * 0.15, hand.y + (random.nextDouble() - 0.5) * 0.15,
-                                hand.z + (random.nextDouble() - 0.5) * 0.15, 0, 0.01, 0);
-                    }
-                }
-                case MAGNETO -> {
-                    if (player.tickCount % 2 == 0) {
-                        level.addParticle(new EnergyParticleOptions(Power.MAGNETO.glow, 0.9F),
-                                player.getX() + (random.nextDouble() - 0.5) * 0.8, player.getY() - 0.05,
-                                player.getZ() + (random.nextDouble() - 0.5) * 0.8, 0, -0.03, 0);
-                    }
-                }
-                case BILLY -> {
-                    if (player.tickCount % 3 == 0) {
-                        HumanoidArm arm = random.nextBoolean() ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
-                        Vec3 hand = handInWorld(player, arm);
-                        level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? BillyAbilities.CORE : BillyAbilities.MAIN, 0.8F),
-                                hand.x + (random.nextDouble() - 0.5) * 0.2, hand.y + (random.nextDouble() - 0.5) * 0.2,
-                                hand.z + (random.nextDouble() - 0.5) * 0.2, 0, 0.015, 0);
-                    }
-                }
-                case QUICKSILVER, VISION, TOMMY, LOKI, THOR, NONE -> {
-                }
-            }
-        }
-    }
-
-    /** Rough position of a hand of a player standing or flying, as far as the body leans. */
-    private static Vec3 handInWorld(Player player, HumanoidArm arm) {
-        float yaw = player.yBodyRot * Mth.DEG_TO_RAD;
-        double side = arm == HumanoidArm.RIGHT ? -0.38 : 0.38;
-        double x = -Mth.sin(yaw) * 0.05 + Mth.cos(yaw) * side;
-        double z = Mth.cos(yaw) * 0.05 + Mth.sin(yaw) * side;
-        return BodyLean.follow(player, player.position().add(x, player.isCrouching() ? 0.6 : 0.75, z), 1.0F);
-    }
-
-    /** Players currently drawn with a hover bob (their pose stack was pushed in Pre and must be popped in Post). */
-    private static final java.util.Set<Integer> BOBBING = new java.util.HashSet<>();
-
-    /** Flying heroes float with a gentle up-and-down bob. */
-    @SubscribeEvent
-    public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
-        Player player = event.getEntity();
-        PowerData data = Powers.get(player);
-        if (data.power().hasPowers() && data.flying() && !player.onGround()) {
-            float t = player.tickCount + event.getPartialTick();
-            event.getPoseStack().pushPose();
-            event.getPoseStack().translate(0.0, Mth.sin(t * 0.08F) * 0.06, 0.0);
-            BOBBING.add(player.getId());
-        }
-    }
-
     @SubscribeEvent
     public static void onRenderPlayerPost(RenderPlayerEvent.Post event) {
-        if (BOBBING.remove(event.getEntity().getId())) {
-            event.getPoseStack().popPose();
-        }
         Afterimages.render(event);
     }
 

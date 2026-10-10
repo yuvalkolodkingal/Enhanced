@@ -62,17 +62,20 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
 
         if (hands) {
             VertexConsumer glow = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-            handOrb(poseStack, glow, model.rightArm, -1F / 16F, t);
-            handOrb(poseStack, glow, model.leftArm, 1F / 16F, t + 20F);
+            // The orbs swell as she speeds up.
+            HeroAnimState state = HeroAnimator.peek(player);
+            float swell = state == null ? 1F : 1F + 0.35F * AnimMath.ss(1F, 2F, state.s);
+            handOrb(poseStack, glow, model.rightArm, -1F / 16F, t, swell);
+            handOrb(poseStack, glow, model.leftArm, 1F / 16F, t + 20F, swell);
         }
     }
 
     /** A spinning ball of chaos energy cupped in the hand. */
-    private static void handOrb(PoseStack poseStack, VertexConsumer vc, ModelPart arm, float x, float t) {
+    private static void handOrb(PoseStack poseStack, VertexConsumer vc, ModelPart arm, float x, float t, float swell) {
         poseStack.pushPose();
         arm.translateAndRotate(poseStack);
         poseStack.translate(x, 10F / 16F, 0F);
-        float pulse = 0.85F + 0.15F * (float) Math.sin(t * 0.5F);
+        float pulse = (0.85F + 0.15F * (float) Math.sin(t * 0.5F)) * swell;
         for (int i = 0; i < 3; i++) {
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(t * 9F + i * 60F));

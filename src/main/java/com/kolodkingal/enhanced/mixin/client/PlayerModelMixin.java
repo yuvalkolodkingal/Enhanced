@@ -8,9 +8,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** The heroes' custom poses, applied after the vanilla animation. */
+/**
+ * The heroes' poses, blended on top of the vanilla animation. The reset at the head clears the two fields vanilla never
+ * resets and the poses write (this model is shared by everyone with the same arm width).
+ */
 @Mixin(PlayerModel.class)
 public abstract class PlayerModelMixin {
+    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("HEAD"))
+    private void enhanced$resetPoses(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                                     float netHeadYaw, float headPitch, CallbackInfo ci) {
+        HeroPoses.reset((PlayerModel<?>) (Object) this);
+    }
+
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     private void enhanced$heroPoses(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks,
                                     float netHeadYaw, float headPitch, CallbackInfo ci) {

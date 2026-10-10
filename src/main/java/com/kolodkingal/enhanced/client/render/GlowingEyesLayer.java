@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
  * Eyes that glow, drawn full-bright over the skin's eyes:
  * <ul>
  *     <li>the Scarlet Witch's turn red while she wields chaos magic (WandaVision finale, Multiverse of Madness);</li>
- *     <li>Thor's blaze white-blue when the God of Thunder is unleashed (Ragnarok).</li>
+ *     <li>Thor's blaze white-blue when the God of Thunder is unleashed (Ragnarok), and while he fires lightning.</li>
  * </ul>
  */
 public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
@@ -33,7 +34,7 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
     private static RenderType eyes(PowerData data) {
         return switch (data.power()) {
             case SCARLET_WITCH -> data.beamActive() || data.chaosShieldActive() || data.heldEntityId() != -1 ? WANDA : null;
-            case THOR -> data.toggle(Toggle.GOD_OF_THUNDER) ? THOR : null;
+            case THOR -> data.toggle(Toggle.GOD_OF_THUNDER) || data.is(Live.CALLING_LIGHTNING) ? THOR : null;
             default -> null;
         };
     }

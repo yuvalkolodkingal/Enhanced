@@ -65,6 +65,10 @@ public final class ThorEffects {
     public static void add(ThorFxPayload payload) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level != null && !payload.points().isEmpty()) {
+            HeroAnimator.onThorFx(payload);
+            if (payload.kind() == ThorFxPayload.PIN) {
+                return;
+            }
             EFFECTS.add(new Effect(payload.kind(), payload.entityId(), payload.points(), level.dimension(), level.getGameTime()));
         }
     }
@@ -271,12 +275,24 @@ public final class ThorEffects {
         Vec3 look = player.getViewVector(partialTick);
         boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         if (firstPerson) {
-            // Where the held weapon's head, or the bare hand, appears: at the right of the screen.
+            // Where the held weapon's head, or the bare hand, appears: at the right of the screen, moved with the
+            // first-person pose of the beam (the view-space offset is about 0.8 blocks from the camera, so 0.4 of it is
+            // the offset in the world).
             Vec3 right = look.cross(new Vec3(0, 1, 0));
             right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
             Vec3 up = right.cross(look).normalize();
             double side = player.getMainArm() == HumanoidArm.RIGHT ? 1.0 : -1.0;
-            return player.getEyePosition(partialTick).add(look.scale(0.75)).add(right.scale(0.58 * side)).add(up.scale(weapon ? -0.08 : -0.36));
+            float[] hand = new float[3];
+            if (player == mc.player) {
+                FirstPersonArms.mainHand(mc.player, hand);
+            }
+            return player.getEyePosition(partialTick).add(look.scale(0.75 + 0.4 * hand[2])).add(right.scale(side * (0.58 + 0.4 * hand[0])))
+                    .add(up.scale((weapon ? -0.08 : -0.36) + 0.4 * hand[1]));
+        }
+        // Where the body is really drawn: the head of the weapon in his fist, or the fist itself.
+        Vec3 tracked = weapon ? HandTracker.weaponHead(player, partialTick) : HandTracker.hand(player, player.getMainArm(), partialTick);
+        if (tracked != null) {
+            return tracked;
         }
         Vec3 eye = player.getEyePosition(partialTick);
         float yaw = Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot) * Mth.DEG_TO_RAD;

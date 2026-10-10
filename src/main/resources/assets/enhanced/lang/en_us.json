@@ -363,5 +363,11 @@
   "message.enhanced.mjolnir.pinned_cannot": "Mjolnir holds you down: you can't go anywhere",
   "death.attack.enhanced.lightning_beam": "%1$s was struck down by lightning",
   "death.attack.enhanced.lightning_beam.player": "%1$s was struck down by %2$s's lightning",
-  "death.attack.enhanced.lightning_beam.item": "%1$s was struck down by %2$s's lightning"
+  "death.attack.enhanced.lightning_beam.item": "%1$s was struck down by %2$s's lightning",
+  "config.enhanced.animations": "Hero animations",
+  "config.enhanced.animations.tooltip": "Blended poses, flight, running and Thor's weapon. Off: vanilla poses only.",
+  "config.enhanced.reduced_motion": "Reduced motion",
+  "config.enhanced.reduced_motion.tooltip": "No hover bob, drift or camera shake, and fainter rings.",
+  "config.enhanced.flight_effects": "Flight effects",
+  "config.enhanced.flight_effects.tooltip": "Ribbons, rings, wind streaks and shockwaves around flying heroes."
 }

@@ -523,14 +523,14 @@
   "display": {
     "thirdperson_righthand": {
       "rotation": [
-        50,
-        90,
+        30,
+        0,
         0
       ],
       "translation": [
-        0.5,
-        3.9,
-        4.6
+        0,
+        1.572,
+        3.562
       ],
       "scale": [
         0.55,
@@ -540,14 +540,14 @@
     },
     "thirdperson_lefthand": {
       "rotation": [
-        50,
-        90,
+        30,
+        180,
         0
       ],
       "translation": [
-        0.5,
-        3.9,
-        4.6
+        0,
+        1.572,
+        3.562
       ],
       "scale": [
         0.55,
