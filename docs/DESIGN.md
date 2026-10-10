@@ -324,36 +324,65 @@ Monica Rambeau after she crossed the Hex.
 
 ### 4.2 Quicksilver Time (the main power)
 
-**When Quicksilver sprints, time slows down around him:**
+**Press R and time slows down around him, whether he runs or not:** **(changed)** it used to start only while he
+sprinted. Now he can stand still, walk, mine, build, fight or eat in the middle of it.
 
 * Everything within **32 blocks** runs **5 times slower**: monsters, animals, villagers,
   falling blocks, TNT fuses, dropped items, smoke, sparks and splashes, and **arrows and thrown things, which hang in
   the air** and crawl forward. **(added)** An arrow that finally lands still hits as hard as it
   would have.
 * Other players in range are slowed down heavily (a strong Slowness).
-* **Quicksilver speeds up**: he runs **4 times faster** than normal and steps up whole
-  blocks without jumping. He takes no fall damage while running.
-* **The world starts playing his song**: everyone near him hears the theme from his Walkman.
-  It fades in when he starts running, keeps playing from where it was if he stops and starts
-  again within 10 seconds, and fades out when he stops.
+* **Quicksilver speeds up when he sprints**: he runs **4 times faster** than normal and steps up whole
+  blocks without jumping. He takes no fall damage while running. Walking, he moves at his normal speed, so he can
+  still do precise work.
+* **The world starts playing his song**: everyone near him hears the theme from his Walkman for as long as
+  Quicksilver Time is on, running or not (if his Walkman is on). It fades in when he turns Quicksilver Time on, keeps
+  playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
   * The song is *Sweet Dreams (Are Made of This)* by Eurythmics, built into the mod.
   * **(added)** To play a different song, put an `.mp3`, `.ogg` or `.wav` file into
     `config/enhanced/music/` in the Minecraft folder (the mod creates that folder and a short README
     the first time it starts). The first file in alphabetical order is used. Remove it to go back
     to *Sweet Dreams*.
-* A cool grey shade at the edges of the screen shows that time is slowed, and Quicksilver
+* A cool grey shade at the edges of the screen shows that time is slowed, and while he runs Quicksilver
   leaves a grey blur and fading afterimages behind him (in the X-Men films his speed has no
   coloured glow).
-* Cost: it burns hunger while he runs. With an empty hunger bar, he can only run normally.
+* Cost: it burns hunger the whole time it is on, **half** as fast while he stands or walks and at the full rate
+  (0.03 exhaustion a tick) while he runs. When the hunger bar is empty, Quicksilver Time switches itself off (with a
+  message) and can't be switched on again until he has eaten. Creative players never run out.
 
-### 4.3 Abilities
+### 4.3 Super Speed (Sneak + R) **(added)**
+
+A second mode, for when only **he** should be fast: Sneak + R turns Super Speed on or off.
+
+* **The world is not slowed at all**: no slow motion, no song, no grey shade. Everyone else lives at the normal pace.
+* When he sprints he runs at the **same super speed** as in Quicksilver Time (4 times faster, steps up whole blocks,
+  no fall damage), with the same grey blur and afterimages, and Wall & Water Run works too.
+* Cost: hunger only while he runs, at the full rate. With an empty hunger bar he can't run, but Super Speed stays on.
+* **One mode at a time**: turning one on turns the other off. Both start off, and the choice is saved with the player.
+
+### 4.4 Doing everything faster (in both modes) **(added)**
+
+While Quicksilver Time **or** Super Speed is on, Quicksilver does everything **4 times as fast** (config:
+`quicksilver.actionSpeed`), whether he runs or not:
+
+| What | How it is faster |
+|---|---|
+| Mining | His block break speed is multiplied by 4: stone with a pickaxe takes a quarter of the time. |
+| Attacking | His attack speed is multiplied by 4, so the attack cooldown recharges 4 times faster. |
+| Eating, drinking, bows, crossbows and everything else you hold the use button for | The use runs 4 times as fast: a steak takes 8 ticks instead of 32, a bow is fully drawn in 5 ticks instead of 20, a crossbow is loaded in 7 instead of 25. Food is still eaten and arrows still fly at full strength. |
+| Swimming | His swim speed is multiplied by 4. |
+| Placing and breaking blocks one after another | On his own screen, the game's built-in pause between one block and the next (after a right click, and after a block is broken) is cut by the same factor, so holding the button places or breaks blocks without waiting. |
+
+The movement speed bonus and the step-up stay tied to **sprinting**, so he can still walk normally and precisely.
+
+### 4.5 Abilities
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R (toggle) | **Quicksilver Time** | On by default: sprinting starts Quicksilver Time. Turn it off to sprint normally. |
+| 1 | R (toggle) | **Quicksilver Time** | Turn Quicksilver Time on or off: the world around him is slowed, whether he runs or not. Off by default. **Sneak + R: Super Speed** **(added)**, only he is fast (see 4.3). |
 | 2 | G | **Speed Blitz** **(added)** | Look at a creature up to 24 blocks away: Quicksilver is next to it in an instant and lands 6 rapid punches (2 damage each, ignoring the hit cooldown), then knocks it back. Cooldown 4 s. |
 | 3 | V | **Pickpocket** **(added)** | Snatch whatever the creature or player you look at (up to 24 blocks) holds in its hand, straight into your inventory. Cooldown 5 s. |
-| 4 | B (toggle) | **Wall & Water Run** **(added)** | During Quicksilver Time, run straight up walls you run into, and across water as long as you keep running. |
+| 4 | B (toggle) | **Wall & Water Run** **(added)** | While running (in Quicksilver Time or Super Speed), run straight up walls you run into, and across water as long as you keep running. |
 | 5 | N (toggle) | **Walkman** **(added)** | Turn the theme music on or off. |
 
 ## 5. Vision — the Mind Stone in a synthetic body **(added)**
@@ -607,6 +636,6 @@ Every power's light follows the films and shows:
 ## 12. Server configuration **(added)**
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
-shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
-Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's cooldown…) can be changed in
-`world/serverconfig/enhanced-server.toml`.
+shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, how much faster Quicksilver does
+everything, Tommy's speed, Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's
+cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`.

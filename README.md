@@ -2,7 +2,7 @@
 
 A Minecraft mod where you can become one of the *Enhanced*:
 **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**;
-**Quicksilver**, who runs so fast the world slows down around him (to *Sweet Dreams*);
+**Quicksilver**, who slows the world down around him (to *Sweet Dreams*) or just outruns it;
 **Vision**, the Mind Stone in a synthetic body (or **White Vision**);
 Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; the God of Mischief, **Loki**;
 or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
@@ -52,7 +52,7 @@ look. In Thor's hands either weapon is thrown, called back, flown with and struc
 
 | Key | Magneto | Scarlet Witch | Quicksilver | Vision |
 |---|---|---|---|---|
-| **R** | Metal Telekinesis | Chaos Energy Beam (hold) | Quicksilver Time on/off | Mind Stone Beam (hold) |
+| **R** | Metal Telekinesis | Chaos Energy Beam (hold) | Quicksilver Time on/off (Sneak: Super Speed) | Mind Stone Beam (hold) |
 | **G** | Iron Shrapnel Storm (hold) | Enhanced Flight | Speed Blitz | Flight |
 | **V** | Armor & Weapon Strip | Telekinesis (creatures, items, blocks) | Pickpocket | Phase through walls (toggle) |
 | **B** | Magnetic Shield (toggle) | Chaos Shield (hold) | Wall & Water Run (toggle) | Density (toggle) |
@@ -67,8 +67,10 @@ look. In Thor's hands either weapon is thrown, called back, flown with and struc
 | **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | **H** | Change look | Change look | Change look | Change look |
 
-**Quicksilver Time:** as Quicksilver, just sprint. Everything within 32 blocks slows to a
-fifth of its speed (arrows hang in the air), you run four times faster, and the music starts.
+**Quicksilver Time:** as Quicksilver, press **R**. Everything within 32 blocks slows to a fifth of its speed
+(arrows hang in the air) and the music starts, whether you run or just stand there; sprint, and you run four times
+faster. Press **Sneak + R** for **Super Speed** instead: only you are fast, and the world is not slowed. In either mode
+you also mine, attack, eat, shoot a bow and swim four times as fast.
 
 Every hero except Quicksilver, Tommy and Loki can also fly by double-tapping **Space** (Thor only with
 Mjolnir or Stormbreaker in hand). With telekinesis, press the key again
