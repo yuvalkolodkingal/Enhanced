@@ -150,12 +150,13 @@ public final class ThorEffects {
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.9F);
                 rainbowBeam(pose, vc, feet, 1.3F * pulse, time, 1.0F);
             }
-            if (data.power() != Power.THOR || player.isInvisible()) {
+            if (data.power() != Power.THOR) {
                 continue;
             }
-            if (data.toggle(Toggle.GOD_OF_THUNDER)) {
+            if (data.toggle(Toggle.GOD_OF_THUNDER) && !player.isInvisible()) {
                 crackle(pose, vc, player, camera, partialTick, time);
             }
+            // The beam is drawn even for an invisible Thor: it hurts all the same.
             if (data.is(Live.CALLING_LIGHTNING)) {
                 beam(mc, player, ThorAbilities.holdsWeapon(player), data.toggle(Toggle.GOD_OF_THUNDER), pose, vc, camera, partialTick, time);
             }
@@ -179,7 +180,7 @@ public final class ThorEffects {
     private static void beam(Minecraft mc, AbstractClientPlayer player, boolean weapon, boolean thunder, Matrix4f pose, VertexConsumer vc,
                              Vec3 camera, float partialTick, float time) {
         Vec3 origin = beamOrigin(mc, player, weapon, partialTick);
-        Vec3 target = Raycasts.any(player, ThorAbilities.beamRange(weapon), ThorAbilities.BEAM_TARGET, partialTick).getLocation();
+        Vec3 target = Raycasts.any(player, ThorAbilities.beamRange(weapon), ThorAbilities.beamTargets(player), partialTick).getLocation();
         Vec3 a = origin.subtract(camera);
         Vec3 b = target.subtract(camera);
         double length = a.distanceTo(b);

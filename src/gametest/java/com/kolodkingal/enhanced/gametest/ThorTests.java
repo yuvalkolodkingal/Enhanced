@@ -455,7 +455,9 @@ public final class ThorTests {
     // ------------------------------------------------------------------------------------------------------------
     // The lightning beam (V, held)
 
+    /** V (or another key) goes down; a fresh Thor's beam is free to hit at once, whatever tick it is. */
     private static void hold(ServerPlayer player, int ability) {
+        ThorAbilities.forgetBeamPace(player);
         AbilityHandler.onKey(player, ability, true);
     }
 
@@ -630,6 +632,28 @@ public final class ThorTests {
         thor.setGameMode(GameType.SPECTATOR);
         PowerTicker.tick(thor);
         check(!data.is(Live.CALLING_LIGHTNING), "a spectator fires nothing");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void theBeamSparesTheSteedThorRidesAndLettingGoDoesNotResetItsPace(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        Pig steed = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(3.5, FLOOR, 10.5));
+        check(thor.startRiding(steed, true), "Thor sits on the pig");
+        Zombie zombie = bareZombie(helper, 9.5, 10.5);
+        lookAt(thor, zombie);
+        float steedBefore = steed.getHealth();
+        assertNear(oneHit(thor, zombie), 2.0, 1.0E-4, "the beam goes past his steed, to the zombie");
+        check(steed.getHealth() == steedBefore, "and the steed he rides isn't hurt");
+        // Pressing and letting go again and again can't hit faster than the beam's own pace (one hit in this very tick).
+        zombie.setHealth(zombie.getMaxHealth());
+        for (int i = 0; i < 6; i++) {
+            AbilityHandler.onKey(thor, 3, true);
+            PowerTicker.tick(thor);
+            letGo(thor, 3);
+        }
+        check(zombie.getMaxHealth() - zombie.getHealth() <= 2.0F + 1.0E-4F, "the pace holds: " + (zombie.getMaxHealth() - zombie.getHealth()));
         helper.succeed();
     }
 
@@ -979,6 +1003,20 @@ public final class ThorTests {
         check(rightClick(thor, victim, false), "its owner lifts Mjolnir off them");
         PowerTicker.tick(victim);
         check(!Powers.get(victim).is(Live.PINNED) && pinsNear(victim).isEmpty(), "and they are free");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void killingTheHammerThatPinsSomeoneStillDropsMjolnir(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "pinned");
+        // Something kills the entity that carries the hammer (a /kill of everything, say).
+        pinsNear(zombie).forEach(Entity::kill);
+        check(pinsNear(zombie).isEmpty() && !MjolnirPin.isPinned(zombie), "the pin is gone, and the zombie is free");
+        check(mjolnirsOnTheGround(zombie).stream().anyMatch(e -> ownedBy(e.getItem(), thor)), "Mjolnir isn't lost: it lies beside it, still Thor's");
         helper.succeed();
     }
 

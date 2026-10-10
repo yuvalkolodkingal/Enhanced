@@ -104,12 +104,20 @@ public final class ThorAbilities {
     public static final Predicate<Entity> BEAM_TARGET = e -> e.isPickable() && !e.isSpectator() && e.isAlive()
             && (e instanceof LivingEntity || e instanceof PartEntity<?> || e instanceof EndCrystal) && !isThor(e);
 
+    /** What this Thor's own beam can hit: {@link #BEAM_TARGET}, but never the steed he rides, nor whoever rides with him. */
+    public static Predicate<Entity> beamTargets(Entity thor) {
+        return e -> BEAM_TARGET.test(e) && !thor.isPassengerOfSameVehicle(e);
+    }
+
     /** Traveller → the Bifrost that is about to take them. */
     private static final Map<UUID, Journey> JOURNEYS = new HashMap<>();
     /** Thor → his lightning beam while V is held. */
     private static final Map<UUID, Beam> BEAMS = new HashMap<>();
 
-    /** A beam being fired: when it may hit next, and the creatures it has hit already (they get lightning's effects once). */
+    /**
+     * Thor's beam: when it may hit next (kept between holds, so that letting go and pressing again can't hit more often
+     * than the interval), and the creatures it has hit since V went down (they get lightning's effects once).
+     */
     private static final class Beam {
         long nextHit;
         final IntSet struck = new IntOpenHashSet();
@@ -528,7 +536,6 @@ public final class ThorAbilities {
      */
     private static void lightningBeam(ServerPlayer player, PowerData data, boolean down) {
         if (!down || player.isSpectator()) {
-            BEAMS.remove(player.getUUID());
             data.set(Live.CALLING_LIGHTNING, false);
             return;
         }
@@ -539,7 +546,7 @@ public final class ThorAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.thor.too_hungry"), true);
             return;
         }
-        BEAMS.put(player.getUUID(), new Beam());
+        BEAMS.computeIfAbsent(player.getUUID(), id -> new Beam()).struck.clear();
         data.set(Live.CALLING_LIGHTNING, true);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 0.8F, 1.3F);
     }
@@ -553,7 +560,6 @@ public final class ThorAbilities {
      */
     private static void beamTick(ServerPlayer thor, PowerData data) {
         if (thor.isSpectator() || starving(thor)) {
-            BEAMS.remove(thor.getUUID());
             data.set(Live.CALLING_LIGHTNING, false);
             return;
         }
@@ -562,7 +568,7 @@ public final class ThorAbilities {
         boolean weapon = holdsWeapon(thor);
         boolean thunder = data.toggle(Toggle.GOD_OF_THUNDER);
         thor.causeFoodExhaustion(EnhancedConfig.THOR_BEAM_EXHAUSTION.get().floatValue());
-        HitResult hit = Raycasts.any(thor, beamRange(weapon), BEAM_TARGET, 1.0F);
+        HitResult hit = Raycasts.any(thor, beamRange(weapon), beamTargets(thor), 1.0F);
         Vec3 end = hit.getLocation();
         long now = level.getGameTime();
         if (hit instanceof EntityHitResult entityHit && now >= beam.nextHit) {
@@ -584,7 +590,8 @@ public final class ThorAbilities {
         Entity target = hit.getEntity();
         LivingEntity living = target instanceof LivingEntity l ? l
                 : target instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity l ? l : null;
-        if (weapon && living != null && beam.struck.add(living.getId())) {
+        // (Not on players: lightning has nothing to do to them but a flinch, and PvP rules are not for it to bypass.)
+        if (weapon && living != null && !(living instanceof Player) && beam.struck.add(living.getId())) {
             thunderStruck(level, thor, living);
         }
         target.hurt(ModDamageTypes.source(level, ModDamageTypes.LIGHTNING_BEAM, thor, thor), beamDamage(weapon, thunder));
@@ -611,6 +618,14 @@ public final class ThorAbilities {
         int fire = target.getRemainingFireTicks();
         target.thunderHit(level, bolt);
         target.setRemainingFireTicks(fire);
+    }
+
+    /**
+     * Lets the next hit of Thor's beam land at once, whenever the last was (it is forgotten when he loses the power or
+     * logs out; a test that fires the beam several times within one tick calls it in between).
+     */
+    public static void forgetBeamPace(ServerPlayer thor) {
+        BEAMS.remove(thor.getUUID());
     }
 
     /** Damage of one hit of the beam, for whether Thor holds Mjolnir or Stormbreaker and whether the God of Thunder is unleashed. */
@@ -882,7 +897,7 @@ public final class ThorAbilities {
 
     /** Ends everything this hero left in the world (the power is being taken away). */
     public static void endAll(ServerPlayer player, PowerData data) {
-        BEAMS.remove(player.getUUID());
+        forgetBeamPace(player);
         data.set(Live.CALLING_LIGHTNING, false);
         data.setToggle(Toggle.GOD_OF_THUNDER, false);
         // A shattered Mjolnir comes together where he stands and falls. A weapon in flight finds no Thor to return to, and
@@ -892,7 +907,7 @@ public final class ThorAbilities {
 
     /** Thor logs out: his beam stops (a Mjolnir in pieces falls: see {@link MjolnirShatter#onGone}). */
     public static void onLogout(ServerPlayer player) {
-        BEAMS.remove(player.getUUID());
+        forgetBeamPace(player);
         Powers.get(player).set(Live.CALLING_LIGHTNING, false);
     }
 

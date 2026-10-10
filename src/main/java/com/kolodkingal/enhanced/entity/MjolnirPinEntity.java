@@ -37,6 +37,8 @@ public class MjolnirPinEntity extends Entity {
     /** The game time at which it lets go. */
     private long endsAt;
     private boolean loadedFromDisk;
+    /** The hammer has been handed back or dropped by {@link MjolnirPin}: nothing is left to fall if this entity goes. */
+    private boolean spent;
     /** Where the target was held, and the lowest it has been since (it may fall, but never climb). */
     private Vec3 holdAt = Vec3.ZERO;
 
@@ -120,6 +122,21 @@ public class MjolnirPinEntity extends Entity {
         }
         setPos(centre(target));
         MjolnirPin.tick(level, this, target);
+    }
+
+    /** {@link MjolnirPin} has taken the hammer off: from here on the entity is only an empty shell. */
+    public void spend() {
+        spent = true;
+    }
+
+    /** Killed or discarded by anything but {@link MjolnirPin} (a {@code /kill} cleaning up a world, say): the hammer still falls. */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (!spent && !level().isClientSide && reason.shouldDestroy() && level() instanceof ServerLevel level) {
+            MjolnirPin.release(level, this);
+            return;
+        }
+        super.remove(reason);
     }
 
     @Override

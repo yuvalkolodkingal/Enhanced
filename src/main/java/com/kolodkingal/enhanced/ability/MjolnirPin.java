@@ -213,6 +213,7 @@ public final class MjolnirPin {
     private static ItemStack end(MjolnirPinEntity pin, @Nullable LivingEntity target) {
         ItemStack hammer = pin.hammer();
         BY_TARGET.remove(pin.targetUuid(), pin);
+        pin.spend();
         pin.discard();
         if (target instanceof ServerPlayer player) {
             Powers.get(player).set(Live.PINNED, false);
