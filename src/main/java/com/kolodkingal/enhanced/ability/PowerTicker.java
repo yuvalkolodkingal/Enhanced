@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -107,12 +108,16 @@ public final class PowerTicker {
         }
     }
 
-    /** Releases every hold-to-use ability (beam, shrapnel, shield) and stops Quicksilver Time. */
+    /**
+     * Releases every hold-to-use ability (beam, shrapnel, shield) and stops Quicksilver Time slowing the world and
+     * any run at super speed. (Which mode is chosen is kept: it comes back with the player.)
+     */
     public static void stopHoldAbilities(PowerData data) {
         data.setBeamActive(false);
         data.setChaosShieldActive(false);
         data.setShrapnelActive(false);
         data.setSlowMo(false);
+        data.set(Live.SPEEDING, false);
     }
 
     /** The hero's flight key: take off or land, the same as double-tapping Space. */

@@ -49,6 +49,7 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue SLOW_MOTION_RADIUS;
     public static final ModConfigSpec.DoubleValue QUICKSILVER_SPEED_BONUS;
     public static final ModConfigSpec.DoubleValue QUICKSILVER_EXHAUSTION;
+    public static final ModConfigSpec.DoubleValue QUICKSILVER_ACTION_SPEED;
 
     // ---- Billy (Wiccan) ----
     public static final ModConfigSpec.DoubleValue BILLY_FLIGHT_SPEED;
@@ -143,10 +144,15 @@ public final class EnhancedConfig {
                 .defineInRange("slowMotionFactor", 5, 2, 20);
         SLOW_MOTION_RADIUS = BUILDER.comment("How far (blocks) from Quicksilver time slows down.")
                 .defineInRange("slowMotionRadius", 32, 4, 128);
-        QUICKSILVER_SPEED_BONUS = BUILDER.comment("Extra movement speed during Quicksilver Time (3.0 = four times as fast).")
+        QUICKSILVER_SPEED_BONUS = BUILDER.comment("Extra movement speed while he runs in Quicksilver Time or Super Speed",
+                        "(3.0 = four times as fast).")
                 .defineInRange("speedBonus", 3.0, 0.0, 10.0);
-        QUICKSILVER_EXHAUSTION = BUILDER.comment("Food exhaustion per tick during Quicksilver Time (4.0 = 1 food point).")
+        QUICKSILVER_EXHAUSTION = BUILDER.comment("Food exhaustion per tick while he runs in Quicksilver Time or Super Speed",
+                        "(4.0 = 1 food point). Quicksilver Time also costs half of this while he is not running.")
                 .defineInRange("exhaustion", 0.03, 0.0, 4.0);
+        QUICKSILVER_ACTION_SPEED = BUILDER.comment("While Quicksilver Time or Super Speed is on he mines, attacks, eats, drinks,",
+                        "draws bows, loads crossbows, swims and places blocks this many times as fast (4.0 = four times as fast).")
+                .defineInRange("actionSpeed", 4.0, 1.0, 10.0);
         BUILDER.pop();
 
         BUILDER.push("billy");

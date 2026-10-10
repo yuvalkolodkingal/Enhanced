@@ -10,7 +10,9 @@
     "client.AbstractClientPlayerMixin",
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
+    "client.MinecraftAccessor",
     "client.MinecraftMixin",
+    "client.MultiPlayerGameModeAccessor",
     "client.ParticleEngineMixin",
     "client.ParticleMixin",
     "client.PlayerModelMixin"

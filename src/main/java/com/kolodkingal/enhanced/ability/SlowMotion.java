@@ -30,7 +30,8 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Quicksilver Time: while Quicksilver sprints, everything near him runs several times slower.
+ * Quicksilver Time: while it is on, everything near Quicksilver runs several times slower, whether he runs or not. (His
+ * Super Speed slows nothing: only {@link PowerData#slowMo()}, which just Quicksilver Time sets, counts here.)
  *
  * <ul>
  *     <li>Creatures and most other entities only get every Nth tick (on the server; clients smooth the movement).</li>
@@ -156,7 +157,7 @@ public final class SlowMotion {
                 }
             }
         }
-        // Restore projectiles that left every zone (or whose Quicksilver stopped running), and let a Loyalty trident that
+        // Restore projectiles that left every zone (or whose Quicksilver Time ended), and let a Loyalty trident that
         // started flying home go at its own pace.
         if (!SLOWED.isEmpty()) {
             List<Projectile> leaving = new ArrayList<>();

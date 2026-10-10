@@ -23,8 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Speedster afterimages: fading grey copies of Quicksilver trail behind him while he runs in Quicksilver Time,
- * teal-green ghosts behind Tommy at super speed; and while Tommy spins a whirlwind, ghosts of him race around its ring.
+ * Speedster afterimages: fading grey copies of Quicksilver trail behind him while he runs (in Quicksilver Time or Super
+ * Speed), teal-green ghosts behind Tommy at super speed; and while Tommy spins a whirlwind, ghosts of him race around
+ * its ring.
  */
 public final class Afterimages {
     private static final int LENGTH = 6;
@@ -46,7 +47,7 @@ public final class Afterimages {
 
     private static boolean running(AbstractClientPlayer player) {
         PowerData data = Powers.get(player);
-        return ((data.power() == Power.QUICKSILVER && data.slowMo()) || (data.power() == Power.TOMMY && data.is(Live.SPEEDING)))
+        return (data.power() == Power.QUICKSILVER || data.power() == Power.TOMMY) && data.is(Live.SPEEDING)
                 && !player.isInvisible();
     }
 

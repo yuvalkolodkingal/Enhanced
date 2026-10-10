@@ -5,7 +5,7 @@ package com.kolodkingal.enhanced.power;
  * they are recomputed by the server while the power is in use. Kept together as one bit set in {@link PowerData}.
  */
 public enum Live {
-    /** Tommy is running at super speed right now. */
+    /** Tommy, or Quicksilver in Quicksilver Time or Super Speed, is running at super speed right now. */
     SPEEDING,
     /** Tommy is spinning a whirlwind around himself. */
     WHIRLWIND,

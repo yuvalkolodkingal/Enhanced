@@ -117,7 +117,7 @@ public class PowerHud implements LayeredDraw.Layer {
                 default -> null;
             };
             case QUICKSILVER -> switch (ability) {
-                case 1 -> data.slowMo() ? active("hud.enhanced.running") : onOff(data.quicksilverTime());
+                case 1 -> quicksilverMode(data);
                 case 4 -> onOff(data.wallRun());
                 case 5 -> onOff(data.walkman());
                 default -> null;
@@ -136,6 +136,19 @@ public class PowerHud implements LayeredDraw.Layer {
             case THOR -> thor(player, data, ability);
             case NONE -> null;
         };
+    }
+
+    /** Which of Quicksilver's modes is on ("Time" or "Speed", or OFF), and "running" while he runs in it. */
+    private static Component quicksilverMode(PowerData data) {
+        if (!data.quicksilverTime() && !data.superSpeed()) {
+            return onOff(false);
+        }
+        MutableComponent mode = Component.translatable(data.quicksilverTime() ? "hud.enhanced.time" : "hud.enhanced.speed")
+                .withStyle(ChatFormatting.GREEN);
+        if (data.is(Live.SPEEDING)) {
+            mode.append(Component.literal(" ")).append(active("hud.enhanced.running"));
+        }
+        return mode;
     }
 
     private static Component billy(LocalPlayer player, PowerData data, int ability) {

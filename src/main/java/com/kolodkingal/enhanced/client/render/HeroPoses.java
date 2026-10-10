@@ -98,7 +98,7 @@ public final class HeroPoses {
                 }
             }
             case QUICKSILVER -> {
-                if (data.slowMo()) {
+                if (data.is(Live.SPEEDING)) {
                     lean(model, 0.35F);
                     // Pumping arms, bigger and faster than a normal sprint.
                     float swing = Mth.cos(limbSwing * 0.6662F * 1.4F) * 1.6F * Math.max(limbSwingAmount, 0.6F);

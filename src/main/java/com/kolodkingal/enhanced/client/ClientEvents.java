@@ -60,6 +60,7 @@ public final class ClientEvents {
             return;
         }
         handleKeys(mc, player);
+        QuickHands.tick(mc, player);
         spawnFlightParticles(mc.level);
         spawnSpeedTrails(mc.level);
         spawnFrostParticles(mc);
@@ -128,7 +129,7 @@ public final class ClientEvents {
                 whirlwindParticles(level, player, random);
             }
             boolean tommy = data.power() == Power.TOMMY && data.is(Live.SPEEDING);
-            if (!tommy && (data.power() != Power.QUICKSILVER || !data.slowMo())) {
+            if (!tommy && !QuicksilverAbilities.isRunning(player)) {
                 continue;
             }
             // Only while he actually moves, and laid down along the path he just ran (never in his own face).
@@ -175,8 +176,8 @@ public final class ClientEvents {
     }
 
     /**
-     * Quicksilver's footwork, done on the client because players move themselves: in Quicksilver Time he runs
-     * straight up walls he runs into, and across water as long as he keeps running.
+     * Quicksilver's footwork, done on the client because players move themselves: while he runs (in Quicksilver Time
+     * or Super Speed) he runs straight up walls he runs into, and across water as long as he keeps running.
      */
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
@@ -184,14 +185,14 @@ public final class ClientEvents {
             return;
         }
         PowerData data = Powers.get(player);
-        if (data.power() != Power.QUICKSILVER || !data.slowMo() || !data.wallRun() || player.getAbilities().flying) {
+        if (!QuicksilverAbilities.isRunning(player) || !data.wallRun() || player.getAbilities().flying) {
             return;
         }
         Vec3 motion = player.getDeltaMovement();
         if (player.horizontalCollision && player.zza > 0) {
             player.setDeltaMovement(motion.x, Math.max(motion.y, 0.42), motion.z);
             player.resetFallDistance();
-            // Running into the wall would otherwise cancel the sprint (and with it Quicksilver Time) later this tick.
+            // Running into the wall would otherwise cancel the sprint (and with it his run) later this tick.
             player.minorHorizontalCollision = true;
             return;
         }
