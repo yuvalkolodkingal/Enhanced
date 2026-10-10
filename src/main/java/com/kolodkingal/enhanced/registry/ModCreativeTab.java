@@ -21,6 +21,7 @@ public final class ModCreativeTab {
                         output.accept(ModItems.WANDA_CROWN.get());
                         output.accept(ModItems.QUICKSILVER_GOGGLES.get());
                         output.accept(ModItems.SYNTHEZOID_CORE.get());
+                        output.accept(ModItems.WITCHES_ROAD_DOOR.get());
                     })
                     .build());
 

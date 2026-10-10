@@ -19,6 +19,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
+import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -73,6 +74,7 @@ public final class CommonEvents {
             HexManager.tickLevel(level);
             SlowMotion.serverTick(level);
             MagnetoAbilities.tickHeld(level);
+            WitchesRoad.tick(level);
         }
     }
 
@@ -84,6 +86,7 @@ public final class CommonEvents {
         MagnetoAbilities.clearHeld();
         TommyAbilities.clear();
         BillyAbilities.clear();
+        WitchesRoad.clear();
     }
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----
@@ -125,6 +128,7 @@ public final class CommonEvents {
             Powers.get(player).setBeamActive(false);
             Powers.get(player).setChaosShieldActive(false);
             Powers.get(player).setShrapnelActive(false);
+            WitchesRoad.forget(player.getUUID());
         }
     }
 

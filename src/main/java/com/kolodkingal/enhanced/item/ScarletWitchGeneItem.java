@@ -8,7 +8,10 @@ import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
-/** Does nothing on its own. Hold it while touching the Mind Stone (use Loki's Scepter) to awaken as the Scarlet Witch. */
+/**
+ * Does nothing on its own. Hold it while touching the Mind Stone (use Loki's Scepter) to awaken as the Scarlet Witch, or
+ * while opening a Witches' Road door to become Billy or Tommy.
+ */
 public class ScarletWitchGeneItem extends Item {
     public ScarletWitchGeneItem(Properties properties) {
         super(properties);
@@ -23,5 +26,6 @@ public class ScarletWitchGeneItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.enhanced.scarlet_witch_gene.desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         tooltip.add(Component.translatable("item.enhanced.scarlet_witch_gene.desc2").withStyle(ChatFormatting.RED));
+        tooltip.add(Component.translatable("item.enhanced.scarlet_witch_gene.desc3").withStyle(ChatFormatting.AQUA));
     }
 }

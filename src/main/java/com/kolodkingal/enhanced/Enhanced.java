@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced;
 import com.kolodkingal.enhanced.network.ModNetwork;
 import com.kolodkingal.enhanced.registry.ModArmorMaterials;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModCreativeTab;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -27,6 +28,7 @@ public class Enhanced {
 
     public Enhanced(IEventBus modBus, ModContainer container) {
         ModArmorMaterials.ARMOR_MATERIALS.register(modBus);
+        ModBlocks.BLOCKS.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModEffects.EFFECTS.register(modBus);
         ModEntities.ENTITIES.register(modBus);

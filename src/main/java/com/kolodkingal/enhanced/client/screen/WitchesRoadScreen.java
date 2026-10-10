@@ -1,0 +1,125 @@
+package com.kolodkingal.enhanced.client.screen;
+
+import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
+import com.kolodkingal.enhanced.network.RoadChoicePayload;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.road.WitchesRoad;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+/**
+ * "Seekest thou the Road?": a Witches' Road door opened for a seeker holding a Scarlet Witch Gene, who chooses whose
+ * road to walk, Billy's or Tommy's. The server checks everything again (still no powers, still a gene, still near the
+ * open door). The screen closes by itself when the door does, or when the seeker walks away.
+ */
+public class WitchesRoadScreen extends Screen {
+    private static final int CHOICE_WIDTH = 170;
+    private static final int CHOICE_HEIGHT = 44;
+    private static final int GAP = 10;
+
+    private final BlockPos door;
+
+    public WitchesRoadScreen(BlockPos door) {
+        super(Component.translatable("screen.enhanced.road.title"));
+        this.door = door;
+    }
+
+    /** Opens the screen (called when the server says the door opened for us). */
+    public static void open(BlockPos door) {
+        Minecraft.getInstance().setScreen(new WitchesRoadScreen(door));
+    }
+
+    @Override
+    protected void init() {
+        int top = height / 2 - CHOICE_HEIGHT / 2 - 6;
+        int left = width / 2 - CHOICE_WIDTH - GAP / 2;
+        addRenderableWidget(new Choice(left, top, Power.BILLY, Power.BILLY.color, "screen.enhanced.road.billy"));
+        addRenderableWidget(new Choice(left + CHOICE_WIDTH + GAP, top, Power.TOMMY, Power.TOMMY.glow, "screen.enhanced.road.tommy"));
+        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b -> onClose())
+                .bounds(width / 2 - 50, top + CHOICE_HEIGHT + 16, 100, 20).build());
+    }
+
+    private void choose(Power power) {
+        PacketDistributor.sendToServer(new RoadChoicePayload(door, power));
+        onClose();
+    }
+
+    @Override
+    public void tick() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) {
+            onClose();
+            return;
+        }
+        boolean open = mc.level.getBlockState(door).getOptionalValue(WitchesRoadDoorBlock.OPEN).orElse(false);
+        boolean near = mc.player.position().distanceToSqr(Vec3.atBottomCenterOf(door)) <= WitchesRoad.CHOICE_DISTANCE * WitchesRoad.CHOICE_DISTANCE;
+        if (!open || !near) {
+            onClose();
+        }
+    }
+
+    @Override
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
+        int top = height / 2 - CHOICE_HEIGHT / 2 - 6;
+        graphics.drawCenteredString(font, title.copy().withStyle(s -> s.withColor(WitchesRoad.LIGHT_CORE).withBold(true).withItalic(true)),
+                width / 2, top - 22, 0xFFFFFF);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    private static int darken(int rgb) {
+        return (rgb >> 1) & 0x7F7F7F;
+    }
+
+    /** A big button for one road: the hero's name in their colour, and one line about them. */
+    private final class Choice extends AbstractButton {
+        private final Power power;
+        private final int color;
+        private final Component description;
+
+        Choice(int x, int y, Power power, int color, String key) {
+            super(x, y, CHOICE_WIDTH, CHOICE_HEIGHT, Component.translatable(key));
+            this.power = power;
+            this.color = color;
+            this.description = Component.translatable(key + ".desc");
+        }
+
+        @Override
+        public void onPress() {
+            choose(power);
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            boolean lit = isHoveredOrFocused();
+            int x = getX();
+            int y = getY();
+            graphics.fill(x, y, x + width, y + height, lit ? 0xE0182436 : 0xC0101824);
+            graphics.renderOutline(x, y, width, height, 0xFF000000 | (lit ? color : darken(color)));
+            if (lit) {
+                graphics.renderOutline(x + 1, y + 1, width - 2, height - 2, 0x80000000 | color);
+            }
+            Component name = getMessage().copy().withStyle(s -> s.withColor(color).withBold(true));
+            graphics.drawCenteredString(font, name, x + width / 2, y + 10, 0xFFFFFF);
+            graphics.drawCenteredString(font, description.copy().withStyle(ChatFormatting.GRAY), x + width / 2, y + 26, 0xFFFFFF);
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput output) {
+            defaultButtonNarrationText(output);
+        }
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "open=false": {
+      "model": "enhanced:block/witches_road_door"
+    },
+    "open=true": {
+      "model": "enhanced:block/witches_road_door_open"
+    }
+  }
+}
