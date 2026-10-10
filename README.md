@@ -88,6 +88,10 @@ to launch what you hold, or **Sneak** + the key to put it down gently. Keys can 
 under *Options → Controls → Enhanced Powers*. The top-left corner of the screen always
 shows your abilities, cooldowns and resources.
 
+**Client options** (*Mods → Enhanced → Config*, or `config/enhanced-client.toml`): *Hero animations*
+(off: vanilla poses only), *Reduced motion* (calmer hover, no trembling or camera shake) and *Flight
+effects* (off: no trails, rings or wind).
+
 ## Screenshots
 
 ![The Scarlet Witch](docs/screenshots/scarlet-witch-sheet.png)

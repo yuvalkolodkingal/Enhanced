@@ -41,7 +41,7 @@ Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 | `scarlet_witch.chaosBeamNauseaTicks` | `100` | 0 to 6000 | Duration of the Nausea the Chaos Beam inflicts, in ticks (100 = 5 seconds). |
 | `scarlet_witch.chaosShieldExhaustion` | `0.1` | 0.0 to 4.0 | Food exhaustion per tick while the Chaos Shield is held (4.0 exhaustion = 1 food point, so 0.1 is about 1 food point every 2 seconds). |
 | `scarlet_witch.chaosShieldExplosionFactor` | `0.25` | 0.0 to 1.0 | Fraction of explosion damage that still gets through the Chaos Shield (0.25 = 75% less). |
-| `scarlet_witch.chaosShieldWindUpTicks` | `15` | 0 to 200 | How long the Chaos Shield takes to form after B is pressed, in ticks (15 = 3/4 of a second). It blocks nothing until it is complete. |
+| `scarlet_witch.chaosShieldWindUpTicks` | `15` | 0 to 200 | How long the Chaos Shield takes to form after B is pressed, in ticks (15 = 3/4 of a second). It blocks nothing until it is complete. Her raise (arms and effects) keeps time with it. |
 | `scarlet_witch.chaosShieldMaxTicks` | `160` | 1 to 6000 | How long a complete Chaos Shield can be held before it drops, in ticks (160 = 8 seconds). |
 | `scarlet_witch.chaosShieldStrength` | `30.0` | 1.0 to 1000.0 | Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down: the damage of a projectile, and the explosion damage it takes away. |
 | `scarlet_witch.chaosShieldCooldown` | `120` | 0 to 6000 | Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds). |

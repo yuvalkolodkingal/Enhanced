@@ -993,6 +993,8 @@ public final class ScarletWitchTests {
                 "what a client needs to draw and show the shield reaches it");
         check(!synced.chaosShieldUp(1014L) && synced.chaosShieldUp(1015L), "and it knows when the shield is complete");
         assertNear(synced.chaosShieldProgress(1007.5F), 0.5, 1.0E-6, "and how far it has grown");
+        check(synced.shieldStart() == 1000L && synced.shieldFormedAt() - synced.shieldStart() == 15L,
+                "and the wind-up the shield was given, which is how long every other client acts the raise over");
         check(buf.readableBytes() == 0, "nothing is left over in the packet");
 
         PowerData idle = new PowerData();
@@ -1002,6 +1004,13 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
+    /** What a client expects of its own key press is the wind-up in the config (and the default is the keyed 15). */
+    @GameTest(template = ARENA)
+    public static void theClientKnowsTheWindUpOfAShieldItRaises(GameTestHelper helper) {
+        check(WandaAbilities.windUpTicks() == EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get(), "it is the configured wind-up");
+        check(EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.getDefault() == 15, "15 ticks by default");
+        helper.succeed();
+    }
 
     private ScarletWitchTests() {
     }

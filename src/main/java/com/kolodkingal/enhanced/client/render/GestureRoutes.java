@@ -19,6 +19,12 @@ public final class GestureRoutes {
      * short snap and only the caster's predicted raise shows the whole wind-up).
      */
     public static final boolean SHIELD_FLAG_AT_PRESS = true;
+    /** The wind-up (ticks) the keys of {@link GestureId#WANDA_SHIELD_RAISE} are made for: arms open at this tick. */
+    public static final int SHIELD_KEYED_WIND_UP = 15;
+    /** A shield that forms in fewer ticks than this is not acted out with a wind-up: the arms just snap into place. */
+    public static final int SHIELD_SHORTEST_WIND_UP = 4;
+    /** How long a raise that the data does not (yet) show is believed, in ticks (see {@link #shieldRaiseAborted}). */
+    public static final int SHIELD_DATA_GRACE = 12;
 
     /** A Boolean flag of the synced power data (the ones that are not a {@link Toggle} or a {@link Live} bit). */
     public enum Flag {
@@ -46,6 +52,31 @@ public final class GestureRoutes {
     /** What happened to the Scarlet Witch's Hex. */
     public enum HexChange {
         RISES, DISSOLVES, TWEAKED, GROWS, SHRINKS
+    }
+
+    /** The gesture of raising a Chaos Shield that takes {@code windUp} ticks to form: the wind-up, or a snap. */
+    public static GestureId shieldRaise(int windUp) {
+        return windUp < SHIELD_SHORTEST_WIND_UP ? GestureId.WANDA_SHIELD_SNAP : GestureId.WANDA_SHIELD_RAISE;
+    }
+
+    /**
+     * How fast the keys of {@link GestureId#WANDA_SHIELD_RAISE} are played so that the arms are thrown open at the
+     * very tick the shield is complete, whatever the wind-up in the config: 1 for the keyed 15 ticks, 0.5 for a wind-up
+     * of 30.
+     */
+    public static float shieldRate(int windUp) {
+        return windUp <= 0 ? 1.0F : (float) SHIELD_KEYED_WIND_UP / windUp;
+    }
+
+    /**
+     * Whether the effects of a Chaos Shield being raised (the motes gathering, the flash of it thrown open) are over
+     * because it was let go of, or refused, before it formed. {@code flagUp} is whether the synced data says the shield
+     * is being held, {@code seenUp} whether it has said so since the raise began, {@code sinceStart} the ticks since
+     * the raise began. The local player's raise starts at the key press, a round trip before the data can say so: it is
+     * given {@link #SHIELD_DATA_GRACE} ticks to.
+     */
+    public static boolean shieldRaiseAborted(boolean flagUp, boolean seenUp, long sinceStart) {
+        return !flagUp && (seenUp || sinceStart > SHIELD_DATA_GRACE);
     }
 
     /** The gesture an ability's cooldown starting stands for, or null. {@code left} is the cooldown in ticks. */

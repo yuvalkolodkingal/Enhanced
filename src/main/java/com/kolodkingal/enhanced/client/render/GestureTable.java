@@ -50,6 +50,8 @@ public final class GestureTable {
         /** What telekinesis just let go of, to be told apart (thrown or set down) a tick later. */
         Entity released;
         int hammer = -1;
+        /** When the last Chaos Shield seen raised was (or will be) complete: let go of sooner, it never formed. */
+        long shieldFormedAt;
         /** The weapon "in flight" is Mjolnir's fragments (it was shattered), not the whole weapon. */
         boolean fragments;
         /** A catch or a draw seen in the data whose weapon has not yet appeared in the hand, and the ticks left to wait for it. */
@@ -68,6 +70,7 @@ public final class GestureTable {
             java.util.Arrays.fill(lives, false);
             java.util.Arrays.fill(flags, false);
             form = "";
+            shieldFormedAt = 0L;
             held = -1;
             heldEntity = null;
             released = null;
@@ -146,7 +149,18 @@ public final class GestureTable {
         for (GestureRoutes.Flag flag : FLAGS) {
             boolean on = flag(data, flag);
             if (on != m.flags[flag.ordinal()]) {
-                fire(s, p, GestureRoutes.flag(power, flag, on, white, phased), age);
+                GestureId id = GestureRoutes.flag(power, flag, on, white, phased);
+                if (id == GestureId.WANDA_SHIELD_DROP && now < m.shieldFormedAt) {
+                    // Let go of before it formed: there is no shield to drop, the arms only go back down.
+                    HeroAnimator.release(s, GestureId.WANDA_SHIELD_RAISE, age);
+                    HeroAnimator.release(s, GestureId.WANDA_SHIELD_SNAP, age);
+                } else if (id == GestureId.WANDA_SHIELD_RAISE) {
+                    // Acted over the shield's own wind-up (the data says how long it is), whatever the config.
+                    int windUp = (int) (data.shieldFormedAt() - data.shieldStart());
+                    fire(s, p, GestureRoutes.shieldRaise(windUp), windUp, age);
+                } else {
+                    fire(s, p, id, age);
+                }
             }
         }
 
@@ -246,6 +260,9 @@ public final class GestureTable {
         for (GestureRoutes.Flag flag : FLAGS) {
             m.flags[flag.ordinal()] = flag(data, flag);
         }
+        if (data.chaosShieldActive()) {
+            m.shieldFormedAt = data.shieldFormedAt();
+        }
         m.form = data.form();
         m.swinging = p.swinging;
         m.held = data.heldEntityId();
@@ -286,11 +303,16 @@ public final class GestureTable {
 
     /** Starts a gesture because the data changed, unless the key press already started it or it was just started. */
     private static void fire(HeroAnimState s, AbstractClientPlayer p, GestureId id, float age) {
+        fire(s, p, id, 0.0F, age);
+    }
+
+    /** As above, for a gesture that takes a number ({@link HeroAnimator#start}). */
+    private static void fire(HeroAnimState s, AbstractClientPlayer p, GestureId id, float param, float age) {
         if (id == null) {
             return;
         }
         for (HeroAnimState.Slot slot : s.slots) {
-            if (!slot.active || slot.id != id) {
+            if (!slot.active || !sameGesture(slot.id, id)) {
                 continue;
             }
             float since = age - slot.start;
@@ -303,8 +325,14 @@ public final class GestureTable {
                 return;
             }
         }
-        HeroAnimator.start(s, id, 0.0F, age);
-        GestureEffects.started(p, s, id);
+        HeroAnimator.start(s, id, param, age);
+        GestureEffects.started(p, s, id, param);
+    }
+
+    /** Whether two gestures stand for the same thing (the shield's raise and snap: the wind-up decides which plays). */
+    private static boolean sameGesture(GestureId a, GestureId b) {
+        return a == b || (a == GestureId.WANDA_SHIELD_RAISE || a == GestureId.WANDA_SHIELD_SNAP)
+                && (b == GestureId.WANDA_SHIELD_RAISE || b == GestureId.WANDA_SHIELD_SNAP);
     }
 
     // ====================================================================================================================

@@ -169,6 +169,11 @@ public final class WandaAbilities {
         return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_SHIELD_STRENGTH.get().floatValue() : 30.0F;
     }
 
+    /** How long a Chaos Shield takes to form after B is pressed, in ticks (what a client expects of its own press). */
+    public static int windUpTicks() {
+        return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get() : 15;
+    }
+
     /** How long a complete Chaos Shield can be held, in ticks. */
     public static int maxShieldTicks() {
         return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_SHIELD_MAX_TICKS.get() : 160;

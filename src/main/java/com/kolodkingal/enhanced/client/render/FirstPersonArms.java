@@ -270,10 +270,15 @@ public final class FirstPersonArms {
         float w = slot.weight;
         float t = slot.t;
         switch (slot.id) {
-            case WANDA_SHIELD_RAISE, WANDA_SHIELD_SNAP -> {
-                // The hands gather across the chest before they are thrown open: at t4 they are 0.18 further in.
-                float cross = slot.id == GestureId.WANDA_SHIELD_RAISE ? ss(0.0F, 4.0F, t) * (1.0F - ss(8.0F, 15.0F, t)) : 0.0F;
-                both(w, -0.12F - 0.18F * cross, 0.36F, 0.10F, -38, 6, 0);
+            case WANDA_SHIELD_RAISE -> {
+                // The hands are up already (the stance rises with the shield's flag, and its row is summed with
+                // this one): the raise only adds how they gather across the chest before they are thrown open: at t4
+                // they are 0.18 further in. (Its own copy of the stance's row would double it: the arms would fill the
+                // screen.)
+                float cross = ss(0.0F, 4.0F, t) * (1.0F - ss(8.0F, 15.0F, t));
+                if (cross > 0.0F) {
+                    both(w, -0.18F * cross, 0.0F, 0.0F, 0, 0, 0);
+                }
             }
             case BILLY_BOLT -> {
                 // The hand drawn back, then thrust at the target.
