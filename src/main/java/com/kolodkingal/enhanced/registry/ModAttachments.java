@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.hex.HexData;
+import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.road.RoadDoors;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -20,6 +21,14 @@ public final class ModAttachments {
                     .serialize(PowerData.CODEC)
                     .copyOnDeath()
                     .sync(PowerData.STREAM_CODEC)
+                    .build());
+
+    /** A player's Bifrost (saved places, cooldown). Saved, kept on death, synced to that player only. */
+    public static final Supplier<AttachmentType<BifrostData>> BIFROST = ATTACHMENTS.register("bifrost",
+            () -> AttachmentType.builder(() -> BifrostData.EMPTY)
+                    .serialize(BifrostData.CODEC)
+                    .copyOnDeath()
+                    .sync((holder, to) -> holder == to, BifrostData.STREAM_CODEC)
                     .build());
 
     /** All Hexes in a dimension. Saved with the level and synced to every player in it. */

@@ -4,13 +4,17 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
-import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
+import com.kolodkingal.enhanced.client.screen.BifrostScreen;
+import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
@@ -24,11 +28,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -57,9 +63,12 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Thor, the God of Thunder. His power is his own, but Mjolnir focuses it: he throws it and calls it back, flies by
- * spinning it, and calls lightning down through it. Whoever lifts Mjolnir first, if worthy and without another power,
- * becomes Thor.
+ * Thor, the God of Thunder. His power is his own, but his weapon focuses it, Mjolnir or Stormbreaker: he throws it and
+ * calls it back, flies by spinning it, and calls lightning down through it. Whoever lifts Mjolnir first, if worthy and
+ * without another power, becomes Thor.
+ * <p>
+ * Either weapon also calls the Bifrost, for Thor or anyone else who holds it: home, to where they look, or to a place
+ * they saved, in any dimension (the places and the cooldown live in {@link BifrostData}).
  */
 public final class ThorAbilities {
     private static final ResourceLocation BODY_HEALTH = Enhanced.id("thor_body_health");
@@ -75,16 +84,19 @@ public final class ThorAbilities {
     public static final float ARC_DAMAGE = 4.0F;
     public static final double ARC_RANGE = 6.0;
     public static final int ARC_JUMPS = 2;
-    /** Ticks the Bifrost's light gathers around Thor before it takes him. */
+    /** Ticks the Bifrost's light gathers around its traveller before it takes them. */
     public static final int BIFROST_CHARGE = 30;
     public static final int BIFROST_LOOK_RANGE = 512;
+    /** If a saved place has been built over, the Bifrost sets its traveller down on the first free spot up to this high. */
+    private static final int ARRIVAL_SEARCH = 24;
 
-    /** Thor → the Bifrost that is about to take him. */
-    private static final Map<UUID, Bifrost> BIFROSTS = new HashMap<>();
-    /** Thor → game time until which he holds Mjolnir up to the sky (pose). */
+    /** Traveller → the Bifrost that is about to take them. */
+    private static final Map<UUID, Journey> JOURNEYS = new HashMap<>();
+    /** Thor → game time until which he holds his weapon up to the sky (pose). */
     private static final Map<UUID, Long> CALLING = new HashMap<>();
 
-    private record Bifrost(ResourceKey<Level> dimension, Vec3 to, float yaw, int[] ticksLeft) {
+    /** Where the Bifrost is taking someone, and the game time it takes them. */
+    private record Journey(ResourceKey<Level> dimension, Vec3 to, float yaw, long arrivesAt) {
     }
 
     // ---- input ----
@@ -97,7 +109,7 @@ public final class ThorAbilities {
             case 1 -> throwOrRecall(player, data);
             case 2 -> {
                 if (!player.mayFly()) {
-                    player.displayClientMessage(Component.translatable("message.enhanced.thor.flight_needs_mjolnir"), true);
+                    player.displayClientMessage(Component.translatable("message.enhanced.thor.flight_needs_weapon"), true);
                 } else {
                     PowerTicker.toggleFlight(player);
                 }
@@ -117,16 +129,32 @@ public final class ThorAbilities {
                 }
                 player.displayClientMessage(Component.translatable(on ? "message.enhanced.god_of_thunder.on" : "message.enhanced.god_of_thunder.off"), true);
             }
-            case 5 -> bifrost(player, data);
+            // Without Sneak the client opens the Bifrost screen instead; a bare key press goes home.
+            case 5 -> {
+                if (player.isShiftKeyDown()) {
+                    bifrostToLook(player);
+                } else {
+                    bifrostHome(player);
+                }
+            }
             default -> {
             }
         }
     }
 
-    // ---- Mjolnir and the worthy (runs for every player) ----
+    // ---- the weapons, the worthy and the Bifrost (runs for every player) ----
 
     public static boolean isMjolnir(ItemStack stack) {
         return stack.is(ModItems.MJOLNIR.get());
+    }
+
+    public static boolean isStormbreaker(ItemStack stack) {
+        return stack.is(ModItems.STORMBREAKER.get());
+    }
+
+    /** Mjolnir or Stormbreaker. */
+    public static boolean isWeapon(ItemStack stack) {
+        return isMjolnir(stack) || isStormbreaker(stack);
     }
 
     /** Mjolnir in either hand. */
@@ -134,11 +162,25 @@ public final class ThorAbilities {
         return isMjolnir(player.getMainHandItem()) || isMjolnir(player.getOffhandItem());
     }
 
+    /** Mjolnir or Stormbreaker in either hand. */
+    public static boolean holdsWeapon(LivingEntity entity) {
+        return weaponHand(entity) != null;
+    }
+
+    /** The hand holding Mjolnir or Stormbreaker (the main hand first), or null. */
+    @Nullable
+    public static InteractionHand weaponHand(LivingEntity entity) {
+        return isWeapon(entity.getMainHandItem()) ? InteractionHand.MAIN_HAND
+                : isWeapon(entity.getOffhandItem()) ? InteractionHand.OFF_HAND : null;
+    }
+
     /**
-     * The worthy who lift Mjolnir become Thor (if they have no other power); in the hands of the unworthy it is far too
-     * heavy, and drops to the ground wherever they are.
+     * Every player: the worthy who lift Mjolnir become Thor (if they have no other power); in the hands of the unworthy
+     * it is far too heavy, and drops to the ground wherever they are. And whoever the Bifrost is about to take, Thor or
+     * not, is held in its light.
      */
-    public static void mjolnirTick(ServerPlayer player, PowerData data) {
+    public static void everyPlayerTick(ServerPlayer player, PowerData data) {
+        bifrostTick(player, data);
         if (player.isSpectator()) {
             return;
         }
@@ -199,8 +241,8 @@ public final class ThorAbilities {
     // ---- passives ----
 
     public static void tick(ServerPlayer player, PowerData data) {
-        // The hammer in flight may have been caught, dropped or unloaded.
-        if (data.hammerEntityId() != -1 && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof ThrownMjolnirEntity)) {
+        // The weapon in flight may have been caught, dropped or unloaded.
+        if (data.hammerEntityId() != -1 && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity)) {
             data.setHammerEntityId(-1);
         }
         if (data.toggle(Toggle.GOD_OF_THUNDER)) {
@@ -218,12 +260,11 @@ public final class ThorAbilities {
             CALLING.remove(player.getUUID());
         }
         data.set(Live.CALLING_LIGHTNING, isCalling);
-        bifrostTick(player, data);
     }
 
-    /** Thor flies by spinning Mjolnir: only while he holds it (or it is on its way back to him). */
+    /** Thor flies by spinning his weapon: only while he holds it (or it is on its way back to him). */
     public static boolean canFly(ServerPlayer player, PowerData data) {
-        return holdsMjolnir(player) || data.hammerEntityId() != -1;
+        return holdsWeapon(player) || data.hammerEntityId() != -1;
     }
 
     /** Asgardian body (30 health, 6 armor, hard to knock back); the God of Thunder hits harder and takes less. */
@@ -244,7 +285,7 @@ public final class ThorAbilities {
         return entity instanceof Player player && Powers.is(player, Power.THOR);
     }
 
-    // ---- Ability 1: throw Mjolnir, or call it back ----
+    // ---- Ability 1: throw the weapon, or call it back ----
 
     private static void throwOrRecall(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
@@ -252,11 +293,10 @@ public final class ThorAbilities {
         if (!data.isReady(1, now)) {
             return;
         }
-        InteractionHand hand = isMjolnir(player.getMainHandItem()) ? InteractionHand.MAIN_HAND
-                : isMjolnir(player.getOffhandItem()) ? InteractionHand.OFF_HAND : null;
+        InteractionHand hand = weaponHand(player);
         if (hand != null) {
-            ItemStack hammer = player.getItemInHand(hand);
-            ThrownMjolnirEntity thrown = new ThrownMjolnirEntity(level, player, hammer);
+            ItemStack weapon = player.getItemInHand(hand);
+            ThrownWeaponEntity thrown = new ThrownWeaponEntity(level, player, weapon);
             player.setItemInHand(hand, ItemStack.EMPTY);
             level.addFreshEntity(thrown);
             data.setHammerEntityId(thrown.getId());
@@ -268,13 +308,14 @@ public final class ThorAbilities {
         if (recall(player, data)) {
             data.startCooldown(1, now, THROW_COOLDOWN);
         } else {
-            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.out_of_reach"), true);
+            player.displayClientMessage(Component.translatable("message.enhanced.thor.weapon_out_of_reach"), true);
         }
     }
 
     /**
-     * Calls Mjolnir home, from wherever it is nearest: the rest of his inventory, the air, the ground (dropped, or
-     * resting as a block). Returns false if there is no Mjolnir within reach.
+     * Calls his weapon home, from wherever the nearest one is: the rest of his inventory, the air, the ground (dropped,
+     * or Mjolnir resting as a block), or the hands of a creature that picked it up. Returns false if there is no Mjolnir
+     * or Stormbreaker within reach. (Never from another player's hands: theirs is theirs.)
      */
     public static boolean recall(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
@@ -288,33 +329,46 @@ public final class ThorAbilities {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.PLAYERS, 1.0F, 0.8F);
             return true;
         }
-        if (level.getEntity(data.hammerEntityId()) instanceof ThrownMjolnirEntity flying) {
+        if (level.getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity flying) {
             flying.setReturning(true);
             return true;
         }
         double range = EnhancedConfig.MJOLNIR_RECALL_RANGE.get();
         Vec3 eye = player.getEyePosition();
+        AABB around = player.getBoundingBox().inflate(range);
         // Lying on the ground as an item.
-        ItemEntity nearestItem = level.getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(range),
-                        e -> isMjolnir(e.getItem()) && e.distanceToSqr(player) <= range * range).stream()
+        ItemEntity nearestItem = level.getEntitiesOfClass(ItemEntity.class, around,
+                        e -> isWeapon(e.getItem()) && e.distanceToSqr(player) <= range * range).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
         // Resting as a block.
         BlockPos nearestBlock = findBlock(level, player.blockPosition(), range);
+        // In a creature's hands.
+        LivingEntity nearestHolder = level.getEntitiesOfClass(LivingEntity.class, around,
+                        e -> !(e instanceof Player) && e.isAlive() && holdsWeapon(e) && e.distanceToSqr(player) <= range * range).stream()
+                .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
+        double toItem = nearestItem == null ? Double.MAX_VALUE : nearestItem.distanceToSqr(eye);
+        double toBlock = nearestBlock == null ? Double.MAX_VALUE : nearestBlock.getCenter().distanceToSqr(eye);
+        double toHolder = nearestHolder == null ? Double.MAX_VALUE : nearestHolder.distanceToSqr(eye);
         Vec3 from;
-        ItemStack hammer;
-        if (nearestItem != null && (nearestBlock == null || nearestItem.distanceToSqr(eye) <= nearestBlock.getCenter().distanceToSqr(eye))) {
+        ItemStack weapon;
+        if (nearestItem != null && toItem <= toBlock && toItem <= toHolder) {
             from = nearestItem.position().add(0, 0.25, 0);
-            hammer = nearestItem.getItem().split(1);
+            weapon = nearestItem.getItem().split(1);
             if (nearestItem.getItem().isEmpty()) {
                 nearestItem.discard();
             }
-        } else if (nearestBlock != null) {
+        } else if (nearestBlock != null && toBlock <= toHolder) {
             from = nearestBlock.getCenter();
-            hammer = MjolnirBlock.lift(level, nearestBlock);
+            weapon = MjolnirBlock.lift(level, nearestBlock);
+        } else if (nearestHolder != null) {
+            InteractionHand hand = weaponHand(nearestHolder);
+            from = nearestHolder.getEyePosition().subtract(0, 0.4, 0);
+            weapon = nearestHolder.getItemInHand(hand).split(1);
+            nearestHolder.setItemInHand(hand, ItemStack.EMPTY);
         } else {
             return false;
         }
-        ThrownMjolnirEntity returning = ThrownMjolnirEntity.recalled(level, player, hammer, from);
+        ThrownWeaponEntity returning = ThrownWeaponEntity.recalled(level, player, weapon, from);
         level.addFreshEntity(returning);
         data.setHammerEntityId(returning.getId());
         level.playSound(null, from.x, from.y, from.z, SoundEvents.TRIDENT_RIPTIDE_1.value(), SoundSource.PLAYERS, 1.0F, 0.6F);
@@ -324,7 +378,7 @@ public final class ThorAbilities {
     private static int findInInventory(Player player) {
         Inventory inventory = player.getInventory();
         for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-            if (isMjolnir(inventory.getItem(slot))) {
+            if (isWeapon(inventory.getItem(slot))) {
                 return slot;
             }
         }
@@ -388,8 +442,8 @@ public final class ThorAbilities {
                 strike(level, player, ground(level, around.add(0, 3, 0)), false);
             }
         }
-        // Everyone nearby sees the lightning come down into Mjolnir and leap from it to the target.
-        if (holdsMjolnir(player)) {
+        // Everyone nearby sees the lightning come down into his weapon and leap from it to the target.
+        if (holdsWeapon(player)) {
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,
                     new ThorFxPayload(ThorFxPayload.CHANNEL, player.getId(), List.of(target)));
         }
@@ -462,70 +516,187 @@ public final class ThorAbilities {
         }
     }
 
-    // ---- Ability 5: the Bifrost ----
+    // ---- the Bifrost: Thor's ability 5, and anyone's who holds Mjolnir or Stormbreaker ----
 
     /**
-     * "Heimdall! Open the Bifrost!": a beam of rainbow light gathers around Thor and, a moment later, takes him home to
-     * his respawn point (bed or respawn anchor, otherwise the world spawn), even in another dimension. Sneak: to the
-     * spot he looks at instead, up to 512 blocks away. The Bifrost burns its circle of runes into the ground where it
-     * lands and where it left.
+     * Using Mjolnir or Stormbreaker (right-click): the Bifrost screen opens on the client (home, the saved places, save
+     * this one); with Sneak, the Bifrost opens to where the player looks.
      */
-    private static void bifrost(ServerPlayer player, PowerData data) {
-        ServerLevel level = player.serverLevel();
-        long now = level.getGameTime();
-        if (!data.isReady(5, now) || BIFROSTS.containsKey(player.getUUID())) {
+    public static InteractionResultHolder<ItemStack> useWeapon(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (player.isShiftKeyDown()) {
+            if (player instanceof ServerPlayer server) {
+                bifrostToLook(server);
+            }
+        } else if (level.isClientSide) {
+            // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
+            BifrostScreen.open();
+        }
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+    }
+
+    /**
+     * "Heimdall! Open the Bifrost!": a beam of rainbow light gathers around the traveller and, a moment later, takes
+     * them home to their respawn point (bed or respawn anchor, otherwise the world spawn), even in another dimension.
+     * The Bifrost burns its circle of runes into the ground where it lands and where it left.
+     */
+    public static void bifrostHome(ServerPlayer player) {
+        if (mayOpenBifrost(player)) {
+            DimensionTransition home = player.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING);
+            openBifrost(player, home.newLevel().dimension(), home.pos(), player.getYRot());
+        }
+    }
+
+    /** The Bifrost to the spot the player looks at, up to 512 blocks away. */
+    public static void bifrostToLook(ServerPlayer player) {
+        if (!mayOpenBifrost(player)) {
             return;
         }
-        ResourceKey<Level> dimension;
-        Vec3 to;
-        if (player.isShiftKeyDown()) {
-            BlockHitResult hit = Raycasts.block(player, BIFROST_LOOK_RANGE, 1.0F);
-            if (hit.getType() == HitResult.Type.MISS) {
-                player.displayClientMessage(Component.translatable("message.enhanced.bifrost.no_ground"), true);
-                return;
-            }
-            dimension = level.dimension();
-            to = Vec3.atBottomCenterOf(hit.getBlockPos().above());
-        } else {
-            DimensionTransition home = player.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING);
-            dimension = home.newLevel().dimension();
-            to = home.pos();
+        BlockHitResult hit = Raycasts.block(player, BIFROST_LOOK_RANGE, 1.0F);
+        if (hit.getType() == HitResult.Type.MISS) {
+            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.no_ground"), true);
+            return;
         }
-        data.startCooldown(5, now, EnhancedConfig.BIFROST_COOLDOWN.get());
-        BIFROSTS.put(player.getUUID(), new Bifrost(dimension, to, player.getYRot(), new int[]{BIFROST_CHARGE}));
+        openBifrost(player, player.level().dimension(), Vec3.atBottomCenterOf(hit.getBlockPos().above()), player.getYRot());
+    }
+
+    /**
+     * The Bifrost to the saved place at {@code index}, in whatever dimension it is, if it is still the one called
+     * {@code name} (the list may have changed since the screen showed it).
+     */
+    public static void bifrostToPlace(ServerPlayer player, int index, String name) {
+        BifrostData.Place place = placeAt(player, index, name);
+        if (place == null || !mayOpenBifrost(player)) {
+            return;
+        }
+        if (player.server.getLevel(place.dimension()) == null) {
+            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.no_world"), true);
+            return;
+        }
+        openBifrost(player, place.dimension(), place.pos(), place.yaw());
+    }
+
+    /**
+     * Marks where the player stands, facing the way they face, as a place the Bifrost can take them back to. Saving a
+     * name again moves that place; the Bifrost's runes flare at their feet.
+     */
+    public static void savePlace(ServerPlayer player, String typed) {
+        if (player.isSpectator()) {
+            return;
+        }
+        if (!holdsWeapon(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
+            return;
+        }
+        BifrostData bifrost = player.getData(ModAttachments.BIFROST);
+        BlockPos at = player.blockPosition();
+        String name = BifrostData.cleanName(typed, at.getX() + ", " + at.getY() + ", " + at.getZ());
+        BifrostData updated = bifrost.with(new BifrostData.Place(name, player.level().dimension(), player.position(), player.getYRot()));
+        if (updated == bifrost) {
+            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.full", BifrostData.MAX_PLACES), true);
+            return;
+        }
+        player.setData(ModAttachments.BIFROST, updated);
+        ServerLevel level = player.serverLevel();
+        mark(level, player.position());
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.2F, 1.2F);
+        player.displayClientMessage(Component.translatable("message.enhanced.bifrost.saved", name), true);
+    }
+
+    /** Forgets the saved place at {@code index}, if it is still the one called {@code name}. */
+    public static void forgetPlace(ServerPlayer player, int index, String name) {
+        BifrostData.Place place = placeAt(player, index, name);
+        if (place != null) {
+            player.setData(ModAttachments.BIFROST, player.getData(ModAttachments.BIFROST).without(index));
+            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.forgotten", place.name()), true);
+        }
+    }
+
+    @Nullable
+    private static BifrostData.Place placeAt(ServerPlayer player, int index, String name) {
+        List<BifrostData.Place> places = player.getData(ModAttachments.BIFROST).places();
+        return index >= 0 && index < places.size() && places.get(index).name().equals(name) ? places.get(index) : null;
+    }
+
+    /** The Bifrost answers whoever holds Mjolnir or Stormbreaker, once it has gathered its strength again. */
+    private static boolean mayOpenBifrost(ServerPlayer player) {
+        if (player.isSpectator() || JOURNEYS.containsKey(player.getUUID())) {
+            return false;
+        }
+        if (!holdsWeapon(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
+            return false;
+        }
+        long wait = player.getData(ModAttachments.BIFROST).cooldown(player.level().getGameTime());
+        if (wait > 0) {
+            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.not_ready", (wait + 19) / 20), true);
+            return false;
+        }
+        return true;
+    }
+
+    private static void openBifrost(ServerPlayer player, ResourceKey<Level> dimension, Vec3 to, float yaw) {
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
+        int cooldown = EnhancedConfig.BIFROST_COOLDOWN.get();
+        player.setData(ModAttachments.BIFROST, player.getData(ModAttachments.BIFROST).readyAt(now + cooldown));
+        PowerData data = Powers.get(player);
+        if (data.power() == Power.THOR) {
+            // The same cooldown, shown on Thor's HUD.
+            data.startCooldown(5, now, cooldown);
+        }
+        JOURNEYS.put(player.getUUID(), new Journey(dimension, to, yaw, now + BIFROST_CHARGE));
         data.set(Live.BIFROST, true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.5F, 0.7F);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 0.6F, 1.6F);
     }
 
     private static void bifrostTick(ServerPlayer player, PowerData data) {
-        Bifrost bifrost = BIFROSTS.get(player.getUUID());
-        if (bifrost == null) {
+        Journey journey = JOURNEYS.get(player.getUUID());
+        if (journey == null) {
             data.set(Live.BIFROST, false);
             return;
         }
-        // Held in the beam: rising slightly, unable to walk away.
-        player.setDeltaMovement(0, 0.02, 0);
-        player.hurtMarked = true;
-        player.resetFallDistance();
-        if (--bifrost.ticksLeft()[0] > 0) {
+        long now = player.level().getGameTime();
+        if (now < journey.arrivesAt()) {
+            // Held in the beam: rising slightly, unable to walk away.
+            player.setDeltaMovement(0, 0.02, 0);
+            player.hurtMarked = true;
+            player.resetFallDistance();
             return;
         }
-        BIFROSTS.remove(player.getUUID());
+        JOURNEYS.remove(player.getUUID());
         data.set(Live.BIFROST, false);
-        ServerLevel from = player.serverLevel();
-        ServerLevel destination = player.server.getLevel(bifrost.dimension());
-        if (destination == null) {
+        ServerLevel destination = player.server.getLevel(journey.dimension());
+        if (destination == null || now > journey.arrivesAt() + 5) {
+            // The world is gone, or the traveller wasn't there to be taken (dead, or away): the light went out.
             return;
         }
-        Vec3 start = player.position();
-        mark(from, start);
-        player.teleportTo(destination, bifrost.to().x, bifrost.to().y, bifrost.to().z, bifrost.yaw(), player.getXRot());
+        Vec3 to = safeArrival(destination, player, journey.to());
+        if (!HexManager.onTeleport(destination, player, to)) {
+            return;
+        }
+        ServerLevel from = player.serverLevel();
+        mark(from, player.position());
+        player.teleportTo(destination, to.x, to.y, to.z, journey.yaw(), player.getXRot());
         player.resetFallDistance();
         destination.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 1.0F, 1.4F);
         PacketDistributor.sendToPlayersNear(destination, null, player.getX(), player.getY(), player.getZ(), 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_ARRIVAL, player.getId(), List.of(player.position())));
         mark(destination, player.position());
+    }
+
+    /** {@code to}, or the first spot above it where the traveller fits (a saved place may have been built over since). */
+    private static Vec3 safeArrival(ServerLevel level, ServerPlayer player, Vec3 to) {
+        // Collision checks treat unloaded chunks as empty air: load the landing chunk first.
+        level.getChunkAt(BlockPos.containing(to));
+        AABB body = player.getDimensions(Pose.STANDING).makeBoundingBox(to);
+        for (int up = 0; up <= ARRIVAL_SEARCH && to.y + up < level.getMaxBuildHeight(); up++) {
+            if (level.noCollision(player, body.move(0, up, 0))) {
+                return to.add(0, up, 0);
+            }
+        }
+        return to;
     }
 
     /** The Bifrost's circle of runes, burned into the ground (seen by everyone nearby, fading after a minute). */
@@ -536,23 +707,22 @@ public final class ThorAbilities {
     }
 
     public static boolean inBifrost(Player player) {
-        return BIFROSTS.containsKey(player.getUUID());
+        return JOURNEYS.containsKey(player.getUUID());
     }
 
     // ---- cleanup ----
 
     /** Ends everything this hero left in the world (the power is being taken away). */
     public static void endAll(ServerPlayer player, PowerData data) {
-        BIFROSTS.remove(player.getUUID());
         CALLING.remove(player.getUUID());
-        data.set(Live.BIFROST, false);
         data.set(Live.CALLING_LIGHTNING, false);
         data.setToggle(Toggle.GOD_OF_THUNDER, false);
-        // A hammer in flight finds no Thor to return to, and drops by itself.
+        // A weapon in flight finds no Thor to return to, and drops by itself. A Bifrost already gathering still takes
+        // its traveller: it answers the weapon, not the power.
     }
 
     public static void clear() {
-        BIFROSTS.clear();
+        JOURNEYS.clear();
         CALLING.clear();
     }
 

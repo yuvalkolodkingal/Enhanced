@@ -6,13 +6,16 @@ import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
 import com.kolodkingal.enhanced.item.MjolnirItem;
 import com.kolodkingal.enhanced.item.QuicksilverGogglesItem;
 import com.kolodkingal.enhanced.item.ScarletWitchGeneItem;
+import com.kolodkingal.enhanced.item.StormbreakerItem;
 import com.kolodkingal.enhanced.item.SynthezoidCoreItem;
 import com.kolodkingal.enhanced.item.TesseractItem;
 import com.kolodkingal.enhanced.item.WandaCrownItem;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.component.Unbreakable;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -46,6 +49,12 @@ public final class ModItems {
     public static final DeferredItem<MjolnirItem> MJOLNIR = ITEMS.register("mjolnir",
             () -> new MjolnirItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
                     .attributes(MjolnirItem.createAttributes())));
+
+    /** Anyone can wield it. Never wears out: the Unbreakable component (hidden; the tooltip says it in its own words). */
+    public static final DeferredItem<StormbreakerItem> STORMBREAKER = ITEMS.register("stormbreaker",
+            () -> new StormbreakerItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                    .component(DataComponents.UNBREAKABLE, new Unbreakable(false))
+                    .attributes(StormbreakerItem.createAttributes())));
     /** The Space Stone in its cube. Using it is how Loki escapes in 2012, so it makes you Loki. */
     public static final DeferredItem<TesseractItem> TESSERACT = ITEMS.register("tesseract",
             () -> new TesseractItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));

@@ -19,7 +19,7 @@ import java.util.List;
  * @param points   where (the meaning depends on the kind)
  */
 public record ThorFxPayload(int kind, int entityId, List<Vec3> points) implements CustomPacketPayload {
-    /** Lightning comes down from the sky into Mjolnir and leaps from it to {@code points[0]}. */
+    /** Lightning comes down from the sky into Thor's weapon and leaps from it to {@code points[0]}. */
     public static final int CHANNEL = 0;
     /** Lightning arcs along {@code points}, from one to the next. */
     public static final int ARC = 1;

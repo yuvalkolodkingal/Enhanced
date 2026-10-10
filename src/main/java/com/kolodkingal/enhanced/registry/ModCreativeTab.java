@@ -23,6 +23,7 @@ public final class ModCreativeTab {
                         output.accept(ModItems.QUICKSILVER_GOGGLES.get());
                         output.accept(ModItems.SYNTHEZOID_CORE.get());
                         output.accept(ModItems.MJOLNIR.get());
+                        output.accept(ModItems.STORMBREAKER.get());
                         output.accept(ModItems.WITCHES_ROAD_DOOR.get());
                     })
                     .build());

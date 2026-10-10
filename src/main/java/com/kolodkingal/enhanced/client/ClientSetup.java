@@ -10,7 +10,7 @@ import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
-import com.kolodkingal.enhanced.client.render.ThrownMjolnirRenderer;
+import com.kolodkingal.enhanced.client.render.ThrownWeaponRenderer;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModParticles;
 import net.minecraft.client.KeyMapping;
@@ -58,7 +58,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.IRON_SHRAPNEL.get(), ctx -> new ThrownItemRenderer<>(ctx, 0.75F, false));
         event.registerEntityRenderer(ModEntities.PHOTON_BLAST.get(), ctx -> new ThrownItemRenderer<>(ctx, 1.4F, true));
         event.registerEntityRenderer(ModEntities.TELEKINETIC_BLOCK.get(), TelekineticBlockRenderer::new);
-        event.registerEntityRenderer(ModEntities.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
+        event.registerEntityRenderer(ModEntities.THROWN_WEAPON.get(), ThrownWeaponRenderer::new);
         event.registerEntityRenderer(ModEntities.LOKI_DAGGER.get(), LokiDaggerRenderer::new);
         event.registerEntityRenderer(ModEntities.LOKI_ILLUSION.get(), LokiIllusionRenderer::new);
     }

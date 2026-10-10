@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Thor's lightning and the Bifrost, drawn in the world: lightning pouring from the sky into Mjolnir and leaping to its
+ * Thor's lightning and the Bifrost, drawn in the world: lightning pouring from the sky into his weapon and leaping to its
  * target, arcs from creature to creature, the God of Thunder crackling with it, the Bifrost's rainbow beam and the
  * circle of runes it burns into the ground.
  */
@@ -79,19 +79,17 @@ public final class ThorEffects {
         RandomSource random = level.random;
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() != Power.THOR || player.isInvisible()) {
-                continue;
-            }
-            if (data.toggle(Toggle.GOD_OF_THUNDER) && random.nextInt(2) == 0) {
-                level.addParticle(ParticleTypes.ELECTRIC_SPARK, player.getRandomX(0.7), player.getRandomY(), player.getRandomZ(0.7),
-                        (random.nextDouble() - 0.5) * 0.2, random.nextDouble() * 0.1, (random.nextDouble() - 0.5) * 0.2);
-            }
+            // The Bifrost takes anyone who wields Mjolnir or Stormbreaker, so its light is drawn for everyone.
             if (data.is(Live.BIFROST)) {
                 for (int i = 0; i < 3; i++) {
                     double angle = random.nextDouble() * Mth.TWO_PI;
                     level.addParticle(ParticleTypes.END_ROD, player.getX() + Math.cos(angle) * 1.4, player.getY() + random.nextDouble() * 2.5,
                             player.getZ() + Math.sin(angle) * 1.4, 0, 0.25, 0);
                 }
+            }
+            if (data.power() == Power.THOR && !player.isInvisible() && data.toggle(Toggle.GOD_OF_THUNDER) && random.nextInt(2) == 0) {
+                level.addParticle(ParticleTypes.ELECTRIC_SPARK, player.getRandomX(0.7), player.getRandomY(), player.getRandomZ(0.7),
+                        (random.nextDouble() - 0.5) * 0.2, random.nextDouble() * 0.1, (random.nextDouble() - 0.5) * 0.2);
             }
         }
     }
@@ -156,13 +154,13 @@ public final class ThorEffects {
         }
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() != Power.THOR || player.isInvisible()) {
-                continue;
-            }
             if (data.is(Live.BIFROST)) {
                 Vec3 feet = player.getPosition(partialTick).subtract(camera);
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.9F);
                 rainbowBeam(pose, vc, feet, 1.3F * pulse, time, 1.0F);
+            }
+            if (data.power() != Power.THOR || player.isInvisible()) {
+                continue;
             }
             if (data.toggle(Toggle.GOD_OF_THUNDER)) {
                 crackle(pose, vc, player, camera, partialTick, time);
@@ -171,7 +169,7 @@ public final class ThorEffects {
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
 
-    /** Where Mjolnir is when Thor raises it to the sky: above his head, a little forward. */
+    /** Where his weapon is when Thor raises it to the sky: above his head, a little forward. */
     private static Vec3 hammerAloft(Minecraft mc, AbstractClientPlayer player, float partialTick) {
         boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         Vec3 eye = player.getEyePosition(partialTick);

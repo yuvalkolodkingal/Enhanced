@@ -2,7 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
-import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
+import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -160,7 +160,7 @@ public final class HeroPoses {
             case THOR -> {
                 Entity hammer = data.hammerEntityId() != -1 ? player.level().getEntity(data.hammerEntityId()) : null;
                 if (data.is(Live.CALLING_LIGHTNING)) {
-                    // Mjolnir raised to the sky, catching the lightning.
+                    // His weapon raised to the sky, catching the lightning.
                     main.xRot = -Mth.PI + 0.1F + Mth.sin(t * 2.1F) * 0.03F;
                     main.yRot = 0.0F;
                     main.zRot = 0.1F * side;
@@ -170,13 +170,13 @@ public final class HeroPoses {
                     model.leftArm.xRot = -0.3F;
                     model.rightArm.zRot = 0.45F;
                     model.leftArm.zRot = -0.45F;
-                } else if (hammer instanceof ThrownMjolnirEntity flying && flying.isReturning()
+                } else if (hammer instanceof ThrownWeaponEntity flying && flying.isReturning()
                         && flying.distanceToSqr(player) < 20 * 20) {
-                    // Hand out, waiting for Mjolnir to come home.
+                    // Hand out, waiting for his weapon to come home.
                     pointAt(main, player, flying.position(), t);
                     off.zRot += 0.15F * -side;
                 } else if (airborne) {
-                    // Flying behind Mjolnir: hovering, it is held up to the sky; at speed the arm swings forward to lead
+                    // Flying behind his weapon: hovering, it is held up to the sky; at speed the arm swings forward to lead
                     // the way. The other arm trails back.
                     double dx = player.getX() - player.xOld;
                     double dz = player.getZ() - player.zOld;

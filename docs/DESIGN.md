@@ -12,7 +12,7 @@ one of the *Enhanced*:
 * **Billy Maximoff (Wiccan)**, Wanda's son, the witch who made the Witches' Road real **(added)**
 * **Loki**, the God of Mischief, and his variants: Sylvie, Classic Loki, Kid Loki, President Loki, TVA Loki
   and the God of Stories **(added)**
-* **Thor**, the God of Thunder, and **Mjolnir** **(added)**
+* **Thor**, the God of Thunder, with **Mjolnir** and **Stormbreaker**, and the **Bifrost** **(added)**
 
 This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
 Scarlet Witch, and Quicksilver's slow-motion run). Everything the concepts said is kept.
@@ -415,7 +415,7 @@ teal-green ghost trail and afterimages, low along the ground, like in the Battle
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | R (toggle) | **Super Speed** | On from the start: sprinting is super speed, three and a half times as fast, stepping up whole blocks, with no fall damage while running. It burns hunger slowly; with an empty hunger bar he only runs normally. Turn it off to sprint normally. |
-| 2 | G | **Disarm Blitz** | In a blink he circles every armed creature within 12 blocks (up to 8 of them) and is back before they notice, their weapons in his arms: creatures lose whatever they hold, players only their weapon (swords, axes, bows, crossbows, tridents, maces). Everyone disarmed is slowed for 2 seconds. Mjolnir is far too heavy to snatch. Cooldown 8 seconds. |
+| 2 | G | **Disarm Blitz** | In a blink he circles every armed creature within 12 blocks (up to 8 of them) and is back before they notice, their weapons in his arms: creatures lose whatever they hold, players only their weapon (swords, axes, bows, crossbows, tridents, maces, Stormbreaker). Everyone disarmed is slowed for 2 seconds. Mjolnir is far too heavy to snatch. Cooldown 8 seconds. |
 | 3 | V | **Whirlwind** | For 3 seconds he runs circles around himself: everything within 8 blocks (creatures, players, arrows in flight) is pulled onto a spinning ring, lifted up to 3 blocks, and flung away when the whirlwind ends. Ghosts of Tommy race round the ring. Cooldown 10 seconds. |
 | 4 | B | **Vibrate Through Walls** | He vibrates his molecules and passes straight through the wall in front of him, up to 4 blocks thick (*VisionQuest* trailer; the comics). Not through bedrock or other unbreakable blocks, nor through a Hex he isn't allowed into. Cooldown 2 seconds. |
 | 5 | N | **Molecular Acceleration** | *(comics)* He vibrates whatever he touches (up to 5 blocks away) until it shatters: a block breaks and drops its item (anything up to the hardness of obsidian, never bedrock; it respects spawn protection and claims), a creature takes 6 damage and is blasted back. Cooldown 1 second. |
@@ -432,7 +432,7 @@ costume, green and white with amber goggles), and *Your own skin*.
 
 > "Whosoever holds this hammer, if he be worthy, shall possess the power of Thor."
 
-### 9.1 Mjolnir and the worthy
+### 9.1 Mjolnir, Stormbreaker and the worthy
 
 * **Forging Mjolnir.** "Forged in the heart of a dying star, from the sacred metal of Uru":
 
@@ -456,25 +456,65 @@ costume, green and white with amber goggles), and *Your own skin*.
   strikes and they **become Thor**. Vision can lift it and fight with it, but stays Vision.
 * Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava
   can't destroy it. Speedsters can't snatch it and telekinesis can't lift it.
+* **Stormbreaker.** Forged in Nidavellir in the heart of a dying star, its handle grown from
+  Groot's arm:
+
+  ```
+  N N        N = Netherite Ingot (Uru)
+  N S        S = Nether Star (the dying star)
+    L        L = any log (Groot's arm)
+  ```
+
+  Stormbreaker carries no enchantment of worthiness: **anyone can wield it**. It is an axe (it
+  chops wood, strips logs and knocks shields aside) that hits harder than any other (12 attack
+  damage), never breaks and can't burn. It doesn't make anyone Thor, but whoever holds it can call
+  **the Bifrost** (9.4). In Thor's hands it does everything Mjolnir does: he throws it, calls it
+  back, flies with it and calls lightning down through it. Unlike Mjolnir, a speedster can snatch
+  it out of a hand.
 
 ### 9.2 The Asgardian body
 
 * **Max health 30** (15 hearts), **6 armor**, half knockback.
-* Lightning never hurts or burns Thor. With Mjolnir in hand he takes no fall damage.
+* Lightning never hurts or burns Thor. With Mjolnir or Stormbreaker in hand he takes no fall damage.
 
 ### 9.3 Abilities
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R | **Throw / Call Mjolnir** | With Mjolnir in hand: throw it. It flies straight, tumbling, smashing everything in its path (10 damage and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. Without Mjolnir in hand: **call it**, from his inventory, the air, or the ground anywhere within 64 blocks (dropped, or resting as a block). |
-| 2 | G (toggle) | **Flight** | Thor flies by spinning Mjolnir: only with it in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. |
-| 3 | V | **Lightning** | He raises Mjolnir and lightning pours down into it from the sky and leaps to what he looks at, up to 64 blocks away: 8 damage there and less to everything within 3 blocks, with the usual effects of lightning on creatures (creepers become charged, pigs turn into zombified piglins), but no fire on blocks. Without Mjolnir he can still call it, straight from the sky. Cooldown 1.5 seconds. |
-| 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown Mjolnir arcs too, and each Lightning strikes three times. It burns hunger; with an empty hunger bar the thunder calms. |
-| 5 | N | **Bifrost** | "Heimdall! Open the Bifrost!" A column of swirling rainbow light gathers around him for a second and a half and takes him **home to his respawn point** (bed or respawn anchor, otherwise the world spawn), even in another dimension. **Sneak + N**: to the spot he looks at instead, up to 512 blocks away. It burns its circle of runes into the ground where it lands and where it left, glowing gold and fading over a minute. Cooldown 60 seconds. |
+| 1 | R | **Throw / Call Back** | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player). |
+| 2 | G (toggle) | **Flight** | Thor flies by spinning his weapon: only with Mjolnir or Stormbreaker in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. |
+| 3 | V | **Lightning** | He raises his weapon and lightning pours down into it from the sky and leaps to what he looks at, up to 64 blocks away: 8 damage there and less to everything within 3 blocks, with the usual effects of lightning on creatures (creepers become charged, pigs turn into zombified piglins), but no fire on blocks. Without a weapon he can still call it, straight from the sky. Cooldown 1.5 seconds. |
+| 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon arcs too, and each Lightning strikes three times. It burns hunger; with an empty hunger bar the thunder calms. |
+| 5 | N | **Bifrost** | "Heimdall! Open the Bifrost!" With Mjolnir or Stormbreaker in hand: **N** opens the Bifrost screen (home, his saved places, save this one), **Sneak + N** takes him to the spot he looks at, up to 512 blocks away. See 9.4. |
 
 All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep blue halo.
 
-### 9.4 Looks
+### 9.4 The Bifrost and saved places
+
+* **The Bifrost answers the weapon, not the power.** Thor calls it with **N**; anyone else
+  holding **Mjolnir or Stormbreaker** calls it by **using the weapon** (right click). With
+  neither in hand it doesn't come.
+* **The Bifrost screen** shows:
+  * **Home**: the respawn point (bed or respawn anchor, otherwise the world spawn), in whatever
+    dimension it is;
+  * every **saved place**, with how far away it is, or which world it is in (the Overworld, the
+    Nether, the End, or a dimension added by another mod); **✕** forgets one;
+  * a field to **save the place you stand on**, under a name of up to 32 characters, facing the
+    way you face. Saving a name again moves that place. Up to 24 places.
+* **Sneak + N** (or Sneak + right click with the weapon): to the spot you look at, up to 512
+  blocks away.
+* A column of swirling rainbow light gathers around the traveller for a second and a half,
+  holding them in place, then takes them, **across dimensions if need be**. They land exactly
+  on the saved spot, facing the saved way; if it has been built over since, on the first free
+  spot above it. It burns its circle of runes into the ground where it lands and where it left,
+  glowing gold and fading over a minute.
+* Arriving inside a Hex counts as crossing its wall: the Hex judges the traveller as it judges
+  everyone else.
+* **Cooldown 60 seconds**, the same for everyone, shown on the screen (and on Thor's HUD).
+  The places and the cooldown are saved with the player and kept on death, and only that player
+  sees them.
+
+### 9.5 Looks
 
 *Thor* (2011/*The Avengers*: black and silver armour with the six chest discs, red cape),
 *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder*
@@ -516,5 +556,5 @@ Every power's light follows the films and shows:
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
-Mjolnir's damage and range, who is worthy of Mjolnir, the Bifrost's cooldown…) can be changed in
+Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's cooldown…) can be changed in
 `world/serverconfig/enhanced-server.toml`.

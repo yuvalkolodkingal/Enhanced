@@ -1,12 +1,15 @@
 package com.kolodkingal.enhanced.item;
 
+import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -25,7 +28,8 @@ import java.util.List;
 /**
  * Mjolnir, forged from Uru in the heart of a dying star. Only the worthy can lift it (see {@link Worthiness}): in
  * anyone else's hands it slips to the ground, and wherever it comes to rest it stays, as a block nobody else can move.
- * Whoever lifts it first, if they have no other power, becomes Thor. Never breaks; fire and lava can't hurt it.
+ * Whoever lifts it first, if they have no other power, becomes Thor. The worthy who hold it can call the Bifrost (use
+ * it; see {@link ThorAbilities#useWeapon}). Never breaks; fire and lava can't hurt it.
  */
 public class MjolnirItem extends Item {
     public MjolnirItem(Properties properties) {
@@ -40,6 +44,12 @@ public class MjolnirItem extends Item {
                 .add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -3.0, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND)
                 .build();
+    }
+
+    /** Use: the Bifrost screen (Sneak: the Bifrost to where you look). */
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        return ThorAbilities.useWeapon(level, player, hand);
     }
 
     /** Sneak + use on a block: set Mjolnir down on top of it. */
@@ -104,6 +114,7 @@ public class MjolnirItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.enhanced.mjolnir.desc").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));
         tooltip.add(Component.translatable("item.enhanced.mjolnir.desc2").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.enhanced.thor_weapon.bifrost").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.enhanced.unbreakable").withStyle(ChatFormatting.BLUE));
     }
 }

@@ -1,14 +1,16 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
+import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
-import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
+import com.kolodkingal.enhanced.client.screen.BifrostScreen;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.ChangeLookPayload;
@@ -230,6 +232,10 @@ public final class ClientEvents {
             if (usable && clicked && !SENT_DOWN[i]) {
                 if (i == 5 && power == Power.SCARLET_WITCH && !player.isShiftKeyDown() && hasOwnHex(player)) {
                     mc.setScreen(new HexScreen());
+                    continue;
+                }
+                if (i == 5 && power == Power.THOR && !player.isShiftKeyDown() && ThorAbilities.holdsWeapon(player)) {
+                    mc.setScreen(new BifrostScreen());
                     continue;
                 }
                 PacketDistributor.sendToServer(new AbilityKeyPayload(i, true));

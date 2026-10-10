@@ -5,7 +5,7 @@ A Minecraft mod where you can become one of the *Enhanced*:
 **Quicksilver**, who runs so fast the world slows down around him (to *Sweet Dreams*);
 **Vision**, the Mind Stone in a synthetic body (or **White Vision**);
 Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki** and his variants, **Sylvie** among them;
-or, if you are worthy, **Thor**, with **Mjolnir**.
+or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
 And if you're lucky enough to survive Wanda's Hex wall, **Photon**.
 
 Every power's look and colour follows the MCU films and shows, and Vision, Tommy, Billy, Loki
@@ -44,6 +44,12 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | **Loki** | Find the **Tesseract** (End City, Stronghold library, Ancient City and Woodland Mansion chests) and use it: you vanish in a blue flash and reappear far away as Loki. |
 | **Thor** | Forge **Mjolnir** (netherite ingots, a Nether Star, a Heavy Core, a Breeze Rod). Only the **worthy** can lift it: Heroes of the Village (save a village from a raid). Lift it, and lightning makes you Thor. |
 
+**Stormbreaker** (3 netherite ingots, a Nether Star and any log, shaped like an axe) can be wielded by
+anyone: the hardest-hitting axe there is. Whoever holds Mjolnir or Stormbreaker can **call the Bifrost**:
+right-click for the Bifrost screen, which takes you home or to any place you saved, **in any
+dimension** (save up to 24 places, by name, where you stand), or Sneak + right-click to go where you
+look. In Thor's hands either weapon is thrown, called back, flown with and struck with lightning.
+
 ## Controls
 
 | Key | Magneto | Scarlet Witch | Photon | Quicksilver | Vision |
@@ -56,18 +62,18 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 
 | Key | Tommy | Billy | Loki | Thor |
 |---|---|---|---|---|
-| **R** | Super Speed on/off (sprint) | Hex Bolt | Daggers (Sneak: three) | Throw Mjolnir / call it back |
-| **G** | Disarm Blitz | Flight | Duplicates | Flight (with Mjolnir) |
+| **R** | Super Speed on/off (sprint) | Hex Bolt | Daggers (Sneak: three) | Throw Mjolnir or Stormbreaker / call it back |
+| **G** | Disarm Blitz | Flight | Duplicates | Flight (weapon in hand) |
 | **V** | Whirlwind | Telekinesis | Shapeshift | Lightning |
 | **B** | Vibrate Through Walls | Freeze | Vanish | God of Thunder (toggle) |
-| **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant, or the variant's own power | Bifrost (Sneak: where you look) |
+| **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant, or the variant's own power | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | **H** | Change look | Change look | Change look | Change look |
 
 **Quicksilver Time:** as Quicksilver, just sprint. Everything within 32 blocks slows to a
 fifth of its speed (arrows hang in the air), you run four times faster, and the music starts.
 
 Every hero except Quicksilver, Tommy and Loki can also fly by double-tapping **Space** (Thor only with
-Mjolnir in hand). With telekinesis, press the key again
+Mjolnir or Stormbreaker in hand). With telekinesis, press the key again
 to launch what you hold, or **Sneak** + the key to put it down gently. Keys can be changed
 under *Options → Controls → Enhanced Powers*. The top-left corner of the screen always
 shows your abilities, cooldowns and resources.

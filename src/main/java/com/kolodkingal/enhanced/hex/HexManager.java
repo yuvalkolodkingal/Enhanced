@@ -240,7 +240,9 @@ public final class HexManager {
     }
 
     /**
-     * An Ender Pearl teleport (exact target known in advance) that would cross a Hex wall.
+     * A teleport whose exact target is known in advance (an Ender Pearl, a Vibrate, the Bifrost) that would cross a Hex
+     * wall. {@code level} is where it lands: arriving from another dimension counts as coming from outside every Hex
+     * there.
      *
      * @return false if the teleport must be cancelled
      */
@@ -248,10 +250,10 @@ public final class HexManager {
         if (!(entity instanceof LivingEntity living)) {
             return true;
         }
-        Vec3 from = bodyCenter(living);
+        Vec3 from = living.level() == level ? bodyCenter(living) : null;
         Vec3 to = target.add(0, living.getBbHeight() * 0.5, 0);
         for (Hex hex : data(level).hexes()) {
-            boolean insideBefore = hex.contains(from);
+            boolean insideBefore = from != null && hex.contains(from);
             boolean insideAfter = hex.contains(to);
             if (insideBefore == insideAfter) {
                 continue;

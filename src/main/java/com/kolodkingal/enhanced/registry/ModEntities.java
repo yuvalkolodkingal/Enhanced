@@ -6,7 +6,7 @@ import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.PhotonBlastEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
-import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
+import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -38,13 +38,14 @@ public final class ModEntities {
                     .updateInterval(1)
                     .build("telekinetic_block"));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<ThrownMjolnirEntity>> THROWN_MJOLNIR = ENTITIES.register("thrown_mjolnir",
-            () -> EntityType.Builder.<ThrownMjolnirEntity>of(ThrownMjolnirEntity::new, MobCategory.MISC)
+    /** Mjolnir or Stormbreaker, thrown by Thor. */
+    public static final DeferredHolder<EntityType<?>, EntityType<ThrownWeaponEntity>> THROWN_WEAPON = ENTITIES.register("thrown_weapon",
+            () -> EntityType.Builder.<ThrownWeaponEntity>of(ThrownWeaponEntity::new, MobCategory.MISC)
                     .sized(0.6F, 0.6F)
                     .clientTrackingRange(8)
                     .updateInterval(1)
                     .fireImmune()
-                    .build("thrown_mjolnir"));
+                    .build("thrown_weapon"));
     public static final DeferredHolder<EntityType<?>, EntityType<LokiDaggerEntity>> LOKI_DAGGER = ENTITIES.register("loki_dagger",
             () -> EntityType.Builder.<LokiDaggerEntity>of(LokiDaggerEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)

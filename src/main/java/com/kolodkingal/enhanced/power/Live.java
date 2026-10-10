@@ -11,7 +11,7 @@ public enum Live {
     WHIRLWIND,
     /** Thor holds Mjolnir up to the sky, calling lightning. */
     CALLING_LIGHTNING,
-    /** The Bifrost's light is gathering around Thor, about to take him. */
+    /** The Bifrost's light is gathering around its traveller (Thor, or anyone holding his weapon), about to take them. */
     BIFROST,
     /** Loki is invisible while his duplicates draw every eye: his held items, armour and name tag are hidden too. */
     HIDDEN,

@@ -30,7 +30,7 @@ public final class PowerTicker {
         }
         MagnetoAbilities.helmetTick(player, data);
         QuicksilverAbilities.gogglesTick(player, data);
-        ThorAbilities.mjolnirTick(player, data);
+        ThorAbilities.everyPlayerTick(player, data);
         applyPassives(player, data);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.tick(player, data);
@@ -53,7 +53,7 @@ public final class PowerTicker {
     /** Flight permission and speed, plus the Scarlet Witch's crown bonuses. */
     public static void applyPassives(ServerPlayer player, PowerData data) {
         Power power = data.power();
-        // Vision's dense body is too heavy to fly, and Thor needs Mjolnir to fly.
+        // Vision's dense body is too heavy to fly, and Thor needs his weapon to fly.
         boolean canFly = power.canFly() && !(power == Power.VISION && data.dense())
                 && !(power == Power.THOR && !ThorAbilities.canFly(player, data));
         setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
@@ -94,7 +94,7 @@ public final class PowerTicker {
         }
     }
 
-    /** The player is about to lose this power: everything it left in the world ends, Mjolnir comes home. */
+    /** The player is about to lose this power: everything it left in the world ends. */
     public static void endPower(ServerPlayer player, PowerData data) {
         endLook(player, data);
         switch (data.power()) {

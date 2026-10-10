@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
+import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -15,20 +15,20 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Mjolnir in flight: thrown, it tumbles end over end; coming home, it flies head first with the handle trailing, the
- * way it always returns to Thor's hand.
+ * Mjolnir or Stormbreaker in flight: thrown, it tumbles end over end; coming home, it flies head first with the handle
+ * trailing, the way it always returns to Thor's hand.
  */
-public class ThrownMjolnirRenderer extends EntityRenderer<ThrownMjolnirEntity> {
+public class ThrownWeaponRenderer extends EntityRenderer<ThrownWeaponEntity> {
     private final ItemRenderer itemRenderer;
 
-    public ThrownMjolnirRenderer(EntityRendererProvider.Context context) {
+    public ThrownWeaponRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.itemRenderer = context.getItemRenderer();
         this.shadowRadius = 0.25F;
     }
 
     @Override
-    public void render(ThrownMjolnirEntity entity, float yaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public void render(ThrownWeaponEntity entity, float yaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         Vec3 motion = entity.getDeltaMovement();
         float heading = motion.horizontalDistanceSqr() < 1.0E-6 ? entity.getYRot()
                 : (float) (Mth.atan2(motion.x, motion.z) * Mth.RAD_TO_DEG);
@@ -45,7 +45,7 @@ public class ThrownMjolnirRenderer extends EntityRenderer<ThrownMjolnirEntity> {
             poseStack.mulPose(Axis.XP.rotationDegrees(spin));
         }
         poseStack.scale(1.1F, 1.1F, 1.1F);
-        itemRenderer.renderStatic(entity.hammer(), ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer,
+        itemRenderer.renderStatic(entity.weapon(), ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer,
                 entity.level(), entity.getId());
         poseStack.popPose();
         super.render(entity, yaw, partialTick, poseStack, buffer, packedLight);
@@ -53,7 +53,7 @@ public class ThrownMjolnirRenderer extends EntityRenderer<ThrownMjolnirEntity> {
 
     @SuppressWarnings("deprecation")
     @Override
-    public ResourceLocation getTextureLocation(ThrownMjolnirEntity entity) {
+    public ResourceLocation getTextureLocation(ThrownWeaponEntity entity) {
         return TextureAtlas.LOCATION_BLOCKS;
     }
 }

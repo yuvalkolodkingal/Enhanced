@@ -225,8 +225,8 @@ public final class CommonEvents {
             return;
         }
         if (ThorAbilities.isThor(player) && !unstoppable && (source.is(DamageTypeTags.IS_LIGHTNING)
-                || (source.is(DamageTypeTags.IS_FALL) && ThorAbilities.holdsMjolnir(player)))) {
-            // The God of Thunder; and with Mjolnir in hand he lands like one.
+                || (source.is(DamageTypeTags.IS_FALL) && ThorAbilities.holdsWeapon(player)))) {
+            // The God of Thunder; and with Mjolnir or Stormbreaker in hand he lands like one.
             event.setCanceled(true);
             return;
         }
@@ -240,7 +240,7 @@ public final class CommonEvents {
         }
     }
 
-    /** Every blow the God of Thunder lands with his own hands (or Mjolnir in them) arcs lightning. */
+    /** Every blow the God of Thunder lands with his own hands (or his weapon in them) arcs lightning. */
     @SubscribeEvent
     public static void onThorMelee(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();

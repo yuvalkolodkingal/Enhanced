@@ -6,12 +6,15 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
-import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
+import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.advancements.AdvancementHolder;
@@ -31,6 +34,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -46,7 +50,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.assertNear;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
-/** Thor and Mjolnir. */
+/** Thor, Mjolnir, Stormbreaker and the Bifrost. */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
 public final class ThorTests {
@@ -154,7 +158,7 @@ public final class ThorTests {
         press(thor, 1);
         PowerData data = Powers.get(thor);
         check(!holdsMjolnir(thor) && data.hammerEntityId() != -1, "Mjolnir is in flight");
-        check(helper.getLevel().getEntity(data.hammerEntityId()) instanceof ThrownMjolnirEntity, "as a thrown hammer");
+        check(helper.getLevel().getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity, "as a thrown hammer");
         boolean[] hit = {false};
         f.everyTick(150, tick -> {
             PowerTicker.tick(thor);
@@ -238,6 +242,143 @@ public final class ThorTests {
             }
             return false;
         });
+    }
+
+    @GameTest(template = ARENA)
+    public static void stormbreakerIsForgedFromUruAStarAndGrootsArm(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("stormbreaker"));
+        check(holder.isPresent() && holder.get().value() instanceof ShapedRecipe, "recipe enhanced:stormbreaker exists");
+        ShapedRecipe recipe = (ShapedRecipe) holder.get().value();
+        ItemStack n = new ItemStack(Items.NETHERITE_INGOT);
+        ItemStack s = new ItemStack(Items.NETHER_STAR);
+        ItemStack log = new ItemStack(Items.OAK_LOG);
+        ItemStack e = ItemStack.EMPTY;
+        check(recipe.matches(CraftingInput.of(3, 3, List.of(n, n, e, n, s, e, e, log, e)), level), "N N / N S / _ L");
+        check(recipe.matches(CraftingInput.of(3, 3, List.of(e, n, n, e, s, n, e, new ItemStack(Items.MANGROVE_LOG), e)), level),
+                "mirrored, with any log");
+        check(recipe.getResultItem(level.registryAccess()).is(ModItems.STORMBREAKER.get()), "it makes Stormbreaker");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void anyoneCanWieldStormbreaker(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(4.5, FLOOR, 10.5);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        player.doTick();
+        check(player.getMainHandItem().is(ModItems.STORMBREAKER.get()), "nobody needs to be worthy to hold it");
+        check(Powers.is(player, Power.NONE), "and holding it doesn't make anyone Thor");
+        assertNear(player.getAttributeValue(Attributes.ATTACK_DAMAGE), 12.0, 1.0E-6, "it hits for 12");
+        check(!player.getMainHandItem().isDamageableItem(), "it never wears out");
+        // Sneak + use: the Bifrost, to where they look.
+        lookAt(player, helper.absoluteVec(new Vec3(14.5, 1.99, 10.5)));
+        player.setShiftKeyDown(true);
+        player.getMainHandItem().use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+        check(Powers.get(player).is(Live.BIFROST), "the Bifrost answers anyone who holds Stormbreaker");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void thrownStormbreakerHitsAndComesBack(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        PowerTicker.tick(thor);
+        check(thor.mayFly(), "Thor flies with Stormbreaker too");
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        lookAt(thor, zombie);
+        float before = zombie.getHealth();
+        press(thor, 1);
+        PowerData data = Powers.get(thor);
+        check(thor.getMainHandItem().isEmpty() && helper.getLevel().getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity,
+                "Stormbreaker is in flight");
+        boolean[] hit = {false};
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(thor);
+            hit[0] |= zombie.getHealth() < before - 8.0F || !zombie.isAlive();
+            if (thor.getMainHandItem().is(ModItems.STORMBREAKER.get())) {
+                check(hit[0], "it cleaved the zombie on the way");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void thorCallsHisWeaponOutOfACreaturesHands(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 10.5));
+        zombie.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        press(thor, 1);
+        check(zombie.getMainHandItem().isEmpty(), "it tears out of the zombie's hand");
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(thor);
+            return thor.getMainHandItem().is(ModItems.STORMBREAKER.get());
+        });
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void theBifrostRemembersPlacesInEveryWorld(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(4.5, FLOOR, 4.5);
+        ServerLevel level = helper.getLevel();
+        ThorAbilities.savePlace(player, "Camp");
+        check(player.getData(ModAttachments.BIFROST).places().isEmpty(), "nothing is saved without Mjolnir or Stormbreaker in hand");
+        ThorAbilities.bifrostHome(player);
+        check(!Powers.get(player).is(Live.BIFROST), "and the Bifrost doesn't answer");
+
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        ThorAbilities.savePlace(player, "\u00a7cCamp\n");
+        BifrostData data = player.getData(ModAttachments.BIFROST);
+        check(data.places().size() == 1 && data.places().get(0).name().equals("Camp"), "saved as Camp (no formatting): " + data);
+        check(data.places().get(0).dimension() == level.dimension(), "in this world");
+        Vec3 moved = helper.absoluteVec(new Vec3(14.5, FLOOR, 14.5));
+        player.moveTo(moved.x, moved.y, moved.z);
+        ThorAbilities.savePlace(player, "camp");
+        data = player.getData(ModAttachments.BIFROST);
+        check(data.places().size() == 1 && data.places().get(0).pos().distanceTo(moved) < 1.0E-6, "saving the name again moves it");
+        check(data.places().get(0).name().equals("camp"), "under the name as typed this time");
+
+        // A place saved earlier on the roof of the Nether.
+        player.setData(ModAttachments.BIFROST, data.with(new BifrostData.Place("Nether roof", Level.NETHER, new Vec3(0.5, 128.0, 0.5), 90.0F)));
+        ThorAbilities.bifrostToPlace(player, 1, "Somewhere else");
+        check(!Powers.get(player).is(Live.BIFROST), "a place that isn't there any more (the list changed) is ignored");
+        ThorAbilities.bifrostToPlace(player, 1, "Nether roof");
+        check(Powers.get(player).is(Live.BIFROST), "the Bifrost gathers around them");
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(player);
+            if (player.level().dimension() != Level.NETHER) {
+                return false;
+            }
+            assertNear(player.getX(), 0.5, 1.0E-6, "x in the Nether");
+            assertNear(player.getZ(), 0.5, 1.0E-6, "z in the Nether");
+            check(player.getY() >= 128.0 - 1.0E-6, "standing on the roof of the Nether");
+            ThorAbilities.bifrostHome(player);
+            check(!Powers.get(player).is(Live.BIFROST), "not again until the Bifrost has gathered its strength");
+            check(player.getData(ModAttachments.BIFROST).cooldown(player.level().getGameTime()) > 0, "its cooldown is running");
+            ThorAbilities.forgetPlace(player, 0, "camp");
+            List<BifrostData.Place> left = player.getData(ModAttachments.BIFROST).places();
+            check(left.size() == 1 && left.get(0).name().equals("Nether roof"), "the camp is forgotten");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void bifrostNamesAreCleanedAndTheListIsBounded(GameTestHelper helper) {
+        check(BifrostData.cleanName("  \u00a7lHome\u00a7r  ", "x").equals("Home"), "formatting and spaces are stripped");
+        check(BifrostData.cleanName("\n\t", "1, 2, 3").equals("1, 2, 3"), "an empty name falls back to the coordinates");
+        check(BifrostData.cleanName("a".repeat(100), "x").length() == BifrostData.MAX_NAME_LENGTH, "long names are cut");
+        BifrostData data = BifrostData.EMPTY;
+        for (int i = 0; i < BifrostData.MAX_PLACES; i++) {
+            data = data.with(new BifrostData.Place("P" + i, Level.OVERWORLD, Vec3.ZERO, 0.0F));
+        }
+        check(data.isFull() && data.with(new BifrostData.Place("One more", Level.OVERWORLD, Vec3.ZERO, 0.0F)) == data, "at most 24 places");
+        check(data.with(new BifrostData.Place("p3", Level.NETHER, Vec3.ZERO, 0.0F)).places().get(3).dimension() == Level.NETHER,
+                "but an existing name can still be moved");
+        check(data.without(99) == data && data.without(0).places().size() == BifrostData.MAX_PLACES - 1, "forgetting checks the index");
+        helper.succeed();
     }
 
     @GameTest(template = ARENA)
