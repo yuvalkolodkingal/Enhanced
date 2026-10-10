@@ -42,7 +42,7 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | **Vision** | Craft a **Synthezoid Core** (redstone blocks, netherite ingots, a Nether Star). Hold it in one hand and use **Loki's Scepter** with the other. |
 | **Tommy** or **Billy** | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors, an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
 | **Loki** | Find the **Tesseract** (End City, Stronghold library, Ancient City and Woodland Mansion chests) and use it: you vanish in a blue flash and reappear far away as Loki. |
-| **Thor** | Forge **Mjolnir** (netherite ingots, a Nether Star, a Heavy Core, a Breeze Rod). Only the **worthy** can lift it: Heroes of the Village (save a village from a raid). Lift it, and lightning makes you Thor. |
+| **Thor** | Forge **Mjolnir** (netherite ingots, a Nether Star, a Heavy Core, a Breeze Rod). The first **worthy** player to lift it (Heroes of the Village: save a village from a raid) claims it, and lightning makes you Thor. From then on only its owner can lift it. |
 
 **Stormbreaker** (3 netherite ingots, a Nether Star and any log, shaped like an axe) can be wielded by
 anyone: the hardest-hitting axe there is. Whoever holds Mjolnir or Stormbreaker can **call the Bifrost**:

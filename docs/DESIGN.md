@@ -493,19 +493,30 @@ costume), *Wiccan (comics)*, and *Your own skin*.
   N H N      S = Nether Star (the heart of a dying star)
     R        H = Heavy Core, R = Breeze Rod (the handle)
   ```
-* **The worthy.** Only the worthy can lift Mjolnir: Thor himself, **Vision** (who lifted it in
-  *Age of Ultron*), players in Creative or Spectator mode, and anyone who has proven
-  themselves a hero by **saving a village from a raid** (the *Hero of the Village*
+* **The worthy.** Only the worthy can lift a Mjolnir nobody owns yet: Thor himself, **Vision**
+  (who lifted it in *Age of Ultron*), players in Creative or Spectator mode, and anyone who has
+  proven themselves a hero by **saving a village from a raid** (the *Hero of the Village*
   advancement). The server config can make everyone worthy.
-* **The unworthy can't hold it.** In an unworthy player's inventory (crafted, taken from a
-  chest, anywhere) Mjolnir is far too heavy: it slips to the ground at their feet. They can't
-  pick it up either.
+* **One hammer, one owner.** A freshly forged Mjolnir (or one from the Creative tab) belongs to
+  nobody. The first worthy player to lift it **claims it, for good**: when it comes into their
+  inventory or hand, when they lift it off the ground, when they forge it, or when Thor calls it
+  to himself. The hammer remembers its owner (an `enhanced:owner` item component, kept when it is
+  thrown, dropped or set down), and its tooltip says so: *Bound to <name>*, or *Unclaimed* until
+  then. From then on **only its owner can lift it**: not another Hero of the Village, not Vision,
+  not another Thor. Players in Creative or Spectator mode can still lift any Mjolnir, so
+  operators can move it, but holding someone else's never changes its owner. The server config
+  (`mjolnirOwnerOnly`) can bring back the old rule, where any worthy player can lift any Mjolnir.
+* **Everyone else can't hold it.** In the inventory of a player who is not worthy, or of a worthy
+  one holding someone else's Mjolnir (crafted, taken from a chest, anywhere) it is far too heavy:
+  it slips to the ground at their feet. They can't pick it up either.
 * **Wherever Mjolnir comes to rest, it stays.** A dropped Mjolnir lands and stands on its
   head, handle up, like in the crater in New Mexico: a block that **nothing can break, blow up
-  or push**. Only the worthy can lift it (right click). Thor can set it down himself with
+  or push**, and that remembers whose it is. Only its owner can lift it (right click); anyone else
+  gets *"It won't budge. Only <owner> can lift it."* Thor can set it down himself with
   **Sneak + right click** on a block.
-* **Becoming Thor.** The first time a worthy player with no other power lifts Mjolnir, lightning
-  strikes and they **become Thor**. Vision can lift it and fight with it, but stays Vision.
+* **Becoming Thor.** The first time a worthy player with no other power lifts (and so claims) a
+  Mjolnir nobody owned, or lifts their own, lightning strikes and they **become Thor**. Vision can
+  claim it and fight with it, but stays Vision.
 * Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava
   can't destroy it. Speedsters can't snatch it and telekinesis can't lift it.
 * **Stormbreaker.** Forged in Nidavellir in the heart of a dying star, its handle grown from
@@ -533,7 +544,7 @@ costume), *Wiccan (comics)*, and *Your own skin*.
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R | **Throw / Call Back** | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player). |
+| 1 | R | **Throw / Call Back** | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player, and never another player's Mjolnir: he calls his own, one nobody owns yet, or Stormbreaker). |
 | 2 | G (toggle) | **Flight** | Thor flies by spinning his weapon: only with Mjolnir or Stormbreaker in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. |
 | 3 | V | **Lightning** | He raises his weapon and lightning pours down into it from the sky and leaps to what he looks at, up to 64 blocks away: 8 damage there and less to everything within 3 blocks, with the usual effects of lightning on creatures (creepers become charged, pigs turn into zombified piglins), but no fire on blocks. Without a weapon he can still call it, straight from the sky. Cooldown 1.5 seconds. |
 | 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon arcs too, and each Lightning strikes three times. It burns hunger; with an empty hunger bar the thunder calms. |
@@ -608,5 +619,5 @@ Every power's light follows the films and shows:
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
-Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's cooldown…) can be changed in
+Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir and whether each Mjolnir belongs to the first worthy player who lifts it, the Bifrost's cooldown…) can be changed in
 `world/serverconfig/enhanced-server.toml`.
