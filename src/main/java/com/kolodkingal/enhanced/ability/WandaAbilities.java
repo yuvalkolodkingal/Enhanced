@@ -139,7 +139,8 @@ public final class WandaAbilities {
 
     // ---- Ability 4: Chaos Shield ----
 
-    private static boolean canAffordShield(Player player) {
+    /** Whether the Chaos Shield can be held: it costs hunger, so a hungry Scarlet Witch is refused (the client's animation asks too). */
+    public static boolean canAffordShield(Player player) {
         return player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
     }
 

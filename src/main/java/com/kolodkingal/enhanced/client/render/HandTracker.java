@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -115,6 +116,11 @@ public final class HandTracker {
         Vector3f v = poseStack.last().pose().transformPosition(x, y, z, new Vector3f());
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         return new Vec3(v.x + camera.x, v.y + camera.y, v.z + camera.z);
+    }
+
+    /** Forgets the points of players who left the world (a respawn is a new entity: the old points are never read again). */
+    public static void prune(ClientLevel level) {
+        POINTS.keySet().removeIf(id -> !(level.getEntity(id) instanceof Player));
     }
 
     public static void clear() {

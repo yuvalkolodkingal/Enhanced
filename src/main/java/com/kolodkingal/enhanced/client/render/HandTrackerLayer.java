@@ -26,7 +26,8 @@ public class HandTrackerLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         HeroAnimState state = HeroAnimator.peek(player);
-        if (state == null || state.wVanilla > 0.0F) {
+        // Only a body drawn in the world says where its hands are: not the inventory's preview, whose pose stack is the screen's.
+        if (state == null || state.wVanilla > 0.0F || !state.posed) {
             return;
         }
         PlayerModel<AbstractClientPlayer> model = getParentModel();

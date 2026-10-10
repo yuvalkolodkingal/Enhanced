@@ -91,6 +91,8 @@ public final class Gestures {
         final List<float[]> keys = new ArrayList<>();
         final List<Ease> eases = new ArrayList<>();
         final List<Float> times = new ArrayList<>();
+        /** A scratch cell for {@link #scalar}, so reading a one-wide track every frame allocates nothing. */
+        private final float[] one = new float[1];
 
         Track(int width) {
             this.width = width;
@@ -152,9 +154,8 @@ public final class Gestures {
             if (keys.isEmpty()) {
                 return unset;
             }
-            float[] tmp = new float[1];
-            sample(t, tmp);
-            return tmp[0];
+            sample(t, one);
+            return one[0];
         }
     }
 
@@ -175,6 +176,8 @@ public final class Gestures {
         /** 1 while the gesture asks the weapon to whirl or to lead. */
         public final Track spin = new Track(1);
         public final Track lead = new Track(1);
+        /** A scratch cell for {@link #sampleArm} (the render thread samples one arm at a time). */
+        private final float[] next = new float[3];
 
         Def(GestureId id) {
             this.id = id;
@@ -250,10 +253,9 @@ public final class Gestures {
             if (i + 1 < n && t > a.t) {
                 ArmKey b = keys.get(i + 1);
                 float u = b.t > a.t ? (mechanical ? Ease.E : b.ease).apply((t - a.t) / (b.t - a.t)) : 1.0F;
-                float[] tmp = new float[3];
-                solver.resolve(b, main, tmp);
+                solver.resolve(b, main, next);
                 for (int k = 0; k < 3; k++) {
-                    out[k] = out[k] + (tmp[k] - out[k]) * u;
+                    out[k] = out[k] + (next[k] - out[k]) * u;
                 }
                 tremble[0] = a.tremble + (b.tremble - a.tremble) * u;
                 tremble[1] = b.trembleSpeed;

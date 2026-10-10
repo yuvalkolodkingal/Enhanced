@@ -50,12 +50,14 @@ public final class ThorGrip {
         }
         GripMath.Kind kind = ThorAbilities.isStormbreaker(stack) ? GripMath.Kind.STORMBREAKER : GripMath.Kind.MJOLNIR;
         boolean slim = player.getSkin().model() == PlayerSkin.Model.SLIM;
+        // A model that was not posed from the state (the inventory's preview) gets the resting grip: nothing of the flight.
+        boolean posed = state.posed;
         // The arm's world elevation: 0 hangs, 90 level forward, 180 straight up.
         float xRot = (arm == HumanoidArm.RIGHT ? playerModel.rightArm : playerModel.leftArm).xRot;
-        float phi = -xRot / RAD - state.renderPitch;
-        float lead = GripMath.leadWeight(phi, state.leadForce);
+        float phi = -xRot / RAD - (posed ? state.renderPitch : 0.0F);
+        float lead = GripMath.leadWeight(phi, posed ? state.leadForce : 0.0F);
         float beta = GripMath.beta(lead);
-        float whirl = state.wSpin;
+        float whirl = posed ? state.wSpin : 0.0F;
         GripMath.Placement p = GripMath.placement(kind, left, slim, beta, whirl, state.spinAngle);
 
         ps.pushPose();
@@ -64,7 +66,9 @@ public final class ThorGrip {
         ps.scale(GripMath.SCALE, GripMath.SCALE, GripMath.SCALE);
         ps.translate(-(p.held.x - 8.0F) / 16.0F, -(p.held.y - 8.0F) / 16.0F, -(p.held.z - 8.0F) / 16.0F);
         renderer.renderItem(entity, stack, ItemDisplayContext.NONE, left, ps, buffer, light);
-        HandTracker.recordWeapon(player, (float) state.time, ps, kind.head);
+        if (posed) {
+            HandTracker.recordWeapon(player, (float) state.time, ps, kind.head);
+        }
         ps.popPose();
 
         if (whirl > 0.02F) {

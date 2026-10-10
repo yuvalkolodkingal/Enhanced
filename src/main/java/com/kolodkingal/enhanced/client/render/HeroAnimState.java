@@ -44,6 +44,11 @@ public final class HeroAnimState {
     public double time = -1.0;
     /** Whether the tick has looked at this hero yet (the first tick only remembers). */
     public boolean seeded;
+    /**
+     * Whether the model being drawn right now was posed from this state ({@link HeroPoses#apply} sets it for every draw). It is
+     * false for the inventory's preview of the player, which the layers must draw as vanilla does: no whirl, no tracked points.
+     */
+    public boolean posed;
 
     // ---- tick samples ----
     /** Vertical motion of the last three ticks, newest first (blocks per tick) and the horizontal speed of the last four. */

@@ -60,10 +60,14 @@ public final class HeroPoses {
             return;
         }
         HeroAnimState st = HeroAnimator.peek(player);
+        if (st != null) {
+            st.posed = false;
+        }
         float pt = ageInTicks - player.tickCount;
         if (st == null || pt >= 1.0F || st.wVanilla > 0.0F || Math.abs(st.time - ageInTicks) > 1.5 || !EnhancedClientConfig.animations()) {
             return;
         }
+        st.posed = true;
         PoseContext c = CTX;
         c.begin(model, player, st, ageInTicks, pt);
 

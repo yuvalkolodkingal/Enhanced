@@ -67,15 +67,22 @@ final class RunPoses {
     }
 
     private static final Character DEFAULT = new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.015F);
+    private static final Character MAGNETO = new Character(0.85F, 1.0F, 1.0F, 4, 3, 0.015F);
+    private static final Character WANDA = new Character(0.80F, 1.10F, 1.05F, 5, 4, 0.015F);
+    private static final Character VISION = new Character(0.60F, 0.80F, 1.0F, 3, 2, 0.010F);
+    private static final Character WHITE_VISION = new Character(0.30F, 0.35F, 1.0F, 0, 0, 0.0F);
+    private static final Character BILLY = new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.025F);
+    private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
+    private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
-            case MAGNETO -> new Character(0.85F, 1.0F, 1.0F, 4, 3, 0.015F);
-            case SCARLET_WITCH -> new Character(0.80F, 1.10F, 1.05F, 5, 4, 0.015F);
-            case VISION -> whiteVision ? new Character(0.30F, 0.35F, 1.0F, 0, 0, 0.0F) : new Character(0.60F, 0.80F, 1.0F, 3, 2, 0.010F);
-            case BILLY -> new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.025F);
-            case LOKI -> new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
-            case THOR -> new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
+            case MAGNETO -> MAGNETO;
+            case SCARLET_WITCH -> WANDA;
+            case VISION -> whiteVision ? WHITE_VISION : VISION;
+            case BILLY -> BILLY;
+            case LOKI -> LOKI;
+            case THOR -> THOR;
             default -> DEFAULT;
         };
     }

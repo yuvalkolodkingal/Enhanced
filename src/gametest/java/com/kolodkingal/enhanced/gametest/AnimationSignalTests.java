@@ -24,6 +24,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
+import static com.kolodkingal.enhanced.gametest.TestKit.look;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /**
@@ -49,27 +50,28 @@ public final class AnimationSignalTests {
     @GameTest(template = ARENA)
     public static void aMoveWithNothingToActOnStartsNoCooldown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        // Alone in the arena, looking at the wall.
+        // Alone in the arena, looking straight up: the tests of a batch run side by side, and the creatures of the arena next
+        // door must not be in anyone's cone or line.
         ServerPlayer magneto = f.player(10.5, FLOOR, 10.5, Power.MAGNETO);
         ServerPlayer quicksilver = f.player(4.5, FLOOR, 4.5, Power.QUICKSILVER);
         ServerPlayer tommy = f.player(16.5, FLOOR, 16.5, Power.TOMMY);
         ServerPlayer billy = f.player(4.5, FLOOR, 16.5, Power.BILLY);
         ServerPlayer thor = f.player(16.5, FLOOR, 4.5, Power.THOR);
-        lookAt(magneto, new Vec3(10.5, FLOOR + 1.6, 0.0));
+        look(magneto, 0.0F, -90.0F);
         press(magneto, 3);
         check(ready(magneto, 3), "Magneto's strip needs something to strip");
-        lookAt(quicksilver, new Vec3(4.5, FLOOR + 1.6, 0.0));
+        look(quicksilver, 0.0F, -90.0F);
         press(quicksilver, 2);
         press(quicksilver, 3);
         check(ready(quicksilver, 2) && ready(quicksilver, 3), "Quicksilver's blitz and pickpocket need a target");
-        lookAt(tommy, new Vec3(16.5, FLOOR + 1.6, 21.0));
+        look(tommy, 0.0F, -90.0F);
         press(tommy, 2);
         press(tommy, 5);
         press(tommy, 4);
         check(ready(tommy, 2), "Tommy's blitz needs an armed creature near him");
         check(ready(tommy, 5), "Molecular acceleration needs something to touch");
         check(ready(tommy, 4), "Vibrate needs a wall to go through");
-        lookAt(billy, new Vec3(4.5, FLOOR + 1.6, 21.0));
+        look(billy, 0.0F, -90.0F);
         press(billy, 4);
         check(ready(billy, 4) && !Powers.get(billy).is(Live.FREEZING), "Freeze needs creatures to freeze");
         press(thor, 1);

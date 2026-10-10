@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
@@ -94,9 +95,11 @@ public final class HeroAnimator {
     public static void tick(ClientLevel level) {
         if (!EnhancedClientConfig.animations()) {
             STATES.clear();
+            HandTracker.clear();
             return;
         }
         STATES.keySet().removeIf(id -> level.getPlayerByUUID(id) == null);
+        HandTracker.prune(level);
         long now = level.getGameTime();
         Minecraft mc = Minecraft.getInstance();
         for (AbstractClientPlayer player : level.players()) {
@@ -863,6 +866,10 @@ public final class HeroAnimator {
     public static void predict(LocalPlayer player, int ability) {
         HeroAnimState s = peek(player);
         if (s == null || s.wVanilla > 0.0F || !EnhancedClientConfig.animations()) {
+            return;
+        }
+        if (s.power == Power.SCARLET_WITCH && ability == 4 && !WandaAbilities.canAffordShield(player)) {
+            // The server refuses a shield she cannot pay for: do not raise her arms for nothing.
             return;
         }
         PowerData data = Powers.get(player);
