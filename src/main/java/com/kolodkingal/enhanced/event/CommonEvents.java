@@ -5,6 +5,8 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
+import com.kolodkingal.enhanced.ability.MjolnirPin;
+import com.kolodkingal.enhanced.ability.MjolnirShatter;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
@@ -25,6 +27,7 @@ import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffects;
@@ -41,18 +44,22 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityMountEvent;
 import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
+import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -114,6 +121,7 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Pre event) {
+        MjolnirPin.beforeTick(event.getEntity());
         if (SlowMotion.skipTick(event.getEntity())) {
             event.setCanceled(true);
         }
@@ -122,6 +130,7 @@ public final class CommonEvents {
     @SubscribeEvent
     public static void onEntityTickDone(EntityTickEvent.Post event) {
         SlowMotion.afterTick(event.getEntity());
+        MjolnirPin.afterTick(event.getEntity());
     }
 
     @SubscribeEvent
@@ -149,6 +158,9 @@ public final class CommonEvents {
             Powers.get(player).setBeamActive(false);
             Powers.get(player).setChaosShieldActive(false);
             Powers.get(player).setShrapnelActive(false);
+            ThorAbilities.onLogout(player);
+            MjolnirShatter.onGone(player);
+            MjolnirPin.onOwnerGone(player);
             WitchesRoad.forget(player.getUUID());
         }
     }
@@ -178,6 +190,9 @@ public final class CommonEvents {
             if (Powers.is(player, Power.SCARLET_WITCH)) {
                 HexManager.onOwnerDeath(player);
             }
+            // A Mjolnir in pieces comes together and falls where he dies; whoever he pinned is free.
+            MjolnirShatter.onGone(player);
+            MjolnirPin.onOwnerGone(player);
         }
     }
 
@@ -247,6 +262,14 @@ public final class CommonEvents {
         }
     }
 
+    /** Thor's lightning beam hits again and again: it leaves no invulnerability behind, and ignores what is left of anyone's. */
+    @SubscribeEvent
+    public static void onBeamHit(LivingIncomingDamageEvent event) {
+        if (event.getSource().is(ModDamageTypes.LIGHTNING_BEAM)) {
+            event.setInvulnerabilityTicks(0);
+        }
+    }
+
     /** Every blow the God of Thunder lands with his own hands (or his weapon in them) arcs lightning. */
     @SubscribeEvent
     public static void onThorMelee(LivingIncomingDamageEvent event) {
@@ -271,6 +294,40 @@ public final class CommonEvents {
         ItemStack stack = event.getItemEntity().getItem();
         if (ThorAbilities.isMjolnir(stack) && !Worthiness.canLift(event.getPlayer(), stack)) {
             event.setCanPickup(TriState.FALSE);
+        }
+    }
+
+    // ---- Mjolnir pins someone down ----
+
+    /** Sneak + right click with Mjolnir sets it down on a creature; right click on the pinned one lifts it (its owner only). */
+    @SubscribeEvent
+    public static void onInteractEntity(PlayerInteractEvent.EntityInteract event) {
+        InteractionResult result = MjolnirPin.interact(event.getEntity(), event.getHand(), event.getTarget());
+        if (result != null) {
+            event.setCancellationResult(result);
+            event.setCanceled(true);
+        }
+    }
+
+    /** Whoever is pinned can't be knocked about, climb onto a mount or leave for another dimension. */
+    @SubscribeEvent
+    public static void onKnockBack(LivingKnockBackEvent event) {
+        if (MjolnirPin.isPinned(event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMount(EntityMountEvent event) {
+        if (event.isMounting() && MjolnirPin.isPinned(event.getEntityMounting())) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onTravelToDimension(EntityTravelToDimensionEvent event) {
+        if (MjolnirPin.isPinned(event.getEntity())) {
+            event.setCanceled(true);
         }
     }
 
@@ -357,14 +414,18 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onChorusFruit(EntityTeleportEvent.ChorusFruit event) {
-        if (!event.getEntityLiving().level().isClientSide) {
+        if (MjolnirPin.isPinned(event.getEntityLiving())) {
+            event.setCanceled(true);
+        } else if (!event.getEntityLiving().level().isClientSide) {
             HexManager.rememberTeleportStart(event.getEntityLiving());
         }
     }
 
     @SubscribeEvent
     public static void onEnderTeleport(EntityTeleportEvent.EnderEntity event) {
-        if (!event.getEntityLiving().level().isClientSide) {
+        if (MjolnirPin.isPinned(event.getEntityLiving())) {
+            event.setCanceled(true);
+        } else if (!event.getEntityLiving().level().isClientSide) {
             HexManager.rememberTeleportStart(event.getEntityLiving());
         }
     }

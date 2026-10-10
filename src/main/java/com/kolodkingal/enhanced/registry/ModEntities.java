@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
+import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import net.minecraft.core.registries.Registries;
@@ -38,6 +40,28 @@ public final class ModEntities {
                     .updateInterval(1)
                     .fireImmune()
                     .build("thrown_weapon"));
+
+    /** A fragment of a shattered Mjolnir. Never saved: the hammer is kept in Thor's own data while it is in pieces. */
+    public static final DeferredHolder<EntityType<?>, EntityType<MjolnirFragmentEntity>> MJOLNIR_FRAGMENT = ENTITIES.register("mjolnir_fragment",
+            () -> EntityType.Builder.<MjolnirFragmentEntity>of(MjolnirFragmentEntity::new, MobCategory.MISC)
+                    .sized(0.3F, 0.3F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .fireImmune()
+                    .noSave()
+                    .noSummon()
+                    .build("mjolnir_fragment"));
+
+    /** Mjolnir lying on someone it pins down. */
+    public static final DeferredHolder<EntityType<?>, EntityType<MjolnirPinEntity>> MJOLNIR_PIN = ENTITIES.register("mjolnir_pin",
+            () -> EntityType.Builder.<MjolnirPinEntity>of(MjolnirPinEntity::new, MobCategory.MISC)
+                    .sized(0.4F, 0.4F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .fireImmune()
+                    .noSummon()
+                    .build("mjolnir_pin"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<LokiDaggerEntity>> LOKI_DAGGER = ENTITIES.register("loki_dagger",
             () -> EntityType.Builder.<LokiDaggerEntity>of(LokiDaggerEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)

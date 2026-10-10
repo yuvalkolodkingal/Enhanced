@@ -65,10 +65,18 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue STORMBREAKER_THROW_DAMAGE;
     public static final ModConfigSpec.IntValue MJOLNIR_THROW_RANGE;
     public static final ModConfigSpec.IntValue MJOLNIR_RECALL_RANGE;
-    public static final ModConfigSpec.DoubleValue THOR_LIGHTNING_DAMAGE;
-    public static final ModConfigSpec.IntValue THOR_LIGHTNING_RANGE;
+    public static final ModConfigSpec.DoubleValue THOR_BEAM_DAMAGE;
+    public static final ModConfigSpec.IntValue THOR_BEAM_INTERVAL;
+    public static final ModConfigSpec.IntValue THOR_BEAM_RANGE;
+    public static final ModConfigSpec.IntValue THOR_BEAM_WEAPON_RANGE;
+    public static final ModConfigSpec.DoubleValue THOR_BEAM_WEAPON_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue THOR_BEAM_THUNDER_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue THOR_BEAM_EXHAUSTION;
     public static final ModConfigSpec.DoubleValue GOD_OF_THUNDER_EXHAUSTION;
     public static final ModConfigSpec.IntValue BIFROST_COOLDOWN;
+    public static final ModConfigSpec.IntValue MJOLNIR_SHATTER_COOLDOWN;
+    public static final ModConfigSpec.DoubleValue MJOLNIR_SHATTER_DAMAGE;
+    public static final ModConfigSpec.IntValue MJOLNIR_PIN_DURATION;
 
     static {
         BUILDER.push("magneto");
@@ -180,14 +188,35 @@ public final class EnhancedConfig {
                 .defineInRange("throwRange", 40, 4, 128);
         MJOLNIR_RECALL_RANGE = BUILDER.comment("How far away (blocks) Thor can call Mjolnir or Stormbreaker back from.")
                 .defineInRange("recallRange", 64, 4, 256);
-        THOR_LIGHTNING_DAMAGE = BUILDER.comment("Damage of Thor's lightning to whatever it strikes.")
-                .defineInRange("lightningDamage", 8.0, 0.0, 100.0);
-        THOR_LIGHTNING_RANGE = BUILDER.comment("How far away (blocks) Thor can call lightning down.")
-                .defineInRange("lightningRange", 64, 4, 256);
+        THOR_BEAM_DAMAGE = BUILDER.comment("Damage of one hit of Thor's lightning beam, bare-handed (2 = one heart).",
+                        "Mjolnir or Stormbreaker in hand multiplies it by beamWeaponMultiplier, the God of Thunder by",
+                        "godOfThunderBeamMultiplier on top.")
+                .defineInRange("beamDamage", 2.0, 0.0, 100.0);
+        THOR_BEAM_INTERVAL = BUILDER.comment("Ticks between two hits of the lightning beam (5 = four hits a second). The beam ignores",
+                        "the creature's damage cooldown, so every hit lands.")
+                .defineInRange("beamInterval", 5, 1, 40);
+        THOR_BEAM_RANGE = BUILDER.comment("How far (blocks) Thor's lightning beam reaches bare-handed.")
+                .defineInRange("beamRange", 24, 4, 128);
+        THOR_BEAM_WEAPON_RANGE = BUILDER.comment("How far (blocks) the beam reaches with Mjolnir or Stormbreaker in hand.")
+                .defineInRange("beamWeaponRange", 48, 4, 256);
+        THOR_BEAM_WEAPON_MULTIPLIER = BUILDER.comment("What Mjolnir or Stormbreaker in hand multiplies the beam's damage by.",
+                        "(With one in hand the first hit on each creature also has the usual effects of lightning on it.)")
+                .defineInRange("beamWeaponMultiplier", 2.0, 1.0, 20.0);
+        THOR_BEAM_THUNDER_MULTIPLIER = BUILDER.comment("What the God of Thunder multiplies the beam's damage by. Every hit also arcs to the",
+                        "next two creatures nearby.")
+                .defineInRange("godOfThunderBeamMultiplier", 1.5, 1.0, 20.0);
+        THOR_BEAM_EXHAUSTION = BUILDER.comment("Food exhaustion per tick while the lightning beam is fired (4.0 = 1 food point).")
+                .defineInRange("beamExhaustion", 0.03, 0.0, 4.0);
         GOD_OF_THUNDER_EXHAUSTION = BUILDER.comment("Food exhaustion per tick while the God of Thunder is unleashed (4.0 = 1 food point).")
                 .defineInRange("godOfThunderExhaustion", 0.04, 0.0, 4.0);
         BIFROST_COOLDOWN = BUILDER.comment("Cooldown of the Bifrost (Thor's, or anyone's who wields Stormbreaker or Mjolnir), in ticks.")
                 .defineInRange("bifrostCooldown", 1200, 0, 72000);
+        MJOLNIR_SHATTER_COOLDOWN = BUILDER.comment("Cooldown of shattering Mjolnir (Sneak + R), in ticks, from the moment it shatters.")
+                .defineInRange("shatterCooldown", 300, 0, 72000);
+        MJOLNIR_SHATTER_DAMAGE = BUILDER.comment("Damage of each fragment of a shattered Mjolnir to the enemy it strikes.")
+                .defineInRange("shatterDamage", 6.0, 0.0, 100.0);
+        MJOLNIR_PIN_DURATION = BUILDER.comment("How long (ticks) Mjolnir pins someone down before it lets go by itself (1200 = a minute).")
+                .defineInRange("pinDuration", 1200, 20, 72000);
         BUILDER.pop();
     }
 

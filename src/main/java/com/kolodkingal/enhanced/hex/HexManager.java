@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.hex;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -248,6 +249,13 @@ public final class HexManager {
     public static boolean onTeleport(ServerLevel level, Entity entity, Vec3 target) {
         if (!(entity instanceof LivingEntity living)) {
             return true;
+        }
+        // Whoever Mjolnir pins down teleports nowhere (this is where the mod's own teleports and Ender Pearls are judged).
+        if (MjolnirPin.isPinned(living)) {
+            if (living instanceof Player player) {
+                player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
+            }
+            return false;
         }
         Vec3 from = living.level() == level ? bodyCenter(living) : null;
         Vec3 to = target.add(0, living.getBbHeight() * 0.5, 0);

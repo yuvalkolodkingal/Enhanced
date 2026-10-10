@@ -3,13 +3,18 @@ package com.kolodkingal.enhanced.gametest;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
+import com.kolodkingal.enhanced.ability.MjolnirPin;
+import com.kolodkingal.enhanced.ability.MjolnirShatter;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
+import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
@@ -19,8 +24,10 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModTags;
 import io.netty.buffer.Unpooled;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
@@ -33,12 +40,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -51,6 +63,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -130,7 +144,7 @@ public final class ThorTests {
         lying.playerTouch(player);
     }
 
-    private static List<ItemEntity> mjolnirsOnTheGround(ServerPlayer near) {
+    private static List<ItemEntity> mjolnirsOnTheGround(Entity near) {
         return near.level().getEntitiesOfClass(ItemEntity.class, near.getBoundingBox().inflate(2), e -> e.getItem().is(ModItems.MJOLNIR.get()));
     }
 
@@ -244,24 +258,6 @@ public final class ThorTests {
             }
             return false;
         });
-    }
-
-    @GameTest(template = ARENA)
-    public static void lightningStrikesWhatThorLooksAt(GameTestHelper helper) {
-        TestKit.Fixture f = TestKit.fixture(helper);
-        ServerPlayer thor = thor(f, 3.5, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(14.5, FLOOR, 12.0));
-        lookAt(thor, zombie);
-        float before = zombie.getHealth();
-        float thorBefore = thor.getHealth();
-        press(thor, 3);
-        check(zombie.getHealth() < before, "the zombie is struck");
-        check(creeper.isPowered(), "a creeper next to the strike is charged, as by any lightning");
-        check(Powers.get(thor).is(Live.CALLING_LIGHTNING), "Thor raises Mjolnir to the sky");
-        check(thor.getHealth() == thorBefore, "Thor isn't hurt");
-        check(!thor.hurt(thor.damageSources().lightningBolt(), 10.0F), "lightning can't hurt Thor");
-        helper.succeed();
     }
 
     @GameTest(template = ARENA)
@@ -454,6 +450,557 @@ public final class ThorTests {
         check(holdsMjolnir(thor), "and so does Quicksilver's Pickpocket");
         check(TommyAbilities.BLITZ_RADIUS > 3, "sanity");
         helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // The lightning beam (V, held)
+
+    private static void hold(ServerPlayer player, int ability) {
+        AbilityHandler.onKey(player, ability, true);
+    }
+
+    private static void letGo(ServerPlayer player, int ability) {
+        AbilityHandler.onKey(player, ability, false);
+    }
+
+    /** A zombie (a Husk, which does not burn in the sun) that takes damage as written: no armour to soften it. */
+    private static Zombie bareZombie(GameTestHelper helper, double x, double z) {
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
+        return zombie;
+    }
+
+    /** One hit of the beam on {@code target}: V held for a single tick, then let go. Returns the damage it did. */
+    private static float oneHit(ServerPlayer thor, Zombie target) {
+        target.setHealth(target.getMaxHealth());
+        hold(thor, 3);
+        PowerTicker.tick(thor);
+        letGo(thor, 3);
+        return target.getMaxHealth() - target.getHealth();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 100)
+    public static void theBeamHitsTheFirstCreatureInLineButNotOneBehindAWall(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        // Bare-handed, with a zombie in line and another right behind it.
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        Zombie first = bareZombie(helper, 8.5, 10.5);
+        Zombie behind = bareZombie(helper, 12.5, 10.5);
+        lookAt(thor, first);
+        // Another Thor on the other side of the arena, with a wall between him and his zombie.
+        ServerPlayer walled = f.player(3.5, FLOOR, 4.5, Power.THOR);
+        Zombie hidden = bareZombie(helper, 12.5, 4.5);
+        for (int y = 2; y <= 5; y++) {
+            helper.setBlock(new BlockPos(8, y, 4), Blocks.STONE);
+        }
+        lookAt(walled, hidden);
+        hold(thor, 3);
+        hold(walled, 3);
+        PowerData data = Powers.get(thor);
+        check(data.is(Live.CALLING_LIGHTNING), "the beam is on while V is held");
+        float thorBefore = thor.getHealth();
+        f.everyTick(12, tick -> {
+            PowerTicker.tick(thor);
+            PowerTicker.tick(walled);
+            if (tick < 12) {
+                return false;
+            }
+            // Hits at ticks 1, 6 and 11: three hits of 2.
+            assertNear(first.getMaxHealth() - first.getHealth(), 6.0, 1.0E-4, "the first zombie took three hits of 2");
+            check(behind.getHealth() == behind.getMaxHealth(), "the zombie behind it is not touched");
+            check(hidden.getHealth() == hidden.getMaxHealth(), "nor is the one behind the wall");
+            check(thor.getHealth() == thorBefore, "Thor isn't hurt");
+            check(!thor.hurt(thor.damageSources().lightningBolt(), 10.0F), "lightning can't hurt Thor");
+            check(!thor.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.LIGHTNING_BEAM, walled, walled), 10.0F),
+                    "nor another Thor's beam");
+            letGo(thor, 3);
+            check(!data.is(Live.CALLING_LIGHTNING), "the beam is off when V is let go");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void theWeaponMakesTheBeamReachFartherAndHitHarder(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        check(EnhancedConfig.THOR_BEAM_RANGE.getDefault() == 24 && EnhancedConfig.THOR_BEAM_WEAPON_RANGE.getDefault() == 48,
+                "24 blocks bare-handed, 48 with the weapon");
+        check(EnhancedConfig.THOR_BEAM_DAMAGE.getDefault() == 2.0 && EnhancedConfig.THOR_BEAM_INTERVAL.getDefault() == 5,
+                "2 damage every 5 ticks");
+        f.config(EnhancedConfig.THOR_BEAM_RANGE, 6);
+        f.config(EnhancedConfig.THOR_BEAM_WEAPON_RANGE, 14);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        Zombie near = bareZombie(helper, 7.5, 10.5);
+        lookAt(thor, near);
+        assertNear(oneHit(thor, near), 2.0, 1.0E-4, "bare-handed: 2 damage a hit");
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        assertNear(oneHit(thor, near), 4.0, 1.0E-4, "with Stormbreaker in hand: twice that");
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        assertNear(oneHit(thor, near), 4.0, 1.0E-4, "and with Mjolnir");
+
+        // The God of Thunder on top: 1.5 times.
+        press(thor, 4);
+        check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
+        assertNear(oneHit(thor, near), 6.0, 1.0E-4, "the God of Thunder with the weapon: 6");
+        thor.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        assertNear(oneHit(thor, near), 3.0, 1.0E-4, "and bare-handed: 3");
+        press(thor, 4);
+
+        // Reach: a zombie 10 blocks off is out of reach bare-handed, but not with the weapon.
+        Zombie far = bareZombie(helper, 13.5, 10.5);
+        check(oneHit(thor, near) > 0.0F, "sanity: the near zombie is the first in line");
+        near.discard();
+        lookAt(thor, far);
+        assertNear(ThorAbilities.beamRange(false), 6.0, 1.0E-9, "bare-handed range (config)");
+        assertNear(ThorAbilities.beamRange(true), 14.0, 1.0E-9, "weapon range (config)");
+        check(oneHit(thor, far) == 0.0F, "10 blocks away is out of reach bare-handed");
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        check(oneHit(thor, far) > 0.0F, "but not with Mjolnir in hand");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void theWeaponsBeamChargesCreepersTheFirstTimeItHitsThem(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.5, FLOOR, 10.5));
+        lookAt(thor, creeper);
+        hold(thor, 3);
+        PowerTicker.tick(thor);
+        letGo(thor, 3);
+        check(creeper.getHealth() < creeper.getMaxHealth(), "the beam hurts the creeper");
+        check(!creeper.isPowered(), "but bare-handed it doesn't charge it");
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        hold(thor, 3);
+        PowerTicker.tick(thor);
+        check(creeper.isPowered(), "through Mjolnir it does, as any lightning would");
+        check(creeper.getRemainingFireTicks() <= 0, "without setting it alight");
+        letGo(thor, 3);
+        // And a pig turns into a zombified piglin (unless the world is peaceful).
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 13.5));
+        creeper.discard();
+        lookAt(thor, pig);
+        hold(thor, 3);
+        PowerTicker.tick(thor);
+        letGo(thor, 3);
+        if (helper.getLevel().getDifficulty() != Difficulty.PEACEFUL) {
+            check(pig.isRemoved() && !helper.getLevel().getEntitiesOfClass(ZombifiedPiglin.class, thor.getBoundingBox().inflate(16)).isEmpty(),
+                    "the pig is a zombified piglin now");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void theGodOfThunderBeamArcsToTheNextTwoCreatures(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 3.5, 10.5);
+        Zombie first = bareZombie(helper, 8.5, 10.5);
+        Zombie second = bareZombie(helper, 8.5, 13.5);
+        Zombie third = bareZombie(helper, 8.5, 16.5);
+        lookAt(thor, first);
+        oneHit(thor, first);
+        check(second.getHealth() == second.getMaxHealth() && third.getHealth() == third.getMaxHealth(), "without the God of Thunder nothing arcs");
+        press(thor, 4);
+        float firstBefore = first.getHealth();
+        hold(thor, 3);
+        PowerTicker.tick(thor);
+        letGo(thor, 3);
+        check(first.getHealth() < firstBefore, "the beam hurts the first zombie");
+        check(second.getHealth() < second.getMaxHealth(), "the lightning arcs to the next");
+        check(third.getHealth() < third.getMaxHealth(), "and on to the one after");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void theBeamBurnsHungerAndStopsWhenThorStarvesOrIsASpectator(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 3.5, 10.5);
+        PowerData data = Powers.get(thor);
+        float exhaustion = thor.getFoodData().getExhaustionLevel();
+        hold(thor, 3);
+        PowerTicker.tick(thor);
+        check(thor.getFoodData().getExhaustionLevel() > exhaustion, "firing the beam burns hunger");
+        thor.getFoodData().setFoodLevel(0);
+        PowerTicker.tick(thor);
+        check(!data.is(Live.CALLING_LIGHTNING), "with an empty hunger bar the beam dies");
+        hold(thor, 3);
+        check(!data.is(Live.CALLING_LIGHTNING), "and can't be started");
+        thor.getFoodData().setFoodLevel(20);
+        hold(thor, 3);
+        check(data.is(Live.CALLING_LIGHTNING), "fed again, it can");
+        thor.setGameMode(GameType.SPECTATOR);
+        PowerTicker.tick(thor);
+        check(!data.is(Live.CALLING_LIGHTNING), "a spectator fires nothing");
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Mjolnir shatters
+
+    /** The fragments in the air in this test's arena (the tests of a batch run side by side in the same world). */
+    private static List<MjolnirFragmentEntity> fragments(GameTestHelper helper) {
+        return helper.getLevel().getEntitiesOfClass(MjolnirFragmentEntity.class, helper.getBounds());
+    }
+
+    private static void sneakPress(ServerPlayer player, int ability) {
+        player.setShiftKeyDown(true);
+        press(player, ability);
+        player.setShiftKeyDown(false);
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void mjolnirShattersStrikesEveryZombieAndReassemblesInThorsHand(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 10.5, 10.5);
+        PowerTicker.tick(thor);
+        check(ownedBy(thor.getMainHandItem(), thor), "sanity: Mjolnir is Thor's");
+        List<Zombie> zombies = List.of(bareZombie(helper, 5.5, 10.5), bareZombie(helper, 15.5, 8.5), bareZombie(helper, 10.5, 16.5));
+        // A friendly creature isn't an enemy.
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 12.5));
+        sneakPress(thor, 1);
+        PowerData data = Powers.get(thor);
+        check(!holdsMjolnir(thor), "Mjolnir leaves his hand");
+        check(fragments(helper).size() == 3, "one fragment for each of the three zombies, and none for the pig: " + fragments(helper).size());
+        PowerTicker.tick(thor);
+        check(data.hammerEntityId() != -1 && thor.mayFly(), "it counts as a weapon in flight: he keeps his wings");
+        ItemStack stored = thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).orElse(ItemStack.EMPTY);
+        check(ownedBy(stored, thor), "the hammer is kept in his data, owner and all");
+        f.everyTick(120, tick -> {
+            PowerTicker.tick(thor);
+            if (!holdsMjolnir(thor)) {
+                return false;
+            }
+            for (Zombie zombie : zombies) {
+                check(zombie.getMaxHealth() - zombie.getHealth() >= 5.0F, "every zombie was struck by its fragment");
+            }
+            check(pig.getHealth() == pig.getMaxHealth(), "the pig was left alone");
+            check(ownedBy(thor.getMainHandItem(), thor), "Mjolnir is back in his hand, and still his");
+            check(fragments(helper).isEmpty() && data.hammerEntityId() == -1, "no fragment is left");
+            check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "nothing is kept in his data any more");
+            // The cooldown: not again for a while.
+            sneakPress(thor, 1);
+            check(holdsMjolnir(thor) && fragments(helper).isEmpty(), "it needs to gather itself before it can shatter again");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void withNobodyAroundTheFragmentsBurstOutInARingAndComeBack(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 10.5, 10.5);
+        PowerTicker.tick(thor);
+        sneakPress(thor, 1);
+        check(!holdsMjolnir(thor) && fragments(helper).size() == MjolnirShatter.RING_FRAGMENTS, "a ring of fragments bursts out");
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(thor);
+            if (!holdsMjolnir(thor)) {
+                return false;
+            }
+            check(ownedBy(thor.getMainHandItem(), thor), "Mjolnir is whole again, in his hand");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void aFullHandSendsTheReassembledMjolnirToTheInventory(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 10.5, 10.5);
+        PowerTicker.tick(thor);
+        sneakPress(thor, 1);
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_SWORD));
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(thor);
+            ItemStack carried = carriedMjolnir(thor);
+            if (carried.isEmpty()) {
+                return false;
+            }
+            check(thor.getMainHandItem().is(Items.DIAMOND_SWORD), "his hand was busy, and keeps what it holds");
+            check(ownedBy(carried, thor), "Mjolnir comes to his inventory instead, still his");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void stormbreakerDoesNotShatter(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        bareZombie(helper, 5.5, 10.5);
+        sneakPress(thor, 1);
+        check(fragments(helper).isEmpty(), "Stormbreaker doesn't burst into fragments");
+        check(helper.getLevel().getEntity(Powers.get(thor).hammerEntityId()) instanceof ThrownWeaponEntity, "Sneak + R throws it, as R does");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 100)
+    public static void aShatteredMjolnirFallsWhereThorDiesOrLogsOut(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer thor = thor(f, 6.5, 6.5);
+        PowerTicker.tick(thor);
+        sneakPress(thor, 1);
+        check(fragments(helper).size() == MjolnirShatter.RING_FRAGMENTS, "shattered");
+        // He logs out (the same call the logout event makes).
+        MjolnirShatter.onGone(thor);
+        check(fragments(helper).isEmpty(), "the fragments are gone");
+        List<ItemEntity> fallen = mjolnirsOnTheGround(thor);
+        check(fallen.size() == 1 && ownedBy(fallen.get(0).getItem(), thor), "Mjolnir lies where he stood, still his");
+        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "nothing is kept in his data");
+        fallen.get(0).discard();
+
+        // And he dies.
+        ServerPlayer other = thor(f, 15.5, 15.5);
+        PowerTicker.tick(other);
+        sneakPress(other, 1);
+        check(fragments(helper).size() == MjolnirShatter.RING_FRAGMENTS, "the other Thor's shattered");
+        other.hurt(level.damageSources().genericKill(), 1000.0F);
+        check(!other.isAlive(), "he is dead");
+        check(fragments(helper).isEmpty(), "the fragments are gone");
+        check(mjolnirsOnTheGround(other).stream().anyMatch(e -> ownedBy(e.getItem(), other)), "Mjolnir lies where he fell, still his");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void aShatteredMjolnirKeptInHisDataComesBackIfTheWorldWasClosedMeanwhile(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 10.5, 10.5);
+        PowerTicker.tick(thor);
+        sneakPress(thor, 1);
+        // The world is closed (nothing remembers the fragments), and opened again.
+        fragments(helper).forEach(Entity::discard);
+        MjolnirShatter.clear();
+        PowerTicker.tick(thor);
+        check(holdsMjolnir(thor) && ownedBy(thor.getMainHandItem(), thor), "it is in his hand again, and his");
+        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "and no longer kept in pieces");
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Mjolnir pins someone down
+
+    /** Right click on {@code target} with the player's Sneak state as given; returns whether the click was taken. */
+    private static boolean rightClick(ServerPlayer player, Entity target, boolean sneaking) {
+        player.setShiftKeyDown(sneaking);
+        PlayerInteractEvent.EntityInteract click = new PlayerInteractEvent.EntityInteract(player, InteractionHand.MAIN_HAND, target);
+        NeoForge.EVENT_BUS.post(click);
+        player.setShiftKeyDown(false);
+        return click.isCanceled();
+    }
+
+    /** The hammers lying on this entity. */
+    private static List<MjolnirPinEntity> pinsNear(Entity target) {
+        return target.level().getEntitiesOfClass(MjolnirPinEntity.class, target.getBoundingBox().inflate(1.5));
+    }
+
+    /** The Y and X/Z drift of an entity from where it was. */
+    private static double drift(Entity entity, Vec3 from) {
+        return entity.position().distanceTo(from);
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void mjolnirPinsAZombieInPlaceAndOnlyItsOwnerLiftsIt(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        ServerPlayer hero = f.player(8.5, FLOOR, 12.5);
+        makeWorthy(hero);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        check(!rightClick(thor, zombie, false) && pinsNear(zombie).isEmpty(), "a plain right click doesn't pin");
+        check(holdsMjolnir(thor), "and Mjolnir stays in his hand");
+        check(rightClick(thor, zombie, true), "Sneak + right click is taken");
+        check(!holdsMjolnir(thor), "Mjolnir is set down on the zombie");
+        List<MjolnirPinEntity> pins = pinsNear(zombie);
+        check(pins.size() == 1 && ownedBy(pins.get(0).hammer(), thor), "it lies on it, still Thor's");
+        Vec3 pinned = zombie.position();
+        // It tries to bolt, and jump.
+        zombie.setDeltaMovement(0.8, 0.6, 0.4);
+        zombie.hurtMarked = true;
+        f.everyTick(60, t -> {
+            PowerTicker.tick(thor);
+            if (t == 1 || t == 2) {
+                zombie.setDeltaMovement(0.8, 0.6, 0.4);
+            }
+            if (t <= 30) {
+                check(drift(zombie, pinned) < 0.01, "the pinned zombie hasn't moved at tick " + t + ": " + drift(zombie, pinned));
+            }
+            if (t == 20) {
+                // Another worthy player can't lift it: it will not budge.
+                check(rightClick(hero, zombie, false), "the click is taken, but ...");
+                check(pinsNear(zombie).size() == 1 && hero.getMainHandItem().isEmpty() && carriedMjolnir(hero).isEmpty(),
+                        "another worthy player can't lift Mjolnir off it");
+            }
+            if (t == 30) {
+                check(rightClick(thor, zombie, false), "its owner lifts it");
+                check(pinsNear(zombie).isEmpty(), "the pin is gone");
+                check(holdsMjolnir(thor) && ownedBy(thor.getMainHandItem(), thor), "Mjolnir is back in his hand, and his");
+                zombie.setDeltaMovement(0.8, 0.0, 0.0);
+            }
+            if (t == 40) {
+                check(zombie.getX() > pinned.x + 0.5, "the zombie is free to move again");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void mjolnirLetsGoByItselfAfterItsTime(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        check(EnhancedConfig.MJOLNIR_PIN_DURATION.getDefault() == 1200, "a minute by default");
+        f.config(EnhancedConfig.MJOLNIR_PIN_DURATION, 40);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "pinned");
+        Vec3 pinned = zombie.position();
+        f.everyTick(60, t -> {
+            PowerTicker.tick(thor);
+            zombie.setDeltaMovement(0.5, 0.0, 0.0);
+            if (!pinsNear(zombie).isEmpty()) {
+                check(t < 45 && drift(zombie, pinned) < 0.01, "held until its time is up");
+                return false;
+            }
+            check(t >= 39, "it held for its time: " + t);
+            check(mjolnirsOnTheGround(zombie).stream().anyMatch(e -> ownedBy(e.getItem(), thor)), "Mjolnir falls beside it, still Thor's");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 100)
+    public static void mjolnirLetsGoWhenItsOwnerDiesOrTheZombieDies(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 6.5);
+        PowerTicker.tick(thor);
+        Zombie one = bareZombie(helper, 8.5, 6.5);
+        check(rightClick(thor, one, true) && pinsNear(one).size() == 1, "pinned");
+        // The pinned zombie dies: the hammer falls, its owner kept.
+        one.kill();
+        ServerPlayer second = thor(f, 6.5, 14.5);
+        PowerTicker.tick(second);
+        Zombie two = bareZombie(helper, 8.5, 14.5);
+        check(rightClick(second, two, true) && pinsNear(two).size() == 1, "the second is pinned");
+        // Its owner dies: the zombie is free.
+        second.hurt(helper.getLevel().damageSources().genericKill(), 1000.0F);
+        check(!second.isAlive(), "the second Thor is dead");
+        check(pinsNear(two).isEmpty() && !MjolnirPin.isPinned(two), "the zombie is free");
+        check(mjolnirsOnTheGround(two).stream().anyMatch(e -> ownedBy(e.getItem(), second)), "Mjolnir lies beside it, still his");
+        f.everyTick(10, t -> {
+            if (!pinsNear(one).isEmpty()) {
+                return false;
+            }
+            check(mjolnirsOnTheGround(one).stream().anyMatch(e -> ownedBy(e.getItem(), thor)), "the dead zombie's Mjolnir fell, still Thor's");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void mjolnirLetsGoWhenItsOwnerLogsOut(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        check(rightClick(thor, zombie, true) && MjolnirPin.isPinned(zombie), "pinned");
+        // The same call the logout event makes.
+        MjolnirPin.onOwnerGone(thor);
+        check(pinsNear(zombie).isEmpty() && !MjolnirPin.isPinned(zombie), "the zombie is free");
+        check(mjolnirsOnTheGround(zombie).stream().anyMatch(e -> ownedBy(e.getItem(), thor)), "Mjolnir lies beside it, still Thor's");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void thorCallsMjolnirOffSomeoneItPins(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 3.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 12.5, 10.5);
+        check(rightClick(thor, zombie, true) && !holdsMjolnir(thor), "pinned, and Mjolnir is out of his hand");
+        press(thor, 1);
+        check(pinsNear(zombie).isEmpty() && !MjolnirPin.isPinned(zombie), "R calls Mjolnir off the zombie, which is free");
+        f.everyTick(150, t -> {
+            PowerTicker.tick(thor);
+            if (!holdsMjolnir(thor)) {
+                return false;
+            }
+            check(ownedBy(thor.getMainHandItem(), thor), "Mjolnir flies home to his hand");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void theBossesCantBePinned(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        check(EntityType.ENDER_DRAGON.is(ModTags.PIN_IMMUNE) && EntityType.WITHER.is(ModTags.PIN_IMMUNE)
+                && EntityType.WARDEN.is(ModTags.PIN_IMMUNE), "the Ender Dragon, the Wither and the Warden are immune");
+        check(!EntityType.ZOMBIE.is(ModTags.PIN_IMMUNE), "a zombie is not");
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(8.5, FLOOR, 10.5));
+        check(rightClick(thor, warden, true), "the click is taken (Mjolnir doesn't open the Bifrost), but ...");
+        check(pinsNear(warden).isEmpty() && !MjolnirPin.isPinned(warden), "the Warden isn't pinned");
+        check(holdsMjolnir(thor), "and Mjolnir stays in his hand");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 100)
+    public static void aPlayerCantBePinnedWithPvpOffButIsHeldWithItOn(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        ServerPlayer victim = f.player(8.5, FLOOR, 10.5, Power.MAGNETO);
+        f.pvp(false);
+        check(rightClick(thor, victim, true), "the click is taken");
+        check(pinsNear(victim).isEmpty() && holdsMjolnir(thor) && !MjolnirPin.isPinned(victim), "with PvP off a player can't be pinned");
+        f.pvp(true);
+        check(rightClick(thor, victim, true) && pinsNear(victim).size() == 1, "with PvP on they can");
+        PowerTicker.tick(victim);
+        check(Powers.get(victim).is(Live.PINNED), "their client is told to hold still");
+        Vec3 pinned = victim.position();
+        // They try to walk off, to fly and to teleport.
+        victim.setPos(pinned.x + 3.0, pinned.y, pinned.z);
+        PowerTicker.tick(victim);
+        check(drift(victim, pinned) < 0.01, "they are put back where they were pinned: " + drift(victim, pinned));
+        victim.setPos(pinned.x, pinned.y + 2.0, pinned.z);
+        PowerTicker.tick(victim);
+        check(drift(victim, pinned) < 0.01, "and brought down if they jump or fly");
+        victim.getAbilities().flying = true;
+        PowerTicker.tick(victim);
+        check(!victim.getAbilities().flying, "they can't fly");
+        check(!HexManager.onTeleport(helper.getLevel(), victim, pinned.add(5, 0, 0)), "nor teleport (Ender Pearls, the Bifrost, Vanish...)");
+        AbilityHandler.onKey(victim, 5, true);
+        check(victim.getAbilities().flying == false, "(Magneto's flight key does nothing)");
+        // They can still look around: being put back doesn't turn them.
+        victim.setYRot(victim.getYRot() + 90.0F);
+        float looking = victim.getYRot();
+        victim.setPos(pinned.x + 2.0, pinned.y, pinned.z);
+        PowerTicker.tick(victim);
+        check(victim.getYRot() == looking && drift(victim, pinned) < 0.01, "they can look around, and are still held");
+        // A pinned creature isn't knocked about either.
+        victim.knockback(2.0, 1.0, 0.0);
+        check(victim.getDeltaMovement().x == 0.0, "nor knocked back");
+        check(rightClick(thor, victim, false), "its owner lifts Mjolnir off them");
+        PowerTicker.tick(victim);
+        check(!Powers.get(victim).is(Live.PINNED) && pinsNear(victim).isEmpty(), "and they are free");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 60)
+    public static void aPinnedCreatureCantRideTeleportOrTravel(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        Pig steed = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 12.5));
+        check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "pinned");
+        check(!zombie.startRiding(steed), "it can't climb onto a steed");
+        Vec3 pinned = zombie.position();
+        zombie.setPos(zombie.getX() + 1.0, zombie.getY(), zombie.getZ());
+        f.everyTick(4, t -> {
+            if (t < 4) {
+                return false;
+            }
+            check(MjolnirPin.isPinned(zombie) && drift(zombie, pinned) < 0.01, "still pinned, and put back where it was");
+            check(!HexManager.onTeleport(helper.getLevel(), zombie, zombie.position().add(4, 0, 0)), "it can't be teleported");
+            return true;
+        });
     }
 
     // ------------------------------------------------------------------------------------------------------------

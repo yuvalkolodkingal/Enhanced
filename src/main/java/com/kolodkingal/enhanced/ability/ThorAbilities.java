@@ -5,6 +5,8 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
+import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
+import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
@@ -20,12 +22,15 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -61,13 +66,16 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Thor, the God of Thunder. His power is his own, but his weapon focuses it, Mjolnir or Stormbreaker: he throws it and
- * calls it back, flies by spinning it, and calls lightning down through it. Whoever claims Mjolnir first (the first
- * worthy hand to lift it), if they have no other power, becomes Thor; after that only its owner can lift it.
+ * calls it back, flies by spinning it, and fires lightning from his hand, twice as strong through the weapon. Mjolnir
+ * can also shatter into fragments that strike his enemies ({@link MjolnirShatter}) and be set down on someone to pin them
+ * in place ({@link MjolnirPin}). Whoever claims Mjolnir first (the first worthy hand to lift it), if they have no other
+ * power, becomes Thor; after that only its owner can lift it.
  * <p>
  * Either weapon also calls the Bifrost, for Thor or anyone else who holds it: home, to where they look, or to a place
  * they saved, in any dimension (the places and the cooldown live in {@link BifrostData}).
@@ -80,9 +88,6 @@ public final class ThorAbilities {
     private static final ResourceLocation THUNDER_TOUGHNESS = Enhanced.id("thor_god_of_thunder_toughness");
 
     public static final int THROW_COOLDOWN = 10;
-    public static final int LIGHTNING_COOLDOWN = 30;
-    /** Creatures this close to a strike are hit too (at reduced damage). */
-    public static final double STRIKE_RADIUS = 3.0;
     public static final float ARC_DAMAGE = 4.0F;
     public static final double ARC_RANGE = 6.0;
     public static final int ARC_JUMPS = 2;
@@ -92,10 +97,23 @@ public final class ThorAbilities {
     /** If a saved place has been built over, the Bifrost sets its traveller down on the first free spot up to this high. */
     private static final int ARRIVAL_SEARCH = 24;
 
+    /**
+     * What Thor's lightning beam can hit: creatures (other Thors excepted: lightning never hurts them), the parts of the
+     * Ender Dragon and End Crystals. Shared by the server (who is hit) and the client (where the beam is drawn to).
+     */
+    public static final Predicate<Entity> BEAM_TARGET = e -> e.isPickable() && !e.isSpectator() && e.isAlive()
+            && (e instanceof LivingEntity || e instanceof PartEntity<?> || e instanceof EndCrystal) && !isThor(e);
+
     /** Traveller → the Bifrost that is about to take them. */
     private static final Map<UUID, Journey> JOURNEYS = new HashMap<>();
-    /** Thor → game time until which he holds his weapon up to the sky (pose). */
-    private static final Map<UUID, Long> CALLING = new HashMap<>();
+    /** Thor → his lightning beam while V is held. */
+    private static final Map<UUID, Beam> BEAMS = new HashMap<>();
+
+    /** A beam being fired: when it may hit next, and the creatures it has hit already (they get lightning's effects once). */
+    private static final class Beam {
+        long nextHit;
+        final IntSet struck = new IntOpenHashSet();
+    }
 
     /** Where the Bifrost is taking someone, and the game time it takes them. */
     private record Journey(ResourceKey<Level> dimension, Vec3 to, float yaw, long arrivesAt) {
@@ -104,11 +122,24 @@ public final class ThorAbilities {
     // ---- input ----
 
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        // The lightning beam is held: letting go must always get through, even for a Thor who just became a spectator.
+        if (ability == 3) {
+            lightningBeam(player, data, down);
+            return;
+        }
         if (!down || player.isSpectator()) {
             return;
         }
         switch (ability) {
-            case 1 -> throwOrRecall(player, data);
+            case 1 -> {
+                InteractionHand hand = weaponHand(player);
+                if (player.isShiftKeyDown() && hand != null && isMjolnir(player.getItemInHand(hand))) {
+                    // Sneak + R: Mjolnir shatters (Stormbreaker doesn't: it is thrown as usual).
+                    MjolnirShatter.shatter(player, data, hand);
+                } else {
+                    throwOrRecall(player, data);
+                }
+            }
             case 2 -> {
                 if (!player.mayFly()) {
                     player.displayClientMessage(Component.translatable("message.enhanced.thor.flight_needs_weapon"), true);
@@ -116,10 +147,9 @@ public final class ThorAbilities {
                     PowerTicker.toggleFlight(player);
                 }
             }
-            case 3 -> callLightning(player, data);
             case 4 -> {
                 boolean on = !data.toggle(Toggle.GOD_OF_THUNDER);
-                if (on && !player.getAbilities().invulnerable && player.getFoodData().getFoodLevel() <= 0) {
+                if (on && starving(player)) {
                     player.displayClientMessage(Component.translatable("message.enhanced.thor.too_hungry"), true);
                     return;
                 }
@@ -179,6 +209,8 @@ public final class ThorAbilities {
      */
     public static void everyPlayerTick(ServerPlayer player, PowerData data) {
         bifrostTick(player, data);
+        MjolnirShatter.tick(player);
+        MjolnirPin.tickPlayer(player);
         if (player.isSpectator()) {
             return;
         }
@@ -255,10 +287,15 @@ public final class ThorAbilities {
 
     /** Mjolnir drops straight down at the player's feet. */
     private static void fall(ServerPlayer player, ItemStack stack) {
-        ItemEntity item = new ItemEntity(player.level(), player.getX(), player.getY() + 0.3, player.getZ(), stack.copy());
+        dropAt(player.serverLevel(), player.position(), stack.copy());
+    }
+
+    /** A hammer (or anything) drops straight down at a point; Mjolnir comes to rest as a block where it lands. */
+    public static void dropAt(ServerLevel level, Vec3 at, ItemStack stack) {
+        ItemEntity item = new ItemEntity(level, at.x, at.y + 0.3, at.z, stack);
         item.setDeltaMovement(0, -0.2, 0);
         item.setPickUpDelay(40);
-        player.level().addFreshEntity(item);
+        level.addFreshEntity(item);
     }
 
     /** The worthy lift Mjolnir: lightning answers, and a new God of Thunder stands there. */
@@ -276,25 +313,27 @@ public final class ThorAbilities {
     // ---- passives ----
 
     public static void tick(ServerPlayer player, PowerData data) {
-        // The weapon in flight may have been caught, dropped or unloaded.
-        if (data.hammerEntityId() != -1 && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity)) {
+        // The weapon in flight (or the fragments of the shattered one) may have been caught, dropped or unloaded.
+        if (data.hammerEntityId() != -1 && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity)
+                && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof MjolnirFragmentEntity)) {
             data.setHammerEntityId(-1);
         }
         if (data.toggle(Toggle.GOD_OF_THUNDER)) {
-            boolean starving = !player.getAbilities().invulnerable && player.getFoodData().getFoodLevel() <= 0;
-            if (starving) {
+            if (starving(player)) {
                 data.setToggle(Toggle.GOD_OF_THUNDER, false);
                 player.displayClientMessage(Component.translatable("message.enhanced.god_of_thunder.off"), true);
             } else {
                 player.causeFoodExhaustion(EnhancedConfig.GOD_OF_THUNDER_EXHAUSTION.get().floatValue());
             }
         }
-        Long calling = CALLING.get(player.getUUID());
-        boolean isCalling = calling != null && player.level().getGameTime() < calling;
-        if (calling != null && !isCalling) {
-            CALLING.remove(player.getUUID());
+        if (data.is(Live.CALLING_LIGHTNING)) {
+            beamTick(player, data);
         }
-        data.set(Live.CALLING_LIGHTNING, isCalling);
+    }
+
+    /** With an empty hunger bar there is nothing left to fuel the thunder (not in Creative). */
+    private static boolean starving(Player player) {
+        return !player.getAbilities().invulnerable && player.getFoodData().getFoodLevel() <= 0;
     }
 
     /** Thor flies by spinning his weapon: only while he holds it (or it is on its way back to him). */
@@ -370,6 +409,10 @@ public final class ThorAbilities {
             flying.setReturning(true);
             return true;
         }
+        // In pieces: every fragment turns home at once.
+        if (MjolnirShatter.callBack(player)) {
+            return true;
+        }
         double range = EnhancedConfig.MJOLNIR_RECALL_RANGE.get();
         Vec3 eye = player.getEyePosition();
         AABB around = player.getBoundingBox().inflate(range);
@@ -384,20 +427,29 @@ public final class ThorAbilities {
                         e -> !(e instanceof Player) && e.isAlive() && callableHand(player, e) != null
                                 && e.distanceToSqr(player) <= range * range).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
+        // Lying on someone it pins down (never the one it pins: they cannot call it off themselves).
+        MjolnirPinEntity nearestPin = level.getEntitiesOfClass(MjolnirPinEntity.class, around,
+                        p -> !p.targetUuid().equals(player.getUUID()) && canCall(player, p.hammer()) && p.distanceToSqr(player) <= range * range).stream()
+                .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
         double toItem = nearestItem == null ? Double.MAX_VALUE : nearestItem.distanceToSqr(eye);
         double toBlock = nearestBlock == null ? Double.MAX_VALUE : nearestBlock.getCenter().distanceToSqr(eye);
+        double toPin = nearestPin == null ? Double.MAX_VALUE : nearestPin.distanceToSqr(eye);
         double toHolder = nearestHolder == null ? Double.MAX_VALUE : nearestHolder.distanceToSqr(eye);
+        double nearest = Math.min(Math.min(toItem, toBlock), Math.min(toPin, toHolder));
         Vec3 from;
         ItemStack weapon;
-        if (nearestItem != null && toItem <= toBlock && toItem <= toHolder) {
+        if (nearestItem != null && toItem == nearest) {
             from = nearestItem.position().add(0, 0.25, 0);
             weapon = nearestItem.getItem().split(1);
             if (nearestItem.getItem().isEmpty()) {
                 nearestItem.discard();
             }
-        } else if (nearestBlock != null && toBlock <= toHolder) {
+        } else if (nearestBlock != null && toBlock == nearest) {
             from = nearestBlock.getCenter();
             weapon = MjolnirBlock.lift(level, nearestBlock);
+        } else if (nearestPin != null && toPin == nearest) {
+            from = nearestPin.position();
+            weapon = MjolnirPin.takeHammer(level, nearestPin);
         } else if (nearestHolder != null) {
             InteractionHand hand = callableHand(player, nearestHolder);
             from = nearestHolder.getEyePosition().subtract(0, 0.4, 0);
@@ -468,40 +520,117 @@ public final class ThorAbilities {
         return best;
     }
 
-    // ---- Ability 3: lightning ----
+    // ---- Ability 3: the lightning beam (hold) ----
 
-    private static void callLightning(ServerPlayer player, PowerData data) {
-        ServerLevel level = player.serverLevel();
-        long now = level.getGameTime();
-        if (!data.isReady(3, now)) {
+    /**
+     * V down: lightning pours from his hand, or from the weapon in it, to whatever he looks at, for as long as he holds
+     * it (see {@link #beamTick}); V up: it stops. {@link Live#CALLING_LIGHTNING} is what every client draws it from.
+     */
+    private static void lightningBeam(ServerPlayer player, PowerData data, boolean down) {
+        if (!down || player.isSpectator()) {
+            BEAMS.remove(player.getUUID());
+            data.set(Live.CALLING_LIGHTNING, false);
             return;
         }
-        int range = EnhancedConfig.THOR_LIGHTNING_RANGE.get();
-        HitResult hit = Raycasts.any(player, range, e -> (e instanceof LivingEntity || e instanceof EndCrystal) && e != player
-                && e.isAlive() && !e.isSpectator(), 1.0F);
-        Vec3 target;
-        if (hit instanceof EntityHitResult entityHit) {
-            target = entityHit.getEntity().position();
-        } else {
-            target = ground(level, hit.getLocation());
+        if (data.is(Live.CALLING_LIGHTNING)) {
+            return;
         }
-        data.startCooldown(3, now, LIGHTNING_COOLDOWN);
-        CALLING.put(player.getUUID(), now + 14);
+        if (starving(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.thor.too_hungry"), true);
+            return;
+        }
+        BEAMS.put(player.getUUID(), new Beam());
         data.set(Live.CALLING_LIGHTNING, true);
-        strike(level, player, target, true);
-        if (data.toggle(Toggle.GOD_OF_THUNDER)) {
-            // Unleashed, the storm answers twice more around the target.
-            for (int i = 0; i < 2; i++) {
-                double angle = level.random.nextDouble() * Math.PI * 2;
-                Vec3 around = target.add(Math.cos(angle) * 3.5, 0, Math.sin(angle) * 3.5);
-                strike(level, player, ground(level, around.add(0, 3, 0)), false);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 0.8F, 1.3F);
+    }
+
+    /**
+     * While the beam is fired: every few ticks (config) it hits the first creature in the line of sight, up to its range
+     * (24 blocks, 48 with Mjolnir or Stormbreaker in hand), for 2 damage (twice that with the weapon, and 1.5 times that
+     * again for the God of Thunder, whose every hit also arcs to the next creatures nearby). With the weapon in hand the
+     * first hit on each creature has the usual effects of lightning on it (creepers charge, pigs turn into zombified
+     * piglins). It burns a little hunger; where it ends, sparks fly, but nothing burns.
+     */
+    private static void beamTick(ServerPlayer thor, PowerData data) {
+        if (thor.isSpectator() || starving(thor)) {
+            BEAMS.remove(thor.getUUID());
+            data.set(Live.CALLING_LIGHTNING, false);
+            return;
+        }
+        ServerLevel level = thor.serverLevel();
+        Beam beam = BEAMS.computeIfAbsent(thor.getUUID(), id -> new Beam());
+        boolean weapon = holdsWeapon(thor);
+        boolean thunder = data.toggle(Toggle.GOD_OF_THUNDER);
+        thor.causeFoodExhaustion(EnhancedConfig.THOR_BEAM_EXHAUSTION.get().floatValue());
+        HitResult hit = Raycasts.any(thor, beamRange(weapon), BEAM_TARGET, 1.0F);
+        Vec3 end = hit.getLocation();
+        long now = level.getGameTime();
+        if (hit instanceof EntityHitResult entityHit && now >= beam.nextHit) {
+            beam.nextHit = now + EnhancedConfig.THOR_BEAM_INTERVAL.get();
+            beamHit(level, thor, beam, entityHit, weapon, thunder);
+        }
+        // Sparks and a crackle where it lands, on a block or a creature (not in the empty air).
+        if (hit.getType() != HitResult.Type.MISS) {
+            if (now % 2 == 0) {
+                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, end.x, end.y, end.z, 3, 0.12, 0.12, 0.12, 0.25);
+            }
+            if (now % 6 == 0) {
+                level.playSound(null, end.x, end.y, end.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.25F, 1.9F);
             }
         }
-        // Everyone nearby sees the lightning come down into his weapon and leap from it to the target.
-        if (holdsWeapon(player)) {
-            PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,
-                    new ThorFxPayload(ThorFxPayload.CHANNEL, player.getId(), List.of(target)));
+    }
+
+    private static void beamHit(ServerLevel level, ServerPlayer thor, Beam beam, EntityHitResult hit, boolean weapon, boolean thunder) {
+        Entity target = hit.getEntity();
+        LivingEntity living = target instanceof LivingEntity l ? l
+                : target instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity l ? l : null;
+        if (weapon && living != null && beam.struck.add(living.getId())) {
+            thunderStruck(level, thor, living);
         }
+        target.hurt(ModDamageTypes.source(level, ModDamageTypes.LIGHTNING_BEAM, thor, thor), beamDamage(weapon, thunder));
+        Vec3 at = hit.getLocation();
+        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.3);
+        if (thunder) {
+            arc(level, thor, at, living != null ? living : target, false);
+        }
+    }
+
+    /**
+     * Lightning's own effect on a creature (a creeper is charged, a pig turns into a zombified piglin, a villager into a
+     * witch...), without its damage or its fire.
+     */
+    private static void thunderStruck(ServerLevel level, ServerPlayer thor, LivingEntity target) {
+        LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
+        if (bolt == null) {
+            return;
+        }
+        bolt.moveTo(target.getX(), target.getY(), target.getZ());
+        bolt.setVisualOnly(true);
+        bolt.setCause(thor);
+        bolt.setDamage(0.0F);
+        int fire = target.getRemainingFireTicks();
+        target.thunderHit(level, bolt);
+        target.setRemainingFireTicks(fire);
+    }
+
+    /** Damage of one hit of the beam, for whether Thor holds Mjolnir or Stormbreaker and whether the God of Thunder is unleashed. */
+    public static float beamDamage(boolean weapon, boolean thunder) {
+        double damage = EnhancedConfig.THOR_BEAM_DAMAGE.get();
+        if (weapon) {
+            damage *= EnhancedConfig.THOR_BEAM_WEAPON_MULTIPLIER.get();
+        }
+        if (thunder) {
+            damage *= EnhancedConfig.THOR_BEAM_THUNDER_MULTIPLIER.get();
+        }
+        return (float) damage;
+    }
+
+    /** How far the beam reaches (blocks); on a client before the server's config has arrived, the defaults. */
+    public static double beamRange(boolean weapon) {
+        if (!EnhancedConfig.SPEC.isLoaded()) {
+            return weapon ? 48 : 24;
+        }
+        return weapon ? EnhancedConfig.THOR_BEAM_WEAPON_RANGE.get() : EnhancedConfig.THOR_BEAM_RANGE.get();
     }
 
     /** The first solid ground at or below a point (up to 32 blocks down). */
@@ -512,39 +641,18 @@ public final class ThorAbilities {
     }
 
     /**
-     * A bolt of lightning at {@code target}: everything within 3 blocks is struck (full damage at the centre), with
-     * the usual effects of lightning on creatures (creepers charge, pigs turn into zombified piglins...), but no fire
-     * on blocks. Thor himself is never hurt by lightning.
-     */
-    public static void strike(ServerLevel level, ServerPlayer thor, Vec3 target, boolean main) {
-        LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
-        if (bolt == null) {
-            return;
-        }
-        bolt.moveTo(target.x, target.y, target.z);
-        bolt.setVisualOnly(true);
-        bolt.setCause(thor);
-        level.addFreshEntity(bolt);
-        float damage = EnhancedConfig.THOR_LIGHTNING_DAMAGE.get().floatValue() * (main ? 1.0F : 0.75F);
-        AABB area = new AABB(target, target).inflate(STRIKE_RADIUS, STRIKE_RADIUS + 1, STRIKE_RADIUS);
-        for (Entity e : level.getEntities(thor, area, e -> (e instanceof LivingEntity || e instanceof EndCrystal) && e.isAlive()
-                && !e.isSpectator() && !isThor(e))) {
-            double distance = e.position().distanceTo(target);
-            if (distance > STRIKE_RADIUS + 0.5) {
-                continue;
-            }
-            float falloff = distance < 1.5 ? 1.0F : 0.6F;
-            e.hurt(ModDamageTypes.source(level, DamageTypes.LIGHTNING_BOLT, thor, bolt), damage * falloff);
-            // Vanilla's reactions to lightning (its own damage is absorbed by the hit above).
-            e.thunderHit(level, bolt);
-        }
-    }
-
-    /**
      * The God of Thunder's lightning leaps from a hit to the target and on to the next creatures nearby, up to two
      * jumps. Seen by everyone around.
      */
     public static void arc(ServerLevel level, ServerPlayer thor, Vec3 from, Entity first) {
+        arc(level, thor, from, first, true);
+    }
+
+    /**
+     * {@link #arc(ServerLevel, ServerPlayer, Vec3, Entity)}, where the first creature is the one that was struck already
+     * (the beam's) and is only the start of the arc if {@code hurtFirst} is false.
+     */
+    private static void arc(ServerLevel level, ServerPlayer thor, Vec3 from, Entity first, boolean hurtFirst) {
         List<Vec3> points = new ArrayList<>();
         points.add(from);
         List<Entity> struck = new ArrayList<>();
@@ -552,7 +660,9 @@ public final class ThorAbilities {
         for (int jump = 0; current != null && jump <= ARC_JUMPS; jump++) {
             struck.add(current);
             points.add(current.position().add(0, current.getBbHeight() * 0.6, 0));
-            current.hurt(ModDamageTypes.source(level, DamageTypes.LIGHTNING_BOLT, thor, thor), ARC_DAMAGE);
+            if (jump > 0 || hurtFirst) {
+                current.hurt(ModDamageTypes.source(level, DamageTypes.LIGHTNING_BOLT, thor, thor), ARC_DAMAGE);
+            }
             Entity from2 = current;
             current = level.getEntities(thor, current.getBoundingBox().inflate(ARC_RANGE), e -> e instanceof LivingEntity && e.isAlive()
                             && !e.isSpectator() && !struck.contains(e) && !isThor(e)).stream()
@@ -678,6 +788,10 @@ public final class ThorAbilities {
         if (player.isSpectator() || JOURNEYS.containsKey(player.getUUID())) {
             return false;
         }
+        if (MjolnirPin.isPinned(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
+            return false;
+        }
         if (!holdsWeapon(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
             return false;
@@ -768,16 +882,25 @@ public final class ThorAbilities {
 
     /** Ends everything this hero left in the world (the power is being taken away). */
     public static void endAll(ServerPlayer player, PowerData data) {
-        CALLING.remove(player.getUUID());
+        BEAMS.remove(player.getUUID());
         data.set(Live.CALLING_LIGHTNING, false);
         data.setToggle(Toggle.GOD_OF_THUNDER, false);
-        // A weapon in flight finds no Thor to return to, and drops by itself. A Bifrost already gathering still takes
-        // its traveller: it answers the weapon, not the power.
+        // A shattered Mjolnir comes together where he stands and falls. A weapon in flight finds no Thor to return to, and
+        // drops by itself. A Bifrost already gathering still takes its traveller: it answers the weapon, not the power.
+        MjolnirShatter.onGone(player);
+    }
+
+    /** Thor logs out: his beam stops (a Mjolnir in pieces falls: see {@link MjolnirShatter#onGone}). */
+    public static void onLogout(ServerPlayer player) {
+        BEAMS.remove(player.getUUID());
+        Powers.get(player).set(Live.CALLING_LIGHTNING, false);
     }
 
     public static void clear() {
         JOURNEYS.clear();
-        CALLING.clear();
+        BEAMS.clear();
+        MjolnirShatter.clear();
+        MjolnirPin.clear();
     }
 
     private ThorAbilities() {

@@ -23,6 +23,7 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> STORMBREAKER = key("stormbreaker");
     public static final ResourceKey<DamageType> LOKI_DAGGER = key("loki_dagger");
     public static final ResourceKey<DamageType> HEX_BOLT = key("hex_bolt");
+    public static final ResourceKey<DamageType> LIGHTNING_BEAM = key("lightning_beam");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

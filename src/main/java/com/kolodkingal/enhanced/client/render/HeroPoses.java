@@ -31,7 +31,7 @@ import net.minecraft.world.phys.Vec3;
  *     <li>Vision: composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
  *     weightless while phased.</li>
  *     <li>Thor: his weapon held to the sky as he hovers, and thrust ahead of him, Superman style, as he leans into the
- *     flight.</li>
+ *     flight; an arm pointing where he looks while he fires his lightning beam.</li>
  *     <li>Loki: a throwing arm after each dagger, a raised open hand as he vanishes or changes shape, and arms held
  *     slightly out in his Frost Giant form.</li>
  *     <li>Billy: his casting hand thrust forward for a Hex Bolt; both hands raised and trembling while he holds creatures
@@ -163,10 +163,8 @@ public final class HeroPoses {
             case THOR -> {
                 Entity hammer = data.hammerEntityId() != -1 ? player.level().getEntity(data.hammerEntityId()) : null;
                 if (data.is(Live.CALLING_LIGHTNING)) {
-                    // His weapon raised to the sky, catching the lightning.
-                    main.xRot = -Mth.PI + 0.1F - bodyPitch + Mth.sin(t * 2.1F) * 0.03F;
-                    main.yRot = 0.0F;
-                    main.zRot = 0.1F * side;
+                    // Firing the lightning beam: the arm (and the weapon in it) points where he looks, trembling a little.
+                    aim(model, main, -0.04F * side, t, 0.03F);
                     off.zRot += 0.25F * -side;
                 } else if (data.is(Live.BIFROST)) {
                     model.rightArm.xRot = -0.3F;

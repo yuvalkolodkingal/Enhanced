@@ -9,10 +9,13 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -301,6 +304,38 @@ public final class DataTests {
             }
         }
         check(missing.isEmpty(), "missing translations: " + missing);
+        helper.succeed();
+    }
+
+    /** Every entity the mod adds has a name, and every damage type its death messages, in English and in Hebrew. */
+    @GameTest(template = ARENA)
+    public static void everyEntityHasANameAndEveryDamageTypeItsDeathMessages(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        List<String> missing = new ArrayList<>();
+        for (String name : List.of("en_us", "he_il")) {
+            JsonObject lang = lang(mod, name);
+            for (var entity : ModEntities.ENTITIES.getEntries()) {
+                String key = "entity." + Enhanced.MODID + "." + entity.getId().getPath();
+                if (!lang.has(key)) {
+                    missing.add(name + ": " + key);
+                }
+            }
+            var damageTypes = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+            for (ResourceLocation id : damageTypes.keySet()) {
+                if (!id.getNamespace().equals(Enhanced.MODID)) {
+                    continue;
+                }
+                for (String suffix : List.of("", ".player")) {
+                    String key = "death.attack." + Enhanced.MODID + "." + id.getPath() + suffix;
+                    if (!lang.has(key)) {
+                        missing.add(name + ": " + key);
+                    }
+                }
+            }
+        }
+        check(missing.isEmpty(), "missing translations: " + missing);
+        check(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModDamageTypes.LIGHTNING_BEAM.location()),
+                "the lightning beam's damage type is there");
         helper.succeed();
     }
 

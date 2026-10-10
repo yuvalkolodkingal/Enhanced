@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.hex.HexData;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.road.RoadDoors;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -29,6 +30,16 @@ public final class ModAttachments {
                     .serialize(BifrostData.CODEC)
                     .copyOnDeath()
                     .sync((holder, to) -> holder == to, BifrostData.STREAM_CODEC)
+                    .build());
+
+    /**
+     * The Mjolnir a player has shattered into fragments (Love and Thunder) while its pieces are in the air: saved with
+     * the player, so the hammer is neither lost nor copied if the world closes before it is whole again. Not kept on
+     * death (it falls where he dies instead).
+     */
+    public static final Supplier<AttachmentType<ItemStack>> SHATTERED_MJOLNIR = ATTACHMENTS.register("shattered_mjolnir",
+            () -> AttachmentType.builder(() -> ItemStack.EMPTY)
+                    .serialize(ItemStack.OPTIONAL_CODEC)
                     .build());
 
     /** All Hexes in a dimension. Saved with the level and synced to every player in it. */

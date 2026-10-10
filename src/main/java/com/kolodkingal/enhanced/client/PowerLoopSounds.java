@@ -19,24 +19,28 @@ import java.util.function.Supplier;
 
 /**
  * Sounds that last as long as a power is in use: the Chaos Beam's crackle, the Mind Stone beam's hum, Magneto's
- * magnetic hum while he holds something and the roar of Tommy's whirlwind. Each follows its player and fades in and
- * out with the power.
+ * magnetic hum while he holds something, the roar of Tommy's whirlwind and the crackle of Thor's lightning beam. Each
+ * follows its player and fades in and out with the power.
  */
 public final class PowerLoopSounds {
 
     private enum Kind {
-        CHAOS_BEAM(ModSounds.CHAOS_BEAM, 0.9F, d -> d.power() == Power.SCARLET_WITCH && d.beamActive()),
-        MIND_STONE_BEAM(ModSounds.MIND_STONE_BEAM, 0.8F, d -> d.power() == Power.VISION && d.beamActive()),
-        MAGNET_HUM(ModSounds.MAGNET_HUM, 0.6F, d -> d.power() == Power.MAGNETO && d.heldEntityId() != -1),
-        WHIRLWIND(ModSounds.WHIRLWIND, 0.9F, d -> d.power() == Power.TOMMY && d.is(Live.WHIRLWIND));
+        CHAOS_BEAM(ModSounds.CHAOS_BEAM, 0.9F, 1.0F, d -> d.power() == Power.SCARLET_WITCH && d.beamActive()),
+        MIND_STONE_BEAM(ModSounds.MIND_STONE_BEAM, 0.8F, 1.0F, d -> d.power() == Power.VISION && d.beamActive()),
+        MAGNET_HUM(ModSounds.MAGNET_HUM, 0.6F, 1.0F, d -> d.power() == Power.MAGNETO && d.heldEntityId() != -1),
+        WHIRLWIND(ModSounds.WHIRLWIND, 0.9F, 1.0F, d -> d.power() == Power.TOMMY && d.is(Live.WHIRLWIND)),
+        /** Thor's lightning beam: the same crackle as the Chaos Beam, higher and sharper. */
+        LIGHTNING_BEAM(ModSounds.CHAOS_BEAM, 0.8F, 1.45F, d -> d.power() == Power.THOR && d.is(Live.CALLING_LIGHTNING));
 
         final Supplier<SoundEvent> sound;
         final float volume;
+        final float pitch;
         final Predicate<PowerData> active;
 
-        Kind(Supplier<SoundEvent> sound, float volume, Predicate<PowerData> active) {
+        Kind(Supplier<SoundEvent> sound, float volume, float pitch, Predicate<PowerData> active) {
             this.sound = sound;
             this.volume = volume;
+            this.pitch = pitch;
             this.active = active;
         }
     }
@@ -86,6 +90,7 @@ public final class PowerLoopSounds {
             this.kind = kind;
             this.looping = true;
             this.delay = 0;
+            this.pitch = kind.pitch;
             this.volume = 0.05F;
             follow();
         }

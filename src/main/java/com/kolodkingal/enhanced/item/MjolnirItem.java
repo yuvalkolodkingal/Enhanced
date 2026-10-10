@@ -30,7 +30,10 @@ import java.util.List;
  * claims it (the {@code enhanced:owner} component, see {@link MjolnirOwner} and {@link Worthiness}), and only they can
  * lift it from then on. In anyone else's hands it slips to the ground, and wherever it comes to rest it stays, as a
  * block nobody else can move. Whoever claims it, if they have no other power, becomes Thor. Whoever holds it can call
- * the Bifrost (use it; see {@link ThorAbilities#useWeapon}). Never breaks; fire and lava can't hurt it.
+ * the Bifrost (use it; see {@link ThorAbilities#useWeapon}). In Thor's hands it shatters into fragments that strike his
+ * enemies ({@link com.kolodkingal.enhanced.ability.MjolnirShatter}), and its owner can set it down on a creature or
+ * player, Sneak + right click, to pin it in place ({@link com.kolodkingal.enhanced.ability.MjolnirPin}). Never breaks;
+ * fire and lava can't hurt it.
  */
 public class MjolnirItem extends Item {
     public MjolnirItem(Properties properties) {
@@ -127,6 +130,8 @@ public class MjolnirItem extends Item {
         tooltip.add(owner != null ? Component.translatable("item.enhanced.mjolnir.bound", owner.name()).withStyle(ChatFormatting.YELLOW)
                 : Component.translatable("item.enhanced.mjolnir.unclaimed").withStyle(ChatFormatting.DARK_GRAY));
         tooltip.add(Component.translatable("item.enhanced.thor_weapon.bifrost").withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.enhanced.mjolnir.shatter").withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.enhanced.mjolnir.pin").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.enhanced.unbreakable").withStyle(ChatFormatting.BLUE));
     }
 }

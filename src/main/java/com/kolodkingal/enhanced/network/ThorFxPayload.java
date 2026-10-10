@@ -14,19 +14,17 @@ import java.util.List;
 /**
  * Server → client: a moment of Thor's power everyone nearby should see. The client draws it for a short while.
  *
- * @param kind     what happened ({@link #CHANNEL}, {@link #ARC}, {@link #BIFROST_ARRIVAL}, {@link #BIFROST_MARK})
+ * @param kind     what happened ({@link #ARC}, {@link #BIFROST_ARRIVAL}, {@link #BIFROST_MARK})
  * @param entityId Thor, or -1
  * @param points   where (the meaning depends on the kind)
  */
 public record ThorFxPayload(int kind, int entityId, List<Vec3> points) implements CustomPacketPayload {
-    /** Lightning comes down from the sky into Thor's weapon and leaps from it to {@code points[0]}. */
-    public static final int CHANNEL = 0;
     /** Lightning arcs along {@code points}, from one to the next. */
-    public static final int ARC = 1;
+    public static final int ARC = 0;
     /** The Bifrost's beam of light lands on {@code points[0]}. */
-    public static final int BIFROST_ARRIVAL = 2;
+    public static final int BIFROST_ARRIVAL = 1;
     /** The Bifrost's circle of runes is burned into the ground at {@code points[0]}. */
-    public static final int BIFROST_MARK = 3;
+    public static final int BIFROST_MARK = 2;
 
     public static final Type<ThorFxPayload> TYPE = new Type<>(Enhanced.id("thor_fx"));
 

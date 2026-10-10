@@ -106,11 +106,12 @@ public final class PowerTicker {
         data.setShrapnelActive(false);
         data.setSlowMo(false);
         data.set(Live.SPEEDING, false);
+        data.set(Live.CALLING_LIGHTNING, false);
     }
 
     /** The hero's flight key: take off or land, the same as double-tapping Space. */
     static void toggleFlight(ServerPlayer player) {
-        if (!player.mayFly()) {
+        if (!player.mayFly() || MjolnirPin.isPinned(player)) {
             return;
         }
         Abilities abilities = player.getAbilities();

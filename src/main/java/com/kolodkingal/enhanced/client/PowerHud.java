@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
@@ -165,10 +166,14 @@ public class PowerHud implements LayeredDraw.Layer {
     private static Component thor(LocalPlayer player, PowerData data, int ability) {
         return switch (ability) {
             case 1 -> ThorAbilities.holdsWeapon(player) ? Component.translatable("hud.enhanced.thor_weapon.in_hand").withStyle(ChatFormatting.AQUA)
-                    : data.hammerEntityId() != -1 ? Component.translatable("hud.enhanced.thor_weapon.flying").withStyle(ChatFormatting.AQUA)
+                    : data.hammerEntityId() != -1 ? Component.translatable(player.level().getEntity(data.hammerEntityId()) instanceof MjolnirFragmentEntity
+                    ? "hud.enhanced.thor_weapon.shattered" : "hud.enhanced.thor_weapon.flying").withStyle(ChatFormatting.AQUA)
                     : Component.translatable("hud.enhanced.thor_weapon.away").withStyle(ChatFormatting.GRAY);
             case 2 -> !ThorAbilities.holdsWeapon(player) && data.hammerEntityId() == -1
                     ? Component.translatable("hud.enhanced.thor_weapon.needed").withStyle(ChatFormatting.DARK_GRAY) : onOff(data.flying());
+            case 3 -> data.is(Live.CALLING_LIGHTNING) ? active("hud.enhanced.active")
+                    : ThorAbilities.holdsWeapon(player) ? Component.translatable("hud.enhanced.thor_beam.boosted").withStyle(ChatFormatting.AQUA)
+                    : Component.translatable("hud.enhanced.thor_beam.stronger").withStyle(ChatFormatting.DARK_GRAY);
             case 4 -> onOff(data.toggle(Toggle.GOD_OF_THUNDER));
             case 5 -> data.is(Live.BIFROST) ? active("hud.enhanced.active")
                     : !ThorAbilities.holdsWeapon(player) ? Component.translatable("hud.enhanced.thor_weapon.needed").withStyle(ChatFormatting.DARK_GRAY)
