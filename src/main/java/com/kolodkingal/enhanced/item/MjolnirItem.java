@@ -26,10 +26,11 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * Mjolnir, forged from Uru in the heart of a dying star. Only the worthy can lift it (see {@link Worthiness}): in
- * anyone else's hands it slips to the ground, and wherever it comes to rest it stays, as a block nobody else can move.
- * Whoever lifts it first, if they have no other power, becomes Thor. The worthy who hold it can call the Bifrost (use
- * it; see {@link ThorAbilities#useWeapon}). Never breaks; fire and lava can't hurt it.
+ * Mjolnir, forged from Uru in the heart of a dying star. It belongs to one player: the first worthy hand to lift it
+ * claims it (the {@code enhanced:owner} component, see {@link MjolnirOwner} and {@link Worthiness}), and only they can
+ * lift it from then on. In anyone else's hands it slips to the ground, and wherever it comes to rest it stays, as a
+ * block nobody else can move. Whoever claims it, if they have no other power, becomes Thor. Whoever holds it can call
+ * the Bifrost (use it; see {@link ThorAbilities#useWeapon}). Never breaks; fire and lava can't hurt it.
  */
 public class MjolnirItem extends Item {
     public MjolnirItem(Properties properties) {
@@ -74,6 +75,14 @@ public class MjolnirItem extends Item {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
+    /** Whoever forges it, if worthy, claims it at once. */
+    @Override
+    public void onCraftedBy(ItemStack stack, Level level, Player player) {
+        if (!level.isClientSide) {
+            Worthiness.claim(player, stack);
+        }
+    }
+
     /** A dropped Mjolnir comes to rest as a block where it lands; until then it never despawns. */
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
@@ -114,6 +123,9 @@ public class MjolnirItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.enhanced.mjolnir.desc").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));
         tooltip.add(Component.translatable("item.enhanced.mjolnir.desc2").withStyle(ChatFormatting.GRAY));
+        MjolnirOwner owner = Worthiness.ownerOf(stack);
+        tooltip.add(owner != null ? Component.translatable("item.enhanced.mjolnir.bound", owner.name()).withStyle(ChatFormatting.YELLOW)
+                : Component.translatable("item.enhanced.mjolnir.unclaimed").withStyle(ChatFormatting.DARK_GRAY));
         tooltip.add(Component.translatable("item.enhanced.thor_weapon.bifrost").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.enhanced.unbreakable").withStyle(ChatFormatting.BLUE));
     }

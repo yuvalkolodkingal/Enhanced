@@ -1,13 +1,16 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
+import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -16,11 +19,18 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
+import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
+import io.netty.buffer.Unpooled;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -29,11 +39,14 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
@@ -43,6 +56,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -77,6 +91,47 @@ public final class ThorTests {
 
     private static boolean holdsMjolnir(ServerPlayer player) {
         return player.getMainHandItem().is(ModItems.MJOLNIR.get());
+    }
+
+    private static boolean ownedBy(ItemStack hammer, ServerPlayer player) {
+        MjolnirOwner owner = Worthiness.ownerOf(hammer);
+        return owner != null && owner.is(player);
+    }
+
+    /** A Mjolnir that belongs to {@code owner}. */
+    private static ItemStack ownedMjolnir(MjolnirOwner owner) {
+        ItemStack hammer = new ItemStack(ModItems.MJOLNIR.get());
+        hammer.set(ModDataComponents.OWNER.get(), owner);
+        return hammer;
+    }
+
+    /** The first Mjolnir in the player's inventory, or an empty stack. */
+    private static ItemStack carriedMjolnir(ServerPlayer player) {
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (stack.is(ModItems.MJOLNIR.get())) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    /** Right click on the Mjolnir block at the absolute position. */
+    private static void useBlock(GameTestHelper helper, ServerPlayer player, BlockPos abs) {
+        ServerLevel level = helper.getLevel();
+        level.getBlockState(abs).useWithoutItem(level, player, new BlockHitResult(Vec3.atCenterOf(abs), Direction.UP, abs, false));
+    }
+
+    /** Lays the Mjolnir on the ground at the player's feet and lets them walk into it. */
+    private static void walkInto(GameTestHelper helper, ServerPlayer player, ItemStack hammer) {
+        ItemEntity lying = new ItemEntity(helper.getLevel(), player.getX(), player.getY(), player.getZ(), hammer);
+        lying.setNoPickUpDelay();
+        helper.getLevel().addFreshEntity(lying);
+        lying.playerTouch(player);
+    }
+
+    private static List<ItemEntity> mjolnirsOnTheGround(ServerPlayer near) {
+        return near.level().getEntitiesOfClass(ItemEntity.class, near.getBoundingBox().inflate(2), e -> e.getItem().is(ModItems.MJOLNIR.get()));
     }
 
     @GameTest(template = ARENA)
@@ -182,7 +237,12 @@ public final class ThorTests {
         helper.assertBlockPresent(Blocks.AIR, rest);
         f.everyTick(150, tick -> {
             PowerTicker.tick(thor);
-            return holdsMjolnir(thor);
+            if (holdsMjolnir(thor)) {
+                // Nobody owned it: it is his from the moment he catches it.
+                check(ownedBy(thor.getMainHandItem(), thor), "the Mjolnir nobody owned is Thor's now");
+                return true;
+            }
+            return false;
         });
     }
 
@@ -394,6 +454,327 @@ public final class ThorTests {
         check(holdsMjolnir(thor), "and so does Quicksilver's Pickpocket");
         check(TommyAbilities.BLITZ_RADIUS > 3, "sanity");
         helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Mjolnir belongs to one player
+
+    @GameTest(template = ARENA)
+    public static void theFirstWorthyHandToLiftMjolnirClaimsIt(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        check(EnhancedConfig.MJOLNIR_OWNER_ONLY.getDefault() && EnhancedConfig.MJOLNIR_OWNER_ONLY.get(), "ownership is on by default");
+        // Fresh from the forge (or the creative tab) it is nobody's. The unworthy can't keep it, so it stays that way.
+        ServerPlayer villager = f.player(4.5, FLOOR, 4.5);
+        ItemStack fresh = new ItemStack(ModItems.MJOLNIR.get());
+        check(Worthiness.ownerOf(fresh) == null, "a fresh Mjolnir has no owner");
+        villager.getInventory().add(fresh);
+        PowerTicker.tick(villager);
+        List<ItemEntity> fallen = mjolnirsOnTheGround(villager);
+        check(fallen.size() == 1 && Worthiness.ownerOf(fallen.get(0).getItem()) == null, "it slips from the unworthy still unclaimed");
+        ItemStack unworthyForge = new ItemStack(ModItems.MJOLNIR.get());
+        unworthyForge.onCraftedBy(level, villager, 1);
+        check(Worthiness.ownerOf(unworthyForge) == null, "the unworthy don't claim what they forge");
+
+        // The worthy who lift it claim it, and become Thor.
+        ServerPlayer hero = f.player(10.5, FLOOR, 4.5);
+        makeWorthy(hero);
+        hero.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        PowerTicker.tick(hero);
+        MjolnirOwner owner = Worthiness.ownerOf(hero.getMainHandItem());
+        check(owner != null && owner.is(hero) && owner.name().equals(hero.getGameProfile().getName()), "the Hero of the Village is its owner: " + owner);
+        check(Powers.is(hero, Power.THOR), "and becomes Thor");
+
+        // Vision is worthy too: whoever holds an unclaimed one first claims it, and Vision stays Vision.
+        ServerPlayer vision = f.player(16.5, FLOOR, 4.5, Power.VISION);
+        vision.getInventory().add(new ItemStack(ModItems.MJOLNIR.get()));
+        PowerTicker.tick(vision);
+        check(vision.getInventory().countItem(ModItems.MJOLNIR.get()) == 1, "Vision keeps it");
+        check(ownedBy(carriedMjolnir(vision), vision), "and owns it");
+        check(Powers.is(vision, Power.VISION), "Vision stays Vision");
+
+        // So do the worthy who forge it, the moment they take it from the table ...
+        ServerPlayer smith = f.player(4.5, FLOOR, 12.5);
+        makeWorthy(smith);
+        ItemStack forged = new ItemStack(ModItems.MJOLNIR.get());
+        forged.onCraftedBy(level, smith, 1);
+        check(ownedBy(forged, smith), "a worthy smith owns the Mjolnir they forge");
+        // ... and Creative players, who are worthy of everything.
+        ServerPlayer creative = f.player(10.5, FLOOR, 12.5, GameType.CREATIVE);
+        creative.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        PowerTicker.tick(creative);
+        check(ownedBy(creative.getMainHandItem(), creative), "a Creative player claims an unclaimed one as usual");
+
+        // Lifted from the ground as a block: claimed on the way up.
+        ServerPlayer lifter = f.player(16.5, FLOOR, 12.5);
+        makeWorthy(lifter);
+        BlockPos rest = new BlockPos(15, 2, 12);
+        BlockPos abs = helper.absolutePos(rest);
+        check(MjolnirBlock.setDown(level, abs, new ItemStack(ModItems.MJOLNIR.get())), "set Mjolnir down");
+        useBlock(helper, lifter, abs);
+        helper.assertBlockPresent(Blocks.AIR, rest);
+        check(ownedBy(lifter.getMainHandItem(), lifter), "lifting it from the ground claims it");
+
+        // Claiming is permanent: the next worthy hand to hold it finds it taken.
+        ServerPlayer latecomer = f.player(10.5, FLOOR, 8.5, Power.VISION);
+        latecomer.getInventory().add(lifter.getMainHandItem().copy());
+        PowerTicker.tick(latecomer);
+        check(latecomer.getInventory().countItem(ModItems.MJOLNIR.get()) == 0, "nobody else can take it over");
+        check(ownedBy(lifter.getMainHandItem(), lifter), "it is still the lifter's");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void onlyTheOwnerCanLiftTheirMjolnir(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer owner = thor(f, 4.5, 4.5);
+        PowerTicker.tick(owner);
+        ItemStack hammer = owner.getMainHandItem().copy();
+        MjolnirOwner mark = Worthiness.ownerOf(hammer);
+        check(mark != null && mark.is(owner), "Thor owns the Mjolnir he first lifted");
+        owner.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        ServerPlayer hero = f.player(10.5, FLOOR, 10.5);
+        makeWorthy(hero);
+        ServerPlayer vision = f.player(14.5, FLOOR, 14.5, Power.VISION);
+        ServerPlayer otherThor = f.player(4.5, FLOOR, 14.5, Power.THOR);
+        List<ServerPlayer> others = List.of(hero, vision, otherThor);
+        for (ServerPlayer other : others) {
+            check(Worthiness.isWorthy(other), "they are all worthy ...");
+            check(mark.equals(Worthiness.ownerKeepingFrom(other, hammer)), "... but it is not theirs");
+        }
+        check(Worthiness.canLift(owner, hammer), "while its owner can lift it");
+
+        // It slips out of their inventory ...
+        for (ServerPlayer other : others) {
+            other.getInventory().add(hammer.copy());
+            PowerTicker.tick(other);
+            check(other.getInventory().countItem(ModItems.MJOLNIR.get()) == 0, "it slips out of " + other.getGameProfile().getName() + "'s inventory");
+            List<ItemEntity> fallen = mjolnirsOnTheGround(other);
+            check(fallen.size() == 1 && mark.equals(Worthiness.ownerOf(fallen.get(0).getItem())), "it falls at their feet, still its owner's");
+            fallen.get(0).discard();
+        }
+        // ... and off the cursor.
+        hero.containerMenu.setCarried(hammer.copy());
+        PowerTicker.tick(hero);
+        check(hero.containerMenu.getCarried().isEmpty() && mjolnirsOnTheGround(hero).size() == 1, "it slips off the cursor too");
+        check(Powers.is(hero, Power.NONE) && Powers.is(vision, Power.VISION), "and nobody's power changes");
+
+        // They can't pick it up.
+        for (ServerPlayer other : others) {
+            walkInto(helper, other, hammer.copy());
+            check(other.getInventory().countItem(ModItems.MJOLNIR.get()) == 0, other.getGameProfile().getName() + " can't pick it up");
+        }
+        walkInto(helper, owner, hammer.copy());
+        check(owner.getInventory().countItem(ModItems.MJOLNIR.get()) == 1, "but its owner can");
+        owner.getInventory().clearContent();
+
+        // They can't lift it as a block either, and the block remembers whose it is.
+        BlockPos rest = new BlockPos(8, 2, 14);
+        BlockPos abs = helper.absolutePos(rest);
+        check(MjolnirBlock.setDown(level, abs, hammer.copy()), "set Mjolnir down");
+        check(level.getBlockEntity(abs) instanceof MjolnirBlockEntity be && mark.equals(Worthiness.ownerOf(be.hammer())),
+                "the block remembers its owner");
+        for (ServerPlayer other : others) {
+            useBlock(helper, other, abs);
+            helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), rest);
+            check(other.getInventory().countItem(ModItems.MJOLNIR.get()) == 0 && other.getMainHandItem().isEmpty(),
+                    "it doesn't budge for " + other.getGameProfile().getName());
+        }
+        useBlock(helper, owner, abs);
+        helper.assertBlockPresent(Blocks.AIR, rest);
+        check(holdsMjolnir(owner) && ownedBy(owner.getMainHandItem(), owner), "its owner lifts it, and it is still theirs");
+        PowerTicker.tick(owner);
+        check(holdsMjolnir(owner) && Powers.is(owner, Power.THOR), "and keeps it");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void creativePlayersCanMoveAnyMjolnirButNeverTakeItOver(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        MjolnirOwner odin = new MjolnirOwner(UUID.randomUUID(), "Odin");
+        ServerPlayer op = f.player(10.5, FLOOR, 10.5, GameType.CREATIVE);
+        check(Worthiness.canLift(op, ownedMjolnir(odin)), "a Creative player may lift anyone's Mjolnir");
+
+        op.setItemInHand(InteractionHand.MAIN_HAND, ownedMjolnir(odin));
+        PowerTicker.tick(op);
+        check(holdsMjolnir(op), "they can hold it");
+        check(odin.equals(Worthiness.ownerOf(op.getMainHandItem())), "and it is still Odin's");
+        check(Powers.is(op, Power.NONE), "which doesn't make them Thor");
+
+        walkInto(helper, op, ownedMjolnir(odin));
+        check(op.getInventory().countItem(ModItems.MJOLNIR.get()) == 2, "they can pick it up");
+
+        BlockPos rest = new BlockPos(15, 2, 15);
+        BlockPos abs = helper.absolutePos(rest);
+        check(MjolnirBlock.setDown(level, abs, ownedMjolnir(odin)), "set Mjolnir down");
+        useBlock(helper, op, abs);
+        helper.assertBlockPresent(Blocks.AIR, rest);
+        PowerTicker.tick(op);
+        check(op.getInventory().countItem(ModItems.MJOLNIR.get()) == 3, "and lift it from the ground");
+        for (int slot = 0; slot < op.getInventory().getContainerSize(); slot++) {
+            ItemStack stack = op.getInventory().getItem(slot);
+            check(!stack.is(ModItems.MJOLNIR.get()) || odin.equals(Worthiness.ownerOf(stack)), "none of them changed hands");
+        }
+
+        // An unclaimed one, though, is claimed in Creative as usual.
+        ServerPlayer builder = f.player(4.5, FLOOR, 4.5, GameType.CREATIVE);
+        builder.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        PowerTicker.tick(builder);
+        check(ownedBy(builder.getMainHandItem(), builder), "an unclaimed one becomes the Creative player's");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 200)
+    public static void thorCallsBackOnlyMjolnirsThatAreHis(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
+        MjolnirOwner odin = new MjolnirOwner(UUID.randomUUID(), "Odin");
+        // Odin's Mjolnir rests close by, a zombie nearer still holds another of Odin's, a third lies on the ground right
+        // next to Thor, and a fourth is in his own pocket.
+        BlockPos odinsBlock = new BlockPos(6, 2, 10);
+        check(MjolnirBlock.setDown(level, helper.absolutePos(odinsBlock), ownedMjolnir(odin)), "set Odin's Mjolnir down");
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
+        zombie.setItemInHand(InteractionHand.MAIN_HAND, ownedMjolnir(odin));
+        Vec3 beside = helper.absoluteVec(new Vec3(4.5, FLOOR, 10.5));
+        ItemEntity lying = new ItemEntity(level, beside.x, beside.y, beside.z, ownedMjolnir(odin));
+        level.addFreshEntity(lying);
+        thor.getInventory().setItem(5, ownedMjolnir(odin));
+        press(thor, 1);
+        check(Powers.get(thor).hammerEntityId() == -1 && !holdsMjolnir(thor), "Thor can't call a Mjolnir that is Odin's");
+        helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), odinsBlock);
+        check(zombie.getMainHandItem().is(ModItems.MJOLNIR.get()), "and the zombie keeps its grip on it");
+        check(lying.isAlive() && lying.getItem().is(ModItems.MJOLNIR.get()), "and the one on the ground stays where it lies");
+        check(thor.getInventory().getItem(5).is(ModItems.MJOLNIR.get()), "and the one in his pocket doesn't come to his hand");
+        lying.discard();
+        thor.getInventory().clearContent();
+
+        // His own, farther away, comes at once.
+        BlockPos hisBlock = new BlockPos(16, 2, 10);
+        check(MjolnirBlock.setDown(level, helper.absolutePos(hisBlock), ownedMjolnir(MjolnirOwner.of(thor))), "set Thor's own Mjolnir down");
+        press(thor, 1);
+        helper.assertBlockPresent(Blocks.AIR, hisBlock);
+        helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), odinsBlock);
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(thor);
+            if (!holdsMjolnir(thor)) {
+                return false;
+            }
+            check(ownedBy(thor.getMainHandItem(), thor), "it is his own Mjolnir that comes");
+            check(zombie.getMainHandItem().is(ModItems.MJOLNIR.get()), "the zombie still holds Odin's");
+            helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), odinsBlock);
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA)
+    public static void aCreativeThorCanMoveAnyMjolnirButStillCallsOnlyHis(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, GameType.CREATIVE);
+        Powers.setPower(thor, Power.THOR);
+        MjolnirOwner odin = new MjolnirOwner(UUID.randomUUID(), "Odin");
+        check(Worthiness.canLift(thor, ownedMjolnir(odin)), "an operator can lift Odin's Mjolnir by hand ...");
+        check(!Worthiness.canCall(thor, ownedMjolnir(odin)), "... but his call is never answered by it");
+        check(Worthiness.canCall(thor, new ItemStack(ModItems.MJOLNIR.get())), "an unclaimed one answers it");
+        check(Worthiness.canCall(thor, ownedMjolnir(MjolnirOwner.of(thor))), "and so does his own");
+        BlockPos odinsBlock = new BlockPos(6, 2, 10);
+        check(MjolnirBlock.setDown(level, helper.absolutePos(odinsBlock), ownedMjolnir(odin)), "set Odin's Mjolnir down");
+        press(thor, 1);
+        check(Powers.get(thor).hammerEntityId() == -1 && !holdsMjolnir(thor), "Thor can't call a Mjolnir that is Odin's, even in Creative");
+        helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), odinsBlock);
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void theOwnersNameOnTheHammerFollowsThemWhenTheyRename(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer owner = thor(f, 4.5, 4.5);
+        owner.setItemInHand(InteractionHand.MAIN_HAND, ownedMjolnir(new MjolnirOwner(owner.getUUID(), "OldName")));
+        PowerTicker.tick(owner);
+        MjolnirOwner now = Worthiness.ownerOf(owner.getMainHandItem());
+        check(now != null && now.is(owner) && now.name().equals(owner.getGameProfile().getName()), "the hammer shows their new name: " + now);
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void withOwnershipOffAnyWorthyPlayerCanLiftAnyMjolnir(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.MJOLNIR_OWNER_ONLY, false);
+        ServerLevel level = helper.getLevel();
+        MjolnirOwner odin = new MjolnirOwner(UUID.randomUUID(), "Odin");
+        ItemStack hammer = ownedMjolnir(odin);
+        ServerPlayer hero = f.player(10.5, FLOOR, 10.5);
+        makeWorthy(hero);
+        check(Worthiness.canLift(hero, hammer), "the old rule: any worthy player can lift any Mjolnir");
+        hero.getInventory().add(hammer.copy());
+        PowerTicker.tick(hero);
+        check(hero.getInventory().countItem(ModItems.MJOLNIR.get()) == 1, "it stays in the Hero of the Village's inventory");
+        check(Powers.is(hero, Power.THOR), "who becomes Thor, as before there were owners");
+        check(odin.equals(Worthiness.ownerOf(carriedMjolnir(hero))), "and it is still marked as Odin's");
+
+        ServerPlayer vision = f.player(14.5, FLOOR, 14.5, Power.VISION);
+        walkInto(helper, vision, hammer.copy());
+        check(vision.getInventory().countItem(ModItems.MJOLNIR.get()) == 1, "Vision picks it up");
+        BlockPos rest = new BlockPos(8, 2, 14);
+        BlockPos abs = helper.absolutePos(rest);
+        check(MjolnirBlock.setDown(level, abs, hammer.copy()), "set Mjolnir down");
+        ServerPlayer smith = f.player(4.5, FLOOR, 14.5);
+        makeWorthy(smith);
+        useBlock(helper, smith, abs);
+        helper.assertBlockPresent(Blocks.AIR, rest);
+        check(holdsMjolnir(smith), "and the smith lifts it from the ground");
+
+        // Nobody claims anything either, but the unworthy still can't hold it.
+        ServerPlayer claimer = f.player(4.5, FLOOR, 4.5, Power.VISION);
+        claimer.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        PowerTicker.tick(claimer);
+        check(holdsMjolnir(claimer) && Worthiness.ownerOf(claimer.getMainHandItem()) == null, "an unclaimed one stays unclaimed");
+        ServerPlayer villager = f.player(16.5, FLOOR, 4.5);
+        villager.getInventory().add(hammer.copy());
+        PowerTicker.tick(villager);
+        check(villager.getInventory().countItem(ModItems.MJOLNIR.get()) == 0, "the unworthy still can't keep it");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void theOwnerIsSavedSentAndShownOnTheTooltip(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer hero = f.player(10.5, FLOOR, 10.5);
+        ItemStack hammer = ownedMjolnir(MjolnirOwner.of(hero));
+        // Saved with the item ...
+        CompoundTag saved = (CompoundTag) hammer.save(level.registryAccess());
+        check(ownedBy(ItemStack.parseOptional(level.registryAccess(), saved), hero), "the owner is saved with the item");
+        // ... sent to clients with it ...
+        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
+        ItemStack.STREAM_CODEC.encode(buf, hammer);
+        check(ownedBy(ItemStack.STREAM_CODEC.decode(buf), hero), "and sent to clients with it");
+        // ... and kept by the block it is set down as, through a save and a load.
+        BlockPos abs = helper.absolutePos(new BlockPos(8, 2, 8));
+        check(MjolnirBlock.setDown(level, abs, hammer), "set Mjolnir down");
+        MjolnirBlockEntity resting = (MjolnirBlockEntity) level.getBlockEntity(abs);
+        MjolnirBlockEntity loaded = new MjolnirBlockEntity(abs, level.getBlockState(abs));
+        loaded.loadWithComponents(resting.saveWithoutMetadata(level.registryAccess()), level.registryAccess());
+        check(ownedBy(loaded.hammer(), hero), "the block keeps the owner through a save and a load");
+
+        // The tooltip says whose it is, or that it is up for the taking.
+        check(tooltipHas(hammer, "item.enhanced.mjolnir.bound", hero.getGameProfile().getName()), "the tooltip says: Bound to <name>");
+        check(tooltipHas(new ItemStack(ModItems.MJOLNIR.get()), "item.enhanced.mjolnir.unclaimed", null), "an unclaimed one says so");
+        helper.succeed();
+    }
+
+    /** Whether the stack's tooltip has a line with this translation key (and, if given, this first argument). */
+    private static boolean tooltipHas(ItemStack stack, String key, String argument) {
+        for (Component line : stack.getTooltipLines(Item.TooltipContext.EMPTY, null, TooltipFlag.NORMAL)) {
+            if (line.getContents() instanceof TranslatableContents translatable && translatable.getKey().equals(key)
+                    && (argument == null || (translatable.getArgs().length == 1 && argument.equals(translatable.getArgs()[0])))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ThorTests() {

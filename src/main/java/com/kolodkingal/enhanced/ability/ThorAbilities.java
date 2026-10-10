@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
@@ -16,6 +17,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import java.util.ArrayList;
@@ -64,8 +66,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Thor, the God of Thunder. His power is his own, but his weapon focuses it, Mjolnir or Stormbreaker: he throws it and
- * calls it back, flies by spinning it, and calls lightning down through it. Whoever lifts Mjolnir first, if worthy and
- * without another power, becomes Thor.
+ * calls it back, flies by spinning it, and calls lightning down through it. Whoever claims Mjolnir first (the first
+ * worthy hand to lift it), if they have no other power, becomes Thor; after that only its owner can lift it.
  * <p>
  * Either weapon also calls the Bifrost, for Thor or anyone else who holds it: home, to where they look, or to a place
  * they saved, in any dimension (the places and the cooldown live in {@link BifrostData}).
@@ -157,11 +159,6 @@ public final class ThorAbilities {
         return isMjolnir(stack) || isStormbreaker(stack);
     }
 
-    /** Mjolnir in either hand. */
-    public static boolean holdsMjolnir(Player player) {
-        return isMjolnir(player.getMainHandItem()) || isMjolnir(player.getOffhandItem());
-    }
-
     /** Mjolnir or Stormbreaker in either hand. */
     public static boolean holdsWeapon(LivingEntity entity) {
         return weaponHand(entity) != null;
@@ -175,8 +172,9 @@ public final class ThorAbilities {
     }
 
     /**
-     * Every player: the worthy who lift Mjolnir become Thor (if they have no other power); in the hands of the unworthy
-     * it is far too heavy, and drops to the ground wherever they are. And whoever the Bifrost is about to take, Thor or
+     * Every player: the first worthy hand to carry an unclaimed Mjolnir claims it; one they may not lift (they are not
+     * worthy, or it belongs to someone else) is far too heavy, and drops to the ground wherever they are. The worthy
+     * who hold their own become Thor (if they have no other power). And whoever the Bifrost is about to take, Thor or
      * not, is held in its light.
      */
     public static void everyPlayerTick(ServerPlayer player, PowerData data) {
@@ -184,37 +182,74 @@ public final class ThorAbilities {
         if (player.isSpectator()) {
             return;
         }
-        boolean worthy = Worthiness.isWorthy(player);
-        if (!worthy) {
-            dropFromUnworthy(player);
-            return;
-        }
-        if (data.power() == Power.NONE && holdsMjolnir(player)) {
+        settleMjolnirs(player);
+        if (data.power() == Power.NONE && holdsOwnMjolnir(player)) {
             awaken(player);
         }
     }
 
-    /** Every Mjolnir the unworthy player carries (inventory, or on the cursor) crashes to the ground. */
-    private static void dropFromUnworthy(ServerPlayer player) {
+    /** Mjolnir in either hand, and theirs to hold as Thor (see {@link Worthiness#isTheirs}). */
+    private static boolean holdsOwnMjolnir(Player player) {
+        if (!Worthiness.isWorthy(player)) {
+            return false;
+        }
+        for (InteractionHand hand : InteractionHand.values()) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (isMjolnir(stack) && Worthiness.isTheirs(player, stack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Every Mjolnir the player carries (inventory, or on the cursor): one nobody owns yet is claimed by them if they
+     * are worthy, and one they may not lift crashes to the ground.
+     */
+    private static void settleMjolnirs(ServerPlayer player) {
         boolean dropped = false;
+        MjolnirOwner heavyFor = null;
         Inventory inventory = player.getInventory();
         for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
             ItemStack stack = inventory.getItem(slot);
-            if (isMjolnir(stack)) {
+            if (!isMjolnir(stack)) {
+                continue;
+            }
+            if (Worthiness.canLift(player, stack)) {
+                keep(player, stack);
+            } else {
                 inventory.setItem(slot, ItemStack.EMPTY);
                 fall(player, stack);
+                heavyFor = Worthiness.ownerKeepingFrom(player, stack);
                 dropped = true;
             }
         }
         ItemStack carried = player.containerMenu.getCarried();
         if (isMjolnir(carried)) {
-            player.containerMenu.setCarried(ItemStack.EMPTY);
-            fall(player, carried);
-            dropped = true;
+            if (Worthiness.canLift(player, carried)) {
+                keep(player, carried);
+            } else {
+                player.containerMenu.setCarried(ItemStack.EMPTY);
+                fall(player, carried);
+                heavyFor = Worthiness.ownerKeepingFrom(player, carried);
+                dropped = true;
+            }
         }
         if (dropped) {
-            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.too_heavy").withStyle(ChatFormatting.GRAY), true);
+            player.displayClientMessage((heavyFor != null ? Component.translatable("message.enhanced.mjolnir.slips", heavyFor.name())
+                    : Component.translatable("message.enhanced.mjolnir.too_heavy")).withStyle(ChatFormatting.GRAY), true);
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.8F, 0.6F);
+        }
+    }
+
+    /** A Mjolnir the player may carry: it is theirs now if nobody owned it, and it shows their current name. */
+    private static void keep(ServerPlayer player, ItemStack mjolnir) {
+        if (Worthiness.claim(player, mjolnir)) {
+            return;
+        }
+        MjolnirOwner owner = Worthiness.ownerOf(mjolnir);
+        if (owner != null && owner.is(player) && !owner.name().equals(player.getGameProfile().getName())) {
+            mjolnir.set(ModDataComponents.OWNER.get(), MjolnirOwner.of(player));
         }
     }
 
@@ -315,7 +350,9 @@ public final class ThorAbilities {
     /**
      * Calls his weapon home, from wherever the nearest one is: the rest of his inventory, the air, the ground (dropped,
      * or Mjolnir resting as a block), or the hands of a creature that picked it up. Returns false if there is no Mjolnir
-     * or Stormbreaker within reach. (Never from another player's hands: theirs is theirs.)
+     * or Stormbreaker within reach. (Never from another player's hands: theirs is theirs. And never another player's
+     * Mjolnir, wherever it lies, even if he is in Creative: only Stormbreaker, his own Mjolnir, or one nobody owns yet,
+     * which he claims when it reaches him.)
      */
     public static boolean recall(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
@@ -338,13 +375,14 @@ public final class ThorAbilities {
         AABB around = player.getBoundingBox().inflate(range);
         // Lying on the ground as an item.
         ItemEntity nearestItem = level.getEntitiesOfClass(ItemEntity.class, around,
-                        e -> isWeapon(e.getItem()) && e.distanceToSqr(player) <= range * range).stream()
+                        e -> canCall(player, e.getItem()) && e.distanceToSqr(player) <= range * range).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
         // Resting as a block.
-        BlockPos nearestBlock = findBlock(level, player.blockPosition(), range);
+        BlockPos nearestBlock = findBlock(level, player, range);
         // In a creature's hands.
         LivingEntity nearestHolder = level.getEntitiesOfClass(LivingEntity.class, around,
-                        e -> !(e instanceof Player) && e.isAlive() && holdsWeapon(e) && e.distanceToSqr(player) <= range * range).stream()
+                        e -> !(e instanceof Player) && e.isAlive() && callableHand(player, e) != null
+                                && e.distanceToSqr(player) <= range * range).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
         double toItem = nearestItem == null ? Double.MAX_VALUE : nearestItem.distanceToSqr(eye);
         double toBlock = nearestBlock == null ? Double.MAX_VALUE : nearestBlock.getCenter().distanceToSqr(eye);
@@ -361,7 +399,7 @@ public final class ThorAbilities {
             from = nearestBlock.getCenter();
             weapon = MjolnirBlock.lift(level, nearestBlock);
         } else if (nearestHolder != null) {
-            InteractionHand hand = weaponHand(nearestHolder);
+            InteractionHand hand = callableHand(player, nearestHolder);
             from = nearestHolder.getEyePosition().subtract(0, 0.4, 0);
             weapon = nearestHolder.getItemInHand(hand).split(1);
             nearestHolder.setItemInHand(hand, ItemStack.EMPTY);
@@ -378,16 +416,33 @@ public final class ThorAbilities {
     private static int findInInventory(Player player) {
         Inventory inventory = player.getInventory();
         for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-            if (isWeapon(inventory.getItem(slot))) {
+            if (canCall(player, inventory.getItem(slot))) {
                 return slot;
             }
         }
         return -1;
     }
 
-    /** The nearest Mjolnir block within range, among the loaded chunks around the player. */
+    /** Whether Thor can call this weapon: Stormbreaker, or a Mjolnir that is his or nobody's. */
+    private static boolean canCall(Player thor, ItemStack weapon) {
+        return isStormbreaker(weapon) || (isMjolnir(weapon) && Worthiness.canCall(thor, weapon));
+    }
+
+    /** The hand in which the creature holds a weapon Thor can call, or null. */
     @Nullable
-    private static BlockPos findBlock(ServerLevel level, BlockPos center, double range) {
+    private static InteractionHand callableHand(Player thor, LivingEntity holder) {
+        for (InteractionHand hand : InteractionHand.values()) {
+            if (canCall(thor, holder.getItemInHand(hand))) {
+                return hand;
+            }
+        }
+        return null;
+    }
+
+    /** The nearest Mjolnir block within range that Thor can call, among the loaded chunks around him. */
+    @Nullable
+    private static BlockPos findBlock(ServerLevel level, Player thor, double range) {
+        BlockPos center = thor.blockPosition();
         int chunks = (int) Math.ceil(range / 16.0);
         int cx = center.getX() >> 4;
         int cz = center.getZ() >> 4;
@@ -400,7 +455,7 @@ public final class ThorAbilities {
                     continue;
                 }
                 for (BlockEntity be : chunk.getBlockEntities().values()) {
-                    if (be instanceof MjolnirBlockEntity) {
+                    if (be instanceof MjolnirBlockEntity mjolnir && Worthiness.canCall(thor, mjolnir.hammer())) {
                         double d = be.getBlockPos().distSqr(center);
                         if (d <= bestDist) {
                             bestDist = d;

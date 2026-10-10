@@ -45,7 +45,7 @@ public final class ModItems {
             () -> new LokisScepterItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
                     .attributes(LokisScepterItem.createAttributes())));
 
-    /** Only the worthy can lift it: see {@link com.kolodkingal.enhanced.ability.Worthiness}. */
+    /** Only its owner can lift it: see {@link com.kolodkingal.enhanced.ability.Worthiness}. */
     public static final DeferredItem<MjolnirItem> MJOLNIR = ITEMS.register("mjolnir",
             () -> new MjolnirItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
                     .attributes(MjolnirItem.createAttributes())));
