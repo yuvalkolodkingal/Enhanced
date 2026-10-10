@@ -262,7 +262,10 @@ public final class CommonEvents {
         }
     }
 
-    /** Thor's lightning beam hits again and again: it leaves no invulnerability behind, and ignores what is left of anyone's. */
+    /**
+     * Thor's lightning beam hits again and again: it leaves no invulnerability behind, and ignores what is left of
+     * anyone's.
+     */
     @SubscribeEvent
     public static void onBeamHit(LivingIncomingDamageEvent event) {
         if (event.getSource().is(ModDamageTypes.LIGHTNING_BEAM)) {
@@ -299,7 +302,10 @@ public final class CommonEvents {
 
     // ---- Mjolnir pins someone down ----
 
-    /** Sneak + right click with Mjolnir sets it down on a creature; right click on the pinned one lifts it (its owner only). */
+    /**
+     * Sneak + right click with Mjolnir sets it down on a creature; right click on the pinned one lifts it (its owner
+     * only).
+     */
     @SubscribeEvent
     public static void onInteractEntity(PlayerInteractEvent.EntityInteract event) {
         InteractionResult result = MjolnirPin.interact(event.getEntity(), event.getHand(), event.getTarget());

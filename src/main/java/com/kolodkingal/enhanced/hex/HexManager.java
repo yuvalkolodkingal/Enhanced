@@ -250,7 +250,8 @@ public final class HexManager {
         if (!(entity instanceof LivingEntity living)) {
             return true;
         }
-        // Whoever Mjolnir pins down teleports nowhere (this is where the mod's own teleports and Ender Pearls are judged).
+        // Whoever Mjolnir pins down teleports nowhere (this is where the mod's own teleports and Ender Pearls are
+        // judged).
         if (MjolnirPin.isPinned(living)) {
             if (living instanceof Player player) {
                 player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);

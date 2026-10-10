@@ -36,8 +36,8 @@ import java.util.List;
 
 /**
  * Thor's lightning and the Bifrost, drawn in the world: the lightning beam from his hand (or the head of his weapon) to
- * whatever he looks at, arcs from creature to creature, the God of Thunder crackling with it, the glow of the fragments of
- * a shattered Mjolnir, the Bifrost's rainbow beam and the circle of runes it burns into the ground.
+ * whatever he looks at, arcs from creature to creature, the God of Thunder crackling with it, the glow of the fragments
+ * of a shattered Mjolnir, the Bifrost's rainbow beam and the circle of runes it burns into the ground.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class ThorEffects {
@@ -174,8 +174,8 @@ public final class ThorEffects {
     /**
      * Thor's lightning beam, from his hand (or the head of the weapon in it) to what he looks at: a jagged bolt with a
      * white-hot core, an electric blue body and a deep blue halo, reshaping itself every half tick, with a few strands
-     * crackling beside it and short forks branching off. Through Mjolnir or Stormbreaker it is thicker and brighter, and
-     * the God of Thunder's is thicker still. It starts thin, so it never fills the screen in first person.
+     * crackling beside it and short forks branching off. Through Mjolnir or Stormbreaker it is thicker and brighter,
+     * and the God of Thunder's is thicker still. It starts thin, so it never fills the screen in first person.
      */
     private static void beam(Minecraft mc, AbstractClientPlayer player, boolean weapon, boolean thunder, Matrix4f pose, VertexConsumer vc,
                              Vec3 camera, float partialTick, float time) {
@@ -263,9 +263,9 @@ public final class ThorEffects {
     }
 
     /**
-     * Where the beam leaves Thor: the head of the weapon in his hand, or his bare hand. From the shoulder of the arm that
-     * points where he looks (the body leans in flight, so the point is carried to where the lean has put it); in first
-     * person from where the weapon or the hand appears at the right of the screen.
+     * Where the beam leaves Thor: the head of the weapon in his hand, or his bare hand. From the shoulder of the arm
+     * that points where he looks (the body leans in flight, so the point is carried to where the lean has put it); in
+     * first person from where the weapon or the hand appears at the right of the screen.
      */
     private static Vec3 beamOrigin(Minecraft mc, AbstractClientPlayer player, boolean weapon, float partialTick) {
         Vec3 look = player.getViewVector(partialTick);
@@ -294,12 +294,14 @@ public final class ThorEffects {
         Vec3 c = centre.subtract(camera);
         Vec3 motion = fragment.getDeltaMovement();
         float flicker = 0.8F + 0.2F * Mth.sin(time * 1.7F + fragment.getId());
+        // Smaller the closer it is to the camera: a fragment bursting out of his own hand would fill the screen.
+        float near = (float) Mth.clamp(c.length() / 3.0, 0.15, 1.0);
         if (motion.lengthSqr() > 1.0E-4) {
             Vec3 tail = c.subtract(motion.normalize().scale(Math.min(2.4, motion.length() * 1.2)));
-            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.20F, EnergyGeometry.argb(HALO, 0.0F), EnergyGeometry.argb(BLUE, 0.55F * flicker));
-            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.07F, EnergyGeometry.argb(CORE, 0.0F), EnergyGeometry.argb(CORE, 0.85F));
+            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.20F * near, EnergyGeometry.argb(HALO, 0.0F), EnergyGeometry.argb(BLUE, 0.55F * flicker));
+            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.07F * near, EnergyGeometry.argb(CORE, 0.0F), EnergyGeometry.argb(CORE, 0.85F));
         }
-        flare(pose, vc, c, 0.34F * flicker, 0.9F);
+        flare(pose, vc, c, 0.34F * flicker * near, 0.9F);
         RandomSource random = RandomSource.create((long) (time * 2.0F) * 31L + fragment.getId());
         for (int i = 0; i < 2; i++) {
             Vec3 end = c.add((random.nextDouble() - 0.5) * 0.9, (random.nextDouble() - 0.5) * 0.9, (random.nextDouble() - 0.5) * 0.9);

@@ -61,6 +61,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
@@ -220,6 +221,9 @@ public final class ThorTests {
     @GameTest(template = ARENA, timeoutTicks = 200)
     public static void thrownMjolnirHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        // Out and back inside this arena: a hammer that flies on into chunks nothing keeps loaded (when the tests of a
+        // batch happen to be laid out far apart) stops ticking, and never comes home.
+        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 16);
         ServerPlayer thor = thor(f, 3.5, 10.5);
         Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         lookAt(thor, zombie);
@@ -338,6 +342,7 @@ public final class ThorTests {
     @GameTest(template = ARENA, timeoutTicks = 200)
     public static void thrownStormbreakerHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 16);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         PowerTicker.tick(thor);
@@ -646,7 +651,8 @@ public final class ThorTests {
         float steedBefore = steed.getHealth();
         assertNear(oneHit(thor, zombie), 2.0, 1.0E-4, "the beam goes past his steed, to the zombie");
         check(steed.getHealth() == steedBefore, "and the steed he rides isn't hurt");
-        // Pressing and letting go again and again can't hit faster than the beam's own pace (one hit in this very tick).
+        // Pressing and letting go again and again can't hit faster than the beam's own pace (one hit in this very
+        // tick).
         zombie.setHealth(zombie.getMaxHealth());
         for (int i = 0; i < 6; i++) {
             AbilityHandler.onKey(thor, 3, true);
@@ -798,6 +804,48 @@ public final class ThorTests {
         helper.succeed();
     }
 
+    @GameTest(template = ARENA, timeoutTicks = 60)
+    public static void aShatteredMjolnirFallsWhereThorWasWhenHeChangesDimension(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer thor = thor(f, 6.5, 6.5);
+        PowerTicker.tick(thor);
+        sneakPress(thor, 1);
+        check(fragments(helper).size() == MjolnirShatter.RING_FRAGMENTS, "shattered");
+        Vec3 where = thor.position();
+        thor.teleportTo(level.getServer().getLevel(Level.NETHER), 0.5, 128.0, 0.5, 0.0F, 0.0F);
+        PowerTicker.tick(thor);
+        check(fragments(helper).isEmpty() && !MjolnirShatter.isShattered(thor), "the fragments are gone");
+        List<ItemEntity> fallen = level.getEntitiesOfClass(ItemEntity.class, new AABB(where, where).inflate(2),
+                e -> e.getItem().is(ModItems.MJOLNIR.get()));
+        check(fallen.size() == 1 && ownedBy(fallen.get(0).getItem(), thor), "Mjolnir lies where he stood in the world he left, still his");
+        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty() && Powers.get(thor).hammerEntityId() == -1,
+                "nothing is kept in his data, and no weapon is in flight");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 100)
+    public static void theGodOfThunderArcsFromEveryFragment(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 10.5, 10.5);
+        PowerTicker.tick(thor);
+        press(thor, 4);
+        check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
+        Zombie enemy = bareZombie(helper, 5.5, 10.5);
+        // Not an enemy, so no fragment is sent for it, but near enough for the lightning to leap to it.
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.5, FLOOR, 13.5));
+        sneakPress(thor, 1);
+        check(fragments(helper).size() == 1, "one fragment, for the zombie");
+        f.everyTick(60, t -> {
+            PowerTicker.tick(thor);
+            if (pig.getHealth() == pig.getMaxHealth()) {
+                return false;
+            }
+            check(enemy.getMaxHealth() - enemy.getHealth() >= 6.0F, "the zombie was struck");
+            return true;
+        });
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // Mjolnir pins someone down
 
@@ -928,6 +976,24 @@ public final class ThorTests {
         check(pinsNear(zombie).isEmpty() && !MjolnirPin.isPinned(zombie), "the zombie is free");
         check(mjolnirsOnTheGround(zombie).stream().anyMatch(e -> ownedBy(e.getItem(), thor)), "Mjolnir lies beside it, still Thor's");
         helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 60)
+    public static void mjolnirLetsGoWhenItsOwnerChangesDimension(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = thor(f, 6.5, 10.5);
+        PowerTicker.tick(thor);
+        Zombie zombie = bareZombie(helper, 8.5, 10.5);
+        check(rightClick(thor, zombie, true) && MjolnirPin.isPinned(zombie), "pinned");
+        thor.teleportTo(helper.getLevel().getServer().getLevel(Level.NETHER), 0.5, 128.0, 0.5, 0.0F, 0.0F);
+        f.everyTick(10, t -> {
+            if (!pinsNear(zombie).isEmpty()) {
+                return false;
+            }
+            check(!MjolnirPin.isPinned(zombie), "the zombie is free");
+            check(mjolnirsOnTheGround(zombie).stream().anyMatch(e -> ownedBy(e.getItem(), thor)), "Mjolnir lies beside it, still Thor's");
+            return true;
+        });
     }
 
     @GameTest(template = ARENA, timeoutTicks = 200)

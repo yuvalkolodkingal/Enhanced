@@ -43,13 +43,13 @@ import java.util.UUID;
  * click a creature or player with Mjolnir in hand, as its owner (or any worthy player, with {@code mjolnirOwnerOnly}
  * off): the hammer is set down on them. While it lies there they can't move, jump, fly, swim up, ride, teleport, or
  * glide on an elytra; they can still look around. Only the owner can lift it again (right click the pinned one, or call
- * it back with R), nobody else, the pinned one included. It lets go by itself after a minute (config), or when its owner
- * logs out, dies or changes dimension, or when the pinned one dies or leaves, and then it falls to the ground, its owner
- * kept. The bosses ({@code enhanced:pin_immune}) can't be pinned, nor can players PvP rules protect.
+ * it back with R), nobody else, the pinned one included. It lets go by itself after a minute (config), or when its
+ * owner logs out, dies or changes dimension, or when the pinned one dies or leaves, and then it falls to the ground,
+ * its owner kept. The bosses ({@code enhanced:pin_immune}) can't be pinned, nor can players PvP rules protect.
  * <p>
- * The hammer lies on them as a {@link MjolnirPinEntity}. This class holds the pinned one in place: creatures through the
- * tick events (before they tick they stop; after, they are put back), players each tick, because they move themselves,
- * and the pinned player's client stops their own movement as well ({@link Live#PINNED}).
+ * The hammer lies on them as a {@link MjolnirPinEntity}. This class holds the pinned one in place: creatures through
+ * the tick events (before they tick they stop; after, they are put back), players each tick, because they move
+ * themselves, and the pinned player's client stops their own movement as well ({@link Live#PINNED}).
  */
 public final class MjolnirPin {
     /** How far (blocks) a pinned player's own movement may take them before the server puts them back. */
@@ -63,9 +63,9 @@ public final class MjolnirPin {
     // ---- right click ----
 
     /**
-     * Right click on {@code clicked}: lifting Mjolnir off someone pinned (only its owner can; for anyone else it will not
-     * budge), or, with Sneak and Mjolnir in {@code hand}, setting it down on them. Returns what the click did, or null if
-     * it was none of this business. Run on both sides, so the client doesn't also use the hammer (the Bifrost).
+     * Right click on {@code clicked}: lifting Mjolnir off someone pinned (only its owner can; for anyone else it will
+     * not budge), or, with Sneak and Mjolnir in {@code hand}, setting it down on them. Returns what the click did, or
+     * null if it was none of this business. Run on both sides, so the client doesn't also use the hammer (the Bifrost).
      */
     @Nullable
     public static InteractionResult interact(Player player, InteractionHand hand, Entity clicked) {
@@ -205,7 +205,10 @@ public final class MjolnirPin {
         level.playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.5F, 0.8F);
     }
 
-    /** The hammer is taken off (Thor called it, or its owner lifted it): the pinned one is free and the hammer is returned. */
+    /**
+     * The hammer is taken off (Thor called it, or its owner lifted it): the pinned one is free and the hammer is
+     * returned.
+     */
     public static ItemStack takeHammer(ServerLevel level, MjolnirPinEntity pin) {
         return end(pin, targetOf(level, pin));
     }
@@ -238,7 +241,9 @@ public final class MjolnirPin {
 
     // ---- holding them down ----
 
-    /** The pin's own tick: it lets go when its time is up or its owner is gone, and keeps the pinned one off any steed. */
+    /**
+     * The pin's own tick: it lets go when its time is up or its owner is gone, and keeps the pinned one off any steed.
+     */
     public static void tick(ServerLevel level, MjolnirPinEntity pin, LivingEntity target) {
         BY_TARGET.put(target.getUUID(), pin);
         ServerPlayer owner = level.getServer().getPlayerList().getPlayer(pin.ownerId());
@@ -268,7 +273,9 @@ public final class MjolnirPin {
         }
     }
 
-    /** After it ticked, a pinned creature is put back where it was pinned (it may have fallen, but it hasn't climbed). */
+    /**
+     * After it ticked, a pinned creature is put back where it was pinned (it may have fallen, but it hasn't climbed).
+     */
     public static void afterTick(Entity entity) {
         MjolnirPinEntity pin = pinnedCreature(entity);
         if (pin == null) {
@@ -308,8 +315,8 @@ public final class MjolnirPin {
     }
 
     /**
-     * Every player, every tick: a pinned player is marked for their own client (which stops them moving), can't fly, glide
-     * or ride, and is put back if they got anywhere all the same.
+     * Every player, every tick: a pinned player is marked for their own client (which stops them moving), can't fly,
+     * glide or ride, and is put back if they got anywhere all the same.
      */
     public static void tickPlayer(ServerPlayer player) {
         MjolnirPinEntity pin = BY_TARGET.isEmpty() ? null : pinOf(player);

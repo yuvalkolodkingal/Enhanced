@@ -73,9 +73,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Thor, the God of Thunder. His power is his own, but his weapon focuses it, Mjolnir or Stormbreaker: he throws it and
  * calls it back, flies by spinning it, and fires lightning from his hand, twice as strong through the weapon. Mjolnir
- * can also shatter into fragments that strike his enemies ({@link MjolnirShatter}) and be set down on someone to pin them
- * in place ({@link MjolnirPin}). Whoever claims Mjolnir first (the first worthy hand to lift it), if they have no other
- * power, becomes Thor; after that only its owner can lift it.
+ * can also shatter into fragments that strike his enemies ({@link MjolnirShatter}) and be set down on someone to pin
+ * them in place ({@link MjolnirPin}). Whoever claims Mjolnir first (the first worthy hand to lift it), if they have no
+ * other power, becomes Thor; after that only its owner can lift it.
  * <p>
  * Either weapon also calls the Bifrost, for Thor or anyone else who holds it: home, to where they look, or to a place
  * they saved, in any dimension (the places and the cooldown live in {@link BifrostData}).
@@ -98,13 +98,16 @@ public final class ThorAbilities {
     private static final int ARRIVAL_SEARCH = 24;
 
     /**
-     * What Thor's lightning beam can hit: creatures (other Thors excepted: lightning never hurts them), the parts of the
-     * Ender Dragon and End Crystals. Shared by the server (who is hit) and the client (where the beam is drawn to).
+     * What Thor's lightning beam can hit: creatures (other Thors excepted: lightning never hurts them), the parts of
+     * the Ender Dragon and End Crystals. Shared by the server (who is hit) and the client (where the beam is drawn to).
      */
     public static final Predicate<Entity> BEAM_TARGET = e -> e.isPickable() && !e.isSpectator() && e.isAlive()
             && (e instanceof LivingEntity || e instanceof PartEntity<?> || e instanceof EndCrystal) && !isThor(e);
 
-    /** What this Thor's own beam can hit: {@link #BEAM_TARGET}, but never the steed he rides, nor whoever rides with him. */
+    /**
+     * What this Thor's own beam can hit: {@link #BEAM_TARGET}, but never the steed he rides, nor whoever rides with
+     * him.
+     */
     public static Predicate<Entity> beamTargets(Entity thor) {
         return e -> BEAM_TARGET.test(e) && !thor.isPassengerOfSameVehicle(e);
     }
@@ -552,11 +555,11 @@ public final class ThorAbilities {
     }
 
     /**
-     * While the beam is fired: every few ticks (config) it hits the first creature in the line of sight, up to its range
-     * (24 blocks, 48 with Mjolnir or Stormbreaker in hand), for 2 damage (twice that with the weapon, and 1.5 times that
-     * again for the God of Thunder, whose every hit also arcs to the next creatures nearby). With the weapon in hand the
-     * first hit on each creature has the usual effects of lightning on it (creepers charge, pigs turn into zombified
-     * piglins). It burns a little hunger; where it ends, sparks fly, but nothing burns.
+     * While the beam is fired: every few ticks (config) it hits the first creature in the line of sight, up to its
+     * range (24 blocks, 48 with Mjolnir or Stormbreaker in hand), for 2 damage (twice that with the weapon, and 1.5
+     * times that again for the God of Thunder, whose every hit also arcs to the next creatures nearby). With the weapon
+     * in hand the first hit on each creature has the usual effects of lightning on it (creepers charge, pigs turn into
+     * zombified piglins). It burns a little hunger; where it ends, sparks fly, but nothing burns.
      */
     private static void beamTick(ServerPlayer thor, PowerData data) {
         if (thor.isSpectator() || starving(thor)) {
@@ -603,8 +606,8 @@ public final class ThorAbilities {
     }
 
     /**
-     * Lightning's own effect on a creature (a creeper is charged, a pig turns into a zombified piglin, a villager into a
-     * witch...), without its damage or its fire.
+     * Lightning's own effect on a creature (a creeper is charged, a pig turns into a zombified piglin, a villager into
+     * a witch...), without its damage or its fire.
      */
     private static void thunderStruck(ServerLevel level, ServerPlayer thor, LivingEntity target) {
         LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
@@ -628,7 +631,10 @@ public final class ThorAbilities {
         BEAMS.remove(thor.getUUID());
     }
 
-    /** Damage of one hit of the beam, for whether Thor holds Mjolnir or Stormbreaker and whether the God of Thunder is unleashed. */
+    /**
+     * Damage of one hit of the beam, for whether Thor holds Mjolnir or Stormbreaker and whether the God of Thunder is
+     * unleashed.
+     */
     public static float beamDamage(boolean weapon, boolean thunder) {
         double damage = EnhancedConfig.THOR_BEAM_DAMAGE.get();
         if (weapon) {
@@ -664,8 +670,8 @@ public final class ThorAbilities {
     }
 
     /**
-     * {@link #arc(ServerLevel, ServerPlayer, Vec3, Entity)}, where the first creature is the one that was struck already
-     * (the beam's) and is only the start of the arc if {@code hurtFirst} is false.
+     * {@link #arc(ServerLevel, ServerPlayer, Vec3, Entity)}, where the first creature is the one that was struck
+     * already (the beam's) and is only the start of the arc if {@code hurtFirst} is false.
      */
     private static void arc(ServerLevel level, ServerPlayer thor, Vec3 from, Entity first, boolean hurtFirst) {
         List<Vec3> points = new ArrayList<>();
@@ -900,8 +906,9 @@ public final class ThorAbilities {
         forgetBeamPace(player);
         data.set(Live.CALLING_LIGHTNING, false);
         data.setToggle(Toggle.GOD_OF_THUNDER, false);
-        // A shattered Mjolnir comes together where he stands and falls. A weapon in flight finds no Thor to return to, and
-        // drops by itself. A Bifrost already gathering still takes its traveller: it answers the weapon, not the power.
+        // A shattered Mjolnir comes together where he stands and falls. A weapon in flight finds no Thor to return to,
+        // and drops by itself. A Bifrost already gathering still takes its traveller: it answers the weapon, not the
+        // power.
         MjolnirShatter.onGone(player);
     }
 

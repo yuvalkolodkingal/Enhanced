@@ -163,7 +163,8 @@ public final class HeroPoses {
             case THOR -> {
                 Entity hammer = data.hammerEntityId() != -1 ? player.level().getEntity(data.hammerEntityId()) : null;
                 if (data.is(Live.CALLING_LIGHTNING)) {
-                    // Firing the lightning beam: the arm (and the weapon in it) points where he looks, trembling a little.
+                    // Firing the lightning beam: the arm (and the weapon in it) points where he looks, trembling a
+                    // little.
                     aim(model, main, -0.04F * side, t, 0.03F);
                     off.zRot += 0.25F * -side;
                 } else if (data.is(Live.BIFROST)) {

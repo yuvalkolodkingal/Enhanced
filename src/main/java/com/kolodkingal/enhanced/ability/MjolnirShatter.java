@@ -38,11 +38,11 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Mjolnir shatters (Thor: Love and Thunder, where Jane's Mjolnir bursts into dozens of glowing pieces that each strike an
- * enemy and then fly back to reassemble). Sneak + R with Mjolnir in hand: it bursts into fragments, one for each enemy
- * Thor can see within 16 blocks (hostile monsters, and anyone who is going after him or has just hurt him; the nearest
- * 12), or a ring of them if there is nobody; each strikes its enemy ({@link MjolnirFragmentEntity}) and flies home, and
- * when the last one is back the hammer is whole again in his hand.
+ * Mjolnir shatters (Thor: Love and Thunder, where Jane's Mjolnir bursts into dozens of glowing pieces that each strike
+ * an enemy and then fly back to reassemble). Sneak + R with Mjolnir in hand: it bursts into fragments, one for each
+ * enemy Thor can see within 16 blocks (hostile monsters, and anyone who is going after him or has just hurt him; the
+ * nearest 12), or a ring of them if there is nobody; each strikes its enemy ({@link MjolnirFragmentEntity}) and flies
+ * home, and when the last one is back the hammer is whole again in his hand.
  * <p>
  * While it is in pieces the hammer is kept in Thor's own saved data (not in the world), so it can neither be lost nor
  * copied. If Thor dies, logs out, changes dimension or loses his power meanwhile, it comes together where he was and
@@ -133,7 +133,9 @@ public final class MjolnirShatter {
         level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.6F), from.x, from.y, from.z, 24, 0.25, 0.25, 0.25, 0.3);
     }
 
-    /** The enemies Thor can see within {@link #RANGE} blocks, the nearest {@link #MAX_FRAGMENTS} of them, nearest first. */
+    /**
+     * The enemies Thor can see within {@link #RANGE} blocks, the nearest {@link #MAX_FRAGMENTS} of them, nearest first.
+     */
     public static List<LivingEntity> enemies(ServerPlayer thor) {
         List<LivingEntity> found = new ArrayList<>(thor.level().getEntitiesOfClass(LivingEntity.class, thor.getBoundingBox().inflate(RANGE),
                 e -> isEnemy(thor, e)));
@@ -142,8 +144,8 @@ public final class MjolnirShatter {
     }
 
     /**
-     * A hostile monster, or a creature or player going after Thor right now or who hurt him lately, that he can see. Not
-     * players who are in Creative or Spectator mode, or whom PvP rules out, and not his own pets.
+     * A hostile monster, or a creature or player going after Thor right now or who hurt him lately, that he can see.
+     * Not players who are in Creative or Spectator mode, or whom PvP rules out, and not his own pets.
      */
     private static boolean isEnemy(ServerPlayer thor, LivingEntity e) {
         if (e == thor || !e.isAlive() || e.isSpectator() || e instanceof ArmorStand || e.distanceToSqr(thor) > RANGE * RANGE) {
@@ -185,8 +187,8 @@ public final class MjolnirShatter {
     public static void tick(ServerPlayer player) {
         Shattered shattered = ACTIVE.get(player.getUUID());
         if (shattered == null) {
-            // A hammer still in pieces in the player's data, but with no fragments to bring it together (the world was closed
-            // or crashed meanwhile): it simply comes back.
+            // A hammer still in pieces in the player's data, but with no fragments to bring it together (the world was
+            // closed or crashed meanwhile): it simply comes back.
             ItemStack stored = player.getExistingData(ModAttachments.SHATTERED_MJOLNIR).orElse(ItemStack.EMPTY);
             if (!stored.isEmpty()) {
                 player.removeData(ModAttachments.SHATTERED_MJOLNIR);

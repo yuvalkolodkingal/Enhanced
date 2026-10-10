@@ -11,8 +11,9 @@ public enum Live {
     /** Tommy is spinning a whirlwind around himself. */
     WHIRLWIND,
     /**
-     * Thor is firing his lightning beam from his hand (or from the weapon in it): V is held down, and every client draws
-     * the beam to whatever he looks at. (The name is older than the beam, which used to call lightning down from the sky.)
+     * Thor is firing his lightning beam from his hand (or from the weapon in it): V is held down, and every client
+     * draws the beam to whatever he looks at. (The name is older than the beam, which used to call lightning down from
+     * the sky.)
      */
     CALLING_LIGHTNING,
     /** The Bifrost's light is gathering around its traveller (Thor, or anyone holding his weapon), about to take them. */
@@ -27,7 +28,10 @@ public enum Live {
     CROWNED,
     /** Billy is holding the creatures in front of him spellbound (both hands raised). */
     FREEZING,
-    /** Mjolnir lies on this player and pins them in place: their client stops their movement (any player, not only heroes). */
+    /**
+     * Mjolnir lies on this player and pins them in place: their client stops their movement (any player, not only
+     * heroes).
+     */
     PINNED;
 
     final int bit() {
