@@ -25,7 +25,7 @@
   "item.enhanced.wanda_crown.desc2": "On her: 20 hearts and Diamond-level protection",
   "item.enhanced.scarlet_witch_gene": "Scarlet Witch Gene",
   "item.enhanced.scarlet_witch_gene.desc": "On its own, it does nothing at all...",
-  "item.enhanced.scarlet_witch_gene.desc2": "Hold it while you touch the Mind Stone",
+  "item.enhanced.scarlet_witch_gene.desc2": "Hold it while you use Loki's Scepter or the Tesseract",
   "item.enhanced.lokis_scepter": "Loki's Scepter",
   "item.enhanced.lokis_scepter.desc": "The Mind Stone glows inside its blue gem",
   "item.enhanced.lokis_scepter.desc2": "Never touch the stone without the Scarlet Witch Gene!",
@@ -338,5 +338,12 @@
   "subtitles.enhanced.loki_vanish": "Loki vanishes",
   "subtitles.enhanced.loki_shapeshift": "Loki changes shape",
   "subtitles.enhanced.frost_giant": "The Frost Giant awakens",
-  "subtitles.enhanced.tesseract": "The Tesseract opens"
+  "subtitles.enhanced.tesseract": "The Tesseract opens",
+  "item.enhanced.tesseract.desc3": "With a Scarlet Witch Gene in your other hand it awakens you as the Scarlet Witch instead",
+  "item.enhanced.lokis_scepter.desc3": "Whoever it strikes is left confused",
+  "message.enhanced.chaos_shield.recharging": "The Chaos Shield needs %s more seconds",
+  "message.enhanced.chaos_shield.shattered": "The Chaos Shield shattered!",
+  "hud.enhanced.shield_forming": "forming",
+  "hud.enhanced.shield_strength": "%1$s/%2$s",
+  "effect.enhanced.confused": "Confused"
 }

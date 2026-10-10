@@ -90,10 +90,12 @@ public final class HeroPoses {
                     main.zRot += Mth.sin(t * 0.9F) * 0.06F;
                     off.zRot += 0.3F * side * -1;
                 } else if (data.chaosShieldActive()) {
-                    model.rightArm.xRot = -1.1F + Mth.sin(t * 0.3F) * 0.05F;
-                    model.leftArm.xRot = -1.1F + Mth.cos(t * 0.3F) * 0.05F;
-                    model.rightArm.zRot = 0.55F;
-                    model.leftArm.zRot = -0.55F;
+                    // The arms rise as the shield forms (ageInTicks is the player's age plus the partial tick).
+                    float raised = data.chaosShieldProgress(player.level().getGameTime() + (t - player.tickCount));
+                    model.rightArm.xRot = Mth.lerp(raised, -0.25F, -1.1F) + Mth.sin(t * 0.3F) * 0.05F;
+                    model.leftArm.xRot = Mth.lerp(raised, -0.25F, -1.1F) + Mth.cos(t * 0.3F) * 0.05F;
+                    model.rightArm.zRot = Mth.lerp(raised, 0.15F, 0.55F);
+                    model.leftArm.zRot = -Mth.lerp(raised, 0.15F, 0.55F);
                 } else if (airborne) {
                     // Arms open, palms glowing, slowly drifting.
                     model.rightArm.xRot = -0.25F + Mth.sin(t * 0.08F) * 0.08F;

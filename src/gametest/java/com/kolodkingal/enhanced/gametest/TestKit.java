@@ -247,6 +247,8 @@ public final class TestKit {
      */
     public static List<HeardSound> heardSounds(ServerPlayer player) {
         EmbeddedChannel channel = (EmbeddedChannel) player.connection.getConnection().channel();
+        // Nothing ticks the fake connection, which is what flushes it: a packet sent later would sit there unseen.
+        channel.flush();
         List<HeardSound> heard = new ArrayList<>();
         for (Object sent = channel.readOutbound(); sent != null; sent = channel.readOutbound()) {
             if (sent instanceof ClientboundSoundPacket packet) {

@@ -186,7 +186,7 @@ public final class CommonEvents {
         EnhancedCommand.register(event.getDispatcher());
     }
 
-    // ---- Magneto's mental immunity; the few too powerful to be spellbound ----
+    // ---- Magneto's mental immunity; the few too powerful to be spellbound or confused ----
 
     @SubscribeEvent
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
@@ -194,6 +194,9 @@ public final class CommonEvents {
             event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
         }
         if (event.getEffectInstance().is(ModEffects.SPELLBOUND) && event.getEntity().getType().is(ModTags.SPELLBOUND_IMMUNE)) {
+            event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+        }
+        if (event.getEffectInstance().is(ModEffects.CONFUSED) && event.getEntity().getType().is(ModTags.CONFUSED_IMMUNE)) {
             event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
         }
     }
@@ -217,13 +220,16 @@ public final class CommonEvents {
             event.setCanceled(true);
             return;
         }
-        if (WandaAbilities.hasShieldUp(player) && !unstoppable) {
+        if (player instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(player) && !unstoppable) {
+            // What the shield stops wears it down (and when nothing is left it shatters).
             if (source.is(DamageTypeTags.IS_PROJECTILE) && source.getDirectEntity() != null && source.getEntity() != player) {
+                WandaAbilities.wear(wanda, event.getAmount());
                 event.setCanceled(true);
                 return;
             }
             if (source.is(DamageTypeTags.IS_EXPLOSION)) {
-                event.setAmount(event.getAmount() * EnhancedConfig.CHAOS_SHIELD_EXPLOSION_FACTOR.get().floatValue());
+                float absorbable = event.getAmount() * (1.0F - EnhancedConfig.CHAOS_SHIELD_EXPLOSION_FACTOR.get().floatValue());
+                event.setAmount(event.getAmount() - WandaAbilities.wear(wanda, absorbable));
             }
         }
         if (MagnetoAbilities.wearsHelmet(player) && isWandasAttack(source)) {
@@ -301,7 +307,7 @@ public final class CommonEvents {
         }
         if (WandaAbilities.hasShieldUp(player)) {
             event.setCanceled(true);
-            WandaAbilities.disintegrate(player.serverLevel(), projectile);
+            WandaAbilities.block(player, projectile);
             return;
         }
         if (MagnetoAbilities.hasShieldUp(player) && MagnetoAbilities.isMetalProjectile(projectile)) {
@@ -335,13 +341,13 @@ public final class CommonEvents {
     // ---- who creatures go after ----
 
     /**
-     * A spellbound mob can't pick anyone to go after (it may only let go of its target); and a shapeshifted Loki is one
-     * of them: creatures of his new kind never go after him.
+     * A spellbound or confused mob can't pick anyone to go after (it may only let go of its target); and a shapeshifted
+     * Loki is one of them: creatures of his new kind never go after him.
      */
     @SubscribeEvent
     public static void onChangeTarget(LivingChangeTargetEvent event) {
         LivingEntity target = event.getNewAboutToBeSetTarget();
-        if (target != null && event.getEntity().hasEffect(ModEffects.SPELLBOUND)) {
+        if (target != null && (event.getEntity().hasEffect(ModEffects.SPELLBOUND) || event.getEntity().hasEffect(ModEffects.CONFUSED))) {
             event.setCanceled(true);
         } else if (target instanceof Player player && LokiAbilities.passesAs(player, event.getEntity().getType())) {
             event.setCanceled(true);

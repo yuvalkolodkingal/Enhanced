@@ -25,7 +25,7 @@
   "item.enhanced.wanda_crown.desc2": "על מכשפת השני: 20 לבבות והגנה כמו שריון יהלום",
   "item.enhanced.scarlet_witch_gene": "גן מכשפת השני",
   "item.enhanced.scarlet_witch_gene.desc": "לבד הוא לא עושה שום דבר...",
-  "item.enhanced.scarlet_witch_gene.desc2": "החזיקו אותו כשאתם נוגעים באבן התודעה",
+  "item.enhanced.scarlet_witch_gene.desc2": "החזיקו אותו כשאתם משתמשים בשרביט של לוקי או בטסרקט",
   "item.enhanced.lokis_scepter": "השרביט של לוקי",
   "item.enhanced.lokis_scepter.desc": "אבן התודעה זוהרת בתוך הקריסטל הכחול שלו",
   "item.enhanced.lokis_scepter.desc2": "לעולם אל תיגעו באבן בלי גן מכשפת השני!",
@@ -338,5 +338,12 @@
   "subtitles.enhanced.loki_vanish": "לוקי נעלם",
   "subtitles.enhanced.loki_shapeshift": "לוקי משנה צורה",
   "subtitles.enhanced.frost_giant": "ענק הכפור מתעורר",
-  "subtitles.enhanced.tesseract": "הטסרקט נפתח"
+  "subtitles.enhanced.tesseract": "הטסרקט נפתח",
+  "item.enhanced.tesseract.desc3": "עם גן מכשפת השני ביד השנייה הוא יעיר אתכם כמכשפת השני במקום",
+  "item.enhanced.lokis_scepter.desc3": "מי שהוא מכה נשאר מבולבל",
+  "message.enhanced.chaos_shield.recharging": "מגן הכאוס צריך עוד %s שניות",
+  "message.enhanced.chaos_shield.shattered": "מגן הכאוס התנפץ!",
+  "hud.enhanced.shield_forming": "נוצר",
+  "hud.enhanced.shield_strength": "%1$s/%2$s",
+  "effect.enhanced.confused": "מבולבל"
 }
