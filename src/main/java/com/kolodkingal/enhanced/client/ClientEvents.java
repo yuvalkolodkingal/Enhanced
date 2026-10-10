@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
@@ -19,6 +20,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.Music;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -54,7 +56,9 @@ public final class ClientEvents {
         handleKeys(mc, player);
         spawnFlightParticles(mc.level);
         spawnSpeedTrails(mc.level);
+        spawnFrostParticles(mc);
         Afterimages.tick(mc.level);
+        Shapeshifts.tick(mc.level);
         QuicksilverMusic.tick(mc);
         PowerLoopSounds.tick(mc);
         SlowMotionEffect.tick(mc);
@@ -75,7 +79,27 @@ public final class ClientEvents {
         QuicksilverMusic.stop();
         PowerLoopSounds.stopAll();
         Afterimages.clear();
+        Shapeshifts.clear();
         SlowMotionEffect.stop(Minecraft.getInstance());
+    }
+
+    /** Frost drifts off a Frost Giant: snowflakes and a faint icy shimmer (not in his own face in first person). */
+    private static void spawnFrostParticles(Minecraft mc) {
+        ClientLevel level = mc.level;
+        RandomSource random = level.random;
+        for (AbstractClientPlayer player : level.players()) {
+            if (!LokiAbilities.isFrostGiant(player) || player.isInvisible() || player.tickCount % 3 != 0
+                    || (player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson())) {
+                continue;
+            }
+            double x = player.getX() + (random.nextDouble() - 0.5) * 0.8;
+            double y = player.getY() + 0.2 + random.nextDouble() * 1.5;
+            double z = player.getZ() + (random.nextDouble() - 0.5) * 0.8;
+            level.addParticle(ParticleTypes.SNOWFLAKE, x, y, z, (random.nextDouble() - 0.5) * 0.04, -0.02, (random.nextDouble() - 0.5) * 0.04);
+            if (random.nextInt(3) == 0) {
+                level.addParticle(new EnergyParticleOptions(LokiAbilities.FROST_GLOW, 0.7F), x, y, z, 0, -0.01, 0);
+            }
+        }
     }
 
     /**

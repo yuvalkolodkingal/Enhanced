@@ -1,0 +1,153 @@
+package com.kolodkingal.enhanced.item;
+
+import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.ability.Teleports;
+import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Powers;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+
+/**
+ * The Tesseract, with the Space Stone inside. In Avengers: Endgame the 2012 Loki grabs it and vanishes in a blue swirl:
+ * that escape is where the Loki of the TVA comes from. Used by someone without powers, it does the same: a swirl, a
+ * flash, and they are Loki somewhere far away. A hero who uses it is simply taken to the block they look at.
+ * The cube itself is never used up.
+ */
+public class TesseractItem extends Item {
+    /** The Space Stone palette: dim, mid, bright, core. */
+    public static final int DIM = 0x028EB4;
+    public static final int MID = 0x1FB6CF;
+    public static final int BRIGHT = 0x5DCCE1;
+    public static final int CORE = 0xA0DBE8;
+
+    public static final int ESCAPE_MIN = 100;
+    public static final int ESCAPE_MAX = 250;
+    public static final int ESCAPE_TRIES = 12;
+    public static final int JUMP_RANGE = 48;
+    public static final int JUMP_COOLDOWN = 100;
+
+    public TesseractItem(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (player instanceof ServerPlayer serverPlayer) {
+            if (Powers.power(serverPlayer).hasPowers()) {
+                if (!jump(serverPlayer)) {
+                    return InteractionResultHolder.fail(stack);
+                }
+                player.getCooldowns().addCooldown(this, JUMP_COOLDOWN);
+            } else {
+                escape(serverPlayer);
+                player.getCooldowns().addCooldown(this, 20);
+            }
+        }
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+    }
+
+    /**
+     * Loki's escape: the Space Stone swirls round the player, they vanish in a blue flash and reappear 100-250 blocks
+     * away on safe ground (or stay where they are, if none is found), and awaken as Loki.
+     */
+    public static void escape(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        swirl(level, player.position());
+        Vec3 from = player.position();
+        Vec3 to = Teleports.farAway(player, player.getRandom(), ESCAPE_MIN, ESCAPE_MAX, ESCAPE_TRIES);
+        level.playSound(null, from.x, from.y, from.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.6F);
+        if (to != null) {
+            flash(level, from);
+            level.playSound(null, from.x, from.y, from.z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0F, 0.7F);
+            float yaw = (float) (Mth.atan2(-(to.x - from.x), to.z - from.z) * Mth.RAD_TO_DEG);
+            player.teleportTo(level, to.x, to.y, to.z, yaw, 0.0F);
+            player.resetFallDistance();
+            flash(level, to);
+            level.playSound(null, to.x, to.y, to.z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0F, 0.7F);
+        }
+        Powers.awaken(player, Power.LOKI);
+    }
+
+    /**
+     * A hero's jump: the Space Stone takes them to the block they look at (up to 48 blocks away), on top of it if
+     * there is room. The Hex wall still stops them.
+     *
+     * @return false if nothing happened (nothing in reach, no room, or the Hex refused)
+     */
+    public static boolean jump(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockHitResult hit = Raycasts.block(player, JUMP_RANGE, 1.0F);
+        if (hit.getType() != HitResult.Type.BLOCK) {
+            player.displayClientMessage(Component.translatable("message.enhanced.tesseract.no_block", JUMP_RANGE), true);
+            return false;
+        }
+        Vec3 to = Teleports.onto(player, hit);
+        if (to == null) {
+            player.displayClientMessage(Component.translatable("message.enhanced.teleport.no_room"), true);
+            return false;
+        }
+        if (!HexManager.onTeleport(level, player, to)) {
+            return false;
+        }
+        Vec3 from = player.position();
+        flash(level, from);
+        level.playSound(null, from.x, from.y, from.z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.8F, 1.3F);
+        player.teleportTo(level, to.x, to.y, to.z, player.getYRot(), player.getXRot());
+        player.resetFallDistance();
+        flash(level, to);
+        level.playSound(null, to.x, to.y, to.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.6F, 1.8F);
+        return true;
+    }
+
+    /** A rising spiral of Space Stone light round someone about to vanish. */
+    private static void swirl(ServerLevel level, Vec3 at) {
+        int[] colors = {DIM, MID, BRIGHT, CORE};
+        for (int i = 0; i < 72; i++) {
+            double t = i / 72.0;
+            double angle = t * Mth.TWO_PI * 3;
+            double radius = 1.1 - t * 0.5;
+            double x = at.x + Math.cos(angle) * radius;
+            double z = at.z + Math.sin(angle) * radius;
+            // Moving along the spiral, so it turns.
+            level.sendParticles(new EnergyParticleOptions(colors[i % colors.length], 1.3F), x, at.y + t * 2.2, z, 0,
+                    -Math.sin(angle), 0.15, Math.cos(angle), 0.18);
+        }
+    }
+
+    /** A blue flash where someone vanished or appeared. */
+    private static void flash(ServerLevel level, Vec3 at) {
+        level.sendParticles(new EnergyParticleOptions(MID, 2.0F), at.x, at.y + 1.0, at.z, 40, 0.35, 0.7, 0.35, 0.1);
+        level.sendParticles(new EnergyParticleOptions(CORE, 2.6F), at.x, at.y + 1.0, at.z, 16, 0.15, 0.4, 0.15, 0.04);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("item.enhanced.tesseract.desc").withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.enhanced.tesseract.desc2").withStyle(ChatFormatting.DARK_GREEN));
+    }
+
+    @Override
+    public boolean isFoil(ItemStack stack) {
+        return true;
+    }
+}

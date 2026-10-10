@@ -8,14 +8,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Swaps in Magneto's or the Scarlet Witch's suit while they are transformed. */
+/** Swaps in a hero's suit while they are transformed (and Loki's borrowed or Frost Giant skin). */
 @Mixin(AbstractClientPlayer.class)
 public abstract class AbstractClientPlayerMixin {
     @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
     private void enhanced$suit(CallbackInfoReturnable<PlayerSkin> cir) {
-        PlayerSkin suit = SuitSkins.suitFor((AbstractClientPlayer) (Object) this);
-        if (suit != null) {
-            cir.setReturnValue(suit);
+        PlayerSkin own = cir.getReturnValue();
+        PlayerSkin skin = SuitSkins.skinFor((AbstractClientPlayer) (Object) this, own);
+        if (skin != own) {
+            cir.setReturnValue(skin);
         }
     }
 }

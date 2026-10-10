@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.event;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.PhotonAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -21,6 +22,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,6 +37,8 @@ import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
@@ -80,6 +84,7 @@ public final class CommonEvents {
         SlowMotion.clear();
         MagnetoAbilities.clearHeld();
         TommyAbilities.clear();
+        LokiAbilities.clear();
     }
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----
@@ -179,6 +184,11 @@ public final class CommonEvents {
             event.setCanceled(true);
             return;
         }
+        if (source.is(DamageTypeTags.IS_FREEZING) && LokiAbilities.isFrostGiant(player)) {
+            // A Frost Giant is made of the cold.
+            event.setCanceled(true);
+            return;
+        }
         if (WandaAbilities.hasShieldUp(player) && !unstoppable) {
             if (source.is(DamageTypeTags.IS_PROJECTILE) && source.getDirectEntity() != null && source.getEntity() != player) {
                 event.setCanceled(true);
@@ -248,6 +258,25 @@ public final class CommonEvents {
     @SubscribeEvent
     public static void onAttack(AttackEntityEvent event) {
         if (PhotonAbilities.isPhased(event.getEntity()) || VisionAbilities.isPhased(event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    /** A blow that landed: a Frost Giant's freezes. */
+    @SubscribeEvent
+    public static void onDamageDealt(LivingDamageEvent.Post event) {
+        DamageSource source = event.getSource();
+        if (source.is(DamageTypes.PLAYER_ATTACK) && source.getEntity() instanceof ServerPlayer player && source.getDirectEntity() == player) {
+            LokiAbilities.onMeleeHit(player, event.getEntity());
+        }
+    }
+
+    // ---- who creatures go after ----
+
+    /** A shapeshifted Loki is one of them: creatures of his new kind never go after him. */
+    @SubscribeEvent
+    public static void onChangeTarget(LivingChangeTargetEvent event) {
+        if (event.getNewAboutToBeSetTarget() instanceof Player player && LokiAbilities.passesAs(player, event.getEntity().getType())) {
             event.setCanceled(true);
         }
     }

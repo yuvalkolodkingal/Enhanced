@@ -18,6 +18,7 @@ public final class ModCreativeTab {
                         output.accept(ModItems.MAGNETO_HELMET.get());
                         output.accept(ModItems.SCARLET_WITCH_GENE.get());
                         output.accept(ModItems.LOKIS_SCEPTER.get());
+                        output.accept(ModItems.TESSERACT.get());
                         output.accept(ModItems.WANDA_CROWN.get());
                         output.accept(ModItems.QUICKSILVER_GOGGLES.get());
                         output.accept(ModItems.SYNTHEZOID_CORE.get());

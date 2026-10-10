@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -24,6 +25,8 @@ import net.minecraft.world.phys.Vec3;
  *     <li>Vision: upright, composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
  *     weightless while phased.</li>
  *     <li>Photon: a fist forward like a superhero in flight.</li>
+ *     <li>Loki: a throwing arm after each dagger, a raised open hand as he vanishes or changes shape, and arms held
+ *     slightly out in his Frost Giant form.</li>
  * </ul>
  */
 public final class HeroPoses {
@@ -149,7 +152,25 @@ public final class HeroPoses {
                     model.leftArm.xRot = 0.0F;
                 }
             }
-            case BILLY, LOKI, THOR, NONE -> {
+            case LOKI -> {
+                if (data.is(Live.THROWING)) {
+                    // The follow-through of a throw: the arm swept forward from over the shoulder.
+                    main.xRot = -1.7F + model.head.xRot * 0.6F;
+                    main.yRot = model.head.yRot * 0.5F - 0.15F * side;
+                    main.zRot = 0.0F;
+                } else if (data.is(Live.CASTING)) {
+                    // A hand raised, fingers spread, as the spell is cast.
+                    main.xRot = -2.5F + Mth.sin(t * 0.9F) * 0.04F;
+                    main.yRot = -0.25F * side;
+                    main.zRot = 0.3F * side;
+                }
+                if (LokiAbilities.isFrostGiant(player)) {
+                    // The Jotun stance: arms held slightly out from the body.
+                    model.rightArm.zRot += 0.2F;
+                    model.leftArm.zRot -= 0.2F;
+                }
+            }
+            case BILLY, THOR, NONE -> {
             }
         }
         sync(model);

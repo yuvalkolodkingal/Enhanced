@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
 import com.kolodkingal.enhanced.item.QuicksilverGogglesItem;
 import com.kolodkingal.enhanced.item.ScarletWitchGeneItem;
 import com.kolodkingal.enhanced.item.SynthezoidCoreItem;
+import com.kolodkingal.enhanced.item.TesseractItem;
 import com.kolodkingal.enhanced.item.WandaCrownItem;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
@@ -39,9 +40,14 @@ public final class ModItems {
             () -> new LokisScepterItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
                     .attributes(LokisScepterItem.createAttributes())));
 
+    /** The Space Stone in its cube. Using it is how Loki escapes in 2012, so it makes you Loki. */
+    public static final DeferredItem<TesseractItem> TESSERACT = ITEMS.register("tesseract",
+            () -> new TesseractItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
     /** Projectile sprites only; not in the creative tab. */
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");
     public static final DeferredItem<Item> PHOTON_ORB = ITEMS.registerSimpleItem("photon_orb");
+    public static final DeferredItem<Item> LOKI_DAGGER = ITEMS.registerSimpleItem("loki_dagger");
 
     private ModItems() {
     }

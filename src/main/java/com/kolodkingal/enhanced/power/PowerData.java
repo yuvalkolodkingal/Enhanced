@@ -349,7 +349,7 @@ public final class PowerData {
         }
     }
 
-    /** Loki's shapeshifted form (an entity type id), or empty for his own body. */
+    /** Loki's shapeshifted form (an entity type id, or another player: see {@link LokiForm}), or empty for his own body. */
     public String form() {
         return form;
     }

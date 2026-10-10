@@ -57,6 +57,9 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
     public static final ModConfigSpec.DoubleValue TOMMY_EXHAUSTION;
 
+    // ---- Loki ----
+    public static final ModConfigSpec.DoubleValue LOKI_DAGGER_DAMAGE;
+
     // ---- Thor ----
     public static final ModConfigSpec.DoubleValue THOR_FLIGHT_SPEED;
 
@@ -143,6 +146,11 @@ public final class EnhancedConfig {
                 .defineInRange("speedBonus", 2.5, 0.0, 10.0);
         TOMMY_EXHAUSTION = BUILDER.comment("Food exhaustion per tick while Tommy runs at super speed (4.0 = 1 food point).")
                 .defineInRange("exhaustion", 0.02, 0.0, 4.0);
+        BUILDER.pop();
+
+        BUILDER.push("loki");
+        LOKI_DAGGER_DAMAGE = BUILDER.comment("Damage of one of Loki's conjured daggers.")
+                .defineInRange("daggerDamage", 5.0, 0.0, 100.0);
         BUILDER.pop();
 
         BUILDER.push("thor");
