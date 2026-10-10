@@ -658,5 +658,5 @@ Every power's light follows the films and shows:
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
-Loki's dagger damage, Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's cooldown…) can be changed in
-`world/serverconfig/enhanced-server.toml`.
+Loki's dagger damage, Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir, the Bifrost's
+cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`.

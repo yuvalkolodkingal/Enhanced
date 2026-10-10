@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,6 +25,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -41,6 +43,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 
@@ -67,6 +70,11 @@ public final class LokiTests {
         return new AABB(helper.absoluteVec(new Vec3(0, 0, 0)), helper.absoluteVec(new Vec3(21, 12, 21)));
     }
 
+    /** How many times {@code listener} heard {@code sound} played inside {@code where} since it last asked. */
+    private static long heard(ServerPlayer listener, AABB where, DeferredHolder<SoundEvent, SoundEvent> sound) {
+        return TestKit.heardSounds(listener).stream().filter(s -> s.id().equals(sound.getId()) && where.contains(s.at())).count();
+    }
+
     // ---- the Tesseract ----
 
     @GameTest(template = ARENA)
@@ -76,10 +84,14 @@ public final class LokiTests {
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.TESSERACT.get()));
         Vec3 start = player.position();
+        TestKit.heardSounds(player);
 
         player.getMainHandItem().use(level, player, InteractionHand.MAIN_HAND);
 
         check(Powers.is(player, Power.LOKI), "whoever escapes with the Tesseract becomes Loki");
+        List<TestKit.HeardSound> sounds = TestKit.heardSounds(player).stream().filter(s -> s.id().equals(ModSounds.TESSERACT.getId())).toList();
+        check(sounds.stream().anyMatch(s -> arena(helper).contains(s.at())), "the Tesseract opens with its own sound where they vanish");
+        check(sounds.stream().anyMatch(s -> !arena(helper).contains(s.at())), "and again where they appear");
         double distance = player.position().subtract(start).multiply(1, 0, 1).length();
         check(distance >= TesseractItem.ESCAPE_MIN && distance <= TesseractItem.ESCAPE_MAX,
                 "they reappear 100-250 blocks away, not " + distance);
@@ -101,9 +113,11 @@ public final class LokiTests {
         BlockPos block = new BlockPos(12, 2, 10);
         helper.setBlock(block, Blocks.STONE);
         lookAt(magneto, helper.absoluteVec(Vec3.atCenterOf(block)));
+        TestKit.heardSounds(magneto);
 
         magneto.getMainHandItem().use(level, magneto, InteractionHand.MAIN_HAND);
 
+        check(heard(magneto, arena(helper), ModSounds.TESSERACT) == 2, "the jump plays the Tesseract's sound at both ends");
         Vec3 rel = helper.relativeVec(magneto.position());
         check(Math.abs(rel.x - 12.5) < 0.01 && Math.abs(rel.z - 10.5) < 0.01 && Math.abs(rel.y - 3.0) < 0.01,
                 "the Space Stone puts him on top of the block he looked at, not at " + rel);
@@ -362,6 +376,51 @@ public final class LokiTests {
             check(Powers.cycleVariant(loki, 1), "the look changes");
             check(Variants.current(data).id().equals(expected), "the next look is " + expected + ", not " + Variants.current(data).id());
         }
+        helper.succeed();
+    }
+
+    // ---- Sounds ----
+
+    /** Every trick has Loki's own sound (not a vanilla stand-in), played where it happens. */
+    @GameTest(template = ARENA)
+    public static void everyTrickHasItsOwnSound(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        AABB arena = arena(helper);
+        ServerPlayer loki = f.player(4.5, FLOOR, 10.5, Power.LOKI);
+        look(loki, EAST, 0.0F);
+        TestKit.heardSounds(loki);
+
+        press(loki, 1);
+        check(heard(loki, arena, ModSounds.LOKI_DAGGER) == 1, "throwing a dagger plays loki_dagger");
+
+        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        lookAt(loki, model);
+        press(loki, 3);
+        check(heard(loki, arena, ModSounds.LOKI_SHAPESHIFT) == 1, "taking a shape plays loki_shapeshift");
+        look(loki, EAST, -90.0F);
+        press(loki, 3);
+        check(heard(loki, arena, ModSounds.LOKI_SHAPESHIFT) == 1, "and so does turning back");
+        model.discard();
+
+        BlockPos block = new BlockPos(14, 2, 10);
+        helper.setBlock(block, Blocks.STONE);
+        lookAt(loki, helper.absoluteVec(Vec3.atCenterOf(block)));
+        press(loki, 4);
+        check(heard(loki, arena, ModSounds.LOKI_VANISH) == 2, "vanishing plays loki_vanish where he goes and where he arrives");
+
+        press(loki, 5);
+        check(heard(loki, arena, ModSounds.FROST_GIANT) == 1, "becoming a Frost Giant plays frost_giant");
+        press(loki, 5);
+        check(heard(loki, arena, ModSounds.FROST_GIANT) == 0, "and turning Asgardian again doesn't");
+
+        press(loki, 2);
+        check(heard(loki, arena, ModSounds.LOKI_ILLUSION) == 1, "the duplicates appearing play loki_illusion");
+        LokiIllusionEntity copy = LokiIllusionEntity.ownedBy(level, loki.getUUID()).get(0);
+        copy.hurt(level.damageSources().generic(), 1.0F);
+        check(copy.isRemoved() && heard(loki, arena, ModSounds.LOKI_DISSOLVE) == 1, "a duplicate breaking plays loki_dissolve");
+        // The dagger thrown at the start is still in flight; it mustn't leave the arena.
+        level.getEntitiesOfClass(LokiDaggerEntity.class, arena).forEach(LokiDaggerEntity::discard);
         helper.succeed();
     }
 

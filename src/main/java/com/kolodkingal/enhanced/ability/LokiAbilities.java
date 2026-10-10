@@ -393,8 +393,6 @@ public final class LokiAbilities {
                 20, 0.3, 0.7, 0.3, 0.05);
         if (frost) {
             level.sendParticles(ParticleTypes.SNOWFLAKE, player.getX(), player.getY() + 1.0, player.getZ(), 30, 0.4, 0.8, 0.4, 0.02);
-        }
-        if (frost) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.FROST_GIANT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         } else {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 1.4F);

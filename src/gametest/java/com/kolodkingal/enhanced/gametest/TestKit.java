@@ -12,6 +12,7 @@ import net.minecraft.gametest.framework.GameTestListener;
 import net.minecraft.gametest.framework.GameTestRunner;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
@@ -231,6 +232,29 @@ public final class TestKit {
 
     /** Yaw that looks along +X. */
     public static final float EAST = -90.0F;
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Sounds
+
+    /** A sound the server sent a player: which sound event, and where in the world it was played. */
+    public record HeardSound(ResourceLocation id, Vec3 at) {
+    }
+
+    /**
+     * The sounds the server has sent this player since the last call, oldest first. The fake client's connection keeps
+     * every packet written to it, so a test can ask what a player would have heard. A sound reaches every player
+     * within 16 blocks of where it is played, so tests that count sounds only count the ones played in their own arena.
+     */
+    public static List<HeardSound> heardSounds(ServerPlayer player) {
+        EmbeddedChannel channel = (EmbeddedChannel) player.connection.getConnection().channel();
+        List<HeardSound> heard = new ArrayList<>();
+        for (Object sent = channel.readOutbound(); sent != null; sent = channel.readOutbound()) {
+            if (sent instanceof ClientboundSoundPacket packet) {
+                heard.add(new HeardSound(packet.getSound().value().getLocation(), new Vec3(packet.getX(), packet.getY(), packet.getZ())));
+            }
+        }
+        return heard;
+    }
 
     // ------------------------------------------------------------------------------------------------------------
     // Assertions
