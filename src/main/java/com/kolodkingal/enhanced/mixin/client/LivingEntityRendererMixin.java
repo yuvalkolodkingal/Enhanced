@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.mixin.client;
 
-import com.kolodkingal.enhanced.ability.PhotonAbilities;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -12,11 +11,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Phasing heroes (Vision, Photon) are drawn see-through, like a ghost. */
+/** A phasing Vision is drawn see-through, like a ghost. */
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
     private static boolean enhanced$phased(LivingEntity entity) {
-        return entity instanceof Player player && (VisionAbilities.isPhased(player) || PhotonAbilities.isPhased(player));
+        return entity instanceof Player player && VisionAbilities.isPhased(player);
     }
 
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)

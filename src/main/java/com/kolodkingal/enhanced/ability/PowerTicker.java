@@ -35,7 +35,6 @@ public final class PowerTicker {
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.tick(player, data);
             case SCARLET_WITCH -> WandaAbilities.tick(player, data);
-            case PHOTON -> PhotonAbilities.tick(player, data);
             case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
             case VISION -> VisionAbilities.tick(player, data);
             case BILLY -> BillyAbilities.tick(player, data);

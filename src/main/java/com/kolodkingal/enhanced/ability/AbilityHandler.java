@@ -20,7 +20,6 @@ public final class AbilityHandler {
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down);
             case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down);
-            case PHOTON -> PhotonAbilities.onKey(player, data, ability, down);
             case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down);
             case VISION -> VisionAbilities.onKey(player, data, ability, down);
             case BILLY -> BillyAbilities.onKey(player, data, ability, down);

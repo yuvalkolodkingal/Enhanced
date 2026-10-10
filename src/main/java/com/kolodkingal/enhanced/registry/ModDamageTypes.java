@@ -16,8 +16,6 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> TELEKINETIC_SLAM = key("telekinetic_slam");
     public static final ResourceKey<DamageType> HEX_WALL = key("hex_wall");
     public static final ResourceKey<DamageType> MIND_STONE = key("mind_stone");
-    public static final ResourceKey<DamageType> PHOTON_BLAST = key("photon_blast");
-    public static final ResourceKey<DamageType> ENERGY_BURST = key("energy_burst");
     public static final ResourceKey<DamageType> SPEED_BLITZ = key("speed_blitz");
     public static final ResourceKey<DamageType> MIND_STONE_BEAM = key("mind_stone_beam");
     public static final ResourceKey<DamageType> MOLECULAR_ACCELERATION = key("molecular_acceleration");

@@ -253,8 +253,8 @@ public final class ClientEvents {
     }
 
     /**
-     * Wanda's hands trail crimson energy in flight, Billy's give off faint blue sparks, Photon leaves a trail of light,
-     * Magneto a faint haze of metal dust.
+     * Wanda's hands trail crimson energy in flight, Billy's give off faint blue sparks, Magneto a faint haze of metal
+     * dust.
      */
     private static void spawnFlightParticles(ClientLevel level) {
         RandomSource random = level.random;
@@ -272,9 +272,6 @@ public final class ClientEvents {
                                 hand.z + (random.nextDouble() - 0.5) * 0.15, 0, 0.01, 0);
                     }
                 }
-                case PHOTON -> level.addParticle(new EnergyParticleOptions(Power.PHOTON.color, 1.3F),
-                        player.getX() + (random.nextDouble() - 0.5) * 0.4, player.getY() + 0.2 + random.nextDouble() * 1.2,
-                        player.getZ() + (random.nextDouble() - 0.5) * 0.4, 0, 0, 0);
                 case MAGNETO -> {
                     if (player.tickCount % 2 == 0) {
                         level.addParticle(new EnergyParticleOptions(Power.MAGNETO.glow, 0.9F),

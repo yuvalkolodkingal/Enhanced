@@ -13,11 +13,10 @@ import java.util.Locale;
 public enum Power implements StringRepresentable {
     NONE(0xFFFFFF, 0xFFFFFF),
     // Energy colours follow the films and shows: Magneto's magnetism has no glow in the X-Men films (iron-grey metal
-    // dust), the Scarlet Witch's chaos magic is crimson with hot pink highlights, Photon's light is blue-white, Fox
-    // Quicksilver leaves only a grey blur, and the Mind Stone's beam is pale gold.
+    // dust), the Scarlet Witch's chaos magic is crimson with hot pink highlights, Fox Quicksilver leaves only a grey
+    // blur, and the Mind Stone's beam is pale gold.
     MAGNETO(0x8A9096, 0xD2D6DA),
     SCARLET_WITCH(0xE0193F, 0xFF6F86),
-    PHOTON(0xA2D4F3, 0xEBF8FD),
     QUICKSILVER(0x9AA3AD, 0xC8D0D8),
     VISION(0xF5D77A, 0xFFF6D5),
     BILLY(0x5CC8FF, 0xCFEFFF),
@@ -25,7 +24,14 @@ public enum Power implements StringRepresentable {
     LOKI(0x76B154, 0xCAF297),
     THOR(0x4DB8FF, 0xBFE6FF);
 
-    public static final Codec<Power> CODEC = StringRepresentable.fromEnum(Power::values);
+    /**
+     * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
+     * failing, so a world saved with that hero still loads.
+     */
+    public static final Codec<Power> CODEC = Codec.STRING.xmap(name -> {
+        Power power = byName(name);
+        return power == null ? NONE : power;
+    }, Power::getSerializedName);
 
     /** Main colour (UI text, particles). */
     public final int color;
@@ -63,7 +69,7 @@ public enum Power implements StringRepresentable {
     /** Quicksilver and Tommy run and Loki walks; everyone else can fly (Thor only with Mjolnir, see ThorAbilities). */
     public boolean canFly() {
         return switch (this) {
-            case MAGNETO, SCARLET_WITCH, PHOTON, VISION, BILLY, THOR -> true;
+            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR -> true;
             case NONE, QUICKSILVER, TOMMY, LOKI -> false;
         };
     }
@@ -72,7 +78,6 @@ public enum Power implements StringRepresentable {
         return switch (this) {
             case MAGNETO -> EnhancedConfig.MAGNETO_FLIGHT_SPEED.get().floatValue();
             case SCARLET_WITCH -> EnhancedConfig.WANDA_FLIGHT_SPEED.get().floatValue();
-            case PHOTON -> EnhancedConfig.PHOTON_FLIGHT_SPEED.get().floatValue();
             case VISION -> EnhancedConfig.VISION_FLIGHT_SPEED.get().floatValue();
             case BILLY -> EnhancedConfig.BILLY_FLIGHT_SPEED.get().floatValue();
             case THOR -> EnhancedConfig.THOR_FLIGHT_SPEED.get().floatValue();
@@ -84,7 +89,7 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, PHOTON, VISION, BILLY, THOR -> 2;
+            case SCARLET_WITCH, VISION, BILLY, THOR -> 2;
             case NONE, QUICKSILVER, TOMMY, LOKI -> -1;
         };
     }

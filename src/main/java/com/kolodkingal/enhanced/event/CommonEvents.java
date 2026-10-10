@@ -5,7 +5,6 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
-import com.kolodkingal.enhanced.ability.PhotonAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
@@ -197,7 +196,7 @@ public final class CommonEvents {
         DamageSource source = event.getSource();
         boolean unstoppable = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
 
-        if ((PhotonAbilities.isPhased(player) || VisionAbilities.isPhased(player)) && !unstoppable) {
+        if (VisionAbilities.isPhased(player) && !unstoppable) {
             event.setCanceled(true);
             return;
         }
@@ -233,10 +232,6 @@ public final class CommonEvents {
         if (MagnetoAbilities.hasShieldUp(player) && MagnetoAbilities.isMetalProjectile(source.getDirectEntity())
                 && source.getEntity() != player) {
             event.setCanceled(true);
-            return;
-        }
-        if (Powers.is(player, Power.PHOTON) && source.is(ModTags.ABSORBABLE_ENERGY) && source.getEntity() != player) {
-            event.setAmount(PhotonAbilities.absorb(player, event.getAmount()));
         }
     }
 
@@ -287,7 +282,7 @@ public final class CommonEvents {
                 || !(hit.getEntity() instanceof ServerPlayer player) || projectile.getOwner() == player) {
             return;
         }
-        if (PhotonAbilities.isPhased(player) || VisionAbilities.isPhased(player)) {
+        if (VisionAbilities.isPhased(player)) {
             event.setCanceled(true); // passes straight through
             return;
         }
@@ -306,7 +301,7 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onAttack(AttackEntityEvent event) {
-        if (PhotonAbilities.isPhased(event.getEntity()) || VisionAbilities.isPhased(event.getEntity())) {
+        if (VisionAbilities.isPhased(event.getEntity())) {
             event.setCanceled(true);
         }
         // A spellbound player can't strike anyone (not even with an enchanted weapon).

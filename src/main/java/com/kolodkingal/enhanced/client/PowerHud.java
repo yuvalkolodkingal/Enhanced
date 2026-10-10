@@ -23,7 +23,7 @@ import net.minecraft.network.chat.MutableComponent;
 
 import java.util.Locale;
 
-/** Top-left panel: your hero, each ability with its key, and its current state (cooldown, on/off, ammo, energy). */
+/** Top-left panel: your hero, each ability with its key, and its current state (cooldown, on/off, ammo). */
 public class PowerHud implements LayeredDraw.Layer {
 
     @Override
@@ -67,19 +67,13 @@ public class PowerHud implements LayeredDraw.Layer {
 
         int x = 4;
         int y = 4;
-        int height = 12 + PowerData.ABILITIES * 10 + (power == Power.PHOTON ? 8 : 0);
+        int height = 12 + PowerData.ABILITIES * 10;
         graphics.fill(x - 2, y - 2, x + width + 4, y + height, 0x70000000);
         graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);
         y += 12;
         for (Component line : lines) {
             graphics.drawString(font, line, x, y, 0xFFFFFFFF, true);
             y += 10;
-        }
-        if (power == Power.PHOTON) {
-            int barWidth = width;
-            float fill = data.energy() / PowerData.MAX_ENERGY;
-            graphics.fill(x, y + 1, x + barWidth, y + 5, 0xFF202020);
-            graphics.fill(x, y + 1, x + (int) (barWidth * fill), y + 5, 0xFF000000 | Power.PHOTON.color);
         }
     }
 
@@ -106,14 +100,6 @@ public class PowerHud implements LayeredDraw.Layer {
                 case 5 -> player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID())
                         .map(hex -> (Component) Component.translatable("hud.enhanced.hex_radius", hex.radius()).withStyle(ChatFormatting.RED))
                         .orElse(null);
-                default -> null;
-            };
-            case PHOTON -> switch (ability) {
-                case 2 -> onOff(data.flying());
-                case 3 -> Component.literal(String.format(Locale.ROOT, "%.0f/%.0f", data.energy(), PowerData.MAX_ENERGY))
-                        .withStyle(ChatFormatting.GOLD);
-                case 4 -> data.isPhased() ? active("hud.enhanced.active") : null;
-                case 5 -> onOff(data.spectrumVision());
                 default -> null;
             };
             case QUICKSILVER -> switch (ability) {

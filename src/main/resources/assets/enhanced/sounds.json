@@ -104,22 +104,6 @@
       }
     ]
   },
-  "photon_blast": {
-    "subtitle": "subtitles.enhanced.photon_blast",
-    "sounds": [
-      {
-        "name": "enhanced:sfx/photon_blast"
-      }
-    ]
-  },
-  "energy_release": {
-    "subtitle": "subtitles.enhanced.energy_release",
-    "sounds": [
-      {
-        "name": "enhanced:sfx/energy_release"
-      }
-    ]
-  },
   "mjolnir_throw": {
     "subtitle": "subtitles.enhanced.mjolnir_throw",
     "sounds": [

@@ -4,7 +4,6 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
-import com.kolodkingal.enhanced.entity.PhotonBlastEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import net.minecraft.core.registries.Registries;
@@ -23,13 +22,6 @@ public final class ModEntities {
                     .clientTrackingRange(4)
                     .updateInterval(10)
                     .build("iron_shrapnel"));
-
-    public static final DeferredHolder<EntityType<?>, EntityType<PhotonBlastEntity>> PHOTON_BLAST = ENTITIES.register("photon_blast",
-            () -> EntityType.Builder.<PhotonBlastEntity>of(PhotonBlastEntity::new, MobCategory.MISC)
-                    .sized(0.5F, 0.5F)
-                    .clientTrackingRange(6)
-                    .updateInterval(10)
-                    .build("photon_blast"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<TelekineticBlockEntity>> TELEKINETIC_BLOCK = ENTITIES.register("telekinetic_block",
             () -> EntityType.Builder.<TelekineticBlockEntity>of(TelekineticBlockEntity::new, MobCategory.MISC)

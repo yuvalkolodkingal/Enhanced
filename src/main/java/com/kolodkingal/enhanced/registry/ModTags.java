@@ -3,7 +3,6 @@ package com.kolodkingal.enhanced.registry;
 import com.kolodkingal.enhanced.Enhanced;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -35,9 +34,6 @@ public final class ModTags {
 
     /** Blocks Wanda can never tear out of the ground. */
     public static final TagKey<Block> TELEKINESIS_IMMOVABLE = TagKey.create(Registries.BLOCK, Enhanced.id("telekinesis_immovable"));
-
-    /** Damage Photon can absorb. */
-    public static final TagKey<DamageType> ABSORBABLE_ENERGY = TagKey.create(Registries.DAMAGE_TYPE, Enhanced.id("absorbable_energy"));
 
     private ModTags() {
     }

@@ -22,7 +22,6 @@ import org.joml.Matrix4f;
  * Swirling energy drawn over the body:
  * <ul>
  *     <li>the Scarlet Witch in flight: glowing crimson energy around both hands;</li>
- *     <li>Photon while phased: a gold shimmer over her whole body (WandaVision episode 9);</li>
  *     <li>Vision while phased: a greenish-yellow aura (Age of Ultron), white for White Vision.</li>
  * </ul>
  */
@@ -41,9 +40,7 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
         boolean hands = data.power() == Power.SCARLET_WITCH && data.flying();
-        boolean photonPhased = data.power() == Power.PHOTON && data.isPhased();
-        boolean visionPhased = data.power() == Power.VISION && data.visionPhased();
-        boolean phased = photonPhased || visionPhased;
+        boolean phased = data.power() == Power.VISION && data.visionPhased();
         if ((!hands && !phased) || player.isInvisible()) {
             return;
         }
@@ -59,9 +56,7 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             model.rightSleeve.visible = false;
             model.leftSleeve.visible = false;
         }
-        int color = photonPhased ? 0xB0E6D59E
-                : visionPhased ? ("white_vision".equals(data.variant()) ? 0x90F4F8FF : 0x90E3DC6E)
-                : 0x90E0193F;
+        int color = phased ? ("white_vision".equals(data.variant()) ? 0x90F4F8FF : 0x90E3DC6E) : 0x90E0193F;
         VertexConsumer swirl = buffer.getBuffer(RenderType.energySwirl(SWIRL, (t * 0.02F) % 1F, (t * 0.013F) % 1F));
         model.renderToBuffer(poseStack, swirl, packedLight, OverlayTexture.NO_OVERLAY, color);
 

@@ -27,7 +27,6 @@ import net.minecraft.world.phys.Vec3;
  *     <li>Quicksilver: leaning into the run with exaggerated, blurring arm swings.</li>
  *     <li>Vision: upright, composed hover; arms braced while dense, pulled back while the Mind Stone fires, open and
  *     weightless while phased.</li>
- *     <li>Photon: a fist forward like a superhero in flight.</li>
  *     <li>Loki: a throwing arm after each dagger, a raised open hand as he vanishes or changes shape, and arms held
  *     slightly out in his Frost Giant form.</li>
  *     <li>Billy: his casting hand thrust forward for a Hex Bolt; both hands raised and trembling while he holds creatures
@@ -131,14 +130,6 @@ public final class HeroPoses {
                     model.leftArm.xRot = 0.05F;
                     model.rightArm.zRot = 0.08F + Mth.sin(t * 0.05F) * 0.03F;
                     model.leftArm.zRot = -0.08F - Mth.sin(t * 0.05F) * 0.03F;
-                }
-            }
-            case PHOTON -> {
-                if (airborne) {
-                    main.xRot = -2.6F;
-                    main.zRot = 0.0F;
-                    off.xRot = 0.3F;
-                    off.zRot = 0.15F * -side;
                 }
             }
             case TOMMY -> {
