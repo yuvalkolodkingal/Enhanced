@@ -449,15 +449,18 @@ public final class QuicksilverTests {
         // In the main inventory: the bow and the crossbow take the hotbar slot in his hand.
         peter.getInventory().setItem(10, new ItemStack(Items.ARROW, 64));
 
-        // Six ticks is a quick tap for a normal archer: a weak shot, and a crossbow that is nowhere near loaded.
-        check(!shoot(helper, peter, 6).isCritArrow(), "without a mode, six ticks only draw the bow part of the way");
-        check(!loadCrossbow(peter, 8), "and a crossbow takes much longer to load");
+        // Five ticks is a quick tap for a normal archer (a bow takes 20 to draw): a weak shot, and a crossbow that is
+        // nowhere near loaded (it takes 25).
+        check(!shoot(helper, peter, 5).isCritArrow(), "without a mode, five ticks only draw the bow part of the way");
+        check(!loadCrossbow(peter, 7), "and a crossbow takes much longer to load");
 
         for (boolean time : new boolean[]{true, false}) {
             String mode = time ? "Quicksilver Time" : "Super Speed";
             toggle(peter, time);
-            check(shoot(helper, peter, 6).isCritArrow(), "in " + mode + " six ticks draw the bow fully: the arrow flies at full power");
-            check(loadCrossbow(peter, 8), "and eight ticks load a crossbow");
+            check(!shoot(helper, peter, 4).isCritArrow(), "in " + mode + " four ticks still only draw the bow part of the way");
+            check(shoot(helper, peter, 5).isCritArrow(), "in " + mode + " five ticks draw the bow fully: the arrow flies at full power");
+            check(!loadCrossbow(peter, 6), "in " + mode + " six ticks don't load a crossbow yet");
+            check(loadCrossbow(peter, 7), "but seven ticks do");
             toggle(peter, time);
         }
         helper.succeed();
