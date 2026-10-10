@@ -289,7 +289,17 @@ To touch the stone, hold the scepter and **right-click** (use it):
   damage at its speed (about 4 to 6), a trident 8, a fireball 6, a thrown Mjolnir,
   Stormbreaker, dagger or iron shard its own damage, and 2 for anything else. The projectile
   that breaks the shield is still stopped. A thrown Mjolnir or Stormbreaker is one of a kind,
-  so it is not destroyed: the shield turns it round and it flies home to Thor.
+  so it is not destroyed: the shield turns it round and it flies home to Thor. So does a
+  fragment of a shattered Mjolnir that is sent at her (the shield pays what its strike would
+  have done, 6), while one that is already flying home passes through.
+* **Stops Thor's lightning beam.** The sphere is solid to a beam as it is to an arrow: the beam
+  ends on its surface (that is where it is drawn to), Wanda is not touched, nothing beyond the
+  sphere is hit (and no lightning arcs on from it), and the shield pays the beam's damage for
+  every hit: 2 bare-handed, 4 with Mjolnir or Stormbreaker, 6 with the God of Thunder on top.
+  The beam that breaks the shield is stopped too. Lightning that Thor sends at Wanda from
+  inside the sphere, or that leaps from a blow of his, is stopped and paid for in the same way.
+  A shield that is still forming stops nothing, and on a server with PvP off the beam costs
+  the shield nothing. (Lightning from the sky, by contrast, still hurts.)
 * **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it
   down; if less strength is left than that, the shield shatters and the rest gets through.
   Melee blows are not stopped.
@@ -646,8 +656,9 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
   up). Its owner (or any worthy player, with `mjolnirOwnerOnly` off) **Sneak + right-clicks** a
   creature or player with Mjolnir in hand: Mjolnir is set down on them, lying across their chest.
   While it lies there they **can't move, jump, fly, swim up, ride, teleport** (Ender Pearls,
-  chorus fruit, Endermen, and the mod's own teleports, the Bifrost included) **or glide on an
-  elytra**, and knockback doesn't move them; they can still look around. **Only its owner can lift
+  chorus fruit, Endermen, and the mod's own teleports and dashes: the Bifrost, Vanish, Vibrate,
+  the Blitz, the Witches' Road, the Tesseract) **or glide on an elytra**, and knockback doesn't
+  move them and no telekinesis can lift them; they can still look around. **Only its owner can lift
   it again**: right-click the pinned one, or call it back with **R**. Nobody else can, the pinned one
   included (*"It won't budge. Only Steve can lift it."*). It lets go by itself after **60 seconds**
   (config), or when its owner logs out, dies or changes dimension, or when the pinned one dies or
@@ -681,7 +692,7 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
 |---|---|---|---|
 | 1 | R | **Throw / Call Back** (Sneak: shatter Mjolnir) | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player, and never another player's Mjolnir: he calls his own, one nobody owns yet, or Stormbreaker), or off someone it pins down (never off himself). **Sneak + R** with Mjolnir in hand: it shatters into fragments that strike his enemies (see 8.1). |
 | 2 | G (toggle) | **Flight** | Thor flies by spinning his weapon: only with Mjolnir or Stormbreaker in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. |
-| 3 | V (hold) | **Lightning Beam** | While he holds **V**, a crackling beam of lightning pours from his hand, or from the head of the weapon in it (the one in his main hand, if he holds two), to what he looks at, for everyone nearby to see: a white-hot core, electric blue and a deep blue halo, jagged and flickering. Every 5 ticks it hits the first creature in the line (not through walls): bare-handed, 2 damage up to 24 blocks away (8 a second). With **Mjolnir or Stormbreaker** in hand it reaches 48 blocks and hits twice as hard (4), the beam is thicker and brighter, and the first time it hits each creature it also has the usual effects of lightning on it (creepers become charged, pigs turn into zombified piglins, villagers into witches). The **God of Thunder** on top hits 1.5 times as hard, and every hit arcs to the next two creatures nearby. The beam leaves no invulnerability frames, so every hit lands. It burns a little hunger while he fires it, and sparks fly where it ends (no fire, no block damage). |
+| 3 | V (hold) | **Lightning Beam** | While he holds **V**, a crackling beam of lightning pours from his hand, or from the head of the weapon in it (the one in his main hand, if he holds two), to what he looks at, for everyone nearby to see: a white-hot core, electric blue and a deep blue halo, jagged and flickering. Every 5 ticks it hits the first creature in the line (not through walls): bare-handed, 2 damage up to 24 blocks away (8 a second). With **Mjolnir or Stormbreaker** in hand it reaches 48 blocks and hits twice as hard (4), the beam is thicker and brighter, and the first time it hits each creature it also has the usual effects of lightning on it (creepers become charged, pigs turn into zombified piglins, villagers into witches). The **God of Thunder** on top hits 1.5 times as hard, and every hit arcs to the next two creatures nearby. The beam leaves no invulnerability frames, so every hit lands. It burns a little hunger while he fires it, and sparks fly where it ends (no fire, no block damage). A Scarlet Witch's complete **Chaos Shield** stops it at its surface and loses the beam's damage from its strength (see 2.3, ability 4). |
 | 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon and every fragment of a shattered Mjolnir arc too, and his lightning beam hits 1.5 times as hard. It burns hunger; with an empty hunger bar the thunder calms. |
 | 5 | N | **Bifrost** | "Heimdall! Open the Bifrost!" With Mjolnir or Stormbreaker in hand: **N** opens the Bifrost screen (home, his saved places, save this one), **Sneak + N** takes him to the spot he looks at, up to 512 blocks away. See 8.4. |
 

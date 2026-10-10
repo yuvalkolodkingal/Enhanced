@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.item;
 
+import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -65,6 +66,11 @@ public class TesseractItem extends Item {
                 ItemStack gene = player.getItemInHand(otherHand);
                 if (gene.is(ModItems.SCARLET_WITCH_GENE.get())) {
                     ScarletWitchGeneItem.awaken(serverPlayer, gene);
+                } else if (MjolnirPin.isPinned(serverPlayer)) {
+                    // Loki's escape takes him a hundred blocks away: not with Mjolnir lying on him. (A hero's jump is a
+                    // teleport like any other: HexManager.onTeleport says no.)
+                    serverPlayer.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
+                    return InteractionResultHolder.fail(stack);
                 } else {
                     escape(serverPlayer);
                 }

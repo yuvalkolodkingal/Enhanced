@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
+import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -37,10 +38,13 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.function.Predicate;
@@ -273,7 +277,7 @@ public final class WandaAbilities {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.5F);
         }
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(SHIELD_RADIUS + 4),
-                p -> p.getOwner() != player && !(p instanceof ThrownWeaponEntity weapon && weapon.isReturning()))) {
+                p -> p.getOwner() != player && !isHeadingHome(p))) {
             Vec3 velocity = projectile.getDeltaMovement();
             Vec3 toPlayer = center.subtract(projectile.position());
             double reach = SHIELD_RADIUS + 0.5 + velocity.length();
@@ -288,7 +292,8 @@ public final class WandaAbilities {
 
     /**
      * What a projectile would have done to her, in the strength it takes out of the shield: an arrow's damage at its
-     * speed, a trident's 8, a fireball's 6, a thrown hammer's, dagger's or shard's own damage, and 2 for the rest.
+     * speed, a trident's 8, a fireball's 6, a thrown hammer's, a hammer fragment's, a dagger's or a shard's own
+     * damage, and 2 for the rest.
      */
     static float projectilePower(Projectile projectile) {
         if (projectile instanceof ThrownTrident) {
@@ -304,6 +309,9 @@ public final class WandaAbilities {
             return (ThorAbilities.isStormbreaker(weapon.weapon()) ? EnhancedConfig.STORMBREAKER_THROW_DAMAGE
                     : EnhancedConfig.MJOLNIR_THROW_DAMAGE).get().floatValue();
         }
+        if (projectile instanceof MjolnirFragmentEntity) {
+            return EnhancedConfig.MJOLNIR_SHATTER_DAMAGE.get().floatValue();
+        }
         if (projectile instanceof LokiDaggerEntity) {
             return EnhancedConfig.LOKI_DAGGER_DAMAGE.get().floatValue();
         }
@@ -314,28 +322,83 @@ public final class WandaAbilities {
     }
 
     /**
-     * A projectile reaches the shield: it turns to sparks, and the shield pays what it would have cost her. (Mjolnir
-     * and Stormbreaker are the exception: see {@link #repel}.)
+     * A projectile reaches the shield: it turns to sparks, and the shield pays what it would have cost her. (Mjolnir,
+     * Stormbreaker and the fragments of a shattered Mjolnir are the exception: see {@link #repel}.)
      */
     public static void block(ServerPlayer player, Projectile projectile) {
         float power = projectilePower(projectile);
         if (projectile instanceof ThrownWeaponEntity weapon) {
-            repel(player.serverLevel(), weapon);
+            repel(player.serverLevel(), weapon, () -> weapon.setReturning(true));
+        } else if (projectile instanceof MjolnirFragmentEntity fragment) {
+            repel(player.serverLevel(), fragment, fragment::setReturning);
         } else {
             disintegrate(player.serverLevel(), projectile);
         }
         wear(player, power);
     }
 
+    /** A thrown weapon or a hammer fragment already on its way home to Thor: the shield lets it by. */
+    private static boolean isHeadingHome(Projectile projectile) {
+        return projectile instanceof ThrownWeaponEntity weapon ? weapon.isReturning()
+                : projectile instanceof MjolnirFragmentEntity fragment && fragment.isReturning();
+    }
+
     /**
-     * Mjolnir and Stormbreaker are one of a kind (a thrown one holds the only copy of the weapon): the shield turns it
-     * round and it flies home to Thor, instead of being destroyed for good.
+     * Mjolnir and Stormbreaker are one of a kind (a thrown one holds the only copy of the weapon), and the fragments
+     * of a shattered Mjolnir are the hammer itself: the shield turns them round and they fly home to Thor, instead of
+     * being destroyed for good (a fragment shredded here would leave the hammer one piece short).
      */
-    private static void repel(ServerLevel level, ThrownWeaponEntity weapon) {
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F), weapon.getX(), weapon.getY(), weapon.getZ(),
+    private static void repel(ServerLevel level, Projectile projectile, Runnable turnHome) {
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F), projectile.getX(), projectile.getY(), projectile.getZ(),
                 10, 0.15, 0.15, 0.15, 0.08);
-        level.playSound(null, weapon.getX(), weapon.getY(), weapon.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F, 0.8F);
-        weapon.setReturning(true);
+        level.playSound(null, projectile.getX(), projectile.getY(), projectile.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F, 0.8F);
+        turnHome.run();
+    }
+
+    // ---- the shield against beams ----
+
+    /** A complete Chaos Shield that a beam has run into: whose it is, and where on its surface the beam ends. */
+    public record ShieldStop(Player owner, Vec3 point) {
+    }
+
+    /**
+     * The first complete Chaos Shield that a beam from {@code from} to {@code to} runs into from outside it, or null:
+     * the sphere is solid to a beam as it is to an arrow. A beam that starts inside the sphere (its firer stands within
+     * her shield) is not stopped here; what hits Wanda herself is stopped by the damage hook, which also wears the
+     * shield down. Shared by the server (what Thor's lightning beam hits) and the client (where it is drawn to).
+     *
+     * @param firer the one who fires the beam (never its own shield)
+     */
+    @Nullable
+    public static ShieldStop shieldAcross(Level level, @Nullable Entity firer, Vec3 from, Vec3 to, float partialTick) {
+        Vec3 path = to.subtract(from);
+        double length = path.length();
+        if (length < 1.0E-6) {
+            return null;
+        }
+        Vec3 direction = path.scale(1.0 / length);
+        ShieldStop nearest = null;
+        double nearestAt = length;
+        AABB reach = new AABB(from, to).inflate(SHIELD_RADIUS + 1.0);
+        for (Player wanda : level.getEntitiesOfClass(Player.class, reach, p -> p != firer && !p.isSpectator() && hasShieldUp(p))) {
+            Vec3 fromCenter = from.subtract(wanda.getPosition(partialTick).add(0, wanda.getBbHeight() * 0.5, 0));
+            double outside = fromCenter.lengthSqr() - SHIELD_RADIUS * SHIELD_RADIUS;
+            if (outside <= 0) {
+                continue;
+            }
+            // Where the line first meets the sphere: the smaller root of |fromCenter + t * direction| = radius.
+            double along = fromCenter.dot(direction);
+            double discriminant = along * along - outside;
+            if (discriminant < 0) {
+                continue;
+            }
+            double at = -along - Math.sqrt(discriminant);
+            if (at >= 0 && at <= nearestAt) {
+                nearestAt = at;
+                nearest = new ShieldStop(wanda, from.add(direction.scale(at)));
+            }
+        }
+        return nearest;
     }
 
     /**

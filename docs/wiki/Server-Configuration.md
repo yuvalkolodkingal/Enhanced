@@ -144,7 +144,7 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 | `enhanced:cannot_be_snatched` | item | Items that speedsters can't snatch (Mjolnir). |
 | `enhanced:magnetic_entities` | entity type | Creatures and vehicles made of metal that Magneto can lift (the Iron Golem, minecarts). |
 | `enhanced:metallic_projectiles` | entity type | Projectiles the Magnetic Shield catches. |
-| `enhanced:telekinesis_immune` | entity type | Creatures too powerful to lift (the Ender Dragon, the Wither, the Warden, the Elder Guardian). |
+| `enhanced:telekinesis_immune` | entity type | Creatures too powerful to lift (the Ender Dragon, the Wither, the Warden, the Elder Guardian), and the fragments of a shattered Mjolnir. |
 | `enhanced:hex_resistant` | entity type | Bosses the Hex wall can't kill: it throws them back instead. |
 | `enhanced:spellbound_immune` | entity type | Creatures Billy's Freeze can't hold (the Ender Dragon, the Wither). |
 | `enhanced:pin_immune` | entity type | Creatures Mjolnir can't pin down (the Ender Dragon, the Wither, the Warden). |

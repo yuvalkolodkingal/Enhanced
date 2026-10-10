@@ -246,6 +246,13 @@ public final class CommonEvents {
                 float absorbable = event.getAmount() * (1.0F - EnhancedConfig.CHAOS_SHIELD_EXPLOSION_FACTOR.get().floatValue());
                 event.setAmount(event.getAmount() - WandaAbilities.wear(wanda, absorbable));
             }
+            if (source.is(DamageTypeTags.IS_LIGHTNING) && ThorAbilities.isThor(source.getEntity())) {
+                // Thor's lightning (his beam, and the arcs that leap on from what it hits) never gets through the
+                // shield. (The beam is stopped at the sphere before it gets here, unless Thor stands inside it.)
+                WandaAbilities.wear(wanda, event.getAmount());
+                event.setCanceled(true);
+                return;
+            }
         }
         if (MagnetoAbilities.wearsHelmet(player) && isWandasAttack(source)) {
             // The helmet only blocks Nausea: Magneto takes Wanda's attacks at full strength.
