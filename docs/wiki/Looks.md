@@ -1,6 +1,6 @@
 # Looks
 
-A **look** is one of a hero's outfits. Each look has its own skin, its own cape and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do.
+A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do.
 
 Vision, Tommy, Billy, Loki and Thor have several looks. Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
@@ -48,8 +48,8 @@ Every look list of the newer heroes ends with **Your own skin**: the hero's powe
 | Look | Id | What it is |
 |---|---|---|
 | **God of Mischief** (default) | `loki` | The MCU's Loki: black and green leathers with gold trim, the golden horned helm and a cape. |
-| **TVA Variant** | `tva` | The Loki of the Time Variance Authority, in the TVA's brown-and-tan jacket. |
-| **God of Stories** | `god_of_stories` | The Loki of the *Loki* season 2 finale: green armour with glowing green trim and a green cape. |
+| **TVA Variant** | `tva` | The Loki of the Time Variance Authority, in the beige TVA jacket, with no cape. His magic turns sand and amber. |
+| **God of Stories** | `god_of_stories` | The Loki of the *Loki* season 2 finale: green and gold, with a cape. His magic is olive and gold. |
 | **Your own skin** | `own` | Loki's powers and magic colours in your own skin. |
 
 Frost Giant is ability 5 (**N**) in every look of Loki.

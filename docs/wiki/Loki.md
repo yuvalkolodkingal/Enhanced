@@ -31,8 +31,8 @@ Loki has four looks, and **H** switches between them (**Sneak + H** goes back). 
 | Look | What it is |
 |---|---|
 | **God of Mischief** (the default) | The MCU's Loki: the black and green leathers with gold trim, the golden horned helm and a cape. |
-| **TVA Variant** | The Loki of the Time Variance Authority, in the TVA's brown-and-tan jacket. |
-| **God of Stories** | The Loki of the *Loki* season 2 finale: green armour with glowing green trim and a green cape. |
+| **TVA Variant** | The Loki of the Time Variance Authority, in the beige TVA jacket, with no cape. |
+| **God of Stories** | The Loki of the *Loki* season 2 finale: green and gold, with a cape. His magic is olive and gold. |
 | **Your own skin** | Loki's powers and magic colours, in your own Minecraft skin. |
 
 ## Abilities
