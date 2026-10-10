@@ -338,5 +338,11 @@
   "subtitles.enhanced.loki_vanish": "לוקי נעלם",
   "subtitles.enhanced.loki_shapeshift": "לוקי משנה צורה",
   "subtitles.enhanced.frost_giant": "ענק הכפור מתעורר",
-  "subtitles.enhanced.tesseract": "הטסרקט נפתח"
+  "subtitles.enhanced.tesseract": "הטסרקט נפתח",
+  "config.enhanced.animations": "אנימציות גיבורים",
+  "config.enhanced.animations.tooltip": "תנוחות משולבות, תעופה, ריצה והנשק של תור. כבוי: תנוחות רגילות בלבד.",
+  "config.enhanced.reduced_motion": "תנועה מופחתת",
+  "config.enhanced.reduced_motion.tooltip": "בלי נדנוד ריחוף, סחף או רעידות מצלמה, וטבעות עמומות יותר.",
+  "config.enhanced.flight_effects": "אפקטי תעופה",
+  "config.enhanced.flight_effects.tooltip": "סרטים, טבעות, קווי רוח וגלי הלם סביב גיבורים שעפים."
 }

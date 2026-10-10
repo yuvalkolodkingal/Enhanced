@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced;
 
+import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.network.ModNetwork;
 import com.kolodkingal.enhanced.registry.ModArmorMaterials;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -43,6 +44,7 @@ public class Enhanced {
         modBus.addListener(ModNetwork::register);
         modBus.addListener(ModEntities::registerAttributes);
         container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC);
+        container.registerConfig(ModConfig.Type.CLIENT, EnhancedClientConfig.SPEC);
     }
 
     public static ResourceLocation id(String path) {

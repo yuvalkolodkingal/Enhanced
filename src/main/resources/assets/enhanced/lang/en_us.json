@@ -338,5 +338,11 @@
   "subtitles.enhanced.loki_vanish": "Loki vanishes",
   "subtitles.enhanced.loki_shapeshift": "Loki changes shape",
   "subtitles.enhanced.frost_giant": "The Frost Giant awakens",
-  "subtitles.enhanced.tesseract": "The Tesseract opens"
+  "subtitles.enhanced.tesseract": "The Tesseract opens",
+  "config.enhanced.animations": "Hero animations",
+  "config.enhanced.animations.tooltip": "Blended poses, flight, running and Thor's weapon. Off: vanilla poses only.",
+  "config.enhanced.reduced_motion": "Reduced motion",
+  "config.enhanced.reduced_motion.tooltip": "No hover bob, drift or camera shake, and fainter rings.",
+  "config.enhanced.flight_effects": "Flight effects",
+  "config.enhanced.flight_effects.tooltip": "Ribbons, rings, wind streaks and shockwaves around flying heroes."
 }
