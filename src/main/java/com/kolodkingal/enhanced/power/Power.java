@@ -20,7 +20,7 @@ public enum Power implements StringRepresentable {
     BILLY(0x5CC8FF, 0xCFEFFF),
     TOMMY(0x2E9C7E, 0x7FD8B8),
     LOKI(0x76B154, 0xCAF297),
-    THOR(0x8EC9FF, 0xEAF6FF);
+    THOR(0x4DB8FF, 0xBFE6FF);
 
     public static final Codec<Power> CODEC = StringRepresentable.fromEnum(Power::values);
 

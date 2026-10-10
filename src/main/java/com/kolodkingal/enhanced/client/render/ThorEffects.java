@@ -38,10 +38,10 @@ import java.util.List;
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class ThorEffects {
     public static final ResourceLocation BIFROST_MARK = Enhanced.id("textures/effect/bifrost_mark.png");
-    /** MCU lightning: white-hot core, electric blue, a violet fringe. */
-    private static final int CORE = 0xF4FAFF;
-    private static final int BLUE = 0x8EC9FF;
-    private static final int VIOLET = 0xA48CFF;
+    /** MCU lightning: a white-hot core, electric blue glow and a deep blue halo. */
+    private static final int CORE = 0xFFFFFF;
+    private static final int BLUE = 0x4DB8FF;
+    private static final int HALO = 0x1E6BFF;
     private static final int CHANNEL_TICKS = 10;
     private static final int ARC_TICKS = 6;
     private static final int ARRIVAL_TICKS = 24;
@@ -183,13 +183,13 @@ public final class ThorEffects {
         return new Vec3(player.getX() + Math.cos(yaw) * side, eye.y + 1.1, player.getZ() + Math.sin(yaw) * side);
     }
 
-    /** A bolt of MCU lightning: a wide violet-blue glow, a blue bolt and a white-hot core, flickering. */
+    /** A bolt of MCU lightning: a wide deep-blue halo, an electric blue bolt and a white-hot core, flickering. */
     private static void lightning(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, float fade, long seed) {
         if (fade <= 0) {
             return;
         }
         float jitter = (float) Math.min(1.6, a.distanceTo(b) * 0.06 + 0.2);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(VIOLET, 0.25F * fade), seed);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(HALO, 0.3F * fade), seed);
         EnergyGeometry.bolt(pose, vc, a, b, width * 0.7F, jitter, EnergyGeometry.argb(BLUE, 0.75F * fade), seed);
         EnergyGeometry.bolt(pose, vc, a, b, width * 0.25F, jitter, EnergyGeometry.argb(CORE, 0.95F * fade), seed);
         // A forked branch.
