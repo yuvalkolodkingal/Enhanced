@@ -37,6 +37,10 @@ public final class PowerTicker {
             case PHOTON -> PhotonAbilities.tick(player, data);
             case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
             case VISION -> VisionAbilities.tick(player, data);
+            case BILLY -> BillyAbilities.tick(player, data);
+            case TOMMY -> TommyAbilities.tick(player, data);
+            case LOKI -> LokiAbilities.tick(player, data);
+            case THOR -> ThorAbilities.tick(player, data);
             case NONE -> {
             }
         }
@@ -48,8 +52,9 @@ public final class PowerTicker {
     /** Flight permission and speed, plus the Scarlet Witch's crown bonuses. */
     public static void applyPassives(ServerPlayer player, PowerData data) {
         Power power = data.power();
-        // Vision's dense body is too heavy to fly.
-        boolean canFly = power.canFly() && !(power == Power.VISION && data.dense());
+        // Vision's dense body is too heavy to fly, and Thor needs Mjolnir to fly.
+        boolean canFly = power.canFly() && !(power == Power.VISION && data.dense())
+                && !(power == Power.THOR && !ThorAbilities.canFly(player, data));
         setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
@@ -72,6 +77,32 @@ public final class PowerTicker {
         if (data.power() != Power.QUICKSILVER) {
             data.setSlowMo(false);
             QuicksilverAbilities.applySpeed(player, data);
+        }
+        TommyAbilities.applySpeed(player, data);
+        LokiAbilities.applyForm(player, data);
+        ThorAbilities.applyBody(player, data);
+    }
+
+    /**
+     * The player is about to change look: whatever the old look's signature ability left in the world (enchanted
+     * creatures, an army of illusions...) ends.
+     */
+    public static void endLook(ServerPlayer player, PowerData data) {
+        if (data.power() == Power.LOKI) {
+            LokiAbilities.endLook(player, data);
+        }
+    }
+
+    /** The player is about to lose this power: everything it left in the world ends, Mjolnir comes home. */
+    public static void endPower(ServerPlayer player, PowerData data) {
+        endLook(player, data);
+        switch (data.power()) {
+            case LOKI -> LokiAbilities.endAll(player, data);
+            case THOR -> ThorAbilities.endAll(player, data);
+            case BILLY -> BillyAbilities.endAll(player, data);
+            case TOMMY -> TommyAbilities.endAll(player, data);
+            default -> {
+            }
         }
     }
 

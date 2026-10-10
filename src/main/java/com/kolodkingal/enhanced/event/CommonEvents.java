@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.command.EnhancedCommand;
@@ -78,6 +79,7 @@ public final class CommonEvents {
         HexManager.clearMemory();
         SlowMotion.clear();
         MagnetoAbilities.clearHeld();
+        TommyAbilities.clear();
     }
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----
@@ -191,7 +193,7 @@ public final class CommonEvents {
             event.addReductionModifier(DamageContainer.Reduction.ARMOR, (container, reduction) -> 0F);
             event.addReductionModifier(DamageContainer.Reduction.ENCHANTMENTS, (container, reduction) -> 0F);
         }
-        if (source.is(DamageTypeTags.IS_FALL) && QuicksilverAbilities.isRunning(player)) {
+        if (source.is(DamageTypeTags.IS_FALL) && (QuicksilverAbilities.isRunning(player) || TommyAbilities.isRunning(player))) {
             event.setCanceled(true);
             return;
         }

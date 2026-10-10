@@ -4,6 +4,9 @@ import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.power.Variant;
+import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
@@ -34,13 +37,22 @@ public class PowerHud implements LayeredDraw.Layer {
         }
         Font font = mc.font;
         long now = mc.level.getGameTime();
+        Variant look = Variants.current(data);
+        // Heroes with several looks show the current one, and the key that changes it, after their name.
+        MutableComponent title = power.displayName().copy().withStyle(s -> s.withColor(look.color()).withBold(true));
+        if (Variants.hasChoice(power)) {
+            title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
+                    .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
+                            .withStyle(s -> s.withBold(false).withColor(ChatFormatting.YELLOW)))
+                    .append(look.displayName().copy().withStyle(s -> s.withBold(false).withColor(ChatFormatting.GRAY)));
+        }
 
         Component[] lines = new Component[PowerData.ABILITIES];
-        int width = font.width(power.displayName()) + 4;
+        int width = font.width(title) + 4;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
                     .withStyle(ChatFormatting.YELLOW)
-                    .append(Component.translatable(power.abilityKey(i)).withStyle(ChatFormatting.WHITE));
+                    .append(Component.translatable(look.abilityKey(i)).withStyle(ChatFormatting.WHITE));
             Component status = status(player, data, i, now);
             if (status != null) {
                 line.append(Component.literal("  ")).append(status);
@@ -53,7 +65,7 @@ public class PowerHud implements LayeredDraw.Layer {
         int y = 4;
         int height = 12 + PowerData.ABILITIES * 10 + (power == Power.PHOTON ? 8 : 0);
         graphics.fill(x - 2, y - 2, x + width + 4, y + height, 0x70000000);
-        graphics.drawString(font, power.displayName().copy().withStyle(s -> s.withColor(power.color).withBold(true)), x, y, 0xFFFFFFFF, true);
+        graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);
         y += 12;
         for (Component line : lines) {
             graphics.drawString(font, line, x, y, 0xFFFFFFFF, true);
@@ -114,7 +126,36 @@ public class PowerHud implements LayeredDraw.Layer {
                 case 5 -> onOff(data.disguise());
                 default -> null;
             };
+            case BILLY -> billy(player, data, ability);
+            case TOMMY -> tommy(player, data, ability);
+            case LOKI -> loki(player, data, ability);
+            case THOR -> thor(player, data, ability);
             case NONE -> null;
+        };
+    }
+
+    private static Component billy(LocalPlayer player, PowerData data, int ability) {
+        return switch (ability) {
+            case 2 -> onOff(data.flying());
+            default -> null;
+        };
+    }
+
+    private static Component tommy(LocalPlayer player, PowerData data, int ability) {
+        return switch (ability) {
+            case 1 -> onOff(data.toggle(Toggle.SUPER_SPEED));
+            default -> null;
+        };
+    }
+
+    private static Component loki(LocalPlayer player, PowerData data, int ability) {
+        return null;
+    }
+
+    private static Component thor(LocalPlayer player, PowerData data, int ability) {
+        return switch (ability) {
+            case 2 -> onOff(data.flying());
+            default -> null;
         };
     }
 

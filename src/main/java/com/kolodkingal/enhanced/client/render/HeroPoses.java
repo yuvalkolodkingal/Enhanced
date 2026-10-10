@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -132,7 +133,23 @@ public final class HeroPoses {
                     off.zRot = 0.15F * -side;
                 }
             }
-            case NONE -> {
+            case TOMMY -> {
+                if (data.is(Live.SPEEDING)) {
+                    lean(model, 0.3F);
+                    float swing = Mth.cos(limbSwing * 0.6662F * 1.4F) * 1.5F * Math.max(limbSwingAmount, 0.6F);
+                    model.rightArm.xRot = swing + 0.3F;
+                    model.leftArm.xRot = -swing + 0.3F;
+                    model.rightArm.zRot = 0.1F;
+                    model.leftArm.zRot = -0.1F;
+                } else if (data.is(Live.WHIRLWIND)) {
+                    // The real Tommy is a blur in the eye of the storm: arms out, spinning.
+                    model.rightArm.zRot = 1.3F + Mth.sin(t * 0.8F) * 0.1F;
+                    model.leftArm.zRot = -1.3F - Mth.sin(t * 0.8F) * 0.1F;
+                    model.rightArm.xRot = 0.0F;
+                    model.leftArm.xRot = 0.0F;
+                }
+            }
+            case BILLY, LOKI, THOR, NONE -> {
             }
         }
         sync(model);

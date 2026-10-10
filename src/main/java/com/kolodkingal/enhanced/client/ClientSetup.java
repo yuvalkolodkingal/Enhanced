@@ -44,6 +44,7 @@ public final class ClientSetup {
         for (KeyMapping key : KeyBindings.ABILITIES) {
             event.register(key);
         }
+        event.register(KeyBindings.CHANGE_LOOK);
     }
 
     @SubscribeEvent

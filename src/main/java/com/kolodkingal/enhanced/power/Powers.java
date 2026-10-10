@@ -50,6 +50,7 @@ public final class Powers {
             return;
         }
         Telekinesis.release(player, false);
+        PowerTicker.endPower(player, data);
         if (old == Power.SCARLET_WITCH) {
             HexManager.dissolveAllOwnedBy(player.server, player.getUUID());
         }
@@ -63,7 +64,13 @@ public final class Powers {
      * hears and a message to the whole server.
      */
     public static void awaken(ServerPlayer player, Power power) {
+        awaken(player, power, "");
+    }
+
+    /** {@link #awaken(ServerPlayer, Power)} straight into one of the hero's looks (an unknown id means the default). */
+    public static void awaken(ServerPlayer player, Power power, String variant) {
         setPower(player, power);
+        setVariant(player, Variants.get(power, variant));
         ServerLevel level = player.serverLevel();
 
         Component title = power.displayName().copy().withStyle(s -> s.withColor(power.color).withBold(true));
@@ -73,12 +80,62 @@ public final class Powers {
                 Component.translatable("power.enhanced." + power.getSerializedName() + ".awaken").withStyle(ChatFormatting.GRAY)));
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.AWAKEN.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), power.color, 120, 1.6);
-        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), power.glow, 60, 0.8);
+        Variant look = variant(player);
+        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), look.color(), 120, 1.6);
+        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), look.glow(), 60, 0.8);
 
         player.server.getPlayerList().broadcastSystemMessage(
                 Component.translatable("power.enhanced." + power.getSerializedName() + ".broadcast", player.getDisplayName())
                         .withStyle(s -> s.withColor(power.color)), false);
+    }
+
+    /** The player's current look. */
+    public static Variant variant(Player player) {
+        return Variants.current(get(player));
+    }
+
+    /** Main energy colour of the player's hero, in their current look. */
+    public static int color(Player player) {
+        return variant(player).color();
+    }
+
+    /** Secondary glow colour of the player's hero, in their current look. */
+    public static int glow(Player player) {
+        return variant(player).glow();
+    }
+
+    /**
+     * Changes the player's look (no effects). Whatever the old look's signature ability was doing ends first, so
+     * nothing it summoned or enchanted outlives the look.
+     */
+    public static void setVariant(ServerPlayer player, Variant variant) {
+        PowerData data = get(player);
+        if (variant.power() != data.power() || Variants.current(data).equals(variant)) {
+            return;
+        }
+        PowerTicker.endLook(player, data);
+        data.setVariantRaw(variant.id());
+        syncIfDirty(player);
+    }
+
+    /**
+     * The Change Look key: steps to the next (or previous) look in a shimmer of the new look's colours. Returns false
+     * if the hero has no other looks.
+     */
+    public static boolean cycleVariant(ServerPlayer player, int step) {
+        PowerData data = get(player);
+        if (!Variants.hasChoice(data.power())) {
+            return false;
+        }
+        Variant next = Variants.step(data.power(), data.variant(), step);
+        setVariant(player, next);
+        ServerLevel level = player.serverLevel();
+        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), next.color(), 40, 0.5);
+        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), next.glow(), 20, 0.3);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.AWAKEN.get(), SoundSource.PLAYERS, 0.35F, 1.6F);
+        player.displayClientMessage(Component.translatable("message.enhanced.look", next.displayName())
+                .withStyle(s -> s.withColor(next.color())), true);
+        return true;
     }
 
     /** A sphere of energy particles, sent to everyone nearby. */

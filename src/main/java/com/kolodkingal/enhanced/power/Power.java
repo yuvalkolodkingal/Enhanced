@@ -16,7 +16,11 @@ public enum Power implements StringRepresentable {
     SCARLET_WITCH(0xE0102A, 0xFF4058),
     PHOTON(0xFFE9A8, 0x9FF3FF),
     QUICKSILVER(0xC9D3E3, 0x8FD3FF),
-    VISION(0xE8B83A, 0xFFE66B);
+    VISION(0xE8B83A, 0xFFE66B),
+    BILLY(0x5A7DFF, 0xA9C1FF),
+    TOMMY(0x2E9C7E, 0x7FD8B8),
+    LOKI(0x2FC25B, 0xF0CF4A),
+    THOR(0x8EC9FF, 0xEAF6FF);
 
     public static final Codec<Power> CODEC = StringRepresentable.fromEnum(Power::values);
 
@@ -48,9 +52,12 @@ public enum Power implements StringRepresentable {
         return "ability.enhanced." + getSerializedName() + "." + ability;
     }
 
-    /** Quicksilver runs; everyone else can fly. */
+    /** Quicksilver and Tommy run and Loki walks; everyone else can fly (Thor only with Mjolnir, see ThorAbilities). */
     public boolean canFly() {
-        return this != NONE && this != QUICKSILVER;
+        return switch (this) {
+            case MAGNETO, SCARLET_WITCH, PHOTON, VISION, BILLY, THOR -> true;
+            case NONE, QUICKSILVER, TOMMY, LOKI -> false;
+        };
     }
 
     public float flightSpeed() {
@@ -59,7 +66,9 @@ public enum Power implements StringRepresentable {
             case SCARLET_WITCH -> EnhancedConfig.WANDA_FLIGHT_SPEED.get().floatValue();
             case PHOTON -> EnhancedConfig.PHOTON_FLIGHT_SPEED.get().floatValue();
             case VISION -> EnhancedConfig.VISION_FLIGHT_SPEED.get().floatValue();
-            case NONE, QUICKSILVER -> 0.05F;
+            case BILLY -> EnhancedConfig.BILLY_FLIGHT_SPEED.get().floatValue();
+            case THOR -> EnhancedConfig.THOR_FLIGHT_SPEED.get().floatValue();
+            case NONE, QUICKSILVER, TOMMY, LOKI -> 0.05F;
         };
     }
 
@@ -67,8 +76,8 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, PHOTON, VISION -> 2;
-            case NONE, QUICKSILVER -> -1;
+            case SCARLET_WITCH, PHOTON, VISION, BILLY, THOR -> 2;
+            case NONE, QUICKSILVER, TOMMY, LOKI -> -1;
         };
     }
 

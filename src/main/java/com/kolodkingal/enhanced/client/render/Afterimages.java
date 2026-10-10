@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -21,7 +22,10 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Quicksilver's afterimages: fading silver-blue copies of him trail behind while he runs in Quicksilver Time. */
+/**
+ * Speedster afterimages: fading silver-blue copies of Quicksilver trail behind him while he runs in Quicksilver Time,
+ * teal-green ghosts behind Tommy at super speed; and while Tommy spins a whirlwind, ghosts of him race around its ring.
+ */
 public final class Afterimages {
     private static final int LENGTH = 6;
     private static final Map<Integer, Deque<Vec3>> HISTORY = new HashMap<>();
@@ -42,12 +46,22 @@ public final class Afterimages {
 
     private static boolean running(AbstractClientPlayer player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.QUICKSILVER && data.slowMo() && !player.isInvisible();
+        return ((data.power() == Power.QUICKSILVER && data.slowMo()) || (data.power() == Power.TOMMY && data.is(Live.SPEEDING)))
+                && !player.isInvisible();
+    }
+
+    /** Ghost colour (RGB) of each speedster. */
+    private static int ghostColor(AbstractClientPlayer player) {
+        return Powers.power(player) == Power.TOMMY ? 0x7FD8B8 : 0xB8D8FF;
     }
 
     public static void render(RenderPlayerEvent.Post event) {
         if (!(event.getEntity() instanceof AbstractClientPlayer player)) {
             return;
+        }
+        PowerData data = Powers.get(player);
+        if (data.power() == Power.TOMMY && data.is(Live.WHIRLWIND) && !player.isInvisible()) {
+            renderWhirlwind(event, player);
         }
         Deque<Vec3> trail = HISTORY.get(player.getId());
         if (trail == null || trail.size() < 2) {
@@ -80,8 +94,34 @@ public final class Afterimages {
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
             poseStack.scale(-0.9375F, -0.9375F, 0.9375F);
             poseStack.translate(0.0F, -1.501F, 0.0F);
-            model.renderToBuffer(poseStack, vc, event.getPackedLight(), OverlayTexture.NO_OVERLAY, alpha << 24 | 0xB8D8FF);
+            model.renderToBuffer(poseStack, vc, event.getPackedLight(), OverlayTexture.NO_OVERLAY, alpha << 24 | ghostColor(player));
             poseStack.popPose();
+        }
+    }
+
+    /** Four ghosts of Tommy race around the whirlwind's ring, leaning into the turn, each trailed by fainter ones. */
+    private static void renderWhirlwind(RenderPlayerEvent.Post event, AbstractClientPlayer player) {
+        float t = player.tickCount + event.getPartialTick();
+        PlayerModel<AbstractClientPlayer> model = event.getRenderer().getModel();
+        VertexConsumer vc = event.getMultiBufferSource().getBuffer(RenderType.itemEntityTranslucentCull(event.getRenderer().getTextureLocation(player)));
+        PoseStack poseStack = event.getPoseStack();
+        // Running pose for the ghosts: the model was last set up for the real player, so set it up again, sprinting.
+        model.setupAnim(player, t * 1.6F, 1.0F, t, 0.0F, 0.0F);
+        float radius = 2.5F;
+        for (int k = 0; k < 4; k++) {
+            for (int echo = 0; echo < 3; echo++) {
+                float angle = t * 0.55F + k * Mth.HALF_PI - echo * 0.18F;
+                int alpha = (int) ((110 - echo * 35) * (0.85F + 0.15F * Mth.sin(t * 0.9F + k)));
+                poseStack.pushPose();
+                poseStack.translate(Mth.cos(angle) * radius, 0.05, Mth.sin(angle) * radius);
+                // Facing along the ring (the direction of travel), leaning in.
+                poseStack.mulPose(Axis.YP.rotation(-angle));
+                poseStack.mulPose(Axis.ZP.rotationDegrees(-12.0F));
+                poseStack.scale(-0.9375F, -0.9375F, 0.9375F);
+                poseStack.translate(0.0F, -1.501F, 0.0F);
+                model.renderToBuffer(poseStack, vc, event.getPackedLight(), OverlayTexture.NO_OVERLAY, alpha << 24 | 0x7FD8B8);
+                poseStack.popPose();
+            }
         }
     }
 

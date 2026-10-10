@@ -23,6 +23,10 @@ public final class AbilityHandler {
             case PHOTON -> PhotonAbilities.onKey(player, data, ability, down);
             case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down);
             case VISION -> VisionAbilities.onKey(player, data, ability, down);
+            case BILLY -> BillyAbilities.onKey(player, data, ability, down);
+            case TOMMY -> TommyAbilities.onKey(player, data, ability, down);
+            case LOKI -> LokiAbilities.onKey(player, data, ability, down);
+            case THOR -> ThorAbilities.onKey(player, data, ability, down);
             case NONE -> {
             }
         }

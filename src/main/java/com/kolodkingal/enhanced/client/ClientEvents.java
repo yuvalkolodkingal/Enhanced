@@ -2,10 +2,13 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
+import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
+import com.kolodkingal.enhanced.network.ChangeLookPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -75,12 +78,22 @@ public final class ClientEvents {
         SlowMotionEffect.stop(Minecraft.getInstance());
     }
 
-    /** Quicksilver leaves a silver-blue streak behind him. */
+    /**
+     * Quicksilver leaves a silver-blue streak behind him; Tommy a teal-green mist, low along the ground, and a ring of
+     * it while he spins a whirlwind.
+     */
     private static void spawnSpeedTrails(ClientLevel level) {
         RandomSource random = level.random;
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() != Power.QUICKSILVER || !data.slowMo() || player.isInvisible()) {
+            if (player.isInvisible()) {
+                continue;
+            }
+            if (data.power() == Power.TOMMY && data.is(Live.WHIRLWIND)) {
+                whirlwindParticles(level, player, random);
+            }
+            boolean tommy = data.power() == Power.TOMMY && data.is(Live.SPEEDING);
+            if (!tommy && (data.power() != Power.QUICKSILVER || !data.slowMo())) {
                 continue;
             }
             // Only while he actually moves, and laid down along the path he just ran (never in his own face).
@@ -90,12 +103,39 @@ public final class ClientEvents {
             if (dx * dx + dz * dz < 0.04) {
                 continue;
             }
+            if (tommy) {
+                for (int i = 0; i < 4; i++) {
+                    double back = 0.8 + random.nextDouble() * 1.6;
+                    int color = i == 0 ? 0xE6FFF5 : i == 1 ? Power.TOMMY.glow : Power.TOMMY.color;
+                    level.addParticle(new EnergyParticleOptions(color, 1.0F + random.nextFloat() * 0.4F),
+                            player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.6, player.getY() - dy * back + random.nextDouble() * random.nextDouble() * 1.6,
+                            player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.6, 0, 0.005, 0);
+                }
+                continue;
+            }
             for (int i = 0; i < 3; i++) {
                 double back = 1.0 + random.nextDouble();
                 level.addParticle(new EnergyParticleOptions(i == 0 ? Power.QUICKSILVER.glow : Power.QUICKSILVER.color, 1.1F),
                         player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.5, player.getY() - dy * back + random.nextDouble() * 1.8,
                         player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.5, 0, 0, 0);
             }
+        }
+    }
+
+    /** A spinning wall of teal-green mist around Tommy's whirlwind. */
+    private static void whirlwindParticles(ClientLevel level, AbstractClientPlayer player, RandomSource random) {
+        float t = player.tickCount;
+        for (int i = 0; i < 10; i++) {
+            double angle = random.nextDouble() * Mth.TWO_PI;
+            double height = random.nextDouble() * random.nextDouble() * 4.0;
+            double radius = 2.0 + height * 0.35 + random.nextDouble() * 0.6;
+            double x = player.getX() + Math.cos(angle) * radius;
+            double z = player.getZ() + Math.sin(angle) * radius;
+            // Moving along the ring, so the mist swirls.
+            double vx = -Math.sin(angle) * 0.35;
+            double vz = Math.cos(angle) * 0.35;
+            int color = random.nextInt(3) == 0 ? 0xE6FFF5 : random.nextBoolean() ? Power.TOMMY.glow : Power.TOMMY.color;
+            level.addParticle(new EnergyParticleOptions(color, 1.1F), x, player.getY() + height, z, vx, 0.02, vz);
         }
     }
 
@@ -132,13 +172,20 @@ public final class ClientEvents {
     /** Running at super speed would otherwise widen the field of view absurdly. */
     @SubscribeEvent
     public static void onComputeFov(ComputeFovModifierEvent event) {
-        if (QuicksilverAbilities.isRunning(event.getPlayer())) {
+        if (QuicksilverAbilities.isRunning(event.getPlayer()) || TommyAbilities.isRunning(event.getPlayer())) {
             event.setNewFovModifier(Math.min(event.getNewFovModifier(), 1.2F));
         }
     }
 
     private static void handleKeys(Minecraft mc, LocalPlayer player) {
         Power power = Powers.power(player);
+        boolean lookClicked = false;
+        while (KeyBindings.CHANGE_LOOK.consumeClick()) {
+            lookClicked = true;
+        }
+        if (lookClicked && power.hasPowers() && mc.screen == null && !player.isSpectator()) {
+            PacketDistributor.sendToServer(new ChangeLookPayload(player.isShiftKeyDown() ? -1 : 1));
+        }
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             KeyMapping key = KeyBindings.ability(i);
             boolean clicked = false;
@@ -193,7 +240,7 @@ public final class ClientEvents {
                                 player.getZ() + (random.nextDouble() - 0.5) * 0.8, 0, -0.03, 0);
                     }
                 }
-                case QUICKSILVER, NONE -> {
+                case QUICKSILVER, VISION, BILLY, TOMMY, LOKI, THOR, NONE -> {
                 }
             }
         }

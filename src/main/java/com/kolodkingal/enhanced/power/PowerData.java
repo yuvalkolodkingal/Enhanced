@@ -36,6 +36,12 @@ public final class PowerData {
     private boolean dense;
     /** Vision: human disguise from WandaVision. */
     private boolean disguise;
+    /** The hero's current look (see {@link Variants}); empty means the default one. */
+    private String variant = "";
+    /** On/off states of the newer heroes, one bit per {@link Toggle}. */
+    private int toggles;
+    /** Loki: the creature he has shapeshifted into (an entity type id), or empty. */
+    private String form = "";
 
     // ---- runtime (synced, not saved) ----
     private boolean beamActive;
@@ -47,6 +53,10 @@ public final class PowerData {
     private int phaseTicks;
     /** Entity currently held with telekinesis, or -1. */
     private int heldEntityId = -1;
+    /** Thor: Mjolnir while it is thrown and flying, or -1. */
+    private int hammerEntityId = -1;
+    /** Momentary states, one bit per {@link Live}. */
+    private int live;
     /** Game time at which each ability (index 1-5) is ready again. */
     private final long[] cooldownUntil = new long[ABILITIES + 1];
 
@@ -63,8 +73,11 @@ public final class PowerData {
             Codec.BOOL.optionalFieldOf("walkman", true).forGetter(d -> d.walkman),
             Codec.BOOL.optionalFieldOf("vision_phased", false).forGetter(d -> d.visionPhased),
             Codec.BOOL.optionalFieldOf("dense", false).forGetter(d -> d.dense),
-            Codec.BOOL.optionalFieldOf("disguise", false).forGetter(d -> d.disguise)
-    ).apply(i, (power, shield, vision, iron, energy, qsTime, wallRun, walkman, phased, dense, disguise) -> {
+            Codec.BOOL.optionalFieldOf("disguise", false).forGetter(d -> d.disguise),
+            Codec.STRING.optionalFieldOf("variant", "").forGetter(d -> d.variant),
+            Codec.INT.optionalFieldOf("toggles", 0).forGetter(d -> d.toggles),
+            Codec.STRING.optionalFieldOf("form", "").forGetter(d -> d.form)
+    ).apply(i, (power, shield, vision, iron, energy, qsTime, wallRun, walkman, phased, dense, disguise, variant, toggles, form) -> {
         PowerData d = new PowerData();
         d.power = power;
         d.magneticShield = shield;
@@ -77,6 +90,9 @@ public final class PowerData {
         d.visionPhased = phased;
         d.dense = dense;
         d.disguise = disguise;
+        d.variant = variant;
+        d.toggles = toggles;
+        d.form = form;
         return d;
     }));
 
@@ -94,6 +110,11 @@ public final class PowerData {
         buf.writeFloat(energy);
         ByteBufCodecs.VAR_INT.encode(buf, phaseTicks);
         ByteBufCodecs.VAR_INT.encode(buf, heldEntityId + 1);
+        ByteBufCodecs.VAR_INT.encode(buf, hammerEntityId + 1);
+        ByteBufCodecs.stringUtf8(64).encode(buf, variant);
+        ByteBufCodecs.VAR_INT.encode(buf, toggles);
+        ByteBufCodecs.VAR_INT.encode(buf, live);
+        ByteBufCodecs.stringUtf8(256).encode(buf, form);
         for (int i = 1; i <= ABILITIES; i++) {
             ByteBufCodecs.VAR_LONG.encode(buf, cooldownUntil[i]);
         }
@@ -122,6 +143,11 @@ public final class PowerData {
         d.energy = buf.readFloat();
         d.phaseTicks = ByteBufCodecs.VAR_INT.decode(buf);
         d.heldEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
+        d.hammerEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
+        d.variant = ByteBufCodecs.stringUtf8(64).decode(buf);
+        d.toggles = ByteBufCodecs.VAR_INT.decode(buf);
+        d.live = ByteBufCodecs.VAR_INT.decode(buf);
+        d.form = ByteBufCodecs.stringUtf8(256).decode(buf);
         for (int i = 1; i <= ABILITIES; i++) {
             d.cooldownUntil[i] = ByteBufCodecs.VAR_LONG.decode(buf);
         }
@@ -148,6 +174,11 @@ public final class PowerData {
         this.visionPhased = false;
         this.dense = false;
         this.disguise = false;
+        this.variant = "";
+        this.toggles = Toggle.defaults(power);
+        this.live = 0;
+        this.form = "";
+        this.hammerEntityId = -1;
         this.beamActive = false;
         this.chaosShieldActive = false;
         this.shrapnelActive = false;
@@ -277,6 +308,66 @@ public final class PowerData {
     public void setDisguise(boolean v) {
         if (disguise != v) {
             disguise = v;
+            dirty = true;
+        }
+    }
+
+    /** The id of the hero's current look; empty for the default. Use {@link Variants#current} for the look itself. */
+    public String variant() {
+        return variant;
+    }
+
+    /** Changes the look. Use {@link Powers#setVariant} from game code, which also ends whatever the old look was doing. */
+    void setVariantRaw(String v) {
+        if (!variant.equals(v)) {
+            variant = v;
+            dirty = true;
+        }
+    }
+
+    public boolean toggle(Toggle toggle) {
+        return (toggles & toggle.bit()) != 0;
+    }
+
+    public void setToggle(Toggle toggle, boolean on) {
+        int updated = on ? toggles | toggle.bit() : toggles & ~toggle.bit();
+        if (updated != toggles) {
+            toggles = updated;
+            dirty = true;
+        }
+    }
+
+    public boolean is(Live state) {
+        return (live & state.bit()) != 0;
+    }
+
+    public void set(Live state, boolean on) {
+        int updated = on ? live | state.bit() : live & ~state.bit();
+        if (updated != live) {
+            live = updated;
+            dirty = true;
+        }
+    }
+
+    /** Loki's shapeshifted form (an entity type id), or empty for his own body. */
+    public String form() {
+        return form;
+    }
+
+    public void setForm(String v) {
+        if (!form.equals(v)) {
+            form = v;
+            dirty = true;
+        }
+    }
+
+    public int hammerEntityId() {
+        return hammerEntityId;
+    }
+
+    public void setHammerEntityId(int v) {
+        if (hammerEntityId != v) {
+            hammerEntityId = v;
             dirty = true;
         }
     }

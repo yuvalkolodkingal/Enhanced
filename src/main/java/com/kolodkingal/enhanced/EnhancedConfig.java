@@ -50,6 +50,16 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue QUICKSILVER_SPEED_BONUS;
     public static final ModConfigSpec.DoubleValue QUICKSILVER_EXHAUSTION;
 
+    // ---- Billy (Wiccan) ----
+    public static final ModConfigSpec.DoubleValue BILLY_FLIGHT_SPEED;
+
+    // ---- Tommy (Speed) ----
+    public static final ModConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
+    public static final ModConfigSpec.DoubleValue TOMMY_EXHAUSTION;
+
+    // ---- Thor ----
+    public static final ModConfigSpec.DoubleValue THOR_FLIGHT_SPEED;
+
     static {
         BUILDER.push("magneto");
         MAGNETO_FLIGHT_SPEED = BUILDER.comment("Magneto's flying speed (Creative flight is 0.05).")
@@ -122,6 +132,22 @@ public final class EnhancedConfig {
                 .defineInRange("speedBonus", 3.0, 0.0, 10.0);
         QUICKSILVER_EXHAUSTION = BUILDER.comment("Food exhaustion per tick during Quicksilver Time (4.0 = 1 food point).")
                 .defineInRange("exhaustion", 0.03, 0.0, 4.0);
+        BUILDER.pop();
+
+        BUILDER.push("billy");
+        BILLY_FLIGHT_SPEED = BUILDER.defineInRange("flightSpeed", 0.08, 0.01, 0.5);
+        BUILDER.pop();
+
+        BUILDER.push("tommy");
+        TOMMY_SPEED_BONUS = BUILDER.comment("Extra movement speed while Tommy runs at super speed (2.5 = three and a half times as fast).")
+                .defineInRange("speedBonus", 2.5, 0.0, 10.0);
+        TOMMY_EXHAUSTION = BUILDER.comment("Food exhaustion per tick while Tommy runs at super speed (4.0 = 1 food point).")
+                .defineInRange("exhaustion", 0.02, 0.0, 4.0);
+        BUILDER.pop();
+
+        BUILDER.push("thor");
+        THOR_FLIGHT_SPEED = BUILDER.comment("Thor's flying speed while he holds Mjolnir (Creative flight is 0.05).")
+                .defineInRange("flightSpeed", 0.11, 0.01, 0.5);
         BUILDER.pop();
     }
 
