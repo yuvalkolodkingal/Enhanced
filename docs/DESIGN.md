@@ -501,18 +501,19 @@ costume), *Wiccan (comics)*, and *Your own skin*.
   nobody. The first worthy player to lift it **claims it, for good**: when it comes into their
   inventory or hand, when they lift it off the ground, when they forge it, or when Thor calls it
   to himself. The hammer remembers its owner (an `enhanced:owner` item component, kept when it is
-  thrown, dropped or set down), and its tooltip says so: *Bound to <name>*, or *Unclaimed* until
+  thrown, dropped or set down), and its tooltip says so: *Bound to Steve*, or *Unclaimed* until
   then. From then on **only its owner can lift it**: not another Hero of the Village, not Vision,
   not another Thor. Players in Creative or Spectator mode can still lift any Mjolnir, so
   operators can move it, but holding someone else's never changes its owner. The server config
   (`mjolnirOwnerOnly`) can bring back the old rule, where any worthy player can lift any Mjolnir.
-* **Everyone else can't hold it.** In the inventory of a player who is not worthy, or of a worthy
-  one holding someone else's Mjolnir (crafted, taken from a chest, anywhere) it is far too heavy:
-  it slips to the ground at their feet. They can't pick it up either.
+* **Everyone else can't hold it.** A player who is not worthy, or a worthy one who is not its
+  owner, finds Mjolnir far too heavy (crafted, taken from a chest, anywhere in their inventory):
+  it slips to the ground at their feet, and the message names its owner. They can't pick it up
+  either.
 * **Wherever Mjolnir comes to rest, it stays.** A dropped Mjolnir lands and stands on its
   head, handle up, like in the crater in New Mexico: a block that **nothing can break, blow up
   or push**, and that remembers whose it is. Only its owner can lift it (right click); anyone else
-  gets *"It won't budge. Only <owner> can lift it."* Thor can set it down himself with
+  gets *"It won't budge. Only Steve can lift it."* Thor can set it down himself with
   **Sneak + right click** on a block.
 * **Becoming Thor.** The first time a worthy player with no other power lifts (and so claims) a
   Mjolnir nobody owned, or lifts their own, lightning strikes and they **become Thor**. Vision can
@@ -619,5 +620,6 @@ Every power's light follows the films and shows:
 
 All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, how much Quicksilver Time slows the world, Tommy's speed,
-Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir and whether each Mjolnir belongs to the first worthy player who lifts it, the Bifrost's cooldown…) can be changed in
+Mjolnir's and Stormbreaker's damage and range, who is worthy of Mjolnir and whether it belongs to
+the first worthy player who lifts it (`mjolnirOwnerOnly`), the Bifrost's cooldown…) can be changed in
 `world/serverconfig/enhanced-server.toml`.

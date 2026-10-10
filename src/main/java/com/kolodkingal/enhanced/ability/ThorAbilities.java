@@ -203,8 +203,8 @@ public final class ThorAbilities {
     }
 
     /**
-     * Every Mjolnir the player carries (inventory, or on the cursor): one nobody owns yet is claimed by them if they are
-     * worthy, and one they may not lift crashes to the ground.
+     * Every Mjolnir the player carries (inventory, or on the cursor): one nobody owns yet is claimed by them if they
+     * are worthy, and one they may not lift crashes to the ground.
      */
     private static void settleMjolnirs(ServerPlayer player) {
         boolean dropped = false;
@@ -242,7 +242,7 @@ public final class ThorAbilities {
         }
     }
 
-    /** A Mjolnir the player may carry: if nobody owns it yet it is theirs now, and if it is theirs it knows their name. */
+    /** A Mjolnir the player may carry: it is theirs now if nobody owned it, and it shows their current name. */
     private static void keep(ServerPlayer player, ItemStack mjolnir) {
         if (Worthiness.claim(player, mjolnir)) {
             return;
@@ -351,8 +351,8 @@ public final class ThorAbilities {
      * Calls his weapon home, from wherever the nearest one is: the rest of his inventory, the air, the ground (dropped,
      * or Mjolnir resting as a block), or the hands of a creature that picked it up. Returns false if there is no Mjolnir
      * or Stormbreaker within reach. (Never from another player's hands: theirs is theirs. And never another player's
-     * Mjolnir, wherever it lies: only Stormbreaker, a Mjolnir he may lift, or one nobody owns yet, which he claims when
-     * it reaches him.)
+     * Mjolnir, wherever it lies, even if he is in Creative: only Stormbreaker, his own Mjolnir, or one nobody owns yet,
+     * which he claims when it reaches him.)
      */
     public static boolean recall(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
@@ -423,9 +423,9 @@ public final class ThorAbilities {
         return -1;
     }
 
-    /** Whether Thor can call this weapon: Stormbreaker, or a Mjolnir he may lift (see {@link Worthiness#canLift}). */
+    /** Whether Thor can call this weapon: Stormbreaker, or a Mjolnir that is his or nobody's. */
     private static boolean canCall(Player thor, ItemStack weapon) {
-        return isStormbreaker(weapon) || (isMjolnir(weapon) && Worthiness.canLift(thor, weapon));
+        return isStormbreaker(weapon) || (isMjolnir(weapon) && Worthiness.canCall(thor, weapon));
     }
 
     /** The hand in which the creature holds a weapon Thor can call, or null. */
@@ -455,7 +455,7 @@ public final class ThorAbilities {
                     continue;
                 }
                 for (BlockEntity be : chunk.getBlockEntities().values()) {
-                    if (be instanceof MjolnirBlockEntity mjolnir && Worthiness.canLift(thor, mjolnir.hammer())) {
+                    if (be instanceof MjolnirBlockEntity mjolnir && Worthiness.canCall(thor, mjolnir.hammer())) {
                         double d = be.getBlockPos().distSqr(center);
                         if (d <= bestDist) {
                             bestDist = d;

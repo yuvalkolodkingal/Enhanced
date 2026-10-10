@@ -86,6 +86,15 @@ public final class Worthiness {
     }
 
     /**
+     * Whether Thor can call this Mjolnir to his hand: he may lift it, and it is not another player's. Unlike
+     * {@link #canLift} that leaves out the Creative and Spectator exception: an operator can move anyone's hammer by
+     * hand, but his call never takes it from its owner.
+     */
+    public static boolean canCall(Player thor, ItemStack mjolnir) {
+        return canLift(thor, mjolnir) && (ownerOf(mjolnir) == null || isTheirs(thor, mjolnir));
+    }
+
+    /**
      * An unclaimed Mjolnir becomes the player's, for good, if they are worthy to lift it. Returns true if it was
      * claimed just now (the stack itself is changed, so call this on the very stack the player ends up with).
      */

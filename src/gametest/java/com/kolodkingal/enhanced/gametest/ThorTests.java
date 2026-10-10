@@ -21,8 +21,8 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.advancements.AdvancementHolder;
 import io.netty.buffer.Unpooled;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -463,6 +463,7 @@ public final class ThorTests {
     public static void theFirstWorthyHandToLiftMjolnirClaimsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
+        check(EnhancedConfig.MJOLNIR_OWNER_ONLY.getDefault() && EnhancedConfig.MJOLNIR_OWNER_ONLY.get(), "ownership is on by default");
         // Fresh from the forge (or the creative tab) it is nobody's. The unworthy can't keep it, so it stays that way.
         ServerPlayer villager = f.player(4.5, FLOOR, 4.5);
         ItemStack fresh = new ItemStack(ModItems.MJOLNIR.get());
@@ -631,15 +632,24 @@ public final class ThorTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
         MjolnirOwner odin = new MjolnirOwner(UUID.randomUUID(), "Odin");
-        // Odin's Mjolnir rests close by, and a zombie nearer still holds another of Odin's.
+        // Odin's Mjolnir rests close by, a zombie nearer still holds another of Odin's, a third lies on the ground right
+        // next to Thor, and a fourth is in his own pocket.
         BlockPos odinsBlock = new BlockPos(6, 2, 10);
         check(MjolnirBlock.setDown(level, helper.absolutePos(odinsBlock), ownedMjolnir(odin)), "set Odin's Mjolnir down");
         Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
         zombie.setItemInHand(InteractionHand.MAIN_HAND, ownedMjolnir(odin));
+        Vec3 beside = helper.absoluteVec(new Vec3(4.5, FLOOR, 10.5));
+        ItemEntity lying = new ItemEntity(level, beside.x, beside.y, beside.z, ownedMjolnir(odin));
+        level.addFreshEntity(lying);
+        thor.getInventory().setItem(5, ownedMjolnir(odin));
         press(thor, 1);
         check(Powers.get(thor).hammerEntityId() == -1 && !holdsMjolnir(thor), "Thor can't call a Mjolnir that is Odin's");
         helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), odinsBlock);
         check(zombie.getMainHandItem().is(ModItems.MJOLNIR.get()), "and the zombie keeps its grip on it");
+        check(lying.isAlive() && lying.getItem().is(ModItems.MJOLNIR.get()), "and the one on the ground stays where it lies");
+        check(thor.getInventory().getItem(5).is(ModItems.MJOLNIR.get()), "and the one in his pocket doesn't come to his hand");
+        lying.discard();
+        thor.getInventory().clearContent();
 
         // His own, farther away, comes at once.
         BlockPos hisBlock = new BlockPos(16, 2, 10);
@@ -657,6 +667,36 @@ public final class ThorTests {
             helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), odinsBlock);
             return true;
         });
+    }
+
+    @GameTest(template = ARENA)
+    public static void aCreativeThorCanMoveAnyMjolnirButStillCallsOnlyHis(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer thor = f.player(3.5, FLOOR, 10.5, GameType.CREATIVE);
+        Powers.setPower(thor, Power.THOR);
+        MjolnirOwner odin = new MjolnirOwner(UUID.randomUUID(), "Odin");
+        check(Worthiness.canLift(thor, ownedMjolnir(odin)), "an operator can lift Odin's Mjolnir by hand ...");
+        check(!Worthiness.canCall(thor, ownedMjolnir(odin)), "... but his call is never answered by it");
+        check(Worthiness.canCall(thor, new ItemStack(ModItems.MJOLNIR.get())), "an unclaimed one answers it");
+        check(Worthiness.canCall(thor, ownedMjolnir(MjolnirOwner.of(thor))), "and so does his own");
+        BlockPos odinsBlock = new BlockPos(6, 2, 10);
+        check(MjolnirBlock.setDown(level, helper.absolutePos(odinsBlock), ownedMjolnir(odin)), "set Odin's Mjolnir down");
+        press(thor, 1);
+        check(Powers.get(thor).hammerEntityId() == -1 && !holdsMjolnir(thor), "Thor can't call a Mjolnir that is Odin's, even in Creative");
+        helper.assertBlockPresent(ModBlocks.MJOLNIR.get(), odinsBlock);
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void theOwnersNameOnTheHammerFollowsThemWhenTheyRename(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer owner = thor(f, 4.5, 4.5);
+        owner.setItemInHand(InteractionHand.MAIN_HAND, ownedMjolnir(new MjolnirOwner(owner.getUUID(), "OldName")));
+        PowerTicker.tick(owner);
+        MjolnirOwner now = Worthiness.ownerOf(owner.getMainHandItem());
+        check(now != null && now.is(owner) && now.name().equals(owner.getGameProfile().getName()), "the hammer shows their new name: " + now);
+        helper.succeed();
     }
 
     @GameTest(template = ARENA)
