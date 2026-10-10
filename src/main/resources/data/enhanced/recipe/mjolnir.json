@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "NSN",
+    "NHN",
+    " R "
+  ],
+  "key": {
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "S": {
+      "item": "minecraft:nether_star"
+    },
+    "H": {
+      "item": "minecraft:heavy_core"
+    },
+    "R": {
+      "item": "minecraft:breeze_rod"
+    }
+  },
+  "result": {
+    "id": "enhanced:mjolnir",
+    "count": 1
+  }
+}

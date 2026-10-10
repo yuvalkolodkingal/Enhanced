@@ -30,6 +30,7 @@ public final class PowerTicker {
         }
         MagnetoAbilities.helmetTick(player, data);
         QuicksilverAbilities.gogglesTick(player, data);
+        ThorAbilities.mjolnirTick(player, data);
         applyPassives(player, data);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.tick(player, data);

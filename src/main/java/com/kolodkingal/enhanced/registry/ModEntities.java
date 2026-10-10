@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.PhotonBlastEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -33,6 +34,14 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .updateInterval(1)
                     .build("telekinetic_block"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ThrownMjolnirEntity>> THROWN_MJOLNIR = ENTITIES.register("thrown_mjolnir",
+            () -> EntityType.Builder.<ThrownMjolnirEntity>of(ThrownMjolnirEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 0.6F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .fireImmune()
+                    .build("thrown_mjolnir"));
 
     private ModEntities() {
     }

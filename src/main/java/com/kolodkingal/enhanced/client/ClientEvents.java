@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
+import com.kolodkingal.enhanced.client.render.ThorEffects;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.ChangeLookPayload;
@@ -75,6 +76,7 @@ public final class ClientEvents {
         QuicksilverMusic.stop();
         PowerLoopSounds.stopAll();
         Afterimages.clear();
+        ThorEffects.clear();
         SlowMotionEffect.stop(Minecraft.getInstance());
     }
 

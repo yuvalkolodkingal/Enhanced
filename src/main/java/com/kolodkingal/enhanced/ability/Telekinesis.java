@@ -151,6 +151,10 @@ public final class Telekinesis {
         if (e instanceof Player p && (p.isCreative() || p.isSpectator())) {
             return false;
         }
+        if (e instanceof ItemEntity item && item.getItem().is(ModTags.CANNOT_BE_SNATCHED)) {
+            // Mjolnir: no power but worthiness can lift it.
+            return false;
+        }
         return switch (mode) {
             case MAGNETO -> isMagnetic(e);
             case WANDA -> e instanceof LivingEntity || e instanceof ItemEntity || e instanceof TelekineticBlockEntity

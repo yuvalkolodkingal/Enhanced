@@ -3,10 +3,12 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
+import com.kolodkingal.enhanced.client.render.GodOfThunderLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.PhotonEyesLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
+import com.kolodkingal.enhanced.client.render.ThrownMjolnirRenderer;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModParticles;
 import net.minecraft.client.KeyMapping;
@@ -52,6 +54,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.IRON_SHRAPNEL.get(), ctx -> new ThrownItemRenderer<>(ctx, 0.75F, false));
         event.registerEntityRenderer(ModEntities.PHOTON_BLAST.get(), ctx -> new ThrownItemRenderer<>(ctx, 1.4F, true));
         event.registerEntityRenderer(ModEntities.TELEKINETIC_BLOCK.get(), TelekineticBlockRenderer::new);
+        event.registerEntityRenderer(ModEntities.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
     }
 
     @SubscribeEvent
@@ -70,6 +73,7 @@ public final class ClientSetup {
                 renderer.addLayer(new PowerAuraLayer(renderer, energy));
                 renderer.addLayer(new PhotonEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
+                renderer.addLayer(new GodOfThunderLayer(renderer));
             }
         }
     }

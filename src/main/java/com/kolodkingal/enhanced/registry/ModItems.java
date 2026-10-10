@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.registry;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
 import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
+import com.kolodkingal.enhanced.item.MjolnirItem;
 import com.kolodkingal.enhanced.item.QuicksilverGogglesItem;
 import com.kolodkingal.enhanced.item.ScarletWitchGeneItem;
 import com.kolodkingal.enhanced.item.SynthezoidCoreItem;
@@ -38,6 +39,11 @@ public final class ModItems {
     public static final DeferredItem<LokisScepterItem> LOKIS_SCEPTER = ITEMS.register("lokis_scepter",
             () -> new LokisScepterItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
                     .attributes(LokisScepterItem.createAttributes())));
+
+    /** Only the worthy can lift it: see {@link com.kolodkingal.enhanced.ability.Worthiness}. */
+    public static final DeferredItem<MjolnirItem> MJOLNIR = ITEMS.register("mjolnir",
+            () -> new MjolnirItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                    .attributes(MjolnirItem.createAttributes())));
 
     /** Projectile sprites only; not in the creative tab. */
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");

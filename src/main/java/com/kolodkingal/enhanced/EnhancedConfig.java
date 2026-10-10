@@ -59,6 +59,14 @@ public final class EnhancedConfig {
 
     // ---- Thor ----
     public static final ModConfigSpec.DoubleValue THOR_FLIGHT_SPEED;
+    public static final ModConfigSpec.BooleanValue MJOLNIR_ANYONE_WORTHY;
+    public static final ModConfigSpec.DoubleValue MJOLNIR_THROW_DAMAGE;
+    public static final ModConfigSpec.IntValue MJOLNIR_THROW_RANGE;
+    public static final ModConfigSpec.IntValue MJOLNIR_RECALL_RANGE;
+    public static final ModConfigSpec.DoubleValue THOR_LIGHTNING_DAMAGE;
+    public static final ModConfigSpec.IntValue THOR_LIGHTNING_RANGE;
+    public static final ModConfigSpec.DoubleValue GOD_OF_THUNDER_EXHAUSTION;
+    public static final ModConfigSpec.IntValue BIFROST_COOLDOWN;
 
     static {
         BUILDER.push("magneto");
@@ -148,6 +156,23 @@ public final class EnhancedConfig {
         BUILDER.push("thor");
         THOR_FLIGHT_SPEED = BUILDER.comment("Thor's flying speed while he holds Mjolnir (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.11, 0.01, 0.5);
+        MJOLNIR_ANYONE_WORTHY = BUILDER.comment("If true, everyone is worthy of Mjolnir. If false (the default), only Thor, Vision,",
+                        "Creative players and those who have earned the Hero of the Village advancement can lift it.")
+                .define("anyoneWorthy", false);
+        MJOLNIR_THROW_DAMAGE = BUILDER.comment("Damage of a thrown Mjolnir, both ways.")
+                .defineInRange("throwDamage", 10.0, 0.0, 100.0);
+        MJOLNIR_THROW_RANGE = BUILDER.comment("How far (blocks) a thrown Mjolnir flies before it turns back.")
+                .defineInRange("throwRange", 40, 4, 128);
+        MJOLNIR_RECALL_RANGE = BUILDER.comment("How far away (blocks) Thor can call Mjolnir back from.")
+                .defineInRange("recallRange", 64, 4, 256);
+        THOR_LIGHTNING_DAMAGE = BUILDER.comment("Damage of Thor's lightning to whatever it strikes.")
+                .defineInRange("lightningDamage", 8.0, 0.0, 100.0);
+        THOR_LIGHTNING_RANGE = BUILDER.comment("How far away (blocks) Thor can call lightning down.")
+                .defineInRange("lightningRange", 64, 4, 256);
+        GOD_OF_THUNDER_EXHAUSTION = BUILDER.comment("Food exhaustion per tick while the God of Thunder is unleashed (4.0 = 1 food point).")
+                .defineInRange("godOfThunderExhaustion", 0.04, 0.0, 4.0);
+        BIFROST_COOLDOWN = BUILDER.comment("Cooldown of the Bifrost, in ticks.")
+                .defineInRange("bifrostCooldown", 1200, 0, 72000);
         BUILDER.pop();
     }
 

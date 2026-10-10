@@ -1,0 +1,486 @@
+{
+  "credit": "Enhanced: Mjolnir, drawn for the mod",
+  "textures": {
+    "head_side": "enhanced:block/mjolnir_head_side",
+    "head_end": "enhanced:block/mjolnir_head_end",
+    "handle": "enhanced:block/mjolnir_handle",
+    "pommel": "enhanced:block/mjolnir_pommel",
+    "strap": "enhanced:block/mjolnir_strap",
+    "particle": "enhanced:block/mjolnir_head_end"
+  },
+  "elements": [
+    {
+      "from": [
+        7.6,
+        -4,
+        7.5
+      ],
+      "to": [
+        8.4,
+        0,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#strap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#strap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#strap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#strap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#strap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#strap",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      },
+      "name": "strap"
+    },
+    {
+      "from": [
+        6.75,
+        0,
+        6.75
+      ],
+      "to": [
+        9.25,
+        1.25,
+        9.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "up": {
+          "texture": "#pommel",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "down": {
+          "texture": "#pommel",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        }
+      },
+      "name": "pommel"
+    },
+    {
+      "from": [
+        7,
+        1.25,
+        7
+      ],
+      "to": [
+        9,
+        9.5,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#handle",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#handle",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#handle",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#handle",
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#pommel",
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ]
+        },
+        "down": {
+          "texture": "#pommel",
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ]
+        }
+      },
+      "name": "grip"
+    },
+    {
+      "from": [
+        6.75,
+        9.5,
+        6.75
+      ],
+      "to": [
+        9.25,
+        10.75,
+        9.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#pommel",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "up": {
+          "texture": "#pommel",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "down": {
+          "texture": "#pommel",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        }
+      },
+      "name": "collar"
+    },
+    {
+      "from": [
+        3,
+        10.75,
+        5.25
+      ],
+      "to": [
+        13,
+        15.75,
+        10.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#head_side",
+          "uv": [
+            0,
+            4,
+            16,
+            12
+          ]
+        },
+        "south": {
+          "texture": "#head_side",
+          "uv": [
+            0,
+            4,
+            16,
+            12
+          ]
+        },
+        "east": {
+          "texture": "#head_end",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#head_end",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#head_side",
+          "uv": [
+            0,
+            4,
+            16,
+            12
+          ]
+        },
+        "down": {
+          "texture": "#head_side",
+          "uv": [
+            0,
+            4,
+            16,
+            12
+          ]
+        }
+      },
+      "name": "head"
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        3.5,
+        0.5
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        3.5,
+        0.5
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        90,
+        20
+      ],
+      "translation": [
+        1.5,
+        3.5,
+        0
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        90,
+        20
+      ],
+      "translation": [
+        1.5,
+        3.5,
+        0
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ]
+    },
+    "gui": {
+      "rotation": [
+        20,
+        -35,
+        -40
+      ],
+      "translation": [
+        0,
+        0.5,
+        0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        -40
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    "head": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        13,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  }
+}

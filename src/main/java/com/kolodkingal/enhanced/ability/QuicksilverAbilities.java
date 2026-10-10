@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
+import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -177,8 +178,8 @@ public final class QuicksilverAbilities {
             return;
         }
         LivingEntity target = (LivingEntity) hit.getEntity();
-        InteractionHand hand = !target.getMainHandItem().isEmpty() ? InteractionHand.MAIN_HAND
-                : !target.getOffhandItem().isEmpty() ? InteractionHand.OFF_HAND : null;
+        InteractionHand hand = snatchable(target.getMainHandItem()) ? InteractionHand.MAIN_HAND
+                : snatchable(target.getOffhandItem()) ? InteractionHand.OFF_HAND : null;
         if (hand == null) {
             player.displayClientMessage(Component.translatable("message.enhanced.pickpocket.empty"), true);
             return;
@@ -195,6 +196,10 @@ public final class QuicksilverAbilities {
         streak(level, player.getEyePosition(), target.getEyePosition());
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1.0F, 1.6F);
         player.displayClientMessage(Component.translatable("message.enhanced.pickpocket.stolen", stolen.getHoverName()), true);
+    }
+
+    private static boolean snatchable(ItemStack stack) {
+        return !stack.isEmpty() && !stack.is(ModTags.CANNOT_BE_SNATCHED);
     }
 
     /** A silver-blue streak between two points. */

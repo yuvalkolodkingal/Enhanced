@@ -1,13 +1,16 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
+import com.kolodkingal.enhanced.entity.ThrownMjolnirEntity;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -149,7 +152,38 @@ public final class HeroPoses {
                     model.leftArm.xRot = 0.0F;
                 }
             }
-            case BILLY, LOKI, THOR, NONE -> {
+            case THOR -> {
+                Entity hammer = data.hammerEntityId() != -1 ? player.level().getEntity(data.hammerEntityId()) : null;
+                if (data.is(Live.CALLING_LIGHTNING)) {
+                    // Mjolnir raised to the sky, catching the lightning.
+                    main.xRot = -Mth.PI + 0.1F + Mth.sin(t * 2.1F) * 0.03F;
+                    main.yRot = 0.0F;
+                    main.zRot = 0.1F * side;
+                    off.zRot += 0.25F * -side;
+                } else if (data.is(Live.BIFROST)) {
+                    model.rightArm.xRot = -0.3F;
+                    model.leftArm.xRot = -0.3F;
+                    model.rightArm.zRot = 0.45F;
+                    model.leftArm.zRot = -0.45F;
+                } else if (hammer instanceof ThrownMjolnirEntity flying && flying.isReturning()
+                        && flying.distanceToSqr(player) < 20 * 20) {
+                    // Hand out, waiting for Mjolnir to come home.
+                    pointAt(main, player, flying.position(), t);
+                    off.zRot += 0.15F * -side;
+                } else if (airborne) {
+                    // Flying behind Mjolnir: hammer arm thrust forward and up, the other arm back.
+                    main.xRot = -2.75F + Mth.sin(t * 0.2F) * 0.04F;
+                    main.yRot = 0.0F;
+                    main.zRot = 0.0F;
+                    off.xRot = 0.35F;
+                    off.zRot = 0.12F * -side;
+                } else if (data.toggle(Toggle.GOD_OF_THUNDER)) {
+                    // Unleashed: arms held away from the body, crackling.
+                    model.rightArm.zRot += 0.22F + Mth.sin(t * 1.9F) * 0.03F;
+                    model.leftArm.zRot -= 0.22F + Mth.cos(t * 1.7F) * 0.03F;
+                }
+            }
+            case BILLY, LOKI, NONE -> {
             }
         }
         sync(model);

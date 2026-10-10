@@ -8,6 +8,8 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
@@ -21,6 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,13 +35,16 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
@@ -80,6 +86,7 @@ public final class CommonEvents {
         SlowMotion.clear();
         MagnetoAbilities.clearHeld();
         TommyAbilities.clear();
+        ThorAbilities.clear();
     }
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----
@@ -197,6 +204,12 @@ public final class CommonEvents {
             event.setCanceled(true);
             return;
         }
+        if (ThorAbilities.isThor(player) && !unstoppable && (source.is(DamageTypeTags.IS_LIGHTNING)
+                || (source.is(DamageTypeTags.IS_FALL) && ThorAbilities.holdsMjolnir(player)))) {
+            // The God of Thunder; and with Mjolnir in hand he lands like one.
+            event.setCanceled(true);
+            return;
+        }
         if (MagnetoAbilities.hasShieldUp(player) && MagnetoAbilities.isMetalProjectile(source.getDirectEntity())
                 && source.getEntity() != player) {
             event.setCanceled(true);
@@ -204,6 +217,32 @@ public final class CommonEvents {
         }
         if (Powers.is(player, Power.PHOTON) && source.is(ModTags.ABSORBABLE_ENERGY) && source.getEntity() != player) {
             event.setAmount(PhotonAbilities.absorb(player, event.getAmount()));
+        }
+    }
+
+    /** Every blow the God of Thunder lands with his own hands (or Mjolnir in them) arcs lightning. */
+    @SubscribeEvent
+    public static void onThorMelee(LivingIncomingDamageEvent event) {
+        DamageSource source = event.getSource();
+        if (source.is(DamageTypes.PLAYER_ATTACK) && source.getDirectEntity() instanceof ServerPlayer thor && source.getEntity() == thor
+                && event.getEntity() != thor) {
+            ThorAbilities.onMeleeHit(thor, event.getEntity());
+        }
+    }
+
+    /** Lightning doesn't hurt or burn Thor. */
+    @SubscribeEvent
+    public static void onStruckByLightning(EntityStruckByLightningEvent event) {
+        if (ThorAbilities.isThor(event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    /** Only the worthy can pick Mjolnir up. */
+    @SubscribeEvent
+    public static void onItemPickup(ItemEntityPickupEvent.Pre event) {
+        if (ThorAbilities.isMjolnir(event.getItemEntity().getItem()) && !Worthiness.isWorthy(event.getPlayer())) {
+            event.setCanPickup(TriState.FALSE);
         }
     }
 

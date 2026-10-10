@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
+import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -154,7 +156,13 @@ public class PowerHud implements LayeredDraw.Layer {
 
     private static Component thor(LocalPlayer player, PowerData data, int ability) {
         return switch (ability) {
-            case 2 -> onOff(data.flying());
+            case 1 -> ThorAbilities.holdsMjolnir(player) ? Component.translatable("hud.enhanced.mjolnir.in_hand").withStyle(ChatFormatting.AQUA)
+                    : data.hammerEntityId() != -1 ? Component.translatable("hud.enhanced.mjolnir.flying").withStyle(ChatFormatting.AQUA)
+                    : Component.translatable("hud.enhanced.mjolnir.away").withStyle(ChatFormatting.GRAY);
+            case 2 -> !ThorAbilities.holdsMjolnir(player) && data.hammerEntityId() == -1
+                    ? Component.translatable("hud.enhanced.mjolnir.needed").withStyle(ChatFormatting.DARK_GRAY) : onOff(data.flying());
+            case 4 -> onOff(data.toggle(Toggle.GOD_OF_THUNDER));
+            case 5 -> data.is(Live.BIFROST) ? active("hud.enhanced.active") : null;
             default -> null;
         };
     }
