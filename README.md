@@ -3,8 +3,13 @@
 A Minecraft mod where you can become one of the *Enhanced*:
 **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**;
 **Quicksilver**, who runs so fast the world slows down around him (to *Sweet Dreams*);
-or **Vision**, the Mind Stone in a synthetic body.
+**Vision**, the Mind Stone in a synthetic body (or **White Vision**);
+Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki** and his variants, **Sylvie** among them;
+or, if you are worthy, **Thor**, with **Mjolnir**.
 And if you're lucky enough to survive Wanda's Hex wall, **Photon**.
+
+Every power's look and colour follows the MCU films and shows, and Vision, Tommy, Billy, Loki
+and Thor each have several looks (press **H**).
 
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).
@@ -35,6 +40,9 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | **Photon** | Cross a Scarlet Witch's Hex wall without her permission and survive the 5% chance. |
 | **Quicksilver** | Craft **Quicksilver's Goggles** (sugar, iron, glass panes, a Block of Diamond) and put them on. |
 | **Vision** | Craft a **Synthezoid Core** (redstone blocks, netherite ingots, a Nether Star). Hold it in one hand and use **Loki's Scepter** with the other. |
+| **Tommy** or **Billy** | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors, an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
+| **Loki** | Find the **Tesseract** (End City, Stronghold library, Ancient City and Woodland Mansion chests) and use it: you vanish in a blue flash and reappear far away as Loki. |
+| **Thor** | Forge **Mjolnir** (netherite ingots, a Nether Star, a Heavy Core, a Breeze Rod). Only the **worthy** can lift it: Heroes of the Village (save a village from a raid). Lift it, and lightning makes you Thor. |
 
 ## Controls
 
@@ -46,10 +54,20 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | **B** | Magnetic Shield (toggle) | Chaos Shield (hold) | Phase Shift | Wall & Water Run (toggle) | Density (toggle) |
 | **N** | Magnetic Flight | The Hex (again: Hex Control, Sneak: dissolve) | Spectrum Vision (toggle) | Walkman: music on/off | Human disguise (toggle) |
 
+| Key | Tommy | Billy | Loki | Thor |
+|---|---|---|---|---|
+| **R** | Super Speed on/off (sprint) | Hex Bolt | Daggers (Sneak: three) | Throw Mjolnir / call it back |
+| **G** | Disarm Blitz | Flight | Duplicates | Flight (with Mjolnir) |
+| **V** | Whirlwind | Telekinesis | Shapeshift | Lightning |
+| **B** | Vibrate Through Walls | Freeze | Vanish | God of Thunder (toggle) |
+| **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant, or the variant's own power | Bifrost (Sneak: where you look) |
+| **H** | Change look | Change look | Change look | Change look |
+
 **Quicksilver Time:** as Quicksilver, just sprint. Everything within 32 blocks slows to a
 fifth of its speed (arrows hang in the air), you run four times faster, and the music starts.
 
-Every hero except Quicksilver can also fly by double-tapping **Space**. With telekinesis, press the key again
+Every hero except Quicksilver, Tommy and Loki can also fly by double-tapping **Space** (Thor only with
+Mjolnir in hand). With telekinesis, press the key again
 to launch what you hold, or **Sneak** + the key to put it down gently. Keys can be changed
 under *Options → Controls → Enhanced Powers*. The top-left corner of the screen always
 shows your abilities, cooldowns and resources.
@@ -106,7 +124,8 @@ To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a
 ## For server owners
 
 * `/enhanced power get|set …` (`none`, `magneto`, `scarlet_witch`, `photon`, `quicksilver`,
-  `vision`) and `/enhanced hex list|clear` (operators only).
+  `vision`, `tommy`, `billy`, `loki`, `thor`, optionally followed by a look), `/enhanced look <players> <look>`
+  and `/enhanced hex list|clear` (operators only).
 * Balance numbers (beam damage, Hex death chance and radius, flight speeds, shrapnel, how much
   Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
 * Item, block, entity and damage tags under `data/enhanced/tags/` decide what counts as
