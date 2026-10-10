@@ -622,7 +622,12 @@ public final class HeroAnimator {
 
     // ---- gestures ----
 
-    /** Starts a gesture on a hero: the others of its group fade out, and a free (or the weakest) slot plays it. */
+    /**
+     * Starts a gesture on a hero: the others of its group fade out, and a free (or the weakest) slot plays it.
+     * {@code param} is the gesture's own number: for the Chaos Shield's raise the shield's wind-up in ticks (the keys
+     * are played at the speed that has the arms thrown open exactly then; 0 plays them as keyed), for every other
+     * gesture unused.
+     */
     static void start(HeroAnimState s, GestureId id, float param, float age) {
         Gestures.Def def = Gestures.get(id);
         if (def == null) {
@@ -656,11 +661,22 @@ public final class HeroAnimator {
         target.releaseStart = Float.NaN;
         target.releaseFrom = 0.0F;
         target.param = param;
+        target.rate = id == GestureId.WANDA_SHIELD_RAISE ? GestureRoutes.shieldRate(Math.round(param)) : 1.0F;
         target.holdTicks = 0.0F;
         target.weight = 0.0F;
         target.t = 0.0F;
         target.predicted = false;
         target.active = true;
+    }
+
+    /** Lets a playing gesture go early: it fades out over 3 ticks instead of running to its end. */
+    static void release(HeroAnimState s, GestureId id, float age) {
+        for (HeroAnimState.Slot slot : s.slots) {
+            if (slot.active && slot.id == id && Float.isNaN(slot.releaseStart)) {
+                slot.releaseFrom = slot.weight;
+                slot.releaseStart = age;
+            }
+        }
     }
 
     /** A deterministic noise in -1..1 for step {@code n} and an entity: the same on every client, whatever the frame rate. */
@@ -686,11 +702,11 @@ public final class HeroAnimator {
             }
             GestureId id = slot.id;
             Gestures.Def def = Gestures.get(id);
-            float t = age - slot.start;
+            float t = (age - slot.start) * slot.rate;
             if (slot.holdTicks > 0.0F && t >= id.dur - id.release && Float.isNaN(slot.releaseStart)) {
                 slot.start += dt;
                 slot.holdTicks -= dt;
-                t = age - slot.start;
+                t = (age - slot.start) * slot.rate;
             }
             float weight;
             if (!Float.isNaN(slot.releaseStart)) {
@@ -879,13 +895,19 @@ public final class HeroAnimator {
         if (id == null) {
             return;
         }
-        start(s, id, 0.0F, player.tickCount);
+        float param = 0.0F;
+        if (id == GestureId.WANDA_SHIELD_RAISE) {
+            // The wind-up the server will give it (the config), so the arms open as the dome completes.
+            param = WandaAbilities.windUpTicks();
+            id = GestureRoutes.shieldRaise(Math.round(param));
+        }
+        start(s, id, param, player.tickCount);
         for (HeroAnimState.Slot slot : s.slots) {
             if (slot.active && slot.id == id && slot.start == player.tickCount) {
                 slot.predicted = true;
             }
         }
-        GestureEffects.started(player, s, id);
+        GestureEffects.started(player, s, id, param);
     }
 
     // ---- the debugging tools ----
@@ -947,7 +969,7 @@ public final class HeroAnimator {
         float age = (float) s.time;
         for (HeroAnimState.Slot slot : s.slots) {
             if (slot.active) {
-                slot.start = age - ticks;
+                slot.start = age - ticks / slot.rate;
             }
         }
         sampleSlots(s, age, 0.0F);

@@ -22,6 +22,11 @@ public final class HeroAnimState {
         public float releaseFrom;
         public float releaseStart = Float.NaN;
         public float param;
+        /**
+         * How fast the gesture's own clock runs against the game's: 1 plays it as keyed, 0.5 twice as slowly. Only the
+         * Chaos Shield's raise is ever stretched (to the shield's wind-up, so the arms open as the dome completes).
+         */
+        public float rate = 1.0F;
         /** Ticks the last pose is still to be held ({@code HeroAnimator.hold}). */
         public float holdTicks;
         /** Set by the frame: the weight and the time into the gesture. */

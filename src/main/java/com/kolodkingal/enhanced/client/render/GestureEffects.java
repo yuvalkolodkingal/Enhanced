@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -41,13 +42,37 @@ public final class GestureEffects {
         VIBRATE_HAND
     }
 
-    private record Timed(int player, long from, long to, Kind kind) {
+    /**
+     * An effect that runs from tick {@code from} to {@code to} of the game's clock. A shield effect belongs to a
+     * shield being raised: it stops if the shield is let go of (or refused) before it forms, so nothing is thrown open
+     * that never formed.
+     */
+    private static final class Timed {
+        final int player;
+        final long born;
+        final long from;
+        final long to;
+        final Kind kind;
+        /** The data has shown the shield being raised. */
+        boolean seen;
+
+        Timed(int player, long born, long from, long to, Kind kind) {
+            this.player = player;
+            this.born = born;
+            this.from = from;
+            this.to = to;
+            this.kind = kind;
+        }
+
+        boolean isShield() {
+            return kind == Kind.SHIELD_GATHER || kind == Kind.SHIELD_FLASH;
+        }
     }
 
     private static final List<Timed> TIMED = new ArrayList<>();
 
-    /** A gesture just began for this hero: start what goes with it. */
-    static void started(AbstractClientPlayer player, HeroAnimState state, GestureId id) {
+    /** A gesture just began for this hero ({@code param} as in {@link HeroAnimator#start}): start what goes with it. */
+    static void started(AbstractClientPlayer player, HeroAnimState state, GestureId id, float param) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null || player.isInvisible() || !EnhancedClientConfig.flightEffects()) {
             return;
@@ -61,22 +86,25 @@ public final class GestureEffects {
             case THOR_CATCH -> catchSparks(level, player, state);
             case THOR_BEAM_KICK, THOR_BEAM_KICK_BARE -> kickSparks(level, player, state);
             case WANDA_SHIELD_RAISE -> {
-                add(player, now + 4, now + 14, Kind.SHIELD_GATHER);
-                add(player, now + 15, now + 15, Kind.SHIELD_FLASH);
+                // The motes gather while the arms do (t4 to t14 of the keys), the flash is the arms thrown open (t15):
+                // both stretched with the wind-up, so the shield is complete as they open.
+                float k = GestureRoutes.shieldRate(Math.round(param));
+                add(player, now, now + Math.round(4 / k), now + Math.max(Math.round(14 / k), Math.round(4 / k)), Kind.SHIELD_GATHER);
+                add(player, now, now + Math.round(15 / k), now + Math.round(15 / k), Kind.SHIELD_FLASH);
             }
-            case WANDA_SHIELD_SNAP -> add(player, now + 4, now + 4, Kind.SHIELD_FLASH);
-            case WANDA_HEX_RISE -> add(player, now + 8, now + 36, Kind.HEX_RISE);
-            case LOKI_CAST -> add(player, now + 3, now + 9, Kind.CAST_HAND);
-            case MAG_DISARM -> add(player, now + 5, now + 8, Kind.CAST_HAND);
-            case BILLY_FREEZE_CAST -> add(player, now + 5, now + 20, Kind.CAST_BOTH);
-            case TOMMY_ACCEL -> add(player, now + 2, now + 7, Kind.VIBRATE_HAND);
+            case WANDA_SHIELD_SNAP -> add(player, now, now + 4, now + 4, Kind.SHIELD_FLASH);
+            case WANDA_HEX_RISE -> add(player, now, now + 8, now + 36, Kind.HEX_RISE);
+            case LOKI_CAST -> add(player, now, now + 3, now + 9, Kind.CAST_HAND);
+            case MAG_DISARM -> add(player, now, now + 5, now + 8, Kind.CAST_HAND);
+            case BILLY_FREEZE_CAST -> add(player, now, now + 5, now + 20, Kind.CAST_BOTH);
+            case TOMMY_ACCEL -> add(player, now, now + 2, now + 7, Kind.VIBRATE_HAND);
             default -> {
             }
         }
     }
 
-    private static void add(AbstractClientPlayer player, long from, long to, Kind kind) {
-        TIMED.add(new Timed(player.getId(), from, to, kind));
+    private static void add(AbstractClientPlayer player, long born, long from, long to, Kind kind) {
+        TIMED.add(new Timed(player.getId(), born, from, to, kind));
     }
 
     /** Runs the timed effects of this client tick. */
@@ -85,16 +113,16 @@ public final class GestureEffects {
             return;
         }
         long now = level.getGameTime();
-        TIMED.removeIf(t -> now > t.to());
+        TIMED.removeIf(t -> now > t.to || t.isShield() && shieldGone(level, t, now));
         for (Timed t : TIMED) {
-            if (now < t.from() || !(level.getEntity(t.player()) instanceof AbstractClientPlayer player) || player.isInvisible()) {
+            if (now < t.from || !(level.getEntity(t.player) instanceof AbstractClientPlayer player) || player.isInvisible()) {
                 continue;
             }
             HeroAnimState state = HeroAnimator.peek(player);
             if (state == null) {
                 continue;
             }
-            switch (t.kind()) {
+            switch (t.kind) {
                 case SHIELD_GATHER -> gather(level, player);
                 case SHIELD_FLASH -> flash(level, player);
                 case HEX_RISE -> rise(level, player);
@@ -106,6 +134,16 @@ public final class GestureEffects {
                 case VIBRATE_HAND -> vibrate(level, player);
             }
         }
+    }
+
+    /** Whether the shield that a shield effect belongs to was let go of or refused before it could be thrown open. */
+    private static boolean shieldGone(ClientLevel level, Timed t, long now) {
+        if (!(level.getEntity(t.player) instanceof AbstractClientPlayer player)) {
+            return true;
+        }
+        boolean up = Powers.get(player).chaosShieldActive();
+        t.seen |= up;
+        return GestureRoutes.shieldRaiseAborted(up, t.seen, now - t.born);
     }
 
     public static void clear() {
@@ -120,6 +158,15 @@ public final class GestureEffects {
         Vec3 other = HandTracker.shoulder(player, HumanoidArm.LEFT, 0.0F);
         return shoulder != null && other != null ? shoulder.add(other).scale(0.5).add(0.0, -0.2, 0.0)
                 : player.position().add(0.0, player.getBbHeight() * 0.65, 0.0);
+    }
+
+    /**
+     * How large the particles of an effect at a hero's hands are drawn: the local player's own hands are a hand's
+     * length from the camera in first person, where a full-size mote would fill a tenth of the screen.
+     */
+    private static float size(AbstractClientPlayer player) {
+        Minecraft mc = Minecraft.getInstance();
+        return player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson() ? 0.4F : 1.0F;
     }
 
     /** A hand of the hero: the tracked one, or (the local player in first person) where energy leaves the hand. */
@@ -140,7 +187,7 @@ public final class GestureEffects {
             Vec3 toChest = chest.subtract(hand);
             for (int i = 0; i < 2; i++) {
                 Vec3 at = hand.add((random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3);
-                level.addParticle(new EnergyParticleOptions(i == 0 ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 0.9F), at.x, at.y, at.z,
+                level.addParticle(new EnergyParticleOptions(i == 0 ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 0.9F * size(player)), at.x, at.y, at.z,
                         toChest.x * 0.12, toChest.y * 0.12, toChest.z * 0.12);
             }
         }
@@ -154,7 +201,7 @@ public final class GestureEffects {
         for (int i = 0; i < 14; i++) {
             double angle = random.nextDouble() * Mth.TWO_PI;
             Vec3 out = new Vec3(Math.cos(angle), (random.nextDouble() - 0.5) * 0.8, Math.sin(angle)).normalize().scale(0.18);
-            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 1.1F), chest.x, chest.y, chest.z,
+            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 1.1F * size(player)), chest.x, chest.y, chest.z,
                     out.x, out.y, out.z);
         }
     }
@@ -163,7 +210,7 @@ public final class GestureEffects {
         RandomSource random = level.random;
         for (HumanoidArm arm : HumanoidArm.values()) {
             Vec3 hand = hand(player, arm);
-            level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 1.0F),
+            level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 1.0F * size(player)),
                     hand.x + (random.nextDouble() - 0.5) * 0.2, hand.y, hand.z + (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.02,
                     0.05 + random.nextDouble() * 0.03, (random.nextDouble() - 0.5) * 0.02);
         }
@@ -176,7 +223,7 @@ public final class GestureEffects {
         int color = state.power == Power.BILLY ? BillyAbilities.MAIN : state.power.color;
         int glow = state.power == Power.BILLY ? BillyAbilities.INNER : state.power.glow;
         for (int i = 0; i < 2; i++) {
-            level.addParticle(new EnergyParticleOptions(i == 0 ? color : glow, 0.9F), hand.x + (random.nextDouble() - 0.5) * 0.25,
+            level.addParticle(new EnergyParticleOptions(i == 0 ? color : glow, 0.9F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.25,
                     hand.y + (random.nextDouble() - 0.5) * 0.25, hand.z + (random.nextDouble() - 0.5) * 0.25, (random.nextDouble() - 0.5) * 0.04,
                     0.02 + random.nextDouble() * 0.03, (random.nextDouble() - 0.5) * 0.04);
         }
@@ -186,7 +233,7 @@ public final class GestureEffects {
         RandomSource random = level.random;
         Vec3 hand = hand(player, player.getMainArm());
         for (int i = 0; i < 3; i++) {
-            level.addParticle(new EnergyParticleOptions(i == 0 ? Power.TOMMY.glow : Power.TOMMY.color, 0.7F), hand.x + (random.nextDouble() - 0.5) * 0.2,
+            level.addParticle(new EnergyParticleOptions(i == 0 ? Power.TOMMY.glow : Power.TOMMY.color, 0.7F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.2,
                     hand.y + (random.nextDouble() - 0.5) * 0.2, hand.z + (random.nextDouble() - 0.5) * 0.2, 0.0, 0.0, 0.0);
         }
     }
@@ -229,7 +276,7 @@ public final class GestureEffects {
         Vec3 tip = hand.add(player.getLookAngle().scale(0.45)).add(0.0, 0.4, 0.0);
         RandomSource random = level.random;
         for (int i = 0; i < 2; i++) {
-            level.addParticle(new EnergyParticleOptions(0x4DB8FF, 0.6F), tip.x + (random.nextDouble() - 0.5) * 0.1, tip.y + (random.nextDouble() - 0.5) * 0.1,
+            level.addParticle(new EnergyParticleOptions(0x4DB8FF, 0.6F * size(player)), tip.x + (random.nextDouble() - 0.5) * 0.1, tip.y + (random.nextDouble() - 0.5) * 0.1,
                     tip.z + (random.nextDouble() - 0.5) * 0.1, 0.0, 0.01, 0.0);
         }
     }

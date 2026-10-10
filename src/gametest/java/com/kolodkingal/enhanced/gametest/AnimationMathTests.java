@@ -366,6 +366,44 @@ public final class AnimationMathTests {
         helper.succeed();
     }
 
+    /**
+     * The Chaos Shield's raise is acted over the shield's own wind-up, whatever the config says: the keys are played
+     * faster or slower so the arms are thrown open (key 15) at the very tick the shield is complete, and a wind-up too
+     * short to act is a snap. A raise the shield never formed for (let go of at once, or refused) stops its effects.
+     */
+    @GameTest(template = ARENA)
+    public static void theShieldsRaiseKeepsTimeWithItsWindUp(GameTestHelper helper) {
+        int opens = GestureRoutes.SHIELD_KEYED_WIND_UP;
+        Gestures.Def raise = Gestures.get(GestureId.WANDA_SHIELD_RAISE);
+        Gestures.ArmKey thrownOpen = null;
+        for (Gestures.ArmKey key : raise.m) {
+            if (key.t >= opens - 0.01F && thrownOpen == null) {
+                thrownOpen = key;
+            }
+        }
+        check(thrownOpen != null && Math.abs(thrownOpen.t - opens) < 0.01F, "the arms are thrown open at tick " + opens + " of the keys");
+        for (int windUp : new int[]{4, 8, 15, 30, 60, 200}) {
+            float rate = GestureRoutes.shieldRate(windUp);
+            // The gesture's own clock reaches the opening key exactly when the shield is complete.
+            assertNear(windUp * rate, opens, 1.0E-4, "the arms open when a " + windUp + "-tick shield is complete");
+            check(GestureRoutes.shieldRaise(windUp) == GestureId.WANDA_SHIELD_RAISE, "a " + windUp + "-tick shield is acted out");
+        }
+        assertNear(GestureRoutes.shieldRate(15), 1.0, 1.0E-6, "the keyed wind-up plays as keyed");
+        assertNear(GestureRoutes.shieldRate(30), 0.5, 1.0E-6, "a shield twice as slow gets a raise twice as slow");
+        for (int windUp : new int[]{0, 1, 3}) {
+            check(GestureRoutes.shieldRaise(windUp) == GestureId.WANDA_SHIELD_SNAP, "a " + windUp + "-tick shield is a snap");
+        }
+        check(GestureRoutes.shieldRate(0) == 1.0F, "no wind-up: no stretching either");
+
+        // The effects of a raise: believed while the data has not caught up with the key press, over once it fell or
+        // never came.
+        check(!GestureRoutes.shieldRaiseAborted(true, true, 5), "held: on");
+        check(!GestureRoutes.shieldRaiseAborted(false, false, 2), "the key was just pressed: the data is on its way");
+        check(GestureRoutes.shieldRaiseAborted(false, false, GestureRoutes.SHIELD_DATA_GRACE + 1), "refused: the data never came");
+        check(GestureRoutes.shieldRaiseAborted(false, true, 3), "let go of before it formed: over at once");
+        helper.succeed();
+    }
+
     /** Every ability of every hero, every toggle, momentary state and flag is acted by a gesture, or has a reason why not. */
     @GameTest(template = ARENA)
     public static void everyAbilityIsActedOrExplained(GameTestHelper helper) {

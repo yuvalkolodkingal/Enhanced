@@ -412,6 +412,11 @@ public final class PowerData {
         return span <= 0 ? 1F : Mth.clamp((now - shieldStart) / span, 0F, 1F);
     }
 
+    /** Game time at which the Chaos Shield started to form (its wind-up ran from here to {@link #shieldFormedAt}). */
+    public long shieldStart() {
+        return shieldStart;
+    }
+
     /** Game time at which the Chaos Shield is, or will be, complete. */
     public long shieldFormedAt() {
         return shieldFormedAt;

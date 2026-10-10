@@ -89,7 +89,7 @@ On anyone else the crown is just a crown.
 * **Blocks every projectile** it meets while it is up: arrows, tridents, Ghast and Blaze fireballs, Wither skulls, shulker bullets, potions and snowballs. Projectiles disintegrate on the sphere. Each one costs the shield what it would have done to Wanda: an arrow its damage at its speed (about 4 to 6 points), a trident 8, a fireball 6, a thrown Mjolnir, Stormbreaker, dagger or iron shard its own damage, and 2 for anything else. The projectile that breaks the shield is still stopped. A thrown Mjolnir or Stormbreaker is one of a kind, so it is not destroyed: the shield turns it round and it flies home to Thor.
 * **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it down. If less strength is left than that, the shield shatters and the rest gets through. Melee blows are not stopped.
 * **Cost:** it burns hunger quickly while held (about 1 food point every 2 seconds), while it forms too. When the hunger bar is empty, the shield collapses and has to recharge.
-* **HUD:** while it forms it shows "forming". Once it is up it shows what is left of its strength (green, then yellow, then red) and the seconds it can still be held, and after it drops it shows the cooldown. The sphere flickers as it weakens or when its time is nearly up.
+* **HUD:** while it forms it shows "forming". Once it is up it shows what is left of its strength (green, then yellow, then red) and the seconds it can still be held, and after it drops it shows the cooldown. The sphere flickers as it weakens or when its time is nearly up. Her arms gather across her chest while it forms and are thrown open as it completes (let go of earlier, she only lowers them).
 
 ![The Chaos Shield](images/chaos-shield.png)
 

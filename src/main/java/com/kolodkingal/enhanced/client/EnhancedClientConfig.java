@@ -17,7 +17,7 @@ public final class EnhancedClientConfig {
         ANIMATIONS = BUILDER.comment("Animate the heroes: blended poses, flight, running, Thor's weapon. Off: vanilla poses only.")
                 .translation("config.enhanced.animations")
                 .define("animations", true);
-        REDUCED_MOTION = BUILDER.comment("Calmer animation: no hover bob, drift, banking jitter or camera shake, and fainter rings.")
+        REDUCED_MOTION = BUILDER.comment("Calmer animation: hover bob and drift at a third, no trembling hands, jitter or camera shake, and fainter rings.")
                 .translation("config.enhanced.reduced_motion")
                 .define("reducedMotion", false);
         FLIGHT_EFFECTS = BUILDER.comment("Flight effects: ribbons, rings, wind streaks and shockwaves (trail particles are thinned out when off).")
