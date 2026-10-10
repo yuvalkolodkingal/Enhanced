@@ -10,6 +10,16 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -27,16 +37,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * The Witches' Road. Billy's chaos magic made the legendary road real, and its doors are set in the floors of the world
@@ -185,7 +185,7 @@ public final class WitchesRoad {
         if (ritual == null) {
             ritual = new Ritual(level.getGameTime());
             RITUALS.put(key, ritual);
-            level.playSound(null, pos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.8F, 0.6F);
+            level.playSound(null, pos, ModSounds.WITCHES_ROAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         }
         if (ritual.seekers.add(player.getUUID())) {
             player.displayClientMessage(Component.translatable("message.enhanced.road.ritual").withStyle(s -> s.withColor(LIGHT)), true);
@@ -344,13 +344,13 @@ public final class WitchesRoad {
         open(level, from);
         Vec3 start = player.position();
         lightColumn(level, start, false);
-        level.playSound(null, start.x, start.y, start.z, SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.0F, 0.8F);
+        level.playSound(null, start.x, start.y, start.z, ModSounds.ROAD_TRAVEL.get(), SoundSource.PLAYERS, 1.0F, 0.9F);
 
         player.teleportTo(level, arrival.x, arrival.y, arrival.z, player.getYRot(), player.getXRot());
         player.resetFallDistance();
         open(level, to);
         lightColumn(level, arrival, true);
-        level.playSound(null, arrival.x, arrival.y, arrival.z, SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.0F, 1.2F);
+        level.playSound(null, arrival.x, arrival.y, arrival.z, ModSounds.ROAD_TRAVEL.get(), SoundSource.PLAYERS, 1.0F, 1.1F);
         level.playSound(null, arrival.x, arrival.y, arrival.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 

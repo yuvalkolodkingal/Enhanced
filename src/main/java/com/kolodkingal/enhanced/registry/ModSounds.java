@@ -31,6 +31,40 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PHOTON_BLAST = register("photon_blast");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENERGY_RELEASE = register("energy_release");
 
+    // Thor
+    public static final DeferredHolder<SoundEvent, SoundEvent> MJOLNIR_THROW = register("mjolnir_throw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MJOLNIR_RETURN = register("mjolnir_return");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MJOLNIR_IMPACT = register("mjolnir_impact");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GOD_OF_THUNDER = register("god_of_thunder");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BIFROST_CHARGE = register("bifrost_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BIFROST_ARRIVE = register("bifrost_arrive");
+
+    // Tommy
+    public static final DeferredHolder<SoundEvent, SoundEvent> WHIRLWIND = register("whirlwind");
+    public static final DeferredHolder<SoundEvent, SoundEvent> VIBRATE = register("vibrate");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MOLECULAR_BURST = register("molecular_burst");
+
+    // Billy and the Witches' Road
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEX_BOLT = register("hex_bolt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FREEZE_SPELL = register("freeze_spell");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WITCHES_ROAD = register("witches_road");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_TRAVEL = register("road_travel");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THE_NOISE = register("the_noise");
+
+    // Loki
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOKI_DAGGER = register("loki_dagger");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOKI_ILLUSION = register("loki_illusion");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOKI_DISSOLVE = register("loki_dissolve");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOKI_VANISH = register("loki_vanish");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOKI_SHAPESHIFT = register("loki_shapeshift");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FROST_GIANT = register("frost_giant");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TESSERACT = register("tesseract");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TEMPAD_DOOR = register("tempad_door");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ENCHANTMENT = register("enchantment");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GLORIOUS_PURPOSE = register("glorious_purpose");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LAEVATEINN = register("laevateinn");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_SLIP = register("time_slip");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

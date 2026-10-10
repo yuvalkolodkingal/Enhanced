@@ -17,6 +17,13 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -54,13 +61,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Thor, the God of Thunder. His power is his own, but his weapon focuses it, Mjolnir or Stormbreaker: he throws it and
@@ -124,7 +124,7 @@ public final class ThorAbilities {
                 data.setToggle(Toggle.GOD_OF_THUNDER, on);
                 if (on) {
                     ServerLevel level = player.serverLevel();
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 0.8F, 1.3F);
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.GOD_OF_THUNDER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                     level.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1.0, player.getZ(), 60, 0.5, 1.0, 0.5, 0.4);
                 }
                 player.displayClientMessage(Component.translatable(on ? "message.enhanced.god_of_thunder.on" : "message.enhanced.god_of_thunder.off"), true);
@@ -302,7 +302,7 @@ public final class ThorAbilities {
             data.setHammerEntityId(thrown.getId());
             data.startCooldown(1, now, THROW_COOLDOWN);
             player.swing(hand, true);
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.TRIDENT_THROW.value(), SoundSource.PLAYERS, 1.2F, 0.6F);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.MJOLNIR_THROW.get(), SoundSource.PLAYERS, 1.2F, isStormbreaker(weapon) ? 0.85F : 1.0F);
             return;
         }
         if (recall(player, data)) {
@@ -647,8 +647,7 @@ public final class ThorAbilities {
         }
         JOURNEYS.put(player.getUUID(), new Journey(dimension, to, yaw, now + BIFROST_CHARGE));
         data.set(Live.BIFROST, true);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.5F, 0.7F);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 0.6F, 1.6F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_CHARGE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
     }
 
     private static void bifrostTick(ServerPlayer player, PowerData data) {
@@ -680,7 +679,7 @@ public final class ThorAbilities {
         mark(from, player.position());
         player.teleportTo(destination, to.x, to.y, to.z, journey.yaw(), player.getXRot());
         player.resetFallDistance();
-        destination.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 1.0F, 1.4F);
+        destination.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_ARRIVE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
         PacketDistributor.sendToPlayersNear(destination, null, player.getX(), player.getY(), player.getZ(), 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_ARRIVAL, player.getId(), List.of(player.position())));
         mark(destination, player.position());

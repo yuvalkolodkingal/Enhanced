@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client;
 
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -17,15 +18,17 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Sounds that last as long as a power is in use: the Chaos Beam's crackle, the Mind Stone beam's hum and Magneto's
- * magnetic hum while he holds something. Each follows its player and fades in and out with the power.
+ * Sounds that last as long as a power is in use: the Chaos Beam's crackle, the Mind Stone beam's hum, Magneto's
+ * magnetic hum while he holds something and the roar of Tommy's whirlwind. Each follows its player and fades in and
+ * out with the power.
  */
 public final class PowerLoopSounds {
 
     private enum Kind {
         CHAOS_BEAM(ModSounds.CHAOS_BEAM, 0.9F, d -> d.power() == Power.SCARLET_WITCH && d.beamActive()),
         MIND_STONE_BEAM(ModSounds.MIND_STONE_BEAM, 0.8F, d -> d.power() == Power.VISION && d.beamActive()),
-        MAGNET_HUM(ModSounds.MAGNET_HUM, 0.6F, d -> d.power() == Power.MAGNETO && d.heldEntityId() != -1);
+        MAGNET_HUM(ModSounds.MAGNET_HUM, 0.6F, d -> d.power() == Power.MAGNETO && d.heldEntityId() != -1),
+        WHIRLWIND(ModSounds.WHIRLWIND, 0.9F, d -> d.power() == Power.TOMMY && d.is(Live.WHIRLWIND));
 
         final Supplier<SoundEvent> sound;
         final float volume;

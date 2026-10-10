@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.core.particles.ParticleTypes;
@@ -19,7 +20,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageType;
@@ -139,7 +139,7 @@ public class ThrownWeaponEntity extends Projectile {
             setPos(to);
             travelled += to.distanceTo(from);
             if (hitWall) {
-                level.playSound(null, getX(), getY(), getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.7F, 0.7F);
+                level.playSound(null, getX(), getY(), getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 1.0F, 0.9F);
                 level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY(), getZ(), 12, 0.2, 0.2, 0.2, 0.3);
             }
             if (hitWall || travelled >= EnhancedConfig.MJOLNIR_THROW_RANGE.get()) {
@@ -185,8 +185,8 @@ public class ThrownWeaponEntity extends Projectile {
                 if (e instanceof LivingEntity living && push.lengthSqr() > 1.0E-6) {
                     living.knockback(1.3, -push.x, -push.z);
                 }
-                level.playSound(null, e.getX(), e.getY(), e.getZ(), stormbreaker ? SoundEvents.TRIDENT_HIT : SoundEvents.ANVIL_PLACE,
-                        SoundSource.PLAYERS, 0.6F, stormbreaker ? 0.7F : 1.4F);
+                level.playSound(null, e.getX(), e.getY(), e.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F,
+                        stormbreaker ? 1.15F : 1.0F);
                 if (owner instanceof ServerPlayer thor && Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER)) {
                     ThorAbilities.arc(level, thor, position(), e);
                 }
@@ -208,7 +208,7 @@ public class ThrownWeaponEntity extends Projectile {
         } else if (!thor.getInventory().add(weapon)) {
             thor.drop(weapon, false);
         }
-        level().playSound(null, thor.getX(), thor.getY(), thor.getZ(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 1.2F, 0.7F);
+        level().playSound(null, thor.getX(), thor.getY(), thor.getZ(), ModSounds.MJOLNIR_RETURN.get(), SoundSource.PLAYERS, 1.2F, 1.0F);
         forget();
         discard();
     }

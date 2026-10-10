@@ -162,8 +162,7 @@ public final class BillyAbilities {
         Vec3 from = player.getEyePosition().add(0, -0.3, 0).add(player.getLookAngle().scale(0.75));
         PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0,
                 new HexBoltPayload(player.getId(), from, end, forks, player.getRandom().nextLong()));
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.CHAOS_BEAM_START.get(), SoundSource.PLAYERS, 0.6F, 1.6F);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.3F, 2.0F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.HEX_BOLT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     /** White-hot sparks where a bolt strikes. */
@@ -209,8 +208,7 @@ public final class BillyAbilities {
         }
         data.startCooldown(4, now, FREEZE_COOLDOWN);
         spells(player).freeze = now + FREEZE_POSE_TICKS;
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1.0F, 1.3F);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 0.6F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.FREEZE_SPELL.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     private static boolean canFreeze(ServerPlayer billy, LivingEntity e) {

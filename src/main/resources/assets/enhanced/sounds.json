@@ -119,5 +119,213 @@
         "name": "enhanced:sfx/energy_release"
       }
     ]
+  },
+  "mjolnir_throw": {
+    "subtitle": "subtitles.enhanced.mjolnir_throw",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mjolnir_throw"
+      }
+    ]
+  },
+  "mjolnir_return": {
+    "subtitle": "subtitles.enhanced.mjolnir_return",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mjolnir_return"
+      }
+    ]
+  },
+  "mjolnir_impact": {
+    "subtitle": "subtitles.enhanced.mjolnir_impact",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mjolnir_impact"
+      }
+    ]
+  },
+  "god_of_thunder": {
+    "subtitle": "subtitles.enhanced.god_of_thunder",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/god_of_thunder"
+      }
+    ]
+  },
+  "bifrost_charge": {
+    "subtitle": "subtitles.enhanced.bifrost_charge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/bifrost_charge"
+      }
+    ]
+  },
+  "bifrost_arrive": {
+    "subtitle": "subtitles.enhanced.bifrost_arrive",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/bifrost_arrive"
+      }
+    ]
+  },
+  "whirlwind": {
+    "subtitle": "subtitles.enhanced.whirlwind",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/whirlwind_loop"
+      }
+    ]
+  },
+  "vibrate": {
+    "subtitle": "subtitles.enhanced.vibrate",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/vibrate"
+      }
+    ]
+  },
+  "molecular_burst": {
+    "subtitle": "subtitles.enhanced.molecular_burst",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/molecular_burst"
+      }
+    ]
+  },
+  "hex_bolt": {
+    "subtitle": "subtitles.enhanced.hex_bolt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hex_bolt"
+      }
+    ]
+  },
+  "freeze_spell": {
+    "subtitle": "subtitles.enhanced.freeze_spell",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/freeze_spell"
+      }
+    ]
+  },
+  "witches_road": {
+    "subtitle": "subtitles.enhanced.witches_road",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/witches_road"
+      }
+    ]
+  },
+  "road_travel": {
+    "subtitle": "subtitles.enhanced.road_travel",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/road_travel"
+      }
+    ]
+  },
+  "the_noise": {
+    "subtitle": "subtitles.enhanced.the_noise",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/the_noise_loop"
+      }
+    ]
+  },
+  "loki_dagger": {
+    "subtitle": "subtitles.enhanced.loki_dagger",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/loki_dagger"
+      }
+    ]
+  },
+  "loki_illusion": {
+    "subtitle": "subtitles.enhanced.loki_illusion",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/loki_illusion"
+      }
+    ]
+  },
+  "loki_dissolve": {
+    "subtitle": "subtitles.enhanced.loki_dissolve",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/loki_dissolve"
+      }
+    ]
+  },
+  "loki_vanish": {
+    "subtitle": "subtitles.enhanced.loki_vanish",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/loki_vanish"
+      }
+    ]
+  },
+  "loki_shapeshift": {
+    "subtitle": "subtitles.enhanced.loki_shapeshift",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/loki_shapeshift"
+      }
+    ]
+  },
+  "frost_giant": {
+    "subtitle": "subtitles.enhanced.frost_giant",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/frost_giant"
+      }
+    ]
+  },
+  "tesseract": {
+    "subtitle": "subtitles.enhanced.tesseract",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/tesseract"
+      }
+    ]
+  },
+  "tempad_door": {
+    "subtitle": "subtitles.enhanced.tempad_door",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/tempad_door"
+      }
+    ]
+  },
+  "enchantment": {
+    "subtitle": "subtitles.enhanced.enchantment",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/enchantment"
+      }
+    ]
+  },
+  "glorious_purpose": {
+    "subtitle": "subtitles.enhanced.glorious_purpose",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/glorious_purpose"
+      }
+    ]
+  },
+  "laevateinn": {
+    "subtitle": "subtitles.enhanced.laevateinn",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/laevateinn"
+      }
+    ]
+  },
+  "time_slip": {
+    "subtitle": "subtitles.enhanced.time_slip",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_slip"
+      }
+    ]
   }
 }

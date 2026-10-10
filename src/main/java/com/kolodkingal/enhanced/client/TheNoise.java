@@ -5,11 +5,11 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -81,11 +81,11 @@ public final class TheNoise {
     /** The whispers in his head: not placed in the world, fading in and out with The Noise. */
     private static final class Whispers extends AbstractTickableSoundInstance {
         Whispers() {
-            super(SoundEvents.AMBIENT_SOUL_SAND_VALLEY_LOOP.value(), SoundSource.PLAYERS, SoundInstance.createUnseededRandom());
+            super(ModSounds.THE_NOISE.get(), SoundSource.PLAYERS, SoundInstance.createUnseededRandom());
             this.looping = true;
             this.delay = 0;
             this.volume = 0.01F;
-            this.pitch = 1.25F;
+            this.pitch = 1.0F;
             this.relative = true;
             this.attenuation = SoundInstance.Attenuation.NONE;
         }

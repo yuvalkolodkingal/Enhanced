@@ -298,8 +298,8 @@ public final class TommyAbilities {
                 player.teleportTo(level, target.x, target.y, target.z, player.getYRot(), player.getXRot());
                 player.resetFallDistance();
                 trail(level, start, target);
-                level.playSound(null, start.x, start.y, start.z, ModSounds.VISION_PHASE.get(), SoundSource.PLAYERS, 0.8F, 1.6F);
-                level.playSound(null, target.x, target.y, target.z, ModSounds.QUICKSILVER_WHOOSH.get(), SoundSource.PLAYERS, 0.6F, 1.8F);
+                level.playSound(null, start.x, start.y, start.z, ModSounds.VIBRATE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                level.playSound(null, target.x, target.y, target.z, ModSounds.VIBRATE.get(), SoundSource.PLAYERS, 0.7F, 1.2F);
                 return;
             }
             if (unbreakable(level, pos) || unbreakable(level, pos.above())) {
@@ -338,7 +338,6 @@ public final class TommyAbilities {
             Vec3 push = target.position().subtract(player.position());
             target.knockback(0.8, -push.x, -push.z);
             burst(level, entityHit.getLocation());
-            level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.4F, 1.8F);
             return;
         }
         if (!(hit instanceof BlockHitResult blockHit) || blockHit.getType() != HitResult.Type.BLOCK) {
@@ -390,6 +389,7 @@ public final class TommyAbilities {
     private static void burst(ServerLevel level, Vec3 at) {
         level.sendParticles(new EnergyParticleOptions(Power.TOMMY.glow, 1.4F), at.x, at.y, at.z, 30, 0.3, 0.3, 0.3, 0.12);
         level.sendParticles(new EnergyParticleOptions(0xE6FFF5, 1.0F), at.x, at.y, at.z, 12, 0.15, 0.15, 0.15, 0.05);
+        level.playSound(null, at.x, at.y, at.z, ModSounds.MOLECULAR_BURST.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     /** Ends everything this hero left in the world (the power is being taken away). */
