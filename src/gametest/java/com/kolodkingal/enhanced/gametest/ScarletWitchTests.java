@@ -801,9 +801,9 @@ public final class ScarletWitchTests {
      * (These three have batches of their own: they need PvP on for several ticks, and the tests of a batch run side by
      * side, some of them switching PvP back off when they end.)
      *
-     * A complete Chaos Shield is solid to Thor's lightning beam as it is to an arrow: the beam ends on the sphere, Wanda
-     * is not touched, nothing beyond is hit and the shield pays the beam's damage (the weapon and the God of Thunder make
-     * it more). A shield that is still forming stops nothing.
+     * A complete Chaos Shield is solid to Thor's lightning beam as it is to an arrow: the beam ends on the sphere,
+     * Wanda is not touched, nothing beyond is hit and the shield pays the beam's damage (the weapon and the God of
+     * Thunder make it more). A shield that is still forming stops nothing.
      */
     @GameTest(template = ARENA, batch = "chaos_shield_beam_pvp", timeoutTicks = 100)
     public static void chaosShieldStopsThorsLightningBeamAtItsSurfaceAndIsWornDownByIt(GameTestHelper helper) {
@@ -843,7 +843,7 @@ public final class ScarletWitchTests {
             check(WandaAbilities.shieldAcross(helper.getLevel(), wanda, thor.getEyePosition(), center, 1.0F) == null,
                     "and nobody's own shield stops their own beam");
 
-            // The weapon doubles it, the God of Thunder adds half again: 6 points, and no lightning leaps past the shield.
+            // The weapon doubles it, the God of Thunder adds half again: 6 points, and no lightning leaps past it.
             thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
             AbilityHandler.onKey(thor, 4, true);
             check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
@@ -856,8 +856,8 @@ public final class ScarletWitchTests {
     }
 
     /**
-     * A beam from inside the sphere is not stopped at its surface, but what hits Wanda herself still never gets through,
-     * and neither does the lightning that leaps on from what Thor strikes.
+     * A beam from inside the sphere is not stopped at its surface, but what hits Wanda herself still never gets
+     * through, and neither does the lightning that leaps on from what Thor strikes.
      */
     @GameTest(template = ARENA, batch = "chaos_shield_point_blank_pvp", timeoutTicks = 100)
     public static void chaosShieldStopsAPointBlankBeamFromInsideItToo(GameTestHelper helper) {

@@ -287,8 +287,8 @@ public final class WandaAbilities {
 
     /**
      * What a projectile would have done to her, in the strength it takes out of the shield: an arrow's damage at its
-     * speed, a trident's 8, a fireball's 6, a thrown hammer's, a hammer fragment's, a dagger's or a shard's own damage, and 2
-     * for the rest.
+     * speed, a trident's 8, a fireball's 6, a thrown hammer's, a hammer fragment's, a dagger's or a shard's own
+     * damage, and 2 for the rest.
      */
     static float projectilePower(Projectile projectile) {
         if (projectile instanceof ThrownTrident) {
@@ -339,9 +339,9 @@ public final class WandaAbilities {
     }
 
     /**
-     * Mjolnir and Stormbreaker are one of a kind (a thrown one holds the only copy of the weapon), and the fragments of a
-     * shattered Mjolnir are the hammer itself: the shield turns them round and they fly home to Thor, instead of being
-     * destroyed for good (a fragment shredded here would leave the hammer one piece short).
+     * Mjolnir and Stormbreaker are one of a kind (a thrown one holds the only copy of the weapon), and the fragments
+     * of a shattered Mjolnir are the hammer itself: the shield turns them round and they fly home to Thor, instead of
+     * being destroyed for good (a fragment shredded here would leave the hammer one piece short).
      */
     private static void repel(ServerLevel level, Projectile projectile, Runnable turnHome) {
         level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F), projectile.getX(), projectile.getY(), projectile.getZ(),
@@ -352,15 +352,15 @@ public final class WandaAbilities {
 
     // ---- the shield against beams ----
 
-    /** A complete Chaos Shield that a beam has run into: whose it is, and the point of its surface where the beam ends. */
+    /** A complete Chaos Shield that a beam has run into: whose it is, and where on its surface the beam ends. */
     public record ShieldStop(Player owner, Vec3 point) {
     }
 
     /**
-     * The first complete Chaos Shield that a beam from {@code from} to {@code to} runs into from outside it, or null: the
-     * sphere is solid to a beam as it is to an arrow. A beam that starts inside the sphere (its firer stands within her
-     * shield) is not stopped here; what hits Wanda herself is stopped by the damage hook, which also wears the shield
-     * down. Shared by the server (what Thor's lightning beam hits) and the client (where it is drawn to).
+     * The first complete Chaos Shield that a beam from {@code from} to {@code to} runs into from outside it, or null:
+     * the sphere is solid to a beam as it is to an arrow. A beam that starts inside the sphere (its firer stands within
+     * her shield) is not stopped here; what hits Wanda herself is stopped by the damage hook, which also wears the
+     * shield down. Shared by the server (what Thor's lightning beam hits) and the client (where it is drawn to).
      *
      * @param firer the one who fires the beam (never its own shield)
      */

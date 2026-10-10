@@ -1109,7 +1109,10 @@ public final class ThorTests {
         });
     }
 
-    /** A pinned player's dashes and jumps are teleports like any other: Quicksilver's Blitz and Loki's escape with the Tesseract. */
+    /**
+     * A pinned player's dashes and jumps are teleports like any other: Quicksilver's Blitz, and Loki's escape with the
+     * Tesseract.
+     */
     @GameTest(template = ARENA, timeoutTicks = 60)
     public static void aPinnedPlayerCantBlitzOrEscapeWithTheTesseract(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
@@ -1170,8 +1173,8 @@ public final class ThorTests {
     }
 
     /**
-     * The pin remembers where the hammer lay. If the world is closed with the hammer on someone and opened again, and the
-     * pinned player is not there (they are offline), it falls where it was, not at the world's origin.
+     * The pin remembers where the hammer lay. If the world is closed with the hammer on someone and opened again, and
+     * the pinned player is not there (they are offline), it falls where it was, not at the world's origin.
      */
     @GameTest(template = ARENA, timeoutTicks = 60)
     public static void aPinLoadedWithoutItsPinnedOneDropsMjolnirWhereItLay(GameTestHelper helper) {
@@ -1185,7 +1188,7 @@ public final class ThorTests {
         MjolnirPinEntity pin = pinsNear(zombie).get(0);
         CompoundTag saved = new CompoundTag();
         pin.saveWithoutId(saved);
-        // The world closes: the hammer goes to disk inside the pin, and the one it held down is not there when it loads.
+        // The world closes: the hammer goes to disk inside the pin, and the one it held down is gone when it loads.
         pin.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
         zombie.discard();
         MjolnirPinEntity loaded = new MjolnirPinEntity(ModEntities.MJOLNIR_PIN.get(), level);

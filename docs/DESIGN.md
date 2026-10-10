@@ -299,7 +299,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
   The beam that breaks the shield is stopped too. Lightning that Thor sends at Wanda from
   inside the sphere, or that leaps from a blow of his, is stopped and paid for in the same way.
   A shield that is still forming stops nothing, and on a server with PvP off the beam costs
-  the shield nothing. (The sky's own lightning is nobody's to stop.)
+  the shield nothing. (Lightning from the sky, by contrast, still hurts.)
 * **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it
   down; if less strength is left than that, the shield shatters and the rest gets through.
   Melee blows are not stopped.

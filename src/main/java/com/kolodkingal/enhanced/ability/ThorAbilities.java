@@ -600,9 +600,9 @@ public final class ThorAbilities {
     }
 
     /**
-     * The beam meets a Scarlet Witch's Chaos Shield: it spends itself on the sphere (red sparks, the crackle of the beam
-     * where it ends) and takes {@code damage} points off the shield's strength. Whoever is inside is not touched, and
-     * nothing happens to creatures beyond (no lightning effects, no arcs).
+     * The beam meets a Scarlet Witch's Chaos Shield: it spends itself on the sphere (red sparks, the crackle of the
+     * beam where it ends) and takes {@code damage} points off the shield's strength. Whoever is inside is not touched,
+     * and nothing happens to creatures beyond (no lightning effects, no arcs).
      */
     private static void beamShielded(ServerLevel level, ServerPlayer thor, WandaAbilities.ShieldStop shield, float damage) {
         Vec3 at = shield.point();
