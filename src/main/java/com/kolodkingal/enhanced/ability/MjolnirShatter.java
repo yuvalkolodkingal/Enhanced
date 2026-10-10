@@ -102,7 +102,7 @@ public final class MjolnirShatter {
         ItemStack hammer = thor.getItemInHand(hand).copyWithCount(1);
         Worthiness.claim(thor, hammer);
         List<LivingEntity> enemies = enemies(thor);
-        Vec3 from = thor.getEyePosition().add(thor.getLookAngle().scale(0.5)).subtract(0, 0.5, 0);
+        Vec3 from = muzzle(thor);
         RandomSource random = thor.getRandom();
         int count = enemies.isEmpty() ? RING_FRAGMENTS : enemies.size();
         List<UUID> fragments = new ArrayList<>();
@@ -131,6 +131,14 @@ public final class MjolnirShatter {
         level.playSound(null, thor.getX(), thor.getY(), thor.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F, 0.7F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, from.x, from.y, from.z, 40, 0.3, 0.3, 0.3, 0.5);
         level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.6F), from.x, from.y, from.z, 24, 0.25, 0.25, 0.25, 0.3);
+    }
+
+    /**
+     * Where the fragments burst out and come together: out in front of him, where the hammer is held. (A burst of
+     * sparks at his eyes would fill the whole screen of his first-person view.)
+     */
+    private static Vec3 muzzle(ServerPlayer thor) {
+        return thor.getEyePosition().add(thor.getLookAngle().scale(0.9)).subtract(0, 0.5, 0);
     }
 
     /**
@@ -228,7 +236,7 @@ public final class MjolnirShatter {
         }
         giveBack(thor, shattered.hammer.copy(), shattered.hand);
         level.playSound(null, thor.getX(), thor.getY(), thor.getZ(), ModSounds.MJOLNIR_RETURN.get(), SoundSource.PLAYERS, 1.2F, 1.2F);
-        Vec3 hand = thor.getEyePosition().subtract(0, 0.5, 0);
+        Vec3 hand = muzzle(thor);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, hand.x, hand.y, hand.z, 24, 0.25, 0.25, 0.25, 0.3);
         level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.4F), hand.x, hand.y, hand.z, 10, 0.2, 0.2, 0.2, 0.15);
     }
