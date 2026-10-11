@@ -1,0 +1,10 @@
+<!-- table: All keys, per hero -->
+| [Thanos](Thanos#playing-thanos) | Power Blast (Sneak: Titan Slam) | Portal Step (Sneak: Space Pull) | Transmute to stone (Sneak: Reality Veil, toggle) | Soul Drain (hold) (Sneak: Soul Sight) | Rewind (Sneak: Time Lock) |
+<!-- table: Flight -->
+Thanos does not fly: he steps through portals.
+<!-- table: Sneak changes some keys -->
+| Sneak + **R** as Thanos | The Titan Slam, instead of the Power Blast. |
+| Sneak + **G** as Thanos | The Space Pull, instead of the Portal Step. |
+| Sneak + **V** as Thanos | The Reality Veil (a toggle), instead of the Transmute. |
+| Sneak + **B** as Thanos | The Soul Sight, instead of the Soul Drain (which is a hold). |
+| Sneak + **N** as Thanos | The Time Lock, instead of the Rewind. |

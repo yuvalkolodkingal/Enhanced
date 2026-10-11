@@ -93,3 +93,68 @@ Every move has a **tell**: a ring on the ground, a line from his hand, a glow. W
 ## The Infinity Gauntlet
 
 The reward. **Hold right-click for three seconds with no power** to become Thanos. It is used up; a hero who tries is told that their body already holds a power, and nothing is used up. In Creative it is kept. Playing Thanos has its own section below.
+
+## Playing Thanos
+
+Hold the Gauntlet for three seconds with no power: the five stones light on your left hand one after the other, each with its voice, a bolt of light (it hurts nobody) strikes where you stand, and you are **Thanos**. You keep the five stones the Mad Titan held, one on each key, and **never the Mind Stone and never the Snap**: it is in Loki's Scepter and in Vision's forehead, and the sixth socket of your Gauntlet stays dark for good. You do not fly. The Space Stone is how you move. You are a tank with a toolbox.
+
+### The quick version
+
+(**Sneak** is the Shift key, unless you changed it. Everyone nearby sees what you do.)
+
+* **R: shoot the Power Stone.** A violet beam leaves the Gauntlet and hits the first creature you look at, hard; the energy bursts where it ends and hurts the hostile creatures round it. **Sneak + R: slam the ground**, and a ring runs out from your feet and throws everything standing on the ground (jump to clear it).
+* **G: step through a portal** to the block you look at, or right behind the creature. **Sneak + G: pull the creature you look at** through a portal to just in front of you.
+* **V: turn a creature to stone** for three seconds. **Sneak + V: the Reality Veil**, a toggle that turns arrows and other projectiles that come at you into harmless bubbles.
+* **Hold B: drain a soul.** A chain of orange light takes the life of what you look at, 3 damage every half second, and heals you with half of it. **Sneak + B: the Soul Sight**, the creatures near you glow through walls, and Loki's tricks come apart.
+* **N: rewind.** You go back to where you were five seconds ago, with the health you had then. **Sneak + N: the Time Lock**, a dome in which everything but you is slow and arrows hang in the air.
+
+### The five keys
+
+| Key | Stone | Press | Sneak + press | Cooldown | Hunger |
+|---|---|---|---|---|---|
+| **R** | Power | **Power Blast**: 12 damage to the first creature in the beam (28 blocks), 6 to the hostile ones within 2.5 blocks of where it ends; no block is ever broken | **Titan Slam**: a ring to 7 blocks, 10 damage, thrown away; only what stands on the ground | 70 / 160 | half a food point / one |
+| **G** | Space | **Portal Step**: 40 blocks, onto the block you look at or right behind the creature | **Space Pull**: 24 blocks, the creature is drawn in over a third of a second and arrives two blocks ahead, dazed | 100 / 220 | a quarter / half |
+| **V** | Reality | **Transmute**: a red sphere (20 blocks) turns a creature to stone for 3 seconds: it cannot move, jump, attack or use anything, and takes half damage | **Reality Veil** (toggle): projectiles heading for you within 8 blocks become bubbles that pop | 240 / none | half / a hundredth of a point a tick |
+| **B** | Soul | **Soul Drain** (hold): 16 blocks; 3 damage every half second that armour and enchantments cannot lessen, half of it heals you | **Soul Sight**: 32 blocks, 8 seconds | 40 after you let go / 400 | a point in ten seconds / a quarter |
+| **N** | Time | **Rewind**: back to where you were 5 seconds ago, with that health if it was higher (up to 20 more) | **Time Lock**: a dome of 6 blocks for 5 seconds at your feet | 900 / 600 | two / three quarters |
+
+The two things on one key share one cooldown: after the Blast the Slam waits for the Blast's 70 ticks. An ability that cannot do anything (no target, no room, a wall in the way) tells you why and costs nothing. With an empty hunger bar the stones do not answer ("Too hungry for the stones"); in Creative nothing costs hunger.
+
+### What each stone does, exactly
+
+* **Power Blast.** The beam leaves your left hand and goes where you look, to the first creature or block. A creature that is a player is hit only with PvP on; a Creative or Spectator player is never hit (the beam passes). A **Chaos Shield** in the way stops it at its surface and loses 12 strength; a boss's **Space Barrier** turns it away (it is a beam, not Stone-born). The splash spares villagers, animals, golems and pets. **Titan Slam**: the ring moves under a block a tick; whoever is more than half a block off the ground when it passes takes nothing, and neither do you.
+* **Portal Step.** A blue ring opens at your feet and another where you arrive, and you keep looking where you looked. It is a teleport like Loki's Vanish: **a Hex wall refuses it** and turns you back like any hero, **Mjolnir's pin refuses it**, the arena of a boss keeps you in, and you need room for your whole body (not in water) or you hear "No room there". Look at a block closer than the range or you hear "Look at a block within 40 blocks". **Space Pull**: not a boss, not a creature Mjolnir lies on, not an armour stand; a player only with PvP on; the Hex judges the landing; a creature held by someone's telekinesis is let go first.
+* **Transmute.** The sphere flies for a third of a second; a **Chaos Shield** in its path stops it and loses 2. A boss (and anything the Freeze cannot hold) shakes it off: "The stone cracks and falls". A petrified Scarlet Witch cannot hold her beam or her shield; a Loki's duplicate dissolves. **Reality Veil**: it costs hunger every tick and goes out when you starve; it is saved with you. Mjolnir, Stormbreaker and the Mad Titan's own sword, meteors and orbs are not turned (nor are beams, which are not projectiles).
+* **Soul Drain.** You lock onto the creature you look at (16 blocks, in line of sight); it loses 3 and slows a little every half second for as long as you hold B. The chain parts, and the cooldown starts, when you let go, when a block comes between, when the target is more than 20 blocks away, dies or becomes untouchable, when you starve, when you are held, or when you take **60 damage in one second**. A Chaos Shield stops the chain and loses 12. Bosses can be drained: they take the damage, their plates and mitigation apply, and it is no projectile, so the Space Barrier does not stop it. **Soul Sight**: while it lasts every creature near you glows orange for you through the walls; at the first moment Loki's duplicates dissolve, an invisible Loki is seen and a shapeshifted Loki is himself (the server can turn that off), and every invisible creature glows for everyone for 5 seconds. No cooldown in Creative.
+* **Rewind.** The game keeps a snapshot of you every quarter of a second for five seconds. With less than two seconds of history you hear "Nothing to rewind" and it costs nothing. Otherwise you go back to the oldest snapshot (to the nearest free spot within three blocks if it is blocked now), your health rises to what it was if that was more (by at most 20), the harmful effects that began in the window are gone (poison, wither, slowness, weakness, nausea, blindness, darkness, hunger, mining fatigue, levitation, the stones' own), the fire goes out, your air and your fall are reset. Your food and your things stay, and so does everyone else. **A Hex wall or the arena of a boss refuses the place, but your health still returns; Mjolnir's pin refuses all of it.** It does not undo a death. The history is dropped when you die, leave, change dimension or lose the power.
+* **Time Lock.** Everything in the dome but you and your own pets is locked: 60 percent slower, hitting and digging at half speed. Players only with PvP on, never Creative. A boss shrugs it off. Projectiles in the dome lose 65 percent of their speed every tick and have no gravity until they leave it or the dome closes.
+
+### His body
+
+| | |
+|---|---|
+| Health | **+20** (20 hearts) |
+| Armour, toughness | **+6**, **+2** |
+| Knockback | half |
+| Strength | **+3** with the fist or any weapon |
+| Size | **10 percent taller** (it still fits a two-block door) |
+| Reach | **+1** block to creatures; a long stride (**+0.4**: he walks up whole blocks); **half** the damage from falls |
+| **Titan healing factor** | **half a point a second** when you have not been hurt for 5 seconds and are not starving; it costs a little hunger |
+| Flight | **none** |
+
+Nothing else is passive: lightning, fire, magic and the Hex treat you as a hero.
+
+### Looks
+
+**Infinity War** (default: the navy tunic, the gold gorget), **Endgame: Battle Armor** (the gold helmet and the plum breastplate) and **Your own skin**; **H** cycles them, **Sneak + H** goes back. The Gauntlet is drawn on your left arm in every look. The energy of each stone has its own colour: purple, blue, red, orange and green.
+
+### Against the other heroes
+
+* **Wanda's Chaos Shield** stops your Blast (12) and your Drain (12) and your Transmute (2), and takes away three quarters of the Slam's damage as an explosion. **Her Hex** bounces you at the wall like any hero, and judges your Step, your Pull and your Rewind as teleports.
+* **Mjolnir's pin** refuses your Step and your Rewind; you can still use the Blast and the Drain, and you can pull nothing it holds.
+* **Billy's Freeze**, a petrified body or the Soul World hold your hand: while any of them lasts **no stone answers** ("The stones will not answer while you are held"): the film's flaw, that a restrained Gauntlet hand cannot snap.
+* **Loki's** duplicates, hiding and shapeshift are what the Soul Sight is for; a Loki turned to stone loses his duplicates.
+* **Vision** phased through everything cannot be touched by any stone. **Magneto** has nothing of yours to take: the Gauntlet is not metal he wears. **Quicksilver Time** slows you like anyone, but your Rewind and Lock run on the game's own clock.
+* **With PvP off** your Blast, Slam, Pull, Transmute, Drain and Lock do nothing to players ("PvP is off"); creatures are always valid.
+* **The Mad Titan** treats you as the nearest player. Your damage counts in his ledger. He is immune to your Transmute, Pull and Lock (bosses cannot be held), but your Blast and your Drain hurt him.
+* You never break a block, whatever the game rules say.

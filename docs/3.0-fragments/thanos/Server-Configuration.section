@@ -1,6 +1,6 @@
 ## Thanos (the boss)
 
-Section `[thanos_boss]`. The boss's page is [Thanos](Thanos). The rules every boss shares (how many fights at once, the wipe and abandon times, the minimum time for a reward, the experience each rewarded fighter gets, the difficulty scale) are in `[boss]`. His own numbers are here. The hero's `[thanos]` section is on the hero's page.
+Section `[thanos_boss]`. The boss's page is [Thanos](Thanos). The rules every boss shares (how many fights at once, the wipe and abandon times, the minimum time for a reward, the experience each rewarded fighter gets, the difficulty scale) are in `[boss]`. His own numbers are here. The hero's `[thanos]` section is below.
 
 ### The call
 
@@ -115,3 +115,88 @@ Section `[thanos_boss]`. The boss's page is [Thanos](Thanos). The rules every bo
 | `thanos_boss.gauntletRitualTicks` | `60` | 20 to 400 | How long the Infinity Gauntlet must be held to become Thanos. |
 | `thanos_boss.webLockTicks` | `40` | 0 to 400 | A Spider-Man's web locks his Gauntlet for this long (0 turns it off). |
 | `thanos_boss.webLockCooldown` | `400` | 0 to 6000 | A web can lock his Gauntlet at most this often. |
+
+## Thanos (the hero)
+
+Section `[thanos]`: the playable Thanos, whose page is [Playing Thanos](Thanos#playing-thanos). Ticks are 1/20 s. The *exhaustion* options are how much hunger an ability costs: 4.0 is one food point.
+
+### The body
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos.healthBonus` | `20.0` | 0.0 to 100.0 | Extra health Thanos has (20 = 10 hearts). |
+| `thanos.armorBonus` | `6.0` | 0.0 to 30.0 | Extra armour points. |
+| `thanos.toughnessBonus` | `2.0` | 0.0 to 20.0 | Extra armour toughness. |
+| `thanos.knockbackResistance` | `0.5` | 0.0 to 1.0 | Knockback resistance (1 = none at all). |
+| `thanos.attackBonus` | `3.0` | 0.0 to 20.0 | Extra attack damage, with a bare fist or any weapon (Titan strength). |
+| `thanos.scale` | `0.1` | 0.0 to 0.5 | Extra size (0.1 = 10 percent taller and wider). |
+| `thanos.reachBonus` | `1.0` | 0.0 to 4.0 | Extra reach, in blocks (long arms). |
+| `thanos.stepBonus` | `0.4` | 0.0 to 1.0 | Extra step height: a Titan's stride walks up whole blocks. |
+| `thanos.regenPerSecond` | `0.5` | 0.0 to 10.0 | The Titan healing factor: health regained each second while unhurt. |
+| `thanos.regenDelayTicks` | `100` | 0 to 1200 | Ticks without being hurt before the healing factor starts. |
+
+### The Power Stone (R)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos.powerBlastDamage` | `12.0` | 0.0 to 100.0 | Damage of the Power Blast. |
+| `thanos.powerBlastSplash` | `6.0` | 0.0 to 100.0 | Damage of the explosion at the end of the Power Blast. |
+| `thanos.powerBlastRange` | `28.0` | 4.0 to 64.0 | Range of the Power Blast, in blocks. |
+| `thanos.powerBlastCooldown` | `70` | 0 to 6000 | Ticks before the Power Blast can be used again. |
+| `thanos.powerBlastExhaustion` | `2.0` | 0.0 to 20.0 | Exhaustion of the Power Blast (4.0 = one food point). |
+| `thanos.slamDamage` | `10.0` | 0.0 to 100.0 | Damage of the Titan Slam. |
+| `thanos.slamRadius` | `7.0` | 2.0 to 24.0 | Radius of the Titan Slam's ring. |
+| `thanos.slamCooldown` | `160` | 0 to 6000 | Ticks before the Titan Slam can be used again. |
+| `thanos.slamExhaustion` | `4.0` | 0.0 to 20.0 | Exhaustion of the Titan Slam. |
+
+### The Space Stone (G)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos.spaceStepRange` | `40.0` | 4.0 to 128.0 | Range of the Portal Step, in blocks. |
+| `thanos.spaceStepCooldown` | `100` | 0 to 6000 | Ticks before the Portal Step can be used again. |
+| `thanos.stepExhaustion` | `1.0` | 0.0 to 20.0 | Exhaustion of the Portal Step. |
+| `thanos.pullRange` | `24.0` | 4.0 to 64.0 | Range of the Space Pull, in blocks. |
+| `thanos.pullCooldown` | `220` | 0 to 6000 | Ticks before the Space Pull can be used again. |
+| `thanos.pullExhaustion` | `2.0` | 0.0 to 20.0 | Exhaustion of the Space Pull. |
+
+### The Reality Stone (V)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos.transmuteRange` | `20.0` | 4.0 to 64.0 | Range of the Transmute, in blocks. |
+| `thanos.transmuteTicks` | `60` | 10 to 600 | How long a creature stays stone. |
+| `thanos.transmuteCooldown` | `240` | 0 to 6000 | Ticks before the Transmute can be used again. |
+| `thanos.transmuteExhaustion` | `2.0` | 0.0 to 20.0 | Exhaustion of the Transmute. |
+| `thanos.petrifyDamageFactor` | `0.5` | 0.1 to 1.0 | The damage a petrified creature takes, times (it is stone). The boss's Petrify Orb does this too. |
+| `thanos.veilRadius` | `8.0` | 2.0 to 32.0 | How close a projectile must come to be turned into a bubble by the Reality Veil. |
+| `thanos.veilExhaustion` | `0.01` | 0.0 to 1.0 | Exhaustion of the Reality Veil each tick it is on. |
+
+### The Soul Stone (B)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos.drainRange` | `16.0` | 4.0 to 64.0 | Range of the Soul Drain, in blocks. |
+| `thanos.drainDamagePerSecond` | `6.0` | 0.0 to 100.0 | Damage of the Soul Drain each second (it ignores armour and enchantments). |
+| `thanos.drainHealFraction` | `0.5` | 0.0 to 2.0 | The share of the Soul Drain's damage that heals Thanos. |
+| `thanos.drainExhaustion` | `0.02` | 0.0 to 1.0 | Exhaustion of the Soul Drain each tick. |
+| `thanos.drainCooldown` | `40` | 0 to 6000 | Ticks before the Soul Drain can be used again after it ends. |
+| `thanos.sightRange` | `32.0` | 4.0 to 64.0 | Range of the Soul Sight, in blocks. |
+| `thanos.sightTicks` | `160` | 20 to 1200 | How long the Soul Sight lasts. |
+| `thanos.sightCooldown` | `400` | 0 to 6000 | Ticks before the Soul Sight can be used again. |
+| `thanos.sightBreaksIllusions` | `true` | `true` or `false` | Whether the Soul Sight dissolves Loki's duplicates and ends his disguises. |
+| `thanos.sightExhaustion` | `1.0` | 0.0 to 20.0 | Exhaustion of the Soul Sight. |
+
+### The Time Stone (N)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos.rewindSeconds` | `5` | 1 to 15 | How far back the Rewind goes, in seconds. |
+| `thanos.rewindMaxHeal` | `20.0` | 0.0 to 100.0 | The most health the Rewind returns. |
+| `thanos.rewindCooldown` | `900` | 0 to 72000 | Ticks before the Rewind can be used again. |
+| `thanos.rewindExhaustion` | `8.0` | 0.0 to 20.0 | Exhaustion of the Rewind. |
+| `thanos.timeLockRadius` | `6.0` | 2.0 to 24.0 | Radius of the Time Lock's dome. |
+| `thanos.timeLockTicks` | `100` | 10 to 600 | How long the Time Lock stands. |
+| `thanos.timeLockCooldown` | `600` | 0 to 72000 | Ticks before the Time Lock can be used again. |
+| `thanos.timeLockProjectileDrag` | `0.65` | 0.0 to 1.0 | The share of its speed a projectile loses each tick inside the Time Lock. |
+| `thanos.timeLockExhaustion` | `3.0` | 0.0 to 20.0 | Exhaustion of the Time Lock. |

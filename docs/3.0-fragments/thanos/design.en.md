@@ -4,7 +4,7 @@
 > and the Infinity Gauntlet on his left, who takes the stones one by one. In the mod he is the hardest of the three bosses
 > and the source of the **Infinity Gauntlet**, the item that makes a player Thanos (15.11).
 
-This section is the boss. Its code is `thanos/` (`ThanosEntity`, `ThanosMoves`, `ThanosFight`, `ThanosLane`, `ThanosSummon`,
+Sections 15.1 to 15.10 are the boss; 15.11 is the hero. The boss's code is `thanos/` (`ThanosEntity`, `ThanosMoves`, `ThanosFight`, `ThanosLane`, `ThanosSummon`,
 `ArenaCheck`, `ThanosDefence`, `ThanosClock`, `StonePowers`, the sword, meteor, orb and phantom entities); the shared
 rules of every boss (the registry of fights, the participants and the ledger, the wipe and the abandonment, the rest, the
 rewards and the gifts, the bars) are the `boss/` package, and its numbers are in `[boss]` of the server config; Thanos's
@@ -182,4 +182,77 @@ for `abandonSeconds` (90) and he leaves. Everyone dead for `wipeSeconds` (15): h
 
 ### 15.11 The playable Thanos
 
-The hero (the keys, the abilities, the looks, the body) is built by the hero stage and described here when it lands.
+> "Dread it. Run from it. Destiny arrives all the same." Whoever holds the Infinity Gauntlet for `gauntletRitualTicks`
+> (60) with no power becomes Thanos: the five stones the Mad Titan held, one on each key, **no Mind Stone and no Snap**.
+> He does not fly. He is a tank with a toolbox. Its code is `ability/ThanosAbilities` (the keys, the cooldowns, what lasts
+> from tick to tick), hung on the `HeroServer` plug-in `ThanosServer`; what the stones do in the world is the boss's
+> `thanos/StonePowers` (caster-agnostic: a beam, a ring, a splash, the Chaos Shield asked wherever a beam crosses it); the
+> three stone effects are `effect/StoneEffect`; the events are `thanos/ThanosEvents`. Every number is `[thanos]` in the
+> server config.
+
+#### 15.11.1 The Gauntlet
+
+An `AwakeningItem`: hold right-click for `gauntletRitualTicks`. While it is held the five stones light **one after the
+other** (Power, Space, Reality, Soul, Time), each with its voice, and a little of its colour rises round the hand; when
+the hold is done a **visual-only bolt** strikes where he stands (it hurts nobody) and `Powers.awaken` makes him Thanos in
+the Infinity War look, with the usual title, burst and announcement. A hero who tries is told so and nothing is used up;
+in Creative it is kept. The Gauntlet is in `cannot_be_snatched` and can be given to a friend.
+
+#### 15.11.2 The keys
+
+An ability that cannot do anything (no target, no room, a wall in the way, PvP off) says why and starts no cooldown. The
+two on a key **share one cooldown slot** (the client tells them apart by its length). Hunger is exhaustion (4.0 = one food
+point). With an empty hunger bar the stones do not answer ("Too hungry for the stones"); in Creative they cost nothing.
+
+| Key | Stone | Press | Sneak + press | Cooldown (ticks) | Exhaustion |
+|---|---|---|---|---|---|
+| **R** | Power | **Power Blast**: a violet beam from the Gauntlet to the first creature or block (28 blocks): 12 `stone_power` and a shove; a burst of 2.5 blocks where it ends: 6 `stone_blast` to the hostile ones (the aimed creature excluded); no block is ever broken | **Titan Slam**: a ring from his feet at 0.9 blocks a tick to 7 blocks: 10 `stone_blast` once to whatever stands on the ground, thrown outward; a jump clears it | 70 / 160 | 2.0 / 4.0 |
+| **G** | Space | **Portal Step**: onto the block he looks at, or right behind the creature (40 blocks), through two rings; the Hex, Mjolnir's pin and a boss's arena refuse it, and it needs room for his whole body and no water | **Space Pull**: the creature he looks at (24 blocks) is drawn over 6 ticks to two blocks ahead of him and dazed (Slowness II, 20 ticks); not a boss, a pinned creature or an armour stand; a player only with PvP; the Hex judges the landing | 100 / 220 | 1.0 / 2.0 |
+| **V** | Reality | **Transmute**: a sphere flies 6 ticks to the creature (20 blocks) and it is stone (`PETRIFIED`) for 60: it cannot move, jump, attack or use anything and takes half damage; a boss shakes it off; a Chaos Shield stops the sphere and loses 2; a Loki's duplicate dissolves | **Reality Veil** (toggle, `Toggle.REALITY_VEIL`, saved): a projectile heading for him within 8 blocks is a bubble that pops (not Mjolnir, Stormbreaker or the stones' own; not his own); 0.01 exhaustion a tick; off at an empty bar | 240 / none | 2.0 / 0.01 a tick |
+| **B** | Soul | **Soul Drain** (hold, `Live.SOUL_DRAINING`): he locks onto the creature (16 blocks) and every 10 ticks it takes 3 `stone_soul` (armour and enchantments ignored) and he heals half of what it lost; ends when the key is let go, a block comes between, it is past 20 blocks or dies, he starves or is held, or he takes 60 damage in a second; a Chaos Shield stops the chain and loses 12 | **Soul Sight** (`Live.SOUL_SIGHT`, 160 ticks): the client outlines the creatures within 32 blocks through walls; Loki's duplicates dissolve, a hidden Loki is seen, a shapeshifted Loki is himself again (`sightBreaksIllusions`); whoever is invisible glows for everyone for 5 seconds | 40 after it ends / 400 (none in Creative) | 0.02 a tick / 1.0 |
+| **N** | Time | **Rewind**: back to where he was 5 seconds ago, his health up to what it was then (at most 20 more), the harmful effects that began in the window gone, the fire out; needs 2 seconds of history; a Hex or a boss's arena refuses the place (the rest still happens), Mjolnir's pin refuses it all | **Time Lock**: a dome of 6 blocks at his feet for 100 ticks: `TIME_LOCKED` on what is inside (not him, not his pets, a player only with PvP, never Creative); projectiles lose 65 percent of their speed a tick and fall under no gravity | 900 / 600 | 8.0 / 3.0 |
+
+While he is held (`SPELLBOUND`, `PETRIFIED`, `SOULWORLD`) no key answers ("The stones will not answer while you are
+held"): the film's flaw that a restrained Gauntlet hand cannot snap. A key's **release** always goes through.
+
+#### 15.11.3 The body
+
+Permanent attribute modifiers under `enhanced:thanos_*`, applied by `applyBody` to whoever is Thanos and taken off
+everyone else: `healthBonus` (+20), `armorBonus` (+6), `toughnessBonus` (+2), `knockbackResistance` (+0.5),
+`attackBonus` (+3), `scale` (+10 percent, `ADD_MULTIPLIED_BASE`), `reachBonus` (+1 `entity_interaction_range`),
+`stepBonus` (+0.4), and half the fall damage. The **Titan healing factor**: `regenPerSecond` (0.5) after `regenDelayTicks`
+(100) without being hurt (`ThanosEvents.onHeroHurt` tells him), for 0.01 exhaustion a tick, none when starving. Nothing
+else is passive, and `Power.THANOS.canFly()` is false.
+
+#### 15.11.4 What lasts, and what ends it
+
+The server state is `ThanosAbilities`' map by player UUID: the history (a snapshot every 5 ticks for `rewindSeconds`),
+the damage of the last second, the creatures he turned to stone, the sight's end, and the drain, the sphere, the vortex,
+the ring and the dome. It ends with **his power** (`endAll`: the body comes off, the veil drops), **his life**, **his
+session** and **his dimension** (`gone`: the dome opens and the projectiles it hung fall, the creatures it held are free,
+the stone he made is flesh, the drain lets go, the history is dropped), and **the server** (`onServerStopped`). A hold
+released (`stopHold`: a screen, a death) lets the chain go and his next tick finishes it.
+
+#### 15.11.5 The other heroes and the rules
+
+* **Wanda:** the Chaos Shield stops the Blast (12), the Drain (12) and the Transmute (2) at its surface and takes three
+  quarters of the Slam as an explosion; the Hex bounces him like any hero and judges the Step, the Pull and the Rewind as
+  teleports (`HexManager.onTeleport`).
+* **Thor:** Mjolnir's pin refuses the Step, the Pull of the pinned and the Rewind (a pinned creature is not shoved either);
+  the Blast and the Drain still work.
+* **Billy:** a Freeze holds his hand. **Loki:** the Soul Sight is the answer to the duplicates, the hiding and the shape.
+* **Vision:** phased through everything he cannot be touched. **Magneto:** the Gauntlet is a model, not an item: nothing to
+  take. **Quicksilver Time:** slows him like anyone; the Rewind and the Lock run on the game clock.
+* **PvP off:** the Blast, Slam, Pull, Transmute, Drain and Lock do nothing to players and say so; Creative and Spectator
+  players are never touched.
+* **The Mad Titan:** the hero's Blast is a beam and the Space Barrier turns it away; the Drain is no projectile and passes
+  it; the damage counts in the ledger; a boss cannot be pulled, turned to stone or locked (the tags) but is hurt by both.
+* **Blocks:** nothing of his changes a block, whatever the rules say.
+
+#### 15.11.6 Tests
+
+`ThanosTests` (the body and healing factor, the Blast, Slam, Step, Pull, Transmute and Veil, the refusals when held, hungry,
+in Creative or as a Spectator, the looks) and `ThanosSoulTimeTests` (the Drain and the Sight, the Rewind and the Lock, what
+ends with him, the Gauntlet's ceremony, and the hero beside the boss). The state-heavy tests have a batch each
+(`thanos_hero_*`). Deliberate bugs in each important rule (the shield check of each stone, the Hex and the pin, the heal
+and its cap, the history, the dome's end, the hold, the hunger) were each caught by the test meant for them.
