@@ -8,8 +8,10 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="Eilon Kolodkin-Gal (ideas), Yuval Kolodkin-Gal"
 description='''
-Become one of the Enhanced: Magneto, the Master of Magnetism; Wanda Maximoff, the Scarlet Witch;
-Quicksilver, who slows the world down around him or just outruns it; or Vision, the Mind Stone in a synthetic body.
+Become one of the Enhanced: Magneto, the Master of Magnetism; Wanda Maximoff, the Scarlet Witch, and her Hex;
+Quicksilver, who slows the world down around him or just outruns it; Vision, the Mind Stone in a synthetic body;
+Tommy and Billy, Wanda's sons; Loki, the God of Mischief; or Thor, the God of Thunder, with Mjolnir, Stormbreaker and
+the Bifrost.
 '''
 
 [[mixins]]
