@@ -6,6 +6,8 @@ import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.AreaTargets;
+import com.kolodkingal.enhanced.ability.HeroLifecycle;
+import com.kolodkingal.enhanced.ability.HeroServer;
 import com.kolodkingal.enhanced.ability.HeroServers;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -83,9 +85,12 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
@@ -217,6 +222,139 @@ public final class SkeletonTests {
             check(player.getHealth() == health && player.getMaxHealth() == maxHealth, hero + " is as healthy as before");
             check(player.isAlive(), hero + " is alive");
         }
+        helper.succeed();
+    }
+
+    /**
+     * What a lane's plug-in can count on (the lane guide, section 3): its key for its own player only, its tick for its
+     * own player while alive, the everyPlayer and body calls for everybody, the hold release when the player is dead,
+     * endAll when the power is taken away (while the data still say whose it was), and one call per session event for
+     * every player, from the real events.
+     */
+    @GameTest(template = ARENA, batch = SKELETON)
+    public static void aHeroPlugInIsCalledForTheRightPlayersAndOncePerSessionEvent(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        MinecraftServer server = helper.getLevel().getServer();
+        List<String> calls = new ArrayList<>();
+        HeroServer recorder = new HeroServer() {
+            @Override
+            public Power power() {
+                return Power.PHOENIX;
+            }
+
+            @Override
+            public void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+                calls.add("key" + ability + (down ? "v" : "^") + ":" + name(player));
+            }
+
+            @Override
+            public void tick(ServerPlayer player, PowerData data) {
+                calls.add("tick:" + name(player));
+            }
+
+            @Override
+            public void everyPlayerTick(ServerPlayer player, PowerData data) {
+                calls.add("every:" + name(player));
+            }
+
+            @Override
+            public void applyBody(ServerPlayer player, PowerData data) {
+                calls.add("body:" + name(player) + ":" + data.power());
+            }
+
+            @Override
+            public void endAll(ServerPlayer player, PowerData data) {
+                calls.add("end:" + name(player) + ":" + data.power());
+            }
+
+            @Override
+            public void stopHold(PowerData data) {
+                calls.add("hold");
+            }
+
+            @Override
+            public void onLogin(ServerPlayer player) {
+                calls.add("login:" + name(player));
+            }
+
+            @Override
+            public void onLogout(ServerPlayer player) {
+                calls.add("logout:" + name(player));
+            }
+
+            @Override
+            public void onDeath(ServerPlayer player) {
+                calls.add("death:" + name(player));
+            }
+
+            @Override
+            public void onRespawn(ServerPlayer player) {
+                calls.add("respawn:" + name(player));
+            }
+
+            @Override
+            public void onChangeDimension(ServerPlayer player) {
+                calls.add("dimension:" + name(player));
+            }
+
+            @Override
+            public void onServerStopped() {
+                calls.add("stopped");
+            }
+
+            private String name(ServerPlayer player) {
+                return player.getGameProfile().getName();
+            }
+        };
+        HeroServer previous = HeroServers.register(recorder);
+        f.onClose(() -> HeroServers.register(previous));
+        ServerPlayer phoenix = f.player(5.5, FLOOR, 5.5, Power.PHOENIX);
+        ServerPlayer wanda = f.player(9.5, FLOOR, 5.5, Power.SCARLET_WITCH);
+        ServerPlayer third = f.player(13.5, FLOOR, 5.5, Power.PHOENIX);
+        String hero = phoenix.getGameProfile().getName();
+        String other = wanda.getGameProfile().getName();
+        calls.clear();
+
+        // Keys go to the hero's own plug-in, for the hero's own player only.
+        AbilityHandler.onKey(phoenix, 3, true);
+        AbilityHandler.onKey(phoenix, 3, false);
+        AbilityHandler.onKey(wanda, 5, false);
+        check(calls.equals(List.of("key3v:" + hero, "key3^:" + hero)), "keys: " + calls);
+
+        // A tick: everybody's everyPlayerTick and applyBody, the hero's own tick.
+        calls.clear();
+        PowerTicker.tick(phoenix);
+        check(calls.equals(List.of("every:" + hero, "body:" + hero + ":PHOENIX", "tick:" + hero)), "the hero's tick: " + calls);
+        calls.clear();
+        PowerTicker.tick(wanda);
+        check(calls.equals(List.of("every:" + other, "body:" + other + ":SCARLET_WITCH")), "another hero's tick: " + calls);
+
+        // Taking the power away: endAll while the data still say whose it was, then the body for the new power.
+        calls.clear();
+        Powers.setPower(third, Power.NONE);
+        check(calls.equals(List.of("end:" + third.getGameProfile().getName() + ":PHOENIX", "body:" + third.getGameProfile().getName() + ":NONE")),
+                "losing the power: " + calls);
+
+        // Dying: the real event calls onDeath once; a dead body releases its holds and does not tick.
+        calls.clear();
+        phoenix.kill();
+        check(calls.equals(List.of("death:" + hero)), "death: " + calls);
+        calls.clear();
+        PowerTicker.tick(phoenix);
+        check(calls.equals(List.of("hold")), "a dead hero's tick only lets go of what it held: " + calls);
+
+        // The session events, once each, for the player they are about.
+        for (var event : List.of(new PlayerEvent.PlayerLoggedInEvent(wanda), new PlayerEvent.PlayerLoggedOutEvent(wanda),
+                new PlayerEvent.PlayerRespawnEvent(wanda, false), new PlayerEvent.PlayerChangedDimensionEvent(wanda, Level.OVERWORLD, Level.NETHER))) {
+            calls.clear();
+            NeoForge.EVENT_BUS.post(event);
+            String expected = (event instanceof PlayerEvent.PlayerLoggedInEvent ? "login:" : event instanceof PlayerEvent.PlayerLoggedOutEvent ? "logout:"
+                    : event instanceof PlayerEvent.PlayerRespawnEvent ? "respawn:" : "dimension:") + other;
+            check(calls.equals(List.of(expected)), event.getClass().getSimpleName() + ": " + calls);
+        }
+        calls.clear();
+        HeroLifecycle.onServerStopped();
+        check(calls.equals(List.of("stopped")), "the server stopping: " + calls);
         helper.succeed();
     }
 

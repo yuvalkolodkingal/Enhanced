@@ -25,8 +25,16 @@ public final class HeroServers {
         register(new ApocalypseServer());
     }
 
-    private static void register(HeroServer server) {
-        BY_POWER.put(server.power(), server);
+    /**
+     * Registers a plug-in for the power it says it is the server side of, in place of the one there was. Done by the
+     * static block above, once per hero when the mod loads; a test may put in a plug-in of its own and, when it ends,
+     * the one it replaced.
+     *
+     * @return the plug-in that was registered before, or null
+     */
+    @Nullable
+    public static HeroServer register(HeroServer server) {
+        return BY_POWER.put(server.power(), server);
     }
 
     /** The plug-in of a hero, or null for the heroes that are not plug-ins (and for {@link Power#NONE}). */

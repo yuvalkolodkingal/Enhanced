@@ -64,7 +64,12 @@ public final class ScepterRituals {
      * with {@link #registerThanosHold}. While there is none, the row is declined.
      */
     public interface Hold {
-        /** Whether the hold begins (the caller then starts using the item). */
+        /**
+         * Whether the hold begins (the caller then starts using the item). {@code hand} is the hand of the item that is
+         * being used (the Scepter's for a use of the Scepter, the Tesseract's for a use of the Tesseract); the other
+         * hand holds the other item. A refusal answers false after telling the player why: nothing else happens (the
+         * Scepter does not explode, the Tesseract does not jump or make a Loki).
+         */
         boolean begin(ServerPlayer player, InteractionHand hand);
 
         /** Each tick of the hold; {@code remaining} counts down to 0. */
