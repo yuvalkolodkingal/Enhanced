@@ -93,6 +93,10 @@ public final class GestureRoutes {
 
     /** The gesture an ability's cooldown starting stands for, or null. {@code left} is the cooldown in ticks. */
     public static GestureId cooldown(Power power, int ability, long left) {
+        HeroClient hero = HeroClients.of(power); // (the heroes of 3.0 answer for themselves)
+        if (hero != null) {
+            return hero.cooldownGesture(ability, left);
+        }
         return switch (power) {
             case MAGNETO -> ability == 3 ? GestureId.MAG_DISARM : null;
             case QUICKSILVER -> ability == 2 ? GestureId.QS_BLITZ : ability == 3 ? GestureId.QS_SNATCH : null;
@@ -131,6 +135,10 @@ public final class GestureRoutes {
 
     /** The gesture a flag flipping stands for, or null. {@code white} is White Vision, {@code phased} Vision passing through things. */
     public static GestureId flag(Power power, Flag flag, boolean on, boolean white, boolean phased) {
+        HeroClient hero = HeroClients.of(power);
+        if (hero != null) {
+            return hero.flagGesture(flag, on);
+        }
         return switch (flag) {
             case MAGNETIC_SHIELD -> power == Power.MAGNETO ? (on ? GestureId.MAG_SHIELD_ON : GestureId.MAG_SHIELD_OFF) : null;
             case SHRAPNEL -> power == Power.MAGNETO && on ? GestureId.MAG_SHRAPNEL_START : null;
@@ -149,6 +157,10 @@ public final class GestureRoutes {
 
     /** The gesture a momentary state beginning stands for, or null. {@code armed} is Thor with a weapon in a hand. */
     public static GestureId live(Power power, Live live, boolean armed) {
+        HeroClient hero = HeroClients.of(power);
+        if (hero != null) {
+            return hero.liveGesture(live);
+        }
         return switch (live) {
             case WHIRLWIND -> power == Power.TOMMY ? GestureId.TOMMY_WHIRL_START : null;
             case CALLING_LIGHTNING -> power == Power.THOR ? (armed ? GestureId.THOR_BEAM_KICK : GestureId.THOR_BEAM_KICK_BARE) : null;
@@ -160,6 +172,10 @@ public final class GestureRoutes {
 
     /** The gesture of grabbing something with telekinesis, or null for a hero who has none. */
     public static GestureId grab(Power power) {
+        HeroClient hero = HeroClients.of(power);
+        if (hero != null) {
+            return hero.grabGesture();
+        }
         return switch (power) {
             case MAGNETO -> GestureId.TK_GRAB_MAGNETO;
             case SCARLET_WITCH -> GestureId.TK_GRAB_WANDA;
@@ -170,6 +186,10 @@ public final class GestureRoutes {
 
     /** The gesture of throwing what was held, or null. */
     public static GestureId fling(Power power) {
+        HeroClient hero = HeroClients.of(power);
+        if (hero != null) {
+            return hero.flingGesture();
+        }
         return switch (power) {
             case MAGNETO -> GestureId.TK_FLING_MAGNETO;
             case SCARLET_WITCH -> GestureId.TK_FLING_WANDA;
@@ -301,6 +321,11 @@ public final class GestureRoutes {
 
     /** The gestures that other code than the table starts: the animator's own edges and the payloads. */
     public static boolean startedElsewhere(GestureId id) {
+        for (HeroClient hero : HeroClients.all()) {
+            if (hero.startedElsewhere(id)) {
+                return true; // (the heroes of 3.0 say which of their gestures a payload or an edge starts)
+            }
+        }
         return switch (id) {
             case LOOK_CHANGE, TAKEOFF_MAGNETO, TAKEOFF_WANDA, TAKEOFF_VISION, TAKEOFF_BILLY, TAKEOFF_THOR, BRAKE, BRAKE_THOR, LAND_SOFT,
                  LAND_HERO, THOR_ARRIVAL, RUN_SKID -> true;

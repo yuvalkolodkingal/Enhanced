@@ -493,7 +493,13 @@ public final class AnimationMathTests {
         assertNear(FlightProfile.vyRef(0.09F), 0.405, 0.001, "Wanda's climb speed");
         assertNear(FlightProfile.normalised(5.0F, 0.09F), 3.0, 1.0E-6, "speed is clamped to 3");
         assertNear(FlightProfile.normalised(-5.0F, 0.09F), -1.0, 1.0E-6, "and to -1 backwards");
-        for (Power power : new Power[]{Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR}) {
+        for (Power power : new Power[]{Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR,
+                // The heroes of 3.0 that fly with a profile of their own, one line each in the region of their lane (a
+                // hero with no flight profile yet is not listed: it flies with the vanilla pose).
+                // ===== phoenix =====
+                // ===== ultron =====
+                // ===== apocalypse =====
+        }) {
             FlightProfile profile = FlightProfile.of(power, false);
             check(profile != null, power + " flies");
             float before = profile.pitchTarget(0.0F, 0.0F);
@@ -540,9 +546,19 @@ public final class AnimationMathTests {
         for (GestureId id : stageA) {
             check(Gestures.get(id) != null, id + " has its keys");
         }
+        // One take-off per flying hero with a profile; a hero of 3.0 adds its gesture to the first array and its power to the
+        // second, in the same position, each in the region of its lane.
         GestureId[] ids = {GestureId.TAKEOFF_MAGNETO, GestureId.TAKEOFF_WANDA, GestureId.TAKEOFF_VISION, GestureId.TAKEOFF_BILLY,
-                GestureId.TAKEOFF_THOR};
-        Power[] powers = {Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR};
+                GestureId.TAKEOFF_THOR,
+                // ===== phoenix =====
+                // ===== ultron =====
+                // ===== apocalypse =====
+        };
+        Power[] powers = {Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR,
+                // ===== phoenix =====
+                // ===== ultron =====
+                // ===== apocalypse =====
+        };
         for (int k = 0; k < ids.length; k++) {
             Gestures.Def def = Gestures.get(ids[k]);
             FlightProfile profile = FlightProfile.of(powers[k], false);
@@ -603,6 +619,12 @@ public final class AnimationMathTests {
                 {GestureId.VISION_PHASE_IN, StancePoses.VISION_PHASED_M, StancePoses.VISION_PHASED_O},
                 {GestureId.VISION_DENSE_ON, StancePoses.VISION_DENSE_M, StancePoses.VISION_DENSE_O},
                 {GestureId.BILLY_FREEZE_CAST, StancePoses.BILLY_FREEZE_M, StancePoses.BILLY_FREEZE_O},
+                // The gestures of 3.0 that hand over to a stance, one row each in the region of their lane.
+                // ===== phoenix =====
+                // ===== spider =====
+                // ===== thanos =====
+                // ===== ultron =====
+                // ===== apocalypse =====
         };
         for (Object[] pair : pairs) {
             Gestures.Def def = Gestures.get((GestureId) pair[0]);

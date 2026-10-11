@@ -20,6 +20,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -29,6 +30,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.animal.Wolf;
@@ -67,6 +69,7 @@ public final class BossHookTests {
         int slow = -1;
         boolean strips;
         int stripped;
+        final java.util.List<String> lightning = new java.util.ArrayList<>();
 
         HookedZombie(Level level) {
             super(EntityType.ZOMBIE, level);
@@ -82,6 +85,11 @@ public final class BossHookTests {
         public boolean onMagnetoStrip(ServerPlayer magneto) {
             stripped++;
             return strips;
+        }
+
+        @Override
+        public void onLightning(ServerPlayer thor, float amount) {
+            lightning.add(thor == null ? "weather:" + amount : "thor:" + thor.getGameProfile().getName() + ":" + amount);
         }
     }
 
@@ -259,6 +267,39 @@ public final class BossHookTests {
         boss.strips = false;
         AbilityHandler.onKey(magneto, 3, true);
         check(boss.stripped == 2 && boss.getItemBySlot(EquipmentSlot.HEAD).isEmpty(), "a boss that does not handle it is stripped like anyone");
+        helper.succeed();
+    }
+
+    /** Lightning is told to an entity that wants to know, with Thor if it is his, and only when it got through. */
+    @GameTest(template = ARENA, batch = "boss_hook_lightning")
+    public static void lightningIsToldToABossWithThorIfItIsHisAndOnlyWhenItGotThrough(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer thor = f.player(4.5, FLOOR, 10.5, Power.THOR);
+        ServerPlayer nobody = f.player(4.5, FLOOR, 14.5);
+        HookedZombie boss = hooked(helper, 12.5, 10.5);
+        boss.setHealth(boss.getMaxHealth());
+
+        boss.hurt(ModDamageTypes.source(level, ModDamageTypes.LIGHTNING_BEAM, thor, thor), 4.0F);
+        boss.invulnerableTime = 0;
+        boss.hurt(ModDamageTypes.source(level, DamageTypes.LIGHTNING_BOLT, thor, thor), 3.0F);
+        boss.invulnerableTime = 0;
+        boss.hurt(level.damageSources().lightningBolt(), 5.0F);
+        boss.invulnerableTime = 0;
+        boss.hurt(ModDamageTypes.source(level, ModDamageTypes.LIGHTNING_BEAM, nobody, nobody), 2.0F);
+        String thorName = thor.getGameProfile().getName();
+        check(boss.lightning.equals(java.util.List.of("thor:" + thorName + ":4.0", "thor:" + thorName + ":3.0", "weather:5.0", "weather:2.0")),
+                "the bolts were told, Thor's with Thor: " + boss.lightning);
+
+        boss.lightning.clear();
+        boss.invulnerableTime = 0;
+        boss.hurt(level.damageSources().generic(), 2.0F);
+        boss.invulnerableTime = 0;
+        boss.hurt(level.damageSources().playerAttack(thor), 2.0F);
+        check(boss.lightning.isEmpty(), "nothing else is told as lightning: " + boss.lightning);
+        // An entity that does not ask is left alone (and nothing breaks for it).
+        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 14.5));
+        check(plain.hurt(level.damageSources().lightningBolt(), 2.0F), "an ordinary creature is struck as ever");
         helper.succeed();
     }
 

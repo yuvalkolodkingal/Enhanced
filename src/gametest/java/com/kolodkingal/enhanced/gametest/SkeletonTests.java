@@ -17,7 +17,9 @@ import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
+import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
+import com.kolodkingal.enhanced.client.render.HeroClient;
 import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.item.AwakeningItem;
 import com.kolodkingal.enhanced.item.ScepterRituals;
@@ -355,6 +357,74 @@ public final class SkeletonTests {
         calls.clear();
         HeroLifecycle.onServerStopped();
         check(calls.equals(List.of("stopped")), "the server stopping: " + calls);
+        helper.succeed();
+    }
+
+    /** A client plug-in that answers every gesture route with a gesture of Thor's, so a test can tell who was asked. */
+    private static final class RoutingClient implements HeroClient {
+        @Override
+        public Power power() {
+            return Power.PHOENIX;
+        }
+
+        @Override
+        public GestureId cooldownGesture(int ability, long left) {
+            return ability == 2 ? GestureId.THOR_CATCH : null;
+        }
+
+        @Override
+        public GestureId flagGesture(GestureRoutes.Flag flag, boolean on) {
+            return flag == GestureRoutes.Flag.BEAM && on ? GestureId.THOR_ARRIVAL : null;
+        }
+
+        @Override
+        public GestureId liveGesture(Live live) {
+            return live == Live.CASTING ? GestureId.THOR_SHATTER : null;
+        }
+
+        @Override
+        public GestureId grabGesture() {
+            return GestureId.THOR_REFORM;
+        }
+
+        @Override
+        public GestureId flingGesture() {
+            return GestureId.THOR_BEAM_KICK;
+        }
+
+        @Override
+        public boolean startedElsewhere(GestureId id) {
+            return id == GestureId.THOR_BEAM_KICK_BARE;
+        }
+    }
+
+    /**
+     * The routes from what the data show to the gesture to act (GestureRoutes) ask a hero of 3.0 what it means, so a lane
+     * routes its own abilities without editing the arms of the others, and the heroes before it answer as ever.
+     */
+    @GameTest(template = ARENA, batch = SKELETON)
+    public static void theGestureRoutesAskTheClientOfAHeroOf3AndLeaveTheOlderHeroesAlone(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        HeroClient previous = HeroClients.register(new RoutingClient());
+        f.onClose(() -> HeroClients.register(previous));
+        check(GestureRoutes.cooldown(Power.PHOENIX, 2, 5) == GestureId.THOR_CATCH && GestureRoutes.cooldown(Power.PHOENIX, 1, 5) == null,
+                "the cooldown of an ability of the new hero");
+        check(GestureRoutes.flag(Power.PHOENIX, GestureRoutes.Flag.BEAM, true, false, false) == GestureId.THOR_ARRIVAL
+                && GestureRoutes.flag(Power.PHOENIX, GestureRoutes.Flag.BEAM, false, false, false) == null, "its flags");
+        check(GestureRoutes.live(Power.PHOENIX, Live.CASTING, false) == GestureId.THOR_SHATTER
+                && GestureRoutes.live(Power.PHOENIX, Live.PINNED, false) == null, "its states");
+        check(GestureRoutes.grab(Power.PHOENIX) == GestureId.THOR_REFORM && GestureRoutes.fling(Power.PHOENIX) == GestureId.THOR_BEAM_KICK,
+                "its grab and its fling");
+        check(GestureRoutes.startedElsewhere(GestureId.THOR_BEAM_KICK_BARE) && !GestureRoutes.startedElsewhere(GestureId.THOR_CATCH),
+                "and the gestures a payload starts");
+        // The heroes before it are as they were (and are not asked): the arms of their own routes.
+        check(GestureRoutes.cooldown(Power.LOKI, 1, 5) == GestureId.LOKI_DAGGER && GestureRoutes.cooldown(Power.MAGNETO, 3, 5) == GestureId.MAG_DISARM,
+                "the cooldowns of the older heroes");
+        check(GestureRoutes.flag(Power.SCARLET_WITCH, GestureRoutes.Flag.BEAM, true, false, false) == GestureId.WANDA_BEAM_KICK
+                && GestureRoutes.live(Power.LOKI, Live.CASTING, false) == GestureId.LOKI_CAST
+                && GestureRoutes.grab(Power.BILLY) == GestureId.TK_GRAB_BILLY && GestureRoutes.fling(Power.SCARLET_WITCH) == GestureId.TK_FLING_WANDA,
+                "their flags, states, grabs and flings");
+        check(GestureRoutes.startedElsewhere(GestureId.TAKEOFF_THOR) && GestureRoutes.startedElsewhere(GestureId.THOR_PIN), "and what they start elsewhere");
         helper.succeed();
     }
 

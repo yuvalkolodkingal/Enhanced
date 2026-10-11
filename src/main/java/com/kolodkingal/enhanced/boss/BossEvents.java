@@ -1,9 +1,11 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -14,6 +16,7 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -47,6 +50,19 @@ public final class BossEvents {
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide && BossFights.isOrphan(event.getEntity())) {
             event.setCanceled(true);
+        }
+    }
+
+    /**
+     * Lightning reaches an entity that has a say in it (a Sentry is stunned, Apocalypse's Escape is interrupted): {@link
+     * BossHooks#onLightning}, with Thor if it is his (his beam and his arcs; the weather's has no Thor). Last of all,
+     * after every defence: a bolt that was stopped (cancelled) is not told.
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onLightning(LivingIncomingDamageEvent event) {
+        if (event.getEntity() instanceof BossHooks hooks && event.getSource().is(DamageTypeTags.IS_LIGHTNING)) {
+            ServerPlayer thor = event.getSource().getEntity() instanceof ServerPlayer player && ThorAbilities.isThor(player) ? player : null;
+            hooks.onLightning(thor, event.getAmount());
         }
     }
 

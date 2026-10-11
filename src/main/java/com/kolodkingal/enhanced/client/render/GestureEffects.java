@@ -99,6 +99,11 @@ public final class GestureEffects {
             case BILLY_FREEZE_CAST -> add(player, now, now + 5, now + 20, Kind.CAST_BOTH);
             case TOMMY_ACCEL -> add(player, now, now + 2, now + 7, Kind.VIBRATE_HAND);
             default -> {
+                // The heroes of 3.0 start the flourishes of their own gestures themselves.
+                HeroClient hero = HeroClients.of(state.power);
+                if (hero != null) {
+                    hero.gestureStarted(player, state, id, param);
+                }
             }
         }
     }

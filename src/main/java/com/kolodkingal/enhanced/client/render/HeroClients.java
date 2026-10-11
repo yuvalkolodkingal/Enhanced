@@ -24,8 +24,16 @@ public final class HeroClients {
         register(new ApocalypseClient());
     }
 
-    private static void register(HeroClient client) {
-        BY_POWER.put(client.power(), client);
+    /**
+     * Registers a plug-in for the power it says it is the client side of, in place of the one there was. Done by the
+     * static block above, once per hero when the client loads; a test may put in a plug-in of its own and, when it ends,
+     * the one it replaced.
+     *
+     * @return the plug-in that was registered before, or null
+     */
+    @Nullable
+    public static HeroClient register(HeroClient client) {
+        return BY_POWER.put(client.power(), client);
     }
 
     /** The plug-in of a hero, or null for the heroes that are not plug-ins (and for {@link Power#NONE}). */

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.PowerHud;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -107,6 +108,57 @@ public interface HeroClient {
 
     /** Defines the keys of the hero's gestures ({@link Gestures#define}), once, when the gesture tables are built. */
     default void registerGestures() {
+    }
+
+    // ---- which gesture stands for what (the routes of GestureRoutes, for this hero: they ask here first) ----
+
+    /**
+     * The gesture an ability's cooldown starting stands for, or null (see {@link GestureRoutes#cooldown}); {@code left}
+     * is the cooldown in ticks. Say {@code "cooldown"} in {@link GestureRoutes#acting} for the abilities that answer.
+     */
+    @Nullable
+    default GestureId cooldownGesture(int ability, long left) {
+        return null;
+    }
+
+    /** The gesture a flag of the power data flipping stands for, or null (see {@link GestureRoutes#flag}). */
+    @Nullable
+    default GestureId flagGesture(GestureRoutes.Flag flag, boolean on) {
+        return null;
+    }
+
+    /** The gesture a momentary state beginning stands for, or null (see {@link GestureRoutes#live}). */
+    @Nullable
+    default GestureId liveGesture(Live live) {
+        return null;
+    }
+
+    /** The gesture of grabbing something with telekinesis, or null (see {@link GestureRoutes#grab}). */
+    @Nullable
+    default GestureId grabGesture() {
+        return null;
+    }
+
+    /** The gesture of throwing what was held, or null (see {@link GestureRoutes#fling}). */
+    @Nullable
+    default GestureId flingGesture() {
+        return null;
+    }
+
+    /**
+     * Whether the gesture is started by something other than the routes (the take-off, a payload, the animator's own
+     * edges), so that the completeness test does not call it orphaned (see {@link GestureRoutes#startedElsewhere}).
+     */
+    default boolean startedElsewhere(GestureId id) {
+        return false;
+    }
+
+    /**
+     * A gesture of this hero just began ({@code param} as in {@link HeroAnimator#start}): start the flourish that goes
+     * with it (motes at the hand, a flash). Called only when the player is in view and the client's flight effects are
+     * on, like {@link GestureEffects}' own.
+     */
+    default void gestureStarted(AbstractClientPlayer player, HeroAnimState state, GestureId id, float param) {
     }
 
     // ---- first person and flight ----
