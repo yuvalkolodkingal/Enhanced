@@ -115,13 +115,21 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
 public final class SkeletonTests {
+    /**
+     * The batch of the tests that need nothing but themselves. They all finish in their first tick, and a finished test
+     * lets go of the chunks it had forced. The grid puts tests side by side, and a thrown weapon that leaves its own
+     * arena (the Stormbreaker test throws 16 blocks east) stops ticking in a chunk nobody holds, and never comes back.
+     * So these tests run in a batch of their own and are never the neighbours of the others.
+     */
+    private static final String SKELETON = "skeleton";
+
     /** The heroes of 3.0, in Eilon's order: the last five of {@link Power}. */
     private static final List<Power> NEW_HEROES = List.of(Power.PHOENIX, Power.SPIDER_MAN, Power.THANOS, Power.ULTRON, Power.APOCALYPSE);
 
     // ------------------------------------------------------------------------------------------------------------
     // The five powers
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theFiveNewHeroesComeLastInEilonsOrder(GameTestHelper helper) {
         Power[] all = Power.values();
         for (int i = 0; i < NEW_HEROES.size(); i++) {
@@ -133,7 +141,7 @@ public final class SkeletonTests {
     }
 
     /** A name for everything, a look to choose, and flight rules that agree with each other. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void everyNewHeroHasNamesLooksAndConsistentFlightRules(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject en = lang(mod, "en_us");
@@ -166,7 +174,7 @@ public final class SkeletonTests {
     }
 
     /** {@code /enhanced power set <player> <hero>} makes each of them, with and without a look. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void thePowerCommandMakesEveryNewHero(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -184,7 +192,7 @@ public final class SkeletonTests {
     }
 
     /** The power exists and does nothing: no key does anything, nothing ticks into a state, nobody is hurt. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void aNewHeroDoesNothingYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
@@ -209,7 +217,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theFliersFlyAndTheOthersDoNot(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
@@ -228,7 +236,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void spiderManStartsWithHisWallAndHisSenseOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer spider = f.player(5.5, FLOOR, 5.5, Power.SPIDER_MAN);
@@ -245,7 +253,7 @@ public final class SkeletonTests {
     /**
      * The momentary states are a long since 3.0: 26 bits are used, there is room for 64, and the sync keeps them all.
      */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theLiveStatesFitInALongAndSurviveTheSync(GameTestHelper helper) {
         check(Live.values().length >= 26 && Live.values().length <= 63, "26 states or more, and room to grow: " + Live.values().length);
         PowerData data = new PowerData();
@@ -268,7 +276,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void shiftingCooldownsMovesOnlyWhatIsRunning(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000;
@@ -288,7 +296,7 @@ public final class SkeletonTests {
     }
 
     /** A world saved with a new hero loads with it; one saved without any loads without. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void aSavedNewHeroLoadsBackAndAnOldSaveLoadsWithout(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5, Power.SPIDER_MAN);
@@ -314,7 +322,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The registries
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theHeroesAreAllRegisteredAsPlugIns(GameTestHelper helper) {
         for (Power hero : NEW_HEROES) {
             check(HeroServers.of(hero) != null && HeroServers.of(hero).power() == hero, hero + " has a server plug-in");
@@ -328,7 +336,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theEntitiesAreRegisteredAndCannotBeSummoned(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         List<EntityType<?>> types = List.of(ModEntities.THANOS.get(), ModEntities.THANOS_SWORD.get(), ModEntities.THANOS_METEOR.get(),
@@ -351,7 +359,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theEffectsAreRegisteredAndHold(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -365,7 +373,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theBossDataStartsEmptyAndTheCodecRoundTrips(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BossData fresh = level.getServer().overworld().getData(ModAttachments.BOSS_DATA);
@@ -385,7 +393,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Chaos Shield's melee rule reads a tag, and the tag holds exactly what the rule held before
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theMeleeBlowsTagHoldsExactlyTodaysListPlusTheNewBlows(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
@@ -418,7 +426,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void mindPowerIsTheBeamTheSlamAndTheBurst(GameTestHelper helper) {
         Registry<DamageType> registry = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         Set<String> inTag = new LinkedHashSet<>();
@@ -428,7 +436,7 @@ public final class SkeletonTests {
     }
 
     /** Every tag file of the mod parses, and every entry names a real thing or a tag that exists. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void everyTagFileNamesRealThings(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         ServerLevel level = helper.getLevel();
@@ -478,7 +486,7 @@ public final class SkeletonTests {
     // Loki's Scepter and the Tesseract: one table for both
 
     /** The table of integration.md 3.2, row by row. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theScepterAndTesseractTableIsReadRowByRow(GameTestHelper helper) {
         ItemStack gene = new ItemStack(ModItems.SCARLET_WITCH_GENE.get());
         ItemStack core = new ItemStack(ModItems.SYNTHEZOID_CORE.get());
@@ -525,7 +533,7 @@ public final class SkeletonTests {
         check(expected == actual, what + ": expected " + expected + " but was " + actual);
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theScepterWakesUltronFromHisCoreForAPowerlessPlayerOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -545,7 +553,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theScepterWithTheProgramNeverHurtsAndUsesNothingUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -565,7 +573,7 @@ public final class SkeletonTests {
     }
 
     /** Until the summoning is built the Mad Titan's rows are declined and the Scepter does what it always did. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theScepterAndTheTesseractDoWhatTheyDidWhileTheSummoningIsNotBuilt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(5.5, FLOOR, 5.5, Power.SCARLET_WITCH);
@@ -586,7 +594,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The awakening items
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void anAwakeningItemIsHeldThenUsedUpAndAwakens(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -612,7 +620,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void anAwakeningItemTurnsAHeroAwayBeforeTheHoldAndCreativeKeepsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -635,7 +643,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // Area attacks, the hero is held, the boss facade
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void anAreaAttackSparesWhatItShouldAndHurtsTheRest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(10.5, FLOOR, 10.5);
@@ -680,7 +688,7 @@ public final class SkeletonTests {
     }
 
     /** The cocoon covers the hands: a key press does nothing while entombed, a release still goes through. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void anEntombedHeroCannotPressAKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(5.5, FLOOR, 5.5, Power.SCARLET_WITCH);
@@ -694,7 +702,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theBossFacadeAnswersAsIfThereWereNoBossYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -754,13 +762,13 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The network
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theProtocolIsFour(GameTestHelper helper) {
         check(ModNetwork.PROTOCOL_VERSION.equals("4"), "3.0 bumps the protocol from 3 to 4, once: " + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void everyPayloadOf3RoundTrips(GameTestHelper helper) {
         var access = helper.getLevel().registryAccess();
         Vec3 a = new Vec3(1.5, 64.0, -2.25);
@@ -828,7 +836,7 @@ public final class SkeletonTests {
     // The lang files and the release gates
 
     /** The lanes' regions of the lang files: the same sentinel lines, in the same order, in both languages. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void theLangSentinelsAreTheSameInBothLanguagesAndInHeroOrder(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> english = sentinels(lang(mod, "en_us"));
@@ -847,7 +855,7 @@ public final class SkeletonTests {
      * The release gate for the sentinel lines of the lang files: they are scaffolding of the 3.0 work and must be gone
      * from the release (a version of 3.0.0 or later). Passes while the version is older.
      */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void noLangSentinelsRemainAtTheRelease(GameTestHelper helper) throws IOException {
         if (isReleaseOf3()) {
             IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
@@ -861,7 +869,7 @@ public final class SkeletonTests {
      * The release gate for the animation tables: every ability, toggle and state of the five heroes is acted by a
      * gesture of its own or explained, not pending. Passes while the version is older than 3.0.0.
      */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void noAnimationIsPendingAtTheRelease(GameTestHelper helper) {
         List<String> pending = pendingAnimation();
         if (isReleaseOf3()) {
@@ -899,7 +907,7 @@ public final class SkeletonTests {
      * {@code AnimationMathTests.everyAbilityIsActedOrExplained}, which checks the heroes before them); until a lane
      * builds the hero, the reason is "pending lane".
      */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = SKELETON)
     public static void everyAbilityOfTheNewHeroesIsActedOrExplained(GameTestHelper helper) {
         for (Power hero : NEW_HEROES) {
             for (int ability = 1; ability <= PowerData.ABILITIES; ability++) {
