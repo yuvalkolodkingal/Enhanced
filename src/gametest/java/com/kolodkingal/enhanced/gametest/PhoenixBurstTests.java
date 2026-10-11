@@ -44,6 +44,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
@@ -459,6 +460,94 @@ public final class PhoenixBurstTests {
             check(zombie.position().subtract(zombieStart).x > 1.0, "a zombie is thrown away from the centre: " + zombiePush);
             check(boss.getHealth() < bossHealth, "a boss is hurt");
             check(bossPush < zombiePush * 0.6, "but the boss is not thrown with it: " + bossPush + " against " + zombiePush);
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = "phoenix_burst_cover", timeoutTicks = 80)
+    public static void burstDoesNotGetThroughStone(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        smallBursts(f);
+        f.config(PhoenixConfig.BURST_FIRE_SECONDS, 10);
+        ServerPlayer jean = jean(f, X, Z);
+        // A wall of stone, one block thick, four high and seven wide, between her and the zombie behind it.
+        for (int z = 7; z <= 13; z++) {
+            for (int y = 2; y <= 5; y++) {
+                helper.setBlock(new BlockPos(7, y, z), Blocks.STONE);
+            }
+        }
+        Zombie behind = sturdy(helper, X + 3.0, Z);
+        Zombie clear = sturdy(helper, X, Z + 4.0);
+        double clearDistance = distance(jean, clear);
+        List<LivingEntity> told = new ArrayList<>();
+        PhoenixPower.Listener listener = (phoenix, target, kind, amount) -> {
+            if (phoenix == jean && kind == PhoenixPower.Kind.BURST) {
+                told.add(target);
+            }
+        };
+        PhoenixPower.addListener(listener);
+        f.onClose(() -> PhoenixPower.removeListener(listener));
+        AbilityHandler.onKey(jean, 5, true);
+        f.everyTick(50, tick -> {
+            PowerTicker.tick(jean);
+            if (tick < 22) {
+                return false;
+            }
+            check(PhoenixBurst.active() == 0, "the wave is over");
+            check(behind.getHealth() == 200.0F && !behind.isOnFire(), "a creature behind a wall of stone takes nothing and is not set alight: " + behind.getHealth());
+            check(!told.contains(behind), "and nobody is told the Burst touched it");
+            assertNear(200.0 - clear.getHealth(), expected(30.0, clearDistance, 9.0), 0.3, "one in the open the same distance away takes the Burst");
+            check(clear.isOnFire() && told.contains(clear), "and burns");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = "phoenix_burst_border", timeoutTicks = 100)
+    public static void burstLightsNoFireWhereTheWorldWillNotLetHerBuild(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        smallBursts(f);
+        f.config(PhoenixConfig.BURST_MAX_FIRE_BLOCKS, 400);
+        ServerLevel level = helper.getLevel();
+        for (int x = 0; x < 21; x++) {
+            for (int z = 0; z < 21; z++) {
+                helper.setBlock(new BlockPos(x, 1, z), Blocks.OAK_PLANKS);
+            }
+        }
+        ServerPlayer jean = jean(f, 10.5, 10.5);
+        // The world border stands 5 blocks from her on every side (a place nobody may build is a place nobody may burn).
+        WorldBorder border = level.getWorldBorder();
+        double centreX = border.getCenterX();
+        double centreZ = border.getCenterZ();
+        double size = border.getSize();
+        f.onClose(() -> {
+            border.setCenter(centreX, centreZ);
+            border.setSize(size);
+        });
+        Vec3 middle = helper.absoluteVec(new Vec3(10.5, FLOOR, 10.5));
+        border.setCenter(middle.x, middle.z);
+        border.setSize(10.0);
+        AbilityHandler.onKey(jean, 5, true);
+        f.everyTick(70, tick -> {
+            PowerTicker.tick(jean);
+            if (tick < 24) {
+                return false;
+            }
+            int inside = 0;
+            int outside = 0;
+            for (int x = 0; x < 21; x++) {
+                for (int z = 0; z < 21; z++) {
+                    BlockPos pos = helper.absolutePos(new BlockPos(x, 2, z));
+                    if (level.getBlockState(pos).is(Blocks.FIRE)) {
+                        if (border.isWithinBounds(pos)) {
+                            inside++;
+                        } else {
+                            outside++;
+                        }
+                    }
+                }
+            }
+            check(inside > 0, "(control: the wave does light fires where the world lets her build)");
+            check(outside == 0, "but none outside the world border: " + outside);
             return true;
         });
     }

@@ -84,6 +84,7 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -591,6 +592,15 @@ public final class PhoenixTests {
         MindReading.look(jean, 5200);
         check(actionBarKeys(other).contains("message.enhanced.mind_read.felt"), "and again when they are over");
 
+        // A mind that was not read (Magneto's helmet keeps it shut) feels nothing.
+        ServerPlayer magneto = f.player(10.5, FLOOR, 16.5, Power.MAGNETO);
+        magneto.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
+        lookAt(jean, magneto);
+        actionBar(magneto);
+        MindReading.look(jean, 7000);
+        check(!actionBarKeys(magneto).contains("message.enhanced.mind_read.felt"), "a mind that stays shut feels no presence");
+        lookAt(jean, other);
+
         f.config(PhoenixConfig.MIND_READ_NOTIFIES, false);
         MindReading.look(jean, 9000);
         check(!actionBarKeys(other).contains("message.enhanced.mind_read.felt"), "never, if the server says so");
@@ -986,6 +996,11 @@ public final class PhoenixTests {
         press(jean, 4);
         check(host.hasEffect(ModEffects.POSSESSED), "possessed");
         check(host.getTarget() == nearest, "with nothing else to go for, the nearest hostile: " + host.getTarget());
+        // A boss is never sent for, however near it stands.
+        WitherBoss boss = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(7.5, FLOOR, 11.5));
+        PhoenixAbilities.steer(host);
+        check(host.getTarget() == nearest, "never a boss, though it stands nearer: " + host.getTarget());
+        boss.discard();
 
         jean.setLastHurtMob(hit);
         PhoenixAbilities.steer(host);
@@ -1076,6 +1091,8 @@ public final class PhoenixTests {
             check(actionBarKeys(jean).contains("message.enhanced.mind_control.cannot"), "and Jean is told that mind is closed to her");
             check(Powers.get(jean).isReady(4, helper.getLevel().getGameTime()), "a refused cast costs her nothing");
         }
+        // The effect itself is refused by the Warden whoever gives it (a command, a potion), not only by Mind Control.
+        check(!warden.addEffect(new MobEffectInstance(ModEffects.POSSESSED, 100)) && !warden.hasEffect(ModEffects.POSSESSED), "the Warden refuses the possessed effect from anyone");
 
         // A creature Mjolnir holds down.
         ServerPlayer thor = f.player(1.5, FLOOR, 18.5, Power.THOR);
@@ -1193,7 +1210,7 @@ public final class PhoenixTests {
         Zombie behindWall = zombie(helper, 10.5, 15.5);
         helper.setBlock(new BlockPos(10, 2, 13), Blocks.STONE);
         helper.setBlock(new BlockPos(10, 3, 13), Blocks.STONE);
-        Zombie farOut = zombie(helper, 19.5, 19.5);
+        Zombie farOut = zombie(helper, 17.0, 17.0);
         Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(7.5, FLOOR, 10.5));
         pet.tame(jean);
         Zombie host = zombie(helper, 10.5, 6.5);
@@ -1230,7 +1247,7 @@ public final class PhoenixTests {
         sneakPress(jean, 4);
         check(held.hasEffect(ModEffects.SPELLBOUND) && held.getEffect(ModEffects.SPELLBOUND).getDuration() == 40, "a zombie in the sphere is held for the time the server says");
         check(behindWall.hasEffect(ModEffects.SPELLBOUND), "even through a wall (it is a field of the mind)");
-        check(!farOut.hasEffect(ModEffects.SPELLBOUND), "but not one beyond the radius");
+        check(!farOut.hasEffect(ModEffects.SPELLBOUND), "but not one beyond the radius (in a corner of the cube that holds the sphere)");
         check(!pet.hasEffect(ModEffects.SPELLBOUND) && !host.hasEffect(ModEffects.SPELLBOUND) && !mate.hasEffect(ModEffects.SPELLBOUND),
                 "not her pet, her host or her team");
         check(!warden.hasEffect(ModEffects.SPELLBOUND), "not the Warden, whose mind is too vast");
@@ -1328,6 +1345,12 @@ public final class PhoenixTests {
         sneakPress(jean, 4);
         check(!warden.hasEffect(ModEffects.SPELLBOUND), "the Psionic Field does not hold the Warden");
         check(told.equals(List.of("MIND_CONTROL", "PSIONIC_FIELD")), "and still reports itself once: " + told);
+
+        lookAt(jean, warden);
+        MindReading.look(jean, 5000);
+        check(told.equals(List.of("MIND_CONTROL", "PSIONIC_FIELD", "MIND_READ")), "a glance at it is reported too, though the mind is too vast to read: " + told);
+        MindReading.look(jean, 5010);
+        check(told.size() == 3, "and only the first time she turns to it: " + told);
         helper.succeed();
     }
 
