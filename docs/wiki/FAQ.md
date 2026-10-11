@@ -59,6 +59,10 @@ Ability keys work only for a hero, with no screen open. If you are a hero, check
 
 Press **H**. **Sneak + H** goes back. Only Vision, Tommy, Billy, Loki and Thor have several looks. See [Looks](Looks).
 
+### Why can't I see my armour?
+
+Heroes are drawn without their armour, so it doesn't hide the characters. It still protects you as usual, and a player with no power is drawn with theirs. The elytra, a carved pumpkin or mob head and Magneto's Helmet, Wanda's Crown and Quicksilver's Goggles are always drawn. To see armour on heroes again, turn off *Hide heroes' armour* under *Mods, Enhanced, Config, Hero appearance*. See [Server Configuration](Server-Configuration#client-options-animations-effects-and-looks).
+
 ### Why can't Thor fly?
 
 Thor flies by spinning his weapon, so only with Mjolnir or Stormbreaker in hand. See [Thor](Thor).

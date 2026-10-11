@@ -242,6 +242,14 @@ public final class CommonEvents {
                 event.setCanceled(true);
                 return;
             }
+            if (WandaAbilities.isMeleeHit(source) && source.getDirectEntity() instanceof LivingEntity attacker && attacker != player) {
+                // Close in is no way round it: a creature's or a player's blow is stopped like an arrow, and the
+                // attacker is thrown back out of the dome. (With PvP off a player's blow never gets here: it costs
+                // nothing.)
+                WandaAbilities.blockMelee(wanda, attacker, event.getAmount());
+                event.setCanceled(true);
+                return;
+            }
             if (source.is(DamageTypeTags.IS_EXPLOSION)) {
                 float absorbable = event.getAmount() * (1.0F - EnhancedConfig.CHAOS_SHIELD_EXPLOSION_FACTOR.get().floatValue());
                 event.setAmount(event.getAmount() - WandaAbilities.wear(wanda, absorbable));
@@ -286,8 +294,11 @@ public final class CommonEvents {
         }
     }
 
-    /** Every blow the God of Thunder lands with his own hands (or his weapon in them) arcs lightning. */
-    @SubscribeEvent
+    /**
+     * Every blow the God of Thunder lands with his own hands (or his weapon in them) arcs lightning. (Last: a blow that
+     * a Chaos Shield, or any other defence, has stopped lands nothing.)
+     */
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onThorMelee(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         if (source.is(DamageTypes.PLAYER_ATTACK) && source.getDirectEntity() instanceof ServerPlayer thor && source.getEntity() == thor

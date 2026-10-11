@@ -22,6 +22,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -203,6 +204,31 @@ public final class TestKit {
     public static void clearSpawnInvulnerability(ServerPlayer player) {
         try {
             SPAWN_INVULNERABLE_TIME.setInt(player, 0);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static final Field ATTACK_STRENGTH_TICKER;
+
+    static {
+        try {
+            ATTACK_STRENGTH_TICKER = LivingEntity.class.getDeclaredField("attackStrengthTicker");
+            ATTACK_STRENGTH_TICKER.setAccessible(true);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Makes the player's next swing a full-strength one: what is in their hand counts (the player ticks once, as a
+     * connected client's would) and the swing has had all the time it needs to recover (a new player's has hardly
+     * begun).
+     */
+    public static void chargeAttack(ServerPlayer player) {
+        player.doTick();
+        try {
+            ATTACK_STRENGTH_TICKER.setInt(player, 1000);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }

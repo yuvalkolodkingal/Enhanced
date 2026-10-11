@@ -24,6 +24,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -353,6 +355,61 @@ public final class WandaAbilities {
                 10, 0.15, 0.15, 0.15, 0.08);
         level.playSound(null, projectile.getX(), projectile.getY(), projectile.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F, 0.8F);
         turnHome.run();
+    }
+
+    // ---- the shield against blows ----
+
+    /**
+     * How hard a blow that reaches the shield throws its attacker back (a sword's knockback is 0.4). A creature on the
+     * ground is lifted a little as well and flies about 3.5 blocks, which takes it out of the 1.9-block sphere from
+     * anywhere in it.
+     */
+    private static final double MELEE_KNOCKBACK = 0.6;
+
+    /**
+     * Whether {@code source} is a creature's or a player's own blow, struck with a hand, claw, paw, fang or weapon:
+     * what a zombie, a spider, a Ravager or a Warden does when it swipes at someone, a sword, an axe or a fist, a
+     * bee's sting and Quicksilver's blitz. Whatever is thrown, shot or cast (arrows, fireballs, beams, magic and
+     * potions, a Guardian's laser, a Warden's sonic boom), whatever explodes, and the world's own harm (falling,
+     * starving, fire, the void, {@code /kill}) are not melee.
+     */
+    public static boolean isMeleeHit(DamageSource source) {
+        Entity attacker = source.getDirectEntity();
+        return attacker instanceof LivingEntity && attacker == source.getEntity()
+                && (source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO)
+                || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.STING)
+                || source.is(ModDamageTypes.SPEED_BLITZ));
+    }
+
+    /**
+     * A creature's or player's blow lands on a complete shield: the sphere is as solid to a swung sword or a swiping
+     * claw as it is to an arrow. The blow never touches Wanda (the caller cancels it) and costs the shield what it
+     * would have done to her (the blow that breaks the shield is stopped too), and red sparks fly where it struck as
+     * the attacker is thrown back out of the dome with a ring of sound.
+     *
+     * @param amount what the blow would have done to Wanda (before her armour)
+     */
+    public static void blockMelee(ServerPlayer player, LivingEntity attacker, float amount) {
+        ServerLevel level = player.serverLevel();
+        Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
+        Vec3 away = attacker.position().add(0, attacker.getBbHeight() * 0.5, 0).subtract(center);
+        double distance = away.length();
+        // The blow struck the sphere (or the attacker, if it is inside it): sparks and a ring of sound there.
+        Vec3 contact = distance < 1.0E-3 ? center : center.add(away.scale(Math.min(distance, SHIELD_RADIUS) / distance));
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.4F), contact.x, contact.y, contact.z, 8, 0.15, 0.15, 0.15, 0.1);
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.2F), contact.x, contact.y, contact.z, 10, 0.2, 0.2, 0.2, 0.15);
+        level.playSound(null, contact.x, contact.y, contact.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F, 1.9F);
+        level.playSound(null, contact.x, contact.y, contact.z, SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.8F, 1.5F);
+
+        // Thrown straight out from her (a creature that can't be knocked back, like the Warden, stays; so does whoever
+        // Mjolnir pins). One that stands right on top of her goes the way she faces.
+        double flat = Math.hypot(away.x, away.z);
+        Vec3 out = flat < 1.0E-3 ? Vec3.directionFromRotation(0, player.getYRot()) : new Vec3(away.x / flat, 0, away.z / flat);
+        // knockback() throws away from the point it is given: from the attacker towards her.
+        attacker.knockback(MELEE_KNOCKBACK, -out.x, -out.z);
+        attacker.hurtMarked = true;
+
+        wear(player, amount);
     }
 
     // ---- the shield against beams ----
