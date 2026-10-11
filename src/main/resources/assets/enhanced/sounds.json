@@ -272,6 +272,62 @@
       }
     ]
   },
+  "phoenix_charge": {
+    "subtitle": "subtitles.enhanced.phoenix_charge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/phoenix_charge"
+      }
+    ]
+  },
+  "phoenix_burst": {
+    "subtitle": "subtitles.enhanced.phoenix_burst",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/phoenix_burst"
+      }
+    ]
+  },
+  "phoenix_blaze": {
+    "subtitle": "subtitles.enhanced.phoenix_blaze",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/phoenix_blaze_loop"
+      }
+    ]
+  },
+  "mind_read": {
+    "subtitle": "subtitles.enhanced.mind_read",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_read"
+      }
+    ]
+  },
+  "mind_sense": {
+    "subtitle": "subtitles.enhanced.mind_sense",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_sense"
+      }
+    ]
+  },
+  "mind_control": {
+    "subtitle": "subtitles.enhanced.mind_control",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_control"
+      }
+    ]
+  },
+  "psionic_field": {
+    "subtitle": "subtitles.enhanced.psionic_field",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/psionic_field"
+      }
+    ]
+  },
   "space_stone": {
     "subtitle": "subtitles.enhanced.space_stone",
     "sounds": [

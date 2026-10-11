@@ -20,6 +20,12 @@
     "enhanced:tesseract_from_ancient_city",
     "enhanced:tesseract_from_stronghold_library",
     "enhanced:tesseract_from_woodland_mansion",
+    "enhanced:ember_from_end_city_treasure",
+    "enhanced:ember_from_bastion_treasure",
+    "enhanced:ember_from_ancient_city",
+    "enhanced:ember_from_stronghold_library",
+    "enhanced:ember_from_nether_bridge",
+    "enhanced:ember_from_woodland_mansion",
     "enhanced:gene_from_witch",
     "enhanced:gene_from_evoker"
   ]

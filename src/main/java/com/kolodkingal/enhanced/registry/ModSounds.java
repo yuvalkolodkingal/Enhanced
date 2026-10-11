@@ -81,6 +81,20 @@ public final class ModSounds {
     // <stone>_stone_hum) | ultron_ sentry_ | apocalypse_ sand_ entomb essence_.
 
     // ===== phoenix =====
+    /** The Burst gathers (3 s); the Ember's ritual plays it too. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHOENIX_CHARGE = register("phoenix_charge");
+    /** The Burst goes off. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHOENIX_BURST = register("phoenix_burst");
+    /** The flames round her while she charges (a loop that follows her). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHOENIX_BLAZE = register("phoenix_blaze");
+    /** Mind Reading switched on, or a new mind found. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> MIND_READ = register("mind_read");
+    /** The Mind Sense ping. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> MIND_SENSE = register("mind_sense");
+    /** A creature is taken over. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> MIND_CONTROL = register("mind_control");
+    /** The Psionic Field closes. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSIONIC_FIELD = register("psionic_field");
 
     // ===== spider =====
 
