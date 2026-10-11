@@ -34,9 +34,13 @@ import net.minecraft.world.entity.player.Player;
  */
 public final class HeroPoses {
     private static final float RAD = Mth.DEG_TO_RAD;
-    /** The planting angle of each weapon's arm in a hero landing (degrees of world elevation). */
-    private static final float PLANT_MJOLNIR = 31.0F;
-    private static final float PLANT_STORMBREAKER = 36.0F;
+    /**
+     * The planting angle of each weapon's arm in a hero landing (degrees of world elevation): with the lead grip the
+     * lowest point of the weapon, in the hero's landing stance, touches the ground at this angle (the bigger the
+     * weapon, the higher the arm: see {@link GripMath.Kind#scale}).
+     */
+    public static final float PLANT_MJOLNIR = 46.7F;
+    public static final float PLANT_STORMBREAKER = 53.3F;
     private static final float PLANT_BARE = 25.0F;
 
     private static final PoseContext CTX = new PoseContext();

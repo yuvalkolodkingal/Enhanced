@@ -64,7 +64,7 @@ public final class ThorGrip {
         ps.pushPose();
         ps.translate(p.position.x / 16.0F, p.position.y / 16.0F, p.position.z / 16.0F);
         ps.mulPose(p.rotation);
-        ps.scale(GripMath.SCALE, GripMath.SCALE, GripMath.SCALE);
+        ps.scale(p.scale, p.scale, p.scale);
         ps.translate(-(p.held.x - 8.0F) / 16.0F, -(p.held.y - 8.0F) / 16.0F, -(p.held.z - 8.0F) / 16.0F);
         renderer.renderItem(entity, stack, ItemDisplayContext.NONE, left, ps, buffer, light);
         // Only the weapon the arm of the poses holds is the muzzle of the beam, not the one in his other hand.

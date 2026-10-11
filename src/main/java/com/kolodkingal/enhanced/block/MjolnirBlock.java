@@ -43,8 +43,9 @@ import org.jetbrains.annotations.Nullable;
 public class MjolnirBlock extends BaseEntityBlock {
     public static final MapCodec<MjolnirBlock> CODEC = simpleCodec(MjolnirBlock::new);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    private static final VoxelShape SHAPE_X = Shapes.or(Block.box(3, 0, 5, 13, 6, 11), Block.box(7, 6, 7, 9, 15, 9));
-    private static final VoxelShape SHAPE_Z = Shapes.or(Block.box(5, 0, 3, 11, 6, 13), Block.box(7, 6, 7, 9, 15, 9));
+    /** The head is 12.5 pixels long and the whole hammer almost 19 pixels high: taller than the block it stands in. */
+    private static final VoxelShape SHAPE_X = Shapes.or(Block.box(1.75, 0, 4.5, 14.25, 7.5, 11.5), Block.box(6.75, 7.5, 6.75, 9.25, 18.75, 9.25));
+    private static final VoxelShape SHAPE_Z = Shapes.or(Block.box(4.5, 0, 1.75, 11.5, 7.5, 14.25), Block.box(6.75, 7.5, 6.75, 9.25, 18.75, 9.25));
 
     public MjolnirBlock(Properties properties) {
         super(properties);

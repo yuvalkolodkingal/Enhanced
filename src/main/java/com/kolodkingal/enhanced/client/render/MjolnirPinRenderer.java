@@ -23,6 +23,15 @@ import net.minecraft.world.phys.Vec3;
  * person, where it would be in your face.
  */
 public class MjolnirPinRenderer extends EntityRenderer<MjolnirPinEntity> {
+    /**
+     * The hammer is drawn this big for each block of the target's width, or of its height, whichever asks for more...
+     */
+    private static final float PER_WIDTH = 1.75F;
+    private static final float PER_HEIGHT = 0.58F;
+    /** ...and never smaller than this (a mouse) nor bigger than that (a giant). */
+    private static final float MIN_SCALE = 0.8F;
+    private static final float MAX_SCALE = 2.2F;
+
     private final ItemRenderer itemRenderer;
 
     public MjolnirPinRenderer(EntityRendererProvider.Context context) {
@@ -48,7 +57,7 @@ public class MjolnirPinRenderer extends EntityRenderer<MjolnirPinEntity> {
             if (target instanceof LivingEntity living) {
                 facing = Mth.rotLerp(partialTick, living.yBodyRotO, living.yBodyRot);
             }
-            scale = Mth.clamp(Math.max(target.getBbWidth() * 1.4F, target.getBbHeight() * 0.45F), 0.6F, 1.8F);
+            scale = Mth.clamp(Math.max(target.getBbWidth() * PER_WIDTH, target.getBbHeight() * PER_HEIGHT), MIN_SCALE, MAX_SCALE);
         }
         float settle = Mth.sin((entity.tickCount + partialTick) * 0.12F) * 0.01F;
         poseStack.translate(0.0F, settle, 0.0F);

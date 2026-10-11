@@ -1,5 +1,9 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.AimMath;
 import com.kolodkingal.enhanced.client.render.AnimMath;
@@ -8,18 +12,27 @@ import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.Gestures;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
 import com.kolodkingal.enhanced.client.render.GripMath;
+import com.kolodkingal.enhanced.client.render.HeroPoses;
 import com.kolodkingal.enhanced.client.render.StancePoses;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.util.Mth;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -166,21 +179,121 @@ public final class AnimationMathTests {
         helper.succeed();
     }
 
+    // ---- Thor's weapons: the item models, the fist, the head and the body ----
+
+    /** The item models of the two weapons, in the order of {@link GripMath.Kind}. */
+    private static final String[] WEAPON_MODELS = {"mjolnir", "stormbreaker"};
+    /**
+     * The head and the torso of the player model (pixels; x left, y down, z back): what a whirling weapon must not
+     * touch.
+     */
+    private static final float[][] HEAD_BOX = {{-4, -8, -4}, {4, 0, 4}};
+    private static final float[][] TORSO_BOX = {{-4, 0, -2}, {4, 12, 2}};
+
+    /** An item model of the mod, as shipped (the same JSON the game draws the weapon from). */
+    private static JsonObject itemModel(String name) throws IOException {
+        Path file = ModList.get().getModFileById(Enhanced.MODID).getFile().findResource("assets", Enhanced.MODID, "models", "item", name + ".json");
+        return JsonParser.parseString(Files.readString(file)).getAsJsonObject();
+    }
+
+    private static float[] floats(JsonObject object, String key) {
+        JsonArray array = object.getAsJsonArray(key);
+        float[] out = new float[array.size()];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = array.get(i).getAsFloat();
+        }
+        return out;
+    }
+
+    /**
+     * The boxes (from, to; item pixels) of the elements of a model whose name starts with one of the prefixes (all, if
+     * none).
+     */
+    private static List<float[][]> boxes(JsonObject model, String... prefixes) {
+        List<float[][]> out = new ArrayList<>();
+        for (JsonElement e : model.getAsJsonArray("elements")) {
+            JsonObject element = e.getAsJsonObject();
+            String name = element.has("name") ? element.get("name").getAsString() : "";
+            boolean wanted = prefixes.length == 0;
+            for (String prefix : prefixes) {
+                wanted |= name.startsWith(prefix);
+            }
+            if (wanted) {
+                out.add(new float[][]{floats(element, "from"), floats(element, "to")});
+            }
+        }
+        check(!out.isEmpty(), "the model has the element(s) " + Arrays.toString(prefixes));
+        return out;
+    }
+
+    /** The handle of a weapon's model (its "grip" or "handle" element): from, to. */
+    private static float[][] handle(int kind, JsonObject model) {
+        return boxes(model, kind == 0 ? "grip" : "handle").get(0);
+    }
+
+    /**
+     * Points all over the weapon (item pixels): a grid at most 2 px apart through every element, so nothing thin slips
+     * between.
+     */
+    private static List<Vector3f> weaponPoints(JsonObject model) {
+        List<Vector3f> points = new ArrayList<>();
+        for (float[][] box : boxes(model)) {
+            int[] n = new int[3];
+            for (int a = 0; a < 3; a++) {
+                n[a] = Math.max(2, (int) Math.ceil((box[1][a] - box[0][a]) / 2.0F) + 1);
+            }
+            for (int i = 0; i < n[0]; i++) {
+                for (int j = 0; j < n[1]; j++) {
+                    for (int k = 0; k < n[2]; k++) {
+                        points.add(new Vector3f(Mth.lerp(i / (n[0] - 1.0F), box[0][0], box[1][0]), Mth.lerp(j / (n[1] - 1.0F), box[0][1], box[1][1]),
+                                Mth.lerp(k / (n[2] - 1.0F), box[0][2], box[1][2])));
+                    }
+                }
+            }
+        }
+        return points;
+    }
+
+    private static boolean inside(Vector3f p, float[][] box, float margin) {
+        return p.x > box[0][0] - margin && p.x < box[1][0] + margin && p.y > box[0][1] - margin && p.y < box[1][1] + margin
+                && p.z > box[0][2] - margin && p.z < box[1][2] + margin;
+    }
+
+    /**
+     * A point of the hand frame H (pixels) in the player model (pixels; x left, y down, z back), for the arm of a hand,
+     * raised to {@code xRotDeg} (the model's own arm rotation: -90 is level forward, -180 straight up).
+     */
+    private static Vector3f handToModel(Vector3f h, boolean left, float xRotDeg) {
+        float xl = left ? 1.0F - h.x : -1.0F - h.x;
+        float yl = 10.0F - h.z;
+        float zl = -2.0F - h.y;
+        float c = Mth.cos(xRotDeg * RAD);
+        float s = Mth.sin(xRotDeg * RAD);
+        return new Vector3f((left ? 5.0F : -5.0F) + xl, 2.0F + yl * c - zl * s, yl * s + zl * c);
+    }
+
     /** Thor's weapon at rest sits in the fist exactly as the models' own third-person transforms put it. */
     @GameTest(template = ARENA)
-    public static void thorsGripMatchesTheItemModels(GameTestHelper helper) {
-        // The third-person display transforms of mjolnir.json and stormbreaker.json (translation in pixels).
-        float[][] json = {{0.0F, 0.62F, 3.012F}, {0.0F, 1.572F, 3.562F}};
+    public static void thorsGripMatchesTheItemModels(GameTestHelper helper) throws IOException {
         Vector3f[] points = {new Vector3f(8, 2.5F, 8), new Vector3f(8, 13, 8), new Vector3f(3, 12, 6), new Vector3f(13, 15, 10),
-                new Vector3f(8, -4, 8), new Vector3f(1, 7, 3)};
+                new Vector3f(8, -4, 8), new Vector3f(1, 7, 3), new Vector3f(15, 18, 8), new Vector3f(8, -6, 8)};
         GripMath.Kind[] kinds = GripMath.Kind.values();
         for (int k = 0; k < kinds.length; k++) {
+            JsonObject display = itemModel(WEAPON_MODELS[k]).getAsJsonObject("display");
             for (boolean left : new boolean[]{false, true}) {
-                // ItemTransform.apply: translate, rotationXYZ with the left hand's y and z negated, scale; then the model
-                // is moved by (-0.5, -0.5, -0.5).
-                float ry = left ? -180.0F : 0.0F;
-                Matrix4f vanilla = new Matrix4f().translate(json[k][0] / 16.0F, json[k][1] / 16.0F, json[k][2] / 16.0F)
-                        .rotate(new Quaternionf().rotationXYZ(30.0F * RAD, ry * RAD, 0.0F)).scale(0.55F).translate(-0.5F, -0.5F, -0.5F);
+                // The transform the game applies is the model's own third-person display transform, numbers and all.
+                JsonObject hand = display.getAsJsonObject(left ? "thirdperson_lefthand" : "thirdperson_righthand");
+                float[] rotation = floats(hand, "rotation");
+                float[] translation = floats(hand, "translation");
+                float[] scale = floats(hand, "scale");
+                check(scale[0] == scale[1] && scale[1] == scale[2] && Math.abs(scale[0] - kinds[k].scale) < 1.0E-6F,
+                        kinds[k] + ": the model draws it at the size the grip maths uses (" + kinds[k].scale + "), not " + Arrays.toString(scale));
+                // ItemTransform.apply: translate, rotationXYZ, scale (the left hand's x, y and z are negated); then the
+                // model is moved by (-0.5, -0.5, -0.5).
+                float m = left ? -1.0F : 1.0F;
+                Matrix4f vanilla = new Matrix4f().translate(m * translation[0] / 16.0F, translation[1] / 16.0F, translation[2] / 16.0F)
+                        .rotate(new Quaternionf().rotationXYZ(rotation[0] * RAD, m * rotation[1] * RAD, m * rotation[2] * RAD))
+                        .scale(scale[0], scale[1], scale[2]).translate(-0.5F, -0.5F, -0.5F);
                 GripMath.Placement placement = GripMath.placement(kinds[k], left, false, GripMath.BETA_REST, 0.0F, 0.0F);
                 Matrix4f mine = placement.matrix();
                 for (Vector3f point : points) {
@@ -193,7 +306,7 @@ public final class AnimationMathTests {
                 check(held.distance(GripMath.FIST) < 0.005F, kinds[k] + ": the held point lands in the middle of the fist, " + held);
             }
         }
-        // Whirling: the handle's end stays on the arm's axis, and the head sweeps a full circle about it.
+        // Whirling: the held point stays on the arm's axis, and the head sweeps a full circle about it, a good way out.
         for (GripMath.Kind kind : kinds) {
             float far = 0.0F;
             for (int spin = 0; spin < 360; spin += 30) {
@@ -203,9 +316,171 @@ public final class AnimationMathTests {
                 Vector3f held = whirl.toHand(whirl.held);
                 check(held.distance(whirl.position) < 0.01F, "the whirl turns the weapon about its held point");
             }
-            check(far > 4.0F, kind + "'s head is a good way out from the pivot while it whirls: " + far);
+            check(far > 7.0F * kind.scale, kind + "'s head is a good way out from the pivot while it whirls: " + far);
         }
         helper.succeed();
+    }
+
+    /**
+     * The handle really passes through Thor's fist, at rest, in the lead and in between, with either hand (and either
+     * arm width), and while the weapon whirls the fist stays on the line of the handle (Mjolnir hangs from it on its
+     * strap).
+     */
+    @GameTest(template = ARENA)
+    public static void theHandlePassesThroughThorsFistInEveryGrip(GameTestHelper helper) throws IOException {
+        GripMath.Kind[] kinds = GripMath.Kind.values();
+        for (int k = 0; k < kinds.length; k++) {
+            float[][] handle = handle(k, itemModel(WEAPON_MODELS[k]));
+            Vector3f low = new Vector3f(8, handle[0][1], 8);
+            Vector3f high = new Vector3f(8, handle[1][1], 8);
+            for (boolean left : new boolean[]{false, true}) {
+                for (boolean slim : new boolean[]{false, true}) {
+                    for (float beta : new float[]{GripMath.BETA_REST, 0.0F, -40.0F, GripMath.BETA_LEAD}) {
+                        GripMath.Placement p = GripMath.placement(kinds[k], left, slim, beta, 0.0F, 0.0F);
+                        Vector3f fist = new Vector3f(slim ? (left ? 0.5F : -0.5F) : 0.0F, GripMath.FIST.y, GripMath.FIST.z);
+                        check(distanceToSegment(fist, p.toHand(low), p.toHand(high)) < 0.01F, kinds[k] + (left ? " left" : " right") + (slim ? " slim" : "")
+                                + ": at an angle of " + beta + " the handle passes through the fist");
+                    }
+                    for (int spin = 0; spin < 360; spin += 45) {
+                        GripMath.Placement p = GripMath.placement(kinds[k], left, slim, GripMath.BETA_LEAD, 1.0F, spin);
+                        // The line of the item's axis (x = z = 8), through the whirl's pivot.
+                        Vector3f a = p.toHand(new Vector3f(8, -20, 8));
+                        Vector3f b = p.toHand(new Vector3f(8, 30, 8));
+                        check(distanceToLine(p.pivot, a, b) < 0.01F, kinds[k] + " whirling: the pivot is on the line of the handle (and its strap)");
+                    }
+                }
+            }
+        }
+        helper.succeed();
+    }
+
+    private static float distanceToSegment(Vector3f p, Vector3f a, Vector3f b) {
+        Vector3f ab = new Vector3f(b).sub(a);
+        float t = Mth.clamp(new Vector3f(p).sub(a).dot(ab) / ab.lengthSquared(), 0.0F, 1.0F);
+        return p.distance(new Vector3f(a).fma(t, ab));
+    }
+
+    private static float distanceToLine(Vector3f p, Vector3f a, Vector3f b) {
+        Vector3f ab = new Vector3f(b).sub(a);
+        return new Vector3f(p).sub(a).cross(ab).length() / ab.length();
+    }
+
+    /**
+     * The points the grip maths calls the head, the grip and the strap really are the head, the grip and the strap of
+     * the models.
+     */
+    @GameTest(template = ARENA)
+    public static void thorsGripMarksTheRealHeadGripAndStrap(GameTestHelper helper) throws IOException {
+        GripMath.Kind[] kinds = GripMath.Kind.values();
+        for (int k = 0; k < kinds.length; k++) {
+            JsonObject model = itemModel(WEAPON_MODELS[k]);
+            GripMath.Kind kind = kinds[k];
+            // The head (where the lightning beam leaves, where the shatter's fragments burst out): inside the head of
+            // the weapon, about in the middle of it (the hammer of Mjolnir, the blade of the axe).
+            float[] lo = {Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE};
+            float[] hi = {-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE};
+            for (float[][] box : boxes(model, k == 0 ? "head" : "blade")) {
+                for (int a = 0; a < 3; a++) {
+                    lo[a] = Math.min(lo[a], box[0][a]);
+                    hi[a] = Math.max(hi[a], box[1][a]);
+                }
+            }
+            Vector3f middle = new Vector3f((lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2);
+            check(inside(kind.head, new float[][]{lo, hi}, 0.0F), kind + ": its head point is inside the head of the model");
+            check(kind.head.distance(middle) < 1.0F, kind + ": and about in the middle of it, " + kind.head + " for " + middle);
+            // The held point is on the handle, the strap's end on the strap's end.
+            float[][] handle = handle(k, model);
+            check(kind.grip.x == 8.0F && kind.grip.z == 8.0F && kind.grip.y > handle[0][1] + 0.5F && kind.grip.y < handle[1][1] - 0.5F,
+                    kind + ": the held point is on the handle: " + kind.grip + " for " + Arrays.deepToString(handle));
+            if (k == 0) {
+                check(Math.abs(kind.strap.y - boxes(model, "strap").get(0)[0][1]) < 1.0E-4F, "Mjolnir whirls on the end of its strap");
+            } else {
+                check(kind.strap.equals(kind.grip) && kind.gap == 0.0F, "Stormbreaker whirls on its handle");
+            }
+        }
+        // The head of Mjolnir is about as long as Thor's head is wide (8 px of the player model, drawn at 0.9375); the
+        // axe is the bigger of the two.
+        float[][] head = boxes(itemModel("mjolnir"), "head").get(0);
+        check((head[1][0] - head[0][0]) * GripMath.Kind.MJOLNIR.scale * 0.9375F >= 7.5F, "Mjolnir's head is about as long as Thor's head is wide");
+        check(GripMath.Kind.STORMBREAKER.scale > GripMath.Kind.MJOLNIR.scale, "Stormbreaker is the bigger of the two");
+        helper.succeed();
+    }
+
+    /**
+     * The whirl on the strap clears Thor's head and body: for every elevation of the weapon arm from -45 to -195
+     * degrees (the arm pointing level forward is -90, straight up -180), every angle of the spin, either hand, both
+     * weapons, every point of the real models stays out of the head and the torso, by a quarter of a pixel at least.
+     * (So does the weapon thrust ahead in the lead grip, at any elevation. The few ticks of the hand-over between the
+     * two, when the whirl has taken hold of only a part of the weapon, are not covered.)
+     */
+    @GameTest(template = ARENA, timeoutTicks = 400)
+    public static void theWhirlClearsThorsHeadAndBody(GameTestHelper helper) throws IOException {
+        GripMath.Kind[] kinds = GripMath.Kind.values();
+        for (int k = 0; k < kinds.length; k++) {
+            List<Vector3f> points = weaponPoints(itemModel(WEAPON_MODELS[k]));
+            for (boolean left : new boolean[]{false, true}) {
+                for (int elevation = 45; elevation <= 195; elevation += 5) {
+                    for (int spin = 0; spin < 360; spin += 10) {
+                        GripMath.Placement p = GripMath.placement(kinds[k], left, false, GripMath.BETA_LEAD, 1.0F, spin);
+                        for (Vector3f point : points) {
+                            Vector3f model = handToModel(p.toHand(point), left, -elevation);
+                            check(!inside(model, HEAD_BOX, 0.25F) && !inside(model, TORSO_BOX, 0.25F), kinds[k] + (left ? " left" : " right")
+                                    + " whirling, the arm at " + elevation + " degrees and the spin at " + spin + ": the item point " + point
+                                    + " is at " + model + ", in him");
+                        }
+                    }
+                }
+                GripMath.Placement lead = GripMath.placement(kinds[k], left, false, GripMath.BETA_LEAD, 0.0F, 0.0F);
+                for (int elevation = 0; elevation <= 195; elevation += 5) {
+                    for (Vector3f point : points) {
+                        Vector3f model = handToModel(lead.toHand(point), left, -elevation);
+                        check(!inside(model, HEAD_BOX, 0.25F) && !inside(model, TORSO_BOX, 0.25F), kinds[k] + " in the lead with the arm at "
+                                + elevation + " degrees: the item point " + point + " is inside him, at " + model);
+                    }
+                }
+            }
+        }
+        helper.succeed();
+    }
+
+    /**
+     * In a hero landing (the body leaned 40 degrees about a pivot 0.4 blocks up, sunk by 0.28 so the front foot is on
+     * the ground) the weapon arm is held at the planting angle of its weapon with the lead grip: the lowest point of
+     * the weapon, whichever the size of it, touches the ground (within a centimetre or two), well ahead of the body.
+     */
+    @GameTest(template = ARENA)
+    public static void aHeroLandingPlantsTheHeadOfEachWeaponOnTheGround(GameTestHelper helper) throws IOException {
+        float[] plant = {HeroPoses.PLANT_MJOLNIR, HeroPoses.PLANT_STORMBREAKER};
+        GripMath.Kind[] kinds = GripMath.Kind.values();
+        for (int k = 0; k < kinds.length; k++) {
+            List<Vector3f> points = weaponPoints(itemModel(WEAPON_MODELS[k]));
+            GripMath.Placement p = GripMath.placement(kinds[k], false, false, GripMath.BETA_LEAD, 0.0F, 0.0F);
+            double lowest = Double.MAX_VALUE;
+            double ahead = 0.0;
+            for (Vector3f point : points) {
+                Vector3f model = handToModel(p.toHand(point), false, -(plant[k] + 40.0F));
+                double y = worldHeight(model, 40.0F, 0.4F, 0.28F);
+                if (y < lowest) {
+                    lowest = y;
+                    // How far in front of the body this lowest point is (blocks; the model's -z is forward).
+                    ahead = -model.z * 0.9375 / 16.0;
+                }
+            }
+            check(Math.abs(lowest) < 0.015, kinds[k] + ": the lowest point of the weapon is " + lowest + " blocks above the ground in the landing");
+            check(ahead > 0.4, kinds[k] + ": and it is well ahead of the body: " + ahead);
+        }
+        helper.succeed();
+    }
+
+    /**
+     * Height (blocks above the feet) of a point of the player model, drawn leaned forward about a pivot and sunk by
+     * {@code drop}.
+     */
+    private static double worldHeight(Vector3f model, float pitchDeg, float pivot, float drop) {
+        double up = (1.501 - model.y / 16.0) * 0.9375 - pivot;
+        double back = model.z * 0.9375 / 16.0;
+        double pitch = pitchDeg * RAD;
+        return up * Math.cos(pitch) + back * Math.sin(pitch) + pivot - drop;
     }
 
     /** The flight profile: the reference speeds, and a pitch curve that only ever leans further as he speeds up. */

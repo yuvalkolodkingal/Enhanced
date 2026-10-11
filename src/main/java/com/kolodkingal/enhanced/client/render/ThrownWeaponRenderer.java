@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -19,6 +20,13 @@ import net.minecraft.world.phys.Vec3;
  * trailing, the way it always returns to Thor's hand.
  */
 public class ThrownWeaponRenderer extends EntityRenderer<ThrownWeaponEntity> {
+    /**
+     * How big each weapon is drawn in flight (blocks per pixel of the item model, over 16): a little bigger than in the
+     * hand (see {@link GripMath.Kind#scale}), so it reads from far away, and Stormbreaker bigger than Mjolnir.
+     */
+    private static final float MJOLNIR_SCALE = 1.25F;
+    private static final float STORMBREAKER_SCALE = 1.3F;
+
     private final ItemRenderer itemRenderer;
 
     public ThrownWeaponRenderer(EntityRendererProvider.Context context) {
@@ -46,7 +54,8 @@ public class ThrownWeaponRenderer extends EntityRenderer<ThrownWeaponEntity> {
             float spin = (entity.tickCount + partialTick) * 40.0F;
             poseStack.mulPose(Axis.XP.rotationDegrees(spin));
         }
-        poseStack.scale(1.1F, 1.1F, 1.1F);
+        float scale = ThorAbilities.isStormbreaker(entity.weapon()) ? STORMBREAKER_SCALE : MJOLNIR_SCALE;
+        poseStack.scale(scale, scale, scale);
         itemRenderer.renderStatic(entity.weapon(), ItemDisplayContext.NONE, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer,
                 entity.level(), entity.getId());
         poseStack.popPose();
