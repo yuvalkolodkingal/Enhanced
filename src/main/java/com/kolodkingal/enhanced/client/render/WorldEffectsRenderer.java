@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
+import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
@@ -359,8 +360,11 @@ public final class WorldEffectsRenderer {
         Vec3 start = handPosition(mc, player, partialTick).subtract(camera);
         Vec3 end = held.getPosition(partialTick).add(0, held.getBbHeight() * 0.5, 0).subtract(camera);
         long seed = ((long) time / 3) * 6364136223846793005L + player.getId();
-        EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.35F, EnergyGeometry.argb(power.color, 0.7F), seed);
-        EnergyGeometry.bolt(pose, vc, start, end, 0.025F, 0.5F, EnergyGeometry.argb(power.glow, 0.4F), seed + 31);
+        // The Phoenix's telekinesis is of the mind: violet, where the others' take their hero's colour.
+        int main = power == Power.PHOENIX ? PhoenixAbilities.PSY_MAIN : power.color;
+        int glow = power == Power.PHOENIX ? PhoenixAbilities.PSY_CORE : power.glow;
+        EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.35F, EnergyGeometry.argb(main, 0.7F), seed);
+        EnergyGeometry.bolt(pose, vc, start, end, 0.025F, 0.5F, EnergyGeometry.argb(glow, 0.4F), seed + 31);
     }
 
     /** Vision's Mind Stone, in the middle of his forehead (just above the screen centre in first person). */

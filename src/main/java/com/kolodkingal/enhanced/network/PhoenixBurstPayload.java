@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.render.PhoenixFx;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -38,7 +39,8 @@ public record PhoenixBurstPayload(int caster, Vec3 centre, float yaw, float char
         return TYPE;
     }
 
-    /** The Phoenix lane draws the Burst here. */
+    /** The Burst is drawn: the firebird, the shell of fire, the scorch. */
     static void handle(PhoenixBurstPayload payload, IPayloadContext context) {
+        PhoenixFx.add(payload);
     }
 }

@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
+import com.kolodkingal.enhanced.EnhancedConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
@@ -153,6 +154,28 @@ public final class PhoenixConfig {
         EMBER_RITUAL_TICKS = builder.comment("How long the Phoenix Ember must be held to awaken, in ticks.")
                 .defineInRange("emberRitualTicks", 60, 20, 400);
         builder.pop();
+    }
+
+    // ---- As the client reads them (the server's values are synced to it; these defaults hold until they arrive) ----
+
+    /** The ticks of a full charge of the Burst. */
+    public static int chargeTicks() {
+        return EnhancedConfig.SPEC.isLoaded() ? BURST_CHARGE_TICKS.get() : 60;
+    }
+
+    /** How fast the Burst's wave spreads, in blocks a tick. */
+    public static double waveSpeed() {
+        return EnhancedConfig.SPEC.isLoaded() ? BURST_WAVE_SPEED.get() : 1.0;
+    }
+
+    /** The radius of the Psionic Field, in blocks. */
+    public static int psionicRadius() {
+        return EnhancedConfig.SPEC.isLoaded() ? PSIONIC_RADIUS.get() : 16;
+    }
+
+    /** How far Mind Sense's ping reaches, in blocks. */
+    public static int senseRange() {
+        return EnhancedConfig.SPEC.isLoaded() ? MIND_SENSE_RANGE.get() : 48;
     }
 
     private PhoenixConfig() {

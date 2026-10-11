@@ -48,6 +48,8 @@ public final class PowerLoopSounds {
 
         // The loops of 3.0, in one region per hero (the // ===== lines), each lane's own.
         // ===== phoenix =====
+        /** The flames round the Phoenix while she charges the Burst (and for a moment after it). */
+        PHOENIX_BLAZE(ModSounds.PHOENIX_BLAZE, 0.9F, 1.0F, (p, d) -> d.power() == Power.PHOENIX && d.is(Live.PHOENIX_BLAZE)),
 
         // ===== spider =====
 
