@@ -38,7 +38,8 @@ import java.util.List;
  * Gene in your other hand you awaken as the Scarlet Witch, with a Synthezoid Core you become Vision; with neither,
  * the stone's energy tears you apart. It is also a melee weapon. In the films it takes over the mind of whoever it
  * touches; that is too much, so a hit only confuses: a player gets Nausea and Slowness, a creature the
- * {@link ConfusedEffect confused} effect (the bosses shrug it off).
+ * {@link ConfusedEffect confused} effect (the bosses shrug it off). Whenever the stone is touched or lands a blow it
+ * sings with its own voice (see {@link InfinityStone}), and it hums softly for as long as someone holds the scepter.
  */
 public class LokisScepterItem extends Item {
     public LokisScepterItem(Properties properties) {
@@ -72,6 +73,7 @@ public class LokisScepterItem extends Item {
         if (power == Power.SCARLET_WITCH || power == Power.VISION) {
             player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.recognizes").withStyle(ChatFormatting.GOLD), true);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 1.0F);
+            InfinityStone.MIND.use(level, player.position(), InfinityStone.UNDER, 1.0F);
             return;
         }
 
@@ -82,6 +84,7 @@ public class LokisScepterItem extends Item {
                 player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.already_powered").withStyle(ChatFormatting.GRAY), true);
                 return;
             }
+            InfinityStone.MIND.use(level, player.position(), InfinityStone.UNDER, 1.0F);
             ScarletWitchGeneItem.awaken(player, gene);
             return;
         }
@@ -93,6 +96,7 @@ public class LokisScepterItem extends Item {
                 return;
             }
             core.consume(1, player);
+            InfinityStone.MIND.use(level, player.position(), InfinityStone.UNDER, 1.0F);
             LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
             if (bolt != null) {
                 bolt.moveTo(player.getX(), player.getY(), player.getZ());
@@ -103,7 +107,9 @@ public class LokisScepterItem extends Item {
             return;
         }
 
-        // No gene or synthezoid body: the Mind Stone's energy is too much for an ordinary body.
+        // No gene or synthezoid body: the Mind Stone's energy is too much for an ordinary body. The stone sings lower
+        // and louder than it does for a friend.
+        InfinityStone.MIND.use(level, player.position(), 1.0F, 0.75F);
         level.explode(player, player.getX(), player.getY() + 1.0, player.getZ(), 3.0F, Level.ExplosionInteraction.NONE);
         if (player.isCreative() || player.isSpectator()) {
             player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.creative").withStyle(ChatFormatting.GRAY), true);

@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.effect;
 
+import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -96,7 +97,10 @@ public class ConfusedEffect extends MobEffect {
         }
     }
 
-    /** The moment the Scepter lands: a small burst of the Mind Stone's light round the creature's head, and a chime. */
+    /**
+     * The moment the Scepter lands: a small burst of the Mind Stone's light round the creature's head, and a chime with
+     * the stone's own voice under it.
+     */
     public static void burst(ServerLevel level, LivingEntity entity) {
         double x = entity.getX();
         double y = entity.getEyeY();
@@ -107,5 +111,6 @@ public class ConfusedEffect extends MobEffect {
                     0, Math.cos(angle), 0.2, Math.sin(angle), 0.18);
         }
         level.playSound(null, x, y, z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.9F, 1.4F);
+        InfinityStone.MIND.use(level, x, y, z, 0.5F, 1.2F);
     }
 }
