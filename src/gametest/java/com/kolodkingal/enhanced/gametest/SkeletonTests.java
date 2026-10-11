@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.HeroServers;
+import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossArena;
@@ -36,6 +37,7 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -436,6 +438,45 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
+    /**
+     * The Phoenix's side of Apocalypse's shield (phoenix.md 4.8), written by the skeleton so that the Apocalypse lane
+     * builds against the real thing: mind power is the tag with a Phoenix as the causing entity, and the listeners are
+     * told of every touch.
+     */
+    @GameTest(template = ARENA, batch = SKELETON)
+    public static void phoenixPowerIsTheMindPowerTagWithAPhoenixCauseAndTellsItsListeners(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer phoenix = f.player(5.5, FLOOR, 5.5, Power.PHOENIX);
+        ServerPlayer wanda = f.player(9.5, FLOOR, 5.5, Power.SCARLET_WITCH);
+        ServerPlayer nobody = f.player(13.5, FLOOR, 5.5);
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 9.5));
+
+        check(PhoenixPower.isPhoenix(phoenix) && !PhoenixPower.isPhoenix(wanda) && !PhoenixPower.isPhoenix(zombie), "who is a Phoenix");
+        check(PhoenixPower.isPhoenixMindPower(ModDamageTypes.source(level, ModDamageTypes.PHOENIX_BURST, phoenix, phoenix)),
+                "the Burst of a Phoenix is her mind power");
+        check(PhoenixPower.isPhoenixMindPower(ModDamageTypes.source(level, ModDamageTypes.TELEKINETIC_SLAM, phoenix, zombie)),
+                "so is the slam of what she threw");
+        check(!PhoenixPower.isPhoenixMindPower(ModDamageTypes.source(level, ModDamageTypes.CHAOS_BEAM, wanda, wanda)),
+                "Wanda's beam is mind power, but not the Phoenix's");
+        check(!PhoenixPower.isPhoenixMindPower(ModDamageTypes.source(level, ModDamageTypes.PHOENIX_BURST, nobody, nobody)),
+                "a Burst nobody who is a Phoenix caused is not (a stray source)");
+        check(!PhoenixPower.isPhoenixMindPower(ModDamageTypes.source(level, ModDamageTypes.SHRAPNEL, phoenix, phoenix))
+                && !PhoenixPower.isPhoenixMindPower(level.damageSources().generic()), "nor is anything outside the tag");
+
+        List<String> told = new ArrayList<>();
+        PhoenixPower.Listener listener = (who, target, kind, amount) -> told.add(kind + ":" + amount + ":" + (who == phoenix) + ":" + (target == zombie));
+        PhoenixPower.addListener(listener);
+        f.onClose(() -> PhoenixPower.removeListener(listener));
+        PhoenixPower.touched(phoenix, zombie, PhoenixPower.Kind.MIND_CONTROL, 0.0F);
+        PhoenixPower.touched(phoenix, zombie, PhoenixPower.Kind.BURST, 12.5F);
+        check(told.equals(List.of("MIND_CONTROL:0.0:true:true", "BURST:12.5:true:true")), "the listener was told of both touches: " + told);
+        PhoenixPower.removeListener(listener);
+        PhoenixPower.touched(phoenix, zombie, PhoenixPower.Kind.SLAM, 3.0F);
+        check(told.size() == 2, "and not after it was removed");
+        helper.succeed();
+    }
+
     /** Every tag file of the mod parses, and every entry names a real thing or a tag that exists. */
     @GameTest(template = ARENA, batch = SKELETON)
     public static void everyTagFileNamesRealThings(GameTestHelper helper) throws IOException {
@@ -589,6 +630,81 @@ public final class SkeletonTests {
         creative.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.TESSERACT.get()));
         ScepterRituals.useScepter(creative, InteractionHand.MAIN_HAND, false);
         check(creative.isAlive() && Powers.power(creative) == Power.NONE, "and a Creative player is told the stone has nothing for them");
+        helper.succeed();
+    }
+
+    /**
+     * Once the Thanos lane has registered its summoning, the call to the Mad Titan is the lane's alone: a summoning that
+     * refuses (it has told the player why) must not leave the Scepter to explode in the player's hand, nor the Tesseract
+     * to take them a hundred blocks away as Loki. One that begins holds the item for five seconds.
+     */
+    @GameTest(template = ARENA, batch = SKELETON)
+    public static void aRefusedSummoningNeitherExplodesTheScepterNorSendsTheTesseractAway(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerLevel level = helper.getLevel();
+        int[] begun = {0};
+        boolean[] accept = {false};
+        ScepterRituals.registerThanosHold(new ScepterRituals.Hold() {
+            @Override
+            public boolean begin(ServerPlayer player, InteractionHand hand) {
+                begun[0]++;
+                return accept[0];
+            }
+
+            @Override
+            public void tick(ServerPlayer player, ItemStack stack, int remaining) {
+            }
+
+            @Override
+            public void release(ServerPlayer player, ItemStack stack) {
+            }
+
+            @Override
+            public void finish(ServerPlayer player, ItemStack stack) {
+            }
+        });
+
+        // The Scepter in the main hand, the Tesseract in the other: refused.
+        ServerPlayer holder = f.player(5.5, FLOOR, 5.5);
+        ItemStack scepter = new ItemStack(ModItems.LOKIS_SCEPTER.get());
+        holder.setItemInHand(InteractionHand.MAIN_HAND, scepter);
+        holder.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.TESSERACT.get()));
+        float health = holder.getHealth();
+        InteractionResultHolder<ItemStack> used = scepter.getItem().use(level, holder, InteractionHand.MAIN_HAND);
+        check(begun[0] == 1, "the summoning was asked");
+        check(holder.isAlive() && holder.getHealth() == health, "a refusal leaves the Scepter's holder whole, not torn apart");
+        check(!holder.isUsingItem() && used.getResult().consumesAction(), "no hold begins, and the Scepter is only on its cooldown");
+
+        // The Tesseract in the main hand, the Scepter in the other: refused, nobody is taken away or made Loki.
+        ServerPlayer traveller = f.player(9.5, FLOOR, 5.5);
+        ItemStack tesseract = new ItemStack(ModItems.TESSERACT.get());
+        traveller.setItemInHand(InteractionHand.MAIN_HAND, tesseract);
+        traveller.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
+        Vec3 where = traveller.position();
+        InteractionResultHolder<ItemStack> tried = tesseract.getItem().use(level, traveller, InteractionHand.MAIN_HAND);
+        check(begun[0] == 2, "the summoning was asked again");
+        check(traveller.position().equals(where) && Powers.power(traveller) == Power.NONE, "a refusal does not send the Tesseract's holder away as Loki");
+        check(!traveller.isUsingItem() && !tried.getResult().consumesAction(), "and no hold begins");
+        check(!traveller.getCooldowns().isOnCooldown(tesseract.getItem()), "nor does the Tesseract cool down");
+
+        // The same hands with a summoning that begins: the item is held (five seconds), nothing else happens.
+        accept[0] = true;
+        ServerPlayer caller = f.player(13.5, FLOOR, 5.5);
+        ItemStack held = new ItemStack(ModItems.TESSERACT.get());
+        caller.setItemInHand(InteractionHand.MAIN_HAND, held);
+        caller.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
+        held.getItem().use(level, caller, InteractionHand.MAIN_HAND);
+        check(caller.isUsingItem() && caller.getUseItem() == held && Powers.power(caller) == Power.NONE, "a summoning that begins holds the Tesseract");
+        caller.stopUsingItem();
+        ItemStack stone = new ItemStack(ModItems.LOKIS_SCEPTER.get());
+        caller.setItemInHand(InteractionHand.MAIN_HAND, stone);
+        caller.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.TESSERACT.get()));
+        stone.getItem().use(level, caller, InteractionHand.MAIN_HAND);
+        check(caller.isUsingItem() && caller.isAlive(), "and the Scepter");
+
+        // Without a summoning the Tesseract's holder is not asked anything and keeps the old behaviour.
+        ScepterRituals.registerThanosHold(null);
+        check(!ScepterRituals.callsThanos(traveller, InteractionHand.MAIN_HAND), "with no summoning built, the call is nobody's");
         helper.succeed();
     }
 

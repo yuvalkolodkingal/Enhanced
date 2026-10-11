@@ -44,10 +44,14 @@ public final class HeroLifecycle {
 
     /** The server stopped: every hero and the boss fights forget their statics. */
     public static void onServerStopped() {
-        for (HeroServer server : HeroServers.all()) {
-            server.onServerStopped();
+        try {
+            for (HeroServer server : HeroServers.all()) {
+                server.onServerStopped();
+            }
+        } finally {
+            // (A hero that fails to forget must not leave a boss fight of the stopped server in the next world.)
+            BossFights.clear();
         }
-        BossFights.clear();
     }
 
     private HeroLifecycle() {

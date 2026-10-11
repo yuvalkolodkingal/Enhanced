@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.BossLane;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -73,8 +74,8 @@ public final class TestKit {
     /**
      * A fixture for a test of a boss fight, or of anything that keeps server-wide state from one tick to the next (the
      * boss registry, the rewards waiting to be handed over, the heroes' static maps): when the test ends, pass or fail,
-     * it lets every fight go, clears the heroes' statics, puts back the boss lanes the mod registered and the rewards
-     * that were waiting, so a fight left over from one test never reaches the next. A boss test also has a batch of its
+     * it lets every fight go, clears the heroes' statics, puts back the boss lanes and the Thanos summoning the mod
+     * registered and the rewards that were waiting, so a fight left over from one test never reaches the next. A boss test also has a batch of its
      * own ({@code @GameTest(batch = ...)}), so no other test runs while it does.
      */
     public static Fixture bossFixture(GameTestHelper helper) {
@@ -88,7 +89,9 @@ public final class TestKit {
             }
         }
         BossData data = server.overworld().getData(ModAttachments.BOSS_DATA);
+        ScepterRituals.Hold summoning = ScepterRituals.thanosHold();
         fixture.onClose(() -> {
+            ScepterRituals.registerThanosHold(summoning);
             BossFights.clear();
             for (HeroServer hero : HeroServers.all()) {
                 hero.onServerStopped();

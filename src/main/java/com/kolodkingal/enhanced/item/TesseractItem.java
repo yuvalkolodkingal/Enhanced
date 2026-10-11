@@ -58,8 +58,12 @@ public class TesseractItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player instanceof ServerPlayer serverPlayer) {
-            if (ScepterRituals.useTesseract(serverPlayer, hand)) {
-                // The Mad Titan is being called: five seconds of holding it (with Loki's Scepter in the other hand).
+            if (ScepterRituals.callsThanos(serverPlayer, hand)) {
+                // The Mad Titan is being called (Loki's Scepter in the other hand): five seconds of holding it. If the
+                // summoning refuses it has told the player why, and the Tesseract does nothing else (no jump, no escape).
+                if (!ScepterRituals.useTesseract(serverPlayer, hand)) {
+                    return InteractionResultHolder.fail(stack);
+                }
                 player.startUsingItem(hand);
                 return InteractionResultHolder.consume(stack);
             }

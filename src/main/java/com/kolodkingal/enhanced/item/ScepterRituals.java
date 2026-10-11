@@ -79,13 +79,28 @@ public final class ScepterRituals {
 
     private static final Map<BossKind, Hold> HOLDS = new EnumMap<>(BossKind.class);
 
-    public static void registerThanosHold(Hold hold) {
-        HOLDS.put(BossKind.THANOS, hold);
+    /**
+     * Registers the Thanos lane's summoning (once, when the mod loads); null takes it away (a test that registered its
+     * own puts the old one back). Once there is one, the rows of the Mad Titan are the lane's alone: when its
+     * {@link Hold#begin} refuses, the player is told why and nothing else happens (the Scepter does not explode, the
+     * Tesseract does not take them away).
+     *
+     * @return the hold that was registered before, or null
+     */
+    @Nullable
+    public static Hold registerThanosHold(@Nullable Hold hold) {
+        return hold == null ? HOLDS.remove(BossKind.THANOS) : HOLDS.put(BossKind.THANOS, hold);
     }
 
     @Nullable
     private static Hold thanos() {
         return HOLDS.get(BossKind.THANOS);
+    }
+
+    /** The summoning that is registered, or null (what a test saves and puts back). */
+    @Nullable
+    public static Hold thanosHold() {
+        return thanos();
     }
 
     // ---- the table ----
@@ -151,8 +166,9 @@ public final class ScepterRituals {
         Ritual ritual = scepter(power, other, player.isShiftKeyDown(), onBlock);
         if (ritual == Ritual.THANOS) {
             Hold hold = thanos();
-            if (hold != null && hold.begin(player, scepterHand)) {
-                return true;
+            if (hold != null) {
+                // The lane answers for this row, also when it refuses (it tells the player why): never the explosion.
+                return hold.begin(player, scepterHand);
             }
             // The Mad Titan cannot be called yet: the Scepter does what it always did with a Tesseract.
             ritual = beforeTheVillains(power, other);
@@ -248,17 +264,27 @@ public final class ScepterRituals {
     // ---- the Tesseract ----
 
     /**
-     * The Tesseract is used. Only the hold that calls the Mad Titan is decided here; everything else the Tesseract does
-     * (the jump, Loki's escape, the Scarlet Witch's awakening) is still its own.
+     * Whether this use of the Tesseract is the call to the Mad Titan and the lane that answers it is built: the
+     * Scepter in the other hand, and a registered {@link Hold}. Then the summoning is the whole answer, whether it
+     * begins or refuses ({@link #useTesseract}); the jump, Loki's escape and the awakening of the Scarlet Witch, which
+     * are the Tesseract's own, must not follow a refusal.
+     */
+    public static boolean callsThanos(ServerPlayer player, InteractionHand hand) {
+        return thanos() != null && tesseract(Powers.power(player), player.getItemInHand(other(hand))) == Ritual.THANOS;
+    }
+
+    /**
+     * The Tesseract is used for the call to the Mad Titan ({@link #callsThanos}). Only that hold is decided here;
+     * everything else the Tesseract does (the jump, Loki's escape, the Scarlet Witch's awakening) is still its own.
      *
-     * @return true if a hold began (the caller starts using the Tesseract)
+     * @return true if a hold began (the caller starts using the Tesseract); false if it did not, or if this is not the
+     * call to Thanos
      */
     public static boolean useTesseract(ServerPlayer player, InteractionHand hand) {
-        if (tesseract(Powers.power(player), player.getItemInHand(other(hand))) != Ritual.THANOS) {
+        if (!callsThanos(player, hand)) {
             return false;
         }
-        Hold hold = thanos();
-        return hold != null && hold.begin(player, hand);
+        return thanos().begin(player, hand);
     }
 
     // ---- the hold: what the two items delegate ----

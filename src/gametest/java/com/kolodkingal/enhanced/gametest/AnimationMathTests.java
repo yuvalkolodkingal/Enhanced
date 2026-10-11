@@ -682,7 +682,9 @@ public final class AnimationMathTests {
     /** Every ability of every hero, every toggle, momentary state and flag is acted by a gesture, or has a reason why not. */
     @GameTest(template = ARENA)
     public static void everyAbilityIsActedOrExplained(GameTestHelper helper) {
-        Power[] heroes = {Power.MAGNETO, Power.SCARLET_WITCH, Power.QUICKSILVER, Power.VISION, Power.TOMMY, Power.BILLY, Power.LOKI, Power.THOR};
+        // Every power that has abilities: the heroes of 3.0 are in without their lanes editing this line (a lane that
+        // routes a toggle or a state to its own hero only would otherwise fail "has no gesture" here).
+        Power[] heroes = java.util.Arrays.stream(Power.values()).filter(Power::hasPowers).toArray(Power[]::new);
         java.util.Set<GestureId> used = new java.util.HashSet<>();
         for (Power power : heroes) {
             for (int ability = 1; ability <= 5; ability++) {
