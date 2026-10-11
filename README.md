@@ -50,6 +50,12 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 target and stumbles about for 6 seconds (the Ender Dragon, the Wither and the Warden are immune), and a player gets
 Nausea for 8 seconds and Slowness for 3.
 
+The **Infinity Stones** have voices of their own: the Space Stone in the Tesseract is a deep, swelling cosmic hum, and
+the Mind Stone in Loki's Scepter and in Vision's forehead a bright, shimmering, slightly eerie chime-hum. They sound
+under the portal, the awakening or the chime they come with, and hum softly for as long as you hold the Tesseract or
+the scepter (the *Players* volume slider turns them down). The Power, Reality, Soul and Time Stones' voices are in the
+mod too, waiting for the Thanos boss.
+
 **Stormbreaker** (3 netherite ingots, a Nether Star and any log, shaped like an axe) can be wielded by
 anyone: the hardest-hitting axe there is. Whoever holds Mjolnir or Stormbreaker can **call the Bifrost**:
 right-click for the Bifrost screen, which takes you home or to any place you saved, **in any
