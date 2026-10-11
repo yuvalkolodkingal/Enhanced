@@ -1,0 +1,15 @@
+### How do I call Thanos?
+
+Hold the Tesseract in one hand and Loki's Scepter in the other, and hold right-click for five seconds. See [Thanos](Thanos#calling-him). Neither item is used up.
+
+### I held the Tesseract and the Scepter and the Titan did not come. Why?
+
+The action bar says why, in red, and nothing else happens (you do not explode and you are not taken anywhere). The usual reasons: you are not on solid ground with open sky above you and open country round you, the difficulty is Peaceful, he is already here or another boss is fighting, the last fight was less than ten minutes ago, you are not in the Overworld, or the server turned the call off. The table is on [Thanos](Thanos#calling-him).
+
+### Why can't I kill Thanos quickly?
+
+No hit takes more than 6 percent of his health and no second more than 15 percent, and he takes a new Infinity Stone every 90 seconds, each with new moves. The fight is meant to be won by a team, fast, by breaking his clench (100 poise of blows while he closes the Gauntlet) and by using the openings: the three seconds he kneels when a stone arrives, and the seconds after a stagger. See [Thanos](Thanos#how-the-fight-is-beaten).
+
+### Does Thanos break my builds?
+
+No. He never breaks or places a block, unless the server turned `blockDamage` on (and then only the Overload and the meteors make small craters). The Soul World, the Petrify Orb and the Time Snare change creatures, never the world.

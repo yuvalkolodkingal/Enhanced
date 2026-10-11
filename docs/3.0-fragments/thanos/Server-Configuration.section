@@ -1,0 +1,117 @@
+## Thanos (the boss)
+
+Section `[thanos_boss]`. The boss's page is [Thanos](Thanos). The rules every boss shares (how many fights at once, the wipe and abandon times, the minimum time for a reward, the experience each rewarded fighter gets, the difficulty scale) are in `[boss]`. His own numbers are here. The hero's `[thanos]` section is on the hero's page.
+
+### The call
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos_boss.summonEnabled` | `true` | `true` or `false` | Whether the Tesseract and Loki's Scepter, held together, can call Thanos. |
+| `thanos_boss.summonOverworldOnly` | `true` | `true` or `false` | Whether he answers only in the Overworld. |
+| `thanos_boss.summonChargeTicks` | `100` | 20 to 100 | How long the two items are held up before the portal opens (100 is the longest they can be held: 5 seconds). |
+| `thanos_boss.summonCountdownTicks` | `120` | 20 to 1200 | From the portal opening to his arrival (120 = 6 seconds). |
+| `thanos_boss.summonSkyBlocks` | `24` | 4 to 64 | Clear air needed over the summoner's head. |
+| `thanos_boss.summonOpenFraction` | `0.6` | 0.0 to 1.0 | The fraction of 24 sample spots round the summoner that need standing room. |
+| `thanos_boss.summonCooldownTicks` | `12000` | 0 to 1728000 | The rest after a fight before he can be called again (12000 = 10 minutes; half after a wipe or when he leaves). |
+
+### The body, the clock and the arena
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos_boss.health` | `3000.0` | 100.0 to 100000.0 | His health for one fighter (before the shared `[boss].difficultyScale`). |
+| `thanos_boss.healthPerExtraPlayer` | `0.5` | 0.0 to 2.0 | The fraction of his health added for each extra fighter. |
+| `thanos_boss.maxFightersCounted` | `4` | 1 to 16 | How many fighters count for his health and for the targets of his area moves. |
+| `thanos_boss.arenaRadius` | `40` | 16 to 96 | The radius of the fight round the summoning point, in blocks (the clock and the count of fighters reach 24 blocks beyond it). |
+| `thanos_boss.xpReward` | `12000` | 0 to 100000 | The experience that falls where he stood when he is defeated. |
+| `thanos_boss.maxStones` | `5` | 1 to 5 | The most Infinity Stones he can have. There is no sixth: the Mind Stone never comes. |
+| `thanos_boss.stoneIntervalTicks` | `1800` | 200 to 36000 | Combat time between one stone and the next (1800 = 90 seconds). |
+| `thanos_boss.surgeTicks` | `60` | 0 to 200 | The surge when a stone arrives: for this long he kneels and takes extra damage. |
+| `thanos_boss.surgeDamageFactor` | `1.5` | 1.0 to 4.0 | The damage he takes in the surge, times. |
+| `thanos_boss.damageScalePerStone` | `0.06` | 0.0 to 0.5 | The extra damage he deals for each stone beyond the first (0.06 = 6 percent). |
+| `thanos_boss.enrageAfterTicks` | `3600` | 0 to 72000 | The time after his last stone before his damage starts to grow. |
+| `thanos_boss.enrageStepPerMinute` | `0.04` | 0.0 to 0.5 | How much his damage grows each minute of enrage (0.04 = 4 percent). |
+| `thanos_boss.enrageMax` | `0.40` | 0.0 to 2.0 | The most the enrage adds to his damage (0.4 = 40 percent). |
+| `thanos_boss.gapPerExtraPlayer` | `2` | 0 to 10 | Ticks cut from his rest between moves for each extra fighter. |
+| `thanos_boss.blockDamage` | `false` | `true` or `false` | If true, and the `mobGriefing` rule is on, Overload and the meteors break blocks with small explosions. Nothing else he does ever breaks a block. |
+
+### His damage
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos_boss.blockDamage` | `false` | `true` or `false` | Damage: If true, and the `mobGriefing` rule is on, Overload and the meteors break blocks with small explosions. Nothing else he does ever breaks a block. |
+| `thanos_boss.swordDamage` | `30.0` | 0.0 to 400.0 | Damage: Sword Sweep. |
+| `thanos_boss.smashDamage` | `26.0` | 0.0 to 400.0 | Damage: The impact of an Overhead Smash. |
+| `thanos_boss.smashRingDamage` | `12.0` | 0.0 to 400.0 | Damage: The ground ring of an Overhead Smash. |
+| `thanos_boss.jabDamage` | `14.0` | 0.0 to 400.0 | Damage: Each Gauntlet Jab (there are two). |
+| `thanos_boss.swordThrowDamage` | `22.0` | 0.0 to 400.0 | Damage: Each pass of the thrown sword (out, and back). |
+| `thanos_boss.chokeDamage` | `16.0` | 0.0 to 400.0 | Damage: The whole Choke hold (the throw at the end adds half again). |
+| `thanos_boss.leapDamage` | `12.0` | 0.0 to 400.0 | Damage: The landing of a Leap. |
+| `thanos_boss.powerBlastDamage` | `20.0` | 0.0 to 400.0 | Damage: The Power Blast beam. |
+| `thanos_boss.powerBlastSplash` | `8.0` | 0.0 to 400.0 | Damage: The explosion at the end of the Power Blast. |
+| `thanos_boss.overloadDamage` | `16.0` | 0.0 to 400.0 | Damage: Each sigil of Overload. |
+| `thanos_boss.shockwaveDamage` | `12.0` | 0.0 to 400.0 | Damage: The Titan Shockwave ring. |
+| `thanos_boss.meteorDamage` | `16.0` | 0.0 to 400.0 | Damage: Each meteor. |
+| `thanos_boss.pullCrushDamage` | `10.0` | 0.0 to 400.0 | Damage: The crush at the end of the Gravity Pull. |
+| `thanos_boss.soulDrainTick` | `3.0` | 0.0 to 400.0 | Damage: Each pulse of the Soul Drain (every 10 ticks; ignores armour and enchantments). |
+| `thanos_boss.pulseDamage` | `12.0` | 0.0 to 400.0 | Damage: The Power Pulse that finds a fighter hiding behind walls. |
+| `thanos_boss.infinityBeamDamage` | `40.0` | 0.0 to 400.0 | Damage: The Infinity Beam. |
+| `thanos_boss.phantomDamage` | `3.5` | 0.0 to 400.0 | Damage: A jab of one of his illusions. |
+| `thanos_boss.swordShieldFactor` | `2.0` | 1.0 to 10.0 | Damage: What his sword costs a Chaos Shield: this many times the damage it would have done. |
+
+### His cooldowns (ticks)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos_boss.swordCooldown` | `40` | 0 to 6000 | How long Sword Sweep waits before he can use it again. |
+| `thanos_boss.smashCooldown` | `100` | 0 to 6000 | How long Overhead Smash waits before he can use it again. |
+| `thanos_boss.jabCooldown` | `30` | 0 to 6000 | How long Gauntlet Jab waits before he can use it again. |
+| `thanos_boss.swordThrowCooldown` | `280` | 0 to 6000 | How long Sword Throw waits before he can use it again. |
+| `thanos_boss.chokeCooldown` | `400` | 0 to 6000 | How long Choke waits before he can use it again. |
+| `thanos_boss.leapCooldown` | `160` | 0 to 6000 | How long Leap waits before he can use it again. |
+| `thanos_boss.powerBlastCooldown` | `120` | 0 to 6000 | How long Power Blast waits before he can use it again. |
+| `thanos_boss.overloadCooldown` | `200` | 0 to 6000 | How long Overload waits before he can use it again. |
+| `thanos_boss.shockwaveCooldown` | `240` | 0 to 6000 | How long Titan Shockwave waits before he can use it again. |
+| `thanos_boss.stepCooldown` | `160` | 0 to 6000 | How long Portal Step waits before he can use it again. |
+| `thanos_boss.meteorCooldown` | `440` | 0 to 6000 | How long Meteor Hail waits before he can use it again. |
+| `thanos_boss.pullCooldown` | `360` | 0 to 6000 | How long Gravity Pull waits before he can use it again. |
+| `thanos_boss.barrierCooldown` | `300` | 0 to 6000 | How long Space Barrier waits before he can use it again. |
+| `thanos_boss.veilCooldown` | `280` | 0 to 6000 | How long Reality Veil waits before he can use it again. |
+| `thanos_boss.phantomsCooldown` | `560` | 0 to 6000 | How long Phantoms waits before he can use it again. |
+| `thanos_boss.orbCooldown` | `240` | 0 to 6000 | How long Petrify Orb waits before he can use it again. |
+| `thanos_boss.sightCooldown` | `240` | 0 to 6000 | How long Soul Sight waits before he can use it again. |
+| `thanos_boss.drainCooldown` | `320` | 0 to 6000 | How long Soul Drain waits before he can use it again. |
+| `thanos_boss.soulworldCooldown` | `800` | 0 to 6000 | How long Soul World waits before he can use it again. |
+| `thanos_boss.rewindCooldown` | `600` | 0 to 6000 | How long Rewind waits before he can use it again. |
+| `thanos_boss.snareCooldown` | `360` | 0 to 6000 | How long Time Snare waits before he can use it again. |
+| `thanos_boss.infinityBeamCooldown` | `900` | 0 to 6000 | How long Infinity Beam waits before he can use it again. |
+| `thanos_boss.pulseCooldown` | `80` | 0 to 6000 | How long Power Pulse (for each fighter) waits before he can use it again. |
+
+### Durations and rules
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `thanos_boss.barrierTicks` | `60` | 10 to 400 | How long the Space Barrier stands. |
+| `thanos_boss.veilTicks` | `120` | 10 to 600 | How long his Reality Veil stands. |
+| `thanos_boss.snareTicks` | `80` | 10 to 400 | How long the Time Snare locks whoever it catches. |
+| `thanos_boss.soulworldTicks` | `80` | 10 to 400 | How long a soul stays in the Soul World. |
+| `thanos_boss.soulworldHeal` | `0.03` | 0.0 to 0.5 | The fraction of his maximum health he heals for each soul taken into the Soul World. |
+| `thanos_boss.drainHealFraction` | `0.4` | 0.0 to 2.0 | How much of the Soul Drain's damage he heals (0.4 = 40 percent). |
+| `thanos_boss.rewindSeconds` | `6` | 1 to 20 | How far back his Rewind goes, in seconds. |
+| `thanos_boss.rewindMaxHeal` | `0.08` | 0.0 to 0.5 | The most health a Rewind returns (a fraction of his maximum). |
+| `thanos_boss.rewindTrigger` | `0.06` | 0.0 to 1.0 | The damage he took in that window that makes him rewind (a fraction of his maximum). |
+| `thanos_boss.plateReduction` | `0.10` | 0.0 to 0.2 | The share of the damage each intact armour plate takes off (four plates: 0.1 means 40 percent). |
+| `thanos_boss.plateTearSeconds` | `3` | 1 to 30 | Seconds of a Scarlet Witch's Chaos Beam on him that tear a plate away. |
+| `thanos_boss.staggerPoise` | `100` | 10 to 1000 | The poise damage during a stone move's wind-up that breaks it and staggers him. |
+| `thanos_boss.poiseHit` | `2.0` | 0.1 to 10.0 | Poise per point of damage he takes (three times that for damage born of an Infinity Stone). |
+| `thanos_boss.lockTicks` | `80` | 10 to 400 | How long his stones stay dark after a stagger. |
+| `thanos_boss.stormbreakerFactor` | `2.5` | 1.0 to 10.0 | The damage Stormbreaker does to him, times. |
+| `thanos_boss.maxHitFraction` | `0.06` | 0.005 to 1.0 | The most one hit can take from him (a fraction of his maximum health). |
+| `thanos_boss.maxDamagePerSecond` | `0.15` | 0.01 to 1.0 | The most one second can take from him (a fraction of his maximum health). |
+| `thanos_boss.mobDamageFactor` | `0.25` | 0.0 to 1.0 | What golems, wolves and other creatures that are not players do to him, times. |
+| `thanos_boss.meteorExtra` | `4` | 0 to 8 | Random meteors beyond one for each player. |
+| `thanos_boss.unreachableTicks` | `160` | 40 to 1200 | How long a fighter can hide where he can neither walk nor see before the Power Pulse finds them. |
+| `thanos_boss.idleRegenPerMinute` | `0.02` | 0.0 to 0.5 | His healing per minute while no fighter is in the arena (a fraction of his maximum). |
+| `thanos_boss.rewardMinShare` | `0.03` | 0.0 to 0.5 | The damage (a fraction of his maximum health) that earns an Infinity Gauntlet, together with the shared `[boss].rewardMinSeconds`. Whoever strikes the last blow always earns one. |
+| `thanos_boss.gauntletRitualTicks` | `60` | 20 to 400 | How long the Infinity Gauntlet must be held to become Thanos. |
+| `thanos_boss.webLockTicks` | `40` | 0 to 400 | A Spider-Man's web locks his Gauntlet for this long (0 turns it off). |
+| `thanos_boss.webLockCooldown` | `400` | 0 to 6000 | A web can lock his Gauntlet at most this often. |
