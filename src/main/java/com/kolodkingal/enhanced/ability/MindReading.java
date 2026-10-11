@@ -57,8 +57,11 @@ import java.util.UUID;
 public final class MindReading {
     /** How often the server looks again at what the Phoenix looks at (ticks). */
     public static final int PERIOD = 5;
-    /** The snapshot is sent again at least this often, so that the client can time the panel out soon after the last. */
-    public static final int RESEND_TICKS = 20;
+    /**
+     * The snapshot is sent again at least this often (twice a second): the client's panel gives up 15 ticks after the
+     * last one, so it stays up while she looks and goes soon after she looks away.
+     */
+    public static final int RESEND_TICKS = 10;
     /** A player who is read is told so at most once in this long (10 s). */
     public static final int NOTICE_TICKS = 200;
     /** The most a snapshot may weigh once encoded (64 KiB). */

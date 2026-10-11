@@ -450,7 +450,8 @@ public final class PhoenixTests {
         check(hostile.mood() == MindReadPayload.HOSTILE && hostile.hostileTo().equals(skeleton.getName().getString()),
                 "a zombie with a target means harm to it: " + hostile.hostileTo());
 
-        // The server tells her client when the target or what it holds changes, or at least every 20 ticks.
+        // The server tells her client when the target or what it holds changes, or at least every 10 ticks (her panel
+        // times out after 15).
         zombie.setTarget(null);
         TestKit.sentPackets(jean);
         MindReading.look(jean, 1000);
@@ -460,8 +461,10 @@ public final class PhoenixTests {
         zombie.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
         MindReading.look(jean, 1010);
         check(payloads(TestKit.sentPackets(jean), MindReadPayload.class).size() == 1, "what changed is sent");
-        MindReading.look(jean, 1031);
-        check(payloads(TestKit.sentPackets(jean), MindReadPayload.class).size() == 1, "and so is the same thing after 20 ticks");
+        MindReading.look(jean, 1015);
+        check(payloads(TestKit.sentPackets(jean), MindReadPayload.class).isEmpty(), "the same thing is not sent again within ten ticks");
+        MindReading.look(jean, 1020);
+        check(payloads(TestKit.sentPackets(jean), MindReadPayload.class).size() == 1, "but it is sent again after ten, so her panel never times out while she looks");
         press(jean, 1);
         check(!data.toggle(Toggle.MIND_READING) && actionBarKeys(jean).contains("message.enhanced.mind_reading.off"), "R again switches it off");
         helper.succeed();

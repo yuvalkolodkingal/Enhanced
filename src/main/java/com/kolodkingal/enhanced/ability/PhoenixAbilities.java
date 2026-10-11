@@ -15,7 +15,10 @@ import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -486,7 +489,23 @@ public final class PhoenixAbilities {
         }
         mob.getNavigation().stop();
         steer(mob);
+        tell(mob, true);
         return true;
+    }
+
+    /**
+     * Tells every client that tracks the creature that it is (or no longer is) possessed. The effects of a creature
+     * that is not a player reach no client by themselves, and her HUD names the host she has taken (it looks for the
+     * effect).
+     */
+    private static void tell(Mob mob, boolean possessed) {
+        if (!(mob.level() instanceof ServerLevel level)) {
+            return;
+        }
+        MobEffectInstance effect = mob.getEffect(ModEffects.POSSESSED);
+        Packet<?> packet = possessed && effect != null ? new ClientboundUpdateMobEffectPacket(mob.getId(), effect, false)
+                : new ClientboundRemoveMobEffectPacket(mob.getId(), ModEffects.POSSESSED);
+        level.getChunkSource().broadcast(mob, packet);
     }
 
     /** Lets a host go: its effect ends, and (when she took another in its place) it wakes confused for a moment. */
@@ -525,6 +544,7 @@ public final class PhoenixAbilities {
         }
         if (host instanceof Mob mob && (owner != null || mob.hasEffect(ModEffects.POSSESSED))) {
             mob.setTarget(null); // what she sent it after is not its quarrel
+            tell(mob, false);
         }
     }
 
@@ -839,8 +859,9 @@ public final class PhoenixAbilities {
         player.removeEffect(MobEffects.DARKNESS);
         int drain = PhoenixConfig.BURST_DRAIN_TICKS.get();
         if (!player.isCreative() && drain > 0) {
-            player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, drain, 0, false, true, true));
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, drain, 0, false, true, true));
+            // Without the swirls of a potion: in first person they are dark squares over her face for five seconds.
+            player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, drain, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, drain, 0, false, false, true));
         }
         Vec3 centre = player.position().add(0, player.getBbHeight() * 0.5, 0);
         float radius = PhoenixBurst.radius(f);
