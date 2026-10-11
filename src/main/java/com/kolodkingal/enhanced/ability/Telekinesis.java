@@ -142,6 +142,11 @@ public final class Telekinesis {
             hold(player, hit.getEntity(), mode);
             return;
         }
+        if (Raycasts.entity(player, range, 0.3, MjolnirPin::isPinned, 1.0F) != null) {
+            // What they aim at is there, but Mjolnir holds it down: say so, rather than that there is nothing to lift.
+            player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.pinned"), true);
+            return;
+        }
         if (mode == Mode.WANDA && BlockLifting.tryLift(player)) {
             return;
         }

@@ -201,6 +201,15 @@ public final class ThorAbilities {
         return isMjolnir(stack) || isStormbreaker(stack);
     }
 
+    /**
+     * The look-alike that {@code /give} drops at the player's feet just to show the pickup (the real one went into the
+     * inventory): it can never be picked up and vanishes on its next tick. It must not be kept forever, nor set down as
+     * a second Mjolnir.
+     */
+    public static boolean isFakeDrop(ItemEntity entity) {
+        return entity.getAge() >= entity.lifespan - 1;
+    }
+
     /** Mjolnir or Stormbreaker in either hand. */
     public static boolean holdsWeapon(LivingEntity entity) {
         return weaponHand(entity) != null;

@@ -46,6 +46,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
@@ -172,6 +173,29 @@ public final class ThorTests {
         check(recipe.matches(CraftingInput.of(3, 3, List.of(n, s, n, n, h, n, e, r, e)), level), "N S N / N H N / _ R _");
         check(recipe.getResultItem(level.registryAccess()).is(ModItems.MJOLNIR.get()), "it makes Mjolnir");
         helper.succeed();
+    }
+
+    @GameTest(template = ARENA)
+    public static void giveCommandsLookAlikeDropIsNotASecondWeapon(GameTestHelper helper) {
+        // /give puts the weapon in the inventory and drops a look-alike at the player's feet only to show the pickup:
+        // it must vanish as usual, not be kept forever or set down as a second Mjolnir.
+        ServerLevel level = helper.getLevel();
+        List<ItemEntity> fakes = new java.util.ArrayList<>();
+        for (ItemStack weapon : List.of(new ItemStack(ModItems.MJOLNIR.get()), new ItemStack(ModItems.STORMBREAKER.get()))) {
+            Vec3 at = helper.absoluteVec(new Vec3(fakes.isEmpty() ? 6.5 : 13.5, FLOOR + 0.5, 10.5));
+            ItemEntity fake = new ItemEntity(level, at.x, at.y, at.z, weapon);
+            fake.makeFakeItem();
+            level.addFreshEntity(fake);
+            fakes.add(fake);
+        }
+        helper.runAfterDelay(30, () -> {
+            for (ItemEntity fake : fakes) {
+                check(fake.isRemoved(), fake.getItem().getHoverName().getString() + "'s look-alike vanished");
+            }
+            BlockPos.betweenClosedStream(helper.absolutePos(new BlockPos(1, 1, 1)), helper.absolutePos(new BlockPos(19, 4, 19)))
+                    .forEach(pos -> check(!level.getBlockState(pos).is(ModBlocks.MJOLNIR.get()), "no Mjolnir was set down at " + pos));
+            helper.succeed();
+        });
     }
 
     @GameTest(template = ARENA)
@@ -1310,6 +1334,12 @@ public final class ThorTests {
         check(!Telekinesis.isHeld(zombie), "her grip lets go of what Mjolnir pins");
         check(!Telekinesis.canLift(wanda, zombie, Telekinesis.Mode.WANDA), "and she can't pick it up again");
         check(Telekinesis.canLift(wanda, other, Telekinesis.Mode.WANDA), "though she still lifts a free one");
+        // Reaching for it again, she is told why it won't come.
+        TestKit.sentPackets(wanda);
+        lookAt(wanda, zombie);
+        press(wanda, 3);
+        check(!Telekinesis.isHeld(zombie) && toldOnActionBar(wanda, "message.enhanced.telekinesis.pinned"),
+                "reaching for it, she is told that Mjolnir holds it down");
         check(ModEntities.MJOLNIR_FRAGMENT.get().is(ModTags.TELEKINESIS_IMMUNE), "nor does anyone catch a fragment of Mjolnir out of the air");
         helper.succeed();
     }
@@ -1671,6 +1701,17 @@ public final class ThorTests {
         check(tooltipHas(hammer, "item.enhanced.mjolnir.bound", hero.getGameProfile().getName()), "the tooltip says: Bound to <name>");
         check(tooltipHas(new ItemStack(ModItems.MJOLNIR.get()), "item.enhanced.mjolnir.unclaimed", null), "an unclaimed one says so");
         helper.succeed();
+    }
+
+    /** Whether the server has just put the message with this translation key on the player's action bar. */
+    private static boolean toldOnActionBar(ServerPlayer player, String key) {
+        for (Object sent : TestKit.sentPackets(player)) {
+            if (sent instanceof ClientboundSystemChatPacket chat && chat.overlay()
+                    && chat.content().getContents() instanceof TranslatableContents translatable && translatable.getKey().equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Whether the stack's tooltip has a line with this translation key (and, if given, this first argument). */

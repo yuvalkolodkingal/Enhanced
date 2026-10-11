@@ -90,6 +90,9 @@ public class MjolnirItem extends Item {
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (entity.level() instanceof ServerLevel level) {
+            if (ThorAbilities.isFakeDrop(entity)) {
+                return false;
+            }
             if (entity.tickCount == 1) {
                 entity.setUnlimitedLifetime();
             }
