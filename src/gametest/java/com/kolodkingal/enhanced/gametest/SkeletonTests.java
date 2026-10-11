@@ -1039,7 +1039,9 @@ public final class SkeletonTests {
         check(!BossFights.protects(level, helper.absolutePos(new BlockPos(5, 2, 5))), "no block is protected");
         check(!BossFights.telekinesisPress(player) && !BossFights.telekinesisLaunch(player, zombie), "Wanda's telekinesis is hers alone");
         for (BossKind kind : BossKind.values()) {
-            check(!BossFights.start(kind, player, true), "no " + kind + " fight can start yet, not even by force");
+            if (BossFights.lane(kind) == null) { // (a boss lane that is built registers its own, and starts)
+                check(!BossFights.start(kind, player, true), "no " + kind + " fight can start yet, not even by force");
+            }
             check(BossKind.byId(kind.id()) == kind, kind + " is found by its id");
         }
         BossFights.tickLevel(level);
@@ -1054,7 +1056,8 @@ public final class SkeletonTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
         check(run(player, "enhanced boss start thanos") == 0, "a fight that cannot start is a failure");
-        check(run(player, "enhanced boss start ultron force") == 0, "even by force, until a lane registers its fight");
+        check(BossFights.lane(BossKind.ULTRON) != null || run(player, "enhanced boss start ultron force") == 0,
+                "even by force, until a lane registers its fight");
         boolean refused = false;
         try {
             run(player, "enhanced boss start nobody");
