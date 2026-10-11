@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.hex.HexData;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.road.RoadDoors;
+import com.kolodkingal.enhanced.ultron.SokoviaRelocations;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -63,6 +64,15 @@ public final class ModAttachments {
     public static final Supplier<AttachmentType<BossData>> BOSS_DATA = ATTACHMENTS.register("boss_data",
             () -> AttachmentType.builder(() -> BossData.EMPTY)
                     .serialize(BossData.CODEC)
+                    .build());
+
+    /**
+     * The players who were in the sky on Sokovia when it went away while they were offline, to be set down on the
+     * ground when they log in. Saved with the level, not synced; read and written on the Overworld only.
+     */
+    public static final Supplier<AttachmentType<SokoviaRelocations>> SOKOVIA_RELOCATIONS = ATTACHMENTS.register("sokovia_relocations",
+            () -> AttachmentType.builder(() -> SokoviaRelocations.EMPTY)
+                    .serialize(SokoviaRelocations.CODEC)
                     .build());
 
     private ModAttachments() {

@@ -120,6 +120,7 @@ public final class UltronFight extends BossFight {
     private boolean spokeFirstDeath;
     private boolean spokeLow;
     private boolean victoryTold;
+    private boolean programUsed;
 
     // Per-tick caches.
     private long cachedAt = -1;
@@ -184,6 +185,19 @@ public final class UltronFight extends BossFight {
     @Nullable
     public VibraniumKeyEntity key() {
         return keyId != null && level().getEntity(keyId) instanceof VibraniumKeyEntity key ? key : null;
+    }
+
+    /**
+     * Whether the fight was woken with an Ultron Program, which is owed back to whoever started it if a crash ends the
+     * fight.
+     */
+    public boolean programUsed() {
+        return programUsed;
+    }
+
+    /** Records that the ritual used up a Program (the lane does it when it makes the fight). */
+    void markProgramUsed() {
+        this.programUsed = true;
     }
 
     /** How many uploads he has done (the body he is in). */
@@ -355,6 +369,7 @@ public final class UltronFight extends BossFight {
             spokeLow = true;
             say("low");
         }
+        LiftHooks.get().tick(this);
         updateBars(boss);
     }
 
@@ -375,9 +390,12 @@ public final class UltronFight extends BossFight {
 
     // ---- placing things ----
 
-    /** The ground height at a column of the arena, as the ritual's ground has it. */
+    /**
+     * The surface at a column of the arena, as the ritual's ground has it, and as high as the island is up: where the
+     * ground is while the fight is on the ground, and the island's top once it rises.
+     */
     public double groundAt(double x, double z) {
-        return UltronMotion.surface(level(), x, island.center().y + 4.0, z);
+        return UltronMotion.surface(level(), x, island.center().y + 4.0, z) + island.islandOffset();
     }
 
     private Vec3 onRing(double ring, double angle) {
@@ -520,7 +538,7 @@ public final class UltronFight extends BossFight {
     private void tickRising(@Nullable UltronEntity boss) {
         Vec3 c = island.center();
         if (boss != null) {
-            boss.brain().flyTo(boss, new Vec3(c.x, groundAt(c.x, c.z) + island.islandOffset() + 3.5, c.z), 0.25);
+            boss.brain().flyTo(boss, new Vec3(c.x, groundAt(c.x, c.z) + 3.5, c.z), 0.25);
         }
         if (phaseTicks % 40 == 1) {
             UltronSounds.RUMBLE.play(level(), c, 1.5F, 1.0F);
@@ -1043,6 +1061,7 @@ public final class UltronFight extends BossFight {
         boolean victory = ended == BossEnd.VICTORY;
         int pause = victory ? VICTORY_PAUSE : UPLOAD_AWAY_TICKS;
         if (ticks < pause) {
+            LiftHooks.get().tick(this);
             return false;
         }
         if (ticks == pause) {
@@ -1053,14 +1072,19 @@ public final class UltronFight extends BossFight {
             }
             LiftHooks.get().beginDescent(this);
         }
-        return LiftHooks.get().descend(this, ticks - pause);
+        boolean landed = LiftHooks.get().descend(this, ticks - pause);
+        LiftHooks.get().tick(this);
+        return landed;
     }
 
     @Override
     protected void onFinished(boolean forced) {
-        setHexExempt(false);
-        island.setIslandOffset(0.0);
-        LiftHooks.get().finish(this, forced);
+        try {
+            LiftHooks.get().finish(this, forced);
+        } finally {
+            setHexExempt(false);
+            island.landIsland();
+        }
     }
 
     @Override

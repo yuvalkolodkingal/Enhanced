@@ -99,7 +99,7 @@ public final class UltronLane implements BossLane {
         if (site != null) {
             return site;
         }
-        return LiftHooks.get().refusal(level, BlockPos.containing(centre), radius);
+        return LiftHooks.get().refusal(level, BlockPos.containing(centre), radius, starter);
     }
 
     @Nullable
@@ -118,6 +118,7 @@ public final class UltronLane implements BossLane {
             }
             ItemStack program = starter.getItemInHand(hand);
             fight.refundOnFailure(program);
+            fight.markProgramUsed();
             program.consume(1, starter);
         }
         return fight;

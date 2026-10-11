@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ultron;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -11,7 +12,9 @@ import org.jetbrains.annotations.Nullable;
  * {@link #refusal} at the ritual, {@link #warn} when the lift's warning begins (it answers whether the island will really
  * rise), {@link #lock} when everybody is locked and carried, {@link #rise} every tick of the rise until it answers true,
  * then, after the victory, {@link #beginDescent} and {@link #descend} until the island has landed. {@link #finish} is the
- * last word, forced when the server is stopping (everything is put back at once).
+ * last word, forced when the server is stopping (everything is put back at once). {@link #tick} is called at the end of
+ * every tick of the fight, whatever its phase, for what the lift keeps up all the time (the protection of the island,
+ * the work of its builders).
  *
  * <p>Every method does the Tremor by default: nothing moves, no site is refused, and the island is "up" as soon as its
  * time has passed. {@link LiftHooks} holds the one that is installed; until the Sokovia lane installs its own, the fight
@@ -30,6 +33,15 @@ public interface LiftHook {
     @Nullable
     default Component refusal(ServerLevel level, BlockPos centre, int radius) {
         return null;
+    }
+
+    /**
+     * The same, with whoever starts the fight, for the checks that are about them (spawn protection, a claim). The
+     * ritual asks this one; by default it is {@link #refusal(ServerLevel, BlockPos, int)}.
+     */
+    @Nullable
+    default Component refusal(ServerLevel level, BlockPos centre, int radius, @Nullable ServerPlayer starter) {
+        return refusal(level, centre, radius);
     }
 
     /**
@@ -68,6 +80,13 @@ public interface LiftHook {
      */
     default boolean descend(UltronFight fight, int tick) {
         return true;
+    }
+
+    /**
+     * Every tick of the fight, after its own work of the tick and also while it winds down: the lift's housekeeping (it
+     * keeps what it carries where it should be, and the players on the island on it).
+     */
+    default void tick(UltronFight fight) {
     }
 
     /**
