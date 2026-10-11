@@ -1,0 +1,29 @@
+<!--
+Fragment of the Phoenix for the wiki page Home / Home-HE (3.0). One block per place, English first, then Hebrew.
+Format of every small fragment file: a line `<!-- en: <where it goes> -->` starts an English block and `<!-- he: <where it goes> -->` a
+Hebrew one; a block runs to the next marker line or the end of the file. The docs step pastes each block where it says, in hero order.
+-->
+
+<!-- en: the table "The heroes", after the Thor row -->
+| [Phoenix](Phoenix) | Jean Grey | Find the very rare **Phoenix Ember** in a chest and hold right-click on it for 3 seconds, with no power | Mind Reading (the items of whoever you look at), Mind Sense through walls, Mind Control, the Psionic Field, telekinesis, flight, the Phoenix Burst |
+
+<!-- en: the first paragraph, the list of heroes, before "or, if you are worthy, Thor" -->
+**Jean Grey, the Phoenix**, who reads minds and burns with cosmic fire;
+
+<!-- en: the line under the table, the heroes with several looks -->
+(Vision, Tommy, Billy, Loki, Thor and the Phoenix)
+
+<!-- en: "What's new in 3.0" (a new section above "What's new in 2.3") -->
+* **The Phoenix, Jean Grey.** Find a Phoenix Ember, hold right-click for three seconds, and read minds (**R**: a violet panel shows the items of whoever you look at, a player's whole inventory included; **Sneak + R** finds every mind around you through the walls), fly, lift things with your mind, take over a creature (**B**) or freeze everyone around you (**Sneak + B**), and hold **N** to charge the **Phoenix Burst**: a wave of cosmic fire that spreads in every direction. Two looks, from *X-Men: Apocalypse* and *Spider-Man: Brand New Day*. See [Phoenix](Phoenix).
+
+<!-- he: the table "הגיבורים", after the Thor row -->
+| [הפניקס](Phoenix-HE) | ג'ין גריי | מוצאים בתיבה את **ניצוץ הפניקס** הנדיר מאוד ומחזיקים עליו קליק ימני 3 שניות, בלי כוחות | קריאת מחשבות (הפריטים של מי שמסתכלים עליו), חישת מוחות דרך קירות, שליטה בתודעה, השדה הפסיוני, טלקינזיס, תעופה, פיצוץ הפניקס |
+
+<!-- he: the first paragraph, the list of heroes, before "או, אם אתם ראויים, ת'ור" -->
+**ג'ין גריי, הפניקס**, שקוראת מחשבות ובוערת באש קוסמית;
+
+<!-- he: the line under the table, the heroes with several looks -->
+(ויז'ן, טומי, בילי, לוקי, ת'ור והפניקס)
+
+<!-- he: "מה חדש ב-3.0" (a new section above "מה חדש ב-2.3") -->
+* **הפניקס, ג'ין גריי.** מוצאים ניצוץ הפניקס, מחזיקים קליק ימני שלוש שניות, וקוראים מחשבות (**R**: לוח סגול מראה את הפריטים של מי שמסתכלים עליו, כולל כל התיק של שחקן; **התכופפות + R** מוצאת כל מוח סביבכם דרך הקירות), עפים, מרימים דברים בכוח המחשבה, משתלטים על יצור (**B**) או מקפיאים את כל מי שסביבכם (**התכופפות + B**), ומחזיקים **N** כדי לטעון את **פיצוץ הפניקס**: גל של אש קוסמית שמתפשט לכל כיוון. שני מראות, מ*X-Men: אפוקליפסה* ומ*ספיידרמן: יום חדש*. ראו [הפניקס](Phoenix-HE).

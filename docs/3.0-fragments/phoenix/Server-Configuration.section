@@ -1,0 +1,103 @@
+<!-- Fragment of the Phoenix for the wiki pages Server-Configuration / Server-Configuration-HE (3.0). Format: see Home.row (`<!-- en: where -->` and `<!-- he: where -->` blocks). The option table is generated from config/PhoenixConfig.java (39 options). -->
+
+<!-- en: a new section after "Thor (Mjolnir, Stormbreaker and the Bifrost)" and before "Datapack tags" -->
+## Phoenix (Jean Grey)
+
+Section `[phoenix]`. The hero's page is [Phoenix](Phoenix). Her telekinesis has no options of its own: it uses `magneto.telekinesisRange`, `magneto.throwSpeed` and `scarlet_witch.blockLift*`.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `phoenix.flightSpeed` | `0.09` | 0.01 to 0.5 | The Phoenix's flying speed (Creative flight is 0.05). |
+| `phoenix.fireImmune` | `true` | `true` or `false` | If `true` (the default), fire, lava and burning cannot hurt the Phoenix (damage that goes through everything still does). |
+| `phoenix.mindReadRange` | `24` | 4 to 64 | How far (in blocks) Mind Reading reaches. It needs a line of sight. |
+| `phoenix.mindReadPlayers` | `true` | `true` or `false` | If `false`, Mind Reading cannot read players' minds (the panel says the server keeps them private). |
+| `phoenix.mindReadInventory` | `true` | `true` or `false` | If `true` (the default) the panel lists a player's whole inventory; if `false`, only the hands and the armour. |
+| `phoenix.mindReadNotifies` | `true` | `true` or `false` | If `true` (the default), the player who is read feels a presence in their mind (once per 10 seconds), so it is not a spy tool. |
+| `phoenix.mindReadExhaustion` | `0.01` | 0.0 to 4.0 | Food exhaustion per tick while Mind Reading is on (4.0 = 1 food point). |
+| `phoenix.mindSenseRange` | `48` | 8 to 128 | How far (in blocks) the Mind Sense ping reaches. |
+| `phoenix.mindSenseTicks` | `120` | 20 to 1200 | How long (in ticks) the sensed minds glow on her screen (120 = 6 seconds). |
+| `phoenix.mindSenseCooldown` | `400` | 0 to 72000 | Cooldown of Mind Sense (Sneak + R), in ticks (400 = 20 seconds). |
+| `phoenix.mindSenseExhaustion` | `2.0` | 0.0 to 40.0 | Food exhaustion of one Mind Sense. |
+| `phoenix.mindControlRange` | `10` | 2 to 32 | How far (in blocks) Mind Control reaches (10 = about 33 feet, as in the film). |
+| `phoenix.mindControlTicks` | `300` | 20 to 2400 | How long (in ticks) a creature stays possessed (300 = 15 seconds). |
+| `phoenix.mindControlMax` | `1` | 1 to 5 | How many creatures she can possess at once. Taking one more frees the oldest, who wakes confused. |
+| `phoenix.mindControlPlayerTicks` | `60` | 0 to 1200 | How long (in ticks) Mind Control holds a player still (it needs PvP on). 0 turns it off for players. |
+| `phoenix.mindControlCooldown` | `400` | 0 to 72000 | Cooldown of Mind Control (ability 4), in ticks (400 = 20 seconds). |
+| `phoenix.mindControlExhaustion` | `6.0` | 0.0 to 40.0 | Food exhaustion of one Mind Control. |
+| `phoenix.psionicRadius` | `16` | 4 to 64 | Radius (in blocks) of the Psionic Field (Sneak + B). It works through walls. |
+| `phoenix.psionicTicks` | `60` | 10 to 600 | How long (in ticks) the Psionic Field holds everyone still (60 = 3 seconds; players only with PvP on). |
+| `phoenix.psionicCooldown` | `1200` | 0 to 72000 | Cooldown of the Psionic Field, in ticks (1200 = 60 seconds). It shares ability slot 4 with Mind Control. |
+| `phoenix.psionicExhaustion` | `8.0` | 0.0 to 40.0 | Food exhaustion of one Psionic Field. If it holds nobody it costs nothing and has no cooldown. |
+| `phoenix.burstChargeTicks` | `60` | 10 to 200 | Ticks of charge for a full Phoenix Burst (60 = 3 seconds). It fires by itself at full charge. |
+| `phoenix.burstMinChargeTicks` | `12` | 0 to 100 | A charge shorter than this (in ticks) is cancelled: no damage, no hunger, a short cooldown. |
+| `phoenix.burstMinRadius` | `8` | 2 to 64 | Radius (in blocks) of a barely charged Burst. |
+| `phoenix.burstMaxRadius` | `24` | 4 to 96 | Radius (in blocks) of a fully charged Burst. |
+| `phoenix.burstMinDamage` | `8.0` | 0.0 to 200.0 | Damage of a barely charged Burst, at the centre. |
+| `phoenix.burstMaxDamage` | `30.0` | 0.0 to 200.0 | Damage of a fully charged Burst, at the centre. It stays the same out to half the radius and falls to 60% at the edge. |
+| `phoenix.burstPlayerFactor` | `0.5` | 0.0 to 1.0 | What a player takes of the Burst's damage (only with PvP on): 0.5 = half. |
+| `phoenix.burstWaveSpeed` | `1.0` | 0.2 to 4.0 | How fast the wave spreads (blocks per tick). A creature 20 blocks away is hit 20 ticks after one at 1 block. |
+| `phoenix.burstFireSeconds` | `10` | 0 to 60 | Seconds a creature burns after a full Burst (a weaker Burst burns 40% as long). |
+| `phoenix.burstKnockback` | `1.2` | 0.0 to 5.0 | Knockback of the wave, away from the centre (none for creatures in `enhanced:pin_immune`). |
+| `phoenix.burstSetsFire` | `true` | `true` or `false` | Whether the wave lights fires on flammable blocks (it also needs the `mobGriefing` game rule). It never breaks a block. |
+| `phoenix.burstHurtsPassives` | `false` | `true` or `false` | If `true`, the wave also hurts villagers, Iron Golems, animals and other players' pets. By default it hurts only hostile creatures, creatures after her, the bosses and players (with PvP on). |
+| `phoenix.burstMaxFireBlocks` | `40` | 0 to 400 | At most this many fires per Burst. |
+| `phoenix.burstFoodCost` | `6` | 0 to 20 | Food points a full Burst costs, and the least hunger needed to start charging (a smaller charge costs less, at least 30%). |
+| `phoenix.burstCooldown` | `1800` | 0 to 72000 | Cooldown of the Burst, in ticks (1800 = 90 seconds). |
+| `phoenix.burstCancelCooldown` | `40` | 0 to 1200 | Cooldown after a cancelled charge, in ticks. |
+| `phoenix.burstDrainTicks` | `100` | 0 to 1200 | How long (in ticks) Weakness and Slowness last after a Burst (none in Creative). |
+| `phoenix.emberRitualTicks` | `60` | 20 to 400 | How long (in ticks) the Phoenix Ember must be held with right-click to awaken (60 = 3 seconds). |
+
+<!-- en: the table "Datapack tags", rows to add (the damage type tag `enhanced:mind_power` is shared with the other 3.0 heroes: add it once) -->
+| `enhanced:telepathy_immune` | entity type | Creatures too vast for a mind to be read, taken over or held by the Phoenix (the Ender Dragon, the Wither, the Warden and the 3.0 bosses). |
+| `enhanced:mind_power` | damage type | Damage that counts as a mind's power: the Chaos Beam, a telekinetic slam and the Phoenix Burst. The Apocalypse boss's shield lets it through when Wanda or the Phoenix is the cause. |
+
+<!-- he: a new section after "ת'ור (מיולניר, סטורמברייקר והביפרוסט)" and before "תגיות דאטה-פק" -->
+## פניקס (ג'ין גריי)
+
+סעיף `[phoenix]`. הדף של הגיבורה הוא [הפניקס](Phoenix-HE). לטלקינזיס שלה אין אפשרויות משלו: הוא משתמש ב-`magneto.telekinesisRange`, `magneto.throwSpeed` ו-`scarlet_witch.blockLift*`.
+
+| אפשרות | ברירת מחדל | ערכים מותרים | משמעות |
+|---|---|---|---|
+| `phoenix.flightSpeed` | `0.09` | 0.01 עד 0.5 | מהירות התעופה של הפניקס (תעופה בקריאייטיב היא 0.05). |
+| `phoenix.fireImmune` | `true` | `true` או `false` | אם `true` (ברירת המחדל), אש, לבה ובעירה לא יכולות לפגוע בפניקס (נזק שעובר דרך הכול עדיין פוגע). |
+| `phoenix.mindReadRange` | `24` | 4 עד 64 | עד כמה רחוק (בבלוקים) קריאת המחשבות מגיעה. היא צריכה קו ראייה. |
+| `phoenix.mindReadPlayers` | `true` | `true` או `false` | אם `false`, קריאת המחשבות לא יכולה לקרוא את המוח של שחקנים (הלוח אומר שהשרת שומר עליהם פרטיים). |
+| `phoenix.mindReadInventory` | `true` | `true` או `false` | אם `true` (ברירת המחדל) הלוח מפרט את כל התיק של שחקן; אם `false`, רק את הידיים והשריון. |
+| `phoenix.mindReadNotifies` | `true` | `true` או `false` | אם `true` (ברירת המחדל), השחקן שנקרא מרגיש נוכחות בראש (פעם בכל 10 שניות), כדי שזה לא יהיה כלי ריגול. |
+| `phoenix.mindReadExhaustion` | `0.01` | 0.0 עד 4.0 | תשישות אוכל בכל טיק בזמן שקריאת המחשבות דלוקה (4.0 = נקודת אוכל אחת). |
+| `phoenix.mindSenseRange` | `48` | 8 עד 128 | עד כמה רחוק (בבלוקים) הפינג של חישת המוחות מגיע. |
+| `phoenix.mindSenseTicks` | `120` | 20 עד 1200 | כמה זמן (בטיקים) המוחות שנחשו זוהרים על המסך שלה (120 = 6 שניות). |
+| `phoenix.mindSenseCooldown` | `400` | 0 עד 72000 | קולדאון של חישת מוחות (התכופפות + R), בטיקים (400 = 20 שניות). |
+| `phoenix.mindSenseExhaustion` | `2.0` | 0.0 עד 40.0 | תשישות אוכל של חישת מוחות אחת. |
+| `phoenix.mindControlRange` | `10` | 2 עד 32 | עד כמה רחוק (בבלוקים) השליטה בתודעה מגיעה (10 = בערך 33 רגל, כמו בסרט). |
+| `phoenix.mindControlTicks` | `300` | 20 עד 2400 | כמה זמן (בטיקים) יצור נשאר נשלט (300 = 15 שניות). |
+| `phoenix.mindControlMax` | `1` | 1 עד 5 | כמה יצורים היא יכולה לשלוט בהם בבת אחת. לקיחה של עוד אחד משחררת את הוותיק, שמתעורר מבולבל. |
+| `phoenix.mindControlPlayerTicks` | `60` | 0 עד 1200 | כמה זמן (בטיקים) השליטה בתודעה מחזיקה שחקן במקום (צריך PvP דלוק). 0 מכבה את זה לשחקנים. |
+| `phoenix.mindControlCooldown` | `400` | 0 עד 72000 | קולדאון של שליטה בתודעה (יכולת 4), בטיקים (400 = 20 שניות). |
+| `phoenix.mindControlExhaustion` | `6.0` | 0.0 עד 40.0 | תשישות אוכל של שליטה בתודעה אחת. |
+| `phoenix.psionicRadius` | `16` | 4 עד 64 | הרדיוס (בבלוקים) של השדה הפסיוני (התכופפות + B). הוא עובד דרך קירות. |
+| `phoenix.psionicTicks` | `60` | 10 עד 600 | כמה זמן (בטיקים) השדה הפסיוני מחזיק את כולם במקום (60 = 3 שניות; שחקנים רק כש-PvP דלוק). |
+| `phoenix.psionicCooldown` | `1200` | 0 עד 72000 | קולדאון של השדה הפסיוני, בטיקים (1200 = 60 שניות). הוא חולק את משבצת יכולת 4 עם השליטה בתודעה. |
+| `phoenix.psionicExhaustion` | `8.0` | 0.0 עד 40.0 | תשישות אוכל של שדה פסיוני אחד. אם הוא לא מחזיק אף אחד הוא לא עולה כלום ואין קולדאון. |
+| `phoenix.burstChargeTicks` | `60` | 10 עד 200 | טיקים של טעינה לפיצוץ הפניקס מלא (60 = 3 שניות). הוא יורה מעצמו בטעינה מלאה. |
+| `phoenix.burstMinChargeTicks` | `12` | 0 עד 100 | טעינה קצרה מזה (בטיקים) מתבטלת: בלי נזק, בלי רעב, וקולדאון קצר. |
+| `phoenix.burstMinRadius` | `8` | 2 עד 64 | הרדיוס (בבלוקים) של פיצוץ שבקושי נטען. |
+| `phoenix.burstMaxRadius` | `24` | 4 עד 96 | הרדיוס (בבלוקים) של פיצוץ בטעינה מלאה. |
+| `phoenix.burstMinDamage` | `8.0` | 0.0 עד 200.0 | הנזק של פיצוץ שבקושי נטען, במרכז. |
+| `phoenix.burstMaxDamage` | `30.0` | 0.0 עד 200.0 | הנזק של פיצוץ בטעינה מלאה, במרכז. הוא נשאר זהה עד חצי מהרדיוס ויורד ל-60% בקצה. |
+| `phoenix.burstPlayerFactor` | `0.5` | 0.0 עד 1.0 | כמה שחקן סופג מהנזק של הפיצוץ (רק כש-PvP דלוק): 0.5 = חצי. |
+| `phoenix.burstWaveSpeed` | `1.0` | 0.2 עד 4.0 | כמה מהר הגל מתפשט (בלוקים לטיק). יצור במרחק 20 בלוקים נפגע 20 טיקים אחרי יצור במרחק בלוק. |
+| `phoenix.burstFireSeconds` | `10` | 0 עד 60 | שניות שיצור בוער אחרי פיצוץ מלא (פיצוץ חלש בוער 40% מהזמן הזה). |
+| `phoenix.burstKnockback` | `1.2` | 0.0 עד 5.0 | הנוקבק של הגל, הרחק מהמרכז (בלי נוקבק ליצורים ב-`enhanced:pin_immune`). |
+| `phoenix.burstSetsFire` | `true` | `true` או `false` | אם הגל מדליק שריפות על בלוקים דליקים (הוא צריך גם את חוק המשחק `mobGriefing`). הוא אף פעם לא שובר בלוק. |
+| `phoenix.burstHurtsPassives` | `false` | `true` או `false` | אם `true`, הגל פוגע גם בכפריים, בגולמי ברזל, בחיות ובחיות מחמד של שחקנים אחרים. כברירת מחדל הוא פוגע רק ביצורים עוינים, ביצורים שרודפים אחריה, בבוסים ובשחקנים (כש-PvP דלוק). |
+| `phoenix.burstMaxFireBlocks` | `40` | 0 עד 400 | לכל היותר כל כך הרבה שריפות בפיצוץ אחד. |
+| `phoenix.burstFoodCost` | `6` | 0 עד 20 | נקודות אוכל שפיצוץ מלא עולה, והרעב המינימלי שצריך כדי להתחיל לטעון (טעינה קטנה יותר עולה פחות, לפחות 30%). |
+| `phoenix.burstCooldown` | `1800` | 0 עד 72000 | קולדאון של הפיצוץ, בטיקים (1800 = 90 שניות). |
+| `phoenix.burstCancelCooldown` | `40` | 0 עד 1200 | קולדאון אחרי טעינה שבוטלה, בטיקים. |
+| `phoenix.burstDrainTicks` | `100` | 0 עד 1200 | כמה זמן (בטיקים) חולשה והאטה נמשכות אחרי פיצוץ (אין בקריאייטיב). |
+| `phoenix.emberRitualTicks` | `60` | 20 עד 400 | כמה זמן (בטיקים) צריך להחזיק את ניצוץ הפניקס עם קליק ימני כדי להתעורר (60 = 3 שניות). |
+
+<!-- he: the table "תגיות דאטה-פק", rows to add (the damage type tag `enhanced:mind_power` is shared with the other 3.0 heroes: add it once) -->
+| `enhanced:telepathy_immune` | סוג יצור | יצורים עצומים מכדי שהפניקס תקרא את המוח שלהם, תשתלט עליהם או תחזיק אותם (אנדר דרגון, וית'ר, וורדן והבוסים של 3.0). |
+| `enhanced:mind_power` | סוג נזק | נזק שנחשב לכוח של מוח: קרן הכאוס, מכת טלקינזיס ופיצוץ הפניקס. המגן של בוס אפוקליפסה מעביר אותו כשוונדה או הפניקס הם הגורם. |

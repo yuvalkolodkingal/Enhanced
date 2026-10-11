@@ -1,0 +1,29 @@
+<!-- Fragment of the Phoenix for the wiki pages Items-and-Crafting / Items-and-Crafting-HE (3.0). Format: see Home.row (`<!-- en: where -->` and `<!-- he: where -->` blocks). -->
+
+<!-- en: the section "Items found in the world", after Tesseract (the opening count of found items goes up by one) -->
+### Phoenix Ember
+
+A spark of the cosmic fire that remembers a host, very rare. It has no recipe and does nothing on its own, until a player with **no power** **holds right-click on it for 3 seconds**: flames spiral up around them, and the Ember burns into them and is used up (not in Creative). They awaken as the [Phoenix](Phoenix), Jean Grey. A hero is turned away ("Your body already holds a power") and keeps the Ember. It doesn't stack, can't burn, and an operator can change how long the ritual takes (`phoenix.emberRitualTicks`, 3 seconds by default). The Phoenix's gathering roar plays while it is held, and the Burst's at the end, softly.
+
+| Source | Chance |
+|---|---|
+| End City treasure chest | 6% |
+| Bastion treasure chest | 5% |
+| Ancient City chest | 4% |
+| Stronghold library chest | 3% |
+| Nether Fortress chest | 3% |
+| Woodland Mansion chest | 3% |
+
+<!-- he: the section "חפצים שמוצאים בעולם", after the Tesseract (the opening count of found items goes up by one) -->
+### ניצוץ הפניקס
+
+ניצוץ של האש הקוסמית שזוכרת מארח, נדיר מאוד. אין לו מתכון והוא לא עושה כלום בעצמו, עד ששחקן **בלי כוחות** **מחזיק עליו קליק ימני 3 שניות**: להבות מסתחררות סביבו, והניצוץ נשרף לתוכו ונגמר (לא בקריאייטיב). הוא מתעורר בתור [הפניקס](Phoenix-HE), ג'ין גריי. גיבור נדחה ("בגוף שלכם כבר יש כוח") ושומר על הניצוץ. הוא לא נערם, לא נשרף, ואופרטור יכול לשנות כמה זמן הטקס נמשך (`phoenix.emberRitualTicks`, 3 שניות כברירת מחדל). השאגה של הפניקס שמתאספת מתנגנת בזמן ההחזקה, והשאגה של הפיצוץ, בשקט, בסוף.
+
+| מקור | סיכוי |
+|---|---|
+| תיבת אוצר של עיר הסוף | 6% |
+| תיבת אוצר של בסטיון | 5% |
+| תיבה של עיר עתיקה | 4% |
+| תיבה של ספריית מבצר | 3% |
+| תיבה של מבצר הנד'ר | 3% |
+| תיבה של אחוזת יער | 3% |

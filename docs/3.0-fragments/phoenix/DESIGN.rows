@@ -1,0 +1,37 @@
+<!-- Fragment of the Phoenix for the shared rows of docs/DESIGN.md and docs/DESIGN.he.md (3.0), besides its own section 13 (design.en.md, design.he.md). Not in the lane guide's list of files: the shared rows of DESIGN. Format: see Home.row (`<!-- en: where -->` and `<!-- he: where -->` blocks). -->
+
+<!-- en: the list at the top of DESIGN.md, after the Thor line -->
+* **Jean Grey, the Phoenix**, the telepath who reads minds and burns with cosmic fire, with the **Phoenix Burst** **(added in 3.0)**
+
+<!-- en: section 0, the row "One power per player": add "Phoenix" after Thor in the list -->
+Phoenix
+
+<!-- en: section 0, the row "Looks (added)": the heroes with several looks, add -->
+the Phoenix
+
+<!-- en: section 9, the table "MCU colours", after the Thor row -->
+| Phoenix | A hooded telepath's mental power has no colour in *Brand New Day*; the fire of the Phoenix in *X-Men: Apocalypse* is "bird-shaped flames" (the colour is not in the sources) | Two palettes so a glance tells them apart: **fire** (the Burst, the charge, the Ember, flight embers) is gold and orange, core `#FFF4C2`, `#FFD65A`, `#FF8A1F`, `#E2531A`, `#8C2410`; **the mind** (reading, Mind Sense, Mind Control, the Psionic Field, telekinesis) is violet, `#F4EEFF`, `#B79CFF`, `#7C5CE0`, `#3F2B96`. Eyes violet when she uses her mind, burning gold when she charges. The Brand New Day look's own sparks are gold `#F2B632` with a pale green `#C4E88A`. |
+
+<!-- en: section 10, the line of `/enhanced power set`: add `phoenix` to `<none|magneto|...|thor>`, and the example looks (`apocalypse`, `brand_new_day`) -->
+phoenix
+
+<!-- en: section 11, the sentence listing the config numbers: add after "the Bifrost's cooldown" -->
+how far the Phoenix's Mind Reading, Mind Sense and Mind Control reach and what they cost, how many creatures she can take over and for how long, the Psionic Field, and every number of the Phoenix Burst (charge time, radius, damage, what a player takes, wave speed, fire, knockback, whether it sets fires or hurts villagers and animals, hunger, cooldowns and the drain afterwards)
+
+<!-- he: the list at the top of DESIGN.he.md, after the Thor line -->
+* **ג'ין גריי, הפניקס**, הטלפתית שקוראת מחשבות ובוערת באש קוסמית, עם **פיצוץ הפניקס** **(נוסף ב-3.0)**
+
+<!-- he: section 0, the row "כוח אחד לכל שחקן": add "הפניקס" after ת'ור in the list -->
+הפניקס
+
+<!-- he: section 0, the row "מראות (נוסף)": the heroes with several looks, add -->
+הפניקס
+
+<!-- he: section 9, the table "צבעי MCU", after the Thor row -->
+| הפניקס | לכוח המחשבה של טלפתית עם ברדס אין צבע ב*יום חדש*; האש של הפניקס ב*X-Men: אפוקליפסה* היא "להבות בצורת ציפור" (הצבע לא מופיע במקורות) | שתי פלטות כדי שמבט אחד יבדיל ביניהן: **אש** (הפיצוץ, הטעינה, הניצוץ, גחלים בתעופה) בזהב וכתום, ליבה `#FFF4C2`, `#FFD65A`, `#FF8A1F`, `#E2531A`, `#8C2410`; **התודעה** (קריאה, חישת מוחות, שליטה בתודעה, השדה הפסיוני, טלקינזיס) בסגול, `#F4EEFF`, `#B79CFF`, `#7C5CE0`, `#3F2B96`. עיניים סגולות כשהיא משתמשת בתודעה, בוערות בזהב כשהיא טוענת. הניצוצות של המראה יום חדש הם זהב `#F2B632` עם ירוק חיוור `#C4E88A`. |
+
+<!-- he: section 10, the line of `/enhanced power set`: add `phoenix` to `<none|magneto|...|thor>`, and the example looks (`apocalypse`, `brand_new_day`) -->
+phoenix
+
+<!-- he: section 11, the sentence listing the config numbers: add after "הקולדאון של הביפרוסט" -->
+כמה רחוק מגיעות קריאת המחשבות, חישת המוחות והשליטה בתודעה של הפניקס ומה הן עולות, על כמה יצורים היא יכולה להשתלט ולכמה זמן, השדה הפסיוני, וכל מספר של פיצוץ הפניקס (זמן הטעינה, רדיוס, נזק, כמה שחקן סופג, מהירות הגל, אש, נוקבק, אם הוא מדליק שריפות או פוגע בכפריים ובחיות, רעב, קולדאונים והחולשה שאחריו)

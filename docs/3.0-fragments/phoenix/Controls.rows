@@ -1,0 +1,75 @@
+<!-- Fragment of the Phoenix for the wiki pages Controls / Controls-HE (3.0). Format: see Home.row (`<!-- en: where -->` and `<!-- he: where -->` blocks). -->
+
+<!-- en: the table "All keys, per hero", after the Thor row -->
+| [Phoenix](Phoenix) | Mind Reading on/off (Sneak: Mind Sense) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks) | Mind Control (Sneak: Psionic Field) | Phoenix Burst (hold to charge, let go to unleash) |
+
+<!-- en: the paragraph "Press, hold, toggle.": the list of hold abilities, add -->
+the Phoenix Burst
+
+<!-- en: the section "Change Look: H", the list of heroes that have several looks, add -->
+the Phoenix
+
+<!-- en: the table in "Flight", after the Thor row -->
+| Phoenix | **G** (Flight) |
+
+<!-- en: the table in "Sneak changes some keys", after the Thor rows (the line about heroes that do not fly needs no change) -->
+| Sneak + **R** as the Phoenix | **Mind Sense**: a ring of violet light finds every mind within 48 blocks through the walls and they glow on your screen for 6 seconds. |
+| Sneak + **V** as the Phoenix | Sets what you hold with telekinesis down gently. |
+| Sneak + **B** as the Phoenix | The **Psionic Field**: everything living within 16 blocks, through walls, is held still for 3 seconds. |
+
+<!-- en: a new section after "Thor's beam, shatter and pin, step by step" -->
+## The Phoenix's mind and fire, step by step
+
+**Reading a mind (R)**
+
+1. Press **R**. "Mind Reading: ON" appears above your hotbar.
+2. Look at a creature or player, up to 24 blocks away with nothing solid between you. A violet panel appears beside your crosshair with what they hold and wear, their mood and their health, and, for a player, their whole inventory.
+3. Press **R** again to switch it off. A player you read is told "You feel a presence in your mind". Magneto's helmet, a Loki's illusion and the biggest bosses show only a line of why they can't be read.
+
+**Mind Sense (Sneak + R) and Mind Control (B)**
+
+1. **Sneak + R:** a ring of violet light spreads out to 48 blocks and every mind it passes glows on your screen through the walls for 6 seconds (players white, monsters pink, the rest violet). The action bar says how many it found. Wait 20 seconds before the next.
+2. **B**, looking at a creature within 10 blocks: it is yours for 15 seconds and fights for you. A second one frees the first. **Sneak + B:** everything living within 16 blocks, through walls, is frozen for 3 seconds (players only with PvP on). Wait 20 seconds after Mind Control, 60 after the field.
+
+**The Phoenix Burst (hold N)**
+
+1. Hold **N**. You rise in flames to hover a block and a half above the ground, and a firebird forms behind you. You walk slowly while you charge, and you can be hurt.
+2. Let go to unleash it: a wave of fire spreads in every direction (8 to 24 blocks, the more you charged the bigger and stronger). Three seconds is a full charge and it fires by itself. Let go within the first half second and the Phoenix slips away.
+3. It costs food (up to 6 points), leaves you weak and slow for 5 seconds, and needs 90 seconds to rest. See [Phoenix](Phoenix).
+
+<!-- he: the table "כל המקשים, לפי גיבור", after the Thor row -->
+| [הפניקס](Phoenix-HE) | קריאת מחשבות דלוקה/כבויה (התכופפות: חישת מוחות) | תעופה (הדלקה/כיבוי) | טלקינזיס (יצורים, פריטים, חיצים, בלוקים) | שליטה בתודעה (התכופפות: שדה פסיוני) | פיצוץ הפניקס (מחזיקים כדי לטעון, מרפים כדי לשחרר) |
+
+<!-- he: the paragraph "לחיצה, החזקה, הדלקה/כיבוי.": the list of hold abilities, add -->
+פיצוץ הפניקס
+
+<!-- he: the section "החלפת מראה: H", the list of heroes that have several looks, add -->
+הפניקס
+
+<!-- he: the table in "תעופה", after the Thor row -->
+| הפניקס | **G** (תעופה) |
+
+<!-- he: the table in "התכופפות משנה חלק מהמקשים", after the Thor rows -->
+| התכופפות + **R** כהפניקס | **חישת מוחות**: טבעת של אור סגול מוצאת כל מוח במרחק של עד 48 בלוקים דרך הקירות, והם זוהרים על המסך שלכם 6 שניות. |
+| התכופפות + **V** כהפניקס | מניחה בעדינות את מה שאתם מחזיקים בטלקינזיס. |
+| התכופפות + **B** כהפניקס | **השדה הפסיוני**: כל מה שחי במרחק של עד 16 בלוקים, גם דרך קירות, מוחזק במקום 3 שניות. |
+
+<!-- he: a new section after "הברק, הריסוק וההצמדה של ת'ור, צעד אחר צעד" -->
+## המוח והאש של הפניקס, צעד אחר צעד
+
+**קריאת מוח (R)**
+
+1. לוחצים **R**. "קריאת מחשבות: דלוקה" מופיע מעל שורת הפריטים.
+2. מסתכלים על יצור או שחקן, עד 24 בלוקים, בלי שום דבר מוצק בינכם. לוח סגול מופיע ליד הכוונת עם מה שהוא מחזיק ולובש, מצב הרוח והחיים שלו, ובשחקן גם כל התיק.
+3. לוחצים **R** שוב כדי לכבות. שחקן שקראתם מקבל הודעה "אתם מרגישים נוכחות בתוך הראש". הקסדה של מגנטו, אשליה של לוקי והבוסים הגדולים ביותר מראים רק שורה שאומרת למה אי אפשר לקרוא אותם.
+
+**חישת מוחות (התכופפות + R) ושליטה בתודעה (B)**
+
+1. **התכופפות + R:** טבעת של אור סגול נפרשת עד 48 בלוקים וכל מוח שהיא עוברת עליו זוהר על המסך שלכם דרך הקירות 6 שניות (שחקנים בלבן, מפלצות בוורוד, השאר בסגול). שורת הפעולה אומרת כמה נמצאו. מחכים 20 שניות עד הבאה.
+2. **B**, כשמסתכלים על יצור במרחק של עד 10 בלוקים: הוא שלכם ל-15 שניות ונלחם בשבילכם. השתלטות שנייה משחררת את הראשון. **התכופפות + B:** כל מה שחי במרחק של עד 16 בלוקים, גם דרך קירות, קופא ל-3 שניות (שחקנים רק כש-PvP דלוק). מחכים 20 שניות אחרי שליטה בתודעה, 60 אחרי השדה.
+
+**פיצוץ הפניקס (מחזיקים N)**
+
+1. מחזיקים **N**. אתם עולים באש ומרחפים בלוק וחצי מעל הקרקע, וציפור להבות נוצרת מאחוריכם. אתם הולכים לאט בזמן הטעינה, ואפשר לפגוע בכם.
+2. מרפים כדי לשחרר: גל של אש מתפשט לכל כיוון (8 עד 24 בלוקים, ככל שטענתם יותר הוא גדול וחזק יותר). שלוש שניות הן טעינה מלאה והוא יורה מעצמו. מרפים בחצי השנייה הראשונה והפניקס חומקת.
+3. זה עולה אוכל (עד 6 נקודות), משאיר אתכם חלשים ואיטיים 5 שניות, וצריך 90 שניות מנוחה. ראו [הפניקס](Phoenix-HE).

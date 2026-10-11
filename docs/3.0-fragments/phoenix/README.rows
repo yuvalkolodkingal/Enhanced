@@ -1,0 +1,26 @@
+<!-- Fragment of the Phoenix for README.md (3.0). Format: see Home.row (`<!-- en: where -->` blocks; the README is in English only). -->
+
+<!-- en: the first paragraph, the list of heroes, before "or, if you are worthy, **Thor**" -->
+**Jean Grey, the Phoenix**, who reads minds and burns with cosmic fire;
+
+<!-- en: the second paragraph, the heroes with several looks: add "the Phoenix" to the list (Vision, Tommy, Billy, Loki, Thor and the Phoenix) -->
+the Phoenix
+
+<!-- en: the table "Becoming a hero", after the Thor row -->
+| **Phoenix** | Find the very rare **Phoenix Ember** (End City and bastion treasure, Ancient City, stronghold library, Nether fortress and woodland mansion chests), hold it with no power and **hold right-click for 3 seconds**. Mind Reading (**R**) shows the items of whoever you look at, **Sneak + R** senses every mind through the walls, **B** takes over a creature, **Sneak + B** freezes everyone around you, and **N**, held, charges the Phoenix Burst: a wave of cosmic fire in every direction. |
+
+<!-- en: a new table after the Tommy, Billy, Loki and Thor controls table -->
+| Key | Phoenix |
+|---|---|
+| **R** | Mind Reading on/off (Sneak: Mind Sense through walls) |
+| **G** | Flight |
+| **V** | Telekinesis (creatures, items, arrows, blocks) |
+| **B** | Mind Control (Sneak: Psionic Field) |
+| **N** | Phoenix Burst (hold to charge, let go to unleash) |
+| **H** | Change look |
+
+<!-- en: the paragraph "Every hero except Quicksilver, Tommy and Loki can also fly": the Phoenix flies with G and when she charges the Burst (she hovers). Nothing to change in the sentence. "For server owners", the list of powers in `/enhanced power get|set …`: add `phoenix` after `thor` -->
+`phoenix`
+
+<!-- en: "For server owners", the balance numbers: add "the Phoenix's Mind Reading, Mind Control and Burst" to the list in parentheses -->
+the Phoenix's Mind Reading, Mind Control and Burst
