@@ -463,6 +463,9 @@ public final class HeroAnimator {
 
         // ---- the speedster's run cycle ----
         RunPoses.advance(s, dt, snap);
+        if (s.power == Power.SPIDER_MAN) {
+            SpiderPoses.advance(s, player, dt, snap);
+        }
         RunPoses.Style style = RunPoses.style(s);
         shiftPhases(s);
 
@@ -517,14 +520,18 @@ public final class HeroAnimator {
             s.addPitch = 0.0F;
             s.addDrop = 0.0F;
         }
-        s.yawAdd = s.whirlYaw + s.gestureYaw;
+        s.yawAdd = s.whirlYaw + s.gestureYaw + s.stanceYaw;
+        s.jx += s.clingOffX;
+        s.jz += s.clingOffZ;
         float addPitch = s.addPitch + Stances.lean(s);
         float addDrop = s.addDrop + Stances.drop(s);
         s.addDrop = addDrop;
         float bifrost = s.stance(Stance.THOR_BIFROST);
         s.renderPitch = (s.pitch.x + addPitch) * (1.0F - bifrost);
-        s.renderRoll = (s.roll + s.addRoll) * (1.0F - bifrost);
+        s.renderRoll = (s.roll + s.addRoll + s.ceilingRoll) * (1.0F - bifrost);
         s.pivot = AnimMath.lerp(s.landWeight, AnimMath.lerp(s.wAir, 0.40F, 0.90F), 0.40F);
+        // Hanging from a ceiling the body is flipped over about its middle.
+        s.pivot = AnimMath.lerp(Math.min(1.0F, Math.abs(s.ceilingRoll) / 180.0F), s.pivot, 0.90F);
     }
 
     /** Vanilla already turns the body of a dying, sleeping, gliding, swimming or riding player (and a spectator floats). */
@@ -874,6 +881,17 @@ public final class HeroAnimator {
         } else if (payload.kind() == ThorFxPayload.BIFROST_ARRIVAL) {
             start(s, GestureId.THOR_ARRIVAL, 0.0F, player.tickCount);
             FlightEffects.impact(player, s, 1.0F);
+        }
+    }
+
+    /** A zip or a swing begins: the arm of his web aims at its anchor while he holds on. */
+    public static void onSpiderFx(int playerId, Vec3 anchor) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level != null && level.getEntity(playerId) instanceof AbstractClientPlayer player) {
+            HeroAnimState s = peek(player);
+            if (s != null) {
+                s.anchor = anchor;
+            }
         }
     }
 

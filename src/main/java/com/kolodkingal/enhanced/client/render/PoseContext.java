@@ -213,6 +213,7 @@ final class PoseContext {
             case WEAPON -> st.thrownWeapon != null && !st.thrownWeapon.isRemoved() ? center(st.thrownWeapon) : st.lastWeaponPos;
             case WEAPON_LAST -> st.catchFrom != null ? st.catchFrom : st.lastWeaponPos;
             case STRIKE -> st.strikeTarget != null && player.level().getGameTime() - st.strikeTick <= BOLT_MEMORY ? st.strikeTarget : null;
+            case ANCHOR -> st.anchor;
         };
     }
 

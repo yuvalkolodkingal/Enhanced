@@ -152,6 +152,25 @@ public final class HeroAnimState {
     /** The age at which the first-person hands were last moved ({@link FirstPersonArms}). */
     public double fpAge = Double.NEGATIVE_INFINITY;
 
+    // ---- Spider-Man ----
+    /** The end of his web while he zips or swings (the aim of the stances SPIDER_ZIP and SPIDER_SWING), or null. */
+    public Vec3 anchor;
+    /** The horizontal unit vector from him to the wall he clings to (zero before he has clung to one). */
+    public Vec3 wallDir = Vec3.ZERO;
+    /** His speed along the surface he clings to (blocks per tick, this tick), and the cycle of his hands and knees. */
+    public float crawlSpeed;
+    public float crawlPhase;
+    public float crawlOmega;
+    public float crawlAmp;
+    /** The yaw (degrees) his body faces while it is turned to a wall or an anchor, and whether it has been set. */
+    public float faceYaw;
+    public boolean faceSet;
+    /** What the cling adds to the body: the turn to the wall (in {@link #yawAdd}'s signs), the ceiling's flip, the offset. */
+    public float stanceYaw;
+    public float ceilingRoll;
+    public float clingOffX;
+    public float clingOffZ;
+
     // ---- gestures ----
     public final Slot[] slots = new Slot[SLOTS];
 
