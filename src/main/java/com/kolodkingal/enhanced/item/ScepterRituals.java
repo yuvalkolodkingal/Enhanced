@@ -46,8 +46,9 @@ import java.util.Map;
  *
  * The rows are chosen by the pure functions {@link #scepter} and {@link #tesseract} (checked row by row by the game
  * tests); {@link #useScepter} and {@link #useTesseract} carry them out. The rows before 3.0 do exactly what the items
- * did before. The rows of the three villains (the Ultron fight, the Thanos summoning) need the boss framework: until it
- * is built they are declined, and the Scepter and Tesseract do what they always did.
+ * did before. The rows of the villains need their lanes: the Ultron fight is started through {@link BossFights}, which
+ * declines until the Ultron lane registers its fight, and the Thanos summoning is declined until the Thanos lane
+ * registers its hold ({@link #registerThanosHold}); the Scepter and Tesseract then do what they always did.
  */
 public final class ScepterRituals {
     /** How long the Scepter and the Tesseract are held to call the Mad Titan: five seconds. */
@@ -189,9 +190,8 @@ public final class ScepterRituals {
             }
             case ULTRON_FIGHT -> {
                 InfinityStone.MIND.use(level, player.position(), InfinityStone.UNDER, 1.0F);
-                if (!BossFights.start(BossKind.ULTRON, player, false)) {
-                    player.displayClientMessage(Component.translatable("message.enhanced.boss.unavailable").withStyle(ChatFormatting.GRAY), true);
-                }
+                // BossFights tells the player why it cannot start (no lane yet, Peaceful, another fight, the site).
+                BossFights.start(BossKind.ULTRON, player, false);
             }
             case ULTRON_HINT -> {
                 // The stone is turned away, as it is for a gene: nothing is used up, nobody is hurt.

@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.command;
 
+import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
@@ -163,15 +164,22 @@ public final class EnhancedCommand {
     }
 
     private static int stopBosses(CommandSourceStack source) {
+        int running = BossFights.all(source.getServer()).size();
         BossFights.stopAll(source.getServer(), StopReason.COMMAND);
-        source.sendSuccess(() -> Component.translatable("commands.enhanced.boss.stop"), true);
+        source.sendSuccess(() -> Component.translatable(running == 0 ? "commands.enhanced.boss.stop.none" : "commands.enhanced.boss.stop"), true);
         return 1;
     }
 
     private static int listBosses(CommandSourceStack source) {
-        // (A running fight lists itself here once the boss framework has fights to list.)
-        source.sendSuccess(() -> Component.translatable("commands.enhanced.boss.list.none"), false);
-        return 0;
+        List<BossFight> fights = BossFights.all(source.getServer());
+        if (fights.isEmpty()) {
+            source.sendSuccess(() -> Component.translatable("commands.enhanced.boss.list.none"), false);
+            return 0;
+        }
+        for (BossFight fight : fights) {
+            source.sendSuccess(() -> Component.literal(fight.describe()), false);
+        }
+        return fights.size();
     }
 
     /** Removes the boss entities left in a ball round a point: what a fight that went wrong leaves behind. */

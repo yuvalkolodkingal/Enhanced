@@ -100,7 +100,7 @@ public final class Teleports {
 
     /** The highest safe standing spot in this column (below the roof, in a dimension with one). */
     @Nullable
-    private static Vec3 groundAt(LivingEntity traveller, ServerLevel level, int x, int z) {
+    public static Vec3 groundAt(LivingEntity traveller, ServerLevel level, int x, int z) {
         int bottom = level.getMinBuildHeight();
         int top = level.dimensionType().hasCeiling()
                 ? bottom + level.dimensionType().logicalHeight() - 2

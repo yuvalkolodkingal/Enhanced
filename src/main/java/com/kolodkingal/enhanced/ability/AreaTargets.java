@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,11 +20,12 @@ import java.util.function.BiPredicate;
  * farm animals and pets round a base without a block changing, so each of them asks {@link #mayHurt} for every
  * creature in reach.
  *
- * <p>The rule: never the caster, a Creative or Spectator player, an armour stand, a teammate, the caster's own pets or
- * an ally some rule names ({@link #addAllyRule}: a creature the Phoenix has taken over, the fighters of a boss fight).
- * A player only if PvP is on and the caster may harm them. Hostile creatures always, and so is anything that is going
- * after the caster or their team, and the bosses and their minions. Every other creature (villagers, golems, animals,
- * others' pets) only if the caster's option for hurting passive creatures says so, which every hero has off.
+ * <p>The rule: never the caster, a Creative or Spectator player, an armour stand, a teammate, the caster's own pets, an
+ * ally some rule names ({@link #addAllyRule}: a creature the Phoenix has taken over) or, for a boss, its own minions
+ * (the creatures of one boss fight spare each other). A player only if PvP is on and the caster may harm them. Hostile
+ * creatures always, and so is anything that is going after the caster or their team, and the bosses and their
+ * minions. Every other creature (villagers, golems, animals, others' pets) only if the caster's option for hurting
+ * passive creatures says so, which every hero has off.
  */
 public final class AreaTargets {
     private static final List<BiPredicate<LivingEntity, LivingEntity>> ALLIES = new CopyOnWriteArrayList<>();
@@ -58,6 +60,9 @@ public final class AreaTargets {
         }
         if (owner.isAlliedTo(target) || (target instanceof TamableAnimal pet && pet.isOwnedBy(owner))) {
             return false;
+        }
+        if (BossFights.sameFight(owner, target)) {
+            return false; // a boss's slam spares its own minions
         }
         for (BiPredicate<LivingEntity, LivingEntity> ally : ALLIES) {
             if (ally.test(owner, target)) {
