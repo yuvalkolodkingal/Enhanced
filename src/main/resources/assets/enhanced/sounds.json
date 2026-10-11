@@ -397,5 +397,109 @@
         "name": "enhanced:sfx/time_stone_loop_1"
       }
     ]
+  },
+  "web_shot": {
+    "subtitle": "subtitles.enhanced.web_shot",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/web_shot"
+      }
+    ]
+  },
+  "web_zip": {
+    "subtitle": "subtitles.enhanced.web_zip",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/web_zip"
+      }
+    ]
+  },
+  "web_burst": {
+    "subtitle": "subtitles.enhanced.web_burst",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/web_burst"
+      }
+    ]
+  },
+  "web_splat": {
+    "subtitle": "subtitles.enhanced.web_splat",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/web_splat"
+      }
+    ]
+  },
+  "web_stick": {
+    "subtitle": "subtitles.enhanced.web_stick",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/web_stick"
+      }
+    ]
+  },
+  "web_swing": {
+    "subtitle": "subtitles.enhanced.web_swing",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/web_swing_loop"
+      }
+    ]
+  },
+  "spider_sense": {
+    "subtitle": "subtitles.enhanced.spider_sense",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/spider_sense"
+      }
+    ]
+  },
+  "black_eyes_on": {
+    "subtitle": "subtitles.enhanced.black_eyes_on",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/black_eyes_on"
+      }
+    ]
+  },
+  "black_eyes_off": {
+    "subtitle": "subtitles.enhanced.black_eyes_off",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/black_eyes_off"
+      }
+    ]
+  },
+  "spider_legs": {
+    "subtitle": "subtitles.enhanced.spider_legs",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/spider_legs"
+      }
+    ]
+  },
+  "leg_strike": {
+    "subtitle": "subtitles.enhanced.leg_strike",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/leg_strike"
+      }
+    ]
+  },
+  "instant_kill_on": {
+    "subtitle": "subtitles.enhanced.instant_kill_on",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/instant_kill_on"
+      }
+    ]
+  },
+  "spider_bite": {
+    "subtitle": "subtitles.enhanced.spider_bite",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/spider_bite"
+      }
+    ]
   }
 }

@@ -42,9 +42,17 @@ public final class ModBlocks {
                     .isValidSpawn(Blocks::never));
 
     // ===== spider =====
-    /** The temporary web of Spider-Man: no item, no drop. */
+    /** The temporary web of Spider-Man: no item, no drop; a hand or a sword clears it (hardness 0.5, no tool needed). */
     public static final DeferredBlock<SpiderWebBlock> SPIDER_WEB = BLOCKS.registerBlock("spider_web",
-            SpiderWebBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.COBWEB).noLootTable());
+            SpiderWebBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOL)
+                    .sound(SoundType.COBWEB)
+                    .forceSolidOn()
+                    .noCollission()
+                    .noOcclusion()
+                    .strength(0.5F)
+                    .pushReaction(PushReaction.DESTROY)
+                    .noLootTable());
 
     private ModBlocks() {
     }

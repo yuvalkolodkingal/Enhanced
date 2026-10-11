@@ -1,0 +1,23 @@
+{
+  "type": "neoforge:add_table",
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:entities/cave_spider"
+    },
+    {
+      "condition": "minecraft:killed_by_player"
+    },
+    {
+      "condition": "minecraft:random_chance_with_enchanted_bonus",
+      "enchantment": "minecraft:looting",
+      "unenchanted_chance": 0.004,
+      "enchanted_chance": {
+        "type": "minecraft:linear",
+        "base": 0.007,
+        "per_level_above_first": 0.003
+      }
+    }
+  ],
+  "table": "enhanced:inject/radioactive_spider"
+}

@@ -83,6 +83,20 @@ public final class ModSounds {
     // ===== phoenix =====
 
     // ===== spider =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEB_SHOT = register("web_shot");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEB_ZIP = register("web_zip");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEB_BURST = register("web_burst");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEB_SPLAT = register("web_splat");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEB_STICK = register("web_stick");
+    /** The creak of a taut web while he swings (a loop). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEB_SWING = register("web_swing");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPIDER_SENSE = register("spider_sense");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BLACK_EYES_ON = register("black_eyes_on");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BLACK_EYES_OFF = register("black_eyes_off");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPIDER_LEGS = register("spider_legs");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LEG_STRIKE = register("leg_strike");
+    public static final DeferredHolder<SoundEvent, SoundEvent> INSTANT_KILL_ON = register("instant_kill_on");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPIDER_BITE = register("spider_bite");
 
     // ===== thanos =====
 
