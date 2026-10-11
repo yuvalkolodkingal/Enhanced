@@ -31,6 +31,10 @@ public enum Stance {
     // The stances of 3.0, in one region per hero (the // ===== lines), each lane's own. Whatever the order here, the
     // ambient ones are applied first and the aimed and holding ones after (see Stances).
     // ===== phoenix =====
+    /** Phoenix: Mind Reading is on, the head tilted as if listening. */
+    PHOENIX_READ(6, 6, false),
+    /** Phoenix: the Burst gathers, a V of arms thrown up and out. */
+    PHOENIX_CHARGE(1.5F, 4, true),
 
     // ===== spider =====
 

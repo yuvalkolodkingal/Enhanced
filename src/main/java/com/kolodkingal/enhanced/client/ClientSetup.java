@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
+import com.kolodkingal.enhanced.client.render.PhoenixFlameLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
 import com.kolodkingal.enhanced.client.render.ThrownWeaponRenderer;
@@ -53,6 +54,7 @@ public final class ClientSetup {
         event.enqueueWork(() -> {
             EntityGlow.register(TheNoise::reveals, TheNoise::moodColor);
             // ===== phoenix =====
+            EntityGlow.register(MindSense::reveals, MindSense::color);
             // ===== spider =====
             // ===== thanos =====
             // ===== ultron =====
@@ -133,6 +135,8 @@ public final class ClientSetup {
                 renderer.addLayer(new BillyCrownLayer(renderer));
                 // The layers of 3.0, one region per hero (the // ===== lines), before the last one.
                 // ===== phoenix =====
+                renderer.addLayer(new PhoenixFlameLayer(renderer,
+                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
                 // ===== spider =====
                 // ===== thanos =====
                 // ===== ultron =====
@@ -155,6 +159,8 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("anim_state"), new AnimStateOverlay());
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("mind_read"), new MindReadingOverlay());
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("phoenix_light"), new PhoenixOverlay());
         // ===== spider =====
         // ===== thanos =====
         // ===== ultron =====
