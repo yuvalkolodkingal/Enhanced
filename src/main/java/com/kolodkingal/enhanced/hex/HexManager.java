@@ -514,7 +514,7 @@ public final class HexManager {
         // the wall. Then put them back just on their own side of it instead.
         double halfHeight = entity.getBbHeight() * 0.5;
         if (hex.contains(back.add(0, halfHeight, 0)) != wasInside && radial.lengthSqr() > 1.0E-6) {
-            back = hex.center().add(radial.normalize().scale(wasInside ? hex.radius() - 1.0 : hex.radius() + 1.0)).subtract(0, halfHeight, 0);
+            back = besideWall(hex, radial, wasInside).subtract(0, halfHeight, 0);
         }
         if (entity instanceof ServerPlayer player) {
             player.connection.teleport(back.x, back.y, back.z, player.getYRot(), player.getXRot());
@@ -523,6 +523,25 @@ public final class HexManager {
         }
         entity.setDeltaMovement(push.x, Math.max(0.2, push.y), push.z);
         entity.hurtMarked = true;
+    }
+
+    /**
+     * The middle of the body one block off the wall on the side it came from, straight out from the middle of the Hex
+     * and at the height the body is at. (A line from the middle of the Hex through the body would bring it a little
+     * lower each time it is thrown back, so a hero leaning on the wall would sink into the floor.) Only right at the
+     * top of the dome, where no such spot is left at that height, does it follow that line.
+     *
+     * @param radial from the middle of the Hex to the middle of the body
+     */
+    private static Vec3 besideWall(Hex hex, Vec3 radial, boolean wasInside) {
+        double distance = wasInside ? hex.radius() - 1.0 : hex.radius() + 1.0;
+        double across = distance * distance - radial.y * radial.y;
+        double flat = Math.sqrt(radial.x * radial.x + radial.z * radial.z);
+        if (across > 0.0 && flat > 1.0E-6) {
+            double along = Math.sqrt(across) / flat;
+            return hex.center().add(radial.x * along, radial.y, radial.z * along);
+        }
+        return hex.center().add(radial.normalize().scale(distance));
     }
 
     private static Vec3 bodyCenter(LivingEntity entity) {
