@@ -192,3 +192,82 @@ batch of its own. A test class must not have a client class (`GuiGraphics`, `Lay
 included: the test server cannot load it, and **a crash at registration still ends the Gradle build with "BUILD SUCCESSFUL"**
 (look for `All N required tests passed` in the log).
 
+
+## 8. What the review (step 3) fixed, and what a lane can count on
+
+An adversarial review of the skeleton and the framework (every changed line of an existing hero, the boss lifecycle, a
+dedicated server and a client in play) found the following. All of it is in the code and pinned by tests.
+
+**Fixed**
+
+* **A refused summoning no longer kills.** Once the Thanos lane registers its hold (`ScepterRituals.registerThanosHold`),
+  the rows of the Mad Titan are the lane's alone: `Hold.begin` answers false after telling the player why, and *nothing else
+  happens* (before, the Scepter fell through to its explosion, which kills, and the Tesseract to Loki's escape, which
+  teleports a hundred blocks and makes the player Loki). `Hold.begin(player, hand)` gets the hand of the item that is being
+  used. `ScepterRituals.callsThanos(player, hand)` says whether a use of the Tesseract is the call; `registerThanosHold` returns
+  the hold it replaced (tests put it back; `TestKit.bossFixture` does).
+* **`PhoenixPower` exists** (`ability/PhoenixPower`): `isPhoenix`, `isPhoenixMindPower(source)` (the `mind_power` tag with a
+  Phoenix as the causing entity), `Kind`, `Listener`, `addListener`, `touched(phoenix, target, kind, amount)`. The Phoenix lane
+  *calls* `touched` (before any refusal, once per cast); the Apocalypse lane *registers* a listener. The plan promised a stub
+  and the skeleton had none.
+* **`BossHooks.onLightning` has a call site** (`BossEvents.onLightning`, `LivingIncomingDamageEvent`, lowest priority, not for a
+  cancelled hit): any entity that implements `BossHooks` and takes damage of the `minecraft:is_lightning` tag (Thor's beam, his
+  arcs, the weather) is told, with Thor if the bolt is his. `onWebShot` stays the Spider lane's to call.
+* **The gesture routes ask the hero's client first.** `GestureRoutes.cooldown/flag/live/grab/fling/startedElsewhere` and
+  `GestureEffects.started` call `HeroClient.cooldownGesture(ability, left)`, `flagGesture(flag, on)`, `liveGesture(live)`,
+  `grabGesture()`, `flingGesture()`, `startedElsewhere(id)` and `gestureStarted(player, state, id, param)` for a hero of 3.0. A lane
+  never edits the arms of the others: those switches were the merge hot spots left. (`toggle`, `acting` and `reason` keep their
+  regions.)
+* **`AnimationMathTests` no longer needs a hero added to `heroes`** (every power with abilities is in), and its three
+  data-driven arrays (the flight profiles, the take-off hand-overs, the gesture/stance pairs) have a region for each lane.
+* `cannot_be_snatched` holds the Infinity Gauntlet (a speedster cannot pickpocket the reward, as the Thanos spec says).
+  Whether the Essence and Ultron's Core join it is the lanes' call.
+* `HeroLifecycle.onServerStopped` clears the boss fights even if a hero's own clean-up throws; `HeroServers.register` and
+  `HeroClients.register` are public and return what they replaced (a test puts a recording plug-in in and the old one back).
+* The Hebrew `power.enhanced.apocalypse.awaken` says "בתוכך" like the awakening lines before it.
+
+**The contract of a `HeroServer`, tested by `SkeletonTests.aHeroPlugInIsCalledForTheRightPlayersAndOncePerSessionEvent`**
+
+| Call | When |
+|---|---|
+| `onKey` | the hero's own player only, from `AbilityHandler` (an Entombed player's presses are dropped, their releases are not) |
+| `everyPlayerTick`, `applyBody` | every alive player, every tick, whatever their power: the hero checks whose it is, and removes its modifiers from anyone who is not it |
+| `tick` | the hero's own alive player, after the above |
+| `stopHold(data)` | a dead player's tick (and `stopHoldAbilities`): clear your `Live` bits and flags that stand for a held key |
+| `endAll(player, data)` | the power is being taken away: `data.power()` is *still* the hero; `applyBody` follows with the new one |
+| `onLogin`, `onLogout`, `onDeath`, `onRespawn`, `onChangeDimension` | once per event for **every** plug-in and every player (check the player is yours); `onDeath` is the real `LivingDeathEvent` |
+| `onServerStopped` | once, with the boss fights cleared even if you throw |
+
+**Rules the lanes must follow that the framework cannot enforce**
+
+* **A boss entity must stay.** A `Monster` despawns when no player is near and in Peaceful: the boss and its minions override
+  `removeWhenFarAway` (false), call `setPersistenceRequired()` and, if they must not vanish in Peaceful, `shouldDespawnInPeaceful`
+  (false); the fight ends the Peaceful case itself (`BossEnd.PEACEFUL`).
+* **Boss minions have no owner.** The orphan sweep leaves alone any `OwnableEntity` whose owner is set (that is how the Ultron
+  hero's drones survive a restart). A Sentry of the fight, a Phantom, a Horseman's Husk must report `getOwnerUUID() == null`, or
+  the sweep would never remove them after a crash. If an entity must be owned, set the owner *before* `addFreshEntity`.
+* **A payload handler is one static call into a client class** (`ThorFxPayload.handle` is the pattern): the client class is
+  loaded only when the handler runs, on a client. Never name a client class anywhere else in a payload or in common code; the
+  dedicated server (`./gradlew runServer`, with a client class on its path) refuses to load it.
+* **Lane tests go in the lane's own classes** (`PhoenixTests`, `PhoenixAnimationTests`, ...), never in `AnimationMathTests`,
+  `AnimationSignalTests`, `DataTests` or `SkeletonTests`, except for the regions in `AnimationMathTests`. A test of
+  server-wide state takes `TestKit.bossFixture` and a batch of its own.
+* **Do not edit `PowerAuraLayer`** (Phoenix's flame, Apocalypse's tint): add a `RenderLayer` of your own in your region of
+  `ClientSetup.onAddLayers`. Do not edit `GestureEffects`: implement `HeroClient.gestureStarted`.
+* A new gesture needs its keys (`HeroClient.registerGestures`), a route (`cooldownGesture`, `flagGesture`, `liveGesture`, a `toggle`
+  arm of its own, or `HeroClient.startedElsewhere` for a payload or an edge) and, for a hero that flies with a profile, a take-off
+  (`HeroClient.takeoffGesture`); `AnimationMathTests` fails an orphan.
+
+**Shared files with exactly one lane that edits them (outside the regions)**
+
+| File | Lane | Edit |
+|---|---|---|
+| `Telekinesis`, `TelekineticBlockEntity` | Phoenix | `Mode.JEAN` and a colour per mode |
+| `Telekinesis` | Spider-Man | `isMagnetic`: one line for an Iron Spider |
+| `Telekinesis`, `TommyAbilities` | Apocalypse | `hold`, `vibrate`: `SandCocoonEntity.freeFrom` (two lines) |
+| `LokiAbilities` | Thanos | two public methods for the Soul Sight |
+| `mixin/client/PlayerRendererMixin` | Thanos | one inject for the first-person Gauntlet |
+| `EnhancedRenderTypes` | Spider-Man | `webDecal` |
+| `PoseContext`, `HeroAnimState`, `HeroAnimator` (`applyBody`, `onSpiderFx`) | Spider-Man | the wall and ceiling body turn, the anchor target |
+| `ModAttachments` | Ultron | `SOKOVIA_RELOCATIONS` |
+| `data/neoforge/loot_modifiers/global_loot_modifiers.json` | Phoenix, Spider-Man | the chest and spider loot (a JSON list: the second to merge keeps both sides) |
