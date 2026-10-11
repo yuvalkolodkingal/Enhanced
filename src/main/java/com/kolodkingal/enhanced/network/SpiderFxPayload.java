@@ -20,7 +20,9 @@ import java.util.List;
  *   <li>{@link Kind#BURST}: {@code from} his chest, {@code points} where each strand ended, {@code arg} how many were
  *       blocked by a shield.</li>
  *   <li>{@link Kind#ZIP_START}, {@link Kind#SWING_START}: {@code to} the anchor, {@code normal} the face,
- *       {@code value} the rope length (swing); also sent to the hero himself as the acknowledgement.</li>
+ *       {@code value} the rope length (swing); also sent to the hero himself as the acknowledgement. A zip also carries
+ *       the point the server will have him stand at as {@code points[0]} (the client moves him there), and, for a zip
+ *       aimed at a creature (it ends in a kick), the creature's entity id as {@code arg} (otherwise -1).</li>
  *   <li>{@link Kind#ZIP_END}, {@link Kind#SWING_END}: {@code arg} the reason (0 arrived, 1 cancelled, 2 refused,
  *       3 blocked, 4 timeout, 5 released, 6 anchor lost).</li>
  *   <li>{@link Kind#LEG_STRIKE}: {@code arg} the leg 0 to 3, {@code to} where the tip goes.</li>
