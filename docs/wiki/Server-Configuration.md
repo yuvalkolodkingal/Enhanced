@@ -154,15 +154,18 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 
 The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_modifiers/`) are datapack files too: see [Items and Crafting](Items-and-Crafting).
 
-## Client options: animations and effects
+## Client options: animations, effects and looks
 
-Three options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]` section. The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
+Four options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]` and `[appearance]` sections. The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
 
 ```toml
 [animation]
     animations = true
     reducedMotion = false
     flightEffects = true
+
+[appearance]
+    hideHeroArmour = true
 ```
 
 | Option | Setting in the file | Default | What it does |
@@ -170,6 +173,7 @@ Three options are about your own game only. They are not synced, and a server ca
 | Hero animations | `animations` | `true` | The heroes' blended poses, flight, running, abilities and Thor's weapon in his fist. Off: only the usual Minecraft poses. |
 | Reduced motion | `reducedMotion` | `false` | A calmer animation: the hover bob and drift at a third, no trembling hands, jitter or camera shake, and fainter rings. |
 | Flight effects | `flightEffects` | `true` | Ribbons, rings, wind streaks and shockwaves around flying heroes, and the little flourishes of some abilities. Off: only a few trail particles are left. |
+| Hide heroes' armour | `hideHeroArmour` | `true` | Players with a power are drawn without their armour (helmet, chestplate, leggings and boots, with their trims and dye): yours in third person, everyone else's, and in the inventory preview, so it doesn't hide the characters. The armour still protects as usual, and a player with no power looks as they always did. The elytra, a carved pumpkin or a mob head, and the mod's own hero gear (Magneto's Helmet, Wanda's Crown, Quicksilver's Goggles) are always drawn. Off: heroes show their armour like everyone else. |
 
 ## Related
 

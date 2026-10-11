@@ -373,10 +373,15 @@
   "enhanced.configuration.animation": "Hero animation",
   "enhanced.configuration.animation.tooltip": "How the heroes are acted, and how much they flare.",
   "enhanced.configuration.animation.button": "Edit…",
+  "enhanced.configuration.appearance": "Hero appearance",
+  "enhanced.configuration.appearance.tooltip": "How the heroes look.",
+  "enhanced.configuration.appearance.button": "Edit…",
   "config.enhanced.animations": "Hero animations",
   "config.enhanced.animations.tooltip": "Blended poses, flight, running and Thor's weapon. Off: vanilla poses only.",
   "config.enhanced.reduced_motion": "Reduced motion",
   "config.enhanced.reduced_motion.tooltip": "Hover bob and drift at a third, no trembling hands, jitter or camera shake, and fainter rings.",
   "config.enhanced.flight_effects": "Flight effects",
-  "config.enhanced.flight_effects.tooltip": "Ribbons, rings, wind streaks and shockwaves around flying heroes."
+  "config.enhanced.flight_effects.tooltip": "Ribbons, rings, wind streaks and shockwaves around flying heroes.",
+  "config.enhanced.hide_hero_armour": "Hide heroes' armour",
+  "config.enhanced.hide_hero_armour.tooltip": "Don't draw the armour of heroes (yours in third person, and everyone else's), so it doesn't hide the characters. It still protects as usual. Elytra, mob heads, carved pumpkins and the hero gear of this mod are always drawn."
 }

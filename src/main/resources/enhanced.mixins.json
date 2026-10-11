@@ -9,6 +9,7 @@
   "client": [
     "client.AbstractClientPlayerMixin",
     "client.CapeLayerMixin",
+    "client.HumanoidArmorLayerMixin",
     "client.ItemInHandLayerMixin",
     "client.ItemInHandRendererAccessor",
     "client.LevelRendererMixin",

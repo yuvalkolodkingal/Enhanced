@@ -89,8 +89,9 @@ under *Options → Controls → Enhanced Powers*. The top-left corner of the scr
 shows your abilities, cooldowns and resources.
 
 **Client options** (*Mods → Enhanced → Config*, or `config/enhanced-client.toml`): *Hero animations*
-(off: vanilla poses only), *Reduced motion* (calmer hover, no trembling or camera shake) and *Flight
-effects* (off: no trails, rings or wind).
+(off: vanilla poses only), *Reduced motion* (calmer hover, no trembling or camera shake), *Flight
+effects* (off: no trails, rings or wind) and *Hide heroes' armour* (on by default: heroes are drawn
+without their armour, which still protects them).
 
 ## Screenshots
 

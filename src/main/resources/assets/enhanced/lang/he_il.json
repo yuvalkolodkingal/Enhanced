@@ -373,10 +373,15 @@
   "enhanced.configuration.animation": "אנימציית גיבורים",
   "enhanced.configuration.animation.tooltip": "איך הגיבורים משוחקים, וכמה זוהר יש סביבם.",
   "enhanced.configuration.animation.button": "עריכה…",
+  "enhanced.configuration.appearance": "מראה הגיבורים",
+  "enhanced.configuration.appearance.tooltip": "איך הגיבורים נראים.",
+  "enhanced.configuration.appearance.button": "עריכה…",
   "config.enhanced.animations": "אנימציות גיבורים",
   "config.enhanced.animations.tooltip": "תנוחות משולבות, תעופה, ריצה והנשק של ת'ור. כבוי: תנוחות רגילות בלבד.",
   "config.enhanced.reduced_motion": "תנועה מופחתת",
   "config.enhanced.reduced_motion.tooltip": "נדנוד ריחוף וסחף בשליש מהעוצמה, בלי ידיים רועדות, ריטוט או רעידות מצלמה, וטבעות עמומות יותר.",
   "config.enhanced.flight_effects": "אפקטי תעופה",
-  "config.enhanced.flight_effects.tooltip": "שובלים, טבעות, קווי רוח וגלי הלם סביב גיבורים שעפים."
+  "config.enhanced.flight_effects.tooltip": "שובלים, טבעות, קווי רוח וגלי הלם סביב גיבורים שעפים.",
+  "config.enhanced.hide_hero_armour": "הסתרת השריון של גיבורים",
+  "config.enhanced.hide_hero_armour.tooltip": "לא מציירים את השריון של גיבורים (שלכם בגוף שלישי ושל כל השחקנים האחרים), כדי שהוא לא יסתיר את הדמויות. הוא ממשיך להגן כרגיל. אליטרה, ראשי מפלצות, דלעות מגולפות והציוד של הגיבורים מהמוד הזה תמיד מצוירים."
 }
