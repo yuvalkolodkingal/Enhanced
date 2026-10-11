@@ -48,7 +48,7 @@ renumbered.
 
 | Server (`ability/`) | Client (`client/render/`) |
 |---|---|
-| `HeroServer`: `onKey`, `tick`, `everyPlayerTick`, `applyBody`, `endAll`, `stopHold`, `onLogin`, `onLogout`, `onDeath`, `onRespawn`, `onChangeDimension`, `onServerStopped` | `HeroClient`: `hudStatus`, `eyes`, `stanceTargets`, `edges`, `takeoffGesture`, `lean`, `drop`, `ambient`, `aimed`, `predictedGesture`, `registerGestures`, `firstPerson`, `flightParticles`, `flightRibbons`, `tick`, `clear` |
+| `HeroServer`: `onKey`, `tick`, `everyPlayerTick`, `applyBody`, `endAll`, `stopHold`, `onLogin`, `onLogout`, `onDeath`, `onRespawn`, `onChangeDimension`, `onServerStopped` | `HeroClient`: `hudStatus`, `shieldStyle`, `eyes`, `stanceTargets`, `edges`, `takeoffGesture`, `lean`, `drop`, `ambient`, `aimed`, `predictedGesture`, `registerGestures`, `cooldownGesture`, `flagGesture`, `liveGesture`, `grabGesture`, `flingGesture`, `startedElsewhere`, `gestureStarted`, `firstPerson`, `flightParticles`, `flightRibbons`, `tick`, `clear` |
 | `HeroServers` (one line per hero), `HeroLifecycle` (what `CommonEvents` calls) | `HeroClients` (one line per hero) |
 | your class: `PhoenixServer`, `SpiderServer`, `ThanosServer`, `UltronServer`, `ApocalypseServer` | your class: `PhoenixClient`, ... `ApocalypseClient` |
 
