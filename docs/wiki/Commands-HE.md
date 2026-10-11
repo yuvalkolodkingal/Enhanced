@@ -40,7 +40,7 @@
 | טומי | `halloween`, `tracksuit`, `speed`, `own` |
 | בילי | `wiccan`, `teen`, `halloween`, `comics`, `own` |
 | לוקי | `loki`, `tva`, `god_of_stories`, `own` |
-| ת'ור | `thor`, `ragnarok`, `love_and_thunder`, `mighty_thor`, `own` |
+| ת'ור | `thor`, `ragnarok`, `love_and_thunder`, `love_and_thunder_helmet`, `mighty_thor`, `own` |
 
 למגנטו, למכשפת השני ולקוויקסילבר אין מראות לבחור. `/enhanced look` מדלגת על שחקנים שלגיבור שלהם אין את המראה, והיא נכשלת עם "מראה לא מוכר" אם לאף שחקן מהרשימה אין אותו.
 

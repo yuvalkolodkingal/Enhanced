@@ -769,8 +769,15 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue, a deep bl
 
 *Thor* (2011/*The Avengers*: black and silver armour with the six chest discs, red cape),
 *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder*
-(the suit of most of that film: navy, gold and black armour, bare arms, long blond hair and a
-beard, red cape), *Mighty Thor* (Jane Foster), and *Your own skin*.
+(the suit of most of that film: navy, gold and black armour with a gold Y on the chest, bare arms,
+red cape; long ash-blond hair swept back from a bare forehead, falling down his back and in locks
+in front of his shoulders, a full brown beard), *Love and Thunder, helmet* (the same suit with the
+winged helmet of the fight at New Asgard, drawn in the hat layer: a gold shell with blue stripes,
+wing panels at the sides, a bird's head over the brow and a face guard with a nose ridge that leaves
+his eyes free, so they still glow as the God of Thunder; the film shows it only briefly, with the
+gold-sleeved suit, and it is mostly computer-made), *Mighty Thor* (Jane Foster), and *Your own skin*.
+Both Love and Thunder looks share one cape (a bright red one with a padded roll at the shoulders,
+and his hair lying over it).
 
 ---
 
