@@ -52,7 +52,8 @@ import java.util.UUID;
 
 /**
  * Lifting, carrying and launching things with the mind. Shared by Magneto (metal only), Wanda (anything, including
- * blocks) and Billy (anything loose, including projectiles in flight: he stops bullets in WandaVision).
+ * blocks), Billy (anything loose, including projectiles in flight: he stops bullets in WandaVision) and Jean Grey (all
+ * of that: blocks and projectiles too).
  *
  * <p>While held, the target is moved every tick towards the point the holder is looking at. Launched targets are
  * tracked until they slam into something: they hurt every creature they crash into and take heavy impact damage
@@ -63,12 +64,21 @@ public final class Telekinesis {
     public enum Mode {
         MAGNETO(Power.MAGNETO),
         WANDA(Power.SCARLET_WITCH),
-        BILLY(Power.BILLY);
+        BILLY(Power.BILLY),
+        /** Jean Grey: Wanda's telekinesis, in the violet of her mind. */
+        JEAN(Power.PHOENIX, PhoenixAbilities.PSY_MAIN);
 
         final Power power;
+        /** The colour of the particles, the tether and the block it lifts. */
+        public final int color;
 
         Mode(Power power) {
+            this(power, power.color);
+        }
+
+        Mode(Power power, int color) {
             this.power = power;
+            this.color = color;
         }
     }
 
@@ -138,7 +148,7 @@ public final class Telekinesis {
 
         double range = EnhancedConfig.TELEKINESIS_RANGE.get();
         EntityHitResult hit = Raycasts.entity(player, range, 0.3, e -> canLift(player, e, mode), 1.0F);
-        if (hit == null && mode == Mode.BILLY) {
+        if (hit == null && (mode == Mode.BILLY || mode == Mode.JEAN)) {
             // Arrows are small and fast: aim a little more generously at them.
             hit = Raycasts.entity(player, range, 1.0, e -> e instanceof Projectile && canLift(player, e, mode), 1.0F);
         }
@@ -151,7 +161,7 @@ public final class Telekinesis {
             player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.pinned"), true);
             return;
         }
-        if (mode == Mode.WANDA && BlockLifting.tryLift(player)) {
+        if ((mode == Mode.WANDA || mode == Mode.JEAN) && BlockLifting.tryLift(player, mode)) {
             return;
         }
         player.displayClientMessage(Component.translatable(mode == Mode.MAGNETO
@@ -182,7 +192,7 @@ public final class Telekinesis {
         return switch (mode) {
             case MAGNETO -> isMagnetic(e);
             case WANDA -> isLoose(e);
-            case BILLY -> isLoose(e) || (e instanceof Projectile projectile && inFlight(projectile));
+            case BILLY, JEAN -> isLoose(e) || (e instanceof Projectile projectile && inFlight(projectile));
         };
     }
 
@@ -248,7 +258,7 @@ public final class Telekinesis {
             }
         }
         if (target instanceof TelekineticBlockEntity block) {
-            block.grab(player);
+            block.grab(player, mode.color);
         }
         if (target instanceof Projectile projectile) {
             // Caught: it stops dead and hangs weightless in front of the holder.
@@ -315,7 +325,7 @@ public final class Telekinesis {
             }
         }
         if (grip.ticks % 2 == 0) {
-            level.sendParticles(new EnergyParticleOptions(grip.mode.power.color, 1.2F),
+            level.sendParticles(new EnergyParticleOptions(grip.mode.color, 1.2F),
                     e.getX(), e.getY() + e.getBbHeight() * 0.5, e.getZ(), 3,
                     e.getBbWidth() * 0.6, e.getBbHeight() * 0.5, e.getBbWidth() * 0.6, 0.02);
         }
@@ -371,7 +381,7 @@ public final class Telekinesis {
             e.hurtMarked = true;
             e.hasImpulse = true;
             FLIGHTS.put(e.getUUID(), new Flight(player.getUUID(), player.level().dimension(), e.position(), speed,
-                    e instanceof IronGolem, grip.mode.power.color));
+                    e instanceof IronGolem, grip.mode.color));
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);
         player.level().playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS, 0.9F, 0.7F);

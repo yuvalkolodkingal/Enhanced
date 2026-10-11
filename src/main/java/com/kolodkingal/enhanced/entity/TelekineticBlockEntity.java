@@ -37,14 +37,17 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import java.util.UUID;
 
 /**
- * A block Wanda tore out of the ground. While held it floats wherever she looks; launched, it flies like a shell,
- * hurts the first creature it hits and shatters (dropping its normal item). Put down gently, it lands like sand.
+ * A block Wanda (or Jean Grey) tore out of the ground. While held it floats wherever she looks; launched, it flies like
+ * a shell, hurts the first creature it hits and shatters (dropping its normal item). Put down gently, it lands like
+ * sand. It glows in the colour of the telekinesis that holds it: Wanda's red, Jean's violet.
  */
 public class TelekineticBlockEntity extends Entity {
     private static final EntityDataAccessor<BlockState> DATA_BLOCK =
             SynchedEntityData.defineId(TelekineticBlockEntity.class, EntityDataSerializers.BLOCK_STATE);
     private static final EntityDataAccessor<Boolean> DATA_HELD =
             SynchedEntityData.defineId(TelekineticBlockEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> DATA_COLOR =
+            SynchedEntityData.defineId(TelekineticBlockEntity.class, EntityDataSerializers.INT);
 
     /** Damage of a thrown block hitting a creature at normal speed. */
     public static final float BASE_DAMAGE = 8.0F;
@@ -77,10 +80,16 @@ public class TelekineticBlockEntity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_BLOCK, Blocks.STONE.defaultBlockState());
         builder.define(DATA_HELD, false);
+        builder.define(DATA_COLOR, Power.SCARLET_WITCH.color);
     }
 
     public BlockState getBlockState() {
         return entityData.get(DATA_BLOCK);
+    }
+
+    /** The colour of the telekinesis that holds (or last held) this block. */
+    public int getColor() {
+        return entityData.get(DATA_COLOR);
     }
 
     private void setBlockState(BlockState state) {
@@ -89,8 +98,9 @@ public class TelekineticBlockEntity extends Entity {
 
     // ---- control from Telekinesis ----
 
-    public void grab(Player holder) {
+    public void grab(Player holder, int color) {
         thrower = holder.getUUID();
+        entityData.set(DATA_COLOR, color);
         launched = false;
         ticksSinceHeld = 0;
         hit.clear();
@@ -141,7 +151,7 @@ public class TelekineticBlockEntity extends Entity {
         if (isHeld()) {
             // Telekinesis moves us; nothing to simulate.
             if (level().isClientSide && tickCount % 3 == 0) {
-                level().addParticle(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.0F),
+                level().addParticle(new EnergyParticleOptions(getColor(), 1.0F),
                         getX() + (random.nextDouble() - 0.5), getY() + random.nextDouble(), getZ() + (random.nextDouble() - 0.5), 0, 0.02, 0);
             }
             return;
@@ -167,7 +177,7 @@ public class TelekineticBlockEntity extends Entity {
 
         if (level().isClientSide) {
             if (launched) {
-                level().addParticle(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.2F), getX(), getY() + 0.5, getZ(), 0, 0, 0);
+                level().addParticle(new EnergyParticleOptions(getColor(), 1.2F), getX(), getY() + 0.5, getZ(), 0, 0, 0);
             }
             return;
         }
@@ -256,6 +266,9 @@ public class TelekineticBlockEntity extends Entity {
         setBlockState(NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK), tag.getCompound("BlockState")));
         launched = tag.getBoolean("Launched");
         life = tag.getInt("Life");
+        if (tag.contains("Color")) {
+            entityData.set(DATA_COLOR, tag.getInt("Color"));
+        }
         if (tag.hasUUID("Thrower")) {
             thrower = tag.getUUID("Thrower");
         }
@@ -266,6 +279,7 @@ public class TelekineticBlockEntity extends Entity {
         tag.put("BlockState", NbtUtils.writeBlockState(getBlockState()));
         tag.putBoolean("Launched", launched);
         tag.putInt("Life", life);
+        tag.putInt("Color", getColor());
         if (thrower != null) {
             tag.putUUID("Thrower", thrower);
         }

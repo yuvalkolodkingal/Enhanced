@@ -17,16 +17,21 @@ import java.util.List;
  * reader.
  *
  * @param entityId  the creature read
- * @param name      its display name (a player's name)
- * @param species   the name of its kind
- * @param state     {@link #OK}, {@link #BLOCKED}, {@link #ILLUSION}, {@link #TOO_VAST} or {@link #PLAYERS_OFF}
+ * @param name      a player's name or a creature's custom name, else empty (the panel then names the species)
+ * @param species   the id of its entity type ({@code minecraft:zombie}), which the client names in its own language
+ * @param state     {@link #OK}, {@link #BLOCKED}, {@link #ILLUSION}, {@link #TOO_VAST} or {@link #PLAYERS_OFF}; for any
+ *                  but {@link #OK} nothing below the state is filled in
  * @param mood      {@link #CALM}, {@link #ALERT}, {@link #HOSTILE} or {@link #AFRAID}
  * @param hostileTo the name of the creature it means harm (mood {@link #HOSTILE}), or empty
  * @param health    its health, and its largest health
  * @param food      a player's food level, and their experience level (else 0)
- * @param worn      up to 7 stacks: main hand, off hand, head, chest, legs, feet, body
- * @param carried   a player's 36 inventory slots, a creature's inventory, an Enderman's block
- * @param extra     "really Loki, shaped as a Zombie", "disguised", or empty
+ * @param worn      the seven slots it wears, in the order main hand, off hand, head, chest, legs, feet, body (an empty
+ *                  slot is an empty stack)
+ * @param carried   a player's 36 inventory slots (hotbar first, empty slots kept) unless the server keeps packs
+ *                  private, a creature's inventory (at most 8 stacks), an Enderman's block, else empty
+ * @param extra     {@code "shaped:<form>"} for a Loki in another shape (the form is what the Loki's power data saves:
+ *                  an entity type id, or {@code minecraft:player;<uuid>;<name>}), {@code "disguised"} for a Vision in
+ *                  his human disguise, else empty
  */
 public record MindReadPayload(int entityId, String name, String species, int state, int mood, String hostileTo, float health,
                               float maxHealth, int food, int level, List<ItemStack> worn, List<ItemStack> carried, String extra)

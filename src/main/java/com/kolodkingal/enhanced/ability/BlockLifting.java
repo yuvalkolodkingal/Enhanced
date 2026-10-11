@@ -16,11 +16,16 @@ import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
-/** Wanda tearing a block out of the ground. */
+/** Wanda (or Jean Grey) tearing a block out of the ground. */
 public final class BlockLifting {
 
     /** @return true if a block was lifted */
     public static boolean tryLift(ServerPlayer player) {
+        return tryLift(player, Telekinesis.Mode.WANDA);
+    }
+
+    /** @return true if a block was lifted, and is now held in {@code mode} (the hero's own telekinesis) */
+    public static boolean tryLift(ServerPlayer player, Telekinesis.Mode mode) {
         double range = EnhancedConfig.BLOCK_LIFT_RANGE.get();
         BlockHitResult hit = Raycasts.block(player, range, 1.0F);
         if (hit.getType() != HitResult.Type.BLOCK) {
@@ -44,7 +49,7 @@ public final class BlockLifting {
         level.destroyBlock(pos, false, player);
         TelekineticBlockEntity entity = new TelekineticBlockEntity(level, pos, lifted, player);
         level.addFreshEntity(entity);
-        Telekinesis.hold(player, entity, Telekinesis.Mode.WANDA);
+        Telekinesis.hold(player, entity, mode);
         return true;
     }
 
