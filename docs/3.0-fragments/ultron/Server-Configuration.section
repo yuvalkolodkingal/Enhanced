@@ -49,3 +49,49 @@ Section `[ultron_boss]`. The boss is woken by the Ultron Program and has no hero
 | `ultron_boss.rescueDamage` | `2.0` | 0.0 to 10.0 | Damage (never lethal) when the field pulls someone back onto the island. |
 | `ultron_boss.rejoinLimit` | `3` | 0 to 20 | How many times a player may be taken up again by the pit's tractor. |
 | `ultron_boss.visionBeamBonus` | `1.5` | 1.0 to 5.0 | The Mind Stone beam does this much to Ultron and the Sentries. |
+
+## Ultron the hero
+
+Section `[ultron]`. The lightning and Vision numbers also apply to the boss, its bodies and its Sentries.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `ultron.flightSpeed` | `0.10` | 0.01 to 0.5 | Ultron's flying speed (Creative flight is 0.05). |
+| `ultron.bodyHealth` | `10.0` | 0.0 to 40.0 | Extra maximum health of the vibranium body. |
+| `ultron.bodyArmor` | `8.0` | 0.0 to 30.0 | Extra armour of the vibranium body. |
+| `ultron.knockbackResistance` | `0.3` | 0.0 to 1.0 | Extra knockback resistance of the vibranium body. |
+| `ultron.lightningFactor` | `1.25` | 1.0 to 3.0 | Lightning does this much to Ultron, his bodies and the Sentries (they are electronics). |
+| `ultron.visionCutRange` | `48` | 0 to 128 | A Vision this near cuts Ultron's uploads, the boss's and the hero's (0 turns it off). |
+| `ultron.boltDamage` | `4.0` | 0.0 to 100.0 | Damage of a plasma bolt. |
+| `ultron.boltSplash` | `1.2` | 0.0 to 4.0 | The radius in which others near the bolt's target take half. |
+| `ultron.boltInterval` | `4` | 1 to 20 | Ticks between bolts while R is held. |
+| `ultron.boltPool` | `30` | 5 to 500 | The plasma pool: how many bolts he can fire before he is empty. |
+| `ultron.boltRegenPerSecond` | `4.0` | 0.0 to 100.0 | How fast the plasma pool refills, per second (after half a second without firing). |
+| `ultron.boltRestart` | `6` | 1 to 100 | How much plasma he needs to fire again once the pool is empty. |
+| `ultron.overchargeDamage` | `14.0` | 0.0 to 200.0 | The Overcharge's hit. |
+| `ultron.overchargeSplash` | `8.0` | 0.0 to 200.0 | The Overcharge's splash damage. |
+| `ultron.overchargeRadius` | `3.5` | 0.5 to 10.0 | The Overcharge's splash radius. |
+| `ultron.overchargeCost` | `10` | 0 to 100 | How much plasma the Overcharge costs. |
+| `ultron.overchargeChargeTicks` | `15` | 1 to 100 | How long the Overcharge charges. |
+| `ultron.overchargeSlow` | `0.6` | 0.0 to 0.95 | How much slower he moves while he charges (0.6 = 40% of his speed). |
+| `ultron.overchargeCooldown` | `160` | 0 to 6000 | The Overcharge's cooldown, in ticks. |
+| `ultron.pullRange` | `24` | 4 to 64 | Gravity Pull: how far it reaches. |
+| `ultron.pullDamage` | `3.0` | 0.0 to 100.0 | Gravity Pull: its damage. |
+| `ultron.pullCooldown` | `80` | 0 to 6000 | Gravity Pull: its cooldown, in ticks. |
+| `ultron.slamRadius` | `7.0` | 2.0 to 24.0 | Gravity Slam: its radius. |
+| `ultron.slamDamage` | `6.0` | 0.0 to 100.0 | Gravity Slam: its damage. |
+| `ultron.slamCooldown` | `160` | 0 to 6000 | Gravity Slam: its cooldown, in ticks. |
+| `ultron.uploadRange` | `48` | 8 to 128 | Upload: how near a drone must be. |
+| `ultron.uploadHeal` | `8.0` | 0.0 to 40.0 | Upload: how much health it heals. |
+| `ultron.uploadCooldown` | `500` | 0 to 12000 | Upload: its cooldown, in ticks. |
+| `ultron.secondLifeCooldown` | `6000` | 0 to 72000 | Second Life: its recharge, in ticks. |
+| `ultron.secondLifeHealth` | `0.25` | 0.05 to 1.0 | Second Life: the health he comes back with, as a fraction of the maximum. |
+| `ultron.secondLifeRange` | `64` | 8 to 256 | Second Life: how near a drone must be. |
+| `ultron.hackRange` | `32` | 4 to 64 | Hack: how far it reaches. |
+| `ultron.hackMax` | `2` | 0 to 6 | Hack: how many hacked Sentries he can have at a time. |
+| `ultron.droneCount` | `3` | 1 to 6 | Sentry Army: how many Sentries one use calls. |
+| `ultron.droneMax` | `6` | 1 to 12 | Sentry Army: the most drones he can have at a time. |
+| `ultron.droneLifetime` | `1800` | 100 to 72000 | Sentry Army: how long a drone lasts, in ticks. |
+| `ultron.droneCooldown` | `400` | 0 to 12000 | Sentry Army: its cooldown, in ticks. |
+| `ultron.droneHealth` | `24.0` | 4.0 to 200.0 | A drone's health. |
+| `ultron.droneDamage` | `3.0` | 0.0 to 100.0 | A drone's plasma bolt. |
