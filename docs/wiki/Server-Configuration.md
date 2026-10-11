@@ -54,6 +54,7 @@ Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 | `scarlet_witch.hexDeathChance` | `0.95` | 0.0 to 1.0 | Chance that a creature without powers dies when it crosses the Hex wall without Wanda's permission (0.95 = 95%). The rest survive. |
 | `scarlet_witch.hexHoldDamage` | `2.0` | 0.0 to 20.0 | Damage Vision takes the first time he is thrown back at the wall of a Hex he is inside (2 = one heart). He can't leave a standing Hex, and comes apart a little at its edge; it never kills him. |
 | `scarlet_witch.hexHoldDamageMax` | `8.0` | 0.0 to 40.0 | The most one throw back at the wall can do to Vision. Each time he pushes again within three seconds it grows by `hexHoldDamage`, up to this; it never takes his last half heart. |
+| `scarlet_witch.hexHoldReleaseHealth` | `0.3` | 0.0 to 1.0 | A badly hurt Wanda can no longer hold Vision in her Hex: at or below this share of her health (0.3 = 30%) he can leave it. Her death (which dissolves the Hex) always frees him; 0 = only that does. |
 
 ## The Vision of the Hex
 

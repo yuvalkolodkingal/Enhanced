@@ -42,7 +42,8 @@ import java.util.UUID;
  * Crossing without Wanda's permission means: bounce off (anyone with powers, and bosses), or a 95% chance of
  * instant death (the survivors simply walk on). Vision is the exception to permission: inside a standing Hex he can't
  * leave it (Wanda is in control, and in WandaVision he comes apart at the edge of Westview), whether or not she let him
- * in. The same goes for the Vision her Hex raised.
+ * in, until Wanda is badly hurt, gone from the world or dead (her death dissolves the Hex). White Vision is held the
+ * same way but is simply thrown back: he doesn't come apart. The same goes for the Vision her Hex raised.
  */
 public final class HexManager {
 
@@ -54,7 +55,10 @@ public final class HexManager {
         BLOCK,
         /** It must survive the wall: 95% death (by default, see the config). */
         GAMBLE,
-        /** It is inside and the Hex does not let it go (Vision): it comes apart a little and is thrown back inside. */
+        /**
+         * It is inside and the Hex does not let it go (Vision): it comes apart a little and is thrown back inside (White
+         * Vision is only thrown back).
+         */
         HELD
     }
 
@@ -330,7 +334,9 @@ public final class HexManager {
                 }
                 case HELD -> {
                     // No teleport takes Vision out of a Hex that holds him: he flakes where he stands, and stays.
-                    comeApart(level, hex, living);
+                    if (!whiteVision(living)) {
+                        comeApart(level, hex, living);
+                    }
                     if (living instanceof Player player) {
                         player.displayClientMessage(Component.translatable("message.enhanced.hex.holds_vision"), true);
                     }
@@ -356,7 +362,8 @@ public final class HexManager {
      * What the wall makes of something crossing it.
      *
      * @param leaving true if it is inside and going out: Vision, and the Vision of the Hex, are then held, whatever
-     *                Wanda allowed (Creative and Spectator players and Wanda herself pass)
+     *                Wanda allowed (Creative and Spectator players and Wanda herself pass), unless Wanda can no longer
+     *                hold him (see {@link #holdsVision})
      */
     public static Verdict judge(Hex hex, LivingEntity entity, boolean leaving) {
         if (entity instanceof Player player) {
@@ -364,7 +371,8 @@ public final class HexManager {
                 return Verdict.PASS;
             }
             if (leaving && Powers.is(player, Power.VISION)) {
-                return Verdict.HELD;
+                // While Wanda holds the Hex he can't go; once she can't, he walks out, allowed in or not.
+                return holdsVision(hex, player) ? Verdict.HELD : Verdict.PASS;
             }
             if (hex.isAllowed(player.getUUID())) {
                 return Verdict.PASS;
@@ -384,6 +392,27 @@ public final class HexManager {
             return Verdict.BLOCK;
         }
         return Verdict.GAMBLE;
+    }
+
+    /**
+     * Whether Wanda still holds Vision in her Hex: she must be in the world, alive, and above {@code hexHoldReleaseHealth}
+     * of her health. Hurt her badly enough (or kill her: her death dissolves the Hex) and he can leave; and with her gone
+     * from the world there is no one to hold him.
+     */
+    public static boolean holdsVision(Hex hex, Entity vision) {
+        if (vision.getServer() == null) {
+            return true;
+        }
+        ServerPlayer wanda = vision.getServer().getPlayerList().getPlayer(hex.owner());
+        if (wanda == null || !wanda.isAlive()) {
+            return false;
+        }
+        return wanda.getHealth() > wanda.getMaxHealth() * EnhancedConfig.HEX_HOLD_RELEASE_HEALTH.get();
+    }
+
+    /** White Vision is held in a Hex like Vision, but the Hex doesn't take him apart: he is only thrown back. */
+    private static boolean whiteVision(LivingEntity entity) {
+        return entity instanceof Player player && Powers.is(player, Power.VISION) && "white_vision".equals(Powers.get(player).variant());
     }
 
     /** @return true if the entity survived */
@@ -413,9 +442,14 @@ public final class HexManager {
     /**
      * The Hex holds Vision (or the Vision it raised): he is thrown back inside and comes apart a little where he met
      * the wall. Vision himself is told why, and takes a little damage that grows while he keeps pushing (see
-     * {@link #holdDamage}); it never kills him.
+     * {@link #holdDamage}); it never kills him. White Vision is only thrown back, like a hero walking into glass.
      */
     private static void hold(ServerLevel level, Hex hex, LivingEntity entity, boolean wasInside) {
+        if (whiteVision(entity)) {
+            bounce(level, hex, entity, wasInside);
+            ((ServerPlayer) entity).displayClientMessage(Component.translatable("message.enhanced.hex.holds_vision"), true);
+            return;
+        }
         throwBack(hex, entity, wasInside);
         comeApart(level, hex, entity);
         if (entity instanceof ServerPlayer player) {

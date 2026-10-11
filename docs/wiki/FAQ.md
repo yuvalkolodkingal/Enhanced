@@ -73,7 +73,7 @@ When anyone without powers crosses Wanda's Hex wall without her permission, ther
 
 ### Why can't Vision leave the Hex?
 
-Wanda is in control of her Hex, and in *WandaVision* Vision starts to come apart at the edge of Westview. A Vision (either look) inside a standing Hex can't leave it, whether or not Wanda let him in: he is thrown back, comes apart a little, and is told "Wanda's Hex holds you: only she can let you go". He is free when the Hex dissolves, when Wanda shrinks it past him, and in Creative or Spectator. See [Scarlet Witch](Scarlet-Witch#vision-cant-leave-your-hex).
+Wanda is in control of her Hex, and in *WandaVision* Vision starts to come apart at the edge of Westview. A Vision (either look) inside a standing Hex can't leave it, whether or not Wanda let him in: he is thrown back, comes apart a little (White Vision is only thrown back), and is told "Wanda's Hex holds you: only she can let you go". He can escape by hurting Wanda badly (30% of her health or less) or by defeating her. He is also free when the Hex dissolves, when Wanda shrinks it past him or leaves the world, and in Creative or Spectator. See [Scarlet Witch](Scarlet-Witch#vision-cant-leave-your-hex).
 
 ### How do I send Vision at an enemy?
 

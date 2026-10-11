@@ -42,8 +42,9 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /**
  * Wanda's Hex holds Vision: inside a standing Hex he can't leave it (walking, flying, phasing, any teleport or
- * portal), whether or not she allowed him in; he comes apart a little at the wall, never dies of it, and is free once
- * the Hex is gone or the wall is no longer round him.
+ * portal), whether or not she allowed him in; he comes apart a little at the wall (White Vision is only thrown back),
+ * never dies of it, and is free once the Hex is gone, the wall is no longer round him, or Wanda is badly hurt, dead or
+ * gone from the world.
  *
  * <p>The Hex is Wanda's, in the middle of the arena (10.5, 2, 10.5), radius 8; the arena is 21 blocks across, so the
  * wall is in reach of its edge: a spot at z = 1.0 is outside the Hex, one at z = 5.0 inside.
@@ -151,7 +152,7 @@ public final class HexHoldsVisionTests {
     }
 
     @GameTest(template = ARENA, batch = "hex_holds_white")
-    public static void whiteVisionIsHeldToo(GameTestHelper helper) {
+    public static void whiteVisionIsHeldTooButDoesNotComeApart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         ServerPlayer vision = f.player(CENTER, FLOOR, 5.0, Power.VISION);
@@ -159,17 +160,110 @@ public final class HexHoldsVisionTests {
         check("white_vision".equals(Powers.get(vision).variant()), "this is White Vision");
         // Wanda let him in, so the old rule (a hero is thrown back) would let him out again.
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(vision.getUUID()), 1);
+        float health = vision.getHealth();
 
         f.everyTick(10, tick -> {
             if (tick == 2) {
+                TestKit.sentPackets(vision);
                 walkTo(vision, abs(helper, CENTER, FLOOR, 1.0));
             }
             if (tick >= 4) {
                 check(inside(f, wanda, vision), "any look of Vision is held inside the Hex");
+                check(vision.getHealth() == health, "White Vision is only thrown back: the wall doesn't hurt him");
+                check(!flakedOrange(TestKit.sentPackets(vision)), "and he doesn't come apart");
                 return true;
             }
             return false;
         });
+    }
+
+    @GameTest(template = ARENA, batch = "hex_holds_white_in")
+    public static void whiteVisionGetsInOnlyIfWandaAllowsHim(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = raiseHex(f);
+        ServerPlayer allowed = f.player(CENTER, FLOOR, 1.0, Power.VISION);
+        ServerPlayer stranger = f.player(1.0, FLOOR, CENTER, Power.VISION);
+        Powers.setVariant(allowed, Variants.get(Power.VISION, "white_vision"));
+        Powers.setVariant(stranger, Variants.get(Power.VISION, "white_vision"));
+        HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(allowed.getUUID()), 1);
+        float health = stranger.getHealth();
+
+        f.everyTick(10, tick -> {
+            if (tick == 2) {
+                walkTo(allowed, abs(helper, CENTER, FLOOR, 3.5));
+                walkTo(stranger, abs(helper, 3.5, FLOOR, CENTER));
+            }
+            if (tick >= 5) {
+                check(inside(f, wanda, allowed), "the White Vision Wanda allowed walks in");
+                check(!inside(f, wanda, stranger), "the one she did not allow is thrown back");
+                check(stranger.getHealth() == health, "without coming apart");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = "hex_holds_release")
+    public static void aBadlyHurtWandaCanNoLongerHoldVision(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = raiseHex(f);
+        ServerPlayer vision = f.player(CENTER, FLOOR, 5.0, Power.VISION);
+        // Hurt, but not badly: she still holds him.
+        wanda.setHealth(wanda.getMaxHealth() * 0.5F);
+
+        f.everyTick(16, tick -> {
+            if (tick == 2) {
+                walkTo(vision, abs(helper, CENTER, FLOOR, 1.0));
+            }
+            if (tick == 4) {
+                check(inside(f, wanda, vision), "at half her health Wanda still holds Vision in");
+                // Badly hurt (30% by default): the Hex can no longer hold him.
+                wanda.setHealth(wanda.getMaxHealth() * 0.25F);
+            }
+            if (tick == 6) {
+                walkTo(vision, abs(helper, CENTER, FLOOR, 1.0));
+            }
+            if (tick >= 9) {
+                check(!inside(f, wanda, vision), "with Wanda badly hurt, Vision walks out of her Hex");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = "hex_holds_release_kill")
+    public static void killingWandaFreesVision(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = raiseHex(f);
+        ServerPlayer vision = f.player(CENTER, FLOOR, 5.0, Power.VISION);
+
+        f.everyTick(12, tick -> {
+            if (tick == 2) {
+                wanda.kill();
+            }
+            if (tick == 4) {
+                walkTo(vision, abs(helper, CENTER, FLOOR, 1.0));
+            }
+            if (tick >= 7) {
+                check(HexManager.data(helper.getLevel()).byOwner(wanda.getUUID()).isEmpty(), "Wanda's death dissolves her Hex");
+                check(vision.isAlive() && vision.position().z < abs(helper, CENTER, FLOOR, 3.0).z, "and Vision walks free");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = "hex_holds_release_gone")
+    public static void withWandaGoneFromTheWorldNobodyHoldsVision(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = raiseHex(f);
+        ServerPlayer vision = f.player(CENTER, FLOOR, 5.0, Power.VISION);
+        Hex hex = HexManager.data(helper.getLevel()).byOwner(wanda.getUUID()).orElseThrow();
+        check(HexManager.holdsVision(hex, vision), "with Wanda here, her Hex holds Vision");
+        helper.getLevel().getServer().getPlayerList().remove(wanda);
+        check(!HexManager.holdsVision(hex, vision), "with her gone from the world, there is no one to hold him");
+        check(HexManager.judge(hex, vision, true) == HexManager.Verdict.PASS, "and he may walk out");
+        helper.succeed();
     }
 
     @GameTest(template = ARENA, batch = "hex_holds_phase")

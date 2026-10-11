@@ -139,10 +139,12 @@ Other rules of the wall:
 
 You are in control of the Hex, and in *WandaVision* Vision starts to come apart at the edge of Westview. So a player with Vision's power (White Vision too) who is inside a standing Hex **can't leave it**. Walking, flying, phasing, portals and every teleport out (Ender Pearls, Chorus Fruit, the Bifrost, Loki's Tesseract, the Witches' Road, Tommy's Vibrate) are refused at the wall, even when you let him in.
 
-* At the wall he **comes apart**: pieces of him flake off in orange and yellow with a crackling sound, he is thrown back inside, and he is told "Wanda's Hex holds you: only she can let you go".
+* At the wall Vision **comes apart**: pieces of him flake off in orange and yellow with a crackling sound, he is thrown back inside, and he is told "Wanda's Hex holds you: only she can let you go".
 * It hurts him a little: **1 heart** the first time, and 1 heart more for every push within 3 seconds of the last, up to **4 hearts**. However hard he leans on the wall it bites at most twice a second. It never kills him (the last half heart is never taken), and it starts over after 3 seconds without pushing. These are `scarlet_witch.hexHoldDamage` and `scarlet_witch.hexHoldDamageMax`.
-* **He is free** when the Hex dissolves, when you shrink it past him (the wall then runs inside him, and he is not dragged back), and if he is in Creative or Spectator.
-* Getting **into** a Hex keeps the old rules: your permission lets him in, and without it he is thrown back like any hero.
+* **White Vision doesn't come apart**: the wall just throws him back, like glass, and doesn't hurt him. He is held in all the same.
+* **He can escape by hurting you.** When you are **badly hurt** (30% of your health or less, `scarlet_witch.hexHoldReleaseHealth`) your Hex can no longer hold him and he can walk out, allowed in or not; if he **kills** you, your Hex dissolves and he is free anyway. With you gone from the world (logged out) nobody holds him either.
+* **He is also free** when the Hex dissolves, when you shrink it past him (the wall then runs inside him, and he is not dragged back), and if he is in Creative or Spectator.
+* Getting **into** a Hex keeps the old rules, for both looks: your permission lets him in, and without it he is thrown back like any hero.
 
 #### The Vision of the Hex
 

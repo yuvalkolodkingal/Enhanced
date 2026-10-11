@@ -39,6 +39,7 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue HEX_DEATH_CHANCE;
     public static final ModConfigSpec.DoubleValue HEX_HOLD_DAMAGE;
     public static final ModConfigSpec.DoubleValue HEX_HOLD_DAMAGE_MAX;
+    public static final ModConfigSpec.DoubleValue HEX_HOLD_RELEASE_HEALTH;
 
     // ---- The Vision of the Hex ----
     public static final ModConfigSpec.BooleanValue HEX_VISION_ENABLED;
@@ -162,6 +163,9 @@ public final class EnhancedConfig {
         HEX_HOLD_DAMAGE_MAX = BUILDER.comment("The most one throw back at the wall can do to Vision. Each time he pushes again within three",
                         "seconds it grows by hexHoldDamage, up to this; it never takes his last half heart.")
                 .defineInRange("hexHoldDamageMax", 8.0, 0.0, 40.0);
+        HEX_HOLD_RELEASE_HEALTH = BUILDER.comment("A badly hurt Wanda can no longer hold Vision in her Hex: at or below this share of her health",
+                        "(0.3 = 30%) he can leave it. Her death (which dissolves the Hex) always frees him; 0 = only that does.")
+                .defineInRange("hexHoldReleaseHealth", 0.3, 0.0, 1.0);
         BUILDER.pop();
 
         BUILDER.push("hex_vision");

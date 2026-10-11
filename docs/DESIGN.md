@@ -358,9 +358,14 @@ To touch the stone, hold the scepter and **right-click** (use it):
   holds you: only she can let you go". It hurts him a little: 1 heart the first time, and 1 heart more for
   every push within 3 seconds of the one before, up to 4 hearts (`hexHoldDamage`, `hexHoldDamageMax`); however
   hard he leans on the wall it bites at most twice a second. It never kills him (the last half heart is
-  never taken), and it starts over after 3 seconds without pushing. He is free when the Hex dissolves, when Wanda shrinks it past him (the wall then runs inside
-  him, and he is not dragged back) and if he is in Creative or Spectator. Getting **into** a Hex keeps the
-  old rules: Wanda's permission lets him in, and without it he is thrown back like any hero.
+  never taken), and it starts over after 3 seconds without pushing. White Vision is held the same way but
+  doesn't come apart: he is only thrown back, like a hero walking into glass, and is not hurt. **He can
+  escape by hurting Wanda**: at or below 30% of her health (`hexHoldReleaseHealth`) her Hex can no longer
+  hold him and he walks out, allowed in or not, and her death dissolves the Hex. He is also free when the
+  Hex dissolves, when Wanda shrinks it past him (the wall then runs inside him, and he is not dragged
+  back), when Wanda is gone from the world, and if he is in Creative or Spectator. Getting **into** a Hex
+  keeps the old rules, for both looks: Wanda's permission lets him in, and without it he is thrown back
+  like any hero.
 * **(added)** **The Vision of the Hex** ("when Wanda raises the Hex, Vision appears and attacks whoever she
   tells him to"):
   * When Wanda raises a Hex, a Vision appears beside her. He is a creature of his own, drawn like Vision:
@@ -499,7 +504,8 @@ The movement speed bonus and the step-up stay tied to **sprinting**, so he can s
 * **Max health 30** (15 hearts) and **8 armor** from his vibranium body.
 * He never gets hungry and never runs out of air.
 * **(added)** Inside a standing Hex he can't leave it, in either look, whether or not Wanda let him in:
-  he comes apart at its wall and is thrown back (section 2, ability 5). Wanda's Hex raises a Vision of
+  he comes apart at its wall and is thrown back (White Vision is only thrown back), until he hurts Wanda
+  badly or defeats her (section 2, ability 5). Wanda's Hex raises a Vision of
   its own to fight at her side (section 2).
 
 ### 4.3 Abilities
