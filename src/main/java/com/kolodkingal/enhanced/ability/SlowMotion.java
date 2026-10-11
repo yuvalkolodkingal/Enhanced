@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.network.SlowedProjectilePayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -92,13 +93,21 @@ public final class SlowMotion {
         return false;
     }
 
+    /**
+     * How many times slower Quicksilver Time makes this entity: the zone's factor, unless it is a boss or a minion that
+     * says otherwise ({@link BossHooks#slowFactor}: Ultron's bodies are not slowed at all, Thanos's half).
+     */
+    private static int factorOf(Entity entity) {
+        return entity instanceof BossHooks boss ? boss.slowFactor(factor()) : factor();
+    }
+
     /** Whether this entity is slowed by Quicksilver Time at all (players and things they ride are never tick-skipped). */
     private static boolean affected(Entity entity) {
         if (entity instanceof Player || entity instanceof PartEntity<?> || entity.getControllingPassenger() instanceof Player
                 || entity.hasPassenger(e -> e instanceof Player)) {
             return false;
         }
-        return isInZone(entity.level(), entity.position());
+        return isInZone(entity.level(), entity.position()) && factorOf(entity) > 1;
     }
 
     /** Arrows and thrown things are slowed by scaling their speed instead of skipping ticks, so they glide smoothly. */
@@ -130,20 +139,19 @@ public final class SlowMotion {
         if (entity.level().isClientSide && entity instanceof LivingEntity) {
             return false;
         }
-        return Math.floorMod(entity.tickCount + entity.getId(), factor()) != 0;
+        return Math.floorMod(entity.tickCount + entity.getId(), factorOf(entity)) != 0;
     }
 
     /** Server, once per level tick: slow down projectiles entering the zones, restore the ones that left, slow players. */
     public static void serverTick(ServerLevel level) {
         List<Vec3> zones = zones(level);
         double radius = radius();
-        int factor = factor();
         for (Vec3 center : zones) {
             AABB box = new AABB(center, center).inflate(radius);
             for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box,
                     p -> slowedBySpeed(p) && !returning(p) && !p.getPersistentData().contains(SLOWED_TAG) && !MagnetoAbilities.isHeld(p)
-                            && p.position().distanceToSqr(center) < radius * radius)) {
-                slow(projectile, factor);
+                            && factorOf(p) > 1 && p.position().distanceToSqr(center) < radius * radius)) {
+                slow(projectile, factorOf(projectile));
             }
             for (Player player : level.players()) {
                 PowerData data = Powers.get(player);

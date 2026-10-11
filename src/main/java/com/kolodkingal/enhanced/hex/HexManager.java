@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.hex;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -307,6 +308,11 @@ public final class HexManager {
         if (!(entity instanceof LivingEntity living)) {
             return true;
         }
+        // The arena of a boss fight keeps its fighters in.
+        if (!BossFights.allowsTeleport(level, entity, target)) {
+            BossFights.tellHeld(entity);
+            return false;
+        }
         // Whoever Mjolnir pins down teleports nowhere (this is where the mod's own teleports and Ender Pearls are
         // judged).
         if (MjolnirPin.isPinned(living)) {
@@ -366,6 +372,10 @@ public final class HexManager {
      *                hold him (see {@link #holdsVision})
      */
     public static Verdict judge(Hex hex, LivingEntity entity, boolean leaving) {
+        if (BossFights.isHexExempt(entity)) {
+            // A boss fight whose lift carries everyone (Ultron's) takes its members through the wall.
+            return Verdict.PASS;
+        }
         if (entity instanceof Player player) {
             if (player.isCreative() || player.isSpectator() || player.getUUID().equals(hex.owner())) {
                 return Verdict.PASS;
