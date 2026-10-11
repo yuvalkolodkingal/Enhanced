@@ -126,7 +126,8 @@ public final class ArenaCheck {
                 double angle = k * (Math.PI * 2.0 / 16.0) + distance * 0.37;
                 int x = summoner.getX() + (int) Math.round(Math.cos(angle) * distance);
                 int z = summoner.getZ() + (int) Math.round(Math.sin(angle) * distance);
-                if (!world.inBorder(x + 0.5, z + 0.5)) {
+                if (!world.inBorder(x + 0.5, z + 0.5) || Math.hypot(x - summoner.getX(), z - summoner.getZ()) < 14.0) {
+                    // (Rounding to a block can bring a spot a little closer than the ring it was taken on.)
                     continue;
                 }
                 int feet = standingRoom(world, x, summoner.getY(), z);

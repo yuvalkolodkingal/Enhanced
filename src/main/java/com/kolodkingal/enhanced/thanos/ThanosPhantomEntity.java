@@ -98,6 +98,12 @@ public class ThanosPhantomEntity extends Monster {
         return false;
     }
 
+    /** A fight never survives a restart: neither he nor anything of his is written to the world. */
+    @Override
+    public boolean shouldBeSaved() {
+        return false;
+    }
+
     @Override
     public boolean isPersistenceRequired() {
         return true;

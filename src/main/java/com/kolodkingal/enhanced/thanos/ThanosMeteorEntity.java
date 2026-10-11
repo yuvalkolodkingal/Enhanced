@@ -97,6 +97,12 @@ public class ThanosMeteorEntity extends Projectile implements ShieldCost {
         discard();
     }
 
+    /** A fight never survives a restart: neither he nor anything of his is written to the world. */
+    @Override
+    public boolean shouldBeSaved() {
+        return false;
+    }
+
     @Override
     public float shieldCost() {
         return ThanosBossConfig.METEOR_DAMAGE.get().floatValue();

@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -414,6 +415,23 @@ public class ThanosEntity extends Monster implements BossHooks {
         return choice == null ? null : choice.move();
     }
 
+    /**
+     * Whom he would go after now, as his idle tick decides it (and he then faces them): the Vision first, then the one who
+     * dealt him the most lately, then the nearest, and he keeps the choice for sixty calls.
+     *
+     * @param fresh forget the hold on the last choice
+     */
+    @VisibleForTesting
+    @Nullable
+    public LivingEntity chooseTargetNow(boolean fresh) {
+        if (fresh) {
+            targetHold = 0;
+        }
+        LivingEntity chosen = chooseTarget((ServerLevel) level());
+        focusOn(chosen);
+        return chosen;
+    }
+
     /** Skips the arrival: he stands ready at once. */
     public void forceArrived() {
         landed = true;
@@ -543,6 +561,13 @@ public class ThanosEntity extends Monster implements BossHooks {
             tickClock(level);
             tickHiding(level);
             tickFootsteps(level);
+            if (!passive && state != ThanosState.IDLE) {
+                // The stuck rule keeps counting through a move, a rest, a stagger: only the leaping waits for the idle tick.
+                LivingEntity hunted = target();
+                if (hunted != null) {
+                    trackProgress(level, hunted, false);
+                }
+            }
         }
     }
 
@@ -805,8 +830,10 @@ public class ThanosEntity extends Monster implements BossHooks {
             return;
         }
         faceToward(target.position());
-        // The stuck rule: no progress toward a target for four seconds.
-        trackProgress(level, target);
+        // The stuck rule: no progress toward a target for four seconds (counted all the while; acted on between moves).
+        if (trackProgress(level, target, true)) {
+            return;
+        }
         ThanosMoves.Choice next = ThanosMoves.choose(this, target);
         if (next != null) {
             beginMove(next.move(), next.target(), 0);
@@ -836,41 +863,45 @@ public class ThanosEntity extends Monster implements BossHooks {
         getLookControl().setLookAt(point.x, point.y, point.z);
     }
 
-    private void trackProgress(ServerLevel level, LivingEntity target) {
+    /** @return whether it started a Leap (he then has his move) */
+    private boolean trackProgress(ServerLevel level, LivingEntity target, boolean mayAct) {
         double distance = distanceTo(target);
         if (distance < 4.5 || distance > 40.0) {
             stuckTicks = 0;
             stuckDistance = distance;
             stuckLeaps = 0;
-            return;
+            return false;
         }
         if (distance < stuckDistance - 0.5) {
             stuckDistance = distance;
             stuckTicks = 0;
-            return;
+            return false;
         }
-        if (++stuckTicks < 80) {
-            return;
+        if (stuckTicks < 80) {
+            stuckTicks++;
+        }
+        if (stuckTicks < 80 || !mayAct) {
+            return false;
         }
         stuckTicks = 0;
         stuckDistance = distance;
         if (stuckLeaps < 2 && distance >= 5.0) {
             stuckLeaps++;
             beginMove(ThanosMove.LEAP, target, 0);
-            return;
+            return true;
         }
         stuckLeaps = 0;
         freeSpotNear(level, target);
+        return false;
     }
 
-    /** Moves him to the nearest free ground near the target, with a purple flash. */
+    /** Moves him to the nearest free ground near the target (at the target's own height), with a purple flash. */
     private void freeSpotNear(ServerLevel level, LivingEntity target) {
         for (int radius = 2; radius <= 6; radius += 2) {
             for (int k = 0; k < 8; k++) {
                 double angle = k * Math.PI / 4.0;
-                Vec3 at = target.position().add(Math.cos(angle) * radius, 0.0, Math.sin(angle) * radius);
-                Vec3 spot = com.kolodkingal.enhanced.ability.Teleports.groundAt(this, level, Mth.floor(at.x), Mth.floor(at.z));
-                if (spot != null && Math.abs(spot.y - target.getY()) < 4.0) {
+                Vec3 spot = standingSpotAt(level, target.getX() + Math.cos(angle) * radius, target.getY(), target.getZ() + Math.sin(angle) * radius);
+                if (spot != null) {
                     flashAt(level, position());
                     moveTo(spot.x, spot.y, spot.z, getYRot(), getXRot());
                     navigation.stop();
@@ -879,6 +910,29 @@ public class ThanosEntity extends Monster implements BossHooks {
                 }
             }
         }
+    }
+
+    /**
+     * Where he could stand in the column of {@code (x, z)} within four blocks of {@code y}: solid dry ground under free room for
+     * his whole body (the same height as whoever he hunts, so a roof or a cave over the surface is no trouble), or null.
+     */
+    @Nullable
+    private Vec3 standingSpotAt(ServerLevel level, double x, double y, double z) {
+        int base = Mth.floor(y);
+        for (int step : new int[]{0, 1, -1, 2, -2, 3, -3, 4, -4}) {
+            BlockPos feet = new BlockPos(Mth.floor(x), base + step, Mth.floor(z));
+            BlockPos under = feet.below();
+            BlockState ground = level.getBlockState(under);
+            if (!ground.isFaceSturdy(level, under, net.minecraft.core.Direction.UP) || !ground.getFluidState().isEmpty()
+                    || ground.is(Blocks.MAGMA_BLOCK) || ground.is(Blocks.CACTUS)) {
+                continue;
+            }
+            Vec3 spot = Vec3.atBottomCenterOf(feet);
+            if (com.kolodkingal.enhanced.ability.Teleports.fits(this, spot) && !level.containsAnyLiquid(getBoundingBox().move(spot.subtract(position())))) {
+                return spot;
+            }
+        }
+        return null;
     }
 
     private void flashAt(ServerLevel level, Vec3 at) {
@@ -1147,7 +1201,8 @@ public class ThanosEntity extends Monster implements BossHooks {
     // Cooldowns, for the choice of moves
 
     /** Whether the move's cooldown is over. */
-    boolean ready(ThanosMove which) {
+    @VisibleForTesting
+    public boolean ready(ThanosMove which) {
         return readyAt.getOrDefault(which, 0) <= tickCount;
     }
 
@@ -1571,6 +1626,12 @@ public class ThanosEntity extends Monster implements BossHooks {
 
     @Override
     public boolean shouldShowName() {
+        return false;
+    }
+
+    /** A fight never survives a restart: neither he nor anything of his is written to the world. */
+    @Override
+    public boolean shouldBeSaved() {
         return false;
     }
 

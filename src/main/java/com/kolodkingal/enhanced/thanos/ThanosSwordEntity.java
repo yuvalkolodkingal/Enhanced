@@ -102,7 +102,7 @@ public class ThanosSwordEntity extends Projectile implements ShieldCost {
                 setReturning(true);
             }
         } else {
-            Vec3 hand = thanos.handPosition();
+            Vec3 hand = thanos.swordHandPosition();
             Vec3 toHand = hand.subtract(from);
             double distance = toHand.length();
             if (distance < 1.6) {
@@ -134,6 +134,12 @@ public class ThanosSwordEntity extends Projectile implements ShieldCost {
                 ThanosSounds.HIT.play(level, e.position());
             }
         }
+    }
+
+    /** A fight never survives a restart: neither he nor anything of his is written to the world. */
+    @Override
+    public boolean shouldBeSaved() {
+        return false;
     }
 
     @Override

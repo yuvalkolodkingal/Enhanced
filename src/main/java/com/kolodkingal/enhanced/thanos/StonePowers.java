@@ -149,6 +149,12 @@ public final class StonePowers {
                 continue;
             }
             alreadyHit.add(e.getId());
+            if (e instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(wanda)) {
+                // A wide beam that grazes the sphere without its centre line meeting it is stopped by it just the same.
+                WandaAbilities.wear(wanda, shieldCost);
+                shield = true;
+                continue;
+            }
             hit.add(e);
             if (hurt(level, caster, e, type, damage, caster) && push > 0.0) {
                 shove(e, start, push, 0.2);

@@ -317,6 +317,15 @@ final class ThanosMoves {
         return d.lengthSqr() < 1.0E-6 ? new Vec3(0, 0, 1) : d.normalize();
     }
 
+    /**
+     * The way his body faces the one he aims at (the gauntlet's hand is a step to the side, so the aim from it points a
+     * little across): the flat direction from him to the target, or the aim's if there is none.
+     */
+    private static Vec3 bodyAim(ThanosEntity boss, MoveState c) {
+        LivingEntity target = c.target;
+        return target != null ? flat(target.position().subtract(boss.position())) : flat(c.aim);
+    }
+
     private static Vec3 flat(Vec3 v) {
         Vec3 f = new Vec3(v.x, 0, v.z);
         return f.lengthSqr() < 1.0E-6 ? new Vec3(0, 0, 1) : f.normalize();
@@ -420,7 +429,7 @@ final class ThanosMoves {
     }
 
     private static void smash(ThanosEntity boss, MoveState c, ServerLevel level, int t, int fire) {
-        Vec3 ahead = flat(c.aim);
+        Vec3 ahead = c.locked ? flat(c.aim) : bodyAim(boss, c);
         if (t <= 16 && !c.locked) {
             c.spot = boss.position().add(ahead.scale(4.0));
         }
@@ -469,7 +478,15 @@ final class ThanosMoves {
         }
         if (t == fire && !boss.swordAway()) {
             ThanosSwordEntity sword = new ThanosSwordEntity(ModEntities.THANOS_SWORD.get(), level);
-            sword.launch(boss, boss.swordHandPosition(), c.aim);
+            // The blade leaves the other hand: it flies at the point of the locked line nearest the target, so it still goes for him.
+            Vec3 from = boss.swordHandPosition();
+            Vec3 aim = c.aim;
+            if (c.target != null) {
+                Vec3 hand = boss.handPosition();
+                double along = Math.max(4.0, chestOf(c.target).subtract(hand).dot(c.aim));
+                aim = dir(from, hand.add(c.aim.scale(along)));
+            }
+            sword.launch(boss, from, aim);
             boss.fight().spawn(sword);
             boss.swordThrown(sword);
             ThanosSounds.SWING.play(level, boss.position(), 1.2F, 0.7F);
@@ -545,7 +562,7 @@ final class ThanosMoves {
     /** Whom the Choke takes: a player in the cone ahead within 3.2 blocks, a Loki or a Vision before the others. */
     @Nullable
     private static LivingEntity chokeVictim(ThanosEntity boss, MoveState c) {
-        Vec3 direction = flat(c.aim);
+        Vec3 direction = bodyAim(boss, c);
         double cos = Math.cos(Math.toRadians(20.0));
         ServerPlayer best = null;
         for (ServerPlayer player : boss.mortals()) {
