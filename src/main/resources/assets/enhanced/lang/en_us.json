@@ -490,6 +490,7 @@
   "screen.enhanced.mind_read.players_off": "The server keeps players' minds private",
   "screen.enhanced.mind_read.really": "Really %1$s, shaped as %2$s",
   "screen.enhanced.mind_read.disguised": "%s (disguised)",
+  "screen.enhanced.mind_read.level": "Level %s",
   "hud.enhanced.phoenix_host": "host: %s",
   "hud.enhanced.phoenix_charging": "charging %s%%",
   "hud.enhanced.phoenix_sense": "sense %s",

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.MindReadingOverlay;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -79,7 +80,8 @@ public record MindReadPayload(int entityId, String name, String species, int sta
         return TYPE;
     }
 
-    /** The Phoenix lane shows the panel here. */
+    /** The panel beside her crosshair shows it. */
     static void handle(MindReadPayload payload, IPayloadContext context) {
+        MindReadingOverlay.accept(payload);
     }
 }

@@ -490,6 +490,7 @@
   "screen.enhanced.mind_read.players_off": "השרת שומר על המחשבות של השחקנים פרטיות",
   "screen.enhanced.mind_read.really": "באמת %1$s, בדמות %2$s",
   "screen.enhanced.mind_read.disguised": "%s (מחופש)",
+  "screen.enhanced.mind_read.level": "רמה %s",
   "hud.enhanced.phoenix_host": "מארח: %s",
   "hud.enhanced.phoenix_charging": "נטען %s%%",
   "hud.enhanced.phoenix_sense": "חישה %s",
