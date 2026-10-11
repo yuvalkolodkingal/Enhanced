@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.client.render.HeroClient;
+import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
@@ -80,9 +82,14 @@ public class PowerHud implements LayeredDraw.Layer {
     }
 
     private static Component status(LocalPlayer player, PowerData data, int ability, long now) {
-        long cooldown = data.cooldownUntil(ability) - now;
-        if (cooldown > 0) {
-            return Component.literal(String.format(Locale.ROOT, "%.1fs", cooldown / 20.0)).withStyle(ChatFormatting.GRAY);
+        // The heroes of 3.0 say for themselves (by default: the cooldown, as below).
+        HeroClient hero = HeroClients.of(data.power());
+        if (hero != null) {
+            return hero.hudStatus(player, data, ability, now);
+        }
+        Component cooldown = cooldown(data, ability, now);
+        if (cooldown != null) {
+            return cooldown;
         }
         boolean holding = data.heldEntityId() != -1;
         return switch (data.power()) {
@@ -122,8 +129,14 @@ public class PowerHud implements LayeredDraw.Layer {
             case TOMMY -> tommy(player, data, ability);
             case LOKI -> loki(player, data, ability);
             case THOR -> thor(player, data, ability);
-            case NONE -> null;
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, NONE -> null;
         };
+    }
+
+    /** The ability's cooldown as the HUD shows it (grey seconds), or null when it is ready. */
+    public static Component cooldown(PowerData data, int ability, long now) {
+        long left = data.cooldownUntil(ability) - now;
+        return left > 0 ? Component.literal(String.format(Locale.ROOT, "%.1fs", left / 20.0)).withStyle(ChatFormatting.GRAY) : null;
     }
 
     /**

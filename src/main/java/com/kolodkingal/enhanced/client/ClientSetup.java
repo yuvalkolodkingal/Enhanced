@@ -22,6 +22,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -47,6 +48,16 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         CustomMusic.prepareFolder();
+        // Who glows through walls for the local player: Billy's Noise, and the senses of the heroes of 3.0 as they add
+        // theirs.
+        event.enqueueWork(() -> {
+            EntityGlow.register(TheNoise::reveals, TheNoise::moodColor);
+            // ===== phoenix =====
+            // ===== spider =====
+            // ===== thanos =====
+            // ===== ultron =====
+            // ===== apocalypse =====
+        });
     }
 
     @SubscribeEvent
@@ -68,6 +79,27 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.LOKI_DAGGER.get(), LokiDaggerRenderer::new);
         event.registerEntityRenderer(ModEntities.LOKI_ILLUSION.get(), LokiIllusionRenderer::new);
         event.registerEntityRenderer(ModEntities.HEX_VISION.get(), HexVisionRenderer::new);
+
+        // The entities of 3.0, one region per hero (the // ===== lines): drawn as nothing until the lane that builds
+        // them replaces its line with a renderer of its own.
+        // ===== phoenix =====
+        // ===== spider =====
+        // ===== thanos =====
+        event.registerEntityRenderer(ModEntities.THANOS.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_SWORD.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_METEOR.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_ORB.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_PHANTOM.get(), NoopRenderer::new);
+        // ===== ultron =====
+        event.registerEntityRenderer(ModEntities.ULTRON.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.ULTRON_SENTRY.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.VIBRANIUM_KEY.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.ULTRON_BOLT.get(), NoopRenderer::new);
+        // ===== apocalypse =====
+        event.registerEntityRenderer(ModEntities.APOCALYPSE.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_BOULDER.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_COCOON.get(), NoopRenderer::new);
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */
@@ -80,6 +112,12 @@ public final class ClientSetup {
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ENERGY_WIDE, () -> LayerDefinition.create(PlayerModel.createMesh(new CubeDeformation(0.3F), false), 64, 64));
         event.registerLayerDefinition(ENERGY_SLIM, () -> LayerDefinition.create(PlayerModel.createMesh(new CubeDeformation(0.3F), true), 64, 64));
+        // The model layers of 3.0, one region per hero (the // ===== lines).
+        // ===== phoenix =====
+        // ===== spider =====
+        // ===== thanos =====
+        // ===== ultron =====
+        // ===== apocalypse =====
     }
 
     @SubscribeEvent
@@ -93,6 +131,12 @@ public final class ClientSetup {
                 renderer.addLayer(new GlowingEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
                 renderer.addLayer(new BillyCrownLayer(renderer));
+                // The layers of 3.0, one region per hero (the // ===== lines), before the last one.
+                // ===== phoenix =====
+                // ===== spider =====
+                // ===== thanos =====
+                // ===== ultron =====
+                // ===== apocalypse =====
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
@@ -109,6 +153,12 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("powers"), new PowerHud());
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("slow_motion"), new SlowMotionOverlay());
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("anim_state"), new AnimStateOverlay());
+        // The screens of 3.0, one region per hero (the // ===== lines).
+        // ===== phoenix =====
+        // ===== spider =====
+        // ===== thanos =====
+        // ===== ultron =====
+        // ===== apocalypse =====
     }
 
     private ClientSetup() {

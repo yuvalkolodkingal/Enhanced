@@ -370,6 +370,10 @@ public final class GestureTable {
                 }
             }
             default -> {
+                HeroClient hero = HeroClients.of(s.power);
+                if (hero != null) {
+                    return hero.predictedGesture(s, data, ability, now, sneaking);
+                }
             }
         }
         return null;

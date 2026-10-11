@@ -425,6 +425,7 @@ public final class Gestures {
         WitchGestures.register();
         SpeedGestures.register();
         AsgardGestures.register();
+        HeroClients.registerGestures();
     }
 
     private Gestures() {

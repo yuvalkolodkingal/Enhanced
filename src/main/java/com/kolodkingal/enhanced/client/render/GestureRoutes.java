@@ -26,6 +26,18 @@ public final class GestureRoutes {
     /** How long a raise that the data does not (yet) show is believed, in ticks (see {@link #shieldRaiseAborted}). */
     public static final int SHIELD_DATA_GRACE = 12;
 
+    /**
+     * What stands in for a gesture a hero of 3.0 does not have yet: the toggles, abilities and states of the five new
+     * heroes are routed (so the table is complete) but pending, until the lane that builds the hero routes them to its
+     * own gestures. {@code SkeletonTests.noAnimationIsPendingAtTheRelease} fails at the release while any of them is
+     * left.
+     */
+    public static final GestureId PENDING_GESTURE = GestureId.LOOK_CHANGE;
+    /** The way {@link #acting} says an ability of a hero of 3.0 is not acted yet. */
+    public static final String PENDING_ACTING = "none: pending lane";
+    /** What {@link #reason} says of a momentary state of a hero of 3.0 that is not acted yet (it begins with this). */
+    public static final String PENDING_REASON = "pending lane";
+
     /** A Boolean flag of the synced power data (the ones that are not a {@link Toggle} or a {@link Live} bit). */
     public enum Flag {
         MAGNETIC_SHIELD, SHRAPNEL, BEAM, CHAOS_SHIELD, VISION_PHASED, DENSE, DISGUISE, QUICKSILVER_TIME, SUPER_SPEED, WALKMAN
@@ -104,6 +116,16 @@ public final class GestureRoutes {
             case GOD_OF_THUNDER -> power == Power.THOR ? (on ? GestureId.THOR_UNLEASH_ON : GestureId.THOR_UNLEASH_OFF) : null;
             case SUPER_SPEED -> power == Power.TOMMY && on ? GestureId.TOMMY_READY : null;
             case THE_NOISE -> power == Power.BILLY ? (on ? GestureId.BILLY_NOISE_ON : GestureId.BILLY_NOISE_OFF) : null;
+            // The toggles of 3.0 (one region per hero): pending, routed to the stand-in whoever has them, until the
+            // hero's lane routes each to a gesture of its own (for its own hero only, as above).
+            // ===== phoenix =====
+            case MIND_READING -> PENDING_GESTURE;
+            // ===== spider =====
+            case WALL_CRAWL, SPIDER_SENSE, SPIDER_LEGS -> PENDING_GESTURE;
+            // ===== thanos =====
+            case REALITY_VEIL -> PENDING_GESTURE;
+            // ===== ultron =====
+            // ===== apocalypse =====
         };
     }
 
@@ -235,6 +257,17 @@ public final class GestureRoutes {
                 case 4 -> "toggle:GOD_OF_THUNDER";
                 default -> "none: the Bifrost is a stance and its arrival a gesture of the payload";
             };
+            // The heroes of 3.0 (one arm each): pending until the hero's lane says how each ability is acted.
+            // ===== phoenix =====
+            case PHOENIX -> PENDING_ACTING;
+            // ===== spider =====
+            case SPIDER_MAN -> PENDING_ACTING;
+            // ===== thanos =====
+            case THANOS -> PENDING_ACTING;
+            // ===== ultron =====
+            case ULTRON -> PENDING_ACTING;
+            // ===== apocalypse =====
+            case APOCALYPSE -> PENDING_ACTING;
             default -> "none: no abilities";
         };
     }
@@ -250,6 +283,19 @@ public final class GestureRoutes {
             case CROWNED -> "Billy's crown is drawn by its own layer, not a pose";
             case FREEZING -> "the cooldown of Freeze plays the cast; the stance BILLY_FREEZE holds the pose";
             case PINNED -> "Mjolnir lying on them is the whole picture: they can't move, so they have no move to make";
+            // The states of 3.0 (one region per hero): pending until the hero's lane gives them a gesture or a reason.
+            // ===== phoenix =====
+            case PHOENIX_CHARGING, PHOENIX_BLAZE, MIND_SENSING, PHOENIX_PSIONIC -> PENDING_REASON + ": the Phoenix lane acts it";
+            // ===== spider =====
+            case CLINGING_WALL, CLINGING_CEILING, ZIPPING, SWINGING, SENSING, BLACK_EYES, INSTANT_KILL ->
+                    PENDING_REASON + ": the Spider-Man lane acts it";
+            // ===== thanos =====
+            case SOUL_DRAINING, SOUL_SIGHT -> PENDING_REASON + ": the Thanos lane acts it";
+            // ===== ultron =====
+            case ULTRON_CHARGING -> PENDING_REASON + ": the Ultron lane acts it";
+            case LIFTED -> "Sokovia carries them: like a pinned player they can't move, so they have no move to make";
+            // ===== apocalypse =====
+            case SANDSTORM -> PENDING_REASON + ": the Apocalypse lane acts it";
         };
     }
 

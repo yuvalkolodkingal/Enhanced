@@ -52,7 +52,11 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
                     ? (SuitSkins.suitFor(player) != null ? WANDA_SUIT : WANDA) : null;
             case THOR -> data.toggle(Toggle.GOD_OF_THUNDER) || data.is(Live.CALLING_LIGHTNING)
                     ? ("ragnarok".equals(Variants.current(data).id()) ? THOR_RAGNAROK : THOR) : null;
-            default -> null;
+            // The heroes of 3.0 say for themselves, a mask for each look.
+            default -> {
+                HeroClient hero = HeroClients.of(data.power());
+                yield hero == null ? null : hero.eyes(player, data);
+            }
         };
     }
 

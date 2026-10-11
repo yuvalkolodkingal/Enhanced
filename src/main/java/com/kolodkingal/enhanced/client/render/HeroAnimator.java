@@ -252,7 +252,12 @@ public final class HeroAnimator {
                 case SCARLET_WITCH -> GestureId.TAKEOFF_WANDA;
                 case VISION -> GestureId.TAKEOFF_VISION;
                 case BILLY -> GestureId.TAKEOFF_BILLY;
-                default -> GestureId.TAKEOFF_THOR;
+                default -> {
+                    // (Thor's take-off is the default; a hero of 3.0 may have one of its own.)
+                    HeroClient hero = HeroClients.of(power);
+                    GestureId own = hero == null ? null : hero.takeoffGesture();
+                    yield own != null ? own : GestureId.TAKEOFF_THOR;
+                }
             };
             start(s, id, 0.0F, age);
             FlightEffects.takeoff(p, s, power);
@@ -313,6 +318,11 @@ public final class HeroAnimator {
         if (!s.look.equals(data.variant()) && s.seeded) {
             start(s, GestureId.LOOK_CHANGE, 0.0F, age);
         }
+        // The heroes of 3.0 find their own edges.
+        HeroClient hero = HeroClients.of(power);
+        if (hero != null) {
+            hero.edges(s, p, data, now);
+        }
     }
 
     /** What the next tick compares against. */
@@ -358,6 +368,10 @@ public final class HeroAnimator {
         on[Stance.SHIELD_WANDA.ordinal()] = power == Power.SCARLET_WITCH && data.chaosShieldActive();
         on[Stance.THOR_BEAM.ordinal()] = power == Power.THOR && data.is(Live.CALLING_LIGHTNING);
         on[Stance.TOMMY_WHIRL.ordinal()] = power == Power.TOMMY && data.is(Live.WHIRLWIND);
+        HeroClient hero = HeroClients.of(power);
+        if (hero != null) {
+            hero.stanceTargets(s, p, data, on, now);
+        }
         if (isDebugTarget(p)) {
             for (int i = 0; i < on.length; i++) {
                 if (DEBUG_STANCE[i] != 0) {

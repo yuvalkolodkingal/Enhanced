@@ -83,6 +83,13 @@ final class RunPoses {
             case BILLY -> BILLY;
             case LOKI -> LOKI;
             case THOR -> THOR;
+            // The heroes of 3.0, one line each (each lane's own): they walk and sprint as anyone does until their lane
+            // gives them a character.
+            case PHOENIX -> DEFAULT;
+            case SPIDER_MAN -> DEFAULT;
+            case THANOS -> DEFAULT;
+            case ULTRON -> DEFAULT;
+            case APOCALYPSE -> DEFAULT;
             default -> DEFAULT;
         };
     }

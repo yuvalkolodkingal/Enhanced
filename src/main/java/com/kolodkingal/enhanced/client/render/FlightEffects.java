@@ -59,17 +59,17 @@ import static com.kolodkingal.enhanced.client.render.AnimMath.ss;
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class FlightEffects {
     /** Where the effects come from: indices of a hero's tracked points. */
-    private static final int HAND_R = 0;
-    private static final int HAND_L = 1;
-    private static final int FOOT_R = 2;
-    private static final int FOOT_L = 3;
-    private static final int SHOULDER_R = 4;
-    private static final int SHOULDER_L = 5;
-    private static final int FOREHEAD = 6;
-    private static final int WEAPON = 7;
-    private static final int SOURCES = 8;
+    static final int HAND_R = 0;
+    static final int HAND_L = 1;
+    static final int FOOT_R = 2;
+    static final int FOOT_L = 3;
+    static final int SHOULDER_R = 4;
+    static final int SHOULDER_L = 5;
+    static final int FOREHEAD = 6;
+    static final int WEAPON = 7;
+    static final int SOURCES = 8;
     /** Ticks of history kept for each source. */
-    private static final int HISTORY = 8;
+    static final int HISTORY = 8;
     private static final double TELEPORT = 6.0;
     private static final int MAX_RINGS_PER_PLAYER = 3;
     private static final int MAX_RINGS = 24;
@@ -79,7 +79,7 @@ public final class FlightEffects {
     private static final int WHITE = 0xFFFFFF;
 
     /** The recent positions of one hero's sources, one per client tick, newest first. */
-    private static final class Fx {
+    static final class Fx {
         final Vec3[][] hist = new Vec3[SOURCES][HISTORY];
         final int[] count = new int[SOURCES];
         final Vec3[] live = new Vec3[SOURCES];
@@ -198,7 +198,7 @@ public final class FlightEffects {
     }
 
     /** The point a source was at {@code back} ticks ago (0 = this tick), or null. */
-    private static Vec3 at(Fx fx, int source, int back) {
+    static Vec3 at(Fx fx, int source, int back) {
         return fx.count[source] > back ? fx.hist[source][back] : null;
     }
 
@@ -206,7 +206,7 @@ public final class FlightEffects {
      * Lays particles evenly along the path a source travelled since the last tick, so there are no gaps at any speed.
      * Returns how many were laid.
      */
-    private static int lay(ClientLevel level, Fx fx, int source, double spacing, int cap, double jitter, int budget, float density,
+    static int lay(ClientLevel level, Fx fx, int source, double spacing, int cap, double jitter, int budget, float density,
                            java.util.function.IntFunction<ParticleOptions> options, double drift) {
         Vec3 cur = at(fx, source, 0);
         Vec3 prev = at(fx, source, 1);
@@ -327,6 +327,10 @@ public final class FlightEffects {
                 }
             }
             default -> {
+                HeroClient hero = HeroClients.of(power);
+                if (hero != null) {
+                    hero.flightParticles(level, player, st, fx, density, local);
+                }
             }
         }
         // First person: the air streams past the camera.
@@ -726,12 +730,16 @@ public final class FlightEffects {
                 }
             }
             default -> {
+                HeroClient hero = HeroClients.of(st.power);
+                if (hero != null) {
+                    hero.flightRibbons(pose, vc, camera, player, st, fx, time);
+                }
             }
         }
     }
 
     /** One ribbon from a source through its history. */
-    private static void source(Matrix4f pose, VertexConsumer vc, Vec3 camera, Fx fx, int source, double length, float width, int rgb, float alpha,
+    static void source(Matrix4f pose, VertexConsumer vc, Vec3 camera, Fx fx, int source, double length, float width, int rgb, float alpha,
                                float wobble, float phase, float spiral, float time) {
         Vec3 head = fx.live[source];
         if (head == null || fx.count[source] < 1) {
@@ -749,7 +757,7 @@ public final class FlightEffects {
      * A ribbon along a path: from {@code head} back through {@code points} for {@code length} blocks, narrowing and fading to
      * nothing, with an optional wave across it.
      */
-    private static void polyline(Matrix4f pose, VertexConsumer vc, Vec3 camera, Vec3 head, Vec3[] points, int count, double length, float width, int rgb,
+    static void polyline(Matrix4f pose, VertexConsumer vc, Vec3 camera, Vec3 head, Vec3[] points, int count, double length, float width, int rgb,
                                  float alpha, float wobble, float phase, float time) {
         Vec3 prev = head;
         double along = 0.0;
