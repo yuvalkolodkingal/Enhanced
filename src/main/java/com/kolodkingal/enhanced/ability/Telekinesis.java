@@ -200,9 +200,9 @@ public final class Telekinesis {
         return !(projectile instanceof FishingHook) && !MagnetoAbilities.isHeld(projectile);
     }
 
-    /** Iron Golems, minecarts, dropped metal, and any creature wearing Iron, Chainmail or Gold armor. */
+    /** Iron Golems, minecarts, dropped metal, any creature wearing Iron, Chainmail or Gold armor, and an Iron Spider. */
     public static boolean isMagnetic(Entity e) {
-        if (e.getType().is(ModTags.MAGNETIC_ENTITIES)) {
+        if (e.getType().is(ModTags.MAGNETIC_ENTITIES) || SpiderServer.isIronSpider(e)) {
             return true;
         }
         if (e instanceof ItemEntity item) {
