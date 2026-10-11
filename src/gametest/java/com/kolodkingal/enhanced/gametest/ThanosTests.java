@@ -212,9 +212,8 @@ public final class ThanosTests {
             }
             // (100 ticks of healing: 0.5 a second.)
             assertNear(thanos.getHealth() - hurt, 2.5, 0.3, "he healed half a point a second for a hundred ticks");
-            check(thanos.getFoodData().getExhaustionLevel() > exhaustion || thanos.getFoodData().getSaturationLevel() < 5.0F,
-                    "and it cost him hunger");
-            check(starving.getHealth() == 30.0F || starving.getHealth() == hurt, "with an empty hunger bar there is no healing: " + starving.getHealth());
+            check(thanos.getFoodData().getExhaustionLevel() - exhaustion > 0.5, "and it cost him hunger: " + thanos.getFoodData().getExhaustionLevel());
+            check(starving.getHealth() == hurt, "with an empty hunger bar there is no healing: " + starving.getHealth());
             return true;
         });
     }
@@ -722,6 +721,54 @@ public final class ThanosTests {
         check(!ThanosAbilities.veilTakes(thanos, late) && !late.isRemoved(), "with the Veil down an arrow is an arrow");
         hammer.discard();
         helper.succeed();
+    }
+
+    /** What he shot himself is not a bubble, even if it comes back at him. */
+    @GameTest(template = ARENA, batch = "thanos_hero_veil", timeoutTicks = 60)
+    public static void theVeilLeavesWhatHeShotHimselfAlone(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = f.level();
+        ServerPlayer thanos = thanos(f, 10.5, 10.5);
+        pressSneaking(thanos, 3);
+        Arrow own = EntityType.ARROW.create(level);
+        own.setOwner(thanos);
+        own.setNoGravity(true);
+        own.moveTo(helper.absoluteVec(new Vec3(10.5 + 6.0, FLOOR + 1.5, 10.5)));
+        own.setDeltaMovement(-0.5, 0.0, 0.0);
+        level.addFreshEntity(own);
+        f.everyTick(8, t -> {
+            PowerTicker.tick(thanos);
+            if (t < 6) {
+                return false;
+            }
+            check(!own.isRemoved(), "his own arrow is not turned into a bubble");
+            own.discard();
+            return true;
+        });
+    }
+
+    /** A creature that is pinned while the vortex draws it in stays where it is. */
+    @GameTest(template = ARENA, batch = "thanos_hero_pull_not", timeoutTicks = 60)
+    public static void aCreaturePinnedWhileTheVortexDrawsItStaysWhereItIs(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thanos = thanos(f, 10.5, 4.5);
+        TestKit.look(thanos, 0.0F, 0.0F);
+        Zombie target = zombie(helper, 10.5, 16.5);
+        pressSneaking(thanos, 2);
+        check(cooldownLeft(thanos, 2) == ThanosConfig.PULL_COOLDOWN.get(), "the pull was cast");
+        ServerPlayer thor = f.player(1.5, FLOOR, 1.5, Power.THOR);
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        MjolnirPin.pin(thor, InteractionHand.MAIN_HAND, target);
+        check(MjolnirPin.isPinned(target), "pinned in flight");
+        Vec3 before = target.position();
+        f.everyTick(12, t -> {
+            PowerTicker.tick(thanos);
+            if (t < 10) {
+                return false;
+            }
+            check(target.position().distanceTo(before) < 0.2, "the vortex did not draw him in");
+            return true;
+        });
     }
 
     // ------------------------------------------------------------------------------------------------------------
