@@ -35,12 +35,10 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -460,6 +458,14 @@ public final class ThanosAbilities {
         return ahead.getLocation().distanceTo(thanos.getEyePosition()) <= limit + 0.5;
     }
 
+    /** Tells him if a player within {@code radius} is spared by PvP, for the stones that fall on an area. */
+    private static void sayIfPvpSpares(ServerPlayer thanos, double radius) {
+        if (!thanos.level().getEntitiesOfClass(Player.class, thanos.getBoundingBox().inflate(radius), other -> other != thanos
+                && !other.isCreative() && !other.isSpectator() && !thanos.canHarmPlayer(other)).isEmpty()) {
+            thanos.displayClientMessage(Component.translatable("message.enhanced.thanos.pvp_off"), true);
+        }
+    }
+
     // ---- R, the Power Stone ----
 
     /**
@@ -531,6 +537,7 @@ public final class ThanosAbilities {
         player.causeFoodExhaustion(ThanosConfig.SLAM_EXHAUSTION.get().floatValue());
         state.slam = new Slam(player.position());
         float radius = ThanosConfig.SLAM_RADIUS.get().floatValue();
+        sayIfPvpSpares(player, radius);
         ThanosEffects.shockRing(level, player.position().add(0.0, 0.1, 0.0), radius, (int) Math.ceil(radius / SLAM_SPEED), StoneKind.POWER.color());
         ThanosSounds.CLENCH.play(level, player.position());
         ThanosSounds.HIT.play(level, player.position(), 1.2F, 0.6F);
@@ -836,10 +843,12 @@ public final class ThanosAbilities {
         if (!mayStart(player, data, 4, now) || state.drain != null) {
             return;
         }
-        Aim aim = aim(player, ThanosConfig.DRAIN_RANGE.get(), 0.3, target -> mayStrike(player, target));
+        double range = ThanosConfig.DRAIN_RANGE.get();
+        Aim aim = aim(player, range, 0.3, target -> mayStrike(player, target));
         LivingEntity target = aim.creature();
         if (target == null) {
-            player.displayClientMessage(Component.translatable("message.enhanced.thanos.no_target"), true);
+            boolean spared = protectedPlayerAhead(player, range, aim);
+            player.displayClientMessage(Component.translatable(spared ? "message.enhanced.thanos.pvp_off" : "message.enhanced.thanos.no_target"), true);
             return;
         }
         state.drain = new Drain(target.getUUID(), now);
@@ -1092,6 +1101,7 @@ public final class ThanosAbilities {
         player.causeFoodExhaustion(ThanosConfig.TIME_LOCK_EXHAUSTION.get().floatValue());
         state.lock = new Lock(level.dimension(), player.position(), now + ticks);
         float radius = ThanosConfig.TIME_LOCK_RADIUS.get().floatValue();
+        sayIfPvpSpares(player, radius);
         ThanosEffects.dome(level, player.position(), radius, ticks, StoneKind.TIME.color());
         ThanosEffects.mandala(level, player.position().add(0.0, 0.05, 0.0), radius, ticks, StoneKind.TIME.color());
         ThanosSounds.REWIND.play(level, player.position(), 0.8F, 1.3F);
@@ -1124,8 +1134,11 @@ public final class ThanosAbilities {
         double drag = 1.0 - ThanosConfig.TIME_LOCK_PROJECTILE_DRAG.get();
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box, p -> !isOwnedBy(p.getOwner(), player)
                 && p.position().distanceTo(lock.centre) <= radius)) {
-            inside.add(projectile.getId());
-            projectile.setNoGravity(true);
+            if (lock.hung.contains(projectile.getId()) || !projectile.isNoGravity()) {
+                // (One that has no gravity of its own is slowed too, but is not ours to let fall again.)
+                inside.add(projectile.getId());
+                projectile.setNoGravity(true);
+            }
             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(drag));
             projectile.hurtMarked = true;
         }
