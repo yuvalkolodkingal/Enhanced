@@ -89,6 +89,23 @@ public final class ModSounds {
     // ===== ultron =====
 
     // ===== apocalypse =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_AWAKEN = register("apocalypse_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_PORTAL = register("apocalypse_portal");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SAND_WAVE = register("sand_wave");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SAND_SPIKE = register("sand_spike");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SAND_STORM_LOOP = register("sand_storm_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ENTOMB = register("entomb");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ENTOMB_BREAK = register("entomb_break");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_SHIELD_UP = register("apocalypse_shield_up");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_SHIELD_HIT = register("apocalypse_shield_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_SHIELD_BREAK = register("apocalypse_shield_break");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_MIND_CRUSH = register("apocalypse_mind_crush");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_SPEAK = register("apocalypse_speak");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_BESTOW = register("apocalypse_bestow");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ESSENCE_TRANSFER = register("essence_transfer");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_THEME = register("apocalypse_theme");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_THEME_FINAL = register("apocalypse_theme_final");
+    public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_DEATH = register("apocalypse_death");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
