@@ -37,7 +37,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 * **A harder Chaos Shield.** It takes 3/4 of a second to form, holds for 8 seconds, has 30 points of strength, shatters when those run out, and needs 6 to 15 seconds to recharge. See [Scarlet Witch](Scarlet-Witch).
 * **The Tesseract awakens Wanda too.** Use it with a Scarlet Witch Gene in your other hand and you become the Scarlet Witch instead of Loki.
 * **Loki's Scepter confuses.** A hit makes a creature forget its target and wander about, and gives a player Nausea and Slowness. See [Loki](Loki).
-* **Thor's Love and Thunder suit, redrawn** to match the film: navy, gold and black armour, long blond hair, a red cape. See [Looks](Looks).
+* **Thor's Love and Thunder look, redrawn** to match the film: navy, gold and black armour, long ash-blond hair swept back from a bare forehead, a full beard, a red cape. And a new look, **Love and Thunder, helmet**, with the winged helmet from the New Asgard fight. See [Looks](Looks).
 
 ## Animations and effects
 

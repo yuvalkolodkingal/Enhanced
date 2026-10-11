@@ -38,7 +38,7 @@ The `[look]` or `<look>` argument is the id of a look (see [Looks](Looks)):
 | Tommy | `halloween`, `tracksuit`, `speed`, `own` |
 | Billy | `wiccan`, `teen`, `halloween`, `comics`, `own` |
 | Loki | `loki`, `tva`, `god_of_stories`, `own` |
-| Thor | `thor`, `ragnarok`, `love_and_thunder`, `mighty_thor`, `own` |
+| Thor | `thor`, `ragnarok`, `love_and_thunder`, `love_and_thunder_helmet`, `mighty_thor`, `own` |
 
 Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced look` skips players whose hero does not have the look, and it fails with "Unknown look" if no given player has it.
 
