@@ -1039,8 +1039,11 @@ public final class SkeletonTests {
         check(!BossFights.protects(level, helper.absolutePos(new BlockPos(5, 2, 5))), "no block is protected");
         check(!BossFights.telekinesisPress(player) && !BossFights.telekinesisLaunch(player, zombie), "Wanda's telekinesis is hers alone");
         for (BossKind kind : BossKind.values()) {
-            check(!BossFights.start(kind, player, true), "no " + kind + " fight can start yet, not even by force");
             check(BossKind.byId(kind.id()) == kind, kind + " is found by its id");
+            if (BossFights.lane(kind) != null) {
+                continue; // a boss whose lane is built answers to the tests of its own lane
+            }
+            check(!BossFights.start(kind, player, true), "no " + kind + " fight can start yet, not even by force");
         }
         BossFights.tickLevel(level);
         BossFights.stopAll(level.getServer(), StopReason.COMMAND);
