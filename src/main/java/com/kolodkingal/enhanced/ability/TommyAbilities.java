@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -274,6 +275,7 @@ public final class TommyAbilities {
         if (!data.isReady(4, now)) {
             return;
         }
+        SandCocoonEntity.freeFrom(player); // his molecules slip out of a cocoon of Apocalypse's sand
         Direction facing = player.getDirection();
         BlockPos feet = player.blockPosition();
         int wallStart = -1;

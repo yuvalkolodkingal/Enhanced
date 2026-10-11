@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -236,6 +237,7 @@ public final class Telekinesis {
     // Holding
 
     public static void hold(ServerPlayer player, Entity target, Mode mode) {
+        SandCocoonEntity.freeFrom(target); // taking hold of a friend breaks the cocoon of Apocalypse's sand that held them
         double dist = player.getEyePosition().distanceTo(target.position().add(0, target.getBbHeight() * 0.5, 0));
         GRIPS.put(player.getUUID(), new Grip(target.getUUID(), mode, Mth.clamp(dist, MIN_HOLD_DISTANCE, MAX_HOLD_DISTANCE)));
         FLIGHTS.remove(target.getUUID());

@@ -1,20 +1,19 @@
 package com.kolodkingal.enhanced.entity;
 
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 
 /**
- * A boulder of Apocalypse's sand. A stub: its flight and its damage are built by the Apocalypse lane (DESIGN section
- * 17); until then it is only registered and cannot be summoned.
+ * A boulder of Apocalypse's sand: a block of it torn out of the ground and hurled, 1.3 blocks a tick with a little
+ * gravity, 11 damage ({@code boulderDamage}) and a shove of 0.8. It shatters in a puff.
  */
-public class SandBoulderEntity extends ThrowableProjectile {
+public class SandBoulderEntity extends AbstractSandProjectile {
     public SandBoulderEntity(EntityType<? extends SandBoulderEntity> type, Level level) {
-        super(type, level);
+        super(type, level, 11.0F, 0.8F);
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected double getDefaultGravity() {
+        return 0.012;
     }
 }
