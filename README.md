@@ -83,6 +83,11 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 faster. Press **Sneak + R** for **Super Speed** instead: only you are fast, and the world is not slowed. In either mode
 you also mine, attack, eat, shoot a bow and swim four times as fast.
 
+**The Hex's Vision:** when the Scarlet Witch raises a Hex, a Vision appears at her side and fights for her
+while it stands (he can never leave it). Look at a creature and press **Z** to send him at it, at nothing to
+call him back, **Sneak + Z** to make him hold his post. Vision himself, inside a standing Hex, can't leave it
+either: he comes apart a little at the wall and is thrown back.
+
 Every hero except Quicksilver, Tommy and Loki can also fly by double-tapping **Space** (Thor only with
 Mjolnir or Stormbreaker in hand). With telekinesis, press the key again
 to launch what you hold, or **Sneak** + the key to put it down gently. Keys can be changed
@@ -147,8 +152,8 @@ To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a
 * `/enhanced power get|set …` (`none`, `magneto`, `scarlet_witch`, `quicksilver`,
   `vision`, `tommy`, `billy`, `loki`, `thor`, optionally followed by a look), `/enhanced look <players> <look>`
   (for example `/enhanced look @a tva`) and `/enhanced hex list|clear` (operators only).
-* Balance numbers (beam damage, Hex death chance and radius, flight speeds, shrapnel, how much
-  Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
+* Balance numbers (beam damage, Hex death chance and radius, the Vision of the Hex, flight speeds, shrapnel,
+  how much Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
 * Item, block and entity tags under `data/enhanced/tags/` decide what counts as
   metal, what can be lifted, what the shield repels and which bosses resist the Hex,
   so datapacks can change them.

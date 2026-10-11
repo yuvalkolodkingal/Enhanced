@@ -20,9 +20,10 @@ import java.util.UUID;
  * @param allowed        players Wanda allowed to cross the wall
  * @param allowCreatures whether mobs and animals may cross the wall
  * @param createdAt      game time of creation (used for the rising animation)
+ * @param visionStays    Wanda's order to the Vision her Hex raised: he holds his post instead of following her
  */
 public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius, Set<UUID> allowed,
-                  boolean allowCreatures, long createdAt) {
+                  boolean allowCreatures, long createdAt, boolean visionStays) {
 
     public static final Codec<Hex> CODEC = RecordCodecBuilder.create(i -> i.group(
             UUIDUtil.CODEC.fieldOf("id").forGetter(Hex::id),
@@ -32,9 +33,10 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
             Codec.INT.fieldOf("radius").forGetter(Hex::radius),
             UUIDUtil.CODEC.listOf().optionalFieldOf("allowed", List.of()).forGetter(h -> List.copyOf(h.allowed())),
             Codec.BOOL.optionalFieldOf("allow_creatures", false).forGetter(Hex::allowCreatures),
-            Codec.LONG.optionalFieldOf("created_at", 0L).forGetter(Hex::createdAt)
-    ).apply(i, (id, owner, name, center, radius, allowed, creatures, created) ->
-            new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created)));
+            Codec.LONG.optionalFieldOf("created_at", 0L).forGetter(Hex::createdAt),
+            Codec.BOOL.optionalFieldOf("vision_stays", false).forGetter(Hex::visionStays)
+    ).apply(i, (id, owner, name, center, radius, allowed, creatures, created, stays) ->
+            new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created, stays)));
 
     public static final StreamCodec<ByteBuf, Hex> STREAM_CODEC = StreamCodec.of((buf, h) -> {
         UUIDUtil.STREAM_CODEC.encode(buf, h.id);
@@ -50,6 +52,7 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
         }
         buf.writeBoolean(h.allowCreatures);
         ByteBufCodecs.VAR_LONG.encode(buf, h.createdAt);
+        buf.writeBoolean(h.visionStays);
     }, buf -> {
         UUID id = UUIDUtil.STREAM_CODEC.decode(buf);
         UUID owner = UUIDUtil.STREAM_CODEC.decode(buf);
@@ -63,7 +66,8 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
         }
         boolean creatures = buf.readBoolean();
         long created = ByteBufCodecs.VAR_LONG.decode(buf);
-        return new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created);
+        boolean stays = buf.readBoolean();
+        return new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created, stays);
     });
 
     /** Whether a point is inside the wall. */
@@ -86,14 +90,18 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
         } else {
             copy.remove(player);
         }
-        return new Hex(id, owner, ownerName, center, radius, Set.copyOf(copy), allowCreatures, createdAt);
+        return new Hex(id, owner, ownerName, center, radius, Set.copyOf(copy), allowCreatures, createdAt, visionStays);
     }
 
     public Hex withAllowCreatures(boolean allow) {
-        return new Hex(id, owner, ownerName, center, radius, allowed, allow, createdAt);
+        return new Hex(id, owner, ownerName, center, radius, allowed, allow, createdAt, visionStays);
     }
 
     public Hex withRadius(int newRadius) {
-        return new Hex(id, owner, ownerName, center, newRadius, allowed, allowCreatures, createdAt);
+        return new Hex(id, owner, ownerName, center, newRadius, allowed, allowCreatures, createdAt, visionStays);
+    }
+
+    public Hex withVisionStays(boolean stays) {
+        return new Hex(id, owner, ownerName, center, radius, allowed, allowCreatures, createdAt, stays);
     }
 }

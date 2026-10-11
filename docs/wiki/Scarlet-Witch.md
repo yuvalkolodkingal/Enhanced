@@ -110,6 +110,7 @@ Press **N** again, while you have a Hex, to open the **Hex Control** screen:
 
 * Allow or block each online player.
 * Allow or block creatures (mobs and animals).
+* Tell [your Vision](#the-vision-of-the-hex) to follow you or to hold his post.
 * Make the Hex bigger or smaller (radius 8 to 96 by default).
 * Dissolve the Hex (or press **Sneak + N**).
 
@@ -132,7 +133,33 @@ Other rules of the wall:
 * Anyone **with powers** (a hero) and bosses (the Ender Dragon, the Wither, the Warden and the Elder Guardian) can't be killed by the wall. They are thrown back as if they hit glass, unless Wanda allowed them in. Phasing doesn't get Vision through: it is a wall of reality, not of stone.
 * Creative and Spectator players pass through.
 * Pets owned by an allowed player pass through safely.
+* **Vision can't leave a standing Hex**, whether or not you let him in: see below.
+
+#### Vision can't leave your Hex
+
+You are in control of the Hex, and in *WandaVision* Vision starts to come apart at the edge of Westview. So a player with Vision's power (White Vision too) who is inside a standing Hex **can't leave it**. Walking, flying, phasing, portals and every teleport out (Ender Pearls, Chorus Fruit, the Bifrost, Loki's Tesseract, the Witches' Road, Tommy's Vibrate) are refused at the wall, even when you let him in.
+
+* At the wall he **comes apart**: pieces of him flake off in orange and yellow with a crackling sound, he is thrown back inside, and he is told "Wanda's Hex holds you: only she can let you go".
+* It hurts him a little: **1 heart** the first time, and 1 heart more for every push within 3 seconds of the last, up to **4 hearts**. However hard he leans on the wall it bites at most twice a second. It never kills him (the last half heart is never taken), and it starts over after 3 seconds without pushing. These are `scarlet_witch.hexHoldDamage` and `scarlet_witch.hexHoldDamageMax`.
+* **He is free** when the Hex dissolves, when you shrink it past him (the wall then runs inside him, and he is not dragged back), and if he is in Creative or Spectator.
+* Getting **into** a Hex keeps the old rules: your permission lets him in, and without it he is thrown back like any hero.
+
+#### The Vision of the Hex
+
+*"When Wanda raises the Hex, Vision appears and attacks whoever she tells him to."* When you raise a Hex, a **Vision appears beside you**, as if you brought him back to life inside it.
+
+* **Look.** He is drawn like Vision: Vision's skin and yellow cape, and the Mind Stone glowing in his forehead (brighter while he fires). He floats and flies, and has poses of his own for hovering, flying (leaning into it, arms swept back, cape streaming), standing guard and punching.
+* **His place.** He follows you inside the Hex and **can never leave it**: the wall holds him exactly as it holds Vision. There is one per Hex, and he is there as long as it stands.
+* **He protects you** like a tamed wolf. He goes for whatever attacks you, whatever you attack, whatever hits him, and whatever you point him at (below). Up close he fights with **dense punches**: 12 damage (6 hearts), about one a second. From a way off he fires a short **Mind Stone beam**: 4 damage a hit, two hits a second, 16 blocks. He has 80 health (40 hearts; an Iron Golem has 100) and 8 armor.
+* **He never harms** you, players you allowed into the Hex, the pets of either, other Visions, or Creative and Spectator players, and no player at all on a server with PvP off. Your Chaos Beam and blows pass him by, and telekinesis can't lift him.
+* **Orders.** The **Z** key, *Vision, That One!* (it can be changed under *Options, Controls, Key Binds, Enhanced Powers*):
+  * **Look at a creature and press Z**: he goes for that one, whatever else he is doing.
+  * **Look at nothing and press Z**: he comes back to your side.
+  * **Sneak + Z**: he holds his post where he is, or follows you again. The Hex Control screen has the same choice as a button, *Vision: follows you / holds his post*, and the Hex remembers it.
+* **If he falls** he fades to nothing, and you **rebuild him 60 seconds later** while the Hex stands. He fades away when the Hex dissolves, and when you leave (log out or change dimension); your Hex raises him again when you are back. Nothing of him is saved.
+
+![The Vision of the Hex](images/hex-vision.png)
 
 ## Numbers you can change
 
-Wanda's flight speed, the beam's damage, range and Nausea, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be, and the Hex's default, smallest and largest radius and its death chance are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration).
+Wanda's flight speed, the beam's damage, range and Nausea, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be, and the Hex's default, smallest and largest radius, its death chance and how hard it bites a Vision who pushes against it are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration). The Vision of the Hex (his health, punch and beam, how long you need to rebuild him, and turning him off) is the `hex_vision.*` options.

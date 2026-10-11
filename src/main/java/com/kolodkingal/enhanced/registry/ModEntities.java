@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
@@ -79,9 +80,22 @@ public final class ModEntities {
                     .noSummon()
                     .build("loki_illusion"));
 
+    /** The Vision of Wanda's Hex. Never saved: the Hex that raised him makes him again when the world is loaded. */
+    public static final DeferredHolder<EntityType<?>, EntityType<HexVisionEntity>> HEX_VISION = ENTITIES.register("hex_vision",
+            () -> EntityType.Builder.<HexVisionEntity>of(HexVisionEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.62F)
+                    .clientTrackingRange(10)
+                    .updateInterval(2)
+                    .fireImmune()
+                    .noSave()
+                    .noSummon()
+                    .build("hex_vision"));
+
     /** Mod bus: attributes of the mod's living entities. */
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
+        event.put(HEX_VISION.get(), HexVisionEntity.createAttributes().build());
     }
 
     private ModEntities() {

@@ -11,8 +11,9 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 public final class ModNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         // The version of the messages and synced data: a client and a server with different versions can't play together
-        // (2.2 renumbered Thor's effects and added the Chaos Shield's state to the power data).
-        PayloadRegistrar registrar = event.registrar("2");
+        // (2.2 renumbered Thor's effects and added the Chaos Shield's state to the power data; 2.3 added the order
+        // to the Vision of the Hex to every Hex).
+        PayloadRegistrar registrar = event.registrar("3");
         registrar.playToServer(AbilityKeyPayload.TYPE, AbilityKeyPayload.STREAM_CODEC, AbilityKeyPayload::handle);
         registrar.playToServer(HexActionPayload.TYPE, HexActionPayload.STREAM_CODEC, HexActionPayload::handle);
         registrar.playToServer(ChangeLookPayload.TYPE, ChangeLookPayload.STREAM_CODEC, ChangeLookPayload::handle);

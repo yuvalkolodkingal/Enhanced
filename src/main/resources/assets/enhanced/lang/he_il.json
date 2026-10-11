@@ -385,5 +385,20 @@
   "config.enhanced.flight_effects": "אפקטי תעופה",
   "config.enhanced.flight_effects.tooltip": "שובלים, טבעות, קווי רוח וגלי הלם סביב גיבורים שעפים.",
   "config.enhanced.hide_hero_armour": "הסתרת השריון של גיבורים",
-  "config.enhanced.hide_hero_armour.tooltip": "לא מציירים את השריון של גיבורים (שלכם בגוף שלישי ושל כל השחקנים האחרים), כדי שהוא לא יסתיר את הדמויות. הוא ממשיך להגן כרגיל. אליטרה, ראשי מפלצות, דלעות מגולפות והציוד של הגיבורים מהמוד הזה תמיד מצוירים."
+  "config.enhanced.hide_hero_armour.tooltip": "לא מציירים את השריון של גיבורים (שלכם בגוף שלישי ושל כל השחקנים האחרים), כדי שהוא לא יסתיר את הדמויות. הוא ממשיך להגן כרגיל. אליטרה, ראשי מפלצות, דלעות מגולפות והציוד של הגיבורים מהמוד הזה תמיד מצוירים.",
+  "entity.enhanced.hex_vision": "ויז'ן",
+  "key.enhanced.vision_command": "ויז'ן, את זה! (מכשפת השני)",
+  "message.enhanced.hex.holds_vision": "ההקס של וונדה מחזיק אותך: רק היא יכולה לשחרר אותך",
+  "message.enhanced.hex_vision.fell": "ויז'ן נפל. ההקס שלך יבנה אותו מחדש בעוד %s שניות",
+  "message.enhanced.hex_vision.rebuilt": "ויז'ן קם שוב",
+  "message.enhanced.hex_vision.attack": "ויז'ן תוקף את %s",
+  "message.enhanced.hex_vision.refuses": "ויז'ן לא יפגע ב-%s",
+  "message.enhanced.hex_vision.recall": "ויז'ן חוזר אליך",
+  "message.enhanced.hex_vision.absent": "אין כרגע ויז'ן בהקס שלך",
+  "message.enhanced.hex_vision.stays": "ויז'ן שומר על עמדתו",
+  "message.enhanced.hex_vision.follows": "ויז'ן הולך איתך",
+  "screen.enhanced.hex.vision": "ויז'ן: %s",
+  "screen.enhanced.hex.vision_follows": "הולך איתך",
+  "screen.enhanced.hex.vision_stays": "שומר על עמדתו",
+  "screen.enhanced.hex.vision_tooltip": "הביטו ביצור ולחצו %s: ויז'ן, את זה! הבטה בלי יעד מחזירה אותו אליכם. התגנבות + %s: הוא שומר על עמדתו או הולך איתכם שוב."
 }

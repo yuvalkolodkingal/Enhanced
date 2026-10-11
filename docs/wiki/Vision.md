@@ -44,6 +44,12 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 
 ![Vision in his WandaVision human disguise](images/vision-disguise.png)
 
+## Wanda's Hex holds him
+
+Inside a standing Hex, Vision **can't leave it**, in either look, whether or not Wanda let him in: in *WandaVision* he starts to come apart at the edge of Westview. Walking, flying, phasing, portals and every teleport out are refused at the wall. He comes apart a little there (pieces flake off in orange and yellow, with a crackle), is thrown back inside and told "Wanda's Hex holds you: only she can let you go". It costs him 1 heart the first time and up to 4 hearts if he keeps pushing, and never kills him. He is free when the Hex dissolves, when Wanda shrinks it past him, and in Creative or Spectator. Wanda's Hex also brings a Vision of its own to fight at her side. All of it is on [Scarlet Witch](Scarlet-Witch).
+
+![Vision coming apart at the wall of Wanda's Hex](images/vision-held.png)
+
 ## Numbers you can change
 
 Vision's flight speed (0.08) and the Mind Stone Beam's damage (6) are the `vision.*` options. The beam's range is the same option as the Chaos Beam's, `scarlet_witch.chaosBeamRange`. See [Server Configuration](Server-Configuration).

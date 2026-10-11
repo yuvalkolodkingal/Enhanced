@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.power.Power;
@@ -22,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -32,6 +34,7 @@ import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Draws the energy effects that live in the world rather than on a body: the Hex walls, the Chaos Beam, the Chaos
@@ -105,11 +108,13 @@ public final class WorldEffectsRenderer {
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
             if (data.power() == Power.SCARLET_WITCH && data.beamActive()) {
-                renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS, pose, beams, camera, partialTick, time);
+                renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS, WandaAbilities.beamTargets(player), pose, beams, camera,
+                        partialTick, time);
             }
             if (data.power() == Power.VISION && data.beamActive()) {
                 Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION : MIND_STONE;
-                renderBeam(mc, player, foreheadPosition(mc, player, partialTick), palette, pose, beams, camera, partialTick, time);
+                renderBeam(mc, player, foreheadPosition(mc, player, partialTick), palette, WandaAbilities.BEAM_TARGET, pose, beams, camera,
+                        partialTick, time);
             }
             if (data.heldEntityId() != -1) {
                 Entity held = level.getEntity(data.heldEntityId());
@@ -119,6 +124,11 @@ public final class WorldEffectsRenderer {
             }
             if (data.power() == Power.MAGNETO && data.magneticShield() && !player.isInvisible()) {
                 renderMagneticField(mc, player, pose, beams, camera, partialTick, time);
+            }
+        }
+        for (Entity entity : level.entitiesForRendering()) {
+            if (entity instanceof HexVisionEntity vision && vision.beamTarget() != null) {
+                renderVisionBeam(vision, vision.beamTarget(), pose, beams, camera, partialTick, time);
             }
         }
         renderHexBolts(mc, level, pose, beams, camera, partialTick, time);
@@ -171,12 +181,27 @@ public final class WorldEffectsRenderer {
     /** White Vision's beam: pale cyan-white (WandaVision episode 9). */
     private static final Palette WHITE_VISION = new Palette(0x7EBADF, 0xE8FBFF, 0xA6E2F0);
 
-    private static void renderBeam(Minecraft mc, AbstractClientPlayer player, Vec3 origin, Palette palette, Matrix4f pose,
-                                   VertexConsumer vc, Vec3 camera, float partialTick, float time) {
+    private static void renderBeam(Minecraft mc, AbstractClientPlayer player, Vec3 origin, Palette palette, Predicate<Entity> targets,
+                                   Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick, float time) {
         double range = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_BEAM_RANGE.get() : 32;
-        Vec3 end = Raycasts.any(player, range, WandaAbilities.BEAM_TARGET, partialTick).getLocation().subtract(camera);
-        Vec3 start = origin.subtract(camera);
+        Vec3 end = Raycasts.any(player, range, targets, partialTick).getLocation().subtract(camera);
+        drawBeam(origin.subtract(camera), end, palette, player.getId(), pose, vc, time);
+    }
 
+    /**
+     * The Mind Stone beam of the Vision of a Hex: from his forehead to the creature he is fighting (a short beam; his
+     * White Vision look does not exist, so it is always the stone's pale gold).
+     */
+    private static void renderVisionBeam(HexVisionEntity vision, LivingEntity target, Matrix4f pose, VertexConsumer vc, Vec3 camera,
+                                         float partialTick, float time) {
+        Vec3 look = vision.getViewVector(partialTick);
+        Vec3 start = vision.getEyePosition(partialTick).add(look.scale(0.28)).add(0, 0.18, 0);
+        Vec3 end = target.getPosition(partialTick).add(0, target.getBbHeight() * 0.6, 0);
+        drawBeam(start.subtract(camera), end.subtract(camera), MIND_STONE, vision.getId(), pose, vc, time);
+    }
+
+    /** A beam from {@code start} to {@code end} (both camera-relative): glow, core, bolts and a flare where it ends. */
+    private static void drawBeam(Vec3 start, Vec3 end, Palette palette, int seedId, Matrix4f pose, VertexConsumer vc, float time) {
         float flicker = 0.85F + 0.15F * Mth.sin(time * 1.7F) * Mth.cos(time * 0.9F);
         // The beam starts thin at its source and swells a little towards the target, so it never fills the screen in first
         // person; a source right in front of the camera is drawn thinner still.
@@ -185,7 +210,7 @@ public final class WorldEffectsRenderer {
         EnergyGeometry.ribbon(pose, vc, start, end, 0.06F * near, 0.26F * flicker, EnergyGeometry.argb(palette.glow, 0.45F), EnergyGeometry.argb(palette.glow, 0.55F));
         EnergyGeometry.ribbon(pose, vc, start, end, 0.02F * near, 0.08F, EnergyGeometry.argb(palette.core, 0.75F), EnergyGeometry.argb(palette.core, 0.85F));
 
-        long seed = ((long) time / 2) * 341873128712L + player.getId() * 132897987541L;
+        long seed = ((long) time / 2) * 341873128712L + seedId * 132897987541L;
         for (int k = 0; k < 3; k++) {
             EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.28F, EnergyGeometry.argb(palette.bolt, 0.8F), seed + k * 7919L);
         }

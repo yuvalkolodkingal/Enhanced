@@ -7,7 +7,8 @@ import org.lwjgl.glfw.GLFW;
 
 /**
  * Ability 1-5 keys (default R, G, V, B, N). Each triggers the ability with the same number in the hero's list. The
- * Change Look key (default H) cycles through the hero's looks (Shift+H goes back).
+ * Change Look key (default H) cycles through the hero's looks (Shift+H goes back). The Vision key (default Z) is the
+ * Scarlet Witch's order to the Vision her Hex raised: "Vision, that one!" (Shift+Z: hold your post, or follow me).
  */
 public final class KeyBindings {
     public static final String CATEGORY = "key.categories.enhanced";
@@ -22,6 +23,9 @@ public final class KeyBindings {
 
     public static final KeyMapping CHANGE_LOOK = new KeyMapping("key.enhanced.change_look", KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
+
+    public static final KeyMapping VISION_COMMAND = new KeyMapping("key.enhanced.vision_command", KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY);
 
     private static KeyMapping create(int ability, int key) {
         return new KeyMapping("key.enhanced.ability_" + ability, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, key, CATEGORY);

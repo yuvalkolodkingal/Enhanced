@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
@@ -62,6 +63,11 @@ public final class WandaAbilities {
     /** What the Chaos Beam can hit: creatures, Ender Dragon parts and End Crystals. */
     public static final Predicate<Entity> BEAM_TARGET = e -> e.isPickable() && !e.isSpectator()
             && (e instanceof LivingEntity || e instanceof PartEntity<?> || e instanceof EndCrystal);
+
+    /** What Wanda's Chaos Beam hits: {@link #BEAM_TARGET}, but never the Vision her own Hex raised (he is on her side). */
+    public static Predicate<Entity> beamTargets(Player wanda) {
+        return e -> BEAM_TARGET.test(e) && !(e instanceof HexVisionEntity vision && wanda.getUUID().equals(vision.getOwnerUUID()));
+    }
 
     // ---- input ----
 
@@ -131,7 +137,7 @@ public final class WandaAbilities {
 
     private static void beamTick(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
-        HitResult hit = Raycasts.any(player, EnhancedConfig.CHAOS_BEAM_RANGE.get(), BEAM_TARGET, 1.0F);
+        HitResult hit = Raycasts.any(player, EnhancedConfig.CHAOS_BEAM_RANGE.get(), beamTargets(player), 1.0F);
         if (hit instanceof EntityHitResult entityHit) {
             Entity target = entityHit.getEntity();
             target.hurt(ModDamageTypes.source(level, ModDamageTypes.CHAOS_BEAM, player, player),

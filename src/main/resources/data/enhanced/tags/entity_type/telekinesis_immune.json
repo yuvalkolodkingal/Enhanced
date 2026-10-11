@@ -5,6 +5,7 @@
     "minecraft:wither",
     "minecraft:warden",
     "minecraft:elder_guardian",
-    "enhanced:mjolnir_fragment"
+    "enhanced:mjolnir_fragment",
+    "enhanced:hex_vision"
   ]
 }

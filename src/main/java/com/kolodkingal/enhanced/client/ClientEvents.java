@@ -15,8 +15,11 @@ import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
+import com.kolodkingal.enhanced.hex.Hex;
+import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.ChangeLookPayload;
+import com.kolodkingal.enhanced.network.HexActionPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -46,6 +49,8 @@ import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.Optional;
 
 /** Client game events: ability keys, hand poses and flight particles. */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
@@ -241,6 +246,13 @@ public final class ClientEvents {
         if (lookClicked && power.hasPowers() && mc.screen == null && !player.isSpectator()) {
             PacketDistributor.sendToServer(new ChangeLookPayload(player.isShiftKeyDown() ? -1 : 1));
         }
+        boolean visionClicked = false;
+        while (KeyBindings.VISION_COMMAND.consumeClick()) {
+            visionClicked = true;
+        }
+        if (visionClicked && power == Power.SCARLET_WITCH && mc.screen == null && !player.isSpectator()) {
+            sendVisionOrder(player);
+        }
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             KeyMapping key = KeyBindings.ability(i);
             boolean clicked = false;
@@ -271,6 +283,22 @@ public final class ClientEvents {
 
     private static boolean hasOwnHex(LocalPlayer player) {
         return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
+    }
+
+    /**
+     * The Vision key, for a Scarlet Witch with a Hex: "Vision, that one!" at the creature she looks at (nothing in view
+     * calls him back to her side); with Shift, he holds his post, or follows her again.
+     */
+    private static void sendVisionOrder(LocalPlayer player) {
+        Optional<Hex> hex = player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID());
+        if (hex.isEmpty()) {
+            return;
+        }
+        if (player.isShiftKeyDown()) {
+            PacketDistributor.sendToServer(new HexActionPayload(HexAction.SET_VISION_STAYS, Optional.empty(), hex.get().visionStays() ? 0 : 1));
+        } else {
+            PacketDistributor.sendToServer(new HexActionPayload(HexAction.VISION_TARGET, Optional.empty(), 0));
+        }
     }
 
     @SubscribeEvent

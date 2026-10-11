@@ -52,6 +52,21 @@ Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 | `scarlet_witch.hexMinRadius` | `8` | 4 to 256 | Smallest radius Wanda can shrink her Hex to in Hex Control. |
 | `scarlet_witch.hexMaxRadius` | `96` | 4 to 256 | Largest radius Wanda can grow her Hex to in Hex Control. |
 | `scarlet_witch.hexDeathChance` | `0.95` | 0.0 to 1.0 | Chance that a creature without powers dies when it crosses the Hex wall without Wanda's permission (0.95 = 95%). The rest survive. |
+| `scarlet_witch.hexHoldDamage` | `2.0` | 0.0 to 20.0 | Damage Vision takes the first time he is thrown back at the wall of a Hex he is inside (2 = one heart). He can't leave a standing Hex, and comes apart a little at its edge; it never kills him. |
+| `scarlet_witch.hexHoldDamageMax` | `8.0` | 0.0 to 40.0 | The most one throw back at the wall can do to Vision. Each time he pushes again within three seconds it grows by `hexHoldDamage`, up to this; it never takes his last half heart. |
+
+## The Vision of the Hex
+
+Section `[hex_vision]`. When Wanda raises a Hex, a Vision appears to fight at her side (see [Scarlet Witch](Scarlet-Witch#the-vision-of-the-hex)).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `hex_vision.enabled` | `true` | `true` or `false` | If `true` (the default), a Hex brings a Vision to fight at Wanda's side while it stands. If `false`, no Hex does. |
+| `hex_vision.health` | `80.0` | 1.0 to 1000.0 | Health of the Vision of the Hex (an Iron Golem has 100; 80 = 40 hearts). |
+| `hex_vision.punchDamage` | `12.0` | 0.0 to 100.0 | Damage of one of his dense punches, about one a second (12 = 6 hearts). |
+| `hex_vision.beamDamage` | `4.0` | 0.0 to 100.0 | Damage per hit of his Mind Stone beam, two hits a second. |
+| `hex_vision.beamRange` | `16` | 2 to 64 | How far (in blocks) his Mind Stone beam reaches. Up close he punches instead. |
+| `hex_vision.rebuildTicks` | `1200` | 20 to 72000 | How long, in ticks, Wanda needs to rebuild him after he falls, while the Hex stands (1200 = a minute). |
 
 ## Vision
 
@@ -146,8 +161,8 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 | `enhanced:cannot_be_snatched` | item | Items that speedsters can't snatch (Mjolnir). |
 | `enhanced:magnetic_entities` | entity type | Creatures and vehicles made of metal that Magneto can lift (the Iron Golem, minecarts). |
 | `enhanced:metallic_projectiles` | entity type | Projectiles the Magnetic Shield catches. |
-| `enhanced:telekinesis_immune` | entity type | Creatures too powerful to lift (the Ender Dragon, the Wither, the Warden, the Elder Guardian), and the fragments of a shattered Mjolnir. |
-| `enhanced:hex_resistant` | entity type | Bosses the Hex wall can't kill: it throws them back instead. |
+| `enhanced:telekinesis_immune` | entity type | Creatures too powerful to lift (the Ender Dragon, the Wither, the Warden, the Elder Guardian), the fragments of a shattered Mjolnir, and the Vision of a Hex. |
+| `enhanced:hex_resistant` | entity type | Bosses the Hex wall can't kill: it throws them back instead (and the Vision of another Hex). |
 | `enhanced:spellbound_immune` | entity type | Creatures Billy's Freeze can't hold (the Ender Dragon, the Wither). |
 | `enhanced:pin_immune` | entity type | Creatures Mjolnir can't pin down (the Ender Dragon, the Wither, the Warden). |
 | `enhanced:confused_immune` | entity type | Creatures Loki's Scepter can't confuse (the Ender Dragon, the Wither, the Warden). |
