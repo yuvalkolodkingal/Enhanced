@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFights;
@@ -34,6 +35,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -269,6 +271,36 @@ public final class BossArenaTests {
             check(fight.arena().distance(fighter.position()) <= fight.arena().containRadius(),
                     "and the field still brings a fighter back (Ultron's island is lowered with everybody on it)");
             helper.succeed();
+        });
+    }
+
+    /**
+     * The real arena (not the test's, whose ground is the floor of the test) puts a stray fighter on the ground of
+     * the column it brings them to, and its tickets load the chunks round it. The test world is flat, and the arena
+     * stands beside the structure, on open ground.
+     */
+    @GameTest(template = ARENA, batch = "boss_arena_ground", timeoutTicks = 160)
+    public static void theRealFieldPutsAFighterOnTheGroundAndItsTicketsLoadTheChunks(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer fighter = f.player(10.5, FLOOR, 10.5);
+        Vec3 centre = helper.absoluteVec(new Vec3(48.5, FLOOR, 10.5));
+        TestFight fight = new TestFight(level, BossKind.APOCALYPSE, new BossArena(level, centre, 8.0,
+                Containment.FIELD, false).containAt(6.0).joinWithin(9.0).tractorDepth(0.0));
+        start(f, BossKind.APOCALYPSE, fighter, fight);
+        helper.runAfterDelay(30, () -> {
+            check(level.hasChunk(BlockPos.containing(centre).getX() >> 4, BlockPos.containing(centre).getZ() >> 4), "the arena's chunks are loaded");
+            Vec3 stray = centre.add(7.0, 0.0, 0.0);
+            fighter.teleportTo(level, stray.x, stray.y + 1.0, stray.z, 0.0F, 0.0F);
+        });
+        f.everyTick(120, tick -> {
+            if (tick < 45) {
+                return false;
+            }
+            check(fight.arena().distance(fighter.position()) <= fight.arena().containRadius() - 2.0, "the fighter was brought back inside");
+            int ground = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(fighter.getX()), (int) Math.floor(fighter.getZ()));
+            assertNear(fighter.getY(), ground, 0.01, "and stands on the ground there, not on the floor of the test");
+            return true;
         });
     }
 
