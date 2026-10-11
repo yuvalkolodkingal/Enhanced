@@ -271,5 +271,131 @@
         "name": "enhanced:sfx/tesseract"
       }
     ]
+  },
+  "space_stone": {
+    "subtitle": "subtitles.enhanced.space_stone",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/space_stone_1"
+      },
+      {
+        "name": "enhanced:sfx/space_stone_2"
+      },
+      {
+        "name": "enhanced:sfx/space_stone_3"
+      }
+    ]
+  },
+  "space_stone_hum": {
+    "subtitle": "subtitles.enhanced.space_stone_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/space_stone_loop_1"
+      },
+      {
+        "name": "enhanced:sfx/space_stone_loop_2"
+      }
+    ]
+  },
+  "mind_stone": {
+    "subtitle": "subtitles.enhanced.mind_stone",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_stone_1"
+      },
+      {
+        "name": "enhanced:sfx/mind_stone_2"
+      },
+      {
+        "name": "enhanced:sfx/mind_stone_3"
+      }
+    ]
+  },
+  "mind_stone_hum": {
+    "subtitle": "subtitles.enhanced.mind_stone_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_stone_loop_1"
+      },
+      {
+        "name": "enhanced:sfx/mind_stone_loop_2"
+      }
+    ]
+  },
+  "power_stone": {
+    "subtitle": "subtitles.enhanced.power_stone",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/power_stone_1"
+      },
+      {
+        "name": "enhanced:sfx/power_stone_2"
+      }
+    ]
+  },
+  "power_stone_hum": {
+    "subtitle": "subtitles.enhanced.power_stone_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/power_stone_loop_1"
+      }
+    ]
+  },
+  "reality_stone": {
+    "subtitle": "subtitles.enhanced.reality_stone",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/reality_stone_1"
+      },
+      {
+        "name": "enhanced:sfx/reality_stone_2"
+      }
+    ]
+  },
+  "reality_stone_hum": {
+    "subtitle": "subtitles.enhanced.reality_stone_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/reality_stone_loop_1"
+      }
+    ]
+  },
+  "soul_stone": {
+    "subtitle": "subtitles.enhanced.soul_stone",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/soul_stone_1"
+      },
+      {
+        "name": "enhanced:sfx/soul_stone_2"
+      }
+    ]
+  },
+  "soul_stone_hum": {
+    "subtitle": "subtitles.enhanced.soul_stone_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/soul_stone_loop_1"
+      }
+    ]
+  },
+  "time_stone": {
+    "subtitle": "subtitles.enhanced.time_stone",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_stone_1"
+      },
+      {
+        "name": "enhanced:sfx/time_stone_2"
+      }
+    ]
+  },
+  "time_stone_hum": {
+    "subtitle": "subtitles.enhanced.time_stone_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_stone_loop_1"
+      }
+    ]
   }
 }
