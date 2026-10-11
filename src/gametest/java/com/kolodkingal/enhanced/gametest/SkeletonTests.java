@@ -201,11 +201,20 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
+    /** A hero whose lane is not built yet: its plug-in is the stub the skeleton wrote, the power and nothing else. */
+    private static boolean isStub(Power hero) {
+        HeroServer server = HeroServers.of(hero);
+        return server != null && server.getClass().getDeclaredMethods().length <= 1;
+    }
+
     /** The power exists and does nothing: no key does anything, nothing ticks into a state, nobody is hurt. */
     @GameTest(template = ARENA, batch = SKELETON)
     public static void aNewHeroDoesNothingYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
+            if (!isStub(hero)) {
+                continue; // its lane has built it: its own tests say what it does
+            }
             ServerPlayer player = f.player(10.5, FLOOR, 10.5, hero);
             PowerData data = Powers.get(player);
             float health = player.getHealth();
