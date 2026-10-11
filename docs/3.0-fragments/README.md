@@ -115,8 +115,11 @@ entities), `BossFights` and the rest of the `boss/` package (the boss framework:
 * `SkeletonTests` pins the skeleton: the order of the powers, the tag files (every entry names something real), the melee
   tag, the Scepter and Tesseract table, the awakening items, the area rule, the boss facade, the payloads, the protocol
   (`ModNetwork.PROTOCOL_VERSION`, "4"). Keep it green. It runs in its own batch, `skeleton`, on purpose: the grid puts
-  tests side by side and a test that finishes in its first tick lets go of its chunks, which can freeze a weapon that
-  `ThorTests.thrownStormbreakerHitsAndComesBack` throws out of its arena (it failed 3 times in 23 runs before the move).
+  tests side by side and a test that finishes in its first tick lets go of its chunks. A thrown hammer that overshoots
+  its arena (`ThorTests.thrownMjolnirHitsAndComesBack`, `...Stormbreaker...`) then lands in a chunk that has stopped
+  ticking, freezes and never comes home (it failed 2 times in 22 runs): those tests now throw only 12 blocks, which
+  keeps the whole flight inside the 21-wide arena. A test of yours that lets something fly must keep it inside its own
+  arena too.
   A lane's quick tests belong in the lane's own batch (one batch per lane, not one per test), not in the default one.
 * Two **release gates** pass until the version is 3.0.0 and then fail while the work is unfinished: no pending animation
   route (`GestureRoutes.PENDING_*`: every ability, toggle and state of your hero has a gesture or a reason of its own),
