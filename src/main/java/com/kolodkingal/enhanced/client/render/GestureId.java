@@ -102,6 +102,24 @@ public enum GestureId {
     // The gestures of 3.0, in one region per hero (the // ===== lines), each lane's own. A gesture needs its keys in
     // the hero's HeroClient.registerGestures and a route in GestureRoutes (or a line in startedElsewhere).
     // ===== phoenix =====
+    /** Phoenix: the wings unfurl, the arms thrown overhead and swept down and out to the hover. */
+    TAKEOFF_PHOENIX(Group.TAKEOFF, 24, 3, 8, true),
+    /** Phoenix: telekinesis takes hold, an open palm at the thing and the other hand raised a little. */
+    TK_GRAB_PHOENIX(Group.TK, 12, 2, 6, false),
+    TK_FLING_PHOENIX(Group.TK, 10, 1, 5, true),
+    /** Phoenix: two fingers to the temple as Mind Reading begins, a small shake of the head as it ends. */
+    PHOENIX_READ_ON(Group.CAST, 14, 2, 5, false),
+    PHOENIX_READ_OFF(Group.CAST, 8, 1, 3, false),
+    /** Phoenix: Mind Sense, both hands to the temples and then the arms sweep out like a ripple. */
+    PHOENIX_SENSE(Group.CAST, 20, 2, 6, false),
+    /** Phoenix: Mind Control, fingers to the temple, the host held in the mind. */
+    PHOENIX_MIND_CAST(Group.CAST, 16, 2, 6, false),
+    /** Phoenix: the Psionic Field, both arms up and then thrown out and down with a push. */
+    PHOENIX_PSIONIC_CAST(Group.CAST, 24, 2, 8, true),
+    /** Phoenix: the Burst gathers, the arms sweep out and up into the V of the charge. */
+    PHOENIX_CHARGE_START(Group.CAST, 14, 2, 5, false),
+    /** Phoenix: the Burst goes off, the scream, the V thrown wide open and the back arched (started by the payload). */
+    PHOENIX_BURST(Group.CAST, 24, 1, 9, true),
 
     // ===== spider =====
 

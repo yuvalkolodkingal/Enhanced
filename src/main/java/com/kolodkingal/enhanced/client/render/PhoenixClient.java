@@ -27,8 +27,11 @@ import org.joml.Matrix4f;
  * names a client class except in a signature of {@link HeroClient} and each method hands its arguments on as they came
  * (the logic lives in the classes above, loaded only on a client).
  *
- * <p>Her gestures (the take-off, the cast of each ability, the release of the Burst), their routes, her flight profile
- * and run, and her first-person hands are the animation's, not yet written here.
+ * <p>Her animation: the keys of her gestures are {@link PhoenixGestures} (the take-off, the grab and the throw of her
+ * telekinesis, the cast of each ability, the release of the Burst); the routes that start them are the lines of her
+ * own in {@link GestureRoutes} and the methods below; what the client adds (the key press that acts before the server
+ * answers, the take-off the charge must not show, her hands in first person, the glints of the mind) is
+ * {@link PhoenixActing}; her flight profile is {@code FlightProfile.PHOENIX} and her walk {@code RunPoses.PHOENIX}.
  */
 public final class PhoenixClient implements HeroClient {
     @Override
@@ -55,8 +58,21 @@ public final class PhoenixClient implements HeroClient {
     }
 
     @Override
+    public void edges(HeroAnimState s, AbstractClientPlayer p, PowerData data, long now) {
+        PhoenixActing.edges(s, p, data);
+    }
+
+    @Override
+    @Nullable
+    public GestureId takeoffGesture() {
+        return GestureId.TAKEOFF_PHOENIX;
+    }
+
+    @Override
     public float lean(HeroAnimState st) {
-        return -4.0F * st.stance(Stance.PHOENIX_CHARGE) + 1.0F * st.stance(Stance.PHOENIX_READ);
+        // (The gesture that carries the V holds the lean itself: the stance's gives way by its weight.)
+        return PhoenixGestures.CHARGE_LEAN * st.stance(Stance.PHOENIX_CHARGE) * (1.0F - PhoenixGestures.owningTheV(st))
+                + 1.0F * st.stance(Stance.PHOENIX_READ);
     }
 
     @Override
@@ -67,6 +83,59 @@ public final class PhoenixClient implements HeroClient {
     @Override
     public void aimed(PoseContext c) {
         PhoenixPoses.aimed(c);
+    }
+
+    @Override
+    @Nullable
+    public GestureId predictedGesture(HeroAnimState s, PowerData data, int ability, long now, boolean sneaking) {
+        return PhoenixActing.predicted(data, ability, now, sneaking);
+    }
+
+    @Override
+    public void registerGestures() {
+        PhoenixGestures.register();
+    }
+
+    // ---- which gesture stands for what ----
+
+    @Override
+    @Nullable
+    public GestureId liveGesture(Live live) {
+        return switch (live) {
+            case CASTING -> GestureId.PHOENIX_MIND_CAST;
+            case PHOENIX_CHARGING -> GestureId.PHOENIX_CHARGE_START;
+            case MIND_SENSING -> GestureId.PHOENIX_SENSE;
+            case PHOENIX_PSIONIC -> GestureId.PHOENIX_PSIONIC_CAST;
+            default -> null;
+        };
+    }
+
+    @Override
+    @Nullable
+    public GestureId grabGesture() {
+        return GestureId.TK_GRAB_PHOENIX;
+    }
+
+    @Override
+    @Nullable
+    public GestureId flingGesture() {
+        return GestureId.TK_FLING_PHOENIX;
+    }
+
+    @Override
+    public boolean startedElsewhere(GestureId id) {
+        // The take-off is the animator's own edge; the release of the Burst is told by its payload (PhoenixFx).
+        return id == GestureId.TAKEOFF_PHOENIX || id == GestureId.PHOENIX_BURST;
+    }
+
+    @Override
+    public void gestureStarted(AbstractClientPlayer player, HeroAnimState state, GestureId id, float param) {
+        PhoenixActing.started(player, id);
+    }
+
+    @Override
+    public void firstPerson(HeroAnimState s, LocalPlayer player, FirstPersonArms.Offset main, FirstPersonArms.Offset off) {
+        PhoenixActing.firstPerson(s, player, main, off);
     }
 
     @Override

@@ -497,6 +497,7 @@ public final class AnimationMathTests {
                 // The heroes of 3.0 that fly with a profile of their own, one line each in the region of their lane (a
                 // hero with no flight profile yet is not listed: it flies with the vanilla pose).
                 // ===== phoenix =====
+                Power.PHOENIX,
                 // ===== ultron =====
                 // ===== apocalypse =====
         }) {
@@ -551,11 +552,13 @@ public final class AnimationMathTests {
         GestureId[] ids = {GestureId.TAKEOFF_MAGNETO, GestureId.TAKEOFF_WANDA, GestureId.TAKEOFF_VISION, GestureId.TAKEOFF_BILLY,
                 GestureId.TAKEOFF_THOR,
                 // ===== phoenix =====
+                GestureId.TAKEOFF_PHOENIX,
                 // ===== ultron =====
                 // ===== apocalypse =====
         };
         Power[] powers = {Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR,
                 // ===== phoenix =====
+                Power.PHOENIX,
                 // ===== ultron =====
                 // ===== apocalypse =====
         };
@@ -621,6 +624,8 @@ public final class AnimationMathTests {
                 {GestureId.BILLY_FREEZE_CAST, StancePoses.BILLY_FREEZE_M, StancePoses.BILLY_FREEZE_O},
                 // The gestures of 3.0 that hand over to a stance, one row each in the region of their lane.
                 // ===== phoenix =====
+                {GestureId.PHOENIX_CHARGE_START, com.kolodkingal.enhanced.client.render.PhoenixGestures.CHARGE_M,
+                        com.kolodkingal.enhanced.client.render.PhoenixGestures.CHARGE_O},
                 // ===== spider =====
                 // ===== thanos =====
                 // ===== ultron =====

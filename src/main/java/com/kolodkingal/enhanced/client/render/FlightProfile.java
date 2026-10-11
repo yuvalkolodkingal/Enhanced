@@ -122,6 +122,17 @@ public final class FlightProfile {
             pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),
             pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
 
+    /**
+     * The Phoenix: a calm telekinetic flier whose arms spread like wings as she speeds up, neither the Scarlet Witch's
+     * forward thrust nor Vision's stiffness.
+     */
+    private static final FlightProfile PHOENIX = new FlightProfile(
+            new float[]{30, 58, -8}, 0.45F, 16, 14, 3.5F, 10, 5, false, new float[]{4.5F, 4.5F}, new float[]{0.05F, 76}, 3.5F, 3.0F, 2.0F, 0.0F,
+            false, 0.09F, false, new float[][]{
+            pose(-10, 0, 24, -10, 0, -24, 4, 1, 2, -1),    // hover: arms low and a little out
+            pose(-6, 0, 58, -6, 0, -58, 8, 2, 5, -2),      // cruise: arms spread like a bird's
+            pose(14, 0, 72, 14, 0, -72, 10, 2, 10, -2)});  // sprint: arms swept back and out, wings
+
     /** The profile of a flier, or null for a hero that does not fly. */
     public static FlightProfile of(Power power, boolean whiteVision) {
         return switch (power) {
@@ -131,8 +142,8 @@ public final class FlightProfile {
             case BILLY -> BILLY;
             case THOR -> THOR;
             // The heroes of 3.0, one line each (each lane's own): none has a flight profile until its lane makes one.
-            // Phoenix, Ultron and Apocalypse fly with the vanilla pose until then.
-            case PHOENIX -> null;
+            // Ultron and Apocalypse fly with the vanilla pose until then.
+            case PHOENIX -> PHOENIX;
             case SPIDER_MAN -> null;
             case THANOS -> null;
             case ULTRON -> null;

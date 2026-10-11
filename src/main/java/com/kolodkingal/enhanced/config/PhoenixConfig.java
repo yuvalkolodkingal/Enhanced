@@ -178,6 +178,16 @@ public final class PhoenixConfig {
         return EnhancedConfig.SPEC.isLoaded() ? MIND_SENSE_RANGE.get() : 48;
     }
 
+    /** The food points she must have to start charging a Burst. */
+    public static int burstFoodCost() {
+        return EnhancedConfig.SPEC.isLoaded() ? BURST_FOOD_COST.get() : 6;
+    }
+
+    /** How far Mind Control reaches, in blocks. */
+    public static int mindControlRange() {
+        return EnhancedConfig.SPEC.isLoaded() ? MIND_CONTROL_RANGE.get() : 10;
+    }
+
     private PhoenixConfig() {
     }
 }

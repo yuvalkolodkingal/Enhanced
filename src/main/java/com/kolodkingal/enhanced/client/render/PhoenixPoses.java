@@ -5,12 +5,10 @@ import net.minecraft.util.Mth;
 
 /**
  * The pose rows of the Phoenix's two stances ({@link Stance#PHOENIX_READ}, {@link Stance#PHOENIX_CHARGE}) and her own
- * way of holding what her telekinesis holds. Written for a right-handed player (see {@link PoseContext}).
+ * way of holding what her telekinesis holds. Written for a right-handed player (see {@link PoseContext}). The poses the
+ * gestures hand over to are in {@link PhoenixGestures}, which the game tests can read.
  */
 final class PhoenixPoses {
-    /** The arms of the charge stance: thrown up and out in a V (the pose the charge gesture will hand over to). */
-    static final float[] CHARGE_M = {-150, 0, 52};
-    static final float[] CHARGE_O = {-150, 0, -52};
 
     /** Mind Reading: the head tilted and a little lowered, as if listening. */
     static void ambient(PoseContext c) {
@@ -23,7 +21,8 @@ final class PhoenixPoses {
     /**
      * Her telekinesis in an open, steady palm with the other hand raised a little (elegant, where the shared row is the
      * claw of the films; this runs after it, so it wins), and the V of arms thrown up and out that gathers the Burst:
-     * trembling, the head thrown back, the legs hanging.
+     * trembling, the head thrown back, the legs hanging. While the gesture that starts the charge or lets it go plays, it
+     * carries the head itself, so the stance gives its head up by the weight of the gesture.
      */
     static void aimed(PoseContext c) {
         HeroAnimState st = c.st;
@@ -35,11 +34,11 @@ final class PhoenixPoses {
         }
         w = st.stance(Stance.PHOENIX_CHARGE);
         if (w > 0.001F) {
-            c.arm(true, CHARGE_M[0], CHARGE_M[1], CHARGE_M[2], w);
-            c.arm(false, CHARGE_O[0], CHARGE_O[1], CHARGE_O[2], w);
+            c.arm(true, PhoenixGestures.CHARGE_M[0], PhoenixGestures.CHARGE_M[1], PhoenixGestures.CHARGE_M[2], w);
+            c.arm(false, PhoenixGestures.CHARGE_O[0], PhoenixGestures.CHARGE_O[1], PhoenixGestures.CHARGE_O[2], w);
             c.tremble(true, 2.9F, 1.7F, w);
             c.tremble(false, 2.9F, 1.7F, w);
-            c.head(-14, 0, 0, w);
+            c.head(PhoenixGestures.CHARGE_HEAD, 0, 0, w * (1.0F - PhoenixGestures.owningTheV(st)));
             float ground = w * (1.0F - st.wAir);
             c.leg(true, 0, 4, ground);
             c.leg(false, 0, -4, ground);

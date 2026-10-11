@@ -107,7 +107,10 @@ public final class PhoenixFx {
         }
         BURSTS.add(new Burst(payload.caster(), payload.centre(), payload.yaw(), payload.charge(), payload.radius(), payload.start(),
                 level.dimension(), ground, payload.start() * 31L + payload.caster()));
-        // (The animation of the release, PHOENIX_BURST, is started where the gestures are.)
+        // The scream of the release, for everyone who sees her (the local Phoenix too: the poses are drawn for the camera).
+        if (caster instanceof AbstractClientPlayer player) {
+            HeroAnimator.play(player, GestureId.PHOENIX_BURST, 0.0F);
+        }
     }
 
     public static void clear() {

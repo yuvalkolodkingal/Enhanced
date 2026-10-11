@@ -123,7 +123,7 @@ public final class GestureRoutes {
             // The toggles of 3.0 (one region per hero): pending, routed to the stand-in whoever has them, until the
             // hero's lane routes each to a gesture of its own (for its own hero only, as above).
             // ===== phoenix =====
-            case MIND_READING -> PENDING_GESTURE;
+            case MIND_READING -> power == Power.PHOENIX ? (on ? GestureId.PHOENIX_READ_ON : GestureId.PHOENIX_READ_OFF) : null;
             // ===== spider =====
             case WALL_CRAWL, SPIDER_SENSE, SPIDER_LEGS -> PENDING_GESTURE;
             // ===== thanos =====
@@ -279,7 +279,14 @@ public final class GestureRoutes {
             };
             // The heroes of 3.0 (one arm each): pending until the hero's lane says how each ability is acted.
             // ===== phoenix =====
-            case PHOENIX -> PENDING_ACTING;
+            // (Sneak + R, Mind Sense, is live:MIND_SENSING; Sneak + B, the Psionic Field, is live:PHOENIX_PSIONIC.)
+            case PHOENIX -> switch (ability) {
+                case 1 -> "toggle:MIND_READING";
+                case 2 -> "flight";
+                case 3 -> "held";
+                case 4 -> "live:CASTING";
+                default -> "live:PHOENIX_CHARGING";
+            };
             // ===== spider =====
             case SPIDER_MAN -> PENDING_ACTING;
             // ===== thanos =====
@@ -305,7 +312,8 @@ public final class GestureRoutes {
             case PINNED -> "Mjolnir lying on them is the whole picture: they can't move, so they have no move to make";
             // The states of 3.0 (one region per hero): pending until the hero's lane gives them a gesture or a reason.
             // ===== phoenix =====
-            case PHOENIX_CHARGING, PHOENIX_BLAZE, MIND_SENSING, PHOENIX_PSIONIC -> PENDING_REASON + ": the Phoenix lane acts it";
+            case PHOENIX_CHARGING, MIND_SENSING, PHOENIX_PSIONIC -> null;
+            case PHOENIX_BLAZE -> "the flames are drawn by a layer (PhoenixFlameLayer) and the eyes by GlowingEyesLayer, not by a pose";
             // ===== spider =====
             case CLINGING_WALL, CLINGING_CEILING, ZIPPING, SWINGING, SENSING, BLACK_EYES, INSTANT_KILL ->
                     PENDING_REASON + ": the Spider-Man lane acts it";

@@ -74,6 +74,8 @@ final class RunPoses {
     private static final Character BILLY = new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.025F);
     private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
     private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
+    /** The Phoenix: an unhurried walk with relaxed hands, a shade calmer than the default. */
+    private static final Character PHOENIX = new Character(0.90F, 1.15F, 1.05F, 5, 4, 0.015F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
@@ -85,7 +87,7 @@ final class RunPoses {
             case THOR -> THOR;
             // The heroes of 3.0, one line each (each lane's own): they walk and sprint as anyone does until their lane
             // gives them a character.
-            case PHOENIX -> DEFAULT;
+            case PHOENIX -> PHOENIX;
             case SPIDER_MAN -> DEFAULT;
             case THANOS -> DEFAULT;
             case ULTRON -> DEFAULT;
