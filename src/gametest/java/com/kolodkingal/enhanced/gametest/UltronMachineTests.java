@@ -27,6 +27,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -372,7 +373,7 @@ public final class UltronMachineTests {
         assertNear(lose(boss, beam, 10.0F), 15.0, 0.01, "the beam does 15 to a body");
         assertNear(lose(sentry, beam, 10.0F), 15.0, 0.01, "and to a Sentry");
         assertNear(lose(pig, beam, 10.0F), 10.0, 0.01, "but 10 to a pig");
-        assertNear(lose(hero, beam, 4.0F), 4.0, 0.01, "and 4 to the human Ultron: the beam is for machines");
+        assertNear(lose(hero, beam, 4.0F), afterArmour(hero, 4.0F, beam), 0.01, "and 4 (before his armour) to the Ultron hero: the beam is for machines");
 
         // Lightning: 1.25 to the bodies, the Sentries and the human Ultron.
         assertNear(lose(boss, lightning, 20.0F), 25.0, 0.01, "lightning does 25 where it would do 20");
@@ -380,7 +381,7 @@ public final class UltronMachineTests {
         check(sentry.isStunned() && !boss.isStaggered(), "and the bolt stuns the Sentry (and not the body)");
         assertNear(lose(pig, lightning, 8.0F), 8.0, 0.01, "8 to a pig");
         assertNear(lose(plain, lightning, 4.0F), 4.0, 0.01, "4 to a player");
-        assertNear(lose(hero, lightning, 4.0F), 5.0, 0.01, "5 to the human Ultron");
+        assertNear(lose(hero, lightning, 4.0F), afterArmour(hero, 5.0F, lightning), 0.01, "5 (before his armour) to the Ultron hero");
         f.config(UltronConfig.LIGHTNING_FACTOR, 2.0);
         f.config(UltronBossConfig.VISION_BEAM_BONUS, 3.0);
         assertNear(lose(sentry, lightning, 8.0F), 16.0, 0.01, "the factors are the config's: lightningFactor 2");
@@ -406,6 +407,11 @@ public final class UltronMachineTests {
         vision.setGameMode(GameType.SPECTATOR);
         check(!fight.visionNear(boss.position()), "a Spectator is not there");
         helper.succeed();
+    }
+
+    /** What is left of a blow of {@code amount} after the creature's armour (the vibranium body has some). */
+    private static float afterArmour(LivingEntity entity, float amount, DamageSource source) {
+        return CombatRules.getDamageAfterAbsorb(entity, amount, source, entity.getArmorValue(), (float) entity.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
     }
 
     /** Hurts the creature with the source (the hit cooldown cleared) and returns the health it lost. */
