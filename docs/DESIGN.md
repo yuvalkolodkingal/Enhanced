@@ -873,3 +873,25 @@ beam, how long Wanda needs to rebuild him, or turning him off), how long it pins
 who lifts it (`mjolnirOwnerOnly`), the Bifrost's
 cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`. The four client options
 (*Hero animations*, *Reduced motion*, *Flight effects*, *Hide heroes' armour*) are in `config/enhanced-client.toml` of the player's own game.
+
+## 12. Sounds: the voices of the Infinity Stones **(added)**
+
+Every Infinity Stone has a voice of its own, so the stones can be told apart by ear. They are synthesised from
+scratch like all the mod's sounds (no samples), and mastered under the mod's other sounds, so that a stone sounds
+**under** the portal, the awakening or the chime it comes with, never on top of it. Each stone has a short *use*
+sound (two or three takes of it, so it is never quite the same twice) and a quiet *hum* that loops.
+
+| Stone | Its voice | Where it sounds in the mod today |
+|---|---|---|
+| Space (the Tesseract) | A deep, swelling cosmic hum | Under the portal at both ends of Loki's escape and of a hero's jump, and when the Tesseract and the gene awaken the Scarlet Witch (there is no portal then); a soft hum while anyone holds the Tesseract. |
+| Mind (Loki's Scepter, Vision's forehead) | A bright, shimmering, slightly eerie chime-hum | When the scepter's stone is touched (the awakening of the Scarlet Witch or of Vision, a hero it recognises, the touch that kills); under the chime of a hit that confuses (not over a creature the blow killed); as Vision's beam starts; a soft hum while anyone holds the scepter. |
+| Power | A heavy violet roar | Registered, not used yet: it is for the Thanos boss (3.0). |
+| Reality | A liquid, bending, backwards-running swell | The same. |
+| Soul | A breathy, mournful choir tone | The same. |
+| Time | A ticking, rushing, rewinding shimmer | The same. |
+
+The hum of the Space and Mind Stones is a quiet client-side loop for as long as the Tesseract or the scepter is in
+either hand of a player: everyone near hears it, it follows the player, fades in and out with the item and stops when
+it is put away (the *Players* volume slider of the game turns it down). The Thanos boss will use the other four
+voices as he gathers the stones: the sound events `power_stone`, `reality_stone`, `soul_stone` and `time_stone` (and
+their `_hum` loops) are already registered, in `sounds.json` and in `ModSounds`, and `InfinityStone` lists all six.

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -26,8 +27,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Vision: a synthetic body with the Mind Stone in its forehead. Flies, fires the Mind Stone's beam, and controls his
- * own density: intangible enough to walk through walls, or dense enough to hit like a falling building.
+ * Vision: a synthetic body with the Mind Stone in its forehead. Flies, fires the Mind Stone's beam (the stone's voice
+ * sounds as it starts), and controls his own density: intangible enough to walk through walls, or dense enough to hit
+ * like a falling building.
  */
 public final class VisionAbilities {
     private static final ResourceLocation BODY_HEALTH = Enhanced.id("vision_body_health");
@@ -47,6 +49,8 @@ public final class VisionAbilities {
                 boolean start = down && !player.isSpectator() && !data.visionPhased();
                 if (start && !data.beamActive()) {
                     player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.8F, 1.8F);
+                    // The Mind Stone in his forehead wakes with its own voice.
+                    InfinityStone.MIND.use(player.level(), player.position(), InfinityStone.UNDER, 1.0F);
                 }
                 data.setBeamActive(start);
             }

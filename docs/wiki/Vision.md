@@ -32,7 +32,7 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | **R** (hold) | Mind Stone Beam | A pale gold beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. |
+| 1 | **R** (hold) | Mind Stone Beam | A pale gold beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. The stone sings its own chime-hum as the beam starts. |
 | 2 | **G** (toggle) | Flight | Survival flight at 0.08, upright and calm. You can also double-tap **Space**. |
 | 3 | **V** (toggle) | Phase | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you are only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
 | 4 | **B** (toggle) | Density | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Phasing ends density, and you can't turn dense while phased. |

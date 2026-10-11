@@ -89,6 +89,10 @@ Quicksilver's Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, and
 
 Yes. Put an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/` in your Minecraft folder (the mod creates the folder the first time it starts). The first file in alphabetical order is played, and removing it brings back *Sweet Dreams*. See [Quicksilver](Quicksilver).
 
+### Why does my Tesseract (or Loki's Scepter) hum? Can I turn it down?
+
+Every Infinity Stone has a voice of its own. The Space Stone in the Tesseract and the Mind Stone in Loki's Scepter hum softly, to you and to everyone near you, for as long as the item is in a hand, and stop when you put it away. It is quiet on purpose. To turn it down, use the **Players** slider under *Options > Music & Sounds*. See [Items and Crafting](Items-and-Crafting).
+
 ## Servers
 
 ### Do players need the mod too?

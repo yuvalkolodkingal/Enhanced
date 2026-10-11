@@ -33,7 +33,8 @@ import java.util.List;
  * that escape is where the Loki of the TVA comes from. Used by someone without powers, it does the same: a swirl, a
  * flash, and they are Loki somewhere far away; unless they hold a Scarlet Witch Gene in their other hand: then it
  * awakens them as the Scarlet Witch instead, exactly as Loki's Scepter does. A hero who uses it is simply taken to the
- * block they look at. The cube itself is never used up.
+ * block they look at. The cube itself is never used up. The Space Stone's voice (see {@link InfinityStone}) sounds
+ * whenever it is used, under the portal's own sound; and a soft hum of it is heard while someone holds the cube.
  */
 public class TesseractItem extends Item {
     /** The Space Stone palette: dim, mid, bright, core. */
@@ -65,6 +66,8 @@ public class TesseractItem extends Item {
                 InteractionHand otherHand = hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
                 ItemStack gene = player.getItemInHand(otherHand);
                 if (gene.is(ModItems.SCARLET_WITCH_GENE.get())) {
+                    // No portal here, but the Space Stone still answers the gene.
+                    InfinityStone.SPACE.use(serverPlayer.serverLevel(), serverPlayer.position(), InfinityStone.UNDER, 1.0F);
                     ScarletWitchGeneItem.awaken(serverPlayer, gene);
                 } else if (MjolnirPin.isPinned(serverPlayer)) {
                     // Loki's escape takes him a hundred blocks away: not with Mjolnir lying on him. (A hero's jump is a
@@ -89,14 +92,14 @@ public class TesseractItem extends Item {
         swirl(level, player.position());
         Vec3 from = player.position();
         Vec3 to = Teleports.farAway(player, player.getRandom(), ESCAPE_MIN, ESCAPE_MAX, ESCAPE_TRIES);
-        level.playSound(null, from.x, from.y, from.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        portalSound(level, from, 1.0F, 1.0F);
         if (to != null) {
             flash(level, from);
             float yaw = (float) (Mth.atan2(-(to.x - from.x), to.z - from.z) * Mth.RAD_TO_DEG);
             player.teleportTo(level, to.x, to.y, to.z, yaw, 0.0F);
             player.resetFallDistance();
             flash(level, to);
-            level.playSound(null, to.x, to.y, to.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 0.7F, 1.2F);
+            portalSound(level, to, 0.7F, 1.2F);
         }
         Powers.awaken(player, Power.LOKI);
     }
@@ -124,12 +127,18 @@ public class TesseractItem extends Item {
         }
         Vec3 from = player.position();
         flash(level, from);
-        level.playSound(null, from.x, from.y, from.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 0.8F, 1.3F);
+        portalSound(level, from, 0.8F, 1.3F);
         player.teleportTo(level, to.x, to.y, to.z, player.getYRot(), player.getXRot());
         player.resetFallDistance();
         flash(level, to);
-        level.playSound(null, to.x, to.y, to.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, 0.6F, 1.5F);
+        portalSound(level, to, 0.6F, 1.5F);
         return true;
+    }
+
+    /** One end of a teleport: the portal opening, with the Space Stone's voice swelling underneath it. */
+    private static void portalSound(ServerLevel level, Vec3 at, float volume, float pitch) {
+        level.playSound(null, at.x, at.y, at.z, ModSounds.TESSERACT.get(), SoundSource.PLAYERS, volume, pitch);
+        InfinityStone.SPACE.use(level, at, volume * InfinityStone.UNDER, pitch);
     }
 
     /** A rising spiral of Space Stone light round someone about to vanish. */

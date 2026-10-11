@@ -18,6 +18,7 @@ In *Avengers: Endgame* the 2012 Loki grabs the Tesseract and vanishes in a blue 
 * **Using it.** A player **with no power** who uses it (right-click) is wrapped in a swirl of Space Stone light, vanishes in a blue flash and reappears **100 to 250 blocks away**, in a random direction, on safe ground in the same dimension (solid ground underfoot, room to stand, no liquid, nothing burning, and no Hex wall in between). They awaken as **Loki**. If the mod does not find a safe spot after 12 tries, you stay where you are, but you still become Loki.
 * **With a Scarlet Witch Gene.** A player with no power who holds a gene in the other hand awakens as the [Scarlet Witch](Scarlet-Witch) instead of Loki, the same way as with Loki's Scepter: the gene is used up, Wanda's Crown appears, and nobody is taken anywhere. Without the gene the cube makes Loki, as above.
 * **The cube is never used up.** After the escape it stays in your inventory.
+* **Its sound.** The Space Stone swells with a deep cosmic hum under the sound of the portal, at both ends of the escape and of a jump; and the cube hums softly in anyone's hand.
 * **Heroes use it as a jump.** A hero (Loki included) who uses the Tesseract is not changed: the Space Stone takes them to the block they look at, up to 48 blocks away, standing on top of it if there is room. The cube then needs 5 seconds before it can be used again, and a Hex wall they are not allowed through still stops them.
 
 ## Loki's Scepter

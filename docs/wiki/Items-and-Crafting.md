@@ -136,7 +136,7 @@ A stack holds up to 16 genes.
 
 ### Loki's Scepter
 
-The Mind Stone sits in the blue gem of its golden blade. Touching it with the gene in your other hand makes you the Scarlet Witch, with a Synthezoid Core makes you Vision, and with neither **kills you**. It is also a strong melee weapon (8 attack damage, never breaks), and a hit confuses: a creature forgets its target and stumbles about for 6 seconds, a player gets Nausea and Slowness (see [Scarlet Witch](Scarlet-Witch)).
+The Mind Stone sits in the blue gem of its golden blade. Touching it with the gene in your other hand makes you the Scarlet Witch, with a Synthezoid Core makes you Vision, and with neither **kills you**. It is also a strong melee weapon (8 attack damage, never breaks), and a hit confuses: a creature forgets its target and stumbles about for 6 seconds, a player gets Nausea and Slowness (see [Scarlet Witch](Scarlet-Witch)). The stone has a voice of its own, a bright, shimmering, slightly eerie chime-hum: it sings when the stone is touched, softly under the chime of a confusing hit, and hums quietly for as long as the scepter is in someone's hand.
 
 | Source | Chance |
 |---|---|
@@ -148,7 +148,7 @@ The Mind Stone sits in the blue gem of its golden blade. Touching it with the ge
 
 ### Tesseract
 
-The Space Stone in its cube. Using it as a player with no power makes you [Loki](Loki), far away, unless you hold a Scarlet Witch Gene in your other hand: then you awaken as the [Scarlet Witch](Scarlet-Witch) instead. A hero who uses it jumps to the block they look at. It is never used up.
+The Space Stone in its cube. Using it as a player with no power makes you [Loki](Loki), far away, unless you hold a Scarlet Witch Gene in your other hand: then you awaken as the [Scarlet Witch](Scarlet-Witch) instead. A hero who uses it jumps to the block they look at. It is never used up. The Space Stone has a voice of its own, a deep, swelling cosmic hum: it swells under the sound of the portal, and hums softly for as long as the cube is in someone's hand.
 
 | Source | Chance |
 |---|---|

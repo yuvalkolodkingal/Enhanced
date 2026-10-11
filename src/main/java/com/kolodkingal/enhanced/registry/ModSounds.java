@@ -58,6 +58,21 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> FROST_GIANT = register("frost_giant");
     public static final DeferredHolder<SoundEvent, SoundEvent> TESSERACT = register("tesseract");
 
+    // The voices of the Infinity Stones (see InfinityStone): a use sound and a quiet hum for each. The Space and Mind
+    // Stones are in the mod; the other four are registered for the Thanos boss.
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPACE_STONE = register("space_stone");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPACE_STONE_HUM = register("space_stone_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MIND_STONE = register("mind_stone");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MIND_STONE_HUM = register("mind_stone_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> POWER_STONE = register("power_stone");
+    public static final DeferredHolder<SoundEvent, SoundEvent> POWER_STONE_HUM = register("power_stone_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REALITY_STONE = register("reality_stone");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REALITY_STONE_HUM = register("reality_stone_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_STONE = register("soul_stone");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_STONE_HUM = register("soul_stone_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_STONE = register("time_stone");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_STONE_HUM = register("time_stone_hum");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }
