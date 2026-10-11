@@ -92,14 +92,13 @@ public final class ApocalypseFightTests {
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
         ServerPlayer second = d.f().player(14.5, FLOOR, 4.5);
-        ServerPlayer third = d.f().player(14.5, FLOOR, 16.5);
         ApocalypseTestSupport.tank(second);
-        ApocalypseTestSupport.tank(third);
         ServerPlayer magneto = d.f().player(4.5, FLOOR, 16.5, Power.MAGNETO);
         ApocalypseTestSupport.tank(magneto);
         Log log = new Log(d.hero());
         helper.runAfterDelay(4, () -> {
-            check(fight.fighterCount() == 4, "four fight: " + fight.fighterCount());
+            check(fight.fighterCount() == 3, "three fight: " + fight.fighterCount());
+            check(Horsemen.countFor(1) == 2 && Horsemen.countFor(2) == 3 && Horsemen.countFor(3) == 4 && Horsemen.countFor(6) == 4, "min(4, 1 + n) Horsemen");
             fight.forceState(ApocalypseFight.Stage.TRANSITION_1, 1);
             check(fight.stage() == ApocalypseFight.Stage.TRANSITION_1 && boss.state() == ApocalypseState.HOVER, "he rises and hangs");
             check(boss.shield().state() == ApocalypseShield.State.GONE && fight.bossInvulnerable(), "the first shield is gone, and nothing hurts him");
@@ -111,7 +110,7 @@ public final class ApocalypseFightTests {
                 }
                 if (fight.stage() == ApocalypseFight.Stage.TRANSITION_1 && fight.stageTicks() < 104) {
                     List<Husk> horsemen = fight.horsemenAlive();
-                    check(horsemen.size() == 4, "min(4, 1 + 4) = 4 Horsemen: " + horsemen.size());
+                    check(horsemen.size() == 4, "min(4, 1 + 3) = 4 Horsemen: " + horsemen.size());
                     Set<Horsemen.Kind> kinds = new HashSet<>();
                     for (Husk husk : horsemen) {
                         Horsemen.Kind kind = Horsemen.kindOf(husk);
@@ -133,7 +132,7 @@ public final class ApocalypseFightTests {
                 }
                 if (fight.stage() == ApocalypseFight.Stage.TRANSITION_1 && fight.stageTicks() >= 104) {
                     check(boss.shield().state() == ApocalypseShield.State.FORMING, "his second shield knits from tick 100");
-                    assertNear(boss.shield().max(), ApocalypseShield.strengthFor(2, 4), 1.0E-3, "at the strength of shield 2 for four fighters");
+                    assertNear(boss.shield().max(), ApocalypseShield.strengthFor(2, 3), 1.0E-3, "at the strength of shield 2 for three fighters");
                     return false;
                 }
                 if (fight.stage() == ApocalypseFight.Stage.FIGHT && !finished[0]) {
