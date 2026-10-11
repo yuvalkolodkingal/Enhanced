@@ -43,6 +43,35 @@ public final class Variants {
                 new Variant("love_and_thunder_helmet", Power.THOR, Variant.suit("thor_love_and_thunder_helmet"), Variant.suit("thor_love_and_thunder_cape"), false, Power.THOR.color, Power.THOR.glow),
                 new Variant("mighty_thor", Power.THOR, Variant.suit("thor_mighty"), Variant.suit("thor_mighty_cape"), true, Power.THOR.color, Power.THOR.glow),
                 own(Power.THOR));
+
+        // The heroes of 3.0. Their skins are flat placeholders until the art of each lane lands (see DESIGN section 13
+        // to 17).
+        add(Power.PHOENIX,
+                new Variant("apocalypse", Power.PHOENIX, Variant.suit("phoenix_apocalypse"), null, true, 0xFF8A1F, 0xFFD65A),
+                new Variant("brand_new_day", Power.PHOENIX, Variant.suit("phoenix_brand_new_day"), null, true, 0xF2B632, 0xC4E88A),
+                own(Power.PHOENIX));
+
+        add(Power.SPIDER_MAN,
+                new Variant("homemade", Power.SPIDER_MAN, Variant.suit("spider_homemade"), null, true, 0xC9232D, 0xB9CDE8),
+                new Variant("iron_spider", Power.SPIDER_MAN, Variant.suit("spider_iron"), null, true, 0xC9A66B, 0xE7D8A8),
+                new Variant("brand_new_day", Power.SPIDER_MAN, Variant.suit("spider_bnd"), null, true, 0xD9381E, 0x5BB6D6),
+                own(Power.SPIDER_MAN));
+
+        add(Power.THANOS,
+                new Variant("infinity_war", Power.THANOS, Variant.suit("thanos_infinity_war"), null, false, 0x9B4DEB, 0xE6D2FF),
+                new Variant("endgame", Power.THANOS, Variant.suit("thanos_endgame"), null, false, 0x9B4DEB, 0xE6D2FF),
+                own(Power.THANOS));
+
+        add(Power.ULTRON,
+                new Variant("prime", Power.ULTRON, Variant.suit("ultron_prime"), null, false, 0xFFA23A, 0xFFE9B8),
+                new Variant("sentry", Power.ULTRON, Variant.suit("ultron_sentry"), null, false, 0x45B4F5, 0xD8F0FF),
+                new Variant("human", Power.ULTRON, Variant.suit("ultron_human"), null, false, 0xE23B2E, 0xFFD6CF),
+                own(Power.ULTRON));
+
+        add(Power.APOCALYPSE,
+                new Variant("apocalypse", Power.APOCALYPSE, Variant.suit("apocalypse"), Variant.suit("apocalypse_cape"), false, 0xF2B84B, 0xFFF0B8),
+                new Variant("en_sabah_nur", Power.APOCALYPSE, Variant.suit("apocalypse_ancient"), null, false, 0xD9A93A, 0x7ADBC6),
+                own(Power.APOCALYPSE));
     }
 
     private static void add(Power power, Variant... variants) {

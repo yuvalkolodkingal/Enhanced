@@ -59,7 +59,7 @@ public final class PowerData {
     /** Thor: Mjolnir while it is thrown and flying, or -1. */
     private int hammerEntityId = -1;
     /** Momentary states, one bit per {@link Live}. */
-    private int live;
+    private long live;
     /** Game time at which each ability (index 1-5) is ready again. */
     private final long[] cooldownUntil = new long[ABILITIES + 1];
 
@@ -118,7 +118,7 @@ public final class PowerData {
         ByteBufCodecs.VAR_INT.encode(buf, hammerEntityId + 1);
         ByteBufCodecs.stringUtf8(64).encode(buf, variant);
         ByteBufCodecs.VAR_INT.encode(buf, toggles);
-        ByteBufCodecs.VAR_INT.encode(buf, live);
+        ByteBufCodecs.VAR_LONG.encode(buf, live);
         ByteBufCodecs.stringUtf8(256).encode(buf, form);
         for (int i = 1; i <= ABILITIES; i++) {
             ByteBufCodecs.VAR_LONG.encode(buf, cooldownUntil[i]);
@@ -154,7 +154,7 @@ public final class PowerData {
         d.hammerEntityId = ByteBufCodecs.VAR_INT.decode(buf) - 1;
         d.variant = ByteBufCodecs.stringUtf8(64).decode(buf);
         d.toggles = ByteBufCodecs.VAR_INT.decode(buf);
-        d.live = ByteBufCodecs.VAR_INT.decode(buf);
+        d.live = ByteBufCodecs.VAR_LONG.decode(buf);
         d.form = ByteBufCodecs.stringUtf8(256).decode(buf);
         for (int i = 1; i <= ABILITIES; i++) {
             d.cooldownUntil[i] = ByteBufCodecs.VAR_LONG.decode(buf);
@@ -337,7 +337,7 @@ public final class PowerData {
     }
 
     public void set(Live state, boolean on) {
-        int updated = on ? live | state.bit() : live & ~state.bit();
+        long updated = on ? live | state.bit() : live & ~state.bit();
         if (updated != live) {
             live = updated;
             dirty = true;
@@ -478,6 +478,23 @@ public final class PowerData {
     public void startCooldown(int ability, long gameTime, int ticks) {
         cooldownUntil[ability] = gameTime + ticks;
         dirty = true;
+    }
+
+    /**
+     * Makes every cooldown that is still running at {@code gameTime} end {@code ticks} sooner (but not before now), the
+     * way Apocalypse's Power Bestowal makes the cooldowns of whoever it empowers recharge faster. Marks the data dirty
+     * only if a cooldown moved, so a caller that calls it every second tick does not make the server sync idle data.
+     */
+    public void shiftCooldowns(long gameTime, long ticks) {
+        if (ticks <= 0) {
+            return;
+        }
+        for (int i = 1; i <= ABILITIES; i++) {
+            if (cooldownUntil[i] > gameTime) {
+                cooldownUntil[i] = Math.max(gameTime, cooldownUntil[i] - ticks);
+                dirty = true;
+            }
+        }
     }
 
     public boolean isDirty() {

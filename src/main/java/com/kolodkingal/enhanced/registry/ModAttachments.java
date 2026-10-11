@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.hex.HexData;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -53,6 +54,15 @@ public final class ModAttachments {
     public static final Supplier<AttachmentType<RoadDoors>> ROAD_DOORS = ATTACHMENTS.register("road_doors",
             () -> AttachmentType.builder(() -> RoadDoors.EMPTY)
                     .serialize(RoadDoors.CODEC)
+                    .build());
+
+    /**
+     * What the boss fights keep between fights (rewards waiting to be handed over, when each boss may be called again).
+     * Saved with the level, not synced; read and written on the Overworld only, so it is the same from every dimension.
+     */
+    public static final Supplier<AttachmentType<BossData>> BOSS_DATA = ATTACHMENTS.register("boss_data",
+            () -> AttachmentType.builder(() -> BossData.EMPTY)
+                    .serialize(BossData.CODEC)
                     .build());
 
     private ModAttachments() {

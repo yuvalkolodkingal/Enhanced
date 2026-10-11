@@ -1,5 +1,15 @@
 package com.kolodkingal.enhanced;
 
+import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
+import com.kolodkingal.enhanced.config.ApocalypseConfig;
+import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
+import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.config.ThanosBossConfig;
+import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.config.UltronConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
@@ -286,6 +296,18 @@ public final class EnhancedConfig {
         MJOLNIR_PIN_DURATION = BUILDER.comment("How long (ticks) Mjolnir pins someone down before it lets go by itself (1200 = a minute).")
                 .defineInRange("pinDuration", 1200, 20, 72000);
         BUILDER.pop();
+
+        // The heroes and bosses of 3.0 keep their options in a class of their own (each pushes its own section).
+        BossConfig.define(BUILDER);
+        PhoenixConfig.define(BUILDER);
+        SpiderConfig.define(BUILDER);
+        ThanosBossConfig.define(BUILDER);
+        ThanosConfig.define(BUILDER);
+        UltronBossConfig.define(BUILDER);
+        UltronConfig.define(BUILDER);
+        ApocalypseShieldConfig.define(BUILDER);
+        ApocalypseBossConfig.define(BUILDER);
+        ApocalypseConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();
