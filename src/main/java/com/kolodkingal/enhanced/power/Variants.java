@@ -40,6 +40,7 @@ public final class Variants {
                 new Variant("thor", Power.THOR, Variant.suit("thor"), Variant.suit("thor_cape"), false, Power.THOR.color, Power.THOR.glow),
                 new Variant("ragnarok", Power.THOR, Variant.suit("thor_ragnarok"), Variant.suit("thor_ragnarok_cape"), false, Power.THOR.color, Power.THOR.glow),
                 new Variant("love_and_thunder", Power.THOR, Variant.suit("thor_love_and_thunder"), Variant.suit("thor_love_and_thunder_cape"), false, Power.THOR.color, Power.THOR.glow),
+                new Variant("love_and_thunder_helmet", Power.THOR, Variant.suit("thor_love_and_thunder_helmet"), Variant.suit("thor_love_and_thunder_cape"), false, Power.THOR.color, Power.THOR.glow),
                 new Variant("mighty_thor", Power.THOR, Variant.suit("thor_mighty"), Variant.suit("thor_mighty_cape"), true, Power.THOR.color, Power.THOR.glow),
                 own(Power.THOR));
     }

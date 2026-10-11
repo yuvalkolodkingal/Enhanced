@@ -49,6 +49,8 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforgespi.locating.IModFile;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -456,6 +458,111 @@ public final class DataTests {
         check(data.power() == Power.NONE, "the saved Photon loads as a player without powers, not " + data.power());
         check(!data.wallRun(), "and the attachment was read, not dropped (Quicksilver's wall run is still off)");
         helper.succeed();
+    }
+
+    /**
+     * Thor's two Love and Thunder looks (the bare head with its long hair, and the winged helmet) follow the skin
+     * rules: a 64x64 skin whose body parts are fully opaque, whose overlay layer has no half-transparent pixels and
+     * whose unused corners are empty; the cape has the same alpha mask as Thor's own; the hat layer keeps the four
+     * pixels clear where the glowing eyes of the God of Thunder shine through, and the helmet look is the same suit
+     * with a different head.
+     */
+    @GameTest(template = ARENA)
+    public static void thorsLoveAndThunderLooksFollowTheSkinRules(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        List<String> ids = Variants.of(Power.THOR).stream().map(Variant::id).toList();
+        check(ids.indexOf("love_and_thunder_helmet") == ids.indexOf("love_and_thunder") + 1,
+                "the helmet look follows the Love and Thunder look in the cycle: " + ids);
+        BufferedImage thorCape = readImage(mod, Variants.get(Power.THOR, "thor").cape());
+        BufferedImage eyes = readImage(mod, Enhanced.id("textures/entity/thor_eyes.png"));
+        Map<String, BufferedImage> skins = new java.util.LinkedHashMap<>();
+        for (String id : List.of("love_and_thunder", "love_and_thunder_helmet")) {
+            Variant look = Variants.get(Power.THOR, id);
+            check(look.id().equals(id) && !look.slim(), id + " is a look of Thor with the classic arms");
+            BufferedImage skin = readImage(mod, look.skin());
+            BufferedImage cape = readImage(mod, look.cape());
+            check(skin.getWidth() == 64 && skin.getHeight() == 64, id + " skin is 64x64");
+            boolean[][] used = new boolean[64][64];
+            for (SkinPart part : SKIN_PARTS) {
+                for (int[] face : part.faces()) {
+                    for (int y = face[1]; y < face[1] + face[3]; y++) {
+                        for (int x = face[0]; x < face[0] + face[2]; x++) {
+                            used[y][x] = true;
+                            int alpha = skin.getRGB(x, y) >>> 24;
+                            check(!part.base() || alpha == 255, id + ": the base layer is opaque at " + x + "," + y);
+                            check(part.base() || alpha == 0 || alpha == 255, id + ": no half-transparent overlay pixel at " + x + "," + y);
+                        }
+                    }
+                }
+            }
+            for (int y = 0; y < 64; y++) {
+                for (int x = 0; x < 64; x++) {
+                    check(used[y][x] || skin.getRGB(x, y) >>> 24 == 0, id + ": nothing is drawn outside the used rectangles at " + x + "," + y);
+                }
+            }
+            check(cape.getWidth() == 64 && cape.getHeight() == 32, id + " cape is 64x32");
+            for (int y = 0; y < 32; y++) {
+                for (int x = 0; x < 64; x++) {
+                    check(cape.getRGB(x, y) >>> 24 == thorCape.getRGB(x, y) >>> 24, id + ": the cape has Thor's alpha mask at " + x + "," + y);
+                }
+            }
+            // The glowing eyes are drawn over the face (8..15, 8..15); the hat layer (32..39 further right) leaves them free.
+            int glow = 0;
+            for (int y = 8; y < 16; y++) {
+                for (int x = 8; x < 16; x++) {
+                    if (eyes.getRGB(x, y) >>> 24 != 0) {
+                        glow++;
+                        check(skin.getRGB(x + 32, y) >>> 24 == 0, id + ": the hat layer is clear over the glowing eye at " + x + "," + y);
+                    }
+                }
+            }
+            check(glow == 4, "the God of Thunder's eyes are the four pixels this look expects, not " + glow);
+            skins.put(id, skin);
+        }
+        BufferedImage bare = skins.get("love_and_thunder");
+        BufferedImage helmet = skins.get("love_and_thunder_helmet");
+        int differing = 0;
+        for (SkinPart part : SKIN_PARTS) {
+            for (int[] face : part.faces()) {
+                for (int y = face[1]; y < face[1] + face[3]; y++) {
+                    for (int x = face[0]; x < face[0] + face[2]; x++) {
+                        if (bare.getRGB(x, y) != helmet.getRGB(x, y)) {
+                            differing++;
+                            check(part.name().equals("hat") || part.name().equals("head") || part.name().equals("jacket"),
+                                    "the helmet look wears the same suit: " + part.name() + " differs at " + x + "," + y);
+                        }
+                    }
+                }
+            }
+        }
+        check(differing > 100, "the helmet changes the head (" + differing + " pixels differ)");
+        helper.succeed();
+    }
+
+    /** One box of the player model in the skin: its name, whether it is a base part and its six face rectangles (x, y, w, h). */
+    private record SkinPart(String name, boolean base, int u, int v, int w, int h, int d) {
+        int[][] faces() {
+            return new int[][]{{u + d, v, w, d}, {u + d + w, v, w, d}, {u, v + d, d, h}, {u + d, v + d, w, h},
+                    {u + d + w, v + d, d, h}, {u + d + w + d, v + d, w, h}};
+        }
+    }
+
+    /** The classic (4-pixel arms) skin layout: head, body, arms and legs, and the second layer over each. */
+    private static final List<SkinPart> SKIN_PARTS = List.of(
+            new SkinPart("head", true, 0, 0, 8, 8, 8), new SkinPart("hat", false, 32, 0, 8, 8, 8),
+            new SkinPart("body", true, 16, 16, 8, 12, 4), new SkinPart("jacket", false, 16, 32, 8, 12, 4),
+            new SkinPart("rarm", true, 40, 16, 4, 12, 4), new SkinPart("rsleeve", false, 40, 32, 4, 12, 4),
+            new SkinPart("larm", true, 32, 48, 4, 12, 4), new SkinPart("lsleeve", false, 48, 48, 4, 12, 4),
+            new SkinPart("rleg", true, 0, 16, 4, 12, 4), new SkinPart("rpants", false, 0, 32, 4, 12, 4),
+            new SkinPart("lleg", true, 16, 48, 4, 12, 4), new SkinPart("lpants", false, 0, 48, 4, 12, 4));
+
+    private static BufferedImage readImage(IModFile mod, ResourceLocation texture) throws IOException {
+        Path file = mod.findResource(("assets/" + texture.getNamespace() + "/" + texture.getPath()).split("/"));
+        try (InputStream in = Files.newInputStream(file)) {
+            BufferedImage image = ImageIO.read(in);
+            check(image != null, texture + " is a readable image");
+            return image;
+        }
     }
 
     private static JsonObject lang(IModFile mod, String name) throws IOException {
