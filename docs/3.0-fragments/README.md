@@ -244,7 +244,10 @@ dedicated server and a client in play) found the following. All of it is in the 
   `removeWhenFarAway` (false), call `setPersistenceRequired()` and, if they must not vanish in Peaceful, `shouldDespawnInPeaceful`
   (false); the fight ends the Peaceful case itself (`BossEnd.PEACEFUL`).
 * **Boss minions have no owner.** The orphan sweep leaves alone any `OwnableEntity` whose owner is set (that is how the Ultron
-  hero's drones survive a restart). A Sentry of the fight, a Phantom, a Horseman's Husk must report `getOwnerUUID() == null`, or
+  hero's drones survive a restart) and any `Projectile` a player shot (the Ultron hero's bolt, the Apocalypse hero's lance);
+  for the rest of a hero's own boss-type entities (the Apocalypse hero's cocoon) use `BossFights.exemptFromSweep(predicate)`.
+  Everything else of a boss type that a fight made must be `fight.spawn(...)`ed or `fight.adopt(...)`ed before it is added:
+  a boss's bolt, orb, sword, lance or meteor too (an unmarked one is swept the moment it joins). A Sentry of the fight, a Phantom, a Horseman's Husk must report `getOwnerUUID() == null`, or
   the sweep would never remove them after a crash. If an entity must be owned, set the owner *before* `addFreshEntity`.
 * **A payload handler is one static call into a client class** (`ThorFxPayload.handle` is the pattern): the client class is
   loaded only when the handler runs, on a client. Never name a client class anywhere else in a payload or in common code; the

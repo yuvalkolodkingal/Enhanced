@@ -172,6 +172,20 @@ public final class BossHookTests {
         BossFights.stopExempting(drone);
         check(joined, "an exempted entity (a hero's own drone) joins");
 
+        // A projectile a player shot is a hero's own (the Ultron hero's bolt); one a boss shot belongs to its fight.
+        var heroBolt = ModEntities.ULTRON_BOLT.get().create(level);
+        heroBolt.moveTo(at);
+        heroBolt.setOwner(player);
+        check(level.addFreshEntity(heroBolt), "a bolt a player shot joins");
+        var bossBolt = ModEntities.ULTRON_BOLT.get().create(level);
+        bossBolt.moveTo(at);
+        bossBolt.setOwner(unmarked);
+        check(!level.addFreshEntity(bossBolt), "a bolt a boss shot, not marked by its fight, is turned away");
+        var markedBolt = ModEntities.ULTRON_BOLT.get().create(level);
+        markedBolt.moveTo(at);
+        markedBolt.setOwner(owned);
+        check(level.addFreshEntity(fight.adopt(markedBolt)), "and one the fight marked joins");
+
         fight.end(BossEnd.ABORT);
         BossFights.clear();
         var late = ModEntities.ULTRON_SENTRY.get().create(level);

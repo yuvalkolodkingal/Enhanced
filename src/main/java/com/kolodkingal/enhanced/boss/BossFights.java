@@ -14,6 +14,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,7 +69,8 @@ public final class BossFights {
 
     /**
      * An entity of a boss type that the orphan sweep must leave alone though no fight owns it. (Anything with an owner
-     * already is: the Ultron hero's drones are Sentries of the same type as the boss's.)
+     * already is: the Ultron hero's drones are Sentries of the same type as the boss's, and a projectile a player shot
+     * is a hero's, such as the Ultron hero's bolt or the Apocalypse hero's sand lance.)
      */
     public static void exemptFromSweep(Predicate<Entity> exempt) {
         SWEEP_EXEMPT.add(exempt);
@@ -190,6 +193,9 @@ public final class BossFights {
         }
         if (fightOf(entity) != null || (entity instanceof OwnableEntity pet && pet.getOwnerUUID() != null)) {
             return false;
+        }
+        if (entity instanceof Projectile projectile && projectile.getOwner() instanceof Player) {
+            return false; // a hero's own bolt, lance or boulder (a boss's are marked by its fight)
         }
         for (Predicate<Entity> exempt : SWEEP_EXEMPT) {
             if (exempt.test(entity)) {
