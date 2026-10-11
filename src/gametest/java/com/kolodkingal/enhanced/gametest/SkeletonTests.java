@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.HeroServers;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
@@ -729,7 +730,7 @@ public final class SkeletonTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
         check(run(player, "enhanced boss start thanos") == 0, "a fight that cannot start is a failure");
-        check(run(player, "enhanced boss start ultron force") == 0, "even by force, until the framework is built");
+        check(run(player, "enhanced boss start ultron force") == 0, "even by force, until a lane registers its fight");
         boolean refused = false;
         try {
             run(player, "enhanced boss start nobody");
@@ -747,9 +748,12 @@ public final class SkeletonTests {
         thanos.moveTo(here.x, here.y, here.z);
         sentry.moveTo(here.x + 3, here.y, here.z);
         far.moveTo(here.x + 40, here.y, here.z);
-        level.addFreshEntity(thanos);
-        level.addFreshEntity(sentry);
-        level.addFreshEntity(far);
+        // (An entity of a boss that no fight owns never joins a level, so a fight of the test owns these.)
+        BossTestSupport.TestFight fight = BossFrameworkTests.start(f, BossKind.ULTRON, player,
+                BossFrameworkTests.fight(f, BossKind.ULTRON, BossArena.Containment.NONE, false));
+        fight.spawn(thanos);
+        fight.spawn(sentry);
+        fight.spawn(far);
         Zombie bystander = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 12.5));
         check(run(player, String.format(Locale.ROOT, "enhanced boss cleanup %f %f %f 8", here.x, here.y, here.z)) == 2,
                 "two boss entities were near");
