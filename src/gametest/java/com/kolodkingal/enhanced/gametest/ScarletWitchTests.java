@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -30,11 +31,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -1080,6 +1084,270 @@ public final class ScarletWitchTests {
             explode(helper, wanda, 8.0F);
             assertNear(20.0F - wanda.getHealth(), 4.0, 1.0E-4, "the 4 points left take 4 of the 6 it would stop: 2 + 2 get through");
             check(!data.chaosShieldActive(), "and it shatters");
+            helper.succeed();
+        });
+    }
+
+    // ---- the Chaos Shield against blows ----
+
+    /** What a husk's blow does to a Scarlet Witch with no shield (difficulty counts): what a shield must stop. */
+    private static float huskBlowDamage(GameTestHelper helper, TestKit.Fixture f) {
+        ServerPlayer open = f.player(3.5, FLOOR, 3.5, Power.SCARLET_WITCH);
+        Zombie husk = bareHusk(helper, 4.7, 3.5);
+        husk.doHurtTarget(open);
+        float damage = open.getMaxHealth() - open.getHealth();
+        check(damage >= 1.0F, "sanity: a husk's blow hurts a Scarlet Witch with no shield, by " + damage);
+        return damage;
+    }
+
+    /** How far the attacker is from the middle of the dome, across the ground. */
+    private static double outOfDome(ServerPlayer wanda, Entity attacker) {
+        return attacker.position().subtract(wanda.position()).horizontalDistance();
+    }
+
+    /**
+     * A complete Chaos Shield is solid to a creature's blow as it is to an arrow: the blow doesn't touch Wanda, it
+     * costs the shield what it would have done to her, red sparks fly, the sphere rings, and the attacker (who stood
+     * inside the dome) is thrown back out of it.
+     */
+    @GameTest(template = ARENA, timeoutTicks = 120)
+    public static void chaosShieldStopsACreaturesBlowAndThrowsItBackOutOfTheDome(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        float damage = huskBlowDamage(helper, f);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        Zombie husk = bareHusk(helper, 13.3, 10.5);
+        boolean[] hit = {false};
+        raiseShield(f, wanda, () -> {
+            check(outOfDome(wanda, husk) < WandaAbilities.SHIELD_RADIUS, "sanity: the husk stands inside the dome, not " + outOfDome(wanda, husk) + " away");
+            TestKit.sentPackets(wanda);
+
+            check(!husk.doHurtTarget(wanda), "the blow doesn't land");
+
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "Wanda is not touched");
+            assertNear(Powers.get(wanda).shieldStrength(), 30.0 - damage, 1.0E-4, "the shield paid what the blow would have done to her");
+            check(Powers.get(wanda).chaosShieldActive(), "and held");
+            List<Object> packets = TestKit.sentPackets(wanda);
+            check(TestKit.soundsIn(packets).stream().anyMatch(s -> s.id().equals(SoundEvents.SHIELD_BLOCK.getLocation())),
+                    "the sphere rings, heard " + TestKit.soundsIn(packets).stream().map(TestKit.HeardSound::id).toList());
+            check(TestKit.particlesIn(packets).stream().anyMatch(p -> p.getParticle() instanceof EnergyParticleOptions),
+                    "and red sparks fly");
+            check(husk.getDeltaMovement().x < -0.3, "the husk is thrown back, away from her: " + husk.getDeltaMovement());
+            hit[0] = true;
+        });
+        // (Scheduled up front: the test framework runs what is due from a hash map, and one that is added while it
+        // does that may be run twice.)
+        f.everyTick(70, tick -> {
+            if (!hit[0]) {
+                return false;
+            }
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "still not touched");
+            return outOfDome(wanda, husk) > WandaAbilities.SHIELD_RADIUS + 0.2;
+        });
+    }
+
+    /** Whatever the creature: its swipe is a blow, and the shield stops it. */
+    @GameTest(template = ARENA, batch = "chaos_shield_strength_1000", timeoutTicks = 100)
+    public static void chaosShieldStopsASpidersARavagersAndAWardensBlows(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, 1000.0);
+        ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        List<Mob> attackers = List.of(
+                helper.spawnWithNoFreeWill(EntityType.SPIDER, new Vec3(8.9, FLOOR, 10.5)),
+                helper.spawnWithNoFreeWill(EntityType.RAVAGER, new Vec3(12.0, FLOOR, 12.5)),
+                helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 7.9)),
+                helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(13.5, FLOOR, 8.5)));
+        raiseShield(f, wanda, () -> {
+            float before = Powers.get(wanda).shieldStrength();
+            for (Mob attacker : attackers) {
+                float strength = Powers.get(wanda).shieldStrength();
+                String name = attacker.getType().getDescriptionId();
+                check(!attacker.doHurtTarget(wanda), name + "'s blow doesn't land");
+                assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, name + " didn't touch her");
+                check(Powers.get(wanda).shieldStrength() < strength, "and the shield paid for it");
+            }
+            check(Powers.get(wanda).shieldStrength() < before - 20.0F, "the Warden's blow alone is worth 30 points");
+            helper.succeed();
+        });
+    }
+
+    /** A sword is stopped as a zombie's claw is, and its wielder is thrown back out of the dome. */
+    @GameTest(template = ARENA, batch = "chaos_shield_sword_pvp", timeoutTicks = 100)
+    public static void chaosShieldStopsAPlayersSwordAndThrowsHimBack(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer attacker = f.player(13.0, FLOOR, 10.5);
+        attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_SWORD));
+        raiseShield(f, wanda, () -> {
+            TestKit.chargeAttack(attacker);
+            float sword = (float) attacker.getAttributeValue(Attributes.ATTACK_DAMAGE);
+            check(sword >= 7.0F, "sanity: a diamond sword hits for 7, not " + sword);
+
+            attacker.attack(wanda);
+
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "the sword never touches her");
+            assertNear(Powers.get(wanda).shieldStrength(), 30.0 - sword, 1.0E-4, "the shield paid what the blow would have done");
+            check(attacker.getDeltaMovement().x < -0.3, "the swordsman is thrown back, away from her: " + attacker.getDeltaMovement());
+            check(attacker.hurtMarked, "and his client is told");
+            assertNear(attacker.getHealth(), attacker.getMaxHealth(), 1.0E-4, "he is not hurt himself");
+
+            // A bare fist is a blow too.
+            attacker.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            TestKit.chargeAttack(attacker);
+            float fist = (float) attacker.getAttributeValue(Attributes.ATTACK_DAMAGE);
+            attacker.attack(wanda);
+            assertNear(Powers.get(wanda).shieldStrength(), 30.0 - sword - fist, 1.0E-4, "a fist is stopped and paid for as well");
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "and doesn't touch her either");
+            helper.succeed();
+        });
+    }
+
+    /** With PvP off a player can't hurt her anyway: the blow costs the shield nothing and throws nobody back. */
+    @GameTest(template = ARENA, batch = "chaos_shield_pvp_off")
+    public static void aPlayersBlowCostsTheShieldNothingWhenPvpIsOff(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(false);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer attacker = f.player(13.0, FLOOR, 10.5);
+        attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_SWORD));
+        raiseShield(f, wanda, () -> {
+            TestKit.chargeAttack(attacker);
+            attacker.attack(wanda);
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "no PvP: she is not hurt");
+            assertNear(Powers.get(wanda).shieldStrength(), 30.0, 1.0E-4, "and the shield wasn't asked to stop anything");
+            check(attacker.getDeltaMovement().horizontalDistanceSqr() < 1.0E-6, "nobody is thrown back");
+            helper.succeed();
+        });
+    }
+
+    /** A shield that is still forming stops nothing: the blow hurts her in full and costs the shield nothing. */
+    @GameTest(template = ARENA)
+    public static void aFormingChaosShieldStopsNoBlows(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        float damage = huskBlowDamage(helper, f);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        Zombie husk = bareHusk(helper, 13.3, 10.5);
+        AbilityHandler.onKey(wanda, 4, true);
+        check(Powers.get(wanda).chaosShieldActive() && !WandaAbilities.hasShieldUp(wanda), "just pressed: forming, not up");
+
+        check(husk.doHurtTarget(wanda), "the blow lands");
+
+        assertNear(20.0F - wanda.getHealth(), damage, 1.0E-4, "in full");
+        assertNear(Powers.get(wanda).shieldStrength(), 30.0, 1.0E-4, "the shield, still forming, took nothing");
+        check(Math.abs(husk.getDeltaMovement().x) < 0.3, "and nobody is thrown back by it: " + husk.getDeltaMovement());
+        helper.succeed();
+    }
+
+    /** The blow that breaks the shield is stopped too (as the last arrow is); the next one goes through. */
+    @GameTest(template = ARENA, batch = "chaos_shield_melee_shatter")
+    public static void theBlowThatShattersTheChaosShieldIsStoppedAndTheNextGoesThrough(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        float damage = huskBlowDamage(helper, f);
+        f.config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, damage * 2.5);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        Zombie husk = bareHusk(helper, 13.3, 10.5);
+        PowerData data = Powers.get(wanda);
+        raiseShield(f, wanda, () -> {
+            husk.doHurtTarget(wanda);
+            husk.doHurtTarget(wanda);
+            assertNear(data.shieldStrength(), damage * 0.5, 1.0E-4, "two blows took two blows' worth off");
+            check(data.chaosShieldActive(), "and it holds");
+            TestKit.sentPackets(wanda);
+
+            check(!husk.doHurtTarget(wanda), "the blow that breaks it doesn't land either");
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "she is not touched by it");
+            check(!data.chaosShieldActive() && !WandaAbilities.hasShieldUp(wanda), "the shield shattered");
+            assertNear(data.shieldStrength(), 0.0, 1.0E-4, "nothing left of it");
+            check(TestKit.soundsIn(TestKit.sentPackets(wanda)).stream().anyMatch(s -> s.id().equals(SoundEvents.GLASS_BREAK.getLocation())),
+                    "with a glassy sound");
+
+            check(husk.doHurtTarget(wanda), "the next blow lands");
+            assertNear(20.0F - wanda.getHealth(), damage, 1.0E-4, "in full");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * Only a creature's or a player's own blow is stopped: what the world does to her, magic, thorns and a Warden's
+     * sonic boom still hurt her through the shield, and cost it nothing.
+     */
+    @GameTest(template = ARENA)
+    public static void theChaosShieldLetsEverythingButBlowsAndMissilesThrough(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        Zombie husk = bareHusk(helper, 5.5, 10.5);
+        DamageSources sources = helper.getLevel().damageSources();
+        raiseShield(f, wanda, () -> {
+            List<DamageSource> through = List.of(sources.fall(), sources.starve(), sources.magic(), sources.indirectMagic(husk, husk),
+                    sources.onFire(), sources.lava(), sources.drown(), sources.inWall(), sources.fellOutOfWorld(), sources.genericKill(),
+                    sources.thorns(husk), sources.sonicBoom(husk), sources.lightningBolt(), sources.cactus());
+            for (DamageSource source : through) {
+                wanda.setHealth(20.0F);
+                wanda.invulnerableTime = 0;
+                wanda.hurt(source, 4.0F);
+                check(wanda.getHealth() < 20.0F, source.getMsgId() + " still hurts her through the shield");
+            }
+            assertNear(Powers.get(wanda).shieldStrength(), 30.0, 1.0E-4, "and none of it cost the shield anything");
+            check(Powers.get(wanda).chaosShieldActive(), "which holds");
+            // None of those is a blow; each of these is.
+            for (DamageSource source : List.of(sources.mobAttack(husk), new DamageSource(sources.damageTypes.getHolderOrThrow(DamageTypes.MOB_ATTACK_NO_AGGRO), husk, husk), sources.sting(husk))) {
+                wanda.setHealth(20.0F);
+                wanda.invulnerableTime = 0;
+                check(!wanda.hurt(source, 4.0F), source.getMsgId() + " is stopped");
+                assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, source.getMsgId() + " doesn't touch her");
+            }
+            check(!WandaAbilities.isMeleeHit(sources.arrow(new Arrow(helper.getLevel(), husk, new ItemStack(Items.ARROW), null), husk)),
+                    "an arrow is not a blow (the shield stops it by its own rule)");
+            helper.succeed();
+        });
+    }
+
+    /** She can still strike out of her own dome, with her hands and with the beam. */
+    @GameTest(template = ARENA)
+    public static void herOwnAttacksStillWorkFromInsideTheChaosShield(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        Zombie husk = bareHusk(helper, 3.5, 12.0); // beside her, not on the line to the pig
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        raiseShield(f, wanda, () -> {
+            float huskHealth = husk.getHealth();
+            lookAt(wanda, husk);
+            wanda.attack(husk);
+            check(husk.getHealth() < huskHealth, "her blow lands on the creature at her side");
+            assertNear(Powers.get(wanda).shieldStrength(), 30.0, 1.0E-4, "and the shield is untouched");
+
+            float pigHealth = pig.getHealth();
+            lookAt(wanda, pig);
+            AbilityHandler.onKey(wanda, 1, true);
+            PowerTicker.tick(wanda);
+            assertNear(pigHealth - pig.getHealth(), 5.0, 1.0E-4, "her beam leaves the dome and hits");
+            check(Powers.get(wanda).chaosShieldActive(), "with the shield still up");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * Thor's blow is stopped like anyone's, and the God of Thunder's lightning does not leap from it: it costs the
+     * shield the blow's damage and no more, and nothing beside her is struck.
+     */
+    @GameTest(template = ARENA, batch = "chaos_shield_thor_blow_pvp", timeoutTicks = 100)
+    public static void aGodOfThunderBlowOnAChaosShieldArcsNoLightning(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer thor = f.player(13.0, FLOOR, 10.5, Power.THOR);
+        Zombie beside = bareHusk(helper, 14.5, 13.5);
+        AbilityHandler.onKey(thor, 4, true);
+        check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
+        raiseShield(f, wanda, () -> {
+            TestKit.chargeAttack(thor);
+            float blow = (float) thor.getAttributeValue(Attributes.ATTACK_DAMAGE);
+            thor.attack(wanda);
+
+            assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "the blow doesn't touch her");
+            assertNear(Powers.get(wanda).shieldStrength(), 30.0 - blow, 1.0E-4, "and costs the shield the blow's damage, no lightning on top");
+            check(beside.getHealth() == beside.getMaxHealth(), "no lightning arcs to the creature beside her");
+            check(thor.getDeltaMovement().x < -0.3, "Thor is thrown back like anyone: " + thor.getDeltaMovement());
             helper.succeed();
         });
     }
