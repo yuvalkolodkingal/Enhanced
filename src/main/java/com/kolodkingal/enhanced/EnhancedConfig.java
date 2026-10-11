@@ -37,6 +37,16 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue HEX_MIN_RADIUS;
     public static final ModConfigSpec.IntValue HEX_MAX_RADIUS;
     public static final ModConfigSpec.DoubleValue HEX_DEATH_CHANCE;
+    public static final ModConfigSpec.DoubleValue HEX_HOLD_DAMAGE;
+    public static final ModConfigSpec.DoubleValue HEX_HOLD_DAMAGE_MAX;
+
+    // ---- The Vision of the Hex ----
+    public static final ModConfigSpec.BooleanValue HEX_VISION_ENABLED;
+    public static final ModConfigSpec.DoubleValue HEX_VISION_HEALTH;
+    public static final ModConfigSpec.DoubleValue HEX_VISION_PUNCH_DAMAGE;
+    public static final ModConfigSpec.DoubleValue HEX_VISION_BEAM_DAMAGE;
+    public static final ModConfigSpec.IntValue HEX_VISION_BEAM_RANGE;
+    public static final ModConfigSpec.IntValue HEX_VISION_REBUILD_TICKS;
 
     // ---- Vision ----
     public static final ModConfigSpec.DoubleValue VISION_FLIGHT_SPEED;
@@ -144,6 +154,27 @@ public final class EnhancedConfig {
         HEX_MAX_RADIUS = BUILDER.defineInRange("hexMaxRadius", 96, 4, 256);
         HEX_DEATH_CHANCE = BUILDER.comment("Chance that an unauthorised creature without powers dies when crossing the Hex wall.")
                 .defineInRange("hexDeathChance", 0.95, 0.0, 1.0);
+        HEX_HOLD_DAMAGE = BUILDER.comment("Damage Vision takes the first time he is thrown back at the wall of a Hex he is inside (2 = one heart).",
+                        "He can't leave a standing Hex, and comes apart a little at its edge; it never kills him.")
+                .defineInRange("hexHoldDamage", 2.0, 0.0, 20.0);
+        HEX_HOLD_DAMAGE_MAX = BUILDER.comment("The most one throw back at the wall can do to Vision. Each time he pushes again within three",
+                        "seconds it grows by hexHoldDamage, up to this; it never takes his last half heart.")
+                .defineInRange("hexHoldDamageMax", 8.0, 0.0, 40.0);
+        BUILDER.pop();
+
+        BUILDER.push("hex_vision");
+        HEX_VISION_ENABLED = BUILDER.comment("If true (the default), a Hex brings a Vision to fight at Wanda's side while it stands.")
+                .define("enabled", true);
+        HEX_VISION_HEALTH = BUILDER.comment("Health of the Vision of the Hex (an Iron Golem has 100; 80 = 40 hearts).")
+                .defineInRange("health", 80.0, 1.0, 1000.0);
+        HEX_VISION_PUNCH_DAMAGE = BUILDER.comment("Damage of one of his dense punches, about one a second (12 = 6 hearts).")
+                .defineInRange("punchDamage", 12.0, 0.0, 100.0);
+        HEX_VISION_BEAM_DAMAGE = BUILDER.comment("Damage per hit of his Mind Stone beam, two hits a second.")
+                .defineInRange("beamDamage", 4.0, 0.0, 100.0);
+        HEX_VISION_BEAM_RANGE = BUILDER.comment("How far (blocks) his Mind Stone beam reaches. Up close he punches instead.")
+                .defineInRange("beamRange", 16, 2, 64);
+        HEX_VISION_REBUILD_TICKS = BUILDER.comment("How long (ticks) Wanda needs to rebuild him after he falls, while the Hex stands (1200 = a minute).")
+                .defineInRange("rebuildTicks", 1200, 20, 72000);
         BUILDER.pop();
 
         BUILDER.push("vision");

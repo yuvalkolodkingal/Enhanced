@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
+import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
@@ -54,6 +55,7 @@ public final class ClientSetup {
             event.register(key);
         }
         event.register(KeyBindings.CHANGE_LOOK);
+        event.register(KeyBindings.VISION_COMMAND);
     }
 
     @SubscribeEvent
@@ -65,6 +67,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.MJOLNIR_PIN.get(), MjolnirPinRenderer::new);
         event.registerEntityRenderer(ModEntities.LOKI_DAGGER.get(), LokiDaggerRenderer::new);
         event.registerEntityRenderer(ModEntities.LOKI_ILLUSION.get(), LokiIllusionRenderer::new);
+        event.registerEntityRenderer(ModEntities.HEX_VISION.get(), HexVisionRenderer::new);
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */

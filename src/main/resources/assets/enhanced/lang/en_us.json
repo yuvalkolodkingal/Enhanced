@@ -378,5 +378,20 @@
   "config.enhanced.reduced_motion": "Reduced motion",
   "config.enhanced.reduced_motion.tooltip": "Hover bob and drift at a third, no trembling hands, jitter or camera shake, and fainter rings.",
   "config.enhanced.flight_effects": "Flight effects",
-  "config.enhanced.flight_effects.tooltip": "Ribbons, rings, wind streaks and shockwaves around flying heroes."
+  "config.enhanced.flight_effects.tooltip": "Ribbons, rings, wind streaks and shockwaves around flying heroes.",
+  "entity.enhanced.hex_vision": "Vision",
+  "key.enhanced.vision_command": "Vision, That One! (Scarlet Witch)",
+  "message.enhanced.hex.holds_vision": "Wanda's Hex holds you: only she can let you go",
+  "message.enhanced.hex_vision.fell": "Vision has fallen. Your Hex will rebuild him in %s seconds",
+  "message.enhanced.hex_vision.rebuilt": "Vision rises again",
+  "message.enhanced.hex_vision.attack": "Vision attacks %s",
+  "message.enhanced.hex_vision.refuses": "Vision won't harm %s",
+  "message.enhanced.hex_vision.recall": "Vision comes back to your side",
+  "message.enhanced.hex_vision.absent": "Your Hex has no Vision right now",
+  "message.enhanced.hex_vision.stays": "Vision holds his post",
+  "message.enhanced.hex_vision.follows": "Vision follows you",
+  "screen.enhanced.hex.vision": "Vision: %s",
+  "screen.enhanced.hex.vision_follows": "follows you",
+  "screen.enhanced.hex.vision_stays": "holds his post",
+  "screen.enhanced.hex.vision_tooltip": "Look at a creature and press %s: Vision, that one! Looking at nothing calls him back to your side. Sneak + %s: he holds his post, or follows you again."
 }

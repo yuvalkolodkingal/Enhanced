@@ -67,6 +67,14 @@ Thor flies by spinning his weapon, so only with Mjolnir or Stormbreaker in hand.
 
 When anyone without powers crosses Wanda's Hex wall without her permission, there is a 95% chance that they die: "rewritten by the Hex". The 5% who survive just keep going. Heroes can't be killed by the wall, but are thrown back. Wanda decides who may pass on the Hex Control screen. See [Scarlet Witch](Scarlet-Witch).
 
+### Why can't Vision leave the Hex?
+
+Wanda is in control of her Hex, and in *WandaVision* Vision starts to come apart at the edge of Westview. A Vision (either look) inside a standing Hex can't leave it, whether or not Wanda let him in: he is thrown back, comes apart a little, and is told "Wanda's Hex holds you: only she can let you go". He is free when the Hex dissolves, when Wanda shrinks it past him, and in Creative or Spectator. See [Scarlet Witch](Scarlet-Witch#vision-cant-leave-your-hex).
+
+### How do I send Vision at an enemy?
+
+When you raise a Hex as the Scarlet Witch, a Vision appears at your side. Look at a creature and press **Z** and he goes for it; look at nothing and press **Z** to call him back; **Sneak + Z** makes him hold his post. See [Scarlet Witch](Scarlet-Witch#the-vision-of-the-hex).
+
 ## Music and sharing
 
 ### Why is the mod for personal use only?

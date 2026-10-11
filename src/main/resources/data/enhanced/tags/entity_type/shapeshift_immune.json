@@ -5,6 +5,7 @@
     "minecraft:wither",
     "minecraft:warden",
     "minecraft:elder_guardian",
-    "enhanced:loki_illusion"
+    "enhanced:loki_illusion",
+    "enhanced:hex_vision"
   ]
 }

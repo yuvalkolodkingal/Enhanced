@@ -23,6 +23,14 @@ The abilities, their cooldowns and costs are explained on each hero's page.
 
 **H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki and Thor. Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
 
+## Vision, That One!: Z
+
+The Scarlet Witch has one more key. **Z** is her order to the Vision her Hex raises (see [Scarlet Witch](Scarlet-Witch#the-vision-of-the-hex)). It works only while she has a Hex:
+
+* **Look at a creature and press Z**: Vision goes for that one.
+* **Look at nothing and press Z**: he comes back to your side.
+* **Sneak + Z**: he holds his post where he is, or follows you again. The Hex Control screen (**N**) has the same choice as a button.
+
 ## Flight
 
 Flying works like Creative mode: **double-tap Space**, or press the hero's flight key. Either one turns flight on, and the same again lands you.
@@ -46,6 +54,7 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **R** as Magneto | Sets the metal you hold down gently, instead of throwing it. |
 | Sneak + **V** as the Scarlet Witch or Billy | Sets what you hold with telekinesis down gently. |
 | Sneak + **N** as the Scarlet Witch | Dissolves your Hex. |
+| Sneak + **Z** as the Scarlet Witch | Your Hex's Vision holds his post, or follows you again. |
 | Sneak + **R** as Quicksilver | Turns Super Speed on or off, instead of Quicksilver Time. |
 | Sneak + **R** as Loki | Throws a fan of three daggers. |
 | Sneak + **R** as Thor, with Mjolnir in hand | Shatters Mjolnir into fragments that strike his enemies (with Stormbreaker it throws it, as R does). |
@@ -83,7 +92,7 @@ The top-left corner of the screen always shows your hero, each ability with its 
 
 ## Rebinding keys
 
-All six keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5* and *Change Look*. Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
+All seven keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look* and *Vision, That One! (Scarlet Witch)*. Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
 
 ## Sprinting heroes
 

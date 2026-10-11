@@ -18,12 +18,14 @@ import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.command.EnhancedCommand;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.hex.HexVisions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.road.WitchesRoad;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -88,6 +90,7 @@ public final class CommonEvents {
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             HexManager.tickLevel(level);
+            HexVisions.tickLevel(level);
             SlowMotion.serverTick(level);
             MagnetoAbilities.tickHeld(level);
             WitchesRoad.tick(level);
@@ -162,6 +165,8 @@ public final class CommonEvents {
             MjolnirShatter.onGone(player);
             MjolnirPin.onOwnerGone(player);
             WitchesRoad.forget(player.getUUID());
+            // The Vision of her Hex goes with Wanda; the Hex itself stays, and raises him again when she is back.
+            HexVisions.ownerGone(player.getUUID());
         }
     }
 
@@ -348,6 +353,19 @@ public final class CommonEvents {
         if (MjolnirPin.isPinned(event.getEntity())) {
             event.setCanceled(true);
         }
+        // A portal doesn't take Vision out of a Hex that holds him either.
+        if (event.getEntity() instanceof ServerPlayer player && HexManager.holdsInside(player.serverLevel(), player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.hex.holds_vision"), true);
+            event.setCanceled(true);
+        }
+    }
+
+    // ---- the Vision of the Hex fights for Wanda ----
+
+    /** Whoever hurts Wanda (or her Vision), or whom she hurts, he goes for. */
+    @SubscribeEvent
+    public static void onHurtForHexVision(LivingDamageEvent.Post event) {
+        HexVisions.onDamage(event.getEntity(), event.getSource());
     }
 
     /** The Chaos Beam, or anything a Scarlet Witch hurled with telekinesis. */

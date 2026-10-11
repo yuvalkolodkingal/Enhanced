@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.hex;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
+import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -9,6 +10,7 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
@@ -23,8 +26,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -35,7 +40,9 @@ import java.util.UUID;
  *
  * <p>Each tick every living thing near a Hex is checked against which side of the wall it was on last tick.
  * Crossing without Wanda's permission means: bounce off (anyone with powers, and bosses), or a 95% chance of
- * instant death (the survivors simply walk on).
+ * instant death (the survivors simply walk on). Vision is the exception to permission: inside a standing Hex he can't
+ * leave it (Wanda is in control, and in WandaVision he comes apart at the edge of Westview), whether or not she let him
+ * in. The same goes for the Vision her Hex raised.
  */
 public final class HexManager {
 
@@ -46,8 +53,28 @@ public final class HexManager {
         /** It has powers (or is a boss): it bounces off. */
         BLOCK,
         /** It must survive the wall: 95% death (by default, see the config). */
-        GAMBLE
+        GAMBLE,
+        /** It is inside and the Hex does not let it go (Vision): it comes apart a little and is thrown back inside. */
+        HELD
     }
+
+    /** How long (ticks) without pushing against the wall before Vision's next push counts as the first again. */
+    private static final int STRAIN_RESET_TICKS = 60;
+    /** The wall hurts Vision at most this often (ticks) however hard he leans on it: twice a second. */
+    private static final int HOLD_DAMAGE_INTERVAL = 10;
+
+    /** How hard Vision has been pushing against the wall. */
+    private static final class Strain {
+        /** Game time of his last throw back, and of the last one that hurt him; how many hurt in a row. */
+        long lastPush = Long.MIN_VALUE / 2;
+        long lastDamage = Long.MIN_VALUE / 2;
+        int pushes;
+    }
+
+    /** Entity UUID → how hard it has been pushing. In memory only. */
+    private static final Map<UUID, Strain> STRAIN = new HashMap<>();
+    /** What a Vision flakes into at the wall: orange and yellow. */
+    private static final int[] FLAKES = {0xFFB02E, 0xFF8A1E, 0xF5D77A};
 
     /** Hex id → entity UUID → was inside last tick. In memory only. */
     private static final Map<UUID, Map<UUID, Boolean>> SIDES = new HashMap<>();
@@ -102,14 +129,20 @@ public final class HexManager {
         ServerLevel level = wanda.serverLevel();
         int radius = Mth.clamp(EnhancedConfig.HEX_DEFAULT_RADIUS.get(), EnhancedConfig.HEX_MIN_RADIUS.get(), EnhancedConfig.HEX_MAX_RADIUS.get());
         Hex hex = new Hex(UUID.randomUUID(), wanda.getUUID(), wanda.getGameProfile().getName(), wanda.position(), radius,
-                Set.of(), false, level.getGameTime());
+                Set.of(), false, level.getGameTime(), false);
         save(level, data(level).with(hex));
         // Volume above 1 widens the range: everyone inside the new Hex hears it rise.
         level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), ModSounds.HEX_RISE.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 16.0F), 1.0F);
         level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 2.0F), wanda.getX(), wanda.getY() + 1, wanda.getZ(),
                 150, 1.5, 1.5, 1.5, 0.4);
         wanda.displayClientMessage(Component.translatable("message.enhanced.hex.created"), true);
+        // "When Wanda raises the Hex, Vision appears": the one who will fight at her side while it stands.
+        HexVisions.raise(wanda, hex);
         return hex;
+    }
+
+    public static Optional<Hex> byId(Level level, UUID id) {
+        return data(level).byId(id);
     }
 
     /** Applies a change from Wanda's Hex Control screen. Only the owner can change her Hex. */
@@ -141,12 +174,20 @@ public final class HexManager {
                 SIDES.remove(hex.id());
             }
             case DISSOLVE -> dissolve(level, hex);
+            case SET_VISION_STAYS -> {
+                boolean stays = value != 0;
+                save(level, data(level).update(hex.id(), h -> h.withVisionStays(stays)));
+                wanda.displayClientMessage(Component.translatable(stays
+                        ? "message.enhanced.hex_vision.stays" : "message.enhanced.hex_vision.follows"), true);
+            }
+            case VISION_TARGET -> HexVisions.point(wanda, hex);
         }
     }
 
     public static void dissolve(ServerLevel level, Hex hex) {
         save(level, data(level).without(hex.id()));
         SIDES.remove(hex.id());
+        HexVisions.dissolved(level, hex);
         Vec3 c = hex.center();
         level.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 3.0F, 0.5F);
     }
@@ -168,6 +209,7 @@ public final class HexManager {
         int n = data(level).hexes().size();
         for (Hex hex : data(level).hexes()) {
             SIDES.remove(hex.id());
+            HexVisions.dissolved(level, hex);
         }
         save(level, HexData.EMPTY);
         return n;
@@ -185,7 +227,16 @@ public final class HexManager {
         for (Hex hex : data.hexes()) {
             Map<UUID, Boolean> sides = SIDES.computeIfAbsent(hex.id(), k -> new HashMap<>());
             Set<UUID> seen = new HashSet<>();
-            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, hex.bounds(6.0), LivingEntity::isAlive)) {
+            List<LivingEntity> near = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, hex.bounds(6.0), LivingEntity::isAlive));
+            // A Vision inside the Hex is watched wherever he is, so that even a jump clear past the edge of the box
+            // above (a lag spike, a command) is seen as leaving and he is brought back.
+            for (ServerPlayer player : level.players()) {
+                if (player.isAlive() && Boolean.TRUE.equals(sides.get(player.getUUID())) && Powers.is(player, Power.VISION)
+                        && !near.contains(player)) {
+                    near.add(player);
+                }
+            }
+            for (LivingEntity entity : near) {
                 UUID id = entity.getUUID();
                 seen.add(id);
                 boolean inside = hex.contains(bodyCenter(entity));
@@ -202,10 +253,11 @@ public final class HexManager {
                     continue;
                 }
                 // It crossed the wall this tick.
-                Verdict verdict = judge(hex, entity);
+                Verdict verdict = judge(hex, entity, before);
                 switch (verdict) {
                     case PASS -> sides.put(id, inside);
                     case BLOCK -> bounce(level, hex, entity, before);
+                    case HELD -> hold(level, hex, entity, true);
                     case GAMBLE -> {
                         if (gamble(level, hex, entity)) {
                             sides.put(id, inside);
@@ -237,6 +289,7 @@ public final class HexManager {
             sides.remove(entity);
         }
         TELEPORTED_FROM.remove(entity);
+        STRAIN.remove(entity);
     }
 
     /**
@@ -267,11 +320,19 @@ public final class HexManager {
                 continue;
             }
             Map<UUID, Boolean> sides = SIDES.computeIfAbsent(hex.id(), k -> new HashMap<>());
-            switch (judge(hex, living)) {
+            switch (judge(hex, living, insideBefore)) {
                 case PASS -> sides.put(living.getUUID(), insideAfter);
                 case BLOCK -> {
                     if (living instanceof Player player) {
                         player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);
+                    }
+                    return false;
+                }
+                case HELD -> {
+                    // No teleport takes Vision out of a Hex that holds him: he flakes where he stands, and stays.
+                    comeApart(level, hex, living);
+                    if (living instanceof Player player) {
+                        player.displayClientMessage(Component.translatable("message.enhanced.hex.holds_vision"), true);
                     }
                     return false;
                 }
@@ -286,12 +347,32 @@ public final class HexManager {
         return true;
     }
 
+    /** What the wall makes of something crossing it into the Hex. */
     public static Verdict judge(Hex hex, LivingEntity entity) {
+        return judge(hex, entity, false);
+    }
+
+    /**
+     * What the wall makes of something crossing it.
+     *
+     * @param leaving true if it is inside and going out: Vision, and the Vision of the Hex, are then held, whatever
+     *                Wanda allowed (Creative and Spectator players and Wanda herself pass)
+     */
+    public static Verdict judge(Hex hex, LivingEntity entity, boolean leaving) {
         if (entity instanceof Player player) {
-            if (player.isCreative() || player.isSpectator() || hex.isAllowed(player.getUUID())) {
+            if (player.isCreative() || player.isSpectator() || player.getUUID().equals(hex.owner())) {
+                return Verdict.PASS;
+            }
+            if (leaving && Powers.is(player, Power.VISION)) {
+                return Verdict.HELD;
+            }
+            if (hex.isAllowed(player.getUUID())) {
                 return Verdict.PASS;
             }
             return Powers.power(player).hasPowers() ? Verdict.BLOCK : Verdict.GAMBLE;
+        }
+        if (entity instanceof HexVisionEntity vision && hex.id().equals(vision.hexId())) {
+            return leaving ? Verdict.HELD : Verdict.PASS;
         }
         if (hex.allowCreatures()) {
             return Verdict.PASS;
@@ -320,6 +401,76 @@ public final class HexManager {
 
     /** Pushes something back to the side it came from, as if it walked into glass. */
     private static void bounce(ServerLevel level, Hex hex, LivingEntity entity, boolean wasInside) {
+        throwBack(hex, entity, wasInside);
+        if (entity instanceof ServerPlayer player) {
+            player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);
+        }
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.5F), entity.getX(), entity.getY() + 1, entity.getZ(),
+                20, 0.4, 0.6, 0.4, 0.05);
+        level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SHULKER_BULLET_HURT, SoundSource.PLAYERS, 1.0F, 0.6F);
+    }
+
+    /**
+     * The Hex holds Vision (or the Vision it raised): he is thrown back inside and comes apart a little where he met
+     * the wall. Vision himself is told why, and takes a little damage that grows while he keeps pushing (see
+     * {@link #holdDamage}); it never kills him.
+     */
+    private static void hold(ServerLevel level, Hex hex, LivingEntity entity, boolean wasInside) {
+        throwBack(hex, entity, wasInside);
+        comeApart(level, hex, entity);
+        if (entity instanceof ServerPlayer player) {
+            player.displayClientMessage(Component.translatable("message.enhanced.hex.holds_vision"), true);
+            float damage = Math.min(holdDamage(level, player), player.getHealth() - 1.0F);
+            if (damage > 0) {
+                player.hurt(ModDamageTypes.source(level, ModDamageTypes.HEX_WALL), damage);
+            }
+        }
+    }
+
+    /**
+     * What this throw back at the wall costs Vision: {@code hexHoldDamage} the first time, and that much more each time
+     * he pushes again within three seconds, up to {@code hexHoldDamageMax}. However hard he leans on the wall it hurts
+     * him at most twice a second.
+     */
+    private static float holdDamage(ServerLevel level, LivingEntity entity) {
+        long now = level.getGameTime();
+        Strain strain = STRAIN.computeIfAbsent(entity.getUUID(), k -> new Strain());
+        boolean rested = now - strain.lastPush > STRAIN_RESET_TICKS;
+        strain.lastPush = now;
+        if (!rested && now - strain.lastDamage < HOLD_DAMAGE_INTERVAL) {
+            return 0.0F;
+        }
+        strain.pushes = rested ? 1 : strain.pushes + 1;
+        strain.lastDamage = now;
+        return (float) Math.min(EnhancedConfig.HEX_HOLD_DAMAGE_MAX.get(), EnhancedConfig.HEX_HOLD_DAMAGE.get() * strain.pushes);
+    }
+
+    /**
+     * Pieces of him flake off in orange and yellow and drift away towards the wall, with a crackle: Vision, or his
+     * double, at the edge of Westview.
+     */
+    private static void comeApart(ServerLevel level, Hex hex, LivingEntity entity) {
+        Vec3 at = bodyCenter(entity);
+        RandomSource random = entity.getRandom();
+        Vec3 radial = at.subtract(hex.center());
+        Vec3 out = radial.lengthSqr() < 1.0E-6 ? Vec3.ZERO : radial.normalize();
+        for (int i = 0; i < 56; i++) {
+            double x = entity.getX() + (random.nextDouble() - 0.5) * entity.getBbWidth() * 1.4;
+            double y = entity.getY() + random.nextDouble() * entity.getBbHeight();
+            double z = entity.getZ() + (random.nextDouble() - 0.5) * entity.getBbWidth() * 1.4;
+            double drift = 0.25 + random.nextDouble() * 0.5;
+            // count 0: the "spread" is the particle's own velocity, so each flake drifts off on its own way
+            level.sendParticles(new EnergyParticleOptions(FLAKES[i % FLAKES.length], 1.4F + random.nextFloat() * 1.0F), x, y, z, 0,
+                    out.x * drift + random.nextGaussian() * 0.12, 0.15 + random.nextDouble() * 0.45, out.z * drift + random.nextGaussian() * 0.12, 0.1);
+        }
+        level.sendParticles(ParticleTypes.SMALL_FLAME, at.x, at.y, at.z, 10, entity.getBbWidth() * 0.4, entity.getBbHeight() * 0.4,
+                entity.getBbWidth() * 0.4, 0.03);
+        level.playSound(null, at.x, at.y, at.z, SoundEvents.CAMPFIRE_CRACKLE, SoundSource.PLAYERS, 1.2F, 1.3F);
+        level.playSound(null, at.x, at.y, at.z, ModSounds.HEX_CROSS.get(), SoundSource.PLAYERS, 0.6F, 1.7F);
+    }
+
+    /** Sets something back on the side of the wall it came from. */
+    private static void throwBack(Hex hex, LivingEntity entity, boolean wasInside) {
         Vec3 back = new Vec3(entity.xo, entity.yo, entity.zo);
         Vec3 radial = bodyCenter(entity).subtract(hex.center());
         Vec3 push = radial.lengthSqr() < 1.0E-6 ? Vec3.ZERO : radial.normalize().scale(wasInside ? -0.6 : 0.6);
@@ -333,15 +484,11 @@ public final class HexManager {
         }
         if (entity instanceof ServerPlayer player) {
             player.connection.teleport(back.x, back.y, back.z, player.getYRot(), player.getXRot());
-            player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);
         } else {
             entity.teleportTo(back.x, back.y, back.z);
         }
         entity.setDeltaMovement(push.x, Math.max(0.2, push.y), push.z);
         entity.hurtMarked = true;
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.5F), entity.getX(), entity.getY() + 1, entity.getZ(),
-                20, 0.4, 0.6, 0.4, 0.05);
-        level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SHULKER_BULLET_HURT, SoundSource.PLAYERS, 1.0F, 0.6F);
     }
 
     private static Vec3 bodyCenter(LivingEntity entity) {
@@ -353,9 +500,25 @@ public final class HexManager {
         dissolveAllOwnedBy(wanda.server, wanda.getUUID());
     }
 
+    /**
+     * Whether a Hex that stands round this entity keeps it from leaving the dimension (a portal): Vision inside a Hex
+     * is held, wherever he tries to go.
+     */
+    public static boolean holdsInside(ServerLevel level, LivingEntity entity) {
+        Vec3 at = bodyCenter(entity);
+        for (Hex hex : data(level).hexes()) {
+            if (hex.contains(at) && judge(hex, entity, true) == Verdict.HELD) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void clearMemory() {
         SIDES.clear();
         TELEPORTED_FROM.clear();
+        STRAIN.clear();
+        HexVisions.clear();
     }
 
     private HexManager() {

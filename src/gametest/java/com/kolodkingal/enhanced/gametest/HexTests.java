@@ -44,7 +44,7 @@ public final class HexTests {
     private static final int RADIUS = 8;
 
     /** Creates Wanda in the middle of the arena and lets her press N. */
-    private static ServerPlayer raiseHex(TestKit.Fixture f) {
+    static ServerPlayer raiseHex(TestKit.Fixture f) {
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, RADIUS);
         ServerPlayer wanda = f.player(CENTER, FLOOR, CENTER, Power.SCARLET_WITCH);
         AbilityHandler.onKey(wanda, 5, true);
@@ -54,17 +54,17 @@ public final class HexTests {
         return wanda;
     }
 
-    private static Vec3 abs(GameTestHelper helper, double x, double y, double z) {
+    static Vec3 abs(GameTestHelper helper, double x, double y, double z) {
         return helper.absoluteVec(new Vec3(x, y, z));
     }
 
-    private static boolean inside(TestKit.Fixture f, ServerPlayer wanda, LivingEntity entity) {
+    static boolean inside(TestKit.Fixture f, ServerPlayer wanda, LivingEntity entity) {
         Hex hex = HexManager.ownedBy(f.level(), wanda.getUUID()).orElseThrow();
         return hex.contains(entity.position().add(0, entity.getBbHeight() * 0.5, 0));
     }
 
     /** What a client's movement packet does: the position changes, the previous-tick position doesn't. */
-    private static void walkTo(ServerPlayer player, Vec3 pos) {
+    static void walkTo(ServerPlayer player, Vec3 pos) {
         player.absMoveTo(pos.x, pos.y, pos.z);
     }
 

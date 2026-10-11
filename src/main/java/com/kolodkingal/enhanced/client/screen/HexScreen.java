@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.screen;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.client.KeyBindings;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.network.HexActionPayload;
@@ -10,6 +11,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -24,8 +26,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Wanda's Hex Control: choose who may cross the wall, resize it, or dissolve it. Reads the Hex straight from the
- * synced level data and rebuilds itself whenever the server confirms a change.
+ * Wanda's Hex Control: choose who may cross the wall, resize it, or dissolve it, and whether the Vision her Hex raised
+ * follows her or holds his post. Reads the Hex straight from the synced level data and rebuilds itself whenever the
+ * server confirms a change.
  */
 public class HexScreen extends Screen {
     private static final int ROW = 24;
@@ -64,7 +67,7 @@ public class HexScreen extends Screen {
     }
 
     private int perPage() {
-        return Math.max(1, (height - 150) / ROW);
+        return Math.max(1, (height - 150 - ROW) / ROW);
     }
 
     @Override
@@ -87,6 +90,14 @@ public class HexScreen extends Screen {
         Component creatures = Component.translatable("screen.enhanced.hex.creatures",
                 hex.allowCreatures() ? allowed() : blocked());
         addRenderableWidget(Button.builder(creatures, b -> send(HexAction.SET_CREATURES, null, hex.allowCreatures() ? 0 : 1))
+                .bounds(left, y, WIDTH, 20).build());
+        y += ROW;
+
+        Component visionOrder = Component.translatable("screen.enhanced.hex.vision",
+                Component.translatable(hex.visionStays() ? "screen.enhanced.hex.vision_stays" : "screen.enhanced.hex.vision_follows"));
+        Component keys = KeyBindings.VISION_COMMAND.getTranslatedKeyMessage();
+        addRenderableWidget(Button.builder(visionOrder, b -> send(HexAction.SET_VISION_STAYS, null, hex.visionStays() ? 0 : 1))
+                .tooltip(Tooltip.create(Component.translatable("screen.enhanced.hex.vision_tooltip", keys, keys)))
                 .bounds(left, y, WIDTH, 20).build());
         y += ROW + 8;
 
@@ -135,7 +146,7 @@ public class HexScreen extends Screen {
     }
 
     private int stateHash(Hex hex) {
-        return Objects.hash(hex.radius(), hex.allowCreatures(), hex.allowed(), otherPlayers().size());
+        return Objects.hash(hex.radius(), hex.allowCreatures(), hex.visionStays(), hex.allowed(), otherPlayers().size());
     }
 
     @Override
@@ -158,7 +169,7 @@ public class HexScreen extends Screen {
             graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.radius", hex.radius()), width / 2, 42, 0xFFFFFF);
             if (otherPlayers().isEmpty()) {
                 graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.no_players").withStyle(ChatFormatting.GRAY),
-                        width / 2, 36 + ROW * 2 + 14, 0xFFFFFF);
+                        width / 2, 36 + ROW * 3 + 14, 0xFFFFFF);
             }
         });
         long deathPercent = EnhancedConfig.SPEC.isLoaded() ? Math.round(EnhancedConfig.HEX_DEATH_CHANCE.get() * 100) : 95;

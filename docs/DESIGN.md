@@ -27,14 +27,14 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 |---|---|
 | One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
-| Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. |
+| Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. One more key, **Z** (*Vision, That One!*), belongs to the Scarlet Witch alone: it is her order to the Vision her Hex raises (section 2). |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs. |
 | Flight and run animation **(added)** | Every hero's pose is blended from the situation instead of switched, so nothing snaps and other players see it too. Each flier has a flight of his own. Magneto glides with his arms spread, leaning about 40° at full speed. Wanda floats upright with her palms open and stretches out, arms ahead, about 60° forward in a sprint. Vision is a straight body with arms at his sides, leaning about 65° at speed. Billy flies like a kid, arms wide, then ahead at a sprint. Thor leans about 90° behind his weapon, which really is in his fist in every pose (Mjolnir's handle and Stormbreaker's pass through it), whirls on its strap with a swoosh while he takes off and hovers, and is thrust ahead of him at speed; he overshoots a little and settles like a heavy hero. Every flier takes off with a gesture of his own, banks into turns, tips over in a dive, leans back when he climbs and brakes when he stops (Thor lands as a hero, planting the weapon). Quicksilver (in Quicksilver Time and in Super Speed) and Tommy at super speed run with their own stride, with ghosts of the stride behind them and a skid when they stop, and everyone else sprints and walks with a character of his own. Every flier leaves a trail of his own along the path he flew (crimson threads from Wanda's hands, golden threads from Vision's shoulders, field lines from Magneto's, a double helix from Billy's, lightning from Thor's boots), with white wind streaks at speed, a ring at take-off, a shockwave when a hero lands and a sonic boom when Thor or Vision break the sound barrier. Three client options (in `config/enhanced-client.toml`, section `[animation]`, and behind the *Config* button of Enhanced in the Mods screen; nothing there is synced) change it: *Hero animations* turns the hero animation off (vanilla poses), *Reduced motion* tones it down (hover bob and drift at a third, no trembling hands, jitter or camera shake), and *Flight effects* turns off the trails, wind and rings. |
 | Ability animation **(added)** | Every ability is acted, not just switched on, and other players see it too. **Magneto** draws his field out around him with both arms, closes a claw on the metal and wrenches it away, and holds what he lifts with a steady open hand. The **Scarlet Witch** gathers her arms across her chest and throws them open to raise the Chaos Shield, thrusts both hands out for the beam, raises both hands overhead to grow the Hex and moves them apart or together to make it bigger or smaller; her lifting hand is a raised, shaking claw. **Quicksilver** taps his goggles, starts like a sprinter, jabs a flurry of fists in his blitz and darts a hand out to snatch. **Vision** puts his fingers to his temple before the beam, floats his arms wide to let go of the world and braces to become dense. **Tommy** shakes his arms out, spins twice in his blitz, shivers before he goes through a wall and holds out a vibrating palm. **Billy** thrusts his hand at the target of the Hex Bolt, throws both hands up to freeze and presses them to his ears for the Noise. **Loki** flicks his daggers from over the shoulder, raises a spread hand to cast and roars as the Frost Giant; his Scepter jabs instead of chopping. **Thor** hauls back and whips his arm to throw the weapon, holds out his hand for it, is slapped by it as it comes home (with sparks), kicks back as the lightning leaves his hand and holds his arm out along the beam while he fires it, thrusts Mjolnir up as it bursts into fragments and closes his fist as they come together, brings it down on whoever he pins, and roars as the God of Thunder. Your own gesture starts the moment you press the key, without waiting for the server. In first person your hands move too (hands in and up for the shield, a palm thrust out for the bolt, the dagger flicked forward, the weapon whirling at the edge of the screen) and the beam, the tether and the bolt leave the hand where it is drawn. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
 | Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, the TVA Loki, Mighty Thor... Press **H** to change look (**Sneak + H** goes back). A look changes only how the hero looks and the colour of his energy: the abilities are the same in every look. Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
 | MCU colours **(added)** | Every power's light and colour follows the films and shows (section 9). |
-| Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, the same way vanilla treats them as invulnerable. |
+| Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, and the Hex never holds a Creative or Spectator Vision, the same way vanilla treats them as invulnerable. |
 
 ---
 
@@ -335,6 +335,43 @@ To touch the stone, hold the scepter and **right-click** (use it):
   bosses can't be killed by the wall. They're thrown back as if they hit glass, unless
   Wanda allowed them in.
 * **(added)** Pets owned by an allowed player pass through safely.
+* **(added)** **Vision can't leave a standing Hex.** Wanda is in control of it, and in *WandaVision* Vision
+  starts to come apart at the edge of Westview. A player with Vision's power (White Vision too) who is
+  inside a Hex can't leave it, whether or not Wanda allowed him in. Walking, flying, phasing, portals and
+  every teleport out (Ender Pearls, Chorus Fruit, the Bifrost, Loki's Tesseract, the Witches' Road,
+  Tommy's Vibrate) are refused at the wall. Where he meets it he starts to come apart: pieces of him flake
+  off in orange and yellow with a crackling sound, and he is thrown back inside and told "Wanda's Hex
+  holds you: only she can let you go". It hurts him a little: 1 heart the first time, and 1 heart more for
+  every push within 3 seconds of the one before, up to 4 hearts (`hexHoldDamage`, `hexHoldDamageMax`); however
+  hard he leans on the wall it bites at most twice a second. It never kills him (the last half heart is
+  never taken), and it starts over after 3 seconds without pushing. He is free when the Hex dissolves, when Wanda shrinks it past him (the wall then runs inside
+  him, and he is not dragged back) and if he is in Creative or Spectator. Getting **into** a Hex keeps the
+  old rules: Wanda's permission lets him in, and without it he is thrown back like any hero.
+* **(added)** **The Vision of the Hex** ("when Wanda raises the Hex, Vision appears and attacks whoever she
+  tells him to"):
+  * When Wanda raises a Hex, a Vision appears beside her. He is a creature of his own, drawn like Vision:
+    the player model with Vision's skin and yellow cape and the Mind Stone glowing in his forehead
+    (brighter while he fires the beam). He floats and flies, with poses of his own for hovering, flying
+    (leaning into it, arms swept back, cape streaming), standing guard and punching. He belongs to the
+    Hex: he follows Wanda inside it, can never leave it (the wall holds him exactly as it holds Vision,
+    and a Vision of another Hex is thrown back at this one) and is there as long as it stands. One per
+    Hex.
+  * He protects her like a tamed wolf. He goes for whatever attacks her, whatever she attacks and whatever
+    hits him, and for whatever she points him at. Up close he fights with dense punches (12 damage, about
+    one a second) and from a way off with a short Mind Stone beam (4 damage a hit, two hits a second, 16
+    blocks). He has 80 health (an Iron Golem has 100) and 8 armor. All of it is in the `hex_vision`
+    section of the config, which can also turn him off.
+  * He never harms Wanda, players she allowed into the Hex, the pets of either, other Visions, or Creative
+    and Spectator players, and no player at all on a server with PvP off. Wanda's Chaos Beam and blows pass
+    him by, and telekinesis can't lift him.
+  * **Orders.** The **Z** key (*Vision, That One!*, rebindable under *Options → Controls → Enhanced
+    Powers*): look at a creature and press it, and he goes for that one, whatever else he is doing;
+    look at nothing and press it, and he comes back to her side; **Sneak + Z** makes him hold his post or
+    follow her again. The Hex Control screen has the last as a button, *Vision: follows you / holds his
+    post*, and the Hex remembers it.
+  * If he falls he fades to nothing, and Wanda rebuilds him 60 seconds later (`hex_vision.rebuildTicks`)
+    as long as the Hex stands. He fades away when the Hex dissolves, and when Wanda leaves (logs out or
+    changes dimension; her Hex raises him again when she is back). Nothing of him is saved.
 
 ---
 
@@ -447,6 +484,9 @@ The movement speed bonus and the step-up stay tied to **sprinting**, so he can s
   he phases in a white aura. Press **H** to switch.
 * **Max health 30** (15 hearts) and **8 armor** from his vibranium body.
 * He never gets hungry and never runs out of air.
+* **(added)** Inside a standing Hex he can't leave it, in either look, whether or not Wanda let him in:
+  he comes apart at its wall and is thrown back (section 2, ability 5). Wanda's Hex raises a Vision of
+  its own to fight at her side (section 2).
 
 ### 4.3 Abilities
 
@@ -454,7 +494,7 @@ The movement speed bonus and the step-up stay tied to **sprinting**, so he can s
 |---|---|---|---|
 | 1 | R (hold) | **Mind Stone Beam** | A pale gold beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. |
 | 2 | G (toggle) | **Flight** | Survival flight at 0.08, calm and composed. |
-| 3 | V (toggle) | **Phase** | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you're only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
+| 3 | V (toggle) | **Phase** | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you're only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone, and inside a standing Hex it doesn't get you out either. |
 | 4 | B (toggle) | **Density** | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Phasing ends density, and you can't turn dense while phased. |
 | 5 | N (toggle) | **Human Disguise** | Take on the human look from *WandaVision*: a 1950s sitcom husband in a shirt, tie and cardigan. Only the looks change. |
 
@@ -774,7 +814,8 @@ shrapnel damage, shield reflect chance, the Chaos Shield's wind-up, time limit, 
 Quicksilver Time slows the world, how much faster Quicksilver does everything, Tommy's speed, Loki's dagger damage, how
 long Loki's Scepter confuses, Mjolnir's and Stormbreaker's damage and range, Thor's lightning beam (damage, range, its
 strength with a weapon and as the God of Thunder, its hunger cost), the cooldown of shattering Mjolnir and the damage of
-its fragments, how long it pins someone down, who is worthy of Mjolnir and whether it belongs to the first worthy player
+its fragments, how hard the Hex wall bites a Vision who pushes against it, the Vision of the Hex (health, punch,
+beam, how long Wanda needs to rebuild him, or turning him off), how long it pins someone down, who is worthy of Mjolnir and whether it belongs to the first worthy player
 who lifts it (`mjolnirOwnerOnly`), the Bifrost's
 cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`. The three client options of the hero animation
 (*Hero animations*, *Reduced motion*, *Flight effects*) are in `config/enhanced-client.toml` of the player's own game.

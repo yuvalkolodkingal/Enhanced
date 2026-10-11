@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -32,13 +33,23 @@ public class MindStoneLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         }
         float pulse = 0.75F + 0.25F * Mth.sin(ageInTicks * 0.12F);
         float boost = data.beamActive() ? 1.6F : 1.0F;
+        draw(poseStack, buffer, getParentModel().head, pulse, boost, "white_vision".equals(data.variant()));
+    }
+
+    /**
+     * The stone (or White Vision's socket) on the forehead of {@code head}, in the pose the head is in.
+     *
+     * @param pulse how bright the slow breathing of the halo is just now (0.5 to 1)
+     * @param boost how much wider the halo is (1.6 while he fires the beam)
+     */
+    public static void draw(PoseStack poseStack, MultiBufferSource buffer, ModelPart head, float pulse, float boost, boolean white) {
         poseStack.pushPose();
-        getParentModel().head.translateAndRotate(poseStack);
+        head.translateAndRotate(poseStack);
         // Middle of the forehead, just in front of the face.
         poseStack.translate(0.0F, -6.0F / 16.0F, -4.15F / 16.0F);
         Matrix4f m = poseStack.last().pose();
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-        if ("white_vision".equals(data.variant())) {
+        if (white) {
             hexagon(vc, m, 1.1F / 16.0F, EnergyGeometry.argb(0xDBC49C, 0.7F));
             diamond(vc, m, 0.45F / 16.0F, EnergyGeometry.argb(0xE8FBFF, 0.9F));
             halo(vc, m, 2.6F / 16.0F * pulse * boost, EnergyGeometry.argb(0x8FDFFF, 0.35F * pulse));

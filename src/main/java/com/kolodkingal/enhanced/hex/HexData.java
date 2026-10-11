@@ -31,6 +31,10 @@ public record HexData(List<Hex> hexes) {
         return hexes.stream().filter(h -> h.owner().equals(owner)).findFirst();
     }
 
+    public Optional<Hex> byId(UUID id) {
+        return hexes.stream().filter(h -> h.id().equals(id)).findFirst();
+    }
+
     public HexData with(Hex hex) {
         List<Hex> list = new ArrayList<>(hexes);
         list.removeIf(h -> h.id().equals(hex.id()));
