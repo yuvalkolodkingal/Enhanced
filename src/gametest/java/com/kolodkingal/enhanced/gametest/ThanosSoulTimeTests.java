@@ -333,7 +333,9 @@ public final class ThanosSoulTimeTests {
         thanos.addEffect(new MobEffectInstance(MobEffects.POISON, 400, 0, false, false));
         thanos.setRemainingFireTicks(100);
         float exhaustion = thanos.getFoodData().getExhaustionLevel();
+        thanos.getFoodData().setFoodLevel(11);
         press(thanos, 5);
+        check(thanos.getFoodData().getFoodLevel() == 11, "his food is not rewound");
         assertNear(thanos.getX(), there.x, 0.05, "he is back where he was (x)");
         assertNear(thanos.getZ(), there.z, 0.05, "(z)");
         assertNear(thanos.getHealth(), Math.min(thanos.getMaxHealth(), 15.0 + ThanosConfig.REWIND_MAX_HEAL.get()), 0.01, "his health returned, by at most twenty");
@@ -488,6 +490,11 @@ public final class ThanosSoulTimeTests {
         arrow.moveTo(helper.absoluteVec(new Vec3(7.5, FLOOR + 3.0, 8.5)));
         arrow.setDeltaMovement(0.6, 0.0, 0.0);
         level.addFreshEntity(arrow);
+        Arrow floating = EntityType.ARROW.create(level);
+        floating.setNoGravity(true);
+        floating.moveTo(helper.absoluteVec(new Vec3(7.5, FLOOR + 3.0, 12.5)));
+        floating.setDeltaMovement(0.6, 0.0, 0.0);
+        level.addFreshEntity(floating);
         pressSneaking(thanos, 5);
         check(cooldownLeft(thanos, 5) == ThanosConfig.TIME_LOCK_COOLDOWN.get(), "the lock's cooldown: " + cooldownLeft(thanos, 5));
         f.everyTick(ThanosConfig.TIME_LOCK_TICKS.get() + 20, t -> {
@@ -505,6 +512,7 @@ public final class ThanosSoulTimeTests {
             if (t == ThanosConfig.TIME_LOCK_TICKS.get() + 8) {
                 check(!inside.hasEffect(ModEffects.TIME_LOCKED), "the dome closed: the zombie is free");
                 check(!arrow.isNoGravity() || arrow.isRemoved(), "and gravity is back on the arrow");
+                check(floating.isNoGravity(), "but not on the one that had none of its own");
                 return true;
             }
             return false;
@@ -692,18 +700,20 @@ public final class ThanosSoulTimeTests {
     }
 
     /**
-     * A Transmute the Mad Titan shakes off, and a Pull he cannot be drawn by: the tags that keep a boss from being
-     * held.
+     * What holds, the Mad Titan shakes off: a Transmute (it cracks and falls), a Pull (he is not drawn anywhere) and a Time
+     * Lock (the dome does not slow him): the tags that keep a boss from being held.
      */
     @GameTest(template = ARENA, batch = "thanos_hero_boss_held", timeoutTicks = 160)
     public static void theMadTitanShakesOffTheStonesThatHold(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
-        ServerPlayer thanos = ThanosTests.thanos(f, 4.5, 10.5);
+        ServerPlayer thanos = ThanosTests.thanos(f, 7.5, 10.5);
         ThanosEntity boss = ThanosBossTests.boss(f, thanos);
+        Vec3 stood = boss.position();
         lookAt(thanos, boss);
         TestKit.sentPackets(thanos);
         press(thanos, 3);
         pressSneaking(thanos, 2);
+        pressSneaking(thanos, 5);
         f.everyTick(40, t -> {
             PowerTicker.tick(thanos);
             if (t < 12) {
@@ -711,11 +721,24 @@ public final class ThanosSoulTimeTests {
             }
             check(told(TestKit.sentPackets(thanos), "message.enhanced.thanos.shaken_off"), "'The stone cracks and falls'");
             check(!boss.hasEffect(ModEffects.PETRIFIED), "the Titan is not stone");
-            check(boss.position().distanceTo(ThanosMoveSupport.spot(f, 0, FLOOR, 0)) < 1.5, "and was not drawn anywhere");
-            lookAt(thanos, boss);
-            pressSneaking(thanos, 5);
+            check(!boss.hasEffect(ModEffects.TIME_LOCKED), "and the dome does not slow him");
+            check(boss.position().distanceTo(stood) < 0.5, "and he was not drawn anywhere");
             return true;
         });
+    }
+
+    /** A hand turned to stone lets go of the spells it held: a Scarlet Witch's beam and shield stop. */
+    @GameTest(template = ARENA, batch = "thanos_hero_stone_hand", timeoutTicks = 60)
+    public static void aPetrifiedHandLetsGoOfHeldSpells(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        PowerData data = Powers.get(wanda);
+        data.setBeamActive(true);
+        data.setChaosShieldActive(true);
+        wanda.addEffect(new MobEffectInstance(ModEffects.PETRIFIED, 100, 0, false, false));
+        wanda.doTick();
+        check(!data.beamActive() && !data.chaosShieldActive(), "stone cannot hold a beam or a shield up");
+        helper.succeed();
     }
 
     /** Ability keys of another hero's plug-in do nothing for Thanos: his keys reach only his own stones. */

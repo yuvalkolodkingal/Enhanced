@@ -312,6 +312,24 @@ public final class ThanosTests {
         helper.succeed();
     }
 
+    /** The stones that fall on an area, and the Drain, say so when PvP spares a player (and do nothing to him). */
+    @GameTest(template = ARENA, batch = "thanos_hero_pvp", timeoutTicks = 60)
+    public static void theAreaStonesAndTheDrainSayWhenPvpSparesAPlayer(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thanos = thanos(f, 2.5, 10.5);
+        ServerPlayer victim = f.player(5.5, FLOOR, 10.5);
+        TestKit.sentPackets(thanos);
+        pressSneaking(thanos, 1);
+        check(told(TestKit.sentPackets(thanos), "message.enhanced.thanos.pvp_off"), "the Slam says PvP is off");
+        pressSneaking(thanos, 5);
+        check(told(TestKit.sentPackets(thanos), "message.enhanced.thanos.pvp_off"), "so does the Time Lock");
+        AbilityHandler.onKey(thanos, 4, true);
+        check(told(TestKit.sentPackets(thanos), "message.enhanced.thanos.pvp_off") && !Powers.get(thanos).is(Live.SOUL_DRAINING),
+                "and the Drain does not start, and says why");
+        check(lost(victim) == 0.0F, "and he was not touched");
+        helper.succeed();
+    }
+
     /**
      * A complete Chaos Shield in the way stops the beam at its surface and loses twelve; the creature behind is
      * untouched.
@@ -391,6 +409,52 @@ public final class ThanosTests {
                     "the near one was thrown outward: " + near.getX() + " from " + nearX[0] + ", moving " + near.getDeltaMovement());
             return true;
         });
+    }
+
+    /** The Slam is an explosion to a Chaos Shield: it takes most of it away and wears. */
+    @GameTest(template = ARENA, batch = "thanos_hero_slam_shield", timeoutTicks = 60)
+    public static void aChaosShieldTakesMostOfTheSlamAsAnExplosion(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer thanos = thanos(f, 10.5, 10.5);
+        ServerPlayer wanda = f.player(13.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        wanda.setHealth(20.0F);
+        shield(f, wanda, 100.0F);
+        pressSneaking(thanos, 1);
+        f.everyTick(14, t -> {
+            PowerTicker.tick(thanos);
+            if (t < 12) {
+                return false;
+            }
+            float hurt = 20.0F - wanda.getHealth();
+            float worn = 100.0F - Powers.get(wanda).shieldStrength();
+            check(worn > 0.0F, "the shield wore");
+            check(hurt < ThanosConfig.SLAM_DAMAGE.get() * 0.5, "and took most of it away: she lost " + hurt + " of " + ThanosConfig.SLAM_DAMAGE.get());
+            return true;
+        });
+    }
+
+    /** A Vision phased through everything is out of reach of every stone: the Blast passes him, the Transmute and the Drain have no target. */
+    @GameTest(template = ARENA, batch = "thanos_hero_phased", timeoutTicks = 60)
+    public static void aPhasedVisionCannotBeTouchedByAnyStone(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer thanos = thanos(f, 2.5, 10.5);
+        ServerPlayer vision = f.player(8.5, FLOOR, 10.5, Power.VISION);
+        Powers.get(vision).setVisionPhased(true);
+        Zombie behind = zombie(helper, 14.5, 10.5);
+        float health = vision.getHealth();
+        TestKit.sentPackets(thanos);
+        press(thanos, 1);
+        check(vision.getHealth() == health, "the Blast passes through him");
+        assertNear(lost(behind), ThanosConfig.POWER_BLAST_DAMAGE.get(), 0.01, "and finds what is behind");
+        behind.discard();
+        press(thanos, 3);
+        pressSneaking(thanos, 2);
+        AbilityHandler.onKey(thanos, 4, true);
+        check(!Powers.get(thanos).is(Live.SOUL_DRAINING), "there is nothing to drain");
+        check(!vision.hasEffect(ModEffects.PETRIFIED), "and nothing to turn to stone");
+        helper.succeed();
     }
 
     // ------------------------------------------------------------------------------------------------------------
