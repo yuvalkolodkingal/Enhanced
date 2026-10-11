@@ -11,17 +11,22 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 /**
- * Ultron's own game-bus events, at the priorities of {@code docs/3.0-fragments/README.md}: the damage bonuses (lightning,
- * the Mind Stone beam), the body's own pipeline of a blow, and the fighters who fall. (The rest of what the fight needs
- * is in the entities and the fight, or is the framework's.)
+ * Ultron's own game-bus events, at the priorities of {@code docs/3.0-fragments/README.md}: the damage bonuses
+ * (lightning, the Mind Stone beam), the body's own pipeline of a blow, the fighters who fall, and what the hero's body
+ * does about it: no fall damage, no Poison or Wither, and Second Life. (The rest of what the fight needs is in the
+ * entities and the fight, or is the framework's; the hero's five abilities are {@code UltronAbilities}.)
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class UltronEvents {
@@ -43,6 +48,52 @@ public final class UltronEvents {
             event.setAmount(event.getAmount() * UltronConfig.LIGHTNING_FACTOR.get().floatValue());
         } else if (robot && event.getSource().is(ModDamageTypes.MIND_STONE_BEAM)) {
             event.setAmount(event.getAmount() * UltronBossConfig.VISION_BEAM_BONUS.get().floatValue());
+        } else if (hero && event.getSource().is(DamageTypeTags.IS_FALL) && !event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            // The anti-gravity palms catch him.
+            event.setCanceled(true);
+        }
+    }
+
+    /** HIGH: a machine takes no Poison and no Wither. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onEffectApplicable(MobEffectEvent.Applicable event) {
+        if (event.getEntity() instanceof ServerPlayer player && Powers.is(player, Power.ULTRON)
+                && (event.getEffectInstance().is(MobEffects.POISON) || event.getEffectInstance().is(MobEffects.WITHER))) {
+            event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+        }
+    }
+
+    /**
+     * HIGH, after vanilla's Totem of Undying (which runs inside the blow): the hero's Second Life. If it saves him the
+     * death is cancelled, and nothing that follows a death ({@code CommonEvents}, the fight's fallen fighter) hears of
+     * it.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onSecondLife(LivingDeathEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && Powers.is(player, Power.ULTRON) && UltronDrones.secondLife(player, event.getSource())) {
+            event.setCanceled(true);
+        }
+    }
+
+    /**
+     * A blow that landed. What the hero struck himself (not his drones' bolts and punches, which are his in everything
+     * else) is what his drones go for next; and a player who hurt him, or a drone of his, is fair game for them for a
+     * while (when PvP allows it).
+     */
+    @SubscribeEvent
+    public static void onDamaged(LivingDamageEvent.Post event) {
+        LivingEntity victim = event.getEntity();
+        Entity cause = event.getSource().getEntity();
+        if (cause instanceof ServerPlayer hero && hero != victim && Powers.is(hero, Power.ULTRON) && !UltronDrones.isDroneBlow(event.getSource())
+                && !(victim instanceof UltronSentryEntity sentry && hero.getUUID().equals(sentry.getOwnerUUID()))) {
+            hero.setLastHurtMob(victim);
+        }
+        if (cause instanceof ServerPlayer attacker) {
+            ServerPlayer hero = victim instanceof ServerPlayer player && Powers.is(player, Power.ULTRON) ? player
+                    : victim instanceof UltronSentryEntity sentry && sentry.getOwner() instanceof ServerPlayer owner ? owner : null;
+            if (hero != null && hero != attacker) {
+                UltronDrones.provoke(hero, attacker);
+            }
         }
     }
 

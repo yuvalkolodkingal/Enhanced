@@ -56,8 +56,46 @@ public record UltronFxPayload(int kind, int entityId, Vec3 at, Vec3 to, float ra
     public static final int DEATH = 14;
     /** The boss's eyes flash or the Core pulses: a short glow on {@code entityId} for {@code ticks}. */
     public static final int PULSE = 15;
-    /** The hero's effects (the Pull and Slam rings, the Upload's motes, the drones' assembling) start here; the hero stage lists them. */
+    /**
+     * The hero's effects start here (the Pull and Slam rings, the Upload's motes, the drones' assembling, the Hack).
+     */
     public static final int HERO = 32;
+    /**
+     * Gravity Slam: a ring of pale-blue anti-gravity motes runs out from {@code at} (his feet) to {@code radius} (7)
+     * over {@code ticks} (10), with a ring of dust (the block under him) and a puff at the middle. Flat on the ground;
+     * it does not move.
+     */
+    public static final int GRAVITY_SLAM = HERO;
+    /**
+     * Gravity Pull: pale-blue motes run inward along the line from {@code to} (the target) to {@code at} (his palm) for
+     * {@code ticks} (8), and a short ring contracts round the target; {@code entityId} is the hero (the palm rises).
+     */
+    public static final int GRAVITY_PULL = HERO + 1;
+    /**
+     * Overcharge: the heavy blast leaves the raised palm at {@code at} along {@code to} (a unit vector): a white-orange
+     * flash {@code radius} (2) across and a short cone of sparks. {@code entityId} is the hero.
+     */
+    public static final int OVERCHARGE_FLASH = HERO + 2;
+    /**
+     * A burst of the network palette (white and red square motes, scanline streaks) {@code radius} blocks across at
+     * {@code at}: both ends of an Upload, Second Life and a Sentry that is taken apart into data. {@code ticks} is 10.
+     */
+    public static final int NETWORK_FLASH = HERO + 3;
+    /**
+     * A drone assembles: sparks gather into a Sentry-sized silhouette at {@code at} over {@code ticks} (20), blue
+     * turning red; {@code entityId} is the Sentry that is forming (or -1).
+     */
+    public static final int DRONE_ASSEMBLE = HERO + 4;
+    /**
+     * The Hack reaches out: data motes run from the hero's open hand ({@code entityId}) to the Sentry at {@code to} for
+     * {@code ticks} (20) while the Sentry's eyes flicker blue, white and red; {@code at} is the hand.
+     */
+    public static final int HACK_BEAM = HERO + 5;
+    /**
+     * The hero tells his drones what to do: a pale ring of motes at {@code at} (the creature they are sent to, or the
+     * hero's own feet when they gather) {@code radius} (1.5) across for {@code ticks} (10).
+     */
+    public static final int COMMAND_MARK = HERO + 6;
 
     public static final Type<UltronFxPayload> TYPE = new Type<>(Enhanced.id("ultron_fx"));
 

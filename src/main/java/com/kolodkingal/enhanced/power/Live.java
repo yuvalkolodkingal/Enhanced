@@ -70,7 +70,7 @@ public enum Live {
     SOUL_SIGHT,
 
     // ===== ultron =====
-    /** Ultron charges his repulsors (R is held). */
+    /** Ultron builds the Overcharge: a palm raised and glowing, trembling, for the 15 ticks before the blast (Sneak + R). */
     ULTRON_CHARGING,
     /**
      * Sokovia carries this player into the sky: they can't move on their own, like a pinned player (any player in the

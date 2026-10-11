@@ -25,6 +25,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -143,6 +144,9 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
 
     @Override
     public void tick() {
+        if (!level().isClientSide && !isRemoved() && overlapping()) {
+            return;
+        }
         super.tick();
         if (level().isClientSide || isRemoved()) {
             return;
@@ -156,6 +160,26 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
             spark(server, position());
             discard();
         }
+    }
+
+    /**
+     * Whether the bolt starts this tick already touching a creature it can hit, and hits it. The game looks for what a
+     * projectile hits along its way and, at 2.6 blocks a tick, a creature that moves into the bolt's last position (a
+     * knocked-back zombie, one walking at it) is inside the margin round it at the start of the segment, so that the
+     * line enters nothing and the bolt flies through. Plasma does not.
+     */
+    private boolean overlapping() {
+        AABB probe = getBoundingBox().inflate(0.3);
+        for (Entity target : level().getEntities(this, probe, this::canHitEntity)) {
+            EntityHitResult hit = new EntityHitResult(target, position());
+            if (!EventHooks.onProjectileImpact(this, hit)) {
+                hitTargetOrDeflectSelf(hit);
+            }
+            if (isRemoved()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** The one the bolt is fought for: the player behind a drone's bolt, otherwise whoever fired it. */

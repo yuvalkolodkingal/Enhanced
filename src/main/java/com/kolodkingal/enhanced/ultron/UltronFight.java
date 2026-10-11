@@ -815,11 +815,19 @@ public final class UltronFight extends BossFight {
 
     /** Whether a Vision (or White Vision) stands within {@code visionCutRange} of the point: the film's hack. */
     public boolean visionNear(Vec3 at) {
+        return visionNear(level(), at);
+    }
+
+    /**
+     * Whether a Vision (or White Vision) of this level stands within {@code visionCutRange} of the point. The boss's
+     * uploads and the hero's (Upload, Hack and Second Life) are cut by the same rule.
+     */
+    public static boolean visionNear(ServerLevel level, Vec3 at) {
         double range = UltronConfig.VISION_CUT_RANGE.get();
         if (range <= 0.0) {
             return false;
         }
-        for (ServerPlayer player : level().players()) {
+        for (ServerPlayer player : level.players()) {
             if (player.isAlive() && !player.isSpectator() && Powers.is(player, Power.VISION) && player.position().distanceToSqr(at) <= range * range) {
                 return true;
             }

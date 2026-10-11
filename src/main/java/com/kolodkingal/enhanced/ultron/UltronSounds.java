@@ -40,7 +40,9 @@ public enum UltronSounds {
     /** A Sentry or drone destroyed. */
     SENTRY_DEATH(() -> SoundEvents.IRON_GOLEM_DEATH, 0.9F, 1.5F),
     /** A hit of the Punch. */
-    PUNCH(() -> SoundEvents.IRON_GOLEM_ATTACK, 1.2F, 0.6F);
+    PUNCH(() -> SoundEvents.IRON_GOLEM_ATTACK, 1.2F, 0.6F),
+    /** The hero's Overcharge: a rising whine, then a boom. */
+    OVERCHARGE(() -> SoundEvents.WARDEN_SONIC_CHARGE, 1.2F, 1.5F);
 
     private final Supplier<SoundEvent> event;
     private final float volume;
@@ -64,6 +66,11 @@ public enum UltronSounds {
 
     /** Plays it with the volume and pitch scaled. */
     public void play(ServerLevel level, Vec3 at, float volumeScale, float pitchScale) {
-        level.playSound(null, at.x, at.y, at.z, event.get(), SoundSource.HOSTILE, volume * volumeScale, pitch * pitchScale);
+        play(level, at, SoundSource.HOSTILE, volumeScale, pitchScale);
+    }
+
+    /** Plays it in the given sound category (the hero's voices are the players'). */
+    public void play(ServerLevel level, Vec3 at, SoundSource source, float volumeScale, float pitchScale) {
+        level.playSound(null, at.x, at.y, at.z, event.get(), source, volume * volumeScale, pitch * pitchScale);
     }
 }
