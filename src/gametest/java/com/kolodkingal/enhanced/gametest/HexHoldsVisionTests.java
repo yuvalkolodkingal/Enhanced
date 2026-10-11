@@ -523,6 +523,33 @@ public final class HexHoldsVisionTests {
         });
     }
 
+    @GameTest(template = ARENA, batch = "hex_holds_floor")
+    public static void leaningOnTheWallDoesNotSinkHimIntoTheFloor(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = raiseHex(f);
+        ServerPlayer vision = f.player(CENTER, FLOOR, 5.0, Power.VISION);
+        vision.setHealth(vision.getMaxHealth());
+        double floor = abs(helper, CENTER, FLOOR, 5.0).y;
+        double wallZ = abs(helper, CENTER, FLOOR, 1.0).z;
+
+        f.everyTick(26, tick -> {
+            if (tick >= 2 && tick <= 20 && tick % 2 == 0) {
+                // Holding the key down: his client has moved him past the wall before the tick starts, so where he was
+                // last tick is already past the wall too (and the wall must put him back at the height he was).
+                vision.invulnerableTime = 0;
+                walkTo(vision, new Vec3(vision.getX(), vision.getY(), wallZ));
+                vision.setOldPosAndRot();
+            }
+            check(vision.getY() > floor - 1.0E-3, "thrown back at the wall, Vision sinks into the floor (tick " + tick + ", "
+                    + (vision.getY() - floor) + " blocks)");
+            if (tick == 24) {
+                check(inside(f, wanda, vision), "and he is held inside all the while");
+                return true;
+            }
+            return false;
+        });
+    }
+
     private HexHoldsVisionTests() {
     }
 }
