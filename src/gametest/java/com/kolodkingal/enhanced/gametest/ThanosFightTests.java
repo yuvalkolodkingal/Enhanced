@@ -225,6 +225,27 @@ public final class ThanosFightTests {
         helper.succeed();
     }
 
+    /** The stones' effects do not take on a boss, but they take on a zombie. */
+    @GameTest(template = ARENA, batch = "thanos_fight_spellbound", timeoutTicks = 40)
+    public static void spellboundImmuneCreaturesShakeOffTheStones(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        ServerLevel level = f.level();
+        ServerPlayer a = fighter(f, 6, 6);
+        ThanosEntity boss = boss(f, a);
+        net.minecraft.world.entity.boss.wither.WitherBoss wither = EntityType.WITHER.create(level);
+        wither.setNoAi(true);
+        wither.moveTo(ThanosMoveSupport.spot(f, -6, FLOOR, -6));
+        level.addFreshEntity(wither);
+        check(!com.kolodkingal.enhanced.thanos.StonePowers.petrify(level, boss, wither, 60) && !wither.hasEffect(ModEffects.PETRIFIED),
+                "a Wither is not turned to stone");
+        check(!wither.addEffect(new MobEffectInstance(ModEffects.TIME_LOCKED, 80)) && !wither.addEffect(new MobEffectInstance(ModEffects.SOULWORLD, 80)),
+                "nor locked in time, nor taken to the Soul World");
+        wither.discard();
+        net.minecraft.world.entity.monster.Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
+        check(com.kolodkingal.enhanced.thanos.StonePowers.petrify(level, boss, zombie, 60) && zombie.hasEffect(ModEffects.PETRIFIED), "a zombie is");
+        helper.succeed();
+    }
+
     /** A slam of Wanda's tears a plate away, but only once in six seconds. */
     @GameTest(template = ARENA, batch = "thanos_fight_slam", timeoutTicks = 40)
     public static void aTelekineticSlamTearsAPlateOnceInSixSeconds(GameTestHelper helper) {

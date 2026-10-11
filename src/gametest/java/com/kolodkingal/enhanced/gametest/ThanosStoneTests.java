@@ -210,7 +210,8 @@ public final class ThanosStoneTests {
         ServerPlayer onGround = fighter(f, 5, 0);
         ServerPlayer jumper = fighter(f, -5, 0);
         ThanosEntity boss = boss(f, onGround, 1);
-        Vec3 high = ThanosMoveSupport.spot(f, -5, FLOOR + 3.0, 0);
+        // (A block and a half up: well above the half a block the ring reaches, and inside the box it looks for creatures in.)
+        Vec3 high = ThanosMoveSupport.spot(f, -5, FLOOR + 1.5, 0);
         jumper.teleportTo(f.level(), high.x, high.y, high.z, 0.0F, 0.0F);
         boss.forceMove(ThanosMove.SHOCKWAVE, onGround);
         f.everyTick(60, t -> {

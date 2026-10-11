@@ -652,7 +652,6 @@ final class ThanosMoves {
             }
             ThanosEffects.shockRing(level, beam.end(), 3.0F, 6, color);
             level.sendParticles(ParticleTypes.EXPLOSION, beam.end().x, beam.end().y, beam.end().z, 1, 0, 0, 0, 0);
-            StonePowers.craterIfAllowed(level, boss, beam.end(), 0.0F);
         }
     }
 
