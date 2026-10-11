@@ -1,0 +1,59 @@
+package com.kolodkingal.enhanced.client.render;
+
+import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
+
+/**
+ * Whose shield the client draws, and how: the Scarlet Witch's Chaos Shield, and the shield of any hero whose {@link
+ * HeroClient#shieldStyle} says one. Used by the world renderer, which draws the dome of every player whose shield is
+ * up.
+ */
+public final class ShieldStyles {
+    /** The Chaos Shield: a translucent crimson dome with a hot pink rim. */
+    public static final ShieldStyle CHAOS_SHIELD = new ShieldStyle(0xC72D4B, Power.SCARLET_WITCH.color,
+            Enhanced.id("textures/entity/hex_wall.png"), (float) WandaAbilities.SHIELD_RADIUS, WandaAbilities::maxShieldStrength,
+            WandaAbilities::maxShieldTicks);
+
+    /** The style of this power's shield, or null if it raises none. */
+    @Nullable
+    public static ShieldStyle of(Power power) {
+        if (power == Power.SCARLET_WITCH) {
+            return CHAOS_SHIELD;
+        }
+        HeroClient hero = HeroClients.of(power);
+        return hero == null ? null : hero.shieldStyle();
+    }
+
+    /**
+     * The HUD line of a hero's shield: "forming" while it grows, then what is left of its strength (green, then yellow,
+     * then red as it wears down) and the seconds it can still be held; null while there is no shield (the cooldown then
+     * shows instead). Kept here, with no client class in it, so that it can be tested like the rest of the shield.
+     *
+     * @param max      the strength a fresh shield of this hero has
+     * @param maxTicks how long a complete shield of this hero can be held
+     */
+    @Nullable
+    public static Component hudLine(PowerData data, long now, float max, int maxTicks) {
+        if (!data.chaosShieldActive()) {
+            return null;
+        }
+        if (!data.chaosShieldUp(now)) {
+            return Component.translatable("hud.enhanced.shield_forming").withStyle(ChatFormatting.GOLD);
+        }
+        float left = data.shieldStrength();
+        ChatFormatting color = left > max * 0.5F ? ChatFormatting.GREEN : left > max * 0.25F ? ChatFormatting.YELLOW : ChatFormatting.RED;
+        double seconds = Math.max(0, data.shieldFormedAt() + maxTicks - now) / 20.0;
+        return Component.translatable("hud.enhanced.shield_strength", (int) Math.ceil(left), (int) Math.ceil(max)).withStyle(color)
+                .append(Component.literal(String.format(Locale.ROOT, "  %.1fs", seconds)).withStyle(ChatFormatting.GRAY));
+    }
+
+    private ShieldStyles() {
+    }
+}

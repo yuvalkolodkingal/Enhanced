@@ -44,6 +44,16 @@ public interface HeroClient {
     // ---- the body ----
 
     /**
+     * How this hero's energy shield is drawn, or null if it raises none. The shield is the one in {@code PowerData}
+     * ({@code chaosShieldActive}, {@code shieldFormedAt}, {@code shieldStrength}); the world renderer draws the dome of
+     * every player whose power says a style, and the hero's HUD line is {@link PowerHud#shield}.
+     */
+    @Nullable
+    default ShieldStyle shieldStyle() {
+        return null;
+    }
+
+    /**
      * The mask of the glowing eyes for this player right now, or null: a texture the size of the skin (see
      * GlowingEyesLayer).
      */
