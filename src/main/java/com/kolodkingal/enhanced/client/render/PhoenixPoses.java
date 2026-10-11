@@ -21,8 +21,8 @@ final class PhoenixPoses {
     /**
      * Her telekinesis in an open, steady palm with the other hand raised a little (elegant, where the shared row is the
      * claw of the films; this runs after it, so it wins), and the V of arms thrown up and out that gathers the Burst:
-     * trembling, the head thrown back, the legs hanging. While the gesture that starts the charge or lets it go plays, it
-     * carries the head itself, so the stance gives its head up by the weight of the gesture.
+     * trembling, the head thrown back, the legs hanging. While the gesture that starts the charge or lets it go plays,
+     * it carries the head itself, so the stance gives its head up by the weight of the gesture.
      */
     static void aimed(PoseContext c) {
         HeroAnimState st = c.st;

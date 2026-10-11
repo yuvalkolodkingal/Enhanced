@@ -12,20 +12,25 @@ import static com.kolodkingal.enhanced.client.render.Gestures.Target.LOOK;
 import static com.kolodkingal.enhanced.client.render.Gestures.define;
 
 /**
- * The keys of the Phoenix's gestures (DESIGN section 13): the unfurling of her wings at take-off, the grab and the throw
- * of her telekinesis, the two fingers to the temple of Mind Reading, the ripple of Mind Sense, the cast of Mind Control,
- * the push of the Psionic Field, and the V of arms that gathers the Burst and the scream that lets it go. Telepathy is
- * done with the head and the hands near it, the fire with the whole body thrown open: a glance at her arms tells which of
- * the two she is using.
+ * The keys of the Phoenix's gestures (DESIGN section 13): the unfurling of her wings at take-off, the grab and the
+ * throw of her telekinesis, the two fingers to the temple of Mind Reading, the ripple of Mind Sense, the cast of Mind
+ * Control, the push of the Psionic Field, and the V of arms that gathers the Burst and the scream that lets it go.
+ * Telepathy is done with the head and the hands near it, the fire with the whole body thrown open: a glance at her arms
+ * tells which of the two she is using.
  *
  * <p>The poses the gestures hand over to are here too ({@link #CHARGE_M}, {@link #CHARGE_O}), because the stance row
- * ({@link PhoenixPoses}) and the last key of {@link GestureId#PHOENIX_CHARGE_START} must be the same numbers. No Minecraft
- * client imports: the tables, and {@link #predicted}, are checked by the game tests.
+ * ({@link PhoenixPoses}) and the last key of {@link GestureId#PHOENIX_CHARGE_START} must be the same numbers. No
+ * Minecraft client imports: the tables, and {@link #predicted}, are checked by the game tests.
  */
 public final class PhoenixGestures {
-    /** The arms of the charge stance: thrown up and out in a V (the pose the charge gesture hands over to). */
-    public static final float[] CHARGE_M = {-150, 0, 52};
-    public static final float[] CHARGE_O = {-150, 0, -52};
+    /**
+     * The arms of the charge stance: thrown up and out in a V, a little forward (the pose the charge gesture hands over
+     * to). An arm that points up is tipped outward by a z of the other sign than a hanging one, so the V is written as
+     * the arm swung wide in the frontal plane (135 degrees from hanging, 45 from vertical), not as -150 and +52, which
+     * crosses the arms above the head.
+     */
+    public static final float[] CHARGE_M = {-30, 0, 135};
+    public static final float[] CHARGE_O = {-30, 0, -135};
     /** How far the head is thrown back and the body leans (degrees) in the charge. */
     public static final float CHARGE_HEAD = -14;
     public static final float CHARGE_LEAN = -4;
@@ -121,10 +126,11 @@ public final class PhoenixGestures {
     // ---- What the key presses start, before the server has answered ----
 
     /**
-     * The gesture the local Phoenix's own key press starts at once, or null: N (the Burst) when the Burst is rested, she
-     * is fed and not already charging; B (Mind Control, not Sneak + B) when it is rested and she has a mind in her
-     * sight. The two guards are told by the caller ({@code fed}, {@code mindInSight}), because only a client can see them;
-     * the server's refusals (a boss, a Spectator) cannot be seen, and then the gesture plays out and costs nothing.
+     * The gesture the local Phoenix's own key press starts at once, or null: N (the Burst) when the Burst is rested,
+     * she is fed and not already charging; B (Mind Control, not Sneak + B) when it is rested and she has a mind in her
+     * sight. The two guards are told by the caller ({@code fed}, {@code mindInSight}), because only a client can see
+     * them; the server's refusals (a boss, a Spectator) cannot be seen, and then the gesture plays out and costs
+     * nothing.
      */
     @Nullable
     public static GestureId predicted(PowerData data, int ability, long now, boolean sneaking, boolean fed, boolean mindInSight) {
@@ -138,8 +144,8 @@ public final class PhoenixGestures {
     }
 
     /**
-     * How much a gesture that carries the V of the charge in its own keys is playing now (0 to 1): the stance's head and
-     * lean are given up by this much, because the gesture's head and lean are added to the stance's and the V would
+     * How much a gesture that carries the V of the charge in its own keys is playing now (0 to 1): the stance's head
+     * and lean are given up by this much, because the gesture's head and lean are added to the stance's and the V would
      * otherwise be thrown back twice as far while the one hands over to the other.
      */
     public static float owningTheV(HeroAnimState st) {

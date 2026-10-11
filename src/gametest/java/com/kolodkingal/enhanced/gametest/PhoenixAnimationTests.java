@@ -68,6 +68,20 @@ public final class PhoenixAnimationTests {
         }
     }
 
+    /**
+     * Where the tip of an arm points, as the model draws it: the unit vector (0, 1, 0) along the arm turned by x about
+     * the side axis, then y about the vertical, then z about the front-back axis (the order of the model part), in the
+     * model's space: +x is the player's left, +y down, -z forward. Degrees.
+     */
+    private static double[] tip(float[] pose) {
+        double x = Math.toRadians(pose[0]);
+        double y = Math.toRadians(pose[1]);
+        double z = Math.toRadians(pose[2]);
+        double[] v = {0.0, Math.cos(x), Math.sin(x)};
+        v = new double[]{v[0] * Math.cos(y) + v[2] * Math.sin(y), v[1], -v[0] * Math.sin(y) + v[2] * Math.cos(y)};
+        return new double[]{v[0] * Math.cos(z) - v[1] * Math.sin(z), v[0] * Math.sin(z) + v[1] * Math.cos(z), v[2]};
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // The gestures
 
@@ -184,6 +198,31 @@ public final class PhoenixAnimationTests {
             assertNear(pose(last(burst.o))[i], profile.anchor(FlightProfile.HOVER, 3 + i), 0.5, "and the off arm " + i);
         }
         assertNear(burst.head.value(burst.head.size() - 1)[0], 0.0, 1.0E-4, "with the head straight");
+        helper.succeed();
+    }
+
+    /**
+     * The V of the charge really is a V: each arm points up and out (the right arm toward -x, the left toward +x) and a
+     * little forward, and the two arms do not cross. An arm that points up is tipped outward by a z of the other sign
+     * than a hanging one, so the first numbers of the design (-150 and +52) crossed them above the head: this keeps
+     * that out.
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theVOfTheChargeThrowsHerArmsUpAndOutAndDoesNotCrossThem(GameTestHelper helper) {
+        double[] m = tip(PhoenixGestures.CHARGE_M);
+        double[] o = tip(PhoenixGestures.CHARGE_O);
+        check(-m[1] > 0.4 && -o[1] > 0.4, "both arms point up (" + -m[1] + ", " + -o[1] + ")");
+        check(-m[0] > 0.4, "the right arm points out, to the right (" + -m[0] + ")");
+        check(o[0] > 0.4, "the left arm points out, to the left (" + o[0] + ")");
+        check(m[2] < -0.2 && o[2] < -0.2, "a little forward, as the gesture of the burst (" + m[2] + ")");
+        assertNear(m[0], -o[0], 1.0E-6, "the arms are mirrors of each other");
+        // The Burst throws it wider still: the arms level with the shoulders, to the sides.
+        Gestures.Def burst = Gestures.get(GestureId.PHOENIX_BURST);
+        double[] open = tip(pose(burst.m.get(2)));
+        check(-open[0] > 0.95 && Math.abs(open[1]) < 0.35, "at the scream the arms are level and out (" + -open[0] + ", " + open[1] + ")");
+        // And so does the gathering, on its way: out to the sides at tick 6, rising to the V.
+        double[] gather = tip(arm(GestureId.PHOENIX_CHARGE_START, true, 6));
+        check(-gather[0] > 0.4, "at tick 6 the arms sweep out (" + -gather[0] + ")");
         helper.succeed();
     }
 

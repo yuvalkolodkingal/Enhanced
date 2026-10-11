@@ -73,9 +73,9 @@ final class PhoenixActing {
     // ---- first person ----
 
     /**
-     * Her hands at the edges of the screen: the V of the charge (up and in, trembling), a hand up near the temple for the
-     * gestures of the mind, both hands lifted and then pushed out for the Psionic Field, and thrown wide for the Burst. Where a
-     * gesture carries the V itself the stance's row gives way by its weight, as the stance's head does.
+     * Her hands at the edges of the screen: the V of the charge (up and in, trembling), a hand up near the temple for
+     * the gestures of the mind, both hands lifted and then pushed out for the Psionic Field, and thrown wide for the
+     * Burst. Where a gesture carries the V itself the stance's row gives way by its weight, as the stance's head does.
      */
     static void firstPerson(HeroAnimState s, LocalPlayer player, FirstPersonArms.Offset m, FirstPersonArms.Offset o) {
         float age = (float) s.time;
