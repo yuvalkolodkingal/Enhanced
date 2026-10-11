@@ -1,5 +1,8 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.ability.HeroServer;
+import com.kolodkingal.enhanced.ability.HeroServers;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -58,6 +61,23 @@ public final class TestKit {
     public static Fixture fixture(GameTestHelper helper) {
         Fixture fixture = new Fixture(helper);
         helper.testInfo.addListener(fixture);
+        return fixture;
+    }
+
+    /**
+     * A fixture for a test of a boss fight, or of anything that keeps server-wide state from one tick to the next (the
+     * boss registry, the rewards waiting to be handed over, the heroes' static maps): when the test ends, pass or fail,
+     * it clears them, so a fight left over from one test never reaches the next. A boss test also has a batch of its
+     * own ({@code @GameTest(batch = ...)}), so no other test runs while it does.
+     */
+    public static Fixture bossFixture(GameTestHelper helper) {
+        Fixture fixture = fixture(helper);
+        fixture.onClose(() -> {
+            BossFights.clear();
+            for (HeroServer hero : HeroServers.all()) {
+                hero.onServerStopped();
+            }
+        });
         return fixture;
     }
 
@@ -134,6 +154,11 @@ public final class TestKit {
             boolean old = server.isPvpAllowed();
             server.setPvpAllowed(allowed);
             undo.add(() -> server.setPvpAllowed(old));
+        }
+
+        /** Runs {@code action} when the test ends, pass or fail (before what was registered earlier is undone). */
+        public void onClose(Runnable action) {
+            undo.add(action);
         }
 
         /** Runs {@code step} once per tick for ticks 1..{@code lastTick}. Returning true ends the test successfully. */
