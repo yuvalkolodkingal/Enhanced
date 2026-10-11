@@ -1177,6 +1177,32 @@ public final class SpiderManTests {
         }
     }
 
+    /** The position of a hero on a slow client or a hitching connection comes in steps of several ticks at once. */
+    @GameTest(template = ARENA, batch = "spider_zip_hitch", timeoutTicks = 100)
+    public static void aHitchDoesNotEndAZip(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(SpiderConfig.ZIP_COOLDOWN, 0);
+        // His position is held for four ticks, then the movement of four ticks arrives at once.
+        ServerPlayer held = zipping(f, helper);
+        Vec3 stand = SpiderServer.zipStand(held);
+        for (int i = 0; i < 4; i++) {
+            PowerTicker.tick(held);
+        }
+        Vec3 toward = stand.subtract(held.position()).normalize().scale(5.5);
+        held.absMoveTo(held.getX() + toward.x, held.getY() + toward.y, held.getZ() + toward.z);
+        PowerTicker.tick(held);
+        check(data(held).is(Live.ZIPPING), "a step of 5.5 blocks after four held ticks is a hitch, not a jump");
+        // A step is no more than twice the step before it, and more than that is a jump.
+        ServerPlayer slow = zipping(f, helper);
+        Vec3 first = SpiderServer.zipStand(slow).subtract(slow.position()).normalize().scale(2.5);
+        slow.absMoveTo(slow.getX() + first.x, slow.getY() + first.y, slow.getZ() + first.z);
+        PowerTicker.tick(slow);
+        slow.absMoveTo(slow.getX() + first.x * 2.0, slow.getY() + first.y * 2.0, slow.getZ() + first.z * 2.0);
+        PowerTicker.tick(slow);
+        check(data(slow).is(Live.ZIPPING), "a step of twice the step before it is a client that was slow for a tick");
+        helper.succeed();
+    }
+
     @GameTest(template = ARENA, batch = "spider_zip_ends_when_it_should", timeoutTicks = 200)
     public static void aZipEndsWhenItShould(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);

@@ -114,6 +114,12 @@ public final class SpiderServer implements HeroServer {
     /** A swing on the ground this many ticks in a row is let go (counted after its first ticks). */
     private static final int SWING_GROUND_TICKS = 10;
     private static final int SWING_GRACE = 10;
+    /**
+     * A step may be this many blocks longer for each tick before it that his position was held (he is no faster than that),
+     * for up to {@link #HITCH_TICKS} ticks (and twice the step before it, which a slow client makes by catching up).
+     */
+    private static final double HITCH_STEP = 1.6;
+    private static final int HITCH_TICKS = 12;
     /** What the cling's flag outlives the contact by. */
     private static final int CLING_HYSTERESIS = 4;
     /** A jump's rise slows to nothing in about this many ticks; hanging in the air before then is no cling. */
@@ -832,9 +838,17 @@ public final class SpiderServer implements HeroServer {
         if (blocked(player, Powers.get(player))) {
             return 3;
         }
-        if (position.distanceTo(line.last) > 3.0) {
+        // A hitch of the connection or of the server (ticks run in a burst to catch up), or a client slower than the server,
+        // gives his position in steps of several ticks at once: a step is a jump only beyond what the ticks it was held
+        // could hold, and twice the step before it.
+        double step = position.distanceTo(line.last);
+        if (step > 3.0 + HITCH_STEP * Math.min(line.still, HITCH_TICKS) + 2.0 * line.lastStep) {
             return 1;
         }
+        boolean held = Math.hypot(position.x - line.last.x, position.z - line.last.z) < 0.05
+                && Math.abs(position.y - line.last.y) < 0.2;
+        line.still = held ? line.still + 1 : 0;
+        line.lastStep = held ? 0.0 : step;
         if (needsBlock) {
             BlockPos behind = BlockPos.containing(line.anchor.subtract(new Vec3(line.face.getStepX(), line.face.getStepY(), line.face.getStepZ()).scale(0.1)));
             BlockState state = player.serverLevel().getBlockState(behind);
@@ -943,6 +957,12 @@ public final class SpiderServer implements HeroServer {
         data.set(Live.CLINGING_CEILING, active && state.surface.kind() == SpiderClimb.Kind.CEILING);
         if (active) {
             keepAloft(player);
+            // His own client moves him: the server's copy of him must not gather a fall of its own between two positions
+            // (it would sag him off the ceiling, and the next position would look like a climb).
+            Vec3 motion = player.getDeltaMovement();
+            if (motion.y < 0.0) {
+                player.setDeltaMovement(motion.x, 0.0, motion.z);
+            }
             if (state.moving) {
                 player.causeFoodExhaustion(SpiderConfig.CRAWL_EXHAUSTION.get().floatValue());
             }

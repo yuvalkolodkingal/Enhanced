@@ -30,6 +30,10 @@ final class SpiderState {
         /** The nearest he has been to {@link #stand} (a zip). */
         double nearest = Double.MAX_VALUE;
         boolean moved;
+        /** The ticks in a row his position has hardly changed (a hitch holds it, see {@code lineEnd}). */
+        int still;
+        /** The length of the last step he made (not counting the ticks it was held). */
+        double lastStep;
         int stalled;
         int groundTicks;
 
