@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
@@ -26,7 +27,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -378,13 +378,13 @@ public final class WandaAbilities {
      * bee's sting and Quicksilver's blitz. Whatever is thrown, shot or cast (arrows, fireballs, beams, magic and
      * potions, a Guardian's laser, a Warden's sonic boom), whatever explodes, and the world's own harm (falling,
      * starving, fire, the void, {@code /kill}) are not melee.
+     *
+     * <p>Which damage types are blows is the data-driven tag {@code enhanced:melee_blows} (the vanilla creature attack,
+     * sting and player attack, the speed blitz, and the blows of the heroes and villains of 3.0).
      */
     public static boolean isMeleeHit(DamageSource source) {
         Entity attacker = source.getDirectEntity();
-        return attacker instanceof LivingEntity && attacker == source.getEntity()
-                && (source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO)
-                || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.STING)
-                || source.is(ModDamageTypes.SPEED_BLITZ));
+        return attacker instanceof LivingEntity && attacker == source.getEntity() && source.is(ModTags.MELEE_BLOWS);
     }
 
     /**

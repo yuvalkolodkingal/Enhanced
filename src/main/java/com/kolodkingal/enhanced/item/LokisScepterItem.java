@@ -2,24 +2,17 @@ package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.effect.ConfusedEffect;
-import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
-import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
-import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -28,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 
@@ -40,6 +34,10 @@ import java.util.List;
  * touches; that is too much, so a hit only confuses: a player gets Nausea and Slowness, a creature the
  * {@link ConfusedEffect confused} effect (the bosses shrug it off). Whenever the stone is touched or lands a blow it
  * sings with its own voice (see {@link InfinityStone}), and it hums softly for as long as someone holds the scepter.
+ * <p>
+ * What touching the stone does with another item in the other hand (the genes, the Synthezoid Core, Ultron's Core and
+ * Program, the Tesseract) is one table, {@link ScepterRituals}; this class only hands the use, and the five-second hold
+ * that calls the Mad Titan, over to it.
  */
 public class LokisScepterItem extends Item {
     public LokisScepterItem(Properties properties) {
@@ -60,62 +58,52 @@ public class LokisScepterItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack scepter = player.getItemInHand(hand);
         if (player instanceof ServerPlayer serverPlayer) {
-            touchMindStone(serverPlayer, hand);
+            if (ScepterRituals.useScepter(serverPlayer, hand, false)) {
+                // The Mad Titan is being called: five seconds of holding it.
+                player.startUsingItem(hand);
+                return InteractionResultHolder.consume(scepter);
+            }
         }
         player.getCooldowns().addCooldown(this, 20);
         return InteractionResultHolder.sidedSuccess(scepter, level.isClientSide());
     }
 
+    /** Sneak + use on a block with Ultron's Program in the other hand wakes Ultron; every other use is {@link #use}. */
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getPlayer() instanceof ServerPlayer player && ScepterRituals.useScepterOnBlock(player, context.getHand())) {
+            player.getCooldowns().addCooldown(this, 20);
+            return InteractionResult.sidedSuccess(context.getLevel().isClientSide());
+        }
+        return InteractionResult.PASS;
+    }
+
     /** The player touches the Mind Stone with their {@code scepterHand}; the other hand may hold the gene. */
     public static void touchMindStone(ServerPlayer player, InteractionHand scepterHand) {
-        ServerLevel level = player.serverLevel();
-        Power power = Powers.power(player);
-        if (power == Power.SCARLET_WITCH || power == Power.VISION) {
-            player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.recognizes").withStyle(ChatFormatting.GOLD), true);
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 1.0F);
-            InfinityStone.MIND.use(level, player.position(), InfinityStone.UNDER, 1.0F);
-            return;
-        }
+        ScepterRituals.useScepter(player, scepterHand, false);
+    }
 
-        InteractionHand otherHand = scepterHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
-        ItemStack gene = player.getItemInHand(otherHand);
-        if (gene.is(ModItems.SCARLET_WITCH_GENE.get())) {
-            if (power.hasPowers()) {
-                player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.already_powered").withStyle(ChatFormatting.GRAY), true);
-                return;
-            }
-            InfinityStone.MIND.use(level, player.position(), InfinityStone.UNDER, 1.0F);
-            ScarletWitchGeneItem.awaken(player, gene);
-            return;
-        }
+    // The five seconds that call the Mad Titan (with the Tesseract in the other hand): see ScepterRituals.
 
-        ItemStack core = player.getItemInHand(otherHand);
-        if (core.is(ModItems.SYNTHEZOID_CORE.get())) {
-            if (power.hasPowers()) {
-                player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.already_powered").withStyle(ChatFormatting.GRAY), true);
-                return;
-            }
-            core.consume(1, player);
-            InfinityStone.MIND.use(level, player.position(), InfinityStone.UNDER, 1.0F);
-            LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
-            if (bolt != null) {
-                bolt.moveTo(player.getX(), player.getY(), player.getZ());
-                bolt.setVisualOnly(true);
-                level.addFreshEntity(bolt);
-            }
-            Powers.awaken(player, Power.VISION);
-            return;
-        }
+    @Override
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+        return ScepterRituals.HOLD_TICKS;
+    }
 
-        // No gene or synthezoid body: the Mind Stone's energy is too much for an ordinary body. The stone sings lower
-        // and louder than it does for a friend.
-        InfinityStone.MIND.use(level, player.position(), 1.0F, 0.75F);
-        level.explode(player, player.getX(), player.getY() + 1.0, player.getZ(), 3.0F, Level.ExplosionInteraction.NONE);
-        if (player.isCreative() || player.isSpectator()) {
-            player.displayClientMessage(Component.translatable("message.enhanced.mind_stone.creative").withStyle(ChatFormatting.GRAY), true);
-            return;
-        }
-        player.hurt(ModDamageTypes.source(level, ModDamageTypes.MIND_STONE), 1.0E6F);
+    @Override
+    public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int remainingUseDuration) {
+        ScepterRituals.holdTick(entity, stack, remainingUseDuration);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
+        ScepterRituals.holdReleased(entity, stack);
+    }
+
+    @Override
+    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+        ScepterRituals.holdFinished(entity, stack);
+        return stack;
     }
 
     /** A melee hit that landed: whoever it hit is left confused. */

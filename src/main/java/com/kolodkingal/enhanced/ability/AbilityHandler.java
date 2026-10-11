@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import net.minecraft.server.level.ServerPlayer;
 
 /** Routes an ability key press/release from a client to the right hero. */
@@ -16,6 +17,10 @@ public final class AbilityHandler {
         if (ability < 1 || ability > PowerData.ABILITIES || (down && !player.isAlive())) {
             return;
         }
+        // Held in a cocoon of sand: the hands are covered. (A release still goes through, as above.)
+        if (down && player.hasEffect(ModEffects.ENTOMBED)) {
+            return;
+        }
         PowerData data = Powers.get(player);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down);
@@ -26,6 +31,8 @@ public final class AbilityHandler {
             case TOMMY -> TommyAbilities.onKey(player, data, ability, down);
             case LOKI -> LokiAbilities.onKey(player, data, ability, down);
             case THOR -> ThorAbilities.onKey(player, data, ability, down);
+            // The heroes of 3.0 are plug-ins (HeroServer): their keys are theirs.
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE -> HeroServers.onKey(player, data, ability, down);
             case NONE -> {
             }
         }

@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -57,6 +58,11 @@ public class TesseractItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player instanceof ServerPlayer serverPlayer) {
+            if (ScepterRituals.useTesseract(serverPlayer, hand)) {
+                // The Mad Titan is being called: five seconds of holding it (with Loki's Scepter in the other hand).
+                player.startUsingItem(hand);
+                return InteractionResultHolder.consume(stack);
+            }
             if (Powers.power(serverPlayer).hasPowers()) {
                 if (!jump(serverPlayer)) {
                     return InteractionResultHolder.fail(stack);
@@ -81,6 +87,29 @@ public class TesseractItem extends Item {
             }
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+    }
+
+    // The five seconds that call the Mad Titan (with Loki's Scepter in the other hand): see ScepterRituals.
+
+    @Override
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+        return ScepterRituals.HOLD_TICKS;
+    }
+
+    @Override
+    public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int remainingUseDuration) {
+        ScepterRituals.holdTick(entity, stack, remainingUseDuration);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
+        ScepterRituals.holdReleased(entity, stack);
+    }
+
+    @Override
+    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+        ScepterRituals.holdFinished(entity, stack);
+        return stack;
     }
 
     /**

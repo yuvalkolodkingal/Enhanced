@@ -145,7 +145,7 @@ public final class Teleports {
     }
 
     /** Whether moving the traveller to {@code target} would take them across a Hex wall (either way). */
-    private static boolean crossesHex(ServerLevel level, LivingEntity traveller, Vec3 target) {
+    public static boolean crossesHex(ServerLevel level, LivingEntity traveller, Vec3 target) {
         Vec3 from = traveller.position().add(0, traveller.getBbHeight() * 0.5, 0);
         Vec3 to = target.add(0, traveller.getBbHeight() * 0.5, 0);
         for (Hex hex : HexManager.data(level).hexes()) {
