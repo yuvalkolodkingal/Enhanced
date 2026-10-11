@@ -28,16 +28,26 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki and Thor) are on [Looks](Looks).
 
+## What's new in 2.3
+
+* **Bigger Mjolnir and Stormbreaker**, as in the films, and **Stormbreaker is a fifth stronger** than Mjolnir in everything they share: blows, throws and the lightning beam. See [Thor](Thor).
+* **The Chaos Shield stops blows up close too.** A blow that reaches a complete shield is stopped, wears the shield down and throws the attacker out. See [Scarlet Witch](Scarlet-Witch).
+* **The glowing eyes sit on the eyes** of every look of Wanda and Thor.
+* **Heroes' armour is hidden.** It still protects, but heroes are drawn without it, so you see the character. A client option brings it back. See [FAQ](FAQ#why-cant-i-see-my-armour).
+* **Thor's Love and Thunder look, redrawn** to match the film: navy, gold and black armour, long ash-blond hair swept back from a bare forehead, a full beard, a red cape. And a new look, **Love and Thunder, helmet**, with the winged helmet from the New Asgard fight. See [Looks](Looks).
+* **Vision can't leave Wanda's Hex**, unless he hurts her badly or defeats her. White Vision is held too, but never comes apart at the wall. See [Scarlet Witch](Scarlet-Witch#vision-cant-leave-your-hex).
+* **The Vision of the Hex.** When Wanda raises her Hex, a Vision appears and fights at her side; look at a creature and press **Z** to send him at it.
+* **The voices of the Infinity Stones.** The Space Stone sounds when the Tesseract is used, the Mind Stone when the Scepter is, and both hum quietly while you hold them.
+
 ## What's new in 2.2
 
 * **Everyone moves like the character on screen.** New poses for every hero, a flight of his own for every flier, every ability acted out (other players see it too), and trails, rings and wind behind flying heroes. See *Animations and effects* below.
-* **Thor's lightning beam.** Hold **V** and lightning pours from his hand, or from the head of Mjolnir or Stormbreaker: longer and twice as strong through Mjolnir, a fifth stronger still through Stormbreaker, stronger yet as the God of Thunder. See [Thor](Thor).
+* **Thor's lightning beam.** Hold **V** and lightning pours from his hand, or from the head of Mjolnir or Stormbreaker: longer and twice as strong through Mjolnir or Stormbreaker, stronger yet as the God of Thunder. See [Thor](Thor).
 * **Shatter Mjolnir.** **Sneak + R** and Mjolnir bursts into glowing pieces that strike his enemies, then fly back and make it whole in his hand again.
 * **Pin someone with Mjolnir.** **Sneak + right-click** a creature or player and Mjolnir pins them down until its owner lifts it.
 * **A harder Chaos Shield.** It takes 3/4 of a second to form, holds for 8 seconds, has 30 points of strength, shatters when those run out, and needs 6 to 15 seconds to recharge. See [Scarlet Witch](Scarlet-Witch).
 * **The Tesseract awakens Wanda too.** Use it with a Scarlet Witch Gene in your other hand and you become the Scarlet Witch instead of Loki.
 * **Loki's Scepter confuses.** A hit makes a creature forget its target and wander about, and gives a player Nausea and Slowness. See [Loki](Loki).
-* **Thor's Love and Thunder look, redrawn** to match the film: navy, gold and black armour, long ash-blond hair swept back from a bare forehead, a full beard, a red cape. And a new look, **Love and Thunder, helmet**, with the winged helmet from the New Asgard fight. See [Looks](Looks).
 
 ## Animations and effects
 
