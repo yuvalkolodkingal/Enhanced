@@ -1,0 +1,51 @@
+## The Ultron boss
+
+Section `[ultron_boss]`. The boss is woken by the Ultron Program and has no hero page of its own; the hero's numbers are in the next section.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `ultron_boss.enabled` | `true` | true or false | Whether the Ultron ritual works at all. |
+| `ultron_boss.bodyHealth` | `600.0` | 50.0 to 20000.0 | Health of the first body, Ultron Prime, for one player. (A creature can hold 1024 at most: for more, every blow is made smaller in proportion.) |
+| `ultron_boss.bodyHealthDecay` | `0.8` | 0.3 to 1.0 | Each new body has this fraction of the last one's health. |
+| `ultron_boss.bodyHealthFloor` | `0.25` | 0.05 to 1.0 | No body has less than this fraction of the first one's health. |
+| `ultron_boss.healthPerExtraPlayer` | `0.35` | 0.0 to 2.0 | Extra health (as a fraction of the first body) for each participant after the first (at most 6 count). |
+| `ultron_boss.bodyArmor` | `8.0` | 0.0 to 30.0 | Armour of Prime (a body later has less). |
+| `ultron_boss.bodyToughness` | `4.0` | 0.0 to 20.0 | Armour toughness of Prime (a body later has less). |
+| `ultron_boss.maxHitFraction` | `0.15` | 0.02 to 1.0 | The most a single hit can take from a body, as a fraction of its maximum health (before armour). |
+| `ultron_boss.explosionDamageFactor` | `0.5` | 0.0 to 1.0 | Explosion damage to a body is multiplied by this. |
+| `ultron_boss.liftAt` | `0.55` | 0.1 to 0.95 | Prime's health fraction at which the Sokovia phase starts. |
+| `ultron_boss.heartRipThreshold` | `0.15` | 0.0 to 0.5 | A Scarlet Witch can tear a body's core out below this fraction of its health (0 turns it off). |
+| `ultron_boss.volleyBoltDamage` | `6.0` | 0.0 to 100.0 | Damage of one Repulsor Volley bolt (Normal difficulty). |
+| `ultron_boss.fingerBeamDamage` | `6.0` | 0.0 to 100.0 | Damage of one Finger Beams hit (Normal difficulty). |
+| `ultron_boss.diveDamage` | `18.0` | 0.0 to 100.0 | Damage of the Thruster Dive's landing. |
+| `ultron_boss.pullDamage` | `14.0` | 0.0 to 100.0 | Damage of the Gravity Pull's punch. |
+| `ultron_boss.punchDamage` | `12.0` | 0.0 to 100.0 | Damage of the Punch. |
+| `ultron_boss.debrisDamage` | `10.0` | 0.0 to 100.0 | Damage of a piece of falling Sokovia. |
+| `ultron_boss.debrisInterval` | `100` | 20 to 1200 | Ticks between falling debris on the island, for every two participants. |
+| `ultron_boss.sentryHealth` | `40.0` | 4.0 to 500.0 | Health of an Ultron Sentry of the fight. |
+| `ultron_boss.sentryBoltDamage` | `4.0` | 0.0 to 100.0 | Damage of a Sentry's plasma bolt. |
+| `ultron_boss.sentryMeleeDamage` | `6.0` | 0.0 to 100.0 | Damage of a Sentry's punch. |
+| `ultron_boss.sentryStunTicks` | `60` | 0 to 600 | How long lightning stuns a Sentry. |
+| `ultron_boss.sentryBudgetBase` | `20` | 4 to 200 | How many Sentries Ultron can still call, beyond the first ones, for one player. |
+| `ultron_boss.sentryBudgetPerPlayer` | `8` | 0 to 50 | How many more Sentries Ultron can call for each extra player. |
+| `ultron_boss.sentriesAtStart` | `6` | 0 to 40 | The Sentries beside him when he wakes. |
+| `ultron_boss.sentryWaveSize` | `4` | 1 to 20 | How many Sentries come in a wave. |
+| `ultron_boss.sentryWaveInterval` | `500` | 100 to 6000 | Ticks between waves of Sentries. |
+| `ultron_boss.sentryMaxAlive` | `8` | 2 to 60 | How many Sentries may be alive at once, for one player. |
+| `ultron_boss.sentryMaxAlivePerPlayer` | `3` | 0 to 20 | How many more Sentries may be alive for each extra player. |
+| `ultron_boss.maxUploads` | `12` | 1 to 100 | Safety valve: after this many uploads Ultron is destroyed even if Sentries remain. |
+| `ultron_boss.liftEnabled` | `true` | true or false | Whether the island rises at all; off means the Tremor (nothing moves). |
+| `ultron_boss.liftMode` | `SKY_ISLAND` | SKY_ISLAND, CUT_GROUND, TREMOR | How the island is made: SKY_ISLAND (a copy built in the sky, the ground is never edited), CUT_GROUND (the real ground is lifted and put back; a later release) or TREMOR (nothing moves). |
+| `ultron_boss.hideGround` | `true` | true or false | Sky Island only: clients hide the columns the island was copied from while it is up (cosmetic; the server's ground never changes). |
+| `ultron_boss.liftRequiresMobGriefing` | `true` | true or false | CUT_GROUND only: if the game rule mobGriefing is off, use the Tremor instead of lifting. |
+| `ultron_boss.islandRadius` | `20` | 12 to 32 | Radius of the lifted ground, and of the ground fight before it. |
+| `ultron_boss.liftHeight` | `40` | 16 to 80 | How far the island rises. |
+| `ultron_boss.liftTicks` | `160` | 1 to 600 | How long the rise and the descent take, in ticks (1 = a cut). |
+| `ultron_boss.skinDepth` | `5` | 3 to 8 | Layers of real ground that rise with the island. |
+| `ultron_boss.coverHeight` | `16` | 8 to 24 | How far above the ground things are carried (grass, flowers, trees). |
+| `ultron_boss.coneDepth` | `14` | 6 to 24 | The depth of the rock cone under the middle of the island. |
+| `ultron_boss.maxRelief` | `6` | 2 to 12 | The most the ground may rise and fall inside the island's disc. |
+| `ultron_boss.editsPerTick` | `2500` | 200 to 20000 | Block edits per tick while the island is built or taken down (lower it on a weak server). |
+| `ultron_boss.rescueDamage` | `2.0` | 0.0 to 10.0 | Damage (never lethal) when the field pulls someone back onto the island. |
+| `ultron_boss.rejoinLimit` | `3` | 0 to 20 | How many times a player may be taken up again by the pit's tractor. |
+| `ultron_boss.visionBeamBonus` | `1.5` | 1.0 to 5.0 | The Mind Stone beam does this much to Ultron and the Sentries. |
