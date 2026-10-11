@@ -31,7 +31,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 ## What's new in 2.2
 
 * **Everyone moves like the character on screen.** New poses for every hero, a flight of his own for every flier, every ability acted out (other players see it too), and trails, rings and wind behind flying heroes. See *Animations and effects* below.
-* **Thor's lightning beam.** Hold **V** and lightning pours from his hand, or from the head of Mjolnir or Stormbreaker: longer and twice as strong through the weapon, stronger still as the God of Thunder. See [Thor](Thor).
+* **Thor's lightning beam.** Hold **V** and lightning pours from his hand, or from the head of Mjolnir or Stormbreaker: longer and twice as strong through Mjolnir, a fifth stronger still through Stormbreaker, stronger yet as the God of Thunder. See [Thor](Thor).
 * **Shatter Mjolnir.** **Sneak + R** and Mjolnir bursts into glowing pieces that strike his enemies, then fly back and make it whole in his hand again.
 * **Pin someone with Mjolnir.** **Sneak + right-click** a creature or player and Mjolnir pins them down until its owner lifts it.
 * **A harder Chaos Shield.** It takes 3/4 of a second to form, holds for 8 seconds, has 30 points of strength, shatters when those run out, and needs 6 to 15 seconds to recharge. See [Scarlet Witch](Scarlet-Witch).

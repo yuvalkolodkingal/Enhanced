@@ -107,7 +107,7 @@ S = Nether Star
 L = any log
 ```
 
-An axe that hits harder than any other (12 attack damage), never breaks, can't burn. Anyone can wield it, and whoever holds it can call the Bifrost. See [Thor](Thor).
+An axe that hits harder than any other (12 attack damage: a fifth more than Mjolnir), never breaks, can't burn. Anyone can wield it, and whoever holds it can call the Bifrost. See [Thor](Thor), where Mjolnir and Stormbreaker are compared.
 
 ## Items found in the world
 

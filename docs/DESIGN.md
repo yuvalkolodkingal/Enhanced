@@ -682,6 +682,33 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
   back, flies with it and fires his lightning beam through it (it doesn't shatter, and it can't pin
   anyone). Unlike Mjolnir, a speedster can snatch it out of a hand.
 
+  Both weapons are drawn big, as in the films: Mjolnir's head is about as long as Thor's head is
+  wide, and Stormbreaker is a big axe with a long handle, the bigger of the two. They keep that size
+  wherever they are seen: in Thor's fist (the handle passes through it at rest, thrust ahead in flight
+  and while the weapon whirls on its strap), in first person, thrown, set down on the ground, lying on
+  someone it pins, and as a dropped item (the inventory icon is as it was).
+
+* **Mjolnir or Stormbreaker?** In the films the axe hit a bit harder than the hammer, and so it does
+  here: **Stormbreaker is a fifth stronger than Mjolnir in everything they share**. What only
+  Mjolnir can do stays Mjolnir's.
+
+  | | Mjolnir | Stormbreaker |
+  |---|---|---|
+  | Who can wield it | only the worthy, and only its owner | anyone |
+  | A blow in the hand | 10 damage (5 hearts) | **12** damage (6 hearts) |
+  | Thrown (both ways) | 10 damage | **12** damage |
+  | Lightning beam, each hit | 4 damage (2 hearts) | **4.8** damage |
+  | With the God of Thunder | 6 damage | **7.2** damage |
+  | Lightning beam, how far | 48 blocks | **58** blocks |
+  | The Chaos Shield pays for the beam | the beam's damage | the beam's damage (a fifth more) |
+  | Shatter into fragments (Sneak + R) | yes | no |
+  | Pin someone down (Sneak + right click) | yes | no |
+  | Throw, call back, flight, the Bifrost | yes | yes (the same speed, range and cooldown) |
+  | A speedster can snatch it | no | yes |
+  | Its size in the hand | the head as long as Thor's head is wide | a big axe, taller than the hammer |
+
+  Every number above is a server option (`thor.*`, section 11).
+
 ### 8.2 The Asgardian body
 
 * **Max health 30** (15 hearts), **6 armor**, half knockback.
@@ -693,7 +720,7 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
 |---|---|---|---|
 | 1 | R | **Throw / Call Back** (Sneak: shatter Mjolnir) | With Mjolnir or Stormbreaker in hand: throw it. It flies straight, tumbling, smashing everything in its path (Mjolnir 10 damage, Stormbreaker 12, and heavy knockback), until it hits a wall or has flown 40 blocks, then turns back and flies home to his hand, straight through walls, hitting everything on the way back too. With neither in hand: **call the nearest one back**, from his inventory, the air, the ground anywhere within 64 blocks (dropped, or Mjolnir resting as a block), or the hands of a creature that picked it up (never from another player, and never another player's Mjolnir: he calls his own, one nobody owns yet, or Stormbreaker), or off someone it pins down (never off himself). **Sneak + R** with Mjolnir in hand: it shatters into fragments that strike his enemies (see 8.1). |
 | 2 | G (toggle) | **Flight** | Thor flies by spinning his weapon: only with Mjolnir or Stormbreaker in hand (or while it flies back to him). Fast: 0.11. Hovering, he holds it up to the sky; at speed it leads the way. |
-| 3 | V (hold) | **Lightning Beam** | While he holds **V**, a crackling beam of lightning pours from his hand, or from the head of the weapon in it (the one in his main hand, if he holds two), to what he looks at, for everyone nearby to see: a white-hot core, electric blue and a deep blue halo, jagged and flickering. Every 5 ticks it hits the first creature in the line (not through walls): bare-handed, 2 damage (one heart) up to 24 blocks away (8 damage a second). With **Mjolnir or Stormbreaker** in hand it reaches 48 blocks and hits twice as hard (4 damage), the beam is thicker and brighter, and the first time it hits each creature it also has the usual effects of lightning on it (creepers become charged, pigs turn into zombified piglins, villagers into witches). The **God of Thunder** on top hits 1.5 times as hard, and every hit arcs to the next two creatures nearby. The beam leaves no invulnerability frames, so every hit lands. It burns a little hunger while he fires it (with an empty hunger bar it stops, and it won't start), and sparks fly where it ends (no fire, no block damage). A Scarlet Witch's complete **Chaos Shield** stops it at its surface and loses the beam's damage from its strength (see 2.3, ability 4). |
+| 3 | V (hold) | **Lightning Beam** | While he holds **V**, a crackling beam of lightning pours from his hand, or from the head of the weapon in it (the one in his main hand, if he holds two), to what he looks at, for everyone nearby to see: a white-hot core, electric blue and a deep blue halo, jagged and flickering. Every 5 ticks it hits the first creature in the line (not through walls): bare-handed, 2 damage (one heart) up to 24 blocks away (8 damage a second). With **Mjolnir** in hand it reaches 48 blocks and hits twice as hard (4 damage); with **Stormbreaker**, a fifth more of both (58 blocks, 4.8 damage). Through either the beam is thicker and brighter, and the first time it hits each creature it also has the usual effects of lightning on it (creepers become charged, pigs turn into zombified piglins, villagers into witches). The **God of Thunder** on top hits 1.5 times as hard, and every hit arcs to the next two creatures nearby. The beam leaves no invulnerability frames, so every hit lands. It burns a little hunger while he fires it (with an empty hunger bar it stops, and it won't start), and sparks fly where it ends (no fire, no block damage). A Scarlet Witch's complete **Chaos Shield** stops it at its surface and loses the beam's damage from its strength (see 2.3, ability 4). |
 | 4 | B (toggle) | **God of Thunder** | *Thor: Ragnarok*: his eyes blaze white-blue and lightning crawls over his body. +4 attack damage, +6 armor toughness, every blow he lands arcs lightning to the next two creatures nearby (4 damage each), a thrown weapon and every fragment of a shattered Mjolnir arc too, and his lightning beam hits 1.5 times as hard. It burns hunger; with an empty hunger bar the thunder calms. |
 | 5 | N | **Bifrost** | "Heimdall! Open the Bifrost!" With Mjolnir or Stormbreaker in hand: **N** opens the Bifrost screen (home, his saved places, save this one), **Sneak + N** takes him to the spot he looks at, up to 512 blocks away. See 8.4. |
 
@@ -773,7 +800,7 @@ All the main numbers (beam damage, Hex death chance, Hex radius, flight speeds,
 shrapnel damage, shield reflect chance, the Chaos Shield's wind-up, time limit, strength and cooldowns, how much
 Quicksilver Time slows the world, how much faster Quicksilver does everything, Tommy's speed, Loki's dagger damage, how
 long Loki's Scepter confuses, Mjolnir's and Stormbreaker's damage and range, Thor's lightning beam (damage, range, its
-strength with a weapon and as the God of Thunder, its hunger cost), the cooldown of shattering Mjolnir and the damage of
+strength with each weapon and as the God of Thunder, its hunger cost), the cooldown of shattering Mjolnir and the damage of
 its fragments, how long it pins someone down, who is worthy of Mjolnir and whether it belongs to the first worthy player
 who lifts it (`mjolnirOwnerOnly`), the Bifrost's
 cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`. The three client options of the hero animation

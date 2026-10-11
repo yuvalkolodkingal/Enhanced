@@ -115,14 +115,16 @@ Section `[thor]`. The hero's page is [Thor](Thor).
 | `thor.anyoneWorthy` | `false` | `true` or `false` | If `true`, everyone is worthy of Mjolnir. If `false` (the default), only Thor, Vision, Creative and Spectator players and those who have earned the *Hero of the Village* advancement are worthy: they can claim a Mjolnir nobody owns yet, and lift it. |
 | `thor.mjolnirOwnerOnly` | `true` | `true` or `false` | If `true` (the default), each Mjolnir belongs to the first worthy player who lifts it, and only they can lift it from then on (Creative and Spectator players always can, without taking it). If `false`, Mjolnirs are never claimed: the old rule, where any worthy player can lift any Mjolnir. Stormbreaker is never bound to anyone. |
 | `thor.throwDamage` | `10.0` | 0.0 to 100.0 | Damage of a thrown Mjolnir, both ways. |
-| `thor.stormbreakerThrowDamage` | `12.0` | 0.0 to 100.0 | Damage of a thrown Stormbreaker, both ways. |
+| `thor.stormbreakerThrowDamage` | `12.0` | 0.0 to 100.0 | Damage of a thrown Stormbreaker, both ways (a fifth more than Mjolnir's). |
 | `thor.throwRange` | `40` | 4 to 128 | How far (in blocks) a thrown Mjolnir or Stormbreaker flies before it turns back. |
 | `thor.recallRange` | `64` | 4 to 256 | How far away (in blocks) Thor can call Mjolnir or Stormbreaker back from. |
-| `thor.beamDamage` | `2.0` | 0.0 to 100.0 | Damage of one hit of Thor's lightning beam, bare-handed (2 = one heart). Mjolnir or Stormbreaker in hand multiplies it by `thor.beamWeaponMultiplier`, the God of Thunder by `thor.godOfThunderBeamMultiplier` on top. |
+| `thor.beamDamage` | `2.0` | 0.0 to 100.0 | Damage of one hit of Thor's lightning beam, bare-handed (2 = one heart). Mjolnir in hand multiplies it by `thor.beamWeaponMultiplier`, Stormbreaker by `thor.stormbreakerBeamMultiplier`, the God of Thunder by `thor.godOfThunderBeamMultiplier` on top. |
 | `thor.beamInterval` | `5` | 1 to 40 | Ticks between two hits of the lightning beam (5 = four hits a second). The beam ignores the creature's damage cooldown, so every hit lands. |
 | `thor.beamRange` | `24` | 4 to 128 | How far (in blocks) Thor's lightning beam reaches bare-handed. |
-| `thor.beamWeaponRange` | `48` | 4 to 256 | How far (in blocks) the beam reaches with Mjolnir or Stormbreaker in hand. |
-| `thor.beamWeaponMultiplier` | `2.0` | 1.0 to 20.0 | What Mjolnir or Stormbreaker in hand multiplies the beam's damage by. (With one in hand the first hit on each creature also has the usual effects of lightning on it.) |
+| `thor.beamWeaponRange` | `48` | 4 to 256 | How far (in blocks) the beam reaches with Mjolnir in hand. |
+| `thor.stormbreakerBeamRange` | `58` | 4 to 256 | How far (in blocks) the beam reaches with Stormbreaker in hand (a fifth farther than Mjolnir's). |
+| `thor.beamWeaponMultiplier` | `2.0` | 1.0 to 20.0 | What Mjolnir in hand multiplies the beam's damage by. (With Mjolnir or Stormbreaker in hand the first hit on each creature also has the usual effects of lightning on it.) |
+| `thor.stormbreakerBeamMultiplier` | `2.4` | 1.0 to 20.0 | What Stormbreaker in hand multiplies the beam's damage by (a fifth more than Mjolnir's). |
 | `thor.godOfThunderBeamMultiplier` | `1.5` | 1.0 to 20.0 | What the God of Thunder multiplies the beam's damage by. Every hit also arcs to the next two creatures nearby. |
 | `thor.beamExhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion per tick while the lightning beam is fired (4.0 = 1 food point). |
 | `thor.godOfThunderExhaustion` | `0.04` | 0.0 to 4.0 | Food exhaustion per tick while the God of Thunder is unleashed (4.0 = 1 food point). |
