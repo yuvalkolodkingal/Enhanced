@@ -33,6 +33,7 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 | Ability animation **(added)** | Every ability is acted, not just switched on, and other players see it too. **Magneto** draws his field out around him with both arms, closes a claw on the metal and wrenches it away, and holds what he lifts with a steady open hand. The **Scarlet Witch** gathers her arms across her chest and throws them open to raise the Chaos Shield, thrusts both hands out for the beam, raises both hands overhead to grow the Hex and moves them apart or together to make it bigger or smaller; her lifting hand is a raised, shaking claw. **Quicksilver** taps his goggles, starts like a sprinter, jabs a flurry of fists in his blitz and darts a hand out to snatch. **Vision** puts his fingers to his temple before the beam, floats his arms wide to let go of the world and braces to become dense. **Tommy** shakes his arms out, spins twice in his blitz, shivers before he goes through a wall and holds out a vibrating palm. **Billy** thrusts his hand at the target of the Hex Bolt, throws both hands up to freeze and presses them to his ears for the Noise. **Loki** flicks his daggers from over the shoulder, raises a spread hand to cast and roars as the Frost Giant; his Scepter jabs instead of chopping. **Thor** hauls back and whips his arm to throw the weapon, holds out his hand for it, is slapped by it as it comes home (with sparks), kicks back as the lightning leaves his hand and holds his arm out along the beam while he fires it, thrusts Mjolnir up as it bursts into fragments and closes his fist as they come together, brings it down on whoever he pins, and roars as the God of Thunder. Your own gesture starts the moment you press the key, without waiting for the server. In first person your hands move too (hands in and up for the shield, a palm thrust out for the bolt, the dagger flicked forward, the weapon whirling at the edge of the screen) and the beam, the tether and the bolt leave the hand where it is drawn. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
 | Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, the TVA Loki, Mighty Thor... Press **H** to change look (**Sneak + H** goes back). A look changes only how the hero looks and the colour of his energy: the abilities are the same in every look. Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
+| Heroes' armour **(added)** | Players with a power are drawn without their armour (helmet, chestplate, leggings and boots, with their trims, dye and glint), in third person, to other players and in the inventory preview: it only hides the characters. It still protects as usual, and a player with no power looks as they always did. The elytra (flight gear), a carved pumpkin or a mob head (a costume the player chose, not armour) and the mod's own hero gear (Magneto's Helmet, Wanda's Crown, Quicksilver's Goggles: part of the costume, and what puts the suit on) are always drawn. The client option *Hide heroes' armour* (on by default) turns it off. |
 | MCU colours **(added)** | Every power's light and colour follows the films and shows (section 9). |
 | Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, the same way vanilla treats them as invulnerable. |
 
@@ -228,7 +229,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
 | 1 | R (hold) | **Chaos Energy Beam** | A glowing, crackling red beam from Wanda's hand. |
 | 2 | G (toggle) | **Enhanced Flight** | Fast, smooth flight with red energy around both hands. |
 | 3 | V | **Telekinesis** | Lift creatures, dropped items **or blocks**, move them with your gaze, then launch them. |
-| 4 | B (hold) | **Chaos Shield** | A red glowing sphere that stops projectiles and softens explosions. It takes time to form, wears out and can shatter. |
+| 4 | B (hold) | **Chaos Shield** | A red glowing sphere that stops projectiles and melee blows and softens explosions. It takes time to form, wears out and can shatter. |
 | 5 | N | **The Hex** | A giant red energy dome that only Wanda controls. |
 
 #### Ability 1 — Chaos Energy Beam
@@ -236,7 +237,9 @@ To touch the stone, hold the scepter and **right-click** (use it):
 * **Look:** a bright, shimmering crimson beam with hot pink wisps, a near-white core,
   a crackling outer glow and sparks where it hits. It's a real rendered beam, not ordinary
   redstone particles. **(added)** While she wields chaos magic (beam, shield, telekinesis)
-  her eyes glow red, as in the WandaVision finale.
+  her eyes glow red, as in the WandaVision finale. The glow sits exactly on the eyes of the
+  skin that is drawn: on the suit, whose eyes are two rows lower than a usual Minecraft
+  skin's, and on her own skin, where they are on the usual row.
 * **Range:** 32 blocks. The beam stops at the first creature or block.
 * **Damage:** **2.5 hearts (5 HP) per hit** for as long as the beam stays on the target.
   Minecraft lets a creature be hurt at most twice per second, so a target takes about
@@ -300,9 +303,20 @@ To touch the stone, hold the scepter and **right-click** (use it):
   inside the sphere, or that leaps from a blow of his, is stopped and paid for in the same way.
   A shield that is still forming stops nothing, and on a server with PvP off the beam costs
   the shield nothing. (Lightning from the sky, by contrast, still hurts.)
+* **Stops melee blows too.** Close in is no way round it. A creature's or a player's own
+  blow (a swung sword or a fist, a zombie's or a Warden's swipe, a spider's bite, a Ravager's
+  charge, a bee's sting, Quicksilver's blitz) never touches Wanda: the sphere takes it like an
+  arrow. It costs the shield what it would have done to her (the blow that breaks the shield
+  is stopped too), red sparks fly where it struck, the sphere rings, and the attacker is
+  thrown back out of the dome (a creature that can't be knocked back, like the Warden, stays,
+  and whoever Mjolnir pins is held where it is). A shield that is still forming stops nothing.
+  Thor's blows are stopped like anyone's and the God of Thunder's lightning does not leap from
+  them. With PvP off a player's blow can't hurt her anyway and costs the shield nothing. Her
+  own blows and her beam work out of the dome. What is not a blow still gets through:
+  falling, hunger, fire, lava, drowning, the void, `/kill`, magic and potions, a Guardian's
+  beam, thorns and a Warden's sonic boom.
 * **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it
   down; if less strength is left than that, the shield shatters and the rest gets through.
-  Melee blows are not stopped.
 * **Cost:** it burns hunger quickly while held (about 1 food point every 2 seconds), while it
   forms too. When the hunger bar is empty the shield collapses (and has to recharge).
 * **HUD:** "forming" while it grows; once it is up, what is left of its strength (green, then
@@ -776,5 +790,5 @@ long Loki's Scepter confuses, Mjolnir's and Stormbreaker's damage and range, Tho
 strength with a weapon and as the God of Thunder, its hunger cost), the cooldown of shattering Mjolnir and the damage of
 its fragments, how long it pins someone down, who is worthy of Mjolnir and whether it belongs to the first worthy player
 who lifts it (`mjolnirOwnerOnly`), the Bifrost's
-cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`. The three client options of the hero animation
-(*Hero animations*, *Reduced motion*, *Flight effects*) are in `config/enhanced-client.toml` of the player's own game.
+cooldown…) can be changed in `world/serverconfig/enhanced-server.toml`. The four client options
+(*Hero animations*, *Reduced motion*, *Flight effects*, *Hide heroes' armour*) are in `config/enhanced-client.toml` of the player's own game.
