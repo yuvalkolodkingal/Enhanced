@@ -76,8 +76,10 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue THOR_BEAM_DAMAGE;
     public static final ModConfigSpec.IntValue THOR_BEAM_INTERVAL;
     public static final ModConfigSpec.IntValue THOR_BEAM_RANGE;
-    public static final ModConfigSpec.IntValue THOR_BEAM_WEAPON_RANGE;
-    public static final ModConfigSpec.DoubleValue THOR_BEAM_WEAPON_MULTIPLIER;
+    public static final ModConfigSpec.IntValue MJOLNIR_BEAM_RANGE;
+    public static final ModConfigSpec.IntValue STORMBREAKER_BEAM_RANGE;
+    public static final ModConfigSpec.DoubleValue MJOLNIR_BEAM_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue STORMBREAKER_BEAM_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue THOR_BEAM_THUNDER_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue THOR_BEAM_EXHAUSTION;
     public static final ModConfigSpec.DoubleValue GOD_OF_THUNDER_EXHAUSTION;
@@ -209,26 +211,30 @@ public final class EnhancedConfig {
                 .define("mjolnirOwnerOnly", true);
         MJOLNIR_THROW_DAMAGE = BUILDER.comment("Damage of a thrown Mjolnir, both ways.")
                 .defineInRange("throwDamage", 10.0, 0.0, 100.0);
-        STORMBREAKER_THROW_DAMAGE = BUILDER.comment("Damage of a thrown Stormbreaker, both ways.")
+        STORMBREAKER_THROW_DAMAGE = BUILDER.comment("Damage of a thrown Stormbreaker, both ways (a fifth more than Mjolnir's).")
                 .defineInRange("stormbreakerThrowDamage", 12.0, 0.0, 100.0);
         MJOLNIR_THROW_RANGE = BUILDER.comment("How far (blocks) a thrown Mjolnir or Stormbreaker flies before it turns back.")
                 .defineInRange("throwRange", 40, 4, 128);
         MJOLNIR_RECALL_RANGE = BUILDER.comment("How far away (blocks) Thor can call Mjolnir or Stormbreaker back from.")
                 .defineInRange("recallRange", 64, 4, 256);
         THOR_BEAM_DAMAGE = BUILDER.comment("Damage of one hit of Thor's lightning beam, bare-handed (2 = one heart).",
-                        "Mjolnir or Stormbreaker in hand multiplies it by beamWeaponMultiplier, the God of Thunder by",
-                        "godOfThunderBeamMultiplier on top.")
+                        "Mjolnir in hand multiplies it by beamWeaponMultiplier, Stormbreaker by stormbreakerBeamMultiplier, the God",
+                        "of Thunder by godOfThunderBeamMultiplier on top.")
                 .defineInRange("beamDamage", 2.0, 0.0, 100.0);
         THOR_BEAM_INTERVAL = BUILDER.comment("Ticks between two hits of the lightning beam (5 = four hits a second). The beam ignores",
                         "the creature's damage cooldown, so every hit lands.")
                 .defineInRange("beamInterval", 5, 1, 40);
         THOR_BEAM_RANGE = BUILDER.comment("How far (blocks) Thor's lightning beam reaches bare-handed.")
                 .defineInRange("beamRange", 24, 4, 128);
-        THOR_BEAM_WEAPON_RANGE = BUILDER.comment("How far (blocks) the beam reaches with Mjolnir or Stormbreaker in hand.")
+        MJOLNIR_BEAM_RANGE = BUILDER.comment("How far (blocks) the beam reaches with Mjolnir in hand.")
                 .defineInRange("beamWeaponRange", 48, 4, 256);
-        THOR_BEAM_WEAPON_MULTIPLIER = BUILDER.comment("What Mjolnir or Stormbreaker in hand multiplies the beam's damage by.",
-                        "(With one in hand the first hit on each creature also has the usual effects of lightning on it.)")
+        STORMBREAKER_BEAM_RANGE = BUILDER.comment("How far (blocks) the beam reaches with Stormbreaker in hand (a fifth farther than Mjolnir's).")
+                .defineInRange("stormbreakerBeamRange", 58, 4, 256);
+        MJOLNIR_BEAM_MULTIPLIER = BUILDER.comment("What Mjolnir in hand multiplies the beam's damage by.",
+                        "(With Mjolnir or Stormbreaker in hand the first hit on each creature also has the usual effects of lightning on it.)")
                 .defineInRange("beamWeaponMultiplier", 2.0, 1.0, 20.0);
+        STORMBREAKER_BEAM_MULTIPLIER = BUILDER.comment("What Stormbreaker in hand multiplies the beam's damage by (a fifth more than Mjolnir's).")
+                .defineInRange("stormbreakerBeamMultiplier", 2.4, 1.0, 20.0);
         THOR_BEAM_THUNDER_MULTIPLIER = BUILDER.comment("What the God of Thunder multiplies the beam's damage by. Every hit also arcs to the",
                         "next two creatures nearby.")
                 .defineInRange("godOfThunderBeamMultiplier", 1.5, 1.0, 20.0);

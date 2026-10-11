@@ -294,6 +294,7 @@
   "death.attack.enhanced.hex_bolt.item": "%1$s נפגע מברק הכישוף של %2$s",
   "item.enhanced.stormbreaker": "סטורמברייקר",
   "item.enhanced.stormbreaker.desc": "חושל בנידאבליר, בלב כוכב גוסס",
+  "item.enhanced.stormbreaker.stronger": "חזק בחמישית ממיולניר: במכה, בהשלכה ובקרן הברק",
   "item.enhanced.thor_weapon.bifrost": "שימוש: הביפרוסט (התכופפות: לאן שמסתכלים)",
   "entity.enhanced.thrown_weapon": "נשק מושלך",
   "message.enhanced.thor.weapon_out_of_reach": "אין מיולניר או סטורמברייקר בטווח",

@@ -294,6 +294,7 @@
   "death.attack.enhanced.hex_bolt.item": "%1$s was struck by %2$s's Hex Bolt",
   "item.enhanced.stormbreaker": "Stormbreaker",
   "item.enhanced.stormbreaker.desc": "Forged in Nidavellir, in the heart of a dying star",
+  "item.enhanced.stormbreaker.stronger": "A fifth stronger than Mjolnir: in a blow, thrown and through the lightning beam",
   "item.enhanced.thor_weapon.bifrost": "Use: the Bifrost (Sneak: to where you look)",
   "entity.enhanced.thrown_weapon": "Thrown Weapon",
   "message.enhanced.thor.weapon_out_of_reach": "No Mjolnir or Stormbreaker within reach",

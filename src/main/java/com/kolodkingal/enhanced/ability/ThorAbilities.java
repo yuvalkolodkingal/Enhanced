@@ -222,6 +222,12 @@ public final class ThorAbilities {
                 : isWeapon(entity.getOffhandItem()) ? InteractionHand.OFF_HAND : null;
     }
 
+    /** The Mjolnir or Stormbreaker in the entity's hands (the main hand first), or an empty stack. */
+    public static ItemStack heldWeapon(LivingEntity entity) {
+        InteractionHand hand = weaponHand(entity);
+        return hand == null ? ItemStack.EMPTY : entity.getItemInHand(hand);
+    }
+
     /**
      * Every player: the first worthy hand to carry an unclaimed Mjolnir claims it; one they may not lift (they are not
      * worthy, or it belongs to someone else) is far too heavy, and drops to the ground wherever they are. The worthy
@@ -566,10 +572,11 @@ public final class ThorAbilities {
 
     /**
      * While the beam is fired: every few ticks (config) it hits the first creature in the line of sight, up to its
-     * range (24 blocks, 48 with Mjolnir or Stormbreaker in hand), for 2 damage (twice that with the weapon, and 1.5
-     * times that again for the God of Thunder, whose every hit also arcs to the next creatures nearby). With the weapon
-     * in hand the first hit on each creature has the usual effects of lightning on it (creepers charge, pigs turn into
-     * zombified piglins). It burns a little hunger; where it ends, sparks fly, but nothing burns.
+     * range (24 blocks bare-handed, 48 with Mjolnir in hand and 58 with Stormbreaker), for 2 damage (twice that with
+     * Mjolnir, 2.4 times with Stormbreaker, a fifth stronger; and 1.5 times that again for the God of Thunder, whose
+     * every hit also arcs to the next creatures nearby). With a weapon in hand the first hit on each creature has the
+     * usual effects of lightning on it (creepers charge, pigs turn into zombified piglins). It burns a little hunger;
+     * where it ends, sparks fly, but nothing burns.
      */
     private static void beamTick(ServerPlayer thor, PowerData data) {
         if (thor.isSpectator() || starving(thor)) {
@@ -578,7 +585,7 @@ public final class ThorAbilities {
         }
         ServerLevel level = thor.serverLevel();
         Beam beam = BEAMS.computeIfAbsent(thor.getUUID(), id -> new Beam());
-        boolean weapon = holdsWeapon(thor);
+        ItemStack weapon = heldWeapon(thor);
         boolean thunder = data.toggle(Toggle.GOD_OF_THUNDER);
         thor.causeFoodExhaustion(EnhancedConfig.THOR_BEAM_EXHAUSTION.get().floatValue());
         HitResult hit = Raycasts.any(thor, beamRange(weapon), beamTargets(thor), 1.0F);
@@ -624,12 +631,12 @@ public final class ThorAbilities {
         }
     }
 
-    private static void beamHit(ServerLevel level, ServerPlayer thor, Beam beam, EntityHitResult hit, boolean weapon, boolean thunder) {
+    private static void beamHit(ServerLevel level, ServerPlayer thor, Beam beam, EntityHitResult hit, ItemStack weapon, boolean thunder) {
         Entity target = hit.getEntity();
         LivingEntity living = target instanceof LivingEntity l ? l
                 : target instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity l ? l : null;
         // (Not on players: lightning has nothing to do to them but a flinch, and PvP rules are not for it to bypass.)
-        if (weapon && living != null && !(living instanceof Player) && beam.struck.add(living.getId())) {
+        if (!weapon.isEmpty() && living != null && !(living instanceof Player) && beam.struck.add(living.getId())) {
             thunderStruck(level, thor, living);
         }
         target.hurt(ModDamageTypes.source(level, ModDamageTypes.LIGHTNING_BEAM, thor, thor), beamDamage(weapon, thunder));
@@ -667,13 +674,15 @@ public final class ThorAbilities {
     }
 
     /**
-     * Damage of one hit of the beam, for whether Thor holds Mjolnir or Stormbreaker and whether the God of Thunder is
-     * unleashed.
+     * Damage of one hit of the beam, for the weapon in Thor's hand (Mjolnir, Stormbreaker, or an empty stack for his
+     * bare hand) and whether the God of Thunder is unleashed.
      */
-    public static float beamDamage(boolean weapon, boolean thunder) {
+    public static float beamDamage(ItemStack weapon, boolean thunder) {
         double damage = EnhancedConfig.THOR_BEAM_DAMAGE.get();
-        if (weapon) {
-            damage *= EnhancedConfig.THOR_BEAM_WEAPON_MULTIPLIER.get();
+        if (isStormbreaker(weapon)) {
+            damage *= EnhancedConfig.STORMBREAKER_BEAM_MULTIPLIER.get();
+        } else if (isMjolnir(weapon)) {
+            damage *= EnhancedConfig.MJOLNIR_BEAM_MULTIPLIER.get();
         }
         if (thunder) {
             damage *= EnhancedConfig.THOR_BEAM_THUNDER_MULTIPLIER.get();
@@ -681,12 +690,16 @@ public final class ThorAbilities {
         return (float) damage;
     }
 
-    /** How far the beam reaches (blocks); on a client before the server's config has arrived, the defaults. */
-    public static double beamRange(boolean weapon) {
+    /**
+     * How far the beam reaches (blocks) with this weapon in hand (Mjolnir's, Stormbreaker's, or the bare hand's for an
+     * empty stack); on a client before the server's config has arrived, the defaults.
+     */
+    public static double beamRange(ItemStack weapon) {
         if (!EnhancedConfig.SPEC.isLoaded()) {
-            return weapon ? 48 : 24;
+            return isStormbreaker(weapon) ? 58 : isMjolnir(weapon) ? 48 : 24;
         }
-        return weapon ? EnhancedConfig.THOR_BEAM_WEAPON_RANGE.get() : EnhancedConfig.THOR_BEAM_RANGE.get();
+        return isStormbreaker(weapon) ? EnhancedConfig.STORMBREAKER_BEAM_RANGE.get()
+                : isMjolnir(weapon) ? EnhancedConfig.MJOLNIR_BEAM_RANGE.get() : EnhancedConfig.THOR_BEAM_RANGE.get();
     }
 
     /** The first solid ground at or below a point (up to 32 blocks down). */

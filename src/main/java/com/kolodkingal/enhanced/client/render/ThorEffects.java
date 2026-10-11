@@ -186,7 +186,8 @@ public final class ThorEffects {
     private static void beam(Minecraft mc, AbstractClientPlayer player, boolean weapon, boolean thunder, Matrix4f pose, VertexConsumer vc,
                              Vec3 camera, float partialTick, float time) {
         Vec3 origin = beamOrigin(mc, player, weapon, partialTick);
-        Vec3 target = Raycasts.any(player, ThorAbilities.beamRange(weapon), ThorAbilities.beamTargets(player), partialTick).getLocation();
+        double range = ThorAbilities.beamRange(ThorAbilities.heldWeapon(player));
+        Vec3 target = Raycasts.any(player, range, ThorAbilities.beamTargets(player), partialTick).getLocation();
         // A Scarlet Witch's complete Chaos Shield in the way stops it at its surface (as on the server).
         WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(partialTick), target, partialTick);
         if (shield != null) {
@@ -298,8 +299,8 @@ public final class ThorEffects {
                 FirstPersonArms.hand(mc.player, arm, hand);
             }
             boolean mjolnir = weaponHand != null && ThorAbilities.isMjolnir(player.getItemInHand(weaponHand));
-            double across = mjolnir ? 0.43 : weapon ? 0.45 : 0.42;
-            double high = mjolnir ? -0.01 : weapon ? -0.09 : -0.28;
+            double across = mjolnir ? 0.35 : weapon ? 0.33 : 0.42;
+            double high = mjolnir ? 0.08 : weapon ? 0.0 : -0.28;
             double fov = Math.tan(Math.toRadians(mc.options.fov().get() * 0.5)) / Math.tan(Math.toRadians(35.0));
             return player.getEyePosition(partialTick).add(look.scale(0.75 + 0.4 * hand[2]))
                     .add(right.scale(side * (across + 0.4 * hand[0]) * fov)).add(up.scale((high + 0.4 * hand[1]) * fov));
@@ -314,7 +315,7 @@ public final class ThorEffects {
         double side = player.getMainArm() == HumanoidArm.RIGHT ? -0.31 : 0.31;
         Vec3 shoulder = BodyLean.follow(player, new Vec3(eye.x + Math.cos(yaw) * side, eye.y - 0.25, eye.z + Math.sin(yaw) * side), partialTick);
         Vec3 hand = shoulder.add(look.scale(0.7));
-        return weapon ? hand.add(look.scale(0.5)).add(0, 0.1, 0) : hand;
+        return weapon ? hand.add(look.scale(0.7)).add(0, 0.1, 0) : hand;
     }
 
     // ---- the fragments of a shattered Mjolnir ----

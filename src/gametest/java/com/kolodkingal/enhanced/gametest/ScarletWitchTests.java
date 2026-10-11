@@ -843,7 +843,7 @@ public final class ScarletWitchTests {
             check(WandaAbilities.shieldAcross(helper.getLevel(), wanda, thor.getEyePosition(), center, 1.0F) == null,
                     "and nobody's own shield stops their own beam");
 
-            // The weapon doubles it, the God of Thunder adds half again: 6 points, and no lightning leaps past it.
+            // Mjolnir doubles it, the God of Thunder adds half again: 6 points, and no lightning leaps past it.
             thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
             AbilityHandler.onKey(thor, 4, true);
             check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
@@ -851,6 +851,11 @@ public final class ScarletWitchTests {
             assertNear(20.0F - wanda.getHealth(), 0.0, 1.0E-4, "still not a scratch");
             assertNear(data.shieldStrength(), 22.0, 1.0E-4, "Mjolnir and the God of Thunder: 2 x 2 x 1.5 = 6 points");
             check(beside.getHealth() == beside.getMaxHealth(), "no lightning arcs to the creature beside her");
+
+            // Stormbreaker's beam is a fifth stronger than Mjolnir's, and costs the shield a fifth more.
+            thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+            beamOnce(thor);
+            assertNear(data.shieldStrength(), 22.0 - 7.2, 1.0E-4, "Stormbreaker and the God of Thunder: 2 x 2.4 x 1.5 = 7.2 points");
             helper.succeed();
         });
     }

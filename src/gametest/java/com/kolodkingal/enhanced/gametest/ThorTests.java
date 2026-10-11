@@ -562,40 +562,140 @@ public final class ThorTests {
     @GameTest(template = ARENA)
     public static void theWeaponMakesTheBeamReachFartherAndHitHarder(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        check(EnhancedConfig.THOR_BEAM_RANGE.getDefault() == 24 && EnhancedConfig.THOR_BEAM_WEAPON_RANGE.getDefault() == 48,
-                "24 blocks bare-handed, 48 with the weapon");
+        check(EnhancedConfig.THOR_BEAM_RANGE.getDefault() == 24 && EnhancedConfig.MJOLNIR_BEAM_RANGE.getDefault() == 48
+                        && EnhancedConfig.STORMBREAKER_BEAM_RANGE.getDefault() == 58,
+                "24 blocks bare-handed, 48 with Mjolnir, 58 with Stormbreaker");
         check(EnhancedConfig.THOR_BEAM_DAMAGE.getDefault() == 2.0 && EnhancedConfig.THOR_BEAM_INTERVAL.getDefault() == 5,
                 "2 damage every 5 ticks");
+        check(EnhancedConfig.MJOLNIR_BEAM_MULTIPLIER.getDefault() == 2.0 && EnhancedConfig.STORMBREAKER_BEAM_MULTIPLIER.getDefault() == 2.4,
+                "twice that with Mjolnir, 2.4 times with Stormbreaker");
         f.config(EnhancedConfig.THOR_BEAM_RANGE, 6);
-        f.config(EnhancedConfig.THOR_BEAM_WEAPON_RANGE, 14);
+        f.config(EnhancedConfig.MJOLNIR_BEAM_RANGE, 14);
+        f.config(EnhancedConfig.STORMBREAKER_BEAM_RANGE, 17);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
         Zombie near = bareZombie(helper, 7.5, 10.5);
         lookAt(thor, near);
         assertNear(oneHit(thor, near), 2.0, 1.0E-4, "bare-handed: 2 damage a hit");
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
-        assertNear(oneHit(thor, near), 4.0, 1.0E-4, "with Stormbreaker in hand: twice that");
+        assertNear(oneHit(thor, near), 4.8, 1.0E-4, "with Stormbreaker in hand: 2.4 times that");
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
-        assertNear(oneHit(thor, near), 4.0, 1.0E-4, "and with Mjolnir");
+        assertNear(oneHit(thor, near), 4.0, 1.0E-4, "and with Mjolnir: twice that");
 
         // The God of Thunder on top: 1.5 times.
         press(thor, 4);
         check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
-        assertNear(oneHit(thor, near), 6.0, 1.0E-4, "the God of Thunder with the weapon: 6");
+        assertNear(oneHit(thor, near), 6.0, 1.0E-4, "the God of Thunder with Mjolnir: 6");
+        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        assertNear(oneHit(thor, near), 7.2, 1.0E-4, "and with Stormbreaker: 7.2");
         thor.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         assertNear(oneHit(thor, near), 3.0, 1.0E-4, "and bare-handed: 3");
         press(thor, 4);
 
-        // Reach: a zombie 10 blocks off is out of reach bare-handed, but not with the weapon.
+        // Reach: a zombie 10 blocks off is out of reach bare-handed, but not with a weapon; one 15 blocks off only
+        // Stormbreaker reaches.
         Zombie far = bareZombie(helper, 13.5, 10.5);
         check(oneHit(thor, near) > 0.0F, "sanity: the near zombie is the first in line");
         near.discard();
         lookAt(thor, far);
-        assertNear(ThorAbilities.beamRange(false), 6.0, 1.0E-9, "bare-handed range (config)");
-        assertNear(ThorAbilities.beamRange(true), 14.0, 1.0E-9, "weapon range (config)");
+        ItemStack mjolnir = new ItemStack(ModItems.MJOLNIR.get());
+        ItemStack stormbreaker = new ItemStack(ModItems.STORMBREAKER.get());
+        assertNear(ThorAbilities.beamRange(ItemStack.EMPTY), 6.0, 1.0E-9, "bare-handed range (config)");
+        assertNear(ThorAbilities.beamRange(mjolnir), 14.0, 1.0E-9, "Mjolnir's range (config)");
+        assertNear(ThorAbilities.beamRange(stormbreaker), 17.0, 1.0E-9, "Stormbreaker's range (config)");
         check(oneHit(thor, far) == 0.0F, "10 blocks away is out of reach bare-handed");
-        thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        thor.setItemInHand(InteractionHand.MAIN_HAND, mjolnir.copy());
         check(oneHit(thor, far) > 0.0F, "but not with Mjolnir in hand");
+        EnhancedConfig.MJOLNIR_BEAM_RANGE.set(8);
+        EnhancedConfig.STORMBREAKER_BEAM_RANGE.set(12);
+        check(oneHit(thor, far) == 0.0F, "with a shorter reach, 10 blocks away is beyond Mjolnir");
+        thor.setItemInHand(InteractionHand.MAIN_HAND, stormbreaker.copy());
+        check(oneHit(thor, far) > 0.0F, "but within Stormbreaker's");
         helper.succeed();
+    }
+
+    /**
+     * Stormbreaker is a bit stronger than Mjolnir, a fifth, in everything the two share: the blow of the hand, the
+     * throw, the lightning beam through it (its damage per hit and its reach). What only Mjolnir can do (shatter, pin,
+     * the worthy) is not for Stormbreaker.
+     */
+    @GameTest(template = ARENA)
+    public static void stormbreakerIsAFifthStrongerThanMjolnirInEverythingTheyShare(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        // In the hand: the attack damage of the main hand.
+        ServerPlayer player = f.player(4.5, FLOOR, 10.5);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        player.doTick();
+        double mjolnirBlow = player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        player.doTick();
+        double stormbreakerBlow = player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        assertNear(mjolnirBlow, 10.0, 1.0E-6, "Mjolnir hits for 10");
+        assertNear(stormbreakerBlow, 12.0, 1.0E-6, "Stormbreaker hits for 12");
+        assertFifthStronger(stormbreakerBlow / mjolnirBlow, "in the hand");
+        // Thrown.
+        double mjolnirThrow = EnhancedConfig.MJOLNIR_THROW_DAMAGE.get();
+        double stormbreakerThrow = EnhancedConfig.STORMBREAKER_THROW_DAMAGE.get();
+        assertFifthStronger(stormbreakerThrow / mjolnirThrow, "thrown");
+        // The beam through it: damage per hit, with and without the God of Thunder, and the reach.
+        ItemStack mjolnir = new ItemStack(ModItems.MJOLNIR.get());
+        ItemStack stormbreaker = new ItemStack(ModItems.STORMBREAKER.get());
+        assertFifthStronger(ThorAbilities.beamDamage(stormbreaker, false) / ThorAbilities.beamDamage(mjolnir, false), "the beam's damage per hit");
+        assertFifthStronger(ThorAbilities.beamDamage(stormbreaker, true) / ThorAbilities.beamDamage(mjolnir, true), "the God of Thunder's beam");
+        assertFifthStronger(ThorAbilities.beamRange(stormbreaker) / ThorAbilities.beamRange(mjolnir), "the beam's reach");
+        check(ThorAbilities.beamDamage(mjolnir, false) > ThorAbilities.beamDamage(ItemStack.EMPTY, false)
+                && ThorAbilities.beamRange(mjolnir) > ThorAbilities.beamRange(ItemStack.EMPTY), "and either is stronger than the bare hand");
+        // What only Mjolnir can do: the worthy, the shatter, the pin.
+        check(ThorAbilities.isMjolnir(mjolnir) && !ThorAbilities.isMjolnir(stormbreaker), "only Mjolnir is Mjolnir");
+        helper.succeed();
+    }
+
+    private static void assertFifthStronger(double ratio, String what) {
+        check(ratio >= 1.15 && ratio <= 1.25, "Stormbreaker is about a fifth stronger than Mjolnir " + what + ": " + ratio);
+    }
+
+    /**
+     * The thrown weapons really hit as hard as their configured damage: Mjolnir for 10, Stormbreaker for 12, in two
+     * lanes of the arena at once. (A batch of its own: heroes throwing, and hostile husks standing about, must not meet
+     * the tests of the shatter, which looks for enemies all around.)
+     */
+    @GameTest(template = ARENA, batch = "thrown_weapon_damage", timeoutTicks = 200)
+    public static void aThrownStormbreakerHitsAFifthHarderThanAThrownMjolnir(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 16);
+        ServerPlayer first = f.player(3.5, FLOOR, 5.5, Power.THOR);
+        ServerPlayer second = f.player(3.5, FLOOR, 15.5, Power.THOR);
+        first.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
+        second.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        Zombie hitByMjolnir = bareZombie(helper, 12.5, 5.5);
+        Zombie hitByStormbreaker = bareZombie(helper, 12.5, 15.5);
+        for (Zombie zombie : List.of(hitByMjolnir, hitByStormbreaker)) {
+            // Plenty of health, so neither blow kills.
+            zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
+            zombie.setHealth(100.0F);
+        }
+        lookAt(first, hitByMjolnir);
+        lookAt(second, hitByStormbreaker);
+        press(first, 1);
+        press(second, 1);
+        float[] damage = {0.0F, 0.0F};
+        f.everyTick(60, tick -> {
+            PowerTicker.tick(first);
+            PowerTicker.tick(second);
+            // The first blow of each: the health lost the first time it drops.
+            if (damage[0] == 0.0F && hitByMjolnir.getHealth() < 100.0F) {
+                damage[0] = 100.0F - hitByMjolnir.getHealth();
+            }
+            if (damage[1] == 0.0F && hitByStormbreaker.getHealth() < 100.0F) {
+                damage[1] = 100.0F - hitByStormbreaker.getHealth();
+            }
+            if (damage[0] == 0.0F || damage[1] == 0.0F) {
+                return false;
+            }
+            assertNear(damage[0], 10.0, 1.0E-3, "a thrown Mjolnir hits for 10");
+            assertNear(damage[1], 12.0, 1.0E-3, "a thrown Stormbreaker hits for 12");
+            assertFifthStronger(damage[1] / damage[0], "thrown, as it lands");
+            return true;
+        });
     }
 
     @GameTest(template = ARENA)
@@ -822,7 +922,11 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    /**
+     * (A batch of its own: it clears the memory of every shattered Mjolnir, as closing the world does, so no other test of
+     * the shatter may be running beside it.)
+     */
+    @GameTest(template = ARENA, batch = "shatter_world_closed")
     public static void aShatteredMjolnirKeptInHisDataComesBackIfTheWorldWasClosedMeanwhile(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);

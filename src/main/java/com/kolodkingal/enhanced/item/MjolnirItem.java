@@ -40,7 +40,7 @@ public class MjolnirItem extends Item {
         super(properties);
     }
 
-    /** 10 attack damage at axe-like speed. */
+    /** 10 attack damage at axe-like speed (Stormbreaker's 12 is a fifth more). */
     public static ItemAttributeModifiers createAttributes() {
         return ItemAttributeModifiers.builder()
                 .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 9.0, AttributeModifier.Operation.ADD_VALUE),
