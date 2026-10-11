@@ -394,6 +394,15 @@ public final class UltronNetworkTests {
         lookAt(hero, mine);
         key(hero, 4, true);
         check(!UltronDrones.isHacking(hero), "nor is a drone of his own");
+        // And with a Vision near, no Sentry at all: it is part of the network.
+        UltronSentryEntity enemy = sentryAt(f, fight, 12.5, 14.5);
+        enemy.setHeld(true);
+        f.player(16.5, FLOOR, 16.5, Power.VISION);
+        f.config(UltronConfig.VISION_CUT_RANGE, 48);
+        lookAt(hero, enemy);
+        log.drain();
+        key(hero, 4, true);
+        check(!UltronDrones.isHacking(hero) && log.drain().toldOnActionBar("message.enhanced.ultron.cut_off"), "Vision has cut the Hack too");
         helper.succeed();
     }
 

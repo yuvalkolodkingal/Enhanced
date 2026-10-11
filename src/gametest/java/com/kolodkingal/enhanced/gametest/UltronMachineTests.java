@@ -560,6 +560,7 @@ public final class UltronMachineTests {
 
         int[] tellStart = {-1};
         int[] firstBolt = {-1};
+        float[] healthAtBolt = {0.0F};
         int[] stunnedAt = {-1};
         int[] shotsWhileStunned = {0};
         int[] wokeAt = {-1};
@@ -591,11 +592,16 @@ public final class UltronMachineTests {
                 }
                 if (tellStart[0] > 0 && firstBolt[0] < 0 && !bolts.isEmpty()) {
                     firstBolt[0] = tick;
+                    // (It may have punched on its way here, wherever it circled to: only what the bolt does counts.)
+                    healthAtBolt[0] = player.getHealth();
                     check(tick - tellStart[0] >= UltronSentryEntity.SHOT_TELL - 1, "the bolt came " + (tick - tellStart[0]) + " ticks after the tell began");
                     check(tick - tellStart[0] <= UltronSentryEntity.SHOT_TELL + 3, "and not much later than it ends");
+                    // (It stands still for a while, so that no punch of its own can land while the shot is judged.)
+                    sentry.freeze(12);
                 }
                 if (firstBolt[0] > 0 && tick == firstBolt[0] + 14) {
-                    check(player.getHealth() > 999.99F, "the shot went where it was aimed when the tell began, not after the target: " + player.getHealth());
+                    check(player.getHealth() == healthAtBolt[0], "the shot went where it was aimed when the tell began, not after the target: "
+                            + healthAtBolt[0] + " then " + player.getHealth());
                     // Lightning stuns it for 30 ticks.
                     sentry.onLightning(null, 5.0F);
                     stunnedAt[0] = tick;

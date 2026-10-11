@@ -183,7 +183,7 @@ public final class UltronTests {
         Zombie far = dummy(helper, 9.5, 14.5);
         ServerPlayer creative = f.player(10.3, FLOOR, 10.0, GameType.CREATIVE);
         ServerPlayer bystander = f.player(10.3, FLOOR, 9.4);
-        UltronSentryEntity drone = drone(f, hero, 10.6, FLOOR, 10.2);
+        UltronSentryEntity drone = drone(f, hero, 9.5, FLOOR, 9.5);
         float bystanderHealth = bystander.getHealth();
         List<BlockState> before = blocks(helper);
         tick(hero);
@@ -239,6 +239,27 @@ public final class UltronTests {
                 tick(hero);
             }
             return false;
+        });
+    }
+
+    /**
+     * The game looks for what a projectile hits along its next step, and a creature that moved into the margin round the
+     * bolt (a zombie walking at it, one knocked back into it) is no longer entered by that line: plasma still hits it.
+     */
+    @GameTest(template = ARENA, batch = QUICK)
+    public static void plasmaHitsWhatItStartsInside(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = f.level();
+        ServerPlayer hero = hero(f, 3.5, 10.5);
+        Zombie zombie = dummy(helper, 12.5, 10.5);
+        // The zombie's body starts at x = 12.2; the bolt is 0.2 short of it, inside the 0.3 margin the game gives a target.
+        UltronBoltEntity bolt = UltronBoltEntity.create(level, hero, helper.absoluteVec(new Vec3(12.0, FLOOR + 1.0, 10.5)), new Vec3(2.6, 0.0, 0.0), 4.0F,
+                UltronBoltEntity.Palette.PRIME);
+        level.addFreshEntity(bolt);
+        helper.runAfterDelay(2, () -> {
+            assertNear(lost(zombie), 4.0, 0.01, "the bolt hit what it began inside the margin of");
+            check(bolt.isRemoved(), "and is spent");
+            helper.succeed();
         });
     }
 
@@ -458,6 +479,19 @@ public final class UltronTests {
         PowerData data = Powers.get(hero);
         tick(hero);
         long now = level.getGameTime();
+
+        // Only what is within reach: a zombie ten blocks away is out of a range of five, and in one of twenty-four.
+        Zombie reach = dummy(helper, 12.5, 4.5);
+        lookAt(hero, reach);
+        f.config(UltronConfig.PULL_RANGE, 5);
+        key(hero, 3, true);
+        check(data.isReady(3, now) && reach.getDeltaMovement().x == 0.0, "out of reach, nothing is pulled and nothing recharges");
+        f.config(UltronConfig.PULL_RANGE, 24);
+        key(hero, 3, true);
+        check(!data.isReady(3, now), "within it, the zombie is a target");
+        data.startCooldown(3, now, 0);
+        reach.discard();
+        look(hero, EAST, 0.0F);
 
         // A Creative player in the way is looked through; a player with PvP off is no target.
         ServerPlayer creative = f.player(8.5, FLOOR, 10.5, GameType.CREATIVE);
