@@ -9,10 +9,12 @@ import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
+import com.kolodkingal.enhanced.client.render.BlackEyesLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
+import com.kolodkingal.enhanced.client.render.SpiderLegsLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
 import com.kolodkingal.enhanced.client.render.ThrownWeaponRenderer;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -54,6 +56,7 @@ public final class ClientSetup {
             EntityGlow.register(TheNoise::reveals, TheNoise::moodColor);
             // ===== phoenix =====
             // ===== spider =====
+            EntityGlow.register(SpiderSenseClient::reveals, SpiderSenseClient::color);
             // ===== thanos =====
             // ===== ultron =====
             // ===== apocalypse =====
@@ -134,6 +137,8 @@ public final class ClientSetup {
                 // The layers of 3.0, one region per hero (the // ===== lines), before the last one.
                 // ===== phoenix =====
                 // ===== spider =====
+                renderer.addLayer(new SpiderLegsLayer(renderer));
+                renderer.addLayer(new BlackEyesLayer(renderer));
                 // ===== thanos =====
                 // ===== ultron =====
                 // ===== apocalypse =====
@@ -156,6 +161,7 @@ public final class ClientSetup {
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
         // ===== spider =====
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("spider_sense"), new SpiderSenseOverlay());
         // ===== thanos =====
         // ===== ultron =====
         // ===== apocalypse =====

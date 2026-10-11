@@ -50,6 +50,8 @@ public final class PowerLoopSounds {
         // ===== phoenix =====
 
         // ===== spider =====
+        /** The creak of the taut web while Spider-Man swings. */
+        WEB_SWING(ModSounds.WEB_SWING, 0.35F, 1.0F, (p, d) -> d.power() == Power.SPIDER_MAN && d.is(Live.SWINGING)),
 
         // ===== thanos =====
 

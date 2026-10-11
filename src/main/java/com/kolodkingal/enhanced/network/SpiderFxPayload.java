@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.render.SpiderEffects;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -68,7 +69,8 @@ public record SpiderFxPayload(Kind kind, int player, Vec3 from, Vec3 to, Vec3 no
         return TYPE;
     }
 
-    /** The Spider-Man lane draws the lines, splats and strikes here. */
+    /** Draws the lines, splats and strikes, and tells the local hero's movement. */
     static void handle(SpiderFxPayload payload, IPayloadContext context) {
+        SpiderEffects.add(payload);
     }
 }
