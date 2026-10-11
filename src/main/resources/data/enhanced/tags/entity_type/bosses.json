@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:ender_dragon",
+    "minecraft:wither",
+    "minecraft:warden",
+    "minecraft:elder_guardian",
+    "enhanced:ultron",
+    "enhanced:thanos",
+    "enhanced:apocalypse"
+  ]
+}

@@ -2,6 +2,10 @@
   "replace": false,
   "values": [
     "enhanced:hex_wall",
-    "enhanced:mind_stone"
+    "enhanced:mind_stone",
+    "enhanced:thanos_blow",
+    "enhanced:thanos_sword",
+    "enhanced:stone_power",
+    "enhanced:stone_soul"
   ]
 }

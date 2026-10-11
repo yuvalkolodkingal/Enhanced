@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
@@ -62,8 +63,14 @@ public final class BlockLifting {
         return hardness >= 0 && hardness <= EnhancedConfig.BLOCK_LIFT_MAX_HARDNESS.get();
     }
 
-    /** Respects spawn protection, Adventure mode, world borders and claim mods (through the block-break event). */
+    /**
+     * Respects spawn protection, Adventure mode, world borders and claim mods (through the block-break event), and the
+     * arena of a boss fight.
+     */
     private static boolean mayBreak(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state) {
+        if (BossFights.protects(level, pos)) {
+            return false; // the arena of a boss fight stays as it is
+        }
         if (!player.mayBuild() || !level.mayInteract(player, pos) || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
             return false;
         }

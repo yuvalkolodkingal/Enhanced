@@ -33,7 +33,9 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -49,8 +51,6 @@ public final class WorldEffectsRenderer {
     /** The angry red Hex (WandaVision episodes 5-9): raspberry scanlines over a dark magenta-red body. */
     private static final int HEX_LINES = 0xC03762;
     private static final int HEX_BODY = 0x6F0D28;
-    /** The Chaos Shield: a translucent crimson dome with a hot pink rim. */
-    private static final int SHIELD_BODY = 0xC72D4B;
     private static final Vec3 UP = new Vec3(0, 1, 0);
 
     @SubscribeEvent
@@ -77,31 +77,30 @@ public final class WorldEffectsRenderer {
             RenderType hexType = lines ? EnhancedRenderTypes.energyField(HEX_BARRIER) : EnhancedRenderTypes.ENERGY_VEIL;
             renderHexes(level, pose, buffers.getBuffer(hexType), lines, camera, time, renderDistance);
             buffers.endBatch(hexType);
-            RenderType type = lines ? EnhancedRenderTypes.energyField(HEX_TEXTURE) : EnhancedRenderTypes.ENERGY_VEIL;
-            VertexConsumer vc = buffers.getBuffer(type);
+            // Every shield that is up, of whichever hero (the Chaos Shield, and the shields of the heroes of 3.0).
+            Set<RenderType> drawn = new HashSet<>();
             for (AbstractClientPlayer player : level.players()) {
                 PowerData data = Powers.get(player);
-                if (data.power() == Power.SCARLET_WITCH && data.chaosShieldActive() && !player.isInvisible()) {
+                ShieldStyle style = ShieldStyles.of(data.power());
+                if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
+                    RenderType type = lines ? EnhancedRenderTypes.energyField(style.texture()) : EnhancedRenderTypes.ENERGY_VEIL;
+                    VertexConsumer vc = buffers.getBuffer(type);
+                    drawn.add(type);
                     Vec3 center = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
-                    // It grows from her hands to its full size while it forms (and is fainter while it does).
-                    float formed = data.chaosShieldProgress(time);
-                    float eased = formed * formed * (3F - 2F * formed);
-                    float radius = (float) WandaAbilities.SHIELD_RADIUS * (0.2F + 0.8F * eased);
-                    float flicker = (0.9F + 0.1F * Mth.sin(time * 0.6F)) * (0.4F + 0.6F * eased);
-                    // Close to shattering, or to the end of its time, it gutters.
-                    float weak = 1F - Mth.clamp(data.shieldStrength() / WandaAbilities.maxShieldStrength() / 0.4F, 0F, 1F);
-                    float ending = Mth.clamp((20F - (data.shieldFormedAt() + WandaAbilities.maxShieldTicks() - time)) / 20F, 0F, 1F);
-                    float failing = formed < 1F ? 0F : Math.max(weak, ending);
-                    flicker *= 1F - failing * 0.5F * (0.5F + 0.5F * Mth.sin(time * 2.2F));
+                    // It grows from the hands to its full size while it forms (and is fainter while it does).
+                    ShieldStyle.Look look = style.look(data, time);
                     if (lines) {
-                        EnergyGeometry.sphere(pose, vc, center, radius, 32, 16, 6, 3, time * 0.01F,
-                                Power.SCARLET_WITCH.color, 0.35F * flicker, 0.65F * flicker);
+                        EnergyGeometry.sphere(pose, vc, center, look.radius(), 32, 16, 6, 3, time * 0.01F,
+                                style.lines(), 0.35F * look.flicker(), 0.65F * look.flicker());
                     } else {
-                        EnergyGeometry.veil(pose, vc, center, radius, 32, 16, SHIELD_BODY, 0.12F * flicker, 0.45F * flicker);
+                        EnergyGeometry.veil(pose, vc, center, look.radius(), 32, 16, style.veil(), 0.12F * look.flicker(),
+                                0.45F * look.flicker());
                     }
                 }
             }
-            buffers.endBatch(type);
+            for (RenderType type : drawn) {
+                buffers.endBatch(type);
+            }
         }
 
         VertexConsumer beams = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);

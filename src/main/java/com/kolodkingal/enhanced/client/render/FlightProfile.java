@@ -130,6 +130,13 @@ public final class FlightProfile {
             case VISION -> whiteVision ? WHITE_VISION : VISION;
             case BILLY -> BILLY;
             case THOR -> THOR;
+            // The heroes of 3.0, one line each (each lane's own): none has a flight profile until its lane makes one.
+            // Phoenix, Ultron and Apocalypse fly with the vanilla pose until then.
+            case PHOENIX -> null;
+            case SPIDER_MAN -> null;
+            case THANOS -> null;
+            case ULTRON -> null;
+            case APOCALYPSE -> null;
             case NONE, QUICKSILVER, TOMMY, LOKI -> null;
         };
     }

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -415,7 +416,7 @@ public final class LokiAbilities {
         for (BlockPos pos : BlockPos.betweenClosed(below.offset(-FROST_WALK_RADIUS, 0, -FROST_WALK_RADIUS),
                 below.offset(FROST_WALK_RADIUS, 0, FROST_WALK_RADIUS))) {
             if (pos.distToCenterSqr(player.getX(), pos.getY() + 0.5, player.getZ()) >= r2
-                    || !level.getBlockState(pos.above()).isAir()) {
+                    || !level.getBlockState(pos.above()).isAir() || BossFights.protects(level, pos)) {
                 continue;
             }
             BlockState state = level.getBlockState(pos);

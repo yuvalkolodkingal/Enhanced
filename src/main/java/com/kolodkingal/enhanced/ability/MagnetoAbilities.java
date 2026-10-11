@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -224,6 +225,11 @@ public final class MagnetoAbilities {
             return;
         }
         LivingEntity target = (LivingEntity) hit.getEntity();
+        if (target instanceof BossHooks boss && boss.onMagnetoStrip(player)) {
+            // A boss has its own answer to the strip (it cuts its armour, it laughs): nothing else is taken.
+            data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
+            return;
+        }
         RandomSource random = player.getRandom();
         int ripped = 0;
         for (EquipmentSlot slot : EquipmentSlot.values()) {

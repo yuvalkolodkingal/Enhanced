@@ -254,9 +254,10 @@ public final class ThorTests {
     @GameTest(template = ARENA, timeoutTicks = 200)
     public static void thrownMjolnirHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        // Out and back inside this arena: a hammer that flies on into chunks nothing keeps loaded (when the tests of a
-        // batch happen to be laid out far apart) stops ticking, and never comes home.
-        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 16);
+        // Out and back inside this arena (21 wide, the thrower at x 3.5, the zombie at 12.5): the hammer overshoots its
+        // range by a block or two before it turns, and one that flies on into the chunks of a neighbouring test (which
+        // stop ticking when that test finishes) freezes there and never comes home. 12 turns it at about x 17.
+        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
         ServerPlayer thor = thor(f, 3.5, 10.5);
         Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         lookAt(thor, zombie);
@@ -375,7 +376,7 @@ public final class ThorTests {
     @GameTest(template = ARENA, timeoutTicks = 200)
     public static void thrownStormbreakerHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 16);
+        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         PowerTicker.tick(thor);
@@ -661,7 +662,7 @@ public final class ThorTests {
     @GameTest(template = ARENA, batch = "thrown_weapon_damage", timeoutTicks = 200)
     public static void aThrownStormbreakerHitsAFifthHarderThanAThrownMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 16);
+        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
         ServerPlayer first = f.player(3.5, FLOOR, 5.5, Power.THOR);
         ServerPlayer second = f.player(3.5, FLOOR, 15.5, Power.THOR);
         first.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));

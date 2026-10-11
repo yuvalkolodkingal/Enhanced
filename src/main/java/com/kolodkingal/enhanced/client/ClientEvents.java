@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.client.render.FlightEffects;
 import com.kolodkingal.enhanced.client.render.GestureEffects;
 import com.kolodkingal.enhanced.client.render.HandTracker;
 import com.kolodkingal.enhanced.client.render.HeroAnimator;
+import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
@@ -79,6 +80,7 @@ public final class ClientEvents {
         PowerLoopSounds.tick(mc);
         SlowMotionEffect.tick(mc);
         TheNoise.tick(mc);
+        HeroClients.tick(mc);
     }
 
     /** The game's own music waits while Quicksilver's song plays, and for its usual pause after the song ends. */
@@ -106,6 +108,7 @@ public final class ClientEvents {
         TheNoise.stop();
         BillyCrownLayer.clear();
         WorldEffectsRenderer.clearHexBolts();
+        HeroClients.clear();
     }
 
     /** A new world (a dimension change, say) starts the heroes' lean from scratch. */
@@ -116,6 +119,7 @@ public final class ClientEvents {
             HandTracker.clear();
             FlightEffects.clear();
             GestureEffects.clear();
+            HeroClients.clear();
         }
     }
 

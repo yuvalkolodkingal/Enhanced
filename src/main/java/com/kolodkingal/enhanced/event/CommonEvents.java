@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.event;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
@@ -99,6 +100,7 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
+        HeroLifecycle.onServerStopped();
         Telekinesis.clear();
         HexManager.clearMemory();
         SlowMotion.clear();
@@ -167,6 +169,7 @@ public final class CommonEvents {
             WitchesRoad.forget(player.getUUID());
             // The Vision of her Hex goes with Wanda; the Hex itself stays, and raises him again when she is back.
             HexVisions.ownerGone(player.getUUID());
+            HeroLifecycle.onLogout(player);
         }
     }
 
@@ -175,17 +178,24 @@ public final class CommonEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             Telekinesis.release(player, false);
             HexManager.forget(player.getUUID());
+            HeroLifecycle.onChangeDimension(player);
         }
     }
 
     @SubscribeEvent
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         HexManager.forget(event.getEntity().getUUID());
+        if (event.getEntity() instanceof ServerPlayer player) {
+            HeroLifecycle.onRespawn(player);
+        }
     }
 
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         HexManager.forget(event.getEntity().getUUID());
+        if (event.getEntity() instanceof ServerPlayer player) {
+            HeroLifecycle.onLogin(player);
+        }
     }
 
     @SubscribeEvent
@@ -198,6 +208,7 @@ public final class CommonEvents {
             // A Mjolnir in pieces comes together and falls where he dies; whoever he pinned is free.
             MjolnirShatter.onGone(player);
             MjolnirPin.onOwnerGone(player);
+            HeroLifecycle.onDeath(player);
         }
     }
 

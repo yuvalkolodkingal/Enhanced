@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -130,6 +131,9 @@ public final class Telekinesis {
                 launch(player);
             }
             return;
+        }
+        if (mode == Mode.WANDA && BossFights.telekinesisPress(player)) {
+            return; // a boss has its own use for her hand (Ultron's heart)
         }
 
         double range = EnhancedConfig.TELEKINESIS_RANGE.get();
@@ -350,6 +354,10 @@ public final class Telekinesis {
         Entity e = player.serverLevel().getEntity(grip.target);
         if (e == null) {
             return;
+        }
+        if (grip.mode == Mode.WANDA && BossFights.telekinesisLaunch(player, e)) {
+            letGo(e);
+            return; // a boss took what she threw (a Sentry's core is crushed)
         }
         double speed = EnhancedConfig.THROW_SPEED.get();
         Vec3 vel = player.getLookAngle().scale(speed);

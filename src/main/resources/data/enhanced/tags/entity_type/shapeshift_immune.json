@@ -6,6 +6,16 @@
     "minecraft:warden",
     "minecraft:elder_guardian",
     "enhanced:loki_illusion",
-    "enhanced:hex_vision"
+    "enhanced:hex_vision",
+    "enhanced:ultron",
+    "enhanced:thanos",
+    "enhanced:apocalypse",
+    "enhanced:thanos_sword",
+    "enhanced:thanos_meteor",
+    "enhanced:thanos_orb",
+    "enhanced:thanos_phantom",
+    "enhanced:sand_lance",
+    "enhanced:sand_boulder",
+    "enhanced:sand_cocoon"
   ]
 }

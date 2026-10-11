@@ -1,14 +1,27 @@
 package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
+import com.kolodkingal.enhanced.entity.SandBoulderEntity;
+import com.kolodkingal.enhanced.entity.SandCocoonEntity;
+import com.kolodkingal.enhanced.entity.SandLanceEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.thanos.ThanosEntity;
+import com.kolodkingal.enhanced.thanos.ThanosMeteorEntity;
+import com.kolodkingal.enhanced.thanos.ThanosOrbEntity;
+import com.kolodkingal.enhanced.thanos.ThanosPhantomEntity;
+import com.kolodkingal.enhanced.thanos.ThanosSwordEntity;
+import com.kolodkingal.enhanced.ultron.UltronBoltEntity;
+import com.kolodkingal.enhanced.ultron.UltronEntity;
+import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
+import com.kolodkingal.enhanced.ultron.VibraniumKeyEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -92,10 +105,135 @@ public final class ModEntities {
                     .noSummon()
                     .build("hex_vision"));
 
+    // The entities of 3.0, in one region per hero (the // ===== lines). None can be summoned (the bosses are started by
+    // a ritual or by /enhanced boss start), and none but a Sentry is saved with the world: a fight does not survive a
+    // restart.
+
+    // ===== thanos =====
+    public static final DeferredHolder<EntityType<?>, EntityType<ThanosEntity>> THANOS = ENTITIES.register("thanos",
+            () -> EntityType.Builder.<ThanosEntity>of(ThanosEntity::new, MobCategory.MONSTER)
+                    .sized(1.2F, 3.3F)
+                    .eyeHeight(2.95F)
+                    .fireImmune()
+                    .clientTrackingRange(16)
+                    .updateInterval(2)
+                    .noSave()
+                    .noSummon()
+                    .build("thanos"));
+    public static final DeferredHolder<EntityType<?>, EntityType<ThanosSwordEntity>> THANOS_SWORD = ENTITIES.register("thanos_sword",
+            () -> EntityType.Builder.<ThanosSwordEntity>of(ThanosSwordEntity::new, MobCategory.MISC)
+                    .sized(0.8F, 0.8F)
+                    .fireImmune()
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("thanos_sword"));
+    public static final DeferredHolder<EntityType<?>, EntityType<ThanosMeteorEntity>> THANOS_METEOR = ENTITIES.register("thanos_meteor",
+            () -> EntityType.Builder.<ThanosMeteorEntity>of(ThanosMeteorEntity::new, MobCategory.MISC)
+                    .sized(2.0F, 2.0F)
+                    .fireImmune()
+                    .clientTrackingRange(12)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("thanos_meteor"));
+    public static final DeferredHolder<EntityType<?>, EntityType<ThanosOrbEntity>> THANOS_ORB = ENTITIES.register("thanos_orb",
+            () -> EntityType.Builder.<ThanosOrbEntity>of(ThanosOrbEntity::new, MobCategory.MISC)
+                    .sized(0.9F, 0.9F)
+                    .fireImmune()
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("thanos_orb"));
+    public static final DeferredHolder<EntityType<?>, EntityType<ThanosPhantomEntity>> THANOS_PHANTOM = ENTITIES.register("thanos_phantom",
+            () -> EntityType.Builder.<ThanosPhantomEntity>of(ThanosPhantomEntity::new, MobCategory.MONSTER)
+                    .sized(1.2F, 3.3F)
+                    .eyeHeight(2.95F)
+                    .clientTrackingRange(16)
+                    .noSave()
+                    .noSummon()
+                    .build("thanos_phantom"));
+
+    // ===== ultron =====
+    public static final DeferredHolder<EntityType<?>, EntityType<UltronEntity>> ULTRON = ENTITIES.register("ultron",
+            () -> EntityType.Builder.<UltronEntity>of(UltronEntity::new, MobCategory.MONSTER)
+                    .sized(1.3F, 3.4F)
+                    .fireImmune()
+                    .clientTrackingRange(12)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("ultron"));
+    public static final DeferredHolder<EntityType<?>, EntityType<UltronSentryEntity>> ULTRON_SENTRY = ENTITIES.register("ultron_sentry",
+            () -> EntityType.Builder.<UltronSentryEntity>of(UltronSentryEntity::new, MobCategory.MONSTER)
+                    .sized(0.7F, 1.7F)
+                    .clientTrackingRange(10)
+                    .noSummon()
+                    .build("ultron_sentry"));
+    public static final DeferredHolder<EntityType<?>, EntityType<VibraniumKeyEntity>> VIBRANIUM_KEY = ENTITIES.register("vibranium_key",
+            () -> EntityType.Builder.<VibraniumKeyEntity>of(VibraniumKeyEntity::new, MobCategory.MISC)
+                    .sized(3.2F, 3.4F)
+                    .fireImmune()
+                    .clientTrackingRange(16)
+                    .noSave()
+                    .noSummon()
+                    .build("vibranium_key"));
+    public static final DeferredHolder<EntityType<?>, EntityType<UltronBoltEntity>> ULTRON_BOLT = ENTITIES.register("ultron_bolt",
+            () -> EntityType.Builder.<UltronBoltEntity>of(UltronBoltEntity::new, MobCategory.MISC)
+                    .sized(0.3F, 0.3F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("ultron_bolt"));
+
+    // ===== apocalypse =====
+    public static final DeferredHolder<EntityType<?>, EntityType<ApocalypseEntity>> APOCALYPSE = ENTITIES.register("apocalypse",
+            () -> EntityType.Builder.<ApocalypseEntity>of(ApocalypseEntity::new, MobCategory.MONSTER)
+                    .sized(0.9F, 2.9F)
+                    .eyeHeight(2.6F)
+                    .fireImmune()
+                    .clientTrackingRange(12)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("apocalypse"));
+    public static final DeferredHolder<EntityType<?>, EntityType<SandLanceEntity>> SAND_LANCE = ENTITIES.register("sand_lance",
+            () -> EntityType.Builder.<SandLanceEntity>of(SandLanceEntity::new, MobCategory.MISC)
+                    .sized(0.3F, 0.3F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("sand_lance"));
+    public static final DeferredHolder<EntityType<?>, EntityType<SandBoulderEntity>> SAND_BOULDER = ENTITIES.register("sand_boulder",
+            () -> EntityType.Builder.<SandBoulderEntity>of(SandBoulderEntity::new, MobCategory.MISC)
+                    .sized(0.3F, 0.3F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("sand_boulder"));
+    public static final DeferredHolder<EntityType<?>, EntityType<SandCocoonEntity>> SAND_COCOON = ENTITIES.register("sand_cocoon",
+            () -> EntityType.Builder.<SandCocoonEntity>of(SandCocoonEntity::new, MobCategory.MISC)
+                    .sized(0.9F, 2.0F)
+                    .fireImmune()
+                    .clientTrackingRange(10)
+                    .noSave()
+                    .noSummon()
+                    .build("sand_cocoon"));
+
     /** Mod bus: attributes of the mod's living entities. */
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
         event.put(HEX_VISION.get(), HexVisionEntity.createAttributes().build());
+        event.put(THANOS.get(), ThanosEntity.createAttributes().build());
+        event.put(THANOS_PHANTOM.get(), ThanosPhantomEntity.createAttributes().build());
+        event.put(ULTRON.get(), UltronEntity.createAttributes().build());
+        event.put(ULTRON_SENTRY.get(), UltronSentryEntity.createAttributes().build());
+        event.put(APOCALYPSE.get(), ApocalypseEntity.createAttributes().build());
     }
 
     private ModEntities() {

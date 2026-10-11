@@ -25,6 +25,13 @@ public final class ModCreativeTab {
                         output.accept(ModItems.MJOLNIR.get());
                         output.accept(ModItems.STORMBREAKER.get());
                         output.accept(ModItems.WITCHES_ROAD_DOOR.get());
+                        output.accept(ModItems.PHOENIX_EMBER.get());
+                        output.accept(ModItems.RADIOACTIVE_SPIDER.get());
+                        output.accept(ModItems.INFINITY_GAUNTLET.get());
+                        output.accept(ModItems.ULTRON_PROGRAM.get());
+                        output.accept(ModItems.ULTRON_CORE.get());
+                        output.accept(ModItems.CAPSTONE.get());
+                        output.accept(ModItems.ESSENCE.get());
                     })
                     .build());
 

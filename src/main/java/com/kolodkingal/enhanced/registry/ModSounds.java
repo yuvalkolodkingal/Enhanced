@@ -59,7 +59,8 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> TESSERACT = register("tesseract");
 
     // The voices of the Infinity Stones (see InfinityStone): a use sound and a quiet hum for each. The Space and Mind
-    // Stones are in the mod; the other four are registered for the Thanos boss.
+    // Stones are in the mod; the other four are registered for the Thanos boss (the names are <stone>_stone and
+    // <stone>_stone_hum, as the files and sounds.json have them).
     public static final DeferredHolder<SoundEvent, SoundEvent> SPACE_STONE = register("space_stone");
     public static final DeferredHolder<SoundEvent, SoundEvent> SPACE_STONE_HUM = register("space_stone_hum");
     public static final DeferredHolder<SoundEvent, SoundEvent> MIND_STONE = register("mind_stone");
@@ -72,6 +73,22 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_STONE_HUM = register("soul_stone_hum");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIME_STONE = register("time_stone");
     public static final DeferredHolder<SoundEvent, SoundEvent> TIME_STONE_HUM = register("time_stone_hum");
+
+    // The sounds of 3.0, one region per hero (the // ===== lines), each lane's own: its events here, its entries in
+    // sounds.json and its subtitles in the lang files (DataTests checks all three). The names start with the hero's
+    // prefixes so they never collide: phoenix_ mind_ psionic_ | web_ spider_ leg_ instant_kill_ black_eyes_ |
+    // thanos_ gauntlet_ soul_ time_ reality_ (not the stone voices above, which are <stone>_stone and
+    // <stone>_stone_hum) | ultron_ sentry_ | apocalypse_ sand_ entomb essence_.
+
+    // ===== phoenix =====
+
+    // ===== spider =====
+
+    // ===== thanos =====
+
+    // ===== ultron =====
+
+    // ===== apocalypse =====
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));

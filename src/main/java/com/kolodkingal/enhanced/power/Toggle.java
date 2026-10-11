@@ -1,8 +1,11 @@
 package com.kolodkingal.enhanced.power;
 
 /**
- * On/off states of the newer heroes, saved together as one bit set in {@link PowerData}. Only ever append: a
- * toggle's bit is its position in this list, and that is what is saved.
+ * On/off states of the newer heroes, saved together as one bit set in {@link PowerData}. Only ever append: a toggle's
+ * bit is its position in this list, and that is what is saved.
+ *
+ * <p>The toggles of 3.0 sit in one region per hero (the {@code // =====} lines), so the five lanes that build those
+ * heroes append to their own lines and never to the same one. The positions are fixed when a version is released.
  */
 public enum Toggle {
     /** Loki: his true Frost Giant form. */
@@ -12,14 +15,42 @@ public enum Toggle {
     /** Tommy: sprinting is super speed (on from the start). */
     SUPER_SPEED,
     /** Billy: hearing the thoughts of everything around him. */
-    THE_NOISE;
+    THE_NOISE,
+
+    // ===== phoenix =====
+    /** Phoenix: reading the mind of whoever she looks at. */
+    MIND_READING,
+
+    // ===== spider =====
+    /** Spider-Man: sticking to walls and ceilings (on from the start). */
+    WALL_CRAWL,
+    /** Spider-Man: the tingle that warns him of danger (on from the start). */
+    SPIDER_SENSE,
+    /** Spider-Man: the Iron Spider's mechanical legs are out. */
+    SPIDER_LEGS,
+
+    // ===== thanos =====
+    /** Thanos: the Reality Stone's veil of illusion is drawn around him. */
+    REALITY_VEIL,
+
+    // ===== ultron =====
+
+    // ===== apocalypse =====
+    ;
 
     final int bit() {
         return 1 << ordinal();
     }
 
-    /** The toggles a hero starts with: Tommy's sprint is super speed until he turns it off. */
+    /**
+     * The toggles a hero starts with: Tommy's sprint is super speed until he turns it off, Spider-Man clings and
+     * senses.
+     */
     static int defaults(Power power) {
-        return power == Power.TOMMY ? SUPER_SPEED.bit() : 0;
+        return switch (power) {
+            case TOMMY -> SUPER_SPEED.bit();
+            case SPIDER_MAN -> WALL_CRAWL.bit() | SPIDER_SENSE.bit();
+            default -> 0;
+        };
     }
 }

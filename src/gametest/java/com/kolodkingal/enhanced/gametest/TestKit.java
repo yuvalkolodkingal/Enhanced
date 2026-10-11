@@ -1,8 +1,16 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.ability.HeroServer;
+import com.kolodkingal.enhanced.ability.HeroServers;
+import com.kolodkingal.enhanced.boss.BossData;
+import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossKind;
+import com.kolodkingal.enhanced.boss.BossLane;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.gametest.framework.GameTestAssertException;
@@ -33,8 +41,10 @@ import java.lang.reflect.Field;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.IntPredicate;
 
@@ -58,6 +68,44 @@ public final class TestKit {
     public static Fixture fixture(GameTestHelper helper) {
         Fixture fixture = new Fixture(helper);
         helper.testInfo.addListener(fixture);
+        return fixture;
+    }
+
+    /**
+     * A fixture for a test of a boss fight, or of anything that keeps server-wide state from one tick to the next (the
+     * boss registry, the rewards waiting to be handed over, the heroes' static maps): when the test ends, pass or fail,
+     * it lets every fight go, clears the heroes' statics, puts back the boss lanes and the Thanos summoning the mod
+     * registered and the rewards that were waiting, so a fight left over from one test never reaches the next. A boss test also has a batch of its
+     * own ({@code @GameTest(batch = ...)}), so no other test runs while it does.
+     */
+    public static Fixture bossFixture(GameTestHelper helper) {
+        Fixture fixture = fixture(helper);
+        MinecraftServer server = helper.getLevel().getServer();
+        Map<BossKind, BossLane> lanes = new EnumMap<>(BossKind.class);
+        for (BossKind kind : BossKind.values()) {
+            BossLane lane = BossFights.lane(kind);
+            if (lane != null) {
+                lanes.put(kind, lane);
+            }
+        }
+        BossData data = server.overworld().getData(ModAttachments.BOSS_DATA);
+        ScepterRituals.Hold summoning = ScepterRituals.thanosHold();
+        fixture.onClose(() -> {
+            ScepterRituals.registerThanosHold(summoning);
+            BossFights.clear();
+            for (HeroServer hero : HeroServers.all()) {
+                hero.onServerStopped();
+            }
+            for (BossKind kind : BossKind.values()) {
+                BossLane lane = lanes.get(kind);
+                if (lane == null) {
+                    BossFights.unregister(kind);
+                } else {
+                    BossFights.register(kind, lane);
+                }
+            }
+            server.overworld().setData(ModAttachments.BOSS_DATA, data);
+        });
         return fixture;
     }
 
@@ -101,9 +149,17 @@ public final class TestKit {
          * {@link ServerPlayer#doTick()}, which is exactly what a connected client's tick does) themselves.
          */
         public ServerPlayer player(double x, double y, double z, GameType gameType) {
+            return player(x, y, z, gameType, UUID.randomUUID());
+        }
+
+        /**
+         * The same, for a given UUID: a player who logs in again after they were removed from the server is the same
+         * person with a new body, and this is how a test brings them back.
+         */
+        public ServerPlayer player(double x, double y, double z, GameType gameType, UUID uuid) {
             ServerLevel level = helper.getLevel();
             MinecraftServer server = level.getServer();
-            GameProfile profile = new GameProfile(UUID.randomUUID(), "enh-test-" + (++playerCounter));
+            GameProfile profile = new GameProfile(uuid, "enh-test-" + (++playerCounter));
             CommonListenerCookie cookie = new CommonListenerCookie(profile, 0, ClientInformation.createDefault(), false, ConnectionType.NEOFORGE);
             ServerPlayer player = new ServerPlayer(server, level, profile, cookie.clientInformation());
             Connection connection = new Connection(PacketFlow.SERVERBOUND);
@@ -134,6 +190,11 @@ public final class TestKit {
             boolean old = server.isPvpAllowed();
             server.setPvpAllowed(allowed);
             undo.add(() -> server.setPvpAllowed(old));
+        }
+
+        /** Runs {@code action} when the test ends, pass or fail (before what was registered earlier is undone). */
+        public void onClose(Runnable action) {
+            undo.add(action);
         }
 
         /** Runs {@code step} once per tick for ticks 1..{@code lastTick}. Returning true ends the test successfully. */

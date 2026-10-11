@@ -1,5 +1,9 @@
 package com.kolodkingal.enhanced.command;
 
+import com.kolodkingal.enhanced.boss.BossFight;
+import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossKind;
+import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.Power;
@@ -7,6 +11,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -15,9 +20,13 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -30,10 +39,16 @@ import java.util.List;
  * /enhanced look &lt;players&gt; &lt;look&gt;
  * /enhanced hex list
  * /enhanced hex clear
+ * /enhanced boss start &lt;ultron|thanos|apocalypse&gt; [force]
+ * /enhanced boss stop
+ * /enhanced boss list
+ * /enhanced boss cleanup &lt;center&gt; &lt;radius&gt;
  */
 public final class EnhancedCommand {
     private static final DynamicCommandExceptionType UNKNOWN_POWER =
             new DynamicCommandExceptionType(name -> Component.translatable("commands.enhanced.power.unknown", name));
+    private static final DynamicCommandExceptionType UNKNOWN_BOSS =
+            new DynamicCommandExceptionType(name -> Component.translatable("commands.enhanced.boss.unknown", name));
     private static final DynamicCommandExceptionType UNKNOWN_LOOK =
             new DynamicCommandExceptionType(name -> Component.translatable("commands.enhanced.look.unknown", name));
 
@@ -63,7 +78,21 @@ public final class EnhancedCommand {
                                         .executes(EnhancedCommand::look))))
                 .then(Commands.literal("hex")
                         .then(Commands.literal("list").executes(ctx -> listHexes(ctx.getSource())))
-                        .then(Commands.literal("clear").executes(ctx -> clearHexes(ctx.getSource())))));
+                        .then(Commands.literal("clear").executes(ctx -> clearHexes(ctx.getSource()))))
+                .then(Commands.literal("boss")
+                        .then(Commands.literal("start")
+                                .then(Commands.argument("boss", StringArgumentType.word())
+                                        .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
+                                                Arrays.stream(BossKind.values()).map(BossKind::id), builder))
+                                        .executes(ctx -> startBoss(ctx, false))
+                                        .then(Commands.literal("force").executes(ctx -> startBoss(ctx, true)))))
+                        .then(Commands.literal("stop").executes(ctx -> stopBosses(ctx.getSource())))
+                        .then(Commands.literal("list").executes(ctx -> listBosses(ctx.getSource())))
+                        .then(Commands.literal("cleanup")
+                                .then(Commands.argument("center", Vec3Argument.vec3())
+                                        .then(Commands.argument("radius", IntegerArgumentType.integer(1, 512))
+                                                .executes(ctx -> cleanupBosses(ctx.getSource(), Vec3Argument.getVec3(ctx, "center"),
+                                                        IntegerArgumentType.getInteger(ctx, "radius"))))))));
     }
 
     private static int get(CommandSourceStack source, ServerPlayer player) {
@@ -116,6 +145,50 @@ public final class EnhancedCommand {
         int n = changed;
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.look.set", n, look), true);
         return changed;
+    }
+
+    /** Wakes a boss at the player who runs the command; "force" skips the ritual's own checks. */
+    private static int startBoss(CommandContext<CommandSourceStack> ctx, boolean force) throws CommandSyntaxException {
+        String name = StringArgumentType.getString(ctx, "boss");
+        BossKind kind = BossKind.byId(name);
+        if (kind == null) {
+            throw UNKNOWN_BOSS.create(name);
+        }
+        Component boss = Component.translatable("entity.enhanced." + kind.id());
+        if (!BossFights.start(kind, ctx.getSource().getPlayerOrException(), force)) {
+            ctx.getSource().sendFailure(Component.translatable("commands.enhanced.boss.start.failed", boss));
+            return 0;
+        }
+        ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.boss.start", boss), true);
+        return 1;
+    }
+
+    private static int stopBosses(CommandSourceStack source) {
+        int running = BossFights.all(source.getServer()).size();
+        BossFights.stopAll(source.getServer(), StopReason.COMMAND);
+        source.sendSuccess(() -> Component.translatable(running == 0 ? "commands.enhanced.boss.stop.none" : "commands.enhanced.boss.stop"), true);
+        return 1;
+    }
+
+    private static int listBosses(CommandSourceStack source) {
+        List<BossFight> fights = BossFights.all(source.getServer());
+        if (fights.isEmpty()) {
+            source.sendSuccess(() -> Component.translatable("commands.enhanced.boss.list.none"), false);
+            return 0;
+        }
+        for (BossFight fight : fights) {
+            source.sendSuccess(() -> Component.literal(fight.describe()), false);
+        }
+        return fights.size();
+    }
+
+    /** Removes the boss entities left in a ball round a point: what a fight that went wrong leaves behind. */
+    private static int cleanupBosses(CommandSourceStack source, Vec3 center, int radius) {
+        List<Entity> strays = source.getLevel().getEntities((Entity) null, AABB.ofSize(center, radius * 2.0, radius * 2.0, radius * 2.0),
+                entity -> BossFights.isFightEntity(entity) && entity.position().distanceToSqr(center) <= (double) radius * radius);
+        strays.forEach(Entity::discard);
+        source.sendSuccess(() -> Component.translatable("commands.enhanced.boss.cleanup", strays.size()), true);
+        return strays.size();
     }
 
     private static int listHexes(CommandSourceStack source) {

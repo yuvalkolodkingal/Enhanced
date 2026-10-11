@@ -248,6 +248,12 @@ public final class FirstPersonArms {
             }
         }
 
+        // ---- the heroes of 3.0 ----
+        HeroClient hero = HeroClients.of(s.power);
+        if (hero != null) {
+            hero.firstPerson(s, player, m, o);
+        }
+
         // ---- ambient motion: the weapon's whirl, the wind, the breathing of a hover ----
         if (s.wSpin > 0.02F) {
             float a = s.spinAngle * Mth.DEG_TO_RAD;
@@ -310,13 +316,13 @@ public final class FirstPersonArms {
         }
     }
 
-    private static void both(float w, float dx, float dy, float dz, float rx, float ry, float rz) {
+    static void both(float w, float dx, float dy, float dz, float rx, float ry, float rz) {
         RIGHT.add(w, dx, dy, dz, rx, ry, rz);
         LEFT.add(w, dx, dy, dz, rx, ry, rz);
     }
 
     /** A tremble of at most 0.015 blocks, none with reduced motion. */
-    private static void tremble(Offset a, Offset b, float w, float amplitude, float speed, float age, boolean calm) {
+    static void tremble(Offset a, Offset b, float w, float amplitude, float speed, float age, boolean calm) {
         if (calm) {
             return;
         }

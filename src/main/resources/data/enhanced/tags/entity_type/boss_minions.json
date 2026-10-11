@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:ultron_sentry",
+    "enhanced:thanos_phantom",
+    "enhanced:thanos_sword",
+    "enhanced:thanos_meteor",
+    "enhanced:thanos_orb"
+  ]
+}

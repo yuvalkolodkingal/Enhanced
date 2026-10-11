@@ -44,7 +44,19 @@ public final class PowerLoopSounds {
         /** The Mind Stone in Loki's Scepter. */
         MIND_STONE_HUM(ModSounds.MIND_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holds(p, ModItems.LOKIS_SCEPTER.get())),
         /** The Vision of a Hex firing his Mind Stone beam: Vision's own hum, a little lower and softer. */
-        HEX_VISION_BEAM(ModSounds.MIND_STONE_BEAM, 0.6F, 0.9F, null);
+        HEX_VISION_BEAM(ModSounds.MIND_STONE_BEAM, 0.6F, 0.9F, null),
+
+        // The loops of 3.0, in one region per hero (the // ===== lines), each lane's own.
+        // ===== phoenix =====
+
+        // ===== spider =====
+
+        // ===== thanos =====
+
+        // ===== ultron =====
+
+        // ===== apocalypse =====
+        ;
 
         final Supplier<SoundEvent> sound;
         final float volume;

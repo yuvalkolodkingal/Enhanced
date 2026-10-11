@@ -97,7 +97,20 @@ public enum GestureId {
     /** The fragments come together in his hand. */
     THOR_REFORM(Group.THOR_ARM, 18, 3, 6, false),
     /** He brings Mjolnir down on someone and pins them (started by the server's payload). */
-    THOR_PIN(Group.THOR_ARM, 20, 2, 8, true);
+    THOR_PIN(Group.THOR_ARM, 20, 2, 8, true),
+
+    // The gestures of 3.0, in one region per hero (the // ===== lines), each lane's own. A gesture needs its keys in
+    // the hero's HeroClient.registerGestures and a route in GestureRoutes (or a line in startedElsewhere).
+    // ===== phoenix =====
+
+    // ===== spider =====
+
+    // ===== thanos =====
+
+    // ===== ultron =====
+
+    // ===== apocalypse =====
+    ;
 
     /** Gestures of one group never play together. */
     public enum Group {

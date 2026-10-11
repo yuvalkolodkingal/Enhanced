@@ -3,7 +3,10 @@ package com.kolodkingal.enhanced.power;
 /**
  * Momentary states of the newer heroes (and of whoever Mjolnir pins down) that clients must see (to draw effects and
  * poses, or to stop a pinned player's own movement) but that are never saved: they are recomputed by the server while
- * the power is in use. Kept together as one bit set in {@link PowerData}.
+ * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (26 bits are used).
+ *
+ * <p>The states of 3.0 sit in one region per hero (the {@code // =====} lines), so the five lanes that build those
+ * heroes append to their own lines and never to the same one.
  */
 public enum Live {
     /** Tommy, or Quicksilver in Quicksilver Time or Super Speed, is running at super speed right now. */
@@ -32,9 +35,55 @@ public enum Live {
      * Mjolnir lies on this player and pins them in place: their client stops their movement (any player, not only
      * heroes).
      */
-    PINNED;
+    PINNED,
 
-    final int bit() {
-        return 1 << ordinal();
+    // ===== phoenix =====
+    /** Phoenix: N is held and the Burst gathers in her. */
+    PHOENIX_CHARGING,
+    /** Phoenix: the cosmic fire burns around her body (while she charges, and for a moment after the Burst). */
+    PHOENIX_BLAZE,
+    /** Phoenix: Mind Sense is on, a ring of light spreading from her through walls. */
+    MIND_SENSING,
+    /** Phoenix: the Psionic Field is closed around her. */
+    PHOENIX_PSIONIC,
+
+    // ===== spider =====
+    /** Spider-Man clings to a wall. */
+    CLINGING_WALL,
+    /** Spider-Man hangs from a ceiling. */
+    CLINGING_CEILING,
+    /** Spider-Man is pulled along a web to the point he aimed at. */
+    ZIPPING,
+    /** Spider-Man swings on a web. */
+    SWINGING,
+    /** Spider-Man's spider-sense tingles. */
+    SENSING,
+    /** Spider-Man's Black Eyes are on. */
+    BLACK_EYES,
+    /** The Iron Spider's Instant Kill is active. */
+    INSTANT_KILL,
+
+    // ===== thanos =====
+    /** Thanos drains the soul of whoever he holds with the Soul Stone (B is held). */
+    SOUL_DRAINING,
+    /** Thanos sees souls through walls with the Soul Stone. */
+    SOUL_SIGHT,
+
+    // ===== ultron =====
+    /** Ultron charges his repulsors (R is held). */
+    ULTRON_CHARGING,
+    /**
+     * Sokovia carries this player into the sky: they can't move on their own, like a pinned player (any player in the
+     * arena, not only Ultron).
+     */
+    LIFTED,
+
+    // ===== apocalypse =====
+    /** Apocalypse is calling a sandstorm. */
+    SANDSTORM,
+    ;
+
+    final long bit() {
+        return 1L << ordinal();
     }
 }

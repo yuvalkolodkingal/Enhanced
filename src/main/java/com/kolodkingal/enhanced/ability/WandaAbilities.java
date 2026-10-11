@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
@@ -26,7 +27,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -299,11 +299,15 @@ public final class WandaAbilities {
     }
 
     /**
-     * What a projectile would have done to her, in the strength it takes out of the shield: an arrow's damage at its
-     * speed, a trident's 8, a fireball's 6, a thrown hammer's, a hammer fragment's, a dagger's or a shard's own
-     * damage, and 2 for the rest.
+     * What a projectile would have done to her, in the strength it takes out of the shield: what it says itself if it
+     * is a {@link ShieldCost} (the projectiles of the villains and of the heroes of 3.0), an arrow's damage at its
+     * speed, a trident's 8, a fireball's 6, a thrown hammer's, a hammer fragment's, a dagger's or a shard's own damage,
+     * and 2 for the rest.
      */
     static float projectilePower(Projectile projectile) {
+        if (projectile instanceof ShieldCost cost) {
+            return cost.shieldCost();
+        }
         if (projectile instanceof ThrownTrident) {
             return 8.0F;
         }
@@ -330,23 +334,44 @@ public final class WandaAbilities {
     }
 
     /**
-     * A projectile reaches the shield: it turns to sparks, and the shield pays what it would have cost her. (Mjolnir,
-     * Stormbreaker and the fragments of a shattered Mjolnir are the exception: see {@link #repel}.)
+     * A projectile reaches the shield: it is neutralised ({@link #neutralize}), and the shield pays what it would have
+     * cost her.
      */
     public static void block(ServerPlayer player, Projectile projectile) {
         float power = projectilePower(projectile);
-        if (projectile instanceof ThrownWeaponEntity weapon) {
-            repel(player.serverLevel(), weapon, () -> weapon.setReturning(true));
-        } else if (projectile instanceof MjolnirFragmentEntity fragment) {
-            repel(player.serverLevel(), fragment, fragment::setReturning);
-        } else {
-            disintegrate(player.serverLevel(), projectile);
-        }
+        neutralize(player.serverLevel(), projectile);
         wear(player, power);
     }
 
-    /** A thrown weapon or a hammer fragment already on its way home to Thor: the shield lets it by. */
+    /**
+     * What a shield of any hero does to a projectile that reaches it, without the cost: it turns to sparks in the
+     * Scarlet Witch's red. (Mjolnir, Stormbreaker, the fragments of a shattered Mjolnir and every {@link ShieldCost}
+     * that is {@linkplain ShieldCost#oneOfAKind one of a kind} are the exception: see {@link #repel}.)
+     */
+    public static void neutralize(ServerLevel level, Projectile projectile) {
+        neutralize(level, projectile, Power.SCARLET_WITCH.color);
+    }
+
+    /** {@link #neutralize(ServerLevel, Projectile)} in the colour of another hero's shield (Apocalypse's gold). */
+    public static void neutralize(ServerLevel level, Projectile projectile, int color) {
+        if (projectile instanceof ThrownWeaponEntity weapon) {
+            repel(level, weapon, color, () -> weapon.setReturning(true));
+        } else if (projectile instanceof MjolnirFragmentEntity fragment) {
+            repel(level, fragment, color, fragment::setReturning);
+        } else if (projectile instanceof ShieldCost cost && cost.oneOfAKind()) {
+            repel(level, projectile, color, cost::turnHome);
+        } else {
+            disintegrate(level, projectile, color);
+        }
+    }
+
+    /**
+     * A projectile already on its way home to its owner (a weapon of Thor's, Thanos's sword): the shield lets it by.
+     */
     private static boolean isHeadingHome(Projectile projectile) {
+        if (projectile instanceof ShieldCost cost && cost.oneOfAKind()) {
+            return cost.returning();
+        }
         return projectile instanceof ThrownWeaponEntity weapon ? weapon.isReturning()
                 : projectile instanceof MjolnirFragmentEntity fragment && fragment.isReturning();
     }
@@ -356,8 +381,8 @@ public final class WandaAbilities {
      * of a shattered Mjolnir are the hammer itself: the shield turns them round and they fly home to Thor, instead of
      * being destroyed for good (a fragment shredded here would leave the hammer one piece short).
      */
-    private static void repel(ServerLevel level, Projectile projectile, Runnable turnHome) {
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F), projectile.getX(), projectile.getY(), projectile.getZ(),
+    private static void repel(ServerLevel level, Projectile projectile, int color, Runnable turnHome) {
+        level.sendParticles(new EnergyParticleOptions(color, 1.3F), projectile.getX(), projectile.getY(), projectile.getZ(),
                 10, 0.15, 0.15, 0.15, 0.08);
         level.playSound(null, projectile.getX(), projectile.getY(), projectile.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F, 0.8F);
         turnHome.run();
@@ -378,13 +403,13 @@ public final class WandaAbilities {
      * bee's sting and Quicksilver's blitz. Whatever is thrown, shot or cast (arrows, fireballs, beams, magic and
      * potions, a Guardian's laser, a Warden's sonic boom), whatever explodes, and the world's own harm (falling,
      * starving, fire, the void, {@code /kill}) are not melee.
+     *
+     * <p>Which damage types are blows is the data-driven tag {@code enhanced:melee_blows} (the vanilla creature attack,
+     * sting and player attack, the speed blitz, and the blows of the heroes and villains of 3.0).
      */
     public static boolean isMeleeHit(DamageSource source) {
         Entity attacker = source.getDirectEntity();
-        return attacker instanceof LivingEntity && attacker == source.getEntity()
-                && (source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO)
-                || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.STING)
-                || source.is(ModDamageTypes.SPEED_BLITZ));
+        return attacker instanceof LivingEntity && attacker == source.getEntity() && source.is(ModTags.MELEE_BLOWS);
     }
 
     /**
@@ -482,7 +507,12 @@ public final class WandaAbilities {
 
     /** A projectile touching the Chaos Shield turns to red sparks. */
     public static void disintegrate(ServerLevel level, Projectile projectile) {
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F), projectile.getX(), projectile.getY(), projectile.getZ(),
+        disintegrate(level, projectile, Power.SCARLET_WITCH.color);
+    }
+
+    /** A projectile touching a shield turns to sparks of its colour and is gone. */
+    public static void disintegrate(ServerLevel level, Projectile projectile, int color) {
+        level.sendParticles(new EnergyParticleOptions(color, 1.3F), projectile.getX(), projectile.getY(), projectile.getZ(),
                 10, 0.15, 0.15, 0.15, 0.08);
         level.sendParticles(ParticleTypes.SMOKE, projectile.getX(), projectile.getY(), projectile.getZ(), 3, 0.1, 0.1, 0.1, 0.01);
         level.playSound(null, projectile.getX(), projectile.getY(), projectile.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5F, 1.8F);

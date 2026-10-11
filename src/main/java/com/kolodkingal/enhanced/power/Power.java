@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.power;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.config.ApocalypseConfig;
+import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.config.UltronConfig;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
@@ -22,7 +25,16 @@ public enum Power implements StringRepresentable {
     BILLY(0x5CC8FF, 0xCFEFFF),
     TOMMY(0x2E9C7E, 0x7FD8B8),
     LOKI(0x76B154, 0xCAF297),
-    THOR(0x4DB8FF, 0xBFE6FF);
+    THOR(0x4DB8FF, 0xBFE6FF),
+    // The heroes of 3.0, in Eilon's order. They are appended after Thor and in this order: the stream codec sends the
+    // ordinal, so every hero of one version must be in the same build (saves use the name, so the order never matters
+    // on disk). Phoenix fire is gold-orange, Spider-Man's suit red with silver webs, the Infinity Stones purple, the
+    // Sentry-bright amber of Ultron's body and the ochre and gold of Apocalypse.
+    PHOENIX(0xFF8A1F, 0xFFD65A),
+    SPIDER_MAN(0xDC2B2F, 0xDCE6F2),
+    THANOS(0x9B4DEB, 0xE6D2FF),
+    ULTRON(0xFFA23A, 0xFFE9B8),
+    APOCALYPSE(0xF2B84B, 0xFFF0B8);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -48,9 +60,17 @@ public enum Power implements StringRepresentable {
         return name().toLowerCase(Locale.ROOT);
     }
 
-    /** Colour of the hero's name (titles, HUD): the energy colour, except Magneto's, whose power has no colour. */
+    /**
+     * Colour of the hero's name (titles, HUD): the energy colour, except for three whose energy would not read as the
+     * hero: Magneto's power has no colour, Ultron is named in the red of his eyes and Apocalypse in the blue of his.
+     */
     public int titleColor() {
-        return this == MAGNETO ? 0xC8323C : color;
+        return switch (this) {
+            case MAGNETO -> 0xC8323C;
+            case ULTRON -> 0xD8262B;
+            case APOCALYPSE -> 0x4A9BC4;
+            default -> color;
+        };
     }
 
     public boolean hasPowers() {
@@ -66,11 +86,14 @@ public enum Power implements StringRepresentable {
         return "ability.enhanced." + getSerializedName() + "." + ability;
     }
 
-    /** Quicksilver and Tommy run and Loki walks; everyone else can fly (Thor only with Mjolnir, see ThorAbilities). */
+    /**
+     * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, and Loki walks; everyone else can
+     * fly (Thor only with Mjolnir, see ThorAbilities).
+     */
     public boolean canFly() {
         return switch (this) {
-            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR -> true;
-            case NONE, QUICKSILVER, TOMMY, LOKI -> false;
+            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> true;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> false;
         };
     }
 
@@ -81,7 +104,10 @@ public enum Power implements StringRepresentable {
             case VISION -> EnhancedConfig.VISION_FLIGHT_SPEED.get().floatValue();
             case BILLY -> EnhancedConfig.BILLY_FLIGHT_SPEED.get().floatValue();
             case THOR -> EnhancedConfig.THOR_FLIGHT_SPEED.get().floatValue();
-            case NONE, QUICKSILVER, TOMMY, LOKI -> 0.05F;
+            case PHOENIX -> PhoenixConfig.FLIGHT_SPEED.get().floatValue();
+            case ULTRON -> UltronConfig.FLIGHT_SPEED.get().floatValue();
+            case APOCALYPSE -> ApocalypseConfig.FLIGHT_SPEED.get().floatValue();
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> 0.05F;
         };
     }
 
@@ -89,8 +115,8 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, VISION, BILLY, THOR -> 2;
-            case NONE, QUICKSILVER, TOMMY, LOKI -> -1;
+            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> 2;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> -1;
         };
     }
 

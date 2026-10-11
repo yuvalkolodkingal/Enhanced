@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:thrown_weapon",
+    "enhanced:mjolnir_fragment",
+    "enhanced:thanos_sword",
+    "enhanced:thanos_meteor",
+    "enhanced:thanos_orb"
+  ]
+}

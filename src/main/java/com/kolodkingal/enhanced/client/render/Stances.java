@@ -84,6 +84,11 @@ final class Stances {
             c.arm(false, -55, 0, -55, w);
             c.head(-18, 0, 0, w);
         }
+        // The heroes of 3.0, last.
+        HeroClient hero = HeroClients.of(st.power);
+        if (hero != null) {
+            hero.ambient(c);
+        }
     }
 
     /** Applies the aimed and holding stances: later rows win where they overlap. */
@@ -202,6 +207,11 @@ final class Stances {
             c.occupy(true, w);
             c.occupy(false, w);
         }
+        // The heroes of 3.0, last.
+        HeroClient hero = HeroClients.of(st.power);
+        if (hero != null) {
+            hero.aimed(c);
+        }
     }
 
     /** The hand that holds something: a style per hero. */
@@ -255,13 +265,14 @@ final class Stances {
         lean += (st.weaponKind > 0 ? 6.0F : 4.0F) * st.stance(Stance.THOR_BEAM);
         lean += 10.0F * st.stance(Stance.TOMMY_WHIRL);
         lean += 2.0F * st.stance(Stance.NOISE);
+        lean += HeroClients.lean(st);
         return lean;
     }
 
     /** The dip (blocks, positive sinks) the stances add. */
     static float drop(HeroAnimState st) {
         return 0.02F * st.stance(Stance.TK_STRAIN) + 0.03F * st.stance(Stance.VISION_DENSE)
-                + 0.03F * HeroAnimator.beamPower(st) * st.stance(Stance.THOR_BEAM);
+                + 0.03F * HeroAnimator.beamPower(st) * st.stance(Stance.THOR_BEAM) + HeroClients.drop(st);
     }
 
     private Stances() {

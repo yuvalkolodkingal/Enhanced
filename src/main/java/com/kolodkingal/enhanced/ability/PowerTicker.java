@@ -32,6 +32,7 @@ public final class PowerTicker {
         MagnetoAbilities.helmetTick(player, data);
         QuicksilverAbilities.gogglesTick(player, data);
         ThorAbilities.everyPlayerTick(player, data);
+        HeroServers.everyPlayerTick(player, data);
         applyPassives(player, data);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.tick(player, data);
@@ -42,6 +43,7 @@ public final class PowerTicker {
             case TOMMY -> TommyAbilities.tick(player, data);
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE -> HeroServers.tick(player, data);
             case NONE -> {
             }
         }
@@ -82,6 +84,7 @@ public final class PowerTicker {
         TommyAbilities.applySpeed(player, data);
         LokiAbilities.applyForm(player, data);
         ThorAbilities.applyBody(player, data);
+        HeroServers.applyBody(player, data);
     }
 
     /** The player is about to lose this power: everything it left in the world ends. */
@@ -91,6 +94,7 @@ public final class PowerTicker {
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);
             case TOMMY -> TommyAbilities.endAll(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE -> HeroServers.endAll(player, data);
             default -> {
             }
         }
@@ -107,6 +111,7 @@ public final class PowerTicker {
         data.setSlowMo(false);
         data.set(Live.SPEEDING, false);
         data.set(Live.CALLING_LIGHTNING, false);
+        HeroServers.stopHold(data);
     }
 
     /** The hero's flight key: take off or land, the same as double-tapping Space. */

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -349,6 +350,11 @@ public final class TommyAbilities {
         float hardness = state.getDestroySpeed(level, pos);
         if (hardness < 0 || hardness > 50.0F || state.is(ModTags.TELEKINESIS_IMMOVABLE)) {
             player.displayClientMessage(Component.translatable("message.enhanced.accelerate.too_hard"), true);
+            return;
+        }
+        if (BossFights.protects(level, pos)) {
+            // The arena of a boss fight stays as it is.
+            player.displayClientMessage(Component.translatable("message.enhanced.boss.protected"), true);
             return;
         }
         // Breaking a block is a player action: spawn protection, claims and adventure mode all get their say.

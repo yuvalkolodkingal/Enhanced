@@ -1,14 +1,21 @@
 package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.item.CapstoneItem;
+import com.kolodkingal.enhanced.item.EssenceItem;
+import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
 import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
 import com.kolodkingal.enhanced.item.MjolnirItem;
+import com.kolodkingal.enhanced.item.PhoenixEmberItem;
 import com.kolodkingal.enhanced.item.QuicksilverGogglesItem;
+import com.kolodkingal.enhanced.item.RadioactiveSpiderItem;
 import com.kolodkingal.enhanced.item.ScarletWitchGeneItem;
 import com.kolodkingal.enhanced.item.StormbreakerItem;
 import com.kolodkingal.enhanced.item.SynthezoidCoreItem;
 import com.kolodkingal.enhanced.item.TesseractItem;
+import com.kolodkingal.enhanced.item.UltronCoreItem;
+import com.kolodkingal.enhanced.item.UltronProgramItem;
 import com.kolodkingal.enhanced.item.WandaCrownItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ArmorItem;
@@ -60,6 +67,39 @@ public final class ModItems {
             () -> new TesseractItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<BlockItem> WITCHES_ROAD_DOOR = ITEMS.registerSimpleBlockItem(ModBlocks.WITCHES_ROAD_DOOR,
             new Item.Properties().rarity(Rarity.RARE));
+
+    // The items of 3.0, in one region per hero (the // ===== lines). All stack to one, are fire-resistant and epic,
+    // except the spider, which stacks to sixteen.
+
+    // ===== phoenix =====
+    /** Found in chests; hold right-click for three seconds with no power to become the Phoenix. */
+    public static final DeferredItem<PhoenixEmberItem> PHOENIX_EMBER = ITEMS.register("phoenix_ember",
+            () -> new PhoenixEmberItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    // ===== spider =====
+    public static final DeferredItem<RadioactiveSpiderItem> RADIOACTIVE_SPIDER = ITEMS.register("radioactive_spider",
+            () -> new RadioactiveSpiderItem(new Item.Properties().stacksTo(16).fireResistant().rarity(Rarity.EPIC)));
+
+    // ===== thanos =====
+    /** The reward of the Thanos fight; hold right-click for three seconds with no power to become Thanos. */
+    public static final DeferredItem<InfinityGauntletItem> INFINITY_GAUNTLET = ITEMS.register("infinity_gauntlet",
+            () -> new InfinityGauntletItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    // ===== ultron =====
+    /** Starts the Ultron fight, with Loki's Scepter (see ScepterRituals). */
+    public static final DeferredItem<UltronProgramItem> ULTRON_PROGRAM = ITEMS.register("ultron_program",
+            () -> new UltronProgramItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** The reward of the Ultron fight; with Loki's Scepter it makes a player without powers Ultron. */
+    public static final DeferredItem<UltronCoreItem> ULTRON_CORE = ITEMS.register("ultron_core",
+            () -> new UltronCoreItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    // ===== apocalypse =====
+    /** Planted on sand by day, it wakes the Apocalypse fight. */
+    public static final DeferredItem<CapstoneItem> CAPSTONE = ITEMS.register("capstone",
+            () -> new CapstoneItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** The reward of the Apocalypse fight; hold right-click for three seconds with no power to become Apocalypse. */
+    public static final DeferredItem<EssenceItem> ESSENCE = ITEMS.register("essence",
+            () -> new EssenceItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
     /** Projectile sprites only; not in the creative tab. */
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");
