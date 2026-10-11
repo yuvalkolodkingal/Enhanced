@@ -136,6 +136,19 @@ public final class SkeletonTests {
     /** The heroes of 3.0, in Eilon's order: the last five of {@link Power}. */
     private static final List<Power> NEW_HEROES = List.of(Power.PHOENIX, Power.SPIDER_MAN, Power.THANOS, Power.ULTRON, Power.APOCALYPSE);
 
+    /**
+     * Whether the hero's lane is built: its plug-in does something with the keys, so the tests that pin a stub ("does
+     * nothing yet", "G is not wired yet") leave it to the lane's own tests.
+     */
+    private static boolean wired(Power hero) {
+        try {
+            return HeroServers.of(hero).getClass().getMethod("onKey", ServerPlayer.class, PowerData.class, int.class, boolean.class)
+                    .getDeclaringClass() != HeroServer.class;
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // The five powers
 
@@ -206,6 +219,9 @@ public final class SkeletonTests {
     public static void aNewHeroDoesNothingYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
+            if (wired(hero)) {
+                continue;
+            }
             ServerPlayer player = f.player(10.5, FLOOR, 10.5, hero);
             PowerData data = Powers.get(player);
             float health = player.getHealth();
@@ -439,7 +455,7 @@ public final class SkeletonTests {
                 assertNear(player.getAbilities().getFlyingSpeed(), hero.flightSpeed(), 1.0E-4, hero + " flies at its speed");
             }
             // G toggles the flight of the fliers, once their lane wires it: until then nothing takes off.
-            if (hero.canFly()) {
+            if (hero.canFly() && !wired(hero)) {
                 AbilityHandler.onKey(player, hero.flightAbility(), true);
                 check(!player.getAbilities().flying, hero + ": G is not wired yet, so nothing took off");
             }
