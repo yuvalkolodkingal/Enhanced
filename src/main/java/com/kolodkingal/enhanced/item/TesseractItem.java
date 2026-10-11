@@ -200,6 +200,7 @@ public class TesseractItem extends Item {
         tooltip.add(Component.translatable("item.enhanced.tesseract.desc").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.enhanced.tesseract.desc2").withStyle(ChatFormatting.DARK_GREEN));
         tooltip.add(Component.translatable("item.enhanced.tesseract.desc3").withStyle(ChatFormatting.RED));
+        tooltip.add(Component.translatable("item.enhanced.tesseract.desc4").withStyle(ChatFormatting.LIGHT_PURPLE));
     }
 
     @Override

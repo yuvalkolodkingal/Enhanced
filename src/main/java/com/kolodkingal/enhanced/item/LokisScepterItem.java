@@ -143,6 +143,7 @@ public class LokisScepterItem extends Item {
         tooltip.add(Component.translatable("item.enhanced.lokis_scepter.desc").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.enhanced.lokis_scepter.desc2").withStyle(ChatFormatting.DARK_RED));
         tooltip.add(Component.translatable("item.enhanced.lokis_scepter.desc3").withStyle(ChatFormatting.DARK_AQUA));
+        tooltip.add(Component.translatable("item.enhanced.lokis_scepter.desc4").withStyle(ChatFormatting.LIGHT_PURPLE));
     }
 
     @Override

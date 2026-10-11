@@ -35,9 +35,12 @@ public final class ModEffects {
             RadioactiveBiteEffect::new);
 
     // ===== thanos =====
-    public static final DeferredHolder<MobEffect, StoneEffect> PETRIFIED = EFFECTS.register("petrified", () -> new StoneEffect(0x7A7A82));
-    public static final DeferredHolder<MobEffect, StoneEffect> SOULWORLD = EFFECTS.register("soulworld", () -> new StoneEffect(0xFF8A1E));
-    public static final DeferredHolder<MobEffect, StoneEffect> TIME_LOCKED = EFFECTS.register("time_locked", () -> new StoneEffect(0x5BDB6A));
+    public static final DeferredHolder<MobEffect, StoneEffect> PETRIFIED = EFFECTS.register("petrified",
+            () -> new StoneEffect(StoneEffect.Kind.PETRIFIED));
+    public static final DeferredHolder<MobEffect, StoneEffect> SOULWORLD = EFFECTS.register("soulworld",
+            () -> new StoneEffect(StoneEffect.Kind.SOULWORLD));
+    public static final DeferredHolder<MobEffect, StoneEffect> TIME_LOCKED = EFFECTS.register("time_locked",
+            () -> new StoneEffect(StoneEffect.Kind.TIME_LOCKED));
 
     // ===== ultron =====
 

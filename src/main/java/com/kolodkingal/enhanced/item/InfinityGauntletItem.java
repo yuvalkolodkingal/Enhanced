@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.item;
 
+import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -20,6 +21,17 @@ public class InfinityGauntletItem extends AwakeningItem {
     @Override
     public Power power() {
         return Power.THANOS;
+    }
+
+    @Override
+    protected Component alreadyPowered() {
+        return Component.translatable("message.enhanced.thanos.already_powered");
+    }
+
+    /** Three seconds by default; {@code gauntletRitualTicks} in the {@code [thanos_boss]} config. */
+    @Override
+    public int holdTicks() {
+        return ThanosBossConfig.GAUNTLET_RITUAL_TICKS.get();
     }
 
     @Override
