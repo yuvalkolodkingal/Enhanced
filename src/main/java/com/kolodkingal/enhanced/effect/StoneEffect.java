@@ -1,10 +1,13 @@
 package com.kolodkingal.enhanced.effect;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -21,10 +24,10 @@ import net.minecraft.world.level.block.Blocks;
  *
  * <ul>
  *     <li><b>Petrified</b> (the Reality Stone): turned to stone. It cannot move, jump, attack or use anything, forgets
- *     whom it hunted, and takes only part of the damage (the damage rule is {@code ThanosEvents.onStoneDamage}, the rule
- *     for attacks and for using items is there too).</li>
+ *     whom it hunted, lets go of any spell it held (a beam, a shield), and takes only part of the damage (the damage rule
+ *     is {@code ThanosEvents.onStoneDamage}, the rule for attacks and for using items is there too).</li>
  *     <li><b>In the Soul World</b> (the Soul Stone): frozen where it stands, and nothing hurts it: it is not in this
- *     world.</li>
+ *     world. It lets go of held spells too.</li>
  *     <li><b>Time locked</b> (the Time Stone): slowed to 40 percent, swings and digs at half speed.</li>
  * </ul>
  */
@@ -76,6 +79,10 @@ public class StoneEffect extends MobEffect {
             mob.setTarget(null);
             mob.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
             mob.getNavigation().stop();
+        }
+        if (kind != Kind.TIME_LOCKED && entity instanceof ServerPlayer player) {
+            // A hand turned to stone cannot hold a beam or a shield up: the held spells stop.
+            PowerTicker.stopHoldAbilities(Powers.get(player));
         }
         if (entity.level() instanceof ServerLevel level && entity.tickCount % 3 == 0) {
             double x = entity.getX();

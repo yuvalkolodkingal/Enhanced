@@ -77,9 +77,10 @@ public final class StonePowers {
         return victim.hurt(source, amount);
     }
 
-    /** Throws the creature away from {@code from} by {@code strength} (what its knockback resistance leaves), lifting it by {@code lift}. */
+    /** Throws the creature away from {@code from} by {@code strength} (what its knockback resistance leaves), lifting it by {@code lift};
+     * not a Creative or Spectator player, and not a creature Mjolnir lies on. */
     public static void shove(LivingEntity target, Vec3 from, double strength, double lift) {
-        if (target instanceof Player player && (player.isCreative() || player.isSpectator())) {
+        if (target instanceof Player player && (player.isCreative() || player.isSpectator()) || MjolnirPin.isPinned(target)) {
             return;
         }
         target.knockback(strength, from.x - target.getX(), from.z - target.getZ());

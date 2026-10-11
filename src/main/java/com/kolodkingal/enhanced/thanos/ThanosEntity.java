@@ -1285,8 +1285,9 @@ public class ThanosEntity extends Monster implements BossHooks {
         Entity attacker = source.getEntity();
         boolean stoneBorn = source.is(ModTags.STONE_BORN);
         boolean stormbreaker = source.is(ModDamageTypes.STORMBREAKER) || heldStormbreaker(source);
+        // (A Power Blast of the hero is a beam like the lightning: the Barrier turns it away.)
         boolean ranged = source.is(DamageTypeTags.IS_PROJECTILE) || source.is(ModDamageTypes.LIGHTNING_BEAM)
-                || source.getDirectEntity() instanceof Projectile;
+                || source.is(ModDamageTypes.STONE_POWER) || source.getDirectEntity() instanceof Projectile;
         boolean fromMob = attacker instanceof LivingEntity living && !(living instanceof Player) && !(living instanceof ThanosEntity)
                 && !(living instanceof HexVisionEntity);
         ThanosDefence.Hit hit = new ThanosDefence.Hit(bypass, fromMob, ranged, stoneBorn, stormbreaker);
