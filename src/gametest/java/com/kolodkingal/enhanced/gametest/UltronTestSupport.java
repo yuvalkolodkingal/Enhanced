@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.ultron.LiftHook;
+import com.kolodkingal.enhanced.ultron.LiftHooks;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
@@ -38,10 +40,15 @@ final class UltronTestSupport {
 
     /**
      * A boss fixture whose island is 9 blocks across, so that the whole fight (the ring of Sentries at 6, the field at
-     * R + 12 = 21) happens in the one test arena; the server's announcements are off.
+     * R + 12 = 21) happens in the one test arena; the server's announcements are off. The island does not rise in these
+     * tests (the arena has a ceiling, which the Sky Island's rules refuse): the lift is the Tremor, as it was before
+     * the Sokovia lift existed. The tests of the lift itself ({@code SokoviaTests}) install the real one on the Sokovia
+     * pad.
      */
     static TestKit.Fixture fixture(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
+        LiftHook lift = LiftHooks.install(null);
+        f.onClose(() -> LiftHooks.install(lift));
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
         f.config(UltronBossConfig.ISLAND_RADIUS, 9);
         f.config(UltronBossConfig.LIFT_HEIGHT, 16);

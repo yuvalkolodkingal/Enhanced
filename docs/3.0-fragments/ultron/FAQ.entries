@@ -1,0 +1,29 @@
+## Ultron and Sokovia
+
+### Does the island rise out of the real ground? Will my world be dug up?
+
+No. At the warning the mod **copies** the island (the top few layers of the ground, what grows on it, and a cone of
+rock made up under it) into the sky above the fight and builds it there; the real ground is never touched. The fight
+goes on on the copy, and when it is over the copy is cleared and everyone is set down on the ground where the fight
+began. Buildings, chests and trees standing on the ground are left where they are; the lift refuses a site with
+something built on it, or something in the sky above.
+
+### The server crashed (or I killed it) while Sokovia was up. What now?
+
+Nothing, if you let the server start again. The lift keeps a small note of every island in the world folder
+(`data/enhanced/sokovia`). At the next start the mod reads the notes, clears the floating copy and, if a player's Ultron
+Program was used up for a fight that never ended, gives it back. A server that is *stopped* normally (`/stop`) puts
+everything back before it closes. Players who were up when it happened are set down on the ground, and are told so,
+when they log in.
+
+### I logged out in the sky. Where will I be?
+
+The island may be gone when you come back. You are put on the ground where the fight was if it is, or on the island if it
+is still there; either way you are not hurt. A player who is carried up cannot fall and cannot be hurt until they are set
+down.
+
+### Can I turn the lift off?
+
+Yes. Set `ultron_boss.liftMode` to `TREMOR` (or `ultron_boss.liftEnabled` to `false`): the ground shakes and the fight
+goes on where it began, with the same waves of Sentries and the same falling debris. Nothing is built and nothing needs recovering.
+If the site cannot be lifted (protected ground, a claim, something in the sky) the ritual says why and uses nothing up.
