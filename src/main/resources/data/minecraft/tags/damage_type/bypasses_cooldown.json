@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "enhanced:lightning_beam"
+    "enhanced:lightning_beam",
+    "enhanced:stone_soul"
   ]
 }

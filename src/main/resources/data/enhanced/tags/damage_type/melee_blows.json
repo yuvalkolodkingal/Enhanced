@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:mob_attack",
+    "minecraft:mob_attack_no_aggro",
+    "minecraft:player_attack",
+    "minecraft:sting",
+    "enhanced:speed_blitz",
+    "enhanced:thanos_blow",
+    "enhanced:thanos_sword",
+    "enhanced:apocalypse_blow",
+    "enhanced:spider_legs",
+    "enhanced:web_kick"
+  ]
+}

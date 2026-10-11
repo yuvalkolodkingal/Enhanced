@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
+import com.kolodkingal.enhanced.block.SpiderWebBlock;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -39,6 +40,11 @@ public final class ModBlocks {
                     .pushReaction(PushReaction.BLOCK)
                     .lightLevel(state -> state.getValue(WitchesRoadDoorBlock.OPEN) ? 12 : 3)
                     .isValidSpawn(Blocks::never));
+
+    // ===== spider =====
+    /** The temporary web of Spider-Man: no item, no drop. */
+    public static final DeferredBlock<SpiderWebBlock> SPIDER_WEB = BLOCKS.registerBlock("spider_web",
+            SpiderWebBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.COBWEB).noLootTable());
 
     private ModBlocks() {
     }

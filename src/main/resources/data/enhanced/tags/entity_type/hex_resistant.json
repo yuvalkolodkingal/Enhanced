@@ -5,6 +5,9 @@
     "minecraft:wither",
     "minecraft:warden",
     "minecraft:elder_guardian",
-    "enhanced:hex_vision"
+    "enhanced:hex_vision",
+    "enhanced:ultron",
+    "enhanced:thanos",
+    "enhanced:apocalypse"
   ]
 }

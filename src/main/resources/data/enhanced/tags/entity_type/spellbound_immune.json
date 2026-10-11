@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "minecraft:ender_dragon",
-    "minecraft:wither"
+    "minecraft:wither",
+    "enhanced:ultron",
+    "enhanced:thanos",
+    "enhanced:apocalypse"
   ]
 }
