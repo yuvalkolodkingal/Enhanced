@@ -35,6 +35,13 @@ import java.util.Locale;
  * client side has a class of its own: {@link com.kolodkingal.enhanced.client.SpiderMotion} moves him, {@link
  * SpiderEffects} draws his webs, {@link SpiderLegsLayer} and {@link BlackEyesLayer} his legs and eyes, {@link
  * SpiderPoses} his pose and {@link com.kolodkingal.enhanced.client.SpiderSenseClient} his sense.
+ *
+ * <p>His animation: the keys of his fifteen gestures are {@link SpiderGestures}; the routes that start them are the
+ * lines of his own in {@link GestureRoutes} and the methods below; what the client adds (the key press that acts before
+ * the server answers, the zip his own movement begins, the landing, the push off a wall and the grab of one, his hands
+ * in first person, the flourishes of his gestures) is {@link SpiderActing}, with {@link SpiderEdges} for the rules and
+ * {@link SpiderGestureFx} for the flourishes. He does not fly, so he has no flight profile; his walk and sprint have a
+ * character of their own in {@code RunPoses}.
  */
 public final class SpiderClient implements HeroClient {
     /** The look of the Iron Spider suit. */
@@ -51,9 +58,10 @@ public final class SpiderClient implements HeroClient {
     private static int missingArmour;
 
     /**
-     * The player as a plain {@code Player}. The game tests load this class (with the registry of the heroes) on a server,
-     * where a class of the client may not be loaded, and the verifier loads a client class to find out that it is a
-     * {@code Player} when a {@code LocalPlayer} is passed on as one; passed on as an {@code Object}, it needs no loading.
+     * The player as a plain {@code Player}. The game tests load this class (with the registry of the heroes) on a
+     * server, where a class of the client may not be loaded, and the verifier loads a client class to find out that it
+     * is a {@code Player} when a {@code LocalPlayer} is passed on as one; passed on as an {@code Object}, it needs no
+     * loading.
      */
     private static Player asPlayer(Object player) {
         return (Player) player;
@@ -138,7 +146,7 @@ public final class SpiderClient implements HeroClient {
      * suit's armour does: it is missing from his armour attribute for as long as they are scattered (counted over a few
      * ticks, so that changing look does not flash it).
      */
-    private static boolean scattered() {
+    static boolean scattered() {
         return missingArmour >= STRIPPED_TICKS;
     }
 
@@ -163,12 +171,12 @@ public final class SpiderClient implements HeroClient {
 
     @Override
     public float lean(HeroAnimState st) {
-        return SpiderPoses.lean(st);
+        return SpiderGestures.lean(st);
     }
 
     @Override
     public float drop(HeroAnimState st) {
-        return SpiderPoses.drop(st);
+        return SpiderGestures.drop(st);
     }
 
     @Override
@@ -181,6 +189,65 @@ public final class SpiderClient implements HeroClient {
         SpiderPoses.aimed(c);
     }
 
+    @Override
+    public void edges(HeroAnimState s, AbstractClientPlayer p, PowerData data, long now) {
+        SpiderActing.edges(s, p, data);
+    }
+
+    @Nullable
+    @Override
+    public GestureId predictedGesture(HeroAnimState s, PowerData data, int ability, long now, boolean sneaking) {
+        return SpiderActing.predicted(s, data, ability, now, sneaking);
+    }
+
+    @Override
+    public void registerGestures() {
+        SpiderGestures.register();
+    }
+
+    // ---- which gesture stands for what ----
+
+    /**
+     * The Web Burst: R's cooldown is the burst's alone (the Web Shot has a timer of its own that the data never shows).
+     */
+    @Nullable
+    @Override
+    public GestureId cooldownGesture(int ability, long left) {
+        return ability == 1 && left > 0 ? GestureId.SPIDER_BURST : null;
+    }
+
+    @Nullable
+    @Override
+    public GestureId liveGesture(Live live) {
+        return switch (live) {
+            case CASTING -> GestureId.SPIDER_SHOOT;
+            case ZIPPING -> GestureId.SPIDER_ZIP_START;
+            case SWINGING -> GestureId.SPIDER_SWING_START;
+            case SENSING -> GestureId.SPIDER_ALERT_START;
+            case BLACK_EYES -> GestureId.SPIDER_SURGE_ON;
+            case INSTANT_KILL -> GestureId.SPIDER_KILL_ON;
+            default -> null;
+        };
+    }
+
+    /**
+     * The landing, the push off a surface and the grab of a wall are the animator's own edges ({@link SpiderActing}).
+     */
+    @Override
+    public boolean startedElsewhere(GestureId id) {
+        return id == GestureId.SPIDER_LAND || id == GestureId.SPIDER_LEAP || id == GestureId.SPIDER_ARRIVE;
+    }
+
+    @Override
+    public void gestureStarted(AbstractClientPlayer player, HeroAnimState state, GestureId id, float param) {
+        SpiderActing.started(player, id);
+    }
+
+    @Override
+    public void firstPerson(HeroAnimState s, LocalPlayer player, FirstPersonArms.Offset main, FirstPersonArms.Offset off) {
+        SpiderActing.firstPerson(s, player, main, off);
+    }
+
     // ---- the client's life ----
 
     @Override
@@ -191,6 +258,7 @@ public final class SpiderClient implements HeroClient {
             return;
         }
         SpiderEffects.tick(level);
+        SpiderGestureFx.tick(level);
         SpiderSenseClient.tick(mc);
         if (level.getGameTime() % 100 == 0) {
             SpiderLegsLayer.prune(level);
@@ -208,6 +276,8 @@ public final class SpiderClient implements HeroClient {
     @Override
     public void clear() {
         SpiderEffects.clear();
+        SpiderGestureFx.clear();
+        SpiderActing.clear();
         SpiderSenseClient.clear();
         SpiderLegsLayer.clear();
         SpiderMotion.reset();

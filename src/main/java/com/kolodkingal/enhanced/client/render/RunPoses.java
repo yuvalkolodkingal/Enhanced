@@ -74,6 +74,10 @@ final class RunPoses {
     private static final Character BILLY = new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.025F);
     private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
     private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
+    /** Spider-Man: agile and light, between Billy and Quicksilver, with a sprint that leans into it. */
+    private static final Character SPIDER = new Character(1.05F, 1.25F, 1.20F, 9, 5, 0.020F);
+    /** Spider-Man in the Black Eyes: a predatory lope, longer in the stride and lower. */
+    private static final Character SPIDER_SURGE = new Character(1.10F, 1.40F, 1.30F, 16, 7, 0.030F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
@@ -86,12 +90,20 @@ final class RunPoses {
             // The heroes of 3.0, one line each (each lane's own): they walk and sprint as anyone does until their lane
             // gives them a character.
             case PHOENIX -> DEFAULT;
-            case SPIDER_MAN -> DEFAULT;
+            case SPIDER_MAN -> SPIDER;
             case THANOS -> DEFAULT;
             case ULTRON -> DEFAULT;
             case APOCALYPSE -> DEFAULT;
             default -> DEFAULT;
         };
+    }
+
+    /** The character of the hero this state is for: Spider-Man's changes while the Black Eyes are on. */
+    private static Character character(HeroAnimState st) {
+        if (st.power == Power.SPIDER_MAN && st.stance(Stance.SPIDER_SURGE) > 0.5F) {
+            return SPIDER_SURGE;
+        }
+        return character(st.power, "white_vision".equals(st.look));
     }
 
     /** The run style of a speedster, or null when the hero has none. */
@@ -106,7 +118,7 @@ final class RunPoses {
 
     /** The lean (degrees) a sprint adds on the ground. */
     static float sprintLean(HeroAnimState st) {
-        return character(st.power, "white_vision".equals(st.look)).lean * st.wSprint * ss(0.05F, 0.30F, st.speed);
+        return character(st).lean * st.wSprint * ss(0.05F, 0.30F, st.speed);
     }
 
     /** The lean (degrees) of the speedster's run, a little less when running up a wall. */
@@ -123,7 +135,7 @@ final class RunPoses {
             bob += st.wRun * style.bob * (Math.abs(Mth.cos(st.runPhase)) - 0.5F) * st.runAmp;
         }
         if (st.wSprint > 0.0F) {
-            Character ch = character(st.power, "white_vision".equals(st.look));
+            Character ch = character(st);
             bob += ch.bob * (Math.abs(Mth.cos(st.limbSwing * 0.6662F)) - 0.5F) * Math.min(1.0F, st.limbAmount) * st.wSprint;
         }
         return bob;
@@ -170,7 +182,7 @@ final class RunPoses {
         // Walk and sprint character: scales the vanilla swing that is already in the arms and legs.
         float free = (1.0F - st.wAir) * (1.0F - wRun);
         if (free > 0.001F) {
-            Character ch = character(st.power, "white_vision".equals(st.look));
+            Character ch = character(st);
             float k = AnimMath.lerp(st.wSprint, ch.walkArms, ch.sprintArms);
             float swing = st.limbSwing * 0.6662F;
             float amount = st.limbAmount;

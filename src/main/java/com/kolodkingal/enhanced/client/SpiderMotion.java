@@ -162,6 +162,12 @@ public final class SpiderMotion {
         return mode == Mode.CLING ? surface : SpiderClimb.Surface.NONE;
     }
 
+    /** The end of the web the local hero's own movement holds (a zip's or a swing's anchor), or null when it holds none. */
+    @Nullable
+    public static Vec3 anchor() {
+        return mode == Mode.ZIP ? zipAnchor : mode == Mode.SWING ? swingAnchor : null;
+    }
+
     /** Whether a second press of Sneak + B would turn Instant Kill on (the first press asked for it). */
     public static boolean confirmPending(long now) {
         return now <= confirmUntil;

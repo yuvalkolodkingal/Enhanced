@@ -21,16 +21,6 @@ import net.minecraft.world.phys.Vec3;
  * weights are the stances' eased ones, so nothing snaps.
  */
 final class SpiderPoses {
-    /** The lean (degrees) each stance adds to the body (summed with the others). */
-    static final float LEAN_ZIP = 16.0F;
-    static final float LEAN_SWING = 12.0F;
-    static final float LEAN_SURGE = 12.0F;
-    static final float LEAN_KILL = 6.0F;
-    static final float LEAN_CLING_WALL = -4.0F;
-    /** The dip (blocks) each stance adds. */
-    static final float DROP_CLING_WALL = 0.10F;
-    static final float DROP_SURGE = 0.06F;
-    static final float DROP_ALERT = 0.08F;
     /** How far toward the wall his body is moved, so the chest is against it and not in the middle of his box. */
     static final float WALL_OFFSET = 0.22F;
     /** The part of a full turn of the walk swing that the ceiling's upside-down walk keeps (it is scaled by this). */
@@ -68,6 +58,10 @@ final class SpiderPoses {
             speed = (float) Math.hypot(d.x, d.z);
         }
         s.crawlSpeed = speed;
+        // The local hero's arm aims at the end of the web his own movement holds (the server's word comes later).
+        if (p == Minecraft.getInstance().player && SpiderMotion.anchor() != null) {
+            s.anchor = SpiderMotion.anchor();
+        }
         if (s.stance(Stance.SPIDER_ZIP) < 0.01F && s.stance(Stance.SPIDER_SWING) < 0.01F && !s.stanceOn[Stance.SPIDER_ZIP.ordinal()]
                 && !s.stanceOn[Stance.SPIDER_SWING.ordinal()]) {
             s.anchor = null;
@@ -141,18 +135,6 @@ final class SpiderPoses {
     // The stances' rows
     // =================================================================================================================
 
-    /** The lean the stances add, degrees. */
-    static float lean(HeroAnimState st) {
-        return LEAN_ZIP * st.stance(Stance.SPIDER_ZIP) + LEAN_SWING * st.stance(Stance.SPIDER_SWING) + LEAN_SURGE * st.stance(Stance.SPIDER_SURGE)
-                + LEAN_KILL * st.stance(Stance.SPIDER_KILL) + LEAN_CLING_WALL * st.stance(Stance.SPIDER_CLING_WALL);
-    }
-
-    /** The dip the stances add, blocks (positive sinks). */
-    static float drop(HeroAnimState st) {
-        return DROP_CLING_WALL * st.stance(Stance.SPIDER_CLING_WALL) + DROP_SURGE * st.stance(Stance.SPIDER_SURGE)
-                + DROP_ALERT * st.stance(Stance.SPIDER_ALERT);
-    }
-
     /** The ambient stances: clinging, the surge, the kill, the guard. */
     static void ambient(PoseContext c) {
         HeroAnimState st = c.st;
@@ -162,11 +144,13 @@ final class SpiderPoses {
             // with the small drift of the pipeline.
             float p = st.crawlPhase;
             float amp = st.crawlAmp;
-            c.arm(true, -160 + 24 * Mth.sin(p) * amp, -10, 24, w);
-            c.arm(false, -160 + 24 * Mth.sin(p + Mth.PI) * amp, 10, -24, w);
-            c.leg(true, -58 + 22 * Mth.sin(p + Mth.PI) * amp, 22, w);
-            c.leg(false, -58 + 22 * Mth.sin(p) * amp, -22, w);
-            c.head(-10, 0, 0, w);
+            float[] m = SpiderGestures.CLING_WALL_M;
+            float[] o = SpiderGestures.CLING_WALL_O;
+            c.arm(true, m[0] + 24 * Mth.sin(p) * amp, m[1], m[2], w);
+            c.arm(false, o[0] + 24 * Mth.sin(p + Mth.PI) * amp, o[1], o[2], w);
+            c.leg(true, SpiderGestures.CLING_WALL_LEGS + 22 * Mth.sin(p + Mth.PI) * amp, 22, w);
+            c.leg(false, SpiderGestures.CLING_WALL_LEGS + 22 * Mth.sin(p) * amp, -22, w);
+            c.head(SpiderGestures.CLING_WALL_HEAD, 0, 0, w);
             Stances.drift(c, 1.5F, w * (1.0F - amp), true);
         }
         if ((w = st.stance(Stance.SPIDER_CLING_CEILING)) > 0.001F) {
@@ -183,28 +167,25 @@ final class SpiderPoses {
         }
         if ((w = st.stance(Stance.SPIDER_SURGE)) > 0.001F) {
             // A predatory hunch: the hands hang forward and out, clawed, trembling, the head down.
-            c.arm(true, -28, 8, 22, w);
-            c.arm(false, -28, -8, -22, w);
+            pose(c, SpiderGestures.SURGE_M, SpiderGestures.SURGE_O, w);
             c.tremble(true, 1.1F, 1.9F, w);
             c.tremble(false, 1.1F, 1.9F, w);
-            c.head(14, 0, 0, w);
+            c.head(SpiderGestures.SURGE_HEAD, 0, 0, SpiderGestures.kept(st, Stance.SPIDER_SURGE));
             float ground = w * (1.0F - st.wAir);
             c.leg(true, -10, 6, ground);
             c.leg(false, 10, -6, ground);
         }
         if ((w = st.stance(Stance.SPIDER_KILL)) > 0.001F) {
             // Menace: the arms a little out, a tremble, the head down; the legs and the eyes do the rest.
-            c.arm(true, -12, 0, 14, w);
-            c.arm(false, -12, 0, -14, w);
+            pose(c, SpiderGestures.KILL_M, SpiderGestures.KILL_O, w);
             c.tremble(true, 0.8F, 2.3F, w);
             c.tremble(false, 0.8F, 2.3F, w);
-            c.head(8, 0, 0, w);
+            c.head(SpiderGestures.KILL_HEAD, 0, 0, SpiderGestures.kept(st, Stance.SPIDER_KILL));
         }
         if ((w = st.stance(Stance.SPIDER_ALERT)) > 0.001F) {
             // The guard: both forearms up in front of him, the head a little up.
-            c.arm(true, -70, -30, 18, w);
-            c.arm(false, -70, 30, -18, w);
-            c.head(-6, 0, 0, w);
+            pose(c, SpiderGestures.ALERT_M, SpiderGestures.ALERT_O, w);
+            c.head(SpiderGestures.ALERT_HEAD, 0, 0, SpiderGestures.kept(st, Stance.SPIDER_ALERT));
         }
     }
 
@@ -214,24 +195,34 @@ final class SpiderPoses {
         float w;
         if ((w = st.stance(Stance.SPIDER_ZIP)) > 0.001F) {
             // The web arm points at the anchor (a little under it), the other swept back; the legs trail.
-            c.aim(true, Target.ANCHOR, 0, -4, 0, w);
+            float[] aim = SpiderGestures.ZIP_AIM;
+            float[] o = SpiderGestures.ZIP_O;
+            c.aim(true, Target.ANCHOR, aim[0], aim[1], aim[2], w);
             c.tremble(true, 1.0F, 2.1F, w);
-            c.arm(false, 22, 0, -34, w);
-            c.leg(true, 10, 2, w);
-            c.leg(false, -16, -2, w);
-            c.head(-6, 0, 0, w);
+            c.arm(false, o[0], o[1], o[2], w);
+            c.leg(true, SpiderGestures.ZIP_LEGS[0], 2, w);
+            c.leg(false, SpiderGestures.ZIP_LEGS[1], -2, w);
+            c.head(SpiderGestures.ZIP_HEAD, 0, 0, w);
             c.occupy(true, w);
         }
         if ((w = st.stance(Stance.SPIDER_SWING)) > 0.001F) {
             // The arm runs along the web, up; the other back and out; the knees tucked.
-            c.aim(true, Target.ANCHOR, 0, 0, 0, w);
+            float[] aim = SpiderGestures.SWING_AIM;
+            float[] o = SpiderGestures.SWING_O;
+            c.aim(true, Target.ANCHOR, aim[0], aim[1], aim[2], w);
             c.tremble(true, 1.5F, 1.7F, w);
-            c.arm(false, 28, 0, -38, w);
-            c.leg(true, -38, 8, w);
-            c.leg(false, -52, -8, w);
-            c.head(-10, 0, 0, w);
+            c.arm(false, o[0], o[1], o[2], w);
+            c.leg(true, SpiderGestures.SWING_LEGS[0], 8, w);
+            c.leg(false, SpiderGestures.SWING_LEGS[1], -8, w);
+            c.head(SpiderGestures.SWING_HEAD, 0, 0, w);
             c.occupy(true, w);
         }
+    }
+
+    /** Both arms to a pose (the main arm's row and the off arm's), by weight. */
+    private static void pose(PoseContext c, float[] m, float[] o, float w) {
+        c.arm(true, m[0], m[1], m[2], w);
+        c.arm(false, o[0], o[1], o[2], w);
     }
 
     private SpiderPoses() {
