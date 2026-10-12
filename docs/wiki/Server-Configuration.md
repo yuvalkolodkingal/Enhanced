@@ -300,7 +300,7 @@ Section `[thanos_boss]`. The boss's page is [Thanos](Thanos). The rules every bo
 | `thanos_boss.summonCountdownTicks` | `120` | 20 to 1200 | From the portal opening to his arrival (120 = 6 seconds). |
 | `thanos_boss.summonSkyBlocks` | `24` | 4 to 64 | Clear air needed over the summoner's head. |
 | `thanos_boss.summonOpenFraction` | `0.6` | 0.0 to 1.0 | The fraction of 24 sample spots round the summoner that need standing room. |
-| `thanos_boss.summonCooldownTicks` | `12000` | 0 to 1728000 | The rest after a fight before he can be called again (12000 = 10 minutes; half after a wipe or when he leaves). |
+| `thanos_boss.summonCooldownTicks` | `12000` | 0 to 1728000 | The rest after a fight before he can be called again (12000 = 10 minutes; half after a wipe or an abandoned fight, none after the time limit or a stop). |
 
 ### The body, the clock and the arena
 
@@ -505,7 +505,7 @@ Two more options are about your own game only (they are not synced, and a server
 
 ## The Ultron boss
 
-Section `[ultron_boss]`. The boss is woken by the Ultron Program and has no hero page of its own; the hero's numbers are in the next section.
+Section `[ultron_boss]`. The boss and the hero share one page, [Ultron](Ultron); the hero's numbers are in the next section.
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
@@ -540,9 +540,9 @@ Section `[ultron_boss]`. The boss is woken by the Ultron Program and has no hero
 | `ultron_boss.sentryMaxAlivePerPlayer` | `3` | 0 to 20 | How many more Sentries may be alive for each extra player. |
 | `ultron_boss.maxUploads` | `12` | 1 to 100 | Safety valve: after this many uploads Ultron is destroyed even if Sentries remain. |
 | `ultron_boss.liftEnabled` | `true` | `true` or `false` | Whether the island rises at all; off means the Tremor (nothing moves). |
-| `ultron_boss.liftMode` | `SKY_ISLAND` | `SKY_ISLAND`, `CUT_GROUND` or `TREMOR` | How the island is made: SKY_ISLAND (a copy built in the sky, the ground is never edited), CUT_GROUND (the real ground is lifted and put back; a later release) or TREMOR (nothing moves). |
+| `ultron_boss.liftMode` | `SKY_ISLAND` | `SKY_ISLAND`, `CUT_GROUND` or `TREMOR` | How the island is made: SKY_ISLAND (a copy built in the sky, the ground is never edited), CUT_GROUND (the real ground lifted and put back: reserved for a later release; in 3.0 it acts as TREMOR) or TREMOR (nothing moves). |
 | `ultron_boss.hideGround` | `true` | `true` or `false` | Sky Island only: clients hide the columns the island was copied from while it is up (cosmetic; the server's ground never changes). |
-| `ultron_boss.liftRequiresMobGriefing` | `true` | `true` or `false` | CUT_GROUND only: if the game rule mobGriefing is off, use the Tremor instead of lifting. |
+| `ultron_boss.liftRequiresMobGriefing` | `true` | `true` or `false` | CUT_GROUND only: if the game rule mobGriefing is off, use the Tremor instead of lifting (no effect in 3.0, where CUT_GROUND is not built yet). |
 | `ultron_boss.islandRadius` | `20` | 12 to 32 | Radius of the lifted ground, and of the ground fight before it. |
 | `ultron_boss.liftHeight` | `40` | 16 to 80 | How far the island rises. |
 | `ultron_boss.liftTicks` | `160` | 1 to 600 | How long the rise and the descent take, in ticks (1 = a cut). |

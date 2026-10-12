@@ -1498,7 +1498,7 @@ maximum and no second more than `maxDamagePerSecond` (15 percent).
   Gauntlet is dark for `lockTicks` (80): only the sword and fist moves. Soul Drain breaks at 60 poise, the Choke at 60
   damage. `lockGauntlet` (Spider-Man's web: `webLockTicks` 40, at most once in `webLockCooldown` 400) does the same to a
   clench in progress; at any other time it only locks the Gauntlet for those 40 ticks (no stone move, a quarter more damage).
-* **A mob's blow** (a golem, a wolf) does a quarter, and a golem that hits him is swatted dead with the back of his hand.
+* **A mob's blow** (a golem, a wolf) does a quarter, and any creature that hits him (a golem, a wolf, a tamed pet) is swatted dead with the back of his hand.
 
 ### 15.7 Targeting and movement
 
@@ -1538,7 +1538,7 @@ for `abandonSeconds` (90) and he leaves. Everyone dead for `wipeSeconds` (15): h
   tick 40 and turns to dust from tick 60; the fight is won at once. The experience (`xpReward`, 12,000) falls where he stood.
 * **The reward** (`BossRewards`): each participant who was there `rewardMinSeconds` and did at least `rewardMinShare` (3 percent)
   of his maximum health, and whoever struck the last blow, gets **one Infinity Gauntlet** and `xpRewardPerPlayer` points. A
-  Creative player never does. It goes into the inventory; a full one drops it for that player alone; a dead or absent player's
+  Creative player does not, unless `[boss].creativeGetsReward` is on. It goes into the inventory; a full one drops it for that player alone; a dead or absent player's
   waits as a gift. The rest is `summonCooldownTicks` (12,000: ten minutes).
 * **Any other end:** nobody is rewarded, and he steps through a ring of Space (30 ticks; when the server stops he is simply gone).
   After a wipe or `abandonSeconds` the rest is half as long (6,000: five minutes); after an operator's stop, Peaceful,
@@ -2107,7 +2107,7 @@ island **rises 40 blocks in 8 seconds**.
   before the island is built and deleted after it is cleared. On a clean stop the island is cleared at once; after a crash the
   next start clears the island's shape at altitude, sets players down on the ground, discards the boss's leftover entities and
   deletes the file. A lost file leaves at worst a floating island of ordinary blocks (to be taken down by hand: `/enhanced boss cleanup` removes entities only), never a hole
-  in the ground. `CUT_GROUND` (really lifting the ground) is a setting kept for later and is not in this release.
+  in the ground. `CUT_GROUND` (really lifting the ground) is a setting kept for later and is not in this release: set, it acts as `TREMOR`, and `liftRequiresMobGriefing` has no effect.
 
 ### 16.6 Uploading, the end and the reward
 

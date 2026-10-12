@@ -21,7 +21,7 @@ The call is turned down, with a red message in the action bar and nothing else h
 | Mjolnir lies on you | "Mjolnir holds you down: you can't go anywhere" |
 | He is already here | "He is already here" |
 | Another boss is fighting | who it is, and where |
-| He fought less than ten minutes ago (five if he left without being beaten; fights against Ultron or Apocalypse do not count) | "The stones are quiet. Wait 7:42" |
+| He fought less than ten minutes ago (five if every fighter fell or everyone left; none after the 25-minute limit or an operator's stop; fights against Ultron or Apocalypse do not count) | "The stones are quiet. Wait 7:42" |
 | Not the Overworld | "The Titan answers only in the Overworld" |
 | There are blocks over your head (he needs 24 blocks of open air above you) | "The Titan needs open sky above you" |
 | You are not on solid ground (or you stand in water), there is not enough open ground round you (fewer than 60 percent of 24 spots round you), or the arena would cross the world border | "The Titan needs open ground around you" |
@@ -32,7 +32,7 @@ An operator can call him anywhere with `/enhanced boss start thanos force` (see 
 
 * **3,000 health for one fighter**, and half as much again for each extra one (up to four fighters counted: 7,500). Creative and Spectator players do not count. The bar is **purple with one stone, blue with two, red, yellow, then green** (the colour of his newest stone); at five it says **"Only the Mind Stone remains"**, and when his damage starts to grow it says he is **enraged**.
 * **Four armour plates**: his right pauldron breaks below 75 percent of his health, the left below 55, the breastplate below 35 and the helmet below 20. Each plate takes **10 percent** off the damage he takes. Mjolnir breaks his helmet at once, 3 seconds of the Scarlet Witch's Chaos Beam tear a plate away, and a Telekinetic Slam tears one (at most once in 6 seconds). His Rewind puts them back.
-* **No hit takes more than 6 percent of his health, and no second more than 15 percent**, so there is no way to kill him quickly. A creature that is not a player (a golem, a wolf) does a quarter, and an Iron Golem that dares is swatted away with the back of his hand. **Stormbreaker does two and a half times** what it does to anything else.
+* **No hit takes more than 6 percent of his health, and no second more than 15 percent**, so there is no way to kill him quickly. A creature that is not a player (a golem, a wolf) does a quarter, and then he swats it dead with the back of his hand, a tamed pet too: keep your pets away from him. **Stormbreaker does two and a half times** what it does to anything else.
 * **He cannot be pushed, burned or poisoned**: no knockback, no fire, lava, drowning or falls, no Wither, Poison, Hunger, Nausea, Levitation, Mining Fatigue or Weakness, and no Slowness above level II. The Hex bounces him, Mjolnir cannot pin him, telekinesis cannot lift him and nothing can shapeshift him or confuse him.
 
 ## The clock of stones
@@ -93,7 +93,7 @@ Every move has a **tell**: a ring on the ground, a line from his hand, a glow. W
 
 ## When it ends
 
-* **He is beaten.** He kneels, says his last words and turns to dust (five seconds, invulnerable). **Everyone who did 3 percent of his health** (and was there for the shared minimum, a minute) **and whoever struck the last blow** gets **an Infinity Gauntlet**, straight into the inventory; if it is full it drops for them alone; if they are dead or away it waits and arrives when they are back. Each of them also gets 1,500 experience points, and **12,000 more fall where he stood**. Creative players are never rewarded. He cannot be called again for **ten minutes**.
+* **He is beaten.** He kneels, says his last words and turns to dust (five seconds, invulnerable). **Everyone who did 3 percent of his health** (and was there for the shared minimum, a minute) **and whoever struck the last blow** gets **an Infinity Gauntlet**, straight into the inventory; if it is full it drops for them alone; if they are dead or away it waits and arrives when they are back. Each of them also gets 1,500 experience points, and **12,000 more fall where he stood**. Creative players are not rewarded (unless the server turns on `boss.creativeGetsReward`). He cannot be called again for **ten minutes**.
 * **Every fighter is dead for 15 seconds**, or **nobody is near him for 90 seconds** ("Thanos has lost interest and left"): he steps through a ring of Space and is gone. Nobody is rewarded, and the rest is five minutes.
 * The fight is never saved: if the server stops, he is gone.
 

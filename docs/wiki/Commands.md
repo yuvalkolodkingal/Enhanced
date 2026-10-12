@@ -1,6 +1,6 @@
 # Commands
 
-All commands start with `/enhanced` and are for **operators** (permission level 2): server owners and players who can use `/gamemode`. Heroes are otherwise permanent, so these commands are also the only way to take a power away. (The exceptions are `/enhanced_anim` and `/enhanced_model`, for looking at the animations and at the bosses: see below.)
+All commands start with `/enhanced` and are for **operators** (permission level 2): server owners and players who can use `/gamemode`. Heroes are otherwise permanent, so these commands are also the only way to take a power away. (The exceptions are `/enhanced_anim`, `/enhanced_model` and `/enhanced_ultron_fx`, for looking at the animations, the bosses and Ultron's effects: see below.)
 
 | Command | Effect |
 |---|---|
@@ -100,6 +100,7 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced l
 * `/enhanced_model <thanos|thanos_phantom|thanos_sword|thanos_meteor|thanos_orb> <state> [tick]` shows the Mad Titan in a state (`idle`, and `idle_2` to `idle_5` for the stones he holds, `broken`, `barrier`, `veil`, `surge`, `stagger`, `falling`, `arriving`, `dying`) or at a tick of any of his moves (`sword_sweep`, `power_blast`, `infinity_beam`...), his illusion, his sword, a meteor or the Petrify Orb.
 * `/enhanced_model <ultron|ultron_sentry|vibranium_key> <state> [tick]` shows Ultron in a state (`idle`, `volley`, `beams`, `dive`, `pull`, `call`, `punch`, `stagger`, `lift`, `transfer`, `death`, `awakening`, `hybrid`, `ultron3`...), a Sentry or the Vibranium Key.
 * `/enhanced_model apocalypse <state> [tick]` shows En Sabah Nur in a state (`idle`, `awakening`, `tell_lance`, `tell_wave`, `tell_spikes`, `tell_boulders`, `tell_entomb`, `tell_mind_crush`, `tell_portal`, `backhand`, `tell_tornado`, `staggered`, `hover`, `escaping`, `kneeling`, `armour_fall`, `dying`, `withdrawing`, `true_<state>` for the frail body, `dying_fire`, and the shield's states `shield_up`, `shield_cracked`, `shield_forming`, `shield_reforming` and `shield_broken`); `sand_cocoon`, `sand_lance` and `sand_boulder` show his cocoon, a lance and a boulder.
+* `/enhanced_ultron_fx <effect> [ticks]` plays one effect of the Ultron fight (a tell, a beam, a ring, the assembly...) a few blocks in front of you, on your side only; nothing is sent to the server. The effects of a body, such as `beams_fire`, need one shown with `/enhanced_model ultron`.
 
 ## Related
 

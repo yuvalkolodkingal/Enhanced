@@ -121,7 +121,7 @@ Hold the Tesseract in one hand and Loki's Scepter in the other, and hold right-c
 
 ### I held the Tesseract and the Scepter and the Titan did not come. Why?
 
-The action bar says why, in red, and nothing else happens (you do not explode and you are not taken anywhere). The usual reasons: you are not on solid ground with open sky above you and open country round you, the difficulty is Peaceful, he is already here or another boss is fighting, he fought less than ten minutes ago (five if he left without being beaten), you are not in the Overworld, or the server turned the call off. The table is on [Thanos](Thanos#calling-him).
+The action bar says why, in red, and nothing else happens (you do not explode and you are not taken anywhere). The usual reasons: you are not on solid ground with open sky above you and open country round you, the difficulty is Peaceful, he is already here or another boss is fighting, he fought less than ten minutes ago (five if every fighter fell or everyone left), you are not in the Overworld, or the server turned the call off. The table is on [Thanos](Thanos#calling-him).
 
 ### Why can't I kill Thanos quickly?
 
