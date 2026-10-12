@@ -1498,7 +1498,7 @@ maximum and no second more than `maxDamagePerSecond` (15 percent).
   Gauntlet is dark for `lockTicks` (80): only the sword and fist moves. Soul Drain breaks at 60 poise, the Choke at 60
   damage. `lockGauntlet` (Spider-Man's web: `webLockTicks` 40, at most once in `webLockCooldown` 400) does the same to a
   clench in progress; at any other time it only locks the Gauntlet for those 40 ticks (no stone move, a quarter more damage).
-* **A mob's blow** (a golem, a wolf) does a quarter, and any creature that hits him (a golem, a wolf, a tamed pet) is swatted dead with the back of his hand.
+* **A mob's blow** (a golem, a wolf) does a quarter, and any creature that hits him (a golem, a wolf, a tamed pet) is swatted dead with the back of his hand. The Vision of Wanda's Hex is not a mob here: he hits at full strength and is not swatted (`ThanosEntity.hurt`).
 
 ### 15.7 Targeting and movement
 

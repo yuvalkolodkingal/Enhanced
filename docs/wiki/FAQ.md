@@ -113,6 +113,12 @@ He crawls at about 4.4 blocks a second (25% faster with the Iron Spider's legs, 
 
 The big bosses (the Ender Dragon, the Wither, the Warden, the Elder Guardian and the 3.0 bosses) can't be wrapped, nor can another Spider-Man, Creative and Spectator players, or players when **PvP is off**. A complete Chaos Shield stops a web, and Wanda's Hex wall refuses a zip across it. The Web Burst also spares villagers, Iron Golems, animals and pets, as every area attack does (a single Web Shot does wrap them). Spider-Man himself is never wrapped by a web.
 
+## The bosses
+
+### The bosses kill me in seconds. Can they be easier?
+
+Thanos, Ultron and Apocalypse are made for heroes who come ready: good armour (diamond or netherite), food, and a hero's powers, best two or three of you, with a Scarlet Witch or a Phoenix for Apocalypse. A player in plain clothes falls in a few seconds. To make them easier, set `difficultyScale` in the `[boss]` section of `enhanced-server.toml` (in your world's `serverconfig` folder, or the server's) to `0.5`: every boss and Sentry has half the health, and Thanos, Ultron and the Sentries hit half as hard. Apocalypse's blows follow the game's difficulty instead, so set the world to Easy for him. See [Server Configuration](Server-Configuration).
+
 ## Thanos
 
 ### How do I call Thanos?
