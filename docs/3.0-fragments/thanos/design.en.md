@@ -267,7 +267,7 @@ and its cap, the history, the dome's end, the hold, the hunger) were each caught
 > pipeline. `M` is the main arm; **`O` is the arm the Gauntlet is on** (the off arm), so every gesture of his drives `O`. His
 > plug-in is `ThanosClient`; the keys of the gestures are `ThanosGestures`, the rows of the stances `ThanosPoses`, the client's
 > own part (the key press, the landing, the first-person hand) `ThanosActing` and the flourishes at the hand `ThanosGestureFx`.
-> The boss is a model of his own and does not use this pipeline (15.6.1).
+> The boss is a model of his own and does not use this pipeline (15.14.4).
 
 #### 15.12.1 The gestures
 
@@ -325,7 +325,7 @@ at the look with no offset and gives the lean back to the stance. `ThanosGesture
 #### 15.12.4 First person
 
 The Gauntlet is on the off hand, which vanilla draws only when something moves it: for Thanos the off hand is **always drawn**,
-at the lower left of the screen, with the Gauntlet on it (the `PlayerRendererMixin` hook, 15.2.6), breathing a little. Every row
+at the lower left of the screen, with the Gauntlet on it (the `PlayerRendererMixin` hook, 15.13.2), breathing a little. Every row
 is added to that rest, in a right hand's signs (the left hand mirrors), and stays at the edge of the screen but for the thrust of
 the Blast (four ticks) and the stamp of the Time Lock:
 
@@ -365,3 +365,235 @@ The shared checks cover him too: `AnimationMathTests` (every gesture has well-fo
 every ability, toggle and state is acted or explained, no gesture is started by nothing). What the poses, the hands and the flourishes
 look like was checked by eye in a real game, from a second player (`/enhanced_anim target`, `play <gesture> <tick>`, which freeze each
 pose at a tick) and in first person.
+
+### 15.13 Looks and art
+
+Everything of him that is a picture. Every texture is drawn pixel by pixel by a script (no sample, no traced image), so
+that it can be drawn again; the scripts are in `scratchpad/art/thanos/` of the 3.0 work (`gen_skins.py`, `gen_boss.py`,
+`gen_items.py`, `gen_effects.py`) and the textures in `assets/enhanced/textures/`. `ThanosAssetsTests` (batch
+`thanos_assets`) reads the files back and holds them to the rules below.
+
+#### 15.13.1 The two skins and "your own skin"
+
+The playable Thanos has three looks (`H` cycles them, `Sneak + H` goes back): **Infinity War** (the default),
+**Endgame: Battle Armor** and **Your own skin** (the player's own, with the Gauntlet and the powers). The two skins are
+64x64 with the classic four-pixel arm (`entity/suit/thanos_infinity_war.png`, `thanos_endgame.png`). Armour is hidden on a
+hero, so everything he wears is painted into the skin and what stands off the body is on the overlay layers.
+
+| | Infinity War (after the Statesman) | Endgame (the battle armour of 2014) |
+|---|---|---|
+| Face | purple and bald, a heavy brow, blue irises, a furrowed grey beard in vertical stripes (the great chin stands off the face on the hat layer) | the same face, open |
+| Head | bareheaded | a gold helmet on the hat layer: a bright crest down the middle, a brow band with a point between the eyes, cheek guards and a neck guard |
+| Body | a navy quilted tunic with blue piping, a gold gorget that makes a Y over the chest, a gold belt with an angular buckle | a plum breastplate with gold trim and a raised ridge, a thick gold gorget, the belt |
+| Arms | bare purple, a bicep, veins on the forearm, gold straps over the shoulders | bare purple under great gold pauldrons |
+| Legs | olive trousers, gold knee plates, dark boots | olive trousers, gold knee plates and greaves, dark boots |
+
+* **Palette** (lifted from the posters, which are dark, so that eight pixels read): skin `#8C7DB4` with a ramp from `#CDC1EA` to
+  `#3C3258`; beard `#7A7490`; iris `#5C9CE4`, pupil `#1E1830`; aged brass `#A08540` (light `#E2CA80`, dark `#614D26`); navy
+  `#222C62`, piping `#4266D8`; olive `#4A4528`; boots `#2F2A1E`; plum `#5A3F7E`. Light comes from the top left; the metal has a lit
+  top and left edge, a dark bottom and right edge and a few scratches; the cloth is quilted and dull.
+* **The rules** (the shared skin rules, tested): nothing is drawn outside the rectangles the player model reads; the base layer is
+  opaque; an overlay pixel is fully opaque or fully clear; the arm is the classic width. **The eyes** are on the columns 9 to 10 and 13 to 14
+  of the head front, rows 11 to 12, a pupil outside and an iris inside, and the Endgame helmet leaves those eight pixels and the
+  face clear, so that a glow mask over the eyes works on every look.
+* **Drawn in at least three rounds each** with the mod's skin kit (`skinkit.py`, a character grid per face and a colour ramp per material) and the
+  box renderer of the art tools, each round looked at from the front, back, sides, three quarters, from above and at the sizes a
+  player is seen at in the game, and compared with the stills of the films (the *Infinity War* poster, the *Endgame* helmet and
+  shoulders).
+
+#### 15.13.2 The Infinity Gauntlet
+
+**On the arm.** A model layer (`GauntletLayer`) draws a cuff, an engraved forearm and a fist on the off-hand arm of every
+playing Thanos, whatever his look, scaled by 0.6 to fit a player's arm; in first person the same cuboids are put on the hand by one
+injection into the renderer of the hand. They are cut from the boss's own texture (15.13.3), so the Gauntlet of the hero and
+of the boss are one drawing: aged brass with a lozenge on the back of the forearm of nested channels, a thick cuff, a back of the
+hand with a large round socket.
+
+**The six sockets** are drawn by code on the back of the hand, a row of four on the knuckles and one at the thumb:
+
+| Stone | Place | Lit colour | Core |
+|---|---|---|---|
+| Power | knuckle, index | `#9B4DEB` | `#E6D2FF` |
+| Space | knuckle, middle | `#2F9BFF` | `#BFE6FF` |
+| Reality | knuckle, ring | `#E5253B` | `#FFB3BB` |
+| Soul | knuckle, little finger | `#FF8A1E` | `#FFD6A0` |
+| Time | the thumb | `#35D46A` | `#B8FFC9` |
+| Mind (never lit) | the large round socket, 3 by 3 pixels | a thin yellow outline `#F5D77A` | none |
+
+A stone that is not burning is a dark glassy gem (`#15131C`); a burning one is drawn full bright with a halo. A stone he holds
+**glows softly**, **flares for eight ticks when it is used** and burns while a held effect lasts; the stone that arrives next
+pulses in its last ten seconds. The engraved lines of the cuff and forearm glow in the colour of the stone he used last
+(`entity/thanos_glow.png`, white on clear, tinted by code). At five stones the Mind socket glimmers yellow for a second every
+twenty. The Gauntlet is hidden while the player is invisible, hidden or shapeshifted.
+
+**The item** (`item/infinity_gauntlet.png`, 16x64, four frames of 16x16, `frametime` 3, interpolated): the Gauntlet seen from the back
+of the hand, aged brass with a dark outline, four gems on the knuckles, the Time gem at the thumb and the large dark socket; the gems
+pulse in turn over the four frames (the Power and Time gems, then Space, Reality, Soul) and a yellow glint comes and goes in the socket.
+
+#### 15.13.3 The Mad Titan's model and texture
+
+A custom humanoid (`ThanosModel`), not a scaled player: 34 pixels tall at a render scale of 1.55 (3.29 blocks), with a hitbox of
+1.2 by 3.3 and an eye height of 2.95. His breadth is what he is: shoulders twice a player's, a big head and a long arm. It has
+28 boxes: the head with the beard, the **helmet** (crown, crest, two cheek guards, a neck guard), the body with the gorget, the
+**breastplate**, the belt and its buckle, two arms with the two **pauldrons** (a top and a low plate each) and the dark leather bracer of the
+sword arm, the Gauntlet's cuff, forearm and fist, the legs with knee plates and boots. The four plates (the helmet, the two pauldrons,
+the breastplate) are hidden when they break (the synced `plates`), and what shows then is the **undersuit**: the bald purple head, bare purple
+arms and the navy quilted tunic with its piping.
+
+* **The texture** (`entity/thanos.png`, 128x128) is cut for the model's boxes at their `texOffs`: the Endgame armour (scratched gold with a lit
+  edge and a dark edge, rivets on the pauldrons, the neck guard in three plates) over the Infinity War undersuit, the breastplate plum with a
+  gold border and a raised ridge, the face of 15.13.1 stretched to the head's nine pixels (the brow, the eyes, a frown), the beard
+  furrowed, the belt dark leather with gold studs. Every face of every box is painted in full. **One face is clear on purpose**: the breastplate's back, which lies
+  in the plane of the body's back (two opaque faces in one plane flicker); the body's back is plum armour with a gold border.
+* **The glow** (`entity/thanos_glow.png`) is white on clear: the lattice of the engraved lozenge, the channels of the forearm and the
+  bands of the cuff, and nothing else (no pixel of it lies on a pixel the skin leaves clear).
+* **His illusions** use the same model and texture (with the plates and stones of the real one), and have no shadow.
+* **The sword** (`ThanosSwordModel`, `entity/thanos_sword.png`, 64x32): two broad flat blades back to back on a short grip, a bronze
+  guard in the middle, a groove down each blade with a bronze inlay, a ridge (the spine) behind each; steel `#666678`, bronze
+  `#A08540`, wrapped dark leather on the grip. It is the model in his hand and the entity in flight.
+* **The meteor** (`ThanosMeteorEntity`) is a tumbling cluster of cubes that are all `item/titan_debris.png` (16x16): slate grey-blue rock with the
+  Space Stone's blue running through its cracks, lit from within; a blue halo and a streak follow it. **The orb** is a translucent red sphere
+  with a pale heart and four motes circling it, made of energy shapes, so it has no texture.
+* `/enhanced_model thanos <state or move> [tick]` shows the model in any state, frozen at a tick (his Sweep eight ticks in is
+  `/enhanced_model thanos sword_sweep 8`), for the people who draw.
+
+#### 15.13.4 Energy colours
+
+What every effect of the fight is painted with, whatever the look: **Power** `#9B4DEB` (core `#E6D2FF`), **Space** `#2F9BFF` (`#BFE6FF`; the
+portals use the Tesseract's own blues), **Reality** `#E5253B` (`#FFB3BB`), **Soul** `#FF8A1E` (`#FFD6A0`), **Time** `#35D46A`
+(`#B8FFC9`), **Mind** `#F5D77A`, only the empty socket's outline. The Infinity Beam is white with the five colours as a banded halo.
+The boss bar takes the colour of his newest stone (purple, blue, red, yellow for orange, green).
+
+#### 15.13.5 The other pictures
+
+| File | What |
+|---|---|
+| `mob_effect/petrified.png` | 18x18: a grey cracked stone with the Reality Stone's red in the cracks |
+| `mob_effect/soulworld.png` | 18x18: an orange sun on a horizon over still water |
+| `mob_effect/time_locked.png` | 18x18: a green dial with ticks inside a mandala ring |
+| `effect/stone_mandala.png` | 128x128, white on clear, tinted by code: a double outer ring, a band of twelve runes, a six-pointed star, clock hands (two of them are drawn, turning against each other, under the Time Stone's discs and mandalas) |
+| `effect/portal_ring.png` | 128x128, white on clear: a thick ring with a lit core and a bright edge, a ring of sparks, a faint three-armed spiral (the portals of the Space Stone and the sky portal of the call) |
+| `item/titan_debris.png` | 16x16, the meteor's rock |
+
+The boss bar and the chains of the Soul Drain are drawn by code (the bar from rectangles and the sockets' own geometry, the chain from ribbons),
+so they have no picture of their own.
+
+#### 15.13.6 How it was checked
+
+`ThanosAssetsTests` read the files back (the skin rules, the eyes, a painted face on every box, the animated strip). The pictures were then looked at **in a real game** (a
+server and a client, `/enhanced_model` for every state, the playing Thanos in both looks in the third person and the first, the Gauntlet item in the hotbar, the meteor, and the
+fight itself with the bar, the air and the subtitles). That round found one thing: in the Dying pose his legs come up and the soles of the boots, drawn nearly black, showed as a black slab; they are
+now worn leather with a welt and a tread, and drawn light because the game shades every downward face by half. The call's subtitle (*Dread it. Run from it. Destiny arrives all the same.*, as the specification gives it) is
+wider than a small window at GUI scale 2 and is clipped at its ends; nothing else was out of place.
+
+### 15.14 What is shown
+
+The client's part of the fight. Nothing here changes the world, and nothing but the picture is decided on the client: the server tells
+it what to show with one payload (`ThanosFxPayload`) and with the entity's synced fields (his stones, the clock to the next, his state, move and
+tick, the plates, the flags, the aim).
+
+#### 15.14.1 The boss bar
+
+`ThanosBossBar` draws the bar in the place of the vanilla one (`BossBarOverride`, for the three names of the bar): his health in the colour of his newest stone, a
+darker bar behind it for what he has just lost, **a gold tick where each plate will break** (dark once it has), and under it **a row of six sockets**:
+a stone he holds is a lit gem with a soft glow, the next one is a ring that fills while it counts down with its name and the time ("Space Stone 0:42"),
+the sixth is a dark socket outlined in yellow that is never filled. His name turns red when he is enraged. For a Thanos the client does not know (he
+is far away) the vanilla bar's health and colour are shown alone.
+
+#### 15.14.2 The tells and the effects
+
+`ThanosFx` draws what the server sends, at most 48 at a time, none beyond 96 blocks, each for a few ticks. The fifteen kinds: a **ring on the ground** that closes in on the
+impact (`RING_TELL`: the melee, the leap, the sigils of the Overload, the meteors, the Soul World's pillar), a **line** from the hand
+that whitens as the aim locks (`LINE_TELL`, through the walls for the Pulse), a **beam** (`BEAM`, white core with a halo and a spiral of
+motes; the Infinity Beam's is banded), a **portal** (`PORTAL`, `PORTAL_SKY`), a **falling star** in the stone's colour that is the stone arriving (`STAR`), a
+**ring that spreads** (`SHOCK_RING`), a **mandala** (`MANDALA`: thin at first, solid at the end for the Snare), a **dome** (`DOME`: the Barrier blue, the Veil red, the
+Time Lock green; the Barrier and the Veil are also drawn from his flags, so that a late arrival sees them), a **red wave** (`WAVE`), **orange chains** from the Gauntlet
+(`CHAINS`, tense while the drain lasts, with motes flowing back), a **pillar** of orange light (`PILLAR`), the **Soul World** for the one taken (`SOULWORLD`), the **illusion**
+round a petrified creature (`ILLUSION`, nothing in the world changes) and a white **flash** (`FLASH`, not with *Reduced motion*). At most 12 meteor rings, 6 chains and 4
+domes are drawn at once. Every tell has the colour of its stone: gold for melee, purple Power, blue Space, red Reality, orange Soul, green Time.
+
+#### 15.14.3 The air
+
+`ThanosAtmosphere`, within 64 blocks of a living Thanos (the client option `bossAtmosphere`): the fog turns dark violet `#2A1A40` over three seconds, the edges of the screen
+darken, a thunder that is not weather rumbles far away every 20 to 40 seconds, and a stone arriving flashes the screen white for a second. The call has its own sky: the fog
+turns violet while the two items are held up and while the portal is open. On the player: a grey vignette for `PETRIFIED`, a green tint for `TIME_LOCKED`, and in the Soul World
+an orange sky over still water with a gateway far ahead and the screen tinted orange.
+
+#### 15.14.4 The boss's poses
+
+`ThanosBossPoses` is a table of keyed poses (a wind-up, a strike, a hold, a recovery, each with its easing) for his body: a stand, the sweep, the smash, the jab, the throw, the
+choke, the leap, the point (the Gauntlet along the locked aim, for the Blast, the orb, the drain and the Overload), the Gauntlet raised (Shockwave, Meteor Hail, Rewind, Infinity
+Beam), the slam, the palm out (Pull, Barrier), the step, the wide arms (Veil, Phantoms), the press (Time Snare), the sight, the infinity pose, and the poses of the states: falling
+through the portal, the surge (a knee, the Gauntlet arm shaking), the stagger, the arrival, the death (one knee, then seated). Each tick of a move reads its pose from the synced
+state, move and tick, blended over four ticks from the last one. The legs swing at 0.5 of a player's rate with the arms against them, he breathes, his head follows what he looks at, he
+leans forward a little when he chases. The sword whirls by an angle carried from frame to frame, so a whirl that begins or ends never makes it jump.
+
+#### 15.14.5 The hero's screen
+
+The hero's panel has a line for each key (15.11.2): the cooldown seconds, `ON`/`OFF` for the Veil, `draining` while the chain holds, `Sight 6.2s` while it looks, and, when the Rewind is
+ready, the seconds of history stored (counted on the client, since the server's snapshots are not synced). The Soul Sight outlines come from `SoulSight` through the game's own glow, so they
+show through walls and in his colour. The Drain's chain hums (the `soul_drain` loop, 15.15). The Gauntlet's sockets burn for the stone just used.
+
+### 15.15 Sounds and music
+
+All of it original and synthesized with the mod's numpy toolkit (`sfx.py`: oscillators, noise, filters, modal synthesis, a synthetic reverb; the recipes are `thanos_sounds.py`), mono Ogg
+Vorbis at 44.1 kHz. **The six voices of the Infinity Stones are not here:** they are the 2.3 sounds (`<stone>_stone` and `<stone>_stone_hum`), and are played at every stone's arrival (full), as a
+soft hum ten seconds before, at every stone move's tell, in turn in the Infinity Beam's charge, at each hero ability and in a row at the Gauntlet's ceremony. The portals reuse
+the Tesseract's sound (higher), a dissolving illusion Loki's, the shield turning the sword home Mjolnir's impact.
+
+#### 15.15.1 The sounds
+
+Each cue of the fight (`ThanosSounds`) is a sound event, with its subtitle in English and in Hebrew; the names start with the lane's prefixes (`thanos_`, `gauntlet_`, `soul_`, `time_`, `reality_`).
+
+| Event | Files | Seconds | Where | How it is made |
+|---|---|---|---|---|
+| `thanos_summon` | 1 | 3.5 | the charge, and the portal opening | a sub-bass swell (a sine 38 to 92 Hz and a saw an octave up, +12 dB over 3 seconds), a noise riser (400 Hz to 3 kHz), the Tesseract's own sound reversed, and at 3.0 s his bell cluster over a deep boom |
+| `thanos_bell` | 1 | 1.4 | each second of the charge | the bell cluster alone: partials at 220, 349, 528 and 880 Hz (1 : 1.58 : 2.4 : 4.0) with a boom |
+| `thanos_arrive` | 1 | 2.0 | the landing | a reversed ring-whoosh into a saturated 55 Hz thump, a noise burst, a crack, a gravelly rumble and grains of ground |
+| `thanos_roar` | 1 | 1.6 | the arrival, each stone, the enrage | a baritone: a fundamental from 78 up to 108 Hz and down, formants at 600, 1000 and 2500 Hz opening toward "ah", a 6 Hz tremolo, a growl (noise modulated at 40 Hz), a rasp, a sub, a long hall |
+| `thanos_step` | 3 | 0.45 | his footfalls | a 55 Hz thump, 0.15 s of gravel, a tiny armour clink (pings at 2.4 and 3.1 kHz) |
+| `thanos_swing` | 2 | 0.55 | the Sweep, the Smash, the Throw | a broad whoosh sweeping 500 to 1800 Hz with a Doppler bend, the hollow ring of a big blade (190 and 215 Hz) |
+| `thanos_hit` | 2 | 0.5 | his blows landing, the Slam | a 70 Hz thud, a metal clang (640, 1630 and 2900 Hz), a slap of body |
+| `thanos_hurt` | 3 | 0.7 | he is hit hard (at most once in 20 ticks) | a short "oh" with the pitch falling 90 to 70 Hz, breath, a touch of vocal fry |
+| `thanos_death` | 1 | 5.0 | the death (100 ticks) | a long exhale (78 down to 46 Hz through "oo" formants), a hiss of dust, and five falling tones (700 to 200 Hz), one a second, for the sockets going dark |
+| `gauntlet_clench` | 1 | 0.4 | every stone move's tell, the hero's presses | a leather-and-metal creak falling 900 to 400 Hz, a gem click at 3.8 kHz, a low hum |
+| `thanos_stone_surge` | 1 | 1.5 | a stone fuses (under its voice) | a rising shimmer, a deep "whomp" (40 to 65 Hz) at 0.7 s, a crackle |
+| `thanos_power_blast` | 1 | 1.0 | the Power Blast, boss and hero, at the release | a 0.12 s rising snap, a wide crack, a 60 Hz boom, a violet shimmer tail |
+| `thanos_infinity_charge` | 1 | 2.5 | the Infinity Beam's tell | five rising tones in turn 0.4 s apart (D2 F2 A2 C3 E3), each held, over a growing swell; it plays once |
+| `thanos_infinity_beam` | 1 | 1.6 | the beam | a full-spectrum roar: pink noise with a 7 Hz tremolo of 3 dB, saws at 55, 110 and 165 Hz, a band that sweeps with the beam |
+| `time_rewind` | 1 | 1.6 | the Rewind (boss and hero) | 28 reversed clock ticks speeding up from 6 to 40 a second, a sweep 120 to 900 Hz, a bright shimmer, a soft chime |
+| `soul_drain` | 1 (`soul_drain_loop`) | 2.0, a loop | the chains lashing out; the hero's drain, in `PowerLoopSounds` | a choir shimmer (four detuned voices on A3, "ooh", 5 Hz vibrato) with chain clicks, 18 a second, at random pitches |
+| `soul_world` | 1 | 3.0 | the victim's client | a gentle wash: low wind, two drops of water, a distant wordless voice on E4 at a quarter of the level |
+| `reality_pop` | 3 | 0.3 | a bubble pops, the Petrify | a resonant blip gliding 900 to 1900 Hz in 40 ms, a puff of noise |
+| `thanos_meteor_whistle` | 1 | 1.2 | each meteor falling | a sine gliding 1800 down to 400 Hz with a noise bed that follows it and a growing rumble |
+| `thanos_barrier_up` | 1 | 0.6 | the Space Barrier | a glassy dome (partials at 900, 1420 and 2100 Hz), a noise sweep, a soft whump |
+| `thanos_theme_1` to `_5` | 5 | 40 each, loops, streamed | the music (15.15.2) | below |
+
+Departures from the plan, where the code's timing decides: `thanos_power_blast` opens with a 0.12 s snap, not a 0.6 s charge (the cue plays at the
+release; the wind-up is the clench and the stone's voice); `thanos_death` is five seconds, the length of the dying state; `thanos_bell` is
+new (the plan's vanilla bell would have clashed). The six sounds that the plan named without a prefix take `thanos_` (the Soul World is `soul_world`).
+
+#### 15.15.2 The music
+
+`ThanosMusic`: **five stems of 40 seconds in D minor**, one for each stone he holds, that play **together**, so the music grows as he does; each is a loop that closes,
+every frequency a multiple of 1/40 Hz and every filter, noise and reverb circular. A stem fades in over two seconds when its stone arrives and stays; all are at full volume within 48
+blocks of him, silent at 96, and fade out over three seconds when he dies or leaves; the game's own music waits; it is music-volume sound (the slider controls it) and the client
+option `bossMusic` switches it off.
+
+| Stem | Stone | What it adds |
+|---|---|---|
+| `thanos_theme_1` | Power | a drone (D1, D2, A2) in a slow breathing saw pad, a dark wind, and a heartbeat at 60 bpm (two low thumps, the second softer) that never stops |
+| `thanos_theme_2` | Space | low strings: an open fifth rising D2 to A2 and settling on F2 over C3, twice in the 40 seconds |
+| `thanos_theme_3` | Reality | high choir clusters a semitone apart (D5 E-flat5 E5 over A4 B-flat4 B4), their vowel slowly changing, glass above |
+| `thanos_theme_4` | Soul | a driving ostinato at 90 bpm in eighths on D2 A2 F2 C3 under a low drum on the beat |
+| `thanos_theme_5` | Time | the bells of the call (A4 D5 C5, then a low D) over a deep boom, with a high shimmer |
+
+The stems are mixed so that all five together are no louder than a loud effect (each is trimmed 6 to 8 dB under the effects' loudness).
+
+#### 15.15.3 How it was checked
+
+`ThanosAssetsTests`: every event is registered, has its `sounds.json` entry with the right files, its subtitle in both languages, mono at 44.1 kHz,
+a sensible length (the themes 40 s, the drain loop 2 s), the themes streamed; every cue of `ThanosSounds` plays an event of the mod. Each recipe was looked at as a
+spectrogram and a waveform and measured (the peak under -1 dBFS after encoding, the loudness, the energy above 12 kHz, the pitch and the timing of what it is
+meant to do); the loops were tested at the seam. The themes' downbeats are on the loop's first sample, which the seam test counts as a jump in level: it is a drum or a bell
+beginning on the beat.

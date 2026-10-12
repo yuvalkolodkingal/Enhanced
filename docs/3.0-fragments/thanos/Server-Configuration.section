@@ -38,7 +38,6 @@ Section `[thanos_boss]`. The boss's page is [Thanos](Thanos). The rules every bo
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
-| `thanos_boss.blockDamage` | `false` | `true` or `false` | Damage: If true, and the `mobGriefing` rule is on, Overload and the meteors break blocks with small explosions. Nothing else he does ever breaks a block. |
 | `thanos_boss.swordDamage` | `30.0` | 0.0 to 400.0 | Damage: Sword Sweep. |
 | `thanos_boss.smashDamage` | `26.0` | 0.0 to 400.0 | Damage: The impact of an Overhead Smash. |
 | `thanos_boss.smashRingDamage` | `12.0` | 0.0 to 400.0 | Damage: The ground ring of an Overhead Smash. |
@@ -213,5 +212,5 @@ Two more options are about your own game only (they are not synced, and a server
 
 | Option | Setting in the file | Default | What it does |
 |---|---|---|---|
-| Boss music | `bossMusic` | `true` | The music of the fight while a Thanos is near: a low hum that gains a layer for each stone he has, while the game's own music waits (it follows the music volume). Off: silence (the sounds of his moves stay). |
+| Boss music | `bossMusic` | `true` | The music of the fight while a Thanos is near: five layers in D minor that play together, one for each stone he has (a drone and a heartbeat, then low strings, a high choir, a driving ostinato and bells), while the game's own music waits (it follows the music volume). Off: silence (the sounds of his moves stay). |
 | Boss atmosphere | `bossAtmosphere` | `true` | The violet fog, the dark edges of the screen and the far thunder while a Thanos is near, and the violet haze of the call that wakes him. Off: the sky stays as it is. The grey of stone, the green of the Time Lock, the Soul World and the white flashes are what he does to you, so they always show. |

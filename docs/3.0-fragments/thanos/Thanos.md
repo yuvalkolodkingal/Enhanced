@@ -84,6 +84,13 @@ Every move has a **tell**: a ring on the ground, a line from his hand, a glow. W
 * **Quicksilver Time** slows him to half, and not at all once he has the Time Stone. Magneto's strip takes nothing from him.
 * Nobody is forced to stay: there are no walls round the arena, and **the world is never changed** (no block is ever broken or placed, unless the server turned *blockDamage* on).
 
+## What you see and hear
+
+* **The bar** shows his health in the colour of his newest stone, a gold tick where each armour plate will break, and under it six sockets: a lit gem for each stone he holds, a ring filling toward the next ("Space Stone 0:42"), and a dark socket outlined in yellow that never fills.
+* **Every move shows itself first**: a ring closing on the ground where it will land, a line from his hand that whitens as the aim locks, a portal, a falling star. The colour is the stone's: gold for the sword and the fist, purple for Power, blue for Space, red for Reality, orange for Soul, green for Time.
+* **The air** turns dark violet within 64 blocks of him, with far thunder and a white flash when a stone arrives. These effects follow the client options *bossAtmosphere* and *Reduced motion*.
+* **The music** is five layers in D minor, one for each stone he holds: a drone and a heartbeat, low strings, a high choir, a driving ostinato and bells. They play together, so the music grows as he does, and fade out when he is gone. It is music-volume sound (the music slider controls it) and the client option *bossMusic* switches it off. The sounds of the fight (his steps, his roar, the clench of the Gauntlet, the beams) are original, and every one has a subtitle in English and Hebrew.
+
 ## When it ends
 
 * **He is beaten.** He kneels, says his last words and turns to dust (five seconds, invulnerable). **Everyone who did 3 percent of his health** (and was there for the shared minimum, a minute) **and whoever struck the last blow** gets **an Infinity Gauntlet**, straight into the inventory; if it is full it drops for them alone; if they are dead or away it waits and arrives when they are back. Each of them also gets 1,500 experience points, and **12,000 more fall where he stood**. Creative players are never rewarded. He cannot be called again for **ten minutes**.
