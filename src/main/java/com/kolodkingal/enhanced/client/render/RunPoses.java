@@ -74,6 +74,8 @@ final class RunPoses {
     private static final Character BILLY = new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.025F);
     private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
     private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
+    /** Thanos: heavy and wide, between Thor and Magneto; the bob of a stride that shakes the ground. */
+    private static final Character THANOS = new Character(0.90F, 1.15F, 1.15F, 9, 5, 0.030F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
@@ -87,7 +89,7 @@ final class RunPoses {
             // gives them a character.
             case PHOENIX -> DEFAULT;
             case SPIDER_MAN -> DEFAULT;
-            case THANOS -> DEFAULT;
+            case THANOS -> THANOS;
             case ULTRON -> DEFAULT;
             case APOCALYPSE -> DEFAULT;
             default -> DEFAULT;

@@ -623,6 +623,9 @@ public final class AnimationMathTests {
                 // ===== phoenix =====
                 // ===== spider =====
                 // ===== thanos =====
+                // (The Veil's stance adds the spread to the main arm, so the gesture ends level with the body, spread by it.)
+                {GestureId.THANOS_VEIL_ON, new float[]{0, 0, com.kolodkingal.enhanced.client.render.ThanosGestures.VEIL_M_Z},
+                        com.kolodkingal.enhanced.client.render.ThanosGestures.VEIL_O},
                 // ===== ultron =====
                 // ===== apocalypse =====
         };

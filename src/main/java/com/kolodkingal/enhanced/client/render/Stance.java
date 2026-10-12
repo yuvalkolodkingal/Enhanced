@@ -35,6 +35,10 @@ public enum Stance {
     // ===== spider =====
 
     // ===== thanos =====
+    /** Thanos: the Reality Veil is up, the Gauntlet hand held out as if it held a thin film. */
+    THANOS_VEIL(4, 5, false),
+    /** Thanos: the Soul Drain holds, the Gauntlet arm along the look and the legs braced. */
+    THANOS_DRAIN(2, 4, true),
 
     // ===== ultron =====
 

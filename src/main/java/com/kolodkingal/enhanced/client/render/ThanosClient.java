@@ -12,9 +12,9 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -22,8 +22,18 @@ import java.util.Locale;
 /**
  * The client side of Thanos, as a {@link HeroClient} plug-in (DESIGN section 15): the HUD lines of the five stones, the
  * Gauntlet's light and the life of everything the Thanos lane draws (the effects, the music, the air round the Mad
- * Titan, his bar), which this plug-in starts and stops with the client. The Gauntlet itself is {@link GauntletLayer};
- * the stones' flourishes and gestures are the animation's.
+ * Titan, his bar), which this plug-in starts and stops with the client. The Gauntlet itself is {@link GauntletLayer}.
+ *
+ * <p>His animation (DESIGN section 15.12): the keys of his gestures are {@link ThanosGestures} (one for each use of each
+ * stone, plus the Veil closing and opening), the rows of his two stances {@link ThanosPoses}, the routes that start the
+ * gestures the lines of his own in {@link GestureRoutes} and the methods below; what the client adds (the key press that
+ * acts before the server answers, the landing of a Titan, the Gauntlet hand in first person) is {@link ThanosActing}
+ * and the flourishes at the hand {@link ThanosGestureFx}. He does not fly, so he has no flight profile; his walk is
+ * {@code RunPoses.THANOS}.
+ *
+ * <p>The plug-in is built when {@link HeroClients} loads, which a dedicated server does too when it lists the heroes, so
+ * nothing in this class names a client class except in a signature of {@link HeroClient}: each method hands its arguments
+ * on as they came to the classes above, loaded only on a client.
  */
 public final class ThanosClient implements HeroClient {
     @Override
@@ -65,13 +75,77 @@ public final class ThanosClient implements HeroClient {
         return Component.translatable(on ? "hud.enhanced.on" : "hud.enhanced.off").withStyle(on ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY);
     }
 
+    // ---- the animation (the keys are ThanosGestures, the stances' rows ThanosPoses, the rest ThanosActing) ----
+
+    @Override
+    public void stanceTargets(HeroAnimState s, AbstractClientPlayer p, PowerData data, boolean[] on, long now) {
+        ThanosGestures.stances(data, on);
+    }
+
+    @Override
+    public void edges(HeroAnimState s, AbstractClientPlayer p, PowerData data, long now) {
+        ThanosActing.edges(s, p);
+    }
+
+    @Override
+    public float lean(HeroAnimState st) {
+        return ThanosGestures.DRAIN_LEAN * st.stance(Stance.THANOS_DRAIN);
+    }
+
+    @Override
+    public void ambient(PoseContext c) {
+        ThanosPoses.ambient(c);
+    }
+
+    @Override
+    public void aimed(PoseContext c) {
+        ThanosPoses.aimed(c);
+    }
+
+    @Override
+    @Nullable
+    public GestureId predictedGesture(HeroAnimState s, PowerData data, int ability, long now, boolean sneaking) {
+        return ThanosActing.predicted(data, ability, now, sneaking);
+    }
+
+    @Override
+    public void registerGestures() {
+        ThanosGestures.register();
+    }
+
+    // ---- which gesture stands for what ----
+
+    @Override
+    @Nullable
+    public GestureId cooldownGesture(int ability, long left) {
+        return ThanosGestures.cooldown(ability, left);
+    }
+
+    @Override
+    @Nullable
+    public GestureId liveGesture(Live live) {
+        return switch (live) {
+            case SOUL_DRAINING -> GestureId.THANOS_DRAIN_CAST;
+            case SOUL_SIGHT -> GestureId.THANOS_SIGHT;
+            default -> null;
+        };
+    }
+
+    @Override
+    public boolean startedElsewhere(GestureId id) {
+        // The Slam, the Pull and the Rewind are the second use of a key, told from the first by the length of the
+        // cooldown it starts (a length the completeness check's two small probes never reach).
+        return ThanosGestures.toldByCooldown(id);
+    }
+
+    @Override
+    public void gestureStarted(AbstractClientPlayer player, HeroAnimState state, GestureId id, float param) {
+        ThanosGestureFx.started(player, id);
+    }
+
     @Override
     public void firstPerson(HeroAnimState s, LocalPlayer player, FirstPersonArms.Offset main, FirstPersonArms.Offset off) {
-        // The Gauntlet is always at the lower left of the screen: the off hand is drawn even when it holds nothing.
-        if (player.getOffhandItem().isEmpty() && !player.isInvisible()) {
-            off.add(1.0F, 0.10F, 0.08F, 0.15F, -8.0F, 0.0F, 20.0F);
-            off.ambient(1.0F, 0.0F, 0.005F * Mth.sin((float) s.time * 0.08F), 0.0F);
-        }
+        ThanosActing.firstPerson(s, player, main, off);
     }
 
     @Override
@@ -79,6 +153,7 @@ public final class ThanosClient implements HeroClient {
         if (mc.level == null) {
             return;
         }
+        ThanosGestureFx.tick(mc.level);
         ThanosHeroGlow.tick(mc.level);
         ThanosAtmosphere.tick(mc);
         ThanosMusic.tick(mc);
@@ -87,6 +162,7 @@ public final class ThanosClient implements HeroClient {
 
     @Override
     public void clear() {
+        ThanosGestureFx.clear();
         ThanosHistory.clear();
         ThanosFx.clear();
         ThanosHeroGlow.clear();

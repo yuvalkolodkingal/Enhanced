@@ -127,7 +127,7 @@ public final class GestureRoutes {
             // ===== spider =====
             case WALL_CRAWL, SPIDER_SENSE, SPIDER_LEGS -> PENDING_GESTURE;
             // ===== thanos =====
-            case REALITY_VEIL -> PENDING_GESTURE;
+            case REALITY_VEIL -> power == Power.THANOS ? (on ? GestureId.THANOS_VEIL_ON : GestureId.THANOS_VEIL_OFF) : null;
             // ===== ultron =====
             // ===== apocalypse =====
         };
@@ -283,7 +283,12 @@ public final class GestureRoutes {
             // ===== spider =====
             case SPIDER_MAN -> PENDING_ACTING;
             // ===== thanos =====
-            case THANOS -> PENDING_ACTING;
+            // (Sneak + V, the Reality Veil, is toggle:REALITY_VEIL; Sneak + B, the Soul Sight, is live:SOUL_SIGHT; the second use of
+            // R, G and N is told from the first by the length of the cooldown, see ThanosGestures.cooldown.)
+            case THANOS -> switch (ability) {
+                case 1, 2, 3, 5 -> "cooldown";
+                default -> "live:SOUL_DRAINING";
+            };
             // ===== ultron =====
             case ULTRON -> PENDING_ACTING;
             // ===== apocalypse =====
@@ -310,7 +315,7 @@ public final class GestureRoutes {
             case CLINGING_WALL, CLINGING_CEILING, ZIPPING, SWINGING, SENSING, BLACK_EYES, INSTANT_KILL ->
                     PENDING_REASON + ": the Spider-Man lane acts it";
             // ===== thanos =====
-            case SOUL_DRAINING, SOUL_SIGHT -> PENDING_REASON + ": the Thanos lane acts it";
+            case SOUL_DRAINING, SOUL_SIGHT -> null;
             // ===== ultron =====
             case ULTRON_CHARGING -> PENDING_REASON + ": the Ultron lane acts it";
             case LIFTED -> "Sokovia carries them: like a pinned player they can't move, so they have no move to make";

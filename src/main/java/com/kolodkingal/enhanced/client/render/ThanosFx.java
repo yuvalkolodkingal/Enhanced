@@ -773,7 +773,15 @@ public final class ThanosFx {
             right = right.lengthSqr() < 1.0E-6 ? new Vec3(1.0, 0.0, 0.0) : right.normalize();
             Vec3 up = right.cross(look).normalize();
             double side = off == HumanoidArm.RIGHT ? 1.0 : -1.0;
-            return player.getEyePosition(partial).add(look.scale(0.7)).add(right.scale(side * 0.3)).add(up.scale(-0.3));
+            // Where the hand is drawn: its resting place, moved with the first-person gesture (the view-space offset is about
+            // 0.8 blocks from the camera, so 0.4 of it is the offset in the world), as WorldEffectsRenderer.handPosition does
+            // for the main hand.
+            float[] moved = new float[3];
+            if (player == mc.player) {
+                FirstPersonArms.hand(mc.player, off, moved);
+            }
+            return player.getEyePosition(partial).add(look.scale(0.7 + 0.4 * moved[2])).add(right.scale(side * (0.3 + 0.4 * moved[0])))
+                    .add(up.scale(-0.3 + 0.4 * moved[1]));
         }
         return ThanosAbilities.handPosition(player).add(player.getPosition(partial).subtract(player.position()));
     }

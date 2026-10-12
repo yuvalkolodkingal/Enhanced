@@ -106,6 +106,27 @@ public enum GestureId {
     // ===== spider =====
 
     // ===== thanos =====
+    /** Thanos: the Power Blast, the Gauntlet thrust at the aim (R). */
+    THANOS_BLAST(Group.CAST, 10, 1, 5, true),
+    /** Thanos: the Titan Slam, the Gauntlet raised overhead and driven into the ground (Sneak + R). */
+    THANOS_SLAM(Group.CAST, 22, 2, 8, true),
+    /** Thanos: the Portal Step, the Gauntlet draws a circle in the air (G). */
+    THANOS_STEP(Group.CAST, 12, 1, 5, false),
+    /** Thanos: the Space Pull, the palm forward and then dragged back (Sneak + G). */
+    THANOS_PULL(Group.CAST, 16, 2, 6, true),
+    /** Thanos: the Transmute, a flick of the Gauntlet toward the creature, fingers spread (V). */
+    THANOS_WARP(Group.CAST, 14, 1, 5, true),
+    /** Thanos: the Reality Veil closes round him, and opens again (Sneak + V). */
+    THANOS_VEIL_ON(Group.CAST, 16, 2, 6, false),
+    THANOS_VEIL_OFF(Group.CAST, 10, 1, 4, false),
+    /** Thanos: the chain of the Soul Drain lashes out (hold B). */
+    THANOS_DRAIN_CAST(Group.CAST, 12, 1, 5, true),
+    /** Thanos: the Soul Sight, the Gauntlet to the eye and swept across (Sneak + B). */
+    THANOS_SIGHT(Group.CAST, 14, 2, 5, false),
+    /** Thanos: the Rewind, the palm up and trembling and then drawn back (N). */
+    THANOS_REWIND(Group.CAST, 22, 2, 8, false),
+    /** Thanos: the Time Lock, both palms pressing down in a stamp (Sneak + N). */
+    THANOS_TIMELOCK(Group.CAST, 20, 2, 8, false),
 
     // ===== ultron =====
 
