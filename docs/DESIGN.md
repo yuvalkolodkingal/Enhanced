@@ -13,6 +13,9 @@ one of the *Enhanced*:
 * **Thor**, the God of Thunder, with **Mjolnir** and **Stormbreaker**, and the **Bifrost** **(added)**
 * **Jean Grey, the Phoenix**, the telepath who reads minds and burns with cosmic fire, with the **Phoenix Burst** **(added in 3.0)**
 * **Peter Parker, Spider-Man**, who goes everywhere on a web, sticks to walls and ceilings, feels danger coming and wears the Homemade Suit, the Iron Spider and the Brand New Day suit **(added in 3.0)**
+* **Thanos, the Mad Titan**: a **boss** who gathers up to five Infinity Stones as he fights, never the sixth, and, for those who beat him, the **Infinity Gauntlet** and a **hero** of five stones **(added in 3.0)**
+* **Ultron**, the artificial intelligence of the Mind Stone: a **boss** with an army of Sentries who lifts the ground into the sky and moves into a new body when one is destroyed, and, for those who beat him, a **hero** of plasma, anti-gravity, uploads and Sentries **(added in 3.0)**
+* **Apocalypse (En Sabah Nur)**, the first mutant: a **boss** whose golden shield stops everything except mind power, and, for those who beat him, a **hero** of sand, levitation, portals and a shield of his own **(added in 3.0)**
 
 This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
 Scarlet Witch, and Quicksilver's slow-motion run). Everything the concepts said is kept.
@@ -27,14 +30,14 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, Phoenix, Spider-Man. Powers never stack. |
+| One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, Phoenix, Spider-Man, Thanos, Ultron, Apocalypse. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
 | Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. One more key, **Z** (*Vision, That One!*), belongs to the Scarlet Witch alone: it is her order to the Vision her Hex raises (section 2). |
-| Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs; Spider-Man doesn't fly either: he zips and swings on webs (section 14). |
+| Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs; Spider-Man doesn't fly either: he zips and swings on webs (section 14), and Thanos walks and steps through portals (section 15). |
 | Flight and run animation **(added)** | Every hero's pose is blended from the situation instead of switched, so nothing snaps and other players see it too. Each flier has a flight of his own. Magneto glides with his arms spread, leaning about 40° at full speed. Wanda floats upright with her palms open and stretches out, arms ahead, about 60° forward in a sprint. Vision is a straight body with arms at his sides, leaning about 65° at speed. Billy flies like a kid, arms wide, then ahead at a sprint. Thor leans about 90° behind his weapon, which really is in his fist in every pose (Mjolnir's handle and Stormbreaker's pass through it), whirls on its strap with a swoosh while he takes off and hovers, and is thrust ahead of him at speed; he overshoots a little and settles like a heavy hero. Every flier takes off with a gesture of his own, banks into turns, tips over in a dive, leans back when he climbs and brakes when he stops (Thor lands as a hero, planting the weapon). Quicksilver (in Quicksilver Time and in Super Speed) and Tommy at super speed run with their own stride, with ghosts of the stride behind them and a skid when they stop, and everyone else sprints and walks with a character of his own. Every flier leaves a trail of his own along the path he flew (crimson threads from Wanda's hands, golden threads from Vision's shoulders, field lines from Magneto's, a double helix from Billy's, lightning from Thor's boots), with white wind streaks at speed, a ring at take-off, a shockwave when a hero lands and a sonic boom when Thor or Vision break the sound barrier. Three client options (in `config/enhanced-client.toml`, section `[animation]`, and behind the *Config* button of Enhanced in the Mods screen; nothing there is synced) change it: *Hero animations* turns the hero animation off (vanilla poses), *Reduced motion* tones it down (hover bob and drift at a third, no trembling hands, jitter or camera shake), and *Flight effects* turns off the trails, wind and rings. |
 | Ability animation **(added)** | Every ability is acted, not just switched on, and other players see it too. **Magneto** draws his field out around him with both arms, closes a claw on the metal and wrenches it away, and holds what he lifts with a steady open hand. The **Scarlet Witch** gathers her arms across her chest and throws them open to raise the Chaos Shield, thrusts both hands out for the beam, raises both hands overhead to grow the Hex and moves them apart or together to make it bigger or smaller; her lifting hand is a raised, shaking claw. **Quicksilver** taps his goggles, starts like a sprinter, jabs a flurry of fists in his blitz and darts a hand out to snatch. **Vision** puts his fingers to his temple before the beam, floats his arms wide to let go of the world and braces to become dense. **Tommy** shakes his arms out, spins twice in his blitz, shivers before he goes through a wall and holds out a vibrating palm. **Billy** thrusts his hand at the target of the Hex Bolt, throws both hands up to freeze and presses them to his ears for the Noise. **Loki** flicks his daggers from over the shoulder, raises a spread hand to cast and roars as the Frost Giant; his Scepter jabs instead of chopping. **Thor** hauls back and whips his arm to throw the weapon, holds out his hand for it, is slapped by it as it comes home (with sparks), kicks back as the lightning leaves his hand and holds his arm out along the beam while he fires it, thrusts Mjolnir up as it bursts into fragments and closes his fist as they come together, brings it down on whoever he pins, and roars as the God of Thunder. Your own gesture starts the moment you press the key, without waiting for the server. In first person your hands move too (hands in and up for the shield, a palm thrust out for the bolt, the dagger flicked forward, the weapon whirling at the edge of the screen) and the beam, the tether and the bolt leave the hand where it is drawn. |
 | HUD **(added)** | The top-left corner shows your hero, each ability with its key, cooldowns, toggles and resources. |
-| Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, the TVA Loki, Mighty Thor, the Phoenix, Spider-Man... Press **H** to change look (**Sneak + H** goes back). A look changes only how the hero looks and the colour of his energy: the abilities are the same in every look (the one exception is Spider-Man, whose suits also differ in protection, and only the Iron Spider has the legs: section 14). Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
+| Looks **(added)** | Vision and the newer heroes have several looks (variants), each with its own skin, cape and energy colours: White Vision, the TVA Loki, Mighty Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse... Press **H** to change look (**Sneak + H** goes back). A look changes only how the hero looks and the colour of his energy: the abilities are the same in every look (the one exception is Spider-Man, whose suits also differ in protection, and only the Iron Spider has the legs: section 14). Every look of the newer heroes includes *Your own skin*: the hero's powers in your own skin. |
 | Heroes' armour **(added)** | Players with a power are drawn without their armour (helmet, chestplate, leggings and boots, with their trims, dye and glint), in third person, to other players and in the inventory preview: it only hides the characters. It still protects as usual, and a player with no power looks as they always did. The elytra (flight gear), a carved pumpkin or a mob head (a costume the player chose, not armour) and the mod's own hero gear (Magneto's Helmet, Wanda's Crown, Quicksilver's Goggles: part of the costume, and what puts the suit on) are always drawn. The client option *Hide heroes' armour* (on by default) turns it off. |
 | MCU colours **(added)** | Every power's light and colour follows the films and shows (section 9). |
 | Creative / Spectator **(added)** | Creative and Spectator players are never killed by the Mind Stone or the Hex wall, and the Hex never holds a Creative or Spectator Vision, the same way vanilla treats them as invulnerable. |
@@ -847,6 +850,9 @@ Every power's light follows the films and shows:
 | Thor | Blue-white lightning; rainbow Bifrost | White-hot core, electric blue, deep blue halo; rainbow Bifrost |
 | Phoenix | A hooded telepath's mental power has no colour in *Brand New Day*; the fire of the Phoenix in *X-Men: Apocalypse* is "bird-shaped flames" (the colour is not in the sources) | Two palettes so a glance tells them apart: **fire** (the Burst, the charge, the Ember, flight embers) is gold and orange, core `#FFF4C2`, `#FFD65A`, `#FF8A1F`, `#E2531A`, `#8C2410`; **the mind** (reading, Mind Sense, Mind Control, the Psionic Field, telekinesis) is violet, `#F4EEFF`, `#B79CFF`, `#7C5CE0`, `#3F2B96`. Eyes violet when she uses her mind, burning gold when she charges. The Brand New Day look's own sparks are gold `#F2B632` with a pale green `#C4E88A`. |
 | Spider-Man | The webs of the MCU films are plain white-silver; the Iron Spider is crimson and gold nanotech with white lenses; in *Brand New Day* his eyes turn fully black | Webs silver-white `#F2F6FA` with a shimmer `#BFD3E6` (organic: creamier, `#F4EFE3`); spider-sense a white-blue ring `#DDEEFF` / `#8EC5FF`; the Black Eyes black `#0A0305` with a dark red glint `#8A1020`; Instant Kill red `#FF2A2A` with gold at the leg tips `#FFC247`; the Iron Spider's look-change burst is gold `#C9A66B` with a pale gold `#E7D8A8`; the Radioactive Spider glows `#7CFC00`. The hero's red is `#DC2B2F`, with accents `#C9232D` (Homemade), `#C9A66B` (Iron Spider) and `#D9381E` with blue `#5BB6D6` (Brand New Day) |
+| Thanos | The stones of *Infinity War*: Power purple, Space blue, Reality red, Soul orange, Time green; gold armour and the Gauntlet | **Power** `#9B4DEB` (core `#E6D2FF`), **Space** `#2F9BFF` (`#BFE6FF`), **Reality** `#E5253B` (`#FFB3BB`), **Soul** `#FF8A1E` (`#FFD6A0`), **Time** `#35D46A` (`#B8FFC9`); the Mind Stone's `#F5D77A` only outlines the empty socket. The boss bar takes the colour of his newest stone, and the Infinity Beam is white with the five colours as a banded halo (section 15.13.4) |
+| Ultron | Amber-gold beams from the fingertips; red eyes and a red light in the torso; the Sentries blue at rest and red when he is in them; the Chitauri anti-gravity pale blue | Plasma amber-gold with a white core and a red edge (blue in the Sentry look, red in the human one); red eyes; Sentries blue, red when they hunt; anti-gravity a pale blue shimmer (the flight, the Pull, the Slam, the island's rim); the net white and red square motes; the Vibranium Key steel with `#7FD4FF` seams (section 16.10) |
+| Apocalypse | A yellow-hued energy shield (fan wikis; the film's recap only says he obliterates the projectiles); "an immense sphere of violet light" for his teleport; warm ochre sand in the Cairo scenes; a sapphire-blue "soul-glow" in the transference ritual; the Phoenix's orange fire when she kills him | **Shield gold** (the boss's shield, the hero's shield and the Bestowal): a sphere of a hexagonal web, `#FFF2B0`, `#F5C84A`, `#E39B1B`, `#8A5A0E`. **Teleport violet** (the portals, the Mind Crush): `#F0D4FF`, `#B04FD8`, `#7A2EC8`, `#3F1A7A`. **Sand ochre** (the wave, spikes, lances, boulders, tornadoes, the cocoon, the sandstorm, the amber sky of the arena): `#E6CB86`, `#D8B76A`, `#B8934A`, `#8C6B2F`, haze `#C9A862`. **Soul-glow** (the Essence, the cap's glow): `#3FA0FF`, `#D8EEFF`, gold vein `#F5C84A`. His death uses the Phoenix's fire palette. His title is steel blue `#4A9BC4`. |
 
 ---
 
@@ -855,15 +861,26 @@ Every power's light follows the films and shows:
 | Command | Effect |
 |---|---|
 | `/enhanced power get [player]` | Show a player's power. |
-| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|quicksilver\|vision\|tommy\|billy\|loki\|thor\|phoenix\|spider_man> [look]` | Give or remove a power, optionally straight into one of its looks. |
-| `/enhanced look <players> <look>` | Change the look of every given player whose hero has that look (e.g. `tva`, `white_vision`, `mighty_thor`, `brand_new_day`, `iron_spider`). |
+| `/enhanced power set <players> <none\|magneto\|scarlet_witch\|quicksilver\|vision\|tommy\|billy\|loki\|thor\|phoenix\|spider_man\|thanos\|ultron\|apocalypse> [look]` | Give or remove a power, optionally straight into one of its looks. |
+| `/enhanced look <players> <look>` | Change the look of every given player whose hero has that look (e.g. `tva`, `white_vision`, `mighty_thor`, `brand_new_day`, `iron_spider`, `endgame`, `sentry`, `en_sabah_nur`). |
 | `/enhanced hex list` | List all Hexes in the current dimension. |
 | `/enhanced hex clear` | Dissolve every Hex in the current dimension. |
+| `/enhanced boss start thanos [force]` | Call the Mad Titan where you stand, as the ritual does (a portal, and six seconds later he lands 14 to 20 blocks away); `force` skips the site, the Overworld rule, `summonEnabled` and the rest (section 15.2). |
+| `/enhanced boss start ultron [force]` | Without `force`, the ritual without the Scepter: the Program in hand is used up and the arena is the block looked at, after every check; with `force`, at your feet with no Program, skipping the site rules but not the switch or the sky (section 16.10). |
+| `/enhanced boss start apocalypse [force]` | With `force`, wakes En Sabah Nur at your feet, with no Capstone, and skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (never the switch that turns him off, Peaceful or the one-fight-at-a-time rule); without `force` the command is the ritual itself and needs a Capstone in hand and a block in sight (section 17.11). |
+| `/enhanced boss stop` | End the running boss fight (a used Program or Capstone is given back, the island of Sokovia is put back); a second stop while a boss is leaving ends it at once. |
+| `/enhanced boss list` | List the running boss fights. |
+| `/enhanced boss cleanup <center> <radius>` | Remove every entity of a boss's kind within the radius (the bosses, the Sentries, Thanos's sword, meteors, orbs and illusions, the Vibranium Key, the bolts, lances, boulders and cocoons), whether a fight owns it or not; no block is touched. |
 
 **(added)** `/enhanced_anim` is a client-only tool (no operator rights, nothing changes for anyone else) for looking at the
 animation: `play <gesture>` starts any gesture on yourself (and can freeze it at a tick, with `hold` and `release`), `fly <s> <u> <turn>`
 pretends a flight speed, climb and turn so a pose can be seen without flying that fast, `stance <stance> on|off|auto` forces a held
 pose, `target <name>` acts on another player in view, and `state` shows the numbers behind the pose.
+
+**(added in 3.0)** `/enhanced_model <subject> <state> [tick]` is another client-only tool, for the people who draw the bosses: it
+shows a copy, on your side only, of a boss or of something of his fight (`thanos`, `thanos_phantom`, `thanos_sword`, `thanos_meteor`,
+`thanos_orb`, `ultron`, `ultron_sentry`, `vibranium_key`, `apocalypse`, `sand_cocoon`, `sand_lance`, `sand_boulder`) in a state, frozen
+at a tick; `list` shows what can be shown and `clear` takes the copy away. The states are in each boss's section.
 
 ## 11. Server configuration **(added)**
 
@@ -875,8 +892,9 @@ strength with each weapon and as the God of Thunder, its hunger cost), the coold
 its fragments, how hard the Hex wall bites a Vision who pushes against it, the Vision of the Hex (health, punch,
 beam, how long Wanda needs to rebuild him, or turning him off), how long it pins someone down, who is worthy of Mjolnir and whether it belongs to the first worthy player
 who lifts it (`mjolnirOwnerOnly`), the Bifrost's
-cooldown, how far the Phoenix's Mind Reading, Mind Sense and Mind Control reach and what they cost, how many creatures she can take over and for how long, the Psionic Field, and every number of the Phoenix Burst (charge time, radius, damage, what a player takes, wave speed, fire, knockback, whether it sets fires or hurts villagers and animals, hunger, cooldowns and the drain afterwards), Spider-Man's speed, jump, strength and fall damage, how long the Radioactive Spider's bite takes, how far spider-sense reaches and how often it scans, every number of the Web Shot, the Web Burst, the Web Zip (including the kick), the Web Swing and the Wall Crawl, how long webs and web blocks last and how many he can have, organic webs, each suit's protection and how long Magneto's strip lasts, the Iron Spider's legs, every number of Instant Kill (including whether it may strike players), and every number of the Black Eyes (what they give, what they cost, how long they last, the crash, and whether low health sets them off)…) can be changed in `world/serverconfig/enhanced-server.toml`. The four client options
-(*Hero animations*, *Reduced motion*, *Flight effects*, *Hide heroes' armour*) are in `config/enhanced-client.toml` of the player's own game.
+cooldown, how far the Phoenix's Mind Reading, Mind Sense and Mind Control reach and what they cost, how many creatures she can take over and for how long, the Psionic Field, and every number of the Phoenix Burst (charge time, radius, damage, what a player takes, wave speed, fire, knockback, whether it sets fires or hurts villagers and animals, hunger, cooldowns and the drain afterwards), Spider-Man's speed, jump, strength and fall damage, how long the Radioactive Spider's bite takes, how far spider-sense reaches and how often it scans, every number of the Web Shot, the Web Burst, the Web Zip (including the kick), the Web Swing and the Wall Crawl, how long webs and web blocks last and how many he can have, organic webs, each suit's protection and how long Magneto's strip lasts, the Iron Spider's legs, every number of Instant Kill (including whether it may strike players), and every number of the Black Eyes (what they give, what they cost, how long they last, the crash, and whether low health sets them off), the rules every boss fight shares (`[boss]`: how many fights at once, the wipe, abandon and time limits, the reward's minimum time, Creative players, the experience, the announcements, the arena's protection and a difficulty scale), every number of the Mad Titan (the call and its site, his health, the clock of stones, the surge and the enrage, the damage and cooldown of every move, the durations, the plates, poise and caps, and the share that earns the Gauntlet) and of the Thanos hero (his body and each stone's damage, range, duration, cooldown and hunger), every number of the Ultron fight (the bodies, the attacks, the Sentries and their waves, the lift: its mode, radius, height, depth and speed, and the field) and of the Ultron hero (his body, the plasma pool, every ability, the drones, the range of Vision's cut and lightning), what counts as mind power for En Sabah Nur's shield and how much of each kind it takes, his health, the strength and growth of his three shields, the windows and floors, the Escape, the damage and number of every attack, the Horsemen, the arena and its wall, and the hero's body, flight speed, shield, Wave, Entomb, Portal, Bestowal and Sandstorm (damage, range, duration, cooldown and cost)…) can be changed in `world/serverconfig/enhanced-server.toml`. The four client options
+(*Hero animations*, *Reduced motion*, *Flight effects*, *Hide heroes' armour*) are in `config/enhanced-client.toml` of the player's own game,
+with two of Thanos's (the music and the atmosphere of his fight, in its `[thanos]` section).
 
 ## 12. Sounds: the voices of the Infinity Stones **(added)**
 
@@ -887,18 +905,18 @@ sound (two or three takes of it, so it is never quite the same twice) and a quie
 
 | Stone | Its voice | Where it sounds in the mod today |
 |---|---|---|
-| Space (the Tesseract) | A deep, swelling cosmic hum | Under the portal at both ends of Loki's escape and of a hero's jump, and when the Tesseract and the gene awaken the Scarlet Witch (there is no portal then); a soft hum while anyone holds the Tesseract. |
+| Space (the Tesseract) | A deep, swelling cosmic hum | Under the portal at both ends of Loki's escape and of a hero's jump, and when the Tesseract and the gene awaken the Scarlet Witch (there is no portal then); a soft hum while anyone holds the Tesseract. The Mad Titan and the Thanos hero use it for their Space Stone too (section 15.15). |
 | Mind (Loki's Scepter, Vision's forehead) | A bright, shimmering, slightly eerie chime-hum | When the scepter's stone is touched (the awakening of the Scarlet Witch or of Vision, a hero it recognises, the touch that kills); under the chime of a hit that confuses (not over a creature the blow killed); as Vision's beam starts; a soft hum while anyone holds the scepter. |
-| Power | A heavy violet roar | Registered, not used yet: it is for the Thanos boss (3.0). |
+| Power | A heavy violet roar | The Mad Titan's (section 15.15): when the stone arrives, quietly ten seconds before, at the tell of each of its moves and in the Infinity Beam's charge; and when a Thanos hero uses it, and in the Gauntlet's ceremony. |
 | Reality | A liquid, bending, backwards-running swell | The same. |
 | Soul | A breathy, mournful choir tone | The same. |
 | Time | A ticking, rushing, rewinding shimmer | The same. |
 
 The hum of the Space and Mind Stones is a quiet client-side loop for as long as the Tesseract or the scepter is in
 either hand of a player: everyone near hears it, it follows the player, fades in and out with the item and stops when
-it is put away (the *Players* volume slider of the game turns it down). The Thanos boss will use the other four
-voices as he gathers the stones: the sound events `power_stone`, `reality_stone`, `soul_stone` and `time_stone` (and
-their `_hum` loops) are already registered, in `sounds.json` and in `ModSounds`, and `InfinityStone` lists all six.
+it is put away (the *Players* volume slider of the game turns it down). The Thanos boss and hero use the other four
+voices (and the Space Stone's) through `StoneKind`: the sound events `power_stone`, `reality_stone`, `soul_stone` and `time_stone` (and
+their `_hum` loops) are registered, in `sounds.json` and in `ModSounds`, and `InfinityStone` lists all six.
 
 ---
 
@@ -1341,3 +1359,1091 @@ The damage types `web_kick` and `spider_legs` are in the tag `enhanced:melee_blo
 legs are his hands). Entity tags `web_immune` and `instant_kill_immune`, block tag `cannot_cling` (empty). Textures: the three
 suits (`entity/suit/spider_*`), the five eye overlays and the legs (`entity/spider_*`), the web splat (`effect`), the Spider Web
 block, the animated jar of the item (4 frames, a green pulse) and the two effect icons.
+
+---
+
+## 15. Thanos — the Mad Titan **(added in 3.0)**
+
+> "I am inevitable." The Thanos of *Avengers: Infinity War*: a giant in gold, the Double-Edged Sword in his right hand
+> and the Infinity Gauntlet on his left, who takes the stones one by one. In the mod he is the hardest of the three bosses
+> and the source of the **Infinity Gauntlet**, the item that makes a player Thanos (15.11).
+
+Sections 15.1 to 15.10 are the boss; 15.11 is the hero. The boss's code is `thanos/` (`ThanosEntity`, `ThanosMoves`, `ThanosFight`, `ThanosLane`, `ThanosSummon`,
+`ArenaCheck`, `ThanosDefence`, `ThanosClock`, `StonePowers`, the sword, meteor, orb and phantom entities); the shared
+rules of every boss (the registry of fights, the participants and the ledger, the wipe and the abandonment, the rest, the
+rewards and the gifts, the bars) are the `boss/` package, and its numbers are in `[boss]` of the server config; Thanos's
+own are in `[thanos_boss]`.
+
+### 15.1 The design on one page
+
+* He is called by the **Tesseract and Loki's Scepter held together** for five seconds (15.2), in open country (15.3).
+* He arrives from a portal in the sky, invulnerable for three seconds, and the fight is a **clock**: he starts with the
+  **Power Stone** and takes **one more every 90 seconds of combat** (Space, Reality, Soul, Time), each of which gives him
+  moves, an announcement and a power surge in which he kneels and takes half again the damage. He never has the sixth, the
+  Mind Stone. The difficulty is the clock, not the health (15.4).
+* Every move has a **tell** and a number; every stone move is a **clench** that enough blows break (15.5, 15.6).
+* The world is **never changed**: no block is broken or placed unless the server turned `blockDamage` on, and then only
+  by two small craters. There is no containment: nobody is held in and nobody is walled out.
+* He is beaten once; **one Infinity Gauntlet for each fighter who did 3 percent of his health or struck the last blow**
+  (15.10). The ritual consumes nothing, so there is nothing to refund.
+* No fight is saved: the entities are never written to the world, and the framework sweeps strays.
+
+### 15.2 Summoning
+
+**The hold.** The Tesseract in one hand and Loki's Scepter in the other, either way round; right-click and hold for
+`summonChargeTicks` (100, at most the 100 ticks the items can be held). While held, a spiral of the Space Stone's blue
+and one of the Mind Stone's gold rise round the player, a drone swells, a bell tolls every second (a little higher each
+time) and the action bar counts "The stones are calling... n/5". Letting go, moving an item out of a hand, or dying
+cancels it. Nothing is used up. `ScepterRituals.Hold` carries it; `ThanosSummon` is the hold, registered when the mod loads.
+
+**The refusals** are shown in red in the action bar when the hold would begin, and nothing else happens (the Scepter does
+not explode and the Tesseract does not take the player away): the server turned it off or the player is a Spectator
+(`summon.disabled`), Peaceful, Mjolnir lies on the player (`mjolnir.pinned_cannot`), he is already here (`summon.active`),
+another boss fights (`boss.busy`, with its place), the rest is not over (`summon.resting`, `m:ss`), another dimension than the
+Overworld unless `summonOverworldOnly` is false (`summon.wrong_dimension`), and the site (15.3). When the hold ends the
+shared rules are asked again (`BossFights.start`: Peaceful, one fight at a time, the rest), then the lane's.
+
+**The call.** A title for everyone within 160 blocks, a portal in the sky 30 blocks over the landing (less where the column is
+not free), a column of light on the landing and a ring on it every second; the landing is **14 to 20 blocks** from the
+summoner, where there is room (`ArenaCheck.arrivalSpot`), or the summoner's own ground. After `summonCountdownTicks` (120)
+he is made above the landing and falls through the portal, lands (a ring that shoves) and rises: **60 ticks of arrival,
+invulnerable**. The arena is a circle of `arenaRadius` (40) blocks round the summoner; the clock and the leash reach 24
+blocks beyond it, and so does the count of fighters (`joinWithin`).
+
+An operator calls him anywhere with `/enhanced boss start thanos [force]` (`force` skips the site, the Overworld rule, `summonEnabled` and the rest; Peaceful and one fight at a time still apply).
+
+### 15.3 The site
+
+`ArenaCheck.verdict` (a pure function over a `World` the real server and the game tests each supply):
+
+1. **Border:** the summoner and four points at `arenaRadius` north, south, east and west are inside the world border.
+2. **Ground:** solid ground under the feet, and no liquid at them.
+3. **Sky:** open sky above (the motion-blocking height map) and `summonSkyBlocks` (24) free blocks over the head.
+4. **Room:** 24 sample spots (8 on each ring of radius 8, 16 and 24); a spot counts if it has standing room (solid ground
+   within three blocks up or down, three free blocks above, no liquid). At least `summonOpenFraction` (60 percent) must.
+
+### 15.4 The body and the clock
+
+* **Health.** `health` (3,000) for one fighter, plus `healthPerExtraPlayer` (50 percent) for each other, at most
+  `maxFightersCounted` (4) counted: 7,500, times `[boss].difficultyScale`. Creative and Spectator players are not counted.
+  The maximum is recomputed when a fighter joins or leaves, keeping the fraction of health he has left. **The vanilla
+  health attribute cannot hold thousands, so the entity has 1,000 health and every number of this design (3,000, the
+  6 percent cap, the poise) is converted by the factor between the two (`toBar`, `toPoints`); the ledger and the bar are
+  in the entity's own health.**
+* **The stones.** `stonesAt(combatTicks) = 1 + combatTicks / stoneIntervalTicks` (1,800: 90 seconds), at most `maxStones`
+  (5) and never more than the five he can hold; the order is Power, Space, Reality, Soul, Time, and **there is no sixth**. A
+  stone adds its moves to his choice, his voice, a title for the arena and a **surge**: for `surgeTicks` (60) he kneels,
+  starts no move, and takes `surgeDamageFactor` (1.5) times the damage. When several stones are added at once (a test, a
+  command) only the last surges. Ten seconds before a stone the arena is told its name.
+* **Combat ticks** only run while at least one fighter who is not Creative or Spectator is in the arena; with nobody he heals
+  `idleRegenPerMinute` (2 percent) after a minute alone.
+* **Damage scale.** Everything he does is multiplied by `difficultyScale` × (1 + `damageScalePerStone` (0.06) × (stones − 1))
+  × (1 + the enrage). The **enrage** begins `enrageAfterTicks` (3,600: three minutes) after his last stone and adds
+  `enrageStepPerMinute` (0.04) per minute up to `enrageMax` (0.4); the bar then says he is enraged.
+* **Rest between moves:** `max(10, 26 − 3 × stones)` ticks, `gapPerExtraPlayer` (2) fewer for each extra fighter, never below 4.
+* **The bar** (`ThanosFight`): his health, in the colour of his newest stone (purple, blue, red, yellow, green), named
+  "Thanos, the Mad Titan", "Only the Mind Stone remains" at five stones, "Thanos, Enraged" in the enrage.
+
+### 15.5 The moves
+
+A state machine (arriving, idle, tell, active, recover, surge, staggered, dying) chooses a move when he is idle: the
+**reactive** moves first, by their triggers (the Power Pulse for a hiding fighter, the Rewind after much damage, the Space
+Barrier after ranged hits, the Veil after ranged hits, the Soul Sight for a trick near him), then the **Infinity Beam** when
+it is ready and he has five stones, then a **weighted choice** among what the situation allows (distance, line of sight, the
+number of fighters, the cooldowns; a move he used among his last two weighs half, and the moves of a stone that just arrived
+weigh 2.5 times for a while). Each move: the **tell** in ticks, the tick at which his **aim locks** (a player who sidesteps
+after it dodges), the **after** ticks that follow, its **weight** and its **cooldown**. The damage is in the config
+(`[thanos_boss]`), times the damage scale; a Chaos Shield that stops a beam, a meteor, an orb or the sword pays what it
+would have done (the sword's melee blows `swordShieldFactor` (2) times, a beam once).
+
+| Move | Stone | Tell | After | Weight | Cooldown | Damage | What it does |
+|---|---|---|---|---|---|---|---|
+| Sword Sweep | none | 16 | 14 | 5 | 40 | 30 `thanos_sword` | a cone of 160 degrees and 5.5 blocks; breaks a raised Shield (100 ticks), throws a rider off |
+| Overhead Smash | none | 24 | 16 | 3 | 100 | 26 + ring 12 | blow at the point 4 ahead, radius 3.5; then a ring from 3.5 to 6 only the grounded meet |
+| Gauntlet Jab | none | 8 | 14 | 4 | 30 | 14 × 2 `thanos_blow` | two blows 8 ticks apart in a cone of 50 degrees, 4 blocks |
+| Sword Throw | none | 14 | 10 | 2 | 280 | 22 per pass | the sword flies out 28 blocks (or to a wall) at 1.3 blocks a tick and returns at 1.5 through blocks, once per creature per pass; no Sweep or Smash while it is away; the Chaos Shield turns it home |
+| Choke | none | 14 | 50 | 1.5 | 400 | 16 over 40 ticks, + 8 | takes one player within 3.2 blocks in a cone of 40 degrees (Loki and Vision first; never Creative, a phased Vision, a pinned or telekinesis-immune creature), holds him 3.2 up for 40 ticks (4 every 10), throws him; 60 damage from others frees him and staggers Thanos |
+| Leap | none | 18 | 26 | 2 (3 beyond 15) | 160 | 12 | to where the target stood, at most 18 blocks; the landing is a ring of 4 |
+| Power Blast | Power | 22 | 8 | 3 | 120 | 20 + splash 8 (r 3) | a beam 30 long and 1.2 wide for 6 ticks; a block or Chaos Shield (costs 20) stops it; Stormbreaker cuts it |
+| Overload | Power | 30 | 8 | 2.5 | 200 | 16 per sigil | sigils (radius 3) under up to 3 players in sight, fixed at tick 12, detonate at 30 (9 up, 1 down); a crater of radius 2 only with `blockDamage` |
+| Titan Shockwave | Power | 20 | 16 | 2 | 240 | 12 | a ring to 9 blocks in 10 ticks; whoever's feet are more than 0.5 above the ground is spared |
+| Power Pulse | Power | 40 | 8 | reactive | 80 | 12 | a shot through the walls at a fighter he can neither see nor walk to for `unreachableTicks` (160); a Chaos Shield costs 12 |
+| Portal Step | Space | 16 | 14 | 3 | 160 | none | he appears behind the target (6 to 40 blocks away) and a Jab or Sweep follows at once; a Hex wall refuses it |
+| Meteor Hail | Space | 30 | 40 | 2.5 | 440 | 16 each | a ring under every player and `meteorExtra` (4) random ones, at most 10; each falls 24 blocks in 24 ticks and bursts in radius 2.5; a Chaos Shield costs 16 |
+| Gravity Pull | Space | 24 | 26 | 2 | 360 | 10 crush | draws everyone in sight (4 to 22 blocks) at 0.55 blocks a tick for 16 ticks, then crushes radius 3.5 |
+| Space Barrier | Space | 10 | 6 | reactive | 300 | none | a dome for `barrierTicks` (60) that cancels ranged damage (arrows, daggers, Thor's lightning) but not that born of a stone (the Chaos Beam, Vision's beam, Stormbreaker) |
+| Reality Veil | Reality | 12 | 6 | reactive | 280 | none | for `veilTicks` (120) projectiles within 12 blocks heading at him turn to bubbles, except those of the tag `reality_proof` |
+| Phantoms | Reality | 24 | 10 | 1.5 | 560 | 3.5 each | three illusions of one health that walk at the players; the real one is invisible for 80 ticks, shown for 40 by any hit on him |
+| Petrify Orb | Reality | 14 | 14 | 2.5 | 240 | none | an orb at 0.55 blocks a tick; the first creature it meets is petrified for 60 ticks (cannot move, takes half damage); the shield costs 2 |
+| Soul Sight | Soul | 10 | 6 | reactive | 240 | none | dissolves Loki's duplicates within 40 blocks, ends invisibility and shapeshifts |
+| Soul Drain | Soul | 26 | 86 | 3 | 320 | 3 every 10 ticks | chains to up to 2 players in sight; ignores armour and enchantments; he heals `drainHealFraction` (0.4) of it; snaps at no line of sight, 28 blocks, or 60 poise |
+| Soul World | Soul | 30 | 8 | 1 | 800 | none | a pillar of radius 3 under a player (fixed at tick 10); whoever is in it at 30 is in the Soul World for 80 ticks (nothing hurts them), he heals 3 percent of his maximum for each |
+| Rewind | Time | 30 | 8 | reactive | 600 | none | returns up to `rewindMaxHeal` (8 percent) of health, the plates and his place of `rewindSeconds` (6) ago; fails if he is staggered |
+| Time Snare | Time | 24 | 8 | 2.5 | 360 | none | discs under 2 players (fixed at tick 10); inside at 24: `TIME_LOCKED` for 80 ticks (−60 percent speed) |
+| Infinity Beam | Time | 50 | 36 | reactive | 900 | 40 | with five stones only: a beam 40 long and 3 wide sweeping 60 degrees in 24 ticks, once per creature; a block stops it, a Chaos Shield costs 40; Stormbreaker cuts it |
+
+### 15.6 Defence, plates and poise
+
+`ThanosDefence.damageTaken` takes the steps in this order: nothing while arriving or dying unless the damage bypasses
+invulnerability; a creature that is not a player does `mobDamageFactor` (0.25); the Space Barrier cancels ranged damage that is
+not stone-born; each intact plate takes `plateReduction` (10 percent) off; the surge multiplies by 1.5 and a stagger or a
+dark Gauntlet by 1.25; Stormbreaker by `stormbreakerFactor` (2.5); no hit takes more than `maxHitFraction` (6 percent) of his
+maximum and no second more than `maxDamagePerSecond` (15 percent).
+
+* **Plates:** right pauldron below 75 percent of health, left pauldron below 55, breastplate below 35, helmet below 20.
+  Mjolnir breaks the helmet if its blow lands; `plateTearSeconds` (3) of continuous Chaos Beam tear a plate; a Telekinetic
+  Slam tears one (at most once in 120 ticks); a Rewind restores them.
+* **Poise:** a clench is the wind-up of any move of a stone. Blows during it add `poiseHit` (2) per point of damage taken
+  (three times for `stone_born` damage: the Chaos Beam, the Mind Stone beam and Stormbreaker); at `staggerPoise` (100) the move breaks and he is **staggered** for 40 ticks and his
+  Gauntlet is dark for `lockTicks` (80): only the sword and fist moves. Soul Drain breaks at 60 poise, the Choke at 60
+  damage. `lockGauntlet` (Spider-Man's web: `webLockTicks` 40, at most once in `webLockCooldown` 400) does the same to a
+  clench in progress; at any other time it only locks the Gauntlet for those 40 ticks (no stone move, a quarter more damage).
+* **A mob's blow** (a golem, a wolf) does a quarter, and a golem that hits him is swatted dead with the back of his hand.
+
+### 15.7 Targeting and movement
+
+He targets a **Vision first**, then whoever dealt him the most in the last 10 seconds, then the nearest; never a Creative or
+Spectator player, a dead one, or one in the Soul World; he keeps a target 60 ticks, and until he has the Soul Stone he goes for
+the nearest of Loki's copies. He walks like a creature of 1.2 × 3.3 blocks with a step of 1.4, ignores cobwebs and powder snow,
+and has these rules: the **stuck rule** (no progress toward a target 4.5 to 40 blocks away for 80 ticks: he leaps at him, twice at
+most, then is moved to the nearest free ground beside him with a purple flash); the **unreachable rule** (the Power Pulse);
+the clock needs a fighter inside `arenaRadius + 24`.
+
+### 15.8 What he is immune to, and how the other heroes meet him
+
+* **Immune:** knockback, fire, lava, drowning, falls, suffocation, cactus, lightning, Wither, Hunger, starvation, magic
+  without a source; effects: Wither, Poison, Hunger, Nausea, Levitation, Mining Fatigue, Weakness, `PETRIFIED`, `SOULWORLD`,
+  `TIME_LOCKED`, and Slowness above level II.
+* **Tags:** he is in `bosses` (so webs and the Instant Kill do not take hold of him: a web reaches the Gauntlet through a hook
+  instead), `hex_resistant` (the wall bounces him in and out), `pin_immune`, `telekinesis_immune`, `shapeshift_immune`,
+  `spellbound_immune` (the Freeze, the Petrify, the Time Lock), `confused_immune` and `telepathy_immune`; his sword, meteors
+  and orb are in `telekinesis_immune`, `shapeshift_immune` and `reality_proof`; a phantom is in `shapeshift_immune` and `boss_minions`
+  (Wanda can lift one).
+* **Hooks (`BossHooks`):** Quicksilver Time slows him to one half and not at all with the Time Stone; Magneto's strip takes
+  nothing; Spider-Man's web locks the Gauntlet; Thor's lightning is a hook of the framework.
+* **Wanda:** the Chaos Beam tears plates; **a Telekinetic Slam by any player** (Wanda's, Billy's or the Phoenix's) tears one too; her shield stops everything of his that is a projectile or a
+  beam. **Vision** is what he hunts first. **Loki's** duplicates lure him until the Soul Stone. **Thor:** Mjolnir breaks his
+  helmet, Stormbreaker does 2.5 times and cuts a beam. **The Phoenix:** her Mind Control and Psionic Field do not take hold of
+  him (`telepathy_immune`, `spellbound_immune`), and the Burst's damage lands (it is not fire).
+
+### 15.9 Anti-cheese
+
+A pillar, a hole, a bunker or a boat: the unreachable rule and the Pull, the Step and the Meteors that reach anywhere in the
+arena. Sniping from outside: the clock needs a fighter inside `arenaRadius + 24`. Standing out of the arena: no fighter near him
+for `abandonSeconds` (90) and he leaves. Everyone dead for `wipeSeconds` (15): he leaves. The world is never changed.
+
+### 15.10 The end and the reward
+
+* **He falls.** A blow that would kill leaves him one health and he kneels for 100 ticks, invulnerable, says his last words at
+  tick 40 and turns to dust from tick 60; the fight is won at once. The experience (`xpReward`, 12,000) falls where he stood.
+* **The reward** (`BossRewards`): each participant who was there `rewardMinSeconds` and did at least `rewardMinShare` (3 percent)
+  of his maximum health, and whoever struck the last blow, gets **one Infinity Gauntlet** and `xpRewardPerPlayer` points. A
+  Creative player never does. It goes into the inventory; a full one drops it for that player alone; a dead or absent player's
+  waits as a gift. The rest is `summonCooldownTicks` (12,000: ten minutes).
+* **Any other end:** nobody is rewarded, and he steps through a ring of Space (30 ticks; when the server stops he is simply gone).
+  After a wipe or `abandonSeconds` the rest is half as long (6,000: five minutes); after an operator's stop, Peaceful,
+  `maxFightMinutes` or a kill from outside there is no rest at all.
+* **The Gauntlet** (`InfinityGauntletItem`) is held for `gauntletRitualTicks` (60) by a player with no power to become Thanos
+  (15.11); a hero who tries is told so and nothing is used up; in Creative it is kept.
+
+### 15.11 The playable Thanos
+
+> "Dread it. Run from it. Destiny arrives all the same." Whoever holds the Infinity Gauntlet for `gauntletRitualTicks`
+> (60) with no power becomes Thanos: the five stones the Mad Titan held, one on each key, **no Mind Stone and no Snap**.
+> He does not fly. He is a tank with a toolbox. Its code is `ability/ThanosAbilities` (the keys, the cooldowns, what lasts
+> from tick to tick), hung on the `HeroServer` plug-in `ThanosServer`; what the stones do in the world is the boss's
+> `thanos/StonePowers` (caster-agnostic: a beam, a ring, a splash, the Chaos Shield asked wherever a beam crosses it); the
+> three stone effects are `effect/StoneEffect`; the events are `thanos/ThanosEvents`. Every number is `[thanos]` in the
+> server config.
+
+#### 15.11.1 The Gauntlet
+
+An `AwakeningItem`: hold right-click for `gauntletRitualTicks`. While it is held the five stones light **one after the
+other** (Power, Space, Reality, Soul, Time), each with its voice, and a little of its colour rises round the hand; when
+the hold is done a **visual-only bolt** strikes where he stands (it hurts nobody) and `Powers.awaken` makes him Thanos in
+the Infinity War look, with the usual title, burst and announcement. A hero who tries is told so and nothing is used up;
+in Creative it is kept. The Gauntlet is in `cannot_be_snatched` and can be given to a friend.
+
+#### 15.11.2 The keys
+
+An ability that cannot do anything (no target, no room, a wall in the way, PvP off) says why and starts no cooldown. The
+two on a key **share one cooldown slot** (the client tells them apart by its length). Hunger is exhaustion (4.0 = one food
+point). With an empty hunger bar the stones do not answer ("Too hungry for the stones"); in Creative they cost nothing.
+
+| Key | Stone | Press | Sneak + press | Cooldown (ticks) | Exhaustion |
+|---|---|---|---|---|---|
+| **R** | Power | **Power Blast**: a violet beam from the Gauntlet to the first creature or block (28 blocks): 12 `stone_power` and a shove; a burst of 2.5 blocks where it ends: 6 `stone_blast` to the hostile ones (the aimed creature excluded); no block is ever broken | **Titan Slam**: a ring from his feet at 0.9 blocks a tick to 7 blocks: 10 `stone_blast` once to whatever stands on the ground, thrown outward; a jump clears it | 70 / 160 | 2.0 / 4.0 |
+| **G** | Space | **Portal Step**: onto the block he looks at, or right behind the creature (40 blocks), through two rings; the Hex, Mjolnir's pin and a boss's arena refuse it, and it needs room for his whole body and no water | **Space Pull**: the creature he looks at (24 blocks) is drawn over 6 ticks to two blocks ahead of him and dazed (Slowness II, 20 ticks); not a boss, a pinned creature or an armour stand; a player only with PvP; the Hex judges the landing | 100 / 220 | 1.0 / 2.0 |
+| **V** | Reality | **Transmute**: a sphere flies 6 ticks to the creature (20 blocks) and it is stone (`PETRIFIED`) for 60: it cannot move, jump, attack or use anything and takes half damage; a boss shakes it off; a Chaos Shield stops the sphere and loses 2; a Loki's duplicate dissolves | **Reality Veil** (toggle, `Toggle.REALITY_VEIL`, saved): a projectile heading for him within 8 blocks is a bubble that pops (not Mjolnir, Stormbreaker or the stones' own; not his own); 0.01 exhaustion a tick; off at an empty bar | 240 / none | 2.0 / 0.01 a tick |
+| **B** | Soul | **Soul Drain** (hold, `Live.SOUL_DRAINING`): he locks onto the creature (16 blocks) and every 10 ticks it takes 3 `stone_soul` (armour and enchantments ignored) and he heals half of what it lost; ends when the key is let go, a block comes between, it is past 20 blocks or dies, he starves or is held, or he takes 60 damage in a second; a Chaos Shield stops the chain and loses 12 | **Soul Sight** (`Live.SOUL_SIGHT`, 160 ticks): the client outlines the creatures within 32 blocks through walls; Loki's duplicates dissolve, a hidden Loki is seen, a shapeshifted Loki is himself again (`sightBreaksIllusions`); whoever is invisible glows for everyone for 5 seconds | 40 after it ends / 400 (none in Creative) | 0.02 a tick / 1.0 |
+| **N** | Time | **Rewind**: back to where he was 5 seconds ago, his health up to what it was then (at most 20 more), the harmful effects that began in the window gone, the fire out; needs 2 seconds of history; a Hex or a boss's arena refuses the place (the rest still happens), Mjolnir's pin refuses it all | **Time Lock**: a dome of 6 blocks at his feet for 100 ticks: `TIME_LOCKED` on what is inside (not him, not his pets, a player only with PvP, never Creative); projectiles lose 65 percent of their speed a tick and fall under no gravity | 900 / 600 | 8.0 / 3.0 |
+
+While he is held (`SPELLBOUND`, `PETRIFIED`, `SOULWORLD`) no key answers ("The stones will not answer while you are
+held"): the film's flaw that a restrained Gauntlet hand cannot snap. A key's **release** always goes through.
+
+#### 15.11.3 The body
+
+Permanent attribute modifiers under `enhanced:thanos_*`, applied by `applyBody` to whoever is Thanos and taken off
+everyone else: `healthBonus` (+20), `armorBonus` (+6), `toughnessBonus` (+2), `knockbackResistance` (+0.5),
+`attackBonus` (+3), `scale` (+10 percent, `ADD_MULTIPLIED_BASE`), `reachBonus` (+1 `entity_interaction_range`),
+`stepBonus` (+0.4), and half the fall damage. The **Titan healing factor**: `regenPerSecond` (0.5) after `regenDelayTicks`
+(100) without being hurt (`ThanosEvents.onHeroHurt` tells him), for 0.01 exhaustion a tick, none when starving. Nothing
+else is passive, and `Power.THANOS.canFly()` is false.
+
+#### 15.11.4 What lasts, and what ends it
+
+The server state is `ThanosAbilities`' map by player UUID: the history (a snapshot every 5 ticks for `rewindSeconds`),
+the damage of the last second, the creatures he turned to stone, the sight's end, and the drain, the sphere, the vortex,
+the ring and the dome. It ends with **his power** (`endAll`: the body comes off, the veil drops), **his life**, **his
+session** and **his dimension** (`gone`: the dome opens and the projectiles it hung fall, the creatures it held are free,
+the stone he made is flesh, the drain lets go, the history is dropped), and **the server** (`onServerStopped`). A hold
+released (`stopHold`: a screen, a death) lets the chain go and his next tick finishes it.
+
+#### 15.11.5 The other heroes and the rules
+
+* **Wanda:** the Chaos Shield stops the Blast (12), the Drain (12) and the Transmute (2) at its surface and takes three
+  quarters of the Slam as an explosion; the Hex bounces him like any hero and judges the Step, the Pull and the Rewind as
+  teleports (`HexManager.onTeleport`).
+* **Thor:** Mjolnir's pin refuses the Step, the Pull of the pinned and the Rewind (a pinned creature is not shoved either);
+  the Blast and the Drain still work.
+* **Billy, the Phoenix:** a Freeze, a Mind Control or a Psionic Field (all `SPELLBOUND`) holds his hand. **Apocalypse:** in a cocoon
+  of sand (`ENTOMBED`), `AbilityHandler` drops his presses. **Loki:** the Soul Sight is the answer to the duplicates, the hiding and the shape.
+* **Vision:** phased through everything he cannot be touched. **Magneto:** the Gauntlet is a model, not an item: nothing to
+  take. **Quicksilver Time:** slows him like anyone; the Rewind and the Lock run on the game clock.
+* **PvP off:** the Blast, Slam, Pull, Transmute, Drain and Lock do nothing to players and say so; Creative and Spectator
+  players are never touched.
+* **The Mad Titan:** the hero's Blast is a beam and the Space Barrier turns it away; the Drain is no projectile and passes
+  it; the damage counts in the ledger; a boss cannot be pulled, turned to stone or locked (the tags) but is hurt by both (Apocalypse's golden shield
+  turns both away while it is up: they are not mind power).
+* **Blocks:** nothing of his changes a block, whatever the rules say.
+
+#### 15.11.6 Tests
+
+`ThanosTests` (the body and healing factor, the Blast, Slam, Step, Pull, Transmute and Veil, the refusals when held, hungry,
+in Creative or as a Spectator, the looks) and `ThanosSoulTimeTests` (the Drain and the Sight, the Rewind and the Lock, what
+ends with him, the Gauntlet's ceremony, and the hero beside the boss). The state-heavy tests have a batch each
+(`thanos_hero_*`). Deliberate bugs in each important rule (the shield check of each stone, the Hex and the pin, the heal
+and its cap, the history, the dome's end, the hold, the hunger) were each caught by the test meant for them.
+
+### 15.12 How the playing Thanos moves
+
+> The animation of the hero is **client only** (the server sends nothing for it) and is built on the mod's animation system
+> in `client/render`: a state per hero in view, layers blended by eased weights (locomotion, ambient stances, aimed stances,
+> one-shot gestures), `GestureId` (the timing), `Gestures` (the keys), `Stances` (the rows), `GestureRoutes` (which change in
+> the synced data stands for which gesture), `GestureTable` (the edges) and `FirstPersonArms`. Thanos adds to it and changes none of
+> its rules. Every row is a raw model angle in degrees for a right-handed player, and a left-handed one is mirrored by the
+> pipeline. `M` is the main arm; **`O` is the arm the Gauntlet is on** (the off arm), so every gesture of his drives `O`. His
+> plug-in is `ThanosClient`; the keys of the gestures are `ThanosGestures`, the rows of the stances `ThanosPoses`, the client's
+> own part (the key press, the landing, the first-person hand) `ThanosActing` and the flourishes at the hand `ThanosGestureFx`.
+> The boss is a model of his own and does not use this pipeline (15.14.4).
+
+#### 15.12.1 The gestures
+
+One gesture of the group `CAST` plays at a time. "Force" means the gesture replaces the swing of a punch on the arms it holds.
+
+| Gesture | Ticks (total / attack / release) | Force | Started by | What it looks like |
+|---|---|---|---|---|
+| `THANOS_BLAST` | 10 / 1 / 5 | yes | R's cooldown starts, nearer to the Blast's | The Gauntlet is thrust at the aim and holds, trembling; the other arm balances; the chest turns with the arm |
+| `THANOS_SLAM` | 22 / 2 / 8 | yes | R's cooldown starts, nearer to the Slam's | The Gauntlet goes overhead; at tick 12 it is driven down to the ground, he leans in and sinks 0.24 blocks, the legs forward |
+| `THANOS_STEP` | 12 / 1 / 5 | no | G's cooldown starts, nearer to the Step's | The Gauntlet draws a circle in the air, a blue ring |
+| `THANOS_PULL` | 16 / 2 / 6 | yes | G's cooldown starts, nearer to the Pull's | The palm out level, then dragged back; he leans away |
+| `THANOS_WARP` | 14 / 1 / 5 | yes | V's cooldown starts (the Transmute) | A flick of the Gauntlet at the aim, fingers spread, trembling |
+| `THANOS_VEIL_ON` / `THANOS_VEIL_OFF` | 16 / 2 / 6 and 10 / 1 / 4 | no | `Toggle.REALITY_VEIL` flips | Both arms out, closing round him into the Veil's stance; the opposite when it drops |
+| `THANOS_DRAIN_CAST` | 12 / 1 / 5 | yes | `Live.SOUL_DRAINING` rises | The chain lashes out, and the gesture hands over to the Drain's stance |
+| `THANOS_SIGHT` | 14 / 2 / 5 | no | `Live.SOUL_SIGHT` rises | The Gauntlet to the eye, then swept across the face |
+| `THANOS_REWIND` | 22 / 2 / 8 | no | N's cooldown starts, nearer to the Rewind's | The palm up and out, trembling; drawn back, he leans away |
+| `THANOS_TIMELOCK` | 20 / 2 / 8 | no | N's cooldown starts, nearer to the Lock's | Both palms up and then pressing down in a stamp; the body sinks with it |
+
+**Which of two uses of a key it is.** The two uses of R, G and N start cooldowns of different lengths (70 and 160, 100 and
+220, 900 and 600 by default). When the data arrives the ticks left tell them apart: the use whose **configured cooldown** is
+nearer plays (`ThanosGestures.cooldown`; the client has the server's config), so changing a cooldown in the server config
+changes nothing for the animation, and a tie plays the first. The Soul Stone's two uses need no such rule: the drain and the
+sight have states of their own (`Live`), which also covers the Sight in Creative, where it starts no cooldown. The Veil is a
+toggle. The Transmute is the only use of V that has a cooldown.
+
+**Before the server answers.** The local Thanos's own key press starts the gesture at once where the client can tell the stone
+will work: not while he is held (`SPELLBOUND`, `PETRIFIED`, `SOULWORLD`), starving or a spectator; the Step only with a block or a
+creature in range, the Pull, the Transmute and the Drain only with a creature in his sight (and the Drain not while it is
+already draining), the Rewind only with two seconds of history, the Veil, the Sight, the Lock, the Blast and the Slam whenever
+they are rested. A refusal the client cannot see (a Hex wall, no room to stand, PvP) lets the gesture play out and costs nothing.
+The change in the data that arrives a moment later is swallowed, so the gesture does not play twice.
+
+#### 15.12.2 The stances
+
+| Stance | tauIn, tauOut | Aimed | On while | Rows |
+|---|---|---|---|---|
+| `THANOS_VEIL` | 4, 5 | no | `Toggle.REALITY_VEIL` | The main arm spread 10 degrees more than whatever it is doing (so he can walk and fight with the Veil up), the Gauntlet hand held out and up (-30, 0, -22) as if it held a thin film, trembling 0.8 at 1.6, the head back 2 degrees, a slow sway of 1.5 degrees |
+| `THANOS_DRAIN` | 2, 4 | yes | `Live.SOUL_DRAINING` | The Gauntlet arm along his look (the one he drains is where he looks), trembling 1.4 at 1.9; the main arm braced back and out (-12, 0, 8); the head down 3; the legs braced wide; the body 2 degrees back; the Gauntlet arm counts as occupied |
+
+A gesture that hands over to a stance ends on its pose, so that nothing pops: `THANOS_VEIL_ON` ends with the Gauntlet arm at the
+Veil's and the main arm level with the body, spread by the stance's own angle; `THANOS_DRAIN_CAST` ends with the Gauntlet aimed
+at the look with no offset and gives the lean back to the stance. `ThanosGestures` holds the numbers both read.
+
+#### 15.12.3 Walking, landing, no flight
+
+* **No flight profile** (`FlightProfile.of` answers null for him): no take-off, banking or braking, and the animator never starts
+  a flight gesture.
+* **Walk and sprint** (`RunPoses.THANOS`): heavy and wide, between Thor and Magneto: the arms swing 0.9 of the walk and 1.15
+  of the sprint, the legs 1.15, a lean of 9 degrees and a turn of 5 at a sprint, and a bob of 0.03 blocks that is the stride
+  shaking the ground. No speedster cycle: his speed is human.
+* **Landing.** The animator lands only the heroes who fly, so `ThanosActing.edges` lands a Titan: a fall of more than three blocks
+  (the speed just before the ground is 0.6 blocks a tick or more, `ThanosGestures.HARD_LANDING`) plays the soft landing with a dip
+  deeper than anyone's (the dip of Thor's soft landing) and the dust and ring of the ground. A short fall is nothing.
+
+#### 15.12.4 First person
+
+The Gauntlet is on the off hand, which vanilla draws only when something moves it: for Thanos the off hand is **always drawn**,
+at the lower left of the screen, with the Gauntlet on it (the `PlayerRendererMixin` hook, 15.13.2), breathing a little. Every row
+is added to that rest, in a right hand's signs (the left hand mirrors), and stays at the edge of the screen but for the thrust of
+the Blast (four ticks) and the stamp of the Time Lock:
+
+| Gesture or stance | The Gauntlet hand |
+|---|---|
+| `THANOS_BLAST` | thrust forward and up a little (dz +0.22) for four ticks, then a kick back |
+| `THANOS_SLAM` | up for six ticks (dy +0.30), then down hard (dy -0.25, dz +0.10, rx +25) |
+| `THANOS_STEP` | a circle over the twelve ticks (dx 0.08, dy 0.06) |
+| `THANOS_PULL` | out (dz +0.20), then drawn back (dz -0.06) |
+| `THANOS_WARP` | a flick forward (dz +0.18) |
+| `THANOS_VEIL_ON` / `OFF` | both hands come up a little and gather in, or open out |
+| `THANOS_DRAIN_CAST`, the Drain | lashed out, then held out along the look, trembling (dx +0.10, dy +0.12, dz +0.16, rx -10) |
+| `THANOS_SIGHT` | the hand rises at the edge of the screen, toward the eye |
+| `THANOS_REWIND` | the palm up (rz +25), trembling, then drawn back |
+| `THANOS_TIMELOCK` | both hands pressed down (dy -0.10, dz +0.10) |
+
+The beam, the chain and the sparks leave the Gauntlet where it is drawn: the tracked hand when he is seen by someone else, and in
+first person the hand's resting place moved by the same offset the hand is drawn with. The camera is never touched, and with
+*Reduced motion* every tremble is off.
+
+#### 15.12.5 The flourishes
+
+Each gesture starts a small effect at the places the model really has (`HandTracker`), thinned by the client's *Flight effects* option
+and only for a Thanos in view: a violet flare and spiral at the Gauntlet as the Blast leaves it, grey chips and a dust ring at his
+feet for the Slam, motes hanging where the Step's hand has been and a blue ring at the end of the circle, a blue spiral drawn in
+to the palm of the Pull, red sparks at the fingers of the Transmute, red motes round the hand that closes the Veil, orange motes at
+the eyes of the Sight, two green rings on the forearm of the Rewind and a quick green mandala under the feet of the Time Lock.
+
+#### 15.12.6 Tests, and how it was checked
+
+`ThanosAnimationTests` (batch `thanos_anim`): the timing of the eleven gestures; that every one drives the Gauntlet arm and the other only
+balances or joins in; that no key asks an arm for an impossible angle; what each gesture looks like in numbers; the hand-overs to the
+stances; the routes (every ability, toggle and state of his acted or explained, none pending); that the cooldown of each use of
+a key reaches its own gesture with the config's numbers and a few ticks late, and follows the config; that every gesture can be reached
+by something; every key press of the prediction; that he has no flight profile; and the speed that makes a landing a Titan's.
+The shared checks cover him too: `AnimationMathTests` (every gesture has well-formed keys and the Veil's closing ends on its stance,
+every ability, toggle and state is acted or explained, no gesture is started by nothing). What the poses, the hands and the flourishes
+look like was checked by eye in a real game, from a second player (`/enhanced_anim target`, `play <gesture> <tick>`, which freeze each
+pose at a tick) and in first person.
+
+### 15.13 Looks and art
+
+Everything of him that is a picture. Every texture is drawn pixel by pixel by a script (no sample, no traced image), so
+that it can be drawn again; the scripts are in `scratchpad/art/thanos/` of the 3.0 work (`gen_skins.py`, `gen_boss.py`,
+`gen_items.py`, `gen_effects.py`) and the textures in `assets/enhanced/textures/`. `ThanosAssetsTests` (batch
+`thanos_assets`) reads the files back and holds them to the rules below.
+
+#### 15.13.1 The two skins and "your own skin"
+
+The playable Thanos has three looks (`H` cycles them, `Sneak + H` goes back): **Infinity War** (the default),
+**Endgame: Battle Armor** and **Your own skin** (the player's own, with the Gauntlet and the powers). The two skins are
+64x64 with the classic four-pixel arm (`entity/suit/thanos_infinity_war.png`, `thanos_endgame.png`). Armour is hidden on a
+hero, so everything he wears is painted into the skin and what stands off the body is on the overlay layers.
+
+| | Infinity War (after the Statesman) | Endgame (the battle armour of 2014) |
+|---|---|---|
+| Face | purple and bald, a heavy brow, blue irises, a furrowed grey beard in vertical stripes (the great chin stands off the face on the hat layer) | the same face, open |
+| Head | bareheaded | a gold helmet on the hat layer: a bright crest down the middle, a brow band with a point between the eyes, cheek guards and a neck guard |
+| Body | a navy quilted tunic with blue piping, a gold gorget that makes a Y over the chest, a gold belt with an angular buckle | a plum breastplate with gold trim and a raised ridge, a thick gold gorget, the belt |
+| Arms | bare purple, a bicep, veins on the forearm, gold straps over the shoulders | bare purple under great gold pauldrons |
+| Legs | olive trousers, gold knee plates, dark boots | olive trousers, gold knee plates and greaves, dark boots |
+
+* **Palette** (lifted from the posters, which are dark, so that eight pixels read): skin `#8C7DB4` with a ramp from `#CDC1EA` to
+  `#3C3258`; beard `#7A7490`; iris `#5C9CE4`, pupil `#1E1830`; aged brass `#A08540` (light `#E2CA80`, dark `#614D26`); navy
+  `#222C62`, piping `#4266D8`; olive `#4A4528`; boots `#2F2A1E`; plum `#5A3F7E`. Light comes from the top left; the metal has a lit
+  top and left edge, a dark bottom and right edge and a few scratches; the cloth is quilted and dull.
+* **The rules** (the shared skin rules, tested): nothing is drawn outside the rectangles the player model reads; the base layer is
+  opaque; an overlay pixel is fully opaque or fully clear; the arm is the classic width. **The eyes** are on the columns 9 to 10 and 13 to 14
+  of the head front, rows 11 to 12, a pupil outside and an iris inside, and the Endgame helmet leaves those eight pixels and the
+  face clear, so that a glow mask over the eyes works on every look.
+* **Drawn in at least three rounds each** with the mod's skin kit (`skinkit.py`, a character grid per face and a colour ramp per material) and the
+  box renderer of the art tools, each round looked at from the front, back, sides, three quarters, from above and at the sizes a
+  player is seen at in the game, and compared with the stills of the films (the *Infinity War* poster, the *Endgame* helmet and
+  shoulders).
+
+#### 15.13.2 The Infinity Gauntlet
+
+**On the arm.** A model layer (`GauntletLayer`) draws a cuff, an engraved forearm and a fist on the off-hand arm of every
+playing Thanos, whatever his look, scaled by 0.6 to fit a player's arm; in first person the same cuboids are put on the hand by one
+injection into the renderer of the hand. They are cut from the boss's own texture (15.13.3), so the Gauntlet of the hero and
+of the boss are one drawing: aged brass with a lozenge on the back of the forearm of nested channels, a thick cuff, a back of the
+hand with a large round socket.
+
+**The six sockets** are drawn by code on the back of the hand, a row of four on the knuckles and one at the thumb:
+
+| Stone | Place | Lit colour | Core |
+|---|---|---|---|
+| Power | knuckle, index | `#9B4DEB` | `#E6D2FF` |
+| Space | knuckle, middle | `#2F9BFF` | `#BFE6FF` |
+| Reality | knuckle, ring | `#E5253B` | `#FFB3BB` |
+| Soul | knuckle, little finger | `#FF8A1E` | `#FFD6A0` |
+| Time | the thumb | `#35D46A` | `#B8FFC9` |
+| Mind (never lit) | the large round socket, 3 by 3 pixels | a thin yellow outline `#F5D77A` | none |
+
+A stone that is not burning is a dark glassy gem (`#15131C`); a burning one is drawn full bright with a halo. A stone he holds
+**glows softly**, **flares for eight ticks when it is used** and burns while a held effect lasts; the stone that arrives next
+pulses in its last ten seconds. The engraved lines of the cuff and forearm glow in the colour of the stone he used last
+(`entity/thanos_glow.png`, white on clear, tinted by code). At five stones the Mind socket glimmers yellow for a second every
+twenty. The Gauntlet is hidden while the player is invisible, hidden or shapeshifted.
+
+**The item** (`item/infinity_gauntlet.png`, 16x64, four frames of 16x16, `frametime` 3, interpolated): the Gauntlet seen from the back
+of the hand, aged brass with a dark outline, four gems on the knuckles, the Time gem at the thumb and the large dark socket; the gems
+pulse in turn over the four frames (the Power and Time gems, then Space, Reality, Soul) and a yellow glint comes and goes in the socket.
+
+#### 15.13.3 The Mad Titan's model and texture
+
+A custom humanoid (`ThanosModel`), not a scaled player: 34 pixels tall at a render scale of 1.55 (3.29 blocks), with a hitbox of
+1.2 by 3.3 and an eye height of 2.95. His breadth is what he is: shoulders twice a player's, a big head and a long arm. It has
+28 boxes: the head with the beard, the **helmet** (crown, crest, two cheek guards, a neck guard), the body with the gorget, the
+**breastplate**, the belt and its buckle, two arms with the two **pauldrons** (a top and a low plate each) and the dark leather bracer of the
+sword arm, the Gauntlet's cuff, forearm and fist, the legs with knee plates and boots. The four plates (the helmet, the two pauldrons,
+the breastplate) are hidden when they break (the synced `plates`), and what shows then is the **undersuit**: the bald purple head, bare purple
+arms and the navy quilted tunic with its piping.
+
+* **The texture** (`entity/thanos.png`, 128x128) is cut for the model's boxes at their `texOffs`: the Endgame armour (scratched gold with a lit
+  edge and a dark edge, rivets on the pauldrons, the neck guard in three plates) over the Infinity War undersuit, the breastplate plum with a
+  gold border and a raised ridge, the face of 15.13.1 stretched to the head's nine pixels (the brow, the eyes, a frown), the beard
+  furrowed, the belt dark leather with gold studs. Every face of every box is painted in full. **One face is clear on purpose**: the breastplate's back, which lies
+  in the plane of the body's back (two opaque faces in one plane flicker); the body's back is plum armour with a gold border.
+* **The glow** (`entity/thanos_glow.png`) is white on clear: the lattice of the engraved lozenge, the channels of the forearm and the
+  bands of the cuff, and nothing else (no pixel of it lies on a pixel the skin leaves clear).
+* **His illusions** use the same model and texture (with the plates and stones of the real one), and have no shadow.
+* **The sword** (`ThanosSwordModel`, `entity/thanos_sword.png`, 64x32): two broad flat blades back to back on a short grip, a bronze
+  guard in the middle, a groove down each blade with a bronze inlay, a ridge (the spine) behind each; steel `#666678`, bronze
+  `#A08540`, wrapped dark leather on the grip. It is the model in his hand and the entity in flight.
+* **The meteor** (`ThanosMeteorEntity`) is a tumbling cluster of cubes that are all `item/titan_debris.png` (16x16): slate grey-blue rock with the
+  Space Stone's blue running through its cracks, lit from within; a blue halo and a streak follow it. **The orb** is a translucent red sphere
+  with a pale heart and four motes circling it, made of energy shapes, so it has no texture.
+* `/enhanced_model thanos <state or move> [tick]` shows the model in any state, frozen at a tick (his Sweep eight ticks in is
+  `/enhanced_model thanos sword_sweep 8`), for the people who draw.
+
+#### 15.13.4 Energy colours
+
+What every effect of the fight is painted with, whatever the look: **Power** `#9B4DEB` (core `#E6D2FF`), **Space** `#2F9BFF` (`#BFE6FF`; the
+portals use the Tesseract's own blues), **Reality** `#E5253B` (`#FFB3BB`), **Soul** `#FF8A1E` (`#FFD6A0`), **Time** `#35D46A`
+(`#B8FFC9`), **Mind** `#F5D77A`, only the empty socket's outline. The Infinity Beam is white with the five colours as a banded halo.
+The boss bar takes the colour of his newest stone (purple, blue, red, yellow for orange, green).
+
+#### 15.13.5 The other pictures
+
+| File | What |
+|---|---|
+| `mob_effect/petrified.png` | 18x18: a grey cracked stone with the Reality Stone's red in the cracks |
+| `mob_effect/soulworld.png` | 18x18: an orange sun on a horizon over still water |
+| `mob_effect/time_locked.png` | 18x18: a green dial with ticks inside a mandala ring |
+| `effect/stone_mandala.png` | 128x128, white on clear, tinted by code: a double outer ring, a band of twelve runes, a six-pointed star, clock hands (two of them are drawn, turning against each other, under the Time Stone's discs and mandalas) |
+| `effect/portal_ring.png` | 128x128, white on clear: a thick ring with a lit core and a bright edge, a ring of sparks, a faint three-armed spiral (the portals of the Space Stone and the sky portal of the call) |
+| `item/titan_debris.png` | 16x16, the meteor's rock |
+
+The boss bar and the chains of the Soul Drain are drawn by code (the bar from rectangles and the sockets' own geometry, the chain from ribbons),
+so they have no picture of their own.
+
+#### 15.13.6 How it was checked
+
+`ThanosAssetsTests` read the files back (the skin rules, the eyes, a painted face on every box, the animated strip). The pictures were then looked at **in a real game** (a
+server and a client, `/enhanced_model` for every state, the playing Thanos in both looks in the third person and the first, the Gauntlet item in the hotbar, the meteor, and the
+fight itself with the bar, the air and the subtitles). That round found one thing: in the Dying pose his legs come up and the soles of the boots, drawn nearly black, showed as a black slab; they are
+now worn leather with a welt and a tread, and drawn light because the game shades every downward face by half. The call's subtitle (*Dread it. Run from it. Destiny arrives all the same.*, as the specification gave it) was
+wider than a window at GUI scale 2 and was clipped at its ends; the review of the lane (15.16) shortened it, and the one of the awakening, to
+*Destiny arrives all the same.*, which fits at every scale, and the title of the reward from *THE GAUNTLET IS YOURS* to *YOUR GAUNTLET*, which was
+clipped at the default scale of a 1080p window too; nothing else was out of place.
+
+### 15.14 What is shown
+
+The client's part of the fight. Nothing here changes the world, and nothing but the picture is decided on the client: the server tells
+it what to show with one payload (`ThanosFxPayload`) and with the entity's synced fields (his stones, the clock to the next, his state, move and
+tick, the plates, the flags, the aim).
+
+#### 15.14.1 The boss bar
+
+`ThanosBossBar` draws the bar in the place of the vanilla one (`BossBarOverride`, for the three names of the bar): his health in the colour of his newest stone, a
+darker bar behind it for what he has just lost, **a gold tick where each plate will break** (dark once it has), and under it **a row of six sockets**:
+a stone he holds is a lit gem with a soft glow, the next one is a ring that fills while it counts down with its name and the time ("Space Stone in 0:42"),
+the sixth is a dark socket outlined in yellow that is never filled. His name turns red when he is enraged. For a Thanos the client does not know (he
+is far away) the vanilla bar's health and colour are shown alone.
+
+#### 15.14.2 The tells and the effects
+
+`ThanosFx` draws what the server sends, at most 48 at a time, none beyond 96 blocks, each for a few ticks. The fifteen kinds: a **ring on the ground** that closes in on the
+impact (`RING_TELL`: the melee, the leap, the sigils of the Overload, the meteors, the Soul World's pillar), a **line** from the hand
+that whitens as the aim locks (`LINE_TELL`, through the walls for the Pulse), a **beam** (`BEAM`, white core with a halo and a spiral of
+motes; the Infinity Beam's is banded), a **portal** (`PORTAL`, `PORTAL_SKY`), a **falling star** in the stone's colour that is the stone arriving (`STAR`), a
+**ring that spreads** (`SHOCK_RING`), a **mandala** (`MANDALA`: thin at first, solid at the end for the Snare), a **dome** (`DOME`: the Barrier blue, the Veil red, the
+Time Lock green; the Barrier and the Veil are also drawn from his flags, so that a late arrival sees them), a **red wave** (`WAVE`), **orange chains** from the Gauntlet
+(`CHAINS`, tense while the drain lasts, with motes flowing back), a **pillar** of orange light (`PILLAR`), the **Soul World** for the one taken (`SOULWORLD`), the **illusion**
+round a petrified creature (`ILLUSION`, nothing in the world changes) and a white **flash** (`FLASH`, not with *Reduced motion*). At most 12 meteor rings, 6 chains and 4
+domes are drawn at once. Every tell has the colour of its stone: gold for melee, purple Power, blue Space, red Reality, orange Soul, green Time.
+
+#### 15.14.3 The air
+
+`ThanosAtmosphere`, within 64 blocks of a living Thanos (the client option `bossAtmosphere`): the fog turns dark violet `#2A1A40` over three seconds, the edges of the screen
+darken, a thunder that is not weather rumbles far away every 20 to 40 seconds, and a stone arriving flashes the screen white for a second. The call has its own sky: the fog
+turns violet while the two items are held up and while the portal is open. On the player: a grey vignette for `PETRIFIED`, a green tint for `TIME_LOCKED`, and in the Soul World
+an orange sky over still water with a gateway far ahead and the screen tinted orange.
+
+#### 15.14.4 The boss's poses
+
+`ThanosBossPoses` is a table of keyed poses (a wind-up, a strike, a hold, a recovery, each with its easing) for his body: a stand, the sweep, the smash, the jab, the throw, the
+choke, the leap, the point (the Gauntlet along the locked aim, for the Blast, the orb, the drain and the Overload), the Gauntlet raised (Shockwave, Meteor Hail, Rewind, Infinity
+Beam), the slam, the palm out (Pull, Barrier), the step, the wide arms (Veil, Phantoms), the press (Time Snare), the sight, the infinity pose, and the poses of the states: falling
+through the portal, the surge (a knee, the Gauntlet arm shaking), the stagger, the arrival, the death (one knee, then seated). Each tick of a move reads its pose from the synced
+state, move and tick, blended over four ticks from the last one. The legs swing at 0.5 of a player's rate with the arms against them, he breathes, his head follows what he looks at, he
+leans forward a little when he chases. The sword whirls by an angle carried from frame to frame, so a whirl that begins or ends never makes it jump.
+
+#### 15.14.5 The hero's screen
+
+The hero's panel has a line for each key (15.11.2): the cooldown seconds, `ON`/`OFF` for the Veil, `draining` while the chain holds, `Sight 6.2s` while it looks, and, when the Rewind is
+ready, the seconds of history stored (counted on the client, since the server's snapshots are not synced). The Soul Sight outlines come from `SoulSight` through the game's own glow, so they
+show through walls and in his colour. The Drain's chain hums (the `soul_drain` loop, 15.15). The Gauntlet's sockets burn for the stone just used.
+
+### 15.15 Sounds and music
+
+All of it original and synthesized with the mod's numpy toolkit (`sfx.py`: oscillators, noise, filters, modal synthesis, a synthetic reverb; the recipes are `thanos_sounds.py`), mono Ogg
+Vorbis at 44.1 kHz. **The six voices of the Infinity Stones are not here:** they are the 2.3 sounds (`<stone>_stone` and `<stone>_stone_hum`), and are played at every stone's arrival (full), as a
+soft hum ten seconds before, at every stone move's tell, in turn in the Infinity Beam's charge, at each hero ability and in a row at the Gauntlet's ceremony. The portals reuse
+the Tesseract's sound (higher), a dissolving illusion Loki's, the shield turning the sword home Mjolnir's impact.
+
+#### 15.15.1 The sounds
+
+Each cue of the fight (`ThanosSounds`) is a sound event, with its subtitle in English and in Hebrew; the names start with the lane's prefixes (`thanos_`, `gauntlet_`, `soul_`, `time_`, `reality_`).
+
+| Event | Files | Seconds | Where | How it is made |
+|---|---|---|---|---|
+| `thanos_summon` | 1 | 3.5 | the charge, and the portal opening | a sub-bass swell (a sine 38 to 92 Hz and a saw an octave up, +12 dB over 3 seconds), a noise riser (400 Hz to 3 kHz), the Tesseract's own sound reversed, and at 3.0 s his bell cluster over a deep boom |
+| `thanos_bell` | 1 | 1.4 | each second of the charge | the bell cluster alone: partials at 220, 349, 528 and 880 Hz (1 : 1.58 : 2.4 : 4.0) with a boom |
+| `thanos_arrive` | 1 | 2.0 | the landing | a reversed ring-whoosh into a saturated 55 Hz thump, a noise burst, a crack, a gravelly rumble and grains of ground |
+| `thanos_roar` | 1 | 1.6 | the arrival, each stone, the enrage | a baritone: a fundamental from 78 up to 108 Hz and down, formants at 600, 1000 and 2500 Hz opening toward "ah", a 6 Hz tremolo, a growl (noise modulated at 40 Hz), a rasp, a sub, a long hall |
+| `thanos_step` | 3 | 0.45 | his footfalls | a 55 Hz thump, 0.15 s of gravel, a tiny armour clink (pings at 2.4 and 3.1 kHz) |
+| `thanos_swing` | 2 | 0.55 | the Sweep, the Smash, the Throw | a broad whoosh sweeping 500 to 1800 Hz with a Doppler bend, the hollow ring of a big blade (190 and 215 Hz) |
+| `thanos_hit` | 2 | 0.5 | his blows landing, the Slam | a 70 Hz thud, a metal clang (640, 1630 and 2900 Hz), a slap of body |
+| `thanos_hurt` | 3 | 0.7 | he is hit hard (at most once in 20 ticks) | a short "oh" with the pitch falling 90 to 70 Hz, breath, a touch of vocal fry |
+| `thanos_death` | 1 | 5.0 | the death (100 ticks) | a long exhale (78 down to 46 Hz through "oo" formants), a hiss of dust, and five falling tones (700 to 200 Hz), one a second, for the sockets going dark |
+| `gauntlet_clench` | 1 | 0.4 | every stone move's tell, the hero's presses | a leather-and-metal creak falling 900 to 400 Hz, a gem click at 3.8 kHz, a low hum |
+| `thanos_stone_surge` | 1 | 1.5 | a stone fuses (under its voice) | a rising shimmer, a deep "whomp" (40 to 65 Hz) at 0.7 s, a crackle |
+| `thanos_power_blast` | 1 | 1.0 | the Power Blast, boss and hero, at the release | a 0.12 s rising snap, a wide crack, a 60 Hz boom, a violet shimmer tail |
+| `thanos_infinity_charge` | 1 | 2.5 | the Infinity Beam's tell | five rising tones in turn 0.4 s apart (D2 F2 A2 C3 E3), each held, over a growing swell; it plays once |
+| `thanos_infinity_beam` | 1 | 1.6 | the beam | a full-spectrum roar: pink noise with a 7 Hz tremolo of 3 dB, saws at 55, 110 and 165 Hz, a band that sweeps with the beam |
+| `time_rewind` | 1 | 1.6 | the Rewind (boss and hero) | 28 reversed clock ticks speeding up from 6 to 40 a second, a sweep 120 to 900 Hz, a bright shimmer, a soft chime |
+| `soul_drain` | 1 (`soul_drain_loop`) | 2.0, a loop | the chains lashing out; the hero's drain, in `PowerLoopSounds` | a choir shimmer (four detuned voices on A3, "ooh", 5 Hz vibrato) with chain clicks, 18 a second, at random pitches |
+| `soul_world` | 1 | 3.0 | the victim's client | a gentle wash: low wind, two drops of water, a distant wordless voice on E4 at a quarter of the level |
+| `reality_pop` | 3 | 0.3 | a bubble pops, the Petrify | a resonant blip gliding 900 to 1900 Hz in 40 ms, a puff of noise |
+| `thanos_meteor_whistle` | 1 | 1.2 | each meteor falling | a sine gliding 1800 down to 400 Hz with a noise bed that follows it and a growing rumble |
+| `thanos_barrier_up` | 1 | 0.6 | the Space Barrier | a glassy dome (partials at 900, 1420 and 2100 Hz), a noise sweep, a soft whump |
+| `thanos_theme_1` to `_5` | 5 | 40 each, loops, streamed | the music (15.15.2) | below |
+
+Departures from the plan, where the code's timing decides: `thanos_power_blast` opens with a 0.12 s snap, not a 0.6 s charge (the cue plays at the
+release; the wind-up is the clench and the stone's voice); `thanos_death` is five seconds, the length of the dying state; `thanos_bell` is
+new (the plan's vanilla bell would have clashed). The six sounds that the plan named without a prefix take `thanos_` (the Soul World is `soul_world`).
+
+#### 15.15.2 The music
+
+`ThanosMusic`: **five stems of 40 seconds in D minor**, one for each stone he holds, that play **together**, so the music grows as he does; each is a loop that closes,
+every frequency a multiple of 1/40 Hz and every filter, noise and reverb circular. A stem fades in over two seconds when its stone arrives and stays; all are at full volume within 48
+blocks of him, silent at 96, and fade out over three seconds when he dies or leaves; the game's own music waits; it is music-volume sound (the slider controls it) and the client
+option `bossMusic` switches it off.
+
+| Stem | Stone | What it adds |
+|---|---|---|
+| `thanos_theme_1` | Power | a drone (D1, D2, A2) in a slow breathing saw pad, a dark wind, and a heartbeat at 60 bpm (two low thumps, the second softer) that never stops |
+| `thanos_theme_2` | Space | low strings: an open fifth rising D2 to A2 and settling on F2 over C3, twice in the 40 seconds |
+| `thanos_theme_3` | Reality | high choir clusters a semitone apart (D5 E-flat5 E5 over A4 B-flat4 B4), their vowel slowly changing, glass above |
+| `thanos_theme_4` | Soul | a driving ostinato at 90 bpm in eighths on D2 A2 F2 C3 under a low drum on the beat |
+| `thanos_theme_5` | Time | the bells of the call (A4 D5 C5, then a low D) over a deep boom, with a high shimmer |
+
+The stems are mixed so that all five together are no louder than a loud effect (each is trimmed 6 to 8 dB under the effects' loudness).
+
+#### 15.15.3 How it was checked
+
+`ThanosAssetsTests`: every event is registered, has its `sounds.json` entry with the right files, its subtitle in both languages, mono at 44.1 kHz,
+a sensible length (the themes 40 s, the drain loop 2 s), the themes streamed; every cue of `ThanosSounds` plays an event of the mod. Each recipe was looked at as a
+spectrogram and a waveform and measured (the peak under -1 dBFS after encoding, the loudness, the energy above 12 kHz, the pitch and the timing of what it is
+meant to do); the loops were tested at the seam. The themes' downbeats are on the loop's first sample, which the seam test counts as a jump in level: it is a drum or a bell
+beginning on the beat.
+
+### 15.16 The review of the lane
+
+The lane was read once more against the specification and then played in a real game (a dedicated server and two clients): the call, a two-player fight up to the fourth stone with each
+stone's arrival and its five tells, a Hex as the arena, Stormbreaker and the Scarlet Witch against him, the reward, the becoming and the hero's keys with the Gauntlet in first person, and a
+fight of two players with all five stones to the end. It found four things; each was fixed and has a game test of its own (`ThanosReviewTests`, and the targeting test of `ThanosFightTests`), which was
+checked to fail on the old code.
+
+1. **Titles wider than a screen.** A title is drawn at four times the size of the text and a subtitle at twice, and the game's scale for a 1080p window makes the screen only 480 units wide: the title
+   of the reward (*THE GAUNTLET IS YOURS*) and the subtitles of the call and of the awakening (*Dread it. Run from it. Destiny arrives all the same.*) were cut at both ends. They are now *YOUR GAUNTLET* and *Destiny arrives all the
+   same.*, which fit at every scale; a test holds every title of the lane to 14 characters and every subtitle to 32, in both languages (15.13.6).
+2. **The hold on a target counted idle ticks.** "He keeps a target for sixty ticks" was a count of the calls of his idle choice, and he is idle only for a moment between one move and the next: the first fighter he picked
+   held him for minutes, whoever hurt him since. It is now sixty ticks of the game (`TARGET_HOLD_TICKS`).
+3. **A Titan who never lands.** The arrival (he is invulnerable in it) ended when he stood on the ground; one who fell into a lake, a cobweb or a block put into the column during the countdown never
+   "landed" and stood in the portal until the fight timed out. Water and lava count as landed, and so does `LAND_TIMEOUT_TICKS` (200) of falling.
+4. **The stuck rule walked through the Hex.** When he makes no progress toward the one he hunts the rule frees him to a spot beside them, and it did not ask the wall: a Thanos inside a Hex whose prey stood
+   outside was put outside, and one outside was put in. It is a teleport like any of his now (`mayTeleportTo`, which asks `HexManager.onTeleport`), and a refused step leaves him where he is.
+
+**Still imperfect.** No sound could be listened to in the test setup (a server and clients with no sound device), so the mix of the themes and the effects was judged only by the measurements of 15.15.3. A Hex that is raised *before* the call, with the landing spot outside its wall, keeps him outside it (the rule is "one outside cannot enter"); it is not a bug, but the caller may be surprised. The projectiles that a hero's Time Lock hung are freed when the dome closes or when the Thanos who cast it dies, logs out (so also when the server stops), changes dimension or loses the power; after a crash they stay hung, like any `noGravity` that a power has set.
+
+---
+
+## 16. Ultron — the boss and the hero **(added in 3.0)**
+
+> "I'm here to help." In *Avengers: Age of Ultron* Tony Stark and Bruce Banner configure the neural net in the Mind Stone
+> of Loki's Scepter; what wakes decides that peace means the end of humanity, and lifts a city into the sky to drop it. In
+> Enhanced he is a **boss** (the biggest fight in the mod) and, for those who beat him, a **hero**.
+
+Ultron has two parts that share a name: the **boss fight** (16.1 to 16.6), which is the only way to get the power, and the
+**hero** (16.7 to 16.9) a player becomes with the reward. Both are in the **Enhanced** creative tab.
+
+### 16.1 The Ultron Program and the ritual
+
+* **The Ultron Program** ("Stark's peacekeeping program, waiting for a mind"). Crafted, never found in a chest, so
+  Ultron is never met by surprise: a Nether Star in the middle, two Echo Shards above and below it, a Block of Redstone
+  to its left and right and a Block of Iron in each corner (a Wither, an Ancient City and 36 iron). The recipe unlocks on
+  picking up a Nether Star. Stack size 1, fireproof, epic, with no glint (only the Core has one).
+* **The Scepter.** Loki's Scepter in one hand, the Program in the other, **Sneak + right-click** on a block (any power
+  may start it: a party is started by one of its heroes). The centre of the arena is the top face of that block. Without
+  Sneak, or without the Program, the Scepter does what it did before; with the Program in the other hand the Mind Stone
+  only hums at it (it does not kill the holder, as with the gene and the Synthezoid Core).
+* **The checks**, all made before anything is used up; the first refusal is told to the starter in the action bar: the
+  boss is switched on (`ultron_boss.enabled`); the difficulty is not Peaceful; fewer than `[boss].maxActiveFights` (1)
+  fights run on the server; the starter holds the Program; there is ground to aim at; the dimension has sky light and no
+  ceiling (so not the Nether or the End); the arena and a margin of 14 are inside the world border; spawn protection and
+  claims allow a break at the middle and eight points of the island's rim; the ground is level (it rises and falls by at
+  most `maxRelief`, 6) and at least 60% of the island's columns are dry, walkable ground; the chunks of the island and the
+  sky above it are loaded; no item frame, painting, leash knot, armour stand, minecart, boat or End Crystal hangs in the
+  island's circle; the sky above the island, with a margin of 6, is empty; spawn protection and claims allow a break at
+  the nine points in the sky too. Nothing that is built on the ground is a reason to refuse.
+* **The awakening, 6 seconds.** The Program is used up (not in Creative) and the Scepter rests 20 ticks. Tick 0: the gem
+  flares, a thin blue-white beam (`#7FD4FF`, the Mind Stone's) runs into the ground, `ultron_awaken` begins. Ticks 0 to
+  50: scrap spirals up and assembles a standing silhouette. Tick 50: a flash, **six Ultron Sentries** (20 ticks
+  assembling) appear in a ring of radius 6 and **Ultron Prime** hovers in the middle, invulnerable. Tick 60 and 100: *"I'm
+  here to help."*, *"Peace in our time."* (the Sentries' eyes turn red). Tick 120: the fight begins.
+* **Never by surprise, never by command.** `ultron` and `ultron_sentry` cannot be `/summon`ed or spawned from an egg,
+  and an Ultron or a Sentry of the boss that is loaded without a live fight of its own is discarded (after a crash, or
+  from a copied chunk). Operators have `/enhanced boss start ultron [force]` (16.10).
+
+### 16.2 The bodies
+
+Ultron is **one creature with many bodies**, so the boss bar, the target and the state never reset. The model is a
+hand-made biped of 54 cubes on a 128x128 skin, scaled per body (not the player model: antennae, pauldrons and a jaw do
+not fit a 64x64 skin).
+
+| Body | Form | Scale | Hitbox | Health (n players) | Armour / toughness | Attacks |
+|---|---|---|---|---|---|---|
+| 0 | **Prime** | 1.9 | 1.3 x 3.4 | `bodyHealth` (600) x (1 + 0.35 (n-1)) | 8 / 4 | all |
+| 1 | **Hybrid** (a Sentry's right forearm, a cracked chest plate, a broken antenna) | 1.7 | 1.2 x 3.1 | 0.8 of that | 7 / 4 | no Finger Beams |
+| k >= 2 | **Sentry-Ultron** (a Sentry body with his crest and orange-red eyes) | max(1.1, 1.5 - 0.1 (k-2)) | 1.0 x 2.6, shrinking | 0.8^k of Prime's, at least 25% | max(2, 8-k) / 2 | Volley (one burst), Dive, Call, Punch |
+
+(For one player: 600, 480, 384, 307, 246, 197, 157, then 150.) A hit takes at most **15%** of the body's maximum health
+(before armour), explosions do half, and all mob effects are refused except Instant Damage and Instant Health (inverted
+for undead only: he is a machine, so Harming hurts him). He is immune to fire, drowning, poison and the Wither (not to suffocation),
+cannot be slowed (Quicksilver Time slows the Sentries, never the bodies), frozen, pinned, confused, shapeshifted, mind-controlled
+or lifted with telekinesis; the Hex bounces him and never kills him (from the lift's lock to the end of the fight it lets him, the Sentries and the fighters through). Prime cannot drop below 10% before the island is up.
+
+### 16.3 The attacks and their tells
+
+Every attack that can hurt has a **tell** (a pose, a glow, a sound), and after it the aim is fixed. Ultron hovers 10 to 14
+blocks from the nearest fighter, 3 above the ground, strafing, and never breaks a block. He chooses by weight among the
+attacks that are ready and in range; never the same twice in a row, the Beams and the Dive never within 4 seconds of each
+other, a Volley after a stagger, a pause of 1 second between attacks (1.5 for the later bodies).
+
+| Attack | Range | Cooldown | Tell | What it does |
+|---|---|---|---|---|
+| **Repulsor Volley** | 6 to 30 | 3.5 s | 0.7 s: arms forward, fingertips glow, a whine; amber glint lines for the last 0.3 s | 3 bursts of 3 bolts, 1.7 blocks a tick, led 35%, 2.5 degrees of spread: **6 damage** each |
+| **Finger Beams** (Prime) | 8 to 32 | 8 s | 1.5 s: **ten dotted aim lines** converge on a point at the target's feet and lock at the end; an electric hum | for 1 s ten beams fan +-10 degrees round the locked line, a hit every 4 ticks, **6 damage** each (up to five) |
+| **Thruster Dive** | 5 to 30 | 12 s | 1.2 s: he rises 4 blocks; a red ring (radius 4) closes at one player's feet and does not follow | dives at 1.6 blocks a tick (8 to anyone within 1.5 of the path), lands: radius 4.5, **18 damage**, Slowness II; then **staggered 2.5 s** (grounded, venting, +30% damage taken) |
+| **Gravity Pull** (Prime, Hybrid) | 6 to 26 | 15 s | 1.2 s: a fist in a pale-blue vortex, a ring of motes closes in | drags everyone within 16 blocks in sight for 0.6 s, then slams: radius 6, **14 damage**; nothing to anyone 2 or more blocks above the ground |
+| **Call Sentries** | any | 25 s | 1.5 s: arms spread, the core pulses; cracks and pillars of light at every spawn point | a wave of Sentries |
+| **Punch** | 0 to 3.2 | 1.25 s | 0.4 s: the fist drawn back | **12 damage**, knockback |
+
+The Chaos Shield stops every bolt and every Finger Beam hit (6 each against the shield), not the shockwaves.
+
+### 16.4 The Ultron Sentries
+
+His army. A flying creature of the same model at scale 0.95, hovering on thrusters; **40 health**, armour 4, knockback
+resistance 0.2, no fall damage; immune to fire, drowning, poison and the Wither; **magnetic** (Magneto can lift and throw
+one); drops nothing and gives no experience. Eyes **blue** while assembling, stunned or with no target, **red** while hunting.
+A **plasma bolt** (range 4 to 22, every 2.5 to 3.5 s, a 0.5 s tell, 1.4 blocks a tick, **4 damage**), a **punch** (within 2.2,
+**6 damage**); several round one target take different angles. **Lightning stuns for 3 s.**
+
+**Waves.** Six at the start; a wave of 4 every 25 s and whenever he calls, while fewer than 8 (+3 per extra player) live
+and the **budget** (20, +8 per extra player) is not spent; on the island waves are 1.5 times the size and 0.8 times the
+interval. A Sentry he has uploaded into, or one a hero hacked, no longer counts. The second boss bar counts **alive + budget
+left** and the fight is not over while it is above zero.
+
+### 16.5 Sokovia: the lift
+
+At **55%** Prime floats to the middle, invulnerable, and a **Vibranium Key** (the Doomsday Trigger: a steel gear drum with
+three toothed spokes and a black tower of gears with cyan seams) drills out of the ground. A 10-second **warning** (a ring
+of light on the ground at the rim; fighters outside are asked in and, at the lock, set at the rim by a tractor), then the
+island **rises 40 blocks in 8 seconds**.
+
+* **The Sky Island (default).** The island is a **copy built in the sky**: a wavy disc of radius 20 (the rim varies by up to
+  3), the natural ground as it is (5 layers) with what grows on it (up to 16 blocks), and a rock cone 14 deep. Blocks that are not
+  natural (chests, doors, walls, torches, fluids) are not copied. The real ground is **never edited**. Only the island is built
+  (and cleared) in the sky, in two batches of about 2,500 blocks a tick. During the rise the clients draw a mesh of the island
+  climbing out of its place and hide the original columns on their side (`hideGround`).
+* **Everyone who fights is carried and locked** for the move; the server keeps the kick counter from firing; villagers,
+  animals and items stay on the ground. Telekinesis, Magneto's holds and Mjolnir's pins are released at the lock (a thrown
+  hammer is not recalled: it comes back to its owner as after any throw).
+* **On the island:** more Sentries, and every 5 s, for every two fighters, a **red ring** (radius 3) under one of them for
+  1.5 s and a piece of Sokovia falls on it: **10 damage**, nothing breaks.
+* **The field.** A fighter who strays more than 4 past the rim, 3 below the cone or 80 above is put back on the island,
+  takes 2 damage that cannot kill, gets Slowness for 3 s, at most once in 5 s. On the ground the same field is at the rim + 12
+  and also catches anyone more than 12 blocks underground. A fighter who died stands in the **pit** for 2 s to be carried up
+  again (3 times).
+* **The arena is protected** from the ritual to the end: no block placed or broken, no fluid, no piston, explosions break nothing,
+  mobs break nothing, no natural spawn; the mod's own block-changing abilities refuse; teleports that would leave the cylinder
+  (Ender Pearl, Chorus Fruit, the Bifrost, Vanish, the Tesseract, the Witches' Road, Vibrate, portals) are cancelled.
+* **The descent** is the mirror: the clients capture the island into the mesh, the server clears it, everyone is set down
+  on the real ground at the same place relative to the middle, and the hidden columns come back.
+* **The Tremor.** If the lift is switched off, the site cannot hold the island at the warning, or `liftMode` is `TREMOR`,
+  the same warning, Sentries and falling rock happen on the ground and nothing moves.
+* **Failure is one small rule.** The only record is a header of a few hundred bytes (`data/enhanced/sokovia`), written
+  before the island is built and deleted after it is cleared. On a clean stop the island is cleared at once; after a crash the
+  next start clears the island's shape at altitude, sets players down on the ground, discards the boss's leftover entities and
+  deletes the file. A lost file leaves at worst a floating island of ordinary blocks (to be taken down by hand: `/enhanced boss cleanup` removes entities only), never a hole
+  in the ground. `CUT_GROUND` (really lifting the ground) is a setting kept for later and is not in this release.
+
+### 16.6 Uploading, the end and the reward
+
+* **Bodies.** When a body would die, Ultron is not destroyed. If a Sentry of the fight is free (alive, not assembling, not
+  owned by a player) he **uploads** into the nearest: a 4-second transfer (2 s of the body shuddering and sagging, the Sentries
+  frozen and speaking as one, red-and-white data lines), the Sentry is consumed, the new body wakes weaker and says a line.
+  A **Vision** within 48 blocks cuts the net: only a Sentry within 12 of the body will do.
+* **The finish rule.** Ultron is destroyed for good only when **his body dies, no Sentry is alive and none is left in the
+  budget** (or after `maxUploads`, 12, the safety valve). Then the body falls open, the last Sentries explode and the island
+  lowers.
+* **Heart rip.** A Scarlet Witch using telekinesis on a body at or below 15% of its health tears out its core: it is
+  destroyed at once. Launching a Sentry she holds crushes it.
+* **Speech** (his colour, a robot voice): *"I'm here to help."*, *"Peace in our time."*, *"Everyone creates the thing they
+  dread."* (40 s in), *"I think you're confusing 'peace' with 'quiet'."* (the first fighter falls), *"You, Avengers, you are my
+  meteor."* (the warning), *"This is exactly what I wanted. All of you, against all of me."* (the island), the three transfers,
+  *"I've moved beyond your mission. I'm free."* (a body at 25%), *"Stark asked for a savior, and settled for a slave."* (the end,
+  Vision near), *"Life... life always decides."*, and on a wipe *"When the dust settles, the only thing living in this world
+  will be metal."*
+* **Bars.** The first, red with six notches, is Ultron's current body (it reads "Ultron: lifting Sokovia" and "Ultron:
+  uploading..." in their phases); the second, white with twenty notches, is "Ultron Sentries: N".
+* **The reward: Ultron's Core.** Every fighter present at least 60 s who hurt the fight's entities, and whoever struck the last
+  blow, gets one Core and 1,500 experience points (never a Creative or Spectator player, unless `creativeGetsReward`). It goes
+  into the inventory; if that is full it drops at their feet, owner-only and never despawning; a fighter who is dead or offline gets it as a gift at the
+  next login or respawn. Sentries and bodies drop nothing.
+* **When the fight fails.** Everyone dead for 15 s (a wipe), nobody within 64 blocks for 90 s, or 25 minutes: the bosses dissolve,
+  the island lowers, no reward and **no refund**. An operator's stop, a change to Peaceful, or the server stopping: the island is put
+  back and the Program is given back. `/kill` on the body ends the fight with no reward.
+
+### 16.7 Becoming Ultron
+
+**Ultron's Core** ("The heart Wanda tore out. It still hums."): stack 1, fireproof, epic, with the glint, no recipe, never in a chest.
+A player with **no power** who holds the Core in one hand and Loki's Scepter in the other and uses the Scepter awakens as Ultron:
+the Core is used up (not in Creative), a red title, *"I was meant to be new. I was meant to be beautiful."*, a burst and a message to
+the server. A player with a power keeps the Core and is told "Your DNA is already altered. The gene won't bond."; the Core, like the gene, protects its
+holder from the Mind Stone's touch. Operators: `/enhanced power set <player> ultron [look]`.
+
+### 16.8 Abilities
+
+Ultron has **30 health** (15 hearts), **+8 armour**, +30% knockback resistance, no fall damage, never hungry and never out of
+breath, immune to Poison and the Wither; he is **not magnetic** (vibranium), and **lightning does 1.25 times** (he is electronics).
+
+| # | Key | Ability | How it works |
+|---|---|---|---|
+| 1 | R (hold) | **Repulsor Fire** | A plasma bolt every 4 ticks, alternating hands, from a pool of **30 charges** (one per bolt) that refills 4 a second after 0.5 s without firing; empty, it needs 6 before firing again. A bolt (2.6 blocks a tick, 30 ticks) does **4 damage** to the first creature and **2 to every other within 1.2 blocks**, with no hit delay (about 20 damage a second). It breaks nothing and sets nothing alight. A Chaos Shield stops it. The pool is Magneto's synced charge field, reused. |
+| 1 | Sneak + R | **Overcharge** | With at least 10 charges: a 15-tick charge (a palm raised, glowing, trembling; he moves at 40% and cannot fire), then one heavy bolt: **14 damage**, **8 to everything within 3.5 blocks**, knockback 1.5, a flash and a boom, no block damage. Costs 10 charges, cooldown 8 s; being hit does not break the charge. |
+| 2 | G (toggle) | **Anti-Gravity Flight** | Survival flight at 0.10 (Creative's is 0.05), upright and quiet. A pale-blue shimmer at palms and soles, a ground ring within 6 blocks with dust of the block below, a low hum (the Sentries' thrusters, pitched down). No jets, no flame, no hunger. |
+| 3 | V | **Gravity Pull** | The first creature, dropped item or flying projectile within 24 blocks that is not his is yanked to 2 blocks in front of him: 3 damage and Slowness II for 2 s; a projectile is caught, an item lands at his feet. Not the bosses, not anyone pinned; no players with PvP off. Cooldown 4 s. |
+| 3 | Sneak + V | **Gravity Slam** | A ring of anti-gravity to 7 blocks: every creature in it that is not his and is not a boss takes **6 damage**, is thrown outward and pressed down, and is slowed for 3 s. Cooldown 8 s. |
+| 4 | B | **Upload** | Teleports him into the place of the drone he looks at (or the nearest within 48 blocks); the drone bursts into data; he is healed 8 (4 hearts) and loses harmful effects and fire. Cooldown 25 s. |
+| 4 | Sneak + B | **Hack** | A 1-second cast on an enemy Sentry within 32: it becomes his drone. At most 2 hacked at a time; never works on a body; in the boss fight the Sentry leaves the count. |
+| 4 | passive | **Second Life** | A blow that would kill him (after a Totem of Undying), with ability 4 ready and a drone within 64 blocks: the death is cancelled, he is set to 25% inside the drone, Resistance IV for 3 s; ability 4 then recharges for **5 minutes**. Not against the void or `/kill`. |
+| 5 | N | **Sentry Army** | Three drones assemble round him (1 s): 24 health, a 3-damage bolt every 2 s, red eyes. They follow him (catching up by teleport past 24 blocks), attack what hurt him or what he last hit and hostile mobs within 12, and never a player unless PvP is on and that player attacked. At most 6; each lasts 90 s and all fall apart if he dies, leaves, changes dimension or loses the power. Cooldown 20 s. |
+| 5 | Sneak + N | **Command** | All drones attack the creature he looks at within 32, or gather round him. |
+
+**Vision cuts the net:** within 48 blocks of a Vision (or White Vision), Upload, Hack and Second Life refuse ("Vision has cut
+your connection") and the HUD says "cut off". **PvP off:** his bolts, Overcharge, Pull and Slam neither hurt nor move players and
+his drones never target them. Creative and Spectator players are never touched by his abilities. **Rules:** the Hex bounces him like
+any hero (his drones follow his permission, as pets do); Quicksilver Time slows him and hangs his bolts; Billy's Freeze, Loki's Scepter
+and Mjolnir's pin work on him; he cannot lift Mjolnir; Magneto's metal control does nothing to him; nothing he does breaks a block.
+
+### 16.9 Looks
+
+Four looks, with **H** (Sneak + H goes back): **Ultron Prime (Age of Ultron)** (default: gunmetal plates, bronze pipes, a ridged
+crest and antennae, red-orange slit eyes; amber-gold plasma with a red edge), **Ultron Sentry** (matte black, a domed head, a red cheek
+light, a ribbed spine; blue plasma), **VisionQuest (the human avatar)** (long grey hair and beard, glasses, a long dark coat; red
+plasma; his eyes do not glow) and **Your own skin**. The skins use the 64x64 wide-arm layout; armour is hidden, so every detail is in
+the overlay layers. The eyes glow from masks of four slanted pixels (none at rest in the human look).
+
+### 16.10 MCU colours, commands and configuration
+
+| What | On screen | In the mod |
+|---|---|---|
+| Ultron's plasma | Amber-gold beams from the fingertips (the still from Seoul); his eyes and torso light glow red | Amber-gold with a white core and a red edge; red eyes and a red torso strip |
+| The Sentries | Blue idle, red when he is in them | Blue eyes and bolts; red when hunting or driven |
+| Anti-gravity | The Chitauri technology, pale blue | Pale blue shimmer, rings and motes (flight, Pull, Slam, the rim of the island) |
+| The net | Data, white and red | White and red square motes with scanlines (Upload, transfers, the tractor) |
+| The Key and Sokovia | Steel, cyan seams, cracked stone | Steel, `#7FD4FF` seams, tan rubble |
+
+* **Commands (operators):** `/enhanced boss start ultron` is the ritual without the Scepter (the Program in hand is used up, the arena is the block looked at, every
+  check is made); `/enhanced boss start ultron force` starts the fight at your feet with no Program and skips the site rules (not the
+  switch and not the sky), `/enhanced boss stop` ends it and gives the Program back, `/enhanced boss list`, `/enhanced boss cleanup
+  <center> <radius>` removes a boss's leftover creatures and projectiles (no blocks), `/enhanced power set <players> ultron [look]` and `/enhanced look <players> prime|sentry|human|own`.
+  The model viewer `/enhanced_model ultron|ultron_sentry|vibranium_key <state> [tick]` and `/enhanced_ultron_fx` are client tools for the artists.
+* **Configuration:** `[ultron_boss]` (the fight: the bodies' health, armour and decay, the damage of every attack, the Sentries, the lift: mode,
+  radius, height, depth, speed, and the field), `[ultron]` (the hero: his body, every ability's damage, range, pool, cost and cooldown, the drones,
+  Vision's range, lightning) and the shared `[boss]` (one fight at a time, the wipe, abandon and time limits, the reward). Every number in this
+  section is one of them.
+
+### 16.11 Sounds
+
+All synthesised, no samples. `ultron_awaken` (servos, plate hits, a rising electrical hum and a 7 kHz whistle, a boot chord), `ultron_bolt` (three
+FM zaps), `ultron_overcharge` (a rising whine and a boom), `ultron_servo`, `ultron_beam` (a detuned hum with crackle, a loop), `ultron_gravity` (a
+whomp), `ultron_lift_start` (stone cracking and a metal groan), `ultron_rumble` (a loop), `ultron_upload` (bit-crushed chirps and a modem warble),
+`ultron_speak` (three robot-voice chirps), `sentry_hover` (thrusters, a loop; the hero's flight plays it lower), `sentry_death`, `ultron_transfer`
+(overload, a falling saw and a chorus), `ultron_death` (a long power-down) and the **theme**: an original music box figure over a pulsing sub-bass, 32
+bars at 84 BPM in A minor (not Disney's "I've Got No Strings"), played while a body is within 96 blocks. Each has a subtitle.
+
+---
+
+## 17. Apocalypse (En Sabah Nur) — the boss and the hero **(added in 3.0)**
+
+> "Only the strong will survive." In *X-Men: Apocalypse* the first mutant, worshipped as a god for five thousand years, is woken in
+> Cairo in 1983 and sets out to remake the world; the only thing in the film that breaks his protection is the mind: Jean Grey's
+> Phoenix. In Enhanced he is a **boss** whose golden shield **stops everything except mind power** (the Scarlet Witch's and the
+> Phoenix's), and, for those who beat him, a **hero**.
+
+Apocalypse has two parts that share a name: the **boss fight** (17.1 to 17.8), which is the only way to get the power, and the **hero**
+(17.9 to 17.10) a player becomes with the reward. Both items are in the **Enhanced** creative tab. The boss is built on the shared boss
+framework (`boss/`, `BossFights`): the one-fight-at-a-time rule, the arena protection, the rewards and the gifts are the framework's;
+the entity, the shield, the attacks, the states and the speech are his.
+
+### 17.1 The Capstone and the ritual
+
+* **The Capstone** ("The golden tip of the pyramid. The sun feeds it."). Crafted, never found in a chest, so he is never met by
+  surprise: a Nether Star at the top, a Lapis Block in the middle of the second row and Gold Blocks on either side of it and across the whole
+  third row (a Wither, five Gold Blocks and a Lapis Block). Stack size 1, fireproof, epic, with the glint. A plain right-click only says "Plant it in the
+  sand, in the sun".
+* **Planting it.** **Sneak + right-click on a block** with the Capstone in either hand. The centre of the arena is the top face of that block.
+* **The checks**, all made before anything is used up; the first refusal is told to the starter in the action bar: the boss is switched on
+  (`apocalypse_boss.enabled`); the difficulty is not Peaceful; fewer than `[boss].maxActiveFights` (1) fights run on the server; the
+  dimension is in `ritualDimensions` (the Overworld); it is day and the block has sky above it (`ritualDaylightOnly`); the block is in the
+  tag `enhanced:ritual_ground`, sand and sandstone (`ritualNeedsSand`); the circle of 8 blocks round the click has 12 blocks of free air
+  above it, no liquid and at most 40 percent of its columns blocked; the arena and a margin are inside the world border; spawn
+  protection and claims allow a break at the middle and at the rim; and **a Scarlet Witch or a Phoenix is within 64 blocks**
+  (`requireBreaker`, `breakerRange`; Creative and Spectator players do not count), because a shield nobody can break is a fight nobody can win.
+  Nothing that is built on the ground is a reason to refuse: the arena is never edited.
+* **The awakening, 8 seconds.** The Capstone is used up (not in Creative). A column of gold light drives into the ground and
+  `apocalypse_awaken` swells; the sky and the air turn amber for everyone within 64 blocks; a **wall of sand**, 40 high, rises round a circle of 24
+  blocks radius; a violet portal opens above the middle; a flash, and he steps out facing the starter. For 3 seconds he is untouchable, his
+  shield knits from the ground up, his eyes are white. *"Who wakes the First One?"*, then *"Only the strong will survive."*
+* **Never by surprise, never by command.** `apocalypse`, `sand_lance`, `sand_boulder` and `sand_cocoon` cannot be `/summon`ed or spawned from
+  an egg (`noSummon`), none is saved with its chunk (`noSave`), and an entity of the fight that is loaded without a live fight of its own is
+  discarded: after a crash nothing is left. Operators have `/enhanced boss start apocalypse [force]` (17.11); `force` skips the checks of the
+  ground, the sky and the breaker, never the switch, Peaceful or the one-fight rule.
+* **When it is given back.** If the fight ends for a reason that was not the players' doing (the server stops, Peaceful, an operator's
+  stop, the withdrawal for want of a breaker), the Capstone is returned (as a gift at the next login if the server is stopping). After a wipe,
+  an abandoned fight or the time limit it is not.
+
+### 17.2 The body
+
+One creature, one boss bar. The model is a hand-made biped of **24 cubes** on a **128 x 64** texture (`client/render/ApocalypseCubes`,
+the one table the model, the texture painter and the tests read; the 10 that exist on both sides are listed once and drawn mirrored with the
+same texels, so 34 boxes are drawn): a player-like skeleton (head, body, two arms, two legs) with the armour built on it as cubes of their own, which a player
+model cannot do (the domed cap, the cables, the flared collar, the pauldrons, the cloak's strips). A cube is armour, cap, cloth or body; in
+the **true form** the armour is gone and the rest stays.
+
+| Form | Drawn at | Hitbox | Health | Armour / toughness | Speed |
+|---|---|---|---|---|---|
+| **Armoured** (phases 1 to 3) | 1.35 times | 0.9 x 2.9 | `bodyHealth` (900) x (1 + 0.5 (n-1)) for n counted fighters, up to 6 | 10 / 6 | walks |
+| **True form** (after the third shield) | 1.2 times | 0.8 x 2.5 | the same pool | none | 28 percent faster (0.36) |
+
+He **walks** (he does not fly), keeps 8 to 14 blocks from the nearest fighter, and when he has found no path to anyone for 3 seconds he
+steps through a portal. He cannot be pushed, set on fire, poisoned, withered, drowned or suffocated; **every mob effect is refused** (except
+Glowing); the Hex bounces him (never kills him); Mjolnir's pin, Billy's Freeze, Loki's Scepter, telekinesis, shapeshifting and the Phoenix's
+reading and possession do nothing. A hit takes at most **12 percent** of his maximum health (`maxHitFraction`), explosions do half.
+His health follows the number of fighters: it is recomputed at the start of every transition and every phase, and he keeps the fraction of health
+he has.
+
+### 17.3 The shield: the one rule
+
+**Mind power wears the shield down. Nothing else touches him.** The test (`apocalypse/MindPower`) is a pure function of the damage: it counts if and
+only if its damage type is in the data tag `enhanced:mind_power` (the Chaos Beam, a telekinetic slam, the Phoenix Burst), its causing
+entity is a player whose power is in `mindPowerHeroes` (Scarlet Witch and Phoenix by default, so a slam thrown by Magneto or Billy is not mind
+power), and it arrives as damage. The same function is the hero's shield's own rule (17.9).
+
+| Hit | While the shield is up |
+|---|---|
+| Chaos Beam | amount x `chaosBeamFactor` (1): 5 a hit, one hit per attacker every `mindHitCooldownTicks` (10) |
+| A telekinetic throw (a creature, an item, a block) | amount x `slamFactor` (1) |
+| Phoenix Burst | amount x `phoenixBurstFactor` (**5**): a Burst of 30 takes 150, **breaking shield 1 at once for a lone fighter** (150; 203 for two) |
+| Phoenix throws | as the Scarlet Witch's |
+| Phoenix Mind Control, Psionic Field | a **strain** (25 and 60 points) even if refused |
+| Everything else (swords, arrows, TNT, fire, potions, pets, Mjolnir, lightning, Magneto's shrapnel, Vision's beam, Billy's Hex Bolt, the stones, the other heroes) | **nothing**: no damage, no knockback, a golden ripple and a chime (`apocalypse_shield_hit`) |
+
+The server owner can add `"billy"` or `"vision"` to `mindPowerHeroes` and they then count with the same damage types. The shield's strength is
+`shieldStrength` (150) x `shieldGrowth` (1.25) ^ (phase - 1) x (1 + `shieldPerExtraPlayer` (0.35) (n - 1)): **150, 188, 234** for one fighter,
+255, 319, 398 for three. It knits in 40 ticks, 2 seconds (nothing hurts him then), mends 3 percent a second once 8 seconds (`shieldRegenDelayTicks`
+160) have passed with no mind power, and he heals 4 a second (`regenPerSecond`) while it is up, never above the part of the fight he is in.
+The boss bar is blue (his health, with notches at the floors) and a second, yellow bar for the shield ("broken" with the seconds left,
+"forming").
+
+### 17.4 The fight, phase by phase
+
+| Part | What happens |
+|---|---|
+| **Phase 1: The God Awakens** (100% to 66%) | Shield 1. Sand Lances, Sand Wave, Sand Spikes, Boulder Barrage, Portal Step, Backhand. |
+| **Window 1** | The shield breaks: he kneels (staggered 3 s, attacking nothing), 10 s (`windowTicks` 200) in which **everything hurts him**, x1.25 (`windowDamageFactor`), armour counting. His health cannot fall below **two thirds** (the floor); reaching it ends the window. If nobody does enough, the shield re-forms at full strength. After the kneel he fights on with Lances, Backhand and Spikes at half speed. |
+| **Transition 1** (6 s) | Untouchable; **the Four Horsemen** step out of four portals; shield 2 forms. *"Rise, my Horsemen."* |
+| **Phase 2: The Horsemen** (66% to 33%) | Shield 2. **Entomb, Mind Crush and one Tornado** join. Window 2 (floor at one third). |
+| **Transition 2: the Cairo Collapse** (8 s) | He floats up, the sky goes dark ochre, **three rings of sand** cross the arena (30 ticks apart); any Horseman still alive crumbles; shield 3 forms. *"Everything they've built will fall..."* |
+| **Phase 3: Unmasked** (33% to 5%) | Shield 3. **Three Tornadoes at once.** Its break has **no window**: |
+| **The armour falls** | The plates fly off (collar, pauldrons, chest, gauntlets, the crown of the cap), the shield is gone for good, he is in the **true form**, and **everything hurts him fully**, with no window; his health stops at 15% until the Escape has been tried, then at 5% (the kneel), so both always happen. If he is not hurt for 80 ticks he heals 3 a second (`trueFormRegenPerSecond`). |
+| **The Escape** (once, at 15%) | A hand rises; a violet portal grows over him for 100 ticks (`escapeChannelTicks`). **Interrupted by any lightning damage (Thor's), by `escapeInterruptFraction` (4%) of his health in damage during the channel, or by a Hex wall.** Interrupted: staggered 6 s and never again. Not interrupted: he vanishes and returns 10 s later at `escapeHealTo` (40%) with a fresh shield 3. The blow that earns the Escape starts it before his healing can mend him. |
+| **The end** (5%) | Untouchable and kneeling: *"All is revealed."* He dies **in the Phoenix's fire, layer by layer** if a Phoenix dealt Burst or throw damage in the last `phoenixFinishSeconds` (15), otherwise in a column of sand (`apocalypse_death`). He drops nothing. |
+
+The fight is meant to last 6 to 10 minutes for two or three equipped players (a lone Scarlet Witch: 8 to 12, mostly dodging). The two
+floors are why a fight can never be won early, whatever damage a group brings.
+
+### 17.5 The attacks and their tells
+
+Every attack that can hurt has a **tell** (a pose, a glow, a sound) and then a **fixed aim moment**; after it, it does not follow. His sand is
+**sand, not metal** (Magneto's shield does not catch it). He chooses by weight among the attacks that are ready and in range, never the
+same twice in a row; damage scales with difficulty like a mob's.
+
+| Attack | From | Tell (and the lock) | What it does |
+|---|---|---|---|
+| **Sand Lances** | 1 | The right hand rises, the fingers pinch; five thin ochre lines from the palm to the chest (locked 6 ticks before) | `lanceCount` (5) in a flat fan, **6** each. Billy and the Phoenix can catch them and throw them back |
+| **Sand Wave** | 1 | Both arms sweep low; a faint lane on the ground, 4 wide (locks just over halfway) | A ridge 1.1 blocks tall: **10**, knockback, Slowness II; lower than a jump's peak |
+| **Sand Spikes** | 1 | A fist rises and slams; an amber ring under each of up to four players, tracking, then locked | Spikes in each ring: **9**, launched up |
+| **Boulder Barrage** | 1 | Both arms rise; three blocks of sand tear out of the ground and orbit over his head with a growing hum; amber lines to up to three players | Three boulders: **11** each; can be caught and thrown back |
+| **Portal Step** | all | Violet shards at his feet; a second ring opens at the exit, usually behind the player farthest from him | An arrival shockwave: **6**, knockback. A Hex wall refuses it |
+| **Backhand** | all | The arm drawn across the chest (8 ticks) | **16**, strong knockback |
+| **Entomb** | 2 | His hand reaches to the player who wore the shield most; a stripe of sand crawls to their feet and locks 10 ticks before the hand closes | If still on the spot: a **cocoon** for `entombTicks` (100): no movement, jumping, flight, attacks, items or powers; 1.5 a second, never below two hearts; `cocoonHealth` (20) to break it. A complete Chaos Shield skips it; a phased Vision is intangible; `enhanced:entomb_immune` |
+| **Mind Crush** | 2 | Two fingers to the temple, his eyes flash white-violet, a violet ring contracts from 28 blocks to nothing (2 s) | Everyone within `mindCrushRange` (28): Nausea (120), Slowness 3 s, Blindness 2 s. **Magneto's helmet turns it away.** A Phoenix who touches him with Mind Control or the Psionic Field during the tell interrupts it. The Chaos Shield does not stop it |
+| **Tornado** | 2 (one), 3 (three) | Both arms rise; the sky above darkens; dust spirals up at one to three spots | Funnels for 160 ticks that drift toward the nearest player, slower than a walk: 2 every half second, and they lift what is inside |
+| **Cairo Collapse** | T2 | The ground ripples; he floats up, arms wide | Three rings: **12**, strong knockback |
+
+The Lances and Boulders are entities (`sand_lance`, `sand_boulder`, both of `AbstractSandProjectile`) that implement `ShieldCost`, so the Chaos Shield
+stops them and pays for their damage, and a projectile that Billy or the Phoenix catches is thrown back like any other. His blows are the damage types `sand`, `apocalypse_blow` and `entomb`.
+**No attack ever changes a block**: the sand wave, the spikes, the tornadoes and the wall are effects and entities, so mobGriefing changes nothing and there is
+nothing to restore after the fight.
+
+### 17.6 The Four Horsemen
+
+At Transition 1 he enhances **Husks** (vanilla desert mobs): `min(horsemenMax (4), 1 + fighters)`, in the order War, Famine, Pestilence, Death. Each is
+named, glows, has `horsemanHealthFactor` (2) times a Husk's health, `horsemanDamageBonus` (4) more attack damage, a little more speed and armour,
+and **drops nothing and gives no experience**. They live until killed or until Transition 2. They are ordinary creatures: Wanda can lift them,
+a Phoenix can take one over, Billy can freeze them. A Magneto hears, once, "Join me, Erik."
+
+| Horseman | Gear | Trick |
+|---|---|---|
+| **War** | iron helmet, chestplate, axe | **Shard Volley** every 5 s: three iron shards hover, then fly in a fan, 4 each (Magneto can catch them) |
+| **Famine** | none | **Gale** every 6 s: white lightning on the hands, a bolt falls beside the target, a gust blows back (3; Thor takes no lightning damage but the wind still pushes) |
+| **Pestilence** | iron sword | **Psi-Blade Dash** every 5 s: the sword glows violet, a six-block leap: 7 and Slowness |
+| **Death** | none | **Dive** every 7 s: he springs up, hangs, dives with a slam: 9 in a radius of 2.5 |
+
+### 17.7 The arena, and when it goes wrong
+
+* **Protection** (from the planting to the end, a circle of the arena + 8): no block is placed or broken, no fluid, bucket, piston or TNT works,
+  explosions break nothing, and the mod's own block-changing abilities refuse. **The wall of sand** (4 outside the arena, 40 high) is solid to
+  players and to what they throw; whoever touches it is pushed back once a second for `fieldDamage` (1) that cannot kill, and flight ends at
+  its top. Ender Pearl, Chorus Fruit, the Bifrost, Vanish, the Tesseract, the Witches' Road and Vibrate cannot take anyone out of the circle, and nothing
+  takes anyone in. Anyone more than 8 blocks underground is lifted back by a violet tractor of sand. A dead fighter's drops never despawn while the
+  fight lasts and get a fresh five minutes after it.
+* **Everyone dead** for 15 s: *"You are not worthy yet."* He withdraws, the Horsemen crumble; no reward, no refund.
+* **Nobody within 64 blocks** for 90 s: the fight is abandoned. **25 minutes**: he withdraws (no refund).
+* **No breaker**: if no Scarlet Witch or Phoenix is alive in the arena for `noBreakerSeconds` (60) while the shield is up, he withdraws and the
+  Capstone is given back.
+* **A crash** leaves nothing: entities are not saved; at the next load any entity of the fight is swept as an orphan.
+
+### 17.8 The reward: the Essence of En Sabah Nur
+
+"A sapphire soul in gold veins. It looks for a body." Never crafted, never in a chest; stack 1, fireproof, epic, with the glint.
+
+* **Who gets one:** every fighter who stayed at least `[boss].rewardMinSeconds` (60) and dealt any damage to him **or to his shield** (so a Scarlet Witch who only wore
+  the shield down is rewarded like the one who landed blows), and whoever landed the last blow whatever their time; never a Creative or Spectator player (unless
+  `creativeGetsReward`); pets credit nobody. Each also gets 1,500 experience. It goes into the inventory, else drops at their feet for them alone, never despawning (no time limit); a
+  dead or offline fighter gets it as a gift at the next login or respawn. `dropsPhoenixEmber` (off) also gives a Phoenix Ember to a fighter with no power.
+* **Awakening.** A player with **no power** who **holds right-click for `essenceRitualTicks` (60, three seconds)** is moved into it (`AwakeningItem`): blue wisps
+  with gold veins spiral in with a heartbeat (`essence_transfer`), the skin turns blue, a harmless lightning flash, and the Essence is used up (not in
+  Creative): **Apocalypse**. Letting go early uses nothing. A player with a power is told "Your body already holds a power".
+
+### 17.9 Becoming Apocalypse: the abilities
+
+**40 health** (+20), **armour 10, toughness 4**, +50% knockback resistance, a **healing factor** of half a heart a second after 5 seconds without damage; his own
+sand never hurts him. Keys **R G V B N** (Sneak for the other).
+
+| # | Key | Ability | How it works |
+|---|---|---|---|
+| 1 | R | **Sand Wave** | A ridge of sand from his feet along the ground, `waveLength` 18 long and 4 wide, 0.9 blocks a tick: **8 damage**, knockback, Slowness II for 2 s, each creature once. Needs ground within 6 blocks below. Cooldown 3 s. |
+| 1 | Sneak + R | **Entomb** | A creature or player within 24 (`entombRange`): sand climbs its legs into a cocoon for **80 ticks**: no moving, jumping, flying, attacking, items or powers; 1 damage a second, never below two hearts; friends free it by hitting the cocoon (16 health). Not on bosses, a phased Vision, Creative or Spectator, a complete Chaos Shield; players only with PvP on. Cooldown 12 s. |
+| 2 | G (toggle) | **Levitation** | Survival flight at **0.08** (Creative's is 0.05), upright and calm, with sand motes at his feet and a ring at take-off. |
+| 3 | V | **Portal** | A violet portal to the spot he looks at within 40 (on top of the block or in front of it). He takes every tamed pet and teammate within 3 blocks and every other player within 3 who is sneaking (stepping in is consent). The Hex wall judges every traveller, a pinned one stays, and nobody leaves a boss arena. Cooldown 8 s. |
+| 4 | B (hold) | **Apocalypse's Shield** | A golden hexagonal sphere (radius 2.4): 10 ticks to form, **stops nothing until complete**, then stops every kind of damage **except mind power** (and except falls, drowning, suffocation, starvation, the void and `/kill`). Projectiles are neutralised before they hit; Mjolnir and Stormbreaker are turned back to Thor. Held up to **6 s**, **60 points of strength**; what it stops wears it by `shieldOtherWear` (0.5) of the damage, **mind power in full** (the Burst five times over), and when it breaks the rest of that blow comes through. Recharge 8 s (20 s after it shatters), a little food. |
+| 5 | N | **Power Bestowal** | An ally within 24 (a player, a tamed pet, an Iron Golem or a villager; "You only enhance your own") is **Empowered** for 1,200 ticks: +3 attack damage, +4 armour, +10% speed, half a heart every 2 s, and a hero's ability cooldowns recharge 1.5 times as fast; a golden aura. At most 2 at once (a third replaces the oldest). Cooldown 20 s. |
+| 5 | Sneak + N | **Sandstorm** | A funnel of sand round him for 120 ticks, radius 7, following him: every half second everything he may hurt takes **2** and Slowness, **projectiles that enter are slowed to half**, and it blots out the sight of those inside. Allies are unaffected. Cooldown 30 s. |
+
+**Rules.** The Hex bounces him like any hero unless Wanda allowed him; Mjolnir's pin stops his levitation and portal; his sand and storm ignore a Hex
+wall. Magneto's powers do nothing to him unless he wears iron, chainmail or gold (he is flesh and sand is not metal). With **PvP off** his Wave, Entomb
+and Sandstorm do not hurt, hold or slow any player (mobs always); the shield, portal and Bestowal still work. A Spectator Apocalypse can use nothing;
+Creative players are never swept or entombed and pay no hunger. `apocalypse.shieldOtherWear` at 0 makes the hero's shield cost nothing (the literal
+rule); **the boss's shield always uses the literal rule.**
+
+### 17.10 Looks and art
+
+Two looks and the player's own skin, chosen with **H** (Sneak + H goes back); the abilities are the same in every one. Skins are 64 x 64, classic
+(4 px) arms, an opaque base layer and no semi-transparent pixel; the eyes are glow masks (`apocalypse_eyes*`).
+
+| Look id | Look | What it is |
+|---|---|---|
+| `apocalypse` | **X-Men: Apocalypse (1983)** (default) | Teal-blue skin, blank white eyes, a domed gunmetal cap with a leaf engraved on the brow, ribbed black cables down the sides of the face, a wide pewter lace collar and shoulder plates, dark verdigris armour with a cyan glyph on the chest, black gloves, a hooded teal cloak. |
+| `en_sabah_nur` | **En Sabah Nur (3600 BC)** | The god-king in gold: a falcon-beaked helm with red cabochon eyes, a broad collar of gold, teal, lapis and red, teal chevrons on gold armour, a pleated kilt and sandals. His eyes glow red. |
+| (own) | **Your own skin** | His powers in your own skin. |
+
+The boss has two textures on the 128 x 64 sheet (`apocalypse_boss`, armoured, and `apocalypse_boss_true`, with its gold cracks), each with a glow layer
+(`..._eyes`: his eyes `#FFF6D8`, the glyph on the chest `#59C3CF` and the engraving of the cap `#3FA0FF`, drawn with the eyes render type); the effects have
+their own (`sand_swirl`, an animated strip of four square frames for the wall and the tornadoes; `golden_web`, the shield's hexagonal lattice with knots of `#FFF2B0`;
+`sand_cocoon` and `sand_cocoon_cracks`). The art is drawn by generators written for the lane (Python and PIL, with a renderer that
+reproduces the cube table so the model can be looked at without the game), not by hand, so a change of colour is a change of a palette. The Capstone (three
+frames) and the Essence (four) are animated.
+
+### 17.11 MCU colours, commands and configuration
+
+| What | On screen | In the mod |
+|---|---|---|
+| The shield | Fan wikis describe a yellow-hued energy shield that held against Storm, Cyclops and Magneto but "did not protect him from Phoenix's power for long" (the recap says only that he obliterates the projectiles; the colour is the wikis', the hexagonal web is borrowed from the web-like cocoon of the 3600 BC scene, which the artists built on microscopic bone tissue) | **Shield gold**: a sphere knit from a hexagonal web, core `#FFF2B0`, main `#F5C84A`, edge `#E39B1B`, deep `#8A5A0E`. The same for the hero's shield and the Bestowal. `Power.APOCALYPSE` is `0xF2B84B` / `0xFFF0B8` |
+| His portals and the Mind Crush | "An immense sphere of violet light", a ring of pink-violet shards (the actor said the first stills made him look purple because of the portal's light) | **Teleport violet**: core `#F0D4FF`, main `#B04FD8`, body `#7A2EC8`, fringe `#3F1A7A`; the Mind Crush's ring and eyes white `#F4F4F4` and violet |
+| His sand | Warm ochre and amber, the Cairo stills are sepia with dust haze | **Sand**: light `#E6CB86`, main `#D8B76A`, shade `#B8934A`, deep `#8C6B2F`; the haze of the arena's air `#C9A862` |
+| The Essence, the transference and the cap | At the altar his soul is a sapphire-blue gaseous energy and golden liquid runs through circuit-like symbols; the capstone's energy feeds down through golden veins | **Soul-glow**: sapphire `#3FA0FF`, core `#D8EEFF`, gold vein `#F5C84A` |
+| His death | Jean's orange phoenix; his body torn apart layer by layer, a grey skull with red muscle in a shower of orange-gold sparks | The Phoenix's fire palette (core `#FFF4C2`, gold `#FFD65A`, main `#FF8A1F`, ember `#E2531A`) and the dissolve layer by layer |
+| His voice in chat and title | His skin, a steel blue | `#4A9BC4` (`Power.titleColor`) |
+
+* **Commands (operators):** `/enhanced boss start apocalypse force` starts the fight at your feet (no Capstone; without `force` the command is the ritual and needs a Capstone in hand and a block in sight), `/enhanced boss stop` ends it and gives the Capstone
+  back, `/enhanced boss list`, `/enhanced boss cleanup <center> <radius>` (removes strays of the boss framework in a radius; he edits no block, so there is never a site to restore), `/enhanced power set <players> apocalypse [look]` and
+  `/enhanced look <players> apocalypse|en_sabah_nur|own`. The model viewer `/enhanced_model apocalypse <state> [tick]` is a client tool for the artists.
+* **Configuration:** `[apocalypse_shield]` (what counts as mind power and how much each kind wears the shield), `[apocalypse_boss]` (the fight: health, the shield's
+  numbers, the windows, the Escape, every attack's damage, the Horsemen, the arena), `[apocalypse]` (the hero: his body, every ability's damage, range,
+  cooldown and cost) and the shared `[boss]`. Every number in this section is one of them.
+
+### 17.12 Sounds
+
+All synthesised, no samples, no part of the film's score. `apocalypse_awaken` (a deep rumble, grinding stone and a choir chord rising to a gong),
+`apocalypse_portal` (a reversed crystalline shimmer and a soft thump), `sand_wave`, `sand_spike`, `sand_storm_loop` (a loop), `entomb`, `entomb_break`,
+`apocalypse_shield_up` (gold chimes), `apocalypse_shield_hit` (a glassy tink), `apocalypse_shield_break` (glass over a sub-boom), `apocalypse_mind_crush`,
+`apocalypse_speak` (a low breathy "ah" under every line he says), `apocalypse_bestow`, `essence_transfer` (a heartbeat at 60 per minute under a rising shimmer),
+`apocalypse_death` and **two themes**, played while he is within 96 blocks (full volume within 64): an original loop of 6/8 in D Phrygian dominant, a drone, a frame drum, an
+end-blown flute and a choir, 96 seconds (60 bars); and a fuller loop of 64 seconds (40 bars) for the third phase, with a second drum, rising strings and a
+faster pulse. They share one bar so that their pulses agree; both loop without a seam. Every effect has a subtitle in English and Hebrew; the music does not.
+
+### 17.13 Tests
+
+122 game tests in eight classes: `ApocalypseRitualTests` (7: every refusal of the ritual and what is used up), `ApocalypseShieldTests` (17: the rule of mind
+power, every kind of hit against the shield, the windows, the floors), `ApocalypseBossTests` (18: each attack and its tell, the Horsemen), `ApocalypseFightTests`
+(22: the phases, transitions, the Escape, the end, the rewards, the failures), `ApocalypseTests` (23: the hero's five abilities, the body, the Essence),
+`ApocalypseReviewTests` (5: what the review found: the end of the arena told to everyone, Creative players not counted as fighters, the Sandstorm slowing a lance,
+Quicksilver Time slowing his tells and his Horsemen, a tornado kept in the arena), `ApocalypseAnimationTests` (14) and `ApocalypseClientTests` (16: the cube table, the poses, the tells, the music and the amber air, and the art). Any test that touches a fight has a
+batch of its own (`apocalypse_...`), because a window nobody uses is lost; the pure ones share `apocalypse_pure`. The art is pinned by the tests too: no two regions of
+the texture overlap, every texture is the size the model reads, and the glow masks light only a small part of the sheet. `DataTests` checks the lang in both languages, the subtitles and that every
+`.ogg` exists.
