@@ -70,8 +70,8 @@ public final class ThanosGestures {
                 .key(0, S).m(-8, 0, 8).o(-8, 0, -8).lean(0).drop(0).legs(0, 0)
                 .key(6, E).o(-175, 0, -12).m(-60, 0, 12).lean(-6).drop(0).legs(0, 0)
                 .key(10, S).o(-175, 0, -12).m(-60, 0, 12).lean(-6).drop(0).legs(0, 0)
-                .key(12, I).o(12, 0, -10).m(-20, 0, 8).lean(10).drop(0.20F).legs(-24, -24)
-                .key(14, S).o(12, 0, -10).m(-20, 0, 8).lean(10).drop(0.20F).legs(-24, -24)
+                .key(12, I).o(-4, 0, -10).m(-20, 0, 8).lean(12).drop(0.24F).legs(-26, -26)
+                .key(14, S).o(-4, 0, -10).m(-20, 0, 8).lean(12).drop(0.24F).legs(-26, -26)
                 .key(22, S).o(-8, 0, -8).m(-8, 0, 8).lean(0).drop(0).legs(0, 0);
     }
 

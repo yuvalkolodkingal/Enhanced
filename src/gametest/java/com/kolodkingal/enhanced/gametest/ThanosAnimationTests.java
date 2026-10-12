@@ -178,8 +178,8 @@ public final class ThanosAnimationTests {
         Gestures.Def slam = Gestures.get(GestureId.THANOS_SLAM);
         assertPose(pose(keyAt(slam.o, 6)), new float[]{-175, 0, -12}, 1.0E-4, "at tick 6 the Gauntlet is overhead");
         assertPose(pose(keyAt(slam.o, 10)), new float[]{-175, 0, -12}, 1.0E-4, "and held there to tick 10");
-        assertPose(pose(keyAt(slam.o, 12)), new float[]{12, 0, -10}, 1.0E-4, "at tick 12 it has been driven down past the hip");
-        assertNear(slam.drop.scalar(12.0F, -1.0F), 0.20, 1.0E-4, "the body sinks 0.2 blocks with the blow");
+        assertPose(pose(keyAt(slam.o, 12)), new float[]{-4, 0, -10}, 1.0E-4, "at tick 12 it has been driven down, nearly straight, to the ground");
+        assertNear(slam.drop.scalar(12.0F, -1.0F), 0.24, 1.0E-4, "the body sinks 0.24 blocks with the blow");
         for (float t = 0.0F; t <= 10.0F; t += 1.0F) {
             assertNear(slam.drop.scalar(t, -1.0F), 0.0, 1.0E-6, "and does not sink while the Gauntlet is going up, tick " + t);
         }
