@@ -190,7 +190,9 @@ public final class ApocalypseTests {
         check(ticks >= hold - 1 && ticks <= hold + 1, "the hold takes three seconds: " + ticks);
         check(Powers.power(player) == Power.APOCALYPSE, "and awakens Apocalypse: " + Powers.power(player));
         check(player.getMainHandItem().isEmpty(), "the Essence is used up");
-        check(player.getHealth() == health && !player.isOnFire(), "with no damage and no fire: health " + player.getHealth() + " of " + health + ", fire ticks " + player.getRemainingFireTicks());
+        // (His healing factor may have mended a point in the very tick he awoke: the body is 40 health now and the wait for quiet is
+        // counted from before the world began, so it is "no less", not "the same".)
+        check(player.getHealth() >= health && !player.isOnFire(), "with no damage and no fire: health " + player.getHealth() + " of " + health + ", fire ticks " + player.getRemainingFireTicks());
         log.drain();
         check(log.titled("power.enhanced.apocalypse"), "the title is shown");
         check(log.said("power.enhanced.apocalypse.broadcast"), "and the whole server is told");
