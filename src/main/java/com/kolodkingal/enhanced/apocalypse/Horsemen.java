@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.apocalypse;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
@@ -222,6 +223,9 @@ public final class Horsemen {
 
     private void tickRider(ServerLevel level, Rider rider, long now, List<ServerPlayer> targets) {
         Husk husk = rider.husk;
+        if (SlowMotion.skipTick(husk)) {
+            return; // Quicksilver Time: the Husk lives slower, and so does its trick
+        }
         if (rider.strike > 0) {
             strike(level, rider);
             return;

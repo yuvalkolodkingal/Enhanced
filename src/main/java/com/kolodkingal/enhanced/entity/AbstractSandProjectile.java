@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.entity;
 
+import com.kolodkingal.enhanced.ability.ApocalypseAbilities;
 import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
@@ -69,6 +70,9 @@ public abstract class AbstractSandProjectile extends ThrowableProjectile impleme
             return;
         }
         double scale = SlowMotion.timeScale(this);
+        if (getPersistentData().getBoolean(ApocalypseAbilities.SLOWED_TAG)) {
+            scale *= 0.5; // a Sandstorm slowed it to half, once (the flight below would otherwise undo it at once)
+        }
         if ((life += scale) > MAX_LIFE) {
             vanish();
             return;

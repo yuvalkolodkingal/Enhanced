@@ -108,6 +108,83 @@ public final class ApocalypseReviewTests {
         });
     }
 
+    @GameTest(template = ARENA, batch = "apocalypse_review_storm", timeoutTicks = 100)
+    public static void aSandstormSlowsALanceToHalfAndItStaysSlow(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerLevel level = f.level();
+        ServerPlayer hero = f.player(10.5, FLOOR, 10.5, Power.APOCALYPSE);
+        hero.setHealth(hero.getMaxHealth());
+        ServerPlayer shooter = f.player(3.5, FLOOR, 3.5); // a lance a player shot is a player's own: the orphan sweep leaves it alone
+        hero.setShiftKeyDown(true);
+        AbilityHandler.onKey(hero, 5, true);
+        hero.setShiftKeyDown(false);
+        check(Powers.get(hero).is(Live.SANDSTORM), "the storm is up");
+        SandLanceEntity inside = lance(level, shooter, helper.absoluteVec(new Vec3(12.5, FLOOR + 1.0, 10.5)));
+        SandLanceEntity outside = lance(level, shooter, helper.absoluteVec(new Vec3(19.5, FLOOR + 1.0, 10.5)));
+        PowerTicker.tick(hero);
+        check(inside.getPersistentData().getBoolean(ApocalypseAbilities.SLOWED_TAG), "the lance in the storm is marked slowed");
+        check(!outside.getPersistentData().getBoolean(ApocalypseAbilities.SLOWED_TAG), "the one beyond it is not");
+        every(helper, 4, tick -> {
+            if (tick == 3) {
+                // The lance flies at its own speed every tick (the air takes nothing from it): the slowing must survive that.
+                assertNear(inside.getDeltaMovement().length(), 0.95, 0.05, "it flies at half its speed, tick after tick");
+                assertNear(outside.getDeltaMovement().length(), 1.9, 0.05, "the one beyond the storm at its full speed");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private static SandLanceEntity lance(ServerLevel level, ServerPlayer owner, Vec3 at) {
+        SandLanceEntity lance = new SandLanceEntity(ModEntities.SAND_LANCE.get(), level);
+        lance.launch(owner, at, new Vec3(0.0, 1.0, 0.0), 1.9F, 6.0F);
+        level.addFreshEntity(lance);
+        return lance;
+    }
+
+    @GameTest(template = ARENA, batch = "apocalypse_review_slow", timeoutTicks = 150)
+    public static void quicksilverTimeSlowsHisTellsAndTheTricksOfHisHorsemen(GameTestHelper helper) {
+        Duel d = duel(helper, 1, Power.QUICKSILVER);
+        ServerPlayer speedster = d.hero();
+        ApocalypseEntity boss = d.boss();
+        ServerLevel level = d.level();
+        AbilityHandler.onKey(speedster, 1, true);
+        AbilityHandler.onKey(speedster, 1, false);
+        PowerTicker.tick(speedster);
+        check(Powers.get(speedster).slowMo(), "Quicksilver Time is on");
+        SlowMotion.clear(); // (the zones are cached for the tick, and were cached before the time was on)
+        Husk war = d.fight().horsemen().spawn(level, Horsemen.Kind.WAR, helper.absoluteVec(new Vec3(14.5, FLOOR, 14.5)));
+        war.setNoAi(true);
+        Set<UUID> volley = new HashSet<>();
+        every(helper, 140, tick -> {
+            PowerTicker.tick(speedster); // (the world is slowed for as long as he keeps the time)
+            for (IronShrapnelEntity shard : shards(level, war)) {
+                volley.add(shard.getUUID());
+            }
+            if (tick == 3) {
+                check(boss.brain().force(boss, d.fight(), ApocalypseAttack.LANCES), "a Lance attack begins");
+            }
+            if (tick == 33) {
+                // Thirty ticks on, a tell of 14 ticks would long have fired; slowed fivefold it is at its sixth.
+                check(boss.brain().attack() == ApocalypseAttack.LANCES, "his tell is still going, slowed with the rest: " + boss.brain().attack());
+                int ticks = boss.brain().attackTicks();
+                check(ticks >= 4 && ticks <= 8, "at about a fifth of the pace: " + ticks);
+            }
+            if (tick == 75) {
+                check(volley.isEmpty(), "the War Horseman's volley is not fired yet: its tell is slowed as well");
+            }
+            if (tick == 135) {
+                check(volley.size() == 3, "but it comes, three shards: " + volley.size());
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private static List<IronShrapnelEntity> shards(ServerLevel level, Husk husk) {
+        return level.getEntitiesOfClass(IronShrapnelEntity.class, new AABB(husk.blockPosition()).inflate(40.0), shard -> shard.getOwner() == husk);
+    }
+
     @GameTest(template = ARENA, batch = "apocalypse_review_tornado", timeoutTicks = 120)
     public static void aTornadoFollowsAVictimOnlyAsFarAsTheArena(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.NONE);

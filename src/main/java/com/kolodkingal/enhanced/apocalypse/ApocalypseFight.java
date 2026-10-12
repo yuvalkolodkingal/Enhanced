@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.apocalypse;
 
 import com.kolodkingal.enhanced.ability.PhoenixPower;
+import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.boss.BossBars;
@@ -375,9 +376,18 @@ public final class ApocalypseFight extends BossFight {
                 closeWindow();
             }
         }
-        if (staggerLeft == 0 && !isOver()) {
+        if (staggerLeft == 0 && !isOver() && thinks()) {
             boss.brain().tick(boss, this);
         }
+    }
+
+    /**
+     * Whether his controller gets its turn this tick. Quicksilver Time makes everything near the speedster run slower, him
+     * too (until he adapts to it, {@link ApocalypseEntity#slowFactor}): his tells and his blows take the longer, as his walk
+     * does. The body is slowed by the game; the controller runs from the fight, so it asks.
+     */
+    private boolean thinks() {
+        return !SlowMotion.skipTick(boss);
     }
 
     /** The most health the phase's shield lets him have: all of it, then two thirds, then one third. */
@@ -697,7 +707,7 @@ public final class ApocalypseFight extends BossFight {
                 boss.brain().setAfterStagger(false);
                 boss.brain().setInWindow(false);
             }
-        } else {
+        } else if (thinks()) {
             boss.brain().tick(boss, this);
         }
         // What the blow that brought him to the floor did comes first: his healing must not mend him past the line (he is held
