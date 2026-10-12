@@ -15,7 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
  *
  * <p>Events that are not about the power's life (damage, targeting, effects, projectiles) are not here: a hero
  * subscribes to them in a class of its own ({@code @EventBusSubscriber}), with the priorities listed in
- * {@code docs/3.0-fragments/README.md} so that independent subscribers compose.
+ * {@code docs/HEROES-AND-BOSSES.md} so that independent subscribers compose.
  */
 public interface HeroServer {
     /** The hero this plug-in is the server side of. */

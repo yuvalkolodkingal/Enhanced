@@ -23,7 +23,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 /**
- * Ultron's own game-bus events, at the priorities of {@code docs/3.0-fragments/README.md}: the damage bonuses
+ * Ultron's own game-bus events, at the priorities of {@code docs/HEROES-AND-BOSSES.md}: the damage bonuses
  * (lightning, the Mind Stone beam), the body's own pipeline of a blow, the fighters who fall, and what the hero's body
  * does about it: no fall damage, no Poison or Wither, and Second Life. (The rest of what the fight needs is in the
  * entities and the fight, or is the framework's; the hero's five abilities are {@code UltronAbilities}.)

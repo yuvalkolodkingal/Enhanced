@@ -16,7 +16,7 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /**
- * The game-bus events of the Sokovia lift, at the priorities of {@code docs/3.0-fragments/README.md}:
+ * The game-bus events of the Sokovia lift, at the priorities of {@code docs/HEROES-AND-BOSSES.md}:
  *
  * <ul>
  *     <li><b>HIGHEST {@code LivingIncomingDamageEvent}:</b> a player the lift is carrying is immune to everything but

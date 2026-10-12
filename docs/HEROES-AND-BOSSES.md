@@ -1,29 +1,22 @@
-# 3.0: the lanes' guide and the documentation fragments
+# The heroes and bosses of 3.0: how they hang on the shared code
 
-Version 3.0 adds five heroes (the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse) that are built in parallel, one lane
-each. The **skeleton** (this commit series) already did every edit of a shared file, for all five, so that no lane edits
-one. This file says what the skeleton gives a lane, what a lane may touch, and how its documentation reaches the
-shared pages. The plan it implements is `integration.md` of the 3.0 design folder (section 5); where this file and a
-spec disagree, `integration.md` wins.
+Version 3.0 added five heroes (the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse), built in parallel, one *lane* each,
+on a **skeleton** that did every edit of a shared file for all five, and a shared **boss framework** (`boss/`). This was
+the lanes' guide while they were built; they are merged now, and it stays as the reference for the plug-ins, the regions,
+the event priorities, the boss framework and the rules they count on. Where it speaks of a lane, read "the hero's own
+code". The plan it implemented is `integration.md` of the 3.0 design (section 5).
 
-Lanes: `phoenix`, `spider`, `thanos`, `ultron`, `apocalypse` (the order of Eilon's list, and the order of everything
-below). The folder of each lane in this directory is where its documentation fragments go.
+The order of the five, everywhere (regions, lang, docs, tests): `phoenix`, `spider`, `thanos`, `ultron`, `apocalypse`,
+the order of Eilon's list.
 
-## 1. Documentation fragments
+## 1. Where the documentation is
 
-A lane never edits a shared page. It writes, in `docs/3.0-fragments/<lane>/`:
-
-| File | What |
-|---|---|
-| `Phoenix.md`, `Phoenix-HE.md` (and so on) | the new wiki pages of the hero, complete, English and Hebrew |
-| `design.en.md`, `design.he.md` | the hero's section of `docs/DESIGN.md` and `docs/DESIGN.he.md`, complete |
-| `Home.row`, `Controls.rows`, `Looks.section`, `Items.rows`, `Commands.rows`, `Server-Configuration.section`, `FAQ.entries`, `Becoming-a-Hero.section`, `README.rows` | one small file per shared page, holding only that lane's row or paragraph (a file that is not needed is left out) |
-
-The documentation step (Z) applies all fragments in one commit, in hero order, to both languages.
-
-**DESIGN section numbers.** Section 12 is the voices of the Infinity Stones (2.3). The heroes of 3.0 are
-**13 Phoenix, 14 Spider-Man, 15 Thanos, 16 Ultron, 17 Apocalypse**. Sections 0 to 12 keep their numbers; nothing is
-renumbered.
+Each hero has its wiki pages (`docs/wiki/<Hero>.md` and `<Hero>-HE.md`) and a section of `docs/DESIGN.md` and
+`docs/DESIGN.he.md`: **13 Phoenix, 14 Spider-Man, 15 Thanos, 16 Ultron, 17 Apocalypse** (12 is 2.3's voices of the
+Infinity Stones). Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
+Configuration, FAQ, Becoming a Hero, Credits, the sidebar) and in the README, in both languages. While 3.0 was built
+each lane wrote these as fragments that were stitched in at the end; a change now goes straight into the pages, English
+and Hebrew together.
 
 ## 2. What belongs to whom
 
@@ -81,17 +74,16 @@ entities), `BossFights` and the rest of the `boss/` package (the boss framework:
 
 ## 4. Lang, sounds, art
 
-* **Lang.** `en_us.json` and `he_il.json` have one block per lane, each starting with a sentinel line
-  (`"_lane.phoenix": ""` ... `"_end": ""`; Minecraft ignores unknown keys). The skeleton filled the names of every
-  registered thing; a lane adds its messages, HUD words, subtitles and screens after its own sentinel, in both files with
-  the same keys and the same `%` placeholders (`DataTests` fails otherwise), the Hebrew natural, never a
-  transliteration. Prefixes: Phoenix `message.enhanced.mind_*`, `mind_control`, `psionic_field`, `phoenix*`,
-  `screen.enhanced.mind_read.*`, `hud.enhanced.phoenix_*`; Spider-Man `message.enhanced.web*`, `zip`, `swing`, `crawl`,
-  `sense`, `legs`, `instant_kill`, `black_eyes`, `bite`; Thanos `boss.enhanced.thanos*`, `message.enhanced.thanos*`,
-  `stone`; Ultron `boss.enhanced.ultron*`, `message.enhanced.ultron*`; Apocalypse `boss.enhanced.apocalypse*`,
-  `message.enhanced.apocalypse*`. Shared: `message.enhanced.boss.*`, `commands.enhanced.boss.*`
-  (the existing commands use `commands.`, with an s). The sentinels are removed at the release; a game test fails after
-  the 3.0.0 tag while any remains.
+* **Lang.** `en_us.json` and `he_il.json` keep each hero's keys together, in hero order after the shared boss keys, with
+  the same keys and the same `%` placeholders in both files (`DataTests` fails otherwise), the Hebrew natural, never a
+  transliteration. (While the lanes were built each block started with a sentinel line, `"_lane.phoenix": ""` ...
+  `"_end": ""`; they were removed at 3.0.0 and `SkeletonTests.noLangSentinelsRemain` keeps them out.) Prefixes: Phoenix
+  `message.enhanced.mind_*`, `mind_control`, `psionic_field`, `phoenix*`, `screen.enhanced.mind_read.*`,
+  `hud.enhanced.phoenix_*`; Spider-Man `message.enhanced.web*`, `zip`, `swing`, `crawl`, `sense`, `legs`,
+  `instant_kill`, `black_eyes`, `bite`; Thanos `boss.enhanced.thanos*`, `message.enhanced.thanos*`, `stone`; Ultron
+  `boss.enhanced.ultron*`, `message.enhanced.ultron*`; Apocalypse `boss.enhanced.apocalypse*`,
+  `message.enhanced.apocalypse*`. Shared: `message.enhanced.boss.*`, `commands.enhanced.boss.*` (the existing commands
+  use `commands.`, with an s).
 * **Sounds.** Register your events in your `ModSounds` region and your entries in `sounds.json` (every entry needs its
   `.ogg`, a `subtitle` and the subtitle's translations: `DataTests`). `sounds.json` is a plain JSON object whose keys
   must be registered sound events, so it has no sentinel lines: add your block **right before the entry of the first hero
@@ -121,11 +113,12 @@ entities), `BossFights` and the rest of the `boss/` package (the boss framework:
   keeps the whole flight inside the 21-wide arena. A test of yours that lets something fly must keep it inside its own
   arena too.
   A lane's quick tests belong in the lane's own batch (one batch per lane, not one per test), not in the default one.
-* Two **release gates** pass until the version is 3.0.0 and then fail while the work is unfinished: no pending animation
-  route (`GestureRoutes.PENDING_*`: every ability, toggle and state of your hero has a gesture or a reason of its own),
-  and no lang sentinel.
+* Two **release gates** are on since 3.0.0: no pending animation route (`GestureRoutes.PENDING_*`: every ability,
+  toggle and state of a hero has a gesture or a reason of its own), and no lang sentinel.
+* A test that changes a server-wide setting (`f.config`, `f.pvp`) runs in a **batch of its own**: the tests of a batch
+  run side by side and would see its value. `TestKit` puts a setting back only when the last test that changed it ends.
 
-## 6. Merge order and gates
+## 6. Merge order and gates (how 3.0 was put together)
 
 Phoenix, Spider-Man, Thanos, Apocalypse, Ultron. A lane merges when: the build is green; `runGameTestServer` is green
 twice in a row; its fragments and both languages of its lang block are delivered; its in-game checklist is done by someone

@@ -33,7 +33,7 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /**
- * Apocalypse's own game-bus events, at the priorities of {@code docs/3.0-fragments/README.md}: the sand hazards tick with
+ * Apocalypse's own game-bus events, at the priorities of {@code docs/HEROES-AND-BOSSES.md}: the sand hazards tick with
  * their level, a projectile that reaches the boss's shield (or the hero's) is turned away before it hits, the hero's shield
  * takes the blows meant for him before Wanda's branch does, the Horsemen drop nothing and are swept up if no fight owns
  * them, a player who comes into view of the boss is told where the arena is, a fighter who falls earns a word from him, and a

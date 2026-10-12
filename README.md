@@ -183,6 +183,9 @@ push and pull request, and publishes a release for every push to `main` (or a `v
 To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a NeoForge
 1.21.1 instance.
 
+How the heroes and bosses of 3.0 hang on the shared code (the plug-ins, the event priorities, the
+boss framework and its rules) is in [docs/HEROES-AND-BOSSES.md](docs/HEROES-AND-BOSSES.md).
+
 ## Credits
 
 * Hero concepts: Eilon Kolodkin-Gal.

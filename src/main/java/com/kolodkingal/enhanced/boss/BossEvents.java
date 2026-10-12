@@ -24,7 +24,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 /**
  * The boss framework's own game-bus events: the fights tick with their level, end when the server stops, credit the
  * damage players do to them, sweep up their orphans and hand over the gifts that wait. (The events that protect an
- * arena are in {@link BossArenaEvents}.) The priorities are those of {@code docs/3.0-fragments/README.md}.
+ * arena are in {@link BossArenaEvents}.) The priorities are those of {@code docs/HEROES-AND-BOSSES.md}.
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class BossEvents {

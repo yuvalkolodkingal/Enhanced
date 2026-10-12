@@ -1,7 +1,0 @@
-| `/enhanced boss start thanos [force]` | Wakes the Mad Titan at your feet as the Tesseract and Loki's Scepter do. `force` skips the site check and the rest (Peaceful and one fight at a time still apply). See [Thanos](Thanos). |
-<!-- table: the powers -->
-| `thanos` | [Thanos](Thanos) |
-<!-- table: the looks -->
-| Thanos | `infinity_war`, `endgame`, `own` |
-<!-- table: examples -->
-| `/enhanced power set Steve thanos endgame` | Makes Steve Thanos, in the Endgame armour (he skips the Mad Titan and the Gauntlet). |
