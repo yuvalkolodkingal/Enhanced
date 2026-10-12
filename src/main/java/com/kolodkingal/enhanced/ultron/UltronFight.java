@@ -24,6 +24,7 @@ import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -86,6 +87,8 @@ public final class UltronFight extends BossFight {
     public static final double CUT_VESSEL_RANGE = 12.0;
     /** His speech is in this colour: the red of his eyes. */
     public static final int SPEECH_COLOR = 0xD8262B;
+    /** While the island is up his body and the Sentries are looked over this often (ticks), and brought back onto it. */
+    public static final int TETHER_INTERVAL = 10;
 
     private static final Component NAME = Component.translatable("entity.enhanced.ultron");
 
@@ -262,14 +265,15 @@ public final class UltronFight extends BossFight {
         cachedAt = now;
         List<LivingEntity> targets = new ArrayList<>();
         for (ServerPlayer player : present()) {
-            if (!player.isCreative() && !player.isSpectator()) {
+            if (!player.isCreative() && !player.isSpectator() && onTheFightsGround(player)) {
                 targets.add(player);
             }
         }
         Vec3 c = island.center();
         double reach = island.joinRadius();
         AABB box = new AABB(c.x - reach, level().getMinBuildHeight(), c.z - reach, c.x + reach, level().getMaxBuildHeight(), c.z + reach);
-        for (LokiIllusionEntity illusion : level().getEntitiesOfClass(LokiIllusionEntity.class, box, i -> i.isAlive() && isParticipant(i.ownerId()))) {
+        for (LokiIllusionEntity illusion : level().getEntitiesOfClass(LokiIllusionEntity.class, box,
+                i -> i.isAlive() && isParticipant(i.ownerId()) && onTheFightsGround(i))) {
             targets.add(illusion);
         }
         targetCache = targets;
@@ -278,13 +282,23 @@ public final class UltronFight extends BossFight {
 
     /** Whether the creature is one his army and he may hunt now. */
     public boolean isTargetable(LivingEntity entity) {
-        if (!entity.isAlive()) {
+        if (!entity.isAlive() || !onTheFightsGround(entity)) {
             return false;
         }
         if (entity instanceof ServerPlayer player) {
             return !player.isCreative() && !player.isSpectator() && island.inJoinRange(player.position());
         }
         return entity instanceof LokiIllusionEntity illusion && isParticipant(illusion.ownerId());
+    }
+
+    /**
+     * Whether the creature stands where the fight is: anywhere in the arena while it is on the ground, but only on the
+     * island while the island is up. A fighter on the ground under it (they fell, they died and came back, they came
+     * late) is not hunted until the pit's tractor has taken them up: his army cannot follow them down there and come
+     * back up, so it is never lured off the island.
+     */
+    private boolean onTheFightsGround(Entity entity) {
+        return !island.isIslandUp() || island.isOnTheIsland(entity);
     }
 
     /** How many Sentries may be alive at once: {@code sentryMaxAlive} and {@code sentryMaxAlivePerPlayer} for each fighter after the first. */
@@ -297,9 +311,12 @@ public final class UltronFight extends BossFight {
         return budget;
     }
 
-    /** How many Sentries are still to come (not counting a wave that is on its way). */
+    /**
+     * How many Sentries are still to come, not counting a wave that is on its way (its Sentries are spent from the budget
+     * when they emerge, and until then they are {@link #pendingSentries}).
+     */
     public int budgetLeft() {
-        return Math.max(0, budget - budgetSpent);
+        return Math.max(0, budget - budgetSpent - wave.size());
     }
 
     /** The Sentries of a wave that is announced and has not emerged yet. */
@@ -366,6 +383,7 @@ public final class UltronFight extends BossFight {
         }
         tickWave(now);
         tickDebris(now);
+        keepTheArmyOnTheIsland(boss, now);
         if (boss != null && !spokeLow && canFall() && boss.getHealth() <= boss.getMaxHealth() * 0.25F && boss.bodyIndex() == uploads) {
             spokeLow = true;
             say("low");
@@ -397,6 +415,15 @@ public final class UltronFight extends BossFight {
      */
     public double groundAt(double x, double z) {
         return UltronMotion.surface(level(), x, island.center().y + 4.0, z) + island.islandOffset();
+    }
+
+    /**
+     * How far from the middle his body and the Sentries keep: {@code onTheGround} while the fight is on the ground; while
+     * the island is up, inside the narrowest its wavy rim runs, so that there is always island under them. (They hover
+     * at a height over the ground beneath them: past the rim that is the real ground, forty blocks down.)
+     */
+    public double armyReach(double onTheGround) {
+        return island.isIslandUp() ? Math.max(2.0, radius - SokoviaShape.RIM_SLACK - 1.0) : onTheGround;
     }
 
     private Vec3 onRing(double ring, double angle) {
@@ -743,7 +770,7 @@ public final class UltronFight extends BossFight {
         }
         nextDebrisAt = now + UltronBossConfig.DEBRIS_INTERVAL.get();
         List<ServerPlayer> candidates = new ArrayList<>(present());
-        candidates.removeIf(p -> p.isCreative() || p.isSpectator());
+        candidates.removeIf(p -> p.isCreative() || p.isSpectator() || !onTheFightsGround(p));
         int rings = (candidates.size() + 1) / 2;
         for (int i = 0; i < rings && !candidates.isEmpty(); i++) {
             ServerPlayer victim = candidates.remove(level().getRandom().nextInt(candidates.size()));
@@ -751,6 +778,55 @@ public final class UltronFight extends BossFight {
             debris.add(new Pending(at, now + WAVE_TELL));
             UltronFx.at(level(), UltronFxPayload.DEBRIS_RING, at, 3.0F, WAVE_TELL);
         }
+    }
+
+    // ---- the army stays on the island ----
+
+    /**
+     * While the island is up, a body or a Sentry of the fight that has ended up under it (it sank past the rim, a blow
+     * knocked it off) or far past its rim is brought back over the island, inside its rim, in a flash: they hover at a
+     * height over the ground beneath them, so one that is down there could never climb back, and the fight would go on
+     * without them.
+     */
+    private void keepTheArmyOnTheIsland(@Nullable UltronEntity boss, long now) {
+        if (phase != Phase.ISLAND || !island.isIslandUp() || dying || now % TETHER_INTERVAL != 0) {
+            return;
+        }
+        if (boss != null && transfer == null) {
+            tether(boss);
+        }
+        for (UltronSentryEntity sentry : sentries()) {
+            tether(sentry);
+        }
+    }
+
+    /** Brings one of his back over the island if it is under it or off it; true if it was moved. */
+    private boolean tether(Mob mob) {
+        Vec3 c = island.center();
+        double dx = mob.getX() - c.x;
+        double dz = mob.getZ() - c.z;
+        double flat = Math.hypot(dx, dz);
+        boolean under = mob.getY() < islandSurface(mob.getX(), mob.getZ()) - 3.0;
+        boolean off = flat > radius + SokoviaShape.RIM_SLACK + 1.0;
+        if (!under && !off) {
+            return false;
+        }
+        double reach = armyReach(radius);
+        double scale = flat > reach ? reach / flat : 1.0;
+        double x = c.x + dx * scale;
+        double z = c.z + dz * scale;
+        Vec3 to = new Vec3(x, islandSurface(x, z) + 2.5, z);
+        UltronFx.at(level(), UltronFxPayload.FLASH, mob.position().add(0, mob.getBbHeight() * 0.5, 0), 2.0F, 8);
+        mob.teleportTo(to.x, to.y, to.z);
+        mob.setDeltaMovement(Vec3.ZERO);
+        mob.resetFallDistance();
+        UltronFx.at(level(), UltronFxPayload.FLASH, to.add(0, mob.getBbHeight() * 0.5, 0), 2.0F, 8);
+        return true;
+    }
+
+    /** The top of the island's ground at a column (a tree on it is not its ground), while it is up. */
+    private double islandSurface(double x, double z) {
+        return UltronMotion.groundBelowTheTrees(level(), x, island.center().y + 4.0, z) + island.islandOffset();
     }
 
     /** A piece of Sokovia lands: dust, stone and a thud, 10 damage to everything in the ring. Nothing in the world changes. */
@@ -795,7 +871,7 @@ public final class UltronFight extends BossFight {
         }
         ServerPlayer striker = ripper != null ? ripper : source != null && source.getEntity() instanceof ServerPlayer player ? player : null;
         List<UltronSentryEntity> vessels = vessels(body);
-        if (vessels.isEmpty() && budgetLeft() > 0) {
+        if (vessels.isEmpty() && (budgetLeft() > 0 || !wave.isEmpty())) {
             vessels = spawnTheRest(body);
         }
         if (vessels.isEmpty() || uploads >= UltronBossConfig.MAX_UPLOADS.get()) {
@@ -816,9 +892,13 @@ public final class UltronFight extends BossFight {
                 .toList();
     }
 
-    /** With nobody to jump into and Sentries still in the budget, the rest of it (at most 6) comes at once, round him. */
+    /**
+     * With nobody to jump into and Sentries still to come, the rest of them (at most 6) come at once, round him: a wave
+     * that was on its way is among them.
+     */
     private List<UltronSentryEntity> spawnTheRest(UltronEntity body) {
-        int count = Math.min(6, budgetLeft());
+        int count = Math.min(6, budgetLeft() + wave.size());
+        wave.clear();
         List<UltronSentryEntity> fresh = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             double angle = Mth.TWO_PI * i / count;
@@ -1096,7 +1176,7 @@ public final class UltronFight extends BossFight {
     protected String status() {
         UltronEntity boss = boss();
         return (isOver() ? "ending (" + ended + ")" : phase.name().toLowerCase(Locale.ROOT)) + ", body " + (boss == null ? "-" : boss.bodyIndex())
-                + ", " + sentries().size() + " Sentries + " + budgetLeft() + " to come";
+                + ", " + sentries().size() + " Sentries + " + (budgetLeft() + pendingSentries()) + " to come";
     }
 
     // ---------------------------------------------------------------------------------------------------------

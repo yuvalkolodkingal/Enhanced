@@ -322,7 +322,7 @@ public final class UltronBrain {
             }
         }
         Vec3 wanted = new Vec3(horizontal.x, vertical, horizontal.z);
-        UltronMotion.steer(boss, UltronMotion.keepInDisc(position, wanted, fight.arena().center(), fight.islandRadius() - 2.0), 0.05);
+        UltronMotion.steer(boss, UltronMotion.keepInDisc(position, wanted, fight.arena().center(), fight.armyReach(fight.islandRadius() - 2.0)), 0.05);
     }
 
     /** Flies toward a point at up to {@code speed} blocks a tick (the fight uses it to bring him to the middle). */

@@ -374,9 +374,20 @@ public abstract class BossFight {
 
     // ---- speech and messages ----
 
-    /** The players who see the bars: they hear the boss, too. */
+    /**
+     * The players who see the bars: they hear the boss, too. So does a fighter of the level who is on the death screen:
+     * a dead player leaves the level's list a second after they fall, and with it the bars, but the boss's line over a
+     * wipe and how the fight ended are for them.
+     */
     public final Set<ServerPlayer> audience() {
-        return bars.viewers();
+        Set<ServerPlayer> audience = new LinkedHashSet<>(bars.viewers());
+        for (Participant participant : participants.values()) {
+            ServerPlayer player = server().getPlayerList().getPlayer(participant.id);
+            if (player != null && !player.isAlive() && player.level() == level) {
+                audience.add(player);
+            }
+        }
+        return audience;
     }
 
     /**
