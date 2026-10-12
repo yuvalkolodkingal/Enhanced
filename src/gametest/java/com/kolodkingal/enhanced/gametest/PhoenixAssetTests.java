@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -240,10 +241,11 @@ public final class PhoenixAssetTests {
     public static void theHebrewOfHerLangBlockIsHebrewAndNotAnEnglishCopy(GameTestHelper helper) throws IOException {
         List<String> lines = List.of(text("lang/he_il.json").split("\n"));
         List<String> englishLines = List.of(text("lang/en_us.json").split("\n"));
-        int from = lines.indexOf(lines.stream().filter(l -> l.contains("\"_lane.phoenix\"")).findFirst().orElseThrow());
-        int to = lines.indexOf(lines.stream().filter(l -> l.contains("\"_lane.spider\"")).findFirst().orElseThrow());
-        int englishFrom = englishLines.indexOf(englishLines.stream().filter(l -> l.contains("\"_lane.phoenix\"")).findFirst().orElseThrow());
-        int englishTo = englishLines.indexOf(englishLines.stream().filter(l -> l.contains("\"_lane.spider\"")).findFirst().orElseThrow());
+        // Her block runs from her power's name to Spider-Man's (the next hero's block).
+        int from = lineOf(lines, "power.enhanced.phoenix") - 1;
+        int to = lineOf(lines, "power.enhanced.spider_man");
+        int englishFrom = lineOf(englishLines, "power.enhanced.phoenix") - 1;
+        int englishTo = lineOf(englishLines, "power.enhanced.spider_man");
         check(to - from == englishTo - englishFrom, "the two blocks have the same number of keys: " + (to - from) + " and " + (englishTo - englishFrom));
         JsonObject he = lang("he_il");
         JsonObject en = lang("en_us");
@@ -268,6 +270,17 @@ public final class PhoenixAssetTests {
     }
 
     // ------------------------------------------------------------------------------------------------------------
+
+    /** The line of a lang file that holds {@code key}. */
+    private static int lineOf(List<String> lines, String key) {
+        String quoted = "\"" + key + "\":";
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).trim().startsWith(quoted)) {
+                return i;
+            }
+        }
+        throw new GameTestAssertException(key + " is in the lang file");
+    }
 
     private static boolean hebrew(String text) {
         return text.chars().anyMatch(c -> c >= 0x05D0 && c <= 0x05EA);

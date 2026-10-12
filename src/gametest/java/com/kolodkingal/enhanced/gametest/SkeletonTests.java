@@ -1189,34 +1189,21 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The lang files and the release gates
 
-    /** The lanes' regions of the lang files: the same sentinel lines, in the same order, in both languages. */
+    /**
+     * The release gate for the sentinel lines of the lang files ({@code "_lane.phoenix": ""} and so on): they were the
+     * scaffolding that kept the lanes' blocks apart while 3.0 was built in parallel, and are gone now that the lanes are
+     * merged.
+     */
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theLangSentinelsAreTheSameInBothLanguagesAndInHeroOrder(GameTestHelper helper) throws IOException {
+    public static void noLangSentinelsRemain(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        List<String> english = sentinels(lang(mod, "en_us"));
-        List<String> hebrew = sentinels(lang(mod, "he_il"));
-        check(english.equals(hebrew), "the sentinels differ: " + english + " / " + hebrew);
-        check(english.equals(List.of("_lane.shared", "_lane.phoenix", "_lane.spider", "_lane.thanos", "_lane.ultron", "_lane.apocalypse", "_end")),
-                "the lanes are in Eilon's order: " + english);
+        check(sentinels(lang(mod, "en_us")).isEmpty() && sentinels(lang(mod, "he_il")).isEmpty(),
+                "the lanes' sentinel lines are still in the lang files");
         helper.succeed();
     }
 
     private static List<String> sentinels(JsonObject lang) {
         return lang.keySet().stream().filter(key -> key.startsWith("_")).toList();
-    }
-
-    /**
-     * The release gate for the sentinel lines of the lang files: they are scaffolding of the 3.0 work and must be gone
-     * from the release (a version of 3.0.0 or later). Passes while the version is older.
-     */
-    @GameTest(template = ARENA, batch = SKELETON)
-    public static void noLangSentinelsRemainAtTheRelease(GameTestHelper helper) throws IOException {
-        if (isReleaseOf3()) {
-            IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-            check(sentinels(lang(mod, "en_us")).isEmpty() && sentinels(lang(mod, "he_il")).isEmpty(),
-                    "the lanes' sentinel lines are still in the lang files");
-        }
-        helper.succeed();
     }
 
     /**
