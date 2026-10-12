@@ -466,6 +466,55 @@ public final class ThanosSummonTests {
         });
     }
 
+    /**
+     * The summoner who keeps the use key down after the call (the game asks again every four ticks while it is held) is
+     * not told "He is already here" over the portal's own line; once he lets go and presses again, he is, and anyone
+     * else is at once.
+     */
+    @GameTest(template = ARENA, batch = "thanos_summon_held", timeoutTicks = 200)
+    public static void theSummonersHeldKeyIsNotToldHeIsAlreadyHere(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(ThanosBossConfig.SUMMON_CHARGE_TICKS, 40);
+        f.config(ThanosBossConfig.SUMMON_COUNTDOWN_TICKS, 120);
+        ServerPlayer summoner = f.player(10.5, FLOOR, 10.5);
+        ServerPlayer other = f.player(16.5, FLOOR, 16.5);
+        hold(summoner, tesseract(), scepter());
+        hold(other, tesseract(), scepter());
+        use(f, summoner);
+        int[] calledAt = {-1};
+        f.everyTick(180, t -> {
+            summoner.doTick();
+            if (calledAt[0] < 0) {
+                if (BossFights.active(f.level()) == null) {
+                    return false;
+                }
+                calledAt[0] = t;
+                TestKit.sentPackets(summoner);
+                return false;
+            }
+            int since = t - calledAt[0];
+            if (since <= 24 && since % 4 == 0) {
+                // The key is still down: the game asks again.
+                use(f, summoner);
+                check(!summoner.isUsingItem(), "no second hold begins");
+                String shown = BossTestSupport.lastActionBarKey(summoner);
+                check(!"message.enhanced.thanos.summon.active".equals(shown), "the held key is answered with silence, not " + shown);
+            }
+            if (since == 4) {
+                use(f, other);
+                check("message.enhanced.thanos.summon.active".equals(BossTestSupport.lastActionBarKey(other)), "anyone else is told he is already here");
+            }
+            if (since == 50) {
+                // He let go twenty ticks ago, and presses again.
+                use(f, summoner);
+                String shown = BossTestSupport.lastActionBarKey(summoner);
+                check("message.enhanced.thanos.summon.active".equals(shown), "a new press is told he is already here: " + shown);
+                return true;
+            }
+            return false;
+        });
+    }
+
     /** Held ten ticks short of the end, nothing has happened; the last tick starts it. */
     @GameTest(template = ARENA, batch = "thanos_summon_charge", timeoutTicks = 200)
     public static void aShortChargeCallsHimBeforeTheItemsRunOut(GameTestHelper helper) {
