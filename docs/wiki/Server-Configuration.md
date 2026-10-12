@@ -149,9 +149,129 @@ Section `[thor]`. The hero's page is [Thor](Thor).
 | `thor.shatterDamage` | `6.0` | 0.0 to 100.0 | Damage of each fragment of a shattered Mjolnir to the enemy it strikes. |
 | `thor.pinDuration` | `1200` | 20 to 72000 | How long (in ticks) Mjolnir pins someone down before it lets go by itself (1200 = a minute). |
 
+## Phoenix (Jean Grey)
+
+Section `[phoenix]`. The hero's page is [Phoenix](Phoenix). Her telekinesis has no options of its own: it uses `magneto.telekinesisRange`, `magneto.throwSpeed` and `scarlet_witch.blockLift*`.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `phoenix.flightSpeed` | `0.09` | 0.01 to 0.5 | The Phoenix's flying speed (Creative flight is 0.05). |
+| `phoenix.fireImmune` | `true` | `true` or `false` | If `true` (the default), fire, lava and burning cannot hurt the Phoenix (damage that goes through everything still does). |
+| `phoenix.mindReadRange` | `24` | 4 to 64 | How far (in blocks) Mind Reading reaches. It needs a line of sight. |
+| `phoenix.mindReadPlayers` | `true` | `true` or `false` | If `false`, Mind Reading cannot read players' minds (the panel says the server keeps them private). |
+| `phoenix.mindReadInventory` | `true` | `true` or `false` | If `true` (the default) the panel lists a player's whole inventory; if `false`, only the hands and the armour. |
+| `phoenix.mindReadNotifies` | `true` | `true` or `false` | If `true` (the default), the player who is read feels a presence in their mind (once per 10 seconds), so it is not a spy tool. |
+| `phoenix.mindReadExhaustion` | `0.01` | 0.0 to 4.0 | Food exhaustion per tick while Mind Reading is on (4.0 = 1 food point). |
+| `phoenix.mindSenseRange` | `48` | 8 to 128 | How far (in blocks) the Mind Sense ping reaches. |
+| `phoenix.mindSenseTicks` | `120` | 20 to 1200 | How long (in ticks) the sensed minds glow on her screen (120 = 6 seconds). |
+| `phoenix.mindSenseCooldown` | `400` | 0 to 72000 | Cooldown of Mind Sense (Sneak + R), in ticks (400 = 20 seconds). |
+| `phoenix.mindSenseExhaustion` | `2.0` | 0.0 to 40.0 | Food exhaustion of one Mind Sense. |
+| `phoenix.mindControlRange` | `10` | 2 to 32 | How far (in blocks) Mind Control reaches (10 = about 33 feet, as in the film). |
+| `phoenix.mindControlTicks` | `300` | 20 to 2400 | How long (in ticks) a creature stays possessed (300 = 15 seconds). |
+| `phoenix.mindControlMax` | `1` | 1 to 5 | How many creatures she can possess at once. Taking one more frees the oldest, who wakes confused. |
+| `phoenix.mindControlPlayerTicks` | `60` | 0 to 1200 | How long (in ticks) Mind Control holds a player still (it needs PvP on). 0 turns it off for players. |
+| `phoenix.mindControlCooldown` | `400` | 0 to 72000 | Cooldown of Mind Control (ability 4), in ticks (400 = 20 seconds). |
+| `phoenix.mindControlExhaustion` | `6.0` | 0.0 to 40.0 | Food exhaustion of one Mind Control. |
+| `phoenix.psionicRadius` | `16` | 4 to 64 | Radius (in blocks) of the Psionic Field (Sneak + B). It works through walls. |
+| `phoenix.psionicTicks` | `60` | 10 to 600 | How long (in ticks) the Psionic Field holds everyone still (60 = 3 seconds; players only with PvP on). |
+| `phoenix.psionicCooldown` | `1200` | 0 to 72000 | Cooldown of the Psionic Field, in ticks (1200 = 60 seconds). It shares ability slot 4 with Mind Control. |
+| `phoenix.psionicExhaustion` | `8.0` | 0.0 to 40.0 | Food exhaustion of one Psionic Field. If it holds nobody it costs nothing and has no cooldown. |
+| `phoenix.burstChargeTicks` | `60` | 10 to 200 | Ticks of charge for a full Phoenix Burst (60 = 3 seconds). It fires by itself at full charge. |
+| `phoenix.burstMinChargeTicks` | `12` | 0 to 100 | A charge shorter than this (in ticks) is cancelled: no damage, no hunger, a short cooldown. |
+| `phoenix.burstMinRadius` | `8` | 2 to 64 | Radius (in blocks) of a barely charged Burst. |
+| `phoenix.burstMaxRadius` | `24` | 4 to 96 | Radius (in blocks) of a fully charged Burst. |
+| `phoenix.burstMinDamage` | `8.0` | 0.0 to 200.0 | Damage of a barely charged Burst, at the centre. |
+| `phoenix.burstMaxDamage` | `30.0` | 0.0 to 200.0 | Damage of a fully charged Burst, at the centre. It stays the same out to half the radius and falls to 60% at the edge. |
+| `phoenix.burstPlayerFactor` | `0.5` | 0.0 to 1.0 | What a player takes of the Burst's damage (only with PvP on): 0.5 = half. |
+| `phoenix.burstWaveSpeed` | `1.0` | 0.2 to 4.0 | How fast the wave spreads (blocks per tick). A creature 20 blocks away is hit 20 ticks after one at 1 block. |
+| `phoenix.burstFireSeconds` | `10` | 0 to 60 | Seconds a creature burns after a full Burst (a weaker Burst burns 40% as long). |
+| `phoenix.burstKnockback` | `1.2` | 0.0 to 5.0 | Knockback of the wave, away from the centre (none for creatures in `enhanced:pin_immune`). |
+| `phoenix.burstSetsFire` | `true` | `true` or `false` | Whether the wave lights fires on flammable blocks (it also needs the `mobGriefing` game rule). It never breaks a block. |
+| `phoenix.burstHurtsPassives` | `false` | `true` or `false` | If `true`, the wave also hurts villagers, Iron Golems, animals and other players' pets. By default it hurts only hostile creatures, creatures after her, the bosses and players (with PvP on). |
+| `phoenix.burstMaxFireBlocks` | `40` | 0 to 400 | At most this many fires per Burst. |
+| `phoenix.burstFoodCost` | `6` | 0 to 20 | Food points a full Burst costs, and the least hunger needed to start charging (a smaller charge costs less, at least 30%). |
+| `phoenix.burstCooldown` | `1800` | 0 to 72000 | Cooldown of the Burst, in ticks (1800 = 90 seconds). |
+| `phoenix.burstCancelCooldown` | `40` | 0 to 1200 | Cooldown after a cancelled charge, in ticks. |
+| `phoenix.burstDrainTicks` | `100` | 0 to 1200 | How long (in ticks) Weakness and Slowness last after a Burst (none in Creative). |
+| `phoenix.emberRitualTicks` | `60` | 20 to 400 | How long (in ticks) the Phoenix Ember must be held with right-click to awaken (60 = 3 seconds). |
+
+## Spider-Man
+
+Section `[spider_man]`. The hero's page is [Spider-Man](Spider-Man). Ticks are 1/20 of a second, and "exhaustion" 4.0 is one food point. Every option is read when it is used, so editing the config file changes it live. There is no web fluid: hunger is the only resource.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `spider_man.speedBonus` | `0.15` | 0.0 to 2.0 | Extra walking speed of Spider-Man, as a fraction of the normal speed (0.15 = 15% faster). |
+| `spider_man.jumpBonus` | `0.3` | 0.0 to 2.0 | Extra jump strength (0.3 is a jump of about 2.1 blocks instead of 1.25). |
+| `spider_man.strengthBonus` | `2.0` | 0.0 to 20.0 | Extra melee damage (his bare fists hit for 3). |
+| `spider_man.fallDamageReduction` | `0.5` | 0.0 to 1.0 | The part of fall damage he does not take (0.5 = half). |
+| `spider_man.biteDelayTicks` | `140` | 20 to 1200 | How long (in ticks) the Radioactive Spider's bite takes to change a player (140 = a sick 7 seconds). |
+| `spider_man.spiderSenseRange` | `12` | 4 to 48 | How far (in blocks) he feels danger coming. |
+| `spider_man.spiderSenseInterval` | `5` | 1 to 40 | Ticks between two scans of his spider-sense for danger (5 = four times a second). |
+| `spider_man.webShotRange` | `24` | 4 to 64 | Range (in blocks) of a Web Shot. |
+| `spider_man.webShotCooldown` | `10` | 0 to 200 | Ticks between two Web Shots (hidden: the HUD shows only the Web Burst's cooldown). |
+| `spider_man.webShotExhaustion` | `0.4` | 0.0 to 4.0 | Food exhaustion of one Web Shot (4.0 = 1 food point). |
+| `spider_man.webbedTicks` | `120` | 20 to 1200 | How long (in ticks) a creature hit by a Web Shot stays webbed (120 = 6 seconds). |
+| `spider_man.organicWebFactor` | `1.5` | 1.0 to 5.0 | Organic webs (the Brand New Day suit, or the Black Eyes) last this many times as long. |
+| `spider_man.organicWebCostFactor` | `2.0` | 1.0 to 8.0 | Organic webs cost this many times the hunger. |
+| `spider_man.webBlocks` | `true` | `true` or `false` | Whether webs also leave temporary web blocks (the cocoon round a creature, the patch on a wall). With `false`, webs only entangle creatures. |
+| `spider_man.webBlockTicks` | `200` | 20 to 6000 | How long (in ticks) a web block lasts before it vanishes (200 = 10 seconds; organic webs last longer). It only ever replaces air. |
+| `spider_man.webPatchRadius` | `1` | 0 to 2 | Radius of the patch a Web Shot leaves on a wall (1 = 3 by 3 blocks). |
+| `spider_man.webBlockCap` | `64` | 8 to 512 | The most web blocks one Spider-Man can have at once; the oldest vanish first. |
+| `spider_man.webBurstStrands` | `24` | 6 to 96 | Strands of a Web Burst (Sneak + R), spread evenly in every direction. |
+| `spider_man.webBurstRange` | `10` | 3 to 24 | How far (in blocks) a strand of the burst flies. |
+| `spider_man.webBurstCooldown` | `240` | 0 to 6000 | Cooldown of the Web Burst, in ticks (240 = 12 seconds). |
+| `spider_man.webBurstExhaustion` | `2.0` | 0.0 to 8.0 | Food exhaustion of one Web Burst (2.0 = half a food point). |
+| `spider_man.webBurstWebbedTicks` | `80` | 20 to 1200 | How long (in ticks) a Web Burst keeps a creature webbed (80 = 4 seconds). |
+| `spider_man.zipRange` | `40` | 8 to 96 | How far (in blocks) a Web Zip reaches. |
+| `spider_man.zipSpeed` | `1.3` | 0.3 to 3.0 | Speed of a zip in blocks per tick, before his speed factor (1.3 = 26 blocks a second). |
+| `spider_man.zipCooldown` | `6` | 0 to 200 | Ticks before he can zip again (small, so zips chain). |
+| `spider_man.zipMaxTicks` | `60` | 10 to 400 | The longest a zip can take, in ticks (60 = 3 seconds). |
+| `spider_man.zipExhaustion` | `0.3` | 0.0 to 4.0 | Food exhaustion of one zip (4.0 = 1 food point). |
+| `spider_man.zipKickDamage` | `4.0` | 0.0 to 40.0 | Damage of the kick when a zip aimed at a creature ends on it. 0 = no kick: the zip then goes only to blocks. |
+| `spider_man.swingRange` | `40` | 8 to 96 | How far (in blocks) the anchor of a Web Swing can be. |
+| `spider_man.swingMaxTicks` | `300` | 20 to 2400 | The longest a swing can last, in ticks (300 = 15 seconds). |
+| `spider_man.swingMaxSpeed` | `1.8` | 0.5 to 3.0 | His top speed while swinging, in blocks per tick. |
+| `spider_man.swingGravity` | `0.06` | 0.02 to 0.12 | Gravity while he swings, in blocks per tick squared (the normal one is 0.08). |
+| `spider_man.swingExhaustion` | `0.01` | 0.0 to 1.0 | Food exhaustion per tick while he swings (4.0 = 1 food point; 0.01 is a food point every 20 seconds). |
+| `spider_man.crawlSpeed` | `0.22` | 0.05 to 0.6 | His speed on a wall or ceiling, in blocks per tick, before his speed factor (0.22 = 4.4 blocks a second). |
+| `spider_man.crawlExhaustion` | `0.005` | 0.0 to 1.0 | Food exhaustion per tick while he moves on a wall or ceiling. |
+| `spider_man.leapSpeed` | `0.9` | 0.3 to 2.0 | Speed of a leap off a wall, in blocks per tick, before his speed factor. |
+| `spider_man.homemadeArmor` | `0.0` | 0.0 to 30.0 | Armor of the Homemade Suit (and of his own skin): a hoodie, no protection. |
+| `spider_man.brandNewDayArmor` | `8.0` | 0.0 to 30.0 | Armor of the Brand New Day suit. |
+| `spider_man.brandNewDayToughness` | `2.0` | 0.0 to 20.0 | Armor toughness of the Brand New Day suit. |
+| `spider_man.ironSpiderArmor` | `14.0` | 0.0 to 30.0 | Armor of the Iron Spider. |
+| `spider_man.ironSpiderToughness` | `6.0` | 0.0 to 20.0 | Armor toughness of the Iron Spider. |
+| `spider_man.ironSpiderKnockbackResistance` | `0.2` | 0.0 to 1.0 | Knockback resistance of the Iron Spider (0.2 = 20%). |
+| `spider_man.ironSpiderStripTicks` | `200` | 0 to 6000 | How long (in ticks) Magneto's Armor & Weapon Strip scatters the Iron Spider's nanites: its armor, its legs and Instant Kill are off meanwhile (200 = 10 seconds). |
+| `spider_man.legsDamage` | `5.0` | 0.0 to 100.0 | Damage of one jab of the Iron Spider's legs. It is also all they do to a boss or a boss's minion, even in Instant Kill. |
+| `spider_man.legsInterval` | `20` | 4 to 200 | Ticks between two jabs of the legs when they guard him (20 = once a second). |
+| `spider_man.legsRange` | `4.0` | 1.0 to 10.0 | How far (in blocks) the legs jab a threat. |
+| `spider_man.legsReachBonus` | `2.0` | 0.0 to 6.0 | Extra attack reach, in blocks, with the legs out. |
+| `spider_man.legsExhaustion` | `0.01` | 0.0 to 1.0 | Food exhaustion per tick with the legs out. |
+| `spider_man.instantKillRange` | `5.0` | 1.0 to 12.0 | How far (in blocks) Instant Kill reaches. |
+| `spider_man.instantKillInterval` | `5` | 1 to 40 | Ticks between the strikes of Instant Kill; each time each of the four legs strikes one threat (5 = four times a second). |
+| `spider_man.instantKillDamage` | `1000.0` | 1.0 to 10000.0 | Damage of one strike of Instant Kill (a kill). Bosses and their minions take only `legsDamage`. |
+| `spider_man.instantKillMaxTicks` | `200` | 20 to 2400 | The longest Instant Kill lasts, in ticks (200 = 10 seconds). |
+| `spider_man.instantKillCooldown` | `600` | 0 to 12000 | Cooldown in ticks after Instant Kill ends (600 = 30 seconds). |
+| `spider_man.instantKillExhaustion` | `0.08` | 0.0 to 4.0 | Food exhaustion per tick while Instant Kill lasts (4.0 = 1 food point; the full 10 seconds cost about 4 points). |
+| `spider_man.instantKillConfirmTicks` | `60` | 20 to 200 | The window, in ticks, to press Sneak + B a second time to confirm Instant Kill (60 = 3 seconds). |
+| `spider_man.instantKillPlayers` | `false` | `true` or `false` | Whether Instant Kill may strike players. It never does by default, and PvP must be on as well. |
+| `spider_man.blackEyesSpeedBonus` | `0.6` | 0.0 to 5.0 | Extra speed while the Black Eyes are on, as a fraction on top of his own (0.6 = 60% faster). |
+| `spider_man.blackEyesStrengthBonus` | `4.0` | 0.0 to 40.0 | Extra melee damage while the Black Eyes are on (bare fists then hit for 7). |
+| `spider_man.blackEyesAttackSpeedBonus` | `0.5` | 0.0 to 3.0 | Extra attack speed while the Black Eyes are on, as a fraction (0.5 = 50% faster). |
+| `spider_man.blackEyesJumpBonus` | `0.25` | 0.0 to 2.0 | Extra jump strength while the Black Eyes are on, as a fraction. |
+| `spider_man.blackEyesKnockbackResistance` | `0.3` | 0.0 to 1.0 | Knockback resistance while the Black Eyes are on (0.3 = 30%). |
+| `spider_man.blackEyesExhaustion` | `0.05` | 0.0 to 4.0 | Food exhaustion per tick while the Black Eyes are on (0.05 = a food point every 4 seconds). |
+| `spider_man.blackEyesMaxTicks` | `600` | 40 to 6000 | The longest the surge of the Black Eyes lasts, in ticks (600 = 30 seconds). |
+| `spider_man.blackEyesCooldown` | `600` | 0 to 12000 | Cooldown in ticks after the surge ends (half of it when he calms himself). |
+| `spider_man.blackEyesCrashTicks` | `200` | 0 to 2400 | How long (in ticks) the crash (Slowness II and Weakness) lasts when the surge runs out (200 = 10 seconds). A calm ending has no crash. |
+| `spider_man.blackEyesPanicHealth` | `0.0` | 0.0 to 20.0 | If above 0, the Black Eyes switch on by themselves when his health falls to this many points (and can't be calmed for 5 seconds). 0 = never. |
+| `spider_man.blackEyesSenseFactor` | `2.0` | 1.0 to 4.0 | How much the Black Eyes widen his spider-sense (and how much faster it scans). |
+
 ## Datapack tags
 
-Item, block and entity tags under `data/enhanced/tags/` decide what the powers affect, so a datapack can change them without touching the mod.
+Item, block, entity type and damage type tags under `data/enhanced/tags/` decide what the powers affect, so a datapack can change them without touching the mod.
 
 | Tag | Kind | What it decides |
 |---|---|---|
@@ -168,7 +288,12 @@ Item, block and entity tags under `data/enhanced/tags/` decide what the powers a
 | `enhanced:pin_immune` | entity type | Creatures Mjolnir can't pin down (the Ender Dragon, the Wither, the Warden). |
 | `enhanced:confused_immune` | entity type | Creatures Loki's Scepter can't confuse (the Ender Dragon, the Wither, the Warden). |
 | `enhanced:shapeshift_immune` | entity type | Creatures Loki can't take the shape of. |
+| `enhanced:telepathy_immune` | entity type | Creatures too vast for a mind to be read, taken over or held by the Phoenix (the Ender Dragon, the Wither, the Warden and the 3.0 bosses). |
+| `enhanced:web_immune` | entity type | Creatures Spider-Man's webs can't wrap (the bosses). Spider-Man himself, Creative and Spectator players, and players when PvP is off are never wrapped, whatever this tag says. |
+| `enhanced:instant_kill_immune` | entity type | Creatures Instant Kill spares (the bosses and their minions: they take only the legs' normal damage). |
 | `enhanced:telekinesis_immovable` | block | Blocks Wanda can't tear out of the ground. |
+| `enhanced:cannot_cling` | block | Blocks Spider-Man cannot stick to (empty by default; water, cobwebs, vines and ladders never hold him anyway). |
+| `enhanced:mind_power` | damage type | Damage that counts as a mind's power: the Chaos Beam, a telekinetic slam and the Phoenix Burst. |
 
 The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_modifiers/`) are datapack files too: see [Items and Crafting](Items-and-Crafting).
 

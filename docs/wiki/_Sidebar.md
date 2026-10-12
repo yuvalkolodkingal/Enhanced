@@ -15,6 +15,8 @@
 * [Billy and the Witches' Road](Billy-and-the-Witches-Road)
 * [Loki](Loki)
 * [Thor](Thor)
+* [Phoenix](Phoenix)
+* [Spider-Man](Spider-Man)
 
 **Reference**
 
@@ -44,6 +46,8 @@
 * [בילי ודרך המכשפות](Billy-and-the-Witches-Road-HE)
 * [לוקי](Loki-HE)
 * [ת'ור](Thor-HE)
+* [הפניקס](Phoenix-HE)
+* [ספיידרמן](Spider-Man-HE)
 
 **מידע**
 

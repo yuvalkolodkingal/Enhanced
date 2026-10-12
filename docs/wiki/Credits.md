@@ -15,7 +15,7 @@
 
 ## The films and shows
 
-Magneto, Quicksilver (Fox's *X-Men* films), the Scarlet Witch, Vision, Tommy, Billy, Loki, Thor, Mjolnir and Stormbreaker, the Hex, the Witches' Road, the Tesseract and the Mind Stone belong to Marvel and the studios that made the films and shows (*WandaVision*, *Agatha All Along*, *Loki*, *Thor: Ragnarok* and the rest). The looks and the colours of the powers follow the screen. This is a fan project, not made or endorsed by Marvel or Disney.
+Magneto, Quicksilver (Fox's *X-Men* films), the Scarlet Witch, Vision, Tommy, Billy, Loki, Thor, Jean Grey, the Phoenix (*X-Men: Apocalypse* and *Spider-Man: Brand New Day*), Spider-Man (Peter Parker, the Homemade Suit, the Iron Spider, the Brand New Day suit and the Black Eyes: *Spider-Man: Homecoming*, *Avengers: Infinity War*, *Avengers: Endgame* and *Spider-Man: Brand New Day*), Mjolnir and Stormbreaker, the Hex, the Witches' Road, the Tesseract and the Mind Stone belong to Marvel and the studios that made the films and shows (*WandaVision*, *Agatha All Along*, *Loki*, *Thor: Ragnarok* and the rest). The looks and the colours of the powers follow the screen. This is a fan project, not made or endorsed by Marvel or Disney.
 
 ## This wiki
 

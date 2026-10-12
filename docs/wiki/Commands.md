@@ -25,6 +25,8 @@ The `<power>` argument is one of:
 | `billy` | [Billy](Billy-and-the-Witches-Road) |
 | `loki` | [Loki](Loki) |
 | `thor` | [Thor](Thor) |
+| `phoenix` | [Phoenix](Phoenix) |
+| `spider_man` | [Spider-Man](Spider-Man) |
 
 The command suggests the names as you type. A player who is given a power awakens as that hero, with the title, the sound and the announcement to everyone, exactly as if they had earned it. If a player already has that power and you give a look, only the look changes.
 
@@ -39,6 +41,8 @@ The `[look]` or `<look>` argument is the id of a look (see [Looks](Looks)):
 | Billy | `wiccan`, `teen`, `halloween`, `comics`, `own` |
 | Loki | `loki`, `tva`, `god_of_stories`, `own` |
 | Thor | `thor`, `ragnarok`, `love_and_thunder`, `love_and_thunder_helmet`, `mighty_thor`, `own` |
+| Phoenix | `apocalypse`, `brand_new_day`, `own` |
+| Spider-Man | `homemade`, `iron_spider`, `brand_new_day`, `own` |
 
 Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced look` skips players whose hero does not have the look, and it fails with "Unknown look" if no given player has it.
 
@@ -49,6 +53,8 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced l
 | `/enhanced power get Steve` | Tells you what Steve is. |
 | `/enhanced power set Steve thor` | Makes Steve Thor. |
 | `/enhanced power set @a loki tva` | Makes every player Loki, in the TVA Variant look. |
+| `/enhanced power set Steve phoenix brand_new_day` | Makes Steve the Phoenix, in the Brand New Day look. |
+| `/enhanced power set Steve spider_man iron_spider` | Makes Steve Spider-Man, in the Iron Spider suit. |
 | `/enhanced power set Steve none` | Takes Steve's power away. |
 | `/enhanced look Steve white_vision` | Puts Steve, a Vision, in the White Vision look. |
 | `/enhanced hex list` | Lists the Hexes in your dimension. |

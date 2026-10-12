@@ -27,6 +27,8 @@
 | `billy` | [בילי](Billy-and-the-Witches-Road-HE) |
 | `loki` | [לוקי](Loki-HE) |
 | `thor` | [ת'ור](Thor-HE) |
+| `phoenix` | [הפניקס](Phoenix-HE) |
+| `spider_man` | [ספיידרמן](Spider-Man-HE) |
 
 הפקודה מציעה את השמות בזמן ההקלדה. שחקן שמקבל כוח מתעורר בתור הגיבור, עם הכותרת, הצליל וההודעה לכולם, בדיוק כאילו הרוויח אותו. אם לשחקן כבר יש את הכוח הזה ונותנים מראה, רק המראה משתנה.
 
@@ -41,6 +43,8 @@
 | בילי | `wiccan`, `teen`, `halloween`, `comics`, `own` |
 | לוקי | `loki`, `tva`, `god_of_stories`, `own` |
 | ת'ור | `thor`, `ragnarok`, `love_and_thunder`, `love_and_thunder_helmet`, `mighty_thor`, `own` |
+| הפניקס | `apocalypse`, `brand_new_day`, `own` |
+| ספיידרמן | `homemade`, `iron_spider`, `brand_new_day`, `own` |
 
 למגנטו, למכשפת השני ולקוויקסילבר אין מראות לבחור. `/enhanced look` מדלגת על שחקנים שלגיבור שלהם אין את המראה, והיא נכשלת עם "מראה לא מוכר" אם לאף שחקן מהרשימה אין אותו.
 
@@ -51,6 +55,8 @@
 | `/enhanced power get Steve` | אומרת לכם איזה כוח יש לסטיב. |
 | `/enhanced power set Steve thor` | הופכת את סטיב לת'ור. |
 | `/enhanced power set @a loki tva` | הופכת כל שחקן ללוקי, במראה של הווריאנט של ה-TVA. |
+| `/enhanced power set Steve phoenix brand_new_day` | הופכת את סטיב להפניקס, במראה של יום חדש. |
+| `/enhanced power set Steve spider_man iron_spider` | הופכת את סטיב לספיידרמן, בחליפת איירון ספיידר. |
 | `/enhanced power set Steve none` | מורידה מסטיב את הכוח. |
 | `/enhanced look Steve white_vision` | מעבירה את סטיב, שהוא ויז'ן, למראה של ויז'ן הלבן. |
 | `/enhanced hex list` | מציגה את ההקסים במימד שלכם. |

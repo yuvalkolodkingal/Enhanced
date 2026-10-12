@@ -14,14 +14,16 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Billy](Billy-and-the-Witches-Road) | Hex Bolt | Flight (toggle) | Telekinesis | Freeze | The Noise (toggle) |
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |
 | [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
+| [Phoenix](Phoenix) | Mind Reading on/off (Sneak: Mind Sense) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks) | Mind Control (Sneak: Psionic Field) | Phoenix Burst (hold to charge, let go to unleash) |
+| [Spider-Man](Spider-Man) | Web Shot (Sneak: Web Burst) | Web Zip (Sneak, hold: Web Swing) | Wall Crawl (toggle; Sneak: Spider-Sense on/off) | Spider Legs (toggle; Sneak, twice: Instant Kill); Iron Spider only | Black Eyes (toggle) |
 
-**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam) work for as long as you keep the key down (the Chaos Shield also drops by itself after 8 seconds, or when it breaks, and then has to recharge). *Toggle* abilities switch on with one press and off with the next.
+**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing) work for as long as you keep the key down (the Chaos Shield also drops by itself after 8 seconds, or when it breaks, and then has to recharge). *Toggle* abilities switch on with one press and off with the next.
 
 The abilities, their cooldowns and costs are explained on each hero's page.
 
 ## Change Look: H
 
-**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki and Thor. Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
+**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki, Thor, the Phoenix and Spider-Man. Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
 
 ## Vision, That One!: Z
 
@@ -42,8 +44,9 @@ Flying works like Creative mode: **double-tap Space**, or press the hero's fligh
 | Vision | **G** (Flight) |
 | Billy | **G** (Flight) |
 | Thor | **G**, and only with Mjolnir or Stormbreaker in hand |
+| Phoenix | **G** (Flight) |
 
-Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes).
+Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes). Spider-Man does not fly either: he zips and swings on webs.
 
 ## Sneak changes some keys
 
@@ -60,6 +63,13 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **R** as Thor, with Mjolnir in hand | Shatters Mjolnir into fragments that strike his enemies (with Stormbreaker it throws it, as R does). |
 | Sneak + right-click on a creature or player, with Mjolnir in hand | Pins them down under Mjolnir. Right-click them again, without Sneak, to lift it (only its owner can). |
 | Sneak + **N** as Thor | Opens the Bifrost to the spot you look at. |
+| Sneak + **R** as the Phoenix | **Mind Sense**: a ring of violet light finds every mind within 48 blocks through the walls and they glow on your screen for 6 seconds. |
+| Sneak + **V** as the Phoenix | Sets what you hold with telekinesis down gently. |
+| Sneak + **B** as the Phoenix | The **Psionic Field**: everything living within 16 blocks, through walls, is held still for 3 seconds. |
+| Sneak + **R** as Spider-Man | The **Web Burst**: 24 strands fly out in every direction and wrap the hostile creatures near you (12 second cooldown). |
+| Sneak + **G** as Spider-Man, and keep holding **G** | The **Web Swing**: you swing on a web from the block you look at until you let go. |
+| Sneak + **V** as Spider-Man | Switches **Spider-Sense** on or off (Wall Crawl stays on). |
+| Sneak + **B** as the Iron Spider, then **B** again within 3 seconds | **Instant Kill**. |
 | Sneak + **H** | Previous look. |
 
 With telekinesis, pressing the key again **launches** what you hold.
@@ -83,6 +93,51 @@ With telekinesis, pressing the key again **launches** what you hold.
 1. Hold Mjolnir in your hand, and hold **Sneak**.
 2. Right-click a creature or player. Mjolnir lies down on their chest and they can't move, jump, fly or teleport.
 3. To lift it again, right-click them again without Sneak, or press **R** to call it back. Only Mjolnir's owner can, and it lets go by itself after a minute. Bosses can't be pinned. See [Thor](Thor).
+
+## The Phoenix's mind and fire, step by step
+
+**Reading a mind (R)**
+
+1. Press **R**. "Mind Reading: ON" appears above your hotbar.
+2. Look at a creature or player, up to 24 blocks away with nothing solid between you. A violet panel appears beside your crosshair with what they hold and wear, their mood and their health, and, for a player, their whole inventory.
+3. Press **R** again to switch it off. A player you read is told "You feel a presence in your mind". Magneto's helmet, a Loki's illusion and the biggest bosses show only a line of why they can't be read.
+
+**Mind Sense (Sneak + R) and Mind Control (B)**
+
+1. **Sneak + R:** a ring of violet light spreads out to 48 blocks and every mind it passes glows on your screen through the walls for 6 seconds (players white, monsters pink, the rest violet). The action bar says how many it found. Wait 20 seconds before the next.
+2. **B**, looking at a creature within 10 blocks: it is yours for 15 seconds and fights for you. A second one frees the first. **Sneak + B:** everything living within 16 blocks, through walls, is frozen for 3 seconds (players only with PvP on). Wait 20 seconds after Mind Control, 60 after the field.
+
+**The Phoenix Burst (hold N)**
+
+1. Hold **N**. You rise in flames to hover a block and a half above the ground, and a firebird forms behind you. You walk slowly while you charge, and you can be hurt.
+2. Let go to unleash it: a wave of fire spreads in every direction (8 to 24 blocks, the more you charged the bigger and stronger). Three seconds is a full charge and it fires by itself. Let go within the first 0.6 seconds and the Phoenix slips away.
+3. It costs food (up to 6 points), leaves you weak and slow for 5 seconds, and needs 90 seconds to rest. See [Phoenix](Phoenix).
+
+## Spider-Man's webs, walls and legs, step by step
+
+**Webbing something (R)**
+
+1. Look at a creature or a block, up to 24 blocks away, and press **R**. A silver strand flies from your wrist and a splat sticks to the wall.
+2. A creature is wrapped for 6 seconds: it can barely move and can't jump. A block gets a patch of web in front of it. The web blocks vanish by themselves after 10 seconds.
+3. **Sneak + R** is the Web Burst: 24 strands fly out in every direction, wrapping the hostile creatures near you (villagers, animals and pets are spared), and then you wait 12 seconds. You can't be webbed yourself.
+
+**Zipping and swinging (G)**
+
+1. Look at a block, up to 40 blocks away, and press **G**. The web pulls you there, then it vanishes and you stick to the wall or ceiling you came to. Press **G** again for the next one.
+2. To swing, hold **Sneak**, press **G** and **keep holding it**: you swing like a pendulum (**W** reels the web in, **S** lets it out). Let go of **G** and you fly off with your speed.
+3. **Space** during a zip cancels it (you keep your speed). A swing also ends if you stay on the ground for half a second, after 15 seconds, or if you are held.
+
+**Climbing (V, on by default)**
+
+1. Jump at a wall and keep pushing into it, or stand against it and hold **Space**. You stick. (Walking into a wall on the ground does nothing.)
+2. Look along the wall and press **W** to go that way; look at the wall or up and **W** climbs; look down and **W** climbs down. **A** and **D** go sideways. Hold **Space** with your head against a ceiling to walk upside down.
+3. A new press of **Space** leaps you off the wall. **V** turns the climbing off.
+
+**The legs, Instant Kill and the Black Eyes (B, N)**
+
+1. In the **Iron Spider** look, **B** unfolds four mechanical legs from your back, and **B** again folds them. They guard you, plant on walls, and you never take fall damage.
+2. **Sneak + B** with the legs out, then **Sneak + B** again within 3 seconds to confirm: Instant Kill. The legs strike every threat around you for 10 seconds at most, then you wait 30 seconds.
+3. **N** (any look; 6 food points needed) turns your eyes black for up to 30 seconds: much faster and stronger, and organic webs. **N** again calms it. When it runs out you crash for 10 seconds. See [Spider-Man](Spider-Man).
 
 ## The HUD
 

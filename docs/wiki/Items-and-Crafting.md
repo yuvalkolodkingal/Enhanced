@@ -1,6 +1,6 @@
 # Items and Crafting
 
-Every item you can use is in the **Enhanced** creative tab. Seven are crafted, and three are found in chests (or dropped). In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
+Every item you can use is in the **Enhanced** creative tab. Eight are crafted, and four more are found in chests (or dropped). The Radioactive Spider is both: you can craft it and find it. In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
 
 ## Crafted items
 
@@ -13,6 +13,7 @@ Every item you can use is in the **Enhanced** creative tab. Seven are crafted, a
 | [Witches' Road Door](#witches-road-door) | [Tommy or Billy](Billy-and-the-Witches-Road) (with a gene) | Picking up an Eye of Ender |
 | [Mjolnir](#mjolnir) | [Thor](Thor) (if worthy) | Picking up a Heavy Core |
 | [Stormbreaker](#stormbreaker) | Nothing: anyone can wield it | Picking up a Nether Star |
+| [Radioactive Spider](#radioactive-spider) | [Spider-Man](Spider-Man) (by its bite) | Picking up a Glow Ink Sac |
 
 ### Magneto's Helmet
 
@@ -109,9 +110,31 @@ L = any log
 
 An axe that hits harder than any other (12 attack damage: a fifth more than Mjolnir), never breaks, can't burn. Anyone can wield it, and whoever holds it can call the Bifrost. See [Thor](Thor), where Mjolnir and Stormbreaker are compared.
 
+### Radioactive Spider
+
+```
+F G F
+G B G
+F G F
+
+F = Fermented Spider Eye
+G = Glow Ink Sac
+B = Slime Block
+```
+
+A small spider in a jar, glowing sickly green (an epic item, up to 16 to a stack). It does nothing until a player with **no power** right-clicks with it: the bite takes **one** spider (not in Creative) and **1 damage**, makes you sick for 7 seconds (the *Radioactive Bite* effect: Nausea, Weakness, Slowness, then Poison, which never kills), and then you awaken as [Spider-Man](Spider-Man). Milk cures the bite. A hero is turned away ("The spider's bite changes nothing: your power does not mix") and keeps it. Besides the recipe, it is found in chests and, very rarely, dropped by a Cave Spider that a player kills. An operator can change how long the bite takes (`spider_man.biteDelayTicks`, 7 seconds by default).
+
+| Source | Chance |
+|---|---|
+| Abandoned Mineshaft chest | 4% |
+| Dungeon chest | 5% |
+| Trial Chambers reward chest | 3% |
+| Ancient City chest | 2% |
+| Cave Spider, killed by a player | 0.4% (+0.3% per Looting level) |
+
 ## Items found in the world
 
-These three are never crafted. Each chance is **per chest generated** (or per kill, for the mobs): a chest of that kind has that chance to hold the item.
+These four are never crafted. Each chance is **per chest generated** (or per kill, for the mobs): a chest of that kind has that chance to hold the item.
 
 ### Scarlet Witch Gene
 
@@ -156,6 +179,25 @@ The Space Stone in its cube. Using it as a player with no power makes you [Loki]
 | Stronghold library chest | 6% |
 | Woodland Mansion chest | 5% |
 | Ancient City chest | 4% |
+
+### Phoenix Ember
+
+A spark of the cosmic fire that remembers a host, very rare. It has no recipe and does nothing on its own, until a player with **no power** **holds right-click on it for 3 seconds**: flames spiral up around them, and the Ember burns into them and is used up (not in Creative). They awaken as the [Phoenix](Phoenix), Jean Grey. A hero is turned away ("Your body already holds a power") and keeps the Ember. It doesn't stack, can't burn, and an operator can change how long the ritual takes (`phoenix.emberRitualTicks`, 3 seconds by default). The Phoenix's gathering roar plays while it is held, and the Burst's at the end, softly.
+
+| Source | Chance |
+|---|---|
+| End City treasure chest | 6% |
+| Bastion treasure chest | 5% |
+| Ancient City chest | 4% |
+| Stronghold library chest | 3% |
+| Nether Fortress chest | 3% |
+| Woodland Mansion chest | 3% |
+
+The **Radioactive Spider** ([above](#radioactive-spider)) is found too, in five places listed with its recipe.
+
+## Spider Web (a block, not an item)
+
+The webs that [Spider-Man](Spider-Man) shoots leave temporary **Spider Web** blocks. You can't craft, find or pick one up. It is like a cobweb, but it holds everyone **except Spider-Man**, it **vanishes by itself after 10 seconds** (15 for organic webs), and a hand or a sword clears it at once. It only appears in free air, never where spawn protection or a claim says no, and never inside a boss arena. An operator can turn the blocks off (`spider_man.webBlocks`) or change how long they last (`spider_man.webBlockTicks`).
 
 ## Changing the loot
 

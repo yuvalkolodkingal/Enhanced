@@ -6,7 +6,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki or Thor. Powers never stack. |
+| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix or Spider-Man. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command removes it: `/enhanced power set <player> none` (see [Commands](Commands)). |
 | Creative and Spectator | Creative and Spectator players are never killed by the Mind Stone or the Hex wall. |
 
@@ -21,6 +21,8 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Tommy](Tommy) or [Billy](Billy-and-the-Witches-Road) | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors and an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
 | [Loki](Loki) | Find the **Tesseract** and use it: you vanish in a blue flash and reappear far away, as Loki. (With a **Scarlet Witch Gene** in your other hand it makes you the Scarlet Witch instead.) |
 | [Thor](Thor) | Forge **Mjolnir** (Netherite Ingots, a Nether Star, a Heavy Core and a Breeze Rod). Only the worthy can lift it, and the first worthy player who lifts it claims it for good. Lift it, and lightning makes you Thor. |
+| [Phoenix](Phoenix) | Find a very rare **Phoenix Ember** in a chest (End City, Bastion, Ancient City, Stronghold library, Nether Fortress and Woodland Mansion chests), hold it with no power, and **hold right-click for 3 seconds**. The Ember burns into you and you awaken as Jean Grey. |
+| [Spider-Man](Spider-Man) | Craft a **Radioactive Spider** (Fermented Spider Eyes, Glow Ink Sacs and a Slime Block), or find one in a mineshaft, dungeon or Ancient City chest, a Trial Chambers reward chest (or, rarely, from a Cave Spider you kill). With no power, **right-click with it**: it bites you, you are sick for 7 seconds, and then you awaken as Peter Parker. |
 
 ## Step by step
 
@@ -70,3 +72,19 @@ A hero who uses the Tesseract does not become anyone else: they are simply taken
 4. If you have no other power, lightning strikes and you become **Thor**. A Vision who claims Mjolnir fights with it but stays Vision.
 
 Everyone else finds Mjolnir far too heavy: it slips out of their hands. See [Thor](Thor) for the details, including the server option that turns ownership off.
+
+### Phoenix
+
+1. Find a **Phoenix Ember**. It is not crafted: it turns up, very rarely, in End City and bastion treasure chests, Ancient City chests, stronghold libraries, Nether fortresses and woodland mansions (chances are on [Items and Crafting](Items-and-Crafting)).
+2. With **no power**, hold the Ember in either hand and **hold right-click for 3 seconds**. Gold and orange flames spiral up around you and you hear the Phoenix gather. Let go early and the flames sputter out; nothing is used up.
+3. At the end the Ember burns into you and is used up (not in Creative), a burst of fire goes out that hurts nobody, and you are **the Phoenix**: you can't be burned, and you have five abilities on **R G V B N**.
+
+A hero who tries is told "Your body already holds a power" and keeps the Ember. Loki's Scepter and the Scarlet Witch Gene have nothing to do with the Phoenix: the Ember is her way in. See [Phoenix](Phoenix).
+
+### Spider-Man
+
+1. Get a **Radioactive Spider**. Craft it from 4 Fermented Spider Eyes, 4 Glow Ink Sacs and a Slime Block (the recipe is on [Items and Crafting](Items-and-Crafting#radioactive-spider); it unlocks when you pick up a Glow Ink Sac), or find it, in a chest of an abandoned mineshaft, a dungeon or an Ancient City, in the reward chest of a Trial Chambers, or as a very rare drop of a Cave Spider that you kill.
+2. With **no power**, hold it and **right-click**. You hear the bite, green motes rise from your hand, one spider is used up (not in Creative) and you take 1 damage.
+3. **For 7 seconds you are sick** (Nausea, Weakness, Slowness, and Poison at the end, which never kills). Drink milk and the bite is cured: nothing happens. Otherwise, when the 7 seconds are over, you awaken as **Spider-Man** in the Homemade Suit, and everyone on the server is told.
+
+A hero who tries is told "The spider's bite changes nothing: your power does not mix" and keeps the spider. Press **H** to put on the Iron Spider or the Brand New Day suit. See [Spider-Man](Spider-Man).

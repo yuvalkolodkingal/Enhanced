@@ -1,6 +1,6 @@
 # Enhanced
 
-**Enhanced** is a Minecraft mod (NeoForge, Minecraft 1.21.1) where you can become one of the *Enhanced*: a hero from the Marvel films and shows, with the powers, the look and the colours you know from the screen. You can be **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**; **Quicksilver**, who slows the world down around him (to *Sweet Dreams*) or just outruns it; **Vision**, the Mind Stone in a synthetic body (or **White Vision**); Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief; or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
+**Enhanced** is a Minecraft mod (NeoForge, Minecraft 1.21.1) where you can become one of the *Enhanced*: a hero from the Marvel films and shows, with the powers, the look and the colours you know from the screen. You can be **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**; **Quicksilver**, who slows the world down around him (to *Sweet Dreams*) or just outruns it; **Vision**, the Mind Stone in a synthetic body (or **White Vision**); Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief; **Jean Grey, the Phoenix**, who reads minds and burns with cosmic fire; **Peter Parker, Spider-Man**, who goes everywhere on a web; or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
 
 Original hero concepts by Eilon Kolodkin-Gal. This wiki is the player's guide. The full design, with every rule and number, is in [docs/DESIGN.md](https://github.com/yuvalkolodkingal/enhanced/blob/main/docs/DESIGN.md).
 
@@ -25,8 +25,17 @@ Hebrew: [עברית, דף הבית](Home-HE)
 | [Billy](Billy-and-the-Witches-Road) | Billy Maximoff (Wiccan) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Billy | Hex Bolt, flight, freeze, The Noise |
 | [Loki](Loki) | The God of Mischief | Use the Tesseract (without a gene in your other hand) | Daggers, duplicates, shapeshifting, vanishing, Frost Giant form |
 | [Thor](Thor) | The God of Thunder | Be worthy and lift Mjolnir | Throwing, shattering and pinning with Mjolnir, flight, the lightning beam, the Bifrost |
+| [Phoenix](Phoenix) | Jean Grey | Find the very rare **Phoenix Ember** in a chest and hold right-click on it for 3 seconds, with no power | Mind Reading (the items of whoever you look at), Mind Sense through walls, Mind Control, the Psionic Field, telekinesis, flight, the Phoenix Burst |
+| [Spider-Man](Spider-Man) | Peter Parker | Get bitten: **craft** or find a **Radioactive Spider** and right-click it with no power | Web Shot and Web Burst, Web Zip and Web Swing, walking on walls and ceilings, Spider-Sense; three suits (the Iron Spider has four mechanical legs and Instant Kill) and the Black Eyes |
 
-How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki and Thor) are on [Looks](Looks).
+How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix and Spider-Man) are on [Looks](Looks).
+
+## What's new in 3.0
+
+<!-- Draft: the heroes merged so far (the Phoenix, Spider-Man). The release step adds the rest of 3.0. -->
+
+* **The Phoenix, Jean Grey.** Find a Phoenix Ember, hold right-click for three seconds, and read minds (**R**: a violet panel shows the items of whoever you look at, a player's whole inventory included; **Sneak + R** finds every mind around you through the walls), fly, lift things with your mind, take over a creature (**B**) or freeze everyone around you (**Sneak + B**), and hold **N** to charge the **Phoenix Burst**: a wave of cosmic fire that spreads in every direction. Two looks, from *X-Men: Apocalypse* and *Spider-Man: Brand New Day*. See [Phoenix](Phoenix).
+* **Spider-Man, Peter Parker.** Get bitten by a **Radioactive Spider** (craft it or find it in a chest) and go by web: **R** wraps what you look at (**Sneak + R**: a burst of 24 strands in every direction), **G** zips you to the block you look at and on to the next (**Sneak + G**, held: swing on the web), jump at a wall and keep pushing to **climb it, and walk on the ceiling** (**V**), and a spider-sense warns you of danger before it hits. In the **Iron Spider** suit **B** unfolds four mechanical legs (**Sneak + B**, twice: Instant Kill), and **N** turns his eyes black for a short, strong, costly surge. Three suits, from *Homecoming*, *Infinity War* and *Brand New Day*. See [Spider-Man](Spider-Man).
 
 ## What's new in 2.3
 
