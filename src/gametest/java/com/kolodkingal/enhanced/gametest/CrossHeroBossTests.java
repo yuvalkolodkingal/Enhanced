@@ -379,6 +379,45 @@ public final class CrossHeroBossTests {
         helper.succeed();
     }
 
+    /**
+     * A hero Apocalypse behind his own shield is strained by the Phoenix's Mind Control and Psionic Field as the boss is
+     * (apocalypse.md 4.4: "A Phoenix's Mind Control and Psionic Field strain it by 25 and 60"), once per cast, where PvP lets
+     * her reach him.
+     */
+    @GameTest(template = ARENA, batch = "cross_phoenix_strain_hero", timeoutTicks = 100)
+    public static void thePhoenixsMindStrainsAHeroApocalypsesShieldToo(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer jean = f.player(4.5, FLOOR, 10.5, Power.PHOENIX);
+        float control = ApocalypseShieldConfig.PHOENIX_MIND_CONTROL_STRAIN.get().floatValue();
+        float field = ApocalypseShieldConfig.PHOENIX_PSIONIC_STRAIN.get().floatValue();
+        ServerPlayer hero = tank(f.player(10.5, FLOOR, 10.5, Power.APOCALYPSE));
+        PowerTicker.tick(hero);
+        hold(hero, 4);
+        f.everyTick(60, tick -> {
+            PowerTicker.tick(hero);
+            if (!ApocalypseGuard.isUp(hero)) {
+                return false;
+            }
+            PowerData his = Powers.get(hero);
+            float full = his.shieldStrength();
+            lookAt(jean, hero);
+            press(jean, 4);
+            assertNear(full - his.shieldStrength(), control, 1.0E-3, "her Mind Control strains the hero's shield by " + control);
+            Powers.get(jean).startCooldown(4, helper.getLevel().getGameTime(), 0);
+            lookAt(jean, hero);
+            press(jean, 4);
+            assertNear(full - his.shieldStrength(), control, 1.0E-3, "a second Mind Control within her recharge strains it no more");
+            Powers.get(jean).startCooldown(4, helper.getLevel().getGameTime(), 0);
+            float before = his.shieldStrength();
+            sneakPress(jean, 4);
+            check(before - field <= 0.0F ? !his.chaosShieldActive() : Math.abs(before - his.shieldStrength() - field) < 1.0E-3,
+                    "and her Psionic Field by " + field + ": " + before + " -> " + his.shieldStrength() + " (up " + his.chaosShieldActive() + ")");
+            letGo(hero, 4);
+            return true;
+        });
+    }
+
     // ============================================================================================================
     // 3. Only Wanda's and the Phoenix's mind power break Apocalypse's shield
 

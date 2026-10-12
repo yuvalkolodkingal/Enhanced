@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.apocalypse;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
@@ -32,7 +33,8 @@ public final class ApocalypseSetup {
      * What the Phoenix's mind does to the shield besides her Burst and her slams (those are damage and reach it through
      * {@code hurt}): a Mind Control (even a refused one) strains it by {@code phoenixMindControlStrain}, a Psionic Field
      * whose sphere holds him by {@code phoenixPsionicStrain} (each once per cast), and either one, touching him in the tell
-     * of the Mind Crush, interrupts it (the astral duel of the film).
+     * of the Mind Crush, interrupts it (the astral duel of the film). A hero Apocalypse's own shield is strained the same way
+     * ({@link ApocalypseGuard#strain}).
      */
     static void registerPhoenixListener() {
         PhoenixPower.addListener(ApocalypseSetup::phoenixTouched);
@@ -41,6 +43,10 @@ public final class ApocalypseSetup {
     static void phoenixTouched(ServerPlayer phoenix, LivingEntity target, PhoenixPower.Kind kind, float amount) {
         if (kind != PhoenixPower.Kind.MIND_CONTROL && kind != PhoenixPower.Kind.PSIONIC_FIELD) {
             return; // her Burst and her slams are damage: they reach the shield through hurt
+        }
+        if (target instanceof ServerPlayer hero) {
+            ApocalypseGuard.strain(hero, phoenix, kind); // a hero Apocalypse behind his own shield
+            return;
         }
         if (!(target instanceof ApocalypseEntity boss)) {
             return;
