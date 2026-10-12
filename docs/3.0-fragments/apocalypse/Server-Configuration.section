@@ -1,6 +1,6 @@
-## Apocalypse (the boss and his shield)
+## Apocalypse (the boss, his shield and the hero)
 
-Sections `[apocalypse_shield]` and `[apocalypse_boss]`. The fight itself is described in the Apocalypse page; the numbers shared by every boss (how many fights run at once, the wipe and abandon clocks, the reward's minimum time, the experience, the time limit, the protection of the arena) are in `[boss]`.
+Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The fight itself and the hero are described in the Apocalypse page; the numbers shared by every boss (how many fights run at once, the wipe and abandon clocks, the reward's minimum time, the experience, the time limit, the protection of the arena) are in `[boss]`.
 
 ### `[apocalypse_shield]`: what counts as mind power
 
@@ -72,3 +72,51 @@ Sections `[apocalypse_shield]` and `[apocalypse_boss]`. The fight itself is desc
 | `apocalypse_boss.magnetoStripExtendTicks` | 100 | 0 to 1200 | A Magneto's Strip on him in a window extends it by this much (once per window). |
 | `apocalypse_boss.noBreakerSeconds` | 60 | 10 to 600 | He withdraws if no breaker is in the arena while his shield is up for this long. |
 | `apocalypse_boss.dropsPhoenixEmber` | false |  | Also give a Phoenix Ember (if it exists) to a rewarded fighter with no power. |
+
+### `[apocalypse]`: the hero (a player who won the Essence of En Sabah Nur)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `apocalypse.flightSpeed` | 0.08 | 0.01 to 0.5 | Levitation speed (Creative flight is 0.05). |
+| `apocalypse.bodyHealthBonus` | 20.0 | 0.0 to 200.0 | Extra max health (20 = 10 hearts, so 40). |
+| `apocalypse.armor` | 10.0 | 0.0 to 30.0 | Armour while Apocalypse. |
+| `apocalypse.armorToughness` | 4.0 | 0.0 to 20.0 | Armour toughness while Apocalypse. |
+| `apocalypse.knockbackResistance` | 0.5 | 0.0 to 1.0 | Knockback resistance while Apocalypse. |
+| `apocalypse.regenPerSecond` | 1.0 | 0.0 to 20.0 | Healing factor: health a second after `regenDelayTicks` without damage. 0 turns it off. |
+| `apocalypse.regenDelayTicks` | 100 | 0 to 1200 | Ticks without damage before the healing factor starts. |
+| `apocalypse.waveDamage` | 8.0 | 0.0 to 100.0 | The Sand Wave. |
+| `apocalypse.waveLength` | 18 | 4 to 48 | Blocks. |
+| `apocalypse.waveSpeed` | 0.9 | 0.2 to 3.0 | Blocks per tick. |
+| `apocalypse.waveSlowTicks` | 40 | 0 to 600 | Slowness II duration. |
+| `apocalypse.waveCooldown` | 60 | 0 to 72000 | Ticks. |
+| `apocalypse.waveExhaustion` | 1.0 | 0.0 to 40.0 | Hunger the Sand Wave costs. |
+| `apocalypse.entombRange` | 24 | 4 to 64 | Blocks. |
+| `apocalypse.entombTicks` | 80 | 10 to 1200 | How long the Entomb holds. |
+| `apocalypse.entombDamagePerSecond` | 1.0 | 0.0 to 20.0 | Damage while entombed (never below 2 hearts). |
+| `apocalypse.cocoonHealth` | 16.0 | 1.0 to 200.0 | Health of the cocoon (a friend breaks it by hitting it). |
+| `apocalypse.entombCooldown` | 240 | 0 to 72000 | Ticks (shared with the Wave: the same key). |
+| `apocalypse.entombExhaustion` | 3.0 | 0.0 to 40.0 | Hunger the Entomb costs. |
+| `apocalypse.portalRange` | 40 | 4 to 128 | Blocks. |
+| `apocalypse.portalAllyRadius` | 3 | 0 to 16 | Pets, teammates and sneaking players within this come along. |
+| `apocalypse.portalCooldown` | 160 | 0 to 72000 | Ticks. |
+| `apocalypse.portalExhaustion` | 2.0 | 0.0 to 40.0 | Hunger the Portal costs. |
+| `apocalypse.shieldRadius` | 2.4 | 1.0 to 6.0 | Drawn radius of the sphere (and how close a projectile is neutralised). |
+| `apocalypse.shieldWindUpTicks` | 10 | 0 to 200 | The shield stops nothing until it is complete. |
+| `apocalypse.shieldMaxTicks` | 120 | 1 to 6000 | How long a complete shield can be held. |
+| `apocalypse.shieldStrength` | 60.0 | 1.0 to 1000.0 | How much mind power it takes to break it. |
+| `apocalypse.shieldOtherWear` | 0.5 | 0.0 to 1.0 | The part of any other damage it stops that wears it down (0 = it costs nothing, the literal rule; the boss's shield always uses 0). |
+| `apocalypse.shieldCooldown` | 160 | 0 to 6000 | Ticks after a drop. |
+| `apocalypse.shieldBrokenCooldown` | 400 | 0 to 6000 | Ticks after it shattered or was held to its limit. |
+| `apocalypse.shieldExhaustion` | 0.1 | 0.0 to 4.0 | Hunger per tick while held. |
+| `apocalypse.bestowRange` | 24 | 4 to 64 | Blocks. |
+| `apocalypse.bestowTicks` | 1200 | 20 to 72000 | How long Empowered lasts. |
+| `apocalypse.bestowMax` | 2 | 1 to 8 | Allies empowered at once. |
+| `apocalypse.bestowCooldown` | 400 | 0 to 72000 | Ticks. |
+| `apocalypse.bestowExhaustion` | 6.0 | 0.0 to 40.0 | Hunger Power Bestowal costs. |
+| `apocalypse.empowerCooldownBoost` | 1.5 | 1.0 to 5.0 | A hero's ability cooldowns recharge this many times as fast while Empowered. |
+| `apocalypse.stormRadius` | 7 | 2 to 32 | Blocks. |
+| `apocalypse.stormTicks` | 120 | 20 to 1200 | How long the Sandstorm lasts. |
+| `apocalypse.stormDamage` | 2.0 | 0.0 to 100.0 | Every 10 ticks. |
+| `apocalypse.stormCooldown` | 600 | 0 to 72000 | Ticks (shared with Power Bestowal: the same key). |
+| `apocalypse.stormExhaustion` | 8.0 | 0.0 to 40.0 | Hunger the Sandstorm costs. |
+| `apocalypse.essenceRitualTicks` | 60 | 20 to 400 | How long the Essence must be held to awaken. |
