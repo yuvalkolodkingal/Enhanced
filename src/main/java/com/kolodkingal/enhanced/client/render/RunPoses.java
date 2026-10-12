@@ -75,6 +75,10 @@ final class RunPoses {
     private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
     private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
 
+    // ===== apocalypse =====
+    /** An unhurried, upright god's walk: little arm swing and almost no bounce. */
+    private static final Character APOCALYPSE = new Character(0.55F, 0.80F, 0.90F, 3, 2, 0.008F);
+
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
             case MAGNETO -> MAGNETO;
@@ -89,7 +93,7 @@ final class RunPoses {
             case SPIDER_MAN -> DEFAULT;
             case THANOS -> DEFAULT;
             case ULTRON -> DEFAULT;
-            case APOCALYPSE -> DEFAULT;
+            case APOCALYPSE -> APOCALYPSE;
             default -> DEFAULT;
         };
     }

@@ -32,6 +32,18 @@ public final class StancePoses {
     /** The Mind Stone's beam. */
     public static final float THOR_BEAM_TWIST = -10;
 
+    // ===== apocalypse =====
+    /** Apocalypse's Shield: both forearms raised before the chest, palms out, elbows wide. */
+    public static final float[] APOC_SHIELD_M = {-78, 8, 24};
+    public static final float[] APOC_SHIELD_O = {-78, -8, -24};
+    public static final float APOC_SHIELD_HEAD = -3;
+    public static final float APOC_SHIELD_LEAN = -2;
+    /** The Sandstorm: both arms flung wide and up, the head back. */
+    public static final float[] APOC_STORM_M = {-118, 0, 74};
+    public static final float[] APOC_STORM_O = {-118, 0, -74};
+    public static final float APOC_STORM_HEAD = -12;
+    public static final float APOC_STORM_LEAN = -3;
+
     private StancePoses() {
     }
 }

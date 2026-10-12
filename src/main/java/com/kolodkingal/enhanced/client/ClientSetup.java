@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
+import com.kolodkingal.enhanced.client.render.ApocalypseAuraLayer;
 import com.kolodkingal.enhanced.client.render.ApocalypseModel;
 import com.kolodkingal.enhanced.client.render.ApocalypseRenderer;
 import com.kolodkingal.enhanced.client.render.ApocalypseViewer;
@@ -146,6 +147,7 @@ public final class ClientSetup {
                 // ===== thanos =====
                 // ===== ultron =====
                 // ===== apocalypse =====
+                renderer.addLayer(new ApocalypseAuraLayer(renderer, energy));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
@@ -168,6 +170,7 @@ public final class ClientSetup {
         // ===== thanos =====
         // ===== ultron =====
         // ===== apocalypse =====
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("apocalypse"), new ApocalypseOverlay());
     }
 
     private ClientSetup() {
