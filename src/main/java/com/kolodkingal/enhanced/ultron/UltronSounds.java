@@ -42,7 +42,18 @@ public enum UltronSounds {
     /** A hit of the Punch. */
     PUNCH(() -> SoundEvents.IRON_GOLEM_ATTACK, 1.2F, 0.6F),
     /** The hero's Overcharge: a rising whine, then a boom. */
-    OVERCHARGE(() -> SoundEvents.WARDEN_SONIC_CHARGE, 1.2F, 1.5F);
+    OVERCHARGE(() -> SoundEvents.WARDEN_SONIC_CHARGE, 1.2F, 1.5F),
+    // What the clients loop (the sounds above are played once, by the server). The music is a client loop that plays
+    // while a body of Ultron is within 96 blocks of the camera; the beam loop follows the body while the Finger Beams
+    // hum and fire; the hover loop is a Sentry's thrusters and the hero's anti-gravity; the rumble is Sokovia's.
+    /** The boss's theme: a long loop, streamed. */
+    THEME(() -> SoundEvents.MUSIC_DISC_PRECIPICE.value(), 1.0F, 1.0F),
+    /** The Finger Beams: an electric hum that follows him. */
+    BEAM_LOOP(() -> SoundEvents.BEACON_AMBIENT, 1.0F, 1.6F),
+    /** Thrusters: a Sentry's, and the hero's flight (pitched down). */
+    HOVER_LOOP(() -> SoundEvents.ELYTRA_FLYING, 0.4F, 1.4F),
+    /** Sokovia rumbles: the warning of the lift and the move itself. */
+    RUMBLE_LOOP(() -> SoundEvents.AMBIENT_BASALT_DELTAS_LOOP.value(), 1.0F, 0.6F);
 
     private final Supplier<SoundEvent> event;
     private final float volume;
@@ -52,6 +63,16 @@ public enum UltronSounds {
         this.event = event;
         this.volume = volume;
         this.pitch = pitch;
+    }
+
+    /** The loudness this sound is mastered at, for a loop that plays it (the scale a client multiplies its fade by). */
+    public float volume() {
+        return volume;
+    }
+
+    /** The pitch this sound is mastered at. */
+    public float pitch() {
+        return pitch;
     }
 
     /** The sound event to play (for a chat line's voice, or anything that takes an event). */
