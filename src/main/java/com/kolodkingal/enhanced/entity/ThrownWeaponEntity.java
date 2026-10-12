@@ -134,7 +134,9 @@ public class ThrownWeaponEntity extends Projectile {
             BlockHitResult wall = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
             boolean hitWall = wall.getType() != HitResult.Type.MISS;
             if (hitWall) {
-                to = wall.getLocation();
+                // A hair short of the face it struck, so it stays on its own side of the wall (a face can be the border
+                // of a chunk that does not tick, where it would hang in the air and never fly home).
+                to = wall.getLocation().subtract(motion.normalize().scale(0.05));
             }
             smash(level, from, to, hitOut);
             setPos(to);

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
@@ -148,12 +149,13 @@ public final class AnimationSignalTests {
 
     /**
      * Thor's weapon: thrown it is named in flight (and gone from his hand), drawn from the inventory it arrives in his hand,
-     * caught it is unnamed. (A batch of its own: the weapon flies to the arena's wall and back, and a shield, a Hex or
-     * Quicksilver Time in the arena next door can hold it on the way.)
+     * caught it is unnamed. (A batch of its own, and a throw of 12 blocks, as in {@code ThorTests}: at its usual range
+     * the weapon struck the arena's wall, which stands on the border of a chunk where nothing ticks in a test.)
      */
     @GameTest(template = ARENA, timeoutTicks = 200, batch = "thor_weapon_signal")
     public static void thorsWeaponSaysWhereItIs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
         Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
