@@ -12,6 +12,8 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.BooleanValue REDUCED_MOTION;
     public static final ModConfigSpec.BooleanValue FLIGHT_EFFECTS;
     public static final ModConfigSpec.BooleanValue HIDE_HERO_ARMOUR;
+    public static final ModConfigSpec.BooleanValue BOSS_MUSIC;
+    public static final ModConfigSpec.BooleanValue BOSS_ATMOSPHERE;
 
     static {
         BUILDER.push("animation");
@@ -30,6 +32,15 @@ public final class EnhancedClientConfig {
                         "It protects as usual. Elytra, mob heads, carved pumpkins and the hero gear of this mod are always drawn.")
                 .translation("config.enhanced.hide_hero_armour")
                 .define("hideHeroArmour", true);
+        BUILDER.pop();
+        // ===== thanos =====
+        BUILDER.push("thanos");
+        BOSS_MUSIC = BUILDER.comment("Play the music of the fight while Thanos is near. Off: silence.")
+                .translation("config.enhanced.boss_music")
+                .define("bossMusic", true);
+        BOSS_ATMOSPHERE = BUILDER.comment("The violet fog and the dark edges of the screen while Thanos is near.")
+                .translation("config.enhanced.boss_atmosphere")
+                .define("bossAtmosphere", true);
         BUILDER.pop();
     }
 
@@ -51,6 +62,16 @@ public final class EnhancedClientConfig {
     /** Whether heroes are drawn without their armour (true until the config has loaded). */
     public static boolean hideHeroArmour() {
         return !SPEC.isLoaded() || HIDE_HERO_ARMOUR.get();
+    }
+
+    /** Whether the fight against Thanos plays its music (true until the config has loaded). */
+    public static boolean bossMusic() {
+        return !SPEC.isLoaded() || BOSS_MUSIC.get();
+    }
+
+    /** Whether the fog and the dark edges of the screen mark a Thanos near (true until the config has loaded). */
+    public static boolean bossAtmosphere() {
+        return !SPEC.isLoaded() || BOSS_ATMOSPHERE.get();
     }
 
     private EnhancedClientConfig() {

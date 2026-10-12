@@ -557,5 +557,234 @@
         "name": "enhanced:sfx/spider_bite"
       }
     ]
+  },
+  "thanos_summon": {
+    "subtitle": "subtitles.enhanced.thanos_summon",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_summon"
+      }
+    ]
+  },
+  "thanos_bell": {
+    "subtitle": "subtitles.enhanced.thanos_bell",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_bell"
+      }
+    ]
+  },
+  "thanos_arrive": {
+    "subtitle": "subtitles.enhanced.thanos_arrive",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_arrive"
+      }
+    ]
+  },
+  "thanos_roar": {
+    "subtitle": "subtitles.enhanced.thanos_roar",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_roar"
+      }
+    ]
+  },
+  "thanos_step": {
+    "subtitle": "subtitles.enhanced.thanos_step",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_step_1"
+      },
+      {
+        "name": "enhanced:sfx/thanos_step_2"
+      },
+      {
+        "name": "enhanced:sfx/thanos_step_3"
+      }
+    ]
+  },
+  "thanos_swing": {
+    "subtitle": "subtitles.enhanced.thanos_swing",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_swing_1"
+      },
+      {
+        "name": "enhanced:sfx/thanos_swing_2"
+      }
+    ]
+  },
+  "thanos_hit": {
+    "subtitle": "subtitles.enhanced.thanos_hit",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_hit_1"
+      },
+      {
+        "name": "enhanced:sfx/thanos_hit_2"
+      }
+    ]
+  },
+  "thanos_hurt": {
+    "subtitle": "subtitles.enhanced.thanos_hurt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_hurt_1"
+      },
+      {
+        "name": "enhanced:sfx/thanos_hurt_2"
+      },
+      {
+        "name": "enhanced:sfx/thanos_hurt_3"
+      }
+    ]
+  },
+  "thanos_death": {
+    "subtitle": "subtitles.enhanced.thanos_death",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_death"
+      }
+    ]
+  },
+  "gauntlet_clench": {
+    "subtitle": "subtitles.enhanced.gauntlet_clench",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gauntlet_clench"
+      }
+    ]
+  },
+  "thanos_stone_surge": {
+    "subtitle": "subtitles.enhanced.thanos_stone_surge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_stone_surge"
+      }
+    ]
+  },
+  "thanos_power_blast": {
+    "subtitle": "subtitles.enhanced.thanos_power_blast",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_power_blast"
+      }
+    ]
+  },
+  "thanos_infinity_charge": {
+    "subtitle": "subtitles.enhanced.thanos_infinity_charge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_infinity_charge"
+      }
+    ]
+  },
+  "thanos_infinity_beam": {
+    "subtitle": "subtitles.enhanced.thanos_infinity_beam",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_infinity_beam"
+      }
+    ]
+  },
+  "thanos_meteor_whistle": {
+    "subtitle": "subtitles.enhanced.thanos_meteor_whistle",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_meteor_whistle"
+      }
+    ]
+  },
+  "thanos_barrier_up": {
+    "subtitle": "subtitles.enhanced.thanos_barrier_up",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_barrier_up"
+      }
+    ]
+  },
+  "time_rewind": {
+    "subtitle": "subtitles.enhanced.time_rewind",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_rewind"
+      }
+    ]
+  },
+  "soul_drain": {
+    "subtitle": "subtitles.enhanced.soul_drain",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/soul_drain_loop"
+      }
+    ]
+  },
+  "soul_world": {
+    "subtitle": "subtitles.enhanced.soul_world",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/soul_world"
+      }
+    ]
+  },
+  "reality_pop": {
+    "subtitle": "subtitles.enhanced.reality_pop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/reality_pop_1"
+      },
+      {
+        "name": "enhanced:sfx/reality_pop_2"
+      },
+      {
+        "name": "enhanced:sfx/reality_pop_3"
+      }
+    ]
+  },
+  "thanos_theme_1": {
+    "subtitle": "subtitles.enhanced.thanos_theme_1",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_theme_1",
+        "stream": true
+      }
+    ]
+  },
+  "thanos_theme_2": {
+    "subtitle": "subtitles.enhanced.thanos_theme_2",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_theme_2",
+        "stream": true
+      }
+    ]
+  },
+  "thanos_theme_3": {
+    "subtitle": "subtitles.enhanced.thanos_theme_3",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_theme_3",
+        "stream": true
+      }
+    ]
+  },
+  "thanos_theme_4": {
+    "subtitle": "subtitles.enhanced.thanos_theme_4",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_theme_4",
+        "stream": true
+      }
+    ]
+  },
+  "thanos_theme_5": {
+    "subtitle": "subtitles.enhanced.thanos_theme_5",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/thanos_theme_5",
+        "stream": true
+      }
+    ]
   }
 }

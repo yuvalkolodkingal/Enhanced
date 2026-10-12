@@ -56,6 +56,8 @@ public final class PowerLoopSounds {
         WEB_SWING(ModSounds.WEB_SWING, 0.35F, 1.0F, (p, d) -> d.power() == Power.SPIDER_MAN && d.is(Live.SWINGING)),
 
         // ===== thanos =====
+        /** The Soul Drain's chains: a choir shimmer with the click of chain links. */
+        SOUL_DRAIN(ModSounds.SOUL_DRAIN, 0.8F, 1.0F, (p, d) -> d.power() == Power.THANOS && d.is(Live.SOUL_DRAINING)),
 
         // ===== ultron =====
 

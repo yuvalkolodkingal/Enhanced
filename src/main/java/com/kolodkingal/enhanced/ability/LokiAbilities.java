@@ -188,6 +188,51 @@ public final class LokiAbilities {
                 && LokiForm.of(data).filter(form -> !form.isPlayer() && form.type() == type).isPresent();
     }
 
+    // ---- seen through (the Soul Stone of Thanos, the boss and the hero) ----
+
+    /**
+     * The Soul Stone sees which Loki is the true one: every duplicate within {@code radius} of {@code center} dissolves.
+     *
+     * @return how many copies dissolved
+     */
+    public static int dissolveDuplicates(ServerLevel level, Vec3 center, double radius) {
+        int dissolved = 0;
+        for (LokiIllusionEntity illusion : level.getEntitiesOfClass(LokiIllusionEntity.class, new net.minecraft.world.phys.AABB(center, center).inflate(radius))) {
+            illusion.dissolve(null);
+            dissolved++;
+        }
+        return dissolved;
+    }
+
+    /**
+     * The Soul Stone shows Loki as he is: an invisible Loki (hiding behind his duplicates) is seen again, and a Loki who
+     * took another shape is himself.
+     *
+     * @return whether anything about him changed
+     */
+    public static boolean unmask(ServerPlayer loki) {
+        PowerData data = Powers.get(loki);
+        if (data.power() != Power.LOKI) {
+            return false;
+        }
+        boolean changed = false;
+        if (data.is(Live.HIDDEN) || loki.hasEffect(MobEffects.INVISIBILITY)) {
+            loki.removeEffect(MobEffects.INVISIBILITY);
+            Map<Live, Long> until = UNTIL.get(loki.getUUID());
+            if (until != null) {
+                until.remove(Live.HIDDEN);
+            }
+            data.set(Live.HIDDEN, false);
+            changed = true;
+        }
+        if (!data.form().isEmpty()) {
+            data.setForm("");
+            shimmer(loki, data);
+            changed = true;
+        }
+        return changed;
+    }
+
     // ---- Ability 1: Daggers ----
 
     /** A conjured dagger thrown from the hand, or (sneaking) a fan of three. */

@@ -114,6 +114,39 @@ public final class ModSounds {
 
     // ===== thanos =====
 
+    // The summoning and the arrival
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_SUMMON = register("thanos_summon");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_BELL = register("thanos_bell");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_ARRIVE = register("thanos_arrive");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_ROAR = register("thanos_roar");
+
+    // The Titan himself
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_STEP = register("thanos_step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_SWING = register("thanos_swing");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_HIT = register("thanos_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_HURT = register("thanos_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_DEATH = register("thanos_death");
+
+    // The Gauntlet and the stones
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAUNTLET_CLENCH = register("gauntlet_clench");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_STONE_SURGE = register("thanos_stone_surge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_POWER_BLAST = register("thanos_power_blast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_INFINITY_CHARGE = register("thanos_infinity_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_INFINITY_BEAM = register("thanos_infinity_beam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_METEOR_WHISTLE = register("thanos_meteor_whistle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_BARRIER_UP = register("thanos_barrier_up");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_REWIND = register("time_rewind");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_DRAIN = register("soul_drain");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_WORLD = register("soul_world");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REALITY_POP = register("reality_pop");
+
+    // The music of the fight: the layer each stone adds (the six stones' own voices are above)
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_THEME_1 = register("thanos_theme_1");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_THEME_2 = register("thanos_theme_2");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_THEME_3 = register("thanos_theme_3");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_THEME_4 = register("thanos_theme_4");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_THEME_5 = register("thanos_theme_5");
+
     // ===== ultron =====
 
     // ===== apocalypse =====

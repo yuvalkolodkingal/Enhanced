@@ -80,6 +80,8 @@ final class RunPoses {
     private static final Character SPIDER = new Character(1.05F, 1.25F, 1.20F, 9, 5, 0.020F);
     /** Spider-Man in the Black Eyes: a predatory lope, longer in the stride and lower. */
     private static final Character SPIDER_SURGE = new Character(1.10F, 1.40F, 1.30F, 16, 7, 0.030F);
+    /** Thanos: heavy and wide, between Thor and Magneto; the bob of a stride that shakes the ground. */
+    private static final Character THANOS = new Character(0.90F, 1.15F, 1.15F, 9, 5, 0.030F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
@@ -93,7 +95,7 @@ final class RunPoses {
             // gives them a character.
             case PHOENIX -> PHOENIX;
             case SPIDER_MAN -> SPIDER;
-            case THANOS -> DEFAULT;
+            case THANOS -> THANOS;
             case ULTRON -> DEFAULT;
             case APOCALYPSE -> DEFAULT;
             default -> DEFAULT;

@@ -145,7 +145,7 @@ public final class FlightProfile {
             // Ultron and Apocalypse fly with the vanilla pose until then.
             case PHOENIX -> PHOENIX;
             case SPIDER_MAN -> null;
-            case THANOS -> null;
+            case THANOS -> null; // he does not fly: no take-off, banking or braking (his landings are ThanosActing's)
             case ULTRON -> null;
             case APOCALYPSE -> null;
             case NONE, QUICKSILVER, TOMMY, LOKI -> null;
