@@ -17,6 +17,9 @@
 * [Thor](Thor)
 * [Phoenix](Phoenix)
 * [Spider-Man](Spider-Man)
+* [Thanos](Thanos)
+* [Ultron](Ultron)
+* [Apocalypse](Apocalypse)
 
 **Reference**
 
@@ -48,6 +51,9 @@
 * [ת'ור](Thor-HE)
 * [הפניקס](Phoenix-HE)
 * [ספיידרמן](Spider-Man-HE)
+* [תאנוס](Thanos-HE)
+* [אולטרון](Ultron-HE)
+* [אפוקליפסה](Apocalypse-HE)
 
 **מידע**
 

@@ -4,11 +4,11 @@
 
 ### How do I become a hero?
 
-Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open, a Tesseract to use, a hammer to lift, an Ember to hold, or a spider's bite. See [Becoming a Hero](Becoming-a-Hero).
+Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open, a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, or, for Thanos, Ultron and Apocalypse, a boss to beat. See [Becoming a Hero](Becoming-a-Hero).
 
 ### I touched Loki's Scepter and died. Why?
 
-The Mind Stone tears apart anyone who touches it **without** a Scarlet Witch Gene or a Synthezoid Core in the other hand. Hold the gene (to become the Scarlet Witch) or the core (to become Vision) in one hand and use the scepter with the other. Creative and Spectator players are never killed. See [Scarlet Witch](Scarlet-Witch).
+The Mind Stone tears apart anyone who touches it **without** a Scarlet Witch Gene or a Synthezoid Core in the other hand (or the Ultron Program, Ultron's Core or the Tesseract, which wake Ultron, make you Ultron or call Thanos). Hold the gene (to become the Scarlet Witch) or the core (to become Vision) in one hand and use the scepter with the other. Creative and Spectator players are never killed. See [Scarlet Witch](Scarlet-Witch).
 
 ### Can I have two powers?
 
@@ -112,6 +112,117 @@ He crawls at about 4.4 blocks a second (25% faster with the Iron Spider's legs, 
 ### Why can't I web that creature or player?
 
 The big bosses (the Ender Dragon, the Wither, the Warden, the Elder Guardian and the 3.0 bosses) can't be wrapped, nor can another Spider-Man, Creative and Spectator players, or players when **PvP is off**. A complete Chaos Shield stops a web, and Wanda's Hex wall refuses a zip across it. The Web Burst also spares villagers, Iron Golems, animals and pets, as every area attack does (a single Web Shot does wrap them). Spider-Man himself is never wrapped by a web.
+
+## Thanos
+
+### How do I call Thanos?
+
+Hold the Tesseract in one hand and Loki's Scepter in the other, and hold right-click for five seconds. See [Thanos](Thanos#calling-him). Neither item is used up.
+
+### I held the Tesseract and the Scepter and the Titan did not come. Why?
+
+The action bar says why, in red, and nothing else happens (you do not explode and you are not taken anywhere). The usual reasons: you are not on solid ground with open sky above you and open country round you, the difficulty is Peaceful, he is already here or another boss is fighting, he fought less than ten minutes ago (five if he left without being beaten), you are not in the Overworld, or the server turned the call off. The table is on [Thanos](Thanos#calling-him).
+
+### Why can't I kill Thanos quickly?
+
+No hit takes more than 6 percent of his health and no second more than 15 percent, and he takes a new Infinity Stone every 90 seconds, each with new moves. The fight is meant to be won by a team, fast, by breaking his clench (100 poise of blows while he closes the Gauntlet) and by using the openings: the three seconds he kneels when a stone arrives, and the seconds after a stagger. See [Thanos](Thanos#how-the-fight-is-beaten).
+
+### Does Thanos break my builds?
+
+No. He never breaks or places a block, unless the server turned `blockDamage` on (and then only the Overload and the meteors make small craters). The Soul World, the Petrify Orb and the Time Snare change creatures, never the world.
+
+### Can Thanos fly?
+
+No. He steps through portals (the Space Stone), turns things to stone (the Reality Stone), drains souls, rewinds himself and locks time in a dome, but he walks. See [Playing Thanos](Thanos#playing-thanos).
+
+### Can I get the Snap?
+
+No, and never the sixth stone. Thanos the hero has the five stones the Mad Titan held; the Mind Stone belongs to Vision and to Loki's Scepter.
+
+### Why do none of the stones answer me?
+
+You are held: Billy's Freeze, the Phoenix's Mind Control or Psionic Field, a body turned to stone, the Soul World, or a cocoon of Apocalypse's sand. The film's flaw: a restrained Gauntlet hand cannot snap. Wait for it to end.
+
+### Can I be Thanos and another hero?
+
+No: one power per player. The Gauntlet works only for someone with no power, and a Thanos can give it to a friend.
+
+## Ultron and Sokovia
+
+### Does the island rise out of the real ground? Will my world be dug up?
+
+No. At the warning the mod **copies** the island (the top few layers of the ground, what grows on it, and a cone of
+rock made up under it) into the sky above the fight and builds it there; the real ground is never touched. The fight
+goes on on the copy, and when it is over the copy is cleared and everyone is set down on the ground where the fight
+began. Buildings and chests standing on the ground are left where they are (only the natural ground is copied); the
+ritual refuses a site with something hanging in the way (an item frame, a painting, a boat) or something in the sky above.
+
+### The server crashed (or I killed it) while Sokovia was up. What now?
+
+Nothing, if you let the server start again. Every fight keeps a small note in the world folder
+(`data/enhanced/sokovia`): first it only says who is owed the Program, and once the island is built it describes the island. At
+the next start the mod reads the notes, clears any floating copy and, if a player's Ultron Program was used up for a fight
+that never ended (on the ground too), gives it back. A server that is *stopped* normally (`/stop`) puts
+everything back before it closes. Players who were up when it happened are set down on the ground, and are told so,
+when they log in.
+
+### I logged out in the sky. Where will I be?
+
+The island may be gone when you come back. You are put on the ground where the fight was if it is, or on the island if it
+is still there; either way you are not hurt. A player who is carried up cannot fall and cannot be hurt until they are set
+down.
+
+### Can I turn the lift off?
+
+Yes. Set `ultron_boss.liftMode` to `TREMOR` (or `ultron_boss.liftEnabled` to `false`): the ground shakes and the fight
+goes on where it began, with the same waves of Sentries and the same falling debris. Nothing is built and nothing needs recovering.
+If the site cannot be lifted (protected ground, a claim, something in the sky) the ritual says why and uses nothing up.
+
+### Why does Ultron refuse my ground?
+
+The action bar says why, and nothing is used up. The most common reasons: the dimension has no open sky (not the Nether or the End); the ground is not level (it may rise and fall by 6 blocks at most across the island's circle (a radius of 20 blocks, about 40 across); trees do not count) or is mostly water, lava or non-walkable; the sky above, with a margin of 6 blocks, is not empty (a mountain, a tree canopy, a floating build); an item frame, painting, armour stand, boat or minecart is inside the circle; the ground is protected by spawn protection or a claim; it is too near the world border; the difficulty is Peaceful; or another boss fight is already running. Houses and chests on the ground are *not* a reason: the island is a copy, and only the natural ground is copied.
+
+### Why can't I build, dig or run away on the island?
+
+From the ritual until the fight is over, the arena is protected on purpose: nothing can be placed or broken, there is no water, lava or pistons, explosions break nothing, and teleports out are cancelled. Otherwise people would pillar up, dig a hole or hide and cheese the fight. A field pulls anyone who strays too far back onto the island (2 damage that cannot kill), so nobody falls to their death. Everything goes back to normal when the fight ends.
+
+## Apocalypse
+
+### How do I wake Apocalypse?
+
+Craft a **Capstone** (a Nether Star, five Gold Blocks and a Lapis Block) and **Sneak + right-click it on sand** (or sandstone), by day, under the open sky, with **a Scarlet Witch or a Phoenix within 64 blocks**. See [Apocalypse](Apocalypse#waking-him).
+
+### Why does nothing hurt Apocalypse?
+
+While his golden shield is up, **everything but mind power does exactly nothing to him**: arrows, swords, Mjolnir, lightning, shrapnel, the Mind Stone, tamed wolves, TNT. Only the **Scarlet Witch's Chaos Beam and what she throws with telekinesis**, and the **Phoenix's Burst, her throws and her mind powers**, wear it down. When it breaks he kneels for ten seconds and **everyone** can hurt him, down to a floor; then a stronger shield forms. Bring one of the two, then bring everyone else for the windows. See [Apocalypse](Apocalypse#the-shield-the-one-rule).
+
+### Why can I not wake him?
+
+The action bar says why, in red, and nothing is used up. The usual reasons: it is night, there is a roof over the sand, the block is not sand or sandstone, there is not enough room round it, the spot is protected, the difficulty is Peaceful, another boss is fighting, or **no Scarlet Witch or Phoenix is within 64 blocks**: without one nobody could break his shield, so he does not wake. The table is on [Apocalypse](Apocalypse#the-ritual).
+
+### I have no Scarlet Witch. Can I still fight him?
+
+Not through the ritual: it refuses, so that nobody walks into a fight that cannot be won. A server owner can turn the check off (`apocalypse_boss.requireBreaker`); he still withdraws, and gives the Capstone back, if nobody who can break his shield is left for a minute.
+
+### The Capstone is gone and he left. Do I get it back?
+
+If he withdrew because nobody could break his shield, because the server stopped, because the world went Peaceful or because an operator stopped the fight: **yes** (at your next login if the server stopped). After a wipe, an abandoned fight or the 25-minute limit: no.
+
+### Does Apocalypse break my builds?
+
+No. He never places or breaks a block: his sand, his waves, his tornadoes and his rings are effects and damage, not blocks. The arena is also protected from the moment the Capstone is planted: nothing can be placed, broken, burned or blown up in it. See [Apocalypse](Apocalypse#the-arena-what-you-cannot-do).
+
+### I was swallowed by sand and I cannot move. What do I do?
+
+You are **entombed**. Inside it you can do nothing (no key, no blow, no item): **your friends break the cocoon** by hitting it (three sword hits), or a Scarlet Witch, a Phoenix or Billy frees you by taking hold of you with telekinesis. It lets go by itself after five seconds, and the damage inside never takes you below two hearts. To avoid it, keep moving after the stripe of sand locks on your feet.
+
+### What is the Essence of En Sabah Nur?
+
+The reward of the fight. Every fighter who stayed a minute and hurt him or his shield gets one, and so does whoever landed the last blow. With **no power**, hold right-click with it for **three seconds** and you become Apocalypse. With a power you cannot use it (nothing is used up): keep it, or give it to a friend. See [Apocalypse](Apocalypse#the-reward-the-essence-of-en-sabah-nur).
+
+### Why do the abilities of Apocalypse not hurt other players?
+
+With PvP off the Sand Wave, the Entomb and the Sandstorm never hurt, hold or slow a player (mobs are always affected); the shield, the portal and Power Bestowal still work. See [Apocalypse](Apocalypse#becoming-apocalypse-the-hero).
 
 ## Abilities and keys
 

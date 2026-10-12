@@ -2,7 +2,7 @@
 
 A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The one exception is Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs.)
 
-Vision, Tommy, Billy, Loki, Thor, the Phoenix and Spider-Man have several looks. Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
+Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse have several looks. Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
 ## Switching looks
 
@@ -85,6 +85,37 @@ Her eyes glow **violet** while she reads minds, senses them, takes one over or f
 | **Your own skin** | `own` | Spider-Man's powers in your own skin (the legs, the eyes and the webs still show). |
 
 The webs are always silver-white, in every look; the look gives the colour of the title and the look-change burst (the Iron Spider's is gold). In every suit the lenses **go black with a dark red glint** while the Black Eyes last, and in the Iron Spider they close to **two red slits** in Instant Kill. Spider-Man is the one hero whose looks differ in **protection**: it comes with the suit and works at once when you change it, even in the air.
+
+### Thanos ([page](Thanos#playing-thanos))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Infinity War** (default) | `infinity_war` | The Titan of *Infinity War*: bare purple arms, the navy quilted tunic with its gold collar, a gold belt, olive trousers and a gold knee plate. |
+| **Endgame: Battle Armor** | `endgame` | The Thanos of 2014: the gold helmet with its crest, the huge gold shoulders, the plum breastplate and the greaves. |
+| **Your own skin** | `own` | Thanos's powers in your own skin. |
+
+The Infinity Gauntlet is drawn on the left arm in every look, your own skin included. The energy of each stone has its own colour (purple, blue, red, orange, green) whatever the look.
+
+### Ultron ([page](Ultron))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Ultron Prime (Age of Ultron)** (default) | `prime` | The body of *Age of Ultron*: gunmetal plates with silver edges, bronze pipes at the neck, shoulders and knees, a ridged helmet with a crest and curved antennae, narrow red-orange eyes, a dark red mouth and red lights in the chest. His plasma is amber-gold with a red edge. |
+| **Ultron Sentry** | `sentry` | A Sentry under his control: matte black plates, a smooth domed head with two thin blade antennae, a ribbed spine, a round red cheek light and cyan palms. His plasma is blue. |
+| **VisionQuest (the human avatar)** | `human` | The human Ultron of *VisionQuest*: long grey-white hair and beard, dark-rimmed glasses, a long dark coat. His plasma is red, and his eyes do not glow. |
+| **Your own skin** | `own` | Ultron's powers in your own skin. |
+
+The eyes of Prime and the Sentry glow, and the flight, the Gravity Pull and the Slam are pale blue in every look.
+
+### Apocalypse ([page](Apocalypse#looks))
+
+| Look | Id | What it is |
+|---|---|---|
+| **X-Men: Apocalypse (1983)** (default) | `apocalypse` | The first mutant of *X-Men: Apocalypse*: teal-blue skin with blank white eyes, a domed gunmetal cap engraved with a leaf on the brow, ribbed black cables down both sides of the face, a wide pewter lace collar and shoulder plates, dark verdigris armour with a glowing cyan glyph on the chest, black gloves and a hooded teal cloak. The eyes glow white-gold. |
+| **En Sabah Nur (3600 BC)** | `en_sabah_nur` | The ancient god-king in gold: a falcon-beaked helm with red cabochon eyes, a broad collar of gold, teal, lapis and red, teal chevrons on gold armour, a pleated kilt and sandals. The eyes glow red. |
+| **Your own skin** | `own` | Apocalypse's powers in your own skin. |
+
+The golden shield, the violet portal and the ochre sand are the same in every look.
 
 ### Magneto, the Scarlet Witch and Quicksilver
 

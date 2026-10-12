@@ -2,7 +2,7 @@
 
 # פקודות
 
-כל הפקודות מתחילות ב-`/enhanced` והן ל**אופרטורים** (רמת הרשאה 2): בעלי שרתים ושחקנים שיכולים להשתמש ב-`/gamemode`. הכוחות של גיבורים הם קבועים, ולכן הפקודות האלה הן גם הדרך היחידה להוריד כוח. (היוצא מן הכלל היחיד הוא `/enhanced_anim`, להסתכלות על האנימציות: ראו בהמשך.)
+כל הפקודות מתחילות ב-`/enhanced` והן ל**אופרטורים** (רמת הרשאה 2): בעלי שרתים ושחקנים שיכולים להשתמש ב-`/gamemode`. הכוחות של גיבורים הם קבועים, ולכן הפקודות האלה הן גם הדרך היחידה להוריד כוח. (היוצאות מן הכלל הן `/enhanced_anim` ו-`/enhanced_model`, להסתכלות על האנימציות ועל הבוסים: ראו בהמשך.)
 
 | פקודה | מה היא עושה |
 |---|---|
@@ -11,6 +11,12 @@
 | `/enhanced look <players> <look>` | משנה את המראה של כל שחקן שלגיבור שלו יש את המראה הזה. |
 | `/enhanced hex list` | מציגה את כל ההקסים במימד הנוכחי (הבעלים, המיקום, הרדיוס וכמה שחקנים מורשים להיכנס). |
 | `/enhanced hex clear` | מפרקת את כל ההקסים במימד הנוכחי. |
+| `/enhanced boss start thanos [force]` | קורא לטיטאן המטורף במקום שבו אתם עומדים, כמו הטסרקט והשרביט של לוקי: נפתח פורטל ואחרי שש שניות הוא נוחת 14 עד 20 בלוקים מכם. `force` מדלג על בדיקת המקום, על הכלל של העולם העליון, על המתג `summonEnabled` של השרת ועל המנוחה (שליו וקרב אחד בכל פעם עדיין חלים). ראו [תאנוס](Thanos-HE). |
+| `/enhanced boss start ultron [force]` | בלי `force` זה הטקס בלי השרביט: צריך את תוכנית אולטרון ביד (והיא נגמרת), אולטרון מתעורר על הבלוק שאתם מסתכלים עליו, וכל הבדיקות נעשות. עם `force` הוא מתעורר ברגליים שלכם בלי תוכנית, ובדיקות הקרקע מדולגות (לא השמיים הפתוחים, ואף פעם לא כשהוא כבוי בשרת, בשליו או כשקרב בוס אחר רץ). ראו [אולטרון](Ultron-HE). |
+| `/enhanced boss start apocalypse [force]` | עם `force` מעיר את אן סבאח נור ליד הרגליים שלכם, בלי אבן פסגה, ומדלג על הבדיקות של הקרקע, השמיים והצורך במכשפת השני או בפניקס (לא על קושי שליו, לא על המתג שמכבה אותו ולא על החוק של קרב אחד בכל פעם). בלי `force` הפקודה היא הטקס עצמו: צריך אבן פסגה ביד, בלוק בטווח ראייה וכל הבדיקות. ראו [אפוקליפסה](Apocalypse-HE). |
+| `/enhanced boss stop` | מסיימת את קרב הבוס שרץ. תוכנית אולטרון או אבן פסגה שנגמרו מוחזרות, והאי של סוקוביה מוחזר למקומו. `stop` שני בזמן שבוס עוד עוזב מסיים אותו מיד. |
+| `/enhanced boss list` | מציגה את קרבות הבוס הרצים. |
+| `/enhanced boss cleanup <center> <radius>` | מסירה כל יצור וקליע מהסוג של בוס בטווח הזה, בין אם קרב שייך אליו ובין אם לא: את תאנוס, החרב, המטאורים, הכדורים והאשליות שלו; את אולטרון, הזקיפים (גם של אולטרון גיבור), הקליעים שלו ומפתח הוויברניום; את אפוקליפסה, החניתות, הסלעים והפקעות שלו. היא לא מסירה בלוקים. |
 
 ## כוחות
 
@@ -29,6 +35,9 @@
 | `thor` | [ת'ור](Thor-HE) |
 | `phoenix` | [הפניקס](Phoenix-HE) |
 | `spider_man` | [ספיידרמן](Spider-Man-HE) |
+| `thanos` | [תאנוס](Thanos-HE) |
+| `ultron` | [אולטרון](Ultron-HE) |
+| `apocalypse` | [אפוקליפסה](Apocalypse-HE) |
 
 הפקודה מציעה את השמות בזמן ההקלדה. שחקן שמקבל כוח מתעורר בתור הגיבור, עם הכותרת, הצליל וההודעה לכולם, בדיוק כאילו הרוויח אותו. אם לשחקן כבר יש את הכוח הזה ונותנים מראה, רק המראה משתנה.
 
@@ -45,6 +54,9 @@
 | ת'ור | `thor`, `ragnarok`, `love_and_thunder`, `love_and_thunder_helmet`, `mighty_thor`, `own` |
 | הפניקס | `apocalypse`, `brand_new_day`, `own` |
 | ספיידרמן | `homemade`, `iron_spider`, `brand_new_day`, `own` |
+| תאנוס | `infinity_war`, `endgame`, `own` |
+| אולטרון | `prime`, `sentry`, `human`, `own` |
+| אפוקליפסה | `apocalypse`, `en_sabah_nur`, `own` |
 
 למגנטו, למכשפת השני ולקוויקסילבר אין מראות לבחור. `/enhanced look` מדלגת על שחקנים שלגיבור שלהם אין את המראה, והיא נכשלת עם "מראה לא מוכר" אם לאף שחקן מהרשימה אין אותו.
 
@@ -57,10 +69,17 @@
 | `/enhanced power set @a loki tva` | הופכת כל שחקן ללוקי, במראה של הווריאנט של ה-TVA. |
 | `/enhanced power set Steve phoenix brand_new_day` | הופכת את סטיב להפניקס, במראה של יום חדש. |
 | `/enhanced power set Steve spider_man iron_spider` | הופכת את סטיב לספיידרמן, בחליפת איירון ספיידר. |
+| `/enhanced power set Steve thanos endgame` | הופך את סטיב לתאנוס, בשריון של סוף המשחק (בלי הטיטאן המטורף ובלי הכפפה). |
+| `/enhanced power set Steve ultron sentry` | הופכת את סטיב לאולטרון, במראה הזקיף. |
+| `/enhanced power set Steve apocalypse en_sabah_nur` | הופך את סטיב לאפוקליפסה, במראה של 3600 לפנה"ס (הוא מדלג על הבוס ועל המהות). |
 | `/enhanced power set Steve none` | מורידה מסטיב את הכוח. |
 | `/enhanced look Steve white_vision` | מעבירה את סטיב, שהוא ויז'ן, למראה של ויז'ן הלבן. |
 | `/enhanced hex list` | מציגה את ההקסים במימד שלכם. |
 | `/enhanced hex clear` | מפרקת את כולם. |
+| `/enhanced boss start thanos` | קוראת לטיטאן המטורף במקום שבו אתם עומדים, אם המקום מתאים לטקס. |
+| `/enhanced boss start ultron force` | מעירה את אולטרון איפה שאתם עומדים, בלי תוכנית ובלי שרביט. |
+| `/enhanced boss start apocalypse force` | מעיר את אן סבאח נור במקום שאתם עומדים בו, בלי אבן פסגה ובלי מי שישבור את המגן שלו. |
+| `/enhanced boss cleanup ~ ~ ~ 40` | מסירה את מה שבוס השאיר בטווח 40 בלוקים מכם: את היצורים ואת הקליעים שלו. |
 
 ## הסתכלות על האנימציות: /enhanced_anim
 
@@ -75,6 +94,14 @@
 | `/enhanced_anim stance <stance> on` | מכריחה תנוחה מוחזקת (כמו `SHIELD_WANDA` או `THOR_BEAM`) להיות דלוקה. עם `off` היא מוכרחת להיות כבויה, עם `auto` המשחק מחליט, ו-`/enhanced_anim stance off` מחזירה כל תנוחה למצב הרגיל. |
 | `/enhanced_anim target <name>` | גורמת לפקודות לפעול על שחקן אחר שבטווח הראייה ולא עליכם. `/enhanced_anim target self` חוזרת אליכם. |
 | `/enhanced_anim state` | מציגה או מסתירה את המספרים שמאחורי התנוחה. |
+
+## הסתכלות על הבוסים: /enhanced_model
+
+גם `/enhanced_model` פועלת רק במשחק שלכם, לא צריכה הרשאות אופרטור ולא משנה שום דבר אצל אף אחד אחר. היא מציגה העתק של בוס, או של משהו מהקרב שלו, שרק אתם רואים, כדי שמי שמצייר יוכל להסתכל עליו מקרוב. `/enhanced_model list` מראה מה אפשר להציג, ו-`/enhanced_model clear` מסירה את ההעתק.
+
+* `/enhanced_model <thanos|thanos_phantom|thanos_sword|thanos_meteor|thanos_orb> <state> [tick]` מציגה את הטיטאן המטורף במצב מסוים (`idle`, ו-`idle_2` עד `idle_5` לפי האבנים שהוא מחזיק, `broken`, `barrier`, `veil`, `surge`, `stagger`, `falling`, `arriving`, `dying`) או בטיק של אחד המהלכים שלו (`sword_sweep`, `power_blast`, `infinity_beam`...), את האשליה שלו, את החרב שלו, מטאור או את כדור ההפיכה לאבן.
+* `/enhanced_model <ultron|ultron_sentry|vibranium_key> <state> [tick]` מציגה את אולטרון במצב מסוים (`idle`, `volley`, `beams`, `dive`, `pull`, `call`, `punch`, `stagger`, `lift`, `transfer`, `death`, `awakening`, `hybrid`, `ultron3`...), זקיף או את מפתח הוויברניום.
+* `/enhanced_model apocalypse <state> [tick]` מציגה את אן סבאח נור במצב מסוים (`idle`, `awakening`, `tell_lance`, `tell_wave`, `tell_spikes`, `tell_boulders`, `tell_entomb`, `tell_mind_crush`, `tell_portal`, `backhand`, `tell_tornado`, `staggered`, `hover`, `escaping`, `kneeling`, `armour_fall`, `dying`, `withdrawing`, `true_<state>` לגוף השברירי, `dying_fire`, והמצבים של המגן `shield_up`, `shield_cracked`, `shield_forming`, `shield_reforming` ו-`shield_broken`); `sand_cocoon`, `sand_lance` ו-`sand_boulder` מציגות את הפקעת, חנית וסלע שלו.
 
 ## קישורים
 

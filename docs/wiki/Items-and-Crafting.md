@@ -1,6 +1,6 @@
 # Items and Crafting
 
-Every item you can use is in the **Enhanced** creative tab. Eight are crafted, and four more are found in chests (or dropped). The Radioactive Spider is both: you can craft it and find it. In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
+Every item you can use is in the **Enhanced** creative tab. Ten are crafted, four more are found in chests (or dropped), and three more are the rewards of the bosses. The Radioactive Spider is both: you can craft it and find it. In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
 
 ## Crafted items
 
@@ -14,6 +14,8 @@ Every item you can use is in the **Enhanced** creative tab. Eight are crafted, a
 | [Mjolnir](#mjolnir) | [Thor](Thor) (if worthy) | Picking up a Heavy Core |
 | [Stormbreaker](#stormbreaker) | Nothing: anyone can wield it | Picking up a Nether Star |
 | [Radioactive Spider](#radioactive-spider) | [Spider-Man](Spider-Man) (by its bite) | Picking up a Glow Ink Sac |
+| [The Ultron Program](#the-ultron-program) | Wakes [Ultron](Ultron), the boss (with Loki's Scepter) | Picking up a Nether Star |
+| [Capstone](#capstone) | Wakes [Apocalypse](Apocalypse), the boss (planted in sand by day) | Picking up a Nether Star |
 
 ### Magneto's Helmet
 
@@ -132,6 +134,35 @@ A small spider in a jar, glowing sickly green (an epic item, up to 16 to a stack
 | Ancient City chest | 2% |
 | Cave Spider, killed by a player | 0.4% (+0.3% per Looting level) |
 
+### The Ultron Program
+
+```
+I E I
+R S R
+I E I
+
+I = Block of Iron
+E = Echo Shard
+R = Block of Redstone
+S = Nether Star
+```
+
+Stark's peacekeeping program, waiting for a mind: a dark steel data core with a red scanline that runs down it. It does nothing alone. Hold it in one hand and use Loki's Scepter on open, level ground with Sneak and Ultron wakes: see [Ultron](Ultron). It is used up only when the ritual starts, and is given back if the fight is stopped, the server stops or the world goes Peaceful. Fireproof, does not stack. To make one you need a Wither, an Ancient City and thirty-six iron.
+
+### Capstone
+
+```
+. S .
+G L G
+G G G
+
+S = Nether Star
+G = Gold Block
+L = Lapis Block
+```
+
+"The golden tip of the pyramid. The sun feeds it." A golden pyramid tip with a sapphire pulse running down its edge. **Sneak + right-click on sand (or sandstone) by day, under the open sky, with a Scarlet Witch or a Phoenix within 64 blocks**, and En Sabah Nur wakes: see [Apocalypse](Apocalypse#waking-him). It is used up only when the ritual starts, and is given back if the fight is stopped, the server stops, the world goes Peaceful or he withdraws because nobody could break his shield (not after a wipe, an abandoned fight or the time limit). Fireproof, does not stack. To make one you need a Wither and forty-five gold ingots.
+
 ## Items found in the world
 
 These four are never crafted. Each chance is **per chest generated** (or per kill, for the mobs): a chest of that kind has that chance to hold the item.
@@ -159,7 +190,7 @@ A stack holds up to 16 genes.
 
 ### Loki's Scepter
 
-The Mind Stone sits in the blue gem of its golden blade. Touching it with the gene in your other hand makes you the Scarlet Witch, with a Synthezoid Core makes you Vision, and with neither **kills you**. It is also a strong melee weapon (8 attack damage, never breaks), and a hit confuses: a creature forgets its target and stumbles about for 6 seconds, a player gets Nausea and Slowness (see [Scarlet Witch](Scarlet-Witch)). The stone has a voice of its own, a bright, shimmering, slightly eerie chime-hum: it sings when the stone is touched, softly under the chime of a confusing hit, and hums quietly for as long as the scepter is in someone's hand.
+The Mind Stone sits in the blue gem of its golden blade. Touching it with the gene in your other hand makes you the Scarlet Witch, with a Synthezoid Core makes you Vision, with Ultron's Core makes you [Ultron](Ultron), and with none of them **kills you** (with the [Ultron Program](#the-ultron-program) in the other hand, Sneak + right-click on the ground wakes the Ultron boss, and with the Tesseract it calls [Thanos](Thanos)). It is also a strong melee weapon (8 attack damage, never breaks), and a hit confuses: a creature forgets its target and stumbles about for 6 seconds, a player gets Nausea and Slowness (see [Scarlet Witch](Scarlet-Witch)). The stone has a voice of its own, a bright, shimmering, slightly eerie chime-hum: it sings when the stone is touched, softly under the chime of a confusing hit, and hums quietly for as long as the scepter is in someone's hand.
 
 | Source | Chance |
 |---|---|
@@ -171,7 +202,7 @@ The Mind Stone sits in the blue gem of its golden blade. Touching it with the ge
 
 ### Tesseract
 
-The Space Stone in its cube. Using it as a player with no power makes you [Loki](Loki), far away, unless you hold a Scarlet Witch Gene in your other hand: then you awaken as the [Scarlet Witch](Scarlet-Witch) instead. A hero who uses it jumps to the block they look at. It is never used up. The Space Stone has a voice of its own, a deep, swelling cosmic hum: it swells under the sound of the portal, and hums softly for as long as the cube is in someone's hand.
+The Space Stone in its cube. Using it as a player with no power makes you [Loki](Loki), far away, unless you hold a Scarlet Witch Gene in your other hand: then you awaken as the [Scarlet Witch](Scarlet-Witch) instead. A hero who uses it jumps to the block they look at. Held together with Loki's Scepter, right-click held for five seconds, it calls [Thanos](Thanos) instead. It is never used up. The Space Stone has a voice of its own, a deep, swelling cosmic hum: it swells under the sound of the portal, and hums softly for as long as the cube is in someone's hand.
 
 | Source | Chance |
 |---|---|
@@ -194,6 +225,24 @@ A spark of the cosmic fire that remembers a host, very rare. It has no recipe an
 | Woodland Mansion chest | 3% |
 
 The **Radioactive Spider** ([above](#radioactive-spider)) is found too, in five places listed with its recipe.
+
+## Rewards of the bosses
+
+These three are never crafted and never found in a chest: each is the reward of a boss fight, and the only way in to its hero.
+
+| Item | Becomes | Where it comes from |
+|---|---|---|
+| [Infinity Gauntlet](Thanos#the-infinity-gauntlet) | [Thanos](Thanos) (hold right-click for three seconds with no power) | The reward for beating the Mad Titan: one for each fighter who did 3 percent of his health, and one for whoever struck the last blow. Held with no power it lights its five stones in turn and makes you [Thanos](Thanos#playing-thanos); it can be given to a friend |
+| [Ultron's Core](#ultrons-core) | [Ultron](Ultron) (with Loki's Scepter, with no power) | The reward for beating Ultron: one for each fighter who was there for a minute and hurt him or his Sentries, and one for whoever struck the last blow |
+| [Essence of En Sabah Nur](#essence-of-en-sabah-nur) | [Apocalypse](Apocalypse#becoming-apocalypse-the-hero) (hold right-click for three seconds with no power) | The reward for beating Apocalypse: one for each fighter who was there for a minute and hurt him or his shield, and one for whoever struck the last blow |
+
+### Ultron's Core
+
+The heart Wanda tore out, in a cage of three gunmetal bars: a glowing red-orange sphere that pulses. It is the reward of the Ultron fight: every fighter who was there for a minute and hurt him or his Sentries gets one, and so does whoever lands the last blow; it is never crafted and never found in a chest. On its own it does nothing. A player with no power who holds it in one hand and uses Loki's Scepter with the other becomes [Ultron](Ultron) (the Core is used up). Fireproof, does not stack.
+
+### Essence of En Sabah Nur
+
+"A sapphire soul in gold veins. It looks for a body." A pale-blue wisp swirling in a gold-veined crystal. It is the reward of the Apocalypse fight: every fighter who was there for a minute and hurt him **or his shield** gets one, and so does whoever lands the last blow; it is never crafted and never found in a chest. A player with **no power** who **holds right-click for three seconds** with it is moved into the Essence and becomes [Apocalypse](Apocalypse#becoming-apocalypse-the-hero) (the Essence is used up; let go early and nothing is). Someone who already has a power is told "Your body already holds a power", and nothing is used up: they can keep it or give it to a friend. Fireproof, does not stack.
 
 ## Spider Web (a block, not an item)
 

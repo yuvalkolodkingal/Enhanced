@@ -16,14 +16,17 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | [Phoenix](Phoenix) | Mind Reading on/off (Sneak: Mind Sense) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks) | Mind Control (Sneak: Psionic Field) | Phoenix Burst (hold to charge, let go to unleash) |
 | [Spider-Man](Spider-Man) | Web Shot (Sneak: Web Burst) | Web Zip (Sneak, hold: Web Swing) | Wall Crawl (toggle; Sneak: Spider-Sense on/off) | Spider Legs (toggle; Sneak, twice: Instant Kill); Iron Spider only | Black Eyes (toggle) |
+| [Thanos](Thanos#playing-thanos) | Power Blast (Sneak: Titan Slam) | Portal Step (Sneak: Space Pull) | Transmute to stone (Sneak: Reality Veil, toggle) | Soul Drain (hold) (Sneak: Soul Sight) | Rewind (Sneak: Time Lock) |
+| [Ultron](Ultron) | Repulsor Fire (hold; Sneak: Overcharge) | Anti-Gravity Flight (toggle) | Gravity Pull (Sneak: Gravity Slam) | Upload (Sneak: Hack; Second Life) | Sentry Army (Sneak: Command) |
+| [Apocalypse](Apocalypse#becoming-apocalypse-the-hero) | Sand Control: Sand Wave (Sneak: Entomb) | Levitation (toggle) | Portal | Apocalypse's Shield (hold) | Power Bestowal (Sneak: Sandstorm) |
 
-**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing) work for as long as you keep the key down (the Chaos Shield also drops by itself after 8 seconds, or when it breaks, and then has to recharge). *Toggle* abilities switch on with one press and off with the next.
+**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield) work for as long as you keep the key down (the Chaos Shield also drops by itself after 8 seconds, or when it breaks, and then has to recharge). *Toggle* abilities switch on with one press and off with the next.
 
 The abilities, their cooldowns and costs are explained on each hero's page.
 
 ## Change Look: H
 
-**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki, Thor, the Phoenix and Spider-Man. Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
+**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse. Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
 
 ## Vision, That One!: Z
 
@@ -45,8 +48,10 @@ Flying works like Creative mode: **double-tap Space**, or press the hero's fligh
 | Billy | **G** (Flight) |
 | Thor | **G**, and only with Mjolnir or Stormbreaker in hand |
 | Phoenix | **G** (Flight) |
+| Ultron | **G** (Anti-Gravity Flight) |
+| Apocalypse | **G** (Levitation) |
 
-Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes). Spider-Man does not fly either: he zips and swings on webs.
+Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes). Spider-Man does not fly either: he zips and swings on webs. Nor does Thanos: he steps through portals.
 
 ## Sneak changes some keys
 
@@ -70,6 +75,19 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **G** as Spider-Man, and keep holding **G** | The **Web Swing**: you swing on a web from the block you look at until you let go. |
 | Sneak + **V** as Spider-Man | Switches **Spider-Sense** on or off (Wall Crawl stays on). |
 | Sneak + **B** as the Iron Spider, then **B** again within 3 seconds | **Instant Kill**. |
+| Sneak + **R** as Thanos | The Titan Slam, instead of the Power Blast. |
+| Sneak + **G** as Thanos | The Space Pull, instead of the Portal Step. |
+| Sneak + **V** as Thanos | The Reality Veil (a toggle), instead of the Transmute. |
+| Sneak + **B** as Thanos | The Soul Sight, instead of the Soul Drain (which is a hold). |
+| Sneak + **N** as Thanos | The Time Lock, instead of the Rewind. |
+| Sneak + **R** as Ultron | Charges an Overcharge, one heavy blast, instead of firing plasma bolts. |
+| Sneak + **V** as Ultron | Gravity Slam, instead of the Gravity Pull. |
+| Sneak + **B** as Ultron | Hack: takes over an enemy Sentry, instead of uploading into your own. |
+| Sneak + **N** as Ultron | Command: tells your Sentries what to attack (or to gather round you), instead of calling more. |
+| Sneak + right-click with Loki's Scepter, the Ultron Program in the other hand | Wakes Ultron, the boss: see [Ultron](Ultron). |
+| Sneak + **R** as Apocalypse | Entomb: swallows the creature you look at in a cocoon of sand, instead of the Sand Wave. |
+| Sneak + **N** as Apocalypse | The Sandstorm, instead of Power Bestowal. |
+| Sneak + right-click with the Capstone | Plants it in sand, by day under the open sky: wakes En Sabah Nur (see [Apocalypse](Apocalypse#waking-him)). |
 | Sneak + **H** | Previous look. |
 
 With telekinesis, pressing the key again **launches** what you hold.
