@@ -2,7 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.ThanosClientView;
-import com.kolodkingal.enhanced.item.InfinityStone;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosState;
 import net.minecraft.client.Minecraft;
@@ -28,19 +28,19 @@ import java.util.function.Supplier;
  * it plays. It is a music-volume sound, so the music slider controls it, and the client option {@code bossMusic}
  * switches it off.
  *
- * <p>The loops are {@link #THEMES}: until the sound lane makes the themes, each is the hum of the stone it stands for
- * (the stones' own loops, played low and slow), which already layers in the right order. When {@code thanos_theme_1}
- * ... {@code _5} exist, only that list changes.
+ * <p>The loops are {@link #THEMES}: five stems of 40 seconds in D minor, each the layer a stone adds (1: a drone and a
+ * heartbeat; 2: low strings; 3: dissonant high choir; 4: a driving ostinato; 5: the bells of the call), made to sound
+ * together in any combination.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class ThanosMusic {
-    /** The loop of each stone count, first to fifth. */
+    /** The layer each stone count adds, first to fifth: they play together, so the music grows as he does. */
     public static final List<Supplier<SoundEvent>> THEMES = List.of(
-            () -> InfinityStone.POWER.humSound(),
-            () -> InfinityStone.SPACE.humSound(),
-            () -> InfinityStone.REALITY.humSound(),
-            () -> InfinityStone.SOUL.humSound(),
-            () -> InfinityStone.TIME.humSound());
+            () -> ModSounds.THANOS_THEME_1.get(),
+            () -> ModSounds.THANOS_THEME_2.get(),
+            () -> ModSounds.THANOS_THEME_3.get(),
+            () -> ModSounds.THANOS_THEME_4.get(),
+            () -> ModSounds.THANOS_THEME_5.get());
     /** Within this many blocks the music is at full volume; past {@link #SILENT} it is silent. */
     private static final double FULL = 48.0;
     private static final double SILENT = 96.0;
@@ -124,7 +124,7 @@ public final class ThanosMusic {
             this.looping = true;
             this.delay = 0;
             this.volume = 0.001F;
-            this.pitch = 0.6F + 0.05F * index;
+            this.pitch = 1.0F;
             this.relative = true;
             this.attenuation = SoundInstance.Attenuation.NONE;
         }

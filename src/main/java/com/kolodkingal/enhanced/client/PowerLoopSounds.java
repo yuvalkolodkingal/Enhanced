@@ -52,10 +52,8 @@ public final class PowerLoopSounds {
         // ===== spider =====
 
         // ===== thanos =====
-        /**
-         * The Soul Drain's chains: the Soul Stone's own hum, lower, until the drain has a loop of its own (soul_drain).
-         */
-        SOUL_DRAIN(ModSounds.SOUL_STONE_HUM, 0.7F, 0.8F, (p, d) -> d.power() == Power.THANOS && d.is(Live.SOUL_DRAINING)),
+        /** The Soul Drain's chains: a choir shimmer with the click of chain links. */
+        SOUL_DRAIN(ModSounds.SOUL_DRAIN, 0.8F, 1.0F, (p, d) -> d.power() == Power.THANOS && d.is(Live.SOUL_DRAINING)),
 
         // ===== ultron =====
 

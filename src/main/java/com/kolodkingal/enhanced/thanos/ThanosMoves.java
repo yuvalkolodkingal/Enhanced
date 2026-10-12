@@ -1073,11 +1073,14 @@ final class ThanosMoves {
 
     private static void infinityBeam(ThanosEntity boss, MoveState c, ServerLevel level, int t, int fire) {
         Vec3 hand = boss.handPosition();
+        if (t == 1) {
+            // Five tones in turn, 0.4 seconds apart, are one sound: it plays once, under the voices of the stones.
+            ThanosSounds.INFINITY_CHARGE.play(level, boss.position());
+        }
         if (t >= 1 && t <= 33 && (t - 1) % 8 == 0) {
             StoneKind stone = StoneKind.nth((t - 1) / 8 + 1);
             if (stone != null) {
                 stone.voice().use(level, boss.position(), 0.4F, 1.0F);
-                ThanosSounds.INFINITY_CHARGE.play(level, boss.position(), 1.0F, 0.8F + 0.1F * ((t - 1) / 8));
                 level.sendParticles(new EnergyParticleOptions(stone.color(), 1.6F), hand.x, hand.y + 0.3, hand.z, 8, 0.2, 0.2, 0.2, 0.03);
             }
         }
