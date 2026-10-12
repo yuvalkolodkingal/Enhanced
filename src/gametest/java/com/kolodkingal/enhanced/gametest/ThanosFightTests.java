@@ -71,9 +71,10 @@ public final class ThanosFightTests {
 
     /**
      * Never a Creative player or one in the Soul World; the nearest by default, the one who hurt him most when someone has,
-     * and a Vision before anyone; he keeps a choice for sixty calls.
+     * and a Vision before anyone; he keeps a choice for sixty ticks of the game (the review found that he kept it for sixty
+     * of his idle ticks, which are a moment between two moves: the first target was held for minutes).
      */
-    @GameTest(template = ARENA, batch = "thanos_fight_target", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "thanos_fight_target", timeoutTicks = 120)
     public static void targetingGoesToVisionThenTheBiggestHitterThenTheNearest(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nearest = fighter(f, 0, 3);
@@ -84,7 +85,7 @@ public final class ThanosFightTests {
         ThanosEntity boss = boss(f, nearest);
         ServerPlayer vision = fighter(f, -7, 5, Power.VISION);
         Powers.get(vision).setVisionPhased(false);
-        f.everyTick(10, t -> {
+        f.everyTick(100, t -> {
             if (t == 1) {
                 // (Vision is not yet there for him: he joins the fight next tick.)
                 return false;
@@ -103,11 +104,13 @@ public final class ThanosFightTests {
                 }
                 return false;
             }
-            if (t == 4) {
-                check(boss.chooseTargetNow(false) == hitter, "then he goes for the one who hurt him most");
-                return true;
+            if (t < 3 + ThanosEntity.TARGET_HOLD_TICKS) {
+                // (Every tick of the game counts, not every call: he is idle only a moment between two moves.)
+                check(boss.chooseTargetNow(false) == nearest, "he holds it for sixty ticks: " + t);
+                return false;
             }
-            return false;
+            check(boss.chooseTargetNow(false) == hitter, "then he goes for the one who hurt him most");
+            return true;
         });
     }
 

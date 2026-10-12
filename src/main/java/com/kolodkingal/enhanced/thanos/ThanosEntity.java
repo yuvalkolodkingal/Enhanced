@@ -110,6 +110,14 @@ public class ThanosEntity extends Monster implements BossHooks {
     public static final int DYING_TICKS = 100;
     /** How long a stagger lasts. */
     public static final int STAGGER_TICKS = 40;
+    /** How long he keeps the target he chose before he looks again at who deserves it. */
+    public static final int TARGET_HOLD_TICKS = 60;
+    /**
+     * How long he may fall through the portal before he counts as landed whatever is under him: a pool or a lake, a block
+     * placed in the column during the countdown, a cobweb. (The arrival is invulnerable, so a Thanos that never landed
+     * would stand in it, untouchable, until the fight timed out.)
+     */
+    public static final int LAND_TIMEOUT_TICKS = 200;
     /** How long he stays invisible among his phantoms, and how long he is seen when something reveals him. */
     public static final int HIDDEN_TICKS = 80;
     public static final int REVEAL_TICKS = 40;
@@ -134,6 +142,7 @@ public class ThanosEntity extends Monster implements BossHooks {
     private int stoneBoost;
     private int arriveLeft = ARRIVE_TICKS;
     private boolean landed;
+    private int fallTicks;
     private int dyingTicks;
     /** His maximum health in design points (3000 for one fighter, up to 7500). */
     private double virtualMax = ThanosClock.healthFor(1);
@@ -191,7 +200,8 @@ public class ThanosEntity extends Monster implements BossHooks {
     // ---- walking and aiming ----
     @Nullable
     private UUID targetId;
-    private int targetHold;
+    /** The game tick until which he keeps the target he chose (the choice is judged again only at his idle tick after it). */
+    private int targetUntil;
     private int stuckTicks;
     private double stuckDistance = Double.MAX_VALUE;
     private int stuckLeaps;
@@ -514,7 +524,7 @@ public class ThanosEntity extends Monster implements BossHooks {
 
     /**
      * Whom he would go after now, as his idle tick decides it (and he then faces them): the Vision first, then the one who
-     * dealt him the most lately, then the nearest, and he keeps the choice for sixty calls.
+     * dealt him the most lately, then the nearest, and he keeps the choice for sixty ticks.
      *
      * @param fresh forget the hold on the last choice
      */
@@ -522,11 +532,34 @@ public class ThanosEntity extends Monster implements BossHooks {
     @Nullable
     public LivingEntity chooseTargetNow(boolean fresh) {
         if (fresh) {
-            targetHold = 0;
+            targetUntil = 0;
         }
         LivingEntity chosen = chooseTarget((ServerLevel) level());
         focusOn(chosen);
         return chosen;
+    }
+
+    /** Sets how long he has been falling through the portal (a test that does not want to wait for the landing's deadline). */
+    @VisibleForTesting
+    public void forceFallTicks(int ticks) {
+        this.fallTicks = ticks;
+    }
+
+    /** Whether the portal has let go of him: he has landed (or counts as landed) and is rising from it. */
+    @VisibleForTesting
+    public boolean hasLanded() {
+        return landed;
+    }
+
+    /**
+     * Frees him as the stuck rule does when he has made no progress toward {@code target}: to a free spot near it, if a
+     * teleport to there is allowed him.
+     */
+    @VisibleForTesting
+    public void forceUnstick(LivingEntity target) {
+        if (level() instanceof ServerLevel level) {
+            freeSpotNear(level, target);
+        }
     }
 
     /** Skips the arrival: he stands ready at once. */
@@ -757,6 +790,7 @@ public class ThanosEntity extends Monster implements BossHooks {
     /** Lets him fall from the portal: invulnerable until he lands and has risen. */
     void beginArrival() {
         landed = false;
+        fallTicks = 0;
         arriveLeft = ARRIVE_TICKS;
         setState(ThanosState.ARRIVING);
         rescale(1);
@@ -766,7 +800,8 @@ public class ThanosEntity extends Monster implements BossHooks {
     private void tickArriving(ServerLevel level) {
         fallDistance = 0.0F;
         if (!landed) {
-            if (onGround()) {
+            // He has landed on the ground, in water or lava (where he floats), or has fallen long enough.
+            if (onGround() || isInWater() || isInLava() || ++fallTicks > LAND_TIMEOUT_TICKS) {
                 landed = true;
                 landingEffects(level);
             }
@@ -992,13 +1027,17 @@ public class ThanosEntity extends Monster implements BossHooks {
         return false;
     }
 
-    /** Moves him to the nearest free ground near the target (at the target's own height), with a purple flash. */
+    /**
+     * Moves him to the nearest free ground near the target (at the target's own height), with a purple flash. It is a
+     * teleport like any of his, so a Hex wall (or anything else that refuses a step) is asked first: a Thanos in a Hex is
+     * kept in it, however far the one he hunts stands outside, and one outside does not get in.
+     */
     private void freeSpotNear(ServerLevel level, LivingEntity target) {
         for (int radius = 2; radius <= 6; radius += 2) {
             for (int k = 0; k < 8; k++) {
                 double angle = k * Math.PI / 4.0;
                 Vec3 spot = standingSpotAt(level, target.getX() + Math.cos(angle) * radius, target.getY(), target.getZ() + Math.sin(angle) * radius);
-                if (spot != null) {
+                if (spot != null && mayTeleportTo(level, spot)) {
                     flashAt(level, position());
                     moveTo(spot.x, spot.y, spot.z, getYRot(), getXRot());
                     navigation.stop();
@@ -1039,16 +1078,16 @@ public class ThanosEntity extends Monster implements BossHooks {
 
     /**
      * Picks whom to go after: a Vision first (the stone he hunts), then whoever dealt him the most in the last ten
-     * seconds, then the nearest. He keeps a target for sixty ticks, and goes for the nearest of Loki's copies until he
-     * has the Soul Stone.
+     * seconds, then the nearest. He keeps a target for sixty ticks of the game (not sixty idle ticks: he is idle for a
+     * moment between one move and the next, so a count of those would hold the first target for minutes), and goes for the
+     * nearest of Loki's copies until he has the Soul Stone.
      */
     @Nullable
     private LivingEntity chooseTarget(ServerLevel level) {
         List<ServerPlayer> mortals = mortals();
         LivingEntity current = target();
         boolean valid = current != null && (current instanceof ServerPlayer player ? mortals.contains(player) : current.isAlive());
-        if (valid && targetHold > 0) {
-            targetHold--;
+        if (valid && tickCount < targetUntil) {
             return current;
         }
         ServerPlayer best = null;
@@ -1079,7 +1118,7 @@ public class ThanosEntity extends Monster implements BossHooks {
                 chosen = lure;
             }
         }
-        targetHold = 60;
+        targetUntil = tickCount + TARGET_HOLD_TICKS;
         return chosen;
     }
 
