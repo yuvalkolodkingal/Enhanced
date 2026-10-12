@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -91,8 +92,10 @@ public final class PhoenixAbilities {
     /** The speed (blocks per tick) she rises at while she charges, and how high above the ground she hovers. */
     private static final double RISE_SPEED = 0.12;
     private static final double HOVER_HEIGHT = 1.5;
-    /** The charge cuts her walking speed to 40 percent. */
+    /** The charge cuts her walking speed, and her flying speed while it hovers her, to 40 percent. */
     private static final double CHARGE_SLOW = -0.6;
+    /** The flying speed {@link PowerTicker} gives everyone who is not a survival flier (the Creative default). */
+    private static final float CREATIVE_FLYING_SPEED = 0.05F;
     private static final ResourceLocation CHARGE_SLOW_ID = Enhanced.id("phoenix_charge_slow");
     /** How far up a charging Phoenix looks for the ground below her. */
     private static final int GROUND_SEARCH = 6;
@@ -280,13 +283,27 @@ public final class PhoenixAbilities {
     }
 
     /**
-     * Every player, whenever the passives are applied: a charging Phoenix is slow (60 percent off her walking speed);
-     * everyone else has none of it.
+     * Every player, whenever the passives are applied: a charging Phoenix is slow (60 percent off her walking speed and
+     * off her flying speed, which is what she moves at while the charge hovers her); everyone else has none of it.
+     *
+     * <p>The walking speed is an attribute, but a flier does not move at it: her speed in the air is the flying speed of
+     * her abilities, which {@link PowerTicker#applyPassives} sets before this runs and which only the client's own
+     * movement obeys. So the charge sets it lower again, every tick, for as long as it lasts (the passives put it back
+     * the tick after).
      */
     public static void applyBody(ServerPlayer player, PowerData data) {
         boolean charging = data.power() == Power.PHOENIX && data.is(Live.PHOENIX_CHARGING);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, CHARGE_SLOW_ID, CHARGE_SLOW, charging,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        if (charging) {
+            Abilities abilities = player.getAbilities();
+            float base = player.isCreative() || player.isSpectator() ? CREATIVE_FLYING_SPEED : Power.PHOENIX.flightSpeed();
+            float slowed = base * (1.0F + (float) CHARGE_SLOW);
+            if (Math.abs(abilities.getFlyingSpeed() - slowed) > 1.0E-4F) {
+                abilities.setFlyingSpeed(slowed);
+                player.onUpdateAbilities();
+            }
+        }
     }
 
     /** The power is being taken away: everything she left in the world ends. */
@@ -589,8 +606,13 @@ public final class PhoenixAbilities {
         steering = true;
         try {
             host.setTarget(goal);
-            if (goal != null && host.getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.REGISTERED)) {
-                host.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, goal);
+            if (host.getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.REGISTERED)) {
+                // A creature with a brain (a piglin, a hoglin) keeps its quarrel there: hers replaces it, none forgets it.
+                if (goal != null) {
+                    host.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, goal);
+                } else {
+                    host.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
+                }
             }
         } finally {
             steering = false;
@@ -599,6 +621,29 @@ public final class PhoenixAbilities {
             follow(host, owner);
         }
         return true;
+    }
+
+    /**
+     * A creature with a brain (a piglin, a hoglin, a breeze) picks its quarrels itself and puts them straight into its
+     * memory, which {@code PhoenixEvents.onChangeTarget} never sees: so every tick a host forgets a quarrel with someone
+     * it may not be sent after (her, her pets, her team, the bosses), and cannot turn on her in the half second
+     * between two steerings.
+     */
+    public static void guardBrain(Mob host) {
+        if (!host.getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_PRESENT)) {
+            return;
+        }
+        UUID ownerId = HOST_OWNER.get(host.getUUID());
+        MinecraftServer server = host.getServer();
+        ServerPlayer owner = ownerId == null || server == null ? null : server.getPlayerList().getPlayer(ownerId);
+        if (owner == null) {
+            return;
+        }
+        host.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).ifPresent(target -> {
+            if (!mayFight(owner, host, target)) {
+                host.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
+            }
+        });
     }
 
     /** What the creature should go for, in her order of preference, or null. */
@@ -686,8 +731,8 @@ public final class PhoenixAbilities {
         state.psionicUntil = now + PSIONIC_POSE_TICKS;
         data.set(Live.PHOENIX_PSIONIC, true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.PSIONIC_FIELD.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-        level.sendParticles(new EnergyParticleOptions(PSY_CORE, 1.4F), player.getX(), player.getY() + player.getBbHeight() * 0.5, player.getZ(),
-                30, 0.5, 0.6, 0.5, 0.2);
+        sparksForOthers(level, player, new EnergyParticleOptions(PSY_CORE, 1.4F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
+                player.getZ(), 30, 0.5, 0.6, 0.5, 0.2);
     }
 
     /** Whether the Psionic Field holds this mind. */
@@ -836,10 +881,24 @@ public final class PhoenixAbilities {
             double angle = turn + i * Mth.TWO_PI / 6.0;
             double y = player.getY() + ((now + i * 3) % 20) / 20.0 * height;
             int colour = i % 3 == 0 ? FIRE_GOLD : (i % 3 == 1 ? FIRE_MAIN : FIRE_CORE);
-            level.sendParticles(new EnergyParticleOptions(colour, 1.0F + f * 0.5F), player.getX() + Math.cos(angle) * radius, y,
+            sparksForOthers(level, player, new EnergyParticleOptions(colour, 1.0F + f * 0.5F), player.getX() + Math.cos(angle) * radius, y,
                     player.getZ() + Math.sin(angle) * radius, 1, 0.0, 0.0, 0.0, 0.0);
         }
-        level.sendParticles(ParticleTypes.FLAME, player.getX(), player.getY() + 0.2, player.getZ(), 1, 0.3, 0.1, 0.3, 0.02);
+        sparksForOthers(level, player, ParticleTypes.FLAME, player.getX(), player.getY() + 0.2, player.getZ(), 1, 0.3, 0.1, 0.3, 0.02);
+    }
+
+    /**
+     * Sends particles to everyone near but {@code except}. The server's sparks round the Phoenix herself are for the
+     * others to see: she sees her own flames from the client ({@code PhoenixFx} draws them for every player), and a
+     * spark that spawns a block from her camera is a blob over half her screen.
+     */
+    public static void sparksForOthers(ServerLevel level, Entity except, ParticleOptions options, double x, double y, double z, int count,
+                                        double dx, double dy, double dz, double speed) {
+        for (ServerPlayer viewer : level.players()) {
+            if (viewer != except) {
+                level.sendParticles(viewer, options, false, x, y, z, count, dx, dy, dz, speed);
+            }
+        }
     }
 
     /** The release: pays, rests, cleanses her, drains her and sends the wave. */
@@ -869,7 +928,7 @@ public final class PhoenixAbilities {
         PacketDistributor.sendToPlayersNear(level, null, centre.x, centre.y, centre.z, Math.max(64.0, radius + 32.0),
                 new PhoenixBurstPayload(player.getId(), centre, player.getYRot(), f, radius, now));
         level.playSound(null, centre.x, centre.y, centre.z, ModSounds.PHOENIX_BURST.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 8.0F), 1.0F);
-        level.sendParticles(new EnergyParticleOptions(FIRE_CORE, 2.0F), centre.x, centre.y, centre.z, 40, 0.4, 0.4, 0.4, 0.3);
+        sparksForOthers(level, player, new EnergyParticleOptions(FIRE_CORE, 2.0F), centre.x, centre.y, centre.z, 40, 0.4, 0.4, 0.4, 0.3);
     }
 
     /** Stops a sound for every player near (the Burst slipped away; its gathering roar should not go on). */

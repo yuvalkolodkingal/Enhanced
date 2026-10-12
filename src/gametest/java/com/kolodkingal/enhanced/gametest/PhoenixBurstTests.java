@@ -132,6 +132,21 @@ public final class PhoenixBurstTests {
         assertNear(jean.getDeltaMovement().y, 0.12, 1.0E-6, "rising at 0.12 blocks per tick");
         check(jean.hurtMarked, "and the client is told");
         assertNear(speed.getValue(), speed.getBaseValue() * 0.4, 1.0E-4, "her walking speed is cut to 40 percent");
+        // She hovers while she charges, and a hovering flier moves at her flying speed, not at the walking speed
+        // (found in game: she charged at three times a walk): so that is cut too, every tick the charge lasts.
+        float flying = Power.PHOENIX.flightSpeed();
+        assertNear(jean.getAbilities().getFlyingSpeed(), flying * 0.4, 1.0E-4, "and so is her flying speed");
+        PowerTicker.tick(jean);
+        assertNear(jean.getAbilities().getFlyingSpeed(), flying * 0.4, 1.0E-4, "tick after tick");
+
+        // The flames that spiral up her are for the others to see: sent to her, a spark that spawns a block from her
+        // camera is a blob over her whole screen (found in game). She sees her own from the client.
+        ServerPlayer watcher = f.player(16.5, FLOOR, 10.5);
+        TestKit.sentPackets(jean);
+        TestKit.sentPackets(watcher);
+        PowerTicker.tick(jean);
+        check(TestKit.particlesIn(TestKit.sentPackets(jean)).isEmpty(), "the server sends her none of her own flames");
+        check(!TestKit.particlesIn(TestKit.sentPackets(watcher)).isEmpty(), "but whoever is near sees them");
 
         // 1.5 blocks above the ground she stops rising and hangs there.
         jean.setPos(jean.getX(), jean.getY() + 1.6, jean.getZ());
@@ -153,6 +168,7 @@ public final class PhoenixBurstTests {
         check(!jean.getAbilities().flying, "she is put down again, since the charge lifted her");
         PowerTicker.tick(jean);
         check(!speed.hasModifier(Enhanced.id("phoenix_charge_slow")), "and her speed is her own");
+        assertNear(jean.getAbilities().getFlyingSpeed(), flying, 1.0E-4, "her flying speed too");
 
         AbilityHandler.onKey(jean, 5, true);
         check(!data.is(Live.PHOENIX_CHARGING) && actionBarKeys(jean).contains("message.enhanced.phoenix.not_ready"),

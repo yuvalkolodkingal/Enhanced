@@ -25,11 +25,12 @@ final class PhoenixFlight {
      */
     static void particles(ClientLevel level, AbstractClientPlayer player, HeroAnimState st, FlightEffects.Fx fx, float density, boolean local) {
         int budget = st.s >= 1.8F ? 12 : 6;
-        for (int source : new int[]{HAND_R, HAND_L, FOOT_R, FOOT_L}) {
+        boolean hands = PhoenixMath.handsEmit(local);
+        for (int source : hands ? new int[]{HAND_R, HAND_L, FOOT_R, FOOT_L} : new int[]{FOOT_R, FOOT_L}) {
             budget -= FlightEffects.lay(level, fx, source, 0.5, 2, 0.2, budget, density, i -> new EnergyParticleOptions(
                     i % 3 == 2 ? PhoenixMath.FIRE_CORE : i % 5 == 0 ? PhoenixMath.FIRE_EMBER : PhoenixMath.FIRE_MAIN, 0.8F), 0.01);
         }
-        if (st.sH > 0.05F && level.getGameTime() % 4 == 0 && level.random.nextFloat() < density) {
+        if (hands && st.sH > 0.05F && level.getGameTime() % 4 == 0 && level.random.nextFloat() < density) {
             for (int source : new int[]{HAND_R, HAND_L}) {
                 Vec3 hand = FlightEffects.at(fx, source, 0);
                 if (hand != null) {

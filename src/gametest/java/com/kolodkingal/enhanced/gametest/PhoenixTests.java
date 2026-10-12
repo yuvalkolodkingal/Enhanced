@@ -76,6 +76,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -84,6 +85,7 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
@@ -256,13 +258,16 @@ public final class PhoenixTests {
         PhoenixEmberItem ember = (PhoenixEmberItem) stack.getItem();
         check(ember.getUseDuration(stack, player) == PhoenixConfig.EMBER_RITUAL_TICKS.get() && ember.getUseDuration(stack, player) == 60,
                 "the hold lasts three seconds");
+        ServerPlayer watcher = f.player(16.5, FLOOR, 10.5);
         TestKit.sentPackets(player);
+        TestKit.sentPackets(watcher);
 
         check(ember.use(level, player, InteractionHand.MAIN_HAND).getResult().consumesAction() && player.isUsingItem(), "the hold begins");
         ember.onUseTick(level, player, stack, 60);
         List<Object> held = TestKit.sentPackets(player);
         check(heard(TestKit.soundsIn(held), ModSounds.PHOENIX_CHARGE.getId()), "the Phoenix gathers as the hold begins");
-        check(!TestKit.particlesIn(held).isEmpty(), "and flames spiral up the player");
+        check(!TestKit.particlesIn(TestKit.sentPackets(watcher)).isEmpty(), "and flames spiral up the player, for whoever is near to see");
+        check(TestKit.particlesIn(held).isEmpty(), "(not for the player, a spark a block from whose camera is a blob over the screen)");
 
         // Let go too soon: nothing changes, the flames sputter out and the roar is cut.
         ember.releaseUsing(stack, level, player, 30);
@@ -1027,6 +1032,64 @@ public final class PhoenixTests {
         press(jean, 4);
         check(bystander.hasEffect(ModEffects.POSSESSED), "a pig can be taken too");
         check(!host.hasEffect(ModEffects.POSSESSED) && host.hasEffect(ModEffects.CONFUSED), "(and the zombie is freed, since she holds one)");
+        helper.succeed();
+    }
+
+    /**
+     * A creature with a brain (a hoglin, a piglin) picks its quarrels itself and writes them straight into its memory,
+     * where {@code LivingChangeTargetEvent} never sees them: the host of a Phoenix forgets a quarrel with her, her pets
+     * and her team (found in game: a possessed hoglin all but killed the Phoenix who had taken it), and keeps the one
+     * she sent it on.
+     */
+    @GameTest(template = ARENA, batch = QUICK)
+    public static void aPossessedCreatureWithABrainNeverTurnsOnHerSide(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jean = jean(f, 4.5, 10.5);
+        Hoglin host = helper.spawnWithNoFreeWill(EntityType.HOGLIN, new Vec3(8.5, FLOOR, 10.5));
+        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
+        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(6.5, FLOOR, 6.5));
+        pet.tame(jean);
+        lookAt(jean, host);
+        press(jean, 4);
+        check(host.hasEffect(ModEffects.POSSESSED), "B takes the hoglin over");
+        check(host.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).orElse(null) == skeleton,
+                "she sends it after the skeleton: " + host.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET));
+
+        // Its own brain picks her as the quarrel: the effect's next tick has it forgotten. (Not a tick the effect steers
+        // on, which would put the skeleton there: the guard alone is what is tested.)
+        host.tickCount = 1;
+        host.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, jean);
+        ModEffects.POSSESSED.get().applyEffectTick(host, 0);
+        check(host.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).isEmpty(), "a quarrel with her is forgotten at once");
+        host.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, pet);
+        ModEffects.POSSESSED.get().applyEffectTick(host, 0);
+        check(host.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).isEmpty(), "and so is one with her tamed wolf");
+        host.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, skeleton);
+        ModEffects.POSSESSED.get().applyEffectTick(host, 0);
+        check(host.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).orElse(null) == skeleton, "but the one she sent it after stays");
+
+        // With nothing to fight, the steering clears a quarrel too (it stands guard).
+        skeleton.discard();
+        host.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, jean);
+        check(PhoenixAbilities.steer(host), "she steers it again");
+        check(host.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).isEmpty(), "with nothing to fight, no quarrel is kept");
+        helper.succeed();
+    }
+
+    /** A bucket of milk (or a totem) cures a possession like any effect: the creature is nobody's and forgets her quarrel. */
+    @GameTest(template = ARENA, batch = QUICK)
+    public static void aHostCuredWithMilkIsNobodysAndForgetsItsQuarrel(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jean = jean(f, 4.5, 10.5);
+        Zombie host = zombie(helper, 9.5, 10.5);
+        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
+        lookAt(jean, host);
+        press(jean, 4);
+        check(host.hasEffect(ModEffects.POSSESSED) && host.getTarget() == skeleton, "taken, and sent after the skeleton");
+        check(host.removeEffectsCuredBy(net.neoforged.neoforge.common.EffectCures.MILK), "milk cures it");
+        check(!host.hasEffect(ModEffects.POSSESSED), "the possession is gone");
+        check(PhoenixAbilities.hostsOf(jean).isEmpty(), "it is nobody's: " + PhoenixAbilities.hostsOf(jean));
+        check(host.getTarget() == null, "and it forgets what she sent it after: " + host.getTarget());
         helper.succeed();
     }
 

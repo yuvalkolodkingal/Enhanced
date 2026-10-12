@@ -169,6 +169,9 @@ public final class MindReading {
         }
         Long last = NOTICES.get(read.getUUID());
         if (last == null || now - last >= NOTICE_TICKS) {
+            // Whoever was told long ago is as good as never told: forget them, so the map never outgrows the players
+            // read in the last ten seconds.
+            NOTICES.values().removeIf(told -> now - told >= NOTICE_TICKS);
             NOTICES.put(read.getUUID(), now);
             read.displayClientMessage(Component.translatable("message.enhanced.mind_read.felt"), true);
         }

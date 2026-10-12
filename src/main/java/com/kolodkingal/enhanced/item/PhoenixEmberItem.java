@@ -66,11 +66,13 @@ public class PhoenixEmberItem extends AwakeningItem {
             double angle = turn + i * Mth.TWO_PI / 3.0;
             double y = user.getY() + ((held + i * 6) % 30) / 30.0 * user.getBbHeight();
             int colour = i == 0 ? PhoenixAbilities.FIRE_GOLD : (i == 1 ? PhoenixAbilities.FIRE_MAIN : PhoenixAbilities.FIRE_CORE);
-            server.sendParticles(new EnergyParticleOptions(colour, 1.0F), user.getX() + Math.cos(angle) * 0.7, y,
+            // For the others to see: a spark a block from the user's own camera is a blob over their screen.
+            PhoenixAbilities.sparksForOthers(server, user, new EnergyParticleOptions(colour, 1.0F), user.getX() + Math.cos(angle) * 0.7, y,
                     user.getZ() + Math.sin(angle) * 0.7, 1, 0.0, 0.0, 0.0, 0.0);
         }
         if (held % 4 == 0) {
-            server.sendParticles(ParticleTypes.FLAME, user.getX(), user.getY() + user.getBbHeight() * 0.6, user.getZ(), 1, 0.15, 0.1, 0.15, 0.02);
+            PhoenixAbilities.sparksForOthers(server, user, ParticleTypes.FLAME, user.getX(), user.getY() + user.getBbHeight() * 0.6, user.getZ(), 1,
+                    0.15, 0.1, 0.15, 0.02);
         }
     }
 

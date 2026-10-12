@@ -59,7 +59,7 @@ Keys **R G V B N** are abilities 1 to 5. Every number is an option in the `[phoe
 
 Hold **N**. Not a Spectator, ability 5 rested, not already charging and at least `burstFoodCost` (6) food points, else "The Phoenix is still resting (12.3 s)" or "Too hungry to hold the Phoenix".
 
-1. **Charging.** `Live.PHOENIX_CHARGING` and `PHOENIX_BLAZE` are set; she rises at 0.12 blocks a tick to 1.5 blocks above the ground and hovers (a pinned Phoenix does not rise, fall damage is reset), her walking speed is cut by 60 percent (the modifier `enhanced:phoenix_charge_slow`), and she is **not invulnerable**. Flames spiral up her body; `phoenix_charge` plays.
+1. **Charging.** `Live.PHOENIX_CHARGING` and `PHOENIX_BLAZE` are set; she rises at 0.12 blocks a tick to 1.5 blocks above the ground and hovers (a pinned Phoenix does not rise, fall damage is reset), her walking speed is cut by 60 percent (the modifier `enhanced:phoenix_charge_slow`) and so is her flying speed, which is what a hovering player moves at (set again every tick of the charge by `PhoenixAbilities.applyBody`; the passives restore it the tick after), and she is **not invulnerable**. Flames spiral up her body; `phoenix_charge` plays.
 2. **Release** (or full charge, `burstChargeTicks` 60: it fires by itself). Fewer than `burstMinChargeTicks` (12) ticks: cancelled, no damage, no hunger, the cooldown `burstCancelCooldown` (40). Otherwise the Burst, with the charge `f` (0 to 1).
 
 | Value | Formula | Default |

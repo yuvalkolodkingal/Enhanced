@@ -92,7 +92,7 @@ From *X-Men: Apocalypse*, where Xavier tells Jean to let go and **bird-shaped fl
 **Hold N.**
 
 1. **Checks.** The Burst must be rested, and you need at least 6 food points ("The Phoenix is still resting (12.3 s)", "Too hungry to hold the Phoenix"). Creative players pay nothing.
-2. **Charging.** You **rise** (0.12 blocks a tick) until you hover 1.5 blocks above the ground, and your walking speed is cut to 40 percent. A **firebird of flame ribbons** forms behind and above you, and grows with the charge, flames spiral up your body, your eyes burn gold and the Phoenix's roar gathers. You are **not invulnerable**: charging is a risk. A pinned Phoenix doesn't rise.
+2. **Charging.** You **rise** (0.12 blocks a tick) until you hover 1.5 blocks above the ground, and your speed is cut to 40 percent (your walking speed, and your flying speed, which is what you move at while you hover). A **firebird of flame ribbons** forms behind and above you, and grows with the charge, flames spiral up your body, your eyes burn gold and the Phoenix's roar gathers. You are **not invulnerable**: charging is a risk. A pinned Phoenix doesn't rise.
 3. **Release** (or full charge: after 3 seconds it goes off by itself). Let go before 12 ticks (0.6 s) and it is **cancelled**: "The Phoenix slips away", no damage, no hunger, and a 2 second wait. Otherwise the **Burst** goes off with the charge `f` (0 to 1):
 
 | | At the smallest charge | At full charge |

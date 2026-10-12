@@ -112,6 +112,15 @@ public final class PhoenixMath {
         return Mth.lerp(t, -20.0F, 50.0F);
     }
 
+    /**
+     * Whether her hands let embers and flames go as she flies (and while the charge hovers her). In first person they do
+     * not: the hand is half a block from the camera, and a spark there is a blob of squares over half the screen (found
+     * in game, charging the Burst). Her feet always do; the others see her hands burn.
+     */
+    public static boolean handsEmit(boolean firstPerson) {
+        return !firstPerson;
+    }
+
     /** The flash of the first two ticks: a disc of this radius at the centre. */
     public static float flashRadius(float charge, float age) {
         return age < 0.0F || age > 2.0F ? 0.0F : 1.5F * Math.max(0.3F, charge) * (1.0F - age / 3.0F);

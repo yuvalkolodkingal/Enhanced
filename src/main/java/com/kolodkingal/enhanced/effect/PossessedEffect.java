@@ -34,8 +34,11 @@ public class PossessedEffect extends MobEffect {
         if (!(entity.level() instanceof ServerLevel level)) {
             return true;
         }
-        if (entity instanceof Mob mob && entity.tickCount % STEER_PERIOD == 0 && !PhoenixAbilities.steer(mob)) {
-            return false; // nobody holds it any more
+        if (entity instanceof Mob mob) {
+            if (entity.tickCount % STEER_PERIOD == 0 && !PhoenixAbilities.steer(mob)) {
+                return false; // nobody holds it any more
+            }
+            PhoenixAbilities.guardBrain(mob);
         }
         if (entity.tickCount % 3 == 0) {
             // Three violet sparks circling the head.

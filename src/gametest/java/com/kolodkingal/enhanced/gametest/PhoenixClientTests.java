@@ -45,6 +45,13 @@ public final class PhoenixClientTests {
     // The Burst
 
     @GameTest(template = ARENA, batch = BATCH)
+    public static void inFirstPersonHerHandsLetNoEmberGo(GameTestHelper helper) {
+        check(!PhoenixMath.handsEmit(true), "a spark half a block from the camera is a blob over the screen: none from the hands");
+        check(PhoenixMath.handsEmit(false), "but everyone else sees her hands burn");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = BATCH)
     public static void theBurstsShellSpreadsAtTheWavesSpeedAndFadesInItsLastTenTicks(GameTestHelper helper) {
         // The same radius the server's wave has at each tick: speed * (age + 1), at most the radius.
         assertNear(PhoenixMath.shellRadius(24.0F, 1.0F, 0.0F), 1.0, 1.0E-6, "a block at the first tick");
