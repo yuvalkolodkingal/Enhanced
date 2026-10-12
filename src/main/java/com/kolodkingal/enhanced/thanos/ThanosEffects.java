@@ -13,13 +13,15 @@ import java.util.List;
 
 /**
  * What the Mad Titan shows: every tell, beam, portal and ring he draws is sent to the players nearby as a {@link
- * ThanosFxPayload} (which the client draws for a few ticks), and, while the client does not draw them yet, as a little
- * server-side energy so that the fight can be read with the placeholder visuals. {@link #PARTICLES} switches the stand-in
- * off when the client's {@code ThanosFx} draws everything.
+ * ThanosFxPayload} (which the client's {@code ThanosFx} draws for a few ticks). {@link #PARTICLES} brings back, as a
+ * little server-side energy with every effect, the stand-in that showed the fight before the client drew anything; it
+ * is off, since the client draws everything.
  */
 public final class ThanosEffects {
-    /** Whether the server sends stand-in particles with every effect (until the client draws the payloads itself). */
-    public static boolean PARTICLES = true;
+    /**
+     * Whether the server also sends stand-in particles with every effect (off: the client draws the payloads itself).
+     */
+    public static boolean PARTICLES = false;
 
     /** How far an effect is sent: past it nobody could see it. */
     private static final double RANGE = 128.0;

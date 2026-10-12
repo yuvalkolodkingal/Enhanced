@@ -63,6 +63,7 @@ public final class ClientSetup {
             // ===== phoenix =====
             // ===== spider =====
             // ===== thanos =====
+            ThanosBossBar.register();
             ThanosViewer.register();
             // ===== ultron =====
             // ===== apocalypse =====
@@ -168,6 +169,7 @@ public final class ClientSetup {
         // ===== phoenix =====
         // ===== spider =====
         // ===== thanos =====
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("thanos_atmosphere"), new ThanosAtmosphere.Overlay());
         // ===== ultron =====
         // ===== apocalypse =====
     }

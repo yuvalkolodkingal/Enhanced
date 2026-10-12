@@ -45,6 +45,8 @@ import java.util.List;
  */
 final class ThanosMoves {
     private static final int GOLD = 0xD9C48A;
+    /** How long the Leap flies, about: the landing ring's clock. */
+    private static final int LEAP_FLIGHT_TICKS = 20;
 
     /** A move and the creature it is aimed at. */
     record Choice(ThanosMove move, LivingEntity target) {
@@ -588,6 +590,11 @@ final class ThanosMoves {
             Vec3 to = c.target.position().subtract(boss.position());
             double distance = Math.min(18.0, Math.hypot(to.x, to.z));
             c.spot = boss.position().add(flat(to).scale(distance));
+        }
+        if (t == Math.min(ThanosMove.LEAP.lock(), c.tell) && c.target != null) {
+            // His aim is fixed: the ring of the landing shows from now until he comes down (the flight takes about a
+            // second).
+            ThanosEffects.ringTell(level, c.spot, 4.0F, c.tell - t + LEAP_FLIGHT_TICKS, GOLD);
         }
         if (t == fire) {
             Vec3 to = c.spot.subtract(boss.position());

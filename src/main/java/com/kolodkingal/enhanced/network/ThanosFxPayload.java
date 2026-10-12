@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.render.ThanosFx;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -71,7 +72,10 @@ public record ThanosFxPayload(int kind, int color, int entityId, int ticks, floa
         return TYPE;
     }
 
-    /** The Thanos lane draws the effect here. */
+    /**
+     * The effect arrived: the client draws it for a few ticks (one call into a client class, loaded only on a client).
+     */
     static void handle(ThanosFxPayload payload, IPayloadContext context) {
+        ThanosFx.add(payload);
     }
 }
