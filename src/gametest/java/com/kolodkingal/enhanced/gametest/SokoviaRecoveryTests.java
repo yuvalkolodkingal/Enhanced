@@ -23,6 +23,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -99,7 +100,9 @@ public final class SokoviaRecoveryTests {
 
     /**
      * ... and the one who was knocked up (or whose client lags: the lift lets a carried player drift a few blocks before
-     * it puts them back) is put on the ground where the lift says they are, not where the knock left them.
+     * it puts them back) is put on the ground where the lift says they are, not where the knock left them: there is a
+     * block on the ground two over where they stand, which one let down from as high as the knock left them would stop
+     * on.
      */
     @GameTest(template = PAD, batch = "ultron_lift_stop_knocked", timeoutTicks = 600)
     public static void stoppingTheServerWhileTheIslandComesDownPutsAKnockedUpPlayerOnTheGround(GameTestHelper helper) {
@@ -114,7 +117,8 @@ public final class SokoviaRecoveryTests {
      * Plays the fight to a moment ({@code when}, with the fight won as soon as the island is up if {@code win}), then
      * stops the server: the island is cleared and everyone is on the ground where they stood, flags and journal and
      * lift are gone, all in the same tick, and the Program that started the fight is waiting for the summoner as a
-     * gift. The starter is {@code knock} blocks higher than the lift says they are when it stops.
+     * gift. The starter is {@code knock} blocks higher than the lift says they are when it stops; if they are, a stone
+     * block is put on the ground two blocks over where they stand (and taken away after: the ground is the same).
      */
     private static void stopWhen(GameTestHelper helper, Predicate<UltronFight> when, boolean win, double knock) {
         TestKit.Fixture f = pad(helper);
@@ -126,14 +130,10 @@ public final class SokoviaRecoveryTests {
         tank(starter);
         long ground = groundHash(helper);
         UltronFight fight = ritual(f, starter);
-        calm(fight);
         Vec3[] where = new Vec3[2];
         Script script = new Script();
         script.step("the second fighter joins", () -> fight.participants().size() == 2);
-        script.then("the lift begins", () -> {
-            fight.forceState(UltronFight.Phase.LIFT_WARN);
-            fight.forceState(UltronFight.Phase.LIFT_LOCK);
-        });
+        script.then("the lift begins", () -> liftBegins(fight));
         script.step("the moment comes", () -> {
             client(starter, other);
             // (Where they stand sideways: the boss pushes them about a little on the island.)
@@ -145,9 +145,20 @@ public final class SokoviaRecoveryTests {
             return when.test(fight);
         });
         script.then("the server stops", () -> {
-            starter.setPos(starter.position().add(0.0, knock, 0.0));
+            BlockPos shelf = null;
+            if (knock > 0.0) {
+                // (Where the lift says they are, they stand under it. Where the knock left them, they are over it: let
+                // down from there, they would stand on it, three over the ground.)
+                Vec3 at = rel(helper, starter);
+                shelf = new BlockPos(Mth.floor(at.x), (int) GROUND + 2, Mth.floor(at.z));
+                helper.setBlock(shelf, Blocks.STONE);
+                starter.setPos(starter.position().add(0.0, knock, 0.0));
+            }
             BossFights.stopAll(server, StopReason.SERVER_STOPPING);
             check(blocksInTheSky(helper) == 0, "the sky is empty in the same tick: " + blocksInTheSky(helper));
+            if (shelf != null) {
+                helper.setBlock(shelf, Blocks.AIR);
+            }
             check(groundHash(helper) == ground, "the ground is as it was");
             for (int i = 0; i < 2; i++) {
                 ServerPlayer player = i == 0 ? starter : other;
@@ -165,6 +176,388 @@ public final class SokoviaRecoveryTests {
                     "the Program is waiting for whoever used it");
         });
         script.run(f, 280);
+    }
+
+    /**
+     * The lift begins after a ritual: the warning, which makes his body appear (the test does not wait out the
+     * awakening, where it would), then he is calmed ({@link UltronTestSupport#calm}: before his body is there that does
+     * nothing to him, and he would choose attacks on the island and through the pause after a win), then the lock.
+     */
+    private static void liftBegins(UltronFight fight) {
+        fight.forceState(UltronFight.Phase.LIFT_WARN);
+        check(fight.boss() != null, "(his body is there, to be calmed)");
+        calm(fight);
+        fight.forceState(UltronFight.Phase.LIFT_LOCK);
+    }
+
+    /**
+     * Whoever is in the air over the island when it goes (Ultron's Gravity Pull holds a fighter at his chest, about four
+     * blocks up; a jump; a knock) is set down on the ground below, not as high over it: by a stop while it comes down
+     * (the lift carried them down that high), by a stop while it is up (they stand on nothing), and when it lands. A hero
+     * who is flying flies on at his height.
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_air_falling", timeoutTicks = 600)
+    public static void stoppingTheServerWhileTheIslandComesDownPutsAFighterInTheAirOnTheGround(GameTestHelper helper) {
+        inTheAir(helper, true, true);
+    }
+
+    @GameTest(template = PAD, batch = "ultron_lift_air_placed", timeoutTicks = 400)
+    public static void stoppingTheServerWhileTheIslandIsUpPutsAFighterInTheAirOnTheGround(GameTestHelper helper) {
+        inTheAir(helper, false, true);
+    }
+
+    @GameTest(template = PAD, batch = "ultron_lift_air_landing", timeoutTicks = 600)
+    public static void theIslandLandsAFighterWhoWasInTheAirOnTheGround(GameTestHelper helper) {
+        inTheAir(helper, true, false);
+    }
+
+    /** How high over the island the fighter is: as high as the Gravity Pull holds one, at Ultron's chest. */
+    private static final double IN_THE_AIR = 4.4;
+    /** How high over it the hero flies. */
+    private static final double FLYING = 3.0;
+
+    /**
+     * The island goes up; the fighter is put {@link #IN_THE_AIR} blocks over it and a flying hero {@link #FLYING} blocks
+     * over it, both at rest. If {@code won}, the fight is won at once (nothing of Ultron fights on) and the island comes
+     * down with them; the server stops then ({@code stop}: in the fall, or at once while the island is up if it was not
+     * won), or the island lands.
+     */
+    private static void inTheAir(GameTestHelper helper, boolean won, boolean stop) {
+        TestKit.Fixture f = pad(helper);
+        f.config(UltronBossConfig.EDITS_PER_TICK, 400);
+        MinecraftServer server = f.level().getServer();
+        ServerPlayer fighter = f.player(MIDDLE_X - 4.0, GROUND, MIDDLE_Z + 2.0);
+        ServerPlayer flyer = f.player(MIDDLE_X + 4.0, GROUND, MIDDLE_Z - 3.0);
+        flyer.getAbilities().mayfly = true;
+        flyer.getAbilities().flying = true;
+        flyer.onUpdateAbilities();
+        tank(fighter);
+        tank(flyer);
+        UltronFight fight = UltronTestSupport.onTheGround(f, fighter);
+        calm(fight);
+        Vec3[] where = new Vec3[2];
+        Script script = new Script();
+        script.step("the flyer joins", () -> fight.participants().size() == 2);
+        script.then("the lift begins", () -> {
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the island is up", () -> {
+            client(fighter, flyer);
+            return fight.phase() == UltronFight.Phase.ISLAND && in(fight, SokoviaLift.Step.PLACED);
+        });
+        script.then("one is in the air over it, the other flies", () -> {
+            if (won) {
+                fight.end(BossEnd.VICTORY);
+                check(fight.boss() != null && !fight.boss().brain().isEnabled() && fight.sentries().isEmpty(),
+                        "the fight is won while a body still stands: nothing of his fights on (his mind is off, his Sentries are gone)");
+            }
+            fighter.setPos(fighter.position().add(0.0, IN_THE_AIR, 0.0));
+            flyer.setPos(flyer.position().add(0.0, FLYING, 0.0));
+            fighter.setDeltaMovement(Vec3.ZERO);
+            flyer.setDeltaMovement(Vec3.ZERO);
+        });
+        script.step(won ? (stop ? "the island comes down with them" : "the island lands") : "the moment comes", () -> {
+            client(fighter, flyer);
+            if (!fight.isFinished()) {
+                where[0] = rel(helper, fighter);
+                where[1] = rel(helper, flyer);
+            }
+            if (!won) {
+                return true;
+            }
+            return stop ? in(fight, SokoviaLift.Step.FALLING) && SokoviaLift.of(fight).altitude() < LIFT - 6.0 : fight.isFinished();
+        });
+        script.then(stop ? "the server stops" : "they are down", () -> {
+            if (stop) {
+                SokoviaLift.Lift lift = SokoviaLift.of(fight);
+                assertNear(where[0].y - (GROUND + lift.altitude()), IN_THE_AIR, 0.6, "(the fighter is " + IN_THE_AIR + " blocks over the island)");
+                check(lift.carried().contains(fighter.getUUID()) == won, won ? "(and the lift carries them down that high)" : "(and stands on nothing)");
+                BossFights.stopAll(server, StopReason.SERVER_STOPPING);
+                check(blocksInTheSky(helper) == 0 && fight.isFinished(), "the island is gone");
+            }
+            Vec3 now = rel(helper, fighter);
+            assertNear(now.y, GROUND, 0.01, "the fighter is on the ground");
+            assertNear(now.x, where[0].x, 0.01, "under where they were");
+            assertNear(now.z, where[0].z, 0.01, "under where they were");
+            Vec3 flying = rel(helper, flyer);
+            assertNear(flying.y, GROUND + FLYING, 0.6, "the flying hero flies on at his height");
+            assertNear(flying.x, where[1].x, 0.01, "over where he was");
+            check(flyer.getAbilities().flying, "and still flies");
+            for (ServerPlayer player : List.of(fighter, flyer)) {
+                check(!player.isNoGravity() && !Powers.get(player).is(Live.LIFTED), player.getGameProfile().getName() + " is free");
+            }
+        });
+        script.run(f, won ? 580 : 380);
+    }
+
+    /**
+     * Whoever stands on a ledge of the island, their middle past its edge and their body still over it (the game lets
+     * anyone stand so), is left on it, not dropped down the column under their middle: when the island lands, when the
+     * server stops while it is up, and when the rise is cut short (where a fighter who was in the air at the lock is put
+     * on the ground, as one in the air is at the other two).
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_ledge_landing", timeoutTicks = 600)
+    public static void theIslandLandsOneWhoStandsOnALedgeOnTheLedge(GameTestHelper helper) {
+        onALedge(helper, Ledge.LANDING);
+    }
+
+    @GameTest(template = PAD, batch = "ultron_lift_ledge_placed", timeoutTicks = 400)
+    public static void stoppingTheServerWhileTheIslandIsUpLeavesOneWhoStandsOnALedgeOnTheLedge(GameTestHelper helper) {
+        onALedge(helper, Ledge.STOP_UP);
+    }
+
+    @GameTest(template = PAD, batch = "ultron_lift_ledge_rising", timeoutTicks = 400)
+    public static void aRiseCutShortLeavesOneWhoStandsOnALedgeOnTheLedgeAndPutsOneWhoJumpedOnTheGround(GameTestHelper helper) {
+        onALedge(helper, Ledge.RISE_CUT);
+    }
+
+    /** When the one on the ledge is set down: the island lands, the server stops while it is up, the rise is cut short. */
+    private enum Ledge {
+        LANDING, STOP_UP, RISE_CUT
+    }
+
+    /** The top of the ledge: a stone block 3 x 3 and 4 high on the pad (relative x 26 to 28, z 20 to 22). */
+    private static final double LEDGE_TOP = GROUND + 4.0;
+    /** Where one stands on it: their middle 0.2 past its west face (x = 26), their body (0.6 wide) over it by 0.1. */
+    private static final double ON_THE_LEDGE_X = 25.8;
+    /** How high over the ground a fighter who jumps is. */
+    private static final double JUMP = 1.2;
+
+    /**
+     * A fighter stands on a ledge on the island, their middle past its edge; the island goes up, and at the {@code
+     * moment} they are set down: they are on the ledge, free of it, as they stood (not four blocks down the column of
+     * their middle, in its side), and the starter, in the middle, on the ground. At a cut-short rise the starter jumped at
+     * the lock, so the lift took them in the air.
+     */
+    private static void onALedge(GameTestHelper helper, Ledge moment) {
+        for (int x = 26; x <= 28; x++) {
+            for (int z = 20; z <= 22; z++) {
+                for (int y = SURFACE + 1; y < SURFACE + 5; y++) {
+                    helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
+                }
+            }
+        }
+        TestKit.Fixture f = pad(helper);
+        f.config(UltronBossConfig.EDITS_PER_TICK, 400);
+        // (A lower cover over the ground, so that the island, with the ledge on it, still fits under the pad's ceiling.)
+        f.config(UltronBossConfig.COVER_HEIGHT, 4);
+        ServerLevel level = f.level();
+        MinecraftServer server = level.getServer();
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        ServerPlayer ledge = f.player(ON_THE_LEDGE_X, LEDGE_TOP, MIDDLE_Z);
+        tank(starter);
+        tank(ledge);
+        UltronFight fight = UltronTestSupport.onTheGround(f, starter);
+        calm(fight);
+        Vec3 start = rel(helper, ledge);
+        Vec3[] where = new Vec3[1];
+        Script script = new Script();
+        script.step("the one on the ledge joins", () -> fight.participants().size() == 2);
+        script.then("the lift begins", () -> {
+            check(start.x < 26.0 && start.x + ledge.getBbWidth() / 2.0 > 26.0 && Math.abs(start.y - LEDGE_TOP) < 1.0E-6
+                            && level.noCollision(ledge, ledge.getBoundingBox().deflate(0.001)),
+                    "(they stand on the ledge with their middle past its edge, free of it): " + start);
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            if (moment == Ledge.RISE_CUT) {
+                starter.setPos(starter.position().add(0.0, JUMP, 0.0));
+            }
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the moment comes", () -> {
+            client(starter, ledge);
+            if (!fight.isOver()) {
+                where[0] = rel(helper, starter);
+            }
+            switch (moment) {
+                case LANDING -> {
+                    if (fight.phase() == UltronFight.Phase.ISLAND && !fight.isOver()) {
+                        fight.end(BossEnd.VICTORY);
+                    }
+                    return fight.isFinished();
+                }
+                case STOP_UP -> {
+                    if (fight.phase() == UltronFight.Phase.ISLAND && in(fight, SokoviaLift.Step.PLACED)) {
+                        BossFights.stopAll(server, StopReason.SERVER_STOPPING);
+                        return true;
+                    }
+                    return false;
+                }
+                default -> {
+                    if (in(fight, SokoviaLift.Step.RISING) && SokoviaLift.of(fight).altitude() > 5.0 && !fight.isOver()) {
+                        check(SokoviaLift.of(fight).carried().contains(starter.getUUID()), "(the lift took the starter in the air)");
+                        fight.end(BossEnd.COMMAND);
+                    }
+                    return fight.isFinished();
+                }
+            }
+        });
+        script.then("they are set down", () -> {
+            check(blocksInTheSky(helper) == 0 && fight.isFinished(), "the island is gone");
+            Vec3 now = rel(helper, ledge);
+            assertNear(now.y, LEDGE_TOP, 0.01, "the one on the ledge is still on it (they stood at " + start + ")");
+            assertNear(now.x, start.x, 0.01, "where they stood on it");
+            assertNear(now.z, start.z, 0.01, "where they stood on it");
+            Vec3 middle = rel(helper, starter);
+            assertNear(middle.y, GROUND, 0.01, moment == Ledge.RISE_CUT ? "the one who jumped is on the ground" : "the starter is on the ground");
+            assertNear(middle.x, where[0].x, 1.0, "the starter has not moved sideways");
+            assertNear(middle.z, where[0].z, 1.0, "the starter has not moved sideways");
+            for (ServerPlayer player : List.of(starter, ledge)) {
+                String name = player.getGameProfile().getName();
+                check(level.noCollision(player, player.getBoundingBox().deflate(0.001)), name + " is free of the blocks");
+                check(!player.isNoGravity() && !Powers.get(player).is(Live.LIFTED), name + " is free");
+            }
+        });
+        script.run(f, moment == Ledge.LANDING ? 580 : 380);
+    }
+
+    /**
+     * The island is nearly down when the server stops, and someone stands on the real ground under it, inside its rim (a
+     * passer-by; a fighter who logs in while it comes down is set there). Its blocks are gone by then, and in the last
+     * five blocks of the fall where they stand is in the region of what stands on it: they are left where they stand
+     * (the island does not carry them), not set as far under it as the island is still up (into the ground).
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_stop_settling", timeoutTicks = 600)
+    public static void stoppingTheServerAsTheIslandSettlesLeavesWhoeverStandsUnderItWhereTheyStand(GameTestHelper helper) {
+        underTheSettlingIsland(helper, false);
+    }
+
+    /**
+     * ... and one who is in the air there (a jump, a glide: the island never had them) is left as they are, in the air
+     * and moving as they were, not set down on the ground.
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_stop_settling_air", timeoutTicks = 600)
+    public static void stoppingTheServerAsTheIslandSettlesLeavesWhoeverIsInTheAirUnderItAsTheyAre(GameTestHelper helper) {
+        underTheSettlingIsland(helper, true);
+    }
+
+    /** How high over the ground the passer-by who jumps under the settling island is, and how they move. */
+    private static final double JUMPED = 3.0;
+    private static final Vec3 JUMPING = new Vec3(0.2, 0.3, -0.1);
+
+    /**
+     * The fight is won, the island comes down with its fighter, and in the last five blocks of the fall a passer-by is
+     * under it, on the ground or ({@code jumping}) {@link #JUMPED} over it and moving: the server stops.
+     */
+    private static void underTheSettlingIsland(GameTestHelper helper, boolean jumping) {
+        TestKit.Fixture f = pad(helper);
+        f.config(UltronBossConfig.EDITS_PER_TICK, 400);
+        ServerLevel level = f.level();
+        MinecraftServer server = level.getServer();
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        tank(starter);
+        UltronFight fight = UltronTestSupport.onTheGround(f, starter);
+        calm(fight);
+        Script script = new Script();
+        script.then("the lift begins", () -> {
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the fight is won and the island is nearly down", () -> {
+            client(starter);
+            if (fight.phase() == UltronFight.Phase.ISLAND && !fight.isOver()) {
+                fight.end(BossEnd.VICTORY);
+            }
+            return in(fight, SokoviaLift.Step.FALLING) && SokoviaLift.of(fight).altitude() < 5.0;
+        });
+        script.then(jumping ? "someone is in the air under it when the server stops" : "someone stands under it when the server stops", () -> {
+            double altitude = SokoviaLift.of(fight).altitude();
+            ServerPlayer passerBy = f.player(MIDDLE_X + 3.0, GROUND + (jumping ? JUMPED : 0.0), MIDDLE_Z + 3.0);
+            if (jumping) {
+                passerBy.setDeltaMovement(JUMPING);
+            }
+            check(!fight.isParticipant(passerBy.getUUID()) && level.noCollision(passerBy, passerBy.getBoundingBox().deflate(0.001)),
+                    "(they are not a fighter, and are free of the blocks)");
+            Vec3 before = rel(helper, passerBy);
+            BossFights.stopAll(server, StopReason.SERVER_STOPPING);
+            check(blocksInTheSky(helper) == 0 && fight.isFinished(), "the island is gone");
+            Vec3 now = rel(helper, passerBy);
+            if (jumping) {
+                assertNear(now.y, GROUND + JUMPED, 0.01, "the one in the air under it is still in the air (the island was " + altitude + " up)");
+                check(passerBy.getDeltaMovement().equals(JUMPING), "and moves as they did: " + passerBy.getDeltaMovement());
+            } else {
+                assertNear(now.y, GROUND, 0.01, "the one under it is on the ground where they stood (the island was " + altitude + " up)");
+            }
+            assertNear(now.x, before.x, 0.01, "where they were");
+            assertNear(now.z, before.z, 0.01, "where they were");
+            check(level.noCollision(passerBy, passerBy.getBoundingBox().deflate(0.001)), "and not in the ground");
+            assertNear(rel(helper, starter).y, GROUND, 0.01, "the fighter it carried is on the ground");
+        });
+        script.run(f, 580);
+    }
+
+    /**
+     * The server stops while the pit's tractor carries a fighter up to the island (one who came after the lock, or died
+     * up there): they are set on the ground under where they are, free, as everyone the island carries is. From low
+     * under the island, where nothing that is on the island is; and from among its underside, where what is on the island
+     * is (they are not set as far under where they are as the island is up: into the ground).
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_stop_tractor_low", timeoutTicks = 600)
+    public static void stoppingTheServerWhileThePitsTractorCarriesAFighterUpPutsThemOnTheGround(GameTestHelper helper) {
+        onTheTractor(helper, false);
+    }
+
+    @GameTest(template = PAD, batch = "ultron_lift_stop_tractor_high", timeoutTicks = 600)
+    public static void stoppingTheServerAsThePitsTractorBringsAFighterToTheIslandPutsThemOnTheGround(GameTestHelper helper) {
+        onTheTractor(helper, true);
+    }
+
+    /**
+     * The island is up and a latecomer stands under it until the tractor takes them; the server stops when it has them
+     * halfway up, or ({@code high}) among the island's underside: in the region of what is on the island (from the bottom
+     * of its skin, five under its surface, up), in its lowest block and a half, where one set as far under where they are
+     * as the island is up would be more than three blocks deep in the ground (deeper than a free spot is looked for).
+     */
+    private static void onTheTractor(GameTestHelper helper, boolean high) {
+        TestKit.Fixture f = pad(helper);
+        f.config(UltronBossConfig.EDITS_PER_TICK, 400);
+        ServerLevel level = f.level();
+        MinecraftServer server = level.getServer();
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        tank(starter);
+        UltronFight fight = UltronTestSupport.onTheGround(f, starter);
+        calm(fight);
+        ServerPlayer[] late = new ServerPlayer[1];
+        Vec3[] stood = new Vec3[1];
+        Script script = new Script();
+        script.then("the lift begins", () -> {
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the island is up", () -> {
+            client(starter);
+            return fight.phase() == UltronFight.Phase.ISLAND && in(fight, SokoviaLift.Step.PLACED);
+        });
+        script.then("a latecomer stands under it", () -> {
+            // (Nothing of his acts while the tractor works (the island let his Sentries go and called his waves again), and
+            // no piece of Sokovia falls: a blow would send the starter sliding off the island, as the test's client never
+            // stops one who was knocked.)
+            calm(fight);
+            fight.setNextDebrisAt(Long.MAX_VALUE / 2);
+            late[0] = f.player(MIDDLE_X + 3.0, GROUND, MIDDLE_Z + 3.0);
+            tank(late[0]);
+            stood[0] = rel(helper, late[0]);
+        });
+        script.step(high ? "the tractor brings them up among the island's underside" : "the tractor has them halfway up", () -> {
+            client(starter, late[0]);
+            SokoviaLift.Lift lift = SokoviaLift.of(fight);
+            double y = rel(helper, late[0]).y;
+            boolean towed = lift.carries(late[0].getUUID()) && !lift.carried().contains(late[0].getUUID());
+            return towed && (high ? y >= GROUND + LIFT - 5.0 && y < GROUND + LIFT - 3.5 : y > GROUND + 6.0 && y < GROUND + LIFT - 8.0);
+        });
+        script.then("the server stops", () -> {
+            Vec3 was = rel(helper, late[0]);
+            BossFights.stopAll(server, StopReason.SERVER_STOPPING);
+            check(blocksInTheSky(helper) == 0 && fight.isFinished(), "the island is gone");
+            Vec3 now = rel(helper, late[0]);
+            assertNear(now.y, GROUND, 0.01, "the one the tractor carried is on the ground (they were at " + was + ")");
+            assertNear(now.x, stood[0].x, 0.01, "where they stood");
+            assertNear(now.z, stood[0].z, 0.01, "where they stood");
+            check(level.noCollision(late[0], late[0].getBoundingBox().deflate(0.001)), "and not in the ground");
+            check(!late[0].isNoGravity() && !Powers.get(late[0]).is(Live.LIFTED), "and free");
+            assertNear(rel(helper, starter).y, GROUND, 0.01, "the one on the island is on the ground");
+        });
+        script.run(f, 580);
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -210,13 +603,9 @@ public final class SokoviaRecoveryTests {
         tank(starter);
         long ground = groundHash(helper);
         UltronFight fight = ritual(f, starter);
-        calm(fight);
         boolean descent = SokoviaJournal.CLEARING.equals(note);
         Script script = new Script();
-        script.then("the lift begins", () -> {
-            fight.forceState(UltronFight.Phase.LIFT_WARN);
-            fight.forceState(UltronFight.Phase.LIFT_LOCK);
-        });
+        script.then("the lift begins", () -> liftBegins(fight));
         if (descent) {
             script.step("the island goes up and the fight is won", () -> {
                 client(starter);

@@ -1117,6 +1117,18 @@ public final class UltronFight extends BossFight {
         }
         wave.clear();
         debris.clear();
+        // Whatever the ending, nothing of his fights on: his mind stops and the Sentries that are left go. (A fight won by
+        // the death of his last body has neither by now. One that is ended as won while a body still stands, as the
+        // tests do, would otherwise go on pulling, slamming and punching the fighters through the pause before the
+        // island comes down.)
+        if (boss != null) {
+            boss.brain().abort(boss);
+            boss.brain().setEnabled(false);
+        }
+        for (UltronSentryEntity sentry : sentries()) {
+            sentry.dissolve();
+        }
+        refreshCacheNow();
         if (why == BossEnd.VICTORY) {
             if (!victoryTold) {
                 victoryTold = true;
@@ -1126,13 +1138,8 @@ public final class UltronFight extends BossFight {
         }
         // Defeat, an abort, an operator, Peaceful: Ultron uploads himself away, and his army with him.
         if (boss != null) {
-            boss.brain().abort(boss);
-            boss.brain().setEnabled(false);
             boss.setShielded(true);
             boss.setState(UltronState.TRANSFER);
-        }
-        for (UltronSentryEntity sentry : sentries()) {
-            sentry.dissolve();
         }
         if (why == BossEnd.WIPE) {
             say("wipe");

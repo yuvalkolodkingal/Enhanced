@@ -290,8 +290,11 @@ public final class SokoviaRecovery {
         player.displayClientMessage(Component.translatable("message.enhanced.ultron.lift.relocated").withStyle(ChatFormatting.YELLOW), true);
     }
 
-    /** Whether there is something to stand on right under the spot (so that the spot is not a hole in the air). */
-    private static boolean supported(ServerPlayer player, Vec3 spot) {
+    /**
+     * Whether there is something to stand on right under the spot, within half a block, with the player's own collisions
+     * (so that the spot is not a hole in the air).
+     */
+    static boolean supported(ServerPlayer player, Vec3 spot) {
         return !player.serverLevel().noCollision(player, player.getBoundingBox().move(spot.subtract(player.position())).move(0.0, -0.5, 0.0));
     }
 
