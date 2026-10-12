@@ -59,7 +59,9 @@ public class RadioactiveSpiderItem extends Item {
             if (!level.isClientSide) {
                 player.displayClientMessage(refusal, true);
             }
-            return InteractionResultHolder.fail(stack);
+            // The click is spent on the refusal: the game must not go on to use what the other hand holds (Loki's
+            // Scepter there would tear a hero apart).
+            return InteractionResultHolder.consume(stack);
         }
         if (level.isClientSide || !(player instanceof ServerPlayer bitten)) {
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);

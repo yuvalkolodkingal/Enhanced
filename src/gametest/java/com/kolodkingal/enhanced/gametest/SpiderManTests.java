@@ -409,7 +409,8 @@ public final class SpiderManTests {
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.RADIOACTIVE_SPIDER.get(), 3));
             TestKit.sentPackets(player);
             InteractionResultHolder<ItemStack> used = player.getMainHandItem().getItem().use(level, player, InteractionHand.MAIN_HAND);
-            check(!used.getResult().consumesAction(), hero + " is turned away");
+            check(used.getResult().consumesAction() && !used.getResult().shouldSwing(),
+                    hero + " is turned away, and the refusal spends the click so the other hand's item is not used instead");
             check(player.getMainHandItem().getCount() == 3, hero + " keeps the spider");
             check(!player.hasEffect(ModEffects.RADIOACTIVE_BITE), hero + " is not bitten");
             check("message.enhanced.bite.not_now".equals(seen(player).message()), hero + " is told it does not mix");
