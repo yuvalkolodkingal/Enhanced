@@ -483,8 +483,10 @@ so they have no picture of their own.
 `ThanosAssetsTests` read the files back (the skin rules, the eyes, a painted face on every box, the animated strip). The pictures were then looked at **in a real game** (a
 server and a client, `/enhanced_model` for every state, the playing Thanos in both looks in the third person and the first, the Gauntlet item in the hotbar, the meteor, and the
 fight itself with the bar, the air and the subtitles). That round found one thing: in the Dying pose his legs come up and the soles of the boots, drawn nearly black, showed as a black slab; they are
-now worn leather with a welt and a tread, and drawn light because the game shades every downward face by half. The call's subtitle (*Dread it. Run from it. Destiny arrives all the same.*, as the specification gives it) is
-wider than a small window at GUI scale 2 and is clipped at its ends; nothing else was out of place.
+now worn leather with a welt and a tread, and drawn light because the game shades every downward face by half. The call's subtitle (*Dread it. Run from it. Destiny arrives all the same.*, as the specification gave it) was
+wider than a window at GUI scale 2 and was clipped at its ends; the review of the lane (15.16) shortened it, and the one of the awakening, to
+*Destiny arrives all the same.*, which fits at every scale, and the title of the reward from *THE GAUNTLET IS YOURS* to *YOUR GAUNTLET*, which was
+clipped at the default scale of a 1080p window too; nothing else was out of place.
 
 ### 15.14 What is shown
 
@@ -597,3 +599,22 @@ a sensible length (the themes 40 s, the drain loop 2 s), the themes streamed; ev
 spectrogram and a waveform and measured (the peak under -1 dBFS after encoding, the loudness, the energy above 12 kHz, the pitch and the timing of what it is
 meant to do); the loops were tested at the seam. The themes' downbeats are on the loop's first sample, which the seam test counts as a jump in level: it is a drum or a bell
 beginning on the beat.
+
+### 15.16 The review of the lane
+
+The lane was read once more against the specification and then played in a real game (a dedicated server and two clients): the call, a two-player fight up to the fourth stone with each
+stone's arrival and its five tells, a Hex as the arena, Stormbreaker and the Scarlet Witch against him, the reward, the becoming and the hero's keys with the Gauntlet in first person, and a
+fight of two players with all five stones to the end. It found four things; each was fixed and has a game test of its own (`ThanosReviewTests`, and the targeting test of `ThanosFightTests`), which was
+checked to fail on the old code.
+
+1. **Titles wider than a screen.** A title is drawn at four times the size of the text and a subtitle at twice, and the game's scale for a 1080p window makes the screen only 480 units wide: the title
+   of the reward (*THE GAUNTLET IS YOURS*) and the subtitles of the call and of the awakening (*Dread it. Run from it. Destiny arrives all the same.*) were cut at both ends. They are now *YOUR GAUNTLET* and *Destiny arrives all the
+   same.*, which fit at every scale; a test holds every title of the lane to 14 characters and every subtitle to 32, in both languages (15.13.6).
+2. **The hold on a target counted idle ticks.** "He keeps a target for sixty ticks" was a count of the calls of his idle choice, and he is idle only for a moment between one move and the next: the first fighter he picked
+   held him for minutes, whoever hurt him since. It is now sixty ticks of the game (`TARGET_HOLD_TICKS`).
+3. **A Titan who never lands.** The arrival (he is invulnerable in it) ended when he stood on the ground; one who fell into a lake, a cobweb or a block put into the column during the countdown never
+   "landed" and stood in the portal until the fight timed out. Water and lava count as landed, and so does `LAND_TIMEOUT_TICKS` (200) of falling.
+4. **The stuck rule walked through the Hex.** When he makes no progress toward the one he hunts the rule frees him to a spot beside them, and it did not ask the wall: a Thanos inside a Hex whose prey stood
+   outside was put outside, and one outside was put in. It is a teleport like any of his now (`mayTeleportTo`, which asks `HexManager.onTeleport`), and a refused step leaves him where he is.
+
+**Still imperfect.** No sound could be listened to in the test setup (a server and clients with no sound device), so the mix of the themes and the effects was judged only by the measurements of 15.15.3. A Hex that is raised *before* the call, with the landing spot outside its wall, keeps him outside it (the rule is "one outside cannot enter"); it is not a bug, but the caller may be surprised. The projectiles that a hero's Time Lock hung are freed when the dome closes or when the Thanos who cast it dies, logs out (so also when the server stops), changes dimension or loses the power; after a crash they stay hung, like any `noGravity` that a power has set.
