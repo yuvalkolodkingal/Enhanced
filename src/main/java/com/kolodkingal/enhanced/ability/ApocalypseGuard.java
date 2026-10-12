@@ -71,6 +71,8 @@ public final class ApocalypseGuard {
     private static final Map<UUID, Map<UUID, Long>> MIND_HITS = new HashMap<>();
     /** Hero -> game time of the last ripple (and its sound). */
     private static final Map<UUID, Long> LAST_RIPPLE = new HashMap<>();
+    /** Hero -> when each Phoenix's touch last strained his shield ({@link MindPower#strainCounts}). */
+    private static final Map<UUID, Map<String, Long>> STRAINS = new HashMap<>();
 
     // ---- the numbers (clients ask too: their animation predicts the press) ----
 
@@ -181,6 +183,30 @@ public final class ApocalypseGuard {
         }
         shatter(player, data);
         return Math.max(0.0F, cost - strength);
+    }
+
+    /**
+     * A Phoenix's Mind Control or Psionic Field touches the hero: his complete shield is strained by {@code
+     * phoenixMindControlStrain} or {@code phoenixPsionicStrain} (not damage; it may shatter it), once per cast ({@link
+     * MindPower#strainCounts}), where an attack of hers could reach him (PvP). Her touch still does to him what it does to
+     * any player. Called by the Phoenix listener of {@code ApocalypseSetup}.
+     */
+    public static void strain(ServerPlayer hero, ServerPlayer phoenix, PhoenixPower.Kind kind) {
+        float points = MindPower.strain(kind);
+        if (points <= 0.0F || !isUp(hero) || !MindPower.isBreaker(phoenix) || !AreaTargets.mayHurt(phoenix, hero, false)) {
+            return;
+        }
+        long now = hero.level().getGameTime();
+        if (!MindPower.strainCounts(STRAINS.computeIfAbsent(hero.getUUID(), id -> new HashMap<>()), phoenix.getUUID(), kind, now)) {
+            return;
+        }
+        PowerData data = Powers.get(hero);
+        absorb(hero, data, points);
+        if (data.chaosShieldActive()) {
+            Vec3 center = hero.position().add(0, hero.getBbHeight() * 0.5, 0);
+            Vec3 away = phoenix.getEyePosition().subtract(center);
+            ripple(hero, data, away.lengthSqr() < 1.0E-6 ? center.add(0, radius(), 0) : center.add(away.normalize().scale(radius())), now, true);
+        }
     }
 
     /** Whether a mind-power hit of this attacker is to be counted now (the shield's own cooldown per attacker). */
@@ -367,6 +393,7 @@ public final class ApocalypseGuard {
     static void clear() {
         MIND_HITS.clear();
         LAST_RIPPLE.clear();
+        STRAINS.clear();
     }
 
     private ApocalypseGuard() {

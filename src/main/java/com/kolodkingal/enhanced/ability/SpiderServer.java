@@ -1132,7 +1132,9 @@ public final class SpiderServer implements HeroServer {
     /**
      * Who the legs go for: a hostile mob that is alive, not owned or tamed (a Loki illusion, a villager, a golem, a pet or
      * an animal never), a neutral mob only if it goes for him, and a player only if the server turned
-     * {@code instantKillPlayers} on (and PvP lets him).
+     * {@code instantKillPlayers} on (and PvP lets him). A boss and the minions of a boss fight are hostile whoever they hunt,
+     * also those that are not of the game's {@code Enemy} kind (Ultron's Sentries): the legs strike them for their own
+     * damage, never a kill ({@link #killImmune}).
      */
     public static boolean isThreat(ServerPlayer spider, LivingEntity target) {
         if (target == spider || !target.isAlive() || target.isSpectator() || target instanceof ArmorStand || target instanceof LokiIllusionEntity) {
@@ -1149,7 +1151,8 @@ public final class SpiderServer implements HeroServer {
             // An Enderman or a zombified piglin is a threat only while it goes for him.
             return target instanceof Mob mob && mob.getTarget() == spider;
         }
-        return target instanceof Enemy || (target instanceof Mob mob && mob.getTarget() == spider);
+        return target instanceof Enemy || target.getType().is(ModTags.BOSSES) || target.getType().is(ModTags.BOSS_MINIONS)
+                || BossFights.isMinion(target) || (target instanceof Mob mob && mob.getTarget() == spider);
     }
 
     /** The boss and its minions take only the legs' own damage, never an Instant Kill. */

@@ -1,7 +1,9 @@
 package com.kolodkingal.enhanced.apocalypse;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
+import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -12,7 +14,9 @@ import net.minecraft.world.entity.player.Player;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * What counts as mind power: the one rule of Apocalypse's shield, for the boss's and the hero's alike. Eilon's words are
@@ -67,6 +71,35 @@ public final class MindPower {
             return 0.0F;
         }
         return amount * factor(source);
+    }
+
+    /**
+     * The strain of a Phoenix's touch of this kind: {@code phoenixMindControlStrain} or {@code phoenixPsionicStrain}, 0 for
+     * any other.
+     */
+    public static float strain(PhoenixPower.Kind kind) {
+        return switch (kind) {
+            case MIND_CONTROL -> ApocalypseShieldConfig.PHOENIX_MIND_CONTROL_STRAIN.get().floatValue();
+            case PSIONIC_FIELD -> ApocalypseShieldConfig.PHOENIX_PSIONIC_STRAIN.get().floatValue();
+            default -> 0.0F;
+        };
+    }
+
+    /**
+     * Whether a strain of {@code phoenix}'s touch of {@code kind} counts now on a shield whose strains so far are in
+     * {@code last} (updated when it counts): once per cast. A cast that the mind refuses (his always do) starts no recharge
+     * of hers, so pressing the key again at once is not another cast; the shield keeps her recharge of it itself
+     * ({@code mindControlCooldown}, {@code psionicCooldown}).
+     */
+    public static boolean strainCounts(Map<String, Long> last, UUID phoenix, PhoenixPower.Kind kind, long now) {
+        String key = phoenix + "/" + kind;
+        Long before = last.get(key);
+        long recharge = kind == PhoenixPower.Kind.MIND_CONTROL ? PhoenixConfig.MIND_CONTROL_COOLDOWN.get() : PhoenixConfig.PSIONIC_COOLDOWN.get();
+        if (before != null && now - before >= 0 && now - before < recharge) {
+            return false;
+        }
+        last.put(key, now);
+        return true;
     }
 
     /** The factor of the damage's type. */
