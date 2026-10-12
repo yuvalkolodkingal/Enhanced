@@ -499,6 +499,7 @@ public final class AnimationMathTests {
                 // ===== phoenix =====
                 Power.PHOENIX,
                 // ===== ultron =====
+                Power.ULTRON,
                 // ===== apocalypse =====
                 Power.APOCALYPSE,
         }) {
@@ -555,6 +556,7 @@ public final class AnimationMathTests {
                 // ===== phoenix =====
                 GestureId.TAKEOFF_PHOENIX,
                 // ===== ultron =====
+                GestureId.TAKEOFF_ULTRON,
                 // ===== apocalypse =====
                 GestureId.TAKEOFF_APOC,
         };
@@ -562,6 +564,7 @@ public final class AnimationMathTests {
                 // ===== phoenix =====
                 Power.PHOENIX,
                 // ===== ultron =====
+                Power.ULTRON,
                 // ===== apocalypse =====
                 Power.APOCALYPSE,
         };

@@ -2,9 +2,13 @@ package com.kolodkingal.enhanced.item;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -15,6 +19,16 @@ import java.util.List;
 public class UltronCoreItem extends Item {
     public UltronCoreItem(Properties properties) {
         super(properties);
+    }
+
+    /** Used alone it does nothing: it needs the Mind Stone to give it a mind. */
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack core = player.getItemInHand(hand);
+        if (!level.isClientSide()) {
+            player.displayClientMessage(Component.translatable("message.enhanced.ultron_core.needs_stone").withStyle(ChatFormatting.GRAY), true);
+        }
+        return InteractionResultHolder.sidedSuccess(core, level.isClientSide());
     }
 
     @Override

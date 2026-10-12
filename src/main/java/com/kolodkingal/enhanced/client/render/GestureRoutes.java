@@ -307,7 +307,14 @@ public final class GestureRoutes {
                 default -> "live:SOUL_DRAINING";
             };
             // ===== ultron =====
-            case ULTRON -> PENDING_ACTING;
+            // (Sneak + R, the Overcharge, is live:ULTRON_CHARGING and its blast the cooldown of R; Sneak + B, the Hack, is
+            // live:CASTING; Sneak + V, the Slam, and Sneak + N, Command, are told by the payload of their effect.)
+            case ULTRON -> switch (ability) {
+                case 1 -> "flag:BEAM";
+                case 2 -> "flight";
+                case 3 -> "none: Gravity Pull and Gravity Slam are told by the payload of their effect, which names the caster";
+                default -> "cooldown";
+            };
             // ===== apocalypse =====
             case APOCALYPSE -> switch (ability) {
                 case 1, 3, 5 -> "cooldown";
@@ -340,7 +347,7 @@ public final class GestureRoutes {
             // ===== thanos =====
             case SOUL_DRAINING, SOUL_SIGHT -> null;
             // ===== ultron =====
-            case ULTRON_CHARGING -> PENDING_REASON + ": the Ultron lane acts it";
+            case ULTRON_CHARGING -> null;
             case LIFTED -> "Sokovia carries them: like a pinned player they can't move, so they have no move to make";
             // ===== apocalypse =====
             case SANDSTORM -> null;

@@ -214,6 +214,12 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
+    /** A hero whose lane is not built yet: its plug-in is the stub the skeleton wrote, the power and nothing else. */
+    private static boolean isStub(Power hero) {
+        HeroServer server = HeroServers.of(hero);
+        return server != null && server.getClass().getDeclaredMethods().length <= 1;
+    }
+
     /** The power exists and does nothing: no key does anything, nothing ticks into a state, nobody is hurt. */
     @GameTest(template = ARENA, batch = SKELETON)
     public static void aNewHeroDoesNothingYet(GameTestHelper helper) {
@@ -1073,7 +1079,8 @@ public final class SkeletonTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
         check(run(player, "enhanced boss start thanos") == 0, "a fight that cannot start is a failure");
-        check(run(player, "enhanced boss start ultron force") == 0, "even by force, until a lane registers its fight");
+        check(BossFights.lane(BossKind.ULTRON) != null || run(player, "enhanced boss start ultron force") == 0,
+                "even by force, until a lane registers its fight");
         boolean refused = false;
         try {
             run(player, "enhanced boss start nobody");

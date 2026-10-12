@@ -60,6 +60,8 @@ public final class PowerLoopSounds {
         SOUL_DRAIN(ModSounds.SOUL_DRAIN, 0.8F, 1.0F, (p, d) -> d.power() == Power.THANOS && d.is(Live.SOUL_DRAINING)),
 
         // ===== ultron =====
+        /** Ultron's anti-gravity flight: the thrusters' hiss of the Sentries, low and soft (it has no jets and no flame). */
+        ULTRON_FLIGHT(ModSounds.SENTRY_HOVER, 0.5F, 0.7F, (p, d) -> d.power() == Power.ULTRON && d.flying()),
 
         // ===== apocalypse =====
         /** The Sandstorm: the roar of sand round him. */

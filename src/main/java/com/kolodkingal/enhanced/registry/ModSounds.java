@@ -148,6 +148,21 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> THANOS_THEME_5 = register("thanos_theme_5");
 
     // ===== ultron =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_AWAKEN = register("ultron_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_THEME = register("ultron_theme");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_BOLT = register("ultron_bolt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_OVERCHARGE = register("ultron_overcharge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_SERVO = register("ultron_servo");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_BEAM = register("ultron_beam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_GRAVITY = register("ultron_gravity");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_LIFT_START = register("ultron_lift_start");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_RUMBLE = register("ultron_rumble");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_UPLOAD = register("ultron_upload");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_SPEAK = register("ultron_speak");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SENTRY_HOVER = register("sentry_hover");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SENTRY_DEATH = register("sentry_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_TRANSFER = register("ultron_transfer");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ULTRON_DEATH = register("ultron_death");
 
     // ===== apocalypse =====
     public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_AWAKEN = register("apocalypse_awaken");

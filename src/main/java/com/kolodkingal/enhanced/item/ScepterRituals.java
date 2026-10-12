@@ -34,7 +34,7 @@ import java.util.Map;
  *  Scepter      | Ultron Program   | Sneak + use on a block    | ULTRON_FIGHT  (the Ultron boss wakes)
  *  Scepter      | Ultron Program   | use                       | ULTRON_HINT   ("aim at the ground", nothing else)
  *  Scepter      | Tesseract        | hold use (5 s)            | THANOS        (the Mad Titan is called)
- *  Scepter      | Wanda or Vision  | use                       | RECOGNISES    (the stone knows its own)
+ *  Scepter      | Wanda, Vision or Ultron | use                | RECOGNISES    (the stone knows its own)
  *  Scepter      | Scarlet W. Gene  | use                       | WANDA_GENE    (the Scarlet Witch awakens)
  *  Scepter      | Synthezoid Core  | use                       | VISION_CORE   (Vision awakens)
  *  Scepter      | anything else    | use                       | EXPLODES      (the stone's energy tears you apart)
@@ -131,7 +131,7 @@ public final class ScepterRituals {
 
     /** The rows the Scepter had before the villains: what it still does where theirs are declined. */
     private static Ritual beforeTheVillains(Power power, ItemStack other) {
-        if (power == Power.SCARLET_WITCH || power == Power.VISION) {
+        if (power == Power.SCARLET_WITCH || power == Power.VISION || power == Power.ULTRON) {
             return Ritual.RECOGNISES;
         }
         if (other.is(ModItems.SCARLET_WITCH_GENE.get())) {

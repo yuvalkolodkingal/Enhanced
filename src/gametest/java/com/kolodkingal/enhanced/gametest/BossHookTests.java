@@ -211,6 +211,8 @@ public final class BossHookTests {
         fight.spawn(first);
         fight.spawn(second);
         fight.spawn(boss);
+        // (The real Sentry wears armour, and the ledger counts what got through it: this test is about the ledger.)
+        first.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).setBaseValue(0.0);
         BossFight.Participant ledger = fight.participant(player.getUUID());
 
         first.hurt(level.damageSources().playerAttack(player), 6.0F);
@@ -224,6 +226,7 @@ public final class BossHookTests {
         first.hurt(level.damageSources().playerAttack(player), 6.0F);
         assertNear(ledger.damage(), 6.0, 0.01, "a lane that credits by itself is not credited twice");
 
+        boss.setHealth(1.0F); // (the real Ultron takes at most 15 percent of his health from one blow)
         boss.hurt(level.damageSources().playerAttack(player), 100000.0F);
         check(boss.isDeadOrDying() && ledger.struckLastBlow(), "whoever kills the boss struck the last blow");
         helper.succeed();

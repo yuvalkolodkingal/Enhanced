@@ -133,6 +133,21 @@ public final class FlightProfile {
             pose(-6, 0, 58, -6, 0, -58, 8, 2, 5, -2),      // cruise: arms spread like a bird's
             pose(14, 0, 72, 14, 0, -72, 10, 2, 10, -2)});  // sprint: arms swept back and out, wings
 
+    // ===== ultron =====
+    /**
+     * Ultron: an upright, rigid, silent flier carried by the anti-gravity of his palms, which hang a little out with the
+     * palms down. A machine does not lean into the wind like a man: ten degrees at a cruise and thirty-two at a sprint, a
+     * dive tips him over only a little, the banking is slight and the arms and legs hold their poses (no sway, no flutter,
+     * hardly a bob). He leans in deliberately and stands up straight again at once when he stops (a quick fall of the
+     * pitch and no braking gesture): he stops as dead as a machine.
+     */
+    private static final FlightProfile ULTRON = new FlightProfile(
+            new float[]{10, 32, -5}, 0.30F, 12, 6, 2.0F, 5, 7, false, new float[]{5, 2.5F}, new float[]{0.018F, 100}, 1.0F, 0.0F, 0.0F, 0.0F,
+            true, 0.10F, false, new float[][]{
+            pose(-6, 0, 18, -6, 0, -18, 2, 1, 2, -1),     // hover: palms down, arms a little out, legs straight
+            pose(-10, 0, 14, -10, 0, -14, 4, 1, 4, -1),   // cruise: the arms nearer the body
+            pose(-18, 0, 10, -18, 0, -10, 6, 1, 6, -1)}); // sprint: the arms swept slightly forward, a rigid dart
+
     // ===== apocalypse =====
     /** A calm, upright, composed flier, like Vision but with the arms a little open: a god at ease. */
     private static final FlightProfile APOCALYPSE = new FlightProfile(
@@ -151,11 +166,10 @@ public final class FlightProfile {
             case BILLY -> BILLY;
             case THOR -> THOR;
             // The heroes of 3.0, one line each (each lane's own): none has a flight profile until its lane makes one.
-            // Ultron and Apocalypse fly with the vanilla pose until then.
             case PHOENIX -> PHOENIX;
             case SPIDER_MAN -> null;
             case THANOS -> null; // he does not fly: no take-off, banking or braking (his landings are ThanosActing's)
-            case ULTRON -> null;
+            case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
             case NONE, QUICKSILVER, TOMMY, LOKI -> null;
         };

@@ -35,6 +35,13 @@ import com.kolodkingal.enhanced.client.render.ThanosSwordModel;
 import com.kolodkingal.enhanced.client.render.ThanosSwordRenderer;
 import com.kolodkingal.enhanced.client.render.ThanosViewer;
 import com.kolodkingal.enhanced.client.render.ThrownWeaponRenderer;
+import com.kolodkingal.enhanced.client.render.UltronBoltRenderer;
+import com.kolodkingal.enhanced.client.render.UltronModel;
+import com.kolodkingal.enhanced.client.render.UltronRenderer;
+import com.kolodkingal.enhanced.client.render.UltronSentryRenderer;
+import com.kolodkingal.enhanced.client.render.UltronViewer;
+import com.kolodkingal.enhanced.client.render.VibraniumKeyModel;
+import com.kolodkingal.enhanced.client.render.VibraniumKeyRenderer;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModParticles;
 import net.minecraft.client.KeyMapping;
@@ -81,6 +88,7 @@ public final class ClientSetup {
             ThanosBossBar.register();
             ThanosViewer.register();
             // ===== ultron =====
+            UltronViewer.register();
             // ===== apocalypse =====
             ApocalypseViewer.register();
         });
@@ -117,10 +125,10 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.THANOS_ORB.get(), ThanosOrbRenderer::new);
         event.registerEntityRenderer(ModEntities.THANOS_PHANTOM.get(), ThanosPhantomRenderer::new);
         // ===== ultron =====
-        event.registerEntityRenderer(ModEntities.ULTRON.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.ULTRON_SENTRY.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.VIBRANIUM_KEY.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.ULTRON_BOLT.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.ULTRON.get(), UltronRenderer::new);
+        event.registerEntityRenderer(ModEntities.ULTRON_SENTRY.get(), UltronSentryRenderer::new);
+        event.registerEntityRenderer(ModEntities.VIBRANIUM_KEY.get(), VibraniumKeyRenderer::new);
+        event.registerEntityRenderer(ModEntities.ULTRON_BOLT.get(), UltronBoltRenderer::new);
         // ===== apocalypse =====
         event.registerEntityRenderer(ModEntities.APOCALYPSE.get(), ApocalypseRenderer::new);
         event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), SandLanceRenderer::new);
@@ -146,6 +154,8 @@ public final class ClientSetup {
         event.registerLayerDefinition(ThanosSwordModel.LAYER, ThanosSwordModel::createBodyLayer);
         event.registerLayerDefinition(GauntletLayer.LAYER, GauntletLayer::createLayer);
         // ===== ultron =====
+        event.registerLayerDefinition(UltronModel.LAYER, UltronModel::createBodyLayer);
+        event.registerLayerDefinition(VibraniumKeyModel.LAYER, VibraniumKeyModel::createBodyLayer);
         // ===== apocalypse =====
         event.registerLayerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
         event.registerLayerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);

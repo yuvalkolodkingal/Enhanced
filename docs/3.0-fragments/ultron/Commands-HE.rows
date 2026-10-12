@@ -1,0 +1,19 @@
+<!-- Commands-HE.md, טבלת הפקודות: שורות (פקודות הבוס משותפות לאולטרון, תאנוס ואפוקליפסה; מי שמחבר משאיר עותק אחד) -->
+| `/enhanced boss start <ultron\|thanos\|apocalypse> [force]` | מתחילה קרב בוס ברגליים שלכם, בלי חפץ טקס. `force` מדלגת על בדיקות הקרקע (לא על השמיים). לאולטרון: [אולטרון](Ultron-HE). |
+| `/enhanced boss stop` | מסיימת את קרב הבוס הרץ (האי של סוקוביה מוחזר למקומו, ותוכנית שנגמרה מוחזרת). |
+| `/enhanced boss list` | מציגה את קרבות הבוס הרצים. |
+| `/enhanced boss cleanup <center> <radius>` | מסירה מה שבוס השאיר שם בשמיים או על הקרקע (אי צף של סוקוביה אחרי פתק שאבד). |
+
+<!-- Commands-HE.md, טבלת "כוחות": שורה אחת -->
+| `ultron` | [אולטרון](Ultron-HE) |
+
+<!-- Commands-HE.md, טבלת "מראות": שורה אחת -->
+| אולטרון | `prime`, `sentry`, `human`, `own` |
+
+<!-- Commands-HE.md, טבלת "דוגמאות": שורות -->
+| `/enhanced boss start ultron` | מעירה את אולטרון איפה שאתם עומדים, בלי תוכנית ובלי שרביט. |
+| `/enhanced power set Steve ultron sentry` | הופכת את סטיב לאולטרון, במראה הזקיף. |
+| `/enhanced boss cleanup ~ ~ ~ 40` | מסירה אי סוקוביה שנשאר בטווח 40 בלוקים. |
+
+<!-- Commands-HE.md, הסעיף "הסתכלות על האנימציות": שורה מתחת ל-/enhanced_anim, או סעיף קצר משלה -->
+`/enhanced_model <ultron|ultron_sentry|vibranium_key> <state> [tick]` היא גם פקודה שרצה רק במשחק שלכם, לאנשים שמציירים: היא מציגה העתק של הבוס, של זקיף או של מפתח הוויברניום במצב מסוים (לאולטרון: `idle`, `volley`, `beams`, `dive`, `pull`, `call`, `punch`, `stagger`, `lift`, `transfer`, `death`, `awakening`, `hybrid`, `ultron3`...), קפוא בטיק מסוים. `/enhanced_model list` מראה מה אפשר להציג.

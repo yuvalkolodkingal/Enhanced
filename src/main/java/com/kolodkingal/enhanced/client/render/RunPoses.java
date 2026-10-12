@@ -83,6 +83,10 @@ final class RunPoses {
     /** Thanos: heavy and wide, between Thor and Magneto; the bob of a stride that shakes the ground. */
     private static final Character THANOS = new Character(0.90F, 1.15F, 1.15F, 9, 5, 0.030F);
 
+    // ===== ultron =====
+    /** Ultron: a stiff, deliberate march, the arms hardly swinging, no lean, almost no bob. */
+    private static final Character ULTRON = new Character(0.55F, 0.70F, 1.0F, 2, 2, 0.008F);
+
     // ===== apocalypse =====
     /** An unhurried, upright god's walk: little arm swing and almost no bounce. */
     private static final Character APOCALYPSE = new Character(0.55F, 0.80F, 0.90F, 3, 2, 0.008F);
@@ -100,7 +104,7 @@ final class RunPoses {
             case PHOENIX -> PHOENIX;
             case SPIDER_MAN -> SPIDER;
             case THANOS -> THANOS;
-            case ULTRON -> DEFAULT;
+            case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
             default -> DEFAULT;
         };

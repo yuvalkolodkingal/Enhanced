@@ -169,7 +169,9 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<UltronSentryEntity>> ULTRON_SENTRY = ENTITIES.register("ultron_sentry",
             () -> EntityType.Builder.<UltronSentryEntity>of(UltronSentryEntity::new, MobCategory.MONSTER)
                     .sized(0.7F, 1.7F)
+                    .fireImmune()
                     .clientTrackingRange(10)
+                    .updateInterval(2)
                     .noSummon()
                     .build("ultron_sentry"));
     public static final DeferredHolder<EntityType<?>, EntityType<VibraniumKeyEntity>> VIBRANIUM_KEY = ENTITIES.register("vibranium_key",

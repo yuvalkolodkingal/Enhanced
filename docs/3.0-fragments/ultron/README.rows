@@ -1,0 +1,14 @@
+<!-- README.md, the opening paragraph: add "**Ultron**, the AI of the Mind Stone, whose boss fight is the biggest in the mod, and whose Core makes you Ultron," to the list of heroes, and "Ultron" to the heroes with several looks -->
+
+<!-- README.md, table "Becoming a hero": one row -->
+| **Ultron** | Beat the **Ultron** boss and take his **Core**. Craft the **Ultron Program** (a Nether Star, 4 Blocks of Iron, 2 Echo Shards, 2 Blocks of Redstone), hold it in one hand and **Sneak + right-click** open, level ground with **Loki's Scepter** in the other: he rises among six Sentries, then the ground you stand on lifts into the sky. Everyone who fights for a minute gets a **Core**; hold it in one hand and use the Scepter with the other (with no power) and you become Ultron. |
+
+<!-- README.md, section "Controls": a third table -->
+| Key | Ultron |
+|---|---|
+| **R** | Repulsor Fire (hold; Sneak: Overcharge) |
+| **G** | Anti-Gravity Flight (toggle) |
+| **V** | Gravity Pull (Sneak: Gravity Slam) |
+| **B** | Upload (Sneak: Hack; Second Life) |
+| **N** | Sentry Army (Sneak: Command) |
+| **H** | Change look |

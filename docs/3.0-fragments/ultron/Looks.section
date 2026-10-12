@@ -1,0 +1,10 @@
+### Ultron ([page](Ultron))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Ultron Prime (Age of Ultron)** (default) | `prime` | The body of *Age of Ultron*: gunmetal plates with silver edges, bronze pipes at the neck, shoulders and knees, a ridged helmet with a crest and curved antennae, narrow red-orange eyes, a dark red mouth and red lights in the chest. His plasma is amber-gold with a red edge. |
+| **Ultron Sentry** | `sentry` | A Sentry under his control: matte black plates, a smooth domed head with two thin blade antennae, a ribbed spine, a round red cheek light and cyan palms. His plasma is blue. |
+| **VisionQuest (the human avatar)** | `human` | The human Ultron of *VisionQuest*: long grey-white hair and beard, dark-rimmed glasses, a long dark coat. His plasma is red, and his eyes do not glow. |
+| **Your own skin** | `own` | Ultron's powers in your own skin. |
+
+The eyes of Prime and the Sentry glow, and the flight, the Gravity Pull and the Slam are pale blue in every look.
