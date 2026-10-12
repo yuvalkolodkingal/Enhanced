@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.render.UltronEffects;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -63,7 +64,7 @@ public record UltronFxPayload(int kind, int entityId, Vec3 at, Vec3 to, float ra
     /**
      * Gravity Slam: a ring of pale-blue anti-gravity motes runs out from {@code at} (his feet) to {@code radius} (7)
      * over {@code ticks} (10), with a ring of dust (the block under him) and a puff at the middle. Flat on the ground;
-     * it does not move.
+     * it does not move. {@code entityId} is the hero (his arms come down with the stamp).
      */
     public static final int GRAVITY_SLAM = HERO;
     /**
@@ -93,7 +94,8 @@ public record UltronFxPayload(int kind, int entityId, Vec3 at, Vec3 to, float ra
     public static final int HACK_BEAM = HERO + 5;
     /**
      * The hero tells his drones what to do: a pale ring of motes at {@code at} (the creature they are sent to, or the
-     * hero's own feet when they gather) {@code radius} (1.5) across for {@code ticks} (10).
+     * hero's own feet when they gather) {@code radius} (1.5) across for {@code ticks} (10); {@code entityId} is the hero
+     * (his arm points).
      */
     public static final int COMMAND_MARK = HERO + 6;
 
@@ -113,7 +115,8 @@ public record UltronFxPayload(int kind, int entityId, Vec3 at, Vec3 to, float ra
         return TYPE;
     }
 
-    /** The Ultron lane draws the effect here. */
+    /** The effect is drawn here (the client class is loaded only when this runs, on a client). */
     static void handle(UltronFxPayload payload, IPayloadContext context) {
+        UltronEffects.receive(payload);
     }
 }

@@ -74,6 +74,8 @@ public class UltronEntity extends Monster implements BossHooks {
     private DamageSource hurtSource;
     @Nullable
     private UltronFight cachedFight;
+    /** The model viewer holds the state at this age (not a negative number); no fight ever sets it. */
+    private int heldAge = -1;
 
     public UltronEntity(EntityType<? extends UltronEntity> type, Level level) {
         super(type, level);
@@ -185,6 +187,25 @@ public class UltronEntity extends Monster implements BossHooks {
             entityData.set(DATA_STATE, state.id());
             entityData.set(DATA_STATE_TICK, level().getGameTime());
         }
+    }
+
+    /**
+     * How long the current state has lasted, in ticks, with the partial tick: what every client poses the body by. The
+     * model viewer ({@code /enhanced_model}) can hold it at a tick ({@link #showState}).
+     */
+    public float stateAge(float partialTick) {
+        return heldAge >= 0 ? heldAge : (float) (level().getGameTime() - stateTick()) + partialTick;
+    }
+
+    /**
+     * Puts the body in a state and a body for the model viewer, as if the state began {@code age} ticks ago; with
+     * {@code frozen} the age stays where it is. Client only: the viewer's copy has no server to say what it does.
+     */
+    public void showState(UltronState state, int body, int age, boolean frozen) {
+        entityData.set(DATA_BODY, body);
+        entityData.set(DATA_STATE, state.id());
+        entityData.set(DATA_STATE_TICK, level().getGameTime() - age);
+        heldAge = frozen ? age : -1;
     }
 
     /** The creature he is aimed at, for the effects, or null. */

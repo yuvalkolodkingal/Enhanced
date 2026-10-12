@@ -27,6 +27,28 @@ public enum UltronAttack {
     /** The rest between two attacks, in ticks (and 10 more for the bodies after the second). */
     public static final int GLOBAL_GAP = 20;
 
+    // The timelines of the attacks, in ticks since the attack began: public because the clients pose the body by them
+    // (the model lowers the arms when the attack is over, and the tests hold the two to the same numbers).
+    /** The Volley's bursts come this far apart; the arms stay up this long after the last. */
+    public static final int BURST_GAP = 6;
+    public static final int VOLLEY_RECOVERY = 8;
+    /** The Finger Beams fan this many degrees either side of the locked line and reach this many blocks. */
+    public static final double BEAM_FAN_DEGREES = 10.0;
+    public static final double BEAM_REACH = 32.0;
+    /** The Finger Beams fire this long after the tell, and the arms stay up this long after. */
+    public static final int BEAM_FIRE_TICKS = 20;
+    public static final int BEAM_RECOVERY = 6;
+    /** The Dive rises for this many ticks, hangs until the end of its tell, and then dives. */
+    public static final int DIVE_RISE_TICKS = 12;
+    /** The Pull drags for {@code PULL_TICKS} ticks from {@code PULL_START}, punches the ground at {@code PULL_PUNCH}, and recovers. */
+    public static final int PULL_START = 24;
+    public static final int PULL_TICKS = 12;
+    public static final int PULL_PUNCH = 40;
+    public static final int PULL_RECOVERY = 16;
+    /** The ticks after the blow of the Punch, and after the tell of the Call, before the attack is over. */
+    public static final int PUNCH_RECOVERY = 10;
+    public static final int CALL_RECOVERY = 10;
+
     private final UltronState state;
     private final int weight;
     private final double minRange;
@@ -51,6 +73,21 @@ public enum UltronAttack {
     /** The ticks of the tell: the first damage comes no sooner. */
     public int tell() {
         return tell;
+    }
+
+    /**
+     * How many ticks the attack takes from its first to its last, for the body with this index. The Dive's end is its
+     * landing, which depends on the distance: for it, this is the tick on which the dive begins.
+     */
+    public int length(int body) {
+        return switch (this) {
+            case VOLLEY -> tell + BURST_GAP * ((body >= 2 ? 1 : 3) - 1) + VOLLEY_RECOVERY;
+            case BEAMS -> tell + BEAM_FIRE_TICKS + BEAM_RECOVERY;
+            case DIVE -> tell;
+            case PULL -> PULL_PUNCH + PULL_RECOVERY;
+            case CALL -> tell + CALL_RECOVERY;
+            case PUNCH -> tell + PUNCH_RECOVERY;
+        };
     }
 
     /** The ticks before this attack can be chosen again. */

@@ -56,26 +56,26 @@ final class UltronAttacks {
     /** The speed of a Volley bolt, in blocks a tick. */
     static final double BOLT_SPEED = 1.7;
     /** The Volley's bursts come this many ticks apart. */
-    static final int BURST_GAP = 6;
+    static final int BURST_GAP = UltronAttack.BURST_GAP;
     static final double BOLT_SPREAD_DEGREES = 2.5;
     /** The Beams fan this many degrees either side of the locked line. */
-    static final double BEAM_FAN_DEGREES = 10.0;
-    static final int BEAM_TELL = 30;
-    static final int BEAM_FIRE_TICKS = 20;
+    static final double BEAM_FAN_DEGREES = UltronAttack.BEAM_FAN_DEGREES;
+    static final int BEAM_TELL = UltronAttack.BEAMS.tell();
+    static final int BEAM_FIRE_TICKS = UltronAttack.BEAM_FIRE_TICKS;
     static final int BEAM_STEP = 4;
-    static final double BEAM_REACH = 32.0;
+    static final double BEAM_REACH = UltronAttack.BEAM_REACH;
     static final double BEAM_WIDTH = 0.6;
     static final double DIVE_RISE = 4.0;
-    static final int DIVE_RISE_TICKS = 12;
+    static final int DIVE_RISE_TICKS = UltronAttack.DIVE_RISE_TICKS;
     static final double DIVE_SPEED = 1.6;
     static final double DIVE_PATH = 1.5;
     static final double DIVE_PATH_DAMAGE = 8.0;
     static final double DIVE_RING = 4.0;
     static final double DIVE_SHOCK = 4.5;
     static final double PULL_RANGE = 16.0;
-    static final int PULL_START = 24;
-    static final int PULL_TICKS = 12;
-    static final int PULL_PUNCH = 40;
+    static final int PULL_START = UltronAttack.PULL_START;
+    static final int PULL_TICKS = UltronAttack.PULL_TICKS;
+    static final int PULL_PUNCH = UltronAttack.PULL_PUNCH;
     static final double PULL_SHOCK = 6.0;
     static final double PUNCH_KNOCKBACK = 0.8;
 
@@ -118,7 +118,7 @@ final class UltronAttacks {
             }
         }
         UltronMotion.steer(boss, Vec3.ZERO, 0.2);
-        return t >= tell + BURST_GAP * (bursts - 1) + 8;
+        return t >= tell + BURST_GAP * (bursts - 1) + UltronAttack.VOLLEY_RECOVERY;
     }
 
     /** Three bolts from the two palms at the point the target is at (and going to) now. */
@@ -179,7 +179,7 @@ final class UltronAttacks {
         if (t < BEAM_TELL + BEAM_FIRE_TICKS && (t - BEAM_TELL) % BEAM_STEP == 0) {
             beamStep(level, boss, run);
         }
-        return t >= BEAM_TELL + BEAM_FIRE_TICKS + 6;
+        return t >= BEAM_TELL + BEAM_FIRE_TICKS + UltronAttack.BEAM_RECOVERY;
     }
 
     /** The positions of the ten fingertips: five on each hand, spread along the hand. */
@@ -342,7 +342,7 @@ final class UltronAttacks {
                 hurt(level, boss, victim, ModDamageTypes.ULTRON_SLAM, damage, 1.0, false);
             }
         }
-        return t >= PULL_PUNCH + 16;
+        return t >= PULL_PUNCH + UltronAttack.PULL_RECOVERY;
     }
 
     /**
@@ -375,7 +375,7 @@ final class UltronAttacks {
             UltronFx.send(level, UltronFxPayload.PULSE, boss.getId(), boss.position(), Vec3.ZERO, 0.0F, UltronAttack.CALL.tell());
             UltronSounds.SERVO.play(level, boss.position(), 1.0F, 0.5F);
         }
-        return t >= UltronAttack.CALL.tell() + 10;
+        return t >= UltronAttack.CALL.tell() + UltronAttack.CALL_RECOVERY;
     }
 
     // ---- Punch ----
@@ -402,7 +402,7 @@ final class UltronAttacks {
                 }
             }
         }
-        return t >= tell + 10;
+        return t >= tell + UltronAttack.PUNCH_RECOVERY;
     }
 
     // ---- shared ----

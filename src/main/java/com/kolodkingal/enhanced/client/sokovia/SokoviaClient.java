@@ -297,6 +297,24 @@ public final class SokoviaClient {
         return island;
     }
 
+    /** What the effects of the fight need to know of the island: where it is, how big, how high, and whether it is up. */
+    public record View(BlockPos centre, SokoviaShape.Spec spec, double offset, boolean up, boolean moving) {
+    }
+
+    /**
+     * The island of the fight as the effects see it right now (the rim that sparkles, the pit that glows), or null when
+     * there is none in the level the camera is in.
+     */
+    @Nullable
+    public static View view(float partial) {
+        Island current = island;
+        if (current == null || Minecraft.getInstance().level != current.level) {
+            return null;
+        }
+        return new View(current.centre, current.spec, offset(current, partial), current.phase == HELD || offset(current, partial) >= current.spec.height() - 0.01,
+                moving(current, partial));
+    }
+
     /** How far up the picture of the island is, {@code partial} of a tick after this one. */
     static double offset(Island current, float partial) {
         double height = current.spec.height();

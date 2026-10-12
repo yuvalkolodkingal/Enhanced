@@ -121,6 +121,8 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
     private static final EntityDataAccessor<Byte> DATA_EYES = SynchedEntityData.defineId(UltronSentryEntity.class, EntityDataSerializers.BYTE);
     /** The game time the current act began, so that every client animates a tell the same way. */
     private static final EntityDataAccessor<Long> DATA_ACT_TICK = SynchedEntityData.defineId(UltronSentryEntity.class, EntityDataSerializers.LONG);
+    /** Whether the hero took this drone over from the enemy (the clients flicker its eyes when it joins). */
+    private static final EntityDataAccessor<Boolean> DATA_HACKED = SynchedEntityData.defineId(UltronSentryEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int assembling;
     private int stunned;
@@ -139,8 +141,6 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
     private Vec3 wanderTo = Vec3.ZERO;
     /** The drone's life, in ticks left (the hero's drones only; the boss's Sentries have none). */
     private int lifetime = -1;
-    /** Whether the master took this Sentry over (the Hack) rather than calling it. */
-    private boolean hacked;
     /** The creature the master told his drones to attack, or null. */
     @Nullable
     private UUID ordered;
@@ -193,7 +193,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         UltronSentryEntity sentry = new UltronSentryEntity(ModEntities.ULTRON_SENTRY.get(), level);
         sentry.setPos(at);
         sentry.setOwner(owner);
-        sentry.hacked = hacked;
+        sentry.entityData.set(DATA_HACKED, hacked);
         sentry.lifetime = UltronConfig.DRONE_LIFETIME.get();
         double health = UltronConfig.DRONE_HEALTH.get();
         sentry.getAttribute(Attributes.MAX_HEALTH).setBaseValue(health);
@@ -225,7 +225,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
 
     /** Whether the hero took this drone over from the enemy (the Hack) rather than calling it. */
     public boolean isHacked() {
-        return hacked;
+        return entityData.get(DATA_HACKED);
     }
 
     /** Tells the drone to attack this creature until it is dead or the master says otherwise (null: no order). */
@@ -250,6 +250,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         builder.define(DATA_ACT, (byte) Act.IDLE.ordinal());
         builder.define(DATA_EYES, (byte) Eyes.BLUE.ordinal());
         builder.define(DATA_ACT_TICK, 0L);
+        builder.define(DATA_HACKED, false);
     }
 
     public Act act() {
@@ -291,7 +292,18 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
     public void beginAssembling() {
         assembling = ASSEMBLE_TICKS;
         entityData.set(DATA_ACT, (byte) Act.ASSEMBLING.ordinal());
+        entityData.set(DATA_ACT_TICK, level().getGameTime());
         entityData.set(DATA_EYES, (byte) Eyes.BLUE.ordinal());
+    }
+
+    /**
+     * Puts the model in an act for the model viewer ({@code /enhanced_model}), as if it began {@code since} game ticks ago.
+     * Client only: the viewer's copy has no server to say what it does.
+     */
+    public void showAct(Act act, Eyes eyes, long since) {
+        entityData.set(DATA_ACT, (byte) act.ordinal());
+        entityData.set(DATA_EYES, (byte) eyes.ordinal());
+        entityData.set(DATA_ACT_TICK, level().getGameTime() - since);
     }
 
     /** Ultron changes bodies: every Sentry freezes for a while, eyes red. */
@@ -827,7 +839,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
             tag.putUUID("Owner", owner);
         }
         tag.putInt("Lifetime", lifetime);
-        tag.putBoolean("Hacked", hacked);
+        tag.putBoolean("Hacked", isHacked());
     }
 
     @Override
@@ -835,6 +847,6 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         super.readAdditionalSaveData(tag);
         setOwner(tag.hasUUID("Owner") ? tag.getUUID("Owner") : null);
         lifetime = tag.contains("Lifetime") ? tag.getInt("Lifetime") : -1;
-        hacked = tag.getBoolean("Hacked");
+        entityData.set(DATA_HACKED, tag.getBoolean("Hacked"));
     }
 }

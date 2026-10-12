@@ -49,6 +49,15 @@ public class VibraniumKeyEntity extends Entity {
         }
     }
 
+    /**
+     * Puts the key in a stage for the model viewer ({@code /enhanced_model}): it began to rise {@code age} ticks ago, and
+     * if {@code down} is given it began to power down that many ticks ago. Client only.
+     */
+    public void showStage(int age, int down) {
+        entityData.set(DATA_EMERGED_AT, level().getGameTime() - age);
+        entityData.set(DATA_POWERED_DOWN_AT, down < 0 ? -1L : level().getGameTime() - down);
+    }
+
     /** Starts the glow's fade (at the victory). */
     public void powerDown() {
         if (poweredDownAt() < 0) {
