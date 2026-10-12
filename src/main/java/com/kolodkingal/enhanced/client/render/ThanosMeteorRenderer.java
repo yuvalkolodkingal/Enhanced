@@ -1,29 +1,30 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.thanos.ThanosMeteorEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.Blocks;
 import org.joml.Matrix4f;
 
 /**
  * A meteor of Titan rock: a tumbling cluster of dark stone with a blue edge glow and a long streak of Space light
- * behind it, falling out of the portal its ring warned of. Drawn from vanilla's blackstone, so it needs no texture of
- * its own.
+ * behind it, falling out of the portal its ring warned of (DESIGN section 15.13.3). The stones are cubes that all wear
+ * {@code item/titan_debris.png}, slate rock with the Space Stone's blue in its cracks, a little lit from within.
  */
 public class ThanosMeteorRenderer extends EntityRenderer<ThanosMeteorEntity> {
     private static final int BLUE = StoneKind.SPACE.color();
     private static final int CORE = StoneKind.SPACE.core();
+    private static final ResourceLocation DEBRIS = Enhanced.id("textures/item/titan_debris.png");
 
     public ThanosMeteorRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -63,13 +64,38 @@ public class ThanosMeteorRenderer extends EntityRenderer<ThanosMeteorEntity> {
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
+    /** One stone of the cluster: a cube of the debris texture, tilted a little by its place so that no two look alike. */
     private static void block(PoseStack poseStack, MultiBufferSource buffer, float size, float x, float y, float z, int light) {
         poseStack.pushPose();
         poseStack.translate(x, y, z);
-        poseStack.scale(size, size, size);
-        poseStack.translate(-0.5F, -0.5F, -0.5F);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(Blocks.BLACKSTONE.defaultBlockState(), poseStack, buffer, light, OverlayTexture.NO_OVERLAY);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(x * 57.0F + 13.0F));
+        poseStack.mulPose(Axis.XP.rotationDegrees(z * 43.0F + y * 31.0F));
+        PoseStack.Pose pose = poseStack.last();
+        // Lit from within: the block light is never below half, whatever the sky does.
+        int lit = LightTexture.pack(Math.max(LightTexture.block(light), 8), LightTexture.sky(light));
+        VertexConsumer vc = buffer.getBuffer(RenderType.entityCutoutNoCull(DEBRIS));
+        float h = size * 0.5F;
+        quad(vc, pose, lit, -h, -h, h, h, -h, h, h, h, h, -h, h, h, 0, 0, 1);
+        quad(vc, pose, lit, h, -h, -h, -h, -h, -h, -h, h, -h, h, h, -h, 0, 0, -1);
+        quad(vc, pose, lit, h, -h, h, h, -h, -h, h, h, -h, h, h, h, 1, 0, 0);
+        quad(vc, pose, lit, -h, -h, -h, -h, -h, h, -h, h, h, -h, h, -h, -1, 0, 0);
+        quad(vc, pose, lit, -h, h, h, h, h, h, h, h, -h, -h, h, -h, 0, 1, 0);
+        quad(vc, pose, lit, -h, -h, -h, h, -h, -h, h, -h, h, -h, -h, h, 0, -1, 0);
         poseStack.popPose();
+    }
+
+    private static void quad(VertexConsumer vc, PoseStack.Pose pose, int light, float x0, float y0, float z0, float x1, float y1, float z1,
+                             float x2, float y2, float z2, float x3, float y3, float z3, float nx, float ny, float nz) {
+        corner(vc, pose, light, x0, y0, z0, 0, 1, nx, ny, nz);
+        corner(vc, pose, light, x1, y1, z1, 1, 1, nx, ny, nz);
+        corner(vc, pose, light, x2, y2, z2, 1, 0, nx, ny, nz);
+        corner(vc, pose, light, x3, y3, z3, 0, 0, nx, ny, nz);
+    }
+
+    private static void corner(VertexConsumer vc, PoseStack.Pose pose, int light, float x, float y, float z, float u, float v,
+                               float nx, float ny, float nz) {
+        vc.addVertex(pose, x, y, z).setColor(255, 255, 255, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
+                .setNormal(pose, nx, ny, nz);
     }
 
     /** A soft glow: three crossed discs of light. */
@@ -102,6 +128,6 @@ public class ThanosMeteorRenderer extends EntityRenderer<ThanosMeteorEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(ThanosMeteorEntity entity) {
-        return TextureAtlas.LOCATION_BLOCKS;
+        return DEBRIS;
     }
 }
