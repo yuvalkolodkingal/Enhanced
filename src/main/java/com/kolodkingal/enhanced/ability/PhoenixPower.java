@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -70,7 +71,13 @@ public final class PhoenixPower {
     /** Reports a touch to every listener: the Phoenix lane calls it, before any refusal, once per cast. */
     public static void touched(ServerPlayer phoenix, LivingEntity target, Kind kind, float amount) {
         for (Listener listener : LISTENERS) {
-            listener.touched(phoenix, target, kind, amount);
+            // A listener belongs to another hero or a boss: its mistake must not break the Phoenix's cast (which runs in
+            // the server's tick).
+            try {
+                listener.touched(phoenix, target, kind, amount);
+            } catch (RuntimeException e) {
+                Enhanced.LOGGER.error("A PhoenixPower listener failed on {} ({})", target, kind, e);
+            }
         }
     }
 
