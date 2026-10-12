@@ -718,6 +718,68 @@ public final class CrossHeroBossTests {
     }
 
     // ============================================================================================================
+    // 5. Spider-Man's mechanical legs against a Zombie and against an Ultron Sentry
+
+    /**
+     * The Iron Spider's legs guard him against a Zombie and against a Sentry of a real Ultron fight: each is a threat and is
+     * jabbed for the legs' five (spider-man.md 4.3.4; ultron.md 3.14 "they take the legs' 5 damage"). In Instant Kill the
+     * Zombie dies at the first strike, and the Sentry, a boss's minion, still takes only the legs' damage.
+     */
+    @GameTest(template = ARENA, batch = "cross_spider_legs_ultron", timeoutTicks = 160)
+    public static void spiderLegsJabAZombieAndASentryButKillOnlyTheZombie(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        ServerPlayer spider = tank(f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SPIDER_MAN));
+        UltronFight fight = UltronTestSupport.onTheGround(f, spider);
+        UltronTestSupport.calm(fight);
+        UltronEntity body = UltronTestSupport.boss(fight);
+        UltronTestSupport.put(f, body, 18.5, FLOOR, 18.5);
+        for (UltronSentryEntity other : fight.sentries()) {
+            UltronTestSupport.put(f, other, 2.5, FLOOR + 1.0, 2.5);
+        }
+        UltronSentryEntity sentry = UltronTestSupport.sentryAt(f, fight, 12.5, 10.5);
+        sentry.setHeld(true);
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(8.5, FLOOR, 10.5));
+        zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
+        zombie.setHealth(100.0F);
+        wear(spider, "iron_spider");
+        press(spider, 4);
+        check(Powers.get(spider).toggle(Toggle.SPIDER_LEGS), "the legs are out");
+        check(SpiderServer.isThreat(spider, zombie), "a Zombie is a threat");
+        check(SpiderServer.isThreat(spider, sentry), "and so is a Sentry of Ultron's army, whoever it hunts");
+        float legs = SpiderConfig.LEGS_DAMAGE.get().floatValue();
+        float sentryHealth = sentry.getHealth();
+        float zombieHealth = zombie.getHealth();
+        int[] killFrom = {-1};
+        f.everyTick(140, tick -> {
+            PowerTicker.tick(spider);
+            if (killFrom[0] < 0) {
+                if (tick < 45) {
+                    return false;
+                }
+                // Two or three jabs in 45 ticks, at the nearest threat each time: both were jabbed.
+                check(zombie.getHealth() < zombieHealth, "the legs jabbed the Zombie: " + zombie.getHealth());
+                check(sentry.getHealth() < sentryHealth, "and the Sentry: " + sentry.getHealth() + " of " + sentryHealth);
+                check(sentryHealth - sentry.getHealth() <= 2 * legs + 0.01F, "for the legs' damage: " + (sentryHealth - sentry.getHealth()));
+                check(zombie.isAlive() && sentry.isAlive(), "a jab is a stab, not a kill");
+                sneakPress(spider, 4);
+                sneakPress(spider, 4);
+                check(Powers.get(spider).is(Live.INSTANT_KILL), "Instant Kill is on");
+                killFrom[0] = tick;
+                return false;
+            }
+            float before = sentry.getHealth();
+            if (tick - killFrom[0] < 40) {
+                return false;
+            }
+            check(!zombie.isAlive(), "Instant Kill killed the Zombie");
+            check(sentry.isAlive(), "and not the Sentry, a minion of the fight: " + sentry.getHealth());
+            check(sentry.getHealth() < before || sentry.getHealth() < sentryHealth - legs * 0.5F, "which the legs still strike");
+            check(fight.sentries().contains(sentry), "and which still counts for the fight");
+            return true;
+        });
+    }
+
+    // ============================================================================================================
     // 6. A web shot at Thanos locks the Gauntlet
 
     /**
