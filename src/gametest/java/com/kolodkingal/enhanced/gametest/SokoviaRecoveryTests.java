@@ -98,12 +98,25 @@ public final class SokoviaRecoveryTests {
     }
 
     /**
+     * ... and the one who was knocked up (or whose client lags: the lift lets a carried player drift a few blocks before
+     * it puts them back) is put on the ground where the lift says they are, not where the knock left them.
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_stop_knocked", timeoutTicks = 600)
+    public static void stoppingTheServerWhileTheIslandComesDownPutsAKnockedUpPlayerOnTheGround(GameTestHelper helper) {
+        stopWhen(helper, fight -> in(fight, SokoviaLift.Step.FALLING) && SokoviaLift.of(fight).altitude() < LIFT - 6.0, true, 4.5);
+    }
+
+    private static void stopWhen(GameTestHelper helper, Predicate<UltronFight> when, boolean win) {
+        stopWhen(helper, when, win, 0.0);
+    }
+
+    /**
      * Plays the fight to a moment ({@code when}, with the fight won as soon as the island is up if {@code win}), then
      * stops the server: the island is cleared and everyone is on the ground where they stood, flags and journal and
      * lift are gone, all in the same tick, and the Program that started the fight is waiting for the summoner as a
-     * gift.
+     * gift. The starter is {@code knock} blocks higher than the lift says they are when it stops.
      */
-    private static void stopWhen(GameTestHelper helper, Predicate<UltronFight> when, boolean win) {
+    private static void stopWhen(GameTestHelper helper, Predicate<UltronFight> when, boolean win, double knock) {
         TestKit.Fixture f = pad(helper);
         f.config(UltronBossConfig.EDITS_PER_TICK, 400);
         ServerLevel level = f.level();
@@ -132,6 +145,7 @@ public final class SokoviaRecoveryTests {
             return when.test(fight);
         });
         script.then("the server stops", () -> {
+            starter.setPos(starter.position().add(0.0, knock, 0.0));
             BossFights.stopAll(server, StopReason.SERVER_STOPPING);
             check(blocksInTheSky(helper) == 0, "the sky is empty in the same tick: " + blocksInTheSky(helper));
             check(groundHash(helper) == ground, "the ground is as it was");

@@ -994,12 +994,20 @@ public final class SokoviaLift implements LiftHook {
                     down.add(entity);
                 }
             }
+            // (Whoever the lift carries goes where the lift says they are, not where a knock, or a client that lags, has left
+            // them: the carry lets them drift up to DRIFT blocks before it puts them back, and the stop must not keep that.)
+            List<Vec3> spots = new ArrayList<>();
+            for (Entity entity : down) {
+                SokoviaCarry.Rider rider = carry.rider(entity.getUUID());
+                double y = rider != null ? rider.expected(carry.moved()).y : entity.getY();
+                spots.add(new Vec3(entity.getX(), y - now, entity.getZ()));
+            }
             carry.releaseAll();
             SokoviaTemplate t = template;
-            for (Entity entity : down) {
-                Vec3 spot = new Vec3(entity.getX(), entity.getY() - now, entity.getZ());
+            for (int i = 0; i < down.size(); i++) {
+                Entity entity = down.get(i);
                 SokoviaCarry.release(entity);
-                SokoviaCarry.teleport(entity, SokoviaCarry.freeSpot(entity, spot));
+                SokoviaCarry.teleport(entity, SokoviaCarry.freeSpot(entity, spots.get(i)));
                 if (entity instanceof ServerPlayer player) {
                     grace.put(player.getUUID(), level.getGameTime() + GRACE_TICKS);
                 }
