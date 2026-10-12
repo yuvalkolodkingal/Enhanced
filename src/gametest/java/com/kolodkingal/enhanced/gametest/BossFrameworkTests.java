@@ -294,7 +294,8 @@ public final class BossFrameworkTests {
             if (tick == 50) {
                 check(!fight.isOver(), "the wipe takes its time");
                 check(a.isRemoved() && b.isRemoved() && !f.level().players().contains(a), "the dead have left the level");
-                check(!fight.audience().contains(a) && !fight.audience().contains(b), "and no longer see the bars");
+                check(fight.audience().contains(a) && fight.audience().contains(b),
+                        "but they still hear the boss from the death screen (his last line over a wipe is for them)");
             }
             if (!fight.isOver()) {
                 return false;
