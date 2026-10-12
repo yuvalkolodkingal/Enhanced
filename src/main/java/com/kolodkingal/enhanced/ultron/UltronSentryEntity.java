@@ -817,7 +817,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         Vec3 toward = new Vec3(spot.x - getX(), y - getY(), spot.z - getZ());
         Vec3 wanted = toward.lengthSqr() < 0.04 ? Vec3.ZERO : toward.normalize().scale(Math.min(speed(), toward.length() * 0.2 + 0.05));
         Vec3 centre = fight.arena().center();
-        double limit = fight.arena().containRadius() - 1.0;
+        double limit = fight.armyReach(fight.arena().containRadius() - 1.0);
         UltronMotion.steer(this, UltronMotion.keepInDisc(position(), wanted, centre, limit), 0.06);
     }
 

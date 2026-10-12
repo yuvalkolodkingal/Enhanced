@@ -656,6 +656,8 @@ public final class UltronMachineTests {
         // A wave is announced and emerges thirty ticks later, four at a time.
         check(fight.callWave(true) && fight.pendingSentries() == 4, "a wave of four is announced");
         check(fight.sentries().isEmpty() && fight.budgetSpent() == 0, "nothing has emerged yet");
+        check(fight.budgetLeft() == 16 && fight.sentriesLeft() == 20,
+                "the four on their way are no longer in the budget, so the second bar does not count them twice: " + fight.sentriesLeft());
         check(!fight.mayCall() && !fight.callWave(true), "and a second is refused while it is on its way");
         int[] stage = {0};
         long[] announcedAt = {level.getGameTime()};

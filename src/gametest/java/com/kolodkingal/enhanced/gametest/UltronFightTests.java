@@ -36,6 +36,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -332,6 +333,25 @@ public final class UltronFightTests {
             fight.spendBudget(16);
             lethal(fight, boss, blow);
             check(fight.isTransferring() && fight.sentries().size() == 4 && fight.budgetLeft() == 0, "with four left in the budget, four come");
+        });
+
+        attempt(failed, "3c. a wave on its way", () -> {
+            UltronFight fight = island(f, player);
+            UltronEntity boss = boss(fight);
+            check(fight.callWave(true) && fight.pendingSentries() == 6 && fight.budgetLeft() == 14, "a wave of six is announced");
+            lethal(fight, boss, blow);
+            check(fight.isTransferring() && fight.sentries().size() == 6 && fight.budgetSpent() == 6 && fight.pendingSentries() == 0,
+                    "the wave comes at once, round him, and he jumps into it; it does not rise a second time later");
+        });
+
+        attempt(failed, "3d. only a wave on its way is left", () -> {
+            UltronFight fight = island(f, player);
+            UltronEntity boss = boss(fight);
+            fight.spendBudget(16);
+            check(fight.callWave(true) && fight.pendingSentries() == 4 && fight.budgetLeft() == 0, "the last four are on their way");
+            lethal(fight, boss, blow);
+            check(fight.isTransferring() && !fight.isDying() && fight.sentries().size() == 4, "they are still to come, so he is not destroyed: they come and he uploads");
+            check(fight.budgetSpent() == 20 && fight.pendingSentries() == 0, "and the budget is spent once: " + fight.budgetSpent());
         });
 
         attempt(failed, "4. no Sentries, no budget", () -> {
@@ -802,6 +822,80 @@ public final class UltronFightTests {
                 return true;
             }
             return false;
+        });
+    }
+
+    /**
+     * While the island is up his army stays on it. Found in the game: Sentries that drifted past the rim, and his body
+     * after a fighter down on the ground lured them, sank to the real ground and could never climb back (they hover at a
+     * height over the ground beneath them), and the fight on the island went on without them. Now a fighter who is not
+     * on the island is not hunted, and a body or Sentry that ends up under the island is brought back onto it.
+     */
+    @GameTest(template = ARENA, batch = "ultron_tether", timeoutTicks = 120)
+    public static void theArmyStaysOnTheIsland(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        ServerPlayer below = f.player(MIDDLE.x + 3.0, FLOOR, MIDDLE.z);
+        tank(below);
+        UltronFight fight = onTheIsland(f, below);
+        calm(fight);
+        UltronEntity boss = boss(fight);
+        boss.brain().setEnabled(false);
+        double floor = f.helper().absoluteVec(new Vec3(0, FLOOR, 0)).y;
+        // The island stands six blocks up. (No blocks are needed for what is tested: the arena is told where it is.)
+        fight.island().raiseIsland(6.0, floor + 6.0);
+        ServerPlayer above = f.player(MIDDLE.x - 3.0, FLOOR + 6.0, MIDDLE.z);
+        tank(above);
+        UltronSentryEntity sunk = sentryAt(f, fight, MIDDLE.x + 2.0, MIDDLE.z + 2.0);
+        sunk.setHeld(true);
+        put(f, boss, MIDDLE.x, FLOOR + 1.0, MIDDLE.z - 2.0);
+        check(sunk.getY() < floor + 3.0 && boss.getY() < floor + 3.0, "(the Sentry and the body are down under the island)");
+        f.everyTick(100, tick -> {
+            if (tick < UltronFight.TETHER_INTERVAL + 2) {
+                return false;
+            }
+            fight.refresh();
+            check(!fight.isTargetable(below) && fight.isTargetable(above), "only the fighter on the island is hunted");
+            check(fight.targets().contains(above) && !fight.targets().contains(below), "and only they are the army's targets");
+            check(sunk.isAlive() && sunk.getY() >= floor + 6.0, "the Sentry under the island was brought back onto it: y " + (sunk.getY() - floor));
+            check(boss.getY() >= floor + 6.0, "and so was his body: y " + (boss.getY() - floor));
+            check(Math.hypot(sunk.getX() - fight.island().center().x, sunk.getZ() - fight.island().center().z) <= fight.armyReach(0.0) + 0.01,
+                    "inside the island's rim");
+            fight.island().landIsland();
+            fight.refresh();
+            check(fight.isTargetable(below), "with the island down the fighter on the ground is hunted again");
+            return true;
+        });
+    }
+
+    /**
+     * The fallen hear how it ends. In the game a player who dies leaves the level's list a second later (the body is
+     * removed, {@code LivingEntity.tickDeath}), and with it the boss bars; a wipe comes fifteen seconds after the last one
+     * fell, so it must still reach them on their death screens.
+     */
+    @GameTest(template = ARENA, batch = "ultron_wipe_told", timeoutTicks = 200)
+    public static void aWipeIsToldToTheFallen(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.WIPE_SECONDS, 3);
+        ServerPlayer player = f.player(MIDDLE.x, FLOOR, MIDDLE.z);
+        Log log = new Log(player);
+        UltronFight fight = onTheGround(f, player);
+        calm(fight);
+        player.kill();
+        // (What the game does to a fallen player after twenty ticks; a test player is never ticked, so the test does it.)
+        player.remove(Entity.RemovalReason.KILLED);
+        check(!f.level().players().contains(player), "the fallen player has left the level's list");
+        f.everyTick(180, tick -> {
+            if (!fight.isOver()) {
+                check(tick < 90, "the wipe never came");
+                return false;
+            }
+            check(fight.result() == BossEnd.WIPE, "a wipe");
+            check(!fight.bars().viewers().contains(player), "(the bars were taken from the fallen player)");
+            log.drain();
+            check(log.said("speech.enhanced.ultron.wipe"), "the fallen fighter hears his last line");
+            check(log.said(BossEnd.WIPE.messageKey()), "and is told the fight is lost");
+            return true;
         });
     }
 
