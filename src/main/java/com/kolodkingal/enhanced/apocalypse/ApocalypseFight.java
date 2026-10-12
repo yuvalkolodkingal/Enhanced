@@ -684,15 +684,20 @@ public final class ApocalypseFight extends BossFight {
         } else {
             boss.brain().tick(boss, this);
         }
-        // His healing factor: left alone, he mends.
-        if (now - lastDamageTick >= TRUE_FORM_REST && now % 20 == 0) {
-            boss.heal(ApocalypseBossConfig.TRUE_FORM_REGEN_PER_SECOND.get().floatValue(), ceiling());
-        }
+        // What the blow that brought him to the floor did comes first: his healing must not mend him past the line (he is held
+        // at 15 or 5 percent) in the same tick, and so spare him the Escape or the kneel that the blow earned.
         float fraction = boss.healthFraction();
         if (fraction <= KNEEL_AT + 1.0E-3F) {
             startKneel();
-        } else if (!escapeUsed && fraction <= ESCAPE_AT + 1.0E-3F) {
+            return;
+        }
+        if (!escapeUsed && fraction <= ESCAPE_AT + 1.0E-3F) {
             startEscape();
+            return;
+        }
+        // His healing factor: left alone, he mends.
+        if (now - lastDamageTick >= TRUE_FORM_REST && now % 20 == 0) {
+            boss.heal(ApocalypseBossConfig.TRUE_FORM_REGEN_PER_SECOND.get().floatValue(), ceiling());
         }
     }
 

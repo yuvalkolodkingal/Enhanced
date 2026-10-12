@@ -410,6 +410,43 @@ public final class ApocalypseFightTests {
         });
     }
 
+    /**
+     * The blow that takes him to 15 percent earns him the Escape whatever second of the game it lands in: his healing (once
+     * a second, after four quiet seconds) must not mend him past the line in the same tick first. A blow of something that
+     * is not a player does not count as a hit for the rest, so the healing is due at once; the scenario is run in a row of
+     * ticks, which meets every moment of that second.
+     */
+    @GameTest(template = ARENA, batch = "apocalypse_escape_heal", timeoutTicks = 400)
+    public static void theBlowThatEarnsTheEscapeStartsItEvenWhenHealingIsDue(GameTestHelper helper) {
+        Duel d = duel(helper, 3, Power.NONE);
+        ApocalypseFight fight = d.fight();
+        ApocalypseEntity boss = d.boss();
+        ServerLevel level = d.level();
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        DamageSource blow = level.damageSources().mobAttack(zombie);
+        int[] rounds = {0};
+        every(helper, 380, tick -> {
+            if (level.getGameTime() < 100) {
+                return false; // the quiet that the healing waits for is over in any case: this is only for a short-lived server
+            }
+            if (rounds[0] > 0) {
+                check(fight.stage() == ApocalypseFight.Stage.ESCAPE && boss.state() == ApocalypseState.ESCAPING,
+                        "round " + rounds[0] + ", game second " + (level.getGameTime() % 20) + ": he channels his escape: " + fight.stage() + " at " + boss.healthFraction());
+            }
+            if (rounds[0] == 45) {
+                return true;
+            }
+            rounds[0]++;
+            fight.setEscapeUsed(false);
+            fight.forceState(ApocalypseFight.Stage.TRUE_FORM, 3);
+            calm(fight);
+            boss.setFraction(0.16);
+            boss.invulnerableTime = 0;
+            check(boss.hurt(blow, 20.0F), "the blow lands");
+            return false;
+        });
+    }
+
     @GameTest(template = ARENA, batch = "apocalypse_escape_bolt", timeoutTicks = 200)
     public static void lightningAndAHexWallInterruptTheEscape(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
