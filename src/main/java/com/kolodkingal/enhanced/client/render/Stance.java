@@ -61,6 +61,10 @@ public enum Stance {
     // ===== ultron =====
 
     // ===== apocalypse =====
+    /** Apocalypse's Shield: both forearms raised before the chest, palms out. */
+    APOC_SHIELD(1.5F, 3.0F, true),
+    /** The Sandstorm: both arms flung wide and up, the head back. */
+    APOC_STORM(3.0F, 5.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

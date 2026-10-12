@@ -1,0 +1,122 @@
+## אפוקליפסה (הבוס, המגן שלו והגיבור)
+
+החלקים `[apocalypse_shield]`, `[apocalypse_boss]` ו-`[apocalypse]`. הקרב עצמו והגיבור מתוארים בדף של אפוקליפסה: [אפוקליפסה](Apocalypse-HE). המספרים המשותפים לכל הבוסים (כמה קרבות רצים בו זמנית, שעוני הכישלון והנטישה, הזמן המינימלי לתגמול, הניסיון, מגבלת הזמן והגנת הזירה) נמצאים בחלק `[boss]`.
+
+### `[apocalypse_shield]`: מה נחשב כוח תודעה
+
+| אפשרות | ברירת מחדל | ערכים מותרים | משמעות |
+|---|---|---|---|
+| `apocalypse_shield.mindPowerHeroes` | `["scarlet_witch", "phoenix"]` | רשימת שמות של כוחות | הגיבורים שכוח התודעה שלהם יכול לשחוק את המגן של אפוקליפסה (של הבוס ושל הגיבור). כדי שגם של בילי או של ויז'ן ייחשב, מוסיפים `"billy"` או `"vision"` (ואת סוגי הנזק שלהם לתגית הדאטה-פק `enhanced:mind_power`). |
+| `apocalypse_shield.chaosBeamFactor` | 1.0 | 0.0 עד 20.0 | כמה מחוזק המגן יורד על כל נקודת נזק של קרן הכאוס. |
+| `apocalypse_shield.slamFactor` | 1.0 | 0.0 עד 20.0 | על כל נקודת נזק של התנגשות טלקינטית (דבר שוונדה או הפניקס זרקו). |
+| `apocalypse_shield.phoenixBurstFactor` | 5.0 | 0.0 עד 50.0 | על כל נקודת נזק של הבזק הפניקס (הבזק מלא של 30 מוריד 150). |
+| `apocalypse_shield.otherMindFactor` | 1.0 | 0.0 עד 20.0 | על כל נקודת נזק מכל סוג אחר שנמצא בתגית `enhanced:mind_power`. |
+| `apocalypse_shield.phoenixMindControlStrain` | 25.0 | 0.0 עד 1000.0 | כמה מחוזק המגן מוריד שליטה בתודעה של הפניקס (גם אם נדחתה). |
+| `apocalypse_shield.phoenixPsionicStrain` | 60.0 | 0.0 עד 1000.0 | כמה מחוזק המגן מוריד שדה פסיוני של הפניקס שמגיע אליו. |
+| `apocalypse_shield.shieldRegenDelayTicks` | 160 | 0 עד 2400 | המגן של הבוס מתחדש רק אחרי כל כך הרבה טיקים בלי נזק של כוח תודעה. |
+| `apocalypse_shield.shieldRegenFraction` | 0.03 | 0.0 עד 1.0 | איזה חלק מהחוזק שלו מקבל המגן בחזרה בכל שנייה. |
+| `apocalypse_shield.mindHitCooldownTicks` | 10 | 1 עד 40 | כמה טיקים בין שתי פגיעות כוח תודעה של אותו תוקף שהמגן יספור (קרן הכאוס פוגעת בכל טיק, ומגן לא משאיר מסגרות חסינות, ולכן יש לו קולדאון משלו). |
+
+### `[apocalypse_boss]`: הקרב
+
+| אפשרות | ברירת מחדל | ערכים מותרים | משמעות |
+|---|---|---|---|
+| `apocalypse_boss.enabled` | true | `true` או `false` | אם `false`, הטקס של אבן הפסגה נדחה. |
+| `apocalypse_boss.ritualDimensions` | `["minecraft:overworld"]` | רשימת מזהי ממדים | איפה אפשר להעיר אותו. |
+| `apocalypse_boss.ritualNeedsSand` | true | `true` או `false` | הבלוק של הטקס חייב להיות חול או אבן חול (`enhanced:ritual_ground`). |
+| `apocalypse_boss.ritualDaylightOnly` | true | `true` או `false` | חייב להיות יום בתחילת הטקס, תחת שמיים פתוחים. |
+| `apocalypse_boss.requireBreaker` | true | `true` או `false` | הטקס נדחה אלא אם יש בטווח `breakerRange` מכשפת השני או פניקס (גיבור שמופיע ב-`mindPowerHeroes`). |
+| `apocalypse_boss.breakerRange` | 64 | 8 עד 256 | בבלוקים. |
+| `apocalypse_boss.arenaRadius` | 24 | 12 עד 48 | הרדיוס של המעגל שבו הוא נלחם. |
+| `apocalypse_boss.arenaHeight` | 40 | 16 עד 100 | עד איזה גובה מגיע קיר החול. |
+| `apocalypse_boss.fieldDamage` | 1.0 | 0.0 עד 10.0 | הנזק (שאף פעם לא הורג) ששחקן שנוגע בקיר החול מקבל, פעם בשנייה. |
+| `apocalypse_boss.bodyHealth` | 900.0 | 100.0 עד 50000.0 | הבריאות שלו, ללוחם אחד. |
+| `apocalypse_boss.healthPerExtraPlayer` | 0.5 | 0.0 עד 3.0 | בריאות נוספת על כל לוחם נוסף (חלק מ-`bodyHealth`). |
+| `apocalypse_boss.armor` | 10.0 | 0.0 עד 30.0 | השריון שלו בצורה המשוריינת. |
+| `apocalypse_boss.armorToughness` | 6.0 | 0.0 עד 20.0 | קשיחות השריון שלו בצורה המשוריינת. |
+| `apocalypse_boss.maxHitFraction` | 0.12 | 0.01 עד 1.0 | הכי הרבה שמכה אחת יכולה לקחת, כחלק מהבריאות המרבית שלו (לפני שריון). |
+| `apocalypse_boss.explosionDamageFactor` | 0.5 | 0.0 עד 1.0 | נזק פיצוץ שהוא סופג בחלון מוכפל במספר הזה. |
+| `apocalypse_boss.shieldStrength` | 150.0 | 10.0 עד 10000.0 | החוזק של המגן הראשון, ללוחם אחד. |
+| `apocalypse_boss.shieldGrowth` | 1.25 | 1.0 עד 3.0 | כל מגן שאחריו חזק פי כמה. |
+| `apocalypse_boss.shieldPerExtraPlayer` | 0.35 | 0.0 עד 3.0 | חוזק נוסף על כל לוחם נוסף (חלק). |
+| `apocalypse_boss.windowTicks` | 200 | 40 עד 2400 | כמה זמן מגן שבור משאיר אותו פגיע (200 = 10 שניות). |
+| `apocalypse_boss.staggerTicks` | 60 | 0 עד 400 | כמה זמן הוא מתנודד ולא תוקף בתחילת החלון. |
+| `apocalypse_boss.windowDamageFactor` | 1.25 | 1.0 עד 5.0 | הכפלת הנזק שהוא סופג בחלון. |
+| `apocalypse_boss.regenPerSecond` | 4.0 | 0.0 עד 100.0 | ההחלמה שלו כשיש לו מגן (אף פעם לא מעל התקרה של השלב). |
+| `apocalypse_boss.trueFormRegenPerSecond` | 3.0 | 0.0 עד 100.0 | ההחלמה שלו בצורתו האמיתית, אחרי 80 טיקים בלי פגיעה. |
+| `apocalypse_boss.escapeChannelTicks` | 100 | 20 עד 600 | כמה זמן לוקח לשער הבריחה שלו להיפתח. |
+| `apocalypse_boss.escapeInterruptFraction` | 0.04 | 0.005 עד 0.5 | הנזק (חלק מהבריאות ההתחלתית `H0`) שמפסיק את הבריחה; גם כל נזק ברק מפסיק אותה. |
+| `apocalypse_boss.escapeHealTo` | 0.40 | 0.05 עד 0.9 | הבריאות שאיתה הוא חוזר אם הבריחה לא הופסקה. |
+| `apocalypse_boss.phoenixFinishSeconds` | 15 | 0 עד 120 | אם הפניקס גרמה נזק הבזק או התנגשות במהלך כל כך הרבה שניות לפני הסוף, הוא מת באש שלה. |
+| `apocalypse_boss.lanceDamage` | 6.0 | 0.0 עד 100.0 | חנית חול אחת. |
+| `apocalypse_boss.lanceCount` | 5 | 1 עד 9 | כמה חניתות במניפה. |
+| `apocalypse_boss.waveDamage` | 10.0 | 0.0 עד 100.0 | גל החול. |
+| `apocalypse_boss.spikeDamage` | 9.0 | 0.0 עד 100.0 | קוץ חול אחד. |
+| `apocalypse_boss.boulderDamage` | 11.0 | 0.0 עד 100.0 | סלע חול אחד. |
+| `apocalypse_boss.backhandDamage` | 16.0 | 0.0 עד 100.0 | מכת גב היד. |
+| `apocalypse_boss.portalShockDamage` | 6.0 | 0.0 עד 100.0 | גל ההלם במקום שבו הוא מגיע. |
+| `apocalypse_boss.stormDamage` | 2.0 | 0.0 עד 100.0 | הנזק של מערבולת חול, כל 10 טיקים. |
+| `apocalypse_boss.tornadoTicks` | 160 | 20 עד 1200 | כמה זמן מערבולת חול נמשכת. |
+| `apocalypse_boss.ringDamage` | 12.0 | 0.0 עד 100.0 | טבעת אחת של קריסת קהיר. |
+| `apocalypse_boss.entombTicks` | 100 | 10 עד 1200 | כמה זמן הכליאה בחול מחזיקה. |
+| `apocalypse_boss.entombDamagePerSecond` | 1.5 | 0.0 עד 20.0 | נזק בזמן הכליאה (אף פעם לא מתחת ל-2 לבבות). |
+| `apocalypse_boss.cocoonHealth` | 20.0 | 1.0 עד 200.0 | הבריאות של הפקעת של הבוס. |
+| `apocalypse_boss.mindCrushRange` | 28 | 8 עד 64 | בבלוקים. |
+| `apocalypse_boss.mindCrushNauseaTicks` | 120 | 0 עד 1200 | הבחילה של ריסוק התודעה (איטיות של 3 שניות ועיוורון של 2 שניות מצטרפים אליה). |
+| `apocalypse_boss.horsemen` | true | `true` או `false` | הוא קורא לארבעת הפרשים במעבר הראשון. |
+| `apocalypse_boss.horsemenMax` | 4 | 0 עד 8 | המספר המרבי של פרשים (`min(max, 1 + לוחמים)`). |
+| `apocalypse_boss.horsemanHealthFactor` | 2.0 | 1.0 עד 10.0 | הכפלת הבריאות של ההאסק. |
+| `apocalypse_boss.horsemanDamageBonus` | 4.0 | 0.0 עד 50.0 | נזק תקיפה שנוסף. |
+| `apocalypse_boss.adaptTicks` | 80 | 0 עד 1200 | כמה זמן זמן קוויקסילבר מאט אותו לגמרי, ואז הוא מסתגל. |
+| `apocalypse_boss.adaptedTicks` | 600 | 0 עד 12000 | כמה זמן אחרי זה הוא מתעלם מההאטה. |
+| `apocalypse_boss.magnetoStripExtendTicks` | 100 | 0 עד 1200 | פירוק משריון של מגנטו עליו בחלון מאריך את החלון בכך (פעם אחת בחלון). |
+| `apocalypse_boss.noBreakerSeconds` | 60 | 10 עד 600 | הוא נסוג אם במשך כל כך הרבה זמן אין בזירה מי שיכול לשבור את המגן, כשהמגן קיים. |
+| `apocalypse_boss.dropsPhoenixEmber` | false | `true` או `false` | לתת גם גחלת פניקס (אם היא קיימת) ללוחם מתוגמל שאין לו כוח. |
+
+### `[apocalypse]`: הגיבור (שחקן שזכה במהות של אן סבאח נור)
+
+| אפשרות | ברירת מחדל | ערכים מותרים | משמעות |
+|---|---|---|---|
+| `apocalypse.flightSpeed` | 0.08 | 0.01 עד 0.5 | מהירות הריחוף של אפוקליפסה (בקריאייטיב התעופה היא 0.05). |
+| `apocalypse.bodyHealthBonus` | 20.0 | 0.0 עד 200.0 | בריאות מרבית נוספת (20 = 10 לבבות, כלומר 40). |
+| `apocalypse.armor` | 10.0 | 0.0 עד 30.0 | שריון בזמן שהוא אפוקליפסה. |
+| `apocalypse.armorToughness` | 4.0 | 0.0 עד 20.0 | קשיחות שריון בזמן שהוא אפוקליפסה. |
+| `apocalypse.knockbackResistance` | 0.5 | 0.0 עד 1.0 | עמידות בפני הדיפה בזמן שהוא אפוקליפסה. |
+| `apocalypse.regenPerSecond` | 1.0 | 0.0 עד 20.0 | גורם ההחלמה: בריאות בשנייה אחרי `regenDelayTicks` בלי נזק. 0 מכבה אותו. |
+| `apocalypse.regenDelayTicks` | 100 | 0 עד 1200 | כמה טיקים בלי נזק עד שגורם ההחלמה מתחיל. |
+| `apocalypse.waveDamage` | 8.0 | 0.0 עד 100.0 | גל החול. |
+| `apocalypse.waveLength` | 18 | 4 עד 48 | בבלוקים. |
+| `apocalypse.waveSpeed` | 0.9 | 0.2 עד 3.0 | בלוקים לטיק. |
+| `apocalypse.waveSlowTicks` | 40 | 0 עד 600 | משך האיטיות II. |
+| `apocalypse.waveCooldown` | 60 | 0 עד 72000 | בטיקים. |
+| `apocalypse.waveExhaustion` | 1.0 | 0.0 עד 40.0 | תשישות האוכל שגל החול עולה. |
+| `apocalypse.entombRange` | 24 | 4 עד 64 | בבלוקים. |
+| `apocalypse.entombTicks` | 80 | 10 עד 1200 | כמה זמן הכליאה בחול מחזיקה. |
+| `apocalypse.entombDamagePerSecond` | 1.0 | 0.0 עד 20.0 | נזק בזמן הכליאה (אף פעם לא מתחת ל-2 לבבות). |
+| `apocalypse.cocoonHealth` | 16.0 | 1.0 עד 200.0 | הבריאות של הפקעת (חבר שובר אותה בכך שהוא מכה בה). |
+| `apocalypse.entombCooldown` | 240 | 0 עד 72000 | בטיקים (משותף עם הגל: אותו מקש). |
+| `apocalypse.entombExhaustion` | 3.0 | 0.0 עד 40.0 | תשישות האוכל שהכליאה עולה. |
+| `apocalypse.portalRange` | 40 | 4 עד 128 | בבלוקים. |
+| `apocalypse.portalAllyRadius` | 3 | 0 עד 16 | חיות מחמד, חברים לקבוצה ושחקנים מתכופפים בתוך הרדיוס הזה עוברים איתו. |
+| `apocalypse.portalCooldown` | 160 | 0 עד 72000 | בטיקים. |
+| `apocalypse.portalExhaustion` | 2.0 | 0.0 עד 40.0 | תשישות האוכל שהשער עולה. |
+| `apocalypse.shieldRadius` | 2.4 | 1.0 עד 6.0 | הרדיוס המצויר של הכדור (וגם כמה קרוב קליע מנוטרל). |
+| `apocalypse.shieldWindUpTicks` | 10 | 0 עד 200 | המגן לא עוצר דבר עד שהוא שלם. |
+| `apocalypse.shieldMaxTicks` | 120 | 1 עד 6000 | כמה זמן אפשר להחזיק מגן שלם. |
+| `apocalypse.shieldStrength` | 60.0 | 1.0 עד 1000.0 | כמה כוח תודעה צריך כדי לשבור אותו. |
+| `apocalypse.shieldOtherWear` | 0.5 | 0.0 עד 1.0 | החלק מכל נזק אחר שהמגן עוצר ושוחק אותו (0 = זה לא עולה לו כלום, הכלל המילולי; המגן של הבוס תמיד משתמש ב-0). |
+| `apocalypse.shieldCooldown` | 160 | 0 עד 6000 | בטיקים אחרי הורדה. |
+| `apocalypse.shieldBrokenCooldown` | 400 | 0 עד 6000 | בטיקים אחרי שהוא התנפץ או הוחזק עד הגבול שלו. |
+| `apocalypse.shieldExhaustion` | 0.1 | 0.0 עד 4.0 | תשישות האוכל בכל טיק שהוא מוחזק. |
+| `apocalypse.bestowRange` | 24 | 4 עד 64 | בבלוקים. |
+| `apocalypse.bestowTicks` | 1200 | 20 עד 72000 | כמה זמן מוגבר נמשך. |
+| `apocalypse.bestowMax` | 2 | 1 עד 8 | כמה בעלי ברית מוגברים בו זמנית. |
+| `apocalypse.bestowCooldown` | 400 | 0 עד 72000 | בטיקים. |
+| `apocalypse.bestowExhaustion` | 6.0 | 0.0 עד 40.0 | תשישות האוכל שהענקת הכוח עולה. |
+| `apocalypse.empowerCooldownBoost` | 1.5 | 1.0 עד 5.0 | הקולדאונים של גיבור מוגבר מתאוששים פי כמה מהר. |
+| `apocalypse.stormRadius` | 7 | 2 עד 32 | בבלוקים. |
+| `apocalypse.stormTicks` | 120 | 20 עד 1200 | כמה זמן סופת החול נמשכת. |
+| `apocalypse.stormDamage` | 2.0 | 0.0 עד 100.0 | כל 10 טיקים. |
+| `apocalypse.stormCooldown` | 600 | 0 עד 72000 | בטיקים (משותף עם הענקת הכוח: אותו מקש). |
+| `apocalypse.stormExhaustion` | 8.0 | 0.0 עד 40.0 | תשישות האוכל שסופת החול עולה. |
+| `apocalypse.essenceRitualTicks` | 60 | 20 עד 400 | כמה זמן צריך להחזיק את המהות כדי להתעורר. |

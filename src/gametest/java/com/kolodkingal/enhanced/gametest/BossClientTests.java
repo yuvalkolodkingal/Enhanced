@@ -6,7 +6,7 @@ import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.client.BossBarOverride;
-import com.kolodkingal.enhanced.client.render.HeroClients;
+import com.kolodkingal.enhanced.client.render.HeroClient;
 import com.kolodkingal.enhanced.client.render.ShieldStyle;
 import com.kolodkingal.enhanced.client.render.ShieldStyles;
 import com.kolodkingal.enhanced.power.Power;
@@ -50,9 +50,11 @@ public final class BossClientTests {
     public static void theGenericShieldDrawsWandasChaosShieldWithWandasNumbers(GameTestHelper helper) {
         check(ShieldStyles.of(Power.SCARLET_WITCH) == ShieldStyles.CHAOS_SHIELD, "the Scarlet Witch has the Chaos Shield");
         for (Power power : Power.values()) {
-            check(power == Power.SCARLET_WITCH || ShieldStyles.of(power) == null, power + " has none until its lane says one");
+            // (Apocalypse's lane has said one, the gold web: ApocalypseClientTests checks it.)
+            check(power == Power.SCARLET_WITCH || power == Power.APOCALYPSE || ShieldStyles.of(power) == null,
+                    power + " has none until its lane says one");
         }
-        check(HeroClients.of(Power.APOCALYPSE).shieldStyle() == null, "a hero's client says no style by default");
+        check(((HeroClient) () -> Power.NONE).shieldStyle() == null, "a hero's client says no style by default");
 
         ShieldStyle chaos = ShieldStyles.CHAOS_SHIELD;
         assertNear(chaos.radius(), 1.9, 1.0E-6, "a radius of 1.9");

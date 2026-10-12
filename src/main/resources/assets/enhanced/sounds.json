@@ -786,5 +786,141 @@
         "stream": true
       }
     ]
+  },
+  "apocalypse_awaken": {
+    "subtitle": "subtitles.enhanced.apocalypse_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_awaken"
+      }
+    ]
+  },
+  "apocalypse_portal": {
+    "subtitle": "subtitles.enhanced.apocalypse_portal",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_portal"
+      }
+    ]
+  },
+  "sand_wave": {
+    "subtitle": "subtitles.enhanced.sand_wave",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/sand_wave"
+      }
+    ]
+  },
+  "sand_spike": {
+    "subtitle": "subtitles.enhanced.sand_spike",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/sand_spike"
+      }
+    ]
+  },
+  "sand_storm_loop": {
+    "subtitle": "subtitles.enhanced.sand_storm_loop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/sand_storm_loop"
+      }
+    ]
+  },
+  "entomb": {
+    "subtitle": "subtitles.enhanced.entomb",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/entomb"
+      }
+    ]
+  },
+  "entomb_break": {
+    "subtitle": "subtitles.enhanced.entomb_break",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/entomb_break"
+      }
+    ]
+  },
+  "apocalypse_shield_up": {
+    "subtitle": "subtitles.enhanced.apocalypse_shield_up",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_shield_up"
+      }
+    ]
+  },
+  "apocalypse_shield_hit": {
+    "subtitle": "subtitles.enhanced.apocalypse_shield_hit",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_shield_hit"
+      }
+    ]
+  },
+  "apocalypse_shield_break": {
+    "subtitle": "subtitles.enhanced.apocalypse_shield_break",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_shield_break"
+      }
+    ]
+  },
+  "apocalypse_mind_crush": {
+    "subtitle": "subtitles.enhanced.apocalypse_mind_crush",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_mind_crush"
+      }
+    ]
+  },
+  "apocalypse_speak": {
+    "subtitle": "subtitles.enhanced.apocalypse_speak",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_speak"
+      }
+    ]
+  },
+  "apocalypse_bestow": {
+    "subtitle": "subtitles.enhanced.apocalypse_bestow",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_bestow"
+      }
+    ]
+  },
+  "essence_transfer": {
+    "subtitle": "subtitles.enhanced.essence_transfer",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/essence_transfer"
+      }
+    ]
+  },
+  "apocalypse_theme": {
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_theme",
+        "stream": true
+      }
+    ]
+  },
+  "apocalypse_theme_final": {
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_theme_final",
+        "stream": true
+      }
+    ]
+  },
+  "apocalypse_death": {
+    "subtitle": "subtitles.enhanced.apocalypse_death",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/apocalypse_death"
+      }
+    ]
   }
 }

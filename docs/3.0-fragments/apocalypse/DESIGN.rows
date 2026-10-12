@@ -1,0 +1,43 @@
+<!-- Fragment of Apocalypse for the shared rows of docs/DESIGN.md and docs/DESIGN.he.md (3.0), besides its own section 17 (design.en.md, design.he.md). Not in the lane guide's list of files: the shared rows of DESIGN. Format: see Home.row (`<!-- en: where -->` and `<!-- he: where -->` blocks). -->
+
+<!-- en: the list at the top of DESIGN.md, after the Thor line (and the other 3.0 heroes, in hero order) -->
+* **Apocalypse (En Sabah Nur)**, the first mutant: a **boss** whose golden shield stops everything except mind power, and, for those who beat him, a **hero** of sand, levitation, portals and a shield of his own **(added in 3.0)**
+
+<!-- en: section 0, the row "One power per player": add "Apocalypse" at the end of the list -->
+Apocalypse
+
+<!-- en: section 0, the row "Looks (added)": the heroes with several looks, add -->
+Apocalypse
+
+<!-- en: section 9, the table "MCU colours", after the Thor row (and the other 3.0 heroes) -->
+| Apocalypse | A yellow-hued energy shield (fan wikis; the film's recap only says he obliterates the projectiles); "an immense sphere of violet light" for his teleport; warm ochre sand in the Cairo scenes; a sapphire-blue "soul-glow" in the transference ritual; the Phoenix's orange fire when she kills him | **Shield gold** (the boss's shield, the hero's shield and the Bestowal): a sphere of a hexagonal web, `#FFF2B0`, `#F5C84A`, `#E39B1B`, `#8A5A0E`. **Teleport violet** (the portals, the Mind Crush): `#F0D4FF`, `#B04FD8`, `#7A2EC8`, `#3F1A7A`. **Sand ochre** (the wave, spikes, lances, boulders, tornadoes, the cocoon, the sandstorm, the amber sky of the arena): `#E6CB86`, `#D8B76A`, `#B8934A`, `#8C6B2F`, haze `#C9A862`. **Soul-glow** (the Essence, the cap's glow): `#3FA0FF`, `#D8EEFF`, gold vein `#F5C84A`. His death uses the Phoenix's fire palette. His title is steel blue `#4A9BC4`. |
+
+<!-- en: section 10, the line of `/enhanced power set`: add `apocalypse` to `<none|magneto|...|thor>`, and the example looks (`en_sabah_nur`) -->
+apocalypse
+
+<!-- en: section 10, the table of commands: a row for the boss commands (once for Thanos, Ultron and Apocalypse; whoever stitches keeps one copy) -->
+| `/enhanced boss start apocalypse [force]` | Wakes En Sabah Nur at your feet, with no Capstone (`force` skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix, never the switch that turns him off, Peaceful or the one-fight-at-a-time rule). `/enhanced boss stop` ends the fight and gives the Capstone back; `/enhanced boss list` and `/enhanced boss cleanup <center> <radius>` are shared by all the bosses. |
+
+<!-- en: section 11, the sentence listing the config numbers: add after the Phoenix's (and the other 3.0 heroes') -->
+what counts as mind power for En Sabah Nur's shield and how much of each kind it takes, his health, the strength and growth of his three shields, the windows and floors, the Escape, the damage and number of every attack, the Horsemen, the arena and its wall, and the hero's body, flight speed, shield, Wave, Entomb, Portal, Bestowal and Sandstorm (damage, range, duration, cooldown and cost)
+
+<!-- he: the list at the top of DESIGN.he.md, after the Thor line (and the other 3.0 heroes, in hero order) -->
+* **אפוקליפסה (אן סבאח נור)**, המוטנט הראשון: **בוס** שהמגן הזהוב שלו עוצר הכול חוץ מכוח מוח, ולמי שמנצח אותו, **גיבור** של חול, ריחוף, שערים ומגן משלו **(נוסף ב-3.0)**
+
+<!-- he: section 0, the row "כוח אחד לכל שחקן": add "אפוקליפסה" at the end of the list -->
+אפוקליפסה
+
+<!-- he: section 0, the row "מראות (נוסף)": the heroes with several looks, add -->
+אפוקליפסה
+
+<!-- he: section 9, the table "צבעי MCU", after the Thor row (and the other 3.0 heroes) -->
+| אפוקליפסה | מגן אנרגיה בגוון צהוב (ויקי של מעריצים; הסיכום של הסרט אומר רק שהוא משמיד את הקליעים); "כדור עצום של אור סגול" לטלפורט שלו; חול אוקר חם בסצנות של קהיר; "זוהר נשמה" כחול-ספיר בטקס ההעברה; האש הכתומה של הפניקס כשהיא הורגת אותו | **זהב המגן** (המגן של הבוס, המגן של הגיבור וההענקה): כדור של סבכה משושה, `#FFF2B0`, `#F5C84A`, `#E39B1B`, `#8A5A0E`. **סגול הטלפורט** (השערים, ריסוק התודעה): `#F0D4FF`, `#B04FD8`, `#7A2EC8`, `#3F1A7A`. **אוקר החול** (הגל, העמודים, החניתות, הסלעים, המערבולות, הפקעת, סופת החול, השמיים הענבריים של הזירה): `#E6CB86`, `#D8B76A`, `#B8934A`, `#8C6B2F`, אובך `#C9A862`. **זוהר נשמה** (המהות, הזוהר של הכובע): `#3FA0FF`, `#D8EEFF`, עורק זהב `#F5C84A`. המוות שלו משתמש בפלטת האש של הפניקס. הכותרת שלו כחולה-פלדה `#4A9BC4`. |
+
+<!-- he: section 10, the line of `/enhanced power set`: add `apocalypse` to `<none|magneto|...|thor>`, and the example looks (`en_sabah_nur`) -->
+apocalypse
+
+<!-- he: section 10, the table of commands: a row for the boss commands (once for Thanos, Ultron and Apocalypse; whoever stitches keeps one copy) -->
+| `/enhanced boss start apocalypse [force]` | מעירה את אן סבאח נור ליד הרגליים שלכם, בלי אבן פסגה (`force` מדלג על הבדיקות של הקרקע, השמיים והצורך במכשפת השני או בפניקס, אף פעם לא על המתג שמכבה אותו, על קושי שליו או על חוק הקרב האחד). `/enhanced boss stop` מסיימת את הקרב ומחזירה את אבן הפסגה; `/enhanced boss list` ו-`/enhanced boss cleanup <center> <radius>` משותפות לכל הבוסים. |
+
+<!-- he: section 11, the sentence listing the config numbers: add after the Phoenix's (and the other 3.0 heroes') -->
+מה נחשב כוח מוח למגן של אן סבאח נור וכמה כל סוג לוקח ממנו, החיים שלו, החוזק והגידול של שלושת המגנים שלו, החלונות והרצפות, הבריחה, הנזק והמספר של כל התקפה, הפרשים, הזירה והחומה שלה, והגוף של הגיבור, מהירות התעופה, המגן, הגל, הכליאה, השער, ההענקה וסופת החול (נזק, טווח, משך, קולדאון ועלות)

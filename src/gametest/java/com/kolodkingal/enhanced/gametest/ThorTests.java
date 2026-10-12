@@ -1668,9 +1668,14 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    /**
+     * (A batch of its own, with a short reach: it counts on there being nothing he may call, and at the usual 64 blocks
+     * his call would reach into the arenas around it, where other tests leave hammers that nobody owns.)
+     */
+    @GameTest(template = ARENA, timeoutTicks = 200, batch = "mjolnir_recall_alone")
     public static void thorCallsBackOnlyMjolnirsThatAreHis(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.MJOLNIR_RECALL_RANGE, 8);
         ServerLevel level = helper.getLevel();
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
         MjolnirOwner odin = new MjolnirOwner(UUID.randomUUID(), "Odin");
@@ -1694,7 +1699,7 @@ public final class ThorTests {
         thor.getInventory().clearContent();
 
         // His own, farther away, comes at once.
-        BlockPos hisBlock = new BlockPos(16, 2, 10);
+        BlockPos hisBlock = new BlockPos(10, 2, 10);
         check(MjolnirBlock.setDown(level, helper.absolutePos(hisBlock), ownedMjolnir(MjolnirOwner.of(thor))), "set Thor's own Mjolnir down");
         press(thor, 1);
         helper.assertBlockPresent(Blocks.AIR, hisBlock);
@@ -1741,7 +1746,11 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    /**
+     * (A batch of its own: it turns ownership off for the whole server while it runs, and the tests of a batch run side
+     * by side, so a test that counts on ownership would see it off.)
+     */
+    @GameTest(template = ARENA, batch = "mjolnir_ownership_off")
     public static void withOwnershipOffAnyWorthyPlayerCanLiftAnyMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_OWNER_ONLY, false);

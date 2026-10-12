@@ -4,6 +4,10 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
 import com.kolodkingal.enhanced.client.render.GauntletLayer;
+import com.kolodkingal.enhanced.client.render.ApocalypseAuraLayer;
+import com.kolodkingal.enhanced.client.render.ApocalypseModel;
+import com.kolodkingal.enhanced.client.render.ApocalypseRenderer;
+import com.kolodkingal.enhanced.client.render.ApocalypseViewer;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
 import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
@@ -18,6 +22,9 @@ import com.kolodkingal.enhanced.client.render.PhoenixFlameLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.SpiderLegsLayer;
 import com.kolodkingal.enhanced.client.render.SoulSight;
+import com.kolodkingal.enhanced.client.render.SandBoulderRenderer;
+import com.kolodkingal.enhanced.client.render.SandCocoonRenderer;
+import com.kolodkingal.enhanced.client.render.SandLanceRenderer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
 import com.kolodkingal.enhanced.client.render.ThanosMeteorRenderer;
 import com.kolodkingal.enhanced.client.render.ThanosModel;
@@ -75,6 +82,7 @@ public final class ClientSetup {
             ThanosViewer.register();
             // ===== ultron =====
             // ===== apocalypse =====
+            ApocalypseViewer.register();
         });
     }
 
@@ -114,10 +122,10 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.VIBRANIUM_KEY.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.ULTRON_BOLT.get(), NoopRenderer::new);
         // ===== apocalypse =====
-        event.registerEntityRenderer(ModEntities.APOCALYPSE.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_BOULDER.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_COCOON.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.APOCALYPSE.get(), ApocalypseRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), SandLanceRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_BOULDER.get(), SandBoulderRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_COCOON.get(), SandCocoonRenderer::new);
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */
@@ -139,6 +147,8 @@ public final class ClientSetup {
         event.registerLayerDefinition(GauntletLayer.LAYER, GauntletLayer::createLayer);
         // ===== ultron =====
         // ===== apocalypse =====
+        event.registerLayerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
+        event.registerLayerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -163,6 +173,7 @@ public final class ClientSetup {
                 renderer.addLayer(new GauntletLayer(renderer, event.getContext().bakeLayer(GauntletLayer.LAYER)));
                 // ===== ultron =====
                 // ===== apocalypse =====
+                renderer.addLayer(new ApocalypseAuraLayer(renderer, energy));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
@@ -189,6 +200,7 @@ public final class ClientSetup {
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("thanos_atmosphere"), new ThanosAtmosphere.Overlay());
         // ===== ultron =====
         // ===== apocalypse =====
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("apocalypse"), new ApocalypseOverlay());
     }
 
     private ClientSetup() {

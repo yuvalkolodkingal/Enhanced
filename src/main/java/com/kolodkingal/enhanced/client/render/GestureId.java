@@ -177,6 +177,22 @@ public enum GestureId {
     // ===== ultron =====
 
     // ===== apocalypse =====
+    /** He rises as if lifted: the arms swept up a little, then settled on the hover pose. */
+    TAKEOFF_APOC(Group.TAKEOFF, 22, 3, 8, true),
+    /** The arms drawn back and low, then thrown forward and down, palms to the ground. */
+    APOC_SAND_WAVE(Group.CAST, 18, 2, 6, false),
+    /** The main arm reaches at the target and the hand closes. */
+    APOC_ENTOMB(Group.CAST, 26, 3, 8, false),
+    /** The arms spread wide, then drawn across the body as he steps through. */
+    APOC_PORTAL(Group.CAST, 20, 2, 6, false),
+    /** The hands drawn up to the chest and opened, palms out (played at the speed of the shield's wind-up). */
+    APOC_SHIELD_RAISE(Group.CAST, 15, 2, 5, true),
+    /** The shield is let go of: the arms fall. */
+    APOC_SHIELD_DROP(Group.CAST, 8, 1, 4, false),
+    /** The hand held out, palm up, to the ally; the other hand on the chest. */
+    APOC_BESTOW(Group.CAST, 22, 2, 7, false),
+    /** The arms gather, then are flung wide and up into the stance of the storm. */
+    APOC_STORM_START(Group.CAST, 18, 2, 6, true)
     ;
 
     /** Gestures of one group never play together. */

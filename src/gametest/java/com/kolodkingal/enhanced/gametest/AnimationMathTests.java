@@ -500,6 +500,7 @@ public final class AnimationMathTests {
                 Power.PHOENIX,
                 // ===== ultron =====
                 // ===== apocalypse =====
+                Power.APOCALYPSE,
         }) {
             FlightProfile profile = FlightProfile.of(power, false);
             check(profile != null, power + " flies");
@@ -555,12 +556,14 @@ public final class AnimationMathTests {
                 GestureId.TAKEOFF_PHOENIX,
                 // ===== ultron =====
                 // ===== apocalypse =====
+                GestureId.TAKEOFF_APOC,
         };
         Power[] powers = {Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR,
                 // ===== phoenix =====
                 Power.PHOENIX,
                 // ===== ultron =====
                 // ===== apocalypse =====
+                Power.APOCALYPSE,
         };
         for (int k = 0; k < ids.length; k++) {
             Gestures.Def def = Gestures.get(ids[k]);
@@ -641,6 +644,8 @@ public final class AnimationMathTests {
                         com.kolodkingal.enhanced.client.render.ThanosGestures.VEIL_O},
                 // ===== ultron =====
                 // ===== apocalypse =====
+                {GestureId.APOC_SHIELD_RAISE, StancePoses.APOC_SHIELD_M, StancePoses.APOC_SHIELD_O},
+                {GestureId.APOC_STORM_START, StancePoses.APOC_STORM_M, StancePoses.APOC_STORM_O},
         };
         for (Object[] pair : pairs) {
             Gestures.Def def = Gestures.get((GestureId) pair[0]);

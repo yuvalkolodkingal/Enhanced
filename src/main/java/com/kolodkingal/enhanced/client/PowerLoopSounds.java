@@ -62,6 +62,8 @@ public final class PowerLoopSounds {
         // ===== ultron =====
 
         // ===== apocalypse =====
+        /** The Sandstorm: the roar of sand round him. */
+        SANDSTORM(ModSounds.SAND_STORM_LOOP, 0.9F, 1.0F, (p, d) -> d.power() == Power.APOCALYPSE && d.is(Live.SANDSTORM))
         ;
 
         final Supplier<SoundEvent> sound;

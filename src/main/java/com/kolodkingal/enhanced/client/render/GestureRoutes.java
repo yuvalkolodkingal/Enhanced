@@ -309,7 +309,11 @@ public final class GestureRoutes {
             // ===== ultron =====
             case ULTRON -> PENDING_ACTING;
             // ===== apocalypse =====
-            case APOCALYPSE -> PENDING_ACTING;
+            case APOCALYPSE -> switch (ability) {
+                case 1, 3, 5 -> "cooldown";
+                case 2 -> "flight";
+                default -> "flag:CHAOS_SHIELD";
+            };
             default -> "none: no abilities";
         };
     }
@@ -339,7 +343,7 @@ public final class GestureRoutes {
             case ULTRON_CHARGING -> PENDING_REASON + ": the Ultron lane acts it";
             case LIFTED -> "Sokovia carries them: like a pinned player they can't move, so they have no move to make";
             // ===== apocalypse =====
-            case SANDSTORM -> PENDING_REASON + ": the Apocalypse lane acts it";
+            case SANDSTORM -> null;
         };
     }
 

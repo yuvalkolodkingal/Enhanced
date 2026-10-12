@@ -133,6 +133,15 @@ public final class FlightProfile {
             pose(-6, 0, 58, -6, 0, -58, 8, 2, 5, -2),      // cruise: arms spread like a bird's
             pose(14, 0, 72, 14, 0, -72, 10, 2, 10, -2)});  // sprint: arms swept back and out, wings
 
+    // ===== apocalypse =====
+    /** A calm, upright, composed flier, like Vision but with the arms a little open: a god at ease. */
+    private static final FlightProfile APOCALYPSE = new FlightProfile(
+            new float[]{30, 56, -6}, 0.30F, 28, 10, 3.0F, 8, 5, false, new float[]{3.5F, 1.8F}, new float[]{0.02F, 96},
+            2.0F, 0.6F, 0.4F, 0.0F, true, 0.08F, false, new float[][]{
+            pose(-8, 0, 14, -8, 0, -14, 2, 1, 1, -1),
+            pose(-14, 0, 20, -14, 0, -20, 4, 1, 3, -1),
+            pose(-26, 0, 26, -26, 0, -26, 6, 1, 5, -2)});
+
     /** The profile of a flier, or null for a hero that does not fly. */
     public static FlightProfile of(Power power, boolean whiteVision) {
         return switch (power) {
@@ -147,7 +156,7 @@ public final class FlightProfile {
             case SPIDER_MAN -> null;
             case THANOS -> null; // he does not fly: no take-off, banking or braking (his landings are ThanosActing's)
             case ULTRON -> null;
-            case APOCALYPSE -> null;
+            case APOCALYPSE -> APOCALYPSE;
             case NONE, QUICKSILVER, TOMMY, LOKI -> null;
         };
     }
