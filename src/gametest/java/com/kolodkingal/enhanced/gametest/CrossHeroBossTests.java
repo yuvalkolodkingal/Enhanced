@@ -27,6 +27,7 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -45,6 +46,8 @@ import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -193,6 +196,26 @@ public final class CrossHeroBossTests {
     /** How often the boss's shield has rung (it turned something away) in all that was sent to the player so far. */
     private static int ripples(ApocalypseTestSupport.Log log) {
         return log.drain().effects(ApocalypseFxPayload.SHIELD_HIT).size();
+    }
+
+    /** The ids of the creatures the web shots sent to the player since the last look ended on (a shot at nothing: -1). */
+    private static List<Integer> webShotsAt(ServerPlayer player) {
+        List<Integer> struck = new ArrayList<>();
+        for (Object packet : TestKit.sentPackets(player)) {
+            List<Object> parts = new ArrayList<>();
+            if (packet instanceof ClientboundBundlePacket bundle) {
+                bundle.subPackets().forEach(parts::add);
+            } else {
+                parts.add(packet);
+            }
+            for (Object part : parts) {
+                if (part instanceof ClientboundCustomPayloadPacket custom && custom.payload() instanceof SpiderFxPayload fx
+                        && fx.kind() == SpiderFxPayload.Kind.SHOT) {
+                    struck.add(fx.arg());
+                }
+            }
+        }
+        return struck;
     }
 
     /** A Burst that fits in its arena: a charge of 10 ticks, radii of 4 to 9, no fire and no push, no long rest. */
@@ -401,9 +424,13 @@ public final class CrossHeroBossTests {
             }
             PowerData his = Powers.get(hero);
             float full = his.shieldStrength();
+            check(full == ApocalypseGuard.maxStrength() && full > control && full - control < field,
+                    "his shield is complete (" + full + "): it outlasts her Mind Control and not the Psionic Field after it");
             lookAt(jean, hero);
             press(jean, 4);
             assertNear(full - his.shieldStrength(), control, 1.0E-3, "her Mind Control strains the hero's shield by " + control);
+            check(ApocalypseGuard.isUp(hero), "and it still stands");
+            // (Her own recharge is forgotten: the shield itself counts one Mind Control of hers per its recharge.)
             Powers.get(jean).startCooldown(4, helper.getLevel().getGameTime(), 0);
             lookAt(jean, hero);
             press(jean, 4);
@@ -411,8 +438,8 @@ public final class CrossHeroBossTests {
             Powers.get(jean).startCooldown(4, helper.getLevel().getGameTime(), 0);
             float before = his.shieldStrength();
             sneakPress(jean, 4);
-            check(before - field <= 0.0F ? !his.chaosShieldActive() : Math.abs(before - his.shieldStrength() - field) < 1.0E-3,
-                    "and her Psionic Field by " + field + ": " + before + " -> " + his.shieldStrength() + " (up " + his.chaosShieldActive() + ")");
+            check(!his.chaosShieldActive() && his.shieldStrength() == 0.0F && !ApocalypseGuard.isUp(hero),
+                    "her Psionic Field (" + field + ") shattered the " + before + " left of it: " + his.shieldStrength() + " (up " + his.chaosShieldActive() + ")");
             letGo(hero, 4);
             return true;
         });
@@ -530,7 +557,10 @@ public final class CrossHeroBossTests {
         ServerPlayer spider = d.hero();
         lookAt(spider, boss);
         Guarded before = Guarded.of(boss);
+        TestKit.sentPackets(spider);
         press(spider, 1);
+        List<Integer> shotAt = webShotsAt(spider);
+        check(shotAt.contains(boss.getId()), "the web shot reached him (it struck " + shotAt + ", he is " + boss.getId() + ")");
         check(!boss.hasEffect(ModEffects.WEBBED), "the web does not take hold of him");
         before.unchanged(boss, "a web shot");
 
@@ -605,8 +635,9 @@ public final class CrossHeroBossTests {
     }
 
     /**
-     * The villains as heroes are not mind power either: the Ultron hero's repulsor stream and Overcharge, his Gravity Pull and
-     * Slam, and the Thanos hero's Power Blast, Titan Slam and Soul Drain leave the shield and his health whole.
+     * The villains as heroes are not mind power either: the Ultron hero's repulsor stream and Overcharge, and the Thanos
+     * hero's Power Blast, Titan Slam and Soul Drain reach him and leave the shield and his health whole; the Ultron hero's
+     * Gravity Pull and Slam do not even reach him (ultron.md 4.3: a boss is {@code telekinesis_immune}).
      */
     @GameTest(template = ARENA, batch = "cross_apocalypse_villains", timeoutTicks = 220)
     public static void theUltronAndThanosHeroesLeaveApocalypsesShieldWhole(GameTestHelper helper) {
@@ -623,10 +654,17 @@ public final class CrossHeroBossTests {
             PowerTicker.tick(ultron);
             PowerTicker.tick(thanos);
             before.unchanged(boss, "the villains' powers (tick " + tick + ")");
+            // (One look after each: the stream, the Overcharge, the Power Blast, the Titan Slam, the Soul Drain must each have
+            // reached him on its own. The Gravity Pull and Slam pass a boss by (ultron.md 4.3: not a telekinesis_immune
+            // type, he is too powerful to pull or slam), so nothing of them reaches his shield.)
             if (tick == 25 || tick == 69 || tick == 89 || tick == 129 || tick == 180) {
                 int now = ripples(log);
                 check(now > rang[0], "each of them reached him and his shield rang (tick " + tick + ", " + now + " rings)");
                 rang[0] = now;
+            }
+            if (tick == 79) {
+                int now = ripples(log);
+                check(now == rang[0], "the Gravity Pull and Slam pass him by: nothing reached his shield (" + (now - rang[0]) + " rings)");
             }
             switch (tick) {
                 case 25 -> {
@@ -685,8 +723,10 @@ public final class CrossHeroBossTests {
         ServerPlayer billy = d.hero();
         ServerPlayer wanda = tank(d.f().player(3.5, FLOOR, 17.5, Power.SCARLET_WITCH));
         Guarded before = Guarded.of(boss);
+        ApocalypseTestSupport.Log log = new ApocalypseTestSupport.Log(billy);
         int[] step = {0};
         int[] stepAt = {0};
+        int[] rang = {0};
         float[] health = {boss.getHealth()};
         d.f().everyTick(240, tick -> {
             PowerTicker.tick(billy);
@@ -720,12 +760,14 @@ public final class CrossHeroBossTests {
                 case 2 -> {
                     // Thrown back while the shield is up: turned away like everything else.
                     if (tick - stepAt[0] == 2) {
+                        rang[0] = ripples(log);
                         lookAt(billy, boss);
                         press(billy, 3);
                         check(!Telekinesis.isHolding(billy), "Billy threw the lance");
                     }
                     before.unchanged(boss, "a lance thrown back at the shield");
                     if (tick - stepAt[0] >= 20) {
+                        check(ripples(log) > rang[0], "the lance Billy threw reached him: his shield turned it away");
                         step[0]++;
                         stepAt[0] = tick;
                     }
@@ -785,7 +827,7 @@ public final class CrossHeroBossTests {
                 return false;
             }
             check(paid >= 6.0F && Math.abs(paid / 6.0F - Math.round(paid / 6.0F)) < 1.0E-3F, "the shield paid six for each lance: " + paid);
-            check(Math.round(paid / 6.0F) >= 3, "and stopped most of the volley: " + paid / 6.0F + " lances");
+            check(Math.round(paid / 6.0F) >= 3 && Math.round(paid / 6.0F) <= 5, "and stopped most of the volley of five: " + paid / 6.0F + " lances");
             check(WandaAbilities.hasShieldUp(wanda), "and still stands");
             letGo(wanda, 4);
             return true;
@@ -825,7 +867,15 @@ public final class CrossHeroBossTests {
         float sentryHealth = sentry.getHealth();
         float zombieHealth = zombie.getHealth();
         int[] killFrom = {-1};
+        // The Sentry's health when Instant Kill began and at the last tick, and the Zombie's when Instant Kill began.
+        float[] sentryAtKill = {-1.0F};
+        float[] sentryLast = {-1.0F};
+        float[] zombieAtKill = {-1.0F};
         f.everyTick(140, tick -> {
+            if (killFrom[0] >= 0) {
+                // (A jab knocks the Sentry back out of reach: it is held where it was, two blocks from him.)
+                UltronTestSupport.put(f, sentry, 12.5, FLOOR + 1.0, 10.5);
+            }
             PowerTicker.tick(spider);
             if (killFrom[0] < 0) {
                 if (tick < 45) {
@@ -840,15 +890,23 @@ public final class CrossHeroBossTests {
                 sneakPress(spider, 4);
                 check(Powers.get(spider).is(Live.INSTANT_KILL), "Instant Kill is on");
                 killFrom[0] = tick;
+                sentryAtKill[0] = sentry.getHealth();
+                sentryLast[0] = sentry.getHealth();
+                zombieAtKill[0] = zombie.getHealth();
                 return false;
             }
-            float before = sentry.getHealth();
+            // Every strike of Instant Kill: the Zombie dies of the first one that reaches it, the Sentry takes the legs' 5.
+            float struck = sentryLast[0] - sentry.getHealth();
+            check(struck <= legs + 0.01F, "a strike of Instant Kill takes no more than the legs' " + legs + " from the Sentry, not " + struck);
+            sentryLast[0] = sentry.getHealth();
+            check(!zombie.isAlive() || zombie.getHealth() == zombieAtKill[0],
+                    "Instant Kill kills the Zombie at its first strike, it does not jab it: " + zombieAtKill[0] + " -> " + zombie.getHealth());
             if (tick - killFrom[0] < 40) {
                 return false;
             }
             check(!zombie.isAlive(), "Instant Kill killed the Zombie");
             check(sentry.isAlive(), "and not the Sentry, a minion of the fight: " + sentry.getHealth());
-            check(sentry.getHealth() < before || sentry.getHealth() < sentryHealth - legs * 0.5F, "which the legs still strike");
+            check(sentry.getHealth() < sentryAtKill[0], "which the legs still strike in Instant Kill: " + sentryAtKill[0] + " -> " + sentry.getHealth());
             check(fight.sentries().contains(sentry), "and which still counts for the fight");
             return true;
         });
@@ -1093,6 +1151,7 @@ public final class CrossHeroBossTests {
                 check(counter.ticks(boss) <= 10, "at first he is slowed fully, five times: " + counter.ticks(boss) + " of 40");
                 check(!boss.hasAdapted(), "and has not adapted yet");
             }
+            check(adaptedAt[0] > 0 || boss.hasAdapted() || tick < adapt + 10, "he never adapted to Quicksilver Time (" + adapt + " ticks of it)");
             if (adaptedAt[0] < 0 && boss.hasAdapted()) {
                 adaptedAt[0] = tick;
                 check(tick >= adapt - 5, "he adapts after " + adapt + " ticks of it, not " + tick);
@@ -1136,6 +1195,19 @@ public final class CrossHeroBossTests {
     }
 
     /**
+     * A boss the wall threw back stands near it, on the side he came from (it puts him a block from the wall and pushes him
+     * a little further), not wherever something else (his arena, a teleport) would have put him; and the wall did not hurt
+     * him: {@code hex_resistant} is a bounce, never the wall's damage.
+     */
+    private static void bounced(Hex hex, LivingEntity boss, boolean in, float health, String who, GameTestHelper helper) {
+        double fromCentre = boss.position().add(0, boss.getBbHeight() * 0.5, 0).distanceTo(hex.center());
+        check(boss.isAlive() && inside(hex, boss) == in, who + " was thrown back " + (in ? "inside" : "out of") + " the Hex, alive: at " + rel(helper, boss));
+        check(in ? fromCentre > hex.radius() - 4.0 : fromCentre < hex.radius() + 4.0,
+                who + " is near the wall, where it threw him: " + fromCentre + " from the middle of a Hex of " + hex.radius());
+        check(boss.getHealth() >= health, who + " was not hurt by the wall: " + health + " -> " + boss.getHealth());
+    }
+
+    /**
      * The Mad Titan is {@code hex_resistant}: the wall bounces him back, alive, whichever way he goes; his phantoms are
      * creatures without powers and die at it (thanos.md 3.9: "a Hex is a perfect arena").
      */
@@ -1150,14 +1222,29 @@ public final class CrossHeroBossTests {
         put(helper, phantom, 12.5, FLOOR, 13.5);
         phantom.setNoAi(true);
         boss.fight().spawn(phantom);
+        float health = boss.getHealth();
         f.everyTick(100, tick -> {
             crossOut(helper, boss, new Vec3(14.5, FLOOR, 13.5), new Vec3(19.5, FLOOR, 13.5), 5, tick);
             crossOut(helper, phantom, new Vec3(12.5, FLOOR, 13.5), new Vec3(19.5, FLOOR, 18.5), 5, tick);
-            if (tick < 20) {
+            if (tick == 10) {
+                // (Looked at three ticks after he crossed: later he walks back to Wanda.)
+                bounced(hex, boss, true, health, "Thanos", helper);
+            }
+            if (tick == 20) {
+                check(boss.isAlive() && inside(hex, boss), "Thanos stays inside the Hex: at " + rel(helper, boss));
+                check(!phantom.isAlive() || phantom.isRemoved(), "his phantom did not survive the wall: at " + rel(helper, phantom));
+                // The other way: he stands outside (the wall forgets where he was, as for one who just arrived), then walks in.
+                put(helper, boss, 19.5, FLOOR, 13.5);
+                HexManager.forget(boss.getUUID());
+            }
+            if (tick == 23) {
+                check(!inside(hex, boss), "Thanos stood outside the Hex: at " + rel(helper, boss));
+                put(helper, boss, 14.5, FLOOR, 13.5);
+            }
+            if (tick < 26) {
                 return false;
             }
-            check(boss.isAlive() && inside(hex, boss), "Thanos was thrown back inside the Hex, alive: at " + rel(helper, boss));
-            check(!phantom.isAlive() || phantom.isRemoved(), "his phantom did not survive the wall: at " + rel(helper, phantom));
+            bounced(hex, boss, false, health, "Thanos walking in", helper);
             return true;
         });
     }
@@ -1179,13 +1266,17 @@ public final class CrossHeroBossTests {
         UltronSentryEntity sentry = UltronTestSupport.sentryAt(f, fight, 12.5, 13.5);
         sentry.setHeld(true);
         Hex hex = hex(f, wanda);
+        float health = body.getHealth();
         f.everyTick(100, tick -> {
             crossOut(helper, body, new Vec3(14.5, FLOOR, 13.5), new Vec3(19.5, FLOOR, 13.5), 5, tick);
             crossOut(helper, sentry, new Vec3(12.5, FLOOR + 1.0, 13.5), new Vec3(19.5, FLOOR + 1.0, 18.5), 5, tick);
+            if (tick == 10) {
+                bounced(hex, body, true, health, "Ultron's body", helper);
+            }
             if (tick < 20) {
                 return false;
             }
-            check(body.isAlive() && inside(hex, body), "Ultron's body was thrown back inside, alive: at " + rel(helper, body));
+            check(body.isAlive() && inside(hex, body), "Ultron's body stays inside the Hex: at " + rel(helper, body));
             check(!sentry.isAlive(), "the Sentry did not survive the wall: at " + rel(helper, sentry));
             fight.refresh();
             check(!fight.sentries().contains(sentry), "and is no longer one of the fight's");
@@ -1207,13 +1298,17 @@ public final class CrossHeroBossTests {
         war.setNoAi(true);
         check(Horsemen.kindOf(war) == Horsemen.Kind.WAR, "War rides for him");
         Hex hex = hex(d.f(), wanda);
+        float health = boss.getHealth();
         d.f().everyTick(100, tick -> {
             crossOut(helper, boss, new Vec3(14.5, FLOOR, 13.5), new Vec3(19.5, FLOOR, 13.5), 5, tick);
             crossOut(helper, war, new Vec3(12.5, FLOOR, 13.5), new Vec3(19.5, FLOOR, 18.5), 5, tick);
+            if (tick == 10) {
+                bounced(hex, boss, true, health, "Apocalypse", helper);
+            }
             if (tick < 20) {
                 return false;
             }
-            check(boss.isAlive() && inside(hex, boss), "Apocalypse was thrown back inside, alive: at " + rel(helper, boss));
+            check(boss.isAlive() && inside(hex, boss), "Apocalypse stays inside the Hex: at " + rel(helper, boss));
             check(!war.isAlive(), "War did not survive the wall: at " + rel(helper, war));
             check(d.fight().horsemenAlive().stream().noneMatch(h -> h == war), "and rides for him no more");
             return true;

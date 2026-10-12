@@ -268,7 +268,8 @@ public final class CrossHeroTests {
         }
         ServerPlayer survivor = f.player(10.5, FLOOR, 16.5);
         use(survivor, scepter, ModItems.INFINITY_GAUNTLET.get());
-        check(!survivor.isAlive(), "a survival player with the Gauntlet and the Scepter is torn apart by the Mind Stone");
+        check(!survivor.isAlive() && survivor.getLastDamageSource() != null && survivor.getLastDamageSource().is(ModDamageTypes.MIND_STONE),
+                "a survival player with the Gauntlet and the Scepter is torn apart by the Mind Stone: " + survivor.getLastDamageSource());
         check(Powers.power(survivor) == Power.NONE, "and did not become Thanos");
         helper.succeed();
     }
@@ -322,6 +323,13 @@ public final class CrossHeroTests {
             check(ScepterRituals.tesseract(Power.NONE, new ItemStack(reward)) == Ritual.ESCAPE,
                     "the Tesseract with " + BuiltInRegistries.ITEM.getKey(reward) + " is Loki's escape, nothing of the villains");
         }
+        // And the item does what the table says: the Gauntlet in the other hand calls no Titan, it is Loki's escape.
+        ServerPlayer escaper = f.player(16.5, FLOOR, 16.5);
+        use(escaper, tesseract, ModItems.INFINITY_GAUNTLET.get());
+        check(!escaper.isUsingItem(), "the Tesseract with the Gauntlet begins no summoning");
+        check(Powers.power(escaper) == Power.LOKI, "it is Loki's escape: a Loki now, not " + Powers.power(escaper));
+        check(count(escaper, ModItems.INFINITY_GAUNTLET.get()) == 1 && count(escaper, tesseract) == 1, "and the Gauntlet and the Tesseract are kept");
+        check(BossFights.active(f.level()) == null, "and no fight was called");
         helper.succeed();
     }
 
@@ -549,11 +557,15 @@ public final class CrossHeroTests {
     // ============================================================================================================
     // 10. AreaTargets: every 3.0 area attack against a village
 
-    /** A village round a spot: who must be spared, and a Zombie that must not be. */
-    private record Village(Villager villager, IronGolem golem, Cow cow, Wolf othersPet, Wolf ownPet, Zombie zombie, Map<LivingEntity, Float> health) {
+    /**
+     * A village round a spot: who must be spared (a villager, an Iron Golem, a cow, the caster's own wolf, a neighbour's wolf
+     * and the neighbour himself, PvP being off as on the GameTest server), and a Zombie that must not be.
+     */
+    private record Village(Villager villager, IronGolem golem, Cow cow, Wolf othersPet, Wolf ownPet, ServerPlayer neighbour, Zombie zombie,
+                           Map<LivingEntity, Float> health) {
         static Village round(TestKit.Fixture f, ServerPlayer caster, double x, double z) {
             GameTestHelper helper = f.helper();
-            ServerPlayer neighbour = f.player(1.5, FLOOR, 19.5);
+            ServerPlayer neighbour = f.player(x + 3.0, FLOOR, z - 3.0);
             Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(x + 3.0, FLOOR, z));
             IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(x, FLOOR, z + 3.0));
             Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(x - 3.0, FLOOR, z + 1.0));
@@ -565,17 +577,18 @@ public final class CrossHeroTests {
             zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
             zombie.setHealth(200.0F);
             Map<LivingEntity, Float> health = new LinkedHashMap<>();
-            for (LivingEntity e : List.of(villager, golem, cow, othersPet, ownPet)) {
+            for (LivingEntity e : List.of(villager, golem, cow, othersPet, ownPet, neighbour)) {
                 health.put(e, e.getHealth());
             }
-            return new Village(villager, golem, cow, othersPet, ownPet, zombie, health);
+            return new Village(villager, golem, cow, othersPet, ownPet, neighbour, zombie, health);
         }
 
         /** Nobody of the village was hurt or webbed by {@code what}. */
         void spared(String what) {
             for (Map.Entry<LivingEntity, Float> e : health.entrySet()) {
                 LivingEntity creature = e.getKey();
-                String name = EntityType.getKey(creature.getType()).getPath() + (creature == ownPet ? " (the caster's own pet)" : creature == othersPet ? " (another player's pet)" : "");
+                String name = EntityType.getKey(creature.getType()).getPath() + (creature == ownPet ? " (the caster's own pet)"
+                        : creature == othersPet ? " (another player's pet)" : creature == neighbour ? " (the neighbour, PvP off)" : "");
                 check(creature.isAlive() && creature.getHealth() == e.getValue(), what + " spared the " + name + ": " + e.getValue() + " -> " + creature.getHealth());
                 check(!creature.hasEffect(ModEffects.WEBBED) && !creature.hasEffect(ModEffects.ENTOMBED), what + " held nothing of the " + name);
             }
@@ -730,7 +743,8 @@ public final class CrossHeroTests {
                 BossTestSupport.lastActionBarKey(other);
                 check(!BossFights.start(second, other, true), "an operator cannot start " + pair);
                 check("message.enhanced.boss.busy".equals(BossTestSupport.lastActionBarKey(other)), "and is told a fight runs (" + pair + ")");
-                // Its ritual, with its item: refused, the item kept.
+                // Its ritual, with its item: refused because a fight runs (not for some other reason), the item kept.
+                BossTestSupport.lastActionBarKey(other);
                 switch (second) {
                     case THANOS -> {
                         InteractionResultHolder<ItemStack> result = use(other, ModItems.TESSERACT.get(), ModItems.LOKIS_SCEPTER.get());
@@ -750,6 +764,8 @@ public final class CrossHeroTests {
                         check(count(other, ModItems.CAPSTONE.get()) == 1, "the Capstone is kept: " + pair);
                     }
                 }
+                String told = BossTestSupport.lastActionBarKey(other);
+                check("message.enhanced.boss.busy".equals(told), "the ritual is refused because a fight runs (" + pair + "), not: " + told);
                 check(other.isAlive(), "the refused ritual hurt nobody: " + pair);
                 check(BossFights.all(server).size() == 1 && BossFights.all(server).get(0).kind() == running, "still one fight, the " + running + " one: " + pair);
                 other.getInventory().clearContent();
@@ -1004,13 +1020,17 @@ public final class CrossHeroTests {
         UltronFight fight = UltronTestSupport.onTheGround(f, riders.get(0));
         UltronTestSupport.calm(fight);
         Map<ServerPlayer, Integer> carried = new LinkedHashMap<>();
+        Map<ServerPlayer, Integer> floating = new LinkedHashMap<>();
         Map<ServerPlayer, Integer> highest = new LinkedHashMap<>();
+        Map<ServerPlayer, Double> startY = new LinkedHashMap<>();
+        Map<ServerPlayer, Double> risen = new LinkedHashMap<>();
         SokoviaTestSupport.Script script = new SokoviaTestSupport.Script();
         script.then("the lock", () -> {
             fight.forceState(UltronFight.Phase.LIFT_WARN);
             fight.forceState(UltronFight.Phase.LIFT_LOCK);
             for (ServerPlayer rider : riders) {
                 TestKit.sentPackets(rider);
+                startY.put(rider, rider.getY());
             }
         });
         script.step("200 ticks in the air", () -> {
@@ -1018,11 +1038,16 @@ public final class CrossHeroTests {
             double ground = helper.absoluteVec(new Vec3(0, y + 1.0, 0)).y;
             for (ServerPlayer rider : riders) {
                 boolean up = lift != null && lift.carried().contains(rider.getUUID());
+                boolean inTheAir = up && rider.getY() > ground;
                 try {
-                    FLOATING.setBoolean(rider.connection, up && rider.getY() > ground);
+                    FLOATING.setBoolean(rider.connection, inTheAir);
                 } catch (IllegalAccessException e) {
                     throw new IllegalStateException(e);
                 }
+                if (inTheAir) {
+                    floating.merge(rider, 1, Integer::sum);
+                }
+                risen.merge(rider, rider.getY() - startY.get(rider), Math::max);
                 // What the server does to every connected player each tick (the player's own tick, the heroes' code
                 // with it, and the kick check), and what the client does with the velocity it is given.
                 rider.connection.tick();
@@ -1030,6 +1055,9 @@ public final class CrossHeroTests {
                 if (up) {
                     carried.merge(rider, 1, Integer::sum);
                     highest.merge(rider, rider.connection.aboveGroundTickCount, Math::max);
+                    // (The lift holds them without gravity, so the server allows them any time in the air; their own hero's
+                    // tick must not give it back.)
+                    check(rider.isNoGravity(), Powers.power(rider) + " was given back gravity while the lift carried them");
                 }
                 for (Object packet : TestKit.sentPackets(rider)) {
                     check(!(packet instanceof ClientboundDisconnectPacket), Powers.power(rider) + " was kicked after " + carried.getOrDefault(rider, 0) + " ticks");
@@ -1041,6 +1069,9 @@ public final class CrossHeroTests {
             for (ServerPlayer rider : riders) {
                 String who = Powers.power(rider).toString();
                 check(carried.getOrDefault(rider, 0) >= 200, who + " was carried for " + carried.getOrDefault(rider, 0) + " ticks");
+                // (Off the ground, as the server sees a client in the air, for longer than the 80 ticks that get a player kicked.)
+                check(floating.getOrDefault(rider, 0) > 100, who + " hung in the air for only " + floating.getOrDefault(rider, 0) + " ticks");
+                check(risen.getOrDefault(rider, 0.0) > SokoviaTestSupport.LIFT - 1.0, who + " rose with the island only " + risen.get(rider) + " blocks");
                 check(highest.getOrDefault(rider, 0) <= 2, who + "'s floating counter rose to " + highest.get(rider));
                 check(rider.isAlive() && rider.connection.isAcceptingMessages(), who + " is still on the server");
             }
