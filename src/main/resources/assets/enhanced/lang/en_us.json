@@ -504,7 +504,7 @@
   "message.enhanced.web.no_target": "Nothing to web",
   "message.enhanced.web.hungry": "Too hungry to make webs",
   "message.enhanced.web.shield": "The web splats on the shield",
-  "message.enhanced.burst.no_target": "No one near to web",
+  "message.enhanced.burst.no_target": "Nobody close enough to web",
   "message.enhanced.zip.no_anchor": "Nothing to zip to",
   "message.enhanced.zip.hex": "The Hex stops your web",
   "message.enhanced.swing.no_anchor": "Nothing to swing from",
