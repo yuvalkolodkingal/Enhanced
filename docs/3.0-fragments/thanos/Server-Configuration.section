@@ -200,3 +200,18 @@ Section `[thanos]`: the playable Thanos, whose page is [Playing Thanos](Thanos#p
 | `thanos.timeLockCooldown` | `600` | 0 to 72000 | Ticks before the Time Lock can be used again. |
 | `thanos.timeLockProjectileDrag` | `0.65` | 0.0 to 1.0 | The share of its speed a projectile loses each tick inside the Time Lock. |
 | `thanos.timeLockExhaustion` | `3.0` | 0.0 to 20.0 | Exhaustion of the Time Lock. |
+
+### Your own game: the music and the atmosphere of the fight
+
+Two more options are about your own game only (they are not synced, and a server can't change them). They live in the client file, **`config/enhanced-client.toml`**, in a `[thanos]` section, next to the options of [Client options](#client-options-animations-effects-and-looks), and in the game under **Mods, Enhanced, Config**.
+
+```toml
+[thanos]
+    bossMusic = true
+    bossAtmosphere = true
+```
+
+| Option | Setting in the file | Default | What it does |
+|---|---|---|---|
+| Boss music | `bossMusic` | `true` | The music of the fight while a Thanos is near: a low hum that gains a layer for each stone he has, while the game's own music waits (it follows the music volume). Off: silence (the sounds of his moves stay). |
+| Boss atmosphere | `bossAtmosphere` | `true` | The violet fog, the dark edges of the screen and the far thunder while a Thanos is near, and the violet haze of the call that wakes him. Off: the sky stays as it is. The grey of stone, the green of the Time Lock, the Soul World and the white flashes are what he does to you, so they always show. |
