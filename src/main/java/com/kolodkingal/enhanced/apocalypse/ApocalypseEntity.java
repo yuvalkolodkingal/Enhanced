@@ -104,6 +104,9 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     private long lastSlowed = Long.MIN_VALUE / 2;
     private long adaptedUntil;
     private boolean lightningStruck;
+    /** The model viewer's copy: the tick it is shown at (-1 when this is a real boss), and whether the tick advances. */
+    private float shownTick = -1.0F;
+    private boolean shownRunning;
 
     public ApocalypseEntity(EntityType<? extends ApocalypseEntity> type, Level level) {
         super(type, level);
@@ -301,6 +304,40 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     /** The game time the current state began. */
     public long stateTick() {
         return entityData.get(DATA_STATE_TICK);
+    }
+
+    /**
+     * How long ago the current state began, in ticks with the partial tick (what every pose and every tell is drawn from).
+     * A copy in the model viewer is held at the tick it was put at, or runs on from it.
+     */
+    public float stateTime(float partial) {
+        if (shownTick >= 0.0F) {
+            return shownTick + (shownRunning ? partial : 0.0F);
+        }
+        return Math.max(0.0F, level().getGameTime() + partial - stateTick());
+    }
+
+    /**
+     * The model viewer puts this client-only copy in a state, as it would be {@code tick} ticks into it (see {@code
+     * ModelViewer}): nothing here is sent anywhere, and the copy is never a fight's.
+     */
+    public void showState(ApocalypseState state, int tick, boolean running, boolean trueForm, ApocalypseShield.State shieldState, float shieldFraction,
+                          int phase, boolean fire, Vec3 aim) {
+        shownRunning = running;
+        shownTick = tick;
+        entityData.set(DATA_STATE, state.id());
+        entityData.set(DATA_STATE_TICK, level().getGameTime() - tick);
+        entityData.set(DATA_TRUE_FORM, trueForm);
+        entityData.set(DATA_SHIELD, (byte) shieldState.ordinal());
+        entityData.set(DATA_SHIELD_FRAC, shieldFraction);
+        entityData.set(DATA_PHASE, (byte) phase);
+        entityData.set(DATA_FIRE_DEATH, fire);
+        entityData.set(DATA_AIM, new Vector3f((float) aim.x, (float) aim.y, (float) aim.z));
+    }
+
+    /** Whether this is the model viewer's copy and not a boss of a fight. */
+    public boolean shownByViewer() {
+        return shownTick >= 0.0F;
     }
 
     public void setState(ApocalypseState state) {

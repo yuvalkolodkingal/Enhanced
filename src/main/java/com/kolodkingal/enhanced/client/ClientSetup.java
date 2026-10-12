@@ -3,6 +3,9 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
+import com.kolodkingal.enhanced.client.render.ApocalypseModel;
+import com.kolodkingal.enhanced.client.render.ApocalypseRenderer;
+import com.kolodkingal.enhanced.client.render.ApocalypseViewer;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
 import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
@@ -13,6 +16,9 @@ import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
+import com.kolodkingal.enhanced.client.render.SandBoulderRenderer;
+import com.kolodkingal.enhanced.client.render.SandCocoonRenderer;
+import com.kolodkingal.enhanced.client.render.SandLanceRenderer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
 import com.kolodkingal.enhanced.client.render.ThrownWeaponRenderer;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -57,6 +63,7 @@ public final class ClientSetup {
             // ===== thanos =====
             // ===== ultron =====
             // ===== apocalypse =====
+            ApocalypseViewer.register();
         });
     }
 
@@ -96,10 +103,10 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.VIBRANIUM_KEY.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.ULTRON_BOLT.get(), NoopRenderer::new);
         // ===== apocalypse =====
-        event.registerEntityRenderer(ModEntities.APOCALYPSE.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_BOULDER.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_COCOON.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.APOCALYPSE.get(), ApocalypseRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), SandLanceRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_BOULDER.get(), SandBoulderRenderer::new);
+        event.registerEntityRenderer(ModEntities.SAND_COCOON.get(), SandCocoonRenderer::new);
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */
@@ -118,6 +125,8 @@ public final class ClientSetup {
         // ===== thanos =====
         // ===== ultron =====
         // ===== apocalypse =====
+        event.registerLayerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
+        event.registerLayerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);
     }
 
     @SubscribeEvent

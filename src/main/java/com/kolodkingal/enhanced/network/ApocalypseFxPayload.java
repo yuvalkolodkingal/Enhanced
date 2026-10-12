@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.render.SandFx;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -85,7 +86,8 @@ public record ApocalypseFxPayload(byte kind, int id, Vec3 a, Vec3 b, int c, int 
         return TYPE;
     }
 
-    /** The Apocalypse lane draws the effect here. */
+    /** The effect arrived: the client draws it (one call into a client class, loaded only on a client). */
     static void handle(ApocalypseFxPayload payload, IPayloadContext context) {
+        SandFx.handle(payload);
     }
 }
