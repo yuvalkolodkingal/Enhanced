@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.apocalypse;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ApocalypseAbilities;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
+import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.power.Power;
@@ -20,6 +21,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
@@ -31,6 +33,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Apocalypse's own game-bus events, at the priorities of {@code docs/HEROES-AND-BOSSES.md}: the sand hazards tick with
@@ -64,6 +67,38 @@ public final class ApocalypseEvents {
         if (event.getEntity() instanceof ServerPlayer player && !player.level().isClientSide) {
             ApocalypseGuard.guard(player, event);
         }
+    }
+
+    /**
+     * HIGHEST: he and his Horsemen are one side. War's iron shards fly at the fighters past Pestilence, Famine's gust and
+     * Death's slam spare War, and none of them strikes another, so none of them turns on another (in a real fight War's
+     * volley cut Pestilence down and he and Famine fought it out within half a minute of their coming). A Horseman a
+     * Phoenix has taken over is hers: it fights them, and they may fight it back.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onFriendlyFire(LivingIncomingDamageEvent event) {
+        LivingEntity victim = event.getEntity();
+        if (!victim.level().isClientSide && sameSide(victim, event.getSource().getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    /** No Horseman takes another of the fight, or him, for a target (unless a Phoenix holds one of the two). */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onChangeTarget(LivingChangeTargetEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!entity.level().isClientSide && sameSide(entity, event.getNewAboutToBeSetTarget())) {
+            event.setCanceled(true);
+        }
+    }
+
+    /** Whether two entities are his and on his side: the boss or a Horseman each, of the same fight, neither held by a Phoenix. */
+    static boolean sameSide(Entity a, @Nullable Entity b) {
+        return b != null && a != b && ofHisSide(a) && ofHisSide(b) && BossFights.sameFight(a, b);
+    }
+
+    private static boolean ofHisSide(Entity entity) {
+        return (entity instanceof ApocalypseEntity || Horsemen.kindOf(entity) != null) && !PhoenixAbilities.isHost(entity);
     }
 
     /** The healing factor of the hero waits for quiet: any damage that reached him starts the wait over. */

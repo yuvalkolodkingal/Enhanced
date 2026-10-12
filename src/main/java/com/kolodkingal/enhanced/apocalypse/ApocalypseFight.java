@@ -498,8 +498,8 @@ public final class ApocalypseFight extends BossFight {
         lastDamageTick = level().getGameTime();
     }
 
-    /** The shield turned something away: the first time he says why. */
-    void onDeflected(DamageSource source) {
+    /** The shield turned something away (a blow, or an arrow before it hit): the first time he says why. */
+    void onDeflected() {
         if (!spokeDeflect && boss != null && boss.shield().isUp()) {
             spokeDeflect = true;
             say("speech.enhanced.apocalypse.babel");
