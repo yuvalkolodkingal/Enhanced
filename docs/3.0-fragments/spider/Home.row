@@ -1,0 +1,30 @@
+<!--
+Fragment of Spider-Man for the wiki page Home / Home-HE (3.0). One block per place, English first, then Hebrew.
+Format of every small fragment file: a line `<!-- en: <where it goes> -->` starts an English block and `<!-- he: <where it goes> -->` a
+Hebrew one; a block runs to the next marker line or the end of the file. The docs step pastes each block where it says, in hero order
+(Spider-Man comes right after the Phoenix).
+-->
+
+<!-- en: the table "The heroes", after the Phoenix row -->
+| [Spider-Man](Spider-Man) | Peter Parker | Get bitten: **craft** or find a **Radioactive Spider** and right-click it with no power | Web Shot and Web Burst, Web Zip and Web Swing, walking on walls and ceilings, Spider-Sense; three suits (the Iron Spider has four mechanical legs and Instant Kill) and the Black Eyes |
+
+<!-- en: the first paragraph, the list of heroes, before "or, if you are worthy, Thor" (after the Phoenix) -->
+**Peter Parker, Spider-Man**, who goes everywhere on a web;
+
+<!-- en: the line under the table, the heroes with several looks -->
+(Vision, Tommy, Billy, Loki, Thor, the Phoenix and Spider-Man)
+
+<!-- en: "What's new in 3.0" (a new section above "What's new in 2.3"), after the Phoenix bullet -->
+* **Spider-Man, Peter Parker.** Get bitten by a **Radioactive Spider** (craft it or find it in a chest) and go by web: **R** wraps what you look at (**Sneak + R**: a burst of 24 strands in every direction), **G** zips you to the block you look at and on to the next (**Sneak + G**, held: swing on the web), jump at a wall and keep pushing to **climb it, and walk on the ceiling** (**V**), and a spider-sense warns you of danger before it hits. In the **Iron Spider** suit **B** unfolds four mechanical legs (**Sneak + B**, twice: Instant Kill), and **N** turns his eyes black for a short, strong, costly surge. Three suits, from *Homecoming*, *Infinity War* and *Brand New Day*. See [Spider-Man](Spider-Man).
+
+<!-- he: the table "הגיבורים", after the Phoenix row -->
+| [ספיידרמן](Spider-Man-HE) | פיטר פארקר | נשכים: **מכינים** או מוצאים **עכביש רדיואקטיבי** ולוחצים עליו קליק ימני בלי כוחות | ירי קורים ופיצוץ קורים, משיכה והתנדנדות בקורים, הליכה על קירות ותקרות, חוש העכביש; שלוש חליפות (לאיירון ספיידר יש ארבע רגליים מכניות והרג מיידי) ועיניים שחורות |
+
+<!-- he: the first paragraph, the list of heroes, before "או, אם אתם ראויים, ת'ור" (after the Phoenix) -->
+**פיטר פארקר, ספיידרמן**, שמגיע לכל מקום על קורים;
+
+<!-- he: the line under the table, the heroes with several looks -->
+(ויז'ן, טומי, בילי, לוקי, ת'ור, הפניקס וספיידרמן)
+
+<!-- he: "מה חדש ב-3.0" (a new section above "מה חדש ב-2.3"), after the Phoenix bullet -->
+* **ספיידרמן, פיטר פארקר.** נשכים על ידי **עכביש רדיואקטיבי** (מכינים אותו או מוצאים בתיבה) ונעים בקורים: **R** עוטף את מה שמסתכלים עליו (**התכופפות + R**: פיצוץ של 24 חוטים לכל כיוון), **G** מושך אתכם אל הבלוק שמסתכלים עליו ומשם הלאה (**התכופפות + G**, מחזיקים: מתנדנדים על הקורים), קופצים על קיר וממשיכים לדחוף כדי **לטפס עליו וללכת על התקרה** (**V**), וחוש העכביש מזהיר מפני סכנה לפני שהיא פוגעת. בחליפה של **איירון ספיידר** **B** פותח ארבע רגליים מכניות (**התכופפות + B**, פעמיים: הרג מיידי), ו-**N** מהפך את העיניים לשחורות להתפרצות קצרה, חזקה ויקרה. שלוש חליפות, מ*שובו הביתה*, *מלחמת האינסוף* ו*יום חדש*. ראו [ספיידרמן](Spider-Man-HE).

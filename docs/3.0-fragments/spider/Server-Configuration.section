@@ -1,0 +1,161 @@
+<!-- Fragment of Spider-Man for the wiki pages Server-Configuration / Server-Configuration-HE (3.0). Format: see Home.row (`<!-- en: where -->` and `<!-- he: where -->` blocks). The option table is generated from config/SpiderConfig.java (67 options). -->
+
+<!-- en: a new section after the Phoenix section and before "Datapack tags" -->
+## Spider-Man
+
+Section `[spider_man]`. The hero's page is [Spider-Man](Spider-Man). Ticks are 1/20 of a second, and "exhaustion" 4.0 is one food point. Every option is read when it is used, so editing the config file changes it live. There is no web fluid: hunger is the only resource.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `spider_man.speedBonus` | `0.15` | 0.0 to 2.0 | Extra walking speed of Spider-Man, as a fraction of the normal speed (0.15 = 15% faster). |
+| `spider_man.jumpBonus` | `0.3` | 0.0 to 2.0 | Extra jump strength (0.3 is a jump of about 2.1 blocks instead of 1.25). |
+| `spider_man.strengthBonus` | `2.0` | 0.0 to 20.0 | Extra melee damage (his bare fists hit for 3). |
+| `spider_man.fallDamageReduction` | `0.5` | 0.0 to 1.0 | The part of fall damage he does not take (0.5 = half). |
+| `spider_man.biteDelayTicks` | `140` | 20 to 1200 | How long (in ticks) the Radioactive Spider's bite takes to change a player (140 = a sick 7 seconds). |
+| `spider_man.spiderSenseRange` | `12` | 4 to 48 | How far (in blocks) he feels danger coming. |
+| `spider_man.spiderSenseInterval` | `5` | 1 to 40 | Ticks between two scans of his spider-sense for danger (5 = four times a second). |
+| `spider_man.webShotRange` | `24` | 4 to 64 | Range (in blocks) of a Web Shot. |
+| `spider_man.webShotCooldown` | `10` | 0 to 200 | Ticks between two Web Shots (hidden: the HUD shows only the Web Burst's cooldown). |
+| `spider_man.webShotExhaustion` | `0.4` | 0.0 to 4.0 | Food exhaustion of one Web Shot (4.0 = 1 food point). |
+| `spider_man.webbedTicks` | `120` | 20 to 1200 | How long (in ticks) a creature hit by a Web Shot stays webbed (120 = 6 seconds). |
+| `spider_man.organicWebFactor` | `1.5` | 1.0 to 5.0 | Organic webs (the Brand New Day suit, or the Black Eyes) last this many times as long. |
+| `spider_man.organicWebCostFactor` | `2.0` | 1.0 to 8.0 | Organic webs cost this many times the hunger. |
+| `spider_man.webBlocks` | `true` | `true` or `false` | Whether webs also leave temporary web blocks (the cocoon round a creature, the patch on a wall). With `false`, webs only entangle creatures. |
+| `spider_man.webBlockTicks` | `200` | 20 to 6000 | How long (in ticks) a web block lasts before it vanishes (200 = 10 seconds; organic webs last longer). It only ever replaces air. |
+| `spider_man.webPatchRadius` | `1` | 0 to 2 | Radius of the patch a Web Shot leaves on a wall (1 = 3 by 3 blocks). |
+| `spider_man.webBlockCap` | `64` | 8 to 512 | The most web blocks one Spider-Man can have at once; the oldest vanish first. |
+| `spider_man.webBurstStrands` | `24` | 6 to 96 | Strands of a Web Burst (Sneak + R), spread evenly in every direction. |
+| `spider_man.webBurstRange` | `10` | 3 to 24 | How far (in blocks) a strand of the burst flies. |
+| `spider_man.webBurstCooldown` | `240` | 0 to 6000 | Cooldown of the Web Burst, in ticks (240 = 12 seconds). |
+| `spider_man.webBurstExhaustion` | `2.0` | 0.0 to 8.0 | Food exhaustion of one Web Burst (2.0 = half a food point). |
+| `spider_man.webBurstWebbedTicks` | `80` | 20 to 1200 | How long (in ticks) a Web Burst keeps a creature webbed (80 = 4 seconds). |
+| `spider_man.zipRange` | `40` | 8 to 96 | How far (in blocks) a Web Zip reaches. |
+| `spider_man.zipSpeed` | `1.3` | 0.3 to 3.0 | Speed of a zip in blocks per tick, before his speed factor (1.3 = 26 blocks a second). |
+| `spider_man.zipCooldown` | `6` | 0 to 200 | Ticks before he can zip again (small, so zips chain). |
+| `spider_man.zipMaxTicks` | `60` | 10 to 400 | The longest a zip can take, in ticks (60 = 3 seconds). |
+| `spider_man.zipExhaustion` | `0.3` | 0.0 to 4.0 | Food exhaustion of one zip (4.0 = 1 food point). |
+| `spider_man.zipKickDamage` | `4.0` | 0.0 to 40.0 | Damage of the kick when a zip aimed at a creature ends on it. 0 = no kick: the zip then goes only to blocks. |
+| `spider_man.swingRange` | `40` | 8 to 96 | How far (in blocks) the anchor of a Web Swing can be. |
+| `spider_man.swingMaxTicks` | `300` | 20 to 2400 | The longest a swing can last, in ticks (300 = 15 seconds). |
+| `spider_man.swingMaxSpeed` | `1.8` | 0.5 to 3.0 | His top speed while swinging, in blocks per tick. |
+| `spider_man.swingGravity` | `0.06` | 0.02 to 0.12 | Gravity while he swings, in blocks per tick squared (the normal one is 0.08). |
+| `spider_man.swingExhaustion` | `0.01` | 0.0 to 1.0 | Food exhaustion per tick while he swings (4.0 = 1 food point; 0.01 is a food point every 20 seconds). |
+| `spider_man.crawlSpeed` | `0.22` | 0.05 to 0.6 | His speed on a wall or ceiling, in blocks per tick, before his speed factor (0.22 = 4.4 blocks a second). |
+| `spider_man.crawlExhaustion` | `0.005` | 0.0 to 1.0 | Food exhaustion per tick while he moves on a wall or ceiling. |
+| `spider_man.leapSpeed` | `0.9` | 0.3 to 2.0 | Speed of a leap off a wall, in blocks per tick, before his speed factor. |
+| `spider_man.homemadeArmor` | `0.0` | 0.0 to 30.0 | Armor of the Homemade Suit (and of his own skin): a hoodie, no protection. |
+| `spider_man.brandNewDayArmor` | `8.0` | 0.0 to 30.0 | Armor of the Brand New Day suit. |
+| `spider_man.brandNewDayToughness` | `2.0` | 0.0 to 20.0 | Armor toughness of the Brand New Day suit. |
+| `spider_man.ironSpiderArmor` | `14.0` | 0.0 to 30.0 | Armor of the Iron Spider. |
+| `spider_man.ironSpiderToughness` | `6.0` | 0.0 to 20.0 | Armor toughness of the Iron Spider. |
+| `spider_man.ironSpiderKnockbackResistance` | `0.2` | 0.0 to 1.0 | Knockback resistance of the Iron Spider (0.2 = 20%). |
+| `spider_man.ironSpiderStripTicks` | `200` | 0 to 6000 | How long (in ticks) Magneto's Armor & Weapon Strip scatters the Iron Spider's nanites: its armor, its legs and Instant Kill are off meanwhile (200 = 10 seconds). |
+| `spider_man.legsDamage` | `5.0` | 0.0 to 100.0 | Damage of one jab of the Iron Spider's legs. It is also all they do to a boss or a boss's minion, even in Instant Kill. |
+| `spider_man.legsInterval` | `20` | 4 to 200 | Ticks between two jabs of the legs when they guard him (20 = once a second). |
+| `spider_man.legsRange` | `4.0` | 1.0 to 10.0 | How far (in blocks) the legs jab a threat. |
+| `spider_man.legsReachBonus` | `2.0` | 0.0 to 6.0 | Extra attack reach, in blocks, with the legs out. |
+| `spider_man.legsExhaustion` | `0.01` | 0.0 to 1.0 | Food exhaustion per tick with the legs out. |
+| `spider_man.instantKillRange` | `5.0` | 1.0 to 12.0 | How far (in blocks) Instant Kill reaches. |
+| `spider_man.instantKillInterval` | `5` | 1 to 40 | Ticks between the strikes of Instant Kill; each time each of the four legs strikes one threat (5 = four times a second). |
+| `spider_man.instantKillDamage` | `1000.0` | 1.0 to 10000.0 | Damage of one strike of Instant Kill (a kill). Bosses and their minions take only `legsDamage`. |
+| `spider_man.instantKillMaxTicks` | `200` | 20 to 2400 | The longest Instant Kill lasts, in ticks (200 = 10 seconds). |
+| `spider_man.instantKillCooldown` | `600` | 0 to 12000 | Cooldown in ticks after Instant Kill ends (600 = 30 seconds). |
+| `spider_man.instantKillExhaustion` | `0.08` | 0.0 to 4.0 | Food exhaustion per tick while Instant Kill lasts (4.0 = 1 food point; the full 10 seconds cost about 4 points). |
+| `spider_man.instantKillConfirmTicks` | `60` | 20 to 200 | The window, in ticks, to press Sneak + B a second time to confirm Instant Kill (60 = 3 seconds). |
+| `spider_man.instantKillPlayers` | `false` | `true` or `false` | Whether Instant Kill may strike players. It never does by default, and PvP must be on as well. |
+| `spider_man.blackEyesSpeedBonus` | `0.6` | 0.0 to 5.0 | Extra speed while the Black Eyes are on, as a fraction on top of his own (0.6 = 60% faster). |
+| `spider_man.blackEyesStrengthBonus` | `4.0` | 0.0 to 40.0 | Extra melee damage while the Black Eyes are on (bare fists then hit for 7). |
+| `spider_man.blackEyesAttackSpeedBonus` | `0.5` | 0.0 to 3.0 | Extra attack speed while the Black Eyes are on, as a fraction (0.5 = 50% faster). |
+| `spider_man.blackEyesJumpBonus` | `0.25` | 0.0 to 2.0 | Extra jump strength while the Black Eyes are on, as a fraction. |
+| `spider_man.blackEyesKnockbackResistance` | `0.3` | 0.0 to 1.0 | Knockback resistance while the Black Eyes are on (0.3 = 30%). |
+| `spider_man.blackEyesExhaustion` | `0.05` | 0.0 to 4.0 | Food exhaustion per tick while the Black Eyes are on (0.05 = a food point every 4 seconds). |
+| `spider_man.blackEyesMaxTicks` | `600` | 40 to 6000 | The longest the surge of the Black Eyes lasts, in ticks (600 = 30 seconds). |
+| `spider_man.blackEyesCooldown` | `600` | 0 to 12000 | Cooldown in ticks after the surge ends (half of it when he calms himself). |
+| `spider_man.blackEyesCrashTicks` | `200` | 0 to 2400 | How long (in ticks) the crash (Slowness II and Weakness) lasts when the surge runs out (200 = 10 seconds). A calm ending has no crash. |
+| `spider_man.blackEyesPanicHealth` | `0.0` | 0.0 to 20.0 | If above 0, the Black Eyes switch on by themselves when his health falls to this many points (and can't be calmed for 5 seconds). 0 = never. |
+| `spider_man.blackEyesSenseFactor` | `2.0` | 1.0 to 4.0 | How much the Black Eyes widen his spider-sense (and how much faster it scans). |
+
+<!-- en: the table "Datapack tags", rows to add -->
+| `enhanced:web_immune` | entity type | Creatures Spider-Man's webs can't wrap (the bosses). Spider-Man himself, Creative and Spectator players, and players when PvP is off are never wrapped, whatever this tag says. |
+| `enhanced:instant_kill_immune` | entity type | Creatures Instant Kill spares (the bosses and their minions: they take only the legs' normal damage). |
+| `enhanced:cannot_cling` | block | Blocks Spider-Man cannot stick to (empty by default; water, cobwebs, vines and ladders never hold him anyway). |
+
+<!-- he: a new section after the Phoenix section and before "תגיות דאטה-פק" -->
+## ספיידרמן
+
+סעיף `[spider_man]`. הדף של הגיבור הוא [ספיידרמן](Spider-Man-HE). טיקים הם 1/20 שנייה, ו"תשישות" 4.0 היא נקודת אוכל אחת. כל אפשרות נקראת ברגע שמשתמשים בה, אז שינוי של קובץ ההגדרות משפיע מיד. אין נוזל קורים: האוכל הוא המשאב היחיד.
+
+| אפשרות | ברירת מחדל | ערכים מותרים | משמעות |
+|---|---|---|---|
+| `spider_man.speedBonus` | `0.15` | 0.0 עד 2.0 | תוספת מהירות הליכה של ספיידרמן, כשבר מהמהירות הרגילה (0.15 = מהיר ב-15%). |
+| `spider_man.jumpBonus` | `0.3` | 0.0 עד 2.0 | תוספת כוח קפיצה (0.3 הוא קפיצה של בערך 2.1 בלוקים במקום 1.25). |
+| `spider_man.strengthBonus` | `2.0` | 0.0 עד 20.0 | תוספת נזק במכה (האגרופים החשופים שלו מכים ב-3). |
+| `spider_man.fallDamageReduction` | `0.5` | 0.0 עד 1.0 | החלק מנזק הנפילה שהוא לא סופג (0.5 = חצי). |
+| `spider_man.biteDelayTicks` | `140` | 20 עד 1200 | כמה זמן (בטיקים) לוקח לנשיכה של העכביש הרדיואקטיבי לשנות שחקן (140 = 7 שניות של חולי). |
+| `spider_man.spiderSenseRange` | `12` | 4 עד 48 | עד כמה רחוק (בבלוקים) הוא מרגיש סכנה מתקרבת. |
+| `spider_man.spiderSenseInterval` | `5` | 1 עד 40 | טיקים בין שתי סריקות של חוש העכביש שלו (5 = ארבע פעמים בשנייה). |
+| `spider_man.webShotRange` | `24` | 4 עד 64 | הטווח (בבלוקים) של ירי קורים. |
+| `spider_man.webShotCooldown` | `10` | 0 עד 200 | טיקים בין שני ירי קורים (מוסתר: התצוגה מראה רק את הקולדאון של פיצוץ הקורים). |
+| `spider_man.webShotExhaustion` | `0.4` | 0.0 עד 4.0 | תשישות אוכל של ירי קורים אחד (4.0 = נקודת אוכל אחת). |
+| `spider_man.webbedTicks` | `120` | 20 עד 1200 | כמה זמן (בטיקים) יצור שנפגע מירי קורים נשאר עטוף (120 = 6 שניות). |
+| `spider_man.organicWebFactor` | `1.5` | 1.0 עד 5.0 | קורים אורגניים (החליפה של יום חדש, או העיניים השחורות) נמשכים פי כמה מהרגיל. |
+| `spider_man.organicWebCostFactor` | `2.0` | 1.0 עד 8.0 | קורים אורגניים עולים פי כמה אוכל. |
+| `spider_man.webBlocks` | `true` | `true` או `false` | אם הקורים משאירים גם בלוקי קורים זמניים (הגולם סביב יצור, הטלאי על קיר). עם `false`, הקורים רק עוטפים יצורים. |
+| `spider_man.webBlockTicks` | `200` | 20 עד 6000 | כמה זמן (בטיקים) בלוק קורים נמשך לפני שהוא נעלם (200 = 10 שניות; קורים אורגניים נמשכים יותר). הוא תמיד מחליף רק אוויר. |
+| `spider_man.webPatchRadius` | `1` | 0 עד 2 | הרדיוס של הטלאי שירי קורים משאיר על קיר (1 = 3 על 3 בלוקים). |
+| `spider_man.webBlockCap` | `64` | 8 עד 512 | המקסימום של בלוקי קורים שלספיידרמן אחד יכולים להיות בבת אחת; הוותיקים נעלמים ראשונים. |
+| `spider_man.webBurstStrands` | `24` | 6 עד 96 | מספר החוטים של פיצוץ קורים (התכופפות + R), מפוזרים שווה לכל כיוון. |
+| `spider_man.webBurstRange` | `10` | 3 עד 24 | עד כמה רחוק (בבלוקים) חוט של הפיצוץ עף. |
+| `spider_man.webBurstCooldown` | `240` | 0 עד 6000 | קולדאון של פיצוץ הקורים, בטיקים (240 = 12 שניות). |
+| `spider_man.webBurstExhaustion` | `2.0` | 0.0 עד 8.0 | תשישות אוכל של פיצוץ קורים אחד (2.0 = חצי נקודת אוכל). |
+| `spider_man.webBurstWebbedTicks` | `80` | 20 עד 1200 | כמה זמן (בטיקים) פיצוץ קורים משאיר יצור עטוף (80 = 4 שניות). |
+| `spider_man.zipRange` | `40` | 8 עד 96 | עד כמה רחוק (בבלוקים) משיכה בקורים מגיעה. |
+| `spider_man.zipSpeed` | `1.3` | 0.3 עד 3.0 | מהירות של משיכה בבלוקים לטיק, לפני גורם המהירות שלו (1.3 = 26 בלוקים בשנייה). |
+| `spider_man.zipCooldown` | `6` | 0 עד 200 | טיקים עד שהוא יכול להימשך שוב (קטן, כדי שאפשר לשרשר משיכות). |
+| `spider_man.zipMaxTicks` | `60` | 10 עד 400 | הזמן הארוך ביותר שמשיכה יכולה לקחת, בטיקים (60 = 3 שניות). |
+| `spider_man.zipExhaustion` | `0.3` | 0.0 עד 4.0 | תשישות אוכל של משיכה אחת (4.0 = נקודת אוכל אחת). |
+| `spider_man.zipKickDamage` | `4.0` | 0.0 עד 40.0 | הנזק של הבעיטה כשמשיכה שכוונה אל יצור נגמרת עליו. 0 = בלי בעיטה: אז המשיכה הולכת רק אל בלוקים. |
+| `spider_man.swingRange` | `40` | 8 עד 96 | עד כמה רחוק (בבלוקים) יכולה להיות נקודת האחיזה של התנדנדות. |
+| `spider_man.swingMaxTicks` | `300` | 20 עד 2400 | הזמן הארוך ביותר שהתנדנדות יכולה להימשך, בטיקים (300 = 15 שניות). |
+| `spider_man.swingMaxSpeed` | `1.8` | 0.5 עד 3.0 | המהירות המרבית שלו בהתנדנדות, בבלוקים לטיק. |
+| `spider_man.swingGravity` | `0.06` | 0.02 עד 0.12 | כוח המשיכה בזמן ההתנדנדות, בבלוקים לטיק בריבוע (הרגיל הוא 0.08). |
+| `spider_man.swingExhaustion` | `0.01` | 0.0 עד 1.0 | תשישות אוכל בכל טיק של התנדנדות (4.0 = נקודת אוכל אחת; 0.01 הוא נקודת אוכל כל 20 שניות). |
+| `spider_man.crawlSpeed` | `0.22` | 0.05 עד 0.6 | המהירות שלו על קיר או תקרה, בבלוקים לטיק, לפני גורם המהירות שלו (0.22 = 4.4 בלוקים בשנייה). |
+| `spider_man.crawlExhaustion` | `0.005` | 0.0 עד 1.0 | תשישות אוכל בכל טיק שהוא נע על קיר או תקרה. |
+| `spider_man.leapSpeed` | `0.9` | 0.3 עד 2.0 | מהירות של קפיצה מקיר, בבלוקים לטיק, לפני גורם המהירות שלו. |
+| `spider_man.homemadeArmor` | `0.0` | 0.0 עד 30.0 | השריון של החליפה הביתית (ושל הסקין שלו עצמו): סוודר, בלי הגנה. |
+| `spider_man.brandNewDayArmor` | `8.0` | 0.0 עד 30.0 | השריון של החליפה של יום חדש. |
+| `spider_man.brandNewDayToughness` | `2.0` | 0.0 עד 20.0 | הקשיחות של החליפה של יום חדש. |
+| `spider_man.ironSpiderArmor` | `14.0` | 0.0 עד 30.0 | השריון של איירון ספיידר. |
+| `spider_man.ironSpiderToughness` | `6.0` | 0.0 עד 20.0 | הקשיחות של איירון ספיידר. |
+| `spider_man.ironSpiderKnockbackResistance` | `0.2` | 0.0 עד 1.0 | עמידות בפני נוקבק של איירון ספיידר (0.2 = 20%). |
+| `spider_man.ironSpiderStripTicks` | `200` | 0 עד 6000 | כמה זמן (בטיקים) הפירוק משריון ומנשק של מגנטו מפזר את הננו-חלקיקים של איירון ספיידר: השריון, הרגליים וההרג המיידי כבויים בינתיים (200 = 10 שניות). |
+| `spider_man.legsDamage` | `5.0` | 0.0 עד 100.0 | הנזק של דקירה אחת של הרגליים של איירון ספיידר. זה גם כל מה שהן עושות לבוס או לשליח של בוס, גם בהרג מיידי. |
+| `spider_man.legsInterval` | `20` | 4 עד 200 | טיקים בין שתי דקירות של הרגליים כשהן שומרות עליו (20 = פעם בשנייה). |
+| `spider_man.legsRange` | `4.0` | 1.0 עד 10.0 | עד כמה רחוק (בבלוקים) הרגליים דוקרות איום. |
+| `spider_man.legsReachBonus` | `2.0` | 0.0 עד 6.0 | הגעה נוספת במכה, בבלוקים, כשהרגליים בחוץ. |
+| `spider_man.legsExhaustion` | `0.01` | 0.0 עד 1.0 | תשישות אוכל בכל טיק כשהרגליים בחוץ. |
+| `spider_man.instantKillRange` | `5.0` | 1.0 עד 12.0 | עד כמה רחוק (בבלוקים) ההרג המיידי מגיע. |
+| `spider_man.instantKillInterval` | `5` | 1 עד 40 | טיקים בין המכות של ההרג המיידי; בכל פעם כל אחת מארבע הרגליים מכה באיום אחד (5 = ארבע פעמים בשנייה). |
+| `spider_man.instantKillDamage` | `1000.0` | 1.0 עד 10000.0 | הנזק של מכה אחת של הרג מיידי (הרג). בוסים והשליחים שלהם סופגים רק `legsDamage`. |
+| `spider_man.instantKillMaxTicks` | `200` | 20 עד 2400 | הזמן הארוך ביותר שהרג מיידי נמשך, בטיקים (200 = 10 שניות). |
+| `spider_man.instantKillCooldown` | `600` | 0 עד 12000 | קולדאון בטיקים אחרי שהרג מיידי נגמר (600 = 30 שניות). |
+| `spider_man.instantKillExhaustion` | `0.08` | 0.0 עד 4.0 | תשישות אוכל בכל טיק בזמן שהרג מיידי נמשך (4.0 = נקודת אוכל אחת; 10 השניות המלאות עולות בערך 4 נקודות). |
+| `spider_man.instantKillConfirmTicks` | `60` | 20 עד 200 | החלון, בטיקים, ללחוץ התכופפות + B פעם שנייה כדי לאשר הרג מיידי (60 = 3 שניות). |
+| `spider_man.instantKillPlayers` | `false` | `true` או `false` | אם ההרג המיידי רשאי להכות שחקנים. כברירת מחדל הוא אף פעם לא מכה, וגם PvP חייב להיות דלוק. |
+| `spider_man.blackEyesSpeedBonus` | `0.6` | 0.0 עד 5.0 | תוספת מהירות כשהעיניים השחורות דלוקות, כשבר מעל המהירות שלו עצמו (0.6 = מהיר ב-60%). |
+| `spider_man.blackEyesStrengthBonus` | `4.0` | 0.0 עד 40.0 | תוספת נזק במכה כשהעיניים השחורות דלוקות (אגרופים חשופים אז מכים ב-7). |
+| `spider_man.blackEyesAttackSpeedBonus` | `0.5` | 0.0 עד 3.0 | תוספת מהירות מכה כשהעיניים השחורות דלוקות, כשבר (0.5 = מהיר ב-50%). |
+| `spider_man.blackEyesJumpBonus` | `0.25` | 0.0 עד 2.0 | תוספת כוח קפיצה כשהעיניים השחורות דלוקות, כשבר. |
+| `spider_man.blackEyesKnockbackResistance` | `0.3` | 0.0 עד 1.0 | עמידות בפני נוקבק כשהעיניים השחורות דלוקות (0.3 = 30%). |
+| `spider_man.blackEyesExhaustion` | `0.05` | 0.0 עד 4.0 | תשישות אוכל בכל טיק כשהעיניים השחורות דלוקות (0.05 = נקודת אוכל כל 4 שניות). |
+| `spider_man.blackEyesMaxTicks` | `600` | 40 עד 6000 | הזמן הארוך ביותר שההתפרצות של העיניים השחורות נמשכת, בטיקים (600 = 30 שניות). |
+| `spider_man.blackEyesCooldown` | `600` | 0 עד 12000 | קולדאון בטיקים אחרי שההתפרצות נגמרת (חצי ממנו כשהוא מרגיע את עצמו). |
+| `spider_man.blackEyesCrashTicks` | `200` | 0 עד 2400 | כמה זמן (בטיקים) ההתרסקות (האטה II וחולשה) נמשכת כשההתפרצות נגמרת (200 = 10 שניות). סיום רגוע הוא בלי התרסקות. |
+| `spider_man.blackEyesPanicHealth` | `0.0` | 0.0 עד 20.0 | אם גדול מ-0, העיניים השחורות נדלקות מעצמן כשהחיים שלו יורדים לכמה נקודות כאלה (ואי אפשר להרגיע אותן 5 שניות). 0 = אף פעם. |
+| `spider_man.blackEyesSenseFactor` | `2.0` | 1.0 עד 4.0 | בכמה העיניים השחורות מרחיבות את חוש העכביש שלו (ובכמה הוא סורק מהר יותר). |
+
+<!-- he: the table "תגיות דאטה-פק", rows to add -->
+| `enhanced:web_immune` | סוג יצור | יצורים שהקורים של ספיידרמן לא יכולים לעטוף (הבוסים). ספיידרמן עצמו, שחקנים בקריאייטיב ובספקטייטור, ושחקנים כש-PvP כבוי אף פעם לא נעטפים, מה שלא יהיה כתוב בתג הזה. |
+| `enhanced:instant_kill_immune` | סוג יצור | יצורים שההרג המיידי חוסך (הבוסים והשליחים שלהם: הם סופגים רק את הנזק הרגיל של הרגליים). |
+| `enhanced:cannot_cling` | בלוק | בלוקים שספיידרמן לא יכול להידבק אליהם (ריק כברירת מחדל; מים, קורי עכביש, גפנים וסולמות אף פעם לא מחזיקים אותו בכל מקרה). |

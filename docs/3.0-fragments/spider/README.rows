@@ -1,0 +1,29 @@
+<!-- Fragment of Spider-Man for README.md (3.0). Format: see Home.row (`<!-- en: where -->` blocks; the README is in English only). -->
+
+<!-- en: the first paragraph, the list of heroes, before "or, if you are worthy, **Thor**" (after the Phoenix) -->
+**Peter Parker, Spider-Man**, who goes everywhere on a web;
+
+<!-- en: the second paragraph, the heroes with several looks: add "Spider-Man" to the list (Vision, Tommy, Billy, Loki, Thor, the Phoenix and Spider-Man) -->
+Spider-Man
+
+<!-- en: the table "Becoming a hero", after the Phoenix row -->
+| **Spider-Man** | Craft a **Radioactive Spider** (Fermented Spider Eyes, Glow Ink Sacs and a Slime Block) or find one in a mineshaft, dungeon, Trial Chambers or Ancient City chest, and **right-click with it** with no power: you are sick for 7 seconds and awaken. **R** webs what you look at (**Sneak + R**: a burst of 24 strands), **G** zips you to the block you look at (**Sneak + G**, held: swing), jump at a wall and push to climb it, **V** switches Wall Crawl, and a spider-sense warns of danger. The Iron Spider suit has **B**, four mechanical legs (twice **Sneak + B**: Instant Kill), and **N** turns his eyes black. |
+
+<!-- en: a new table after the Phoenix controls table -->
+| Key | Spider-Man |
+|---|---|
+| **R** | Web Shot (Sneak: Web Burst) |
+| **G** | Web Zip (Sneak, hold: Web Swing) |
+| **V** | Wall Crawl on/off (Sneak: Spider-Sense on/off) |
+| **B** | Spider Legs (Iron Spider only; Sneak, twice: Instant Kill) |
+| **N** | Black Eyes |
+| **H** | Change suit |
+
+<!-- en: the paragraph "Every hero except Quicksilver, Tommy and Loki can also fly": add Spider-Man to the heroes who do not fly -->
+Every hero except Quicksilver, Tommy, Loki and Spider-Man
+
+<!-- en: "For server owners", the list of powers in `/enhanced power get|set …`: add `spider_man` after `phoenix` -->
+`spider_man`
+
+<!-- en: "For server owners", the balance numbers: add "Spider-Man's webs, zip, swing, crawl, suits, legs, Instant Kill and Black Eyes" to the list in parentheses -->
+Spider-Man's webs, zip, swing, crawl, suits, legs, Instant Kill and Black Eyes
