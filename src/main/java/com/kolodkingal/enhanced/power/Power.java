@@ -81,6 +81,15 @@ public enum Power implements StringRepresentable {
         return Component.translatable("power.enhanced." + getSerializedName());
     }
 
+    /**
+     * The name the title of the awakening shows: the hero's own, except where that is too wide for the screen. A title is
+     * drawn in bold four times the size of the text, and a 1080p window at the default GUI scale is only 480 of those
+     * wide (the default 854x480 window 427): "Jean Grey (Phoenix)" was cut at both ends, so the Phoenix wakes as "The Phoenix".
+     */
+    public Component awakeningTitle() {
+        return this == PHOENIX ? Component.translatable("power.enhanced.phoenix.title") : displayName();
+    }
+
     /** Translation key for the given ability (1-5). */
     public String abilityKey(int ability) {
         return "ability.enhanced." + getSerializedName() + "." + ability;
