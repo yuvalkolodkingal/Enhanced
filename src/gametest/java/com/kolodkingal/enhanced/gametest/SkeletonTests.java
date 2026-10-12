@@ -975,7 +975,7 @@ public final class SkeletonTests {
         ItemStack ember = new ItemStack(ModItems.PHOENIX_EMBER.get());
         hero.setItemInHand(InteractionHand.MAIN_HAND, ember);
         InteractionResultHolder<ItemStack> used = ember.getItem().use(level, hero, InteractionHand.MAIN_HAND);
-        check(!used.getResult().consumesAction() && !hero.isUsingItem(), "no hold begins for a hero");
+        check(used.getResult().consumesAction() && !hero.isUsingItem(), "no hold begins for a hero (the click is spent on the refusal, not passed to the other hand)");
         check(ember.getCount() == 1 && Powers.power(hero) == Power.THOR, "and nothing is used up");
 
         ServerPlayer creative = f.player(9.5, FLOOR, 5.5, GameType.CREATIVE);
