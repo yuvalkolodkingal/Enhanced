@@ -100,6 +100,16 @@ public final class ThanosBossPoses {
     /** The tremble of a hand that holds a stone's power. */
     private static final float SHAKE = 1.3F;
 
+    /**
+     * The angle the whirling sword has turned through after one more frame: the angle so far (degrees) and the whirl in
+     * degrees per tick, for {@code ticks} ticks since the last frame (a pause of more than four is a stall, not a
+     * spin). Carried from frame to frame, so a whirl that begins, speeds up or ends never makes the sword jump (the
+     * whirl times the age of the entity would, each time the rate changes).
+     */
+    public static float turned(float angle, float rate, float ticks) {
+        return (angle + rate * AnimMath.clamp(ticks, 0.0F, 4.0F)) % 360.0F;
+    }
+
     static {
         STAND[Ch.RX.ordinal()] = -22.0F;
         STAND[Ch.RZ.ordinal()] = 6.0F;

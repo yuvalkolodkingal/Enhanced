@@ -62,8 +62,9 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
     // ---- what the layers read after the pose is set ----
     /** The brightness of each socket of the Gauntlet (see {@link ThanosGlow}). */
     public final float[] sockets = new float[ThanosGlow.SOCKETS];
-    /** The whirl of the sword about its grip, in degrees per tick. */
+    /** The whirl of the sword about its grip, in degrees per tick, and the angle it has turned through (see {@link #whirl}). */
     public float spin;
+    public float spinAngle;
     /** Which plates of his armour are on (see {@link ThanosDefence}) and how many stones are lit. */
     public int plates = ThanosDefence.ALL_PLATES;
     public int stones = 1;
@@ -80,6 +81,9 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
         final float[] last = new float[Ch.values().length];
         final float[] from = new float[Ch.values().length];
         float changedAt = -1.0E9F;
+        /** How far the sword has turned about its grip (degrees), and the clock it was last turned at (-1: not yet). */
+        float spinAngle;
+        float spinClock = -1.0F;
     }
 
     public ThanosModel(ModelPart root) {
@@ -237,6 +241,7 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
         }
         blend(entity, pose);
         spin = target.get(Ch.SPIN);
+        whirl(entity);
         place(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, walk, aim);
     }
 
@@ -277,6 +282,20 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
             }
         }
         System.arraycopy(values, 0, b.last, 0, values.length);
+    }
+
+    /**
+     * Turns the sword on by this frame's share of the whirl: the angle is carried from frame to frame (so a whirl that
+     * begins, speeds up or ends never makes the sword jump, as a rate times the age of the entity would), and runs on the
+     * same wall clock as the blend between poses.
+     */
+    private void whirl(T entity) {
+        Blend b = blends.computeIfAbsent(entity.getId(), id -> new Blend());
+        float clock = System.nanoTime() / 5.0E7F;
+        float dt = b.spinClock < 0.0F ? 0.0F : clock - b.spinClock;
+        b.spinClock = clock;
+        b.spinAngle = ThanosBossPoses.turned(b.spinAngle, spin, dt);
+        spinAngle = b.spinAngle;
     }
 
     /** Puts the pose on the parts, with the walk on top of it. */

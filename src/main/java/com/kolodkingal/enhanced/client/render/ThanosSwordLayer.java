@@ -38,7 +38,7 @@ public class ThanosSwordLayer<T extends Monster> extends RenderLayer<T, ThanosMo
         // In the fist, held like a staff: the blades up and down, tilted a little forward.
         poseStack.translate(0.0F, 14.0F / 16.0F, -2.0F / 16.0F);
         poseStack.mulPose(Axis.XP.rotationDegrees(-30.0F));
-        poseStack.mulPose(Axis.YP.rotationDegrees(model.spin * ageInTicks));
+        poseStack.mulPose(Axis.YP.rotationDegrees(model.spinAngle));
         sword.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)), packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
     }

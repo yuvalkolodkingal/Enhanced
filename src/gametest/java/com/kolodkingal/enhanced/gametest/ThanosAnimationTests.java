@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.client.render.HeroAnimState;
 import com.kolodkingal.enhanced.client.render.HeroClient;
 import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.Stance;
+import com.kolodkingal.enhanced.client.render.ThanosBossPoses;
 import com.kolodkingal.enhanced.client.render.ThanosGestures;
 import com.kolodkingal.enhanced.config.ThanosConfig;
 import com.kolodkingal.enhanced.power.Live;
@@ -533,6 +534,34 @@ public final class ThanosAnimationTests {
             fallenBefore += speedBefore;
         }
         check(fallenBefore < 3.0 && speedBefore < ThanosGestures.HARD_LANDING, "and one tick before it was a fall of " + fallenBefore + " blocks, which is not");
+        helper.succeed();
+    }
+
+    /**
+     * The boss's sword whirls by an angle carried from frame to frame: a whirl that starts, speeds up or stops leaves the
+     * sword where it was (the rate times the age of the entity jumped by the whole age whenever the rate changed), the
+     * angle stays within a turn, and a stalled frame is not a spin.
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theBossSwordTurnsWithoutJumping(GameTestHelper helper) {
+        float angle = 0.0F;
+        for (int frame = 0; frame < 40; frame++) {
+            float next = ThanosBossPoses.turned(angle, 0.0F, 0.5F);
+            assertNear(next, angle, 1.0E-4F, "with no whirl the sword stays where it is, frame " + frame);
+            angle = next;
+        }
+        float before = 123.0F;
+        float started = ThanosBossPoses.turned(before, 40.0F, 0.5F);
+        assertNear(started, before + 20.0F, 1.0E-3F, "a whirl of forty degrees a tick turns it twenty in half a tick, from where it was and not from its age");
+        float stopped = ThanosBossPoses.turned(started, 0.0F, 0.5F);
+        assertNear(stopped, started, 1.0E-4F, "and when it ends the sword stays at the angle it reached");
+        float spun = 0.0F;
+        for (int frame = 0; frame < 200; frame++) {
+            spun = ThanosBossPoses.turned(spun, 40.0F, 0.5F);
+            check(spun >= 0.0F && spun < 360.0F, "the angle stays within a turn, " + spun);
+        }
+        assertNear(ThanosBossPoses.turned(10.0F, 40.0F, 100.0F), 10.0F + 160.0F, 1.0E-3F, "a frame after a long stall counts as four ticks at most");
+        assertNear(ThanosBossPoses.turned(10.0F, 40.0F, -3.0F), 10.0F, 1.0E-4F, "and a clock that went backwards turns nothing");
         helper.succeed();
     }
 }
