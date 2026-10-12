@@ -118,7 +118,7 @@ public final class SokoviaClient {
                 next.start = payload.start();
                 next.hide = payload.hide();
                 SokoviaTemplate ground = SokoviaTemplate.capture(level, spec, payload.centre());
-                next.mesh = SokoviaMesh.build(ground, level);
+                next.mesh = SokoviaMesh.build(ground, level, 0);
                 queueTheGround(next, ground, level);
                 island = next;
             }
@@ -142,7 +142,7 @@ public final class SokoviaClient {
                 next.start = payload.start();
                 next.ending = false;
                 // The island as it stands in the sky now (the server is about to clear it): that is what comes down.
-                next.mesh = SokoviaMesh.build(SokoviaTemplate.read(level, spec, payload.centre(), spec.height()), level);
+                next.mesh = SokoviaMesh.build(SokoviaTemplate.read(level, spec, payload.centre(), spec.height()), level, spec.height());
                 if (!same && payload.hide()) {
                     queueTheGround(next, SokoviaTemplate.capture(level, spec, payload.centre()), level);
                 }

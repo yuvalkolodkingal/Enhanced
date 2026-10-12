@@ -899,14 +899,16 @@ public final class SokoviaLift implements LiftHook {
                     carry.bind(player, false);
                 }
                 case PLACING, PLACED -> {
-                    // They stand on the island if they were on it.
-                    if (player.getY() >= t.minY() + spec.height() - 4.0) {
-                        islanders.add(id);
+                    // They stand on the island if they were on it; one who was saved on the way up (they left during
+                    // the rise) is put on it now.
+                    if (player.getY() < t.lowestGround() + spec.height() - 3.0) {
+                        bringIn(player, spec.height());
                     }
+                    islanders.add(id);
                 }
                 default -> {
                     // The island is coming down or gone: set them on the ground.
-                    SokoviaRecovery.setDown(player, spec.height());
+                    SokoviaRecovery.setDown(player, column(t));
                 }
             }
         }
@@ -996,6 +998,13 @@ public final class SokoviaLift implements LiftHook {
             }
         }
 
+        /** The column of the island, from its bottom on the ground to above its place in the sky (for the notes). */
+        private SokoviaRelocations.Entry column(SokoviaTemplate t) {
+            Vec3 middle = fight.arena().center();
+            return new SokoviaRelocations.Entry(middle.x, middle.z, spec.extent() + 2.0, t.minY(),
+                    t.roomTop() + spec.height() + SKY_FIELD, spec.height(), t.lowestGround() + spec.height() - 3.0);
+        }
+
         /**
          * The members who are offline when the island goes get a note to be set down on the ground when they log in.
          */
@@ -1008,9 +1017,7 @@ public final class SokoviaLift implements LiftHook {
                 absent.clear();
                 return;
             }
-            Vec3 middle = fight.arena().center();
-            SokoviaRelocations.Entry entry = new SokoviaRelocations.Entry(middle.x, middle.z, spec.extent() + 2.0, t.minY() + spec.height() - 8.0,
-                    t.roomTop() + spec.height() + SKY_FIELD, spec.height());
+            SokoviaRelocations.Entry entry = column(t);
             SokoviaRelocations data = SokoviaRelocations.of(level.getServer());
             for (UUID id : absent) {
                 data = data.with(id, entry);

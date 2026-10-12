@@ -67,24 +67,30 @@ final class SokoviaMesh implements AutoCloseable {
     private record Built(Map<RenderType, MeshData> meshes, Map<RenderType, ByteBufferBuilder> memory) {
     }
 
+    /** The block the cells are measured from (the template's middle). */
     private final BlockPos origin;
+    /** Where the picture is when its move has not begun: the ground the island came from. */
+    private final BlockPos ground;
     private final CompletableFuture<Built> building;
     private final Map<RenderType, VertexBuffer> buffers = new LinkedHashMap<>();
     private boolean uploaded;
     private boolean closed;
 
-    private SokoviaMesh(BlockPos origin, CompletableFuture<Built> building) {
+    private SokoviaMesh(BlockPos origin, BlockPos ground, CompletableFuture<Built> building) {
         this.origin = origin;
+        this.ground = ground;
         this.building = building;
     }
 
     /**
      * Starts building the mesh of an island on a worker thread.
      *
-     * @param template the island's blocks (read from the client's world, in the coordinates they are drawn in)
+     * @param template the island's blocks (read from the client's world, in the coordinates they are in)
      * @param level    the client's world, for the biome tints and the shade
+     * @param lifted   how far above the ground the template's blocks are: 0 for the ground, the height of the lift for
+     *                 the island in the sky (the picture is drawn from the ground up, so it comes down to the ground)
      */
-    static SokoviaMesh build(SokoviaTemplate template, ClientLevel level) {
+    static SokoviaMesh build(SokoviaTemplate template, ClientLevel level, int lifted) {
         BlockPos origin = template.centre();
         // The view of the island: its own blocks and nothing else, copied so that the worker never reads the live
         // world.
@@ -97,7 +103,7 @@ final class SokoviaMesh implements AutoCloseable {
         View view = new View(level, cells);
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         CompletableFuture<Built> future = CompletableFuture.supplyAsync(() -> make(dispatcher, view, positions, cells, origin), Util.backgroundExecutor());
-        return new SokoviaMesh(origin, future);
+        return new SokoviaMesh(origin, origin.below(lifted), future);
     }
 
     private static Built make(BlockRenderDispatcher dispatcher, View view, BlockPos[] positions, Long2ObjectOpenHashMap<BlockState> cells, BlockPos origin) {
@@ -182,7 +188,7 @@ final class SokoviaMesh implements AutoCloseable {
         shader.apply();
         Uniform chunkOffset = shader.CHUNK_OFFSET;
         if (chunkOffset != null) {
-            chunkOffset.set((float) (origin.getX() - camera.x), (float) (origin.getY() + offset - camera.y), (float) (origin.getZ() - camera.z));
+            chunkOffset.set((float) (ground.getX() - camera.x), (float) (ground.getY() + offset - camera.y), (float) (ground.getZ() - camera.z));
             chunkOffset.upload();
         }
         buffer.bind();

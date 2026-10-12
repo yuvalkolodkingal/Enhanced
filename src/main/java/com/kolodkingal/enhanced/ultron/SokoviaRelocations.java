@@ -28,22 +28,34 @@ public record SokoviaRelocations(Map<UUID, Entry> entries) {
     public static final SokoviaRelocations EMPTY = new SokoviaRelocations(Map.of());
 
     /**
-     * Where the island was: a cylinder of {@code radius} round {@code (x, z)} between two heights, and how far down the
-     * ground is below it.
+     * Where the island was: a cylinder of {@code radius} round {@code (x, z)} from the bottom of the island on the
+     * ground ({@code minY}) up to above its place in the sky ({@code maxY}), how far down the ground is below the
+     * island ({@code down}, which is how high it rose) and the lowest height where a player counts as standing up on
+     * the island ({@code skyY}). The cylinder is the whole column because a player who logged out while the island was
+     * still rising was saved somewhere in it, between the ground and the sky.
      */
-    public record Entry(double x, double z, double radius, double minY, double maxY, double down) {
+    public record Entry(double x, double z, double radius, double minY, double maxY, double down, double skyY) {
         public static final Codec<Entry> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.DOUBLE.fieldOf("x").forGetter(Entry::x),
                 Codec.DOUBLE.fieldOf("z").forGetter(Entry::z),
                 Codec.DOUBLE.fieldOf("radius").forGetter(Entry::radius),
                 Codec.DOUBLE.fieldOf("min_y").forGetter(Entry::minY),
                 Codec.DOUBLE.fieldOf("max_y").forGetter(Entry::maxY),
-                Codec.DOUBLE.fieldOf("down").forGetter(Entry::down)
+                Codec.DOUBLE.fieldOf("down").forGetter(Entry::down),
+                Codec.DOUBLE.fieldOf("sky_y").forGetter(Entry::skyY)
         ).apply(i, Entry::new));
 
-        /** Whether a player saved at this point was in the sky round the island. */
+        /** Whether a player saved at this point was in the column of the island, between the ground and the sky. */
         public boolean contains(Vec3 position) {
             return Math.hypot(position.x - x, position.z - z) <= radius && position.y >= minY && position.y <= maxY;
+        }
+
+        /**
+         * Whether a point is up where the island stood (the ground is {@link #down} blocks below it), and not on the
+         * way up (a player saved there was in the air under the island, and the ground is simply below them).
+         */
+        public boolean inTheSky(Vec3 position) {
+            return position.y >= skyY;
         }
     }
 

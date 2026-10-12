@@ -312,6 +312,100 @@ public final class SokoviaRecoveryTests {
         script.run(f, 580);
     }
 
+    /**
+     * A fighter who logs out while the island is still rising is saved in the air, between the ground and the sky,
+     * where the island will never be. When they log in after the fight they are set down on the ground at once, in the
+     * login itself (a client that takes a few seconds to load the terrain is kicked by the game for "flying" if it is
+     * left hanging in the air; the real game did exactly that to a player in the soak test).
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_away_rise_gone", timeoutTicks = 600)
+    public static void aFighterWhoLeftDuringTheRiseIsSetDownWhenTheyLogInAfterTheFight(GameTestHelper helper) {
+        TestKit.Fixture f = pad(helper);
+        MinecraftServer server = f.level().getServer();
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        ServerPlayer away = f.player(MIDDLE_X - 4.0, GROUND, MIDDLE_Z + 2.0);
+        tank(starter);
+        UltronFight fight = UltronTestSupport.onTheGround(f, starter);
+        calm(fight);
+        Vec3[] saved = new Vec3[1];
+        Script script = new Script();
+        script.step("the fighters join", () -> fight.participants().size() == 2);
+        script.then("the lift begins", () -> {
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the island is on its way up", () -> {
+            client(starter, away);
+            double altitude = SokoviaLift.of(fight).altitude();
+            return in(fight, SokoviaLift.Step.RISING) && altitude > 8.0 && altitude < LIFT - 8.0;
+        });
+        script.then("one logs out in the air", () -> {
+            saved[0] = away.position();
+            SokoviaLift.onLogout(away);
+            check(rel(helper, away).y > GROUND + 6.0, "(they are well above the ground)");
+        });
+        script.step("the island is up", () -> {
+            client(starter);
+            return fight.phase() == UltronFight.Phase.ISLAND;
+        });
+        script.then("the fight ends", () -> fight.end(BossEnd.VICTORY));
+        script.step("and the island is gone", () -> {
+            client(starter);
+            return fight.isFinished();
+        });
+        script.then("they log in where they were saved, in the air", () -> {
+            check(SokoviaRelocations.of(server).of(away.getUUID()) != null, "there is a record for them");
+            away.setPos(saved[0]);
+            SokoviaRecovery.onLogin(away);
+            SokoviaLift.onLogin(away);
+            assertNear(rel(helper, away).y, GROUND, 1.0, "they are on the ground");
+            assertNear(rel(helper, away).x, MIDDLE_X - 4.0, 1.0, "under where they were");
+            check(SokoviaRelocations.of(server).of(away.getUUID()) == null, "and the record is used up");
+        });
+        script.run(f, 580);
+    }
+
+    /**
+     * The same fighter, logging in while the island is up: they are put on it, not left hanging under it.
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_away_rise_up", timeoutTicks = 600)
+    public static void aFighterWhoLeftDuringTheRiseIsPutOnTheIslandWhenTheyLogInWhileItIsUp(GameTestHelper helper) {
+        TestKit.Fixture f = pad(helper);
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        ServerPlayer away = f.player(MIDDLE_X - 4.0, GROUND, MIDDLE_Z + 2.0);
+        tank(starter);
+        UltronFight fight = UltronTestSupport.onTheGround(f, starter);
+        calm(fight);
+        Vec3[] saved = new Vec3[1];
+        Script script = new Script();
+        script.step("the fighters join", () -> fight.participants().size() == 2);
+        script.then("the lift begins", () -> {
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the island is on its way up", () -> {
+            client(starter, away);
+            double altitude = SokoviaLift.of(fight).altitude();
+            return in(fight, SokoviaLift.Step.RISING) && altitude > 8.0 && altitude < LIFT - 8.0;
+        });
+        script.then("one logs out in the air", () -> {
+            saved[0] = away.position();
+            SokoviaLift.onLogout(away);
+        });
+        script.step("the island is up", () -> {
+            client(starter);
+            return fight.phase() == UltronFight.Phase.ISLAND;
+        });
+        script.then("they log in where they were saved, in the air under it", () -> {
+            away.setPos(saved[0]);
+            SokoviaRecovery.onLogin(away);
+            SokoviaLift.onLogin(away);
+            assertNear(rel(helper, away).y, GROUND + LIFT, 1.0, "they are on the island");
+            check(SokoviaLift.of(fight).islanders().contains(away.getUUID()), "and they are one of its islanders");
+        });
+        script.run(f, 580);
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // What is not the island's
 

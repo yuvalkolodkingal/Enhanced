@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ultron;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.boss.BossGifts;
+import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -202,7 +203,8 @@ public final class SokoviaRecovery {
         }
         Spec spec = header.spec();
         SokoviaRelocations.Entry entry = new SokoviaRelocations.Entry(header.centre().getX() + 0.5, header.centre().getZ() + 0.5, spec.extent() + 2.0,
-                header.minY() - 8.0, header.maxY() + 80.0, spec.height());
+                header.minY() - spec.height(), header.maxY() + 80.0, spec.height(),
+                header.minY() + spec.skin() + spec.cone() - UltronBossConfig.MAX_RELIEF.get() - 3.0);
         SokoviaRelocations data = SokoviaRelocations.of(server);
         for (UUID member : header.members()) {
             data = data.with(member, entry);
@@ -234,11 +236,23 @@ public final class SokoviaRecovery {
         if (entry != null) {
             SokoviaRelocations.store(server, data.without(player.getUUID()));
             if (entry.contains(player.position())) {
-                setDown(player, entry.down());
+                setDown(player, entry);
                 return;
             }
         }
         if (marked && hangsInTheAir(player)) {
+            setDownOnTheSurface(player);
+        }
+    }
+
+    /**
+     * Sets a player down on the ground where a record says they were: {@code down} blocks below them if they were up in
+     * the sky, or on the first ground below them if they were saved on the way up (in the air under the island).
+     */
+    public static void setDown(ServerPlayer player, SokoviaRelocations.Entry entry) {
+        if (entry.inTheSky(player.position())) {
+            setDown(player, entry.down());
+        } else {
             setDownOnTheSurface(player);
         }
     }
@@ -249,16 +263,23 @@ public final class SokoviaRecovery {
     public static void setDown(ServerPlayer player, double down) {
         Vec3 target = new Vec3(player.getX(), player.getY() - down, player.getZ());
         Vec3 spot = SokoviaCarry.freeSpot(player, target);
-        if (!SokoviaCarry.fits(player, spot)) {
+        if (!SokoviaCarry.fits(player, spot) || !supported(player, spot)) {
             Vec3 ground = Teleports.groundAt(player, player.serverLevel(), player.getBlockX(), player.getBlockZ());
-            if (ground != null) {
-                spot = ground;
+            if (ground == null) {
+                setDownOnTheSurface(player);
+                return;
             }
+            spot = ground;
         }
         SokoviaCarry.teleport(player, spot);
         player.resetFallDistance();
         player.connection.aboveGroundTickCount = 0;
         player.displayClientMessage(Component.translatable("message.enhanced.ultron.lift.relocated").withStyle(ChatFormatting.YELLOW), true);
+    }
+
+    /** Whether there is something to stand on right under the spot (so that the spot is not a hole in the air). */
+    private static boolean supported(ServerPlayer player, Vec3 spot) {
+        return !player.serverLevel().noCollision(player, player.getBoundingBox().move(spot.subtract(player.position())).move(0.0, -0.5, 0.0));
     }
 
     /** Sets a player on the first ground below them (they were saved hanging in the air). */
