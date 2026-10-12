@@ -37,7 +37,7 @@ The Radioactive Spider is an epic item, up to 16 to a stack, and it is used up b
 
 1. With **no power**, right-click with it in your hand. You hear the bite and green motes rise from your hand. **One spider is used up** (not in Creative) and you take **1 damage** (a bite never takes your last half heart).
 2. **For 7 seconds you are sick**: the *Radioactive Bite* effect, with Nausea, Weakness and Slowness, and Poison for the last 3 seconds (Poison never kills).
-3. When the 7 seconds are over, you awaken as **Spider-Man**: the title "With great power comes great responsibility", the awakening burst and a message to everyone on the server. You start in the **Homemade Suit**.
+3. When the 7 seconds are over, you awaken as **Spider-Man**: his name as the title and "With great power comes great responsibility" over the hotbar, the awakening burst and a message to everyone on the server. You start in the **Homemade Suit**.
 
 Drink milk and the bite is cured: nothing happens ("The bite fades"), and the spider is gone. The same if you die, or get another power, during the 7 seconds. Log out and the bite keeps counting. A hero who uses the spider is turned away ("The spider's bite changes nothing: your power does not mix") and keeps it; so is a player who is still sick from the last bite. Creative players are bitten and keep the spider. An operator can use `/enhanced power set <player> spider_man [look]` (see [Commands](Commands)).
 

@@ -24,6 +24,10 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -563,6 +567,54 @@ public final class DataTests {
             check(image != null, texture + " is a readable image");
             return image;
         }
+    }
+
+    /**
+     * Every awakening line is seen whole: a subtitle is drawn at twice the size of text and never wrapped, so a short line
+     * goes under the title and a long one in the action bar; a Hebrew line shown under the title fits there too.
+     */
+    @GameTest(template = ARENA)
+    public static void everyAwakeningLineIsSeenWhole(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        JsonObject en = lang(mod, "en_us");
+        JsonObject he = lang(mod, "he_il");
+        TestKit.Fixture f = TestKit.fixture(helper);
+        for (Power power : Power.values()) {
+            if (!power.hasPowers()) {
+                continue;
+            }
+            String key = "power.enhanced." + power.getSerializedName() + ".awaken";
+            boolean under = Powers.fitsSubtitle(key);
+            check(under == (en.get(key).getAsString().length() <= Powers.SUBTITLE_CHARS), key + ": the server measures the English line");
+            check(!under || he.get(key).getAsString().length() <= Powers.SUBTITLE_CHARS,
+                    "the Hebrew of " + key + " fits under the title too: " + he.get(key).getAsString());
+            ServerPlayer player = f.player(10.5, FLOOR, 10.5);
+            TestKit.sentPackets(player);
+            Powers.awaken(player, power);
+            Component subtitle = null;
+            boolean inActionBar = false;
+            List<String> sent = new ArrayList<>();
+            for (Object packet : TestKit.sentPackets(player)) {
+                sent.add(packet.getClass().getSimpleName());
+                if (packet instanceof ClientboundSetSubtitleTextPacket text) {
+                    subtitle = text.text();
+                } else if (packet instanceof ClientboundSystemChatPacket chat && chat.overlay()) {
+                    inActionBar |= says(chat.content(), key);
+                }
+            }
+            check(subtitle != null, power + ": a subtitle is sent (empty or not), so no old one stays under the title: " + sent);
+            if (under) {
+                check(says(subtitle, key) && !inActionBar, power + ": the line goes under the title");
+            } else {
+                check(subtitle.getString().isEmpty() && inActionBar, power + ": the long line goes in the action bar, not under the title ("
+                        + subtitle.getString() + "): " + sent);
+            }
+        }
+        helper.succeed();
+    }
+
+    private static boolean says(Component text, String key) {
+        return text.getContents() instanceof TranslatableContents contents && contents.getKey().equals(key);
     }
 
     private static JsonObject lang(IModFile mod, String name) throws IOException {

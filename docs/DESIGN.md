@@ -1067,7 +1067,7 @@ Her head tilts and violet motes drift from her forehead to the one she reads; he
   last), `biteDelayTicks` (140 = 7 s) of the effect `enhanced:radioactive_bite` with Nausea, Weakness I and Slowness I,
   and Poison I for the last 3 seconds (it never kills); sound `spider_bite`, green motes. One spider is used up (not in
   Creative). When the effect **expires** (`MobEffectEvent.Expired` in `SpiderEvents`) and the player is still online,
-  alive and without a power, `Powers.awaken(SPIDER_MAN)` (the title "With great power comes great responsibility", the
+  alive and without a power, `Powers.awaken(SPIDER_MAN)` (his name as the title and "With great power comes great responsibility" in the action bar, too long for a subtitle, the
   shared awakening sound and burst, a message to the server). He wakes in the Homemade Suit.
 * **Cancelled** by milk or anything that removes the effect, by death, or by another power meanwhile ("The bite
   fades"). The effect is saved with the player, so a logout does not lose it. A hero is turned away with "The spider's

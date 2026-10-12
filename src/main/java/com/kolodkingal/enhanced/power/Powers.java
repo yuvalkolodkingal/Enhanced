@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
@@ -76,8 +77,16 @@ public final class Powers {
         Component title = power.awakeningTitle().copy().withStyle(s -> s.withColor(power.titleColor()).withBold(true));
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 20));
         player.connection.send(new ClientboundSetTitleTextPacket(title));
-        player.connection.send(new ClientboundSetSubtitleTextPacket(
-                Component.translatable("power.enhanced." + power.getSerializedName() + ".awaken").withStyle(ChatFormatting.GRAY)));
+        String lineKey = "power.enhanced." + power.getSerializedName() + ".awaken";
+        Component line = Component.translatable(lineKey).withStyle(ChatFormatting.GRAY);
+        if (fitsSubtitle(lineKey)) {
+            player.connection.send(new ClientboundSetSubtitleTextPacket(line));
+        } else {
+            // A subtitle is drawn at twice the size of text and never wrapped, so a long line ("Whosoever holds this
+            // hammer...") is cut at both ends on most screens: it goes in the action bar, which shows it whole.
+            player.connection.send(new ClientboundSetSubtitleTextPacket(Component.empty()));
+            player.displayClientMessage(line, true);
+        }
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.AWAKEN.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
         Variant look = variant(player);
@@ -87,6 +96,14 @@ public final class Powers {
         player.server.getPlayerList().broadcastSystemMessage(
                 Component.translatable("power.enhanced." + power.getSerializedName() + ".broadcast", player.getDisplayName())
                         .withStyle(s -> s.withColor(power.titleColor())), false);
+    }
+
+    /** The longest awakening line (in the server's English) that is shown as the title's subtitle. */
+    public static final int SUBTITLE_CHARS = 32;
+
+    /** Whether the awakening line of this key fits under the title (see {@link #SUBTITLE_CHARS}). */
+    public static boolean fitsSubtitle(String lineKey) {
+        return Language.getInstance().getOrDefault(lineKey).length() <= SUBTITLE_CHARS;
     }
 
     /** The player's current look. */
