@@ -253,15 +253,20 @@ public final class SandHazards {
         private Vec3 position;
         private final double radius;
         private final float damage;
+        private final Vec3 centre;
+        private final double bound;
         private int ticksLeft;
         private final Int2FloatOpenHashMap lifted = new Int2FloatOpenHashMap();
 
-        Tornado(ServerLevel level, LivingEntity owner, @Nullable UUID fightId, Vec3 position, double radius, int ticks, float damage) {
+        Tornado(ServerLevel level, LivingEntity owner, @Nullable UUID fightId, Vec3 position, double radius, int ticks, float damage,
+                @Nullable Vec3 centre, double bound) {
             super(level, owner, fightId);
             this.position = position;
             this.radius = radius;
             this.ticksLeft = ticks;
             this.damage = damage;
+            this.centre = centre == null ? position : centre;
+            this.bound = bound;
         }
 
         public Vec3 position() {
@@ -294,6 +299,11 @@ public final class SandHazards {
                 Vec3 toward = SandControl.flat(position, nearest.position());
                 double x = position.x + toward.x * DRIFT;
                 double z = position.z + toward.z * DRIFT;
+                // It follows the nearest victim but stays where the fight is: a bystander outside the wall is not its business.
+                if (bound > 0.0 && Math.hypot(x - centre.x, z - centre.z) > bound) {
+                    x = position.x;
+                    z = position.z;
+                }
                 position = new Vec3(x, SandControl.groundAt(level, x, position.y + 2.0, z), z);
             }
             Vec3 aim = nearest == null ? position : nearest.position();
@@ -323,7 +333,16 @@ public final class SandHazards {
 
     /** A tornado of {@code radius} blocks starts at {@code position}, for {@code ticks}, and hurts {@code damage} every 10 ticks. */
     public static Tornado tornado(ServerLevel level, LivingEntity owner, @Nullable UUID fight, Vec3 position, double radius, int ticks, float damage) {
-        Tornado tornado = new Tornado(level, owner, fight, position, radius, ticks, damage);
+        return tornado(level, owner, fight, position, radius, ticks, damage, null, 0.0);
+    }
+
+    /**
+     * The same, kept inside a fight's arena: it drifts only where its distance from {@code centre} stays within {@code bound}
+     * ({@code bound} 0: no limit).
+     */
+    public static Tornado tornado(ServerLevel level, LivingEntity owner, @Nullable UUID fight, Vec3 position, double radius, int ticks, float damage,
+                                  @Nullable Vec3 centre, double bound) {
+        Tornado tornado = new Tornado(level, owner, fight, position, radius, ticks, damage, centre, bound);
         HAZARDS.add(tornado);
         return tornado;
     }

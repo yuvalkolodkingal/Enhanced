@@ -25,6 +25,15 @@ public final class ApocalypseFx {
         PacketDistributor.sendToPlayersNear(level, null, near.x, near.y, near.z, radius, new ApocalypseFxPayload(kind, id, a, b, c, d));
     }
 
+    /**
+     * Sends the effect to every player in the level, wherever they are. The end of the arena is told like this: a player who
+     * walked away (or was thrown out of range) while the fight lasted must not keep the wall and the amber air of a fight
+     * that is over.
+     */
+    public static void sendToLevel(ServerLevel level, byte kind, int id, Vec3 a, Vec3 b, int c, int d) {
+        PacketDistributor.sendToPlayersInDimension(level, new ApocalypseFxPayload(kind, id, a, b, c, d));
+    }
+
     /** Sends the effect to one player (a late joiner who starts tracking the boss is told where the arena is). */
     public static void sendTo(ServerPlayer player, byte kind, int id, Vec3 a, Vec3 b, int c, int d) {
         PacketDistributor.sendToPlayer(player, new ApocalypseFxPayload(kind, id, a, b, c, d));

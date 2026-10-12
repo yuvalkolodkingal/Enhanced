@@ -9,9 +9,11 @@ import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.Vec3;
@@ -21,6 +23,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import static com.kolodkingal.enhanced.client.render.EnergyGeometry.argb;
@@ -55,6 +58,9 @@ public final class ArenaFx {
 
     private static boolean on;
     private static int fight;
+    /** The dimension the arena stands in: a client that left it (and so missed its end) does not keep its wall. */
+    @Nullable
+    private static ResourceKey<Level> dimension;
     private static Vec3 centre = Vec3.ZERO;
     private static double radius;
     private static double height;
@@ -80,6 +86,7 @@ public final class ArenaFx {
         boolean same = on && fight == id;
         on = true;
         fight = id;
+        dimension = level.dimension();
         centre = middle;
         radius = wallRadius;
         height = wallHeight;
@@ -179,6 +186,9 @@ public final class ArenaFx {
         }
         float target = 0.0F;
         inside = false;
+        if (on && !level.dimension().equals(dimension)) {
+            on = false; // the fight is in another dimension now: this client missed its end
+        }
         if (on) {
             double distance = Math.hypot(camera.getX() - centre.x, camera.getZ() - centre.z);
             inside = distance < radius;

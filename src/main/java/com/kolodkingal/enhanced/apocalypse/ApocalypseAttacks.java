@@ -211,7 +211,8 @@ final class ApocalypseAttacks {
             case BACKHAND -> backhand(boss, level);
             case TORNADO -> {
                 for (Vec3 spot : brain.points) {
-                    SandHazards.tornado(level, boss, fight.id(), spot, TORNADO_RADIUS, ApocalypseBossConfig.TORNADO_TICKS.get(), ApocalypseBossConfig.STORM_DAMAGE.get().floatValue());
+                    SandHazards.tornado(level, boss, fight.id(), spot, TORNADO_RADIUS, ApocalypseBossConfig.TORNADO_TICKS.get(),
+                            ApocalypseBossConfig.STORM_DAMAGE.get().floatValue(), fight.arena().center(), fight.arena().containRadius());
                 }
                 sound(level, boss, ModSounds.SAND_SPIKE.get(), 1.0F, 0.6F);
             }

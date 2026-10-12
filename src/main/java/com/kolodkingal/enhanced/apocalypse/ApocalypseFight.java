@@ -168,9 +168,19 @@ public final class ApocalypseFight extends BossFight {
         return foes;
     }
 
-    /** How many fighters the fight counts for its numbers: those who took part, at most six. */
+    /**
+     * How many fighters the fight counts for its numbers (his health, his shields, the Horsemen): those who took part, at most
+     * six. A Creative player is a participant of the ledger but is not a fighter: an operator flying through the arena does not
+     * make the fight bigger.
+     */
     public int fighterCount() {
-        return Math.max(1, Math.min(6, participants().size()));
+        int fighters = 0;
+        for (Participant participant : participants()) {
+            if (!participant.wasCreative()) {
+                fighters++;
+            }
+        }
+        return Math.max(1, Math.min(6, fighters));
     }
 
     /** Whether nothing can hurt him now (a set piece, the end), except what bypasses invulnerability. */
@@ -229,8 +239,14 @@ public final class ApocalypseFight extends BossFight {
     /** The picture of the sand wall and the amber sky for everyone near (and for whoever comes later: see the events). */
     private void arenaFx(boolean on) {
         ApocalypseArena arena = (ApocalypseArena) arena();
-        ApocalypseFx.send(level(), centre, arena.fightRadius() + 64.0, on ? ApocalypseFxPayload.ARENA_ON : ApocalypseFxPayload.ARENA_OFF,
-                id().hashCode(), centre, Vec3.ZERO, (int) Math.round(arena.containRadius()), (int) Math.round(arena.top() - centre.y));
+        int radius = (int) Math.round(arena.containRadius());
+        int height = (int) Math.round(arena.top() - centre.y);
+        if (on) {
+            ApocalypseFx.send(level(), centre, arena.fightRadius() + 64.0, ApocalypseFxPayload.ARENA_ON, id().hashCode(), centre, Vec3.ZERO, radius, height);
+        } else {
+            // Everyone in the dimension is told it is over, also whoever went out of range while it lasted.
+            ApocalypseFx.sendToLevel(level(), ApocalypseFxPayload.ARENA_OFF, id().hashCode(), centre, Vec3.ZERO, radius, height);
+        }
     }
 
     /** Tells a player who has just come into view where the arena is. */
