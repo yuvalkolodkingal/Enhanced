@@ -71,6 +71,8 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
     /** The glow round the fist while a stone is called on: its colour and how strong (0 to 1). */
     public int auraColor;
     public float auraStrength;
+    /** The Gauntlet is held shut (a stagger, a Spider-Man's web): its stones and its engraving are dark. */
+    public boolean locked;
 
     private final ThanosBossPoses.Out target = new ThanosBossPoses.Out();
     private final Map<Integer, Blend> blends = new HashMap<>();
@@ -223,6 +225,10 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
             aim = boss.aim();
             ThanosGlow.sockets(sockets, boss.stones(), boss.nextStoneIn(), state, state == ThanosState.TELL || state == ThanosState.ACTIVE ? move : null,
                     boss.moveTime(partial), boss.stateTime(partial), ageInTicks);
+            locked = boss.flag(ThanosEntity.FLAG_GAUNTLET_LOCKED) && state != ThanosState.DYING;
+            if (locked) {
+                ThanosGlow.locked(sockets);
+            }
             plates = boss.plates();
             stones = boss.stones();
             aura(boss, state, move, boss.moveTime(partial), boss.stateTime(partial));
@@ -235,6 +241,7 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
             }
             ThanosEntity real = ThanosClientView.nearestBoss(entity);
             ThanosGlow.sockets(sockets, real == null ? 1 : real.stones(), -1, ThanosState.IDLE, null, 0.0F, 0.0F, ageInTicks);
+            locked = false;
             plates = real == null ? ThanosDefence.ALL_PLATES : real.plates();
             stones = real == null ? 1 : real.stones();
             auraStrength = 0.0F;

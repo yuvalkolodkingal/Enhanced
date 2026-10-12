@@ -312,7 +312,7 @@ public final class PhoenixTests {
             player.setItemInHand(InteractionHand.MAIN_HAND, stack);
             TestKit.sentPackets(player);
             InteractionResultHolder<ItemStack> used = stack.getItem().use(level, player, InteractionHand.MAIN_HAND);
-            check(!used.getResult().consumesAction() && !player.isUsingItem(), hero + ": no hold begins");
+            check(used.getResult().consumesAction() && !player.isUsingItem(), hero + ": no hold begins (the click is spent on the refusal, not passed to the other hand)");
             check(actionBarKeys(player).contains("message.enhanced.phoenix_ember.already_powered"), hero + " is told their body already holds a power");
             stack.getItem().finishUsingItem(stack, level, player);
             check(Powers.power(player) == hero && stack.getCount() == 1, hero + " stays what they are and keeps the Ember");

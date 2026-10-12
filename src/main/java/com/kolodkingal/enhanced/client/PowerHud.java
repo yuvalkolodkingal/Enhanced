@@ -71,7 +71,8 @@ public class PowerHud implements LayeredDraw.Layer {
         }
 
         int x = 4;
-        int y = 4;
+        // Under the boss bars, when a fight's bars and their names would run into the panel.
+        int y = 4 + BossBarOverride.clearance(x + width + 4);
         int height = 12 + PowerData.ABILITIES * 10;
         graphics.fill(x - 2, y - 2, x + width + 4, y + height, 0x70000000);
         graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);

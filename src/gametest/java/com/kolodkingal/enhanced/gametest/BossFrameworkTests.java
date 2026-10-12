@@ -259,6 +259,96 @@ public final class BossFrameworkTests {
         });
     }
 
+    /**
+     * A wipe is told to the fallen: when everyone is dead, nobody stands near the bars any more (the dead leave the
+     * level a second after they die), and the line still reaches every participant.
+     */
+    @GameTest(template = ARENA, batch = "boss_wipe_told", timeoutTicks = 160)
+    public static void theFallenAreToldOfTheWipe(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.WIPE_SECONDS, 3);
+        ServerPlayer a = f.player(10.5, FLOOR, 10.5);
+        ServerPlayer b = f.player(12.5, FLOOR, 10.5);
+        TestFight fight = start(f, a, Containment.NONE, false);
+        helper.runAfterDelay(3, () -> {
+            check(fight.isParticipant(b.getUUID()), "both fight");
+            a.kill();
+            b.kill();
+            TestKit.sentPackets(a);
+            TestKit.sentPackets(b);
+        });
+        List<Object> toA = new java.util.ArrayList<>();
+        List<Object> toB = new java.util.ArrayList<>();
+        f.everyTick(150, tick -> {
+            if (tick <= 3) {
+                return false;
+            }
+            // (What a connected client's tick does: the dead are taken out of the level after their death.)
+            for (ServerPlayer dead : List.of(a, b)) {
+                if (!dead.isRemoved()) {
+                    dead.doTick();
+                }
+            }
+            toA.addAll(TestKit.sentPackets(a));
+            toB.addAll(TestKit.sentPackets(b));
+            if (tick == 50) {
+                check(!fight.isOver(), "the wipe takes its time");
+                check(a.isRemoved() && b.isRemoved() && !f.level().players().contains(a), "the dead have left the level");
+                check(!fight.audience().contains(a) && !fight.audience().contains(b), "and no longer see the bars");
+            }
+            if (!fight.isOver()) {
+                return false;
+            }
+            check(fight.result() == BossEnd.WIPE, "a wipe: " + fight.result());
+            check(told(toA, "message.enhanced.boss.end.wipe") && told(toB, "message.enhanced.boss.end.wipe"),
+                    "both fallen fighters read that everyone has fallen");
+            return true;
+        });
+    }
+
+    /** Whether a chat line (not the action bar) with that translation key is among the packets. */
+    private static boolean told(List<Object> packets, String key) {
+        return packets.stream().anyMatch(packet -> packet instanceof net.minecraft.network.protocol.game.ClientboundSystemChatPacket chat
+                && !chat.overlay() && chat.content().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
+                && t.getKey().equals(key));
+    }
+
+    /**
+     * A fighter who walks out of the arena alive has not fallen: the fight is not wiped after the wipe time, and if
+     * nobody comes back it is abandoned (the boss loses interest), with its own words.
+     */
+    @GameTest(template = ARENA, batch = "boss_walk_away", timeoutTicks = 200)
+    public static void walkingAwayAliveIsAnAbandonmentNotAWipe(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.WIPE_SECONDS, 1);
+        f.config(BossConfig.ABANDON_SECONDS, 5);
+        ServerPlayer a = f.player(10.5, FLOOR, 10.5);
+        TestFight fight = start(f, a, Containment.NONE, false);
+        // (The real arenas let go of a fighter some way beyond their join radius; this one is small enough to walk out of.)
+        fight.arena().abandonBeyond(4.0);
+        helper.runAfterDelay(3, () -> moveTo(helper, a, 1.5, 1.5));
+        helper.runAfterDelay(4, () -> {
+            check(fight.isParticipant(a.getUUID()) && !fight.present().contains(a) && fight.fighters().contains(a),
+                    "he is out of the arena, alive");
+            TestKit.sentPackets(a);
+        });
+        helper.runAfterDelay(60, () -> check(!fight.isOver(), "three times the wipe time later, walking away is no wipe: " + fight.result()));
+        List<Object> toA = new java.util.ArrayList<>();
+        f.everyTick(190, tick -> {
+            if (tick > 4) {
+                toA.addAll(TestKit.sentPackets(a));
+            }
+            if (fight.result() == null) {
+                return false;
+            }
+            check(tick >= 100, "not before the abandon time: " + tick);
+            check(fight.result() == BossEnd.ABANDON, "nobody near: abandoned, not " + fight.result());
+            check(told(toA, "message.enhanced.boss.end.abandon") && !told(toA, "message.enhanced.boss.end.wipe"),
+                    "he reads that nobody is left near, not that everyone has fallen");
+            return true;
+        });
+    }
+
     @GameTest(template = ARENA, batch = "boss_wipe_creative", timeoutTicks = 140)
     public static void creativePlayersCannotDieSoAFightOfOnlyThemNeverWipes(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);

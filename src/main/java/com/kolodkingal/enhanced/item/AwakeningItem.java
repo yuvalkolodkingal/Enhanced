@@ -55,7 +55,9 @@ public abstract class AwakeningItem extends Item {
             if (!level.isClientSide) {
                 player.displayClientMessage(alreadyPowered(), true);
             }
-            return InteractionResultHolder.fail(stack);
+            // The click is spent on the refusal: the game must not go on to use what the other hand holds (Loki's
+            // Scepter, still there after the call of the Mad Titan, would tear a hero apart).
+            return InteractionResultHolder.consume(stack);
         }
         player.startUsingItem(hand);
         return InteractionResultHolder.consume(stack);

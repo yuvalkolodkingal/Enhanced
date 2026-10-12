@@ -18,7 +18,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,6 +40,15 @@ public final class ThanosSummon implements ScepterRituals.Hold {
     /** Players whose charge already completed early (a charge shorter than the five seconds the items can be held). */
     private static final Set<UUID> DONE = new HashSet<>();
 
+    /**
+     * The summoners who have not let go of the use key since their call completed, and the last tick it asked again. A
+     * held key asks again every four ticks; those asks are the same press, and are not answered with "He is already
+     * here" over the portal's own line.
+     */
+    private static final Map<UUID, Long> STILL_HELD = new HashMap<>();
+    /** More than this many ticks between two asks: the key was let go of in between. */
+    static final int HELD_GAP = 10;
+
     /** Registers the Thanos fight and its summoning, once, when the mod loads. */
     public static void register() {
         BossFights.register(BossKind.THANOS, new ThanosLane());
@@ -47,6 +58,7 @@ public final class ThanosSummon implements ScepterRituals.Hold {
     /** Forgets every charge (the server has stopped). */
     public static void clear() {
         DONE.clear();
+        STILL_HELD.clear();
     }
 
     /**
@@ -85,11 +97,29 @@ public final class ThanosSummon implements ScepterRituals.Hold {
     public boolean begin(ServerPlayer player, InteractionHand hand) {
         Component refusal = refusal(player);
         if (refusal != null) {
-            player.displayClientMessage(refusal.copy().withStyle(ChatFormatting.RED), true);
+            if (!stillHeld(player)) {
+                player.displayClientMessage(refusal.copy().withStyle(ChatFormatting.RED), true);
+            }
             return false;
         }
         DONE.remove(player.getUUID());
+        STILL_HELD.remove(player.getUUID());
         return true;
+    }
+
+    /**
+     * Whether this use is the summoner's key still held down after the call completed (the game asks again every four
+     * ticks while it is): it is answered with silence, and keeps the silence going for as long as it is held.
+     */
+    private static boolean stillHeld(ServerPlayer player) {
+        Long last = STILL_HELD.get(player.getUUID());
+        long now = player.serverLevel().getGameTime();
+        if (last != null && now - last <= HELD_GAP) {
+            STILL_HELD.put(player.getUUID(), now);
+            return true;
+        }
+        STILL_HELD.remove(player.getUUID());
+        return false;
     }
 
     /** Whether the two hands hold the Tesseract and the Scepter, one each. */
@@ -151,6 +181,8 @@ public final class ThanosSummon implements ScepterRituals.Hold {
 
     /** The five seconds are up: the rules are asked once more and the portal opens. */
     private static void complete(ServerPlayer player) {
-        BossFights.start(BossKind.THANOS, player, false);
+        if (BossFights.start(BossKind.THANOS, player, false)) {
+            STILL_HELD.put(player.getUUID(), player.serverLevel().getGameTime());
+        }
     }
 }

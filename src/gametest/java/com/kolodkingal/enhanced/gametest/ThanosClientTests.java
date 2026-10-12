@@ -169,6 +169,19 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
+    /** A Gauntlet held shut (a stagger, a Spider-Man's web) has dark stones, even the one a clench was lighting. */
+    @GameTest(template = TestKit.ARENA, batch = PURE)
+    public static void aLockedGauntletHasDarkStones(GameTestHelper helper) {
+        float[] alpha = new float[ThanosGlow.SOCKETS];
+        ThanosGlow.sockets(alpha, 5, -1, ThanosState.TELL, ThanosMove.POWER_BLAST, ThanosMove.POWER_BLAST.tell(), 5.0F, 10.0F);
+        check(alpha[0] >= 0.99F && alpha[3] > 0.15F, "before: the clench burns the Power Stone and the others glow");
+        ThanosGlow.locked(alpha);
+        for (int i = 0; i < ThanosGlow.SOCKETS; i++) {
+            check(alpha[i] == 0.0F, "socket " + i + " is dark while the Gauntlet is held shut");
+        }
+        helper.succeed();
+    }
+
     @GameTest(template = TestKit.ARENA, batch = PURE)
     public static void aClenchLightsItsOwnStoneAndTheSurgeFlaresTheNewestAndDeathDarkensAll(GameTestHelper helper) {
         float[] alpha = new float[ThanosGlow.SOCKETS];

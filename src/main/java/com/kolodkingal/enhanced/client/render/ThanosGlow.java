@@ -103,6 +103,16 @@ public final class ThanosGlow {
         alpha[index] = Math.max(alpha[index], swell);
     }
 
+    /**
+     * The Gauntlet is held shut (a stagger broke his clench, or a Spider-Man's web holds it): no stone answers, and
+     * every socket is a dark gem while it lasts.
+     */
+    public static void locked(float[] alpha) {
+        for (int i = 0; i < SOCKETS; i++) {
+            alpha[i] = 0.0F;
+        }
+    }
+
     /** How bright the halo of a socket is for a stone's brightness (a lit stone has one; a dark gem none). */
     public static float halo(float alpha) {
         return alpha > IDLE + 0.1F ? 0.5F * alpha : 0.0F;

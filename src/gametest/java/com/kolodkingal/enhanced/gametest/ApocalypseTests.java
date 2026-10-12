@@ -202,7 +202,7 @@ public final class ApocalypseTests {
         ItemStack another = new ItemStack(ModItems.ESSENCE.get());
         player.setItemInHand(InteractionHand.MAIN_HAND, another);
         log.clear();
-        check(!another.getItem().use(level, player, InteractionHand.MAIN_HAND).getResult().consumesAction() && !player.isUsingItem(), "no hold begins for him");
+        check(another.getItem().use(level, player, InteractionHand.MAIN_HAND).getResult().consumesAction() && !player.isUsingItem(), "no hold begins for him (the click is spent on the refusal)");
         check(log.drain().toldOnActionBar("message.enhanced.essence.already_apocalypse") && another.getCount() == 1, "he is told he already is En Sabah Nur");
 
         // Another hero's body does not take it: refused with a word, and the Essence stays.
@@ -212,7 +212,7 @@ public final class ApocalypseTests {
             hero.setItemInHand(InteractionHand.MAIN_HAND, stack);
             Log heroLog = new Log(hero).drain();
             heroLog.clear();
-            check(!stack.getItem().use(level, hero, InteractionHand.MAIN_HAND).getResult().consumesAction() && !hero.isUsingItem(), power + " is turned away");
+            check(stack.getItem().use(level, hero, InteractionHand.MAIN_HAND).getResult().consumesAction() && !hero.isUsingItem(), power + " is turned away (the click is spent on the refusal)");
             check(heroLog.drain().toldOnActionBar("message.enhanced.essence.already_powered"), "with a word");
             check(stack.getCount() == 1 && Powers.power(hero) == power, "and nothing is used up");
         }

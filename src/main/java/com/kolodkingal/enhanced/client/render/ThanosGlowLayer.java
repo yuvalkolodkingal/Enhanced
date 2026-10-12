@@ -44,9 +44,12 @@ public class ThanosGlowLayer<T extends Monster> extends RenderLayer<T, ThanosMod
         if (model.auraStrength > 0.01F) {
             tint = model.auraColor;
         }
-        float strength = Mth.clamp(0.2F + brightest * 0.6F, 0.0F, 1.0F);
-        model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.eyes(GLOW)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                EnergyGeometry.argb(tint, strength));
+        // (Held shut, the Gauntlet's engraving is dark like its stones.)
+        if (!model.locked) {
+            float strength = Mth.clamp(0.2F + brightest * 0.6F, 0.0F, 1.0F);
+            model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.eyes(GLOW)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                    EnergyGeometry.argb(tint, strength));
+        }
 
         poseStack.pushPose();
         model.translateToGauntlet(poseStack);

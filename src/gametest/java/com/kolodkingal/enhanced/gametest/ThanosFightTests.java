@@ -30,6 +30,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -37,6 +38,7 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
@@ -475,6 +477,17 @@ public final class ThanosFightTests {
         String shown = BossTestSupport.lastActionBarKey(hero);
         check("message.enhanced.thanos.already_powered".equals(shown) && !hero.isUsingItem(), "a hero is turned away: " + shown);
         check(hero.getMainHandItem().is(ModItems.INFINITY_GAUNTLET.get()), "and keeps it");
+        // The refusal takes the click: the game does not go on to the other hand (where the summoner still holds Loki's
+        // Scepter, which would tear a hero apart).
+        for (Item item : new Item[]{ModItems.INFINITY_GAUNTLET.get(), ModItems.PHOENIX_EMBER.get(), ModItems.ESSENCE.get()}) {
+            ItemStack held = new ItemStack(item);
+            hero.setItemInHand(InteractionHand.MAIN_HAND, held);
+            hero.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
+            InteractionResultHolder<ItemStack> result = held.getItem().use(level, hero, InteractionHand.MAIN_HAND);
+            check(result.getResult().consumesAction() && !hero.isUsingItem(), item + ": a hero's refused click is spent on the refusal: " + result.getResult());
+        }
+        hero.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        hero.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.INFINITY_GAUNTLET.get()));
         plain.getMainHandItem().getItem().use(level, plain, InteractionHand.MAIN_HAND);
         creative.getMainHandItem().getItem().use(level, creative, InteractionHand.MAIN_HAND);
         check(plain.isUsingItem() && creative.isUsingItem(), "the others hold it up");
