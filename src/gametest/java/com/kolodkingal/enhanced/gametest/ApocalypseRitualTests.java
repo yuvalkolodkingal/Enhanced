@@ -278,7 +278,7 @@ public final class ApocalypseRitualTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_ritual_checks", timeoutTicks = 200)
+    @GameTest(template = ARENA, batch = "apocalypse_ritual_checks", timeoutTicks = 800)
     public static void ritualChecksEachConditionAndUsesNothingUpWhenItRefuses(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         readyGround(f);
@@ -289,10 +289,10 @@ public final class ApocalypseRitualTests {
         ServerPlayer starter = starter(f, 10.5, 5.5);
         Log log = new Log(starter);
         BlockPos click = absolute(f, CLICK);
-        // A roof over the block, for the sun check below (the light needs a few ticks to know).
+        // A roof over the block, for the sun check below (the light needs a few ticks to know: the test waits until it does).
         helper.setBlock(CLICK.above(2), Blocks.STONE);
 
-        helper.runAfterDelay(6, () -> {
+        ApocalypseTestSupport.whenReady(helper, 300, () -> !level.canSeeSky(click.above()), "told of the roof", () -> {
             // Nothing in the hand, and the wrong thing in it.
             starter.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             starter.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
@@ -313,7 +313,7 @@ public final class ApocalypseRitualTests {
             // A roof over the block: no sun.
             refused(f, starter, log, click, "message.enhanced.apocalypse.refuse.sun", "a roof over the block", true);
             helper.setBlock(CLICK.above(2), Blocks.AIR);
-            helper.runAfterDelay(6, () -> {
+            ApocalypseTestSupport.whenReady(helper, 300, () -> level.canSeeSky(click.above()), "told the roof is gone", () -> {
                 // Not sand.
                 helper.setBlock(CLICK, Blocks.STONE);
                 refused(f, starter, log, click, "message.enhanced.apocalypse.refuse.sand", "a block of stone", true);

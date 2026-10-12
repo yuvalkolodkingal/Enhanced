@@ -14,6 +14,9 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -27,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntPredicate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -98,6 +102,34 @@ final class ApocalypseTestSupport {
                 throw new GameTestAssertException("Test did not finish within " + lastTick + " ticks");
             } else {
                 schedule(helper, tick + 1, lastTick, step);
+            }
+        });
+    }
+
+    /**
+     * Runs {@code then} in the first tick in which {@code ready} is true (it is asked once a tick), and fails the test if that
+     * has not happened in {@code maxTicks}: for what the server learns from another thread (the light engine knows of a new
+     * roof only when its own thread has had its turn, and a test server ticks as fast as it can, so a fixed number of ticks
+     * can be over in a few milliseconds and is a flake). Each tick that finds it not ready gives the other threads ten
+     * milliseconds of the server thread's time.
+     */
+    static void whenReady(GameTestHelper helper, int maxTicks, BooleanSupplier ready, String what, Runnable then) {
+        awaitStep(helper, 1, maxTicks, ready, what, then);
+    }
+
+    private static void awaitStep(GameTestHelper helper, int tick, int maxTicks, BooleanSupplier ready, String what, Runnable then) {
+        helper.runAfterDelay(1, () -> {
+            if (ready.getAsBoolean()) {
+                then.run();
+            } else if (tick >= maxTicks) {
+                throw new GameTestAssertException("Not " + what + " within " + maxTicks + " ticks");
+            } else {
+                try {
+                    Thread.sleep(10L);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                awaitStep(helper, tick + 1, maxTicks, ready, what, then);
             }
         });
     }
@@ -226,6 +258,21 @@ final class ApocalypseTestSupport {
         /** Whether a sound of this event was sent. */
         boolean heard(SoundEvent event) {
             return TestKit.soundsIn(packets).stream().anyMatch(s -> s.id().equals(event.getLocation()));
+        }
+
+        /** Whether the server told the client to stop the sound of this event. */
+        boolean soundStopped(SoundEvent event) {
+            return packets.stream().anyMatch(p -> p instanceof ClientboundStopSoundPacket stop && event.getLocation().equals(stop.getName()));
+        }
+
+        /** Whether a title with this translation key (in its text or in any part of it) was shown. */
+        boolean titled(String key) {
+            return packets.stream().anyMatch(p -> p instanceof ClientboundSetTitleTextPacket title && mentions(title.text(), key));
+        }
+
+        /** The particle bursts that were sent. */
+        List<ClientboundLevelParticlesPacket> particles() {
+            return TestKit.particlesIn(packets);
         }
 
         /** Every effect payload of the Apocalypse fight that was sent, of the given kind. */

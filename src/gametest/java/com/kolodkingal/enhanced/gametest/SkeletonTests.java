@@ -206,6 +206,9 @@ public final class SkeletonTests {
     public static void aNewHeroDoesNothingYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
+            if (hero == Power.APOCALYPSE) {
+                continue; // built: ApocalypseTests
+            }
             ServerPlayer player = f.player(10.5, FLOOR, 10.5, hero);
             PowerData data = Powers.get(player);
             float health = player.getHealth();
@@ -439,7 +442,7 @@ public final class SkeletonTests {
                 assertNear(player.getAbilities().getFlyingSpeed(), hero.flightSpeed(), 1.0E-4, hero + " flies at its speed");
             }
             // G toggles the flight of the fliers, once their lane wires it: until then nothing takes off.
-            if (hero.canFly()) {
+            if (hero.canFly() && hero != Power.APOCALYPSE) {
                 AbilityHandler.onKey(player, hero.flightAbility(), true);
                 check(!player.getAbilities().flying, hero + ": G is not wired yet, so nothing took off");
             }
