@@ -8,7 +8,7 @@ import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
 /**
- * The six sockets of the Infinity Gauntlet (DESIGN section 15.2.6), shared by the boss's model and the hero's layer.
+ * The six sockets of the Infinity Gauntlet (DESIGN section 15.13.2), shared by the boss's model and the hero's layer.
  * The sockets are on the back of the hand: a row of four on the knuckles (Power, Space, Reality, Soul), the Time Stone
  * at the thumb and the large round socket of the Mind Stone, which is never lit. A stone that is not burning is a dark
  * glassy gem; a burning one is drawn full-bright in its colour with a halo, and a stone that is being used throws a

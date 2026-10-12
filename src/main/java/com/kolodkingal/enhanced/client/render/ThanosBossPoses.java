@@ -15,7 +15,7 @@ import static com.kolodkingal.enhanced.client.render.AnimMath.Ease.O;
 import static com.kolodkingal.enhanced.client.render.AnimMath.Ease.S;
 
 /**
- * The poses of the Mad Titan's body (DESIGN section 15.6.1): one per kind of move, and one each for a new stone, a
+ * The poses of the Mad Titan's body (DESIGN section 15.14.4): one per kind of move, and one each for a new stone, a
  * stagger, the arrival and the death. A pose is a list of keys; a key is a tick, the easing of the segment that arrives
  * at it and the value of every channel from then on (a channel a key does not mention keeps the value it had). The
  * model reads the pose at the tick of the move (or the time in the state) and puts the channels on its parts.

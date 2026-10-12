@@ -29,7 +29,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The Infinity Gauntlet on the arm of the playing Thanos (DESIGN section 15.2.6): the cuff, the engraved forearm and
+ * The Infinity Gauntlet on the arm of the playing Thanos (DESIGN section 15.13.2): the cuff, the engraved forearm and
  * the fist of the boss's own Gauntlet, scaled down to fit a player's arm, with its six sockets alight as {@link
  * ThanosHeroGlow} says. It is on the off-hand arm (the left, for a right-handed player, as in the film), over the skin,
  * so it is on every look, "your own skin" too. In first person the same cuboids are put on the hand by an injection

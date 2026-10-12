@@ -24,7 +24,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 
 /**
- * The air round the Mad Titan (DESIGN section 15.3.12 and 15.5.3): within 64 blocks of a living Thanos the fog turns
+ * The air round the Mad Titan (DESIGN section 15.14.3 and 15.14.2): within 64 blocks of a living Thanos the fog turns
  * dark violet over three seconds and the edges of the screen darken, a thunder that is not weather rumbles far off
  * every so often, and a stone arriving flashes the screen white. The call has its own sky: while the Tesseract and the
  * Scepter are held up, and while the portal is open, the fog turns violet too. The effects on the player himself are

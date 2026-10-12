@@ -9,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.function.Supplier;
 
 /**
- * Every sound the Thanos fight makes, by what it is for (DESIGN section 15.5.4): each cue is a sound event of the
+ * Every sound the Thanos fight makes, by what it is for (DESIGN section 15.15.1): each cue is a sound event of the
  * mod's own, synthesized for him ({@code thanos_roar}, {@code thanos_step}, {@code gauntlet_clench} ...), played a
  * little louder or quieter and higher or lower by the places that call it. The portals, a dissolving phantom and the
  * shield turning the sword home reuse sounds of the other heroes. The six stones' voices are {@link StoneKind#voice()}.

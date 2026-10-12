@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The body of the Mad Titan (DESIGN section 15.2.7): a custom humanoid 34 pixels tall and twice as broad as a player,
+ * The body of the Mad Titan (DESIGN section 15.13.3): a custom humanoid 34 pixels tall and twice as broad as a player,
  * drawn at 1.55 times its size, with its own 128 by 128 texture. His shoulders, his jaw and his long arms are what he
  * is; the four plates of his armour (the helmet, the two pauldrons, the breastplate) are parts of their own that are
  * hidden when the plate breaks; the Gauntlet is a forearm, a cuff and a fist whose six sockets are drawn by {@link
@@ -102,7 +102,7 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
     }
 
     /**
-     * The layer: the parts of the table of DESIGN section 15.2.7, each with its box, its pivot and its place in the
+     * The layer: the parts of the table of DESIGN section 15.13.3, each with its box, its pivot and its place in the
      * texture. The torso is a pivot of its own at the hips (the model leans and twists there), and the pivots below it
      * are the table's, taken from the hips.
      */

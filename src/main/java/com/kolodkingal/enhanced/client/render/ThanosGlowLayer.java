@@ -14,7 +14,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.monster.Monster;
 
 /**
- * The light of the Infinity Gauntlet on the Mad Titan (DESIGN section 15.5.3): the engraved lines of the forearm and
+ * The light of the Infinity Gauntlet on the Mad Titan (DESIGN section 15.14.2): the engraved lines of the forearm and
  * the cuff glow in the colour of his newest stone, the six sockets burn as {@link ThanosGlow} says, and a stone he is
  * using throws a glow round his fist that swells through the clench, which is the first thing anyone sees of what is
  * coming.

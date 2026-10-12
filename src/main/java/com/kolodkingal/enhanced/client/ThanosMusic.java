@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * The music of the fight (DESIGN section 15.3.12): one loop for each stone he holds, layered, so the music grows as he
+ * The music of the fight (DESIGN section 15.15.2): one loop for each stone he holds, layered, so the music grows as he
  * does. Each loop fades in over two seconds when its stone arrives and stays; all of them are loud within 48 blocks of
  * him, fade to silence at 96, and fade out over three seconds when he dies or leaves. The game's own music waits while
  * it plays. It is a music-volume sound, so the music slider controls it, and the client option {@code bossMusic}

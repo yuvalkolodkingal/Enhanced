@@ -13,7 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
 /**
- * The Soul Stone's sight (DESIGN section 15.4.3): for a few seconds every creature within the Sight's range glows
+ * The Soul Stone's sight (DESIGN section 15.11.2): for a few seconds every creature within the Sight's range glows
  * orange through the walls for the Thanos who looks, and nobody else. {@code EntityGlow} asks {@link #reveals} and
  * {@link #color}; the glow is the game's own outline, so it is drawn through walls like the Noise of Billy.
  */

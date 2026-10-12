@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * The boss bar of the Mad Titan (DESIGN section 15.3.12): his health in the colour of his newest stone, with a darker
+ * The boss bar of the Mad Titan (DESIGN section 15.14.1): his health in the colour of his newest stone, with a darker
  * bar behind it for what he has just lost; a gold tick on the bar where each plate of his armour will break, dark once
  * it has; and under it a row of six sockets, the Gauntlet's. A stone he holds is a lit gem; the next one is a ring that
  * fills while it counts down, with its name and the time; the sixth, the Mind Stone's, is a dark socket outlined in

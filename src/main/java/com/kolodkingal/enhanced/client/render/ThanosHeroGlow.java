@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * How the sockets of the Gauntlet of a playing Thanos burn (DESIGN section 15.2.6): all five stones glow softly, a
+ * How the sockets of the Gauntlet of a playing Thanos burn (DESIGN section 15.13.2): all five stones glow softly, a
  * stone flares when its ability is used (the cooldown of its key starts, or the drain begins), and burns on while
  * something it made lasts (the Veil, the Drain, the Sight). The flares are found by watching each Thanos's cooldowns
  * tick by tick; the sockets are read by {@link GauntletLayer} for every frame it draws one.

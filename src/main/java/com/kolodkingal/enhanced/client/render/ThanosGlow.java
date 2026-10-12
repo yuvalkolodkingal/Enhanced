@@ -6,7 +6,7 @@ import com.kolodkingal.enhanced.thanos.ThanosState;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * How brightly each socket of the Gauntlet burns (DESIGN section 15.2.6): a stone he holds glows softly; the one a move
+ * How brightly each socket of the Gauntlet burns (DESIGN section 15.13.2): a stone he holds glows softly; the one a move
  * calls on swells through the clench and flares, and fades after it; the newest flares in its surge; the next one
  * pulses in the last ten seconds before it arrives; the five flare in turn for the Infinity Beam; they go dark one by
  * one when he dies; and the sixth socket, the Mind Stone's, only glimmers now and then once he holds five. Pure

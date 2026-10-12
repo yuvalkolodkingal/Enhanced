@@ -14,7 +14,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.RenderType;
 
 /**
- * Thanos's Double-Edged Sword (DESIGN section 15.2.7): two broad, flat blades back to back on a short grip, with a
+ * Thanos's Double-Edged Sword (DESIGN section 15.13.3): two broad, flat blades back to back on a short grip, with a
  * small guard in the middle and a ridge down each blade. It is drawn in his hand by a layer and flying by an entity
  * renderer; the model is the same, centred on the grip, a blade pointing up and a blade down.
  */

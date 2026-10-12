@@ -39,7 +39,7 @@ import java.util.List;
 import static com.kolodkingal.enhanced.client.render.EnergyGeometry.argb;
 
 /**
- * Everything the Mad Titan and the playable Thanos show that is not a body (DESIGN section 15.5.3): the tells a fighter
+ * Everything the Mad Titan and the playable Thanos show that is not a body (DESIGN section 15.14.2): the tells a fighter
  * reads to dodge (the rings on the ground that close in on the impact, the lines that whiten as the aim locks, the
  * sigils that mark a player), the beams, the portals, the falling stars of the stones arriving, the domes, the chains,
  * the pillars of the Soul World and the Time Stone's mandalas. The server sends one {@link ThanosFxPayload} for each,
