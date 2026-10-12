@@ -14,6 +14,14 @@ import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
+import com.kolodkingal.enhanced.client.render.ThanosMeteorRenderer;
+import com.kolodkingal.enhanced.client.render.ThanosModel;
+import com.kolodkingal.enhanced.client.render.ThanosOrbRenderer;
+import com.kolodkingal.enhanced.client.render.ThanosPhantomRenderer;
+import com.kolodkingal.enhanced.client.render.ThanosRenderer;
+import com.kolodkingal.enhanced.client.render.ThanosSwordModel;
+import com.kolodkingal.enhanced.client.render.ThanosSwordRenderer;
+import com.kolodkingal.enhanced.client.render.ThanosViewer;
 import com.kolodkingal.enhanced.client.render.ThrownWeaponRenderer;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModParticles;
@@ -55,6 +63,7 @@ public final class ClientSetup {
             // ===== phoenix =====
             // ===== spider =====
             // ===== thanos =====
+            ThanosViewer.register();
             // ===== ultron =====
             // ===== apocalypse =====
         });
@@ -85,11 +94,11 @@ public final class ClientSetup {
         // ===== phoenix =====
         // ===== spider =====
         // ===== thanos =====
-        event.registerEntityRenderer(ModEntities.THANOS.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_SWORD.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_METEOR.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_ORB.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_PHANTOM.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS.get(), ThanosRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_SWORD.get(), ThanosSwordRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_METEOR.get(), ThanosMeteorRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_ORB.get(), ThanosOrbRenderer::new);
+        event.registerEntityRenderer(ModEntities.THANOS_PHANTOM.get(), ThanosPhantomRenderer::new);
         // ===== ultron =====
         event.registerEntityRenderer(ModEntities.ULTRON.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.ULTRON_SENTRY.get(), NoopRenderer::new);
@@ -116,6 +125,8 @@ public final class ClientSetup {
         // ===== phoenix =====
         // ===== spider =====
         // ===== thanos =====
+        event.registerLayerDefinition(ThanosModel.LAYER, ThanosModel::createBodyLayer);
+        event.registerLayerDefinition(ThanosSwordModel.LAYER, ThanosSwordModel::createBodyLayer);
         // ===== ultron =====
         // ===== apocalypse =====
     }

@@ -172,6 +172,22 @@ public class ThanosEntity extends Monster implements BossHooks {
     private final Deque<Snapshot> history = new ArrayDeque<>();
     private final Map<UUID, Deque<Damage>> recentFrom = new HashMap<>();
 
+    // ---- the animation clock (both sides count; only the clients read it) ----
+    /** The state and move the clock below was last started for. */
+    private ThanosState clockState = ThanosState.ARRIVING;
+    private int clockMove = -2;
+    /** Ticks since the state last changed. */
+    private int stateClock;
+    /** Ticks since the move last began (kept in step with the move tick the server syncs). */
+    private int moveClock;
+    /** Ticks he has stood on the ground since the portal let go of him (clients: the landing is not synced). */
+    private int groundClock;
+    /**
+     * Whether the viewer put him in his pose: the partial tick is then ignored, so a pose held for a photograph holds
+     * still.
+     */
+    private boolean shown;
+
     // ---- walking and aiming ----
     @Nullable
     private UUID targetId;
@@ -355,6 +371,87 @@ public class ThanosEntity extends Monster implements BossHooks {
     /** His chest: where a beam leaves from and where his eyes look. */
     public Vec3 chest() {
         return position().add(0.0, 2.3, 0.0);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // The animation clock
+
+    @Override
+    public void tick() {
+        super.tick();
+        tickAnimation();
+    }
+
+    /**
+     * Counts the ticks since the state and the move began, so that the model needs no clock of its own: a state has no
+     * synced tick except a move's, and the move's arrives with the network's jitter, so the count runs locally and is
+     * only pulled forward to the synced tick when that is ahead of it.
+     */
+    private void tickAnimation() {
+        ThanosState state = state();
+        int move = entityData.get(DATA_MOVE);
+        int synced = moveTick();
+        if (state != clockState) {
+            clockState = state;
+            stateClock = 0;
+        } else {
+            stateClock++;
+        }
+        if (move != clockMove) {
+            clockMove = move;
+            moveClock = synced;
+        } else {
+            moveClock = Math.max(moveClock + 1, synced);
+        }
+        groundClock = state == ThanosState.ARRIVING && onGround() ? groundClock + 1 : 0;
+    }
+
+    /**
+     * The ticks since his state last changed, with the partial tick: how far into a surge, a stagger or the death he
+     * is.
+     */
+    public float stateTime(float partialTick) {
+        return stateClock + (shown ? 0.0F : partialTick);
+    }
+
+    /** The ticks since he landed, with the partial tick, or -1 while he is still falling through the portal. */
+    public float landedTime(float partialTick) {
+        return groundClock > 0 ? groundClock - 1 + (shown ? 0.0F : partialTick) : -1.0F;
+    }
+
+    /** The ticks since his move began, with the partial tick: the time the pose of the move is read at. */
+    public float moveTime(float partialTick) {
+        return moveClock + (shown ? 0.0F : partialTick);
+    }
+
+    /**
+     * Whether this is the client-only copy of {@code /enhanced_model}: it is a picture, not a Thanos (no bar, no music,
+     * no fog).
+     */
+    public boolean shownByViewer() {
+        return shown;
+    }
+
+    /**
+     * Puts the client-only copy that {@code /enhanced_model} shows in a state: what the model reads, and nothing else.
+     * (The viewer sets it every tick; no server ever calls this.)
+     *
+     * @param moveTick the tick of the move, or the time in the state for those that have no move
+     */
+    public void showState(ThanosState state, @Nullable ThanosMove move, int moveTick, int stones, int plates, int flags, Vec3 aim) {
+        entityData.set(DATA_STATE, (byte) state.ordinal());
+        entityData.set(DATA_MOVE, (byte) (move == null ? -1 : move.ordinal()));
+        entityData.set(DATA_MOVE_TICK, moveTick);
+        entityData.set(DATA_STONES, (byte) Mth.clamp(stones, 1, StoneKind.granted().size()));
+        entityData.set(DATA_PLATES, (byte) (plates & ThanosDefence.ALL_PLATES));
+        entityData.set(DATA_FLAGS, flags);
+        entityData.set(DATA_AIM, new Vector3f((float) aim.x, (float) aim.y, (float) aim.z));
+        clockState = state;
+        clockMove = move == null ? -1 : move.ordinal();
+        stateClock = moveTick;
+        moveClock = moveTick;
+        groundClock = moveTick + 1;
+        shown = true;
     }
 
     // ---------------------------------------------------------------------------------------------------------
