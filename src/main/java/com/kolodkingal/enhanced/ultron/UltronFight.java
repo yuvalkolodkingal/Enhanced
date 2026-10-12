@@ -1027,6 +1027,8 @@ public final class UltronFight extends BossFight {
     @Override
     protected void onEnd(BossEnd why) {
         ended = why;
+        // The Program is settled (given back, or not owed): a crash from here on must not give it again.
+        SokoviaJournal.deleteRitual(server(), id());
         UltronEntity boss = boss();
         VibraniumKeyEntity key = key();
         if (key != null) {
@@ -1084,6 +1086,8 @@ public final class UltronFight extends BossFight {
         } finally {
             setHexExempt(false);
             island.landIsland();
+            // (The note that gives the Program back after a crash: the fight is over, the island's own note is not touched.)
+            SokoviaJournal.deleteRitual(server(), id());
         }
     }
 

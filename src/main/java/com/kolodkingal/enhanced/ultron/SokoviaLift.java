@@ -710,6 +710,9 @@ public final class SokoviaLift implements LiftHook {
             if (step == Step.DONE || step == Step.TREMOR || step == Step.WARNED) {
                 return;
             }
+            if (header != null && header.refund() && fight.isOver()) {
+                settleTheProgram();
+            }
             if (fight.isOver() && (step == Step.LOCKED || step == Step.RISING)) {
                 // The fight ended before the island was placed (an operator, a defeat): nobody is left hanging in the
                 // air.
@@ -746,6 +749,20 @@ public final class SokoviaLift implements LiftHook {
             }
             if (level.getGameTime() % 20 == 0) {
                 SokoviaRecovery.sweepStale(level);
+            }
+        }
+
+        /**
+         * The fight is over, so its Program is settled (it was given back, or the fight was won or lost and none is owed):
+         * the note stops saying it is owed, or a crash during the wind-down would give a second one on top of the reward.
+         */
+        private void settleTheProgram() {
+            Header settled = header.withoutRefund();
+            header = settled;
+            try {
+                SokoviaJournal.write(level.getServer(), settled);
+            } catch (IOException e) {
+                Enhanced.LOGGER.error("Ultron's journal could not be updated", e);
             }
         }
 

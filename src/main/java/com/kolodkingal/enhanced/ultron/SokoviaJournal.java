@@ -46,6 +46,12 @@ public final class SokoviaJournal {
     public static final String PASTED = "PASTED";
     /** The island is being taken down. */
     public static final String CLEARING = "CLEARING";
+    /**
+     * The fight was woken with a Program and no island has risen yet: the note only says who is owed it back, so that a
+     * crash on the ground does not cost the Program (it is written at the ritual and deleted when the fight is let go;
+     * the lift's own note replaces it once the island is placed). It clears nothing: its heights are an empty range.
+     */
+    public static final String RITUAL = "RITUAL";
 
     /** The folder of the notes, inside the world. */
     public static final String DIRECTORY = "data/enhanced/sokovia";
@@ -55,7 +61,7 @@ public final class SokoviaJournal {
     /**
      * What a note says.
      *
-     * @param state   {@link #PASTED} or {@link #CLEARING}
+     * @param state   {@link #PASTED}, {@link #CLEARING} or {@link #RITUAL}
      * @param minY    the lowest block of the island in the sky
      * @param maxY    the highest
      * @param summoner whoever started the fight (the Program is given back to them after a crash), or null
@@ -69,12 +75,27 @@ public final class SokoviaJournal {
             members = List.copyOf(members);
         }
 
+        /** The note of a fight that has not lifted anything yet: it only says who is owed the Program back. */
+        public static Header ritual(UUID fight, ResourceKey<Level> dimension, BlockPos centre, Spec spec, @Nullable UUID summoner) {
+            return new Header(fight, dimension, centre, spec, 0, -1, RITUAL, summoner, true, List.of());
+        }
+
+        /** Whether this is the ritual's note, which has no island to clear. */
+        public boolean isRitual() {
+            return RITUAL.equals(state);
+        }
+
         public Header withState(String next) {
             return new Header(fight, dimension, centre, spec, minY, maxY, next, summoner, refund, members);
         }
 
         public Header withMembers(List<UUID> next) {
             return new Header(fight, dimension, centre, spec, minY, maxY, state, summoner, refund, next);
+        }
+
+        /** The same note once the Program is settled (the fight is over: given back or not owed), so a crash gives nothing. */
+        public Header withoutRefund() {
+            return new Header(fight, dimension, centre, spec, minY, maxY, state, summoner, false, members);
         }
 
         public CompoundTag toTag() {
@@ -112,7 +133,7 @@ public final class SokoviaJournal {
             }
             ResourceLocation dimension = ResourceLocation.tryParse(tag.getString("dim"));
             String state = tag.getString("state");
-            if (dimension == null || !(state.equals(PASTED) || state.equals(CLEARING))) {
+            if (dimension == null || !(state.equals(PASTED) || state.equals(CLEARING) || state.equals(RITUAL))) {
                 return null;
             }
             int[] centre = tag.getIntArray("centre");
@@ -160,6 +181,24 @@ public final class SokoviaJournal {
             Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    /**
+     * Deletes the fight's note if it is the ritual's (the fight is over and the Program is not owed): the note of an
+     * island that may still be in the sky is never touched here.
+     */
+    public static void deleteRitual(MinecraftServer server, UUID fight) {
+        Path path = file(server, fight);
+        if (!Files.isRegularFile(path)) {
+            return;
+        }
+        try {
+            if (RITUAL.equals(NbtIo.readCompressed(path, NbtAccounter.unlimitedHeap()).getString("state"))) {
+                delete(server, fight);
+            }
+        } catch (IOException | RuntimeException e) {
+            Enhanced.LOGGER.error("Could not read the Sokovia journal {} to delete it", path, e);
         }
     }
 

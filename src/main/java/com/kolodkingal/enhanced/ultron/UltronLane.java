@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ultron;
 
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossLane;
@@ -20,6 +21,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.function.Predicate;
 
 /**
@@ -120,8 +122,23 @@ public final class UltronLane implements BossLane {
             fight.refundOnFailure(program);
             fight.markProgramUsed();
             program.consume(1, starter);
+            writeRitualNote(level, fight, centre, starter);
         }
         return fight;
+    }
+
+    /**
+     * The fight used up a Program, which a crash must not cost the player: a small note on disk (it is deleted when the
+     * fight is let go, and replaced by the lift's own once an island is placed) says who is owed it back. If it cannot be
+     * written the fight goes on without it.
+     */
+    private static void writeRitualNote(ServerLevel level, UltronFight fight, Vec3 centre, ServerPlayer starter) {
+        try {
+            SokoviaJournal.write(level.getServer(), SokoviaJournal.Header.ritual(fight.id(), level.dimension(), BlockPos.containing(centre),
+                    SokoviaShape.Spec.ofConfig(0L), starter.getUUID()));
+        } catch (IOException e) {
+            Enhanced.LOGGER.error("The note that gives the Program back after a crash could not be written", e);
+        }
     }
 
     // ---- the checks ----

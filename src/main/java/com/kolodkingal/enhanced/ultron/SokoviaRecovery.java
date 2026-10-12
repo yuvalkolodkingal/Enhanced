@@ -111,9 +111,7 @@ public final class SokoviaRecovery {
             for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, box)) {
                 item.setExtendedLifetime(); // (a drop kept for the fight would otherwise lie there for ever)
             }
-            if (header.refund() && header.summoner() != null) {
-                BossGifts.add(level.getServer(), header.summoner(), new ItemStack(ModItems.ULTRON_PROGRAM.get()));
-            }
+            payBack(level.getServer(), header);
             SokoviaJournal.delete(level.getServer(), header.fight());
             release();
             Enhanced.LOGGER.info("Ultron's floating island of fight {} was cleared", header.fight());
@@ -134,12 +132,20 @@ public final class SokoviaRecovery {
      * At the start of the server (the levels exist and nothing has ticked): every note on disk becomes a job. A note of
      * a dimension that is not there stays, for when it is.
      *
-     * @return how many jobs began
+     * @return how many jobs began (a note of a fight that never lifted anything has no job: its Program is just given
+     * back)
      */
     public static int recoverAll(MinecraftServer server) {
         int began = 0;
         for (Header header : SokoviaJournal.readAll(server)) {
             if (JOBS.stream().anyMatch(job -> job.header.fight().equals(header.fight()))) {
+                continue;
+            }
+            if (header.isRitual()) {
+                // A crash on the ground: no island was ever placed, so there is nothing to clear, but the Program is owed.
+                payBack(server, header);
+                SokoviaJournal.delete(server, header.fight());
+                Enhanced.LOGGER.warn("Ultron's fight {} was cut short by a crash: the Program is given back", header.fight());
                 continue;
             }
             ServerLevel level = server.getLevel(header.dimension());
@@ -154,6 +160,13 @@ public final class SokoviaRecovery {
             Enhanced.LOGGER.warn("Ultron's island of fight {} was left in the sky ({}): clearing it", header.fight(), header.state());
         }
         return began;
+    }
+
+    /** Gives the Program back to whoever the note says used it, at their next login (a fight that was cut short). */
+    private static void payBack(MinecraftServer server, Header header) {
+        if (header.refund() && header.summoner() != null) {
+            BossGifts.add(server, header.summoner(), new ItemStack(ModItems.ULTRON_PROGRAM.get()));
+        }
     }
 
     /** Works on the recoveries of this level, a slice a tick. */

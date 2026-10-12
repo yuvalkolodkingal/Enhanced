@@ -158,7 +158,7 @@ public final class SokoviaRecoveryTests {
 
     @GameTest(template = PAD, batch = "ultron_lift_crash_rising", timeoutTicks = 400)
     public static void aCrashWhileTheIslandRisesLeavesNothingToClear(GameTestHelper helper) {
-        crash(helper, fight -> in(fight, SokoviaLift.Step.RISING) && SokoviaLift.of(fight).altitude() > 8.0, false, null);
+        crash(helper, fight -> in(fight, SokoviaLift.Step.RISING) && SokoviaLift.of(fight).altitude() > 8.0, false, SokoviaJournal.RITUAL);
     }
 
     @GameTest(template = PAD, batch = "ultron_lift_crash_placing", timeoutTicks = 400)
@@ -184,7 +184,8 @@ public final class SokoviaRecoveryTests {
      * gives everyone who was up there a record to be set down when they log in, and deletes the note. Then a player
      * logs in (still marked as carried, up in the sky) and is set down on the ground.
      *
-     * @param note the state the journal says at that moment, or null if there is none
+     * @param note the state the journal says at that moment (before the island is placed it is the ritual's note, which
+     *             only says who is owed the Program)
      */
     private static void crash(GameTestHelper helper, Predicate<UltronFight> when, boolean island, String note) {
         TestKit.Fixture f = pad(helper);
@@ -219,28 +220,40 @@ public final class SokoviaRecoveryTests {
             SokoviaLift.Lift lift = SokoviaLift.of(fight);
             int placed = blocksInTheSky(helper);
             check((placed > 0) == island, "the island is in the sky or not, as the case wants: " + placed + " blocks");
-            if (note == null) {
-                check(journals(level).isEmpty(), "no journal was written before the island was placed");
+            List<SokoviaJournal.Header> notes = SokoviaJournal.readAll(server);
+            check(notes.size() == 1 && notes.get(0).state().equals(note), "the journal says " + note + ": " + notes.stream().map(SokoviaJournal.Header::state).toList());
+            boolean ritual = SokoviaJournal.RITUAL.equals(note);
+            if (ritual) {
+                check(!island && notes.get(0).refund() && starter.getUUID().equals(notes.get(0).summoner()), "before the island is placed the note only says who is owed the Program");
             } else {
-                List<SokoviaJournal.Header> notes = SokoviaJournal.readAll(server);
-                check(notes.size() == 1 && notes.get(0).state().equals(note), "the journal says " + note + ": " + notes.stream().map(SokoviaJournal.Header::state).toList());
                 check(notes.get(0).minY() <= abs(helper, 0, SURFACE + 8 + LIFT, 0).getY() && notes.get(0).members().contains(starter.getUUID()), "and lists the fighter");
+                // A fight that was won has settled its Program (the reward is the Core): the note owes nothing.
+                check(notes.get(0).refund() == !descent, "the note says whether the Program is still owed: " + notes.get(0).refund());
             }
-            // The process dies: nothing is cleaned up, the journal stays, the world stays.
+            // The process dies: nothing is cleaned up, the journal stays, the world stays. (Letting the fight go here is
+            // how the test throws it away; the note it deletes is put back, as a crash would have left it.)
             SokoviaLift.clear();
             BossFights.clear();
+            for (SokoviaJournal.Header header : notes) {
+                try {
+                    SokoviaJournal.write(server, header);
+                } catch (java.io.IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
             check(blocksInTheSky(helper) == placed, "nothing of the island was touched by the end of the fight");
             int began = SokoviaRecovery.recoverAll(server);
-            check(began == (note == null ? 0 : 1), "the next start finds " + began + " journals");
+            check(began == (ritual ? 0 : 1), "the next start finds " + began + " islands to clear");
             check(lift != null, "(there was a lift)");
         });
         script.step("the next start clears the island", () -> SokoviaRecovery.pending() == 0 && blocksInTheSky(helper) == 0);
         script.then("and puts things right", () -> {
             check(groundHash(helper) == ground, "the ground is as it was");
             check(journals(level).isEmpty(), "the journal is deleted");
-            if (note != null) {
-                check(BossGifts.pending(server, starter.getUUID()).stream().anyMatch(stack -> stack.is(ModItems.ULTRON_PROGRAM.get())),
-                        "the Program is owed to the summoner");
+            // (A crash in the wind-down of a won fight gives no Program on top of the Core.)
+            check(BossGifts.pending(server, starter.getUUID()).stream().anyMatch(stack -> stack.is(ModItems.ULTRON_PROGRAM.get())) == !descent,
+                    descent ? "no Program is owed after a won fight" : "the Program is owed to the summoner");
+            if (!SokoviaJournal.RITUAL.equals(note)) {
                 SokoviaRelocations.Entry entry = SokoviaRelocations.of(server).of(starter.getUUID());
                 check(entry != null && entry.down() == LIFT, "and the fighter has a record to be set down");
             }
@@ -252,6 +265,45 @@ public final class SokoviaRecoveryTests {
             check(SokoviaRelocations.of(server).of(starter.getUUID()) == null, "and the record is used up");
         });
         script.run(f, 380);
+    }
+
+    /**
+     * The Program is used up by the ritual, so a crash on the ground (no island was ever placed) must not keep it: a note
+     * written at the ritual says who is owed it, a crash leaves it, and the next start gives the Program back and
+     * deletes the note. A fight that ends by itself leaves no note.
+     */
+    @GameTest(template = PAD, batch = "ultron_crash_ground", timeoutTicks = 300)
+    public static void aCrashOnTheGroundGivesTheProgramBackAndAnEndedFightLeavesNoNote(GameTestHelper helper) throws java.io.IOException {
+        TestKit.Fixture f = pad(helper);
+        MinecraftServer server = f.level().getServer();
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        tank(starter);
+        UltronFight fight = ritual(f, starter);
+        calm(fight);
+        List<SokoviaJournal.Header> notes = SokoviaJournal.readAll(server);
+        check(notes.size() == 1 && notes.get(0).isRitual() && notes.get(0).fight().equals(fight.id()), "the ritual left a note");
+        check(starter.getInventory().countItem(ModItems.ULTRON_PROGRAM.get()) == 0, "the Program is used up");
+        // The process dies on the ground: the note stays; the next start gives the Program back.
+        SokoviaLift.clear();
+        BossFights.clear();
+        check(journals(f.level()).isEmpty(), "(letting the fight go in the test deletes its note, as an end does)");
+        SokoviaJournal.write(server, notes.get(0));
+        check(SokoviaRecovery.recoverAll(server) == 0, "there is no island to clear");
+        check(journals(f.level()).isEmpty(), "the note is deleted");
+        check(BossGifts.pending(server, starter.getUUID()).stream().anyMatch(stack -> stack.is(ModItems.ULTRON_PROGRAM.get())), "and the Program is owed to the summoner");
+        // A fight that ends by itself (an operator's stop: the Program comes back at once) leaves no note.
+        UltronFight second = ritual(f, starter);
+        calm(second);
+        check(journals(f.level()).size() == 1, "the second ritual wrote its note");
+        second.end(BossEnd.COMMAND);
+        f.everyTick(200, tick -> {
+            if (!second.isFinished()) {
+                return false;
+            }
+            check(journals(f.level()).isEmpty(), "an ended fight leaves no note");
+            check(starter.getInventory().countItem(ModItems.ULTRON_PROGRAM.get()) == 1, "and the Program came back to the starter");
+            return true;
+        });
     }
 
     // ------------------------------------------------------------------------------------------------------------
