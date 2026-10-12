@@ -1210,14 +1210,16 @@ public final class SpiderServer implements HeroServer {
         ServerLevel level = player.serverLevel();
         Vec3 middle = target.position().add(0, target.getBbHeight() * 0.5, 0);
         Vec3 from = player.position().add(0, player.getBbHeight() * 0.75, 0);
-        double damage = kill && !killImmune(target) ? SpiderConfig.INSTANT_KILL_DAMAGE.get() : SpiderConfig.LEGS_DAMAGE.get();
+        boolean deadly = kill && !killImmune(target);
+        double damage = deadly ? SpiderConfig.INSTANT_KILL_DAMAGE.get() : SpiderConfig.LEGS_DAMAGE.get();
         int leg = state.legCursor++ % LEGS;
         WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, player, from, middle, 1.0F);
         if (shield != null) {
             payShield(player, shield, (float) Math.min(damage, 5.0));
             return;
         }
-        if (kill) {
+        if (deadly) {
+            // (A boss or its minion gets the legs' damage by the vanilla rhythm of hits, not a hit every strike.)
             target.invulnerableTime = 0;
         }
         DamageSource source = ModDamageTypes.source(level, ModDamageTypes.SPIDER_LEGS, player, player);

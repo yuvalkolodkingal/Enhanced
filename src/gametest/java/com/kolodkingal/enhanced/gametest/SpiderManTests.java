@@ -951,6 +951,46 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
+    /**
+     * Instant Kill takes a hit off a boss's minion at the rhythm of the game's own invulnerability, as the legs' guard
+     * does, not at every strike: a leg that resets the minion's invulnerability for every strike (as it does for the
+     * creatures it kills) would hit it twice as often, and four legs would clear a boss's army in seconds.
+     */
+    @GameTest(template = ARENA, batch = "spider_instant_kill_does_not_hasten_the_blows_on_a_minion", timeoutTicks = 100)
+    public static void instantKillDoesNotHastenTheBlowsOnAMinionOfAFight(GameTestHelper helper) {
+        TestKit.Fixture f = BossFrameworkTests.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer player = spider(f, 10.5, 7.5);
+        wear(player, "iron_spider");
+        press(player, 4);
+        BossTestSupport.TestFight fight = BossFrameworkTests.start(f, BossKind.ULTRON, player,
+                BossFrameworkTests.fight(f, BossKind.ULTRON, BossArena.Containment.NONE, true));
+        Husk husk = EntityType.HUSK.create(level);
+        husk.moveTo(abs(helper, 10.5, FLOOR, 10.5));
+        husk.setNoAi(true);
+        toughen(husk);
+        fight.spawn(husk);
+        check(BossFights.isMinion(husk), "the Husk is a minion of the fight");
+        pressSneaking(player, 4);
+        pressSneaking(player, 4);
+        check(data(player).is(Live.INSTANT_KILL), "Instant Kill is on");
+        float before = husk.getHealth();
+        float legs = SpiderConfig.LEGS_DAMAGE.get().floatValue();
+        int strikes = 36 / SpiderConfig.INSTANT_KILL_INTERVAL.get() + 1;
+        f.everyTick(36, tick -> {
+            PowerTicker.tick(player);
+            if (tick < 36) {
+                return false;
+            }
+            float lost = before - husk.getHealth();
+            check(lost >= 2 * legs * 0.7F, "the minion did take the legs' blows: " + lost);
+            // Vanilla lets a hit through every ten ticks (four of them in 36 ticks); a leg that resets the minion's
+            // invulnerability at every strike would land every one of them.
+            check(lost <= 5 * legs + 0.01F, "but no more often than the game's own rhythm lets them (" + strikes + " strikes, " + lost + " lost)");
+            return true;
+        });
+    }
+
     @GameTest(template = ARENA, batch = "spider_no_web_block_goes_up_in_a_protected_arena")
     public static void noWebBlockGoesUpInAProtectedArena(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
