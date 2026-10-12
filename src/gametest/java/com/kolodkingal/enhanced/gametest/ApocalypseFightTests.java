@@ -27,6 +27,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -36,6 +37,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -235,6 +237,41 @@ public final class ApocalypseFightTests {
                 run.done = true;
             }
         });
+    }
+
+    /**
+     * The Horsemen are one side (found in the real game: War's volley cut Pestilence down, Famine was hurt and War slew
+     * him, all within half a minute of their coming). Neither his shards nor his axe hurt another Horseman, nor do they
+     * hurt the boss, and no Horseman takes another for a target. One that a Phoenix holds is hers: it fights them, and
+     * they may fight it back.
+     */
+    @GameTest(template = ARENA, batch = "apocalypse_horsemen_one_side", timeoutTicks = 60)
+    public static void horsemenDoNotHurtOneAnother(GameTestHelper helper) {
+        Duel d = duel(helper, 2, Power.NONE);
+        ServerLevel level = d.level();
+        Husk war = d.fight().horsemen().spawn(level, Horsemen.Kind.WAR, helper.absoluteVec(new Vec3(6.5, FLOOR, 16.5)));
+        Husk pestilence = d.fight().horsemen().spawn(level, Horsemen.Kind.PESTILENCE, helper.absoluteVec(new Vec3(8.5, FLOOR, 16.5)));
+        war.setNoAi(true);
+        pestilence.setNoAi(true);
+        float full = pestilence.getHealth();
+        IronShrapnelEntity shard = new IronShrapnelEntity(level, war);
+        check(!pestilence.hurt(ModDamageTypes.source(level, ModDamageTypes.SHRAPNEL, war, shard), 4.0F), "War's shard does not hurt Pestilence");
+        check(!pestilence.hurt(level.damageSources().mobAttack(war), 7.0F), "nor does his axe");
+        check(!war.hurt(level.damageSources().mobAttack(d.boss()), 7.0F), "nor does the boss hurt his own");
+        check(pestilence.getHealth() == full && pestilence.getLastHurtByMob() == null, "Pestilence is whole and holds nothing against War");
+        float shield = d.boss().shield().strength();
+        check(!d.boss().hurt(ModDamageTypes.source(level, ModDamageTypes.SHRAPNEL, war, shard), 4.0F) && d.boss().shield().strength() == shield,
+                "a shard of War's that flies into the boss is nothing to him");
+        pestilence.setTarget(war);
+        check(pestilence.getTarget() == null, "Pestilence does not take War for a target");
+        pestilence.setTarget(d.hero());
+        check(pestilence.getTarget() == d.hero(), "the fighters are still its prey");
+        // Taken over by a Phoenix, War fights for her, and Pestilence may answer.
+        war.addEffect(new MobEffectInstance(ModEffects.POSSESSED, 200));
+        check(pestilence.hurt(level.damageSources().mobAttack(war), 3.0F), "a possessed War strikes Pestilence");
+        pestilence.setTarget(war);
+        check(pestilence.getTarget() == war, "and Pestilence may fight him back");
+        helper.succeed();
     }
 
     // ------------------------------------------------------------------------------------------------------------

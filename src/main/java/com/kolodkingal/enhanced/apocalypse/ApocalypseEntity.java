@@ -463,11 +463,18 @@ public class ApocalypseEntity extends Monster implements BossHooks {
         }
     }
 
-    /** One projectile turned away by the shield. */
+    /**
+     * One projectile turned away by the shield. An arrow never reaches {@link #hurt} (it turns to dust first), so the
+     * fight is told here too: his line about arrows and the Tower of Babel is for the first arrow as much as the first blow.
+     */
     public void neutralise(Projectile projectile) {
         if (level() instanceof ServerLevel server) {
             WandaAbilities.neutralize(server, projectile, SHIELD_GOLD);
             deflectEffects(projectile.position(), true);
+            ApocalypseFight fight = fight();
+            if (fight != null) {
+                fight.onDeflected();
+            }
         }
     }
 
@@ -510,8 +517,8 @@ public class ApocalypseEntity extends Monster implements BossHooks {
             }
             return super.hurt(source, amount);
         }
-        if (fight == null || fight.bossInvulnerable() || amount <= 0.0F) {
-            return false;
+        if (fight == null || fight.bossInvulnerable() || amount <= 0.0F || ApocalypseEvents.sameSide(this, source.getEntity())) {
+            return false; // (a shard of War's that flies into him is nothing: no ripple, no chime, no word about arrows)
         }
         fight.noteAttack(source);
         switch (shield.state()) {
@@ -598,7 +605,7 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     private void deflect(DamageSource source) {
         ApocalypseFight fight = fight();
         if (fight != null) {
-            fight.onDeflected(source);
+            fight.onDeflected();
         }
         deflectEffects(hitPoint(source), false);
     }

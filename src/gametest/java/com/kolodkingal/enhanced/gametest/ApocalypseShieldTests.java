@@ -348,6 +348,34 @@ public final class ApocalypseShieldTests {
         level.addFreshEntity(projectile);
     }
 
+    /**
+     * His line about arrows is for the first arrow too (found in the real game: an arrow turns to dust before it reaches
+     * {@code hurt}, so only a later sword blow made him say it): "You can fire your arrows from the Tower of Babel, but you
+     * can never strike God!", once.
+     */
+    @GameTest(template = ARENA, batch = "apocalypse_babel", timeoutTicks = 60)
+    public static void theFirstArrowEarnsHisLineAboutBabel(GameTestHelper helper) {
+        Duel d = duel(helper, 1, Power.NONE);
+        ServerLevel level = d.level();
+        ApocalypseEntity boss = d.boss();
+        ApocalypseTestSupport.Log log = new ApocalypseTestSupport.Log(d.hero());
+        log.drain();
+        check(!log.said("speech.enhanced.apocalypse.babel"), "nothing has touched the shield yet");
+        Arrow shot = EntityType.ARROW.create(level);
+        shot.setOwner(d.hero());
+        shot.pickup = AbstractArrow.Pickup.DISALLOWED;
+        fly(level, shot, new Vec3(boss.getX() + 5.0, boss.getY() + 1.4, boss.getZ()));
+        float strength = boss.shield().strength();
+        every(helper, 40, tick -> {
+            if (!shot.isRemoved()) {
+                return false;
+            }
+            check(boss.shield().strength() == strength, "the arrow wore nothing");
+            check(log.drain().said("speech.enhanced.apocalypse.babel"), "the first arrow turned away makes him speak of Babel");
+            return true;
+        });
+    }
+
     @GameTest(template = ARENA, batch = "apocalypse_beam", timeoutTicks = 120)
     public static void chaosBeamWearsTheShieldNotTheHealth(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
