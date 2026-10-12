@@ -84,20 +84,19 @@ public final class ApocalypseClient implements HeroClient {
     @Override
     @Nullable
     public GestureId predictedGesture(HeroAnimState s, PowerData data, int ability, long now, boolean sneaking) {
+        GestureId id = null;
         if (ability == 1 && data.isReady(1, now)) {
-            return sneaking ? GestureId.APOC_ENTOMB : GestureId.APOC_SAND_WAVE;
+            id = sneaking ? GestureId.APOC_ENTOMB : GestureId.APOC_SAND_WAVE;
+        } else if (ability == 3 && data.isReady(3, now)) {
+            id = GestureId.APOC_PORTAL;
+        } else if (ability == 4 && data.isReady(4, now) && !data.chaosShieldActive()) {
+            id = GestureId.APOC_SHIELD_RAISE;
+        } else if (ability == 5 && data.isReady(5, now)) {
+            id = sneaking ? GestureId.APOC_STORM_START : GestureId.APOC_BESTOW;
         }
-        if (ability == 3 && data.isReady(3, now)) {
-            return GestureId.APOC_PORTAL;
-        }
-        if (ability == 4 && data.isReady(4, now) && !data.chaosShieldActive()) {
-            // The server refuses a shield he cannot pay for: do not raise his arms for nothing.
-            return ApocalypseActing.canPayForShield() ? GestureId.APOC_SHIELD_RAISE : null;
-        }
-        if (ability == 5 && data.isReady(5, now)) {
-            return sneaking ? GestureId.APOC_STORM_START : GestureId.APOC_BESTOW;
-        }
-        return null;
+        // What the server will refuse is not acted: no Wave without ground, no Entomb with nobody to close on, no Portal at the
+        // sky, no shield on an empty stomach, nothing at all while he is entombed.
+        return id != null && ApocalypseHeroMath.works(ability, sneaking) ? id : null;
     }
 
     // ---- which gesture stands for what ----
@@ -152,6 +151,7 @@ public final class ApocalypseClient implements HeroClient {
 
     @Override
     public void tick(Minecraft mc) {
+        ApocalypseHeroMath.installCastCheck(ApocalypseActing::canCast);
         ClientLevel level = mc.level;
         if (level != null) {
             ApocalypseActing.tick(level);

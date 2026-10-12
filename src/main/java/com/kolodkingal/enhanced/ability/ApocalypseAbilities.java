@@ -73,8 +73,6 @@ public final class ApocalypseAbilities {
     private static final int PORTAL_SLOT = 3;
     private static final int BESTOW_SLOT = 5;
 
-    /** How far below him the ground may be for the Wave. */
-    private static final double GROUND_REACH = 6.0;
     /** The Wave is four wide and a little over a block tall; it throws what it hits a block along it. */
     private static final double WAVE_WIDTH = 4.0;
     private static final double WAVE_HEIGHT = 1.1;
@@ -219,11 +217,11 @@ public final class ApocalypseAbilities {
             return;
         }
         // A levitating Apocalypse casts it at the ground beneath; with none in reach there is no sand to pull.
-        double ground = SandControl.groundAt(level, player.getX(), player.getY() + 0.5, player.getZ());
-        if (player.getY() - ground > GROUND_REACH) {
+        if (!ApocalypseAim.waveHasGround(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.sand.no_ground"), true);
             return;
         }
+        double ground = SandControl.groundAt(level, player.getX(), player.getY() + 0.5, player.getZ());
         Vec3 dir = SandControl.flat(Vec3.ZERO, player.getLookAngle());
         if (dir.equals(Vec3.ZERO)) {
             dir = Vec3.directionFromRotation(0.0F, player.getYRot());
@@ -249,8 +247,7 @@ public final class ApocalypseAbilities {
         if (!data.isReady(WAVE_SLOT, now)) {
             return;
         }
-        EntityHitResult hit = Raycasts.entity(player, ApocalypseConfig.ENTOMB_RANGE.get(), 0.3,
-                e -> e instanceof LivingEntity && e != player && !e.isSpectator() && !(e instanceof ArmorStand), 1.0F);
+        EntityHitResult hit = ApocalypseAim.entombTarget(player);
         if (hit == null) {
             player.displayClientMessage(Component.translatable("message.enhanced.entomb.nothing"), true);
             return;
@@ -293,7 +290,7 @@ public final class ApocalypseAbilities {
         if (!data.isReady(PORTAL_SLOT, now)) {
             return;
         }
-        BlockHitResult hit = Raycasts.block(player, ApocalypseConfig.PORTAL_RANGE.get(), 1.0F);
+        BlockHitResult hit = ApocalypseAim.portalTarget(player);
         if (hit.getType() == HitResult.Type.MISS) {
             player.displayClientMessage(Component.translatable("message.enhanced.portal.nothing"), true);
             return;

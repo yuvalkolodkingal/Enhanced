@@ -129,6 +129,9 @@ public class ApocalypseAnimationTests {
         for (int windUp = 4; windUp <= 60; windUp += 4) {
             assertNear(GestureId.APOC_SHIELD_RAISE.dur / ApocalypseHeroMath.raiseRate(windUp), windUp, 1.0E-3, "the arms are open at tick " + windUp);
         }
+        // Let go of within the wind-up, there is no shield to drop; once it has formed there is.
+        check(ApocalypseHeroMath.neverFormed(1005L, 1010L), "a tap of the key never forms the shield");
+        check(!ApocalypseHeroMath.neverFormed(1010L, 1010L) && !ApocalypseHeroMath.neverFormed(1200L, 1010L), "a held one does");
         helper.succeed();
     }
 
@@ -279,6 +282,23 @@ public class ApocalypseAnimationTests {
         check(hero.predictedGesture(null, data, 1, now + 60, false) == GestureId.APOC_SAND_WAVE, "and again when it is ready");
         data.raiseChaosShield(now, 10, 60.0F);
         check(hero.predictedGesture(null, data, 4, now + 5, false) == null, "a shield that is up is not raised again");
+        // What the client can tell the server will refuse is not acted (here a check of the test's own: no ground for the
+        // Wave, nobody to close on, no block for the Portal, no food, and nothing while entombed). All in this one method,
+        // for the check is a static.
+        PowerData ready = new PowerData();
+        try {
+            ApocalypseHeroMath.installCastCheck((ability, sneaking) -> ability == 5);
+            check(hero.predictedGesture(null, ready, 1, now, false) == null, "no Wave without ground");
+            check(hero.predictedGesture(null, ready, 1, now, true) == null, "no Entomb with nobody to close on");
+            check(hero.predictedGesture(null, ready, 3, now, false) == null, "no Portal at the sky");
+            check(hero.predictedGesture(null, ready, 4, now, false) == null, "no shield on an empty stomach");
+            check(hero.predictedGesture(null, ready, 5, now, false) == GestureId.APOC_BESTOW, "and the keys that need nothing still act");
+            ApocalypseHeroMath.installCastCheck((ability, sneaking) -> false);
+            check(hero.predictedGesture(null, ready, 5, now, true) == null, "nothing at all while he is entombed");
+        } finally {
+            ApocalypseHeroMath.installCastCheck((ability, sneaking) -> true);
+        }
+        check(hero.predictedGesture(null, ready, 1, now, false) == GestureId.APOC_SAND_WAVE, "and the Wave acts again once the check is lifted");
         helper.succeed();
     }
 

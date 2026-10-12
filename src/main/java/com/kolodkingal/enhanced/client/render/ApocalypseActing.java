@@ -1,10 +1,13 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.ability.ApocalypseAim;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -144,12 +147,22 @@ final class ApocalypseActing {
     }
 
     /**
-     * Whether the local player can pay for the shield (it costs hunger). Kept here and not in the plug-in: the plug-in is
-     * loaded by the game tests on a server, and it must not need a client class (the local player) to be verified.
+     * Whether a key of the local hero will work, so far as the client can tell from where he stands and looks (the server
+     * refuses the rest, and his arms should not have reached for it): see {@link ApocalypseHeroMath#works}. Kept here and not in
+     * the plug-in: the plug-in is loaded by the game tests on a server, and it must not need a client class (the local player)
+     * to be verified.
      */
-    static boolean canPayForShield() {
+    static boolean canCast(int ability, boolean sneaking) {
         net.minecraft.client.player.LocalPlayer self = Minecraft.getInstance().player;
-        return self != null && ApocalypseGuard.canAfford(self);
+        if (self == null || self.isSpectator() || self.hasEffect(ModEffects.ENTOMBED)) {
+            return false; // (an entombed hero's presses are dropped by the server)
+        }
+        return switch (ability) {
+            case 1 -> sneaking ? ApocalypseAim.entombTarget(self) != null : ApocalypseAim.waveHasGround(self);
+            case 3 -> ApocalypseAim.portalHasPlace(self);
+            case 4 -> ApocalypseGuard.canAfford(self);
+            default -> true;
+        };
     }
 
     /** The wind-up (ticks) of the shield that is being raised: the data's if it has said, else the config's. */
@@ -179,7 +192,28 @@ final class ApocalypseActing {
         STORM_BURST
     }
 
-    private record Timed(int player, long from, long to, Kind kind) {
+    /** A flourish waiting for its time: {@code began} is when its gesture began, {@code seenUp} whether the shield was seen held since. */
+    private static final class Timed {
+        final int player;
+        final long from;
+        final long to;
+        final Kind kind;
+        final long began;
+        boolean seenUp;
+        boolean aborted;
+
+        Timed(int player, long from, long to, Kind kind, long began) {
+            this.player = player;
+            this.from = from;
+            this.to = to;
+            this.kind = kind;
+            this.began = began;
+        }
+
+        /** Whether this flourish is about the raising of the shield. */
+        boolean raising() {
+            return kind == Kind.SHIELD_GATHER || kind == Kind.SHIELD_FLASH;
+        }
     }
 
     private static final List<Timed> TIMED = new ArrayList<>();
@@ -198,12 +232,23 @@ final class ApocalypseActing {
             case APOC_PORTAL -> add(player, now + 5, now + 12, Kind.PORTAL_SPREAD);
             case APOC_SHIELD_RAISE -> {
                 // The gold gathers while the arms do (t4 to t14 of the keys) and is thrown open at t15, stretched with the wind-up.
-                int windUp = param > 0 ? Math.round(param) : windUp(com.kolodkingal.enhanced.power.Powers.get(player));
+                int windUp = param > 0 ? Math.round(param) : windUp(Powers.get(player));
                 float k = ApocalypseHeroMath.raiseRate(windUp);
                 add(player, now + Math.round(4 / k), now + Math.max(Math.round(14 / k), Math.round(4 / k)), Kind.SHIELD_GATHER);
                 add(player, now + Math.round(15 / k), now + Math.round(15 / k), Kind.SHIELD_FLASH);
             }
             case APOC_STORM_START -> add(player, now + 11, now + 11, Kind.STORM_BURST);
+            case APOC_SHIELD_DROP -> {
+                // Let go of before it formed: there is no shield to drop, the arms only go back down. The raise was released by
+                // the start of this gesture (they share a group); the drop would first throw them to the pose of the stance.
+                if (ApocalypseHeroMath.neverFormed(now, state.table.shieldFormedAt)) {
+                    for (HeroAnimState.Slot slot : state.slots) {
+                        if (slot.active && slot.id == GestureId.APOC_SHIELD_DROP) {
+                            slot.active = false;
+                        }
+                    }
+                }
+            }
             default -> {
             }
         }
@@ -216,7 +261,7 @@ final class ApocalypseActing {
         if (TIMED.size() >= MAX_TIMED) {
             TIMED.remove(0);
         }
-        TIMED.add(new Timed(player.getId(), from, to, kind));
+        TIMED.add(new Timed(player.getId(), from, to, kind, player.level().getGameTime()));
     }
 
     /** Runs the flourishes of this client tick. */
@@ -225,15 +270,26 @@ final class ApocalypseActing {
             return;
         }
         long now = level.getGameTime();
-        TIMED.removeIf(t -> now > t.to());
+        TIMED.removeIf(t -> now > t.to || t.aborted);
         if (quiet()) {
             return;
         }
         for (Timed t : TIMED) {
-            if (now < t.from() || !(level.getEntity(t.player()) instanceof AbstractClientPlayer player) || player.isInvisible()) {
+            if (!(level.getEntity(t.player) instanceof AbstractClientPlayer player)) {
                 continue;
             }
-            switch (t.kind()) {
+            if (t.raising()) {
+                // The shield was let go of (or refused) before it formed: the gold that was gathering for it is not thrown open.
+                boolean up = Powers.get(player).chaosShieldActive();
+                t.seenUp |= up;
+                if (GestureRoutes.shieldRaiseAborted(up, t.seenUp, now - t.began)) {
+                    t.aborted = true;
+                }
+            }
+            if (t.aborted || now < t.from || player.isInvisible()) {
+                continue;
+            }
+            switch (t.kind) {
                 case WAVE_THROW -> waveThrow(level, player);
                 case ENTOMB_CLENCH -> entombClench(level, player);
                 case PORTAL_SPREAD -> portalSpread(level, player);

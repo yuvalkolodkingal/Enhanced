@@ -30,6 +30,38 @@ public final class ApocalypseHeroMath {
         return entombCooldown > waveCooldown && cooldown > waveCooldown;
     }
 
+    /** What the client can tell of whether a key of his will work, from where he stands and looks (see {@link #works}). */
+    public interface CastCheck {
+        boolean works(int ability, boolean sneaking);
+    }
+
+    private static volatile CastCheck castCheck = (ability, sneaking) -> true;
+
+    /** Installed by the client's tick (the check needs the local player, which a game test server has not got). */
+    public static void installCastCheck(CastCheck check) {
+        castCheck = check;
+    }
+
+    /**
+     * Whether his own key press will work, so far as the client can tell: the Wave needs ground, the Entomb a creature to
+     * close on, the Portal a block, the shield food, and nothing works while he is entombed. A key that will be refused is not
+     * acted (the arms do not reach for nothing). Everything works until a client has installed its check.
+     */
+    public static boolean works(int ability, boolean sneaking) {
+        return castCheck.works(ability, sneaking);
+    }
+
+    /**
+     * Whether a shield that is being let go of never formed (the key was released within the wind-up): there is no shield to
+     * drop, so the arms only go back down, as Wanda's do, instead of being thrown to the pose of the stance first.
+     *
+     * @param now      the game time the shield is let go of
+     * @param formedAt the game time the last shield seen raised was (or would have been) complete
+     */
+    public static boolean neverFormed(long now, long formedAt) {
+        return now < formedAt;
+    }
+
     /** Whether the eyes glow: while the shield is up or the storm rages. */
     public static boolean eyesGlow(boolean shield, boolean storm) {
         return shield || storm;
