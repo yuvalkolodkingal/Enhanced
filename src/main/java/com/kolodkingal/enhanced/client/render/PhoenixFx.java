@@ -62,8 +62,6 @@ public final class PhoenixFx {
     /** Nothing farther than this from the camera is drawn or sparked. */
     private static final double DRAW_DISTANCE = 192.0;
     private static final double PARTICLE_DISTANCE = 96.0;
-    /** Closer to the camera than this, a spark would fill the screen. */
-    private static final double NEAR_CAMERA = 3.0;
     private static final int EMBERS = 150;
     private static final int FLAMES = 60;
     private static final int STREAKS = 48;
@@ -189,15 +187,15 @@ public final class PhoenixFx {
                 continue;
             }
             if (data.is(Live.PHOENIX_CHARGING)) {
-                chargeParticles(level, player, chargeOf(player, now), thin, random);
+                chargeParticles(level, camera, player, chargeOf(player, now), thin, random);
             }
             Long dome = DOMES.get(id);
             if (dome != null && now - dome <= PhoenixMath.DOME_GROW_TICKS) {
-                domeParticles(level, player, now - dome, thin, random);
+                domeParticles(level, camera, player, now - dome, thin, random);
             }
             if (data.toggle(Toggle.MIND_READING) && !data.is(Live.PHOENIX_CHARGING) && player.tickCount % 7 == player.getId() % 7
                     && random.nextFloat() < thin) {
-                readingMote(level, player, random);
+                readingMote(level, camera, player, random);
             }
         }
         CHARGING.keySet().retainAll(seen);
@@ -212,7 +210,7 @@ public final class PhoenixFx {
     /**
      * Embers rising from her shoulders and hands, and a flame from the hands now and then; more as the charge fills.
      */
-    private static void chargeParticles(ClientLevel level, AbstractClientPlayer player, float charge, float thin, RandomSource random) {
+    private static void chargeParticles(ClientLevel level, Vec3 camera, AbstractClientPlayer player, float charge, float thin, RandomSource random) {
         HumanoidArm[] sides = {HumanoidArm.RIGHT, HumanoidArm.LEFT};
         int count = Math.round((1 + 3 * Math.max(charge, 0.0F)) * thin);
         for (int i = 0; i < count; i++) {
@@ -224,6 +222,9 @@ public final class PhoenixFx {
                 double across = side == HumanoidArm.RIGHT ? 0.4 : -0.4;
                 at = player.position().add(-Math.cos(yaw) * across, 1.4, -Math.sin(yaw) * across);
             }
+            if (PhoenixMath.tooCloseToCamera(at.distanceToSqr(camera))) {
+                continue; // her own shoulders, seen from inside her head
+            }
             int colour = random.nextInt(3) == 0 ? PhoenixMath.FIRE_CORE : random.nextBoolean() ? PhoenixMath.FIRE_GOLD : PhoenixMath.FIRE_MAIN;
             level.addParticle(new EnergyParticleOptions(colour, 0.9F), at.x + (random.nextDouble() - 0.5) * 0.2, at.y,
                     at.z + (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.02, 0.05 + random.nextDouble() * 0.05,
@@ -231,14 +232,14 @@ public final class PhoenixFx {
         }
         if (player.tickCount % 4 == 0 && random.nextFloat() < thin) {
             Vec3 hand = HandTracker.hand(player, HumanoidArm.RIGHT, 0.0F);
-            if (hand != null) {
+            if (hand != null && !PhoenixMath.tooCloseToCamera(hand.distanceToSqr(camera))) {
                 level.addParticle(ParticleTypes.FLAME, hand.x, hand.y, hand.z, 0.0, 0.03, 0.0);
             }
         }
     }
 
     /** A ring of violet motes at the edge of the dome as it grows. */
-    private static void domeParticles(ClientLevel level, AbstractClientPlayer player, long age, float thin, RandomSource random) {
+    private static void domeParticles(ClientLevel level, Vec3 camera, AbstractClientPlayer player, long age, float thin, RandomSource random) {
         float radius = PhoenixMath.domeRadius(PhoenixConfig.psionicRadius(), age);
         Vec3 centre = player.position().add(0, player.getBbHeight() * 0.5, 0);
         int count = Math.round(24 * thin);
@@ -247,17 +248,26 @@ public final class PhoenixFx {
             double tilt = (random.nextDouble() - 0.5) * 0.6;
             double flat = Math.cos(tilt) * radius;
             int colour = random.nextInt(3) == 0 ? PhoenixAbilities.PSY_CORE : PhoenixAbilities.PSY_MAIN;
-            level.addParticle(new EnergyParticleOptions(colour, 1.0F), centre.x + Math.cos(angle) * flat, centre.y + Math.sin(tilt) * radius,
-                    centre.z + Math.sin(angle) * flat, 0.0, 0.01, 0.0);
+            double x = centre.x + Math.cos(angle) * flat;
+            double y = centre.y + Math.sin(tilt) * radius;
+            double z = centre.z + Math.sin(angle) * flat;
+            if (!PhoenixMath.tooCloseToCamera(camera.distanceToSqr(x, y, z))) {
+                level.addParticle(new EnergyParticleOptions(colour, 1.0F), x, y, z, 0.0, 0.01, 0.0);
+            }
         }
     }
 
     /** One violet mote drifting up round the head of a Phoenix who reads minds (about three a second). */
-    private static void readingMote(ClientLevel level, AbstractClientPlayer player, RandomSource random) {
+    private static void readingMote(ClientLevel level, Vec3 camera, AbstractClientPlayer player, RandomSource random) {
         double angle = random.nextDouble() * Mth.TWO_PI;
-        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? PhoenixAbilities.PSY_MAIN : PhoenixAbilities.PSY_CORE, 0.7F),
-                player.getX() + Math.cos(angle) * 0.4, player.getEyeY() + (random.nextDouble() - 0.3) * 0.4,
-                player.getZ() + Math.sin(angle) * 0.4, 0.0, 0.015, 0.0);
+        double x = player.getX() + Math.cos(angle) * 0.4;
+        double y = player.getEyeY() + (random.nextDouble() - 0.3) * 0.4;
+        double z = player.getZ() + Math.sin(angle) * 0.4;
+        if (PhoenixMath.tooCloseToCamera(camera.distanceToSqr(x, y, z))) {
+            return; // her own head, seen from inside it
+        }
+        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? PhoenixAbilities.PSY_MAIN : PhoenixAbilities.PSY_CORE, 0.7F), x, y, z,
+                0.0, 0.015, 0.0);
     }
 
     /**
@@ -280,7 +290,7 @@ public final class PhoenixFx {
             for (int i = 0; i < embers; i++) {
                 Vec3 dir = randomDirection(random);
                 Vec3 at = burst.centre().add(dir.scale(radius));
-                if (at.distanceToSqr(camera) < NEAR_CAMERA * NEAR_CAMERA) {
+                if (PhoenixMath.tooCloseToCamera(at.distanceToSqr(camera))) {
                     continue;
                 }
                 double push = 0.3 + random.nextDouble() * 0.3;
@@ -291,7 +301,7 @@ public final class PhoenixFx {
             for (int i = 0; i < flames; i++) {
                 Vec3 dir = randomDirection(random);
                 Vec3 at = burst.centre().add(dir.scale(radius));
-                if (at.distanceToSqr(camera) < NEAR_CAMERA * NEAR_CAMERA) {
+                if (PhoenixMath.tooCloseToCamera(at.distanceToSqr(camera))) {
                     continue;
                 }
                 double push = 0.15 + random.nextDouble() * 0.2;

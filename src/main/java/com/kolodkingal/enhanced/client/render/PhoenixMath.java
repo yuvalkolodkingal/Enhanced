@@ -112,6 +112,14 @@ public final class PhoenixMath {
         return Mth.lerp(t, -20.0F, 50.0F);
     }
 
+    /** Closer to the camera than this (blocks), a spark is drawn as a square that fills the screen. */
+    public static final double NEAR_CAMERA = 3.0;
+
+    /** Whether a spark at this squared distance from the camera would be drawn as a blob over the screen. */
+    public static boolean tooCloseToCamera(double distanceSq) {
+        return distanceSq < NEAR_CAMERA * NEAR_CAMERA;
+    }
+
     /**
      * Whether her hands let embers and flames go as she flies (and while the charge hovers her). In first person they do
      * not: the hand is half a block from the camera, and a spark there is a blob of squares over half the screen (found

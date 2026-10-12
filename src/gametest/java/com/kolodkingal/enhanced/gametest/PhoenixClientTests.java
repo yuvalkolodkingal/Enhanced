@@ -48,6 +48,8 @@ public final class PhoenixClientTests {
     public static void inFirstPersonHerHandsLetNoEmberGo(GameTestHelper helper) {
         check(!PhoenixMath.handsEmit(true), "a spark half a block from the camera is a blob over the screen: none from the hands");
         check(PhoenixMath.handsEmit(false), "but everyone else sees her hands burn");
+        check(PhoenixMath.tooCloseToCamera(0.5 * 0.5) && PhoenixMath.tooCloseToCamera(2.9 * 2.9), "a spark within three blocks of the camera is a blob");
+        check(!PhoenixMath.tooCloseToCamera(3.0 * 3.0) && !PhoenixMath.tooCloseToCamera(10.0 * 10.0), "farther it is only a spark");
         helper.succeed();
     }
 

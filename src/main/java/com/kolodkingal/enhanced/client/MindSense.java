@@ -107,7 +107,7 @@ public final class MindSense {
             }
             Ping ping = PINGS.get(id);
             if (ping != null && !player.isInvisible() && ping.origin().distanceTo(camera) < 140.0) {
-                ring(level, ping, now - ping.start(), player.getYRot(), thin);
+                ring(level, camera, ping, now - ping.start(), player.getYRot(), thin);
             }
         }
         PINGS.keySet().retainAll(seen);
@@ -118,7 +118,7 @@ public final class MindSense {
      * The ring of motes at the radius the ping has reached (two blocks a tick): twenty on the horizontal ring and a few
      * on a faint vertical ring in the plane she faces. It stops when the ring has spread over the whole range.
      */
-    private static void ring(ClientLevel level, Ping ping, long age, float yaw, float thin) {
+    private static void ring(ClientLevel level, Vec3 camera, Ping ping, long age, float yaw, float thin) {
         float range = PhoenixConfig.senseRange();
         if (age < 0 || age > PhoenixMath.senseRingTicks(range)) {
             return;
@@ -128,8 +128,11 @@ public final class MindSense {
         int count = Math.round(28 * thin);
         for (int i = 0; i < count; i++) {
             double angle = random.nextDouble() * Mth.TWO_PI;
-            level.addParticle(new EnergyParticleOptions(PhoenixAbilities.PSY_MAIN, 1.6F), ping.origin().x + Math.cos(angle) * radius,
-                    ping.origin().y - 0.4, ping.origin().z + Math.sin(angle) * radius, 0.0, 0.004, 0.0);
+            double x = ping.origin().x + Math.cos(angle) * radius;
+            double z = ping.origin().z + Math.sin(angle) * radius;
+            if (!PhoenixMath.tooCloseToCamera(camera.distanceToSqr(x, ping.origin().y - 0.4, z))) {
+                level.addParticle(new EnergyParticleOptions(PhoenixAbilities.PSY_MAIN, 1.6F), x, ping.origin().y - 0.4, z, 0.0, 0.004, 0.0);
+            }
         }
         double facing = Math.toRadians(yaw);
         double dx = -Math.sin(facing);
@@ -138,8 +141,12 @@ public final class MindSense {
         for (int i = 0; i < vertical; i++) {
             double angle = random.nextDouble() * Mth.TWO_PI;
             double along = Math.cos(angle) * radius;
-            level.addParticle(new EnergyParticleOptions(PhoenixAbilities.PSY_CORE, 1.3F), ping.origin().x + dx * along,
-                    ping.origin().y + Math.sin(angle) * radius, ping.origin().z + dz * along, 0.0, 0.0, 0.0);
+            double x = ping.origin().x + dx * along;
+            double y = ping.origin().y + Math.sin(angle) * radius;
+            double z = ping.origin().z + dz * along;
+            if (!PhoenixMath.tooCloseToCamera(camera.distanceToSqr(x, y, z))) {
+                level.addParticle(new EnergyParticleOptions(PhoenixAbilities.PSY_CORE, 1.3F), x, y, z, 0.0, 0.0, 0.0);
+            }
         }
     }
 

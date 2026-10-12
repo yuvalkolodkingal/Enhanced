@@ -465,7 +465,7 @@
   "message.enhanced.mind_reading.on": "קריאת מחשבות: דלוקה (הסתכלו על מישהו כדי לקרוא את מחשבותיו)",
   "message.enhanced.mind_reading.off": "קריאת מחשבות: כבויה",
   "message.enhanced.mind_read.felt": "אתם מרגישים נוכחות בתוך הראש",
-  "message.enhanced.mind_sense.result": "מוחות בסביבה: %1$s (%2$s שחקנים, %3$s עוינים)",
+  "message.enhanced.mind_sense.result": "מוחות בסביבה: %1$s (שחקנים: %2$s, עוינים: %3$s)",
   "message.enhanced.mind_sense.blank": "...וגם שתיקות במקום שבו אמור להיות מוח: %s",
   "message.enhanced.mind_sense.recovering": "חישת המוחות מתאוששת (%s שניות)",
   "message.enhanced.mind_control.nothing": "אין אף אחד בטווח",
