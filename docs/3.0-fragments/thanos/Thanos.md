@@ -144,6 +144,12 @@ The two things on one key share one cooldown: after the Blast the Slam waits for
 
 Nothing else is passive: lightning, fire, magic and the Hex treat you as a hero.
 
+### How he moves
+
+Every use of a stone has a motion of its own, on the hand the Gauntlet is on, and everyone near sees it. **R**: the fist is thrust at where you look and holds, trembling, as the Blast leaves it; the Slam goes overhead and is driven into the ground, and you sink a little with it. **G**: the hand draws a circle in the air for the Portal Step, and the palm is held out and dragged back for the Pull. **V**: a flick of the fingers for the Transmute; the Veil closes both arms round you and then holds the Gauntlet hand out as if it held a thin film. **B**: the Drain lashes a chain out and holds the arm along your look while it lasts; the Sight brings the Gauntlet to your eye and sweeps it across. **N**: the Rewind holds a palm up, trembling, and draws it back; the Time Lock presses both palms down in a stamp. A small flourish at the hand goes with each (the *Flight effects* option thins it).
+
+He walks heavily, and the ground shakes with the stride; he does not fly, so he never takes off or banks. A fall of more than three blocks ends in a thud, with a dip deeper than anyone's and a cloud of dust. In first person the Gauntlet is always at the lower left of your screen, breathing a little, and it thrusts, slams, draws circles and presses with each stone. The key press starts the motion at once where the stone will work, so there is no lag. *Hero animations* and *Reduced motion* ([client options](Server-Configuration#client-options-animations-effects-and-looks)) switch it off or calm it.
+
 ### Looks
 
 **Infinity War** (default: the navy tunic, the gold gorget), **Endgame: Battle Armor** (the gold helmet and the plum breastplate) and **Your own skin**; **H** cycles them, **Sneak + H** goes back. The Gauntlet is drawn on your left arm in every look. The energy of each stone has its own colour: purple, blue, red, orange and green.

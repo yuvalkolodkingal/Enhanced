@@ -256,3 +256,112 @@ in Creative or as a Spectator, the looks) and `ThanosSoulTimeTests` (the Drain a
 ends with him, the Gauntlet's ceremony, and the hero beside the boss). The state-heavy tests have a batch each
 (`thanos_hero_*`). Deliberate bugs in each important rule (the shield check of each stone, the Hex and the pin, the heal
 and its cap, the history, the dome's end, the hold, the hunger) were each caught by the test meant for them.
+
+### 15.12 How the playing Thanos moves
+
+> The animation of the hero is **client only** (the server sends nothing for it) and is built on the mod's animation system
+> in `client/render`: a state per hero in view, layers blended by eased weights (locomotion, ambient stances, aimed stances,
+> one-shot gestures), `GestureId` (the timing), `Gestures` (the keys), `Stances` (the rows), `GestureRoutes` (which change in
+> the synced data stands for which gesture), `GestureTable` (the edges) and `FirstPersonArms`. Thanos adds to it and changes none of
+> its rules. Every row is a raw model angle in degrees for a right-handed player, and a left-handed one is mirrored by the
+> pipeline. `M` is the main arm; **`O` is the arm the Gauntlet is on** (the off arm), so every gesture of his drives `O`. His
+> plug-in is `ThanosClient`; the keys of the gestures are `ThanosGestures`, the rows of the stances `ThanosPoses`, the client's
+> own part (the key press, the landing, the first-person hand) `ThanosActing` and the flourishes at the hand `ThanosGestureFx`.
+> The boss is a model of his own and does not use this pipeline (15.6.1).
+
+#### 15.12.1 The gestures
+
+One gesture of the group `CAST` plays at a time. "Force" means the gesture replaces the swing of a punch on the arms it holds.
+
+| Gesture | Ticks (total / attack / release) | Force | Started by | What it looks like |
+|---|---|---|---|---|
+| `THANOS_BLAST` | 10 / 1 / 5 | yes | R's cooldown starts, nearer to the Blast's | The Gauntlet is thrust at the aim and holds, trembling; the other arm balances; the chest turns with the arm |
+| `THANOS_SLAM` | 22 / 2 / 8 | yes | R's cooldown starts, nearer to the Slam's | The Gauntlet goes overhead; at tick 12 it is driven down to the ground, he leans in and sinks 0.24 blocks, the legs forward |
+| `THANOS_STEP` | 12 / 1 / 5 | no | G's cooldown starts, nearer to the Step's | The Gauntlet draws a circle in the air, a blue ring |
+| `THANOS_PULL` | 16 / 2 / 6 | yes | G's cooldown starts, nearer to the Pull's | The palm out level, then dragged back; he leans away |
+| `THANOS_WARP` | 14 / 1 / 5 | yes | V's cooldown starts (the Transmute) | A flick of the Gauntlet at the aim, fingers spread, trembling |
+| `THANOS_VEIL_ON` / `THANOS_VEIL_OFF` | 16 / 2 / 6 and 10 / 1 / 4 | no | `Toggle.REALITY_VEIL` flips | Both arms out, closing round him into the Veil's stance; the opposite when it drops |
+| `THANOS_DRAIN_CAST` | 12 / 1 / 5 | yes | `Live.SOUL_DRAINING` rises | The chain lashes out, and the gesture hands over to the Drain's stance |
+| `THANOS_SIGHT` | 14 / 2 / 5 | no | `Live.SOUL_SIGHT` rises | The Gauntlet to the eye, then swept across the face |
+| `THANOS_REWIND` | 22 / 2 / 8 | no | N's cooldown starts, nearer to the Rewind's | The palm up and out, trembling; drawn back, he leans away |
+| `THANOS_TIMELOCK` | 20 / 2 / 8 | no | N's cooldown starts, nearer to the Lock's | Both palms up and then pressing down in a stamp; the body sinks with it |
+
+**Which of two uses of a key it is.** The two uses of R, G and N start cooldowns of different lengths (70 and 160, 100 and
+220, 900 and 600 by default). When the data arrives the ticks left tell them apart: the use whose **configured cooldown** is
+nearer plays (`ThanosGestures.cooldown`; the client has the server's config), so changing a cooldown in the server config
+changes nothing for the animation, and a tie plays the first. The Soul Stone's two uses need no such rule: the drain and the
+sight have states of their own (`Live`), which also covers the Sight in Creative, where it starts no cooldown. The Veil is a
+toggle. The Transmute is the only use of V that has a cooldown.
+
+**Before the server answers.** The local Thanos's own key press starts the gesture at once where the client can tell the stone
+will work: not while he is held (`SPELLBOUND`, `PETRIFIED`, `SOULWORLD`), starving or a spectator; the Step only with a block or a
+creature in range, the Pull, the Transmute and the Drain only with a creature in his sight (and the Drain not while it is
+already draining), the Rewind only with two seconds of history, the Veil, the Sight, the Lock, the Blast and the Slam whenever
+they are rested. A refusal the client cannot see (a Hex wall, no room to stand, PvP) lets the gesture play out and costs nothing.
+The change in the data that arrives a moment later is swallowed, so the gesture does not play twice.
+
+#### 15.12.2 The stances
+
+| Stance | tauIn, tauOut | Aimed | On while | Rows |
+|---|---|---|---|---|
+| `THANOS_VEIL` | 4, 5 | no | `Toggle.REALITY_VEIL` | The main arm spread 10 degrees more than whatever it is doing (so he can walk and fight with the Veil up), the Gauntlet hand held out and up (-30, 0, -22) as if it held a thin film, trembling 0.8 at 1.6, the head back 2 degrees, a slow sway of 1.5 degrees |
+| `THANOS_DRAIN` | 2, 4 | yes | `Live.SOUL_DRAINING` | The Gauntlet arm along his look (the one he drains is where he looks), trembling 1.4 at 1.9; the main arm braced back and out (-12, 0, 8); the head down 3; the legs braced wide; the body 2 degrees back; the Gauntlet arm counts as occupied |
+
+A gesture that hands over to a stance ends on its pose, so that nothing pops: `THANOS_VEIL_ON` ends with the Gauntlet arm at the
+Veil's and the main arm level with the body, spread by the stance's own angle; `THANOS_DRAIN_CAST` ends with the Gauntlet aimed
+at the look with no offset and gives the lean back to the stance. `ThanosGestures` holds the numbers both read.
+
+#### 15.12.3 Walking, landing, no flight
+
+* **No flight profile** (`FlightProfile.of` answers null for him): no take-off, banking or braking, and the animator never starts
+  a flight gesture.
+* **Walk and sprint** (`RunPoses.THANOS`): heavy and wide, between Thor and Magneto: the arms swing 0.9 of the walk and 1.15
+  of the sprint, the legs 1.15, a lean of 9 degrees and a turn of 5 at a sprint, and a bob of 0.03 blocks that is the stride
+  shaking the ground. No speedster cycle: his speed is human.
+* **Landing.** The animator lands only the heroes who fly, so `ThanosActing.edges` lands a Titan: a fall of more than three blocks
+  (the speed just before the ground is 0.6 blocks a tick or more, `ThanosGestures.HARD_LANDING`) plays the soft landing with a dip
+  deeper than anyone's (the dip of Thor's soft landing) and the dust and ring of the ground. A short fall is nothing.
+
+#### 15.12.4 First person
+
+The Gauntlet is on the off hand, which vanilla draws only when something moves it: for Thanos the off hand is **always drawn**,
+at the lower left of the screen, with the Gauntlet on it (the `PlayerRendererMixin` hook, 15.2.6), breathing a little. Every row
+is added to that rest, in a right hand's signs (the left hand mirrors), and stays at the edge of the screen but for the thrust of
+the Blast (four ticks) and the stamp of the Time Lock:
+
+| Gesture or stance | The Gauntlet hand |
+|---|---|
+| `THANOS_BLAST` | thrust forward and up a little (dz +0.22) for four ticks, then a kick back |
+| `THANOS_SLAM` | up for six ticks (dy +0.30), then down hard (dy -0.25, dz +0.10, rx +25) |
+| `THANOS_STEP` | a circle over the twelve ticks (dx 0.08, dy 0.06) |
+| `THANOS_PULL` | out (dz +0.20), then drawn back (dz -0.06) |
+| `THANOS_WARP` | a flick forward (dz +0.18) |
+| `THANOS_VEIL_ON` / `OFF` | both hands come up a little and gather in, or open out |
+| `THANOS_DRAIN_CAST`, the Drain | lashed out, then held out along the look, trembling (dx +0.10, dy +0.12, dz +0.16, rx -10) |
+| `THANOS_SIGHT` | the hand rises at the edge of the screen, toward the eye |
+| `THANOS_REWIND` | the palm up (rz +25), trembling, then drawn back |
+| `THANOS_TIMELOCK` | both hands pressed down (dy -0.10, dz +0.10) |
+
+The beam, the chain and the sparks leave the Gauntlet where it is drawn: the tracked hand when he is seen by someone else, and in
+first person the hand's resting place moved by the same offset the hand is drawn with. The camera is never touched, and with
+*Reduced motion* every tremble is off.
+
+#### 15.12.5 The flourishes
+
+Each gesture starts a small effect at the places the model really has (`HandTracker`), thinned by the client's *Flight effects* option
+and only for a Thanos in view: a violet flare and spiral at the Gauntlet as the Blast leaves it, grey chips and a dust ring at his
+feet for the Slam, motes hanging where the Step's hand has been and a blue ring at the end of the circle, a blue spiral drawn in
+to the palm of the Pull, red sparks at the fingers of the Transmute, red motes round the hand that closes the Veil, orange motes at
+the eyes of the Sight, two green rings on the forearm of the Rewind and a quick green mandala under the feet of the Time Lock.
+
+#### 15.12.6 Tests, and how it was checked
+
+`ThanosAnimationTests` (batch `thanos_anim`): the timing of the eleven gestures; that every one drives the Gauntlet arm and the other only
+balances or joins in; that no key asks an arm for an impossible angle; what each gesture looks like in numbers; the hand-overs to the
+stances; the routes (every ability, toggle and state of his acted or explained, none pending); that the cooldown of each use of
+a key reaches its own gesture with the config's numbers and a few ticks late, and follows the config; that every gesture can be reached
+by something; every key press of the prediction; that he has no flight profile; and the speed that makes a landing a Titan's.
+The shared checks cover him too: `AnimationMathTests` (every gesture has well-formed keys and the Veil's closing ends on its stance,
+every ability, toggle and state is acted or explained, no gesture is started by nothing). What the poses, the hands and the flourishes
+look like was checked by eye in a real game, from a second player (`/enhanced_anim target`, `play <gesture> <tick>`, which freeze each
+pose at a tick) and in first person.
