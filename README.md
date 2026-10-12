@@ -5,10 +5,12 @@ A Minecraft mod where you can become one of the *Enhanced*:
 **Quicksilver**, who slows the world down around him (to *Sweet Dreams*) or just outruns it;
 **Vision**, the Mind Stone in a synthetic body (or **White Vision**);
 Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief;
+**Jean Grey, the Phoenix**, who reads minds and burns with cosmic fire;
+**Peter Parker, Spider-Man**, who goes everywhere on a web;
 or, if you are worthy, **Thor**, with **Mjolnir** and **Stormbreaker**.
 
 Every power's look and colour follows the MCU films and shows, and Vision, Tommy, Billy, Loki
-(in his Asgardian clothes, the TVA's or the God of Stories') and Thor each have several looks
+(in his Asgardian clothes, the TVA's or the God of Stories'), Thor, the Phoenix and Spider-Man each have several looks
 (press **H**).
 
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
@@ -45,6 +47,8 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | **Tommy** or **Billy** | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors, an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
 | **Loki** | Find the **Tesseract** (End City, Stronghold library, Ancient City and Woodland Mansion chests) and use it: you vanish in a blue flash and reappear far away as Loki. (With a **Scarlet Witch Gene** in your other hand it awakens the Scarlet Witch instead.) |
 | **Thor** | Forge **Mjolnir** (netherite ingots, a Nether Star, a Heavy Core, a Breeze Rod). The first **worthy** player to lift it (Heroes of the Village: save a village from a raid) claims it, and lightning makes you Thor. From then on only its owner can lift it. |
+| **Phoenix** | Find the very rare **Phoenix Ember** (End City and bastion treasure, Ancient City, stronghold library, Nether fortress and woodland mansion chests), hold it with no power and **hold right-click for 3 seconds**. Mind Reading (**R**) shows the items of whoever you look at, **Sneak + R** senses every mind through the walls, **B** takes over a creature, **Sneak + B** freezes everyone around you, and **N**, held, charges the Phoenix Burst: a wave of cosmic fire in every direction. |
+| **Spider-Man** | Craft a **Radioactive Spider** (Fermented Spider Eyes, Glow Ink Sacs and a Slime Block) or find one in a mineshaft, dungeon, Trial Chambers or Ancient City chest, and **right-click with it** with no power: you are sick for 7 seconds and awaken. **R** webs what you look at (**Sneak + R**: a burst of 24 strands), **G** zips you to the block you look at (**Sneak + G**, held: swing), jump at a wall and push to climb it, **V** switches Wall Crawl, and a spider-sense warns of danger. The Iron Spider suit has **B**, four mechanical legs (twice **Sneak + B**: Instant Kill), and **N** turns his eyes black. |
 
 **Loki's Scepter** is a weapon too (8 damage), and a hit confuses whoever it lands on: a creature forgets its
 target and stumbles about for 6 seconds (the Ender Dragon, the Wither and the Warden are immune), and a player gets
@@ -84,6 +88,24 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 | **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | **H** | Change look | Change look | Change look | Change look |
 
+| Key | Phoenix |
+|---|---|
+| **R** | Mind Reading on/off (Sneak: Mind Sense through walls) |
+| **G** | Flight |
+| **V** | Telekinesis (creatures, items, arrows, blocks) |
+| **B** | Mind Control (Sneak: Psionic Field) |
+| **N** | Phoenix Burst (hold to charge, let go to unleash) |
+| **H** | Change look |
+
+| Key | Spider-Man |
+|---|---|
+| **R** | Web Shot (Sneak: Web Burst) |
+| **G** | Web Zip (Sneak, hold: Web Swing) |
+| **V** | Wall Crawl on/off (Sneak: Spider-Sense on/off) |
+| **B** | Spider Legs (Iron Spider only; Sneak, twice: Instant Kill) |
+| **N** | Black Eyes |
+| **H** | Change suit |
+
 **Quicksilver Time:** as Quicksilver, press **R**. Everything within 32 blocks slows to a fifth of its speed
 (arrows hang in the air) and the music starts, whether you run or just stand there; sprint, and you run four times
 faster. Press **Sneak + R** for **Super Speed** instead: only you are fast, and the world is not slowed. In either mode
@@ -94,7 +116,7 @@ while it stands (he can never leave it). Look at a creature and press **Z** to s
 call him back, **Sneak + Z** to make him hold his post. Vision himself, inside a standing Hex, can't leave it
 either: he comes apart a little at the wall and is thrown back.
 
-Every hero except Quicksilver, Tommy and Loki can also fly by double-tapping **Space** (Thor only with
+Every hero except Quicksilver, Tommy, Loki and Spider-Man can also fly by double-tapping **Space** (Thor only with
 Mjolnir or Stormbreaker in hand). With telekinesis, press the key again
 to launch what you hold, or **Sneak** + the key to put it down gently. Keys can be changed
 under *Options → Controls → Enhanced Powers*. The top-left corner of the screen always
@@ -156,10 +178,10 @@ To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a
 ## For server owners
 
 * `/enhanced power get|set …` (`none`, `magneto`, `scarlet_witch`, `quicksilver`,
-  `vision`, `tommy`, `billy`, `loki`, `thor`, optionally followed by a look), `/enhanced look <players> <look>`
+  `vision`, `tommy`, `billy`, `loki`, `thor`, `phoenix`, `spider_man`, optionally followed by a look), `/enhanced look <players> <look>`
   (for example `/enhanced look @a tva`) and `/enhanced hex list|clear` (operators only).
 * Balance numbers (beam damage, Hex death chance and radius, the Vision of the Hex, flight speeds, shrapnel,
-  how much Quicksilver Time slows the world…) are in `world/serverconfig/enhanced-server.toml`.
+  how much Quicksilver Time slows the world, the Phoenix's Mind Reading, Mind Control and Burst, Spider-Man's webs, zip, swing, crawl, suits, legs, Instant Kill and Black Eyes…) are in `world/serverconfig/enhanced-server.toml`.
 * Item, block and entity tags under `data/enhanced/tags/` decide what counts as
   metal, what can be lifted, what the shield repels and which bosses resist the Hex,
   so datapacks can change them.
