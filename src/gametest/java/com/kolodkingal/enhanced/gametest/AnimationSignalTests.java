@@ -146,8 +146,12 @@ public final class AnimationSignalTests {
         helper.succeed();
     }
 
-    /** Thor's weapon: thrown it is named in flight (and gone from his hand), drawn from the inventory it arrives in his hand, caught it is unnamed. */
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    /**
+     * Thor's weapon: thrown it is named in flight (and gone from his hand), drawn from the inventory it arrives in his hand,
+     * caught it is unnamed. (A batch of its own: the weapon flies to the arena's wall and back, and a shield, a Hex or
+     * Quicksilver Time in the arena next door can hold it on the way.)
+     */
+    @GameTest(template = ARENA, timeoutTicks = 200, batch = "thor_weapon_signal")
     public static void thorsWeaponSaysWhereItIs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
@@ -165,6 +169,8 @@ public final class AnimationSignalTests {
                 check(data.hammerEntityId() == -1, "caught: nothing is named in flight any more");
                 return true;
             }
+            check(tick < 150, "the weapon never came back: in flight " + helper.getLevel().getEntity(data.hammerEntityId())
+                    + ", Thor at " + thor.position() + ", alive " + thor.isAlive() + ", power " + Powers.power(thor));
             return false;
         });
     }
