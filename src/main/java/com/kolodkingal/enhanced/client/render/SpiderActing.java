@@ -59,6 +59,10 @@ final class SpiderActing {
         if (me == null || me.isSpectator() || !EnhancedConfig.SPEC.isLoaded()) {
             return null;
         }
+        if (SpiderMotion.keysIgnored(me, data)) {
+            // Held (a spell, a pin, telekinesis, a tomb): the server ignores every key, so no hand may thrust a web.
+            return null;
+        }
         boolean creative = me.getAbilities().invulnerable;
         int food = me.getFoodData().getFoodLevel();
         SpiderGestures.Sight sight = new SpiderGestures.Sight(now >= shotReadyAt, ability == 1 && !sneaking && shotInSight(me),
