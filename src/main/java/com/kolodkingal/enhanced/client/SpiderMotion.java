@@ -92,6 +92,7 @@ public final class SpiderMotion {
     private static final double MANTLE_PUSH = 0.2;
     /** A swing begun on the ground hops him off it. */
     private static final double SWING_HOP = 0.35;
+    private static final double SWING_PUSH = 0.3;
     /** The shortest rope a swing is reeled in to, and how much longer than at first it is let out to. */
     private static final double MIN_ROPE = 3.0;
     private static final double MAX_ROPE_FACTOR = 1.25;
@@ -104,6 +105,9 @@ public final class SpiderMotion {
     private static final int SWING_GRACE = 10;
     /** What he clings to is told to the server again this often while it lasts (the server believes it for 12 ticks). */
     private static final int REPORT_TICKS = 8;
+    /** A zip that has just arrived is not let go of for this many ticks, and is drawn in to the wall at this speed. */
+    private static final int SETTLE_TICKS = 8;
+    private static final double SETTLE_PULL = 0.2;
 
     private static final SpiderClimb.Surface CEILING = new SpiderClimb.Surface(SpiderClimb.Kind.CEILING, Direction.DOWN);
 
@@ -122,6 +126,8 @@ public final class SpiderMotion {
     private static int toldKind = -1;
     private static int toldNormal;
     private static int toldAt;
+    /** A zip has just arrived and he is being drawn in to the wall: nothing is lost for a few ticks. */
+    private static boolean settling;
 
     // ---- cling ----
     private static SpiderClimb.Surface surface = SpiderClimb.Surface.NONE;
@@ -192,6 +198,7 @@ public final class SpiderMotion {
         confirmUntil = 0;
         jumpWas = false;
         toldKind = -1;
+        settling = false;
     }
 
     // =================================================================================================================
@@ -457,6 +464,7 @@ public final class SpiderMotion {
     private static void enterCling(LocalPlayer player, SpiderClimb.Surface on) {
         mode = Mode.CLING;
         surface = on;
+        settling = false;
         clingAge = 0;
         lost = 0;
         groundTicks = 0;
@@ -485,10 +493,12 @@ public final class SpiderMotion {
                 touched = wall;
             }
         }
+        boolean drawingIn = settling && clingAge <= SETTLE_TICKS && !touched.touches();
         if (touched.touches()) {
             lost = 0;
             surface = touched;
-        } else {
+            settling = false;
+        } else if (!drawingIn) {
             lost++;
         }
         groundTicks = player.onGround() ? groundTicks + 1 : 0;
@@ -524,7 +534,8 @@ public final class SpiderMotion {
             forward *= Mth.SQRT_OF_TWO / 2.0F;
             right *= Mth.SQRT_OF_TWO / 2.0F;
         }
-        Vec3 velocity = SpiderClimb.velocity(surface, player.getLookAngle(), player.getYRot(), forward, right, speed);
+        Vec3 velocity = drawingIn ? surface.normalVector().scale(-SETTLE_PULL)
+                : SpiderClimb.velocity(surface, player.getLookAngle(), player.getYRot(), forward, right, speed);
         player.setDeltaMovement(velocity);
         player.resetFallDistance();
         player.setSprinting(false);
@@ -659,7 +670,9 @@ public final class SpiderMotion {
         mode = Mode.NONE;
         if (wallOrCeiling && zipCreature < 0 && data.toggle(Toggle.WALL_CRAWL) && !starving(player)) {
             enterCling(player, new SpiderClimb.Surface(face == Direction.DOWN ? SpiderClimb.Kind.CEILING : SpiderClimb.Kind.WALL, face));
-            player.setDeltaMovement(surface.normalVector().scale(-SpiderClimb.STICK));
+            // (He stops a little short of the stand point: the first ticks draw him in to the surface.)
+            settling = true;
+            player.setDeltaMovement(surface.normalVector().scale(-SETTLE_PULL));
             lastVelocity = player.getDeltaMovement();
         } else if (wallOrCeiling && zipCreature < 0) {
             player.setDeltaMovement(velocity.scale(0.4));
@@ -711,7 +724,12 @@ public final class SpiderMotion {
         swingConfirmed = confirmed;
         Vec3 velocity = player.getDeltaMovement();
         if (player.onGround()) {
-            velocity = new Vec3(velocity.x, Math.max(velocity.y, SWING_HOP), velocity.z);
+            // A swing begun on the ground hops him off it, and towards the anchor: from rest the pendulum's way down is
+            // mostly into the floor (and Sneak keeps him from stepping off a ledge), so it would never get going.
+            Vec3 toward = new Vec3(anchor.x - player.getX(), 0, anchor.z - player.getZ());
+            toward = toward.lengthSqr() < 1.0 ? new Vec3(player.getLookAngle().x, 0, player.getLookAngle().z) : toward;
+            toward = toward.lengthSqr() < 1.0E-6 ? Vec3.ZERO : toward.normalize().scale(SWING_PUSH);
+            velocity = new Vec3(velocity.x + toward.x, Math.max(velocity.y, SWING_HOP), velocity.z + toward.z);
         }
         swingVelocity = velocity;
         swingLast = player.position();
