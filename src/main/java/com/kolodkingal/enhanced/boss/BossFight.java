@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -479,7 +480,17 @@ public abstract class BossFight {
                         names(rewarded.isEmpty() ? List.copyOf(participants.values()) : rewarded), boss).withStyle(ChatFormatting.GOLD), false);
             }
         } else {
-            tell(Component.translatable(why.messageKey(), boss).withStyle(ChatFormatting.GRAY), false);
+            // Told to the participants too, wherever they are: after a wipe they are all on the death screen, and the
+            // dead no longer see the bars.
+            Component message = Component.translatable(why.messageKey(), boss).withStyle(ChatFormatting.GRAY);
+            Set<ServerPlayer> told = new LinkedHashSet<>(audience());
+            for (Participant participant : participants.values()) {
+                ServerPlayer player = server().getPlayerList().getPlayer(participant.id());
+                if (player != null) {
+                    told.add(player);
+                }
+            }
+            told.forEach(player -> player.sendSystemMessage(message));
         }
         if (why.refunds() && !refund.isEmpty() && starter != null) {
             BossRewards.hand(server(), starter, refund, why != BossEnd.SERVER_STOPPING);
@@ -573,14 +584,18 @@ public abstract class BossFight {
         onJoin(player);
     }
 
-    /** Every fighter who can die is dead or gone for {@code wipeSeconds}: a wipe. (Creative players cannot die.) */
+    /**
+     * Every fighter who can die is dead or gone (logged out, or in another dimension) for {@code wipeSeconds}: a wipe.
+     * (Creative players cannot die.) A fighter who is alive but has walked away is not fallen: if nobody comes back, the
+     * fight is abandoned ({@link #checkAbandon}).
+     */
     private boolean checkWipe() {
         boolean mortals = false;
         for (Participant participant : participants.values()) {
             mortals |= !participant.creative;
         }
         boolean standing = false;
-        for (ServerPlayer player : present()) {
+        for (ServerPlayer player : fighters) {
             standing |= !player.isCreative();
         }
         if (!mortals || standing) {
