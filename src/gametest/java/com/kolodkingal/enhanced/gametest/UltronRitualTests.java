@@ -56,6 +56,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -382,6 +383,51 @@ public final class UltronRitualTests {
         check(refusalKey(lane.refusal(player, false)) == null, "a rise of " + allowed + " blocks is accepted");
         level.setBlock(pillar.above(allowed), Blocks.STONE.defaultBlockState(), 3);
         check("message.enhanced.ultron.refuse.relief".equals(refusalKey(lane.refusal(player, false))), "a rise of " + (allowed + 1) + " is not");
+        helper.succeed();
+    }
+
+    /**
+     * A tree is something the island carries, not a hill: oaks standing in the island's disc (a trunk of five logs and
+     * a canopy eight blocks over the ground, taller than {@code maxRelief}) do not make the ground uneven, while a
+     * pillar of stone as high as they are does.
+     */
+    @GameTest(template = ARENA, batch = QUICK)
+    public static void aGroveIsLevelGround(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        ServerLevel level = f.level();
+        ServerPlayer player = f.player(MIDDLE.x, FLOOR, MIDDLE.z);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.ULTRON_PROGRAM.get()));
+        TestKit.look(player, 0.0F, 90.0F);
+        UltronLane lane = (UltronLane) BossFights.lane(BossKind.ULTRON);
+        List<BlockPos> placed = new ArrayList<>();
+        f.onClose(() -> placed.forEach(pos -> level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3)));
+        for (int[] at : new int[][]{{14, 10}, {6, 12}, {10, 5}}) {
+            BlockPos foot = helper.absolutePos(new BlockPos(at[0], 2, at[1]));
+            for (int dy = 0; dy < 5; dy++) {
+                placed.add(foot.above(dy));
+                level.setBlock(foot.above(dy), Blocks.OAK_LOG.defaultBlockState(), 3);
+            }
+            for (int dy = 3; dy < 7; dy++) {
+                int reach = dy < 5 ? 2 : 1;
+                for (int dx = -reach; dx <= reach; dx++) {
+                    for (int dz = -reach; dz <= reach; dz++) {
+                        BlockPos leaf = foot.offset(dx, dy, dz);
+                        if (level.getBlockState(leaf).isAir()) {
+                            placed.add(leaf);
+                            level.setBlock(leaf, Blocks.OAK_LEAVES.defaultBlockState(), 3);
+                        }
+                    }
+                }
+            }
+        }
+        check(refusalKey(lane.refusal(player, false)) == null, "three oaks in the disc are level ground");
+        BlockPos pillar = helper.absolutePos(new BlockPos(14, 2, 14));
+        int height = UltronBossConfig.MAX_RELIEF.get() + 2;
+        for (int dy = 0; dy < height; dy++) {
+            placed.add(pillar.above(dy));
+            level.setBlock(pillar.above(dy), Blocks.STONE.defaultBlockState(), 3);
+        }
+        check("message.enhanced.ultron.refuse.relief".equals(refusalKey(lane.refusal(player, false))), "a stone pillar as high as the trees is not");
         helper.succeed();
     }
 

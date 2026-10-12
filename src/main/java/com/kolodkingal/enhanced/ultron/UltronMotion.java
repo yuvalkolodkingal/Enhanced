@@ -2,9 +2,12 @@ package com.kolodkingal.enhanced.ultron;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * How Ultron's body and the Sentries move: they hover, with no gravity and no pathfinding, so each tick the brain says
@@ -43,6 +46,28 @@ final class UltronMotion {
             pos.move(0, 1, 0);
         }
         return groundBelow(level, x, pos.getY() + 0.5, z);
+    }
+
+    /**
+     * The ground of the column of {@code (x, z)} near {@code y}, as the ritual judges a site: like {@link #surface}, but a
+     * tree is not ground. Logs and leaves are skipped (the island carries a tree, it is not a hill), so a column under
+     * a canopy or a trunk has the dirt it grows from for its ground and a forest is not a mountain range.
+     */
+    static double groundBelowTheTrees(Level level, double x, double y, double z) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(Math.floor(x), Math.floor(y), Math.floor(z));
+        int top = level.getMaxBuildHeight();
+        for (int i = 0; i < 48 && pos.getY() < top && !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty(); i++) {
+            pos.move(0, 1, 0);
+        }
+        int bottom = level.getMinBuildHeight();
+        for (int i = 0; i < LOOK_DOWN && pos.getY() > bottom; i++, pos.move(0, -1, 0)) {
+            BlockState state = level.getBlockState(pos);
+            VoxelShape shape = state.getCollisionShape(level, pos);
+            if (!shape.isEmpty() && !state.is(BlockTags.LEAVES) && !state.is(BlockTags.LOGS)) {
+                return pos.getY() + shape.max(Direction.Axis.Y);
+            }
+        }
+        return bottom;
     }
 
     /** The y of the ground under the mob (found from its own height). */

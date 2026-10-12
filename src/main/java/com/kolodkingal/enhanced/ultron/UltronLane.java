@@ -179,7 +179,9 @@ public final class UltronLane implements BossLane {
     /**
      * The ground of the island must be level enough and walkable: across its columns the ground rises and falls by at
      * most {@code maxRelief}, and at least 60 percent of them are ground one can stand on (solid, with room above and no
-     * liquid). Every column of the disc is looked at.
+     * liquid). Every column of the disc is looked at. A tree is not part of the ground (the island carries trees along,
+     * as it carries flowers), so a grove is level ground, but the trunks and the low leaves still take their columns
+     * out of the walkable share.
      */
     @Nullable
     static Component site(ServerLevel level, Vec3 centre, int radius) {
@@ -199,7 +201,7 @@ public final class UltronLane implements BossLane {
                 if (!level.hasChunk((int) Math.floor(x) >> 4, (int) Math.floor(z) >> 4)) {
                     continue;
                 }
-                double ground = UltronMotion.surface(level, x, centre.y + 4.0, z);
+                double ground = UltronMotion.groundBelowTheTrees(level, x, centre.y + 4.0, z);
                 low = Math.min(low, ground);
                 high = Math.max(high, ground);
                 if (standable(level, x, ground, z)) {
