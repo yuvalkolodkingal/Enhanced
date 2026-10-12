@@ -69,10 +69,10 @@ final class ApocalypseGestures {
                 .key(14, S).mAim(LOOK, -10, -12, 0).o(-70, 20, -16).twist(-8)
                 .key(22, S).m(REST_M).o(REST_O).twist(0);
 
-        // The Sandstorm: the arms gather, then are flung wide and up into the stance.
+        // The Sandstorm: the hands gather in front of him, low, then the arms are flung wide and up (a V) into the stance.
         define(GestureId.APOC_STORM_START)
                 .key(0, S).m(REST_M).o(REST_O).head(0, 0, 0).lean(0)
-                .key(5, O).m(-40, 0, 50).o(-40, 0, -50).head(-4, 0, 0).lean(3)
+                .key(5, O).m(-50, -22, 4).o(-50, 22, -4).head(-4, 0, 0).lean(3)
                 .key(11, O).m(StancePoses.APOC_STORM_M).o(StancePoses.APOC_STORM_O).head(StancePoses.APOC_STORM_HEAD, 0, 0)
                 .lean(StancePoses.APOC_STORM_LEAN)
                 .key(18, S).m(StancePoses.APOC_STORM_M).o(StancePoses.APOC_STORM_O).head(StancePoses.APOC_STORM_HEAD, 0, 0)

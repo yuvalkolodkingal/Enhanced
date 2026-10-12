@@ -179,9 +179,10 @@ public final class ApocalypseBossPoses {
                 .key(20, I, Ch.RX, -20, Ch.LEAN, 12, Ch.DROP, 1.2F)
                 .key(30, S).as(Pose.SPIKES);
 
-        // The Boulders: both arms raised, palms up, the body arched back, floating a little.
+        // The Boulders: both arms raised overhead and a little apart (above the shoulder a negative z on the right arm spreads it),
+        // palms up, the body arched back, floating a little.
         new Builder().stand(0, S)
-                .key(10, O, Ch.RX, -160, Ch.RZ, 24, Ch.LX, -160, Ch.LZ, -24, Ch.LEAN, -8, Ch.DROP, -2.4F, Ch.HEAD_X, -8)
+                .key(10, O, Ch.RX, -160, Ch.RZ, -24, Ch.LX, -160, Ch.LZ, 24, Ch.LEAN, -8, Ch.DROP, -2.4F, Ch.HEAD_X, -8)
                 .key(30, S)
                 .key(33, I, Ch.RX, -70, Ch.LX, -70, Ch.RZ, 10, Ch.LZ, -10, Ch.LEAN, 8, Ch.DROP, 0)
                 .key(38, S).as(Pose.BOULDERS);
@@ -210,9 +211,9 @@ public final class ApocalypseBossPoses {
                 .key(11, I, Ch.RY, 70, Ch.TWIST, 25)
                 .key(16, S, Ch.RY, 60).as(Pose.BACKHAND);
 
-        // The Tornado: both arms raised, the head back.
+        // The Tornado: both arms raised overhead and apart, the head back.
         new Builder().stand(0, S)
-                .key(12, O, Ch.RX, -150, Ch.LX, -150, Ch.RZ, 25, Ch.LZ, -25, Ch.LEAN, -6, Ch.HEAD_X, -10)
+                .key(12, O, Ch.RX, -150, Ch.LX, -150, Ch.RZ, -25, Ch.LZ, 25, Ch.LEAN, -6, Ch.HEAD_X, -10)
                 .key(40, S).as(Pose.TORNADO);
 
         // Kneeling, staggered: the legs folded, the body forward, the head down, the arms hanging.
@@ -220,9 +221,10 @@ public final class ApocalypseBossPoses {
                 .key(10, O, Ch.LEG_R, -KNEEL_LEG, Ch.LEG_L, KNEEL_LEG, Ch.DROP, KNEEL_DROP, Ch.LEAN, 25, Ch.HEAD_X, 30, Ch.RX, 8, Ch.LX, 8,
                         Ch.RZ, 6, Ch.LZ, -6).as(Pose.STAGGER);
 
-        // Floating (the body itself is raised by the server): the arms wide and up, the head back, the legs hanging.
+        // Floating (the body itself is raised by the server): the arms wide and up in a V, the head back, the legs hanging. (The
+        // design's x -120, z 70 points the arms forward and then tips them inward: they cross in front of the chest.)
         new Builder().stand(0, S)
-                .key(14, O, Ch.DROP, -1.5F, Ch.RX, -120, Ch.RZ, 70, Ch.LX, -120, Ch.LZ, -70, Ch.HEAD_X, -12, Ch.LEG_R, 8, Ch.LEG_L, -4)
+                .key(14, O, Ch.DROP, -1.5F, Ch.RX, -14, Ch.RZ, 132, Ch.LX, -14, Ch.LZ, -132, Ch.HEAD_X, -12, Ch.LEG_R, 8, Ch.LEG_L, -4)
                 .as(Pose.HOVER);
 
         // The Escape: the right hand raised to the sky.

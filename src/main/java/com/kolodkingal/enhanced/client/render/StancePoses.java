@@ -38,9 +38,13 @@ public final class StancePoses {
     public static final float[] APOC_SHIELD_O = {-78, -8, -24};
     public static final float APOC_SHIELD_HEAD = -3;
     public static final float APOC_SHIELD_LEAN = -2;
-    /** The Sandstorm: both arms flung wide and up, the head back. */
-    public static final float[] APOC_STORM_M = {-118, 0, 74};
-    public static final float[] APOC_STORM_O = {-118, 0, -74};
+    /**
+     * The Sandstorm: both arms flung wide and up in a V, the head back. (The design's {@code -118, 0, 74} points a forward-raised
+     * arm and then tips it inward, so the arms cross in front of the chest: an arm raised above the shoulder is spread by a large
+     * {@code z}, with little {@code x}.)
+     */
+    public static final float[] APOC_STORM_M = {-14, 0, 132};
+    public static final float[] APOC_STORM_O = {-14, 0, -132};
     public static final float APOC_STORM_HEAD = -12;
     public static final float APOC_STORM_LEAN = -3;
 

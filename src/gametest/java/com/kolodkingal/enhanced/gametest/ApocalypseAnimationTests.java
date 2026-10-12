@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
+import com.kolodkingal.enhanced.client.render.ApocalypseBossPoses;
 import com.kolodkingal.enhanced.client.render.ApocalypseHeroMath;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.client.render.ApocalypseView;
@@ -146,7 +147,68 @@ public class ApocalypseAnimationTests {
         check(hero != null && hero.power() == Power.APOCALYPSE, "Apocalypse has a client plug-in");
         // The arms of the shield are raised in front of the chest, the storm's flung wide and up.
         check(StancePoses.APOC_SHIELD_M[0] == -78 && StancePoses.APOC_SHIELD_O[2] == -24, "the shield's pose");
-        check(StancePoses.APOC_STORM_M[0] == -118 && StancePoses.APOC_STORM_M[2] == 74 && StancePoses.APOC_STORM_O[2] == -74, "the storm's pose");
+        check(StancePoses.APOC_STORM_M[2] > 90 && StancePoses.APOC_STORM_O[2] == -StancePoses.APOC_STORM_M[2]
+                && StancePoses.APOC_STORM_O[0] == StancePoses.APOC_STORM_M[0], "the storm's pose is a symmetric V");
+        helper.succeed();
+    }
+
+    /** Where the right arm points for a pair of poses (and that the pair is symmetric: both arms point the same way). */
+    private static float[] pair(float[] m, float[] o, String what) {
+        float[] right = ApocalypseHeroMath.armDirection(m[0], m[1], m[2], false);
+        float[] left = ApocalypseHeroMath.armDirection(o[0], o[1], o[2], true);
+        for (int i = 0; i < 3; i++) {
+            assertNear(right[i], left[i], 1.0E-4, what + ": the arms are mirrors of each other (" + i + ")");
+        }
+        return right;
+    }
+
+    private static float[] keyed(Gestures.Def def, int index, String what) {
+        Gestures.ArmKey m = def.m.get(index);
+        Gestures.ArmKey o = def.o.get(index);
+        return pair(new float[]{m.x, m.y, m.z}, new float[]{o.x, o.y, o.z}, what);
+    }
+
+    @GameTest(template = ARENA, batch = PURE)
+    public static void theArmsPointWhereTheDesignSaysTheyDo(GameTestHelper helper) {
+        // The numbers of a pose are raw angles whose signs are easy to get wrong (an arm raised above the shoulder is
+        // tipped INWARD by a positive z): these say where the arms really go. {forward, up, outward}.
+        float[] shield = pair(StancePoses.APOC_SHIELD_M, StancePoses.APOC_SHIELD_O, "the shield");
+        check(shield[0] > 0.9F && Math.abs(shield[1]) < 0.3F && shield[2] > 0.0F, "the shield: the arms are held out before him, a little apart");
+        float[] storm = pair(StancePoses.APOC_STORM_M, StancePoses.APOC_STORM_O, "the storm");
+        check(storm[2] > 0.6F && storm[1] > 0.4F && storm[0] >= 0.0F && storm[0] < 0.5F, "the storm: flung wide and up, in a V, not crossed before the chest");
+        Gestures.Def wave = Gestures.get(GestureId.APOC_SAND_WAVE);
+        float[] drawn = keyed(wave, 1, "the wave drawn back");
+        check(drawn[0] < 0.0F && drawn[1] < 0.0F, "the wave: the arms are drawn back and low");
+        float[] thrown = keyed(wave, 2, "the wave thrown");
+        check(thrown[0] > 0.9F && thrown[1] < 0.0F, "the wave: and thrown forward and down, to the ground");
+        float[] spread = keyed(Gestures.get(GestureId.APOC_PORTAL), 1, "the portal spread");
+        check(spread[2] > 0.8F && Math.abs(spread[1]) < 0.3F, "the portal: the arms spread wide");
+        float[] gather = keyed(Gestures.get(GestureId.APOC_STORM_START), 1, "the storm gathers");
+        check(gather[0] > 0.5F && gather[1] < -0.4F && gather[2] < 0.0F, "the storm: the hands gather low in front of him, together");
+        float[] raised = keyed(Gestures.get(GestureId.APOC_SHIELD_RAISE), 1, "the shield drawn up");
+        check(raised[0] > 0.7F && raised[2] > 0.0F, "the raise: the arms come forward and open");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = PURE)
+    public static void theBossLiftsHisArmsAsTheDesignSaysToo(GameTestHelper helper) {
+        ApocalypseBossPoses.Out out = new ApocalypseBossPoses.Out();
+        for (Object[] row : new Object[][]{
+                // pose, tick, least up, least outward
+                {ApocalypseBossPoses.Pose.HOVER, 14, 0.4F, 0.6F},
+                {ApocalypseBossPoses.Pose.BOULDERS, 20, 0.7F, 0.2F},
+                {ApocalypseBossPoses.Pose.TORNADO, 30, 0.7F, 0.2F},
+        }) {
+            ApocalypseBossPoses.Pose pose = (ApocalypseBossPoses.Pose) row[0];
+            ApocalypseBossPoses.sample(pose, (int) row[1], out);
+            float[] right = ApocalypseHeroMath.armDirection(out.get(ApocalypseBossPoses.Ch.RX), out.get(ApocalypseBossPoses.Ch.RY),
+                    out.get(ApocalypseBossPoses.Ch.RZ), false);
+            float[] left = ApocalypseHeroMath.armDirection(out.get(ApocalypseBossPoses.Ch.LX), out.get(ApocalypseBossPoses.Ch.LY),
+                    out.get(ApocalypseBossPoses.Ch.LZ), true);
+            for (float[] arm : new float[][]{right, left}) {
+                check(arm[1] >= (float) row[2] && arm[2] >= (float) row[3], pose + ": the arms go up and apart (up " + arm[1] + ", out " + arm[2] + ")");
+            }
+        }
         helper.succeed();
     }
 

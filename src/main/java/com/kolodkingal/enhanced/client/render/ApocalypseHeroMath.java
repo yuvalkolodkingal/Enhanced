@@ -48,6 +48,34 @@ public final class ApocalypseHeroMath {
         return StancePoses.APOC_SHIELD_LEAN * shield + StancePoses.APOC_STORM_LEAN * storm;
     }
 
+    /**
+     * Where the upper arm of the model points for raw angles (degrees; the signs of the arm it is, see {@link PoseContext}), as
+     * {@code {forward, up, outward}} of a unit vector. The model turns a vertex about X first, then Y, then Z, so an arm raised
+     * forward is spread by {@code y} and one raised above the shoulder by {@code z}; the numbers of a pose are easy to get wrong
+     * in their signs, and this says what they do. The left arm's signs are the mirror ({@code y} and {@code z} negated):
+     * pass {@code left} and they are mirrored back, so that a symmetric pair gives the same answer.
+     */
+    public static float[] armDirection(float x, float y, float z, boolean left) {
+        double yy = left ? -y : y;
+        double zz = left ? -z : z;
+        double rx = Math.toRadians(x);
+        double ry = Math.toRadians(yy);
+        double rz = Math.toRadians(zz);
+        // The hanging arm (0, 1, 0) in model space (+x is the player's left, +y down, -z forward), turned X, then Y, then Z.
+        double vx = 0.0;
+        double vy = Math.cos(rx);
+        double vz = Math.sin(rx);
+        double tx = vx * Math.cos(ry) + vz * Math.sin(ry);
+        double tz = -vx * Math.sin(ry) + vz * Math.cos(ry);
+        vx = tx;
+        vz = tz;
+        tx = vx * Math.cos(rz) - vy * Math.sin(rz);
+        double ty = vx * Math.sin(rz) + vy * Math.cos(rz);
+        vx = tx;
+        vy = ty;
+        return new float[]{(float) -vz, (float) -vy, (float) -vx};
+    }
+
     private ApocalypseHeroMath() {
     }
 }

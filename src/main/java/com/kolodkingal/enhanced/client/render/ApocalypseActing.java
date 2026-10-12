@@ -75,7 +75,8 @@ final class ApocalypseActing {
             both(m, o, w, -0.12F, 0.30F, 0.12F, -44, 8, 0);
         }
         if ((w = s.stance(Stance.APOC_STORM)) > 0.001F) {
-            both(m, o, w, -0.18F, 0.20F, 0.12F, -30, 18, 0);
+            // The arms are flung wide and up: the hands go out to the edges of the screen and rise, the palms turned outward.
+            both(m, o, w, 0.20F, 0.18F, 0.02F, -22, -20, -16);
         }
         for (HeroAnimState.Slot slot : s.slots) {
             if (!slot.active || slot.weight <= 0.001F) {
@@ -91,9 +92,12 @@ final class ApocalypseActing {
                 }
                 case APOC_ENTOMB -> m.add(w2, -0.10F, 0.26F, 0.22F, -52, 8, 0); // a hand reaching ahead
                 case APOC_PORTAL -> {
-                    // The arms spread.
+                    // The arms spread: the hands go out to the edges of the screen, turned outward (the design's row drew them
+                    // together, which is how they come back across the body, not how they open).
                     float u = ss(0, 5, t);
-                    both(m, o, w2, lerp(u, -0.10F, -0.30F), lerp(u, 0.10F, 0.10F), lerp(u, 0.0F, 0.20F), lerp(u, -10, -20), lerp(u, 6, 30), 0);
+                    float back = ss(7, 12, t);
+                    both(m, o, w2, lerp(u, -0.10F, 0.20F) - 0.34F * back, lerp(u, 0.10F, 0.16F) - 0.04F * back, lerp(u, 0.0F, 0.06F) + 0.10F * back,
+                            lerp(u, -10, -14) - 8 * back, lerp(u, 6, -24) + 40 * back, 0);
                 }
                 case APOC_BESTOW -> m.add(w2, -0.12F, 0.20F, 0.24F, -34, 6, 0); // a hand offered
                 default -> {
