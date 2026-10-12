@@ -460,19 +460,27 @@ public final class UltronNetworkTests {
         });
     }
 
+    /**
+     * The hero stands three and a half blocks in from two walls, not in the corner: the drone that catches up appears
+     * three blocks from him at a random angle, and from the corner that spot can be past the arena's wall, in a chunk
+     * that is not the test's. The GameTest server does not tick a creature there (it forces only the test's own chunks,
+     * and its simulation distance is 0), so that drone would keep the target it had, and the test failed on about one
+     * placement of the arena in ten.
+     */
     @GameTest(template = ARENA, batch = "ultron_drones", timeoutTicks = 300)
     public static void dronesFollowAndFight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
-        ServerPlayer hero = hero(f, 1.5, 1.5);
-        UltronSentryEntity a = drone(f, hero, 3.5, FLOOR + 1.0, 3.5, false);
-        UltronSentryEntity b = drone(f, hero, 3.5, FLOOR + 1.0, 1.5, false);
-        // One of them is far from him (the length of the floor): it catches up by teleporting.
-        UltronSentryEntity far = drone(f, hero, 20.5, FLOOR + 1.0, 20.5, false);
-        Zombie hostile = dummy(helper, 9.5, 1.5);
-        Zombie distant = dummy(helper, 14.5, 14.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 8.5));
-        ServerPlayer bystander = f.player(8.5, FLOOR, 6.5);
+        ServerPlayer hero = hero(f, 3.5, 3.5);
+        UltronSentryEntity a = drone(f, hero, 5.5, FLOOR + 1.0, 5.5, false);
+        UltronSentryEntity b = drone(f, hero, 5.5, FLOOR + 1.0, 3.5, false);
+        // One of them is far from him (the far corner, high up: more than 24 blocks): it catches up by teleporting.
+        UltronSentryEntity far = drone(f, hero, 20.5, FLOOR + 5.0, 20.5, false);
+        check(far.distanceTo(hero) > UltronSentryEntity.DRONE_LEASH, "the far drone starts beyond the leash: " + far.distanceTo(hero));
+        Zombie hostile = dummy(helper, 11.5, 3.5);
+        Zombie distant = dummy(helper, 16.5, 16.5);
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 10.5));
+        ServerPlayer bystander = f.player(10.5, FLOOR, 8.5);
         tick(hero);
         f.everyTick(240, t -> {
             tick(hero);
