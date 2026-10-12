@@ -1442,7 +1442,7 @@ public class ThanosEntity extends Monster implements BossHooks {
         noteWho(source, attacker, hit);
         if (fromMob && !bypass && attacker instanceof LivingEntity mob && !mob.getType().is(ModTags.BOSSES)
                 && !BossFights.sameFight(this, mob)) {
-            // A golem or a wolf that hits him is swatted away with the back of his hand.
+            // A golem or a wolf that hits him is struck down with the back of his hand (1000: no creature lives through it).
             StonePowers.hurt((ServerLevel) level(), this, mob, ModDamageTypes.THANOS_BLOW, 1000.0F, this);
         }
         if (takenPoints <= 0.0F && !bypass) {

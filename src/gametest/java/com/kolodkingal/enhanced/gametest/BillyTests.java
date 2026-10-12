@@ -363,8 +363,13 @@ public final class BillyTests {
         helper.succeed();
     }
 
+    /**
+     * The spellbound zombie is watched every tick and must never move; the free one has until tick 90 to walk a block
+     * (a zombie can take more than two seconds to set off after a target it was handed).
+     */
     @GameTest(template = ARENA, timeoutTicks = 100)
     public static void aSpellboundZombieDoesNotGoAfterItsTarget(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
         Zombie frozen = helper.spawn(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 6.5));
         Zombie free = helper.spawn(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 14.5));
         Villager frozenPrey = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 6.5));
@@ -374,13 +379,16 @@ public final class BillyTests {
         free.setTarget(freePrey);
         Vec3 frozenAt = frozen.position();
         Vec3 freeAt = free.position();
-        helper.runAfterDelay(40, () -> {
-            check(frozen.getTarget() == null, "a spellbound zombie forgets its target");
+        f.everyTick(90, tick -> {
             double moved = frozen.position().subtract(frozenAt).horizontalDistance();
-            check(moved < 0.2, "and stays where it is (moved " + moved + ")");
+            check(moved < 0.2, "a spellbound zombie stays where it is (moved " + moved + " by tick " + tick + ")");
+            if (tick < 40) {
+                return false;
+            }
+            check(frozen.getTarget() == null, "a spellbound zombie forgets its target");
             double walked = free.position().subtract(freeAt).horizontalDistance();
-            check(walked > 1.0, "while a free zombie goes after its own (walked " + walked + ")");
-            helper.succeed();
+            check(walked > 1.0 || tick < 90, "while a free zombie goes after its own (walked " + walked + ")");
+            return walked > 1.0;
         });
     }
 

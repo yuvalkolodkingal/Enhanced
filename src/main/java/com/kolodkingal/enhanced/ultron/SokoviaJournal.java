@@ -39,7 +39,8 @@ import java.util.stream.Stream;
  * so recovery clears "every block inside this shape, in this range of heights" and needs no copy of anything.
  *
  * <p>The ground is never edited by the lift, so there is no snapshot to restore, and a lost file's worst case is a
- * floating island of ordinary blocks ({@code /enhanced boss cleanup} removes it).
+ * floating island of ordinary blocks, which stays like any other blocks ({@code /enhanced boss cleanup} removes only the
+ * fight's creatures, never blocks).
  */
 public final class SokoviaJournal {
     /** The island is, or may be, in the sky: the placing has begun. */
