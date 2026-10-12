@@ -4,7 +4,6 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
-import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,23 +31,22 @@ public final class ApocalypseSetup {
     /**
      * What the Phoenix's mind does to the shield besides her Burst and her slams (those are damage and reach it through
      * {@code hurt}): a Mind Control (even a refused one) strains it by {@code phoenixMindControlStrain}, a Psionic Field
-     * whose sphere holds him by {@code phoenixPsionicStrain}, and either one, touching him in the tell of the Mind Crush,
-     * interrupts it (the astral duel of the film).
+     * whose sphere holds him by {@code phoenixPsionicStrain} (each once per cast), and either one, touching him in the tell
+     * of the Mind Crush, interrupts it (the astral duel of the film).
      */
     static void registerPhoenixListener() {
         PhoenixPower.addListener(ApocalypseSetup::phoenixTouched);
     }
 
     static void phoenixTouched(ServerPlayer phoenix, LivingEntity target, PhoenixPower.Kind kind, float amount) {
-        if (!(target instanceof ApocalypseEntity boss)) {
-            return;
-        }
         if (kind != PhoenixPower.Kind.MIND_CONTROL && kind != PhoenixPower.Kind.PSIONIC_FIELD) {
             return; // her Burst and her slams are damage: they reach the shield through hurt
         }
+        if (!(target instanceof ApocalypseEntity boss)) {
+            return;
+        }
         if (MindPower.isBreaker(phoenix)) {
-            boss.strain(phoenix, (kind == PhoenixPower.Kind.MIND_CONTROL ? ApocalypseShieldConfig.PHOENIX_MIND_CONTROL_STRAIN
-                    : ApocalypseShieldConfig.PHOENIX_PSIONIC_STRAIN).get().floatValue());
+            boss.strain(phoenix, kind);
         }
         boss.brain().interrupt();
     }

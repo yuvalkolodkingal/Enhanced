@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.apocalypse;
 
+import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossFights;
@@ -39,6 +40,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Apocalypse, the boss: En Sabah Nur, the first mutant, 2.9 blocks tall. He is a body with a controller: this class is
@@ -103,6 +107,8 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     private long slowedSince = -1;
     private long lastSlowed = Long.MIN_VALUE / 2;
     private long adaptedUntil;
+    /** When each Phoenix's touch last strained the shield ({@link MindPower#strainCounts}). */
+    private final Map<String, Long> strains = new HashMap<>();
     private boolean lightningStruck;
     /** The model viewer's copy: the tick it is shown at (-1 when this is a real boss), and whether the tick advances. */
     private float shownTick = -1.0F;
@@ -561,10 +567,15 @@ public class ApocalypseEntity extends Monster implements BossHooks {
         return true;
     }
 
-    /** The shield is strained (not hit): a Phoenix's Mind Control or Psionic Field. */
-    public void strain(ServerPlayer phoenix, float points) {
+    /**
+     * The shield is strained (not hit): a Phoenix's Mind Control or Psionic Field, once per cast ({@link MindPower#strainCounts}:
+     * his mind refuses her, so the cast starts no recharge of hers, and the shield keeps it).
+     */
+    public void strain(ServerPlayer phoenix, PhoenixPower.Kind kind) {
         ApocalypseFight fight = fight();
-        if (fight == null || fight.bossInvulnerable() || !shield.isUp()) {
+        float points = MindPower.strain(kind);
+        if (fight == null || fight.bossInvulnerable() || !shield.isUp() || points <= 0.0F
+                || !MindPower.strainCounts(strains, phoenix.getUUID(), kind, level().getGameTime())) {
             return;
         }
         float before = shield.strength();

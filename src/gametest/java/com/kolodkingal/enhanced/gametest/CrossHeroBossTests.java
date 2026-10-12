@@ -343,6 +343,42 @@ public final class CrossHeroBossTests {
         });
     }
 
+    /**
+     * The Phoenix's Mind Control and Psionic Field are not damage but a strain on Apocalypse's shield, even when his mind
+     * refuses them (apocalypse.md 3.5.4: 25 and 60 points): once per cast. A cast he refuses starts no recharge of hers
+     * (phoenix.md 4.4), so pressing the key again at once is not a second cast: the shield feels each of her touches once
+     * per its recharge.
+     */
+    @GameTest(template = ARENA, batch = "cross_phoenix_strain", timeoutTicks = 100)
+    public static void thePhoenixsMindStrainsApocalypsesShieldOncePerCast(GameTestHelper helper) {
+        Duel d = ApocalypseTestSupport.duel(helper, 1, Power.PHOENIX);
+        ServerPlayer jean = d.hero();
+        ApocalypseEntity boss = d.boss();
+        float health = boss.getHealth();
+        float control = ApocalypseShieldConfig.PHOENIX_MIND_CONTROL_STRAIN.get().floatValue();
+        float field = ApocalypseShieldConfig.PHOENIX_PSIONIC_STRAIN.get().floatValue();
+        float max = boss.shield().strength();
+        lookAt(jean, boss);
+        press(jean, 4);
+        check(Powers.get(jean).isReady(4, helper.getLevel().getGameTime()), "his mind refused her: her Mind Control did not start its recharge");
+        assertNear(max - boss.shield().strength(), control, 1.0E-3, "but the attempt strained his shield by " + control);
+        for (int i = 0; i < 5; i++) {
+            lookAt(jean, boss);
+            press(jean, 4);
+        }
+        assertNear(max - boss.shield().strength(), control, 1.0E-3, "pressing B again at once is the same cast: no more strain ("
+                + (max - boss.shield().strength()) + ")");
+        sneakPress(jean, 4);
+        assertNear(max - boss.shield().strength(), control + field, 1.0E-3, "her Psionic Field round him strains it by " + field);
+        for (int i = 0; i < 5; i++) {
+            sneakPress(jean, 4);
+        }
+        assertNear(max - boss.shield().strength(), control + field, 1.0E-3, "and again at once, no more (" + (max - boss.shield().strength()) + ")");
+        check(boss.shield().isUp() && boss.getHealth() == health, "the shield stands, and his health is untouched");
+        assertNear(d.fight().participant(jean.getUUID()).counter("shield"), control + field, 1.0E-3, "she is credited with the strain");
+        helper.succeed();
+    }
+
     // ============================================================================================================
     // 3. Only Wanda's and the Phoenix's mind power break Apocalypse's shield
 
