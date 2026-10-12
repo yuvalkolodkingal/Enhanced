@@ -443,6 +443,7 @@
   "message.enhanced.boss.end.server_stopping": "השרת נסגר: הקרב נגד %s נגמר",
   "commands.enhanced.boss.stop.none": "אין קרב בוס פעיל",
   "power.enhanced.phoenix": "ג'ין גריי (הפניקס)",
+  "power.enhanced.phoenix.title": "הפניקס",
   "power.enhanced.phoenix.awaken": "האש הקוסמית מתעוררת בתוכך",
   "power.enhanced.phoenix.broadcast": "%s הפך לג'ין גריי, הפניקס!",
   "ability.enhanced.phoenix.1": "קריאת מחשבות (התכופפות: חישת מוחות)",

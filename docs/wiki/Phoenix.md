@@ -57,7 +57,7 @@ What the panel shows is explained [below](#the-mind-reading-panel).
 
 * A **ring of violet motes** spreads out from you at 2 blocks a tick, up to 48 blocks. Everyone nearby sees the ring.
 * **Only you** see the glow: every mind the ring passes glows through the walls until six seconds are over. **Players** glow white-violet, **hostile monsters** pink, **everything else** violet. A hidden Loki glows too (his illusions don't).
-* The action bar says what you found: "Minds nearby: 7 (2 players, 3 hostile)". If someone in range wears Magneto's helmet you also hear about "silences where a mind should be", one for each helmet.
+* The action bar says what you found: "Minds nearby: 7 (players: 2, hostile: 3)". If someone in range wears Magneto's helmet you also hear about "silences where a mind should be", one for each helmet.
 * Costs 2 exhaustion. **Cooldown: 20 seconds.**
 
 **Not minds.** Armour stands, you, Loki's duplicates, and players in Creative or Spectator mode aren't read, sensed or taken. **Magneto's helmet** blocks every power of the mind (reading, sensing, taking over, the field): in the X-Men films it keeps Xavier out too. It does not block her telekinesis or her fire. The biggest bosses (the Ender Dragon, the Wither, the Warden and the 3.0 bosses) are too vast to read ("A mind too vast to read") or take.

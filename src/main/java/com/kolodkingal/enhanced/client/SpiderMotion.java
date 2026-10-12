@@ -266,7 +266,7 @@ public final class SpiderMotion {
         if (ability == 2) {
             pressedG = true;
             pressedGSneaking = sneaking;
-        } else if (ability == 4 && sneaking) {
+        } else if (ability == 4 && sneaking && !keysIgnored(player, data)) {
             // The same asking as the server's, so that the HUD can say "confirm?" (nothing is decided here).
             if (data.is(Live.INSTANT_KILL) || !legsOut(data) || !data.isReady(4, now)) {
                 confirmUntil = 0;
@@ -408,6 +408,14 @@ public final class SpiderMotion {
     /**
      * What stops him acting: the things that hold or carry a player (Billy's spell holds him in place, see the cling).
      */
+    /**
+     * Whether the server ignores every key of his now ({@code SpiderServer.blocked}): what stops his own movement here,
+     * and Billy's spell or the Phoenix's hold, which leave a cling frozen in place but let no web, zip or leg out.
+     */
+    public static boolean keysIgnored(LocalPlayer player, PowerData data) {
+        return blocked(player, data) || player.hasEffect(ModEffects.SPELLBOUND);
+    }
+
     private static boolean blocked(LocalPlayer player, PowerData data) {
         if (player.isSpectator() || player.isPassenger() || player.getAbilities().flying || player.isFallFlying() || data.is(Live.PINNED)
                 || data.is(Live.LIFTED) || player.hasEffect(ModEffects.ENTOMBED)) {
