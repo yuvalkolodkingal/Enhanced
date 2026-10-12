@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.ultron.SokoviaJournal.Header;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -21,8 +22,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,6 +105,8 @@ public final class SokoviaLift implements LiftHook {
     private static final double FALL_FIELD = 3.0;
     /** ... or this high over the island's top. */
     private static final double SKY_FIELD = 80.0;
+    /** How far under a fighter who is set down in the air the ground is looked for. */
+    private static final int SET_DOWN_REACH = 64;
 
     private static final Map<UUID, Lift> LIFTS = new LinkedHashMap<>();
 
@@ -693,6 +698,7 @@ public final class SokoviaLift implements LiftHook {
         private void landed() {
             carry.move(-spec.height());
             carry.snapAll();
+            setPlayersDown();
             long now = level.getGameTime();
             for (SokoviaCarry.Rider rider : carry.riders()) {
                 if (rider.player) {
@@ -969,6 +975,7 @@ public final class SokoviaLift implements LiftHook {
         private void setDownInPlace() {
             carry.move(0.0);
             carry.snapAll();
+            setPlayersDown();
             long now = level.getGameTime();
             for (SokoviaCarry.Rider rider : carry.riders()) {
                 if (rider.player) {
@@ -982,8 +989,8 @@ public final class SokoviaLift implements LiftHook {
         }
 
         /**
-         * The island is in the sky (whole, or half placed, or half taken down) and must go now: everything on it, and
-         * everything it was carrying, is set on the ground below, then every block of the island is cleared.
+         * The island is in the sky (whole, or half placed, or half taken down) and must go now: every block of the island
+         * is cleared, and everything on it, and everything it was carrying, is set on the ground below.
          */
         private void restoreEverything() {
             double high = spec.height();
@@ -1004,21 +1011,72 @@ public final class SokoviaLift implements LiftHook {
             }
             carry.releaseAll();
             SokoviaTemplate t = template;
-            for (int i = 0; i < down.size(); i++) {
-                Entity entity = down.get(i);
-                SokoviaCarry.release(entity);
-                SokoviaCarry.teleport(entity, SokoviaCarry.freeSpot(entity, spots.get(i)));
-                if (entity instanceof ServerPlayer player) {
-                    grace.put(player.getUUID(), level.getGameTime() + GRACE_TICKS);
-                }
-            }
             if (t != null) {
-                // (A placing that was cut short is dropped: what it did place is cleared with the rest.)
+                // (A placing that was cut short is dropped: what it did place is cleared with the rest. The island goes
+                // first, so that what is under a fighter who was in the air over it is the real ground.)
                 SokoviaJob clearing = job != null && !job.isPasting() ? job : SokoviaJob.clear(level, spec, centre, t.minY() + spec.height(), t.roomTop() + spec.height());
                 clearing.finishNow();
             }
             job = null;
+            for (int i = 0; i < down.size(); i++) {
+                Entity entity = down.get(i);
+                SokoviaCarry.release(entity);
+                SokoviaCarry.teleport(entity, setDownSpot(entity, spots.get(i)));
+                if (entity instanceof ServerPlayer player) {
+                    grace.put(player.getUUID(), level.getGameTime() + GRACE_TICKS);
+                }
+            }
             altitude = 0.0;
+        }
+
+        /**
+         * Where something is set down on the real ground at the end of a move, given the spot the lift has for it: a
+         * player who is not flying is set on what is under that spot, so that a fighter who was in the air over the
+         * island when it went (a jump, a knock; Ultron's Gravity Pull holds one at his chest, four blocks up) is put on
+         * the ground below and not as high over it, where the lift had carried them. A hero who is flying is left at his
+         * height and flies on, and anything else keeps its spot (it falls by itself). Always free of the blocks.
+         */
+        private Vec3 setDownSpot(Entity entity, Vec3 spot) {
+            Vec3 at = entity instanceof ServerPlayer player && !player.getAbilities().flying ? groundUnder(spot) : spot;
+            return SokoviaCarry.freeSpot(entity, at);
+        }
+
+        /**
+         * The spot lowered through the air under it onto the first block below that has a body (or onto the surface of
+         * water): the spot itself if it is in such a block already (it is not raised), or if nothing is within reach.
+         */
+        private Vec3 groundUnder(Vec3 spot) {
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(Mth.floor(spot.x), Mth.floor(spot.y), Mth.floor(spot.z));
+            int bottom = Math.max(level.getMinBuildHeight(), pos.getY() - SET_DOWN_REACH);
+            for (; pos.getY() >= bottom; pos.move(Direction.DOWN)) {
+                BlockState state = level.getBlockState(pos);
+                VoxelShape shape = state.getCollisionShape(level, pos);
+                double top;
+                if (!shape.isEmpty()) {
+                    top = pos.getY() + shape.max(Direction.Axis.Y);
+                } else if (!state.getFluidState().isEmpty()) {
+                    top = pos.getY() + state.getFluidState().getHeight(level, pos);
+                } else {
+                    continue;
+                }
+                return new Vec3(spot.x, Math.min(spot.y, top), spot.z);
+            }
+            return spot;
+        }
+
+        /**
+         * The players the lift has just put where it says they are on the real ground are set down on what is under them
+         * ({@link #setDownSpot}), before they are let go.
+         */
+        private void setPlayersDown() {
+            for (Entity entity : carry.entities()) {
+                if (entity instanceof ServerPlayer player && player.isAlive()) {
+                    Vec3 spot = setDownSpot(player, player.position());
+                    if (player.position().distanceToSqr(spot) > 1.0E-6) {
+                        SokoviaCarry.teleport(player, spot);
+                    }
+                }
+            }
         }
 
         private void deleteNote() {

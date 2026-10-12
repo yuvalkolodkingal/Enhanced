@@ -2100,11 +2100,14 @@ island **rises 40 blocks in 8 seconds**.
   mobs break nothing, no natural spawn; the mod's own block-changing abilities refuse; teleports that would leave the cylinder
   (Ender Pearl, Chorus Fruit, the Bifrost, Vanish, the Tesseract, the Witches' Road, Vibrate, portals) are cancelled.
 * **The descent** is the mirror: the clients capture the island into the mesh, the server clears it, everyone is set down
-  on the real ground at the same place relative to the middle, and the hidden columns come back.
+  on the real ground at the same place relative to the middle (one who was in the air over the island, from a jump, a
+  knock or his Gravity Pull, is set on the ground under them; a hero who is flying flies on at his height), and the
+  hidden columns come back.
 * **The Tremor.** If the lift is switched off, the site cannot hold the island at the warning, or `liftMode` is `TREMOR`,
   the same warning, Sentries and falling rock happen on the ground and nothing moves.
 * **Failure is one small rule.** The only record is a header of a few hundred bytes (`data/enhanced/sokovia`), written
-  before the island is built and deleted after it is cleared. On a clean stop the island is cleared at once; after a crash the
+  before the island is built and deleted after it is cleared. On a clean stop the island is cleared at once and everyone on
+  it is set on the ground under them, in the same way; after a crash the
   next start clears the island's shape at altitude, sets players down on the ground, discards the boss's leftover entities and
   deletes the file. A lost file leaves at worst a floating island of ordinary blocks (to be taken down by hand: `/enhanced boss cleanup` removes entities only), never a hole
   in the ground. `CUT_GROUND` (really lifting the ground) is a setting kept for later and is not in this release: set, it acts as `TREMOR`, and `liftRequiresMobGriefing` has no effect.
