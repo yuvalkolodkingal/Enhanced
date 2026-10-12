@@ -630,6 +630,7 @@
   "message.enhanced.portal.nothing": "Nothing in reach",
   "message.enhanced.shield.recharging": "The shield is recharging (%s s)",
   "message.enhanced.shield.shattered": "Your shield shattered",
+  "message.enhanced.shield.hungry": "Too hungry to hold the shield",
   "message.enhanced.bestow.nothing": "Look at someone to empower",
   "message.enhanced.bestow.hostile": "You only enhance your own",
   "message.enhanced.bestow.done": "You empower %s",

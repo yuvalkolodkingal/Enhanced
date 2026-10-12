@@ -630,6 +630,7 @@
   "message.enhanced.portal.nothing": "אין שום דבר בטווח",
   "message.enhanced.shield.recharging": "המגן נטען (%s שניות)",
   "message.enhanced.shield.shattered": "המגן שלכם התנפץ",
+  "message.enhanced.shield.hungry": "אין מספיק אוכל כדי להחזיק את המגן",
   "message.enhanced.bestow.nothing": "הסתכלו על מישהו כדי להעצים אותו",
   "message.enhanced.bestow.hostile": "אתם מעצימים רק את שלכם",
   "message.enhanced.bestow.done": "העצמתם את %s",

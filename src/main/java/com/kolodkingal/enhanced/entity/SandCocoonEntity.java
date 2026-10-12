@@ -112,6 +112,12 @@ public class SandCocoonEntity extends Entity {
         return ticksLeft;
     }
 
+    /** The one who cast it (the boss, or the hero), or null. */
+    @Nullable
+    public UUID casterId() {
+        return casterId;
+    }
+
     /** Whether a hero cast it (its own caster is a player): the orphan sweep leaves a hero's cocoon alone. */
     public boolean isHeroes() {
         return casterIsPlayer;
