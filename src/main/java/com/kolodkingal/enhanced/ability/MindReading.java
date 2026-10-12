@@ -216,7 +216,7 @@ public final class MindReading {
      */
     public static MindReadPayload snapshot(ServerPlayer reader, LivingEntity target) {
         int state = stateOf(target);
-        String name = target instanceof Player || target.hasCustomName() ? target.getName().getString() : "";
+        String name = target instanceof Player || target.hasCustomName() ? clip(target.getName().getString()) : "";
         String species = BuiltInRegistries.ENTITY_TYPE.getKey(target.getType()).toString();
         if (state != MindReadPayload.OK) {
             return new MindReadPayload(target.getId(), name, species, state, MindReadPayload.CALM, "", 0.0F, 0.0F, 0, 0,
@@ -228,7 +228,7 @@ public final class MindReading {
             LivingEntity goal = mob.getTarget();
             if (goal != null && goal.isAlive()) {
                 mood = MindReadPayload.HOSTILE;
-                hostileTo = goal.getName().getString();
+                hostileTo = clip(goal.getName().getString());
             } else if (mob.isAggressive()) {
                 mood = MindReadPayload.ALERT;
             } else if (mob.getLastHurtByMob() != null && mob.tickCount - mob.getLastHurtByMobTimestamp() < AFRAID_TICKS) {
@@ -284,6 +284,14 @@ public final class MindReading {
             }
         }
         return "";
+    }
+
+    /**
+     * A name as the payload carries it: the codec refuses a string over 256 characters, and a creature named by a command
+     * (or a data pack) may have a longer one, which would throw in the middle of the Phoenix's tick.
+     */
+    static String clip(String name) {
+        return name.length() > NAME_LENGTH ? name.substring(0, NAME_LENGTH) : name;
     }
 
     /**

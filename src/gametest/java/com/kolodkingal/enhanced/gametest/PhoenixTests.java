@@ -635,6 +635,27 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
+    /**
+     * The payload codec refuses a string over 256 characters. A creature a command named at length, and the creature it
+     * hunts, must not make the snapshot throw in the middle of the Phoenix's tick (which would take the server with it).
+     */
+    @GameTest(template = ARENA, batch = QUICK)
+    public static void aVeryLongNameNeverBreaksTheSnapshot(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jean = jean(f, 4.5, 10.5);
+        Zombie named = zombie(helper, 9.5, 10.5);
+        Zombie prey = zombie(helper, 12.5, 10.5);
+        named.setCustomName(Component.literal("N".repeat(400)));
+        prey.setCustomName(Component.literal("P".repeat(400)));
+        named.setTarget(prey);
+        MindReadPayload payload = read(jean, named);
+        check(payload.name().length() <= 64 && payload.hostileTo().length() <= 64, "both names are cut: " + payload.name().length() + ", "
+                + payload.hostileTo().length());
+        check(payload.mood() == MindReadPayload.HOSTILE && !payload.hostileTo().isEmpty(), "and it still says whom it hunts");
+        check(MindReading.encodedSize(jean, payload) < MindReading.MAX_BYTES, "so that the payload encodes");
+        helper.succeed();
+    }
+
     @GameTest(template = ARENA, batch = QUICK)
     public static void mindReadPayloadRoundTrips(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
