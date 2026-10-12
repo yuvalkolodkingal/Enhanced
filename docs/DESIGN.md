@@ -2106,14 +2106,15 @@ island **rises 40 blocks in 8 seconds**.
   scaffolding they are not sneaking down; water or lava stops them at its surface; they are let down 64 blocks at most
   (with nothing under them in that, they stay where they are). A player who stands on something (within half a block) or
   is in water or lava stays as they are, and a hero who is flying flies on at his height. A rise that is cut short sets
-  everyone down where they were taken from, in the same way.
+  everyone down where they were taken from, in the same way. A fighter the pit's tractor is still carrying up when the
+  island starts down is put on it at once and comes down with it.
 * **The Tremor.** If the lift is switched off, the site cannot hold the island at the warning, or `liftMode` is `TREMOR`,
   the same warning, Sentries and falling rock happen on the ground and nothing moves.
 * **Failure is one small rule.** The only record is a header of a few hundred bytes (`data/enhanced/sokovia`), written
   before the island is built and deleted after it is cleared. On a clean stop the island is cleared at once and whoever was
-  on it or carried by it is set on the ground below, in the same way; once it is falling its blocks are gone already, so
-  whoever it is not carrying (one who stands on the real ground under it, say) is set down from where they are, not
-  lowered with it. After a crash the
+  on it, carried by it or on the way up to it from the pit is set on the ground below, in the same way; once it is falling
+  its blocks are gone already, so whoever it is not carrying (one who stands on the real ground under it, or jumps there)
+  is left as they are. After a crash the
   next start clears the island's shape at altitude, sets players down on the ground, discards the boss's leftover entities and
   deletes the file. A lost file leaves at worst a floating island of ordinary blocks (to be taken down by hand: `/enhanced boss cleanup` removes entities only), never a hole
   in the ground. `CUT_GROUND` (really lifting the ground) is a setting kept for later and is not in this release: set, it acts as `TREMOR`, and `liftRequiresMobGriefing` has no effect.

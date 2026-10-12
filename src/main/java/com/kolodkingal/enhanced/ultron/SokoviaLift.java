@@ -599,6 +599,13 @@ public final class SokoviaLift implements LiftHook {
             }
             descending = true;
             carry.restart();
+            // (Whoever the pit's tractor is carrying up is put on the island at once, to come down with it. Left to the
+            // tractor, they would be locked twice: the island's lock would keep the tractor's "no gravity" as their own,
+            // and when both had let go they would float.)
+            for (Tractor tractor : tractors.values()) {
+                finishTractor(tractor);
+            }
+            tractors.clear();
             for (ServerPlayer player : fight.present()) {
                 if (!inRegion(player.position(), high)) {
                     bringIn(player, high);
@@ -988,34 +995,43 @@ public final class SokoviaLift implements LiftHook {
 
         /**
          * The island is in the sky (whole, or half placed, or half taken down, or on its way down) and must go now: every
-         * block of the island is cleared, and everything on it, and everything it was carrying, is set on the ground
-         * below. While it falls its blocks are gone already, so what it does not carry is set down from where it is.
+         * block of the island is cleared, and everything on it, everything it was carrying and everyone the pit's tractor
+         * was carrying up to it is set on the ground below. While it falls its blocks are gone already: nothing stands on
+         * it that it does not carry, and whoever is where it is (on the real ground under it, or in the air there) is not
+         * its business and is left as they are.
          */
         private void restoreEverything() {
             double high = spec.height();
             double now = descending ? high + carry.moved() : high;
-            boolean falling = step == Step.FALLING;
-            List<Entity> down = new ArrayList<>(islandEntities(now));
-            for (Entity entity : carry.entities()) {
-                if (!down.contains(entity)) {
-                    down.add(entity);
+            // (The tractor runs only while the island is up: the descent puts whoever it has on the island.)
+            List<Entity> towed = new ArrayList<>();
+            for (Tractor tractor : tractors.values()) {
+                towed.addAll(tractor.carry.entities());
+            }
+            List<Entity> down = new ArrayList<>(carry.entities());
+            if (step != Step.FALLING) {
+                for (Entity entity : islandEntities(now)) {
+                    if (!down.contains(entity) && !towed.contains(entity)) {
+                        down.add(entity);
+                    }
                 }
             }
             // (Whoever the lift carries goes where the lift says they are, not where a knock, or a client that lags, has left
             // them: the carry lets them drift up to DRIFT blocks before it puts them back, and the stop must not keep that.
-            // Whatever stands on the island is as high over its place on the ground as the island is. But while the island
-            // falls there is no block of it left to stand on: what it does not carry is where it really is, on the real
-            // ground or in the air over it, and in the last blocks of the fall the region that is gathered reaches down to
-            // whoever stands on the real ground inside the rim: they are not to be sunk into it.)
+            // Whatever stands on the island is as high over its place on the ground as the island is. Whoever the tractor
+            // has is not on the island but on their way up to it, from the ground under where they are: they are let down
+            // from there, not set as far under it as the island is up, which among its underside is in the ground.)
             List<Vec3> spots = new ArrayList<>();
             for (Entity entity : down) {
                 SokoviaCarry.Rider rider = carry.rider(entity.getUUID());
-                if (rider == null && falling) {
-                    spots.add(entity.position());
-                    continue;
-                }
                 double y = rider != null ? rider.expected(carry.moved()).y : entity.getY();
                 spots.add(new Vec3(entity.getX(), y - now, entity.getZ()));
+            }
+            for (Entity entity : towed) {
+                if (!down.contains(entity)) {
+                    down.add(entity);
+                    spots.add(entity.position());
+                }
             }
             carry.releaseAll();
             SokoviaTemplate t = template;

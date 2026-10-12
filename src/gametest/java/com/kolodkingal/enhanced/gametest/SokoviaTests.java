@@ -631,6 +631,68 @@ public final class SokoviaTests {
         script.run(f, 880);
     }
 
+    /**
+     * A fighter the pit's tractor is still carrying up when the island goes down (the fight was won while they stood
+     * under it, after they died up there) is put on the island at once and comes down with it, and is free when it lands:
+     * they fall again when they step off a block. (Had the tractor kept them, the island's lock would have been put on
+     * top of the tractor's and taken its "no gravity" for their own, and they would have floated for good.)
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_tractor_descent", timeoutTicks = 700)
+    public static void aFighterTheTractorCarriesWhenTheIslandGoesDownComesDownWithItAndIsFree(GameTestHelper helper) {
+        TestKit.Fixture f = pad(helper);
+        f.config(UltronBossConfig.EDITS_PER_TICK, 400);
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        ServerPlayer fallen = f.player(MIDDLE_X + 3.0, GROUND, MIDDLE_Z + 3.0);
+        tank(starter);
+        tank(fallen);
+        UltronFight fight = onTheGround(f, starter);
+        calm(fight);
+        int[] waited = {0};
+        boolean[] towed = {false};
+        Script script = new Script();
+        script.step("the second fighter joins", () -> fight.participants().size() == 2);
+        script.then("the lift begins", () -> {
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the island is up", () -> {
+            client(starter, fallen);
+            return fight.phase() == UltronFight.Phase.ISLAND && in(fight, SokoviaLift.Step.PLACED);
+        });
+        script.then("the fight is won", () -> {
+            fight.setNextDebrisAt(Long.MAX_VALUE / 2); // (nothing falls on them: the test's client never stops one who was knocked)
+            fight.end(BossEnd.VICTORY);
+        });
+        // (The island goes down 100 ticks after the win; the tractor takes one who stood under it for 40 ticks, in 60.)
+        script.step("a while into the pause", () -> {
+            client(starter, fallen);
+            return ++waited[0] >= 30;
+        });
+        script.then("one died up there and stands under it", () -> {
+            SokoviaLift.onDeath(fallen);
+            put(f, fallen, MIDDLE_X + 3.0, GROUND, MIDDLE_Z + 3.0);
+        });
+        script.step("the island goes down with them, and lands", () -> {
+            client(starter, fallen);
+            SokoviaLift.Lift lift = SokoviaLift.of(fight);
+            if (lift != null && lift.step() == SokoviaLift.Step.PLACED) {
+                towed[0] = lift.carries(fallen.getUUID()) && !lift.carried().contains(fallen.getUUID());
+            } else if (lift != null && lift.step() == SokoviaLift.Step.DESCENT_LOCK) {
+                check(towed[0], "(the tractor had them when the island began to go down)");
+                check(lift.carried().contains(fallen.getUUID()) && rel(helper, fallen).y > GROUND + LIFT - 1.0,
+                        "they are on the island, and it carries them: " + rel(helper, fallen));
+            }
+            return fight.isFinished();
+        });
+        script.then("they are down, and free", () -> {
+            assertNear(rel(helper, fallen).y, GROUND, 0.01, "they are on the ground");
+            assertNear(rel(helper, fallen).x, MIDDLE_X + 3.0, 0.5, "under where they stood");
+            check(!fallen.isNoGravity() && !Powers.get(fallen).is(Live.LIFTED), "and free: noGravity " + fallen.isNoGravity());
+            check(!SokoviaLift.isCarried(fallen), "nothing carries them");
+        });
+        script.run(f, 680);
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // Being carried
 
