@@ -163,7 +163,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // An upload
 
-    @GameTest(template = ARENA, batch = "ultron_upload", timeoutTicks = 360)
+    @GameTest(template = ARENA, batch = "solo_upload_moves_the_boss", timeoutTicks = 360)
     public static void uploadMovesTheBoss(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);

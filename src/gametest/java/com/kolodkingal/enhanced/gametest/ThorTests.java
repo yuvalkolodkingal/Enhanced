@@ -251,7 +251,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @GameTest(template = ARENA, timeoutTicks = 200, batch = "solo_thrown_mjolnir_hits_and_comes_back")
     public static void thrownMjolnirHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // Out and back inside this arena (21 wide, the thrower at x 3.5, the zombie at 12.5): the hammer overshoots its
@@ -373,7 +373,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @GameTest(template = ARENA, timeoutTicks = 200, batch = "solo_thrown_stormbreaker_hits_and_comes_back")
     public static void thrownStormbreakerHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
@@ -560,7 +560,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = "solo_the_weapon_makes_the_beam_reach_farther_and_hit_harder")
     public static void theWeaponMakesTheBeamReachFartherAndHitHarder(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EnhancedConfig.THOR_BEAM_RANGE.getDefault() == 24 && EnhancedConfig.MJOLNIR_BEAM_RANGE.getDefault() == 48
@@ -1187,7 +1187,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @GameTest(template = ARENA, timeoutTicks = 200, batch = "solo_mjolnir_lets_go_by_itself_after_its_time")
     public static void mjolnirLetsGoByItselfAfterItsTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EnhancedConfig.MJOLNIR_PIN_DURATION.getDefault() == 1200, "a minute by default");
@@ -1303,7 +1303,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100)
+    @GameTest(template = ARENA, timeoutTicks = 100, batch = "solo_a_player_cant_be_pinned_with_pvp_off_but_is_held_with_it_on")
     public static void aPlayerCantBePinnedWithPvpOffButIsHeldWithItOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1384,7 +1384,7 @@ public final class ThorTests {
      * A pinned player's dashes and jumps are teleports like any other: Quicksilver's Blitz, and Loki's escape with the
      * Tesseract.
      */
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @GameTest(template = ARENA, timeoutTicks = 60, batch = "solo_a_pinned_player_cant_blitz_or_escape_with_the_tesseract")
     public static void aPinnedPlayerCantBlitzOrEscapeWithTheTesseract(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);

@@ -146,7 +146,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** Past the chain's slack it parts: a creature that leaves, or a Thanos who is starving or held, ends it. */
-    @GameTest(template = ARENA, batch = "thanos_hero_drain_ends")
+    @GameTest(template = ARENA, batch = "solo_the_soul_drain_ends_out_of_range_and_when_he_starves_or_is_held")
     public static void theSoulDrainEndsOutOfRangeAndWhenHeStarvesOrIsHeld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosConfig.DRAIN_RANGE, 4.0);
@@ -281,7 +281,7 @@ public final class ThanosSoulTimeTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "thanos_hero_sight_keeps", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "solo_with_the_config_off_the_soul_sight_keeps_lokis_tricks", timeoutTicks = 60)
     public static void withTheConfigOffTheSoulSightKeepsLokisTricks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosConfig.SIGHT_BREAKS_ILLUSIONS, false);

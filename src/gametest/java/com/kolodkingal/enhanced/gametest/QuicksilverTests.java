@@ -358,7 +358,7 @@ public final class QuicksilverTests {
         return ticks;
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    @GameTest(template = ARENA, batch = "solo_eating_finishes_in_a_quarter_of_the_ticks")
     public static void eatingFinishesInAQuarterOfTheTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -391,7 +391,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    @GameTest(template = ARENA, batch = "solo_brushes_spyglasses_and_horns_keep_their_own_pace")
     public static void brushesSpyglassesAndHornsKeepTheirOwnPace(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -419,7 +419,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_eating")
+    @GameTest(template = ARENA, batch = "solo_others_are_not_rushed_by_quicksilver_time")
     public static void othersAreNotRushedByQuicksilverTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);

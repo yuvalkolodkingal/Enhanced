@@ -300,7 +300,7 @@ public final class ScarletWitchTests {
     }
 
     /** A hit player gets Nausea for 8 seconds and Slowness I for 3; Magneto's helmet turns the Nausea away. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = "solo_scepter_gives_a_player_nausea_and_slowness")
     public static void scepterGivesAPlayerNauseaAndSlowness(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -573,7 +573,7 @@ public final class ScarletWitchTests {
     private static final int LAUNCH_TICK = 6;
 
     /** The whole chain behind "Magneto takes Wanda's attacks in full": a block she hurls at him hits as if he had no armor. */
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = "solo_wanda_hurls_a_block_at_magneto")
     public static void wandaHurlsABlockAtMagneto(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);

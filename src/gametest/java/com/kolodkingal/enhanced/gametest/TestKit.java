@@ -42,10 +42,12 @@ import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 
 /**
@@ -107,6 +109,38 @@ public final class TestKit {
             server.overworld().setData(ModAttachments.BOSS_DATA, data);
         });
         return fixture;
+    }
+
+    /**
+     * What the server had before the first of the tests that change it (a config value, PvP) changed it, and how many of
+     * them still hold a change: it comes back only when the last of them ends. (If each test put back the value it found,
+     * two tests that overlap would leave the change in place for good whenever the first one ends first.) A test that
+     * changes one still needs a batch of its own, or the tests beside it would run with its value.
+     */
+    private static final Map<Object, Held<?>> HELD = new HashMap<>();
+
+    private static final class Held<T> {
+        private final T original;
+        private final Consumer<T> restore;
+        private int holders;
+
+        private Held(T original, Consumer<T> restore) {
+            this.original = original;
+            this.restore = restore;
+        }
+    }
+
+    /** Notes a test's change of {@code key} (now {@code current}); the returned undo restores it after the last holder. */
+    @SuppressWarnings("unchecked")
+    private static <T> Runnable hold(Object key, T current, Consumer<T> restore) {
+        Held<T> held = (Held<T>) HELD.computeIfAbsent(key, k -> new Held<>(current, restore));
+        held.holders++;
+        return () -> {
+            if (--held.holders == 0) {
+                HELD.remove(key);
+                held.restore.accept(held.original);
+            }
+        };
     }
 
     public static final class Fixture implements GameTestListener {
@@ -179,17 +213,15 @@ public final class TestKit {
 
         /** Temporarily changes a server config value; the old value comes back when the test ends. */
         public <T> void config(ModConfigSpec.ConfigValue<T> value, T newValue) {
-            T old = value.get();
+            undo.add(hold(value, value.get(), value::set));
             value.set(newValue);
-            undo.add(() -> value.set(old));
         }
 
         /** PvP is off on the GameTest server; tests where one hero attacks another switch it on. */
         public void pvp(boolean allowed) {
             MinecraftServer server = helper.getLevel().getServer();
-            boolean old = server.isPvpAllowed();
+            undo.add(hold(MinecraftServer.class, server.isPvpAllowed(), server::setPvpAllowed));
             server.setPvpAllowed(allowed);
-            undo.add(() -> server.setPvpAllowed(old));
         }
 
         /** Runs {@code action} when the test ends, pass or fail (before what was registered earlier is undone). */

@@ -730,7 +730,7 @@ public final class PhoenixBurstTests {
     // ------------------------------------------------------------------------------------------------------------
     // The damage, directly (quick)
 
-    @GameTest(template = ARENA, batch = PhoenixTests.PVP)
+    @GameTest(template = ARENA, batch = "solo_burst_wears_wandas_shield_down")
     public static void burstWearsWandasShieldDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -758,7 +758,7 @@ public final class PhoenixBurstTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PhoenixTests.PVP)
+    @GameTest(template = ARENA, batch = "solo_burst_does_not_bypass_a_phased_vision_but_passes_armour_and_fire")
     public static void burstDoesNotBypassAPhasedVisionButPassesArmourAndFire(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);

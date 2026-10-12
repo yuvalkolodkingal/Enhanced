@@ -399,7 +399,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 2: Anti-Gravity Flight
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @GameTest(template = ARENA, batch = "solo_flight")
     public static void flight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = hero(f, 10.5, 10.5);

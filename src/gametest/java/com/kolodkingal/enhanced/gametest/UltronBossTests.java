@@ -59,7 +59,7 @@ public final class UltronBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The bodies
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @GameTest(template = ARENA, batch = "solo_body_stats")
     public static void bodyStats(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();

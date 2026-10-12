@@ -79,7 +79,7 @@ public final class MagnetoTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = "solo_chaos_beam_still_hurts_magneto_but_no_nausea")
     public static void chaosBeamStillHurtsMagnetoButNoNausea(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true); // the GameTest server has PvP off; real servers have it on
@@ -105,7 +105,7 @@ public final class MagnetoTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = "solo_telekinetic_slam_from_wanda_ignores_magnetos_armor")
     public static void telekineticSlamFromWandaIgnoresMagnetosArmor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -344,7 +344,7 @@ public final class MagnetoTests {
     }
 
     /** Like the bullets in the films: a caught arrow hangs still in mid-air, then drops or flies back. */
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @GameTest(template = ARENA, timeoutTicks = 60, batch = "solo_magnetic_shield_holds_arrows_in_mid_air")
     public static void magneticShieldHoldsArrowsInMidAir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SHIELD_REFLECT_CHANCE, 0.0);

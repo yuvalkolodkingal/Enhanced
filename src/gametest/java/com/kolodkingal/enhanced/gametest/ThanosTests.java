@@ -226,7 +226,7 @@ public final class ThanosTests {
      * round where it ends (not the cow, not the one far off), the cooldown of the key and a little hunger, and no block
      * changes even with block damage on.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_blast", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "solo_the_power_blast_hurts_one_splashes_the_rest_and_breaks_no_block", timeoutTicks = 60)
     public static void thePowerBlastHurtsOneSplashesTheRestAndBreaksNoBlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosBossConfig.BLOCK_DAMAGE, true);
@@ -286,7 +286,7 @@ public final class ThanosTests {
      * Players are hit only with PvP on, and the stone says so when PvP spared one; a Creative player is never hit; the
      * Blast passes them by.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_blast", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "solo_the_power_blast_spares_players_with_pvp_off_and_creative_always", timeoutTicks = 60)
     public static void thePowerBlastSparesPlayersWithPvpOffAndCreativeAlways(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 2.5, 10.5);
@@ -334,7 +334,7 @@ public final class ThanosTests {
      * A complete Chaos Shield in the way stops the beam at its surface and loses twelve; the creature behind is
      * untouched.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_blast", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "solo_a_chaos_shield_stops_the_power_blast_and_loses_twelve", timeoutTicks = 60)
     public static void aChaosShieldStopsThePowerBlastAndLosesTwelve(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -464,7 +464,7 @@ public final class ThanosTests {
      * The Portal Step: he steps onto the block he looks at, or right behind the creature; it costs the cooldown and a
      * little hunger, and if there is no room behind, or nothing to look at, he says so and pays nothing.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_step", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "solo_the_portal_step_lands_on_the_block_or_behind_the_creature", timeoutTicks = 60)
     public static void thePortalStepLandsOnTheBlockOrBehindTheCreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -667,7 +667,7 @@ public final class ThanosTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "thanos_hero_transmute_not", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "solo_transmute_is_held_back_by_pvp_and_by_shields", timeoutTicks = 60)
     public static void transmuteIsHeldBackByPvpAndByShields(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -696,7 +696,7 @@ public final class ThanosTests {
     }
 
     /** A Creative player and a Loki's duplicate: no target for the first; the second dissolves. */
-    @GameTest(template = ARENA, batch = "thanos_hero_transmute_not", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "solo_transmute_never_holds_creative_players", timeoutTicks = 60)
     public static void transmuteNeverHoldsCreativePlayers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
