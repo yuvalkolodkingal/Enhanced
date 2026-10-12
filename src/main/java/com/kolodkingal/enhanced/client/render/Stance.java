@@ -37,6 +37,10 @@ public enum Stance {
     // ===== thanos =====
 
     // ===== ultron =====
+    /** Ultron: R is held, both palms raised along the look and firing plasma in turn. */
+    ULTRON_FIRE(1, 3, true),
+    /** Ultron: the Overcharge builds, one palm raised along the look and the other hand bracing its wrist. */
+    ULTRON_CHARGE(2, 3, true),
 
     // ===== apocalypse =====
     ;

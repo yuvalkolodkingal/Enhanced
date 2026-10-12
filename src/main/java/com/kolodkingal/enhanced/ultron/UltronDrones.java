@@ -163,7 +163,7 @@ public final class UltronDrones {
             for (UltronSentryEntity drone : drones) {
                 drone.order(target.getUUID());
             }
-            UltronFx.at(level, UltronFxPayload.COMMAND_MARK, target.position().add(0, target.getBbHeight() * 0.5, 0), 1.5F, 10);
+            UltronFx.from(level, UltronFxPayload.COMMAND_MARK, hero, target.position().add(0, target.getBbHeight() * 0.5, 0), Vec3.ZERO, 1.5F, 10);
         } else {
             for (UltronSentryEntity drone : drones) {
                 drone.order(null);
@@ -171,7 +171,7 @@ public final class UltronDrones {
                     drone.catchUp(level, hero);
                 }
             }
-            UltronFx.at(level, UltronFxPayload.COMMAND_MARK, hero.position(), 1.5F, 10);
+            UltronFx.from(level, UltronFxPayload.COMMAND_MARK, hero, hero.position(), Vec3.ZERO, 1.5F, 10);
         }
     }
 

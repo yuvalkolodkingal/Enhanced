@@ -122,6 +122,18 @@ public final class FlightProfile {
             pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),
             pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
 
+    /**
+     * Ultron: an upright, stiff flier carried by the anti-gravity in his palms, which hang a little out and back with the
+     * palms down; he leans forward as he speeds up, the arms sweep back along the body and the legs hang straight. Hardly
+     * a bob, no lazy roll: a machine holds still.
+     */
+    private static final FlightProfile ULTRON = new FlightProfile(
+            new float[]{34, 64, -8}, 0.40F, 18, 12, 3.0F, 8, 5, false, new float[]{4.5F, 5.5F}, new float[]{0.02F, 100}, 1.2F, 0.6F, 0.5F, 0.0F,
+            false, 0.10F, false, new float[][]{
+            pose(12, 0, 16, 12, 0, -16, 3, 1, 3, -1),     // hover: arms hang a little back and out, palms down
+            pose(26, 0, 11, 26, 0, -11, 7, 1, 7, -1),     // cruise: the arms trail
+            pose(46, 0, 7, 46, 0, -7, 11, 0, 11, 0)});    // sprint: swept back along the body
+
     /** The profile of a flier, or null for a hero that does not fly. */
     public static FlightProfile of(Power power, boolean whiteVision) {
         return switch (power) {
@@ -135,7 +147,7 @@ public final class FlightProfile {
             case PHOENIX -> null;
             case SPIDER_MAN -> null;
             case THANOS -> null;
-            case ULTRON -> null;
+            case ULTRON -> ULTRON;
             case APOCALYPSE -> null;
             case NONE, QUICKSILVER, TOMMY, LOKI -> null;
         };

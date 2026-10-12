@@ -75,6 +75,9 @@ final class RunPoses {
     private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
     private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
 
+    /** Ultron: a machine's walk, upright, the arms hardly swinging and nothing in the hips. */
+    private static final Character ULTRON = new Character(0.55F, 0.90F, 1.0F, 3, 2, 0.008F);
+
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
             case MAGNETO -> MAGNETO;
@@ -88,7 +91,7 @@ final class RunPoses {
             case PHOENIX -> DEFAULT;
             case SPIDER_MAN -> DEFAULT;
             case THANOS -> DEFAULT;
-            case ULTRON -> DEFAULT;
+            case ULTRON -> ULTRON;
             case APOCALYPSE -> DEFAULT;
             default -> DEFAULT;
         };

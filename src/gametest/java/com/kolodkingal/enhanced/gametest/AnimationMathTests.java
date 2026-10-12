@@ -498,6 +498,7 @@ public final class AnimationMathTests {
                 // hero with no flight profile yet is not listed: it flies with the vanilla pose).
                 // ===== phoenix =====
                 // ===== ultron =====
+                Power.ULTRON,
                 // ===== apocalypse =====
         }) {
             FlightProfile profile = FlightProfile.of(power, false);
@@ -552,11 +553,13 @@ public final class AnimationMathTests {
                 GestureId.TAKEOFF_THOR,
                 // ===== phoenix =====
                 // ===== ultron =====
+                GestureId.TAKEOFF_ULTRON,
                 // ===== apocalypse =====
         };
         Power[] powers = {Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR,
                 // ===== phoenix =====
                 // ===== ultron =====
+                Power.ULTRON,
                 // ===== apocalypse =====
         };
         for (int k = 0; k < ids.length; k++) {

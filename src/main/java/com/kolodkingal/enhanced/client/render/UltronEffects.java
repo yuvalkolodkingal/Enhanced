@@ -116,6 +116,8 @@ public final class UltronEffects {
             AIM_SINCE.remove(payload.entityId());
         }
         EFFECTS.add(new Effect(payload.kind(), payload.entityId(), payload.at(), payload.to(), payload.radius(), payload.ticks(), now, level.dimension()));
+        // (The caster of the hero's Pull, Slam and Command acts it.)
+        UltronActing.onFx(payload);
     }
 
     /** Forgets every effect (the client left the world or changed dimension). */

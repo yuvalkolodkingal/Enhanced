@@ -591,7 +591,7 @@ public final class UltronAbilities {
             victim.hurtMarked = true;
             victim.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0), player);
         }
-        UltronFx.at(level, UltronFxPayload.GRAVITY_SLAM, centre, (float) radius, 10);
+        UltronFx.from(level, UltronFxPayload.GRAVITY_SLAM, player, centre, Vec3.ZERO, (float) radius, 10);
         UltronSounds.GRAVITY.play(level, centre, SoundSource.PLAYERS, 1.0F, 0.8F);
         for (int i = 0; i < 24; i++) {
             double angle = Mth.TWO_PI * i / 24.0;
