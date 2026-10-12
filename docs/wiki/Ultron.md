@@ -179,7 +179,7 @@ From the ritual until the fight is over, the arena (the island, the pit and the 
 
 ## Ultron's Core
 
-*"The heart Wanda tore out. It still hums."* When Ultron is destroyed, **every fighter** who was there for at least **60 seconds** and hurt him or his Sentries gets one **Ultron's Core**, and so does whoever struck the last blow, whatever their time or damage. Each also gets 1,500 experience points. Creative and Spectator players do not get one by default.
+*"The heart Wanda tore out. It still hums."* When Ultron is destroyed, **every fighter** who was there for at least **60 seconds** and hurt him or his Sentries gets one **Ultron's Core**, and so does whoever struck the last blow, whatever their time or damage. Each also gets 1,500 experience points. Creative players do not get one (unless the server turns on `boss.creativeGetsReward`), and Spectators never do.
 
 The Core goes straight into your inventory; if it is full, it drops at your feet where only you can pick it up, and it never despawns. A fighter who is dead or offline when he falls gets it as a gift at the next login or respawn. A player who already has a power gets a Core too, and may keep it or give it to a friend. It is fireproof, never in a chest, and on its own does nothing.
 
