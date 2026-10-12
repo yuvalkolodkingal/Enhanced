@@ -406,12 +406,15 @@ public final class UltronClientTests {
                     hotLit += alpha(hot, x, y) > 0 ? 1 : 0;
                 }
             }
-            // Four pixels wide, two rows, on the face's fifth row (y = 11 and 12 of the texture), like the other heroes'.
+            // The human avatar's eyes do not glow (spec 2.4): his idle mask is empty and only a flash of red shows while he works.
+            boolean glows = !look.equals("human");
+            // Four pixels (spec 2.1): each slit is a slant on rows y = 11 and 12 of the texture, one lit pixel of the two in each of the
+            // columns 9, 10, 13 and 14, like the other heroes' eyes; when he works the whole slit burns.
             for (int x : new int[]{9, 10, 13, 14}) {
-                check(alpha(idle, x, 11) > 0 && alpha(idle, x, 12) > 0, look + ": the eyes are painted at x " + x);
-                check(alpha(hot, x, 12) > 0, look + ": and burn brighter when he works");
+                check(!glows || (alpha(idle, x, 11) > 0) != (alpha(idle, x, 12) > 0), look + ": a slanted slit is painted at x " + x);
+                check(alpha(hot, x, 11) > 0 && alpha(hot, x, 12) > 0 || !glows, look + ": and the whole slit burns when he works");
             }
-            check(idleLit == 8, look + ": nothing but the eyes is painted (" + idleLit + ")");
+            check(idleLit == (glows ? 4 : 0), look + ": nothing but the eyes is painted (" + idleLit + ")");
             check(hotLit > idleLit, look + ": the hot mask glows over more");
             for (int y = 0; y < 64; y++) {
                 for (int x = 0; x < 64; x++) {
