@@ -35,7 +35,8 @@ public class PowerHud implements LayeredDraw.Layer {
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || mc.level == null || mc.options.hideGui || mc.getDebugOverlay().showDebugScreen()) {
+        // (Nor on the death screen: the powers wait for the respawn, and the panel would sit over "You Died!".)
+        if (player == null || mc.level == null || mc.options.hideGui || mc.getDebugOverlay().showDebugScreen() || player.isDeadOrDying()) {
             return;
         }
         PowerData data = Powers.get(player);
