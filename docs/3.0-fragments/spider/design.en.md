@@ -146,9 +146,14 @@ blocks a tick. It ends on arrival, on a collision after 3 ticks, after `zipMaxTi
 when the anchor is gone, on a jump of the position (a Hex bounce or a teleport) or when he is blocked. The server
 validates every tick (the anchor block, the distance, the time, a position that jumps more than a hitch can explain)
 and resets `connection.aboveGroundTickCount` and the fall distance. On arrival at a wall or a ceiling with Wall Crawl on he
-clings at once (`state.surface`, a grace of 8 ticks); on a floor he lands; with Wall Crawl off he keeps 40% of his speed.
+clings at once (`state.surface`, a grace of 8 ticks); the client stops a little short of the stand point (it arrives within
+0.45 of it), so for the first 8 ticks it draws him in to the surface at 0.2 a tick and loses nothing; on a floor he lands;
+with Wall Crawl off he keeps 40% of his speed.
 **G again at any time** is a new zip: the chain. A zip aimed at a **creature** ends in a kick (`zipKickDamage` 4.0,
-`enhanced:web_kick`, never a Creative or protected target; 0 turns it off).
+`enhanced:web_kick`, never a Creative or protected target; 0 turns it off). **A refused zip or swing** (the Hex, a shield,
+an empty stomach, no anchor, a cooldown, a hold on him) is answered with a ZIP_END or SWING_END of reason 2 to him alone,
+because his client has begun the movement on its own prediction and stops it when it hears so (it drops an answer that
+never comes after 12 ticks).
 
 **Web Swing (Sneak + G, held).** The same aim within `swingRange` (40); the rope is `L = clamp(distance, 4, swingRange)`.
 While G is held (`HeroServer.stopHold` clears it when he dies) the client runs a pendulum, `SpiderMath.swingStep`:
@@ -156,7 +161,9 @@ While G is held (`HeroServer.stopHold` clears it when he dies) the client runs a
 position past the rope length is pulled back onto the sphere, so the speed along the web is lost and the speed across it
 kept. W reels the rope in (down to 3), S lets it out (to 1.25 times the first length). He lets go on release (keeping
 his speed, plus a push if Space is held), after 10 ticks on the ground, if the anchor is gone, after `swingMaxTicks`
-(300) or when blocked. G without Sneak while swinging zips to the new aim. Costs `swingExhaustion` (0.01) a tick.
+(300) or when blocked. A swing begun on the ground hops him off it and pushes him 0.3 towards the anchor (from rest the
+pendulum's way down is into the floor, and Sneak keeps a player from stepping off a ledge). G without Sneak while swinging
+zips to the new aim. Costs `swingExhaustion` (0.01) a tick.
 A loop `web_swing` follows him (client, `PowerLoopSounds`). ZIP_END and SWING_END carry the reason: 0 arrived,
 1 cancelled, 2 refused, 3 blocked, 4 timeout, 5 released, 6 anchor lost.
 
@@ -187,10 +194,17 @@ flag others see).
   vanishing for 4 ticks, no food, water, riding, or a teleport. A **mantle** over the top of a block, and a flip from a wall
   to a ceiling and back, are handled at the edges. The optional corner climb is not built: he picks the wall he presses into.
 * **Cost:** `crawlExhaustion` (0.005) a tick while he moves.
-* **What the server sees:** a cling is raised from his position, `onGround` and the vertical history (he is beside or under a
-  surface, in the air, not falling, not on the arc of a jump) and lasts 4 ticks after contact is lost; the client sends a
-  keepalive position while it hangs still, and the server zeroes the downward motion of its copy while the flag is up.
-  While clinging, zipping or swinging the server resets `aboveGroundTickCount` and the fall distance every tick.
+* **What the server sees:** the flag others see is raised from **what his own client says**: `SpiderClingPayload` (the
+  lane's one client-to-server message, registered by `SpiderNetwork`) carries 0 nothing, 1 a wall or 2 a ceiling, and the
+  way it faces, when the cling begins, changes or ends and every 8 ticks while it lasts. The server believes it for 12
+  ticks, only for a Spider-Man and only while a block he may cling to is within 0.45 of that side of his body
+  (`SpiderClimb.near`): a crawl down a wall looks like a fall from his positions alone, and a steady climb like the arc of
+  a jump, so the server cannot guess them. The flag lasts 4 ticks after the last confirmed tick, and goes at once when the
+  client says it let go. Until a client says anything (a test, a client without the lane's movement) the server guesses
+  from his position, `onGround` and the vertical history (he is beside or under a surface, in the air, not falling, not on
+  the arc of a jump). The client also sends a keepalive position while it hangs still, and the server zeroes the downward
+  motion of its copy while the flag is up. While clinging, zipping or swinging the server resets `aboveGroundTickCount` and
+  the fall distance every tick.
 
 ### 14.8 Spider-Sense
 
