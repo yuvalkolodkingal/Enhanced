@@ -136,6 +136,19 @@ public final class SkeletonTests {
     /** The heroes of 3.0, in Eilon's order: the last five of {@link Power}. */
     private static final List<Power> NEW_HEROES = List.of(Power.PHOENIX, Power.SPIDER_MAN, Power.THANOS, Power.ULTRON, Power.APOCALYPSE);
 
+    /**
+     * Whether the hero's lane is built: its plug-in does something with the keys, so the tests that pin a stub ("does
+     * nothing yet", "G is not wired yet") leave it to the lane's own tests.
+     */
+    private static boolean wired(Power hero) {
+        try {
+            return HeroServers.of(hero).getClass().getMethod("onKey", ServerPlayer.class, PowerData.class, int.class, boolean.class)
+                    .getDeclaringClass() != HeroServer.class;
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // The five powers
 
@@ -201,26 +214,13 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    /**
-     * Whether the lane of a hero has built its server side: its plug-in answers the keys itself. (The stubs of the heroes
-     * that are not built yet override nothing, and that is what {@link #aNewHeroDoesNothingYet} pins down.)
-     */
-    private static boolean isBuilt(Power hero) {
-        try {
-            return HeroServers.of(hero).getClass().getMethod("onKey", ServerPlayer.class, PowerData.class, int.class, boolean.class)
-                    .getDeclaringClass() != HeroServer.class;
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     /** The power exists and does nothing: no key does anything, nothing ticks into a state, nobody is hurt. */
     @GameTest(template = ARENA, batch = SKELETON)
     public static void aNewHeroDoesNothingYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
-            if (isBuilt(hero)) {
-                continue; // its lane has built it: that lane's own tests say what it does
+            if (wired(hero)) {
+                continue;
             }
             ServerPlayer player = f.player(10.5, FLOOR, 10.5, hero);
             PowerData data = Powers.get(player);
