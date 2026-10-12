@@ -52,6 +52,26 @@ public final class EnhancedRenderTypes {
         return ENERGY_FIELD.apply(texture);
     }
 
+    private static final Function<ResourceLocation, RenderType> WEB_DECAL = Util.memoize(texture ->
+            RenderType.create("enhanced_web_decal",
+                    DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 1536, false, true,
+                    RenderType.CompositeState.builder()
+                            .setShaderState(POSITION_TEX_COLOR)
+                            .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
+                            .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                            .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                            .setCullState(RenderStateShard.NO_CULL)
+                            .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
+                            .createCompositeState(false)));
+
+    /**
+     * Textured, see-through (normal alpha blending, so a white web shows on a bright day), double-sided, pushed a little
+     * towards the camera so it does not fight with the block it lies on: Spider-Man's web splats.
+     */
+    public static RenderType webDecal(ResourceLocation texture) {
+        return WEB_DECAL.apply(texture);
+    }
+
     private EnhancedRenderTypes() {
     }
 }

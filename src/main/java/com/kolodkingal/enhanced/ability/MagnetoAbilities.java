@@ -244,6 +244,9 @@ public final class MagnetoAbilities {
             level.addFreshEntity(item);
             ripped++;
         }
+        if (SpiderServer.onStripped(target)) {
+            ripped++; // the nanites of an Iron Spider's suit scatter
+        }
         if (ripped == 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.disarm.no_metal"), true);
             return;

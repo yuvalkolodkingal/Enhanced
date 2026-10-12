@@ -627,6 +627,14 @@ public final class AnimationMathTests {
                 {GestureId.PHOENIX_CHARGE_START, com.kolodkingal.enhanced.client.render.PhoenixGestures.CHARGE_M,
                         com.kolodkingal.enhanced.client.render.PhoenixGestures.CHARGE_O},
                 // ===== spider =====
+                {GestureId.SPIDER_ARRIVE, com.kolodkingal.enhanced.client.render.SpiderGestures.CLING_WALL_M,
+                        com.kolodkingal.enhanced.client.render.SpiderGestures.CLING_WALL_O},
+                {GestureId.SPIDER_ALERT_START, com.kolodkingal.enhanced.client.render.SpiderGestures.ALERT_M,
+                        com.kolodkingal.enhanced.client.render.SpiderGestures.ALERT_O},
+                {GestureId.SPIDER_KILL_ON, com.kolodkingal.enhanced.client.render.SpiderGestures.KILL_M,
+                        com.kolodkingal.enhanced.client.render.SpiderGestures.KILL_O},
+                {GestureId.SPIDER_SURGE_ON, com.kolodkingal.enhanced.client.render.SpiderGestures.SURGE_M,
+                        com.kolodkingal.enhanced.client.render.SpiderGestures.SURGE_O},
                 // ===== thanos =====
                 // ===== ultron =====
                 // ===== apocalypse =====

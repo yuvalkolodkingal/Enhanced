@@ -47,7 +47,9 @@ public final class Gestures {
         /** Where the weapon was just before it came back to his hand. */
         WEAPON_LAST,
         /** Where Thor last brought his weapon down (the creature he pinned). */
-        STRIKE
+        STRIKE,
+        /** The end of Spider-Man's web: the anchor of the zip or the swing he is on. */
+        ANCHOR
     }
 
     /** One key of an arm track. */

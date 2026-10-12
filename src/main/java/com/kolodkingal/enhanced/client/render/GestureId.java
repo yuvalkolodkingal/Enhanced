@@ -122,6 +122,34 @@ public enum GestureId {
     PHOENIX_BURST(Group.CAST, 24, 1, 9, true),
 
     // ===== spider =====
+    /** Spider-Man: the thwip. The arm snaps to the aim, the wrist flicks, the other arm balances (a Web Shot). */
+    SPIDER_SHOOT(Group.CAST, 8, 1, 4, true),
+    /** The arms gather across the chest in a crouch, then are flung wide as he straightens (the Web Burst). */
+    SPIDER_BURST(Group.CAST, 20, 3, 6, true),
+    /** The arm shoots out at the anchor and the body tips toward it; hands over to the stance SPIDER_ZIP. */
+    SPIDER_ZIP_START(Group.CAST, 10, 1, 4, true),
+    /** The arm is thrown up at the anchor; hands over to the stance SPIDER_SWING. */
+    SPIDER_SWING_START(Group.CAST, 10, 1, 4, true),
+    /** Both hands up and spread, fingers flexing (Wall Crawl on), and shaken loose again (off). */
+    SPIDER_CRAWL_ON(Group.CAST, 8, 1, 3, false),
+    SPIDER_CRAWL_OFF(Group.CAST, 6, 1, 3, false),
+    /** A finger to the temple: the spider-sense switched on or off. */
+    SPIDER_SENSE_TOGGLE(Group.CAST, 8, 1, 3, false),
+    /** The sense tingles: the guard goes up; hands over to the stance SPIDER_ALERT. */
+    SPIDER_ALERT_START(Group.CAST, 12, 1, 5, false),
+    /** The shoulders roll back and the arms open as the Iron Spider's legs unfold, and fold again. */
+    SPIDER_LEGS_OUT(Group.CAST, 16, 2, 6, false),
+    SPIDER_LEGS_IN(Group.CAST, 10, 1, 4, false),
+    /** Instant Kill: the head drops, the arms go to the claw; hands over to the stance SPIDER_KILL. */
+    SPIDER_KILL_ON(Group.CAST, 14, 2, 5, false),
+    /** The Black Eyes: he clutches his head, shudders and snaps up; hands over to the stance SPIDER_SURGE. */
+    SPIDER_SURGE_ON(Group.CAST, 22, 2, 8, false),
+    /** The superhero landing after a fast fall: a fist and a toe to the ground (the animator's own edge starts it). */
+    SPIDER_LAND(Group.LAND, 22, 2, 8, true),
+    /** He pushes off a wall or a ceiling (started by the animator's own edge). */
+    SPIDER_LEAP(Group.CAST, 10, 1, 4, true),
+    /** A zip ends on a wall and the hands grab it (started by the animator's own edge). */
+    SPIDER_ARRIVE(Group.CAST, 12, 1, 5, true),
 
     // ===== thanos =====
 

@@ -37,6 +37,20 @@ public enum Stance {
     PHOENIX_CHARGE(1.5F, 4, true),
 
     // ===== spider =====
+    /** Spider-Man clings to a wall: the arms reach up, the knees go out, the body faces the wall. */
+    SPIDER_CLING_WALL(3, 5, false),
+    /** He hangs from a ceiling: the body is flipped over, feet to the ceiling. */
+    SPIDER_CLING_CEILING(6, 8, false),
+    /** The Black Eyes: a predatory hunch, hands hanging forward and clawed. */
+    SPIDER_SURGE(4, 8, false),
+    /** Instant Kill: a menacing stillness. */
+    SPIDER_KILL(3, 6, false),
+    /** His spider-sense tingles: the guard goes up. */
+    SPIDER_ALERT(1.5F, 5, false),
+    /** A zip: the web arm points at the anchor, the body is turned to it. */
+    SPIDER_ZIP(1.5F, 4, true),
+    /** A swing: the web arm is up along the web, the knees tucked. */
+    SPIDER_SWING(2, 5, true),
 
     // ===== thanos =====
 

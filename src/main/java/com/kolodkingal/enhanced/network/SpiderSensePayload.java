@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.SpiderSenseClient;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,7 +30,8 @@ public record SpiderSensePayload(List<Integer> ids, boolean strong) implements C
         return TYPE;
     }
 
-    /** The Spider-Man lane shows the warning here. */
+    /** Outlines the dangers and starts the ripples on his screen. */
     static void handle(SpiderSensePayload payload, IPayloadContext context) {
+        SpiderSenseClient.add(payload);
     }
 }

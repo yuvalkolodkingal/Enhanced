@@ -125,7 +125,9 @@ public final class GestureRoutes {
             // ===== phoenix =====
             case MIND_READING -> power == Power.PHOENIX ? (on ? GestureId.PHOENIX_READ_ON : GestureId.PHOENIX_READ_OFF) : null;
             // ===== spider =====
-            case WALL_CRAWL, SPIDER_SENSE, SPIDER_LEGS -> PENDING_GESTURE;
+            case WALL_CRAWL -> power == Power.SPIDER_MAN ? (on ? GestureId.SPIDER_CRAWL_ON : GestureId.SPIDER_CRAWL_OFF) : null;
+            case SPIDER_SENSE -> power == Power.SPIDER_MAN ? GestureId.SPIDER_SENSE_TOGGLE : null;
+            case SPIDER_LEGS -> power == Power.SPIDER_MAN ? (on ? GestureId.SPIDER_LEGS_OUT : GestureId.SPIDER_LEGS_IN) : null;
             // ===== thanos =====
             case REALITY_VEIL -> PENDING_GESTURE;
             // ===== ultron =====
@@ -288,7 +290,15 @@ public final class GestureRoutes {
                 default -> "live:PHOENIX_CHARGING";
             };
             // ===== spider =====
-            case SPIDER_MAN -> PENDING_ACTING;
+            // (R's Web Shot is live:CASTING and Sneak + R's burst the cooldown; G's swing is live:SWINGING; Sneak + V is
+            // toggle:SPIDER_SENSE; Sneak + B, Instant Kill, is live:INSTANT_KILL: all routed by his plug-in.)
+            case SPIDER_MAN -> switch (ability) {
+                case 1 -> "cooldown";
+                case 2 -> "live:ZIPPING";
+                case 3 -> "toggle:WALL_CRAWL";
+                case 4 -> "toggle:SPIDER_LEGS";
+                default -> "live:BLACK_EYES";
+            };
             // ===== thanos =====
             case THANOS -> PENDING_ACTING;
             // ===== ultron =====
@@ -315,8 +325,9 @@ public final class GestureRoutes {
             case PHOENIX_CHARGING, MIND_SENSING, PHOENIX_PSIONIC -> null;
             case PHOENIX_BLAZE -> "the flames are drawn by a layer (PhoenixFlameLayer) and the eyes by GlowingEyesLayer, not by a pose";
             // ===== spider =====
-            case CLINGING_WALL, CLINGING_CEILING, ZIPPING, SWINGING, SENSING, BLACK_EYES, INSTANT_KILL ->
-                    PENDING_REASON + ": the Spider-Man lane acts it";
+            case CLINGING_WALL, CLINGING_CEILING -> "stances (SPIDER_CLING_WALL, SPIDER_CLING_CEILING): he is already in the pose of the surface he walks"
+                    + " on; the arrival is the animator's SPIDER_ARRIVE and the push off it SPIDER_LEAP";
+            case ZIPPING, SWINGING, SENSING, BLACK_EYES, INSTANT_KILL -> null;
             // ===== thanos =====
             case SOUL_DRAINING, SOUL_SIGHT -> PENDING_REASON + ": the Thanos lane acts it";
             // ===== ultron =====

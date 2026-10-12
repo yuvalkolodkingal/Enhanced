@@ -1,0 +1,91 @@
+<!-- Fragment of Spider-Man for the wiki pages Controls / Controls-HE (3.0). Format: see Home.row (`<!-- en: where -->` and `<!-- he: where -->` blocks). -->
+
+<!-- en: the table "All keys, per hero", after the Phoenix row -->
+| [Spider-Man](Spider-Man) | Web Shot (Sneak: Web Burst) | Web Zip (Sneak, hold: Web Swing) | Wall Crawl (toggle; Sneak: Spider-Sense on/off) | Spider Legs (toggle; Sneak, twice: Instant Kill); Iron Spider only | Black Eyes (toggle) |
+
+<!-- en: the paragraph "Press, hold, toggle.": the list of hold abilities, add -->
+Spider-Man's Web Swing
+
+<!-- en: the section "Change Look: H", the list of heroes that have several looks, add -->
+Spider-Man
+
+<!-- en: the section "Flight", the line under the table: add Spider-Man to the heroes who do not fly -->
+Spider-Man does not fly either: he zips and swings on webs.
+
+<!-- en: the table in "Sneak changes some keys", after the Phoenix rows (the line about heroes that do not fly needs no change) -->
+| Sneak + **R** as Spider-Man | The **Web Burst**: 24 strands fly out in every direction and wrap everything near you (12 second cooldown). |
+| Sneak + **G** as Spider-Man, and keep holding **G** | The **Web Swing**: you swing on a web from the block you look at until you let go. |
+| Sneak + **V** as Spider-Man | Switches **Spider-Sense** on or off (Wall Crawl stays on). |
+| Sneak + **B** as the Iron Spider, then **B** again within 3 seconds | **Instant Kill**. |
+
+<!-- en: a new section after "The Phoenix's mind and fire, step by step" -->
+## Spider-Man's webs, walls and legs, step by step
+
+**Webbing something (R)**
+
+1. Look at a creature or a block, up to 24 blocks away, and press **R**. A silver strand flies from your wrist and a splat sticks to the wall.
+2. A creature is wrapped for 6 seconds: it can barely move and can't jump. A block gets a patch of web in front of it. The web blocks vanish by themselves after 10 seconds.
+3. **Sneak + R** is the Web Burst: 24 strands fly out in every direction, wrapping everything near you, and then you wait 12 seconds. You can't be webbed yourself.
+
+**Zipping and swinging (G)**
+
+1. Look at a block, up to 40 blocks away, and press **G**. The web pulls you there, then it vanishes and you stick to the wall or ceiling you came to. Press **G** again for the next one.
+2. To swing, hold **Sneak**, press **G** and **keep holding it**: you swing like a pendulum (**W** reels the web in, **S** lets it out). Let go of **G** and you fly off with your speed.
+3. **Space** during a zip cancels it (you keep your speed). A swing also ends if you stay on the ground for half a second, after 15 seconds, or if you are held.
+
+**Climbing (V, on by default)**
+
+1. Jump at a wall and keep pushing into it, or stand against it and hold **Space**. You stick. (Walking into a wall on the ground does nothing.)
+2. Look along the wall and press **W** to go that way; look at the wall or up and **W** climbs; look down and **W** climbs down. **A** and **D** go sideways. Hold **Space** with your head against a ceiling to walk upside down.
+3. A new press of **Space** leaps you off the wall. **V** turns the climbing off.
+
+**The legs, Instant Kill and the Black Eyes (B, N)**
+
+1. In the **Iron Spider** look, **B** unfolds four mechanical legs from your back, and **B** again folds them. They guard you, plant on walls, and you never take fall damage.
+2. **Sneak + B** with the legs out, then **Sneak + B** again within 3 seconds to confirm: Instant Kill. The legs strike every threat around you for 10 seconds at most, then you wait 30 seconds.
+3. **N** (any look; 6 food points needed) turns your eyes black for up to 30 seconds: much faster and stronger, and organic webs. **N** again calms it. When it runs out you crash for 10 seconds. See [Spider-Man](Spider-Man).
+
+<!-- he: the table "כל המקשים, לפי גיבור", after the Phoenix row -->
+| [ספיידרמן](Spider-Man-HE) | ירי קורים (התכופפות: פיצוץ קורים) | משיכה בקורים (התכופפות, מחזיקים: התנדנדות) | טיפוס על קירות (הדלקה/כיבוי; התכופפות: חוש העכביש דלוק/כבוי) | רגליים מכניות (הדלקה/כיבוי; התכופפות, פעמיים: הרג מיידי); רק איירון ספיידר | עיניים שחורות (הדלקה/כיבוי) |
+
+<!-- he: the paragraph "לחיצה, החזקה, הדלקה/כיבוי.": the list of hold abilities, add -->
+ההתנדנדות בקורים של ספיידרמן
+
+<!-- he: the section "החלפת מראה: H", the list of heroes that have several looks, add -->
+ספיידרמן
+
+<!-- he: the section "תעופה", the line under the table: add Spider-Man to the heroes who do not fly -->
+גם ספיידרמן לא עף: הוא נמשך ומתנדנד על קורים.
+
+<!-- he: the table in "התכופפות משנה חלק מהמקשים", after the Phoenix rows -->
+| התכופפות + **R** כספיידרמן | **פיצוץ הקורים**: 24 חוטים עפים לכל כיוון ועוטפים כל מה שקרוב אליכם (קולדאון של 12 שניות). |
+| התכופפות + **G** כספיידרמן, וממשיכים להחזיק **G** | **ההתנדנדות**: מתנדנדים על קורים מהבלוק שמסתכלים עליו עד שמרפים. |
+| התכופפות + **V** כספיידרמן | מדליקה או מכבה את **חוש העכביש** (הטיפוס על קירות נשאר דלוק). |
+| התכופפות + **B** כאיירון ספיידר, ו-**B** שוב תוך 3 שניות | **הרג מיידי**. |
+
+<!-- he: a new section after "המוח והאש של הפניקס, צעד אחר צעד" -->
+## הקורים, הקירות והרגליים של ספיידרמן, צעד אחר צעד
+
+**עוטפים משהו בקורים (R)**
+
+1. מסתכלים על יצור או בלוק, עד 24 בלוקים, ולוחצים **R**. קורים כסופים עפים מפרק היד ופיצוץ של קורים נדבק לקיר.
+2. יצור נעטף ל-6 שניות: הוא בקושי זז ולא יכול לקפוץ. בלוק מקבל טלאי של קורים לפניו. בלוקי הקורים נעלמים מעצמם אחרי 10 שניות.
+3. **התכופפות + R** היא פיצוץ הקורים: 24 חוטים עפים לכל כיוון, עוטפים כל מה שקרוב אליכם, ואז מחכים 12 שניות. לא אפשר לעטוף אתכם בעצמכם.
+
+**נמשכים ומתנדנדים (G)**
+
+1. מסתכלים על בלוק, עד 40 בלוקים, ולוחצים **G**. הקורים מושכים אתכם לשם, ואז הם נעלמים ואתם נדבקים לקיר או לתקרה שהגעתם אליהם. לוחצים **G** שוב להימשך אל הבא.
+2. כדי להתנדנד, מחזיקים **התכופפות**, לוחצים **G** ו**ממשיכים להחזיק**: מתנדנדים כמו מטוטלת (**W** מקצר את הקורים, **S** משחרר). מרפים מ-**G** ועפים הלאה במהירות שהייתה לכם.
+3. **Space** באמצע המשיכה מבטל אותה (שומרים על המהירות). התנדנדות גם נגמרת אם נשארים על הקרקע חצי שנייה, אחרי 15 שניות, או אם מחזיקים אתכם.
+
+**מטפסים (V, דלוק כברירת מחדל)**
+
+1. קופצים על קיר וממשיכים לדחוף אליו, או עומדים מולו ומחזיקים **Space**. אתם נדבקים. (הליכה אל קיר על הקרקע לא עושה כלום.)
+2. מסתכלים לאורך הקיר ולוחצים **W** ללכת לשם; מסתכלים אל הקיר או למעלה ו-**W** מטפס; מסתכלים למטה ו-**W** יורד. **A** ו-**D** הולכים הצידה. מחזיקים **Space** כשהראש נוגע בתקרה כדי ללכת הפוך.
+3. לחיצה חדשה על **Space** זורקת אתכם מהקיר בקפיצה. **V** מכבה את הטיפוס.
+
+**הרגליים, ההרג המיידי והעיניים השחורות (B, N)**
+
+1. במראה של **איירון ספיידר**, **B** פותח ארבע רגליים מכניות מהגב, ו-**B** שוב מקפל אותן. הן שומרות עליכם, נתקעות בקירות, ואתם אף פעם לא סופגים נזק נפילה.
+2. **התכופפות + B** כשהרגליים בחוץ, ו**התכופפות + B** שוב תוך 3 שניות כדי לאשר: הרג מיידי. הרגליים מכות בכל איום סביבכם עד 10 שניות, ואז מחכים 30 שניות.
+3. **N** (בכל מראה; צריך 6 נקודות אוכל) מהפך את העיניים לשחורות עד 30 שניות: מהירים וחזקים בהרבה, וקורים אורגניים. **N** שוב מרגיע. כשזה נגמר מתרסקים ל-10 שניות. ראו [ספיידרמן](Spider-Man-HE).
