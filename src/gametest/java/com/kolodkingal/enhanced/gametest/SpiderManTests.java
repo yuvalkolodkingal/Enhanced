@@ -1101,7 +1101,10 @@ public final class SpiderManTests {
         seen(player);
         press(player, 2);
         check(!data(player).is(Live.ZIPPING) && data(player).cooldownUntil(2) == 0, "nothing in range: no zip, no cooldown");
-        check("message.enhanced.zip.no_anchor".equals(seen(player).message()), "the message");
+        Seen nothing = seen(player);
+        check("message.enhanced.zip.no_anchor".equals(nothing.message()), "the message");
+        check(nothing.lastEnd() != null && nothing.lastEnd().arg() == 2, "and his client, which may have begun the zip, is told it was refused");
+        check(seen(watcher).fx().isEmpty(), "nobody else is told anything");
         assertNear(exhaustion(player), 0.0, 1.0E-9, "no hunger");
 
         // A pillar 6 blocks off.
@@ -1145,6 +1148,9 @@ public final class SpiderManTests {
         check(!data(player).is(Live.ZIPPING), "the zip across the wall is refused");
         check("message.enhanced.zip.hex".equals(refused.message()), "with the Hex's message");
         check(data(player).cooldownUntil(2) == 0, "and no cooldown");
+        // His client began the zip on its own prediction: it is told at once that the web never came.
+        SpiderFxPayload end = refused.lastEnd();
+        check(end != null && end.kind() == SpiderFxPayload.Kind.ZIP_END && end.arg() == 2, "he is told so (a zip end with the reason 'refused'): " + end);
         // A zip that does not cross it is fine: he steps inside, next to the pillar.
         put(helper, player, 8.5, FLOOR, 8.5);
         lookAt(player, abs(helper, 6.5, 3.5, 7.0));

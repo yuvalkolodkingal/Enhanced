@@ -70,6 +70,7 @@ public final class SpiderMotion {
     /** The reasons a zip or a swing ends (the codes of {@link SpiderFxPayload}). */
     private static final int ARRIVED = 0;
     private static final int CANCELLED = 1;
+    private static final int REFUSED = 2;
     private static final int BLOCKED = 3;
     private static final int TIMEOUT = 4;
     private static final int RELEASED = 5;
@@ -689,6 +690,8 @@ public final class SpiderMotion {
             if (reason == BLOCKED || reason == TIMEOUT) {
                 // (Blocked is held by something else; timed out he has been at it long enough: he slows to a fall.)
                 player.setDeltaMovement(player.getDeltaMovement().scale(0.5));
+            } else if (reason == REFUSED) {
+                player.setDeltaMovement(player.getDeltaMovement().scale(0.1));
             }
         }
     }
@@ -799,6 +802,8 @@ public final class SpiderMotion {
         Vec3 actual = swingAge <= 1 ? player.getDeltaMovement() : player.position().subtract(swingLast);
         if (reason == BLOCKED) {
             player.setDeltaMovement(actual.scale(0.5));
+        } else if (reason == REFUSED) {
+            player.setDeltaMovement(actual.scale(0.1));
         } else if (reason != CANCELLED || swingAge > 1) {
             player.setDeltaMovement(SpiderMath.releaseVelocity(actual, jumped, maxSpeed));
         }
@@ -861,7 +866,13 @@ public final class SpiderMotion {
                 }
             }
             case ZIP_END -> {
-                if (mode == Mode.ZIP && zipConfirmed && zipAnchor.distanceToSqr(payload.to()) < 1.0) {
+                if (payload.arg() == REFUSED) {
+                    // The server never made the web (the Hex, a shield, a cooldown ...): the zip this client began on its own
+                    // prediction stops where it is, and does not fly on with its speed.
+                    if (mode == Mode.ZIP && !zipConfirmed) {
+                        stopZip(player, REFUSED);
+                    }
+                } else if (mode == Mode.ZIP && zipConfirmed && zipAnchor.distanceToSqr(payload.to()) < 1.0) {
                     if (payload.arg() == ARRIVED) {
                         // (The server calls it arrived a block short; he finishes the last of it himself.)
                         zipFinish = Math.max(zipFinish, 1);
@@ -871,7 +882,11 @@ public final class SpiderMotion {
                 }
             }
             case SWING_END -> {
-                if (mode == Mode.SWING && swingConfirmed && swingAnchor.distanceToSqr(payload.to()) < 1.0) {
+                if (payload.arg() == REFUSED) {
+                    if (mode == Mode.SWING && !swingConfirmed) {
+                        stopSwing(player, REFUSED, false);
+                    }
+                } else if (mode == Mode.SWING && swingConfirmed && swingAnchor.distanceToSqr(payload.to()) < 1.0) {
                     stopSwing(player, payload.arg(), false);
                 }
             }

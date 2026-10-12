@@ -264,7 +264,13 @@ public final class SpiderServer implements HeroServer {
             }
             return;
         }
-        if (!down || blocked(player, data)) {
+        if (!down) {
+            return;
+        }
+        if (blocked(player, data)) {
+            if (ability == 2) {
+                refuse(player, player.isShiftKeyDown());
+            }
             return;
         }
         SpiderState state = state(player);
@@ -410,6 +416,16 @@ public final class SpiderServer implements HeroServer {
 
     private static void send(ServerLevel level, ServerPlayer player, SpiderFxPayload payload) {
         PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0, payload);
+    }
+
+    /**
+     * The key of a zip or a swing was refused (the Hex, a shield, an empty stomach, no anchor, a cooldown, a hold on him):
+     * his own client has already begun the movement on its own prediction, so it is told at once that the web never
+     * came, and it stops (code 2 of {@link SpiderFxPayload}). Nobody else is told: nobody else saw anything.
+     */
+    private static void refuse(ServerPlayer player, boolean swing) {
+        PacketDistributor.sendToPlayer(player, new SpiderFxPayload(swing ? SpiderFxPayload.Kind.SWING_END : SpiderFxPayload.Kind.ZIP_END,
+                player.getId(), player.position(), player.position(), Vec3.ZERO, 2, 0F, false, 0L, List.of()));
     }
 
     /** About where his hand is (the client uses the real one when it can see it). */
@@ -605,11 +621,13 @@ public final class SpiderServer implements HeroServer {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         if (!data.isReady(2, now)) {
+            refuse(player, false);
             return;
         }
         boolean organic = organic(player, data);
         if (organic && starving(player)) {
             say(player, "message.enhanced.web.hungry");
+            refuse(player, false);
             return;
         }
         double range = SpiderConfig.ZIP_RANGE.get();
@@ -617,6 +635,7 @@ public final class SpiderServer implements HeroServer {
         HitResult hit = kick > 0.0 ? Raycasts.any(player, range, e -> kickable(player, e), 1.0F) : Raycasts.block(player, range, 1.0F);
         if (hit.getType() == HitResult.Type.MISS) {
             say(player, "message.enhanced.zip.no_anchor");
+            refuse(player, false);
             return;
         }
         Vec3 eye = player.getEyePosition();
@@ -638,16 +657,19 @@ public final class SpiderServer implements HeroServer {
         }
         if (stand == null) {
             say(player, "message.enhanced.zip.no_anchor");
+            refuse(player, false);
             return;
         }
         if (Teleports.crossesHex(level, player, stand)) {
             say(player, "message.enhanced.zip.hex");
+            refuse(player, false);
             return;
         }
         WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, player, eye, anchor, 1.0F);
         if (shield != null) {
             payShield(player, shield, 2.0F);
             say(player, "message.enhanced.web.shield");
+            refuse(player, false);
             return;
         }
         if (state.swing != null) {
@@ -689,17 +711,23 @@ public final class SpiderServer implements HeroServer {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         if (!data.isReady(2, now) || state.swing != null) {
+            // (A swing that is already on is not told it was refused: it goes on.)
+            if (state.swing == null) {
+                refuse(player, true);
+            }
             return;
         }
         boolean organic = organic(player, data);
         if (organic && starving(player)) {
             say(player, "message.enhanced.web.hungry");
+            refuse(player, true);
             return;
         }
         double range = SpiderConfig.SWING_RANGE.get();
         BlockHitResult hit = Raycasts.block(player, range, 1.0F);
         if (hit.getType() == HitResult.Type.MISS) {
             say(player, "message.enhanced.swing.no_anchor");
+            refuse(player, true);
             return;
         }
         Vec3 eye = player.getEyePosition();
@@ -708,6 +736,7 @@ public final class SpiderServer implements HeroServer {
         if (shield != null) {
             payShield(player, shield, 2.0F);
             say(player, "message.enhanced.web.shield");
+            refuse(player, true);
             return;
         }
         double rope = Mth.clamp(eye.distanceTo(anchor), 4.0, range);
