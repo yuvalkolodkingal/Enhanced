@@ -230,10 +230,11 @@ faster pulse. They share one bar so that their pulses agree; both loop without a
 
 ### 17.13 Tests
 
-124 game tests in seven classes: `ApocalypseRitualTests` (8: every refusal of the ritual and what is used up), `ApocalypseShieldTests` (18: the rule of mind
-power, every kind of hit against the shield, the windows, the floors), `ApocalypseBossTests` (19: each attack and its tell, the Horsemen), `ApocalypseFightTests`
-(23: the phases, transitions, the Escape, the end, the rewards, the failures), `ApocalypseTests` (24: the hero's five abilities, the body, the Essence),
-`ApocalypseAnimationTests` (15) and `ApocalypseClientTests` (17: the cube table, the poses, the tells, the music and the amber air, and the art). Any test that touches a fight has a
+122 game tests in eight classes: `ApocalypseRitualTests` (7: every refusal of the ritual and what is used up), `ApocalypseShieldTests` (17: the rule of mind
+power, every kind of hit against the shield, the windows, the floors), `ApocalypseBossTests` (18: each attack and its tell, the Horsemen), `ApocalypseFightTests`
+(22: the phases, transitions, the Escape, the end, the rewards, the failures), `ApocalypseTests` (23: the hero's five abilities, the body, the Essence),
+`ApocalypseReviewTests` (5: what the review found: the end of the arena told to everyone, Creative players not counted as fighters, the Sandstorm slowing a lance,
+Quicksilver Time slowing his tells and his Horsemen, a tornado kept in the arena), `ApocalypseAnimationTests` (14) and `ApocalypseClientTests` (16: the cube table, the poses, the tells, the music and the amber air, and the art). Any test that touches a fight has a
 batch of its own (`apocalypse_...`), because a window nobody uses is lost; the pure ones share `apocalypse_pure`. The art is pinned by the tests too: no two regions of
 the texture overlap, every texture is the size the model reads, and the glow masks light only a small part of the sheet. `DataTests` checks the lang in both languages, the subtitles and that every
 `.ogg` exists.

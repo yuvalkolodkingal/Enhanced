@@ -1,5 +1,5 @@
 <!-- Commands.md, table of commands: rows (the boss commands are shared by Ultron, Thanos and Apocalypse; whoever stitches keeps one copy) -->
-| `/enhanced boss start apocalypse [force]` | Wakes En Sabah Nur at your feet, with no Capstone. `force` skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (not Peaceful, not the switch that turns him off, not the one-fight-at-a-time rule). See [Apocalypse](Apocalypse). |
+| `/enhanced boss start apocalypse [force]` | With `force`, wakes En Sabah Nur at your feet, with no Capstone, and skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (not Peaceful, not the switch that turns him off, not the one-fight-at-a-time rule). Without it the command is the ritual itself: it needs a Capstone in your hand and a block in sight, and every check. See [Apocalypse](Apocalypse). |
 | `/enhanced boss stop` | Ends the running boss fight (the Capstone is given back, if one was used). |
 | `/enhanced boss list` | Lists the running boss fights. |
 
