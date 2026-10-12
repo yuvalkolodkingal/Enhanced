@@ -5,10 +5,11 @@ import java.util.List;
 
 /**
  * The cubes of En Sabah Nur's body (DESIGN section 17, 6.8): the one table that the model, the texture painter and the
- * game tests all read, so the three can never drift apart. His body is a custom model of 36 cubes on a 128 by 64
- * texture (one texel per model pixel; the renderer draws it at 1.35 times its size, so a texel is 0.084 blocks): a
- * biped skeleton (the head, the body, two arms, two legs) with the armour built on it as cubes of their own, which is
- * what a player model cannot do (the cap's dome, the cables, the collar's flare, the pauldrons).
+ * game tests all read, so the three can never drift apart. His body is a custom model of 24 cubes (ten of them also
+ * drawn mirrored on the left, so 34 boxes are drawn) on a 128 by 64 texture (one texel per model pixel; the renderer
+ * draws it at 1.35 times its size, so a texel is 0.084 blocks): a biped skeleton (the head, the body, two arms, two
+ * legs) with the armour built on it as cubes of their own, which is what a player model cannot do (the cap's dome, the
+ * cables, the collar's flare, the pauldrons).
  *
  * <p>A cube's box is relative to the pivot of the part it hangs on. The cubes that exist on both sides (the arm, the
  * pauldrons, the cables) are listed once, for the right side; the left is the same cube mirrored about the pivot, with
@@ -95,8 +96,11 @@ public final class ApocalypseCubes {
         add("belt", Pivot.BODY, Kind.ARMOUR, -4.5F, 10, -2.5F, 9, 2, 5, 94, 29, false);
         add("tasset", Pivot.BODY, Kind.CLOTH, -2.5F, 11.5F, -2.8F, 5, 5, 1, 76, 39, false);
         add("collar_low", Pivot.BODY, Kind.ARMOUR, -6, -1, -5, 12, 1, 10, 56, 16, false);
-        add("collar_high", Pivot.BODY, Kind.ARMOUR, -5, -3, -4, 10, 2, 8, 16, 29, false);
-        add("collar_back", Pivot.BODY, Kind.ARMOUR, -6, -6, 2, 12, 5, 2, 0, 39, false);
+        // These two collar cubes are nudged in z (the spec's -4 and 2..4): a face coplanar with the head's z-fights with it,
+        // and the collar's front covered the mouth. Now the head's face is in front of the collar at the front, and at the
+        // back the collar's face lies just behind the head's.
+        add("collar_high", Pivot.BODY, Kind.ARMOUR, -5, -3, -3.5F, 10, 2, 8, 16, 29, false);
+        add("collar_back", Pivot.BODY, Kind.ARMOUR, -6, -6, 2.7F, 12, 5, 2, 0, 39, false);
         add("cloak_1", Pivot.BODY, Kind.ARMOUR, -6, 0, 2.2F, 4, 13, 1, 88, 0, false);
         add("cloak_2", Pivot.BODY, Kind.ARMOUR, -2, 0, 2.4F, 4, 13, 1, 88, 0, false);
         add("cloak_3", Pivot.BODY, Kind.ARMOUR, 2, 0, 2.2F, 4, 13, 1, 88, 0, false);
