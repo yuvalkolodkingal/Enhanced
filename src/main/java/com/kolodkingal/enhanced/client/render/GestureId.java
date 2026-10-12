@@ -108,8 +108,8 @@ public enum GestureId {
     // ===== thanos =====
 
     // ===== ultron =====
-    /** Ultron: the anti-gravity palms press down, the knees tuck and he rises; the arms settle back and out to the hover. */
-    TAKEOFF_ULTRON(Group.TAKEOFF, 22, 3, 8, true),
+    /** Ultron: the anti-gravity palms push the air down and out as he rises; the arms settle on the hover. */
+    TAKEOFF_ULTRON(Group.TAKEOFF, 18, 2, 8, true),
     /** Ultron: R goes down, both palms snap up along the look and the first bolt leaves. */
     ULTRON_FIRE_START(Group.CAST, 8, 1, 4, false),
     /** Ultron: the Overcharge gathers, a palm rises and the other hand braces its wrist. */
@@ -120,8 +120,8 @@ public enum GestureId {
     ULTRON_PULL(Group.CAST, 16, 2, 6, true),
     /** Ultron: Gravity Slam, both arms raised over the head and brought down with the stamp (the payload of its effect). */
     ULTRON_SLAM(Group.CAST, 22, 3, 8, true),
-    /** Ultron: Upload and Second Life, the arms drawn in to the chest and thrown wide as he becomes data. */
-    ULTRON_UPLOAD(Group.CAST, 18, 2, 6, false),
+    /** Ultron: Upload and Second Life, the arms drawn in, the head glitching, then thrown wide as he becomes data. */
+    ULTRON_UPLOAD(Group.CAST, 20, 2, 6, false),
     /** Ultron: the Hack, one hand held out, trembling, as the other machine is overwritten. */
     ULTRON_HACK(Group.CAST, 22, 2, 6, false),
     /** Ultron: the Sentry Army, both arms raised and swept out like a conductor's. */

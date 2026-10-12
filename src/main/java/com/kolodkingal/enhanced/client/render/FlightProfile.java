@@ -123,16 +123,18 @@ public final class FlightProfile {
             pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
 
     /**
-     * Ultron: an upright, stiff flier carried by the anti-gravity in his palms, which hang a little out and back with the
-     * palms down; he leans forward as he speeds up, the arms sweep back along the body and the legs hang straight. Hardly
-     * a bob, no lazy roll: a machine holds still.
+     * Ultron: an upright, rigid, silent flier carried by the anti-gravity of his palms, which hang a little out with the
+     * palms down. A machine does not lean into the wind like a man: ten degrees at a cruise and thirty-two at a sprint, a
+     * dive tips him over only a little, the banking is slight and the arms and legs hold their poses (no sway, no flutter,
+     * hardly a bob). He leans in deliberately and stands up straight again at once when he stops (a quick fall of the
+     * pitch and no braking gesture): he stops as dead as a machine.
      */
     private static final FlightProfile ULTRON = new FlightProfile(
-            new float[]{34, 64, -8}, 0.40F, 18, 12, 3.0F, 8, 5, false, new float[]{4.5F, 5.5F}, new float[]{0.02F, 100}, 1.2F, 0.6F, 0.5F, 0.0F,
-            false, 0.10F, false, new float[][]{
-            pose(12, 0, 16, 12, 0, -16, 3, 1, 3, -1),     // hover: arms hang a little back and out, palms down
-            pose(26, 0, 11, 26, 0, -11, 7, 1, 7, -1),     // cruise: the arms trail
-            pose(46, 0, 7, 46, 0, -7, 11, 0, 11, 0)});    // sprint: swept back along the body
+            new float[]{10, 32, -5}, 0.30F, 12, 6, 2.0F, 5, 7, false, new float[]{5, 2.5F}, new float[]{0.018F, 100}, 1.0F, 0.0F, 0.0F, 0.0F,
+            true, 0.10F, false, new float[][]{
+            pose(-6, 0, 18, -6, 0, -18, 2, 1, 2, -1),     // hover: palms down, arms a little out, legs straight
+            pose(-10, 0, 14, -10, 0, -14, 4, 1, 4, -1),   // cruise: the arms nearer the body
+            pose(-18, 0, 10, -18, 0, -10, 6, 1, 6, -1)}); // sprint: the arms swept slightly forward, a rigid dart
 
     /** The profile of a flier, or null for a hero that does not fly. */
     public static FlightProfile of(Power power, boolean whiteVision) {

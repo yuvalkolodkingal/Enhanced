@@ -46,13 +46,13 @@ public final class UltronGestures {
     // ---- Flight ----
 
     private static void flight() {
-        // The palms press the air down: the arms go back and out and the knees tuck, then settle on the hover pose
-        // (FlightProfile).
+        // The anti-gravity takes hold: the palms push the air down and out (the arms go a little forward and wide, the
+        // right leg pushing off), then the arms settle on the hover pose of FlightProfile, with no pop.
         define(GestureId.TAKEOFF_ULTRON)
-                .key(0, S).m(0, 0, 8).o(0, 0, -8).legs(0, 0).head(0, 0, 0).drop(0)
-                .key(5, O).m(30, 0, 26).o(30, 0, -26).legs(-4, -4).head(2, 0, 0).drop(0.05F)
-                .key(11, E).m(20, 0, 36).o(20, 0, -36).legs(8, 8).head(-8, 0, 0).drop(0)
-                .key(22, S).m(12, 0, 16).o(12, 0, -16).legs(3, 3).head(0, 0, 0).drop(0);
+                .key(0, S).m(-6, 0, 12).o(-6, 0, -12).legs(2, 2).head(0, 0, 0)
+                .key(6, O).m(-30, 0, 26).o(-30, 0, -26).legs(6, -2).head(-4, 0, 0)
+                .key(12, E).m(-8, 0, 20).o(-8, 0, -20).legs(4, 0).head(0, 0, 0)
+                .key(18, S).m(-6, 0, 18).o(-6, 0, -18).legs(2, 2).head(0, 0, 0);
     }
 
     // ---- Plasma: R ----
@@ -98,12 +98,16 @@ public final class UltronGestures {
     // ---- The network: B and N ----
 
     private static void network() {
-        // The Upload: the arms drawn in across the chest, the head bowed, then thrown wide as he becomes data.
+        // The Upload: the arms drawn in across the chest and the head bowed, then the glitch (the head jerks one way, the
+        // other, and settles) as he becomes data, and the arms thrown wide as he goes.
         define(GestureId.ULTRON_UPLOAD)
                 .key(0, S).m(0, 0, 8).o(0, 0, -8)
-                .key(5, O).m(-62, -46, 4).o(-62, 46, -4).head(10, 0, 0)
-                .key(10, O).m(-6, 0, 86).o(-6, 0, -86).head(-14, 0, 0).lean(-4)
-                .key(18, S).m(0, 0, 10).o(0, 0, -10).head(0, 0, 0).lean(0);
+                .key(4, O).m(-62, -46, 4).o(-62, 46, -4).head(10, 0, 0)
+                .key(6, E).m(-62, -46, 4).o(-62, 46, -4).head(10, 14, -4)
+                .key(8, E).m(-62, -46, 4).o(-62, 46, -4).head(10, -12, 4)
+                .key(10, E).m(-62, -46, 4).o(-62, 46, -4).head(10, 6, 0)
+                .key(12, O).m(-6, 0, 86).o(-6, 0, -86).head(-14, 0, 0).lean(-4)
+                .key(20, S).m(0, 0, 10).o(0, 0, -10).head(0, 0, 0).lean(0);
         // The Hack: one hand held out at the machine, trembling a little, the head forward.
         define(GestureId.ULTRON_HACK)
                 .key(0, S).m(0, 0, 8)

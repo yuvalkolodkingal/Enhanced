@@ -171,10 +171,11 @@ final class UltronActing {
                     FirstPersonArms.both(gw, 0.0F, 0.30F * up - 0.22F * down, 0.0F, -40 * up + 20 * down, 0, 0);
                 }
                 case ULTRON_UPLOAD -> {
-                    // Drawn in across the chest, then thrown wide.
-                    float in = ss(0.0F, 5.0F, t) * (1.0F - ss(6.0F, 10.0F, t));
-                    float wide = ss(6.0F, 10.0F, t) * (1.0F - ss(12.0F, 18.0F, t));
+                    // Drawn in across the chest and shaking while the data goes (the glitch), then thrown wide.
+                    float in = ss(0.0F, 4.0F, t) * (1.0F - ss(10.0F, 12.0F, t));
+                    float wide = ss(10.0F, 12.0F, t) * (1.0F - ss(14.0F, 20.0F, t));
                     FirstPersonArms.both(gw, -0.20F * in + 0.18F * wide, 0.20F * in, 0.10F * in, -30 * in, 0, 0);
+                    FirstPersonArms.tremble(m, o, gw * ss(5.0F, 6.0F, t) * (1.0F - ss(10.0F, 11.0F, t)), 0.012F, 2.4F, age, calm);
                 }
                 case ULTRON_HACK -> {
                     m.add(gw, -0.14F, 0.18F, 0.34F * ss(0.0F, 4.0F, t), -28, 6, 0);

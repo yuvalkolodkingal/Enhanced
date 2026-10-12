@@ -75,8 +75,8 @@ final class RunPoses {
     private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
     private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
 
-    /** Ultron: a machine's walk, upright, the arms hardly swinging and nothing in the hips. */
-    private static final Character ULTRON = new Character(0.55F, 0.90F, 1.0F, 3, 2, 0.008F);
+    /** Ultron: a stiff, deliberate march, the arms hardly swinging, no lean, almost no bob. */
+    private static final Character ULTRON = new Character(0.55F, 0.70F, 1.0F, 2, 2, 0.008F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {

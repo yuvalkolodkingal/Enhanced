@@ -76,13 +76,13 @@ public final class UltronClientTests {
     public static void hisTenGesturesAreTimedAsDesigned(GameTestHelper helper) {
         // id, group, duration, attack, release, force
         Object[][] table = {
-                {GestureId.TAKEOFF_ULTRON, GestureId.Group.TAKEOFF, 22, 3, 8, true},
+                {GestureId.TAKEOFF_ULTRON, GestureId.Group.TAKEOFF, 18, 2, 8, true},
                 {GestureId.ULTRON_FIRE_START, GestureId.Group.CAST, 8, 1, 4, false},
                 {GestureId.ULTRON_CHARGE_START, GestureId.Group.CAST, 12, 3, 4, false},
                 {GestureId.ULTRON_BLAST, GestureId.Group.CAST, 12, 1, 5, true},
                 {GestureId.ULTRON_PULL, GestureId.Group.CAST, 16, 2, 6, true},
                 {GestureId.ULTRON_SLAM, GestureId.Group.CAST, 22, 3, 8, true},
-                {GestureId.ULTRON_UPLOAD, GestureId.Group.CAST, 18, 2, 6, false},
+                {GestureId.ULTRON_UPLOAD, GestureId.Group.CAST, 20, 2, 6, false},
                 {GestureId.ULTRON_HACK, GestureId.Group.CAST, 22, 2, 6, false},
                 {GestureId.ULTRON_ARMY, GestureId.Group.CAST, 22, 2, 8, false},
                 {GestureId.ULTRON_COMMAND, GestureId.Group.CAST, 14, 2, 5, false},
@@ -126,18 +126,46 @@ public final class UltronClientTests {
     }
 
     @GameTest(template = ARENA, batch = BATCH)
-    public static void theTakeOffPressesTheAirDownAndBackAndEndsOnTheHover(GameTestHelper helper) {
+    public static void theTakeOffPushesTheAirDownAndOutAndEndsOnTheHover(GameTestHelper helper) {
         Gestures.Def def = Gestures.get(GestureId.TAKEOFF_ULTRON);
-        // The arms go back and out (a positive x swings an arm back) before they settle: the palms push the air down.
-        check(def.m.get(1).x > def.m.get(0).x + 15.0F && def.m.get(1).z > def.m.get(0).z + 10.0F, "the palms push back and out first");
-        check(def.drop.value(1)[0] > 0.0F, "the body sinks a little before it rises");
+        // The palms push the air down and out (a negative x swings an arm forward, a positive z spreads it) before they settle.
+        check(def.m.get(1).x < def.m.get(0).x - 15.0F && def.m.get(1).z > def.m.get(0).z + 10.0F, "the palms push forward and out first");
+        check(def.drop.isEmpty(), "the anti-gravity lifts him at once: no dip before it");
         FlightProfile profile = FlightProfile.of(Power.ULTRON, false);
         float[] hover = {profile.anchor(FlightProfile.HOVER, 0), profile.anchor(FlightProfile.HOVER, 1), profile.anchor(FlightProfile.HOVER, 2)};
         assertPose(pose(last(def.m)), hover, 0.5, "the take-off ends on the hover pose, main arm");
         for (int i = 0; i < 3; i++) {
             assertNear(pose(last(def.o))[i], profile.anchor(FlightProfile.HOVER, 3 + i), 0.5, "and the off arm " + i);
         }
-        assertNear(def.drop.value(def.drop.size() - 1)[0], 0.0, 1.0E-6, "with the body back where it was");
+        assertNear(def.right.value(def.right.size() - 1)[0], profile.anchor(FlightProfile.HOVER, 6), 0.5, "and the right leg");
+        assertNear(def.left.value(def.left.size() - 1)[0], profile.anchor(FlightProfile.HOVER, 8), 0.5, "and the left leg");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theUploadGlitchesHisHeadBeforeTheArmsAreThrownWide(GameTestHelper helper) {
+        Gestures.Def def = Gestures.get(GestureId.ULTRON_UPLOAD);
+        // The head jerks one way, then the other, then settles, while the arms are held drawn in.
+        float previous = 0.0F;
+        int turns = 0;
+        float widest = 0.0F;
+        for (int k = 0; k < def.head.size(); k++) {
+            float yaw = def.head.value(k)[1];
+            if (yaw * previous < 0.0F) {
+                turns++;
+            }
+            if (yaw != 0.0F) {
+                previous = yaw;
+            }
+            widest = Math.max(widest, Math.abs(yaw));
+        }
+        check(turns >= 2 && widest >= 10.0F, "the head jerks both ways (" + turns + " turns, up to " + widest + " degrees)");
+        assertNear(def.head.value(def.head.size() - 1)[1], 0.0, 1.0E-6, "and ends straight");
+        Gestures.ArmKey held = def.m.get(1);
+        for (int k = 2; k < 5; k++) {
+            assertPose(pose(def.m.get(k)), pose(held), 1.0E-4, "the arms stay drawn in while the head glitches, key " + k);
+        }
+        check(def.m.get(5).z > 60.0F, "and are thrown wide after it");
         helper.succeed();
     }
 
@@ -331,13 +359,18 @@ public final class UltronClientTests {
         FlightProfile profile = FlightProfile.of(Power.ULTRON, false);
         check(profile != null && !profile.spring && !profile.mWorld, "he has a plain profile of his own");
         assertNear(profile.pitchTarget(0.0F, 0.0F), 0.0, 1.0E-6, "he hovers upright");
-        check(profile.p1 > 25.0F && profile.p2 > profile.p1 + 15.0F, "and leans forward as he speeds up (" + profile.p1 + ", " + profile.p2 + ")");
-        check(profile.lazyRoll == 0.0F && profile.bobAmp <= 0.03F, "a machine does not sway or bob");
-        // The arms trail: back (a positive x) and out, more swept at a sprint.
-        check(profile.anchor(FlightProfile.HOVER, 0) > 0.0F && profile.anchor(FlightProfile.HOVER, 2) > 0.0F, "hovering, the arms hang a little back and out");
-        check(profile.anchor(FlightProfile.SPRINT, 0) > profile.anchor(FlightProfile.CRUISE, 0)
-                && profile.anchor(FlightProfile.CRUISE, 0) > profile.anchor(FlightProfile.HOVER, 0), "and are swept further back the faster he goes");
-        check(profile.anchor(FlightProfile.SPRINT, 2) < profile.anchor(FlightProfile.HOVER, 2), "closer to the body at a sprint");
+        check(profile.p1 <= 12.0F && profile.p2 <= 36.0F && profile.p2 > profile.p1 + 15.0F,
+                "and leans only a little as he speeds up (" + profile.p1 + ", " + profile.p2 + "): a machine, not a diver");
+        check(profile.pitchTarget(1.0F, -1.0F) < 40.0F, "a dive tips him over only a little");
+        check(profile.noBrake && profile.tauPitchOut < profile.tauPitchIn, "he stops as dead as a machine: no braking gesture, he stands up at once");
+        check(profile.lazyRoll == 0.0F && profile.legSway == 0.0F && profile.legFlutter == 0.0F && profile.bobAmp <= 0.03F,
+                "a machine does not sway, flutter or bob");
+        check(profile.maxRoll <= 8.0F, "and banks only slightly");
+        // Palms down, the arms a little out; nearer the body and swept forward the faster he goes.
+        check(profile.anchor(FlightProfile.HOVER, 2) > 10.0F, "hovering, the arms are held a little out");
+        check(profile.anchor(FlightProfile.SPRINT, 2) < profile.anchor(FlightProfile.CRUISE, 2)
+                && profile.anchor(FlightProfile.CRUISE, 2) < profile.anchor(FlightProfile.HOVER, 2), "closer to the body the faster he goes");
+        check(profile.anchor(FlightProfile.SPRINT, 0) < profile.anchor(FlightProfile.HOVER, 0), "and swept slightly forward at a sprint");
         assertNear(profile.anchor(FlightProfile.HOVER, 0), profile.anchor(FlightProfile.HOVER, 3), 1.0E-6, "the arms are a pair, main");
         assertNear(profile.anchor(FlightProfile.HOVER, 2), -profile.anchor(FlightProfile.HOVER, 5), 1.0E-6, "mirrored");
         helper.succeed();
