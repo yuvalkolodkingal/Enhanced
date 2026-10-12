@@ -10,9 +10,10 @@ ritual refuses a site with something hanging in the way (an item frame, a painti
 
 ### The server crashed (or I killed it) while Sokovia was up. What now?
 
-Nothing, if you let the server start again. The lift keeps a small note of every island in the world folder
-(`data/enhanced/sokovia`). At the next start the mod reads the notes, clears the floating copy and, if a player's Ultron
-Program was used up for a fight that never ended, gives it back. A server that is *stopped* normally (`/stop`) puts
+Nothing, if you let the server start again. Every fight keeps a small note in the world folder
+(`data/enhanced/sokovia`): first it only says who is owed the Program, and once the island is built it describes the island. At
+the next start the mod reads the notes, clears any floating copy and, if a player's Ultron Program was used up for a fight
+that never ended (on the ground too), gives it back. A server that is *stopped* normally (`/stop`) puts
 everything back before it closes. Players who were up when it happened are set down on the ground, and are told so,
 when they log in.
 
@@ -30,7 +31,7 @@ If the site cannot be lifted (protected ground, a claim, something in the sky) t
 
 ### Why does Ultron refuse my ground?
 
-The action bar says why, and nothing is used up. The most common reasons: the dimension has no open sky (not the Nether or the End); the ground is not level (it may rise and fall by 6 blocks at most across the 20-block circle) or is mostly water, lava or non-walkable; the sky above, with a margin of 6 blocks, is not empty (a mountain, a tree canopy, a floating build); an item frame, painting, armour stand, boat or minecart is inside the circle; the ground is protected by spawn protection or a claim; it is too near the world border; the difficulty is Peaceful; or another boss fight is already running. Houses and chests on the ground are *not* a reason: the island is a copy, and only the natural ground is copied.
+The action bar says why, and nothing is used up. The most common reasons: the dimension has no open sky (not the Nether or the End); the ground is not level (it may rise and fall by 6 blocks at most across the 20-block circle; trees do not count) or is mostly water, lava or non-walkable; the sky above, with a margin of 6 blocks, is not empty (a mountain, a tree canopy, a floating build); an item frame, painting, armour stand, boat or minecart is inside the circle; the ground is protected by spawn protection or a claim; it is too near the world border; the difficulty is Peaceful; or another boss fight is already running. Houses and chests on the ground are *not* a reason: the island is a copy, and only the natural ground is copied.
 
 ### Why can't I build, dig or run away on the island?
 
