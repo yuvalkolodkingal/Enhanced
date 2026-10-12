@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
+import com.kolodkingal.enhanced.client.render.GauntletLayer;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
 import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
@@ -13,6 +14,7 @@ import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
+import com.kolodkingal.enhanced.client.render.SoulSight;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
 import com.kolodkingal.enhanced.client.render.ThanosMeteorRenderer;
 import com.kolodkingal.enhanced.client.render.ThanosModel;
@@ -63,6 +65,7 @@ public final class ClientSetup {
             // ===== phoenix =====
             // ===== spider =====
             // ===== thanos =====
+            EntityGlow.register(SoulSight::reveals, SoulSight::color);
             ThanosBossBar.register();
             ThanosViewer.register();
             // ===== ultron =====
@@ -128,6 +131,7 @@ public final class ClientSetup {
         // ===== thanos =====
         event.registerLayerDefinition(ThanosModel.LAYER, ThanosModel::createBodyLayer);
         event.registerLayerDefinition(ThanosSwordModel.LAYER, ThanosSwordModel::createBodyLayer);
+        event.registerLayerDefinition(GauntletLayer.LAYER, GauntletLayer::createLayer);
         // ===== ultron =====
         // ===== apocalypse =====
     }
@@ -147,6 +151,7 @@ public final class ClientSetup {
                 // ===== phoenix =====
                 // ===== spider =====
                 // ===== thanos =====
+                renderer.addLayer(new GauntletLayer(renderer, event.getContext().bakeLayer(GauntletLayer.LAYER)));
                 // ===== ultron =====
                 // ===== apocalypse =====
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
