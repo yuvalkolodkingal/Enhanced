@@ -9,7 +9,6 @@ import com.kolodkingal.enhanced.ultron.SokoviaJournal.Header;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -22,10 +21,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,8 +103,8 @@ public final class SokoviaLift implements LiftHook {
     private static final double FALL_FIELD = 3.0;
     /** ... or this high over the island's top. */
     private static final double SKY_FIELD = 80.0;
-    /** How far under a fighter who is set down in the air the ground is looked for. */
-    private static final int SET_DOWN_REACH = 64;
+    /** How far (blocks) a player who is set down standing on nothing is let down at most. */
+    private static final double SET_DOWN_REACH = 64.0;
 
     private static final Map<UUID, Lift> LIFTS = new LinkedHashMap<>();
 
@@ -989,12 +987,14 @@ public final class SokoviaLift implements LiftHook {
         }
 
         /**
-         * The island is in the sky (whole, or half placed, or half taken down) and must go now: every block of the island
-         * is cleared, and everything on it, and everything it was carrying, is set on the ground below.
+         * The island is in the sky (whole, or half placed, or half taken down, or on its way down) and must go now: every
+         * block of the island is cleared, and everything on it, and everything it was carrying, is set on the ground
+         * below. While it falls its blocks are gone already, so what it does not carry is set down from where it is.
          */
         private void restoreEverything() {
             double high = spec.height();
             double now = descending ? high + carry.moved() : high;
+            boolean falling = step == Step.FALLING;
             List<Entity> down = new ArrayList<>(islandEntities(now));
             for (Entity entity : carry.entities()) {
                 if (!down.contains(entity)) {
@@ -1002,10 +1002,18 @@ public final class SokoviaLift implements LiftHook {
                 }
             }
             // (Whoever the lift carries goes where the lift says they are, not where a knock, or a client that lags, has left
-            // them: the carry lets them drift up to DRIFT blocks before it puts them back, and the stop must not keep that.)
+            // them: the carry lets them drift up to DRIFT blocks before it puts them back, and the stop must not keep that.
+            // Whatever stands on the island is as high over its place on the ground as the island is. But while the island
+            // falls there is no block of it left to stand on: what it does not carry is where it really is, on the real
+            // ground or in the air over it, and in the last blocks of the fall the region that is gathered reaches down to
+            // whoever stands on the real ground inside the rim: they are not to be sunk into it.)
             List<Vec3> spots = new ArrayList<>();
             for (Entity entity : down) {
                 SokoviaCarry.Rider rider = carry.rider(entity.getUUID());
+                if (rider == null && falling) {
+                    spots.add(entity.position());
+                    continue;
+                }
                 double y = rider != null ? rider.expected(carry.moved()).y : entity.getY();
                 spots.add(new Vec3(entity.getX(), y - now, entity.getZ()));
             }
@@ -1021,62 +1029,88 @@ public final class SokoviaLift implements LiftHook {
             for (int i = 0; i < down.size(); i++) {
                 Entity entity = down.get(i);
                 SokoviaCarry.release(entity);
-                SokoviaCarry.teleport(entity, setDownSpot(entity, spots.get(i)));
+                Vec3 spot = SokoviaCarry.freeSpot(entity, spots.get(i));
                 if (entity instanceof ServerPlayer player) {
+                    player.setPos(spot); // (what they stand on, and how they collide with it, is asked from there)
+                    spot = restingSpot(player);
                     grace.put(player.getUUID(), level.getGameTime() + GRACE_TICKS);
                 }
+                SokoviaCarry.teleport(entity, spot);
             }
             altitude = 0.0;
         }
 
         /**
-         * Where something is set down on the real ground at the end of a move, given the spot the lift has for it: a
-         * player who is not flying is set on what is under that spot, so that a fighter who was in the air over the
-         * island when it went (a jump, a knock; Ultron's Gravity Pull holds one at his chest, four blocks up) is put on
-         * the ground below and not as high over it, where the lift had carried them. A hero who is flying is left at his
-         * height and flies on, and anything else keeps its spot (it falls by itself). Always free of the blocks.
-         */
-        private Vec3 setDownSpot(Entity entity, Vec3 spot) {
-            Vec3 at = entity instanceof ServerPlayer player && !player.getAbilities().flying ? groundUnder(spot) : spot;
-            return SokoviaCarry.freeSpot(entity, at);
-        }
-
-        /**
-         * The spot lowered through the air under it onto the first block below that has a body (or onto the surface of
-         * water): the spot itself if it is in such a block already (it is not raised), or if nothing is within reach.
-         */
-        private Vec3 groundUnder(Vec3 spot) {
-            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(Mth.floor(spot.x), Mth.floor(spot.y), Mth.floor(spot.z));
-            int bottom = Math.max(level.getMinBuildHeight(), pos.getY() - SET_DOWN_REACH);
-            for (; pos.getY() >= bottom; pos.move(Direction.DOWN)) {
-                BlockState state = level.getBlockState(pos);
-                VoxelShape shape = state.getCollisionShape(level, pos);
-                double top;
-                if (!shape.isEmpty()) {
-                    top = pos.getY() + shape.max(Direction.Axis.Y);
-                } else if (!state.getFluidState().isEmpty()) {
-                    top = pos.getY() + state.getFluidState().getHeight(level, pos);
-                } else {
-                    continue;
-                }
-                return new Vec3(spot.x, Math.min(spot.y, top), spot.z);
-            }
-            return spot;
-        }
-
-        /**
-         * The players the lift has just put where it says they are on the real ground are set down on what is under them
-         * ({@link #setDownSpot}), before they are let go.
+         * The players the lift has just put where it says they are on the real ground (where they were taken, or the
+         * island's move under them) are let down onto what is under them ({@link #restingSpot}), before they are let go.
          */
         private void setPlayersDown() {
             for (Entity entity : carry.entities()) {
                 if (entity instanceof ServerPlayer player && player.isAlive()) {
-                    Vec3 spot = setDownSpot(player, player.position());
+                    Vec3 spot = restingSpot(player);
                     if (player.position().distanceToSqr(spot) > 1.0E-6) {
                         SokoviaCarry.teleport(player, spot);
                     }
                 }
             }
+        }
+
+        /**
+         * Where a player comes to rest who is set down where they are now at the end of a move. One who stands on nothing
+         * there (a fighter who was in the air over the island when it went: a jump, a knock) is let straight down, their
+         * whole body at once and with their own block collisions, onto the first block that stops it: a ledge their body
+         * still overlaps holds them although their middle is past its edge, as do powder snow under leather boots and
+         * scaffolding they do not sneak down. A fluid stops them at its surface. They are let down no more than {@link
+         * #SET_DOWN_REACH} blocks: with nothing under them within that, they stay where they are. So does one who rests on
+         * something already (within half a block: {@link SokoviaRecovery#supported}) or is in a fluid, and a hero who is
+         * flying, who flies on at his height. Never up, and never into a block.
+         */
+        private static Vec3 restingSpot(ServerPlayer player) {
+            Vec3 at = player.position();
+            ServerLevel world = player.serverLevel();
+            AABB body = player.getBoundingBox();
+            if (player.getAbilities().flying || SokoviaRecovery.supported(player, at) || world.containsAnyLiquid(body)) {
+                return at;
+            }
+            double reach = Math.min(SET_DOWN_REACH, body.minY - world.getMinBuildHeight());
+            if (reach <= 0.0) {
+                return at;
+            }
+            double solid = -Entity.collideBoundingBox(player, new Vec3(0.0, -reach, 0.0), body, world, List.of()).y;
+            double drop = Math.min(solid, fluidUnder(world, body, solid));
+            return drop < reach - 1.0E-7 ? at.add(0.0, -drop, 0.0) : at;
+        }
+
+        /**
+         * How far under the body the surface of the highest fluid below it is, looking no deeper than {@code depth}
+         * blocks under its feet; infinite if there is none.
+         */
+        private static double fluidUnder(ServerLevel world, AABB body, double depth) {
+            int minX = Mth.floor(body.minX);
+            int maxX = Mth.floor(body.maxX - 1.0E-7);
+            int minZ = Mth.floor(body.minZ);
+            int maxZ = Mth.floor(body.maxZ - 1.0E-7);
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+            // (From the top down: the first layer with a fluid in it under the feet holds the highest surface.)
+            for (int y = Mth.floor(body.minY); y >= Mth.floor(body.minY - depth); y--) {
+                double nearest = Double.POSITIVE_INFINITY;
+                for (int x = minX; x <= maxX; x++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        FluidState fluid = world.getFluidState(pos.set(x, y, z));
+                        if (fluid.isEmpty()) {
+                            continue;
+                        }
+                        double gap = body.minY - (y + fluid.getHeight(world, pos));
+                        if (gap >= -1.0E-7 && gap <= depth) {
+                            nearest = Math.min(nearest, Math.max(0.0, gap));
+                        }
+                    }
+                }
+                if (nearest < Double.POSITIVE_INFINITY) {
+                    return nearest;
+                }
+            }
+            return Double.POSITIVE_INFINITY;
         }
 
         private void deleteNote() {
