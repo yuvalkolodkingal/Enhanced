@@ -73,6 +73,13 @@ final class SpiderState {
     double y2;
     double y3;
     int samples;
+    /**
+     * What the client of this Spider-Man last said he clings to ({@code SpiderClingPayload}), and when. Once a client has
+     * said anything, it alone says it: the server no longer guesses from his motion.
+     */
+    SpiderClimb.Surface reported = SpiderClimb.Surface.NONE;
+    long reportedAt = Long.MIN_VALUE / 2;
+    boolean reporting;
     /** A jump has been seen: until this time a body that hangs in the air is at the top of its arc, not on a wall. */
     long arcUntil;
     boolean moving;

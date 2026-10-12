@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.ability.SpiderServer;
 import com.kolodkingal.enhanced.ability.SpiderWebs;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -38,6 +39,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -100,6 +102,8 @@ public final class SpiderMotion {
     private static final double PLAIN_FACTOR = 1.15;
     /** A swing on the ground this long is let go of (after its first ticks). */
     private static final int SWING_GRACE = 10;
+    /** What he clings to is told to the server again this often while it lasts (the server believes it for 12 ticks). */
+    private static final int REPORT_TICKS = 8;
 
     private static final SpiderClimb.Surface CEILING = new SpiderClimb.Surface(SpiderClimb.Kind.CEILING, Direction.DOWN);
 
@@ -114,6 +118,10 @@ public final class SpiderMotion {
     private static boolean pressedGSneaking;
     /** Until when a second press of Sneak + B turns Instant Kill on (a game time). */
     private static long confirmUntil;
+    /** What the server was last told he clings to ({@link SpiderClingPayload}), and when (his ticks); -1 before the first word. */
+    private static int toldKind = -1;
+    private static int toldNormal;
+    private static int toldAt;
 
     // ---- cling ----
     private static SpiderClimb.Surface surface = SpiderClimb.Surface.NONE;
@@ -183,6 +191,7 @@ public final class SpiderMotion {
         pressedG = false;
         confirmUntil = 0;
         jumpWas = false;
+        toldKind = -1;
     }
 
     // =================================================================================================================
@@ -343,7 +352,12 @@ public final class SpiderMotion {
     public static void onClientTickPost(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || player != owner || mode != Mode.CLING || player.connection == null) {
+        if (player == null || player != owner || player.connection == null) {
+            lastSent = null;
+            return;
+        }
+        tellTheServer(player);
+        if (mode != Mode.CLING) {
             lastSent = null;
             return;
         }
@@ -352,6 +366,34 @@ public final class SpiderMotion {
             lastSent = at; // (vanilla sent this one)
         } else {
             player.connection.send(new ServerboundMovePlayerPacket.Pos(at.x, at.y, at.z, player.onGround()));
+        }
+    }
+
+    /**
+     * Tells the server what he clings to when that changes, and again every few ticks while he clings (the server
+     * believes it for twelve), because it cannot tell a climb, a crawl down a wall and a fall apart from his positions
+     * alone, and the others see what the server says. Nothing is sent by anyone who is not Spider-Man.
+     */
+    private static void tellTheServer(LocalPlayer player) {
+        if (Powers.get(player).power() != Power.SPIDER_MAN) {
+            toldKind = -1;
+            return;
+        }
+        SpiderClimb.Surface on = mode == Mode.CLING ? surface : SpiderClimb.Surface.NONE;
+        int kind = on.kind() == SpiderClimb.Kind.WALL ? SpiderClingPayload.WALL
+                : on.kind() == SpiderClimb.Kind.CEILING ? SpiderClingPayload.CEILING : SpiderClingPayload.NONE;
+        int normal = on.touches() ? on.normal().get3DDataValue() : 0;
+        boolean changed = kind != toldKind || normal != toldNormal;
+        if (changed || (kind != SpiderClingPayload.NONE && player.tickCount - toldAt >= REPORT_TICKS)) {
+            if (changed && kind == SpiderClingPayload.NONE && toldKind < 0) {
+                toldKind = kind; // (nothing has been told yet, and there is nothing to tell)
+                toldNormal = normal;
+                return;
+            }
+            PacketDistributor.sendToServer(new SpiderClingPayload(kind, normal));
+            toldKind = kind;
+            toldNormal = normal;
+            toldAt = player.tickCount;
         }
     }
 
@@ -819,7 +861,6 @@ public final class SpiderMotion {
             }
         }
     }
-
 
     private SpiderMotion() {
     }

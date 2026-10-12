@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -122,6 +123,10 @@ public final class SpiderServer implements HeroServer {
     private static final int HITCH_TICKS = 12;
     /** What the cling's flag outlives the contact by. */
     private static final int CLING_HYSTERESIS = 4;
+    /** What his client says he clings to counts for this many ticks (it says it again every few). */
+    public static final int REPORT_TICKS = 12;
+    /** How near a block must be to the side of him that his client says he clings to (the server's copy of him lags). */
+    public static final double CLAIM_REACH = 0.45;
     /** A jump's rise slows to nothing in about this many ticks; hanging in the air before then is no cling. */
     private static final int ARC_TICKS = 7;
     /** The Black Eyes' crash: Slowness II (amplifier 1) and Weakness I. */
@@ -923,7 +928,20 @@ public final class SpiderServer implements HeroServer {
         SpiderClimb.Surface touched = free ? SpiderClimb.detect(player.level(), player, wish, state.surface) : SpiderClimb.Surface.NONE;
 
         boolean holding = false;
-        if (touched.touches()) {
+        if (state.reporting) {
+            // His client says what he clings to; the server only checks that there is something to cling to there, and does
+            // not guess from the way he moves (a crawl down a wall looks like a fall, a climb like the arc of a jump).
+            SpiderClimb.Surface told = free && now - state.reportedAt <= REPORT_TICKS ? state.reported : SpiderClimb.Surface.NONE;
+            state.groundTicks = 0;
+            if (told.touches() && SpiderClimb.near(player.level(), player, told, CLAIM_REACH)) {
+                holding = true;
+                touched = told;
+            } else if (now - state.reportedAt <= REPORT_TICKS && !state.reported.touches()) {
+                // He has let go: the flag goes at once (the grace of a zip's arrival below does not outlive his word).
+                state.clingUntil = 0;
+                state.clingGraceUntil = 0;
+            }
+        } else if (touched.touches()) {
             if (player.onGround()) {
                 state.groundTicks++;
             } else {
@@ -968,6 +986,28 @@ public final class SpiderServer implements HeroServer {
             }
         } else if (!state.surface.equals(SpiderClimb.Surface.NONE) && now > state.clingUntil) {
             state.surface = SpiderClimb.Surface.NONE;
+        }
+    }
+
+    /**
+     * His own client says what he clings to ({@code kind} 0 nothing, 1 a wall, 2 a ceiling, {@code normal} the 3D data value
+     * of the direction the surface faces). It is believed only while a block is within {@link #CLAIM_REACH} of that side of
+     * his body, and only for a Spider-Man. From his first word the server stops guessing from his motion.
+     */
+    public static void onClingReport(ServerPlayer player, int kind, int normal) {
+        if (!isSpiderMan(player)) {
+            return;
+        }
+        SpiderState state = state(player);
+        state.reporting = true;
+        state.reportedAt = player.serverLevel().getGameTime();
+        Direction direction = Direction.from3DDataValue(Math.floorMod(normal, 6));
+        if (kind == SpiderClingPayload.WALL && direction.getAxis().isHorizontal()) {
+            state.reported = new SpiderClimb.Surface(SpiderClimb.Kind.WALL, direction);
+        } else if (kind == SpiderClingPayload.CEILING) {
+            state.reported = new SpiderClimb.Surface(SpiderClimb.Kind.CEILING, Direction.DOWN);
+        } else {
+            state.reported = SpiderClimb.Surface.NONE;
         }
     }
 

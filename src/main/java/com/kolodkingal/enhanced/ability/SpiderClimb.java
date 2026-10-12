@@ -87,12 +87,11 @@ public final class SpiderClimb {
         AABB box = player.getBoundingBox();
         List<Direction> walls = new ArrayList<>(4);
         for (Direction side : Direction.Plane.HORIZONTAL) {
-            if (blockIn(level, player, wallSlab(box, side))) {
+            if (blockIn(level, player, wallSlab(box, side, REACH))) {
                 walls.add(side.getOpposite());
             }
         }
-        boolean ceiling = blockIn(level, player, new AABB(box.minX + 0.1, box.maxY, box.minZ + 0.1, box.maxX - 0.1, box.maxY + REACH,
-                box.maxZ - 0.1));
+        boolean ceiling = blockIn(level, player, ceilingSlab(box, REACH));
         if (ceiling && previous != null && previous.kind() == Kind.CEILING) {
             return previous;
         }
@@ -117,15 +116,34 @@ public final class SpiderClimb {
         return walls.isEmpty() ? Surface.NONE : new Surface(Kind.WALL, walls.get(0));
     }
 
-    /** The thin box on the {@code side} of his box. */
-    private static AABB wallSlab(AABB box, Direction side) {
+    /** The thin box, {@code reach} thick, on the {@code side} of his box. */
+    private static AABB wallSlab(AABB box, Direction side, double reach) {
         double low = box.minY + 0.3;
         double high = box.maxY - 0.1;
         return switch (side) {
-            case EAST -> new AABB(box.maxX, low, box.minZ + 0.1, box.maxX + REACH, high, box.maxZ - 0.1);
-            case WEST -> new AABB(box.minX - REACH, low, box.minZ + 0.1, box.minX, high, box.maxZ - 0.1);
-            case SOUTH -> new AABB(box.minX + 0.1, low, box.maxZ, box.maxX - 0.1, high, box.maxZ + REACH);
-            default -> new AABB(box.minX + 0.1, low, box.minZ - REACH, box.maxX - 0.1, high, box.minZ);
+            case EAST -> new AABB(box.maxX, low, box.minZ + 0.1, box.maxX + reach, high, box.maxZ - 0.1);
+            case WEST -> new AABB(box.minX - reach, low, box.minZ + 0.1, box.minX, high, box.maxZ - 0.1);
+            case SOUTH -> new AABB(box.minX + 0.1, low, box.maxZ, box.maxX - 0.1, high, box.maxZ + reach);
+            default -> new AABB(box.minX + 0.1, low, box.minZ - reach, box.maxX - 0.1, high, box.minZ);
+        };
+    }
+
+    /** The thin box, {@code reach} thick, above his head. */
+    private static AABB ceilingSlab(AABB box, double reach) {
+        return new AABB(box.minX + 0.1, box.maxY, box.minZ + 0.1, box.maxX - 0.1, box.maxY + reach, box.maxZ - 0.1);
+    }
+
+    /**
+     * Whether a block he may stick to is within {@code reach} of the surface that his own client says he clings to (the
+     * server's copy of him lags the client's a little, so the reach is wider than {@link #REACH}). This is how the server
+     * checks a claim, which it never takes on trust.
+     */
+    public static boolean near(Level level, Player player, Surface claimed, double reach) {
+        AABB box = player.getBoundingBox();
+        return switch (claimed.kind()) {
+            case WALL -> claimed.normal().getAxis().isHorizontal() && blockIn(level, player, wallSlab(box, claimed.normal().getOpposite(), reach));
+            case CEILING -> blockIn(level, player, ceilingSlab(box, reach));
+            case NONE -> false;
         };
     }
 

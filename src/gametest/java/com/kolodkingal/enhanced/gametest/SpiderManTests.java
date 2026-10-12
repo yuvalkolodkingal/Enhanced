@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
 import com.kolodkingal.enhanced.power.Live;
@@ -30,6 +31,8 @@ import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -1717,6 +1720,118 @@ public final class SpiderManTests {
             check(!data(walker).is(Live.CLINGING_WALL), "tick " + tick + ": walking on the ground beside it he does not cling");
             return tick == fall.length;
         });
+    }
+
+    /**
+     * What his own client says he clings to is the truth for the flag the others see: a crawl down a wall looks like a fall
+     * from his positions alone, and a steady climb like the arc of a jump, so a server that only guessed would drop the
+     * stance of a hero who climbs or descends. The claim is believed only while a block is there, for a few ticks at a
+     * time, and only for a Spider-Man.
+     */
+    @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
+    public static void whatHisClientSaysHeClingsToIsBelievedOnlyWhereABlockIs(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        builtSurfaces(helper);
+        int west = Direction.WEST.get3DDataValue();
+        // He crawls steadily down the wall (a fall, to the server's own reckoning), told to be clinging to it.
+        ServerPlayer told = spider(f, 10.5, 10.5);
+        told.setOnGround(false);
+        told.fallDistance = 5.0F;
+        SpiderServer.onClingReport(told, SpiderClingPayload.WALL, west);
+        // The same crawl with nothing said: the old guess, which takes it for a fall.
+        ServerPlayer silent = spider(f, 9.5, 9.5);
+        silent.setOnGround(false);
+        // Claims where there is nothing to cling to, and a hero who is not Spider-Man.
+        ServerPlayer liar = spider(f, 2.5, 8.5);
+        liar.setOnGround(false);
+        put(helper, liar, 2.5, 3.0, 8.5); // (in the open air, away from the wall and from the roof of the other surface)
+        SpiderServer.onClingReport(liar, SpiderClingPayload.WALL, west);
+        ServerPlayer roof = spider(f, 2.5, 5.5);
+        roof.setOnGround(false);
+        put(helper, roof, 2.5, 3.0, 5.5);
+        SpiderServer.onClingReport(roof, SpiderClingPayload.CEILING, Direction.DOWN.get3DDataValue());
+        ServerPlayer magneto = f.player(6.5, FLOOR, 6.5, Power.MAGNETO);
+        SpiderServer.onClingReport(magneto, SpiderClingPayload.WALL, west);
+        check(!SpiderServer.hasState(magneto), "the claim of a hero who is not Spider-Man is ignored");
+        f.everyTick(26, tick -> {
+            double y = Math.max(2.1, 6.0 - 0.22 * (tick - 1));
+            if (tick <= 18) {
+                putBesideTheWall(helper, told, y);
+                if (tick == 8) {
+                    SpiderServer.onClingReport(told, SpiderClingPayload.WALL, west); // (his client says it again every few ticks)
+                }
+                PowerTicker.tick(told);
+                check(data(told).is(Live.CLINGING_WALL), "tick " + tick + ": told to be on the wall, he is, however he moves");
+                check(told.fallDistance == 0.0F, "tick " + tick + ": and the fall counts for nothing");
+                putBesideTheWall(helper, silent, y);
+                PowerTicker.tick(silent);
+                if (tick >= 8) {
+                    check(!data(silent).is(Live.CLINGING_WALL), "tick " + tick + ": a crawl down the wall that nobody speaks for is guessed to be a fall");
+                }
+            } else {
+                // His last word (at tick 8) counts for twelve ticks, and the flag outlives the last of them by four.
+                putBesideTheWall(helper, told, 3.0);
+                PowerTicker.tick(told);
+                check(data(told).is(Live.CLINGING_WALL) == (tick <= 8 + SpiderServer.REPORT_TICKS + 4),
+                        "tick " + tick + ": a word that is not renewed runs out (twelve ticks, then the four of grace)");
+            }
+            PowerTicker.tick(liar);
+            check(!data(liar).is(Live.CLINGING_WALL), "tick " + tick + ": a wall that is not there is not clung to, whatever is said");
+            PowerTicker.tick(roof);
+            check(!data(roof).is(Live.CLINGING_CEILING), "tick " + tick + ": nor is a ceiling");
+            return tick == 26;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
+    public static void aClientThatSaysItLetGoDropsTheFlagAtOnce(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        builtSurfaces(helper);
+        ServerPlayer player = spider(f, 10.5, 10.5);
+        player.setOnGround(false);
+        putBesideTheWall(helper, player, 4.0);
+        SpiderServer.onClingReport(player, SpiderClingPayload.WALL, Direction.WEST.get3DDataValue());
+        PowerTicker.tick(player);
+        check(data(player).is(Live.CLINGING_WALL), "told to cling beside the wall: he does");
+        SpiderServer.onClingReport(player, SpiderClingPayload.NONE, 0);
+        PowerTicker.tick(player);
+        check(!data(player).is(Live.CLINGING_WALL), "told that he let go: the flag is down at once, though he is still beside the wall");
+        // And a zip that has just arrived (the server holds it a few ticks) does not outlive his word.
+        SpiderServer.onClingReport(player, SpiderClingPayload.WALL, 99); // a normal that is nothing: no surface
+        PowerTicker.tick(player);
+        check(!data(player).is(Live.CLINGING_WALL), "a surface that makes no sense is no surface");
+        // A ceiling is a ceiling, whatever direction is said with it.
+        put(helper, player, 6.5, 2.19, 6.5);
+        SpiderServer.onClingReport(player, SpiderClingPayload.CEILING, Direction.EAST.get3DDataValue());
+        PowerTicker.tick(player);
+        check(data(player).is(Live.CLINGING_CEILING) && !data(player).is(Live.CLINGING_WALL), "told to hang from a ceiling, with a block above his head: he does");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = QUICK)
+    public static void theClingReportRoundTripsAndNearIsAPureCheck(GameTestHelper helper) {
+        for (int kind : new int[]{SpiderClingPayload.NONE, SpiderClingPayload.WALL, SpiderClingPayload.CEILING}) {
+            for (Direction direction : Direction.values()) {
+                SpiderClingPayload sent = new SpiderClingPayload(kind, direction.get3DDataValue());
+                ByteBuf buffer = Unpooled.buffer();
+                SpiderClingPayload.STREAM_CODEC.encode(buffer, sent);
+                check(SpiderClingPayload.STREAM_CODEC.decode(buffer).equals(sent), "the cling report " + sent + " is the same on the other side");
+            }
+        }
+        builtSurfaces(helper);
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = spider(f, 10.5, 10.5);
+        ServerLevel level = helper.getLevel();
+        SpiderClimb.Surface wall = new SpiderClimb.Surface(SpiderClimb.Kind.WALL, Direction.WEST);
+        putBesideTheWall(helper, player, 3.0);
+        check(SpiderClimb.near(level, player, wall, 0.45), "flush with the wall: near");
+        put(helper, player, 11.3, 3.0, 10.5);
+        check(SpiderClimb.near(level, player, wall, 0.45) && !SpiderClimb.near(level, player, wall, 0.12), "0.4 off the wall: near for the wider reach, not the narrow");
+        put(helper, player, 10.5, 3.0, 10.5);
+        check(!SpiderClimb.near(level, player, wall, 0.45), "a block's width away: not near");
+        check(!SpiderClimb.near(level, player, new SpiderClimb.Surface(SpiderClimb.Kind.WALL, Direction.DOWN), 0.45), "a wall that faces down is no wall");
+        check(!SpiderClimb.near(level, player, SpiderClimb.Surface.NONE, 0.45), "nothing is never near");
+        helper.succeed();
     }
 
     @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
