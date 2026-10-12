@@ -23,6 +23,7 @@ import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import com.kolodkingal.enhanced.ultron.UltronState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -36,12 +37,19 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -874,6 +882,49 @@ public final class UltronMachineTests {
                 check(drone.getHealth() == drone.getMaxHealth(), "still not his drone");
                 helper.succeed();
             });
+        });
+    }
+
+    /**
+     * What the arena has in it that is nobody's enemy is not shot: an armour stand, a boat, a minecart and an item frame
+     * (a projectile that struck one would knock the item out of the frame or break the stand), whether it is the boss's
+     * bolt or a Sentry's, and a Sentry's fist.
+     */
+    @GameTest(template = ARENA, batch = "ultron_bolts_spare", timeoutTicks = 200)
+    public static void theBossBoltsAndFistsSpareWhatHangsOrFloatsOrStands(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        ServerLevel level = f.level();
+        ServerPlayer player = f.player(MIDDLE.x, FLOOR, MIDDLE.z);
+        tank(player);
+        UltronFight fight = onTheGround(f, player);
+        calm(fight);
+        UltronEntity boss = boss(fight);
+        put(f, boss, 10.5, FLOOR + 1.0, 1.5);
+        put(f, player, 19.5, FLOOR, 19.5);
+        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(3.5, FLOOR, 10.5));
+        Boat boat = helper.spawn(EntityType.BOAT, new Vec3(6.5, FLOOR, 10.5));
+        Minecart cart = helper.spawn(EntityType.MINECART, new Vec3(9.5, FLOOR, 10.5));
+        BlockPos wall = helper.absolutePos(new BlockPos(13, (int) FLOOR, 11));
+        level.setBlock(wall, Blocks.STONE.defaultBlockState(), 3);
+        f.onClose(() -> level.setBlock(wall, Blocks.AIR.defaultBlockState(), 3));
+        ItemFrame frame = new ItemFrame(level, wall.north(), Direction.NORTH);
+        frame.setItem(new ItemStack(Items.DIAMOND));
+        level.addFreshEntity(frame);
+        check(frame.isAlive(), "the item frame holds on to its wall");
+        UltronSentryEntity sentry = UltronSentryEntity.army(level, helper.absoluteVec(new Vec3(3.5, FLOOR + 1.0, 8.5)), false);
+        fight.spawn(sentry);
+        sentry.setHeld(true);
+        float standHealth = stand.getHealth();
+        for (double x : new double[]{3.5, 6.5, 9.5, 13.5}) {
+            Vec3 from = f.helper().absoluteVec(new Vec3(x, FLOOR + 0.8, 4.5));
+            fight.spawn(UltronBoltEntity.create(level, boss, from, new Vec3(0.0, 0.0, 1.7), 6.0F, UltronBoltEntity.Palette.PRIME));
+        }
+        helper.runAfterDelay(25, () -> {
+            check(stand.isAlive() && stand.getHealth() == standHealth, "the armour stand stands");
+            check(boat.isAlive() && cart.isAlive(), "the boat and the minecart float and roll on");
+            check(frame.isAlive() && frame.getItem().is(Items.DIAMOND), "the item frame still holds its diamond");
+            helper.succeed();
         });
     }
 

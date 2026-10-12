@@ -17,6 +17,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
@@ -215,8 +216,9 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
             }
             return true;
         }
-        // The boss's bolts spare what is on its side.
-        return !(target instanceof UltronEntity);
+        // The boss's bolts spare what is on its side, and break nothing of anyone's: a painting, an item frame, a boat, a
+        // minecart or an armour stand in the arena is not an enemy (a projectile that hit one would take it off its wall).
+        return !(target instanceof UltronEntity) && target instanceof LivingEntity && !(target instanceof ArmorStand);
     }
 
     @Override

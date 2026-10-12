@@ -772,7 +772,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         if (isDrone()) {
             return victim == getTarget() || (getOwner() instanceof ServerPlayer master && victim instanceof Mob mob && hostile(master, mob));
         }
-        return victim != this && !(victim instanceof Player p && (p.isCreative() || p.isSpectator()))
+        return victim != this && !(victim instanceof Player p && (p.isCreative() || p.isSpectator())) && !(victim instanceof ArmorStand)
                 && !BossFights.sameFight(this, victim) && !(victim instanceof UltronEntity);
     }
 
