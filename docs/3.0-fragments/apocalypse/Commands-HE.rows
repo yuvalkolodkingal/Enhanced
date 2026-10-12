@@ -1,0 +1,17 @@
+<!-- Commands-HE.md, טבלת הפקודות: שורות (פקודות הבוסים משותפות לאולטרון, לתאנוס ולאפוקליפסה; מי שמחבר שומר עותק אחד) -->
+| `/enhanced boss start apocalypse [force]` | מעיר את אן סבאח נור ליד הרגליים שלכם, בלי אבן פסגה. `force` מדלג על הבדיקות של הקרקע, השמיים והצורך במכשפת השני או בפניקס (לא על קושי שליו, לא על המתג שמכבה אותו ולא על החוק של קרב אחד בכל פעם). ראו [אפוקליפסה](Apocalypse-HE). |
+| `/enhanced boss stop` | מסיים את קרב הבוס שרץ (אבן הפסגה מוחזרת, אם נשרפה אחת). |
+| `/enhanced boss list` | מציג את קרבות הבוסים שרצים. |
+
+<!-- Commands-HE.md, הטבלה "כוחות": שורה אחת -->
+| `apocalypse` | [אפוקליפסה](Apocalypse-HE) |
+
+<!-- Commands-HE.md, הטבלה "מראות": שורה אחת -->
+| אפוקליפסה | `apocalypse`, `en_sabah_nur`, `own` |
+
+<!-- Commands-HE.md, הטבלה "דוגמאות": שורות -->
+| `/enhanced boss start apocalypse force` | מעיר את אן סבאח נור במקום שאתם עומדים בו, בלי אבן פסגה ובלי מי שישבור את המגן שלו. |
+| `/enhanced power set Steve apocalypse en_sabah_nur` | הופך את סטיב לאפוקליפסה, במראה של 3600 לפנה"ס (הוא מדלג על הבוס ועל המהות). |
+
+<!-- Commands-HE.md, הסעיף "מסתכלים על האנימציות": שורה מתחת ל-/enhanced_anim, או סעיף קצר משלה -->
+`/enhanced_model apocalypse <state>` היא פקודה של המשחק בלבד לאנשים שמציירים: היא מציגה עותק של אן סבאח נור במצב (`idle`, `awakening`, `tell_lance`, `tell_wave`, `tell_spikes`, `tell_boulders`, `tell_entomb`, `tell_mind_crush`, `tell_portal`, `backhand`, `tell_tornado`, `staggered`, `hover`, `escaping`, `kneeling`, `armour_fall`, `dying`, `withdrawing`, `true_<state>` לגוף השברירי, `dying_fire`, המצבים של המגן `shield_up`, `shield_cracked`, `shield_forming`, `shield_reforming` ו-`shield_broken`; ל-`sand_cocoon`, ל-`sand_lance` ול-`sand_boulder` יש פקודה משלהם), קפוא בטיק. `/enhanced_model list` מראה מה אפשר להציג.

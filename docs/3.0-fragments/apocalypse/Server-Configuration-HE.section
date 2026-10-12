@@ -55,8 +55,8 @@
 | `apocalypse_boss.boulderDamage` | 11.0 | 0.0 עד 100.0 | סלע חול אחד. |
 | `apocalypse_boss.backhandDamage` | 16.0 | 0.0 עד 100.0 | מכת גב היד. |
 | `apocalypse_boss.portalShockDamage` | 6.0 | 0.0 עד 100.0 | גל ההלם במקום שבו הוא מגיע. |
-| `apocalypse_boss.stormDamage` | 2.0 | 0.0 עד 100.0 | הנזק של טורנדו, כל 10 טיקים. |
-| `apocalypse_boss.tornadoTicks` | 160 | 20 עד 1200 | כמה זמן טורנדו נמשך. |
+| `apocalypse_boss.stormDamage` | 2.0 | 0.0 עד 100.0 | הנזק של מערבולת חול, כל 10 טיקים. |
+| `apocalypse_boss.tornadoTicks` | 160 | 20 עד 1200 | כמה זמן מערבולת חול נמשכת. |
 | `apocalypse_boss.ringDamage` | 12.0 | 0.0 עד 100.0 | טבעת אחת של קריסת קהיר. |
 | `apocalypse_boss.entombTicks` | 100 | 10 עד 1200 | כמה זמן הכליאה בחול מחזיקה. |
 | `apocalypse_boss.entombDamagePerSecond` | 1.5 | 0.0 עד 20.0 | נזק בזמן הכליאה (אף פעם לא מתחת ל-2 לבבות). |
