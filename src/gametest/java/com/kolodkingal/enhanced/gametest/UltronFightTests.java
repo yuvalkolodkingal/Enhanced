@@ -850,6 +850,40 @@ public final class UltronFightTests {
         });
     }
 
+    /**
+     * An operator's /kill (or the void) takes his body while he is moving into a Sentry: the fight was waiting for the
+     * body to arrive, and without it would wait for ever, holding its fighters. It ends as an abort, like any other loss
+     * of the body.
+     */
+    @GameTest(template = ARENA, batch = "ultron_abort_upload", timeoutTicks = 300)
+    public static void killingTheBodyInTheMiddleOfAnUploadEndsTheFight(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.ANNOUNCE_FIGHTS, false);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        ServerLevel level = f.level();
+        ServerPlayer player = f.player(MIDDLE.x, FLOOR, MIDDLE.z);
+        tank(player);
+        UltronFight fight = onTheIsland(f, player);
+        calm(fight);
+        UltronEntity boss = boss(fight);
+        UltronSentryEntity vessel = sentryAt(f, fight, 15.5, 10.5);
+        vessel.setHeld(true);
+        boss.setHealth(1.0F);
+        boss.invulnerableTime = 0;
+        boss.hurt(level.damageSources().generic(), 5.0F);
+        check(fight.isTransferring(), "he is moving into the Sentry");
+        boss.kill();
+        check(!boss.isAlive(), "/kill takes him even now");
+        f.everyTick(240, tick -> {
+            if (!fight.isFinished()) {
+                return false;
+            }
+            check(fight.result() == BossEnd.ABORT, "the fight was aborted: " + fight.result());
+            check(cores(player) == 0, "no reward");
+            return true;
+        });
+    }
+
     @GameTest(template = ARENA, batch = "ultron_server_stop")
     public static void theServerStoppingPutsEverythingBackAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);

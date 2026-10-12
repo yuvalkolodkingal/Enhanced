@@ -336,8 +336,9 @@ public final class UltronFight extends BossFight {
         phaseTicks++;
         long now = level().getGameTime();
         UltronEntity boss = boss();
-        if (appeared && !isOver() && !dying && transfer == null && boss == null) {
-            // The body is gone without the fight's say (/kill, the void): the fight is over, with no reward.
+        if (appeared && !isOver() && !dying && boss == null) {
+            // The body is gone without the fight's say (/kill, the void), even in the middle of a transfer (which would
+            // otherwise wait for it for ever): the fight is over, with no reward.
             end(BossEnd.ABORT);
             return;
         }

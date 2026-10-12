@@ -572,6 +572,11 @@ public final class SokoviaLift implements LiftHook {
                     setDownInPlace();
                     step = Step.DONE;
                 }
+                case WARNED -> {
+                    // The fight ended during the warning: nothing was copied, nothing is carried, nothing is to be lowered.
+                    // (Left as it is, the descent would never be over and the fight would hold its fighters for five minutes.)
+                    step = Step.DONE;
+                }
                 default -> {
                 }
             }

@@ -851,6 +851,34 @@ public final class SokoviaTests {
     }
 
     /**
+     * The fight ends in the ten seconds of the warning (a wipe, Peaceful, an operator's stop): nothing was copied and
+     * nothing is carried, so the descent that follows has nothing to lower and the fight is over when its ending is,
+     * not after the five minutes the framework would otherwise wait (the arena would hold its fighters all that time and
+     * no other boss could be called).
+     */
+    @GameTest(template = PAD, batch = "ultron_lift_warn_end", timeoutTicks = 300)
+    public static void aFightThatEndsDuringTheWarningIsOverWithItsEnding(GameTestHelper helper) {
+        TestKit.Fixture f = pad(helper);
+        ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
+        tank(starter);
+        long ground = groundHash(helper);
+        UltronFight fight = onTheGround(f, starter);
+        calm(fight);
+        fight.forceState(UltronFight.Phase.LIFT_WARN);
+        check(fight.isLifting() && in(fight, SokoviaLift.Step.WARNED), "the warning has begun and the island will rise");
+        fight.end(BossEnd.WIPE);
+        f.everyTick(200, tick -> {
+            if (!fight.isFinished()) {
+                return false;
+            }
+            check(tick <= UltronFight.UPLOAD_AWAY_TICKS + 5, "the fight was over with its ending (at tick " + tick + "), not held for minutes");
+            check(blocksInTheSky(helper) == 0 && groundHash(helper) == ground && journals(f.level()).isEmpty(), "nothing was changed or written");
+            check(SokoviaLift.of(fight) == null && !fight.island().isIslandUp(), "the lift is gone");
+            return true;
+        });
+    }
+
+    /**
      * A fighter who logs out while the island rises and logs in again a moment later is put back among it and carried
      * on; one who logs in after the island is up is where they were saved, on it.
      */
