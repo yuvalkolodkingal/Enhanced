@@ -15,6 +15,8 @@ final class UltronLights {
     static final ResourceLocation FINGERS = Enhanced.id("textures/entity/ultron_fingers.png");
     static final ResourceLocation PALMS = Enhanced.id("textures/entity/ultron_palms.png");
     static final ResourceLocation SENTRY_EYES = Enhanced.id("textures/entity/ultron_sentry_eyes.png");
+    /** The thin lines of a Sentry (shoulders, torso, spine, thruster ports): a mask of its own, since Ultron's torso is lit by his chest. */
+    static final ResourceLocation SENTRY_TORSO = Enhanced.id("textures/entity/ultron_sentry_torso.png");
 
     /** The skins of Prime, the Hybrid and the Sentry-Ultrons, and of a Sentry. */
     static final ResourceLocation[] BOSS_SKINS = {

@@ -20,7 +20,7 @@ public class UltronSentryRenderer extends MobRenderer<UltronSentryEntity, Ultron
     public UltronSentryRenderer(EntityRendererProvider.Context context) {
         super(context, new UltronModel<>(context.bakeLayer(UltronModel.LAYER)), 0.4F);
         addLayer(new UltronGlowLayer<>(this, UltronLights.SENTRY_EYES, UltronLights::eyes));
-        addLayer(new UltronGlowLayer<>(this, UltronLights.TORSO, UltronLights::sentryTorso));
+        addLayer(new UltronGlowLayer<>(this, UltronLights.SENTRY_TORSO, UltronLights::sentryTorso));
         addLayer(new UltronGlowLayer<>(this, UltronLights.FINGERS, UltronLights::sentryFingers));
         addLayer(new UltronGlowLayer<>(this, UltronLights.PALMS, UltronLights::sentryFingers));
         addLayer(new UltronTracker.Layer<>(this));

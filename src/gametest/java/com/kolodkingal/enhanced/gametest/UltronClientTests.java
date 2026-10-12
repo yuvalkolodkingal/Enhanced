@@ -428,7 +428,7 @@ public final class UltronClientTests {
     public static void theTexturesOfTheBodyAreThereAtTheSizeTheModelReadsThemAt(GameTestHelper helper) {
         // The model reads a 64 x 64 skin and is drawn on 128 x 128 (twice the texel density); the lights are masks of the same size.
         for (String name : new String[]{"ultron", "ultron_form1", "ultron_form2", "ultron_sentry", "ultron_eyes", "ultron_torso", "ultron_fingers",
-                "ultron_palms", "ultron_sentry_eyes"}) {
+                "ultron_palms", "ultron_sentry_eyes", "ultron_sentry_torso"}) {
             BufferedImage image = image(name);
             check(image.getWidth() == 2 * UltronCubes.SKIN && image.getHeight() == 2 * UltronCubes.SKIN, name + " is " + image.getWidth() + " x " + image.getHeight());
         }
