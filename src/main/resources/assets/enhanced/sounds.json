@@ -397,5 +397,141 @@
         "name": "enhanced:sfx/time_stone_loop_1"
       }
     ]
+  },
+  "ultron_awaken": {
+    "subtitle": "subtitles.enhanced.ultron_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_awaken"
+      }
+    ]
+  },
+  "ultron_theme": {
+    "subtitle": "subtitles.enhanced.ultron_theme",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_theme",
+        "stream": true
+      }
+    ]
+  },
+  "ultron_bolt": {
+    "subtitle": "subtitles.enhanced.ultron_bolt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_bolt_1"
+      },
+      {
+        "name": "enhanced:sfx/ultron_bolt_2"
+      },
+      {
+        "name": "enhanced:sfx/ultron_bolt_3"
+      }
+    ]
+  },
+  "ultron_overcharge": {
+    "subtitle": "subtitles.enhanced.ultron_overcharge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_overcharge"
+      }
+    ]
+  },
+  "ultron_servo": {
+    "subtitle": "subtitles.enhanced.ultron_servo",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_servo"
+      }
+    ]
+  },
+  "ultron_beam": {
+    "subtitle": "subtitles.enhanced.ultron_beam",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_beam_loop"
+      }
+    ]
+  },
+  "ultron_gravity": {
+    "subtitle": "subtitles.enhanced.ultron_gravity",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_gravity"
+      }
+    ]
+  },
+  "ultron_lift_start": {
+    "subtitle": "subtitles.enhanced.ultron_lift_start",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_lift_start"
+      }
+    ]
+  },
+  "ultron_rumble": {
+    "subtitle": "subtitles.enhanced.ultron_rumble",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_rumble"
+      }
+    ]
+  },
+  "ultron_upload": {
+    "subtitle": "subtitles.enhanced.ultron_upload",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_upload"
+      }
+    ]
+  },
+  "ultron_speak": {
+    "subtitle": "subtitles.enhanced.ultron_speak",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_speak_1"
+      },
+      {
+        "name": "enhanced:sfx/ultron_speak_2"
+      },
+      {
+        "name": "enhanced:sfx/ultron_speak_3"
+      }
+    ]
+  },
+  "sentry_hover": {
+    "subtitle": "subtitles.enhanced.sentry_hover",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/sentry_hover_loop"
+      }
+    ]
+  },
+  "sentry_death": {
+    "subtitle": "subtitles.enhanced.sentry_death",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/sentry_death_1"
+      },
+      {
+        "name": "enhanced:sfx/sentry_death_2"
+      }
+    ]
+  },
+  "ultron_transfer": {
+    "subtitle": "subtitles.enhanced.ultron_transfer",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_transfer"
+      }
+    ]
+  },
+  "ultron_death": {
+    "subtitle": "subtitles.enhanced.ultron_death",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ultron_death"
+      }
+    ]
   }
 }

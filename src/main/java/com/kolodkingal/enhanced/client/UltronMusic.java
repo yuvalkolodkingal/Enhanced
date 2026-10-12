@@ -18,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
  * The boss's music: a loop that plays for as long as a body of Ultron is within 96 blocks of the camera, fades in over two
  * seconds, ducks the game's own music (which waits and starts again after it), and fades out over five seconds after the
  * last body is gone. It needs no packet (the bodies are entities the client sees), is in the music category of the sound
- * options (so it is silent with that slider at 0) and is not a tune anyone owns: the real track is
- * {@code ultron_theme}, swapped in through {@link UltronSounds#THEME}.
+ * options (so it is silent with that slider at 0) and is not a tune anyone owns: the track is {@code ultron_theme}
+ * ({@link UltronSounds#THEME}), streamed from its file.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class UltronMusic {

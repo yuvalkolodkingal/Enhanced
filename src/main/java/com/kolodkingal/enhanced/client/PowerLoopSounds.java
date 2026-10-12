@@ -54,6 +54,8 @@ public final class PowerLoopSounds {
         // ===== thanos =====
 
         // ===== ultron =====
+        /** Ultron's anti-gravity flight: the thrusters' hiss of the Sentries, low and soft (it has no jets and no flame). */
+        ULTRON_FLIGHT(ModSounds.SENTRY_HOVER, 0.5F, 0.7F, (p, d) -> d.power() == Power.ULTRON && d.flying()),
 
         // ===== apocalypse =====
         ;

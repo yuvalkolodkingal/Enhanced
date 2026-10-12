@@ -23,8 +23,7 @@ import java.util.function.Supplier;
  * The sounds of the Ultron fight that last: the hum of the Finger Beams that follows him from the first tick of the tell
  * to the last of the beams, the thrusters of the nearest Sentries (quiet, positional), the Dive's hiss that swells as he
  * rises, and the rumble of Sokovia, soft while the lift warns and loud while it moves. Each is a loop that follows its
- * entity and fades in and out with what it belongs to ({@link UltronSounds} names the sounds; the real recordings replace
- * the stand-ins there).
+ * entity and fades in and out with what it belongs to ({@link UltronSounds} names the sounds).
  */
 public final class UltronLoops {
     /** How many Sentries have a hover loop at a time: the nearest ones. */
