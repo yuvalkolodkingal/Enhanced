@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossData;
+import com.kolodkingal.enhanced.build.BuildData;
+import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.hex.HexData;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -32,6 +34,30 @@ public final class ModAttachments {
                     .serialize(BifrostData.CODEC)
                     .copyOnDeath()
                     .sync((holder, to) -> holder == to, BifrostData.STREAM_CODEC)
+                    .build());
+
+    /**
+     * A builder's own Build Magic (3.1): Billy's magic meter, rank and practice, the pocket's id and size (saved), and what
+     * the HUD shows of the builder's history and spells at work (not saved). Kept on death, synced to that player only (as the
+     * Bifrost). A player saved before 3.1 has none and reads as {@link BuildData#EMPTY}: Billy at rank 1 with a full meter.
+     * (As with the Bifrost, NeoForge's first sync of a player to someone who starts seeing him sends all his synced data
+     * without asking whom it is for; every change after that reaches him alone.)
+     */
+    public static final Supplier<AttachmentType<BuildData>> BUILD_DATA = ATTACHMENTS.register("build_data",
+            () -> AttachmentType.builder(() -> BuildData.EMPTY)
+                    .serialize(BuildData.CODEC)
+                    .copyOnDeath()
+                    .sync((holder, to) -> holder == to, BuildData.STREAM_CODEC)
+                    .build());
+
+    /**
+     * Whether a player is in build mode, her spell and her box (3.1): what makes the Scarlet Witch's eyes glow, keeps
+     * Billy's crown on, and draws a builder's box for the others. Not saved (build mode is off after a login); synced to
+     * everyone who can see the player, as the power.
+     */
+    public static final Supplier<AttachmentType<BuildView>> BUILD_VIEW = ATTACHMENTS.register("build_view",
+            () -> AttachmentType.builder(() -> BuildView.EMPTY)
+                    .sync(BuildView.STREAM_CODEC)
                     .build());
 
     /**
