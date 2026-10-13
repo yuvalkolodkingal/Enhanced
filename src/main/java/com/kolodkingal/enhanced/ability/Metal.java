@@ -11,6 +11,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -124,6 +126,21 @@ public final class Metal {
     /** Whether a block is metal: in {@code enhanced:magnetic_blocks} (the metal ores among them). */
     public static boolean isMetalBlock(BlockState state) {
         return state.is(ModTags.MAGNETIC_BLOCKS);
+    }
+
+    /**
+     * Whether a metal block is metal the world made, not one people build with (D-M 2.2): an ore ({@code
+     * enhanced:magnetic_ores}) or a raw-metal block (any {@code #c:storage_blocks/raw_*}, which grow in large ore veins;
+     * other mods' raw tin or lead blocks too). The Magnetic Pull takes natural metal through rock and from all round him;
+     * every other metal block is built, and comes only in sight and from where he looks.
+     */
+    public static boolean isNaturalMetal(BlockState state) {
+        return isMetalBlock(state) && (state.is(ModTags.MAGNETIC_ORES) || state.getTags().anyMatch(Metal::isRawStorageTag));
+    }
+
+    /** A {@code c:storage_blocks/raw_*} tag: the blocks of raw metal. */
+    private static boolean isRawStorageTag(TagKey<Block> tag) {
+        return tag.location().getNamespace().equals("c") && tag.location().getPath().startsWith("storage_blocks/raw_");
     }
 
     /**

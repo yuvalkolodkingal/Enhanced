@@ -89,12 +89,18 @@ public final class MagnetoAbilities {
     }
 
     static void tick(ServerPlayer player, PowerData data) {
+        MagnetPull.tick(player);
         if (data.shrapnelActive()) {
             shrapnelTick(player, data);
         }
         if (data.magneticShield() && !player.isSpectator()) {
             shieldTick(player);
         }
+    }
+
+    /** He is about to lose the power of Magneto: his Magnetic Pull ends (what it took stays his). */
+    static void endAll(ServerPlayer player, PowerData data) {
+        MagnetPull.cancel(player);
     }
 
     // ---- the helmet (works for whoever wears it) ----
