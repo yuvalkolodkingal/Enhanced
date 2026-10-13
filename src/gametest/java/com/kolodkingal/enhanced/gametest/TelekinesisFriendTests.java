@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -81,6 +82,64 @@ public final class TelekinesisFriendTests {
             check(Telekinesis.holds(magneto, friend), "60 ticks after his grip ended, Magneto's R holds him again");
             Telekinesis.release(magneto, false);
             return true;
+        });
+    }
+
+    /**
+     * M54a (D-M 3.8, the player part with an iron chestplate, R18): with PvP off, a player a grip lets go of is spared his
+     * landing. Magneto holds a player in an iron chestplate, carries him 12 blocks up and lets go: fall damage is refused
+     * while he is in the air; once he has landed (3 ticks later) it hurts again. Wanda's let-go spares him too (every form).
+     * With PvP on, a let-go spares nobody.
+     */
+    @GameTest(template = ARENA, batch = "telekinesis_friends", timeoutTicks = 40)
+    public static void friendsAreSetDownSafely(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.pvp(false);
+        ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
+        ServerPlayer wanda = f.player(10.5, FLOOR, 3.5, Power.SCARLET_WITCH);
+        ServerPlayer billy = f.player(17.5, FLOOR, 10.5, Power.BILLY);
+        ServerPlayer friend = f.player(10.5, FLOOR, 10.5);
+        friend.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+        Vec3 ground = friend.position();
+
+        lookAt(magneto, friend);
+        press(magneto, 1, false);
+        check(Telekinesis.holds(magneto, friend), "Magneto's R takes the player in iron");
+        friend.teleportTo(ground.x, ground.y + 12.0, ground.z);
+        friend.setOnGround(false);
+        press(magneto, 1, true);
+        check(!Telekinesis.isHolding(magneto) && Telekinesis.isSpared(friend), "let go 12 blocks up, he is spared his landing");
+        float health = friend.getHealth();
+        check(!friend.hurt(friend.damageSources().fall(), 6.0F) && friend.getHealth() == health, "a fall does him no harm");
+        friend.setOnGround(true);
+        f.everyTick(20, tick -> {
+            if (tick < 3) {
+                return false;
+            }
+            if (tick == 3) {
+                check(!Telekinesis.isSpared(friend), "3 ticks after he landed, the guard is gone");
+                check(friend.hurt(friend.damageSources().fall(), 6.0F) && friend.getHealth() < health, "and a fall hurts him again");
+                friend.teleportTo(ground.x, ground.y, ground.z);
+                lookAt(wanda, friend);
+                press(wanda, 3, false);
+                check(Telekinesis.holds(wanda, friend), "Wanda holds him");
+                press(wanda, 3, true);
+                check(Telekinesis.isSpared(friend), "and her let-go spares him too");
+                friend.setOnGround(true);
+                return false;
+            }
+            if (tick == 10) {
+                check(!Telekinesis.isSpared(friend), "he landed: the guard is gone");
+                f.pvp(true);
+                lookAt(billy, friend);
+                press(billy, 3, false);
+                check(Telekinesis.holds(billy, friend), "with PvP on, Billy holds him");
+                press(billy, 3, true);
+                check(!Telekinesis.isSpared(friend), "and his let-go spares nobody: a friend may hurt him now");
+                return true;
+            }
+            return false;
         });
     }
 
