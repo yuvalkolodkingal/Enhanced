@@ -377,6 +377,72 @@ public final class BillyBlockTests {
         });
     }
 
+    /**
+     * T61 (R41): for {@code magneto.telekinesisSneakGraceTicks} (20) after one of their grips ended, however it ended,
+     * Sneak + V with nothing held does nothing at all: Wanda's zombie dies in her grip (the grip is lost), Billy sets his
+     * down, the Phoenix throws hers. Five ticks later the press tears nothing out and says nothing; 25 ticks later it tears
+     * the block out.
+     */
+    @GameTest(template = ARENA, batch = "telekinesis_sneak_grace", timeoutTicks = 60)
+    public static void noBlockRightAfterAGrip(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        Power[] heroes = {Power.SCARLET_WITCH, Power.BILLY, Power.PHOENIX};
+        ServerPlayer[] players = new ServerPlayer[3];
+        Zombie[] zombies = new Zombie[3];
+        BlockPos[] stones = new BlockPos[3];
+        for (int i = 0; i < 3; i++) {
+            int z = 4 + 6 * i;
+            players[i] = f.player(2.5, FLOOR, z + 0.5, heroes[i]);
+            zombies[i] = stillZombie(helper, 6.5, z + 0.5);
+            stones[i] = new BlockPos(10, 2, z);
+            helper.setBlock(stones[i], Blocks.STONE);
+            lookAt(players[i], zombies[i]);
+            pressV(players[i], false);
+            check(Telekinesis.holds(players[i], zombies[i]), heroes[i] + " holds a zombie");
+        }
+
+        // Three ways a grip ends: lost (the zombie dies in Wanda's grip), set down (Billy), thrown (the Phoenix).
+        zombies[0].kill();
+        PowerTicker.tick(players[0]);
+        check(!Telekinesis.isHolding(players[0]), "Wanda's grip is lost with the zombie");
+        pressV(players[1], true);
+        check(!Telekinesis.isHolding(players[1]), "Billy set his zombie down");
+        pressV(players[2], false);
+        check(!Telekinesis.isHolding(players[2]), "the Phoenix threw hers");
+        zombies[2].discard(); // (it would fly on out of the arena)
+        long ended = helper.getLevel().getGameTime();
+        for (int i = 0; i < 3; i++) {
+            check(Telekinesis.lastGripEnd(players[i]) == ended, heroes[i] + ": the end of the grip is remembered");
+        }
+
+        f.everyTick(40, tick -> {
+            long since = helper.getLevel().getGameTime() - ended;
+            if (since == 5) {
+                for (int i = 0; i < 3; i++) {
+                    lastActionBarKey(players[i]);
+                    lookAtBlock(helper, players[i], stones[i]);
+                    pressV(players[i], true);
+                    check(helper.getBlockState(stones[i]).is(Blocks.STONE) && !Telekinesis.isHolding(players[i]),
+                            heroes[i] + ": 5 ticks after the grip ended, Sneak + V tears nothing out");
+                    check(lastActionBarKey(players[i]) == null, heroes[i] + ": and says nothing");
+                }
+            }
+            if (since < 25) {
+                return false;
+            }
+            for (int i = 0; i < 3; i++) {
+                lookAtBlock(helper, players[i], stones[i]);
+                pressV(players[i], true);
+                TelekineticBlockEntity block = heldBlock(helper, players[i]);
+                check(block != null && block.getBlockState().is(Blocks.STONE) && helper.getBlockState(stones[i]).isAir(),
+                        heroes[i] + ": 25 ticks after, Sneak + V tears the stone out");
+                Telekinesis.release(players[i], false);
+            }
+            return true;
+        });
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // A thrown block
 

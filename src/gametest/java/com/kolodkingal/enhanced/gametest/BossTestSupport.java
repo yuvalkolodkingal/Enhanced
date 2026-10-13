@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * The stand-ins for the boss lanes: a {@link BossFight} that does nothing but write down what the framework did to it,
@@ -47,6 +48,8 @@ final class BossTestSupport {
         float minDamage = Float.MIN_VALUE;
         Set<String> counters = Set.of(DAMAGE);
         long rest;
+        /** What the fight holds where it is, as the Sokovia lift holds what it carries ({@link BossFight#locks}). */
+        Predicate<Entity> locked = entity -> false;
         List<ItemStack> reward = List.of(new ItemStack(Items.DIAMOND));
         @Nullable
         BossEnd ended;
@@ -126,6 +129,11 @@ final class BossTestSupport {
         protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
             launched++;
             return launchHandled;
+        }
+
+        @Override
+        protected boolean locks(Entity entity) {
+            return locked.test(entity);
         }
 
         @Override
