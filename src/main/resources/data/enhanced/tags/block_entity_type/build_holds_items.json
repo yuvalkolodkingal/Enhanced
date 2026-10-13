@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:chest",
+    "minecraft:trapped_chest",
+    "minecraft:barrel",
+    "minecraft:shulker_box",
+    "minecraft:hopper",
+    "minecraft:dispenser",
+    "minecraft:dropper",
+    "minecraft:furnace",
+    "minecraft:smoker",
+    "minecraft:blast_furnace",
+    "minecraft:brewing_stand",
+    "minecraft:chiseled_bookshelf",
+    "minecraft:lectern",
+    "minecraft:jukebox",
+    "minecraft:campfire",
+    "minecraft:decorated_pot",
+    "minecraft:crafter",
+    "minecraft:beehive"
+  ]
+}

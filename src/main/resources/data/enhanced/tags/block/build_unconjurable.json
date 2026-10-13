@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "#enhanced:build_untouchable",
+    "minecraft:budding_amethyst",
+    "minecraft:dragon_egg",
+    "minecraft:frosted_ice",
+    "minecraft:piston_head",
+    "minecraft:structure_void",
+    "minecraft:petrified_oak_slab",
+    "minecraft:bubble_column",
+    "minecraft:frogspawn",
+    "minecraft:infested_stone",
+    "minecraft:infested_cobblestone",
+    "minecraft:infested_stone_bricks",
+    "minecraft:infested_mossy_stone_bricks",
+    "minecraft:infested_cracked_stone_bricks",
+    "minecraft:infested_chiseled_stone_bricks",
+    "minecraft:infested_deepslate",
+    "enhanced:spider_web"
+  ]
+}

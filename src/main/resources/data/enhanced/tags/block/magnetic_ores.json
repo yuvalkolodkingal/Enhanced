@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "#c:ores/iron",
+    "#c:ores/gold",
+    "#c:ores/copper",
+    "#c:ores/netherite_scrap",
+    "minecraft:gilded_blackstone",
+    {"id": "#c:ores/tin", "required": false},
+    {"id": "#c:ores/lead", "required": false},
+    {"id": "#c:ores/silver", "required": false},
+    {"id": "#c:ores/nickel", "required": false},
+    {"id": "#c:ores/zinc", "required": false},
+    {"id": "#c:ores/aluminum", "required": false},
+    {"id": "#c:ores/osmium", "required": false},
+    {"id": "#c:ores/uranium", "required": false},
+    {"id": "#c:ores/platinum", "required": false}
+  ]
+}

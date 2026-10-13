@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "#enhanced:telekinesis_immune",
+    "#enhanced:held_as_bosses",
+    "enhanced:ultron",
+    "enhanced:thanos",
+    "enhanced:apocalypse",
+    "enhanced:thanos_sword",
+    "enhanced:thanos_meteor",
+    "enhanced:thanos_orb"
+  ]
+}

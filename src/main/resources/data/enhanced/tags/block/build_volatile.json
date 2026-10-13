@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:tnt",
+    "minecraft:lava",
+    "minecraft:fire",
+    "minecraft:soul_fire"
+  ]
+}

@@ -707,7 +707,11 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    /** Every tag file of the mod parses, and every entry names a real thing or a tag that exists. */
+    /**
+     * Every tag file of the mod parses, and every entry names a real thing or a tag that exists. An entry written
+     * {@code {"id": ..., "required": false}} is skipped: it names what another mod may add (other mods' metal ores), and
+     * the game loads the tag without it when that mod is not installed.
+     */
     @GameTest(template = ARENA, batch = SKELETON)
     public static void everyTagFileNamesRealThings(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
@@ -728,6 +732,10 @@ public final class SkeletonTests {
                     name = name.substring(0, name.length() - ".json".length());
                     JsonObject json = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
                     for (JsonElement entry : json.getAsJsonArray("values")) {
+                        if (entry.isJsonObject() && entry.getAsJsonObject().has("required")
+                                && !entry.getAsJsonObject().get("required").getAsBoolean()) {
+                            continue;
+                        }
                         String id = entry.isJsonObject() ? entry.getAsJsonObject().get("id").getAsString() : entry.getAsString();
                         boolean isTag = id.startsWith("#");
                         ResourceLocation location = ResourceLocation.parse(isTag ? id.substring(1) : id);
@@ -736,6 +744,7 @@ public final class SkeletonTests {
                             case "block" -> exists(BuiltInRegistries.BLOCK, location, isTag);
                             case "item" -> exists(BuiltInRegistries.ITEM, location, isTag);
                             case "damage_type" -> exists(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE), location, isTag);
+                            case "block_entity_type" -> exists(BuiltInRegistries.BLOCK_ENTITY_TYPE, location, isTag);
                             default -> true;
                         };
                         if (!found) {
