@@ -51,8 +51,8 @@ import java.util.UUID;
 
 /**
  * Lifting, carrying and launching things with the mind. Shared by Magneto (metal only), Wanda (anything, including
- * blocks), Billy (anything loose, including projectiles in flight: he stops bullets in WandaVision) and Jean Grey (all
- * of that: blocks and projectiles too).
+ * blocks), Billy (anything loose, including projectiles in flight: he stops bullets in WandaVision; and blocks, within
+ * his own limits) and Jean Grey (all of that: blocks and projectiles too).
  *
  * <p>While held, the target is moved every tick towards the point the holder is looking at. Launched targets are
  * tracked until they slam into something: they hurt every creature they crash into and take heavy impact damage
@@ -134,7 +134,11 @@ public final class Telekinesis {
     // ------------------------------------------------------------------------------------------------------------
     // Input
 
-    /** The telekinesis key: grab what you look at, or launch what you hold (Sneak: put it down gently). */
+    /**
+     * The telekinesis key: grab what you look at, or launch what you hold (Sneak: put it down gently). With nothing held,
+     * Sneak + V takes the block you look at (Wanda, Billy, the Phoenix) and Sneak + R is Magneto's Magnetic Pull; if there
+     * is nothing to grab, V tears out the block you look at.
+     */
     public static void press(ServerPlayer player, Mode mode) {
         Grip grip = GRIPS.get(player.getUUID());
         if (grip != null) {
@@ -143,6 +147,10 @@ public final class Telekinesis {
             } else {
                 launch(player);
             }
+            return;
+        }
+        if (player.isShiftKeyDown() && mode != Mode.MAGNETO) {
+            pressForABlock(player, mode);
             return;
         }
         if (mode == Mode.MAGNETO && player.isShiftKeyDown() && MagnetPull.press(player)) {
@@ -167,11 +175,39 @@ public final class Telekinesis {
             player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.pinned"), true);
             return;
         }
-        if ((mode == Mode.WANDA || mode == Mode.JEAN) && BlockLifting.tryLift(player, mode)) {
+        if (liftsBlocks(mode) && BlockLifting.tryLift(player, mode)) {
             return;
         }
         player.displayClientMessage(Component.translatable(mode == Mode.MAGNETO
                 ? "message.enhanced.telekinesis.no_metal" : "message.enhanced.telekinesis.nothing"), true);
+    }
+
+    /**
+     * Sneak + V with nothing held (Wanda, Billy, the Phoenix): the block they look at and nothing else, even past a
+     * creature, an item or a boss in front of it; a boss's own use of Wanda's hand (Ultron's heart) is never asked. For
+     * {@code magneto.telekinesisSneakGraceTicks} after one of their grips ended it does nothing at all, so a press meant to
+     * set down what had just slipped away tears nothing out of the ground (R41).
+     */
+    private static void pressForABlock(ServerPlayer player, Mode mode) {
+        if (player.serverLevel().getGameTime() - lastGripEnd(player) < EnhancedConfig.TELEKINESIS_SNEAK_GRACE_TICKS.get()) {
+            return;
+        }
+        if (liftsBlocks(mode) && BlockLifting.tryLift(player, mode)) {
+            return;
+        }
+        player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.nothing"), true);
+    }
+
+    /**
+     * Whether this telekinesis tears blocks out of the ground: Wanda's and the Phoenix's, and Billy's while {@code
+     * billy.blockLifting}.
+     */
+    private static boolean liftsBlocks(Mode mode) {
+        return switch (mode) {
+            case WANDA, JEAN -> true;
+            case BILLY -> EnhancedConfig.BILLY_BLOCK_LIFTING.get();
+            case MAGNETO -> false;
+        };
     }
 
     // ------------------------------------------------------------------------------------------------------------

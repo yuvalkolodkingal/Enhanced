@@ -71,6 +71,8 @@ public final class BillyAbilities {
         long crown;
         long bolt;
         long freeze;
+        /** When he may tear the next block out of the ground ({@code billy.blockLiftCooldown} after the last one). */
+        long blockReady;
     }
 
     private static final Map<UUID, Spells> SPELLS = new HashMap<>();
@@ -98,7 +100,11 @@ public final class BillyAbilities {
         return SPELLS.computeIfAbsent(player.getUUID(), id -> new Spells());
     }
 
-    /** Keeps the crown and the casting poses in sync with what he is doing. The crown stays on while he builds. */
+    /**
+     * Keeps the crown and the casting poses in sync with what he is doing. The crown stays on while he builds. His record
+     * is forgotten only once every time in it is over, the recharge of his block lifting included (it may be longer than
+     * the crown, R25).
+     */
     public static void tick(ServerPlayer player, PowerData data) {
         Spells spells = SPELLS.get(player.getUUID());
         long now = player.level().getGameTime();
@@ -107,9 +113,25 @@ public final class BillyAbilities {
         data.set(Live.CROWNED, flying || building || (spells != null && now < spells.crown));
         data.set(Live.CASTING, spells != null && now < spells.bolt);
         data.set(Live.FREEZING, spells != null && now < spells.freeze);
-        if (spells != null && now >= Math.max(spells.crown, Math.max(spells.bolt, spells.freeze))) {
+        if (spells != null && now >= Math.max(Math.max(spells.crown, spells.blockReady), Math.max(spells.bolt, spells.freeze))) {
             SPELLS.remove(player.getUUID());
         }
+    }
+
+    // ---- Ability 3: Telekinesis (the blocks he tears out of the ground) ----
+
+    /**
+     * Whether Billy's magic is ready to tear another block out of the ground: {@code billy.blockLiftCooldown} ticks after
+     * the last one. Catching anything else never waits.
+     */
+    public static boolean blockLiftReady(ServerPlayer player) {
+        Spells spells = SPELLS.get(player.getUUID());
+        return spells == null || player.level().getGameTime() >= spells.blockReady;
+    }
+
+    /** He just tore a block out of the ground: the next one waits for {@code billy.blockLiftCooldown}. */
+    public static void markBlockLift(ServerPlayer player) {
+        spells(player).blockReady = player.level().getGameTime() + EnhancedConfig.BILLY_BLOCK_LIFT_COOLDOWN.get();
     }
 
     // ---- Ability 1: Hex Bolt ----

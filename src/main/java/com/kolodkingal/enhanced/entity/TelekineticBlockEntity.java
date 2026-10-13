@@ -15,6 +15,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -32,14 +33,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import com.kolodkingal.enhanced.ability.BlockLifting;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.boss.BossFights;
 
 import java.util.UUID;
 
 /**
- * A block Wanda (or Jean Grey) tore out of the ground. While held it floats wherever she looks; launched, it flies like
- * a shell, hurts the first creature it hits and shatters (dropping its normal item). Put down gently, it lands like
- * sand. It glows in the colour of the telekinesis that holds it: Wanda's red, Jean's violet.
+ * A block Wanda, Billy or Jean Grey tore out of the ground. While held it floats wherever the holder looks; launched, it
+ * flies like a shell, hurts the first creature it hits and shatters (dropping its normal item). Put down gently, it lands
+ * like sand and becomes a block again where the one who let go of it may place one ({@link BlockLifting#mayPlace});
+ * otherwise it drops as an item. It glows in the colour of the telekinesis that holds it: Wanda's red, Billy's blue,
+ * Jean's violet.
  */
 public class TelekineticBlockEntity extends Entity {
     private static final EntityDataAccessor<BlockState> DATA_BLOCK =
@@ -208,29 +213,56 @@ public class TelekineticBlockEntity extends Entity {
         shatter();
     }
 
-    /** Breaks apart with block particles and drops the block's normal loot. */
+    /** Breaks apart with block particles and drops the block's normal loot (a thrown block, or one that lived too long). */
     private void shatter() {
+        shatter(false);
+    }
+
+    /**
+     * Breaks apart with block particles and drops the block's normal loot, as mined with a bare hand. A block that was set
+     * down and may not stand where it landed ({@code setDown}) gives the block itself instead when that loot is empty (glass,
+     * ice): nothing the holder carried is lost, and nothing that has a loot (an ore) becomes a free Silk Touch (R44).
+     */
+    private void shatter(boolean setDown) {
         if (level() instanceof ServerLevel server) {
             BlockPos pos = BlockPos.containing(getX(), getY() + 0.5, getZ());
-            server.levelEvent(2001, pos, Block.getId(getBlockState()));
+            BlockState state = getBlockState();
+            server.levelEvent(2001, pos, Block.getId(state));
             if (server.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
-                Block.dropResources(getBlockState(), server, pos);
+                if (setDown && Block.getDrops(state, server, pos, null).isEmpty()) {
+                    Block.popResource(server, pos, new ItemStack(state.getBlock())); // nothing, if the block has no item
+                } else {
+                    Block.dropResources(state, server, pos);
+                }
             }
         }
         discard();
     }
 
-    /** Put down gently: becomes a block again if there is room, otherwise drops as an item. */
+    /**
+     * Put down gently: becomes a block again where it landed if the cell takes it and the one who let go of it may place
+     * it there ({@link BlockLifting#mayPlace}: room, the arenas, his rights, never for someone who left); otherwise it
+     * drops as an item. Nothing lands on the ground the clients hide under Ultron's island in the sky.
+     */
     private void land() {
+        if (!(level() instanceof ServerLevel server)) {
+            return;
+        }
         BlockPos pos = blockPosition();
-        BlockState here = level().getBlockState(pos);
+        if (BossFights.hidesGround(server, pos)) {
+            shatter(true);
+            return;
+        }
+        BlockState here = server.getBlockState(pos);
         BlockState state = getBlockState();
-        boolean replaceable = here.canBeReplaced(new DirectionalPlaceContext(level(), pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP));
-        if (replaceable && state.canSurvive(level(), pos) && level().setBlock(pos, state, Block.UPDATE_ALL)) {
-            level().playSound(null, pos, state.getSoundType().getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.8F);
+        ServerPlayer holder = thrower == null ? null : server.getServer().getPlayerList().getPlayer(thrower);
+        boolean replaceable = here.canBeReplaced(new DirectionalPlaceContext(server, pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP));
+        if (replaceable && state.canSurvive(server, pos) && BlockLifting.mayPlace(server, pos, state, holder)
+                && server.setBlock(pos, state, Block.UPDATE_ALL)) {
+            server.playSound(null, pos, state.getSoundType().getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.8F);
             discard();
         } else {
-            shatter();
+            shatter(true);
         }
     }
 
