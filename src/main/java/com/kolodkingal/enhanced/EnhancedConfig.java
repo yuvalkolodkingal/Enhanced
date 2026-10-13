@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
@@ -28,6 +29,29 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue DISARM_RANGE;
     public static final ModConfigSpec.IntValue DISARM_COOLDOWN;
     public static final ModConfigSpec.DoubleValue SHIELD_REFLECT_CHANCE;
+    // 3.1: metal blocks with R, the Magnetic Pull (Sneak + R holding nothing), and what every telekinesis shares
+    public static final ModConfigSpec.IntValue MAGNETO_BLOCK_LIFT_RANGE;
+    public static final ModConfigSpec.DoubleValue MAGNETO_BLOCK_LIFT_MAX_HARDNESS;
+    public static final ModConfigSpec.IntValue PULL_RADIUS;
+    public static final ModConfigSpec.IntValue PULL_MAX_TARGETS;
+    public static final ModConfigSpec.IntValue PULL_PER_TICK;
+    public static final ModConfigSpec.IntValue PULL_SCAN_PER_TICK;
+    public static final ModConfigSpec.IntValue PULL_COOLDOWN;
+    public static final ModConfigSpec.DoubleValue PULL_EXHAUSTION;
+    public static final ModConfigSpec.BooleanValue PULL_TAKES_BUILT_METAL;
+    public static final ModConfigSpec.BooleanValue PULL_BUILT_NEEDS_SIGHT;
+    public static final ModConfigSpec.IntValue PULL_BUILT_CONE;
+    public static final ModConfigSpec.BooleanValue PULL_FROM_STORAGE;
+    public static final ModConfigSpec.BooleanValue PULL_TAKES_GEAR;
+    public static final ModConfigSpec.BooleanValue PULL_TAKES_PLAYER_GEAR;
+    public static final ModConfigSpec.BooleanValue PULL_PLAYER_GEAR_TO_FEET;
+    public static final ModConfigSpec.IntValue PULL_PLAYER_GRACE_TICKS;
+    public static final ModConfigSpec.IntValue TELEKINESIS_SNEAK_GRACE_TICKS;
+    public static final ModConfigSpec.IntValue PULL_RETRY_TICKS;
+    public static final ModConfigSpec.BooleanValue PULL_ANCIENT_DEBRIS;
+    public static final ModConfigSpec.DoubleValue PULL_TUG;
+    public static final ModConfigSpec.BooleanValue TELEKINESIS_SPARES_FRIENDS;
+    public static final ModConfigSpec.IntValue TELEKINESIS_PLAYER_REGRIP_TICKS;
 
     // ---- Scarlet Witch ----
     public static final ModConfigSpec.DoubleValue WANDA_FLIGHT_SPEED;
@@ -75,6 +99,11 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue HEX_BOLT_DAMAGE;
     public static final ModConfigSpec.IntValue FREEZE_DURATION;
     public static final ModConfigSpec.IntValue NOISE_RANGE;
+    // 3.1: his telekinesis tears blocks out of the ground
+    public static final ModConfigSpec.BooleanValue BILLY_BLOCK_LIFTING;
+    public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_RANGE;
+    public static final ModConfigSpec.DoubleValue BILLY_BLOCK_LIFT_MAX_HARDNESS;
+    public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_COOLDOWN;
 
     // ---- Tommy (Speed) ----
     public static final ModConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
@@ -113,7 +142,7 @@ public final class EnhancedConfig {
         BUILDER.push("magneto");
         MAGNETO_FLIGHT_SPEED = BUILDER.comment("Magneto's flying speed (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.075, 0.01, 0.5);
-        TELEKINESIS_RANGE = BUILDER.comment("How far away (blocks) Magneto and Wanda can grab a target with telekinesis.")
+        TELEKINESIS_RANGE = BUILDER.comment("How far away (blocks) every telekinesis (Magneto, Wanda, Billy, the Phoenix) can grab a target.")
                 .defineInRange("telekinesisRange", 32, 4, 128);
         THROW_SPEED = BUILDER.comment("Launch speed (blocks per tick) of a telekinetic throw.")
                 .defineInRange("throwSpeed", 2.6, 0.5, 6.0);
@@ -129,6 +158,66 @@ public final class EnhancedConfig {
                 .defineInRange("disarmCooldown", 60, 0, 6000);
         SHIELD_REFLECT_CHANCE = BUILDER.comment("Chance that a metal projectile caught by the Magnetic Shield flies back at the shooter (otherwise it drops).")
                 .defineInRange("shieldReflectChance", 0.5, 0.0, 1.0);
+        MAGNETO_BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Magneto can tear a metal block out of the ground with R.")
+                .defineInRange("blockLiftRange", 24, 2, 128);
+        MAGNETO_BLOCK_LIFT_MAX_HARDNESS = BUILDER.comment("Hardest metal block Magneto can lift with R (iron block = 5, ancient debris = 30, block of netherite = 50).")
+                .defineInRange("blockLiftMaxHardness", 50.0, 0.0, 100.0);
+        PULL_RADIUS = BUILDER.comment("Radius (blocks) of the Magnetic Pull (Sneak + R holding nothing): a sphere round where he pressed; ores come",
+                        "through rock.")
+                .defineInRange("pullRadius", 8, 2, 32);
+        PULL_MAX_TARGETS = BUILDER.comment("The most things (blocks, items, creatures) one pull takes; the nearest first.")
+                .defineInRange("pullMaxTargets", 64, 1, 512);
+        PULL_PER_TICK = BUILDER.comment("Things the pull takes each tick (2 = 40 a second).")
+                .defineInRange("pullPerTick", 2, 1, 64);
+        PULL_SCAN_PER_TICK = BUILDER.comment("Blocks the pull looks at in one tick while it searches (a big radius searches over a few ticks).")
+                .defineInRange("pullScanPerTick", 8192, 512, 131072);
+        PULL_COOLDOWN = BUILDER.comment("Ticks before Magneto can pull again (100 = 5 seconds). Starts only if the pull affected something (took,",
+                        "tugged, dissolved, crumbled, scattered).")
+                .defineInRange("pullCooldown", 100, 0, 6000);
+        PULL_EXHAUSTION = BUILDER.comment("Hunger one pull costs (4 = one hunger point). Nothing if the pull affected nothing.")
+                .defineInRange("pullExhaustion", 4.0, 0.0, 40.0);
+        PULL_TAKES_BUILT_METAL = BUILDER.comment("The pull also takes metal blocks and fixtures people build with (rails, doors, lanterns, anvils, hoppers,",
+                        "pistons...), whole: never one that holds items, never an extended or powered piston. Off: only ores, raw-metal",
+                        "blocks, loose metal and creatures' gear.")
+                .define("pullTakesBuiltMetal", true);
+        PULL_BUILT_NEEDS_SIGHT = BUILDER.comment("Built metal comes only if Magneto can see it (a clear line from his eyes). Ores and raw-metal blocks",
+                        "always come through rock. Off: built metal also comes through walls.")
+                .define("pullBuiltNeedsSight", true);
+        PULL_BUILT_CONE = BUILDER.comment("Built metal comes only from within this cone (degrees) round where he looks, so he turns round to pull the",
+                        "rest; 360: all round him. Ores, raw-metal blocks, loose metal, gear and carts come from all round.")
+                .defineInRange("pullBuiltCone", 120, 0, 360);
+        PULL_FROM_STORAGE = BUILDER.comment("The pull also takes the metal out of chests and other containers, item frames and armour stands he can",
+                        "see (claims are asked; never a villager's work block); the container, frame or stand stays. Off: what is",
+                        "stored stays where it is.")
+                .define("pullFromStorage", false);
+        PULL_TAKES_GEAR = BUILDER.comment("The pull tears metal armour and weapons off hostile creatures in reach.")
+                .define("pullTakesGear", true);
+        PULL_TAKES_PLAYER_GEAR = BUILDER.comment("With PvP on, the pull also acts on players Magneto can see: one metal piece into his inventory, an Iron",
+                        "Spider's nanites scattered, or a metal body tugged, once per player per pullPlayerGraceTicks. Off: the pull never",
+                        "touches a player.")
+                .define("pullTakesPlayerGear", true);
+        PULL_PLAYER_GEAR_TO_FEET = BUILDER.comment("The player's piece drops at that player's feet instead of flying into Magneto's inventory.")
+                .define("pullPlayerGearToFeet", false);
+        PULL_PLAYER_GRACE_TICKS = BUILDER.comment("After the pull acted on a player, no pull acts on that player again for this many ticks (200 = 10 seconds).")
+                .defineInRange("pullPlayerGraceTicks", 200, 0, 6000);
+        TELEKINESIS_SNEAK_GRACE_TICKS = BUILDER.comment("Every telekinesis (Magneto, Wanda, Billy, the Phoenix): for this many ticks after one of the hero's grips",
+                        "ends, Sneak + the key with nothing held does nothing (so a late \"put it down\" press is not a pull or a torn-out",
+                        "block).")
+                .defineInRange("telekinesisSneakGraceTicks", 20, 0, 100);
+        PULL_RETRY_TICKS = BUILDER.comment("After a pull that found nothing, another press does nothing for this many ticks.")
+                .defineInRange("pullRetryTicks", 10, 0, 100);
+        PULL_ANCIENT_DEBRIS = BUILDER.comment("The pull takes the netherite scrap out of ancient debris (the debris becomes netherrack).")
+                .define("pullAncientDebris", true);
+        PULL_TUG = BUILDER.comment("How hard the pull tugs Iron Golems and other metal bodies toward him (blocks per tick at most; 0 = it leaves",
+                        "them where they are).")
+                .defineInRange("pullTug", 1.0, 0.0, 3.0);
+        TELEKINESIS_SPARES_FRIENDS = BUILDER.comment("Every telekinesis (Magneto, Wanda, Billy, the Phoenix): a player, or a creature another player owns (a",
+                        "pet, a drone, the Vision of a Hex), let go or thrown by someone who may not hurt them (PvP off, a teammate)",
+                        "takes no fall, wall or slam damage until it lands.")
+                .define("telekinesisSparesFriends", true);
+        TELEKINESIS_PLAYER_REGRIP_TICKS = BUILDER.comment("Every telekinesis: after letting go of a player, the same hero cannot grip that player again for this",
+                        "many ticks (60 = 3 seconds).")
+                .defineInRange("telekinesisPlayerRegripTicks", 60, 0, 1200);
         BUILDER.pop();
 
         BUILDER.push("scarlet_witch");
@@ -157,9 +246,11 @@ public final class EnhancedConfig {
         CHAOS_SHIELD_BROKEN_COOLDOWN = BUILDER.comment("Ticks before the Chaos Shield can be raised again after it shattered or was held to its",
                         "limit (300 = 15 seconds).")
                 .defineInRange("chaosShieldBrokenCooldown", 300, 0, 6000);
-        BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Wanda can tear a block out of the ground.")
+        BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Wanda and the Phoenix can tear a block out of the ground (Billy and Magneto have",
+                        "their own).")
                 .defineInRange("blockLiftRange", 24, 2, 128);
-        BLOCK_LIFT_MAX_HARDNESS = BUILDER.comment("Hardest block Wanda can lift (stone = 1.5, iron block = 5, obsidian = 50).")
+        BLOCK_LIFT_MAX_HARDNESS = BUILDER.comment("Hardest block Wanda and the Phoenix can lift (stone = 1.5, iron block = 5, obsidian = 50; Billy and",
+                        "Magneto have their own).")
                 .defineInRange("blockLiftMaxHardness", 5.0, 0.0, 100.0);
         HEX_DEFAULT_RADIUS = BUILDER.comment("Radius of a newly created Hex.")
                 .defineInRange("hexDefaultRadius", 32, 4, 256);
@@ -223,6 +314,15 @@ public final class EnhancedConfig {
                 .defineInRange("freezeDuration", 100, 1, 1200);
         NOISE_RANGE = BUILDER.comment("How far away (blocks) Billy hears the thoughts of creatures while The Noise is on.")
                 .defineInRange("noiseRange", 32, 4, 64);
+        BILLY_BLOCK_LIFTING = BUILDER.comment("Whether Billy's telekinesis can tear blocks out of the ground (and set them down). Off: he catches",
+                        "creatures, items and projectiles only (as in 3.0).")
+                .define("blockLifting", true);
+        BILLY_BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Billy can tear a block out of the ground.")
+                .defineInRange("blockLiftRange", 16, 2, 128);
+        BILLY_BLOCK_LIFT_MAX_HARDNESS = BUILDER.comment("Hardest block Billy can lift (stone = 1.5, ores = 3, iron block = 5).")
+                .defineInRange("blockLiftMaxHardness", 3.0, 0.0, 100.0);
+        BILLY_BLOCK_LIFT_COOLDOWN = BUILDER.comment("Ticks Billy waits between two blocks torn out of the ground (catching anything else never waits).")
+                .defineInRange("blockLiftCooldown", 20, 0, 200);
         BUILDER.pop();
 
         BUILDER.push("tommy");
@@ -308,6 +408,8 @@ public final class EnhancedConfig {
         ApocalypseShieldConfig.define(BUILDER);
         ApocalypseBossConfig.define(BUILDER);
         ApocalypseConfig.define(BUILDER);
+        // 3.1: Build Magic, the Scarlet Witch's and Billy's building spells (three sections of their own).
+        BuildConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

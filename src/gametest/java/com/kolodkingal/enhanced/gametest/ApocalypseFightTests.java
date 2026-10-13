@@ -364,6 +364,7 @@ public final class ApocalypseFightTests {
     @GameTest(template = ARENA, batch = "apocalypse_true_regen", timeoutTicks = 300)
     public static void theTrueFormRegeneratesWhenLeftAlone(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
+        d.f().config(ApocalypseBossConfig.TRUE_FORM_REGEN_PER_SECOND, 3.0); // 3.0's healing: since 3.1 his health never heals
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         fight.forceState(ApocalypseFight.Stage.TRUE_FORM, 3);

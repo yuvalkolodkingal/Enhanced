@@ -109,6 +109,8 @@ public final class ThanosBossConfig {
     public static ModConfigSpec.IntValue GAUNTLET_RITUAL_TICKS;
     public static ModConfigSpec.IntValue WEB_LOCK_TICKS;
     public static ModConfigSpec.IntValue WEB_LOCK_COOLDOWN;
+    public static ModConfigSpec.IntValue HOLD_TICKS;
+    public static ModConfigSpec.IntValue SWORD_HOLD_TICKS;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
@@ -252,6 +254,12 @@ public final class ThanosBossConfig {
                 .defineInRange("webLockTicks", 40, 0, 400);
         WEB_LOCK_COOLDOWN = builder.comment("A web can lock his Gauntlet at most this often.")
                 .defineInRange("webLockCooldown", 400, 0, 6000);
+        HOLD_TICKS = builder.comment("How long telekinesis can hold Thanos before he breaks free (before the hero's factor, boss.billyHoldFactor",
+                        "or boss.magnetoHoldFactor).")
+                .defineInRange("holdTicks", 40, 10, 600);
+        SWORD_HOLD_TICKS = builder.comment("How long telekinesis can hold his thrown sword before it tears free and flies home (every hero; Magneto",
+                        "boss.magnetoHoldFactor times as long).")
+                .defineInRange("swordHoldTicks", 40, 5, 200);
 
         builder.pop();
     }

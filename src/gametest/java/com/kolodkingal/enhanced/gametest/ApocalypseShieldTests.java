@@ -664,6 +664,7 @@ public final class ApocalypseShieldTests {
     @GameTest(template = ARENA, batch = "apocalypse_heal", timeoutTicks = 200)
     public static void heHealsWhileAShieldIsUpNeverAboveTheCeilingOfThePhase(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.SCARLET_WITCH);
+        d.f().config(ApocalypseBossConfig.REGEN_PER_SECOND, 4.0); // 3.0's healing: since 3.1 his health never heals
         ApocalypseEntity boss = d.boss();
         // Phase 2's ceiling is two thirds: a little under it he mends 4 a second and stops there.
         float ceiling = (float) Math.ceil(900.0 * 2.0 / 3.0);
@@ -684,6 +685,7 @@ public final class ApocalypseShieldTests {
     @GameTest(template = ARENA, batch = "apocalypse_heal1", timeoutTicks = 100)
     public static void heMendsFourASecondBehindShieldOne(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
+        d.f().config(ApocalypseBossConfig.REGEN_PER_SECOND, 4.0); // 3.0's healing: since 3.1 his health never heals
         ApocalypseEntity boss = d.boss();
         boss.setFraction(0.5);
         float start = boss.getHealth();

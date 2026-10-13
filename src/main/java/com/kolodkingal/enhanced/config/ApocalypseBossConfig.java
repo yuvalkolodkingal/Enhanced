@@ -73,6 +73,7 @@ public final class ApocalypseBossConfig {
     public static ModConfigSpec.IntValue MAGNETO_STRIP_EXTEND_TICKS;
     public static ModConfigSpec.IntValue NO_BREAKER_SECONDS;
     public static ModConfigSpec.BooleanValue DROPS_PHOENIX_EMBER;
+    public static ModConfigSpec.IntValue HOLD_TICKS;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
@@ -123,10 +124,11 @@ public final class ApocalypseBossConfig {
                 .defineInRange("staggerTicks", 60, 0, 400);
         WINDOW_DAMAGE_FACTOR = builder.comment("Damage he takes in a window is multiplied by this.")
                 .defineInRange("windowDamageFactor", 1.25, 1.0, 5.0);
-        REGEN_PER_SECOND = builder.comment("His healing while a shield is up (never above the phase's ceiling).")
-                .defineInRange("regenPerSecond", 4.0, 0.0, 100.0);
-        TRUE_FORM_REGEN_PER_SECOND = builder.comment("His healing in the true form after 80 ticks without being hurt.")
-                .defineInRange("trueFormRegenPerSecond", 3.0, 0.0, 100.0);
+        REGEN_PER_SECOND = builder.comment("His healing while a shield is up (never above the phase's ceiling). 0: his health never heals (his",
+                        "shield still knits).")
+                .defineInRange("regenPerSecond", 0.0, 0.0, 100.0);
+        TRUE_FORM_REGEN_PER_SECOND = builder.comment("His healing in the true form after 80 ticks without being hurt. 0: his health never heals.")
+                .defineInRange("trueFormRegenPerSecond", 0.0, 0.0, 100.0);
 
         ESCAPE_CHANNEL_TICKS = builder.comment("How long his escape portal takes to open.")
                 .defineInRange("escapeChannelTicks", 100, 20, 600);
@@ -187,6 +189,9 @@ public final class ApocalypseBossConfig {
                 .defineInRange("noBreakerSeconds", 60, 10, 600);
         DROPS_PHOENIX_EMBER = builder.comment("Also give a Phoenix Ember (if it exists) to a rewarded fighter with no power.")
                 .define("dropsPhoenixEmber", false);
+        HOLD_TICKS = builder.comment("How long telekinesis can hold Apocalypse before he breaks free (before the hero's factor,",
+                        "boss.billyHoldFactor or boss.magnetoHoldFactor).")
+                .defineInRange("holdTicks", 60, 10, 600);
         builder.pop();
     }
 

@@ -13,6 +13,10 @@ import java.util.List;
  * power" is a damage type in the data-driven tag {@code enhanced:mind_power} whose causing entity is a player whose power
  * is in {@link #MIND_POWER_HEROES}; a server that wants Billy's or Vision's magic to count adds their name here and their
  * damage types to the tag.
+ *
+ * <p>Since 3.1 the mind power of the heroes in {@link #CRIT_HEROES} (Wanda and the Phoenix) hits the boss critically, on
+ * his shield and on his body, and every other blow to his body counts for less. The list is kept apart from
+ * {@link #MIND_POWER_HEROES}, so a hero a server adds to the shield's breakers does not get critical hits too.
  */
 public final class ApocalypseShieldConfig {
     /** The TOML section of these options. */
@@ -21,6 +25,7 @@ public final class ApocalypseShieldConfig {
     public static ModConfigSpec.ConfigValue<List<? extends String>> MIND_POWER_HEROES;
     public static ModConfigSpec.DoubleValue CHAOS_BEAM_FACTOR;
     public static ModConfigSpec.DoubleValue SLAM_FACTOR;
+    public static ModConfigSpec.DoubleValue BORROWED_SLAM_FACTOR;
     public static ModConfigSpec.DoubleValue PHOENIX_BURST_FACTOR;
     public static ModConfigSpec.DoubleValue OTHER_MIND_FACTOR;
     public static ModConfigSpec.DoubleValue PHOENIX_MIND_CONTROL_STRAIN;
@@ -28,6 +33,11 @@ public final class ApocalypseShieldConfig {
     public static ModConfigSpec.IntValue SHIELD_REGEN_DELAY_TICKS;
     public static ModConfigSpec.DoubleValue SHIELD_REGEN_FRACTION;
     public static ModConfigSpec.IntValue MIND_HIT_COOLDOWN_TICKS;
+    // 3.1: critical hits on the boss
+    public static ModConfigSpec.ConfigValue<List<? extends String>> CRIT_HEROES;
+    public static ModConfigSpec.DoubleValue CRIT_SHIELD_FACTOR;
+    public static ModConfigSpec.DoubleValue CRIT_BODY_FACTOR;
+    public static ModConfigSpec.DoubleValue OTHERS_BODY_FACTOR;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
@@ -39,6 +49,10 @@ public final class ApocalypseShieldConfig {
                 .defineInRange("chaosBeamFactor", 1.0, 0.0, 20.0);
         SLAM_FACTOR = builder.comment("Shield strength removed per point of telekinetic slam damage (a thing thrown by Wanda or the Phoenix).")
                 .defineInRange("slamFactor", 1.0, 0.0, 20.0);
+        BORROWED_SLAM_FACTOR = builder.comment("A block borrowed from his own arena and thrown by mind power wears the shield by this many times what",
+                        "slamFactor gives (blocks never run out; at 1.0 they wear the shield twice as fast as the Chaos Beam). The critical",
+                        "factor comes on top.")
+                .defineInRange("borrowedSlamFactor", 0.5, 0.0, 20.0);
         PHOENIX_BURST_FACTOR = builder.comment("Shield strength removed per point of Phoenix Burst damage (a full Burst of 30 removes 150).")
                 .defineInRange("phoenixBurstFactor", 5.0, 0.0, 50.0);
         OTHER_MIND_FACTOR = builder.comment("Shield strength removed per point of any other damage type in enhanced:mind_power.")
@@ -54,6 +68,17 @@ public final class ApocalypseShieldConfig {
         MIND_HIT_COOLDOWN_TICKS = builder.comment("Ticks between two mind-power hits from the same attacker that the shield will count",
                         "(the Chaos Beam hits every tick, and a shield leaves no invulnerability frames, so it keeps its own).")
                 .defineInRange("mindHitCooldownTicks", 10, 1, 40);
+        CRIT_HEROES = builder.comment("Heroes whose mind power hits the boss Apocalypse critically, on his shield and on his body (only the boss,",
+                        "never the Apocalypse hero). Kept apart from mindPowerHeroes: a hero added there does not get critical hits too.")
+                .defineListAllowEmpty("critHeroes", List.of("scarlet_witch", "phoenix"), () -> "scarlet_witch",
+                        element -> element instanceof String);
+        CRIT_SHIELD_FACTOR = builder.comment("Their mind power (and the Phoenix's Mind Control and Psionic Field strains) wears the boss's shield this",
+                        "many times as much.")
+                .defineInRange("critShieldFactor", 2.0, 1.0, 10.0);
+        CRIT_BODY_FACTOR = builder.comment("Their mind power hurts the boss's body this many times as much when his shield is down.")
+                .defineInRange("critBodyFactor", 2.0, 1.0, 10.0);
+        OTHERS_BODY_FACTOR = builder.comment("Every other blow to the boss's body is multiplied by this when his shield is down.")
+                .defineInRange("othersBodyFactor", 0.4, 0.05, 1.0);
         builder.pop();
     }
 

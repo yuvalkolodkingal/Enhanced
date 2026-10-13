@@ -69,6 +69,7 @@ public final class UltronBossConfig {
     public static ModConfigSpec.DoubleValue RESCUE_DAMAGE;
     public static ModConfigSpec.IntValue REJOIN_LIMIT;
     public static ModConfigSpec.DoubleValue VISION_BEAM_BONUS;
+    public static ModConfigSpec.IntValue HOLD_TICKS;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
@@ -166,6 +167,9 @@ public final class UltronBossConfig {
                 .defineInRange("rejoinLimit", 3, 0, 20);
         VISION_BEAM_BONUS = builder.comment("The Mind Stone beam does this much to Ultron and the Sentries.")
                 .defineInRange("visionBeamBonus", 1.5, 1.0, 5.0);
+        HOLD_TICKS = builder.comment("How long telekinesis can hold a body of Ultron before he breaks free (before the hero's factor,",
+                        "boss.billyHoldFactor or boss.magnetoHoldFactor).")
+                .defineInRange("holdTicks", 60, 10, 600);
         builder.pop();
     }
 
