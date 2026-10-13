@@ -24,7 +24,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
@@ -35,7 +34,6 @@ import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
@@ -128,6 +126,10 @@ public final class Telekinesis {
     private static final Map<UUID, Grip> GRIPS = new HashMap<>();
     /** Thrown entity UUID → its flight. */
     private static final Map<UUID, Flight> FLIGHTS = new HashMap<>();
+    /** Holder UUID → the game time their last grip ended, however it ended. */
+    private static final Map<UUID, Long> GRIP_ENDS = new HashMap<>();
+    /** What {@link #lastGripEnd} answers for a holder whose grip never ended: long enough ago for any wait. */
+    public static final long NEVER = Long.MIN_VALUE / 2;
 
     // ------------------------------------------------------------------------------------------------------------
     // Input
@@ -143,14 +145,17 @@ public final class Telekinesis {
             }
             return;
         }
+        if (mode == Mode.MAGNETO && player.isShiftKeyDown() && MagnetPull.press(player)) {
+            return; // Sneak + R with nothing held: the Magnetic Pull
+        }
         if (mode == Mode.WANDA && BossFights.telekinesisPress(player)) {
             return; // a boss has its own use for her hand (Ultron's heart)
         }
 
         double range = EnhancedConfig.TELEKINESIS_RANGE.get();
         EntityHitResult hit = Raycasts.entity(player, range, 0.3, e -> canLift(player, e, mode), 1.0F);
-        if (hit == null && (mode == Mode.BILLY || mode == Mode.JEAN)) {
-            // Arrows are small and fast: aim a little more generously at them.
+        if (hit == null && (mode == Mode.BILLY || mode == Mode.JEAN || mode == Mode.MAGNETO)) {
+            // Arrows are small and fast: aim a little more generously at them (Magneto: at the metal ones).
             hit = Raycasts.entity(player, range, 1.0, e -> e instanceof Projectile && canLift(player, e, mode), 1.0F);
         }
         if (hit != null) {
@@ -191,9 +196,9 @@ public final class Telekinesis {
             return false;
         }
         return switch (mode) {
-            case MAGNETO -> isMagnetic(e);
+            case MAGNETO -> Metal.isMagnetic(e);
             case WANDA -> isLoose(e);
-            case BILLY, JEAN -> isLoose(e) || (e instanceof Projectile projectile && inFlight(projectile));
+            case BILLY, JEAN -> isLoose(e) || (e instanceof Projectile projectile && Metal.inFlight(projectile));
         };
     }
 
@@ -203,30 +208,12 @@ public final class Telekinesis {
                 || e instanceof VehicleEntity || e instanceof PrimedTnt || e instanceof FallingBlockEntity;
     }
 
-    /** A projectile still flying: not stuck in the ground, not a trident flying home, not caught by Magneto. */
-    private static boolean inFlight(Projectile projectile) {
-        if (projectile instanceof AbstractArrow arrow && (arrow.inGround || arrow.isNoPhysics())) {
-            return false;
-        }
-        return !(projectile instanceof FishingHook) && !MagnetoAbilities.isHeld(projectile);
-    }
-
-    /** Iron Golems, minecarts, dropped metal, any creature wearing Iron, Chainmail or Gold armor, and an Iron Spider. */
+    /**
+     * Whether Magneto's telekinesis can take this entity. The rule is {@link Metal#isMagnetic}, the one every Magneto
+     * power asks; this stays for the callers of 3.0.
+     */
     public static boolean isMagnetic(Entity e) {
-        if (e.getType().is(ModTags.MAGNETIC_ENTITIES) || SpiderServer.isIronSpider(e)) {
-            return true;
-        }
-        if (e instanceof ItemEntity item) {
-            return item.getItem().is(ModTags.MAGNETIC_ITEMS) || item.getItem().is(ModTags.MAGNETIC_ARMOR);
-        }
-        if (e instanceof LivingEntity living) {
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                if (slot.isArmor() && living.getItemBySlot(slot).is(ModTags.MAGNETIC_ARMOR)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return Metal.isMagnetic(e);
     }
 
     public static boolean isHeld(Entity e) {
@@ -290,7 +277,7 @@ public final class Telekinesis {
         boolean lost = e == null || !e.isAlive() || e.level() != level || player.isDeadOrDying() || player.isSpectator()
                 || data.power() != grip.mode.power
                 || e.distanceTo(player) > BREAK_DISTANCE
-                || (grip.mode == Mode.MAGNETO && !isMagnetic(e))
+                || (grip.mode == Mode.MAGNETO && !Metal.staysMagnetic(e))
                 || MjolnirPin.isPinned(e)
                 || (e instanceof Player p && (p.isCreative() || p.isSpectator() || grip.ticks > MAX_PLAYER_HOLD_TICKS));
         if (lost) {
@@ -340,6 +327,7 @@ public final class Telekinesis {
         if (grip == null) {
             return;
         }
+        gripEnded(player);
         Entity e = player.serverLevel().getEntity(grip.target);
         if (e == null) {
             return;
@@ -363,6 +351,7 @@ public final class Telekinesis {
         if (grip == null) {
             return;
         }
+        gripEnded(player);
         Entity e = player.serverLevel().getEntity(grip.target);
         if (e == null) {
             return;
@@ -387,6 +376,21 @@ public final class Telekinesis {
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);
         player.level().playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS, 0.9F, 0.7F);
+    }
+
+    /** A grip of this holder just ended (set down, thrown, lost, or he left): remembered for the Sneak grace. */
+    private static void gripEnded(ServerPlayer holder) {
+        GRIP_ENDS.put(holder.getUUID(), holder.serverLevel().getGameTime());
+    }
+
+    /**
+     * The game time the holder's last grip ended, however it ended: set down, thrown, lost (out of reach, the target gone
+     * or no longer liftable, the 30 s cap on a player), or the holder died, left or changed his power; {@link #NEVER} if
+     * none did. For a second after it, Sneak + the key with nothing held does nothing ({@code
+     * magneto.telekinesisSneakGraceTicks}, R41).
+     */
+    public static long lastGripEnd(ServerPlayer holder) {
+        return GRIP_ENDS.getOrDefault(holder.getUUID(), NEVER);
     }
 
     /** A held projectile gets its weight back. */
@@ -523,6 +527,7 @@ public final class Telekinesis {
     public static void clear() {
         GRIPS.clear();
         FLIGHTS.clear();
+        GRIP_ENDS.clear();
     }
 
     /** A player left the game: drop what they hold. */

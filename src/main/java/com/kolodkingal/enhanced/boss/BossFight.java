@@ -184,6 +184,23 @@ public abstract class BossFight {
         return false;
     }
 
+    /**
+     * Whether the clients hide the ground at {@code pos} while this fight runs (the ground under Ultron's island in the
+     * sky): nothing lands there, nothing is borrowed from there, and neither Build Magic nor the Magnetic Pull changes it
+     * (see {@link BossFights#hidesGround}). None by default.
+     */
+    protected boolean hidesGround(BlockPos pos) {
+        return false;
+    }
+
+    /**
+     * Whether the fight holds {@code entity} where it is, so that no telekinesis may take it (whatever the Sokovia lift
+     * carries; see {@link BossFights#isLocked}). None by default.
+     */
+    protected boolean locks(Entity entity) {
+        return false;
+    }
+
     /** A player joined the fight (their first time within the join radius). */
     protected void onJoin(ServerPlayer player) {
     }
@@ -553,6 +570,14 @@ public abstract class BossFight {
     final void keepDrop(ItemEntity item) {
         item.setUnlimitedLifetime();
         keptDrops.add(item);
+    }
+
+    /**
+     * Whether {@code item} is the drop of a participant who died in the arena, which the fight keeps for them until it is
+     * over (see {@link BossFights#isKeptDrop}).
+     */
+    public final boolean keepsDrop(ItemEntity item) {
+        return keptDrops.contains(item);
     }
 
     // ---- joining, presence, wipe, abandon ----

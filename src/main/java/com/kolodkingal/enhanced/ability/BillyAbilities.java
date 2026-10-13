@@ -1,11 +1,13 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -96,12 +98,13 @@ public final class BillyAbilities {
         return SPELLS.computeIfAbsent(player.getUUID(), id -> new Spells());
     }
 
-    /** Keeps the crown and the casting poses in sync with what he is doing. */
+    /** Keeps the crown and the casting poses in sync with what he is doing. The crown stays on while he builds. */
     public static void tick(ServerPlayer player, PowerData data) {
         Spells spells = SPELLS.get(player.getUUID());
         long now = player.level().getGameTime();
         boolean flying = player.getAbilities().flying;
-        data.set(Live.CROWNED, flying || (spells != null && now < spells.crown));
+        boolean building = player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
+        data.set(Live.CROWNED, flying || building || (spells != null && now < spells.crown));
         data.set(Live.CASTING, spells != null && now < spells.bolt);
         data.set(Live.FREEZING, spells != null && now < spells.freeze);
         if (spells != null && now >= Math.max(spells.crown, Math.max(spells.bolt, spells.freeze))) {

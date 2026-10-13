@@ -1,7 +1,6 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
-import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
@@ -13,8 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 /** Wanda (or Jean Grey) tearing a block out of the ground. */
 public final class BlockLifting {
@@ -38,7 +35,7 @@ public final class BlockLifting {
             player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.too_strong"), true);
             return true;
         }
-        if (!mayBreak(player, level, pos, state)) {
+        if (!BlockRights.mayBreak(player, level, pos, state)) {
             player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.protected"), true);
             return true;
         }
@@ -66,22 +63,6 @@ public final class BlockLifting {
         }
         float hardness = state.getDestroySpeed(level, pos);
         return hardness >= 0 && hardness <= EnhancedConfig.BLOCK_LIFT_MAX_HARDNESS.get();
-    }
-
-    /**
-     * Respects spawn protection, Adventure mode, world borders and claim mods (through the block-break event), and the
-     * arena of a boss fight.
-     */
-    private static boolean mayBreak(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state) {
-        if (BossFights.protects(level, pos)) {
-            return false; // the arena of a boss fight stays as it is
-        }
-        if (!player.mayBuild() || !level.mayInteract(player, pos) || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
-            return false;
-        }
-        BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(level, pos, state, player);
-        NeoForge.EVENT_BUS.post(event);
-        return !event.isCanceled();
     }
 
     private BlockLifting() {

@@ -10,12 +10,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,6 +132,29 @@ public final class BossFights {
         return false;
     }
 
+    /** Whether the player took part in any fight of the server, running or winding down (they may be far away now). */
+    public static boolean isParticipant(ServerPlayer player) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.isParticipant(player.getUUID())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether the item is the drop of a fighter who died in an arena that keeps drops: it waits there for them until the
+     * fight is over, and nothing else may take it (the Magnetic Pull).
+     */
+    public static boolean isKeptDrop(ItemEntity item) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.keepsDrop(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Whether the entity is one that only a boss fight makes (a boss, a minion, one of their projectiles or the key),
      * whether or not a running fight owns it: what {@code /enhanced boss cleanup} removes, and what the orphan sweep of
@@ -235,6 +261,71 @@ public final class BossFights {
     public static boolean protects(ServerLevel level, BlockPos pos) {
         for (BossFight fight : FIGHTS) {
             if (fight.level() == level && fight.arena().protects(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether {@code pos} lies in the cylinder of any fight of this level, protected or not (Thanos's arena included): the
+     * two mass edits of 3.1, Build Magic and the Magnetic Pull, change nothing there while {@code
+     * build_magic.allArenasProtected} is on.
+     */
+    public static boolean inAnyArena(ServerLevel level, BlockPos pos) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == level && fight.arena().contains(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether any block of {@code box} lies in the cylinder of a fight of this level (as {@link #inAnyArena} asks of each
+     * one): a spell at work checks it as it goes on, and stops if a fight began where it builds.
+     */
+    public static boolean overlapsAny(ServerLevel level, BoundingBox box) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == level && meets(fight.arena(), box)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Whether the middle of some cell of the box is inside the arena's cylinder (see {@link BossArena#contains}). */
+    private static boolean meets(BossArena arena, BoundingBox box) {
+        if (box.maxY() + 0.5 < arena.bottom() || box.minY() + 0.5 > arena.top() + 1.0) {
+            return false;
+        }
+        // The cell of the box whose middle is nearest the centre, column by column: the one the centre stands in, or an edge.
+        Vec3 center = arena.center();
+        double x = Mth.clamp(Math.floor(center.x), box.minX(), box.maxX()) + 0.5;
+        double z = Mth.clamp(Math.floor(center.z), box.minZ(), box.maxZ()) + 0.5;
+        return Math.hypot(x - center.x, z - center.z) <= arena.radius();
+    }
+
+    /**
+     * Whether the clients hide the ground at {@code pos} while a fight runs (under Ultron's island in the sky): nothing
+     * lands there or is borrowed from there, and neither Build Magic nor the Magnetic Pull changes it.
+     */
+    public static boolean hidesGround(ServerLevel level, BlockPos pos) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == level && fight.hidesGround(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether a fight holds the entity where it is (whatever the Sokovia lift carries): no telekinesis may take it, and a
+     * hero it carries uses none.
+     */
+    public static boolean isLocked(Entity entity) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == entity.level() && fight.locks(entity)) {
                 return true;
             }
         }
