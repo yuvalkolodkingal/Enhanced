@@ -73,7 +73,7 @@ public final class BossConfig {
                         "then they break free (the Ender Dragon is too vast to hold). Off: they are \"too powerful to lift\".")
                 .define("telekinesisHoldsVanillaBosses", true);
         VANILLA_HOLD_TICKS = builder.comment("How long telekinesis holds the Wither, the Warden or the Elder Guardian before he breaks free (before the",
-                        "hero's factor, billyHoldFactor or magnetoHoldFactor).")
+                        "hero's factor, billyHoldFactor for Billy; Magneto holds none of the three, they wear no metal).")
                 .defineInRange("vanillaHoldTicks", 60, 10, 600);
         TELEKINESIS_CATCHES_BOSS_SHOTS = builder.comment("Billy and the Phoenix (and Magneto, for metal) can catch Thanos's sword, meteors and orbs, and what they",
                         "throw back is theirs (Ultron's bolts and Apocalypse's lances then hit their own side). Off: Thanos's shots",

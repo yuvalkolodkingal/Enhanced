@@ -165,7 +165,8 @@ public record SpellRecipe(Spell spell, Op op, int style, int region, BlockPos a,
      * This recipe with every number forced into range, the first thing the server does with a cast: the style by
      * {@code floorMod} over the spell's styles, the region, the turn, the flip and the material likewise, unknown flags
      * dropped, a face that is no direction made none, at most {@link #MAX_SEEDS} seeds, every position moved inside the
-     * world, and the two sizes into the spell's range from {@code limits} (the table above; an unused size is 0).
+     * world, and the two sizes into the spell's range from {@code limits} (the table above; an unused size is 0, as is
+     * the height of a shape without one, {@link ShapeKind#hasHeight()}).
      */
     public SpellRecipe clamped(RecipeLimits limits) {
         List<BlockPos> inWorld = seeds.stream().limit(MAX_SEEDS).map(limits::inWorld).toList();
@@ -184,7 +185,8 @@ public record SpellRecipe(Spell spell, Op op, int style, int region, BlockPos a,
             }
             case SHAPE -> {
                 first = Mth.clamp(size, 1, Math.max(1, limits.shapeRadius()));
-                second = Mth.clamp(size2, 1, Math.max(1, limits.shapeHeight()));
+                boolean tall = ShapeKind.byId(Math.floorMod(style, spell.styles())).hasHeight();
+                second = tall ? Mth.clamp(size2, 1, Math.max(1, limits.shapeHeight())) : 0;
             }
             case COPY, MOVE -> {
                 int reach = Math.max(0, limits.reach());
