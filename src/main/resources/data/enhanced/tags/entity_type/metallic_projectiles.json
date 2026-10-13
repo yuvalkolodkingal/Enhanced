@@ -4,6 +4,7 @@
     "minecraft:arrow",
     "minecraft:spectral_arrow",
     "minecraft:trident",
-    "enhanced:iron_shrapnel"
+    "enhanced:iron_shrapnel",
+    "#minecraft:arrows"
   ]
 }

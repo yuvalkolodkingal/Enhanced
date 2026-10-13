@@ -14,6 +14,10 @@
     "minecraft:golden_leggings",
     "minecraft:golden_boots",
     "minecraft:iron_horse_armor",
-    "minecraft:golden_horse_armor"
+    "minecraft:golden_horse_armor",
+    "minecraft:netherite_helmet",
+    "minecraft:netherite_chestplate",
+    "minecraft:netherite_leggings",
+    "minecraft:netherite_boots"
   ]
 }

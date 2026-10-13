@@ -629,9 +629,9 @@ public final class UltronNetworkTests {
         ServerPlayer billy = f.player(8.5, FLOOR, 6.5, Power.BILLY);
         tick(hero);
 
-        // Magneto: vibranium is not iron. He cannot lift the hero, but his drones are Stark's metal.
-        check(!Telekinesis.canLift(magneto, hero, Telekinesis.Mode.MAGNETO), "Magneto cannot lift Ultron");
-        check(Telekinesis.canLift(magneto, drone, Telekinesis.Mode.MAGNETO), "but he lifts a drone");
+        // Magneto: vibranium is metal (3.1, D-M 2.3). He lifts the hero, in every look, and his drones too.
+        check(Telekinesis.canLift(magneto, hero, Telekinesis.Mode.MAGNETO), "Magneto lifts Ultron: vibranium is metal now");
+        check(Telekinesis.canLift(magneto, drone, Telekinesis.Mode.MAGNETO), "and he lifts a drone");
         UltronBoltEntity bolt = UltronBoltEntity.create(level, hero, f.helper().absoluteVec(new Vec3(6.5, FLOOR + 1.0, 10.5)), new Vec3(0.2, 0, 0), 4.0F,
                 UltronBoltEntity.Palette.PRIME);
         level.addFreshEntity(bolt);
