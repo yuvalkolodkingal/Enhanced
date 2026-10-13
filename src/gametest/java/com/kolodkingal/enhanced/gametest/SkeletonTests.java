@@ -727,14 +727,16 @@ public final class SkeletonTests {
     /**
      * Every tag file of the mod parses, and every entry names a real thing or a tag that exists. An entry written
      * {@code {"id": ..., "required": false}} is skipped: it names what another mod may add (other mods' metal ores), and
-     * the game loads the tag without it when that mod is not installed.
+     * the game loads the tag without it when that mod is not installed. The twelve tag files of 3.1 are among those read.
      */
     @GameTest(template = ARENA, batch = SKELETON)
     public static void everyTagFileNamesRealThings(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         ServerLevel level = helper.getLevel();
         List<String> problems = new ArrayList<>();
+        Set<String> read = new HashSet<>();
         int files = 0;
+        int optional = 0;
         for (String namespace : List.of("enhanced", "minecraft")) {
             Path root = mod.findResource("data", namespace, "tags");
             if (!Files.isDirectory(root)) {
@@ -747,10 +749,12 @@ public final class SkeletonTests {
                     String kind = relative.getName(0).toString();
                     String name = relative.subpath(1, relative.getNameCount()).toString().replace('\\', '/');
                     name = name.substring(0, name.length() - ".json".length());
+                    read.add(namespace + ":" + kind + "/" + name);
                     JsonObject json = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
                     for (JsonElement entry : json.getAsJsonArray("values")) {
                         if (entry.isJsonObject() && entry.getAsJsonObject().has("required")
                                 && !entry.getAsJsonObject().get("required").getAsBoolean()) {
+                            optional++;
                             continue;
                         }
                         String id = entry.isJsonObject() ? entry.getAsJsonObject().get("id").getAsString() : entry.getAsString();
@@ -772,6 +776,12 @@ public final class SkeletonTests {
             }
         }
         check(files > 40, "there are tag files to check (" + files + ")");
+        List<String> of31 = List.of("entity_type/pull_immune", "entity_type/held_as_bosses", "entity_type/conjured_bodies",
+                "block/magnetic_blocks", "block/magnetic_ores", "block/build_untouchable", "block/build_unconjurable", "block/build_volatile",
+                "block/build_ground", "block/build_plants", "block_entity_type/build_copies_data", "block_entity_type/build_holds_items");
+        List<String> missing = of31.stream().filter(name -> !read.contains("enhanced:" + name)).toList();
+        check(missing.isEmpty(), "the tag files of 3.1 are there to check: " + missing + " missing");
+        check(optional > 0, "the entries for other mods' metals are skipped (" + optional + ")");
         check(problems.isEmpty(), "bad tag entries: " + problems);
         helper.succeed();
     }

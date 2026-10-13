@@ -353,9 +353,10 @@ public final class DataTests {
     }
 
     /**
-     * Every item, block and effect the mod adds, the subtitle of every sound, each client option and each section of the
-     * client options has a name in English and in Hebrew, and a Hebrew line takes the same placeholders as its English one
-     * (a translation that loses its "%s" would show the wrong message).
+     * Every item, block and effect the mod adds, the subtitle of every sound (and of the sounds of 3.1 whose files are still
+     * to come), each client option and each section of the client options has a name in English and in Hebrew, and a
+     * Hebrew line takes the same placeholders as its English one (a translation that loses its "%s" would show the wrong
+     * message).
      */
     @GameTest(template = ARENA)
     public static void everyItemBlockEffectSubtitleAndOptionHasANameInBothLanguages(GameTestHelper helper) throws IOException {
@@ -371,6 +372,12 @@ public final class DataTests {
             if (definition.has("subtitle")) {
                 keys.add(definition.get("subtitle").getAsString());
             }
+        }
+        // 3.1's sounds: Build Magic's eight and Apocalypse's critical hit join sounds.json only with their files, but their
+        // subtitles are named already.
+        for (String sound : List.of("magnet_pull", "apocalypse_crit", "build_on_wanda", "build_on_billy", "build_cast_wanda",
+                "build_cast_billy", "build_hum", "build_fizzle", "build_undo", "build_rank_up")) {
+            keys.add("subtitles." + Enhanced.MODID + "." + sound);
         }
         for (var option : List.<ModConfigSpec.ConfigValue<?>>of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION,
                 EnhancedClientConfig.FLIGHT_EFFECTS, EnhancedClientConfig.BUILD_HINTS, EnhancedClientConfig.BUILD_TIPS,

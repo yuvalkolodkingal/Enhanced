@@ -2,10 +2,13 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.ability.HeroServer;
 import com.kolodkingal.enhanced.ability.HeroServers;
+import com.kolodkingal.enhanced.ability.MagnetPull;
 import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.BossLane;
+import com.kolodkingal.enhanced.build.BuildMagic;
+import com.kolodkingal.enhanced.build.BuildScheduler;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.power.Power;
@@ -75,10 +78,11 @@ public final class TestKit {
 
     /**
      * A fixture for a test of a boss fight, or of anything that keeps server-wide state from one tick to the next (the
-     * boss registry, the rewards waiting to be handed over, the heroes' static maps): when the test ends, pass or fail,
-     * it lets every fight go, clears the heroes' statics, puts back the boss lanes and the Thanos summoning the mod
-     * registered and the rewards that were waiting, so a fight left over from one test never reaches the next. A boss test also has a batch of its
-     * own ({@code @GameTest(batch = ...)}), so no other test runs while it does.
+     * boss registry, the rewards waiting to be handed over, the heroes' static maps, Build Magic's builders and spells, the
+     * Magnetic Pulls): when the test ends, pass or fail, it lets every fight go, clears the heroes' statics, Build Magic
+     * and the pulls, puts back the boss lanes and the Thanos summoning the mod registered and the rewards that were
+     * waiting, so a fight left over from one test never reaches the next. A boss test also has a batch of its own
+     * ({@code @GameTest(batch = ...)}), so no other test runs while it does.
      */
     public static Fixture bossFixture(GameTestHelper helper) {
         Fixture fixture = fixture(helper);
@@ -98,6 +102,9 @@ public final class TestKit {
             for (HeroServer hero : HeroServers.all()) {
                 hero.onServerStopped();
             }
+            BuildMagic.clear();
+            BuildScheduler.clear();
+            MagnetPull.clear();
             for (BossKind kind : BossKind.values()) {
                 BossLane lane = lanes.get(kind);
                 if (lane == null) {

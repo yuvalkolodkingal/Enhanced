@@ -460,7 +460,7 @@ public final class V31SkeletonTests {
     /** {@code Telekinesis.lastGripEnd} is the game time of a set-down, of a throw, and of a grip lost to distance. */
     @GameTest(template = ARENA, batch = "v31_skeleton_grip", timeoutTicks = 40)
     public static void lastGripEndIsRecorded(GameTestHelper helper) {
-        TestKit.Fixture f = TestKit.fixture(helper);
+        TestKit.Fixture f = TestKit.bossFixture(helper);
         f.onClose(Telekinesis::clear);
         ServerLevel level = helper.getLevel();
         ServerPlayer wanda = f.player(6.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -559,7 +559,7 @@ public final class V31SkeletonTests {
     /** Billy's crown stays on while his {@code BuildView} is active; out of build mode it goes when its time is over. */
     @GameTest(template = ARENA, batch = "v31_skeleton_crown", timeoutTicks = 160)
     public static void billysCrownFollowsBuildView(GameTestHelper helper) {
-        TestKit.Fixture f = TestKit.fixture(helper);
+        TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer billy = f.player(10.5, FLOOR, 10.5, Power.BILLY);
         PowerData data = Powers.get(billy);
         BillyAbilities.tick(billy, data);
