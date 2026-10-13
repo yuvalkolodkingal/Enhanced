@@ -181,6 +181,12 @@ public final class Telekinesis {
         if (e == holder || !e.isAlive() || e.isSpectator() || isHeld(e) || e.getType().is(ModTags.TELEKINESIS_IMMUNE)) {
             return false;
         }
+        if (e.getType().is(ModTags.PULL_IMMUNE)) {
+            // The villains, the vanilla bosses and Thanos's shots left telekinesis_immune in 3.1: telekinesis is to hold
+            // them as bosses, under BossGrip's rules (spec 5.2, lane TK step 3). Until that grip exists they stay out of
+            // reach, as in 3.0.
+            return false;
+        }
         if (e.hasPassenger(holder) || holder.hasPassenger(e)) {
             return false;
         }

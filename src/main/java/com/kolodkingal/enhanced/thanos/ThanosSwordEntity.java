@@ -28,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * hit once per pass. While it is away he has no Sweep and no Smash.
  *
  * <p>A Chaos Shield turns it home as it does Mjolnir ({@link ShieldCost#oneOfAKind}) and lets it by on the way back. It
- * belongs to its owner: Thor cannot catch it and Wanda cannot lift it (the tag {@code telekinesis_immune}). If Thanos is
+ * belongs to its owner: Thor cannot catch it and Wanda cannot lift it (the tag {@code pull_immune}). If Thanos is
  * gone it is gone with him.
  */
 public class ThanosSwordEntity extends Projectile implements ShieldCost {

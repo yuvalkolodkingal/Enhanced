@@ -224,14 +224,17 @@ public final class UltronBossTests {
 
     @GameTest(template = ARENA, batch = QUICK)
     public static void immunityTags(GameTestHelper helper) {
-        // The body is a boss: nothing that works on people works on it.
+        // The body is a boss: nothing that works on people works on it. The villains' pulls pass him by; telekinesis holds
+        // him as a boss (3.1), so he is no longer in telekinesis_immune.
         EntityType<?> ultron = ModEntities.ULTRON.get();
         for (TagKey<EntityType<?>> tag : List.of(ModTags.BOSSES, ModTags.ULTRON_ROBOTS, ModTags.HEX_RESISTANT, ModTags.PIN_IMMUNE,
-                ModTags.TELEPATHY_IMMUNE, ModTags.CONFUSED_IMMUNE, ModTags.SHAPESHIFT_IMMUNE, ModTags.SPELLBOUND_IMMUNE, ModTags.TELEKINESIS_IMMUNE,
+                ModTags.TELEPATHY_IMMUNE, ModTags.CONFUSED_IMMUNE, ModTags.SHAPESHIFT_IMMUNE, ModTags.SPELLBOUND_IMMUNE, ModTags.PULL_IMMUNE,
                 ModTags.INSTANT_KILL_IMMUNE, ModTags.WEB_IMMUNE)) {
             check(ultron.is(tag), "Ultron is in " + tag.location());
         }
-        check(!ultron.is(ModTags.BOSS_MINIONS) && !ultron.is(ModTags.MAGNETIC_ENTITIES), "and is neither a minion nor magnetic");
+        check(!ultron.is(ModTags.TELEKINESIS_IMMUNE), "telekinesis holds him as a boss: he is not in telekinesis_immune");
+        check(!ultron.is(ModTags.BOSS_MINIONS), "he is not a minion");
+        check(!ultron.is(ModTags.MAGNETIC_ENTITIES), "his metal is the boss's own answer (BossHooks.isMetal), not a tag");
 
         // The Sentry is his minion: a robot of metal that a hero can still lift, pin or confuse.
         EntityType<?> sentry = ModEntities.ULTRON_SENTRY.get();

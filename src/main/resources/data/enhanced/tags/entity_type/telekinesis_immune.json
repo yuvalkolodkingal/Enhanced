@@ -2,17 +2,9 @@
   "replace": false,
   "values": [
     "minecraft:ender_dragon",
-    "minecraft:wither",
-    "minecraft:warden",
-    "minecraft:elder_guardian",
     "enhanced:mjolnir_fragment",
     "enhanced:hex_vision",
-    "enhanced:ultron",
-    "enhanced:thanos",
-    "enhanced:apocalypse",
-    "enhanced:thanos_sword",
-    "enhanced:thanos_meteor",
-    "enhanced:thanos_orb",
-    "enhanced:sand_cocoon"
+    "enhanced:sand_cocoon",
+    "enhanced:vibranium_key"
   ]
 }

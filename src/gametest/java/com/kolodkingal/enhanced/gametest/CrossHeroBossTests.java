@@ -637,7 +637,8 @@ public final class CrossHeroBossTests {
     /**
      * The villains as heroes are not mind power either: the Ultron hero's repulsor stream and Overcharge, and the Thanos
      * hero's Power Blast, Titan Slam and Soul Drain reach him and leave the shield and his health whole; the Ultron hero's
-     * Gravity Pull and Slam do not even reach him (ultron.md 4.3: a boss is {@code telekinesis_immune}).
+     * Gravity Pull and Slam do not even reach him (ultron.md 4.3: a boss is {@code pull_immune}, which the villains' pulls
+     * pass by).
      */
     @GameTest(template = ARENA, batch = "cross_apocalypse_villains", timeoutTicks = 220)
     public static void theUltronAndThanosHeroesLeaveApocalypsesShieldWhole(GameTestHelper helper) {
@@ -655,8 +656,8 @@ public final class CrossHeroBossTests {
             PowerTicker.tick(thanos);
             before.unchanged(boss, "the villains' powers (tick " + tick + ")");
             // (One look after each: the stream, the Overcharge, the Power Blast, the Titan Slam, the Soul Drain must each have
-            // reached him on its own. The Gravity Pull and Slam pass a boss by (ultron.md 4.3: not a telekinesis_immune
-            // type, he is too powerful to pull or slam), so nothing of them reaches his shield.)
+            // reached him on its own. The Gravity Pull and Slam pass a boss by (ultron.md 4.3: a pull_immune type, he is
+            // too powerful to pull or slam), so nothing of them reaches his shield.)
             if (tick == 25 || tick == 69 || tick == 89 || tick == 129 || tick == 180) {
                 int now = ripples(log);
                 check(now > rang[0], "each of them reached him and his shield rang (tick " + tick + ", " + now + " rings)");

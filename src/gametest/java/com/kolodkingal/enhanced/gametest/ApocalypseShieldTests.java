@@ -715,7 +715,7 @@ public final class ApocalypseShieldTests {
         check(type.is(ModTags.SPELLBOUND_IMMUNE), "spellbound_immune");
         check(type.is(ModTags.CONFUSED_IMMUNE), "confused_immune");
         check(type.is(ModTags.SHAPESHIFT_IMMUNE), "shapeshift_immune");
-        check(type.is(ModTags.TELEKINESIS_IMMUNE), "telekinesis_immune");
+        check(type.is(ModTags.PULL_IMMUNE) && !type.is(ModTags.TELEKINESIS_IMMUNE), "pull_immune, and not telekinesis_immune (held as a boss)");
         check(type.is(ModTags.TELEPATHY_IMMUNE), "telepathy_immune");
         check(type.is(ModTags.BOSSES), "bosses");
         check(type.is(ModTags.ENTOMB_IMMUNE), "entomb_immune");
