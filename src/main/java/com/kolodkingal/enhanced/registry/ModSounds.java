@@ -22,6 +22,8 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> HEX_RISE = register("hex_rise");
     public static final DeferredHolder<SoundEvent, SoundEvent> HEX_CROSS = register("hex_cross");
     public static final DeferredHolder<SoundEvent, SoundEvent> MAGNET_GRAB = register("magnet_grab");
+    /** The Magnetic Pull (3.1) setting off: the grab's own file, deeper and slower (pitch 0.6 in sounds.json). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> MAGNET_PULL = register("magnet_pull");
     public static final DeferredHolder<SoundEvent, SoundEvent> MAGNET_HUM = register("magnet_hum");
     public static final DeferredHolder<SoundEvent, SoundEvent> SHRAPNEL_FIRE = register("shrapnel_fire");
     public static final DeferredHolder<SoundEvent, SoundEvent> QUICKSILVER_WHOOSH = register("quicksilver_whoosh");

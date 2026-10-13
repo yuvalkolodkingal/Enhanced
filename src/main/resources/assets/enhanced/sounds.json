@@ -56,6 +56,15 @@
       }
     ]
   },
+  "magnet_pull": {
+    "subtitle": "subtitles.enhanced.magnet_pull",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/magnet_grab",
+        "pitch": 0.6
+      }
+    ]
+  },
   "magnet_hum": {
     "subtitle": "subtitles.enhanced.magnet_hum",
     "sounds": [
