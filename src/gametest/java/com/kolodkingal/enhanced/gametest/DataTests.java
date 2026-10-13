@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -49,6 +50,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforgespi.locating.IModFile;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -351,9 +353,9 @@ public final class DataTests {
     }
 
     /**
-     * Every item, block and effect the mod adds, the subtitle of every sound and each client option has a name in
-     * English and in Hebrew, and a Hebrew line takes the same placeholders as its English one (a translation that loses
-     * its "%s" would show the wrong message).
+     * Every item, block and effect the mod adds, the subtitle of every sound, each client option and each section of the
+     * client options has a name in English and in Hebrew, and a Hebrew line takes the same placeholders as its English one
+     * (a translation that loses its "%s" would show the wrong message).
      */
     @GameTest(template = ARENA)
     public static void everyItemBlockEffectSubtitleAndOptionHasANameInBothLanguages(GameTestHelper helper) throws IOException {
@@ -370,12 +372,30 @@ public final class DataTests {
                 keys.add(definition.get("subtitle").getAsString());
             }
         }
-        for (var option : List.of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION, EnhancedClientConfig.FLIGHT_EFFECTS)) {
+        for (var option : List.<ModConfigSpec.ConfigValue<?>>of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION,
+                EnhancedClientConfig.FLIGHT_EFFECTS, EnhancedClientConfig.BUILD_HINTS, EnhancedClientConfig.BUILD_TIPS,
+                EnhancedClientConfig.BUILD_GHOST_DETAIL, EnhancedClientConfig.BUILD_SEE_THROUGH, EnhancedClientConfig.BUILD_SHOW_OTHERS)) {
             String key = option.getSpec().getTranslationKey();
             check(key != null, "a client option has a translation key");
             keys.add(key);
             keys.add(key + ".tooltip");
         }
+        // Each section of the client options is a row of the config screen. NeoForge names it by its own translation key,
+        // else by "enhanced.configuration.<section>", and shows the bare key when the lang files lack it; the row also has
+        // a tooltip and the text of its button.
+        List<String> sections = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : EnhancedClientConfig.SPEC.getSpec().valueMap().entrySet()) {
+            if (entry.getValue() instanceof UnmodifiableConfig) {
+                sections.add(entry.getKey());
+                String key = Optional.ofNullable(EnhancedClientConfig.SPEC.getLevelTranslationKey(List.of(entry.getKey())))
+                        .orElse(Enhanced.MODID + ".configuration." + entry.getKey());
+                keys.add(key);
+                keys.add(key + ".tooltip");
+                keys.add(key + ".button");
+            }
+        }
+        check(sections.containsAll(List.of("animation", "appearance", "thanos", "build_magic")),
+                "the sections of the client options are read from its spec (" + sections + ")");
         check(keys.size() > 40, "there are names to check (" + keys.size() + ")");
         JsonObject en = lang(mod, "en_us");
         JsonObject he = lang(mod, "he_il");
