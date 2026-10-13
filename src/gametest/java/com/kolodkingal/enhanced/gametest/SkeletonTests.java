@@ -17,6 +17,9 @@ import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
+import com.kolodkingal.enhanced.build.ShapeKind;
+import com.kolodkingal.enhanced.build.Spell;
+import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
 import com.kolodkingal.enhanced.client.render.HeroClient;
@@ -25,6 +28,12 @@ import com.kolodkingal.enhanced.item.AwakeningItem;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.item.ScepterRituals.Ritual;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.network.BuildActionPayload;
+import com.kolodkingal.enhanced.network.BuildCastPayload;
+import com.kolodkingal.enhanced.network.BuildFxPayload;
+import com.kolodkingal.enhanced.network.BuildPocketPayload;
+import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.network.MindReadPayload;
 import com.kolodkingal.enhanced.network.ModNetwork;
 import com.kolodkingal.enhanced.network.PhoenixBurstPayload;
@@ -47,9 +56,12 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -84,10 +96,13 @@ import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
@@ -103,6 +118,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1126,8 +1143,8 @@ public final class SkeletonTests {
     // The network
 
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theProtocolIsFour(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("4"), "3.0 bumps the protocol from 3 to 4, once: " + ModNetwork.PROTOCOL_VERSION);
+    public static void theProtocolIsFive(GameTestHelper helper) {
+        check(ModNetwork.PROTOCOL_VERSION.equals("5"), "3.1 bumps the protocol from 4 to 5, once: " + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 
@@ -1185,6 +1202,151 @@ public final class SkeletonTests {
         MindReadPayload.STREAM_CODEC.encode(buf, mind);
         check(buf.readableBytes() < 64 * 1024, "the mind read is " + buf.readableBytes() + " bytes");
         helper.succeed();
+    }
+
+    /**
+     * The six messages of 3.1 give back what they were given, and each stays within its bound (R57): a cast with 8 seeds
+     * 140 bytes, a verdict with 64 marks and every number at its largest 620, a spell's effect 64, every part of a pocket
+     * 31 KiB (a 24 x 24 x 24 pocket of 20 kinds of block in at most two parts; a pocket of 3,000 different states, and
+     * one whose palette is every state there is, read back whole), a pull of 64 streams 2 KiB.
+     */
+    @GameTest(template = ARENA, batch = SKELETON)
+    public static void everyPayloadOf31RoundTrips(GameTestHelper helper) {
+        var access = helper.getLevel().registryAccess();
+        BlockPos far = new BlockPos(-29_999_999, -64, 29_999_999);
+        BlockPos farther = new BlockPos(29_999_999, 319, -29_999_999);
+
+        List<BlockPos> seeds = new ArrayList<>();
+        for (int i = 0; i < SpellRecipe.MAX_SEEDS; i++) {
+            seeds.add(far.offset(i, i, -i));
+        }
+        SpellRecipe recipe = new SpellRecipe(Spell.SHAPE, SpellRecipe.Op.DAB, ShapeKind.HEART.ordinal(), SpellRecipe.MASK, far, farther,
+                seeds, farther, Direction.SOUTH.get3DDataValue(), Integer.MIN_VALUE, Integer.MIN_VALUE, 3, SpellRecipe.UPSIDE_DOWN,
+                SpellRecipe.HOLLOW | SpellRecipe.MIX | SpellRecipe.PLANTED, SpellRecipe.PICKED, Long.MIN_VALUE, Integer.MIN_VALUE);
+        BuildCastPayload cast = new BuildCastPayload(Integer.MIN_VALUE, BuildCastPayload.PREFLIGHT | BuildCastPayload.HELD_SHORT
+                | BuildCastPayload.HELD_LONG, recipe);
+        check(roundTrip(BuildCastPayload.STREAM_CODEC, cast, access).equals(cast), "the cast");
+        check(encodedSize(BuildCastPayload.STREAM_CODEC, cast, access) <= 140,
+                "a cast with 8 seeds is " + encodedSize(BuildCastPayload.STREAM_CODEC, cast, access) + " bytes");
+        for (Spell spell : Spell.values()) {
+            SpellRecipe plain = new SpellRecipe(spell, SpellRecipe.Op.CAST, 0, SpellRecipe.BOX, BlockPos.ZERO, new BlockPos(4, 3, 4), List.of(),
+                    BlockPos.ZERO, SpellRecipe.NO_FACE, 2, 1, 0, SpellRecipe.NO_FLIP, 0, SpellRecipe.HAND, 42L, 0);
+            check(roundTrip(SpellRecipe.STREAM_CODEC, plain, access).equals(plain), "a recipe of " + spell);
+        }
+
+        BuildActionPayload action = new BuildActionPayload(BuildActionPayload.VIEW, far, farther, Integer.MIN_VALUE);
+        check(roundTrip(BuildActionPayload.STREAM_CODEC, action, access).equals(action), "an action");
+        check(encodedSize(BuildActionPayload.STREAM_CODEC, action, access) <= 24,
+                "an action is " + encodedSize(BuildActionPayload.STREAM_CODEC, action, access) + " bytes");
+
+        long[] marks = new long[BuildVerdictPayload.MAX_MARKS];
+        byte[] kinds = new byte[BuildVerdictPayload.MAX_MARKS];
+        for (int i = 0; i < marks.length; i++) {
+            marks[i] = far.offset(i, i, i).asLong();
+            kinds[i] = (byte) (i % (BuildVerdictPayload.MARK_BEYOND + 1));
+        }
+        int all = BuildVerdictPayload.CUT_OFF | BuildVerdictPayload.PROTECTED | BuildVerdictPayload.KEEPS | BuildVerdictPayload.BODIES
+                | BuildVerdictPayload.UNLOADED;
+        BuildVerdictPayload verdict = new BuildVerdictPayload(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE,
+                Integer.MAX_VALUE, all, marks, kinds);
+        BuildVerdictPayload verdictBack = roundTrip(BuildVerdictPayload.STREAM_CODEC, verdict, access);
+        check(verdictBack.equals(verdict) && verdictBack.mark(63).equals(far.offset(63, 63, 63)), "the verdict");
+        check(encodedSize(BuildVerdictPayload.STREAM_CODEC, verdict, access) <= 620,
+                "the biggest verdict is " + encodedSize(BuildVerdictPayload.STREAM_CODEC, verdict, access) + " bytes");
+        BuildVerdictPayload refusal = new BuildVerdictPayload(3, BuildVerdictPayload.TOO_FAR, 0, 0, 24, 0);
+        check(roundTrip(BuildVerdictPayload.STREAM_CODEC, refusal, access).equals(refusal) && BuildVerdictPayload.isRefusal(refusal.code())
+                && !BuildVerdictPayload.isRefusal(BuildVerdictPayload.NOTHING_CHANGES), "a refusal without marks");
+
+        BuildFxPayload fx = new BuildFxPayload(BuildFxPayload.RANK_UP, Integer.MAX_VALUE, Integer.MAX_VALUE, BuildFxPayload.BILLY, far, farther,
+                far, Integer.MAX_VALUE, Integer.MAX_VALUE, BuildFxPayload.NO_MOM, BuildFxPayload.COLUMNS);
+        check(roundTrip(BuildFxPayload.STREAM_CODEC, fx, access).equals(fx), "a spell's effect");
+        check(encodedSize(BuildFxPayload.STREAM_CODEC, fx, access) <= 64,
+                "a spell's effect is " + encodedSize(BuildFxPayload.STREAM_CODEC, fx, access) + " bytes");
+
+        // A 24 x 24 x 24 copy of 20 kinds of block (and holes), every cell another block than the one before it.
+        List<BlockState> twenty = BuiltInRegistries.BLOCK.stream().filter(block -> !block.defaultBlockState().isAir()).limit(20)
+                .map(Block::defaultBlockState).toList();
+        int[] cells = new int[24 * 24 * 24];
+        for (int i = 0; i < cells.length; i++) {
+            cells[i] = i % 21;
+        }
+        List<BuildPocketPayload> house = pocketRoundTrip(access, 7, 24, twenty, cells);
+        check(house.size() <= 2, "a 24^3 pocket of 20 kinds of block takes " + house.size() + " parts");
+        // 3,000 different states, a different one in every cell: the runs go over several parts.
+        List<BlockState> states = new ArrayList<>();
+        for (int id = Block.BLOCK_STATE_REGISTRY.size() - 3000; id < Block.BLOCK_STATE_REGISTRY.size(); id++) {
+            states.add(Block.stateById(id));
+        }
+        for (int i = 0; i < cells.length; i++) {
+            cells[i] = 1 + i % states.size();
+        }
+        check(pocketRoundTrip(access, 8, 24, states, cells).size() >= 2, "3,000 states in every cell take more than one part");
+        // Every state there is: the palette itself is split over parts.
+        List<BlockState> every = new ArrayList<>();
+        Block.BLOCK_STATE_REGISTRY.forEach(every::add);
+        int[] few = new int[4 * 4 * 4];
+        for (int i = 0; i < few.length; i++) {
+            few[i] = 1 + i * (every.size() / few.length);
+        }
+        check(pocketRoundTrip(access, 9, 4, every, few).size() >= 3, "a palette of every state takes several parts");
+
+        List<MagnetPullPayload.Stream> streams = new ArrayList<>();
+        List<Item> metal = List.of(Items.IRON_INGOT, Items.RAW_COPPER, Items.RAIL);
+        for (int i = 0; i < MagnetPullPayload.MAX_STREAMS; i++) {
+            streams.add(new MagnetPullPayload.Stream(new Vec3(-29_999_999.5 + i, 319.5, 29_999_999.5 - i), metal.get(i % 3), 1 + i % 3));
+        }
+        for (boolean first : new boolean[]{true, false}) {
+            MagnetPullPayload pull = new MagnetPullPayload(Integer.MAX_VALUE, first, 12.5F, streams);
+            check(roundTrip(MagnetPullPayload.STREAM_CODEC, pull, access).equals(pull), "a pull, first " + first);
+            check(encodedSize(MagnetPullPayload.STREAM_CODEC, pull, access) <= 2048,
+                    "a pull of 64 streams is " + encodedSize(MagnetPullPayload.STREAM_CODEC, pull, access) + " bytes");
+        }
+        MagnetPullPayload start = new MagnetPullPayload(5, true, 8.0F, List.of());
+        check(roundTrip(MagnetPullPayload.STREAM_CODEC, start, access).equals(start), "a pull's start, nothing taken yet");
+        helper.succeed();
+    }
+
+    /**
+     * A pocket of size {@code side} on each axis, with these cells (0: no block, i: {@code palette.get(i - 1)}), sent in
+     * parts: every part comes back equal and within 31 KiB, and the parts put together, in any order, give back the
+     * palette and every cell. Returns the parts.
+     */
+    private static List<BuildPocketPayload> pocketRoundTrip(RegistryAccess access, int id, int side, List<BlockState> palette, int[] cells) {
+        ByteBuf out = Unpooled.buffer();
+        for (int i = 0; i < cells.length; ) {
+            int run = 1;
+            while (i + run < cells.length && cells[i + run] == cells[i]) {
+                run++;
+            }
+            BuildPocketPayload.writeRun(out, cells[i], run);
+            i += run;
+        }
+        byte[] runs = ByteBufUtil.getBytes(out);
+        List<BuildPocketPayload> parts = BuildPocketPayload.split(id, side, side, side, palette, runs);
+        for (BuildPocketPayload part : parts) {
+            check(roundTrip(BuildPocketPayload.STREAM_CODEC, part, access).equals(part), "pocket " + id + ", " + part);
+            int bytes = encodedSize(BuildPocketPayload.STREAM_CODEC, part, access);
+            check(bytes <= 31 * 1024, "pocket " + id + ": part " + part.part() + " is " + bytes + " bytes");
+        }
+        List<BuildPocketPayload> reversed = new ArrayList<>(parts);
+        Collections.reverse(reversed);
+        BuildPocketPayload.Whole whole = BuildPocketPayload.join(reversed);
+        check(whole != null && whole.pocket() == id && whole.sx() == side && whole.sz() == side && whole.palette().equals(palette)
+                && Arrays.equals(whole.runs(), runs), "pocket " + id + " is put together again, its palette whole");
+        int[] back = new int[cells.length];
+        check(BuildPocketPayload.readRuns(whole.runs(), cells.length, palette.size(),
+                (first, length, index) -> Arrays.fill(back, (int) first, (int) first + length, index)), "pocket " + id + ": the runs read");
+        check(Arrays.equals(back, cells), "pocket " + id + ": every cell comes back");
+        if (parts.size() > 1) {
+            check(BuildPocketPayload.join(parts.subList(1, parts.size())) == null, "pocket " + id + ": with a part missing, no pocket yet");
+        }
+        return parts;
+    }
+
+    private static <T> int encodedSize(StreamCodec<? super RegistryFriendlyByteBuf, T> codec, T value, RegistryAccess access) {
+        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), access);
+        codec.encode(buf, value);
+        return buf.readableBytes();
     }
 
     private static <T> T roundTrip(StreamCodec<? super RegistryFriendlyByteBuf, T> codec, T value, RegistryAccess access) {

@@ -4,22 +4,24 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /**
- * Client → server messages (ability keys, Change Look, Hex Control, the Bifrost screen, the Witches' Road choice) and
- * server → client messages (projectiles slowed by Quicksilver Time, Thor's lightning and Bifrost, Hex Bolts, the Witches'
- * Road screen, and the effects of the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse); everything else the client
- * must know (powers, Hexes, Bifrost places) travels as synced data attachments.
+ * Client → server messages (ability keys, Change Look, Hex Control, the Bifrost screen, the Witches' Road choice, Build
+ * Magic's casts and actions) and server → client messages (projectiles slowed by Quicksilver Time, Thor's lightning and
+ * Bifrost, Hex Bolts, the Witches' Road screen, the effects of the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse,
+ * Build Magic's verdicts, effects and pockets, and Magneto's Magnetic Pull); everything else the client must know (powers,
+ * Hexes, Bifrost places, a builder's meter and box) travels as synced data attachments.
  */
 public final class ModNetwork {
     /**
      * The version of the messages and synced data: a client and a server with different versions can't play together.
-     * Bumped once for all of 3.0.
+     * Bumped once for all of 3.1.
      */
-    public static final String PROTOCOL_VERSION = "4";
+    public static final String PROTOCOL_VERSION = "5";
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // (2.2 renumbered Thor's effects and added the Chaos Shield's state to the power data; 2.3 added the order to
         // the Vision of the Hex to every Hex; 3.0 widened the momentary states of the power data to 64 bits and added
-        // the messages of the five new heroes.)
+        // the messages of the five new heroes; 3.1 added Build Magic's five messages and two synced attachments, and the
+        // Magnetic Pull's message.)
         PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
         registrar.playToServer(AbilityKeyPayload.TYPE, AbilityKeyPayload.STREAM_CODEC, AbilityKeyPayload::handle);
         registrar.playToServer(HexActionPayload.TYPE, HexActionPayload.STREAM_CODEC, HexActionPayload::handle);
@@ -39,6 +41,13 @@ public final class ModNetwork {
         registrar.playToClient(UltronFxPayload.TYPE, UltronFxPayload.STREAM_CODEC, UltronFxPayload::handle);
         registrar.playToClient(SokoviaLiftPayload.TYPE, SokoviaLiftPayload.STREAM_CODEC, SokoviaLiftPayload::handle);
         registrar.playToClient(ApocalypseFxPayload.TYPE, ApocalypseFxPayload.STREAM_CODEC, ApocalypseFxPayload::handle);
+        // 3.1: Build Magic and the Magnetic Pull (their handlers call stubs until the lanes BS, BC and MAG fill them).
+        registrar.playToServer(BuildCastPayload.TYPE, BuildCastPayload.STREAM_CODEC, BuildCastPayload::handle);
+        registrar.playToServer(BuildActionPayload.TYPE, BuildActionPayload.STREAM_CODEC, BuildActionPayload::handle);
+        registrar.playToClient(BuildVerdictPayload.TYPE, BuildVerdictPayload.STREAM_CODEC, BuildVerdictPayload::handle);
+        registrar.playToClient(BuildFxPayload.TYPE, BuildFxPayload.STREAM_CODEC, BuildFxPayload::handle);
+        registrar.playToClient(BuildPocketPayload.TYPE, BuildPocketPayload.STREAM_CODEC, BuildPocketPayload::handle);
+        registrar.playToClient(MagnetPullPayload.TYPE, MagnetPullPayload.STREAM_CODEC, MagnetPullPayload::handle);
     }
 
     private ModNetwork() {
