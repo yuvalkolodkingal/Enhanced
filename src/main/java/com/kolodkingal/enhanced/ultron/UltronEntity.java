@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.ultron;
 
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
@@ -10,6 +12,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -270,7 +273,12 @@ public class UltronEntity extends Monster implements BossHooks {
             return;
         }
         if (!held) {
-            brain.tick(this, fight);
+            // A body in a telekinetic grip, or still from a throw, does nothing: only a stagger counts down (D-T 4.4).
+            if (BossGrip.stills(this)) {
+                brain.tickStill(this);
+            } else {
+                brain.tick(this, fight);
+            }
         }
     }
 
@@ -352,6 +360,45 @@ public class UltronEntity extends Monster implements BossHooks {
     @Override
     public int slowFactor(int zoneFactor) {
         return 0;
+    }
+
+    /**
+     * Telekinesis holds a body as a boss (3.1, D-T 6.1.1), but not while it is shielded (awakening, the lift's warning and
+     * rise, a transfer, his death, his upload away), held by the fight, or while the fight is dying or changing bodies.
+     */
+    @Nullable
+    @Override
+    public String gripRefusal(ServerPlayer holder, Telekinesis.Mode mode) {
+        UltronFight fight = fight();
+        return shielded || held || fight == null || fight.isDying() || fight.isTransferring() ? BossGrip.UNTOUCHABLE : null;
+    }
+
+    /** Vibranium: Magneto's metal. */
+    @Override
+    public boolean isMetal() {
+        return true;
+    }
+
+    /** {@code [ultron_boss].holdTicks}, asked of his fight. */
+    @Override
+    public int holdTicks() {
+        UltronFight fight = fight();
+        return fight == null ? 0 : fight.holdTicks();
+    }
+
+    /**
+     * A grip drops the attack in progress, but never a stagger: the team's window after a Dive stays open, and keeps
+     * counting down while he is held.
+     */
+    @Override
+    public void onGripped(ServerPlayer holder) {
+        brain.dropAttack(this);
+    }
+
+    /** A body never goes through a portal: his fight is in this dimension. */
+    @Override
+    public boolean canChangeDimensions(Level oldLevel, Level newLevel) {
+        return false;
     }
 
     // ---- a boss that stays ----

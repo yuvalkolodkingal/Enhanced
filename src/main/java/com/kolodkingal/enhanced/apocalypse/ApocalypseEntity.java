@@ -2,8 +2,10 @@ package com.kolodkingal.enhanced.apocalypse;
 
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.ShieldCost;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
@@ -610,6 +612,21 @@ public class ApocalypseEntity extends Monster implements BossHooks {
         deflectEffects(hitPoint(source), false);
     }
 
+    /**
+     * His shield turns away the telekinesis of {@code holder}, who is not mind power: the golden ripple on the sphere
+     * toward them (rate-limited as every deflection), and what the fight makes of a deflection (his Babel line).
+     */
+    public void turnAway(ServerPlayer holder) {
+        ApocalypseFight fight = fight();
+        if (fight != null) {
+            fight.onDeflected();
+        }
+        Vec3 center = position().add(0, getBbHeight() * 0.5, 0);
+        Vec3 toward = holder.getEyePosition().subtract(center);
+        deflectEffects(toward.lengthSqr() < 1.0E-6 ? center.add(0, ApocalypseShield.RADIUS, 0)
+                : center.add(toward.normalize().scale(ApocalypseShield.RADIUS)), false);
+    }
+
     private void deflectEffects(Vec3 at, boolean force) {
         if (!(level() instanceof ServerLevel server)) {
             return;
@@ -716,6 +733,56 @@ public class ApocalypseEntity extends Monster implements BossHooks {
         boolean struck = lightningStruck;
         lightningStruck = false;
         return struck;
+    }
+
+    /**
+     * Telekinesis holds him as a boss (3.1, D-T 6.3.1), but never in a set piece (awakening, a transition, the armour's
+     * fall, vanished, kneeling, death, his withdrawal) nor while his shield forms or re-forms; and while it is up, only mind
+     * power gets through it ({@code boss_shield} for everyone else). A pure query.
+     */
+    @Nullable
+    @Override
+    public String gripRefusal(ServerPlayer holder, Telekinesis.Mode mode) {
+        ApocalypseFight fight = fight();
+        ApocalypseShield.State state = shield.state();
+        if (fight == null || fight.bossInvulnerable() || state == ApocalypseShield.State.FORMING || state == ApocalypseShield.State.REFORMING) {
+            return BossGrip.UNTOUCHABLE;
+        }
+        return state == ApocalypseShield.State.UP && !MindPower.isBreaker(holder) ? BossGrip.SHIELD : null;
+    }
+
+    /** A press his shield turned away ({@code boss_shield}) shows its golden ripple, once per press. */
+    @Override
+    public void onGripRefused(ServerPlayer holder, String key) {
+        if (BossGrip.SHIELD.equals(key)) {
+            turnAway(holder);
+        }
+    }
+
+    /** His armour, while it stands: Magneto's metal. In his true form there is no metal on him. */
+    @Override
+    public boolean isMetal() {
+        return !isTrueForm();
+    }
+
+    /** {@code [apocalypse_boss].holdTicks}, asked of his fight. */
+    @Override
+    public int holdTicks() {
+        ApocalypseFight fight = fight();
+        return fight == null ? 0 : fight.holdTicks();
+    }
+
+    /** A grip drops his brain's plan and stops his walk; his own stagger, his healing and an Escape's channel go on. */
+    @Override
+    public void onGripped(ServerPlayer holder) {
+        brain.reset();
+        getNavigation().stop();
+    }
+
+    /** He never goes through a portal: his fight is in this dimension. */
+    @Override
+    public boolean canChangeDimensions(Level oldLevel, Level newLevel) {
+        return false;
     }
 
     // ---------------------------------------------------------------------------------------------------------

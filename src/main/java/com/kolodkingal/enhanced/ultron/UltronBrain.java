@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -63,6 +64,8 @@ public final class UltronBrain {
     private int strafeSign = 1;
     private int strafeUntil;
     private Run run = new Run();
+    /** Every call of {@link #tick} (see {@link #ticked}). */
+    private long ticked;
 
     /** Whether the brain acts at all. The fight turns it on when the fight is on and off for the cutscenes. */
     public void setEnabled(boolean enabled) {
@@ -158,10 +161,29 @@ public final class UltronBrain {
         }
     }
 
+    /**
+     * Drops the attack in progress (telekinesis took hold of the body, D-T 4.4), but unlike {@link #abort} leaves a
+     * stagger as it is: a grab never ends the team's window after a Dive, nor lengthens it.
+     */
+    public void dropAttack(UltronEntity boss) {
+        current = null;
+        ticks = 0;
+        if (boss.state().isAttack()) {
+            boss.setState(UltronState.IDLE);
+        }
+    }
+
+    /** How many times the brain was ticked (the tests count the ticks on which he could act). */
+    @VisibleForTesting
+    public long ticked() {
+        return ticked;
+    }
+
     // ---------------------------------------------------------------------------------------------------------
 
     /** One tick of the brain. */
     void tick(UltronEntity boss, UltronFight fight) {
+        ticked++;
         if (!enabled || !(boss.level() instanceof ServerLevel level)) {
             return;
         }
@@ -177,13 +199,8 @@ public final class UltronBrain {
             return;
         }
         if (stagger > 0) {
-            boss.setState(UltronState.STAGGER);
             UltronMotion.steer(boss, Vec3.ZERO, 0.2);
-            if (--stagger == 0) {
-                afterStagger = true;
-                boss.setState(UltronState.IDLE);
-                nextActionAt = now + 10;
-            }
+            countStagger(boss, now);
             return;
         }
         if (boss.state() != UltronState.IDLE) {
@@ -196,6 +213,26 @@ public final class UltronBrain {
         UltronAttack next = UltronAttack.choose(situation(boss, fight, target, now), boss.getRandom());
         if (next != null) {
             begin(boss, fight, next, now);
+        }
+    }
+
+    /**
+     * One tick of a body that telekinesis holds, or that a throw keeps still (D-T 4.4): he does nothing, and only a stagger
+     * counts down, so that it ends on the tick it would have ended without the grip.
+     */
+    void tickStill(UltronEntity boss) {
+        if (enabled && stagger > 0 && boss.level() instanceof ServerLevel level) {
+            countStagger(boss, level.getGameTime());
+        }
+    }
+
+    /** One tick of the stagger after a Dive; when it is over, the next attack is the Volley, after a short gap. */
+    private void countStagger(UltronEntity boss, long now) {
+        boss.setState(UltronState.STAGGER);
+        if (--stagger == 0) {
+            afterStagger = true;
+            boss.setState(UltronState.IDLE);
+            nextActionAt = now + 10;
         }
     }
 

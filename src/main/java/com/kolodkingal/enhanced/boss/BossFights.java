@@ -333,6 +333,69 @@ public final class BossFights {
     }
 
     /**
+     * Where telekinesis may carry {@code entity} when its holder wants it at {@code wanted} (D-T 4.5): anything a fight
+     * owns, and its participants, is never carried out of the arena ({@link BossFight#carryLimit}); anything else goes
+     * where it is wanted.
+     */
+    public static Vec3 carryLimit(Entity entity, Vec3 wanted) {
+        BossFight fight = carrier(entity);
+        return fight == null ? wanted : fight.carryLimit(entity, wanted);
+    }
+
+    /**
+     * The flight of a throw of {@code entity} is over: if it is the boss or one of his and it ended outside its carry
+     * limit, its fight brings it back into the arena ({@link BossFight#bringBack}). Players are left to the arena's own
+     * field and wall.
+     *
+     * @return whether a fight brought it back
+     */
+    public static boolean bringBack(Entity entity) {
+        BossFight fight = fightOf(entity);
+        if (fight == null || fight.isOver() || fight.level() != entity.level()) {
+            return false;
+        }
+        Vec3 at = entity.position();
+        if (fight.carryLimit(entity, at).distanceToSqr(at) < 1.0E-4) {
+            return false;
+        }
+        fight.bringBack(entity);
+        return true;
+    }
+
+    /**
+     * Where a telekinetic flight of {@code entity} is stopped dead, if it would reach the edge of a gated arena (Ultron's
+     * field, Apocalypse's wall) of a fight that owns it or that it takes part in at {@code next}, where it flies to (D-T
+     * 4.5): half a block inside {@code containRadius}, on the line from the centre, at the height it is at. Null if it may
+     * fly on.
+     */
+    @Nullable
+    public static Vec3 edgeStop(Entity entity, Vec3 next) {
+        BossFight fight = carrier(entity);
+        if (fight == null || !fight.arena().gates()) {
+            return null;
+        }
+        BossArena arena = fight.arena();
+        double flat = arena.distance(next);
+        if (flat < arena.containRadius() || arena.distance(entity.position()) >= arena.containRadius()) {
+            return null; // it stays inside, or it was already outside (the field and the wall see to that)
+        }
+        Vec3 center = arena.center();
+        double scale = (arena.containRadius() - 0.5) / flat;
+        return new Vec3(center.x + (next.x - center.x) * scale, entity.getY(), center.z + (next.z - center.z) * scale);
+    }
+
+    /** The running fight of this level that owns {@code entity} or that it takes part in (a player), or null. */
+    @Nullable
+    private static BossFight carrier(Entity entity) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == entity.level() && !fight.isFinished() && fight.isMember(entity)) {
+                return fight;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Wanda pressed her telekinesis key while holding nothing: a boss's special case for it (Ultron's heart). True if
      * handled.
      */

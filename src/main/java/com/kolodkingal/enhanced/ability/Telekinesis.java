@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.thanos.ThanosMeteorEntity;
@@ -33,6 +34,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
@@ -64,9 +66,16 @@ import java.util.UUID;
  * too). The boss of a fight, and the Wither, the Warden and the Elder Guardian, are taken only as bosses, under {@link
  * BossGrip}'s rules; whatever a press may not take, it says why.
  *
- * <p>While held, the target is moved every tick towards the point the holder is looking at. Launched targets are
- * tracked until they slam into something: they hurt every creature they crash into and take heavy impact damage
- * when they hit a wall or the floor. A launched projectile simply flies again, where the holder looks.
+ * <p>While held, the target is moved every tick towards the point the holder is looking at; what a boss fight owns, and
+ * its fighters, are never carried out of its arena ({@link BossFights#carryLimit}), and a boss tears free at the end of
+ * his hold ({@link BossGrip#holdLimit}). Launched targets are tracked until they slam into something: they hurt every
+ * creature they crash into and take heavy impact damage when they hit a wall or the floor; a throw of anything of a fight
+ * stops dead at a gated arena's edge. A launched projectile simply flies again, where the holder looks.
+ *
+ * <p>Whoever a grip lets go of that its holder may not hurt (a player with PvP off, a teammate, another player's pet) is
+ * spared the fall, the wall and the slam until it lands ({@link #isSpared}, the landing guard of {@code
+ * TelekinesisEvents}), and a holder does not grip the same player again for {@code
+ * magneto.telekinesisPlayerRegripTicks}.
  */
 public final class Telekinesis {
 
@@ -103,34 +112,50 @@ public final class Telekinesis {
         final UUID target;
         final Mode mode;
         final double distance;
+        /** How many ticks the target may be held before it tears free ({@link BossGrip#holdLimit}); 0: no limit. */
+        final int limit;
         int ticks;
 
-        Grip(UUID target, Mode mode, double distance) {
+        Grip(UUID target, Mode mode, double distance, int limit) {
             this.target = target;
             this.mode = mode;
             this.distance = distance;
+            this.limit = limit;
         }
     }
 
     private static final class Flight {
         final UUID thrower;
         final ResourceKey<Level> dimension;
-        final boolean heavy;
+        /** It hits like a wall: 15 to every creature it crashes into (an Iron Golem, a boss). */
+        final boolean heavyHit;
+        /** It takes the impact itself when it slams into something (everything but an Iron Golem). */
+        final boolean takesImpact;
         final int color;
         final IntSet hit = new IntOpenHashSet();
         Vec3 lastPos;
         double lastSpeed;
         int ticks;
 
-        Flight(UUID thrower, ResourceKey<Level> dimension, Vec3 pos, double speed, boolean heavy, int color) {
+        Flight(UUID thrower, ResourceKey<Level> dimension, Vec3 pos, double speed, boolean heavyHit, boolean takesImpact, int color) {
             this.thrower = thrower;
             this.dimension = dimension;
             this.lastPos = pos;
             this.lastSpeed = speed;
-            this.heavy = heavy;
+            this.heavyHit = heavyHit;
+            this.takesImpact = takesImpact;
             this.color = color;
         }
     }
+
+    /** One entity spared the landing (see {@link #isSpared}): where it is, and when the grip on it ended. */
+    private record Spared(ResourceKey<Level> dimension, long since) {
+    }
+
+    /** A spared entity's mark is dropped once it has landed, at least this many ticks after the grip ended. */
+    private static final int SPARED_MIN_TICKS = 2;
+    /** ... and at the latest this many ticks after it. */
+    private static final int SPARED_MAX_TICKS = 200;
 
     /** Holder UUID → what they hold. */
     private static final Map<UUID, Grip> GRIPS = new HashMap<>();
@@ -140,6 +165,8 @@ public final class Telekinesis {
     private static final Map<UUID, Long> GRIP_ENDS = new HashMap<>();
     /** Holder UUID → (player UUID → the game time a grip of that holder on that player ended), for the player regrip. */
     private static final Map<UUID, Map<UUID, Long>> PLAYERS_LET_GO = new HashMap<>();
+    /** Entity UUID → its landing guard: what a grip let go of that its holder may not hurt, until it lands. */
+    private static final Map<UUID, Spared> SPARED = new HashMap<>();
     /** What {@link #lastGripEnd} answers for a holder whose grip never ended: long enough ago for any wait. */
     public static final long NEVER = Long.MIN_VALUE / 2;
 
@@ -277,6 +304,7 @@ public final class Telekinesis {
     public static final String MJOLNIR = "message.enhanced.telekinesis.mjolnir";
     public static final String HELD_BY_OTHER = "message.enhanced.telekinesis.held_by_other";
     public static final String PLAYER_REGRIP = "message.enhanced.telekinesis.player_regrip";
+    public static final String SLIPPED = "message.enhanced.telekinesis.slipped";
 
     /**
      * Whether the holder's telekinesis in {@code mode} takes hold of {@code e} now (spec 5.2), false if any of these, in
@@ -328,14 +356,13 @@ public final class Telekinesis {
     }
 
     /**
-     * Interim rule of lane TK, step 3 part 1: what left {@code telekinesis_immune} in 3.1 to be held as a boss (the three
-     * villains, the Wither, the Warden and the Elder Guardian, Thanos's sword, meteor and orb) is not held yet, as in 3.0,
-     * until the grip that holds it as a boss exists: the hold limit and the regrip of the villains (step 3 part 2, with the
-     * bosses' own answers of step 4), a shot still in the grip (step 7), a vanilla boss's {@code NoAI} (step 10). {@link
-     * #refusal} already names what refuses them meanwhile (a switch off, an invulnerable state, the lift).
+     * Interim rule of lane TK: what left {@code telekinesis_immune} in 3.1 and whose grip is not written yet is not held,
+     * as in 3.0: Thanos's sword, meteor and orb until a shot stays still in the grip (step 7), and the Wither, the Warden
+     * and the Elder Guardian until a vanilla boss's {@code NoAI} is kept while he is held (step 10). {@link #refusal} already
+     * names what refuses them meanwhile (a switch off, an invulnerable state).
      */
     private static boolean awaitsBossGrip(Entity e) {
-        return e.getType().is(ModTags.PULL_IMMUNE) && !e.getType().is(ModTags.TELEKINESIS_IMMUNE);
+        return isBossShot(e) || BossGrip.isVanillaBoss(e);
     }
 
     /** The form's own test of what it takes (step 7 of {@link #canLift}): Magneto metal, the others anything loose. */
@@ -456,10 +483,15 @@ public final class Telekinesis {
     // ------------------------------------------------------------------------------------------------------------
     // Holding
 
+    /**
+     * Takes hold of {@code target}. A boss (or a shot of a fight with a hold limit) is held for {@link BossGrip#holdLimit}
+     * ticks at most, drops what he was doing, and his holder is told he is in the grip ({@link BossGrip#gripped}).
+     */
     public static void hold(ServerPlayer player, Entity target, Mode mode) {
         SandCocoonEntity.freeFrom(target); // taking hold of a friend breaks the cocoon of Apocalypse's sand that held them
         double dist = player.getEyePosition().distanceTo(target.position().add(0, target.getBbHeight() * 0.5, 0));
-        GRIPS.put(player.getUUID(), new Grip(target.getUUID(), mode, Mth.clamp(dist, MIN_HOLD_DISTANCE, MAX_HOLD_DISTANCE)));
+        GRIPS.put(player.getUUID(), new Grip(target.getUUID(), mode, Mth.clamp(dist, MIN_HOLD_DISTANCE, MAX_HOLD_DISTANCE),
+                BossGrip.holdLimit(target, mode)));
         FLIGHTS.remove(target.getUUID());
         Powers.get(player).setHeldEntityId(target.getId());
 
@@ -483,9 +515,15 @@ public final class Telekinesis {
         player.level().playSound(null, target.getX(), target.getY(), target.getZ(),
                 mode == Mode.MAGNETO ? ModSounds.MAGNET_GRAB.get() : SoundEvents.ILLUSIONER_CAST_SPELL,
                 SoundSource.PLAYERS, mode == Mode.MAGNETO ? 1.0F : 0.8F, mode == Mode.MAGNETO ? 1.0F : 1.2F);
+        BossGrip.gripped(player, target);
     }
 
-    /** Called every tick for every player. */
+    /**
+     * Called every tick for every player: moves what they hold toward where they look. The grip is lost when the target is
+     * gone, out of reach or no longer liftable (Magneto's: no longer metal; a phased Vision slips out and he is told so),
+     * when the holder dies, changes his power or is entombed (whatever entombed him, D-T 6.3.1), and when a boss slips away
+     * ({@link BossGrip#slips}); a boss breaks free at the end of his hold.
+     */
     static void tickHolder(ServerPlayer player, PowerData data) {
         Grip grip = GRIPS.get(player.getUUID());
         if (grip == null) {
@@ -499,19 +537,37 @@ public final class Telekinesis {
         Entity e = level.getEntity(grip.target);
         boolean lost = e == null || !e.isAlive() || e.level() != level || player.isDeadOrDying() || player.isSpectator()
                 || data.power() != grip.mode.power
+                || player.hasEffect(ModEffects.ENTOMBED)
                 || e.distanceTo(player) > BREAK_DISTANCE
                 || (grip.mode == Mode.MAGNETO && !Metal.staysMagnetic(e))
                 || MjolnirPin.isPinned(e)
                 || (e instanceof Player p && (p.isCreative() || p.isSpectator() || grip.ticks > MAX_PLAYER_HOLD_TICKS));
         if (lost) {
+            boolean phasedAway = e != null && grip.mode == Mode.MAGNETO && e instanceof Player vision && VisionAbilities.isPhased(vision);
             release(player, false);
+            if (phasedAway) {
+                player.displayClientMessage(Component.translatable(SLIPPED, Component.translatable("power.enhanced.vision")), true);
+            }
             return;
+        }
+        if (BossGrip.slips(player, e, grip.mode)) {
+            release(player, false); // he became untouchable, or the lift took him: no word but the fight's
+            return;
+        }
+        if (grip.limit > 0) {
+            if (grip.ticks >= grip.limit) {
+                end(player, false, true);
+                BossGrip.breakFree(player, e, grip.mode.color);
+                return;
+            }
+            BossGrip.struggle(player, e, grip.ticks, grip.limit);
         }
         if (data.heldEntityId() != e.getId()) {
             data.setHeldEntityId(e.getId());
         }
 
-        Vec3 target = player.getEyePosition().add(player.getLookAngle().scale(grip.distance)).subtract(0, e.getBbHeight() * 0.5, 0);
+        Vec3 wanted = player.getEyePosition().add(player.getLookAngle().scale(grip.distance)).subtract(0, e.getBbHeight() * 0.5, 0);
+        Vec3 target = BossFights.carryLimit(e, wanted); // nothing of a fight leaves its arena in a grip
         Vec3 diff = target.subtract(e.position());
         if (e instanceof ServerPlayer held) {
             // Players move themselves on their own computer, so steer them with velocity updates.
@@ -545,12 +601,17 @@ public final class Telekinesis {
 
     /** Lets go of whatever the player holds. */
     public static void release(ServerPlayer player, boolean gently) {
+        end(player, gently, false);
+    }
+
+    /** Lets go of whatever the player holds; {@code brokeFree}: a boss (or a shot) tore free at the end of its hold. */
+    private static void end(ServerPlayer player, boolean gently, boolean brokeFree) {
         Grip grip = GRIPS.remove(player.getUUID());
         Powers.get(player).setHeldEntityId(-1);
         if (grip == null) {
             return;
         }
-        Entity e = player.serverLevel().getEntity(grip.target);
+        Entity e = find(player, grip.target);
         gripEnded(player, e);
         if (e == null) {
             return;
@@ -566,26 +627,36 @@ public final class Telekinesis {
         if (gently) {
             player.level().playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.6F, 1.4F);
         }
+        BossGrip.letGo(player, e, false, brokeFree);
     }
 
+    /**
+     * Throws what the player holds, where he looks: a shot of a fight may turn on its maker itself ({@link
+     * BossHooks#throwBack}); a boss's fight may take what Wanda throws (Ultron's heart, a Sentry's core); anything else
+     * flies, and a boss is heavy for what he hits but takes the impact himself, through his own caps (D-T 4.5).
+     */
     private static void launch(ServerPlayer player) {
         Grip grip = GRIPS.remove(player.getUUID());
         Powers.get(player).setHeldEntityId(-1);
         if (grip == null) {
             return;
         }
-        Entity e = player.serverLevel().getEntity(grip.target);
+        Entity e = find(player, grip.target);
         gripEnded(player, e);
         if (e == null) {
             return;
         }
-        if (grip.mode == Mode.WANDA && BossFights.telekinesisLaunch(player, e)) {
-            letGo(e);
-            return; // a boss took what she threw (a Sentry's core is crushed)
-        }
         double speed = EnhancedConfig.THROW_SPEED.get();
         Vec3 vel = player.getLookAngle().scale(speed);
         letGo(e);
+        if (e instanceof BossHooks hooks && hooks.throwBack(player, vel)) {
+            BossGrip.letGo(player, e, true, false);
+            return; // a shot of a fight turned on its maker (Thanos's sword, meteor, orb)
+        }
+        if (grip.mode == Mode.WANDA && BossFights.telekinesisLaunch(player, e)) {
+            BossGrip.letGo(player, e, false, false);
+            return; // a boss took what she threw (a Sentry's core is crushed, Ultron's heart is torn out)
+        }
         if (e instanceof TelekineticBlockEntity block) {
             block.launch(player, vel);
         } else if (e instanceof Projectile projectile) {
@@ -594,16 +665,35 @@ public final class Telekinesis {
             e.setDeltaMovement(vel);
             e.hurtMarked = true;
             e.hasImpulse = true;
+            boolean golem = e instanceof IronGolem;
             FLIGHTS.put(e.getUUID(), new Flight(player.getUUID(), player.level().dimension(), e.position(), speed,
-                    e instanceof IronGolem, grip.mode.color));
+                    golem || BossGrip.isBoss(e), !golem, grip.mode.color));
         }
+        BossGrip.letGo(player, e, true, false);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);
         player.level().playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS, 0.9F, 0.7F);
     }
 
+    /** The entity of this UUID: in the holder's level, or (if he has just changed dimension) in any level of the server. */
+    @Nullable
+    private static Entity find(ServerPlayer holder, UUID id) {
+        Entity e = holder.serverLevel().getEntity(id);
+        if (e != null) {
+            return e;
+        }
+        for (ServerLevel level : holder.server.getAllLevels()) {
+            e = level.getEntity(id);
+            if (e != null) {
+                return e;
+            }
+        }
+        return null;
+    }
+
     /**
      * A grip of this holder on {@code target} (null if it is gone) just ended, set down, thrown, lost, or he left:
-     * remembered for the Sneak grace, and, when the target is a player, for the player regrip ({@link #playerRegripLeft}).
+     * remembered for the Sneak grace; when the target is a player, for the player regrip ({@link #playerRegripLeft}); and,
+     * when the holder may not hurt it, the target is spared its landing ({@link #isSpared}).
      */
     private static void gripEnded(ServerPlayer holder, @Nullable Entity target) {
         long now = holder.serverLevel().getGameTime();
@@ -614,6 +704,37 @@ public final class Telekinesis {
             letGo.values().removeIf(at -> now - at >= regrip); // forget the waits that are over
             letGo.put(target.getUUID(), now);
         }
+        if (target != null && mayNotHurt(holder, target)) {
+            SPARED.put(target.getUUID(), new Spared(target.level().dimension(), now));
+        }
+    }
+
+    /**
+     * Whether {@code holder} may not hurt {@code target} (D-M 3.8): a player he may not harm (PvP off, a teammate with
+     * friendly fire off), or a creature another player owns whom he may not harm (a pet, a drone, the Vision of a Hex; with
+     * that owner away, PvP decides).
+     */
+    private static boolean mayNotHurt(ServerPlayer holder, Entity target) {
+        if (target instanceof Player player) {
+            return !AreaTargets.mayHurt(holder, player, false);
+        }
+        if (target instanceof OwnableEntity pet && pet.getOwnerUUID() != null && !pet.getOwnerUUID().equals(holder.getUUID())) {
+            ServerPlayer owner = holder.server.getPlayerList().getPlayer(pet.getOwnerUUID());
+            if (owner != null) {
+                return !AreaTargets.mayHurt(holder, owner, false);
+            }
+            return pet.getOwner() == null && !holder.server.isPvpAllowed();
+        }
+        return false;
+    }
+
+    /**
+     * Whether {@code e} is spared its landing (D-M 3.8): a grip let go of it whose holder may not hurt it, and it has not
+     * landed since. While {@code magneto.telekinesisSparesFriends} is on, the landing guard ({@code
+     * TelekinesisEvents.onIncomingDamage}) takes no fall, wall or slam damage from it.
+     */
+    public static boolean isSpared(Entity e) {
+        return SPARED.containsKey(e.getUUID());
     }
 
     /**
@@ -663,7 +784,13 @@ public final class Telekinesis {
     // ------------------------------------------------------------------------------------------------------------
     // Flights
 
-    /** Called once per server tick. */
+    /**
+     * Called once per server tick: every thrown thing flies on, hits what it crashes into and slams into what stops it. A
+     * throw of anything of a fight (or of a fighter) that is about to cross the edge of a gated arena (Ultron's field,
+     * Apocalypse's wall) is stopped dead half a block inside it (D-T 4.5). When a flight ends, the boss may act again
+     * ({@link BossGrip#landed}) and a boss or minion that ended outside its carry limit is brought back ({@link
+     * BossFights#bringBack}). Then the landing guard of whoever has landed is dropped ({@link #isSpared}).
+     */
     public static void tickFlights(MinecraftServer server) {
         Iterator<Map.Entry<UUID, Flight>> it = FLIGHTS.entrySet().iterator();
         while (it.hasNext()) {
@@ -671,8 +798,13 @@ public final class Telekinesis {
             Flight f = entry.getValue();
             ServerLevel level = server.getLevel(f.dimension);
             Entity e = level == null ? null : level.getEntity(entry.getKey());
-            if (e == null || !e.isAlive() || ++f.ticks > 80) {
+            if (e == null || !e.isAlive()) {
                 it.remove();
+                continue;
+            }
+            if (++f.ticks > 80) {
+                it.remove();
+                flightOver(e);
                 continue;
             }
             ServerPlayer thrower = server.getPlayerList().getPlayer(f.thrower);
@@ -693,12 +825,12 @@ public final class Telekinesis {
                 for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, box,
                         v -> v != e && v != thrower && v.isAlive() && !v.isSpectator() && !f.hit.contains(v.getId()))) {
                     f.hit.add(victim.getId());
-                    float damage = (f.heavy ? 15F : 6F) * (float) Mth.clamp(hitSpeed / 1.2, 0.6, 1.0);
+                    float damage = (f.heavyHit ? 15F : 6F) * (float) Mth.clamp(hitSpeed / 1.2, 0.6, 1.0);
                     victim.hurt(ModDamageTypes.source(level, ModDamageTypes.TELEKINETIC_SLAM, thrower, e), damage);
                     if (dir.horizontalDistanceSqr() > 1.0E-4) {
                         victim.knockback(1.2, -dir.x, -dir.z);
                     }
-                    if (f.heavy && e instanceof IronGolem golem && victim instanceof Enemy) {
+                    if (e instanceof IronGolem golem && victim instanceof Enemy) {
                         golem.setTarget(victim);
                     }
                 }
@@ -711,14 +843,27 @@ public final class Telekinesis {
                 golem.setTarget(null);
             }
 
+            Vec3 edge = BossFights.edgeStop(e, pos.add(e.getDeltaMovement()));
+            if (edge != null) {
+                // It would cross the field or the wall of its arena next tick: it stops dead inside it, and crashes there.
+                e.setDeltaMovement(Vec3.ZERO);
+                e.teleportTo(edge.x, edge.y, edge.z);
+                e.hurtMarked = true;
+                impact(level, e, f, thrower, hitSpeed);
+                it.remove();
+                flightOver(e);
+                continue;
+            }
             boolean slammed = f.ticks > 1 && f.lastSpeed > 0.6 && (speed < f.lastSpeed * 0.45 || e.horizontalCollision);
             if (slammed) {
                 impact(level, e, f, thrower, f.lastSpeed);
                 it.remove();
+                flightOver(e);
                 continue;
             }
             if (f.ticks > 3 && speed < 0.05 && e.onGround()) {
                 it.remove();
+                flightOver(e);
                 continue;
             }
             if (f.ticks % 2 == 0) {
@@ -728,8 +873,49 @@ public final class Telekinesis {
             f.lastSpeed = speed;
             f.lastPos = pos;
         }
+        tickSpared(server);
     }
 
+    /**
+     * The flight of {@code e} is over (it slammed, landed, was stopped or flew its time): a thrown boss may act again, and
+     * a boss or minion that ended outside its carry limit is brought back by its fight.
+     */
+    private static void flightOver(Entity e) {
+        BossGrip.landed(e);
+        BossFights.bringBack(e);
+    }
+
+    /** A thrown entity's flight is forgotten (a dying Thanos: nothing may pause his death). */
+    public static void forgetFlight(Entity e) {
+        FLIGHTS.remove(e.getUUID());
+    }
+
+    /**
+     * Drops the landing guard of whoever has landed: on the ground, in water or riding, at least {@link #SPARED_MIN_TICKS}
+     * after the grip ended, and of everyone {@link #SPARED_MAX_TICKS} after it (or once they are gone).
+     */
+    private static void tickSpared(MinecraftServer server) {
+        if (SPARED.isEmpty()) {
+            return;
+        }
+        Iterator<Map.Entry<UUID, Spared>> it = SPARED.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<UUID, Spared> entry = it.next();
+            ServerLevel level = server.getLevel(entry.getValue().dimension());
+            Entity e = level == null ? null : level.getEntity(entry.getKey());
+            long since = level == null ? SPARED_MAX_TICKS : level.getGameTime() - entry.getValue().since();
+            if (e == null || since >= SPARED_MAX_TICKS
+                    || (since >= SPARED_MIN_TICKS && !isHeld(e) && (e.onGround() || e.isInWater() || e.isPassenger()))) {
+                it.remove();
+            }
+        }
+    }
+
+    /**
+     * What a thrown thing does when it slams into something: dust and a crash, and a body or a vehicle takes the impact,
+     * {@code (speed - 0.6) x 8}, 2 to 16, credited to the thrower (an Iron Golem does not; a boss does, through his own
+     * caps).
+     */
     private static void impact(ServerLevel level, Entity e, Flight f, @Nullable ServerPlayer thrower, double impactSpeed) {
         BlockState ground = level.getBlockState(e.blockPosition().below());
         if (ground.isAir()) {
@@ -740,11 +926,14 @@ public final class Telekinesis {
                     30, e.getBbWidth() * 0.5, 0.2, e.getBbWidth() * 0.5, 0.15);
         }
         level.sendParticles(ParticleTypes.EXPLOSION, e.getX(), e.getY() + e.getBbHeight() * 0.5, e.getZ(), 1, 0, 0, 0, 0);
-        if (f.heavy) {
+        if (f.heavyHit) {
             level.playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, 1.0F, 0.6F);
-        } else if (e instanceof LivingEntity || e instanceof VehicleEntity) {
+        }
+        if (f.takesImpact && (e instanceof LivingEntity || e instanceof VehicleEntity)) {
             // Only bodies and vehicles are hurt by the impact; a thrown item stack must not be destroyed.
-            level.playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.GENERIC_BIG_FALL, SoundSource.NEUTRAL, 1.0F, 0.8F);
+            if (!f.heavyHit) {
+                level.playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.GENERIC_BIG_FALL, SoundSource.NEUTRAL, 1.0F, 0.8F);
+            }
             float damage = (float) Mth.clamp((impactSpeed - 0.6) * 8.0, 2.0, 16.0);
             e.hurt(ModDamageTypes.source(level, ModDamageTypes.TELEKINETIC_SLAM, thrower, thrower), damage);
         }
@@ -762,12 +951,43 @@ public final class Telekinesis {
         FLIGHTS.clear();
         GRIP_ENDS.clear();
         PLAYERS_LET_GO.clear();
+        SPARED.clear();
         BossGrip.clear();
     }
 
     /** A player left the game: drop what they hold. */
     public static void onLogout(ServerPlayer player) {
         release(player, false);
+    }
+
+    /**
+     * Whoever holds {@code target} lets go of it, as if the grip were lost (the Hex holds the Vision a grip carried to its
+     * wall, D-M 3.7).
+     *
+     * @return whether a grip held it
+     */
+    public static boolean releaseTarget(Entity target) {
+        ServerPlayer holder = holderOf(target);
+        if (holder == null) {
+            return false;
+        }
+        release(holder, false);
+        return true;
+    }
+
+    /** The player whose grip holds {@code target}, or null. */
+    @Nullable
+    public static ServerPlayer holderOf(Entity target) {
+        if (target.getServer() == null) {
+            return null;
+        }
+        UUID id = target.getUUID();
+        for (Map.Entry<UUID, Grip> entry : GRIPS.entrySet()) {
+            if (entry.getValue().target.equals(id)) {
+                return target.getServer().getPlayerList().getPlayer(entry.getKey());
+            }
+        }
+        return null;
     }
 
     private Telekinesis() {

@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
@@ -786,17 +787,20 @@ public final class UltronFight extends BossFight {
      * While the island is up, a body or a Sentry of the fight that has ended up under it (it sank past the rim, a blow
      * knocked it off) or far past its rim is brought back over the island, inside its rim, in a flash: they hover at a
      * height over the ground beneath them, so one that is down there could never climb back, and the fight would go on
-     * without them.
+     * without them. One that telekinesis holds, or that a throw keeps still, is left to the grip (the tether and the grip
+     * never pull against each other); once let go, the tether brings it back if it must.
      */
     private void keepTheArmyOnTheIsland(@Nullable UltronEntity boss, long now) {
         if (phase != Phase.ISLAND || !island.isIslandUp() || dying || now % TETHER_INTERVAL != 0) {
             return;
         }
-        if (boss != null && transfer == null) {
+        if (boss != null && transfer == null && !BossGrip.stills(boss)) {
             tether(boss);
         }
         for (UltronSentryEntity sentry : sentries()) {
-            tether(sentry);
+            if (!BossGrip.stills(sentry)) {
+                tether(sentry);
+            }
         }
     }
 
@@ -827,6 +831,50 @@ public final class UltronFight extends BossFight {
     /** The top of the island's ground at a column (a tree on it is not its ground), while it is up. */
     private double islandSurface(double x, double z) {
         return UltronMotion.groundBelowTheTrees(level(), x, island.center().y + 4.0, z) + island.islandOffset();
+    }
+
+    // ---- telekinesis (3.1, D-T 6.1.2) ----
+
+    /** {@code [ultron_boss].holdTicks}. */
+    @Override
+    public int holdTicks() {
+        return UltronBossConfig.HOLD_TICKS.get();
+    }
+
+    /**
+     * Where telekinesis may carry a body, a Sentry or a fighter: on the ground, inside the field ({@code containRadius - 2},
+     * the default); while the island is up, what is on it is kept within {@link #armyReach}, the narrowest the rim runs, so
+     * that it is never carried off the island (what is under the island keeps the ground's limit).
+     */
+    @Override
+    protected Vec3 carryLimit(Entity entity, Vec3 wanted) {
+        if (island.isOnTheIsland(entity)) {
+            return keepWithin(entity, wanted, armyReach(radius), Double.NEGATIVE_INFINITY, island.top());
+        }
+        return super.carryLimit(entity, wanted);
+    }
+
+    /**
+     * A body or a Sentry thrown past its carry limit is flashed back, as the tether does: on the ground three blocks inside
+     * the field, over the surface; while the island is up and it was on it, inside the rim over the island.
+     */
+    @Override
+    protected void bringBack(Entity entity) {
+        Vec3 c = island.center();
+        double dx = entity.getX() - c.x;
+        double dz = entity.getZ() - c.z;
+        double flat = Math.hypot(dx, dz);
+        boolean onTheIsland = island.isOnTheIsland(entity);
+        double reach = onTheIsland ? armyReach(radius) : island.containRadius() - 3.0;
+        double scale = flat > reach ? reach / flat : 1.0;
+        double x = c.x + dx * scale;
+        double z = c.z + dz * scale;
+        double y = onTheIsland ? islandSurface(x, z) + 2.5 : groundAt(x, z) + 1.0;
+        UltronFx.at(level(), UltronFxPayload.FLASH, entity.position().add(0, entity.getBbHeight() * 0.5, 0), 2.0F, 8);
+        entity.teleportTo(x, y, z);
+        entity.setDeltaMovement(Vec3.ZERO);
+        entity.resetFallDistance();
+        UltronFx.at(level(), UltronFxPayload.FLASH, new Vec3(x, y + entity.getBbHeight() * 0.5, z), 2.0F, 8);
     }
 
     /** A piece of Sokovia lands: dust, stone and a thud, 10 damage to everything in the ring. Nothing in the world changes. */
@@ -1026,31 +1074,45 @@ public final class UltronFight extends BossFight {
 
     /**
      * Wanda pressed her telekinesis key holding nothing and looks at a body: below {@code heartRipThreshold} of its
-     * health, once the island is up, she tears out its core and the body is destroyed at once, through the upload; above
-     * it, he is too powerful to lift.
+     * health, once the island is up, she tears out its core and the body is destroyed at once, through the upload. Only
+     * then is the press the fight's: otherwise her telekinesis holds him as a boss, or says why it cannot (3.1, D-T
+     * 6.1.1).
      */
     @Override
     protected boolean onTelekinesisPress(ServerPlayer wanda) {
         EntityHitResult looked = Raycasts.entity(wanda, EnhancedConfig.TELEKINESIS_RANGE.get(), 0.3,
                 e -> e instanceof UltronEntity && owns(e), 1.0F);
-        if (looked == null || !(looked.getEntity() instanceof UltronEntity body)) {
+        if (looked == null || !(looked.getEntity() instanceof UltronEntity body) || !canRip(body)) {
             return false;
         }
-        double threshold = UltronBossConfig.HEART_RIP_THRESHOLD.get();
-        if (threshold > 0.0 && canFall() && !body.isShielded() && body.getHealth() <= body.getMaxHealth() * threshold) {
-            UltronSounds.TRANSFER.play(level(), body.position(), 1.0F, 1.4F);
-            UltronFx.at(level(), UltronFxPayload.PULSE, body.position(), 0.0F, 10);
-            credit(wanda, DAMAGE, body.getHealth());
-            onBodyDestroyed(body, null, wanda);
-        } else {
-            wanda.displayClientMessage(Component.translatable("message.enhanced.ultron.too_powerful"), true);
-        }
+        rip(wanda, body);
         return true;
     }
 
-    /** Wanda throws a Sentry she holds: its core is crushed instead, and it dies at once in red sparks. */
+    /** Whether Wanda's hand tears the core out of this body: at or below the threshold, on the island, not shielded. */
+    private boolean canRip(UltronEntity body) {
+        double threshold = UltronBossConfig.HEART_RIP_THRESHOLD.get();
+        return threshold > 0.0 && canFall() && !body.isShielded() && body.getHealth() <= body.getMaxHealth() * threshold;
+    }
+
+    /** Wanda tears the core out of a body: it is destroyed at once, through the upload, and what was left of it is hers. */
+    private void rip(ServerPlayer wanda, UltronEntity body) {
+        UltronSounds.TRANSFER.play(level(), body.position(), 1.0F, 1.4F);
+        UltronFx.at(level(), UltronFxPayload.PULSE, body.position(), 0.0F, 10);
+        credit(wanda, DAMAGE, body.getHealth());
+        onBodyDestroyed(body, null, wanda);
+    }
+
+    /**
+     * Wanda throws what she holds: a body of his that her hand can tear the core out of is torn instead of thrown (3.1);
+     * a Sentry's core is crushed instead, and it dies at once in red sparks.
+     */
     @Override
     protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
+        if (held instanceof UltronEntity body && owns(body) && body.isAlive() && canRip(body)) {
+            rip(wanda, body);
+            return true;
+        }
         if (!(held instanceof UltronSentryEntity sentry) || sentry.getOwnerUUID() != null || !owns(sentry) || !sentry.isAlive()) {
             return false;
         }

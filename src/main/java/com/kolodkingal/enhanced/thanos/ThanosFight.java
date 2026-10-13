@@ -1,10 +1,12 @@
 package com.kolodkingal.enhanced.thanos;
 
+import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -18,7 +20,11 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -58,6 +64,10 @@ public final class ThanosFight extends BossFight {
 
     /** How long he takes to go through the ring of Space when he leaves. */
     private static final int LEAVING_TICKS = 30;
+    /** He is put back when he is this far under the centre of his arena (the void hurts far below, in every dimension). */
+    private static final double VOID_DEPTH = 24.0;
+    /** Brought back, he stands at most this far inside his radius. */
+    private static final double BRING_BACK_INSIDE = 4.0;
     /** How high above the landing the portal hangs. */
     private static final double PORTAL_HEIGHT = 30.0;
 
@@ -194,7 +204,58 @@ public final class ThanosFight extends BossFight {
             end(BossEnd.ABORT);
             return;
         }
+        if (boss.getY() < arena().center().y - VOID_DEPTH && boss.state() != ThanosState.DYING) {
+            // Thrown off the edge of the world's ground (an End island): he steps back before the void can kill him.
+            BossGrip.forget(boss);
+            bringBack(boss);
+        }
         updateBars(boss);
+    }
+
+    // ---- telekinesis (3.1, D-T 6.2.1) ----
+
+    /** {@code [thanos_boss].holdTicks}. */
+    @Override
+    public int holdTicks() {
+        return ThanosBossConfig.HOLD_TICKS.get();
+    }
+
+    /**
+     * Thanos thrown out of his arena, or fallen too far under it, steps back through a Space portal: rings at both ends,
+     * and he stands on the ground at most {@link #BRING_BACK_INSIDE} blocks inside his radius (where he was, if he was
+     * already that far in), stopped.
+     */
+    @Override
+    protected void bringBack(Entity entity) {
+        if (!(entity instanceof ThanosEntity thanos)) {
+            return;
+        }
+        Vec3 c = arena().center();
+        double dx = thanos.getX() - c.x;
+        double dz = thanos.getZ() - c.z;
+        double flat = Math.hypot(dx, dz);
+        double reach = Math.max(1.0, arena().radius() - BRING_BACK_INSIDE);
+        double scale = flat > reach ? reach / flat : 1.0;
+        double x = c.x + dx * scale;
+        double z = c.z + dz * scale;
+        Vec3 spot = groundUnder(thanos, x, z);
+        Vec3 from = thanos.position();
+        ThanosEffects.portal(level(), from.add(0, 0.2, 0), 1.6F, 20);
+        ThanosEffects.portal(level(), spot.add(0, 0.2, 0), 1.6F, 20);
+        thanos.moveTo(spot.x, spot.y, spot.z, thanos.getYRot(), thanos.getXRot());
+        thanos.setDeltaMovement(Vec3.ZERO);
+        thanos.resetFallDistance();
+        thanos.getNavigation().stop();
+        ThanosSounds.PORTAL.play(level(), spot, 1.0F, 1.2F);
+    }
+
+    /** Where he stands in the column of {@code (x, z)}: the first block he can stand on, looking down from above the centre. */
+    private Vec3 groundUnder(ThanosEntity thanos, double x, double z) {
+        double top = arena().center().y + 6.0;
+        BlockHitResult hit = level().clip(new ClipContext(new Vec3(x, top, z), new Vec3(x, top - 46.0, z), ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE, thanos));
+        Vec3 spot = hit.getType() == HitResult.Type.MISS ? new Vec3(x, arena().center().y, z) : hit.getLocation();
+        return Teleports.fits(thanos, spot) ? spot : spot.add(0, 1.0, 0);
     }
 
     /** The bar shows his health in the colour of his newest stone, and says what he has become. */

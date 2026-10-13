@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseFight;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.apocalypse.Horsemen;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
@@ -585,8 +586,9 @@ public final class CrossHeroBossTests {
     }
 
     /**
-     * Magneto and Vision: shrapnel (metal) is stopped before it hits, Metal Telekinesis cannot lift him (he is not metal and
-     * too powerful), the strip outside a window takes nothing, and the Mind Stone's beam is not mind power by default.
+     * Magneto and Vision: shrapnel (metal) is stopped before it hits, Metal Telekinesis cannot lift him (his armour is metal,
+     * but his shield turns away every grip that is not mind power: {@code boss_shield}), the strip outside a window takes
+     * nothing, and the Mind Stone's beam is not mind power by default.
      */
     @GameTest(template = ARENA, batch = "cross_apocalypse_magneto_vision", timeoutTicks = 140)
     public static void magnetoAndVisionLeaveApocalypsesShieldWhole(GameTestHelper helper) {
@@ -600,7 +602,8 @@ public final class CrossHeroBossTests {
         Guarded before = Guarded.of(boss);
         lookAt(magneto, boss);
         press(magneto, 1);
-        check(!Telekinesis.isHolding(magneto), "Metal Telekinesis cannot lift him");
+        check(!Telekinesis.isHolding(magneto), "Metal Telekinesis cannot lift him: his shield is up and Magneto is not mind power");
+        check(BossGrip.SHIELD.equals(Telekinesis.refusal(magneto, boss, Telekinesis.Mode.MAGNETO)), "the shield turns his grip away");
         press(magneto, 3);
         before.unchanged(boss, "Magneto's strip outside a window");
         lookAt(magneto, boss);
@@ -1005,11 +1008,12 @@ public final class CrossHeroBossTests {
 
     /**
      * The Sentries are Stark's drone metal ({@code magnetic_entities}): Magneto's Metal Telekinesis lifts one, and his strip
-     * finds nothing to take from it. Ultron's bodies are vibranium, not magnetic, and too powerful to lift: neither works on
-     * them (ultron.md 3.14).
+     * finds nothing to take from it. Ultron's bodies are vibranium, metal to Magneto (3.1): on the ground and unshielded, his
+     * R holds a body as a boss, for {@code holdTicks} times {@code boss.magnetoHoldFactor} (90 ticks), and then it breaks
+     * free; the strip still does nothing to him.
      */
-    @GameTest(template = ARENA, batch = "cross_magneto_ultron", timeoutTicks = 60)
-    public static void magnetoLiftsASentryButNotAnUltronBody(GameTestHelper helper) {
+    @GameTest(template = ARENA, batch = "cross_magneto_ultron", timeoutTicks = 160)
+    public static void magnetoLiftsASentryAndHoldsAnUltronBodyAsABoss(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         ServerPlayer magneto = tank(f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.MAGNETO));
         UltronFight fight = UltronTestSupport.onTheGround(f, magneto);
@@ -1023,13 +1027,28 @@ public final class CrossHeroBossTests {
         UltronSentryEntity sentry = UltronTestSupport.sentryAt(f, fight, 9.5, 10.5);
         sentry.setHeld(true);
 
-        lookAt(magneto, body);
-        press(magneto, 1);
-        check(!Telekinesis.isHolding(magneto), "Ultron's vibranium body cannot be lifted");
         float bodyHealth = body.getHealth();
         press(magneto, 3);
-        check(body.isAlive() && body.getHealth() == bodyHealth, "and the strip does nothing to him");
+        check(body.isAlive() && body.getHealth() == bodyHealth, "the strip does nothing to him");
+        lookAt(magneto, body);
+        press(magneto, 1);
+        check(Telekinesis.holds(magneto, body), "Magneto holds Ultron's vibranium body as a boss");
+        int[] held = {0};
+        f.everyTick(150, tick -> {
+            PowerTicker.tick(magneto);
+            if (Telekinesis.holds(magneto, body)) {
+                held[0]++;
+                return false;
+            }
+            check(held[0] == 89, "he broke free at the end of Magneto's hold, 60 x 1.5 ticks: held " + held[0]);
+            UltronTestSupport.put(f, magneto, 3.5, FLOOR, 10.5);
+            liftsTheSentry(helper, magneto, sentry);
+            return true;
+        });
+    }
 
+    /** The second half of the test above: Magneto's strip takes nothing from a Sentry, and his R lifts it and holds it. */
+    private static void liftsTheSentry(GameTestHelper helper, ServerPlayer magneto, UltronSentryEntity sentry) {
         lookAt(magneto, sentry);
         float sentryHealth = sentry.getHealth();
         press(magneto, 3);
@@ -1038,11 +1057,10 @@ public final class CrossHeroBossTests {
         lookAt(magneto, sentry);
         press(magneto, 1);
         check(Telekinesis.isHolding(magneto) && Powers.get(magneto).heldEntityId() == sentry.getId(), "but Magneto lifts the Sentry");
-        f.everyTick(20, tick -> {
+        for (int tick = 1; tick <= 20; tick++) {
             PowerTicker.tick(magneto);
-            check(Telekinesis.isHolding(magneto), "and holds it (tick " + tick + ")");
-            return tick >= 20;
-        });
+            check(Telekinesis.isHolding(magneto), "and holds it, with no limit of a boss's (tick " + tick + ")");
+        }
     }
 
     // ============================================================================================================

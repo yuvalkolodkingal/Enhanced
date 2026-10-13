@@ -201,6 +201,55 @@ public abstract class BossFight {
         return false;
     }
 
+    /**
+     * How long telekinesis may hold this fight's boss before he breaks free, in ticks, before the hero's factor (see
+     * {@link BossGrip#holdLimit}): each boss's {@code holdTicks} option. 60 by default.
+     */
+    public int holdTicks() {
+        return 60;
+    }
+
+    /**
+     * Where telekinesis may carry {@code entity}, which this fight owns or which is one of its participants, when its holder
+     * wants it at {@code wanted} (see {@link BossFights#carryLimit}): never out of the arena. By default the point is kept
+     * within {@code containRadius - 2} of the centre in a gated arena ({@code radius - 2} in an open one), with the body
+     * under the arena's top, and in an open arena not below {@code centre.y - 8} (nothing is carried down a ravine or off an
+     * End island). A boss whose ground is his own overrides this.
+     */
+    protected Vec3 carryLimit(Entity entity, Vec3 wanted) {
+        BossArena arena = arena();
+        double reach = arena.gates() ? arena.containRadius() - 2.0 : arena.radius() - 2.0;
+        double floor = arena.gates() ? Double.NEGATIVE_INFINITY : arena.center().y - 8.0;
+        return keepWithin(entity, wanted, reach, floor, arena.top());
+    }
+
+    /**
+     * {@code wanted} kept within {@code reach} of the arena's centre (horizontally, along the line from the centre), not
+     * below {@code floor}, and with {@code entity}'s body under {@code top}.
+     */
+    protected final Vec3 keepWithin(Entity entity, Vec3 wanted, double reach, double floor, double top) {
+        Vec3 center = arena().center();
+        double dx = wanted.x - center.x;
+        double dz = wanted.z - center.z;
+        double flat = Math.hypot(dx, dz);
+        double limit = Math.max(0.5, reach);
+        double x = wanted.x;
+        double z = wanted.z;
+        if (flat > limit) {
+            x = center.x + dx / flat * limit;
+            z = center.z + dz / flat * limit;
+        }
+        double y = Math.max(floor, Math.min(wanted.y, top - entity.getBbHeight()));
+        return x == wanted.x && y == wanted.y && z == wanted.z ? wanted : new Vec3(x, y, z);
+    }
+
+    /**
+     * The flight of a throw left {@code entity} (the boss or one of his) outside its {@link #carryLimit}: put it back in
+     * the arena, the fight's own way (see {@link BossFights#bringBack}). Nothing by default.
+     */
+    protected void bringBack(Entity entity) {
+    }
+
     /** A player joined the fight (their first time within the join radius). */
     protected void onJoin(ServerPlayer player) {
     }

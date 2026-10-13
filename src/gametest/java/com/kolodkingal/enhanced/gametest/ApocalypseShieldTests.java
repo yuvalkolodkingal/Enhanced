@@ -720,10 +720,14 @@ public final class ApocalypseShieldTests {
         check(type.is(ModTags.BOSSES), "bosses");
         check(type.is(ModTags.ENTOMB_IMMUNE), "entomb_immune");
 
-        // Wanda cannot lift him.
+        // Wanda is mind power: her telekinesis takes hold of him through the shield (3.1), and lets go.
+        check(boss.shield().isUp(), "his shield is up");
         lookAt(d.hero(), boss);
         AbilityHandler.onKey(d.hero(), 3, true);
-        check(!Telekinesis.isHolding(d.hero()), "Telekinesis does not take hold of him");
+        AbilityHandler.onKey(d.hero(), 3, false);
+        check(Telekinesis.holds(d.hero(), boss), "Wanda's telekinesis takes hold of him through his shield");
+        Telekinesis.release(d.hero(), false);
+        check(!Telekinesis.isHeld(boss), "and lets go");
         helper.succeed();
     }
 

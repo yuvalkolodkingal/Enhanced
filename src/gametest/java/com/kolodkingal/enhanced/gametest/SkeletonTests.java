@@ -11,10 +11,12 @@ import com.kolodkingal.enhanced.ability.HeroServer;
 import com.kolodkingal.enhanced.ability.HeroServers;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.build.ShapeKind;
@@ -1096,6 +1098,15 @@ public final class SkeletonTests {
         check(BossFights.allowsTeleport(level, player, new Vec3(1, 2, 3)), "a teleport is allowed anywhere");
         check(!BossFights.protects(level, helper.absolutePos(new BlockPos(5, 2, 5))), "no block is protected");
         check(!BossFights.telekinesisPress(player) && !BossFights.telekinesisLaunch(player, zombie), "Wanda's telekinesis is hers alone");
+        // 3.1 (D-T 14.1): telekinesis is not held back by any fight.
+        BlockPos cell = helper.absolutePos(new BlockPos(5, 2, 5));
+        Vec3 far = zombie.position().add(100.0, -40.0, 100.0);
+        check(!BossFights.isLocked(player) && !BossFights.isLocked(zombie), "nothing is locked where it is");
+        check(!BossFights.hidesGround(level, cell), "no ground is hidden");
+        check(BossFights.carryLimit(zombie, far) == far && BossFights.edgeStop(zombie, far) == null && !BossFights.bringBack(zombie),
+                "a zombie is carried and thrown anywhere");
+        check(BossGrip.regripLeft(zombie) == 0 && !BossGrip.stills(zombie) && BossGrip.refusal(player, zombie, Telekinesis.Mode.WANDA) == null,
+                "and no boss rule holds it back");
         for (BossKind kind : BossKind.values()) {
             check(BossKind.byId(kind.id()) == kind, kind + " is found by its id");
             if (BossFights.lane(kind) != null) {
