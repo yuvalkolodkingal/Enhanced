@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
+import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.Metal;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
@@ -15,12 +16,15 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -356,7 +360,136 @@ public final class MagnetoMetalTests {
     }
 
     // ------------------------------------------------------------------------------------------------------------
-    // Loki's illusions give nothing (M58)
+    // The strip (M9, M45)
+
+    /**
+     * M9. Stormbreaker is metal: dropped, R holds it; in a zombie's hand, R holds the zombie; in a player's hand (PvP on),
+     * V tears it off and drops it at his feet, unmarked, so he can take it back first.
+     */
+    @GameTest(template = ARENA, batch = "magneto_metal_pvp")
+    public static void stormbreakerIsMetal(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
+        PowerData data = Powers.get(magneto);
+
+        ItemEntity axe = dropped(level, ModItems.STORMBREAKER.get());
+        axe.setPos(helper.absoluteVec(new Vec3(9.5, FLOOR, 10.5)));
+        level.addFreshEntity(axe);
+        lookAt(magneto, axe);
+        AbilityHandler.onKey(magneto, 1, true);
+        check(Telekinesis.isHolding(magneto) && data.heldEntityId() == axe.getId(), "R holds a dropped Stormbreaker");
+        Telekinesis.release(magneto, false);
+        axe.discard();
+
+        Zombie zombie = wearing(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 15.5), EquipmentSlot.MAINHAND, ModItems.STORMBREAKER.get());
+        lookAt(magneto, zombie);
+        AbilityHandler.onKey(magneto, 1, true);
+        check(Telekinesis.isHolding(magneto) && data.heldEntityId() == zombie.getId(), "R holds a zombie by the Stormbreaker in its hand");
+        Telekinesis.release(magneto, false);
+        zombie.discard();
+
+        ServerPlayer holder = f.player(9.5, FLOOR, 5.5);
+        holder.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
+        lookAt(magneto, holder);
+        AbilityHandler.onKey(magneto, 3, true);
+        check(holder.getMainHandItem().isEmpty(), "V tears Stormbreaker out of a player's hand");
+        List<ItemEntity> fallen = items(helper, ModItems.STORMBREAKER.get());
+        check(fallen.size() == 1 && !fallen.get(0).getPersistentData().contains(MagnetoAbilities.STRIPPED_BY_TAG),
+                "it falls at his feet, unmarked: the player may take it back first");
+        check(!data.isReady(3, level.getGameTime()), "the strip rests");
+        helper.succeed();
+    }
+
+    /**
+     * M45. Gear a creature never drops (drop chance 0) crumbles when V tears it off: no helmet anywhere, only its
+     * fragments and the sound of it breaking; the sword at the ordinary chance falls, marked for his pull.
+     */
+    @GameTest(template = ARENA, batch = METAL)
+    public static void gearAMobNeverDropsCrumbles(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
+        Zombie zombie = wearing(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5), EquipmentSlot.HEAD, Items.IRON_HELMET);
+        zombie.setDropChance(EquipmentSlot.HEAD, 0.0F);
+        zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+        lookAt(magneto, zombie);
+        TestKit.sentPackets(magneto);
+
+        AbilityHandler.onKey(magneto, 3, true);
+        List<Object> packets = TestKit.sentPackets(magneto);
+        check(zombie.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && zombie.getMainHandItem().isEmpty(), "V empties its head and its hand");
+        List<ItemEntity> swords = items(helper, Items.IRON_SWORD);
+        check(swords.size() == 1, "the sword falls as an item");
+        CompoundTag mark = swords.get(0).getPersistentData();
+        check(mark.hasUUID(MagnetoAbilities.STRIPPED_BY_TAG) && magneto.getUUID().equals(mark.getUUID(MagnetoAbilities.STRIPPED_BY_TAG)),
+                "marked as torn off a creature by him, for his pull");
+        check(items(helper, Items.IRON_HELMET).isEmpty() && magneto.getInventory().countItem(Items.IRON_HELMET) == 0,
+                "the helmet it would never drop is nowhere: it crumbled");
+        check(TestKit.soundsIn(packets).stream().anyMatch(sound -> sound.id().equals(SoundEvents.ITEM_BREAK.getLocation())),
+                "it was heard breaking");
+        check(TestKit.particlesIn(packets).stream().anyMatch(p -> p.getParticle() instanceof ItemParticleOption fragments
+                && fragments.getItem().is(Items.IRON_HELMET)), "into its own fragments");
+        check(!Powers.get(magneto).isReady(3, helper.getLevel().getGameTime()), "the strip did something: it rests");
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Loki's illusions give nothing (M44, M58)
+
+    /**
+     * M44 (the strip). Loki in netherite, holding his Scepter, casts Duplicates: no copy is metal and R holds none; V at
+     * each dissolves it ({@code disarm.illusion}) and rests; afterwards no netherite piece and no Scepter lies anywhere or
+     * is in Magneto's inventory, and Loki still wears and holds his own.
+     */
+    @GameTest(template = ARENA, batch = LOKI)
+    public static void illusionsGiveNothing(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer loki = f.player(10.5, FLOOR, 17.5, Power.LOKI);
+        List<Item> set = List.of(Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS);
+        List<EquipmentSlot> slots = List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
+        for (int i = 0; i < set.size(); i++) {
+            loki.setItemSlot(slots.get(i), new ItemStack(set.get(i)));
+        }
+        loki.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
+        AbilityHandler.onKey(loki, 2, true);
+        List<LokiIllusionEntity> copies = LokiIllusionEntity.ownedBy(level, loki.getUUID());
+        check(copies.size() == 3, "three copies stand round him, not " + copies.size());
+        ServerPlayer magneto = f.player(10.5, FLOOR, 2.5, Power.MAGNETO);
+        PowerData data = Powers.get(magneto);
+        for (int i = 0; i < copies.size(); i++) {
+            // Out in front of Magneto, so nothing else is in his line.
+            copies.get(i).moveTo(helper.absoluteVec(new Vec3(6.5 + 4 * i, FLOOR, 9.5)));
+            check(copies.get(i).getItemBySlot(EquipmentSlot.CHEST).is(Items.NETHERITE_CHESTPLATE), "a copy wears his netherite");
+            check(!Metal.isMagnetic(copies.get(i)), "but it is not metal");
+        }
+
+        lookAt(magneto, copies.get(0));
+        AbilityHandler.onKey(magneto, 1, true);
+        check(!Telekinesis.isHeld(copies.get(0)), "R holds no copy");
+        Telekinesis.release(magneto, false);
+
+        for (LokiIllusionEntity copy : copies) {
+            data.startCooldown(3, level.getGameTime(), 0);
+            lookAt(magneto, copy);
+            BossTestSupport.lastActionBarKey(magneto);
+            AbilityHandler.onKey(magneto, 3, true);
+            check(copy.isRemoved(), "V dissolves the copy");
+            check("message.enhanced.disarm.illusion".equals(BossTestSupport.lastActionBarKey(magneto)), "only an illusion: nothing to take");
+            check(!data.isReady(3, level.getGameTime()), "and the strip rests: magnetism saw through the trick");
+        }
+        for (Item item : List.of(Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS,
+                ModItems.LOKIS_SCEPTER.get())) {
+            check(items(helper, item).isEmpty() && magneto.getInventory().countItem(item) == 0,
+                    "no " + BuiltInRegistries.ITEM.getKey(item) + " was made out of an illusion");
+        }
+        for (int i = 0; i < set.size(); i++) {
+            check(loki.getItemBySlot(slots.get(i)).is(set.get(i)), "Loki still wears his " + BuiltInRegistries.ITEM.getKey(set.get(i)));
+        }
+        check(loki.getMainHandItem().is(ModItems.LOKIS_SCEPTER.get()), "and holds his Scepter");
+        helper.succeed();
+    }
 
     /**
      * M58. Tommy's Blitz passes a Loki illusion by (what it holds is a copy of Loki's): no sword reaches Tommy or the
@@ -426,6 +559,11 @@ public final class MagnetoMetalTests {
         AbilityHandler.onKey(wanda, 3, true);
         check(!Telekinesis.isHolding(wanda) && held.getDeltaMovement().lengthSqr() > 0.1, "and throws it");
         return (TelekineticBlockEntity) held;
+    }
+
+    /** The item entities of {@code item} in the arena. */
+    private static List<ItemEntity> items(GameTestHelper helper, Item item) {
+        return helper.getEntities(EntityType.ITEM).stream().filter(e -> e.getItem().is(item)).toList();
     }
 
     private static int countDropped(GameTestHelper helper, Item item) {

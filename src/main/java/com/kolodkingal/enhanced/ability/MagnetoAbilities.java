@@ -212,6 +212,18 @@ public final class MagnetoAbilities {
 
     // ---- Ability 3: Armor & Weapon Strip ----
 
+    /**
+     * What the strip tore off a creature (never a player) carries Magneto's UUID here, in the item entity's persistent
+     * data, so that his Magnetic Pull may take it at once despite its pickup delay (D-M 4.3, 5).
+     */
+    public static final String STRIPPED_BY_TAG = "enhanced:stripped_by";
+
+    /**
+     * V: every metal piece the target wears or holds (D-M 5). A player only when Magneto may hurt him (PvP on, no
+     * teammate, not in Creative), or V says why not; a conjured body (a Loki illusion) dissolves and gives nothing; a boss
+     * answers through its own hook; gear that is not real crumbles; what is torn off a creature is marked for his pull; an
+     * Iron Spider's nanites scatter; and when the metal is the body itself, V says to lift it with R.
+     */
     private static void disarm(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
@@ -225,30 +237,55 @@ public final class MagnetoAbilities {
             return;
         }
         LivingEntity target = (LivingEntity) hit.getEntity();
+        if (target instanceof Player other && !AreaTargets.mayHurt(player, other, false)) {
+            // PvP rules apply to players: nothing is taken and nothing is spent, and he is told why.
+            player.displayClientMessage(Component.translatable(player.server.isPvpAllowed()
+                    ? "message.enhanced.disarm.not_allowed" : "message.enhanced.disarm.no_pvp"), true);
+            return;
+        }
+        if (Metal.isConjured(target)) {
+            // Magnetism sees through Loki's trick: the copy dissolves, and nothing of what it wore is made real.
+            beam(level, player.getEyePosition(), hit.getLocation());
+            Metal.dissolve(target, hit.getLocation());
+            player.displayClientMessage(Component.translatable("message.enhanced.disarm.illusion"), true);
+            data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
+            return;
+        }
         if (target instanceof BossHooks boss && boss.onMagnetoStrip(player)) {
             // A boss has its own answer to the strip (it cuts its armour, it laughs): nothing else is taken.
             data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
             return;
         }
         RandomSource random = player.getRandom();
+        boolean creature = !(target instanceof Player);
         int ripped = 0;
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack stack = target.getItemBySlot(slot);
-            if (stack.isEmpty() || !(stack.is(ModTags.MAGNETIC_ITEMS) || stack.is(ModTags.MAGNETIC_ARMOR))) {
+            if (!Metal.isMetalItem(stack)) {
                 continue;
             }
+            boolean real = Metal.isRealGear(target, slot);
             target.setItemSlot(slot, ItemStack.EMPTY);
+            ripped++;
+            if (!real) {
+                Metal.crumble(level, target, slot, stack); // gear it would never drop (a Horseman's) is never given
+                continue;
+            }
             ItemEntity item = new ItemEntity(level, target.getX(), target.getY() + target.getBbHeight() * 0.6, target.getZ(), stack.copy());
             item.setDeltaMovement((random.nextDouble() - 0.5) * 0.4, 0.3 + random.nextDouble() * 0.15, (random.nextDouble() - 0.5) * 0.4);
             item.setPickUpDelay(40);
+            if (creature) {
+                // His pull may take it at once; what fell off a player waits its 40 ticks, so the player can take it back first.
+                item.getPersistentData().putUUID(STRIPPED_BY_TAG, player.getUUID());
+            }
             level.addFreshEntity(item);
-            ripped++;
         }
         if (SpiderServer.onStripped(target)) {
             ripped++; // the nanites of an Iron Spider's suit scatter
         }
         if (ripped == 0) {
-            player.displayClientMessage(Component.translatable("message.enhanced.disarm.no_metal"), true);
+            player.displayClientMessage(Component.translatable(Metal.isMetalBody(target)
+                    ? "message.enhanced.disarm.metal_body" : "message.enhanced.disarm.no_metal"), true);
             return;
         }
         data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
