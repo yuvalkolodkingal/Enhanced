@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.build.BuildHud;
+import com.kolodkingal.enhanced.client.build.BuildKeys;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
 import com.kolodkingal.enhanced.client.render.GauntletLayer;
@@ -101,6 +103,10 @@ public final class ClientSetup {
         }
         event.register(KeyBindings.CHANGE_LOOK);
         event.register(KeyBindings.VISION_COMMAND);
+        // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).
+        for (KeyMapping key : BuildKeys.ALL) {
+            event.register(key);
+        }
     }
 
     @SubscribeEvent
@@ -211,6 +217,8 @@ public final class ClientSetup {
         // ===== ultron =====
         // ===== apocalypse =====
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("apocalypse"), new ApocalypseOverlay());
+        // 3.1: Build Magic's badge, rings, hint strip and tips.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("build_magic"), new BuildHud());
     }
 
     private ClientSetup() {

@@ -15,6 +15,10 @@ public final class BuildFx {
     public static void accept(BuildFxPayload payload) {
     }
 
+    /** Forgets every spell seen (at logout). Lane BC: called beside {@link BuildClient#clear}. */
+    public static void clear() {
+    }
+
     private BuildFx() {
     }
 }

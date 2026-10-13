@@ -1,12 +1,14 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.client.SuitSkins;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -20,7 +22,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Eyes that glow, drawn full-bright over the skin's eyes:
  * <ul>
- *     <li>the Scarlet Witch's turn red while she wields chaos magic (WandaVision finale, Multiverse of Madness);</li>
+ *     <li>the Scarlet Witch's turn red while she wields chaos magic (WandaVision finale, Multiverse of Madness), and while
+ *     she builds with it (Build Magic's build mode, which everyone who sees her knows from her {@link BuildView});</li>
  *     <li>Thor's blaze white-blue when the God of Thunder is unleashed (Ragnarok), and while he fires lightning.</li>
  * </ul>
  * The glow has to sit exactly on the eyes of the skin being drawn, and skins don't keep their eyes in one place.
@@ -48,7 +51,7 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
     @Nullable
     private static RenderType eyes(AbstractClientPlayer player, PowerData data) {
         return switch (data.power()) {
-            case SCARLET_WITCH -> data.beamActive() || data.chaosShieldActive() || data.heldEntityId() != -1
+            case SCARLET_WITCH -> data.beamActive() || data.chaosShieldActive() || data.heldEntityId() != -1 || building(player)
                     ? (SuitSkins.suitFor(player) != null ? WANDA_SUIT : WANDA) : null;
             case THOR -> data.toggle(Toggle.GOD_OF_THUNDER) || data.is(Live.CALLING_LIGHTNING)
                     ? ("ragnarok".equals(Variants.current(data).id()) ? THOR_RAGNAROK : THOR) : null;
@@ -58,6 +61,11 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
                 yield hero == null ? null : hero.eyes(player, data);
             }
         };
+    }
+
+    /** Whether this player is in build mode, as the server last synced it. */
+    private static boolean building(AbstractClientPlayer player) {
+        return player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
     }
 
     @Override

@@ -3,6 +3,10 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.build.BillyRanks;
+import com.kolodkingal.enhanced.build.BuildData;
+import com.kolodkingal.enhanced.client.build.BuildClient;
+import com.kolodkingal.enhanced.client.build.BuildKeys;
 import com.kolodkingal.enhanced.client.render.HeroClient;
 import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.ShieldStyles;
@@ -28,7 +32,10 @@ import net.minecraft.network.chat.MutableComponent;
 
 import java.util.Locale;
 
-/** Top-left panel: your hero, each ability with its key, and its current state (cooldown, on/off, ammo). */
+/**
+ * Top-left panel: your hero, each ability with its key, and its current state (cooldown, on/off, ammo). The Scarlet Witch
+ * and Billy have a sixth line, Build Magic's key and whether build mode is on (D-B 6.6).
+ */
 public class PowerHud implements LayeredDraw.Layer {
 
     @Override
@@ -57,7 +64,7 @@ public class PowerHud implements LayeredDraw.Layer {
                     .append(look.displayName().copy().withStyle(s -> s.withBold(false).withColor(ChatFormatting.GRAY)));
         }
 
-        Component[] lines = new Component[PowerData.ABILITIES];
+        Component[] lines = new Component[PowerData.ABILITIES + extraLines(power)];
         int width = font.width(title) + 4;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
@@ -70,11 +77,16 @@ public class PowerHud implements LayeredDraw.Layer {
             lines[i - 1] = line;
             width = Math.max(width, font.width(line));
         }
+        if (extraLines(power) > 0) {
+            Component line = buildLine(player, power, now);
+            lines[PowerData.ABILITIES] = line;
+            width = Math.max(width, font.width(line));
+        }
 
         int x = 4;
         // Under the boss bars, when a fight's bars and their names would run into the panel.
         int y = 4 + BossBarOverride.clearance(x + width + 4);
-        int height = 12 + PowerData.ABILITIES * 10;
+        int height = 12 + lines.length * 10;
         graphics.fill(x - 2, y - 2, x + width + 4, y + height, 0x70000000);
         graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);
         y += 12;
@@ -90,14 +102,15 @@ public class PowerHud implements LayeredDraw.Layer {
         if (hero != null) {
             return hero.hudStatus(player, data, ability, now);
         }
-        Component cooldown = cooldown(data, ability, now);
+        // (Magneto's R says which of its recharges runs: the Magnetic Pull's, never a bare cooldown.)
+        Component cooldown = data.power() == Power.MAGNETO && ability == 1 ? null : cooldown(data, ability, now);
         if (cooldown != null) {
             return cooldown;
         }
         boolean holding = data.heldEntityId() != -1;
         return switch (data.power()) {
             case MAGNETO -> switch (ability) {
-                case 1 -> holding ? active("hud.enhanced.holding") : null;
+                case 1 -> holding ? active("hud.enhanced.holding") : pullCooldown(data, now);
                 case 2 -> Component.translatable("hud.enhanced.shards", MagnetoAbilities.countAmmo(player, data))
                         .withStyle(data.shrapnelActive() ? ChatFormatting.AQUA : ChatFormatting.GRAY);
                 case 4 -> onOff(data.magneticShield());
@@ -134,6 +147,38 @@ public class PowerHud implements LayeredDraw.Layer {
             case THOR -> thor(player, data, ability);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, NONE -> null;
         };
+    }
+
+    /** How many lines the panel has after the five abilities: Build Magic's for the Scarlet Witch and Billy, else none. */
+    public static int extraLines(Power power) {
+        return BuildClient.isBuilder(power) ? 1 : 0;
+    }
+
+    /**
+     * The sixth line of the Scarlet Witch and Billy (D-B 6.6): "[Y] Build Magic" with the key's current name and ON or OFF
+     * as flight shows it; for Billy then his magic meter as it refills ("✦ 372/512", the top his rank's).
+     */
+    private static Component buildLine(LocalPlayer player, Power power, long now) {
+        MutableComponent line = Component.literal("[").append(BuildKeys.MAGIC.getTranslatedKeyMessage()).append("] ")
+                .withStyle(ChatFormatting.YELLOW)
+                .append(Component.translatable("hud.enhanced.build").withStyle(ChatFormatting.WHITE))
+                .append(Component.literal("  ")).append(onOff(BuildClient.buildMode()));
+        if (power == Power.BILLY) {
+            BuildData build = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+            int meter = (int) Math.floor(BillyRanks.meterNow(build, now));
+            line.append(Component.literal("  ")).append(Component.translatable("hud.enhanced.build.meter", meter,
+                    BillyRanks.meter(BillyRanks.rank(build))).withStyle(s -> s.withColor(Power.BILLY.color)));
+        }
+        return line;
+    }
+
+    /**
+     * Magneto's R while he holds nothing (D-M 8.3): "pull 4.9s" in grey while the Magnetic Pull recharges (the cooldown of
+     * ability 1), else nothing.
+     */
+    private static Component pullCooldown(PowerData data, long now) {
+        Component left = cooldown(data, 1, now);
+        return left == null ? null : Component.translatable("hud.enhanced.pull_cooldown", left).withStyle(ChatFormatting.GRAY);
     }
 
     /** The ability's cooldown as the HUD shows it (grey seconds), or null when it is ready. */
