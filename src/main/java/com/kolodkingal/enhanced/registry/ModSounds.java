@@ -185,6 +185,9 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_THEME_FINAL = register("apocalypse_theme_final");
     public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_DEATH = register("apocalypse_death");
 
+    // ===== 3.1 build =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_ON_WANDA = register("build_on_wanda");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }
