@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.build;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.build.SpellMath.Volume;
 import com.kolodkingal.enhanced.config.BuildConfig;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -255,6 +256,31 @@ public final class BuildSession {
 
     public void setMomSaidAt(long gameTime) {
         this.momSaidAt = gameTime;
+    }
+
+    /** The server tick the last box was shown to the others (VIEW). */
+    private long viewAt = Long.MIN_VALUE / 2;
+    private @Nullable HeldView held;
+
+    /** A VIEW that came too soon after the last: kept to be shown when its time comes. */
+    public record HeldView(BlockPos a, BlockPos b, int value) {
+    }
+
+    long viewAt() {
+        return viewAt;
+    }
+
+    void viewed(long tick) {
+        viewAt = tick;
+        held = null;
+    }
+
+    void holdView(@Nullable BlockPos a, @Nullable BlockPos b, int value) {
+        held = value == 0 ? null : new HeldView(a, b, value);
+    }
+
+    @Nullable HeldView heldView() {
+        return held;
     }
 
     /** A line to tell the builder when she next logs in. */

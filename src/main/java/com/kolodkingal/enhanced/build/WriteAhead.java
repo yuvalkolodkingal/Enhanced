@@ -86,6 +86,10 @@ final class WriteAhead {
     /** Reads the cell the cursor is on, and what its source holds for a Move: hands over what will change. */
     private void offer() {
         BlockPos pos = cursor.pos();
+        if (!chunkReady(pos)) {
+            scanned += cursor.skipColumn(); // (a chunk column that is not loaded is given up whole, as the writing cursor does)
+            return;
+        }
         if (!ready(pos)) {
             return;
         }
@@ -106,6 +110,13 @@ final class WriteAhead {
                 journal.add(from.asLong(), source, oldData(from, source), emptied, null);
             }
         }
+    }
+
+    /** Whether the cell's chunk is one of the job's and loaded. */
+    private boolean chunkReady(BlockPos pos) {
+        int cx = SectionPos.blockToSectionCoord(pos.getX());
+        int cz = SectionPos.blockToSectionCoord(pos.getZ());
+        return chunks.contains(ChunkPos.asLong(cx, cz)) && loaded.test(cx, cz) && SpellMath.loaded(level, pos);
     }
 
     /** Whether the cell is one the job may change now: inside the world, in a chunk of its set that is loaded. */

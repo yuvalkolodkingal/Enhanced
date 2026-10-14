@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -68,7 +69,8 @@ import java.util.function.LongSupplier;
  */
 public final class BuildMagic {
     /** How often the box the others see may change (ticks): at most 4 times a second. */
-    private static final int VIEW_TICKS = 5;
+    /** The least ticks between two boxes shown to the others (D-B 13.1: at most 4 times a second). */
+    static final int VIEW_TICKS_MIN = 4;
     /**
      * How many cells a preflight's flood (a selected thing, a Pull's surface) may read, within the preflight's 2 ms,
      * before it answers in part.
@@ -100,9 +102,15 @@ public final class BuildMagic {
             dropped(player, session, now);
             return; // C6: dropped
         }
+        if (!legalOp(recipe.spell(), recipe.op())) {
+            return; // a pair no client sends (a Fill's dabs, a Vanish's take): dropped, as a request over the bucket
+        }
         boolean preflight = (flags & BuildCastPayload.PREFLIGHT) != 0;
         if (preflight && !session.takePreflight(now)) {
             return;
+        }
+        if (preflight) {
+            flags &= ~BuildCastPayload.HELD_LONG; // (a preview never gets past the long hold's refusal: no giant look)
         }
         boolean dab = recipe.op() == SpellRecipe.Op.DAB && !preflight;
         if (dab && (!session.takeDab(now) || session.painted(recipe.stroke()))) {
@@ -577,19 +585,48 @@ public final class BuildMagic {
         }
     }
 
-    /** The box the others see while she builds (at most 4 times a second): {@code value} 0 for none, else the spell + 1. */
+    /**
+     * The box the others see while she builds (at most 4 times a second): {@code value} 0 for none, else the spell + 1. One
+     * that comes within {@value #VIEW_TICKS_MIN} ticks of the last is kept and shown when its time comes (the newest
+     * wins), so the last box she drew is never lost; the corners are clamped inside the world and within her reach
+     * and side of her (D-B 13.4).
+     */
     private static void view(ServerPlayer player, BlockPos a, BlockPos b, int value) {
         BuildSession session = BuildSession.of(player.getUUID());
-        if (!session.mode() || value != 0 && player.tickCount % VIEW_TICKS != 0) {
+        if (!session.mode()) {
             return;
         }
+        long now = player.server.getTickCount();
+        if (value != 0 && now - session.viewAt() < VIEW_TICKS_MIN) {
+            session.holdView(a, b, value);
+            return;
+        }
+        showView(player, session, a, b, value, now);
+    }
+
+    private static void showView(ServerPlayer player, BuildSession session, BlockPos a, BlockPos b, int value, long now) {
+        session.viewed(now);
         BuildView view = player.getData(ModAttachments.BUILD_VIEW);
         Spell spell = value == 0 ? view.spell() : Spell.byId(value - 1);
-        Optional<BuildView.Box> box = value == 0 ? Optional.empty() : Optional.of(new BuildView.Box(a, b));
+        Optional<BuildView.Box> box = Optional.empty();
+        Limits limits = Limits.of(player);
+        if (value != 0 && limits != null) {
+            BoundingBox world = limits.world();
+            long span = (long) limits.reach() + limits.side() + 2;
+            Vec3 eyes = player.getEyePosition();
+            box = Optional.of(new BuildView.Box(clampView(a, world, eyes, span), clampView(b, world, eyes, span)));
+        }
         BuildView next = view.withSpell(spell, box);
         if (!next.equals(view)) {
             player.setData(ModAttachments.BUILD_VIEW, next);
         }
+    }
+
+    private static BlockPos clampView(BlockPos at, BoundingBox world, Vec3 eyes, long span) {
+        int x = (int) Mth.clamp(Mth.clamp(at.getX(), world.minX(), world.maxX()), eyes.x - span, eyes.x + span);
+        int y = (int) Mth.clamp(Mth.clamp(at.getY(), world.minY(), world.maxY()), eyes.y - span, eyes.y + span);
+        int z = (int) Mth.clamp(Mth.clamp(at.getZ(), world.minZ(), world.maxZ()), eyes.z - span, eyes.z + span);
+        return new BlockPos(x, y, z);
     }
 
     /**
@@ -641,6 +678,19 @@ public final class BuildMagic {
 
     // ------------------------------------------------------------------------------------------------------------
     // Undo and redo (D-B 12.2)
+
+    /**
+     * Whether a client can send this op for this spell (D-B 13.4: a spell and an op that are each legal are not always a
+     * legal pair): the brushes cast or dab, a Copy takes or stamps, a Move picks up or puts down, the rest cast.
+     */
+    static boolean legalOp(Spell spell, SpellRecipe.Op op) {
+        return switch (spell) {
+            case PAINT, LAND, GROW -> op == SpellRecipe.Op.CAST || op == SpellRecipe.Op.DAB;
+            case COPY -> op == SpellRecipe.Op.TAKE || op == SpellRecipe.Op.STAMP;
+            case MOVE -> op == SpellRecipe.Op.PICK_UP || op == SpellRecipe.Op.PUT_DOWN;
+            default -> op == SpellRecipe.Op.CAST;
+        };
+    }
 
     /** Ctrl + Z (also with build mode off, R42): see the class comment. */
     public static void undo(ServerPlayer player) {
@@ -694,7 +744,11 @@ public final class BuildMagic {
             // Its cells are on disk: read in the background, then Ctrl + Z goes on (a step whose file is gone is dropped).
             UndoFiles.loadStepLater(player.server, history, step, ok -> {
                 if (!player.hasDisconnected()) {
-                    undo(player);
+                    if (ok) {
+                        undo(player);
+                    } else {
+                        player.displayClientMessage(BillyMagic.forgotten(), true); // (its file is gone: the next Ctrl + Z takes the next)
+                    }
                 }
             });
             return;
@@ -732,7 +786,11 @@ public final class BuildMagic {
         if (!step.loaded()) {
             UndoFiles.loadStepLater(player.server, history, step, ok -> {
                 if (!player.hasDisconnected()) {
-                    redo(player);
+                    if (ok) {
+                        redo(player);
+                    } else {
+                        player.displayClientMessage(BillyMagic.forgotten(), true);
+                    }
                 }
             });
             return;
@@ -927,6 +985,14 @@ public final class BuildMagic {
             }
             if (stroke != null && !stroke.closing() && now - stroke.lastDab >= Stroke.CLOSES_AFTER) {
                 closeStroke(stroke, server);
+            }
+            BuildSession.HeldView held = session.heldView();
+            if (held != null && now - session.viewAt() >= VIEW_TICKS_MIN) {
+                ServerPlayer viewer = server.getPlayerList().getPlayer(session.player());
+                session.holdView(null, null, 0);
+                if (viewer != null && session.mode()) {
+                    showView(viewer, session, held.a(), held.b(), held.value(), now);
+                }
             }
             if (session.mode() && now % MOM_TICKS == 0) {
                 ServerPlayer builder = server.getPlayerList().getPlayer(session.player());

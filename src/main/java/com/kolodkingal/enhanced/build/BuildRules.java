@@ -25,7 +25,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
@@ -524,7 +526,7 @@ public final class BuildRules {
             if (BlockRights.massEditRefuses(player, level, pos)) {
                 return Left.PROTECTED;
             }
-            if (!bodies.isEmpty() && !now.getCollisionShape(level, pos).isEmpty()) {
+            if (!bodies.isEmpty() && endangers(now, pos)) {
                 AABB cell = new AABB(pos);
                 for (AABB body : bodies) {
                     if (body.intersects(cell)) {
@@ -542,6 +544,20 @@ public final class BuildRules {
                 return Left.PROTECTED;
             }
             return null;
+        }
+
+        /**
+         * Whether {@code now} at {@code pos} would harm or bury someone standing there: a block with a collision shape, a
+         * fluid, fire, TNT, lava, and the blocks that hold or hurt a body (powder snow, cobweb, berry bushes, campfires,
+         * magma).
+         */
+        private boolean endangers(BlockState now, BlockPos pos) {
+            if (now.isAir()) {
+                return false;
+            }
+            return !now.getCollisionShape(level, pos).isEmpty() || !now.getFluidState().isEmpty() || now.is(ModTags.BUILD_VOLATILE)
+                    || now.is(Blocks.POWDER_SNOW) || now.is(Blocks.COBWEB) || now.is(Blocks.SWEET_BERRY_BUSH) || now.is(Blocks.MAGMA_BLOCK)
+                    || now.is(Blocks.WITHER_ROSE) || now.is(BlockTags.FIRE) || now.is(BlockTags.CAMPFIRES);
         }
 
         /** Whether the last {@link #check} wants the container spilled before the cell is written. */
@@ -590,6 +606,11 @@ public final class BuildRules {
         /** Counts a cell left for {@code why}. */
         public void left(Left why) {
             left[why.ordinal()]++;
+        }
+
+        /** Counts {@code cells} cells left for {@code why}. */
+        public void left(Left why, long cells) {
+            left[why.ordinal()] += cells;
         }
 
         /** How many cells were left for {@code why}. */
@@ -713,6 +734,7 @@ public final class BuildRules {
         private final ServerLevel level;
         private final Cells rules;
         private final boolean carried;
+        private final SpellMath.@Nullable Volume region;
         private final LongArrayList marks = new LongArrayList();
         private final ByteArrayList kinds = new ByteArrayList();
         private long changed;
@@ -724,6 +746,7 @@ public final class BuildRules {
             this.level = level;
             this.rules = new Cells(level, player);
             this.carried = plan.recipe().spell() == Spell.MOVE;
+            this.region = carried ? plan.region() : null;
         }
 
         /** Checks one cell; {@code now} reads what it gets (only once its chunk is known to be loaded). */
@@ -742,7 +765,9 @@ public final class BuildRules {
             if (state == null || state.equals(old)) {
                 return;
             }
-            Left why = rules.check(pos, old, state, !carried, carried);
+            // (a Move carries the contents of its source cells; a chest it lands on from outside is as safe from it as from a Fill)
+            boolean carries = region != null && region.contains(pos.getX(), pos.getY(), pos.getZ());
+            Left why = rules.check(pos, old, state, !carried, carries);
             if (why != null) {
                 mark(pos, switch (why) {
                     case BEYOND -> BuildVerdictPayload.MARK_BEYOND;

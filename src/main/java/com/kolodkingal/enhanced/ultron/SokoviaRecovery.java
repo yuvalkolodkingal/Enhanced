@@ -40,7 +40,7 @@ import java.util.UUID;
  *     set aside and the world is not touched on its account. A note whose island was never placed (it was only about to
  *     be) clears nothing, which is the same job. A note of an island that had landed (kept until two saves hold the
  *     landing, R48) is recovered quietly: its column is looked over once more (normally there is nothing left to
- * clear),     nothing is owed, and nobody is moved (the descent set everyone down).</li>
+ *     clear), nothing is owed, and nobody is moved (the descent set everyone down).</li>
  *     <li><b>The players.</b> Whoever the note lists is given a record to be set down on the ground when they next log
  *     in inside the box where the island was ({@link SokoviaRelocations}); a player who was saved while carried, with
  *     the lift's marks on them, gets their gravity back and, if they hang in the air, is set down on the ground.</li>

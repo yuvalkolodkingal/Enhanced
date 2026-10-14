@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.build;
 
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.BlockRights;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.Telekinesis;
@@ -158,6 +159,8 @@ public final class BuildJob {
     private static final int WAIT = 1;
     private static final int CHANGED = 2;
 
+    /** A box wider than this many chunk columns whose loaded part is under 1 % is not walked (D-B 11.7). */
+    private static final long MAX_COLUMNS = 1_000_000L;
     /** The most chunks of a plan's box asked one by one at the cast; a bigger box takes the level's loaded chunks. */
     private static final int ASKED_CHUNKS = 65_536;
     private static final Method GET_CHUNKS = ObfuscationReflectionHelper.findMethod(ChunkMap.class, "getChunks");
@@ -204,6 +207,8 @@ public final class BuildJob {
     private @Nullable SpellPlanner.Cursor cursor;
     private @Nullable UndoStep.Walk walk;
     private int sideIndex;
+    /** Its step would weigh too much in memory while it works: only its cells' bits are kept, its records on disk are its step. */
+    private boolean lite;
     /** Its record would not fit in what its player may keep (D-B 12.5): it runs, held for, without a step. */
     private boolean noStep;
     /** Where its undo records are written ahead (C13), or null when the history is not written to disk. */
@@ -684,8 +689,20 @@ public final class BuildJob {
         }
         bookBilly();
         step.setState(UndoStep.State.DONE);
-        UndoHistory.of(caster).push(step, limits.undoSteps());
+        if (!keepsStep()) {
+            // Nothing was kept to take it back with: it stops where it is.
+            UndoFiles.discard(UndoHistory.of(caster), step);
+            fx(BuildFxPayload.STOPPED);
+            endJournal();
+            return null;
+        }
+        UndoHistory history = UndoHistory.of(caster);
+        history.push(step, limits.undoSteps());
         endJournal();
+        if (!step.loaded() && !UndoFiles.load(history, step)) {
+            fx(BuildFxPayload.STOPPED);
+            return null; // (a lite step reads back from its records: they could not be read)
+        }
         return replay(player, limits, level, step, false, true, loaded);
     }
 
@@ -717,7 +734,10 @@ public final class BuildJob {
         } else {
             refundUndo();
         }
-        if (kind == Kind.SPELL && step.changed() > 0) {
+        if (kind == Kind.SPELL && step.changed() > 0 && !keepsStep()) {
+            step.setState(UndoStep.State.DONE); // (nothing was kept to take it back with)
+            UndoFiles.discard(UndoHistory.of(caster), step);
+        } else if (kind == Kind.SPELL && step.changed() > 0) {
             step.setState(UndoStep.State.INTERRUPTED);
             step.setTell(line != null);
             UndoHistory.of(caster).push(step, limits.undoSteps());
@@ -731,6 +751,35 @@ public final class BuildJob {
             UndoFiles.sealed(UndoHistory.of(caster), step); // (what it did of the step is on disk)
         }
         endJournal();
+    }
+
+    /**
+     * The job threw while it worked ({@link BuildScheduler} catches it): it ends where it is as an interrupted step, so what
+     * it did can be undone, its tickets and records are let go, and its caster is told. Whatever goes wrong while it ends
+     * (the same cell again) only ends the job.
+     */
+    public void fail(RuntimeException cause) {
+        Enhanced.LOGGER.error("Build Magic: the {} of {} (job {}) failed and was stopped", kind.name().toLowerCase(java.util.Locale.ROOT), profile.getName(), id,
+                cause);
+        try {
+            interrupt(null);
+        } catch (RuntimeException again) {
+            Enhanced.LOGGER.error("Build Magic: job {} could not be ended cleanly", id, again);
+        }
+        releaseTickets();
+        finished = true;
+        if (endCode < 0) {
+            endCode = BuildVerdictPayload.STOPPED;
+        }
+        ServerPlayer online = online();
+        if (online != null) {
+            online.displayClientMessage(Component.translatable("message.enhanced.build.stopped_mode"), true);
+        }
+        try {
+            BuildMagic.sync(level.getServer(), caster);
+        } catch (RuntimeException ignored) {
+            // (the caster's HUD catches up with the next sync)
+        }
     }
 
     /** The job is dropped (it never started, or the server forgets it): its tickets go, nothing else happens. */
@@ -821,7 +870,7 @@ public final class BuildJob {
      */
     private void checkStillAllowed() {
         BoundingBox box = bounds();
-        if (box != null && fightBegan() && BossFights.overlapsAny(level, box)) {
+        if (box != null && fightBeganOver(box)) {
             stop(BuildVerdictPayload.STOPPED_FIGHT);
         } else {
             ServerPlayer online = online();
@@ -838,14 +887,25 @@ public final class BuildJob {
         }
     }
 
-    /** Whether a fight of this level runs now that did not when the spell was cast. */
-    private boolean fightBegan() {
+    /** Whether a fight of this level that did not run when the spell was cast has its arena over {@code box}. */
+    private boolean fightBeganOver(BoundingBox box) {
         for (BossFight fight : BossFights.all(level.getServer())) {
-            if (fight.level() == level && !fightsAtCast.contains(fight)) {
+            if (fight.level() == level && !fightsAtCast.contains(fight) && meets(fight.arena(), box)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /** Whether the arena's cylinder (round its centre, between its bottom and top) reaches the box. */
+    private static boolean meets(com.kolodkingal.enhanced.boss.BossArena arena, BoundingBox box) {
+        if (box.maxY() + 1.0 < arena.bottom() || box.minY() > arena.top() + 1.0) {
+            return false;
+        }
+        Vec3 center = arena.center();
+        double dx = Math.max(Math.max(box.minX() - center.x, 0.0), center.x - (box.maxX() + 1.0));
+        double dz = Math.max(Math.max(box.minZ() - center.z, 0.0), center.z - (box.maxZ() + 1.0));
+        return dx * dx + dz * dz <= arena.radius() * arena.radius();
     }
 
     /** The caster while he is online and alive; else a fake player of his profile (10.3). */
@@ -924,13 +984,19 @@ public final class BuildJob {
             refuse(BuildVerdictPayload.HOLD, size, BuildRules.message(BuildVerdictPayload.HOLD, size));
             return false;
         }
-        if (stroke == null && plan.writes() && !UndoCaps.fits(size, plan.bounds())) {
-            // "Too big to remember: this one can't be undone. Hold to cast it anyway": it then runs without a step.
-            if ((flags & BuildCastPayload.HELD_LONG) == 0) {
-                refuse(BuildVerdictPayload.NO_UNDO_ROOM, size, BuildRules.message(BuildVerdictPayload.NO_UNDO_ROOM, size));
-                return false;
+        if (stroke == null && plan.writes()) {
+            UndoCaps.Room room = UndoCaps.room(recipe.spell(), size, plan.bounds());
+            if (room == UndoCaps.Room.NONE) {
+                // "Too big to remember: this one can't be undone. Hold to cast it anyway": it then runs without a step. (A Move
+                // needs its cells whole to be safe, so it is refused whatever is held.)
+                if (recipe.spell() == Spell.MOVE || (flags & BuildCastPayload.HELD_LONG) == 0) {
+                    refuse(BuildVerdictPayload.NO_UNDO_ROOM, size, BuildRules.message(BuildVerdictPayload.NO_UNDO_ROOM, size));
+                    return false;
+                }
+                noStep = true;
+            } else if (room == UndoCaps.Room.LITE) {
+                lite = true;
             }
-            noStep = true;
         }
         if (needsCapture()) {
             phase = Phase.CAPTURE;
@@ -987,6 +1053,26 @@ public final class BuildJob {
                 : LandBrush.reach(recipe.anchor(), recipe.size(), recipe.landStyle());
     }
 
+    /** The sections of the area a Copy or a Repeat reads, by whether its caster may break there (the break event asked once). */
+    private final it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap mayRead = new it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap();
+
+    /**
+     * Whether a Copy or a Repeat may keep what the container at {@code pos} holds: only where its caster may break (no
+     * claim, arena, Hex or spawn protection refuses; the break event is asked once for the section). Else the pocket gets the
+     * bare block: a claim's vault is not copied.
+     */
+    private boolean mayReadContents(BlockPos pos, BlockState state) {
+        ServerPlayer actor = rules.player();
+        if (BlockRights.massEditRefuses(actor, level, pos) || !BlockRights.vanillaRights(actor, level, pos)) {
+            return false;
+        }
+        long key = SectionPos.asLong(pos);
+        if (!mayRead.containsKey(key)) {
+            mayRead.put(key, BlockRights.postBreak(actor, level, pos, state));
+        }
+        return mayRead.get(key);
+    }
+
     /** Copy's take, a Move's put-down and a Repeat read their source first. */
     private boolean needsCapture() {
         return switch (recipe.spell()) {
@@ -1007,6 +1093,9 @@ public final class BuildJob {
             Pocket.Contents contents = recipe.spell() == Spell.MOVE ? Pocket.Contents.ALL : Pocket.Contents.of(limits);
             taker = Pocket.take(level, region, contents, recipe.spell() == Spell.COPY ? Pocket.nextId() : 0,
                     (x, z) -> chunks.contains(ChunkPos.asLong(x, z)) && loaded.test(x, z));
+            if (recipe.spell() != Spell.MOVE) {
+                taker.reading(this::mayReadContents); // (a Move needs the right to break what it empties: P8, P9, P10)
+            }
             if (recipe.spell() == Spell.MOVE && BuildConfig.MOVE_CARRIES_CREATURES.get()) {
                 board(region);
             }
@@ -1014,7 +1103,7 @@ public final class BuildJob {
         int reads = slice.reads();
         boolean done = taker.step(reads);
         slice.use((long) reads * READ);
-        if (recipe.spell() == Spell.COPY && taker.bytes() > (long) BuildConfig.POCKET_MAX_MB.get() << 20) {
+        if (taker.bytes() > (long) BuildConfig.POCKET_MAX_MB.get() << 20) {
             // Too big to keep in her pocket (D-B 4.8): the pocket she holds stays as it was.
             taker = null;
             refuse(BuildVerdictPayload.POCKET_TOO_BIG, BuildConfig.POCKET_MAX_MB.get(), BuildRules.message(BuildVerdictPayload.POCKET_TOO_BIG, 0));
@@ -1158,6 +1247,21 @@ public final class BuildJob {
         volume = Math.max(1, plan.size());
         cursor = plan.cursor();
         phase = Phase.APPLY;
+        step.setFxOrder(plan.order());
+        if (lite || noStep) {
+            step.makeLite();
+        }
+        BoundingBox all = plan.bounds();
+        if (kind == Kind.SPELL && stroke == null && chunksKnown && all != null) {
+            long columns = (long) ((all.maxX() >> 4) - (all.minX() >> 4) + 1) * ((all.maxZ() >> 4) - (all.minZ() >> 4) + 1);
+            if (chunks.isEmpty() || columns > MAX_COLUMNS && (long) chunks.size() * 100L < columns) {
+                // Nothing of it is loaded (or so little of a box so wide that walking its columns would be the whole job): it
+                // ends at once, every cell counted as too far away.
+                rules.left(Left.UNLOADED, plan.size());
+                phase = Phase.DONE;
+                return;
+            }
+        }
         journal = noStep ? null : UndoFiles.journal(UndoHistory.of(caster), step);
         if (journal != null) {
             ahead = new WriteAhead(level, plan, journal, loaded, chunks, recipe.spell() == Spell.MOVE && source != null);
@@ -1181,6 +1285,9 @@ public final class BuildJob {
         while (true) {
             if (stopCode >= 0) {
                 riders.clear(); // (stopped: what it took along stays where it stood)
+                if (!clearMovedCovered()) {
+                    return false;
+                }
                 toSettle();
                 return true;
             }
@@ -1210,6 +1317,14 @@ public final class BuildJob {
             walked++;
             walkedThisTick++;
             if (ready == 0) {
+                long skipped = cursor.skipColumn();
+                if (skipped > 0) {
+                    // A whole chunk column that is not loaded goes at once, counted by the cells of its box.
+                    rules.left(Left.UNLOADED, skipped);
+                    walked += skipped;
+                    slice.use(SKIP);
+                    continue;
+                }
                 rules.left(Left.UNLOADED);
                 slice.use(SKIP);
                 continue;
@@ -1580,7 +1695,7 @@ public final class BuildJob {
             partner.write(this);
         }
         write(pos, old, now, data, spill);
-        if (paying) {
+        if (paying && !spill) { // (a container that spilled gave its own item with its contents)
             giveItems(pos, old);
             if (partner != null) {
                 giveItems(partner.pos, partner.old);
@@ -1751,7 +1866,11 @@ public final class BuildJob {
             rules.left(Left.CHANGED);
             return 0;
         }
-        Left why = writeTarget ? rules.check(pos, old, now, false, true) : null;
+        // P7: the contents of the cells of the Move's own source were captured and are moved; a chest the Move lands on from
+        // outside is protected as from a Fill (kept, or spilled).
+        boolean carriedTarget = plan.region() != null && plan.region().contains(pos.getX(), pos.getY(), pos.getZ());
+        Left why = writeTarget ? rules.check(pos, old, now, false, carriedTarget) : null;
+        boolean spillTarget = writeTarget && why == null && rules.spills();
         if (why == null && clearSource) {
             why = rules.check(src, srcNow, emptied, false, true);
         }
@@ -1773,7 +1892,10 @@ public final class BuildJob {
         // Whatever the target held of a source moved earlier is accounted for: it now holds this cell's copy.
         movedCovered.remove(pos.asLong());
         if (writeTarget) {
-            write(pos, old, now, data, false);
+            write(pos, old, now, data, spillTarget);
+            if (clearSource && data != null && !src.equals(pos)) {
+                step.link(src, pos); // (the contents are in one of the two places: see the replay)
+            }
         }
         // What hangs on the source's block goes with it.
         carryHangers(src);
@@ -1925,6 +2047,29 @@ public final class BuildJob {
             counted = true;
         }
         return 1;
+    }
+
+    /**
+     * A Move that stops half way leaves no block twice: each source cell it moved but did not clear (its target was to
+     * cover it) is emptied now, by the rules of a refused target. False while a record for such a cell is on its way.
+     */
+    private boolean clearMovedCovered() {
+        if (movedCovered.isEmpty()) {
+            return true;
+        }
+        for (long key : movedCovered.toLongArray()) {
+            BlockPos pos = BlockPos.of(key);
+            if (!SpellMath.loaded(level, pos) || SpellMath.outside(level, pos)) {
+                movedCovered.remove(key);
+                continue;
+            }
+            BlockState here = level.getBlockState(pos);
+            if (journal != null && !journal.failed() && cover(pos, here, SpellMath.vanished(here), null, false) == WAIT) {
+                return false;
+            }
+            failed(pos, here);
+        }
+        return true;
     }
 
     /**
@@ -2190,10 +2335,23 @@ public final class BuildJob {
             if (!body.isAlive() || body.level() != level || Telekinesis.isHeld(body) || !within(inside, body.getBoundingBox())) {
                 continue;
             }
+            // Only a creature whose cell (or the one under it) the Move really moved, where its caster may build, and where
+            // there is room for it, goes along: a Move whose blocks were refused or kept leaves the animals where they stand.
+            BlockPos at = body.blockPosition();
+            if (kept.contains(at.asLong()) || kept.contains(at.below().asLong())) {
+                continue; // (the cell it stands in, or on, stayed: a claim refused it, or someone changed it)
+            }
+            ServerPlayer actor = rules.player();
+            if (BlockRights.massEditRefuses(actor, level, at) || !BlockRights.vanillaRights(actor, level, at)) {
+                continue;
+            }
             Vec3 feet = body.position();
             Vec3 to = plan.carried(feet);
             Vec3 head = plan.carried(feet.add(0.0, body.getBbHeight(), 0.0));
             if (to == null || head == null) {
+                continue;
+            }
+            if (!level.noCollision(body, body.getBoundingBox().move(to.x - feet.x, Math.min(to.y, head.y) - feet.y, to.z - feet.z))) {
                 continue;
             }
             float yaw = plan.carriedYaw(body.getYRot());
@@ -2308,14 +2466,31 @@ public final class BuildJob {
             // of a spell a crash cut short are known by their block only (the records hold what it was to put there).
             boolean holds = undo && step.recovered() ? step.recoveredHolds(pos, here, hashOf(pos, here))
                     : here.equals(expected) && (!undo || hashOf(pos, here) == expectedHash);
+            if (holds && !undo && here.hasBlockEntity()) {
+                // A redo does not wipe what was put into a container since the undo (D-B 12.3): the cell must hold what the
+                // undo put back (its hash), or, for a block put back bare, nothing in it.
+                long put = walk.restoredHash();
+                holds = put != 0L ? hashOf(pos, here) == put : !BuildRules.holdsItems(level, pos, level.getBlockEntity(pos));
+            }
             if (!holds) {
                 walk.setStatus(UndoStep.DROPPED);
-                rules.left(Left.CHANGED);
+                if (!(undo && step.recovered() && here.equals(walk.oldState()))) {
+                    rules.left(Left.CHANGED); // (a recorded cell the spell never reached holds what it found: nothing to say)
+                }
                 slice.use(SKIP);
                 continue;
             }
             BlockState target = undo ? walk.oldState() : walk.newState();
             CompoundTag data = undo ? walk.oldData() : walk.newData();
+            if (data != null) {
+                // What a Move took from a container to another cell comes back to only one of them: an undo gives the
+                // source its contents only if the target was undone, a redo writes the target's only if the source was
+                // cleared again; else the block comes without them.
+                BlockPos other = undo ? step.linkedTarget(pos) : step.linkedSource(pos);
+                if (other != null && step.status(other) != (undo ? UndoStep.UNDONE : UndoStep.APPLIED)) {
+                    data = null;
+                }
+            }
             if (!slice.section(level, pos)) {
                 holding = true;
                 walked--;
@@ -2355,6 +2530,8 @@ public final class BuildJob {
             long hash = place(at, target, data);
             if (!undo) {
                 walk.rehash(hash);
+            } else if (target.hasBlockEntity()) {
+                walk.setRestoredHash(hash);
             }
             walk.setStatus(undo ? UndoStep.UNDONE : UndoStep.APPLIED);
             for (UndoStep.Carried thing : step.carriedOn(at, undo)) {
@@ -2455,8 +2632,8 @@ public final class BuildJob {
                 continue;
             }
             BlockState here = level.getBlockState(pos);
-            if (!here.equals(expected)) {
-                continue;
+            if (expected != null && !here.equals(expected)) {
+                continue; // (a lite step has no states to compare)
             }
             boolean outside = false;
             for (Direction direction : Direction.values()) {
@@ -2508,6 +2685,9 @@ public final class BuildJob {
         ServerPlayer actor = rules.player();
         if (SpellMath.untouchable(before, level, pos) || BlockRights.massEditRefuses(actor, level, pos) || !BlockRights.vanillaRights(actor, level, pos)) {
             return false;
+        }
+        if (before.hasBlockEntity() && before.getBlock() != after.getBlock()) {
+            return false; // (a sign or a banner that would pop off stays: its text is not in the step, vanilla breaks it, with its drop, in its turn)
         }
         return before.getBlock() == after.getBlock() || before.isAir() || BlockRights.postBreak(actor, level, pos, before);
     }
@@ -2569,6 +2749,14 @@ public final class BuildJob {
         }
     }
 
+    /**
+     * Whether the step of this spell can be kept: it was not run without one, and a step that lives on its records alone has
+     * them (the disk did not fail while it worked).
+     */
+    private boolean keepsStep() {
+        return !noStep && !(step.isLite() && (step.journal == null || step.journal.failed()));
+    }
+
     private void finishSpell() {
         if (stroke != null) {
             finishDab();
@@ -2577,8 +2765,9 @@ public final class BuildJob {
         ServerPlayer online = online();
         boolean changed = step.changed() > 0;
         bookBilly(); // (before the step is sealed: its file holds Billy's cost and practice)
-        if (changed && noStep) {
+        if (changed && !keepsStep()) {
             step.setState(UndoStep.State.DONE); // (too big to remember: nothing is kept, nothing can be undone)
+            UndoFiles.discard(UndoHistory.of(caster), step);
         } else if (changed) {
             step.setState(UndoStep.State.DONE);
             int forgotten = UndoHistory.of(caster).push(step, limits.undoSteps());
@@ -2600,6 +2789,7 @@ public final class BuildJob {
         BoundingBox box = step.bounds();
         if (box != null && stopCode < 0) {
             BuildSounds.done(level, box.getCenter().getCenter());
+            burst(Vec3.atCenterOf(new BlockPos(box.getCenter().getX(), box.maxY() + 1, box.getCenter().getZ())));
         }
         tellDone(online, caster, limits, token, code, this.changed, cost, rules, outOf != null ? ranOut() : null);
         BuildMagic.sync(level.getServer(), caster);
@@ -2777,6 +2967,23 @@ public final class BuildJob {
         BuildMagic.billy(level.getServer(), caster, back, changed, -1);
     }
 
+    /** D-B 7.2: 40 sparks at the top middle of a spell that is done. */
+    private void burst(Vec3 at) {
+        int colour = hero == Power.BILLY ? Power.BILLY.color : Power.SCARLET_WITCH.color;
+        level.sendParticles(new EnergyParticleOptions(colour, 1.0F), at.x, at.y, at.z, 40, 0.8, 0.4, 0.8, 0.05);
+    }
+
+    /** D-B 7.2: 20 sparks drift from the middle of an undone spell to its caster. */
+    private void drift(BoundingBox box) {
+        Vec3 from = Vec3.atCenterOf(box.getCenter());
+        Vec3 to = (online() != null ? online().getEyePosition() : eyes);
+        Vec3 way = to.subtract(from).normalize().scale(0.3);
+        int colour = hero == Power.BILLY ? Power.BILLY.color : Power.SCARLET_WITCH.color;
+        for (int i = 0; i < 20; i++) {
+            level.sendParticles(new EnergyParticleOptions(colour, 1.0F), from.x, from.y, from.z, 0, way.x, way.y, way.z, 1.0);
+        }
+    }
+
     private void finishUndo() {
         step.setState(step.applied() > 0 ? UndoStep.State.PARTLY : UndoStep.State.UNDONE);
         UndoHistory history = UndoHistory.of(caster);
@@ -2788,6 +2995,10 @@ public final class BuildJob {
         endCode = rewind ? BuildVerdictPayload.STOPPED : partly ? BuildVerdictPayload.UNDONE_PARTLY : BuildVerdictPayload.UNDONE;
         refundUndo();
         fx(BuildFxPayload.DONE);
+        BoundingBox undoneBox = step.bounds();
+        if (undoneBox != null && changed > 0) {
+            drift(undoneBox);
+        }
         if (online != null) {
             int count = (int) Math.min(Integer.MAX_VALUE, restored);
             send(online, new BuildVerdictPayload(token, endCode, count, 0, (int) Math.min(Integer.MAX_VALUE, kept), rules.flags()));
@@ -2911,7 +3122,11 @@ public final class BuildJob {
         ServerPlayer online = online();
         BlockPos origin = new BlockPos(Math.clamp((long) Math.floor(eyes.x), box.minX(), box.maxX()), Math.clamp((long) Math.floor(eyes.y), box.minY(),
                 box.maxY()), Math.clamp((long) Math.floor(eyes.z), box.minZ(), box.maxZ()));
-        int order = plan != null && plan.prepared() ? plan.order() : kind == Kind.UNDO ? BuildFxPayload.MELT : BuildFxPayload.RISE;
+        int order = plan != null && plan.prepared() ? plan.order() : step.fxOrder();
+        if (kind == Kind.REDO) {
+            // (the client plays an undo's ripple backwards: a redo writes the way the spell did, so its band sweeps the other way round)
+            order = order == BuildFxPayload.RISE ? BuildFxPayload.MELT : order == BuildFxPayload.MELT ? BuildFxPayload.RISE : order;
+        }
         int kindOfMoment = kind != Kind.SPELL && moment == BuildFxPayload.START ? BuildFxPayload.UNDO_START : moment;
         if (stroke != null && moment == BuildFxPayload.START) {
             stroke.fxId = id; // (the stroke's first dab starts its effects; its seal ends them)

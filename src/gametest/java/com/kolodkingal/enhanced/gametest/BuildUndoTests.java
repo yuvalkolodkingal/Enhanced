@@ -580,13 +580,13 @@ public final class BuildUndoTests {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         folder(f);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
-        BoundingBox small = new BoundingBox(1, 2, 1, 3, 4, 3);
-        UndoCaps.use(1L << 40, UndoCaps.estimate(27, abs(f, small)), 1L << 40, 1L << 40);
+        BoundingBox small = new BoundingBox(1, 2, 1, 1, 2, 1);
+        UndoCaps.use(1L << 40, UndoCaps.estimate(1, abs(f, small)), 1L << 40, 1L << 40);
         BoundingBox big = new BoundingBox(5, 2, 5, 14, 10, 14);
         cast(wanda, boxSpell(f, Spell.FILL, small));
         UndoFiles.drain();
         finish(wanda);
-        check(count(f, small, Blocks.STONE) == 27 && BuildTestSupport.steps(wanda).size() == 1, "27 cells fit: a step is kept");
+        check(count(f, small, Blocks.STONE) == 1 && BuildTestSupport.steps(wanda).size() == 1, "one cell fits: a step is kept");
         BuildTestSupport.Seen.of(wanda);
         cast(wanda, boxSpell(f, Spell.FILL, big));
         finish(wanda);

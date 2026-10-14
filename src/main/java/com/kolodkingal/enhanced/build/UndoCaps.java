@@ -97,16 +97,65 @@ public final class UndoCaps {
         return cells * 6 / 10 + sections * 700;
     }
 
-    /**
-     * Whether the record of a spell of {@code cells} cells in {@code box} fits in what one player may keep: his disk when
-     * the history is written, else his memory (D-B 12.5). A spell that does not asks for the long hold and runs without a
-     * step.
-     */
-    static boolean fits(long cells, @Nullable BoundingBox box) {
-        if (!configured()) {
-            return true;
+    /** What a step of {@code cells} cells in {@code box} weighs in memory while its spell works, about: 14 bytes a cell and 12 KiB a section. */
+    public static long memoryEstimate(long cells, @Nullable BoundingBox box) {
+        return cells * 14 + sectionsOf(cells, box) * 12288L;
+    }
+
+    private static long sectionsOf(long cells, @Nullable BoundingBox box) {
+        long sections = 1;
+        if (box != null) {
+            sections = (long) ((box.maxX() >> 4) - (box.minX() >> 4) + 1) * ((box.maxY() >> 4) - (box.minY() >> 4) + 1)
+                    * ((box.maxZ() >> 4) - (box.minZ() >> 4) + 1);
+            sections = Math.min(sections, Math.max(1, cells));
         }
-        return estimate(cells, box) <= (UndoFiles.active() ? diskCap() : memoryCap());
+        return sections;
+    }
+
+    /** How a spell's step is kept (D-B 12.5). */
+    public enum Room {
+        /** Whole in memory while the spell works. */
+        FULL,
+        /** Too big for memory: only the cells it changed are remembered (bits), and its records on disk are its step. */
+        LITE,
+        /** Neither fits: the spell asks for the long hold and then runs without a step. */
+        NONE
+    }
+
+    /**
+     * Where the step of a spell of {@code cells} cells in {@code box} can be kept. Whole in memory while the spell works if
+     * that weighs no more than half of what the server may spend on undo ({@code serverUndoMemoryMb}) nor one player's share
+     * ({@code undoMemoryMb}), counting the steps other spells are working on; else, when the history is written to disk and
+     * the record fits in {@code undoDiskMb}, as bits and records (a Move needs its cells whole: it is refused); else not at
+     * all. A history that does not fit on disk is {@link Room#NONE} whatever memory says.
+     */
+    static Room room(Spell spell, long cells, @Nullable BoundingBox box) {
+        if (!configured()) {
+            return Room.FULL;
+        }
+        boolean disk = UndoFiles.active();
+        boolean diskFits = !disk || estimate(cells, box) <= diskCap();
+        long weight = memoryEstimate(cells, box);
+        long budget = Math.min(memoryCap(), serverMemoryCap() / 2);
+        boolean wholeFits = weight <= budget && weight + workingBytes() <= serverMemoryCap();
+        if (wholeFits && diskFits) {
+            return Room.FULL;
+        }
+        if (disk && diskFits && spell != Spell.MOVE) {
+            return Room.LITE;
+        }
+        return Room.NONE;
+    }
+
+    /** What the steps of the spells at work weigh in memory now. */
+    static long workingBytes() {
+        long bytes = 0;
+        for (BuildJob job : BuildScheduler.all()) {
+            if (job.step().state() == UndoStep.State.WORKING) {
+                bytes += job.step().memoryBytes();
+            }
+        }
+        return bytes;
     }
 
     /**

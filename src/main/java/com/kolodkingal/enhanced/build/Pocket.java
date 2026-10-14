@@ -634,6 +634,7 @@ public final class Pocket implements SpellPlanner.Source {
         private long read;
         private long dataBytes;
         private @Nullable Pocket pocket;
+        private @Nullable BiPredicate<BlockPos, BlockState> mayKeep;
 
         private Taker(ServerLevel level, Volume region, Contents contents, int id, BiPredicate<Integer, Integer> loaded) {
             this.level = level;
@@ -644,6 +645,14 @@ public final class Pocket implements SpellPlanner.Source {
             this.box = region.bounds();
             this.rowStart = new int[box.getYSpan() * box.getZSpan() + 1];
             palette.add(null); // index 0: absent
+        }
+
+        /**
+         * The pocket keeps what a block entity holds only where {@code mayKeep} says so (a claim's vault is copied bare); the
+         * predicate gets the cell and its block.
+         */
+        public void reading(BiPredicate<BlockPos, BlockState> mayKeep) {
+            this.mayKeep = mayKeep;
         }
 
         /** Reads on for at most {@code reads} cells; true once the whole box is read ({@link #pocket}). */
@@ -708,7 +717,7 @@ public final class Pocket implements SpellPlanner.Source {
                 return 0; // never half a door
             }
             BlockEntity entity = state.hasBlockEntity() ? level.getBlockEntity(pos) : null;
-            if (entity != null) {
+            if (entity != null && (mayKeep == null || mayKeep.test(pos, state))) {
                 CompoundTag tag = kept(entity);
                 if (tag != null) {
                     long at = ((long) (wy - box.minY()) * box.getZSpan() + (wz - box.minZ())) * box.getXSpan() + (wx - box.minX());

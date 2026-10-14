@@ -73,31 +73,50 @@ public final class BuildCommands {
 
     /**
      * Undoes the last {@code steps} steps of {@code target}, newest first, each as a job queued behind what he is doing, with
-     * the safe-undo rule of Ctrl + Z. A step whose file cannot be read is skipped. Returns how many undo jobs were queued.
+     * the safe-undo rule of Ctrl + Z. A step that left memory is read back in the background first (the next waits for it,
+     * so the order stays); one whose file cannot be read is skipped.
      */
     private static int undo(CommandContext<CommandSourceStack> ctx, int steps) throws CommandSyntaxException {
         ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
         MinecraftServer server = ctx.getSource().getServer();
         UndoHistory history = UndoHistory.of(target.getUUID());
-        int queued = 0;
-        for (UndoStep step : history.toUndo(steps)) {
+        List<UndoStep> list = history.toUndo(steps);
+        ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.build.undo", list.size(), target.getDisplayName()), true);
+        queueUndo(server, target, history, list, 0);
+        return list.size();
+    }
+
+    private static void queueUndo(MinecraftServer server, ServerPlayer target, UndoHistory history, List<UndoStep> list, int i) {
+        for (; i < list.size(); i++) {
+            UndoStep step = list.get(i);
             ServerLevel level = server.getLevel(step.dimension());
-            if (level == null || !UndoFiles.load(history, step)) {
+            if (level == null) {
                 continue;
             }
-            Limits limits = Limits.of(target);
-            if (limits == null) {
-                limits = Limits.wanda(Limits.world(level)); // (he is no builder any more: the safe-undo rule is all that is asked)
+            if (!step.loaded()) {
+                int next = i + 1;
+                UndoFiles.loadStepLater(server, history, step, ok -> {
+                    if (ok) {
+                        queueOne(server, target, level, step);
+                    }
+                    queueUndo(server, target, history, list, next);
+                });
+                return;
             }
-            BuildJob job = BuildJob.replay(target, limits, level, step, false, false, BuildScheduler.loaded(target.getUUID(), level));
-            BuildScheduler.queue(job, false);
-            job.fx(BuildFxPayload.START);
-            queued++;
+            queueOne(server, target, level, step);
         }
-        int done = queued;
-        ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.build.undo", done, target.getDisplayName()), true);
         BuildMagic.sync(server, target.getUUID());
-        return queued;
+    }
+
+    private static void queueOne(MinecraftServer server, ServerPlayer target, ServerLevel level, UndoStep step) {
+        Limits limits = Limits.of(target);
+        if (limits == null) {
+            limits = Limits.wanda(Limits.world(level)); // (he is no builder any more: the safe-undo rule is all that is asked)
+        }
+        BuildJob job = BuildJob.replay(target, limits, level, step, false, false, BuildScheduler.loaded(target.getUUID(), level));
+        BuildScheduler.queue(job, false);
+        job.fx(BuildFxPayload.START);
+        BuildMagic.sync(server, target.getUUID());
     }
 
     /** Stops the spells of {@code players} (all of them when none is named) and drops their queues. */

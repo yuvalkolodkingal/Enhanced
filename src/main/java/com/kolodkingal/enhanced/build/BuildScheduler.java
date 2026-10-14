@@ -324,7 +324,13 @@ public final class BuildScheduler {
         double weight = job.weight();
         if (!job.finished()) {
             long share = weights <= weight ? tick.units() : (long) Math.floor(tick.units() * weight / weights);
-            tick.use(job.step(tick, share));
+            try {
+                tick.use(job.step(tick, share));
+            } catch (RuntimeException e) {
+                // One job's bad cell (a corrupt pocket, a claim mod's listener, a modded block) must not crash the tick: the
+                // job stops where it is, what it did stays one undoable step, and its caster is told.
+                job.fail(e);
+            }
         }
         if (job.finished()) {
             remove(job);

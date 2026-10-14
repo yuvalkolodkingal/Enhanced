@@ -537,6 +537,10 @@ public final class UndoFiles {
         if (root == null || !step.loaded()) {
             return;
         }
+        if (step.isLite()) {
+            sealLite(history, step);
+            return;
+        }
         UUID owner = history.owner();
         StepFile file = fileOf(owner, step);
         Journal journal = step.journal;
@@ -563,6 +567,36 @@ public final class UndoFiles {
                 }, Util.ioPool());
         file.tail = next;
         track(next);
+    }
+
+    /**
+     * A lite step is sealed (D-B 12.4, C13): its file already holds every cell it changed, as the records written ahead; only
+     * the rest (its state, Billy's cost, the side effects, the hashes of the block entities it left) is appended, and the step
+     * is listed: it is read back from its records when it is undone.
+     */
+    private static void sealLite(UndoHistory history, UndoStep step) {
+        UUID owner = history.owner();
+        StepFile file = fileOf(owner, step);
+        Journal journal = step.journal;
+        if (journal != null) {
+            journal.close();
+            step.journal = null;
+        }
+        Image image = step.image();
+        step.evictLite();
+        List<byte[]> blocks = encodeImage(image);
+        CompletableFuture<byte[]> framed = CompletableFuture.supplyAsync(() -> {
+            int length = 0;
+            for (byte[] block : blocks) {
+                length += block.length;
+            }
+            ByteBuffer joined = ByteBuffer.allocate(length);
+            for (byte[] block : blocks) {
+                joined.put(block);
+            }
+            return joined.array();
+        }, Util.backgroundExecutor());
+        file.append(framed, () -> step.setBytes(file.durable));
     }
 
     /** The spell ended without a step to keep: its journal and its file go. */
@@ -756,7 +790,7 @@ public final class UndoFiles {
     // Reading
 
     /** A history and a pocket as the disk holds them. */
-    record Loaded(UndoHistory history, @Nullable Pocket pocket) {
+    record Loaded(UndoHistory history, @Nullable Pocket pocket, List<Path> leftovers) {
     }
 
     /**
@@ -804,6 +838,25 @@ public final class UndoFiles {
             }
         }
         UndoHistory now = UndoHistory.install(history);
+        if (!loaded.leftovers.isEmpty()) {
+            Set<String> live = new HashSet<>();
+            for (UndoStep step : now.allSteps()) {
+                live.add(String.format("step-%016x", step.file()));
+            }
+            for (UndoStep step : now.open()) {
+                live.add(String.format("step-%016x", step.file()));
+            }
+            List<Path> goes = new ArrayList<>();
+            for (Path file : loaded.leftovers) {
+                String name = file.getFileName().toString();
+                if (live.stream().noneMatch(name::startsWith)) {
+                    goes.add(file);
+                }
+            }
+            if (!goes.isEmpty()) {
+                run(chainOf(owner), () -> goes.forEach(UndoFiles::delete));
+            }
+        }
         if (loaded.pocket != null && Pocket.held(owner) == null) {
             Pocket.holdLoaded(owner, loaded.pocket);
         }
@@ -851,12 +904,14 @@ public final class UndoFiles {
                 readSteps(folder, history, tag.getList("open", Tag.TAG_COMPOUND), false, true, kept);
             }
         }
-        // A step file the index does not list is the leftover of a step that was forgotten: it goes.
+        // A step file the index does not list is the leftover of a step that was forgotten: it goes, once the main thread
+        // has seen it is no live spell's (a spell cast right after the login has a journal this index does not know).
+        List<Path> leftovers = new ArrayList<>();
         try (Stream<Path> files = Files.list(folder)) {
             for (Path file : files.toList()) {
                 String name = file.getFileName().toString();
                 if (name.startsWith("step-") && (name.endsWith(".bin") && !kept.contains(name) || name.endsWith(".tmp"))) {
-                    delete(file);
+                    leftovers.add(file);
                 }
             }
         } catch (IOException ignored) {
@@ -875,7 +930,7 @@ public final class UndoFiles {
                 setAside(pocketFile);
             }
         }
-        return new Loaded(history, pocket);
+        return new Loaded(history, pocket, leftovers);
     }
 
     private static void readSteps(Path folder, UndoHistory history, ListTag list, boolean redo, boolean working, Set<String> kept) {
@@ -1206,6 +1261,7 @@ public final class UndoFiles {
             int[] olds = new int[n];
             int[] news = new int[n];
             long[] hashes = new long[n];
+            long[] restored = new long[n];
             ListTag oldData = new ListTag();
             ListTag newData = new ListTag();
             for (int i = 0; i < n; i++) {
@@ -1214,6 +1270,7 @@ public final class UndoFiles {
                 olds[i] = palette.of(Block.stateById(section.olds()[i]));
                 news[i] = palette.of(Block.stateById(section.news()[i]));
                 hashes[i] = section.hashes().get(cell);
+                restored[i] = section.restored().get(cell);
                 CompoundTag od = section.oldData().get(cell);
                 if (od != null) {
                     oldData.add(dataTag(i, od));
@@ -1232,6 +1289,7 @@ public final class UndoFiles {
             tag.put("news", new IntArrayTag(news));
             tag.putByteArray("status", section.status());
             tag.put("hashes", new net.minecraft.nbt.LongArrayTag(hashes));
+            tag.put("rhashes", new net.minecraft.nbt.LongArrayTag(restored));
             tag.put("od", oldData);
             tag.put("nd", newData);
             blocks.add(frame(compress(tag)));
@@ -1268,6 +1326,8 @@ public final class UndoFiles {
             carried.add(tag);
         }
         end.put("carried", carried);
+        end.put("links", new net.minecraft.nbt.LongArrayTag(image.links()));
+        end.put("behashes", new net.minecraft.nbt.LongArrayTag(image.hashes()));
         blocks.add(frame(compress(end)));
         return blocks;
     }
@@ -1280,12 +1340,16 @@ public final class UndoFiles {
         int[] news = tag.getIntArray("news");
         byte[] status = tag.getByteArray("status");
         long[] hashes = tag.getLongArray("hashes");
+        long[] restored = tag.getLongArray("rhashes");
         Map<Integer, CompoundTag> oldData = dataMap(tag.getList("od", Tag.TAG_COMPOUND));
         Map<Integer, CompoundTag> newData = dataMap(tag.getList("nd", Tag.TAG_COMPOUND));
         for (int i = 0; i < cells.length && i < olds.length && i < news.length && i < status.length; i++) {
             boolean known = palette.known(olds[i]) && palette.known(news[i]);
             step.restore(key, (short) cells[i], Block.getId(palette.state(olds[i])), oldData.get(i), Block.getId(palette.state(news[i])), newData.get(i),
                     i < hashes.length ? hashes[i] : 0L, known ? status[i] : UndoStep.DROPPED);
+            if (i < restored.length && restored[i] != 0L) {
+                step.restoreRestored(key, (short) cells[i], restored[i]);
+            }
         }
     }
 
@@ -1305,6 +1369,14 @@ public final class UndoFiles {
             if (palette.known(old) && palette.known(now)) {
                 step.restoreSideEffect(effect.getLong("pos"), palette.state(old), palette.state(now), effect.getByte("status"));
             }
+        }
+        long[] hashes = tag.getLongArray("behashes");
+        for (int i = 0; i + 1 < hashes.length; i += 2) {
+            step.restoreNewHash(BlockPos.of(hashes[i]), hashes[i + 1]);
+        }
+        long[] links = tag.getLongArray("links");
+        for (int i = 0; i + 1 < links.length; i += 2) {
+            step.link(BlockPos.of(links[i]), BlockPos.of(links[i + 1]));
         }
         ListTag carried = tag.getList("carried", Tag.TAG_COMPOUND);
         for (int i = 0; i < carried.size(); i++) {

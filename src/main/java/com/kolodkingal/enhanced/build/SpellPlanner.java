@@ -992,6 +992,15 @@ public final class SpellPlanner {
             return from;
         }
 
+        /**
+         * Gives up the rest of the chunk column the cursor is in (a spell over a mostly unloaded box does not walk the cells
+         * of every column): the next {@link #next} is the first cell of the next column. Returns how many cells of its
+         * box the column still spans at most, or 0 for a plan that does not walk by columns.
+         */
+        public long skipColumn() {
+            return walk.skipColumn();
+        }
+
         /** How many cells the cursor has moved over. */
         public long walked() {
             return walked;
@@ -1293,6 +1302,14 @@ public final class SpellPlanner {
     private abstract static class Walk {
         /** Moves {@code out} to the next cell; false at the end. */
         abstract boolean next(BlockPos.MutableBlockPos out);
+
+        /**
+         * Gives up the rest of the chunk column the walk is in, when it goes column by column: the next cell is the first of
+         * the next column. Returns how many cells the column's box still spans at most (0: a walk that does not go by columns).
+         */
+        long skipColumn() {
+            return 0L;
+        }
     }
 
     private static final class EmptyWalk extends Walk {
@@ -1421,6 +1438,16 @@ public final class SpellPlanner {
                 column = layers(area);
             }
             return false;
+        }
+
+        @Override
+        final long skipColumn() {
+            if (column == null) {
+                return 0L;
+            }
+            column = null;
+            return (long) (Math.min(box.maxX(), (cx << 4) + 15) - Math.max(box.minX(), cx << 4) + 1) * box.getYSpan()
+                    * (Math.min(box.maxZ(), (cz << 4) + 15) - Math.max(box.minZ(), cz << 4) + 1);
         }
 
         /** Moves {@link #cx}, {@link #cz} to the next column of the box; false after the last. */

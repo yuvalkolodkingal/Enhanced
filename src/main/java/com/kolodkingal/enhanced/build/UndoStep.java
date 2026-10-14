@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.build;
 
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -83,6 +85,31 @@ public final class UndoStep {
     private boolean mom;
     private boolean paid;
 
+    /** The order the spell's ripple swept (a plan's order); set when its job starts. */
+    void setFxOrder(int order) {
+        this.fxOrder = order;
+    }
+
+    /**
+     * The order the spell's ripple swept ({@code BuildFxPayload}: rise, melt, shells, columns): the plan's, else worked out
+     * from the spell and the box for a step read from disk (a Vanish melts, a shape swells in shells, a valley-sized spell goes
+     * by columns).
+     */
+    public int fxOrder() {
+        if (fxOrder >= 0) {
+            return fxOrder;
+        }
+        BoundingBox box = bounds();
+        if (box != null && (box.getXSpan() > 64 || box.getZSpan() > 64)) {
+            return com.kolodkingal.enhanced.network.BuildFxPayload.COLUMNS;
+        }
+        return switch (spell) {
+            case VANISH -> com.kolodkingal.enhanced.network.BuildFxPayload.MELT;
+            case SHAPE -> com.kolodkingal.enhanced.network.BuildFxPayload.SHELLS;
+            default -> com.kolodkingal.enhanced.network.BuildFxPayload.RISE;
+        };
+    }
+
     /** Its file's name on disk ({@code step-<file>.bin}), or 0 before it has one. */
     private long file;
     /** Its records being written ahead (C13), while its spell works. */
@@ -94,6 +121,8 @@ public final class UndoStep {
     /** Its file holds the step as it is now (written after its last change, so its cells can leave memory). */
     private volatile boolean stored;
     private volatile int mods;
+    /** How the spell's ripple swept ({@code BuildFxPayload} order), or -1 when it is not known (read from disk). */
+    private int fxOrder = -1;
     /** What {@link #memoryBytes} found, until the step changes (-1: not known). */
     private long memory = -1;
     /** Read back from a crash's records: its cells are what the spell was to do (see the class comment). */
@@ -106,6 +135,17 @@ public final class UndoStep {
     private boolean listed;
 
     private final Long2ObjectLinkedOpenHashMap<Section> sections = new Long2ObjectLinkedOpenHashMap<>();
+    /**
+     * A lite step (too big to hold in memory while it works, or one that nothing will be able to undo): it remembers only
+     * which cells it changed (a bit each) and the hashes of the block entities it left, not their states. A lite step
+     * whose records are on disk (the journal, C13) is sealed as a listed step that reads back from them; one with no
+     * journal is dropped when its spell ends.
+     */
+    private boolean lite;
+    private final Long2ObjectLinkedOpenHashMap<LiteSection> lites = new Long2ObjectLinkedOpenHashMap<>();
+    /** A Move's cells that carried block-entity data: source cell to target cell, and back. */
+    private @Nullable Long2LongOpenHashMap links;
+    private @Nullable Long2LongOpenHashMap backLinks;
     private final List<SideEffect> sideEffects = new ArrayList<>();
     private final List<Carried> carried = new ArrayList<>();
     /** The carried things by the block they hung on before the Move, and after it. */
@@ -219,7 +259,48 @@ public final class UndoStep {
 
     /** The sections it touched, in the order it touched them ({@link SectionPos#asLong}). */
     public long[] sectionKeys() {
-        return sections.keySet().toLongArray();
+        return lite ? lites.keySet().toLongArray() : sections.keySet().toLongArray();
+    }
+
+    /**
+     * A Move took the block entity of {@code source} (with what it holds) to {@code target}: an undo gives the source its
+     * contents back only if the target was undone, and a redo writes the target's only if the source was cleared, so
+     * what a container holds is never in two places (D-B 12.3).
+     */
+    public void link(BlockPos source, BlockPos target) {
+        if (links == null) {
+            links = new Long2LongOpenHashMap();
+            links.defaultReturnValue(Long.MIN_VALUE);
+            backLinks = new Long2LongOpenHashMap();
+            backLinks.defaultReturnValue(Long.MIN_VALUE);
+        }
+        links.put(source.asLong(), target.asLong());
+        backLinks.put(target.asLong(), source.asLong());
+    }
+
+    /** Where the Move took the contents of {@code source}, or null. */
+    public @Nullable BlockPos linkedTarget(BlockPos source) {
+        long target = links == null ? Long.MIN_VALUE : links.get(source.asLong());
+        return target == Long.MIN_VALUE ? null : BlockPos.of(target);
+    }
+
+    /** Where the Move took the contents that {@code target} holds from, or null. */
+    public @Nullable BlockPos linkedSource(BlockPos target) {
+        long source = backLinks == null ? Long.MIN_VALUE : backLinks.get(target.asLong());
+        return source == Long.MIN_VALUE ? null : BlockPos.of(source);
+    }
+
+    private long[] linkArray() {
+        if (links == null) {
+            return new long[0];
+        }
+        long[] pairs = new long[links.size() * 2];
+        int i = 0;
+        for (var entry : links.long2LongEntrySet()) {
+            pairs[i++] = entry.getLongKey();
+            pairs[i++] = entry.getLongValue();
+        }
+        return pairs;
     }
 
     /** The side effects of its settle pass, in the order they happened. */
@@ -237,6 +318,10 @@ public final class UndoStep {
      * stroke over the same cell twice) keeps its first old state and takes the new one.
      */
     public void record(BlockPos pos, BlockState old, @Nullable CompoundTag oldData, BlockState now, @Nullable CompoundTag newData, long newHash) {
+        if (lite) {
+            recordLite(pos, newHash);
+            return;
+        }
         long key = SectionPos.asLong(pos);
         Section section = sections.get(key);
         if (section == null) {
@@ -266,14 +351,89 @@ public final class UndoStep {
         section.setNew(cell, newData, newHash);
     }
 
+    /** Makes the step lite (before it records anything): see {@link #lite}. */
+    void makeLite() {
+        if (cells == 0) {
+            lite = true;
+        }
+    }
+
+    /** Whether the step is lite. */
+    public boolean isLite() {
+        return lite;
+    }
+
+    private void recordLite(BlockPos pos, long newHash) {
+        long key = SectionPos.asLong(pos);
+        LiteSection section = lites.get(key);
+        if (section == null) {
+            section = new LiteSection(key);
+            lites.put(key, section);
+        }
+        short cell = Section.cell(pos);
+        if (!section.get(cell)) {
+            section.set(cell);
+            cells++;
+            applied++;
+            minX = Math.min(minX, pos.getX());
+            minY = Math.min(minY, pos.getY());
+            minZ = Math.min(minZ, pos.getZ());
+            maxX = Math.max(maxX, pos.getX());
+            maxY = Math.max(maxY, pos.getY());
+            maxZ = Math.max(maxZ, pos.getZ());
+        }
+        section.setHash(cell, newHash);
+    }
+
+    /** The hashes of the block entities a lite step left, as (position, hash) pairs. */
+    long[] liteHashes() {
+        LongArrayList pairs = new LongArrayList();
+        for (LiteSection section : lites.values()) {
+            if (section.hashes != null) {
+                BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+                for (var entry : section.hashes.short2LongEntrySet()) {
+                    section.pos(entry.getShortKey(), pos);
+                    pairs.add(pos.asLong());
+                    pairs.add(entry.getLongValue());
+                }
+            }
+        }
+        return pairs.toLongArray();
+    }
+
+    /** A lite step whose records are on disk lets go of its bits: it is listed, read back from its file when undone. */
+    void evictLite() {
+        lites.clear();
+        lite = false;
+        listed = true;
+        memory = -1;
+        stored = true;
+    }
+
+    /** Restores the hash of a block entity a lite step left, from its file. */
+    void restoreNewHash(BlockPos pos, long hash) {
+        Section section = sections.get(SectionPos.asLong(pos));
+        short cell = Section.cell(pos);
+        if (section != null && section.indexOf(cell) >= 0) {
+            section.setHash(cell, hash);
+        }
+    }
+
     /** Whether the spell changed {@code pos}. */
     public boolean has(BlockPos pos) {
+        if (lite) {
+            LiteSection bits = lites.get(SectionPos.asLong(pos));
+            return bits != null && bits.get(Section.cell(pos));
+        }
         Section section = sections.get(SectionPos.asLong(pos));
         return section != null && section.indexOf(Section.cell(pos)) >= 0;
     }
 
     /** What the spell put at {@code pos} (null when it did not change it). */
     public @Nullable BlockState newState(BlockPos pos) {
+        if (lite) {
+            return null;
+        }
         Section section = sections.get(SectionPos.asLong(pos));
         int at = section == null ? -1 : section.indexOf(Section.cell(pos));
         return at < 0 ? null : Block.stateById(section.news[at]);
@@ -281,12 +441,19 @@ public final class UndoStep {
 
     /** The hash of the data the spell left at {@code pos} (0 for none). */
     public long newHash(BlockPos pos) {
+        if (lite) {
+            LiteSection bits = lites.get(SectionPos.asLong(pos));
+            return bits == null ? 0L : bits.hash(Section.cell(pos));
+        }
         Section section = sections.get(SectionPos.asLong(pos));
         return section == null ? 0L : section.hash(Section.cell(pos));
     }
 
     /** What {@code pos} held before the spell changed it (null when it did not change it). */
     public @Nullable BlockState oldState(BlockPos pos) {
+        if (lite) {
+            return null;
+        }
         Section section = sections.get(SectionPos.asLong(pos));
         int at = section == null ? -1 : section.indexOf(Section.cell(pos));
         return at < 0 ? null : Block.stateById(section.olds[at]);
@@ -294,12 +461,18 @@ public final class UndoStep {
 
     /** The block-entity data {@code pos} had before the spell changed it (null for none). */
     public @Nullable CompoundTag oldData(BlockPos pos) {
+        if (lite) {
+            return null;
+        }
         Section section = sections.get(SectionPos.asLong(pos));
         return section == null || section.oldData == null ? null : section.oldData.get(Section.cell(pos));
     }
 
     /** The status of the cell {@code pos} ({@link #APPLIED}, {@link #UNDONE}, {@link #DROPPED}), or -1 when not recorded. */
     public byte status(BlockPos pos) {
+        if (lite) {
+            return has(pos) ? APPLIED : -1;
+        }
         Section section = sections.get(SectionPos.asLong(pos));
         int at = section == null ? -1 : section.indexOf(Section.cell(pos));
         return at < 0 ? -1 : section.status[at];
@@ -310,6 +483,9 @@ public final class UndoStep {
      * neighbour): the step now remembers that as what the spell put there, so an undo still finds it as the spell left it.
      */
     public void settled(BlockPos pos, BlockState now) {
+        if (lite) {
+            return;
+        }
         Section section = sections.get(SectionPos.asLong(pos));
         int at = section == null ? -1 : section.indexOf(Section.cell(pos));
         if (at >= 0) {
@@ -402,6 +578,9 @@ public final class UndoStep {
         if (listed) {
             return 256L;
         }
+        if (lite) {
+            return 512L + lites.size() * 1024L;
+        }
         if (memory >= 0 && state != State.WORKING) {
             return memory;
         }
@@ -429,6 +608,8 @@ public final class UndoStep {
         carriedBefore.clear();
         carriedAfter.clear();
         otherNews = null;
+        links = null;
+        backLinks = null;
         listed = true;
         memory = -1;
         return true;
@@ -497,6 +678,8 @@ public final class UndoStep {
         for (Carried thing : body.carried) {
             carried(thing.id(), thing.from(), thing.fromFacing(), thing.to(), thing.toFacing());
         }
+        links = body.links;
+        backLinks = body.backLinks;
         cells = body.cells;
         applied = body.applied;
         undone = body.undone;
@@ -602,6 +785,14 @@ public final class UndoStep {
         return false;
     }
 
+    /** Restores the hash of the data an undo put back in a cell of a step read from disk. */
+    void restoreRestored(long key, short cell, long hash) {
+        Section section = sections.get(key);
+        if (section != null && section.indexOf(cell) >= 0) {
+            section.setRestored(cell, hash);
+        }
+    }
+
     /** Restores a side effect of a step read from disk, with its status. */
     void restoreSideEffect(long pos, BlockState old, BlockState now, byte status) {
         SideEffect effect = new SideEffect(pos, old, now);
@@ -644,23 +835,26 @@ public final class UndoStep {
                     Arrays.copyOf(section.news, section.size), Arrays.copyOf(section.status, section.size),
                     section.oldData == null ? new Short2ObjectOpenHashMap<>() : new Short2ObjectOpenHashMap<>(section.oldData),
                     section.newData == null ? new Short2ObjectOpenHashMap<>() : new Short2ObjectOpenHashMap<>(section.newData),
-                    section.hashes == null ? new Short2LongOpenHashMap() : new Short2LongOpenHashMap(section.hashes)));
+                    section.hashes == null ? new Short2LongOpenHashMap() : new Short2LongOpenHashMap(section.hashes),
+                    section.restored == null ? new Short2LongOpenHashMap() : new Short2LongOpenHashMap(section.restored)));
         }
         List<SideEffectImage> effects = new ArrayList<>(sideEffects.size());
         for (SideEffect effect : sideEffects) {
             effects.add(new SideEffectImage(effect.pos, Block.getId(effect.old), Block.getId(effect.now), effect.status));
         }
-        return new Image(spell, dimension, time, state, cost, practice, mom, paid, tell, recovered, images, effects, List.copyOf(carried));
+        return new Image(spell, dimension, time, state, cost, practice, mom, paid, tell, recovered || lite, images, effects, List.copyOf(carried), linkArray(),
+                liteHashes());
     }
 
     /** A step as it was when copied ({@link #image}), to be written to disk. */
     public record Image(Spell spell, ResourceKey<Level> dimension, long time, State state, int cost, long practice, boolean mom, boolean paid,
-                        boolean tell, boolean recovered, List<SectionImage> sections, List<SideEffectImage> sideEffects, List<Carried> carried) {
+                        boolean tell, boolean recovered, List<SectionImage> sections, List<SideEffectImage> sideEffects, List<Carried> carried,
+                        long[] links, long[] hashes) {
     }
 
     /** A section of an {@link Image}: its cells in the order they were written, with their states (ids) and data. */
     public record SectionImage(long key, short[] cells, int[] olds, int[] news, byte[] status, Short2ObjectOpenHashMap<CompoundTag> oldData,
-                               Short2ObjectOpenHashMap<CompoundTag> newData, Short2LongOpenHashMap hashes) {
+                               Short2ObjectOpenHashMap<CompoundTag> newData, Short2LongOpenHashMap hashes, Short2LongOpenHashMap restored) {
     }
 
     /** A side effect of an {@link Image}: its cell, its old and new state (ids) and its status. */
@@ -685,13 +879,43 @@ public final class UndoStep {
         private int at = -1;
         private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
+        private final boolean liteWalk = lite;
+        private @Nullable LiteSection liteSection;
+        private int liteBit = -1;
+
         private Walk(boolean backwards) {
             this.backwards = backwards;
             this.sectionIndex = backwards ? keys.length - 1 : 0;
         }
 
+        /** A lite step's cells: the section's bits in order (the settle pass wants no states). */
+        private boolean nextLite() {
+            while (true) {
+                if (liteSection == null) {
+                    if (sectionIndex < 0 || sectionIndex >= keys.length) {
+                        return false;
+                    }
+                    liteSection = lites.get(keys[sectionIndex]);
+                    liteBit = backwards ? 4096 : -1;
+                }
+                liteBit += backwards ? -1 : 1;
+                while (liteBit >= 0 && liteBit < 4096 && !liteSection.get((short) liteBit)) {
+                    liteBit += backwards ? -1 : 1;
+                }
+                if (liteBit >= 0 && liteBit < 4096) {
+                    liteSection.pos((short) liteBit, pos);
+                    return true;
+                }
+                liteSection = null;
+                sectionIndex += backwards ? -1 : 1;
+            }
+        }
+
         /** Moves to the next cell; false when every cell has been walked. */
         public boolean next() {
+            if (liteWalk) {
+                return nextLite();
+            }
             while (true) {
                 if (section == null) {
                     if (sectionIndex < 0 || sectionIndex >= keys.length) {
@@ -717,24 +941,37 @@ public final class UndoStep {
             return pos;
         }
 
-        public BlockState oldState() {
-            return Block.stateById(section.olds[at]);
+        public @Nullable BlockState oldState() {
+            return liteWalk ? null : Block.stateById(section.olds[at]);
         }
 
-        public BlockState newState() {
-            return Block.stateById(section.news[at]);
+        public @Nullable BlockState newState() {
+            return liteWalk ? null : Block.stateById(section.news[at]);
         }
 
         public @Nullable CompoundTag oldData() {
-            return section.oldData == null ? null : section.oldData.get(section.cells[at]);
+            return liteWalk ? null : section.oldData == null ? null : section.oldData.get(section.cells[at]);
         }
 
         public @Nullable CompoundTag newData() {
-            return section.newData == null ? null : section.newData.get(section.cells[at]);
+            return liteWalk ? null : section.newData == null ? null : section.newData.get(section.cells[at]);
         }
 
         public long newHash() {
+            if (liteWalk) {
+                return liteSection.hash((short) liteBit);
+            }
             return section.hash(section.cells[at]);
+        }
+
+        /** The hash of the data an undo put back in the cell (0 for none): what a redo expects to find. */
+        public long restoredHash() {
+            return section.restored(section.cells[at]);
+        }
+
+        public void setRestoredHash(long hash) {
+            section.setRestored(section.cells[at], hash);
+            unstore();
         }
 
         /** The new hash of the cell after a redo wrote it again. */
@@ -743,7 +980,7 @@ public final class UndoStep {
         }
 
         public byte status() {
-            return section.status[at];
+            return liteWalk ? APPLIED : section.status[at];
         }
 
         /** Sets the cell's status ({@link #APPLIED}, {@link #UNDONE}, {@link #DROPPED}). */
@@ -886,6 +1123,43 @@ public final class UndoStep {
         }
     }
 
+    /** The cells of one section a lite step changed, one bit each, and the hashes of the block entities among them. */
+    private static final class LiteSection {
+        final long key;
+        final long[] bits = new long[64];
+        @Nullable Short2LongOpenHashMap hashes;
+
+        LiteSection(long key) {
+            this.key = key;
+        }
+
+        boolean get(short cell) {
+            return (bits[cell >> 6 & 63] >>> (cell & 63) & 1L) != 0L;
+        }
+
+        void set(short cell) {
+            bits[cell >> 6 & 63] |= 1L << (cell & 63);
+        }
+
+        void setHash(short cell, long hash) {
+            if (hash != 0L) {
+                if (hashes == null) {
+                    hashes = new Short2LongOpenHashMap();
+                }
+                hashes.put(cell, hash);
+            }
+        }
+
+        long hash(short cell) {
+            return hashes == null ? 0L : hashes.get(cell);
+        }
+
+        void pos(short cell, BlockPos.MutableBlockPos pos) {
+            pos.set(SectionPos.sectionToBlockCoord(SectionPos.x(key)) + (cell & 15), SectionPos.sectionToBlockCoord(SectionPos.y(key)) + ((cell >> 8) & 15),
+                    SectionPos.sectionToBlockCoord(SectionPos.z(key)) + ((cell >> 4) & 15));
+        }
+    }
+
     /** The cells of one 16 x 16 x 16 section a step changed, in the order it changed them. */
     private static final class Section {
         final long key;
@@ -899,6 +1173,8 @@ public final class UndoStep {
         @Nullable Short2ObjectOpenHashMap<CompoundTag> oldData;
         @Nullable Short2ObjectOpenHashMap<CompoundTag> newData;
         @Nullable Short2LongOpenHashMap hashes;
+        /** The hash of the block-entity data an undo put back in a cell (0: none), for the redo's content check. */
+        @Nullable Short2LongOpenHashMap restored;
 
         Section(long key) {
             this.key = key;
@@ -963,6 +1239,21 @@ public final class UndoStep {
             return hashes == null ? 0L : hashes.get(cell);
         }
 
+        void setRestored(short cell, long hash) {
+            if (hash != 0L) {
+                if (restored == null) {
+                    restored = new Short2LongOpenHashMap();
+                }
+                restored.put(cell, hash);
+            } else if (restored != null) {
+                restored.remove(cell);
+            }
+        }
+
+        long restored(short cell) {
+            return restored == null ? 0L : restored.get(cell);
+        }
+
         void pos(int at, BlockPos.MutableBlockPos pos) {
             short cell = cells[at];
             pos.set(SectionPos.sectionToBlockCoord(SectionPos.x(key)) + (cell & 15),
@@ -975,6 +1266,9 @@ public final class UndoStep {
     public LongSet chunks() {
         LongSet chunks = new LongOpenHashSet();
         for (long key : sections.keySet()) {
+            chunks.add(ChunkPos.asLong(SectionPos.x(key), SectionPos.z(key)));
+        }
+        for (long key : lites.keySet()) {
             chunks.add(ChunkPos.asLong(SectionPos.x(key), SectionPos.z(key)));
         }
         return chunks;
