@@ -17,7 +17,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -470,6 +472,11 @@ public final class SpellWheelScreen extends Screen {
         }
         List<FormattedCharSequence> rows = new ArrayList<>();
         rows.add(HudDraw.visual(title));
+        // No room over the ring (a small window): the lines go in the top right corner, and the way to the next rank, which
+        // is long, wraps to stay right of the ring's second picture.
+        int bottom = cy - Math.round((RING + TILE * 0.6F) * k) - 4;
+        boolean corner = bottom - (billy ? 4 : 1) * INFO_ROWS < 2;
+        int room = corner ? width - 6 - (cx + Math.round((RING * Mth.sin(Mth.TWO_PI / SPELLS.length) + TILE / 2.0F) * k) + 4) : width - 12;
         int rank = BillyRanks.rank(data);
         if (billy) {
             Limits limits = Limits.of(player);
@@ -488,14 +495,16 @@ public final class SpellWheelScreen extends Screen {
                         ? Component.translatable("screen.enhanced.build.next_rank", HudDraw.number(data.practice()),
                                 HudDraw.number(BillyRanks.practiceFor(next)), Component.translatable(BillyRanks.nameKey(next)))
                         : Component.translatable("screen.enhanced.build.top_rank");
-                rows.add(HudDraw.visual(line.copy().withStyle(s -> s.withColor(GREY))));
+                Component grey = line.copy().withStyle(s -> s.withColor(GREY));
+                for (FormattedText part : font.getSplitter().splitLines(grey, Math.max(60, room), Style.EMPTY)) {
+                    rows.add(HudDraw.visual(part));
+                }
             }
         }
         int height = rows.size() * INFO_ROWS;
-        int bottom = cy - Math.round((RING + TILE * 0.6F) * k) - 4;
         int y = bottom - height;
-        boolean corner = y < 2;
-        // No room over the ring (a small window): the same lines in the top right corner, clear of the hero panel.
+        // The same lines in the top right corner, clear of the hero panel.
+        corner = y < 2;
         if (corner) {
             y = 4;
         }
@@ -765,6 +774,8 @@ public final class SpellWheelScreen extends Screen {
         if (isMagicKey(key, scan)) {
             // The repeats of the hold that opened the wheel are not a second press of Y.
             if (released) {
+                // Y again closes the wheel and nothing else: the press is not a tap that switches build mode off.
+                BuildInput.swallowMagic();
                 onClose();
             }
             return true;
@@ -772,6 +783,10 @@ public final class SpellWheelScreen extends Screen {
         int number = numberOf(key);
         if (number >= 0 && number < SPELLS.length) {
             choose(SPELLS[number]);
+            if (!released) {
+                // A digit with Y still down: the wheel closes now and Y's hold, which goes on, does not open it again.
+                BuildInput.swallowMagic();
+            }
             onClose();
             return true;
         }

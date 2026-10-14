@@ -58,6 +58,11 @@ public final class BuildInput {
 
     /** Ticks Y has been down. */
     private static int magicHeld;
+    /**
+     * Y's press or hold has been used by the Spell Wheel (it closed with it, or a digit chose and closed it with Y still down):
+     * until Y is up it neither toggles build mode nor opens the wheel again.
+     */
+    private static boolean magicSwallowed;
     /** Whether a left press of the grammar's is down (its release goes to the grammar). */
     private static boolean leftHeld;
     /** The key of a right press of the spell's while it is down (the use key, or Delete), or null. */
@@ -132,6 +137,11 @@ public final class BuildInput {
 
     /** Y: a tap toggles build mode, a hold turns it on and opens the Spell Wheel. */
     private static void magicKey(boolean tapped) {
+        if (magicSwallowed) {
+            magicHeld = 0;
+            magicSwallowed = BuildKeys.MAGIC.isDown();
+            return;
+        }
         if (BuildKeys.MAGIC.isDown()) {
             magicHeld++;
             if (magicHeld == WHEEL_TICKS) {
@@ -146,6 +156,12 @@ public final class BuildInput {
             BuildClient.toggle();
             letGoOfButtons();
         }
+        magicHeld = 0;
+    }
+
+    /** The Spell Wheel took this press (or hold) of Y for itself: it is not a tap of Build Magic's key, nor a new hold. */
+    static void swallowMagic() {
+        magicSwallowed = true;
         magicHeld = 0;
     }
 
@@ -328,6 +344,7 @@ public final class BuildInput {
 
     private static void reset() {
         magicHeld = 0;
+        magicSwallowed = false;
         leftHeld = false;
         rightKey = null;
         useWasDown = false;
