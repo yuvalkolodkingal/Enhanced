@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
+import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.power.Power;
@@ -54,6 +55,18 @@ final class ApocalypseTestSupport {
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
         f.config(ApocalypseBossConfig.ARENA_RADIUS, 9);
         return f;
+    }
+
+    /**
+     * Sets the three factors of the critical hits ({@code critShieldFactor}, {@code critBodyFactor}, {@code
+     * othersBodyFactor}) to 1.0, so that every blow counts as in 3.0: for a test whose subject is another rule (his
+     * armour, explosions, the window's quarter, the floors, the cap, the bars, his healing, the Escape, the strains
+     * counted once a cast; spec 8a.2). The test needs a batch of its own.
+     */
+    static void noCrits(TestKit.Fixture f) {
+        f.config(ApocalypseShieldConfig.CRIT_SHIELD_FACTOR, 1.0);
+        f.config(ApocalypseShieldConfig.CRIT_BODY_FACTOR, 1.0);
+        f.config(ApocalypseShieldConfig.OTHERS_BODY_FACTOR, 1.0);
     }
 
     /** Starts the fight by an operator's command: it is centred at the starter's feet, and no Capstone is used. */

@@ -306,8 +306,9 @@ public final class CrossHeroBossTests {
 
     /**
      * The Burst is Phoenix mind power: it wears Apocalypse's shield by five times its damage and never his health
-     * (apocalypse.md 3.5.2): a weak Burst takes five times what it did off the shield; a full one (30, so 150) breaks shield 1
-     * of a lone fighter, and what is left over is thrown away.
+     * (apocalypse.md 3.5.2), and since 3.1 it is critical, twice that ({@code critShieldFactor}, spec 8a.2): a weak
+     * Burst takes ten times what it did off the shield; a full one (30, so 300) breaks shield 1 of a lone fighter, and
+     * what is left over is thrown away.
      */
     @GameTest(template = ARENA, batch = "cross_burst_apocalypse", timeoutTicks = 160)
     public static void burstsWearApocalypsesShieldByFiveTimesAndAFullOneBreaksIt(GameTestHelper helper) {
@@ -343,7 +344,8 @@ public final class CrossHeroBossTests {
                 }
                 float weak = told.get(0);
                 check(weak > 0.0F && weak < 20.0F, "the weak Burst reached him with little: " + weak);
-                assertNear(max - boss.shield().strength(), weak * 5.0, 1.0E-3, "and took five times that off his shield");
+                double crit = ApocalypseShieldConfig.CRIT_SHIELD_FACTOR.get();
+                assertNear(max - boss.shield().strength(), weak * 5.0 * crit, 1.0E-3, "and took five times that, critical (x" + crit + "), off his shield");
                 check(boss.getHealth() == health && boss.shield().isUp(), "but nothing of his health, and the shield stands");
                 // (The shield counts one mind blow from her in ten ticks.)
                 if (tick < 14) {
@@ -376,6 +378,7 @@ public final class CrossHeroBossTests {
     @GameTest(template = ARENA, batch = "cross_phoenix_strain", timeoutTicks = 100)
     public static void thePhoenixsMindStrainsApocalypsesShieldOncePerCast(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.PHOENIX);
+        ApocalypseTestSupport.noCrits(d.f()); // the strains counted once a cast, at their 3.0 numbers (8a.2)
         ServerPlayer jean = d.hero();
         ApocalypseEntity boss = d.boss();
         float health = boss.getHealth();

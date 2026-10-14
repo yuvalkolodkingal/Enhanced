@@ -68,6 +68,7 @@ import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.breakShiel
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.calm;
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.duel;
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.every;
+import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.noCrits;
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.put;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -324,6 +325,7 @@ public final class ApocalypseFightTests {
     @GameTest(template = ARENA, batch = "apocalypse_armour", timeoutTicks = 260)
     public static void theThirdBreakDismantlesTheArmour(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.SCARLET_WITCH);
+        noCrits(d.f()); // the armour and the floors, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
@@ -365,6 +367,7 @@ public final class ApocalypseFightTests {
     public static void theTrueFormRegeneratesWhenLeftAlone(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
         d.f().config(ApocalypseBossConfig.TRUE_FORM_REGEN_PER_SECOND, 3.0); // 3.0's healing: since 3.1 his health never heals
+        noCrits(d.f()); // and 3.0's blows (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         fight.forceState(ApocalypseFight.Stage.TRUE_FORM, 3);
@@ -399,6 +402,7 @@ public final class ApocalypseFightTests {
     @GameTest(template = ARENA, batch = "apocalypse_escape", timeoutTicks = 500)
     public static void theEscapeIsInterruptedByDamageAndStaggersHimOnce(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
+        noCrits(d.f()); // the Escape, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
@@ -457,6 +461,7 @@ public final class ApocalypseFightTests {
     @GameTest(template = ARENA, batch = "apocalypse_escape_heal", timeoutTicks = 400)
     public static void theBlowThatEarnsTheEscapeStartsItEvenWhenHealingIsDue(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
+        noCrits(d.f()); // the Escape, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
@@ -560,6 +565,7 @@ public final class ApocalypseFightTests {
 
     private static void endTest(GameTestHelper helper, boolean phoenix) {
         Duel d = duel(helper, 3, phoenix ? Power.PHOENIX : Power.NONE);
+        noCrits(d.f()); // the end, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
@@ -838,6 +844,7 @@ public final class ApocalypseFightTests {
     @GameTest(template = ARENA, batch = "apocalypse_bars", timeoutTicks = 320)
     public static void twoBossBarsShowHealthAndShield(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
+        noCrits(d.f()); // the bars, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerPlayer bystander = d.f().player(0.5, FLOOR, 0.5, GameType.SPECTATOR);

@@ -838,10 +838,10 @@ public final class ApocalypseTests {
         check(d.boss().shield().strength() == boss, "an arrow of 50 does nothing to the boss's shield");
         check(blow(hero, arrow, 50.0F).stopped() && data.shieldStrength() == 10.0F, "while it costs the hero's all the option says: 50 of 60");
 
-        // Mind power wears both, at its factor.
+        // Mind power wears both, at its factor; a Scarlet Witch's is critical on the boss's (3.1, x2), not the hero's.
         data.setShieldStrength(60.0F);
         d.hit(ModDamageTypes.CHAOS_BEAM, 5.0F);
-        assertNear(d.boss().shield().strength(), boss - 5.0, 1.0E-3, "a beam of 5 wears his shield by 5");
+        assertNear(d.boss().shield().strength(), boss - 10.0, 1.0E-3, "a beam of 5 wears his shield by 10");
         check(blow(hero, ModDamageTypes.source(level, ModDamageTypes.CHAOS_BEAM, d.hero(), d.hero()), 5.0F).stopped(), "and the hero's");
         assertNear(data.shieldStrength(), 55.0, 1.0E-4, "by 5");
         helper.succeed();

@@ -949,13 +949,14 @@ public final class ArenaLoanTests {
     /**
      * T54 (D-T 9): a block borrowed from Apocalypse's floor and thrown by Wanda wears his shield by half a slam: {@code 10.4
      * x slamFactor x 0.5}; a zombie she throws as fast 20 ticks later wears it by the full slam, {@code 6 x slamFactor}.
+     * Both are her mind power, so both are critical on top ({@code critShieldFactor} 2: spec 8a.2 doubles the numbers).
      */
     @GameTest(template = ARENA, batch = "arena_loans_shield", timeoutTicks = 60)
     public static void borrowedBlocksWearHisShieldByHalf(GameTestHelper helper) {
         shieldWear(helper, 0.5, true);
     }
 
-    /** T54, with {@code apocalypse_shield.borrowedSlamFactor} 1.0: the borrowed block wears the shield by the full 10.4. */
+    /** T54, with {@code apocalypse_shield.borrowedSlamFactor} 1.0: the borrowed block wears the shield by 10.4 (x2). */
     @GameTest(template = ARENA, batch = "arena_loans_shield_full", timeoutTicks = 60)
     public static void borrowedBlocksWearHisShieldInFullAtFactorOne(GameTestHelper helper) {
         shieldWear(helper, 1.0, false);
@@ -968,6 +969,7 @@ public final class ArenaLoanTests {
         ApocalypseEntity boss = d.boss();
         ServerPlayer wanda = d.hero();
         float slam = ApocalypseShieldConfig.SLAM_FACTOR.get().floatValue();
+        double crit = ApocalypseShieldConfig.CRIT_SHIELD_FACTOR.get(); // her mind power is critical on his shield (8a)
         BlockPos floor = new BlockPos(5, 1, 10);
         check(BossFights.protects(d.level(), abs(helper, floor)), "his floor is protected");
         TelekineticBlockEntity block = borrowed(helper, wanda, Telekinesis.Mode.WANDA, floor);
@@ -988,8 +990,8 @@ public final class ArenaLoanTests {
                     return false;
                 }
                 afterBlock[0] = boss.shield().strength();
-                assertNear(before - afterBlock[0], 10.4 * slam * borrowedFactor, 0.01, "the borrowed block wears the shield by 10.4 x slamFactor x "
-                        + borrowedFactor);
+                assertNear(before - afterBlock[0], 10.4 * slam * borrowedFactor * crit, 0.01, "the borrowed block wears the shield by 10.4 x slamFactor x "
+                        + borrowedFactor + " x " + crit);
                 check(boss.getHealth() == health && boss.shield().isUp(), "his shield took it, not his health");
                 check(items(helper) == 0, "and it turned to dust");
                 return !zombieToo;
@@ -1012,7 +1014,7 @@ public final class ArenaLoanTests {
                 check(tick < 40, "the zombie never reached his shield");
                 return false;
             }
-            assertNear(afterBlock[0] - boss.shield().strength(), 6.0 * slam, 0.01, "the zombie wears it by the full slam, 6 x slamFactor");
+            assertNear(afterBlock[0] - boss.shield().strength(), 6.0 * slam * crit, 0.01, "the zombie wears it by the full slam, 6 x slamFactor x " + crit);
             return true;
         });
     }
