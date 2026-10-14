@@ -137,7 +137,7 @@ It scans every quarter of a second, up to **12 blocks** away, and it costs nothi
 * the legs **plant on the wall, the ceiling or the ground** where you walk, and step with you; you crawl 25% faster;
 * a food point every 20 seconds.
 
-They fold by themselves if you change look, or when **Magneto's Armor and Weapon Strip** scatters the nanites (the suit's armor, the legs and Instant Kill are **off for 10 seconds**: "The nanites are scattered").
+They fold by themselves if you change look, or when **Magneto's Armor and Weapon Strip** (with PvP on) scatters the nanites (the suit's armor, the legs and Instant Kill are **off for 10 seconds**: "The nanites are scattered").
 
 **Instant Kill (Sneak + B).** From *Endgame*, where Peter turns it on on purpose and the legs kill the Outriders. You need the **legs out**. **Press Sneak + B, then press it again within 3 seconds to confirm** ("Instant Kill: press Sneak + B again to confirm"; the HUD says `confirm?`). Your lenses close to **two red slits**, a low alert sounds, and for up to **10 seconds** every quarter of a second **each of the four legs strikes one threat** within 5 blocks, nearest first, for **1000 damage** (a kill), in a red-gold spark. It costs food (about 4 points over the full 10 seconds), and ends by itself, with Sneak + B, when the legs fold, when you are out of food or held. Then wait **30 seconds** (the HUD says `recharging`).
 
@@ -174,7 +174,7 @@ His arm thrusts at what he aims at and a silver strand flies to it, with a splat
 |---|---|
 | **Wanda's Hex** | The wall bounces him like glass, like every hero: a zip, swing or cling it throws ends. A zip whose stand point is across the wall is refused. A shot or burst passes through the wall. |
 | **The Chaos Shield** | A complete shield is solid to his webs, zips and legs (2 points for a shot, half a point for a strand, the strike's damage for a leg). He can't cling to a shield. |
-| **Magneto** | The **Iron Spider** is metal: Magneto can lift and throw it (30 seconds at most) and **scatter its nanites** (10 seconds). The other suits are cloth. |
+| **Magneto** | The **Iron Spider** is metal: Magneto can lift and throw it (30 seconds at most) and, **with PvP on**, **scatter its nanites** (10 seconds). The other suits are cloth. |
 | **Mjolnir** | Pinned, he can't use a key, and every web, zip, swing and cling ends. Mjolnir can't be webbed, and he can't pin anyone with webs. |
 | **Billy's Freeze** | Frozen, he can press nothing; a zip or swing ends, and a cling holds him in place on the wall. |
 | **Telekinesis** | Held, he can't act (and a held Spider-Man drops off the wall). Spider-sense warns of a held player's slam. |
