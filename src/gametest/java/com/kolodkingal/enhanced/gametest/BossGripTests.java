@@ -35,6 +35,7 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosFight;
+import com.kolodkingal.enhanced.thanos.ThanosMeteorEntity;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import com.kolodkingal.enhanced.thanos.ThanosState;
 import com.kolodkingal.enhanced.thanos.ThanosSwordEntity;
@@ -1818,7 +1819,7 @@ public final class BossGripTests {
      * T43 (D-T 7): with PvP off, nothing thrown hurts a player. Ultron thrown by Wanda crashes into a zombie (15) and then
      * into a Survival player, whose health is unchanged; a boss bolt Billy caught and throws at the player leaves him whole;
      * two stones Wanda sets down onto the player's cells never become blocks (D-T 2.3 rule 1). (The meteor of D-T 14.2
-     * is lane TK's step 7: a shot is not yet caught.)
+     * needs a Thanos fight, and only one fight runs at a time: {@link #aThrownMeteorSparesPlayersWithoutPvP}.)
      */
     @GameTest(template = ARENA, batch = "boss_grip_pvp", timeoutTicks = 160)
     public static void thrownBossesSparePlayersWithoutPvP(GameTestHelper helper) {
@@ -2132,6 +2133,45 @@ public final class BossGripTests {
             Telekinesis.release(hero, false);
         }
         helper.succeed();
+    }
+
+    /**
+     * T43, the meteor's part (D-T 7; a Thanos fight of its own, PvP off): a meteor the Phoenix caught and throws at a
+     * Survival player bursts on him and leaves him whole, while the zombie beside him takes the burst, her telekinetic
+     * slam.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_pvp_meteor", timeoutTicks = 40)
+    public static void aThrownMeteorSparesPlayersWithoutPvP(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.pvp(false);
+        ServerPlayer phoenix = ThanosMoveSupport.fighter(f, -7.0, -4.0, Power.PHOENIX);
+        ServerPlayer friend = ThanosMoveSupport.fighter(f, 5.0, -4.0);
+        ThanosEntity thanos = ThanosBossTests.boss(f, phoenix);
+        Zombie zombie = stillZombie(helper, 15.5, 8.0);
+        ThanosMeteorEntity meteor = new ThanosMeteorEntity(ModEntities.THANOS_METEOR.get(), helper.getLevel());
+        meteor.launch(thanos, helper.absoluteVec(new Vec3(7.5, FLOOR, 6.5)));
+        Vec3 at = helper.absoluteVec(new Vec3(7.5, FLOOR + 1.0, 6.5));
+        meteor.setPos(at.x, at.y, at.z);
+        BossFights.fightOf(thanos).spawn(meteor);
+        lookAt(phoenix, meteor);
+        press(phoenix, 3, false);
+        check(Telekinesis.holds(phoenix, meteor), "the Phoenix catches a meteor");
+        lookAt(phoenix, friend);
+        press(phoenix, 3, false);
+        check(!Telekinesis.isHolding(phoenix) && meteor.isTurned(), "and throws it at the player");
+        f.everyTick(30, tick -> {
+            PowerTicker.tick(phoenix);
+            check(friend.getHealth() == ThanosMoveSupport.MAX, "the player is never hurt (tick " + tick + ")");
+            if (!meteor.isRemoved()) {
+                return false;
+            }
+            check(zombie.getHealth() < zombie.getMaxHealth() && zombie.getLastDamageSource() != null
+                    && zombie.getLastDamageSource().is(ModDamageTypes.TELEKINETIC_SLAM) && zombie.getLastDamageSource().getEntity() == phoenix,
+                    "it burst on him: the zombie beside him took her telekinetic slam");
+            zombie.discard();
+            return true;
+        });
     }
 
     private BossGripTests() {
