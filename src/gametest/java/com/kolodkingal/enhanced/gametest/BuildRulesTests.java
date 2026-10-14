@@ -236,6 +236,7 @@ public final class BuildRulesTests {
             before.put(pos.immutable(), level.getBlockState(pos));
         }
         BuildData meter = billy.getData(ModAttachments.BUILD_DATA);
+        BuildMagic.useClock(() -> 0L); // (its 2 ms are not this test's: a busy test server must not cut it short)
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, box), BuildCastPayload.PREFLIGHT);
         Seen seen = Seen.of(billy);
@@ -255,7 +256,8 @@ public final class BuildRulesTests {
             body |= mark.getX() == abs(f, 19, 2, 1).getX() && mark.getZ() == abs(f, 19, 2, 1).getZ() && kind == BuildVerdictPayload.MARK_BODY;
             arena |= kind == BuildVerdictPayload.MARK_PROTECTED && BossFights.protects(level, mark);
         }
-        check(keeps && body && arena, "the marks name the chest, the player and the arena: " + keeps + ", " + body + ", " + arena);
+        check(keeps && body && arena, "the marks name the chest, the player and the arena: " + keeps + ", " + body + ", " + arena + " (flags "
+                + verdict.flags() + ")");
         int flags = verdict.flags();
         check((flags & BuildVerdictPayload.PROTECTED) != 0 && (flags & BuildVerdictPayload.KEEPS) != 0 && (flags & BuildVerdictPayload.BODIES) != 0,
                 "and so do the flags: " + flags);

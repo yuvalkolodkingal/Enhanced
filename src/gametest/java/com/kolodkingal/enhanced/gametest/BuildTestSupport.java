@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.gametest;
 import com.kolodkingal.enhanced.build.BuildJob;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildScheduler;
+import com.kolodkingal.enhanced.build.BuildSession;
+import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellPlanner;
 import com.kolodkingal.enhanced.build.SpellRecipe;
@@ -11,6 +13,7 @@ import com.kolodkingal.enhanced.build.UndoStep;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -27,6 +30,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.FluidState;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -35,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * What the Build Magic tests share (lane BS): a little world of blocks kept in a map, recipes written the way a client
@@ -169,6 +176,9 @@ final class BuildTestSupport {
         private int flip = SpellRecipe.NO_FLIP;
         private int flags;
         private long seed;
+        private List<BlockPos> seeds = List.of();
+        private int material = SpellRecipe.HAND;
+        private int stroke;
 
         Recipe(Spell spell) {
             this.spell = spell;
@@ -198,6 +208,15 @@ final class BuildTestSupport {
         /** The region is the selected thing the test hands the planner in its setup. */
         Recipe mask() {
             this.region = SpellRecipe.MASK;
+            return this;
+        }
+
+        /** The region is the thing the magic selection floods from these seeds (the server floods it itself). */
+        Recipe mask(BlockPos... seeds) {
+            this.region = SpellRecipe.MASK;
+            this.seeds = List.of(seeds);
+            this.a = seeds[0];
+            this.b = seeds[0];
             return this;
         }
 
@@ -237,8 +256,33 @@ final class BuildTestSupport {
             return this;
         }
 
+        /** The hotbar's mix (D-B 5.3) instead of one block. */
+        Recipe mix() {
+            this.flags |= SpellRecipe.MIX;
+            return this;
+        }
+
+        /** A planted shape (its height is the one sent). */
+        Recipe planted(boolean planted) {
+            this.flags = planted ? flags | SpellRecipe.PLANTED : flags & ~SpellRecipe.PLANTED;
+            return this;
+        }
+
+        /** The material: {@link SpellRecipe#HAND} or {@link SpellRecipe#PICKED}. */
+        Recipe material(int material) {
+            this.material = material;
+            return this;
+        }
+
+        /** A dab of the Paint stroke {@code stroke}. */
+        Recipe dab(int stroke) {
+            this.op = SpellRecipe.Op.DAB;
+            this.stroke = stroke;
+            return this;
+        }
+
         SpellRecipe build() {
-            return new SpellRecipe(spell, op, style, region, a, b, List.of(), anchor, face, size, size2, turn, flip, flags, SpellRecipe.HAND, seed, 0);
+            return new SpellRecipe(spell, op, style, region, a, b, seeds, anchor, face, size, size2, turn, flip, flags, material, seed, stroke);
         }
     }
 
@@ -343,6 +387,18 @@ final class BuildTestSupport {
     /** The undo history's steps of {@code player}. */
     static List<UndoStep> steps(ServerPlayer player) {
         return UndoHistory.of(player.getUUID()).steps();
+    }
+
+    /** Adds a listener for the test's length (a claim mod, a counter of events). */
+    static <T extends Event> void listen(TestKit.Fixture f, Class<T> type, Consumer<T> listener) {
+        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, type, listener);
+        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+    }
+
+    /** Whether {@code player} is in build mode, as the server and everyone who sees her know it. */
+    static boolean building(ServerPlayer player) {
+        BuildSession session = BuildSession.existing(player.getUUID());
+        return session != null && session.mode() && player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
     }
 
     /** What the server sent a player since the last look: the verdicts, the effects, the action-bar and chat lines. */
