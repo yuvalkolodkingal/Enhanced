@@ -63,13 +63,30 @@ public final class EnhancedRenderTypes {
 
     /**
      * Real block models seen through (D-B 6.2): the block atlas, normal alpha blending, hidden by the world in front of
-     * it but never hiding what is behind it (no depth write), double-sided, and pushed a little towards the camera so
-     * the ghost of a block that replaces another wins over that block's faces. Build Magic's ghost, drawn from buffers
-     * of its own with the terrain's translucent shader (its chunk offset puts the ghost where it stands).
+     * it, no depth write of its own, double-sided, and pushed a little towards the camera so the ghost of a block that
+     * replaces another wins over that block's faces. Build Magic's ghost, drawn from buffers of its own with the
+     * terrain's translucent shader (its chunk offset puts the ghost where it stands), after {@link #BUILD_GHOST_DEPTH}.
      */
     public static final RenderType BUILD_GHOST = RenderType.create("enhanced_build_ghost",
             DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 4096, false, true, ghost(RenderStateShard.BLOCK_SHEET_MIPPED,
                     RenderStateShard.TRANSLUCENT_TRANSPARENCY));
+
+    /**
+     * A ghost's blocks into the depth buffer only, before they are drawn: then only the face of the ghost nearest the
+     * camera is drawn at each point, so its layers (the front and back of a hollow ball) never pile up into a white or
+     * opaque blur, and the ghost reads as one see-through surface. The same shader and offset as {@link #BUILD_GHOST},
+     * so the depths agree exactly.
+     */
+    public static final RenderType BUILD_GHOST_DEPTH = RenderType.create("enhanced_build_ghost_depth",
+            DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 4096, false, false,
+            RenderType.CompositeState.builder()
+                    .setLightmapState(RenderStateShard.LIGHTMAP)
+                    .setShaderState(RenderStateShard.RENDERTYPE_TRANSLUCENT_SHADER)
+                    .setTextureState(RenderStateShard.BLOCK_SHEET_MIPPED)
+                    .setWriteMaskState(RenderStateShard.DEPTH_WRITE)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
+                    .createCompositeState(false));
 
     /** The game's plain white texture: a ghost's blocks drawn with it keep their shape and shade, not their look. */
     private static final RenderStateShard.TextureStateShard WHITE = new RenderStateShard.TextureStateShard(

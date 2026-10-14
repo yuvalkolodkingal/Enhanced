@@ -162,6 +162,16 @@ final class GhostMesh implements AutoCloseable {
 
     private static Built make(BlockRenderDispatcher dispatcher, ClientLevel level, Cells cells) {
         List<ByteBufferBuilder> memory = new ArrayList<>();
+        try {
+            return make(dispatcher, level, cells, memory);
+        } catch (RuntimeException | Error failed) {
+            // A block that cannot be drawn (a broken model of a mod's): no ghost, and no memory left behind.
+            memory.forEach(ByteBufferBuilder::close);
+            throw failed;
+        }
+    }
+
+    private static Built make(BlockRenderDispatcher dispatcher, ClientLevel level, Cells cells, List<ByteBufferBuilder> memory) {
         BlockPos base = cells.base;
         // The world the block renderer is shown: the ghost's own blocks (in world positions) and nothing else.
         Long2ObjectOpenHashMap<BlockState> shown = new Long2ObjectOpenHashMap<>(cells.blocks.size() * 2);

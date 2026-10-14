@@ -75,7 +75,7 @@ final class Ghost {
     private static final float ALPHA = 0.45F;
     private static final float PULSE = 0.10F;
     /** How bright the hero's glow over the blocks is, and a refused ghost's grey. */
-    private static final float GLOW = 0.3F;
+    private static final float GLOW = 0.25F;
     private static final float GREY = 0.6F;
     /** How bright the dust is. */
     private static final float DUST = 0.6F;
@@ -129,7 +129,7 @@ final class Ghost {
             return;
         }
         SpellRecipe planned = plan.recipe();
-        BlockPos near = aim.target();
+        BlockPos near = crosshair(aim, plan.bounds());
         long most = 4L * detail;
         switch (planned.spell()) {
             case COPY, MOVE -> carried(level, plan, planned, near, detail, most);
@@ -152,7 +152,7 @@ final class Ghost {
         boolean big = plan.size() > most;
         Object key = List.of("world", BuildClient.ghostKey() != null ? BuildClient.ghostKey() : "none", detail, big ? nearKey(near) : 0);
         if (MAIN.wants(key)) {
-            boxColour = big ? mapColour(level, bounds) : null;
+            boxColour = big ? mapColour(level, plan.recipe(), bounds) : null;
             if (big) {
                 // The same plan walked from the crosshair (a Pull's surface is found already: its own plan).
                 SpellPlanner.Plan around = plan.recipe().spell() == Spell.PULL ? plan
@@ -177,7 +177,7 @@ final class Ghost {
                 BuildClient.materialKey() != null ? BuildClient.materialKey() : "none", planned.mix() ? origin : 0, detail,
                 big ? nearKey(near.subtract(origin)) : 0);
         if (MAIN.wants(key)) {
-            boxColour = big ? mapColour(level, bounds) : null;
+            boxColour = big ? mapColour(level, planned, bounds) : null;
             SpellPlanner.Plan walked = big ? SpellPlanner.plan(level, planned, BuildClient.setup(planned, near).withWindow(0)) : plan;
             MAIN.gather = new PlanWalk(walked, Placing.SHAPE, origin, false, big ? near : null, detail);
         }
@@ -219,16 +219,36 @@ final class Ghost {
         }
     }
 
+    /**
+     * The cell of the ghost under the crosshair: where the view ray enters the plan's box (just inside it), the
+     * builder's own cell inside it, or the aimed cell when the ray misses it. A big ghost shows its blocks round it.
+     */
+    private static BlockPos crosshair(BuildGrammar.Aim aim, @Nullable BoundingBox bounds) {
+        if (bounds == null) {
+            return aim.target();
+        }
+        AABB box = new AABB(bounds.minX(), bounds.minY(), bounds.minZ(), bounds.maxX() + 1, bounds.maxY() + 1, bounds.maxZ() + 1);
+        if (box.contains(aim.eyes())) {
+            return BlockPos.containing(aim.eyes());
+        }
+        Vec3 look = aim.look().normalize();
+        return box.clip(aim.eyes(), aim.eyes().add(look.scale(4096))).map(hit -> BlockPos.containing(hit.add(look.scale(0.5))))
+                .orElse(aim.target());
+    }
+
     /** Where the crosshair is, to the nearest {@value #NEAR_STEP} blocks: a big ghost's blocks round it follow it. */
     private static Object nearKey(BlockPos at) {
         int shift = Integer.numberOfTrailingZeros(NEAR_STEP);
         return List.of(at.getX() >> shift, at.getY() >> shift, at.getZ() >> shift);
     }
 
-    /** The map colour of the material in the middle of a big ghost, or -1 (the hero's colour) without one. */
-    private static int mapColour(ClientLevel level, BoundingBox box) {
+    /**
+     * The map colour of the material in the middle of a big ghost, or -1 (the hero's colour) for a spell that makes no
+     * block of its own (Vanish, Pull, Repeat).
+     */
+    private static int mapColour(ClientLevel level, SpellRecipe recipe, BoundingBox box) {
         SpellPlanner.Material material = BuildClient.material();
-        if (material == null) {
+        if (material == null || !recipe.spell().needsMaterial()) {
             return -1;
         }
         BlockPos middle = box.getCenter();
@@ -270,6 +290,8 @@ final class Ghost {
         float alpha = calm ? ALPHA : ALPHA + PULSE * Mth.sin(time * 0.12F);
         float swirl = calm ? 0.5F : 0.5F + 0.5F * Mth.sin(time * 0.2F);
         int dust = grey ? 0x9A9A9A : core;
+        // The glow: the hero's colour, a third of the way to its highlight (Billy's highlight alone is nearly white).
+        int tint = mix(core, glow, 0.35F);
         // A big ghost's box, tinted with its material, and its grid.
         BoundingBox bounds = plan.bounds();
         if (boxColour != null && bounds != null) {
@@ -298,15 +320,18 @@ final class Ghost {
             // The blocks: the turn is about the buffer's 0, 0, 0, which the chunk offset puts in its place.
             Matrix4f blocks = new Matrix4f(modelView).translate(offset).mul(turned).translate(-offset.x, -offset.y, -offset.z);
             Matrix4f placed = new Matrix4f(modelView).translate(offset).mul(turned);
+            mesh.drawCubes(placed, projection, grey ? 0x9A9A9A : glow, 0.9F);
+            mesh.drawDust(placed, projection, dust, DUST * swirl, DUST * (1.0F - swirl));
+            // The blocks: their nearest faces into the depth buffer first, so only those are seen, then their look
+            // and the hero's glow over it (or, refused, flat grey).
+            mesh.drawBlocks(EnhancedRenderTypes.BUILD_GHOST_DEPTH, blocks, projection, offset, 1.0F, 1.0F, 1.0F, 1.0F);
             if (grey) {
                 mesh.drawBlocks(EnhancedRenderTypes.BUILD_GHOST_FLAT, blocks, projection, offset, GREY, GREY, GREY, alpha + 0.1F);
             } else {
                 mesh.drawBlocks(EnhancedRenderTypes.BUILD_GHOST, blocks, projection, offset, 1.0F, 1.0F, 1.0F, alpha);
-                mesh.drawBlocks(EnhancedRenderTypes.BUILD_GHOST_GLOW, blocks, projection, offset, red(glow), green(glow), blue(glow),
+                mesh.drawBlocks(EnhancedRenderTypes.BUILD_GHOST_GLOW, blocks, projection, offset, red(tint), green(tint), blue(tint),
                         GLOW * alpha / ALPHA);
             }
-            mesh.drawCubes(placed, projection, grey ? 0x9A9A9A : glow, 0.9F);
-            mesh.drawDust(placed, projection, dust, DUST * swirl, DUST * (1.0F - swirl));
         }
         if (!grey) {
             greyRoundMarks(plan, camera);
@@ -468,6 +493,13 @@ final class Ghost {
             }
         }
         buffers.endBatch(EnhancedRenderTypes.ENERGY_VEIL);
+    }
+
+    private static int mix(int from, int to, float t) {
+        int r = Math.round(Mth.lerp(t, from >> 16 & 0xFF, to >> 16 & 0xFF));
+        int g = Math.round(Mth.lerp(t, from >> 8 & 0xFF, to >> 8 & 0xFF));
+        int b = Math.round(Mth.lerp(t, from & 0xFF, to & 0xFF));
+        return r << 16 | g << 8 | b;
     }
 
     private static float red(int rgb) {

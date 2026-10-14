@@ -360,7 +360,7 @@ public final class BuildRenderer {
         }
         float radius = g.brush() + 0.5F;
         Vec3 centre = Vec3.atCenterOf(at).subtract(camera);
-        int argb = EnergyGeometry.argb(look.glow(), 0.8F);
+        int argb = EnergyGeometry.argb(look.core(), 0.9F);
         float width = wide(centre, 0.05F);
         if (g.spell() == Spell.LAND) {
             EnergyGeometry.ring(pose, vc, centre.add(0, 0.52, 0), UP, radius, width, 48, argb);

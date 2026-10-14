@@ -462,9 +462,12 @@ public final class BuildClient {
         g.selectedBy(null);
     }
 
-    /** The client's count of the plan against this world, {@value #COUNT_PER_TICK} cells a tick. */
+    /**
+     * The client's count of the plan against this world, {@value #COUNT_PER_TICK} cells a tick. A brush's dab is
+     * planned for its ghost (the blocks under the brush) and never counted: it costs what its stroke paints.
+     */
     private static void countOn(ClientLevel level) {
-        if (recipe == null || limits == null || aim == null || recipe.spell().isBrush()) {
+        if (recipe == null || limits == null || aim == null) {
             return;
         }
         if (plan == null) {
@@ -472,6 +475,9 @@ public final class BuildClient {
                 return;
             }
             plan = SpellPlanner.plan(level, recipe.clamped(limits), setup(recipe, BlockPos.containing(aim.eyes())));
+        }
+        if (recipe.spell().isBrush()) {
+            return;
         }
         if (!plan.prepared()) {
             plan.prepare(COUNT_PER_TICK);
