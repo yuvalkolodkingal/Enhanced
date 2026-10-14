@@ -79,7 +79,7 @@ public final class BuildMagic {
         BuildSession session = BuildSession.of(player.getUUID());
         long now = player.server.getTickCount();
         if (!session.takeRequest(now)) {
-            Enhanced.LOGGER.debug("Build Magic: {} sends too many requests; one was dropped", player.getGameProfile().getName());
+            dropped(player, session, now);
             return; // C6: dropped
         }
         boolean preflight = (flags & BuildCastPayload.PREFLIGHT) != 0;
@@ -310,7 +310,9 @@ public final class BuildMagic {
      */
     public static void action(ServerPlayer player, int action, BlockPos a, BlockPos b, int value) {
         BuildSession session = BuildSession.of(player.getUUID());
-        if (!session.takeRequest(player.server.getTickCount())) {
+        long now = player.server.getTickCount();
+        if (!session.takeRequest(now)) {
+            dropped(player, session, now);
             return;
         }
         switch (action) {
@@ -574,6 +576,14 @@ public final class BuildMagic {
             player.displayClientMessage(line, true);
         }
         BuildSounds.fizzle(player);
+    }
+
+    /** A request over the token bucket was dropped (C6): said in the server's log at most once a minute a player. */
+    private static void dropped(ServerPlayer player, BuildSession session, long tick) {
+        if (session.logDropped(tick)) {
+            Enhanced.LOGGER.warn("Build Magic: {} sends more than {} requests a second; the rest are dropped", player.getGameProfile().getName(),
+                    BuildConfig.MAX_REQUESTS_PER_SECOND.get());
+        }
     }
 
     static void send(ServerPlayer player, BuildVerdictPayload verdict) {

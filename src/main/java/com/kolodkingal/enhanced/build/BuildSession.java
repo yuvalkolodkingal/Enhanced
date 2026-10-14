@@ -24,6 +24,8 @@ import java.util.UUID;
 public final class BuildSession {
     /** The most preflights a builder may ask for each second (D-B 10.1); more are dropped, not queued. */
     public static final int PREFLIGHTS_PER_SECOND = 4;
+    /** How often (ticks) a builder's dropped requests are logged: once a minute (C6). */
+    private static final int DROPS_LOGGED_EVERY = 1200;
     /** The spells after a login whose done line says how many blocks they changed; after them, just the pop. */
     public static final int SAID_SPELLS = 5;
 
@@ -37,6 +39,7 @@ public final class BuildSession {
     private double preflights = PREFLIGHTS_PER_SECOND;
     private long preflightsAt;
     private int casts;
+    private long droppedLoggedAt = Long.MIN_VALUE / 2;
     private long momSaidAt = Long.MIN_VALUE / 2;
     private final List<Component> atLogin = new ArrayList<>();
 
@@ -97,6 +100,15 @@ public final class BuildSession {
             return false;
         }
         requests -= 1.0;
+        return true;
+    }
+
+    /** Whether a dropped request at server tick {@code tick} is to be logged: once a minute at most (C6). */
+    public boolean logDropped(long tick) {
+        if (tick - droppedLoggedAt < DROPS_LOGGED_EVERY) {
+            return false;
+        }
+        droppedLoggedAt = tick;
         return true;
     }
 
