@@ -57,6 +57,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -182,7 +183,10 @@ public final class BuildMathTests {
 
     // B2
 
-    /** The heart of radius 3, top to bottom, as Appendix A.2 draws it. */
+    /**
+     * The heart of radius 3, top to bottom, as Appendix A.2 draws it; a row it hands out is the caller's, so changing it
+     * leaves every heart of that radius whole (their plane is remembered for all of them).
+     */
     @GameTest(template = TestKit.ARENA, batch = "build_pure")
     public static void theHeartHasItsRows(GameTestHelper helper) {
         String[] rows = {".##.##.", "#######", "#######", "#######", ".#####.", "..###..", "...#..."};
@@ -197,6 +201,11 @@ public final class BuildMathTests {
         }
         Shape outline = new Shape(ShapeKind.HEART, 3, 0, 1, true, 0);
         check(!outline.contains(0, 3, 0) && outline.contains(0, 0, 0) && outline.contains(-3, 3, 0), "the hollow heart is its outline");
+        int[] top = heart.runs(6, 0, -100, 100);
+        check(Arrays.equals(top, new int[]{-2, -1, 1, 2}), "the top row's runs: " + Arrays.toString(top));
+        Arrays.fill(top, 0);
+        int[] again = new Shape(ShapeKind.HEART, 3, 0, 1, false, 0).runs(6, 0, -100, 100);
+        check(Arrays.equals(again, new int[]{-2, -1, 1, 2}), "a row changed by its caller leaves the next heart whole: " + Arrays.toString(again));
         helper.succeed();
     }
 

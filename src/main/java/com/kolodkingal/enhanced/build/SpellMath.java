@@ -99,7 +99,9 @@ public final class SpellMath {
 
         /**
          * The cells of row {@code y, z} between {@code x0} and {@code x1} (both included), as runs. The default asks
-         * {@link #contains} for every {@code x}; the volumes of this class compute their rows at once.
+         * {@link #contains} for every {@code x}; the volumes of this class compute their rows at once. The array is to
+         * be read, never changed: a volume may give the same array again (every row with no cell is
+         * {@link #NO_RUNS}), so a caller that wants to move or cut a row makes its own copy.
          */
         default int[] runs(int y, int z, int x0, int x1) {
             BoundingBox b = bounds();
@@ -863,7 +865,11 @@ public final class SpellMath {
                 }
                 HEARTS.put(r, plane);
             }
-            return clip(plane[v], u0, u1);
+            // The plane is remembered for every heart of this radius (on a client and its integrated server alike):
+            // a row that needs no cut is handed out as a copy, so no caller can change the remembered one.
+            int[] row = plane[v];
+            int[] cut = clip(row, u0, u1);
+            return cut == row && row.length > 0 ? row.clone() : cut;
         }
 
         /** Every row of the plane of a heart of radius {@code r}, found once (it is the same both sides of u = 0). */
