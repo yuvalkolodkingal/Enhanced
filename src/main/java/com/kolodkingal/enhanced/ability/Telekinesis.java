@@ -452,6 +452,15 @@ public final class Telekinesis {
         return Metal.isMagnetic(e);
     }
 
+    /**
+     * Whether a grip of Magneto's on this entity holds on, each tick: the rule of {@link Metal#staysMagnetic}, and a metal
+     * block he tore out of the ground (a lifted block is metal when its block is, D-M 2.3 row 6), which his grip never
+     * drops while he carries it (D-M 3.3).
+     */
+    private static boolean staysHis(Entity e) {
+        return Metal.staysMagnetic(e) || (e instanceof TelekineticBlockEntity block && Metal.isMetalBlock(block.getBlockState()));
+    }
+
     public static boolean isHeld(Entity e) {
         UUID id = e.getUUID();
         for (Grip g : GRIPS.values()) {
@@ -531,7 +540,7 @@ public final class Telekinesis {
                 || data.power() != grip.mode.power
                 || player.hasEffect(ModEffects.ENTOMBED)
                 || e.distanceTo(player) > BREAK_DISTANCE
-                || (grip.mode == Mode.MAGNETO && !Metal.staysMagnetic(e))
+                || (grip.mode == Mode.MAGNETO && !staysHis(e))
                 || MjolnirPin.isPinned(e)
                 || (e instanceof Player p && (p.isCreative() || p.isSpectator() || grip.ticks > MAX_PLAYER_HOLD_TICKS));
         if (lost) {

@@ -30,6 +30,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -41,11 +42,14 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import java.util.UUID;
 
 /**
- * A block Wanda, Billy or Jean Grey tore out of the ground. While held it floats wherever the holder looks; launched, it
- * flies like a shell, hurts the first creature it hits and shatters (dropping its normal item). Put down gently, it lands
- * like sand and becomes a block again where the one who let go of it may place one ({@link BlockLifting#mayPlace});
- * otherwise it drops as an item. It glows in the colour of the telekinesis that holds it: Wanda's red, Billy's blue,
- * Jean's violet.
+ * A block Wanda, Billy, Jean Grey or Magneto tore out of the ground. While held it floats wherever the holder looks;
+ * launched, it flies like a shell, hurts the first creature it hits and shatters (dropping its normal item). Put down
+ * gently, it lands like sand and becomes a block again where the one who let go of it may place one ({@link
+ * BlockLifting#mayPlace}); otherwise it drops as an item. It glows in the colour of the telekinesis that holds it: Wanda's
+ * red, Billy's blue, Jean's violet, Magneto's iron grey.
+ *
+ * <p>A door Magneto tore out is held by its lower half ({@link BlockLifting#isDoor}): its upper half is drawn above it, it
+ * is set down on two cells, and it shatters into one door. A piston is held retracted, a lantern as it hung.
  *
  * <p>A block torn out of a boss's protected arena is <em>borrowed</em> ({@link #isBorrowed}: it carries the fight's mark,
  * {@link ArenaLoans}): it never drops anything. Thrown, it turns to dust where it hits, and at the edge of a gated arena;
@@ -292,7 +296,9 @@ public class TelekineticBlockEntity extends Entity {
      * Put down gently: becomes a block again where it landed if the cell takes it and the one who let go of it may place
      * it there ({@link BlockLifting#mayPlace}: room, the arenas, his rights, never for someone who left); otherwise it
      * drops as an item. Nothing lands on the ground the clients hide under Ultron's island in the sky. A borrowed block
-     * stands where its arena's rules let it ({@link BossFights#standBorrowed}), and crumbles to dust anywhere else.
+     * stands where its arena's rules let it ({@link BossFights#standBorrowed}), and crumbles to dust anywhere else. A door
+     * needs its two cells, and both are asked (it shatters into one door otherwise); a hanging lantern with nothing to hang
+     * from stands on the ground; a piston is placed retracted and, if it is powered there, pushes out a new head.
      */
     private void land() {
         if (!(level() instanceof ServerLevel server)) {
@@ -307,21 +313,37 @@ public class TelekineticBlockEntity extends Entity {
             }
             return;
         }
-        if (BossFights.hidesGround(server, pos)) {
+        BlockState state = BlockLifting.landingState(server, pos, getBlockState());
+        BlockPos top = BlockLifting.isDoor(state) ? pos.above() : null;
+        if (BossFights.hidesGround(server, pos) || (top != null && BossFights.hidesGround(server, top))) {
             shatter(true);
             return;
         }
-        BlockState here = server.getBlockState(pos);
-        BlockState state = getBlockState();
         ServerPlayer holder = thrower == null ? null : server.getServer().getPlayerList().getPlayer(thrower);
-        boolean replaceable = here.canBeReplaced(new DirectionalPlaceContext(server, pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP));
-        if (replaceable && state.canSurvive(server, pos) && BlockLifting.mayPlace(server, pos, state, holder)
-                && server.setBlock(pos, state, Block.UPDATE_ALL)) {
+        boolean fits = replaceable(server, pos) && state.canSurvive(server, pos) && (top == null || replaceable(server, top))
+                && BlockLifting.mayPlace(server, pos, state, holder)
+                && (top == null || BlockLifting.mayPlace(server, top, BlockLifting.doorTop(state), holder));
+        // UPDATE_ALL: a powered piston pushes out its head, a rail turns to its neighbours.
+        if (fits && server.setBlock(pos, state, Block.UPDATE_ALL)
+                && (top == null || server.setBlock(top, BlockLifting.doorTop(state), Block.UPDATE_ALL))) {
             server.playSound(null, pos, state.getSoundType().getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.8F);
             discard();
         } else {
             shatter(true);
         }
+    }
+
+    /** Whether the cell is in the world and what is in it gives way to a block set down there (air, grass, water). */
+    private static boolean replaceable(ServerLevel server, BlockPos pos) {
+        DirectionalPlaceContext context = new DirectionalPlaceContext(server, pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP);
+        return server.isInWorldBounds(pos) && server.getBlockState(pos).canBeReplaced(context);
+    }
+
+    /** A held door is drawn two blocks tall: its upper half is seen even when only the top is in view. */
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        AABB box = super.getBoundingBoxForCulling();
+        return BlockLifting.isDoor(getBlockState()) ? box.expandTowards(0.0, 1.0, 0.0) : box;
     }
 
     /** A borrowed block never leaves the dimension of its arena (D-T 7). */

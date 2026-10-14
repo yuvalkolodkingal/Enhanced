@@ -241,7 +241,7 @@ public final class ArenaLoans {
         ServerLevel level = fight.level();
         loose.remove(block.getUUID());
         BlockPos cell = pos.immutable();
-        BlockState placed = standingState(block.getBlockState());
+        BlockState placed = standingState(BlockLifting.landingState(level, cell, block.getBlockState()));
         BlockState here = level.getBlockState(cell);
         UUID owner = block.thrower();
         boolean stands = owner != null && block.level() == level && fight.arena().protects(cell) && !BossFights.hidesGround(level, cell)
@@ -272,7 +272,10 @@ public final class ArenaLoans {
         loose.remove(block.getUUID());
     }
 
-    /** The state a borrowed block stands as: leaves set down never decay into saplings. */
+    /**
+     * The state a borrowed block stands as: leaves set down never decay into saplings (a hanging lantern with nothing to
+     * hang from already stands on the ground, {@link BlockLifting#landingState}).
+     */
     private static BlockState standingState(BlockState state) {
         return state.hasProperty(LeavesBlock.PERSISTENT) ? state.setValue(LeavesBlock.PERSISTENT, true) : state;
     }
