@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Function;
 
-/** Glowing, additive render types for energy: beams, shields and the Hex wall. */
+/** Glowing, additive render types for energy: beams, shields, the Hex wall and Build Magic's box. */
 public final class EnhancedRenderTypes {
 
     /** Untextured, additive (light adds up), double-sided, doesn't hide what's behind it. */
@@ -31,6 +31,34 @@ public final class EnhancedRenderTypes {
                     .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
                     .setWriteMaskState(RenderStateShard.COLOR_WRITE)
                     .setCullState(RenderStateShard.NO_CULL)
+                    .createCompositeState(false));
+
+    /**
+     * Untextured, additive, double-sided, and drawn over everything (no depth test): Build Magic's box seen faintly
+     * through hills and walls, so a box is never lost behind one (D-B 6.1, client option {@code seeThrough}).
+     */
+    public static final RenderType BUILD_XRAY = RenderType.create("enhanced_build_xray",
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 4096, false, true,
+            RenderType.CompositeState.builder()
+                    .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
+                    .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                    .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .createCompositeState(false));
+
+    /**
+     * Untextured, additive, double-sided, and pushed a little towards the camera so it never fights the block faces it
+     * lies on: the glow on the faces of a thing Build Magic has selected (D-B 3.4), drawn from a buffer of its own.
+     */
+    public static final RenderType BUILD_GLOW = RenderType.create("enhanced_build_glow",
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 4096, false, true,
+            RenderType.CompositeState.builder()
+                    .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
+                    .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
                     .createCompositeState(false));
 
     private static final RenderStateShard.ShaderStateShard POSITION_TEX_COLOR =
