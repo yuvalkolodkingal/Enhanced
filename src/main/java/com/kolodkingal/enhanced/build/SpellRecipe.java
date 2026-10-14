@@ -31,6 +31,9 @@ import java.util.List;
  *     <tr><td>Land, Grow</td><td>its {@link LandStyle}, {@link GrowStyle}</td><td>the brush's radius</td><td>0</td></tr>
  * </table>
  *
+ * <p>A shape's height is the height itself (at least 1, as {@link #clamped} makes it), never 0 for "the default": until
+ * the shape is planted a client sends {@link ShapeKind#defaultHeight}, so its ghost and the server plan the same shape.
+ *
  * @param spell    which spell
  * @param op       what the right button does with it
  * @param style    the spell's style or shape kind (its ordinal)
