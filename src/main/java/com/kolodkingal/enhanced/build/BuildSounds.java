@@ -18,8 +18,9 @@ import java.util.function.Supplier;
  * ({@code enhanced:build_on_wanda}, {@code build_on_billy}, {@code build_cast_wanda}, {@code build_cast_billy},
  * {@code build_hum}, {@code build_fizzle}, {@code build_undo}, {@code build_rank_up}), and two that are not: a spell of the
  * Scarlet Witch of {@link #HUGE_CAST} blocks or more rises with the Hex of her gesture, and the done sound is a vanilla
- * one. Heard within 16 blocks of where each is played (the spell's front, so a valley-sized spell is heard where it
- * happens), except the fizzle, which only the builder hears. The eight subtitles are in both lang files.
+ * one. Heard within 16 blocks of where each is played: the caster for the cast (and for the hum, which the front of a
+ * working spell repeats where it is, so a valley-sized spell is heard where it happens), except the fizzle, which only
+ * the builder hears. The eight subtitles are in both lang files.
  *
  * <p>Every method plays on the server, for everyone near (on a client {@code level.playSound} with no player does nothing).
  */
@@ -58,6 +59,9 @@ public final class BuildSounds {
     /** A spell is done: a vanilla sound, with no event of its own. */
     private static final Voice DONE = new Voice(() -> SoundEvents.AMETHYST_CLUSTER_PLACE, 0.6F, 1.0F);
 
+    /** How far a sound of Build Magic carries, in blocks (a sound of volume 1 or less). */
+    public static final double HEARD = 16.0;
+
     /** From this many blocks the Scarlet Witch's cast sounds bigger (as her gesture is, {@code WANDA_HEX_RISE}). */
     public static final int HUGE_CAST = 100_000;
 
@@ -66,12 +70,12 @@ public final class BuildSounds {
         play(builder.level(), builder.position(), isBilly(builder) ? ON_BILLY : ON_WANDA);
     }
 
-    /** A spell of {@code blocks} blocks by {@code hero} starts, at {@code at}. */
+    /** A spell of {@code blocks} blocks by {@code hero} starts, at {@code at}: the caster, never the middle of a box he is far from. */
     public static void cast(Level level, Vec3 at, Power hero, long blocks) {
         play(level, at, hero == Power.BILLY ? CAST_BILLY : blocks >= HUGE_CAST ? CAST_WANDA_HUGE : CAST_WANDA);
     }
 
-    /** The hum of {@code hero}'s working spell, at its front. */
+    /** The hum of {@code hero}'s working spell, at {@code at}: its front, and the caster (he hears his own spell weave). */
     public static void hum(Level level, Vec3 at, Power hero) {
         play(level, at, hero == Power.BILLY ? HUM_BILLY : HUM_WANDA);
     }

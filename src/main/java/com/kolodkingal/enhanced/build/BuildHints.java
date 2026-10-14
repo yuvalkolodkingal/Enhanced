@@ -90,7 +90,7 @@ public final class BuildHints {
         boolean undoRow = true;
         switch (spell) {
             case PAINT, LAND, GROW -> {
-                rows.add(new Row(Input.RIGHT_HELD, hint(spell == Spell.PAINT ? "paint" : spell == Spell.LAND ? "raise" : "grow")));
+                rows.add(new Row(Input.RIGHT_HELD, hint(brushVerb(spell, style))));
                 rows.add(row(Input.WHEEL, "brush"));
                 if (spell != Spell.PAINT) {
                     rows.add(new Row(Input.MORE_WHEEL, Component.translatable(HINT + "style", styleName(spell, style))));
@@ -160,7 +160,13 @@ public final class BuildHints {
             }
             case BOX_HOLD -> {
                 rows.add(new Row(Input.RIGHT_HELD, Component.translatable(HINT + "held", hint(verb(spell)))));
-                rows.add(row(Input.WHEEL, "push_side"));
+                if (spell == Spell.REPEAT) {
+                    // The wheel of a Repeat's box counts the copies (and Alt + wheel the gap), as without the hold.
+                    rows.add(row(Input.WHEEL, "copies"));
+                    rows.add(row(Input.MORE_WHEEL, "gap"));
+                } else {
+                    rows.add(row(Input.WHEEL, "push_side"));
+                }
                 rows.add(row(Input.LEFT, "let_go"));
             }
             case GHOST -> {
@@ -175,6 +181,23 @@ public final class BuildHints {
                 rows.add(row(Input.MAGIC_KEY, "spells"));
             }
         }
+    }
+
+    /** What the held right button does with a brush: paint, and Land's and Grow's verb by their style. */
+    private static String brushVerb(Spell spell, int style) {
+        return switch (spell) {
+            case LAND -> switch (LandStyle.byId(style)) {
+                case RAISE -> "raise";
+                case LOWER -> "lower";
+                case SMOOTH -> "smooth";
+            };
+            case GROW -> switch (GrowStyle.byId(style)) {
+                case SWELL -> "grow";
+                case SHRINK -> "shrink";
+                case BLOOM -> "bloom";
+            };
+            default -> "paint";
+        };
     }
 
     /** What the right button does to a box: fill, vanish or change. */

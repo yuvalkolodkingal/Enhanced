@@ -665,10 +665,19 @@ public final class BuildRules {
      * existing block, how many it checked, whether it saw only part ({@code cutOff}: a sample, or the 2 ms ran out), the
      * verdict's flags, and up to {@link BuildVerdictPayload#MAX_MARKS} marked cells with their kinds.
      */
-    public record Preview(long changed, long removed, long checked, boolean cutOff, int flags, long[] marks, byte[] kinds) {
+    public record Preview(long changed, long removed, long checked, boolean cutOff, int flags, long[] marks, byte[] kinds,
+                          @Nullable Component summary) {
         /** Whether some cells it checked would be left. */
         public boolean partly() {
             return (flags & ~BuildVerdictPayload.CUT_OFF) != 0;
+        }
+
+        /**
+         * Whether the plan can change nothing: every cell it would change was checked, and every one of them is left
+         * ({@link BuildVerdictPayload#NOTHING_CAN_CHANGE}). A plan seen in part says nothing of the rest.
+         */
+        public boolean nothingCanChange() {
+            return !cutOff && changed == 0 && partly();
         }
     }
 
@@ -753,10 +762,12 @@ public final class BuildRules {
         void look(BlockPos pos, Supplier<BlockState> now) {
             checked++;
             if (!SpellMath.loaded(level, pos)) {
+                rules.left(Left.UNLOADED);
                 mark(pos, BuildVerdictPayload.MARK_UNLOADED, BuildVerdictPayload.UNLOADED);
                 return;
             }
             if (SpellMath.outside(level, pos)) {
+                rules.left(Left.OUTSIDE);
                 mark(pos, BuildVerdictPayload.MARK_OUTSIDE, BuildVerdictPayload.PROTECTED);
                 return;
             }
@@ -769,6 +780,7 @@ public final class BuildRules {
             boolean carries = region != null && region.contains(pos.getX(), pos.getY(), pos.getZ());
             Left why = rules.check(pos, old, state, !carried, carries);
             if (why != null) {
+                rules.left(why);
                 mark(pos, switch (why) {
                     case BEYOND -> BuildVerdictPayload.MARK_BEYOND;
                     case BODIES -> BuildVerdictPayload.MARK_BODY;
@@ -793,7 +805,7 @@ public final class BuildRules {
 
         Preview preview(boolean cutOff) {
             return new Preview(changed, removed, checked, cutOff, flags | (cutOff ? BuildVerdictPayload.CUT_OFF : 0), marks.toLongArray(),
-                    kinds.toByteArray());
+                    kinds.toByteArray(), rules.summary());
         }
     }
 

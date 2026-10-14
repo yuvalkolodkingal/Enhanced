@@ -411,11 +411,14 @@ final class BuildTestSupport {
         final List<BuildFxPayload> fx = new ArrayList<>();
         final List<Component> bar = new ArrayList<>();
         final List<Component> chat = new ArrayList<>();
+        final List<TestKit.HeardSound> sounds = new ArrayList<>();
 
         /** Reads (and so empties) the player's packets. */
         static Seen of(ServerPlayer player) {
             Seen seen = new Seen();
-            for (Object packet : TestKit.sentPackets(player)) {
+            List<Object> packets = TestKit.sentPackets(player);
+            seen.sounds.addAll(TestKit.soundsIn(packets));
+            for (Object packet : packets) {
                 if (packet instanceof ClientboundCustomPayloadPacket custom) {
                     if (custom.payload() instanceof BuildVerdictPayload verdict) {
                         seen.verdicts.add(verdict);
@@ -427,6 +430,11 @@ final class BuildTestSupport {
                 }
             }
             return seen;
+        }
+
+        /** Whether the player heard the sound event {@code id} (its path, in the mod's namespace). */
+        boolean heard(String id) {
+            return sounds.stream().anyMatch(sound -> sound.id().equals(com.kolodkingal.enhanced.Enhanced.id(id)));
         }
 
         /** The last verdict, or null. */

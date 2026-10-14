@@ -35,6 +35,7 @@ import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
+import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -995,11 +996,12 @@ public final class V31CrossTests {
             check(sky.stream().anyMatch(state -> !state.isAir()) && hidden.stream().anyMatch(state -> !state.isAir()),
                     "the boxes hold island and ground");
             for (BoundingBox box : List.of(skyBox, groundBox)) {
+                BuildTestSupport.Seen.of(wanda);
                 cast(wanda, boxSpell(f, Spell.FILL, box));
-                BuildJob job = working(wanda);
-                check(job != null, "the fill is cast");
-                finish(wanda);
-                check(job.left(Left.PROTECTED) > 0, "the cells are counted protected: " + job.left(Left.PROTECTED));
+                BuildTestSupport.Seen seen = BuildTestSupport.Seen.of(wanda);
+                // Every cell is protected (the arena): nothing can change, so the fill fizzles before it is cast, and says how many.
+                check(working(wanda) == null && seen.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE
+                        && seen.said("message.enhanced.build.left.protected"), "the fill is refused, the cells counted protected: " + seen);
             }
             check(states(helper, skyBox).equals(sky), "every cell over the island is as it was");
             check(states(helper, groundBox).equals(hidden), "and every cell of the hidden ground");

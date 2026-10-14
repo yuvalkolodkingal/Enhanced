@@ -213,12 +213,19 @@ public final class BuildMagic {
             dab(player, session, limits, clamped, token, setup, plan, open);
             return;
         }
+        if (plan != null && plan.prepared() && plan.size() <= BuildConfig.PREVIEW_CHECKS.get()) {
+            // Every cell it would change is left as it is: the same answer as the preflight's, and the fizzle, before a
+            // spell is queued, a meter charged or a cast sound heard (D-B 6.2).
+            BuildRules.Preview seen = BuildRules.preflight(level, player, plan, BuildConfig.PREVIEW_CHECKS.get(), clock);
+            if (seen.nothingCanChange()) {
+                refuse(player, token, BuildVerdictPayload.NOTHING_CAN_CHANGE, 0, seen.summary(), false);
+                return;
+            }
+        }
         BuildJob job = BuildJob.spell(player, limits, clamped, token, flags, setup, plan, BuildScheduler.loaded(player.getUUID(), level));
         BuildScheduler.queue(job, false);
         job.fx(BuildFxPayload.START);
-        BoundingBox at = job.bounds();
-        BuildSounds.cast(level, at != null ? Vec3.atCenterOf(at.getCenter()) : player.position(), limits.hero(),
-                plan != null && plan.prepared() ? plan.size() : 0L);
+        BuildSounds.cast(level, player.position(), limits.hero(), plan != null && plan.prepared() ? plan.size() : 0L);
         if (job.mom()) {
             momHelps(player, session);
         }
@@ -264,8 +271,7 @@ public final class BuildMagic {
         BuildScheduler.queue(job, false);
         if (first) {
             job.fx(BuildFxPayload.START);
-            BoundingBox at = job.bounds();
-            BuildSounds.cast(player.serverLevel(), at != null ? Vec3.atCenterOf(at.getCenter()) : player.position(), limits.hero(), 0L);
+            BuildSounds.cast(player.serverLevel(), player.position(), limits.hero(), 0L);
             if (stroke.mom) {
                 momHelps(player, session);
             }
@@ -395,6 +401,11 @@ public final class BuildMagic {
             return;
         }
         BuildRules.Preview preview = BuildRules.preflight(level, player, plan, BuildConfig.PREVIEW_CHECKS.get(), clock);
+        if (preview.nothingCanChange()) {
+            send(player, new BuildVerdictPayload(token, BuildVerdictPayload.NOTHING_CAN_CHANGE, 0, 0, 0, preview.flags(), preview.marks(),
+                    preview.kinds()));
+            return;
+        }
         int cost = limits.limited() ? BillyMagic.cost(preview.changed(), BillyMagic.mom(player) != null) : 0;
         int code = preview.partly() ? BuildVerdictPayload.READY_PARTLY : BuildVerdictPayload.READY;
         send(player, new BuildVerdictPayload(token, code, (int) Math.min(Integer.MAX_VALUE, preview.changed()), cost,
@@ -827,7 +838,8 @@ public final class BuildMagic {
         BuildScheduler.queue(job, false);
         job.fx(BuildFxPayload.START);
         BoundingBox box = step.bounds();
-        BuildSounds.undo(level, box != null ? Vec3.atCenterOf(box.getCenter()) : player.position());
+        // At the caster, who must hear his own undo (an undo in another dimension than his, at the spell's middle).
+        BuildSounds.undo(level, player.level() == level || box == null ? player.position() : Vec3.atCenterOf(box.getCenter()));
         sync(player.server, id);
     }
 

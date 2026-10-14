@@ -146,6 +146,41 @@ public final class BuildJobTests {
         helper.succeed();
     }
 
+    // B69a
+
+    /**
+     * The cast and the hum are the caster's (D-B 7.3, joint check finding 8): the cast sound is played where she stands,
+     * not at the middle of the box, so that a fill whose middle is far from the corner she stands at is heard by her; the
+     * hum of the working spell is heard at her too (every 20 ticks, the front being within 16 of her), and so is her undo.
+     */
+    @GameTest(template = ARENA, batch = "build_jobs_sounds")
+    public static void theCastAndTheHumAreHeardAtTheCaster(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
+        BoundingBox box = new BoundingBox(5, 2, 5, 19, 4, 19);
+        TestKit.heardSounds(wanda);
+        // (A sound packet keeps a position to an eighth of a block, in single precision: far from the origin, to half a block.)
+        cast(wanda, boxSpell(f, Spell.FILL, box));
+        List<TestKit.HeardSound> heard = TestKit.heardSounds(wanda);
+        check(heard.stream().anyMatch(sound -> sound.id().getPath().equals("build_cast_wanda") && sound.at().distanceTo(wanda.position()) < 1.0),
+                "the cast is heard where she stands (" + wanda.position() + "), not at the box's middle: " + heard);
+        Budget pace = Budget.of(20_000, 4096, 30);
+        for (int tick = 1; tick <= 22; tick++) {
+            BuildScheduler.step(List.of(wanda.getUUID()), pace);
+        }
+        heard = TestKit.heardSounds(wanda);
+        check(heard.stream().anyMatch(sound -> sound.id().getPath().equals("build_hum"))
+                && heard.stream().filter(sound -> sound.id().getPath().equals("build_hum")).allMatch(sound -> sound.at().distanceTo(wanda.position()) < 1.0),
+                "the hum of her working spell is heard, always at her: " + heard);
+        finish(wanda);
+        TestKit.heardSounds(wanda);
+        BuildMagic.undo(wanda);
+        heard = TestKit.heardSounds(wanda);
+        check(heard.stream().anyMatch(sound -> sound.id().getPath().equals("build_undo") && sound.at().distanceTo(wanda.position()) < 1.0),
+                "and so is her undo: " + heard);
+        helper.succeed();
+    }
+
     // B70
 
     /**
