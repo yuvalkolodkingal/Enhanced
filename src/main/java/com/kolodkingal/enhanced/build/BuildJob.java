@@ -78,7 +78,8 @@ import java.util.function.BiPredicate;
  *     <li><b>SELECT</b>: the magic selection's flood from the seeds, for a selected thing (reads count a quarter of a
  *     write); a refusal ends the job ({@code TOO_BIG_TO_SELECT}, {@code TOO_WIDE}, {@code TOO_FAR}, {@code NO_BOX}).
  *     Then the plan's size is known, and the ceiling and the long hold are asked (C11, C12).</li>
- *     <li><b>PREPARE</b>: a Pull's surface.</li>
+ *     <li><b>PREPARE</b>: a Pull's surface; a Land pulse's columns ({@link LandBrush.Pulse}), and Billy's price of
+ *     them, after which it goes straight to APPLY.</li>
  *     <li><b>CAPTURE</b>: a Copy's take reads the box into its builder's pocket (and ends); a Move or a Repeat reads its
  *     source into a pocket of its own, so overlapping cells come out exact and a Move knows what changed under it.</li>
  *     <li><b>COUNT</b> (Billy, a spell paid with items, and a Scarlet Witch's spell that makes TNT, lava or fire):
@@ -89,7 +90,8 @@ import java.util.function.BiPredicate;
  *     <li><b>APPLY</b>: the cells in the planner's work order, each through the rules (P1 to P11) and written as D-B
  *     11.5 says ({@link #write}); a Move moves each cell in one step, compare-and-swap (C12). With
  *     {@code requireMaterials} a conjured cell takes its item from the caster's inventory and gives him the block it
- *     replaced (D-B 5.6); when the items run out, the spell stops there.</li>
+ *     replaced (D-B 5.6); when the items run out, the spell stops there. A Land pulse moves a whole column at a time
+ *     ({@link #moveColumn}), or leaves it whole.</li>
  *     <li><b>SETTLE</b>: fences join, torches behave, redstone and water react, once ({@link #settle}).</li>
  *     <li><b>DONE</b>: the step is sealed into the history, Billy's unused reservation refunded and his practice
  *     booked (at his next login if he is away), the verdict and the summary line said.</li>
@@ -262,6 +264,16 @@ public final class BuildJob {
     private boolean fallables;
     /** A few cells written this tick, for the particles. */
     private final LongArrayList sparks = new LongArrayList();
+    /** A pulse of a Land stroke (a dab of one): planned in PREPARE, then written a whole column at a time. */
+    private LandBrush.@Nullable Pulse pulse;
+    /** The pulse's next column. */
+    private int pulseColumn;
+    /**
+     * The cells a Land pulse wrote, in order: its settle pass walks these, not its stroke's whole step (which every
+     * earlier pulse settled already).
+     */
+    private @Nullable LongArrayList mine;
+    private int settled;
 
     private BuildJob(Kind kind, UUID caster, GameProfile profile, ServerLevel level, Power hero, Limits limits, int token, int flags,
                      @Nullable SpellRecipe recipe, Vec3 eyes, UndoStep step, boolean rewind, BiPredicate<Integer, Integer> loaded, LongSet chunks,
@@ -337,13 +349,16 @@ public final class BuildJob {
      * One dab of the Paint stroke {@code stroke} (D-B 11.8): a spell like any other (the same rules, the same budget),
      * but it writes into the stroke's one step with the stroke's rule book, takes no time of its own to grow (a brush
      * keeps up with the cursor), says nothing, and leaves the sealing to the stroke. A dab over a selected thing uses
-     * the stroke's flood once it has one.
+     * the stroke's flood once it has one. A dab of a Land stroke is one pulse of its brush ({@link LandBrush}): its
+     * chunks are those of the brush's reach.
      */
     public static BuildJob dab(ServerPlayer player, Limits limits, SpellRecipe recipe, int token, Setup setup, @Nullable Plan plan,
                                BiPredicate<Integer, Integer> loaded, BuildSession.Stroke stroke) {
         LongSet chunks = new LongOpenHashSet();
         ServerLevel level = player.serverLevel();
-        BoundingBox reach = plan != null && plan.prepared() && plan.bounds() != null ? plan.bounds() : null;
+        boolean land = recipe.spell() == Spell.LAND;
+        BoundingBox reach = land ? LandBrush.reach(recipe.anchor(), recipe.size(), recipe.landStyle())
+                : plan != null && plan.prepared() && plan.bounds() != null ? plan.bounds() : null;
         if (reach != null) {
             loadedChunks(level, reach, loaded, chunks);
         }
@@ -355,6 +370,9 @@ public final class BuildJob {
         job.phase = recipe.region() == SpellRecipe.MASK && plan == null ? Phase.SELECT : Phase.PREPARE;
         job.mom = stroke.mom;
         job.momId = stroke.momId;
+        if (land) {
+            job.mine = new LongArrayList();
+        }
         return job;
     }
 
@@ -602,13 +620,20 @@ public final class BuildJob {
         return 1.0;
     }
 
-    /** The box of what it changes (the plan's, the step's, or the box the recipe names), or null. */
+    /**
+     * The box of what it changes (the plan's, a Land pulse's columns or its brush's reach, the step's, or the box the
+     * recipe names), or null.
+     */
     public @Nullable BoundingBox bounds() {
         if (kind != Kind.SPELL) {
             return step.bounds();
         }
         if (plan != null && plan.prepared() && plan.bounds() != null) {
             return plan.bounds();
+        }
+        if (recipe.spell() == Spell.LAND) {
+            BoundingBox columns = pulse != null && pulse.done() ? pulse.bounds() : null;
+            return columns != null ? columns : LandBrush.reach(recipe.anchor(), recipe.size(), recipe.landStyle());
         }
         return recipe.region() == SpellRecipe.NO_REGION ? new BoundingBox(recipe.anchor()) : SpellMath.box(recipe.a(), recipe.b());
     }
@@ -732,7 +757,7 @@ public final class BuildJob {
                 case PREPARE -> prepare(slice);
                 case CAPTURE -> capture(slice);
                 case COUNT -> count(slice);
-                case APPLY -> kind == Kind.SPELL ? apply(slice) : replay(slice);
+                case APPLY -> kind != Kind.SPELL ? replay(slice) : pulse != null ? applyPulse(slice) : apply(slice);
                 case SIDE_EFFECTS -> sideEffects(slice);
                 case SETTLE -> settle(slice);
                 case DONE -> {
@@ -840,6 +865,9 @@ public final class BuildJob {
     }
 
     private boolean prepare(Slice slice) {
+        if (recipe.spell() == Spell.LAND && stroke != null) {
+            return preparePulse(slice);
+        }
         if (!plan.prepared()) {
             int reads = slice.reads();
             slice.use((long) reads * READ);
@@ -872,6 +900,34 @@ public final class BuildJob {
         } else {
             startCount();
         }
+        return true;
+    }
+
+    /**
+     * A Land pulse (D-B 4.11): its columns planned against the world as it is now, a few reads at a time, the stroke's
+     * memory of each column taken from; then Wanda's ceiling and Billy's price of the cells it changes (C11, C13), and
+     * straight to APPLY. Land conjures no TNT, lava or fire, and is never paid with items: it moves the ground.
+     */
+    private boolean preparePulse(Slice slice) {
+        if (pulse == null) {
+            pulse = new LandBrush.Pulse(level, recipe.landStyle(), recipe.anchor(), recipe.size(), stroke.land());
+        }
+        long before = pulse.reads();
+        boolean done = pulse.step(slice.reads());
+        slice.use((pulse.reads() - before) * READ);
+        if (!done) {
+            return false;
+        }
+        long changes = pulse.changes();
+        if (limits.maxBlocks() > 0 && changes > limits.maxBlocks()) {
+            refuse(BuildVerdictPayload.CEILING, limits.maxBlocks(), BuildRules.message(BuildVerdictPayload.CEILING, limits.maxBlocks()));
+            return false;
+        }
+        if (!reserveBilly(changes)) {
+            return false;
+        }
+        volume = Math.max(1, pulse.cells());
+        phase = Phase.APPLY;
         return true;
     }
 
@@ -1003,26 +1059,38 @@ public final class BuildJob {
             }
             needs = null;
         }
-        if (limits.limited() && count.changed() > 0) {
-            // Billy's cost (C13), reserved now; he gets back at the end what was left unchanged. One who has gone away
-            // is asked with the meter he left with, and pays at his next login.
-            BuildData data = (online != null ? online : castBy).getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
-            long time = level.getServer().overworld().getGameTime();
-            int price = BillyMagic.cost(count.changed(), mom);
-            int verdict = BillyMagic.verdict(data, time, price);
-            if (verdict != SpellPlanner.NONE) {
-                refuse(verdict, count.changed(), price, BuildMagic.cannotPayExtra(data, time, price, verdict), BillyMagic.cannotPay(data, time, price));
-                return false;
-            }
-            cost = price;
-            if (online != null) {
-                online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, BillyMagic.pay(data, time, price));
-            } else {
-                BuildSession.of(caster).owe(price, 0);
-            }
+        if (!reserveBilly(count.changed())) {
+            return false;
         }
         count = null;
         startApply();
+        return true;
+    }
+
+    /**
+     * Billy's cost of {@code cells} changing (C13), reserved now; he gets back at the end what was left unchanged. One
+     * who has gone away is asked with the meter he left with, and pays at his next login. False, the spell refused
+     * ({@code TOO_BIG}, {@code REFILLING}), when he cannot pay it; true for anyone else.
+     */
+    private boolean reserveBilly(long cells) {
+        if (!limits.limited() || cells <= 0) {
+            return true;
+        }
+        ServerPlayer online = online();
+        BuildData data = (online != null ? online : castBy).getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
+        long time = level.getServer().overworld().getGameTime();
+        int price = BillyMagic.cost(cells, mom);
+        int verdict = BillyMagic.verdict(data, time, price);
+        if (verdict != SpellPlanner.NONE) {
+            refuse(verdict, cells, price, BuildMagic.cannotPayExtra(data, time, price, verdict), BillyMagic.cannotPay(data, time, price));
+            return false;
+        }
+        cost = price;
+        if (online != null) {
+            online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, BillyMagic.pay(data, time, price));
+        } else {
+            BuildSession.of(caster).owe(price, 0);
+        }
         return true;
     }
 
@@ -1140,6 +1208,111 @@ public final class BuildJob {
                     stop(BuildVerdictPayload.DONE_PARTLY); // (P11: the items ran out, the spell stops here)
                 }
             }
+        }
+    }
+
+    // ---- APPLY (a Land pulse) ----
+
+    /**
+     * Writes a Land pulse's columns in their order (nearest the brush's middle first), each whole or not at all
+     * ({@link #moveColumn}); the creatures standing on a rising column are lifted after the slice.
+     */
+    private boolean applyPulse(Slice slice) {
+        List<LandBrush.Column> columns = pulse.columns();
+        findBodies(pulse.bounds(), recipe.anchor());
+        while (true) {
+            if (stopCode >= 0 || pulseColumn >= columns.size()) {
+                toSettle();
+                return true;
+            }
+            if (slice.spent()) {
+                return false;
+            }
+            LandBrush.Column column = columns.get(pulseColumn);
+            if (moveColumn(column, slice) < 0) {
+                holding = true; // (its chunk is loading, or the tick's sections are spent: the next tick's)
+                return false;
+            }
+            holding = false;
+            pulseColumn++;
+            walked += column.size();
+            walkedThisTick += column.size();
+        }
+    }
+
+    /**
+     * One column of a Land pulse, whole or not at all, so the ground never tears: P1 and P2 for the column, each of its
+     * cells still as the pulse found it (else someone changed it since, and it is left), P4 to P8 for every cell that
+     * changes, then the claims (P9, P10), then the writes. A rule that leaves one cell leaves the column, every cell it
+     * would have changed counted for that rule.
+     *
+     * @return the cells written, or -1 when the column must wait for the next tick (its chunk loading, the tick's new
+     * sections spent)
+     */
+    private int moveColumn(LandBrush.Column column, Slice slice) {
+        int changes = column.changes();
+        int ready = chunkReady(column.pos(0));
+        if (ready < 0) {
+            return -1;
+        }
+        if (ready == 0) {
+            leave(Left.UNLOADED, changes);
+            slice.use(SKIP);
+            return 0;
+        }
+        BlockPos[] cells = new BlockPos[column.size()];
+        for (int i = 0; i < cells.length; i++) {
+            cells[i] = column.pos(i);
+            if (SpellMath.outside(level, cells[i])) {
+                leave(Left.OUTSIDE, changes);
+                slice.use(SKIP);
+                return 0;
+            }
+        }
+        for (int i = 0; i < cells.length; i++) {
+            if (!level.getBlockState(cells[i]).equals(column.olds()[i])) {
+                slice.use(SKIP);
+                return 0;
+            }
+        }
+        for (int i = 0; i < cells.length; i++) {
+            if (column.changes(i) && !slice.section(level, cells[i])) {
+                return -1;
+            }
+        }
+        for (int i = 0; i < cells.length; i++) {
+            if (!column.changes(i)) {
+                continue;
+            }
+            Left why = rules.check(cells[i], column.olds()[i], column.news()[i], i == column.conjured(), false);
+            if (why != null) {
+                leave(why, changes);
+                slice.use(SKIP);
+                return 0;
+            }
+        }
+        for (int i = 0; i < cells.length; i++) {
+            if (column.changes(i) && !rules.claims(cells[i], column.olds()[i], column.news()[i])) {
+                leave(Left.PROTECTED, changes);
+                slice.use(SKIP);
+                return 0;
+            }
+        }
+        for (int i = 0; i < cells.length; i++) {
+            if (column.changes(i)) {
+                write(cells[i], column.olds()[i], column.news()[i], null, false);
+                mine.add(cells[i].asLong());
+                changed++;
+            }
+        }
+        slice.use((long) changes * WRITE);
+        return changes;
+    }
+
+    /** Counts {@code cells} cells left for {@code why}. */
+    private void leave(Left why, int cells) {
+        for (int i = 0; i < cells; i++) {
+            rules.left(why);
         }
     }
 
@@ -2056,27 +2229,44 @@ public final class BuildJob {
      * the spell did not write), and every written cell whose block cares about its neighbours, is shaped by them
      * ({@code Block.updateFromNeighbourShapes}); then its outside neighbours by it (a torch on a vanished wall drops,
      * with no item, and is recorded so that undo brings it back), after P4, P5, P8 and the break event; then its
-     * neighbours are told once ({@code updateNeighborsAt}), so redstone, observers and water react once.
+     * neighbours are told once ({@code updateNeighborsAt}), so redstone, observers and water react once. A Land pulse
+     * settles only the cells it wrote itself.
      */
     private boolean settle(Slice slice) {
         byte want = kind == Kind.UNDO ? UndoStep.UNDONE : UndoStep.APPLIED;
         BlockPos.MutableBlockPos next = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos cell = new BlockPos.MutableBlockPos();
         while (true) {
             if (slice.spent()) {
                 return false;
             }
-            if (!walk.next()) {
-                phase = Phase.DONE;
-                return true;
+            BlockPos pos;
+            BlockState expected;
+            if (mine != null) {
+                // A Land pulse settles the cells it wrote (its stroke's earlier pulses settled theirs).
+                if (settled >= mine.size()) {
+                    phase = Phase.DONE;
+                    return true;
+                }
+                pos = cell.set(mine.getLong(settled++));
+                expected = step.newState(pos);
+                if (expected == null) {
+                    continue;
+                }
+            } else {
+                if (!walk.next()) {
+                    phase = Phase.DONE;
+                    return true;
+                }
+                if (walk.status() != want) {
+                    continue;
+                }
+                pos = walk.pos();
+                expected = kind == Kind.UNDO ? walk.oldState() : walk.newState();
             }
-            if (walk.status() != want) {
-                continue;
-            }
-            BlockPos pos = walk.pos();
             if (!SpellMath.loaded(level, pos)) {
                 continue;
             }
-            BlockState expected = kind == Kind.UNDO ? walk.oldState() : walk.newState();
             BlockState here = level.getBlockState(pos);
             if (!here.equals(expected)) {
                 continue;
@@ -2290,9 +2480,10 @@ public final class BuildJob {
     }
 
     /**
-     * Seals a Paint stroke (D-B 11.8): the one step its dabs wrote goes into the history (if they changed anything),
-     * Billy's practice is booked and his pause begins, and the builder is told as for any spell. Its last dab must be
-     * done ({@link BuildSession.Stroke#pending} 0).
+     * Seals a Paint or Land stroke (D-B 11.8): the one step its dabs wrote goes into the history (if they changed
+     * anything), Billy's practice is booked and his pause begins, and the builder is told as for any spell; a stroke a
+     * refused dab ended says why it ended (an empty meter), or nothing more when it changed nothing. Its last dab must
+     * be done ({@link BuildSession.Stroke#pending} 0).
      */
     static void sealStroke(BuildSession.Stroke stroke, net.minecraft.server.MinecraftServer server) {
         if (stroke.sealed) {
@@ -2328,7 +2519,10 @@ public final class BuildJob {
                     1000, (int) Math.min(Integer.MAX_VALUE, stroke.changed), stroke.momId, BuildFxPayload.RISE);
             BuildSounds.done(stroke.level, box.getCenter().getCenter());
         }
-        tellDone(online, stroke.caster, stroke.limits, stroke.token, code, stroke.changed, stroke.cost, rules, stroke.said);
+        if (changed || !stroke.refused) {
+            // (a stroke a refusal ended before it changed anything was told why by the refusal: nothing more to say)
+            tellDone(online, stroke.caster, stroke.limits, stroke.token, code, stroke.changed, stroke.cost, rules, stroke.said);
+        }
         BuildMagic.sync(server, stroke.caster);
     }
 
@@ -2349,12 +2543,15 @@ public final class BuildJob {
 
     /**
      * An undo gives Billy back the cost of every cell it restored ({@code cost x restored / changed}, rounded down) and
-     * takes their practice back; his rank stays (D-B 12.3).
+     * takes their practice back the same way ({@code practice x restored / changed}: a stroke that changed a cell at
+     * several pulses taught him more than its cells, and a Move's two ends are one block moved); his rank stays (D-B
+     * 12.3).
      */
     private void refundUndo() {
         if ((step.cost() > 0 || step.practice() > 0) && step.changed() > 0 && changed > 0) {
             long back = step.cost() * changed / step.changed();
-            BuildMagic.billy(level.getServer(), caster, back, -changed, -1);
+            long practice = step.practice() * changed / step.changed();
+            BuildMagic.billy(level.getServer(), caster, back, -practice, -1);
         }
     }
 
@@ -2444,7 +2641,12 @@ public final class BuildJob {
         }
         fx(BuildFxPayload.FIZZLE);
         if (stroke != null) {
-            // A refused dab (an empty meter, a thing too big) ends its stroke with the fizzle: what it painted stays.
+            // A refused dab (an empty meter, a thing too big) ends its stroke with the fizzle: what it painted stays,
+            // and the stroke's sealing says why it ended, never that nothing changed.
+            stroke.refused = true;
+            if (stroke.said == null) {
+                stroke.said = line;
+            }
             stroke.closing = true;
             dabEnded();
         }

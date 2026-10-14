@@ -157,7 +157,8 @@ public final class BuildMagic {
                 return;
             }
         }
-        BoundingBox box = plan != null && plan.prepared() ? plan.bounds()
+        BoundingBox box = plan != null && plan.prepared() && plan.bounds() != null ? plan.bounds()
+                : clamped.spell() == Spell.LAND ? LandBrush.reach(clamped.anchor(), clamped.size(), clamped.landStyle())
                 : clamped.region() != SpellRecipe.NO_REGION ? SpellMath.box(clamped.a(), clamped.b()) : null;
         // A Move empties its source; a Copy or a Repeat only reads theirs, which may lie on the island (spec 5.4).
         BoundingBox source = plan != null && plan.region() != null && clamped.spell() == Spell.MOVE ? plan.region().bounds() : null;
@@ -217,11 +218,12 @@ public final class BuildMagic {
     }
 
     // ------------------------------------------------------------------------------------------------------------
-    // Paint strokes (D-B 11.8)
+    // Paint and Land strokes (D-B 11.8, 4.11)
 
     /**
-     * A dab of a Paint stroke, checked like any cast: its job is queued behind the stroke's others and writes into the
-     * stroke's one step. The first dab opens the stroke (its effects and its sound are the stroke's).
+     * A dab of a Paint or Land stroke, checked like any cast: its job is queued behind the stroke's others and writes
+     * into the stroke's one step. The first dab opens the stroke (its effects and its sound are the stroke's). A dab of
+     * a Land stroke asks for a pulse of its brush there ({@link #pulse}).
      */
     private static void dab(ServerPlayer player, BuildSession session, Limits limits, SpellRecipe recipe, int token, Setup setup, @Nullable Plan plan,
                             @Nullable Stroke open) {
@@ -236,10 +238,23 @@ public final class BuildMagic {
         }
         stroke.lastDab = player.server.getTickCount();
         stroke.token = token;
+        if (recipe.spell() == Spell.LAND) {
+            stroke.nextPulse = recipe;
+            stroke.nextToken = token;
+            pulse(player, session, stroke);
+            sync(player.server, player.getUUID());
+            return;
+        }
+        startDab(player, session, stroke, limits, recipe, token, setup, plan, open == null);
+    }
+
+    /** Queues the job of one dab of {@code stroke}; the first's effects, sound and Mom's line are the stroke's. */
+    private static void startDab(ServerPlayer player, BuildSession session, Stroke stroke, Limits limits, SpellRecipe recipe, int token, Setup setup,
+                                 @Nullable Plan plan, boolean first) {
         stroke.pending++;
         BuildJob job = BuildJob.dab(player, limits, recipe, token, setup, plan, BuildScheduler.loaded(player.getUUID(), player.serverLevel()), stroke);
         BuildScheduler.queue(job, false);
-        if (open == null) {
+        if (first) {
             job.fx(BuildFxPayload.START);
             BoundingBox at = job.bounds();
             BuildSounds.cast(player.serverLevel(), at != null ? Vec3.atCenterOf(at.getCenter()) : player.position(), limits.hero(), 0L);
@@ -248,6 +263,28 @@ public final class BuildMagic {
             }
         }
         sync(player.server, player.getUUID());
+    }
+
+    /**
+     * The Land stroke's waiting pulse begins, if its turn has come (D-B 4.11): no other pulse of the stroke at work,
+     * and {@value LandBrush#PULSE_TICKS} ticks since the last began. Else it waits (the server's tick asks again), and
+     * a newer dab takes its place: the brush pulses where the cursor is now, never where it was.
+     */
+    private static void pulse(ServerPlayer player, BuildSession session, Stroke stroke) {
+        long now = player.server.getTickCount();
+        SpellRecipe recipe = stroke.nextPulse;
+        if (recipe == null || stroke.closing || stroke.pending > 0 || now - stroke.pulsedAt < LandBrush.PULSE_TICKS) {
+            return;
+        }
+        if (player.serverLevel() != stroke.level) {
+            stroke.nextPulse = null; // (she went to another dimension: the stroke stays where it was)
+            return;
+        }
+        stroke.nextPulse = null;
+        stroke.pulsedAt = now;
+        Setup setup = Setup.at(player.blockPosition()).withWindow(BuildConfig.MAX_TICKET_CHUNKS.get());
+        Plan plan = SpellPlanner.plan(player.serverLevel(), recipe, setup);
+        startDab(player, session, stroke, stroke.limits, recipe, stroke.nextToken, setup, plan, stroke.fxId == 0);
     }
 
     /**
@@ -851,14 +888,20 @@ public final class BuildMagic {
     }
 
     /**
-     * Every server tick ({@code ServerTickEvent.Post}): a stroke whose last dab was 40 ticks ago closes (D-B 11.8),
-     * Billy's badge learns every half second whether Mom is near, and each builder's pocket goes on its way to her
-     * client, at most {@value #POCKET_PARTS} parts a tick.
+     * Every server tick ({@code ServerTickEvent.Post}): a Land stroke's waiting pulse begins when its turn has come, a
+     * stroke whose last dab was 40 ticks ago closes (D-B 11.8), Billy's badge learns every half second whether Mom is
+     * near, and each builder's pocket goes on its way to her client, at most {@value #POCKET_PARTS} parts a tick.
      */
     public static void tick(MinecraftServer server) {
         long now = server.getTickCount();
         for (BuildSession session : BuildSession.all()) {
             Stroke stroke = session.stroke();
+            if (stroke != null && stroke.nextPulse != null) {
+                ServerPlayer builder = server.getPlayerList().getPlayer(session.player());
+                if (builder != null && !builder.hasDisconnected()) {
+                    pulse(builder, session, stroke);
+                }
+            }
             if (stroke != null && !stroke.closing() && now - stroke.lastDab >= Stroke.CLOSES_AFTER) {
                 closeStroke(stroke, server);
             }

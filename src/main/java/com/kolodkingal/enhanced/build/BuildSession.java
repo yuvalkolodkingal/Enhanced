@@ -21,11 +21,11 @@ import java.util.UUID;
 /**
  * A builder's live Build Magic state on the server (D-B 11.1): whether she is in build mode, the block she last picked
  * (with the middle button, or on the palette page), the token buckets that bound what her client may send (C6:
- * {@code maxRequestsPerSecond} for every build payload, 4 preflights and 20 dabs a second), the Paint stroke she is
- * painting ({@link Stroke}), her pocket on its way to her client, how many spells she has cast since she logged in (the
- * first five say how many blocks), the lines she is to be told at her next login ("While you were away, your spell
- * finished"), when "Mom is near" was last said to Billy, and what Billy's spells that ended while he was away owe his
- * meter and his practice (settled at his next login, {@link #owe}).
+ * {@code maxRequestsPerSecond} for every build payload, 4 preflights and 20 dabs a second), the Paint or Land stroke
+ * she is painting ({@link Stroke}), her pocket on its way to her client, how many spells she has cast since she logged
+ * in (the first five say how many blocks), the lines she is to be told at her next login ("While you were away, your
+ * spell finished"), when "Mom is near" was last said to Billy, and what Billy's spells that ended while he was away owe
+ * his meter and his practice (settled at his next login, {@link #owe}).
  *
  * <p>One per player, by UUID; it is not saved. It outlives a logout (so a spell that finishes while she is away can
  * leave her its line), and {@link #clear} forgets them all (the server's stop, the end of a test).
@@ -300,6 +300,10 @@ public final class BuildSession {
      * sealed at {@code STROKE_END}, 40 ticks after its last dab, when another spell is cast, or at Ctrl + Z, once its
      * last dab is done. Its dabs share one rule book (a section a claim refused stays refused for the stroke), and a
      * stroke over a selected thing floods it once, at its first dab.
+     *
+     * <p>A Land stroke is the same, but its dabs are pulses ({@link LandBrush}): at most one at work and one every
+     * {@value LandBrush#PULSE_TICKS} ticks, the newest dab waiting for its turn in place of an older one
+     * ({@link #nextPulse}), and the stroke remembers how far each of its columns has moved.
      */
     public static final class Stroke {
         /** The ticks after a stroke's last dab when it is sealed without its release (D-B 14.7). */
@@ -316,8 +320,21 @@ public final class BuildSession {
         final boolean mom;
         final int momId;
         @Nullable Volume mask;
-        /** What its sealing says instead of the done line (a dab ran out of material), or null. */
+        /** A Land stroke's memory of how far each column has moved (D-B 4.11), made at its first pulse. */
+        private LandBrush.@Nullable Memory land;
+        /** The server tick its last Land pulse began. */
+        long pulsedAt = Long.MIN_VALUE / 2;
+        /**
+         * The Land pulse waiting for its turn (a dab that came while a pulse was at work, or within
+         * {@value LandBrush#PULSE_TICKS} ticks of the last), with its token: the newest dab takes the place of an older
+         * one, so the brush follows the cursor and never trails behind it.
+         */
+        @Nullable SpellRecipe nextPulse;
+        int nextToken;
+        /** What its sealing says instead of the done line (a dab ran out of material, or was refused), or null. */
         @Nullable Component said;
+        /** A dab of it was refused (an empty meter, a thing too big): that ended it, and said why. */
+        boolean refused;
         int fxId;
         int token;
         long lastDab;
@@ -356,6 +373,14 @@ public final class BuildSession {
         /** Whether it takes no more dabs and is sealed once the last one is done. */
         public boolean closing() {
             return closing;
+        }
+
+        /** A Land stroke's memory of its columns (made the first time it is asked for). */
+        public LandBrush.Memory land() {
+            if (land == null) {
+                land = new LandBrush.Memory();
+            }
+            return land;
         }
     }
 }
