@@ -25,7 +25,8 @@ import java.util.Optional;
  *
  * <ul>
  *     <li><b>The ticks</b>: {@code ServerTickEvent.Pre} sets the budget all spells share this tick; each level's
- *     {@code LevelTickEvent.Post} runs its jobs, inside the level tick (D-B 11.7).</li>
+ *     {@code LevelTickEvent.Post} runs its jobs, inside the level tick (D-B 11.7); {@code ServerTickEvent.Post} seals
+ *     the Paint strokes whose last dab was 40 ticks ago and sends each builder's pocket on to her client.</li>
  *     <li><b>Logout, death, respawn</b>: build mode goes off; the spells go on (with a fake player of the caster's
  *     profile while he is away, D-B 11.9); at the next login, what finished or stopped while he was away is said.</li>
  *     <li><b>A change of dimension</b>: build mode stays on, the box is forgotten; the spells go on in their own
@@ -43,6 +44,12 @@ public final class BuildEvents {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Pre event) {
         BuildScheduler.startTick(event.getServer());
+    }
+
+    /** After the levels' ticks: strokes whose last dab was long ago are sealed, and pockets go on to their clients. */
+    @SubscribeEvent
+    public static void onServerTickDone(ServerTickEvent.Post event) {
+        BuildMagic.tick(event.getServer());
     }
 
     @SubscribeEvent

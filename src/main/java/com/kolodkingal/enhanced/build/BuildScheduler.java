@@ -244,6 +244,14 @@ public final class BuildScheduler {
         return newest;
     }
 
+    /** Drops one waiting job (a dab of a stroke that Ctrl + Z ends): nothing of it ever happens. */
+    public static void drop(BuildJob job) {
+        Deque<BuildJob> queue = QUEUES.get(job.caster());
+        if (queue != null && queue.peekFirst() != job && queue.remove(job)) {
+            job.drop();
+        }
+    }
+
     /** Drops every waiting job of the player (his power changed): the one at work goes on. How many were dropped. */
     public static int dropWaiting(UUID player) {
         int dropped = 0;
@@ -367,6 +375,17 @@ public final class BuildScheduler {
             weights = turn(job, tick, weights);
         }
         return tick;
+    }
+
+    /**
+     * Finishes one job at once, loading the chunks of its set as needed (the dab at work when Ctrl + Z ends a stroke).
+     */
+    public static void finishNow(BuildJob job) {
+        Budget endless = new Budget(Long.MAX_VALUE / 4, Integer.MAX_VALUE / BuildJob.WRITE, Integer.MAX_VALUE, 1, System::nanoTime, () -> 0L, 0L, 0);
+        job.force();
+        for (int guard = 0; guard < 100_000 && !job.finished(); guard++) {
+            turn(job, endless.start(), job.weight());
+        }
     }
 
     /** Finishes every job at once, loading the chunks of its set as needed (the server's stop, a test, an operator). */

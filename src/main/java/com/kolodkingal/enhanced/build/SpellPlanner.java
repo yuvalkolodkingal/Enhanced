@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
@@ -786,13 +787,73 @@ public final class SpellPlanner {
          * it): one cell out of order, for a preflight that samples a big plan. Unlike a cursor's, it gives no data.
          */
         public @Nullable BlockState resolveAt(BlockGetter level, BlockPos pos) {
+            Cell cell = resolveCell(level, pos);
+            return cell == null ? null : cell.state();
+        }
+
+        /**
+         * The cell {@code pos} as the plan resolves it against {@code level} now (its block, its data, a Move's source
+         * cell), or null when the plan leaves it or does not cover it: one cell out of the cursor's order (a Move that
+         * moves a source cell before it writes over it, a preflight's sample).
+         */
+        public @Nullable Cell resolveCell(BlockGetter level, BlockPos pos) {
             Volume volume = cells();
             if (volume == null || rule == null || !volume.contains(pos.getX(), pos.getY(), pos.getZ())) {
                 return null;
             }
             Cursor cursor = new Cursor(new EmptyWalk(), rule);
             cursor.pos.set(pos);
-            return cursor.resolve(level);
+            BlockState state = cursor.resolve(level);
+            return state == null ? null : new Cell(pos.immutable(), state, cursor.data(), cursor.from());
+        }
+
+        /**
+         * For a Move's put-down: the cell its source cell {@code source} lands on (turned and flipped), or null for a
+         * cell outside its source box or a plan that is no Move's.
+         */
+        public @Nullable BlockPos targetOf(BlockPos source) {
+            if (!(cells() instanceof Placed placed) || placed.origin == null) {
+                return null;
+            }
+            Placement placement = placed.placement;
+            int x = source.getX() - placed.origin.getX();
+            int y = source.getY() - placed.origin.getY();
+            int z = source.getZ() - placed.origin.getZ();
+            if (x < 0 || y < 0 || z < 0 || x >= placement.sizeX() || y >= placement.sizeY() || z >= placement.sizeZ()) {
+                return null;
+            }
+            return placed.corner.offset(placement.target(x, y, z));
+        }
+
+        /**
+         * For a Move's put-down: where a point of its source box (in the world) is carried, turned and flipped as the
+         * cells are (a creature or a frame the Move takes along), or null for a plan that is no Move's.
+         */
+        public @Nullable Vec3 carried(Vec3 point) {
+            if (!(cells() instanceof Placed placed) || placed.origin == null) {
+                return null;
+            }
+            Vec3 local = placed.placement.target(point.x - placed.origin.getX(), point.y - placed.origin.getY(), point.z - placed.origin.getZ());
+            return local.add(placed.corner.getX(), placed.corner.getY(), placed.corner.getZ());
+        }
+
+        /** For a Move's put-down: a direction of the source as it points at the target (a frame's facing). */
+        public Direction carried(Direction direction) {
+            return cells() instanceof Placed placed ? placed.placement.target(direction) : direction;
+        }
+
+        /** For a Move's put-down: a yaw of the source as it looks at the target (a creature's). */
+        public float carriedYaw(float yaw) {
+            return cells() instanceof Placed placed ? placed.placement.targetYaw(yaw) : yaw;
+        }
+
+        /**
+         * Whether a Move's put-down is turned or flipped and lands on its own source: then a target cell may be a
+         * source cell not moved yet, which the Move moves first ({@code BuildJob}); a plain shift is ordered instead.
+         */
+        public boolean turnsOverItself() {
+            return cells() instanceof Placed placed && placed.origin != null && order != Order.SHIFT && region != null
+                    && placed.bounds.intersects(region.bounds());
         }
 
         /** A new walk over its cells, from the first. */

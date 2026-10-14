@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.build;
 
 import com.kolodkingal.enhanced.ability.BlockRights;
+import com.kolodkingal.enhanced.ability.MjolnirPin;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.build.BuildRules.Left;
@@ -18,6 +20,7 @@ import com.kolodkingal.enhanced.registry.ModTicketTypes;
 import com.kolodkingal.enhanced.ultron.SokoviaJob;
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -29,10 +32,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Clearable;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.GameType;
@@ -54,6 +60,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -137,6 +144,12 @@ public final class BuildJob {
     /** The most chunks of a plan's box asked one by one at the cast; a bigger box takes the level's loaded chunks. */
     private static final int ASKED_CHUNKS = 65_536;
     private static final Method GET_CHUNKS = ObfuscationReflectionHelper.findMethod(ChunkMap.class, "getChunks");
+    /** {@code HangingEntity.setDirection}, which is protected: a frame a Move turns. */
+    private static final Method SET_DIRECTION = ObfuscationReflectionHelper.findMethod(HangingEntity.class, "setDirection", Direction.class);
+    /** The most blocks a body in new blocks is lifted (D-B 11.8). */
+    private static final int LIFT_UP = 64;
+    /** The farthest a body with no room above is moved aside. */
+    private static final int ASIDE = 16;
 
     private static int lastId;
     /** Whether a block "cares about its neighbours" (D-B 11.5), per state. */
@@ -158,6 +171,8 @@ public final class BuildJob {
     private final BiPredicate<Integer, Integer> loaded;
     private final LongSet chunks;
     private final BuildRules.Cells rules;
+    /** The Paint stroke a dab belongs to (its step and rules are the stroke's), or null for any other job. */
+    private final BuildSession.@Nullable Stroke stroke;
     private final int window;
     /** The fights of its level that ran when it was cast (a fight that begins later over its box stops it). */
     private final Set<BossFight> fightsAtCast = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -186,6 +201,14 @@ public final class BuildJob {
     private final LongOpenHashSet kept = new LongOpenHashSet();
     /** A Move's source cells that were moved but not cleared, as its target covers them (cleared if that target fails). */
     private final LongOpenHashSet movedCovered = new LongOpenHashSet();
+    /** A turned or flipped Move over itself: the source cells whose move is decided (moved or kept), else null. */
+    private @Nullable LongOpenHashSet movedSources;
+    /** A turned or flipped Move over itself: the target cells it did out of turn (the cursor passes them by). */
+    private @Nullable LongOpenHashSet doneEarly;
+    /** The creatures (and armour stands) a Move takes along, held where they stand until it is done (D-B 4.9). */
+    private final List<Rider> riders = new ArrayList<>();
+    /** The frames and paintings a Move takes along, by the block they hang on (they go when that block goes). */
+    private final Long2ObjectOpenHashMap<List<HangingEntity>> hangers = new Long2ObjectOpenHashMap<>();
 
     private long volume;
     private long walked;
@@ -218,7 +241,7 @@ public final class BuildJob {
 
     private BuildJob(Kind kind, UUID caster, GameProfile profile, ServerLevel level, Power hero, Limits limits, int token, int flags,
                      @Nullable SpellRecipe recipe, Vec3 eyes, UndoStep step, boolean rewind, BiPredicate<Integer, Integer> loaded, LongSet chunks,
-                     ServerPlayer actor) {
+                     ServerPlayer actor, BuildSession.@Nullable Stroke stroke) {
         this.id = ++lastId;
         this.kind = kind;
         this.caster = caster;
@@ -234,7 +257,8 @@ public final class BuildJob {
         this.rewind = rewind;
         this.loaded = loaded;
         this.chunks = chunks;
-        this.rules = new BuildRules.Cells(level, actor);
+        this.stroke = stroke;
+        this.rules = stroke != null ? stroke.rules : new BuildRules.Cells(level, actor);
         int configured = BuildConfig.MAX_TICKET_CHUNKS.get();
         this.window = Math.max(1, configured);
         this.setup = Setup.at(BlockPos.containing(eyes));
@@ -271,7 +295,7 @@ public final class BuildJob {
             loadedChunks(level, region, loaded, chunks);
         }
         BuildJob job = new BuildJob(Kind.SPELL, player.getUUID(), player.getGameProfile(), level, limits.hero(), limits, token, flags, recipe,
-                player.getEyePosition(), step, false, loaded, chunks, player);
+                player.getEyePosition(), step, false, loaded, chunks, player, null);
         job.setup = setup;
         job.plan = plan;
         job.chunksKnown = reach != null;
@@ -285,6 +309,31 @@ public final class BuildJob {
     }
 
     /**
+     * One dab of the Paint stroke {@code stroke} (D-B 11.8): a spell like any other (the same rules, the same budget),
+     * but it writes into the stroke's one step with the stroke's rule book, takes no time of its own to grow (a brush
+     * keeps up with the cursor), says nothing, and leaves the sealing to the stroke. A dab over a selected thing uses
+     * the stroke's flood once it has one.
+     */
+    public static BuildJob dab(ServerPlayer player, Limits limits, SpellRecipe recipe, int token, Setup setup, @Nullable Plan plan,
+                               BiPredicate<Integer, Integer> loaded, BuildSession.Stroke stroke) {
+        LongSet chunks = new LongOpenHashSet();
+        ServerLevel level = player.serverLevel();
+        BoundingBox reach = plan != null && plan.prepared() && plan.bounds() != null ? plan.bounds() : null;
+        if (reach != null) {
+            loadedChunks(level, reach, loaded, chunks);
+        }
+        BuildJob job = new BuildJob(Kind.SPELL, player.getUUID(), player.getGameProfile(), level, limits.hero(), limits, token, 0, recipe,
+                player.getEyePosition(), stroke.step, false, loaded, chunks, player, stroke);
+        job.setup = setup;
+        job.plan = plan;
+        job.chunksKnown = reach != null;
+        job.phase = recipe.region() == SpellRecipe.MASK && plan == null ? Phase.SELECT : Phase.PREPARE;
+        job.mom = stroke.mom;
+        job.momId = stroke.momId;
+        return job;
+    }
+
+    /**
      * An undo ({@code redo} false) or a redo of {@code step} by its player (online now: {@code player}), in the step's
      * own level; {@code rewind}: the undo of a spell that was just stopped (Ctrl + Z on a working spell), which says
      * "Spell stopped and taken back" when it is done.
@@ -294,14 +343,14 @@ public final class BuildJob {
         // An undo ticket-loads the chunks its step wrote: they exist, the spell wrote them.
         LongSet chunks = step.chunks();
         return new BuildJob(redo ? Kind.REDO : Kind.UNDO, player.getUUID(), player.getGameProfile(), level, limits.hero(), limits, 0, 0, null,
-                player.getEyePosition(), step, rewind, loaded, chunks, player).startReplay();
+                player.getEyePosition(), step, rewind, loaded, chunks, player, null).startReplay();
     }
 
     /** The same for a player who is not online (an operator's undo): his profile acts. */
     public static BuildJob replay(GameProfile profile, Limits limits, ServerLevel level, UndoStep step, boolean redo) {
         ServerPlayer actor = FakePlayerFactory.get(level, profile);
         return new BuildJob(redo ? Kind.REDO : Kind.UNDO, profile.getId(), profile, level, limits.hero(), limits, 0, 0, null, actor.position(), step,
-                false, level::hasChunk, step.chunks(), actor).startReplay();
+                false, level::hasChunk, step.chunks(), actor, null).startReplay();
     }
 
     private BuildJob startReplay() {
@@ -397,6 +446,11 @@ public final class BuildJob {
     /** The step it writes (a spell) or replays (an undo, a redo). */
     public UndoStep step() {
         return step;
+    }
+
+    /** The Paint stroke it is a dab of, or null. */
+    public BuildSession.@Nullable Stroke stroke() {
+        return stroke;
     }
 
     public boolean finished() {
@@ -557,6 +611,12 @@ public final class BuildJob {
         releaseTickets();
         finished = true;
         endCode = BuildVerdictPayload.STOPPED;
+        if (stroke != null) {
+            // A dab: what it painted stays in its stroke, which is sealed now.
+            stroke.closing = true;
+            dabEnded();
+            return;
+        }
         if (kind == Kind.SPELL && step.changed() > 0) {
             step.setState(UndoStep.State.INTERRUPTED);
             UndoHistory.of(caster).push(step, limits.undoSteps());
@@ -571,9 +631,13 @@ public final class BuildJob {
     /** The job is dropped (it never started, or the server forgets it): its tickets go, nothing else happens. */
     public void drop() {
         releaseTickets();
+        boolean was = finished;
         finished = true;
         if (endCode < 0) {
             endCode = BuildVerdictPayload.DROPPED;
+        }
+        if (!was && stroke != null) {
+            dabEnded();
         }
     }
 
@@ -689,20 +753,27 @@ public final class BuildJob {
     // ---- SELECT, PREPARE, CAPTURE, COUNT ----
 
     private boolean select(Slice slice) {
-        if (select == null) {
-            select = limits.select(level, recipe.seeds(), eyes, true);
+        SpellMath.Volume mask = stroke != null ? stroke.mask : null;
+        if (mask == null) {
+            if (select == null) {
+                select = limits.select(level, recipe.seeds(), eyes, true);
+            }
+            int reads = slice.reads();
+            boolean done = select.step(reads);
+            slice.use((long) reads * READ);
+            if (!done) {
+                return false;
+            }
+            if (select.refusal() != SpellPlanner.NONE) {
+                refuse(select.refusal(), select.limit(), select.message(!limits.billy()));
+                return false;
+            }
+            mask = select.mask();
+            if (stroke != null) {
+                stroke.mask = mask; // (the stroke's next dabs paint the same thing without flooding it again)
+            }
         }
-        int reads = slice.reads();
-        boolean done = select.step(reads);
-        slice.use((long) reads * READ);
-        if (!done) {
-            return false;
-        }
-        if (select.refusal() != SpellPlanner.NONE) {
-            refuse(select.refusal(), select.limit(), select.message(!limits.billy()));
-            return false;
-        }
-        setup = setup.withMask(select.mask());
+        setup = setup.withMask(mask);
         plan = SpellPlanner.plan(level, recipe, setup);
         select = null;
         if (plan.refusal() != SpellPlanner.NONE) {
@@ -769,10 +840,19 @@ public final class BuildJob {
             Pocket.Contents contents = recipe.spell() == Spell.MOVE ? Pocket.Contents.ALL : Pocket.Contents.of(limits);
             taker = Pocket.take(level, region, contents, recipe.spell() == Spell.COPY ? Pocket.nextId() : 0,
                     (x, z) -> chunks.contains(ChunkPos.asLong(x, z)) && loaded.test(x, z));
+            if (recipe.spell() == Spell.MOVE && BuildConfig.MOVE_CARRIES_CREATURES.get()) {
+                board(region);
+            }
         }
         int reads = slice.reads();
         boolean done = taker.step(reads);
         slice.use((long) reads * READ);
+        if (recipe.spell() == Spell.COPY && taker.bytes() > (long) BuildConfig.POCKET_MAX_MB.get() << 20) {
+            // Too big to keep in her pocket (D-B 4.8): the pocket she holds stays as it was.
+            taker = null;
+            refuse(BuildVerdictPayload.POCKET_TOO_BIG, BuildConfig.POCKET_MAX_MB.get(), BuildRules.message(BuildVerdictPayload.POCKET_TOO_BIG, 0));
+            return false;
+        }
         if (!done) {
             return false;
         }
@@ -856,6 +936,10 @@ public final class BuildJob {
         volume = Math.max(1, plan.size());
         cursor = plan.cursor();
         phase = Phase.APPLY;
+        if (recipe.spell() == Spell.MOVE && source != null && plan.turnsOverItself()) {
+            movedSources = new LongOpenHashSet();
+            doneEarly = new LongOpenHashSet();
+        }
     }
 
     // ---- APPLY (a spell) ----
@@ -866,8 +950,10 @@ public final class BuildJob {
         long pace = pace(slice.tick);
         boolean moving = recipe.spell() == Spell.MOVE && source != null;
         boolean conjured = recipe.spell() != Spell.MOVE;
+        holdRiders();
         while (true) {
             if (stopCode >= 0) {
+                riders.clear(); // (stopped: what it took along stays where it stood)
                 toSettle();
                 return true;
             }
@@ -875,6 +961,7 @@ public final class BuildJob {
                 return false;
             }
             if (!holding && !cursor.next()) {
+                carryRiders();
                 toSettle();
                 return true;
             }
@@ -905,6 +992,20 @@ public final class BuildJob {
                 rules.left(Left.OUTSIDE);
                 slice.use(SKIP);
                 continue;
+            }
+            if (doneEarly != null) {
+                // A turned Move over itself: a cell done out of turn is passed by; a source cell standing here moves
+                // before it is written over.
+                if (doneEarly.remove(pos.asLong())) {
+                    slice.use(SKIP);
+                    continue;
+                }
+                if (moveSourcesFirst(pos.immutable()) < 0) {
+                    holding = true;
+                    walked--;
+                    walkedThisTick--;
+                    return false;
+                }
             }
             BlockState old = level.getBlockState(pos);
             BlockState now = cursor.resolve(level);
@@ -941,8 +1042,14 @@ public final class BuildJob {
         }
     }
 
-    /** The cells a tick of this job may walk: {@code ceil(volume / minSpellTicks)} (D-B 11.3), so a spell is seen to grow. */
+    /**
+     * The cells a tick of this job may walk: {@code ceil(volume / minSpellTicks)} (D-B 11.3), so a spell is seen to
+     * grow; a dab of a stroke as many as the budget lets it.
+     */
     private long pace(BuildScheduler.Tick tick) {
+        if (stroke != null) {
+            return Long.MAX_VALUE; // a brush keeps up with the cursor (its stroke is what grows)
+        }
         long ticksAtLeast = Math.max(1, tick.minSpellTicks());
         return Math.max(1, (volume + ticksAtLeast - 1) / ticksAtLeast);
     }
@@ -1096,6 +1203,9 @@ public final class BuildJob {
             return -1;
         }
         long srcKey = src.asLong();
+        if (movedSources != null) {
+            movedSources.add(srcKey); // (its move is decided now, whatever comes of it)
+        }
         if (ready == 0 || SpellMath.outside(level, src)) {
             kept.add(srcKey);
             rules.left(Left.UNLOADED);
@@ -1146,11 +1256,150 @@ public final class BuildJob {
         if (writeTarget) {
             write(pos, old, now, data, false);
         }
+        // What hangs on the source's block goes with it.
+        carryHangers(src);
         if (writeTarget || clearSource) {
             changed++;
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * A turned or flipped Move over itself: before {@code target} is written over, the source cell that stands there
+     * moves to its own target first if it has not moved yet, and before that one is written over, the source standing
+     * there, and so on along the chain, so that no source is written over before its own move is decided (a source
+     * whose target is refused stays where it is, and so does whatever was to land on it). A chain that comes back on
+     * itself (a house turned where it stands) is a cycle through {@code target} no cell of which can move first: its
+     * moves are checked together before any is made (the rules that ask nobody, and that nothing changed since the
+     * capture), and if one is refused, the whole cycle stays as it is; else it moves, the cursor's own move last, from
+     * the Move's capture.
+     *
+     * @return 0, or -1 when a cell of the chain waits for its chunk (the chain goes on from there next tick)
+     */
+    private int moveSourcesFirst(BlockPos target) {
+        SpellMath.Volume region = plan.region();
+        List<BlockPos> chain = new ArrayList<>();
+        LongOpenHashSet seen = new LongOpenHashSet();
+        seen.add(target.asLong());
+        BlockPos at = target;
+        int cycle = -1;
+        while (region.contains(at.getX(), at.getY(), at.getZ()) && !movedSources.contains(at.asLong())) {
+            BlockPos next = plan.targetOf(at);
+            if (next == null || next.equals(at)) {
+                break; // (a cell that lands on itself moves in its own turn)
+            }
+            chain.add(at);
+            if (!seen.add(next.asLong())) {
+                cycle = chain.indexOf(next); // the chain closed on itself
+                break;
+            }
+            at = next;
+        }
+        if (cycle >= 0) {
+            int kept = keepCycleIfRefused(chain.subList(cycle, chain.size()), target);
+            if (kept < 0) {
+                return -1;
+            }
+            if (kept > 0) {
+                chain = chain.subList(0, cycle);
+            }
+        }
+        for (int i = chain.size() - 1; i >= 0; i--) {
+            BlockPos from = chain.get(i);
+            BlockPos to = plan.targetOf(from);
+            if (to.equals(target)) {
+                continue; // (the move that closes a cycle onto the cursor's own cell is the cursor's, right after)
+            }
+            int ready = chunkReady(to);
+            if (ready < 0) {
+                return -1;
+            }
+            if (ready == 0 || SpellMath.outside(level, to)) {
+                // Its target can never be written: it stays, and so does whatever was to land on it.
+                movedSources.add(from.asLong());
+                this.kept.add(from.asLong());
+                rules.left(ready == 0 ? Left.UNLOADED : Left.OUTSIDE);
+                doneEarly.add(to.asLong());
+                continue;
+            }
+            SpellPlanner.Cell cell = plan.resolveCell(level, to);
+            if (cell == null || cell.from() == null) {
+                movedSources.add(from.asLong()); // (nothing of it was captured: it is no part of the Move)
+                doneEarly.add(to.asLong());
+                continue;
+            }
+            if (move(to, level.getBlockState(to), cell.state(), cell.data(), cell.from()) < 0) {
+                return -1;
+            }
+            doneEarly.add(to.asLong());
+        }
+        return 0;
+    }
+
+    /**
+     * Checks every move of a cycle of a turned Move over itself before any is made: each source as it was captured,
+     * each target within the rules that ask nobody (P4 to P8). If one fails, every cell of the cycle stays as it is
+     * (counted as left for that reason once, the rest as changed under the Move), and the targets other than
+     * {@code cursor}'s are passed by.
+     *
+     * @return 1 when the cycle stays, 0 when it may move, -1 when a cell waits for its chunk
+     */
+    private int keepCycleIfRefused(List<BlockPos> cycle, BlockPos cursor) {
+        Left why = null;
+        for (BlockPos from : cycle) {
+            BlockPos to = plan.targetOf(from);
+            int readyTo = chunkReady(to);
+            int readyFrom = chunkReady(from);
+            if (readyTo < 0 || readyFrom < 0) {
+                return -1;
+            }
+            if (readyTo == 0 || readyFrom == 0) {
+                why = Left.UNLOADED;
+                break;
+            }
+            if (SpellMath.outside(level, to)) {
+                why = Left.OUTSIDE;
+                break;
+            }
+            SpellPlanner.Cell cell = plan.resolveCell(level, to);
+            if (cell == null) {
+                continue; // (nothing of it was captured: nothing lands there from it)
+            }
+            BlockPos local = from.subtract(source.origin());
+            BlockState now = level.getBlockState(from);
+            if (!now.equals(source.state(local.getX(), local.getY(), local.getZ())) || hashOf(from, now) != source.hash(local.getX(), local.getY(),
+                    local.getZ())) {
+                why = Left.CHANGED;
+                break;
+            }
+            BlockState old = level.getBlockState(to);
+            if (!cell.state().equals(old) || cell.data() != null) {
+                why = rules.check(to, old, cell.state(), false, true);
+                if (why != null) {
+                    break;
+                }
+            }
+        }
+        if (why == null) {
+            return 0;
+        }
+        rules.left(why);
+        boolean counted = false;
+        for (BlockPos from : cycle) {
+            movedSources.add(from.asLong());
+            this.kept.add(from.asLong());
+            BlockPos to = plan.targetOf(from);
+            if (to.equals(cursor)) {
+                continue; // (the cursor's own move finds its target kept, and counts itself)
+            }
+            doneEarly.add(to.asLong());
+            if (counted) {
+                rules.left(Left.CHANGED);
+            }
+            counted = true;
+        }
+        return 1;
     }
 
     /**
@@ -1284,15 +1533,206 @@ public final class BuildJob {
             if (!rules.liftable(body, online) || level.noCollision(body, body.getBoundingBox().deflate(1.0E-4))) {
                 continue;
             }
-            for (int up = 1; up <= 64; up++) {
-                AABB lifted = body.getBoundingBox().move(0.0, up, 0.0);
-                if (level.noCollision(body, lifted)) {
-                    body.teleportTo(body.getX(), body.getY() + up, body.getZ());
-                    body.resetFallDistance();
-                    break;
-                }
+            if (!lift(body)) {
+                pushAside(body);
             }
         }
+    }
+
+    /**
+     * Lifts a body to the first place above it with room for it, at most {@value #LIFT_UP} blocks up; false if none.
+     */
+    private boolean lift(LivingEntity body) {
+        for (int up = 1; up <= LIFT_UP; up++) {
+            AABB lifted = body.getBoundingBox().move(0.0, up, 0.0);
+            if (level.noCollision(body, lifted)) {
+                body.teleportTo(body.getX(), body.getY() + up, body.getZ());
+                body.resetFallDistance();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Out to the nearest free side (D-B 11.8), when there is no room above: the nearest place at its height, at most
+     * {@value #ASIDE} blocks away, where it fits (the first of equal ones, in a fixed order).
+     */
+    private void pushAside(LivingEntity body) {
+        AABB from = body.getBoundingBox();
+        for (int r = 1; r <= ASIDE; r++) {
+            int best = -1;
+            int bestX = 0;
+            int bestZ = 0;
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    int distance = dx * dx + dz * dz;
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != r || best >= 0 && distance >= best) {
+                        continue;
+                    }
+                    if (level.noCollision(body, from.move(dx, 0.0, dz))) {
+                        best = distance;
+                        bestX = dx;
+                        bestZ = dz;
+                    }
+                }
+            }
+            if (best >= 0) {
+                body.teleportTo(body.getX() + bestX, body.getY(), body.getZ() + bestZ);
+                body.resetFallDistance();
+                return;
+            }
+        }
+    }
+
+    // ---- What a Move takes along (D-B 4.9, moveCarriesCreatures) ----
+
+    /** A creature a Move takes along, and where it stood when the Move began. */
+    private record Rider(LivingEntity body, Vec3 at) {
+    }
+
+    /**
+     * What a Move takes along, read with its source: every living body wholly inside its source box (and over the
+     * selected thing, for a thing) but a player, anything of a boss fight, anything telekinesis holds, a creature
+     * Mjolnir pins (C2), and anything ridden or riding; and the frames and paintings hanging on a block of the source.
+     */
+    private void board(SpellMath.Volume region) {
+        BoundingBox box = region.bounds();
+        AABB inside = AABB.of(box);
+        for (Entity entity : level.getEntities((Entity) null, inside.inflate(1.0), Entity::isAlive)) {
+            if (entity instanceof HangingEntity hanging) {
+                BlockPos on = hanging.getPos().relative(hanging.getDirection().getOpposite());
+                if (region.contains(on.getX(), on.getY(), on.getZ())) {
+                    hangers.computeIfAbsent(on.asLong(), key -> new ArrayList<>()).add(hanging);
+                }
+            } else if (entity instanceof LivingEntity body && rides(body) && within(inside, body.getBoundingBox())
+                    && (recipe.region() != SpellRecipe.MASK || over(region, body.blockPosition()))) {
+                riders.add(new Rider(body, body.position()));
+            }
+        }
+    }
+
+    /** Whether a Move takes {@code body} along. */
+    private static boolean rides(LivingEntity body) {
+        return !(body instanceof net.minecraft.world.entity.player.Player) && !BossFights.isFightEntity(body) && !Telekinesis.isHeld(body)
+                && !MjolnirPin.isPinned(body) && !body.isPassenger() && !body.isVehicle();
+    }
+
+    /** Whether the box {@code inner} is wholly inside {@code outer} (a hair's breadth allowed). */
+    private static boolean within(AABB outer, AABB inner) {
+        return outer.inflate(1.0E-4).contains(inner.minX, inner.minY, inner.minZ) && outer.inflate(1.0E-4).contains(inner.maxX, inner.maxY, inner.maxZ);
+    }
+
+    /** Whether a body at {@code feet} stands in or on the selected thing. */
+    private static boolean over(SpellMath.Volume region, BlockPos feet) {
+        return region.contains(feet.getX(), feet.getY(), feet.getZ()) || region.contains(feet.getX(), feet.getY() - 1, feet.getZ());
+    }
+
+    /**
+     * The creatures a Move takes along stay where they stood until it is done (the floor under them may go before
+     * they do), each slice; one that telekinesis took, Mjolnir pinned, or that died or left is let go.
+     */
+    private void holdRiders() {
+        for (Iterator<Rider> it = riders.iterator(); it.hasNext(); ) {
+            Rider rider = it.next();
+            LivingEntity body = rider.body();
+            if (!body.isAlive() || body.level() != level || Telekinesis.isHeld(body) || MjolnirPin.isPinned(body)) {
+                it.remove();
+                continue;
+            }
+            if (body.position().distanceToSqr(rider.at()) > 1.0E-6) {
+                body.teleportTo(rider.at().x, rider.at().y, rider.at().z);
+            }
+            body.setDeltaMovement(Vec3.ZERO);
+            body.resetFallDistance();
+        }
+    }
+
+    /**
+     * The Move is done: each creature it takes along that is still in its source box (C12) goes where its cells
+     * went, turned as they were, unhurt (a Move turned upside down keeps it on its feet).
+     */
+    private void carryRiders() {
+        if (riders.isEmpty()) {
+            return;
+        }
+        AABB inside = AABB.of(plan.region().bounds());
+        for (Rider rider : riders) {
+            LivingEntity body = rider.body();
+            if (!body.isAlive() || body.level() != level || Telekinesis.isHeld(body) || !within(inside, body.getBoundingBox())) {
+                continue;
+            }
+            Vec3 feet = body.position();
+            Vec3 to = plan.carried(feet);
+            Vec3 head = plan.carried(feet.add(0.0, body.getBbHeight(), 0.0));
+            if (to == null || head == null) {
+                continue;
+            }
+            float yaw = plan.carriedYaw(body.getYRot());
+            body.moveTo(to.x, Math.min(to.y, head.y), to.z, yaw, body.getXRot());
+            body.setYHeadRot(plan.carriedYaw(body.getYHeadRot()));
+            body.setYBodyRot(yaw);
+            body.setDeltaMovement(Vec3.ZERO);
+            body.resetFallDistance();
+        }
+        riders.clear();
+    }
+
+    /** What hangs on the source cell {@code src} goes with its block, turned as it was, and the step remembers it. */
+    private void carryHangers(BlockPos src) {
+        List<HangingEntity> on = hangers.isEmpty() ? null : hangers.remove(src.asLong());
+        if (on == null) {
+            return;
+        }
+        for (HangingEntity hanging : on) {
+            if (hanging.isRemoved() || hanging.level() != level) {
+                continue;
+            }
+            BlockPos from = hanging.getPos();
+            Direction facing = hanging.getDirection();
+            Vec3 middle = plan.carried(Vec3.atCenterOf(from));
+            if (middle == null) {
+                continue;
+            }
+            BlockPos to = BlockPos.containing(middle);
+            Direction turned = plan.carried(facing);
+            hang(hanging, to, turned);
+            step.carried(hanging.getUUID(), from, facing, to, turned);
+        }
+    }
+
+    /**
+     * An undo hangs a frame or a painting the Move carried back where it was, once the block it hung on stands there
+     * again ({@code undo}); a redo carries it again once its new block is there. Only if it still hangs where it was
+     * put (D-B 12.3).
+     */
+    private void hangBack(UndoStep.Carried thing, boolean undo) {
+        if (!(level.getEntity(thing.id()) instanceof HangingEntity hanging) || hanging.isRemoved()) {
+            return;
+        }
+        BlockPos at = undo ? thing.to() : thing.from();
+        Direction facing = undo ? thing.toFacing() : thing.fromFacing();
+        if (hanging.getPos().equals(at) && hanging.getDirection() == facing) {
+            hang(hanging, undo ? thing.from() : thing.to(), undo ? thing.fromFacing() : thing.toFacing());
+        }
+    }
+
+    /**
+     * Hangs a frame or a painting in the cell {@code at}, facing {@code facing}. It sends no moves to those who see
+     * it, so they are sent it again where it now hangs.
+     */
+    private static void hang(HangingEntity hanging, BlockPos at, Direction facing) {
+        hanging.setPos(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5);
+        if (hanging.getDirection() != facing) {
+            try {
+                SET_DIRECTION.invoke(hanging, facing);
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("Build Magic cannot turn a frame", e);
+            }
+        }
+        ServerChunkCache chunks = ((ServerLevel) hanging.level()).getChunkSource();
+        chunks.removeEntity(hanging);
+        chunks.addEntity(hanging);
     }
 
     // ---- APPLY (an undo, a redo) ----
@@ -1369,6 +1809,9 @@ public final class BuildJob {
                 walk.rehash(hash);
             }
             walk.setStatus(undo ? UndoStep.UNDONE : UndoStep.APPLIED);
+            for (UndoStep.Carried thing : step.carriedOn(at, undo)) {
+                hangBack(thing, undo);
+            }
             written++;
             changed++;
             writtenThisTick++;
@@ -1547,6 +1990,10 @@ public final class BuildJob {
     }
 
     private void finishSpell() {
+        if (stroke != null) {
+            finishDab();
+            return;
+        }
         ServerPlayer online = online();
         boolean changed = step.changed() > 0;
         if (changed) {
@@ -1572,34 +2019,127 @@ public final class BuildJob {
         if (box != null && stopCode < 0) {
             BuildSounds.done(level, box.getCenter().getCenter());
         }
-        int count = (int) Math.min(Integer.MAX_VALUE, this.changed);
+        tellDone(online, caster, limits, token, code, this.changed, cost, rules);
+        BuildMagic.sync(level.getServer(), caster);
+    }
+
+    /**
+     * What the builder is told when a spell (or a stroke) is done: the verdict with its counts, and one line, the most
+     * important first (it stopped; nothing changed; what was left; else the done line of her first five spells); a
+     * builder who is away hears at her next login that it finished.
+     */
+    private static void tellDone(@Nullable ServerPlayer online, UUID caster, Limits limits, int token, int code, long changedCells, int cost,
+                                 BuildRules.Cells rules) {
+        int count = (int) Math.min(Integer.MAX_VALUE, changedCells);
         if (online == null) {
-            if (changed) {
+            if (changedCells > 0) {
                 BuildSession.of(caster).tellAtLogin(Component.translatable("message.enhanced.build.finished_away", count));
             }
-        } else {
-            send(online, new BuildVerdictPayload(token, code, count, cost, 0, rules.flags()));
-            Component line = switch (code) {
-                case BuildVerdictPayload.STOPPED_FIGHT -> Component.translatable("message.enhanced.build.stopped_fight", count);
-                case BuildVerdictPayload.STOPPED -> Component.translatable("message.enhanced.build.stopped_mode");
-                case BuildVerdictPayload.NOTHING_CHANGES -> Component.translatable("message.enhanced.build.nothing_changes");
-                default -> {
-                    Component summary = rules.summary();
-                    if (summary == null && rules.count(Left.CHANGED) > 0) {
-                        summary = Left.CHANGED.message(rules.count(Left.CHANGED));
-                    }
-                    if (summary != null) {
-                        yield summary;
-                    }
-                    yield BuildSession.of(caster).saysDone() ? Component.translatable(limits.billy() ? "message.enhanced.build.done.billy"
-                            : "message.enhanced.build.done.scarlet_witch", count, Component.keybind("key.enhanced.build_undo")) : null;
+            return;
+        }
+        send(online, new BuildVerdictPayload(token, code, count, cost, 0, rules.flags()));
+        Component line = switch (code) {
+            case BuildVerdictPayload.STOPPED_FIGHT -> Component.translatable("message.enhanced.build.stopped_fight", count);
+            case BuildVerdictPayload.STOPPED -> Component.translatable("message.enhanced.build.stopped_mode");
+            case BuildVerdictPayload.NOTHING_CHANGES -> Component.translatable("message.enhanced.build.nothing_changes");
+            default -> {
+                Component summary = rules.summary();
+                if (summary == null && rules.count(Left.CHANGED) > 0) {
+                    summary = Left.CHANGED.message(rules.count(Left.CHANGED));
                 }
-            };
-            if (line != null) {
-                online.displayClientMessage(line, true);
+                if (summary != null) {
+                    yield summary;
+                }
+                yield BuildSession.of(caster).saysDone() ? Component.translatable(limits.billy() ? "message.enhanced.build.done.billy"
+                        : "message.enhanced.build.done.scarlet_witch", count, Component.keybind("key.enhanced.build_undo")) : null;
+            }
+        };
+        if (line != null) {
+            online.displayClientMessage(line, true);
+        }
+    }
+
+    /**
+     * A dab is done: what it changed is in its stroke's step, what Billy reserved and did not use comes back, and it
+     * says nothing (the stroke speaks when it is sealed).
+     */
+    private void finishDab() {
+        endCode = changed > 0 ? BuildVerdictPayload.DONE : BuildVerdictPayload.NOTHING_CHANGES;
+        ServerPlayer online = online();
+        int used = BillyMagic.cost(changed, mom);
+        if (limits.limited() && online != null && cost > used) {
+            long time = level.getServer().overworld().getGameTime();
+            online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA,
+                    BillyMagic.refund(online.getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA), time, cost - used));
+        }
+        stroke.cost += Math.min(cost, used);
+        stroke.changed += changed;
+        if (stopCode >= 0) {
+            stroke.closing = true; // (a fight began over it, or its painter may no longer build: the stroke ends here)
+        }
+        dabEnded();
+        BuildMagic.sync(level.getServer(), caster);
+    }
+
+    /**
+     * A dab of the stroke is over (done, refused, dropped): the stroke is sealed once it is closing and none is left.
+     */
+    private void dabEnded() {
+        stroke.pending = Math.max(0, stroke.pending - 1);
+        if (stroke.closing && stroke.pending == 0) {
+            sealStroke(stroke, level.getServer());
+        }
+    }
+
+    /**
+     * Seals a Paint stroke (D-B 11.8): the one step its dabs wrote goes into the history (if they changed anything),
+     * Billy's practice is booked and his pause begins, and the builder is told as for any spell. Its last dab must be
+     * done ({@link BuildSession.Stroke#pending} 0).
+     */
+    static void sealStroke(BuildSession.Stroke stroke, net.minecraft.server.MinecraftServer server) {
+        if (stroke.sealed) {
+            return;
+        }
+        stroke.sealed = true;
+        stroke.closing = true;
+        BuildSession.of(stroke.caster).sealed(stroke);
+        ServerPlayer online = server.getPlayerList().getPlayer(stroke.caster);
+        if (online != null && online.hasDisconnected()) {
+            online = null;
+        }
+        UndoStep step = stroke.step;
+        boolean changed = step.changed() > 0;
+        if (changed) {
+            step.setState(UndoStep.State.DONE);
+            step.setBilly(stroke.cost, stroke.changed, stroke.mom);
+            int forgotten = UndoHistory.of(stroke.caster).push(step, stroke.limits.undoSteps());
+            if (forgotten > 0 && online != null) {
+                online.displayClientMessage(BillyMagic.forgotten(), true);
             }
         }
-        BuildMagic.sync(level.getServer(), caster);
+        if (stroke.limits.limited() && online != null) {
+            long time = server.overworld().getGameTime();
+            BuildData data = online.getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
+            BillyMagic.Practiced practiced = BillyMagic.practise(data, time, stroke.changed);
+            data = BillyMagic.pauseAfter(practiced.data(), time, stroke.limits.castPause());
+            online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, data);
+            if (practiced.rankedUp()) {
+                online.displayClientMessage(BillyMagic.rankUp(data.rank()), false);
+                BuildSounds.rankUp(online);
+            }
+        }
+        BuildRules.Cells rules = stroke.rules;
+        long left = rules.leftInAll() - rules.count(Left.CHANGED);
+        int code = !changed && left == 0 && rules.count(Left.CHANGED) == 0 ? BuildVerdictPayload.NOTHING_CHANGES
+                : left > 0 || rules.count(Left.CHANGED) > 0 ? BuildVerdictPayload.DONE_PARTLY : BuildVerdictPayload.DONE;
+        BoundingBox box = step.bounds();
+        if (box != null) {
+            sendFx(stroke.level, online, BuildFxPayload.DONE, stroke.fxId, stroke.limits.hero(), box, new BlockPos(box.minX(), box.minY(), box.minZ()),
+                    1000, (int) Math.min(Integer.MAX_VALUE, stroke.changed), stroke.momId, BuildFxPayload.RISE);
+            BuildSounds.done(stroke.level, box.getCenter().getCenter());
+        }
+        tellDone(online, stroke.caster, stroke.limits, stroke.token, code, stroke.changed, stroke.cost, rules);
+        BuildMagic.sync(server, stroke.caster);
     }
 
     /** Billy's reservation is settled at the end: what was not used comes back, the practice is booked (D-B 8.1, 8.2). */
@@ -1687,6 +2227,11 @@ public final class BuildJob {
             BuildSounds.fizzle(online);
         }
         fx(BuildFxPayload.FIZZLE);
+        if (stroke != null) {
+            // A refused dab (an empty meter, a thing too big) ends its stroke with the fizzle: what it painted stays.
+            stroke.closing = true;
+            dabEnded();
+        }
         BuildMagic.sync(level.getServer(), caster);
     }
 
@@ -1741,9 +2286,22 @@ public final class BuildJob {
                 box.maxY()), Math.clamp((long) Math.floor(eyes.z), box.minZ(), box.maxZ()));
         int order = plan != null && plan.prepared() ? plan.order() : kind == Kind.UNDO ? BuildFxPayload.MELT : BuildFxPayload.RISE;
         int kindOfMoment = kind != Kind.SPELL && moment == BuildFxPayload.START ? BuildFxPayload.UNDO_START : moment;
-        BuildFxPayload payload = new BuildFxPayload(kindOfMoment, id, online != null ? online.getId() : -1, hero == Power.BILLY ? BuildFxPayload.BILLY
+        if (stroke != null && moment == BuildFxPayload.START) {
+            stroke.fxId = id; // (the stroke's first dab starts its effects; its seal ends them)
+        }
+        sendFx(level, online, kindOfMoment, id, hero, box, origin, permille(), (int) Math.min(Integer.MAX_VALUE, finished ? changed : volume), momId,
+                order);
+    }
+
+    /**
+     * A moment of a spell (D-B 7.2) to everyone within 128 blocks of its box, and its caster wherever he is; a fizzle
+     * to the caster alone.
+     */
+    static void sendFx(ServerLevel level, @Nullable ServerPlayer online, int moment, int id, Power hero, BoundingBox box, BlockPos origin, int permille,
+                       int cells, int momId, int order) {
+        BuildFxPayload payload = new BuildFxPayload(moment, id, online != null ? online.getId() : -1, hero == Power.BILLY ? BuildFxPayload.BILLY
                 : BuildFxPayload.WANDA, new BlockPos(box.minX(), box.minY(), box.minZ()), new BlockPos(box.maxX(), box.maxY(), box.maxZ()), origin,
-                permille(), (int) Math.min(Integer.MAX_VALUE, finished ? changed : volume), momId, order);
+                permille, cells, momId, order);
         if (moment == BuildFxPayload.FIZZLE) {
             if (online != null) {
                 send(online, payload);

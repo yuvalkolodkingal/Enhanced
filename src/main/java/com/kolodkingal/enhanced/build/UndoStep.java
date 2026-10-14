@@ -1,11 +1,13 @@
 package com.kolodkingal.enhanced.build;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.shorts.Short2LongOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -23,6 +25,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * One undo step (D-B 12.1): everything one spell changed, so that Ctrl + Z can put it back and Ctrl + Y do it again. One
@@ -31,10 +34,11 @@ import java.util.List;
  * <p>It holds the spell, its dimension, the box of the cells it wrote, the game time, Billy's cost and practice and
  * whether Mom helped, a {@link State}, and for every 16 x 16 x 16 section it touched, in the order it touched them: the
  * cells it changed (in the order it changed them), the old and new state of each (as ids of
- * {@code Block.BLOCK_STATE_REGISTRY}), the old and new block-entity data of the cells that have it, and a 64-bit hash of
- * each new block entity's data as it stood once written. Then the settle pass's side effects (a neighbour outside the
- * spell that changed because of it: a torch that dropped off a vanished wall). In memory only, for now; the history on
- * disk ({@code UndoFiles}) writes the same sections ahead of the cells (C13).
+ * {@code Block.BLOCK_STATE_REGISTRY}), the old and new block-entity data of the cells that have it, and a 64-bit hash
+ * of each new block entity's data as it stood once written. Then the settle pass's side effects (a neighbour outside
+ * the spell that changed because of it: a torch that dropped off a vanished wall), and the frames and paintings a Move
+ * carried (where each hung before and after). In memory only, for now; the history on disk ({@code UndoFiles}) writes
+ * the same sections ahead of the cells (C13).
  *
  * <p>Each recorded cell has a status: still as the spell left it ({@link #APPLIED}), put back by an undo
  * ({@link #UNDONE}), or dropped because someone changed it since ({@link #DROPPED}, D-B 12.3: undo never destroys anyone's
@@ -74,6 +78,10 @@ public final class UndoStep {
 
     private final Long2ObjectLinkedOpenHashMap<Section> sections = new Long2ObjectLinkedOpenHashMap<>();
     private final List<SideEffect> sideEffects = new ArrayList<>();
+    private final List<Carried> carried = new ArrayList<>();
+    /** The carried things by the block they hung on before the Move, and after it. */
+    private final Long2ObjectOpenHashMap<List<Carried>> carriedBefore = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<List<Carried>> carriedAfter = new Long2ObjectOpenHashMap<>();
     private long cells;
     private long applied;
     private int minX = Integer.MAX_VALUE;
@@ -243,6 +251,34 @@ public final class UndoStep {
         sideEffects.add(new SideEffect(pos.asLong(), old, now));
     }
 
+    /**
+     * A Move carried a frame or a painting (by its UUID) from the cell {@code from}, facing {@code fromFacing}, to
+     * {@code to}, facing {@code toFacing} (D-B 12.1): an undo hangs it back where it was if it still hangs where the
+     * spell put it, and a redo carries it again.
+     */
+    public void carried(UUID id, BlockPos from, Direction fromFacing, BlockPos to, Direction toFacing) {
+        Carried thing = new Carried(id, from.immutable(), fromFacing, to.immutable(), toFacing);
+        carried.add(thing);
+        carriedBefore.computeIfAbsent(thing.fromSupport().asLong(), key -> new ArrayList<>()).add(thing);
+        carriedAfter.computeIfAbsent(thing.toSupport().asLong(), key -> new ArrayList<>()).add(thing);
+    }
+
+    /** The frames and paintings a Move carried, in the order it carried them. */
+    public List<Carried> carried() {
+        return carried;
+    }
+
+    /**
+     * The frames and paintings a Move carried that hang on {@code pos}: on their old place's block ({@code before},
+     * what an undo hangs back once that block stands again) or on their new place's (a redo's).
+     */
+    public List<Carried> carriedOn(BlockPos pos, boolean before) {
+        if (carried.isEmpty()) {
+            return List.of();
+        }
+        return (before ? carriedBefore : carriedAfter).getOrDefault(pos.asLong(), List.of());
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // Walking it (an undo backwards, a redo forwards, the settle pass forwards)
 
@@ -376,6 +412,55 @@ public final class UndoStep {
 
         public void setStatus(byte status) {
             this.status = status;
+        }
+    }
+
+    /** A frame or a painting a Move carried, where it hung before and after (D-B 12.1). */
+    public static final class Carried {
+        private final UUID id;
+        private final BlockPos from;
+        private final Direction fromFacing;
+        private final BlockPos to;
+        private final Direction toFacing;
+
+        Carried(UUID id, BlockPos from, Direction fromFacing, BlockPos to, Direction toFacing) {
+            this.id = id;
+            this.from = from;
+            this.fromFacing = fromFacing;
+            this.to = to;
+            this.toFacing = toFacing;
+        }
+
+        public UUID id() {
+            return id;
+        }
+
+        /** The cell it hung in before the Move. */
+        public BlockPos from() {
+            return from;
+        }
+
+        public Direction fromFacing() {
+            return fromFacing;
+        }
+
+        /** The cell the Move hung it in. */
+        public BlockPos to() {
+            return to;
+        }
+
+        public Direction toFacing() {
+            return toFacing;
+        }
+
+        /** The block it hung on before the Move. */
+        public BlockPos fromSupport() {
+            return from.relative(fromFacing.getOpposite());
+        }
+
+        /** The block it hangs on after the Move. */
+        public BlockPos toSupport() {
+            return to.relative(toFacing.getOpposite());
         }
     }
 

@@ -1,7 +1,10 @@
 package com.kolodkingal.enhanced.build;
 
 import com.kolodkingal.enhanced.build.SpellMath.Volume;
+import com.kolodkingal.enhanced.network.BuildPocketPayload;
 import com.kolodkingal.enhanced.registry.ModTags;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -56,6 +59,10 @@ public final class Pocket implements SpellPlanner.Source {
     /** The pocket each builder holds (her last Copy's take), by player. In memory only, for now ({@code UndoFiles}). */
     private static final Map<UUID, Pocket> HELD = new HashMap<>();
     private static int lastId;
+    /** What a run of the pocket is reckoned to cost to keep: its block's index and its length, as two numbers. */
+    private static final int RUN_BYTES = 6;
+    /** What a block of its palette is reckoned to cost. */
+    private static final int STATE_BYTES = 8;
 
     private final int id;
     private final int sizeX;
@@ -179,6 +186,268 @@ public final class Pocket implements SpellPlanner.Source {
         return ((long) y * sizeZ + z) * sizeX + x;
     }
 
+    /**
+     * About how many bytes it takes to keep (its runs, its palette and its data), what {@code pocketMaxMb} bounds (D-B
+     * 4.8: "That is too big to keep in your pocket"). It is counted before compression, so it never lets a pocket
+     * through that the compressed file would refuse.
+     */
+    public long bytes() {
+        return estimate(runState.length, palette.size(), data);
+    }
+
+    private static long estimate(long runs, int states, Long2ObjectOpenHashMap<CompoundTag> data) {
+        long bytes = runs * RUN_BYTES + (long) states * STATE_BYTES;
+        for (CompoundTag tag : data.values()) {
+            bytes += tag.sizeInBytes();
+        }
+        return bytes;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Sending one to its owner's client
+
+    /**
+     * The most cells a pocket may have to travel whole to its owner's client (D-B 13.1): a bigger one goes as its outer
+     * surface only, and when even that has more cells, as its size alone (the ghost is then a frame). It is what a
+     * ghost draws at most ({@code ghostDetail}).
+     */
+    public static final int SENT_WHOLE = 262_144;
+
+    /** How many of its runs a stream reads a tick while it gets a big pocket ready to send. */
+    private static final int STREAM_RUNS = 65_536;
+
+    /** The pocket as its owner's client will get it ({@code BuildPocketPayload}), got ready a slice a tick. */
+    public Stream stream() {
+        return new Stream(SENT_WHOLE);
+    }
+
+    /** The same with another number in place of {@link #SENT_WHOLE} (a test's small pocket sent as its surface). */
+    public Stream stream(int whole) {
+        return new Stream(whole);
+    }
+
+    /**
+     * A pocket on its way to its owner's client: its cells as runs over {@code y}, then {@code z}, then {@code x} (the
+     * client's own order), made a slice a tick ({@link #step}), then cut into parts ({@code BuildPocketPayload#split}),
+     * of which the server sends at most 4 a tick. A pocket of at most {@link #SENT_WHOLE} cells goes whole, its air
+     * included (a box copy's air carves the ghost too); a bigger one as its outer surface only, the blocks with an
+     * absent, air or outside neighbour; and if that surface still has more than {@link #SENT_WHOLE} cells, as its size
+     * alone.
+     */
+    public final class Stream {
+        private final int most;
+        private final boolean whole;
+        private final ByteBuf runs = Unpooled.buffer();
+        private int row;
+        private int pendingIndex = -1;
+        private long pendingLength;
+        private long surface;
+        private boolean sizeOnly;
+        private @Nullable List<BuildPocketPayload> parts;
+        private int sent;
+
+        private Stream(int most) {
+            this.most = most;
+            this.whole = cells <= most;
+        }
+
+        /** The pocket it sends. */
+        public Pocket pocket() {
+            return Pocket.this;
+        }
+
+        /** Gets on with it for one tick; true once every part is ready ({@link #next}). */
+        public boolean step() {
+            if (parts != null) {
+                return true;
+            }
+            int rows = rowStart.length - 1;
+            int budget = STREAM_RUNS;
+            while (row < rows && budget > 0 && !sizeOnly) {
+                budget -= whole ? wholeRow(row) : surfaceRow(row);
+                row++;
+            }
+            if (row < rows && !sizeOnly) {
+                return false;
+            }
+            List<BlockState> states = palette.subList(1, palette.size());
+            if (sizeOnly) {
+                runs.clear();
+                pendingIndex = -1;
+                pendingLength = 0;
+                add(0, (long) sizeX * sizeY * sizeZ);
+                states = List.of();
+            }
+            flush();
+            byte[] bytes = new byte[runs.readableBytes()];
+            runs.readBytes(bytes);
+            runs.release();
+            parts = BuildPocketPayload.split(id, sizeX, sizeY, sizeZ, states, bytes);
+            return true;
+        }
+
+        /** Whether it is sent as its outer surface (a pocket of more than {@link #SENT_WHOLE} cells). */
+        public boolean surfaceOnly() {
+            return !whole && !sizeOnly;
+        }
+
+        /** Whether it is sent as its size alone (even its surface has more than {@link #SENT_WHOLE} cells). */
+        public boolean sizeOnly() {
+            return sizeOnly;
+        }
+
+        /** The next parts to send, at most {@code max} of them (none until it is ready). */
+        public List<BuildPocketPayload> next(int max) {
+            if (parts == null || sent >= parts.size()) {
+                return List.of();
+            }
+            List<BuildPocketPayload> next = parts.subList(sent, Math.min(parts.size(), sent + max));
+            sent += next.size();
+            return next;
+        }
+
+        /** Whether every part has been handed out. */
+        public boolean done() {
+            return parts != null && sent >= parts.size();
+        }
+
+        /** The row as it is. Returns how many runs it read. */
+        private int wholeRow(int r) {
+            int start = 0;
+            for (int i = rowStart[r]; i < rowStart[r + 1]; i++) {
+                add(runState[i], runEnd[i] - start);
+                start = runEnd[i];
+            }
+            return Math.max(1, rowStart[r + 1] - rowStart[r]);
+        }
+
+        /** The row's blocks on the outside of the pocket; every other cell absent. Returns how many runs it read. */
+        private int surfaceRow(int r) {
+            int y = r / sizeZ;
+            int z = r % sizeZ;
+            int[] solid = solid(y, z);
+            // A cell is inside when both its neighbours along x and the four of the rows beside it are blocks too.
+            int[] inside = erode(solid);
+            inside = meet(inside, solid(y - 1, z));
+            inside = meet(inside, solid(y + 1, z));
+            inside = meet(inside, solid(y, z - 1));
+            inside = meet(inside, solid(y, z + 1));
+            int start = 0;
+            int k = 0;
+            for (int i = rowStart[r]; i < rowStart[r + 1]; i++) {
+                int end = runEnd[i];
+                int index = runState[i];
+                if (index == 0 || palette.get(index).isAir()) {
+                    add(0, end - start);
+                    start = end;
+                    continue;
+                }
+                int at = start;
+                while (at < end) {
+                    while (k < inside.length && inside[k + 1] <= at) {
+                        k += 2;
+                    }
+                    if (k < inside.length && inside[k] <= at) {
+                        int to = Math.min(end, inside[k + 1]);
+                        add(0, to - at);
+                        at = to;
+                    } else {
+                        int to = k < inside.length ? Math.min(end, inside[k]) : end;
+                        add(index, to - at);
+                        surface += to - at;
+                        at = to;
+                    }
+                }
+                start = end;
+            }
+            if (surface > most) {
+                sizeOnly = true;
+            }
+            return Math.max(1, (rowStart[r + 1] - rowStart[r]) * 6);
+        }
+
+        /** The stretches along x of row {@code y, z} that hold a block (not absent, not air), as from, to pairs. */
+        private int[] solid(int y, int z) {
+            if (y < 0 || z < 0 || y >= sizeY || z >= sizeZ) {
+                return NO_STRETCHES;
+            }
+            int r = y * sizeZ + z;
+            IntArrayList out = new IntArrayList();
+            int start = 0;
+            for (int i = rowStart[r]; i < rowStart[r + 1]; i++) {
+                int index = runState[i];
+                if (index != 0 && !palette.get(index).isAir()) {
+                    if (!out.isEmpty() && out.getInt(out.size() - 1) == start) {
+                        out.set(out.size() - 1, runEnd[i]);
+                    } else {
+                        out.add(start);
+                        out.add(runEnd[i]);
+                    }
+                }
+                start = runEnd[i];
+            }
+            return out.toIntArray();
+        }
+
+        /** Appends {@code length} cells of {@code index}, joined with the run before when it is the same. */
+        private void add(int index, long length) {
+            if (length <= 0) {
+                return;
+            }
+            if (index == pendingIndex) {
+                pendingLength += length;
+            } else {
+                flush();
+                pendingIndex = index;
+                pendingLength = length;
+            }
+        }
+
+        private void flush() {
+            while (pendingIndex >= 0 && pendingLength > 0) {
+                int length = (int) Math.min(Integer.MAX_VALUE, pendingLength);
+                BuildPocketPayload.writeRun(runs, pendingIndex, length);
+                pendingLength -= length;
+            }
+            pendingIndex = -1;
+        }
+    }
+
+    private static final int[] NO_STRETCHES = new int[0];
+
+    /** Stretches (from, to pairs) less one cell at each end: the cells whose two neighbours along x are in them too. */
+    private static int[] erode(int[] stretches) {
+        IntArrayList out = new IntArrayList();
+        for (int i = 0; i < stretches.length; i += 2) {
+            if (stretches[i] + 1 < stretches[i + 1] - 1) {
+                out.add(stretches[i] + 1);
+                out.add(stretches[i + 1] - 1);
+            }
+        }
+        return out.toIntArray();
+    }
+
+    /** The cells two lists of stretches (from, to pairs, in order) share. */
+    private static int[] meet(int[] a, int[] b) {
+        IntArrayList out = new IntArrayList();
+        int i = 0;
+        int j = 0;
+        while (i < a.length && j < b.length) {
+            int from = Math.max(a[i], b[j]);
+            int to = Math.min(a[i + 1], b[j + 1]);
+            if (from < to) {
+                out.add(from);
+                out.add(to);
+            }
+            if (a[i + 1] < b[j + 1]) {
+                i += 2;
+            } else {
+                j += 2;
+            }
+        }
+        return out.toIntArray();
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // Reading one
 
@@ -212,6 +481,7 @@ public final class Pocket implements SpellPlanner.Source {
         private int current = -1;
         private long cells;
         private long read;
+        private long dataBytes;
         private @Nullable Pocket pocket;
 
         private Taker(ServerLevel level, Volume region, Contents contents, int id, BiPredicate<Integer, Integer> loaded) {
@@ -252,6 +522,11 @@ public final class Pocket implements SpellPlanner.Source {
             return read;
         }
 
+        /** About how many bytes what it has read so far takes to keep ({@link Pocket#bytes}). */
+        public long bytes() {
+            return (long) runState.size() * RUN_BYTES + (long) palette.size() * STATE_BYTES + dataBytes;
+        }
+
         /** The pocket, once read; else null. */
         public @Nullable Pocket pocket() {
             return pocket;
@@ -288,6 +563,7 @@ public final class Pocket implements SpellPlanner.Source {
                     long at = ((long) (wy - box.minY()) * box.getZSpan() + (wz - box.minZ())) * box.getXSpan() + (wx - box.minX());
                     data.put(at, tag);
                     hashes.put(at, UndoStep.hash(tag));
+                    dataBytes += tag.sizeInBytes();
                 }
             }
             cells++;

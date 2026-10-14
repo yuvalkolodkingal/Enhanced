@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.build;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.build.BuildSession.Stroke;
 import com.kolodkingal.enhanced.build.SpellPlanner.Material;
 import com.kolodkingal.enhanced.build.SpellPlanner.Plan;
 import com.kolodkingal.enhanced.build.SpellPlanner.Setup;
@@ -8,12 +9,14 @@ import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
+import com.kolodkingal.enhanced.network.BuildPocketPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -23,6 +26,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluids;
@@ -35,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.LongSupplier;
 
 /**
  * Build Magic on the server (D-B 11): the entry points the two build payloads call ({@code BuildCastPayload},
@@ -66,6 +71,10 @@ public final class BuildMagic {
     private static final int PREFLIGHT_READS = 65_536;
     /** The flood's reads between two looks at the clock. */
     private static final int FLOOD_SLICE = 1024;
+    /** The most parts of a pocket sent to its owner a tick (D-B 13.1). */
+    private static final int POCKET_PARTS = 4;
+    /** What a preflight reads its 2 ms by (a test's clock that stands still sees every cell). */
+    private static LongSupplier clock = System::nanoTime;
 
     // ------------------------------------------------------------------------------------------------------------
     // A cast
@@ -86,20 +95,30 @@ public final class BuildMagic {
         if (preflight && !session.takePreflight(now)) {
             return;
         }
+        boolean dab = recipe.op() == SpellRecipe.Op.DAB && !preflight;
+        if (dab && (!session.takeDab(now) || session.painted(recipe.stroke()))) {
+            return; // more than 20 dabs a second, or a late dab of a stroke already sealed: dropped
+        }
+        Stroke open = session.stroke();
+        if (open != null && !preflight && (!dab || open.number() != recipe.stroke())) {
+            // Another spell, or a new stroke: the stroke painted so far is one step, before it.
+            closeStroke(open, player.server);
+            open = null;
+        }
         Limits limits = Limits.of(player);
         int code = BuildRules.player(player, limits, session.mode(), true);
         if (code == BuildRules.SILENT) {
             return;
         }
         if (code != BuildRules.OK) {
-            refuse(player, token, code, 0, BuildRules.message(code, 0), preflight);
+            refuse(player, token, code, 0, BuildRules.message(code, 0), quiet(session, preflight, dab, recipe));
             return;
         }
         SpellRecipe clamped = recipe.clamped(limits);
         code = BuildRules.reach(player, limits, clamped);
         if (code != BuildRules.OK) {
             int extra = code == BuildVerdictPayload.TOO_WIDE ? limits.side() : limits.reach();
-            refuse(player, token, code, extra, BuildRules.message(code, extra), preflight);
+            refuse(player, token, code, extra, BuildRules.message(code, extra), quiet(session, preflight, dab, recipe));
             return;
         }
         if (clamped.spell() == Spell.MOVE && clamped.op() == SpellRecipe.Op.PICK_UP) {
@@ -113,7 +132,7 @@ public final class BuildMagic {
         if (clamped.spell().needsMaterial()) {
             Chosen chosen = material(player, clamped, session, limits);
             if (chosen.code != BuildRules.OK) {
-                refuse(player, token, chosen.code, 0, chosen.message, preflight);
+                refuse(player, token, chosen.code, 0, chosen.message, quiet(session, preflight, dab, recipe));
                 return;
             }
             setup = setup.withMaterial(chosen.material);
@@ -125,7 +144,7 @@ public final class BuildMagic {
         if (clamped.region() != SpellRecipe.MASK) {
             plan = SpellPlanner.plan(level, clamped, setup);
             if (plan.refusal() != SpellPlanner.NONE) {
-                refuse(player, token, plan.refusal(), 0, BuildRules.message(plan.refusal(), 0), preflight);
+                refuse(player, token, plan.refusal(), 0, BuildRules.message(plan.refusal(), 0), quiet(session, preflight, dab, recipe));
                 return;
             }
         }
@@ -134,30 +153,44 @@ public final class BuildMagic {
         // A Move empties its source; a Copy or a Repeat only reads theirs, which may lie on the island (spec 5.4).
         BoundingBox source = plan != null && plan.region() != null && clamped.spell() == Spell.MOVE ? plan.region().bounds() : null;
         if (BuildRules.island(level, box) || BuildRules.island(level, source)) {
-            refuse(player, token, BuildVerdictPayload.SOKOVIA, 0, BuildRules.message(BuildVerdictPayload.SOKOVIA, 0), preflight);
+            refuse(player, token, BuildVerdictPayload.SOKOVIA, 0, BuildRules.message(BuildVerdictPayload.SOKOVIA, 0),
+                    quiet(session, preflight, dab, recipe));
             return;
         }
-        code = queueRefusal(player, limits);
-        if (code != BuildRules.OK) {
-            int extra = code == BuildVerdictPayload.QUEUE_FULL ? BuildScheduler.waiting(player.getUUID()) : 0;
-            Component line = code == BuildVerdictPayload.WAIT ? BillyMagic.waitForSpell() : BuildRules.message(code, extra);
-            refuse(player, token, code, extra, line, preflight);
-            return;
+        if (open != null) {
+            // The next dab of a stroke being painted: one spell, so no queue or pause of its own; a second of dabs may
+            // wait, more are dropped.
+            if (open.pending() >= Stroke.MAX_WAITING) {
+                return;
+            }
+        } else {
+            code = queueRefusal(player, limits);
+            if (code != BuildRules.OK) {
+                int extra = code == BuildVerdictPayload.QUEUE_FULL ? BuildScheduler.waiting(player.getUUID()) : 0;
+                Component line = code == BuildVerdictPayload.WAIT ? BillyMagic.waitForSpell() : BuildRules.message(code, extra);
+                refuse(player, token, code, extra, line, quiet(session, preflight, dab, recipe));
+                return;
+            }
         }
         if (plan != null && plan.prepared()) {
             long size = plan.size();
             if (limits.maxBlocks() > 0 && size > limits.maxBlocks()) {
                 refuse(player, token, BuildVerdictPayload.CEILING, limits.maxBlocks(),
-                        BuildRules.message(BuildVerdictPayload.CEILING, limits.maxBlocks()), preflight);
+                        BuildRules.message(BuildVerdictPayload.CEILING, limits.maxBlocks()), quiet(session, preflight, dab, recipe));
                 return;
             }
             if (size > BuildConfig.HUGE_SPELL_BLOCKS.get() && (flags & BuildCastPayload.HELD_LONG) == 0) {
-                refuse(player, token, BuildVerdictPayload.HOLD, size, BuildRules.message(BuildVerdictPayload.HOLD, size), preflight);
+                refuse(player, token, BuildVerdictPayload.HOLD, size, BuildRules.message(BuildVerdictPayload.HOLD, size),
+                        quiet(session, preflight, dab, recipe));
                 return;
             }
         }
         if (preflight) {
             preflight(player, limits, clamped, token, setup, plan);
+            return;
+        }
+        if (dab) {
+            dab(player, session, limits, clamped, token, setup, plan, open);
             return;
         }
         BuildJob job = BuildJob.spell(player, limits, clamped, token, flags, setup, plan, BuildScheduler.loaded(player.getUUID(), level));
@@ -167,6 +200,80 @@ public final class BuildMagic {
         BuildSounds.cast(level, at != null ? Vec3.atCenterOf(at.getCenter()) : player.position(), limits.hero(),
                 plan != null && plan.prepared() ? plan.size() : 0L);
         sync(player.server, player.getUUID());
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Paint strokes (D-B 11.8)
+
+    /**
+     * A dab of a Paint stroke, checked like any cast: its job is queued behind the stroke's others and writes into the
+     * stroke's one step. The first dab opens the stroke (its effects and its sound are the stroke's).
+     */
+    private static void dab(ServerPlayer player, BuildSession session, Limits limits, SpellRecipe recipe, int token, Setup setup, @Nullable Plan plan,
+                            @Nullable Stroke open) {
+        Stroke stroke = open;
+        if (stroke == null) {
+            ServerLevel level = player.serverLevel();
+            UndoStep step = new UndoStep(UndoHistory.of(player.getUUID()).nextId(), recipe.spell(), level.dimension(), level.getGameTime());
+            net.minecraft.world.entity.player.Player mom = limits.billy() && limits.limited() ? BillyMagic.mom(player) : null;
+            stroke = new Stroke(player.getUUID(), recipe.stroke(), level, limits, step, new BuildRules.Cells(level, player), mom != null,
+                    mom != null ? mom.getId() : BuildFxPayload.NO_MOM);
+            session.open(stroke);
+        }
+        stroke.lastDab = player.server.getTickCount();
+        stroke.token = token;
+        stroke.pending++;
+        BuildJob job = BuildJob.dab(player, limits, recipe, token, setup, plan, BuildScheduler.loaded(player.getUUID(), player.serverLevel()), stroke);
+        BuildScheduler.queue(job, false);
+        if (open == null) {
+            job.fx(BuildFxPayload.START);
+            BoundingBox at = job.bounds();
+            BuildSounds.cast(player.serverLevel(), at != null ? Vec3.atCenterOf(at.getCenter()) : player.position(), limits.hero(), 0L);
+        }
+        sync(player.server, player.getUUID());
+    }
+
+    /**
+     * The stroke takes no more dabs ({@code STROKE_END}, 40 ticks after its last dab, another spell, a change of
+     * power): it is sealed as one step once its last dab is done.
+     */
+    static void closeStroke(Stroke stroke, MinecraftServer server) {
+        if (stroke.closing) {
+            return;
+        }
+        stroke.closing = true;
+        if (stroke.pending == 0) {
+            BuildJob.sealStroke(stroke, server);
+        }
+    }
+
+    /**
+     * Ctrl + Z (or Ctrl + Y) while a stroke is being painted: it ends now, as one step. Its waiting dabs are dropped,
+     * the one at work is finished at once (a dab is small), and it is sealed.
+     */
+    private static void endStrokeNow(ServerPlayer player, Stroke stroke) {
+        UUID id = player.getUUID();
+        BuildJob working = BuildScheduler.working(id);
+        for (BuildJob job : BuildScheduler.jobs(id)) {
+            if (job != working && job.stroke() == stroke) {
+                BuildScheduler.drop(job);
+            }
+        }
+        closeStroke(stroke, player.server);
+        if (working != null && working.stroke() == stroke) {
+            BuildScheduler.finishNow(working);
+        }
+        if (stroke.pending == 0) {
+            BuildJob.sealStroke(stroke, player.server);
+        }
+    }
+
+    /**
+     * Whether a refusal is answered by its verdict alone: a preflight's, and a dab's but the first of its stroke (a
+     * held button sends 20 dabs a second: the builder hears why once).
+     */
+    private static boolean quiet(BuildSession session, boolean preflight, boolean dab, SpellRecipe recipe) {
+        return preflight || dab && !session.refusedDab(recipe.stroke());
     }
 
     /**
@@ -196,11 +303,11 @@ public final class BuildMagic {
      */
     private static void preflight(ServerPlayer player, Limits limits, SpellRecipe recipe, int token, Setup setup, @Nullable Plan plan) {
         ServerLevel level = player.serverLevel();
-        long deadline = System.nanoTime() + BuildRules.PREFLIGHT_NANOS;
+        long deadline = clock.getAsLong() + BuildRules.PREFLIGHT_NANOS;
         if (plan == null) {
             MagicSelect select = limits.select(level, recipe.seeds(), player.getEyePosition(), true);
             boolean done = false;
-            for (int read = 0; !done && read < PREFLIGHT_READS && System.nanoTime() < deadline; read += FLOOD_SLICE) {
+            for (int read = 0; !done && read < PREFLIGHT_READS && clock.getAsLong() < deadline; read += FLOOD_SLICE) {
                 done = select.step(FLOOD_SLICE);
             }
             if (!done) {
@@ -218,14 +325,14 @@ public final class BuildMagic {
             }
         }
         boolean prepared = plan.prepared();
-        for (int read = 0; !prepared && read < PREFLIGHT_READS && System.nanoTime() < deadline; read += FLOOD_SLICE) {
+        for (int read = 0; !prepared && read < PREFLIGHT_READS && clock.getAsLong() < deadline; read += FLOOD_SLICE) {
             prepared = plan.prepare(FLOOD_SLICE);
         }
         if (!prepared) {
             send(player, new BuildVerdictPayload(token, BuildVerdictPayload.READY, 0, 0, 0, BuildVerdictPayload.CUT_OFF));
             return;
         }
-        BuildRules.Preview preview = BuildRules.preflight(level, player, plan, BuildConfig.PREVIEW_CHECKS.get(), System::nanoTime);
+        BuildRules.Preview preview = BuildRules.preflight(level, player, plan, BuildConfig.PREVIEW_CHECKS.get(), clock);
         int cost = limits.limited() ? BillyMagic.cost(preview.changed(), BillyMagic.mom(player) != null) : 0;
         int code = preview.partly() ? BuildVerdictPayload.READY_PARTLY : BuildVerdictPayload.READY;
         send(player, new BuildVerdictPayload(token, code, (int) Math.min(Integer.MAX_VALUE, preview.changed()), cost,
@@ -255,7 +362,16 @@ public final class BuildMagic {
             });
             return mix == null ? refusal(BuildVerdictPayload.NO_BLOCK, null) : new Chosen(BuildRules.OK, Material.mix(mix, recipe.seed()), null);
         }
-        BlockState state = recipe.material() == SpellRecipe.PICKED ? session.picked() : null;
+        BlockState state = null;
+        // A pick lasts while she holds what she held (D-B 5.2): a new hotbar slot or item goes back to the hand.
+        if (recipe.material() == SpellRecipe.PICKED && session.keepsPick(player)) {
+            state = session.picked();
+            if (state == null && session.pickedBlock() != null) {
+                Block block = session.pickedBlock();
+                ItemStack stack = block.asItem() instanceof BlockItem ? new ItemStack(block) : ItemStack.EMPTY;
+                state = stack.isEmpty() ? block.defaultBlockState() : placement(player, InteractionHand.MAIN_HAND, stack, recipe);
+            }
+        }
         if (state == null) {
             state = placement(player, InteractionHand.MAIN_HAND, player.getMainHandItem(), recipe);
             if (state == null) {
@@ -320,15 +436,29 @@ public final class BuildMagic {
             case BuildActionPayload.UNDO -> undo(player);
             case BuildActionPayload.REDO -> redo(player);
             case BuildActionPayload.PICK -> pick(player, a);
+            case BuildActionPayload.PICK_BLOCK -> pickBlock(player, value);
             case BuildActionPayload.HAND -> {
-                if (session.mode() && session.picked() != null) {
-                    session.setPicked(null);
+                if (session.mode() && (session.picked() != null || session.pickedBlock() != null)) {
+                    session.dropPicked();
                     player.displayClientMessage(Component.translatable("message.enhanced.build.hand"), true);
                 }
             }
+            case BuildActionPayload.STROKE_END -> {
+                Stroke stroke = session.stroke();
+                if (stroke != null && stroke.number() == value) {
+                    closeStroke(stroke, player.server);
+                }
+            }
             case BuildActionPayload.VIEW -> view(player, a, b, value);
+            case BuildActionPayload.POCKET -> {
+                Pocket pocket = Pocket.held(player.getUUID());
+                Pocket.Stream sending = session.pocketStream();
+                if (pocket != null && pocket.id() == value && (sending == null || sending.pocket() != pocket)) {
+                    session.setPocketStream(pocket.stream());
+                }
+            }
             default -> {
-                // PICK_BLOCK, STROKE_END and POCKET come with the palette, the strokes and the pocket's stream.
+                // Any other number is no action: ignored.
             }
         }
     }
@@ -355,8 +485,8 @@ public final class BuildMagic {
             code = BuildVerdictPayload.DIMENSION;
         }
         if (code != BuildRules.OK) {
-            player.displayClientMessage(BuildRules.message(code, 0), true);
-            BuildSounds.fizzle(player);
+            // (The client turned its build mode on at once: the verdict tells it why it is off.)
+            refuse(player, 0, code, 0, BuildRules.message(code, 0), false);
             return;
         }
         BuildSession session = BuildSession.of(player.getUUID());
@@ -423,8 +553,32 @@ public final class BuildMagic {
             refuse(player, 0, code, 0, refusal(code, state).message, false);
             return;
         }
-        session.setPicked(state);
+        session.setPicked(state, null, player);
         player.displayClientMessage(Component.translatable("message.enhanced.build.picked", state.getBlock().getName()), true);
+    }
+
+    /**
+     * A block chosen on the palette page (D-B 5.4), by its registry id: it must exist and be a block magic may make;
+     * it is then placed as the hero would place it, as the hand's block is.
+     */
+    private static void pickBlock(ServerPlayer player, int id) {
+        BuildSession session = BuildSession.of(player.getUUID());
+        Limits limits = Limits.of(player);
+        if (limits == null || !session.mode() || id <= 0 || id >= BuiltInRegistries.BLOCK.size()) {
+            return;
+        }
+        Block block = BuiltInRegistries.BLOCK.byId(id);
+        BlockState state = block.defaultBlockState();
+        if (state.isAir()) {
+            return;
+        }
+        int code = BuildRules.material(state, limits);
+        if (code != BuildRules.OK) {
+            refuse(player, 0, code, 0, refusal(code, state).message, false);
+            return;
+        }
+        session.setPicked(null, block, player);
+        player.displayClientMessage(Component.translatable("message.enhanced.build.picked", block.getName()), true);
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -442,6 +596,11 @@ public final class BuildMagic {
             return;
         }
         UUID id = player.getUUID();
+        BuildSession session = BuildSession.existing(id);
+        if (session != null && session.stroke() != null) {
+            // The stroke being painted is what she did last: it ends here, as one step, and is the one undone.
+            endStrokeNow(player, session.stroke());
+        }
         if (BuildScheduler.dropNewestWaiting(id) != null) {
             send(player, new BuildVerdictPayload(0, BuildVerdictPayload.DROPPED, 0, 0, 0, 0));
             player.displayClientMessage(Component.translatable("message.enhanced.build.dropped"), true);
@@ -487,6 +646,10 @@ public final class BuildMagic {
             return;
         }
         UUID id = player.getUUID();
+        BuildSession session = BuildSession.existing(id);
+        if (session != null && session.stroke() != null) {
+            endStrokeNow(player, session.stroke());
+        }
         if (BuildScheduler.working(id) != null) {
             refuse(player, 0, BuildVerdictPayload.WAIT, 0, BillyMagic.waitForSpell(), false);
             return;
@@ -522,18 +685,56 @@ public final class BuildMagic {
             return;
         }
         leaveMode(player, false);
+        BuildScheduler.dropWaiting(player.getUUID());
         BuildSession session = BuildSession.existing(player.getUUID());
         if (session != null) {
-            session.setPicked(null);
+            session.dropPicked();
+            if (session.stroke() != null) {
+                closeStroke(session.stroke(), player.server);
+            }
         }
-        BuildScheduler.dropWaiting(player.getUUID());
         sync(player.server, player.getUUID());
     }
 
-    /** A copy was taken: the builder's pocket id and size (the client asks for the pocket it lacks). */
+    /**
+     * A copy was taken: the builder's pocket id and size, and the pocket itself on its way to her client (D-B 13.1),
+     * which then draws its ghost; a client that lacks it later asks for it ({@code POCKET}).
+     */
     static void pocketTaken(ServerPlayer player, Pocket pocket) {
         BuildData data = player.getData(ModAttachments.BUILD_DATA);
         player.setData(ModAttachments.BUILD_DATA, data.withPocket(pocket.id(), new Vec3i(pocket.sizeX(), pocket.sizeY(), pocket.sizeZ())));
+        BuildSession.of(player.getUUID()).setPocketStream(pocket.stream());
+    }
+
+    /**
+     * Every server tick ({@code ServerTickEvent.Post}): a stroke whose last dab was 40 ticks ago closes (D-B 11.8), and
+     * each builder's pocket goes on its way to her client, at most {@value #POCKET_PARTS} parts a tick.
+     */
+    public static void tick(MinecraftServer server) {
+        long now = server.getTickCount();
+        for (BuildSession session : BuildSession.all()) {
+            Stroke stroke = session.stroke();
+            if (stroke != null && !stroke.closing() && now - stroke.lastDab >= Stroke.CLOSES_AFTER) {
+                closeStroke(stroke, server);
+            }
+            Pocket.Stream stream = session.pocketStream();
+            if (stream == null) {
+                continue;
+            }
+            ServerPlayer player = server.getPlayerList().getPlayer(session.player());
+            if (player == null || Pocket.held(session.player()) != stream.pocket()) {
+                session.setPocketStream(null); // (away, or another copy taken since: it is sent when asked for)
+                continue;
+            }
+            if (stream.step()) {
+                for (BuildPocketPayload part : stream.next(POCKET_PARTS)) {
+                    PacketDistributor.sendToPlayer(player, part);
+                }
+                if (stream.done()) {
+                    session.setPocketStream(null);
+                }
+            }
+        }
     }
 
     /** What the builder's HUD shows of her history and her spells ({@link BuildData}), when she is online. */
@@ -558,6 +759,15 @@ public final class BuildMagic {
         BuildSession.clear();
         UndoHistory.clear();
         Pocket.clearHeld();
+        clock = System::nanoTime;
+    }
+
+    /**
+     * The clock a preflight reads its 2 ms by (D-B 10.1), until {@link #clear}: a test's that stands still lets a
+     * preflight see every cell on a server that is busy with other things.
+     */
+    public static void useClock(LongSupplier preflightClock) {
+        clock = preflightClock;
     }
 
     // ------------------------------------------------------------------------------------------------------------
