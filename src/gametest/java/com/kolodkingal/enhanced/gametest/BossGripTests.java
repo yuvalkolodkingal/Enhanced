@@ -1663,6 +1663,77 @@ public final class BossGripTests {
     }
 
     /**
+     * T13, a throw down at a crowd (spec 21.3 #8, D-T 1): Wanda throws Prime down at a line of zombies on the ground, as she
+     * would at his Sentries. He crashes where he comes down, before he reaches them: the anvil's clang, and the impact is a
+     * blow of hers that he takes through his own caps. Then he skids on into the line and knocks every zombie down. In all
+     * he loses at most 15 percent of his health. (A wall past the line keeps him in the arena.)
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_throw_down", timeoutTicks = 80)
+    public static void aThrownBossCrashesWhereHeComesDown(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
+        UltronTestSupport.tank(wanda);
+        UltronFight fight = UltronTestSupport.onTheGround(f, wanda);
+        UltronTestSupport.calm(fight);
+        UltronEntity body = UltronTestSupport.boss(fight);
+        UltronTestSupport.put(f, wanda, 1.5, FLOOR, 10.5);
+        UltronTestSupport.put(f, body, 4.5, FLOOR + 1.0, 10.5);
+        List<Zombie> line = new ArrayList<>();
+        for (double x : new double[] {8.6, 9.6}) { // (where he skids, once he has come down)
+            line.add(stillZombie(helper, x, 10.5));
+        }
+        wallAt(helper, 17, 7, 14);
+        float health = body.getHealth();
+        long[] crashedAt = {-1L};
+        double[] crashedX = {0.0};
+        long[] firstHitAt = {-1L};
+        Consumer<LivingIncomingDamageEvent> counter = event -> {
+            if (!event.getSource().is(ModDamageTypes.TELEKINETIC_SLAM)) {
+                return;
+            }
+            long now = event.getEntity().level().getGameTime();
+            if (event.getEntity() == body && crashedAt[0] < 0L) {
+                check(event.getSource().getEntity() == wanda, "the crash is a blow of hers");
+                crashedAt[0] = now;
+                crashedX[0] = helper.relativeVec(body.position()).x;
+            } else if (line.contains(event.getEntity()) && firstHitAt[0] < 0L) {
+                firstHitAt[0] = now;
+            }
+        };
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true, LivingIncomingDamageEvent.class, counter);
+        f.onClose(() -> NeoForge.EVENT_BUS.unregister(counter));
+        TestKit.heardSounds(wanda); // (what she heard before the throw is not counted)
+        lookAt(wanda, body);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, body), "Wanda holds Prime, a block over the ground");
+        look(wanda, EAST, 25.0F);
+        press(wanda, 3, false);
+        check(!Telekinesis.isHolding(wanda), "and throws him down at the zombies");
+        List<TestKit.HeardSound> heard = new ArrayList<>();
+        f.everyTick(70, tick -> {
+            heard.addAll(TestKit.heardSounds(wanda));
+            if (tick < 40) {
+                return false;
+            }
+            check(crashedAt[0] >= 0L, "he crashed into the ground");
+            check(firstHitAt[0] >= 0L, "he hit the zombies");
+            check(crashedAt[0] < firstHitAt[0] && crashedX[0] < 8.0,
+                    "he crashed where he came down, before he reached them (at x " + crashedX[0] + ")");
+            check(heard.stream().anyMatch(sound -> sound.id().equals(SoundEvents.ANVIL_LAND.getLocation())
+                    && helper.relativeVec(sound.at()).x < 8.0), "with the anvil's clang, where he came down");
+            for (Zombie zombie : line) {
+                check(zombie.getHealth() < zombie.getMaxHealth(), "every zombie of the line is knocked down: " + zombie.getHealth());
+            }
+            check(fight.participant(wanda.getUUID()).damage() > 0.0F, "the crash is hers in the fight's ledger");
+            check(health - body.getHealth() <= body.getMaxHealth() * 0.15F,
+                    "he lost at most 15 percent of his health: " + health + " -> " + body.getHealth());
+            return true;
+        });
+    }
+
+    /**
      * T14, Ultron's part (D-T 4.5, 6.1.2): Ultron thrown out toward his field is stopped dead at it, and flashed back to the
      * ground three blocks inside it.
      */

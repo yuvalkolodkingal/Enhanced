@@ -21,6 +21,7 @@ import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal;
 import com.kolodkingal.enhanced.ultron.SokoviaLift;
 import com.kolodkingal.enhanced.ultron.SokoviaRecovery;
+import com.kolodkingal.enhanced.ultron.SokoviaShape;
 import com.kolodkingal.enhanced.ultron.SokoviaTemplate;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
@@ -39,6 +40,7 @@ import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Zombie;
@@ -388,6 +390,104 @@ public final class SokoviaLoanTests {
                     "and so is the island's note");
         });
         script.run(f, 680);
+    }
+
+    /**
+     * The in-game check of T34's scenario (spec 19.4, D-T 6.1.2): a ring block is carried up beside the island by the grip
+     * itself, a tick at a time, as its holder flies up, and it follows him past the height where the island begins (its
+     * lowest block less four): it is never dragged in under the island. Billy, come after the lock, borrows a cell of the
+     * ring four blocks out from the rim and flies up three blocks out from it, looking away from the island (straight past
+     * the one block of height where the island's field would take him for one of its own, which a flyer crosses in a
+     * moment). Over the island the block is kept over it, within the reach the rim always gives; set down there, it stands
+     * on a copy cell. A copy of the island, by contrast, is kept within that reach wherever it is, even beside the island
+     * and under its surface.
+     */
+    @GameTest(template = PAD, batch = "ultron_loans_rise", timeoutTicks = 400)
+    public static void aRingBlockIsCarriedUpPastTheRim(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.BORROWED_BLOCK_TICKS, 2400);
+        ServerLevel level = f.level();
+        ServerPlayer wanda = wanda(f);
+        UltronFight fight = start(f, wanda);
+        Vec3 centre = fight.arena().center();
+        ServerPlayer[] billy = new ServerPlayer[1];
+        TelekineticBlockEntity[] block = new TelekineticBlockEntity[1];
+        double[] rim = new double[1];
+        double[] floor = new double[1];
+        double[] top = new double[1];
+        BlockPos[] landed = new BlockPos[1];
+        Script script = toTheIsland(fight, wanda);
+        script.then("Billy borrows a ring cell beside the island", () -> {
+            quiet(fight);
+            rim[0] = SokoviaShape.rim(template(fight).spec(), 0.0); // (east of the middle)
+            floor[0] = fight.island().islandFloor();
+            Vec3 middle = helper.relativeVec(centre);
+            billy[0] = f.player(middle.x + rim[0] + 3.0, GROUND, middle.z, Power.BILLY);
+            tank(billy[0]);
+            top[0] = fight.groundAt(billy[0].getX(), billy[0].getZ()) + 3.0; // (three blocks over the island's surface)
+            BlockPos cell = new BlockPos(Mth.floor(middle.x + rim[0] + 4.0), SURFACE, Mth.floor(middle.z));
+            check(!BossFights.hidesGround(level, helper.absolutePos(cell)), "(the cell is of the ring, not under the island)");
+            lookAtCell(helper, billy[0], cell);
+            check(BlockLifting.tryLift(billy[0], Telekinesis.Mode.BILLY), "Billy's block telekinesis takes the cell");
+            block[0] = heldBlock(helper, billy[0]);
+            check(block[0] != null && block[0].isBorrowed() && helper.getBlockState(cell).isAir(), "he holds the ring's block, lent");
+            check(!fight.loans().isIslandCopy(block[0]), "(it is no copy of the island)");
+            look(billy[0], EAST, 0.0F); // (away from the island)
+        });
+        script.step("he flies up beside the island, and the block follows him", () -> {
+            ServerPlayer flyer = billy[0];
+            double y = flyer.getY() + 0.5;
+            if (y >= floor[0] - 4.0 && y < floor[0] - 3.0) {
+                y = floor[0] - 3.0;
+            }
+            moveTo(flyer, new Vec3(flyer.getX(), Math.min(y, top[0]), flyer.getZ()));
+            PowerTicker.tick(flyer);
+            TelekineticBlockEntity held = block[0];
+            check(Telekinesis.holds(flyer, held), "he still holds it, at height " + held.getY());
+            double behind = held.position().distanceTo(flyer.getEyePosition());
+            check(behind < 5.0, "the block follows him up: it is " + behind + " from his eyes at height " + held.getY()
+                    + " (the island begins at " + (floor[0] - 4.0) + ")");
+            return flyer.getY() >= top[0] && held.getY() > top[0];
+        });
+        script.step("over the island it is kept within the rim's reach", () -> {
+            ServerPlayer flyer = billy[0];
+            look(flyer, 90.0F, 0.0F); // (west, over the island)
+            moveTo(flyer, new Vec3(Math.max(centre.x - 3.0, flyer.getX() - 0.5), top[0], flyer.getZ()));
+            PowerTicker.tick(flyer);
+            TelekineticBlockEntity held = block[0];
+            check(Telekinesis.holds(flyer, held), "he still holds it");
+            double flat = Math.hypot(held.getX() - centre.x, held.getZ() - centre.z);
+            return flyer.getX() <= centre.x - 3.0 + 1.0E-6 && Math.abs(flat - fight.armyReach(0.0)) < 0.05;
+        });
+        script.then("he sets it down on the island", () -> {
+            TelekineticBlockEntity held = block[0];
+            check(held.getY() > top[0] - 1.0, "(it is over the island)");
+            landed[0] = held.blockPosition();
+            Telekinesis.release(billy[0], true);
+        });
+        script.step("it stands on the island", () -> {
+            if (!block[0].isRemoved()) {
+                return false;
+            }
+            BlockPos at = landed[0];
+            while (level.getBlockState(at).isAir() && at.getY() > floor[0]) {
+                at = at.below();
+            }
+            check(fight.loans().isStanding(at) && BossFights.isCopyCell(level, at), "the ring's block stands on a copy cell: " + at);
+            return true;
+        });
+        script.then("a copy of the island is kept within the rim's reach, even beside it", () -> {
+            BlockPos copyCell = new BlockPos(Mth.floor(WANDA_X), SURFACE + LIFT, Mth.floor(MIDDLE_Z) + 2);
+            TelekineticBlockEntity copy = borrowed(helper, wanda, copyCell);
+            check(fight.loans().isIslandCopy(copy), "the block is a copy of the island");
+            Vec3 home = copy.position();
+            copy.setPos(centre.x + rim[0] + 3.0, floor[0] - 2.0, centre.z); // (beside the island, under its surface)
+            Vec3 limit = BossFights.carryLimit(copy, new Vec3(centre.x + rim[0] + 8.0, floor[0] - 2.0, centre.z));
+            double flat = Math.hypot(limit.x - centre.x, limit.z - centre.z);
+            check(flat <= fight.armyReach(0.0) + 1.0E-6, "carried beside the island it is held within the rim's reach: " + flat);
+            copy.setPos(home.x, home.y, home.z);
+        });
+        script.run(f, 380);
     }
 
     /**
