@@ -6,15 +6,15 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 
 | Hero | **R** | **G** | **V** | **B** | **N** |
 |---|---|---|---|---|---|
-| [Magneto](Magneto) | Metal Telekinesis | Iron Shrapnel Storm (hold) | Armor & Weapon Strip | Magnetic Shield (toggle) | Magnetic Flight (toggle) |
-| [Scarlet Witch](Scarlet-Witch) | Chaos Energy Beam (hold) | Enhanced Flight (toggle) | Telekinesis (creatures, items, blocks) | Chaos Shield (hold) | The Hex (again: Hex Control; Sneak: dissolve) |
+| [Magneto](Magneto) | Metal Telekinesis (Sneak: Magnetic Pull) | Iron Shrapnel Storm (hold) | Armor & Weapon Strip | Magnetic Shield (toggle) | Magnetic Flight (toggle) |
+| [Scarlet Witch](Scarlet-Witch) | Chaos Energy Beam (hold) | Enhanced Flight (toggle) | Telekinesis (creatures, items, blocks; Sneak: a block) | Chaos Shield (hold) | The Hex (again: Hex Control; Sneak: dissolve) |
 | [Quicksilver](Quicksilver) | Quicksilver Time on/off (Sneak: Super Speed) | Speed Blitz | Pickpocket | Wall & Water Run (toggle) | Walkman: music on/off |
 | [Vision](Vision) | Mind Stone Beam (hold) | Flight (toggle) | Phase through walls (toggle) | Density (toggle) | Human Disguise (toggle) |
 | [Tommy](Tommy) | Super Speed on/off (sprint) | Disarm Blitz | Whirlwind | Vibrate Through Walls | Molecular Acceleration |
-| [Billy](Billy-and-the-Witches-Road) | Hex Bolt | Flight (toggle) | Telekinesis | Freeze | The Noise (toggle) |
+| [Billy](Billy-and-the-Witches-Road) | Hex Bolt | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Freeze | The Noise (toggle) |
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |
 | [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
-| [Phoenix](Phoenix) | Mind Reading on/off (Sneak: Mind Sense) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks) | Mind Control (Sneak: Psionic Field) | Phoenix Burst (hold to charge, let go to unleash) |
+| [Phoenix](Phoenix) | Mind Reading on/off (Sneak: Mind Sense) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Mind Control (Sneak: Psionic Field) | Phoenix Burst (hold to charge, let go to unleash) |
 | [Spider-Man](Spider-Man) | Web Shot (Sneak: Web Burst) | Web Zip (Sneak, hold: Web Swing) | Wall Crawl (toggle; Sneak: Spider-Sense on/off) | Spider Legs (toggle; Sneak, twice: Instant Kill); Iron Spider only | Black Eyes (toggle) |
 | [Thanos](Thanos#playing-thanos) | Power Blast (Sneak: Titan Slam) | Portal Step (Sneak: Space Pull) | Transmute to stone (Sneak: Reality Veil, toggle) | Soul Drain (hold; Sneak: Soul Sight) | Rewind (Sneak: Time Lock) |
 | [Ultron](Ultron#the-hero) | Repulsor Fire (hold; Sneak: Overcharge) | Anti-Gravity Flight (toggle) | Gravity Pull (Sneak: Gravity Slam) | Upload (Sneak: Hack; Second Life) | Sentry Army (Sneak: Command) |
@@ -22,7 +22,7 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 
 **Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield) work for as long as you keep the key down (the Chaos Shield also drops by itself after 8 seconds, or when it breaks, and then has to recharge). *Toggle* abilities switch on with one press and off with the next.
 
-The abilities, their cooldowns and costs are explained on each hero's page.
+The abilities, their cooldowns and costs are explained on each hero's page. The Scarlet Witch and Billy also have **Y**, for [Build Magic](Build-Magic).
 
 ## Change Look: H
 
@@ -35,6 +35,43 @@ The Scarlet Witch has one more key. **Z** is her order to the Vision her Hex rai
 * **Look at a creature and press Z**: Vision goes for that one.
 * **Look at nothing and press Z**: he comes back to your side.
 * **Sneak + Z**: he holds his post where he is, or follows you again. The Hex Control screen (**N**) has the same choice as a button.
+
+## Build Magic: Y
+
+The Scarlet Witch and Billy have one more key: **Y**, for [Build Magic](Build-Magic). It is the sixth line of your hero panel (`[Y] Build Magic  OFF`). It does nothing for any other hero.
+
+* **Tap Y**: build mode on or off.
+* **Hold Y** (a third of a second): the **Spell Wheel**. Move the mouse to a picture and let go to choose it; let go without moving and the wheel stays open for clicking. **Esc** or **Y** again closes it.
+
+In build mode the mouse works like this (the strip at the bottom right always tells you what the buttons do right now):
+
+| Input | Meaning |
+|---|---|
+| **Left click** | *Where*: the first and second corner of a box. Double click: the whole tree or house. Click the sky: let go (or a corner in the air). A left click never breaks a block. |
+| **Right click** | *Do it*: cast what the ghost shows. Hold it for a big spell (one second for more than 64 blocks removed or replaced, two for a million) and for Paint and Land. With nothing ready it is plain Minecraft. |
+| **Scroll** | The main number: push the side of the box you look at, size, copies, layers. **Ctrl + scroll**: 8 at a time. |
+| **Alt + scroll** | Which kind: style, shape, turn, gap. |
+| **Middle click** | Take that exact block as your material. |
+
+**The Ctrl shortcuts** (their names in the Controls screen start with "Build Magic"):
+
+| Keys | Does | Works |
+|---|---|---|
+| **Ctrl + Z** / **Ctrl + Y** | Undo / redo | in build mode **and out of it** (for the Scarlet Witch and Billy only; for every other hero Ctrl + Z is what it was) |
+| **Ctrl + R** / **Ctrl + F** | Turn a ghost a quarter / flip it | in build mode |
+| **Ctrl + C** | Copy the box (choose Copy) | in build mode |
+| **Ctrl + X** | Pick the box up (choose Move) | in build mode |
+| **Ctrl + V** | Bring the pocket's ghost back | in build mode |
+| **Delete** | Vanish what is in the box | in build mode |
+| **Left Alt** (held) | The second knob, with the scroll wheel | in build mode |
+
+**No Sneak is used in build mode**, and every key of your hero keeps its power (fly with **G**, fight with **R** and **B**, Sneak + **V** takes a block). Plain **Z** is still Wanda's order to her Vision.
+
+Things you may notice:
+
+* The game's Controls screen marks these Ctrl keys, and the keys they share (Sprint, Swap Item With Offhand, the toolbar keys, and **R**, **V**, **Z**, **Y** of the mod), in **red**, with the note "This key is also used for...". That is only the screen being careful: each key still goes to the right place.
+* **Left Control is still Sprint**: holding Ctrl while you walk forward sprints, as in vanilla Minecraft.
+* **Xaero's Minimap** also uses **Y**. Rebind one of the two.
 
 ## Flight
 
@@ -59,8 +96,8 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 
 | Combination | What it does |
 |---|---|
-| Sneak + **R** as Magneto | Sets the metal you hold down gently, instead of throwing it. |
-| Sneak + **V** as the Scarlet Witch or Billy | Sets what you hold with telekinesis down gently. |
+| Sneak + **R** as Magneto | Sets the metal you hold down gently, instead of throwing it. **When R isn't holding anything: the Magnetic Pull**, the metal around you flies into your inventory (see [Magneto](Magneto#the-magnetic-pull-sneak--r)). |
+| Sneak + **V** as the Scarlet Witch or Billy | Sets what you hold with telekinesis down gently (Billy's block becomes a block where it lands). **When V isn't holding anything: tears out the block you look at**, even past a creature or a boss. Not in the second after you let go of something. |
 | Sneak + **N** as the Scarlet Witch | Dissolves your Hex. |
 | Sneak + **Z** as the Scarlet Witch | Your Hex's Vision holds his post, or follows you again. |
 | Sneak + **R** as Quicksilver | Turns Super Speed on or off, instead of Quicksilver Time. |
@@ -69,7 +106,7 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + right-click on a creature or player, with Mjolnir in hand | Pins them down under Mjolnir. Right-click them again, without Sneak, to lift it (only its owner can). |
 | Sneak + **N** as Thor | Opens the Bifrost to the spot you look at. |
 | Sneak + **R** as the Phoenix | **Mind Sense**: a ring of violet light finds every mind within 48 blocks through the walls and they glow on your screen for 6 seconds. |
-| Sneak + **V** as the Phoenix | Sets what you hold with telekinesis down gently. |
+| Sneak + **V** as the Phoenix | Sets what you hold with telekinesis down gently. **When V isn't holding anything: tears out the block you look at**, even past a creature or a boss. |
 | Sneak + **B** as the Phoenix | The **Psionic Field**: everything living within 16 blocks, through walls, is held still for 3 seconds. |
 | Sneak + **R** as Spider-Man | The **Web Burst**: 24 strands fly out in every direction and wrap the hostile creatures near you (12 second cooldown). |
 | Sneak + **G** as Spider-Man, and keep holding **G** | The **Web Swing**: you swing on a web from the block you look at until you let go. |
@@ -159,13 +196,13 @@ With telekinesis, pressing the key again **launches** what you hold.
 
 ## The HUD
 
-The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored).
+The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges.
 
 ![Magneto's HUD](images/magneto-back.png)
 
 ## Rebinding keys
 
-All seven keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look* and *Vision, That One! (Scarlet Witch)*. Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
+All seventeen keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look*, *Vision, That One! (Scarlet Witch)* and ten *Build Magic* keys (the first is *Build Magic (Scarlet Witch, Billy)*, which is **Y**). Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
 
 ## Sprinting heroes
 
