@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
@@ -74,11 +76,17 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.neoforged.bus.api.EventPriority;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforgespi.locating.IModFile;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.text.Bidi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -1898,6 +1906,44 @@ public final class MagnetPullTests {
                     "and hears nothing of it");
             return true;
         });
+    }
+
+    /**
+     * D-M 8.3 in Hebrew. Magneto's R line on the panel ("[R] name  pull 4.9s", as {@code PowerHud} builds it), put in
+     * visual order as the game does it for a bidirectional language ({@code FormattedBidiReorder}: the Unicode
+     * bidirectional algorithm, the direction from the first letter; here the JDK's, as ICU is the client's alone): the
+     * seconds' unit stands beside its number. With a Latin "s" the line starts left to right ("[R]"), the number joined
+     * the Hebrew words before it, and the "s" was drawn alone at the far end of the line.
+     */
+    @GameTest(template = ARENA, batch = PULL)
+    public static void thePullsHudLineKeepsItsSecondsTogetherInHebrew(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        JsonObject he = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang", "he_il.json"),
+                StandardCharsets.UTF_8)).getAsJsonObject();
+        String seconds = he.get("hud.enhanced.seconds").getAsString();
+        String line = "[R] " + he.get(Power.MAGNETO.abilityKey(1)).getAsString() + "  "
+                + String.format(he.get("hud.enhanced.pull_cooldown").getAsString(), String.format(seconds, "4.9"));
+        Bidi bidi = new Bidi(line, Bidi.DIRECTION_DEFAULT_RIGHT_TO_LEFT);
+        byte[] levels = new byte[line.length()];
+        Character[] chars = new Character[line.length()];
+        for (int i = 0; i < chars.length; i++) {
+            levels[i] = (byte) bidi.getLevelAt(i);
+            chars[i] = line.charAt(i);
+        }
+        Bidi.reorderVisually(levels, 0, chars, 0, chars.length);
+        StringBuilder drawn = new StringBuilder();
+        for (Character c : chars) {
+            drawn.append(c.charValue());
+        }
+        String visual = drawn.toString();
+        String unit = seconds.replace("%s", "").strip();
+        check(!unit.isEmpty(), "the seconds have a unit");
+        int number = visual.indexOf("4.9");
+        int at = visual.indexOf(unit) >= 0 ? visual.indexOf(unit) : visual.indexOf(new StringBuilder(unit).reverse().toString());
+        check(number >= 0 && at >= 0, "the number and its unit are drawn: " + visual);
+        String between = at > number ? visual.substring(number + 3, at) : visual.substring(at + unit.length(), number);
+        check(between.isBlank(), "the unit stands beside its number, not '" + between + "' away: " + visual);
+        helper.succeed();
     }
 
     // ------------------------------------------------------------------------------------------------------------
