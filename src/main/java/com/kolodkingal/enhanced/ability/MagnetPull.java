@@ -102,7 +102,9 @@ import java.util.function.Predicate;
  *     stands in now); the first that affects anything starts the cooldown and costs the hunger. What is taken goes
  *     straight into his inventory and what does not fit drops at his feet (in Creative too); each tick's takes go out in
  *     one {@link MagnetPullPayload} to him and everyone who sees him.</li>
- *     <li><b>The end</b>: one action-bar line and the clink of the metal arriving.</li>
+ *     <li><b>The end</b>: one action-bar line and the clink of the metal arriving. When something dropped at his feet in
+ *     this pull, "your inventory is full" first stands its {@value #FULL_LINE_TICKS} ticks, and the end line waits for
+ *     them.</li>
  * </ol>
  * A pull ends at once (what it took stays his) when he dies, logs out, changes dimension, loses his power, becomes a
  * Spectator, or is more than the pull's radius from where he pressed (then with its line for what came so far).
@@ -121,6 +123,8 @@ public final class MagnetPull {
     private static final Map<Mob, Tug> TUGS = new LinkedHashMap<>();
     /** Magneto's UUID → how many bodies his last pull tugged. */
     private static final Map<UUID, Integer> LAST_TUGS = new HashMap<>();
+    /** Magneto's UUID → the end line of his last pull, held back while "your inventory is full" stands. */
+    private static final Map<UUID, HeldLine> HELD_LINES = new HashMap<>();
     /** The order a player's one piece is taken in: what he holds, then his armour from the head down (D-M 4.3). */
     private static final EquipmentSlot[] PLAYER_PIECES = {EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND, EquipmentSlot.HEAD,
             EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
@@ -129,6 +133,11 @@ public final class MagnetPull {
 
     /** What {@link #searchEndedAt} answers for a Magneto who never searched: long enough ago for any wait. */
     public static final long NEVER = Long.MIN_VALUE / 2;
+    /**
+     * How long "your inventory is full" stands on his action bar before the end line of the same pull may replace it, in
+     * ticks: the time the game shows a line at full strength (D-M 4.4, 4.7; spec 21.7 #29).
+     */
+    public static final int FULL_LINE_TICKS = 40;
 
     // ------------------------------------------------------------------------------------------------------------
     // The press (D-M 4.1)
@@ -151,6 +160,7 @@ public final class MagnetPull {
                 || now - FOUND_NOTHING.getOrDefault(id, NEVER) < EnhancedConfig.PULL_RETRY_TICKS.get()) {
             return true;
         }
+        HELD_LINES.remove(id); // this press answers for itself: the last pull's end line is not put over its answer
         PowerData data = Powers.get(player);
         if (!data.isReady(1, now)) {
             player.displayClientMessage(Component.translatable("message.enhanced.pull.recharging"), true);
@@ -181,9 +191,15 @@ public final class MagnetPull {
 
     /**
      * One tick of this Magneto's pull, if one runs (from {@code MagnetoAbilities.tick}): the next slice of the search, or
-     * the next takes. A tick in which the press already searched does nothing more.
+     * the next takes. A tick in which the press already searched does nothing more. First, the end line of his last pull
+     * goes out when its turn has come ({@link #tell}).
      */
     public static void tick(ServerPlayer player) {
+        HeldLine held = HELD_LINES.get(player.getUUID());
+        if (held != null && player.level().getGameTime() >= held.at()) {
+            HELD_LINES.remove(player.getUUID());
+            player.displayClientMessage(held.line(), true);
+        }
         Job job = JOBS.get(player.getUUID());
         if (job == null) {
             return;
@@ -218,15 +234,20 @@ public final class MagnetPull {
 
     /**
      * Ends this Magneto's pull at once (he died, logged out, changed dimension, lost his power); what was taken stays his,
-     * and a cooldown already started stays.
+     * and a cooldown already started stays. An end line still held back is not sent.
      */
     public static void cancel(ServerPlayer player) {
         JOBS.remove(player.getUUID());
+        HELD_LINES.remove(player.getUUID());
     }
 
-    /** Forgets every pull, every wait, every player's grace and every tug: for the server's stop and for tests. */
+    /**
+     * Forgets every pull, every wait, every held end line, every player's grace and every tug: for the server's stop and
+     * for tests.
+     */
     public static void clear() {
         JOBS.clear();
+        HELD_LINES.clear();
         FOUND_NOTHING.clear();
         SEARCH_ENDS.clear();
         PLAYER_GRACE.clear();
@@ -343,6 +364,10 @@ public final class MagnetPull {
         int left = TUG_TICKS;
     }
 
+    /** The end line of a pull that ended, and the game time it goes out. */
+    private record HeldLine(Component line, long at) {
+    }
+
     /** One thing the search found: a cell (with the state it had) or an entity, and its distance from the press. */
     private record Target(Kind kind, @Nullable BlockPos pos, @Nullable BlockState state, @Nullable Entity entity, double distSq) {
         /** Where its stream starts: the middle of the cell or of the entity. */
@@ -391,7 +416,9 @@ public final class MagnetPull {
         /** Whether some metal was refused for protection (a claim, an arena, Adventure, a villager's work). */
         boolean refused;
         boolean paid;
+        /** Whether he read {@code pull.full} in this pull, and the game time he did. */
         boolean toldFull;
+        long fullAt;
         boolean sentFirst;
         long lastWork;
 
@@ -1499,6 +1526,7 @@ public final class MagnetPull {
             dropAtFeet(player, rest);
             if (!job.toldFull) {
                 job.toldFull = true;
+                job.fullAt = job.level.getGameTime();
                 player.displayClientMessage(Component.translatable("message.enhanced.pull.full"), true);
             }
         }
@@ -1529,13 +1557,23 @@ public final class MagnetPull {
         }
     }
 
-    /** The end line (D-M 4.7): how many things it affected, and whether some metal here was protected. */
+    /**
+     * The end line (D-M 4.7): how many things it affected, and whether some metal here was protected. When he read {@code
+     * pull.full} less than {@value #FULL_LINE_TICKS} ticks ago, the end line is held back until then ({@link #tick} sends
+     * it), or it would replace that line before he could read it, while the rest lies at his feet. A new press of his, or
+     * whatever ends a pull at once, drops it.
+     */
     private static void tell(Job job, ServerPlayer player) {
         Component line;
         if (job.affected > 0) {
             line = Component.translatable(job.refused ? "message.enhanced.pull.done_protected" : "message.enhanced.pull.done", job.affected);
         } else {
             line = Component.translatable(job.refused ? "message.enhanced.pull.protected" : "message.enhanced.pull.nothing");
+        }
+        long readFrom = job.fullAt + FULL_LINE_TICKS;
+        if (job.toldFull && job.level.getGameTime() < readFrom) {
+            HELD_LINES.put(player.getUUID(), new HeldLine(line, readFrom));
+            return;
         }
         player.displayClientMessage(line, true);
     }

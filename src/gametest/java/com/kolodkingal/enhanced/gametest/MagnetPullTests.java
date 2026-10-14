@@ -1046,7 +1046,9 @@ public final class MagnetPullTests {
 
     /**
      * M23. With his inventory full, what the ores give drops at his feet (he reads it once), and the 70 ingots he has no
-     * room for were never searched: they lie where they were, and did not crowd the ores out of the pull's 64 places.
+     * room for were never searched: they lie where they were, and did not crowd the ores out of the pull's 64 places. The
+     * end line does not hide "your inventory is full" (21.7 #29): it comes {@link MagnetPull#FULL_LINE_TICKS} ticks after
+     * it, and nothing else is said.
      */
     @GameTest(template = ARENA, batch = "magnet_pull_full")
     public static void aFullInventoryDropsTheRestAtHisFeet(GameTestHelper helper) {
@@ -1074,16 +1076,31 @@ public final class MagnetPullTests {
             }
         }
         check(ingots.size() == 70, "70 ingots lie round him, not " + ingots.size());
-        List<Object> packets = new ArrayList<>();
+        List<Line> lines = new ArrayList<>();
         TestKit.sentPackets(magneto);
         sneakR(magneto);
-        packets.addAll(TestKit.sentPackets(magneto));
-        f.everyTick(20, tick -> {
+        hear(lines, 0, TestKit.sentPackets(magneto));
+        boolean[] over = {false};
+        f.everyTick(80, tick -> {
             PowerTicker.tick(magneto);
-            packets.addAll(TestKit.sentPackets(magneto));
+            hear(lines, tick, TestKit.sentPackets(magneto));
             if (MagnetPull.isPulling(magneto)) {
                 return false;
             }
+            if (over[0]) {
+                // The end line waits for its turn.
+                Line full = lines.get(0);
+                Line end = lines.get(lines.size() - 1);
+                if (!end.key().equals("message.enhanced.pull.done")) {
+                    return false;
+                }
+                check(lines.size() == 2 && full.key().equals("message.enhanced.pull.full"),
+                        "he reads that his inventory is full, then the end line, and nothing else: " + lines);
+                check(end.tick() - full.tick() == MagnetPull.FULL_LINE_TICKS,
+                        "the end line comes " + MagnetPull.FULL_LINE_TICKS + " ticks after 'inventory full', not " + (end.tick() - full.tick()));
+                return true;
+            }
+            over[0] = true;
             check(ores.stream().allMatch(ore -> helper.getBlockState(ore).is(Blocks.STONE)), "the ores gave their iron");
             int atFeet = 0;
             for (ItemEntity item : helper.getEntities(EntityType.ITEM)) {
@@ -1095,8 +1112,9 @@ public final class MagnetPullTests {
             for (int i = 0; i < ingots.size(); i++) {
                 check(ingots.get(i).isAlive() && ingots.get(i).position().distanceTo(where.get(i)) < 0.01, "ingot " + i + " lies where it was");
             }
-            check(actionBar(packets).stream().filter("message.enhanced.pull.full"::equals).count() == 1, "he read that his inventory is full, once");
-            return true;
+            check(lines.stream().filter(line -> line.key().equals("message.enhanced.pull.full")).count() == 1, "he read that his inventory is full, once");
+            check(lines.size() == 1, "and, as the pull ends, only that: " + lines);
+            return false;
         });
     }
 
@@ -1148,6 +1166,76 @@ public final class MagnetPullTests {
             check(stand.getItemBySlot(EquipmentSlot.CHEST).is(Items.IRON_CHESTPLATE), "the stand keeps its chestplate");
             check(actionBar(packets).stream().filter("message.enhanced.pull.full"::equals).count() == 1, "he read that his inventory is full, once");
             return true;
+        });
+    }
+
+    /**
+     * M23, the end line held back. A pull that drops something at his feet holds its end line back while "your inventory
+     * is full" stands; whatever ends a pull at once (he dies, logs out, changes dimension, loses his power) drops it, and
+     * so does his next press, which answers for itself (it is recharging) without the old end line put over its answer.
+     */
+    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 260)
+    public static void aHeldEndLineGivesWayToWhatComesNext(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer magneto = magneto(f);
+        for (int slot = 0; slot < magneto.getInventory().items.size(); slot++) {
+            magneto.getInventory().setItem(slot, new ItemStack(Items.DIRT, 64));
+        }
+        BlockPos ore = new BlockPos(6, 1, 10);
+        helper.setBlock(ore, Blocks.IRON_ORE);
+        String full = "message.enhanced.pull.full";
+        List<Line> lines = new ArrayList<>();
+        TestKit.sentPackets(magneto);
+        sneakR(magneto);
+        int[] stage = {0};
+        f.everyTick(240, tick -> {
+            PowerTicker.tick(magneto);
+            hear(lines, tick, TestKit.sentPackets(magneto));
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            int heldUntil = lines.isEmpty() ? 0 : lines.get(0).tick() + MagnetPull.FULL_LINE_TICKS;
+            switch (stage[0]) {
+                case 0 -> {
+                    check(atFeet(helper, magneto, Items.RAW_IRON) == 1, "the raw iron lies at his feet");
+                    check(keys(lines).equals(List.of(full)), "as the pull ends he reads only that his inventory is full: " + lines);
+                    MagnetPull.cancel(magneto); // as his death would
+                    stage[0] = 1;
+                }
+                case 1 -> {
+                    if (tick > heldUntil + 5) {
+                        check(keys(lines).equals(List.of(full)), "a pull ended at once sends no end line later: " + lines);
+                        stage[0] = 2;
+                    }
+                }
+                case 2 -> {
+                    if (Powers.get(magneto).isReady(1, level.getGameTime())) {
+                        helper.setBlock(ore, Blocks.IRON_ORE);
+                        lines.clear();
+                        sneakR(magneto);
+                        check(MagnetPull.isPulling(magneto), "rested, he pulls again");
+                        stage[0] = 3;
+                    }
+                }
+                case 3 -> {
+                    check(atFeet(helper, magneto, Items.RAW_IRON) == 2 && keys(lines).equals(List.of(full)),
+                            "the second pull drops its iron at his feet too, and says so: " + lines);
+                    sneakR(magneto); // at once
+                    hear(lines, tick, TestKit.sentPackets(magneto));
+                    check(!MagnetPull.isPulling(magneto) && keys(lines).equals(List.of(full, "message.enhanced.pull.recharging")),
+                            "pressed again at once, he reads that it is recharging: " + lines);
+                    stage[0] = 4;
+                }
+                default -> {
+                    if (tick > heldUntil + 5) {
+                        check(keys(lines).equals(List.of(full, "message.enhanced.pull.recharging")),
+                                "the last pull's end line is not put over his press's answer: " + lines);
+                        return true;
+                    }
+                }
+            }
+            return false;
         });
     }
 
@@ -2016,6 +2104,22 @@ public final class MagnetPullTests {
     private static double hunger(ServerPlayer player) {
         FoodData food = player.getFoodData();
         return 4.0 * food.getFoodLevel() + 4.0 * food.getSaturationLevel() - food.getExhaustionLevel();
+    }
+
+    /** An action-bar line Magneto was sent, and the test tick it was sent in. */
+    private record Line(int tick, String key) {
+    }
+
+    /** Adds the action-bar lines among the packets, sent in this test tick, to {@code lines}. */
+    private static void hear(List<Line> lines, int tick, List<Object> packets) {
+        for (String key : actionBar(packets)) {
+            lines.add(new Line(tick, key));
+        }
+    }
+
+    /** The keys of these lines, oldest first. */
+    private static List<String> keys(List<Line> lines) {
+        return lines.stream().map(Line::key).toList();
     }
 
     /** The keys of the action-bar lines among the packets, oldest first. */
