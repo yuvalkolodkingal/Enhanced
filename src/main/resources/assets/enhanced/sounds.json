@@ -1131,5 +1131,13 @@
         "name": "enhanced:build_rank_up"
       }
     ]
+  },
+  "apocalypse_crit": {
+    "subtitle": "subtitles.enhanced.apocalypse_crit",
+    "sounds": [
+      {
+        "name": "enhanced:apocalypse_crit"
+      }
+    ]
   }
 }
