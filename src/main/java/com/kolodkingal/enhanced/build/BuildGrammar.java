@@ -70,6 +70,8 @@ public final class BuildGrammar {
         PLANTED,
         /** A planted shape's height, which followed the look, is fixed. */
         FIXED,
+        /** A block lies beyond Billy's reach (but within sight): the click does nothing and he is told "too far". */
+        TOO_FAR,
         /** A face of the box moved. */
         PUSHED,
         /** Billy's longest side (or the edge of the world) stopped it: the soft "tock". */
@@ -90,12 +92,21 @@ public final class BuildGrammar {
      *               "this kind", the brushes and middle click; null when none is in reach
      * @param eyes   the eyes
      * @param look   the view direction (a unit vector)
+     * @param tooFar the view meets no block within reach but one beyond it (a hero with a limited reach): a click
+     *               there does nothing, where the sky ({@code false}) is the floating cell (D-B 3.1, 8.4)
      */
-    public record Aim(@Nullable BlockPos cell, @Nullable Direction face, @Nullable BlockPos picked, Vec3 eyes, Vec3 look) {
+    public record Aim(@Nullable BlockPos cell, @Nullable Direction face, @Nullable BlockPos picked, Vec3 eyes, Vec3 look,
+                      boolean tooFar) {
         public Aim {
             cell = cell == null ? null : cell.immutable();
             face = cell == null ? null : face;
             picked = picked == null ? null : picked.immutable();
+            tooFar = tooFar && cell == null;
+        }
+
+        /** An aim with a block in reach or a true sky. */
+        public Aim(@Nullable BlockPos cell, @Nullable Direction face, @Nullable BlockPos picked, Vec3 eyes, Vec3 look) {
+            this(cell, face, picked, eyes, look, false);
         }
 
         /** Looking at the sky: no block within reach. */
@@ -143,6 +154,8 @@ public final class BuildGrammar {
     private @Nullable BoundingBox maskBounds;
     private Predicate<BlockPos> selected = seeds::contains;
     private boolean heldBack;
+    /** Whether the last click, drag or scroll was stopped by the hero's longest side (not by a size or the world). */
+    private boolean sideHeld;
 
     // Clicks: the last one (a double click's first half) and the press a release may make a drag of.
     private @Nullable BlockPos lastClick;
@@ -193,6 +206,14 @@ public final class BuildGrammar {
     /** The hero's numbers now (Billy's rank may have changed, the world border moved). */
     public void limits(RecipeLimits limits) {
         this.limits = limits;
+        // A hero with smaller numbers (Billy after Wanda, Survival after Creative) never shows bigger ones than he casts.
+        radius = clamp(radius, 1, Math.max(1, limits.shapeRadius()));
+        brush = clamp(brush, 0, Math.max(0, limits.brush()));
+        copies = clamp(copies, 1, Math.max(1, limits.repeatCopies()));
+        int reach = Math.max(0, limits.reach());
+        lift = clamp(lift, -reach, reach);
+        plantedHeight = clamp(plantedHeight, 1, Math.max(1, limits.shapeHeight()));
+        layers = clamp(layers, -Math.max(1, limits.side()), Math.max(1, limits.side()));
     }
 
     /**
@@ -234,6 +255,12 @@ public final class BuildGrammar {
      */
     public Result press(Aim aim, long tick) {
         aim(aim);
+        sideHeld = false;
+        if (aim.tooFar()) {
+            // A wall he can see but cannot reach: nothing is marked, nothing is let go (D-B 8.4).
+            pressCell = null;
+            return Result.TOO_FAR;
+        }
         BlockPos cell = aim.cell();
         if (spell.needsBox() && cell != null && cell.equals(lastClick) && tick - lastClickTick <= DOUBLE_CLICK_TICKS) {
             // The first click set a corner for a moment: the selection before it comes back, and the thing joins it.
@@ -261,9 +288,10 @@ public final class BuildGrammar {
      */
     public Result release(Aim aim, long tick) {
         aim(aim);
+        sideHeld = false;
         BlockPos from = pressCell;
         pressCell = null;
-        if (from == null || ghost || !spell.needsBox() || tick - pressTick < DRAG_TICKS) {
+        if (aim.tooFar() || from == null || ghost || !spell.needsBox() || tick - pressTick < DRAG_TICKS) {
             return Result.NOTHING;
         }
         BlockPos to = aim.target();
@@ -274,6 +302,7 @@ public final class BuildGrammar {
         maskBounds = null;
         cornerA = limits.inWorld(from);
         cornerB = within(cornerA, to);
+        sideHeld = heldBack;
         lastClick = null;
         return Result.DRAGGED;
     }
@@ -299,7 +328,9 @@ public final class BuildGrammar {
         pressTick = tick;
         if (cornerA != null && cornerB == null) {
             cornerB = within(cornerA, at);
-            pressCell = at;
+            sideHeld = heldBack;
+            // The click that fixes a box is never the start of a drag: a slow one that drifts must not remake it.
+            pressCell = null;
             return Result.CORNER_B;
         }
         seeds.clear();
@@ -373,6 +404,7 @@ public final class BuildGrammar {
      */
     public Result scroll(int notches, boolean fast, boolean second, Aim aim) {
         aim(aim);
+        sideHeld = false;
         if (notches == 0) {
             return Result.UNUSED;
         }
@@ -489,6 +521,7 @@ public final class BuildGrammar {
         cornerA = low;
         cornerB = high;
         int now = axis.choose(edge.getX(), edge.getY(), edge.getZ());
+        sideHeld = positive ? wanted > min + side - 1 : wanted < max - side + 1;
         return now != wanted ? Result.HELD_BACK : Result.PUSHED;
     }
 
@@ -651,6 +684,14 @@ public final class BuildGrammar {
             return SpellMath.box(cornerA, cornerA);
         }
         return SpellMath.box(cornerA, within(cornerA, aim.target()));
+    }
+
+    /**
+     * Whether the last click, drag or scroll was stopped by the hero's longest side: what the client tells him in words
+     * ("Too big for you yet", D-B 8.4), where the sizes and the world's edge only tock.
+     */
+    public boolean sideHeld() {
+        return sideHeld;
     }
 
     /** Whether Billy's side held the rubber band back at the last look (its label flashes). */

@@ -44,7 +44,7 @@ final class BuildFeedback {
             case LET_GO -> unwound();
             case PUSHED, NUMBER, STYLE -> play(SoundEvents.UI_BUTTON_CLICK.value(), CLICK, 0.8F + 0.8F * Math.min(1.0F, size(grammar) / CLICK_TOP));
             // Billy's longest side (or the edge of the world) holds it: a soft "tock".
-            case HELD_BACK -> play(SoundEvents.NOTE_BLOCK_HAT.value(), 0.3F, 0.6F);
+            case HELD_BACK, TOO_FAR -> play(SoundEvents.NOTE_BLOCK_HAT.value(), 0.3F, 0.6F);
             default -> {
             }
         }

@@ -102,6 +102,10 @@ public final class BuildClient {
     public static final int POCKET_ASK_GAP = 100;
     /** Ticks between two dabs of Land's or Grow's brush held still (a pulse every 4 ticks, D-B 4.11). */
     public static final int PULSE_TICKS = 4;
+    /** How far beyond his reach a block still counts as "too far" rather than the sky (D-B 8.4). */
+    public static final int TOO_FAR_RANGE = 64;
+    /** Ticks between two of the words the client says on the action bar by itself (too far, too big). */
+    private static final int SAY_GAP = 25;
     /** The most casts awaiting their verdict that are remembered (a server that never answers forgets nothing else). */
     private static final int MAX_PENDING = 256;
 
@@ -113,6 +117,12 @@ public final class BuildClient {
     private static @Nullable ClientLevel seenLevel;
     private static @Nullable Power seenPower;
     private static long ticks;
+    /** Ticks after a tap of Y during which a server word that disagrees with it is the echo of an earlier tap. */
+    private static final int MODE_ECHO_TICKS = 40;
+    private static boolean askedMode;
+    private static long askedAt = Long.MIN_VALUE / 2;
+    /** The tick the client last spoke on the action bar by itself (tellWhyHeld). */
+    private static long lastSaid = Long.MIN_VALUE / 2;
 
     private static @Nullable BuildGrammar grammar;
     private static @Nullable Aim aim;
@@ -135,6 +145,8 @@ public final class BuildClient {
     // The selected thing's flood (its picture, its bounds, the double click's "inside").
     private static @Nullable MagicSelect flood;
     private static List<BlockPos> floodSeeds = List.of();
+    /** Set when the thing is found again after a spell changed the world: if it is gone, it is let go without a word. */
+    private static boolean quietFlood;
 
     // The client's count of the plan.
     private static @Nullable SpellPlanner.Plan plan;
@@ -159,7 +171,11 @@ public final class BuildClient {
     private static int holdFor;
     private static int held;
     private static int holdFlags;
-    private static int stroke;
+    /** The plan and the kind of hold the ring in progress was begun for. */
+    private static @Nullable Object ringKey;
+    private static int ringKind;
+    /** The number of the open (or last) stroke: it starts from the clock, as the server's session keeps the last it saw. */
+    private static int stroke = strokeStart();
     private static boolean strokeOpen;
     private static @Nullable BlockPos lastDab;
     private static long lastDabTick;
@@ -227,6 +243,8 @@ public final class BuildClient {
             return;
         }
         mode = on;
+        askedMode = on;
+        askedAt = ticks;
         send(new BuildActionPayload(BuildActionPayload.MODE, on ? 1 : 0));
         if (!on) {
             leaveMode();
@@ -249,7 +267,11 @@ public final class BuildClient {
             serverMode = now;
         } else if (now != serverMode) {
             serverMode = now;
-            if (now) {
+            // A word that disagrees with the tap just made is the echo of an earlier tap: the answer to this one is to come.
+            boolean echo = now != mode && now != askedMode && ticks - askedAt < MODE_ECHO_TICKS;
+            if (echo) {
+                // Nothing to follow.
+            } else if (now) {
                 mode = true;
             } else if (mode) {
                 leaveMode();
@@ -335,7 +357,7 @@ public final class BuildClient {
     /** What a plan of {@code r} is made of: when it changes, the plan, its count and its ghost are made again. */
     private static Object planKeyOf(SpellRecipe r) {
         return List.of(asPlanned(r), Objects.requireNonNullElse(materialKey, "none"), floodSeeds, flood != null && flood.done(),
-                pocket != null ? pocket.id() : 0, epoch);
+                usablePocket() != null ? pocket.id() : 0, epoch);
     }
 
     /** Where the player looks, within the hero's reach: the aimed cell, its face, the picked block (D-B 3.1). */
@@ -347,7 +369,10 @@ public final class BuildClient {
         BlockHitResult pick = Raycasts.outline(player, reach, 1.0F);
         BlockPos cell = hit.getType() == HitResult.Type.BLOCK ? hit.getBlockPos() : null;
         BlockPos at = pick.getType() == HitResult.Type.BLOCK ? pick.getBlockPos() : null;
-        return new Aim(cell, cell != null ? hit.getDirection() : null, at, eyes, look);
+        // Billy's reach is his lightning's: a block in sight beyond it is "too far", where only a true sky is the floating cell.
+        boolean far = cell == null && at == null && limits.limited()
+                && Raycasts.block(player, reach + TOO_FAR_RANGE, 1.0F).getType() == HitResult.Type.BLOCK;
+        return new Aim(cell, cell != null ? hit.getDirection() : null, at, eyes, look, far);
     }
 
     /**
@@ -431,6 +456,7 @@ public final class BuildClient {
     /** The selected thing's flood, {@value #FLOOD_PER_TICK} reads a tick; refused, it is let go and he is told why. */
     private static void floodOn(ClientLevel level, LocalPlayer player, BuildGrammar g) {
         if (!g.hasMask()) {
+            quietFlood = false;
             if (flood != null) {
                 flood = null;
                 floodSeeds = List.of();
@@ -453,11 +479,12 @@ public final class BuildClient {
         }
         if (flood.refusal() == SpellPlanner.NONE) {
             g.maskBounds(flood.bounds());
+            quietFlood = false;
             return;
         }
         // Over the limit nothing is selected, never a part of the thing (D-B 3.4).
         Component why = flood.message(Powers.power(player) == Power.SCARLET_WITCH);
-        if (why != null) {
+        if (why != null && !quietFlood) {
             player.displayClientMessage(why, true);
         }
         g.letGo();
@@ -511,7 +538,7 @@ public final class BuildClient {
         SpellPlanner.Setup setup = SpellPlanner.Setup.at(caster)
                 .withMask(flood != null ? flood.mask() : null)
                 .withMaterial(material)
-                .withSource(r.op() == SpellRecipe.Op.STAMP ? pocket : null);
+                .withSource(r.op() == SpellRecipe.Op.STAMP ? usablePocket() : null);
         return limits == null ? setup : setup.withSurface(limits.magicSelect(), limits.sideLimit());
     }
 
@@ -577,16 +604,43 @@ public final class BuildClient {
     static void leftDown(LocalPlayer player) {
         update(player);
         if (aim != null) {
-            BuildFeedback.heard(grammar().press(aim, ticks), grammar());
+            BuildGrammar.Result result = grammar().press(aim, ticks);
+            BuildFeedback.heard(result, grammar());
+            tellWhyHeld(player, result);
             update(player);
         }
+    }
+
+    /**
+     * What a limited builder is told when his click or scroll was stopped (D-B 8.4): a wall beyond his reach does
+     * nothing ("Too far for your magic"), a side at his longest stops ("Too big for you yet"); a few seconds apart at most.
+     */
+    private static void tellWhyHeld(LocalPlayer player, BuildGrammar.Result result) {
+        Limits now = limits;
+        if (now == null || !now.limited() || ticks - lastSaid < SAY_GAP) {
+            return;
+        }
+        BuildGrammar g = grammar();
+        if (result == BuildGrammar.Result.TOO_FAR) {
+            say(player, Limits.tooFar(now.reach()));
+        } else if (g.sideHeld() && (result == BuildGrammar.Result.HELD_BACK || result == BuildGrammar.Result.CORNER_B
+                || result == BuildGrammar.Result.DRAGGED)) {
+            say(player, Limits.tooWide(now.side()));
+        }
+    }
+
+    private static void say(LocalPlayer player, Component words) {
+        lastSaid = ticks;
+        player.displayClientMessage(words, true);
     }
 
     /** The left button came up. */
     static void leftUp(LocalPlayer player) {
         update(player);
         if (aim != null) {
-            BuildFeedback.heard(grammar().release(aim, ticks), grammar());
+            BuildGrammar.Result result = grammar().release(aim, ticks);
+            BuildFeedback.heard(result, grammar());
+            tellWhyHeld(player, result);
             update(player);
         }
     }
@@ -599,6 +653,7 @@ public final class BuildClient {
         }
         BuildGrammar.Result result = grammar().scroll(notches, fast, second, aim);
         BuildFeedback.heard(result, grammar());
+        tellWhyHeld(player, result);
         update(player);
         return result;
     }
@@ -626,24 +681,47 @@ public final class BuildClient {
      * than {@code holdToConfirmBlocks} existing blocks are removed or replaced, or is not done yet.
      */
     public static int holdTicks() {
+        return switch (holdKind()) {
+            case HOLD_SHORT -> shortHold();
+            case HOLD_LONG -> longHold();
+            default -> 0;
+        };
+    }
+
+    /** No hold, the short one (more than {@code holdToConfirmBlocks} removed or replaced, or not known yet), the long one. */
+    private static final int HOLD_NONE = 0;
+    private static final int HOLD_SHORT = 1;
+    private static final int HOLD_LONG = 2;
+
+    /**
+     * Which hold the plan ready now asks for: the long one for a plan over {@code hugeSpellBlocks} or one the server said
+     * needs it; the short one while the count is not done, when more than {@code holdToConfirmBlocks} existing blocks are
+     * removed or replaced (the larger of the client's count and the server's preflight), or when some of the plan lies in
+     * chunks this client has not loaded (what is there is not known).
+     */
+    private static int holdKind() {
         if (recipe == null || recipe.spell().isBrush()) {
-            return 0;
+            return HOLD_NONE;
         }
         if (plan == null || !plan.prepared()) {
-            return shortHold();
+            return HOLD_SHORT;
         }
         if (plan.refusal() != SpellPlanner.NONE || !plan.writes()) {
-            return 0;
+            return HOLD_NONE;
         }
-        boolean serverSays = preflight() != null && (preflight.code() == BuildVerdictPayload.HOLD
-                || preflight.code() == BuildVerdictPayload.NO_UNDO_ROOM);
+        BuildVerdictPayload server = preflight();
+        boolean serverSays = server != null && (server.code() == BuildVerdictPayload.HOLD || server.code() == BuildVerdictPayload.NO_UNDO_ROOM);
         if (serverSays || plan.sizeBound() > config(BuildConfig.HUGE_SPELL_BLOCKS, 1_000_000)) {
-            return longHold();
+            return HOLD_LONG;
         }
-        if (count == null || !count.done() || count.removed() > config(BuildConfig.HOLD_TO_CONFIRM_BLOCKS, 64)) {
-            return shortHold();
+        if (count == null || !count.done() || count.unloaded() > 0) {
+            return HOLD_SHORT;
         }
-        return 0;
+        long removed = count.removed();
+        if (server != null && (server.code() == BuildVerdictPayload.READY || server.code() == BuildVerdictPayload.READY_PARTLY)) {
+            removed = Math.max(removed, server.extra());
+        }
+        return removed > config(BuildConfig.HOLD_TO_CONFIRM_BLOCKS, 64) ? HOLD_SHORT : HOLD_NONE;
     }
 
     private static int shortHold() {
@@ -678,15 +756,19 @@ public final class BuildClient {
             countOn(level);
             countOn(level);
         }
+        int kind = holdKind();
+        int flags = kind == HOLD_LONG ? BuildCastPayload.HELD_SHORT | BuildCastPayload.HELD_LONG
+                : kind == HOLD_SHORT ? BuildCastPayload.HELD_SHORT : 0;
         int need = holdTicks();
         if (need <= 0) {
-            cast(player, 0);
+            cast(player, flags);
             return;
         }
         holdFor = need;
         held = 0;
-        holdFlags = need >= longHold() && longHold() > shortHold() ? BuildCastPayload.HELD_SHORT | BuildCastPayload.HELD_LONG
-                : BuildCastPayload.HELD_SHORT;
+        holdFlags = flags;
+        ringKey = planKey;
+        ringKind = kind;
         BuildFeedback.holding(0, need);
     }
 
@@ -697,6 +779,14 @@ public final class BuildClient {
             return;
         }
         if (holdFor <= 0) {
+            return;
+        }
+        // The ring confirms the plan it began for: a scroll or a swing that changed it, or made the hold stricter,
+        // lets it go; press again to confirm the new one.
+        if (!Objects.equals(planKey, ringKey) || holdKind() > ringKind) {
+            BuildFeedback.unwound();
+            BuildHud.unwound(holdProgress(), holdHuge());
+            stopHold();
             return;
         }
         held++;
@@ -730,6 +820,8 @@ public final class BuildClient {
     }
 
     private static void stopHold() {
+        ringKey = null;
+        ringKind = HOLD_NONE;
         holdFor = 0;
         held = 0;
         holdFlags = 0;
@@ -767,8 +859,19 @@ public final class BuildClient {
         update(player);
     }
 
+    /** A number no earlier login of this client used: the server keeps the last stroke it saw for the whole run. */
+    private static int strokeStart() {
+        return (int) (System.nanoTime() >>> 20) & 0x3FFFFFFF;
+    }
+
     private static void startStroke() {
         stroke++;
+        // Each stroke has its own seed (Grow's bloom, a mix): the server grows what this stroke showed.
+        LocalPlayer owner = Minecraft.getInstance().player;
+        if (owner != null) {
+            BuildGrammar g = grammar();
+            g.mix(g.mix(), owner.getRandom().nextLong());
+        }
         strokeOpen = true;
         lastDab = null;
         lastDabTick = Long.MIN_VALUE / 2;
@@ -972,8 +1075,14 @@ public final class BuildClient {
         lastVerdictTick = ticks;
         SpellRecipe.Op op = PENDING.remove(payload.token());
         if (changesTheWorld(payload.code())) {
-            // The world under the box is not what the plan was counted against: count it and draw its ghost again.
+            // The world under the box is not what the plan was counted against: count it and draw its ghost again, and
+            // find the selected thing again from where it was clicked (a tree that was vanished is gone).
             epoch++;
+            flood = null;
+            floodSeeds = List.of();
+            grammar().selectedBy(null);
+            grammar().maskBounds(null);
+            quietFlood = true;
         }
         if (!BuildVerdictPayload.isRefusal(payload.code())) {
             return;
@@ -982,7 +1091,11 @@ public final class BuildClient {
             grammar().dropGhost();
         }
         int code = payload.code();
-        if (mode && (code == BuildVerdictPayload.OFF || code == BuildVerdictPayload.OPERATORS || code == BuildVerdictPayload.ADVENTURE)) {
+        // A refusal of build mode itself carries no token; a cast's DIMENSION (a builder who walked into a denied world while
+        // on) keeps the mode the server kept.
+        boolean modeRefused = code == BuildVerdictPayload.OFF || code == BuildVerdictPayload.OPERATORS
+                || code == BuildVerdictPayload.ADVENTURE || code == BuildVerdictPayload.DIMENSION && payload.token() == 0;
+        if (mode && modeRefused) {
             leaveMode();
         }
     }
@@ -1124,7 +1237,16 @@ public final class BuildClient {
 
     /** This client's copy of the pocket (null until one came). */
     public static @Nullable SpellPlanner.Source pocket() {
-        return pocket;
+        return usablePocket();
+    }
+
+    /**
+     * The copy kept, while it is the pocket's copy now ({@link BuildData#pocket}): after a new Copy the new one streams in
+     * over some ticks, and until it is whole the old contents are neither shown nor counted for the stamp.
+     */
+    private static @Nullable ClientPocket usablePocket() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return pocket != null && player != null && pocket.id() == pocketId(player) ? pocket : null;
     }
 
     /** Where the builder looked at the last update. */
@@ -1155,6 +1277,8 @@ public final class BuildClient {
         }
         flood = null;
         floodSeeds = List.of();
+        // The marks of a verdict belong to the world it was about.
+        lastVerdict = null;
         plan = null;
         count = null;
         planKey = null;
@@ -1178,6 +1302,8 @@ public final class BuildClient {
         seenPlayer = null;
         seenLevel = null;
         seenPower = null;
+        askedAt = Long.MIN_VALUE / 2;
+        lastSaid = Long.MIN_VALUE / 2;
         grammar = null;
         limits = null;
         material = null;
@@ -1187,7 +1313,7 @@ public final class BuildClient {
         lastVerdict = null;
         token = 0;
         preflightToken = 0;
-        stroke = 0;
+        stroke = strokeStart();
         sentView = 0;
         sentA = BlockPos.ZERO;
         sentB = BlockPos.ZERO;

@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +63,10 @@ public final class BlockPaletteScreen extends Screen {
     private int scroll;
     private int rows = 4;
     private String search = "";
+    /** What the grid shows: the tab's blocks, or the blocks of every tab whose name holds the search (made when either changes). */
+    private List<Block> shown = List.of();
+    /** Each block's lower-case name, made once. */
+    private final Map<Block, String> names = new java.util.HashMap<>();
     private @Nullable EditBox box;
     private boolean dragging;
 
@@ -114,6 +117,7 @@ public final class BlockPaletteScreen extends Screen {
                 }
             }
         }
+        refresh();
         layout();
         int fieldW = Math.min(180, pitch * COLUMNS);
         box = new EditBox(font, (width - fieldW) / 2, height - 22, fieldW, 16, Component.translatable("screen.enhanced.build.blocks.search"));
@@ -122,6 +126,7 @@ public final class BlockPaletteScreen extends Screen {
         box.setResponder(text -> {
             search = text.trim().toLowerCase(Locale.ROOT);
             scroll = 0;
+            refresh();
         });
         addRenderableWidget(box);
     }
@@ -187,20 +192,25 @@ public final class BlockPaletteScreen extends Screen {
         rows = Math.max(2, (bottom - gridY) / pitch);
     }
 
-    /** The blocks the grid shows: the tab's, or, with something typed, every block of every tab whose name has it. */
-    private List<Block> shown() {
+    /** Makes the list the grid shows: the tab's blocks, or, with something typed, every block of every tab whose name has it. */
+    private void refresh() {
         if (search.isEmpty()) {
-            return tab < tabBlocks.size() ? tabBlocks.get(tab) : List.of();
+            shown = tab < tabBlocks.size() ? tabBlocks.get(tab) : List.of();
+            return;
         }
-        Map<Block, Boolean> found = new LinkedHashMap<>();
+        Set<Block> found = new LinkedHashSet<>();
         for (List<Block> list : tabBlocks) {
             for (Block block : list) {
-                if (block.getName().getString().toLowerCase(Locale.ROOT).contains(search)) {
-                    found.put(block, true);
+                if (names.computeIfAbsent(block, b -> b.getName().getString().toLowerCase(Locale.ROOT)).contains(search)) {
+                    found.add(block);
                 }
             }
         }
-        return new ArrayList<>(found.keySet());
+        shown = new ArrayList<>(found);
+    }
+
+    private List<Block> shown() {
+        return shown;
     }
 
     private int maxScroll(int count) {
@@ -369,6 +379,7 @@ public final class BlockPaletteScreen extends Screen {
                 if (box != null && !search.isEmpty()) {
                     box.setValue("");
                 }
+                refresh();
                 return true;
             }
         }

@@ -559,7 +559,11 @@ final class Ghost {
                     shown = making;
                     frame = makingFrame;
                 } else {
+                    // A mesh that failed: no ghost, rather than the last spell's at its old place.
                     making.close();
+                    close(shown);
+                    shown = null;
+                    frame = null;
                 }
                 making = null;
             }
@@ -639,6 +643,11 @@ final class Ghost {
             cells.blocks.addAll(blocks);
             cells.states.clear();
             cells.states.addAll(states);
+            // Never more than the detail the option allows are meshed, even when every cell has a side open.
+            if (cells.blocks.size() > detail) {
+                cells.blocks.removeElements(detail, cells.blocks.size());
+                cells.states.subList(detail, cells.states.size()).clear();
+            }
         }
 
         /**

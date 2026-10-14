@@ -1,7 +1,6 @@
 package com.kolodkingal.enhanced.client.build;
 
 import com.kolodkingal.enhanced.Enhanced;
-import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
@@ -37,7 +36,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -91,8 +89,6 @@ public final class BuildHud implements LayeredDraw.Layer {
     private static final int METER_H = 5;
     /** The edge tint's alpha at the very edge (D-B 6.3). */
     private static final float TINT = 0.06F;
-    /** How far past his reach a block is still seen as "too far" rather than as the sky. */
-    private static final int TOO_FAR_RANGE = 64;
     /** Ticks after a new player entity (a login, a respawn) before a higher rank is a rank-up rather than the sync. */
     private static final int RANK_SETTLE_TICKS = 100;
     private static final int RANK_UP_TICKS = 40;
@@ -173,12 +169,8 @@ public final class BuildHud implements LayeredDraw.Layer {
         }
         seenRank = rank;
 
-        tooFar = false;
-        Limits limits = BuildClient.limits();
         BuildGrammar.Aim aim = BuildClient.aim();
-        if (building && limits != null && limits.limited() && aim != null && aim.cell() == null) {
-            tooFar = Raycasts.block(player, limits.reach() + TOO_FAR_RANGE, 1.0F).getType() == HitResult.Type.BLOCK;
-        }
+        tooFar = building && aim != null && aim.tooFar();
         BuildTips.tick(building, stage);
     }
 

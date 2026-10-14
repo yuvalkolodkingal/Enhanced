@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.client.render.HandTracker;
 import com.kolodkingal.enhanced.client.render.HeroAnimator;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
+import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -43,8 +44,9 @@ import java.util.Map;
  * <ul>
  *     <li><b>The cast</b> (START): Wanda plays her {@code WANDA_HEX_TWEAK} gesture, or {@code WANDA_HEX_RISE} for a spell of
  *     {@value BuildSounds#HUGE_CAST} blocks or more; Billy plays {@code BILLY_BOLT}, through
- *     {@link HeroAnimator#play}. His blue arc is the server's ordinary {@code HexBoltPayload} (D-B 13.5: no new client
- *     code), which also aims his casting hand at the spell. While it works, scarlet or blue wisps stream from the
+ *     {@link HeroAnimator#play}, and his blue arc leaps from his hand to the spell's origin and forks to the box's top
+ *     corners (an ordinary {@code HexBoltPayload} made here, as the server sends none), which also aims his casting hand at
+ *     the spell. While it works, scarlet or blue wisps stream from the
  *     caster's hands to the spell.</li>
  *     <li><b>The frame and the ripple</b>: the spell's box glows in the hero's colour while it works (a faint copy of the
  *     lines over everything, as the builder's own box has), and a translucent band sweeps it along the order of the work:
@@ -265,7 +267,30 @@ public final class BuildFx {
             GestureId gesture = run.hero == Power.BILLY ? GestureId.BILLY_BOLT
                     : payload.cells() >= BuildSounds.HUGE_CAST ? GestureId.WANDA_HEX_RISE : GestureId.WANDA_HEX_TWEAK;
             HeroAnimator.play(caster, gesture, 0.0F);
+            if (run.hero == Power.BILLY) {
+                arc(level, caster, run, now);
+            }
         }
+    }
+
+    /**
+     * Billy's cast arc (D-B 7.2): a blue Hex Bolt leaps from his hand to the spell's origin and forks to up to four of the
+     * box's top corners. Lane BS sends no payload for it: it is an ordinary {@link HexBoltPayload}, made here from the
+     * START and handed to the Hex Bolt's own renderer, which also aims his casting hand at the spell.
+     */
+    private static void arc(ClientLevel level, Player caster, Run run, long now) {
+        Vec3 from = caster instanceof AbstractClientPlayer billy ? WorldEffectsRenderer.handPosition(Minecraft.getInstance(), billy, 1.0F)
+                : caster.getEyePosition();
+        BoundingBox b = run.box;
+        double top = b.maxY() + 1;
+        List<Vec3> forks = new ArrayList<>(4);
+        for (int i = 0; i < 4; i++) {
+            Vec3 corner = new Vec3(i % 2 == 0 ? b.minX() : b.maxX() + 1, top, i < 2 ? b.minZ() : b.maxZ() + 1);
+            if (corner.distanceToSqr(run.origin) > 1.0 && !forks.contains(corner)) {
+                forks.add(corner);
+            }
+        }
+        WorldEffectsRenderer.addHexBolt(new HexBoltPayload(caster.getId(), from, run.origin, forks, run.job * 31L + now));
     }
 
     private static void end(int job, State to, long now) {
@@ -713,6 +738,14 @@ public final class BuildFx {
             float fade = (1.0F - at) * envelope;
             EnergyGeometry.ring(pose, vc, centre, UP, radius, 0.06F, 28, EnergyGeometry.argb(BillyAbilities.MAIN, 0.55F * fade));
             EnergyGeometry.ring(pose, vc, centre, UP, radius, 0.025F, 28, EnergyGeometry.argb(WHITE, 0.85F * fade));
+        }
+        // His crown flares white: a halo about his head that widens and fades in the first ten ticks.
+        float flare = 1.0F - Mth.clamp(age / 10.0F, 0.0F, 1.0F);
+        if (flare > 0.0F) {
+            Vec3 head = feet.add(0, height + 0.05, 0);
+            float widen = 0.3F + 0.4F * (1.0F - flare);
+            EnergyGeometry.ring(pose, vc, head, UP, widen, 0.07F, 24, EnergyGeometry.argb(WHITE, 0.8F * flare));
+            EnergyGeometry.ring(pose, vc, head, UP, widen * 0.7F, 0.04F, 24, EnergyGeometry.argb(BillyAbilities.INNER, 0.9F * flare));
         }
         // Runes: a ring of them spins round him and climbs.
         float spin = calm ? 0.0F : age * 0.3F;

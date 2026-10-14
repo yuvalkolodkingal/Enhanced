@@ -163,6 +163,40 @@ public final class BuildGrammarTests {
         check(g.press(Aim.sky(new Vec3(0.5, 70.5, 0.5), new Vec3(0.0, 0.0, 1.0)), 80) == Result.CORNER_B && g.finished(),
                 "corner A set: corner B in the air");
 
+        // The click that fixes a box is never a drag: a slow one that drifts onto the next block leaves the box as it was.
+        g = new BuildGrammar(wanda);
+        g.press(on(p), 0);
+        g.release(on(p), 1);
+        check(g.press(on(q), 20) == Result.CORNER_B, "the second click fixes the box");
+        check(g.release(on(new BlockPos(5, 66, 3)), 28) == Result.NOTHING && box(g).equals(new BoundingBox(0, 64, 0, 4, 66, 3)),
+                "let go 8 ticks later on another block: the box is not remade: " + box(g));
+
+        // A block beyond Billy's reach (in sight) does nothing, and does not let go of the box; the sky still does.
+        Aim far = new Aim(null, null, null, EYES, EAST, true);
+        check(far.tooFar() && !far.onBlock(), "an aim beyond reach is not a block");
+        g = new BuildGrammar(billy);
+        check(g.press(far, 0) == Result.TOO_FAR && g.cornerA() == null && g.stage() == Stage.NOTHING, "too far: no corner is marked");
+        g = boxed(new BuildGrammar(billy), p, new BlockPos(3, 65, 3));
+        check(g.press(far, 40) == Result.TOO_FAR && g.finished() && g.box() != null, "too far: the finished box is kept");
+        g.spell(Spell.SHAPE);
+        check(g.press(far, 60) == Result.TOO_FAR && !g.planted(), "too far: no shape is planted");
+        check(new Aim(on(p).cell(), Direction.UP, p, EYES, EAST, true).tooFar() == false, "a block in reach is never too far");
+
+        // Only the longest side says "too big for you yet"; a size at its cap only tocks.
+        g = boxed(new BuildGrammar(billy), p, new BlockPos(4, 64, 4));
+        check(g.scroll(5, true, false, Aim.sky(new Vec3(30.5, 64.5, 2.5), WEST)) == Result.HELD_BACK && g.sideHeld(),
+                "the face held by his side is told as the side");
+        g.spell(Spell.SHAPE);
+        check(g.scroll(1000, false, false, on(p)) == Result.HELD_BACK && !g.sideHeld(), "a radius at its cap is not the side");
+
+        // A hero with smaller numbers never shows bigger ones than he casts.
+        g = new BuildGrammar(wanda);
+        g.spell(Spell.SHAPE);
+        g.scroll(20, false, false, on(p));
+        int big = g.radius();
+        g.limits(billy);
+        check(big > billy.shapeRadius() && g.radius() <= billy.shapeRadius(), "Wanda's radius " + big + " becomes Billy's " + g.radius());
+
         // A shape: it follows, a click plants it, the look sets its height, a second click fixes it, the sky frees it.
         g = new BuildGrammar(wanda);
         g.spell(Spell.SHAPE);
