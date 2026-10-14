@@ -351,19 +351,10 @@ public final class Telekinesis {
         if (isBossShot(e) && !BossConfig.TELEKINESIS_CATCHES_BOSS_SHOTS.get()) {
             return false;
         }
-        if (awaitsBossGrip(e) || BossGrip.refusal(holder, e, mode) != null) {
+        if (BossGrip.refusal(holder, e, mode) != null) {
             return false;
         }
         return takes(e, mode);
-    }
-
-    /**
-     * Interim rule of lane TK: what left {@code telekinesis_immune} in 3.1 and whose grip is not written yet is not held,
-     * as in 3.0: the Wither, the Warden and the Elder Guardian until a vanilla boss's {@code NoAI} is kept while he is held
-     * (step 10). {@link #refusal} already names what refuses them meanwhile (a switch off, an invulnerable state).
-     */
-    private static boolean awaitsBossGrip(Entity e) {
-        return BossGrip.isVanillaBoss(e);
     }
 
     /** The form's own test of what it takes (step 7 of {@link #canLift}): Magneto metal, the others anything loose. */
@@ -798,7 +789,8 @@ public final class Telekinesis {
      * throw of anything of a fight (or of a fighter) that is about to cross the edge of a gated arena (Ultron's field,
      * Apocalypse's wall) is stopped dead half a block inside it (D-T 4.5). When a flight ends, the boss may act again
      * ({@link BossGrip#landed}) and a boss or minion that ended outside its carry limit is brought back ({@link
-     * BossFights#bringBack}). Then the landing guard of whoever has landed is dropped ({@link #isSpared}).
+     * BossFights#bringBack}). Then the landing guard of whoever has landed is dropped ({@link #isSpared}), and a vanilla
+     * boss whose throw kept him still gets his own will back once the still is over ({@link BossGrip#tick}).
      */
     public static void tickFlights(MinecraftServer server) {
         Iterator<Map.Entry<UUID, Flight>> it = FLIGHTS.entrySet().iterator();
@@ -883,6 +875,7 @@ public final class Telekinesis {
             f.lastPos = pos;
         }
         tickSpared(server);
+        BossGrip.tick(server);
     }
 
     /**

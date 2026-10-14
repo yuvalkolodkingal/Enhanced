@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.ArenaLoans;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal;
 import net.minecraft.server.level.ServerLevel;
@@ -12,13 +13,15 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
 /**
  * The game-bus events of telekinesis in 3.1 (every form: Wanda, Billy, the Phoenix, Magneto), in a class of their own so
- * that they compose with the 3.0 chain of {@code CommonEvents} by priority (spec 5.6): the landing guard, and the saves of
- * the world that the journals of the arenas' loans and the notes of Ultron's islands wait for.
+ * that they compose with the 3.0 chain of {@code CommonEvents} by priority (spec 5.6): the landing guard, the saves of the
+ * world that the journals of the arenas' loans and the notes of Ultron's islands wait for, and the will a vanilla boss
+ * gets back if he was saved while a grip had taken it.
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class TelekinesisEvents {
@@ -51,6 +54,17 @@ public final class TelekinesisEvents {
         if (event.getLevel() instanceof ServerLevel level) {
             ArenaLoans.onSave(level);
             SokoviaJournal.onSave(level);
+        }
+    }
+
+    /**
+     * A vanilla boss saved while a grip had turned his {@code NoAI} on (a crash, a chunk unloaded under a throw) joins a
+     * level: the flag is never left saved, so it goes off with its mark ({@link BossGrip#onJoin}, R37).
+     */
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        if (!event.getLevel().isClientSide) {
+            BossGrip.onJoin(event.getEntity());
         }
     }
 

@@ -6,19 +6,24 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,6 +43,10 @@ import java.util.UUID;
  *     <li><b>Then nobody, for a while.</b> {@link #letGo} starts his regrip time when the grip ends, counted from when he
  *     can act again: a thrown boss is still for {@code boss.thrownStillTicks} of his flight ({@link #stills}), and his
  *     regrip time starts after it.</li>
+ *     <li><b>A vanilla boss has no fight</b> to keep him still, so the grip turns his own will off ({@code NoAI}) and gives
+ *     it back when he can act again (the let-go, or the end of a throw's still). The flag is never left saved: the mark
+ *     {@link #NO_AI_MARK} in his persistent data says the grip set it, and a body that joins a level with the mark (after
+ *     a crash, or a chunk unloaded under him) gets its will back ({@link #onJoin}).</li>
  * </ul>
  *
  * <p>Everything here is the server thread's, and forgotten when the server stops ({@link #clear}).
@@ -57,10 +66,18 @@ public final class BossGrip {
     /** The holder is told the boss is breaking free this many ticks before the limit (a limit over 30 only). */
     public static final int BREAKING_TICKS = 20;
 
+    /**
+     * The mark of a vanilla boss whose {@code NoAI} a grip turned on (R37), in his persistent data: it goes when his will
+     * is given back, and a body that joins a level with it gets its will back.
+     */
+    public static final String NO_AI_MARK = "enhanced:grip_no_ai";
+
     /** Boss UUID → the game time from which telekinesis may take hold of him again. */
     private static final Map<UUID, Long> REGRIP_UNTIL = new HashMap<>();
     /** Boss UUID → the game time until which a throw keeps him still. */
     private static final Map<UUID, Long> STILL_UNTIL = new HashMap<>();
+    /** Vanilla boss UUID → his level, while a throw's still keeps the will the grip took from him (see {@link #tick}). */
+    private static final Map<UUID, ResourceKey<Level>> WILL_TAKEN = new HashMap<>();
 
     // ------------------------------------------------------------------------------------------------------------
     // Who may take him
@@ -176,15 +193,40 @@ public final class BossGrip {
     }
 
     /**
-     * Telekinesis just took hold of {@code e}: it drops what it was doing ({@link BossHooks#onGripped}), and the holder of a
-     * boss reads that he is in the grip ({@link #GRABBED}).
+     * Telekinesis just took hold of {@code e}: it drops what it was doing ({@link BossHooks#onGripped}; a vanilla boss loses
+     * his own will until he can act again, {@link #takeWill}), and the holder of a boss reads that he is in the grip
+     * ({@link #GRABBED}).
      */
     public static void gripped(ServerPlayer holder, Entity e) {
         if (e instanceof BossHooks hooks) {
             hooks.onGripped(holder);
         }
+        if (isVanillaBoss(e) && e instanceof Mob mob) {
+            takeWill(mob);
+        }
         if (isBoss(e)) {
             holder.displayClientMessage(Component.translatable(GRABBED, e.getName()), true);
+        }
+    }
+
+    /**
+     * A vanilla boss in the grip does nothing (R37): his {@code NoAI} is turned on (the grip moves him with {@code
+     * move}, which needs no will) and {@link #NO_AI_MARK} says so. A body whose {@code NoAI} was already on is left as it
+     * is, unmarked, so that it keeps it after.
+     */
+    private static void takeWill(Mob mob) {
+        if (!mob.isNoAi()) {
+            mob.setNoAi(true);
+            mob.getPersistentData().putBoolean(NO_AI_MARK, true);
+        }
+    }
+
+    /** The will {@link #takeWill} took is given back: {@code NoAI} off and the mark gone. Nothing if the grip took none. */
+    private static void giveWillBack(Entity e) {
+        WILL_TAKEN.remove(e.getUUID());
+        if (e instanceof Mob mob && mob.getPersistentData().contains(NO_AI_MARK)) {
+            mob.getPersistentData().remove(NO_AI_MARK);
+            mob.setNoAi(false);
         }
     }
 
@@ -236,8 +278,9 @@ public final class BossGrip {
      * A grip on {@code e} ended: set down, slipped, lost, the holder gone, broke free ({@code brokeFree}), or thrown
      * ({@code thrown}). A boss's regrip time starts when he can act again (D-T 4.3): thrown, he is still for {@code
      * boss.thrownStillTicks} and nobody holds him for {@code boss.regripTicks} after that; otherwise nobody holds him for
-     * {@code boss.regripTicks} from now. A grip that ended without a throw tells the entity ({@link BossHooks#onLetGo}: the
-     * sword flies home).
+     * {@code boss.regripTicks} from now. A vanilla boss gets his will back when he can act again: now, or when the still
+     * of his throw is over ({@link #tick}, {@link #landed}). A grip that ended without a throw tells the entity ({@link
+     * BossHooks#onLetGo}: the sword flies home, a meteor or an orb fizzles out).
      */
     public static void letGo(ServerPlayer holder, Entity e, boolean thrown, boolean brokeFree) {
         long now = e.level().getGameTime();
@@ -251,6 +294,13 @@ public final class BossGrip {
                 STILL_UNTIL.remove(e.getUUID());
             }
             REGRIP_UNTIL.put(e.getUUID(), now + still + BossConfig.REGRIP_TICKS.get());
+            if (isVanillaBoss(e)) {
+                if (still > 0) {
+                    WILL_TAKEN.put(e.getUUID(), e.level().dimension());
+                } else {
+                    giveWillBack(e);
+                }
+            }
         }
         if (!thrown && e instanceof BossHooks hooks) {
             hooks.onLetGo(holder, brokeFree);
@@ -278,6 +328,9 @@ public final class BossGrip {
     /** The flight of a throw ended (it landed, slammed or was stopped): he may act again at once. */
     public static void landed(Entity e) {
         STILL_UNTIL.remove(e.getUUID());
+        if (WILL_TAKEN.containsKey(e.getUUID()) && !Telekinesis.isHeld(e)) {
+            giveWillBack(e);
+        }
     }
 
     /** {@code e} is dying (Thanos's long death): no still and no flight of a throw; nothing may pause it. */
@@ -286,10 +339,49 @@ public final class BossGrip {
         Telekinesis.forgetFlight(e);
     }
 
+    /**
+     * Once per server tick, at its end: a thrown vanilla boss whose still is over by the next tick (his flight goes on, on
+     * his own) gets his will back, so that he acts on the first tick he is not still. One that is gone from his level is
+     * forgotten: if he was unloaded, the mark gives his will back when he joins again.
+     */
+    public static void tick(MinecraftServer server) {
+        if (WILL_TAKEN.isEmpty()) {
+            return;
+        }
+        Iterator<Map.Entry<UUID, ResourceKey<Level>>> it = WILL_TAKEN.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<UUID, ResourceKey<Level>> entry = it.next();
+            ServerLevel level = server.getLevel(entry.getValue());
+            Entity e = level == null ? null : level.getEntity(entry.getKey());
+            if (e == null) {
+                it.remove();
+                continue;
+            }
+            Long until = STILL_UNTIL.get(e.getUUID());
+            if (!Telekinesis.isHeld(e) && (until == null || level.getGameTime() + 1 >= until)) {
+                it.remove();
+                giveWillBack(e);
+            }
+        }
+    }
+
+    /**
+     * An entity joins a level carrying {@link #NO_AI_MARK}: a vanilla boss saved while a grip had taken his will (a crash,
+     * a chunk unloaded under a throw). The flag is never left saved: {@code NoAI} goes off and the mark goes, unless a
+     * grip or a throw's still still has him.
+     */
+    public static void onJoin(Entity e) {
+        if (e instanceof Mob mob && mob.getPersistentData().contains(NO_AI_MARK) && !Telekinesis.isHeld(e)
+                && !WILL_TAKEN.containsKey(e.getUUID())) {
+            giveWillBack(mob);
+        }
+    }
+
     /** Forgets every boss's regrip and still: for the server's stop and for tests. */
     public static void clear() {
         REGRIP_UNTIL.clear();
         STILL_UNTIL.clear();
+        WILL_TAKEN.clear();
     }
 
     private BossGrip() {
