@@ -11,7 +11,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -87,16 +86,11 @@ public final class Limits implements RecipeLimits {
     }
 
     /**
-     * The cells of a level a spell may change: inside its build height and inside its world border (a cell whose
-     * corner lies inside, as {@link WorldBorder#isWithinBounds(BlockPos)} reads it).
+     * The cells of a level a spell may change: inside its build height and inside its world border, as the planner
+     * reads them ({@link SpellMath#world}).
      */
     public static BoundingBox world(Level level) {
-        WorldBorder border = level.getWorldBorder();
-        int minX = Mth.ceil(border.getMinX());
-        int minZ = Mth.ceil(border.getMinZ());
-        int maxX = Math.max(minX, Mth.ceil(border.getMaxX()) - 1);
-        int maxZ = Math.max(minZ, Mth.ceil(border.getMaxZ()) - 1);
-        return new BoundingBox(minX, level.getMinBuildHeight(), minZ, maxX, level.getMaxBuildHeight() - 1, maxZ);
+        return SpellMath.world(level);
     }
 
     /** The hero these numbers belong to: {@link Power#SCARLET_WITCH} or {@link Power#BILLY}. */

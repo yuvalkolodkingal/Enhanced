@@ -34,6 +34,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -631,6 +632,68 @@ public final class BuildMathTests {
                 "a Repeat with no count stops where worlds end: " + endless.bounds());
         Plan take = SpellPlanner.plan(new World(), recipe(Spell.COPY).op(SpellRecipe.Op.TAKE).box(two).build(), Setup.at(CASTER));
         check(!take.writes() && take.region() != null && take.refusal() == SpellPlanner.NONE, "a copy's first click writes nothing and reads its box");
+        helper.succeed();
+    }
+
+    /**
+     * A plan ends where the world ends (D-B 10.3 P2) and never loads a chunk to look (11.7): a dome standing on the top
+     * of the world counts and shows only its cells under the build height, the rest counted apart; a Repeat with no
+     * count stops at the top and at the bottom of the world, and one with no room plans nothing; the server's level
+     * knows its border. A Move's or a Repeat's source read live (a ghost's) reads no chunk that is not loaded, and
+     * leaves the far chunk unloaded; its size is the selected thing's cells, not its box's.
+     */
+    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    public static void aPlanEndsWhereTheWorldEnds(GameTestHelper helper) {
+        World world = new World();
+        int top = world.getMaxBuildHeight() - 1;
+        Plan dome = SpellPlanner.plan(world, recipe(Spell.SHAPE).style(ShapeKind.DOME).size(3).hollow(true).at(new BlockPos(0, top - 1, 0), Direction.UP).build(),
+                Setup.at(CASTER).withMaterial(STONE));
+        SpellPlanner.Count count = dome.count(world);
+        count.step(Integer.MAX_VALUE);
+        List<Cell> shown = cells(dome, world);
+        check(count.done() && count.walked() == 57 && count.outside() > 0 && count.changed() + count.outside() == 57 && count.unloaded() == 0,
+                "a dome on the top of the world: " + count.changed() + " of its 57 inside, " + count.outside() + " above");
+        check(shown.size() == count.changed() && shown.stream().allMatch(cell -> cell.pos().getY() == top), "the ghost shows only its base layer");
+
+        World pillar = new World().set(0, 64, 0, STONE).set(0, 65, 0, STONE);
+        BlockPos low = new BlockPos(0, 64, 0);
+        BlockPos high = new BlockPos(0, 65, 0);
+        Plan up = SpellPlanner.plan(pillar, recipe(Spell.REPEAT).box(low, high).at(BlockPos.ZERO, Direction.UP).size(Integer.MAX_VALUE).build(), Setup.at(CASTER));
+        check(up.bounds() != null && up.bounds().maxY() == top && up.size() == 254,
+                "a Repeat up with no count stops at the top of the world: " + up.bounds() + ", " + up.size());
+        Plan down = SpellPlanner.plan(pillar, recipe(Spell.REPEAT).box(low, high).at(BlockPos.ZERO, Direction.DOWN).size(Integer.MAX_VALUE).build(), Setup.at(CASTER));
+        check(down.bounds() != null && down.bounds().minY() == world.getMinBuildHeight() && down.size() == 128, "and down at its bottom: " + down.bounds());
+        World roof = new World().set(0, top - 1, 0, STONE).set(0, top, 0, STONE);
+        Plan none = SpellPlanner.plan(roof, recipe(Spell.REPEAT).box(new BlockPos(0, top - 1, 0), new BlockPos(0, top, 0)).at(BlockPos.ZERO, Direction.UP)
+                .size(3).build(), Setup.at(CASTER));
+        check(none.refusal() == SpellPlanner.NONE && !none.writes() && none.size() == 0, "a Repeat up from the top of the world has no room: nothing");
+
+        ServerLevel level = helper.getLevel();
+        BlockPos beyond = new BlockPos(30_000_000, 64, 0);
+        check(SpellMath.outside(level, beyond) && SpellMath.outside(level, new BlockPos(0, level.getMaxBuildHeight(), 0))
+                && !SpellMath.outside(level, helper.absolutePos(new BlockPos(5, 2, 5))), "the level's world ends at its border and its build height");
+        check(SpellMath.world(level).equals(Limits.world(level)) && !SpellMath.world(level).isInside(beyond), "one box of the world for both");
+
+        // A Move and a Repeat of a box in a chunk that is not loaded, as a ghost would plan them before CAPTURE.
+        BlockPos far = new BlockPos(1_000_000, 64, 1_000_000);
+        check(!level.hasChunkAt(far), "the far chunk is not loaded");
+        BoundingBox away = new BoundingBox(far.getX(), far.getY(), far.getZ(), far.getX() + 2, far.getY() + 2, far.getZ() + 2);
+        BlockPos here = helper.absolutePos(new BlockPos(10, 1, 10));
+        Plan move = SpellPlanner.plan(level, recipe(Spell.MOVE).op(SpellRecipe.Op.PUT_DOWN).box(away).at(here, Direction.UP).build(), Setup.at(here));
+        Plan row = SpellPlanner.plan(level, recipe(Spell.REPEAT).box(away).at(here, Direction.EAST).size(2).build(), Setup.at(here));
+        check(cells(move, level).isEmpty() && move.count(level).step(Integer.MAX_VALUE), "a Move from an unloaded chunk has nothing to put down");
+        row.count(level).step(Integer.MAX_VALUE);
+        check(!level.hasChunkAt(far) && !level.hasChunkAt(far.offset(16, 0, 0)), "and the far chunks are still not loaded");
+
+        // A selected thing of 3 cells in a box of 4: its Move is 3 cells, its Repeat 4 times 3.
+        World corner = new World().set(0, 64, 0, STONE).set(1, 64, 0, STONE).set(0, 64, 1, STONE);
+        LongSet thing = new LongOpenHashSet(new long[]{new BlockPos(0, 64, 0).asLong(), new BlockPos(1, 64, 0).asLong(), new BlockPos(0, 64, 1).asLong()});
+        Plan carried = SpellPlanner.plan(corner, recipe(Spell.MOVE).op(SpellRecipe.Op.PUT_DOWN).mask().at(new BlockPos(5, 63, 5), Direction.UP).build(),
+                Setup.at(CASTER).withMask(SpellMath.cells(thing)));
+        Plan repeated = SpellPlanner.plan(corner, recipe(Spell.REPEAT).mask().at(BlockPos.ZERO, Direction.UP).size(4).build(),
+                Setup.at(CASTER).withMask(SpellMath.cells(thing)));
+        check(carried.size() == 3 && cells(carried, corner).size() == 3, "a Move of the thing is its 3 cells, not its box of 4: " + carried.size());
+        check(repeated.size() == 12 && cells(repeated, corner).size() == 12, "4 copies of it are 12: " + repeated.size());
         helper.succeed();
     }
 

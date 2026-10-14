@@ -10,9 +10,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.BlockFamilies;
 import net.minecraft.data.BlockFamily;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -28,6 +30,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +66,7 @@ import java.util.function.Function;
  *     <li><b>The family rule</b> ({@link #swap}) of Change and Paint: oak stairs become spruce stairs.</li>
  *     <li><b>One cell's rules</b>: what vanishing leaves ({@link #vanished}), the material in water
  *     ({@link #placedInto}), what Change may touch ({@link #canChange}, {@link #touchesOpen}), the other half of a door
- *     or a bed ({@link #partner}).</li>
+ *     or a bed ({@link #partner}), where the world ends ({@link #world}, {@link #outside}).</li>
  *     <li><b>The Pull surface</b> ({@link PullSurface}): the face Pull &amp; Push works on, flooded a few cells at a
  *     time.</li>
  * </ul>
@@ -1307,6 +1310,33 @@ public final class SpellMath {
             }
         }
         return false;
+    }
+
+    /**
+     * The cells of a world a spell may change (D-B 10.3 P2): inside its build height and, for a level, inside its world
+     * border (a cell whose corner lies inside, as {@link WorldBorder#isWithinBounds(BlockPos)} reads it). A getter that
+     * is not a level ends where every world ends, {@link Level#MAX_LEVEL_SIZE} blocks from its middle.
+     */
+    public static BoundingBox world(BlockGetter level) {
+        int minY = level.getMinBuildHeight();
+        int maxY = level.getMaxBuildHeight() - 1;
+        if (!(level instanceof LevelReader reader)) {
+            return new BoundingBox(-Level.MAX_LEVEL_SIZE, minY, -Level.MAX_LEVEL_SIZE, Level.MAX_LEVEL_SIZE - 1, maxY, Level.MAX_LEVEL_SIZE - 1);
+        }
+        WorldBorder border = reader.getWorldBorder();
+        int minX = Mth.ceil(border.getMinX());
+        int minZ = Mth.ceil(border.getMinZ());
+        int maxX = Math.max(minX, Mth.ceil(border.getMaxX()) - 1);
+        int maxZ = Math.max(minZ, Mth.ceil(border.getMaxZ()) - 1);
+        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * Whether the cell is outside the build height or (for a level) the world border, where no spell ever writes
+     * (D-B 10.3 P2): above the top a level reads void air, which a count would otherwise take for a cell to fill.
+     */
+    public static boolean outside(BlockGetter level, BlockPos pos) {
+        return level.isOutsideBuildHeight(pos) || level instanceof LevelReader reader && !reader.getWorldBorder().isWithinBounds(pos);
     }
 
     /** Whether the cell's chunk can be read without loading it (any getter that is not a level always can). */

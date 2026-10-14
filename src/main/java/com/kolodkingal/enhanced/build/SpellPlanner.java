@@ -70,7 +70,6 @@ public final class SpellPlanner {
     public static final int LAYERED_MAX = 64;
     /** No refusal: the plan can be cast (what the world says about its cells is the rules'). */
     public static final int NONE = -1;
-    private static final long WORLD_WIDTH = 60_000_000L;
 
     // ------------------------------------------------------------------------------------------------------------
     // Inputs
@@ -126,11 +125,18 @@ public final class SpellPlanner {
         /**
          * The cells of {@code region} as they are in {@code level} now, read when asked (a client's ghost of a Move or
          * a Repeat): the box's air included, a mask's cells only, never a block magic does not touch
-         * ({@link SpellMath#untouchable}) or half of a door or a bed whose other half is outside. No data.
+         * ({@link SpellMath#untouchable}) or half of a door or a bed whose other half is outside, never a cell in a
+         * chunk that is not loaded (it is read as absent, and never loaded). No data. It is read while the cursor
+         * moves, so it is for ghosts: the server passes the pocket its job captured instead ({@link Setup#source}).
          */
         static Source live(BlockGetter level, Volume region) {
             BoundingBox box = region.bounds();
             return new Source() {
+                @Override
+                public long cells() {
+                    return region.count();
+                }
+
                 @Override
                 public int sizeX() {
                     return box.getXSpan();
@@ -155,6 +161,9 @@ public final class SpellPlanner {
                         return null;
                     }
                     BlockPos pos = new BlockPos(wx, wy, wz);
+                    if (!SpellMath.loaded(level, pos)) {
+                        return null;
+                    }
                     BlockState state = level.getBlockState(pos);
                     if (SpellMath.untouchable(state, level, pos)) {
                         return null;
@@ -439,10 +448,27 @@ public final class SpellPlanner {
         BoundingBox box = region.bounds();
         int gap = Math.max(0, recipe.size2());
         int length = direction.getAxis().choose(source.sizeX(), source.sizeY(), source.sizeZ());
-        // No world is wider than 60 million blocks: copies beyond that could never be built (and would overflow).
-        int count = (int) Math.max(1, Math.min(recipe.size(), WORLD_WIDTH / Math.max(1, length + gap)));
+        // The row stops where the world ends (its build height, its border): a copy beyond could never be built, and
+        // a Repeat with no count would otherwise plan millions of copies above the sky.
+        int count = (int) Math.min(Math.max(1, recipe.size()), copiesInside(SpellMath.world(level), box, direction, length, length + gap));
+        if (count < 1) {
+            return new Plan(recipe, NONE, null, region, null, Order.RISE, setup.caster);
+        }
         Repeated copies = new Repeated(source, new BlockPos(box.minX(), box.minY(), box.minZ()), direction, count, gap);
         return new Plan(recipe, NONE, copies, region, copies, Order.RISE, setup.caster);
+    }
+
+    /**
+     * How many copies of a Repeat ({@code length} long along {@code direction}, one every {@code step} blocks from the
+     * source {@code box}) reach into the {@code world} at all.
+     */
+    private static long copiesInside(BoundingBox world, BoundingBox box, Direction direction, int length, int step) {
+        Direction.Axis axis = direction.getAxis();
+        long from = axis.choose(box.minX(), box.minY(), box.minZ());
+        long room = direction.getAxisDirection() == Direction.AxisDirection.POSITIVE
+                ? axis.choose(world.maxX(), world.maxY(), world.maxZ()) - from
+                : from + length - 1 - axis.choose(world.minX(), world.minY(), world.minZ());
+        return room < 0 ? 0 : room / Math.max(1, step);
     }
 
     /** The block looked at for This kind, when it is in the region and not air; else null. */
@@ -600,8 +626,9 @@ public final class SpellPlanner {
 
         /**
          * How many cells it may write at most, before the world has its say (the size that decides the long hold,
-         * Wanda's ceiling and the job's pace): exact for a box, a shape, a surface, a selected thing; for a pocket the
-         * number of cells it has.
+         * Wanda's ceiling and the job's pace): exact for a box, a shape, a surface, a selected thing; for a stamp, a
+         * Move or a Repeat the cells its source has (a pocket's, or the box's or the selected thing's read live), times
+         * the copies. Cells beyond the build height or the world border are in it; a {@link Count} leaves them out.
          */
         public long size() {
             if (size < 0) {
@@ -671,8 +698,10 @@ public final class SpellPlanner {
         }
 
         /**
-         * Every cell it changes, resolved against {@code level} as the cursor reaches it (a cell the spell leaves alone
-         * is skipped; one that already holds its block is not). For a client's ghost, and for tests.
+         * Every cell it changes, resolved against {@code level} as the cursor reaches it: a cell the spell leaves alone
+         * is skipped, and so is one in a chunk that is not loaded (never read: a ghost leaves it out) or outside the
+         * build height or the world border (never written); one that already holds its block is not. For a client's
+         * ghost, and for tests.
          */
         public Iterator<Cell> walk(BlockGetter level) {
             Cursor cursor = cursor();
@@ -682,6 +711,9 @@ public final class SpellPlanner {
                 @Override
                 public boolean hasNext() {
                     while (next == null && cursor.next()) {
+                        if (!SpellMath.loaded(level, cursor.pos()) || SpellMath.outside(level, cursor.pos())) {
+                            continue;
+                        }
                         BlockState state = cursor.resolve(level);
                         if (state != null) {
                             next = new Cell(cursor.pos().immutable(), state, cursor.data(), cursor.from());
@@ -717,9 +749,10 @@ public final class SpellPlanner {
     }
 
     /**
-     * A walk over a plan's cells. {@link #next} moves to the next cell of its geometry and reads nothing;
-     * {@link #resolve} then reads the world and answers the block the cell gets. {@link #pos} is the cursor's own
-     * position, valid until the next move ({@code immutable()} to keep it).
+     * A walk over a plan's cells. {@link #next} moves to the next cell of its geometry and reads nothing (but for a
+     * Move's or a Repeat's source read live, {@link Source#live}, which reads loaded chunks only); {@link #resolve}
+     * then reads the world and answers the block the cell gets. {@link #pos} is the cursor's own position, valid until
+     * the next move ({@code immutable()} to keep it).
      */
     public static final class Cursor {
         private final Walk walk;
@@ -784,7 +817,8 @@ public final class SpellPlanner {
      * phase): the cells walked, those whose block changes (a cell that gets data counts as changed: the data is not
      * compared), those of them that remove or replace an existing block (not air, not replaceable: the short hold), and
      * those that make a volatile block ({@code enhanced:build_volatile}: Wanda's cap). A cell in a chunk the world has
-     * not loaded is skipped and counted apart.
+     * not loaded (D-B 10.3 P1), and then one outside the build height or the world border (P2), is skipped and counted
+     * apart: neither ever changes, so neither is paid for.
      */
     public static final class Count {
         private final Cursor cursor;
@@ -794,6 +828,7 @@ public final class SpellPlanner {
         private long removed;
         private long volatiles;
         private long unloaded;
+        private long outside;
         private boolean done;
 
         private Count(Cursor cursor, BlockGetter level) {
@@ -812,6 +847,10 @@ public final class SpellPlanner {
                 BlockPos pos = cursor.pos();
                 if (!SpellMath.loaded(level, pos)) {
                     unloaded++;
+                    continue;
+                }
+                if (SpellMath.outside(level, pos)) {
+                    outside++;
                     continue;
                 }
                 BlockState old = level.getBlockState(pos);
@@ -852,6 +891,11 @@ public final class SpellPlanner {
 
         public long unloaded() {
             return unloaded;
+        }
+
+        /** The cells outside the build height or the world border, which no spell writes. */
+        public long outside() {
+            return outside;
         }
     }
 
