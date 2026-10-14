@@ -827,6 +827,32 @@ public final class BuildGrammar {
                 new BlockPos(box.maxX(), box.maxY(), box.maxZ()), List.of(), anchor, face, size, size2, turn, flip, flags, material, seed, stroke);
     }
 
+    /**
+     * What the ghost shows now (D-B 6.2): the recipe the right button would cast ({@link #recipe}), or, while the
+     * rubber band of a Fill, a Vanish, a Change or a Repeat follows the aim, the same spell on the rubber band's box,
+     * so that its ghost grows with it ("the ghost of 35 stone blocks inside", D-B 1). The right button casts nothing
+     * until the box is fixed. Null when there is nothing to show.
+     */
+    public @Nullable SpellRecipe preview(int stroke) {
+        SpellRecipe now = recipe(stroke);
+        Aim at = aim;
+        BoundingBox band = rubberBand() ? box() : null;
+        if (now != null || band == null || at == null) {
+            return now;
+        }
+        return switch (spell) {
+            case FILL, VANISH, CHANGE, REPEAT -> {
+                BlockPos anchor = at.picked() != null ? at.picked() : at.target();
+                boolean row = spell == Spell.REPEAT;
+                int face = row ? Direction.getNearest(at.look().x, at.look().y, at.look().z).get3DDataValue() : SpellRecipe.NO_FACE;
+                yield new SpellRecipe(spell, SpellRecipe.Op.CAST, style(), SpellRecipe.BOX, new BlockPos(band.minX(), band.minY(), band.minZ()),
+                        new BlockPos(band.maxX(), band.maxY(), band.maxZ()), List.of(), anchor, face, row ? copies : 0, row ? gap : 0, 0,
+                        SpellRecipe.NO_FLIP, mix ? SpellRecipe.MIX : 0, material, seed, stroke);
+            }
+            default -> null;
+        };
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // Geometry
 

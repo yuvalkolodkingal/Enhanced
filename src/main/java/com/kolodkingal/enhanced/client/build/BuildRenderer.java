@@ -49,9 +49,9 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Build Magic in the world, as its builder sees it (D-B 3, 6.1, 6.2's marks) and as everyone near sees another
- * builder's box (D-B 7.1), drawn after the particles like {@code WorldEffectsRenderer} (identity pose, positions
- * relative to the camera):
+ * Build Magic in the world, as its builder sees it (D-B 3, 6.1, 6.2) and as everyone near sees another builder's box
+ * (D-B 7.1). The ghost ({@link Ghost}) is drawn after the world's translucent blocks, so it blends over water; the rest
+ * after the particles like {@code WorldEffectsRenderer} (identity pose, positions relative to the camera):
  *
  * <ul>
  *     <li><b>The aimed cell</b>: a thin outline in the hero's colour on the block under the crosshair (vanilla's own
@@ -67,6 +67,8 @@ import java.util.Optional;
  *     so a box inside a hill is never lost.</li>
  *     <li><b>A selected thing</b>: the glow on its open faces as the flood finds it ({@link SelectGlow}) and its
  *     bounding box dotted.</li>
+ *     <li><b>A brush's ghost</b>: Land's disc on the ground and Grow's sphere round the aimed block, as wide as the
+ *     brush (the others' ghosts are blocks).</li>
  *     <li><b>The label</b> over the top of the box (or of a shape's, a Pull's or a ghost's cells):
  *     {@code 7 × 4 × 5 · 140} (Billy's number is what it costs him, {@code 140 ✦}), a shape's radius, a Repeat's
  *     copies, a Pull's layers; {@code counting... 380,000} while the client still counts, {@code about} when some
@@ -173,7 +175,8 @@ public final class BuildRenderer {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+        boolean ghost = event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS;
+        if (!ghost && event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -186,6 +189,14 @@ public final class BuildRenderer {
         Vec3 camera = event.getCamera().getPosition();
         float time = level.getGameTime() + partialTick;
         boolean calm = EnhancedClientConfig.reducedMotion();
+        if (ghost) {
+            // The ghost, after the world's translucent blocks: it blends over water (D-B 11.10).
+            if (BuildClient.buildMode()) {
+                Look look = Look.of(Powers.power(player));
+                Ghost.draw(event, player, look.core(), look.glow(), time, calm);
+            }
+            return;
+        }
         Matrix4f pose = new Matrix4f();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
 
@@ -213,6 +224,7 @@ public final class BuildRenderer {
         // Glowing lines: the aimed cell, the box (or the thing's dotted box), its corners and arrow.
         VertexConsumer beams = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         aimedCell(g, look, pose, beams, camera);
+        brush(g, look, pose, beams, camera);
         if (box != null) {
             Frame frame = Frame.of(box, camera, INFLATE);
             edges(pose, beams, frame, EDGE * 1.6F, EnergyGeometry.argb(look.core(), 0.35F * pulse));
@@ -287,6 +299,7 @@ public final class BuildRenderer {
     /** Lets go of everything kept between frames (at logout). */
     static void clear() {
         SelectGlow.clear();
+        Ghost.clear();
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -332,6 +345,33 @@ public final class BuildRenderer {
         }
     }
 
+    /**
+     * The ghost of a brush that plans its pulses itself (D-B 4.1): Land's disc on the ground, Grow's sphere, round the
+     * aimed block, as wide as the brush.
+     */
+    private static void brush(BuildGrammar g, Look look, Matrix4f pose, VertexConsumer vc, Vec3 camera) {
+        BuildGrammar.Aim aim = BuildClient.aim();
+        if (aim == null || g.spell() != Spell.LAND && g.spell() != Spell.GROW) {
+            return;
+        }
+        BlockPos at = aim.cell() != null ? aim.cell() : aim.picked();
+        if (at == null) {
+            return;
+        }
+        float radius = g.brush() + 0.5F;
+        Vec3 centre = Vec3.atCenterOf(at).subtract(camera);
+        int argb = EnergyGeometry.argb(look.glow(), 0.8F);
+        float width = wide(centre, 0.05F);
+        if (g.spell() == Spell.LAND) {
+            EnergyGeometry.ring(pose, vc, centre.add(0, 0.52, 0), UP, radius, width, 48, argb);
+            EnergyGeometry.ring(pose, vc, centre.add(0, 0.52, 0), UP, 0.25F, width, 12, argb);
+        } else {
+            EnergyGeometry.ring(pose, vc, centre, UP, radius, width, 48, argb);
+            EnergyGeometry.ring(pose, vc, centre, new Vec3(1, 0, 0), radius, width, 48, argb);
+            EnergyGeometry.ring(pose, vc, centre, new Vec3(0, 0, 1), radius, width, 48, argb);
+        }
+    }
+
     /** The 12 edges of a box, each a camera-facing ribbon about {@code width} wide (wider far away). */
     private static void edges(Matrix4f pose, VertexConsumer vc, Frame frame, float width, int argb) {
         for (int[] edge : EDGES) {
@@ -354,7 +394,7 @@ public final class BuildRenderer {
     }
 
     /** A line from {@code a} to {@code b}, in pieces so that each end of each piece is wide enough for its distance. */
-    private static void line(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, int argb) {
+    static void line(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, int argb) {
         int pieces = Mth.clamp(Mth.ceil(a.distanceTo(b) / PIECE), 1, MAX_PIECES);
         Vec3 from = a;
         float fromWidth = wide(a, width);
@@ -547,6 +587,14 @@ public final class BuildRenderer {
     private static void quad(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, Vec3 c, Vec3 d, int argb) {
         for (Vec3 p : new Vec3[] {a, b, c, d}) {
             vc.addVertex(pose, (float) p.x, (float) p.y, (float) p.z).setColor(argb);
+        }
+    }
+
+    /** One face of the cube {@code size} wide whose low corner is {@code min} (camera space). */
+    static void cellFace(Matrix4f pose, VertexConsumer vc, Vec3 min, double size, Direction side, int argb) {
+        for (int i : FACES[side.ordinal()]) {
+            vc.addVertex(pose, (float) (min.x + ((i & 1) == 0 ? 0 : size)), (float) (min.y + ((i & 2) == 0 ? 0 : size)),
+                    (float) (min.z + ((i & 4) == 0 ? 0 : size))).setColor(argb);
         }
     }
 
@@ -749,14 +797,13 @@ public final class BuildRenderer {
             return Component.translatable("hud.enhanced.build.counting", number(count.walked()));
         }
         BuildVerdictPayload preflight = BuildClient.preflight();
-        boolean ready = preflight != null && (preflight.code() == BuildVerdictPayload.READY || preflight.code() == BuildVerdictPayload.READY_PARTLY);
-        long changed = ready ? preflight.changed() : count.changed();
+        long changed = BuildClient.changed();
         boolean about = count.unloaded() > 0 || preflight != null && (preflight.flags() & BuildVerdictPayload.UNLOADED) != 0;
         if (Powers.power(player) != Power.BILLY) {
             return about ? Component.translatable("hud.enhanced.build.about", number(changed)) : Component.literal(number(changed));
         }
         BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
-        int cost = preflight != null && preflight.cost() > 0 ? preflight.cost() : BillyMagic.cost(changed, data.momNear());
+        long cost = BuildClient.cost(data);
         MutableComponent paid = about ? Component.translatable("hud.enhanced.build.about", number(cost)) : Component.literal(number(cost));
         paid.append(" ✦");
         if (cost > BillyMagic.top(data)) {

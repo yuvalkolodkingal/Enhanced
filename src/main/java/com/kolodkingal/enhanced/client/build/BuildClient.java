@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.build;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildGrammar;
 import com.kolodkingal.enhanced.build.BuildGrammar.Aim;
@@ -23,6 +24,7 @@ import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -32,13 +34,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -73,7 +79,10 @@ import java.util.Set;
  * against this client's world, {@value #COUNT_PER_TICK} cells a tick, and decides the short hold (D-B 10.2): a spell
  * that removes or replaces more than {@code holdToConfirmBlocks} existing blocks, or whose count is not done yet, needs
  * the right button held {@code holdToConfirmTicks}; a plan over {@code hugeSpellBlocks}, or one the server answered
- * {@code HOLD} or {@code NO_UNDO_ROOM}, {@code hugeHoldTicks}.
+ * {@code HOLD} or {@code NO_UNDO_ROOM}, {@code hugeHoldTicks}. The material is read exactly as the server reads it
+ * (the mix of the blocks magic may make, the picked block, the hand's block placed at the recipe's anchor and face), so
+ * the count and the ghost ({@link Ghost}) are what the server will build; after a spell of his ends, the plan is made
+ * and counted again against the world it changed.
  *
  * <p>Only ever loaded on a client.
  */
@@ -112,6 +121,15 @@ public final class BuildClient {
     private static @Nullable SpellPlanner.Material material;
     private static @Nullable Object materialKey;
     private static @Nullable Object planKey;
+    /**
+     * What the ghost shows ({@link BuildGrammar#preview}: the recipe, or while nothing is ready, a rubber band's spell),
+     * and the key and the plan of a rubber band's spell (never counted: its label shows the rubber band's size).
+     */
+    private static @Nullable SpellRecipe preview;
+    private static @Nullable Object previewKey;
+    private static @Nullable SpellPlanner.Plan previewPlan;
+    /** How many of the builder's spells ended (done, undone, redone, stopped): plans are made again after each. */
+    private static int epoch;
 
     // The selected thing's flood (its picture, its bounds, the double click's "inside").
     private static @Nullable MagicSelect flood;
@@ -260,12 +278,15 @@ public final class BuildClient {
         }
         if (!buildMode() || mc.level == null) {
             sendView(0, BlockPos.ZERO, BlockPos.ZERO);
+            Ghost.clear();
             return;
         }
         update(player);
         BuildGrammar g = grammar();
         floodOn(mc.level, player, g);
         countOn(mc.level);
+        previewOn(mc.level);
+        Ghost.tick(mc.level, player);
         preflightWhenStill();
         BoundingBox shown = g.box() != null ? g.box() : g.maskBounds();
         if (shown != null) {
@@ -279,7 +300,7 @@ public final class BuildClient {
     }
 
     /**
-     * Brings the aim, the hero's numbers, the material and the recipe up to date: every tick, and at a click or a
+     * Brings the aim, the hero's numbers, the recipe and its material up to date: every tick, and at a click or a
      * scroll, which come between two ticks.
      */
     static void update(LocalPlayer player) {
@@ -292,15 +313,26 @@ public final class BuildClient {
         g.limits(now);
         aim = aimOf(player, now);
         g.aim(aim);
-        material = materialOf(player, aim, g);
         recipe = g.recipe(stroke);
-        Object key = recipe == null ? null : List.of(asPlanned(recipe), Objects.requireNonNullElse(materialKey, "none"), floodSeeds,
-                flood != null && flood.done(), pocket != null ? pocket.id() : 0);
+        preview = recipe != null ? recipe : g.preview(stroke);
+        material = materialOf(player, preview, aim, g);
+        Object key = recipe == null ? null : planKeyOf(recipe);
         if (!Objects.equals(key, planKey)) {
             planKey = key;
             plan = null;
             count = null;
         }
+        Object shown = recipe != null || preview == null ? null : planKeyOf(preview);
+        if (!Objects.equals(shown, previewKey)) {
+            previewKey = shown;
+            previewPlan = null;
+        }
+    }
+
+    /** What a plan of {@code r} is made of: when it changes, the plan, its count and its ghost are made again. */
+    private static Object planKeyOf(SpellRecipe r) {
+        return List.of(asPlanned(r), Objects.requireNonNullElse(materialKey, "none"), floodSeeds, flood != null && flood.done(),
+                pocket != null ? pocket.id() : 0, epoch);
     }
 
     /** Where the player looks, within the hero's reach: the aimed cell, its face, the picked block (D-B 3.1). */
@@ -315,50 +347,81 @@ public final class BuildClient {
         return new Aim(cell, cell != null ? hit.getDirection() : null, at, eyes, look);
     }
 
-    /** The cast's material as the server would read it: the hotbar's mix, the picked block, or the block in a hand. */
-    private static @Nullable SpellPlanner.Material materialOf(LocalPlayer player, Aim aim, BuildGrammar g) {
+    /**
+     * The cast's material exactly as the server reads it (D-B 5, C8), so that the ghost and the count are what the
+     * server builds: the hotbar's mix (of the blocks magic may make, each weighted by its stack), else the picked
+     * block, else the block in the main hand, else the off hand, each in the state it would be placed in at the
+     * recipe's anchor and face; a bucket makes its fluid.
+     */
+    private static @Nullable SpellPlanner.Material materialOf(LocalPlayer player, @Nullable SpellRecipe r, Aim aim, BuildGrammar g) {
         if (g.mix()) {
             List<ItemStack> hotbar = new ArrayList<>(9);
             for (int i = 0; i < 9; i++) {
                 hotbar.add(player.getInventory().getItem(i));
             }
-            SpellMath.Mix mix = SpellMath.Mix.ofHotbar(hotbar, stack -> placed(player, stack, aim));
+            SpellMath.Mix mix = SpellMath.Mix.ofHotbar(hotbar, stack -> {
+                BlockState state = placed(player, InteractionHand.MAIN_HAND, stack, r, aim);
+                return state != null && conjurable(state) ? state : null;
+            });
             materialKey = mix == null ? null : List.of(mix, g.seed());
             return mix == null ? null : SpellPlanner.Material.mix(mix, g.seed());
         }
-        BlockState state = g.material() == SpellRecipe.PICKED && picked != null ? picked : inHand(player, aim);
+        BlockState state = g.material() == SpellRecipe.PICKED ? picked : null;
+        if (state == null) {
+            state = placed(player, InteractionHand.MAIN_HAND, player.getMainHandItem(), r, aim);
+        }
+        if (state == null) {
+            state = placed(player, InteractionHand.OFF_HAND, player.getOffhandItem(), r, aim);
+        }
         materialKey = state;
         return state == null ? null : SpellPlanner.Material.of(state);
     }
 
-    /** The block in the main hand (else the off hand), in the state it would be placed in looking where he looks. */
-    private static @Nullable BlockState inHand(LocalPlayer player, Aim aim) {
-        for (InteractionHand hand : InteractionHand.values()) {
-            ItemStack stack = player.getItemInHand(hand);
-            if (stack.getItem() instanceof BlockItem) {
-                return placed(player, stack, aim);
-            }
+    /**
+     * The block an item makes as the server reads it (D-B 5.1, 5.5): a block item's block as a hand would place it at
+     * the recipe's anchor, clicking its face (else the top; with no recipe yet, where he looks), so stairs face away
+     * and logs follow the face's axis, its plain state when that cell or the one in front is not loaded; a bucket's
+     * fluid as its source block; null for anything else.
+     */
+    private static @Nullable BlockState placed(LocalPlayer player, InteractionHand hand, ItemStack stack, @Nullable SpellRecipe r, Aim aim) {
+        if (stack.isEmpty()) {
+            return null;
         }
-        return null;
-    }
-
-    /** A block item's block as a hand would place it here (D-B 5.1): stairs face away, logs follow the face's axis. */
-    private static @Nullable BlockState placed(LocalPlayer player, ItemStack stack, Aim aim) {
+        if (stack.getItem() instanceof BucketItem bucket && bucket.content != Fluids.EMPTY) {
+            return bucket.content.defaultFluidState().createLegacyBlock();
+        }
         if (!(stack.getItem() instanceof BlockItem item)) {
             return null;
         }
         Block block = item.getBlock();
-        BlockPos at = aim.target();
-        Vec3 look = aim.look();
-        Direction face = aim.face() != null ? aim.face() : Direction.getNearest(look.x, look.y, look.z).getOpposite();
+        BlockPos at = r != null ? r.anchor() : aim.target();
+        Direction face = r != null ? Objects.requireNonNullElse(r.direction(), Direction.UP) : Objects.requireNonNullElse(aim.face(), Direction.UP);
+        if (!SpellMath.loaded(player.level(), at) || !SpellMath.loaded(player.level(), at.relative(face))) {
+            return block.defaultBlockState();
+        }
         try {
-            BlockState state = block.getStateForPlacement(new BlockPlaceContext(player, InteractionHand.MAIN_HAND, stack,
-                    new BlockHitResult(Vec3.atCenterOf(at), face, at, false)));
+            BlockState state = block.getStateForPlacement(new BlockPlaceContext(player, hand, stack, new BlockHitResult(Vec3.atCenterOf(at), face, at,
+                    false)));
             return state != null ? state : block.defaultBlockState();
         } catch (RuntimeException odd) {
             // A block whose placement wants more than a look at a cell: its plain state.
             return block.defaultBlockState();
         }
+    }
+
+    /**
+     * Whether magic may make the block, as the server checks a material (C8): not air, not a block magic never makes
+     * or never touches, not a block of two cells, and TNT, lava or fire only for a hero who may make them. A mix takes
+     * only these, as the server's does.
+     */
+    private static boolean conjurable(BlockState state) {
+        if (state.isAir() || state.is(ModTags.BUILD_UNCONJURABLE) || SpellMath.untouchable(state, EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
+            return false;
+        }
+        if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) || state.hasProperty(BlockStateProperties.BED_PART)) {
+            return false;
+        }
+        return limits == null || limits.volatileAllowed() || !state.is(ModTags.BUILD_VOLATILE);
     }
 
     /** The selected thing's flood, {@value #FLOOD_PER_TICK} reads a tick; refused, it is let go and he is told why. */
@@ -408,12 +471,7 @@ public final class BuildClient {
             if (recipe.region() == SpellRecipe.MASK && (flood == null || flood.mask() == null)) {
                 return;
             }
-            SpellPlanner.Setup setup = SpellPlanner.Setup.at(BlockPos.containing(aim.eyes()))
-                    .withMask(flood != null ? flood.mask() : null)
-                    .withMaterial(material)
-                    .withSource(recipe.op() == SpellRecipe.Op.STAMP ? pocket : null)
-                    .withSurface(limits.magicSelect(), limits.sideLimit());
-            plan = SpellPlanner.plan(level, recipe.clamped(limits), setup);
+            plan = SpellPlanner.plan(level, recipe.clamped(limits), setup(recipe, BlockPos.containing(aim.eyes())));
         }
         if (!plan.prepared()) {
             plan.prepare(COUNT_PER_TICK);
@@ -425,6 +483,26 @@ public final class BuildClient {
         if (!count.done()) {
             count.step(COUNT_PER_TICK);
         }
+    }
+
+    /** The plan of the rubber band's spell, for its ghost: made once for each change, never counted. */
+    private static void previewOn(ClientLevel level) {
+        if (previewKey != null && previewPlan == null && preview != null && limits != null && aim != null) {
+            previewPlan = SpellPlanner.plan(level, preview.clamped(limits), setup(preview, BlockPos.containing(aim.eyes())));
+        }
+    }
+
+    /**
+     * What a plan of {@code r} needs besides the recipe, as the server gives it (its job's caster and ticket window
+     * change only the order of the cells): the selected thing, the material, the pocket for a stamp, and the hero's
+     * cap and side for a Pull's surface. {@code caster}: where the work order starts.
+     */
+    static SpellPlanner.Setup setup(SpellRecipe r, BlockPos caster) {
+        SpellPlanner.Setup setup = SpellPlanner.Setup.at(caster)
+                .withMask(flood != null ? flood.mask() : null)
+                .withMaterial(material)
+                .withSource(r.op() == SpellRecipe.Op.STAMP ? pocket : null);
+        return limits == null ? setup : setup.withSurface(limits.magicSelect(), limits.sideLimit());
     }
 
     /**
@@ -816,6 +894,10 @@ public final class BuildClient {
         lastVerdict = payload;
         lastVerdictTick = ticks;
         SpellRecipe.Op op = PENDING.remove(payload.token());
+        if (changesTheWorld(payload.code())) {
+            // The world under the box is not what the plan was counted against: count it and draw its ghost again.
+            epoch++;
+        }
         if (!BuildVerdictPayload.isRefusal(payload.code())) {
             return;
         }
@@ -826,6 +908,15 @@ public final class BuildClient {
         if (mode && (code == BuildVerdictPayload.OFF || code == BuildVerdictPayload.OPERATORS || code == BuildVerdictPayload.ADVENTURE)) {
             leaveMode();
         }
+    }
+
+    /** Whether a verdict says blocks changed: a spell done, undone, redone or stopped part way. */
+    private static boolean changesTheWorld(int code) {
+        return switch (code) {
+            case BuildVerdictPayload.DONE, BuildVerdictPayload.DONE_PARTLY, BuildVerdictPayload.UNDONE, BuildVerdictPayload.UNDONE_PARTLY,
+                 BuildVerdictPayload.REDONE, BuildVerdictPayload.STOPPED, BuildVerdictPayload.STOPPED_FIGHT -> true;
+            default -> false;
+        };
     }
 
     /** One part of the copy in the pocket: the parts are gathered and, once all are here, the copy is kept. */
@@ -867,9 +958,81 @@ public final class BuildClient {
         return count;
     }
 
+    /**
+     * How many blocks the current plan changes: the server's preflight once it answered {@code READY} or
+     * {@code READY_PARTLY}, else the client's own count; -1 while the count is not done (or nothing is planned).
+     */
+    public static long changed() {
+        if (count == null || !count.done()) {
+            return -1;
+        }
+        BuildVerdictPayload server = preflight();
+        boolean ready = server != null && (server.code() == BuildVerdictPayload.READY || server.code() == BuildVerdictPayload.READY_PARTLY);
+        return ready ? server.changed() : count.changed();
+    }
+
+    /** What the current plan costs Billy: the preflight's cost when it named one, else his price for its blocks. */
+    public static long cost(BuildData data) {
+        long changed = changed();
+        if (changed < 0) {
+            return -1;
+        }
+        BuildVerdictPayload server = preflight();
+        return server != null && server.cost() > 0 ? server.cost() : BillyMagic.cost(changed, data.momNear());
+    }
+
+    /**
+     * Whether the ghost is grey (D-B 6.2, 6.3, 8.4): the server refused the plan as it stands (not for something that
+     * passes by itself: a hold to give, a meter refilling, a spell still at work, a full queue, a busy server), or it
+     * costs Billy more than his whole meter ("never: make it smaller").
+     */
+    public static boolean refused(LocalPlayer player) {
+        BuildVerdictPayload server = preflight();
+        if (server != null && BuildVerdictPayload.isRefusal(server.code())) {
+            switch (server.code()) {
+                case BuildVerdictPayload.HOLD, BuildVerdictPayload.NO_UNDO_ROOM, BuildVerdictPayload.REFILLING, BuildVerdictPayload.WAIT,
+                     BuildVerdictPayload.QUEUE_FULL, BuildVerdictPayload.SERVER_BUSY -> {
+                }
+                default -> {
+                    return true;
+                }
+            }
+        }
+        if (limits == null || !limits.limited()) {
+            return false;
+        }
+        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        return cost(data) > BillyMagic.top(data);
+    }
+
     /** The current plan (null when nothing is ready, or a selected thing is still flooding). */
     public static @Nullable SpellPlanner.Plan plan() {
         return plan;
+    }
+
+    /** What the ghost shows: the recipe ready to cast, or the rubber band's spell ({@link BuildGrammar#preview}). */
+    static @Nullable SpellRecipe ghostRecipe() {
+        return preview;
+    }
+
+    /** The plan of {@link #ghostRecipe} (null while it is not made, or a selected thing is still flooding). */
+    static @Nullable SpellPlanner.Plan ghostPlan() {
+        return recipe != null ? plan : previewPlan;
+    }
+
+    /** What {@link #ghostPlan} is made of: equal keys, equal plans (in a world that did not change meanwhile). */
+    static @Nullable Object ghostKey() {
+        return recipe != null ? planKey : previewKey;
+    }
+
+    /** What the material is made of (a block, or a mix and its seed), to see when it changes. */
+    static @Nullable Object materialKey() {
+        return materialKey;
+    }
+
+    /** How many of the builder's spells ended: it changes when the world under them did. */
+    static int epoch() {
+        return epoch;
     }
 
     /** The material of the current plan (null with none in hand). */
@@ -918,6 +1081,10 @@ public final class BuildClient {
         plan = null;
         count = null;
         planKey = null;
+        preview = null;
+        previewKey = null;
+        previewPlan = null;
+        Ghost.clear();
         stillKey = null;
         preflightKey = null;
         preflight = null;
