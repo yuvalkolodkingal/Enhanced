@@ -88,6 +88,7 @@ public final class BuildInput {
         }
         BuildClient.tick(mc, player);
         BuildHud.tick(player);
+        BuildFx.tick(mc, mc.level);
         boolean usable = mc.screen == null && !player.isSpectator() && BuildClient.isBuilder(Powers.power(player));
         if (!usable) {
             magicHeld = 0;

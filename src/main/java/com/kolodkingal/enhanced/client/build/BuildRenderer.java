@@ -146,7 +146,7 @@ public final class BuildRenderer {
     }
 
     /** A box in camera space, already drawn a little outside its blocks. */
-    private record Frame(Vec3 min, Vec3 max) {
+    record Frame(Vec3 min, Vec3 max) {
         static Frame of(BoundingBox box, Vec3 camera, double inflate) {
             return new Frame(new Vec3(box.minX() - inflate - camera.x, box.minY() - inflate - camera.y, box.minZ() - inflate - camera.z),
                     new Vec3(box.maxX() + 1 + inflate - camera.x, box.maxY() + 1 + inflate - camera.y, box.maxZ() + 1 + inflate - camera.z));
@@ -205,6 +205,8 @@ public final class BuildRenderer {
             others(level, player, pose, beams, camera);
             buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
         }
+        // The spells at work near here, theirs and everyone's, and the builders' own sparks (D-B 7.1, 7.2).
+        BuildFx.render(mc, level, pose, buffers, camera, partialTick, time, calm);
         if (!BuildClient.buildMode()) {
             SelectGlow.clear();
             return;
@@ -373,7 +375,7 @@ public final class BuildRenderer {
     }
 
     /** The 12 edges of a box, each a camera-facing ribbon about {@code width} wide (wider far away). */
-    private static void edges(Matrix4f pose, VertexConsumer vc, Frame frame, float width, int argb) {
+    static void edges(Matrix4f pose, VertexConsumer vc, Frame frame, float width, int argb) {
         for (int[] edge : EDGES) {
             line(pose, vc, frame.corner(edge[0]), frame.corner(edge[1]), width, argb);
         }
