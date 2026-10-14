@@ -26,6 +26,7 @@ import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -85,6 +86,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntPredicate;
@@ -2125,6 +2127,7 @@ public final class BossGripTests {
     @GameTest(template = ARENA, batch = "boss_grip_void", timeoutTicks = 40)
     public static void thanosNeverFallsOutOfTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
         ServerPlayer starter = ThanosMoveSupport.fighter(f, -7.0, 0.0);
         ThanosEntity thanos = ThanosBossTests.boss(f, starter);
         ThanosFight fight = (ThanosFight) BossFights.fightOf(thanos);
@@ -2141,6 +2144,69 @@ public final class BossGripTests {
             check(!BossGrip.stills(thanos), "and nothing keeps him still");
             helper.succeed();
         });
+    }
+
+    /**
+     * Review r2 (spec 16, D-T 4.5, 6.2.1): Thanos is never left 24 blocks under his centre, and his step back puts him where
+     * it is never needed again. He is called on a hill top 44 blocks over the floor (all of it above the test's barrier
+     * ceiling). Moved down onto the open floor of a valley 27 blocks under his centre, with nothing over it, he steps back
+     * at the next tick of his fight, once (a portal at each end), onto his landing (that column has no ground over his
+     * carry floor), and stays there: no portal on the 20 ticks after. Moved into a cave 27 blocks under his centre, with
+     * the hill's rock over him where the look for ground begins, he steps onto his landing too, never into the rock.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_valley", timeoutTicks = 80)
+    public static void thanosFarDownAValleyStepsBackOnce(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        ServerLevel level = f.level();
+        List<BlockPos> placed = new ArrayList<>();
+        f.onClose(() -> placed.forEach(pos -> level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS)));
+        stone(helper, placed, new BlockPos(9, 45, 9), new BlockPos(11, 45, 11)); // the hill top: he stands at y 46
+        stone(helper, placed, new BlockPos(2, 18, 2), new BlockPos(4, 18, 4)); // the valley's floor, 27 under it
+        stone(helper, placed, new BlockPos(16, 18, 16), new BlockPos(18, 18, 18)); // the cave's floor
+        stone(helper, placed, new BlockPos(16, 48, 16), new BlockPos(18, 54, 18)); // its roof, through the centre + 6
+        ServerPlayer starter = ThanosMoveSupport.fighter(f, -7.0, 0.0);
+        ThanosFight fight = ThanosFight.spawnAt(level, helper.absoluteVec(new Vec3(10.5, 46.0, 10.5)), starter);
+        ThanosEntity thanos = fight.boss();
+        check(thanos != null, "the fight made him");
+        thanos.forceArrived();
+        thanos.setPassive(true);
+        Vec3 landing = fight.landing();
+        float health = thanos.getHealth();
+        int[] seen = {0};
+        f.everyTick(70, tick -> {
+            seen[0] += portals(starter);
+            Vec3 at = thanos.position();
+            if (tick == 1 || tick == 31) {
+                check(at.distanceTo(landing) < 0.05, "tick " + tick + ": he stands on the hill top: " + at);
+                check(tick == 1 || seen[0] == 2, "no portal on the ticks after his step back: " + seen[0]);
+                seen[0] = 0;
+                thanos.moveTo(helper.absoluteVec(tick == 1 ? new Vec3(3.5, 19.0, 3.5) : new Vec3(17.5, 19.0, 17.5)));
+                check(thanos.getY() < fight.arena().center().y - 24.0, "he is more than 24 blocks under his centre");
+                return false;
+            }
+            if (tick >= 4) {
+                String from = tick < 31 ? "the valley" : "the cave";
+                check(at.distanceTo(landing) < 0.05, "tick " + tick + ": he stepped back from " + from + " onto his landing and stays: " + at);
+                check(seen[0] == 2, "tick " + tick + ": once from " + from + ", a portal at each end: " + seen[0] + " portals");
+                check(level.noCollision(thanos, thanos.getBoundingBox()), "he is not inside a block");
+                check(thanos.isAlive() && thanos.getHealth() == health, "and unhurt");
+            }
+            return tick == 54;
+        });
+    }
+
+    /** Stone in every cell from {@code from} to {@code to} (relative), noted in {@code placed} to be taken away at the end. */
+    private static void stone(GameTestHelper helper, List<BlockPos> placed, BlockPos from, BlockPos to) {
+        for (BlockPos pos : BlockPos.betweenClosed(from, to)) {
+            helper.setBlock(pos, Blocks.STONE);
+            placed.add(helper.absolutePos(pos));
+        }
+    }
+
+    /** How many of Thanos's portals the server has sent {@code player} since the last look. */
+    private static int portals(ServerPlayer player) {
+        return (int) ThanosSummonTests.fxKinds(TestKit.sentPackets(player)).stream().filter(kind -> kind == ThanosFxPayload.PORTAL).count();
     }
 
     /**

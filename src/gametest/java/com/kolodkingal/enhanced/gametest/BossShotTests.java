@@ -78,6 +78,7 @@ public final class BossShotTests {
      */
     @GameTest(template = ARENA, batch = "boss_shot_tags")
     public static void bossTagsAreSplit(GameTestHelper helper) {
+        TestKit.fixture(helper).onClose(Telekinesis::clear);
         for (EntityType<?> type : List.of(ModEntities.ULTRON.get(), ModEntities.THANOS.get(), ModEntities.APOCALYPSE.get(),
                 ModEntities.THANOS_SWORD.get(), ModEntities.THANOS_METEOR.get(), ModEntities.THANOS_ORB.get())) {
             check(type.is(ModTags.PULL_IMMUNE), EntityType.getKey(type) + " is in pull_immune: the villains' pulls pass it by");
@@ -116,6 +117,7 @@ public final class BossShotTests {
      */
     @GameTest(template = ARENA, batch = "boss_shot_hold")
     public static void magnetoHoldsTheSwordLonger(GameTestHelper helper) {
+        TestKit.fixture(helper).onClose(Telekinesis::clear);
         ThanosSwordEntity sword = ModEntities.THANOS_SWORD.get().create(helper.getLevel());
         check(sword != null && Metal.isMagnetic(sword), "the Double-Edged Sword is metal to Magneto");
         check(BossGrip.holdLimit(sword, Telekinesis.Mode.BILLY) == 40 && BossGrip.holdLimit(sword, Telekinesis.Mode.JEAN) == 40,

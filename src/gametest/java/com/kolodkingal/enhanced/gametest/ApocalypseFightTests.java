@@ -456,11 +456,13 @@ public final class ApocalypseFightTests {
      * The blow that takes him to 15 percent earns him the Escape whatever second of the game it lands in: his healing (once
      * a second, after four quiet seconds) must not mend him past the line in the same tick first. A blow of something that
      * is not a player does not count as a hit for the rest, so the healing is due at once; the scenario is run in a row of
-     * ticks, which meets every moment of that second.
+     * ticks, which meets every moment of that second. (Since 3.1 his health never heals by default: the test gives him 3.0's
+     * healing back, or there would be nothing to come first.)
      */
     @GameTest(template = ARENA, batch = "apocalypse_escape_heal", timeoutTicks = 400)
     public static void theBlowThatEarnsTheEscapeStartsItEvenWhenHealingIsDue(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
+        d.f().config(ApocalypseBossConfig.TRUE_FORM_REGEN_PER_SECOND, 3.0); // 3.0's healing: since 3.1 his health never heals
         noCrits(d.f()); // the Escape, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
