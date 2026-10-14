@@ -23,8 +23,9 @@ import java.util.UUID;
  * (with the middle button, or on the palette page), the token buckets that bound what her client may send (C6:
  * {@code maxRequestsPerSecond} for every build payload, 4 preflights and 20 dabs a second), the Paint stroke she is
  * painting ({@link Stroke}), her pocket on its way to her client, how many spells she has cast since she logged in (the
- * first five say how many blocks), and the lines she is to be told at her next login ("While you were away, your spell
- * finished").
+ * first five say how many blocks), the lines she is to be told at her next login ("While you were away, your spell
+ * finished"), when "Mom is near" was last said to Billy, and what Billy's spells that ended while he was away owe his
+ * meter and his practice (settled at his next login, {@link #owe}).
  *
  * <p>One per player, by UUID; it is not saved. It outlives a logout (so a spell that finishes while she is away can
  * leave her its line), and {@link #clear} forgets them all (the server's stop, the end of a test).
@@ -61,6 +62,8 @@ public final class BuildSession {
     private long droppedLoggedAt = Long.MIN_VALUE / 2;
     private long momSaidAt = Long.MIN_VALUE / 2;
     private final List<Component> atLogin = new ArrayList<>();
+    private long owedMeter;
+    private long owedPractice;
 
     private BuildSession(UUID player) {
         this.player = player;
@@ -267,6 +270,30 @@ public final class BuildSession {
     }
 
     /**
+     * Billy's spell ended (or was paid for) while he was away: at his next login his meter pays {@code meter} more
+     * blocks of magic (less than 0: gets them back) and his practice grows by {@code practice} (less than 0: is taken
+     * back).
+     */
+    public void owe(long meter, long practice) {
+        owedMeter += meter;
+        owedPractice += practice;
+    }
+
+    /**
+     * What his meter owes since he left (less than 0: what it gets back) and the practice he learned (less than 0:
+     * lost), or null when nothing is owed; forgotten as it is taken.
+     */
+    public long @Nullable [] takeOwed() {
+        if (owedMeter == 0 && owedPractice == 0) {
+            return null;
+        }
+        long[] owed = {owedMeter, owedPractice};
+        owedMeter = 0;
+        owedPractice = 0;
+        return owed;
+    }
+
+    /**
      * A Paint stroke being painted (D-B 11.8): the right button's press sends its first dab, every tick the brush moves
      * another, and its release {@code STROKE_END}. Each dab is a small job of its own (the same rules, the same
      * budget), but they all write into this one step, so the whole stroke from press to release is one undo step; it is
@@ -289,6 +316,8 @@ public final class BuildSession {
         final boolean mom;
         final int momId;
         @Nullable Volume mask;
+        /** What its sealing says instead of the done line (a dab ran out of material), or null. */
+        @Nullable Component said;
         int fxId;
         int token;
         long lastDab;

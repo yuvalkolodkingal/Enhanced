@@ -21,7 +21,9 @@ import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
@@ -30,7 +32,11 @@ import net.minecraft.world.level.block.entity.CampfireBlockEntity;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -57,7 +63,8 @@ import java.util.function.Supplier;
  *     the cast) and P2 (the build height, the border) and P3 (nothing to change) are the job's; then P4 beyond magic,
  *     P5 the area rule of the mass edits ({@link BlockRights#massEditRefuses}: arenas, the hidden ground under the
  *     island, a stranger's Hex), P6 bodies that may not be lifted (C2: a creature Mjolnir pins is one), P7 containers
- *     that hold things, P8 the vanilla rights, P9 the section probe and P10 the claims, per cell.</li>
+ *     that hold things, P8 the vanilla rights, P9 the section probe and P10 the claims, per cell; P11 the items a
+ *     spell is paid with ({@link #paysMaterials}, {@link #itemOf}, {@link #itemsIn}).</li>
  *     <li><b>The preflight</b> (D-B 10.1, {@link #preflight}): the rules that ask nobody, on the cells of a plan (or a
  *     sample of a big one), in at most 2 ms, posting no event.</li>
  * </ul>
@@ -336,6 +343,111 @@ public final class BuildRules {
                 }
             }
         }
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Materials (P11, D-B 5.6)
+
+    /**
+     * Whether {@code player} pays for the blocks his spells make with items from his inventory
+     * ({@code build_magic.requireMaterials}): in Survival, while he is here (null: away); Creative never pays.
+     */
+    public static boolean paysMaterials(@Nullable ServerPlayer player) {
+        return player != null && BuildConfig.REQUIRE_MATERIALS.get() && !player.isCreative() && !player.isSpectator();
+    }
+
+    /**
+     * The item a block is paid with, and given back as when it vanishes: the block itself as an item ({@code asItem});
+     * null for a block with none (air, a fluid, fire), which magic makes and takes away for nothing.
+     */
+    public static @Nullable Item itemOf(BlockState state) {
+        Item item = state.getBlock().asItem();
+        return item == Items.AIR ? null : item;
+    }
+
+    /**
+     * How many of its {@link #itemOf item} a cell holding {@code state} is worth: 1; 2 for a double slab; as many as
+     * it holds of candles, sea pickles, turtle eggs, petals or snow layers; 0 for the upper half of a door or a tall
+     * plant and the head of a bed (the other half is the item), and for a block with no item.
+     */
+    public static int itemsIn(BlockState state) {
+        if (itemOf(state) == null) {
+            return 0;
+        }
+        if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+            return state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER ? 0 : 1;
+        }
+        if (state.hasProperty(BlockStateProperties.BED_PART)) {
+            return state.getValue(BlockStateProperties.BED_PART) == BedPart.HEAD ? 0 : 1;
+        }
+        if (state.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+            return state.getValue(BlockStateProperties.SLAB_TYPE) == SlabType.DOUBLE ? 2 : 1;
+        }
+        for (IntegerProperty many : List.of(BlockStateProperties.CANDLES, BlockStateProperties.PICKLES, BlockStateProperties.EGGS,
+                BlockStateProperties.FLOWER_AMOUNT, BlockStateProperties.LAYERS)) {
+            if (state.hasProperty(many)) {
+                return state.getValue(many);
+            }
+        }
+        return 1;
+    }
+
+    /**
+     * How many plain {@code item}s the player carries in his main inventory (the hotbar and the 27 slots): a stack with
+     * data of its own (a filled shulker box, a name, an enchantment) is never used.
+     */
+    public static int plainCount(Player player, Item item) {
+        int count = 0;
+        for (ItemStack stack : player.getInventory().items) {
+            if (plain(stack, item)) {
+                count += stack.getCount();
+            }
+        }
+        return count;
+    }
+
+    /** Takes {@code count} plain {@code item}s from his main inventory; false, and nothing taken, when he has fewer. */
+    public static boolean takePlain(Player player, Item item, int count) {
+        if (count <= 0) {
+            return true;
+        }
+        if (plainCount(player, item) < count) {
+            return false;
+        }
+        int left = count;
+        for (ItemStack stack : player.getInventory().items) {
+            if (left > 0 && plain(stack, item)) {
+                int taken = Math.min(left, stack.getCount());
+                stack.shrink(taken);
+                left -= taken;
+            }
+        }
+        player.getInventory().setChanged();
+        return true;
+    }
+
+    /** Gives {@code count} {@code item}s to his inventory; what does not fit drops at his feet. */
+    public static void give(Player player, Item item, int count) {
+        int left = count;
+        while (left > 0) {
+            int n = Math.min(left, item.getDefaultMaxStackSize());
+            player.getInventory().placeItemBackInInventory(new ItemStack(item, n));
+            left -= n;
+        }
+    }
+
+    private static boolean plain(ItemStack stack, Item item) {
+        return !stack.isEmpty() && stack.is(item) && stack.isComponentsPatchEmpty();
+    }
+
+    /** "You need %1$s more %2$s" ({@code MATERIALS}). */
+    public static Component needMore(int missing, Item item) {
+        return Component.translatable("message.enhanced.build.materials", missing, item.getDescription());
+    }
+
+    /** "No more %1$s: %2$s blocks were not placed" (P11: the items ran out while the spell worked). */
+    public static Component outOf(Item item, long notPlaced) {
+        return Component.translatable("message.enhanced.build.out_of", item.getDescription(), notPlaced);
     }
 
     // ------------------------------------------------------------------------------------------------------------

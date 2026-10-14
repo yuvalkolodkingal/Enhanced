@@ -1004,11 +1004,13 @@ public final class SpellPlanner {
      * compared), those of them that remove or replace an existing block (not air, not replaceable: the short hold), and
      * those that make a volatile block ({@code enhanced:build_volatile}: Wanda's cap). A cell in a chunk the world has
      * not loaded (D-B 10.3 P1), and then one outside the build height or the world border (P2), is skipped and counted
-     * apart: neither ever changes, so neither is paid for.
+     * apart: neither ever changes, so neither is paid for. A {@link Tally} hears of every cell that changes (the items
+     * a spell needs with {@code requireMaterials}).
      */
     public static final class Count {
         private final Cursor cursor;
         private final BlockGetter level;
+        private @Nullable Tally tally;
         private long walked;
         private long changed;
         private long removed;
@@ -1051,8 +1053,17 @@ public final class SpellPlanner {
                 if (now.is(ModTags.BUILD_VOLATILE)) {
                     volatiles++;
                 }
+                if (tally != null) {
+                    tally.cell(old, now);
+                }
             }
             return done;
+        }
+
+        /** Tells {@code tally} of every cell found changing from now on; returns this count. */
+        public Count tally(@Nullable Tally tally) {
+            this.tally = tally;
+            return this;
         }
 
         public boolean done() {
@@ -1082,6 +1093,12 @@ public final class SpellPlanner {
         /** The cells outside the build height or the world border, which no spell writes. */
         public long outside() {
             return outside;
+        }
+
+        /** What a {@link Count} tells of each cell it finds changing: what is there, and what the spell puts there. */
+        @FunctionalInterface
+        public interface Tally {
+            void cell(BlockState old, BlockState now);
         }
     }
 

@@ -28,7 +28,8 @@ import java.util.Optional;
  *     {@code LevelTickEvent.Post} runs its jobs, inside the level tick (D-B 11.7); {@code ServerTickEvent.Post} seals
  *     the Paint strokes whose last dab was 40 ticks ago and sends each builder's pocket on to her client.</li>
  *     <li><b>Logout, death, respawn</b>: build mode goes off; the spells go on (with a fake player of the caster's
- *     profile while he is away, D-B 11.9); at the next login, what finished or stopped while he was away is said.</li>
+ *     profile while he is away, D-B 11.9); at the next login, what finished or stopped while he was away is said, and
+ *     what Billy's spells owe his meter (or it them) is settled.</li>
  *     <li><b>A change of dimension</b>: build mode stays on, the box is forgotten; the spells go on in their own
  *     dimension (their tickets hold it); the pocket travels.</li>
  *     <li><b>Into Adventure or Spectator</b>: build mode goes off; the working spell stops at its next slice (its own
@@ -67,6 +68,7 @@ public final class BuildEvents {
             for (Component line : session.takeLoginLines()) {
                 player.displayClientMessage(line, false);
             }
+            BuildMagic.settleOwed(player);
             BuildMagic.sync(player.server, player.getUUID());
         }
     }

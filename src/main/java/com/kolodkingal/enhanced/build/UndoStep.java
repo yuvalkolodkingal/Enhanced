@@ -32,13 +32,13 @@ import java.util.UUID;
  * spell is one step (a Paint stroke from press to release, a Repeat row, a Move with both its ends).
  *
  * <p>It holds the spell, its dimension, the box of the cells it wrote, the game time, Billy's cost and practice and
- * whether Mom helped, a {@link State}, and for every 16 x 16 x 16 section it touched, in the order it touched them: the
- * cells it changed (in the order it changed them), the old and new state of each (as ids of
- * {@code Block.BLOCK_STATE_REGISTRY}), the old and new block-entity data of the cells that have it, and a 64-bit hash
- * of each new block entity's data as it stood once written. Then the settle pass's side effects (a neighbour outside
- * the spell that changed because of it: a torch that dropped off a vanished wall), and the frames and paintings a Move
- * carried (where each hung before and after). In memory only, for now; the history on disk ({@code UndoFiles}) writes
- * the same sections ahead of the cells (C13).
+ * whether Mom helped, whether its blocks were paid with items ({@code requireMaterials}), a {@link State}, and for
+ * every 16 x 16 x 16 section it touched, in the order it touched them: the cells it changed (in the order it changed
+ * them), the old and new state of each (as ids of {@code Block.BLOCK_STATE_REGISTRY}), the old and new block-entity
+ * data of the cells that have it, and a 64-bit hash of each new block entity's data as it stood once written. Then the
+ * settle pass's side effects (a neighbour outside the spell that changed because of it: a torch that dropped off a
+ * vanished wall), and the frames and paintings a Move carried (where each hung before and after). In memory only, for
+ * now; the history on disk ({@code UndoFiles}) writes the same sections ahead of the cells (C13).
  *
  * <p>Each recorded cell has a status: still as the spell left it ({@link #APPLIED}), put back by an undo
  * ({@link #UNDONE}), or dropped because someone changed it since ({@link #DROPPED}, D-B 12.3: undo never destroys anyone's
@@ -75,6 +75,7 @@ public final class UndoStep {
     private int cost;
     private long practice;
     private boolean mom;
+    private boolean paid;
 
     private final Long2ObjectLinkedOpenHashMap<Section> sections = new Long2ObjectLinkedOpenHashMap<>();
     private final List<SideEffect> sideEffects = new ArrayList<>();
@@ -84,6 +85,7 @@ public final class UndoStep {
     private final Long2ObjectOpenHashMap<List<Carried>> carriedAfter = new Long2ObjectOpenHashMap<>();
     private long cells;
     private long applied;
+    private long undone;
     private int minX = Integer.MAX_VALUE;
     private int minY = Integer.MAX_VALUE;
     private int minZ = Integer.MAX_VALUE;
@@ -154,6 +156,18 @@ public final class UndoStep {
         this.mom = mom;
     }
 
+    /**
+     * Whether its blocks were paid with items from its builder's inventory ({@code build_magic.requireMaterials}, D-B
+     * 5.6): its undo gives the placed blocks back and takes the vanished ones back, and its redo pays again.
+     */
+    public boolean paid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
     /** How many cells it changed. */
     public long changed() {
         return cells;
@@ -162,6 +176,11 @@ public final class UndoStep {
     /** How many of them still hold what it put there ({@link #APPLIED}). */
     public long applied() {
         return applied;
+    }
+
+    /** How many of them an undo put back ({@link #UNDONE}): what a redo would do again, and what Billy pays for it. */
+    public long undone() {
+        return undone;
     }
 
     /** The box of every cell it changed, or null when it changed none. */
@@ -208,6 +227,9 @@ public final class UndoStep {
             maxY = Math.max(maxY, pos.getY());
             maxZ = Math.max(maxZ, pos.getZ());
         } else if (section.status[at] != APPLIED) {
+            if (section.status[at] == UNDONE) {
+                undone--;
+            }
             section.status[at] = APPLIED;
             applied++;
         }
@@ -368,6 +390,11 @@ public final class UndoStep {
                 applied--;
             } else if (status == APPLIED) {
                 applied++;
+            }
+            if (was == UNDONE) {
+                undone--;
+            } else if (status == UNDONE) {
+                undone++;
             }
             section.status[at] = status;
         }

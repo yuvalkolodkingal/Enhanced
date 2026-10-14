@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2BooleanOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,6 +40,8 @@ import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.HangingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.GameType;
@@ -78,19 +81,27 @@ import java.util.function.BiPredicate;
  *     <li><b>PREPARE</b>: a Pull's surface.</li>
  *     <li><b>CAPTURE</b>: a Copy's take reads the box into its builder's pocket (and ends); a Move or a Repeat reads its
  *     source into a pocket of its own, so overlapping cells come out exact and a Move knows what changed under it.</li>
- *     <li><b>COUNT</b> (Billy, and a Scarlet Witch's spell that makes TNT, lava or fire): the cells that will really
- *     change are counted before any block does; Billy's cost is reserved here, or the spell ends with {@code TOO_BIG} or
- *     {@code REFILLING}, and too many volatile blocks end hers with {@code VOLATILE_CAP}.</li>
- *     <li><b>APPLY</b>: the cells in the planner's work order, each through the rules (P1 to P10) and written as D-B 11.5
- *     says ({@link #write}); a Move moves each cell in one step, compare-and-swap (C12).</li>
+ *     <li><b>COUNT</b> (Billy, a spell paid with items, and a Scarlet Witch's spell that makes TNT, lava or fire):
+ *     the cells that will really change are counted before any block does; Billy's cost is reserved here, or the
+ *     spell ends with {@code TOO_BIG} or {@code REFILLING} (or {@code VOLATILE} for a copy of TNT, lava or fire), too
+ *     many volatile blocks end hers with {@code VOLATILE_CAP}, and too few items in the inventory with
+ *     {@code MATERIALS}.</li>
+ *     <li><b>APPLY</b>: the cells in the planner's work order, each through the rules (P1 to P11) and written as D-B
+ *     11.5 says ({@link #write}); a Move moves each cell in one step, compare-and-swap (C12). With
+ *     {@code requireMaterials} a conjured cell takes its item from the caster's inventory and gives him the block it
+ *     replaced (D-B 5.6); when the items run out, the spell stops there.</li>
  *     <li><b>SETTLE</b>: fences join, torches behave, redstone and water react, once ({@link #settle}).</li>
  *     <li><b>DONE</b>: the step is sealed into the history, Billy's unused reservation refunded and his practice
- *     booked, the verdict and the summary line said.</li>
+ *     booked (at his next login if he is away), the verdict and the summary line said.</li>
  * </ol>
  *
  * <p><b>An undo</b> walks its step's cells from the last to the first and puts back the old state of every cell that
  * still holds exactly what the spell put there (D-B 12.3), then the side effects; <b>a redo</b> walks forwards and puts
  * the new state back where the old one still is. Both go through the same rules (P3 replaced by that check) and settle.
+ * An undo gives Billy back the cost of what it restores and takes its practice back; a redo was paid for when it was
+ * asked for, and gives back what it could not do. A step paid with items trades them again: an undo takes the blocks it
+ * puts back from the inventory (one it no longer holds stays away, "you no longer have them") and gives the placed ones
+ * back; a redo the other way round.
  *
  * <p><b>Chunks</b> (P1): only those of the plan that were loaded when it was cast ({@link #chunks}, D-B 11.7); a cell of
  * any other is left and counted, and nothing is ever generated. The job holds region tickets of
@@ -226,6 +237,19 @@ public final class BuildJob {
     private int cost;
     private boolean mom;
     private int momId = BuildFxPayload.NO_MOM;
+    /** The caster as he was at the cast: his meter and game mode are read from him while he is away (D-B 8.1). */
+    private final ServerPlayer castBy;
+    /** Whether its blocks are paid with items from its caster's inventory (P11, D-B 5.6). */
+    private boolean paying;
+    /** What the spell needs, by item, as its count finds it (P11), in the order it needs them. */
+    private @Nullable Object2IntLinkedOpenHashMap<Item> needs;
+    /** The cells the count found paid with items, and how many of them were paid so far. */
+    private long payCells;
+    private long paidCells;
+    /** The item that ran out while it worked (P11): it stopped there. */
+    private @Nullable Item outOf;
+    /** The cells an undo could not put back: their block is no longer in its builder's inventory (D-B 12.3). */
+    private long notReturned;
     private @Nullable AABB bodyBox;
     private int lowX;
     private int lowY;
@@ -258,6 +282,7 @@ public final class BuildJob {
         this.loaded = loaded;
         this.chunks = chunks;
         this.stroke = stroke;
+        this.castBy = actor;
         this.rules = stroke != null ? stroke.rules : new BuildRules.Cells(level, actor);
         int configured = BuildConfig.MAX_TICKET_CHUNKS.get();
         this.window = Math.max(1, configured);
@@ -357,7 +382,18 @@ public final class BuildJob {
         phase = Phase.APPLY;
         walk = step.walk(kind == Kind.UNDO);
         volume = Math.max(1, step.changed());
+        paying = step.paid() && BuildRules.paysMaterials(online());
         return this;
+    }
+
+    /**
+     * A redo of Billy's: what he paid for it when he asked ({@code price}, the cost of the cells it would do again,
+     * halved when {@code mom} helps), settled when it ends.
+     */
+    public void reserved(int price, @Nullable net.minecraft.world.entity.player.Player mom) {
+        this.cost = price;
+        this.mom = mom != null;
+        this.momId = mom != null ? mom.getId() : BuildFxPayload.NO_MOM;
     }
 
     /**
@@ -451,6 +487,16 @@ public final class BuildJob {
     /** The Paint stroke it is a dab of, or null. */
     public BuildSession.@Nullable Stroke stroke() {
         return stroke;
+    }
+
+    /** Whether a Scarlet Witch helps this spell of Billy's (D-B 8.3: it costs him half). */
+    public boolean mom() {
+        return mom;
+    }
+
+    /** What it costs (or cost) Billy: reserved at its count, what it did not use given back at its end. */
+    public int cost() {
+        return cost;
     }
 
     public boolean finished() {
@@ -595,7 +641,7 @@ public final class BuildJob {
         }
         step.setState(UndoStep.State.DONE);
         UndoHistory.of(caster).push(step, limits.undoSteps());
-        bookBilly(player);
+        bookBilly();
         return replay(player, limits, level, step, false, true, loaded);
     }
 
@@ -613,6 +659,7 @@ public final class BuildJob {
         endCode = BuildVerdictPayload.STOPPED;
         if (stroke != null) {
             // A dab: what it painted stays in its stroke, which is sealed now.
+            settleDab();
             stroke.closing = true;
             dabEnded();
             return;
@@ -625,6 +672,14 @@ public final class BuildJob {
             }
         } else if (kind == Kind.UNDO && step.applied() > 0 && step.applied() < step.changed()) {
             step.setState(UndoStep.State.PARTLY);
+        }
+        // Billy pays for what it did, and no more (his reservation, a redo's too).
+        if (kind == Kind.SPELL) {
+            bookBilly();
+        } else if (kind == Kind.REDO) {
+            billRedo();
+        } else {
+            refundUndo();
         }
     }
 
@@ -875,13 +930,35 @@ public final class BuildJob {
         return true;
     }
 
-    /** COUNT when the spell needs it (Billy's cost, Wanda's volatile blocks), else straight to APPLY. */
+    /**
+     * COUNT when the spell needs it (Billy's cost, the items of a spell paid with them, Wanda's volatile blocks), else
+     * straight to APPLY. A spell pays with items ({@code requireMaterials}, P11) when it conjures its blocks (all but a
+     * Move) and its caster is in Survival; one who has gone away pays with what he left behind: nothing.
+     */
     private void startCount() {
-        if (limits.limited() || (limits.volatilePerSpell() > 0 && makesVolatile())) {
+        ServerPlayer online = online();
+        paying = recipe.spell() != Spell.MOVE && BuildRules.paysMaterials(online != null ? online : castBy);
+        if (paying) {
+            step.setPaid(true);
+        }
+        if (limits.limited() || paying || (limits.volatilePerSpell() > 0 && makesVolatile())) {
             count = plan.count(level);
+            if (paying) {
+                needs = new Object2IntLinkedOpenHashMap<>();
+                count.tally(this::tally);
+            }
             phase = Phase.COUNT;
         } else {
             startApply();
+        }
+    }
+
+    /** A cell the count found changing, in a spell paid with items: what its new block needs. */
+    private void tally(BlockState old, BlockState now) {
+        int n = BuildRules.itemsIn(now);
+        if (n > 0) {
+            needs.addTo(BuildRules.itemOf(now), n);
+            payCells++;
         }
     }
 
@@ -902,25 +979,46 @@ public final class BuildJob {
             return false;
         }
         long volatiles = count.volatiles();
-        if (!limits.limited() && volatiles > limits.volatilePerSpell()) {
-            refuse(BuildVerdictPayload.VOLATILE_CAP, volatiles, Component.translatable("message.enhanced.build.volatile_cap", volatiles,
-                    limits.volatilePerSpell()));
+        if (volatiles > 0 && !limits.volatileAllowed() && recipe.spell() != Spell.MOVE) {
+            // Billy's copy or row of TNT, lava or fire: never made by his magic (C8, D-B 8.4).
+            refuse(BuildVerdictPayload.VOLATILE, 0, 0, 0, BillyMagic.tooDangerous());
             return false;
         }
-        if (limits.limited() && count.changed() > 0) {
-            ServerPlayer online = online();
-            BuildData data = online != null ? online.getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA) : null;
-            if (data != null) {
-                long time = level.getServer().overworld().getGameTime();
-                int price = BillyMagic.cost(count.changed(), mom);
-                int verdict = BillyMagic.verdict(data, time, price);
-                if (verdict != SpellPlanner.NONE) {
-                    refuse(verdict, verdict == BuildVerdictPayload.REFILLING ? BillyMagic.secondsToPay(data, time, price) : price,
-                            BillyMagic.cannotPay(data, time, price));
+        if (!limits.limited() && volatiles > limits.volatilePerSpell()) {
+            // "Too much TNT, lava or fire in one spell: 27 of 10" (C13): how many it makes, and her cap.
+            refuse(BuildVerdictPayload.VOLATILE_CAP, volatiles, 0, limits.volatilePerSpell(), Component.translatable(
+                    "message.enhanced.build.volatile_cap", volatiles, limits.volatilePerSpell()));
+            return false;
+        }
+        ServerPlayer online = online();
+        if (paying) {
+            // Whole or nothing (D-B 5.6): "You need 2 more Stone", the first item short in the spell's own order.
+            for (var need : needs.object2IntEntrySet()) {
+                int have = online == null ? 0 : BuildRules.plainCount(online, need.getKey());
+                if (have < need.getIntValue()) {
+                    refuse(BuildVerdictPayload.MATERIALS, need.getIntValue(), 0, need.getIntValue() - have,
+                            BuildRules.needMore(need.getIntValue() - have, need.getKey()));
                     return false;
                 }
-                cost = price;
+            }
+            needs = null;
+        }
+        if (limits.limited() && count.changed() > 0) {
+            // Billy's cost (C13), reserved now; he gets back at the end what was left unchanged. One who has gone away
+            // is asked with the meter he left with, and pays at his next login.
+            BuildData data = (online != null ? online : castBy).getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
+            long time = level.getServer().overworld().getGameTime();
+            int price = BillyMagic.cost(count.changed(), mom);
+            int verdict = BillyMagic.verdict(data, time, price);
+            if (verdict != SpellPlanner.NONE) {
+                refuse(verdict, count.changed(), price, BuildMagic.cannotPayExtra(data, time, price, verdict), BillyMagic.cannotPay(data, time, price));
+                return false;
+            }
+            cost = price;
+            if (online != null) {
                 online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, BillyMagic.pay(data, time, price));
+            } else {
+                BuildSession.of(caster).owe(price, 0);
             }
         }
         count = null;
@@ -1038,6 +1136,9 @@ public final class BuildJob {
                 slice.use(WRITE);
             } else {
                 slice.use(SKIP);
+                if (outOf != null) {
+                    stop(BuildVerdictPayload.DONE_PARTLY); // (P11: the items ran out, the spell stops here)
+                }
             }
         }
     }
@@ -1098,8 +1199,10 @@ public final class BuildJob {
     }
 
     /**
-     * The rules (P4 to P10) and the write of one cell of a spell; false when a rule left it. A block of two cells
-     * whose other half is outside the spell is never cut in half: that half is written in the same step.
+     * The rules (P4 to P11) and the write of one cell of a spell; false when a rule left it. A block of two cells
+     * whose other half is outside the spell is never cut in half: that half is written in the same step. A spell paid
+     * with items takes the cell's from its caster's inventory before the claims are asked (P11: when none is left the
+     * spell stops here), and gives him the blocks it replaced.
      */
     private boolean writeChecked(BlockPos pos, BlockState old, BlockState now, @Nullable CompoundTag data, boolean conjured) {
         Left why = rules.check(pos, old, now, conjured, false);
@@ -1112,7 +1215,16 @@ public final class BuildJob {
         if (partner == Partner.REFUSED) {
             return false;
         }
+        if (paying && !pay(now, partner != null ? partner.now : null)) {
+            return false;
+        }
         if (!rules.claims(pos, old, now)) {
+            if (paying) {
+                giveItems(pos, now); // (not placed: its items go back)
+                if (partner != null) {
+                    giveItems(partner.pos, partner.now);
+                }
+            }
             rules.left(Left.PROTECTED);
             return false;
         }
@@ -1120,8 +1232,67 @@ public final class BuildJob {
             partner.write(this);
         }
         write(pos, old, now, data, spill);
+        if (paying) {
+            giveItems(pos, old);
+            if (partner != null) {
+                giveItems(partner.pos, partner.old);
+            }
+        }
         changed++;
         return true;
+    }
+
+    // ---- Materials (P11, D-B 5.6) ----
+
+    /**
+     * P11: the items the cell's new block (and the other half of its block) is made of, taken from the caster's
+     * inventory. False, with nothing taken, when he has too few (or has gone away): the spell stops here.
+     */
+    private boolean pay(BlockState now, @Nullable BlockState partnerNow) {
+        if (!takeItems(now)) {
+            return false;
+        }
+        if (partnerNow != null && !takeItems(partnerNow)) {
+            giveItems(BlockPos.containing(eyes), now);
+            return false;
+        }
+        if (BuildRules.itemsIn(now) > 0) {
+            paidCells++;
+        }
+        return true;
+    }
+
+    /** Takes what {@code state} is made of from the caster's inventory; false, the item noted as run out, if he lacks it. */
+    private boolean takeItems(BlockState state) {
+        int n = BuildRules.itemsIn(state);
+        if (n == 0) {
+            return true;
+        }
+        Item item = BuildRules.itemOf(state);
+        ServerPlayer online = online();
+        if (online != null && BuildRules.takePlain(online, item, n)) {
+            return true;
+        }
+        outOf = item;
+        return false;
+    }
+
+    /**
+     * Gives the caster what {@code state} is made of (a block his spell vanished or changed away, D-B 5.6): into his
+     * inventory, or at his feet when it is full; dropped at {@code pos} while he is away.
+     */
+    private void giveItems(BlockPos pos, BlockState state) {
+        int n = BuildRules.itemsIn(state);
+        if (n == 0) {
+            return;
+        }
+        Item item = BuildRules.itemOf(state);
+        ServerPlayer online = online();
+        if (online != null) {
+            BuildRules.give(online, item, n);
+        } else {
+            Block.popResource(level, pos, new ItemStack(item, n));
+        }
     }
 
     /** The other half of a two-cell block a cell holds, when the spell does not cover it: what happens to it. */
@@ -1801,8 +1972,25 @@ public final class BuildJob {
                 continue;
             }
             BlockPos at = pos.immutable();
+            if (paying && !takeItems(target)) {
+                if (undo) {
+                    // The block it would put back is no longer in his inventory: the cell stays as the spell left it.
+                    outOf = null;
+                    walk.setStatus(UndoStep.DROPPED);
+                    notReturned++;
+                    slice.use(SKIP);
+                    continue;
+                }
+                // A redo whose items ran out stops here (P11).
+                phase = Phase.SIDE_EFFECTS;
+                sideIndex = 0;
+                return true;
+            }
             if (here.hasBlockEntity()) {
                 Clearable.tryClear(level.getBlockEntity(at));
+            }
+            if (paying) {
+                giveItems(at, here);
             }
             long hash = place(at, target, data);
             if (!undo) {
@@ -2003,7 +2191,7 @@ public final class BuildJob {
                 online.displayClientMessage(BillyMagic.forgotten(), true);
             }
         }
-        bookBilly(online);
+        bookBilly();
         long left = rules.leftInAll() - rules.count(Left.CHANGED);
         int code;
         if (stopCode >= 0) {
@@ -2019,17 +2207,22 @@ public final class BuildJob {
         if (box != null && stopCode < 0) {
             BuildSounds.done(level, box.getCenter().getCenter());
         }
-        tellDone(online, caster, limits, token, code, this.changed, cost, rules);
+        tellDone(online, caster, limits, token, code, this.changed, cost, rules, outOf != null ? ranOut() : null);
         BuildMagic.sync(level.getServer(), caster);
+    }
+
+    /** "No more Stone: 3 blocks were not placed": the items ran out (P11) and the cells paid with them not yet done. */
+    private Component ranOut() {
+        return BuildRules.outOf(outOf, Math.max(0L, payCells - paidCells));
     }
 
     /**
      * What the builder is told when a spell (or a stroke) is done: the verdict with its counts, and one line, the most
-     * important first (it stopped; nothing changed; what was left; else the done line of her first five spells); a
-     * builder who is away hears at her next login that it finished.
+     * important first ({@code said}, when not null: the items ran out; it stopped; nothing changed; what was left; else
+     * the done line of her first five spells); a builder who is away hears at her next login that it finished.
      */
     private static void tellDone(@Nullable ServerPlayer online, UUID caster, Limits limits, int token, int code, long changedCells, int cost,
-                                 BuildRules.Cells rules) {
+                                 BuildRules.Cells rules, @Nullable Component said) {
         int count = (int) Math.min(Integer.MAX_VALUE, changedCells);
         if (online == null) {
             if (changedCells > 0) {
@@ -2038,7 +2231,7 @@ public final class BuildJob {
             return;
         }
         send(online, new BuildVerdictPayload(token, code, count, cost, 0, rules.flags()));
-        Component line = switch (code) {
+        Component line = said != null ? said : switch (code) {
             case BuildVerdictPayload.STOPPED_FIGHT -> Component.translatable("message.enhanced.build.stopped_fight", count);
             case BuildVerdictPayload.STOPPED -> Component.translatable("message.enhanced.build.stopped_mode");
             case BuildVerdictPayload.NOTHING_CHANGES -> Component.translatable("message.enhanced.build.nothing_changes");
@@ -2065,20 +2258,25 @@ public final class BuildJob {
      */
     private void finishDab() {
         endCode = changed > 0 ? BuildVerdictPayload.DONE : BuildVerdictPayload.NOTHING_CHANGES;
-        ServerPlayer online = online();
-        int used = BillyMagic.cost(changed, mom);
-        if (limits.limited() && online != null && cost > used) {
-            long time = level.getServer().overworld().getGameTime();
-            online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA,
-                    BillyMagic.refund(online.getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA), time, cost - used));
+        settleDab();
+        if (outOf != null) {
+            stroke.said = ranOut(); // (its items ran out: the stroke says so when it is sealed)
         }
-        stroke.cost += Math.min(cost, used);
-        stroke.changed += changed;
         if (stopCode >= 0) {
-            stroke.closing = true; // (a fight began over it, or its painter may no longer build: the stroke ends here)
+            stroke.closing = true; // (a fight began over it, its painter may no longer build, the items ran out: it ends here)
         }
         dabEnded();
         BuildMagic.sync(level.getServer(), caster);
+    }
+
+    /** What a dab painted joins its stroke; what Billy reserved for it and it did not use comes back. */
+    private void settleDab() {
+        int used = BillyMagic.cost(changed, mom);
+        if (limits.limited() && cost > used) {
+            BuildMagic.billy(level.getServer(), caster, cost - used, 0, -1);
+        }
+        stroke.cost += Math.min(cost, used);
+        stroke.changed += changed;
     }
 
     /**
@@ -2117,16 +2315,8 @@ public final class BuildJob {
                 online.displayClientMessage(BillyMagic.forgotten(), true);
             }
         }
-        if (stroke.limits.limited() && online != null) {
-            long time = server.overworld().getGameTime();
-            BuildData data = online.getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
-            BillyMagic.Practiced practiced = BillyMagic.practise(data, time, stroke.changed);
-            data = BillyMagic.pauseAfter(practiced.data(), time, stroke.limits.castPause());
-            online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, data);
-            if (practiced.rankedUp()) {
-                online.displayClientMessage(BillyMagic.rankUp(data.rank()), false);
-                BuildSounds.rankUp(online);
-            }
+        if (stroke.limits.limited()) {
+            BuildMagic.billy(server, stroke.caster, 0, stroke.changed, stroke.limits.castPause());
         }
         BuildRules.Cells rules = stroke.rules;
         long left = rules.leftInAll() - rules.count(Left.CHANGED);
@@ -2138,30 +2328,49 @@ public final class BuildJob {
                     1000, (int) Math.min(Integer.MAX_VALUE, stroke.changed), stroke.momId, BuildFxPayload.RISE);
             BuildSounds.done(stroke.level, box.getCenter().getCenter());
         }
-        tellDone(online, stroke.caster, stroke.limits, stroke.token, code, stroke.changed, stroke.cost, rules);
+        tellDone(online, stroke.caster, stroke.limits, stroke.token, code, stroke.changed, stroke.cost, rules, stroke.said);
         BuildMagic.sync(server, stroke.caster);
     }
 
-    /** Billy's reservation is settled at the end: what was not used comes back, the practice is booked (D-B 8.1, 8.2). */
-    private void bookBilly(@Nullable ServerPlayer online) {
-        if (!limits.limited() || online == null) {
+    /**
+     * Billy's reservation is settled at the end: what was not used comes back, the practice is booked and his pause
+     * begins (D-B 8.1, 8.2), at once or at his next login.
+     */
+    private void bookBilly() {
+        if (!limits.limited()) {
             return;
         }
-        long time = level.getServer().overworld().getGameTime();
-        BuildData data = online.getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
         int used = BillyMagic.cost(changed, mom);
-        if (cost > used) {
-            data = BillyMagic.refund(data, time, cost - used);
-        }
+        int back = Math.max(0, cost - used);
         cost = Math.min(cost, used);
         step.setBilly(cost, changed, mom);
-        BillyMagic.Practiced practiced = BillyMagic.practise(data, time, changed);
-        data = BillyMagic.pauseAfter(practiced.data(), time, limits.castPause());
-        online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, data);
-        if (practiced.rankedUp()) {
-            online.displayClientMessage(BillyMagic.rankUp(data.rank()), false);
-            BuildSounds.rankUp(online);
+        BuildMagic.billy(level.getServer(), caster, back, changed, limits.castPause());
+    }
+
+    /**
+     * An undo gives Billy back the cost of every cell it restored ({@code cost x restored / changed}, rounded down) and
+     * takes their practice back; his rank stays (D-B 12.3).
+     */
+    private void refundUndo() {
+        if ((step.cost() > 0 || step.practice() > 0) && step.changed() > 0 && changed > 0) {
+            long back = step.cost() * changed / step.changed();
+            BuildMagic.billy(level.getServer(), caster, back, -changed, -1);
         }
+    }
+
+    /**
+     * A redo of Billy's: he paid for it when he asked; what it could not do again comes back, and what it did teaches
+     * him again (D-B 12.2). The step now remembers this redo's cost, which its next undo gives back.
+     */
+    private void billRedo() {
+        if (!limits.limited()) {
+            return;
+        }
+        int used = BillyMagic.cost(changed, mom);
+        int back = Math.max(0, cost - used);
+        cost = Math.min(cost, used);
+        step.setBilly(cost, changed, mom);
+        BuildMagic.billy(level.getServer(), caster, back, changed, -1);
     }
 
     private void finishUndo() {
@@ -2173,13 +2382,7 @@ public final class BuildJob {
         long kept = rules.count(Left.CHANGED);
         boolean partly = step.state() == UndoStep.State.PARTLY;
         endCode = rewind ? BuildVerdictPayload.STOPPED : partly ? BuildVerdictPayload.UNDONE_PARTLY : BuildVerdictPayload.UNDONE;
-        if (online != null && step.cost() > 0 && step.changed() > 0) {
-            long time = level.getServer().overworld().getGameTime();
-            int back = (int) (step.cost() * restored / step.changed());
-            BuildData data = online.getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
-            data = BillyMagic.unpractise(BillyMagic.refund(data, time, back), restored);
-            online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, data);
-        }
+        refundUndo();
         fx(BuildFxPayload.DONE);
         if (online != null) {
             int count = (int) Math.min(Integer.MAX_VALUE, restored);
@@ -2189,6 +2392,8 @@ public final class BuildJob {
                 line = Component.translatable("message.enhanced.build.stopped");
             } else if (partly) {
                 line = Component.translatable("message.enhanced.build.undo_partly");
+            } else if (notReturned > 0) {
+                line = Component.translatable("message.enhanced.build.not_returned");
             } else if (kept > 0) {
                 line = Left.CHANGED.message(kept);
             } else {
@@ -2203,24 +2408,35 @@ public final class BuildJob {
         step.setState(UndoStep.State.DONE);
         UndoHistory.of(caster).redid(step);
         endCode = BuildVerdictPayload.REDONE;
+        billRedo();
         fx(BuildFxPayload.DONE);
         ServerPlayer online = online();
         if (online != null) {
             int count = (int) Math.min(Integer.MAX_VALUE, changed);
-            send(online, new BuildVerdictPayload(token, endCode, count, 0, 0, rules.flags()));
-            online.displayClientMessage(Component.translatable("message.enhanced.build.redone", count), true);
+            send(online, new BuildVerdictPayload(token, endCode, count, cost, 0, rules.flags()));
+            online.displayClientMessage(outOf != null ? BuildRules.outOf(outOf, step.undone()) : Component.translatable("message.enhanced.build.redone",
+                    count), true);
         }
         BuildMagic.sync(level.getServer(), caster);
     }
 
     /** The spell ends refused before any block changed (C7, C11-C13, a flood refused). */
     private void refuse(int code, long extra, @Nullable Component line) {
+        refuse(code, 0, 0, extra, line);
+    }
+
+    /**
+     * The same, with the counts its verdict names: {@code changed} the cells it would have changed, {@code cost} what
+     * it would cost Billy, {@code extra} the number it names (the seconds to wait, his top, a cap, the items missing).
+     */
+    private void refuse(int code, long changed, int cost, long extra, @Nullable Component line) {
         releaseTickets();
         finished = true;
         endCode = code;
         ServerPlayer online = online();
         if (online != null) {
-            send(online, new BuildVerdictPayload(token, code, 0, 0, (int) Math.min(Integer.MAX_VALUE, extra), 0));
+            send(online, new BuildVerdictPayload(token, code, (int) Math.min(Integer.MAX_VALUE, changed), cost, (int) Math.min(Integer.MAX_VALUE, extra),
+                    0));
             if (line != null) {
                 online.displayClientMessage(line, true);
             }

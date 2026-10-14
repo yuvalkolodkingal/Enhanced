@@ -59,7 +59,12 @@ import java.util.function.LongSupplier;
  *
  * <p><b>Ctrl + Z</b> (D-B 12.2), in the order of what the kid did last: the newest waiting spell is dropped; else the
  * spell at work stops and its partial step is undone at once (the undo jumps the queue); else the newest step is
- * undone; else "Nothing to undo".
+ * undone; else "Nothing to undo". <b>Ctrl + Y</b> does the newest undone step again; Billy pays for it when he asks,
+ * or it is refused.
+ *
+ * <p><b>Billy</b> (D-B 8): his meter and his practice change in one place ({@link #billy}): at once while he is here,
+ * else at his next login; a rank reached is its moment ({@link #rankedUp}); a Scarlet Witch near enough halves his
+ * spells' cost, which his badge learns twice a second and he is told once a minute ("Mom is near").
  */
 public final class BuildMagic {
     /** How often the box the others see may change (ticks): at most 4 times a second. */
@@ -73,6 +78,10 @@ public final class BuildMagic {
     private static final int FLOOD_SLICE = 1024;
     /** The most parts of a pocket sent to its owner a tick (D-B 13.1). */
     private static final int POCKET_PARTS = 4;
+    /** How far (blocks) Billy's rank-up is seen: his crown's flare and the runes (D-B 13.1). */
+    private static final double RANK_UP_RANGE = 32.0;
+    /** How often (ticks) Billy's badge learns whether a Scarlet Witch is near enough to help him. */
+    private static final int MOM_TICKS = 10;
     /** What a preflight reads its 2 ms by (a test's clock that stands still sees every cell). */
     private static LongSupplier clock = System::nanoTime;
 
@@ -167,7 +176,9 @@ public final class BuildMagic {
             code = queueRefusal(player, limits);
             if (code != BuildRules.OK) {
                 int extra = code == BuildVerdictPayload.QUEUE_FULL ? BuildScheduler.waiting(player.getUUID()) : 0;
-                Component line = code == BuildVerdictPayload.WAIT ? BillyMagic.waitForSpell() : BuildRules.message(code, extra);
+                // (D-B 8.4: "Wait for your spell to finish" while it works; in the pause after it, the fizzle alone.)
+                Component line = code != BuildVerdictPayload.WAIT ? BuildRules.message(code, extra)
+                        : BuildScheduler.working(player.getUUID()) != null ? BillyMagic.waitForSpell() : null;
                 refuse(player, token, code, extra, line, quiet(session, preflight, dab, recipe));
                 return;
             }
@@ -199,6 +210,9 @@ public final class BuildMagic {
         BoundingBox at = job.bounds();
         BuildSounds.cast(level, at != null ? Vec3.atCenterOf(at.getCenter()) : player.position(), limits.hero(),
                 plan != null && plan.prepared() ? plan.size() : 0L);
+        if (job.mom()) {
+            momHelps(player, session);
+        }
         sync(player.server, player.getUUID());
     }
 
@@ -229,6 +243,9 @@ public final class BuildMagic {
             job.fx(BuildFxPayload.START);
             BoundingBox at = job.bounds();
             BuildSounds.cast(player.serverLevel(), at != null ? Vec3.atCenterOf(at.getCenter()) : player.position(), limits.hero(), 0L);
+            if (stroke.mom) {
+                momHelps(player, session);
+            }
         }
         sync(player.server, player.getUUID());
     }
@@ -514,6 +531,10 @@ public final class BuildMagic {
         if (view != null && view.active()) {
             player.setData(ModAttachments.BUILD_VIEW, view.withActive(false));
         }
+        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(null);
+        if (data != null && data.momNear()) {
+            player.setData(ModAttachments.BUILD_DATA, data.withMomNear(false));
+        }
         if (was && say) {
             player.displayClientMessage(Component.translatable("message.enhanced.build.off"), true);
         }
@@ -660,17 +681,140 @@ public final class BuildMagic {
             refuse(player, 0, BuildVerdictPayload.NOTHING_TO_REDO, 0, BuildRules.message(BuildVerdictPayload.NOTHING_TO_REDO, 0), false);
             return;
         }
-        replay(player, limits, level, step, true);
+        int price = 0;
+        net.minecraft.world.entity.player.Player mom = null;
+        if (limits.limited()) {
+            // Billy pays again for what the redo does (D-B 12.2), or it is refused: whole or nothing.
+            mom = BillyMagic.mom(player);
+            price = BillyMagic.cost(step.undone(), mom != null);
+            BuildData data = player.getData(ModAttachments.BUILD_DATA);
+            long time = player.server.overworld().getGameTime();
+            int verdict = BillyMagic.verdict(data, time, price);
+            if (verdict != SpellPlanner.NONE) {
+                refuse(player, 0, verdict, step.undone(), price, cannotPayExtra(data, time, price, verdict), BillyMagic.cannotPay(data, time, price),
+                        false);
+                return;
+            }
+            player.setData(ModAttachments.BUILD_DATA, BillyMagic.pay(data, time, price));
+        }
+        BuildJob job = BuildJob.replay(player, limits, level, step, true, false, BuildScheduler.loaded(id, level));
+        if (limits.limited()) {
+            job.reserved(price, mom);
+        }
+        replay(player, level, step, job);
     }
 
     private static void replay(ServerPlayer player, Limits limits, ServerLevel level, UndoStep step, boolean redo) {
+        replay(player, level, step, BuildJob.replay(player, limits, level, step, redo, false, BuildScheduler.loaded(player.getUUID(), level)));
+    }
+
+    private static void replay(ServerPlayer player, ServerLevel level, UndoStep step, BuildJob job) {
         UUID id = player.getUUID();
-        BuildJob job = BuildJob.replay(player, limits, level, step, redo, false, BuildScheduler.loaded(id, level));
         BuildScheduler.queue(job, false);
         job.fx(BuildFxPayload.START);
         BoundingBox box = step.bounds();
         BuildSounds.undo(level, box != null ? Vec3.atCenterOf(box.getCenter()) : player.position());
         sync(player.server, id);
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Billy's meter, his practice and Mom's help (D-B 8)
+
+    /**
+     * Billy gets {@code back} blocks of magic back on his meter (less than 0: he pays them; never above its top or
+     * below 0) and learns {@code practice} blocks of practice (less than 0: an undo takes them back, his rank stays),
+     * at the game time now: at once while he is online, else at his next login ({@link BuildSession#owe}).
+     * {@code pause} 0 or more: his pause after a spell begins now (C10; -1: none). A rank reached is the moment
+     * ({@link #rankedUp}).
+     */
+    static void billy(MinecraftServer server, UUID id, long back, long practice, int pause) {
+        ServerPlayer online = server.getPlayerList().getPlayer(id);
+        if (online == null || online.hasDisconnected()) {
+            if (back != 0 || practice != 0) {
+                BuildSession.of(id).owe(-back, practice);
+            }
+            return;
+        }
+        long time = server.overworld().getGameTime();
+        BuildData data = online.getData(ModAttachments.BUILD_DATA);
+        int amount = (int) Math.min(Integer.MAX_VALUE, Math.abs(back));
+        if (back > 0) {
+            data = BillyMagic.refund(data, time, amount);
+        } else if (back < 0) {
+            data = BillyMagic.pay(data, time, amount);
+        }
+        boolean rankedUp = false;
+        if (practice > 0) {
+            BillyMagic.Practiced practiced = BillyMagic.practise(data, time, practice);
+            data = practiced.data();
+            rankedUp = practiced.rankedUp();
+        } else if (practice < 0) {
+            data = BillyMagic.unpractise(data, -practice);
+        }
+        if (pause >= 0) {
+            data = BillyMagic.pauseAfter(data, time, pause);
+        }
+        online.setData(ModAttachments.BUILD_DATA, data);
+        if (rankedUp) {
+            rankedUp(online, data.rank());
+        }
+    }
+
+    /**
+     * At a login: what Billy's spells that ended while he was away owe his meter (or it them), and the practice they
+     * taught or took, is settled now (D-B 8.1: the meter is whole or nothing, also for a spell that outlives its
+     * caster).
+     */
+    public static void settleOwed(ServerPlayer player) {
+        BuildSession session = BuildSession.existing(player.getUUID());
+        long[] owed = session == null ? null : session.takeOwed();
+        if (owed != null) {
+            billy(player.server, player.getUUID(), -owed[0], owed[1], -1);
+        }
+    }
+
+    /**
+     * Billy learned a rank (D-B 8.2, 7.2): "You learned more magic! Rank 2: Spellcaster. Your magic now holds 1024
+     * blocks", the fanfare, and his crown's flare and the runes for everyone within 32 blocks ({@code RANK_UP}: its
+     * {@code cells} is the new rank, its box and origin the block he stands in).
+     */
+    static void rankedUp(ServerPlayer billy, int rank) {
+        billy.displayClientMessage(BillyMagic.rankUp(rank), false);
+        BuildSounds.rankUp(billy);
+        BlockPos at = billy.blockPosition();
+        PacketDistributor.sendToPlayersNear(billy.serverLevel(), null, billy.getX(), billy.getY(), billy.getZ(), RANK_UP_RANGE,
+                new BuildFxPayload(BuildFxPayload.RANK_UP, 0, billy.getId(), BuildFxPayload.BILLY, at, at, at, 1000, rank, BuildFxPayload.NO_MOM,
+                        BuildFxPayload.RISE));
+    }
+
+    /** A Scarlet Witch helps Billy's spell (D-B 8.3): "Mom is near: your magic costs half", once a minute at most. */
+    private static void momHelps(ServerPlayer billy, BuildSession session) {
+        long time = billy.server.overworld().getGameTime();
+        if (BillyMagic.saysMomAgain(session.momSaidAt(), time)) {
+            session.setMomSaidAt(time);
+            billy.displayClientMessage(BillyMagic.momNear(), true);
+        }
+    }
+
+    /**
+     * Billy's badge learns whether a Scarlet Witch is near enough to halve what his spells cost
+     * ({@code BuildData.momNear}, its scarlet stripe and "½"), while he is in build mode.
+     */
+    private static void syncMom(ServerPlayer player) {
+        Limits limits = Limits.of(player);
+        if (limits == null || !limits.limited()) {
+            return;
+        }
+        boolean near = BillyMagic.mom(player) != null;
+        BuildData data = player.getData(ModAttachments.BUILD_DATA);
+        if (data.momNear() != near) {
+            player.setData(ModAttachments.BUILD_DATA, data.withMomNear(near));
+        }
+    }
+
+    /** The {@code extra} of Billy's "not yet" ({@code REFILLING}: the seconds) or "never" ({@code TOO_BIG}: his top). */
+    static int cannotPayExtra(BuildData data, long time, int price, int verdict) {
+        return verdict == BuildVerdictPayload.REFILLING ? BillyMagic.secondsToPay(data, time, price) : BillyMagic.top(data);
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -707,8 +851,9 @@ public final class BuildMagic {
     }
 
     /**
-     * Every server tick ({@code ServerTickEvent.Post}): a stroke whose last dab was 40 ticks ago closes (D-B 11.8), and
-     * each builder's pocket goes on its way to her client, at most {@value #POCKET_PARTS} parts a tick.
+     * Every server tick ({@code ServerTickEvent.Post}): a stroke whose last dab was 40 ticks ago closes (D-B 11.8),
+     * Billy's badge learns every half second whether Mom is near, and each builder's pocket goes on its way to her
+     * client, at most {@value #POCKET_PARTS} parts a tick.
      */
     public static void tick(MinecraftServer server) {
         long now = server.getTickCount();
@@ -716,6 +861,12 @@ public final class BuildMagic {
             Stroke stroke = session.stroke();
             if (stroke != null && !stroke.closing() && now - stroke.lastDab >= Stroke.CLOSES_AFTER) {
                 closeStroke(stroke, server);
+            }
+            if (session.mode() && now % MOM_TICKS == 0) {
+                ServerPlayer builder = server.getPlayerList().getPlayer(session.player());
+                if (builder != null) {
+                    syncMom(builder);
+                }
             }
             Pocket.Stream stream = session.pocketStream();
             if (stream == null) {
@@ -778,7 +929,15 @@ public final class BuildMagic {
      * alone hears it).
      */
     static void refuse(ServerPlayer player, int token, int code, long extra, @Nullable Component line, boolean preflight) {
-        send(player, new BuildVerdictPayload(token, code, 0, 0, (int) Math.min(Integer.MAX_VALUE, extra), 0));
+        refuse(player, token, code, 0, 0, extra, line, preflight);
+    }
+
+    /**
+     * A refusal with its counts: {@code changed} the cells it would change, {@code cost} what it would cost Billy, and
+     * {@code extra} the number it names (the seconds to wait, his meter's top, a limit).
+     */
+    static void refuse(ServerPlayer player, int token, int code, long changed, int cost, long extra, @Nullable Component line, boolean preflight) {
+        send(player, new BuildVerdictPayload(token, code, (int) Math.min(Integer.MAX_VALUE, changed), cost, (int) Math.min(Integer.MAX_VALUE, extra), 0));
         if (preflight) {
             return;
         }
