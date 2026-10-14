@@ -13,7 +13,7 @@ the order of Eilon's list.
 
 Each hero has its wiki pages (`docs/wiki/<Hero>.md` and `<Hero>-HE.md`) and a section of `docs/DESIGN.md` and
 `docs/DESIGN.he.md`: **13 Phoenix, 14 Spider-Man, 15 Thanos, 16 Ultron, 17 Apocalypse** (12 is 2.3's voices of the
-Infinity Stones). Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
+Infinity Stones) and, since 3.1, **18 Build Magic**. Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
 Configuration, FAQ, Becoming a Hero, Credits, the sidebar) and in the README, in both languages. While 3.0 was built
 each lane wrote these as fragments that were stitched in at the end; a change now goes straight into the pages, English
 and Hebrew together.
@@ -52,6 +52,14 @@ colour: register a source in `ClientSetup`, never edit the two mixins), `AreaTar
 hurt), `AwakeningItem` (the hold-to-use items), `ScepterRituals` (the table of what Loki's Scepter and the Tesseract do),
 `ShieldCost` (the interface a projectile implements for Wanda's shield), `BossHooks` (implemented by boss and minion
 entities), `BossFights` and the rest of the `boss/` package (the boss framework: section 7), `BossConfig` (`[boss]`).
+Since 3.1 also: **`ability/Metal`**, the one rule of what is metal (items, blocks, entities, projectiles in flight, gear that is
+real or crumbles): *every* power of Magneto asks it, and `Telekinesis.isMagnetic` is a one-line call to it (a new hero
+power that touches metal asks `Metal`, never its own list); **`ability/BlockRights`**, the one rule book of changing a block
+(`mayBreak`, `mayPlace`, `vanillaRights`, `postBreak`, `postPlace`, and `massEditRefuses`, the area rule of the two mass edits,
+Build Magic and the Magnetic Pull); and the **`build/`** package, Build Magic's common and server code (`SpellPlanner` and
+`SpellMath` are pure and shared by the client's ghost and the server's cells; `BuildRules`, `BuildJob`, `BuildScheduler`,
+`UndoStep`/`UndoHistory`/`UndoFiles`, `Pocket`, `BuildMagic`, `BuildEvents`; nothing in it names a client class; the client's
+half is `client/build/`; design in `DESIGN.md` section 18).
 
 * **Config.** Each lane has its own class in `config/` with `define(Builder)`; `EnhancedConfig` calls it. Add your
   options there. A static field is assigned in `define`.
@@ -102,11 +110,11 @@ entities), `BossFights` and the rest of the `boss/` package (the boss framework:
   have a **batch of their own** with the lane's prefix: `phoenix_burst`, `spider_climb`, `thanos_fight`,
   `ultron_lift`, `apocalypse_shield`, `boss_framework`.
 * A test of a boss fight, or of anything that keeps server-wide state from one tick to the next, uses
-  `TestKit.bossFixture(helper)`: it clears `BossFights` and every hero's statics when the test ends. Drive a fight by
+  `TestKit.bossFixture(helper)`: it clears `BossFights` and every hero's statics when the test ends, and since 3.1 also Build Magic (`BuildMagic.clear()`, `BuildScheduler.clear()`: jobs, histories, sessions, Billy's meter) and the Magnetic Pull (`MagnetPull.clear()`); a test of telekinesis clears `Telekinesis` and `BossGrip` in its own `f.onClose`. Drive a fight by
   `forceState` and `everyTick` instead of waiting.
 * `SkeletonTests` pins the skeleton: the order of the powers, the tag files (every entry names something real), the melee
   tag, the Scepter and Tesseract table, the awakening items, the area rule, the boss facade, the payloads, the protocol
-  (`ModNetwork.PROTOCOL_VERSION`, "4"). Keep it green. It runs in its own batch, `skeleton`, on purpose: the grid puts
+  (`ModNetwork.PROTOCOL_VERSION`, **"5"** since 3.1, and the round trip of the six payloads of 3.1). Keep it green. It runs in its own batch, `skeleton`, on purpose: the grid puts
   tests side by side and a test that finishes in its first tick lets go of its chunks. A thrown hammer that overshoots
   its arena (`ThorTests.thrownMjolnirHitsAndComesBack`, `...Stormbreaker...`) then lands in a chunk that has stopped
   ticking, freezes and never comes home (it failed 2 times in 22 runs): those tests now throw only 12 blocks, which
@@ -137,7 +145,7 @@ speech, the reward items.
 | `XFight extends BossFight` | the participants (everyone who comes within `arena.joinRadius`; Creative too, Spectators never), the ledger (`credit(player, "damage", n)`, `Participant.counter`), time present, the last blow, two boss bars (`bars()`), wipe, abandon, time-out, Peaceful, the end, rewards, refunds, region tickets, `speak`, `tell`, `spawn`/`adopt` |
 | `XLane implements BossLane` | `refusal(starter, force)` (the site, the items, a hero nearby: all before anything is used up) and `create(starter, force)` (use up the ritual item, call `fight.refundOnFailure(item)`, return the fight); registered once with `BossFights.register(BossKind.X, lane)` |
 | an arena: `new BossArena(level, center, radius, Containment.FIELD/WALL/NONE, protectBlocks)` (or a subclass) | protection of blocks, the field or the wall, the tractor, the teleport gate, drops that stay (`keepDrops`) |
-| `onTick()`, `rewards(participant)` | the rest is optional: `onBegin`, `onEnd(why)`, `windDown(ticks)`, `onFinished(forced)`, `rewardMinDamage()` (Thanos: 3 percent), `rewardCounters()` (Apocalypse: damage + shield), `restTicks(why)`, `creditsDamageEvents()`, `onTelekinesisPress/Launch` (Ultron's heart), `onJoin`, `status()` |
+| `onTick()`, `rewards(participant)` | the rest is optional: `onBegin`, `onEnd(why)`, `windDown(ticks)`, `onFinished(forced)`, `rewardMinDamage()` (Thanos: 3 percent), `rewardCounters()` (Apocalypse: damage + shield), `restTicks(why)`, `creditsDamageEvents()`, `onTelekinesisPress/Launch` (Ultron's heart; Launch is called for Magneto too since 3.1), `onJoin`, `status()`; **since 3.1** `hidesGround(pos)` (the columns the clients hide under an island), `lendRefusal(pos)` (why a block may not be borrowed), `locks(entity)` (an entity the fight carries), `carryLimit(entity, wanted)` (how far a held thing may be carried) |
 
 **The rules it enforces, so the lanes do not**
 
@@ -162,13 +170,15 @@ speech, the reward items.
   `fight.lastBlow(player)`.
 * **The arena** cancels block breaking, placing, fluids, buckets, pistons, explosions, mob griefing and natural spawns inside
   its cylinder (`BossArenaEvents`); every ability of the mod that changes a block asks `BossFights.protects(level, pos)`
-  (Wanda's lifting, Tommy's acceleration, Loki's ice: **yours must too**: Spider-Man's webs, the Phoenix's fires). The teleport
+  (Tommy's acceleration, Loki's ice: **yours must too**: Spider-Man's webs, the Phoenix's fires), **through `BlockRights`** since 3.1; the one exception is block telekinesis, which *borrows*
+  (`BossFights.lending`, `ArenaLoans`): the hole mends, the block crumbles, everything goes back when the fight ends. The two mass edits (Build Magic, the Magnetic Pull)
+  ask `BlockRights.massEditRefuses`, which also closes every running arena (`build_magic.allArenasProtected`) and the ground the island hides. The teleport
   gate is one line in `HexManager.onTeleport` plus the Chorus Fruit and portal events. `FIELD` brings a stray fighter back (a
   damage that cannot kill, Slowness), `WALL` pushes back once a second and stops flight at `top`; a subclass overrides
   `rescueSpot`, `pushSpot` or `surfaceSpot` for its own ground (Ultron's island).
 * **Hooks into the heroes** (done, do not repeat): `HexManager.judge` (`BossFights.isHexExempt`, set by `fight.setHexExempt`),
-  `HexManager.onTeleport` (`allowsTeleport`), `SlowMotion` (`BossHooks.slowFactor`: 0 = not slowed), Magneto's strip
-  (`BossHooks.onMagnetoStrip`), Wanda's telekinesis (`onTelekinesisPress/Launch`), `AreaTargets` (a boss's slam spares its own
+  `HexManager.onTeleport` (`allowsTeleport`), `SlowMotion` (`BossHooks.slowFactor`: 0 = not slowed), Magneto's strip and pull
+  (`BossHooks.onMagnetoStrip`), every telekinesis (`onTelekinesisPress/Launch`, and since 3.1 `gripRefusal`, `holdTicks`, `onGripped`, `onLetGo`, `onGripRefused`, `isMetal`, `throwBack`: a boss is *held* as a boss by `BossGrip`), `AreaTargets` (a boss's slam spares its own
   minions).
 
 **Wanda's shield, for the projectiles of the villains.** A projectile implements `ShieldCost` (`shieldCost()`; `oneOfAKind()`,
@@ -262,7 +272,7 @@ dedicated server and a client in play) found the following. All of it is in the 
 | File | Lane | Edit |
 |---|---|---|
 | `Telekinesis`, `TelekineticBlockEntity` | Phoenix | `Mode.JEAN` and a colour per mode |
-| `Telekinesis` | Spider-Man | `isMagnetic`: one line for an Iron Spider |
+| `Telekinesis` | Spider-Man | `isMagnetic`: one line for an Iron Spider (since 3.1 the rule is `Metal.isMagnetic`, which keeps that row) |
 | `Telekinesis`, `TommyAbilities` | Apocalypse | `hold`, `vibrate`: `SandCocoonEntity.freeFrom` (two lines) |
 | `LokiAbilities` | Thanos | two public methods for the Soul Sight |
 | `mixin/client/PlayerRendererMixin` | Thanos | one inject for the first-person Gauntlet |
@@ -270,3 +280,32 @@ dedicated server and a client in play) found the following. All of it is in the 
 | `PoseContext`, `HeroAnimState`, `HeroAnimator` (`applyBody`, `onSpiderFx`) | Spider-Man | the wall and ceiling body turn, the anchor target |
 | `ModAttachments` | Ultron | `SOKOVIA_RELOCATIONS` |
 | `data/neoforge/loot_modifiers/global_loot_modifiers.json` | Phoenix, Spider-Man | the chest and spider loot (a JSON list: the second to merge keeps both sides) |
+
+
+## 9. How 3.1 was put together
+
+3.1 (Build Magic, telekinesis in the boss fights, Magneto's metal, Apocalypse's healing and critical hits) was built by one
+method, and the rules are worth keeping for the next version.
+
+* **One skeleton, then lanes.** A skeleton step (S) made, once and with the behaviour unchanged, everything shared: every key
+  mapping, payload (protocol "5", six new payloads), attachment (`BUILD_DATA`, `BUILD_VIEW`), config option (every file under
+  `config/`), tag file, lang key (both languages) and seam. Then lanes (TK telekinesis and Apocalypse, MAG Magneto, BS and BC Build
+  Magic's server and client, ART sounds and icons, DOCS) each in its own git worktree, merged in the order MAG, TK, BS, BC. After
+  the skeleton **no lane edits a lang file, a config file, `ModNetwork`, a payload record, `ModAttachments`, `ModTags`, a tag
+  file, `BlockRights`, `Raycasts`, `PowerHud`, `ClientSetup`, `GlowingEyesLayer`, `TestKit`, `DataTests` or `V31SkeletonTests`**:
+  a needed change is an entries file or a minimal `request(I)` commit for the integrator.
+* **Seams.** The skeleton put five behaviour-neutral seams into `Telekinesis`/`BlockLifting` (the metal rule moved to `Metal`, its
+  grip check `Metal.staysMagnetic`, Magneto in the projectile raycast, `MagnetPull.press` for Sneak + R, the time a grip ended), so the
+  Magneto lane never opened files the telekinesis lane rewrote. **One owner per file**, the whole merged `press` order written once.
+* **One rule book.** Everything that changes a block asks `BlockRights` (section 3); Build Magic never borrows from an arena.
+* **Journals forget only what a save holds.** The arena journal (`ArenaLoans`, `ArenaJournalWriter`) and the island's note
+  (`SokoviaJournal`) retire a repair only after **two** world saves of its dimension (an autosave queues its chunks to the IO worker
+  *before* `LevelEvent.Save`; the island's note gets a `<fight>.nbt.retiring` file, state `LANDED`, rewritten with `refund` false at the first
+  save and deleted at the second or at `ServerStoppedEvent`; a ritual's note is still deleted at once).
+* **Write ahead.** Build Magic writes a section's undo record before it changes the section's first cell, so a crash never leaves a
+  change its saved record lacks; a Move is compare-and-swap per cell.
+* **Event priorities** (5.6 of the spec; HIGH for the landing guard and the journals' recovery, LOW for Build Magic at server stop, so
+  arenas are put back first, islands cleared second and spells last) are in each handler's Javadoc.
+* **Testing.** Server-wide state (`BuildScheduler`, `MagnetPull`, `Telekinesis`, `BossGrip`) gets a batch of its own and
+  `TestKit.bossFixture`; a test never names a client type in a signature or lambda, and none touches a class with client-typed static
+  state (the pure `MagnetStreamMath`, `BuildGrammar`, `BuildHints` are tested instead). Every merge passed the full GameTests twice in a row.

@@ -64,9 +64,9 @@ What the panel shows is explained [below](#the-mind-reading-panel).
 
 ### Telekinesis (V)
 
-Wanda's and Billy's telekinesis, in violet, in Jean's hands. Press **V** and look at something to lift it: **creatures, players, dropped items, minecarts and boats, primed TNT and falling blocks, arrows and other projectiles in flight** (an arrow you catch hangs in front of you pointing where you look), and **blocks** (the same rules as Wanda: hardness at most 5, no chests or other block entities, nothing from the `enhanced:telekinesis_immovable` tag, and spawn protection and claims are respected). Press **V** again to **launch** what you hold, **Sneak + V** to set it down gently. Anything you throw hits hard: the damage is the Phoenix's, and it counts as her mind power.
+Wanda's and Billy's telekinesis, in violet, in Jean's hands. Press **V** and look at something to lift it: **creatures, players, dropped items, minecarts and boats, primed TNT and falling blocks, arrows and other projectiles in flight** (an arrow you catch hangs in front of you pointing where you look), and **blocks** (the same rules as Wanda: hardness at most 5, no chests or other block entities, nothing from the `enhanced:telekinesis_immovable` tag, and spawn protection and claims are respected). Press **V** again to **launch** what you hold, **Sneak + V** to set it down gently. **When V isn't holding anything, Sneak + V tears out the block you look at**, even past a creature or a boss (not in the second after you let go of something). Anything you throw hits hard: the damage is the Phoenix's, and it counts as her mind power.
 
-The range, the launch speed and the block limits are the shared numbers `magneto.telekinesisRange`, `magneto.throwSpeed` and `scarlet_witch.blockLift*`: the Phoenix has no options of her own for it. Bosses and the Elder Guardian are too powerful to lift, nothing lifts Mjolnir, and you can hold a player for at most 30 seconds.
+The range, the launch speed and the block limits are the shared numbers `magneto.telekinesisRange`, `magneto.throwSpeed` and `scarlet_witch.blockLift*`: the Phoenix has no options of her own for it. **The three villains (Ultron, Thanos, Apocalypse) and the Wither, the Warden and the Elder Guardian can be held as bosses** (3 seconds, then they break free, and nobody can hold them again for 12 seconds); the Ender Dragon is too vast to hold. **Apocalypse can be held even through his shield**, because her telekinesis is mind power. She catches Thanos's sword, meteors and orbs and throws them back. In a boss arena the blocks are only borrowed (see [Scarlet Witch](Scarlet-Witch#bosses-and-borrowed-blocks)). Nothing lifts Mjolnir, and you can hold a player for at most 30 seconds.
 
 ### Mind Control and the Psionic Field (B)
 
@@ -107,6 +107,10 @@ From *X-Men: Apocalypse*, where Xavier tells Jean to let go and **bird-shaped fl
 * **A cleansing.** At the release the fire burns off what holds you: Spellbound, Confused, Nausea, Slowness, Blindness and Darkness.
 * **A price.** It costs hunger: about 6 food points at full charge (at least 30 percent of that, whatever the charge). Afterwards you are **drained**: Weakness and Slowness for 5 seconds (not in Creative). Then the **cooldown is 90 seconds**.
 * A creature the Burst kills leaves a puff of golden ash. Everyone near sees the firebird fly out and dissolve, a fire shell, scorch rings on the ground and 48 streaks of flame, hears the scream, and everyone in range gets a gold flash (not with Reduced motion).
+
+### Against Apocalypse: critical hits
+
+The Phoenix's mind power hits the boss Apocalypse **critically**, like Wanda's: the Phoenix Burst, a telekinetic slam, and the strains of Mind Control and the Psionic Field are all **twice as strong on his shield** and, when the shield is down, on his body. You see a burst of sparks, hear a crack, and the action bar says "Critical hit! ×2". Everyone else hits him much less. See [Apocalypse](Apocalypse#he-never-heals-wanda-and-the-phoenix-hit-critically).
 
 ## The Mind Reading panel
 

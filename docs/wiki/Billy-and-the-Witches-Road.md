@@ -43,11 +43,24 @@ Billy's magic is blue with a white-hot core, crackling and branching like a Tesl
 |---|---|---|---|
 | 1 | **R** | Hex Bolt | A crackling blue arc from his hand to the first creature he looks at within 24 blocks: 6 damage, and it forks on to the two nearest creatures within 5 blocks of it (3 damage each). Everyone around sees the bolts. Cooldown half a second. |
 | 2 | **G** (toggle) | Flight | Calm, weightless flight with open hands, like his mother's (speed 0.08). You can also double-tap **Space**. |
-| 3 | **V** | Telekinesis | Wanda's telekinesis, in his blue: creatures, dropped items, minecarts, boats, primed TNT, falling blocks, **and projectiles in flight**: an arrow he catches hangs in front of him, pointing where he looks, and flies off at his command. He doesn't tear blocks out of the ground (that is Wanda's). Press again to launch, **Sneak** + the key to put down gently. |
+| 3 | **V** | Telekinesis (Sneak: a block) | Wanda's telekinesis, in his blue: creatures, dropped items, minecarts, boats, primed TNT, falling blocks, **and projectiles in flight**: an arrow he catches hangs in front of him, pointing where he looks, and flies off at his command. **He tears blocks out of the ground too**: within 16 blocks, hardness 3 at most (stone, ores, planks; not iron blocks), one block a second. **Sneak + V** while he holds something sets it down (a block becomes a block again where it lands); **when V isn't holding anything, Sneak + V** takes the block he looks at, even past a creature (not in the second after he let go of something). Press again to launch. He holds the three villains and the Wither, the Warden and the Elder Guardian as bosses, **half as long as Wanda** (1.5 seconds), and Apocalypse only in a window, never through his shield. He catches Thanos's sword, meteors and orbs and throws them back. |
 | 4 | **B** | Freeze | Every creature and player within 12 blocks in a 90 degree cone in front of him, in his line of sight, is **spellbound** for 5 seconds: they can't move, jump or attack, can't pick a new target, and blue sparks circle their heads. The Ender Dragon and the Wither are too strong for it. Cooldown 12 seconds. |
 | 5 | **N** (toggle) | The Noise | He hears every mind within 32 blocks: every creature glows through walls, **red** if it is hostile and about to attack, **blue** otherwise. Whispers crowd his head, louder the more minds are near. |
 
-**The crown.** While he flies, and for three seconds after each spell, a glowing chrome crown forms on his head, in shades from ice-white to deep blue (the *Wiccan* look already has it).
+**The crown.** While he flies, for three seconds after each spell, and while he builds with Build Magic, a glowing chrome crown forms on his head, in shades from ice-white to deep blue (the *Wiccan* look already has it).
+
+## Build Magic
+
+Billy builds too: press **Y**, click two corners and right-click, and a house grows out of the ground; **Ctrl + Z** takes it back. But he is an **apprentice who learns**. His spells cost *magic*, one point a block, from a meter that refills all the time, and the meter, how big he can build and how far he reaches grow with practice (every block he builds), from Apprentice to Wiccan:
+
+| Rank | Practice | Meter | Refills | Longest side | Reach | Undos |
+|---|---|---|---|---|---|---|
+| 1 Apprentice | 0 | 512 | 16 a second | 24 | 24 | 10 |
+| 2 Spellcaster | 2,000 | 1,024 | 24 a second | 32 | 32 | 12 |
+| 3 Sorcerer | 8,000 | 2,048 | 32 a second | 40 | 40 | 14 |
+| 4 Wiccan | 30,000 | 4,096 | 40 a second | 48 | 48 | 16 |
+
+**Near a Scarlet Witch (16 blocks), his spells cost half**, and a thin scarlet thread runs from her hand to his. A spell too big for him never starts half-built. Everything is on the [Build Magic](Build-Magic) page.
 
 ## Looks
 
@@ -55,4 +68,4 @@ Billy's magic is blue with a white-hot core, crackling and branching like a Tesl
 
 ## Numbers you can change
 
-Billy's flight speed, the Hex Bolt's damage, how long Freeze holds (5 seconds), and how far The Noise reaches (32 blocks) are the `billy.*` options on [Server Configuration](Server-Configuration).
+Billy's flight speed, the Hex Bolt's damage, how long Freeze holds (5 seconds), how far The Noise reaches (32 blocks), whether he tears blocks out at all, how far and how hard a block, and his recharge between blocks are the `billy.*` options on [Server Configuration](Server-Configuration). His Build Magic numbers (the meter, the refill, the ranks, his reach and side, Mom's help) are the `build_magic_billy.*` options.

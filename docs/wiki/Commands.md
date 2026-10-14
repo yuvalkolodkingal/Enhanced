@@ -9,12 +9,36 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/enhanced look <players> <look>` | Changes the look of every given player whose hero has that look. |
 | `/enhanced hex list` | Lists all Hexes in the current dimension (the owner, the position, the radius and how many players are allowed in). |
 | `/enhanced hex clear` | Dissolves every Hex in the current dimension. |
-| `/enhanced boss start thanos [force]` | Calls the Mad Titan where you stand, as the Tesseract and Loki's Scepter do: a portal opens and six seconds later he lands 14 to 20 blocks from you. `force` skips the site check, the Overworld rule, the server's `summonEnabled` switch and the rest (Peaceful and one fight at a time still apply). See [Thanos](Thanos). |
+| `/enhanced boss start thanos [force]` | Calls the Mad Titan where you stand, as the Tesseract and Loki's Scepter do: a portal opens and six seconds later he lands 14 to 20 blocks from you. `force` skips the site check, the Overworld rule, the server's `summonEnabled` switch and the rest (Peaceful and one fight at a time still apply; given in the air, the fight is made on the ground under you). See [Thanos](Thanos). |
 | `/enhanced boss start ultron [force]` | Without `force` it is the ritual without the Scepter: you need the Ultron Program in your hand (it is used up), Ultron wakes on the block you look at, and every check is made. With `force` he wakes at your feet with no Program, and the checks of the ground are skipped (not the open sky, and never when he is switched off, in Peaceful or while another boss fight runs). See [Ultron](Ultron). |
 | `/enhanced boss start apocalypse [force]` | With `force`, wakes En Sabah Nur at your feet, with no Capstone, and skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (not Peaceful, not the switch that turns him off, not the one-fight-at-a-time rule). Without it the command is the ritual itself: it needs a Capstone in your hand and a block in sight, and every check. See [Apocalypse](Apocalypse). |
 | `/enhanced boss stop` | Ends the running boss fight. A used Ultron Program or Capstone is given back, and the island of Sokovia is put back. A second `stop` while a boss is still leaving ends it at once. |
 | `/enhanced boss list` | Lists the running boss fights. |
 | `/enhanced boss cleanup <center> <radius>` | Removes every creature and projectile of a boss's kind within that radius, whether a fight owns it or not: Thanos, his sword, meteors, orbs and illusions; Ultron, the Sentries (a hero Ultron's too), his bolts and the Vibranium Key; Apocalypse, his lances, boulders and cocoons. It removes no blocks. |
+| `/enhanced build undo <player> [steps]` | Undoes that player's last Build Magic steps (1 by default), as their Ctrl + Z would, with the same safe rule: blocks someone changed since stay as they are. A parent can fix a child's mistake. See [Build Magic](Build-Magic). |
+| `/enhanced build stop [<player>\|all]` | Stops the Build Magic spells that are working, where they are (what they did stays, and can be undone), and drops the ones waiting. |
+| `/enhanced build list` | Lists the spells working or waiting on the server: the player, the spell, the dimension, the percent done and the blocks. |
+| `/enhanced build history <player>` | Lists that player's steps, newest first: "1. Fill, 140 blocks, 2 min ago, overworld". |
+| `/enhanced build rank <player> [1-4]` | Shows Billy's rank and practice. With a number it sets the rank (his practice becomes that rank's number and his meter fills to its new top). Only works on a Billy. |
+| `/enhanced build meter <player> <value>` | Sets Billy's magic meter (0 up to the top of his rank). Only works on a Billy. |
+| `/enhanced build forget <player>` | Clears that player's Build Magic history and pocket, from memory and from disk. |
+
+## Build Magic: /enhanced build
+
+The `build` commands are for the operator who looks after the builders: they use the same safe rules as the heroes' own Ctrl + Z, and never need the hero to be online.
+
+* **`undo`** takes back a player's steps one by one, newest first, even a step from another day, as long as it is still in their history. A block that someone has changed since stays as it is (the answer says how many), and a part that is protected now can be tried again later.
+* **`stop`** is the emergency brake for a spell that is eating the server's time: it stops where it is and leaves what it did. `/enhanced build list` shows what is working.
+* **`rank`** and **`meter`** are for Billy only (they say "is not Billy" for anyone else): `rank` shows or sets his rank, `meter` sets how much magic he has right now.
+* **`forget`** deletes a player's history and pocket: use it for a player who left for good and left a big history on the disk.
+
+| Example | What it does |
+|---|---|
+| `/enhanced build undo Steve` | Takes back Steve's last spell. |
+| `/enhanced build undo Steve 5` | Takes back his last five. |
+| `/enhanced build stop all` | Stops every spell on the server. |
+| `/enhanced build rank Eilon 4` | Makes Billy a Wiccan. |
+| `/enhanced build meter Eilon 0` | Empties his meter. |
 
 ## Powers
 

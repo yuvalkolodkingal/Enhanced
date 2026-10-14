@@ -69,7 +69,7 @@ Loki has four looks, and **H** switches between them (**Sneak + H** goes back). 
 * "Surprise!" Three copies of Loki appear around him, evenly spaced, and each **walks off in its own direction**, up to 12 blocks away. A copy looks exactly like him: his look, and whatever he holds and wears.
 * **Loki turns invisible for 5 seconds** (nothing of him is drawn, not even what he holds). Drinking milk, or anything else that ends invisibility, ends the trick early.
 * **Decoys.** Every creature within 24 blocks that was after him goes after the nearest copy instead.
-* The copies last **8 seconds**. They have 1 health: one hit and a copy dissolves into warm-white streaks, with a flash of Loki's magic where it was touched. A copy deals no damage, drops nothing and gives no experience.
+* The copies last **8 seconds**. They have 1 health: one hit and a copy dissolves into warm-white streaks, with a flash of Loki's magic where it was touched. A copy deals no damage, drops nothing and gives no experience. Magneto's magnetism finds no real metal in a copy: his strip or pull makes it dissolve, and Tommy's Disarm Blitz takes nothing from it.
 * **Cooldown:** 15 seconds.
 
 ### 3. Shapeshift

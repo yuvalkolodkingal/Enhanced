@@ -2,7 +2,7 @@
 
 Every balance number of the mod lives in one file, **`world/serverconfig/enhanced-server.toml`** in the world (or server) folder. The mod creates it when the world is first loaded, with every option at its default, and syncs it to the clients. It is a plain text file: open it in any editor, change a value and restart the world or the server.
 
-The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
+The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
 
 ```toml
 [scarlet_witch]
@@ -20,7 +20,7 @@ Section `[magneto]`. The hero's page is [Magneto](Magneto).
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `magneto.flightSpeed` | `0.075` | 0.01 to 0.5 | Magneto's flying speed (Creative flight is 0.05). |
-| `magneto.telekinesisRange` | `32` | 4 to 128 | How far away (in blocks) Magneto and Wanda can grab a target with telekinesis. |
+| `magneto.telekinesisRange` | `32` | 4 to 128 | How far away (in blocks) every telekinesis (Magneto, Wanda, Billy, the Phoenix) can grab a target. |
 | `magneto.throwSpeed` | `2.6` | 0.5 to 6.0 | Launch speed, in blocks per tick, of a telekinetic throw. |
 | `magneto.shrapnelDamage` | `4.0` | 0.0 to 100.0 | Damage of one iron shrapnel shard. |
 | `magneto.shrapnelPierce` | `3` | 1 to 16 | How many creatures one shard can pierce through. |
@@ -28,6 +28,28 @@ Section `[magneto]`. The hero's page is [Magneto](Magneto).
 | `magneto.disarmRange` | `32` | 4 to 128 | Range of Armor & Weapon Strip, in blocks. |
 | `magneto.disarmCooldown` | `60` | 0 to 6000 | Cooldown of Armor & Weapon Strip, in ticks (60 = 3 seconds). |
 | `magneto.shieldReflectChance` | `0.5` | 0.0 to 1.0 | Chance that a metal projectile caught by the Magnetic Shield flies back at the shooter (otherwise it drops). |
+| `magneto.blockLiftRange` | `24` | 2 to 128 | How far away (in blocks) Magneto can tear a metal block out of the ground with R. |
+| `magneto.blockLiftMaxHardness` | `50.0` | 0.0 to 100.0 | The hardest metal block Magneto can lift with R (iron block = 5, ancient debris = 30, block of netherite = 50). |
+| `magneto.pullRadius` | `8` | 2 to 32 | Radius (in blocks) of the Magnetic Pull (Sneak + R when R isn't holding anything): a sphere round where he pressed. Ores come through rock. |
+| `magneto.pullMaxTargets` | `64` | 1 to 512 | The most things (blocks, items, creatures) one pull takes, the nearest first. |
+| `magneto.pullPerTick` | `2` | 1 to 64 | Things the pull takes each tick (2 = 40 a second). |
+| `magneto.pullScanPerTick` | `8192` | 512 to 131072 | Blocks the pull looks at in one tick while it searches (a big radius searches over a few ticks). |
+| `magneto.pullCooldown` | `100` | 0 to 6000 | Ticks before Magneto can pull again (100 = 5 seconds). It starts only if the pull affected something (took, tugged, dissolved, crumbled, scattered). |
+| `magneto.pullExhaustion` | `4.0` | 0.0 to 40.0 | Hunger one pull costs (4 = one hunger point). Nothing if the pull affected nothing. |
+| `magneto.pullTakesBuiltMetal` | `true` | `true` or `false` | The pull also takes the metal blocks and fixtures people build with (rails, doors, lanterns, anvils, hoppers, pistons...), whole: never one that holds items, never an extended or powered piston. If `false`: only ores, raw-metal blocks, loose metal and creatures' gear. |
+| `magneto.pullBuiltNeedsSight` | `true` | `true` or `false` | Built metal comes only if Magneto can see it (a clear line from his eyes). Ores and raw-metal blocks always come through rock. If `false`, built metal also comes through walls. |
+| `magneto.pullBuiltCone` | `120` | 0 to 360 | Built metal comes only from within this cone (in degrees) round where he looks, so he turns round to pull the rest; 360 = all round him. Ores, raw-metal blocks, loose metal, gear and carts come from all round. |
+| `magneto.pullFromStorage` | `false` | `true` or `false` | The pull also takes the metal out of chests and other containers, item frames and armor stands he can see (claims are asked; never a villager's work block). The container, frame or stand stays. If `false`, what is stored stays where it is. |
+| `magneto.pullTakesGear` | `true` | `true` or `false` | The pull tears metal armor and weapons off hostile creatures in reach. |
+| `magneto.pullTakesPlayerGear` | `true` | `true` or `false` | With PvP on, the pull also acts on players Magneto can see: one metal piece into his inventory, an Iron Spider's nanites scattered, or a metal body tugged, once per player for `pullPlayerGraceTicks`. If `false`, the pull never touches a player. |
+| `magneto.pullPlayerGearToFeet` | `false` | `true` or `false` | The player's piece drops at that player's feet instead of flying into Magneto's inventory. |
+| `magneto.pullPlayerGraceTicks` | `200` | 0 to 6000 | After the pull acted on a player, no pull acts on that player again for this many ticks (200 = 10 seconds). |
+| `magneto.telekinesisSneakGraceTicks` | `20` | 0 to 100 | Every telekinesis (Magneto, Wanda, Billy, the Phoenix): for this many ticks after one of the hero's grips ends, Sneak + the key with nothing held does nothing (so a late "put it down" press is not a pull or a torn-out block). |
+| `magneto.pullRetryTicks` | `10` | 0 to 100 | After a pull that found nothing, another press does nothing for this many ticks. |
+| `magneto.pullAncientDebris` | `true` | `true` or `false` | The pull takes the netherite scrap out of ancient debris (the debris becomes netherrack). |
+| `magneto.pullTug` | `1.0` | 0.0 to 3.0 | How hard the pull tugs Iron Golems and other metal bodies toward him (blocks per tick at most). 0 = it leaves them where they are. |
+| `magneto.telekinesisSparesFriends` | `true` | `true` or `false` | Every telekinesis (Magneto, Wanda, Billy, the Phoenix): a player, or a creature another player owns (a pet, a drone, the Vision of a Hex), let go or thrown by someone who may not hurt them (PvP off, a teammate) takes no fall, wall or slam damage until it lands. |
+| `magneto.telekinesisPlayerRegripTicks` | `60` | 0 to 1200 | Every telekinesis: after letting go of a player, the same hero cannot grip that player again for this many ticks (60 = 3 seconds). |
 
 ## Scarlet Witch (and the Hex)
 
@@ -46,8 +68,8 @@ Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 | `scarlet_witch.chaosShieldStrength` | `30.0` | 1.0 to 1000.0 | Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down: the damage of a projectile, and the explosion damage it takes away. |
 | `scarlet_witch.chaosShieldCooldown` | `120` | 0 to 6000 | Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds). |
 | `scarlet_witch.chaosShieldBrokenCooldown` | `300` | 0 to 6000 | Ticks before the Chaos Shield can be raised again after it shattered or was held to its limit (300 = 15 seconds). |
-| `scarlet_witch.blockLiftRange` | `24` | 2 to 128 | How far away (in blocks) Wanda can tear a block out of the ground. |
-| `scarlet_witch.blockLiftMaxHardness` | `5.0` | 0.0 to 100.0 | Hardest block Wanda can lift (stone = 1.5, iron block = 5, obsidian = 50). |
+| `scarlet_witch.blockLiftRange` | `24` | 2 to 128 | How far away (in blocks) Wanda and the Phoenix can tear a block out of the ground (Billy and Magneto have their own). |
+| `scarlet_witch.blockLiftMaxHardness` | `5.0` | 0.0 to 100.0 | The hardest block Wanda and the Phoenix can lift (stone = 1.5, iron block = 5, obsidian = 50; Billy and Magneto have their own). |
 | `scarlet_witch.hexDefaultRadius` | `32` | 4 to 256 | Radius, in blocks, of a newly created Hex. |
 | `scarlet_witch.hexMinRadius` | `8` | 4 to 256 | Smallest radius Wanda can shrink her Hex to in Hex Control. |
 | `scarlet_witch.hexMaxRadius` | `96` | 4 to 256 | Largest radius Wanda can grow her Hex to in Hex Control. |
@@ -92,7 +114,7 @@ Section `[quicksilver]`. The hero's page is [Quicksilver](Quicksilver).
 
 ## Billy (Wiccan)
 
-Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road).
+Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road). His block lifting (3.1) is here; his Build Magic numbers are in [Build Magic](#build-magic).
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
@@ -100,6 +122,89 @@ Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road).
 | `billy.hexBoltDamage` | `6.0` | 0.0 to 100.0 | Damage of a Hex Bolt to the creature it strikes. Each creature it forks to takes half. |
 | `billy.freezeDuration` | `100` | 1 to 1200 | How long, in ticks, Billy's Freeze holds creatures spellbound (100 = 5 seconds). |
 | `billy.noiseRange` | `32` | 4 to 64 | How far away (in blocks) Billy hears the thoughts of creatures while The Noise is on. |
+| `billy.blockLifting` | `true` | `true` or `false` | Whether Billy's telekinesis tears blocks out of the ground and sets them down. If `false`: creatures, items and projectiles only (as in 3.0). |
+| `billy.blockLiftRange` | `16` | 2 to 128 | How far away (in blocks) Billy can tear a block out of the ground. |
+| `billy.blockLiftMaxHardness` | `3.0` | 0.0 to 100.0 | The hardest block Billy can lift (stone = 1.5, ores = 3, iron block = 5). |
+| `billy.blockLiftCooldown` | `20` | 0 to 200 | Ticks between two blocks Billy tears out (catching anything else never waits). |
+
+## Build Magic
+
+Sections `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]`. The page is [Build Magic](Build-Magic). In a comment, an option of Billy's or Wanda's is always written with its section (`build_magic_billy.meter`), never as `billy.x`, which is the `[billy]` section of his other powers. Billy's numbers are those of his first rank, an Apprentice: the ranks grow from them. A family that wants him as strong as his mother sets `build_magic_billy.maxRank` to 4, the three practice numbers to 0 and a large meter. Every value is read when it is used, so editing the file changes it live.
+
+### `[build_magic]`: every builder
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `build_magic.enabled` | `true` | `true` or `false` | Build Magic exists on this server. |
+| `build_magic.operatorsOnly` | `false` | `true` or `false` | Only operators (permission level 2) may use it. |
+| `build_magic.requireMaterials` | `false` | `true` or `false` | If `false`: spells conjure their blocks from magic. If `true`: in Survival they take one item per block from the inventory, vanished blocks go into it, and undo gives back. Creative never pays. |
+| `build_magic.millisPerTick` | `8` | 1 to 40 | Milliseconds of each server tick that all spells together may use (half while the server is slow). |
+| `build_magic.blocksPerTick` | `20000` | 256 to 200000 | The most block writes all spells together may make in one tick (reads count a quarter). Every changed block is also sent to each player who sees it: on a server hosted at home or with a modest upload, lower this (5,000 keeps each watching player under about 0.4 MB a second). |
+| `build_magic.sectionsPerTick` | `16` | 1 to 256 | The most 16×16×16 sections spells may start changing in one tick (bounds what clients download). |
+| `build_magic.minSpellTicks` | `10` | 1 to 100 | A spell takes at least this long, so it is seen growing. |
+| `build_magic.maxQueued` | `4` | 0 to 16 | Spells of one Scarlet Witch that may wait behind the one at work (Billy has none). |
+| `build_magic.maxSpellsTotal` | `16` | 1 to 256 | Spells working or waiting on the whole server. |
+| `build_magic.holdToConfirmBlocks` | `64` | 0 to 1000000 | A spell that removes or replaces more existing blocks than this needs the right button held (0 = every such spell). |
+| `build_magic.holdToConfirmTicks` | `20` | 0 to 100 | How long that hold is. |
+| `build_magic.hugeSpellBlocks` | `1000000` | 1000 to 2147483647 | A spell over this many blocks needs the longer hold. |
+| `build_magic.hugeHoldTicks` | `40` | 0 to 200 | How long that hold is. |
+| `build_magic.allArenasProtected` | `true` | `true` or `false` | No Build Magic spell and no Magnetic Pull changes a block in the arena of any running boss fight, Thanos's included. If `false`: only the protected arenas (and always the island in the sky). One switch for both, so the two never disagree about where they may change a block. |
+| `build_magic.hexIsAClaim` | `false` | `true` or `false` | Inside a Hex, only its owner and the players she allowed may build with Build Magic or pull with the Magnetic Pull. (Telekinesis on one block asks the claims as a hand does, and is not covered.) |
+| `build_magic.fullContainers` | `SKIP` | `SKIP` or `SPILL` | A container that holds items in a spell's way: `SKIP` leaves it as it is, `SPILL` spills its items on the spot. A Move always carries it. |
+| `build_magic.liftCreatures` | `true` | `true` or `false` | Creatures inside new blocks are lifted on top (other players only with PvP on; never a creature Mjolnir pins). If `false`, their blocks stay empty. |
+| `build_magic.moveCarriesCreatures` | `true` | `true` or `false` | Move takes the creatures, frames, paintings and armor stands inside along (not one Mjolnir pins). |
+| `build_magic.holdGravityBlocks` | `true` | `true` or `false` | Sand, gravel and other falling blocks a spell places in the air stay where magic put them until something touches them. |
+| `build_magic.postEventsPerBlock` | `true` | `true` or `false` | Ask claim mods (the break and place events) for every block. If `false`: once per 16×16×16 section. |
+| `build_magic.previewChecks` | `8192` | 0 to 65536 | Blocks the server checks to preview a spell (more: a spread sample). 0 = no marks. |
+| `build_magic.undoSurvivesRestart` | `true` | `true` or `false` | The undo history and the pocket are kept on disk with the world. |
+| `build_magic.undoMemoryMb` | `64` | 4 to 4096 | Memory (MiB) one player's undo history may use; past it the oldest spells leave memory (they stay on disk). |
+| `build_magic.undoDiskMb` | `512` | 0 to 1048576 | Disk (MiB) one player's undo history may use; past it the oldest spells are forgotten. |
+| `build_magic.serverUndoMemoryMb` | `512` | 64 to 65536 | Memory (MiB) all undo histories together may use; past it, the spells of the player using the most leave memory (they stay on disk). |
+| `build_magic.serverUndoDiskMb` | `4096` | 0 to 4194304 | Disk (MiB) all undo histories together may use; past it the oldest spell of the player using the most is forgotten. |
+| `build_magic.pocketMaxMb` | `64` | 1 to 4096 | The biggest copy (compressed, in MiB) one player may hold. |
+| `build_magic.finishOnStopBlocks` | `200000` | 0 to 10000000 | When the server stops, the spells still working are finished while their blocks left add up to at most this; the largest are stopped first (and can be undone). |
+| `build_magic.maxTicketChunks` | `256` | 16 to 4096 | Chunks one spell keeps loaded at once. |
+| `build_magic.maxRequestsPerSecond` | `40` | 5 to 200 | Build messages a client may send per second; more are dropped. |
+| `build_magic.deniedDimensions` | `[]` | a list of dimension ids | Dimensions where Build Magic does not work (ids, for example `"minecraft:the_end"`). |
+
+### `[build_magic_wanda]`: the Scarlet Witch
+
+Her magic has no gameplay limit: what is here is technical safety, and a few switches for big public servers.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `build_magic_wanda.enabled` | `true` | `true` or `false` | The Scarlet Witch has Build Magic. |
+| `build_magic_wanda.reach` | `256` | 16 to 1024 | How far (in blocks) she points: anchors, shapes, picks. Her spells themselves have no size limit. |
+| `build_magic_wanda.undoSteps` | `0` | 0 to 100000 | 0 = as many spells as `build_magic.undoMemoryMb` and `undoDiskMb` hold. Otherwise the most she can undo. |
+| `build_magic_wanda.maxBlocks` | `0` | 0 to 2147483647 | 0 = no ceiling. Otherwise the most blocks one of her spells may cover (for big public servers). |
+| `build_magic_wanda.copiesContents` | `true` | `true` or `false` | Her copies keep what is inside chests and other containers. |
+| `build_magic_wanda.volatilePerSpell` | `4096` | 0 to 1000000 | The most TNT, lava and fire blocks one of her spells may make. |
+| `build_magic_wanda.hexBoost` | `2.0` | 1.0 to 8.0 | Inside her own Hex her spells get this many shares of the server's work. |
+| `build_magic_wanda.magicSelectMax` | `100000` | 1000 to 1000000 | The most blocks her double click selects (a selection is held block by block, so it stops at a million). |
+| `build_magic_wanda.brushMax` | `16` | 1 to 64 | Her biggest Paint and Land brush (radius). Technical, not a limit of her magic: a brush pulse every 4 ticks of radius 16 is about 17,000 blocks, which the server keeps up with while she sweeps; at 32 (137,000) the stroke would trail seconds behind the cursor. |
+| `build_magic_wanda.shapeMaxRadius` | `512` | 8 to 1024 | Her biggest shape (radius). |
+| `build_magic_wanda.repeatMax` | `0` | 0 to 65536 | 0 = no count, only the spell's blocks. Otherwise the most copies in a Repeat. |
+
+### `[build_magic_billy]`: Billy, and how he learns
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `build_magic_billy.enabled` | `true` | `true` or `false` | Billy has Build Magic. |
+| `build_magic_billy.meter` | `512` | 16 to 65536 | His magic meter (in blocks) as an Apprentice; it doubles with each rank. |
+| `build_magic_billy.refill` | `16.0` | 0.0 to 4096.0 | Blocks of magic he gets back each second as an Apprentice; half of it more each rank. |
+| `build_magic_billy.maxSide` | `24` | 1 to 256 | The longest side of anything he builds, copies or selects as an Apprentice; +8 each rank. |
+| `build_magic_billy.reach` | `24` | 2 to 128 | How far (in blocks) he points as an Apprentice; +8 each rank. |
+| `build_magic_billy.undoSteps` | `10` | 1 to 100 | Spells he can undo as an Apprentice; +2 each rank. |
+| `build_magic_billy.repeatMax` | `8` | 1 to 64 | The most copies in a Repeat as an Apprentice; +4 each rank. |
+| `build_magic_billy.rank2Practice` | `2000` | 0 to 10000000 | Blocks of magic he must cast to become a Spellcaster (rank 2). |
+| `build_magic_billy.rank3Practice` | `8000` | 0 to 10000000 | Blocks of magic he must cast to become a Sorcerer (rank 3). |
+| `build_magic_billy.rank4Practice` | `30000` | 0 to 10000000 | Blocks of magic he must cast to become Wiccan (rank 4). |
+| `build_magic_billy.maxRank` | `4` | 1 to 4 | The highest rank he can reach (1 = he never grows). |
+| `build_magic_billy.castPause` | `10` | 0 to 200 | Ticks after one of his spells before the next. |
+| `build_magic_billy.momRange` | `16` | 0 to 128 | How near (in blocks) a Scarlet Witch must be to help him (0 = never). |
+| `build_magic_billy.momCostFactor` | `0.5` | 0.0 to 1.0 | What his spells cost near her (0.5 = half). |
+| `build_magic_billy.copiesContents` | `false` | `true` or `false` | His copies keep what is inside containers (if `false`, they come out empty, so nothing is duplicated). |
+| `build_magic_billy.limitsInCreative` | `true` | `true` or `false` | His limits apply in Creative too. |
 
 ## Tommy (Speed)
 
@@ -283,8 +388,21 @@ Section `[boss]`: the rules the three boss fights ([Thanos](Thanos), [Ultron](Ul
 | `boss.creativeGetsReward` | `false` | `true` or `false` | If `true`, Creative players who fought earn the reward too. They never do by default. |
 | `boss.xpRewardPerPlayer` | `1500` | 0 to 100000 | Experience points every rewarded fighter gets when the boss falls. |
 | `boss.announceFights` | `true` | `true` or `false` | If `true` (the default), the server is told in chat when a boss is called and when it falls. |
-| `boss.protectArena` | `true` | `true` or `false` | If `true` (the default), blocks in a boss's arena can't be broken, placed, burned or blown up while the fight lasts, so the world is the same when it ends. (Thanos's arena is never protected: he changes no block anyway.) |
+| `boss.protectArena` | `true` | `true` or `false` | If `true` (the default), blocks in a boss's arena can't be broken, placed, burned or blown up while the fight lasts, so the world is the same when it ends. (Thanos's arena is never protected: he changes no block anyway.) The floating island of Ultron's fight is always protected: it is a copy of the ground, not the world. |
 | `boss.difficultyScale` | `1.0` | 0.1 to 10.0 | Multiplies the health of every boss and of Ultron's Sentries, and the damage of Thanos, Ultron and the Sentries (1.0 = as designed, 0.5 = half as hard). Apocalypse's damage follows the game's difficulty instead. |
+| `boss.telekinesisHoldsBosses` | `true` | `true` or `false` | Telekinesis (Wanda, Billy, the Phoenix, Magneto) can take hold of Ultron, Thanos and Apocalypse, as bosses: for a short time, then they break free. If `false`: they can't be held at all ("too powerful to lift", as in 3.0); Wanda's rip of Ultron's heart still works. |
+| `boss.telekinesisHoldsVanillaBosses` | `true` | `true` or `false` | Telekinesis can take hold of the Wither, the Warden and the Elder Guardian, as bosses: for a short time, then they break free (the Ender Dragon is too vast to hold). If `false`: they are "too powerful to lift". |
+| `boss.vanillaHoldTicks` | `60` | 10 to 600 | How long telekinesis holds the Wither, the Warden or the Elder Guardian before he breaks free (before the hero's factor, `billyHoldFactor` for Billy; Magneto holds none of the three: they wear no metal). |
+| `boss.telekinesisCatchesBossShots` | `true` | `true` or `false` | Billy and the Phoenix (and Magneto, for metal) can catch Thanos's sword, meteors and orbs, and what they throw back is theirs (Ultron's bolts and Apocalypse's lances then hit their own side). If `false`: Thanos's shots can't be caught, and a caught bolt or lance stays the boss's (as in 3.0). |
+| `boss.regripTicks` | `240` | 0 to 2400 | After a boss breaks free, is let go or lands from a throw, nobody can take hold of him again for this many ticks. |
+| `boss.thrownStillTicks` | `20` | 0 to 40 | A boss thrown by telekinesis does nothing for at most this many ticks of his flight (his regrip time starts after it). |
+| `boss.billyHoldFactor` | `0.5` | 0.1 to 2.0 | Billy holds a boss this many times as long as Wanda (bosses only: Thanos's sword he holds `thanos_boss.swordHoldTicks`, as the Phoenix does). |
+| `boss.magnetoHoldFactor` | `1.5` | 0.1 to 3.0 | Magneto holds a metal boss, and every metal thing of a fight (Thanos's sword), this many times as long as Wanda. |
+| `boss.lendArenaBlocks` | `true` | `true` or `false` | Block telekinesis can borrow the blocks of a protected arena: the holes mend, a borrowed block crumbles after a while, and everything goes back when the fight ends. If `false`: lifting is refused in the arenas (as in 3.0). |
+| `boss.arenaMendTicks` | `100` | 20 to 1200 | Ticks after which the hole a borrowed block left mends. |
+| `boss.borrowedBlockTicks` | `100` | 20 to 2400 | How long (in ticks) a borrowed block that is set down stands before it crumbles. |
+| `boss.maxStandingPerPlayer` | `3` | 0 to 48 | At most this many borrowed blocks of one player stand at once; one more set down crumbles at once (0 = every borrowed block crumbles when it is set down). |
+| `boss.maxBorrowedBlocks` | `48` | 1 to 512 | At most this many borrowed blocks (held, flying or standing) per fight. |
 
 ## Thanos (the boss)
 
@@ -402,6 +520,8 @@ Section `[thanos_boss]`. The boss's page is [Thanos](Thanos). The rules every bo
 | `thanos_boss.gauntletRitualTicks` | `60` | 20 to 400 | How long the Infinity Gauntlet must be held to become Thanos. |
 | `thanos_boss.webLockTicks` | `40` | 0 to 400 | A Spider-Man's web locks his Gauntlet for this long (0 turns it off). |
 | `thanos_boss.webLockCooldown` | `400` | 0 to 6000 | A web can lock his Gauntlet at most this often. |
+| `thanos_boss.holdTicks` | `40` | 10 to 600 | How long telekinesis can hold Thanos before he breaks free (before the hero's factor, `boss.billyHoldFactor` or `boss.magnetoHoldFactor`). |
+| `thanos_boss.swordHoldTicks` | `40` | 5 to 200 | How long telekinesis can hold his thrown sword before it tears free and flies home (every hero; Magneto `boss.magnetoHoldFactor` times as long). |
 
 ## Thanos (the hero)
 
@@ -554,6 +674,7 @@ Section `[ultron_boss]`. The boss and the hero share one page, [Ultron](Ultron);
 | `ultron_boss.rescueDamage` | `2.0` | 0.0 to 10.0 | Damage (never lethal) when the field pulls someone back onto the island. |
 | `ultron_boss.rejoinLimit` | `3` | 0 to 20 | How many times a player may be taken up again by the pit's tractor. |
 | `ultron_boss.visionBeamBonus` | `1.5` | 1.0 to 5.0 | The Mind Stone beam does this much to Ultron and the Sentries. |
+| `ultron_boss.holdTicks` | `60` | 10 to 600 | How long telekinesis can hold a body of Ultron before he breaks free (before the hero's factor, `boss.billyHoldFactor` or `boss.magnetoHoldFactor`). |
 
 ## Ultron the hero
 
@@ -612,6 +733,7 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse_shield.mindPowerHeroes` | `["scarlet_witch", "phoenix"]` | a list of power names | Heroes whose mind power can wear down Apocalypse's shield (the boss's and the hero's). Add `"billy"` or `"vision"` to count theirs (and add their damage types to the datapack tag `enhanced:mind_power`). |
 | `apocalypse_shield.chaosBeamFactor` | `1.0` | 0.0 to 20.0 | Shield strength removed per point of Chaos Beam damage. |
 | `apocalypse_shield.slamFactor` | `1.0` | 0.0 to 20.0 | Per point of telekinetic slam damage (a thing thrown by Wanda or the Phoenix). |
+| `apocalypse_shield.borrowedSlamFactor` | `0.5` | 0.0 to 20.0 | A block borrowed from his own arena and thrown by mind power wears the shield by this many times what `slamFactor` gives. The critical factor comes on top. |
 | `apocalypse_shield.phoenixBurstFactor` | `5.0` | 0.0 to 50.0 | Per point of Phoenix Burst damage (a full Burst of 30 removes 150). |
 | `apocalypse_shield.otherMindFactor` | `1.0` | 0.0 to 20.0 | Per point of any other damage type in `enhanced:mind_power`. |
 | `apocalypse_shield.phoenixMindControlStrain` | `25.0` | 0.0 to 1000.0 | Shield strength a Phoenix's Mind Control (even refused) removes. |
@@ -619,6 +741,10 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse_shield.shieldRegenDelayTicks` | `160` | 0 to 2400 | The boss's shield regenerates only after this many ticks without mind-power damage. |
 | `apocalypse_shield.shieldRegenFraction` | `0.03` | 0.0 to 1.0 | Fraction of its strength it regains each second. |
 | `apocalypse_shield.mindHitCooldownTicks` | `10` | 1 to 40 | Ticks between two mind-power hits from the same attacker that the shield will count (the Chaos Beam hits every tick; a shield leaves no invulnerability frames, so it keeps its own). |
+| `apocalypse_shield.critHeroes` | `["scarlet_witch", "phoenix"]` | a list of power names | Heroes whose mind power hits the boss Apocalypse critically, on his shield and on his body (only the boss, never the Apocalypse hero). Kept apart from `mindPowerHeroes`: a hero added there doesn't get critical hits too. |
+| `apocalypse_shield.critShieldFactor` | `2.0` | 1.0 to 10.0 | Their mind power (and the Phoenix's Mind Control and Psionic Field strains) wears the boss's shield this many times as much. |
+| `apocalypse_shield.critBodyFactor` | `2.0` | 1.0 to 10.0 | Their mind power hurts the boss's body this many times as much when his shield is down. |
+| `apocalypse_shield.othersBodyFactor` | `0.4` | 0.05 to 1.0 | Every other blow to the boss's body is multiplied by this when his shield is down. |
 
 ### `[apocalypse_boss]`: the fight
 
@@ -645,8 +771,8 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse_boss.windowTicks` | `200` | 40 to 2400 | How long a broken shield leaves him vulnerable (200 = 10 s). |
 | `apocalypse_boss.staggerTicks` | `60` | 0 to 400 | How long he is staggered and attacks nothing at the start of a window. |
 | `apocalypse_boss.windowDamageFactor` | `1.25` | 1.0 to 5.0 | Damage taken in a window. |
-| `apocalypse_boss.regenPerSecond` | `4.0` | 0.0 to 100.0 | His healing while a shield is up (never above the phase's ceiling). |
-| `apocalypse_boss.trueFormRegenPerSecond` | `3.0` | 0.0 to 100.0 | His healing in the true form after 80 ticks without being hurt. |
+| `apocalypse_boss.regenPerSecond` | `0.0` | 0.0 to 100.0 | His healing while a shield is up (never above the phase's ceiling). 0 = his health never heals (his shield still knits). |
+| `apocalypse_boss.trueFormRegenPerSecond` | `0.0` | 0.0 to 100.0 | His healing in the true form after 80 ticks without being hurt. 0 = his health never heals. |
 | `apocalypse_boss.escapeChannelTicks` | `100` | 20 to 600 | How long his escape portal takes. |
 | `apocalypse_boss.escapeInterruptFraction` | `0.04` | 0.005 to 0.5 | Damage (a fraction of `H0`) that interrupts the escape; any lightning damage also does. |
 | `apocalypse_boss.escapeHealTo` | `0.40` | 0.05 to 0.9 | The health he returns with if the escape was not interrupted. |
@@ -675,6 +801,7 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse_boss.magnetoStripExtendTicks` | `100` | 0 to 1200 | A Magneto's Strip on him in a window extends it by this much (once per window). |
 | `apocalypse_boss.noBreakerSeconds` | `60` | 10 to 600 | He withdraws if no breaker is in the arena while his shield is up for this long. |
 | `apocalypse_boss.dropsPhoenixEmber` | `false` | `true` or `false` | Also give a Phoenix Ember to a rewarded fighter who has no power (and is online when he falls). |
+| `apocalypse_boss.holdTicks` | `60` | 10 to 600 | How long telekinesis can hold Apocalypse before he breaks free (before the hero's factor, `boss.billyHoldFactor` or `boss.magnetoHoldFactor`). |
 
 ### `[apocalypse]`: the hero (a player who won the Essence of En Sabah Nur)
 
@@ -730,14 +857,17 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 
 | Tag | Kind | What it decides |
 |---|---|---|
-| `enhanced:magnetic` | item | Items that count as metal: what Magneto's telekinesis can lift when dropped, and what Armor & Weapon Strip takes from a hand. |
+| `enhanced:magnetic` | item | Items that count as metal (iron, gold, copper, netherite and everything made with them): what Magneto lifts when dropped, takes from a hand, and pulls. |
 | `enhanced:magnetic_armor` | item | Armor that makes its wearer a target of Magneto's telekinesis, and that Armor & Weapon Strip takes. |
 | `enhanced:shrapnel_ammo` | item | Iron and chainmail tools, weapons and armor, and other iron items (shears, buckets, chains, bars, doors), that the Shrapnel Storm can melt into shards (18 each). |
 | `enhanced:weapons` | item | What Tommy's Disarm Blitz takes from players. |
 | `enhanced:cannot_be_snatched` | item | Items that speedsters can't snatch (Mjolnir, the Infinity Gauntlet and Ultron's Core). |
-| `enhanced:magnetic_entities` | entity type | Creatures and vehicles made of metal that Magneto can lift (the Iron Golem, minecarts). |
-| `enhanced:metallic_projectiles` | entity type | Projectiles the Magnetic Shield catches. |
-| `enhanced:telekinesis_immune` | entity type | Creatures too powerful to lift (the Ender Dragon, the Wither, the Warden, the Elder Guardian), the fragments of a shattered Mjolnir, the Vision of a Hex, the three bosses of 3.0, Thanos's sword, meteors and orbs, and a cocoon of sand. |
+| `enhanced:magnetic_entities` | entity type | Creatures and vehicles made of metal that Magneto can lift (the Iron Golem, every minecart, the Sentries, and the Vision of a Hex, whom only Magneto can lift). |
+| `enhanced:metallic_projectiles` | entity type | Projectiles the Magnetic Shield catches, and Magneto can catch in flight (arrows of every kind, tridents, iron shrapnel). |
+| `enhanced:telekinesis_immune` | entity type | Creatures no telekinesis can lift: the Ender Dragon (too vast), the fragments of a shattered Mjolnir, the Vision of a Hex (only Magneto can), the Vibranium Key and a cocoon of sand. The three bosses of 3.0, Thanos's weapons and the Wither, the Warden and the Elder Guardian are not here any more: they can be held as bosses (see `boss.telekinesisHoldsBosses` and `boss.telekinesisHoldsVanillaBosses`). |
+| `enhanced:held_as_bosses` | entity type | The Wither, the Warden and the Elder Guardian: telekinesis holds them as bosses, with no arena (`boss.vanillaHoldTicks`). |
+| `enhanced:pull_immune` | entity type | What the villain heroes' own pulls (Ultron's Gravity Pull, Thanos's Space Pull) leave alone: everything in `telekinesis_immune` and `held_as_bosses`, the three bosses and Thanos's sword, meteors and orbs. Their pulls work as they did in 3.0. |
+| `enhanced:conjured_bodies` | entity type | Bodies that are copies (Loki's Duplicates): they have no real metal, so Magneto's strip or pull dissolves them and Tommy's Disarm Blitz takes nothing from them. |
 | `enhanced:hex_resistant` | entity type | Bosses the Hex wall can't kill: it throws them back instead (and the Vision of another Hex). |
 | `enhanced:spellbound_immune` | entity type | Creatures Billy's Freeze can't hold (the Ender Dragon, the Wither and the three bosses of 3.0). |
 | `enhanced:pin_immune` | entity type | Creatures Mjolnir can't pin down (the Ender Dragon, the Wither, the Warden and the three bosses of 3.0). |
@@ -751,7 +881,16 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:entomb_immune` | entity type | Creatures Apocalypse's sand can't swallow in a cocoon (the Ender Dragon, the Wither, the Warden, the Elder Guardian and Apocalypse himself); a creature in `enhanced:spellbound_immune` slips out of it too. |
 | `enhanced:reality_proof` | entity type | Projectiles the Reality Veil (the Mad Titan's and a Thanos player's) does not turn into bubbles: a thrown Mjolnir or Stormbreaker, Mjolnir's fragments, and the Mad Titan's own sword, meteors and orbs. |
 | `enhanced:ultron_robots` | entity type | Ultron and his Sentries: lightning does `ultron.lightningFactor` (1.25) times to them, and the Mind Stone beam `ultron_boss.visionBeamBonus` (1.5) times. |
-| `enhanced:telekinesis_immovable` | block | Blocks Wanda can't tear out of the ground. |
+| `enhanced:telekinesis_immovable` | block | Blocks no telekinesis can tear out of the ground. |
+| `enhanced:magnetic_blocks` | block | Metal blocks: what Magneto's R tears out and his Magnetic Pull takes whole (it holds `magnetic_ores`, the storage blocks, anvils, rails, chains, bars, doors, lanterns, hoppers, pistons, copper blocks and more; other mods' metals are optional entries). |
+| `enhanced:magnetic_ores` | block | Ores whose metal the Magnetic Pull takes out (the ore turns into its stone). Iron, gold, copper, nether gold, ancient debris and gilded blackstone, and other mods' tin, lead, silver and so on. |
+| `enhanced:build_untouchable` | block | Blocks Build Magic never touches: bedrock-like blocks, portals, spawners, vaults and Mjolnir lying as a block. |
+| `enhanced:build_unconjurable` | block | Blocks Build Magic never makes (and may still vanish or move): everything untouchable, and budding amethyst, the dragon egg, infested blocks, frosted ice, Spider-Man's web and a few more. |
+| `enhanced:build_volatile` | block | TNT, lava and fire: Billy never makes them, and Wanda at most `build_magic_wanda.volatilePerSpell` in one spell. |
+| `enhanced:build_ground` | block | What counts as ground (dirt, stone, sand, ores, gravel, clay, snow, ice...): a double click on a block that is not ground selects the whole built thing, and Land moves only ground. |
+| `enhanced:build_plants` | block | Logs, leaves, flowers, grass, vines, mushrooms and the like: what Vanish's "Plants and trees" style removes. |
+| `enhanced:build_copies_data` | block entity type | The block entities whose data a copy keeps (signs, banners, chests, barrels and so on). Any other copies as the bare block. |
+| `enhanced:build_holds_items` | block entity type | Those of them that hold items (chests, barrels, hoppers, furnaces...): Billy's copies of them come out empty, and a spell leaves a full one standing. |
 | `enhanced:cannot_cling` | block | Blocks Spider-Man cannot stick to (empty by default; water, cobwebs, vines and ladders never hold him anyway). |
 | `enhanced:ritual_ground` | block | What the Capstone must be planted on to wake Apocalypse (sand, red sand and every sandstone), while `apocalypse_boss.ritualNeedsSand` is on. |
 | `enhanced:sokovia_liftable` | block | The natural blocks the island of Sokovia copies into the sky (stone, dirt, sand, ores, grass, leaves, logs, flowers, snow...); anything else, a house or a chest, is left out of the copy. |
@@ -762,7 +901,7 @@ The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_
 
 ## Client options: animations, effects and looks
 
-Four options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]` and `[appearance]` sections. The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
+Nine options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]` and `[build_magic]` sections (the last is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
 
 ```toml
 [animation]
@@ -772,6 +911,13 @@ Four options are about your own game only. They are not synced, and a server can
 
 [appearance]
     hideHeroArmour = true
+
+[build_magic]
+    hints = true
+    tips = true
+    ghostDetail = 32768
+    seeThrough = true
+    showOthers = true
 ```
 
 | Option | Setting in the file | Default | What it does |
@@ -780,6 +926,11 @@ Four options are about your own game only. They are not synced, and a server can
 | Reduced motion | `reducedMotion` | `false` | A calmer animation: the hover bob and drift at a third, no trembling hands, jitter or camera shake, and fainter rings. |
 | Flight effects | `flightEffects` | `true` | Ribbons, rings, wind streaks and shockwaves around flying heroes, and the little flourishes of some abilities. Off: only a few trail particles are left. |
 | Hide heroes' armour | `hideHeroArmour` | `true` | Players with a power are drawn without their armour (helmet, chestplate, leggings and boots, with their trims and dye): yours in third person, everyone else's, and in the inventory preview, so it doesn't hide the characters. The armour still protects as usual, and a player with no power looks as they always did. The elytra, a carved pumpkin or a mob head, and the mod's own hero gear (Magneto's Helmet, Wanda's Crown, Quicksilver's Goggles) are always drawn. Off: heroes show their armour like everyone else. |
+| Build Magic hints | `hints` | `true` | The strip of mouse and key pictures at the bottom right while you build. |
+| Build Magic tips | `tips` | `true` | The little animated tips the first times a spell is used. |
+| Preview detail | `ghostDetail` | `32768` | The most blocks drawn one by one in a spell's preview (0 to 262144): a bigger one is drawn as its outside only, then as a tinted box. |
+| See the box through walls | `seeThrough` | `true` | The box shows faintly through hills and walls. |
+| Other builders | `showOthers` | `true` | See the boxes of other builders near you. |
 
 Two more client options, for the music and the air of the Thanos fight, are in a `[thanos]` section of the same file: see [above](#your-own-game-the-music-and-the-atmosphere-of-the-fight).
 

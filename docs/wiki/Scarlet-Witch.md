@@ -72,12 +72,18 @@ On anyone else the crown is just a crown.
 
 ### 3. Telekinesis
 
-* **Targets:** any monster, animal, villager, player or dropped item within 32 blocks. Bosses (Ender Dragon, Wither, Warden, Elder Guardian) are too powerful to lift.
+* **Targets:** any monster, animal, villager, player, dropped item, minecart or falling block within 32 blocks. **Ultron, Thanos and Apocalypse, and the Wither, the Warden and the Elder Guardian, are held as bosses**: for 3 seconds, then they break free, and nobody can take hold of them again for 12 seconds (see each boss's page). The Ender Dragon is too vast to hold. Apocalypse's shield turns every other power away, but not hers: **mind power gets through**.
 * **Control:** while held, the target floats where Wanda looks. Press **V** again to **launch** it at high speed. When it crashes into a wall or the floor it takes heavy impact damage, and it hurts any creature it slams into.
-* **Blocks:** look at a block (up to 24 blocks away) and press **V** to tear it out of the ground. Throw it at enemies like a shell (8+ damage). It shatters on impact and drops its normal item.
+* **Blocks:** when there is nothing to take, **V** tears out the block you look at (up to 24 blocks away). **Sneak + V**, when V isn't holding anything, tears out the block you look at even past a creature, an item or a boss; not in the second after you let go of something. Throw it at enemies like a shell (8+ damage). It shatters on impact and drops its normal item.
   * Liftable: any block with hardness 5 or less (dirt, stone, logs, ores, iron blocks and so on) that has no inventory or other block data and is not in the `enhanced:telekinesis_immovable` tag. Bedrock, obsidian, portals, chests and spawners can't be lifted.
   * Lifting respects spawn protection, Adventure mode and claim mods.
-* **Sneak + V** sets the target down gently. A held block placed this way lands like falling sand.
+* **Sneak + V** while you hold something sets it down gently. A held block placed this way **becomes a block again where it lands**, under the same rules as building (spawn protection, claims, Adventure mode, never where someone stands, never for a holder who left the game). If it can't be placed, it drops its item (a glass block falls as glass).
+
+#### Bosses and borrowed blocks
+
+In the arena of a boss fight (Ultron's and Apocalypse's, which are protected), telekinesis never breaks the world: the block is **borrowed**. The hole **mends after 5 seconds**; a borrowed block you set down **crumbles 5 seconds later** (at most 3 of yours stand at once, never on top of each other or right next to anyone: no building in a boss fight); it never drops anything, and everything goes back when the fight ends. Sand or gravel that hangs over a gap is not lent, nor a block with a painting, a frame or a lead on it. The island of Sokovia is borrowed from too, but the ground under it lends nothing. A block of the island's ring can be carried up past the rim and set down on the island, but a block of the island itself stays over the island whoever carries it. A hole that snow, ice or a plant fills still mends, and every hole is mended when the fight ends. A block that holds something up (a torch, a flower, a lantern) is still borrowed: what it holds stays where it is, and if it breaks meanwhile it drops nothing and comes back when the hole mends. In Thanos's arena, which is not protected, the blocks are real.
+
+A held boss does nothing and can't be carried out of his arena. A boss you throw crashes where he comes down (dust, an anvil's clang) and takes the impact through his own limits. **Ultron's heart can be torn out also while you hold him** (see [Ultron](Ultron)).
 
 ### 4. Chaos Shield
 
@@ -153,7 +159,7 @@ You are in control of the Hex, and in *WandaVision* Vision starts to come apart 
 * **Look.** He is drawn like Vision: Vision's skin and yellow cape, and the Mind Stone glowing in his forehead (brighter while he fires). He floats and flies, and has poses of his own for hovering, flying (leaning into it, arms swept back, cape streaming), standing guard and punching.
 * **His place.** He follows you inside the Hex and **can never leave it**: the wall holds him exactly as it holds Vision. There is one per Hex, and he is there as long as it stands.
 * **He protects you** like a tamed wolf. He goes for whatever attacks you, whatever you attack, whatever hits him, and whatever you point him at (below). Up close he fights with **dense punches**: 12 damage (6 hearts), about one a second. From a way off he fires a short **Mind Stone beam**: 4 damage a hit, two hits a second, 16 blocks. He has 80 health (40 hearts; an Iron Golem has 100) and 8 armor.
-* **He never harms** you, players you allowed into the Hex, the pets of either, other Visions, or Creative and Spectator players, and no player at all on a server with PvP off. Your Chaos Beam and blows pass him by, and telekinesis can't lift him.
+* **He never harms** you, players you allowed into the Hex, the pets of either, other Visions, or Creative and Spectator players, and no player at all on a server with PvP off. Your Chaos Beam and blows pass him by, and no telekinesis lifts him, except Magneto's: he is vibranium. A Hex still holds him in, and with PvP off no throw or fall hurts him.
 * **Orders.** The **Z** key, *Vision, That One!* (it can be changed under *Options, Controls, Key Binds, Enhanced Powers*):
   * **Look at a creature and press Z**: he goes for that one, whatever else he is doing.
   * **Look at nothing and press Z**: he comes back to your side.
@@ -162,6 +168,14 @@ You are in control of the Hex, and in *WandaVision* Vision starts to come apart 
 
 ![The Vision of the Hex](images/hex-vision.png)
 
+## Build Magic
+
+Wanda can **build with her magic**: press **Y** and click two corners to fill, empty, change or paint them, double-click a whole tree or house, copy a castle and stamp it somewhere else, raise hills. **Her magic has no limit** (only the server's safety keeps the game running smoothly), she points as far as 256 blocks, **and inside her own Hex her spells go twice as fast.** **Ctrl + Z** takes it all back, even tomorrow. And when she stands near Billy, his spells cost half. See [Build Magic](Build-Magic).
+
+## Critical against Apocalypse
+
+Her mind power hits the boss Apocalypse **critically**: the Chaos Beam, a telekinetic slam, a borrowed block she throws, all are twice as strong on his shield and, when his shield is down, on his body. Everyone else hits him for much less then. See [Apocalypse](Apocalypse#he-never-heals-wanda-and-the-phoenix-hit-critically).
+
 ## Numbers you can change
 
-Wanda's flight speed, the beam's damage, range and Nausea, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be, and the Hex's default, smallest and largest radius, its death chance and how hard it bites a Vision who pushes against it are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration). The Vision of the Hex (his health, punch and beam, how long you need to rebuild him, and turning him off) is the `hex_vision.*` options.
+Wanda's flight speed, the beam's damage, range and Nausea, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be (Wanda's and the Phoenix's; Billy and Magneto have their own), and the Hex's default, smallest and largest radius, its death chance and how hard it bites a Vision who pushes against it are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration). The Vision of the Hex (his health, punch and beam, how long you need to rebuild him, and turning him off) is the `hex_vision.*` options.

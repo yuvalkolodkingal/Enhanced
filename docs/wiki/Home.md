@@ -17,7 +17,7 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 | Hero | Who | How you become one | Known for |
 |---|---|---|---|
-| [Magneto](Magneto) | The Master of Magnetism | Craft Magneto's Helmet and put it on | Metal telekinesis, iron shrapnel storm, magnetic shield |
+| [Magneto](Magneto) | The Master of Magnetism | Craft Magneto's Helmet and put it on | Metal telekinesis, the magnetic pull, iron shrapnel storm, magnetic shield |
 | [Scarlet Witch](Scarlet-Witch) | Wanda Maximoff | Touch the Mind Stone in Loki's Scepter (or use the Tesseract) while holding the Scarlet Witch Gene | Chaos beam, telekinesis, the Hex |
 | [Quicksilver](Quicksilver) | Peter Maximoff | Craft Quicksilver's Goggles and put them on | Quicksilver Time: the world slows down and plays *Sweet Dreams*; or Super Speed, where only he is fast |
 | [Vision](Vision) | The Mind Stone in a synthetic body | Touch the Mind Stone while holding a Synthezoid Core | Mind Stone beam, phasing through walls, density; White Vision look |
@@ -32,6 +32,16 @@ Hebrew: [עברית, דף הבית](Home-HE)
 | [Apocalypse](Apocalypse) | En Sabah Nur, the first mutant (a boss) | Plant a Capstone in the sand by day with a Scarlet Witch or a Phoenix near, beat him, and hold the Essence he leaves for three seconds | A fight against a golden shield that only mind power breaks, sand, portals and the Four Horsemen. The reward makes you Apocalypse: sand waves, levitation, a portal, a shield of your own and power bestowal |
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse) are on [Looks](Looks).
+
+## What's new in 3.1
+
+Four things Eilon asked for.
+
+* **Build Magic for Wanda and Billy.** Press **Y** and build with the mouse, as in Axiom and WorldEdit but with your own magic: click two corners and right-click to fill, empty, change or paint them, double-click a whole tree or house, and hold **Y** for the Spell Wheel (Fill, Vanish, Change, Paint, Pull & Push, Shapes, Copy, Move, Repeat, Land). You see everything before it happens, and **Ctrl + Z** takes it back, even tomorrow. Wanda's magic has no limit; Billy's grows as he practises, from Apprentice to Wiccan. See [Build Magic](Build-Magic).
+* **Every telekinesis works in the boss fights, and Billy moves blocks.** Billy tears blocks out of the ground and sets them down (**V**, **Sneak + V**). Wanda, Billy, the Phoenix and Magneto can take hold of Ultron, Thanos and Apocalypse, and the Wither, the Warden and the Elder Guardian too, as bosses: for a few seconds, then they break free. The blocks of a boss arena are only borrowed: the hole mends and the block crumbles. Billy and the Phoenix catch Thanos's sword, meteors and orbs and throw them back.
+* **Magneto masters every metal.** **R** lifts anything with metal in it: Vision, Ultron, armour or a sword in any hand, arrows in flight, metal blocks, rails and doors, and a Sentry he throws is crushed. **Sneak + R** when R isn't holding anything is the **Magnetic Pull**: the metal around you, the ore in the rock included, flies into your inventory. The metal people build with (lanterns, rails, hoppers) comes only from where you face, so your own base behind you is safe. See [Magneto](Magneto).
+* **Apocalypse never heals, and Wanda and the Phoenix hit him critically.** His health never comes back (his shield still knits). Every hit of Wanda's or the Phoenix's mind power is a **critical hit**: twice as strong on his shield and on him, with a burst and a crack you can hear. Everyone else still hurts him when his shield is down, but much less. See [Apocalypse](Apocalypse).
+* **Update the server and every player together.** A 3.1 server and a 3.0 player (or the other way round) cannot play together. Worlds from 3.0 open in 3.1 as they were.
 
 ## What's new in 3.0
 
