@@ -75,7 +75,7 @@ final class Ghost {
     private static final float ALPHA = 0.45F;
     private static final float PULSE = 0.10F;
     /** How bright the hero's glow over the blocks is, and a refused ghost's grey. */
-    private static final float GLOW = 0.25F;
+    private static final float GLOW = 0.15F;
     private static final float GREY = 0.6F;
     /** How bright the dust is. */
     private static final float DUST = 0.6F;
