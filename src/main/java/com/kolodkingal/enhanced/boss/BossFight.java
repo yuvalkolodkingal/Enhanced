@@ -449,6 +449,11 @@ public abstract class BossFight {
         return data.hasUUID(MARK) ? data.getUUID(MARK) : null;
     }
 
+    /** Takes the mark of its fight off the entity: it is nobody's side any more (see {@link BossFights#disown}). */
+    static void unmark(Entity entity) {
+        entity.getPersistentData().remove(MARK);
+    }
+
     /**
      * The loaded entities of this fight (the boss, its minions, its projectiles): a scan of the level, not for every
      * tick.

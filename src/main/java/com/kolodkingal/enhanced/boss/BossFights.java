@@ -431,6 +431,16 @@ public final class BossFights {
     }
 
     /**
+     * The entity leaves its fight: its mark is taken off, so that nothing of the boss's side spares it any more and the
+     * fight no longer counts it as its own (D-T 6.1, 6.3: a bolt of Ultron's or a lance of Apocalypse's that telekinesis
+     * caught and threw back is the thrower's now). Its owner must be someone else by then (a player), or the orphan sweep
+     * would take it at its next join.
+     */
+    public static void disown(Entity entity) {
+        BossFight.unmark(entity);
+    }
+
+    /**
      * Whether a fight holds the entity where it is (whatever the Sokovia lift carries): no telekinesis may take it, and a
      * hero it carries uses none.
      */

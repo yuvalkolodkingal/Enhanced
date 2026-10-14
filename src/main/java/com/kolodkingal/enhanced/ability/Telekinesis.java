@@ -70,7 +70,9 @@ import java.util.UUID;
  * its fighters, are never carried out of its arena ({@link BossFights#carryLimit}), and a boss tears free at the end of
  * his hold ({@link BossGrip#holdLimit}). Launched targets are tracked until they slam into something: they hurt every
  * creature they crash into and take heavy impact damage when they hit a wall or the floor; a throw of anything of a fight
- * stops dead at a gated arena's edge. A launched projectile simply flies again, where the holder looks.
+ * stops dead at a gated arena's edge. A launched projectile flies again, where the holder looks, and is the holder's: a
+ * boss fight's shot caught in flight (it stays still in the grip) leaves the fight when it is thrown, and Thanos's sword,
+ * meteor and orb turn on him ({@link BossHooks#throwBack}).
  *
  * <p>Whoever a grip lets go of that its holder may not hurt (a player with PvP off, a teammate, another player's pet) is
  * spared the fall, the wall and the slam until it lands ({@link #isSpared}, the landing guard of {@code
@@ -357,12 +359,11 @@ public final class Telekinesis {
 
     /**
      * Interim rule of lane TK: what left {@code telekinesis_immune} in 3.1 and whose grip is not written yet is not held,
-     * as in 3.0: Thanos's sword, meteor and orb until a shot stays still in the grip (step 7), and the Wither, the Warden
-     * and the Elder Guardian until a vanilla boss's {@code NoAI} is kept while he is held (step 10). {@link #refusal} already
-     * names what refuses them meanwhile (a switch off, an invulnerable state).
+     * as in 3.0: the Wither, the Warden and the Elder Guardian until a vanilla boss's {@code NoAI} is kept while he is held
+     * (step 10). {@link #refusal} already names what refuses them meanwhile (a switch off, an invulnerable state).
      */
     private static boolean awaitsBossGrip(Entity e) {
-        return isBossShot(e) || BossGrip.isVanillaBoss(e);
+        return BossGrip.isVanillaBoss(e);
     }
 
     /** The form's own test of what it takes (step 7 of {@link #canLift}): Magneto metal, the others anything loose. */
@@ -756,8 +757,15 @@ public final class Telekinesis {
         }
     }
 
-    /** A caught projectile flies again, where the holder looks, and hits for them. */
+    /**
+     * A caught projectile flies again, where the holder looks, and hits for them. A shot of a boss fight (Ultron's bolt,
+     * Apocalypse's lance or boulder) leaves the fight with it, so that nothing of the boss's side is spared by it, unless
+     * {@code boss.telekinesisCatchesBossShots} is off (then it keeps its mark, as in 3.0; D-T 6.1, 6.3).
+     */
     private static void launchProjectile(ServerPlayer player, Projectile projectile, Vec3 velocity) {
+        if (BossConfig.TELEKINESIS_CATCHES_BOSS_SHOTS.get()) {
+            BossFights.disown(projectile);
+        }
         if (projectile instanceof AbstractArrow arrow) {
             arrow.inGround = false;
             if (!(arrow instanceof ThrownTrident)) {
