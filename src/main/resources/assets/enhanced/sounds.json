@@ -1067,5 +1067,77 @@
         "name": "enhanced:sfx/ultron_death"
       }
     ]
+  },
+  "build_on_wanda": {
+    "subtitle": "subtitles.enhanced.build_on_wanda",
+    "sounds": [
+      {
+        "name": "enhanced:build_on_wanda"
+      }
+    ]
+  },
+  "build_on_billy": {
+    "subtitle": "subtitles.enhanced.build_on_billy",
+    "sounds": [
+      {
+        "name": "enhanced:build_on_billy"
+      }
+    ]
+  },
+  "build_cast_wanda": {
+    "subtitle": "subtitles.enhanced.build_cast_wanda",
+    "sounds": [
+      {
+        "name": "enhanced:build_cast_wanda"
+      }
+    ]
+  },
+  "build_cast_billy": {
+    "subtitle": "subtitles.enhanced.build_cast_billy",
+    "sounds": [
+      {
+        "name": "enhanced:build_cast_billy"
+      }
+    ]
+  },
+  "build_hum": {
+    "subtitle": "subtitles.enhanced.build_hum",
+    "sounds": [
+      {
+        "name": "enhanced:build_hum"
+      }
+    ]
+  },
+  "build_fizzle": {
+    "subtitle": "subtitles.enhanced.build_fizzle",
+    "sounds": [
+      {
+        "name": "enhanced:build_fizzle"
+      }
+    ]
+  },
+  "build_undo": {
+    "subtitle": "subtitles.enhanced.build_undo",
+    "sounds": [
+      {
+        "name": "enhanced:build_undo"
+      }
+    ]
+  },
+  "build_rank_up": {
+    "subtitle": "subtitles.enhanced.build_rank_up",
+    "sounds": [
+      {
+        "name": "enhanced:build_rank_up"
+      }
+    ]
+  },
+  "apocalypse_crit": {
+    "subtitle": "subtitles.enhanced.apocalypse_crit",
+    "sounds": [
+      {
+        "name": "enhanced:apocalypse_crit"
+      }
+    ]
   }
 }

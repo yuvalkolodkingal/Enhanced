@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.gametest.framework.GameTest;
@@ -26,7 +27,6 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -437,12 +437,11 @@ public final class ApocalypseCritTests {
         return count;
     }
 
-    /** How many times the crack of a critical hit (until its own sound: the player's crit at pitch 0.7) was heard. */
+    /** How many times the crack of a critical hit (the event {@code enhanced:apocalypse_crit}) was heard. */
     private static int critSounds(List<Object> packets) {
         int count = 0;
         for (Object sent : packets) {
-            if (sent instanceof ClientboundSoundPacket sound && sound.getSound().value() == SoundEvents.PLAYER_ATTACK_CRIT
-                    && Math.abs(sound.getPitch() - 0.7F) < 1.0E-3F) {
+            if (sent instanceof ClientboundSoundPacket sound && sound.getSound().value() == ModSounds.APOCALYPSE_CRIT.get()) {
                 count++;
             }
         }
