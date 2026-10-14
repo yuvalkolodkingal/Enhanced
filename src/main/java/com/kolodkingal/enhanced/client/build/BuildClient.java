@@ -455,6 +455,11 @@ public final class BuildClient {
 
     /** The selected thing's flood, {@value #FLOOD_PER_TICK} reads a tick; refused, it is let go and he is told why. */
     private static void floodOn(ClientLevel level, LocalPlayer player, BuildGrammar g) {
+        if (g.ghost() && g.hasMask()) {
+            // The ghost is the pocket's copy, which stays for the next stamp (D-B 4.8): the thing it was copied from is not
+            // found again after each stamp (a copy stamped beside it makes one bigger thing), nor let go with the ghost.
+            return;
+        }
         if (!g.hasMask()) {
             quietFlood = false;
             if (flood != null) {
@@ -651,7 +656,7 @@ public final class BuildClient {
         if (aim == null) {
             return BuildGrammar.Result.UNUSED;
         }
-        BuildGrammar.Result result = grammar().scroll(notches, fast, second, aim);
+        BuildGrammar.Result result = grammar().scroll(notches, fast, second, aim, ticks);
         BuildFeedback.heard(result, grammar());
         tellWhyHeld(player, result);
         update(player);

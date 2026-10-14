@@ -321,7 +321,7 @@ public final class BuildRenderer {
         if (!pushes || target == null || BuildKeys.MORE.isDown() || mask != null && g.maskBounds() == null) {
             return null;
         }
-        return BuildGrammar.faceLookedAt(target, eyes, look);
+        return g.pushFace(target, eyes, look, BuildClient.now());
     }
 
     /**

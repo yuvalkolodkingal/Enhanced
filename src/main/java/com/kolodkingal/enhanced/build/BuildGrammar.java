@@ -47,6 +47,13 @@ public final class BuildGrammar {
     public static final int FIRST_RADIUS = 3;
     /** A brush's radius when the builder first chooses one. */
     public static final int FIRST_BRUSH = 1;
+    /**
+     * A scroll gesture keeps the face its first notch pushed (D-B 3.3: the one the view met then, not the one it meets
+     * as the box moves under the crosshair) while the notches follow within this many ticks of one another.
+     */
+    public static final int PUSH_LATCH_TICKS = 20;
+    /** ... and while the view stays within about 5 degrees of where the last notch looked. */
+    public static final double PUSH_LATCH_COS = 0.996;
 
     /** What one input did, for the sound and the tip the client plays with it (D-B 6.7, 6.8). */
     public enum Result {
@@ -156,6 +163,12 @@ public final class BuildGrammar {
     private boolean heldBack;
     /** Whether the last click, drag or scroll was stopped by the hero's longest side (not by a size or the world). */
     private boolean sideHeld;
+
+    // The face the scroll gesture pushes, kept from its first notch: the box it left, where the view was, and when.
+    private @Nullable Direction pushed;
+    private @Nullable BoundingBox pushedBox;
+    private Vec3 pushedLook = Vec3.ZERO;
+    private long pushedTick;
 
     // Clicks: the last one (a double click's first half) and the press a release may make a drag of.
     private @Nullable BlockPos lastClick;
@@ -403,6 +416,15 @@ public final class BuildGrammar {
      * held ({@code second}, Left Alt), looking at {@code aim}. {@link Result#UNUSED} leaves the scroll to the hotbar.
      */
     public Result scroll(int notches, boolean fast, boolean second, Aim aim) {
+        return scroll(notches, fast, second, aim, pushedTick);
+    }
+
+    /**
+     * {@link #scroll(int, boolean, boolean, Aim)} at {@code tick}: a notch within {@value #PUSH_LATCH_TICKS} ticks of the
+     * last one, with the view still within a few degrees of where it looked, pushes the same face again (a box that
+     * grows under a held crosshair never makes the next notch push another side).
+     */
+    public Result scroll(int notches, boolean fast, boolean second, Aim aim, long tick) {
         aim(aim);
         sideHeld = false;
         if (notches == 0) {
@@ -414,11 +436,11 @@ public final class BuildGrammar {
         int step = notches * (fast ? (spell == Spell.REPEAT ? REPEAT_CTRL_STEP : CTRL_STEP) : 1);
         switch (spell) {
             case FILL, VANISH, CHANGE -> {
-                return push(aim, step);
+                return push(aim, step, tick);
             }
             case COPY, MOVE -> {
                 if (!ghost) {
-                    return push(aim, step);
+                    return push(aim, step, tick);
                 }
                 int reach = Math.max(0, limits.reach());
                 int wanted = lift + step;
@@ -490,12 +512,12 @@ public final class BuildGrammar {
         return Math.abs(next) > side ? Result.HELD_BACK : Result.NUMBER;
     }
 
-    private Result push(Aim aim, int step) {
+    private Result push(Aim aim, int step, long tick) {
         BoundingBox box = finishedBox();
         if (box == null) {
             return Result.UNUSED;
         }
-        Direction face = faceLookedAt(box, aim.eyes(), aim.look());
+        Direction face = pushFace(box, aim.eyes(), aim.look(), tick);
         if (face == null) {
             return Result.UNUSED;
         }
@@ -522,7 +544,24 @@ public final class BuildGrammar {
         cornerB = high;
         int now = axis.choose(edge.getX(), edge.getY(), edge.getZ());
         sideHeld = positive ? wanted > min + side - 1 : wanted < max - side + 1;
+        pushed = face;
+        pushedBox = finishedBox();
+        pushedLook = aim.look();
+        pushedTick = tick;
         return now != wanted ? Result.HELD_BACK : Result.PUSHED;
+    }
+
+    /**
+     * The face a scroll at {@code tick} pushes: the one the gesture already pushes (the box is the one it left, the
+     * last notch was at most {@value #PUSH_LATCH_TICKS} ticks ago and the view has moved less than a few degrees), else
+     * the face the view meets ({@link #faceLookedAt}). The client's arrow shows this face too.
+     */
+    public @Nullable Direction pushFace(BoundingBox box, Vec3 eyes, Vec3 look, long tick) {
+        if (pushed != null && box.equals(pushedBox) && tick - pushedTick <= PUSH_LATCH_TICKS && tick >= pushedTick
+                && look.dot(pushedLook) >= PUSH_LATCH_COS) {
+            return pushed;
+        }
+        return faceLookedAt(box, eyes, look);
     }
 
     // ------------------------------------------------------------------------------------------------------------
