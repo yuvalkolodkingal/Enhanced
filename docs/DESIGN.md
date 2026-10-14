@@ -32,7 +32,7 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 |---|---|
 | One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, Phoenix, Spider-Man, Thanos, Ultron, Apocalypse. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
-| Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. One more key, **Z** (*Vision, That One!*), belongs to the Scarlet Witch alone: it is her order to the Vision her Hex raises (section 2). |
+| Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. One more key, **Z** (*Vision, That One!*), belongs to the Scarlet Witch alone: it is her order to the Vision her Hex raises (section 2). **(added in 3.1)** **Y** is the one key outside R to N, H and Z: *Build Magic*, for the Scarlet Witch and Billy alone (section 18). |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs; Spider-Man doesn't fly either: he zips and swings on webs (section 14), and Thanos walks and steps through portals (section 15). |
 | Flight and run animation **(added)** | Every hero's pose is blended from the situation instead of switched, so nothing snaps and other players see it too. Each flier has a flight of his own. Magneto glides with his arms spread, leaning about 40° at full speed. Wanda floats upright with her palms open and stretches out, arms ahead, about 60° forward in a sprint. Vision is a straight body with arms at his sides, leaning about 65° at speed. Billy flies like a kid, arms wide, then ahead at a sprint. Thor leans about 90° behind his weapon, which really is in his fist in every pose (Mjolnir's handle and Stormbreaker's pass through it), whirls on its strap with a swoosh while he takes off and hovers, and is thrust ahead of him at speed; he overshoots a little and settles like a heavy hero. Every flier takes off with a gesture of his own, banks into turns, tips over in a dive, leans back when he climbs and brakes when he stops (Thor lands as a hero, planting the weapon). Quicksilver (in Quicksilver Time and in Super Speed) and Tommy at super speed run with their own stride, with ghosts of the stride behind them and a skid when they stop, and everyone else sprints and walks with a character of his own. Every flier leaves a trail of his own along the path he flew (crimson threads from Wanda's hands, golden threads from Vision's shoulders, field lines from Magneto's, a double helix from Billy's, lightning from Thor's boots), with white wind streaks at speed, a ring at take-off, a shockwave when a hero lands and a sonic boom when Thor or Vision break the sound barrier. Three client options (in `config/enhanced-client.toml`, section `[animation]`, and behind the *Config* button of Enhanced in the Mods screen; nothing there is synced) change it: *Hero animations* turns the hero animation off (vanilla poses), *Reduced motion* tones it down (hover bob and drift at a third, no trembling hands, jitter or camera shake), and *Flight effects* turns off the trails, wind and rings. |
 | Ability animation **(added)** | Every ability is acted, not just switched on, and other players see it too. **Magneto** draws his field out around him with both arms, closes a claw on the metal and wrenches it away, and holds what he lifts with a steady open hand. The **Scarlet Witch** gathers her arms across her chest and throws them open to raise the Chaos Shield, thrusts both hands out for the beam, raises both hands overhead to grow the Hex and moves them apart or together to make it bigger or smaller; her lifting hand is a raised, shaking claw. **Quicksilver** taps his goggles, starts like a sprinter, jabs a flurry of fists in his blitz and darts a hand out to snatch. **Vision** puts his fingers to his temple before the beam, floats his arms wide to let go of the world and braces to become dense. **Tommy** shakes his arms out, spins twice in his blitz, shivers before he goes through a wall and holds out a vibrating palm. **Billy** thrusts his hand at the target of the Hex Bolt, throws both hands up to freeze and presses them to his ears for the Noise. **Loki** flicks his daggers from over the shoulder, raises a spread hand to cast and roars as the Frost Giant; his Scepter jabs instead of chopping. **Thor** hauls back and whips his arm to throw the weapon, holds out his hand for it, is slapped by it as it comes home (with sparks), kicks back as the lightning leaves his hand and holds his arm out along the beam while he fires it, thrusts Mjolnir up as it bursts into fragments and closes his fist as they come together, brings it down on whoever he pins, and roars as the God of Thunder. Your own gesture starts the moment you press the key, without waiting for the server. In first person your hands move too (hands in and up for the shield, a palm thrust out for the bolt, the dagger flicked forward, the weapon whirling at the edge of the screen) and the beam, the tether and the bolt leave the hand where it is drawn. |
@@ -75,7 +75,7 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R | **Metal Telekinesis** | Look at a target up to 32 blocks away and press **R** to lift it. While held, it floats where you look. Press **R** again to **launch** it. **Sneak + R** sets it down gently. |
+| 1 | R | **Metal Telekinesis** | Look at a target up to 32 blocks away and press **R** to lift it. While held, it floats where you look. Press **R** again to **launch** it. **Sneak + R** sets it down gently, and **with nothing held, Sneak + R is the Magnetic Pull** (1.3a): everything metal around you flies into your inventory. |
 | 2 | G (hold) | **Iron Shrapnel Storm** | Hold **G** to fire a machine-gun stream of iron shrapnel (10 shards/second), paid for with iron from your inventory. |
 | 3 | V | **Armor & Weapon Strip** | Look at an enemy and press **V**. Every metal weapon and armor piece is ripped off and drops to the ground. |
 | 4 | B (toggle) | **Magnetic Shield** | An invisible magnetic field that repels all metal projectiles. |
@@ -83,18 +83,76 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 
 #### Ability 1 — Metal Telekinesis
 
-* **Valid targets:** any mob or player wearing at least one piece of **Iron, Chainmail
-  or Gold armor**, and **Iron Golems**. **(added)** Minecarts and dropped metal items
-  also count, because they are made of metal.
+* **Valid targets (3.1): everything with metal in it** (one rule, `ability/Metal`, for every power of Magneto): any
+  creature or player with iron, gold, copper or netherite **anywhere in its equipment** (armor, either hand, horse armor),
+  **Iron Golems**, every minecart, Ultron's Sentries, **Vision and White Vision** (unless phased: then he slips out of the
+  grip, `slipped`), **the Ultron hero**, the Iron Spider, **the Vision of a Hex** (only Magneto can lift him), dropped metal
+  items, a falling anvil or a block someone threw, and **metal arrows and tridents in flight** (catch them, then throw them
+  back). **Never** Mjolnir (it answers only to a worthy hand), the Infinity Gauntlet, Ultron's Core, the heroes' own gear,
+  Loki's daggers or a copy of Loki (no real metal), or a phased Vision.
+* **Metal blocks (3.1).** Look at a metal block up to `magneto.blockLiftRange` (24) away and press **R** when nothing else
+  is in the way: the blocks of `enhanced:magnetic_blocks` (iron, gold, copper and netherite blocks, ores, anvils, rails,
+  chains, bars, lanterns, doors, plates, pistons, lightning rods...), up to hardness `blockLiftMaxHardness` (50); rails and
+  plates can be aimed at; **a door comes out whole** and lands as a door; a hanging lantern that cannot hang stands; a
+  piston is held and set down retracted; gold blocks anger piglins. A block that holds things (hopper, blast furnace, crafter,
+  bell) stays: `fixed_metal` says the pull would take it, `fixed_metal_full` that it holds things. Spawn protection, Adventure
+  mode and claims are respected, and in a boss arena the block is only borrowed (section 2.3).
 * **Iron Golem control:** Magneto can lift any Iron Golem and throw it at enemies.
   A thrown golem hits like a wrecking ball (up to 15 damage to whatever it slams into),
-  takes no damage itself, never turns on Magneto, and starts fighting the monster it hit.
+  takes no damage itself, never turns on Magneto, and starts fighting the monster it hit. **(3.1)** A Sentry he throws
+  is crushed (grey metal sparks, an anvil's clang), as when Wanda throws one.
 * **Launch:** launched targets fly at high speed. When they slam into a wall or the
   floor they take heavy impact damage (up to 16) and hurt any creature they crash into
   (up to 6 damage).
 * One target at a time. The hold breaks automatically if the target dies, leaves the
-  dimension or gets more than 48 blocks away. A held *player* is released after
-  30 seconds **(added — so nobody is trapped forever)**.
+  dimension or gets more than 48 blocks away (or a held Vision phases). A held *player* is released after
+  30 seconds **(added — so nobody is trapped forever)**. **(3.1) With PvP off (or a teammate), a player or someone's
+  pet that any telekinesis lets go of or throws takes no fall, wall or slam damage until it lands**
+  (`telekinesisSparesFriends`), and the same holder cannot grip the same player again for 3 seconds
+  (`telekinesisPlayerRegripTicks`); for a second after any grip ends, Sneak + the key with nothing held does nothing
+  (`telekinesisSneakGraceTicks`).
+* **Bosses (3.1).** Ultron, Thanos and Apocalypse are held as bosses, **1.5 times as long as Wanda** (`boss.magnetoHoldFactor`):
+  4.5 s for an Ultron body (vibranium is metal), 3 s for Thanos, 4.5 s for Apocalypse in a window until his true form,
+  never through his shield; then 12 s before anyone can hold him again. Thanos's sword in flight is caught and tears free
+  after 3 s. The Wither, the Warden, the Elder Guardian and the Ender Dragon are not metal.
+
+#### 1.3a The Magnetic Pull (Sneak + R holding nothing) **(added in 3.1)**
+
+**Sneak + R when R holds nothing** (whatever is in his hand) is a pull; it never grabs. Nothing happens within
+`telekinesisSneakGraceTicks` (20) of a grip ending, while he rides, for a Spectator, or while the pull recharges
+(`pull.recharging`) or he is too hungry (`pull.too_hungry`). One pull a time, sliced over the server's ticks.
+
+* **Reach.** A sphere of `pullRadius` (8) round where he pressed. **Natural metal** (`enhanced:magnetic_ores` and raw-metal blocks)
+  comes **through rock**; **built metal** (every other block of `magnetic_blocks`) only if he **sees** it
+  (`pullBuiltNeedsSight`) **and** it lies within the **cone he faces**, `pullBuiltCone` (120 degrees; 360 = all round), so his own
+  base behind him stays. Only loaded chunks, never the block under his feet. Never a cell that is protected by
+  `BlockRights.massEditRefuses` (spawn, claims, the border, Adventure, `build_magic.allArenasProtected`: every running boss
+  arena, Thanos's included, the island of Sokovia, the ground it hides, a Hex that is not his when `build_magic.hexIsAClaim`),
+  never a block a villager has claimed (a blast furnace, smithing table, stonecutter or bell in use), never a block or minecart that **holds
+  items** (an empty one comes), never an extended or powered piston.
+* **What each thing gives.** An **ore** turns into its ground (stone, deepslate, netherrack, blackstone) and gives its metal:
+  iron ore 1 raw iron, gold ore 1 raw gold, copper ore 2 to 5 raw copper, nether gold ore 2 to 6 gold nuggets, gilded blackstone 2 to 5 gold
+  nuggets, ancient debris 1 netherite scrap (`pullAncientDebris`; it becomes netherrack). A **built block** comes whole,
+  as Silk Touch mining gives it (a door as one door; a hopper spills what it held, which is why it comes only when empty).
+  **Loose metal** (items he has room for, stuck arrows and tridents, falling blocks, empty minecarts) comes from all round.
+  **Hostile creatures** lose every metal piece of gear (`pullTakesGear`; a boss's strip hook answers first; a Horseman's crumbles; a
+  Loki copy dissolves). **A player, with PvP on and only one he can see**: one piece into **his inventory**
+  (`pullPlayerGearToFeet` drops it at the player's feet instead), or an Iron Spider's nanites scatter, or a metal body is
+  tugged; then `pullPlayerGraceTicks` (200) of grace. **Metal bodies** (Iron Golem, Vision, the Ultron hero, the Vision of a Hex; never a
+  fight's Sentries, a creature another player owns, or a participant of a fight) are **tugged** toward him, at most `pullTug`
+  (1) blocks a tick, unhurt.
+* **Storage.** What is inside chests, barrels, shulker boxes, item frames and armor stands is never taken, unless
+  `pullFromStorage` (default false): then the **metal stacks** of what he sees come (claims asked per block, never a
+  villager's block, pets never), and the container, frame or stand stays.
+* **Into the inventory.** Each thing goes straight into his inventory; what does not fit drops at his feet (`pull.full`).
+  Taking is sliced: the 64 nearest things (`pullMaxTargets`), 2 a tick (`pullPerTick`), 8,192 cells searched a tick
+  (`pullScanPerTick`); each is checked again when its turn comes. The first thing affected starts the **cooldown**
+  `pullCooldown` (100 ticks, 5 s) and the cost `pullExhaustion` (4.0 = one hunger point); a pull that finds nothing costs
+  nothing (`pullRetryTicks` 10). It ends at once if he dies, logs out, changes dimension, loses the power, becomes a Spectator
+  or moves more than the radius from where he pressed.
+* **Seen and heard.** The gesture (arms wide, fists to the chest), a colourless ring growing to the radius, every thing
+  flying to his hand along a line of force as its item (8 to 26 ticks), `magnet_pull` at the start, `CHAIN_BREAK`,
+  soft pickup clinks, `CHAIN_PLACE` at the end; the HUD shows `pull 4.9s` on R's line while it recharges.
 
 #### Ability 2 — Iron Shrapnel Storm
 
@@ -117,10 +175,14 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 
 #### Ability 3 — Armor & Weapon Strip (Disarm)
 
-* Works on players, zombies, skeletons, piglins and every other creature, up to 32 blocks.
-* Rips off every metal item in a hand or armor slot (iron, chainmail and gold armor,
-  iron and gold weapons and tools, shears, flint & steel, metal horse armor). The items
-  fly out and land on the ground as normal items.
+* Works on zombies, skeletons, piglins and every other creature, up to 32 blocks. **(3.1) On players only with PvP on**
+  (never a teammate or a Creative player: `disarm.no_pvp`, `disarm.not_allowed`).
+* Rips off every metal item in a hand or armor slot (iron, chainmail, gold, **copper and netherite** armor, metal weapons
+  and tools, shields, crossbows, tridents, Stormbreaker, shears, flint & steel, metal horse armor). The items
+  fly out and land on the ground as normal items (a player's piece drops at his feet).
+* **(3.1)** If the metal is the body itself (a golem, a Sentry, Vision, Ultron): `disarm.metal_body`, "lift it with R", no
+  cooldown. A copy of Loki **dissolves** (`disarm.illusion`). Gear a creature never drops (the Horsemen's iron) **crumbles**.
+  On Thanos it wrenches off **one plate** (once in 6 s, shared with slams; never while he arrives or dies).
 * Cooldown: 3 seconds.
 
 #### Ability 4 — Magnetic Shield
@@ -233,7 +295,8 @@ To touch the stone, hold the scepter and **right-click** (use it):
 |---|---|---|---|
 | 1 | R (hold) | **Chaos Energy Beam** | A glowing, crackling red beam from Wanda's hand. |
 | 2 | G (toggle) | **Enhanced Flight** | Fast, smooth flight with red energy around both hands. |
-| 3 | V | **Telekinesis** | Lift creatures, dropped items **or blocks**, move them with your gaze, then launch them. |
+| 3 | V | **Telekinesis** | Lift creatures, dropped items **or blocks**, move them with your gaze, then launch them. **(3.1)** Sneak + V with nothing held tears out the block you look at; the three villains and the Wither, the Warden and the Elder Guardian are held as bosses. |
+| (3.1) | Y | **Build Magic** | Tap: build mode on or off; hold: the Spell Wheel. Her magic has no limit: section 18. |
 | 4 | B (hold) | **Chaos Shield** | A red glowing sphere that stops projectiles and melee blows and softens explosions. It takes time to form, wears out and can shatter. |
 | 5 | N | **The Hex** | A giant red energy dome that only Wanda controls. |
 
@@ -263,20 +326,41 @@ To touch the stone, hold the scepter and **right-click** (use it):
 #### Ability 3 — Telekinesis
 
 * **Targets:** any monster, animal, villager, player or dropped item within 32 blocks.
-  Bosses (Ender Dragon, Wither, Warden, Elder Guardian) are too powerful to lift.
+  **(3.1) Ultron, Thanos and Apocalypse, and the Wither, the Warden and the Elder Guardian, are held as
+  bosses**: for 3 seconds, then they break free, and nobody can take hold of them again for 12 seconds (see each boss's
+  section); the Ender Dragon is too vast to hold (`telekinesis.dragon`). Apocalypse's shield turns every power but mind
+  power away, hers included: she holds him through it. Every form works the same way (3.1: Wanda, Billy, the Phoenix and Magneto),
+  and a boss's shots (Thanos's sword, meteors and orbs; Ultron's bolts; Apocalypse's lances and boulders) are caught by whoever
+  catches projectiles, and are the thrower's when thrown back.
 * **Control:** while held, the target floats where Wanda looks. Press **V** again to
   **launch** it at high speed. When it crashes into a wall or the floor it takes heavy
   impact damage, and it hurts any creature it slams into.
-* **Blocks:** look at a block (up to 24 blocks away) and press **V** to tear it out of
-  the ground. Throw it at enemies like a shell (8+ damage). It shatters on impact and
+* **Blocks:** when there is nothing to take, **V** tears out the block you look at (up to 24 blocks away);
+  **(3.1) Sneak + V with nothing held tears it out even past a creature, an item or a boss** (never in the second after a
+  grip ended: `telekinesisSneakGraceTicks`). Throw it at enemies like a shell (8+ damage). It shatters on impact and
   drops its normal item.
   * Liftable: any block with hardness 5 or less (dirt, stone, logs, ores, iron blocks…)
     that has no inventory or other block data and isn't on the
     `enhanced:telekinesis_immovable` tag. Bedrock, obsidian, portals, chests and
     spawners can't be lifted.
   * Lifting respects spawn protection, Adventure mode and claim mods.
-* **Sneak + V** sets the target down gently. A held block placed this way lands like
-  falling sand.
+* **Sneak + V** sets the target down gently. A held block placed this way **(3.1) becomes a block again where it lands**,
+  under the placing rules (room, arenas, claims, spawn protection, never for a holder who left the game, never where someone
+  stands); refused, it drops its loot, or itself when its loot is empty (glass, ice).
+* **Arena blocks are borrowed (3.1).** In a protected arena (Ultron's and Apocalypse's) a block lifted by any telekinesis is
+  *borrowed*: its hole mends after 5 s (`arenaMendTicks` 100), a set-down borrowed block crumbles after 5 s
+  (`borrowedBlockTicks` 100; at most `maxStandingPerPlayer` 3 stand, never on one another or next to anyone), it never drops
+  anything, a thrown one turns to dust, a fight holds at most `maxBorrowedBlocks` (48), and everything goes back when the fight ends; a
+  journal written off the server thread restores the ground after a hard crash, and forgets a repair only two world saves
+  later. Sand hanging over a gap, a block with a painting, frame or lead on it, and the ground under the island are not
+  lent. The island in the sky is protected whatever `boss.protectArena` says. Thanos's arena is not protected: real blocks.
+* **Bosses in the grip (3.1).** A held boss does nothing, cannot be carried out of his arena, is never held in his
+  invulnerable states (Thanos arriving or dying, Ultron shielded or changing bodies, the lift's lock, Apocalypse's shield forming), breaks
+  free after `holdTicks` (60 / 40 / 60, the vanilla bosses `boss.vanillaHoldTicks` 60) times the form's factor (Billy 0.5,
+  Magneto 1.5 on metal), then nobody can hold him again for `boss.regripTicks` (240) counted from when he can act; a thrown
+  boss does nothing for at most `thrownStillTicks` (20), takes the impact through his own caps and crashes where he comes down.
+  A vanilla boss is held with his AI off (never saved that way).
+* **Critical against Apocalypse (3.1).** Her mind power hits the boss critically: section 17.3.
 
 #### Ability 4 — Chaos Shield
 
@@ -387,7 +471,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
     section of the config, which can also turn him off.
   * He never harms Wanda, players she allowed into the Hex, the pets of either, other Visions, or Creative
     and Spectator players, and no player at all on a server with PvP off. Wanda's Chaos Beam and blows pass
-    him by, and telekinesis can't lift him.
+    him by, and no telekinesis lifts him, except Magneto's: he is vibranium. A Hex still holds him in, and with PvP off no throw or fall hurts him.
   * **Orders.** The **Z** key (*Vision, That One!*, rebindable under *Options → Controls → Enhanced
     Powers*): look at a creature and press it, and he goes for that one, whatever else he is doing;
     look at nothing and press it, and he comes back to her side; **Sneak + Z** makes him hold his post or
@@ -506,7 +590,7 @@ The movement speed bonus and the step-up stay tied to **sprinting**, so he can s
   colour, chalk white with glowing pale cyan eyes and no Mind Stone, only an empty hexagonal
   socket of copper circuitry in his forehead. His beam is pale cyan-white instead of gold, and
   he phases in a white aura. Press **H** to switch.
-* **Max health 30** (15 hearts) and **8 armor** from his vibranium body.
+* **Max health 30** (15 hearts) and **8 armor** from his vibranium body. **(3.1)** Vibranium is metal: Magneto can lift and throw him, unless he is phased: then he slips out of the grip.
 * He never gets hungry and never runs out of air.
 * **(added)** Inside a standing Hex he can't leave it, in either look, whether or not Wanda let him in:
   he comes apart at its wall and is thrown back (White Vision is only thrown back), until he hurts Wanda
@@ -594,7 +678,8 @@ Billy's magic is blue with a white-hot core, crackling and branching like a Tesl
 |---|---|---|---|
 | 1 | R | **Hex Bolt** | A crackling blue arc from his hand to the first creature he looks at within 24 blocks: 6 damage, and it forks on to the two nearest creatures within 5 blocks of it (3 damage each). Everyone around sees the bolts. Cooldown half a second. |
 | 2 | G (toggle) | **Flight** | Calm, weightless flight with open hands, like his mother's (speed 0.08). |
-| 3 | V | **Telekinesis** | Wanda's telekinesis, in his blue: creatures, dropped items, minecarts, boats, primed TNT, falling blocks, **and projectiles in flight**: an arrow he catches hangs in front of him, pointing where he looks, and flies off at his command. He doesn't tear blocks out of the ground (that is Wanda's). Press again to launch, **Sneak** + the key to put down gently. |
+| 3 | V | **Telekinesis** | Wanda's telekinesis, in his blue: creatures, dropped items, minecarts, boats, primed TNT, falling blocks, **and projectiles in flight**: an arrow he catches hangs in front of him, pointing where he looks, and flies off at his command. **(3.1) He tears blocks out of the ground too**: within 16 blocks, hardness 3 at most (stone, ores, planks; not iron blocks), one block a second (`billy.blockLifting`, `blockLiftRange`, `blockLiftMaxHardness`, `blockLiftCooldown`); **Sneak + V** with nothing held takes the block he looks at, even past a creature. He holds the villains and the vanilla bosses as bosses, half as long as Wanda (`boss.billyHoldFactor`); Apocalypse only in a window. Press again to launch, **Sneak** + the key to put down gently (a block becomes a block again where it lands). |
+| (3.1) | Y | **Build Magic** | Tap: build mode on or off; hold: the Spell Wheel. An apprentice who learns: a magic meter, ranks from Apprentice to Wiccan, half the cost near a Scarlet Witch: section 18. |
 | 4 | B | **Freeze** | Every creature and player within 12 blocks in a 90° cone in front of him, in his line of sight, is **spellbound** for 5 seconds: they can't move, jump or attack, can't pick a new target, and blue sparks circle their heads. The Ender Dragon and the Wither are too strong for it. Cooldown 12 seconds. |
 | 5 | N (toggle) | **The Noise** | He hears every mind within 32 blocks: every creature glows through walls, **red** if it is hostile and about to attack, **blue** otherwise. Whispers crowd his head, louder the more minds are near. |
 
@@ -649,7 +734,7 @@ five abilities.
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | R | **Daggers** | He throws a conjured dagger from his hand, fast and almost flat, for up to 3 seconds of flight: **5 damage** (`daggerDamage` in the server config). It was never real: whatever it hits, or when its flight ends, it breaks up into green sparks, so it can never be picked up, and it passes through his own duplicates. Cooldown 0.4 seconds. **Sneak + R** throws a **fan of three**, 10° apart. Cooldown 1.5 seconds. |
-| 2 | G | **Duplicates** | *"Surprise!"* He turns invisible for 5 seconds (his held items and name are hidden too) and **three** illusory copies of him, looking exactly like him and holding what he holds, walk off in different directions, 12 blocks each. Every creature within 24 blocks that was after him goes after the nearest copy instead. A copy dissolves in one hit into warm-white streaks of light with a flash of his green, deals no damage, drops nothing and fades after 8 seconds anyway; they all dissolve if he loses his power. Drinking milk brings him back into view early. Cooldown 15 seconds. |
+| 2 | G | **Duplicates** | *"Surprise!"* He turns invisible for 5 seconds (his held items and name are hidden too) and **three** illusory copies of him, looking exactly like him and holding what he holds, walk off in different directions, 12 blocks each. Every creature within 24 blocks that was after him goes after the nearest copy instead. A copy dissolves in one hit into warm-white streaks of light with a flash of his green, deals no damage, drops nothing and fades after 8 seconds anyway; **(3.1) it has no real metal, so Magneto's strip or pull dissolves it and Tommy's Disarm Blitz takes nothing from it** (`enhanced:conjured_bodies`); they all dissolve if he loses his power. Drinking milk brings him back into view early. Cooldown 15 seconds. |
 | 3 | V | **Shapeshift** | He takes the shape of the creature or player he looks at, up to 16 blocks away, in a flash of green light, and every creature of that kind within 48 blocks lets go of him: creatures never pick one of their own kind as a target (a zombie leaves him alone, a husk still comes for him). A player is copied with their skin and their name. Looking at nothing turns him back. The Ender Dragon, the Wither, the Warden, the Elder Guardian and his own duplicates can't be copied. No cooldown. |
 | 4 | B | **Vanish** | Gone in a green flash and back where he looks, up to 20 blocks away: on top of the block he looks at, or right behind the creature, facing its back; with nothing in reach, in mid-air where he looks. Not where there is no room, and not through a Hex wall. Cooldown 3 seconds. |
 | 5 | N (toggle) | **Frost Giant** | His true Jotun form: blue-grey skin with raised ridges and burning red eyes (painted onto whichever look he wears, his own skin included). **+4 armor**, he never freezes and the cold can't hurt him, still water freezes into frosted ice where he walks (within 3 blocks, like Frost Walker), and every blow he lands slows the creature (**Slowness II for 3 seconds**) and freezes it over. Creatures that are immune to the cold aren't affected. Press again to look Asgardian again. |
@@ -702,7 +787,7 @@ colour of his magic: the abilities are the same in every look, the Frost Giant i
   Mjolnir nobody owned, or lifts their own, lightning strikes and they **become Thor**. Vision can
   claim it and fight with it, but stays Vision.
 * Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava
-  can't destroy it. Speedsters can't snatch it and telekinesis can't lift it.
+  can't destroy it. Speedsters can't snatch it and telekinesis can't lift it, not even Magneto's. **(3.1)** Stormbreaker, by contrast, is metal: Magneto can lift it, tear it from a hand and pull it.
 * **Shattering Mjolnir** (*Thor: Love and Thunder*, where Jane's Mjolnir bursts into dozens of glowing
   fragments that each strike an enemy, then fly back and reassemble). **Sneak + R** with Mjolnir in
   Thor's hand (with Stormbreaker, Sneak + R just throws it as R does): it bursts into glowing,
@@ -870,6 +955,13 @@ Every power's light follows the films and shows:
 | `/enhanced boss start apocalypse [force]` | With `force`, wakes En Sabah Nur at your feet, with no Capstone, and skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (never the switch that turns him off, Peaceful or the one-fight-at-a-time rule); without `force` the command is the ritual itself and needs a Capstone in hand and a block in sight (section 17.11). |
 | `/enhanced boss stop` | End the running boss fight (a used Program or Capstone is given back, the island of Sokovia is put back); a second stop while a boss is leaving ends it at once. |
 | `/enhanced boss list` | List the running boss fights. |
+| `/enhanced build undo <player> [steps]` | **(3.1)** Undo that player's last Build Magic steps (1 by default) with the same safe rule as Ctrl + Z. |
+| `/enhanced build stop [<player>\|all]` | Stop the working spells where they are (undoable) and drop the queues. |
+| `/enhanced build list` | The spells working or waiting: player, spell, dimension, percent, blocks. |
+| `/enhanced build history <player>` | That player's steps. |
+| `/enhanced build rank <player> [1-4]` | Billy's rank and practice; with a number, set the rank (practice becomes its threshold, the meter fills). |
+| `/enhanced build meter <player> <value>` | Set Billy's magic meter (0 to its top). |
+| `/enhanced build forget <player>` | Clear that player's history and pocket (memory and disk). |
 | `/enhanced boss cleanup <center> <radius>` | Remove every entity of a boss's kind within the radius (the bosses, the Sentries, Thanos's sword, meteors, orbs and illusions, the Vibranium Key, the bolts, lances, boulders and cocoons), whether a fight owns it or not; no block is touched. |
 
 **(added)** `/enhanced_anim` is a client-only tool (no operator rights, nothing changes for anyone else) for looking at the
@@ -895,6 +987,8 @@ who lifts it (`mjolnirOwnerOnly`), the Bifrost's
 cooldown, how far the Phoenix's Mind Reading, Mind Sense and Mind Control reach and what they cost, how many creatures she can take over and for how long, the Psionic Field, and every number of the Phoenix Burst (charge time, radius, damage, what a player takes, wave speed, fire, knockback, whether it sets fires or hurts villagers and animals, hunger, cooldowns and the drain afterwards), Spider-Man's speed, jump, strength and fall damage, how long the Radioactive Spider's bite takes, how far spider-sense reaches and how often it scans, every number of the Web Shot, the Web Burst, the Web Zip (including the kick), the Web Swing and the Wall Crawl, how long webs and web blocks last and how many he can have, organic webs, each suit's protection and how long Magneto's strip lasts, the Iron Spider's legs, every number of Instant Kill (including whether it may strike players), and every number of the Black Eyes (what they give, what they cost, how long they last, the crash, and whether low health sets them off), the rules every boss fight shares (`[boss]`: how many fights at once, the wipe, abandon and time limits, the reward's minimum time, Creative players, the experience, the announcements, the arena's protection and a difficulty scale), every number of the Mad Titan (the call and its site, his health, the clock of stones, the surge and the enrage, the damage and cooldown of every move, the durations, the plates, poise and caps, and the share that earns the Gauntlet) and of the Thanos hero (his body and each stone's damage, range, duration, cooldown and hunger), every number of the Ultron fight (the bodies, the attacks, the Sentries and their waves, the lift: its mode, radius, height, depth and speed, and the field) and of the Ultron hero (his body, the plasma pool, every ability, the drones, the range of Vision's cut and lightning), what counts as mind power for En Sabah Nur's shield and how much of each kind it takes, his health, the strength and growth of his three shields, the windows and floors, the Escape, the damage and number of every attack, the Horsemen, the arena and its wall, and the hero's body, flight speed, shield, Wave, Entomb, Portal, Bestowal and Sandstorm (damage, range, duration, cooldown and cost)…) can be changed in `world/serverconfig/enhanced-server.toml`. The four client options
 (*Hero animations*, *Reduced motion*, *Flight effects*, *Hide heroes' armour*) are in `config/enhanced-client.toml` of the player's own game,
 with two of Thanos's (the music and the atmosphere of his fight, in its `[thanos]` section).
+
+**(added in 3.1)** The server file has three new sections for Build Magic, `[build_magic]` (the time and speed budget, the hold-to-confirm rules, where spells may work, the undo and pocket caps), `[build_magic_wanda]` (her reach and her technical caps: her magic has no gameplay limit) and `[build_magic_billy]` (his meter, refill, side, reach, undos, the three practice numbers, Mom's help); new rows in `[billy]` (block lifting), `[magneto]` (the block reach and hardness, and every number of the Magnetic Pull), `[boss]` (telekinesis in the boss fights and the borrowed arena blocks), the three boss sections (how long each is held), and `[apocalypse_shield]` (the critical hits); and the two healing defaults of `[apocalypse_boss]` are now 0. The client file gains a `[build_magic]` section (*Build Magic hints*, *tips*, *preview detail*, *see the box through walls*, *other builders*).
 
 ## 12. Sounds: the voices of the Infinity Stones **(added)**
 
@@ -963,7 +1057,7 @@ Keys **R G V B N** are abilities 1 to 5. Every number is an option in the `[phoe
 |---|---|---|---|
 | 1 | R (toggle) | **Mind Reading** | `Toggle.MIND_READING`. Every 5 ticks the server finds the first living thing along her view that has a mind (line of sight, `mindReadRange` 24) and sends her a snapshot (13.3); the client shows it in a panel beside the crosshair. Costs `mindReadExhaustion` (0.01) a tick. The read player is told once per 10 seconds (`mindReadNotifies`). **Sneak + R: Mind Sense** (below). |
 | 2 | G (toggle) | **Flight** | Survival flight, speed `flightSpeed` (0.09). Pinned: no. A Hex wall bounces her like every hero. |
-| 3 | V | **Telekinesis** | The new `Telekinesis.Mode.JEAN` (violet): Wanda's and Billy's rules, so creatures, players, dropped items, vehicles, primed TNT, falling blocks and projectiles in flight, and blocks (hardness up to 5, no block entities, not `telekinesis_immovable`, spawn protection and claims respected). Press again to launch, Sneak + V to set down. What she throws is `enhanced:telekinetic_slam` with her as the causing entity: Phoenix mind power (13.7). Range, speed and block limits are the shared `magneto.*` and `scarlet_witch.blockLift*` options. |
+| 3 | V | **Telekinesis** | The new `Telekinesis.Mode.JEAN` (violet): Wanda's and Billy's rules, so creatures, players, dropped items, vehicles, primed TNT, falling blocks and projectiles in flight, and blocks (hardness up to 5, no block entities, not `telekinesis_immovable`, spawn protection and claims respected). Press again to launch, Sneak + V to set down; **(3.1) Sneak + V with nothing held tears out the block she looks at**, and the villains and the vanilla bosses can be held as bosses (the Ender Dragon is too vast), Apocalypse even through his shield. What she throws is `enhanced:telekinetic_slam` with her as the causing entity: Phoenix mind power (13.7). Range, speed and block limits are the shared `magneto.*` and `scarlet_witch.blockLift*` options. |
 | 4 | B | **Mind Control** | The creature in her line of sight within `mindControlRange` (10) gets the effect `enhanced:possessed` for `mindControlTicks` (300). A host never targets her, her pets or her team (a strict rule: a possessed mob takes no target but the ones she sends it after; a creature with a brain, a hoglin or a piglin, writes its quarrels straight into its memory, so `PhoenixAbilities.guardBrain` forgets one with her side every tick), and every 10 ticks it is steered: the creature that last hurt her (24 blocks), the one she last hit (5 seconds), the nearest hostile within 16 blocks of her, else it walks back to within 4 blocks and stands guard. `mindControlMax` (1) hosts at once: a new one frees the oldest, who wakes `CONFUSED` for 2 seconds. A player is only held (`SPELLBOUND`, `mindControlPlayerTicks` 60) and only with PvP on. Refused: `enhanced:telepathy_immune`, Creative and Spectator players, Magneto's helmet, Loki's duplicates, armour stands, a creature pinned by Mjolnir, a stranger's pet with PvP off. Cooldown `mindControlCooldown` (400), cost `mindControlExhaustion` (6.0). **Sneak + B: the Psionic Field**, everything living within `psionicRadius` (16) of her, through walls, is `SPELLBOUND` for `psionicTicks` (60); not herself, her pets and team, her host, Creative and Spectator players, `spellbound_immune` and `telepathy_immune` creatures or whoever wears Magneto's helmet; players only with PvP on. Cooldown `psionicCooldown` (1200) on the same slot, cost `psionicExhaustion` (8.0), none of either if nobody is held. |
 | 5 | N (hold) | **Phoenix Burst** | 13.4. |
 
@@ -1026,6 +1120,8 @@ Her head tilts and violet motes drift from her forehead to the one she reads; he
 ### 13.7 For the Apocalypse boss: what counts as Phoenix mind power
 
 `ability/PhoenixPower`: `isPhoenix(entity)`; `isPhoenixMindPower(source)`, exactly `source.is(enhanced:mind_power)` with a Phoenix as the causing entity (the Burst and a slam of something she threw); `addListener(listener)`, called on the server for every touch, **before any refusal**, once per cast: `BURST` (per creature, with the damage), `SLAM`, `MIND_CONTROL`, `PSIONIC_FIELD` (once per mind in the sphere) and `MIND_READ` (once when she starts looking at a new target). Mind Control, the Psionic Field and Mind Reading are not damage; a boss that is `telepathy_immune` still hears of the attempt.
+
+**(3.1) Critical hits.** Her mind power (the Burst, a slam, and the strains of Mind Control and the Psionic Field) hits the boss Apocalypse **critically**, as the Scarlet Witch's does: 17.3.
 
 ### 13.8 Looks, colours, sounds
 
@@ -1302,7 +1398,7 @@ themselves and cannot be calmed for 5 seconds. It never switches on otherwise an
 | One power at a time | The spider turns a hero away. Losing the power (`SpiderServer.endAll`, death, logout, dimension change, server stop) drops every web, zip, swing, cling, mode and modifier; the power, the look and the three toggles survive death. Web blocks already placed vanish by their own tick. |
 | The Hex (Wanda) | He bounces off the wall like every hero: a zip, swing or cling it throws ends. A zip across the wall is refused at the press; a shot or burst passes the wall. |
 | The Chaos Shield | A complete shield is solid to his webs, zips and legs (2 for a shot, 0.5 for a strand, the damage of a strike capped at 5); one that is still forming stops nothing; with PvP off the web costs the shield nothing. He cannot cling to a shield. |
-| Magneto | The Iron Spider is metal: he can be lifted (30 s for a player) and his nanites scattered (14.9). The other suits are cloth. |
+| Magneto | The Iron Spider is metal: he can be lifted (30 s for a player) and, **with PvP on**, his nanites scattered (14.9). The other suits are cloth. |
 | Mjolnir's pin | Every key does nothing, every web ends. Mjolnir cannot be webbed. |
 | Billy's Spellbound | `blocked`, speed factor 0: a zip or swing ends and a cling holds him in place. |
 | Loki | His duplicates dissolve at a web or a leg and are never a threat; a shapeshifted Loki is webbed as himself. |
@@ -1516,11 +1612,19 @@ the clock needs a fighter inside `arenaRadius + 24`.
   `TIME_LOCKED`, and Slowness above level II.
 * **Tags:** he is in `bosses` (so webs and the Instant Kill do not take hold of him: a web reaches the Gauntlet through a hook
   instead), `hex_resistant` (the wall bounces him in and out), `pin_immune`, `telekinesis_immune`, `shapeshift_immune`,
-  `spellbound_immune` (the Freeze, the Petrify, the Time Lock), `confused_immune` and `telepathy_immune`; his sword, meteors
-  and orb are in `telekinesis_immune`, `shapeshift_immune` and `reality_proof`; a phantom is in `shapeshift_immune` and `boss_minions`
+  `spellbound_immune` (the Freeze, the Petrify, the Time Lock), `confused_immune` and `telepathy_immune`; **(3.1)** he is no longer in
+  `telekinesis_immune`: he is held as a boss, and he and his sword, meteors and orb are in `pull_immune` (the villain heroes' own pulls
+  work as in 3.0); his sword, meteors and orb are in `shapeshift_immune` and `reality_proof`; a phantom is in `shapeshift_immune` and `boss_minions`
   (Wanda can lift one).
-* **Hooks (`BossHooks`):** Quicksilver Time slows him to one half and not at all with the Time Stone; Magneto's strip takes
-  nothing; Spider-Man's web locks the Gauntlet; Thor's lightning is a hook of the framework.
+* **Hooks (`BossHooks`):** Quicksilver Time slows him to one half and not at all with the Time Stone; **(3.1)** Magneto's strip or
+  pull wrenches off one plate (once in 6 s, shared with slams; never while he arrives or dies); Spider-Man's web locks the Gauntlet; Thor's lightning is a hook of the framework.
+* **Telekinesis (3.1).** Held only as a boss: `holdTicks` 40 (2 s; Billy 1 s, Magneto 3 s), then 12 s before anyone can hold him
+  again; never while he arrives, leaves, dies or stands in his Space Barrier. Billy, the Phoenix and Magneto catch his **sword**
+  (it tears free after `swordHoldTicks` 40, from Magneto after 60, and flies home; thrown, it strikes him), and Billy and the Phoenix his
+  meteors and orbs (still in the grip; thrown back they are the thrower's: the meteor bursts as a slam and breaks no block, the
+  orb staggers him). His arena is not protected, so block telekinesis lifts real blocks there, but Build Magic and the Magnetic Pull
+  change nothing in it while he fights (`build_magic.allArenasProtected`). He never goes more than 24 blocks below where he was
+  called: dragged down a valley, he steps back once through a portal.
 * **Wanda:** the Chaos Beam tears plates; **a Telekinetic Slam by any player** (Wanda's, Billy's or the Phoenix's) tears one too; her shield stops everything of his that is a projectile or a
   beam. **Vision** is what he hunts first. **Loki's** duplicates lure him until the Soul Stone. **Thor:** Mjolnir breaks his
   helmet, Stormbreaker does 2.5 times and cuts a beam. **The Phoenix:** her Mind Control and Psionic Field do not take hold of
@@ -2042,7 +2146,7 @@ not fit a 64x64 skin).
 (before armour), explosions do half, and all mob effects are refused except Instant Damage and Instant Health (inverted
 for undead only: he is a machine, so Harming hurts him). He is immune to fire, drowning, poison and the Wither (not to suffocation),
 cannot be slowed (Quicksilver Time slows the Sentries, never the bodies), frozen, pinned, confused, shapeshifted, mind-controlled
-or lifted with telekinesis; the Hex bounces him and never kills him (from the lift's lock to the end of the fight it lets him, the Sentries and the fighters through). Prime cannot drop below 10% before the island is up.
+or mind-controlled (**3.1: telekinesis holds him only as a boss**: never while he is shielded, changing bodies or carried by the lift, 3 s at most (Billy 1.5, Magneto 4.5, vibranium is metal), then 12 s before anyone can hold him again; he does nothing while held or for the first second of a throw); the Hex bounces him and never kills him (from the lift's lock to the end of the fight it lets him, the Sentries and the fighters through). Prime cannot drop below 10% before the island is up.
 
 ### 16.3 The attacks and their tells
 
@@ -2065,7 +2169,7 @@ The Chaos Shield stops every bolt and every Finger Beam hit (6 each against the 
 ### 16.4 The Ultron Sentries
 
 His army. A flying creature of the same model at scale 0.95, hovering on thrusters; **40 health**, armour 4, knockback
-resistance 0.2, no fall damage; immune to fire, drowning, poison and the Wither; **magnetic** (Magneto can lift and throw
+resistance 0.2, no fall damage; immune to fire, drowning, poison and the Wither; **metal** (Magneto can lift and throw
 one); drops nothing and gives no experience. Eyes **blue** while assembling, stunned or with no target, **red** while hunting.
 A **plasma bolt** (range 4 to 22, every 2.5 to 3.5 s, a 0.5 s tell, 1.4 blocks a tick, **4 damage**), a **punch** (within 2.2,
 **6 damage**); several round one target take different angles. **Lightning stuns for 3 s.**
@@ -2088,7 +2192,7 @@ island **rises 40 blocks in 8 seconds**.
   (and cleared) in the sky, in two batches of about 2,500 blocks a tick. During the rise the clients draw a mesh of the island
   climbing out of its place and hide the original columns on their side (`hideGround`).
 * **Everyone who fights is carried and locked** for the move; the server keeps the kick counter from firing; villagers,
-  animals and items stay on the ground. Telekinesis, Magneto's holds and Mjolnir's pins are released at the lock (a thrown
+  animals and items stay on the ground. Telekinesis, Magneto's holds and Mjolnir's pins are released at the lock (and nothing that is carried can be taken, nor can a carried hero use telekinesis) (a thrown
   hammer is not recalled: it comes back to its owner as after any throw).
 * **On the island:** more Sentries, and every 5 s, for every two fighters, a **red ring** (radius 3) under one of them for
   1.5 s and a piece of Sokovia falls on it: **10 damage**, nothing breaks.
@@ -2097,7 +2201,7 @@ island **rises 40 blocks in 8 seconds**.
   and also catches anyone more than 12 blocks underground. A fighter who died stands in the **pit** for 2 s to be carried up
   again (3 times).
 * **The arena is protected** from the ritual to the end: no block placed or broken, no fluid, no piston, explosions break nothing,
-  mobs break nothing, no natural spawn; the mod's own block-changing abilities refuse; teleports that would leave the cylinder
+  mobs break nothing, no natural spawn; the mod's own block-changing abilities refuse (**3.1: telekinesis only borrows a block**, the hole mends and the block crumbles, and from the warning until the island is up, and from the descent on, the ground lends nothing; the island in the sky is protected even where `boss.protectArena` is off; Build Magic and the Magnetic Pull change nothing there); teleports that would leave the cylinder
   (Ender Pearl, Chorus Fruit, the Bifrost, Vanish, the Tesseract, the Witches' Road, Vibrate, portals) are cancelled.
 * **The descent** is the mirror: the clients capture the island into the mesh, the server clears it, everyone is set down
   on the real ground at the same place relative to the middle, and the hidden columns come back. A player who was in the
@@ -2128,8 +2232,8 @@ island **rises 40 blocks in 8 seconds**.
 * **The finish rule.** Ultron is destroyed for good only when **his body dies, no Sentry is alive and none is left in the
   budget** (or after `maxUploads`, 12, the safety valve). Then the body falls open, the last Sentries explode and the island
   lowers.
-* **Heart rip.** A Scarlet Witch using telekinesis on a body at or below 15% of its health tears out its core: it is
-  destroyed at once. Launching a Sentry she holds crushes it.
+* **Heart rip.** A Scarlet Witch using telekinesis on a body at or below 15% of its health tears out its core (**3.1: also by pressing V again while she holds him**): it is
+  destroyed at once. Launching a Sentry she holds crushes it (**3.1: Magneto's throw crushes one too**).
 * **Speech** (his colour, a robot voice): *"I'm here to help."*, *"Peace in our time."*, *"Everyone creates the thing they
   dread."* (40 s in), *"I think you're confusing 'peace' with 'quiet'."* (the first fighter falls), *"You, Avengers, you are my
   meteor."* (the warning), *"This is exactly what I wanted. All of you, against all of me."* (the island), the three transfers,
@@ -2157,7 +2261,7 @@ holder from the Mind Stone's touch. Operators: `/enhanced power set <player> ult
 ### 16.8 Abilities
 
 Ultron has **30 health** (15 hearts), **+8 armour**, +30% knockback resistance, no fall damage, never hungry and never out of
-breath, immune to Poison and the Wither; he is **not magnetic** (vibranium), and **lightning does 1.25 times** (he is electronics).
+breath, immune to Poison and the Wither; he is **metal** (vibranium: Magneto lifts him), and **lightning does 1.25 times** (he is electronics).
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
@@ -2176,7 +2280,7 @@ breath, immune to Poison and the Wither; he is **not magnetic** (vibranium), and
 your connection") and the HUD says "cut off". **PvP off:** his bolts, Overcharge, Pull and Slam neither hurt nor move players and
 his drones never target them. Creative and Spectator players are never touched by his abilities. **Rules:** the Hex bounces him like
 any hero (his drones follow his permission, as pets do); Quicksilver Time slows him and hangs his bolts; Billy's Freeze, Loki's Scepter
-and Mjolnir's pin work on him; he cannot lift Mjolnir; Magneto's metal control does nothing to him; nothing he does breaks a block.
+and Mjolnir's pin work on him; he cannot lift Mjolnir; Magneto lifts and throws him and the strip finds nothing; nothing he does breaks a block.
 
 ### 16.9 Looks
 
@@ -2271,8 +2375,8 @@ the **true form** the armour is gone and the rest stays.
 
 He **walks** (he does not fly), keeps 8 to 14 blocks from the nearest fighter, and when he has found no path to anyone for 3 seconds he
 steps through a portal. He cannot be pushed, set on fire, poisoned, withered, drowned or suffocated; **every mob effect is refused** (except
-Glowing); the Hex bounces him (never kills him); Mjolnir's pin, Billy's Freeze, Loki's Scepter, telekinesis, shapeshifting and the Phoenix's
-reading and possession do nothing. A hit takes at most **12 percent** of his maximum health (`maxHitFraction`), explosions do half.
+Glowing); the Hex bounces him (never kills him); Mjolnir's pin, Billy's Freeze, Loki's Scepter, shapeshifting and the Phoenix's
+reading and possession do nothing. **(3.1) While his shield is up only mind power can hold him with telekinesis** (the Scarlet Witch, the Phoenix); in a window anyone's telekinesis can, as a boss (`holdTicks` 60: 3 s, Billy 1.5, Magneto 4.5 while he wears his armour, never in his true form; then 12 s before anyone can hold him again; the grab does not end his stagger). A block of his own arena thrown at his shield wears it half as much as other thrown things (`borrowedSlamFactor`). A hit takes at most **12 percent** of his maximum health (`maxHitFraction`), explosions do half.
 His health follows the number of fighters: it is recomputed at the start of every transition and every phase, and he keeps the fraction of health
 he has.
 
@@ -2283,20 +2387,26 @@ only if its damage type is in the data tag `enhanced:mind_power` (the Chaos Beam
 entity is a player whose power is in `mindPowerHeroes` (Scarlet Witch and Phoenix by default, so a slam thrown by Magneto or Billy is not mind
 power), and it arrives as damage. The same function is the hero's shield's own rule (17.9).
 
+**(3.1) Critical hits.** On the **boss** (never the hero's shield), a hit is *critical* when its damage type is in `enhanced:mind_power`, its
+causing player's power is in the new `critHeroes` (Scarlet Witch and Phoenix, kept apart from `mindPowerHeroes`, so adding Billy to the breakers does
+not give him crits) and, on the shield, it is mind power at all (`MindPower.isCritical`, `isCritHero`). The Phoenix's Mind Control and Psionic Field strains are critical too.
+
 | Hit | While the shield is up |
 |---|---|
-| Chaos Beam | amount x `chaosBeamFactor` (1): 5 a hit, one hit per attacker every `mindHitCooldownTicks` (10) |
-| A telekinetic throw (a creature, an item, a block) | amount x `slamFactor` (1) |
-| Phoenix Burst | amount x `phoenixBurstFactor` (**5**): a Burst of 30 takes 150, **breaking shield 1 at once for a lone fighter** (150; 203 for two) |
+| Chaos Beam | amount x `chaosBeamFactor` (1) x **`critShieldFactor` (2)**: 10 a hit (5 x 2), one hit per attacker every `mindHitCooldownTicks` (10): shield 1 (150) takes 15 hits instead of 30 |
+| A telekinetic throw (a creature, an item, a block) | amount x `slamFactor` (1) x `critShieldFactor` (2); a block borrowed from his arena first x `borrowedSlamFactor` (0.5) |
+| Phoenix Burst | amount x `phoenixBurstFactor` (**5**) x `critShieldFactor` (2): a Burst of 30 takes 300, **breaking any of a lone fighter's three shields at once** (150, 188, 234; 203 for two) |
 | Phoenix throws | as the Scarlet Witch's |
-| Phoenix Mind Control, Psionic Field | a **strain** (25 and 60 points) even if refused, once a cast: a Phoenix strains his shield with each of them at most once per her own recharge of it (`mindControlCooldown`, `psionicCooldown`), however often she presses the key |
+| Phoenix Mind Control, Psionic Field | a **strain** (25 and 60 points, x `critShieldFactor`: **50 and 120**) even if refused, once a cast: a Phoenix strains his shield with each of them at most once per her own recharge of it (`mindControlCooldown`, `psionicCooldown`), however often she presses the key |
 | Everything else (swords, arrows, TNT, fire, potions, pets, Mjolnir, lightning, Magneto's shrapnel, Vision's beam, Billy's Hex Bolt, the stones, the other heroes) | **nothing**: no damage, no knockback, a golden ripple and a chime (`apocalypse_shield_hit`) |
 
 The server owner can add `"billy"` or `"vision"` to `mindPowerHeroes` and they then count with the same damage types. The shield's strength is
 `shieldStrength` (150) x `shieldGrowth` (1.25) ^ (phase - 1) x (1 + `shieldPerExtraPlayer` (0.35) (n - 1)): **150, 188, 234** for one fighter,
 255, 319, 398 for three. It knits in 40 ticks, 2 seconds (nothing hurts him then), mends 3 percent a second once 8 seconds (`shieldRegenDelayTicks`
-160) have passed with no mind power, and he heals 4 a second (`regenPerSecond`) while it is up, never above the part of the fight he is in.
-The boss bar is blue (his health, with notches at the floors) and a second, yellow bar for the shield ("broken" with the seconds left,
+160) have passed with no mind power. **(3.1) His health never heals**: `regenPerSecond` (the heal while a shield is up, never above the part of the fight he is in)
+and `trueFormRegenPerSecond` (the true form's) are both **0** by default; a potion of Healing does nothing to him (`heal` is a no-op; the fight's own `heal(points, ceiling)` and the Escape's return
+use `setHealth`); the shield still knits and re-forms. The Apocalypse **hero's** healing factor is unchanged.
+**(3.1) On his body**, when the shield is down (a window, the stagger of an interrupted Escape, the true form): an explosion x `explosionDamageFactor` (0.5), then **a critical hit x `critBodyFactor` (2), any other blow x `othersBodyFactor` (0.4)**, then his armour, then x `windowDamageFactor` (1.25) in a window, then the cap `maxHitFraction` (12%) and the phase's floor. So Wanda's beam of 5 takes 12.5 in a window (5 x 2 x 1.25) and a sword of 7 takes 3.5 (7 x 0.4 x 1.25); in the true form without the 1.25. A critical blow counts double toward `escapeInterruptFraction`. Every critical hit shows 20 `CRIT` and 10 `ENCHANTED_HIT` particles, plays `enhanced:apocalypse_crit` (stand-in: the vanilla critical sound at pitch 0.7 until its file lands) and tells the attacker "Critical hit! ×2" (at most once per attacker every 10 ticks). `FORMING`, `REFORMING`, set pieces and his invulnerable states take nothing. The tests are `ApocalypseCritTests`. The boss bar is blue (his health, with notches at the floors) and a second, yellow bar for the shield ("broken" with the seconds left,
 "forming").
 
 ### 17.4 The fight, phase by phase
@@ -2304,13 +2414,13 @@ The boss bar is blue (his health, with notches at the floors) and a second, yell
 | Part | What happens |
 |---|---|
 | **Phase 1: The God Awakens** (100% to 66%) | Shield 1. Sand Lances, Sand Wave, Sand Spikes, Boulder Barrage, Portal Step, Backhand. |
-| **Window 1** | The shield breaks: he kneels (staggered 3 s, attacking nothing), 10 s (`windowTicks` 200) in which **everything hurts him**, x1.25 (`windowDamageFactor`), armour counting. His health cannot fall below **two thirds** (the floor); reaching it ends the window. If nobody does enough, the shield re-forms at full strength. After the kneel he fights on with Lances, Backhand and Spikes at half speed. |
+| **Window 1** | The shield breaks: he kneels (staggered 3 s, attacking nothing), 10 s (`windowTicks` 200) in which **everything can hurt him** (critical hits x2, the rest x0.4, then x1.25 for the window: `windowDamageFactor`), armour counting. His health cannot fall below **two thirds** (the floor); reaching it ends the window. If nobody does enough, the shield re-forms at full strength. After the kneel he fights on with Lances, Backhand and Spikes at half speed. |
 | **Transition 1** (6 s) | Untouchable; **the Four Horsemen** step out of four portals; shield 2 forms. *"Rise, my Horsemen."* |
 | **Phase 2: The Horsemen** (66% to 33%) | Shield 2. **Entomb, Mind Crush and one Tornado** join. Window 2 (floor at one third). |
 | **Transition 2: the Cairo Collapse** (8 s) | He floats up, the sky goes dark ochre, **three rings of sand** cross the arena (30 ticks apart); any Horseman still alive crumbles; shield 3 forms. *"Everything they've built will fall..."* |
 | **Phase 3: Unmasked** (33% to 5%) | Shield 3. **Three Tornadoes at once.** Its break has **no window**: |
-| **The armour falls** | The plates fly off (collar, pauldrons, chest, gauntlets, the crown of the cap), the shield is gone for good, he is in the **true form**, and **everything hurts him fully**, with no window; his health stops at 15% until the Escape has been tried, then at 5% (the kneel), so both always happen. If he is not hurt for 80 ticks he heals 3 a second (`trueFormRegenPerSecond`). |
-| **The Escape** (once, at 15%) | A hand rises; a violet portal grows over him for 100 ticks (`escapeChannelTicks`). **Interrupted by any lightning damage (Thor's), by `escapeInterruptFraction` (4%) of his health in damage during the channel, or by a Hex wall.** Interrupted: staggered 6 s and never again. Not interrupted: he vanishes and returns 10 s later at `escapeHealTo` (40%) with a fresh shield 3. The blow that earns the Escape starts it before his healing can mend him. |
+| **The armour falls** | The plates fly off (collar, pauldrons, chest, gauntlets, the crown of the cap), the shield is gone for good, he is in the **true form**, and **everything can hurt him** (critical hits x2, the rest x0.4), with no window; his health stops at 15% until the Escape has been tried, then at 5% (the kneel), so both always happen. He does not heal there either (`trueFormRegenPerSecond` 0). |
+| **The Escape** (once, at 15%) | A hand rises; a violet portal grows over him for 100 ticks (`escapeChannelTicks`). **Interrupted by any lightning damage (Thor's), by `escapeInterruptFraction` (4%) of his health in damage during the channel, or by a Hex wall.** A critical blow counts double. Interrupted: staggered 6 s and never again. Not interrupted: he vanishes and returns 10 s later at `escapeHealTo` (40%) with a fresh shield 3. The blow that earns the Escape starts it before his healing can mend him. |
 | **The end** (5%) | Untouchable and kneeling: *"All is revealed."* He dies **in the Phoenix's fire, layer by layer** if a Phoenix dealt Burst or throw damage in the last `phoenixFinishSeconds` (15), otherwise in a column of sand (`apocalypse_death`). He drops nothing. |
 
 The fight is meant to last 6 to 10 minutes for two or three equipped players (a lone Scarlet Witch: 8 to 12, mostly dodging). The two
@@ -2345,7 +2455,7 @@ nothing to restore after the fight.
 At Transition 1 he enhances **Husks** (vanilla desert mobs): `min(horsemenMax (4), 1 + fighters)`, in the order War, Famine, Pestilence, Death. Each is
 named, glows, has `horsemanHealthFactor` (2) times a Husk's health, `horsemanDamageBonus` (4) more attack damage, a little more speed and armour,
 and **drops nothing and gives no experience**. They live until killed or until Transition 2. They are ordinary creatures: Wanda can lift them,
-a Phoenix can take one over, Billy can freeze them. A Magneto hears, once, "Join me, Erik."
+a Phoenix can take one over, Billy can freeze them. A Magneto hears, once, "Join me, Erik." **(3.1)** War's and Pestilence's iron is metal: Magneto can lift them, and his strip or pull tears it off, and it **crumbles** (the Horsemen are never farmed); Famine and Death carry nothing.
 
 | Horseman | Gear | Trick |
 |---|---|---|
@@ -2357,8 +2467,8 @@ a Phoenix can take one over, Billy can freeze them. A Magneto hears, once, "Join
 ### 17.7 The arena, and when it goes wrong
 
 * **Protection** (from the planting to the end, a circle of the arena + 8): no block is placed or broken, no fluid, bucket, piston or TNT works,
-  explosions break nothing, and the mod's own block-changing abilities refuse. **The wall of sand** (4 outside the arena, 40 high) is solid to
-  players and to what they throw; whoever touches it is pushed back once a second for `fieldDamage` (1) that cannot kill, and flight ends at
+  explosions break nothing, and the mod's own block-changing abilities refuse (**3.1:** telekinesis only borrows a block: the hole mends, the block crumbles). **The wall of sand** (4 outside the arena, 40 high) is solid to
+  players and to what telekinesis throws; whoever touches it is pushed back once a second for `fieldDamage` (1) that cannot kill, and flight ends at
   its top. Ender Pearl, Chorus Fruit, the Bifrost, Vanish, the Tesseract, the Witches' Road and Vibrate cannot take anyone out of the circle, and nothing
   takes anyone in. Anyone more than 8 blocks underground is lifted back by a violet tractor of sand. A dead fighter's drops never despawn while the
   fight lasts and get a fresh five minutes after it.
@@ -2396,7 +2506,7 @@ sand never hurts him. Keys **R G V B N** (Sneak for the other).
 | 5 | Sneak + N | **Sandstorm** | A funnel of sand round him for 120 ticks, radius 7, following him: every half second everything he may hurt takes **2** and Slowness, **projectiles that enter are slowed to half**, and it blots out the sight of those inside. Allies are unaffected. Cooldown 30 s. |
 
 **Rules.** The Hex bounces him like any hero unless Wanda allowed him; Mjolnir's pin stops his levitation and portal; his sand and storm ignore a Hex
-wall. Magneto's powers do nothing to him unless he wears iron, chainmail or gold (he is flesh and sand is not metal). With **PvP off** his Wave, Entomb
+wall. Magneto's powers do nothing to him unless he wears or holds metal (he is flesh and sand is not metal). With **PvP off** his Wave, Entomb
 and Sandstorm do not hurt, hold or slow any player (mobs always); the shield, portal and Bestowal still work. A Spectator Apocalypse can use nothing;
 Creative players are never swept or entombed and pay no hunger. `apocalypse.shieldOtherWear` at 0 makes the hero's shield cost nothing (the literal
 rule); **the boss's shield always uses the literal rule.**
@@ -2457,3 +2567,161 @@ Quicksilver Time slowing his tells and his Horsemen, a tornado kept in the arena
 batch of its own (`apocalypse_...`), because a window nobody uses is lost; the pure ones share `apocalypse_pure`. The art is pinned by the tests too: no two regions of
 the texture overlap, every texture is the size the model reads, and the glow masks light only a small part of the sheet. `DataTests` checks the lang in both languages, the subtitles and that every
 `.ogg` exists.
+
+---
+
+## 18. Build Magic: Wanda's and Billy's building (added in 3.1)
+
+Eilon asked for "WorldEdit/Axiom type abilities that are easy to use", limitless for Wanda and limited for Billy, with no actual
+WorldEdit: **Build Magic**, our own code, taking from those tools only their ideas and their controls. The player's guide is the
+wiki page *Build Magic*. Package `build/` (common and server code, nothing in it names a client class), `client/build/` for the
+input and the pictures. The key rule of the page: **easy to use for an 11-year-old**: one key, one mouse grammar, everything seen before
+it happens, undo always one key away.
+
+### 18.1 The key, the grammar, the context
+
+* **Y** (`key.enhanced.build_magic`), `IN_GAME`, for a Scarlet Witch or Billy with no screen open and not a Spectator; for anyone else it
+  does nothing. **Tap** (let go within 6 ticks): build mode on or off. **Hold** 6 ticks: the **Spell Wheel**; out of build mode it turns
+  the mode on first. Moving to a picture and letting go chooses it; letting go without moving leaves the wheel open to be clicked;
+  Esc or Y closes it unchanged. The sixth line of the hero panel is `[Y] Build Magic ON/OFF` (Billy's also `✦ 372/512`).
+* **Build mode ends by itself** on death, respawn, a power change, Spectator or Adventure mode, logout, and when the server turns
+  `build_magic.enabled` / `operatorsOnly` against the player. A change of dimension keeps the mode and lets go of the box.
+* **One mouse grammar, no Sneak.** Left click = *where* (corners; a drag; double click = the whole thing; the sky = let go, or a corner on the
+  floating aim cell 6 blocks ahead); right click = *do it* (vanilla when nothing is ready; on a creature always vanilla); scroll = the
+  main number (Ctrl: 8 at a time; Repeat's copies and gap 4); Alt + scroll (Left Alt, `key.enhanced.build_more`) = which kind (style,
+  shape, turn, gap); middle click = take that exact block; Ctrl + Z / Ctrl + Y undo and redo; Ctrl + R / Ctrl + F turn and flip a
+  ghost; Ctrl + C / X / V copy, pick up, bring the pocket back; Delete vanishes the box.
+* **Contexts.** `BUILD` (no screen, build mode on) holds turn, flip, copy, cut, paste, vanish and `build_more`; **`WITCH`** (no screen, the
+  power is the Scarlet Witch or Billy, in build mode or out) holds undo and redo, so Ctrl + Z of a witch never reaches Wanda's Z, and the
+  server accepts UNDO and REDO with build mode off. NeoForge's key lookup gives a Ctrl press only to the Ctrl mapping when one is active;
+  the game's Controls screen still marks them (and the keys they share) in red: display only.
+* **How clicks are taken.** Attack on a block, or anywhere while the grammar wants a click, is cancelled (nothing is ever broken, in Creative
+  too); use becomes the spell's right button when something is ready; scroll is taken only when there is something to adjust.
+
+### 18.2 Selecting
+
+* The **aimed cell** is the block under the crosshair within the hero's reach (Billy 24 at rank 1, +8 a rank; Wanda `build_magic_wanda.reach` 256),
+  found with the mod's block ray (grass and flowers are clicked through; a pick uses the outline ray). Billy's rubber band stops at his side limit.
+* **Corners and the box.** Click A, then B (the box rubber-bands in between and is world-aligned, clamped to the build height and the border);
+  a third click starts over; a drag makes the box at once. Looking at the box, **scroll up pushes that face out one, down pulls it in**
+  (Ctrl 8), the looked face lit at 22% with an arrow; the box also shows faintly through terrain; a face cannot pass the opposite one.
+* **Magic select** (double click): on a built block, every non-air, non-fluid, non-ground block connected through its **26** neighbours
+  (a tree comes whole; a house on a meadow stops at the grass; replaceable plants such as grass tufts do not join); on a ground block
+  (`enhanced:build_ground`), the 6-connected cells of that same block. Never beyond the hero's reach, never into an unloaded chunk;
+  **over the limit nothing is selected** (Wanda 100,000, Billy the size of his meter; a sparse thing past 16,777,216 cells of bounds is
+  refused). A double click on another thing adds it (up to 8 seeds). The result is a *mask*: Fill turns exactly those blocks into the
+  material; Vanish, Change and Paint act only on them; Copy, Move and Repeat take only them. Pushing a face turns it back into a box.
+
+### 18.3 The ten spells (and Grow)
+
+One spell is one undo step (a Paint or Land stroke from press to release is one; a Move is one for both ends). Every spell takes at least
+`minSpellTicks` (10) so it is seen growing: fills rise from the ground, shapes swell from their heart shell by shell, vanishing melts from the
+top. The cost (Billy) is the number of blocks it really changes; a block that already holds the result costs nothing and is not written.
+
+| # | Spell | Styles and the details |
+|---|---|---|
+| 1 | **Fill** | Solid; Walls (4 sides); Room (walls, floor, roof, the inside emptied); Floor; Frame (the 12 edges); Only the empty (air and replaceable blocks). A 5×4×5 box: 100, 64, 82 placed + 18 emptied, 25, 40. |
+| 2 | **Vanish** | Everything (Delete); Hollow out (all but the outer layer); Plants and trees (`enhanced:build_plants`); This kind (the kind under the picking ray). No drops, a puff of dust; a waterlogged block leaves its water. |
+| 3 | **Change** | This kind; Everything (non-air); Only the outside (touching air). The **family rule**: if both blocks belong to vanilla block families, the old block's variant (stairs, slab, wall, fence, door, trapdoor, button, plate...) becomes the same variant of the new family (oak stairs become spruce stairs holding spruce planks or spruce stairs), and a variant the family lacks is left alone; otherwise the old block becomes the material. Properties are kept by name. Never makes air, never fills air. |
+| 4 | **Paint** | A brush of radius 0 to `brushMax` round the block under the picking ray; every surface block under it (touching air) changes by the family rule. Billy's radius up to his side ÷ 8 (3 at rank 1), Wanda's to `build_magic_wanda.brushMax` (16). Hold the right button and sweep; one stroke is one step. |
+| 5 | **Pull & Push** | The surface is the looked block and every block of the same block connected to it in the plane of the face whose front neighbour is air or replaceable (up to the magic-select cap). Scroll up pulls N layers out (copies moved N steps, only into air or replaceable cells); down pushes: the surface and the N−1 layers behind it vanish. |
+| 6 | **Shapes** | Ball, Dome, Tower, Ring, Cone, Pyramid, Arch, Heart; solid or hollow (hollow by default for Ball, Dome, Tower; a Ring is always one block thick; shapes standing on the ground have no floor). The ghost sits on the looked surface; scroll = radius (Billy 1 up to (side−1)÷2: 11 at rank 1; Wanda up to `shapeMaxRadius` 512); a click plants it; for the shapes with a height the height then follows the look up and down (default Tower 2r+1, Ring 1, Cone 2r+1, Pyramid r+1). A hollow dome of radius 3 is 57 blocks, a hollow ball of radius 6 is 414 (fits Billy's first meter), radius 7 is 530 (does not). |
+| 7 | **Copy** | The first right click copies the box or mask into the pocket (server side, one per player, saved, travelling across dimensions); the ghost follows the crosshair; each right click stamps a copy from the ground up. A box copy brings its air, a mask copy only the thing. Never copies creatures. Scroll lifts, Alt + scroll or Ctrl + R turns a quarter, Ctrl + F flips. Billy's pocket is at most his side on every axis; Wanda's at most `pocketMaxMb`. |
+| 8 | **Move** | The first right click picks up, the second puts down: one spell. A **compare-and-swap per cell**: a source cell is moved only if it still holds what was captured (or what this Move wrote); a cell someone changed meanwhile is left alone and counted. Block entities move with their full contents; with `moveCarriesCreatures` creatures, frames, paintings and armor stands inside come along. |
+| 9 | **Repeat** | Copies in a row in the direction looked: copy i sits at (size along the direction + gap) × i; scroll = copies (Billy up to 8 +4 a rank; Wanda `repeatMax` 0 = no count), Alt + scroll = gap 0 to 16. |
+| 10 | **Land** | Raise, Lower, Smooth: a brush of pulses every 4 ticks (`REACH` 8). A column of the brush disc moves by a falloff (1 − (d/r)²)² of a block a pulse; the surface is a ground block with something loose on it; a column moves whole or not at all (trees and houses stand, never float); Lower sinks only into ground or empty cells; the filler of a rising column is the block under it when that is plain ground, never an ore; Smooth moves a column toward the average of the square round it by at most one block; creatures on a rising column are lifted. Billy pays per pulse; never paid with items. |
+| (11) | **Grow** | Swell, Shrink, Bloom: **not part of this version** (planned for 3.2). |
+
+### 18.4 The block, magic or materials
+
+The block in the main hand (else the off hand) is the material, in the state it would be placed in by hand (`getStateForPlacement`
+with the caster's look). Middle click takes exactly that block (the client sends only where; the server reads the state). **Mix** weights the
+hotbar's blocks by stack size with a hash of position and a seed carried by the cast, so the ghost shows the mix that will be built. The **Blocks** page
+of the wheel picks any block magic may make. A water bucket makes water, a lava bucket lava (Wanda only). Two-block things (doors, beds, tall
+flowers) are never the material but are carried whole by Copy, Move and Repeat, and no spell cuts one in half. By default blocks come from magic;
+with `requireMaterials` a Survival player pays one plain item per block (an unaffordable spell is refused whole: "You need 37 more Oak Planks"), vanished blocks
+go into the inventory, undo gives back and takes back; Creative never pays; Land is never paid with items.
+
+### 18.5 What the builder sees and hears
+
+* **The box**: 12 glowing ribbons (a wave for Wanda, a flickering arc for Billy), faintly drawn again through terrain (`seeThrough`), faces at 8%, the
+  looked face at 22% with an arrow, corner runes, a label like `7 × 4 × 5 · 140` (`counting...` for a huge plan); the magic-select glow.
+* **The ghost** is the result, in real block models, translucent (alpha 0.45) and tinted in the hero's colour, built off the main thread by the same
+  pure planner as the server's; the detail cap `ghostDetail` (32,768) draws only the outside past it and a tinted box past four times that. **The
+  server's marks** (preflight, at most 4 a second and 2 ms, **no event posted**): red cross = protected, yellow = a chest that stays, white = someone
+  stands there, grey = not loaded; the ghost round them is grey; a wholly refused plan is a grey ghost and the right button fizzles.
+* **The badge** next to the crosshair: material, size, spell and style, Billy's meter with the cost of the ghost as a darker chunk (orange with a clock when
+  more than he has now, red and a grey ghost when more than his whole meter, a scarlet stripe and "½" with Mom), Wanda's ∞. **Rings**: the hold ring (20 ticks, or 40
+  over a million blocks, red for removals) and the progress ring. A done pop `✓ 140` for 40 ticks. The crosshair becomes a rune; the screen's edges take a faint tint.
+* **The hint strip** (bottom right): three to five rows of little pictures of the input and one or two words for the current spell and state
+  (pure `BuildHints.lines`); **tips** (a three-second picture the first times a spell is chosen and when something does nothing; `tips`).
+* **The wheel**: a ring of 40×40 pictures clockwise from the top in the order of the table, the centre disc *Start/Stop building*, undo and redo with their
+  counts, the hotbar row with Mix and Blocks, the style row, and over it Wanda's "Chaos Magic ∞" or Billy's name, rank, stars, meter and the way to the next rank.
+* **Everyone else** sees Wanda's eyes glow and Billy's crown stay, hand wisps or sparks, the builder's thin box within 64 blocks (`showOthers`), the
+  cast gesture (`WANDA_HEX_TWEAK`, or `WANDA_HEX_RISE` from 100,000 blocks; `BILLY_BOLT` with a Hex Bolt arc from his hand), Mom's scarlet thread, a frame and a ripple
+  sweeping the spell in its work order, server particles (at most 64 a tick), the undo ripple backwards, and Billy's rank-up (the crown flares white, runes spin; within 32).
+* **Sounds** (eight events, `build_on_wanda`, `build_on_billy`, `build_cast_wanda`, `build_cast_billy`, `build_hum`, `build_fizzle`, `build_undo`,
+  `build_rank_up`, with vanilla stand-ins until each file lands) and the builder's own UI clicks; `AMETHYST_CLUSTER_PLACE` when a spell is done.
+
+### 18.6 Billy: an apprentice who learns
+
+A spell costs one meter point per block really changed (a Move one per block moved; copying and looking are free); the meter refills continuously (also logged out), stored as
+`(value, game time)`. A spell he cannot pay **does not start**; the COUNT phase reserves the cost, the end refunds what protection, bodies or chests left unchanged; undo
+gives back `cost × restored ÷ changed` and takes back that practice; redo pays again. Every block of magic is **practice**; the rank never goes down.
+
+| Rank | Practice | Meter | Refill | Side | Reach | Undos | Repeat | Brush |
+|---|---|---|---|---|---|---|---|---|
+| 1 Apprentice | 0 | 512 | 16/s | 24 | 24 | 10 | 8 | 3 |
+| 2 Spellcaster | 2,000 | 1,024 | 24/s | 32 | 32 | 12 | 12 | 4 |
+| 3 Sorcerer | 8,000 | 2,048 | 32/s | 40 | 40 | 14 | 16 | 5 |
+| 4 Wiccan | 30,000 | 4,096 | 40/s | 48 | 48 | 16 | 20 | 6 |
+
+From the config numbers: meter = `meter` × 2^(rank−1); refill = `refill` × (1 + (rank−1)/2); side = `maxSide` + 8(rank−1); reach = `reach` + 8(rank−1); undos = `undoSteps` + 2(rank−1);
+repeat = `repeatMax` + 4(rank−1); brush = side ÷ 8; magic select = the meter. `maxRank` caps it. A rank-up is a moment (the crown flares, runes, a fanfare to everyone near, the meter fills as a gift).
+**Mom's help**: a Scarlet Witch within `momRange` (16) when he casts halves the cost (`momCostFactor` 0.5, rounded up), with a scarlet thread and "½"; his practice counts the real blocks.
+Limits and what he is told: the meter now (`refilling`), the whole meter (`too_big`), the side (`too_wide`), the reach (`too_far`), undo history, Repeat, one spell at a time with a pause of `castPause` (10 ticks), TNT, lava and fire never
+(`volatile`), copies of containers come out empty (`copiesContents`), Creative changes nothing (`limitsInCreative`).
+
+### 18.7 Wanda: limitless, and the safety under it
+
+No meter, no cost, no ranks, no size limit, every spell and style, shapes to radius 512, `undoSteps` 0 (as many as the memory and disk caps hold), `repeatMax` 0 (no count), her copies keep what is inside chests,
+lava; reach 256, and her box corners are not limited by reach. Up to `maxQueued` (4) spells wait behind the one at work and run in turn. Inside her own Hex her spells get `hexBoost` (2) shares of the tick. Only technical safety:
+every spell is a **job sliced inside the level tick** under one budget for all spells (`millisPerTick` 8 ms, `blocksPerTick` 20,000 writes with reads counting a quarter, `sectionsPerTick` 16; all
+halved while the average tick is over 45 ms, with a floor of 1 ms and 256 writes), fair round robin, a Hex-boosted job counting `hexBoost` times; a job touches only chunks **loaded when it was cast** (kept loaded by tickets, at most `maxTicketChunks`; none is ever generated); at most `volatilePerSpell` (4,096) TNT, lava
+or fire; `brushMax` 16 for a technical reason (a pulse every 4 ticks of radius 16 is about 17,000 blocks, which the budget follows; at 32 it would be 137,000); `maxBlocks` (0 = none), `operatorsOnly`, `deniedDimensions`.
+A server stopping finishes the spells whose blocks left add up to at most `finishOnStopBlocks` (200,000), the largest stopped first (undoable).
+
+### 18.8 The rules every cell obeys
+
+One rule book (`build/BuildRules`, `ability/BlockRights`) for every spell, undo and redo, for both heroes. **Once per cast**: the switches and `operatorsOnly`; a Scarlet Witch or Billy, alive, in build mode; not Entombed; not
+Adventure; the dimension allowed; a request rate of `maxRequestsPerSecond` (40); anchors within reach + 2 and Billy's side; the material makeable (never `build_unconjurable`; never two blocks tall; Billy never `build_volatile`); no island being cleared after a crash; Billy's pause; Wanda's queue and `maxBlocks`;
+the hold flags (`holdToConfirmBlocks` 64 → 20 ticks, `hugeSpellBlocks` 1,000,000 → 40 ticks); then the COUNT phase decides the meter, the materials and the volatile cap. **Per cell, cheapest first**: loaded; inside the world and the border; the new state differs;
+not `build_untouchable` and not a block with negative hardness; **not in the protected arena** (`BossFights.protects`, and with `allArenasProtected` the cylinder of any running fight, and the ground the island hides, and with `hexIsAClaim` a Hex that is not the caster's); no body there that may not be lifted (another player with PvP off, a boss or fight entity,
+a creature Mjolnir pins); the old block entity holds no items (`fullContainers` SKIP leaves it, SPILL drops them; a Move carries it); vanilla rights (`mayBuild`, `mayInteract`, `blockActionRestricted`); the claim probe once per 16×16×16 section; the break and place events per block (`postEventsPerBlock`);
+materials. The player is the caster, or a fake player of his profile when he is away. Writing: `setBlock` with clients told, no neighbour reaction, no drops; `Clearable.tryClear` before a block entity goes; a door, bed or tall plant is written in both halves; falling blocks a spell places are held where they were put (`holdGravityBlocks`); afterwards
+the outside is **settled** once (shape updates, side effects recorded so an undo brings a fallen torch back). Creatures inside new solid blocks are lifted on top (`liftCreatures`; another player only with PvP on).
+Copies keep the block-entity data of `build_copies_data` types, Billy's without `build_holds_items`. Never touched: bedrock-like blocks, portals, spawners, vaults, Mjolnir as a block; never made: budding amethyst, the dragon egg, infested blocks, frosted ice, Spider-Man's web and a few more; the volatile cap applies to copies too.
+Witches' Road doors are ordinary blocks to magic.
+
+### 18.9 Undo, redo and the history
+
+Ctrl + Z in order: drop Wanda's newest waiting spell; else stop and rewind a working one (it jumps the queue); else undo the newest step (partly undone ones first); else "Nothing to undo". Ctrl + Y redoes. **Safe undo**: a recorded cell is restored only if it still holds exactly what the spell put there (the same state and, with data, the same hash); changed cells are
+left and dropped from the step; cells that became protected stay in the step, marked partly undone, to be tried again. A step records the spell, the dimension, the cost and practice, and per 16×16×16 section the old and new states, the block-entity data, and the side effects; it is written to
+`<world>/data/enhanced/build/<uuid>/` **ahead** (a section's record is on disk before the job writes its first cell, so a crash leaves what the saved world holds undoable), compressed and written off the main thread; `undoSurvivesRestart` off keeps it in memory.
+Caps: steps (Wanda `undoSteps`, Billy by rank), `undoMemoryMb` 64 and `undoDiskMb` 512 per player, `serverUndoMemoryMb` 512 and `serverUndoDiskMb` 4,096 in all; a spell whose record would not fit asks for the long hold ("too big to remember") and runs without a step. Undo cannot bring back what the world did itself afterwards (flowed water, redstone), wandering creatures, or spilled items.
+
+### 18.10 Network, config and tags
+
+Network protocol **"5"** (a 3.0 client cannot join a 3.1 server): `BuildCastPayload` (the recipe: spell, style, region, corners, seeds, anchor, size, turn, flip, material kind, seed, stroke; at most about 140 bytes; the client never sends a block state), `BuildActionPayload`
+(mode, undo, redo, pick, pick block, hand, stroke end, view, pocket), `BuildVerdictPayload`, `BuildFxPayload`, `BuildPocketPayload` (in parts of at most 31 KiB) and, for Magneto, `MagnetPullPayload`; two attachments, `BUILD_DATA` (saved: Billy's meter, rank, practice, the pocket) and
+`BUILD_VIEW` (not saved: mode, spell and box for the people who see him). The server config sections are `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]` (section 11 and the wiki's Server Configuration page; 58 options), the client `[build_magic]` has five. The datapack tags: `enhanced:build_untouchable`, `build_unconjurable`, `build_volatile`, `build_ground`, `build_plants` (blocks)
+and `build_copies_data`, `build_holds_items` (block entity types).
+
+### 18.11 What it does with everything else
+
+* **Boss fights.** No spell and no pull changes a block of any running fight's arena (Thanos's too); a spell working when a fight starts stops; the island in the sky and the ground under it are never touched; an undo of an older spell is retried after the fight. Build Magic never borrows (that is telekinesis, section 2).
+* **Players and creatures.** With PvP off nobody is buried or lifted by another's spell and a Move never carries a player; a creature Mjolnir pins is never lifted or carried; a lifted-by-telekinesis block is an entity, so spells pass it by; telekinesis never moves a creature a spell carries.
+* **Spectator, Adventure, Entombed.** Spectator and Adventure end build mode and stop a working spell at its next slice; Entombed refuses new casts and lets working ones go on.
+* **Hex.** Hex walls are not blocks; Wanda's own Hex speeds her spells; another Hex is a claim only with `hexIsAClaim` (which the Magnetic Pull reads too).
+* **Logout and death.** Build mode turns off, the box is forgotten, a working spell finishes with the fake player, "while you were away" at the next login; the history, pocket and meter stay.
+* **Performance.** Planning is O(1) on the cast (a lazy iterator); preflight at most 2 ms; vanilla sends every changed block to every watching client (about 4 bytes a block), so a hosted server lowers `blocksPerTick`.
