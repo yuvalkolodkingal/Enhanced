@@ -1,8 +1,13 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.build.BillyMagic;
+import com.kolodkingal.enhanced.build.BillyRanks;
+import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.ChangeStyle;
 import com.kolodkingal.enhanced.build.FillStyle;
+import com.kolodkingal.enhanced.build.Limits;
+import com.kolodkingal.enhanced.build.MagicSelect;
 import com.kolodkingal.enhanced.build.ShapeKind;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellMath;
@@ -19,12 +24,18 @@ import com.kolodkingal.enhanced.gametest.BuildTestSupport.Pocket;
 import com.kolodkingal.enhanced.gametest.BuildTestSupport.World;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.SlabBlock;
@@ -35,8 +46,10 @@ import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,9 +61,11 @@ import static com.kolodkingal.enhanced.gametest.BuildTestSupport.recipe;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /**
- * Build Magic's pure code (D-B 19.1, B1 to B7): the shapes and their counts, the Fill styles, turn and flip, the family
- * rule, the mix, and the planner's cells and order, all over little worlds kept in a map. Nothing here touches the
- * level, so the whole batch finishes in its first tick.
+ * Build Magic's pure code (D-B 19.1, B1 to B8 and B12): the shapes and their counts, the Fill styles, turn and flip, the
+ * family rule, the mix, the planner's cells and order, magic select, and a recipe clamped to the hero's limits, all
+ * over little worlds kept in a map; also Billy's meter, practice and ranks as arithmetic over his data. Nothing here
+ * changes the level (one test stands players in the arena to read their limits), so the whole batch finishes in its
+ * first tick.
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -596,6 +611,318 @@ public final class BuildMathTests {
         Plan take = SpellPlanner.plan(new World(), recipe(Spell.COPY).op(SpellRecipe.Op.TAKE).box(two).build(), Setup.at(CASTER));
         check(!take.writes() && take.region() != null && take.refusal() == SpellPlanner.NONE, "a copy's first click writes nothing and reads its box");
         helper.succeed();
+    }
+
+    // B8
+
+    /**
+     * Magic select (D-B 3.4): a five-log trunk with twenty leaves on a grass meadow, four of them touching the rest
+     * only at a corner, gives exactly its 25 cells: no grass block, no dirt, no grass tuft round its foot, not the
+     * cobblestone three cells away; the grass gives only the grass its faces connect (not the dirt under it, not a
+     * grass block touching it at an edge); with a cap of 512 a 30 x 1 x 30 grass floor gives nothing, with the reason.
+     * Also: two seeds give the union and a seed already selected adds nothing; Billy's side, the reach (and the
+     * server's slack), the biggest bounding box, a seed on air; the flood in slices gives the same cells; and the
+     * planner fills exactly the selected thing.
+     */
+    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    public static void magicSelectFindsTheThingNotTheGround(GameTestHelper helper) {
+        BlockState grass = Blocks.GRASS_BLOCK.defaultBlockState();
+        BlockState log = Blocks.OAK_LOG.defaultBlockState();
+        BlockState leaves = Blocks.OAK_LEAVES.defaultBlockState();
+        BlockState tuft = Blocks.SHORT_GRASS.defaultBlockState();
+        BlockState cobble = Blocks.COBBLESTONE.defaultBlockState();
+        World meadow = new World().fill(new BoundingBox(-4, 62, -4, 4, 62, 4), DIRT).fill(new BoundingBox(-4, 63, -4, 4, 63, 4), grass)
+                .set(4, 64, 4, grass).set(5, 63, 5, grass).set(-3, 64, 3, cobble)
+                .set(1, 64, 0, tuft).set(0, 64, -1, tuft).set(1, 64, 1, tuft).set(-1, 64, -1, tuft);
+        for (int y = 64; y <= 68; y++) {
+            meadow.set(0, y, 0, log);
+        }
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            meadow.set(side.getStepX(), 68, side.getStepZ(), leaves).set(side.getStepX(), 69, side.getStepZ(), leaves);
+        }
+        for (int dx = -1; dx <= 1; dx += 2) {
+            for (int dz = -1; dz <= 1; dz += 2) {
+                // A leaf at the trunk's corner, and one that touches only that leaf, at a corner.
+                meadow.set(dx, 68, dz, leaves).set(2 * dx, 69, 2 * dz, leaves);
+            }
+        }
+        meadow.set(0, 69, 0, leaves).set(0, 70, 0, leaves).set(1, 70, 0, leaves).set(-1, 70, 0, leaves);
+        check(meadow.count(log) == 5 && meadow.count(leaves) == 20, "a trunk of 5 and 20 leaves");
+
+        MagicSelect tree = new MagicSelect(meadow, List.of(new BlockPos(0, 66, 0)), 512).run();
+        check(tree.refusal() == SpellPlanner.NONE && tree.size() == 25, "the tree is its 25 cells: " + tree.size() + ", " + tree.refusal());
+        check(tree.found().longStream().allMatch(p -> meadow.getBlockState(BlockPos.of(p)) == log || meadow.getBlockState(BlockPos.of(p)) == leaves),
+                "only logs and leaves: no grass, no tuft, no dirt, no cobblestone");
+        check(tree.found().contains(new BlockPos(2, 69, 2).asLong()) && tree.found().contains(new BlockPos(-2, 69, -2).asLong()),
+                "the leaves touching only at a corner come too");
+        MagicSelect fromLeaf = new MagicSelect(meadow, List.of(new BlockPos(-2, 69, 2)), 512).run();
+        check(fromLeaf.size() == 25 && fromLeaf.found().equals(tree.found()), "a double click on any of its cells gives the same thing");
+        check(tree.bounds() != null && tree.bounds().equals(new BoundingBox(-2, 64, -2, 2, 70, 2)), "its box: " + tree.bounds());
+
+        MagicSelect lawn = new MagicSelect(meadow, List.of(new BlockPos(3, 63, -3)), 512).run();
+        check(lawn.size() == 82 && lawn.found().longStream().allMatch(p -> meadow.getBlockState(BlockPos.of(p)) == grass),
+                "the grass gives its 81 and the grass block on it, nothing else: " + lawn.size());
+        check(!lawn.found().contains(new BlockPos(5, 63, 5).asLong()), "a grass block touching it only at an edge is not connected");
+
+        World field = new World().fill(new BoundingBox(0, 63, 0, 29, 63, 29), grass);
+        MagicSelect tooBig = new MagicSelect(field, List.of(new BlockPos(10, 63, 10)), 512).run();
+        check(tooBig.done() && tooBig.refusal() == BuildVerdictPayload.TOO_BIG_TO_SELECT && tooBig.limit() == 512, "900 grass blocks are over the cap of 512");
+        check(tooBig.size() == 0 && tooBig.mask() == null && tooBig.bounds() == null, "and then nothing is selected, not a part");
+        check(said(tooBig.message(false), "message.enhanced.build.too_big_to_select", 512), "Billy hears: too big to hold in mind (more than 512)");
+        Component toWanda = tooBig.message(true);
+        check(toWanda != null && said(toWanda, "message.enhanced.build.too_big_to_select", 512) && toWanda.getSiblings().stream()
+                .anyMatch(part -> said(part, "message.enhanced.build.mark_corners")), "the Scarlet Witch also hears: mark it with two corners instead");
+        check(new MagicSelect(field, List.of(new BlockPos(10, 63, 10)), 1000).run().size() == 900, "under a cap of 1000 the whole field");
+
+        MagicSelect two = new MagicSelect(meadow, List.of(new BlockPos(0, 66, 0), new BlockPos(-3, 64, 3), new BlockPos(1, 68, 0)), 512).run();
+        check(two.size() == 26 && two.seeds().size() == 3, "two things are their union, and a seed already selected adds nothing: " + two.size());
+        List<BlockPos> nine = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            nine.add(new BlockPos(i, 63, 0));
+        }
+        check(new MagicSelect(meadow, nine, 512).seeds().size() == SpellRecipe.MAX_SEEDS, "at most 8 seeds");
+        MagicSelect sky = new MagicSelect(meadow, List.of(new BlockPos(0, 80, 0), new BlockPos(1, 64, 0)), 512).run();
+        check(sky.refusal() == BuildVerdictPayload.NO_BOX && sky.size() == 0, "seeds on air and on a tuft select nothing");
+
+        World beam = new World().fill(new BoundingBox(0, 64, 0, 29, 64, 0), PLANKS);
+        MagicSelect wide = new MagicSelect(beam, List.of(new BlockPos(3, 64, 0)), 512, 24, null).run();
+        check(wide.refusal() == BuildVerdictPayload.TOO_WIDE && wide.limit() == 24 && wide.size() == 0, "a beam of 30 is wider than Billy's 24");
+        check(new MagicSelect(beam, List.of(new BlockPos(3, 64, 0)), 512, 0, null).run().size() == 30, "with no side limit it is 30");
+
+        Vec3 eyes = new Vec3(0.5, 66.0, -9.5);
+        MagicSelect far = new MagicSelect(meadow, List.of(new BlockPos(0, 66, 0)), 512, 0, new MagicSelect.Reach(eyes, 12, 0)).run();
+        check(far.refusal() == BuildVerdictPayload.TOO_FAR && far.limit() == 12 && far.size() == 0,
+                "a tree reaching 13 blocks from the eyes is beyond a reach of 12: nothing");
+        check(said(far.message(false), "message.enhanced.build.too_far", 12), "too far for your magic (at most 12)");
+        check(new MagicSelect(meadow, List.of(new BlockPos(0, 66, 0)), 512, 0, new MagicSelect.Reach(eyes, 12, Limits.REACH_SLACK)).run().size() == 25,
+                "with the server's slack of 2 it is within reach");
+
+        World chain = new World();
+        for (int i = 0; i < 257; i++) {
+            chain.set(i, -60 + i, i, PLANKS);
+        }
+        MagicSelect diagonal = new MagicSelect(chain, List.of(new BlockPos(0, -60, 0)), 1_000_000).run();
+        check(diagonal.refusal() == BuildVerdictPayload.TOO_BIG_TO_SELECT && diagonal.size() == 0,
+                "257 planks touching at their corners make a box of more than 16,777,216 cells: nothing");
+        chain.set(256, 196, 256, Blocks.AIR.defaultBlockState());
+        check(new MagicSelect(chain, List.of(new BlockPos(0, -60, 0)), 1_000_000).run().size() == 256, "256 make a box of exactly 256^3, which is held");
+
+        MagicSelect sliced = new MagicSelect(meadow, List.of(new BlockPos(0, 66, 0)), 512);
+        int slices = 0;
+        int before = 0;
+        boolean grows = true;
+        while (!sliced.step(10)) {
+            slices++;
+            grows &= sliced.size() >= before;
+            before = sliced.size();
+            check(sliced.mask() == null, "no mask while it floods");
+        }
+        check(slices > 5 && grows && sliced.found().equals(tree.found()), "ten reads at a time it floods in " + slices + " slices to the same 25");
+
+        Plan gold = SpellPlanner.plan(meadow, recipe(Spell.FILL).mask().build(), Setup.at(CASTER).withMask(tree.mask())
+                .withMaterial(Blocks.GOLD_BLOCK.defaultBlockState()));
+        meadow.build(gold);
+        check(meadow.count(Blocks.GOLD_BLOCK.defaultBlockState()) == 25 && meadow.count(tuft) == 4 && meadow.count(grass) == 83 && meadow.count(cobble) == 1,
+                "turn this tree into gold: its 25 cells, and the meadow round it as it was");
+        helper.succeed();
+    }
+
+    // B12
+
+    /**
+     * A recipe as a stale or modified client might send it is clamped by {@code SpellRecipe.clamped} to the hero's
+     * {@code Limits} (D-B 13.4): turn 7 is 3, nine seeds are eight, a size of -5 is each spell's smallest, a position
+     * outside the world comes inside it, every other number into its range; Billy's numbers at ranks 1 and 4 and the
+     * Scarlet Witch's (no count in a Repeat, R39); a recipe in range is unchanged, and clamping twice is clamping once.
+     */
+    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    public static void aRecipeIsClamped(GameTestHelper helper) {
+        BoundingBox world = Limits.world(helper.getLevel());
+        check(world.minY() == helper.getLevel().getMinBuildHeight() && world.maxY() == helper.getLevel().getMaxBuildHeight() - 1
+                && world.getXSpan() > 1_000_000, "the world's cells: its build height and its border " + world);
+        Limits billy = Limits.billy(1, world);
+        Limits wiccan = Limits.billy(4, world);
+        Limits wanda = Limits.wanda(world);
+        check(billy.side() == 24 && billy.reach() == 24 && billy.shapeRadius() == 11 && billy.shapeHeight() == 24 && billy.repeatCopies() == 8
+                && billy.brush() == 3 && billy.magicSelect() == 512 && billy.undoSteps() == 10, "an Apprentice: 24, 24, 11, 24, 8, 3, 512, 10");
+        check(billy.limited() && billy.sideLimit() == 24 && billy.castPause() == 10 && billy.maxQueued() == 0 && !billy.volatileAllowed()
+                && billy.volatilePerSpell() == 0 && !billy.copiesContents() && billy.maxBlocks() == 0, "one spell at a time, never TNT, empty copies");
+        check(wiccan.side() == 48 && wiccan.shapeRadius() == 23 && wiccan.repeatCopies() == 20 && wiccan.brush() == 6 && wiccan.magicSelect() == 4096
+                && wiccan.undoSteps() == 16, "Wiccan: 48, 23, 20, 6, 4096, 16");
+        check(!wanda.limited() && wanda.reach() == 256 && wanda.shapeRadius() == 512 && wanda.shapeHeight() == world.getYSpan() && wanda.brush() == 16
+                && wanda.magicSelect() == 100000 && wanda.undoSteps() == 0 && wanda.repeatCopies() == Integer.MAX_VALUE,
+                "the Scarlet Witch: reach 256, radius 512, the world's height, brush 16, select 100000, no undo count, no Repeat count");
+        check(wanda.sideLimit() == 0 && wanda.side() >= world.getXSpan() && wanda.fits(world) && wanda.volatileAllowed() && wanda.volatilePerSpell() == 4096
+                && wanda.maxQueued() == 4 && wanda.castPause() == 0 && wanda.copiesContents(), "her side is the world's; her queue, her TNT cap");
+        check(billy.fits(new BoundingBox(0, 0, 0, 23, 23, 23)) && !billy.fits(new BoundingBox(0, 0, 0, 24, 0, 0)), "24 fits Billy, 25 does not");
+        Vec3 eyes = new Vec3(0.5, 64.5, 0.5);
+        check(billy.inReach(eyes, new BlockPos(0, 64, 24), false) && !billy.inReach(eyes, new BlockPos(0, 64, 25), false)
+                && billy.inReach(eyes, new BlockPos(0, 64, 26), true) && !billy.inReach(eyes, new BlockPos(0, 64, 27), true),
+                "reach 24 from the eyes, 26 with the server's slack");
+
+        BlockPos outside = new BlockPos(40_000_000, 1000, -40_000_000);
+        BlockPos corner = new BlockPos(world.maxX(), world.maxY(), world.minZ());
+        List<BlockPos> nine = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            nine.add(i == 0 ? outside : new BlockPos(i, 64, 0));
+        }
+        SpellRecipe wild = new SpellRecipe(Spell.SHAPE, SpellRecipe.Op.CAST, 200, 7, outside, new BlockPos(3, -1000, 3), nine, outside, 9, -5, 9999, 7, 6,
+                0xFF, 5, 42L, 3);
+        SpellRecipe clamped = wild.clamped(billy);
+        check(clamped.turn() == 3 && clamped.flip() == SpellRecipe.FLIP_Z && clamped.region() == SpellRecipe.BOX && clamped.style() == 0
+                && clamped.shapeKind() == ShapeKind.BALL, "turn 7 is 3, flip 6 is 2, region 7 is a box, style 200 is the Ball");
+        check(clamped.size() == 1 && clamped.size2() == 0, "a radius of -5 is 1, and a Ball has no height");
+        check(clamped.flags() == (SpellRecipe.HOLLOW | SpellRecipe.MIX | SpellRecipe.PLANTED) && clamped.material() == SpellRecipe.PICKED
+                && clamped.face() == SpellRecipe.NO_FACE && clamped.direction() == null, "unknown flags dropped, material 5 is 1, face 9 none");
+        check(clamped.seeds().size() == 8 && clamped.seeds().get(0).equals(corner) && clamped.seeds().subList(1, 8).equals(nine.subList(1, 8)),
+                "nine seeds are the first eight, the one outside moved inside");
+        check(clamped.a().equals(corner) && clamped.anchor().equals(corner) && clamped.b().equals(new BlockPos(3, world.minY(), 3)),
+                "positions outside the world come to its nearest cell");
+        check(clamped.seed() == 42L && clamped.stroke() == 3 && clamped.spell() == Spell.SHAPE && clamped.op() == SpellRecipe.Op.CAST,
+                "the seed, the stroke, the spell and the op are kept");
+        check(clamped.clamped(billy).equals(clamped), "clamping twice is clamping once");
+
+        // Each spell's numbers, for Billy, Wiccan and the Scarlet Witch.
+        check(sized(Spell.SHAPE, 2, -5, -5, billy) == pair(1, 1) && sized(Spell.SHAPE, 2, 1000, 9999, billy) == pair(11, 24)
+                && sized(Spell.SHAPE, 2, 1000, 9999, wiccan) == pair(23, 48) && sized(Spell.SHAPE, 2, 2000, 9999, wanda) == pair(512, world.getYSpan()),
+                "a Tower: radius 1 to 11 and height 1 to 24 for Billy, 23 and 48 for Wiccan, 512 and the world's height for her");
+        check(sized(Spell.PAINT, 0, -5, 7, billy) == pair(0, 0) && sized(Spell.PAINT, 0, 50, 0, billy) == pair(3, 0)
+                && sized(Spell.PAINT, 0, 50, 0, wanda) == pair(16, 0) && sized(Spell.LAND, 0, 50, 0, wiccan) == pair(6, 0),
+                "a brush: 0 to 3 for Billy, 16 for her, 6 for Wiccan");
+        check(sized(Spell.PULL, 0, -5, 0, billy) == pair(-5, 0) && sized(Spell.PULL, 0, -100, 0, billy) == pair(-24, 0)
+                && sized(Spell.PULL, 0, 100, 0, billy) == pair(24, 0) && sized(Spell.PULL, 0, -100, 0, wanda) == pair(-100, 0),
+                "Pull & Push: up to his side either way; hers are the world's");
+        check(sized(Spell.COPY, 0, -5, 0, billy) == pair(-5, 0) && sized(Spell.MOVE, 0, 1000, 0, billy) == pair(24, 0)
+                && sized(Spell.COPY, 0, 1000, 0, wanda) == pair(256, 0), "a ghost's lift: within the reach");
+        check(sized(Spell.REPEAT, 0, -5, -3, billy) == pair(1, 0) && sized(Spell.REPEAT, 0, 300, 99, billy) == pair(8, SpellRecipe.MAX_GAP)
+                && sized(Spell.REPEAT, 0, 300, 2, wanda) == pair(300, 2), "a Repeat: 1 to 8 copies for Billy, 300 for her (no count), a gap of 0 to 16");
+        check(sized(Spell.FILL, 9, 7, 7, billy) == pair(0, 0) && sized(Spell.VANISH, 9, 7, 7, wanda) == pair(0, 0), "a size Fill does not use is 0");
+
+        SpellRecipe tidy = new SpellRecipe(Spell.FILL, SpellRecipe.Op.CAST, FillStyle.ROOM.ordinal(), SpellRecipe.BOX, new BlockPos(1, 64, 1),
+                new BlockPos(5, 68, 5), List.of(new BlockPos(2, 64, 2)), new BlockPos(3, 64, 3), Direction.UP.get3DDataValue(), 0, 0, 1,
+                SpellRecipe.NO_FLIP, SpellRecipe.HOLLOW, SpellRecipe.HAND, 7L, 0);
+        check(tidy.clamped(billy).equals(tidy) && tidy.clamped(wanda).equals(tidy), "a recipe in range is unchanged");
+        helper.succeed();
+    }
+
+    /** The two sizes of a recipe of {@code spell} (style {@code style}) with sizes {@code size, size2}, clamped. */
+    private static long sized(Spell spell, int style, int size, int size2, Limits limits) {
+        SpellRecipe recipe = new SpellRecipe(spell, SpellRecipe.Op.CAST, style, SpellRecipe.BOX, BlockPos.ZERO, BlockPos.ZERO, List.of(), BlockPos.ZERO,
+                SpellRecipe.NO_FACE, size, size2, 0, 0, 0, 0, 0L, 0).clamped(limits);
+        return pair(recipe.size(), recipe.size2());
+    }
+
+    private static long pair(int a, int b) {
+        return ((long) a << 32) | (b & 0xFFFFFFFFL);
+    }
+
+    /**
+     * Billy's magic (D-B 8.1 to 8.3), as arithmetic over his data: 512 at the start, 372 after 140, 388 a second later;
+     * 100 in the meter and a spell of 140 is refilling with 3 seconds to wait, one of 600 too big (600 of 512); Mom
+     * halves the cost, rounded up; an undo gives back, never above the top; 1,990 practice and 20 more make him a
+     * Spellcaster with his new top full and a side of 32, an undo takes the 20 back and the rank stays; a jump of two
+     * ranks at once; an operator's rank; the pause after a spell; what he is told.
+     */
+    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    public static void billysMagicPaysRefillsAndLearns(GameTestHelper helper) {
+        BuildData fresh = BuildData.EMPTY;
+        check(BillyMagic.meter(fresh, 0L) == 512 && BillyMagic.top(fresh) == 512 && BillyMagic.verdict(fresh, 0L, 512) == SpellPlanner.NONE,
+                "512 at the start, enough for 512");
+        BuildData paid = BillyMagic.pay(fresh, 1000L, 140);
+        check(BillyMagic.meter(paid, 1000L) == 372 && BillyMagic.meter(paid, 1020L) == 388, "372 after 140, 388 a second later");
+        check(BillyMagic.meter(paid, 1000L + 20 * 9) == 512 && BillyMagic.meter(paid, 1_000_000L) == 512, "full again after 9 seconds, never above");
+
+        BuildData low = fresh.withMeter(100.0, 2000L);
+        check(BillyMagic.verdict(low, 2000L, 140) == BuildVerdictPayload.REFILLING && BillyMagic.secondsToPay(low, 2000L, 140) == 3,
+                "100 for a spell of 140: refilling, 3 seconds");
+        check(said(BillyMagic.cannotPay(low, 2000L, 140), "message.enhanced.build.refilling", 3), "your magic is refilling: 3 more seconds");
+        check(BillyMagic.verdict(low, 2000L, 100) == SpellPlanner.NONE && BillyMagic.cannotPay(low, 2000L, 100) == null
+                && BillyMagic.verdict(low, 2050L, 140) == SpellPlanner.NONE, "100 pays 100; 2.5 seconds later 140 too");
+        check(BillyMagic.verdict(low, 2000L, 600) == BuildVerdictPayload.TOO_BIG && said(BillyMagic.cannotPay(low, 2000L, 600),
+                "message.enhanced.build.too_big", 600, 512), "600 is bigger than his magic yet: 600 of 512");
+
+        check(BillyMagic.cost(100, true) == 50 && BillyMagic.cost(101, true) == 51 && BillyMagic.cost(100, false) == 100
+                && BillyMagic.cost(0, true) == 0, "near Mom 100 cost 50 and 101 cost 51; far, 100");
+        BuildData undone = BillyMagic.refund(BillyMagic.pay(fresh, 0L, 27), 0L, 27);
+        check(BillyMagic.meter(undone, 0L) == 512 && BillyMagic.meter(BillyMagic.refund(paid, 1000L, 1000), 1000L) == 512,
+                "an undo gives the 27 back; never above the top");
+        check(BillyMagic.meter(BillyMagic.setMeter(fresh, 0L, 10), 0L) == 10 && BillyMagic.meter(BillyMagic.setMeter(fresh, 0L, 99999), 0L) == 512,
+                "an operator's meter, within 0 and the top");
+
+        BuildData practised = BillyMagic.pay(fresh.withPractice(1990L), 3000L, 20);
+        BillyMagic.Practiced learned = BillyMagic.practise(practised, 3000L, 20);
+        check(learned.rankedUp() && learned.data().rank() == 2 && learned.data().practice() == 2010L, "1,990 and 20 more: rank 2");
+        check(BillyMagic.top(learned.data()) == 1024 && BillyMagic.meter(learned.data(), 3000L) == 1024, "his new top, 1,024, full as a gift");
+        check(Limits.billy(BillyRanks.rank(learned.data()), Limits.world(helper.getLevel())).side() == 32, "and a side of 32");
+        BuildData forgot = BillyMagic.unpractise(learned.data(), 20);
+        check(forgot.practice() == 1990L && forgot.rank() == 2, "an undo takes the 20 practice back, the rank stays 2");
+        BillyMagic.Practiced again = BillyMagic.practise(forgot, 3100L, 5);
+        check(!again.rankedUp() && again.data().rank() == 2, "practice under the next threshold is no rank-up");
+        BillyMagic.Practiced leap = BillyMagic.practise(fresh, 0L, 9000);
+        check(leap.rankedUp() && leap.data().rank() == 3 && BillyMagic.meter(leap.data(), 0L) == 2048, "9,000 at once: a Sorcerer, 2,048 full");
+        check(BillyMagic.unpractise(fresh, 50).practice() == 0L, "practice never goes below 0");
+
+        BuildData sorcerer = BillyMagic.setRank(fresh, 0L, 3);
+        check(sorcerer.rank() == 3 && sorcerer.practice() == 8000L && BillyMagic.meter(sorcerer, 0L) == 2048, "an operator's rank 3: 2,048");
+        BuildData back = BillyMagic.setRank(sorcerer, 0L, 1);
+        check(back.rank() == 1 && back.practice() == 0L && !BillyMagic.practise(back, 0L, 10).rankedUp(), "and back to 1, which his next spell keeps");
+
+        BuildData resting = BillyMagic.pauseAfter(fresh, 4000L, 10);
+        check(BillyMagic.paused(resting, 4009L) && !BillyMagic.paused(resting, 4010L), "the pause: 10 ticks after his spell");
+        check(BillyMagic.saysMomAgain(0L, 1200L) && !BillyMagic.saysMomAgain(100L, 1200L), "Mom is near: once a minute");
+        check(said(BillyMagic.rankUp(2), "message.enhanced.build.rank_up", 2) && ((TranslatableContents) BillyMagic.rankUp(2).getContents()).getArgs()[2]
+                .equals(1024), "you learned more magic! Rank 2, Spellcaster, 1024");
+        check(said(BillyMagic.waitForSpell(), "message.enhanced.build.wait") && said(BillyMagic.tooDangerous(), "message.enhanced.build.volatile")
+                && said(BillyMagic.forgotten(), "message.enhanced.build.forgotten") && said(BillyMagic.momNear(), "message.enhanced.build.mom")
+                && said(Limits.tooWide(24), "message.enhanced.build.too_wide", 24), "and the rest of what he is told");
+        helper.succeed();
+    }
+
+    /**
+     * Whose numbers a player has ({@code Limits.of}): the Scarlet Witch's, Billy's by the rank in his data, Billy's in
+     * Creative too (with {@code limitsInCreative} on, the default), nobody else's; and Mom's help: the nearest Scarlet
+     * Witch within 16 blocks, not a Spectator, not one 24 blocks away.
+     */
+    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    public static void everyBuilderHasHerNumbers(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer billy = f.player(2.5, TestKit.FLOOR, 2.5, Power.BILLY);
+        ServerPlayer wanda = f.player(7.5, TestKit.FLOOR, 2.5, Power.SCARLET_WITCH);
+        ServerPlayer magneto = f.player(10.5, TestKit.FLOOR, 10.5, Power.MAGNETO);
+        Limits his = Limits.of(billy);
+        Limits hers = Limits.of(wanda);
+        check(his != null && his.billy() && his.limited() && his.side() == 24 && his.rank() == 1, "Billy at rank 1: 24");
+        check(hers != null && hers.hero() == Power.SCARLET_WITCH && !hers.limited() && hers.reach() == 256, "the Scarlet Witch: no limit, reach 256");
+        check(Limits.of(magneto) == null && Limits.of(f.player(12.5, TestKit.FLOOR, 12.5)) == null, "Magneto and a powerless player have none");
+        check(hers.inWorld(new BlockPos(0, 5000, 0)).getY() == helper.getLevel().getMaxBuildHeight() - 1, "her world ends at the build height");
+        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(3));
+        Limits sorcerer = Limits.of(billy);
+        check(sorcerer != null && sorcerer.side() == 40 && sorcerer.magicSelect() == 2048, "a Sorcerer: side 40, a double click of 2,048");
+        billy.setGameMode(GameType.CREATIVE);
+        Limits creative = Limits.of(billy);
+        check(creative != null && creative.limited() && creative.side() == 40, "in Creative his limits still apply");
+
+        check(BillyMagic.mom(billy) == wanda, "a Scarlet Witch 5 blocks away helps him");
+        ServerPlayer nearer = f.player(4.5, TestKit.FLOOR, 2.5, Power.SCARLET_WITCH);
+        check(BillyMagic.mom(billy) == nearer, "the nearest one");
+        nearer.setGameMode(GameType.SPECTATOR);
+        check(BillyMagic.mom(billy) == wanda, "not a Spectator");
+        wanda.moveTo(helper.absoluteVec(new Vec3(19.5, TestKit.FLOOR, 19.5)));
+        check(BillyMagic.mom(billy) == null, "24 blocks away she is too far: " + wanda.distanceTo(billy));
+        helper.succeed();
+    }
+
+    /** Whether {@code message} is the lang key {@code key} with these first arguments. */
+    private static boolean said(@Nullable Component message, String key, Object... args) {
+        if (message == null || !(message.getContents() instanceof TranslatableContents translatable) || !translatable.getKey().equals(key)) {
+            return false;
+        }
+        for (int i = 0; i < args.length; i++) {
+            if (translatable.getArgs().length <= i || !args[i].equals(translatable.getArgs()[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // ------------------------------------------------------------------------------------------------------------
