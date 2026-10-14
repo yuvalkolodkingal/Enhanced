@@ -192,6 +192,8 @@ public final class ArenaLoans {
     private final Map<BlockPos, Home> proppedBy = new HashMap<>();
     /** The borrowed blocks held or flying. */
     private final Set<UUID> loose = new HashSet<>();
+    /** Those of them lent from a cell of the island's copy ({@link #isIslandCopy}). */
+    private final Set<UUID> copies = new HashSet<>();
     /** The players told once that a block is borrowed. */
     private final Set<UUID> told = new HashSet<>();
     /** The repairs two saves do not hold yet, one per cell (a standing block's per cell and block): see {@link #keep}. */
@@ -344,6 +346,9 @@ public final class ArenaLoans {
         TelekineticBlockEntity block = fight.adopt(new TelekineticBlockEntity(level, cell, BlockLifting.heldState(state), player));
         level.addFreshEntity(block);
         loose.add(block.getUUID());
+        if (fight.isCopyCell(cell)) {
+            copies.add(block.getUUID());
+        }
         if (told.add(player.getUUID())) {
             player.displayClientMessage(Component.translatable(BORROWED), true);
         }
@@ -363,6 +368,7 @@ public final class ArenaLoans {
     boolean stand(TelekineticBlockEntity block, BlockPos pos) {
         ServerLevel level = fight.level();
         loose.remove(block.getUUID());
+        copies.remove(block.getUUID());
         BlockPos cell = pos.immutable();
         BlockState placed = standingState(BlockLifting.landingState(level, cell, block.getBlockState()));
         BlockState here = level.getBlockState(cell);
@@ -393,6 +399,7 @@ public final class ArenaLoans {
     /** A borrowed block of this fight is gone (it shattered, crumbled, or was discarded): it no longer counts. */
     void gone(Entity block) {
         loose.remove(block.getUUID());
+        copies.remove(block.getUUID());
     }
 
     /**
@@ -461,6 +468,7 @@ public final class ArenaLoans {
                 Entity block = level.getEntity(id);
                 return block == null || block.isRemoved();
             });
+            copies.retainAll(loose);
         }
         if (dirty && now - lastSnapshot >= SNAPSHOT_INTERVAL) {
             hand(now);
@@ -601,6 +609,7 @@ public final class ArenaLoans {
             }
         }
         loose.clear();
+        copies.clear();
         if (written) {
             hand(now);
         }
@@ -948,6 +957,15 @@ public final class ArenaLoans {
     /** Whether a borrowed block stands at {@code pos}. */
     public boolean isStanding(BlockPos pos) {
         return standing.containsKey(pos);
+    }
+
+    /**
+     * Whether {@code block} is a borrowed block of this fight, held or flying, that was lent from a cell of the island's
+     * copy (a block of Ultron's island in the sky, or one set down on it and lent again): the island keeps it wherever it is
+     * ({@code UltronFight.carryLimit}), so that a copy never reaches the real ground.
+     */
+    public boolean isIslandCopy(Entity block) {
+        return copies.contains(block.getUUID());
     }
 
     /** Records a home at {@code pos} as a loan of {@code state} would, without lifting anything (D-T test 52 e). */

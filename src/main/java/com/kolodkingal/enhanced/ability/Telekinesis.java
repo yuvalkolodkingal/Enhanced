@@ -105,6 +105,11 @@ public final class Telekinesis {
     /** Max time a player can be held, so nobody is trapped forever. */
     public static final int MAX_PLAYER_HOLD_TICKS = 600;
     private static final double BREAK_DISTANCE = 48.0;
+    /**
+     * A thrown boss crashes into the ground when it stops him coming down faster than this a tick: more than a tick of
+     * gravity, so that one thrown along the ground, or let fall from a block's height, only skids.
+     */
+    private static final double CRASH_DROP = 0.15;
     private static final double MIN_HOLD_DISTANCE = 3.0;
     private static final double MAX_HOLD_DISTANCE = 12.0;
     /** A held projectile hangs weightless; this remembers whether it was weightless before (to restore it). */
@@ -137,16 +142,28 @@ public final class Telekinesis {
         final IntSet hit = new IntOpenHashSet();
         Vec3 lastPos;
         double lastSpeed;
+        /** Its motion as it was at the end of the last tick: what it moves by in this one (at first, the throw's). */
+        Vec3 lastMotion;
+        /** Whether it was on the ground at the end of the last tick (a throw starts as if in the air). */
+        boolean grounded;
+        /** Whether it has crashed into the ground already ({@link #crashesDown}). */
+        boolean downed;
         int ticks;
 
-        Flight(UUID thrower, ResourceKey<Level> dimension, Vec3 pos, double speed, boolean heavyHit, boolean takesImpact, int color) {
+        Flight(UUID thrower, ResourceKey<Level> dimension, Vec3 pos, Vec3 motion, boolean heavyHit, boolean takesImpact, int color) {
             this.thrower = thrower;
             this.dimension = dimension;
             this.lastPos = pos;
-            this.lastSpeed = speed;
+            this.lastSpeed = motion.length();
+            this.lastMotion = motion;
             this.heavyHit = heavyHit;
             this.takesImpact = takesImpact;
             this.color = color;
+        }
+
+        /** A boss's flight: heavy for what it hits, and he takes the impact himself; he also crashes into the ground. */
+        boolean crashesDown() {
+            return heavyHit && takesImpact;
         }
     }
 
@@ -669,7 +686,7 @@ public final class Telekinesis {
             e.hurtMarked = true;
             e.hasImpulse = true;
             boolean golem = e instanceof IronGolem;
-            FLIGHTS.put(e.getUUID(), new Flight(player.getUUID(), player.level().dimension(), e.position(), speed,
+            FLIGHTS.put(e.getUUID(), new Flight(player.getUUID(), player.level().dimension(), e.position(), vel,
                     golem || BossGrip.isBoss(e), !golem, grip.mode.color));
         }
         BossGrip.letGo(player, e, true, false);
@@ -796,8 +813,9 @@ public final class Telekinesis {
     // Flights
 
     /**
-     * Called once per server tick: every thrown thing flies on, hits what it crashes into and slams into what stops it. A
-     * throw of anything of a fight (or of a fighter) that is about to cross the edge of a gated arena (Ultron's field,
+     * Called once per server tick: every thrown thing flies on, hits what it crashes into and slams into what stops it; a
+     * boss also crashes into the ground where he comes down (once a throw: he takes the impact, and skids on). A throw of
+     * anything of a fight (or of a fighter) that is about to cross the edge of a gated arena (Ultron's field,
      * Apocalypse's wall) is stopped dead half a block inside it (D-T 4.5). When a flight ends, the boss may act again
      * ({@link BossGrip#landed}) and a boss or minion that ended outside its carry limit is brought back ({@link
      * BossFights#bringBack}). Then the landing guard of whoever has landed is dropped ({@link #isSpared}), and a vanilla
@@ -873,6 +891,12 @@ public final class Telekinesis {
                 flightOver(e);
                 continue;
             }
+            boolean comesDown = e.onGround() && !f.grounded && f.lastMotion.y < -CRASH_DROP;
+            if (f.crashesDown() && !f.downed && comesDown && hitSpeed > 0.6) {
+                // A thrown boss comes down: he crashes into the ground (D-T 1), and skids on, still hitting what he meets.
+                impact(level, e, f, thrower, hitSpeed);
+                f.downed = true;
+            }
             if (f.ticks > 3 && speed < 0.05 && e.onGround()) {
                 it.remove();
                 flightOver(e);
@@ -884,6 +908,8 @@ public final class Telekinesis {
             }
             f.lastSpeed = speed;
             f.lastPos = pos;
+            f.lastMotion = e.getDeltaMovement();
+            f.grounded = e.onGround();
         }
         tickSpared(server);
         BossGrip.tick(server);

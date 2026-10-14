@@ -95,6 +95,11 @@ public final class UltronFight extends BossFight {
     public static final int SPEECH_COLOR = 0xD8262B;
     /** While the island is up his body and the Sentries are looked over this often (ticks), and brought back onto it. */
     public static final int TETHER_INTERVAL = 10;
+    /**
+     * What telekinesis carries is still on the island this far under its surface (in a hole of it); farther down it is
+     * under the island or beside it, and keeps the ground's carry limit ({@link #carryLimit}).
+     */
+    public static final double UNDER_THE_SURFACE = 2.0;
 
     private static final Component NAME = Component.translatable("entity.enhanced.ultron");
 
@@ -887,16 +892,28 @@ public final class UltronFight extends BossFight {
     }
 
     /**
-     * Where telekinesis may carry a body, a Sentry or a fighter: on the ground, inside the field ({@code containRadius - 2},
-     * the default); while the island is up, what is on it is kept within {@link #armyReach}, the narrowest the rim runs, so
-     * that it is never carried off the island (what is under the island keeps the ground's limit).
+     * Where telekinesis may carry a body, a Sentry, a fighter or a borrowed block: on the ground, inside the field ({@code
+     * containRadius - 2}, the default); while the island is up, what is on it ({@link #isOverTheIsland}) and a borrowed
+     * copy of it wherever it is ({@link ArenaLoans#isIslandCopy}) are kept within {@link #armyReach}, the narrowest the rim
+     * runs, so that they are never carried off the island. What is beside the island or under it keeps the ground's limit: a
+     * block of the ring carried up past the rim follows its holder up, and is not dragged in under the island.
      */
     @Override
     protected Vec3 carryLimit(Entity entity, Vec3 wanted) {
-        if (island.isOnTheIsland(entity)) {
+        if (island.isIslandUp() && (isOverTheIsland(entity) || loans().isIslandCopy(entity))) {
             return keepWithin(entity, wanted, armyReach(radius), Double.NEGATIVE_INFINITY, island.top());
         }
         return super.carryLimit(entity, wanted);
+    }
+
+    /**
+     * Whether {@code entity} is on the island in the sky or over it, for the carry limit: it is up there ({@link
+     * UltronArena#isOnTheIsland}), in a column of the island ({@link UltronArena#isIslandColumn}), and at most {@link
+     * #UNDER_THE_SURFACE} under the island's surface there (in a hole of it). One beside the island, or under it, is not.
+     */
+    private boolean isOverTheIsland(Entity entity) {
+        return island.isOnTheIsland(entity) && island.isIslandColumn(entity.getX(), entity.getZ())
+                && entity.getY() >= islandSurface(entity.getX(), entity.getZ()) - UNDER_THE_SURFACE;
     }
 
     /**

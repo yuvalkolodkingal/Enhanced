@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.boss.BossArena;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -111,6 +112,21 @@ public final class UltronArena extends BossArena {
     /** Whether the entity is up on the island, as opposed to on the ground under it. */
     public boolean isOnTheIsland(Entity entity) {
         return islandUp && entity.getY() >= islandFloor - 4.0;
+    }
+
+    /**
+     * Whether the column of {@code (x, z)} is one of the island's, while it is up: inside its wavy rim (with no copy to
+     * tell, no farther from the middle than the rim can run).
+     */
+    public boolean isIslandColumn(double x, double z) {
+        if (!islandUp) {
+            return false;
+        }
+        SokoviaTemplate t = copiedFrom;
+        if (t == null) {
+            return Math.hypot(x - center().x, z - center().z) <= islandRadius + SokoviaShape.RIM_SLACK + 1.0;
+        }
+        return SokoviaShape.inside(t.spec(), Mth.floor(x) - t.centre().getX(), Mth.floor(z) - t.centre().getZ());
     }
 
     /**
