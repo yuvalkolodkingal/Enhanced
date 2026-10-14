@@ -955,11 +955,11 @@ Every power's light follows the films and shows:
 | `/enhanced boss start apocalypse [force]` | With `force`, wakes En Sabah Nur at your feet, with no Capstone, and skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (never the switch that turns him off, Peaceful or the one-fight-at-a-time rule); without `force` the command is the ritual itself and needs a Capstone in hand and a block in sight (section 17.11). |
 | `/enhanced boss stop` | End the running boss fight (a used Program or Capstone is given back, the island of Sokovia is put back); a second stop while a boss is leaving ends it at once. |
 | `/enhanced boss list` | List the running boss fights. |
-| `/enhanced build undo <player> [steps]` | **(3.1)** Undo that player's last Build Magic steps (1 by default) with the same safe rule as Ctrl + Z. |
-| `/enhanced build stop [<player>\|all]` | Stop the working spells where they are (undoable) and drop the queues. |
+| `/enhanced build undo <player> [steps]` | **(3.1)** Undo that player's last Build Magic steps (1 by default, 1 to 1000), newest first, each as a queued job with the same safe rule as Ctrl + Z. The player must be online. |
+| `/enhanced build stop [<player>\|all]` | Stop the working spells where they are (undoable) and drop the queues: a player's, or everybody's with `all` or no argument. |
 | `/enhanced build list` | The spells working or waiting: player, spell, dimension, percent, blocks. |
-| `/enhanced build history <player>` | That player's steps. |
-| `/enhanced build rank <player> [1-4]` | Billy's rank and practice; with a number, set the rank (practice becomes its threshold, the meter fills). |
+| `/enhanced build history <player>` | That player's steps, oldest first and numbered from 1, then the undone ones (the redo list): "1. Fill, 140 blocks, 2 min ago, overworld". |
+| `/enhanced build rank <player> [1-4]` | Billy's rank and practice; with a number, set the rank (practice becomes at least its threshold, exactly it when the rank goes down; the meter fills). |
 | `/enhanced build meter <player> <value>` | Set Billy's magic meter (0 to its top). |
 | `/enhanced build forget <player>` | Clear that player's history and pocket (memory and disk). |
 | `/enhanced boss cleanup <center> <radius>` | Remove every entity of a boss's kind within the radius (the bosses, the Sentries, Thanos's sword, meteors, orbs and illusions, the Vibranium Key, the bolts, lances, boulders and cocoons), whether a fight owns it or not; no block is touched. |
@@ -2389,7 +2389,7 @@ power), and it arrives as damage. The same function is the hero's shield's own r
 
 **(3.1) Critical hits.** On the **boss** (never the hero's shield), a hit is *critical* when its damage type is in `enhanced:mind_power`, its
 causing player's power is in the new `critHeroes` (Scarlet Witch and Phoenix, kept apart from `mindPowerHeroes`, so adding Billy to the breakers does
-not give him crits) and, on the shield, it is mind power at all (`MindPower.isCritical`, `isCritHero`). The Phoenix's Mind Control and Psionic Field strains are critical too.
+not give him crits) and, on the shield, it is mind power at all (`MindPower.isCritical`, `isCritHero`). The Phoenix's Mind Control and Psionic Field strains are critical too. Every critical hit whose factor is above 1 plays `apocalypse_crit` (`CritSound`, 0.5 s, a 3 ms crack, glass shards between 1 and 6.5 kHz and a low gong at 73 Hz, volume 1.4 so the whole arena hears it; subtitle "Critical hit on Apocalypse"; file `sounds/apocalypse_crit.ogg`), at most once per attacker every 10 ticks, at the hit point on the shield and at his chest on the body.
 
 | Hit | While the shield is up |
 |---|---|
@@ -2581,9 +2581,16 @@ it happens, undo always one key away.
 ### 18.1 The key, the grammar, the context
 
 * **Y** (`key.enhanced.build_magic`), `IN_GAME`, for a Scarlet Witch or Billy with no screen open and not a Spectator; for anyone else it
-  does nothing. **Tap** (let go within 6 ticks): build mode on or off. **Hold** 6 ticks: the **Spell Wheel**; out of build mode it turns
-  the mode on first. Moving to a picture and letting go chooses it; letting go without moving leaves the wheel open to be clicked;
-  Esc or Y closes it unchanged. The sixth line of the hero panel is `[Y] Build Magic ON/OFF` (Billy's also `✦ 372/512`).
+  does nothing. **Tap** (let go within 6 ticks): build mode on or off. **Hold** 6 ticks: the **Spell Wheel** (`SpellWheelScreen`, a screen
+  that does not pause the game); out of build mode it turns the mode on first. The eleven spells sit on a ring (tiles of 40 pixels at a radius
+  of 110, clockwise from the top, in the order of the table in 18.3). Moving to a picture and letting go of Y chooses it and closes the wheel;
+  letting go in the middle (a dead disc of 28 pixels) leaves it open; a click on another spell chooses it and keeps the wheel open (the style
+  row, the hotbar and the Blocks page follow), a click on the chosen one closes it; **1** to **9** and **0** (the keypad too) choose the first
+  ten spells by number and close it (Grow, the eleventh, has no digit); the mouse wheel steps through the spells (down = clockwise); Esc closes
+  it unchanged, and a tap of Y closes it too but, as built, the same tap also switches build mode off (a known rough edge, HEROES-AND-BOSSES
+  section 9). The wheel also carries the style row (27 pictures), Solid and Hollow for Shapes, the dice (Mix), the nine hotbar slots, the
+  **Blocks** page, Undo and Redo with their counts, and the centre door (start or stop building). The sixth line of the hero panel is
+  `[Y] Build Magic ON/OFF` (Billy's also `✦ 372/512`).
 * **Build mode ends by itself** on death, respawn, a power change, Spectator or Adventure mode, logout, and when the server turns
   `build_magic.enabled` / `operatorsOnly` against the player. A change of dimension keeps the mode and lets go of the box.
 * **One mouse grammar, no Sneak.** Left click = *where* (corners; a drag; double click = the whole thing; the sky = let go, or a corner on the
@@ -2601,7 +2608,9 @@ it happens, undo always one key away.
 ### 18.2 Selecting
 
 * The **aimed cell** is the block under the crosshair within the hero's reach (Billy 24 at rank 1, +8 a rank; Wanda `build_magic_wanda.reach` 256),
-  found with the mod's block ray (grass and flowers are clicked through; a pick uses the outline ray). Billy's rubber band stops at his side limit.
+  found with the mod's block ray (grass and flowers are clicked through; a pick uses the outline ray). Billy's rubber band stops at his side limit
+  (and says "Too big for you yet: at most N blocks on a side"); a click on a block beyond his reach, up to reach + 64 blocks of looking, marks
+  nothing and says "Too far for your magic", where a true sky is still the floating cell. The click that fixes corner B never arms a drag.
 * **Corners and the box.** Click A, then B (the box rubber-bands in between and is world-aligned, clamped to the build height and the border);
   a third click starts over; a drag makes the box at once. Looking at the box, **scroll up pushes that face out one, down pulls it in**
   (Ctrl 8), the looked face lit at 22% with an arrow; the box also shows faintly through terrain; a face cannot pass the opposite one.
@@ -2612,7 +2621,7 @@ it happens, undo always one key away.
   refused). A double click on another thing adds it (up to 8 seeds). The result is a *mask*: Fill turns exactly those blocks into the
   material; Vanish, Change and Paint act only on them; Copy, Move and Repeat take only them. Pushing a face turns it back into a box.
 
-### 18.3 The ten spells (and Grow)
+### 18.3 The eleven spells
 
 One spell is one undo step (a Paint or Land stroke from press to release is one; a Move is one for both ends). Every spell takes at least
 `minSpellTicks` (10) so it is seen growing: fills rise from the ground, shapes swell from their heart shell by shell, vanishing melts from the
@@ -2626,11 +2635,11 @@ top. The cost (Billy) is the number of blocks it really changes; a block that al
 | 4 | **Paint** | A brush of radius 0 to `brushMax` round the block under the picking ray; every surface block under it (touching air) changes by the family rule. Billy's radius up to his side ÷ 8 (3 at rank 1), Wanda's to `build_magic_wanda.brushMax` (16). Hold the right button and sweep; one stroke is one step. |
 | 5 | **Pull & Push** | The surface is the looked block and every block of the same block connected to it in the plane of the face whose front neighbour is air or replaceable (up to the magic-select cap). Scroll up pulls N layers out (copies moved N steps, only into air or replaceable cells); down pushes: the surface and the N−1 layers behind it vanish. |
 | 6 | **Shapes** | Ball, Dome, Tower, Ring, Cone, Pyramid, Arch, Heart; solid or hollow (hollow by default for Ball, Dome, Tower; a Ring is always one block thick; shapes standing on the ground have no floor). The ghost sits on the looked surface; scroll = radius (Billy 1 up to (side−1)÷2: 11 at rank 1; Wanda up to `shapeMaxRadius` 512); a click plants it; for the shapes with a height the height then follows the look up and down (default Tower 2r+1, Ring 1, Cone 2r+1, Pyramid r+1). A hollow dome of radius 3 is 57 blocks, a hollow ball of radius 6 is 414 (fits Billy's first meter), radius 7 is 530 (does not). |
-| 7 | **Copy** | The first right click copies the box or mask into the pocket (server side, one per player, saved, travelling across dimensions); the ghost follows the crosshair; each right click stamps a copy from the ground up. A box copy brings its air, a mask copy only the thing. Never copies creatures. Scroll lifts, Alt + scroll or Ctrl + R turns a quarter, Ctrl + F flips. Billy's pocket is at most his side on every axis; Wanda's at most `pocketMaxMb`. |
-| 8 | **Move** | The first right click picks up, the second puts down: one spell. A **compare-and-swap per cell**: a source cell is moved only if it still holds what was captured (or what this Move wrote); a cell someone changed meanwhile is left alone and counted. Block entities move with their full contents; with `moveCarriesCreatures` creatures, frames, paintings and armor stands inside come along. |
+| 7 | **Copy** | The first right click copies the box or mask into the pocket (server side, one per player, saved in `pocket.bin` of the player's folder, travelling across dimensions); the ghost follows the crosshair; each right click stamps a copy from the ground up. A box copy brings its air, a mask copy only the thing. Never copies creatures. Scroll lifts, Alt + scroll or Ctrl + R turns a quarter, Ctrl + F flips. Billy's pocket is at most his side on every axis; every pocket at most `pocketMaxMb`. **Containers:** the pocket keeps a container's block-entity data (and so its items) only where the caster may break the block (`massEditRefuses`, `vanillaRights`, the break event once a section; a claimed vault is read as the bare block), and Billy's never (`copiesContents`). |
+| 8 | **Move** | The first right click picks up, the second puts down: one spell. A **compare-and-swap per cell**: a source cell is moved only if it still holds what was captured (or what this Move wrote); a cell someone changed meanwhile is left alone and counted `kept_changed`. Block entities move with their full contents. **A full chest is spared at the target:** the target cells that are not part of the Move's own source region are checked as a Fill's are (P7: kept and counted, or spilled with `fullContainers` SPILL), and then the source stays too. **Contents are never in two places:** every moved cell that carried block-entity data is linked to its source (`UndoStep.link`); an undo gives the source its data back only if the target was undone in the same undo, a redo writes the target's data only if the source was cleared, and a redo compares the hash of the data the undo put back (`Walk.restoredHash`) with the cell's, or finds a bare block holding no items, else the cell is dropped (`kept_changed`), so a chest refilled after the undo is not wiped by the redo. With `moveCarriesCreatures`, creatures, frames, paintings and armor stands inside come along, but only if the cells they stand in and on were not kept, the caster may build there and there is room at the end. A Move is never a *lite* step (18.9): over the memory budget it is refused, held or not. |
 | 9 | **Repeat** | Copies in a row in the direction looked: copy i sits at (size along the direction + gap) × i; scroll = copies (Billy up to 8 +4 a rank; Wanda `repeatMax` 0 = no count), Alt + scroll = gap 0 to 16. |
 | 10 | **Land** | Raise, Lower, Smooth: a brush of pulses every 4 ticks (`REACH` 8). A column of the brush disc moves by a falloff (1 − (d/r)²)² of a block a pulse; the surface is a ground block with something loose on it; a column moves whole or not at all (trees and houses stand, never float); Lower sinks only into ground or empty cells; the filler of a rising column is the block under it when that is plain ground, never an ore; Smooth moves a column toward the average of the square round it by at most one block; creatures on a rising column are lifted. Billy pays per pulse; never paid with items. |
-| (11) | **Grow** | Swell, Shrink, Bloom: **not part of this version** (planned for 3.2). |
+| 11 | **Grow** | Swell, Shrink, Bloom: a brush of pulses every 4 ticks like Land (hold the right button, sweep; scroll = radius, Billy's side ÷ 8, Wanda's `brushMax`; Alt + scroll = style; one stroke is one step). A pulse (`GrowBrush.Pulse`, a `BrushPulse` like Land's) is planned against the world as it is, so nothing cascades inside one (a rock swells one layer a pulse), into one-cell columns (a tall flower: two) that the job writes whole or not at all through Land's machinery (the write-ahead gate, the rules, the settle pass). The brush is the sphere d² ≤ r² + r, nearest the middle first; *solid* means a full block with no block entity that magic may touch, and a block entity is never swelled from or shrunk. **Swell:** every air or replaceable cell of the sphere that touches a solid block of the sphere becomes that block (the most common solid face neighbour, ties to the one below). **Shrink:** every solid cell of the sphere with air on two or more faces vanishes. **Bloom** (Westview's garden), on cells with an empty cell above: dirt, coarse dirt and rooted dirt become grass; on grass and moss, by a 5-bit hash, 1 in 32 a tall flower (two cells), 4 in 32 a small flower, 8 in 32 short grass; netherrack becomes crimson nylium (warped in a warped forest) with roots on 8 in 32; mycelium sprouts a mushroom on 8 in 32. Each cell's choice is a hash of (the stroke's seed, x, y, z), the seed fresh per stroke from the client, so the server grows what the ghost showed; a Bloom pulse that plans nothing says "Nothing grows here" once a stroke. Billy pays per pulse for the cells changed; never paid with items; no TNT, lava or fire count. |
 
 ### 18.4 The block, magic or materials
 
@@ -2640,7 +2649,7 @@ hotbar's blocks by stack size with a hash of position and a seed carried by the 
 of the wheel picks any block magic may make. A water bucket makes water, a lava bucket lava (Wanda only). Two-block things (doors, beds, tall
 flowers) are never the material but are carried whole by Copy, Move and Repeat, and no spell cuts one in half. By default blocks come from magic;
 with `requireMaterials` a Survival player pays one plain item per block (an unaffordable spell is refused whole: "You need 37 more Oak Planks"), vanished blocks
-go into the inventory, undo gives back and takes back; Creative never pays; Land is never paid with items.
+go into the inventory, undo gives back and takes back; Creative never pays; Land and Grow are never paid with items (they move and grow the ground).
 
 ### 18.5 What the builder sees and hears
 
@@ -2649,19 +2658,34 @@ go into the inventory, undo gives back and takes back; Creative never pays; Land
 * **The ghost** is the result, in real block models, translucent (alpha 0.45) and tinted in the hero's colour, built off the main thread by the same
   pure planner as the server's; the detail cap `ghostDetail` (32,768) draws only the outside past it and a tinted box past four times that. **The
   server's marks** (preflight, at most 4 a second and 2 ms, **no event posted**): red cross = protected, yellow = a chest that stays, white = someone
-  stands there, grey = not loaded; the ghost round them is grey; a wholly refused plan is a grey ghost and the right button fizzles.
+  stands there, grey = not loaded; the ghost round them is grey; a plan the server refuses whole (an arena, say) is a grey ghost and the right button fizzles; one whose every
+  cell is merely protected still casts and then says how many blocks stayed.
 * **The badge** next to the crosshair: material, size, spell and style, Billy's meter with the cost of the ghost as a darker chunk (orange with a clock when
   more than he has now, red and a grey ghost when more than his whole meter, a scarlet stripe and "½" with Mom), Wanda's ∞. **Rings**: the hold ring (20 ticks, or 40
   over a million blocks, red for removals) and the progress ring. A done pop `✓ 140` for 40 ticks. The crosshair becomes a rune; the screen's edges take a faint tint.
 * **The hint strip** (bottom right): three to five rows of little pictures of the input and one or two words for the current spell and state
   (pure `BuildHints.lines`); **tips** (a three-second picture the first times a spell is chosen and when something does nothing; `tips`).
-* **The wheel**: a ring of 40×40 pictures clockwise from the top in the order of the table, the centre disc *Start/Stop building*, undo and redo with their
+* **The wheel** (18.1): a ring of eleven 40×40 pictures clockwise from the top in the order of the table, the centre disc *Start/Stop building*, undo and redo with their
+  counts, the hotbar row with Mix and Blocks, the style row, and over it Wanda's "Chaos Magic ∞" or Billy's name, rank, stars, meter and the way to the next rank. The **Blocks** page
+  lists the blocks of four creative tabs (Building, Coloured, Natural, Functional) that magic may make (`BuildClient.conjurable`, the test the mix and the server use; with
+  `requireMaterials` a Survival player sees only what the inventory holds), 24-pixel icons in a grid with a scrollbar, a Recent row (the last 16 used this session), a search box over
+  all four tabs and tooltips; a click sends `PICK_BLOCK` with the registry id and the material lasts until the hotbar slot or the held item changes.
   counts, the hotbar row with Mix and Blocks, the style row, and over it Wanda's "Chaos Magic ∞" or Billy's name, rank, stars, meter and the way to the next rank.
 * **Everyone else** sees Wanda's eyes glow and Billy's crown stay, hand wisps or sparks, the builder's thin box within 64 blocks (`showOthers`), the
   cast gesture (`WANDA_HEX_TWEAK`, or `WANDA_HEX_RISE` from 100,000 blocks; `BILLY_BOLT` with a Hex Bolt arc from his hand), Mom's scarlet thread, a frame and a ripple
   sweeping the spell in its work order, server particles (at most 64 a tick), the undo ripple backwards, and Billy's rank-up (the crown flares white, runes spin; within 32).
-* **Sounds** (eight events, `build_on_wanda`, `build_on_billy`, `build_cast_wanda`, `build_cast_billy`, `build_hum`, `build_fizzle`, `build_undo`,
-  `build_rank_up`, with vanilla stand-ins until each file lands) and the builder's own UI clicks; `AMETHYST_CLUSTER_PLACE` when a spell is done.
+* **Sounds.** Eight events of Build Magic, each with a file of its own in `assets/enhanced/sounds/` (the top level; the 3.0 voices are in `sounds/sfx/`), synthesised from scratch like
+  all the mod's sounds, registered in `ModSounds`, `sounds.json` and both lang files (the subtitles): `build_on_wanda` ("Reality bends", 1.2 s, a breathy rising A minor chord with a shimmer),
+  `build_on_billy` ("A spellbook opens", 0.8 s, a paper flutter and two glassy notes), `build_cast_wanda` ("Chaos magic rewrites reality", 1.0 s), `build_cast_billy` ("A spell crackles", 0.8 s),
+  `build_hum` ("Magic weaves", 1.0 s, every 20 ticks at the front of a working spell, pitched lower for Wanda and higher for Billy), `build_fizzle` ("A spell fizzles", 0.4 s, only the builder
+  hears it), `build_undo` ("Reality snaps back", 0.8 s, the cast chord backwards) and `build_rank_up` ("Billy learns new magic", 1.6 s, five rising notes and a sparkle). A Scarlet Witch spell of
+  `BuildSounds.HUGE_CAST` (100,000) blocks or more plays her `HEX_RISE` instead of `build_cast_wanda`; the done sound is the game's `AMETHYST_CLUSTER_PLACE`, and the builder's UI sounds
+  (corners, clicks, the hold ring, the wheel) are the game's own. The ninth new file is not Build Magic's: `apocalypse_crit` ("Critical hit on Apocalypse", 0.5 s, a heavy glassy crack with a low gong under it),
+  played by `CritSound`. All nine are heard in game with their subtitles. **Pictures:** 45 PNGs in `textures/gui/build/`: a 32×32 picture for each spell (`fill`, `vanish`, `change`, `paint`,
+  `pull`, `shape`, `copy`, `move`, `repeat`, `land`, `grow`), one for each of the nineteen styles (`<spell>_<n>.png`, n = the style's ordinal: `fill_0` to `fill_5`, `vanish_0` to `vanish_3`, `change_0` to
+  `change_2`, `land_0` to `land_2`, `grow_0` to `grow_2`), one for each of the eight shapes (`shape_ball`, `shape_dome`, `shape_tower`, `shape_ring`, `shape_cone`, `shape_pyramid`, `shape_arch`,
+  `shape_heart`), and seven 16×16 ones (`mouse_left`, `mouse_right`, `mouse_middle`, `mouse_wheel`, `dice`, `door`, `blocks`). The client draws the mouse pictures of the hint strip itself, so the four
+  `mouse_*` files are spare; where a picture is missing it draws a stand-in.
 
 ### 18.6 Billy: an apprentice who learns
 
@@ -2677,8 +2701,8 @@ gives back `cost × restored ÷ changed` and takes back that practice; redo pays
 | 4 Wiccan | 30,000 | 4,096 | 40/s | 48 | 48 | 16 | 20 | 6 |
 
 From the config numbers: meter = `meter` × 2^(rank−1); refill = `refill` × (1 + (rank−1)/2); side = `maxSide` + 8(rank−1); reach = `reach` + 8(rank−1); undos = `undoSteps` + 2(rank−1);
-repeat = `repeatMax` + 4(rank−1); brush = side ÷ 8; magic select = the meter. `maxRank` caps it. A rank-up is a moment (the crown flares, runes, a fanfare to everyone near, the meter fills as a gift).
-**Mom's help**: a Scarlet Witch within `momRange` (16) when he casts halves the cost (`momCostFactor` 0.5, rounded up), with a scarlet thread and "½"; his practice counts the real blocks.
+repeat = `repeatMax` + 4(rank−1); brush = side ÷ 8; magic select = the meter. `maxRank` caps it. Each rank is the same step up from the Apprentice's five numbers (the meter doubles, the refill gains half of the first, side and reach 8, undos 2, Repeat 4); an operator sets a rank with `/enhanced build rank` (18.12). A rank-up is a moment (the crown flares, runes, a fanfare to everyone near, the meter fills as a gift).
+**Mom's help**: a Scarlet Witch (alive, not a Spectator, in his dimension) within `momRange` (16) when he casts halves the cost (`momCostFactor` 0.5, rounded up), with a scarlet thread and "½"; his practice counts the real blocks.
 Limits and what he is told: the meter now (`refilling`), the whole meter (`too_big`), the side (`too_wide`), the reach (`too_far`), undo history, Repeat, one spell at a time with a pause of `castPause` (10 ticks), TNT, lava and fire never
 (`volatile`), copies of containers come out empty (`copiesContents`), Creative changes nothing (`limitsInCreative`).
 
@@ -2697,18 +2721,34 @@ One rule book (`build/BuildRules`, `ability/BlockRights`) for every spell, undo 
 Adventure; the dimension allowed; a request rate of `maxRequestsPerSecond` (40); anchors within reach + 2 and Billy's side; the material makeable (never `build_unconjurable`; never two blocks tall; Billy never `build_volatile`); no island being cleared after a crash; Billy's pause; Wanda's queue and `maxBlocks`;
 the hold flags (`holdToConfirmBlocks` 64 → 20 ticks, `hugeSpellBlocks` 1,000,000 → 40 ticks); then the COUNT phase decides the meter, the materials and the volatile cap. **Per cell, cheapest first**: loaded; inside the world and the border; the new state differs;
 not `build_untouchable` and not a block with negative hardness; **not in the protected arena** (`BossFights.protects`, and with `allArenasProtected` the cylinder of any running fight, and the ground the island hides, and with `hexIsAClaim` a Hex that is not the caster's); no body there that may not be lifted (another player with PvP off, a boss or fight entity,
-a creature Mjolnir pins); the old block entity holds no items (`fullContainers` SKIP leaves it, SPILL drops them; a Move carries it); vanilla rights (`mayBuild`, `mayInteract`, `blockActionRestricted`); the claim probe once per 16×16×16 section; the break and place events per block (`postEventsPerBlock`);
+a creature Mjolnir pins); the old block entity holds no items (`fullContainers` SKIP leaves it, SPILL drops them; a Move carries it from its own source region, and never lands on a full container, 18.3); vanilla rights (`mayBuild`, `mayInteract`, `blockActionRestricted`); the claim probe once per 16×16×16 section; the break and place events per block (`postEventsPerBlock`);
 materials. The player is the caster, or a fake player of his profile when he is away. Writing: `setBlock` with clients told, no neighbour reaction, no drops; `Clearable.tryClear` before a block entity goes; a door, bed or tall plant is written in both halves; falling blocks a spell places are held where they were put (`holdGravityBlocks`); afterwards
-the outside is **settled** once (shape updates, side effects recorded so an undo brings a fallen torch back). Creatures inside new solid blocks are lifted on top (`liftCreatures`; another player only with PvP on).
-Copies keep the block-entity data of `build_copies_data` types, Billy's without `build_holds_items`. Never touched: bedrock-like blocks, portals, spawners, vaults, Mjolnir as a block; never made: budding amethyst, the dragon egg, infested blocks, frosted ice, Spider-Man's web and a few more; the volatile cap applies to copies too.
+the outside is **settled** once (shape updates, side effects recorded so an undo brings a fallen torch back). Creatures inside new solid blocks are lifted on top (`liftCreatures`; another player only with PvP on). With PvP off a cell where another player stands is also kept free of anything that
+would hurt him: not only blocks with a collision shape but fluids, TNT, lava, fire, powder snow, cobweb, berry bushes, magma, wither roses and campfires. A neighbour with a block entity that would
+become another block (a sign, a banner) is left alone by the settle pass (vanilla breaks it, with its drop, in its turn). A column walk gives up a whole unloaded chunk column at once; a plan
+with no loaded chunk, or a box wider than a million columns of which under 1% is loaded, ends at once with every cell counted unloaded.
+Copies keep the block-entity data of `build_copies_data` types, Billy's without `build_holds_items`, and only where the caster may break the block (18.3). Never touched: bedrock-like blocks, portals, spawners, vaults, Mjolnir as a block; never made: budding amethyst, the dragon egg, infested blocks, frosted ice, Spider-Man's web and a few more; the volatile cap applies to copies too.
 Witches' Road doors are ordinary blocks to magic.
 
 ### 18.9 Undo, redo and the history
 
 Ctrl + Z in order: drop Wanda's newest waiting spell; else stop and rewind a working one (it jumps the queue); else undo the newest step (partly undone ones first); else "Nothing to undo". Ctrl + Y redoes. **Safe undo**: a recorded cell is restored only if it still holds exactly what the spell put there (the same state and, with data, the same hash); changed cells are
-left and dropped from the step; cells that became protected stay in the step, marked partly undone, to be tried again. A step records the spell, the dimension, the cost and practice, and per 16×16×16 section the old and new states, the block-entity data, and the side effects; it is written to
-`<world>/data/enhanced/build/<uuid>/` **ahead** (a section's record is on disk before the job writes its first cell, so a crash leaves what the saved world holds undoable), compressed and written off the main thread; `undoSurvivesRestart` off keeps it in memory.
-Caps: steps (Wanda `undoSteps`, Billy by rank), `undoMemoryMb` 64 and `undoDiskMb` 512 per player, `serverUndoMemoryMb` 512 and `serverUndoDiskMb` 4,096 in all; a spell whose record would not fit asks for the long hold ("too big to remember") and runs without a step. Undo cannot bring back what the world did itself afterwards (flowed water, redstone), wandering creatures, or spilled items.
+left and dropped from the step; cells that became protected stay in the step, marked partly undone, to be tried again. A Move's cells are linked to their sources (18.3), and a redo checks content, so a block entity is never in two places. Undo cannot bring back what the world did itself afterwards (flowed water, redstone), wandering creatures, or spilled items.
+
+**The files** (`build/UndoFiles`, `WriteAhead`): `<world>/data/enhanced/build/<uuid>/` holds `history.dat` (gzip NBT, written to a temporary file, forced and moved into place atomically; it lists the `done`, `redo` and `open` steps with file, counts, state and box),
+`step-<file>.bin` for each step (a header, then blocks of `int length, int crc32, gzip NBT`) and `pocket.bin` (`Pocket.toTag`). A step records the spell, the dimension, the cost and practice, and per 16×16×16 section the old and new states (palette indices), the block-entity data, and the side effects.
+**Written ahead**: while a spell works its file holds *records* (`rec` blocks: per section the cells, the old and new states, the old and new data). `WriteAhead` is a second cursor of the plan that reads the old state and the state the spell will put, up to 32,768 cells ahead of the
+writing cursor and only in the loaded chunks of the job's set, in batches of 256 doubling to 4,096; `BuildJob.gate` runs before every write (the target cell, a door or bed partner, a Move's source, every cell of a Land or Grow column) and answers READY when the cell's batch is on disk, WAIT (the slice yields and
+nothing is written) or CHANGED (the cell no longer holds what was read ahead: left and counted `kept_changed`). Compression is done on `Util.backgroundExecutor()`, appends on `Util.ioPool()`, one ordered chain for each file and each player. When the step is sealed (or an undo or redo ends) its file is replaced atomically by
+the whole step (`sec` blocks and an `end` block with the state, Billy's cost, the side effects and the carried frames). `LevelEvent.Save` forces the open files and writes the indexes; so do the seal, a logout and `ServerStoppingEvent` (LOW, after the scheduler). A torn tail (a bad crc) is cut; an unreadable index, pocket or step file is set aside as `.corrupt`; a
+state whose block no longer exists reads as "keep". **After a crash** the index lists the spell under `open`: at load its file is read as records into an INTERRUPTED, *recovered* step whose undo puts a cell back when it holds the block the spell was to put there, and the player gets "Your last spell stopped when the world closed" at his next login.
+**Reading**: login reads the history and the pocket in the background and installs them on the main thread; a step is only *listed* until Ctrl + Z or Y needs it (loaded in the background, the key asked again); `/enhanced build undo` loads steps in order. `undoSurvivesRestart` off writes nothing (in tests nothing is written unless a test opens a folder); an absent player's memory-only history is dropped after 30 minutes.
+
+**Caps** (`build/UndoCaps`, looked at once a second and after each seal): steps (Wanda `undoSteps`, Billy by rank); `undoMemoryMb` 64 and `undoDiskMb` 512 for one player, `serverUndoMemoryMb` 512 and `serverUndoDiskMb` 4,096 for all. A step can leave memory only when its file holds it as it is and no job works on it; past a memory cap the oldest steps leave memory (the heaviest player's first for the server's cap) and stay listed;
+with nothing written the oldest are forgotten instead. Past a disk cap the oldest step is forgotten (the heaviest player's for the server's) and its player is told; the newest step of a history is never lost to a disk cap. **Room for a working step** (`UndoCaps.room`, asked in PREPARE when the size is known): the step is held *whole* (about 14 bytes a cell and 12 KiB a section; `FULL`) when that fits `undoMemoryMb` and half of `serverUndoMemoryMb`
+together with the steps other jobs work on and the record fits `undoDiskMb` (0.6 byte a cell and 700 bytes a section); *lite* (`LITE`) when it does not but the history is written to disk and the record fits: the step then keeps one bit a cell and the hashes of block entities (`UndoStep.makeLite`), the settle pass walks the bits, and at the seal only an `end` block is appended, so
+the file's records are the step, listed and read back as a recovered step when undone (about 1 KiB a section in memory: 61 million cells about 16 MB); otherwise `NONE`: "Too big to remember: this one can't be undone. Hold to cast it anyway" (`NO_UNDO_ROOM`), and with the long hold the spell runs with a lite step that is never kept (no journal, no file). A Move is never lite, because its compare-and-swap needs states: over the budget it is refused whatever is held. Move and Repeat pockets are capped by `pocketMaxMb` too. At the defaults a Wanda spell over
+about 4 million cells is lite. A server stopping finishes what `finishOnStopBlocks` allows and seals the rest as INTERRUPTED (undoable, with a persisted login line).
 
 ### 18.10 Network, config and tags
 
@@ -2725,3 +2765,18 @@ and `build_copies_data`, `build_holds_items` (block entity types).
 * **Hex.** Hex walls are not blocks; Wanda's own Hex speeds her spells; another Hex is a claim only with `hexIsAClaim` (which the Magnetic Pull reads too).
 * **Logout and death.** Build mode turns off, the box is forgotten, a working spell finishes with the fake player, "while you were away" at the next login; the history, pocket and meter stay.
 * **Performance.** Planning is O(1) on the cast (a lazy iterator); preflight at most 2 ms; vanilla sends every changed block to every watching client (about 4 bytes a block), so a hosted server lowers `blocksPerTick`.
+
+### 18.12 The operator's commands
+
+`BuildCommands.node()` is the `build` branch of `/enhanced`, which already needs permission level 2; every argument that names a player is an online player (`EntityArgument.player()`), and none of them needs him to be a builder at the moment.
+`undo <player> [steps]` (1 to 1000) takes `UndoHistory.toUndo(steps)` (a partly undone step first, then the newest that can be undone, and so on) and queues each step as a replay job of the player behind what he is doing, with the safe-undo rule and without the build-mode check; a step that left memory is read back
+in the background first (the next waits for it, so the order stays) and one whose file cannot be read is skipped; the answer is "Undid N spells of X". `stop [<player>|all]` is `BuildScheduler.stop` for each named player (everyone who has a job when none is named): the spells stop where they are and the queues are dropped; what was done stays and can be undone. `list` prints each job's player,
+spell (or `undo`/`redo`), dimension, percent and the cells it has walked and has left. `history <player>` prints every step, the ones Ctrl + Z works on and then the ones Ctrl + Y does again, oldest first. `rank <player> [1-4]` and `meter <player> <value>` answer "is not Billy" for anyone else; `BillyMagic.setRank` clamps to 1 to 4, sets the practice to at least the threshold of the rank (exactly it when the rank goes down, so his next spell does not undo the change) and fills the meter;
+`setMeter` clamps to 0 and the top of the rank that applies. `forget <player>` clears the history (memory and `data/enhanced/build/<uuid>/`) and the pocket. The texts are `commands.enhanced.build.*` in both lang files.
+
+### 18.13 Tests and the checks in game
+
+About 120 game tests in nine classes of the build package, each with batches of its own because jobs, histories and sessions are server-wide and `TestKit.bossFixture` clears them: `BuildMathTests` (the pure code: shapes, styles, the family rule, the mix, the planner, magic select, a recipe clamped to the hero's limits, Billy's ranks as arithmetic), `BuildLimitsTests` (Billy's meter and "not yet" and "never", Mom's help, Wanda's technical caps, `requireMaterials`), `BuildGrammarTests` (the mouse grammar and the hint strip, pure),
+`BuildJobTests` (the engine: pace, sections, fair shares, Ctrl + Z on waiting and working spells, the stop at server shutdown), `BuildRulesTests` (the rule book of 18.8), `BuildSpellTests` (every spell and style as a hero casts it), `BuildBrushTests` (Land and Grow), `BuildUndoTests` (the files, the write-ahead, the caps, the pocket, the commands) and `BuildReviewTests` (what the reviews found: the Move and the chest,
+the redo, the memory budget, a job that throws, a claimed vault, PvP-off hazards, a sign beside a vanished wall, unloaded columns). `V31CrossTests` crosses Build Magic with the Magnetic Pull, the island, Mjolnir, pinned creatures, held blocks and the boss telekinesis. The release was also played: a dedicated server and two clients (Billy and Wanda) went through the whole of D-B, every spell and style, a 200,000-block fill at 20 ticks a second
+(a mean tick time of 1.7 ms rising to a peak of 12 ms), the undo of all of it, 101 undos in a row, a server restart with seven steps on disk, Hebrew, the sounds with their subtitles, and a Move while a sister emptied the chest in it.
