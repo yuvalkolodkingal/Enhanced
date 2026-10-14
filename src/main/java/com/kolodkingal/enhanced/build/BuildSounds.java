@@ -54,8 +54,8 @@ public final class BuildSounds {
     private static final StandIn HUM_WANDA = new StandIn(ModSounds.BUILD_HUM, 0.5F, 0.9F, 1.0F);
     /** The same at the front of Billy's, higher. */
     private static final StandIn HUM_BILLY = new StandIn(ModSounds.BUILD_HUM, 0.5F, 1.3F, 1.5F);
-    /** "A spell fizzles": a refusal, for the builder alone. */
-    private static final StandIn FIZZLE = new StandIn(() -> SoundEvents.FIRE_EXTINGUISH, 0.4F, 1.8F);
+    /** "A spell fizzles": a refusal, for the builder alone, a short "pfft" with a falling tone. */
+    private static final StandIn FIZZLE = new StandIn(ModSounds.BUILD_FIZZLE, 0.6F, 1.0F);
     /** "Reality snaps back": an undo or a redo starts. */
     private static final StandIn UNDO = new StandIn(ModSounds.TIME_REWIND, 0.7F, 1.5F);
     /** "Billy learns new magic": he ranks up. */

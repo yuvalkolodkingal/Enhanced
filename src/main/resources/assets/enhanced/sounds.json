@@ -1107,5 +1107,13 @@
         "name": "enhanced:build_hum"
       }
     ]
+  },
+  "build_fizzle": {
+    "subtitle": "subtitles.enhanced.build_fizzle",
+    "sounds": [
+      {
+        "name": "enhanced:build_fizzle"
+      }
+    ]
   }
 }
