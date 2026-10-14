@@ -421,6 +421,23 @@ public final class HexManager {
         return wanda.getHealth() > wanda.getMaxHealth() * EnhancedConfig.HEX_HOLD_RELEASE_HEALTH.get();
     }
 
+    /**
+     * A telekinetic grip carried Vision (or the Vision of the Hex) to the wall: it lets go of him, and its holder is told the
+     * Hex holds him in (D-M 3.7). The Vision of the Hex calls this too when his own tick finds him outside, since that tick
+     * can come before the wall's check.
+     *
+     * @return whether a grip held him
+     */
+    public static boolean releaseCarried(LivingEntity entity) {
+        ServerPlayer holder = Telekinesis.holderOf(entity);
+        if (holder == null || !Telekinesis.releaseTarget(entity)) {
+            return false;
+        }
+        holder.displayClientMessage(Component.translatable("message.enhanced.telekinesis.hex_holds",
+                Component.translatable("power.enhanced.vision")), true);
+        return true;
+    }
+
     /** White Vision is held in a Hex like Vision, but the Hex doesn't take him apart: he is only thrown back. */
     private static boolean whiteVision(LivingEntity entity) {
         return entity instanceof Player player && Powers.is(player, Power.VISION) && "white_vision".equals(Powers.get(player).variant());
@@ -459,10 +476,7 @@ public final class HexManager {
      * coming apart nor bitten by the wall (D-M 3.7).
      */
     private static void hold(ServerLevel level, Hex hex, LivingEntity entity, boolean wasInside) {
-        ServerPlayer holder = Telekinesis.holderOf(entity);
-        if (holder != null && Telekinesis.releaseTarget(entity)) {
-            holder.displayClientMessage(Component.translatable("message.enhanced.telekinesis.hex_holds",
-                    Component.translatable("power.enhanced.vision")), true);
+        if (releaseCarried(entity)) {
             throwBack(hex, entity, wasInside);
             return;
         }
