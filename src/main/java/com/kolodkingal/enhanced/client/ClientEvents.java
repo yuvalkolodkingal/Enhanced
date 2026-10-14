@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.client.render.GestureEffects;
 import com.kolodkingal.enhanced.client.render.HandTracker;
 import com.kolodkingal.enhanced.client.render.HeroAnimator;
 import com.kolodkingal.enhanced.client.render.HeroClients;
+import com.kolodkingal.enhanced.client.render.MagnetStreams;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
@@ -70,6 +71,7 @@ public final class ClientEvents {
         HeroAnimator.tick(mc.level);
         FlightEffects.tick(mc.level);
         GestureEffects.tick(mc.level);
+        MagnetStreams.tick(mc.level);
         handleKeys(mc, player);
         QuickHands.tick(mc, player);
         spawnSpeedTrails(mc.level);
@@ -108,10 +110,14 @@ public final class ClientEvents {
         TheNoise.stop();
         BillyCrownLayer.clear();
         WorldEffectsRenderer.clearHexBolts();
+        MagnetStreams.clear();
         HeroClients.clear();
     }
 
-    /** A new world (a dimension change, say) starts the heroes' lean from scratch. */
+    /**
+     * A new world (a dimension change, say) starts the heroes' lean from scratch, and nothing of the old one (a Magnetic
+     * Pull's streams) is drawn in it.
+     */
     @SubscribeEvent
     public static void onLevelUnload(LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
@@ -119,6 +125,7 @@ public final class ClientEvents {
             HandTracker.clear();
             FlightEffects.clear();
             GestureEffects.clear();
+            MagnetStreams.clear();
             HeroClients.clear();
         }
     }

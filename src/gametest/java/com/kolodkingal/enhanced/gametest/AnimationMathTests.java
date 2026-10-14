@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.client.render.Gestures;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
 import com.kolodkingal.enhanced.client.render.GripMath;
 import com.kolodkingal.enhanced.client.render.HeroPoses;
+import com.kolodkingal.enhanced.client.render.MagnetStreamMath;
 import com.kolodkingal.enhanced.client.render.StancePoses;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -21,6 +22,7 @@ import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -862,6 +864,45 @@ public final class AnimationMathTests {
                 "at tick 12 both fists are drawn in to the chest");
         assertNear(def.lean.scalar(12, 0), -4.0, 1.0E-4, "with a lean back of 4 degrees");
         assertNear(def.lean.scalar(20, 0), 0.0, 1.0E-4, "and let go into the stance at its end");
+        helper.succeed();
+    }
+
+    /**
+     * M42. A stream flies round(6 + 0.75 x distance) ticks to his hand, never fewer than 8 nor more than 26 (the pure
+     * {@code MagnetStreamMath}, R59): 8 at 0 blocks, 12 at 8, 26 at 40. Its curve leaves where the thing was, arrives in his
+     * hand and rises over the line between them (half as high with reduced motion); the icon shrinks from 0.5 to 0.35.
+     */
+    @GameTest(template = ARENA)
+    public static void streamTimingIsBounded(GameTestHelper helper) {
+        check(MagnetStreamMath.flightTicks(0) == 8, "8 ticks at 0 blocks, not " + MagnetStreamMath.flightTicks(0));
+        check(MagnetStreamMath.flightTicks(8) == 12, "12 ticks at 8 blocks, not " + MagnetStreamMath.flightTicks(8));
+        check(MagnetStreamMath.flightTicks(40) == 26, "26 ticks at 40 blocks, not " + MagnetStreamMath.flightTicks(40));
+        int last = 0;
+        for (double distance = 0; distance <= 200; distance += 0.25) {
+            int ticks = MagnetStreamMath.flightTicks(distance);
+            check(ticks >= 8 && ticks <= 26 && ticks >= last, "at " + distance + " blocks: " + ticks + " ticks, bounded and never shorter farther away");
+            last = ticks;
+        }
+
+        Vec3 from = new Vec3(4, 1, 0);
+        Vec3 to = new Vec3(0, 2, 0);
+        double height = MagnetStreamMath.arcHeight(from.distanceTo(to), false);
+        assertNear(height, 1.0 + 0.15 * from.distanceTo(to), 1.0E-9, "the curve rises 1 + 0.15 x distance");
+        assertNear(MagnetStreamMath.arcHeight(8, true), 0.5 * MagnetStreamMath.arcHeight(8, false), 1.0E-9, "half as high with reduced motion");
+        check(MagnetStreamMath.point(from, to, height, 0).distanceTo(from) < 1.0E-9, "it leaves where the thing was");
+        check(MagnetStreamMath.point(from, to, height, 1).distanceTo(to) < 1.0E-9, "and arrives in his hand");
+        assertNear(MagnetStreamMath.point(from, to, height, 0.5).y, 1.5 + height * 0.5, 1.0E-9, "its middle is raised by half the control point's lift");
+        assertNear(MagnetStreamMath.along(0), 0.0, 1.0E-9, "the flight starts at the start");
+        assertNear(MagnetStreamMath.along(1), 1.0, 1.0E-9, "and ends in his hand");
+        for (double u = 0; u < 1.0; u += 0.05) {
+            check(MagnetStreamMath.along(u + 0.05) - MagnetStreamMath.along(u) >= MagnetStreamMath.along(u) - MagnetStreamMath.along(Math.max(0, u - 0.05)) - 1.0E-9,
+                    "it speeds up as it nears the magnet, at " + u);
+        }
+        assertNear(MagnetStreamMath.scale(0), 0.5, 1.0E-6, "the icon leaves at scale 0.5");
+        assertNear(MagnetStreamMath.scale(1), 0.35, 1.0E-6, "and arrives at 0.35");
+        assertNear(MagnetStreamMath.pulseRadius(0, 8), 1.0, 1.0E-6, "the pulse starts 1 block round him");
+        assertNear(MagnetStreamMath.pulseRadius(MagnetStreamMath.PULSE_TICKS, 8), 8.0, 1.0E-6, "and reaches the radius in 8 ticks");
+        assertNear(MagnetStreamMath.pulseFade(MagnetStreamMath.PULSE_TICKS), 0.0, 1.0E-6, "faded out as it does");
         helper.succeed();
     }
 

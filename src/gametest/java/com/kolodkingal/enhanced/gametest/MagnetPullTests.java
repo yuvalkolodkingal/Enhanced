@@ -28,6 +28,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -52,6 +53,7 @@ import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
@@ -1563,6 +1565,78 @@ public final class MagnetPullTests {
                 return true;
             }
             return false;
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // What the others see and hear (M43)
+
+    /**
+     * M43. Everyone who sees Magneto sees his pull: a player 6 blocks from him is sent its payloads (each naming Magneto,
+     * the first starting the field's pulse, and a stream of raw iron from the middle of each of the two ores) and hears
+     * the pull begin and the ores break; a player 600 blocks away (farther than anyone is tracked) is sent none of it.
+     */
+    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 200)
+    public static void thePullIsSeenAndHeardNearby(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer magneto = magneto(f);
+        ServerPlayer watcher = f.player(16.5, FLOOR, 10.5);
+        ServerPlayer far = f.player(4.5, FLOOR, 4.5);
+        Vec3 away = far.position().add(600.0, 0.0, 0.0);
+        far.setNoGravity(true);
+        far.moveTo(away.x, away.y, away.z, 0.0F, 0.0F);
+        List<BlockPos> ores = List.of(new BlockPos(7, 1, 13), new BlockPos(13, 1, 7));
+        for (BlockPos ore : ores) {
+            helper.setBlock(ore, Blocks.IRON_ORE);
+        }
+        ChunkPos his = magneto.chunkPosition();
+        List<Object> near = new ArrayList<>();
+        List<Object> farAway = new ArrayList<>();
+        boolean[] pressed = {false};
+        f.everyTick(150, tick -> {
+            if (!pressed[0]) {
+                // A tick for the trackers first. A player is shown the entities of a chunk only once the chunk was sent to
+                // him, and the server sends more chunks only as a client acknowledges the last ones: the fake one does here.
+                watcher.connection.chunkSender.onChunkBatchReceivedByClient(64.0F);
+                if (tick < 2 || !watcher.getChunkTrackingView().contains(his) || watcher.connection.chunkSender.isPending(his.toLong())) {
+                    return false;
+                }
+                level.getChunkSource().move(watcher);
+                TestKit.sentPackets(watcher);
+                TestKit.sentPackets(far);
+                sneakR(magneto);
+                pressed[0] = true;
+            } else {
+                PowerTicker.tick(magneto);
+            }
+            near.addAll(TestKit.sentPackets(watcher));
+            farAway.addAll(TestKit.sentPackets(far));
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            // (The Magnetos of the arenas next door may be in the watcher's sight too: only this one's payloads count.)
+            List<MagnetPullPayload> sent = payloads(near).stream().filter(p -> p.magneto() == magneto.getId()).toList();
+            check(!sent.isEmpty(), "the watcher is sent the pull, each payload naming Magneto");
+            check(sent.get(0).first() && sent.stream().skip(1).noneMatch(MagnetPullPayload::first), "the first starts the field's pulse, and only the first");
+            List<MagnetPullPayload.Stream> streams = sent.stream().flatMap(p -> p.streams().stream()).toList();
+            check(streams.size() == 2, "two streams, not " + streams.size());
+            for (BlockPos ore : ores) {
+                Vec3 middle = Vec3.atCenterOf(helper.absolutePos(ore));
+                check(streams.stream().anyMatch(s -> s.from().distanceTo(middle) < 1.0E-6), "a stream leaves the middle of the ore at " + ore);
+            }
+            check(streams.stream().allMatch(s -> s.item() == Items.RAW_IRON && s.count() == 1), "each one raw iron");
+            check(TestKit.soundsIn(near).stream().anyMatch(sound -> sound.id().equals(Enhanced.id("magnet_pull"))), "the watcher hears the pull begin");
+            for (BlockPos ore : ores) {
+                check(near.stream().anyMatch(p -> p instanceof ClientboundLevelEventPacket event && event.getType() == 2001
+                        && event.getPos().equals(helper.absolutePos(ore))), "and sees and hears the ore at " + ore + " break");
+            }
+            check(count(magneto, Items.RAW_IRON) == 2, "the raw iron is Magneto's");
+            check(payloads(farAway).isEmpty(), "the player 600 blocks away is sent no payload");
+            check(TestKit.soundsIn(farAway).stream().noneMatch(sound -> sound.id().equals(Enhanced.id("magnet_pull")))
+                    && farAway.stream().noneMatch(p -> p instanceof ClientboundLevelEventPacket event && event.getType() == 2001),
+                    "and hears nothing of it");
+            return true;
         });
     }
 
