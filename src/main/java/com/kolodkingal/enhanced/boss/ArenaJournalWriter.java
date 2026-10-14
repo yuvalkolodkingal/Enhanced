@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ultron.SokoviaJournal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
@@ -71,8 +72,8 @@ public final class ArenaJournalWriter {
     }
 
     /**
-     * The server has stopped, after the flushed save of the stop (R48): every journal entry, and every journal kept for a
-     * save, is retired at once, then the queue is drained and the thread ends.
+     * The server has stopped, after the flushed save of the stop (R48): every journal entry, every journal kept for a save
+     * and every island note retiring are retired at once, then the queue is drained and the thread ends.
      */
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
@@ -94,13 +95,15 @@ public final class ArenaJournalWriter {
     }
 
     /**
-     * Everything the arena journals keep only until the world has been saved (R48) is let go now: the entries of the ledgers
-     * of finished fights and the journals a crash recovery restored. Their files are deleted (through the queue). What the
-     * stop handler does first; a test simulates the stop with it.
+     * Everything the journals keep only until the world has been saved (R48) is let go now: the entries of the ledgers of
+     * finished fights and the journals a crash recovery restored (their files deleted through the queue), and the notes of
+     * Ultron's islands that are retiring ({@link SokoviaJournal#retireAll}). What the stop handler does first; a test
+     * simulates the stop with it.
      */
     public static void retireAll(MinecraftServer server) {
         ArenaLoans.retireAll(server);
         ArenaLoansRecovery.retireAll(server);
+        SokoviaJournal.retireAll(server);
     }
 
     /** Waits (at most ten seconds) until everything handed over is written, and ends the thread. */

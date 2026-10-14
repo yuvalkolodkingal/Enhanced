@@ -38,7 +38,7 @@ public final class BlockLifting {
      * Tears out the block the player looks at, to be held in {@code mode} (the hero's own telekinesis), within the hero's
      * reach and hardness, if the game and the claims let him break it. In a boss's protected arena the block is only
      * borrowed, if the arena lends it ({@link BossFights#lendRefusal}): the hole mends and the block never drops anything
-     * ({@code ArenaLoans}). Billy waits {@code
+     * ({@code ArenaLoans}); the ground hidden under Ultron's island in the sky gives nothing. Billy waits {@code
      * billy.blockLiftCooldown} between two blocks (a press while his magic recharges is used up by the message). Magneto
      * takes only a metal block; at any other he is told there is no metal, and at one that is fixed in place (a bell, a
      * hopper) whether his Magnetic Pull would take it.
@@ -64,6 +64,10 @@ public final class BlockLifting {
         String refused = magneto ? metalRefusal(level, pos, state) : null;
         if (refused == null && !canLift(level, pos, state, mode)) {
             refused = "message.enhanced.telekinesis.too_strong";
+        }
+        if (refused == null && BossFights.hidesGround(level, pos)) {
+            // The ground the clients hide under Ultron's island: nothing is taken from it, whatever the arena's config says.
+            refused = PROTECTED;
         }
         if (refused == null && BossFights.protects(level, pos)) {
             // A boss's protected arena lends its block (D-T 5.2): its own rules first, then the rights a hand would need, the

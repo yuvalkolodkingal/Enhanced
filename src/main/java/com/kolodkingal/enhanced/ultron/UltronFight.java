@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ultron;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.boss.ArenaLoans;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
@@ -18,6 +19,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -128,6 +130,8 @@ public final class UltronFight extends BossFight {
     private boolean spokeLow;
     private boolean victoryTold;
     private boolean programUsed;
+    /** Whether the island's descent has begun (the arena lends nothing more). */
+    private boolean descending;
 
     // Per-tick caches.
     private long cachedAt = -1;
@@ -661,7 +665,10 @@ public final class UltronFight extends BossFight {
         }
         boolean wanted = UltronBossConfig.LIFT_ENABLED.get() && UltronBossConfig.LIFT_MODE.get() != UltronBossConfig.LiftMode.TREMOR;
         lifting = wanted && LiftHooks.get().warn(this);
-        if (!lifting) {
+        if (lifting) {
+            // The ground is copied at the lock: whatever telekinesis borrowed from it is back first (D-T 5.7).
+            loans().returnAll();
+        } else {
             tremor = true;
             tell(Component.translatable("message.enhanced.ultron.tremor").withStyle(ChatFormatting.YELLOW), false);
         }
@@ -842,6 +849,41 @@ public final class UltronFight extends BossFight {
     @Override
     public int holdTicks() {
         return UltronBossConfig.HOLD_TICKS.get();
+    }
+
+    /**
+     * Why the arena lends no block at {@code pos} now (D-T 5.6): the ground is about to rise, from the warning to the end of
+     * the rise ({@code arena_moving}: it is copied at the lock, and was given back whole at the warning); the island is
+     * coming down ({@code arena_descending}); or the cell is ground the clients hide under the island ({@code protected}).
+     */
+    @Nullable
+    @Override
+    protected String lendRefusal(BlockPos pos) {
+        if (lifting && (phase == Phase.LIFT_WARN || phase == Phase.LIFT_LOCK || phase == Phase.RISING)) {
+            return "message.enhanced.telekinesis.arena_moving";
+        }
+        if (descending) {
+            return "message.enhanced.telekinesis.arena_descending";
+        }
+        return hidesGround(pos) ? ArenaLoans.PROTECTED : null;
+    }
+
+    /** A cell of the island in the sky (see {@link UltronArena#isCopyCell}): protected and borrowed whatever the config says. */
+    @Override
+    protected boolean isCopyCell(BlockPos pos) {
+        return island.isCopyCell(pos);
+    }
+
+    /** The ground the clients hide under the island while it is up (see {@link UltronArena#hidesGround}). */
+    @Override
+    protected boolean hidesGround(BlockPos pos) {
+        return island.hidesGround(pos);
+    }
+
+    /** Whatever the Sokovia lift carries now: no telekinesis takes it, and a hero it carries uses none. */
+    @Override
+    protected boolean locks(Entity entity) {
+        return SokoviaLift.isCarried(entity);
     }
 
     /**
@@ -1232,6 +1274,10 @@ public final class UltronFight extends BossFight {
                 UltronFx.at(level(), UltronFxPayload.FLASH, boss.position().add(0, 1.5, 0), 5.0F, 20);
                 boss.discard();
             }
+            // Everything borrowed is back before the descent (D-T 5.7): the island is whole and nothing borrowed stands
+            // anywhere, so the clearing removes only the island's own blocks, and the arena lends nothing more.
+            descending = true;
+            loans().returnAll();
             LiftHooks.get().beginDescent(this);
         }
         boolean landed = LiftHooks.get().descend(this, ticks - pause);
