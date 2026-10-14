@@ -15,7 +15,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -46,10 +45,10 @@ import java.util.stream.Stream;
  * unreadable one is set aside as {@code .corrupt}, a {@code .tmp} left by the crash is ignored. Each is restored at the
  * first tick of its dimension (HIGH, before the island's recovery begins to clear: a borrowed block standing on the
  * island is gone before the clearing could drop it): first every standing cell that still holds a block of the type set
- * there gets back what was there before, then every home whose cell is air or a fluid gets its block back, lowest first,
- * each write quiet ({@link ArenaLoans#quiet}). Restoring is idempotent, so a journal that also lists repairs already made
- * changes nothing there. A restored journal is kept until two saves of its dimension hold the restored ground (R48), then
- * deleted.
+ * there gets back what was there before, then every home whose cell is still a hole ({@link ArenaLoans#isHole}) gets its
+ * block back, lowest first, each write quiet ({@link ArenaLoans#quiet}). Restoring is idempotent, so a journal that also
+ * lists repairs already made changes nothing there. A restored journal is kept until two saves of its dimension hold the
+ * restored ground (R48), then deleted.
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class ArenaLoansRecovery {
@@ -161,8 +160,9 @@ public final class ArenaLoansRecovery {
 
     /**
      * Puts the ground of one journal back: the standing cells first (a cell that still holds a block of the type that was
-     * set there gets back what was there before it), then the homes, lowest first (a cell that is air or a fluid gets its
-     * block back; a creature standing in it is lifted onto it). Each write quiet; the chunks are loaded as needed.
+     * set there gets back what was there before it), then the homes, lowest first (a cell that is still a hole, {@link
+     * ArenaLoans#isHole}: air, a fluid, the snow or ice the weather left in it, gets its block back; a creature standing in it
+     * is lifted onto it). Each write quiet; the chunks are loaded as needed.
      */
     private static void restore(ServerLevel level, CompoundTag journal) {
         HolderLookup<Block> blocks = level.holderLookup(Registries.BLOCK);
@@ -188,7 +188,7 @@ public final class ArenaLoansRecovery {
             BlockState state = NbtUtils.readBlockState(blocks, entry.getCompound("state"));
             level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
             BlockState here = level.getBlockState(pos);
-            if (!state.isAir() && (here.isAir() || here.getBlock() instanceof LiquidBlock)) {
+            if (!state.isAir() && ArenaLoans.isHole(here)) {
                 ArenaLoans.liftOut(level, pos, state);
                 ArenaLoans.set(level, pos, state);
             }

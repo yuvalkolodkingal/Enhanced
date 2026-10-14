@@ -494,6 +494,7 @@ public final class Telekinesis {
         GRIPS.put(player.getUUID(), new Grip(target.getUUID(), mode, Mth.clamp(dist, MIN_HOLD_DISTANCE, MAX_HOLD_DISTANCE),
                 BossGrip.holdLimit(target, mode)));
         FLIGHTS.remove(target.getUUID());
+        SPARED.remove(target.getUUID()); // a friend's landing guard is not this grip's: its own end decides anew
         Powers.get(player).setHeldEntityId(target.getId());
 
         if (target instanceof Mob mob) {
@@ -731,9 +732,10 @@ public final class Telekinesis {
     }
 
     /**
-     * Whether {@code e} is spared its landing (D-M 3.8): a grip let go of it whose holder may not hurt it, and it has not
-     * landed since. While {@code magneto.telekinesisSparesFriends} is on, the landing guard ({@code
-     * TelekinesisEvents.onIncomingDamage}) takes no fall, wall or slam damage from it.
+     * Whether {@code e} is spared its landing (D-M 3.8): the last grip that let go of it was one whose holder may not hurt
+     * it, and it has not landed since (a new grip takes the guard away; its own end decides again). While {@code
+     * magneto.telekinesisSparesFriends} is on, the landing guard ({@code TelekinesisEvents.onIncomingDamage}) takes no
+     * fall, wall or slam damage from it.
      */
     public static boolean isSpared(Entity e) {
         return SPARED.containsKey(e.getUUID());

@@ -41,6 +41,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -135,6 +136,13 @@ public final class ArenaLoans {
     private record Repaired(CompoundTag entry, boolean home, long save) {
     }
 
+    /**
+     * What a repaired entry is kept by: its cell, and for a standing block the block that stood there (a home has none).
+     * The newest repair of a key replaces an older one: the recovery puts the same cell right with either.
+     */
+    private record RepairKey(BlockPos pos, @Nullable Block placed) {
+    }
+
     private final BossFight fight;
     private final PriorityQueue<Home> due = new PriorityQueue<>(Comparator.<Home>comparingLong(h -> h.dueAt)
             .thenComparingInt(h -> h.pos.getY()).thenComparingLong(h -> h.order));
@@ -147,7 +155,8 @@ public final class ArenaLoans {
     private final Set<UUID> loose = new HashSet<>();
     /** The players told once that a block is borrowed. */
     private final Set<UUID> told = new HashSet<>();
-    private final List<Repaired> repaired = new ArrayList<>();
+    /** The repairs two saves do not hold yet, one per cell (a standing block's per cell and block): see {@link #keep}. */
+    private final Map<RepairKey, Repaired> repaired = new LinkedHashMap<>();
     private long order;
     /** Whether a snapshot was ever handed to the journal (there is a file to keep up to date, or to delete). */
     private boolean written;
@@ -338,21 +347,28 @@ public final class ArenaLoans {
     }
 
     /**
-     * Whether the home can mend now: its cell is air or a fluid (or holds a standing borrowed block, which it takes back), no
-     * living thing stands in it, and a falling block is not put back over another open home.
+     * Whether the home can mend now: its cell is still a hole ({@link #isHole}: air, a fluid, or what the weather put in it)
+     * or holds a standing borrowed block, which it takes back; no living thing stands in it; and a falling block is not put
+     * back over another open home.
      */
     private boolean mendable(ServerLevel level, Home home) {
         BlockPos pos = home.pos;
-        if (!level.isLoaded(pos) || !open(level, pos) || occupied(level, pos)) {
+        boolean open = isHole(level.getBlockState(pos)) || standing.containsKey(pos);
+        if (!level.isLoaded(pos) || !open || occupied(level, pos)) {
             return false;
         }
         return !(home.state.getBlock() instanceof Fallable) || !homes.containsKey(pos.below());
     }
 
-    /** Whether the cell of a home is empty enough to mend: air, a fluid, or a standing borrowed block. */
-    private boolean open(ServerLevel level, BlockPos pos) {
-        BlockState here = level.getBlockState(pos);
-        return here.isAir() || here.getBlock() instanceof LiquidBlock || standing.containsKey(pos);
+    /**
+     * Whether a cell a borrowed block left is still a hole for its block to come back into: air, a fluid, or what the world
+     * puts into an open hole by itself, which the block replaces as a placed block would ({@link BlockState#canBeReplaced}:
+     * the snow that fell into it, a vine or fire that spread into it), or the water the hole kept turned to ice. Asked by
+     * the mend and by the crash recovery ({@link ArenaLoansRecovery}).
+     */
+    public static boolean isHole(BlockState here) {
+        return here.isAir() || here.getBlock() instanceof LiquidBlock || here.canBeReplaced()
+                || here.is(Blocks.ICE) || here.is(Blocks.FROSTED_ICE);
     }
 
     /** The home's block is back: a standing borrowed block in the hole is taken back with it. */
@@ -367,7 +383,7 @@ public final class ArenaLoans {
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 8, 0.3, 0.3, 0.3, 0.02);
         level.playSound(null, pos, home.state.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 0.7F, 1.2F);
         if (!home.copy) {
-            repaired.add(new Repaired(homeEntry(home), true, saves(level)));
+            keep(new RepairKey(pos, null), new Repaired(homeEntry(home), true, saves(level)));
             dirty = true;
         }
     }
@@ -384,7 +400,8 @@ public final class ArenaLoans {
         standing.remove(stood.pos());
         expiring.remove(stood);
         standingOf.computeIfPresent(stood.owner(), (owner, count) -> count > 1 ? count - 1 : null);
-        repaired.add(new Repaired(standingEntry(stood), false, saves(fight.level())));
+        keep(new RepairKey(stood.pos(), stood.placed().getBlock()),
+                new Repaired(standingEntry(stood), false, saves(fight.level())));
         dirty = true;
     }
 
@@ -394,8 +411,10 @@ public final class ArenaLoans {
     /**
      * Puts everything back in this tick (D-T 5.7): every standing block crumbles, every home mends, lowest first (a living
      * thing standing in a hole is lifted onto the block first), and every borrowed block still held or flying crumbles to
-     * dust; each write quiet. The journal gets the snapshot of it all (every entry a repair now, R48). At most {@code
-     * maxBorrowedBlocks} standing blocks and the open homes.
+     * dust; each write quiet. A home mends whatever has come into its hole meanwhile (the arena lets nobody put a block
+     * there; what the world put in it, a flower a bone meal grew, goes without a drop): the ground is whole again. The
+     * journal gets the snapshot of it all (every entry a repair now, R48). At most {@code maxBorrowedBlocks} standing blocks
+     * and the open homes.
      */
     public void returnAll() {
         ServerLevel level = fight.level();
@@ -406,12 +425,8 @@ public final class ArenaLoans {
         List<Home> open = new ArrayList<>(homes.values());
         open.sort(Comparator.<Home>comparingInt(h -> h.pos.getY()).thenComparingLong(h -> h.order));
         for (Home home : open) {
-            if (open(level, home.pos)) {
-                liftOut(level, home.pos, home.state);
-                mend(level, home, now);
-            } else {
-                homes.remove(home.pos); // something else fills it: it is not the ledger's to undo
-            }
+            liftOut(level, home.pos, home.state);
+            mend(level, home, now);
         }
         homes.clear();
         due.clear();
@@ -459,6 +474,17 @@ public final class ArenaLoans {
     // ---------------------------------------------------------------------------------------------------------
     // The journal
 
+    /**
+     * Keeps a repair until two saves of the dimension hold it (R48), as the only entry of its cell (a standing block's, of
+     * its cell and block): a newer repair of the same replaces the older, with its own count of saves. A cell lent, mended
+     * and lent again and again (a hero throwing borrowed blocks at a shield) is one entry, so the list is never longer than
+     * the cells repaired since the second-last save, and each snapshot copies no more.
+     */
+    private void keep(RepairKey key, Repaired repair) {
+        repaired.remove(key);
+        repaired.put(key, repair);
+    }
+
     /** Hands the journal a snapshot of the ledger now. */
     private void hand(long now) {
         ArenaJournalWriter.submit(fight.server(), fight.id(), snapshot());
@@ -483,7 +509,7 @@ public final class ArenaLoans {
         for (Standing stood : standing.values()) {
             standingList.add(standingEntry(stood));
         }
-        for (Repaired repair : repaired) {
+        for (Repaired repair : repaired.values()) {
             (repair.home() ? homeList : standingList).add(repair.entry().copy());
         }
         CompoundTag journal = new CompoundTag();
@@ -521,7 +547,7 @@ public final class ArenaLoans {
      * fight gets its new snapshot at once.
      */
     private boolean retire(long saves) {
-        if (!repaired.removeIf(repair -> saves - repair.save() >= SAVES_TO_RETIRE)) {
+        if (!repaired.values().removeIf(repair -> saves - repair.save() >= SAVES_TO_RETIRE)) {
             return false;
         }
         if (!finished || !repaired.isEmpty()) {

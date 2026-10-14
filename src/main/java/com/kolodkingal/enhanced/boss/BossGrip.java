@@ -46,7 +46,8 @@ import java.util.UUID;
  *     <li><b>A vanilla boss has no fight</b> to keep him still, so the grip turns his own will off ({@code NoAI}) and gives
  *     it back when he can act again (the let-go, or the end of a throw's still). The flag is never left saved: the mark
  *     {@link #NO_AI_MARK} in his persistent data says the grip set it, and a body that joins a level with the mark (after
- *     a crash, or a chunk unloaded under him) gets its will back ({@link #onJoin}).</li>
+ *     a crash, a chunk unloaded under him, or a portal his throw carried him through) gets its will back ({@link
+ *     #onJoin}).</li>
  * </ul>
  *
  * <p>Everything here is the server thread's, and forgotten when the server stops ({@link #clear}).
@@ -342,7 +343,8 @@ public final class BossGrip {
     /**
      * Once per server tick, at its end: a thrown vanilla boss whose still is over by the next tick (his flight goes on, on
      * his own) gets his will back, so that he acts on the first tick he is not still. One that is gone from his level is
-     * forgotten: if he was unloaded, the mark gives his will back when he joins again.
+     * forgotten: if he was unloaded, or went through a portal, the mark gives his will back when he joins a level ({@link
+     * #onJoin}).
      */
     public static void tick(MinecraftServer server) {
         if (WILL_TAKEN.isEmpty()) {
@@ -367,12 +369,14 @@ public final class BossGrip {
 
     /**
      * An entity joins a level carrying {@link #NO_AI_MARK}: a vanilla boss saved while a grip had taken his will (a crash,
-     * a chunk unloaded under a throw). The flag is never left saved: {@code NoAI} goes off and the mark goes, unless a
-     * grip or a throw's still still has him.
+     * a chunk unloaded under a throw), or one a throw carried through a portal, who joins the other dimension as a new
+     * body in the middle of his still. The flag is never left saved and never crosses a portal: {@code NoAI} goes off and
+     * the mark goes, unless a grip still holds him (its let-go gives the will back). The still of a throw is cut short
+     * then: nothing in the level he left can give his will back any more (the body that arrives may not even be in a
+     * loaded part of the new level yet, where {@link #tick} could find it).
      */
     public static void onJoin(Entity e) {
-        if (e instanceof Mob mob && mob.getPersistentData().contains(NO_AI_MARK) && !Telekinesis.isHeld(e)
-                && !WILL_TAKEN.containsKey(e.getUUID())) {
+        if (e instanceof Mob mob && mob.getPersistentData().contains(NO_AI_MARK) && !Telekinesis.isHeld(e)) {
             giveWillBack(mob);
         }
     }

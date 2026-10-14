@@ -23,7 +23,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.context.DirectionalPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.GameRules;
@@ -257,8 +260,10 @@ public class TelekineticBlockEntity extends Entity {
     /**
      * Breaks apart with block particles and drops the block's normal loot, as mined with a bare hand. A block that was set
      * down and may not stand where it landed ({@code setDown}) gives the block itself instead when that loot is empty (glass,
-     * ice): nothing the holder carried is lost, and nothing that has a loot (an ore) becomes a free Silk Touch (R44). A
-     * borrowed block turns to dust instead: it drops nothing ({@link #crumble}).
+     * ice): nothing the holder carried is lost, and nothing that has a loot (an ore) becomes a free Silk Touch (R44). Only a
+     * block a player could have as an item, one Silk Touch gives as itself: an infested stone (Silk Touch gives plain stone)
+     * shatters as when mined, into nothing but its silverfish, never into an item only Creative has. A borrowed block turns
+     * to dust instead: it drops nothing ({@link #crumble}).
      */
     private void shatter(boolean setDown) {
         if (isBorrowed()) {
@@ -270,14 +275,30 @@ public class TelekineticBlockEntity extends Entity {
             BlockState state = getBlockState();
             server.levelEvent(2001, pos, Block.getId(state));
             if (server.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
-                if (setDown && Block.getDrops(state, server, pos, null).isEmpty()) {
-                    Block.popResource(server, pos, new ItemStack(state.getBlock())); // nothing, if the block has no item
+                if (setDown && Block.getDrops(state, server, pos, null).isEmpty() && silkTouchGivesItself(server, pos, state)) {
+                    Block.popResource(server, pos, new ItemStack(state.getBlock()));
                 } else {
                     Block.dropResources(state, server, pos);
                 }
             }
         }
         discard();
+    }
+
+    /** Whether the block, mined with Silk Touch, drops as its own item: an item a player can have (R44's block itself). */
+    private static boolean silkTouchGivesItself(ServerLevel level, BlockPos pos, BlockState state) {
+        Item item = state.getBlock().asItem();
+        if (item == Items.AIR) {
+            return false;
+        }
+        ItemStack tool = new ItemStack(Items.NETHERITE_PICKAXE);
+        tool.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH), 1);
+        for (ItemStack drop : Block.getDrops(state, level, pos, null, null, tool)) {
+            if (drop.is(item)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
