@@ -47,6 +47,9 @@ public final class MagnetStreams {
     private static final int MAX_PULSES = 16;
     /** Nothing farther from the camera than this is drawn. */
     private static final double MAX_DISTANCE = 96.0;
+    /** An icon closer to the camera than this is not drawn, and shrinks over the next {@link #NEAR_FADE} blocks. */
+    private static final double NEAR_CAMERA = 0.4;
+    private static final double NEAR_FADE = 1.6;
     /** The pulse and the lines of force: his field has no colour of its own, only the pale grey of his glow. */
     private static final float PULSE_ALPHA = 0.25F;
     private static final float LINE_ALPHA = 0.2F;
@@ -257,8 +260,12 @@ public final class MagnetStreams {
                 if (distance > MAX_DISTANCE) {
                     continue;
                 }
-                // Right in front of the camera (his own hand in first person) it shrinks, so it never fills the view.
-                float near = (float) Mth.clamp(distance / 1.2, 0.35, 1.0);
+                // Near the camera it shrinks away (into his own hand in first person; past the lens of a camera in front of
+                // him), so it never fills the view.
+                float near = (float) Mth.clamp((distance - NEAR_CAMERA) / NEAR_FADE, 0.0, 1.0);
+                if (near < 0.05F) {
+                    continue;
+                }
                 float scale = MagnetStreamMath.scale(along) * near;
                 // It spins as it flies; with reduced motion it only turns its face to the camera.
                 float yaw = calm ? (float) (Mth.atan2(rel.x, rel.z) * Mth.RAD_TO_DEG) + 180.0F : s.phase + age * MagnetStreamMath.SPIN;

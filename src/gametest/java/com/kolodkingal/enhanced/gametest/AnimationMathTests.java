@@ -856,7 +856,9 @@ public final class AnimationMathTests {
         check(def != null && def.problems().isEmpty(), "MAG_PULL has keys, in order");
         Gestures.ArmKey wide = armKeyAt(def.m, 5);
         Gestures.ArmKey wideOff = armKeyAt(def.o, 5);
-        check(wide != null && wideOff != null && wide.x <= -110 && wide.z >= 45 && wideOff.x <= -110 && wideOff.z <= -45,
+        // (Raised sideways past the shoulder: z beyond 90 degrees, as the Phoenix's V; a large x would bring them forward
+        // over the head, where they cross.)
+        check(wide != null && wideOff != null && wide.z >= 100 && wideOff.z <= -100 && Math.abs(wide.x) <= 45 && Math.abs(wideOff.x) <= 45,
                 "at tick 5 both arms are flung wide and up");
         Gestures.ArmKey fist = armKeyAt(def.m, 12);
         Gestures.ArmKey fistOff = armKeyAt(def.o, 12);

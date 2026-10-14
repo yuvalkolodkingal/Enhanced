@@ -52,7 +52,7 @@ final class FieldGestures {
         // in to the chest and a lean back as the metal comes to him; held while it flies, then let go into the stance.
         define(GestureId.MAG_PULL)
                 .key(0, S).m(-8, 0, 10).o(-8, 0, -10).head(0, 0, 0).lean(0)
-                .key(5, O).m(-125, 28, 62).o(-125, -28, -62).head(-8, 0, 0).lean(-1)
+                .key(5, O).m(-25, 0, 125).o(-25, 0, -125).head(-8, 0, 0).lean(-1)
                 .key(12, E).m(-74, -40, 0).o(-74, 40, 0).head(4, 0, 0).lean(-4)
                 .key(16, S).m(-74, -40, 0).o(-74, 40, 0).head(4, 0, 0).lean(-4)
                 .key(20, S).m(-8, 0, 10).o(-8, 0, -10).head(0, 0, 0).lean(0);
