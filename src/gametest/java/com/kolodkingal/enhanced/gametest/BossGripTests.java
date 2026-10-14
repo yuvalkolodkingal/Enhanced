@@ -64,6 +64,7 @@ import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.ElderGuardian;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.warden.Warden;
@@ -2172,6 +2173,236 @@ public final class BossGripTests {
             zombie.discard();
             return true;
         });
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // The vanilla bosses (R37)
+
+    /** A player in Creative (no boss whose will is back goes for them) with a power. */
+    private static ServerPlayer creative(TestKit.Fixture f, double x, double z, Power power) {
+        ServerPlayer player = f.player(x, FLOOR, z, GameType.CREATIVE);
+        Powers.setPower(player, power);
+        return player;
+    }
+
+    /** A Wither standing on the floor, his spawn invulnerability over. */
+    private static WitherBoss wither(GameTestHelper helper, double x, double z) {
+        WitherBoss wither = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(x, FLOOR, z));
+        wither.setInvulnerableTicks(0);
+        return wither;
+    }
+
+    private static boolean marked(Entity e) {
+        return e.getPersistentData().contains(BossGrip.NO_AI_MARK);
+    }
+
+    /**
+     * T62 (R37, spec 5.2): the Wither, the Warden and the Elder Guardian are held as bosses, with no fight. The Ultron
+     * hero's pull still passes the Wither by; Wanda's V holds him ({@code boss_grabbed}) without a will of his own ({@code
+     * NoAI}, marked) for {@code boss.vanillaHoldTicks} (60); then he breaks free with his will back, and Billy's press at
+     * once says he is still shaking it off. A Warden is held by Billy for half as long, and one coming out of the ground
+     * cannot be held; an Elder Guardian is held by the Phoenix. A Wither whose {@code NoAI} was on before the grip keeps
+     * it; a thrown one gets his will back on the first tick the still of his throw is over ({@code boss.thrownStillTicks}
+     * 3 here, so that it ends while he still flies); a body that joins a level with the grip's mark gets its will back,
+     * one with {@code NoAI} and no mark keeps it. The Ender Dragon and his parts are too vast for every form. The heroes
+     * are in Creative, so that no boss whose will is back goes for them, and each boss is gone right after its part.
+     */
+    @GameTest(template = ARENA, batch = "vanilla_boss_grip", timeoutTicks = 200)
+    public static void vanillaBossesAreHeldAsBosses(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(BossConfig.THROWN_STILL_TICKS, 3);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer wanda = creative(f, 3.5, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer billy = creative(f, 3.5, 6.5, Power.BILLY);
+        ServerPlayer phoenix = creative(f, 3.5, 14.5, Power.PHOENIX);
+        ServerPlayer ultron = creative(f, 3.5, 17.5, Power.ULTRON);
+
+        // The Ender Dragon and each of its parts: too vast to hold, for every form.
+        EnderDragon dragon = EntityType.ENDER_DRAGON.create(level);
+        check(dragon != null, "a dragon is made");
+        for (Mode mode : Mode.values()) {
+            check(Telekinesis.DRAGON.equals(Telekinesis.refusal(wanda, dragon, mode)) && !Telekinesis.canLift(wanda, dragon, mode),
+                    mode + ": the Ender Dragon is too vast to hold");
+            EnderDragonPart part = dragon.getSubEntities()[0];
+            check(Telekinesis.DRAGON.equals(Telekinesis.refusal(wanda, part, mode)) && !Telekinesis.canLift(wanda, part, mode),
+                    mode + ": and so is his " + part.name);
+        }
+
+        // The Ultron hero's Gravity Pull passes a Wither by (pull_immune): nothing is pulled, the key is not spent.
+        WitherBoss wither = wither(helper, 9.5, 12.5);
+        lookAt(ultron, wither);
+        press(ultron, 3, false);
+        check(Powers.get(ultron).isReady(3, level.getGameTime()), "the Ultron hero's pull takes nothing from the Wither");
+        Zombie control = stillZombie(helper, 6.5, 17.5);
+        lookAt(ultron, control);
+        press(ultron, 3, false);
+        check(!Powers.get(ultron).isReady(3, level.getGameTime()), "where a zombie is pulled");
+        control.discard();
+
+        // Wanda's V holds the Wither as a boss, without his will.
+        lookAt(wanda, wither);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, wither) && BossGrip.GRABBED.equals(lastActionBarKey(wanda)), "Wanda takes hold of the Wither as a boss");
+        check(wither.isNoAi() && marked(wither), "in her grip he has no will of his own, and the mark says why");
+
+        int[] stage = {0};
+        int[] stageAt = {0};
+        Entity[] boss = {wither};
+        f.everyTick(190, tick -> {
+            PowerTicker.tick(wanda);
+            PowerTicker.tick(billy);
+            PowerTicker.tick(phoenix);
+            int since = tick - stageAt[0];
+            switch (stage[0]) {
+                case 0 -> {
+                    WitherBoss held = (WitherBoss) boss[0];
+                    if (since < 60) {
+                        check(Telekinesis.holds(wanda, held) && held.isNoAi(), "held without his will (tick " + since + ")");
+                        return false;
+                    }
+                    check(!Telekinesis.isHolding(wanda) && BossGrip.BROKE_FREE.equals(lastActionBarKey(wanda)),
+                            "after boss.vanillaHoldTicks he broke free");
+                    check(!held.isNoAi() && !marked(held), "with his will back");
+                    lookAt(billy, held);
+                    press(billy, 3, false);
+                    check(!Telekinesis.isHeld(held) && BossGrip.REGRIP.equals(lastActionBarKey(billy)),
+                            "Billy's press at once: he is still shaking off the grip");
+                    held.discard();
+
+                    // A Wither gathering his strength cannot be held.
+                    WitherBoss gathering = wither(helper, 9.5, 12.5);
+                    gathering.setInvulnerableTicks(100);
+                    lookAt(wanda, gathering);
+                    press(wanda, 3, false);
+                    check(!Telekinesis.isHolding(wanda) && BossGrip.UNTOUCHABLE.equals(lastActionBarKey(wanda)),
+                            "a Wither gathering his strength cannot be held now");
+                    gathering.discard();
+
+                    // A Warden, held by Billy for half as long.
+                    Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
+                    lookAt(billy, warden);
+                    press(billy, 3, false);
+                    check(Telekinesis.holds(billy, warden) && BossGrip.GRABBED.equals(lastActionBarKey(billy)) && warden.isNoAi(),
+                            "Billy takes hold of a Warden as a boss");
+                    boss[0] = warden;
+                    stage[0] = 1;
+                    stageAt[0] = tick;
+                }
+                case 1 -> {
+                    Warden warden = (Warden) boss[0];
+                    if (since < 30) {
+                        check(Telekinesis.holds(billy, warden) && warden.isNoAi(), "Billy holds the Warden (tick " + since + ")");
+                        return false;
+                    }
+                    check(!Telekinesis.isHolding(billy) && BossGrip.BROKE_FREE.equals(lastActionBarKey(billy)) && !warden.isNoAi(),
+                            "the Warden broke free of Billy after 60 x 0.5 = 30 ticks, his will back");
+                    warden.setPose(Pose.EMERGING);
+                    lookAt(billy, warden);
+                    press(billy, 3, false);
+                    check(!Telekinesis.isHolding(billy) && BossGrip.UNTOUCHABLE.equals(lastActionBarKey(billy)),
+                            "a Warden coming out of the ground cannot be held now");
+                    warden.discard();
+
+                    // An Elder Guardian, held by the Phoenix.
+                    ElderGuardian guardian = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 15.5));
+                    lookAt(phoenix, guardian);
+                    press(phoenix, 3, false);
+                    check(Telekinesis.holds(phoenix, guardian) && BossGrip.GRABBED.equals(lastActionBarKey(phoenix)) && guardian.isNoAi(),
+                            "the Phoenix takes hold of an Elder Guardian as a boss");
+                    press(phoenix, 3, true);
+                    check(!Telekinesis.isHolding(phoenix) && !guardian.isNoAi() && !marked(guardian), "set down, he has his will back");
+                    guardian.discard();
+
+                    // A Wither whose NoAI was on before the grip keeps it after.
+                    WitherBoss still = wither(helper, 9.5, 12.5);
+                    still.setNoAi(true);
+                    lookAt(wanda, still);
+                    press(wanda, 3, false);
+                    check(Telekinesis.holds(wanda, still) && still.isNoAi() && !marked(still), "Wanda holds a Wither who has no will anyway");
+                    press(wanda, 3, true);
+                    check(!Telekinesis.isHolding(wanda) && still.isNoAi(), "set down, he keeps the NoAI he had");
+                    still.discard();
+
+                    // A Wither thrown: no will while the still of his throw lasts, then his own.
+                    WitherBoss thrown = wither(helper, 9.5, 12.5);
+                    lookAt(wanda, thrown);
+                    press(wanda, 3, false);
+                    check(Telekinesis.holds(wanda, thrown), "Wanda takes hold of another Wither");
+                    look(wanda, EAST, 0.0F);
+                    press(wanda, 3, false);
+                    check(!Telekinesis.isHolding(wanda) && BossGrip.stills(thrown) && thrown.isNoAi() && marked(thrown),
+                            "and throws him: still, without his will");
+                    boss[0] = thrown;
+                    stage[0] = 2;
+                    stageAt[0] = tick;
+                }
+                default -> {
+                    WitherBoss thrown = (WitherBoss) boss[0];
+                    if (BossGrip.stills(thrown)) {
+                        check(since < 3 && thrown.isNoAi(), "no will while his throw keeps him still (tick " + since + ")");
+                        return false;
+                    }
+                    check(since == 3 && !thrown.isNoAi() && !marked(thrown), "his will is back as the still ends (tick " + since + ")");
+                    check(thrown.getDeltaMovement().horizontalDistance() > 0.5, "while his flight goes on: "
+                            + thrown.getDeltaMovement().horizontalDistance());
+                    thrown.discard();
+
+                    // A body saved while a grip had its will: joining a level, it gets it back; one with no mark keeps its NoAI.
+                    Vec3 at = helper.absoluteVec(new Vec3(9.5, FLOOR, 12.5));
+                    Warden saved = EntityType.WARDEN.create(level);
+                    Warden plain = EntityType.WARDEN.create(level);
+                    check(saved != null && plain != null, "two Wardens are made");
+                    saved.setNoAi(true);
+                    saved.getPersistentData().putBoolean(BossGrip.NO_AI_MARK, true);
+                    saved.moveTo(at.x, at.y, at.z);
+                    plain.setNoAi(true);
+                    plain.moveTo(at.x + 3.0, at.y, at.z);
+                    level.addFreshEntity(saved);
+                    level.addFreshEntity(plain);
+                    check(!saved.isNoAi() && !marked(saved), "a body that joins with the grip's mark has its will back");
+                    check(plain.isNoAi(), "one whose NoAI is its own keeps it");
+                    saved.discard();
+                    plain.discard();
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    /**
+     * T62, with {@code boss.telekinesisHoldsVanillaBosses} off (R37): the Wither, the Warden and the Elder Guardian are too
+     * powerful to lift, for Wanda, Billy and the Phoenix, as in 3.0; nothing is held and none loses his will.
+     */
+    @GameTest(template = ARENA, batch = "vanilla_boss_grip_off", timeoutTicks = 40)
+    public static void vanillaBossesAreTooPowerfulWithTheSwitchOff(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(BossConfig.TELEKINESIS_HOLDS_VANILLA_BOSSES, false);
+        ServerPlayer wanda = creative(f, 3.5, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer billy = creative(f, 3.5, 6.5, Power.BILLY);
+        ServerPlayer phoenix = creative(f, 3.5, 14.5, Power.PHOENIX);
+        WitherBoss wither = wither(helper, 9.5, 10.5);
+        lookAt(wanda, wither);
+        press(wanda, 3, false);
+        check(!Telekinesis.isHolding(wanda) && BossGrip.TOO_POWERFUL.equals(lastActionBarKey(wanda)) && !wither.isNoAi(),
+                "the Wither is too powerful to lift");
+        check(!Telekinesis.canLift(wanda, wither, Mode.WANDA), "and cannot be lifted");
+        wither.discard();
+        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
+        lookAt(billy, warden);
+        press(billy, 3, false);
+        check(!Telekinesis.isHolding(billy) && BossGrip.TOO_POWERFUL.equals(lastActionBarKey(billy)) && !warden.isNoAi(),
+                "so is the Warden");
+        warden.discard();
+        ElderGuardian guardian = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 14.5));
+        lookAt(phoenix, guardian);
+        press(phoenix, 3, false);
+        check(!Telekinesis.isHolding(phoenix) && BossGrip.TOO_POWERFUL.equals(lastActionBarKey(phoenix)) && !guardian.isNoAi(),
+                "and the Elder Guardian");
+        guardian.discard();
+        helper.succeed();
     }
 
     private BossGripTests() {
