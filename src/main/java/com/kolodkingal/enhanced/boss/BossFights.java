@@ -334,8 +334,8 @@ public final class BossFights {
 
     /**
      * Where telekinesis may carry {@code entity} when its holder wants it at {@code wanted} (D-T 4.5): anything a fight
-     * owns, and its participants, is never carried out of the arena ({@link BossFight#carryLimit}); anything else goes
-     * where it is wanted.
+     * owns, and its participants while they are in its arena, are never carried out of the arena ({@link
+     * BossFight#carryLimit}); anything else goes where it is wanted.
      */
     public static Vec3 carryLimit(Entity entity, Vec3 wanted) {
         BossFight fight = carrier(entity);
@@ -384,11 +384,18 @@ public final class BossFights {
         return new Vec3(center.x + (next.x - center.x) * scale, entity.getY(), center.z + (next.z - center.z) * scale);
     }
 
-    /** The running fight of this level that owns {@code entity} or that it takes part in (a player), or null. */
+    /**
+     * The fight of this level whose arena keeps {@code entity} in: the one that owns it, or the one it takes part in (a
+     * player) while it is in that arena's cylinder (a fighter far away is not pulled back by a friend's grip); or null.
+     */
     @Nullable
     private static BossFight carrier(Entity entity) {
         for (BossFight fight : FIGHTS) {
-            if (fight.level() == entity.level() && !fight.isFinished() && fight.isMember(entity)) {
+            if (fight.level() != entity.level() || fight.isFinished()) {
+                continue;
+            }
+            if (entity instanceof ServerPlayer player ? fight.isParticipant(player.getUUID()) && fight.arena().contains(player.position())
+                    : fight.owns(entity)) {
                 return fight;
             }
         }

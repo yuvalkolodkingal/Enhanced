@@ -528,8 +528,9 @@ public final class BossGripTests {
                     lookAt(holder, body);
                     press(holder, keys[next[0]], false);
                     check(Telekinesis.holds(holder, body), "a press that is not refused takes hold of him (tick " + tick + ")");
-                    check(grabs[0] == 0 || now - stillEnded[0] >= BossConfig.REGRIP_TICKS.get(),
-                            "no grab comes within the regrip time of the last still's end: " + (now - stillEnded[0]));
+                    long since = stillEnded[0] == Long.MIN_VALUE || still ? -1 : now - stillEnded[0];
+                    check(grabs[0] == 0 || since >= BossConfig.REGRIP_TICKS.get(),
+                            "no grab comes while he is still, nor within the regrip time of the last still's end: " + since);
                     grabs[0]++;
                     grabbedAt[0] = tick;
                     current[0] = next[0];
