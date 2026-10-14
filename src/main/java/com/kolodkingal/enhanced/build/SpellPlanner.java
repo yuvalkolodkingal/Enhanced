@@ -60,16 +60,29 @@ import java.util.NoSuchElementException;
  * blocks (every spell of Billy's) goes layer by layer over the whole plan, placing bottom-up (Fill, Change, Paint,
  * Pull, the stamps, Repeat, Tower, Cone, Pyramid) and clearing top-down (Vanish, Push), each layer in rows from the
  * side nearest the caster; a bigger one goes chunk column by chunk column, in a square spiral from the column nearest
- * the caster, each column layer by layer the same way. The round shapes (Ball, Dome, Ring, Arch, Heart) that fit grow
- * shell by shell from their heart instead (a bigger one goes by columns like every big spell, so the job's chunk
- * tickets can follow it). A Move over itself by a plain shift goes in the order that moves every source cell before the
- * Move writes over it.
+ * the caster, each column layer by layer the same way. The round shapes (Ball, Dome, Ring, Arch, Heart) grow shell by
+ * shell from their heart instead, whenever the job's chunk tickets can hold every chunk they stand in at once
+ * ({@link Setup#window}) and their box has at most 65,536 rows of {@code y} and {@code z} (every ball and dome that
+ * fits the default window); only a bigger one goes by columns like every big spell. A Move over itself by a plain shift
+ * goes in the order that moves every source cell before the Move writes over it: layer by layer against the shift, or,
+ * wider than a layer, chunk column by chunk column in rows against the shift, each column the same way.
  */
 public final class SpellPlanner {
     /** The widest plan (blocks, along x and along z) that is built layer by layer over the whole plan. */
     public static final int LAYERED_MAX = 64;
     /** No refusal: the plan can be cast (what the world says about its cells is the rules'). */
     public static final int NONE = -1;
+    /** The chunks a spell's tickets hold at once unless told otherwise (the default of {@code maxTicketChunks}). */
+    public static final int TICKET_WINDOW = 256;
+    /**
+     * The most rows (one per {@code y} and {@code z} of its box) a shape may have to swell shell by shell: the shell
+     * walk measures each row once, the first time the shells reach it (a hollow ball's whole inside at its first step),
+     * and keeps one number a row. 65,536 rows (every ball and dome whose chunks fit the default window, 256 KiB) are
+     * measured in a few milliseconds; a shape with more rows goes by columns.
+     */
+    private static final long SHELL_ROWS = 1L << 16;
+    /** The longest side of a shape that swells shell by shell (its shells are counted in 16 bits). */
+    private static final int SHELL_SPAN = 1 << 15;
 
     // ------------------------------------------------------------------------------------------------------------
     // Inputs
@@ -187,20 +200,25 @@ public final class SpellPlanner {
      * @param caster    where the caster stands (the work order starts on his side)
      * @param selectCap the most cells of a Pull surface (the magic-select cap)
      * @param span      the widest a Pull surface may be (Billy's side; 0 for no limit)
+     * @param window    the most chunks the job's tickets hold at once ({@code build_magic.maxTicketChunks}): a round
+     *                  shape whose chunks all fit swells shell by shell, a bigger one goes by columns
      */
     public record Setup(@Nullable Volume mask, @Nullable Material material, @Nullable Source source, BlockPos caster, int selectCap,
-                        int span) {
-        /** Nothing but where the caster stands: no mask, material or pocket, a Pull surface of any size. */
+                        int span, int window) {
+        /**
+         * Nothing but where the caster stands: no mask, material or pocket, a Pull surface of any size, the default
+         * ticket window.
+         */
         public static Setup at(BlockPos caster) {
-            return new Setup(null, null, null, caster, Integer.MAX_VALUE, 0);
+            return new Setup(null, null, null, caster, Integer.MAX_VALUE, 0, TICKET_WINDOW);
         }
 
         public Setup withMask(@Nullable Volume mask) {
-            return new Setup(mask, material, source, caster, selectCap, span);
+            return new Setup(mask, material, source, caster, selectCap, span, window);
         }
 
         public Setup withMaterial(@Nullable Material material) {
-            return new Setup(mask, material, source, caster, selectCap, span);
+            return new Setup(mask, material, source, caster, selectCap, span, window);
         }
 
         public Setup withMaterial(BlockState state) {
@@ -208,11 +226,16 @@ public final class SpellPlanner {
         }
 
         public Setup withSource(@Nullable Source source) {
-            return new Setup(mask, material, source, caster, selectCap, span);
+            return new Setup(mask, material, source, caster, selectCap, span, window);
         }
 
         public Setup withSurface(int selectCap, int span) {
-            return new Setup(mask, material, source, caster, selectCap, span);
+            return new Setup(mask, material, source, caster, selectCap, span, window);
+        }
+
+        /** The job's ticket window, in chunks (the server passes {@code build_magic.maxTicketChunks}). */
+        public Setup withWindow(int window) {
+            return new Setup(mask, material, source, caster, selectCap, span, window);
         }
     }
 
@@ -236,7 +259,7 @@ public final class SpellPlanner {
             case COPY -> recipe.op() == SpellRecipe.Op.STAMP ? stamp(recipe, setup) : capture(recipe, setup);
             case MOVE -> recipe.op() == SpellRecipe.Op.PUT_DOWN ? move(level, recipe, setup) : capture(recipe, setup);
             case REPEAT -> repeat(level, recipe, setup);
-            case LAND, GROW -> new Plan(recipe, NONE, null, null, null, Order.RISE, setup.caster);
+            case LAND, GROW -> new Plan(recipe, NONE, null, null, null, Order.RISE, setup);
         };
     }
 
@@ -250,7 +273,7 @@ public final class SpellPlanner {
     }
 
     private static Plan refused(SpellRecipe recipe, Setup setup, int refusal) {
-        return new Plan(recipe, refusal, null, null, null, Order.RISE, setup.caster);
+        return new Plan(recipe, refusal, null, null, null, Order.RISE, setup);
     }
 
     private static Plan fill(SpellRecipe recipe, Setup setup) {
@@ -263,7 +286,7 @@ public final class SpellPlanner {
             return refused(recipe, setup, BuildVerdictPayload.NO_BLOCK);
         }
         if (recipe.region() != SpellRecipe.BOX) {
-            return new Plan(recipe, NONE, region, null, conjure(material), Order.RISE, setup.caster);
+            return new Plan(recipe, NONE, region, null, conjure(material), Order.RISE, setup);
         }
         BoundingBox box = region.bounds();
         Rule rule = switch (recipe.fillStyle()) {
@@ -280,7 +303,7 @@ public final class SpellPlanner {
             default -> conjure(material);
         };
         Volume cells = recipe.fillStyle() == FillStyle.ROOM ? region : SpellMath.fill(recipe.fillStyle(), box);
-        return new Plan(recipe, NONE, cells, null, rule, Order.RISE, setup.caster);
+        return new Plan(recipe, NONE, cells, null, rule, Order.RISE, setup);
     }
 
     private static Plan vanish(BlockGetter level, SpellRecipe recipe, Setup setup) {
@@ -294,7 +317,7 @@ public final class SpellPlanner {
         };
         return switch (recipe.vanishStyle()) {
             case HOLLOW -> {
-                Plan plan = new Plan(recipe, NONE, SpellMath.inside(region), null, gone, Order.MELT, setup.caster);
+                Plan plan = new Plan(recipe, NONE, SpellMath.inside(region), null, gone, Order.MELT, setup);
                 // The inside of a selected thing is counted only cell by cell; the thing's own size bounds it at once.
                 plan.size = recipe.region() == SpellRecipe.BOX ? -1 : region.count();
                 yield plan;
@@ -302,7 +325,7 @@ public final class SpellPlanner {
             case PLANTS -> new Plan(recipe, NONE, region, null, (getter, pos, cursor) -> {
                 BlockState old = getter.getBlockState(pos);
                 return old.is(ModTags.BUILD_PLANTS) ? SpellMath.vanished(old) : null;
-            }, Order.MELT, setup.caster);
+            }, Order.MELT, setup);
             case KIND -> {
                 Block kind = kind(level, recipe, region);
                 if (kind == null) {
@@ -311,9 +334,9 @@ public final class SpellPlanner {
                 yield new Plan(recipe, NONE, region, null, (getter, pos, cursor) -> {
                     BlockState old = getter.getBlockState(pos);
                     return old.is(kind) ? SpellMath.vanished(old) : null;
-                }, Order.MELT, setup.caster);
+                }, Order.MELT, setup);
             }
-            default -> new Plan(recipe, NONE, region, null, gone, Order.MELT, setup.caster);
+            default -> new Plan(recipe, NONE, region, null, gone, Order.MELT, setup);
         };
     }
 
@@ -346,7 +369,7 @@ public final class SpellPlanner {
         if (rule == null) {
             return refused(recipe, setup, BuildVerdictPayload.LOOK_INSIDE);
         }
-        return new Plan(recipe, NONE, region, null, rule, Order.RISE, setup.caster);
+        return new Plan(recipe, NONE, region, null, rule, Order.RISE, setup);
     }
 
     private static Plan paint(SpellRecipe recipe, Setup setup) {
@@ -357,13 +380,13 @@ public final class SpellPlanner {
         BlockPos centre = recipe.anchor();
         int radius = Math.max(0, recipe.size());
         Volume ball = SpellMath.shifted(new Shape(ShapeKind.BALL, radius, 0, 1, false, 0), centre.getX(), centre.getY() - radius, centre.getZ());
-        return new Plan(recipe, NONE, ball, null, skin(material), Order.RISE, setup.caster);
+        return new Plan(recipe, NONE, ball, null, skin(material), Order.RISE, setup);
     }
 
     private static Plan pull(BlockGetter level, SpellRecipe recipe, Setup setup) {
         Direction face = recipe.direction();
         if (face == null || recipe.size() == 0) {
-            return new Plan(recipe, NONE, null, null, null, Order.RISE, setup.caster);
+            return new Plan(recipe, NONE, null, null, null, Order.RISE, setup);
         }
         PullSurface surface = new PullSurface(level, recipe.anchor(), face, setup.selectCap, setup.span);
         int layers = recipe.size();
@@ -378,7 +401,7 @@ public final class SpellPlanner {
             BlockState old = getter.getBlockState(pos);
             return old.isAir() ? null : SpellMath.vanished(old);
         };
-        Plan plan = new Plan(recipe, NONE, null, null, rule, layers > 0 ? Order.RISE : Order.MELT, setup.caster, null, surface);
+        Plan plan = new Plan(recipe, NONE, null, null, rule, layers > 0 ? Order.RISE : Order.MELT, setup, null, surface);
         // Before its flood, a surface holds at most the cap, and at most the span's square of cells.
         long plane = Math.max(1, setup.span > 0 ? Math.min(setup.selectCap, (long) setup.span * setup.span) : setup.selectCap);
         plan.bound = plane * Math.abs((long) layers);
@@ -398,7 +421,7 @@ public final class SpellPlanner {
         int dz = corner.getZ() - local.minZ();
         Volume cells = SpellMath.shifted(shape, dx, dy, dz);
         BlockPos heart = shape.round() ? shape.heart().offset(dx, dy, dz) : null;
-        Plan plan = new Plan(recipe, NONE, cells, null, conjure(material), shape.round() ? Order.SHELLS : Order.RISE, setup.caster, heart, null);
+        Plan plan = new Plan(recipe, NONE, cells, null, conjure(material), shape.round() ? Order.SHELLS : Order.RISE, setup, heart, null);
         plan.origin = new BlockPos(dx, dy, dz);
         return plan;
     }
@@ -408,7 +431,7 @@ public final class SpellPlanner {
         if (region == null) {
             return refused(recipe, setup, BuildVerdictPayload.NO_BOX);
         }
-        return new Plan(recipe, NONE, null, region, null, Order.RISE, setup.caster);
+        return new Plan(recipe, NONE, null, region, null, Order.RISE, setup);
     }
 
     private static Plan stamp(SpellRecipe recipe, Setup setup) {
@@ -417,7 +440,7 @@ public final class SpellPlanner {
             return refused(recipe, setup, BuildVerdictPayload.POCKET_EMPTY);
         }
         Placed placed = Placed.at(source, recipe, null);
-        Plan plan = new Plan(recipe, NONE, placed, null, placed, Order.RISE, setup.caster);
+        Plan plan = new Plan(recipe, NONE, placed, null, placed, Order.RISE, setup);
         plan.origin = placed.corner;
         return plan;
     }
@@ -434,7 +457,7 @@ public final class SpellPlanner {
         if (recipe.turn() == 0 && recipe.flip() == SpellRecipe.NO_FLIP && placed.bounds.intersects(from)) {
             order = Order.SHIFT;
         }
-        Plan plan = new Plan(recipe, NONE, placed, region, placed, order, setup.caster);
+        Plan plan = new Plan(recipe, NONE, placed, region, placed, order, setup);
         plan.origin = placed.corner;
         return plan;
     }
@@ -446,7 +469,7 @@ public final class SpellPlanner {
         }
         Direction direction = recipe.direction();
         if (direction == null) {
-            return new Plan(recipe, NONE, null, region, null, Order.RISE, setup.caster);
+            return new Plan(recipe, NONE, null, region, null, Order.RISE, setup);
         }
         Source source = setup.source != null ? setup.source : Source.live(level, region);
         BoundingBox box = region.bounds();
@@ -456,10 +479,10 @@ public final class SpellPlanner {
         // a Repeat with no count would otherwise plan millions of copies above the sky.
         int count = (int) Math.min(Math.max(1, recipe.size()), copiesInside(SpellMath.world(level), box, direction, length, length + gap));
         if (count < 1) {
-            return new Plan(recipe, NONE, null, region, null, Order.RISE, setup.caster);
+            return new Plan(recipe, NONE, null, region, null, Order.RISE, setup);
         }
         Repeated copies = new Repeated(source, new BlockPos(box.minX(), box.minY(), box.minZ()), direction, count, gap);
-        return new Plan(recipe, NONE, copies, region, copies, Order.RISE, setup.caster);
+        return new Plan(recipe, NONE, copies, region, copies, Order.RISE, setup);
     }
 
     /**
@@ -511,9 +534,12 @@ public final class SpellPlanner {
         RISE,
         /** Layer by layer top-down (or by columns when big). */
         MELT,
-        /** Shell by shell from the heart (or by columns, bottom-up, when big). */
+        /** Shell by shell from the heart (or by columns, bottom-up, when its chunks do not fit the ticket window). */
         SHELLS,
-        /** A Move over itself: each axis against the shift, so a source cell moves before it is written over. */
+        /**
+         * A Move over itself: each axis against the shift, so a source cell moves before it is written over (by columns
+         * in rows against the shift when big).
+         */
         SHIFT
     }
 
@@ -530,6 +556,7 @@ public final class SpellPlanner {
         private final @Nullable Rule rule;
         private final Order order;
         private final BlockPos caster;
+        private final int window;
         private final @Nullable BlockPos heart;
         private final @Nullable PullSurface surface;
         private @Nullable BlockPos origin;
@@ -539,19 +566,20 @@ public final class SpellPlanner {
         private long bound = -1;
 
         private Plan(SpellRecipe recipe, int refusal, @Nullable Volume cells, @Nullable Volume region, @Nullable Rule rule, Order order,
-                     BlockPos caster) {
-            this(recipe, refusal, cells, region, rule, order, caster, null, null);
+                     Setup setup) {
+            this(recipe, refusal, cells, region, rule, order, setup, null, null);
         }
 
         private Plan(SpellRecipe recipe, int refusal, @Nullable Volume cells, @Nullable Volume region, @Nullable Rule rule, Order order,
-                     BlockPos caster, @Nullable BlockPos heart, @Nullable PullSurface surface) {
+                     Setup setup, @Nullable BlockPos heart, @Nullable PullSurface surface) {
             this.recipe = recipe;
             this.refusal = refusal;
             this.cells = cells;
             this.region = region;
             this.rule = rule;
             this.order = order;
-            this.caster = caster.immutable();
+            this.caster = setup.caster.immutable();
+            this.window = setup.window;
             this.heart = heart;
             this.surface = surface;
             this.prepared = surface == null;
@@ -667,14 +695,26 @@ public final class SpellPlanner {
          */
         public int order() {
             BoundingBox box = bounds();
-            if (box != null && !fits(box) && order != Order.SHIFT) {
+            if (box != null && order == Order.SHELLS && heart != null && swells(box)) {
+                return BuildFxPayload.SHELLS;
+            }
+            if (box != null && !fits(box)) {
                 return BuildFxPayload.COLUMNS;
             }
-            return switch (order) {
-                case MELT -> BuildFxPayload.MELT;
-                case SHELLS -> heart != null ? BuildFxPayload.SHELLS : BuildFxPayload.RISE;
-                default -> BuildFxPayload.RISE;
-            };
+            return order == Order.MELT ? BuildFxPayload.MELT : BuildFxPayload.RISE;
+        }
+
+        /**
+         * Whether a round shape swells shell by shell: when it fits a layer or every chunk it stands in fits the ticket
+         * window at once, and its rows fit the shell walk's table.
+         */
+        private boolean swells(BoundingBox box) {
+            int longest = Math.max(box.getXSpan(), Math.max(box.getYSpan(), box.getZSpan()));
+            if ((long) box.getYSpan() * box.getZSpan() > SHELL_ROWS || longest >= SHELL_SPAN) {
+                return false;
+            }
+            long chunks = ((long) (box.maxX() >> 4) - (box.minX() >> 4) + 1) * ((long) (box.maxZ() >> 4) - (box.minZ() >> 4) + 1);
+            return fits(box) || chunks <= window;
         }
 
         /**
@@ -703,16 +743,18 @@ public final class SpellPlanner {
             BoundingBox box = volume.bounds();
             Walk walk;
             if (order == Order.SHIFT) {
+                // Every cell T + d comes before T: each axis against the shift d (from the caster's side where d is 0).
                 BoundingBox from = region == null ? box : region.bounds();
                 int dx = box.minX() - from.minX();
                 int dy = box.minY() - from.minY();
                 int dz = box.minZ() - from.minZ();
-                walk = new LayerWalk(volume, box, dy <= 0, dz == 0 ? caster.getZ() <= middle(box.minZ(), box.maxZ()) : dz < 0,
-                        dx == 0 ? caster.getX() <= middle(box.minX(), box.maxX()) : dx < 0);
-            } else if (!fits(box)) {
-                walk = new ColumnWalk(volume, box, order != Order.MELT, caster);
-            } else if (order == Order.SHELLS && heart != null) {
+                boolean zUp = dz == 0 ? caster.getZ() <= middle(box.minZ(), box.maxZ()) : dz < 0;
+                boolean xUp = dx == 0 ? caster.getX() <= middle(box.minX(), box.maxX()) : dx < 0;
+                walk = fits(box) ? new LayerWalk(volume, box, dy <= 0, zUp, xUp) : new ShiftColumns(volume, box, dy <= 0, zUp, xUp);
+            } else if (order == Order.SHELLS && heart != null && swells(box)) {
                 walk = new ShellWalk(volume, box, heart);
+            } else if (!fits(box)) {
+                walk = new SpiralColumns(volume, box, order != Order.MELT, caster);
             } else {
                 walk = LayerWalk.from(volume, box, order != Order.MELT, caster);
             }
@@ -1201,116 +1243,237 @@ public final class SpellPlanner {
         }
     }
 
-    /**
-     * Chunk column by chunk column, in a square spiral from the column nearest the caster, each column layer by layer
-     * (rows from the caster's side).
-     */
-    private static final class ColumnWalk extends Walk {
-        private final Volume volume;
-        private final BoundingBox box;
-        private final boolean up;
-        private final BlockPos caster;
-        private final int minCx;
-        private final int maxCx;
-        private final int minCz;
-        private final int maxCz;
-        private final int startCx;
-        private final int startCz;
-        private final int rings;
-        private int ring;
-        private int index = -1;
+    /** Chunk column by chunk column, each column layer by layer; which column comes next is the subclass's. */
+    private abstract static class ColumnWalk extends Walk {
+        final Volume volume;
+        final BoundingBox box;
+        final int minCx;
+        final int maxCx;
+        final int minCz;
+        final int maxCz;
+        /** The column the walk is in (set by {@link #nextColumn}). */
+        int cx;
+        int cz;
         private @Nullable LayerWalk column;
+        private boolean done;
 
-        ColumnWalk(Volume volume, BoundingBox box, boolean up, BlockPos caster) {
+        ColumnWalk(Volume volume, BoundingBox box) {
             this.volume = volume;
             this.box = box;
-            this.up = up;
-            this.caster = caster;
             this.minCx = box.minX() >> 4;
             this.maxCx = box.maxX() >> 4;
             this.minCz = box.minZ() >> 4;
             this.maxCz = box.maxZ() >> 4;
+        }
+
+        @Override
+        final boolean next(BlockPos.MutableBlockPos out) {
+            while (!done) {
+                if (column != null && column.next(out)) {
+                    return true;
+                }
+                if (!nextColumn()) {
+                    done = true;
+                    column = null;
+                    break;
+                }
+                BoundingBox area = new BoundingBox(Math.max(box.minX(), cx << 4), box.minY(), Math.max(box.minZ(), cz << 4),
+                        Math.min(box.maxX(), (cx << 4) + 15), box.maxY(), Math.min(box.maxZ(), (cz << 4) + 15));
+                column = layers(area);
+            }
+            return false;
+        }
+
+        /** Moves {@link #cx}, {@link #cz} to the next column of the box; false after the last. */
+        abstract boolean nextColumn();
+
+        /** The walk inside one column ({@code area}: the part of the box in it). */
+        abstract LayerWalk layers(BoundingBox area);
+    }
+
+    /**
+     * Chunk column by chunk column in a square spiral from the column nearest the caster (round each ring clockwise
+     * from its north-west corner: the north side, the east, the south, the west), each column layer by layer with rows
+     * from the caster's side. Only the part of each side of a ring that lies in the box is visited, so the next column
+     * costs the same however long and thin the plan is.
+     */
+    private static final class SpiralColumns extends ColumnWalk {
+        private final boolean up;
+        private final BlockPos caster;
+        private final int startCx;
+        private final int startCz;
+        /** The farthest ring that meets the box. */
+        private final int rings;
+        private int ring = -1;
+        private int side;
+        private int along;
+        private int end = -1;
+
+        SpiralColumns(Volume volume, BoundingBox box, boolean up, BlockPos caster) {
+            super(volume, box);
+            this.up = up;
+            this.caster = caster;
             this.startCx = Math.clamp(caster.getX() >> 4, minCx, maxCx);
             this.startCz = Math.clamp(caster.getZ() >> 4, minCz, maxCz);
             this.rings = Math.max(Math.max(startCx - minCx, maxCx - startCx), Math.max(startCz - minCz, maxCz - startCz));
         }
 
         @Override
-        boolean next(BlockPos.MutableBlockPos out) {
-            while (true) {
-                if (column != null && column.next(out)) {
-                    return true;
-                }
-                if (!nextColumn()) {
-                    return false;
-                }
-            }
-        }
-
-        /** The next column of the spiral that is in the box; false after the last. */
-        private boolean nextColumn() {
-            while (ring <= rings) {
-                index++;
-                int perimeter = ring == 0 ? 1 : 8 * ring;
-                if (index >= perimeter) {
-                    ring++;
-                    index = -1;
-                    continue;
-                }
-                int cx;
-                int cz;
-                if (ring == 0) {
-                    cx = startCx;
-                    cz = startCz;
+        boolean nextColumn() {
+            while (along > end) {
+                if (ring > 0 && side < 3) {
+                    side++;
                 } else {
-                    // Round the ring clockwise from its north-west corner: the north side, the east, the south, the
-                    // west.
-                    int side = index / (2 * ring);
-                    int along = index % (2 * ring);
-                    switch (side) {
-                        case 0 -> {
-                            cx = startCx - ring + along;
-                            cz = startCz - ring;
-                        }
-                        case 1 -> {
-                            cx = startCx + ring;
-                            cz = startCz - ring + along;
-                        }
-                        case 2 -> {
-                            cx = startCx + ring - along;
-                            cz = startCz + ring;
-                        }
-                        default -> {
-                            cx = startCx - ring;
-                            cz = startCz + ring - along;
-                        }
+                    ring++;
+                    side = 0;
+                    if (ring > rings) {
+                        return false;
                     }
                 }
-                if (cx < minCx || cx > maxCx || cz < minCz || cz > maxCz) {
-                    continue;
-                }
-                BoundingBox area = new BoundingBox(Math.max(box.minX(), cx << 4), box.minY(), Math.max(box.minZ(), cz << 4),
-                        Math.min(box.maxX(), (cx << 4) + 15), box.maxY(), Math.min(box.maxZ(), (cz << 4) + 15));
-                column = LayerWalk.from(volume, area, up, caster);
+                sideInBox();
+            }
+            int r = ring;
+            int a = along++;
+            if (r == 0) {
+                cx = startCx;
+                cz = startCz;
                 return true;
             }
-            return false;
+            switch (side) {
+                case 0 -> {
+                    cx = startCx - r + a;
+                    cz = startCz - r;
+                }
+                case 1 -> {
+                    cx = startCx + r;
+                    cz = startCz - r + a;
+                }
+                case 2 -> {
+                    cx = startCx + r - a;
+                    cz = startCz + r;
+                }
+                default -> {
+                    cx = startCx - r;
+                    cz = startCz + r - a;
+                }
+            }
+            return true;
+        }
+
+        /** Sets {@code along} and {@code end} to the steps of the ring's current side that lie in the box. */
+        private void sideInBox() {
+            int r = ring;
+            if (r == 0) {
+                along = 0;
+                end = 0;
+                return;
+            }
+            int low;
+            int high;
+            boolean inBox;
+            switch (side) {
+                case 0 -> {
+                    inBox = startCz - r >= minCz;
+                    low = minCx - (startCx - r);
+                    high = maxCx - (startCx - r);
+                }
+                case 1 -> {
+                    inBox = startCx + r <= maxCx;
+                    low = minCz - (startCz - r);
+                    high = maxCz - (startCz - r);
+                }
+                case 2 -> {
+                    inBox = startCz + r <= maxCz;
+                    low = startCx + r - maxCx;
+                    high = startCx + r - minCx;
+                }
+                default -> {
+                    inBox = startCx - r >= minCx;
+                    low = startCz + r - maxCz;
+                    high = startCz + r - minCz;
+                }
+            }
+            along = Math.max(0, low);
+            end = inBox ? Math.min(2 * r - 1, high) : -1;
+        }
+
+        @Override
+        LayerWalk layers(BoundingBox area) {
+            return LayerWalk.from(volume, area, up, caster);
+        }
+    }
+
+    /**
+     * A Move over itself that is wider than a layer: the chunk columns in rows against the shift (along z first, then
+     * along x), each column layer by layer against it. The column of a target cell's own target (T + d) is never after
+     * T's (a chunk's index only grows with its blocks), and inside one column the layers order them, so every source
+     * cell still moves before the Move writes over it, while the job's chunk tickets follow the walk column by column.
+     */
+    private static final class ShiftColumns extends ColumnWalk {
+        private final boolean up;
+        private final boolean zUp;
+        private final boolean xUp;
+        private boolean started;
+
+        ShiftColumns(Volume volume, BoundingBox box, boolean up, boolean zUp, boolean xUp) {
+            super(volume, box);
+            this.up = up;
+            this.zUp = zUp;
+            this.xUp = xUp;
+        }
+
+        @Override
+        boolean nextColumn() {
+            if (!started) {
+                started = true;
+                cz = zUp ? minCz : maxCz;
+                cx = xUp ? minCx : maxCx;
+                return true;
+            }
+            cx += xUp ? 1 : -1;
+            if (xUp ? cx > maxCx : cx < minCx) {
+                cx = xUp ? minCx : maxCx;
+                cz += zUp ? 1 : -1;
+                return zUp ? cz <= maxCz : cz >= minCz;
+            }
+            return true;
+        }
+
+        @Override
+        LayerWalk layers(BoundingBox area) {
+            return new LayerWalk(volume, area, up, zUp, xUp);
         }
     }
 
     /**
      * Shell by shell from the heart: shell {@code k} is every cell whose squared distance from the heart is at least
      * {@code k^2} and below {@code (k + 1)^2}; inside a shell, by layer, row and x.
+     *
+     * <p>Each row of the box (one {@code y}, one {@code z}) is measured once, when the shells first reach it: the first
+     * and the last shell its cells lie in. So a shell no row reaches (the empty inside of a hollow ball, the corners of
+     * its box) is passed over without reading a row, and inside a shell a row it does not reach costs a comparison.
      */
     private static final class ShellWalk extends Walk {
+        /** A row of the box with no cell. */
+        private static final int EMPTY = -1;
         private final Volume volume;
         private final BoundingBox box;
         private final BlockPos heart;
-        private final int lastShell;
-        private int k;
+        private final int zSpan;
+        /** The farthest ring of rows (the larger of |dy| and |dz|) in the box. */
+        private final int lastRing;
+        /** For each row of the box, its first shell (high 16 bits) and its last (low 16 bits), or {@link #EMPTY}. */
+        private final int[] rows;
+        /** How many measured rows start (+1) and end (-1, the shell after their last) at each shell. */
+        private final int[] delta;
+        /** The last shell of any row measured so far. */
+        private int lastShell = -1;
+        /** How many measured rows have a cell in shell {@code k}. */
+        private int active;
+        private int k = -1;
+        private boolean inShell;
         private int dy;
         private int dz;
-        private boolean started;
         private int[] row = SpellMath.NO_RUNS;
         private int run;
         private int x;
@@ -1319,6 +1482,9 @@ public final class SpellPlanner {
             this.volume = volume;
             this.box = box;
             this.heart = heart;
+            this.zSpan = box.getZSpan();
+            this.lastRing = Math.max(Math.max(Math.abs(box.minY() - heart.getY()), Math.abs(box.maxY() - heart.getY())),
+                    Math.max(Math.abs(box.minZ() - heart.getZ()), Math.abs(box.maxZ() - heart.getZ())));
             long far = 0;
             for (int cx : new int[]{box.minX(), box.maxX()}) {
                 for (int cy : new int[]{box.minY(), box.maxY()}) {
@@ -1330,7 +1496,8 @@ public final class SpellPlanner {
                     }
                 }
             }
-            this.lastShell = SpellMath.isqrt(far);
+            this.rows = new int[box.getYSpan() * zSpan];
+            this.delta = new int[SpellMath.isqrt(far) + 2];
         }
 
         @Override
@@ -1353,28 +1520,33 @@ public final class SpellPlanner {
             }
         }
 
+        /** The next row of the current shell with a cell in it (moving to the next shell when it runs out). */
         private boolean nextRow() {
             while (true) {
-                if (!started) {
-                    started = true;
-                    k = 0;
-                    dy = lowY();
-                    dz = lowZ() - 1;
+                if (!inShell) {
+                    if (!nextShell()) {
+                        row = SpellMath.NO_RUNS;
+                        run = 0;
+                        return false;
+                    }
+                    inShell = true;
+                    dy = Math.max(-k, box.minY() - heart.getY());
+                    dz = Math.max(-k, box.minZ() - heart.getZ()) - 1;
                 }
                 dz++;
-                if (dz > highZ()) {
+                if (dz > Math.min(k, box.maxZ() - heart.getZ())) {
                     dy++;
-                    dz = lowZ();
-                    if (dy > highY()) {
-                        k++;
-                        if (k > lastShell) {
-                            row = SpellMath.NO_RUNS;
-                            run = 0;
-                            return false;
-                        }
-                        dy = lowY();
-                        dz = lowZ();
+                    dz = Math.max(-k, box.minZ() - heart.getZ());
+                    if (dy > Math.min(k, box.maxY() - heart.getY())) {
+                        inShell = false;
+                        continue;
                     }
+                }
+                int y = heart.getY() + dy;
+                int z = heart.getZ() + dz;
+                int shells = rows[(y - box.minY()) * zSpan + (z - box.minZ())];
+                if (shells == EMPTY || shells >>> 16 > k || (shells & 0xFFFF) < k) {
+                    continue;
                 }
                 long s = (long) dy * dy + (long) dz * dz;
                 long high = (long) (k + 1) * (k + 1) - 1 - s;
@@ -1388,8 +1560,6 @@ public final class SpellPlanner {
                     continue;
                 }
                 int hx = heart.getX();
-                int y = heart.getY() + dy;
-                int z = heart.getZ() + dz;
                 int[] cells = c == 0 ? volume.runs(y, z, hx - a, hx + a)
                         : join(volume.runs(y, z, hx - a, hx - c), volume.runs(y, z, hx + c, hx + a));
                 if (cells.length > 0) {
@@ -1401,20 +1571,74 @@ public final class SpellPlanner {
             }
         }
 
-        private int lowY() {
-            return Math.max(box.minY() - heart.getY(), -(k + 1));
+        /**
+         * Moves to the next shell that some row reaches, measuring the rows the shells reach as they grow; false after
+         * the last. A cell of shell {@code k} lies within {@code k} of the heart along y and z, so every row that may
+         * have one is measured by the time the walk is there.
+         */
+        private boolean nextShell() {
+            while (true) {
+                k++;
+                if (k <= lastRing) {
+                    measureRing(k);
+                }
+                if (k > lastRing && k > lastShell) {
+                    return false;
+                }
+                active += delta[k];
+                if (active > 0) {
+                    return true;
+                }
+            }
         }
 
-        private int highY() {
-            return Math.min(box.maxY() - heart.getY(), k + 1);
+        /** Measures the rows of the box whose larger distance from the heart along y or z is {@code m}. */
+        private void measureRing(int m) {
+            int y0 = Math.max(-m, box.minY() - heart.getY());
+            int y1 = Math.min(m, box.maxY() - heart.getY());
+            int z0 = Math.max(-m, box.minZ() - heart.getZ());
+            int z1 = Math.min(m, box.maxZ() - heart.getZ());
+            for (int ry = y0; ry <= y1; ry++) {
+                if (ry == -m || ry == m) {
+                    for (int rz = z0; rz <= z1; rz++) {
+                        measure(ry, rz);
+                    }
+                } else {
+                    if (z0 == -m) {
+                        measure(ry, -m);
+                    }
+                    if (z1 == m) {
+                        measure(ry, m);
+                    }
+                }
+            }
         }
 
-        private int lowZ() {
-            return Math.max(box.minZ() - heart.getZ(), -(k + 1));
-        }
-
-        private int highZ() {
-            return Math.min(box.maxZ() - heart.getZ(), k + 1);
+        /** The first and the last shell the cells of row {@code dy, dz} lie in. */
+        private void measure(int ry, int rz) {
+            int y = heart.getY() + ry;
+            int z = heart.getZ() + rz;
+            int index = (y - box.minY()) * zSpan + (z - box.minZ());
+            int[] cells = volume.runs(y, z, box.minX(), box.maxX());
+            if (cells.length == 0) {
+                rows[index] = EMPTY;
+                return;
+            }
+            long s = (long) ry * ry + (long) rz * rz;
+            long nearest = Long.MAX_VALUE;
+            long farthest = 0;
+            for (int i = 0; i < cells.length; i += 2) {
+                long from = cells[i] - (long) heart.getX();
+                long to = cells[i + 1] - (long) heart.getX();
+                nearest = Math.min(nearest, from <= 0 && to >= 0 ? 0 : Math.min(from * from, to * to));
+                farthest = Math.max(farthest, Math.max(from * from, to * to));
+            }
+            int first = SpellMath.isqrt(s + nearest);
+            int last = SpellMath.isqrt(s + farthest);
+            rows[index] = first << 16 | last;
+            delta[first]++;
+            delta[last + 1]--;
+            lastShell = Math.max(lastShell, last);
         }
 
         private static int[] join(int[] left, int[] right) {

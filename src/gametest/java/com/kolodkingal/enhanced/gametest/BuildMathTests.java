@@ -496,17 +496,60 @@ public final class BuildMathTests {
             nearest = Math.min(nearest, swelling.get(i).pos().distSqr(centre));
         }
         check(farthest < nearest, "the first tenth is nearer the centre than the last tenth: " + farthest + " < " + nearest);
-        // Round shapes too big to swell in one piece go by columns like every big spell, every cell once.
-        for (ShapeKind kind : new ShapeKind[]{ShapeKind.BALL, ShapeKind.HEART, ShapeKind.RING}) {
-            Plan big = SpellPlanner.plan(new World(), recipe(Spell.SHAPE).style(kind).size(40).size2(3).hollow(true).turn(1).at(new BlockPos(5, 63, 7), null).build(),
+        // Round shapes wider than a layer still swell shell by shell while the job's tickets hold all their chunks
+        // (256 by default), every cell once; only a bigger one, or a smaller window, goes by columns.
+        for (ShapeKind kind : new ShapeKind[]{ShapeKind.BALL, ShapeKind.DOME, ShapeKind.HEART, ShapeKind.ARCH, ShapeKind.RING}) {
+            int radius = kind == ShapeKind.RING ? 200 : 40;
+            Plan big = SpellPlanner.plan(new World(), recipe(Spell.SHAPE).style(kind).size(radius).size2(3).hollow(true).turn(1).at(new BlockPos(5, 63, 7), null).build(),
                     Setup.at(CASTER).withMaterial(STONE));
-            Shape shape = Shape.of(kind, 40, 3, true, 1);
+            Shape shape = Shape.of(kind, radius, 3, true, 1);
             List<Cell> all = cells(big, new World());
-            check(big.order() == BuildFxPayload.COLUMNS && all.size() == shape.count() && distinct(all) == all.size(),
-                    "a big hollow " + kind + " goes by columns, its " + shape.count() + " cells each once: " + all.size());
+            int order = kind == ShapeKind.RING ? BuildFxPayload.COLUMNS : BuildFxPayload.SHELLS;
+            check(big.order() == order && all.size() == shape.count() && distinct(all) == all.size(),
+                    "a big " + kind + " goes by " + (order == BuildFxPayload.SHELLS ? "shells" : "columns") + ", its " + shape.count() + " cells each once: "
+                            + all.size() + ", order " + big.order());
             check(big.origin() != null && all.stream().allMatch(cell -> shape.contains(cell.pos().getX() - big.origin().getX(),
                     cell.pos().getY() - big.origin().getY(), cell.pos().getZ() - big.origin().getZ())), "every cell is the shape's, from its base centre");
+            if (order == BuildFxPayload.SHELLS) {
+                check(swellsFrom(all, big.origin().offset(shape.heart())), "a big " + kind + " swells out of its heart shell by shell");
+            }
         }
+        Plan narrow = SpellPlanner.plan(new World(), recipe(Spell.SHAPE).style(ShapeKind.BALL).size(40).hollow(true).at(new BlockPos(5, 63, 7), null).build(),
+                Setup.at(CASTER).withMaterial(STONE).withWindow(16));
+        check(narrow.order() == BuildFxPayload.COLUMNS && distinct(cells(narrow, new World())) == Shape.of(ShapeKind.BALL, 40, 0, true, 0).count(),
+                "with a window of 16 chunks the same ball goes by columns, every cell once");
+        Plan facing = SpellPlanner.plan(new World(), recipe(Spell.SHAPE).style(ShapeKind.HEART).size(150).hollow(true).turn(0).at(new BlockPos(5, 63, 7), null)
+                .build(), Setup.at(CASTER).withMaterial(STONE));
+        Plan sideways = SpellPlanner.plan(new World(), recipe(Spell.SHAPE).style(ShapeKind.HEART).size(150).hollow(true).turn(1).at(new BlockPos(5, 63, 7), null)
+                .build(), Setup.at(CASTER).withMaterial(STONE));
+        check(facing.order() == BuildFxPayload.SHELLS && sideways.order() == BuildFxPayload.COLUMNS,
+                "a heart of radius 150 facing north swells (301 x 38 rows); facing east it has 301 x 301 rows and goes by columns");
+        // A stadium's dome: a hollow ball of radius 110 swells out of its heart, its empty inside passed over at once.
+        long swellStart = System.nanoTime();
+        Plan stadium = SpellPlanner.plan(new World(), recipe(Spell.SHAPE).style(ShapeKind.BALL).size(110).hollow(true).at(new BlockPos(0, -60, 0), Direction.UP).build(),
+                Setup.at(CASTER).withMaterial(STONE));
+        SpellPlanner.Cursor swelling110 = stadium.cursor();
+        BlockPos stadiumHeart = stadium.origin().offset(Shape.of(ShapeKind.BALL, 110, 0, true, 0).heart());
+        long slowest = 0;
+        long stadiumCells = 0;
+        int shell = 0;
+        boolean outward = true;
+        while (true) {
+            long before = System.nanoTime();
+            boolean more = swelling110.next();
+            slowest = Math.max(slowest, System.nanoTime() - before);
+            if (!more) {
+                break;
+            }
+            stadiumCells++;
+            int now = (int) Math.floor(Math.sqrt(swelling110.pos().distSqr(stadiumHeart)));
+            outward &= now >= shell;
+            shell = now;
+        }
+        long swellMillis = (System.nanoTime() - swellStart) / 1_000_000L;
+        check(stadium.order() == BuildFxPayload.SHELLS && outward && stadiumCells == Shape.of(ShapeKind.BALL, 110, 0, true, 0).count(),
+                "a hollow ball of radius 110 swells shell by shell, every cell once: " + stadiumCells);
+        check(swellMillis < 10_000L, "and quickly: " + swellMillis + " ms, the slowest step " + slowest / 1_000_000L + " ms");
         // A Move of a 3 x 3 x 3 pattern one block up and east: each cell's block leaves its cell before the Move lands
         // on it.
         BoundingBox source = new BoundingBox(0, 64, 0, 2, 66, 2);
@@ -524,6 +567,39 @@ public final class BuildMathTests {
             check(!moved.contains(step.from()), "a cell moves before anything lands on it: " + step.from());
             moved.add(step.pos());
         }
+        // A Move over itself wider than a layer: chunk column by chunk column, still every cell before it is landed on.
+        BoundingBox yard = new BoundingBox(0, 64, 0, 99, 65, 69);
+        World paved = new World();
+        for (BlockPos pos : BlockPos.betweenClosed(yard.minX(), yard.minY(), yard.minZ(), yard.maxX(), yard.maxY(), yard.maxZ())) {
+            paved.set(pos, (pos.getX() + pos.getZ()) % 3 == 0 ? STONE : GLASS);
+        }
+        Plan slide = SpellPlanner.plan(paved, recipe(Spell.MOVE).op(SpellRecipe.Op.PUT_DOWN).box(yard).at(new BlockPos(52, 63, 29), Direction.UP).build(),
+                Setup.at(CASTER));
+        check(slide.order() == BuildFxPayload.COLUMNS, "a big Move over itself goes by columns");
+        Set<BlockPos> landed = new HashSet<>();
+        Set<Long> slideColumns = new HashSet<>();
+        long slideColumn = Long.MIN_VALUE;
+        List<Cell> slid = cells(slide, paved);
+        for (Cell step : slid) {
+            check(step.from() != null && step.pos().equals(step.from().offset(3, 0, -5)), "each cell moves 3 east and 5 north: " + step);
+            check(!landed.contains(step.from()), "a cell moves before anything lands on it: " + step.from());
+            landed.add(step.pos());
+            long here = ((long) (step.pos().getX() >> 4) << 32) | ((step.pos().getZ() >> 4) & 0xFFFFFFFFL);
+            if (here != slideColumn) {
+                check(slideColumns.add(here), "a column is never come back to");
+                slideColumn = here;
+            }
+        }
+        check(slid.size() == 14_000, "its 14,000 cells: " + slid.size());
+        // A long thin plan: two cells 3.2 million blocks apart, walked column by column at once (a column of the
+        // spiral costs the same however far out its ring is).
+        long thinStart = System.nanoTime();
+        LongSet ends = new LongOpenHashSet(new long[]{new BlockPos(0, 64, 0).asLong(), new BlockPos(3_199_999, 64, 0).asLong()});
+        Plan thin = SpellPlanner.plan(new World(), recipe(Spell.FILL).mask().build(), Setup.at(CASTER).withMask(SpellMath.cells(ends)).withMaterial(STONE));
+        List<Cell> both = cells(thin, new World());
+        long thinMillis = (System.nanoTime() - thinStart) / 1_000_000L;
+        check(both.size() == 2 && both.get(0).pos().getX() == 0 && both.get(1).pos().getX() == 3_199_999, "both ends, the near one first");
+        check(thinMillis < 5_000L, "200,000 columns in " + thinMillis + " ms");
         // A million cells of a 300-million-cell plan, at once: the plan is its numbers and its cursor.
         long start = System.nanoTime();
         Plan huge = SpellPlanner.plan(new World(), recipe(Spell.FILL).box(new BlockPos(0, -60, 0), new BlockPos(999, 239, 999)).build(),
@@ -1072,6 +1148,19 @@ public final class BuildMathTests {
                     }
                 }
             }
+        }
+        return true;
+    }
+
+    /** Whether the cells come out shell by shell from {@code heart}: none in a shell nearer than the one before it. */
+    private static boolean swellsFrom(List<Cell> cells, BlockPos heart) {
+        int shell = 0;
+        for (Cell cell : cells) {
+            int now = (int) Math.floor(Math.sqrt(cell.pos().distSqr(heart)));
+            if (now < shell) {
+                return false;
+            }
+            shell = now;
         }
         return true;
     }
