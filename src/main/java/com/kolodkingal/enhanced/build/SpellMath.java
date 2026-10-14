@@ -511,12 +511,14 @@ public final class SpellMath {
         }
 
         /**
-         * The shape of a cast: {@code height} as the recipe carries it (0 or less gives the shape's default height,
-         * {@link ShapeKind#defaultHeight}), the depth {@code 1 + r / 4} of Appendix A.1.
+         * The shape of a cast: {@code height} exactly as the recipe carries it (at least 1 for a shape with a height,
+         * as {@link SpellRecipe#clamped} makes it), the depth {@code 1 + r / 4} of Appendix A.1. A recipe never means
+         * "the default height" by 0: a client sends {@link ShapeKind#defaultHeight} until the shape is planted, so the
+         * server, which clamps first, and a client planning its ghost from the recipe it sends plan the same shape.
          */
         public static Shape of(ShapeKind kind, int radius, int height, boolean hollow, int turn) {
             int r = Math.max(0, radius);
-            return new Shape(kind, r, height > 0 ? height : kind.defaultHeight(r), 1 + r / 4, hollow, turn);
+            return new Shape(kind, r, height, 1 + r / 4, hollow, turn);
         }
 
         /** The shapes that grow shell by shell from their heart; the others rise layer by layer (Appendix A.3). */

@@ -169,8 +169,10 @@ public final class BuildMathTests {
             check(windowsAreRows(new Shape(ShapeKind.ARCH, 8, 0, 3, false, turn)), "an arch 3 deep, turned " + turn);
         }
         check(Shape.of(ShapeKind.HEART, 8, 0, false, 0).depth() == 3, "a heart is 1 + r / 4 deep");
-        check(Shape.of(ShapeKind.TOWER, 3, 0, true, 0).height() == 7 && Shape.of(ShapeKind.PYRAMID, 3, 0, false, 0).height() == 4,
-                "a tower starts 2r + 1 tall and a pyramid r + 1");
+        check(ShapeKind.TOWER.defaultHeight(3) == 7 && ShapeKind.PYRAMID.defaultHeight(3) == 4 && ShapeKind.RING.defaultHeight(3) == 1,
+                "a tower starts 2r + 1 tall, a pyramid r + 1, a ring 1");
+        check(Shape.of(ShapeKind.TOWER, 3, 7, true, 0).height() == 7 && Shape.of(ShapeKind.TOWER, 3, 0, true, 0).height() == 1
+                && Shape.of(ShapeKind.BALL, 3, 9, true, 0).height() == 0, "a shape's height is the recipe's, at least 1 (as the clamp makes it)");
         Shape big = new Shape(ShapeKind.BALL, 50, 0, 1, false, 0);
         check(big.count() == 540_113, "a ball of radius 50 has 540,113 cells, not " + big.count());
         helper.succeed();
@@ -823,6 +825,14 @@ public final class BuildMathTests {
                 new BlockPos(5, 68, 5), List.of(new BlockPos(2, 64, 2)), new BlockPos(3, 64, 3), Direction.UP.get3DDataValue(), 0, 0, 1,
                 SpellRecipe.NO_FLIP, SpellRecipe.HOLLOW, SpellRecipe.HAND, 7L, 0);
         check(tidy.clamped(billy).equals(tidy) && tidy.clamped(wanda).equals(tidy), "a recipe in range is unchanged");
+        // A tower sent with a height of 0 is the same tower whether its recipe is clamped (the server) or not (a ghost).
+        for (int height : new int[]{0, ShapeKind.TOWER.defaultHeight(3)}) {
+            SpellRecipe sent = BuildTestSupport.recipe(Spell.SHAPE).style(ShapeKind.TOWER).size(3).size2(height).at(new BlockPos(0, 63, 0), Direction.UP).build();
+            Plan ghost = SpellPlanner.plan(new World(), sent, Setup.at(CASTER).withMaterial(STONE));
+            Plan cast = SpellPlanner.plan(new World(), sent.clamped(billy), Setup.at(CASTER).withMaterial(STONE));
+            check(ghost.bounds() != null && ghost.bounds().equals(cast.bounds()) && ghost.size() == cast.size()
+                    && ghost.bounds().getYSpan() == Math.max(1, height), "a tower sent " + height + " high: the ghost is the cast, " + ghost.bounds());
+        }
         helper.succeed();
     }
 
