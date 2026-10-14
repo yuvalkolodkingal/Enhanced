@@ -101,6 +101,7 @@ public final class BuildClient {
     private static boolean serverMode;
     private static @Nullable LocalPlayer seenPlayer;
     private static @Nullable ClientLevel seenLevel;
+    private static @Nullable Power seenPower;
     private static long ticks;
 
     private static @Nullable BuildGrammar grammar;
@@ -233,9 +234,12 @@ public final class BuildClient {
                 leaveMode();
             }
         }
-        if (mode && (player.isSpectator() || !isBuilder(Powers.power(player)))) {
+        // A change of power ends build mode (D-B 11.9), between the two witches too; so does Spectator mode.
+        Power power = Powers.power(player);
+        if (mode && (player.isSpectator() || !isBuilder(power) || seenPower != null && power != seenPower)) {
             leaveMode();
         }
+        seenPower = power;
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -580,6 +584,12 @@ public final class BuildClient {
             startStroke();
             return;
         }
+        // A plan just changed (a scroll, Delete's Vanish) is counted now, so a small spell needs no ring.
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level != null && (count == null || !count.done())) {
+            countOn(level);
+            countOn(level);
+        }
         int need = holdTicks();
         if (need <= 0) {
             cast(player, 0);
@@ -923,6 +933,7 @@ public final class BuildClient {
         serverMode = false;
         seenPlayer = null;
         seenLevel = null;
+        seenPower = null;
         grammar = null;
         limits = null;
         material = null;

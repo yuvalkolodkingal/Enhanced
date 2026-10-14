@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
 import com.kolodkingal.enhanced.power.Powers;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -18,6 +19,7 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * Build Magic's input on the client (D-B 2, 11.10): the Y key, the two Ctrl keys a witch has at any time, the build-mode
@@ -38,7 +40,8 @@ import org.jetbrains.annotations.Nullable;
  *     <li><b>The right button</b> is the spell's when it has something ready and the crosshair is not on a creature:
  *     one press casts once (vanilla's repeats every 4 ticks are cancelled), a hold spell goes when its ring is full, a
  *     brush dabs while held. Otherwise it is vanilla's: doors, chests, eating, placing one block.</li>
- *     <li><b>Middle click</b> picks the block as the material, and vanilla pick-block still happens.</li>
+ *     <li><b>Middle click</b> picks the block as the material (as far as the hero's reach), and vanilla pick-block
+ *     still happens.</li>
  *     <li><b>The scroll wheel</b> is the grammar's when it has something to change (Ctrl: 8 at a time; Left Alt held:
  *     the second knob), else the hotbar's.</li>
  * </ul>
@@ -200,7 +203,7 @@ public final class BuildInput {
             return;
         }
         if (event.isPickBlock()) {
-            BuildClient.pick(player);
+            // Picked in onMouseButton or onKey, where a block beyond vanilla's reach is picked too.
             return;
         }
         HitResult hit = mc.hitResult;
@@ -244,6 +247,32 @@ public final class BuildInput {
         event.setSwingHand(false);
         rightKey = mc.options.keyUse;
         BuildClient.rightDown(player);
+    }
+
+    /**
+     * Middle click (the pick-block key, wherever it is bound), seen as it is pressed: vanilla asks its own event only for
+     * a block within a hand's reach, and the builder picks one as far as his magic reaches. Vanilla's pick still runs.
+     */
+    @SubscribeEvent
+    public static void onMouseButton(InputEvent.MouseButton.Pre event) {
+        if (event.getAction() == GLFW.GLFW_PRESS) {
+            pressed(InputConstants.Type.MOUSE.getOrCreate(event.getButton()));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onKey(InputEvent.Key event) {
+        if (event.getAction() == GLFW.GLFW_PRESS) {
+            pressed(InputConstants.getKey(event.getKey(), event.getScanCode()));
+        }
+    }
+
+    private static void pressed(InputConstants.Key key) {
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player != null && mc.screen == null && BuildClient.buildMode() && mc.options.keyPickItem.isActiveAndMatches(key)) {
+            BuildClient.pick(player);
+        }
     }
 
     /** The scroll wheel in build mode: the grammar's when it has a use for it, else the hotbar's. */
