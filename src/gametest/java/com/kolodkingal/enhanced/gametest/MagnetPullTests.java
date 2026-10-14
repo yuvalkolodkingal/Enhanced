@@ -21,9 +21,11 @@ import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -1182,9 +1184,11 @@ public final class MagnetPullTests {
     /**
      * M57 (R38). With {@code magneto.pullFromStorage} on: the iron of a chest in sight is his and its dirt stays; an item
      * frame's sword and an armour stand's chestplate are his, the frame and the stand stay; a fisherman's claimed barrel
-     * keeps its iron, and so does a chest behind a wall. The claims are asked for a frame or a stand as for a chest: an
-     * armour stand on a claimed cell keeps its chestplate while a loose ingot beside it comes; a chest on someone's claim
-     * keeps its iron; and a Magneto in Adventure takes a loose ingot but no frame's or stand's metal.
+     * keeps its iron, and so does a chest behind a wall. A map maker's locks hold as against a hand: a fixed frame
+     * keeps its sword, and a stand whose chest slot is locked its chestplate. The claims are asked for a frame or a
+     * stand as for a chest: an armour stand on a claimed cell keeps its chestplate while a loose ingot beside it comes;
+     * a chest on someone's claim keeps its iron; and a Magneto in Adventure takes a loose ingot but no frame's or
+     * stand's metal.
      */
     @GameTest(template = ARENA, batch = "magnet_pull_storage", timeoutTicks = 100)
     public static void storageOnlyWhenAsked(GameTestHelper helper) {
@@ -1210,6 +1214,10 @@ public final class MagnetPullTests {
             }
         }
         BlockPos claimedChest = new BlockPos(12, 2, 5);
+        ItemFrame fixedFrame = frame(helper, new BlockPos(14, 3, 7), new ItemStack(Items.IRON_SWORD));
+        fixedFrame.fixed = true;
+        ArmorStand lockedStand = stand(helper, new Vec3(12.5, FLOOR, 6.5), Items.IRON_CHESTPLATE);
+        lockedStand.disabledSlots = 1 << EquipmentSlot.CHEST.getFilterFlag() + 8; // its chestplate cannot be taken out
         ServerPlayer[] adventurer = new ServerPlayer[1];
         ItemEntity[] loose = new ItemEntity[1];
         List<Consumer<BlockEvent.BreakEvent>> claims = new ArrayList<>();
@@ -1223,6 +1231,9 @@ public final class MagnetPullTests {
                 check(seen(helper, magneto, chest.getX(), chest.getY(), chest.getZ()) && seen(helper, magneto, barrel.getX(), barrel.getY(), barrel.getZ()),
                         "he sees the chest and the barrel");
                 check(!seen(helper, magneto, hiddenChest.getX(), hiddenChest.getY(), hiddenChest.getZ()), "but not the chest behind the wall");
+                check(Raycasts.inSight(magneto, fixedFrame.position().add(0, fixedFrame.getBbHeight() * 0.5, 0))
+                        && Raycasts.inSight(magneto, lockedStand.position().add(0, lockedStand.getBbHeight() * 0.5, 0)),
+                        "he sees the fixed frame and the locked stand");
                 sneakR(magneto);
                 return false;
             }
@@ -1246,6 +1257,9 @@ public final class MagnetPullTests {
                             "the stand's chestplate is his; the stand stays");
                     check(container(helper, barrel).getItem(0).getCount() == 4, "the fisherman's barrel keeps its iron");
                     check(container(helper, hiddenChest).getItem(0).getCount() == 3, "the chest behind the wall keeps its iron");
+                    check(fixedFrame.getItem().is(Items.IRON_SWORD), "the fixed frame keeps its sword");
+                    check(lockedStand.getItemBySlot(EquipmentSlot.CHEST).is(Items.IRON_CHESTPLATE),
+                            "the locked stand keeps its chestplate");
 
                     // A claim on the armour stand's cell only: the section round it is anyone's, so only the stand's own
                     // break check can refuse it.
@@ -1406,8 +1420,9 @@ public final class MagnetPullTests {
     /**
      * M24. An Iron Golem without AI, 7 blocks away and alone in reach: the pull tugs it at least 2 blocks nearer, unhurt and
      * not set against him, and the tug costs (he rests, one hunger point, Sneak + R says recharging). Rested: an empty
-     * minecart and a TNT minecart come as their items (the TNT without going off); a chest minecart with dirt in it, a
-     * minecart a zombie rides and the command block minecart stay; another player's drone, with PvP off, is not tugged.
+     * minecart and a TNT minecart come as their items (the TNT without going off; the minecart with the name it was
+     * given); a chest minecart with dirt in it, a minecart a zombie rides and the command block minecart stay; another
+     * player's drone, with PvP off, is not tugged.
      */
     @GameTest(template = ARENA, batch = PULL, timeoutTicks = 240)
     public static void thePullTugsGolemsAndTakesEmptyCarts(GameTestHelper helper) {
@@ -1440,6 +1455,7 @@ public final class MagnetPullTests {
                 stage[0] = 1;
             } else if (stage[0] == 1 && data.isReady(1, now)) {
                 carts[0] = cart(helper, EntityType.MINECART, new Vec3(13.5, FLOOR, 8.5));
+                carts[0].setCustomName(Component.literal("Rusty"));
                 carts[1] = cart(helper, EntityType.TNT_MINECART, new Vec3(7.5, FLOOR, 13.5));
                 MinecartChest chest = cart(helper, EntityType.CHEST_MINECART, new Vec3(13.5, FLOOR, 12.5));
                 chest.setItem(0, new ItemStack(Items.DIRT, 5));
@@ -1457,6 +1473,10 @@ public final class MagnetPullTests {
                 stage[0] = 2;
             } else if (stage[0] == 2 && !MagnetPull.isPulling(magneto)) {
                 check(!carts[0].isAlive() && count(magneto, Items.MINECART) == 1, "the empty minecart is his, as its item");
+                ItemStack named = magneto.getInventory().items.stream().filter(stack -> stack.is(Items.MINECART))
+                        .findFirst().orElseThrow();
+                check(Component.literal("Rusty").equals(named.get(DataComponents.CUSTOM_NAME)),
+                        "and it keeps its name: " + named.getHoverName().getString());
                 check(!carts[1].isAlive() && count(magneto, Items.TNT_MINECART) == 1, "the TNT minecart is his");
                 for (int dx = -2; dx <= 2; dx++) {
                     for (int dz = -2; dz <= 2; dz++) {

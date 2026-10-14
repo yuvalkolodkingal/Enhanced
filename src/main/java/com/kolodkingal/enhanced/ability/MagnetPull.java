@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -869,11 +870,13 @@ public final class MagnetPull {
     /**
      * What the pull would do to this entity (D-M 4.2, 4.3), or null: never anything to one any telekinesis holds, the
      * Sokovia lift carries, that rides or is ridden. A dropped metal item he could pick up by hand and has room for (never
-     * a drop a fight keeps for a dead fighter); a metal arrow or trident lying stuck that anyone may pick up; a falling or
-     * loose lifted metal block; an empty minecart (never the command block one); a Loki illusion holding or wearing metal;
-     * a creature he may fight wearing or holding metal, or a boss ({@code magneto.pullTakesGear}); a player he may hurt
-     * ({@link #wantsPlayer}); a metal body he may tug ({@link #mayTug}); and, with {@code magneto.pullFromStorage}, an item
-     * frame or an armour stand with metal on it. Nothing that belongs to a fight but its creatures' gear.
+     * a drop a fight keeps for a dead fighter); a metal arrow or trident lying stuck that walking over it would give
+     * him ({@link #isStuckMetal}); a falling or loose lifted metal block; an empty minecart (never the command block
+     * one); a Loki illusion holding or wearing metal; a creature he may fight wearing or holding metal, or a boss
+     * ({@code magneto.pullTakesGear}); a player he may hurt ({@link #wantsPlayer}); a metal body he may tug ({@link
+     * #mayTug}); and, with {@code magneto.pullFromStorage}, an item frame or an armour stand with metal on it that no
+     * map maker's lock (a fixed frame, a stand's disabled slot) keeps from a hand. Nothing that belongs to a fight but
+     * its creatures' gear.
      */
     @Nullable
     private static Act actOn(ServerPlayer player, Entity e) {
@@ -910,13 +913,27 @@ public final class MagnetPull {
         }
         if (EnhancedConfig.PULL_FROM_STORAGE.get()) {
             if (e instanceof ItemFrame frame) {
-                return Metal.isMetalItem(frame.getItem()) ? Act.FRAME : null;
+                // A fixed frame (a map maker's lock) gives its item to no hand, so to no pull either.
+                return !frame.fixed && Metal.isMetalItem(frame.getItem()) ? Act.FRAME : null;
             }
             if (e instanceof ArmorStand stand) {
-                return wearsMetal(stand) ? Act.STAND : null;
+                for (EquipmentSlot slot : EquipmentSlot.values()) {
+                    if (standGives(stand, slot)) {
+                        return Act.STAND;
+                    }
+                }
             }
         }
         return null;
+    }
+
+    /**
+     * Whether this slot of the armour stand holds metal a hand could take: not a slot that its {@code DisabledSlots}
+     * lock (a map maker's) closes, whether wholly or only against taking out.
+     */
+    private static boolean standGives(ArmorStand stand, EquipmentSlot slot) {
+        int flag = slot.getFilterFlag();
+        return (stand.disabledSlots & (1 << flag | 1 << flag + 8)) == 0 && Metal.isMetalItem(stand.getItemBySlot(slot));
     }
 
     /**
@@ -1186,12 +1203,23 @@ public final class MagnetPull {
         IItemHandler items = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
         if (items != null) {
             for (int slot = 0; slot < items.getSlots(); slot++) {
-                if (Metal.isMetalItem(items.getStackInSlot(slot))) {
-                    ItemStack out = items.extractItem(slot, items.getStackInSlot(slot).getCount(), true);
-                    int moved = addWhatFits(player, out.copy());
-                    if (moved > 0) {
-                        came.add(items.extractItem(slot, moved, false));
-                    }
+                ItemStack there = items.getStackInSlot(slot);
+                if (!Metal.isMetalItem(there)) {
+                    continue;
+                }
+                int fits = Math.min(there.getCount(), room(player.getInventory(), there));
+                // Only what really came out is given: a mod's store may hand out less than it promised.
+                ItemStack out = fits > 0 ? items.extractItem(slot, fits, false) : ItemStack.EMPTY;
+                if (out.isEmpty()) {
+                    continue;
+                }
+                ItemStack rest = out.copy();
+                int moved = addWhatFits(player, rest);
+                if (moved > 0) {
+                    came.add(out.copyWithCount(moved));
+                }
+                if (!rest.isEmpty()) {
+                    dropAtFeet(player, items.insertItem(slot, rest, false)); // back where it was, or at his feet
                 }
             }
         }
@@ -1241,6 +1269,7 @@ public final class MagnetPull {
             }
             case CART -> {
                 ItemStack item = ((AbstractMinecart) e).getPickResult();
+                item.set(DataComponents.CUSTOM_NAME, e.getCustomName()); // a named cart keeps its name, as when broken
                 e.discard(); // not destroyed: a TNT cart does not go off, and an empty one has nothing to spill
                 yield Taken.giving(List.of(item));
             }
@@ -1387,12 +1416,12 @@ public final class MagnetPull {
         return Taken.moved(List.of(came));
     }
 
-    /** An armour stand's metal comes as far as it fits; the stand stays. */
+    /** An armour stand's metal comes as far as it fits, but never from a locked slot; the stand stays. */
     private static Taken takeFromStand(ServerPlayer player, ArmorStand stand) {
         List<ItemStack> came = new ArrayList<>();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack stack = stand.getItemBySlot(slot);
-            if (Metal.isMetalItem(stack)) {
+            if (standGives(stand, slot)) {
                 ItemStack rest = stack.copy();
                 int moved = addWhatFits(player, rest);
                 if (moved > 0) {
@@ -1467,15 +1496,23 @@ public final class MagnetPull {
             if (rest.isEmpty()) {
                 continue;
             }
-            ItemEntity drop = new ItemEntity(job.level, player.getX(), player.getY(), player.getZ(), rest);
-            drop.setDeltaMovement(Vec3.ZERO);
-            drop.setDefaultPickUpDelay();
-            job.level.addFreshEntity(drop);
+            dropAtFeet(player, rest);
             if (!job.toldFull) {
                 job.toldFull = true;
                 player.displayClientMessage(Component.translatable("message.enhanced.pull.full"), true);
             }
         }
+    }
+
+    /** Drops a stack at his feet, with no motion and the usual pickup delay (nothing, if it is empty). */
+    private static void dropAtFeet(ServerPlayer player, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        ItemEntity drop = new ItemEntity(player.level(), player.getX(), player.getY(), player.getZ(), stack);
+        drop.setDeltaMovement(Vec3.ZERO);
+        drop.setDefaultPickUpDelay();
+        player.level().addFreshEntity(drop);
     }
 
     /**
