@@ -42,6 +42,8 @@ public enum GestureId {
     MAG_DISARM(Group.CAST, 14, 1, 6, false),
     MAG_SHIELD_ON(Group.CAST, 18, 3, 7, false),
     MAG_SHIELD_OFF(Group.CAST, 10, 1, 5, false),
+    /** Magneto's Magnetic Pull (Sneak + R holding nothing): the arms flung wide, then both fists drawn in to the chest. */
+    MAG_PULL(Group.CAST, 20, 2, 7, false),
 
     WANDA_BEAM_KICK(Group.CAST, 8, 1, 4, true),
     WANDA_SHIELD_RAISE(Group.CAST, 18, 2, 3, true),

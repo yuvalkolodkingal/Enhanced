@@ -96,6 +96,7 @@ public final class GestureEffects {
             case WANDA_HEX_RISE -> add(player, now, now + 8, now + 36, Kind.HEX_RISE);
             case LOKI_CAST -> add(player, now, now + 3, now + 9, Kind.CAST_HAND);
             case MAG_DISARM -> add(player, now, now + 5, now + 8, Kind.CAST_HAND);
+            case MAG_PULL -> add(player, now, now + 5, now + 12, Kind.CAST_HAND);
             case BILLY_FREEZE_CAST -> add(player, now, now + 5, now + 20, Kind.CAST_BOTH);
             case TOMMY_ACCEL -> add(player, now, now + 2, now + 7, Kind.VIBRATE_HAND);
             default -> {

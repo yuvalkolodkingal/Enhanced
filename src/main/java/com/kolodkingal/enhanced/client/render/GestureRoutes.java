@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
 
 /**
@@ -91,6 +92,17 @@ public final class GestureRoutes {
         return !flagUp && (seenUp || sinceStart > SHIELD_DATA_GRACE);
     }
 
+    /**
+     * The gesture Magneto's own key press starts before the server answers ({@link GestureTable#predicted}), or null:
+     * Sneak + R with R holding nothing and the pull rested is the Magnetic Pull ({@link GestureId#MAG_PULL}). A rider's
+     * press is never predicted (vanilla owns his body then). The client does not know the server's second of grace after
+     * a grip, nor the short wait after a pull that found nothing: a press the server ignores then shows the gesture to him
+     * alone, as any predicted gesture the server turns down.
+     */
+    public static GestureId magnetoPredicted(PowerData data, int ability, long now, boolean sneaking) {
+        return ability == 1 && sneaking && data.heldEntityId() == -1 && data.isReady(1, now) ? GestureId.MAG_PULL : null;
+    }
+
     /** The gesture an ability's cooldown starting stands for, or null. {@code left} is the cooldown in ticks. */
     public static GestureId cooldown(Power power, int ability, long left) {
         HeroClient hero = HeroClients.of(power); // (the heroes of 3.0 answer for themselves)
@@ -98,7 +110,8 @@ public final class GestureRoutes {
             return hero.cooldownGesture(ability, left);
         }
         return switch (power) {
-            case MAGNETO -> ability == 3 ? GestureId.MAG_DISARM : null;
+            // R's cooldown is the Magnetic Pull's alone (it starts only when a pull affected something).
+            case MAGNETO -> ability == 1 ? GestureId.MAG_PULL : ability == 3 ? GestureId.MAG_DISARM : null;
             case QUICKSILVER -> ability == 2 ? GestureId.QS_BLITZ : ability == 3 ? GestureId.QS_SNATCH : null;
             case TOMMY -> switch (ability) {
                 case 2 -> GestureId.TOMMY_BLITZ;
@@ -228,6 +241,7 @@ public final class GestureRoutes {
      */
     public static String acting(Power power, int ability) {
         return switch (power) {
+            // (Sneak + R, the Magnetic Pull, is the cooldown of R: MAG_PULL.)
             case MAGNETO -> switch (ability) {
                 case 1 -> "held";
                 case 2 -> "flag:SHRAPNEL";

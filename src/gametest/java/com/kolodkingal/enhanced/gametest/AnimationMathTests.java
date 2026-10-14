@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.client.render.HeroPoses;
 import com.kolodkingal.enhanced.client.render.StancePoses;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -811,6 +812,67 @@ public final class AnimationMathTests {
         check(GestureRoutes.cooldown(Power.LOKI, 1, 8) == GestureId.LOKI_DAGGER && GestureRoutes.cooldown(Power.LOKI, 1, 30) == GestureId.LOKI_FAN,
                 "Loki's two cooldowns tell a dagger from a fan");
         helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Magneto's Magnetic Pull (3.1, D-M 8.3)
+
+    /**
+     * M41. The Magnetic Pull has a gesture of its own: R's cooldown starting plays it for everyone (it starts only when a
+     * pull affected something), as V's plays the strip; his own Sneak + R starts it at once, but only when R holds nothing
+     * and the pull is rested. R itself is still acted by the grab and the fling. The keys fling both arms wide and up at
+     * tick 5, then draw both fists in to the chest with a lean back of 4 degrees at tick 12.
+     */
+    @GameTest(template = ARENA)
+    public static void thePullHasAGesture(GameTestHelper helper) {
+        check(GestureRoutes.cooldown(Power.MAGNETO, 1, 100) == GestureId.MAG_PULL, "R's cooldown is the pull's");
+        check(GestureRoutes.cooldown(Power.MAGNETO, 3, 60) == GestureId.MAG_DISARM, "V's is still the strip's");
+        check(GestureRoutes.cooldown(Power.MAGNETO, 2, 100) == null && GestureRoutes.cooldown(Power.MAGNETO, 4, 100) == null
+                && GestureRoutes.cooldown(Power.MAGNETO, 5, 100) == null, "no other key of his has a cooldown gesture");
+        check(GestureRoutes.acting(Power.MAGNETO, 1).equals("held"), "R is still acted by the grab and the fling");
+
+        // His own press: the client's copy of his data says whether the server will pull.
+        PowerData data = new PowerData();
+        long now = 1000L;
+        check(GestureRoutes.magnetoPredicted(data, 1, now, true) == GestureId.MAG_PULL, "Sneak + R, holding nothing, rested: the pull at once");
+        check(GestureRoutes.magnetoPredicted(data, 1, now, false) == null, "R without Sneak reaches for one thing: no pull");
+        for (int ability = 2; ability <= 5; ability++) {
+            check(GestureRoutes.magnetoPredicted(data, ability, now, true) == null, "Sneak + key " + ability + " is not the pull");
+        }
+        data.setHeldEntityId(42);
+        check(GestureRoutes.magnetoPredicted(data, 1, now, true) == null, "holding something, Sneak + R sets it down: no pull");
+        data.setHeldEntityId(-1);
+        data.startCooldown(1, now, 100);
+        check(GestureRoutes.magnetoPredicted(data, 1, now + 99, true) == null, "recharging: the server only says so, no gesture");
+        check(GestureRoutes.magnetoPredicted(data, 1, now + 100, true) == GestureId.MAG_PULL, "rested again: the pull");
+
+        // Its timing and its keys.
+        GestureId pull = GestureId.MAG_PULL;
+        check(pull.group == GestureId.Group.CAST && pull.dur == 20 && pull.attack == 2 && pull.release == 7 && !pull.force,
+                "a cast of 20 ticks, attack 2, release 7");
+        Gestures.Def def = Gestures.get(pull);
+        check(def != null && def.problems().isEmpty(), "MAG_PULL has keys, in order");
+        Gestures.ArmKey wide = armKeyAt(def.m, 5);
+        Gestures.ArmKey wideOff = armKeyAt(def.o, 5);
+        check(wide != null && wideOff != null && wide.x <= -110 && wide.z >= 45 && wideOff.x <= -110 && wideOff.z <= -45,
+                "at tick 5 both arms are flung wide and up");
+        Gestures.ArmKey fist = armKeyAt(def.m, 12);
+        Gestures.ArmKey fistOff = armKeyAt(def.o, 12);
+        check(fist != null && fistOff != null && fist.x > -90 && fist.x < -60 && fist.y < -20 && fistOff.y > 20,
+                "at tick 12 both fists are drawn in to the chest");
+        assertNear(def.lean.scalar(12, 0), -4.0, 1.0E-4, "with a lean back of 4 degrees");
+        assertNear(def.lean.scalar(20, 0), 0.0, 1.0E-4, "and let go into the stance at its end");
+        helper.succeed();
+    }
+
+    /** The arm key at tick {@code t}, or null. */
+    private static Gestures.ArmKey armKeyAt(List<Gestures.ArmKey> keys, float t) {
+        for (Gestures.ArmKey key : keys) {
+            if (Math.abs(key.t - t) < 1.0E-4F) {
+                return key;
+            }
+        }
+        return null;
     }
 
     private static void add(java.util.Set<GestureId> used, GestureId id) {

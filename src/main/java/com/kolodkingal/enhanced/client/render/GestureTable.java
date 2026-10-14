@@ -345,6 +345,9 @@ public final class GestureTable {
      */
     static GestureId predicted(HeroAnimState s, PowerData data, int ability, long now, boolean hasOwnHex, boolean sneaking) {
         switch (s.power) {
+            case MAGNETO -> {
+                return GestureRoutes.magnetoPredicted(data, ability, now, sneaking);
+            }
             case SCARLET_WITCH -> {
                 if (ability == 4 && !data.chaosShieldActive() && data.isReady(4, now)) {
                     return GestureId.WANDA_SHIELD_RAISE;
