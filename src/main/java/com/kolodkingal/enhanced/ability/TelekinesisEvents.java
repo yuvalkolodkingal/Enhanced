@@ -2,7 +2,9 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.ArenaLoans;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -10,10 +12,12 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 /**
  * The game-bus events of telekinesis in 3.1 (every form: Wanda, Billy, the Phoenix, Magneto), in a class of their own so
- * that they compose with the 3.0 chain of {@code CommonEvents} by priority (spec 5.6).
+ * that they compose with the 3.0 chain of {@code CommonEvents} by priority (spec 5.6): the landing guard, and the saves of
+ * the world that the journals of the arenas' loans wait for.
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class TelekinesisEvents {
@@ -33,6 +37,17 @@ public final class TelekinesisEvents {
         DamageSource source = event.getSource();
         if (source.is(DamageTypeTags.IS_FALL) || source.is(DamageTypes.FLY_INTO_WALL) || source.is(ModDamageTypes.TELEKINETIC_SLAM)) {
             event.setCanceled(true);
+        }
+    }
+
+    /**
+     * A dimension was saved (R48): its chunks are queued to the disk before this event, so a repair of an arena's ground made
+     * before the save before this one is on the disk now, and its journal may forget it ({@link ArenaLoans#onSave}).
+     */
+    @SubscribeEvent
+    public static void onLevelSave(LevelEvent.Save event) {
+        if (event.getLevel() instanceof ServerLevel level) {
+            ArenaLoans.onSave(level);
         }
     }
 

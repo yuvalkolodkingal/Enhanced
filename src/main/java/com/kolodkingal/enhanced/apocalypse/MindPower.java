@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -102,13 +103,18 @@ public final class MindPower {
         return true;
     }
 
-    /** The factor of the damage's type. */
+    /**
+     * The factor of the damage's type. A slam of a block borrowed from an arena wears the shield by {@code
+     * borrowedSlamFactor} times what {@code slamFactor} gives: an arena's blocks never run out (D-T 9).
+     */
     public static float factor(DamageSource source) {
         if (source.is(ModDamageTypes.CHAOS_BEAM)) {
             return ApocalypseShieldConfig.CHAOS_BEAM_FACTOR.get().floatValue();
         }
         if (source.is(ModDamageTypes.TELEKINETIC_SLAM)) {
-            return ApocalypseShieldConfig.SLAM_FACTOR.get().floatValue();
+            float slam = ApocalypseShieldConfig.SLAM_FACTOR.get().floatValue();
+            return source.getDirectEntity() instanceof TelekineticBlockEntity block && block.isBorrowed()
+                    ? slam * ApocalypseShieldConfig.BORROWED_SLAM_FACTOR.get().floatValue() : slam;
         }
         if (source.is(ModDamageTypes.PHOENIX_BURST)) {
             return ApocalypseShieldConfig.PHOENIX_BURST_FACTOR.get().floatValue();

@@ -35,6 +35,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import com.kolodkingal.enhanced.ability.BlockLifting;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.boss.ArenaLoans;
 import com.kolodkingal.enhanced.boss.BossFights;
 
 import java.util.UUID;
@@ -45,6 +46,11 @@ import java.util.UUID;
  * like sand and becomes a block again where the one who let go of it may place one ({@link BlockLifting#mayPlace});
  * otherwise it drops as an item. It glows in the colour of the telekinesis that holds it: Wanda's red, Billy's blue,
  * Jean's violet.
+ *
+ * <p>A block torn out of a boss's protected arena is <em>borrowed</em> ({@link #isBorrowed}: it carries the fight's mark,
+ * {@link ArenaLoans}): it never drops anything. Thrown, it turns to dust where it hits, and at the edge of a gated arena;
+ * set down, it stands for a while under the arena's rules, or crumbles at once; it never goes through a portal, and once
+ * its fight is gone (a crash) it is discarded.
  */
 public class TelekineticBlockEntity extends Entity {
     private static final EntityDataAccessor<BlockState> DATA_BLOCK =
@@ -90,6 +96,20 @@ public class TelekineticBlockEntity extends Entity {
 
     public BlockState getBlockState() {
         return entityData.get(DATA_BLOCK);
+    }
+
+    /** Who holds it, or last held or threw it (null if nobody ever did). */
+    @Nullable
+    public UUID thrower() {
+        return thrower;
+    }
+
+    /**
+     * Whether it was borrowed from a boss's protected arena ({@link ArenaLoans}): it carries the fight's mark, so it never
+     * drops anything, stands only under the arena's rules, and stays in its dimension.
+     */
+    public boolean isBorrowed() {
+        return BossFights.isMarked(this);
     }
 
     /** The colour of the telekinesis that holds (or last held) this block. */
@@ -152,6 +172,10 @@ public class TelekineticBlockEntity extends Entity {
             discard();
             return;
         }
+        if (!level().isClientSide && isBorrowed() && BossFights.fightOf(this) == null) {
+            discard(); // its fight is gone (a crash, a forced stop): what was borrowed was never this world's to keep
+            return;
+        }
         ticksSinceHeld++;
         if (isHeld()) {
             // Telekinesis moves us; nothing to simulate.
@@ -167,12 +191,20 @@ public class TelekineticBlockEntity extends Entity {
         Vec3 motion = getDeltaMovement();
 
         if (!level().isClientSide && launched) {
+            // A borrowed block thrown across the field or the wall of its arena stops there (D-T 4.5).
+            Vec3 edge = BossFights.edgeStop(this, start.add(motion));
             Vec3 center = start.add(0, getBbHeight() * 0.5, 0);
-            EntityHitResult entityHit = Raycasts.entityBetween(level(), this, center, center.add(motion), 0.3,
+            Vec3 reach = edge == null ? center.add(motion) : edge.add(0, getBbHeight() * 0.5, 0);
+            EntityHitResult entityHit = Raycasts.entityBetween(level(), this, center, reach, 0.3,
                     e -> e instanceof LivingEntity living && living.isAlive() && !living.isSpectator()
                             && !e.getUUID().equals(thrower) && !hit.contains(e.getId()));
             if (entityHit != null) {
                 hitCreature((LivingEntity) entityHit.getEntity(), motion);
+                return;
+            }
+            if (edge != null) {
+                setPos(edge.x, edge.y, edge.z);
+                shatter();
                 return;
             }
         }
@@ -221,9 +253,14 @@ public class TelekineticBlockEntity extends Entity {
     /**
      * Breaks apart with block particles and drops the block's normal loot, as mined with a bare hand. A block that was set
      * down and may not stand where it landed ({@code setDown}) gives the block itself instead when that loot is empty (glass,
-     * ice): nothing the holder carried is lost, and nothing that has a loot (an ore) becomes a free Silk Touch (R44).
+     * ice): nothing the holder carried is lost, and nothing that has a loot (an ore) becomes a free Silk Touch (R44). A
+     * borrowed block turns to dust instead: it drops nothing ({@link #crumble}).
      */
     private void shatter(boolean setDown) {
+        if (isBorrowed()) {
+            crumble();
+            return;
+        }
         if (level() instanceof ServerLevel server) {
             BlockPos pos = BlockPos.containing(getX(), getY() + 0.5, getZ());
             BlockState state = getBlockState();
@@ -240,15 +277,36 @@ public class TelekineticBlockEntity extends Entity {
     }
 
     /**
+     * A borrowed block turns to dust and is gone: the sound and the particles of a broken block, no loot, and its arena no
+     * longer counts it.
+     */
+    public void crumble() {
+        if (level() instanceof ServerLevel server) {
+            server.levelEvent(2001, BlockPos.containing(getX(), getY() + 0.5, getZ()), Block.getId(getBlockState()));
+            BossFights.borrowedGone(this);
+        }
+        discard();
+    }
+
+    /**
      * Put down gently: becomes a block again where it landed if the cell takes it and the one who let go of it may place
      * it there ({@link BlockLifting#mayPlace}: room, the arenas, his rights, never for someone who left); otherwise it
-     * drops as an item. Nothing lands on the ground the clients hide under Ultron's island in the sky.
+     * drops as an item. Nothing lands on the ground the clients hide under Ultron's island in the sky. A borrowed block
+     * stands where its arena's rules let it ({@link BossFights#standBorrowed}), and crumbles to dust anywhere else.
      */
     private void land() {
         if (!(level() instanceof ServerLevel server)) {
             return;
         }
         BlockPos pos = blockPosition();
+        if (isBorrowed()) {
+            if (BossFights.standBorrowed(this, pos)) {
+                discard();
+            } else {
+                crumble();
+            }
+            return;
+        }
         if (BossFights.hidesGround(server, pos)) {
             shatter(true);
             return;
@@ -264,6 +322,18 @@ public class TelekineticBlockEntity extends Entity {
         } else {
             shatter(true);
         }
+    }
+
+    /** A borrowed block never leaves the dimension of its arena (D-T 7). */
+    @Override
+    public boolean canChangeDimensions(Level from, Level to) {
+        return !isBorrowed() && super.canChangeDimensions(from, to);
+    }
+
+    /** ... nor even begins to go through a portal (no destination is looked for). */
+    @Override
+    public boolean canUsePortal(boolean allowPassengers) {
+        return !isBorrowed() && super.canUsePortal(allowPassengers);
     }
 
     @Override

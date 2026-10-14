@@ -52,9 +52,10 @@ import java.util.UUID;
  *     #windDown}: the boss leaves, the island lowers); only then are the arena's protection and tickets, the bars and
  *     the fight's entities let go, and the arena goes on holding its fighters. A lane that forgets is stopped after
  *     {@link #MAX_WIND_DOWN_TICKS}.</li>
- *     <li><b>The rest.</b> Two boss bars ({@link BossBars}), the arena ({@link BossArena}), the region tickets, the
- *     orphan sweep (an entity of a fight that is not running is discarded when it joins a level), rewards ({@link
- *     BossRewards}) and gifts ({@link BossGifts}).</li>
+ *     <li><b>The rest.</b> Two boss bars ({@link BossBars}), the arena ({@link BossArena}) and the blocks it lends to
+ *     block telekinesis ({@link ArenaLoans}, all given back when the fight finishes), the region tickets, the orphan sweep
+ *     (an entity of a fight that is not running is discarded when it joins a level), rewards ({@link BossRewards}) and
+ *     gifts ({@link BossGifts}).</li>
  * </ul>
  *
  * <p>Everything here runs on the server thread. A lane adds its own fight entities with {@link #spawn} (or {@link
@@ -77,6 +78,7 @@ public abstract class BossFight {
     private final BossBars bars;
     private final Map<UUID, Participant> participants = new LinkedHashMap<>();
     private final List<ItemEntity> keptDrops = new ArrayList<>();
+    private final ArenaLoans loans = new ArenaLoans(this);
     private List<ChunkPos> ticketed = List.of();
 
     private ItemStack refund = ItemStack.EMPTY;
@@ -198,6 +200,25 @@ public abstract class BossFight {
     }
 
     /**
+     * Why the arena does not lend its block at {@code pos} to block telekinesis now, as a translation key the holder reads
+     * ({@link ArenaLoans}; asked after {@code boss.lendArenaBlocks}, before the ledger's own rules), or null: Ultron's ground
+     * lends nothing while it is about to rise or the island comes down, nor from under the island. Null by default.
+     */
+    @Nullable
+    protected String lendRefusal(BlockPos pos) {
+        return null;
+    }
+
+    /**
+     * Whether {@code pos} is a cell of a copy the fight made of the world (Ultron's island in the sky): it is protected
+     * whatever the config says, and a home there is never journaled (the island's own recovery clears it after a crash).
+     * None by default.
+     */
+    protected boolean isCopyCell(BlockPos pos) {
+        return false;
+    }
+
+    /**
      * Whether the fight holds {@code entity} where it is, so that no telekinesis may take it (whatever the Sokovia lift
      * carries; see {@link BossFights#isLocked}). None by default.
      */
@@ -284,6 +305,11 @@ public abstract class BossFight {
 
     public final BossBars bars() {
         return bars;
+    }
+
+    /** The blocks the arena lent to block telekinesis, and the ledger that gets them back ({@link ArenaLoans}). */
+    public final ArenaLoans loans() {
+        return loans;
     }
 
     /** Ticks since the fight began. */
@@ -512,6 +538,8 @@ public abstract class BossFight {
         if (finished || !begun) {
             return;
         }
+        // The arena's loans mend and crumble while the fight runs and while it winds down.
+        loans.tick(level.getGameTime());
         if (end != null) {
             windDownTicks++;
             // The arena holds its fighters until the ending is over (Ultron's island is lowered with them on it).
@@ -598,6 +626,12 @@ public abstract class BossFight {
         }
         finished = true;
         try {
+            // Everything the arena lent is back before the lane cleans up (D-T 5.7).
+            loans.finish();
+        } catch (RuntimeException e) {
+            Enhanced.LOGGER.error("The {} fight failed to give back its arena's blocks", kind().id(), e);
+        }
+        try {
             onFinished(forced);
         } catch (RuntimeException e) {
             Enhanced.LOGGER.error("The {} fight failed to finish", kind().id(), e);
@@ -617,6 +651,19 @@ public abstract class BossFight {
         ticketed = List.of();
         bars.close();
         BossFights.finished(this);
+    }
+
+    /**
+     * The fight is lost as a hard crash would lose it (a test of the arena's journal): its tickets and bars are let go, and
+     * nothing else is done, nothing given back.
+     */
+    final void forget() {
+        finished = true;
+        for (ChunkPos chunk : ticketed) {
+            level.getChunkSource().removeRegionTicket(kind().ticket(), chunk, arena.ticketDistance(), id, true);
+        }
+        ticketed = List.of();
+        bars.close();
     }
 
     /** The drops of a participant who died in the arena stay until the fight is over. */

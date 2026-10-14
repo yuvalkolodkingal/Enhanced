@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
  * and aims past grass and carpets at a rail or a pressure plate ({@link Raycasts#metalBlock}).
  */
 public final class BlockLifting {
+    private static final String PROTECTED = "message.enhanced.telekinesis.protected";
 
     /** @return true if Wanda lifted a block or was told why not */
     public static boolean tryLift(ServerPlayer player) {
@@ -34,7 +36,9 @@ public final class BlockLifting {
 
     /**
      * Tears out the block the player looks at, to be held in {@code mode} (the hero's own telekinesis), within the hero's
-     * reach and hardness, if the game, the arenas and the claims let him break it. Billy waits {@code
+     * reach and hardness, if the game and the claims let him break it. In a boss's protected arena the block is only
+     * borrowed, if the arena lends it ({@link BossFights#lendRefusal}): the hole mends and the block never drops anything
+     * ({@code ArenaLoans}). Billy waits {@code
      * billy.blockLiftCooldown} between two blocks (a press while his magic recharges is used up by the message). Magneto
      * takes only a metal block; at any other he is told there is no metal, and at one that is fixed in place (a bell, a
      * hopper) whether his Magnetic Pull would take it.
@@ -61,33 +65,57 @@ public final class BlockLifting {
         if (refused == null && !canLift(level, pos, state, mode)) {
             refused = "message.enhanced.telekinesis.too_strong";
         }
+        if (refused == null && BossFights.protects(level, pos)) {
+            // A boss's protected arena lends its block (D-T 5.2): its own rules first, then the rights a hand would need, the
+            // break event heard by the claims (the arena lets this one cell through).
+            refused = BossFights.lendRefusal(player, pos);
+            if (refused == null && !(BlockRights.vanillaRights(player, level, pos)
+                    && BossFights.lending(pos, () -> BlockRights.postBreak(player, level, pos, state)))) {
+                refused = PROTECTED;
+            }
+            if (refused == null) {
+                TelekineticBlockEntity borrowed = BossFights.lend(player, pos, state);
+                if (borrowed != null) {
+                    take(player, borrowed, state, mode);
+                    return true;
+                }
+                refused = PROTECTED;
+            }
+        }
+        if (refused == null && !BlockRights.mayBreak(player, level, pos, state)) {
+            refused = PROTECTED;
+        }
         if (refused != null) {
             player.displayClientMessage(Component.translatable(refused), true);
             return true;
         }
-        if (!BlockRights.mayBreak(player, level, pos, state)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.protected"), true);
-            return true;
-        }
 
-        BlockState lifted = state.hasProperty(BlockStateProperties.WATERLOGGED)
-                ? state.setValue(BlockStateProperties.WATERLOGGED, false) : state;
-        if (lifted.getBlock() instanceof PistonBaseBlock) {
-            // Its head breaks away when the base goes (and drops nothing): it is held, and set down, retracted.
-            lifted = lifted.setValue(PistonBaseBlock.EXTENDED, false);
-        }
+        // Plays the break sound and particles, leaves water behind for waterlogged blocks, drops nothing.
+        level.destroyBlock(pos, false, player);
+        TelekineticBlockEntity entity = new TelekineticBlockEntity(level, pos, heldState(state), player);
+        level.addFreshEntity(entity);
+        take(player, entity, state, mode);
+        return true;
+    }
+
+    /** The lifted block is held: piglins whose gold it was are angered, and Billy's magic needs its moment. */
+    private static void take(ServerPlayer player, TelekineticBlockEntity entity, BlockState state, Telekinesis.Mode mode) {
         if (state.is(BlockTags.GUARDED_BY_PIGLINS)) {
             PiglinAi.angerNearbyPiglins(player, false); // as breaking their gold by hand does
         }
-        // Plays the break sound and particles, leaves water behind for waterlogged blocks, drops nothing.
-        level.destroyBlock(pos, false, player);
-        TelekineticBlockEntity entity = new TelekineticBlockEntity(level, pos, lifted, player);
-        level.addFreshEntity(entity);
         Telekinesis.hold(player, entity, mode);
-        if (billy) {
+        if (mode == Telekinesis.Mode.BILLY) {
             BillyAbilities.markBlockLift(player);
         }
-        return true;
+    }
+
+    /**
+     * The state a block of the world is held as: never waterlogged (the water stays behind), and a piston retracted (its
+     * head breaks away when the base goes, and drops nothing; it is set down retracted).
+     */
+    public static BlockState heldState(BlockState state) {
+        BlockState held = state.hasProperty(BlockStateProperties.WATERLOGGED) ? state.setValue(BlockStateProperties.WATERLOGGED, false) : state;
+        return held.getBlock() instanceof PistonBaseBlock ? held.setValue(PistonBaseBlock.EXTENDED, false) : held;
     }
 
     /** Whether Wanda's telekinesis could tear this block out (her hardness, {@code scarlet_witch.blockLiftMaxHardness}). */
