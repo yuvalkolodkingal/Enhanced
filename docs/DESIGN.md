@@ -2587,8 +2587,8 @@ it happens, undo always one key away.
   letting go in the middle (a dead disc of 28 pixels) leaves it open; a click on another spell chooses it and keeps the wheel open (the style
   row, the hotbar and the Blocks page follow), a click on the chosen one closes it; **1** to **9** and **0** (the keypad too) choose the first
   ten spells by number and close it (Grow, the eleventh, has no digit); the mouse wheel steps through the spells (down = clockwise); Esc closes
-  it unchanged, and a tap of Y closes it too but, as built, the same tap also switches build mode off (a known rough edge, HEROES-AND-BOSSES
-  section 9). The wheel also carries the style row (27 pictures), Solid and Hollow for Shapes, the dice (Mix), the nine hotbar slots, the
+  it unchanged, and so does a tap of Y, which is swallowed (`BuildInput.swallowMagic`) so build mode stays on; a digit chosen while Y is
+  still held closes the wheel and the hold that goes on does not open it again. The wheel also carries the style row (27 pictures), Solid and Hollow for Shapes, the dice (Mix), the nine hotbar slots, the
   **Blocks** page, Undo and Redo with their counts, and the centre door (start or stop building). The sixth line of the hero panel is
   `[Y] Build Magic ON/OFF` (Billy's also `✦ 372/512`).
 * **Build mode ends by itself** on death, respawn, a power change, Spectator or Adventure mode, logout, and when the server turns
@@ -2658,11 +2658,12 @@ go into the inventory, undo gives back and takes back; Creative never pays; Land
 * **The ghost** is the result, in real block models, translucent (alpha 0.45) and tinted in the hero's colour, built off the main thread by the same
   pure planner as the server's; the detail cap `ghostDetail` (32,768) draws only the outside past it and a tinted box past four times that. **The
   server's marks** (preflight, at most 4 a second and 2 ms, **no event posted**): red cross = protected, yellow = a chest that stays, white = someone
-  stands there, grey = not loaded; the ghost round them is grey; a plan the server refuses whole (an arena, say) is a grey ghost and the right button fizzles; one whose every
-  cell is merely protected still casts and then says how many blocks stayed.
+  stands there, grey = not loaded; the ghost round them is grey; a plan the server refuses whole (an arena, or a plan whose every checked cell is left: the refusal `NOTHING_CAN_CHANGE` = 41, `Preview.nothingCanChange`, which needs the whole plan
+  checked, not a sample) is a grey ghost and the right button fizzles before a job, a cast sound, a charge or a history step exist; the `left.*` line says what stayed.
 * **The badge** next to the crosshair: material, size, spell and style, Billy's meter with the cost of the ghost as a darker chunk (orange with a clock when
   more than he has now, red and a grey ghost when more than his whole meter, a scarlet stripe and "½" with Mom), Wanda's ∞. **Rings**: the hold ring (20 ticks, or 40
   over a million blocks, red for removals) and the progress ring. A done pop `✓ 140` for 40 ticks. The crosshair becomes a rune; the screen's edges take a faint tint.
+* **The lines** the game says (`message.enhanced.build.*`) are at most 56 characters, each `%s` counted as 6 (`DataTests.everyBuildMagicLineIsShortEnoughToReadWhole`), plural-safe (a count after a colon, or `block(s)`), so they read whole at 854×480; the action bar's line is moved left until it ends before the hint strip (`BuildHud` on the overlay message's layer events, with access-transformer entries for `Gui.overlayMessageString` and `overlayMessageTime`). The hold rows of the strip say the spell's own verbs (Repeat keeps copies and gap; raise, lower, smooth; grow, shrink, bloom), and a scroll gesture keeps the face it pushes (notches within 20 ticks, the look within about 5 degrees, the same box).
 * **The hint strip** (bottom right): three to five rows of little pictures of the input and one or two words for the current spell and state
   (pure `BuildHints.lines`); **tips** (a three-second picture the first times a spell is chosen and when something does nothing; `tips`).
 * **The wheel** (18.1): a ring of eleven 40×40 pictures clockwise from the top in the order of the table, the centre disc *Start/Stop building*, undo and redo with their
@@ -2679,7 +2680,7 @@ go into the inventory, undo gives back and takes back; Creative never pays; Land
   `build_on_billy` ("A spellbook opens", 0.8 s, a paper flutter and two glassy notes), `build_cast_wanda` ("Chaos magic rewrites reality", 1.0 s), `build_cast_billy` ("A spell crackles", 0.8 s),
   `build_hum` ("Magic weaves", 1.0 s, every 20 ticks at the front of a working spell, pitched lower for Wanda and higher for Billy), `build_fizzle` ("A spell fizzles", 0.4 s, only the builder
   hears it), `build_undo` ("Reality snaps back", 0.8 s, the cast chord backwards) and `build_rank_up` ("Billy learns new magic", 1.6 s, five rising notes and a sparkle). A Scarlet Witch spell of
-  `BuildSounds.HUGE_CAST` (100,000) blocks or more plays her `HEX_RISE` instead of `build_cast_wanda`; the done sound is the game's `AMETHYST_CLUSTER_PLACE`, and the builder's UI sounds
+  `BuildSounds.HUGE_CAST` (100,000) blocks or more plays her `HEX_RISE` instead of `build_cast_wanda`; the cast, the hum and the undo are played at the caster (the hum also at the spell's front when that is more than 16 blocks from him); the done sound is the game's `AMETHYST_CLUSTER_PLACE`, and the builder's UI sounds
   (corners, clicks, the hold ring, the wheel) are the game's own. The ninth new file is not Build Magic's: `apocalypse_crit` ("Critical hit on Apocalypse", 0.5 s, a heavy glassy crack with a low gong under it),
   played by `CritSound`. All nine are heard in game with their subtitles. **Pictures:** 45 PNGs in `textures/gui/build/`: a 32×32 picture for each spell (`fill`, `vanish`, `change`, `paint`,
   `pull`, `shape`, `copy`, `move`, `repeat`, `land`, `grow`), one for each of the nineteen styles (`<spell>_<n>.png`, n = the style's ordinal: `fill_0` to `fill_5`, `vanish_0` to `vanish_3`, `change_0` to

@@ -25,8 +25,8 @@ Xaero's Minimap also uses **Y** by default. Rebind one of the two in *Options, C
 Hold **Y** and a ring of eleven pictures opens round your crosshair, one for each spell, clockwise from the top: Fill, Vanish, Change, Paint, Pull & Push, Shapes, Copy, Move, Repeat, Land and Grow. Point at one and its name and a line about it appear in the middle. The game does not pause, so everyone can still see you.
 
 * **Choose with the mouse.** Move onto a picture and **let go of Y**: that spell is chosen and the wheel closes. Let go in the middle and the wheel stays open: click a picture to choose it. A click on another spell chooses it and the wheel stays open, so you can pick its style next; a click on the chosen spell closes the wheel.
-* **Choose with the keys.** **1** to **9** choose the first nine spells and **0** the tenth (Land), and the wheel closes. Grow, the eleventh, has no number: use the mouse. The **mouse wheel** steps from spell to spell (down is clockwise).
-* **Esc** closes the wheel and changes nothing. (**Y** closes it too, but in this version that tap of Y also switches build mode off, so press it once more.)
+* **Choose with the keys.** **1** to **9** choose the first nine spells and **0** the tenth (Land), and the wheel closes (also while Y is still held; the hold does not open it again). Grow, the eleventh, has no number: use the mouse. The **mouse wheel** steps from spell to spell (down is clockwise).
+* **Esc** closes the wheel and changes nothing. A tap of **Y** closes it too, and build mode stays on.
 * **The right side** shows the styles of the chosen spell (Solid, Walls, Room... for Fill; Ball, Dome... for Shapes, with a Solid or Hollow switch). Under the ring are the **dice** (Mix), your nine hotbar slots, and the **Blocks** button.
 * **The left side** has **Undo** and **Redo** with how many steps each holds (grey at 0). The **door** in the middle starts or stops building.
 * **Over the ring** Wanda's says "Chaos Magic" and "∞"; Billy's shows his name, his stars and rank, his meter and how many blocks of magic he still needs for the next rank.
@@ -191,12 +191,12 @@ Grow works on whole blocks only: chests, furnaces and anything else that holds t
 
 * **The ghost** is the result, in see-through blocks tinted in your colour, before you cast. It is the same plan the server will build, so what you see is what you get (unless the world changes in between; then the server's world is the truth). Very big ghosts are drawn from the outside only.
 * **The badge** next to your crosshair shows your material, the size, the spell and style, and Billy's meter (see below). Over the whole world the crosshair turns into a little rune in your colour.
-* **The server's marks.** The server looks at the spell before you cast it and puts small marks on places that will be **left alone**: a **red cross** is protected (a boss arena, spawn, a claim), a **yellow** cube is a chest with things in it, **white** means someone stands there, **grey** is a place that is not loaded. The ghost round them turns grey. If the server would refuse the whole spell (a box inside a boss arena, say), the whole ghost goes grey and the right button only fizzles.
+* **The server's marks.** The server looks at the spell before you cast it and puts small marks on places that will be **left alone**: a **red cross** is protected (a boss arena, spawn, a claim), a **yellow** cube is a chest with things in it, **white** means someone stands there, **grey** is a place that is not loaded. The ghost round them turns grey. If the server would refuse the whole spell (a box inside a boss arena, or every block of it protected), the whole ghost goes grey and the right button only fizzles: "A spell fizzles", no cast sound, nothing taken from Billy's meter and nothing in your undo history, and the game says how many blocks were left alone.
 * **The rings.** Round your crosshair, a ring fills while you hold the right button for a big spell (red for blocks that disappear), another shows your spell's progress while it works.
 * **Tips.** The first times you use a spell, and whenever you do something that does nothing, a small card plays a three-second picture of what to press.
 * **Other builders.** Everyone sees a builder's box as thin edges in his colour within 64 blocks, and sees his spells grow: a glowing frame and a ripple sweeping the spell, sparkles, and for Billy a Hex Bolt arc from his hand. A thin scarlet thread runs from Wanda's hand to Billy's when she is helping him.
 
-* **Sounds.** Eight moments have a sound of their own, with a subtitle: build mode on (a different one for each hero), a spell cast (Wanda's, Billy's), the hum while a big spell works, a refusal (a short "pfft", only for the builder), an undo or redo, and Billy's rank-up. The little sounds of the corners and clicks are the game's own.
+* **Sounds.** Eight moments have a sound of their own, with a subtitle: build mode on (a different one for each hero), a spell cast (Wanda's, Billy's), the hum while a big spell works, a refusal (a short "pfft", only for the builder), an undo or redo, and Billy's rank-up. The cast, the hum and the undo are heard at the builder, so you hear your own spell however big it is (the hum also where the spell is working). The lines the game says (the action bar) are short and stand to the left of the hint strip, so you can read them whole. The little sounds of the corners and clicks are the game's own.
 
 Every one of these can be switched off in *Mods, Enhanced, Config, Build Magic* (see [Server Configuration](Server-Configuration#client-options-animations-effects-and-looks)).
 
@@ -215,7 +215,7 @@ Billy has every spell from the first minute. What grows is **how big**.
 | 3 **Sorcerer** | 8,000 | 2,048 | 32 a second | 40 | 40 | 14 | 16 | 5 |
 | 4 **Wiccan** | 30,000 | 4,096 | 40 a second | 48 | 48 | 16 | 20 | 6 |
 
-Each rank adds the same step to the Apprentice's numbers: the meter **doubles** (512, 1,024, 2,048, 4,096), the refill grows by half of the first (16, 24, 32, 40 a second), the longest side and the reach grow by **8 blocks**, he can undo **2** more spells and Repeat **4** more copies, and the brush is an eighth of the side. A server can change all of it (see [Server Configuration](Server-Configuration#build-magic)), and an operator can set a rank with `/enhanced build rank`. Rank 1 fills the meter from empty in 32 seconds. When you rank up, your crown flares white, runes spin round you, everyone near hears a fanfare, and the meter fills to its new top as a gift: *"You learned more magic! Rank 2: Spellcaster."*
+Each rank adds the same step to the Apprentice's numbers: the meter **doubles** (512, 1,024, 2,048, 4,096), the refill grows by half of the first (16, 24, 32, 40 a second), the longest side and the reach grow by **8 blocks**, he can undo **2** more spells and Repeat **4** more copies, and the brush is an eighth of the side. A server can change all of it (see [Server Configuration](Server-Configuration#build-magic)), and an operator can set a rank with `/enhanced build rank`. Rank 1 fills the meter from empty in 32 seconds. When you rank up, your crown flares white, runes spin round you, everyone near hears a fanfare, and the meter fills to its new top as a gift: *"More magic! Rank 2: Spellcaster."*
 
 **Mom's help.** When a Scarlet Witch (any player with her power, alive, not in Spectator mode and in the same world) is within **16 blocks**, your spell costs **half** (rounded up). A thin scarlet thread runs from her hand to yours, the badge shows a scarlet stripe and "½", and the first time it says *"Mom is near: your magic costs half."* Your practice still counts the real blocks. Wanda just has to be there.
 
@@ -223,8 +223,8 @@ What Billy is told, and what to do:
 
 | When | He sees | What to do |
 |---|---|---|
-| Not enough magic *right now* | an orange chunk on the meter and a clock, "Your magic is refilling: 7 more seconds" | wait |
-| Too big for the *whole* meter | a grey ghost, "Bigger than your magic yet: 530 of 512" | make it smaller, a hollow style, or cast it near Mom |
+| Not enough magic *right now* | an orange chunk on the meter and a clock, "Your magic is refilling: 7 more second(s)" | wait |
+| Too big for the *whole* meter | a grey ghost, the badge shows "530 / 512 ✦", "Too big for now. Try smaller, hollow, or stand by Mom" | make it smaller, a hollow style, or cast it near Mom |
 | Longer than his side | the side stops growing, "Too big for you yet: at most 24 blocks on a side" | smaller, or practise |
 | Too far | "Too far for your magic (at most 24 blocks)" | go closer |
 | One spell at a time | "Wait for your spell to finish" (and a pause of half a second after each) | wait |
@@ -256,13 +256,13 @@ Under it there is only **technical safety**, so the game never freezes. You do n
 3. otherwise your newest spell is undone, the ripple running backwards;
 4. "Nothing to undo".
 
-Undo is **safe**. It puts a block back only if the block is still exactly what the spell made: if a sister built a door into your wall since then, or someone put things into a chest Wanda stamped, those blocks stay, and the game says *"3 blocks changed since then stay as they are."* Undo never destroys anyone's later work. If part of the area has become protected since, those blocks stay in the step and you can try again later. Undo does not bring back what the world did by itself afterwards (water that flowed, redstone that powered), nor items a spill dropped.
+Undo is **safe**. It puts a block back only if the block is still exactly what the spell made: if a sister built a door into your wall since then, or someone put things into a chest Wanda stamped, those blocks stay, and the game says *"Blocks changed since then stay as they are: 3"* Undo never destroys anyone's later work. If part of the area has become protected since, those blocks stay in the step and you can try again later. Undo does not bring back what the world did by itself afterwards (water that flowed, redstone that powered), nor items a spill dropped.
 
 ### The history on the disk
 
 Your spells are kept **on the server's disk**, in the world's folder, one folder for each player: `data/enhanced/build/<the player's id>/`. It holds a list of your spells, a file for each spell, and your pocket. So you can close the game, even the whole server, and undo tomorrow.
 
-* **Written ahead.** Before a spell changes a part of the world, what is there (and what the spell will put there) is already written to the file, a slice at a time, off the game's main thread. A crash or a power cut in the middle of even a huge spell leaves a record of every block it changed. The next time you log in the game says *"Your last spell stopped when the world closed: Ctrl + Z undoes what it did"*, and it does: each block it reached goes back if it still holds what the spell put there.
+* **Written ahead.** Before a spell changes a part of the world, what is there (and what the spell will put there) is already written to the file, a slice at a time, off the game's main thread. A crash or a power cut in the middle of even a huge spell leaves a record of every block it changed. The next time you log in the game says *"The world closed mid-spell: Ctrl + Z takes it back"*, and it does: each block it reached goes back if it still holds what the spell put there.
 * **When the server stops,** the spells still working are finished if what is left of them adds up to at most `finishOnStopBlocks` (200,000 blocks at the start); the biggest are stopped where they are, and can be undone.
 * **After a restart** your list is read when you log in, and a spell's file is read only when you press Ctrl + Z for it (a moment's wait). A spell in a world that no longer exists is dropped.
 * With `undoSurvivesRestart` off nothing is written: the history lives in memory, is lost when the server stops, and is dropped 30 minutes after you leave.
@@ -272,7 +272,7 @@ Your spells are kept **on the server's disk**, in the world's folder, one folder
 * **How many spells:** Billy 10 and 2 more a rank (up to 16); Wanda as many as fit.
 * **Memory and disk.** Each player may use 64 MiB of the server's memory and 512 MiB of its disk for the history (`undoMemoryMb`, `undoDiskMb`), and all players together 512 MiB and 4,096 MiB (`serverUndoMemoryMb`, `serverUndoDiskMb`). Past the memory limit the **oldest** spells leave memory (they stay on the disk, and come back when you undo them). Past a disk limit the oldest spell is **forgotten** (of the player using the most, for the server's limit) and you are told *"Your oldest spell can no longer be undone"*. Your newest spell is never lost to a disk limit.
 * **Huge spells ("lite steps").** While a spell works, its step is kept whole in memory, about 14 bytes for every block. A spell of more than about 4 million blocks (at the start settings) would not fit, so the server keeps only a bit for each block and lets the file's records on disk be the step. You notice nothing: it is undone like any other, read back from the disk. This needs the history to be written to disk, and the record of the spell (about half a byte for every block) to fit in your disk share, which at the start settings is hundreds of millions of blocks.
-* **Too big to remember.** If even that does not fit (the disk share is full or switched off), the game says *"Too big to remember: this one can't be undone. Hold to cast it anyway."* Holding the right button casts it without a step, and nothing can bring it back. A **Move** that does not fit is refused outright, held or not.
+* **Too big to undo later.** If even that does not fit (the disk share is full or switched off), the game says *"Too big to undo later. Hold the right button to cast it"* Holding the right button casts it without a step, and nothing can bring it back. A **Move** that does not fit is refused outright, held or not.
 
 An operator can look at any player's history and undo it with [`/enhanced build`](Commands#build-magic-enhanced-build).
 
@@ -299,7 +299,7 @@ Witches' Road doors are ordinary blocks to magic: build or vanish one and it joi
 
 **Why did my chest stay?** A container with things inside is never removed or replaced. Empty it, or Move it (a Move carries what is inside). A chest at the place a Move is going to is spared the same way.
 
-**Can I undo after the server restarted?** Yes. Your spells are on the disk; Ctrl + Z reads the newest one back. Only a spell that was "too big to remember", or one that fell off the end of the memory and disk limits, is gone.
+**Can I undo after the server restarted?** Yes. Your spells are on the disk; Ctrl + Z reads the newest one back. Only a spell that was "too big to undo later", or one that fell off the end of the memory and disk limits, is gone.
 
 **Why does my sand float?** Magic holds what it places until something touches it. Break a block next to it and it falls.
 

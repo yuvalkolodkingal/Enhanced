@@ -329,12 +329,10 @@ method, and the rules are worth keeping for the next version.
 * **Testing.** Server-wide state (`BuildScheduler`, `MagnetPull`, `Telekinesis`, `BossGrip`) gets a batch of its own and
   `TestKit.bossFixture`; a test never names a client type in a signature or lambda, and none touches a class with client-typed static
   state (the pure `MagnetStreamMath`, `BuildGrammar`, `BuildHints` are tested instead). Every merge passed the full GameTests twice in a row
-  (1,311 required tests at the end).
-* **Known rough edges of 3.1** (found by the joint check, left as they are; none loses a block): a refusal line such as "Bigger than your
-  magic yet: 517 of 512. Make it smaller, ..." is cut off at both ends of the action bar in the default window; a scroll that pushes
-  a face with the crosshair held still can switch to the near face when the pushed top has passed the eye line; after a stamp of a Copy
-  made from a double-clicked thing the ghost is dropped (Ctrl + V brings it back); a tap of Y with the wheel open closes it and also
-  switches build mode off; a hold row of the hint strip for Repeat, Land or Grow can show the wrong verb ("raise" for Lower, "grow" for
-  Shrink); a spell whose every cell is merely protected plays the cast chime before it says how many blocks stayed; the done and
-  rank-up lines are drawn through the hint strip; the cast and hum sounds play at the box, so a builder standing outside a very big
-  box does not hear them; "1 chests" and "1 layers" are not singular; a digit pressed while Y is still held leaves the wheel open.
+  (1,315 required tests at the end).
+* **The joint check's findings were all fixed** (ten, none blocking), after the lanes were merged: every line the game says is at most 56
+  characters and plural-safe, and the action bar's line stands aside from the hint strip; a scroll gesture keeps the face it pushes; the
+  Copy ghost stays for the next stamp; a tap of Y with the wheel open closes it and build mode stays on (and a digit with Y held closes
+  it for good); the hold rows say each spell's own verb; a spell whose every cell is protected is refused before it is cast
+  (`NOTHING_CAN_CHANGE`, appended as code 41: a fizzle, a grey ghost, no sound, no charge, no step); the cast, the hum and the undo are
+  heard at the caster. Four tests were added (line length, the face latch, the all-protected refusal, the sounds at the caster).

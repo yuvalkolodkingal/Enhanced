@@ -50,9 +50,9 @@ In the wheel (the game does not pause):
 | **Mouse onto a picture, then let go of Y** | Choose that spell; the wheel closes. |
 | **Let go in the middle** | The wheel stays open for clicking. |
 | **Click a picture** | Choose that spell and stay open (to pick a style); click the chosen one to close. |
-| **1** to **9**, **0** | Choose the first nine spells and the tenth (Land); the wheel closes. Grow, the eleventh, has no number. |
+| **1** to **9**, **0** | Choose the first nine spells and the tenth (Land); the wheel closes (also while Y is still held). Grow, the eleventh, has no number. |
 | **Mouse wheel** | Step from spell to spell (down is clockwise). |
-| **Esc** | Close the wheel. (**Y** closes it too, but that tap also switches build mode off.) |
+| **Esc** | Close the wheel. (A tap of **Y** closes it too, and build mode stays on.) |
 
 The wheel also has the style row, **Mix** (the dice), your nine hotbar slots, **Undo** and **Redo**, the door that starts or stops building, and **Blocks**: a page of block pictures with a search box and the last 16 you used. See [Build Magic](Build-Magic#the-spell-wheel).
 
