@@ -860,6 +860,10 @@ public final class BuildMathTests {
         Plan away = SpellPlanner.plan(yard, recipe(Spell.PAINT).op(SpellRecipe.Op.DAB).mask().at(new BlockPos(10, 64, 10), Direction.UP).size(2).build(),
                 Setup.at(CASTER).withMask(thing).withMaterial(PLANKS));
         check(away.refusal() == SpellPlanner.NONE && !away.writes() && away.size() == 0 && cells(away, yard).isEmpty(), "a dab off the thing paints nothing");
+        Plan gap = SpellPlanner.plan(yard, recipe(Spell.PAINT).op(SpellRecipe.Op.DAB).mask().at(new BlockPos(0, 65, 0), Direction.UP).size(0).build(),
+                Setup.at(CASTER).withMask(thing).withMaterial(PLANKS));
+        check(gap.refusal() == SpellPlanner.NONE && !gap.writes() && gap.size() == 0,
+                "a dab inside the thing's box that touches none of its cells plans nothing too: " + gap.writes() + ", " + gap.size());
         check(SpellPlanner.plan(yard, masked, Setup.at(CASTER).withMaterial(SPRUCE)).refusal() == BuildVerdictPayload.NO_BOX,
                 "a selected thing the planner was not handed: no box");
         helper.succeed();

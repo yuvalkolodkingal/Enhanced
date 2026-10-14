@@ -387,7 +387,11 @@ public final class SpellPlanner {
         int radius = Math.max(0, recipe.size());
         Volume ball = SpellMath.shifted(new Shape(ShapeKind.BALL, radius, 0, 1, false, 0), centre.getX(), centre.getY() - radius, centre.getZ());
         Volume cells = region == null ? ball : SpellMath.within(ball, region);
-        // A dab that misses the selected thing paints nothing.
+        // A dab that misses the selected thing paints nothing: the ball misses its box, or meets the box of a sparse
+        // thing (an L, a ring) without touching one of its cells (counted row by row, at most the ball's rows).
+        if (cells != null && region != null && cells.count() == 0) {
+            cells = null;
+        }
         return new Plan(recipe, NONE, cells, null, cells == null ? null : skin(material), Order.RISE, setup);
     }
 
@@ -775,6 +779,20 @@ public final class SpellPlanner {
                 return local == null ? null : copies.origin.offset(local);
             }
             return null;
+        }
+
+        /**
+         * The block {@code pos} gets, read against {@code level} now, or null when the plan leaves it (or does not cover
+         * it): one cell out of order, for a preflight that samples a big plan. Unlike a cursor's, it gives no data.
+         */
+        public @Nullable BlockState resolveAt(BlockGetter level, BlockPos pos) {
+            Volume volume = cells();
+            if (volume == null || rule == null || !volume.contains(pos.getX(), pos.getY(), pos.getZ())) {
+                return null;
+            }
+            Cursor cursor = new Cursor(new EmptyWalk(), rule);
+            cursor.pos.set(pos);
+            return cursor.resolve(level);
         }
 
         /** A new walk over its cells, from the first. */
