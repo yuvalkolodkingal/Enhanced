@@ -8,12 +8,15 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
+import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -43,8 +46,12 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Apocalypse, the boss: En Sabah Nur, the first mutant, 2.9 blocks tall. He is a body with a controller: this class is
@@ -60,6 +67,13 @@ import java.util.Map;
  * the cinematics always happen. Every mob effect but Glowing is refused, fire, drowning, freezing and the rest do
  * nothing, and Quicksilver Time slows him only for a while ({@link #slowFactor}: he adapts, as in the film).
  *
+ * <p>Since 3.1 (Eilon's items 8 and 9) his health never heals by itself (the fight's {@code regenPerSecond} and {@code
+ * trueFormRegenPerSecond} are 0, and the game's own healing is refused, {@link #heal(float)}), and the mind power of a
+ * Scarlet Witch or a Phoenix is <em>critical</em> ({@link MindPower#isCritical}): it wears his shield {@code
+ * critShieldFactor} times as much (their strains too) and hurts his body {@code critBodyFactor} times as much, while
+ * every other blow to his body counts {@code othersBodyFactor} times; a critical hit is seen and heard ({@link
+ * #critEffects}).
+ *
  * <p>His maximum health is more than the 1024 the game allows for fights of more than one: the attribute then holds
  * 1024, the fight's design number is {@link #designMax}, and every blow is made smaller in the same proportion, which is
  * the same fight with a smaller number. He is never saved, never despawns, and cannot be summoned.
@@ -67,6 +81,10 @@ import java.util.Map;
 public class ApocalypseEntity extends Monster implements BossHooks {
     /** The game's limit on a creature's maximum health. */
     private static final float HEALTH_LIMIT = 1024.0F;
+    /** The action-bar line of a critical hit, to its attacker: "Critical hit! x%s". */
+    public static final String CRIT_MESSAGE = "message.enhanced.apocalypse.crit";
+    /** One attacker's critical hits are seen and heard at most once in this many ticks. */
+    public static final int CRIT_EFFECT_TICKS = 10;
     /** The gold of his shield, as the particles and the neutralised projectiles of it are coloured. */
     public static final int SHIELD_GOLD = 0xF5C84A;
     /** The speed of the armoured form and of the true form. */
@@ -111,6 +129,8 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     private long adaptedUntil;
     /** When each Phoenix's touch last strained the shield ({@link MindPower#strainCounts}). */
     private final Map<String, Long> strains = new HashMap<>();
+    /** When each attacker's critical hit was last seen and heard ({@link #critEffects}). */
+    private final Map<UUID, Long> lastCritEffects = new HashMap<>();
     private boolean lightningStruck;
     /** The model viewer's copy: the tick it is shown at (-1 when this is a real boss), and whether the tick advances. */
     private float shownTick = -1.0F;
@@ -224,14 +244,22 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     }
 
     /**
-     * Heals {@code designPoints} of the design's health, never above {@code ceilingFraction} of it. (His healing while a
-     * shield is up, in the true form, and what the Escape gives back.)
+     * Heals {@code designPoints} of the design's health, never above {@code ceilingFraction} of it: his healing while a
+     * shield is up and in the true form, each 0 by default since 3.1 (only a server that sets them heals him).
      */
     public void heal(float designPoints, double ceilingFraction) {
         float ceiling = healthAt(ceilingFraction);
         if (getHealth() < ceiling) {
             super.setHealth(Math.min(ceiling, getHealth() + designPoints / designPerHealth()));
         }
+    }
+
+    /**
+     * The game's own healing (a splashed potion of Healing, whose instant effect never asks {@link #canBeAffected}, or
+     * another mod's) does nothing: his health never heals but by the fight's rules (3.1, item 8).
+     */
+    @Override
+    public void heal(float amount) {
     }
 
     /** The fraction below which no blow brings his health (0 for none). */
@@ -527,7 +555,9 @@ public class ApocalypseEntity extends Monster implements BossHooks {
             case UP -> {
                 float mind = MindPower.shieldDamage(source, amount);
                 if (mind > 0.0F) {
-                    return absorb(fight, source, mind);
+                    // A Scarlet Witch's or a Phoenix's mind power is critical: critShieldFactor times the wear.
+                    double factor = MindPower.isCritical(source) ? ApocalypseShieldConfig.CRIT_SHIELD_FACTOR.get() : 1.0;
+                    return absorb(fight, source, (float) (mind * factor), factor);
                 }
                 deflect(source);
                 return false; // exactly nothing: no damage, no knockback, no invulnerability frames
@@ -540,9 +570,16 @@ public class ApocalypseEntity extends Monster implements BossHooks {
                 if (source.is(DamageTypeTags.IS_EXPLOSION)) {
                     amount *= ApocalypseBossConfig.EXPLOSION_DAMAGE_FACTOR.get().floatValue();
                 }
+                // Their mind power is critical on his body; every other blow counts for much less (3.1, item 9).
+                boolean critical = MindPower.isCritical(source);
+                double factor = critical ? ApocalypseShieldConfig.CRIT_BODY_FACTOR.get() : ApocalypseShieldConfig.OTHERS_BODY_FACTOR.get();
                 // In his own points of health (a fight of many has more design points than the game's attribute holds); his armour,
                 // the window's quarter more and the cap of one hit come after: see getDamageAfterArmorAbsorb.
-                return super.hurt(source, amount / designPerHealth());
+                boolean hurt = super.hurt(source, (float) (amount * factor) / designPerHealth());
+                if (hurt && critical && source.getEntity() instanceof ServerPlayer attacker) {
+                    critEffects(attacker, chest(), factor);
+                }
+                return hurt;
             }
         }
     }
@@ -550,7 +587,7 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     /**
      * What a blow does to him once it has met his armour (spec 3.5.3): in a window (the shield broken, or the stagger of an
      * interrupted Escape) a quarter more, then never more than {@code maxHitFraction} of his health, so that no single
-     * blow can take a phase from him however it is made.
+     * blow can take a phase from him however it is made (a critical one neither: {@link #hurt} multiplies before this).
      */
     @Override
     protected float getDamageAfterArmorAbsorb(DamageSource source, float amount) {
@@ -561,8 +598,12 @@ public class ApocalypseEntity extends Monster implements BossHooks {
         return Math.min(after, designMax * ApocalypseBossConfig.MAX_HIT_FRACTION.get().floatValue() / designPerHealth());
     }
 
-    /** Mind power reaches the shield: it wears the shield and not his health, and may break it. */
-    private boolean absorb(ApocalypseFight fight, DamageSource source, float mind) {
+    /**
+     * Mind power reaches the shield: it wears the shield and not his health, and may break it. {@code factor} is the
+     * critical factor already in {@code mind} (1 for a hit that is not critical); a counted hit above 1 is seen and
+     * heard.
+     */
+    private boolean absorb(ApocalypseFight fight, DamageSource source, float mind, double factor) {
         if (!(source.getEntity() instanceof ServerPlayer attacker)) {
             return false;
         }
@@ -572,13 +613,16 @@ public class ApocalypseEntity extends Monster implements BossHooks {
         if (result == ApocalypseShield.Result.IGNORED) {
             return false;
         }
-        fight.onShieldWorn(attacker, Math.min(before, mind), result == ApocalypseShield.Result.BROKEN, hitPoint(source));
+        Vec3 at = hitPoint(source);
+        fight.onShieldWorn(attacker, Math.min(before, mind), result == ApocalypseShield.Result.BROKEN, at);
+        critEffects(attacker, at, factor);
         return true;
     }
 
     /**
      * The shield is strained (not hit): a Phoenix's Mind Control or Psionic Field, once per cast ({@link MindPower#strainCounts}:
-     * his mind refuses her, so the cast starts no recharge of hers, and the shield keeps it).
+     * his mind refuses her, so the cast starts no recharge of hers, and the shield keeps it). A Phoenix of {@code
+     * critHeroes} strains it {@code critShieldFactor} times as much, a critical hit.
      */
     public void strain(ServerPlayer phoenix, PhoenixPower.Kind kind) {
         ApocalypseFight fight = fight();
@@ -587,11 +631,54 @@ public class ApocalypseEntity extends Monster implements BossHooks {
                 || !MindPower.strainCounts(strains, phoenix.getUUID(), kind, level().getGameTime())) {
             return;
         }
+        double factor = MindPower.isCritHero(phoenix) ? ApocalypseShieldConfig.CRIT_SHIELD_FACTOR.get() : 1.0;
+        points = (float) (points * factor);
         float before = shield.strength();
         ApocalypseShield.Result result = shield.strain(points, level().getGameTime(), fight.windowTicksOfThisShield());
         if (result != ApocalypseShield.Result.IGNORED) {
-            fight.onShieldWorn(phoenix, Math.min(before, points), result == ApocalypseShield.Result.BROKEN, position().add(0, getBbHeight() * 0.7, 0));
+            Vec3 at = chest();
+            fight.onShieldWorn(phoenix, Math.min(before, points), result == ApocalypseShield.Result.BROKEN, at);
+            critEffects(phoenix, at, factor);
         }
+    }
+
+    /** His chest: where a strain rings on the shield, and where a critical hit on his body bursts. */
+    private Vec3 chest() {
+        return position().add(0, getBbHeight() * 0.7, 0);
+    }
+
+    /**
+     * A critical hit (its factor above 1) is seen and heard, at most once per attacker every {@link #CRIT_EFFECT_TICKS}
+     * ticks: 20 crit sparks and 10 enchanted sparks burst at {@code at} for everyone near, the heavy crack of {@link
+     * CritSound}, and "Critical hit! x2" on the attacker's action bar.
+     */
+    private void critEffects(ServerPlayer attacker, Vec3 at, double factor) {
+        if (factor <= 1.0 || !(level() instanceof ServerLevel server)) {
+            return;
+        }
+        long now = server.getGameTime();
+        Long last = lastCritEffects.get(attacker.getUUID());
+        if (last != null && now - last >= 0 && now - last < CRIT_EFFECT_TICKS) {
+            return;
+        }
+        if (lastCritEffects.size() > 8) {
+            Iterator<Long> iterator = lastCritEffects.values().iterator();
+            while (iterator.hasNext()) {
+                if (now - iterator.next() >= CRIT_EFFECT_TICKS) {
+                    iterator.remove();
+                }
+            }
+        }
+        lastCritEffects.put(attacker.getUUID(), now);
+        server.sendParticles(ParticleTypes.CRIT, at.x, at.y, at.z, 20, 0.35, 0.35, 0.35, 0.5);
+        server.sendParticles(ParticleTypes.ENCHANTED_HIT, at.x, at.y, at.z, 10, 0.35, 0.35, 0.35, 0.3);
+        CritSound.play(server, at);
+        attacker.displayClientMessage(Component.translatable(CRIT_MESSAGE, factorText(factor)), true);
+    }
+
+    /** A factor as the action bar shows it: "2" for 2.0, "2.5" for 2.5 (at most two decimals). */
+    private static String factorText(double factor) {
+        return BigDecimal.valueOf(factor).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
     }
 
     /** The point on the sphere where a blow struck, for the ripple. */
