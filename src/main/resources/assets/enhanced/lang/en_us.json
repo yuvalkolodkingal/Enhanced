@@ -1169,6 +1169,7 @@
   "message.enhanced.disarm.illusion": "Only an illusion: nothing to take",
   "message.enhanced.disarm.metal_body": "Nothing to tear off: the metal is the body itself (lift it with R)",
   "hud.enhanced.pull_cooldown": "pull %s",
+  "hud.enhanced.seconds": "%ss",
   "subtitles.enhanced.magnet_pull": "Metal is drawn in",
   "message.enhanced.apocalypse.crit": "Critical hit! ×%s",
   "subtitles.enhanced.apocalypse_crit": "Critical hit on Apocalypse"
