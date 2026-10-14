@@ -138,11 +138,13 @@ public final class BuildReviewTests {
         ((ChestBlockEntity) level.getBlockEntity(chest)).setItem(0, new ItemStack(Items.DIAMOND, 7));
         cast(wanda, recipe(Spell.MOVE).op(SpellRecipe.Op.PUT_DOWN).box(abs(f, 3, 3, 3), abs(f, 3, 3, 3)).at(abs(f, 11, 2, 3), Direction.UP).build());
         // (the block stands on the floor at the looked cell's top: put it down at relative y 3)
-        BuildJob job = working(wanda);
-        finish(wanda);
+        Seen seen = Seen.of(wanda);
+        // Its one cell would be left (the full chest): the spell fizzles before it is cast, and says what stayed.
+        check(working(wanda) == null && seen.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE && seen.said("message.enhanced.build.left.containers"),
+                "nothing can change, so the Move is refused: " + seen);
         check(level.getBlockState(chest).is(Blocks.CHEST) && diamonds(level, chest) == 7, "the full chest stands with its diamonds: "
                 + level.getBlockState(chest) + " " + diamonds(level, chest));
-        check(job.left(Left.CONTAINERS) == 1 && level.getBlockState(stone).is(Blocks.GOLD_BLOCK), "it was counted, and the gold stays where it was");
+        check(level.getBlockState(stone).is(Blocks.GOLD_BLOCK), "and the gold stays where it was");
         helper.succeed();
     }
 

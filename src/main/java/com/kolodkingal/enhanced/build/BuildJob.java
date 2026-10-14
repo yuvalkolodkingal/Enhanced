@@ -859,9 +859,26 @@ public final class BuildJob {
             BuildMagic.sync(level.getServer(), caster);
         }
         if (!finished && ticks % 20 == 0 && kind == Kind.SPELL && phase == Phase.APPLY && cursor != null) {
-            BuildSounds.hum(level, Vec3.atCenterOf(cursor.pos()), hero);
+            humAlong(Vec3.atCenterOf(cursor.pos()));
         }
         return slice.used();
+    }
+
+    /**
+     * The hum of the working spell (D-B 7.3): at its front, for anyone near it, and at the caster, who hears his own spell
+     * weave wherever its front is (a fill a hundred blocks wide is not silent for the one who cast it).
+     */
+    private void humAlong(Vec3 front) {
+        ServerPlayer online = online();
+        if (online == null || online.level() != level) {
+            BuildSounds.hum(level, front, hero);
+            return;
+        }
+        Vec3 caster = online.position();
+        BuildSounds.hum(level, caster, hero);
+        if (front.distanceToSqr(caster) > BuildSounds.HEARD * BuildSounds.HEARD) {
+            BuildSounds.hum(level, front, hero);
+        }
     }
 
     /**

@@ -265,6 +265,52 @@ public final class BuildRulesTests {
         helper.succeed();
     }
 
+    // B57a
+
+    /**
+     * A box wholly inside a protected fight's arena (joint check finding 6): the preflight answers
+     * {@code NOTHING_CAN_CHANGE} with the marks (the ghost goes grey), and the cast is refused with the same code, the
+     * line of what was left and the fizzle, before any job, cast sound, effect, charge on Billy's meter or history step;
+     * a box half in the arena is still cast in part.
+     */
+    @GameTest(template = ARENA, batch = "build_rules_nothing_can_change")
+    public static void aSpellWhoseEveryCellIsProtectedFizzlesBeforeItIsCast(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        f.config(BossConfig.ANNOUNCE_FIGHTS, false);
+        ServerPlayer starter = f.player(10.5, FLOOR, 12.5);
+        ServerPlayer billy = builder(f, Power.BILLY, 10.5, 6.5, Blocks.STONE);
+        fight(f, starter, BossKind.ULTRON, true);
+        BoundingBox inside = new BoundingBox(9, 2, 9, 11, 2, 11);
+        for (BlockPos pos : BlockPos.betweenClosed(abs(f, 9, 2, 9), abs(f, 11, 2, 11))) {
+            check(BossFights.inAnyArena(f.level(), pos), "the box lies in the arena: " + pos);
+        }
+        BuildData before = billy.getData(ModAttachments.BUILD_DATA);
+        BuildMagic.useClock(() -> 0L);
+        Seen.of(billy);
+        cast(billy, boxSpell(f, Spell.FILL, inside), BuildCastPayload.PREFLIGHT);
+        Seen seen = Seen.of(billy);
+        BuildVerdictPayload answer = seen.verdict();
+        check(answer != null && answer.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE && answer.changed() == 0 && answer.marks().length > 0
+                && (answer.flags() & BuildVerdictPayload.PROTECTED) != 0 && BuildVerdictPayload.isRefusal(answer.code()),
+                "the preflight says nothing can change, with its marks: " + seen);
+        check(seen.bar.isEmpty() && !seen.heard("build_fizzle"), "and says and sounds nothing: " + seen);
+
+        cast(billy, boxSpell(f, Spell.FILL, inside));
+        seen = Seen.of(billy);
+        check(seen.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE && seen.said("message.enhanced.build.left.protected")
+                && seen.arg("message.enhanced.build.left.protected", 0).equals("9"), "the cast is refused with what was left: " + seen);
+        check(seen.heard("build_fizzle") && !seen.heard("build_cast_billy") && seen.fx.isEmpty(), "it fizzles, with no cast sound and no effect: "
+                + seen.sounds + ", " + seen.fx);
+        check(working(billy) == null && steps(billy).isEmpty() && count(f, inside, Blocks.STONE) == 0, "no job, no step, no block");
+        BuildData after = billy.getData(ModAttachments.BUILD_DATA);
+        check(after.meter() == before.meter() && after.practice() == before.practice(), "his meter and practice are as they were: " + after);
+
+        BoundingBox across = new BoundingBox(0, 3, 0, 20, 3, 4);
+        cast(billy, boxSpell(f, Spell.FILL, across), BuildCastPayload.PREFLIGHT);
+        check(Seen.of(billy).code() == BuildVerdictPayload.READY_PARTLY, "a box half in the arena is ready in part");
+        helper.succeed();
+    }
+
     // B58
 
     /**
@@ -666,11 +712,13 @@ public final class BuildRulesTests {
         HexManager.create(wanda);
         ServerPlayer billy = builder(f, Power.BILLY, 3.5, 3.5, Blocks.STONE);
         BoundingBox box = new BoundingBox(5, 2, 5, 7, 2, 7);
+        Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, box));
-        BuildJob job = working(billy);
-        finish(billy);
-        check(count(f, box, Blocks.AIR) == 9 && job.left(Left.PROTECTED) == 9, "every cell is left: " + job.left(Left.PROTECTED));
-        check(Seen.of(billy).said("message.enhanced.build.left.protected"), "and he is told");
+        Seen seen = Seen.of(billy);
+        check(working(billy) == null && count(f, box, Blocks.AIR) == 9 && seen.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE,
+                "every cell is left, so the spell fizzles before it is cast: " + seen);
+        check(seen.said("message.enhanced.build.left.protected") && seen.arg("message.enhanced.build.left.protected", 0).equals("9"),
+                "and he is told how many: " + seen);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(billy.getUUID()), 1);
         // After his pause (castPause, 10 ticks).
         helper.runAfterDelay(15, () -> {

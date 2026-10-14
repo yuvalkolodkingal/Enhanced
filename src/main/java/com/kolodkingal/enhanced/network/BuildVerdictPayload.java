@@ -76,6 +76,12 @@ public record BuildVerdictPayload(int token, int code, int changed, int cost, in
     public static final int TOO_BIG_TO_SELECT = 38;
     public static final int NOTHING_TO_UNDO = 39;
     public static final int NOTHING_TO_REDO = 40;
+    /**
+     * Every cell the plan would change is left as it is (an arena, spawn protection, a Hex, a chest with things, someone
+     * standing there): the preflight says so with the marks, the ghost goes grey, and the cast fizzles with the line of
+     * what was left (D-B 6.2).
+     */
+    public static final int NOTHING_CAN_CHANGE = 41;
 
     /** Only part of the plan was checked (it was too big, or the 2 ms ran out): the marks are a sample. */
     public static final int CUT_OFF = 1;

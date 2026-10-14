@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
@@ -238,6 +239,42 @@ public final class BuildGrammarTests {
         helper.succeed();
     }
 
+    // B9a
+
+    /**
+     * A scroll gesture pushes one face (joint check finding 2): from the ground in front of a flat box, looking at its
+     * top, three notches lift the top three times although the top rises past the eyes and the look then meets the near
+     * face; the arrow's face (pushFace) is the same; a look that moved more than a few degrees, or a pause of more than
+     * 20 ticks, or another box, finds the face again.
+     */
+    @GameTest(template = TestKit.ARENA, batch = "build_grammar")
+    public static void aScrollKeepsTheFaceItPushed(GameTestHelper helper) {
+        BoundingBox world = Limits.world(helper.getLevel());
+        BlockPos p = new BlockPos(0, 64, 0);
+        BlockPos q = new BlockPos(6, 64, 4);
+        Vec3 eyes = new Vec3(3.5, 65.62, -3.0);
+        Vec3 look = new Vec3(0.0, -0.2, 1.0).normalize();
+        BuildGrammar g = boxed(new BuildGrammar(Limits.wanda(world)), p, q);
+        check(BuildGrammar.faceLookedAt(box(g), eyes, look) == Direction.UP, "the look meets the top of the flat box");
+        Aim aim = Aim.sky(eyes, look);
+        check(g.scroll(1, false, false, aim, 0) == Result.PUSHED && box(g).maxY() == 65, "the first notch lifts the top");
+        check(BuildGrammar.faceLookedAt(box(g), eyes, look) == Direction.NORTH, "(the box rose: the look now meets its near face)");
+        check(g.pushFace(box(g), eyes, look, 1) == Direction.UP, "the arrow still shows the top");
+        check(g.scroll(1, false, false, aim, 1) == Result.PUSHED && g.scroll(1, false, false, aim, 2) == Result.PUSHED
+                && box(g).equals(new BoundingBox(0, 64, 0, 6, 67, 4)), "three notches make it four high, not longer toward the player: " + box(g));
+        Vec3 turned = new Vec3(0.4, -0.2, 1.0).normalize();
+        check(g.pushFace(box(g), eyes, turned, 3) == BuildGrammar.faceLookedAt(box(g), eyes, turned)
+                && g.pushFace(box(g), eyes, turned, 3) != Direction.UP, "a look that moved 20 degrees finds the face again");
+        check(g.pushFace(box(g), eyes, look, 2 + BuildGrammar.PUSH_LATCH_TICKS + 1) == Direction.NORTH, "so does a notch after a pause");
+        check(g.scroll(1, false, false, aim, 40) == Result.PUSHED && box(g).minZ() == -1, "and the pause's notch pushes the near face: " + box(g));
+        g = boxed(new BuildGrammar(Limits.wanda(world)), p, q);
+        g.scroll(1, false, false, aim, 0);
+        g.letGo();
+        g = boxed(g, p, q);
+        check(g.pushFace(box(g), eyes, look, 6) == BuildGrammar.faceLookedAt(box(g), eyes, look), "a new box forgets the face");
+        helper.succeed();
+    }
+
     // B10
 
     /**
@@ -289,8 +326,28 @@ public final class BuildGrammarTests {
             check(!keys(brush).contains("corner") && !keys(brush).contains("corner2") && brush.get(0).input() == Input.RIGHT_HELD
                     && keys(brush).contains("brush"), "a brush has no corner line: " + keys(brush));
         }
-        check(keys(brushes.get(0)).equals(List.of("paint", "brush")) && keys(brushes.get(1)).equals(List.of("raise", "brush", "style"))
+        check(keys(brushes.get(0)).equals(List.of("paint", "brush")) && keys(brushes.get(1)).equals(List.of("smooth", "brush", "style"))
                 && argument(brushes.get(1).get(2).text()).equals(LandStyle.SMOOTH.key()), "Paint has no style; Land names its own");
+
+        // The held right button's verb comes from the style (Land: raise, lower, smooth; Grow: grow, shrink, bloom), and a
+        // Repeat's wheel counts copies and gap in the hold row too.
+        List<String> land = new ArrayList<>();
+        for (LandStyle style : LandStyle.values()) {
+            land.add(keys(BuildHints.lines(Spell.LAND, style.ordinal(), Stage.NOTHING, Power.BILLY, false, true)).get(0));
+        }
+        List<String> grow = new ArrayList<>();
+        for (GrowStyle style : GrowStyle.values()) {
+            grow.add(keys(BuildHints.lines(Spell.GROW, style.ordinal(), Stage.NOTHING, Power.BILLY, false, true)).get(0));
+        }
+        check(land.equals(List.of("raise", "lower", "smooth")) && grow.equals(List.of("grow", "shrink", "bloom")),
+                "the brush's verb follows its style: " + land + ", " + grow);
+        List<Row> repeatHold = BuildHints.lines(Spell.REPEAT, 0, Stage.BOX_HOLD, Power.BILLY, false, true);
+        check(keys(repeatHold).equals(List.of("held", "copies", "gap", "let_go")) && repeatHold.get(0).input() == Input.RIGHT_HELD
+                && argument(repeatHold.get(0).text()).equals("hud.enhanced.build.hint.repeat") && repeatHold.get(1).input() == Input.WHEEL
+                && repeatHold.get(2).input() == Input.MORE_WHEEL, "a Repeat that needs the hold: its wheel counts copies, Alt + wheel the gap: "
+                + keys(repeatHold));
+        check(keys(BuildHints.lines(Spell.COPY, 0, Stage.BOX_HOLD, Power.BILLY, false, true)).equals(List.of("held", "push_side", "let_go")),
+                "the other spells' holds still push a side");
 
         // Every row of every spell and state has its words in both languages.
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
