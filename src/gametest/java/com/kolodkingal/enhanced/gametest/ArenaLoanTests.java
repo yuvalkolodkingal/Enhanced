@@ -38,14 +38,17 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
@@ -1204,6 +1207,95 @@ public final class ArenaLoanTests {
             check(entries(snapshot, "homes", abs(helper, home)) == 1, "the dirt lent three times is one repair: " + snapshot);
             check(entries(snapshot, "homes", abs(helper, source)) == 1, "so is the home lent twice");
             check(entries(snapshot, "standing", abs(helper, stand)) == 1, "and the cell two borrowed blocks stood on");
+            return true;
+        });
+    }
+
+    /**
+     * Review r3 (D-T 5.5, spec 5.4: the real ground is never edited): what leans on a lent block is safe from its neighbours
+     * while the hole is open. The lower of two sands of a step is lent; a snow layer then settles on the upper one (its fall
+     * is scheduled): it never falls, and stays over the hole. A grass block with a poppy and one with a rose bush are lent; a
+     * stone then set beside the poppy and one beside the rose bush break them: nothing drops, the journal lists them with
+     * their homes, and the mends put the grass, the poppy and both halves of the rose bush back. A stone with an item frame
+     * on its side is not lent ({@code protected}) and the frame stays.
+     */
+    @GameTest(template = ARENA, batch = "arena_loans_propped", timeoutTicks = 140)
+    public static void whatLeansOnAHoleIsNeverLost(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.ARENA_MEND_TICKS, 40);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        TestFight fight = arena(f, wanda, Containment.NONE);
+        BlockPos lowSand = new BlockPos(7, 2, 7);
+        BlockPos highSand = lowSand.above();
+        BlockPos grass = new BlockPos(13, 2, 7);
+        BlockPos poppy = grass.above();
+        BlockPos roseGrass = new BlockPos(13, 2, 13);
+        BlockPos roseLow = roseGrass.above();
+        BlockPos roseHigh = roseLow.above();
+        BlockPos framed = new BlockPos(7, 2, 13);
+        helper.setBlock(lowSand, Blocks.SAND);
+        helper.setBlock(highSand, Blocks.SAND);
+        helper.setBlock(grass, Blocks.GRASS_BLOCK);
+        helper.setBlock(poppy, Blocks.POPPY);
+        helper.setBlock(roseGrass, Blocks.GRASS_BLOCK);
+        DoublePlantBlock.placeAt(level, Blocks.ROSE_BUSH.defaultBlockState(), abs(helper, roseLow), Block.UPDATE_ALL);
+        helper.setBlock(framed, Blocks.STONE);
+        ItemFrame frame = new ItemFrame(level, abs(helper, framed.north()), Direction.NORTH);
+        level.addFreshEntity(frame);
+        BlockPos[] cells = {lowSand, highSand, grass, poppy, roseGrass, roseLow, roseHigh, framed};
+        BlockState[] before = new BlockState[cells.length];
+        for (int i = 0; i < cells.length; i++) {
+            before[i] = helper.getBlockState(cells[i]);
+        }
+        check(before[6].is(Blocks.ROSE_BUSH) && before[6].getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER, "the rose bush is whole");
+        long[] lent = {-1};
+
+        f.everyTick(130, tick -> {
+            check(helper.getEntities(EntityType.FALLING_BLOCK).isEmpty(), "no block falls, ever (tick " + tick + ")");
+            check(items(helper) == 0, "nothing drops, ever (tick " + tick + ")");
+            if (tick < SETTLE) {
+                return false;
+            }
+            long now = level.getGameTime();
+            if (tick == SETTLE) {
+                check(borrow(helper, wanda, Telekinesis.Mode.WANDA, framed) == null && ArenaLoans.PROTECTED.equals(lastActionBarKey(wanda)),
+                        "a stone with an item frame on it is not lent");
+                for (BlockPos support : new BlockPos[]{lowSand, grass, roseGrass}) {
+                    dropDust(wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, support));
+                }
+                check(fight.loans().isPropped(abs(helper, poppy)) && fight.loans().isPropped(abs(helper, roseLow))
+                        && fight.loans().isPropped(abs(helper, roseHigh)), "the poppy and both halves of the rose bush lean on the holes");
+                lent[0] = now;
+                return false;
+            }
+            if (tick == SETTLE + 1) {
+                // The world goes on round the holes: snow settles on the upper sand, stones come beside the flowers.
+                level.setBlockAndUpdate(abs(helper, highSand.above()), Blocks.SNOW.defaultBlockState());
+                check(level.getBlockTicks().hasScheduledTick(abs(helper, highSand), Blocks.SAND), "the snow wakes the upper sand: its fall is scheduled");
+                level.setBlockAndUpdate(abs(helper, poppy.east()), Blocks.STONE.defaultBlockState());
+                level.setBlockAndUpdate(abs(helper, roseLow.east()), Blocks.STONE.defaultBlockState());
+                check(helper.getBlockState(poppy).isAir() && helper.getBlockState(roseLow).isAir() && helper.getBlockState(roseHigh).isAir(),
+                        "the stones break the poppy and the rose bush, which hang in the air");
+                CompoundTag snapshot = fight.loans().snapshot();
+                check(lists(snapshot, "homes", abs(helper, poppy)) && lists(snapshot, "homes", abs(helper, roseLow))
+                        && lists(snapshot, "homes", abs(helper, roseHigh)), "the journal lists them with their homes: " + snapshot);
+                return false;
+            }
+            check(helper.getBlockState(highSand).is(Blocks.SAND), "the upper sand stays over the hole (tick " + tick + ")");
+            check(helper.getBlockState(framed).is(Blocks.STONE) && frame.isAlive(), "the framed stone and its frame stay");
+            if (fight.loans().isOpenHome(abs(helper, lowSand)) || fight.loans().isOpenHome(abs(helper, grass))
+                    || fight.loans().isOpenHome(abs(helper, roseGrass))) {
+                return false;
+            }
+            if (now - lent[0] < 60) {
+                return false; // (the upper sand stays a while after the mend, too)
+            }
+            for (int i = 0; i < cells.length; i++) {
+                check(helper.getBlockState(cells[i]) == before[i], "after the mends " + cells[i] + " is " + before[i] + ", not " + helper.getBlockState(cells[i]));
+            }
+            check(!fight.loans().isPropped(abs(helper, poppy)), "and nothing leans on a hole any more");
+            frame.discard();
             return true;
         });
     }

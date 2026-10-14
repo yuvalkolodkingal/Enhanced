@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.apocalypse.Horsemen;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
+import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossKind;
@@ -36,6 +37,7 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosFight;
+import com.kolodkingal.enhanced.thanos.ThanosLane;
 import com.kolodkingal.enhanced.thanos.ThanosMeteorEntity;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import com.kolodkingal.enhanced.thanos.ThanosState;
@@ -77,6 +79,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -2194,6 +2197,99 @@ public final class BossGripTests {
             }
             return tick == 54;
         });
+    }
+
+    /**
+     * Review r3 (spec 16, D-T 6.2.1): an operator's forced start given while flying 35 blocks over an open floor, with no
+     * ground to arrive on near him, makes the fight on that floor. Its landing and its centre are on the ground under him
+     * (the scene is above the test's barrier ceiling); Thanos comes down through the portal onto it, and stays there: he is
+     * never brought back, the one portal is the one he arrives through.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_valley_air", timeoutTicks = 220)
+    public static void aForcedStartInTheAirFightsOnTheGroundUnderIt(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(ThanosBossConfig.SUMMON_COUNTDOWN_TICKS, 20);
+        ServerLevel level = f.level();
+        List<BlockPos> placed = new ArrayList<>();
+        f.onClose(() -> placed.forEach(pos -> level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS)));
+        stone(helper, placed, new BlockPos(5, 18, 5), new BlockPos(15, 18, 15)); // the open floor: he stands at y 19
+        ServerPlayer starter = ThanosMoveSupport.tough(f.player(10.5, 54.0, 10.5));
+        starter.getAbilities().flying = true;
+        BossFight made = new ThanosLane().create(starter, true);
+        check(made instanceof ThanosFight, "the forced start makes a fight of Thanos");
+        ThanosFight fight = (ThanosFight) made;
+        double ground = helper.absoluteVec(new Vec3(10.5, 19.0, 10.5)).y;
+        assertNear(fight.landing().y, ground, 1.0E-6, "his landing is on the floor under the operator");
+        Vec3 centre = fight.arena().center();
+        assertNear(centre.y, ground, 1.0E-6, "and so is the centre of his arena");
+        check(Math.abs(centre.x - starter.getX()) < 1.0E-6 && Math.abs(centre.z - starter.getZ()) < 1.0E-6, "right under the operator");
+        BossFights.begin(fight, starter);
+        int[] seen = {0};
+        int[] landed = {-1};
+        f.everyTick(210, tick -> {
+            seen[0] += portals(starter);
+            check(seen[0] <= 1, "tick " + tick + ": he is never brought back, the one portal is his arrival's: " + seen[0]);
+            ThanosEntity thanos = fight.boss();
+            if (thanos == null) {
+                return false;
+            }
+            thanos.setPassive(true);
+            if (landed[0] < 0) {
+                if (thanos.hasLanded()) {
+                    landed[0] = tick;
+                    check(seen[0] == 1, "he came through the portal");
+                }
+                return false;
+            }
+            check(thanos.isAlive(), "he is alive");
+            assertNear(thanos.getY(), ground, 0.05, "tick " + tick + ": he stays on the floor");
+            return tick - landed[0] >= 40;
+        });
+    }
+
+    /**
+     * Review r3 (D-T 6.2.1): Ultron's body never even begins to go through a portal, so it never makes the game look for an
+     * exit portal in another dimension (and build one there) as a portal does before it asks whether he may go.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_portal_ultron", timeoutTicks = 20)
+    public static void ultronNeverStepsIntoAPortal(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
+        UltronTestSupport.tank(wanda);
+        UltronFight fight = UltronTestSupport.onTheGround(f, wanda);
+        UltronTestSupport.calm(fight);
+        neverStepsIntoAPortal(helper, UltronTestSupport.boss(fight));
+    }
+
+    /** Review r3 (D-T 6.2.1): nor does Apocalypse. */
+    @GameTest(template = ARENA, batch = "boss_grip_portal_apocalypse", timeoutTicks = 20)
+    public static void apocalypseNeverStepsIntoAPortal(GameTestHelper helper) {
+        ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
+        d.f().onClose(Telekinesis::clear);
+        neverStepsIntoAPortal(helper, d.boss());
+    }
+
+    /** Review r3 (D-T 6.2.1): nor does Thanos. */
+    @GameTest(template = ARENA, batch = "boss_grip_portal_thanos", timeoutTicks = 20)
+    public static void thanosNeverStepsIntoAPortal(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        ServerPlayer starter = ThanosMoveSupport.fighter(f, -7.0, 0.0);
+        neverStepsIntoAPortal(helper, ThanosBossTests.boss(f, starter));
+    }
+
+    /** A Nether portal the boss stands in starts no portal time for him, as it does for a zombie. */
+    private static void neverStepsIntoAPortal(GameTestHelper helper, Entity boss) {
+        BlockState portal = Blocks.NETHER_PORTAL.defaultBlockState();
+        Zombie zombie = stillZombie(helper, 3.5, 3.5);
+        portal.entityInside(helper.getLevel(), zombie.blockPosition(), zombie);
+        check(zombie.portalProcess != null, "a zombie in a Nether portal begins to go through it");
+        portal.entityInside(helper.getLevel(), boss.blockPosition(), boss);
+        check(!boss.canUsePortal(false) && boss.portalProcess == null, boss.getType().getDescriptionId() + " in a Nether portal never begins to go through it");
+        zombie.discard();
+        helper.succeed();
     }
 
     /** Stone in every cell from {@code from} to {@code to} (relative), noted in {@code placed} to be taken away at the end. */
