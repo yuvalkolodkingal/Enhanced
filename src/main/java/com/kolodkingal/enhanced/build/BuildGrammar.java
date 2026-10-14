@@ -13,12 +13,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * The one mouse grammar of Build Magic (D-B 2.3, 3, 4), as a state machine of pure code: what a builder is about to cast,
- * and how each click, drag, double click and scroll changes it. LEFT is <i>where</i> (two corners make a box, a third
- * starts a new one, a drag makes one at once, a double click selects the whole thing, the sky lets go or marks a corner
- * in the air, a shape is planted and its height taken from the look), the scroll is the main number (a side of the box
- * pushed out or in, a shape's size, a ghost's lift, the copies, the layers, the brush) and Alt + scroll the second knob
- * (a style, a shape, a turn, a gap). No Sneak anywhere. It ends in the {@link SpellRecipe} the right button casts.
+ * The one mouse grammar of Build Magic (D-B 2.3, 3, 4), as a state machine of pure code: what a builder is about to
+ * cast, and how each click, drag, double click and scroll changes it. LEFT is <i>where</i> (two corners make a box, a
+ * third starts a new one, a drag makes one at once, a double click selects the whole thing, the sky lets go or marks a
+ * corner in the air, a shape is planted and its height taken from the look), the scroll is the main number (a side of
+ * the box pushed out or in, a shape's size, a ghost's lift, the copies, the layers, the brush) and Alt + scroll the
+ * second knob (a style, a shape, a turn, a gap). No Sneak anywhere. It ends in the {@link SpellRecipe} the right button
+ * casts.
  *
  * <p>The client feeds it (its {@code BuildInput}, every tick and at every click) and keeps it; GameTests drive it
  * directly (B9). It names no client class and reads no world: the client tells it where the builder looks
@@ -107,7 +108,9 @@ public final class BuildGrammar {
             return cell != null;
         }
 
-        /** The floating aim cell, {@value #FLOATING_CELL} blocks in front of the eyes: how a platform is built in the sky. */
+        /**
+         * The floating aim cell, {@value #FLOATING_CELL} blocks ahead of the eyes: how a platform is built in the air.
+         */
         public BlockPos floating() {
             return BlockPos.containing(eyes.add(look.scale(FLOATING_CELL)));
         }
@@ -233,7 +236,7 @@ public final class BuildGrammar {
         aim(aim);
         BlockPos cell = aim.cell();
         if (spell.needsBox() && cell != null && cell.equals(lastClick) && tick - lastClickTick <= DOUBLE_CLICK_TICKS) {
-            // The first click set a corner for a moment: what was selected before it comes back, and the thing joins it.
+            // The first click set a corner for a moment: the selection before it comes back, and the thing joins it.
             lastClick = null;
             pressCell = null;
             if (beforeClick != null) {
@@ -286,7 +289,7 @@ public final class BuildGrammar {
             return Result.LET_GO;
         }
         if (ghost) {
-            // A click with a Copy's or a Move's ghost starts a new box; the ghost hides (D-B 2.3). On the sky it just goes.
+            // A click with a Copy's or a Move's ghost hides it and starts a new box (D-B 2.3); on the sky it just goes.
             ghost = false;
             if (!aim.onBlock()) {
                 return Result.LET_GO;
@@ -335,8 +338,8 @@ public final class BuildGrammar {
     /**
      * A left click with Shapes (D-B 4.7): plants the shape where it is (on the sky, at the floating cell); while a
      * planted shape's height follows the look, fixes it wherever the click is (a tower raised by looking up is clicked
-     * against the sky); once fixed, or for a shape with no height, a click on the sky lets it follow the crosshair again
-     * and a click on a block plants it there.
+     * against the sky); once fixed, or for a shape with no height, a click on the sky lets it follow the crosshair
+     * again and a click on a block plants it there.
      */
     private Result plant(Aim aim) {
         ShapeKind kind = shapeKind();
@@ -522,8 +525,8 @@ public final class BuildGrammar {
     }
 
     /**
-     * Ctrl + F: the ghost flipped along the way the builder looks (east-west or north-south; looking steeply up or down,
-     * upside down); the same flip again puts it back. False when there is no ghost to flip.
+     * Ctrl + F: the ghost flipped along the way the builder looks (east-west or north-south; looking steeply up or
+     * down, upside down); the same flip again puts it back. False when there is no ghost to flip.
      */
     public boolean flipGhost(Vec3 look) {
         if (!ghost) {
@@ -539,7 +542,10 @@ public final class BuildGrammar {
         return true;
     }
 
-    /** The material: the block in the hand ({@link SpellRecipe#HAND}) or the one last picked ({@link SpellRecipe#PICKED}). */
+    /**
+     * The material: the block in the hand ({@link SpellRecipe#HAND}) or the last one picked
+     * ({@link SpellRecipe#PICKED}).
+     */
     public void material(int material) {
         this.material = material;
     }
@@ -551,8 +557,8 @@ public final class BuildGrammar {
     }
 
     /**
-     * Shows the pocket's ghost at the crosshair (Copy after its first right click, Ctrl + V, or Copy chosen with no box;
-     * Move after it picked something up), with no lift, turn or flip.
+     * Shows the pocket's ghost at the crosshair (Copy after its first right click, Ctrl + V, or Copy chosen with no
+     * box; Move after it picked something up), with no lift, turn or flip.
      */
     public void holdGhost() {
         ghost = true;

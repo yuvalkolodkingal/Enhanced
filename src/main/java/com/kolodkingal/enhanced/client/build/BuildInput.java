@@ -22,16 +22,17 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * Build Magic's input on the client (D-B 2, 11.10): the Y key, the two Ctrl keys a witch has at any time, the build-mode
- * shortcuts, and the mouse taken through NeoForge's two input events. Nothing else in the mod listens to those two
- * events, and {@code ClientEvents.handleKeys} is not touched: the hero keys behave as before, and the key contexts
- * ({@link BuildKeys}) keep Ctrl + Z, Ctrl + R and Ctrl + V of a builder off Z, R and V.
+ * Build Magic's input on the client (D-B 2, 11.10): the Y key, the two Ctrl keys a witch has at any time, the
+ * build-mode shortcuts, and the mouse taken through NeoForge's two input events. Nothing else in the mod listens to
+ * those two events, and {@code ClientEvents.handleKeys} is not touched: the hero keys behave as before, and the key
+ * contexts ({@link BuildKeys}) keep Ctrl + Z, Ctrl + R and Ctrl + V of a builder off Z, R and V.
  *
  * <ul>
  *     <li><b>Y</b>: released within {@value #WHEEL_TICKS} ticks, build mode on or off; held that long, build mode on
  *     (the Spell Wheel opens there). Only for a Scarlet Witch or Billy, with no screen open and not as a Spectator; for
  *     anyone else it does nothing and says nothing.</li>
- *     <li><b>Ctrl + Z, Ctrl + Y</b> ({@link BuildKeys.Context#WITCH}): undo and redo, in build mode or out of it (R42).</li>
+ *     <li><b>Ctrl + Z, Ctrl + Y</b> ({@link BuildKeys.Context#WITCH}): undo and redo, in build mode or out of
+ *     it (R42).</li>
  *     <li><b>In build mode</b>: Ctrl + R and Ctrl + F turn and flip a ghost, Ctrl + C copies the box, Ctrl + X picks it
  *     up, Ctrl + V brings the pocket's ghost back, Delete vanishes the box (with its hold).</li>
  *     <li><b>The left button</b> in build mode never breaks a block: on a block, or on the sky while the grammar takes
@@ -250,8 +251,8 @@ public final class BuildInput {
     }
 
     /**
-     * Middle click (the pick-block key, wherever it is bound), seen as it is pressed: vanilla asks its own event only for
-     * a block within a hand's reach, and the builder picks one as far as his magic reaches. Vanilla's pick still runs.
+     * Middle click (the pick-block key, wherever it is bound), seen as it is pressed: vanilla asks its own event only
+     * for a block within a hand's reach, and the builder picks one as far as his magic reaches; vanilla's pick runs.
      */
     @SubscribeEvent
     public static void onMouseButton(InputEvent.MouseButton.Pre event) {

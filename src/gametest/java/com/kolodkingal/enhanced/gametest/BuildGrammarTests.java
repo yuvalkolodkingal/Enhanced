@@ -59,11 +59,11 @@ public final class BuildGrammarTests {
     /**
      * The mouse grammar (D-B 2.3, 3): two clicks make a box and a third a new corner; a press let go on another block 4
      * ticks later is a box at once, a quicker one is not; a double click selects the thing (a seed), and one on another
-     * thing adds it while one on the same thing adds nothing; a scroll on the box's top pushes it up one (Ctrl: 8), never
-     * past the opposite face, and from inside the box the far face moves; Billy's face and rubber band stop at his side
-     * (24); the sky lets go of a box, and with nothing selected marks corner A on the floating cell 6 blocks ahead; a
-     * shape follows, is planted by a click, takes its height from the look, keeps it once a second click fixes it, and a
-     * click on the sky then lets it follow again; each state casts the recipe it shows.
+     * thing adds it while one on the same thing adds nothing; a scroll on the box's top pushes it up one (Ctrl: 8),
+     * never past the opposite face, and from inside the box the far face moves; Billy's face and rubber band stop at
+     * his side (24); the sky lets go of a box, and with nothing selected marks corner A on the floating cell 6 blocks
+     * ahead; a shape follows, is planted by a click, takes its height from the look, keeps it once a second click fixes
+     * it, and a click on the sky then lets it follow again; each state casts the recipe it shows.
      */
     @GameTest(template = TestKit.ARENA, batch = "build_grammar")
     public static void theMouseGrammar(GameTestHelper helper) {
@@ -163,7 +163,7 @@ public final class BuildGrammarTests {
         check(g.press(Aim.sky(new Vec3(0.5, 70.5, 0.5), new Vec3(0.0, 0.0, 1.0)), 80) == Result.CORNER_B && g.finished(),
                 "corner A set: corner B in the air");
 
-        // A shape: it follows, a click plants it, the look sets its height, a second click fixes it, the sky lets it go.
+        // A shape: it follows, a click plants it, the look sets its height, a second click fixes it, the sky frees it.
         g = new BuildGrammar(wanda);
         g.spell(Spell.SHAPE);
         g.style(ShapeKind.TOWER.ordinal());
@@ -208,10 +208,10 @@ public final class BuildGrammarTests {
 
     /**
      * The hint strip (D-B 6.4): Fill with a box shows fill, push a side, its style and undo; a removal over 64 "hold:
-     * vanish"; Copy holding a ghost stamp, up / down, turn, flip; a planted tower place, look up, done, and once fixed only
-     * place and let go; Shapes following its shape; a working spell "stop and undo" (all Billy sees; the Scarlet Witch's
-     * other rows stay); nothing selected the corner, the whole thing, the spells and undo only when there is one; the
-     * brushes have no corner line; and every row's words are in both languages.
+     * vanish"; Copy holding a ghost stamp, up / down, turn, flip; a planted tower place, look up, done, and once fixed
+     * only place and let go; Shapes following its shape; a working spell "stop and undo" (all Billy sees; the Scarlet
+     * Witch's other rows stay); nothing selected the corner, the whole thing, the spells and undo only when there is
+     * one; the brushes have no corner line; and every row's words are in both languages.
      */
     @GameTest(template = TestKit.ARENA, batch = "build_grammar")
     public static void theHintsMatchTheSpellAndState(GameTestHelper helper) throws IOException {

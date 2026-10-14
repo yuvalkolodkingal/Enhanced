@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The hint strip at the bottom right of a builder's screen (D-B 6.4): three to five rows, each a small picture of an input
- * (a mouse with a button lit, the wheel, a key cap) and one or two words, for the spell chosen and the state of its
- * selection. Pure: {@link #lines} is a function of a few values, so a GameTest checks it with no client class (B10); the
- * client's {@code BuildHud} draws the pictures, with the key's own name for a key (rebound keys included).
+ * The hint strip at the bottom right of a builder's screen (D-B 6.4): three to five rows, each a small picture of an
+ * input (a mouse with a button lit, the wheel, a key cap) and one or two words, for the spell chosen and the state of
+ * its selection. Pure: {@link #lines} is a function of a few values, so a GameTest checks it with no client class
+ * (B10); the client's {@code BuildHud} draws the pictures, with the key's own name for a key (rebound keys included).
  */
 public final class BuildHints {
     /** Where the builder is in the grammar ({@link BuildGrammar#stage}), as far as the strip cares. */
@@ -73,9 +73,11 @@ public final class BuildHints {
      *
      * @param spell   the spell chosen
      * @param style   its style or shape (its ordinal), named in the Alt + scroll row
-     * @param stage   the selection's stage ({@link BuildGrammar#stage}, made {@link Stage#BOX_HOLD} by the client's count)
-     * @param hero    {@link Power#SCARLET_WITCH} or {@link Power#BILLY}: while one of his spells works, Billy (one spell at
-     *                a time) sees only how to stop it; the Scarlet Witch, whose spells wait in a queue, goes on building
+     * @param stage   the selection's stage ({@link BuildGrammar#stage}; the client's count makes a box
+     *                {@link Stage#BOX_HOLD})
+     * @param hero    {@link Power#SCARLET_WITCH} or {@link Power#BILLY}: while one of his spells works, Billy (one
+     *                spell at a time) sees only how to stop it; the Scarlet Witch, whose spells wait in a queue, goes
+     *                on building
      * @param working whether a spell of the builder's is at work
      * @param hasUndo whether something can be undone (the Ctrl + Z row)
      */

@@ -8,9 +8,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 /**
- * What the builder alone hears while choosing and shaping (D-B 6.8): vanilla events played straight on this client, never
- * sent, never heard by anyone else. The spell's own sounds (the cast, the hum, the fizzle, the undo) are the server's
- * ({@code BuildSounds}).
+ * What the builder alone hears while choosing and shaping (D-B 6.8): vanilla events played straight on this client,
+ * never sent, never heard by anyone else. The spell's own sounds (the cast, the hum, the fizzle, the undo) are the
+ * server's ({@code BuildSounds}).
  */
 final class BuildFeedback {
     /** A corner, a planted shape: a chime. */

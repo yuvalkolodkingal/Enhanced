@@ -62,18 +62,18 @@ import java.util.Set;
  * server's verdicts with their marks, the box others see, the copy of the pocket and the open brush stroke. It sends
  * recipes and actions; the server decides. {@link BuildInput} reads the keys and the mouse and drives it.
  *
- * <p><b>Build mode</b> answers at once: a tap of Y turns it on here and asks the server ({@code MODE}). The server's word
- * ({@link BuildView#active}, synced) wins whenever it changes: build mode ends by itself at a death, a power change,
- * Spectator or Adventure mode (D-B 2.2). A refusal of the mode itself ({@code OFF}, {@code OPERATORS},
+ * <p><b>Build mode</b> answers at once: a tap of Y turns it on here and asks the server ({@code MODE}). The server's
+ * word ({@link BuildView#active}, synced) wins whenever it changes: build mode ends by itself at a death, a power
+ * change, Spectator or Adventure mode (D-B 2.2). A refusal of the mode itself ({@code OFF}, {@code OPERATORS},
  * {@code ADVENTURE}) turns it off here too. A change of world keeps it, and lets go of the box (D-B 3.5).
  *
- * <p><b>The preflight</b> (D-B 10.1): when the plan has been still for {@value #PREFLIGHT_STILL} ticks, the cast goes to
- * the server with the {@code PREFLIGHT} flag, at most 4 a second; the verdict that comes back for it gives the cost, the
- * counts and the marks of the cells that will be left alone. <b>The client's count</b> (D-B 11.10) walks the plan against
- * this client's world, {@value #COUNT_PER_TICK} cells a tick, and decides the short hold (D-B 10.2): a spell that removes
- * or replaces more than {@code holdToConfirmBlocks} existing blocks, or whose count is not done yet, needs the right
- * button held {@code holdToConfirmTicks}; a plan over {@code hugeSpellBlocks}, or one the server answered {@code HOLD} or
- * {@code NO_UNDO_ROOM}, {@code hugeHoldTicks}.
+ * <p><b>The preflight</b> (D-B 10.1): when the plan has been still for {@value #PREFLIGHT_STILL} ticks, the cast goes
+ * to the server with the {@code PREFLIGHT} flag, at most 4 a second; the verdict that comes back for it gives the cost,
+ * the counts and the marks of the cells that will be left alone. <b>The client's count</b> (D-B 11.10) walks the plan
+ * against this client's world, {@value #COUNT_PER_TICK} cells a tick, and decides the short hold (D-B 10.2): a spell
+ * that removes or replaces more than {@code holdToConfirmBlocks} existing blocks, or whose count is not done yet, needs
+ * the right button held {@code holdToConfirmTicks}; a plan over {@code hugeSpellBlocks}, or one the server answered
+ * {@code HOLD} or {@code NO_UNDO_ROOM}, {@code hugeHoldTicks}.
  *
  * <p>Only ever loaded on a client.
  */
@@ -92,7 +92,7 @@ public final class BuildClient {
     public static final int POCKET_ASK_GAP = 100;
     /** Ticks between two dabs of Land's or Grow's brush held still (a pulse every 4 ticks, D-B 4.11). */
     public static final int PULSE_TICKS = 4;
-    /** The most casts whose verdict is awaited that are remembered (a server that never answers forgets nothing else). */
+    /** The most casts awaiting their verdict that are remembered (a server that never answers forgets nothing else). */
     private static final int MAX_PENDING = 256;
 
     /** The build mode this client shows (it answers at once; the server's changes win). */
@@ -168,8 +168,8 @@ public final class BuildClient {
     }
 
     /**
-     * Whether the local player is in build mode: what the {@link BuildKeys.Context#BUILD} keys and the panel's sixth line
-     * follow. False for anyone who is not a Scarlet Witch or Billy, and for a Spectator.
+     * Whether the local player is in build mode: what the {@link BuildKeys.Context#BUILD} keys and the panel's sixth
+     * line follow. False for anyone who is not a Scarlet Witch or Billy, and for a Spectator.
      */
     public static boolean buildMode() {
         LocalPlayer player = Minecraft.getInstance().player;
@@ -223,7 +223,7 @@ public final class BuildClient {
     private static void followServer(LocalPlayer player) {
         boolean now = player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
         if (player != seenPlayer) {
-            // A new player entity (a respawn, a change of dimension) starts from what the server says, without a change.
+            // A new player entity (a respawn, a change of dimension) starts from what the server says now.
             seenPlayer = player;
             serverMode = now;
         } else if (now != serverMode) {
@@ -246,9 +246,9 @@ public final class BuildClient {
     // Every tick
 
     /**
-     * One client tick of a player ({@link BuildInput} calls it): the server's mode followed, a change of world lets go of
-     * the box; in build mode the aim, the material and the recipe brought up to date, the flood and the count walked on,
-     * the preflight sent when the plan is still, the box others see sent when it changed, a missing pocket asked for.
+     * One client tick of a player ({@link BuildInput} calls it): the server's mode followed, a change of world lets go
+     * of the box; in build mode the aim, the material and the recipe brought up to date, the flood and the count walked
+     * on, the preflight sent when the plan is still, the box others see sent when it changed, a missing pocket asked.
      */
     static void tick(Minecraft mc, LocalPlayer player) {
         ticks++;
@@ -428,8 +428,8 @@ public final class BuildClient {
     }
 
     /**
-     * The recipe as far as the plan is concerned: the anchor (and stroke) of a spell that does not read it, which follows
-     * the crosshair however still the box is, is left out.
+     * The recipe as far as the plan is concerned: the anchor (and stroke) of a spell that does not read it, which
+     * follows the crosshair however still the box is, is left out.
      */
     private static SpellRecipe asPlanned(SpellRecipe r) {
         boolean readsAnchor = switch (r.spell()) {
@@ -524,9 +524,9 @@ public final class BuildClient {
     }
 
     /**
-     * Whether the spell has something ready for the right button (D-B 11.10): a box or a thing for a box spell, a ghost,
-     * a face for Pull, a block in reach for a brush, and a material for the spells that conjure one. Otherwise the right
-     * button is vanilla's (doors, eating, placing a block).
+     * Whether the spell has something ready for the right button (D-B 11.10): a box or a thing for a box spell, a
+     * ghost, a face for Pull, a block in reach for a brush, and a material for the spells that conjure one. Otherwise
+     * the right button is vanilla's (doors, eating, placing a block).
      */
     public static boolean ready() {
         return recipe != null && (!recipe.spell().needsMaterial() || material != null);
@@ -906,7 +906,7 @@ public final class BuildClient {
     // ------------------------------------------------------------------------------------------------------------
     // Forgetting
 
-    /** A new world (a change of dimension): the box, the selected thing, the ghost and the plan go; build mode stays. */
+    /** A new world (a change of dimension): the box, the selected thing, the ghost and the plan go; the mode stays. */
     private static void forgetWorld() {
         endStroke();
         stopHold();
