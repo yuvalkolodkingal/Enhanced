@@ -2042,7 +2042,8 @@ public final class SpiderManTests {
     // ------------------------------------------------------------------------------------------------------------
     // Iron Spider: legs and Instant Kill
 
-    @GameTest(template = ARENA, batch = QUICK)
+    /** Batch of its own: Magneto's strip of a player asks PvP, which the test switches on (3.1, D-M 5). */
+    @GameTest(template = ARENA, batch = "spider_legs_magneto_pvp")
     public static void legsAreIronSpiderOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2064,9 +2065,15 @@ public final class SpiderManTests {
         wear(player, "iron_spider");
         press(player, 4);
         check(data(player).toggle(Toggle.SPIDER_LEGS), "out again");
-        // Magneto's strip scatters the nanites and folds them for a while.
+        // With PvP off Magneto's strip leaves another player alone, and says why.
         ServerPlayer magneto = f.player(8.5, FLOOR, 10.5, Power.MAGNETO);
         lookAt(magneto, player);
+        seen(magneto);
+        press(magneto, 3);
+        check(data(player).toggle(Toggle.SPIDER_LEGS) && "message.enhanced.disarm.no_pvp".equals(seen(magneto).message()),
+                "with PvP off the strip leaves the legs out: PvP is off");
+        // With PvP on it scatters the nanites and folds them for a while.
+        f.pvp(true);
         seen(player);
         press(magneto, 3);
         check(!data(player).toggle(Toggle.SPIDER_LEGS), "Magneto's strip folds them");
@@ -2279,7 +2286,8 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 300)
+    /** Batch of its own: Magneto's strip of a player asks PvP, which the test switches on (3.1, D-M 5). */
+    @GameTest(template = ARENA, batch = "spider_magneto_pvp", timeoutTicks = 300)
     public static void magnetoCanLiftAndStripTheIronSpiderOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2299,6 +2307,10 @@ public final class SpiderManTests {
         ServerPlayer magneto = f.player(8.5, FLOOR, 10.5, Power.MAGNETO);
         lookAt(magneto, player);
         seen(magneto);
+        press(magneto, 3);
+        check("message.enhanced.disarm.no_pvp".equals(seen(magneto).message()) && !SpiderServer.isStripped(player)
+                && Powers.get(magneto).isReady(3, now(helper)), "with PvP off the strip takes nothing from a player, and says why");
+        f.pvp(true);
         press(magneto, 3);
         check(!"message.enhanced.disarm.no_metal".equals(seen(magneto).message()), "Magneto found metal to strip");
         PowerTicker.tick(player);

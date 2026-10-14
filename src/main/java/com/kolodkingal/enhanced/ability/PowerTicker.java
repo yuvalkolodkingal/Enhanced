@@ -90,6 +90,7 @@ public final class PowerTicker {
     /** The player is about to lose this power: everything it left in the world ends. */
     public static void endPower(ServerPlayer player, PowerData data) {
         switch (data.power()) {
+            case MAGNETO -> MagnetoAbilities.endAll(player, data);
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);

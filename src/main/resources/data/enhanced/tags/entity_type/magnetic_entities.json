@@ -8,6 +8,8 @@
     "minecraft:hopper_minecart",
     "minecraft:tnt_minecart",
     "minecraft:spawner_minecart",
-    "enhanced:ultron_sentry"
+    "enhanced:ultron_sentry",
+    "#c:minecarts",
+    "enhanced:hex_vision"
   ]
 }

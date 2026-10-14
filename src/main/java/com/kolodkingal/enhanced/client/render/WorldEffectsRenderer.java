@@ -41,8 +41,8 @@ import java.util.function.Predicate;
 
 /**
  * Draws the energy effects that live in the world rather than on a body: the Hex walls, the Chaos Beam, the Chaos
- * Shield, the telekinetic tether and Billy's Hex Bolts. Everything is drawn for every player, including yourself in
- * first person.
+ * Shield, the telekinetic tether, Billy's Hex Bolts and the pulse and streams of Magneto's Magnetic Pull
+ * ({@link MagnetStreams}). Everything is drawn for every player, including yourself in first person.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class WorldEffectsRenderer {
@@ -133,6 +133,8 @@ public final class WorldEffectsRenderer {
         }
         renderHexBolts(mc, level, pose, beams, camera, partialTick, time);
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
+        // The Magnetic Pull: its pulse and lines of force, then the items flying to his hand (it ends its own batches).
+        MagnetStreams.render(mc, level, buffers, camera, partialTick, level.getGameTime());
     }
 
     // ---- The Hex ----

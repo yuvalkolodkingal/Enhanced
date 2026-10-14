@@ -1169,6 +1169,7 @@
   "message.enhanced.disarm.illusion": "רק אשליה: אין מה לקחת",
   "message.enhanced.disarm.metal_body": "אין מה לתלוש: המתכת היא הגוף עצמו (הרימו אותו עם R)",
   "hud.enhanced.pull_cooldown": "משיכה %s",
+  "hud.enhanced.seconds": "%s ש׳",
   "subtitles.enhanced.magnet_pull": "מתכת נמשכת פנימה",
   "message.enhanced.apocalypse.crit": "פגיעה קריטית! ×%s",
   "subtitles.enhanced.apocalypse_crit": "פגיעה קריטית באפוקליפסה"

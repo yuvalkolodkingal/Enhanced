@@ -140,9 +140,11 @@ public final class TommyAbilities {
         if (!data.isReady(2, now)) {
             return;
         }
+        // A conjured body (a Loki illusion) is passed by: what it holds is a copy of Loki's, and snatching it would make one.
         List<LivingEntity> targets = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class,
                 player.getBoundingBox().inflate(BLITZ_RADIUS), e -> e != player && e.isAlive() && !e.isSpectator()
-                        && e.distanceToSqr(player) <= BLITZ_RADIUS * BLITZ_RADIUS && disarmableHand(e) != null));
+                        && !Metal.isConjured(e) && e.distanceToSqr(player) <= BLITZ_RADIUS * BLITZ_RADIUS
+                        && disarmableHand(e) != null));
         if (targets.isEmpty()) {
             player.displayClientMessage(Component.translatable("message.enhanced.disarm.nothing"), true);
             return;

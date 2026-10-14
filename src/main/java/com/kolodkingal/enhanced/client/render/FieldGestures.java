@@ -8,8 +8,8 @@ import static com.kolodkingal.enhanced.client.render.Gestures.define;
 
 /**
  * The keys of the gestures of the two heroes who command fields rather than throw spells: Magneto, who draws his
- * magnetic field out around him and rips metal away, and Vision, who is serene (White Vision mechanical: his arms move
- * with one easing only, see {@link Gestures.Def#sampleArm}).
+ * magnetic field out around him, rips metal away and pulls it to him, and Vision, who is serene (White Vision
+ * mechanical: his arms move with one easing only, see {@link Gestures.Def#sampleArm}).
  *
  * <p>Where a gesture hands over to a stance, its last key is the stance's own pose ({@link StancePoses}), so nothing pops.
  */
@@ -47,6 +47,15 @@ final class FieldGestures {
                 .key(2, O).m(-10, 0, 30).o(-10, 0, -30)
                 .key(5, S).m(0, 0, 5).o(0, 0, -5)
                 .key(10, S).m(0, 0, 5).o(0, 0, -5);
+
+        // The Magnetic Pull: both arms flung wide and up, palms out, as his field reaches round him; then both fists drawn
+        // in to the chest and a lean back as the metal comes to him; held while it flies, then let go into the stance.
+        define(GestureId.MAG_PULL)
+                .key(0, S).m(-8, 0, 10).o(-8, 0, -10).head(0, 0, 0).lean(0)
+                .key(5, O).m(-25, 0, 125).o(-25, 0, -125).head(-8, 0, 0).lean(-1)
+                .key(12, E).m(-74, -40, 0).o(-74, 40, 0).head(4, 0, 0).lean(-4)
+                .key(16, S).m(-74, -40, 0).o(-74, 40, 0).head(4, 0, 0).lean(-4)
+                .key(20, S).m(-8, 0, 10).o(-8, 0, -10).head(0, 0, 0).lean(0);
     }
 
     private static void vision() {
