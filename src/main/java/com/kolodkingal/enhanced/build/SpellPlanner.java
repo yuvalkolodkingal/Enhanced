@@ -42,7 +42,8 @@ import java.util.NoSuchElementException;
  *     kind of block looked at; a block that held water leaves it ({@link SpellMath#vanished}).</li>
  *     <li><b>Change</b>: the kind looked at, everything, or the skin (blocks touching air), by the family rule
  *     ({@link SpellMath#swap}).</li>
- *     <li><b>Paint</b> (one dab): the skin within a ball of the brush's radius round the block looked at.</li>
+ *     <li><b>Paint</b> (one dab): the skin within a ball of the brush's radius round the block looked at; only the
+ *     selected thing's (or the box's) when the recipe names one (D-B 3.4).</li>
  *     <li><b>Pull &amp; Push</b>: copies of the surface ({@link PullSurface}) pulled out layer by layer into air or
  *     replaceable cells, or that many layers behind it (the surface included) pushed in.</li>
  *     <li><b>Shapes</b>: the {@link Shape} standing on the face looked at ({@link SpellMath#stand}).</li>
@@ -373,6 +374,11 @@ public final class SpellPlanner {
     }
 
     private static Plan paint(SpellRecipe recipe, Setup setup) {
+        // Paint has no box of its own; a dab over a selected thing (or a box) paints only its cells (D-B 3.4).
+        Volume region = region(recipe, setup);
+        if (region == null && recipe.region() != SpellRecipe.NO_REGION) {
+            return refused(recipe, setup, BuildVerdictPayload.NO_BOX);
+        }
         Material material = setup.material;
         if (material == null) {
             return refused(recipe, setup, BuildVerdictPayload.NO_BLOCK);
@@ -380,7 +386,9 @@ public final class SpellPlanner {
         BlockPos centre = recipe.anchor();
         int radius = Math.max(0, recipe.size());
         Volume ball = SpellMath.shifted(new Shape(ShapeKind.BALL, radius, 0, 1, false, 0), centre.getX(), centre.getY() - radius, centre.getZ());
-        return new Plan(recipe, NONE, ball, null, skin(material), Order.RISE, setup);
+        Volume cells = region == null ? ball : SpellMath.within(ball, region);
+        // A dab that misses the selected thing paints nothing.
+        return new Plan(recipe, NONE, cells, null, cells == null ? null : skin(material), Order.RISE, setup);
     }
 
     private static Plan pull(BlockGetter level, SpellRecipe recipe, Setup setup) {

@@ -53,8 +53,9 @@ import java.util.function.Function;
  * <ul>
  *     <li><b>{@link Volume}s</b>: sets of cells that are walked row by row, a row being the cells of one {@code y} and
  *     one {@code z} as runs along {@code x}: the box and its Fill styles ({@link #fill}, {@link #inside}), the eight
- *     {@link Shape}s, a set of cells ({@link #cells}), and {@linkplain #shifted any of them moved}. Rows are computed,
- *     not listed, so the walls of a valley-sized box cost their walls, not their volume.</li>
+ *     {@link Shape}s, a set of cells ({@link #cells}), {@linkplain #shifted any of them moved}, and the cells two of
+ *     them share ({@link #within}). Rows are computed, not listed, so the walls of a valley-sized box cost their walls,
+ *     not their volume.</li>
  *     <li><b>The shapes</b> of Appendix A.1, solid and hollow, in whole blocks and integer arithmetic wherever it can
  *     be, so a client and the server never disagree on a cell (Appendix A.2 pins their counts).</li>
  *     <li><b>Turn and flip</b> ({@link Placement}): where a pocket's cell lands and what its block becomes, and
@@ -173,6 +174,21 @@ public final class SpellMath {
     /** The volume moved by {@code dx, dy, dz}: a shape's offsets put where it stands. */
     public static Volume shifted(Volume volume, int dx, int dy, int dz) {
         return new Shifted(volume, dx, dy, dz, volume.bounds().moved(dx, dy, dz));
+    }
+
+    /**
+     * The cells of {@code volume} that are also in {@code region} (a Paint dab over a selected thing, D-B 3.4), or null
+     * when their boxes do not meet. Its rows are the volume's rows cut to the region's, so it costs what the smaller of
+     * the two costs; it is counted row by row.
+     */
+    public static @Nullable Volume within(Volume volume, Volume region) {
+        BoundingBox a = volume.bounds();
+        BoundingBox b = region.bounds();
+        if (!a.intersects(b)) {
+            return null;
+        }
+        return new Within(volume, region, new BoundingBox(Math.max(a.minX(), b.minX()), Math.max(a.minY(), b.minY()), Math.max(a.minZ(), b.minZ()),
+                Math.min(a.maxX(), b.maxX()), Math.min(a.maxY(), b.maxY()), Math.min(a.maxZ(), b.maxZ())));
     }
 
     /** The cells of a set of positions ({@link BlockPos#asLong}), which must not change while the volume is used. */
@@ -324,6 +340,26 @@ public final class SpellMath {
         @Override
         public long count() {
             return volume.count();
+        }
+    }
+
+    /** The cells of a volume that a region holds too; {@code bounds} is where their boxes meet. */
+    private record Within(Volume volume, Volume region, BoundingBox bounds) implements Volume {
+        @Override
+        public boolean contains(int x, int y, int z) {
+            return bounds.isInside(x, y, z) && volume.contains(x, y, z) && region.contains(x, y, z);
+        }
+
+        @Override
+        public int[] runs(int y, int z, int x0, int x1) {
+            int from = Math.max(x0, bounds.minX());
+            int to = Math.min(x1, bounds.maxX());
+            if (y < bounds.minY() || y > bounds.maxY() || z < bounds.minZ() || z > bounds.maxZ() || from > to) {
+                return NO_RUNS;
+            }
+            int[] cells = volume.runs(y, z, from, to);
+            // The region is asked only where the volume has cells (a selected thing answers cell by cell).
+            return cells.length == 0 ? NO_RUNS : intersect(cells, region.runs(y, z, cells[0], cells[cells.length - 1]));
         }
     }
 

@@ -779,6 +779,54 @@ public final class BuildMathTests {
         helper.succeed();
     }
 
+    /**
+     * A Paint dab over a selected thing paints only the thing (D-B 3.4: Vanish, Change and Paint act only on it): an
+     * oak hut, magic-selected, and an oak fence beside it that is not, both inside the brush; with nothing selected the
+     * same dab paints the fence too. A box limits a dab the same way, a dab that misses the thing paints nothing, and a
+     * selected thing the planner was not handed is no box.
+     */
+    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    public static void aDabPaintsOnlyTheSelectedThing(GameTestHelper helper) {
+        BlockState fence = Blocks.OAK_FENCE.defaultBlockState();
+        BlockState spruceFence = Blocks.SPRUCE_FENCE.defaultBlockState();
+        BlockPos middle = new BlockPos(1, 64, 0);
+        BlockPos post = new BlockPos(1, 64, 2);
+        SpellRecipe dab = recipe(Spell.PAINT).op(SpellRecipe.Op.DAB).at(middle, Direction.UP).size(2).build();
+        World free = hut(fence);
+        free.build(SpellPlanner.plan(free, dab, Setup.at(CASTER).withMaterial(SPRUCE)));
+        check(free.count(SPRUCE) == 4 && free.getBlockState(post) == spruceFence, "with nothing selected the dab paints the hut and the fence");
+
+        World yard = hut(fence);
+        MagicSelect select = new MagicSelect(yard, List.of(middle), 512).run();
+        Volume thing = select.mask();
+        check(thing != null && thing.count() == 4 && !thing.contains(post.getX(), post.getY(), post.getZ()), "the hut is selected, the fence is not");
+        SpellRecipe masked = recipe(Spell.PAINT).op(SpellRecipe.Op.DAB).mask().at(middle, Direction.UP).size(2).build();
+        Plan painted = SpellPlanner.plan(yard, masked, Setup.at(CASTER).withMask(thing).withMaterial(SPRUCE));
+        List<Cell> ghost = cells(painted, yard);
+        check(painted.size() == 4 && ghost.size() == 4 && ghost.stream().allMatch(cell -> thing.contains(cell.pos().getX(), cell.pos().getY(), cell.pos().getZ())),
+                "the ghost is the hut's 4 cells: " + painted.size() + ", " + ghost.size());
+        yard.build(painted);
+        check(yard.count(SPRUCE) == 4 && yard.getBlockState(post) == fence, "the hut is spruce, the fence beside it still oak");
+
+        World boxed = hut(fence);
+        boxed.build(SpellPlanner.plan(boxed, recipe(Spell.PAINT).op(SpellRecipe.Op.DAB).box(new BlockPos(0, 64, 0), new BlockPos(0, 65, 0))
+                .at(middle, Direction.UP).size(2).build(), Setup.at(CASTER).withMaterial(SPRUCE)));
+        check(boxed.count(SPRUCE) == 1 && boxed.getBlockState(new BlockPos(0, 64, 0)) == SPRUCE && boxed.getBlockState(post) == fence,
+                "a box limits the dab the same way: only its one plank");
+
+        Plan away = SpellPlanner.plan(yard, recipe(Spell.PAINT).op(SpellRecipe.Op.DAB).mask().at(new BlockPos(10, 64, 10), Direction.UP).size(2).build(),
+                Setup.at(CASTER).withMask(thing).withMaterial(PLANKS));
+        check(away.refusal() == SpellPlanner.NONE && !away.writes() && away.size() == 0 && cells(away, yard).isEmpty(), "a dab off the thing paints nothing");
+        check(SpellPlanner.plan(yard, masked, Setup.at(CASTER).withMaterial(SPRUCE)).refusal() == BuildVerdictPayload.NO_BOX,
+                "a selected thing the planner was not handed: no box");
+        helper.succeed();
+    }
+
+    /** An oak hut of 4 planks (three in a row and one on the middle) and, one cell away from it, {@code post}. */
+    private static World hut(BlockState post) {
+        return new World().set(0, 64, 0, PLANKS).set(1, 64, 0, PLANKS).set(2, 64, 0, PLANKS).set(1, 65, 0, PLANKS).set(1, 64, 2, post);
+    }
+
     // B8
 
     /**
