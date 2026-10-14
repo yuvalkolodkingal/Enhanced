@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Function;
 
-/** Glowing, additive render types for energy: beams, shields, the Hex wall and Build Magic's box. */
+/** Render types for energy (beams, shields, the Hex wall, Build Magic's box) and for Build Magic's ghost. */
 public final class EnhancedRenderTypes {
 
     /** Untextured, additive (light adds up), double-sided, doesn't hide what's behind it. */
@@ -60,6 +60,41 @@ public final class EnhancedRenderTypes {
                     .setCullState(RenderStateShard.NO_CULL)
                     .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
                     .createCompositeState(false));
+
+    /**
+     * Real block models seen through (D-B 6.2): the block atlas, normal alpha blending, hidden by the world in front of
+     * it but never hiding what is behind it (no depth write), double-sided, and pushed a little towards the camera so
+     * the ghost of a block that replaces another wins over that block's faces. Build Magic's ghost, drawn from buffers
+     * of its own with the terrain's translucent shader (its chunk offset puts the ghost where it stands).
+     */
+    public static final RenderType BUILD_GHOST = RenderType.create("enhanced_build_ghost",
+            DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 4096, false, true, ghost(RenderStateShard.BLOCK_SHEET_MIPPED,
+                    RenderStateShard.TRANSLUCENT_TRANSPARENCY));
+
+    /** The game's plain white texture: a ghost's blocks drawn with it keep their shape and shade, not their look. */
+    private static final RenderStateShard.TextureStateShard WHITE = new RenderStateShard.TextureStateShard(
+            ResourceLocation.withDefaultNamespace("textures/misc/white.png"), false, false);
+
+    /** As {@link #BUILD_GHOST}, but flat white (the shader colour greys it): the ghost of a spell that is refused. */
+    public static final RenderType BUILD_GHOST_FLAT = RenderType.create("enhanced_build_ghost_flat",
+            DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 4096, false, true, ghost(WHITE, RenderStateShard.TRANSLUCENT_TRANSPARENCY));
+
+    /** As {@link #BUILD_GHOST}, but flat white and additive: the hero's glow laid over a ghost's blocks. */
+    public static final RenderType BUILD_GHOST_GLOW = RenderType.create("enhanced_build_ghost_glow",
+            DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 4096, false, true, ghost(WHITE, RenderStateShard.LIGHTNING_TRANSPARENCY));
+
+    private static RenderType.CompositeState ghost(RenderStateShard.EmptyTextureStateShard texture,
+                                                   RenderStateShard.TransparencyStateShard transparency) {
+        return RenderType.CompositeState.builder()
+                .setLightmapState(RenderStateShard.LIGHTMAP)
+                .setShaderState(RenderStateShard.RENDERTYPE_TRANSLUCENT_SHADER)
+                .setTextureState(texture)
+                .setTransparencyState(transparency)
+                .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                .setCullState(RenderStateShard.NO_CULL)
+                .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
+                .createCompositeState(false);
+    }
 
     private static final RenderStateShard.ShaderStateShard POSITION_TEX_COLOR =
             new RenderStateShard.ShaderStateShard(GameRenderer::getPositionTexColorShader);
