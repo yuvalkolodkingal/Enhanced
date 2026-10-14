@@ -190,6 +190,7 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_ON_BILLY = register("build_on_billy");
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_CAST_WANDA = register("build_cast_wanda");
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_CAST_BILLY = register("build_cast_billy");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_HUM = register("build_hum");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));

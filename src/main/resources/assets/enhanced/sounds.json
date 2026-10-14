@@ -1099,5 +1099,13 @@
         "name": "enhanced:build_cast_billy"
       }
     ]
+  },
+  "build_hum": {
+    "subtitle": "subtitles.enhanced.build_hum",
+    "sounds": [
+      {
+        "name": "enhanced:build_hum"
+      }
+    ]
   }
 }

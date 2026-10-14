@@ -50,10 +50,10 @@ public final class BuildSounds {
     private static final StandIn CAST_WANDA_HUGE = new StandIn(ModSounds.HEX_RISE, 0.8F, 1.0F);
     /** "A spell crackles": one of Billy's spells starts, a quick electric crackle and a bright chime. */
     private static final StandIn CAST_BILLY = new StandIn(ModSounds.BUILD_CAST_BILLY, 0.8F, 1.0F);
-    /** "Magic weaves": every 20 ticks at the front of the Scarlet Witch's working spell. */
-    private static final StandIn HUM_WANDA = new StandIn(() -> SoundEvents.AMETHYST_BLOCK_RESONATE, 0.35F, 0.8F, 1.2F);
+    /** "Magic weaves": every 20 ticks at the front of the Scarlet Witch's working spell, a low warm hum (1.0 s). */
+    private static final StandIn HUM_WANDA = new StandIn(ModSounds.BUILD_HUM, 0.5F, 0.9F, 1.0F);
     /** The same at the front of Billy's, higher. */
-    private static final StandIn HUM_BILLY = new StandIn(() -> SoundEvents.AMETHYST_BLOCK_RESONATE, 0.35F, 1.4F, 1.8F);
+    private static final StandIn HUM_BILLY = new StandIn(ModSounds.BUILD_HUM, 0.5F, 1.3F, 1.5F);
     /** "A spell fizzles": a refusal, for the builder alone. */
     private static final StandIn FIZZLE = new StandIn(() -> SoundEvents.FIRE_EXTINGUISH, 0.4F, 1.8F);
     /** "Reality snaps back": an undo or a redo starts. */
