@@ -40,6 +40,7 @@ import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.ItemStack;
@@ -878,8 +879,8 @@ public final class MagnetPull {
             return wantsItem(player, item) ? Act.ITEM : null;
         }
         if (e instanceof AbstractArrow arrow) {
-            return isStuckMetal(arrow) && BossFights.fightOf(e) == null && hasRoom(player, arrow.getPickupItemStackOrigin())
-                    ? Act.ARROW : null;
+            return isStuckMetal(player, arrow) && BossFights.fightOf(e) == null
+                    && hasRoom(player, arrow.getPickupItemStackOrigin()) ? Act.ARROW : null;
         }
         if (e instanceof FallingBlockEntity || e instanceof TelekineticBlockEntity) {
             return Metal.isMagnetic(e) && BossFights.fightOf(e) == null ? Act.BLOCK : null; // a borrowed block carries its fight's mark
@@ -942,10 +943,18 @@ public final class MagnetPull {
         return false;
     }
 
-    /** A metal arrow or trident lying stuck in the ground that anyone may pick up (a skeleton's arrows stay). */
-    private static boolean isStuckMetal(AbstractArrow arrow) {
-        return arrow.inGround && arrow.pickup == AbstractArrow.Pickup.ALLOWED && arrow.getType().is(ModTags.METALLIC_PROJECTILES)
-                && !arrow.getPickupItemStackOrigin().isEmpty();
+    /**
+     * A metal arrow or trident lying stuck in the ground that walking over it would give him: one anyone may pick up (a
+     * skeleton's arrows stay), done shaking from its landing, and, for a trident, his own or no one's who is here (a
+     * thrown trident goes back only to the one who threw it, so another player's stays where it is stuck).
+     */
+    private static boolean isStuckMetal(ServerPlayer player, AbstractArrow arrow) {
+        if (!arrow.inGround || arrow.shakeTime > 0 || arrow.pickup != AbstractArrow.Pickup.ALLOWED
+                || !arrow.getType().is(ModTags.METALLIC_PROJECTILES) || arrow.getPickupItemStackOrigin().isEmpty()) {
+            return false;
+        }
+        Entity owner = arrow.getOwner();
+        return !(arrow instanceof ThrownTrident) || owner == null || owner.getUUID().equals(player.getUUID());
     }
 
     /**

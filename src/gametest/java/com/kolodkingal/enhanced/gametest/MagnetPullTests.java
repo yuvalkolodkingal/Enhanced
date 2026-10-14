@@ -46,6 +46,7 @@ import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.entity.vehicle.MinecartChest;
@@ -1312,9 +1313,10 @@ public final class MagnetPullTests {
 
     /**
      * M21. Loose metal and creatures' gear come from all round him: an ingot, a golden apple, the stuck arrow anyone may
-     * pick up, and a zombie's iron helmet and sword are his. The diamond, the skeleton's kind of arrow nobody may pick up,
-     * the zombie's leather boots, the iron armour of another player's horse and an armour stand's gold chestplate stay
-     * where they are, and the villager is left alone.
+     * pick up, his own stuck trident, and a zombie's iron helmet and sword are his. The diamond, the skeleton's kind of
+     * arrow nobody may pick up, another player's stuck trident (it goes back only to him who threw it), the zombie's
+     * leather boots, the iron armour of another player's horse and an armour stand's gold chestplate stay where they
+     * are, and the villager is left alone.
      */
     @GameTest(template = ARENA, batch = PULL)
     public static void thePullTakesLooseMetalAndGear(GameTestHelper helper) {
@@ -1337,6 +1339,10 @@ public final class MagnetPullTests {
         stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.GOLDEN_CHESTPLATE));
         Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 5.5));
         check(owner.distanceTo(magneto) > EnhancedConfig.PULL_RADIUS.get() + 2, "the horse's owner is out of reach");
+        ThrownTrident his = stuckTrident(helper, new Vec3(14.5, FLOOR, 7.5), magneto);
+        ThrownTrident others = stuckTrident(helper, new Vec3(9.5, FLOOR, 14.5), owner);
+        check(his.pickup == AbstractArrow.Pickup.ALLOWED && others.pickup == AbstractArrow.Pickup.ALLOWED,
+                "each trident may be picked up, as a player's throw leaves it");
 
         sneakR(magneto);
         afterThePull(f, magneto, 20, () -> {
@@ -1344,6 +1350,8 @@ public final class MagnetPullTests {
             check(!apple.isAlive() && count(magneto, Items.GOLDEN_APPLE) == 1, "the golden apple is his");
             check(!anyones.isAlive() && count(magneto, Items.ARROW) == 1, "one arrow is his: the one anyone may pick up");
             check(nobodys.isAlive(), "the arrow nobody may pick up stays stuck");
+            check(!his.isAlive() && count(magneto, Items.TRIDENT) == 1, "his own stuck trident is his again");
+            check(others.isAlive() && others.inGround, "another player's stuck trident stays where it is");
             check(count(magneto, Items.IRON_HELMET) == 1 && count(magneto, Items.IRON_SWORD) == 1, "the zombie's helmet and sword are his");
             check(zombie.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && zombie.getMainHandItem().isEmpty()
                     && zombie.getItemBySlot(EquipmentSlot.FEET).is(Items.LEATHER_BOOTS), "it keeps only its leather boots");
@@ -1865,6 +1873,17 @@ public final class MagnetPullTests {
         arrow.pickup = pickup;
         helper.getLevel().addFreshEntity(arrow);
         return arrow;
+    }
+
+    /** A trident stuck in the floor at {@code relative}, thrown by {@code thrower}. */
+    private static ThrownTrident stuckTrident(GameTestHelper helper, Vec3 relative, ServerPlayer thrower) {
+        Vec3 at = helper.absoluteVec(relative.subtract(0, 0.05, 0));
+        ThrownTrident trident = new ThrownTrident(helper.getLevel(), thrower, new ItemStack(Items.TRIDENT));
+        trident.moveTo(at.x, at.y, at.z);
+        trident.setDeltaMovement(Vec3.ZERO);
+        trident.inGround = true;
+        helper.getLevel().addFreshEntity(trident);
+        return trident;
     }
 
     /** A full set of iron armour on the player. */
