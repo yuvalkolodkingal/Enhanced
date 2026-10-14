@@ -57,7 +57,11 @@ Not at first. Wanda's magic has no limit; Billy's is an apprentice's: a meter of
 
 ### Can someone wreck my house with Build Magic?
 
-Not by accident, and not on your land. A spell asks every claim and protection mod for every block (and the world border, spawn protection and Adventure mode), leaves chests that hold things alone, never touches bedrock-like blocks, spawners or Mjolnir, never buries or lifts another player when PvP is off, and a spell that removes or replaces more than 64 blocks needs the right button held for a second. And **Ctrl + Z** undoes it, even tomorrow, without destroying anything built since. A server can set `build_magic.operatorsOnly`, and an operator can undo a child's mistake with `/enhanced build undo`. See [Build Magic](Build-Magic#what-magic-will-not-touch).
+Not by accident, and not on your land. A spell asks every claim and protection mod for every block (and the world border, spawn protection and Adventure mode), leaves chests that hold things alone (a Move spares a full chest too, and a Copy keeps a chest's things only where the caster may break it), never touches bedrock-like blocks, spawners or Mjolnir, never buries or lifts another player when PvP is off (nor puts water, lava or fire where one stands), and a spell that removes or replaces more than 64 blocks needs the right button held for a second. And **Ctrl + Z** undoes it, even tomorrow, without destroying anything built since. A server can set `build_magic.operatorsOnly`, and an operator can undo a child's mistake with `/enhanced build undo`. See [Build Magic](Build-Magic#what-magic-will-not-touch).
+
+### How much disk does the undo history take?
+
+Up to 512 MiB for each player and 4,096 MiB for all of them together, at the default settings (`build_magic.undoDiskMb`, `build_magic.serverUndoDiskMb`); past that the oldest spells are forgotten and the player is told. It lives in the world folder under `data/enhanced/build/`, one folder for each player, written before a spell changes the world, so even a crash leaves it undoable. A huge spell (over about 4 million blocks) is kept as a "lite step" on the disk instead of in memory, and `/enhanced build forget <player>` clears one player's history. See [Build Magic](Build-Magic#undo-ctrl--z-even-tomorrow).
 
 ### Does Build Magic lag the server?
 
