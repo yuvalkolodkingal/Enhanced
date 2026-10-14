@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
@@ -25,6 +26,7 @@ import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -376,8 +378,8 @@ public final class ApocalypseFight extends BossFight {
                 closeWindow();
             }
         }
-        if (staggerLeft == 0 && !isOver() && thinks()) {
-            boss.brain().tick(boss, this);
+        if (staggerLeft == 0 && !isOver() && thinks() && !BossGrip.stills(boss)) {
+            boss.brain().tick(boss, this); // (a grip, or a throw's still, stops his mind, not his stagger: D-T 4.4)
         }
     }
 
@@ -707,7 +709,7 @@ public final class ApocalypseFight extends BossFight {
                 boss.brain().setAfterStagger(false);
                 boss.brain().setInWindow(false);
             }
-        } else if (thinks()) {
+        } else if (thinks() && !BossGrip.stills(boss)) {
             boss.brain().tick(boss, this);
         }
         // What the blow that brought him to the floor did comes first: his healing must not mend him past the line (he is held
@@ -934,6 +936,55 @@ public final class ApocalypseFight extends BossFight {
             boss.setDeltaMovement(Vec3.ZERO);
             boss.getNavigation().stop();
         }
+    }
+
+    // ---- telekinesis (3.1, D-T 6.3.1) ----
+
+    /** {@code [apocalypse_boss].holdTicks}. */
+    @Override
+    public int holdTicks() {
+        return ApocalypseBossConfig.HOLD_TICKS.get();
+    }
+
+    /**
+     * Where telekinesis may carry what is his, and his fighters: the boss within {@code fightRadius - 2} (inside the leash
+     * of {@link #keepHome}, so the grip and his leash never pull against each other), everything else inside the wall
+     * ({@code containRadius - 2}); and all of it under the wall's top, less two.
+     */
+    @Override
+    protected Vec3 carryLimit(Entity entity, Vec3 wanted) {
+        ApocalypseArena arena = (ApocalypseArena) arena();
+        double reach = entity == boss ? arena.fightRadius() - 2.0 : arena.containRadius() - 2.0;
+        return keepWithin(entity, wanted, reach, Double.NEGATIVE_INFINITY, arena.top() - 2.0);
+    }
+
+    /**
+     * What a throw left outside its carry limit comes back: the boss to the middle, as his leash puts him; a Horseman two
+     * blocks inside the wall, on the sand.
+     */
+    @Override
+    protected void bringBack(Entity entity) {
+        if (entity == boss) {
+            boss.moveTo(centre.x, centre.y, centre.z, boss.getYRot(), 0.0F);
+            boss.setDeltaMovement(Vec3.ZERO);
+            boss.getNavigation().stop();
+            return;
+        }
+        double dx = entity.getX() - centre.x;
+        double dz = entity.getZ() - centre.z;
+        double flat = Math.hypot(dx, dz);
+        double reach = arena().containRadius() - 2.0;
+        double scale = flat > reach ? reach / flat : 1.0;
+        double x = centre.x + dx * scale;
+        double z = centre.z + dz * scale;
+        double y = SandControl.groundAt(level(), x, centre.y + 6.0, z);
+        entity.teleportTo(x, y, z);
+        entity.setDeltaMovement(Vec3.ZERO);
+        entity.resetFallDistance();
+        if (entity instanceof Mob mob) {
+            mob.getNavigation().stop();
+        }
+        SandControl.puff(level(), new Vec3(x, y + 0.5, z), 10, 0.4);
     }
 
     private void refreshBars() {

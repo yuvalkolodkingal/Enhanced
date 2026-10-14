@@ -86,6 +86,7 @@ import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
@@ -904,9 +905,10 @@ public final class PhoenixTests {
             Telekinesis.release(jean, false);
             blocks.get(0).discard();
 
-            // Bosses are too strong, and so is a block that is too hard.
-            Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(12.5, FLOOR, 12.5));
-            check(!Telekinesis.canLift(jean, warden, Telekinesis.Mode.JEAN), "a Warden cannot be lifted");
+            // The Ender Dragon is too vast to hold (the Warden is held as a boss since 3.1, R37), and a block that is too hard
+            // is too strong.
+            EnderDragon dragon = EntityType.ENDER_DRAGON.create(level);
+            check(dragon != null && !Telekinesis.canLift(jean, dragon, Telekinesis.Mode.JEAN), "the Ender Dragon cannot be lifted");
             BlockPos obsidian = new BlockPos(9, 2, 7);
             helper.setBlock(obsidian, Blocks.OBSIDIAN);
             lookAt(jean, Vec3.atCenterOf(helper.absolutePos(obsidian)));

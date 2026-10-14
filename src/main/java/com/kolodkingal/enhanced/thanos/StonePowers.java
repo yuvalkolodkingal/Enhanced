@@ -55,9 +55,12 @@ public final class StonePowers {
         return creature instanceof Player player && (player.isCreative() || player.isSpectator() || VisionAbilities.isPhased(player));
     }
 
-    /** Whether a stone can take hold of the creature (grab it, pull it): not untouchable and not pinned by Mjolnir. */
+    /**
+     * Whether a stone can take hold of the creature (grab it, pull it): not untouchable, not pinned by Mjolnir, and not one
+     * the villains' pulls pass by ({@code pull_immune}: what no telekinesis lifts, and the bosses).
+     */
     public static boolean graspable(LivingEntity creature) {
-        return !untouchable(creature) && !MjolnirPin.isPinned(creature) && !creature.getType().is(ModTags.TELEKINESIS_IMMUNE);
+        return !untouchable(creature) && !MjolnirPin.isPinned(creature) && !creature.getType().is(ModTags.PULL_IMMUNE);
     }
 
     // ---- hurting and pushing ----

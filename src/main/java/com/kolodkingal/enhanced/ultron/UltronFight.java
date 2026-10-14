@@ -2,9 +2,12 @@ package com.kolodkingal.enhanced.ultron;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.boss.ArenaLoans;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
@@ -16,9 +19,12 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -89,6 +95,11 @@ public final class UltronFight extends BossFight {
     public static final int SPEECH_COLOR = 0xD8262B;
     /** While the island is up his body and the Sentries are looked over this often (ticks), and brought back onto it. */
     public static final int TETHER_INTERVAL = 10;
+    /**
+     * What telekinesis carries is still on the island this far under its surface (in a hole of it); farther down it is
+     * under the island or beside it, and keeps the ground's carry limit ({@link #carryLimit}).
+     */
+    public static final double UNDER_THE_SURFACE = 2.0;
 
     private static final Component NAME = Component.translatable("entity.enhanced.ultron");
 
@@ -124,6 +135,8 @@ public final class UltronFight extends BossFight {
     private boolean spokeLow;
     private boolean victoryTold;
     private boolean programUsed;
+    /** Whether the island's descent has begun (the arena lends nothing more). */
+    private boolean descending;
 
     // Per-tick caches.
     private long cachedAt = -1;
@@ -657,7 +670,10 @@ public final class UltronFight extends BossFight {
         }
         boolean wanted = UltronBossConfig.LIFT_ENABLED.get() && UltronBossConfig.LIFT_MODE.get() != UltronBossConfig.LiftMode.TREMOR;
         lifting = wanted && LiftHooks.get().warn(this);
-        if (!lifting) {
+        if (lifting) {
+            // The ground is copied at the lock: whatever telekinesis borrowed from it is back first (D-T 5.7).
+            loans().returnAll();
+        } else {
             tremor = true;
             tell(Component.translatable("message.enhanced.ultron.tremor").withStyle(ChatFormatting.YELLOW), false);
         }
@@ -786,17 +802,20 @@ public final class UltronFight extends BossFight {
      * While the island is up, a body or a Sentry of the fight that has ended up under it (it sank past the rim, a blow
      * knocked it off) or far past its rim is brought back over the island, inside its rim, in a flash: they hover at a
      * height over the ground beneath them, so one that is down there could never climb back, and the fight would go on
-     * without them.
+     * without them. One that telekinesis holds, or that a throw keeps still, is left to the grip (the tether and the grip
+     * never pull against each other); once let go, the tether brings it back if it must.
      */
     private void keepTheArmyOnTheIsland(@Nullable UltronEntity boss, long now) {
         if (phase != Phase.ISLAND || !island.isIslandUp() || dying || now % TETHER_INTERVAL != 0) {
             return;
         }
-        if (boss != null && transfer == null) {
+        if (boss != null && transfer == null && !BossGrip.stills(boss)) {
             tether(boss);
         }
         for (UltronSentryEntity sentry : sentries()) {
-            tether(sentry);
+            if (!BossGrip.stills(sentry)) {
+                tether(sentry);
+            }
         }
     }
 
@@ -827,6 +846,97 @@ public final class UltronFight extends BossFight {
     /** The top of the island's ground at a column (a tree on it is not its ground), while it is up. */
     private double islandSurface(double x, double z) {
         return UltronMotion.groundBelowTheTrees(level(), x, island.center().y + 4.0, z) + island.islandOffset();
+    }
+
+    // ---- telekinesis (3.1, D-T 6.1.2) ----
+
+    /** {@code [ultron_boss].holdTicks}. */
+    @Override
+    public int holdTicks() {
+        return UltronBossConfig.HOLD_TICKS.get();
+    }
+
+    /**
+     * Why the arena lends no block at {@code pos} now (D-T 5.6): the ground is about to rise, from the warning to the end of
+     * the rise ({@code arena_moving}: it is copied at the lock, and was given back whole at the warning); the island is
+     * coming down ({@code arena_descending}); or the cell is ground the clients hide under the island ({@code protected}).
+     */
+    @Nullable
+    @Override
+    protected String lendRefusal(BlockPos pos) {
+        if (lifting && (phase == Phase.LIFT_WARN || phase == Phase.LIFT_LOCK || phase == Phase.RISING)) {
+            return "message.enhanced.telekinesis.arena_moving";
+        }
+        if (descending) {
+            return "message.enhanced.telekinesis.arena_descending";
+        }
+        return hidesGround(pos) ? ArenaLoans.PROTECTED : null;
+    }
+
+    /** A cell of the island in the sky (see {@link UltronArena#isCopyCell}): protected and borrowed whatever the config says. */
+    @Override
+    protected boolean isCopyCell(BlockPos pos) {
+        return island.isCopyCell(pos);
+    }
+
+    /** The ground the clients hide under the island while it is up (see {@link UltronArena#hidesGround}). */
+    @Override
+    protected boolean hidesGround(BlockPos pos) {
+        return island.hidesGround(pos);
+    }
+
+    /** Whatever the Sokovia lift carries now: no telekinesis takes it, and a hero it carries uses none. */
+    @Override
+    protected boolean locks(Entity entity) {
+        return SokoviaLift.isCarried(entity);
+    }
+
+    /**
+     * Where telekinesis may carry a body, a Sentry, a fighter or a borrowed block: on the ground, inside the field ({@code
+     * containRadius - 2}, the default); while the island is up, what is on it ({@link #isOverTheIsland}) and a borrowed
+     * copy of it wherever it is ({@link ArenaLoans#isIslandCopy}) are kept within {@link #armyReach}, the narrowest the rim
+     * runs, so that they are never carried off the island. What is beside the island or under it keeps the ground's limit: a
+     * block of the ring carried up past the rim follows its holder up, and is not dragged in under the island.
+     */
+    @Override
+    protected Vec3 carryLimit(Entity entity, Vec3 wanted) {
+        if (island.isIslandUp() && (isOverTheIsland(entity) || loans().isIslandCopy(entity))) {
+            return keepWithin(entity, wanted, armyReach(radius), Double.NEGATIVE_INFINITY, island.top());
+        }
+        return super.carryLimit(entity, wanted);
+    }
+
+    /**
+     * Whether {@code entity} is on the island in the sky or over it, for the carry limit: it is up there ({@link
+     * UltronArena#isOnTheIsland}), in a column of the island ({@link UltronArena#isIslandColumn}), and at most {@link
+     * #UNDER_THE_SURFACE} under the island's surface there (in a hole of it). One beside the island, or under it, is not.
+     */
+    private boolean isOverTheIsland(Entity entity) {
+        return island.isOnTheIsland(entity) && island.isIslandColumn(entity.getX(), entity.getZ())
+                && entity.getY() >= islandSurface(entity.getX(), entity.getZ()) - UNDER_THE_SURFACE;
+    }
+
+    /**
+     * A body or a Sentry thrown past its carry limit is flashed back, as the tether does: on the ground three blocks inside
+     * the field, over the surface; while the island is up and it was on it, inside the rim over the island.
+     */
+    @Override
+    protected void bringBack(Entity entity) {
+        Vec3 c = island.center();
+        double dx = entity.getX() - c.x;
+        double dz = entity.getZ() - c.z;
+        double flat = Math.hypot(dx, dz);
+        boolean onTheIsland = island.isOnTheIsland(entity);
+        double reach = onTheIsland ? armyReach(radius) : island.containRadius() - 3.0;
+        double scale = flat > reach ? reach / flat : 1.0;
+        double x = c.x + dx * scale;
+        double z = c.z + dz * scale;
+        double y = onTheIsland ? islandSurface(x, z) + 2.5 : groundAt(x, z) + 1.0;
+        UltronFx.at(level(), UltronFxPayload.FLASH, entity.position().add(0, entity.getBbHeight() * 0.5, 0), 2.0F, 8);
+        entity.teleportTo(x, y, z);
+        entity.setDeltaMovement(Vec3.ZERO);
+        entity.resetFallDistance();
+        UltronFx.at(level(), UltronFxPayload.FLASH, new Vec3(x, y + entity.getBbHeight() * 0.5, z), 2.0F, 8);
     }
 
     /** A piece of Sokovia lands: dust, stone and a thud, 10 damage to everything in the ring. Nothing in the world changes. */
@@ -1026,37 +1136,58 @@ public final class UltronFight extends BossFight {
 
     /**
      * Wanda pressed her telekinesis key holding nothing and looks at a body: below {@code heartRipThreshold} of its
-     * health, once the island is up, she tears out its core and the body is destroyed at once, through the upload; above
-     * it, he is too powerful to lift.
+     * health, once the island is up, she tears out its core and the body is destroyed at once, through the upload. Only
+     * then is the press the fight's: otherwise her telekinesis holds him as a boss, or says why it cannot (3.1, D-T
+     * 6.1.1).
      */
     @Override
     protected boolean onTelekinesisPress(ServerPlayer wanda) {
         EntityHitResult looked = Raycasts.entity(wanda, EnhancedConfig.TELEKINESIS_RANGE.get(), 0.3,
                 e -> e instanceof UltronEntity && owns(e), 1.0F);
-        if (looked == null || !(looked.getEntity() instanceof UltronEntity body)) {
+        if (looked == null || !(looked.getEntity() instanceof UltronEntity body) || !canRip(body)) {
             return false;
         }
-        double threshold = UltronBossConfig.HEART_RIP_THRESHOLD.get();
-        if (threshold > 0.0 && canFall() && !body.isShielded() && body.getHealth() <= body.getMaxHealth() * threshold) {
-            UltronSounds.TRANSFER.play(level(), body.position(), 1.0F, 1.4F);
-            UltronFx.at(level(), UltronFxPayload.PULSE, body.position(), 0.0F, 10);
-            credit(wanda, DAMAGE, body.getHealth());
-            onBodyDestroyed(body, null, wanda);
-        } else {
-            wanda.displayClientMessage(Component.translatable("message.enhanced.ultron.too_powerful"), true);
-        }
+        rip(wanda, body);
         return true;
     }
 
-    /** Wanda throws a Sentry she holds: its core is crushed instead, and it dies at once in red sparks. */
+    /** Whether Wanda's hand tears the core out of this body: at or below the threshold, on the island, not shielded. */
+    private boolean canRip(UltronEntity body) {
+        double threshold = UltronBossConfig.HEART_RIP_THRESHOLD.get();
+        return threshold > 0.0 && canFall() && !body.isShielded() && body.getHealth() <= body.getMaxHealth() * threshold;
+    }
+
+    /** Wanda tears the core out of a body: it is destroyed at once, through the upload, and what was left of it is hers. */
+    private void rip(ServerPlayer wanda, UltronEntity body) {
+        UltronSounds.TRANSFER.play(level(), body.position(), 1.0F, 1.4F);
+        UltronFx.at(level(), UltronFxPayload.PULSE, body.position(), 0.0F, 10);
+        credit(wanda, DAMAGE, body.getHealth());
+        onBodyDestroyed(body, null, wanda);
+    }
+
+    /**
+     * Wanda or Magneto throws what they hold. A body of his that her hand can tear the core out of is torn instead of
+     * thrown (3.1; her hand alone: Magneto's throw is a throw). A Sentry of the fight is crushed instead by either, and dies
+     * at once, what was left of it theirs: in her scarlet energy, or, by Magneto (R40), in grey metal sparks with the clang
+     * of an anvil and the snap of a chain.
+     */
     @Override
-    protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
+    protected boolean onTelekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
+        if (mode == Telekinesis.Mode.WANDA && held instanceof UltronEntity body && owns(body) && body.isAlive() && canRip(body)) {
+            rip(holder, body);
+            return true;
+        }
         if (!(held instanceof UltronSentryEntity sentry) || sentry.getOwnerUUID() != null || !owns(sentry) || !sentry.isAlive()) {
             return false;
         }
-        credit(wanda, DAMAGE, sentry.getHealth());
-        level().sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F),
+        boolean magneto = mode == Telekinesis.Mode.MAGNETO;
+        credit(holder, DAMAGE, sentry.getHealth());
+        level().sendParticles(new EnergyParticleOptions(magneto ? Power.MAGNETO.color : Power.SCARLET_WITCH.color, 1.3F),
                 sentry.getX(), sentry.getY() + 0.8, sentry.getZ(), 24, 0.3, 0.4, 0.3, 0.2);
+        if (magneto) {
+            level().playSound(null, sentry.getX(), sentry.getY(), sentry.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0F, 0.8F);
+            level().playSound(null, sentry.getX(), sentry.getY(), sentry.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 1.0F, 0.7F);
+        }
         sentry.kill();
         return true;
     }
@@ -1160,6 +1291,10 @@ public final class UltronFight extends BossFight {
                 UltronFx.at(level(), UltronFxPayload.FLASH, boss.position().add(0, 1.5, 0), 5.0F, 20);
                 boss.discard();
             }
+            // Everything borrowed is back before the descent (D-T 5.7): the island is whole and nothing borrowed stands
+            // anywhere, so the clearing removes only the island's own blocks, and the arena lends nothing more.
+            descending = true;
+            loans().returnAll();
             LiftHooks.get().beginDescent(this);
         }
         boolean landed = LiftHooks.get().descend(this, ticks - pause);

@@ -2,8 +2,10 @@ package com.kolodkingal.enhanced.ultron;
 
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.boss.BossArena;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +21,11 @@ import org.jetbrains.annotations.Nullable;
  * <p>The ground is found from the height of the middle, not from the sky, so that it works under a roof too; and when the
  * island is up ({@link #raiseIsland}) the surface where a fighter who is on it is put back is the island's, {@code
  * offset} blocks higher (a fighter on the ground under it is put back on the ground).
+ *
+ * <p>While it is up, the island is protected whatever {@code boss.protectArena} says ({@link #isCopyCell}): its blocks are
+ * copies, which no ability may take for real ones (a diamond-ore copy mined would give diamonds), so block telekinesis only
+ * borrows them. The ground it was copied from is hidden by the clients ({@link #hidesGround}): nothing is taken from it
+ * and nothing lands on it until the island is down.
  */
 public final class UltronArena extends BossArena {
     /** How deep under the ground a fighter may go before the tractor lifts them out (only while the island is down). */
@@ -28,6 +35,9 @@ public final class UltronArena extends BossArena {
     private double islandOffset;
     private boolean islandUp;
     private double islandFloor;
+    /** The island's blocks as they were copied from the ground, while it is up (null if none was copied). */
+    @Nullable
+    private SokoviaTemplate copiedFrom;
 
     public UltronArena(ServerLevel level, Vec3 center, int islandRadius) {
         super(level, center, islandRadius + 12.0, Containment.FIELD, true);
@@ -66,9 +76,18 @@ public final class UltronArena extends BossArena {
      * @param floorY the height of its lowest block (what has fallen below it has fallen off)
      */
     public void raiseIsland(double offset, double floorY) {
+        raiseIsland(offset, floorY, null);
+    }
+
+    /**
+     * The same, with the island's blocks as they were copied from the ground ({@code template}): its columns are the ground
+     * the clients hide while it is up ({@link #hidesGround}).
+     */
+    public void raiseIsland(double offset, double floorY, @Nullable SokoviaTemplate template) {
         this.islandOffset = offset;
         this.islandFloor = floorY;
         this.islandUp = true;
+        this.copiedFrom = template;
         tractorDepth(0.0);
     }
 
@@ -76,6 +95,7 @@ public final class UltronArena extends BossArena {
     public void landIsland() {
         this.islandOffset = 0.0;
         this.islandUp = false;
+        this.copiedFrom = null;
         tractorDepth(TRACTOR_DEPTH);
     }
 
@@ -92,6 +112,53 @@ public final class UltronArena extends BossArena {
     /** Whether the entity is up on the island, as opposed to on the ground under it. */
     public boolean isOnTheIsland(Entity entity) {
         return islandUp && entity.getY() >= islandFloor - 4.0;
+    }
+
+    /**
+     * Whether the column of {@code (x, z)} is one of the island's, while it is up: inside its wavy rim (with no copy to
+     * tell, no farther from the middle than the rim can run).
+     */
+    public boolean isIslandColumn(double x, double z) {
+        if (!islandUp) {
+            return false;
+        }
+        SokoviaTemplate t = copiedFrom;
+        if (t == null) {
+            return Math.hypot(x - center().x, z - center().z) <= islandRadius + SokoviaShape.RIM_SLACK + 1.0;
+        }
+        return SokoviaShape.inside(t.spec(), Mth.floor(x) - t.centre().getX(), Mth.floor(z) - t.centre().getZ());
+    }
+
+    /**
+     * Whether {@code pos} is a cell of the island in the sky (D-T 5.1): the island is up, the cell is inside the cylinder,
+     * and it is no lower than one block under the island's lowest block. Its blocks are copies of the ground.
+     */
+    public boolean isCopyCell(BlockPos pos) {
+        return islandUp && contains(pos) && pos.getY() >= islandFloor - 1.0;
+    }
+
+    /**
+     * The arena's protection, and the island in the sky whatever the config says ({@link #isCopyCell}): every ability
+     * that would change a block asks this, so the island's copies are never taken, mined or blown up as real blocks.
+     */
+    @Override
+    public boolean protects(BlockPos pos) {
+        return super.protects(pos) || isCopyCell(pos);
+    }
+
+    /**
+     * Whether the clients hide the cell while the island is up (D-T 5.6): a column of the island's disc, from {@code
+     * skinDepth} layers into the ground it was copied from up to the island's own cells (the ground, its cover, and the air
+     * of the pit over it). Nothing is taken from there and nothing lands there, or it would show under the island, or be
+     * missing when it comes down.
+     */
+    public boolean hidesGround(BlockPos pos) {
+        SokoviaTemplate t = copiedFrom;
+        if (!islandUp || t == null || pos.getY() >= islandFloor - 1.0) {
+            return false;
+        }
+        int ground = t.groundAt(pos.getX() - t.centre().getX(), pos.getZ() - t.centre().getZ());
+        return ground != SokoviaTemplate.NO_GROUND && pos.getY() > ground - t.spec().skin();
     }
 
     /**

@@ -15,6 +15,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -22,24 +23,41 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.context.DirectionalPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import com.kolodkingal.enhanced.ability.BlockLifting;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.boss.ArenaLoans;
+import com.kolodkingal.enhanced.boss.BossFights;
 
 import java.util.UUID;
 
 /**
- * A block Wanda (or Jean Grey) tore out of the ground. While held it floats wherever she looks; launched, it flies like
- * a shell, hurts the first creature it hits and shatters (dropping its normal item). Put down gently, it lands like
- * sand. It glows in the colour of the telekinesis that holds it: Wanda's red, Jean's violet.
+ * A block Wanda, Billy, Jean Grey or Magneto tore out of the ground. While held it floats wherever the holder looks;
+ * launched, it flies like a shell, hurts the first creature it hits and shatters (dropping its normal item). Put down
+ * gently, it lands like sand and becomes a block again where the one who let go of it may place one ({@link
+ * BlockLifting#mayPlace}); otherwise it drops as an item. It glows in the colour of the telekinesis that holds it: Wanda's
+ * red, Billy's blue, Jean's violet, Magneto's iron grey.
+ *
+ * <p>A door Magneto tore out is held by its lower half ({@link BlockLifting#isDoor}): its upper half is drawn above it, it
+ * is set down on two cells, and it shatters into one door. A piston is held retracted, a lantern as it hung.
+ *
+ * <p>A block torn out of a boss's protected arena is <em>borrowed</em> ({@link #isBorrowed}: it carries the fight's mark,
+ * {@link ArenaLoans}): it never drops anything. Thrown, it turns to dust where it hits, and at the edge of a gated arena;
+ * set down, it stands for a while under the arena's rules, or crumbles at once; it never goes through a portal, and once
+ * its fight is gone (a crash) it is discarded.
  */
 public class TelekineticBlockEntity extends Entity {
     private static final EntityDataAccessor<BlockState> DATA_BLOCK =
@@ -85,6 +103,20 @@ public class TelekineticBlockEntity extends Entity {
 
     public BlockState getBlockState() {
         return entityData.get(DATA_BLOCK);
+    }
+
+    /** Who holds it, or last held or threw it (null if nobody ever did). */
+    @Nullable
+    public UUID thrower() {
+        return thrower;
+    }
+
+    /**
+     * Whether it was borrowed from a boss's protected arena ({@link ArenaLoans}): it carries the fight's mark, so it never
+     * drops anything, stands only under the arena's rules, and stays in its dimension.
+     */
+    public boolean isBorrowed() {
+        return BossFights.isMarked(this);
     }
 
     /** The colour of the telekinesis that holds (or last held) this block. */
@@ -147,6 +179,10 @@ public class TelekineticBlockEntity extends Entity {
             discard();
             return;
         }
+        if (!level().isClientSide && isBorrowed() && BossFights.fightOf(this) == null) {
+            discard(); // its fight is gone (a crash, a forced stop): what was borrowed was never this world's to keep
+            return;
+        }
         ticksSinceHeld++;
         if (isHeld()) {
             // Telekinesis moves us; nothing to simulate.
@@ -162,12 +198,20 @@ public class TelekineticBlockEntity extends Entity {
         Vec3 motion = getDeltaMovement();
 
         if (!level().isClientSide && launched) {
+            // A borrowed block thrown across the field or the wall of its arena stops there (D-T 4.5).
+            Vec3 edge = BossFights.edgeStop(this, start.add(motion));
             Vec3 center = start.add(0, getBbHeight() * 0.5, 0);
-            EntityHitResult entityHit = Raycasts.entityBetween(level(), this, center, center.add(motion), 0.3,
+            Vec3 reach = edge == null ? center.add(motion) : edge.add(0, getBbHeight() * 0.5, 0);
+            EntityHitResult entityHit = Raycasts.entityBetween(level(), this, center, reach, 0.3,
                     e -> e instanceof LivingEntity living && living.isAlive() && !living.isSpectator()
                             && !e.getUUID().equals(thrower) && !hit.contains(e.getId()));
             if (entityHit != null) {
                 hitCreature((LivingEntity) entityHit.getEntity(), motion);
+                return;
+            }
+            if (edge != null) {
+                setPos(edge.x, edge.y, edge.z);
+                shatter();
                 return;
             }
         }
@@ -208,30 +252,131 @@ public class TelekineticBlockEntity extends Entity {
         shatter();
     }
 
-    /** Breaks apart with block particles and drops the block's normal loot. */
+    /** Breaks apart with block particles and drops the block's normal loot (a thrown block, or one that lived too long). */
     private void shatter() {
+        shatter(false);
+    }
+
+    /**
+     * Breaks apart with block particles and drops the block's normal loot, as mined with a bare hand. A block that was set
+     * down and may not stand where it landed ({@code setDown}) gives the block itself instead when that loot is empty (glass,
+     * ice): nothing the holder carried is lost, and nothing that has a loot (an ore) becomes a free Silk Touch (R44). Only a
+     * block a player could have as an item, one Silk Touch gives as itself: an infested stone (Silk Touch gives plain stone)
+     * shatters as when mined, into nothing but its silverfish, never into an item only Creative has. A borrowed block turns
+     * to dust instead: it drops nothing ({@link #crumble}).
+     */
+    private void shatter(boolean setDown) {
+        if (isBorrowed()) {
+            crumble();
+            return;
+        }
         if (level() instanceof ServerLevel server) {
             BlockPos pos = BlockPos.containing(getX(), getY() + 0.5, getZ());
-            server.levelEvent(2001, pos, Block.getId(getBlockState()));
+            BlockState state = getBlockState();
+            server.levelEvent(2001, pos, Block.getId(state));
             if (server.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
-                Block.dropResources(getBlockState(), server, pos);
+                if (setDown && Block.getDrops(state, server, pos, null).isEmpty() && silkTouchGivesItself(server, pos, state)) {
+                    Block.popResource(server, pos, new ItemStack(state.getBlock()));
+                } else {
+                    Block.dropResources(state, server, pos);
+                }
             }
         }
         discard();
     }
 
-    /** Put down gently: becomes a block again if there is room, otherwise drops as an item. */
+    /** Whether the block, mined with Silk Touch, drops as its own item: an item a player can have (R44's block itself). */
+    private static boolean silkTouchGivesItself(ServerLevel level, BlockPos pos, BlockState state) {
+        Item item = state.getBlock().asItem();
+        if (item == Items.AIR) {
+            return false;
+        }
+        ItemStack tool = new ItemStack(Items.NETHERITE_PICKAXE);
+        tool.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH), 1);
+        for (ItemStack drop : Block.getDrops(state, level, pos, null, null, tool)) {
+            if (drop.is(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * A borrowed block turns to dust and is gone: the sound and the particles of a broken block, no loot, and its arena no
+     * longer counts it.
+     */
+    public void crumble() {
+        if (level() instanceof ServerLevel server) {
+            server.levelEvent(2001, BlockPos.containing(getX(), getY() + 0.5, getZ()), Block.getId(getBlockState()));
+            BossFights.borrowedGone(this);
+        }
+        discard();
+    }
+
+    /**
+     * Put down gently: becomes a block again where it landed if the cell takes it and the one who let go of it may place
+     * it there ({@link BlockLifting#mayPlace}: room, the arenas, his rights, never for someone who left); otherwise it
+     * drops as an item. Nothing lands on the ground the clients hide under Ultron's island in the sky. A borrowed block
+     * stands where its arena's rules let it ({@link BossFights#standBorrowed}), and crumbles to dust anywhere else. A door
+     * needs its two cells, and both are asked (it shatters into one door otherwise); a hanging lantern with nothing to hang
+     * from stands on the ground; a piston is placed retracted and, if it is powered there, pushes out a new head.
+     */
     private void land() {
+        if (!(level() instanceof ServerLevel server)) {
+            return;
+        }
         BlockPos pos = blockPosition();
-        BlockState here = level().getBlockState(pos);
-        BlockState state = getBlockState();
-        boolean replaceable = here.canBeReplaced(new DirectionalPlaceContext(level(), pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP));
-        if (replaceable && state.canSurvive(level(), pos) && level().setBlock(pos, state, Block.UPDATE_ALL)) {
-            level().playSound(null, pos, state.getSoundType().getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.8F);
+        if (isBorrowed()) {
+            if (BossFights.standBorrowed(this, pos)) {
+                discard();
+            } else {
+                crumble();
+            }
+            return;
+        }
+        BlockState state = BlockLifting.landingState(server, pos, getBlockState());
+        BlockPos top = BlockLifting.isDoor(state) ? pos.above() : null;
+        if (BossFights.hidesGround(server, pos) || (top != null && BossFights.hidesGround(server, top))) {
+            shatter(true);
+            return;
+        }
+        ServerPlayer holder = thrower == null ? null : server.getServer().getPlayerList().getPlayer(thrower);
+        boolean fits = replaceable(server, pos) && state.canSurvive(server, pos) && (top == null || replaceable(server, top))
+                && BlockLifting.mayPlace(server, pos, state, holder)
+                && (top == null || BlockLifting.mayPlace(server, top, BlockLifting.doorTop(state), holder));
+        // UPDATE_ALL: a powered piston pushes out its head, a rail turns to its neighbours.
+        if (fits && server.setBlock(pos, state, Block.UPDATE_ALL)
+                && (top == null || server.setBlock(top, BlockLifting.doorTop(state), Block.UPDATE_ALL))) {
+            server.playSound(null, pos, state.getSoundType().getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.8F);
             discard();
         } else {
-            shatter();
+            shatter(true);
         }
+    }
+
+    /** Whether the cell is in the world and what is in it gives way to a block set down there (air, grass, water). */
+    private static boolean replaceable(ServerLevel server, BlockPos pos) {
+        DirectionalPlaceContext context = new DirectionalPlaceContext(server, pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP);
+        return server.isInWorldBounds(pos) && server.getBlockState(pos).canBeReplaced(context);
+    }
+
+    /** A held door is drawn two blocks tall: its upper half is seen even when only the top is in view. */
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        AABB box = super.getBoundingBoxForCulling();
+        return BlockLifting.isDoor(getBlockState()) ? box.expandTowards(0.0, 1.0, 0.0) : box;
+    }
+
+    /** A borrowed block never leaves the dimension of its arena (D-T 7). */
+    @Override
+    public boolean canChangeDimensions(Level from, Level to) {
+        return !isBorrowed() && super.canChangeDimensions(from, to);
+    }
+
+    /** ... nor even begins to go through a portal (no destination is looked for). */
+    @Override
+    public boolean canUsePortal(boolean allowPassengers) {
+        return !isBorrowed() && super.canUsePortal(allowPassengers);
     }
 
     @Override

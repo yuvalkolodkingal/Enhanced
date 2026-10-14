@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.hex;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -452,9 +453,19 @@ public final class HexManager {
     /**
      * The Hex holds Vision (or the Vision it raised): he is thrown back inside and comes apart a little where he met
      * the wall. Vision himself is told why, and takes a little damage that grows while he keeps pushing (see
-     * {@link #holdDamage}); it never kills him. White Vision is only thrown back, like a hero walking into glass.
+     * {@link #holdDamage}); it never kills him. White Vision is only thrown back, like a hero walking into glass. A Vision
+     * that a telekinetic grip carried to the wall is not to blame: the grip lets go of him ({@link
+     * Telekinesis#releaseTarget}), its holder is told the Hex holds him in, and he is only thrown back inside, neither
+     * coming apart nor bitten by the wall (D-M 3.7).
      */
     private static void hold(ServerLevel level, Hex hex, LivingEntity entity, boolean wasInside) {
+        ServerPlayer holder = Telekinesis.holderOf(entity);
+        if (holder != null && Telekinesis.releaseTarget(entity)) {
+            holder.displayClientMessage(Component.translatable("message.enhanced.telekinesis.hex_holds",
+                    Component.translatable("power.enhanced.vision")), true);
+            throwBack(hex, entity, wasInside);
+            return;
+        }
         if (whiteVision(entity)) {
             bounce(level, hex, entity, wasInside);
             ((ServerPlayer) entity).displayClientMessage(Component.translatable("message.enhanced.hex.holds_vision"), true);

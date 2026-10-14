@@ -144,13 +144,15 @@ public final class ThanosBossTests {
     public static void thanosTagsAndDamageTypesAreWhatTheFightReads(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         EntityType<?> thanos = ModEntities.THANOS.get();
-        for (var tag : List.of(ModTags.HEX_RESISTANT, ModTags.PIN_IMMUNE, ModTags.TELEKINESIS_IMMUNE, ModTags.SHAPESHIFT_IMMUNE,
+        for (var tag : List.of(ModTags.HEX_RESISTANT, ModTags.PIN_IMMUNE, ModTags.PULL_IMMUNE, ModTags.SHAPESHIFT_IMMUNE,
                 ModTags.SPELLBOUND_IMMUNE, ModTags.CONFUSED_IMMUNE, ModTags.BOSSES, ModTags.TELEPATHY_IMMUNE)) {
             check(thanos.is(tag), "Thanos is in " + tag.location());
         }
+        check(!thanos.is(ModTags.TELEKINESIS_IMMUNE), "telekinesis holds Thanos as a boss: he is not in telekinesis_immune");
         for (EntityType<?> small : List.of(ModEntities.THANOS_SWORD.get(), ModEntities.THANOS_METEOR.get(), ModEntities.THANOS_ORB.get())) {
-            check(small.is(ModTags.TELEKINESIS_IMMUNE) && small.is(ModTags.SHAPESHIFT_IMMUNE) && small.is(ModTags.REALITY_PROOF),
-                    EntityType.getKey(small) + " cannot be lifted, copied or bubbled");
+            check(small.is(ModTags.PULL_IMMUNE) && small.is(ModTags.SHAPESHIFT_IMMUNE) && small.is(ModTags.REALITY_PROOF),
+                    EntityType.getKey(small) + " cannot be pulled, copied or bubbled");
+            check(!small.is(ModTags.TELEKINESIS_IMMUNE), EntityType.getKey(small) + ": Billy and the Phoenix catch it; the villains' pulls do not");
         }
         check(ModEntities.THANOS_PHANTOM.get().is(ModTags.SHAPESHIFT_IMMUNE) && ModEntities.THANOS_PHANTOM.get().is(ModTags.BOSS_MINIONS)
                 && !ModEntities.THANOS_PHANTOM.get().is(ModTags.TELEKINESIS_IMMUNE), "a phantom is a minion that Wanda can lift");

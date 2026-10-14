@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -27,20 +28,35 @@ import java.util.UUID;
  * (the Chaos Beam, a telekinetic slam, the Phoenix Burst), its causing entity is a player whose power is one of {@link
  * ApocalypseShieldConfig#MIND_POWER_HEROES} (Scarlet Witch and Phoenix by default, so a slam thrown by Magneto or Billy
  * is not mind power), and it arrives as damage. It then wears the shield by its amount times the factor of its type.
+ *
+ * <p>Since 3.1 (Eilon's item 9) a hit is also <em>critical</em> on the boss ({@link #isCritical}) when its type is in
+ * the same tag and its causing player's power is one of {@link ApocalypseShieldConfig#CRIT_HEROES}: a list kept apart
+ * from the breakers, so a hero a server adds to those does not get critical hits too. The factors themselves are the
+ * boss's ({@link ApocalypseEntity#hurt}); the hero's shield, which reads this class as well, is never multiplied.
  */
 public final class MindPower {
-    /** Names in the config that are not a power: warned about once each. */
+    /** Names in the config that are not a power: warned about once each (per option). */
     private static final Set<String> WARNED = new HashSet<>();
 
     /** The heroes whose mind power wears the shield, as the config lists them (a name that is no power is ignored). */
     public static List<Power> breakers() {
+        return powers(ApocalypseShieldConfig.MIND_POWER_HEROES.get(), "mindPowerHeroes");
+    }
+
+    /** The heroes whose mind power hits the boss critically, as the config lists them (a name of no power: ignored). */
+    public static List<Power> critHeroes() {
+        return powers(ApocalypseShieldConfig.CRIT_HEROES.get(), "critHeroes");
+    }
+
+    /** The powers an option of {@code [apocalypse_shield]} names, in order; a name of no power is warned about once. */
+    private static List<Power> powers(List<? extends String> names, String option) {
         List<Power> powers = new ArrayList<>();
-        for (String name : ApocalypseShieldConfig.MIND_POWER_HEROES.get()) {
+        for (String name : names) {
             Power power = Power.byName(name);
             if (power != null && power != Power.NONE) {
                 powers.add(power);
-            } else if (WARNED.add(name)) {
-                Enhanced.LOGGER.warn("apocalypse_shield.mindPowerHeroes names \"{}\", which is not a power: ignored", name);
+            } else if (WARNED.add(option + "/" + name)) {
+                Enhanced.LOGGER.warn("apocalypse_shield.{} names \"{}\", which is not a power: ignored", option, name);
             }
         }
         return powers;
@@ -59,6 +75,21 @@ public final class MindPower {
     /** Whether the damage is mind power: of a type in the tag, caused by a player who is a breaker. */
     public static boolean isMindPower(DamageSource source) {
         return source.is(ModTags.MIND_POWER) && source.getEntity() instanceof Player player && isBreaker(player);
+    }
+
+    /** Whether the player's mind power hits the boss critically (by default a Scarlet Witch or a Phoenix). */
+    public static boolean isCritHero(Player player) {
+        Power power = Powers.power(player);
+        return power != Power.NONE && critHeroes().contains(power);
+    }
+
+    /**
+     * Whether the damage is a critical hit on the boss: of a type in the tag, caused by a player who is one of {@code
+     * critHeroes}. (On his shield it must also be mind power at all, {@link #isMindPower}, or the shield turns it
+     * away.)
+     */
+    public static boolean isCritical(DamageSource source) {
+        return source.is(ModTags.MIND_POWER) && source.getEntity() instanceof Player player && isCritHero(player);
     }
 
     /**
@@ -102,13 +133,18 @@ public final class MindPower {
         return true;
     }
 
-    /** The factor of the damage's type. */
+    /**
+     * The factor of the damage's type. A slam of a block borrowed from an arena wears the shield by {@code
+     * borrowedSlamFactor} times what {@code slamFactor} gives: an arena's blocks never run out (D-T 9).
+     */
     public static float factor(DamageSource source) {
         if (source.is(ModDamageTypes.CHAOS_BEAM)) {
             return ApocalypseShieldConfig.CHAOS_BEAM_FACTOR.get().floatValue();
         }
         if (source.is(ModDamageTypes.TELEKINETIC_SLAM)) {
-            return ApocalypseShieldConfig.SLAM_FACTOR.get().floatValue();
+            float slam = ApocalypseShieldConfig.SLAM_FACTOR.get().floatValue();
+            return source.getDirectEntity() instanceof TelekineticBlockEntity block && block.isBorrowed()
+                    ? slam * ApocalypseShieldConfig.BORROWED_SLAM_FACTOR.get().floatValue() : slam;
         }
         if (source.is(ModDamageTypes.PHOENIX_BURST)) {
             return ApocalypseShieldConfig.PHOENIX_BURST_FACTOR.get().floatValue();

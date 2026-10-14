@@ -184,7 +184,7 @@ public final class ThanosFightTests {
         helper.succeed();
     }
 
-    /** The hooks of the other heroes: Quicksilver's time, Magneto's strip, Spider-Man's web. */
+    /** The hooks of the other heroes: Quicksilver's time, Magneto's strip (one plate, 3.1), Spider-Man's web. */
     @GameTest(template = ARENA, batch = "thanos_fight_hooks", timeoutTicks = 120)
     public static void theHeroesHooksAnswerForHim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
@@ -193,7 +193,12 @@ public final class ThanosFightTests {
         ServerPlayer spider = fighter(f, 6, 6);
         ThanosEntity boss = boss(f, spider);
         check(boss.slowFactor(5) == 2 && boss.slowFactor(1) == 1, "Quicksilver's time slows him to half at most");
-        check(boss.onMagnetoStrip(spider), "Magneto's pull takes nothing from him");
+        // 3.1 (D-M 6.2, R17): Magneto's strip tears one plate of his gold armour, once in six seconds, shared with the slam.
+        int plates = Integer.bitCount(boss.plates());
+        check(boss.onMagnetoStrip(spider), "Magneto's strip is answered by his hook");
+        check(Integer.bitCount(boss.plates()) == plates - 1, "and tears one plate: " + plates + " -> " + Integer.bitCount(boss.plates()));
+        check(boss.onMagnetoStrip(spider) && Integer.bitCount(boss.plates()) == plates - 1,
+                "a second strip at once tears none: once in six seconds, shared with the slam");
         boss.onWebShot(spider);
         check(boss.gauntletLocked() && boss.flag(ThanosEntity.FLAG_GAUNTLET_LOCKED), "a web locks the Gauntlet");
         f.everyTick(60, t -> {

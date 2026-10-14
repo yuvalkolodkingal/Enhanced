@@ -1,9 +1,11 @@
 package com.kolodkingal.enhanced.thanos;
 
 import com.kolodkingal.enhanced.ability.LokiAbilities;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
@@ -684,8 +686,16 @@ public class ThanosEntity extends Monster implements BossHooks {
                     setState(ThanosState.IDLE);
                 }
             }
-            case TELL, ACTIVE -> tickMove(level);
-            case IDLE -> tickIdle(level);
+            case TELL, ACTIVE, IDLE -> {
+                if (BossGrip.stills(this)) {
+                    // In a telekinetic grip, or still from a throw: he starts and runs no move, and stands (D-T 4.4).
+                    navigation.stop();
+                } else if (state == ThanosState.IDLE) {
+                    tickIdle(level);
+                } else {
+                    tickMove(level);
+                }
+            }
         }
         if (state != ThanosState.ARRIVING && state != ThanosState.DYING) {
             tickClock(level);
@@ -1548,7 +1558,7 @@ public class ThanosEntity extends Monster implements BossHooks {
         }
     }
 
-    /** Wanda's beam tears a random plate away. */
+    /** Wanda's beam, a telekinetic slam or Magneto's strip tears a random plate away. */
     private void tearPlate() {
         breakPlates(ThanosDefence.firstIntact(plates(), random.nextInt(4)));
     }
@@ -1576,12 +1586,14 @@ public class ThanosEntity extends Monster implements BossHooks {
 
     /**
      * Defeated: he goes down on one knee, says his last words and turns to dust. Invulnerable throughout; the fight is
-     * won and the fighters are rewarded at once.
+     * won and the fighters are rewarded at once. Nothing pauses his death: a throw's still and flight are forgotten (a grip
+     * slips by itself, since he cannot be held while dying).
      */
     void startDying(@Nullable ServerPlayer lastBlow) {
         if (state() == ThanosState.DYING) {
             return;
         }
+        BossGrip.forget(this);
         interruptMove();
         recallSword();
         clearMinions();
@@ -1668,9 +1680,18 @@ public class ThanosEntity extends Monster implements BossHooks {
         return hasTimeStone() ? 0 : Math.min(zoneFactor, 2);
     }
 
-    /** He wears no metal that Magneto could take: the strip does nothing. */
+    /**
+     * Magneto's strip (and his pull, which asks the same hook) tears one plate of the gold armour off him, and nothing else:
+     * at most once in 6 seconds, a clock shared with the telekinetic slam, and never while he cannot be hurt (arriving,
+     * dying, leaving), 3.1 (D-M 6.2, R17). The normal strip is always skipped: he wears nothing it could take.
+     */
     @Override
     public boolean onMagnetoStrip(ServerPlayer magneto) {
+        ThanosState state = state();
+        if (state != ThanosState.ARRIVING && state != ThanosState.DYING && !leaving && plates() != 0 && tickCount - lastSlamTear >= 120) {
+            lastSlamTear = tickCount;
+            tearPlate();
+        }
         return true;
     }
 
@@ -1685,6 +1706,43 @@ public class ThanosEntity extends Monster implements BossHooks {
     }
 
     private int lastWebLock = -100000;
+
+    /**
+     * Telekinesis holds him as a boss (3.1, D-T 6.2.1), but not while he arrives, dies or leaves, nor behind his Space
+     * Barrier.
+     */
+    @Nullable
+    @Override
+    public String gripRefusal(ServerPlayer holder, Telekinesis.Mode mode) {
+        ThanosState state = state();
+        return state == ThanosState.ARRIVING || state == ThanosState.DYING || leaving || hasBarrier() ? BossGrip.UNTOUCHABLE : null;
+    }
+
+    /** His gold armour and the Gauntlet: Magneto's metal. */
+    @Override
+    public boolean isMetal() {
+        return true;
+    }
+
+    /** {@code [thanos_boss].holdTicks}, asked of his fight. */
+    @Override
+    public int holdTicks() {
+        return fight == null ? 0 : fight.holdTicks();
+    }
+
+    /**
+     * A grip breaks his move off (whatever it held is let go: a Choke frees its player), stops him and shows him if he
+     * hides among his Phantoms.
+     */
+    @Override
+    public void onGripped(ServerPlayer holder) {
+        interruptMove();
+        if (state() == ThanosState.TELL || state() == ThanosState.ACTIVE) {
+            setState(ThanosState.IDLE);
+        }
+        navigation.stop();
+        reveal();
+    }
 
     // ---------------------------------------------------------------------------------------------------------
     // What he is immune to
@@ -1731,8 +1789,15 @@ public class ThanosEntity extends Monster implements BossHooks {
         return false;
     }
 
+    /** He never goes through a portal: his fight is in this dimension. */
     @Override
     public boolean canChangeDimensions(Level oldLevel, Level newLevel) {
+        return false;
+    }
+
+    /** ... nor even begins to go through one (no exit portal is looked for, nor built, in the other dimension). */
+    @Override
+    public boolean canUsePortal(boolean allowPassengers) {
         return false;
     }
 

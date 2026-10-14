@@ -177,6 +177,24 @@ final class SokoviaTestSupport {
         return UltronTestSupport.fightOf(f);
     }
 
+    /**
+     * A script that takes the fighters to the island: once they have all joined, the warning and the lock at once, then the
+     * rise, played by their clients, until the island is up.
+     */
+    static Script toTheIsland(UltronFight fight, ServerPlayer... fighters) {
+        Script script = new Script();
+        script.step("the fighters join", () -> fight.participants().size() == fighters.length);
+        script.then("the lift begins", () -> {
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            fight.forceState(UltronFight.Phase.LIFT_LOCK);
+        });
+        script.step("the island rises", () -> {
+            client(fighters);
+            return fight.phase() == UltronFight.Phase.ISLAND;
+        });
+        return script;
+    }
+
     /** Whether the lift of the fight is in this step. */
     static boolean in(UltronFight fight, SokoviaLift.Step step) {
         SokoviaLift.Lift lift = SokoviaLift.of(fight);

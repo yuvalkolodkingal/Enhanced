@@ -37,7 +37,10 @@ public final class ModTags {
     public static final TagKey<EntityType<?>> CONJURED_BODIES = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("conjured_bodies"));
     /** Projectiles the Magnetic Shield repels. */
     public static final TagKey<EntityType<?>> METALLIC_PROJECTILES = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("metallic_projectiles"));
-    /** Entities too powerful for telekinesis. */
+    /**
+     * Entities no telekinesis can lift (the Ender Dragon, a fragment of Mjolnir, the Hex's Vision, Apocalypse's cocoon, the
+     * Vibranium Key). The bosses are not in it: telekinesis holds them as bosses.
+     */
     public static final TagKey<EntityType<?>> TELEKINESIS_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("telekinesis_immune"));
     /**
      * Entities the villain heroes' pulls pass by (the Ultron hero's Gravity Pull and Slam, the Thanos hero's Space Pull,

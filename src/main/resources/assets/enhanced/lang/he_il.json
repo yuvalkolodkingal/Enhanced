@@ -1130,7 +1130,7 @@
   "config.enhanced.build_see_through.tooltip": "המסגרת נראית חלש דרך גבעות וקירות",
   "config.enhanced.build_show_others": "בונים אחרים",
   "config.enhanced.build_show_others.tooltip": "רואים את המסגרות של בונים אחרים לידכם",
-  "message.enhanced.telekinesis.boss_grabbed": "%s באחיזה שלכם! זרקו אותו לפני שהוא משתחרר",
+  "message.enhanced.telekinesis.boss_grabbed": "%s באחיזה שלכם! זרקו לפני שהאחיזה נשברת",
   "message.enhanced.telekinesis.boss_breaking": "%s עומד להשתחרר!",
   "message.enhanced.telekinesis.boss_broke_free": "%s השתחרר!",
   "message.enhanced.telekinesis.boss_regrip": "%s עוד מתנער מהאחיזה הקודמת",
