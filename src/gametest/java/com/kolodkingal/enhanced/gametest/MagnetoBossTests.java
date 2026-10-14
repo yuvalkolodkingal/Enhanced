@@ -6,7 +6,9 @@ import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.MagnetPull;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.apocalypse.Horsemen;
+import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -14,6 +16,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -33,11 +36,15 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -286,6 +293,80 @@ public final class MagnetoBossTests {
                     "the arena's iron block stands");
             check("message.enhanced.pull.protected".equals(BossTestSupport.lastActionBarKey(magneto)), "he reads that it is protected");
             check(MagnetPull.lastTugs(magneto) == 0 && sentry.position().distanceTo(sentryAt[0]) < STILL, "the Sentry in reach is not tugged");
+            return true;
+        });
+    }
+
+    /**
+     * The claims at an arena's edge: someone's claim holds everything round a protected arena whose round edge cuts
+     * through a chunk section. A husk in the arena, in iron, loses its helmet to the pull (an arena guards its blocks,
+     * not what fights on them), while an iron ingot just outside the arena, in the same section, stays: what the arena
+     * answered for the husk is not kept for the section, so the ingot is still asked the claim. He reads that the rest
+     * is protected.
+     */
+    @GameTest(template = ARENA, batch = "magneto_boss_claims", timeoutTicks = 60)
+    public static void anArenasEdgeOpensNoClaim(GameTestHelper helper) {
+        TestKit.Fixture f = BossFrameworkTests.fixture(helper);
+        ServerLevel level = f.level();
+        // The longest row of floor cells (along x) in one section: the husk at its west end, the ingot 6 blocks east.
+        int originX = helper.absolutePos(BlockPos.ZERO).getX();
+        int start = 1;
+        int rowStart = 1;
+        int rowLength = 0;
+        for (int x = 1; x <= 19; x++) {
+            if (SectionPos.blockToSectionCoord(originX + x) != SectionPos.blockToSectionCoord(originX + x - 1)) {
+                start = x;
+            }
+            if (x - start + 1 > rowLength) {
+                rowStart = start;
+                rowLength = x - start + 1;
+            }
+        }
+        check(rowLength >= 8, "eight floor cells in a row lie in one section");
+        double huskX = rowStart + 0.5;
+
+        Vec3 centre = helper.absoluteVec(new Vec3(huskX, FLOOR, 10.5));
+        BossTestSupport.TestArena arena = new BossTestSupport.TestArena(level, centre, 4.0, Containment.NONE, true);
+        arena.containAt(3.0).joinWithin(5.0).tractorDepth(0.0);
+        BossFrameworkTests.start(f, BossKind.ULTRON, f.player(huskX, FLOOR, 8.5),
+                new BossTestSupport.TestFight(level, BossKind.ULTRON, arena));
+        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(huskX, FLOOR, 10.5));
+        husk.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+        Vec3 at = helper.absoluteVec(new Vec3(huskX + 6.0, FLOOR, 10.5));
+        ItemEntity ingot = new ItemEntity(level, at.x, at.y, at.z, new ItemStack(Items.IRON_INGOT), 0.0, 0.0, 0.0);
+        level.addFreshEntity(ingot);
+        check(BossFights.protects(level, husk.getOnPos()) && !BossFights.protects(level, ingot.getOnPos()),
+                "the husk stands in the protected arena, the ingot just outside it");
+        check(SectionPos.asLong(husk.blockPosition()) == SectionPos.asLong(ingot.blockPosition()), "both lie in one section");
+
+        // Someone's claim on everything here: the arena's own rule answers first inside it.
+        AABB bounds = helper.getBounds();
+        int[] asked = {0};
+        Consumer<BlockEvent.BreakEvent> claim = event -> {
+            if (bounds.contains(Vec3.atCenterOf(event.getPos()))) {
+                asked[0]++;
+                event.setCanceled(true);
+            }
+        };
+        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, claim);
+        f.onClose(() -> NeoForge.EVENT_BUS.unregister(claim));
+        ServerPlayer magneto = f.player(huskX + 5.0, FLOOR, 14.5, Power.MAGNETO);
+        check(!arena.contains(magneto.position()), "Magneto stands outside the arena");
+        BossTestSupport.lastActionBarKey(magneto);
+        MagnetPullTests.sneakR(magneto);
+
+        f.everyTick(50, tick -> {
+            PowerTicker.tick(magneto);
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            check(husk.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && magneto.getInventory().countItem(Items.IRON_HELMET) == 1,
+                    "the husk in the arena loses its iron helmet to him");
+            check(ingot.isAlive() && magneto.getInventory().countItem(Items.IRON_INGOT) == 0,
+                    "the ingot outside the arena, in the same section, stays on the claim");
+            check(asked[0] > 0, "the claim was asked for it");
+            check("message.enhanced.pull.done_protected".equals(BossTestSupport.lastActionBarKey(magneto)),
+                    "he reads that the rest is protected");
             return true;
         });
     }

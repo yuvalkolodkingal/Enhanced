@@ -638,15 +638,20 @@ public final class MagnetPull {
 
     /**
      * Whether the claims let him act on what stands in this entity's section (probed once a section). Where a boss fight
-     * protects the ground no claim is asked: the arena guards its blocks, not what lies or fights on them, and it would
-     * refuse any break there (a minion's gear still crumbles, a loose ingot still comes).
+     * protects the cell the entity stands on no claim is asked: the arena guards its blocks, not what lies or fights on
+     * them, and it would refuse any break there (a minion's gear still crumbles, a loose ingot still comes). That
+     * answer is the entity's own and is never kept for the section: an arena's round edge cuts through sections, and
+     * what lies outside it in the same section (a claimed base's iron farm) is still asked the claim.
      */
     private static boolean claimAllows(Job job, ServerPlayer player, Entity e) {
+        BlockPos on = e.getOnPos();
+        if (BossFights.protects(job.level, on)) {
+            return true;
+        }
         long section = SectionPos.asLong(e.blockPosition());
         Boolean allowed = job.claims.get(section);
         if (allowed == null) {
-            BlockPos on = e.getOnPos();
-            allowed = BossFights.protects(job.level, on) || BlockRights.postBreak(player, job.level, on, job.level.getBlockState(on));
+            allowed = BlockRights.postBreak(player, job.level, on, job.level.getBlockState(on));
             job.claims.put(section, allowed);
         }
         return allowed;
