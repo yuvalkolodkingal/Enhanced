@@ -19,6 +19,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -63,6 +64,13 @@ public final class SokoviaRecovery {
         Job(Header header, ServerLevel level) {
             this.header = header;
             this.level = level;
+        }
+
+        /** The box of the island's columns, from its lowest block to its highest. */
+        BoundingBox box() {
+            int extent = header.spec().extent();
+            return new BoundingBox(header.centre().getX() - extent, header.minY(), header.centre().getZ() - extent,
+                    header.centre().getX() + extent, header.maxY(), header.centre().getZ() + extent);
         }
 
         /** Holds the chunks and gives the players their records. */
@@ -179,6 +187,20 @@ public final class SokoviaRecovery {
                 JOBS.remove(job);
             }
         }
+    }
+
+    /**
+     * Whether {@code box} meets an island a recovery of this level is still clearing (the columns of its shape's square,
+     * from its lowest block to its highest): no Build Magic spell is cast there until it is gone (D-B 10.2 C9), so
+     * nothing a spell builds is ever cleared with it, and nothing it clears is ever undone into the sky.
+     */
+    public static boolean coversAny(ServerLevel level, BoundingBox box) {
+        for (Job job : JOBS) {
+            if (job.level == level && job.header.maxY() >= job.header.minY() && job.box().intersects(box)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** How many recoveries are still going. */
