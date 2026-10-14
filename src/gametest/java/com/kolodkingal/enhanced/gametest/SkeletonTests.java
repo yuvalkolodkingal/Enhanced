@@ -1097,7 +1097,7 @@ public final class SkeletonTests {
         check(!BossFights.isMember(player) && !BossFights.isMinion(zombie) && !BossFights.isHexExempt(player), "nobody is in one");
         check(BossFights.allowsTeleport(level, player, new Vec3(1, 2, 3)), "a teleport is allowed anywhere");
         check(!BossFights.protects(level, helper.absolutePos(new BlockPos(5, 2, 5))), "no block is protected");
-        check(!BossFights.telekinesisPress(player) && !BossFights.telekinesisLaunch(player, zombie), "Wanda's telekinesis is hers alone");
+        check(!BossFights.telekinesisPress(player) && !BossFights.telekinesisLaunch(player, Telekinesis.Mode.WANDA, zombie), "Wanda's telekinesis is hers alone");
         // 3.1 (D-T 14.1): telekinesis is not held back by any fight.
         BlockPos cell = helper.absolutePos(new BlockPos(5, 2, 5));
         Vec3 far = zombie.position().add(100.0, -40.0, 100.0);

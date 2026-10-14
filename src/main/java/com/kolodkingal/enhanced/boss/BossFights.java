@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -416,11 +417,12 @@ public final class BossFights {
     }
 
     /**
-     * Wanda throws what she holds: a boss's special case for it. True if handled (the held thing is then not thrown).
+     * Wanda or Magneto ({@code mode}) throws what they hold: a boss's special case for it (a Sentry is crushed by either, a
+     * heart torn out by her hand alone, R40). True if handled (the held thing is then not thrown).
      */
-    public static boolean telekinesisLaunch(ServerPlayer wanda, Entity held) {
+    public static boolean telekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
         for (BossFight fight : FIGHTS) {
-            if (fight.level() == wanda.level() && fight.onTelekinesisLaunch(wanda, held)) {
+            if (fight.level() == holder.level() && fight.onTelekinesisLaunch(holder, mode, held)) {
                 return true;
             }
         }

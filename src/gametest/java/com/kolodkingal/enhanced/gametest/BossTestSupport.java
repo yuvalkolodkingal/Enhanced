@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
@@ -126,7 +127,7 @@ final class BossTestSupport {
         }
 
         @Override
-        protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
+        protected boolean onTelekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
             launched++;
             return launchHandled;
         }

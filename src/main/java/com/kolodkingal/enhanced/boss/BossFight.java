@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.config.BossConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -179,8 +180,11 @@ public abstract class BossFight {
         return false;
     }
 
-    /** Wanda throws {@code held}; true if this fight handled it (it is then not thrown). */
-    protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
+    /**
+     * Wanda or Magneto ({@code mode}) throws {@code held}; true if this fight handled it (it is then not thrown: Ultron's
+     * Sentry is crushed, his heart torn out).
+     */
+    protected boolean onTelekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
         return false;
     }
 

@@ -632,8 +632,9 @@ public final class Telekinesis {
 
     /**
      * Throws what the player holds, where he looks: a shot of a fight may turn on its maker itself ({@link
-     * BossHooks#throwBack}); a boss's fight may take what Wanda throws (Ultron's heart, a Sentry's core); anything else
-     * flies, and a boss is heavy for what he hits but takes the impact himself, through his own caps (D-T 4.5).
+     * BossHooks#throwBack}); a boss's fight may take what Wanda or Magneto throws (a Sentry is crushed, R40; Ultron's heart
+     * is Wanda's alone); anything else flies, and a boss is heavy for what he hits but takes the impact himself, through
+     * his own caps (D-T 4.5).
      */
     private static void launch(ServerPlayer player) {
         Grip grip = GRIPS.remove(player.getUUID());
@@ -653,9 +654,9 @@ public final class Telekinesis {
             BossGrip.letGo(player, e, true, false);
             return; // a shot of a fight turned on its maker (Thanos's sword, meteor, orb)
         }
-        if (grip.mode == Mode.WANDA && BossFights.telekinesisLaunch(player, e)) {
+        if ((grip.mode == Mode.WANDA || grip.mode == Mode.MAGNETO) && BossFights.telekinesisLaunch(player, grip.mode, e)) {
             BossGrip.letGo(player, e, false, false);
-            return; // a boss took what she threw (a Sentry's core is crushed, Ultron's heart is torn out)
+            return; // a boss took what was thrown (a Sentry is crushed; by her hand, Ultron's heart is torn out)
         }
         if (e instanceof TelekineticBlockEntity block) {
             block.launch(player, vel);

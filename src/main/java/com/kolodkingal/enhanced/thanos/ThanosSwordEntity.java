@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.thanos;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -28,10 +29,11 @@ import net.minecraft.world.phys.Vec3;
  * hit once per pass. While it is away he has no Sweep and no Smash.
  *
  * <p>A Chaos Shield turns it home as it does Mjolnir ({@link ShieldCost#oneOfAKind}) and lets it by on the way back. It
- * belongs to its owner: Thor cannot catch it and Wanda cannot lift it (the tag {@code pull_immune}). If Thanos is
- * gone it is gone with him.
+ * belongs to its owner: Thor cannot catch it and the villains' pulls cannot take it (the tag {@code pull_immune}). It is
+ * metal to Magneto, and a telekinesis that holds it holds it {@code thanos_boss.swordHoldTicks} at most, Magneto {@code
+ * boss.magnetoHoldFactor} times as long ({@link BossHooks}, R8). If Thanos is gone it is gone with him.
  */
-public class ThanosSwordEntity extends Projectile implements ShieldCost {
+public class ThanosSwordEntity extends Projectile implements ShieldCost, BossHooks {
     private static final EntityDataAccessor<Boolean> DATA_RETURNING =
             SynchedEntityData.defineId(ThanosSwordEntity.class, EntityDataSerializers.BOOLEAN);
     /** How far it flies out before it turns. */
@@ -160,6 +162,20 @@ public class ThanosSwordEntity extends Projectile implements ShieldCost {
     @Override
     public boolean returning() {
         return isReturning();
+    }
+
+    // ---- telekinesis (3.1, D-T 6.2.1): a shot of the fight, held for a while ----
+
+    /** {@code [thanos_boss].swordHoldTicks}: it tears free of a grip after that (Magneto's lasts 1.5 times as long, R8). */
+    @Override
+    public int holdTicks() {
+        return ThanosBossConfig.SWORD_HOLD_TICKS.get();
+    }
+
+    /** The Double-Edged Sword is metal: Magneto's R may catch it (D-M 2.3, R9). */
+    @Override
+    public boolean isMetal() {
+        return true;
     }
 
     @Override

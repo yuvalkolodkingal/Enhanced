@@ -1558,7 +1558,7 @@ public class ThanosEntity extends Monster implements BossHooks {
         }
     }
 
-    /** Wanda's beam tears a random plate away. */
+    /** Wanda's beam, a telekinetic slam or Magneto's strip tears a random plate away. */
     private void tearPlate() {
         breakPlates(ThanosDefence.firstIntact(plates(), random.nextInt(4)));
     }
@@ -1680,9 +1680,18 @@ public class ThanosEntity extends Monster implements BossHooks {
         return hasTimeStone() ? 0 : Math.min(zoneFactor, 2);
     }
 
-    /** He wears no metal that Magneto could take: the strip does nothing. */
+    /**
+     * Magneto's strip (and his pull, which asks the same hook) tears one plate of the gold armour off him, and nothing else:
+     * at most once in 6 seconds, a clock shared with the telekinetic slam, and never while he cannot be hurt (arriving,
+     * dying, leaving), 3.1 (D-M 6.2, R17). The normal strip is always skipped: he wears nothing it could take.
+     */
     @Override
     public boolean onMagnetoStrip(ServerPlayer magneto) {
+        ThanosState state = state();
+        if (state != ThanosState.ARRIVING && state != ThanosState.DYING && !leaving && plates() != 0 && tickCount - lastSlamTear >= 120) {
+            lastSlamTear = tickCount;
+            tearPlate();
+        }
         return true;
     }
 

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ultron;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
@@ -20,6 +21,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -1104,21 +1107,28 @@ public final class UltronFight extends BossFight {
     }
 
     /**
-     * Wanda throws what she holds: a body of his that her hand can tear the core out of is torn instead of thrown (3.1);
-     * a Sentry's core is crushed instead, and it dies at once in red sparks.
+     * Wanda or Magneto throws what they hold. A body of his that her hand can tear the core out of is torn instead of
+     * thrown (3.1; her hand alone: Magneto's throw is a throw). A Sentry of the fight is crushed instead by either, and dies
+     * at once, what was left of it theirs: in her scarlet energy, or, by Magneto (R40), in grey metal sparks with the clang
+     * of an anvil and the snap of a chain.
      */
     @Override
-    protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
-        if (held instanceof UltronEntity body && owns(body) && body.isAlive() && canRip(body)) {
-            rip(wanda, body);
+    protected boolean onTelekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
+        if (mode == Telekinesis.Mode.WANDA && held instanceof UltronEntity body && owns(body) && body.isAlive() && canRip(body)) {
+            rip(holder, body);
             return true;
         }
         if (!(held instanceof UltronSentryEntity sentry) || sentry.getOwnerUUID() != null || !owns(sentry) || !sentry.isAlive()) {
             return false;
         }
-        credit(wanda, DAMAGE, sentry.getHealth());
-        level().sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.3F),
+        boolean magneto = mode == Telekinesis.Mode.MAGNETO;
+        credit(holder, DAMAGE, sentry.getHealth());
+        level().sendParticles(new EnergyParticleOptions(magneto ? Power.MAGNETO.color : Power.SCARLET_WITCH.color, 1.3F),
                 sentry.getX(), sentry.getY() + 0.8, sentry.getZ(), 24, 0.3, 0.4, 0.3, 0.2);
+        if (magneto) {
+            level().playSound(null, sentry.getX(), sentry.getY(), sentry.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0F, 0.8F);
+            level().playSound(null, sentry.getX(), sentry.getY(), sentry.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 1.0F, 0.7F);
+        }
         sentry.kill();
         return true;
     }
