@@ -153,6 +153,10 @@ public final class BuildJob {
     private static final int SPARKS = 12;
     /** The block-entity data no cell gets. */
     private static final long NO_HASH = 0L;
+    /** The write-ahead gate: the cell's record is down; its record is on its way (the job yields); the cell changed since it was read. */
+    private static final int READY = 0;
+    private static final int WAIT = 1;
+    private static final int CHANGED = 2;
 
     /** The most chunks of a plan's box asked one by one at the cast; a bigger box takes the level's loaded chunks. */
     private static final int ASKED_CHUNKS = 65_536;
@@ -200,6 +204,12 @@ public final class BuildJob {
     private @Nullable SpellPlanner.Cursor cursor;
     private @Nullable UndoStep.Walk walk;
     private int sideIndex;
+    /** Where its undo records are written ahead (C13), or null when the history is not written to disk. */
+    private UndoFiles.@Nullable Journal journal;
+    /** The second cursor that reads the cells ahead for the journal. */
+    private @Nullable WriteAhead ahead;
+    /** A Land pulse's cells were handed to the journal. */
+    private boolean pulseRecorded;
     /** The cursor sits on a cell it could not do yet (its chunk loading, the tick's sections spent). */
     private boolean holding;
     private boolean force;
@@ -662,11 +672,13 @@ public final class BuildJob {
         endCode = BuildVerdictPayload.STOPPED;
         if (step.changed() == 0) {
             fx(BuildFxPayload.STOPPED);
+            endJournal();
             return null;
         }
+        bookBilly();
         step.setState(UndoStep.State.DONE);
         UndoHistory.of(caster).push(step, limits.undoSteps());
-        bookBilly();
+        endJournal();
         return replay(player, limits, level, step, false, true, loaded);
     }
 
@@ -689,16 +701,8 @@ public final class BuildJob {
             dabEnded();
             return;
         }
-        if (kind == Kind.SPELL && step.changed() > 0) {
-            step.setState(UndoStep.State.INTERRUPTED);
-            UndoHistory.of(caster).push(step, limits.undoSteps());
-            if (line != null) {
-                BuildSession.of(caster).tellAtLogin(Component.translatable(line, Component.keybind("key.enhanced.build_undo")));
-            }
-        } else if (kind == Kind.UNDO && step.applied() > 0 && step.applied() < step.changed()) {
-            step.setState(UndoStep.State.PARTLY);
-        }
-        // Billy pays for what it did, and no more (his reservation, a redo's too).
+        // Billy pays for what it did, and no more (his reservation, a redo's too); before the step is sealed, as its file
+        // holds his cost.
         if (kind == Kind.SPELL) {
             bookBilly();
         } else if (kind == Kind.REDO) {
@@ -706,11 +710,26 @@ public final class BuildJob {
         } else {
             refundUndo();
         }
+        if (kind == Kind.SPELL && step.changed() > 0) {
+            step.setState(UndoStep.State.INTERRUPTED);
+            step.setTell(line != null);
+            UndoHistory.of(caster).push(step, limits.undoSteps());
+            if (line != null) {
+                BuildSession.of(caster).tellAtLogin(Component.translatable(line, Component.keybind("key.enhanced.build_undo")));
+            }
+        } else if (kind == Kind.UNDO && step.applied() > 0 && step.applied() < step.changed()) {
+            step.setState(UndoStep.State.PARTLY);
+            UndoFiles.sealed(UndoHistory.of(caster), step);
+        } else if (kind != Kind.SPELL) {
+            UndoFiles.sealed(UndoHistory.of(caster), step); // (what it did of the step is on disk)
+        }
+        endJournal();
     }
 
     /** The job is dropped (it never started, or the server forgets it): its tickets go, nothing else happens. */
     public void drop() {
         releaseTickets();
+        endJournal();
         boolean was = finished;
         finished = true;
         if (endCode < 0) {
@@ -750,6 +769,9 @@ public final class BuildJob {
         rules.actAs(actor);
         if (kind == Kind.SPELL && stopCode < 0 && phase.ordinal() <= Phase.APPLY.ordinal()) {
             checkStillAllowed();
+        }
+        if (ahead != null && phase == Phase.APPLY && stopCode < 0) {
+            slice.use(ahead.scan(walked, WriteAhead.PER_SLICE) * (long) SKIP);
         }
         while (!finished && !slice.spent()) {
             boolean more = switch (phase) {
@@ -1102,6 +1124,11 @@ public final class BuildJob {
         volume = Math.max(1, plan.size());
         cursor = plan.cursor();
         phase = Phase.APPLY;
+        journal = UndoFiles.journal(UndoHistory.of(caster), step);
+        if (journal != null) {
+            ahead = new WriteAhead(level, plan, journal, loaded, chunks, recipe.spell() == Spell.MOVE && source != null);
+            ahead.scan(0, UndoFiles.FIRST_BATCH); // (the first batch is on its way before the first cell is asked for)
+        }
         if (recipe.spell() == Spell.MOVE && source != null && plan.turnsOverItself()) {
             movedSources = new LongOpenHashSet();
             doneEarly = new LongOpenHashSet();
@@ -1182,6 +1209,21 @@ public final class BuildJob {
                 slice.use(SKIP);
                 continue;
             }
+            if (journal != null) {
+                // C13: a cell is written only when its record is on disk; until then the slice yields.
+                int gated = gate(pos, old, now, data, moving ? cursor.from() : null);
+                if (gated == WAIT) {
+                    holding = true;
+                    walked--;
+                    walkedThisTick--;
+                    return false;
+                }
+                if (gated == CHANGED) {
+                    rules.left(Left.CHANGED); // (someone changed it since it was read ahead: it stays as they made it)
+                    slice.use(SKIP);
+                    continue;
+                }
+            }
             if (!slice.section(level, pos)) {
                 // The tick's new sections are spent: this cell waits for the next tick.
                 holding = true;
@@ -1211,6 +1253,93 @@ public final class BuildJob {
         }
     }
 
+    // ---- Writing ahead (C13) ----
+
+    /**
+     * The write-ahead gate for the cell about to be written at {@code pos} (it holds {@code old} and gets {@code now}):
+     * {@link #READY} when its record is down, {@link #WAIT} while it is on its way (it is recorded now when the read-ahead
+     * never saw it), {@link #CHANGED} when it holds something else than when it was read ahead. The other half of a
+     * two-cell block and a Move's source are covered the same way.
+     */
+    private int gate(BlockPos pos, BlockState old, BlockState now, @Nullable CompoundTag data, @Nullable BlockPos from) {
+        if (journal.failed()) {
+            return READY;
+        }
+        int result = cover(pos, old, now, data, true);
+        if (result != READY) {
+            return result;
+        }
+        BlockPos other = SpellMath.partner(old, pos);
+        if (other != null && !plan.covers(other.getX(), other.getY(), other.getZ()) && SpellMath.loaded(level, other) && !SpellMath.outside(level, other)) {
+            BlockState otherOld = level.getBlockState(other);
+            if (otherOld.getBlock() == old.getBlock()) {
+                result = cover(other, otherOld, otherHalf(now, old, otherOld), null, false);
+                if (result != READY) {
+                    return result;
+                }
+            }
+        }
+        if (from != null && SpellMath.loaded(level, from) && !SpellMath.outside(level, from) && !plan.covers(from.getX(), from.getY(), from.getZ())) {
+            BlockState srcNow = level.getBlockState(from);
+            BlockState emptied = SpellMath.vanished(srcNow);
+            if (!srcNow.equals(emptied)) {
+                result = cover(from, srcNow, emptied, null, false);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Whether the record of {@code pos} (holding {@code cur}, to get {@code planned}) is down: a cell the step has
+     * recorded already is; one the read-ahead recorded is when its batch is on disk, and, with {@code compare}, still
+     * holds what it held then; one it never saw is recorded now.
+     */
+    private int cover(BlockPos pos, BlockState cur, BlockState planned, @Nullable CompoundTag data, boolean compare) {
+        if (step.has(pos)) {
+            return READY;
+        }
+        long key = pos.asLong();
+        UndoFiles.Entry entry = journal.entry(key);
+        if (entry == null) {
+            journal.add(key, cur, WriteAhead.oldData(level, pos, cur), planned, data == null ? null : data.copy());
+            journal.flush();
+            return journal.failed() ? READY : WAIT;
+        }
+        if (!journal.durable(entry)) {
+            journal.flush();
+            return WAIT;
+        }
+        if (compare && !entry.old().equals(cur)) {
+            journal.release(key);
+            return CHANGED;
+        }
+        return READY;
+    }
+
+    /** The journal of this job's step (made at the first need): where a Land pulse's records go. */
+    private UndoFiles.@Nullable Journal pulseJournal() {
+        if (journal == null) {
+            journal = UndoFiles.journal(UndoHistory.of(caster), step);
+        }
+        return journal;
+    }
+
+    /** Hands every cell of a Land pulse to the journal, once: each column is then written when its records are down. */
+    private void recordPulse() {
+        if (pulseRecorded || pulseJournal() == null) {
+            return;
+        }
+        pulseRecorded = true;
+        for (LandBrush.Column column : pulse.columns()) {
+            for (int i = 0; i < column.size(); i++) {
+                if (column.changes(i)) {
+                    journal.add(column.pos(i).asLong(), column.olds()[i], null, column.news()[i], null);
+                }
+            }
+        }
+        journal.flush();
+    }
+
     // ---- APPLY (a Land pulse) ----
 
     /**
@@ -1219,6 +1348,7 @@ public final class BuildJob {
      */
     private boolean applyPulse(Slice slice) {
         List<LandBrush.Column> columns = pulse.columns();
+        recordPulse();
         findBodies(pulse.bounds(), recipe.anchor());
         while (true) {
             if (stopCode >= 0 || pulseColumn >= columns.size()) {
@@ -1273,6 +1403,17 @@ public final class BuildJob {
             if (!level.getBlockState(cells[i]).equals(column.olds()[i])) {
                 slice.use(SKIP);
                 return 0;
+            }
+        }
+        if (journal != null && !journal.failed()) {
+            boolean waiting = false;
+            for (int i = 0; i < cells.length; i++) {
+                if (column.changes(i) && cover(cells[i], column.olds()[i], column.news()[i], null, false) == WAIT) {
+                    waiting = true;
+                }
+            }
+            if (waiting) {
+                return -1; // (its records are on their way)
             }
         }
         for (int i = 0; i < cells.length; i++) {
@@ -1673,7 +1814,13 @@ public final class BuildJob {
                 doneEarly.add(to.asLong());
                 continue;
             }
-            if (move(to, level.getBlockState(to), cell.state(), cell.data(), cell.from()) < 0) {
+            BlockState toNow = level.getBlockState(to);
+            if (journal != null && !journal.failed() && (cover(to, toNow, cell.state(), cell.data(), false) == WAIT
+                    || cell.from() != null && SpellMath.loaded(level, cell.from()) && !plan.covers(cell.from().getX(), cell.from().getY(), cell.from().getZ())
+                    && cover(cell.from(), level.getBlockState(cell.from()), SpellMath.vanished(level.getBlockState(cell.from())), null, false) == WAIT)) {
+                return -1; // (the records of this move are on their way)
+            }
+            if (move(to, toNow, cell.state(), cell.data(), cell.from()) < 0) {
                 return -1;
             }
             doneEarly.add(to.asLong());
@@ -1788,6 +1935,9 @@ public final class BuildJob {
         }
         long hash = place(pos, now, data);
         step.record(pos, old, oldData, now, data == null ? null : data.copy(), hash);
+        if (journal != null) {
+            journal.release(pos.asLong());
+        }
         written++;
         writtenThisTick++;
     }
@@ -2120,8 +2270,11 @@ public final class BuildJob {
             BlockState here = level.getBlockState(pos);
             BlockState expected = undo ? walk.newState() : walk.oldState();
             long expectedHash = undo ? walk.newHash() : NO_HASH;
-            // Only a cell that still holds exactly what the spell put there (or, for a redo, what it found).
-            if (!here.equals(expected) || undo && hashOf(pos, here) != expectedHash) {
+            // Only a cell that still holds exactly what the spell put there (or, for a redo, what it found); the cells
+            // of a spell a crash cut short are known by their block only (the records hold what it was to put there).
+            boolean holds = undo && step.recovered() ? step.recoveredHolds(pos, here, hashOf(pos, here))
+                    : here.equals(expected) && (!undo || hashOf(pos, here) == expectedHash);
+            if (!holds) {
                 walk.setStatus(UndoStep.DROPPED);
                 rules.left(Left.CHANGED);
                 slice.use(SKIP);
@@ -2365,6 +2518,21 @@ public final class BuildJob {
             case UNDO -> finishUndo();
             case REDO -> finishRedo();
         }
+        endJournal();
+    }
+
+    /**
+     * The job is over: the read-ahead goes, and a spell that changed nothing leaves no journal and no file behind (a
+     * stroke's journal is its step's, sealed or discarded with the stroke).
+     */
+    private void endJournal() {
+        ahead = null;
+        if (journal != null) {
+            if (stroke == null && kind == Kind.SPELL && step.changed() == 0) {
+                UndoFiles.discard(UndoHistory.of(caster), step);
+            }
+            journal = null;
+        }
     }
 
     private void finishSpell() {
@@ -2374,6 +2542,7 @@ public final class BuildJob {
         }
         ServerPlayer online = online();
         boolean changed = step.changed() > 0;
+        bookBilly(); // (before the step is sealed: its file holds Billy's cost and practice)
         if (changed) {
             step.setState(UndoStep.State.DONE);
             int forgotten = UndoHistory.of(caster).push(step, limits.undoSteps());
@@ -2381,7 +2550,6 @@ public final class BuildJob {
                 online.displayClientMessage(BillyMagic.forgotten(), true);
             }
         }
-        bookBilly();
         long left = rules.leftInAll() - rules.count(Left.CHANGED);
         int code;
         if (stopCode >= 0) {
@@ -2506,6 +2674,9 @@ public final class BuildJob {
                 online.displayClientMessage(BillyMagic.forgotten(), true);
             }
         }
+        if (!changed) {
+            UndoFiles.discard(UndoHistory.of(stroke.caster), step); // (nothing to keep: no journal, no file)
+        }
         if (stroke.limits.limited()) {
             BuildMagic.billy(server, stroke.caster, 0, stroke.changed, stroke.limits.castPause());
         }
@@ -2628,6 +2799,7 @@ public final class BuildJob {
      */
     private void refuse(int code, long changed, int cost, long extra, @Nullable Component line) {
         releaseTickets();
+        endJournal();
         finished = true;
         endCode = code;
         ServerPlayer online = online();
@@ -2656,6 +2828,7 @@ public final class BuildJob {
     /** The job ended without a refusal and without a step of its own (a Copy's take). */
     private void end(int code) {
         releaseTickets();
+        endJournal();
         finished = true;
         endCode = code;
         BuildMagic.sync(level.getServer(), caster);

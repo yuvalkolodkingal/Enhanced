@@ -12,6 +12,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -56,7 +58,10 @@ public final class Pocket implements SpellPlanner.Source {
         }
     }
 
-    /** The pocket each builder holds (her last Copy's take), by player. In memory only, for now ({@code UndoFiles}). */
+    /**
+     * The pocket each builder holds (her last Copy's take), by player; kept on disk too ({@code pocket.bin},
+     * {@link UndoFiles}), so it survives a restart, and read back at her next login.
+     */
     private static final Map<UUID, Pocket> HELD = new HashMap<>();
     private static int lastId;
     /** What a run of the pocket is reckoned to cost to keep: its block's index and its length, as two numbers. */
@@ -111,6 +116,17 @@ public final class Pocket implements SpellPlanner.Source {
     /** {@code player} now holds {@code pocket} (a Copy's take; it travels with her to any dimension). */
     public static void hold(UUID player, Pocket pocket) {
         HELD.put(player, pocket);
+        UndoFiles.writePocket(player, pocket);
+    }
+
+    /** The pocket read back from {@code pocket.bin} at {@code player}'s login: held, not written again. */
+    static void holdLoaded(UUID player, Pocket pocket) {
+        HELD.put(player, pocket);
+    }
+
+    /** {@code player}'s pocket is gone ({@code /enhanced build forget}). */
+    static void drop(UUID player) {
+        HELD.remove(player);
     }
 
     /** Forgets every builder's pocket (the server's stop, the end of a test). */
@@ -201,6 +217,141 @@ public final class Pocket implements SpellPlanner.Source {
             bytes += tag.sizeInBytes();
         }
         return bytes;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Its file ({@code pocket.bin}, D-B Appendix B)
+
+    /**
+     * The pocket as its file keeps it (D-B Appendix B): its {@code size}, its {@code palette} (block names, index 1 on;
+     * 0 is an absent cell), its {@code cells} as runs of a palette index and a length over y, then z, then x, the
+     * {@code data} of its block entities by cell, its {@code id} and the {@code origin} it was read at. A pocket never
+     * changes once read, so this is made off the server thread.
+     */
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putIntArray("size", new int[]{sizeX, sizeY, sizeZ});
+        tag.putIntArray("origin", new int[]{origin.getX(), origin.getY(), origin.getZ()});
+        tag.putInt("id", id);
+        ListTag states = new ListTag();
+        for (int i = 1; i < palette.size(); i++) {
+            states.add(UndoFiles.stateTag(palette.get(i)));
+        }
+        tag.put("palette", states);
+        IntArrayList runs = new IntArrayList();
+        for (int row = 0; row + 1 < rowStart.length; row++) {
+            int start = 0;
+            for (int i = rowStart[row]; i < rowStart[row + 1]; i++) {
+                int length = runEnd[i] - start;
+                start = runEnd[i];
+                if (!runs.isEmpty() && runs.getInt(runs.size() - 2) == runState[i]) {
+                    runs.set(runs.size() - 1, runs.getInt(runs.size() - 1) + length); // (a run goes on into the next row)
+                } else {
+                    runs.add(runState[i]);
+                    runs.add(length);
+                }
+            }
+        }
+        tag.putIntArray("cells", runs.toIntArray());
+        ListTag entities = new ListTag();
+        for (var entry : data.long2ObjectEntrySet()) {
+            CompoundTag cell = new CompoundTag();
+            cell.putLong("i", entry.getLongKey());
+            cell.put("d", entry.getValue());
+            entities.add(cell);
+        }
+        tag.put("data", entities);
+        return tag;
+    }
+
+    /**
+     * The pocket a file keeps ({@link #toTag}), or null when the tag is not a whole one. A block whose name no longer
+     * exists is an absent cell ("keep": a stamp leaves the target alone), and its data is dropped.
+     */
+    public static @Nullable Pocket fromTag(CompoundTag tag) {
+        int[] size = tag.getIntArray("size");
+        if (size.length != 3 || size[0] <= 0 || size[1] <= 0 || size[2] <= 0 || (long) size[1] * size[2] >= Integer.MAX_VALUE) {
+            return null;
+        }
+        int[] at = tag.getIntArray("origin");
+        BlockPos origin = at.length == 3 ? new BlockPos(at[0], at[1], at[2]) : BlockPos.ZERO;
+        List<BlockState> palette = new ArrayList<>();
+        palette.add(null);
+        ListTag states = tag.getList("palette", Tag.TAG_COMPOUND);
+        int[] remap = new int[states.size() + 1];
+        for (int i = 0; i < states.size(); i++) {
+            BlockState state = UndoFiles.readState(states.getCompound(i));
+            if (state != null) {
+                remap[i + 1] = palette.size();
+                palette.add(state);
+            } // (else 0: a block that no longer exists is read as absent)
+        }
+        int rows = size[1] * size[2];
+        int[] rowStart = new int[rows + 1];
+        IntArrayList runState = new IntArrayList();
+        IntArrayList runEnd = new IntArrayList();
+        int[] runs = tag.getIntArray("cells");
+        int row = 0;
+        int x = 0;
+        long cells = 0;
+        for (int i = 0; i + 1 < runs.length; i += 2) {
+            int index = runs[i];
+            long left = runs[i + 1];
+            if (index < 0 || index >= remap.length || left <= 0) {
+                return null;
+            }
+            index = remap[index];
+            while (left > 0) {
+                if (row >= rows) {
+                    return null; // (more cells than the pocket has)
+                }
+                int take = (int) Math.min(left, size[0] - x);
+                if (x == 0) {
+                    rowStart[row] = runState.size();
+                }
+                if (x > 0 && runState.getInt(runState.size() - 1) == index) {
+                    runEnd.set(runEnd.size() - 1, x + take);
+                } else {
+                    runState.add(index);
+                    runEnd.add(x + take);
+                }
+                if (index != 0) {
+                    cells += take;
+                }
+                x += take;
+                left -= take;
+                if (x == size[0]) {
+                    x = 0;
+                    row++;
+                }
+            }
+        }
+        if (row != rows || x != 0) {
+            return null; // (fewer cells than the pocket has)
+        }
+        rowStart[rows] = runState.size();
+        Pocket shape = new Pocket(0, size[0], size[1], size[2], origin, palette, rowStart, runState.toIntArray(), runEnd.toIntArray(),
+                new Long2ObjectOpenHashMap<>(), new Long2LongOpenHashMap(), cells);
+        Long2ObjectOpenHashMap<CompoundTag> data = new Long2ObjectOpenHashMap<>();
+        Long2LongOpenHashMap hashes = new Long2LongOpenHashMap();
+        ListTag entities = tag.getList("data", Tag.TAG_COMPOUND);
+        for (int i = 0; i < entities.size(); i++) {
+            CompoundTag cell = entities.getCompound(i);
+            long index = cell.getLong("i");
+            int cx = (int) (index % size[0]);
+            long rest = index / size[0];
+            if (index < 0 || shape.state(cx, (int) (rest / size[2]), (int) (rest % size[2])) == null) {
+                continue; // (an absent cell has no data)
+            }
+            CompoundTag value = cell.getCompound("d");
+            data.put(index, value);
+            hashes.put(index, UndoStep.hash(value));
+        }
+        int id = tag.getInt("id");
+        if (id > 0) {
+            lastId = Math.max(lastId, id); // (a pocket read back keeps its number; new ones never take it)
+        }
+        return new Pocket(id, size[0], size[1], size[2], origin, palette, rowStart, runState.toIntArray(), runEnd.toIntArray(), data, hashes, cells);
     }
 
     // ------------------------------------------------------------------------------------------------------------

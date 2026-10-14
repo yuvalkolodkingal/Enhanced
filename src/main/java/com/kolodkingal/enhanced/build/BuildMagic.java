@@ -683,10 +683,20 @@ public final class BuildMagic {
             refuse(player, 0, BuildVerdictPayload.WAIT, 0, BillyMagic.waitForSpell(), false);
             return;
         }
-        UndoStep step = UndoHistory.of(id).nextToUndo();
+        UndoHistory history = UndoHistory.of(id);
+        UndoStep step = history.nextToUndo();
         ServerLevel level = step == null ? null : player.server.getLevel(step.dimension());
         if (step == null || level == null) {
             refuse(player, 0, BuildVerdictPayload.NOTHING_TO_UNDO, 0, BuildRules.message(BuildVerdictPayload.NOTHING_TO_UNDO, 0), false);
+            return;
+        }
+        if (!step.loaded()) {
+            // Its cells are on disk: read in the background, then Ctrl + Z goes on (a step whose file is gone is dropped).
+            UndoFiles.loadStepLater(player.server, history, step, ok -> {
+                if (!player.hasDisconnected()) {
+                    undo(player);
+                }
+            });
             return;
         }
         replay(player, limits, level, step, false);
@@ -712,10 +722,19 @@ public final class BuildMagic {
             refuse(player, 0, BuildVerdictPayload.WAIT, 0, BillyMagic.waitForSpell(), false);
             return;
         }
-        UndoStep step = UndoHistory.of(id).nextToRedo();
+        UndoHistory history = UndoHistory.of(id);
+        UndoStep step = history.nextToRedo();
         ServerLevel level = step == null ? null : player.server.getLevel(step.dimension());
         if (step == null || level == null) {
             refuse(player, 0, BuildVerdictPayload.NOTHING_TO_REDO, 0, BuildRules.message(BuildVerdictPayload.NOTHING_TO_REDO, 0), false);
+            return;
+        }
+        if (!step.loaded()) {
+            UndoFiles.loadStepLater(player.server, history, step, ok -> {
+                if (!player.hasDisconnected()) {
+                    redo(player);
+                }
+            });
             return;
         }
         int price = 0;
@@ -951,6 +970,7 @@ public final class BuildMagic {
     /** Forgets every builder's live state (the sessions, the histories, the pockets): for the server's stop and for tests. */
     public static void clear() {
         BuildSession.clear();
+        UndoFiles.reset();
         UndoHistory.clear();
         Pocket.clearHeld();
         clock = System::nanoTime;

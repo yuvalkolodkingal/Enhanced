@@ -26,8 +26,11 @@ import java.util.UUID;
  *     oldest step is forgotten.</li>
  * </ul>
  *
- * <p>In memory only, for now: until the server stops (the disk, the memory caps and {@code /enhanced build forget} are
- * {@code UndoFiles}', D-B 12.4).
+ * <p>On disk ({@link UndoFiles}, D-B 12.4): the history keeps the steps whose spells still work ({@link #opened}: their
+ * records are being written ahead) for its index, and the steps it lets go of ({@link #takeGone}: forgotten, or an
+ * emptied redo list) until their files are deleted; {@link #version} counts its changes, so a world save rewrites only
+ * the indexes that changed. A history read back from the disk is {@linkplain #install installed}, or merged into one
+ * its player began while it was being read.
  */
 public final class UndoHistory {
     private static final Map<UUID, UndoHistory> ALL = new HashMap<>();
@@ -37,7 +40,17 @@ public final class UndoHistory {
     private final Deque<UndoStep> done = new ArrayDeque<>();
     /** The steps that were undone and can be done again, newest last. */
     private final Deque<UndoStep> undone = new ArrayDeque<>();
+    /** The steps whose spells still work and whose records are on disk (C13), oldest first. */
+    private final List<UndoStep> open = new ArrayList<>();
+    /** The steps it let go of, whose files are still to be deleted. */
+    private final List<UndoStep> gone = new ArrayList<>();
     private int nextId = 1;
+    private long leftAt = -1;
+    private long version;
+    /** The version its index on disk was last written at ({@link UndoFiles}); -1 before. */
+    long indexed = -1;
+    /** How many steps were sealed into it since it was made (a history read from disk drops its redo list if any). */
+    private int pushes;
 
     private UndoHistory(UUID owner) {
         this.owner = owner;
@@ -53,9 +66,55 @@ public final class UndoHistory {
         return ALL.get(owner);
     }
 
+    /** Every history in memory. */
+    public static List<UndoHistory> all() {
+        return List.copyOf(ALL.values());
+    }
+
+    /** A history that belongs to no player yet (one read from disk, before it is installed). */
+    static UndoHistory detached(UUID owner) {
+        return new UndoHistory(owner);
+    }
+
+    /**
+     * Makes {@code loaded} (read from disk) the history of its player; if he began one while it was being read, its
+     * steps are older than his new ones and go before them, and its redo list is dropped if he has cast since (a new
+     * spell empties it). Returns the history the player now has.
+     */
+    static UndoHistory install(UndoHistory loaded) {
+        UndoHistory now = ALL.get(loaded.owner);
+        if (now == null) {
+            ALL.put(loaded.owner, loaded);
+            loaded.version++;
+            return loaded;
+        }
+        List<UndoStep> older = new ArrayList<>(loaded.done);
+        for (int i = older.size() - 1; i >= 0; i--) {
+            UndoStep step = older.get(i);
+            step.renumber(now.nextId++);
+            now.done.addFirst(step);
+        }
+        if (now.pushes == 0 && now.undone.isEmpty()) {
+            for (UndoStep step : loaded.undone) {
+                step.renumber(now.nextId++);
+                now.undone.addLast(step);
+            }
+        } else {
+            now.gone.addAll(loaded.undone);
+        }
+        now.gone.addAll(loaded.gone);
+        now.version++;
+        return now;
+    }
+
     /** Forgets every history (the server has stopped, or a test ends). */
     public static void clear() {
         ALL.clear();
+    }
+
+    /** Forgets the history of {@code owner} (nobody was on for 30 minutes, and none is written to disk). */
+    static void remove(UUID owner) {
+        ALL.remove(owner);
     }
 
     public UUID owner() {
@@ -74,14 +133,77 @@ public final class UndoHistory {
      * @return how many steps were forgotten to make room
      */
     public int push(UndoStep step, int maxSteps) {
+        gone.addAll(undone);
         undone.clear();
+        open.remove(step);
         done.addLast(step);
+        pushes++;
+        version++;
         int forgotten = 0;
         while (maxSteps > 0 && done.size() > maxSteps) {
-            done.removeFirst();
+            gone.add(done.removeFirst());
             forgotten++;
         }
+        UndoFiles.sealed(this, step);
         return forgotten;
+    }
+
+    /** A step read from disk goes in as it was: undone ({@code redo}) or one Ctrl + Z can work on, after the others. */
+    void restore(UndoStep step, boolean redo) {
+        step.renumber(nextId++);
+        (redo ? undone : done).addLast(step);
+    }
+
+    /** The spell of {@code step} began writing its records ahead (C13): its history's index lists it as working. */
+    void opened(UndoStep step) {
+        if (!open.contains(step)) {
+            open.add(step);
+            version++;
+        }
+    }
+
+    /** The spell of {@code step} ended without a step to keep (it changed nothing): it is no longer listed. */
+    void closed(UndoStep step) {
+        if (open.remove(step)) {
+            version++;
+        }
+    }
+
+    /** The steps whose spells still work and whose records are on disk, oldest first. */
+    public List<UndoStep> open() {
+        return List.copyOf(open);
+    }
+
+    /** The steps it let go of since the last call (forgotten, an emptied redo list): their files can go. */
+    List<UndoStep> takeGone() {
+        List<UndoStep> taken = List.copyOf(gone);
+        gone.clear();
+        return taken;
+    }
+
+    /** A number that changes whenever the history does (a world save rewrites only the indexes that changed). */
+    public long version() {
+        return version;
+    }
+
+    /** Something the index keeps changed (a step's state, a line said). */
+    void touched() {
+        version++;
+    }
+
+    /** What a login said of the spells cut short is not said again: the steps' "tell" marks are cleared. */
+    void told() {
+        for (UndoStep step : allSteps()) {
+            if (step.tell()) {
+                step.setTell(false);
+                version++;
+            }
+        }
+    }
+
+    /** The steps that were undone and can be done again, oldest first. */
+    public List<UndoStep> undoneSteps() {
+        return new ArrayList<>(undone);
     }
 
     /** The step Ctrl + Z works on: a partly undone step first, else the newest that can be undone; null if none. */
@@ -111,16 +233,89 @@ public final class UndoHistory {
      * undone one stays where it is for the next Ctrl + Z.
      */
     public void undid(UndoStep step) {
+        version++;
         if (step.state() == UndoStep.State.UNDONE && done.remove(step)) {
             undone.addLast(step);
         }
+        UndoFiles.sealed(this, step);
     }
 
     /** A redo of {@code step} ended: it can be undone again. */
     public void redid(UndoStep step) {
+        version++;
         if (undone.remove(step)) {
             done.addLast(step);
         }
+        UndoFiles.sealed(this, step);
+    }
+
+    /** Lets go of {@code step} (its file could not be read): it is in the history no more. */
+    void drop(UndoStep step) {
+        if (done.remove(step) | undone.remove(step)) {
+            gone.add(step);
+            version++;
+        }
+    }
+
+    /** The server tick its player left at, or -1 while he is on (or never was). */
+    long leftAt() {
+        return leftAt;
+    }
+
+    void left(long tick) {
+        this.leftAt = tick;
+    }
+
+    /** How many steps it holds (the ones Ctrl + Z works on and the ones Ctrl + Y does again). */
+    int stepCount() {
+        return done.size() + undone.size();
+    }
+
+    /** The bytes the files of its steps hold. */
+    long diskBytes() {
+        long bytes = 0;
+        for (UndoStep step : done) {
+            bytes += step.diskBytes();
+        }
+        for (UndoStep step : undone) {
+            bytes += step.diskBytes();
+        }
+        return bytes;
+    }
+
+    /** What the cells of its steps weigh in memory, about. */
+    long memoryBytes() {
+        long bytes = 0;
+        for (UndoStep step : done) {
+            bytes += step.memoryBytes();
+        }
+        for (UndoStep step : undone) {
+            bytes += step.memoryBytes();
+        }
+        return bytes;
+    }
+
+    /** Forgets the oldest step (done or undone), its file with it; null when it has none. */
+    @Nullable UndoStep forgetOldest() {
+        UndoStep first = done.peekFirst();
+        UndoStep other = undone.peekFirst();
+        UndoStep oldest = first == null ? other : other == null ? first : first.time() <= other.time() ? first : other;
+        if (oldest == null) {
+            return null;
+        }
+        if (!done.remove(oldest)) {
+            undone.remove(oldest);
+        }
+        gone.add(oldest);
+        version++;
+        return oldest;
+    }
+
+    /** Every step of it (the ones Ctrl + Z works on, then the ones Ctrl + Y does again), oldest first. */
+    List<UndoStep> allSteps() {
+        List<UndoStep> all = new ArrayList<>(done);
+        all.addAll(undone);
+        return all;
     }
 
     /** The steps that can be undone, oldest first. */
@@ -146,7 +341,10 @@ public final class UndoHistory {
 
     /** Forgets every step of this player. */
     public void forget() {
+        gone.addAll(done);
+        gone.addAll(undone);
         done.clear();
         undone.clear();
+        version++;
     }
 }

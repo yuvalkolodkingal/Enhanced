@@ -37,8 +37,14 @@ import java.util.UUID;
  * them), the old and new state of each (as ids of {@code Block.BLOCK_STATE_REGISTRY}), the old and new block-entity
  * data of the cells that have it, and a 64-bit hash of each new block entity's data as it stood once written. Then the
  * settle pass's side effects (a neighbour outside the spell that changed because of it: a torch that dropped off a
- * vanished wall), and the frames and paintings a Move carried (where each hung before and after). In memory only, for
- * now; the history on disk ({@code UndoFiles}) writes the same sections ahead of the cells (C13).
+ * vanished wall), and the frames and paintings a Move carried (where each hung before and after). On disk
+ * ({@link UndoFiles}) its cells are recorded before they change (C13), and once it is sealed the whole step is kept in
+ * its file ({@link #image}); a step of a history read back from the disk may be only listed, its cells read when it is
+ * undone or redone ({@link #loaded}, {@link #adopt}).
+ *
+ * <p>A step read back from the records of a spell that a crash cut short ({@link #recovered}) knows what each cell held
+ * before and what the spell was to put there, not how its settle pass shaped it or which cells it reached: its undo puts
+ * a cell back when it holds the block the spell was to put there (any of them, for a cell recorded more than once).
  *
  * <p>Each recorded cell has a status: still as the spell left it ({@link #APPLIED}), put back by an undo
  * ({@link #UNDONE}), or dropped because someone changed it since ({@link #DROPPED}, D-B 12.3: undo never destroys anyone's
@@ -67,7 +73,7 @@ public final class UndoStep {
     /** Someone changed the cell since: it is never touched again. */
     public static final byte DROPPED = 2;
 
-    private final int id;
+    private int id;
     private final Spell spell;
     private final ResourceKey<Level> dimension;
     private final long time;
@@ -76,6 +82,28 @@ public final class UndoStep {
     private long practice;
     private boolean mom;
     private boolean paid;
+
+    /** Its file's name on disk ({@code step-<file>.bin}), or 0 before it has one. */
+    private long file;
+    /** Its records being written ahead (C13), while its spell works. */
+    UndoFiles.@Nullable Journal journal;
+    /** Its file's writer (made with its name). */
+    UndoFiles.@Nullable StepFile io;
+    /** How many bytes its file holds. */
+    private volatile long bytes;
+    /** Its file holds the step as it is now (written after its last change, so its cells can leave memory). */
+    private volatile boolean stored;
+    private volatile int mods;
+    /** What {@link #memoryBytes} found, until the step changes (-1: not known). */
+    private long memory = -1;
+    /** Read back from a crash's records: its cells are what the spell was to do (see the class comment). */
+    private boolean recovered;
+    /** For a recovered step: the other new states (and their data's hashes) recorded for a cell, by position. */
+    private @Nullable Long2ObjectOpenHashMap<long[]> otherNews;
+    /** Its "stopped when the world closed" line is still to be said, at its player's next login (D-B 11.9). */
+    private boolean tell;
+    /** Only listed (read from the history's index): its cells are on disk until {@link #adopt}. */
+    private boolean listed;
 
     private final Long2ObjectLinkedOpenHashMap<Section> sections = new Long2ObjectLinkedOpenHashMap<>();
     private final List<SideEffect> sideEffects = new ArrayList<>();
@@ -128,6 +156,7 @@ public final class UndoStep {
 
     public void setState(State state) {
         this.state = state;
+        unstore();
     }
 
     /** Whether Ctrl + Z can still put something of it back. */
@@ -256,6 +285,26 @@ public final class UndoStep {
         return section == null ? 0L : section.hash(Section.cell(pos));
     }
 
+    /** What {@code pos} held before the spell changed it (null when it did not change it). */
+    public @Nullable BlockState oldState(BlockPos pos) {
+        Section section = sections.get(SectionPos.asLong(pos));
+        int at = section == null ? -1 : section.indexOf(Section.cell(pos));
+        return at < 0 ? null : Block.stateById(section.olds[at]);
+    }
+
+    /** The block-entity data {@code pos} had before the spell changed it (null for none). */
+    public @Nullable CompoundTag oldData(BlockPos pos) {
+        Section section = sections.get(SectionPos.asLong(pos));
+        return section == null || section.oldData == null ? null : section.oldData.get(Section.cell(pos));
+    }
+
+    /** The status of the cell {@code pos} ({@link #APPLIED}, {@link #UNDONE}, {@link #DROPPED}), or -1 when not recorded. */
+    public byte status(BlockPos pos) {
+        Section section = sections.get(SectionPos.asLong(pos));
+        int at = section == null ? -1 : section.indexOf(Section.cell(pos));
+        return at < 0 ? -1 : section.status[at];
+    }
+
     /**
      * The settle pass changed a cell the spell had written ({@code Block.updateFromNeighbourShapes}: a fence joining its
      * neighbour): the step now remembers that as what the spell put there, so an undo still finds it as the spell left it.
@@ -299,6 +348,323 @@ public final class UndoStep {
             return List.of();
         }
         return (before ? carriedBefore : carriedAfter).getOrDefault(pos.asLong(), List.of());
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // On disk (UndoFiles)
+
+    /** Its file's name on disk ({@code step-<file>.bin}, as 16 hex digits), or 0 before it has one. */
+    public long file() {
+        return file;
+    }
+
+    void setFile(long file) {
+        this.file = file;
+    }
+
+    /** How many bytes its file holds (what the disk caps count). */
+    public long diskBytes() {
+        return bytes;
+    }
+
+    void setBytes(long bytes) {
+        this.bytes = bytes;
+    }
+
+    /** Its file now holds the step as it was when {@code mods} counted its changes. */
+    void markStored(int mods) {
+        if (this.mods == mods) {
+            stored = true;
+        }
+    }
+
+    /** Its file no longer holds the step as it is (it changed, or is being written again); the count of its changes. */
+    int unstore() {
+        stored = false;
+        memory = -1;
+        return ++mods;
+    }
+
+    /** Whether its file holds the step as it is (its cells may leave memory). */
+    public boolean stored() {
+        return stored;
+    }
+
+    void markRecovered(boolean recovered) {
+        this.recovered = recovered;
+    }
+
+    /**
+     * What its cells weigh in memory, about: a section's index and its cells' lists, and the block-entity data (a few
+     * hundred bytes each); a step only listed weighs nothing.
+     */
+    public long memoryBytes() {
+        if (listed) {
+            return 256L;
+        }
+        if (memory >= 0 && state != State.WORKING) {
+            return memory;
+        }
+        long total = 512L;
+        for (Section section : sections.values()) {
+            total += 8192L + 4096L + (long) section.cells.length * 11L;
+            total += (section.oldData == null ? 0 : section.oldData.size()) * 256L + (section.newData == null ? 0 : section.newData.size()) * 256L;
+        }
+        total += sideEffects.size() * 48L + carried.size() * 96L;
+        memory = total;
+        return total;
+    }
+
+    /**
+     * Lets its cells go from memory once its file holds them ({@link #stored}); it is listed again, and is read back when
+     * it is undone or redone. False when its file does not hold the step as it is, or its spell still works.
+     */
+    boolean evict() {
+        if (listed || !stored || state == State.WORKING || journal != null) {
+            return false;
+        }
+        sections.clear();
+        sideEffects.clear();
+        carried.clear();
+        carriedBefore.clear();
+        carriedAfter.clear();
+        otherNews = null;
+        listed = true;
+        memory = -1;
+        return true;
+    }
+
+    /** Gives the step a new number in the history it is read into. */
+    void renumber(int id) {
+        this.id = id;
+    }
+
+    /** Whether its cells are in memory (false: only listed, read from disk when it is undone or redone). */
+    public boolean loaded() {
+        return !listed;
+    }
+
+    /** Whether it was read back from the records of a spell a crash cut short (see the class comment). */
+    public boolean recovered() {
+        return recovered;
+    }
+
+    /** Whether its "stopped when the world closed" line is still to be said at its player's next login. */
+    public boolean tell() {
+        return tell;
+    }
+
+    public void setTell(boolean tell) {
+        this.tell = tell;
+    }
+
+    /**
+     * A step of a history read from disk that is only listed: what its index says of it (how many cells it changed,
+     * how many still hold what it put there, how many an undo put back, its box); its cells come with {@link #adopt}.
+     */
+    static UndoStep listed(Spell spell, ResourceKey<Level> dimension, long time, long changed, long applied, long undone,
+                           @Nullable BoundingBox box) {
+        UndoStep step = new UndoStep(0, spell, dimension, time);
+        step.listed = true;
+        step.cells = changed;
+        step.applied = applied;
+        step.undone = undone;
+        if (box != null) {
+            step.minX = box.minX();
+            step.minY = box.minY();
+            step.minZ = box.minZ();
+            step.maxX = box.maxX();
+            step.maxY = box.maxY();
+            step.maxZ = box.maxZ();
+        }
+        return step;
+    }
+
+    /** A step read from disk, before its cells are {@linkplain #restore restored}. */
+    static UndoStep read(Spell spell, ResourceKey<Level> dimension, long time) {
+        return new UndoStep(0, spell, dimension, time);
+    }
+
+    /** The cells, side effects and carried things of {@code body} (the same step read from disk) become this step's. */
+    void adopt(UndoStep body) {
+        sections.clear();
+        sections.putAll(body.sections);
+        sideEffects.clear();
+        sideEffects.addAll(body.sideEffects);
+        carried.clear();
+        carriedBefore.clear();
+        carriedAfter.clear();
+        for (Carried thing : body.carried) {
+            carried(thing.id(), thing.from(), thing.fromFacing(), thing.to(), thing.toFacing());
+        }
+        cells = body.cells;
+        applied = body.applied;
+        undone = body.undone;
+        minX = body.minX;
+        minY = body.minY;
+        minZ = body.minZ;
+        maxX = body.maxX;
+        maxY = body.maxY;
+        maxZ = body.maxZ;
+        recovered = body.recovered;
+        otherNews = body.otherNews;
+        listed = false;
+        memory = -1;
+        stored = !body.recovered; // (its file holds it as it is, unless that file is the records of a cut spell)
+    }
+
+    /**
+     * Restores a cell of a step read from disk, in the order the step wrote them: what it held, what the spell put
+     * there, their data, the hash of the new data, and its status ({@link #DROPPED} for a cell whose block no longer
+     * exists: "keep").
+     */
+    void restore(long key, short cell, int old, @Nullable CompoundTag oldData, int now, @Nullable CompoundTag newData, long hash, byte status) {
+        Section section = sections.get(key);
+        if (section == null) {
+            section = new Section(key);
+            sections.put(key, section);
+        }
+        if (section.indexOf(cell) >= 0) {
+            return; // (each cell is recorded once)
+        }
+        int at = section.add(cell, old, oldData);
+        section.news[at] = now;
+        section.setNew(cell, newData, hash);
+        section.status[at] = status;
+        cells++;
+        if (status == APPLIED) {
+            applied++;
+        } else if (status == UNDONE) {
+            undone++;
+        }
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        section.pos(at, pos);
+        minX = Math.min(minX, pos.getX());
+        minY = Math.min(minY, pos.getY());
+        minZ = Math.min(minZ, pos.getZ());
+        maxX = Math.max(maxX, pos.getX());
+        maxY = Math.max(maxY, pos.getY());
+        maxZ = Math.max(maxZ, pos.getZ());
+    }
+
+    /**
+     * A cell of the records of a spell a crash cut short (C13), in the order they were written: its first record says
+     * what it held before; its last, what the spell was to put there, the earlier ones are kept as other new states it
+     * may hold. {@code known} false: a block of it no longer exists, and the cell is kept as it is.
+     */
+    void recover(long key, short cell, int old, @Nullable CompoundTag oldData, int now, @Nullable CompoundTag newData, long hash, boolean known) {
+        recovered = true;
+        Section section = sections.get(key);
+        int at = section == null ? -1 : section.indexOf(cell);
+        if (at < 0) {
+            restore(key, cell, old, oldData, now, newData, hash, known ? APPLIED : DROPPED);
+            return;
+        }
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        section.pos(at, pos);
+        if (otherNews == null) {
+            otherNews = new Long2ObjectOpenHashMap<>();
+        }
+        long[] others = otherNews.get(pos.asLong());
+        long[] more = others == null ? new long[2] : Arrays.copyOf(others, others.length + 2);
+        more[more.length - 2] = section.news[at];
+        more[more.length - 1] = section.hash(cell);
+        otherNews.put(pos.asLong(), more);
+        section.news[at] = now;
+        section.setNew(cell, newData, hash);
+        if (!known && section.status[at] == APPLIED) {
+            section.status[at] = DROPPED;
+            applied--;
+        }
+    }
+
+    /**
+     * For a {@linkplain #recovered recovered} step: whether {@code here} (with the hash {@code hereHash} of its data) is
+     * what the spell was to put at {@code pos}, as far as its records tell: the block of one of the new states
+     * recorded for the cell (whatever its settle pass made of its shape), with the same data where there is some.
+     */
+    public boolean recoveredHolds(BlockPos pos, BlockState here, long hereHash) {
+        Section section = sections.get(SectionPos.asLong(pos));
+        int at = section == null ? -1 : section.indexOf(Section.cell(pos));
+        if (at < 0) {
+            return false;
+        }
+        long hash = section.hash(section.cells[at]);
+        if (Block.stateById(section.news[at]).is(here.getBlock()) && (!here.hasBlockEntity() || hash == 0L || hash == hereHash)) {
+            return true;
+        }
+        long[] others = otherNews == null ? null : otherNews.get(pos.asLong());
+        for (int i = 0; others != null && i < others.length; i += 2) {
+            if (Block.stateById((int) others[i]).is(here.getBlock()) && (!here.hasBlockEntity() || others[i + 1] == 0L || others[i + 1] == hereHash)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Restores a side effect of a step read from disk, with its status. */
+    void restoreSideEffect(long pos, BlockState old, BlockState now, byte status) {
+        SideEffect effect = new SideEffect(pos, old, now);
+        effect.setStatus(status);
+        sideEffects.add(effect);
+    }
+
+    /**
+     * A redo of the step was at work when the server stopped without saving it (a crash): the cells it had put back
+     * may hold what the spell put there again, so the step is one Ctrl + Z can undo, its undone cells (and side effects)
+     * as the spell left them (the undo's check skips those the redo never reached).
+     */
+    void redoCut() {
+        for (Section section : sections.values()) {
+            for (int at = 0; at < section.size; at++) {
+                if (section.status[at] == UNDONE) {
+                    section.status[at] = APPLIED;
+                    undone--;
+                    applied++;
+                }
+            }
+        }
+        for (SideEffect effect : sideEffects) {
+            if (effect.status() == UNDONE) {
+                effect.setStatus(APPLIED);
+            }
+        }
+        state = State.INTERRUPTED;
+    }
+
+    /**
+     * A copy of the step as it is now, for writing it to disk off the server thread ({@link UndoFiles}): every section's
+     * cells in order with their old and new states, statuses, data and hashes, the side effects and what a Move carried.
+     * The data tags are shared, not copied: the step never changes a tag it holds.
+     */
+    public Image image() {
+        List<SectionImage> images = new ArrayList<>(sections.size());
+        for (Section section : sections.values()) {
+            images.add(new SectionImage(section.key, Arrays.copyOf(section.cells, section.size), Arrays.copyOf(section.olds, section.size),
+                    Arrays.copyOf(section.news, section.size), Arrays.copyOf(section.status, section.size),
+                    section.oldData == null ? new Short2ObjectOpenHashMap<>() : new Short2ObjectOpenHashMap<>(section.oldData),
+                    section.newData == null ? new Short2ObjectOpenHashMap<>() : new Short2ObjectOpenHashMap<>(section.newData),
+                    section.hashes == null ? new Short2LongOpenHashMap() : new Short2LongOpenHashMap(section.hashes)));
+        }
+        List<SideEffectImage> effects = new ArrayList<>(sideEffects.size());
+        for (SideEffect effect : sideEffects) {
+            effects.add(new SideEffectImage(effect.pos, Block.getId(effect.old), Block.getId(effect.now), effect.status));
+        }
+        return new Image(spell, dimension, time, state, cost, practice, mom, paid, tell, recovered, images, effects, List.copyOf(carried));
+    }
+
+    /** A step as it was when copied ({@link #image}), to be written to disk. */
+    public record Image(Spell spell, ResourceKey<Level> dimension, long time, State state, int cost, long practice, boolean mom, boolean paid,
+                        boolean tell, boolean recovered, List<SectionImage> sections, List<SideEffectImage> sideEffects, List<Carried> carried) {
+    }
+
+    /** A section of an {@link Image}: its cells in the order they were written, with their states (ids) and data. */
+    public record SectionImage(long key, short[] cells, int[] olds, int[] news, byte[] status, Short2ObjectOpenHashMap<CompoundTag> oldData,
+                               Short2ObjectOpenHashMap<CompoundTag> newData, Short2LongOpenHashMap hashes) {
+    }
+
+    /** A side effect of an {@link Image}: its cell, its old and new state (ids) and its status. */
+    public record SideEffectImage(long pos, int old, int now, byte status) {
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -397,6 +763,7 @@ public final class UndoStep {
                 undone++;
             }
             section.status[at] = status;
+            unstore();
         }
 
         /** The section the walk is in ({@link SectionPos#asLong}). */
