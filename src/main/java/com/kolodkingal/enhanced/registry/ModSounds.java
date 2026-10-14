@@ -187,6 +187,7 @@ public final class ModSounds {
 
     // ===== 3.1 build =====
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_ON_WANDA = register("build_on_wanda");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_ON_BILLY = register("build_on_billy");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));

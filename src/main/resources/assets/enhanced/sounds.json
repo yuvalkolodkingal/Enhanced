@@ -1075,5 +1075,13 @@
         "name": "enhanced:build_on_wanda"
       }
     ]
+  },
+  "build_on_billy": {
+    "subtitle": "subtitles.enhanced.build_on_billy",
+    "sounds": [
+      {
+        "name": "enhanced:build_on_billy"
+      }
+    ]
   }
 }

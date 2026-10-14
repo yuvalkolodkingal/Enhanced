@@ -42,8 +42,8 @@ public final class BuildSounds {
 
     /** "Reality bends": the Scarlet Witch enters build mode, a breathy rising minor chord with a shimmer. */
     private static final StandIn ON_WANDA = new StandIn(ModSounds.BUILD_ON_WANDA, 0.8F, 1.0F);
-    /** "A spellbook opens": Billy enters build mode. */
-    private static final StandIn ON_BILLY = new StandIn(() -> SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.4F);
+    /** "A spellbook opens": Billy enters build mode, a paper flutter and two glassy notes. */
+    private static final StandIn ON_BILLY = new StandIn(ModSounds.BUILD_ON_BILLY, 0.8F, 1.0F);
     /** "Chaos magic rewrites reality": one of her spells starts. */
     private static final StandIn CAST_WANDA = new StandIn(ModSounds.HEX_CROSS, 0.6F, 1.3F);
     /** Her spell of {@link #HUGE_CAST} blocks or more starts. */
