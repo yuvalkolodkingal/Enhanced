@@ -1,7 +1,9 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
+import com.kolodkingal.enhanced.ability.MagnetPull;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.Metal;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -46,6 +48,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -404,7 +407,8 @@ public final class MagnetoMetalTests {
 
     /**
      * M45. Gear a creature never drops (drop chance 0) crumbles when V tears it off: no helmet anywhere, only its
-     * fragments and the sound of it breaking; the sword at the ordinary chance falls, marked for his pull.
+     * fragments and the sound of it breaking; the sword at the ordinary chance falls, marked for his pull. The pull does
+     * the same to a second such zombie: its sword is his, its helmet crumbles.
      */
     @GameTest(template = ARENA, batch = METAL)
     public static void gearAMobNeverDropsCrumbles(GameTestHelper helper) {
@@ -431,16 +435,38 @@ public final class MagnetoMetalTests {
         check(TestKit.particlesIn(packets).stream().anyMatch(p -> p.getParticle() instanceof ItemParticleOption fragments
                 && fragments.getItem().is(Items.IRON_HELMET)), "into its own fragments");
         check(!Powers.get(magneto).isReady(3, helper.getLevel().getGameTime()), "the strip did something: it rests");
-        helper.succeed();
+
+        swords.get(0).discard(); // the strip's sword, out of the way of the pull
+        Zombie second = wearing(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 12.5), EquipmentSlot.HEAD, Items.IRON_HELMET);
+        second.setDropChance(EquipmentSlot.HEAD, 0.0F);
+        second.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+        List<Object> pulled = new ArrayList<>();
+        TestKit.sentPackets(magneto);
+        MagnetPullTests.sneakR(magneto);
+        f.everyTick(20, tick -> {
+            PowerTicker.tick(magneto);
+            pulled.addAll(TestKit.sentPackets(magneto));
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            check(second.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && second.getMainHandItem().isEmpty(), "the pull empties its head and its hand");
+            check(magneto.getInventory().countItem(Items.IRON_SWORD) == 1, "the sword is his");
+            check(items(helper, Items.IRON_HELMET).isEmpty() && magneto.getInventory().countItem(Items.IRON_HELMET) == 0,
+                    "and no helmet is anywhere: it crumbled");
+            check(TestKit.soundsIn(pulled).stream().anyMatch(sound -> sound.id().equals(SoundEvents.ITEM_BREAK.getLocation())),
+                    "it was heard breaking");
+            return true;
+        });
     }
 
     // ------------------------------------------------------------------------------------------------------------
     // Loki's illusions give nothing (M44, M58)
 
     /**
-     * M44 (the strip). Loki in netherite, holding his Scepter, casts Duplicates: no copy is metal and R holds none; V at
-     * each dissolves it ({@code disarm.illusion}) and rests; afterwards no netherite piece and no Scepter lies anywhere or
-     * is in Magneto's inventory, and Loki still wears and holds his own.
+     * M44. Loki in netherite, holding his Scepter, casts Duplicates: no copy is metal and R holds none; V at each dissolves
+     * it ({@code disarm.illusion}) and rests; afterwards no netherite piece and no Scepter lies anywhere or is in Magneto's
+     * inventory, and Loki still wears and holds his own. Cast again, the three copies in reach of the pull dissolve the
+     * same way, nothing of theirs is made real, and the pull rests: it did something.
      */
     @GameTest(template = ARENA, batch = LOKI)
     public static void illusionsGiveNothing(GameTestHelper helper) {
@@ -488,7 +514,41 @@ public final class MagnetoMetalTests {
             check(loki.getItemBySlot(slots.get(i)).is(set.get(i)), "Loki still wears his " + BuiltInRegistries.ITEM.getKey(set.get(i)));
         }
         check(loki.getMainHandItem().is(ModItems.LOKIS_SCEPTER.get()), "and holds his Scepter");
-        helper.succeed();
+
+        Powers.get(loki).startCooldown(2, level.getGameTime(), 0);
+        AbilityHandler.onKey(loki, 2, true);
+        List<LokiIllusionEntity> again = LokiIllusionEntity.ownedBy(level, loki.getUUID());
+        check(again.size() == 3, "Duplicates again: three new copies, not " + again.size());
+        boolean[] pressed = {false};
+        f.everyTick(60, tick -> {
+            long now = level.getGameTime();
+            if (!pressed[0]) {
+                if (now - Telekinesis.lastGripEnd(magneto) < EnhancedConfig.TELEKINESIS_SNEAK_GRACE_TICKS.get()) {
+                    return false; // R's press a moment ago: Sneak + R waits out the grace after a grip
+                }
+                for (int i = 0; i < again.size(); i++) {
+                    again.get(i).moveTo(helper.absoluteVec(new Vec3(7.5 + 3 * i, FLOOR, 5.5 + (i % 2))));
+                    check(again.get(i).getItemBySlot(EquipmentSlot.CHEST).is(Items.NETHERITE_CHESTPLATE), "a copy wears his netherite again");
+                }
+                MagnetPullTests.sneakR(magneto);
+                check(MagnetPull.isPulling(magneto), "Magneto pulls with the three copies in reach");
+                pressed[0] = true;
+                return false;
+            }
+            PowerTicker.tick(magneto);
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            check(again.stream().allMatch(Entity::isRemoved), "the pull dissolves every copy");
+            for (Item item : List.of(Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS,
+                    ModItems.LOKIS_SCEPTER.get())) {
+                check(items(helper, item).isEmpty() && magneto.getInventory().countItem(item) == 0,
+                        "the pull made no " + BuiltInRegistries.ITEM.getKey(item) + " out of an illusion");
+            }
+            check(loki.getItemBySlot(EquipmentSlot.CHEST).is(Items.NETHERITE_CHESTPLATE), "Loki keeps his own");
+            check(!data.isReady(1, now), "and the pull rests: magnetism saw through the trick");
+            return true;
+        });
     }
 
     /**

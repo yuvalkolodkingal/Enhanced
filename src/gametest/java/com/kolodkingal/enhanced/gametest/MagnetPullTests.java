@@ -3,9 +3,11 @@ package com.kolodkingal.enhanced.gametest;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
+import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.MagnetPull;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.ability.SpiderServer;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
@@ -15,6 +17,8 @@ import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -32,10 +36,16 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.food.FoodData;
@@ -56,6 +66,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -1173,6 +1185,356 @@ public final class MagnetPullTests {
     }
 
     // ------------------------------------------------------------------------------------------------------------
+    // What lies loose, creatures and players (M21, M22, M24, M33, M36)
+
+    /**
+     * M21. Loose metal and creatures' gear come from all round him: an ingot, a golden apple, the stuck arrow anyone may
+     * pick up, and a zombie's iron helmet and sword are his. The diamond, the skeleton's kind of arrow nobody may pick up,
+     * the zombie's leather boots, the iron armour of another player's horse and an armour stand's gold chestplate stay
+     * where they are, and the villager is left alone.
+     */
+    @GameTest(template = ARENA, batch = PULL)
+    public static void thePullTakesLooseMetalAndGear(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer magneto = magneto(f);
+        ItemEntity ingot = ingot(helper, new Vec3(12.5, FLOOR, 8.5));
+        ItemEntity apple = loose(helper, new Vec3(8.5, FLOOR, 12.5), new ItemStack(Items.GOLDEN_APPLE));
+        ItemEntity diamond = loose(helper, new Vec3(12.5, FLOOR, 12.5), new ItemStack(Items.DIAMOND));
+        Arrow anyones = stuck(helper, new Vec3(7.5, FLOOR, 8.5), AbstractArrow.Pickup.ALLOWED);
+        Arrow nobodys = stuck(helper, new Vec3(13.5, FLOOR, 9.5), AbstractArrow.Pickup.DISALLOWED);
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 13.5));
+        zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+        zombie.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.LEATHER_BOOTS));
+        zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+        ServerPlayer owner = f.player(19.5, FLOOR, 1.5);
+        Horse horse = helper.spawnWithNoFreeWill(EntityType.HORSE, new Vec3(5.5, FLOOR, 10.5));
+        horse.tameWithName(owner);
+        horse.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
+        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 6.5));
+        stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.GOLDEN_CHESTPLATE));
+        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 5.5));
+        check(owner.distanceTo(magneto) > EnhancedConfig.PULL_RADIUS.get() + 2, "the horse's owner is out of reach");
+
+        sneakR(magneto);
+        afterThePull(f, magneto, 20, () -> {
+            check(!ingot.isAlive() && count(magneto, Items.IRON_INGOT) == 1, "the ingot is his");
+            check(!apple.isAlive() && count(magneto, Items.GOLDEN_APPLE) == 1, "the golden apple is his");
+            check(!anyones.isAlive() && count(magneto, Items.ARROW) == 1, "one arrow is his: the one anyone may pick up");
+            check(nobodys.isAlive(), "the arrow nobody may pick up stays stuck");
+            check(count(magneto, Items.IRON_HELMET) == 1 && count(magneto, Items.IRON_SWORD) == 1, "the zombie's helmet and sword are his");
+            check(zombie.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && zombie.getMainHandItem().isEmpty()
+                    && zombie.getItemBySlot(EquipmentSlot.FEET).is(Items.LEATHER_BOOTS), "it keeps only its leather boots");
+            check(diamond.isAlive() && count(magneto, Items.DIAMOND) == 0, "the diamond stays");
+            check(horse.getBodyArmorItem().is(Items.IRON_HORSE_ARMOR) && count(magneto, Items.IRON_HORSE_ARMOR) == 0,
+                    "another player's horse keeps its armour");
+            check(stand.getItemBySlot(EquipmentSlot.CHEST).is(Items.GOLDEN_CHESTPLATE), "the armour stand keeps its chestplate");
+            check(villager.isAlive() && villager.getHealth() == villager.getMaxHealth(), "the villager is left alone");
+        });
+    }
+
+    /**
+     * M22. V at a zombie in an iron chestplate, then Sneak + R the next tick: the chestplate the strip marked for him
+     * comes at once, through its pickup delay; an iron ingot another player threw a tick before the strip does not.
+     */
+    @GameTest(template = ARENA, batch = PULL)
+    public static void theStripThenThePullAtOnce(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer magneto = magneto(f);
+        ServerPlayer other = f.player(18.5, FLOOR, 18.5);
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+        Vec3 at = helper.absoluteVec(new Vec3(8.5, FLOOR, 12.5));
+        ItemEntity thrown = new ItemEntity(level, at.x, at.y, at.z, new ItemStack(Items.IRON_INGOT), 0.0, 0.0, 0.0);
+        thrown.setPickUpDelay(40);
+        thrown.setThrower(other);
+        level.addFreshEntity(thrown);
+
+        f.everyTick(20, tick -> {
+            if (tick == 1) {
+                TestKit.lookAt(magneto, zombie);
+                AbilityHandler.onKey(magneto, 3, true);
+                check(zombie.getItemBySlot(EquipmentSlot.CHEST).isEmpty(), "V tears the chestplate off");
+                return false;
+            }
+            if (tick == 2) {
+                sneakR(magneto);
+                return false;
+            }
+            PowerTicker.tick(magneto);
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            check(count(magneto, Items.IRON_CHESTPLATE) == 1, "the chestplate the strip marked for him is his at once");
+            check(thrown.isAlive() && thrown.hasPickUpDelay() && count(magneto, Items.IRON_INGOT) == 0,
+                    "the ingot another player threw waits out its delay where it lies");
+            return true;
+        });
+    }
+
+    /**
+     * M24. An Iron Golem without AI, 7 blocks away and alone in reach: the pull tugs it at least 2 blocks nearer, unhurt and
+     * not set against him, and the tug costs (he rests, one hunger point, Sneak + R says recharging). Rested: an empty
+     * minecart and a TNT minecart come as their items (the TNT without going off); a chest minecart with dirt in it, a
+     * minecart a zombie rides and the command block minecart stay; another player's drone, with PvP off, is not tugged.
+     */
+    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 240)
+    public static void thePullTugsGolemsAndTakesEmptyCarts(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer magneto = magneto(f);
+        PowerData data = Powers.get(magneto);
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(3.5, FLOOR, 10.5));
+        double before = golem.distanceTo(magneto);
+        double hunger = hunger(magneto);
+        sneakR(magneto);
+        int[] stage = {0};
+        AbstractMinecart[] carts = new AbstractMinecart[5];
+        UltronSentryEntity[] drone = new UltronSentryEntity[1];
+        Vec3[] droneAt = new Vec3[1];
+
+        f.everyTick(230, tick -> {
+            PowerTicker.tick(magneto);
+            long now = level.getGameTime();
+            if (stage[0] == 0 && tick == 12) {
+                check(golem.distanceTo(magneto) <= before - 2.0, "the golem slid at least 2 blocks nearer: " + before + " to " + golem.distanceTo(magneto));
+                check(golem.getHealth() == golem.getMaxHealth() && golem.getTarget() != magneto, "unhurt, and not set against him");
+                check(MagnetPull.lastTugs(magneto) == 1, "one body tugged");
+                check(!data.isReady(1, now), "the tug was the pull's work: he rests");
+                assertNear(hunger - hunger(magneto), EnhancedConfig.PULL_EXHAUSTION.get(), 0.001, "and it cost a hunger point");
+                BossTestSupport.lastActionBarKey(magneto);
+                sneakR(magneto);
+                check("message.enhanced.pull.recharging".equals(BossTestSupport.lastActionBarKey(magneto)), "Sneak + R at once: recharging");
+                golem.discard();
+                stage[0] = 1;
+            } else if (stage[0] == 1 && data.isReady(1, now)) {
+                carts[0] = cart(helper, EntityType.MINECART, new Vec3(13.5, FLOOR, 8.5));
+                carts[1] = cart(helper, EntityType.TNT_MINECART, new Vec3(7.5, FLOOR, 13.5));
+                MinecartChest chest = cart(helper, EntityType.CHEST_MINECART, new Vec3(13.5, FLOOR, 12.5));
+                chest.setItem(0, new ItemStack(Items.DIRT, 5));
+                carts[2] = chest;
+                carts[3] = cart(helper, EntityType.MINECART, new Vec3(7.5, FLOOR, 7.5));
+                Zombie rider = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.5, FLOOR, 7.5));
+                check(rider.startRiding(carts[3], true), "a zombie rides a minecart");
+                carts[4] = cart(helper, EntityType.COMMAND_BLOCK_MINECART, new Vec3(12.5, FLOOR, 5.5));
+                ServerPlayer ultron = f.player(19.5, FLOOR, 1.5, Power.ULTRON);
+                drone[0] = UltronSentryEntity.drone(level, helper.absoluteVec(new Vec3(10.5, FLOOR + 1.0, 15.5)), ultron.getUUID(), false, false);
+                drone[0].setHeld(true);
+                level.addFreshEntity(drone[0]);
+                droneAt[0] = drone[0].position();
+                sneakR(magneto);
+                stage[0] = 2;
+            } else if (stage[0] == 2 && !MagnetPull.isPulling(magneto)) {
+                check(!carts[0].isAlive() && count(magneto, Items.MINECART) == 1, "the empty minecart is his, as its item");
+                check(!carts[1].isAlive() && count(magneto, Items.TNT_MINECART) == 1, "the TNT minecart is his");
+                for (int dx = -2; dx <= 2; dx++) {
+                    for (int dz = -2; dz <= 2; dz++) {
+                        check(!helper.getBlockState(new BlockPos(7 + dx, 1, 13 + dz)).isAir(), "and it went off nowhere: the floor is whole");
+                    }
+                }
+                check(carts[2].isAlive() && ((MinecartChest) carts[2]).getItem(0).is(Items.DIRT) && ((MinecartChest) carts[2]).getItem(0).getCount() == 5,
+                        "the chest minecart with dirt in it stays, dirt and all");
+                check(carts[3].isAlive() && carts[3].isVehicle(), "the minecart the zombie rides stays");
+                check(carts[4].isAlive() && count(magneto, Items.COMMAND_BLOCK_MINECART) == 0, "the command block minecart stays");
+                check(MagnetPull.lastTugs(magneto) == 0 && drone[0].position().distanceTo(droneAt[0]) < 0.2,
+                        "another player's drone is not tugged with PvP off");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * M33 (R35). Players, PvP off: a pull leaves every one of them as he was. PvP on: player A's iron sword flies into
+     * Magneto's inventory (a stream from A in the tick's payload) and A keeps his armour; the Vision is tugged toward him;
+     * the Iron Spider V already stripped is left as he is; the teammate keeps his chestplate, and player B behind a stone
+     * wall keeps everything. Within the grace a second pull leaves A his helmet; after it a third one takes it. V at A tears
+     * his chestplate off, unmarked.
+     */
+    @GameTest(template = ARENA, batch = "magnet_pull_pvp", timeoutTicks = 360)
+    public static void thePullAndPlayers(GameTestHelper helper) {
+        players(helper, false);
+    }
+
+    /**
+     * M33 with {@code magneto.pullPlayerGearToFeet}: A's sword drops at his own feet, unmarked and with its 40-tick
+     * pickup delay, and flies to nobody.
+     */
+    @GameTest(template = ARENA, batch = "magnet_pull_pvp_feet", timeoutTicks = 100)
+    public static void thePullAndPlayersGearToFeet(GameTestHelper helper) {
+        players(helper, true);
+    }
+
+    private static void players(GameTestHelper helper, boolean toFeet) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        if (toFeet) {
+            f.config(EnhancedConfig.PULL_PLAYER_GEAR_TO_FEET, true);
+        }
+        ServerLevel level = helper.getLevel();
+        ServerPlayer magneto = magneto(f);
+        PowerData data = Powers.get(magneto);
+        ServerPlayer a = f.player(14.5, FLOOR, 10.5);
+        ironSet(a);
+        a.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+        ServerPlayer vision = f.player(6.5, FLOOR, 10.5, Power.VISION);
+        ServerPlayer spider = f.player(10.5, FLOOR, 6.5, Power.SPIDER_MAN);
+        Powers.setVariant(spider, Variants.get(Power.SPIDER_MAN, "iron_spider"));
+        PowerTicker.tick(spider);
+        check(SpiderServer.onStripped(spider) && SpiderServer.isStripped(spider), "V stripped the Iron Spider before");
+        ServerPlayer mate = f.player(13.5, FLOOR, 13.5);
+        mate.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+        ServerPlayer b = f.player(10.5, FLOOR, 16.5);
+        ironSet(b);
+        for (int x = 9; x <= 11; x++) {
+            for (int y = 2; y <= 4; y++) {
+                helper.setBlock(new BlockPos(x, y, 14), Blocks.STONE);
+            }
+        }
+        Scoreboard board = level.getScoreboard();
+        PlayerTeam team = board.addPlayerTeam(toFeet ? "magnet_pull_mates_feet" : "magnet_pull_mates");
+        team.setAllowFriendlyFire(false);
+        board.addPlayerToTeam(magneto.getScoreboardName(), team);
+        board.addPlayerToTeam(mate.getScoreboardName(), team);
+        f.onClose(() -> board.removePlayerTeam(team));
+        check(!Raycasts.inSight(magneto, b.getEyePosition()), "B stands behind the wall");
+        for (ServerPlayer seen : List.of(a, vision, spider, mate)) {
+            check(Raycasts.inSight(magneto, seen.getEyePosition()), seen.getScoreboardName() + " is in sight");
+        }
+        List<ServerPlayer> everyone = List.of(a, vision, spider, mate, b);
+        List<List<ItemStack>> worn = new ArrayList<>();
+        for (ServerPlayer player : everyone) {
+            worn.add(wornBy(player));
+        }
+        TestKit.sentPackets(spider);
+        List<Object> packets = new ArrayList<>();
+        int[] stage = {0};
+        long[] since = {0};
+        sneakR(magneto);
+
+        f.everyTick(toFeet ? 90 : 350, tick -> {
+            PowerTicker.tick(magneto);
+            packets.addAll(TestKit.sentPackets(magneto));
+            long now = level.getGameTime();
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            switch (stage[0]) {
+                case 0 -> {
+                    for (int i = 0; i < everyone.size(); i++) {
+                        check(sameStacks(wornBy(everyone.get(i)), worn.get(i)), "PvP off: " + everyone.get(i).getScoreboardName() + " keeps everything");
+                    }
+                    check(vision.getDeltaMovement().lengthSqr() < 1.0E-9, "PvP off: the Vision is not tugged");
+                    check(!actionBar(TestKit.sentPackets(spider)).contains("message.enhanced.legs.stripped"), "nor the Spider stripped again");
+                    check(data.isReady(1, now), "the pull did nothing, so it does not rest");
+                    f.pvp(true);
+                    since[0] = now;
+                    stage[0] = 1;
+                }
+                case 1 -> {
+                    if (now - since[0] > EnhancedConfig.PULL_RETRY_TICKS.get()) {
+                        packets.clear();
+                        sneakR(magneto);
+                        stage[0] = 2;
+                    }
+                }
+                case 2 -> {
+                    check(a.getMainHandItem().isEmpty(), "PvP on: A's sword is torn from his hand");
+                    for (EquipmentSlot slot : List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET)) {
+                        check(!a.getItemBySlot(slot).isEmpty(), "one piece only: A keeps his " + slot.getName());
+                    }
+                    boolean streamed = payloads(packets).stream().flatMap(payload -> payload.streams().stream())
+                            .anyMatch(stream -> stream.item() == Items.IRON_SWORD && stream.from().distanceTo(a.position().add(0, a.getBbHeight() * 0.5, 0)) < 1.5);
+                    if (toFeet) {
+                        List<ItemEntity> swords = helper.getEntities(EntityType.ITEM).stream().filter(item -> item.getItem().is(Items.IRON_SWORD)).toList();
+                        check(swords.size() == 1 && swords.get(0).position().distanceTo(a.position()) <= 1.5, "the sword lies at A's feet");
+                        check(swords.get(0).hasPickUpDelay() && !swords.get(0).getPersistentData().contains(MagnetoAbilities.STRIPPED_BY_TAG),
+                                "unmarked, and waiting out its delay so that A can take it back");
+                        check(count(magneto, Items.IRON_SWORD) == 0 && !streamed, "it flew to nobody");
+                    } else {
+                        check(count(magneto, Items.IRON_SWORD) == 1, "the sword is in Magneto's inventory");
+                        check(streamed, "and flew to him from A, in the tick's payload");
+                    }
+                    Vec3 tug = vision.getDeltaMovement();
+                    check(tug.length() > 0.3 && tug.dot(magneto.position().subtract(vision.position())) > 0.0, "the Vision is tugged toward him: " + tug);
+                    check(!actionBar(TestKit.sentPackets(spider)).contains("message.enhanced.legs.stripped") && SpiderServer.isStripped(spider),
+                            "the Spider, stripped already, is left as he is");
+                    check(sameStacks(wornBy(mate), worn.get(3)), "the teammate keeps his chestplate");
+                    check(sameStacks(wornBy(b), worn.get(4)), "B, behind the wall, keeps everything");
+                    if (toFeet) {
+                        return true;
+                    }
+                    stage[0] = 3;
+                }
+                case 3 -> {
+                    if (data.isReady(1, now)) {
+                        sneakR(magneto);
+                        stage[0] = 4;
+                    }
+                }
+                case 4 -> {
+                    check(a.getItemBySlot(EquipmentSlot.HEAD).is(Items.IRON_HELMET) && MagnetPull.playerGraceLeft(a) > 0,
+                            "rested, a second pull within the grace leaves A his helmet");
+                    since[0] = now;
+                    stage[0] = 5;
+                }
+                case 5 -> {
+                    if (MagnetPull.playerGraceLeft(a) == 0 && data.isReady(1, now) && now - since[0] > EnhancedConfig.PULL_RETRY_TICKS.get()) {
+                        sneakR(magneto);
+                        stage[0] = 6;
+                    }
+                }
+                default -> {
+                    check(a.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && count(magneto, Items.IRON_HELMET) == 1,
+                            "after the grace a third pull takes A's helmet into his inventory");
+                    data.startCooldown(3, now, 0);
+                    TestKit.lookAt(magneto, a);
+                    AbilityHandler.onKey(magneto, 3, true);
+                    List<ItemEntity> chests = helper.getEntities(EntityType.ITEM).stream().filter(item -> item.getItem().is(Items.IRON_CHESTPLATE)).toList();
+                    check(a.getItemBySlot(EquipmentSlot.CHEST).isEmpty() && chests.size() == 1, "V at A: his chestplate falls");
+                    check(!chests.get(0).getPersistentData().contains(MagnetoAbilities.STRIPPED_BY_TAG), "unmarked: torn off a player");
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    /**
+     * M36. With {@code magneto.pullTakesGear} off and {@code magneto.pullTug} 0: a zombie keeps its iron helmet, an Iron
+     * Golem does not move, and a dropped ingot still comes.
+     */
+    @GameTest(template = ARENA, batch = "magnet_pull_gear")
+    public static void theGearSwitchAndTheTug(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.PULL_TAKES_GEAR, false);
+        f.config(EnhancedConfig.PULL_TUG, 0.0);
+        ServerPlayer magneto = magneto(f);
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.5));
+        zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, FLOOR, 13.5));
+        ItemEntity ingot = ingot(helper, new Vec3(12.5, FLOOR, 8.5));
+        Vec3 golemAt = golem.position();
+        sneakR(magneto);
+        long[] doneAt = {-1};
+        f.everyTick(30, tick -> {
+            PowerTicker.tick(magneto);
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            if (doneAt[0] < 0) {
+                doneAt[0] = tick;
+            }
+            if (tick < doneAt[0] + 5) {
+                return false; // a tugged golem would be on its way by now
+            }
+            check(zombie.getItemBySlot(EquipmentSlot.HEAD).is(Items.IRON_HELMET) && count(magneto, Items.IRON_HELMET) == 0, "the zombie keeps its helmet");
+            check(golem.position().distanceTo(golemAt) < 0.01 && MagnetPull.lastTugs(magneto) == 0, "the golem does not move");
+            check(!ingot.isAlive() && count(magneto, Items.IRON_INGOT) == 1, "the dropped ingot still comes");
+            return true;
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
     // Piglins (M52)
 
     /** M52. A gold block pulled angers the piglins near him, as breaking it by hand does; an iron block does not. */
@@ -1267,6 +1629,51 @@ public final class MagnetPullTests {
         item.setDeltaMovement(Vec3.ZERO);
         helper.getLevel().addFreshEntity(item);
         return item;
+    }
+
+    /** A stack lying still on the floor, anyone's to pick up. */
+    private static ItemEntity loose(GameTestHelper helper, Vec3 relative, ItemStack stack) {
+        Vec3 at = helper.absoluteVec(relative);
+        ItemEntity item = new ItemEntity(helper.getLevel(), at.x, at.y, at.z, stack, 0.0, 0.0, 0.0);
+        helper.getLevel().addFreshEntity(item);
+        return item;
+    }
+
+    /** An arrow stuck in the floor at {@code relative}, with its pickup rule. */
+    private static Arrow stuck(GameTestHelper helper, Vec3 relative, AbstractArrow.Pickup pickup) {
+        Vec3 at = helper.absoluteVec(relative.subtract(0, 0.05, 0));
+        Arrow arrow = new Arrow(helper.getLevel(), at.x, at.y, at.z, new ItemStack(Items.ARROW), null);
+        arrow.setDeltaMovement(Vec3.ZERO);
+        arrow.inGround = true;
+        arrow.pickup = pickup;
+        helper.getLevel().addFreshEntity(arrow);
+        return arrow;
+    }
+
+    /** A full set of iron armour on the player. */
+    private static void ironSet(ServerPlayer player) {
+        player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+        player.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+        player.setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.IRON_LEGGINGS));
+        player.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
+    }
+
+    /** What the player holds and wears, slot by slot (copies). */
+    private static List<ItemStack> wornBy(ServerPlayer player) {
+        List<ItemStack> stacks = new ArrayList<>();
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            stacks.add(player.getItemBySlot(slot).copy());
+        }
+        return stacks;
+    }
+
+    private static boolean sameStacks(List<ItemStack> now, List<ItemStack> before) {
+        for (int i = 0; i < now.size(); i++) {
+            if (!ItemStack.matches(now.get(i), before.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** An item frame holding {@code stack}, facing west from the stone block east of {@code relative}. */

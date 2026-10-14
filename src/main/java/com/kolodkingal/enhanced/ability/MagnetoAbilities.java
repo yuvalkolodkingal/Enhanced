@@ -397,8 +397,12 @@ public final class MagnetoAbilities {
         return entity.getPersistentData().contains(HELD_TAG);
     }
 
-    /** Server, once per level tick: keep caught projectiles hanging, then drop them or send them back. */
+    /**
+     * Server, once per level tick: the mobs the Magnetic Pull tugged fly on ({@link MagnetPull#tickTugs}); caught
+     * projectiles keep hanging, then drop or are sent back.
+     */
     public static void tickHeld(ServerLevel level) {
+        MagnetPull.tickTugs(level);
         if (HELD.isEmpty()) {
             return;
         }

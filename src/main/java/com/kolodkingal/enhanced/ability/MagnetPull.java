@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.boss.BossHooks;
+import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -22,14 +24,22 @@ import net.minecraft.world.Container;
 import net.minecraft.world.RandomizableContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.ItemStack;
@@ -58,6 +68,8 @@ import org.jetbrains.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,10 +79,13 @@ import java.util.function.Predicate;
 
 /**
  * Magneto's Magnetic Pull: Sneak + R with nothing held draws the metal all round him into his inventory (D-M 4). Ores give
- * their metal through rock and turn into their ground, raw-metal blocks come whole through rock, loose metal and empty
- * carts come from all round him, and built metal comes whole when he can see it in the cone he faces (never a block or
- * cart that holds things, never a working piston, never a villager's work block: R36). With {@code
- * magneto.pullFromStorage} the metal stacks of the containers, item frames and armour stands he can see come too (R38).
+ * their metal through rock and turn into their ground, raw-metal blocks come whole through rock, loose metal, stuck arrows,
+ * falling metal blocks and empty carts come from all round him, and built metal comes whole when he can see it in the cone
+ * he faces (never a block or cart that holds things, never a working piston, never a villager's work block: R36). Hostile
+ * creatures lose their metal gear (what they would never drop crumbles), Loki's illusions dissolve, golems and other
+ * metal bodies are tugged toward him, and a player he may hurt and can see gives one piece into his inventory (R35), then
+ * is spared for a while. With {@code magneto.pullFromStorage} the metal stacks of the containers, item frames and armour
+ * stands he can see come too (R38).
  *
  * <p>One job per Magneto, kept where he pressed and sliced over ticks:
  * <ol>
@@ -97,6 +112,17 @@ public final class MagnetPull {
     private static final Map<UUID, Long> FOUND_NOTHING = new HashMap<>();
     /** Magneto's UUID → the game time his last search ended. */
     private static final Map<UUID, Long> SEARCH_ENDS = new HashMap<>();
+    /** A player's UUID → the game time a pull last acted on him: no pull acts on him again for {@code pullPlayerGraceTicks}. */
+    private static final Map<UUID, Long> PLAYER_GRACE = new HashMap<>();
+    /** Mobs without AI a pull tugged, which run no physics of their own: the pull flies them until they land. */
+    private static final Map<Mob, Tug> TUGS = new LinkedHashMap<>();
+    /** Magneto's UUID → how many bodies his last pull tugged. */
+    private static final Map<UUID, Integer> LAST_TUGS = new HashMap<>();
+    /** The order a player's one piece is taken in: what he holds, then his armour from the head down (D-M 4.3). */
+    private static final EquipmentSlot[] PLAYER_PIECES = {EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND, EquipmentSlot.HEAD,
+            EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+    /** How long a tugged mob without AI is flown at most, in ticks. */
+    private static final int TUG_TICKS = 10;
 
     /** What {@link #searchEndedAt} answers for a Magneto who never searched: long enough ago for any wait. */
     public static final long NEVER = Long.MIN_VALUE / 2;
@@ -133,6 +159,7 @@ public final class MagnetPull {
         }
         Job job = new Job(player, level);
         JOBS.put(id, job);
+        LAST_TUGS.put(id, 0);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.MAGNET_PULL.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         job.lastWork = now;
         search(job, player);
@@ -196,11 +223,46 @@ public final class MagnetPull {
         JOBS.remove(player.getUUID());
     }
 
-    /** Forgets every pull and every wait: for the server's stop and for tests. */
+    /** Forgets every pull, every wait, every player's grace and every tug: for the server's stop and for tests. */
     public static void clear() {
         JOBS.clear();
         FOUND_NOTHING.clear();
         SEARCH_ENDS.clear();
+        PLAYER_GRACE.clear();
+        TUGS.clear();
+        LAST_TUGS.clear();
+    }
+
+    /**
+     * Once per level tick (from {@code MagnetoAbilities.tickHeld}): the mobs without AI a pull of this level tugged fly on
+     * by their own velocity, as a mob's physics would carry it (D-M 4.3), until they land or {@value #TUG_TICKS} ticks
+     * have passed. A tug goes on when the pull that gave it has ended.
+     */
+    public static void tickTugs(ServerLevel level) {
+        if (TUGS.isEmpty()) {
+            return;
+        }
+        Iterator<Map.Entry<Mob, Tug>> it = TUGS.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Mob, Tug> entry = it.next();
+            Mob mob = entry.getKey();
+            if (mob.level() != level) {
+                continue;
+            }
+            if (mob.isRemoved() || !mob.isAlive() || !mob.isNoAi() || Telekinesis.isHeld(mob) || --entry.getValue().left < 0) {
+                it.remove();
+                continue;
+            }
+            Vec3 v = mob.getDeltaMovement();
+            mob.move(MoverType.SELF, v);
+            mob.setDeltaMovement(v.x * 0.91, (v.y - 0.08) * 0.98, v.z * 0.91);
+            mob.hasImpulse = true;
+            mob.resetFallDistance();
+            if (mob.onGround() && v.y <= 0.0) {
+                mob.setDeltaMovement(Vec3.ZERO); // landed: it stays where the tug brought it
+                it.remove();
+            }
+        }
     }
 
     /** Whether this Magneto's pull runs. */
@@ -213,6 +275,25 @@ public final class MagnetPull {
     @VisibleForTesting
     public static long searchEndedAt(ServerPlayer player) {
         return SEARCH_ENDS.getOrDefault(player.getUUID(), NEVER);
+    }
+
+    /**
+     * How many ticks this player is still spared by every pull, because one acted on him ({@code
+     * magneto.pullPlayerGraceTicks}); 0 if none is.
+     */
+    @VisibleForTesting
+    public static long playerGraceLeft(Player player) {
+        Long at = PLAYER_GRACE.get(player.getUUID());
+        if (at == null) {
+            return 0;
+        }
+        return Math.max(0, at + EnhancedConfig.PULL_PLAYER_GRACE_TICKS.get() - player.level().getGameTime());
+    }
+
+    /** How many bodies this Magneto's last pull tugged (his current one, while it runs). */
+    @VisibleForTesting
+    public static int lastTugs(ServerPlayer player) {
+        return LAST_TUGS.getOrDefault(player.getUUID(), 0);
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -228,8 +309,37 @@ public final class MagnetPull {
         BUILT,
         /** A container in sight: its metal stacks come, it stays ({@code magneto.pullFromStorage}). */
         STORAGE,
-        /** An entity: what it gives is its own rule (a dropped item, a cart, a frame's or a stand's metal). */
+        /** An entity: what happens to it is its own rule ({@link Act}). */
         ENTITY
+    }
+
+    /** What the pull does to an entity (D-M 4.3). */
+    private enum Act {
+        /** A dropped metal item: it comes, as far as it fits. */
+        ITEM,
+        /** A metal arrow or trident lying stuck that anyone may pick up: it comes as walking over it gives it. */
+        ARROW,
+        /** A falling or loose lifted metal block: it comes as its item. */
+        BLOCK,
+        /** An empty minecart: it comes as its item. */
+        CART,
+        /** A conjured body (a Loki illusion) holding or wearing metal: it dissolves, and gives nothing. */
+        DISSOLVE,
+        /** A creature he may fight wearing or holding metal, or a boss: its gear is torn off (a boss's hook answers first). */
+        GEAR,
+        /** A player he may hurt and can see: one piece, or his nanites, or a tug. */
+        PLAYER,
+        /** A metal body (an Iron Golem, a Sentry, the Hex's Vision): it is tugged toward him. */
+        TUG,
+        /** An item frame with metal in it ({@code magneto.pullFromStorage}): its item comes, the frame stays. */
+        FRAME,
+        /** An armour stand with metal on it ({@code magneto.pullFromStorage}): its metal comes, the stand stays. */
+        STAND
+    }
+
+    /** A tugged mob without AI, flown by the pull for a few more ticks. */
+    private static final class Tug {
+        int left = TUG_TICKS;
     }
 
     /** One thing the search found: a cell (with the state it had) or an entity, and its distance from the press. */
@@ -500,13 +610,13 @@ public final class MagnetPull {
     /**
      * The entities of the sphere, once the blocks are done (one query): each the pull would act on, standing in a section
      * whose claim probe lets him (a section the block search did not probe is probed now, at the cell the entity stands
-     * on), and, for a frame or a stand, in sight. Adventure and spawn protection guard blocks, not these.
+     * on), and, for a player, a frame or a stand, in sight. Adventure and spawn protection guard blocks, not these.
      */
     private static void addEntities(Job job, ServerPlayer player) {
         double r2 = job.radius * job.radius;
         AABB box = new AABB(job.centre, job.centre).inflate(job.radius);
         for (Entity e : job.level.getEntities((Entity) null, box, e -> e.position().distanceToSqr(job.centre) <= r2)) {
-            if (!wantsEntity(player, e)) {
+            if (actOn(player, e) == null) {
                 continue;
             }
             if (!claimAllows(job, player, e)) {
@@ -517,20 +627,24 @@ public final class MagnetPull {
             if (!job.admits(distSq)) {
                 continue;
             }
-            if (needsSight(e) && !Raycasts.inSight(player, e.position().add(0, e.getBbHeight() * 0.5, 0))) {
+            if (!seen(player, e)) {
                 continue;
             }
             job.offer(new Target(Kind.ENTITY, null, null, e, distSq));
         }
     }
 
-    /** Whether the claims let him act on what stands in this entity's section (probed once a section). */
+    /**
+     * Whether the claims let him act on what stands in this entity's section (probed once a section). Where a boss fight
+     * protects the ground no claim is asked: the arena guards its blocks, not what lies or fights on them, and it would
+     * refuse any break there (a minion's gear still crumbles, a loose ingot still comes).
+     */
     private static boolean claimAllows(Job job, ServerPlayer player, Entity e) {
         long section = SectionPos.asLong(e.blockPosition());
         Boolean allowed = job.claims.get(section);
         if (allowed == null) {
             BlockPos on = e.getOnPos();
-            allowed = BlockRights.postBreak(player, job.level, on, job.level.getBlockState(on));
+            allowed = BossFights.protects(job.level, on) || BlockRights.postBreak(player, job.level, on, job.level.getBlockState(on));
             job.claims.put(section, allowed);
         }
         return allowed;
@@ -684,12 +798,14 @@ public final class MagnetPull {
     /**
      * A metal block taken whole, as Silk Touch mining gives it: the block's own loot with a netherite pickaxe enchanted with
      * Silk Touch (an anvil keeps its damage, a double slab gives two slabs, a door one door, a water cauldron a cauldron,
-     * every copper block its oxidation and wax); its own item if that loot is empty. Read before the block goes.
+     * every copper block its oxidation and wax); its own item if that loot is empty. Read before the block goes (a falling
+     * or lifted block, which stands nowhere, is read where it is, with no block entity).
      */
-    private static List<ItemStack> wholeDrops(ServerLevel level, BlockPos pos, BlockState state, ServerPlayer player) {
+    private static List<ItemStack> wholeDrops(ServerLevel level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity,
+                                              ServerPlayer player) {
         ItemStack tool = new ItemStack(Items.NETHERITE_PICKAXE);
         tool.enchant(level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH), 1);
-        List<ItemStack> drops = new ArrayList<>(Block.getDrops(state, level, pos, level.getBlockEntity(pos), player, tool));
+        List<ItemStack> drops = new ArrayList<>(Block.getDrops(state, level, pos, blockEntity, player, tool));
         drops.removeIf(ItemStack::isEmpty);
         if (drops.isEmpty() && state.getBlock().asItem() != Items.AIR) {
             drops.add(new ItemStack(state.getBlock().asItem()));
@@ -726,44 +842,135 @@ public final class MagnetPull {
     // What an entity gives (D-M 4.2, 4.3)
 
     /**
-     * Whether the pull would act on this entity: never one any telekinesis holds, the Sokovia lift carries, that rides or
-     * is ridden; a dropped metal item he could pick up by hand and has room for (never a drop a fight keeps for a dead
-     * fighter); an empty minecart (never the command block one); and, with {@code magneto.pullFromStorage}, an item frame
-     * or an armour stand with metal on it.
+     * What the pull would do to this entity (D-M 4.2, 4.3), or null: never anything to one any telekinesis holds, the
+     * Sokovia lift carries, that rides or is ridden. A dropped metal item he could pick up by hand and has room for (never
+     * a drop a fight keeps for a dead fighter); a metal arrow or trident lying stuck that anyone may pick up; a falling or
+     * loose lifted metal block; an empty minecart (never the command block one); a Loki illusion holding or wearing metal;
+     * a creature he may fight wearing or holding metal, or a boss ({@code magneto.pullTakesGear}); a player he may hurt
+     * ({@link #wantsPlayer}); a metal body he may tug ({@link #mayTug}); and, with {@code magneto.pullFromStorage}, an item
+     * frame or an armour stand with metal on it. Nothing that belongs to a fight but its creatures' gear.
      */
-    private static boolean wantsEntity(ServerPlayer player, Entity e) {
-        if (e == player || !e.isAlive() || e.isPassenger() || e.isVehicle() || !givesSomething(player, e)) {
-            return false;
+    @Nullable
+    private static Act actOn(ServerPlayer player, Entity e) {
+        if (e == player || !e.isAlive() || e.isPassenger() || e.isVehicle() || Telekinesis.isHeld(e) || BossFights.isLocked(e)) {
+            return null;
         }
-        return !Telekinesis.isHeld(e) && !BossFights.isLocked(e);
-    }
-
-    /** What the entity itself would give, before who holds or carries it is asked. */
-    private static boolean givesSomething(ServerPlayer player, Entity e) {
         if (e instanceof ItemEntity item) {
-            return wantsItem(player, item);
+            return wantsItem(player, item) ? Act.ITEM : null;
+        }
+        if (e instanceof AbstractArrow arrow) {
+            return isStuckMetal(arrow) && BossFights.fightOf(e) == null && hasRoom(player, arrow.getPickupItemStackOrigin())
+                    ? Act.ARROW : null;
+        }
+        if (e instanceof FallingBlockEntity || e instanceof TelekineticBlockEntity) {
+            return Metal.isMagnetic(e) && BossFights.fightOf(e) == null ? Act.BLOCK : null; // a borrowed block carries its fight's mark
         }
         if (e instanceof AbstractMinecart cart) {
-            return isEmptyCart(cart);
+            return isEmptyCart(cart) && BossFights.fightOf(e) == null ? Act.CART : null;
+        }
+        if (Metal.isConjured(e)) {
+            return e instanceof LivingEntity body && wearsMetal(body) ? Act.DISSOLVE : null;
+        }
+        if (e instanceof Player other) {
+            return wantsPlayer(player, other) ? Act.PLAYER : null;
+        }
+        if (e instanceof LivingEntity living) {
+            if (EnhancedConfig.PULL_TAKES_GEAR.get() && AreaTargets.mayHurt(player, living, false)
+                    && (isBoss(living) || wearsMetal(living))) {
+                return Act.GEAR;
+            }
+            if (mayTug(player, living)) {
+                return Act.TUG;
+            }
         }
         if (EnhancedConfig.PULL_FROM_STORAGE.get()) {
             if (e instanceof ItemFrame frame) {
-                return Metal.isMetalItem(frame.getItem());
+                return Metal.isMetalItem(frame.getItem()) ? Act.FRAME : null;
             }
             if (e instanceof ArmorStand stand) {
-                for (EquipmentSlot slot : EquipmentSlot.values()) {
-                    if (Metal.isMetalItem(stand.getItemBySlot(slot))) {
-                        return true;
-                    }
-                }
+                return wearsMetal(stand) ? Act.STAND : null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether he can see what of the entity the pull needs to see: a player's eyes, the middle of an item frame or an
+     * armour stand (someone's build, which gives its metal only in sight). Everything else comes from all round him.
+     */
+    private static boolean seen(ServerPlayer player, Entity e) {
+        if (e instanceof Player) {
+            return Raycasts.inSight(player, e.getEyePosition());
+        }
+        if (e instanceof ItemFrame || e instanceof ArmorStand) {
+            return Raycasts.inSight(player, e.position().add(0, e.getBbHeight() * 0.5, 0));
+        }
+        return true;
+    }
+
+    /** A boss, whose own hook answers Magneto's strip (Thanos's plate, Apocalypse's window): it is never tugged. */
+    private static boolean isBoss(Entity e) {
+        return e instanceof BossHooks && e.getType().is(ModTags.BOSSES);
+    }
+
+    /** Whether any slot of the body (armour, either hand, horse armour) holds a metal item. */
+    private static boolean wearsMetal(LivingEntity body) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (Metal.isMetalItem(body.getItemBySlot(slot))) {
+                return true;
             }
         }
         return false;
     }
 
-    /** What is someone's build hangs on a wall or stands on a stand: it gives its metal only if he can see it. */
-    private static boolean needsSight(Entity e) {
-        return e instanceof ItemFrame || e instanceof ArmorStand;
+    /** A metal arrow or trident lying stuck in the ground that anyone may pick up (a skeleton's arrows stay). */
+    private static boolean isStuckMetal(AbstractArrow arrow) {
+        return arrow.inGround && arrow.pickup == AbstractArrow.Pickup.ALLOWED && arrow.getType().is(ModTags.METALLIC_PROJECTILES)
+                && !arrow.getPickupItemStackOrigin().isEmpty();
+    }
+
+    /**
+     * Whether a player the pull may act on (D-M 4.3, R35): {@code magneto.pullTakesPlayerGear} is on, he may hurt him (PvP
+     * on, no teammate, not in Creative), no pull acted on him less than {@code magneto.pullPlayerGraceTicks} ago, and he has
+     * something to give: a metal piece in a hand or on his body, an Iron Spider's nanites not yet scattered, or a metal
+     * body to tug. (Sight is asked by {@link #seen}.)
+     */
+    private static boolean wantsPlayer(ServerPlayer magneto, Player other) {
+        if (!EnhancedConfig.PULL_TAKES_PLAYER_GEAR.get() || !AreaTargets.mayHurt(magneto, other, false) || playerGraceLeft(other) > 0) {
+            return false;
+        }
+        for (EquipmentSlot slot : PLAYER_PIECES) {
+            if (Metal.isMetalItem(other.getItemBySlot(slot))) {
+                return true;
+            }
+        }
+        return SpiderServer.isIronSpider(other) && !SpiderServer.isStripped(other) || mayTugPlayer(other);
+    }
+
+    /**
+     * Whether a player's metal body may be tugged (Vision, the Ultron hero): never a phased Vision, never the Iron Spider
+     * (his metal is the nanites, which a pull scatters), never someone Mjolnir pins, and never a fighter of a boss fight,
+     * whom a tug would carry past the fight's carry limit.
+     */
+    private static boolean mayTugPlayer(Player other) {
+        return EnhancedConfig.PULL_TUG.get() > 0.0 && Metal.isMetalBody(other) && !SpiderServer.isIronSpider(other)
+                && !MjolnirPin.isPinned(other) && !(other instanceof ServerPlayer fighter && BossFights.isParticipant(fighter));
+    }
+
+    /**
+     * Whether a metal body that is no player and no boss may be tugged (an Iron Golem, a Sentry, the Hex's Vision; {@code
+     * magneto.pullTug} above 0): never one a fight owns (a fight's Sentries), never one Mjolnir pins, and never a creature
+     * another player owns unless he may hurt that player.
+     */
+    private static boolean mayTug(ServerPlayer magneto, LivingEntity body) {
+        if (EnhancedConfig.PULL_TUG.get() <= 0.0 || !Metal.isMetalBody(body) || isBoss(body) || BossFights.fightOf(body) != null
+                || MjolnirPin.isPinned(body)) {
+            return false;
+        }
+        if (body instanceof OwnableEntity pet && pet.getOwnerUUID() != null && !pet.getOwnerUUID().equals(magneto.getUUID())) {
+            return pet.getOwner() instanceof Player owner && AreaTargets.mayHurt(magneto, owner, false);
+        }
+        return true;
     }
 
     /**
@@ -781,9 +988,11 @@ public final class MagnetPull {
         }
         boolean marked = item.getPersistentData().hasUUID(MagnetoAbilities.STRIPPED_BY_TAG)
                 && player.getUUID().equals(item.getPersistentData().getUUID(MagnetoAbilities.STRIPPED_BY_TAG));
-        if (item.hasPickUpDelay() && !marked) {
-            return false;
-        }
+        return (!item.hasPickUpDelay() || marked) && hasRoom(player, stack);
+    }
+
+    /** Whether some of the stack fits in his inventory now: what cannot never takes a place of the heap. */
+    private static boolean hasRoom(ServerPlayer player, ItemStack stack) {
         Inventory inventory = player.getInventory();
         return inventory.getSlotWithRemainingSpace(stack) != -1 || inventory.getFreeSlot() != -1;
     }
@@ -808,6 +1017,8 @@ public final class MagnetPull {
     private record Taken(boolean turn, boolean affected, List<ItemStack> toGive, @Nullable ItemStack shown) {
         static final Taken GONE = new Taken(false, false, List.of(), null);
         static final Taken REFUSED = new Taken(true, false, List.of(), null);
+        /** It did something there that gives him nothing (a tug, a dissolve, a crumble, a scatter, a boss's hook). */
+        static final Taken SEEN_THERE = new Taken(true, true, List.of(), null);
 
         /** It gives these, into his inventory or at his feet. */
         static Taken giving(List<ItemStack> stacks) {
@@ -907,7 +1118,7 @@ public final class MagnetPull {
      * door comes and none falls.
      */
     private static List<ItemStack> tearOut(ServerLevel level, BlockPos pos, BlockState state, ServerPlayer player) {
-        List<ItemStack> drops = wholeDrops(level, pos, state, player);
+        List<ItemStack> drops = wholeDrops(level, pos, state, level.getBlockEntity(pos), player);
         level.levelEvent(2001, pos, Block.getId(state));
         int flags = state.getBlock() instanceof DoorBlock ? Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS : Block.UPDATE_ALL;
         level.setBlock(pos, state.getFluidState().createLegacyBlock(), flags);
@@ -960,65 +1171,204 @@ public final class MagnetPull {
     }
 
     /**
-     * An entity's turn: it must still be there, within the radius and two blocks of him, and still what the pull acts on.
-     * Then a dropped item gives what fits (the rest stays where it lies), an empty cart comes as its item (a TNT cart
-     * without going off), and a frame or a stand gives its metal and stays.
+     * An entity's turn: it must still be there, within the radius and two blocks of him, still what the pull acts on, and
+     * still in sight if it needs sight. Then a dropped item gives what fits (the rest stays where it lies), a stuck arrow
+     * comes as walking over it gives it, a falling or lifted block and an empty cart come as their items (a TNT cart
+     * without going off), an illusion dissolves, a creature's gear is torn off, a player gives one thing, a metal body is
+     * tugged, and a frame or a stand gives its metal and stays.
      */
     private static Taken takeEntity(Job job, ServerPlayer player, Target target) {
         Entity e = target.entity;
         double reach = job.radius + 2.0;
-        if (e.isRemoved() || e.level() != job.level || bodyCentre(player).distanceToSqr(e.position()) > reach * reach
-                || !wantsEntity(player, e)) {
+        if (e.isRemoved() || e.level() != job.level || bodyCentre(player).distanceToSqr(e.position()) > reach * reach) {
             return Taken.GONE;
         }
-        Inventory inventory = player.getInventory();
-        if (e instanceof ItemEntity item) {
-            ItemStack stack = item.getItem();
-            ItemStack rest = stack.copy();
-            inventory.add(rest);
-            int moved = stack.getCount() - rest.getCount();
-            if (moved <= 0) {
-                return Taken.REFUSED;
-            }
-            ItemStack came = stack.copyWithCount(moved);
-            if (rest.isEmpty()) {
-                item.discard();
-            } else {
-                item.setItem(rest);
-            }
-            return Taken.moved(List.of(came));
+        Act act = actOn(player, e);
+        if (act == null || !seen(player, e)) {
+            return Taken.GONE;
         }
-        if (e instanceof AbstractMinecart cart) {
-            ItemStack item = cart.getPickResult();
-            cart.discard(); // not destroyed: a TNT cart does not go off, and an empty one has nothing to spill
-            return Taken.giving(List.of(item));
-        }
-        if (e instanceof ItemFrame frame) {
-            ItemStack came = frame.getItem().copy();
-            ItemStack rest = came.copy();
-            inventory.add(rest);
-            if (!rest.isEmpty()) {
-                return Taken.REFUSED;
-            }
-            frame.setItem(ItemStack.EMPTY);
-            return Taken.moved(List.of(came));
-        }
-        if (e instanceof ArmorStand stand) {
-            List<ItemStack> came = new ArrayList<>();
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                ItemStack stack = stand.getItemBySlot(slot);
-                if (Metal.isMetalItem(stack)) {
-                    ItemStack rest = stack.copy();
-                    inventory.add(rest);
-                    if (rest.getCount() < stack.getCount()) {
-                        came.add(stack.copyWithCount(stack.getCount() - rest.getCount()));
-                        stand.setItemSlot(slot, rest);
-                    }
+        return switch (act) {
+            case ITEM -> takeItem(player, (ItemEntity) e);
+            case ARROW -> {
+                ItemStack arrow = ((AbstractArrow) e).getPickupItemStackOrigin().copy();
+                if (!player.getInventory().add(arrow.copy())) {
+                    yield Taken.REFUSED; // no room after all: it stays where it is stuck
                 }
+                e.discard();
+                yield Taken.moved(List.of(arrow));
             }
-            return Taken.moved(came);
+            case BLOCK -> {
+                BlockState state = e instanceof FallingBlockEntity falling
+                        ? falling.getBlockState() : ((TelekineticBlockEntity) e).getBlockState();
+                List<ItemStack> drops = wholeDrops(job.level, e.blockPosition(), state, null, player);
+                e.discard();
+                yield Taken.giving(drops);
+            }
+            case CART -> {
+                ItemStack item = ((AbstractMinecart) e).getPickResult();
+                e.discard(); // not destroyed: a TNT cart does not go off, and an empty one has nothing to spill
+                yield Taken.giving(List.of(item));
+            }
+            case DISSOLVE -> {
+                Metal.dissolve(e, null); // magnetism sees through Loki's trick: nothing of what it wore is made real
+                yield Taken.SEEN_THERE;
+            }
+            case GEAR -> tearGear(player, (LivingEntity) e);
+            case PLAYER -> takeFromPlayer(job, player, (Player) e);
+            case TUG -> {
+                tug(player, (LivingEntity) e);
+                yield Taken.SEEN_THERE;
+            }
+            case FRAME -> takeFromFrame(player, (ItemFrame) e);
+            case STAND -> takeFromStand(player, (ArmorStand) e);
+        };
+    }
+
+    /** A dropped item gives what fits; the rest stays where it lies. */
+    private static Taken takeItem(ServerPlayer player, ItemEntity item) {
+        ItemStack stack = item.getItem();
+        ItemStack rest = stack.copy();
+        player.getInventory().add(rest);
+        int moved = stack.getCount() - rest.getCount();
+        if (moved <= 0) {
+            return Taken.REFUSED;
+        }
+        ItemStack came = stack.copyWithCount(moved);
+        if (rest.isEmpty()) {
+            item.discard();
+        } else {
+            item.setItem(rest);
+        }
+        return Taken.moved(List.of(came));
+    }
+
+    /**
+     * A creature's metal is torn off (D-M 4.3): a boss answers first through its hook, as to the strip (a plate, a window),
+     * and then nothing else is taken; otherwise every slot holding a metal item is emptied, with a chain's break. A real
+     * piece comes to him; one the creature would never drop (a Horseman's) crumbles where it was worn.
+     */
+    private static Taken tearGear(ServerPlayer player, LivingEntity creature) {
+        if (creature instanceof BossHooks boss && boss.onMagnetoStrip(player)) {
+            return Taken.SEEN_THERE;
+        }
+        ServerLevel level = player.serverLevel();
+        List<ItemStack> real = new ArrayList<>();
+        boolean torn = false;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemStack stack = creature.getItemBySlot(slot);
+            if (!Metal.isMetalItem(stack)) {
+                continue;
+            }
+            boolean given = Metal.isRealGear(creature, slot);
+            creature.setItemSlot(slot, ItemStack.EMPTY);
+            torn = true;
+            if (given) {
+                real.add(stack.copy());
+            } else {
+                Metal.crumble(level, creature, slot, stack);
+            }
+        }
+        if (!torn) {
+            return Taken.GONE; // a boss whose hook let it be, with nothing on it
+        }
+        level.playSound(null, creature.getX(), creature.getY(), creature.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 0.7F, 0.8F);
+        return Taken.giving(real);
+    }
+
+    /**
+     * A player gives one thing (D-M 4.3, R35), the first that applies: the metal item in his main hand, then his off hand,
+     * then his metal armour from the head down, which flies into Magneto's inventory (with {@code
+     * magneto.pullPlayerGearToFeet}: drops at the player's own feet, unmarked, with a torn-off piece's pickup delay, as
+     * V's would); else an Iron Spider's
+     * nanites scatter; else his metal body is tugged. Then every pull spares him for {@code magneto.pullPlayerGraceTicks}.
+     */
+    private static Taken takeFromPlayer(Job job, ServerPlayer magneto, Player other) {
+        for (EquipmentSlot slot : PLAYER_PIECES) {
+            ItemStack stack = other.getItemBySlot(slot);
+            if (!Metal.isMetalItem(stack)) {
+                continue;
+            }
+            PLAYER_GRACE.put(other.getUUID(), job.level.getGameTime());
+            other.setItemSlot(slot, ItemStack.EMPTY);
+            job.level.playSound(null, other.getX(), other.getY(), other.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 0.7F, 0.8F);
+            if (EnhancedConfig.PULL_PLAYER_GEAR_TO_FEET.get()) {
+                // At his own feet, unmarked, with the 40 ticks of a torn-off piece: he can take it back first.
+                ItemEntity drop = new ItemEntity(job.level, other.getX(), other.getY(), other.getZ(), stack.copy(), 0.0, 0.2, 0.0);
+                drop.setPickUpDelay(40);
+                job.level.addFreshEntity(drop);
+                return Taken.SEEN_THERE;
+            }
+            return Taken.giving(List.of(stack.copy()));
+        }
+        if (SpiderServer.onStripped(other)) {
+            PLAYER_GRACE.put(other.getUUID(), job.level.getGameTime());
+            return Taken.SEEN_THERE; // the nanites of an Iron Spider's suit scatter
+        }
+        if (mayTugPlayer(other)) {
+            PLAYER_GRACE.put(other.getUUID(), job.level.getGameTime());
+            tug(magneto, other);
+            return Taken.SEEN_THERE;
         }
         return Taken.GONE;
+    }
+
+    /**
+     * A metal body is tugged toward him (D-M 4.3): one impulse of {@code min(magneto.pullTug, 0.15 x distance)} blocks a
+     * tick across plus 0.25 up, its fall forgotten, a mob's path stopped and an Iron Golem never set against him; never
+     * hurt. A mob without AI runs no physics of its own, so the pull flies it ({@link #tickTugs}). Heard, softer than a
+     * grab.
+     */
+    private static void tug(ServerPlayer magneto, LivingEntity body) {
+        Vec3 across = new Vec3(magneto.getX() - body.getX(), 0.0, magneto.getZ() - body.getZ());
+        double distance = across.length();
+        Vec3 impulse = new Vec3(0.0, 0.25, 0.0);
+        if (distance > 1.0E-4) {
+            impulse = impulse.add(across.scale(Math.min(EnhancedConfig.PULL_TUG.get(), 0.15 * distance) / distance));
+        }
+        body.setDeltaMovement(impulse);
+        body.hasImpulse = true;
+        body.hurtMarked = true; // a player's client moves him: send him the new velocity
+        body.resetFallDistance();
+        if (body instanceof Mob mob) {
+            mob.getNavigation().stop();
+            if (mob instanceof IronGolem && mob.getTarget() == magneto) {
+                mob.setTarget(null);
+            }
+            if (mob.isNoAi()) {
+                TUGS.put(mob, new Tug());
+            }
+        }
+        LAST_TUGS.merge(magneto.getUUID(), 1, Integer::sum);
+        body.level().playSound(null, body.getX(), body.getY(), body.getZ(), ModSounds.MAGNET_GRAB.get(), SoundSource.PLAYERS, 0.5F, 0.8F);
+    }
+
+    /** An item frame's metal item comes if it fits; the frame stays. */
+    private static Taken takeFromFrame(ServerPlayer player, ItemFrame frame) {
+        ItemStack came = frame.getItem().copy();
+        ItemStack rest = came.copy();
+        player.getInventory().add(rest);
+        if (!rest.isEmpty()) {
+            return Taken.REFUSED;
+        }
+        frame.setItem(ItemStack.EMPTY);
+        return Taken.moved(List.of(came));
+    }
+
+    /** An armour stand's metal comes as far as it fits; the stand stays. */
+    private static Taken takeFromStand(ServerPlayer player, ArmorStand stand) {
+        List<ItemStack> came = new ArrayList<>();
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemStack stack = stand.getItemBySlot(slot);
+            if (Metal.isMetalItem(stack)) {
+                ItemStack rest = stack.copy();
+                player.getInventory().add(rest);
+                if (rest.getCount() < stack.getCount()) {
+                    came.add(stack.copyWithCount(stack.getCount() - rest.getCount()));
+                    stand.setItemSlot(slot, rest);
+                }
+            }
+        }
+        return Taken.moved(came);
     }
 
     // ------------------------------------------------------------------------------------------------------------
