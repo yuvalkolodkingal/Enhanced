@@ -30,6 +30,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.InteractionHand;
@@ -176,6 +177,8 @@ public final class BuildClient {
 
     // A picked block, and the hotbar slot and item it was picked over (taken a tick later, after vanilla's own pick).
     private static @Nullable BlockState picked;
+    /** The item a palette block stands for (its placement state is read at the recipe's anchor); empty after a middle click. */
+    private static ItemStack paletteStack = ItemStack.EMPTY;
     private static boolean pickSettled;
     private static int pickedSlot;
     private static Item pickedItem = Items.AIR;
@@ -366,7 +369,8 @@ public final class BuildClient {
             materialKey = mix == null ? null : List.of(mix, g.seed());
             return mix == null ? null : SpellPlanner.Material.mix(mix, g.seed());
         }
-        BlockState state = g.material() == SpellRecipe.PICKED ? picked : null;
+        BlockState state = g.material() != SpellRecipe.PICKED ? null : !paletteStack.isEmpty()
+                ? placed(player, InteractionHand.MAIN_HAND, paletteStack, r, aim) : picked;
         if (state == null) {
             state = placed(player, InteractionHand.MAIN_HAND, player.getMainHandItem(), r, aim);
         }
@@ -414,7 +418,7 @@ public final class BuildClient {
      * or never touches, not a block of two cells, and TNT, lava or fire only for a hero who may make them. A mix takes
      * only these, as the server's does.
      */
-    private static boolean conjurable(BlockState state) {
+    static boolean conjurable(BlockState state) {
         if (state.isAir() || state.is(ModTags.BUILD_UNCONJURABLE) || SpellMath.untouchable(state, EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
             return false;
         }
@@ -820,9 +824,68 @@ public final class BuildClient {
             return;
         }
         picked = player.level().getBlockState(aim.picked());
+        paletteStack = ItemStack.EMPTY;
         pickSettled = false;
-        grammar().material(SpellRecipe.PICKED);
+        BuildGrammar g = grammar();
+        g.material(SpellRecipe.PICKED);
+        // A picked block is the material whatever the mix was.
+        g.mix(false, g.seed());
+        BlockPaletteScreen.used(picked.getBlock());
         send(new BuildActionPayload(BuildActionPayload.PICK, aim.picked(), aim.picked(), 0));
+    }
+
+    /**
+     * A block chosen on the palette page (D-B 5.4): the material, in the state a hand would place it in (the server
+     * reads it from its registry id and does the same); it lasts until the hotbar slot or the held item changes, as a
+     * middle click's does.
+     */
+    static void pickBlock(LocalPlayer player, Block block) {
+        Item item = block.asItem();
+        if (item == Items.AIR) {
+            return;
+        }
+        paletteStack = new ItemStack(item);
+        picked = block.defaultBlockState();
+        pickSettled = false;
+        BuildGrammar g = grammar();
+        g.material(SpellRecipe.PICKED);
+        g.mix(false, g.seed());
+        BlockPaletteScreen.used(block);
+        update(player);
+        send(new BuildActionPayload(BuildActionPayload.PICK_BLOCK, BuiltInRegistries.BLOCK.getId(block)));
+    }
+
+    /** The wheel's hotbar row: that slot's block is the material (the hand again, the mix off). */
+    static void useSlot(LocalPlayer player, int slot) {
+        BuildGrammar g = grammar();
+        g.mix(false, g.seed());
+        player.getInventory().selected = slot;
+        paletteStack = ItemStack.EMPTY;
+        picked = null;
+        if (g.material() == SpellRecipe.PICKED) {
+            g.material(SpellRecipe.HAND);
+            send(new BuildActionPayload(BuildActionPayload.HAND, 0));
+        }
+        update(player);
+    }
+
+    /** The wheel's Mix switch: every cell of a Fill, Change, Paint or Shape gets one of the hotbar's blocks. */
+    static void setMix(LocalPlayer player, boolean on) {
+        BuildGrammar g = grammar();
+        g.mix(on, on ? player.getRandom().nextLong() : g.seed());
+        update(player);
+    }
+
+    /** The wheel's style row: the current spell's style (or shape) by its ordinal. */
+    static void chooseStyle(LocalPlayer player, int style) {
+        grammar().style(style);
+        update(player);
+    }
+
+    /** The wheel's Solid and Hollow: whether the current shape is hollow. */
+    static void chooseHollow(LocalPlayer player, boolean hollow) {
+        grammar().hollow(hollow);
+        update(player);
     }
 
     /**
@@ -845,6 +908,7 @@ public final class BuildClient {
         if (slot != pickedSlot || item != pickedItem) {
             g.material(SpellRecipe.HAND);
             picked = null;
+            paletteStack = ItemStack.EMPTY;
             send(new BuildActionPayload(BuildActionPayload.HAND, 0));
         }
     }
@@ -1133,6 +1197,7 @@ public final class BuildClient {
         lastPreflight = Long.MIN_VALUE / 2;
         lastView = Long.MIN_VALUE / 2;
         picked = null;
+        paletteStack = ItemStack.EMPTY;
         pickSettled = false;
     }
 

@@ -29,7 +29,7 @@ import org.lwjgl.glfw.GLFW;
  *
  * <ul>
  *     <li><b>Y</b>: released within {@value #WHEEL_TICKS} ticks, build mode on or off; held that long, build mode on
- *     (the Spell Wheel opens there). Only for a Scarlet Witch or Billy, with no screen open and not as a Spectator; for
+ *     and the Spell Wheel opens ({@link SpellWheelScreen}). Only for a Scarlet Witch or Billy, with no screen open and not as a Spectator; for
  *     anyone else it does nothing and says nothing.</li>
  *     <li><b>Ctrl + Z, Ctrl + Y</b> ({@link BuildKeys.Context#WITCH}): undo and redo, in build mode or out of
  *     it (R42).</li>
@@ -49,7 +49,7 @@ import org.lwjgl.glfw.GLFW;
  *
  * <p>A right click or a scroll that did nothing shows the tip that says how ({@link BuildTips}). At logout everything
  * of the builder is forgotten ({@link BuildClient#clear}, {@link BuildFx#clear}, {@link BuildRenderer#clear},
- * {@link BuildHud#clear}).
+ * {@link BuildHud#clear}, {@link BlockPaletteScreen#clear}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class BuildInput {
@@ -129,13 +129,14 @@ public final class BuildInput {
         buttons(mc, player);
     }
 
-    /** Y: a tap toggles build mode, a hold turns it on (and is where the Spell Wheel opens). */
+    /** Y: a tap toggles build mode, a hold turns it on and opens the Spell Wheel. */
     private static void magicKey(boolean tapped) {
         if (BuildKeys.MAGIC.isDown()) {
             magicHeld++;
             if (magicHeld == WHEEL_TICKS) {
-                // Out of build mode, holding Y turns it on first (D-B 2.2).
+                // Out of build mode, holding Y turns it on first (D-B 2.2); then the Spell Wheel opens.
                 BuildClient.setMode(true);
+                SpellWheelScreen.open();
             }
             return;
         }
@@ -321,6 +322,7 @@ public final class BuildInput {
         BuildFx.clear();
         BuildRenderer.clear();
         BuildHud.clear();
+        BlockPaletteScreen.clear();
     }
 
     private static void reset() {

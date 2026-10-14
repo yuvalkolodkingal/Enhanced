@@ -410,6 +410,19 @@ final class HudDraw {
         };
     }
 
+    /**
+     * ART's picture {@code textures/gui/build/<name>.png}, {@code source} pixels square, drawn {@code size} wide with its
+     * top left at ({@code x}, {@code y}); false (nothing drawn) while it is not there.
+     */
+    static boolean art(GuiGraphics g, String name, int x, int y, int size, int source) {
+        ResourceLocation texture = Enhanced.id("textures/gui/build/" + name + ".png");
+        if (!present(texture)) {
+            return false;
+        }
+        g.blit(texture, x, y, size, size, 0.0F, 0.0F, source, source, source, source);
+        return true;
+    }
+
     /** The item that shows a block: its own, a fluid's bucket, or nothing (empty) for a block no item shows. */
     static ItemStack item(BlockState state) {
         Item item = state.getBlock().asItem();

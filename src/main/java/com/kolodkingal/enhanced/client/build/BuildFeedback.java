@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.build;
 
 import com.kolodkingal.enhanced.build.BuildGrammar;
+import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
@@ -19,6 +20,20 @@ final class BuildFeedback {
     private static final float CLICK = 0.15F;
     /** The biggest number the click's pitch still rises for. */
     private static final float CLICK_TOP = 32.0F;
+
+    /** The wheel opens, or a picture on it is hovered: Wanda a chiming resonance, Billy a page turned (D-B 6.8). */
+    static void wheel(Power hero, float pitch) {
+        if (hero == Power.BILLY) {
+            play(SoundEvents.BOOK_PAGE_TURN, 0.6F, pitch);
+        } else {
+            play(SoundEvents.AMETHYST_BLOCK_RESONATE, 0.4F, pitch);
+        }
+    }
+
+    /** A choice made on the wheel or the palette: a soft click, as a style changed (D-B 6.8). */
+    static void clicked(float pitch) {
+        play(SoundEvents.UI_BUTTON_CLICK.value(), CLICK, pitch);
+    }
 
     /** The sound of one input's result. */
     static void heard(BuildGrammar.Result result, BuildGrammar grammar) {
