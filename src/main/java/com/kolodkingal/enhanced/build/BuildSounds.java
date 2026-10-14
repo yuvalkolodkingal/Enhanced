@@ -48,8 +48,8 @@ public final class BuildSounds {
     private static final StandIn CAST_WANDA = new StandIn(ModSounds.BUILD_CAST_WANDA, 0.8F, 1.0F);
     /** Her spell of {@link #HUGE_CAST} blocks or more starts: the rising Hex of her gesture, which has its own file. */
     private static final StandIn CAST_WANDA_HUGE = new StandIn(ModSounds.HEX_RISE, 0.8F, 1.0F);
-    /** "A spell crackles": one of Billy's spells starts. */
-    private static final StandIn CAST_BILLY = new StandIn(ModSounds.HEX_BOLT, 0.6F, 1.5F);
+    /** "A spell crackles": one of Billy's spells starts, a quick electric crackle and a bright chime. */
+    private static final StandIn CAST_BILLY = new StandIn(ModSounds.BUILD_CAST_BILLY, 0.8F, 1.0F);
     /** "Magic weaves": every 20 ticks at the front of the Scarlet Witch's working spell. */
     private static final StandIn HUM_WANDA = new StandIn(() -> SoundEvents.AMETHYST_BLOCK_RESONATE, 0.35F, 0.8F, 1.2F);
     /** The same at the front of Billy's, higher. */
