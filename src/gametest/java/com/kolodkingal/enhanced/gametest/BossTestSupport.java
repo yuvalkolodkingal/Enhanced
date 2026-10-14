@@ -1,11 +1,13 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.BossLane;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * The stand-ins for the boss lanes: a {@link BossFight} that does nothing but write down what the framework did to it,
@@ -47,6 +50,10 @@ final class BossTestSupport {
         float minDamage = Float.MIN_VALUE;
         Set<String> counters = Set.of(DAMAGE);
         long rest;
+        /** What the fight holds where it is, as the Sokovia lift holds what it carries ({@link BossFight#locks}). */
+        Predicate<Entity> locked = entity -> false;
+        /** The cells the fight calls a copy of the world, as Ultron's island ({@link BossFight#isCopyCell}). */
+        Predicate<BlockPos> copyCells = pos -> false;
         List<ItemStack> reward = List.of(new ItemStack(Items.DIAMOND));
         @Nullable
         BossEnd ended;
@@ -123,9 +130,19 @@ final class BossTestSupport {
         }
 
         @Override
-        protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
+        protected boolean onTelekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
             launched++;
             return launchHandled;
+        }
+
+        @Override
+        protected boolean locks(Entity entity) {
+            return locked.test(entity);
+        }
+
+        @Override
+        protected boolean isCopyCell(BlockPos pos) {
+            return copyCells.test(pos);
         }
 
         @Override
@@ -190,8 +207,14 @@ final class BossTestSupport {
     /** The translation key of the last action-bar line the player was sent since the last call, or null. */
     @Nullable
     static String lastActionBarKey(ServerPlayer player) {
+        return lastActionBarKeyIn(TestKit.sentPackets(player));
+    }
+
+    /** The translation key of the last action-bar line among {@code packets}, or null. */
+    @Nullable
+    static String lastActionBarKeyIn(List<Object> packets) {
         String key = null;
-        for (Object packet : TestKit.sentPackets(player)) {
+        for (Object packet : packets) {
             if (packet instanceof ClientboundSystemChatPacket chat && chat.overlay() && chat.content().getContents() instanceof TranslatableContents translatable) {
                 key = translatable.getKey();
             }

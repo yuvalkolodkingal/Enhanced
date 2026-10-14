@@ -6,6 +6,8 @@ import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.boss.BossGrip;
+import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.hex.Hex;
@@ -237,6 +239,7 @@ public final class UltronMachineTests {
     public static void wandaAndTheMachines(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        f.config(BossConfig.REGRIP_TICKS, 0); // (each step takes hold of him again at once)
         ServerPlayer wanda = f.player(MIDDLE.x, FLOOR, MIDDLE.z, Power.SCARLET_WITCH);
         UltronFight fight = onTheGround(f, wanda);
         calm(fight);
@@ -245,16 +248,22 @@ public final class UltronMachineTests {
         put(f, boss, 10.5, FLOOR + 1.0, 8.5);
         lookAt(wanda, boss);
 
-        // A Prime in good health is too much for her hand.
+        // A Prime in good health: her hand holds him as a boss (3.1), and tears nothing.
         press(wanda);
-        check("message.enhanced.ultron.too_powerful".equals(lastActionBarKey(wanda)), "'too powerful' for a body in good health");
-        check(!Telekinesis.isHolding(wanda) && fight.uploads() == 0 && boss.getHealth() == boss.getMaxHealth(), "nothing was lifted, nothing was torn");
+        check(Telekinesis.isHeld(boss) && BossGrip.GRABBED.equals(lastActionBarKey(wanda)), "she holds a body in good health as a boss");
+        check(fight.uploads() == 0 && boss.getHealth() == boss.getMaxHealth(), "nothing was torn");
+        Telekinesis.release(wanda, false);
         // Before the island is up he cannot fall, whatever his health: his floor of a tenth is below the threshold.
+        put(f, boss, 10.5, FLOOR + 1.0, 8.5);
+        lookAt(wanda, boss);
         boss.setHealth(1.0F);
         check(boss.getHealth() >= boss.getMaxHealth() * 0.1F - 0.01F, "Prime keeps a tenth until the island is up: " + boss.getHealth());
         press(wanda);
-        check("message.enhanced.ultron.too_powerful".equals(lastActionBarKey(wanda)) && !fight.isTransferring() && !fight.isDying(),
-                "and below the threshold, on the ground, her hand still cannot tear him apart");
+        check(Telekinesis.isHeld(boss) && !fight.isTransferring() && !fight.isDying(),
+                "and below the threshold, on the ground, her hand holds him but cannot tear him apart");
+        press(wanda);
+        check(!Telekinesis.isHolding(wanda) && !fight.isTransferring() && !fight.isDying(), "nor when she throws him");
+        Telekinesis.clear();
 
         // She can lift a Sentry, and when she throws it, its core is crushed instead.
         fight.forceState(UltronFight.Phase.ISLAND);
@@ -271,16 +280,18 @@ public final class UltronMachineTests {
         assertNear(fight.participant(wanda.getUUID()).damage(), sentryHealth, 0.01, "its health went to her ledger");
         Telekinesis.clear();
 
-        // On the island, at a sixth of his health: too much. At 15 percent: she tears out the core.
+        // On the island, at a sixth of his health: she holds him. Set to 14.9 percent while she holds him, her V tears out the
+        // core instead of throwing him.
         put(f, boss, 10.5, FLOOR + 1.0, 8.5);
         lookAt(wanda, boss);
         boss.setHealth(boss.getMaxHealth() * 0.16F);
         press(wanda);
-        check("message.enhanced.ultron.too_powerful".equals(lastActionBarKey(wanda)) && !fight.isTransferring(), "16 percent is still too powerful");
+        check(Telekinesis.holds(wanda, boss) && !fight.isTransferring(), "at 16 percent she holds him");
         boss.setHealth(boss.getMaxHealth() * 0.149F);
         float torn = boss.getHealth();
         press(wanda);
-        check(fight.isTransferring() && fight.uploads() == 1, "below 15 percent she tears the core out and he is uploaded");
+        check(fight.isTransferring() && fight.uploads() == 1, "below 15 percent, held, her V tears the core out and he is uploaded");
+        check(!Telekinesis.isHolding(wanda), "he was not thrown");
         check(boss.isShielded() && boss.state() == UltronState.TRANSFER, "which makes him untouchable for its time");
         check(fight.participant(wanda.getUUID()).damage() >= sentryHealth + torn - 0.1F, "and what was left of the body is hers");
         helper.succeed();
@@ -310,11 +321,16 @@ public final class UltronMachineTests {
         UltronSentryEntity sentry = sentryAt(f, fight, 10.5, 10.5);
         sentry.setHeld(false);
 
-        // Iron: a Sentry is metal and she lifts it; Prime is not, and nor is Wanda's hand strong enough for him.
-        check(Telekinesis.isMagnetic(sentry) && !Telekinesis.isMagnetic(boss), "a Sentry is magnetic, Prime is not");
+        // Iron: a Sentry is metal and he lifts it; so is Prime's vibranium (3.1), and on the ground, unshielded, Magneto, Wanda
+        // and Billy can each hold him as a boss; shielded, nobody can.
+        check(Telekinesis.isMagnetic(sentry) && Telekinesis.isMagnetic(boss), "a Sentry is magnetic, and so is Prime");
         check(Telekinesis.canLift(magneto, sentry, Telekinesis.Mode.MAGNETO), "Magneto can lift a Sentry");
+        check(Telekinesis.canLift(magneto, boss, Telekinesis.Mode.MAGNETO) && Telekinesis.canLift(magneto, boss, Telekinesis.Mode.WANDA)
+                && Telekinesis.canLift(magneto, boss, Telekinesis.Mode.BILLY), "on the ground, unshielded, Prime can be held");
+        boss.setShielded(true);
         check(!Telekinesis.canLift(magneto, boss, Telekinesis.Mode.MAGNETO) && !Telekinesis.canLift(magneto, boss, Telekinesis.Mode.WANDA)
-                && !Telekinesis.canLift(magneto, boss, Telekinesis.Mode.BILLY), "nobody can lift Prime");
+                && !Telekinesis.canLift(magneto, boss, Telekinesis.Mode.BILLY), "shielded, nobody can hold him");
+        boss.setShielded(false);
         check(Telekinesis.canLift(magneto, sentry, Telekinesis.Mode.WANDA) && Telekinesis.canLift(magneto, sentry, Telekinesis.Mode.BILLY),
                 "and Wanda or Billy can lift a Sentry too");
 

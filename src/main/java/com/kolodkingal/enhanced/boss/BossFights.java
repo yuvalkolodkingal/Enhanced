@@ -1,7 +1,9 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.ChatFormatting;
@@ -18,9 +20,11 @@ import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -28,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
 /**
@@ -167,7 +172,8 @@ public final class BossFights {
                 || type == ModEntities.ULTRON.get() || type == ModEntities.ULTRON_SENTRY.get()
                 || type == ModEntities.VIBRANIUM_KEY.get() || type == ModEntities.ULTRON_BOLT.get()
                 || type == ModEntities.APOCALYPSE.get() || type == ModEntities.SAND_LANCE.get()
-                || type == ModEntities.SAND_BOULDER.get() || type == ModEntities.SAND_COCOON.get();
+                || type == ModEntities.SAND_BOULDER.get() || type == ModEntities.SAND_COCOON.get()
+                || (entity instanceof TelekineticBlockEntity && isMarked(entity)); // a block an arena lent
     }
 
     /** The fight a (not yet finished) entity of the fight's marks belongs to, or null. */
@@ -320,6 +326,136 @@ public final class BossFights {
     }
 
     /**
+     * Whether the block at {@code pos} leans on a block an arena has lent and whose hole is still open (a torch on it, a
+     * flower, a lantern under it): if its neighbours break it meanwhile it drops nothing, as the mend puts it back
+     * ({@link ArenaLoans#isPropped}).
+     */
+    public static boolean leansOnALoan(ServerLevel level, BlockPos pos) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == level && fight.loans().isPropped(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether {@code pos} is a cell of a copy a fight made of the world (Ultron's island in the sky): protected whatever the
+     * config says, and never journaled as a hole (see {@link BossFight#isCopyCell}).
+     */
+    public static boolean isCopyCell(ServerLevel level, BlockPos pos) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == level && fight.isCopyCell(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ---- the arena's loans to block telekinesis (D-T 5) ----
+
+    /** The fight whose arena protects {@code pos}: the one that lends its block. */
+    @Nullable
+    private static BossFight lender(ServerLevel level, BlockPos pos) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == level && !fight.isFinished() && fight.arena().protects(pos)) {
+                return fight;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Why the arena that protects {@code pos} does not lend its block to {@code player}'s block telekinesis, as the key he
+     * reads; null if it lends it (the player's rights are asked after this, {@link #lending}), or if no fight protects the
+     * cell (it is no loan). In this order: {@code boss.lendArenaBlocks} off ({@code telekinesis.protected}, as in 3.0); the
+     * fight's own rule ({@link BossFight#lendRefusal}); the ledger's ({@link ArenaLoans}: half of a door, a falling block
+     * over a gap, the block under an open home or a standing borrowed block or leaning on an open home, a block that holds
+     * up too much or that something hangs on, the fight's cap).
+     */
+    @Nullable
+    public static String lendRefusal(ServerPlayer player, BlockPos pos) {
+        BossFight fight = lender(player.serverLevel(), pos);
+        if (fight == null) {
+            return null;
+        }
+        if (!BossConfig.LEND_ARENA_BLOCKS.get()) {
+            return ArenaLoans.PROTECTED;
+        }
+        String refusal = fight.lendRefusal(pos);
+        return refusal != null ? refusal : fight.loans().refusal(pos);
+    }
+
+    /** The cell a loan is asking about, while it asks ({@link #lending}). */
+    @Nullable
+    private static BlockPos lending;
+
+    /**
+     * Runs {@code ask} (the break event of a loan, which claim mods hear) while the arena lets the one cell at {@code pos}
+     * through ({@link #isLending}): the arena's own listener does not cancel it, so the claims decide.
+     *
+     * @return what {@code ask} answered
+     */
+    public static boolean lending(BlockPos pos, BooleanSupplier ask) {
+        BlockPos before = lending;
+        lending = pos.immutable();
+        try {
+            return ask.getAsBoolean();
+        } finally {
+            lending = before;
+        }
+    }
+
+    /** Whether the break of the block at {@code pos} is a loan being asked about ({@link #lending}). */
+    public static boolean isLending(BlockPos pos) {
+        return pos.equals(lending);
+    }
+
+    /**
+     * Lends the block at {@code pos} (it is {@code state}) to {@code player}: the cell is emptied and the hole recorded by the
+     * fight whose arena protects it ({@link ArenaLoans}). Asked only after {@link #lendRefusal} and the player's rights.
+     *
+     * @return the borrowed block, in the level and the fight's, or null if no fight protects the cell
+     */
+    @Nullable
+    public static TelekineticBlockEntity lend(ServerPlayer player, BlockPos pos, BlockState state) {
+        BossFight fight = lender(player.serverLevel(), pos);
+        return fight == null ? null : fight.loans().lend(player, pos, state);
+    }
+
+    /**
+     * A borrowed block landed at {@code pos} after a set-down: whether it stands there under its arena's rules ({@link
+     * ArenaLoans}); false (it crumbles) if they refuse it or its fight is gone.
+     */
+    public static boolean standBorrowed(TelekineticBlockEntity block, BlockPos pos) {
+        BossFight fight = fightOf(block);
+        return fight != null && !fight.isFinished() && fight.loans().stand(block, pos);
+    }
+
+    /** A borrowed block is gone (it shattered or crumbled): its fight no longer counts it. */
+    public static void borrowedGone(TelekineticBlockEntity block) {
+        BossFight fight = fightOf(block);
+        if (fight != null) {
+            fight.loans().gone(block);
+        }
+    }
+
+    /** Whether the entity carries the mark of a fight, running or not (a borrowed block does, all its life). */
+    public static boolean isMarked(Entity entity) {
+        return BossFight.markOf(entity) != null;
+    }
+
+    /**
+     * The entity leaves its fight: its mark is taken off, so that nothing of the boss's side spares it any more and the
+     * fight no longer counts it as its own (D-T 6.1, 6.3: a bolt of Ultron's or a lance of Apocalypse's that telekinesis
+     * caught and threw back is the thrower's now). Its owner must be someone else by then (a player), or the orphan sweep
+     * would take it at its next join.
+     */
+    public static void disown(Entity entity) {
+        BossFight.unmark(entity);
+    }
+
+    /**
      * Whether a fight holds the entity where it is (whatever the Sokovia lift carries): no telekinesis may take it, and a
      * hero it carries uses none.
      */
@@ -330,6 +466,76 @@ public final class BossFights {
             }
         }
         return false;
+    }
+
+    /**
+     * Where telekinesis may carry {@code entity} when its holder wants it at {@code wanted} (D-T 4.5): anything a fight
+     * owns, and its participants while they are in its arena, are never carried out of the arena ({@link
+     * BossFight#carryLimit}); anything else goes where it is wanted.
+     */
+    public static Vec3 carryLimit(Entity entity, Vec3 wanted) {
+        BossFight fight = carrier(entity);
+        return fight == null ? wanted : fight.carryLimit(entity, wanted);
+    }
+
+    /**
+     * The flight of a throw of {@code entity} is over: if it is the boss or one of his and it ended outside its carry
+     * limit, its fight brings it back into the arena ({@link BossFight#bringBack}). Players are left to the arena's own
+     * field and wall.
+     *
+     * @return whether a fight brought it back
+     */
+    public static boolean bringBack(Entity entity) {
+        BossFight fight = fightOf(entity);
+        if (fight == null || fight.isOver() || fight.level() != entity.level()) {
+            return false;
+        }
+        Vec3 at = entity.position();
+        if (fight.carryLimit(entity, at).distanceToSqr(at) < 1.0E-4) {
+            return false;
+        }
+        fight.bringBack(entity);
+        return true;
+    }
+
+    /**
+     * Where a telekinetic flight of {@code entity} is stopped dead, if it would reach the edge of a gated arena (Ultron's
+     * field, Apocalypse's wall) of a fight that owns it or that it takes part in at {@code next}, where it flies to (D-T
+     * 4.5): half a block inside {@code containRadius}, on the line from the centre, at the height it is at. Null if it may
+     * fly on.
+     */
+    @Nullable
+    public static Vec3 edgeStop(Entity entity, Vec3 next) {
+        BossFight fight = carrier(entity);
+        if (fight == null || !fight.arena().gates()) {
+            return null;
+        }
+        BossArena arena = fight.arena();
+        double flat = arena.distance(next);
+        if (flat < arena.containRadius() || arena.distance(entity.position()) >= arena.containRadius()) {
+            return null; // it stays inside, or it was already outside (the field and the wall see to that)
+        }
+        Vec3 center = arena.center();
+        double scale = (arena.containRadius() - 0.5) / flat;
+        return new Vec3(center.x + (next.x - center.x) * scale, entity.getY(), center.z + (next.z - center.z) * scale);
+    }
+
+    /**
+     * The fight of this level whose arena keeps {@code entity} in: the one that owns it, or the one it takes part in (a
+     * player) while it is in that arena's cylinder (a fighter far away is not pulled back by a friend's grip); or null.
+     */
+    @Nullable
+    private static BossFight carrier(Entity entity) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() != entity.level() || fight.isFinished()) {
+                continue;
+            }
+            if (entity instanceof ServerPlayer player ? fight.isParticipant(player.getUUID()) && fight.arena().contains(player.position())
+                    : fight.owns(entity)) {
+                return fight;
+            }
+        }
+        return null;
     }
 
     /**
@@ -346,11 +552,12 @@ public final class BossFights {
     }
 
     /**
-     * Wanda throws what she holds: a boss's special case for it. True if handled (the held thing is then not thrown).
+     * Wanda or Magneto ({@code mode}) throws what they hold: a boss's special case for it (a Sentry is crushed by either, a
+     * heart torn out by her hand alone, R40). True if handled (the held thing is then not thrown).
      */
-    public static boolean telekinesisLaunch(ServerPlayer wanda, Entity held) {
+    public static boolean telekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
         for (BossFight fight : FIGHTS) {
-            if (fight.level() == wanda.level() && fight.onTelekinesisLaunch(wanda, held)) {
+            if (fight.level() == holder.level() && fight.onTelekinesisLaunch(holder, mode, held)) {
                 return true;
             }
         }
@@ -482,6 +689,16 @@ public final class BossFights {
     /** A fight finished: it leaves the registry. */
     static void finished(BossFight fight) {
         FIGHTS.remove(fight);
+    }
+
+    /**
+     * Drops a fight from the registry and calls nothing of it, as a hard crash would leave it: nothing is given back, its
+     * journal stays as it was; only its tickets and bars, which a crash loses too, are let go (D-T test 32).
+     */
+    @VisibleForTesting
+    public static void forgetForTests(BossFight fight) {
+        FIGHTS.remove(fight);
+        fight.forget();
     }
 
     // ---------------------------------------------------------------------------------------------------------

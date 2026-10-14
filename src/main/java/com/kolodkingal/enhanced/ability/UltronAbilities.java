@@ -471,12 +471,13 @@ public final class UltronAbilities {
     }
 
     /**
-     * What he can pull: anything alive that is not one of his drones, a creature too powerful for telekinesis (the
-     * bosses), someone Mjolnir pins or Wanda holds, a Creative or Spectator player, or (with PvP off) a player; a
-     * dropped item (but not Mjolnir, which no power lifts); a projectile in flight that is not his.
+     * What he can pull: anything alive that is not one of his drones, a creature his pull passes by ({@code
+     * pull_immune}: what no telekinesis lifts, and the bosses), someone Mjolnir pins or Wanda holds, a Creative or
+     * Spectator player, or (with PvP off) a player; a dropped item (but not Mjolnir, which no power lifts); a projectile
+     * in flight that is not his.
      */
     private static boolean canPull(ServerPlayer hero, Entity e) {
-        if (e == hero || !e.isAlive() || e.isSpectator() || e instanceof ArmorStand || e.getType().is(ModTags.TELEKINESIS_IMMUNE)
+        if (e == hero || !e.isAlive() || e.isSpectator() || e instanceof ArmorStand || e.getType().is(ModTags.PULL_IMMUNE)
                 || Telekinesis.isHeld(e) || MjolnirPin.isPinned(e)) {
             return false;
         }
@@ -601,7 +602,7 @@ public final class UltronAbilities {
     }
 
     private static boolean canSlam(ServerPlayer hero, LivingEntity e) {
-        return e != hero && e.isAlive() && !e.isSpectator() && !e.getType().is(ModTags.TELEKINESIS_IMMUNE) && AreaTargets.mayHurt(hero, e, false);
+        return e != hero && e.isAlive() && !e.isSpectator() && !e.getType().is(ModTags.PULL_IMMUNE) && AreaTargets.mayHurt(hero, e, false);
     }
 
     private UltronAbilities() {

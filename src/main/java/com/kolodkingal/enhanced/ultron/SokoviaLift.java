@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.network.SokoviaLiftPayload;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal.Header;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
@@ -54,7 +55,8 @@ import java.util.UUID;
  *   island                the fight; the arena holds everyone on the island, and takes back a fighter who comes
  *                         to stand under it
  *   descent   (20 + clear + liftTicks) everything on the island is locked and carried; the island is cleared;
- *                         everything is carried down and set down on the ground; the journal is deleted
+ *                         everything is carried down and set down on the ground; the journal says the island
+ *                         landed, and is kept until the world has saved it (R48)
  * </pre>
  *
  * <p>If anything is wrong the fight goes on as the Tremor: the room above is not empty when the warning begins, the
@@ -369,7 +371,7 @@ public final class SokoviaLift implements LiftHook {
             return job;
         }
 
-        /** The note on disk, as last written, or null if there is none. */
+        /** The live note on disk, as last written, or null if there is none (or it is retiring: the island is gone). */
         @Nullable
         public Header header() {
             return header;
@@ -422,7 +424,9 @@ public final class SokoviaLift implements LiftHook {
         }
 
         /**
-         * Locks everything that goes up: the fighters (a stray one is brought in), the fight's creatures, the drones.
+         * Locks everything that goes up: the fighters (a stray one is brought in), the fight's creatures, the drones. A
+         * bolt in the air is not carried, nor a block borrowed from the arena (the fight gave every loan back at the
+         * warning, so there is none; one would turn to dust here rather than ride up).
          */
         private void collectAscent() {
             for (ServerPlayer player : fight.present()) {
@@ -434,6 +438,8 @@ public final class SokoviaLift implements LiftHook {
             for (Entity entity : fight.entities()) {
                 if (entity instanceof UltronBoltEntity) {
                     entity.discard(); // (a bolt in the air cannot be carried)
+                } else if (entity instanceof TelekineticBlockEntity borrowed) {
+                    borrowed.crumble();
                 } else {
                     carry.bind(entity, true);
                 }
@@ -554,7 +560,7 @@ public final class SokoviaLift implements LiftHook {
             }
             carry.releaseAll();
             SokoviaTemplate t = template;
-            fight.island().raiseIsland(spec.height(), t == null ? centre.getY() : t.minY() + spec.height());
+            fight.island().raiseIsland(spec.height(), t == null ? centre.getY() : t.minY() + spec.height(), t);
             job = null;
             step = Step.PLACED;
             askToEnd(true);
@@ -699,7 +705,9 @@ public final class SokoviaLift implements LiftHook {
             step = Step.FALLING;
         }
 
-        /** The island is down: everything is set on the ground, the note is deleted, the clients are told. */
+        /**
+         * The island is down: everything is set on the ground, the note says so and is retired, the clients are told.
+         */
         private void landed() {
             carry.move(-spec.height());
             carry.snapAll();
@@ -715,9 +723,28 @@ public final class SokoviaLift implements LiftHook {
             fight.island().landIsland();
             send(SokoviaLiftPayload.END, now, false);
             endAt = -1;
-            deleteNote();
+            landNote();
             sendAbsentHome();
             step = Step.DONE;
+        }
+
+        /**
+         * The island has landed: its note is rewritten at once to say so, owing nothing (a crash from here on clears an
+         * empty column of the sky and gives no Program back), then retired: it is kept until two saves of the dimension
+         * hold the world without the island (R48).
+         */
+        private void landNote() {
+            if (header == null) {
+                return;
+            }
+            Header landed = header.landed();
+            try {
+                SokoviaJournal.write(level.getServer(), landed);
+                header = landed;
+            } catch (IOException e) {
+                Enhanced.LOGGER.error("Ultron's journal could not be updated", e);
+            }
+            deleteNote();
         }
 
         // ---- every tick ----
@@ -951,7 +978,7 @@ public final class SokoviaLift implements LiftHook {
         /**
          * Puts everything back at once: the fight is gone (the server is stopping, an operator cleans up, a fight that
          * failed). The island is cleared whole, everything that was on it is set down on the ground below, the note is
-         * deleted, the clients are told. Safe to call in any step, and again.
+         * retired, the clients are told. Safe to call in any step, and again.
          */
         void finishNow() {
             switch (step) {
@@ -1129,6 +1156,7 @@ public final class SokoviaLift implements LiftHook {
             return Double.POSITIVE_INFINITY;
         }
 
+        /** Retires the note: the island is gone ({@link SokoviaJournal#delete}). */
         private void deleteNote() {
             if (header != null) {
                 SokoviaJournal.delete(level.getServer(), header.fight());

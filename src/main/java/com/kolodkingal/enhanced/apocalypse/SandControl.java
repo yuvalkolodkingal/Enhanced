@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.apocalypse;
 
 import com.kolodkingal.enhanced.ability.AreaTargets;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
@@ -15,6 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -124,7 +126,9 @@ public final class SandControl {
     /**
      * Swallows {@code victim} in a cocoon of sand for {@code ticks}: it cannot move, jump, fly, attack, use items or use
      * its hero abilities, takes {@code damagePerSecond} a second but never below two hearts, and the cocoon (of {@code
-     * health}) breaks when anything hits it. A boss's cocoon belongs to its fight (marked, discarded with it).
+     * health}) breaks when anything hits it. A boss's cocoon belongs to its fight (marked, discarded with it). An entombed
+     * hero lets go of what their telekinesis holds, at once (the grip's own rule, whatever entombed them, is in {@code
+     * Telekinesis.tickHolder}; this is its early hint, so the grip ends this tick and not the next).
      *
      * @param owner the one who casts it, or null
      * @param fight the fight the cocoon belongs to, or null for a hero's
@@ -137,6 +141,9 @@ public final class SandControl {
             return null;
         }
         SandCocoonEntity cocoon = new SandCocoonEntity(level, victim, owner, ticks, damagePerSecond, health);
+        if (victim instanceof ServerPlayer holder) {
+            Telekinesis.release(holder, false);
+        }
         victim.stopRiding();
         victim.addEffect(new MobEffectInstance(ModEffects.ENTOMBED, EFFECT_TICKS, 0, false, false, true), owner);
         if (fight != null) {

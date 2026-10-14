@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.config.BossConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -51,9 +52,10 @@ import java.util.UUID;
  *     #windDown}: the boss leaves, the island lowers); only then are the arena's protection and tickets, the bars and
  *     the fight's entities let go, and the arena goes on holding its fighters. A lane that forgets is stopped after
  *     {@link #MAX_WIND_DOWN_TICKS}.</li>
- *     <li><b>The rest.</b> Two boss bars ({@link BossBars}), the arena ({@link BossArena}), the region tickets, the
- *     orphan sweep (an entity of a fight that is not running is discarded when it joins a level), rewards ({@link
- *     BossRewards}) and gifts ({@link BossGifts}).</li>
+ *     <li><b>The rest.</b> Two boss bars ({@link BossBars}), the arena ({@link BossArena}) and the blocks it lends to
+ *     block telekinesis ({@link ArenaLoans}, all given back when the fight finishes), the region tickets, the orphan sweep
+ *     (an entity of a fight that is not running is discarded when it joins a level), rewards ({@link BossRewards}) and
+ *     gifts ({@link BossGifts}).</li>
  * </ul>
  *
  * <p>Everything here runs on the server thread. A lane adds its own fight entities with {@link #spawn} (or {@link
@@ -76,6 +78,7 @@ public abstract class BossFight {
     private final BossBars bars;
     private final Map<UUID, Participant> participants = new LinkedHashMap<>();
     private final List<ItemEntity> keptDrops = new ArrayList<>();
+    private final ArenaLoans loans = new ArenaLoans(this);
     private List<ChunkPos> ticketed = List.of();
 
     private ItemStack refund = ItemStack.EMPTY;
@@ -179,8 +182,11 @@ public abstract class BossFight {
         return false;
     }
 
-    /** Wanda throws {@code held}; true if this fight handled it (it is then not thrown). */
-    protected boolean onTelekinesisLaunch(ServerPlayer wanda, Entity held) {
+    /**
+     * Wanda or Magneto ({@code mode}) throws {@code held}; true if this fight handled it (it is then not thrown: Ultron's
+     * Sentry is crushed, his heart torn out).
+     */
+    protected boolean onTelekinesisLaunch(ServerPlayer holder, Telekinesis.Mode mode, Entity held) {
         return false;
     }
 
@@ -194,11 +200,79 @@ public abstract class BossFight {
     }
 
     /**
+     * Why the arena does not lend its block at {@code pos} to block telekinesis now, as a translation key the holder reads
+     * ({@link ArenaLoans}; asked after {@code boss.lendArenaBlocks}, before the ledger's own rules), or null: Ultron's ground
+     * lends nothing while it is about to rise or the island comes down, nor from under the island. Null by default.
+     */
+    @Nullable
+    protected String lendRefusal(BlockPos pos) {
+        return null;
+    }
+
+    /**
+     * Whether {@code pos} is a cell of a copy the fight made of the world (Ultron's island in the sky): it is protected
+     * whatever the config says, and a home there is never journaled (the island's own recovery clears it after a crash).
+     * None by default.
+     */
+    protected boolean isCopyCell(BlockPos pos) {
+        return false;
+    }
+
+    /**
      * Whether the fight holds {@code entity} where it is, so that no telekinesis may take it (whatever the Sokovia lift
      * carries; see {@link BossFights#isLocked}). None by default.
      */
     protected boolean locks(Entity entity) {
         return false;
+    }
+
+    /**
+     * How long telekinesis may hold this fight's boss before he breaks free, in ticks, before the hero's factor (see
+     * {@link BossGrip#holdLimit}): each boss's {@code holdTicks} option. 60 by default.
+     */
+    public int holdTicks() {
+        return 60;
+    }
+
+    /**
+     * Where telekinesis may carry {@code entity}, which this fight owns or which is one of its participants, when its holder
+     * wants it at {@code wanted} (see {@link BossFights#carryLimit}): never out of the arena. By default the point is kept
+     * within {@code containRadius - 2} of the centre in a gated arena ({@code radius - 2} in an open one), with the body
+     * under the arena's top, and in an open arena not below {@code centre.y - 8} (nothing is carried down a ravine or off an
+     * End island). A boss whose ground is his own overrides this.
+     */
+    protected Vec3 carryLimit(Entity entity, Vec3 wanted) {
+        BossArena arena = arena();
+        double reach = arena.gates() ? arena.containRadius() - 2.0 : arena.radius() - 2.0;
+        double floor = arena.gates() ? Double.NEGATIVE_INFINITY : arena.center().y - 8.0;
+        return keepWithin(entity, wanted, reach, floor, arena.top());
+    }
+
+    /**
+     * {@code wanted} kept within {@code reach} of the arena's centre (horizontally, along the line from the centre), not
+     * below {@code floor}, and with {@code entity}'s body under {@code top}.
+     */
+    protected final Vec3 keepWithin(Entity entity, Vec3 wanted, double reach, double floor, double top) {
+        Vec3 center = arena().center();
+        double dx = wanted.x - center.x;
+        double dz = wanted.z - center.z;
+        double flat = Math.hypot(dx, dz);
+        double limit = Math.max(0.5, reach);
+        double x = wanted.x;
+        double z = wanted.z;
+        if (flat > limit) {
+            x = center.x + dx / flat * limit;
+            z = center.z + dz / flat * limit;
+        }
+        double y = Math.max(floor, Math.min(wanted.y, top - entity.getBbHeight()));
+        return x == wanted.x && y == wanted.y && z == wanted.z ? wanted : new Vec3(x, y, z);
+    }
+
+    /**
+     * The flight of a throw left {@code entity} (the boss or one of his) outside its {@link #carryLimit}: put it back in
+     * the arena, the fight's own way (see {@link BossFights#bringBack}). Nothing by default.
+     */
+    protected void bringBack(Entity entity) {
     }
 
     /** A player joined the fight (their first time within the join radius). */
@@ -231,6 +305,11 @@ public abstract class BossFight {
 
     public final BossBars bars() {
         return bars;
+    }
+
+    /** The blocks the arena lent to block telekinesis, and the ledger that gets them back ({@link ArenaLoans}). */
+    public final ArenaLoans loans() {
+        return loans;
     }
 
     /** Ticks since the fight began. */
@@ -370,6 +449,11 @@ public abstract class BossFight {
         return data.hasUUID(MARK) ? data.getUUID(MARK) : null;
     }
 
+    /** Takes the mark of its fight off the entity: it is nobody's side any more (see {@link BossFights#disown}). */
+    static void unmark(Entity entity) {
+        entity.getPersistentData().remove(MARK);
+    }
+
     /**
      * The loaded entities of this fight (the boss, its minions, its projectiles): a scan of the level, not for every
      * tick.
@@ -459,6 +543,8 @@ public abstract class BossFight {
         if (finished || !begun) {
             return;
         }
+        // The arena's loans mend and crumble while the fight runs and while it winds down.
+        loans.tick(level.getGameTime());
         if (end != null) {
             windDownTicks++;
             // The arena holds its fighters until the ending is over (Ultron's island is lowered with them on it).
@@ -545,6 +631,12 @@ public abstract class BossFight {
         }
         finished = true;
         try {
+            // Everything the arena lent is back before the lane cleans up (D-T 5.7).
+            loans.finish();
+        } catch (RuntimeException e) {
+            Enhanced.LOGGER.error("The {} fight failed to give back its arena's blocks", kind().id(), e);
+        }
+        try {
             onFinished(forced);
         } catch (RuntimeException e) {
             Enhanced.LOGGER.error("The {} fight failed to finish", kind().id(), e);
@@ -564,6 +656,19 @@ public abstract class BossFight {
         ticketed = List.of();
         bars.close();
         BossFights.finished(this);
+    }
+
+    /**
+     * The fight is lost as a hard crash would lose it (a test of the arena's journal): its tickets and bars are let go, and
+     * nothing else is done, nothing given back.
+     */
+    final void forget() {
+        finished = true;
+        for (ChunkPos chunk : ticketed) {
+            level.getChunkSource().removeRegionTicket(kind().ticket(), chunk, arena.ticketDistance(), id, true);
+        }
+        ticketed = List.of();
+        bars.close();
     }
 
     /** The drops of a participant who died in the arena stay until the fight is over. */

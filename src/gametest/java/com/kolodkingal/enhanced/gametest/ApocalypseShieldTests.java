@@ -50,6 +50,7 @@ import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.boss;
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.breakShield;
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.duel;
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.every;
+import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.noCrits;
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.rel;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -387,18 +388,19 @@ public final class ApocalypseShieldTests {
             lookAt(d.hero(), boss);
             PowerTicker.tick(d.hero());
             check(boss.getHealth() == health, "the beam never touches his health (tick " + tick + ")");
-            // The shield keeps its own cooldown: five a hit, one hit in ten ticks, whatever the beam does.
+            // The shield keeps its own cooldown: one hit in ten ticks, whatever the beam does; a hit of 5 is critical
+            // (3.1, critShieldFactor 2): ten off the shield.
             if (tick == 10 || tick == 20 || tick == 30 || tick == 40) {
-                assertNear(max - boss.shield().strength(), 5.0 * (tick / 10), 1.0E-4, "five off the shield per ten ticks at tick " + tick);
+                assertNear(max - boss.shield().strength(), 10.0 * (tick / 10), 1.0E-4, "ten off the shield per ten ticks at tick " + tick);
             }
             if (tick == 40) {
-                assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 20.0, 1.0E-4, "and the beam's fighter is credited with the 20");
+                assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 40.0, 1.0E-4, "and the beam's fighter is credited with the 40");
                 check(boss.shield().isUp(), "still up");
                 // The last point and more: it breaks, and what was left over is not taken from him.
                 boss.shield().raiseNow(4.0F);
             }
             if (tick == 41) {
-                check(boss.shield().state() == ApocalypseShield.State.BROKEN, "a hit of 5 against 4 breaks it");
+                check(boss.shield().state() == ApocalypseShield.State.BROKEN, "a hit of 5 (10) against 4 breaks it");
                 check(boss.getHealth() == health, "the excess is thrown away");
                 check(boss.shield().windowLeft() > 150, "and a window of 200 opens");
                 return true;
@@ -412,14 +414,15 @@ public final class ApocalypseShieldTests {
         Duel d = duel(helper, 1, Power.PHOENIX);
         ApocalypseEntity boss = d.boss();
         float health = boss.getHealth();
+        // Five times its damage, then critical (3.1, critShieldFactor 2).
         check(d.hit(ModDamageTypes.PHOENIX_BURST, 8.0F), "a Burst of 8 counts");
-        assertNear(boss.shield().strength(), 110.0, 1.0E-3, "it removes 40 of the 150");
+        assertNear(boss.shield().strength(), 70.0, 1.0E-3, "it removes 80 of the 150");
         check(boss.getHealth() == health && boss.shield().isUp(), "and nothing of his health");
         helper.runAfterDelay(12, () -> {
             check(d.hit(ModDamageTypes.PHOENIX_BURST, 30.0F), "a Burst of 30");
-            check(boss.shield().state() == ApocalypseShield.State.BROKEN, "removes 150 and breaks even the whole of shield 1");
+            check(boss.shield().state() == ApocalypseShield.State.BROKEN, "removes 300 and breaks even the whole of shield 1");
             check(boss.getHealth() == health, "with the excess thrown away");
-            assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 40.0 + 110.0, 1.0E-3,
+            assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 80.0 + 70.0, 1.0E-3,
                     "the Phoenix is credited with what the shield lost, no more");
             helper.succeed();
         });
@@ -439,8 +442,8 @@ public final class ApocalypseShieldTests {
         check(!boss.hurt(ModDamageTypes.source(d.level(), ModDamageTypes.TELEKINETIC_SLAM, magneto, golem), 9.0F), "the slam of a golem Magneto threw is turned away");
         check(boss.shield().strength() == max && boss.getHealth() == health, "and does nothing");
 
-        // Wanda's wears it: the whole chain. She lifts a Zombie (not a block: nothing in the arena can be torn out of the
-        // ground), throws it, and it is the shield that takes the blow, not his health.
+        // Wanda's wears it: the whole chain. She lifts a Zombie (a block borrowed from his floor would do too, at half the
+        // slam: ArenaLoanTests), throws it, and it is the shield that takes the blow, not his health.
         Zombie thrown = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 10.5));
         lookAt(d.hero(), thrown);
         AbilityHandler.onKey(d.hero(), 3, true);
@@ -476,14 +479,15 @@ public final class ApocalypseShieldTests {
         PhoenixPower.touched(d.hero(), boss, PhoenixPower.Kind.SLAM, 10.0F);
         PhoenixPower.touched(d.hero(), boss, PhoenixPower.Kind.MIND_READ, 0.0F);
         check(boss.shield().strength() == 400.0F, "a Burst, a slam and a reading are not a strain: damage reaches the shield through hurt");
+        // Her strains are critical (3.1, critShieldFactor 2): 25 and 60, twice over.
         PhoenixPower.touched(d.hero(), boss, PhoenixPower.Kind.MIND_CONTROL, 0.0F);
-        assertNear(boss.shield().strength(), 375.0, 1.0E-4, "a Mind Control, even a refused one, takes 25");
+        assertNear(boss.shield().strength(), 350.0, 1.0E-4, "a Mind Control, even a refused one, takes 50");
         PhoenixPower.touched(d.hero(), boss, PhoenixPower.Kind.PSIONIC_FIELD, 0.0F);
-        assertNear(boss.shield().strength(), 315.0, 1.0E-4, "a Psionic Field that reaches him takes 60");
-        assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 85.0, 1.0E-4, "and she is credited with the 85");
+        assertNear(boss.shield().strength(), 230.0, 1.0E-4, "a Psionic Field that reaches him takes 120");
+        assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 170.0, 1.0E-4, "and she is credited with the 170");
         check(boss.getHealth() == boss.designMax(), "none of it touches his health");
         PhoenixPower.touched(d.hero(), d.f().player(2.5, FLOOR, 2.5), PhoenixPower.Kind.MIND_CONTROL, 0.0F);
-        assertNear(boss.shield().strength(), 315.0, 1.0E-4, "a touch on someone else is not his business");
+        assertNear(boss.shield().strength(), 230.0, 1.0E-4, "a touch on someone else is not his business");
 
         // The Mind Crush in its tell: either touch breaks the ring. (The fight has to have looked round once to know its foes.)
         d.hero().removeAllEffects();
@@ -528,6 +532,7 @@ public final class ApocalypseShieldTests {
     @GameTest(template = ARENA, batch = "apocalypse_window", timeoutTicks = 200)
     public static void aBrokenShieldIsAWindowWithItsOwnNumbers(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
+        noCrits(d.f()); // the window's own numbers, the blows counted as in 3.0 (8a.2)
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
         boss.brain().setChoosing(true);
@@ -715,15 +720,19 @@ public final class ApocalypseShieldTests {
         check(type.is(ModTags.SPELLBOUND_IMMUNE), "spellbound_immune");
         check(type.is(ModTags.CONFUSED_IMMUNE), "confused_immune");
         check(type.is(ModTags.SHAPESHIFT_IMMUNE), "shapeshift_immune");
-        check(type.is(ModTags.TELEKINESIS_IMMUNE), "telekinesis_immune");
+        check(type.is(ModTags.PULL_IMMUNE) && !type.is(ModTags.TELEKINESIS_IMMUNE), "pull_immune, and not telekinesis_immune (held as a boss)");
         check(type.is(ModTags.TELEPATHY_IMMUNE), "telepathy_immune");
         check(type.is(ModTags.BOSSES), "bosses");
         check(type.is(ModTags.ENTOMB_IMMUNE), "entomb_immune");
 
-        // Wanda cannot lift him.
+        // Wanda is mind power: her telekinesis takes hold of him through the shield (3.1), and lets go.
+        check(boss.shield().isUp(), "his shield is up");
         lookAt(d.hero(), boss);
         AbilityHandler.onKey(d.hero(), 3, true);
-        check(!Telekinesis.isHolding(d.hero()), "Telekinesis does not take hold of him");
+        AbilityHandler.onKey(d.hero(), 3, false);
+        check(Telekinesis.holds(d.hero(), boss), "Wanda's telekinesis takes hold of him through his shield");
+        Telekinesis.release(d.hero(), false);
+        check(!Telekinesis.isHeld(boss), "and lets go");
         helper.succeed();
     }
 

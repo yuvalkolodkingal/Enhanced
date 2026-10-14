@@ -22,6 +22,7 @@ import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.neoforged.neoforge.event.level.PistonEvent;
@@ -31,7 +32,8 @@ import net.neoforged.neoforge.event.level.PistonEvent;
  * pushed, blown up or eaten by a mob, nothing spawns naturally in it, and a fighter cannot leave it by a Chorus Fruit
  * or a portal. Everything asks {@link BossFights#protects} / {@link BossArena#allowsTeleport}, so an arena with {@code
  * protectBlocks} off (Thanos's) is untouched. The mod's own block-changing abilities and teleports ask the same
- * questions where they act (Wanda's block lifting, Tommy's acceleration, Loki's ice, the Hex gate).
+ * questions where they act (Tommy's acceleration, Loki's ice, the Hex gate); block telekinesis only borrows an arena's
+ * blocks, which the arena gets back ({@link ArenaLoans}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class BossArenaEvents {
@@ -48,8 +50,15 @@ public final class BossArenaEvents {
 
     // ---- blocks ----
 
+    /**
+     * Nobody breaks a block of the arena. The one cell a loan of block telekinesis is asking about ({@link
+     * BossFights#lending}) is let through, so that the claim mods that listen after the arena decide it.
+     */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onBreak(BlockEvent.BreakEvent event) {
+        if (BossFights.isLending(event.getPos())) {
+            return;
+        }
         if (protects(event.getLevel(), event.getPos())) {
             refuse(event.getPlayer());
             event.setCanceled(true);
@@ -107,6 +116,17 @@ public final class BossArenaEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onPiston(PistonEvent.Pre event) {
         if (protects(event.getLevel(), event.getPos())) {
+            event.setCanceled(true);
+        }
+    }
+
+    /**
+     * A block that leans on a borrowed block's open hole (a torch on it, a flower, a lantern under it) and that its
+     * neighbours break meanwhile drops nothing: the mend puts it back ({@link ArenaLoans}).
+     */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onDrops(BlockDropsEvent event) {
+        if (BossFights.leansOnALoan(event.getLevel(), event.getPos())) {
             event.setCanceled(true);
         }
     }
