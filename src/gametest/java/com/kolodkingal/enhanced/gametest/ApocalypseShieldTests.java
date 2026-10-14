@@ -439,8 +439,8 @@ public final class ApocalypseShieldTests {
         check(!boss.hurt(ModDamageTypes.source(d.level(), ModDamageTypes.TELEKINETIC_SLAM, magneto, golem), 9.0F), "the slam of a golem Magneto threw is turned away");
         check(boss.shield().strength() == max && boss.getHealth() == health, "and does nothing");
 
-        // Wanda's wears it: the whole chain. She lifts a Zombie (not a block: nothing in the arena can be torn out of the
-        // ground), throws it, and it is the shield that takes the blow, not his health.
+        // Wanda's wears it: the whole chain. She lifts a Zombie (a block borrowed from his floor would do too, at half the
+        // slam: ArenaLoanTests), throws it, and it is the shield that takes the blow, not his health.
         Zombie thrown = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 10.5));
         lookAt(d.hero(), thrown);
         AbilityHandler.onKey(d.hero(), 3, true);

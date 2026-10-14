@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.BossLane;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
@@ -51,6 +52,8 @@ final class BossTestSupport {
         long rest;
         /** What the fight holds where it is, as the Sokovia lift holds what it carries ({@link BossFight#locks}). */
         Predicate<Entity> locked = entity -> false;
+        /** The cells the fight calls a copy of the world, as Ultron's island ({@link BossFight#isCopyCell}). */
+        Predicate<BlockPos> copyCells = pos -> false;
         List<ItemStack> reward = List.of(new ItemStack(Items.DIAMOND));
         @Nullable
         BossEnd ended;
@@ -135,6 +138,11 @@ final class BossTestSupport {
         @Override
         protected boolean locks(Entity entity) {
             return locked.test(entity);
+        }
+
+        @Override
+        protected boolean isCopyCell(BlockPos pos) {
+            return copyCells.test(pos);
         }
 
         @Override

@@ -70,7 +70,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
@@ -108,6 +110,17 @@ public final class BossGripTests {
         AbilityHandler.onKey(player, ability, true);
         AbilityHandler.onKey(player, ability, false);
         player.setShiftKeyDown(false);
+    }
+
+    /** The lifted block the player holds now, or null. */
+    private static TelekineticBlockEntity heldBlock(GameTestHelper helper, ServerPlayer player) {
+        int held = Powers.get(player).heldEntityId();
+        for (TelekineticBlockEntity block : helper.getEntities(ModEntities.TELEKINETIC_BLOCK.get())) {
+            if (block.getId() == held && Telekinesis.isHolding(player)) {
+                return block;
+            }
+        }
+        return null;
     }
 
     /** A zombie that stands still and does not burn in the sun (the tests run by day). */
@@ -999,8 +1012,8 @@ public final class BossGripTests {
      * T15 (D-T 6.1.1): the heart rip stays Wanda's, and works on a body she holds. On the island: her empty-handed V at a
      * body at 15 percent tears the core out (as in 3.0); at 16 percent she holds the next body, and set to 14 percent while
      * she holds it her V tears its core out instead of throwing it. At 14 percent, her Sneak + V takes the block behind
-     * him and begins no upload (it never asks his fight). Billy at 14 percent holds him and throws him: no rip. (The
-     * block is the world's own here, with {@code boss.protectArena} off: the island's loans are lane TK's step 5 and 6.)
+     * him (a block his arena lends) and begins no upload (it never asks his fight). Billy at 14 percent holds him and throws
+     * him: no rip.
      */
     @GameTest(template = ARENA, batch = "boss_grip_rip", timeoutTicks = 300)
     public static void theHeartRipStaysWandasAndWorksOnAHeldBody(GameTestHelper helper) {
@@ -1009,7 +1022,6 @@ public final class BossGripTests {
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
         f.config(BossConfig.REGRIP_TICKS, 0);
         f.config(BossConfig.THROWN_STILL_TICKS, 0);
-        f.config(BossConfig.PROTECT_ARENA, false);
         ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
         UltronTestSupport.tank(wanda);
         ServerPlayer billy = f.player(16.5, FLOOR, 15.5, Power.BILLY);
@@ -1058,8 +1070,10 @@ public final class BossGripTests {
                     lookAt(wanda, Vec3.atCenterOf(helper.absolutePos(stone)));
                     press(wanda, 3, true);
                     check(!fight.isTransferring() && fight.uploads() == 2, "her Sneak + V past him at 14 percent begins no upload");
-                    check(Telekinesis.isHolding(wanda) && !Telekinesis.isHeld(body) && helper.getBlockState(stone).isAir(),
+                    TelekineticBlockEntity borrowed = heldBlock(helper, wanda);
+                    check(borrowed != null && !Telekinesis.isHeld(body) && helper.getBlockState(stone).isAir(),
                             "it takes the block behind him, not him");
+                    check(borrowed.isBorrowed(), "a block his arena lends");
                     for (TelekineticBlockEntity block : helper.getEntities(ModEntities.TELEKINETIC_BLOCK.get())) {
                         block.discard();
                     }
@@ -2001,11 +2015,12 @@ public final class BossGripTests {
 
     /**
      * T47 (D-T 7): the bosses never go through a portal (their fights are in their dimension), while a block Wanda lifted
-     * outside any arena does as any entity. (A borrowed block's part is lane TK's step 5: nothing is borrowed yet.)
+     * outside any arena does as any entity. A block a protected arena lent her stays in its dimension too: held in a nether
+     * portal for 100 ticks, it is still in the overworld.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_dimension", timeoutTicks = 40)
+    @GameTest(template = ARENA, batch = "boss_grip_dimension", timeoutTicks = 140)
     public static void bossesAndBorrowedBlocksStayInTheirDimension(GameTestHelper helper) {
-        TestKit.Fixture f = TestKit.fixture(helper);
+        TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         f.onClose(Telekinesis::clear);
         ServerLevel level = helper.getLevel();
         ServerLevel nether = level.getServer().getLevel(Level.NETHER);
@@ -2021,14 +2036,35 @@ public final class BossGripTests {
         helper.setBlock(dirt, Blocks.DIRT);
         lookAt(wanda, Vec3.atCenterOf(helper.absolutePos(dirt)));
         press(wanda, 3, false);
-        TelekineticBlockEntity lifted = null;
-        for (TelekineticBlockEntity block : helper.getEntities(ModEntities.TELEKINETIC_BLOCK.get())) {
-            lifted = block;
-        }
-        check(lifted != null && lifted.canChangeDimensions(level, other), "a block lifted outside any arena goes through as any entity");
+        TelekineticBlockEntity lifted = heldBlock(helper, wanda);
+        check(lifted != null && !lifted.isBorrowed() && lifted.canChangeDimensions(level, other), "a block lifted outside any arena goes through as any entity");
         Telekinesis.release(wanda, false);
         lifted.discard();
-        helper.succeed();
+
+        // In a protected arena the block is borrowed, and held in a nether portal it goes nowhere.
+        BossFrameworkTests.start(f, BossKind.ULTRON, wanda, BossFrameworkTests.fight(f, BossKind.ULTRON, Containment.NONE, true));
+        BlockPos ground = new BlockPos(10, 2, 13);
+        BlockPos portal = helper.absolutePos(new BlockPos(10, 3, 10));
+        helper.setBlock(ground, Blocks.DIRT);
+        level.setBlock(portal, Blocks.NETHER_PORTAL.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+        lookAt(wanda, Vec3.atCenterOf(helper.absolutePos(ground)));
+        press(wanda, 3, false);
+        TelekineticBlockEntity borrowed = heldBlock(helper, wanda);
+        check(borrowed != null && borrowed.isBorrowed() && !borrowed.canChangeDimensions(level, other), "a borrowed block stays in its dimension");
+        boolean[] inThePortal = {false};
+        f.everyTick(120, tick -> {
+            lookAt(wanda, Vec3.atCenterOf(portal));
+            PowerTicker.tick(wanda);
+            check(borrowed.isAlive() && borrowed.level() == level && Telekinesis.holds(wanda, borrowed), "the borrowed block is held in the overworld");
+            inThePortal[0] |= borrowed.getBoundingBox().intersects(new AABB(portal));
+            if (tick < 105) {
+                return false;
+            }
+            check(inThePortal[0] && level.getBlockState(portal).is(Blocks.NETHER_PORTAL), "it was held in the portal");
+            Telekinesis.release(wanda, false);
+            borrowed.crumble();
+            return true;
+        });
     }
 
     /**
@@ -2059,14 +2095,13 @@ public final class BossGripTests {
     /**
      * T50 (D-T D2, 4.6): Sneak + V takes the ground even past a boss. Apocalypse's shield is up and a block of sand stands
      * behind him on each hero's line of sight: Billy's V says {@code boss_shield}, shows one ripple and leaves the sand;
-     * Billy's, Wanda's and the Phoenix's Sneak + V each take the sand behind him, hold not him, and show no ripple. (With
-     * {@code boss.protectArena} off the sand is the world's own: the arena's loans are lane TK's step 5.)
+     * Billy's, Wanda's and the Phoenix's Sneak + V each borrow the sand behind him from his arena, hold not him, and show no
+     * ripple.
      */
     @GameTest(template = ARENA, batch = "telekinesis_sneak_boss", timeoutTicks = 40)
     public static void sneakTakesTheGroundEvenPastABoss(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         d.f().onClose(Telekinesis::clear);
-        d.f().config(BossConfig.PROTECT_ARENA, false);
         ApocalypseEntity boss = d.boss();
         ServerPlayer billy = d.hero();
         ServerPlayer wanda = d.f().player(10.5, FLOOR, 3.5, Power.SCARLET_WITCH);
@@ -2088,8 +2123,9 @@ public final class BossGripTests {
         for (int i = 0; i < heroes.length; i++) {
             lookAt(heroes[i], Vec3.atCenterOf(helper.absolutePos(sand[i])));
             press(heroes[i], 3, true);
-            check(helper.getBlockState(sand[i]).isAir() && Telekinesis.isHolding(heroes[i]) && !Telekinesis.isHeld(boss),
-                    heroes[i].getGameProfile().getName() + "'s Sneak + V takes the sand behind him, not him");
+            TelekineticBlockEntity borrowed = heldBlock(helper, heroes[i]);
+            check(helper.getBlockState(sand[i]).isAir() && borrowed != null && borrowed.isBorrowed() && !Telekinesis.isHeld(boss),
+                    heroes[i].getGameProfile().getName() + "'s Sneak + V borrows the sand behind him, not him");
         }
         check(log.drain().effects(ApocalypseFxPayload.SHIELD_HIT).isEmpty(), "and no ripple");
         for (ServerPlayer hero : heroes) {

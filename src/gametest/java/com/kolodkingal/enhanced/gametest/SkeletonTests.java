@@ -1103,6 +1103,8 @@ public final class SkeletonTests {
         Vec3 far = zombie.position().add(100.0, -40.0, 100.0);
         check(!BossFights.isLocked(player) && !BossFights.isLocked(zombie), "nothing is locked where it is");
         check(!BossFights.hidesGround(level, cell), "no ground is hidden");
+        check(!BossFights.isCopyCell(level, cell) && BossFights.lendRefusal(player, cell) == null && BossFights.lend(player, cell,
+                level.getBlockState(cell)) == null, "no cell is an island's copy, and no arena lends (or refuses) a block");
         check(BossFights.carryLimit(zombie, far) == far && BossFights.edgeStop(zombie, far) == null && !BossFights.bringBack(zombie),
                 "a zombie is carried and thrown anywhere");
         check(BossGrip.regripLeft(zombie) == 0 && !BossGrip.stills(zombie) && BossGrip.refusal(player, zombie, Telekinesis.Mode.WANDA) == null,

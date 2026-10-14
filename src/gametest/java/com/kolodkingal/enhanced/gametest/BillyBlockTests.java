@@ -571,12 +571,14 @@ public final class BillyBlockTests {
     }
 
     /**
-     * T39 (D-T 2.3 rule 1, R44): a stone set down onto a zombie's cell never becomes a block there (no wall round the
-     * zombie): one cobblestone, the zombie unhurt; a glass block, whose loot is empty, drops as one glass block.
+     * T39 (D-T 2.3 rule 1, 5.4, R44): a stone set down onto a zombie's cell never becomes a block there (no wall round the
+     * zombie): one cobblestone, the zombie unhurt; a glass block, whose loot is empty, drops as one glass block. In a
+     * protected arena a borrowed block set down onto a zombie's cell crumbles: no block, no item.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_place_occupied", timeoutTicks = 80)
+    @GameTest(template = ARENA, batch = "telekinesis_place_occupied", timeoutTicks = 100)
     public static void aSetDownBlockNeedsAFreeCell(GameTestHelper helper) {
-        TestKit.Fixture f = TestKit.fixture(helper);
+        TestKit.Fixture f = BossFrameworkTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
         Block[] kinds = {Blocks.STONE, Blocks.GLASS};
         Item[] drops = {Items.COBBLESTONE, Items.GLASS};
         ServerPlayer[] wandas = new ServerPlayer[2];
@@ -594,7 +596,22 @@ public final class BillyBlockTests {
             check(blocks[i] != null, "Wanda lifts the " + kinds[i].getName().getString());
         }
 
-        f.everyTick(70, tick -> {
+        TelekineticBlockEntity[] borrowed = {null};
+        Zombie[] onTheCell = {null};
+        BlockPos arenaCell = new BlockPos(12, 2, 10);
+
+        f.everyTick(90, tick -> {
+            if (borrowed[0] != null) { // the arena's block, set down onto a zombie
+                if (borrowed[0].isAlive()) {
+                    return false;
+                }
+                for (int y = 2; y <= 4; y++) {
+                    check(!helper.getBlockState(new BlockPos(arenaCell.getX(), y, arenaCell.getZ())).is(Blocks.DIRT), "the borrowed block does not stand there");
+                }
+                check(allItems(helper) == 2, "it crumbled: no item (but the two of before)");
+                check(onTheCell[0].getHealth() == onTheCell[0].getMaxHealth() && !onTheCell[0].isInWall(), "the zombie is unhurt");
+                return true;
+            }
             for (int i = 0; i < 2; i++) {
                 look(wandas[i], EAST, 0.0F);
                 PowerTicker.tick(wandas[i]);
@@ -622,7 +639,20 @@ public final class BillyBlockTests {
                 check(itemsNear(helper, landing[i], 2.0, drops[i]) == 1, "one " + drops[i] + " where it landed");
                 check(zombies[i].getHealth() == zombies[i].getMaxHealth() && !zombies[i].isInWall(), "the zombie is unhurt and not in a wall");
             }
-            return true;
+            // In a protected arena: a borrowed block set down onto a zombie crumbles.
+            BossFrameworkTests.start(f, BossKind.ULTRON, wandas[0], BossFrameworkTests.fight(f, BossKind.ULTRON, Containment.NONE, true));
+            BlockPos ground = new BlockPos(7, 2, 10);
+            helper.setBlock(ground, Blocks.DIRT);
+            lookAtBlock(helper, wandas[0], ground);
+            pressV(wandas[0], false);
+            borrowed[0] = heldBlock(helper, wandas[0]);
+            check(borrowed[0] != null && borrowed[0].isBorrowed(), "Wanda borrows a block of the arena");
+            onTheCell[0] = stillZombie(helper, arenaCell.getX() + 0.5, arenaCell.getZ() + 0.5);
+            Vec3 over = helper.absoluteVec(new Vec3(arenaCell.getX() + 0.5, arenaCell.getY() + 0.01, arenaCell.getZ() + 0.5));
+            borrowed[0].setPos(over.x, over.y, over.z);
+            pressV(wandas[0], true); // set it down onto the zombie
+            check(!Telekinesis.isHolding(wandas[0]), "let go");
+            return false;
         });
     }
 

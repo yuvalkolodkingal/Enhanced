@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.BlockLifting;
@@ -16,6 +17,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -172,9 +174,15 @@ public final class BossArenaTests {
     // ------------------------------------------------------------------------------------------------------------
     // The mod's own abilities ask the arena
 
+    /**
+     * The arena lends its blocks to Wanda's telekinesis (3.1, D-T 14.1): she borrows the dirt (the cell is air, she holds a
+     * borrowed block) and the hole mends {@code arenaMendTicks} later; Tommy's acceleration and Loki's ice change nothing
+     * in a protected arena. With the fight over, all three act on the same blocks as anywhere.
+     */
     @GameTest(template = ARENA, batch = "boss_arena_abilities", timeoutTicks = 80)
-    public static void wandasLiftingTommysAccelerationAndLokisIceLeaveAProtectedArenaAlone(GameTestHelper helper) {
+    public static void wandaBorrowsABlockWhileTommyAndLokiLeaveAProtectedArenaAlone(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.ARENA_MEND_TICKS, 20);
         ServerLevel level = helper.getLevel();
         ServerPlayer wanda = f.player(7.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         ServerPlayer tommy = f.player(7.5, FLOOR, 12.5, Power.TOMMY);
@@ -187,7 +195,11 @@ public final class BossArenaTests {
         TestKit.lookAt(wanda, Vec3.atCenterOf(lift));
         TestKit.lookAt(tommy, Vec3.atCenterOf(shake));
 
-        check(BlockLifting.tryLift(wanda) && level.getBlockState(lift).is(Blocks.DIRT), "Wanda cannot tear a block out of the arena");
+        check(BlockLifting.tryLift(wanda) && level.getBlockState(lift).isAir(), "Wanda tears the block out of the arena");
+        List<TelekineticBlockEntity> held = helper.getEntities(ModEntities.TELEKINETIC_BLOCK.get());
+        check(Telekinesis.isHolding(wanda) && held.size() == 1 && held.get(0).isBorrowed(), "she holds a borrowed block");
+        held.get(0).crumble();
+        Telekinesis.release(wanda, false);
         AbilityHandler.onKey(tommy, 5, true);
         check(level.getBlockState(shake).is(Blocks.DIRT), "Tommy cannot shake one apart");
         check("message.enhanced.boss.protected".equals(lastActionBarKey(tommy)), "and is told why");
@@ -203,8 +215,13 @@ public final class BossArenaTests {
             loki.setOnGround(true);
             PowerTicker.tick(loki);
             check(level.getBlockState(water).is(Blocks.WATER), "no ice forms in the arena");
+        });
+        helper.runAfterDelay(21, () -> {
+            check(level.getBlockState(lift).is(Blocks.DIRT) && !fight.loans().isOpenHome(lift), "after arenaMendTicks the hole has mended");
             BossFights.stopAll(level.getServer(), StopReason.SERVER_STOPPING);
             check(BlockLifting.tryLift(wanda) && !level.getBlockState(lift).is(Blocks.DIRT), "the fight over, Wanda can lift it");
+            List<TelekineticBlockEntity> lifted = helper.getEntities(ModEntities.TELEKINETIC_BLOCK.get());
+            check(lifted.size() == 1 && !lifted.get(0).isBorrowed(), "for real: it is nobody's loan");
             AbilityHandler.onKey(tommy, 5, true);
             check(!level.getBlockState(shake).is(Blocks.DIRT), "and Tommy can shake the other apart");
             PowerTicker.tick(loki);
