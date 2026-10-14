@@ -588,6 +588,12 @@ public final class BuildMathTests {
         check(pushed.size() == 9 && pushed.stream().allMatch(cell -> cell.pos().getX() == 5 && cell.state().isAir()), "Push -1 takes the wall's 9");
         Plan billy = SpellPlanner.plan(wall, recipe(Spell.PULL).at(new BlockPos(5, 65, 1), Direction.EAST).size(1).build(), Setup.at(CASTER).withSurface(4, 0));
         check(billy.size() == 4, "a surface stops at its cap: " + billy.size());
+        // Before its flood a pull says at once how big it may be, and floods only when it is asked to.
+        Plan capped = SpellPlanner.plan(wall, recipe(Spell.PULL).at(new BlockPos(5, 65, 1), Direction.EAST).size(2).build(), Setup.at(CASTER).withSurface(4, 0));
+        check(!capped.prepared() && capped.sizeBound() == 8 && !capped.prepared(), "a pull of 2 layers with a cap of 4: at most 8, not flooded yet");
+        check(capped.size() == 8 && capped.prepared() && capped.sizeBound() == 8, "flooded, it is 8");
+        Plan spanned = SpellPlanner.plan(wall, recipe(Spell.PULL).at(new BlockPos(5, 65, 1), Direction.EAST).size(-1).build(), Setup.at(CASTER).withSurface(100, 3));
+        check(spanned.sizeBound() == 9 && spanned.prepare(1000) && spanned.size() == 9, "a span of 3 holds at most 9 a layer");
         Plan narrow = SpellPlanner.plan(wall, recipe(Spell.PULL).at(new BlockPos(5, 65, 1), Direction.EAST).size(1).build(), Setup.at(CASTER).withSurface(100, 1));
         check(narrow.size() == 1, "and inside the span round the looked block: " + narrow.size());
         // A hollow dome of radius 3 aimed at the floor.

@@ -378,7 +378,11 @@ public final class SpellPlanner {
             BlockState old = getter.getBlockState(pos);
             return old.isAir() ? null : SpellMath.vanished(old);
         };
-        return new Plan(recipe, NONE, null, null, rule, layers > 0 ? Order.RISE : Order.MELT, setup.caster, null, surface);
+        Plan plan = new Plan(recipe, NONE, null, null, rule, layers > 0 ? Order.RISE : Order.MELT, setup.caster, null, surface);
+        // Before its flood, a surface holds at most the cap, and at most the span's square of cells.
+        long plane = Math.max(1, setup.span > 0 ? Math.min(setup.selectCap, (long) setup.span * setup.span) : setup.selectCap);
+        plan.bound = plane * Math.abs((long) layers);
+        return plan;
     }
 
     private static Plan shape(SpellRecipe recipe, Setup setup) {
@@ -531,6 +535,8 @@ public final class SpellPlanner {
         private @Nullable BlockPos origin;
         private boolean prepared;
         private long size = -1;
+        /** The most cells it may write before it is prepared (a Pull's), or -1 for {@link #size}. */
+        private long bound = -1;
 
         private Plan(SpellRecipe recipe, int refusal, @Nullable Volume cells, @Nullable Volume region, @Nullable Rule rule, Order order,
                      BlockPos caster) {
@@ -566,8 +572,10 @@ public final class SpellPlanner {
 
         /**
          * Finishes what the plan needs from the world before its first cell (a Pull's surface) with about {@code reads}
-         * block reads; true once ready. A plan that needs nothing is ready at once; anything that walks or measures an
-         * unready plan finishes it first, whatever it costs.
+         * block reads; true once ready. A plan that needs nothing is ready at once. Anything that walks or measures an
+         * unready plan ({@link #cells}, {@link #bounds}, {@link #size}, {@link #order}, {@link #writes},
+         * {@link #cursor}) finishes it first, whatever it costs: a caller with a budget prepares it in slices first
+         * ({@link #prepared}), and has {@link #sizeBound} at once meanwhile.
          */
         public boolean prepare(int reads) {
             if (prepared) {
@@ -581,6 +589,11 @@ public final class SpellPlanner {
                 cells = new PullCells(surface.cells(), surface.face(), recipe.anchor(), recipe.size());
             }
             return true;
+        }
+
+        /** Whether it has all it needs from the world ({@link #prepare}): always, but for a Pull before its flood. */
+        public boolean prepared() {
+            return prepared;
         }
 
         private void ready() {
@@ -637,6 +650,15 @@ public final class SpellPlanner {
                         : volume instanceof Repeated copies ? copies.source.cells() * copies.copies : volume.count();
             }
             return size;
+        }
+
+        /**
+         * How many cells it may write at most, known at once without reading the world: {@link #size} for a plan that
+         * is {@linkplain #prepared ready}; for a Pull before its flood, the most its surface may hold (the magic-select
+         * cap, or the span's square when that is less) times its layers.
+         */
+        public long sizeBound() {
+            return prepared || bound < 0 ? size() : bound;
         }
 
         /**
