@@ -39,6 +39,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.Horse;
@@ -780,7 +781,10 @@ public final class MagnetPullTests {
             }
             if (tick == 1) {
                 check(MagnetPull.isPulling(second) && drifter.isAlive(), "the pull has taken the nearest, not yet the drifting ingot");
-                drifter.setPos(helper.absoluteVec(new Vec3(east - 0.5, FLOOR, 15.5)));
+                // It drifts a block west, onto the claim, by moving as a drift does: a teleport would leave the block it
+                // last lay on (east of the border) as its footing until it next moves, which a resting item does one tick
+                // in four, as its entity id falls.
+                drifter.move(MoverType.SELF, new Vec3(-1.0, -0.1, 0.0));
             }
             if (tick == 6) {
                 NeoForge.EVENT_BUS.unregister(west);
