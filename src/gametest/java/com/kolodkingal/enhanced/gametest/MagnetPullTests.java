@@ -1480,10 +1480,11 @@ public final class MagnetPullTests {
     }
 
     /**
-     * M33 with {@code magneto.pullPlayerGearToFeet}: A's sword drops at his own feet, unmarked and with its 40-tick
-     * pickup delay, and flies to nobody.
+     * M33 with {@code magneto.pullPlayerGearToFeet}: A's sword drops at his own feet, unmarked, and flies to nobody. Its
+     * pickup delay is the 40 ticks of a torn-off piece, counted from the take: 35 ticks after it not even A can pick the
+     * sword up; 41 ticks after it A takes it back.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_pvp_feet", timeoutTicks = 100)
+    @GameTest(template = ARENA, batch = "magnet_pull_pvp_feet", timeoutTicks = 160)
     public static void thePullAndPlayersGearToFeet(GameTestHelper helper) {
         players(helper, true);
     }
@@ -1532,9 +1533,10 @@ public final class MagnetPullTests {
         List<Object> packets = new ArrayList<>();
         int[] stage = {0};
         long[] since = {0};
+        ItemEntity[] sword = {null};
         sneakR(magneto);
 
-        f.everyTick(toFeet ? 90 : 350, tick -> {
+        f.everyTick(toFeet ? 150 : 350, tick -> {
             PowerTicker.tick(magneto);
             packets.addAll(TestKit.sentPackets(magneto));
             long now = level.getGameTime();
@@ -1573,6 +1575,7 @@ public final class MagnetPullTests {
                         check(swords.get(0).hasPickUpDelay() && !swords.get(0).getPersistentData().contains(MagnetoAbilities.STRIPPED_BY_TAG),
                                 "unmarked, and waiting out its delay so that A can take it back");
                         check(count(magneto, Items.IRON_SWORD) == 0 && !streamed, "it flew to nobody");
+                        sword[0] = swords.get(0);
                     } else {
                         check(count(magneto, Items.IRON_SWORD) == 1, "the sword is in Magneto's inventory");
                         check(streamed, "and flew to him from A, in the tick's payload");
@@ -1584,7 +1587,10 @@ public final class MagnetPullTests {
                     check(sameStacks(wornBy(mate), worn.get(3)), "the teammate keeps his chestplate");
                     check(sameStacks(wornBy(b), worn.get(4)), "B, behind the wall, keeps everything");
                     if (toFeet) {
-                        return true;
+                        // The take is when A's grace began: the pull may have gone on a tick or two after it.
+                        since[0] = now - (EnhancedConfig.PULL_PLAYER_GRACE_TICKS.get() - MagnetPull.playerGraceLeft(a));
+                        stage[0] = 7;
+                        return false;
                     }
                     stage[0] = 3;
                 }
@@ -1604,6 +1610,22 @@ public final class MagnetPullTests {
                     if (MagnetPull.playerGraceLeft(a) == 0 && data.isReady(1, now) && now - since[0] > EnhancedConfig.PULL_RETRY_TICKS.get()) {
                         sneakR(magneto);
                         stage[0] = 6;
+                    }
+                }
+                case 7 -> {
+                    if (now - since[0] >= 35) {
+                        check(sword[0].hasPickUpDelay(), "35 ticks after the take the sword still waits out its delay");
+                        sword[0].playerTouch(a);
+                        check(!sword[0].isRemoved() && a.getInventory().countItem(Items.IRON_SWORD) == 0, "so not even A can pick it up yet");
+                        stage[0] = 8;
+                    }
+                }
+                case 8 -> {
+                    if (now - since[0] >= 41) {
+                        check(!sword[0].hasPickUpDelay(), "41 ticks after the take its 40 ticks are over");
+                        sword[0].playerTouch(a);
+                        check(sword[0].isRemoved() && a.getInventory().countItem(Items.IRON_SWORD) == 1, "and A takes his sword back");
+                        return true;
                     }
                 }
                 default -> {
