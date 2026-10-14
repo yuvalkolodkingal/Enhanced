@@ -96,13 +96,14 @@ import java.util.function.Predicate;
  *     magneto.pullMaxTargets} nearest; a built cell that would enter it is first ray-checked for sight, and every cell the
  *     ray reads is charged to the tick's budget. When the blocks are done, one entity query adds the entities.</li>
  *     <li><b>The takes</b>, nearest first, {@code magneto.pullPerTick} a tick. Each is checked again when its turn comes
- *     (a block with the full break check); the first that affects anything starts the cooldown and costs the hunger. What
- *     is taken goes straight into his inventory and what does not fit drops at his feet; each tick's takes go out in one
- *     {@link MagnetPullPayload} to him and everyone who sees him.</li>
+ *     (a block, a frame or a stand with the full break check of its cell, an entity with the claim of the section it
+ *     stands in now); the first that affects anything starts the cooldown and costs the hunger. What is taken goes
+ *     straight into his inventory and what does not fit drops at his feet (in Creative too); each tick's takes go out in
+ *     one {@link MagnetPullPayload} to him and everyone who sees him.</li>
  *     <li><b>The end</b>: one action-bar line and the clink of the metal arriving.</li>
  * </ol>
  * A pull ends at once (what it took stays his) when he dies, logs out, changes dimension, loses his power, becomes a
- * Spectator, or is more than the pull's radius from where he pressed.
+ * Spectator, or is more than the pull's radius from where he pressed (then with its line for what came so far).
  */
 public final class MagnetPull {
 
@@ -164,7 +165,7 @@ public final class MagnetPull {
         job.lastWork = now;
         search(job, player);
         if (!job.searching && job.order.isEmpty()) {
-            finish(job, player);
+            finish(job, player, true);
             return true;
         }
         // The field reaches out at once: the clients play its pulse before anything has come.
@@ -195,23 +196,21 @@ public final class MagnetPull {
         }
         job.lastWork = now;
         if (bodyCentre(player).distanceToSqr(job.centre) > job.radius * job.radius) {
-            // A pearl, the Bifrost, the Witches' Road, a knockback: the pull stays where he pressed, and ends.
-            JOBS.remove(player.getUUID());
-            if (job.affected > 0) {
-                tell(job, player);
-            }
+            // A pearl, the Bifrost, the Witches' Road, a knockback: the pull stays where he pressed, and ends with the line
+            // for what it took so far (D-M 4.5 step 3); nothing more arrives, so no clink.
+            finish(job, player, false);
             return;
         }
         if (job.searching) {
             search(job, player);
             if (!job.searching && job.order.isEmpty()) {
-                finish(job, player);
+                finish(job, player, true);
             }
             return;
         }
         takeSome(job, player);
         if (job.next >= job.order.size()) {
-            finish(job, player);
+            finish(job, player, true);
         }
     }
 
@@ -610,16 +609,18 @@ public final class MagnetPull {
     /**
      * The entities of the sphere, once the blocks are done (one query): each the pull would act on, standing in a section
      * whose claim probe lets him (a section the block search did not probe is probed now, at the cell the entity stands
-     * on), and, for a player, a frame or a stand, in sight. Adventure and spawn protection guard blocks, not these.
+     * on), and, for a player, a frame or a stand, in sight. Adventure and spawn protection guard blocks, not these; but a
+     * frame or a stand is someone's build, asked as a container is ({@link #buildRefused}).
      */
     private static void addEntities(Job job, ServerPlayer player) {
         double r2 = job.radius * job.radius;
         AABB box = new AABB(job.centre, job.centre).inflate(job.radius);
         for (Entity e : job.level.getEntities((Entity) null, box, e -> e.position().distanceToSqr(job.centre) <= r2)) {
-            if (actOn(player, e) == null) {
+            Act act = actOn(player, e);
+            if (act == null) {
                 continue;
             }
-            if (!claimAllows(job, player, e)) {
+            if (!claimAllows(job, player, e) || isBuild(act) && buildRefused(player, job.level, e, false)) {
                 job.refused = true;
                 continue;
             }
@@ -648,6 +649,24 @@ public final class MagnetPull {
             job.claims.put(section, allowed);
         }
         return allowed;
+    }
+
+    /** An item frame's or an armour stand's metal ({@code magneto.pullFromStorage}): someone's build, as a container is. */
+    private static boolean isBuild(Act act) {
+        return act == Act.FRAME || act == Act.STAND;
+    }
+
+    /**
+     * Whether the rights of the frame's or the stand's own cell refuse him its metal (R38: "claims asked"), as a container's
+     * cell would: the area rule of the mass edits (an arena, the island's hidden ground, a stranger's Hex), then at the
+     * search the game's own rights (Adventure, spawn protection) and at the take ({@code full}) the full break check.
+     */
+    private static boolean buildRefused(ServerPlayer player, ServerLevel level, Entity e, boolean full) {
+        BlockPos pos = e.blockPosition();
+        if (BlockRights.massEditRefuses(player, level, pos)) {
+            return true;
+        }
+        return full ? !BlockRights.mayBreak(player, level, pos, level.getBlockState(pos)) : !BlockRights.vanillaRights(player, level, pos);
     }
 
     /** The cells a sight ray from his eyes to the cell reads at most (charged to the search's budget). */
@@ -1132,7 +1151,6 @@ public final class MagnetPull {
      */
     private static List<ItemStack> takeMetalStacks(ServerPlayer player, Level level, BlockPos pos) {
         List<ItemStack> came = new ArrayList<>();
-        Inventory inventory = player.getInventory();
         BlockEntity entity = level.getBlockEntity(pos);
         if (entity == null || entity instanceof RandomizableContainer loot && loot.getLootTable() != null) {
             return came;
@@ -1141,9 +1159,7 @@ public final class MagnetPull {
             for (int slot = 0; slot < container.getContainerSize(); slot++) {
                 ItemStack stack = container.getItem(slot);
                 if (Metal.isMetalItem(stack)) {
-                    ItemStack rest = stack.copy();
-                    inventory.add(rest);
-                    int moved = stack.getCount() - rest.getCount();
+                    int moved = addWhatFits(player, stack.copy());
                     if (moved > 0) {
                         came.add(stack.copyWithCount(moved));
                         container.removeItem(slot, moved);
@@ -1158,9 +1174,7 @@ public final class MagnetPull {
             for (int slot = 0; slot < items.getSlots(); slot++) {
                 if (Metal.isMetalItem(items.getStackInSlot(slot))) {
                     ItemStack out = items.extractItem(slot, items.getStackInSlot(slot).getCount(), true);
-                    ItemStack rest = out.copy();
-                    inventory.add(rest);
-                    int moved = out.getCount() - rest.getCount();
+                    int moved = addWhatFits(player, out.copy());
                     if (moved > 0) {
                         came.add(items.extractItem(slot, moved, false));
                     }
@@ -1172,7 +1186,9 @@ public final class MagnetPull {
 
     /**
      * An entity's turn: it must still be there, within the radius and two blocks of him, still what the pull acts on, and
-     * still in sight if it needs sight. Then a dropped item gives what fits (the rest stays where it lies), a stuck arrow
+     * still in sight if it needs sight; and the claims must still let him act where it stands now (it may have walked or
+     * drifted into a claimed section since the search), a frame or a stand passing the full break check of its cell
+     * (refused: counted as protected). Then a dropped item gives what fits (the rest stays where it lies), a stuck arrow
      * comes as walking over it gives it, a falling or lifted block and an empty cart come as their items (a TNT cart
      * without going off), an illusion dissolves, a creature's gear is torn off, a player gives one thing, a metal body is
      * tugged, and a frame or a stand gives its metal and stays.
@@ -1187,13 +1203,18 @@ public final class MagnetPull {
         if (act == null || !seen(player, e)) {
             return Taken.GONE;
         }
+        if (!claimAllows(job, player, e) || isBuild(act) && buildRefused(player, job.level, e, true)) {
+            job.refused = true;
+            return Taken.REFUSED;
+        }
         return switch (act) {
             case ITEM -> takeItem(player, (ItemEntity) e);
             case ARROW -> {
                 ItemStack arrow = ((AbstractArrow) e).getPickupItemStackOrigin().copy();
-                if (!player.getInventory().add(arrow.copy())) {
+                if (room(player.getInventory(), arrow) < arrow.getCount()) {
                     yield Taken.REFUSED; // no room after all: it stays where it is stuck
                 }
+                player.getInventory().add(arrow.copy());
                 e.discard();
                 yield Taken.moved(List.of(arrow));
             }
@@ -1228,8 +1249,7 @@ public final class MagnetPull {
     private static Taken takeItem(ServerPlayer player, ItemEntity item) {
         ItemStack stack = item.getItem();
         ItemStack rest = stack.copy();
-        player.getInventory().add(rest);
-        int moved = stack.getCount() - rest.getCount();
+        int moved = addWhatFits(player, rest);
         if (moved <= 0) {
             return Taken.REFUSED;
         }
@@ -1345,11 +1365,10 @@ public final class MagnetPull {
     /** An item frame's metal item comes if it fits; the frame stays. */
     private static Taken takeFromFrame(ServerPlayer player, ItemFrame frame) {
         ItemStack came = frame.getItem().copy();
-        ItemStack rest = came.copy();
-        player.getInventory().add(rest);
-        if (!rest.isEmpty()) {
+        if (room(player.getInventory(), came) < came.getCount()) {
             return Taken.REFUSED;
         }
+        player.getInventory().add(came.copy());
         frame.setItem(ItemStack.EMPTY);
         return Taken.moved(List.of(came));
     }
@@ -1361,9 +1380,9 @@ public final class MagnetPull {
             ItemStack stack = stand.getItemBySlot(slot);
             if (Metal.isMetalItem(stack)) {
                 ItemStack rest = stack.copy();
-                player.getInventory().add(rest);
-                if (rest.getCount() < stack.getCount()) {
-                    came.add(stack.copyWithCount(stack.getCount() - rest.getCount()));
+                int moved = addWhatFits(player, rest);
+                if (moved > 0) {
+                    came.add(stack.copyWithCount(moved));
                     stand.setItemSlot(slot, rest);
                 }
             }
@@ -1375,13 +1394,62 @@ public final class MagnetPull {
     // Into his inventory (D-M 4.4), and the end (4.7)
 
     /**
+     * Puts as much of {@code stack} into his inventory as fits, as picking it up would, and leaves the rest in {@code
+     * stack}. {@code Inventory.add} alone would not do: for a player with infinite materials (Creative) it empties the
+     * stack and reports success when it does not all fit, and the pull would delete what it took from someone (D-M 4.4:
+     * nothing is ever lost).
+     *
+     * @return how many went in
+     */
+    private static int addWhatFits(ServerPlayer player, ItemStack stack) {
+        Inventory inventory = player.getInventory();
+        int fits = Math.min(stack.getCount(), room(inventory, stack));
+        if (fits > 0) {
+            inventory.add(stack.split(fits)); // all of it fits, so nothing is cut away
+        }
+        return fits;
+    }
+
+    /**
+     * How many of the stack the inventory takes now, as {@code Inventory.add} fills it: the room left in the stacks of the
+     * same item (the off hand's too), then whole free slots of the main inventory. A damaged stack only goes into a free
+     * slot.
+     */
+    private static int room(Inventory inventory, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return 0;
+        }
+        int room = 0;
+        if (!stack.isDamaged()) {
+            for (ItemStack there : inventory.items) {
+                room += roomIn(inventory, there, stack);
+            }
+            room += roomIn(inventory, inventory.offhand.get(0), stack);
+        }
+        for (ItemStack there : inventory.items) {
+            if (there.isEmpty()) {
+                room += inventory.getMaxStackSize(stack);
+            }
+        }
+        return room;
+    }
+
+    /** The room a slot's stack has left for more of {@code stack} (the same item, stackable, not full). */
+    private static int roomIn(Inventory inventory, ItemStack there, ItemStack stack) {
+        if (there.isEmpty() || !there.isStackable() || !ItemStack.isSameItemSameComponents(there, stack)) {
+            return 0;
+        }
+        return Math.max(0, inventory.getMaxStackSize(there) - there.getCount());
+    }
+
+    /**
      * Puts what a take gave into his inventory; what does not fit drops at his feet (no motion, the usual pickup delay), and
      * the first time in a pull he reads {@code pull.full}. Nothing waits in between, so nothing on its way can be lost.
      */
     private static void give(Job job, ServerPlayer player, List<ItemStack> stacks) {
         for (ItemStack stack : stacks) {
             ItemStack rest = stack.copy();
-            player.getInventory().add(rest);
+            addWhatFits(player, rest);
             if (rest.isEmpty()) {
                 continue;
             }
@@ -1396,14 +1464,17 @@ public final class MagnetPull {
         }
     }
 
-    /** The pull is over: its line, the clink of the metal arriving; a pull that did nothing makes the next press wait. */
-    private static void finish(Job job, ServerPlayer player) {
+    /**
+     * The pull is over: its line, and the clink of the metal arriving when it took its last target ({@code arrived}; not
+     * when he went too far from where he pressed); a pull that did nothing makes the next press wait.
+     */
+    private static void finish(Job job, ServerPlayer player, boolean arrived) {
         JOBS.remove(player.getUUID());
         tell(job, player);
-        if (job.affected > 0) {
-            job.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 0.8F, 0.7F);
-        } else {
+        if (job.affected == 0) {
             FOUND_NOTHING.put(player.getUUID(), job.level.getGameTime());
+        } else if (arrived) {
+            job.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 0.8F, 0.7F);
         }
     }
 

@@ -382,8 +382,9 @@ public final class MagnetPullTests {
     }
 
     /**
-     * M27. A pull that finds no metal says so and costs nothing: no rest, no hunger. Sneak + R again 5 ticks later does
-     * nothing at all (no line, no new search); 10 ticks after the first it searches again.
+     * M27. A pull that finds no metal says so and costs nothing: no rest, no hunger. Sneak + R again 5 ticks later, and 9,
+     * does nothing at all (no line, no new search); {@code magneto.pullRetryTicks} (10) ticks after the first it searches
+     * again.
      */
     @GameTest(template = ARENA, batch = PULL)
     public static void nothingToPullCostsNothing(GameTestHelper helper) {
@@ -399,14 +400,16 @@ public final class MagnetPullTests {
         long searched = MagnetPull.searchEndedAt(magneto);
         check(searched == level.getGameTime(), "it searched at the press");
 
-        f.everyTick(12, tick -> {
-            if (tick == 5) {
+        int retry = EnhancedConfig.PULL_RETRY_TICKS.get();
+        f.everyTick(retry + 1, tick -> {
+            if (tick == 5 || tick == retry - 1) {
                 sneakR(magneto);
-                check(actionBar(TestKit.sentPackets(magneto)).isEmpty(), "5 ticks later Sneak + R says nothing");
+                check(level.getGameTime() - searched == tick, "pressed " + tick + " ticks after the first");
+                check(actionBar(TestKit.sentPackets(magneto)).isEmpty(), tick + " ticks later Sneak + R says nothing");
                 check(MagnetPull.searchEndedAt(magneto) == searched && !MagnetPull.isPulling(magneto), "and does not search");
-            } else if (tick == 11) {
+            } else if (tick == retry) {
                 sneakR(magneto);
-                check("message.enhanced.pull.nothing".equals(BossTestSupport.lastActionBarKey(magneto)), "after 10 ticks it searches again");
+                check("message.enhanced.pull.nothing".equals(BossTestSupport.lastActionBarKey(magneto)), "after " + retry + " ticks it searches again");
                 check(MagnetPull.searchEndedAt(magneto) == level.getGameTime(), "a new search");
                 return true;
             }
@@ -664,7 +667,7 @@ public final class MagnetPullTests {
 
     /**
      * M50. The pull stays where he pressed: teleported 100 blocks away after 2 pull ticks (one a tick), exactly 2 were
-     * taken, 20 ticks later still 2, and the pull is over.
+     * taken, 20 ticks later still 2, and the pull is over, with the line for what came so far.
      */
     @GameTest(template = ARENA, batch = "magnet_pull_move")
     public static void theJobStaysWhereHePressed(GameTestHelper helper) {
@@ -681,9 +684,11 @@ public final class MagnetPullTests {
             if (tick == 2) {
                 check(taken(helper, blocks) == 2, "2 taken: " + taken(helper, blocks));
                 magneto.teleportTo(helper.getLevel(), magneto.getX() + 100.0, magneto.getY(), magneto.getZ(), magneto.getYRot(), 0.0F);
+                TestKit.sentPackets(magneto);
             }
             if (tick == 3) {
                 check(!MagnetPull.isPulling(magneto), "the pull ends once he is far from where he pressed");
+                check("message.enhanced.pull.done".equals(BossTestSupport.lastActionBarKey(magneto)), "and he reads that the metal came");
             }
             if (tick == 22) {
                 check(taken(helper, blocks) == 2, "and 20 ticks later still exactly 2: " + taken(helper, blocks));
@@ -698,8 +703,8 @@ public final class MagnetPullTests {
 
     /**
      * M32. A claim that refuses everything: nothing comes, he reads that the metal here is protected, and the pull does not
-     * rest. A claim on the chunks west of a border: the ores and the ingot there stay, those east of it come, and he reads
-     * that the rest is protected. In Adventure the ores stay and a dropped ingot comes. In the cylinder of a running fight,
+     * rest. A claim on the chunks west of a border: the ores and the ingot there stay, those east of it come, an ingot found
+     * east of it that drifts onto the claim before its turn stays there, and he reads that the rest is protected. In Adventure the ores stay and a dropped ingot comes. In the cylinder of a running fight,
      * protected or not (R5), the ore stays and the one outside comes.
      */
     @GameTest(template = ARENA, batch = "magnet_pull_rights", timeoutTicks = 100)
@@ -745,6 +750,8 @@ public final class MagnetPullTests {
         }
         ItemEntity westIngot = ingot(helper, new Vec3(east - 0.5, FLOOR, 10.5));
         ItemEntity eastIngot = ingot(helper, new Vec3(east + 0.5, FLOOR, 10.5));
+        // Found east of the border, the farthest of the targets: it drifts onto the claim before its turn comes.
+        ItemEntity drifter = ingot(helper, new Vec3(east + 0.5, FLOOR, 15.5));
         ServerPlayer second = f.player(standX, FLOOR, 10.5, Power.MAGNETO);
         List<Object> secondPackets = new ArrayList<>();
         TestKit.sentPackets(second);
@@ -759,11 +766,16 @@ public final class MagnetPullTests {
                 PowerTicker.tick(second);
                 secondPackets.addAll(TestKit.sentPackets(second));
             }
+            if (tick == 1) {
+                check(MagnetPull.isPulling(second) && drifter.isAlive(), "the pull has taken the nearest, not yet the drifting ingot");
+                drifter.setPos(helper.absoluteVec(new Vec3(east - 0.5, FLOOR, 15.5)));
+            }
             if (tick == 6) {
                 NeoForge.EVENT_BUS.unregister(west);
                 check(!MagnetPull.isPulling(second), "the second pull is over");
                 check(westOres.stream().allMatch(ore -> helper.getBlockState(ore).is(Blocks.IRON_ORE)), "the claimed ores stay");
                 check(westIngot.isAlive(), "and so does the ingot on the claim");
+                check(drifter.isAlive() && drifter.getX() < border, "and the ingot that drifted onto the claim before its turn stays there");
                 check(eastOres.stream().allMatch(ore -> helper.getBlockState(ore).is(Blocks.STONE)) && !eastIngot.isAlive(),
                         "the ores and the ingot east of the border come");
                 check(count(second, Items.RAW_IRON) == 2 && count(second, Items.IRON_INGOT) == 1, "two raw iron and an ingot are his");
@@ -771,6 +783,7 @@ public final class MagnetPullTests {
                 check(!lines.isEmpty() && "message.enhanced.pull.done_protected".equals(lines.get(lines.size() - 1)),
                         "he reads that the rest is protected: " + lines);
                 westIngot.discard();
+                drifter.discard();
                 for (BlockPos ore : westOres) {
                     helper.setBlock(ore, Blocks.STONE);
                 }
@@ -1084,8 +1097,59 @@ public final class MagnetPullTests {
     }
 
     /**
+     * M23 in Creative (D-M 4.4: nothing is ever lost). For a Creative player the game's {@code Inventory.add} empties a
+     * stack that does not fit and calls it done. A Creative Magneto with a full inventory, with PvP and {@code
+     * magneto.pullFromStorage} on: the ore's raw iron and the sword torn from A's hand drop at his feet (he reads it once),
+     * and the chest keeps its ingots, the item frame its sword and the armour stand its chestplate, as for anyone without
+     * room.
+     */
+    @GameTest(template = ARENA, batch = "magnet_pull_full_creative")
+    public static void aFullInventoryInCreativeLosesNothing(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        f.config(EnhancedConfig.PULL_FROM_STORAGE, true);
+        ServerPlayer magneto = f.player(10.5, FLOOR, 10.5, GameType.CREATIVE);
+        Powers.setPower(magneto, Power.MAGNETO);
+        TestKit.look(magneto, TestKit.EAST, 0.0F);
+        check(magneto.hasInfiniteMaterials(), "Magneto plays in Creative");
+        for (int slot = 0; slot < magneto.getInventory().items.size(); slot++) {
+            magneto.getInventory().setItem(slot, new ItemStack(Items.DIRT, 64));
+        }
+        BlockPos ore = new BlockPos(10, 1, 6);
+        helper.setBlock(ore, Blocks.IRON_ORE);
+        ServerPlayer a = f.player(14.5, FLOOR, 10.5);
+        a.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+        BlockPos chest = new BlockPos(13, 2, 8);
+        helper.setBlock(chest, Blocks.CHEST);
+        container(helper, chest).setItem(0, new ItemStack(Items.IRON_INGOT, 5));
+        ItemFrame frame = frame(helper, new BlockPos(14, 3, 13), new ItemStack(Items.IRON_SWORD));
+        ArmorStand stand = stand(helper, new Vec3(12.5, FLOOR, 14.5), Items.IRON_CHESTPLATE);
+        check(Raycasts.inSight(magneto, a.getEyePosition()) && seen(helper, magneto, chest.getX(), chest.getY(), chest.getZ()),
+                "he sees A and the chest");
+        List<Object> packets = new ArrayList<>();
+        TestKit.sentPackets(magneto);
+        sneakR(magneto);
+        packets.addAll(TestKit.sentPackets(magneto));
+        f.everyTick(20, tick -> {
+            PowerTicker.tick(magneto);
+            packets.addAll(TestKit.sentPackets(magneto));
+            if (MagnetPull.isPulling(magneto)) {
+                return false;
+            }
+            check(helper.getBlockState(ore).is(Blocks.STONE) && a.getMainHandItem().isEmpty(), "the ore gave its iron and A lost his sword");
+            check(atFeet(helper, magneto, Items.RAW_IRON) == 1, "the raw iron lies at his feet");
+            check(atFeet(helper, magneto, Items.IRON_SWORD) == 1, "and so does A's sword: nothing is lost");
+            check(container(helper, chest).getItem(0).getCount() == 5, "the chest keeps its ingots");
+            check(frame.getItem().is(Items.IRON_SWORD), "the frame keeps its sword");
+            check(stand.getItemBySlot(EquipmentSlot.CHEST).is(Items.IRON_CHESTPLATE), "the stand keeps its chestplate");
+            check(actionBar(packets).stream().filter("message.enhanced.pull.full"::equals).count() == 1, "he read that his inventory is full, once");
+            return true;
+        });
+    }
+
+    /**
      * M48 (R38). With {@code magneto.pullFromStorage} off: a chest keeps its ingots, a barrel its sword, an item frame its
-     * ingot; the ingot lying beside them comes.
+     * ingot, an armour stand its iron chestplate; the ingot lying beside them comes.
      */
     @GameTest(template = ARENA, batch = PULL)
     public static void aChestKeepsItsMetal(GameTestHelper helper) {
@@ -1097,6 +1161,8 @@ public final class MagnetPullTests {
         helper.setBlock(new BlockPos(13, 2, 12), Blocks.BARREL);
         container(helper, new BlockPos(13, 2, 12)).setItem(0, new ItemStack(Items.IRON_SWORD));
         ItemFrame frame = frame(helper, new BlockPos(14, 3, 10), new ItemStack(Items.IRON_INGOT));
+        ArmorStand stand = stand(helper, new Vec3(12.5, FLOOR, 14.5), Items.IRON_CHESTPLATE);
+        check(Raycasts.inSight(magneto, stand.position().add(0, stand.getBbHeight() * 0.5, 0)), "he sees the armour stand");
         ItemEntity loose = ingot(helper, new Vec3(12.5, FLOOR, 10.5));
         sneakR(magneto);
         afterThePull(f, magneto, 20, () -> {
@@ -1104,6 +1170,8 @@ public final class MagnetPullTests {
             check(chest.is(Items.IRON_INGOT) && chest.getCount() == 10, "the chest keeps its 10 ingots");
             check(container(helper, new BlockPos(13, 2, 12)).getItem(0).is(Items.IRON_SWORD), "the barrel keeps its sword");
             check(frame.isAlive() && frame.getItem().is(Items.IRON_INGOT), "the frame keeps its ingot");
+            check(stand.isAlive() && stand.getItemBySlot(EquipmentSlot.CHEST).is(Items.IRON_CHESTPLATE)
+                    && count(magneto, Items.IRON_CHESTPLATE) == 0, "the armour stand keeps its iron chestplate");
             check(!loose.isAlive() && count(magneto, Items.IRON_INGOT) == 1 && count(magneto, Items.IRON_SWORD) == 0,
                     "the loose ingot is his, and nothing else");
             check(level.getBlockState(helper.absolutePos(new BlockPos(13, 2, 8))).is(Blocks.CHEST), "the chest stands");
@@ -1113,9 +1181,11 @@ public final class MagnetPullTests {
     /**
      * M57 (R38). With {@code magneto.pullFromStorage} on: the iron of a chest in sight is his and its dirt stays; an item
      * frame's sword and an armour stand's chestplate are his, the frame and the stand stay; a fisherman's claimed barrel
-     * keeps its iron, and so does a chest behind a wall; and a chest on someone's claim keeps its iron.
+     * keeps its iron, and so does a chest behind a wall. The claims are asked for a frame or a stand as for a chest: an
+     * armour stand on a claimed cell keeps its chestplate while a loose ingot beside it comes; a chest on someone's claim
+     * keeps its iron; and a Magneto in Adventure takes a loose ingot but no frame's or stand's metal.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_storage", timeoutTicks = 60)
+    @GameTest(template = ARENA, batch = "magnet_pull_storage", timeoutTicks = 100)
     public static void storageOnlyWhenAsked(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_FROM_STORAGE, true);
@@ -1126,10 +1196,7 @@ public final class MagnetPullTests {
         container(helper, chest).setItem(0, new ItemStack(Items.IRON_INGOT, 5));
         container(helper, chest).setItem(1, new ItemStack(Items.DIRT, 7));
         ItemFrame frame = frame(helper, new BlockPos(14, 3, 13), new ItemStack(Items.IRON_SWORD));
-        ArmorStand stand = new ArmorStand(level, 0, 0, 0);
-        stand.moveTo(helper.absoluteVec(new Vec3(12.5, FLOOR, 14.5)));
-        stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
-        level.addFreshEntity(stand);
+        ArmorStand stand = stand(helper, new Vec3(12.5, FLOOR, 14.5), Items.IRON_CHESTPLATE);
         BlockPos barrel = new BlockPos(16, 2, 10);
         helper.setBlock(barrel, Blocks.BARREL);
         container(helper, barrel).setItem(0, new ItemStack(Items.IRON_INGOT, 4));
@@ -1142,7 +1209,13 @@ public final class MagnetPullTests {
             }
         }
         BlockPos claimedChest = new BlockPos(12, 2, 5);
-        f.everyTick(50, tick -> {
+        ServerPlayer[] adventurer = new ServerPlayer[1];
+        ItemEntity[] loose = new ItemEntity[1];
+        List<Consumer<BlockEvent.BreakEvent>> claims = new ArrayList<>();
+        f.onClose(() -> claims.forEach(NeoForge.EVENT_BUS::unregister));
+        List<Object> packets = new ArrayList<>();
+        int[] stage = {0};
+        f.everyTick(90, tick -> {
             if (tick == 2) {
                 BlockPos pos = helper.absolutePos(barrel);
                 check(level.getPoiManager().take(type -> true, (type, p) -> p.equals(pos), pos, 1).isPresent(), "a fisherman claims the barrel");
@@ -1156,33 +1229,81 @@ public final class MagnetPullTests {
                 return false;
             }
             PowerTicker.tick(magneto);
-            if (tick < 20 || MagnetPull.isPulling(magneto)) {
+            packets.addAll(TestKit.sentPackets(magneto));
+            if (adventurer[0] != null) {
+                PowerTicker.tick(adventurer[0]);
+            }
+            if (MagnetPull.isPulling(magneto) || adventurer[0] != null && MagnetPull.isPulling(adventurer[0])) {
                 return false;
             }
-            if (tick == 20) {
-                check(container(helper, chest).getItem(0).isEmpty() && count(magneto, Items.IRON_INGOT) == 5, "the chest's 5 ingots are his");
-                check(container(helper, chest).getItem(1).is(Items.DIRT) && helper.getBlockState(chest).is(Blocks.CHEST), "its dirt and the chest stay");
-                check(frame.isAlive() && frame.getItem().isEmpty() && count(magneto, Items.IRON_SWORD) == 1, "the frame's sword is his; the frame stays");
-                check(stand.isAlive() && stand.getItemBySlot(EquipmentSlot.CHEST).isEmpty() && count(magneto, Items.IRON_CHESTPLATE) == 1,
-                        "the stand's chestplate is his; the stand stays");
-                check(container(helper, barrel).getItem(0).getCount() == 4, "the fisherman's barrel keeps its iron");
-                check(container(helper, hiddenChest).getItem(0).getCount() == 3, "the chest behind the wall keeps its iron");
+            switch (stage[0]++) {
+                case 0 -> {
+                    check(container(helper, chest).getItem(0).isEmpty() && count(magneto, Items.IRON_INGOT) == 5, "the chest's 5 ingots are his");
+                    check(container(helper, chest).getItem(1).is(Items.DIRT) && helper.getBlockState(chest).is(Blocks.CHEST), "its dirt and the chest stay");
+                    check(frame.isAlive() && frame.getItem().isEmpty() && count(magneto, Items.IRON_SWORD) == 1, "the frame's sword is his; the frame stays");
+                    check(stand.isAlive() && stand.getItemBySlot(EquipmentSlot.CHEST).isEmpty() && count(magneto, Items.IRON_CHESTPLATE) == 1,
+                            "the stand's chestplate is his; the stand stays");
+                    check(container(helper, barrel).getItem(0).getCount() == 4, "the fisherman's barrel keeps its iron");
+                    check(container(helper, hiddenChest).getItem(0).getCount() == 3, "the chest behind the wall keeps its iron");
 
-                // A claim on one chest's cell.
-                helper.setBlock(claimedChest, Blocks.CHEST);
-                check(seen(helper, magneto, claimedChest.getX(), claimedChest.getY(), claimedChest.getZ()), "he sees the chest on the claim");
-                container(helper, claimedChest).setItem(0, new ItemStack(Items.IRON_INGOT, 2));
-                BlockPos claimed = helper.absolutePos(claimedChest);
-                Consumer<BlockEvent.BreakEvent> claim = event -> event.setCanceled(event.getPos().equals(claimed));
-                NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, claim);
-                f.onClose(() -> NeoForge.EVENT_BUS.unregister(claim));
-                Powers.get(magneto).startCooldown(1, level.getGameTime(), 0);
-                sneakR(magneto);
-                return false;
+                    // A claim on the armour stand's cell only: the section round it is anyone's, so only the stand's own
+                    // break check can refuse it.
+                    stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+                    BlockPos standCell = stand.blockPosition();
+                    Consumer<BlockEvent.BreakEvent> standClaim = event -> event.setCanceled(event.getPos().equals(standCell));
+                    NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, standClaim);
+                    claims.add(standClaim);
+                    loose[0] = ingot(helper, new Vec3(12.5, FLOOR, 12.5));
+                    Powers.get(magneto).startCooldown(1, level.getGameTime(), 0);
+                    packets.clear();
+                    sneakR(magneto);
+                    packets.addAll(TestKit.sentPackets(magneto));
+                }
+                case 1 -> {
+                    check(stand.getItemBySlot(EquipmentSlot.CHEST).is(Items.IRON_CHESTPLATE) && count(magneto, Items.IRON_CHESTPLATE) == 1,
+                            "the armour stand on someone's claim keeps its chestplate");
+                    check(!loose[0].isAlive() && count(magneto, Items.IRON_INGOT) == 6, "while the loose ingot beside it comes");
+                    List<String> lines = actionBar(packets);
+                    check(!lines.isEmpty() && "message.enhanced.pull.done_protected".equals(lines.get(lines.size() - 1)),
+                            "and he reads that the rest is protected: " + lines);
+                    stand.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
+                    claims.forEach(NeoForge.EVENT_BUS::unregister);
+
+                    // A claim on one chest's cell.
+                    helper.setBlock(claimedChest, Blocks.CHEST);
+                    check(seen(helper, magneto, claimedChest.getX(), claimedChest.getY(), claimedChest.getZ()), "he sees the chest on the claim");
+                    container(helper, claimedChest).setItem(0, new ItemStack(Items.IRON_INGOT, 2));
+                    BlockPos claimed = helper.absolutePos(claimedChest);
+                    Consumer<BlockEvent.BreakEvent> claim = event -> event.setCanceled(event.getPos().equals(claimed));
+                    NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, claim);
+                    claims.add(claim);
+                    Powers.get(magneto).startCooldown(1, level.getGameTime(), 0);
+                    sneakR(magneto);
+                }
+                case 2 -> {
+                    check(container(helper, claimedChest).getItem(0).getCount() == 2 && count(magneto, Items.IRON_INGOT) == 6,
+                            "the chest on someone's claim keeps its iron");
+
+                    // Adventure, no claim anywhere: what lies on the ground is anyone's; a frame or a stand is someone's build,
+                    // as a chest is.
+                    claims.forEach(NeoForge.EVENT_BUS::unregister);
+                    frame.setItem(new ItemStack(Items.IRON_SWORD));
+                    stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+                    loose[0] = ingot(helper, new Vec3(12.5, FLOOR, 12.5));
+                    adventurer[0] = f.player(10.5, FLOOR, 10.5, GameType.ADVENTURE);
+                    Powers.setPower(adventurer[0], Power.MAGNETO);
+                    TestKit.look(adventurer[0], TestKit.EAST, 0.0F);
+                    sneakR(adventurer[0]);
+                }
+                default -> {
+                    check(!loose[0].isAlive() && count(adventurer[0], Items.IRON_INGOT) == 1, "in Adventure the loose ingot comes");
+                    check(frame.getItem().is(Items.IRON_SWORD) && count(adventurer[0], Items.IRON_SWORD) == 0, "but the frame keeps its sword");
+                    check(stand.getItemBySlot(EquipmentSlot.CHEST).is(Items.IRON_CHESTPLATE) && count(adventurer[0], Items.IRON_CHESTPLATE) == 0,
+                            "and the stand its chestplate");
+                    return true;
+                }
             }
-            check(container(helper, claimedChest).getItem(0).getCount() == 2 && count(magneto, Items.IRON_INGOT) == 5,
-                    "the chest on someone's claim keeps its iron");
-            return true;
+            return false;
         });
     }
 
@@ -1759,6 +1880,15 @@ public final class MagnetPullTests {
         return frame;
     }
 
+    /** An armour stand at {@code relative} wearing {@code chest} on its chest. */
+    private static ArmorStand stand(GameTestHelper helper, Vec3 relative, Item chest) {
+        ArmorStand stand = new ArmorStand(helper.getLevel(), 0, 0, 0);
+        stand.moveTo(helper.absoluteVec(relative));
+        stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(chest));
+        helper.getLevel().addFreshEntity(stand);
+        return stand;
+    }
+
     private static <T extends net.minecraft.world.entity.vehicle.AbstractMinecart> T cart(GameTestHelper helper, EntityType<T> type, Vec3 relative) {
         T cart = type.create(helper.getLevel());
         cart.moveTo(helper.absoluteVec(relative));
@@ -1783,6 +1913,17 @@ public final class MagnetPullTests {
             }
         }
         return cells;
+    }
+
+    /** How many of {@code item} lie on the ground within 1.5 blocks of the player's feet. */
+    private static int atFeet(GameTestHelper helper, ServerPlayer player, Item item) {
+        int n = 0;
+        for (ItemEntity e : helper.getEntities(EntityType.ITEM)) {
+            if (e.getItem().is(item) && e.position().distanceTo(player.position()) <= 1.5) {
+                n += e.getItem().getCount();
+            }
+        }
+        return n;
     }
 
     private static long taken(GameTestHelper helper, List<BlockPos> cells) {
