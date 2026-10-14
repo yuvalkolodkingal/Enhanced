@@ -32,6 +32,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -457,6 +458,43 @@ public final class MagnetoMetalTests {
                     "it was heard breaking");
             return true;
         });
+    }
+
+    /**
+     * Spec 5.5 (V at someone's pet: "hostile only"). With PvP off, V at another player's tamed horse in iron horse armour
+     * takes nothing: the armour stays on, nothing falls, V does not rest, and he reads that PvP is off. His own horse's
+     * armour V tears off, as in 3.0.
+     */
+    @GameTest(template = ARENA, batch = METAL)
+    public static void anotherPlayersHorseKeepsItsArmour(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
+        PowerData data = Powers.get(magneto);
+        ServerPlayer owner = f.player(18.5, FLOOR, 18.5);
+        Horse theirs = helper.spawnWithNoFreeWill(EntityType.HORSE, new Vec3(10.5, FLOOR, 7.5));
+        theirs.tameWithName(owner);
+        theirs.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
+        check(Metal.isRealGear(theirs, EquipmentSlot.BODY), "the horse's armour is real gear, which it would drop");
+
+        lookAt(magneto, theirs);
+        BossTestSupport.lastActionBarKey(magneto);
+        AbilityHandler.onKey(magneto, 3, true);
+        String said = BossTestSupport.lastActionBarKey(magneto);
+        check("message.enhanced.disarm.no_pvp".equals(said), "V at another player's horse with PvP off says so, not " + said);
+        check(theirs.getBodyArmorItem().is(Items.IRON_HORSE_ARMOR), "the horse keeps its armour");
+        check(items(helper, Items.IRON_HORSE_ARMOR).isEmpty(), "and nothing falls");
+        check(data.isReady(3, level.getGameTime()), "and V does not rest");
+
+        Horse his = helper.spawnWithNoFreeWill(EntityType.HORSE, new Vec3(10.5, FLOOR, 13.5));
+        his.tameWithName(magneto);
+        his.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
+        lookAt(magneto, his);
+        AbilityHandler.onKey(magneto, 3, true);
+        check(his.getBodyArmorItem().isEmpty() && items(helper, Items.IRON_HORSE_ARMOR).size() == 1, "his own horse's armour V tears off");
+        check(!data.isReady(3, level.getGameTime()), "and then rests");
+        check(theirs.getBodyArmorItem().is(Items.IRON_HORSE_ARMOR), "the other horse still wears its own");
+        helper.succeed();
     }
 
     // ------------------------------------------------------------------------------------------------------------

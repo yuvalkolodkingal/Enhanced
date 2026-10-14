@@ -21,6 +21,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -226,9 +227,11 @@ public final class MagnetoAbilities {
 
     /**
      * V: every metal piece the target wears or holds (D-M 5). A player only when Magneto may hurt him (PvP on, no
-     * teammate, not in Creative), or V says why not; a conjured body (a Loki illusion) dissolves and gives nothing; a boss
-     * answers through its own hook; gear that is not real crumbles; what is torn off a creature is marked for his pull; an
-     * Iron Spider's nanites scatter; and when the metal is the body itself, V says to lift it with R.
+     * teammate, not in Creative), or V says why not; a conjured body (a Loki illusion) dissolves and gives nothing; what
+     * another player owns (a pet, a horse, a drone, the Hex's Vision) only when it is hostile to him ({@link AreaTargets},
+     * spec 5.5), or V says why not, as for its owner; a boss answers through its own hook; gear that is not real crumbles;
+     * what is torn off a creature is marked for his pull; an Iron Spider's nanites scatter; and when the metal is the body
+     * itself, V says to lift it with R.
      */
     private static void disarm(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
@@ -255,6 +258,13 @@ public final class MagnetoAbilities {
             Metal.dissolve(target, hit.getLocation());
             player.displayClientMessage(Component.translatable("message.enhanced.disarm.illusion"), true);
             data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
+            return;
+        }
+        if (ownedByAnother(player, target) && !AreaTargets.mayHurt(player, target, false)) {
+            // Another player's creature keeps its gear unless it is after him: what it wears is its owner's, so he reads
+            // the owner's rule. Nothing is taken and nothing is spent.
+            player.displayClientMessage(Component.translatable(player.server.isPvpAllowed()
+                    ? "message.enhanced.disarm.not_allowed" : "message.enhanced.disarm.no_pvp"), true);
             return;
         }
         if (target instanceof BossHooks boss && boss.onMagnetoStrip(player)) {
@@ -298,6 +308,11 @@ public final class MagnetoAbilities {
         beam(level, player.getEyePosition(), target.position().add(0, target.getBbHeight() * 0.6, 0));
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1.0F, 0.6F);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 1.0F, 0.8F);
+    }
+
+    /** Whether a player other than Magneto owns the creature (a tamed pet or horse, an Ultron hero's drone, the Hex's Vision). */
+    private static boolean ownedByAnother(ServerPlayer player, LivingEntity target) {
+        return target instanceof OwnableEntity pet && pet.getOwnerUUID() != null && !pet.getOwnerUUID().equals(player.getUUID());
     }
 
     /** A line of magnetic sparks between two points. */
