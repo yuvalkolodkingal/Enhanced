@@ -136,7 +136,7 @@ When a body's health reaches zero, Ultron does not die:
 Two ways to stop an upload or to cheat death:
 
 * **Vision.** A Vision within 48 blocks cuts the net, as in the film: Ultron can only upload into a Sentry within 12 blocks of his body. Then, at the end, he says *"Stark asked for a savior, and settled for a slave."* The Mind Stone beam also does half again as much to Ultron and the Sentries.
-* **Wanda's heart rip.** When a body is at 15% health or less, a **Scarlet Witch** who uses Telekinesis (**V**) on him tears out his core: the body is destroyed at once. She can also crush any Sentry she picks up by launching it.
+* **Wanda's heart rip.** When a body is at 15% health or less, a **Scarlet Witch** who uses Telekinesis (**V**) on him, **or presses V again while she holds him**, tears out his core: the body is destroyed at once. She can also crush any Sentry she picks up by launching it.
 
 At the end the last body falls open and fades; every Sentry left falls and explodes; he says *"Life... life always decides."* The Cores are given out and the island lowers.
 
@@ -144,10 +144,10 @@ At the end the last body falls open and fades; every Sentry left falls and explo
 
 From the ritual until the fight is over, the arena (the island, the pit and the air between) is protected:
 
-* **No building, no breaking.** No blocks placed or broken, no water or lava, no pistons. Explosions hurt, but break nothing. Mobs break nothing, and nothing spawns naturally. Wanda's block-lifting, Tommy's Molecular Acceleration and every other block-changing ability of the mod is refused inside it.
+* **No building, no breaking.** No blocks placed or broken, no water or lava, no pistons. Explosions hurt, but break nothing. Mobs break nothing, and nothing spawns naturally. Tommy's Molecular Acceleration and every other block-changing ability of the mod is refused inside it. **Telekinesis only borrows a block**: the hole mends, the block crumbles, and from the warning until the island is up, and from the descent on, the ground lends nothing. The island in the sky is protected even on a server that turns arena protection off. Build Magic and the Magnetic Pull change no block of it either.
 * **No leaving.** Ender Pearls, Chorus Fruit, the Bifrost, Vanish, the Tesseract's jump, the Witches' Road, Vibrate and Nether portals are cancelled for anyone who would leave the arena. The field pulls you back.
 * **No hiding.** Anyone more than 12 blocks below the ground (in a cave or a shaft) is pulled back up. Sentries fly into caves anyway.
-* **No cheating the machine.** Ultron cannot be slowed, frozen, pinned, confused, shapeshifted, mind-controlled or lifted by telekinesis: he is a machine on a network. Quicksilver's slowdown does not touch him (it slows the Sentries and their bolts). A Hex only bounces him, until the island starts to rise: from then until the end of the fight its wall lets him, his Sentries and the fighters through.
+* **No cheating the machine.** Ultron cannot be slowed, frozen, pinned, confused, shapeshifted or mind-controlled. **Telekinesis holds him only as a boss**: never while he is shielded, changing bodies or carried by the lift, for 3 seconds at most (Billy 1.5, Magneto 4.5), and then not again for 12 seconds; he does nothing while held or for the first second of a throw, and a grab does not end his stagger. Quicksilver's slowdown does not touch him (it slows the Sentries and their bolts). A Hex only bounces him, until the island starts to rise: from then until the end of the fight its wall lets him, his Sentries and the fighters through.
 * **No farming.** Sentries and bodies drop nothing and give no experience. What a dead fighter dropped stays on the island and does not despawn until it lands.
 * **Allies do not count.** Tamed wolves and Iron Golems may hurt him, but their damage is not credited to a player.
 
@@ -166,8 +166,8 @@ From the ritual until the fight is over, the arena (the island, the pit and the 
 
 | Hero | Against Ultron |
 |---|---|
-| **Scarlet Witch** | The Chaos Beam does normal damage; the Chaos Shield stops every bolt and the Finger Beams (not the shockwaves); her Telekinesis lifts Sentries but not the bodies, and tears out the heart of a body at 15% or less. The Hex bounces the bodies and kills the Sentries at its wall until the island starts to rise; from then until the fight is over, its wall lets everyone in the fight through: the fighters, the bodies and the Sentries. (With the Tremor it never does.) |
-| **Magneto** | The Sentries are magnetic: he can lift and throw them. Ultron's bodies are vibranium, which is not magnetic. |
+| **Scarlet Witch** | The Chaos Beam does normal damage; the Chaos Shield stops every bolt and the Finger Beams (not the shockwaves); her Telekinesis lifts Sentries and, as a boss, the bodies, and tears out the heart of a body at 15% or less (also while she holds it). The Hex bounces the bodies and kills the Sentries at its wall until the island starts to rise; from then until the fight is over, its wall lets everyone in the fight through: the fighters, the bodies and the Sentries. (With the Tremor it never does.) |
+| **Magneto** | **Vibranium is metal**: he can hold a body for 4.5 seconds, as a boss, and a Sentry he throws is crushed; his strip finds nothing to tear off; his pull never takes the arena's or the island's ground. |
 | **Quicksilver** | His Time slows the Sentries and their bolts, not the bodies. His Speed Blitz works on both. |
 | **Vision** | Cuts Ultron's uploads, and his Mind Stone beam does half again as much. |
 | **Thor** | Lightning does 1.25 times to the bodies and Sentries and stuns a Sentry for 3 seconds. Mjolnir can pin a Sentry but not a body. The lift does not call a thrown weapon back: it finishes its throw and flies back to Thor's hand, as it always does. |
@@ -243,7 +243,7 @@ G (or double-tap Space) toggles flight at speed 0.10: upright, level and quiet (
 
 ### The vibranium body
 
-You get **+10 maximum health** (15 hearts), **+8 armour**, +30% knockback resistance and **no fall damage**. You are never hungry and never out of breath, and Poison and the Wither do nothing. He is also **not magnetic** (vibranium), so Magneto's metal control does nothing to you unless you wear iron, chainmail or gold armour. But you are **electronics**: lightning does **1.25 times** damage to you.
+You get **+10 maximum health** (15 hearts), **+8 armour**, +30% knockback resistance and **no fall damage**. You are never hungry and never out of breath, and Poison and the Wither do nothing. Your vibranium is **metal**: Magneto can lift and throw you (a throw hurts you only with PvP on) and, with PvP on, his pull tugs you; his strip has nothing to take. But you are **electronics**: lightning does **1.25 times** damage to you.
 
 ### Looks
 

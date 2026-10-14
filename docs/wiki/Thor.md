@@ -25,7 +25,7 @@ H = Heavy Core
 R = Breeze Rod (the handle)
 ```
 
-Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava can't destroy it. Speedsters can't snatch it and telekinesis can't lift it.
+Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava can't destroy it. Speedsters can't snatch it and telekinesis can't lift it, not even Magneto's.
 
 ### The worthy
 
@@ -99,7 +99,7 @@ S = Nether Star (the dying star)
 L = any log (Groot's arm)
 ```
 
-Stormbreaker carries no enchantment of worthiness: **anyone can wield it**, and nobody owns it. It is an axe (it chops wood, strips logs and knocks shields aside) that hits harder than any other (12 attack damage), never breaks and can't burn. It doesn't make anyone Thor, but whoever holds it can call **the Bifrost** (below). In Thor's hands it does most of what Mjolnir does: he throws it, calls it back, flies with it and fires his lightning beam through it. (It doesn't shatter, and it can't pin anyone.) Unlike Mjolnir, a speedster can snatch it out of a hand.
+Stormbreaker carries no enchantment of worthiness: **anyone can wield it**, and nobody owns it. It is an axe (it chops wood, strips logs and knocks shields aside) that hits harder than any other (12 attack damage), never breaks and can't burn. It doesn't make anyone Thor, but whoever holds it can call **the Bifrost** (below). In Thor's hands it does most of what Mjolnir does: he throws it, calls it back, flies with it and fires his lightning beam through it. (It doesn't shatter, and it can't pin anyone.) Unlike Mjolnir, a speedster can snatch it out of a hand. It is metal: Magneto can lift it, tear it from a hand, and pull it.
 
 ## Mjolnir or Stormbreaker?
 
