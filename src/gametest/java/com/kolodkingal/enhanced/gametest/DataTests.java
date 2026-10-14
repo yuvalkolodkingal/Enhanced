@@ -640,6 +640,38 @@ public final class DataTests {
         helper.succeed();
     }
 
+    /**
+     * The longest a Build Magic line may be, numbers and names included (each %s counted as {@value #BUILD_SAMPLE_CHARS}
+     * characters): the action bar never wraps and the window's default (854 x 480, GUI scale 2) is 427 pixels wide, where
+     * a character is about 5 pixels in either language, so 56 characters (at most about 290 pixels) are read whole and
+     * stand clear of the hint strip's corner (measured on the font's own glyphs, joint check findings 1 and 7).
+     */
+    private static final int BUILD_LINE_CHARS = 56;
+    private static final int BUILD_SAMPLE_CHARS = 6;
+
+    /** Every line Build Magic says (message.enhanced.build.*) is short enough to be read whole at the default window. */
+    @GameTest(template = ARENA)
+    public static void everyBuildMagicLineIsShortEnoughToReadWhole(GameTestHelper helper) throws IOException {
+        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        List<String> tooLong = new ArrayList<>();
+        int seen = 0;
+        for (String name : List.of("en_us", "he_il")) {
+            for (var entry : lang(mod, name).entrySet()) {
+                if (!entry.getKey().startsWith("message.enhanced.build.")) {
+                    continue;
+                }
+                seen++;
+                String line = entry.getValue().getAsString().replaceAll("%(\\d+\\$)?s", "x".repeat(BUILD_SAMPLE_CHARS));
+                if (line.length() > BUILD_LINE_CHARS) {
+                    tooLong.add(name + " " + entry.getKey() + " (" + line.length() + "): " + line);
+                }
+            }
+        }
+        check(seen >= 2 * 50, "the Build Magic lines were found in both languages: " + seen);
+        check(tooLong.isEmpty(), "Build Magic lines over " + BUILD_LINE_CHARS + " characters: " + tooLong);
+        helper.succeed();
+    }
+
     private static boolean says(Component text, String key) {
         return text.getContents() instanceof TranslatableContents contents && contents.getKey().equals(key);
     }
