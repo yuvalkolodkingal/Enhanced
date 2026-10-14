@@ -278,6 +278,7 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
         }
         // The wall holds him; should something carry him through it anyway, he is back with Wanda.
         if (!hex.contains(position().add(0, getBbHeight() * 0.5, 0))) {
+            HexManager.releaseCarried(this); // a grip that carried him out lets go, and its holder is told
             moveToPost(hex, owner, true);
             return;
         }
