@@ -47,7 +47,8 @@ import org.lwjgl.glfw.GLFW;
  *     the second knob), else the hotbar's.</li>
  * </ul>
  *
- * <p>At logout everything of the builder is forgotten ({@link BuildClient#clear}, {@link BuildFx#clear}).
+ * <p>At logout everything of the builder is forgotten ({@link BuildClient#clear}, {@link BuildFx#clear},
+ * {@link BuildRenderer#clear}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class BuildInput {
@@ -303,12 +304,16 @@ public final class BuildInput {
         }
     }
 
-    /** Logging out forgets everything of the builder: his state, the grammar, the spells seen (spec 5.6). */
+    /**
+     * Logging out forgets everything of the builder: his state, the grammar, the spells seen, the glow kept on the
+     * graphics card (spec 5.6).
+     */
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         reset();
         BuildClient.clear();
         BuildFx.clear();
+        BuildRenderer.clear();
     }
 
     private static void reset() {
