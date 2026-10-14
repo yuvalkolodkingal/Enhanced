@@ -145,7 +145,7 @@ public final class UndoHistory {
             forgotten++;
         }
         UndoFiles.sealed(this, step);
-        return forgotten;
+        return forgotten + UndoCaps.enforce(this);
     }
 
     /** A step read from disk goes in as it was: undone ({@code redo}) or one Ctrl + Z can work on, after the others. */
@@ -204,6 +204,27 @@ public final class UndoHistory {
     /** The steps that were undone and can be done again, oldest first. */
     public List<UndoStep> undoneSteps() {
         return new ArrayList<>(undone);
+    }
+
+    /**
+     * The steps Ctrl + Z would work on, one after the other, up to {@code n}: a partly undone step first, then the newest
+     * that can be undone, and so on (an operator's {@code /enhanced build undo <player> <steps>}).
+     */
+    List<UndoStep> toUndo(int n) {
+        List<UndoStep> steps = new ArrayList<>();
+        for (Iterator<UndoStep> it = done.descendingIterator(); it.hasNext() && steps.size() < n; ) {
+            UndoStep step = it.next();
+            if (step.state() == UndoStep.State.PARTLY && step.undoable()) {
+                steps.add(step);
+            }
+        }
+        for (Iterator<UndoStep> it = done.descendingIterator(); it.hasNext() && steps.size() < n; ) {
+            UndoStep step = it.next();
+            if (step.state() != UndoStep.State.PARTLY && step.undoable()) {
+                steps.add(step);
+            }
+        }
+        return steps;
     }
 
     /** The step Ctrl + Z works on: a partly undone step first, else the newest that can be undone; null if none. */

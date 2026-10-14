@@ -204,6 +204,8 @@ public final class BuildJob {
     private @Nullable SpellPlanner.Cursor cursor;
     private @Nullable UndoStep.Walk walk;
     private int sideIndex;
+    /** Its record would not fit in what its player may keep (D-B 12.5): it runs, held for, without a step. */
+    private boolean noStep;
     /** Where its undo records are written ahead (C13), or null when the history is not written to disk. */
     private UndoFiles.@Nullable Journal journal;
     /** The second cursor that reads the cells ahead for the journal. */
@@ -275,7 +277,7 @@ public final class BuildJob {
     /** A few cells written this tick, for the particles. */
     private final LongArrayList sparks = new LongArrayList();
     /** A pulse of a Land stroke (a dab of one): planned in PREPARE, then written a whole column at a time. */
-    private LandBrush.@Nullable Pulse pulse;
+    private @Nullable BrushPulse pulse;
     /** The pulse's next column. */
     private int pulseColumn;
     /**
@@ -366,8 +368,8 @@ public final class BuildJob {
                                BiPredicate<Integer, Integer> loaded, BuildSession.Stroke stroke) {
         LongSet chunks = new LongOpenHashSet();
         ServerLevel level = player.serverLevel();
-        boolean land = recipe.spell() == Spell.LAND;
-        BoundingBox reach = land ? LandBrush.reach(recipe.anchor(), recipe.size(), recipe.landStyle())
+        boolean land = isBrush(recipe.spell());
+        BoundingBox reach = land ? brushReach(recipe)
                 : plan != null && plan.prepared() && plan.bounds() != null ? plan.bounds() : null;
         if (reach != null) {
             loadedChunks(level, reach, loaded, chunks);
@@ -483,6 +485,11 @@ public final class BuildJob {
     /** The UUID of the player whose job it is. */
     public UUID caster() {
         return caster;
+    }
+
+    /** The profile of the player whose job it is. */
+    public GameProfile profile() {
+        return profile;
     }
 
     public ServerLevel level() {
@@ -641,9 +648,9 @@ public final class BuildJob {
         if (plan != null && plan.prepared() && plan.bounds() != null) {
             return plan.bounds();
         }
-        if (recipe.spell() == Spell.LAND) {
+        if (isBrush(recipe.spell())) {
             BoundingBox columns = pulse != null && pulse.done() ? pulse.bounds() : null;
-            return columns != null ? columns : LandBrush.reach(recipe.anchor(), recipe.size(), recipe.landStyle());
+            return columns != null ? columns : brushReach(recipe);
         }
         return recipe.region() == SpellRecipe.NO_REGION ? new BoundingBox(recipe.anchor()) : SpellMath.box(recipe.a(), recipe.b());
     }
@@ -887,7 +894,7 @@ public final class BuildJob {
     }
 
     private boolean prepare(Slice slice) {
-        if (recipe.spell() == Spell.LAND && stroke != null) {
+        if (isBrush(recipe.spell()) && stroke != null) {
             return preparePulse(slice);
         }
         if (!plan.prepared()) {
@@ -917,6 +924,14 @@ public final class BuildJob {
             refuse(BuildVerdictPayload.HOLD, size, BuildRules.message(BuildVerdictPayload.HOLD, size));
             return false;
         }
+        if (stroke == null && plan.writes() && !UndoCaps.fits(size, plan.bounds())) {
+            // "Too big to remember: this one can't be undone. Hold to cast it anyway": it then runs without a step.
+            if ((flags & BuildCastPayload.HELD_LONG) == 0) {
+                refuse(BuildVerdictPayload.NO_UNDO_ROOM, size, BuildRules.message(BuildVerdictPayload.NO_UNDO_ROOM, size));
+                return false;
+            }
+            noStep = true;
+        }
         if (needsCapture()) {
             phase = Phase.CAPTURE;
         } else {
@@ -932,7 +947,8 @@ public final class BuildJob {
      */
     private boolean preparePulse(Slice slice) {
         if (pulse == null) {
-            pulse = new LandBrush.Pulse(level, recipe.landStyle(), recipe.anchor(), recipe.size(), stroke.land());
+            pulse = recipe.spell() == Spell.GROW ? new GrowBrush.Pulse(level, recipe.growStyle(), recipe.anchor(), recipe.size(), recipe.seed())
+                    : new LandBrush.Pulse(level, recipe.landStyle(), recipe.anchor(), recipe.size(), stroke.land());
         }
         long before = pulse.reads();
         boolean done = pulse.step(slice.reads());
@@ -941,6 +957,13 @@ public final class BuildJob {
             return false;
         }
         long changes = pulse.changes();
+        if (changes == 0 && recipe.spell() == Spell.GROW && GrowBrush.saysNothingGrows(recipe.growStyle()) && !stroke.saidNothingGrows) {
+            stroke.saidNothingGrows = true; // ("Nothing grows here": once a stroke)
+            ServerPlayer online = online();
+            if (online != null) {
+                online.displayClientMessage(Component.translatable("message.enhanced.build.nothing_grows"), true);
+            }
+        }
         if (limits.maxBlocks() > 0 && changes > limits.maxBlocks()) {
             refuse(BuildVerdictPayload.CEILING, limits.maxBlocks(), BuildRules.message(BuildVerdictPayload.CEILING, limits.maxBlocks()));
             return false;
@@ -951,6 +974,17 @@ public final class BuildJob {
         volume = Math.max(1, pulse.cells());
         phase = Phase.APPLY;
         return true;
+    }
+
+    /** Whether the spell is a brush that works in pulses (Land and Grow, D-B 4.11). */
+    static boolean isBrush(Spell spell) {
+        return spell == Spell.LAND || spell == Spell.GROW;
+    }
+
+    /** The box a pulse of the brush recipe may read or write. */
+    static BoundingBox brushReach(SpellRecipe recipe) {
+        return recipe.spell() == Spell.GROW ? GrowBrush.reach(recipe.anchor(), recipe.size(), recipe.growStyle())
+                : LandBrush.reach(recipe.anchor(), recipe.size(), recipe.landStyle());
     }
 
     /** Copy's take, a Move's put-down and a Repeat read their source first. */
@@ -1124,7 +1158,7 @@ public final class BuildJob {
         volume = Math.max(1, plan.size());
         cursor = plan.cursor();
         phase = Phase.APPLY;
-        journal = UndoFiles.journal(UndoHistory.of(caster), step);
+        journal = noStep ? null : UndoFiles.journal(UndoHistory.of(caster), step);
         if (journal != null) {
             ahead = new WriteAhead(level, plan, journal, loaded, chunks, recipe.spell() == Spell.MOVE && source != null);
             ahead.scan(0, UndoFiles.FIRST_BATCH); // (the first batch is on its way before the first cell is asked for)
@@ -2543,7 +2577,9 @@ public final class BuildJob {
         ServerPlayer online = online();
         boolean changed = step.changed() > 0;
         bookBilly(); // (before the step is sealed: its file holds Billy's cost and practice)
-        if (changed) {
+        if (changed && noStep) {
+            step.setState(UndoStep.State.DONE); // (too big to remember: nothing is kept, nothing can be undone)
+        } else if (changed) {
             step.setState(UndoStep.State.DONE);
             int forgotten = UndoHistory.of(caster).push(step, limits.undoSteps());
             if (forgotten > 0 && online != null) {

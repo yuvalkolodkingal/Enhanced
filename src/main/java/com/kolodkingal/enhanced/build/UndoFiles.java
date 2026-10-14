@@ -612,6 +612,11 @@ public final class UndoFiles {
             return;
         }
         LOADED.add(owner);
+        UndoHistory history = UndoHistory.existing(owner);
+        if (history != null) {
+            history.takeGone();
+            history.indexed = history.version(); // (nothing is left to list)
+        }
         Path folder = dir(owner);
         run(chainOf(owner), () -> deleteTree(folder));
     }
@@ -632,6 +637,10 @@ public final class UndoFiles {
         CompoundTag tag = indexTag(history);
         UUID owner = history.owner();
         Path folder = dir(owner);
+        if (history.stepCount() == 0 && history.open().isEmpty()) {
+            run(chainOf(owner), () -> delete(folder.resolve(INDEX))); // (nothing to list: no index)
+            return;
+        }
         run(chainOf(owner), () -> {
             try {
                 writeCompressed(tag, folder.resolve(INDEX));

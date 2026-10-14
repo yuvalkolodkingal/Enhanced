@@ -158,7 +158,7 @@ public final class BuildMagic {
             }
         }
         BoundingBox box = plan != null && plan.prepared() && plan.bounds() != null ? plan.bounds()
-                : clamped.spell() == Spell.LAND ? LandBrush.reach(clamped.anchor(), clamped.size(), clamped.landStyle())
+                : BuildJob.isBrush(clamped.spell()) ? BuildJob.brushReach(clamped)
                 : clamped.region() != SpellRecipe.NO_REGION ? SpellMath.box(clamped.a(), clamped.b()) : null;
         // A Move empties its source; a Copy or a Repeat only reads theirs, which may lie on the island (spec 5.4).
         BoundingBox source = plan != null && plan.region() != null && clamped.spell() == Spell.MOVE ? plan.region().bounds() : null;
@@ -238,7 +238,7 @@ public final class BuildMagic {
         }
         stroke.lastDab = player.server.getTickCount();
         stroke.token = token;
-        if (recipe.spell() == Spell.LAND) {
+        if (BuildJob.isBrush(recipe.spell())) {
             stroke.nextPulse = recipe;
             stroke.nextToken = token;
             pulse(player, session, stroke);
@@ -913,6 +913,10 @@ public final class BuildMagic {
      */
     public static void tick(MinecraftServer server) {
         long now = server.getTickCount();
+        if (now % UndoCaps.EVERY_TICKS == 0) {
+            UndoCaps.enforceAll(server); // (memory and disk caps, once a second)
+            UndoCaps.dropAbsent(server);
+        }
         for (BuildSession session : BuildSession.all()) {
             Stroke stroke = session.stroke();
             if (stroke != null && stroke.nextPulse != null) {
@@ -971,6 +975,7 @@ public final class BuildMagic {
     public static void clear() {
         BuildSession.clear();
         UndoFiles.reset();
+        UndoCaps.reset();
         UndoHistory.clear();
         Pocket.clearHeld();
         clock = System::nanoTime;

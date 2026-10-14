@@ -229,7 +229,7 @@ public final class LandBrush {
      * plans its move ({@link Column}). Planning changes nothing in the world (only the memory); the job writes the
      * columns in their order.
      */
-    public static final class Pulse {
+    public static final class Pulse implements BrushPulse {
         private final Reader reader;
         private final LandStyle style;
         private final BlockPos middle;

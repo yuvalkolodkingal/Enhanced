@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellPlanner;
 import com.kolodkingal.enhanced.build.SpellRecipe;
+import com.kolodkingal.enhanced.build.UndoFiles;
 import com.kolodkingal.enhanced.build.UndoHistory;
 import com.kolodkingal.enhanced.build.UndoStep;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
@@ -356,6 +357,9 @@ final class BuildTestSupport {
         int steps = 0;
         while (Arrays.stream(players).anyMatch(id -> BuildScheduler.working(id) != null)) {
             TestKit.check(++steps <= 10_000, "the spells end");
+            if (UndoFiles.active()) {
+                UndoFiles.drain(); // (a spell waits for its records to be written: give the writer its turn)
+            }
             BuildScheduler.step(List.of(players), budget);
         }
         return steps;

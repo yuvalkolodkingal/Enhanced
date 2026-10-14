@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.build.BillyMagic;
+import com.kolodkingal.enhanced.build.BillyRanks;
+import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildEvents;
 import com.kolodkingal.enhanced.build.BuildJob;
 import com.kolodkingal.enhanced.build.BuildMagic;
@@ -10,10 +13,13 @@ import com.kolodkingal.enhanced.build.BuildScheduler.Budget;
 import com.kolodkingal.enhanced.build.Pocket;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
+import com.kolodkingal.enhanced.build.UndoCaps;
 import com.kolodkingal.enhanced.build.UndoFiles;
 import com.kolodkingal.enhanced.build.UndoHistory;
 import com.kolodkingal.enhanced.build.UndoStep;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModAttachments;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -344,6 +350,254 @@ public final class BuildUndoTests {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    // B79
+
+    /** A synthetic sealed step of {@code cells} cells in one section far from the arena, pushed into {@code history}. */
+    private static UndoStep synthetic(UndoHistory history, int seed, int cells) {
+        UndoStep step = new UndoStep(history.nextId(), Spell.FILL, Level.OVERWORLD, 1000L + seed);
+        BlockState stone = Blocks.STONE.defaultBlockState();
+        BlockState air = Blocks.AIR.defaultBlockState();
+        for (int i = 0; i < cells; i++) {
+            step.record(new BlockPos(5000 + seed * 16 + i % 16, 70 + i / 16, 5000), air, null, stone, null, 0L);
+        }
+        step.setState(UndoStep.State.DONE);
+        history.push(step, 0);
+        return step;
+    }
+
+    /**
+     * Out of memory to disk, then the oldest forgotten (D-B 12.5, C14): with a per-player memory cap of two steps, the
+     * oldest steps leave memory and are read back from disk equal; with a disk cap of two steps the oldest are
+     * forgotten, their files deleted, the newest kept; with the server's memory cap the steps of the player using the
+     * most leave memory first (the other keeps his), and a step that left memory is still undone from disk.
+     */
+    @GameTest(template = ARENA, batch = "build_undo_caps", timeoutTicks = 400)
+    public static void capsForgetTheOldestFirst(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerLevel level = f.level();
+        MinecraftServer server = level.getServer();
+        Path folder = folder(f);
+        long huge = Long.MAX_VALUE / 4;
+        UndoCaps.use(huge, huge, huge, huge);
+        UUID owner = UUID.randomUUID();
+        UndoHistory history = UndoHistory.of(owner);
+        List<UndoStep> steps = new ArrayList<>();
+        List<List<String>> snapshots = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            UndoStep step = synthetic(history, i, 30 + i);
+            steps.add(step);
+            snapshots.add(cellsOf(step));
+        }
+        UndoFiles.drain();
+        long m = steps.get(0).memoryBytes();
+        check(m > 4000 && history.steps().size() == 5 && steps.stream().allMatch(step -> step.stored() && step.diskBytes() > 8),
+                "five steps in memory and on disk: " + m + " bytes each");
+
+        // Per player, memory: the oldest three leave memory (a cap of two steps and a bit).
+        UndoCaps.use(steps.get(3).memoryBytes() + steps.get(4).memoryBytes() + 2000, huge, huge, huge);
+        UndoCaps.enforceAll(server);
+        check(!steps.get(0).loaded() && !steps.get(1).loaded() && !steps.get(2).loaded() && steps.get(3).loaded() && steps.get(4).loaded(),
+                "the oldest three left memory: " + steps.stream().map(UndoStep::loaded).toList());
+        check(history.steps().size() == 5 && steps.get(0).changed() == 30 && steps.get(0).undoable(), "they are still listed, with their counts");
+        for (int i = 0; i < 3; i++) {
+            check(UndoFiles.load(history, steps.get(i)) && cellsOf(steps.get(i)).equals(snapshots.get(i)), "step " + i + " is read back from disk equal");
+        }
+        UndoCaps.use(huge, huge, huge, huge);
+
+        // Per player, disk: a cap that holds the two newest forgets the three oldest, their files with them.
+        long two = steps.get(3).diskBytes() + steps.get(4).diskBytes();
+        UndoCaps.use(huge, two + 1, huge, huge);
+        UndoCaps.enforceAll(server);
+        UndoFiles.drain();
+        check(history.steps().size() == 2 && history.steps().get(0) == steps.get(3) && history.steps().get(1) == steps.get(4),
+                "the oldest are forgotten, the newest two kept: " + history.steps().size());
+        for (int i = 0; i < 3; i++) {
+            check(!Files.exists(UndoFiles.pathOf(owner, steps.get(i))), "the file of the forgotten step " + i + " is deleted");
+        }
+        check(Files.exists(UndoFiles.pathOf(owner, steps.get(3))) && Files.exists(UndoFiles.pathOf(owner, steps.get(4))), "the kept ones' files stay");
+        UndoCaps.use(huge, huge, huge, huge);
+
+        // The server's memory: the player using the most loses his steps from memory first.
+        UndoHistory.clear();
+        UndoHistory lighter = UndoHistory.of(UUID.randomUUID());
+        UndoStep alone = synthetic(lighter, 9, 30);
+        UndoHistory heavier = UndoHistory.of(UUID.randomUUID());
+        List<UndoStep> three = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            three.add(synthetic(heavier, 10 + i, 30));
+        }
+        UndoFiles.drain();
+        long each = alone.memoryBytes();
+        UndoCaps.use(huge, huge, each * 5 / 2, huge);
+        UndoCaps.enforceAll(server);
+        check(!three.get(0).loaded() && !three.get(1).loaded() && three.get(2).loaded() && alone.loaded(),
+                "the heaviest player's oldest steps left memory first, the lighter one kept his: " + three.stream().map(UndoStep::loaded).toList() + ", "
+                        + alone.loaded());
+        check(UndoFiles.load(heavier, three.get(0)) && three.get(0).changed() == 30, "and one of them is read back");
+        UndoCaps.use(huge, huge, huge, huge);
+
+        // A Scarlet Witch's real spells: with every step out of memory, Ctrl + Z reads the newest from disk and undoes it.
+        ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
+        UUID id = wanda.getUUID();
+        BoundingBox first = new BoundingBox(1, 2, 1, 3, 4, 3);
+        BoundingBox second = new BoundingBox(6, 2, 6, 8, 4, 8);
+        cast(wanda, boxSpell(f, Spell.FILL, first));
+        finish(wanda);
+        cast(wanda, boxSpell(f, Spell.FILL, second));
+        finish(wanda);
+        UndoFiles.drain();
+        UndoCaps.use(1, huge, huge, huge);
+        UndoCaps.enforceAll(server);
+        List<UndoStep> hers = UndoHistory.of(id).steps();
+        check(hers.size() == 2 && hers.stream().noneMatch(UndoStep::loaded), "both of her steps are out of memory: " + hers.stream().map(UndoStep::loaded).toList());
+        UndoCaps.use(huge, huge, huge, huge);
+        BuildMagic.undo(wanda);
+        helper.succeedWhen(() -> {
+            if (BuildScheduler.working(id) != null) {
+                BuildScheduler.step(List.of(id), BuildTestSupport.ENDLESS);
+            }
+            check(count(f, second, Blocks.STONE) == 0 && count(f, first, Blocks.STONE) == 27, "the newest step is undone from disk: "
+                    + count(f, second, Blocks.STONE) + ", " + count(f, first, Blocks.STONE));
+        });
+    }
+
+    // B81
+
+    /** Runs {@code command} (without the slash) as {@code source} on the server. */
+    private static void run(MinecraftServer server, CommandSourceStack source, String command) {
+        server.getCommands().performPrefixedCommand(source, command);
+    }
+
+    /**
+     * The operator's tools (D-B 16): {@code undo} undoes a player's last spell, {@code stop all} stops a working spell where
+     * it is (what it did stays, undoable), {@code list} lists the spells at work, {@code history} the steps, {@code rank} sets
+     * Billy's rank (rank 3: meter 2,048) and {@code meter} his meter, {@code forget} empties a player's history and pocket
+     * and deletes the folder; the same commands from a player who is no operator do nothing.
+     */
+    @GameTest(template = ARENA, batch = "build_undo_commands", timeoutTicks = 300)
+    public static void operatorCommands(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerLevel level = f.level();
+        MinecraftServer server = level.getServer();
+        Path folder = folder(f);
+        ServerPlayer op = f.player(0.5, TestKit.FLOOR, 20.5);
+        ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
+        ServerPlayer billy = builder(f, Power.BILLY, 20.5, 0.5, Blocks.STONE);
+        UUID id = wanda.getUUID();
+        CommandSourceStack operator = op.createCommandSourceStack().withPermission(2);
+        CommandSourceStack child = op.createCommandSourceStack().withPermission(0);
+        String her = wanda.getGameProfile().getName();
+        String him = billy.getGameProfile().getName();
+
+        // undo: her last spell, as Ctrl + Z would.
+        BoundingBox small = new BoundingBox(5, 2, 5, 7, 4, 7);
+        cast(wanda, boxSpell(f, Spell.FILL, small));
+        finish(wanda);
+        check(count(f, small, Blocks.STONE) == 27, "27 filled");
+        BuildTestSupport.Seen.of(op);
+        run(server, child, "enhanced build undo " + her);
+        finish(wanda);
+        check(count(f, small, Blocks.STONE) == 27, "a player who is no operator undoes nothing");
+        run(server, operator, "enhanced build undo " + her);
+        finish(wanda);
+        BuildTestSupport.Seen told = BuildTestSupport.Seen.of(op);
+        check(count(f, small, Blocks.AIR) == 27 && UndoHistory.of(id).redoCount() == 1, "the operator's undo took the spell back: "
+                + count(f, small, Blocks.AIR) + ", " + told + ", " + told.chat.stream().map(net.minecraft.network.chat.Component::getString).toList());
+        check(told.chat.stream().anyMatch(line -> BuildTestSupport.Seen.key(line).equals("commands.enhanced.build.undo")),
+                "and said so");
+        BuildTestSupport.Seen.of(op);
+
+        // list and stop all: a working spell is listed, then stopped where it is, undoable.
+        BoundingBox big = new BoundingBox(0, 4, 0, 9, 8, 19);
+        cast(wanda, boxSpell(f, Spell.FILL, big));
+        BuildJob job = working(wanda);
+        for (int i = 0; i < 20 && job.written() == 0; i++) {
+            UndoFiles.drain(); // (its first records go down before its first cell)
+            BuildScheduler.step(List.of(id), Budget.of(100, 4096, 1));
+        }
+        long written = job.written();
+        check(written > 0 && written <= 100 && !job.finished(), "a spell works: " + written);
+        BuildTestSupport.Seen.of(op);
+        run(server, operator, "enhanced build list");
+        List<net.minecraft.network.chat.Component> said = BuildTestSupport.Seen.of(op).chat;
+        check(said.stream().anyMatch(line -> BuildTestSupport.Seen.key(line).equals("commands.enhanced.build.list.entry")), "list names it: " + said);
+        run(server, operator, "enhanced build stop all");
+        check(job.finished() && job.endCode() == com.kolodkingal.enhanced.network.BuildVerdictPayload.STOPPED && BuildScheduler.all().isEmpty(),
+                "stop all stopped it where it was");
+        check(count(f, big, Blocks.STONE) == written, "what it did stays: " + count(f, big, Blocks.STONE));
+        List<UndoStep> steps = UndoHistory.of(id).steps();
+        check(steps.size() == 1 && steps.get(0).state() == UndoStep.State.INTERRUPTED && steps.get(0).undoable(), "as an interrupted step that can be undone");
+        run(server, operator, "enhanced build list");
+        check(BuildTestSupport.Seen.of(op).chat.stream().anyMatch(line -> BuildTestSupport.Seen.key(line).equals("commands.enhanced.build.list.none")),
+                "nothing is working now");
+
+        // history: the steps of the player.
+        BuildTestSupport.Seen.of(op);
+        run(server, operator, "enhanced build history " + her);
+        said = BuildTestSupport.Seen.of(op).chat;
+        check(said.stream().filter(line -> BuildTestSupport.Seen.key(line).equals("commands.enhanced.build.history.line")).count() == 1
+                && said.stream().anyMatch(line -> BuildTestSupport.Seen.key(line).equals("commands.enhanced.build.history.header")),
+                "history lists her step (the new spell emptied the redo list): " + said);
+
+        // rank and meter: Billy's.
+        run(server, child, "enhanced build rank " + him + " 4");
+        check(BillyRanks.rank(billy.getData(ModAttachments.BUILD_DATA)) == 1, "a player who is no operator changes no rank");
+        run(server, operator, "enhanced build rank " + him + " 3");
+        BuildData data = billy.getData(ModAttachments.BUILD_DATA);
+        long now = server.overworld().getGameTime();
+        check(BillyRanks.rank(data) == 3 && BillyMagic.meter(data, now) == 2048, "rank 3 and the meter full at 2,048: " + BillyRanks.rank(data) + ", "
+                + BillyMagic.meter(data, now));
+        run(server, operator, "enhanced build meter " + him + " 10");
+        data = billy.getData(ModAttachments.BUILD_DATA);
+        check(BillyMagic.meter(data, server.overworld().getGameTime()) == 10, "the meter is 10: " + BillyMagic.meter(data, server.overworld().getGameTime()));
+        BuildTestSupport.Seen.of(op);
+        run(server, operator, "enhanced build rank " + her + " 2");
+        check(BuildTestSupport.Seen.of(op).chat.stream().noneMatch(line -> BuildTestSupport.Seen.key(line).equals("commands.enhanced.build.rank_set")),
+                "the Scarlet Witch has no rank");
+
+        // forget: her history and her pocket, in memory and on disk.
+        BlockPos chest = abs(f, 12, 2, 12);
+        cast(wanda, copyTake(f, new BoundingBox(11, 2, 11, 13, 4, 13)));
+        finish(wanda);
+        UndoFiles.drain();
+        check(Pocket.held(id) != null && Files.exists(folder.resolve(id.toString())), "she holds a pocket, and her folder is on disk");
+        run(server, operator, "enhanced build forget " + her);
+        UndoFiles.drain();
+        UndoHistory history = UndoHistory.existing(id);
+        check(history.steps().isEmpty() && history.undoneSteps().isEmpty() && Pocket.held(id) == null, "her history and her pocket are empty");
+        check(!Files.exists(folder.resolve(id.toString())), "and her folder is gone");
+        helper.succeed();
+    }
+
+    /**
+     * A spell whose record would not fit in what its player may keep on disk (D-B 12.5, the estimate of 0.6 byte a cell and
+     * 700 a section) asks for the long hold with {@code NO_UNDO_ROOM}; held for, it runs, and leaves no step.
+     */
+    @GameTest(template = ARENA, batch = "build_undo_room", timeoutTicks = 200)
+    public static void aSpellTooBigToRememberAsksForTheLongHold(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        folder(f);
+        ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
+        BoundingBox small = new BoundingBox(1, 2, 1, 3, 4, 3);
+        UndoCaps.use(1L << 40, UndoCaps.estimate(27, abs(f, small)), 1L << 40, 1L << 40);
+        BoundingBox big = new BoundingBox(5, 2, 5, 14, 10, 14);
+        cast(wanda, boxSpell(f, Spell.FILL, small));
+        UndoFiles.drain();
+        finish(wanda);
+        check(count(f, small, Blocks.STONE) == 27 && BuildTestSupport.steps(wanda).size() == 1, "27 cells fit: a step is kept");
+        BuildTestSupport.Seen.of(wanda);
+        cast(wanda, boxSpell(f, Spell.FILL, big));
+        finish(wanda);
+        BuildTestSupport.Seen seen = BuildTestSupport.Seen.of(wanda);
+        check(seen.code() == com.kolodkingal.enhanced.network.BuildVerdictPayload.NO_UNDO_ROOM && seen.said("message.enhanced.build.no_undo_room")
+                && count(f, big, Blocks.STONE) == 0, "900 cells do not fit: it asks for the hold, nothing is built: " + seen);
+        cast(wanda, boxSpell(f, Spell.FILL, big), com.kolodkingal.enhanced.network.BuildCastPayload.HELD_LONG);
+        finish(wanda);
+        check(count(f, big, Blocks.STONE) == 900 && BuildTestSupport.steps(wanda).size() == 1, "held for, it runs and leaves no step: "
+                + BuildTestSupport.steps(wanda).size() + ", " + count(f, big, Blocks.STONE) + ", " + BuildTestSupport.Seen.of(wanda));
+        helper.succeed();
     }
 
     // B80

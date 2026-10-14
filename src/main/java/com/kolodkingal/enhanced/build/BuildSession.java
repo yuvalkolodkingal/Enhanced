@@ -331,6 +331,8 @@ public final class BuildSession {
          */
         @Nullable SpellRecipe nextPulse;
         int nextToken;
+        /** Whether a pulse of a Bloom stroke said "Nothing grows here" already (once a stroke). */
+        boolean saidNothingGrows;
         /** What its sealing says instead of the done line (a dab ran out of material, or was refused), or null. */
         @Nullable Component said;
         /** A dab of it was refused (an empty meter, a thing too big): that ended it, and said why. */

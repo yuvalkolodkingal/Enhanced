@@ -93,6 +93,7 @@ public final class BuildEvents {
             }
             UndoHistory history = UndoHistory.existing(player.getUUID());
             if (history != null) {
+                history.left(-1);
                 history.told(); // (the lines above said what the session knew; those read from the disk say theirs when they come)
             }
             BuildMagic.settleOwed(player);
@@ -104,6 +105,10 @@ public final class BuildEvents {
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             BuildMagic.leaveMode(player, false);
+            UndoHistory history = UndoHistory.existing(player.getUUID());
+            if (history != null) {
+                history.left(player.server.getTickCount());
+            }
             UndoFiles.onLogout(player.getUUID());
         }
     }
