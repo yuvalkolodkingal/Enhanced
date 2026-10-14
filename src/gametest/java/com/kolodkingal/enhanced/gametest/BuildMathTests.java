@@ -429,8 +429,8 @@ public final class BuildMathTests {
      * The planner's order (Appendix A.3): a 10 x 10 x 10 fill rises layer by layer from the caster's side and its
      * Vanish melts top-down; a 200 x 4 x 200 fill goes chunk column by chunk column, every column once, starting with
      * the one nearest the caster; a radius-3 ball swells shell by shell (the first tenth all nearer its centre than the
-     * last tenth); a Move over itself moves every cell before it writes over it; and a 1000 x 300 x 1000 plan gives its
-     * first million cells at once, holding only its cursor.
+     * last tenth); a Move over itself moves every cell before it writes over it (top-down when it moves up, and its
+     * ripple says so); and a 1000 x 300 x 1000 plan gives its first million cells at once, holding only its cursor.
      */
     @GameTest(template = TestKit.ARENA, batch = "build_pure")
     public static void thePlannerWalksInItsOrder(GameTestHelper helper) {
@@ -567,6 +567,16 @@ public final class BuildMathTests {
             check(!moved.contains(step.from()), "a cell moves before anything lands on it: " + step.from());
             moved.add(step.pos());
         }
+        // Moving up, it goes top-down, and its ripple says so; moving level, it rises.
+        check(steps.getFirst().pos().getY() == 67 && move.order() == BuildFxPayload.MELT, "a Move up starts at its top and says melt: " + move.order());
+        for (int i = 1; i < steps.size(); i++) {
+            check(steps.get(i).pos().getY() <= steps.get(i - 1).pos().getY(), "a Move up goes layer by layer top-down");
+        }
+        Plan flat = SpellPlanner.plan(pattern, recipe(Spell.MOVE).op(SpellRecipe.Op.PUT_DOWN).box(source).at(new BlockPos(2, 63, 2), Direction.UP).build(),
+                Setup.at(CASTER));
+        List<Cell> sliding = cells(flat, pattern);
+        check(sliding.size() == 27 && sliding.getFirst().pos().getY() == 64 && flat.order() == BuildFxPayload.RISE,
+                "a Move east and south rises, and says so: " + flat.order());
         // A Move over itself wider than a layer: chunk column by chunk column, still every cell before it is landed on.
         BoundingBox yard = new BoundingBox(0, 64, 0, 99, 65, 69);
         World paved = new World();

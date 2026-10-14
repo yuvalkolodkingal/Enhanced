@@ -709,7 +709,17 @@ public final class SpellPlanner {
             if (box != null && !fits(box)) {
                 return BuildFxPayload.COLUMNS;
             }
+            if (box != null && order == Order.SHIFT) {
+                // A Move over itself goes against its shift: top-down when it moves up.
+                return shift(box).getY() > 0 ? BuildFxPayload.MELT : BuildFxPayload.RISE;
+            }
             return order == Order.MELT ? BuildFxPayload.MELT : BuildFxPayload.RISE;
+        }
+
+        /** How far a Move over itself moves its cells ({@code box}: the cells it writes). */
+        private BlockPos shift(BoundingBox box) {
+            BoundingBox from = region == null ? box : region.bounds();
+            return new BlockPos(box.minX() - from.minX(), box.minY() - from.minY(), box.minZ() - from.minZ());
         }
 
         /**
@@ -752,10 +762,10 @@ public final class SpellPlanner {
             Walk walk;
             if (order == Order.SHIFT) {
                 // Every cell T + d comes before T: each axis against the shift d (from the caster's side where d is 0).
-                BoundingBox from = region == null ? box : region.bounds();
-                int dx = box.minX() - from.minX();
-                int dy = box.minY() - from.minY();
-                int dz = box.minZ() - from.minZ();
+                BlockPos d = shift(box);
+                int dx = d.getX();
+                int dy = d.getY();
+                int dz = d.getZ();
                 boolean zUp = dz == 0 ? caster.getZ() <= middle(box.minZ(), box.maxZ()) : dz < 0;
                 boolean xUp = dx == 0 ? caster.getX() <= middle(box.minX(), box.maxX()) : dx < 0;
                 walk = fits(box) ? new LayerWalk(volume, box, dy <= 0, zUp, xUp) : new ShiftColumns(volume, box, dy <= 0, zUp, xUp);
