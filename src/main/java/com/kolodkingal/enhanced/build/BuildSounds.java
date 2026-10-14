@@ -44,9 +44,9 @@ public final class BuildSounds {
     private static final StandIn ON_WANDA = new StandIn(ModSounds.BUILD_ON_WANDA, 0.8F, 1.0F);
     /** "A spellbook opens": Billy enters build mode, a paper flutter and two glassy notes. */
     private static final StandIn ON_BILLY = new StandIn(ModSounds.BUILD_ON_BILLY, 0.8F, 1.0F);
-    /** "Chaos magic rewrites reality": one of her spells starts. */
-    private static final StandIn CAST_WANDA = new StandIn(ModSounds.HEX_CROSS, 0.6F, 1.3F);
-    /** Her spell of {@link #HUGE_CAST} blocks or more starts. */
+    /** "Chaos magic rewrites reality": one of her spells starts, a soft whoosh opening into a shimmering chord. */
+    private static final StandIn CAST_WANDA = new StandIn(ModSounds.BUILD_CAST_WANDA, 0.8F, 1.0F);
+    /** Her spell of {@link #HUGE_CAST} blocks or more starts: the rising Hex of her gesture, which has its own file. */
     private static final StandIn CAST_WANDA_HUGE = new StandIn(ModSounds.HEX_RISE, 0.8F, 1.0F);
     /** "A spell crackles": one of Billy's spells starts. */
     private static final StandIn CAST_BILLY = new StandIn(ModSounds.HEX_BOLT, 0.6F, 1.5F);
