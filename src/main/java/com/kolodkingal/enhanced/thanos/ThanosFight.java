@@ -26,6 +26,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
@@ -94,17 +95,36 @@ public final class ThanosFight extends BossFight {
 
     /**
      * A fight round {@code center}: no containment, no protection of blocks (nothing he does changes one), the clock and
-     * the leash reaching 24 blocks beyond the arena.
+     * the leash reaching 24 blocks beyond the arena. A landing in the air (an operator's forced start given while flying,
+     * with no ground to arrive on near him) goes down onto the ground under it, and the centre with it: the fight is on that
+     * ground, so his void check and his step back ({@link #bringBack}) find him on it, as on any other start.
      *
      * @param landing   where he lands
      * @param countdown the ticks from the portal opening to his arrival (0: he is made at once)
      * @param fallHeight how far above the landing he is made (0: standing on it)
      */
     public static ThanosFight create(ServerLevel level, Vec3 center, Vec3 landing, int countdown, double fallHeight) {
+        Vec3 ground = groundUnder(level, landing);
+        if (ground != null && landing.y - ground.y > 1.0) {
+            center = center.subtract(0.0, landing.y - ground.y, 0.0);
+            fallHeight = Math.min(fallHeight, ThanosLane.fallHeight(level, ground));
+            landing = ground;
+        }
         double radius = ThanosBossConfig.ARENA_RADIUS.get();
         BossArena arena = new BossArena(level, center, radius, BossArena.Containment.NONE, false)
                 .joinWithin(radius + 24.0).abandonBeyond(radius + 24.0).tractorDepth(0.0);
         return new ThanosFight(level, arena, landing, countdown, fallHeight);
+    }
+
+    /**
+     * The top of the first ground under {@code from}, down to the bottom of the world (water is looked through, as he sinks
+     * through it); null where there is none (the void under an End island), or where {@code from} is inside a block.
+     */
+    @Nullable
+    private static Vec3 groundUnder(ServerLevel level, Vec3 from) {
+        BlockHitResult hit = level.clip(new ClipContext(from, new Vec3(from.x, level.getMinBuildHeight(), from.z),
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        return hit.getType() == HitResult.Type.MISS || hit.isInside() ? null : hit.getLocation();
     }
 
     /**

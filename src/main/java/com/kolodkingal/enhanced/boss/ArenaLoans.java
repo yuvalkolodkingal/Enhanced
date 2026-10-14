@@ -5,6 +5,8 @@ import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -18,24 +20,39 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.BlockAttachedEntity;
+import net.minecraft.world.entity.decoration.HangingEntity;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.DirectionalPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Fallable;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -55,17 +72,23 @@ import java.util.UUID;
  *
  * <ul>
  *     <li><b>The loan.</b> A block torn out of the arena leaves a <em>home</em> behind (its cell, its state, when it is
- *     due); the lifted block is the fight's (its mark), held like any other. The home mends {@code boss.arenaMendTicks}
- *     later, lowest first; a home something stands in, or whose falling block would hang over another open home, waits for
- *     its own retry and holds up no other.</li>
+ *     due, what its block held up); the lifted block is the fight's (its mark), held like any other. The home mends {@code
+ *     boss.arenaMendTicks} later, lowest first; a home something stands in, or whose falling block would hang over another
+ *     open home, waits for its own retry and holds up no other.</li>
+ *     <li><b>The ground around a hole.</b> What leans on a lent block stays where it is until its home mends: a falling
+ *     block over the hole, and what the block held up (a torch on it, a flower, a lantern under it: {@link Propped}). If an
+ *     update of their neighbours wakes them meanwhile, the fall or the break they schedule is taken back ({@link #keepUp});
+ *     what breaks at once drops nothing ({@link BossFights#leansOnALoan}) and is put back by the mend.</li>
  *     <li><b>What a borrowed block does.</b> Thrown, it turns to dust where it hits (no loot). Set down, it <em>stands</em>
  *     {@code boss.borrowedBlockTicks}, then crumbles back to what was there; it crumbles at once where it may not stand:
  *     no room, on another standing borrowed block, next to anyone, the owner's {@code boss.maxStandingPerPlayer} already
  *     standing, the ground the clients hide, outside its arena. A standing block lifted again is the same loan.</li>
  *     <li><b>What the arena lends.</b> Nothing with {@code boss.lendArenaBlocks} off, nothing the fight's own rule refuses
  *     ({@link BossFight#lendRefusal}), not half of a door, not a falling block over a gap ({@code arena_hanging}), not the
- *     block under an open home or a standing borrowed block ({@code arena_mending}: a hole is never deeper than one block),
- *     and no more than {@code boss.maxBorrowedBlocks} held, flying or standing at once ({@code arena_full}).</li>
+ *     block under an open home or a standing borrowed block, nor one an open home's block holds up ({@code arena_mending}: a
+ *     hole is never deeper than one block), not a block that holds up more than {@link #MAX_PROPPED} others or that a
+ *     painting, an item frame or a lead's knot hangs on ({@code protected}), and no more than {@code boss.maxBorrowedBlocks}
+ *     held, flying or standing at once ({@code arena_full}).</li>
  *     <li><b>Quiet writes.</b> Every block the ledger writes is set with {@link #FLAGS} (the clients told, no neighbour or
  *     shape update, nothing dropped) and made quiet ({@link #quiet}: the cell's scheduled ticks removed, which {@code onPlace}
  *     would otherwise have given a falling block), so whatever the ledger writes stays exactly where it is put.</li>
@@ -75,8 +98,9 @@ import java.util.UUID;
  *     borrow and at a stand (at most once a second after a mend or a crumble), so a hard stop of the server leaves a file
  *     that {@link ArenaLoansRecovery} puts the ground back from at the next start. A repair (a mend, a crumble, the return,
  *     a recovery) leaves the journal only at the second save of its dimension after it (R48): the world on disk holds it by
- *     then. The homes of the island's copies are never journaled (the island's own recovery clears the sky); a standing
- *     block on a copy cell is, with nothing but air before it.</li>
+ *     then. What a home's block held up is journaled with it, as a home of its own (put back only into a hole). The homes
+ *     of the island's copies are never journaled (the island's own recovery clears the sky); a standing block on a copy cell
+ *     is, with nothing but air before it.</li>
  * </ul>
  */
 public final class ArenaLoans {
@@ -94,6 +118,8 @@ public final class ArenaLoans {
 
     /** A home that cannot mend yet is tried again this many ticks later. */
     public static final int RETRY_TICKS = 20;
+    /** A block that holds up more than this many blocks of the world (a tall bamboo, a long vine) is not lent. */
+    public static final int MAX_PROPPED = 8;
     /** A repaired entry leaves the journal at this many saves of its dimension after the repair (R48). */
     public static final int SAVES_TO_RETIRE = 2;
     /** A standing block lets dust fall from it in its last this many ticks ... */
@@ -117,15 +143,26 @@ public final class ArenaLoans {
         /** A cell of the island's copy: never journaled. */
         final boolean copy;
         final long order;
+        /** What its block held up when it was lent ({@link #propped}): put back with it if it broke meanwhile. */
+        final List<Propped> propped;
         long dueAt;
 
-        Home(BlockPos pos, BlockState state, boolean copy, long order, long dueAt) {
+        Home(BlockPos pos, BlockState state, boolean copy, long order, long dueAt, List<Propped> propped) {
             this.pos = pos;
             this.state = state;
             this.copy = copy;
             this.order = order;
             this.dueAt = dueAt;
+            this.propped = propped;
         }
+    }
+
+    /**
+     * A block of the world that leans on a lent block (a torch on it, a flower, a lantern under it), as it was at the loan:
+     * it stays where it is, and if its neighbours break it before the home mends, it drops nothing and the mend puts it
+     * back. A cell of the island's copy is never journaled.
+     */
+    private record Propped(BlockPos pos, BlockState state, boolean copy) {
     }
 
     /** A borrowed block set down that stands until {@code until}, then gives the cell back to {@code previous}. */
@@ -151,6 +188,8 @@ public final class ArenaLoans {
             .thenComparingLong(Standing::order));
     private final Map<BlockPos, Standing> standing = new HashMap<>();
     private final Map<UUID, Integer> standingOf = new HashMap<>();
+    /** The cells of the blocks the open homes' blocks held up, each with its home ({@link Propped}). */
+    private final Map<BlockPos, Home> proppedBy = new HashMap<>();
     /** The borrowed blocks held or flying. */
     private final Set<UUID> loose = new HashSet<>();
     /** The players told once that a block is borrowed. */
@@ -175,8 +214,10 @@ public final class ArenaLoans {
     /**
      * Why the arena does not lend the block at {@code pos} (the fight's own reasons and the switch were asked first, {@link
      * BossFights#lendRefusal}), or null: half of a door ({@code protected}: two cells cannot be one loan), a falling block
-     * over a gap ({@code arena_hanging}), the block under an open home or a standing borrowed block ({@code arena_mending}),
-     * the fight's cap ({@code arena_full}). A standing borrowed block is always lent again: it is the same loan.
+     * over a gap ({@code arena_hanging}), the block under an open home or a standing borrowed block, or one that leans on
+     * an open home ({@code arena_mending}), a block that holds up more than {@link #MAX_PROPPED} blocks or that a painting,
+     * an item frame or a lead's knot hangs on ({@code protected}), the fight's cap ({@code arena_full}). A standing borrowed
+     * block is always lent again: it is the same loan.
      */
     @Nullable
     String refusal(BlockPos pos) {
@@ -192,8 +233,12 @@ public final class ArenaLoans {
             return HANGING; // sand over a cave, gravel over water: it would fall the moment the block under it moved
         }
         BlockPos above = pos.above();
-        if (homes.containsKey(above) || standing.containsKey(above)) {
+        if (homes.containsKey(above) || standing.containsKey(above) || proppedBy.containsKey(pos)) {
             return MENDING;
+        }
+        List<Propped> propped = propped(level, pos, state);
+        if (propped == null || hangsOn(level, pos, propped)) {
+            return PROTECTED; // a tall bamboo, a long vine, a painting on its side: the arena cannot keep them up
         }
         if (borrowed() >= BossConfig.MAX_BORROWED_BLOCKS.get()) {
             return FULL;
@@ -202,11 +247,76 @@ public final class ArenaLoans {
     }
 
     /**
+     * The blocks of the world that could not stay without the block at {@code pos}: what rests on it, hangs from it or is
+     * fixed to its side (a torch, a flower, short grass, a rail, a carpet, a lantern or a stalactite under it, a ladder), and
+     * what could not stay without those in turn (the top of a tall flower, a stack of sugar cane), each as it is now; null
+     * if there are more than {@link #MAX_PROPPED}. Whatever was already loose (a flower already in the air) is not counted.
+     * Nothing is written: the level is read as if those cells were empty ({@link Without}).
+     */
+    @Nullable
+    private List<Propped> propped(ServerLevel level, BlockPos pos, BlockState state) {
+        Map<BlockPos, BlockState> gone = new HashMap<>();
+        gone.put(pos, state.getFluidState().createLegacyBlock());
+        LevelReader without = new Without(level, gone);
+        List<Propped> propped = new ArrayList<>();
+        ArrayDeque<BlockPos> next = new ArrayDeque<>();
+        next.add(pos);
+        while (!next.isEmpty()) {
+            BlockPos from = next.poll();
+            for (Direction direction : Direction.values()) {
+                BlockPos cell = from.relative(direction);
+                if (gone.containsKey(cell)) {
+                    continue;
+                }
+                BlockState there = level.getBlockState(cell);
+                if (there.isAir() || standing.containsKey(cell) || !there.canSurvive(level, cell) || there.canSurvive(without, cell)) {
+                    continue; // nothing there, a borrowed block that crumbles on its own, already loose, or not leaning on it
+                }
+                if (propped.size() == MAX_PROPPED) {
+                    return null;
+                }
+                propped.add(new Propped(cell, there, fight.isCopyCell(cell)));
+                gone.put(cell, there.getFluidState().createLegacyBlock());
+                next.add(cell);
+            }
+        }
+        return propped;
+    }
+
+    /**
+     * Whether a painting, an item frame or a lead's knot hangs on the block at {@code pos} or on one it holds up: the
+     * thing checks its support by itself every few seconds and drops as an item when it is gone, so the arena does not
+     * lend such a block.
+     */
+    private static boolean hangsOn(ServerLevel level, BlockPos pos, List<Propped> propped) {
+        List<BlockPos> cells = new ArrayList<>();
+        cells.add(pos);
+        propped.forEach(p -> cells.add(p.pos()));
+        for (BlockPos cell : cells) {
+            if (!level.getEntitiesOfClass(BlockAttachedEntity.class, new AABB(cell).inflate(1.0), attached -> fixedTo(attached, cell)).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Whether a painting, an item frame or a lead's knot is fixed to the block at {@code pos} (it drops if that goes). */
+    private static boolean fixedTo(BlockAttachedEntity attached, BlockPos pos) {
+        if (attached instanceof HangingEntity hanging) {
+            // Its support is the cells behind it, as HangingEntity#calculateSupportBox finds them.
+            Direction facing = hanging.getDirection();
+            return hanging.getBoundingBox().move(facing.getStepX() * -0.5, facing.getStepY() * -0.5, facing.getStepZ() * -0.5)
+                    .deflate(1.0E-7).intersects(new AABB(pos));
+        }
+        return attached.getPos().equals(pos); // a lead's knot is on its fence
+    }
+
+    /**
      * Lends the block at {@code pos} ({@code state}) to {@code player}: the journal is told first (unless it is a copy of the
      * island), the cell becomes what the block leaves behind (air, or water for a waterlogged block), quietly, with the
-     * sound and the dust of a broken block, and a home is recorded. A standing borrowed block lifted again gives its cell
-     * back to what was there before it, and is the same loan (no new home). The first loan of a player in a fight tells
-     * them the block is borrowed.
+     * sound and the dust of a broken block, and a home is recorded, with what its block holds up ({@link #propped}: they
+     * stay where they are). A standing borrowed block lifted again gives its cell back to what was there before it, and is
+     * the same loan (no new home). The first loan of a player in a fight tells them the block is borrowed.
      *
      * @return the borrowed block, already in the level and the fight's, for the player to take hold of
      */
@@ -219,9 +329,12 @@ public final class ArenaLoans {
             unstand(stood, now);
             set(level, cell, stood.previous());
         } else {
-            Home home = new Home(cell, state, fight.isCopyCell(cell), order++, now + BossConfig.ARENA_MEND_TICKS.get());
+            List<Propped> propped = propped(level, cell, state);
+            Home home = new Home(cell, state, fight.isCopyCell(cell), order++, now + BossConfig.ARENA_MEND_TICKS.get(),
+                    propped != null ? propped : List.of());
             homes.put(cell, home);
             due.add(home);
+            home.propped.forEach(p -> proppedBy.put(p.pos(), home));
             if (!home.copy) {
                 hand(now); // written ahead: the journal knows of the hole before it is made
             }
@@ -241,8 +354,9 @@ public final class ArenaLoans {
      * A borrowed block of this fight was set down (or let go) and has landed at {@code pos}: it stands there, a block again,
      * for {@code boss.borrowedBlockTicks} (the journal told first), if the stand rules let it (D-T 5.4): the cell is in the
      * fight's arena and not ground the clients hide, it takes the block and there is room, it is not on another standing
-     * borrowed block, no living thing is within a block of it, and its owner (who let go of it) has fewer than {@code
-     * boss.maxStandingPerPlayer} standing. Otherwise the owner, if online, is told that the arena takes it back.
+     * borrowed block, the cell is not one an open home's block held up (where the mend puts that back), no living thing is
+     * within a block of it, and its owner (who let go of it) has fewer than {@code boss.maxStandingPerPlayer} standing.
+     * Otherwise the owner, if online, is told that the arena takes it back.
      *
      * @return whether it stands (the caller discards the entity either way, and lets it crumble if not)
      */
@@ -256,7 +370,7 @@ public final class ArenaLoans {
         boolean stands = owner != null && block.level() == level && fight.arena().protects(cell) && !BossFights.hidesGround(level, cell)
                 && here.canBeReplaced(new DirectionalPlaceContext(level, cell, Direction.DOWN, ItemStack.EMPTY, Direction.UP))
                 && placed.canSurvive(level, cell) && level.isUnobstructed(placed, cell, CollisionContext.empty())
-                && !standing.containsKey(cell.below()) && !nearAnyone(level, cell)
+                && !standing.containsKey(cell.below()) && !proppedBy.containsKey(cell) && !nearAnyone(level, cell)
                 && standingOf.getOrDefault(owner, 0) < BossConfig.MAX_STANDING_PER_PLAYER.get();
         if (!stands) {
             ServerPlayer thrower = owner == null ? null : level.getServer().getPlayerList().getPlayer(owner);
@@ -303,9 +417,10 @@ public final class ArenaLoans {
     // Every tick
 
     /**
-     * One tick of the fight (running or winding down): the homes that are due mend, the standing blocks whose time is over
-     * crumble, the last two seconds of a standing block let dust fall, the borrowed blocks that are gone are forgotten, and a
-     * journal that is behind gets a snapshot (at most once a second).
+     * One tick of the fight (running or winding down): the homes that are due mend, what leans on an open home is kept up
+     * ({@link #keepUp}), the standing blocks whose time is over crumble, the last two seconds of a standing block let
+     * dust fall, the borrowed blocks that are gone are forgotten, and a journal that is behind gets a snapshot (at most once
+     * a second).
      */
     void tick(long now) {
         if (homes.isEmpty() && standing.isEmpty() && loose.isEmpty() && !dirty) {
@@ -323,6 +438,12 @@ public final class ArenaLoans {
             }
         }
         due.addAll(later);
+        for (Home home : homes.values()) {
+            keepUp(level, home.pos.above());
+            for (Propped propped : home.propped) {
+                keepUp(level, propped.pos());
+            }
+        }
         while (!expiring.isEmpty() && expiring.peek().until() <= now) {
             crumble(level, expiring.poll(), now);
         }
@@ -364,6 +485,31 @@ public final class ArenaLoans {
     }
 
     /**
+     * A block that leans on an open home stays where it is: a falling block over it (the upper of two gravel blocks of a
+     * cliff whose lower one was lent, the sand above a cell of the island's copy), or what its block held up that breaks a
+     * moment after it finds itself loose (sugar cane, a cactus, a stalactite, scaffolding). The quiet write of the loan did
+     * not wake it, but any later update of its neighbours (a snow layer settling on it, the grass beside it spreading)
+     * schedules its fall or its break, a tick or two later. Every tick of the ledger takes that back before it comes, until
+     * the home has mended: the hole is never filled by the ground above it, that ground is never left with a hole of its
+     * own, and nothing breaks into an item. (What breaks at once, a torch or a flower, drops nothing and is put back by the
+     * mend: {@link Propped}.)
+     */
+    private static void keepUp(ServerLevel level, BlockPos pos) {
+        if (!level.isLoaded(pos)) {
+            return;
+        }
+        BlockState state = level.getBlockState(pos);
+        Block block = state.getBlock();
+        if (!level.getBlockTicks().hasScheduledTick(pos, block)) {
+            return;
+        }
+        boolean falls = block instanceof Fallable && FallingBlock.isFree(level.getBlockState(pos.below()));
+        if (falls || !state.canSurvive(level, pos)) {
+            quiet(level, pos);
+        }
+    }
+
+    /**
      * Whether a cell a borrowed block left is still a hole for its block to come back into: air, a fluid, or what the world
      * puts into an open hole by itself, which the block replaces as a placed block would ({@link BlockState#canBeReplaced}:
      * the snow that fell into it, a vine or fire that spread into it), or the water the hole kept turned to ice. Asked by
@@ -374,7 +520,10 @@ public final class ArenaLoans {
                 || here.is(Blocks.ICE) || here.is(Blocks.FROSTED_ICE);
     }
 
-    /** The home's block is back: a standing borrowed block in the hole is taken back with it. */
+    /**
+     * The home's block is back: a standing borrowed block in the hole is taken back with it, and what the block held up is
+     * put back where its neighbours broke it meanwhile ({@link Propped}).
+     */
     private void mend(ServerLevel level, Home home, long now) {
         BlockPos pos = home.pos;
         Standing stood = standing.get(pos);
@@ -388,6 +537,19 @@ public final class ArenaLoans {
         if (!home.copy) {
             keep(new RepairKey(pos, null), new Repaired(homeEntry(home), true, saves(level)));
             dirty = true;
+        }
+        for (Propped propped : home.propped) {
+            proppedBy.remove(propped.pos(), home);
+            BlockState here = level.getBlockState(propped.pos());
+            if (here != propped.state() && isHole(here) && !homes.containsKey(propped.pos())) {
+                // Its neighbours broke it while the hole was open (it dropped nothing): it is back with its block.
+                liftOut(level, propped.pos(), propped.state());
+                set(level, propped.pos(), propped.state());
+                if (!propped.copy()) {
+                    keep(new RepairKey(propped.pos(), null), new Repaired(proppedEntry(propped), true, saves(level)));
+                    dirty = true;
+                }
+            }
         }
     }
 
@@ -508,6 +670,11 @@ public final class ArenaLoans {
             if (!home.copy) {
                 homeList.add(homeEntry(home));
             }
+            for (Propped propped : home.propped) {
+                if (!propped.copy()) {
+                    homeList.add(proppedEntry(propped)); // restored, like a home, only into a hole
+                }
+            }
         }
         for (Standing stood : standing.values()) {
             standingList.add(standingEntry(stood));
@@ -526,6 +693,12 @@ public final class ArenaLoans {
     private static CompoundTag homeEntry(Home home) {
         CompoundTag entry = cell(home.pos);
         entry.put("state", NbtUtils.writeBlockState(home.state));
+        return entry;
+    }
+
+    private static CompoundTag proppedEntry(Propped propped) {
+        CompoundTag entry = cell(propped.pos());
+        entry.put("state", NbtUtils.writeBlockState(propped.state()));
         return entry;
     }
 
@@ -638,6 +811,119 @@ public final class ArenaLoans {
         level.getBlockTicks().clearArea(BoundingBox.fromCorners(pos, pos));
     }
 
+    /**
+     * The level as it would be with some cells emptied (a loan asks what could stay without its block and what that holds
+     * up, {@link #propped}): everything is read from the level but those cells, which hold what they would be left with
+     * (air, or the water of a waterlogged block). Nothing is written anywhere.
+     */
+    private record Without(ServerLevel level, Map<BlockPos, BlockState> gone) implements LevelReader {
+        @Override
+        public BlockState getBlockState(BlockPos at) {
+            BlockState empty = gone.get(at);
+            return empty != null ? empty : level.getBlockState(at);
+        }
+
+        @Override
+        public FluidState getFluidState(BlockPos at) {
+            BlockState empty = gone.get(at);
+            return empty != null ? empty.getFluidState() : level.getFluidState(at);
+        }
+
+        @Nullable
+        @Override
+        public BlockEntity getBlockEntity(BlockPos at) {
+            return gone.containsKey(at) ? null : level.getBlockEntity(at);
+        }
+
+        @Nullable
+        @Override
+        public ChunkAccess getChunk(int x, int z, ChunkStatus status, boolean require) {
+            return level.getChunk(x, z, status, require);
+        }
+
+        @Override
+        @SuppressWarnings("deprecation")
+        public boolean hasChunk(int x, int z) {
+            return level.hasChunk(x, z);
+        }
+
+        @Override
+        public int getHeight(Heightmap.Types type, int x, int z) {
+            return level.getHeight(type, x, z);
+        }
+
+        @Override
+        public int getSkyDarken() {
+            return level.getSkyDarken();
+        }
+
+        @Override
+        public BiomeManager getBiomeManager() {
+            return level.getBiomeManager();
+        }
+
+        @Override
+        public Holder<Biome> getUncachedNoiseBiome(int x, int y, int z) {
+            return level.getUncachedNoiseBiome(x, y, z);
+        }
+
+        @Override
+        public boolean isClientSide() {
+            return false;
+        }
+
+        @Override
+        @SuppressWarnings("deprecation")
+        public int getSeaLevel() {
+            return level.getSeaLevel();
+        }
+
+        @Override
+        public DimensionType dimensionType() {
+            return level.dimensionType();
+        }
+
+        @Override
+        public RegistryAccess registryAccess() {
+            return level.registryAccess();
+        }
+
+        @Override
+        public FeatureFlagSet enabledFeatures() {
+            return level.enabledFeatures();
+        }
+
+        @Override
+        public float getShade(Direction direction, boolean shade) {
+            return level.getShade(direction, shade);
+        }
+
+        @Override
+        public LevelLightEngine getLightEngine() {
+            return level.getLightEngine();
+        }
+
+        @Override
+        public WorldBorder getWorldBorder() {
+            return level.getWorldBorder();
+        }
+
+        @Override
+        public List<VoxelShape> getEntityCollisions(@Nullable Entity entity, AABB box) {
+            return level.getEntityCollisions(entity, box);
+        }
+
+        @Override
+        public int getHeight() {
+            return level.getHeight();
+        }
+
+        @Override
+        public int getMinBuildHeight() {
+            return level.getMinBuildHeight();
+        }
+    }
+
     // ---------------------------------------------------------------------------------------------------------
     // What the ledger holds (for the fight's own rules and for tests)
 
@@ -651,6 +937,14 @@ public final class ArenaLoans {
         return homes.containsKey(pos);
     }
 
+    /**
+     * Whether the block at {@code pos} leans on an open home: its block held it up when it was lent (a torch on it, a
+     * flower, a lantern under it), and the mend puts it back if it breaks meanwhile.
+     */
+    public boolean isPropped(BlockPos pos) {
+        return proppedBy.containsKey(pos);
+    }
+
     /** Whether a borrowed block stands at {@code pos}. */
     public boolean isStanding(BlockPos pos) {
         return standing.containsKey(pos);
@@ -660,7 +954,7 @@ public final class ArenaLoans {
     @VisibleForTesting
     public void recordHomeForTests(BlockPos pos, BlockState state) {
         long now = fight.level().getGameTime();
-        Home home = new Home(pos.immutable(), state, fight.isCopyCell(pos), order++, now + BossConfig.ARENA_MEND_TICKS.get());
+        Home home = new Home(pos.immutable(), state, fight.isCopyCell(pos), order++, now + BossConfig.ARENA_MEND_TICKS.get(), List.of());
         homes.put(home.pos, home);
         due.add(home);
     }

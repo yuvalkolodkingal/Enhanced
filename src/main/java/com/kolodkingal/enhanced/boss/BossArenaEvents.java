@@ -22,6 +22,7 @@ import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.neoforged.neoforge.event.level.PistonEvent;
@@ -115,6 +116,17 @@ public final class BossArenaEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onPiston(PistonEvent.Pre event) {
         if (protects(event.getLevel(), event.getPos())) {
+            event.setCanceled(true);
+        }
+    }
+
+    /**
+     * A block that leans on a borrowed block's open hole (a torch on it, a flower, a lantern under it) and that its
+     * neighbours break meanwhile drops nothing: the mend puts it back ({@link ArenaLoans}).
+     */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onDrops(BlockDropsEvent event) {
+        if (BossFights.leansOnALoan(event.getLevel(), event.getPos())) {
             event.setCanceled(true);
         }
     }

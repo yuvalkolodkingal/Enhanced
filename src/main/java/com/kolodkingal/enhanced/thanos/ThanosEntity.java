@@ -1789,8 +1789,15 @@ public class ThanosEntity extends Monster implements BossHooks {
         return false;
     }
 
+    /** He never goes through a portal: his fight is in this dimension. */
     @Override
     public boolean canChangeDimensions(Level oldLevel, Level newLevel) {
+        return false;
+    }
+
+    /** ... nor even begins to go through one (no exit portal is looked for, nor built, in the other dimension). */
+    @Override
+    public boolean canUsePortal(boolean allowPassengers) {
         return false;
     }
 

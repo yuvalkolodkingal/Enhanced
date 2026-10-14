@@ -326,6 +326,20 @@ public final class BossFights {
     }
 
     /**
+     * Whether the block at {@code pos} leans on a block an arena has lent and whose hole is still open (a torch on it, a
+     * flower, a lantern under it): if its neighbours break it meanwhile it drops nothing, as the mend puts it back
+     * ({@link ArenaLoans#isPropped}).
+     */
+    public static boolean leansOnALoan(ServerLevel level, BlockPos pos) {
+        for (BossFight fight : FIGHTS) {
+            if (fight.level() == level && fight.loans().isPropped(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Whether {@code pos} is a cell of a copy a fight made of the world (Ultron's island in the sky): protected whatever the
      * config says, and never journaled as a hole (see {@link BossFight#isCopyCell}).
      */
@@ -356,7 +370,8 @@ public final class BossFights {
      * reads; null if it lends it (the player's rights are asked after this, {@link #lending}), or if no fight protects the
      * cell (it is no loan). In this order: {@code boss.lendArenaBlocks} off ({@code telekinesis.protected}, as in 3.0); the
      * fight's own rule ({@link BossFight#lendRefusal}); the ledger's ({@link ArenaLoans}: half of a door, a falling block
-     * over a gap, the block under an open home or a standing borrowed block, the fight's cap).
+     * over a gap, the block under an open home or a standing borrowed block or leaning on an open home, a block that holds
+     * up too much or that something hangs on, the fight's cap).
      */
     @Nullable
     public static String lendRefusal(ServerPlayer player, BlockPos pos) {

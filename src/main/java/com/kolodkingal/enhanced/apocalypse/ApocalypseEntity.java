@@ -872,6 +872,12 @@ public class ApocalypseEntity extends Monster implements BossHooks {
         return false;
     }
 
+    /** ... nor even begins to go through one (no exit portal is looked for, nor built, in the other dimension). */
+    @Override
+    public boolean canUsePortal(boolean allowPassengers) {
+        return false;
+    }
+
     // ---------------------------------------------------------------------------------------------------------
     // A boss that stays
 
