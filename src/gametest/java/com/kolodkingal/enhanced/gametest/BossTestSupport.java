@@ -207,8 +207,14 @@ final class BossTestSupport {
     /** The translation key of the last action-bar line the player was sent since the last call, or null. */
     @Nullable
     static String lastActionBarKey(ServerPlayer player) {
+        return lastActionBarKeyIn(TestKit.sentPackets(player));
+    }
+
+    /** The translation key of the last action-bar line among {@code packets}, or null. */
+    @Nullable
+    static String lastActionBarKeyIn(List<Object> packets) {
         String key = null;
-        for (Object packet : TestKit.sentPackets(player)) {
+        for (Object packet : packets) {
             if (packet instanceof ClientboundSystemChatPacket chat && chat.overlay() && chat.content().getContents() instanceof TranslatableContents translatable) {
                 key = translatable.getKey();
             }
