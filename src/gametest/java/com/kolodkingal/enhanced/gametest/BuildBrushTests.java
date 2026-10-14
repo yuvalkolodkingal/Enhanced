@@ -6,6 +6,8 @@ import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildJob;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildSession;
+import com.kolodkingal.enhanced.build.GrowBrush;
+import com.kolodkingal.enhanced.build.GrowStyle;
 import com.kolodkingal.enhanced.build.LandBrush;
 import com.kolodkingal.enhanced.build.LandStyle;
 import com.kolodkingal.enhanced.build.Spell;
@@ -371,6 +373,127 @@ public final class BuildBrushTests {
                     "its column rose, the older dab's never: " + heights[10][10]);
             BuildMagic.action(wanda, BuildActionPayload.STROKE_END, BlockPos.ZERO, BlockPos.ZERO, 3);
             check(steps(wanda).size() == 1 && steps(wanda).get(0).changed() == 4, "one step of the two pulses: " + steps(wanda).size());
+            helper.succeed();
+        });
+    }
+
+    // B84
+
+    /**
+     * One stone block in the air and one Swell pulse of radius 2: its six face neighbours become stone (and no other cell
+     * does); two Shrink pulses take the bump away (the first its six arms, which touch air on five faces, the second the
+     * block left standing); the swell is one undo step and gives the air back.
+     */
+    @GameTest(template = ARENA, batch = "build_brushes_grow", timeoutTicks = 200)
+    public static void growSwellsAndShrinks(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, null);
+        BlockPos rock = abs(f, 10, 6, 10);
+        f.level().setBlock(rock, Blocks.STONE.defaultBlockState(), 3);
+        cast(wanda, recipe(Spell.GROW).style(GrowStyle.SWELL).dab(1).at(rock, Direction.UP).size(2).build());
+        finish(wanda);
+        BuildMagic.action(wanda, BuildActionPayload.STROKE_END, BlockPos.ZERO, BlockPos.ZERO, 1);
+        int stones = 0;
+        for (BlockPos pos : BlockPos.betweenClosed(rock.offset(-3, -3, -3), rock.offset(3, 3, 3))) {
+            if (f.level().getBlockState(pos).is(Blocks.STONE)) {
+                stones++;
+            }
+        }
+        boolean six = true;
+        for (Direction direction : Direction.values()) {
+            six &= f.level().getBlockState(rock.relative(direction)).is(Blocks.STONE);
+        }
+        check(six && stones == 7, "its six neighbours are stone, nothing else: " + stones);
+        check(steps(wanda).size() == 1 && steps(wanda).get(0).spell() == Spell.GROW && steps(wanda).get(0).changed() == 6, "one step of six cells");
+        Runnable shrink = () -> {
+            cast(wanda, recipe(Spell.GROW).style(GrowStyle.SHRINK).dab(2).at(rock, Direction.UP).size(2).build());
+            finish(wanda);
+        };
+        helper.runAfterDelay(PULSE_GAP, () -> {
+            shrink.run();
+            int left = 0;
+            for (BlockPos pos : BlockPos.betweenClosed(rock.offset(-3, -3, -3), rock.offset(3, 3, 3))) {
+                left += f.level().getBlockState(pos).is(Blocks.STONE) ? 1 : 0;
+            }
+            check(left == 1 && f.level().getBlockState(rock).is(Blocks.STONE), "the first shrink took the arms: " + left);
+            helper.runAfterDelay(PULSE_GAP, () -> {
+                shrink.run();
+                int rest = 0;
+                for (BlockPos pos : BlockPos.betweenClosed(rock.offset(-3, -3, -3), rock.offset(3, 3, 3))) {
+                    rest += f.level().getBlockState(pos).is(Blocks.STONE) ? 1 : 0;
+                }
+                check(rest == 0, "the second shrink took the bump away: " + rest);
+                BuildMagic.action(wanda, BuildActionPayload.STROKE_END, BlockPos.ZERO, BlockPos.ZERO, 2);
+                check(steps(wanda).size() == 2, "the shrinks are a step of their own: " + steps(wanda).size());
+                helper.succeed();
+            });
+        });
+    }
+
+    // B85
+
+    /**
+     * Bloom on a meadow with a patch of dirt: the dirt becomes grass, and with a fixed seed the plants are exactly the
+     * cells the planner predicts (the same pure code, planned before the cast); on the arena's smooth stone nothing changes,
+     * and "Nothing grows here" is said once for the stroke.
+     */
+    @GameTest(template = ARENA, batch = "build_brushes_bloom", timeoutTicks = 200)
+    public static void bloomGrowsWhatThePlannerSaid(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, null);
+        meadow(f);
+        set(f, new BoundingBox(6, MEADOW, 6, 8, MEADOW, 14), Blocks.DIRT);
+        BlockPos middle = abs(f, 10, MEADOW, 10);
+        long seed = 777L;
+        GrowBrush.Pulse planner = new GrowBrush.Pulse(f.level(), GrowStyle.BLOOM, middle, 4, seed);
+        check(planner.step(Integer.MAX_VALUE) && planner.changes() > 0, "the planner finds something to grow");
+        List<LandBrush.Column> predicted = planner.columns();
+        int grass = 0;
+        int plants = 0;
+        for (LandBrush.Column column : predicted) {
+            if (column.news()[0].is(Blocks.GRASS_BLOCK)) {
+                grass++;
+            } else {
+                plants++;
+            }
+        }
+        check(grass > 0 && plants > 0, "grass from dirt and plants from the seed: " + grass + ", " + plants);
+        BoundingBox reach = GrowBrush.reach(middle, 4, GrowStyle.BLOOM);
+        List<BlockPos> changed = new ArrayList<>();
+        cast(wanda, recipe(Spell.GROW).style(GrowStyle.BLOOM).dab(1).at(middle, Direction.UP).size(4).seed(seed).build());
+        finish(wanda);
+        for (LandBrush.Column column : predicted) {
+            for (int i = 0; i < column.size(); i++) {
+                check(f.level().getBlockState(column.pos(i)).equals(column.news()[i]), "the planner's cell " + column.pos(i) + " grew: "
+                        + f.level().getBlockState(column.pos(i)) + " / " + column.news()[i]);
+                changed.add(column.pos(i));
+            }
+        }
+        BuildMagic.action(wanda, BuildActionPayload.STROKE_END, BlockPos.ZERO, BlockPos.ZERO, 1);
+        check(steps(wanda).size() == 1 && steps(wanda).get(0).changed() == planner.changes(), "one step of exactly its cells: "
+                + steps(wanda).get(0).changed() + " / " + planner.changes());
+        for (BlockPos pos : BlockPos.betweenClosed(reach.minX(), reach.minY(), reach.minZ(), reach.maxX(), reach.maxY(), reach.maxZ())) {
+            if (!changed.contains(pos) && !f.level().getBlockState(pos).isAir()) {
+                boolean allowed = f.level().getBlockState(pos).is(Blocks.GRASS_BLOCK) || f.level().getBlockState(pos).is(Blocks.DIRT)
+                        || f.level().getBlockState(pos).is(Blocks.STONE) || f.level().getBlockState(pos).is(Blocks.SMOOTH_STONE) || f.level().getBlockState(pos).is(Blocks.BARRIER);
+                check(allowed, "nothing else grew: " + pos + " " + f.level().getBlockState(pos));
+            }
+        }
+
+        // On smooth stone nothing grows, and the stroke says so once.
+        BlockPos bare = abs(f, 1, 1, 1);
+        Seen.of(wanda);
+        cast(wanda, recipe(Spell.GROW).style(GrowStyle.BLOOM).dab(2).at(bare, Direction.UP).size(1).seed(seed).build());
+        finish(wanda);
+        Seen first = Seen.of(wanda);
+        check(first.said("message.enhanced.build.nothing_grows"), "nothing grows on the stone: " + first);
+        helper.runAfterDelay(PULSE_GAP, () -> {
+            cast(wanda, recipe(Spell.GROW).style(GrowStyle.BLOOM).dab(2).at(bare, Direction.UP).size(1).seed(seed).build());
+            finish(wanda);
+            Seen second = Seen.of(wanda);
+            check(!second.said("message.enhanced.build.nothing_grows"), "and says it once for the stroke: " + second);
+            BuildMagic.action(wanda, BuildActionPayload.STROKE_END, BlockPos.ZERO, BlockPos.ZERO, 2);
+            check(steps(wanda).size() == 1, "the empty stroke leaves no step");
             helper.succeed();
         });
     }
