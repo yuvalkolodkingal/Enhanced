@@ -1130,7 +1130,7 @@
   "config.enhanced.build_see_through.tooltip": "The box shows faintly through hills and walls",
   "config.enhanced.build_show_others": "Other builders",
   "config.enhanced.build_show_others.tooltip": "See the boxes of other builders near you",
-  "message.enhanced.telekinesis.boss_grabbed": "%s is in your grip! Throw him before he breaks free",
+  "message.enhanced.telekinesis.boss_grabbed": "%s is in your grip! Throw before the grip breaks",
   "message.enhanced.telekinesis.boss_breaking": "%s is breaking free!",
   "message.enhanced.telekinesis.boss_broke_free": "%s broke free!",
   "message.enhanced.telekinesis.boss_regrip": "%s is still shaking off the last grip",
