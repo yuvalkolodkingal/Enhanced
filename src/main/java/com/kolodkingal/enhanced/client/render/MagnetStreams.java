@@ -200,16 +200,20 @@ public final class MagnetStreams {
     /**
      * Draws the pulses and the lines of force (in {@link EnhancedRenderTypes#ENERGY_BEAM}), then the flying items, each
      * lit by the world where it is. Ends its own batches.
+     *
+     * <p>Every age is the whole ticks since its start, counted in {@code long}, plus the frame's partial tick: a float game
+     * time loses its fraction in a world played long (half ticks from about 58 hours of world time, whole ticks from 116),
+     * and the streams would move in steps.
      */
     public static void render(Minecraft mc, ClientLevel level, MultiBufferSource.BufferSource buffers, Vec3 camera, float partialTick,
-                              float time) {
+                              long gameTime) {
         if (PULSES.isEmpty() && STREAMS.isEmpty()) {
             return;
         }
         Matrix4f pose = new Matrix4f();
         VertexConsumer light = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         for (Pulse p : PULSES) {
-            float age = time - p.start();
+            float age = age(gameTime, p.start(), partialTick);
             if (age < 0.0F || age > MagnetStreamMath.PULSE_TICKS) {
                 continue;
             }
@@ -235,7 +239,7 @@ public final class MagnetStreams {
                 return magneto == null ? null : hand(mc, magneto, partialTick);
             });
             if (hand != null && s.arrived < s.count) {
-                lineOfForce(s, hand, pose, light, camera, time);
+                lineOfForce(s, hand, pose, light, camera, age(gameTime, s.leaves(s.arrived), partialTick));
             }
         }
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
@@ -249,7 +253,7 @@ public final class MagnetStreams {
             }
             int handLight = LevelRenderer.getLightColor(level, BlockPos.containing(hand));
             for (int icon = s.arrived; icon < s.count; icon++) {
-                float age = time - s.leaves(icon);
+                float age = age(gameTime, s.leaves(icon), partialTick);
                 if (age < 0.0F || age >= s.ticks) {
                     continue;
                 }
@@ -283,12 +287,16 @@ public final class MagnetStreams {
         buffers.endBatch();
     }
 
+    /** Ticks since {@code start} in this frame: the whole ticks in {@code long}, then the partial tick. */
+    private static float age(long gameTime, long start, float partialTick) {
+        return (float) (gameTime - start) + partialTick;
+    }
+
     /**
-     * The thin colourless line of force behind the leading icon: the curve from where it left to where it is now, fainter
-     * toward where it left and fading out as it arrives (the look of his field).
+     * The thin colourless line of force behind the leading icon ({@code age}: ticks since it left): the curve from where it
+     * left to where it is now, fainter toward where it left and fading out as it arrives (the look of his field).
      */
-    private static void lineOfForce(Stream s, Vec3 hand, Matrix4f pose, VertexConsumer vc, Vec3 camera, float time) {
-        float age = time - s.leaves(s.arrived);
+    private static void lineOfForce(Stream s, Vec3 hand, Matrix4f pose, VertexConsumer vc, Vec3 camera, float age) {
         if (age <= 0.0F) {
             return;
         }
