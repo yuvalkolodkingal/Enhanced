@@ -396,8 +396,13 @@ public final class SpellPlanner {
         if (face == null || recipe.size() == 0) {
             return new Plan(recipe, NONE, null, null, null, Order.RISE, setup);
         }
+        // The layers stop where the world ends along the face (its build height, its border), as a Repeat's copies do:
+        // the Scarlet Witch may ask for as many layers as the world is wide.
+        int layers = layersInside(SpellMath.world(level), recipe.anchor(), face, recipe.size());
+        if (layers == 0) {
+            return new Plan(recipe, NONE, null, null, null, Order.RISE, setup);
+        }
         PullSurface surface = new PullSurface(level, recipe.anchor(), face, setup.selectCap, setup.span);
-        int layers = recipe.size();
         Rule rule = layers > 0 ? (getter, pos, cursor) -> {
             BlockState old = getter.getBlockState(pos);
             if (!SpellMath.isEmpty(old)) {
@@ -410,6 +415,7 @@ public final class SpellPlanner {
             return old.isAir() ? null : SpellMath.vanished(old);
         };
         Plan plan = new Plan(recipe, NONE, null, null, rule, layers > 0 ? Order.RISE : Order.MELT, setup, null, surface);
+        plan.layers = layers;
         // Before its flood, a surface holds at most the cap, and at most the span's square of cells.
         long plane = Math.max(1, setup.span > 0 ? Math.min(setup.selectCap, (long) setup.span * setup.span) : setup.selectCap);
         plan.bound = plane * Math.abs((long) layers);
@@ -494,6 +500,23 @@ public final class SpellPlanner {
     }
 
     /**
+     * How many of a Pull's {@code layers} (out of the face above 0, into it below) lie inside the {@code world}: a pull
+     * reaches the cells 1 to {@code layers} steps in front of the {@code anchor}'s plane, a push the plane itself and the
+     * cells behind it. 0 when none does.
+     */
+    private static int layersInside(BoundingBox world, BlockPos anchor, Direction face, int layers) {
+        Direction.Axis axis = face.getAxis();
+        long at = axis.choose(anchor.getX(), anchor.getY(), anchor.getZ());
+        long high = axis.choose(world.maxX(), world.maxY(), world.maxZ());
+        long low = axis.choose(world.minX(), world.minY(), world.minZ());
+        boolean positive = face.getAxisDirection() == Direction.AxisDirection.POSITIVE;
+        // In front of the plane for a pull, behind it (the plane included) for a push.
+        long room = layers > 0 ? (positive ? high - at : at - low) : (positive ? at - low : high - at) + 1;
+        long kept = Math.min(Math.abs((long) layers), Math.max(0, room));
+        return (int) (layers > 0 ? kept : -kept);
+    }
+
+    /**
      * How many copies of a Repeat ({@code length} long along {@code direction}, one every {@code step} blocks from the
      * source {@code box}) reach into the {@code world} at all.
      */
@@ -572,6 +595,8 @@ public final class SpellPlanner {
         private long size = -1;
         /** The most cells it may write before it is prepared (a Pull's), or -1 for {@link #size}. */
         private long bound = -1;
+        /** A Pull's layers, cut where the world ends (out of the face above 0, into it below). */
+        private int layers;
 
         private Plan(SpellRecipe recipe, int refusal, @Nullable Volume cells, @Nullable Volume region, @Nullable Rule rule, Order order,
                      Setup setup) {
@@ -622,7 +647,7 @@ public final class SpellPlanner {
             }
             prepared = true;
             if (surface.size() > 0) {
-                cells = new PullCells(surface.cells(), surface.face(), recipe.anchor(), recipe.size());
+                cells = new PullCells(surface.cells(), surface.face(), recipe.anchor(), layers);
             }
             return true;
         }

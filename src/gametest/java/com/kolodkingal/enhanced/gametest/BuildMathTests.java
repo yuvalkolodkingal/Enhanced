@@ -40,6 +40,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.SlabBlock;
@@ -730,7 +731,8 @@ public final class BuildMathTests {
     /**
      * A plan ends where the world ends (D-B 10.3 P2) and never loads a chunk to look (11.7): a dome standing on the top
      * of the world counts and shows only its cells under the build height, the rest counted apart; a Repeat with no
-     * count stops at the top and at the bottom of the world, and one with no room plans nothing; the server's level
+     * count stops at the top and at the bottom of the world, and one with no room plans nothing, and so do Pull &amp;
+     * Push however many layers they ask for; the server's level
      * knows its border. A Move's or a Repeat's source read live (a ghost's) reads no chunk that is not loaded, and
      * leaves the far chunk unloaded; its size is the selected thing's cells, not its box's.
      */
@@ -759,6 +761,28 @@ public final class BuildMathTests {
         Plan none = SpellPlanner.plan(roof, recipe(Spell.REPEAT).box(new BlockPos(0, top - 1, 0), new BlockPos(0, top, 0)).at(BlockPos.ZERO, Direction.UP)
                 .size(3).build(), Setup.at(CASTER));
         check(none.refusal() == SpellPlanner.NONE && !none.writes() && none.size() == 0, "a Repeat up from the top of the world has no room: nothing");
+
+        // Pull & Push stop there too, however many layers the Scarlet Witch asks for: up from a floor 5 under the top,
+        // down into the bottom of the world, east at its border; and up from the top layer, nothing.
+        World attic = new World().fill(new BoundingBox(0, top - 5, 0, 2, top - 5, 2), STONE);
+        Plan raised = SpellPlanner.plan(attic, recipe(Spell.PULL).at(new BlockPos(1, top - 5, 1), Direction.UP).size(60_000_000).build(),
+                Setup.at(CASTER).withSurface(100, 0));
+        check(raised.sizeBound() == 500, "before its flood, at most 100 cells a layer in 5 layers: " + raised.sizeBound());
+        check(raised.size() == 45 && raised.bounds() != null && raised.bounds().maxY() == top && cells(raised, attic).size() == 45,
+                "a pull up stops at the top of the world: 5 layers of 9, " + raised.size() + ", " + raised.bounds());
+        int bottom = world.getMinBuildHeight();
+        World cellar = new World().fill(new BoundingBox(0, bottom, 0, 2, bottom + 2, 2), STONE);
+        Plan sunk = SpellPlanner.plan(cellar, recipe(Spell.PULL).at(new BlockPos(1, bottom + 2, 1), Direction.UP).size(-60_000_000).build(),
+                Setup.at(CASTER));
+        check(sunk.size() == 27 && sunk.bounds() != null && sunk.bounds().minY() == bottom && cells(sunk, cellar).size() == 27,
+                "a push down stops at the bottom: the surface and the 2 layers under it, " + sunk.size());
+        int edge = Level.MAX_LEVEL_SIZE - 1;
+        World rim = new World().fill(new BoundingBox(edge - 9, 64, 0, edge - 9, 66, 2), STONE);
+        Plan out = SpellPlanner.plan(rim, recipe(Spell.PULL).at(new BlockPos(edge - 9, 65, 1), Direction.EAST).size(1000).build(), Setup.at(CASTER));
+        check(out.size() == 81 && out.bounds() != null && out.bounds().maxX() == edge, "a pull east stops at the border: 9 layers of 9, " + out.size());
+        World lid = new World().fill(new BoundingBox(0, top, 0, 2, top, 2), STONE);
+        Plan sky = SpellPlanner.plan(lid, recipe(Spell.PULL).at(new BlockPos(1, top, 1), Direction.UP).size(3).build(), Setup.at(CASTER));
+        check(sky.refusal() == SpellPlanner.NONE && !sky.writes() && sky.sizeBound() == 0 && sky.size() == 0, "a pull up from the top layer: nothing");
 
         ServerLevel level = helper.getLevel();
         BlockPos beyond = new BlockPos(30_000_000, 64, 0);
