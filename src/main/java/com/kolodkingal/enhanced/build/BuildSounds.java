@@ -14,24 +14,19 @@ import net.minecraft.world.phys.Vec3;
 import java.util.function.Supplier;
 
 /**
- * What Build Magic sounds like (D-B 7.3): eight moments, each to become an event of its own ({@code enhanced:build_on_wanda},
- * {@code build_on_billy}, {@code build_cast_wanda}, {@code build_cast_billy}, {@code build_hum}, {@code build_fizzle},
- * {@code build_undo}, {@code build_rank_up}), and the done sound, a vanilla one. Heard within 16 blocks of where each is
- * played (the spell's front, so a valley-sized spell is heard where it happens), except the fizzle, which only the builder
- * hears.
- *
- * <p>Until a moment's synthesised Ogg file lands, it plays a stand-in from the sounds that already exist, and its event is
- * neither registered nor in {@code sounds.json}, so every sound entry keeps its file ({@code DataTests.everySoundHasItsFile}).
- * The art lane adds each file, registers the event in the last region of {@code ModSounds} ({@code // ===== 3.1 build =====})
- * and in {@code sounds.json} in the same commit, and points its moment here at it. The eight subtitles are in both lang files
- * already.
+ * What Build Magic sounds like (D-B 7.3): eight moments, each an event of its own with a synthesised Ogg file
+ * ({@code enhanced:build_on_wanda}, {@code build_on_billy}, {@code build_cast_wanda}, {@code build_cast_billy},
+ * {@code build_hum}, {@code build_fizzle}, {@code build_undo}, {@code build_rank_up}), and two that are not: a spell of the
+ * Scarlet Witch of {@link #HUGE_CAST} blocks or more rises with the Hex of her gesture, and the done sound is a vanilla
+ * one. Heard within 16 blocks of where each is played (the spell's front, so a valley-sized spell is heard where it
+ * happens), except the fizzle, which only the builder hears. The eight subtitles are in both lang files.
  *
  * <p>Every method plays on the server, for everyone near (on a client {@code level.playSound} with no player does nothing).
  */
 public final class BuildSounds {
-    /** One stand-in: the sound, how loud, and the pitch (between {@code lowPitch} and {@code highPitch}). */
-    private record StandIn(Supplier<SoundEvent> sound, float volume, float lowPitch, float highPitch) {
-        StandIn(Supplier<SoundEvent> sound, float volume, float pitch) {
+    /** One moment's sound: the event, how loud, and the pitch (between {@code lowPitch} and {@code highPitch}). */
+    private record Voice(Supplier<SoundEvent> sound, float volume, float lowPitch, float highPitch) {
+        Voice(Supplier<SoundEvent> sound, float volume, float pitch) {
             this(sound, volume, pitch, pitch);
         }
 
@@ -41,27 +36,27 @@ public final class BuildSounds {
     }
 
     /** "Reality bends": the Scarlet Witch enters build mode, a breathy rising minor chord with a shimmer. */
-    private static final StandIn ON_WANDA = new StandIn(ModSounds.BUILD_ON_WANDA, 0.8F, 1.0F);
+    private static final Voice ON_WANDA = new Voice(ModSounds.BUILD_ON_WANDA, 0.8F, 1.0F);
     /** "A spellbook opens": Billy enters build mode, a paper flutter and two glassy notes. */
-    private static final StandIn ON_BILLY = new StandIn(ModSounds.BUILD_ON_BILLY, 0.8F, 1.0F);
+    private static final Voice ON_BILLY = new Voice(ModSounds.BUILD_ON_BILLY, 0.8F, 1.0F);
     /** "Chaos magic rewrites reality": one of her spells starts, a soft whoosh opening into a shimmering chord. */
-    private static final StandIn CAST_WANDA = new StandIn(ModSounds.BUILD_CAST_WANDA, 0.8F, 1.0F);
+    private static final Voice CAST_WANDA = new Voice(ModSounds.BUILD_CAST_WANDA, 0.8F, 1.0F);
     /** Her spell of {@link #HUGE_CAST} blocks or more starts: the rising Hex of her gesture, which has its own file. */
-    private static final StandIn CAST_WANDA_HUGE = new StandIn(ModSounds.HEX_RISE, 0.8F, 1.0F);
+    private static final Voice CAST_WANDA_HUGE = new Voice(ModSounds.HEX_RISE, 0.8F, 1.0F);
     /** "A spell crackles": one of Billy's spells starts, a quick electric crackle and a bright chime. */
-    private static final StandIn CAST_BILLY = new StandIn(ModSounds.BUILD_CAST_BILLY, 0.8F, 1.0F);
+    private static final Voice CAST_BILLY = new Voice(ModSounds.BUILD_CAST_BILLY, 0.8F, 1.0F);
     /** "Magic weaves": every 20 ticks at the front of the Scarlet Witch's working spell, a low warm hum (1.0 s). */
-    private static final StandIn HUM_WANDA = new StandIn(ModSounds.BUILD_HUM, 0.5F, 0.9F, 1.0F);
+    private static final Voice HUM_WANDA = new Voice(ModSounds.BUILD_HUM, 0.5F, 0.9F, 1.0F);
     /** The same at the front of Billy's, higher. */
-    private static final StandIn HUM_BILLY = new StandIn(ModSounds.BUILD_HUM, 0.5F, 1.3F, 1.5F);
+    private static final Voice HUM_BILLY = new Voice(ModSounds.BUILD_HUM, 0.5F, 1.3F, 1.5F);
     /** "A spell fizzles": a refusal, for the builder alone, a short "pfft" with a falling tone. */
-    private static final StandIn FIZZLE = new StandIn(ModSounds.BUILD_FIZZLE, 0.6F, 1.0F);
+    private static final Voice FIZZLE = new Voice(ModSounds.BUILD_FIZZLE, 0.6F, 1.0F);
     /** "Reality snaps back": an undo or a redo starts, the cast chord backwards ending in a soft snap. */
-    private static final StandIn UNDO = new StandIn(ModSounds.BUILD_UNDO, 0.8F, 1.0F);
+    private static final Voice UNDO = new Voice(ModSounds.BUILD_UNDO, 0.8F, 1.0F);
     /** "Billy learns new magic": he ranks up, five rising notes and a sparkle. */
-    private static final StandIn RANK_UP = new StandIn(ModSounds.BUILD_RANK_UP, 0.9F, 1.0F);
+    private static final Voice RANK_UP = new Voice(ModSounds.BUILD_RANK_UP, 0.9F, 1.0F);
     /** A spell is done: a vanilla sound, with no event of its own. */
-    private static final StandIn DONE = new StandIn(() -> SoundEvents.AMETHYST_CLUSTER_PLACE, 0.6F, 1.0F);
+    private static final Voice DONE = new Voice(() -> SoundEvents.AMETHYST_CLUSTER_PLACE, 0.6F, 1.0F);
 
     /** From this many blocks the Scarlet Witch's cast sounds bigger (as her gesture is, {@code WANDA_HEX_RISE}). */
     public static final int HUGE_CAST = 100_000;
@@ -105,7 +100,7 @@ public final class BuildSounds {
         return Powers.is(player, Power.BILLY);
     }
 
-    private static void play(Level level, Vec3 at, StandIn sound) {
+    private static void play(Level level, Vec3 at, Voice sound) {
         level.playSound(null, at.x, at.y, at.z, sound.sound.get(), SoundSource.PLAYERS, sound.volume, sound.pitch(level.getRandom()));
     }
 
