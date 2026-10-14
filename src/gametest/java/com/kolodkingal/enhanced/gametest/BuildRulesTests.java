@@ -24,6 +24,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal;
 import com.kolodkingal.enhanced.ultron.SokoviaRecovery;
+import com.kolodkingal.enhanced.ultron.SokoviaRelocations;
 import com.kolodkingal.enhanced.ultron.SokoviaShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -48,6 +49,10 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -436,6 +441,61 @@ public final class BuildRulesTests {
         check(working(wanda) != null, "one beside it is cast");
         finish(wanda);
         check(count(f, beside, Blocks.STONE) == 9, "and done");
+        helper.succeed();
+    }
+
+    /**
+     * The note of an island that had landed, kept until two saves hold the landing (R48) and found at a start that
+     * followed a stop that was not clean (lane TK's in-game check): its recovery warns of no island left in the sky,
+     * moves nobody, and its empty column stays as it was, with the ground under it; a note of an island that was left
+     * up there still warns.
+     */
+    @GameTest(template = ARENA, batch = "build_rules_sokovia_landed")
+    public static void aLandedIslandsNoteIsRecoveredQuietly(GameTestHelper helper) throws IOException {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        MinecraftServer server = f.level().getServer();
+        f.onClose(() -> {
+            SokoviaRecovery.clear();
+            SokoviaTestSupport.deleteJournals(server);
+        });
+        List<String> warnings = new ArrayList<>();
+        org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger) LogManager.getLogger(Enhanced.LOGGER.getName());
+        AbstractAppender appender = new AbstractAppender("build-sokovia-landed", null, null, true, Property.EMPTY_ARRAY) {
+            @Override
+            public void append(LogEvent event) {
+                if (event.getLevel().isMoreSpecificThan(org.apache.logging.log4j.Level.WARN)) {
+                    warnings.add(event.getMessage().getFormattedMessage());
+                }
+            }
+        };
+        appender.start();
+        logger.addAppender(appender);
+        f.onClose(() -> {
+            logger.removeAppender(appender);
+            appender.stop();
+        });
+        BlockPos centre = abs(f, 10, 6, 10);
+        BoundingBox ground = new BoundingBox(8, 2, 8, 12, 5, 12);
+        set(f, ground, Blocks.STONE);
+        SokoviaShape.Spec spec = new SokoviaShape.Spec(1, 3, 1, 1, 1, 42L);
+        UUID landed = UUID.randomUUID();
+        UUID member = UUID.randomUUID();
+        SokoviaJournal.write(server, new SokoviaJournal.Header(landed, f.level().dimension(), centre, spec, centre.getY(), centre.getY() + 2,
+                SokoviaJournal.LANDED, null, false, List.of(member)));
+        check(SokoviaRecovery.recoverAll(server) == 1, "the landed note is recovered");
+        SokoviaRecovery.finishAllNow();
+        check(warnings.stream().noneMatch(line -> line.contains(landed.toString())), "with no warning: " + warnings);
+        check(SokoviaRelocations.of(server).of(member) == null, "nobody is moved");
+        check(count(f, ground, Blocks.STONE) == 100 && count(f, new BoundingBox(8, 6, 8, 12, 8, 12), Blocks.AIR) == 75,
+                "its empty column and the ground under it are as they were");
+
+        UUID left = UUID.randomUUID();
+        SokoviaJournal.write(server, new SokoviaJournal.Header(left, f.level().dimension(), centre, spec, centre.getY(), centre.getY() + 2,
+                SokoviaJournal.PASTED, null, false, List.of()));
+        check(SokoviaRecovery.recoverAll(server) == 1, "(an island left in the sky)");
+        SokoviaRecovery.finishAllNow();
+        check(warnings.stream().anyMatch(line -> line.contains(left.toString()) && line.contains("left in the sky")),
+                "an island left up there still warns: " + warnings);
         helper.succeed();
     }
 
