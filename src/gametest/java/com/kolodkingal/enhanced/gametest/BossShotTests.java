@@ -1,9 +1,13 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.Metal;
+import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.thanos.StonePowers;
+import com.kolodkingal.enhanced.thanos.ThanosSwordEntity;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -19,7 +23,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /**
  * What a boss fight throws, in the hands of telekinesis (3.1, D-T 6.2.1 and 10): which of the bosses and their shots the
- * tags leave to telekinesis and which the villains' own pulls pass by.
+ * tags leave to telekinesis and which the villains' own pulls pass by, and how long a grip holds Thanos's sword.
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -60,6 +64,23 @@ public final class BossShotTests {
         }
         LivingEntity zombie = EntityType.ZOMBIE.create(level);
         check(zombie != null && StonePowers.graspable(zombie), "a zombie can");
+        helper.succeed();
+    }
+
+    /**
+     * R8 (D-T 4.3, D-M 3.5): Thanos's Double-Edged Sword is metal to Magneto, and a grip holds it {@code
+     * thanos_boss.swordHoldTicks} (40) at most, Billy's and the Phoenix's alike (Billy's factor is for the bosses only),
+     * Magneto's 1.5 times as long (60): on metal, his grip is the stronger. A shot is no boss: nothing keeps it from the
+     * next grip.
+     */
+    @GameTest(template = ARENA, batch = "boss_shot_hold")
+    public static void magnetoHoldsTheSwordLonger(GameTestHelper helper) {
+        ThanosSwordEntity sword = ModEntities.THANOS_SWORD.get().create(helper.getLevel());
+        check(sword != null && Metal.isMagnetic(sword), "the Double-Edged Sword is metal to Magneto");
+        check(BossGrip.holdLimit(sword, Telekinesis.Mode.BILLY) == 40 && BossGrip.holdLimit(sword, Telekinesis.Mode.JEAN) == 40,
+                "Billy and the Phoenix hold it 40 ticks: " + BossGrip.holdLimit(sword, Telekinesis.Mode.BILLY));
+        check(BossGrip.holdLimit(sword, Telekinesis.Mode.MAGNETO) == 60, "Magneto 60: " + BossGrip.holdLimit(sword, Telekinesis.Mode.MAGNETO));
+        check(!BossGrip.isBoss(sword) && BossGrip.regripLeft(sword) == 0, "a shot has no regrip of its own");
         helper.succeed();
     }
 

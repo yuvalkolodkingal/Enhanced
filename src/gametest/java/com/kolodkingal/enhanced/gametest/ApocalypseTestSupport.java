@@ -226,12 +226,18 @@ final class ApocalypseTestSupport {
 
         /** Whether a chat line (not the action bar) with this translation key, in its text or in any part of it, was sent. */
         boolean said(String key) {
+            return timesSaid(key) > 0;
+        }
+
+        /** How many chat lines (not the action bar) with this translation key, in their text or in any part of it, were sent. */
+        int timesSaid(String key) {
+            int times = 0;
             for (Object packet : packets) {
                 if (packet instanceof ClientboundSystemChatPacket chat && !chat.overlay() && mentions(chat.content(), key)) {
-                    return true;
+                    times++;
                 }
             }
-            return false;
+            return times;
         }
 
         /** Whether an action-bar line with this translation key was sent. */

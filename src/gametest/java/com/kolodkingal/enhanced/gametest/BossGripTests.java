@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.Telekinesis.Mode;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseArena;
+import com.kolodkingal.enhanced.apocalypse.ApocalypseAttack;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseFight;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
@@ -17,12 +18,15 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
+import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -45,6 +49,7 @@ import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -53,6 +58,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -66,9 +72,14 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 
 import static com.kolodkingal.enhanced.gametest.BossTestSupport.lastActionBarKey;
@@ -718,6 +729,486 @@ public final class BossGripTests {
     }
 
     // ------------------------------------------------------------------------------------------------------------
+    // A held boss does nothing (D-T 4.4, 6.1.1, 6.2.1, 6.3.1)
+
+    /**
+     * T8, Thanos's part (D-T 4.4, 6.2.1): a grip breaks his move off and lets go of what it held. Thanos chokes a player up
+     * in the air; Wanda takes hold of him: the Choke is broken off, the player falls back to the floor and is hurt no more,
+     * and no move begins while she holds him, though he chooses again (he is no longer passive). He breaks free after her
+     * 40 ticks and acts again within 100: a move against the player beside him.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_still", timeoutTicks = 260)
+    public static void aHeldBossDoesNothing(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        ServerPlayer victim = ThanosMoveSupport.fighter(f, 0.0, 2.0);
+        victim.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 400, 0)); // (let go up there, the fall alone hurts him)
+        ServerPlayer wanda = ThanosMoveSupport.fighter(f, -7.0, 0.0, Power.SCARLET_WITCH);
+        ThanosEntity thanos = ThanosBossTests.boss(f, victim);
+        thanos.forceMove(ThanosMove.CHOKE, victim);
+        double floor = helper.absoluteVec(new Vec3(0, FLOOR, 0)).y;
+        int[] grabbedAt = {-1};
+        int[] freeAt = {-1};
+        float[] health = {0.0F};
+        f.everyTick(240, tick -> {
+            victim.doTick();
+            PowerTicker.tick(wanda);
+            if (grabbedAt[0] < 0) {
+                if (tick < 24) {
+                    return false;
+                }
+                check(thanos.currentMove() == ThanosMove.CHOKE && victim.getY() > floor + 0.3, "Thanos chokes the player, up off the floor");
+                lookAt(wanda, thanos);
+                press(wanda, 3, false);
+                check(Telekinesis.holds(wanda, thanos), "Wanda takes hold of him");
+                check(thanos.currentMove() == null, "his Choke is broken off");
+                thanos.setPassive(false);
+                grabbedAt[0] = tick;
+                health[0] = victim.getHealth();
+                return false;
+            }
+            if (Telekinesis.isHeld(thanos)) {
+                check(thanos.currentMove() == null, "no move begins while he is held (tick " + (tick - grabbedAt[0]) + ")");
+                check(victim.getHealth() == health[0], "the player is hurt no more");
+                return false;
+            }
+            if (freeAt[0] < 0) {
+                freeAt[0] = tick;
+                check(tick - grabbedAt[0] == 40 && BossGrip.BROKE_FREE.equals(lastActionBarKey(wanda)), "he broke free after her 40 ticks");
+                check(victim.getY() <= floor + 0.01, "the player he choked is back on the floor: " + (victim.getY() - floor));
+            }
+            if (thanos.currentMove() != null) {
+                return true;
+            }
+            check(tick - freeAt[0] < 100, "he acts again within 100 ticks of the end of the grip");
+            return false;
+        });
+    }
+
+    /**
+     * T8, Apocalypse's part (D-T 4.4, 6.3.1): in a window, with his brain busy (he has begun his Lances), Wanda takes hold of
+     * him: his brain drops the attack, and begins none while she holds him, though it chooses again. Once he broke free
+     * he acts again within 100 ticks. (The window opens with no stagger here, so his brain runs at once.)
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_still_apocalypse", timeoutTicks = 200)
+    public static void aHeldApocalypseDoesNothing(GameTestHelper helper) {
+        ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
+        d.f().onClose(Telekinesis::clear);
+        d.f().config(ApocalypseBossConfig.STAGGER_TICKS, 0);
+        ServerPlayer wanda = d.hero();
+        ApocalypseEntity boss = d.boss();
+        ApocalypseTestSupport.breakShield(d);
+        int[] freeAt = {-1};
+        d.f().everyTick(180, tick -> {
+            PowerTicker.tick(wanda);
+            if (tick == 1) {
+                return false; // (the fight counts its foes)
+            }
+            if (tick == 2) {
+                boss.brain().clearCooldowns();
+                check(boss.brain().force(boss, d.fight(), ApocalypseAttack.LANCES) && boss.brain().isBusy(), "in his window he begins his Lances");
+                lookAt(wanda, boss);
+                press(wanda, 3, false);
+                check(Telekinesis.holds(wanda, boss) && !boss.brain().isBusy(), "Wanda takes hold of him: his brain drops the attack");
+                boss.brain().setChoosing(true);
+                return false;
+            }
+            if (Telekinesis.isHeld(boss)) {
+                check(!boss.brain().isBusy(), "no attack begins while he is held (tick " + tick + ")");
+                return false;
+            }
+            if (freeAt[0] < 0) {
+                freeAt[0] = tick;
+                check(boss.shield().state() == ApocalypseShield.State.BROKEN, "his window is still open");
+                boss.brain().clearCooldowns();
+            }
+            if (boss.brain().isBusy()) {
+                return true;
+            }
+            check(tick - freeAt[0] < 100, "he acts again within 100 ticks of the end of the grip");
+            return false;
+        });
+    }
+
+    /**
+     * T8, Ultron's part (D-T 4.4, 6.1.1): Ultron begins a Volley at Wanda and she takes hold of him in its tell: the attack
+     * is dropped, no bolt of his is fired while she holds him, and none begins, though his brain chooses again. Once he
+     * broke free he attacks again within 100 ticks.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_still_ultron", timeoutTicks = 200)
+    public static void aHeldUltronDoesNothing(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
+        UltronTestSupport.tank(wanda);
+        UltronFight fight = UltronTestSupport.onTheGround(f, wanda);
+        UltronTestSupport.calm(fight);
+        UltronEntity body = UltronTestSupport.boss(fight);
+        UltronTestSupport.put(f, wanda, 3.5, FLOOR, 10.5);
+        UltronTestSupport.put(f, body, 12.5, FLOOR + 1.0, 10.5);
+        check(body.brain().force(body, fight, UltronAttack.VOLLEY) && body.state().isAttack(), "he begins a Volley at Wanda");
+        lookAt(wanda, body);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, body) && !body.state().isAttack(), "Wanda takes hold of him in its tell: the Volley is dropped");
+        body.brain().setChoosing(true);
+        body.brain().resetCooldowns();
+        int[] freeAt = {-1};
+        f.everyTick(180, tick -> {
+            PowerTicker.tick(wanda);
+            if (Telekinesis.isHeld(body)) {
+                check(helper.getEntities(ModEntities.ULTRON_BOLT.get()).isEmpty(), "no bolt of his while he is held (tick " + tick + ")");
+                check(!body.state().isAttack(), "and no attack begins");
+                return false;
+            }
+            if (freeAt[0] < 0) {
+                freeAt[0] = tick;
+            }
+            if (body.state().isAttack()) {
+                return true;
+            }
+            check(tick - freeAt[0] < 100, "he attacks again within 100 ticks of the end of the grip");
+            return false;
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Apocalypse's shield (D-T 6.3, 6.3.1)
+
+    /**
+     * T10 (D-T 4.6, 6.3, 6.3.1): only mind power takes Apocalypse through his shield. With it up, Billy's and Magneto's
+     * presses are turned away ({@code boss_shield}), each with exactly one golden ripple (10 ticks apart, past the ripple's
+     * rate limit), and his Babel line is said once in all; a Horseman beside him is taken with no ripple, and one right
+     * behind him on Billy's line is not taken through him. Wanda and the Phoenix hold him. In a window Billy holds him; in
+     * his true form there is no metal on him for Magneto, and Billy holds him.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_shield", timeoutTicks = 60)
+    public static void onlyMindPowerTakesApocalypseThroughHisShield(GameTestHelper helper) {
+        ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
+        d.f().onClose(Telekinesis::clear);
+        d.f().config(BossConfig.REGRIP_TICKS, 0); // (the heroes take hold of him one after the other)
+        ServerLevel level = d.level();
+        ApocalypseEntity boss = d.boss();
+        ServerPlayer billy = d.hero();
+        ServerPlayer magneto = d.f().player(10.5, FLOOR, 3.5, Power.MAGNETO);
+        ServerPlayer wanda = d.f().player(17.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer phoenix = d.f().player(16.5, FLOOR, 16.5, Power.PHOENIX);
+        ApocalypseTestSupport.Log log = new ApocalypseTestSupport.Log(billy);
+        check(boss.shield().isUp(), "his shield is up");
+        ServerPlayer[] pressers = {billy, magneto, billy};
+        int[] keys = {3, 1, 3};
+        d.f().everyTick(40, tick -> {
+            if (tick == 1 || tick == 11 || tick == 21) {
+                int i = tick / 10;
+                ServerPlayer hero = pressers[i];
+                lookAt(hero, boss);
+                if (hero == magneto) {
+                    lastActionBarKey(magneto);
+                }
+                press(hero, keys[i], false);
+                List<String> told = log.drain().actionBarKeys();
+                String key = hero == magneto ? lastActionBarKey(magneto) : told.get(told.size() - 1);
+                check(BossGrip.SHIELD.equals(key) && !Telekinesis.isHolding(hero) && !Telekinesis.isHeld(boss),
+                        hero.getGameProfile().getName() + "'s press: his shield turns it away (" + key + ")");
+                check(log.effects(ApocalypseFxPayload.SHIELD_HIT).size() == i + 1,
+                        "exactly one golden ripple per press: " + log.effects(ApocalypseFxPayload.SHIELD_HIT).size() + " after " + (i + 1));
+                return false;
+            }
+            if (tick < 31) {
+                return false;
+            }
+            check(log.drain().timesSaid("speech.enhanced.apocalypse.babel") == 1, "his Babel line was said once in all");
+
+            // A Horseman beside him is taken, with no ripple; one right behind him is not taken through him.
+            Husk beside = d.fight().horsemen().spawn(level, Horsemen.Kind.FAMINE, helper.absoluteVec(new Vec3(10.5, FLOOR, 15.5)));
+            beside.setNoAi(true);
+            lookAt(billy, beside);
+            press(billy, 3, false);
+            check(Telekinesis.holds(billy, beside), "Billy's press at a Horseman beside him takes the Horseman");
+            check(log.drain().effects(ApocalypseFxPayload.SHIELD_HIT).size() == 3, "and shows no ripple");
+            Telekinesis.release(billy, false);
+            beside.discard();
+            Husk behind = d.fight().horsemen().spawn(level, Horsemen.Kind.FAMINE, helper.absoluteVec(new Vec3(15.5, FLOOR, 10.5)));
+            behind.setNoAi(true);
+            lookAt(billy, behind);
+            press(billy, 3, false);
+            List<String> told = log.drain().actionBarKeys();
+            check(BossGrip.SHIELD.equals(told.get(told.size() - 1)) && !Telekinesis.isHolding(billy) && !Telekinesis.isHeld(behind),
+                    "at a Horseman right behind him: his shield turns it away, and the Horseman is not taken through him");
+            behind.discard();
+
+            // Mind power holds him through it.
+            for (ServerPlayer hero : new ServerPlayer[] {wanda, phoenix}) {
+                lookAt(hero, boss);
+                press(hero, 3, false);
+                check(Telekinesis.holds(hero, boss), hero.getGameProfile().getName() + " (mind power) holds him through his shield");
+                Telekinesis.release(hero, false);
+            }
+
+            // In a window, Billy holds him.
+            boss.invulnerableTime = 0;
+            boss.hurt(ModDamageTypes.source(level, ModDamageTypes.CHAOS_BEAM, wanda, wanda), boss.shield().strength() + 1.0F);
+            check(boss.shield().state() == ApocalypseShield.State.BROKEN, "Wanda's beam breaks his shield");
+            lookAt(billy, boss);
+            press(billy, 3, false);
+            check(Telekinesis.holds(billy, boss), "in his window Billy holds him");
+            Telekinesis.release(billy, false);
+
+            // In his true form there is no metal on him: Magneto has nothing to grip, Billy holds him.
+            d.fight().forceState(ApocalypseFight.Stage.TRUE_FORM, 3);
+            check(boss.isTrueForm() && !Telekinesis.isMagnetic(boss) && !Telekinesis.canLift(magneto, boss, Mode.MAGNETO),
+                    "in his true form he wears no metal");
+            lookAt(magneto, boss);
+            lastActionBarKey(magneto);
+            press(magneto, 1, false);
+            check(!Telekinesis.isHolding(magneto) && "message.enhanced.telekinesis.no_metal".equals(lastActionBarKey(magneto)),
+                    "Magneto's R at him: no metal in sight");
+            lookAt(billy, boss);
+            press(billy, 3, false);
+            check(Telekinesis.holds(billy, boss), "Billy holds him");
+            Telekinesis.release(billy, false);
+            return true;
+        });
+    }
+
+    /**
+     * T10, the config's part (D-T 6.3.1): a server that names Billy in {@code apocalypse_shield.mindPowerHeroes} makes his
+     * telekinesis mind power: he holds Apocalypse through his shield, and no ripple shows.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_shield_billy", timeoutTicks = 40)
+    public static void billyNamedMindPowerHoldsApocalypseThroughHisShield(GameTestHelper helper) {
+        ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
+        d.f().onClose(Telekinesis::clear);
+        d.f().config(ApocalypseShieldConfig.MIND_POWER_HEROES, List.of("scarlet_witch", "phoenix", "billy"));
+        ServerPlayer billy = d.hero();
+        ApocalypseEntity boss = d.boss();
+        ApocalypseTestSupport.Log log = new ApocalypseTestSupport.Log(billy);
+        check(boss.shield().isUp(), "his shield is up");
+        lookAt(billy, boss);
+        press(billy, 3, false);
+        check(Telekinesis.holds(billy, boss), "Billy, named mind power, holds him through his shield");
+        check(log.drain().effects(ApocalypseFxPayload.SHIELD_HIT).isEmpty(), "and no ripple shows");
+        Telekinesis.release(billy, false);
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Ultron's heart and his Sentries (D-T 6.1.1, R40)
+
+    /**
+     * T15 (D-T 6.1.1): the heart rip stays Wanda's, and works on a body she holds. On the island: her empty-handed V at a
+     * body at 15 percent tears the core out (as in 3.0); at 16 percent she holds the next body, and set to 14 percent while
+     * she holds it her V tears its core out instead of throwing it. At 14 percent, her Sneak + V takes the block behind
+     * him and begins no upload (it never asks his fight). Billy at 14 percent holds him and throws him: no rip. (The
+     * block is the world's own here, with {@code boss.protectArena} off: the island's loans are lane TK's step 5 and 6.)
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_rip", timeoutTicks = 300)
+    public static void theHeartRipStaysWandasAndWorksOnAHeldBody(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        f.config(BossConfig.REGRIP_TICKS, 0);
+        f.config(BossConfig.THROWN_STILL_TICKS, 0);
+        f.config(BossConfig.PROTECT_ARENA, false);
+        ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
+        UltronTestSupport.tank(wanda);
+        ServerPlayer billy = f.player(16.5, FLOOR, 15.5, Power.BILLY);
+        UltronTestSupport.tank(billy);
+        UltronFight fight = UltronTestSupport.onTheIsland(f, wanda);
+        UltronTestSupport.calm(fight);
+        // Two bodies to upload into, far from the line of sight.
+        UltronTestSupport.sentryAt(f, fight, 2.5, 2.5);
+        UltronTestSupport.sentryAt(f, fight, 18.5, 2.5);
+        UltronTestSupport.calm(fight);
+        UltronTestSupport.put(f, wanda, 10.5, FLOOR, 15.5);
+        BlockPos stone = new BlockPos(10, 3, 5);
+        int[] step = {0};
+        int[] waitFrom = {0};
+        f.everyTick(280, tick -> {
+            if (fight.isTransferring()) {
+                return false;
+            }
+            UltronEntity body = UltronTestSupport.boss(fight);
+            switch (step[0]) {
+                case 0 -> {
+                    UltronTestSupport.put(f, body, 10.5, FLOOR + 1.0, 9.5);
+                    body.setHealth(body.getMaxHealth() * 0.149F);
+                    lookAt(wanda, body);
+                    press(wanda, 3, false);
+                    check(fight.isTransferring() && fight.uploads() == 1 && !Telekinesis.isHolding(wanda),
+                            "at 15 percent her empty-handed V tears the core out: he uploads");
+                }
+                case 1 -> {
+                    UltronTestSupport.calm(fight);
+                    UltronTestSupport.put(f, body, 10.5, FLOOR + 1.0, 9.5);
+                    body.setHealth(body.getMaxHealth() * 0.16F);
+                    lookAt(wanda, body);
+                    press(wanda, 3, false);
+                    check(Telekinesis.holds(wanda, body) && !fight.isTransferring(), "at 16 percent she holds his next body");
+                    body.setHealth(body.getMaxHealth() * 0.14F);
+                    press(wanda, 3, false);
+                    check(fight.isTransferring() && fight.uploads() == 2, "set to 14 percent while she holds him, her V tears the core out");
+                    check(!Telekinesis.isHolding(wanda) && !BossGrip.stills(body), "instead of throwing him");
+                }
+                case 2 -> {
+                    UltronTestSupport.calm(fight);
+                    UltronTestSupport.put(f, body, 10.5, FLOOR + 1.0, 9.5);
+                    body.setHealth(body.getMaxHealth() * 0.14F);
+                    helper.setBlock(stone, Blocks.STONE);
+                    lookAt(wanda, Vec3.atCenterOf(helper.absolutePos(stone)));
+                    press(wanda, 3, true);
+                    check(!fight.isTransferring() && fight.uploads() == 2, "her Sneak + V past him at 14 percent begins no upload");
+                    check(Telekinesis.isHolding(wanda) && !Telekinesis.isHeld(body) && helper.getBlockState(stone).isAir(),
+                            "it takes the block behind him, not him");
+                    for (TelekineticBlockEntity block : helper.getEntities(ModEntities.TELEKINETIC_BLOCK.get())) {
+                        block.discard();
+                    }
+                    Telekinesis.release(wanda, false);
+                    waitFrom[0] = tick;
+                }
+                case 3 -> {
+                    lookAt(billy, body);
+                    press(billy, 3, false);
+                    check(Telekinesis.holds(billy, body) && !fight.isTransferring(), "Billy at 14 percent holds him: no rip");
+                    look(billy, billy.getYRot(), -60.0F);
+                    press(billy, 3, false);
+                    check(!Telekinesis.isHolding(billy) && !fight.isTransferring() && fight.uploads() == 2, "and his V throws him: no rip");
+                    return true;
+                }
+                default -> {
+                }
+            }
+            step[0]++;
+            return false;
+        });
+    }
+
+    /**
+     * T16 (D-T 6.1.1, R40): the Sentry crush is Wanda's and Magneto's. A held Sentry of the fight thrown by Wanda dies at
+     * once, what was left of it hers; thrown by Magneto it dies too, in 24 grey metal sparks with the clang of an anvil and
+     * the snap of a chain, what was left of it his. Thrown by Billy or the Phoenix it flies and lives. Magneto's throw of a
+     * body at 14 percent on the island tears no heart out (the rip is Wanda's alone).
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_crush", timeoutTicks = 80)
+    public static void theSentryCrushIsWandasAndMagnetos(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
+        ServerPlayer magneto = f.player(3.5, FLOOR, 7.5, Power.MAGNETO);
+        ServerPlayer billy = f.player(3.5, FLOOR, 13.5, Power.BILLY);
+        ServerPlayer phoenix = f.player(3.5, FLOOR, 17.5, Power.PHOENIX);
+        for (ServerPlayer hero : new ServerPlayer[] {wanda, magneto, billy, phoenix}) {
+            UltronTestSupport.tank(hero);
+        }
+        UltronFight fight = UltronTestSupport.onTheIsland(f, wanda);
+        UltronTestSupport.calm(fight);
+        UltronTestSupport.put(f, wanda, 3.5, FLOOR, 3.5);
+        UltronEntity body = UltronTestSupport.boss(fight);
+        UltronTestSupport.put(f, body, 16.5, FLOOR + 1.0, 7.5);
+        UltronSentryEntity forWanda = UltronTestSupport.sentryAt(f, fight, 7.5, 3.5);
+        UltronSentryEntity forMagneto = UltronTestSupport.sentryAt(f, fight, 7.5, 7.5);
+        UltronSentryEntity forBilly = UltronTestSupport.sentryAt(f, fight, 7.5, 13.5);
+        UltronSentryEntity forPhoenix = UltronTestSupport.sentryAt(f, fight, 7.5, 17.5);
+        UltronTestSupport.calm(fight);
+        f.everyTick(60, tick -> {
+            if (tick == 1) {
+                return false; // (the heroes join the fight)
+            }
+            if (tick == 2) {
+                // Wanda's throw crushes it, as in 3.0.
+                float health = forWanda.getHealth();
+                lookAt(wanda, forWanda);
+                press(wanda, 3, false);
+                check(Telekinesis.holds(wanda, forWanda), "Wanda holds a Sentry");
+                press(wanda, 3, false);
+                check(!Telekinesis.isHolding(wanda) && forWanda.isDeadOrDying(), "her throw crushes it");
+                assertNear(fight.participant(wanda.getUUID()).damage(), health, 0.01, "what was left of it is hers");
+
+                // Magneto's throw crushes it too (R40), in grey metal sparks, an anvil's clang and a chain's snap.
+                health = forMagneto.getHealth();
+                lookAt(magneto, forMagneto);
+                press(magneto, 1, false);
+                check(Telekinesis.holds(magneto, forMagneto), "Magneto's R holds a Sentry");
+                TestKit.sentPackets(magneto);
+                press(magneto, 1, false);
+                List<Object> sent = TestKit.sentPackets(magneto);
+                check(!Telekinesis.isHolding(magneto) && forMagneto.isDeadOrDying(), "his throw crushes it");
+                assertNear(fight.participant(magneto.getUUID()).damage(), health, 0.01, "what was left of it is his");
+                boolean sparks = TestKit.particlesIn(sent).stream().anyMatch(p -> p.getCount() == 24
+                        && p.getParticle() instanceof EnergyParticleOptions energy && energy.color() == Power.MAGNETO.color);
+                check(sparks, "24 sparks of his metal grey burst from it");
+                List<TestKit.HeardSound> heard = TestKit.soundsIn(sent);
+                check(heard.stream().anyMatch(s -> s.id().equals(SoundEvents.ANVIL_LAND.getLocation()))
+                        && heard.stream().anyMatch(s -> s.id().equals(SoundEvents.CHAIN_BREAK.getLocation())), "with an anvil's clang and a chain's snap");
+
+                // Billy's and the Phoenix's throws send it flying, into the floor: it lives.
+                for (ServerPlayer hero : new ServerPlayer[] {billy, phoenix}) {
+                    UltronSentryEntity sentry = hero == billy ? forBilly : forPhoenix;
+                    lookAt(hero, sentry);
+                    press(hero, 3, false);
+                    check(Telekinesis.holds(hero, sentry), hero.getGameProfile().getName() + " holds a Sentry");
+                    look(hero, hero.getYRot(), 45.0F);
+                    press(hero, 3, false);
+                    check(!Telekinesis.isHolding(hero) && sentry.isAlive(), hero.getGameProfile().getName() + "'s throw crushes nothing");
+                }
+                return false;
+            }
+            if (tick < 30) {
+                return false;
+            }
+            check(forBilly.isAlive() && forPhoenix.isAlive(), "the Sentries Billy and the Phoenix threw live on");
+
+            // Magneto's throw of a body at 14 percent, on the island, tears no heart out.
+            body.setHealth(body.getMaxHealth() * 0.14F);
+            lookAt(magneto, body);
+            press(magneto, 1, false);
+            check(Telekinesis.holds(magneto, body), "Magneto holds his body (vibranium is metal)");
+            look(magneto, EAST, 0.0F);
+            press(magneto, 1, false);
+            check(!Telekinesis.isHolding(magneto) && !fight.isTransferring() && fight.uploads() == 0 && BossGrip.stills(body),
+                    "his throw throws him: no heart torn out");
+            return true;
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // A cocoon (D-T 6.3)
+
+    /**
+     * T19 (D-T 6.3): taking hold of someone Apocalypse's sand entombed breaks the cocoon and frees them, whatever the form
+     * that does it: Billy's grip frees a pig, Magneto's a zombie in an iron chestplate.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_cocoon", timeoutTicks = 40)
+    public static void anyFormFreesAnEntombedFriend(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer billy = f.player(3.5, FLOOR, 6.5, Power.BILLY);
+        ServerPlayer magneto = f.player(3.5, FLOOR, 14.5, Power.MAGNETO);
+        // The Apocalypse hero's sand: a hero's cocoon, which no fight owns and no sweep takes away.
+        ServerPlayer caster = f.player(17.5, FLOOR, 10.5, Power.APOCALYPSE);
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 6.5));
+        Zombie zombie = stillZombie(helper, 8.5, 14.5);
+        zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+        SandCocoonEntity pigCocoon = SandControl.entomb(level, caster, pig, 100, 0.0F, 20.0F, null);
+        SandCocoonEntity zombieCocoon = SandControl.entomb(level, caster, zombie, 100, 0.0F, 20.0F, null);
+        check(pigCocoon != null && zombieCocoon != null && !pigCocoon.isRemoved() && !zombieCocoon.isRemoved()
+                && pig.hasEffect(ModEffects.ENTOMBED) && zombie.hasEffect(ModEffects.ENTOMBED), "a pig and a zombie in cocoons of sand");
+        lookAt(billy, pig);
+        press(billy, 3, false);
+        check(Telekinesis.holds(billy, pig), "Billy takes hold of the pig");
+        check(pigCocoon.isRemoved() && !pig.hasEffect(ModEffects.ENTOMBED), "and that breaks its cocoon");
+        lookAt(magneto, zombie);
+        press(magneto, 1, false);
+        check(Telekinesis.holds(magneto, zombie), "Magneto's R takes hold of the zombie in iron");
+        check(zombieCocoon.isRemoved() && !zombie.hasEffect(ModEffects.ENTOMBED), "and that breaks its cocoon");
+        Telekinesis.release(billy, false);
+        Telekinesis.release(magneto, false);
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
     // Entombed
 
     /**
@@ -986,6 +1477,270 @@ public final class BossGripTests {
             assertNear(distance, wall - 2.0, 0.05, "it is back two blocks inside the wall");
             assertNear(horseman.getY(), centre.y, 0.05, "on the sand");
             check(horseman.getDeltaMovement().horizontalDistance() < 1.0E-3, "and it is not flying");
+            return true;
+        });
+    }
+
+    /** A wall of stone across the floor, {@code x} the column it stands in (test coordinates), 6 blocks high. */
+    private static void wallAt(GameTestHelper helper, int x, int fromZ, int toZ) {
+        for (int z = fromZ; z <= toZ; z++) {
+            for (int y = 2; y < 8; y++) {
+                helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
+            }
+        }
+    }
+
+    /** The same, across the floor the other way: {@code z} the row it stands in. */
+    private static void wallAlong(GameTestHelper helper, int z, int fromX, int toX) {
+        for (int x = fromX; x <= toX; x++) {
+            for (int y = 2; y < 8; y++) {
+                helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
+            }
+        }
+    }
+
+    /**
+     * T13, Ultron's part (D-T 4.5, 6.1): a thrown boss takes the impact himself, through his own caps. Prime at 11 percent,
+     * on the ground ({@code ultron_boss.liftAt} 0.1 here, so the lift waits), thrown by Wanda into a wall: his floor of a
+     * tenth holds (before the island is up he cannot fall), and the blow is hers in the fight's ledger.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_throw", timeoutTicks = 60)
+    public static void aThrownBossTakesItThroughHisOwnCaps(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        f.config(UltronBossConfig.LIFT_AT, 0.1); // (at 11 percent he stays on the ground: the lift waits for a tenth)
+        ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
+        UltronTestSupport.tank(wanda);
+        UltronFight fight = UltronTestSupport.onTheGround(f, wanda);
+        UltronTestSupport.calm(fight);
+        UltronEntity body = UltronTestSupport.boss(fight);
+        UltronTestSupport.put(f, wanda, 3.5, FLOOR, 10.5);
+        UltronTestSupport.put(f, body, 7.5, FLOOR + 1.0, 10.5);
+        wallAt(helper, 11, 7, 14);
+        float floor = body.getMaxHealth() * 0.10F;
+        body.setHealth(body.getMaxHealth() * 0.11F);
+        f.everyTick(50, tick -> {
+            PowerTicker.tick(wanda);
+            if (tick == 2) {
+                lookAt(wanda, body);
+                press(wanda, 3, false);
+                check(Telekinesis.holds(wanda, body), "Wanda holds Prime at 11 percent");
+                look(wanda, EAST, 0.0F);
+                press(wanda, 3, false);
+                check(!Telekinesis.isHolding(wanda), "and throws him into the wall");
+                return false;
+            }
+            check(body.getHealth() >= floor - 0.01F, "his health never goes below a tenth: " + body.getHealth() + " at tick " + tick);
+            return tick > 2 && fight.participant(wanda.getUUID()).damage() > 0.0F && !BossGrip.stills(body);
+        });
+    }
+
+    /**
+     * T13, Thanos's part (D-T 4.5, 6.2): Wanda throws Thanos into a wall, takes hold of him again as soon as she may (20
+     * ticks after the throw, with {@code boss.regripTicks} 0: his still) and throws him into another wall, both blows within
+     * 6 seconds: both reach his hurt as telekinetic slams, and exactly one plate is torn (once in 6 seconds).
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_throw_thanos", timeoutTicks = 120)
+    public static void aThrownThanosTakesItThroughHisOwnCaps(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(BossConfig.REGRIP_TICKS, 0);
+        ServerPlayer wanda = ThanosMoveSupport.fighter(f, -6.0, 0.0, Power.SCARLET_WITCH);
+        ThanosEntity thanos = ThanosBossTests.boss(f, wanda);
+        wallAt(helper, 15, 6, 15);
+        wallAlong(helper, 5, 6, 15);
+        int plates = Integer.bitCount(thanos.plates());
+        int[] slams = {0};
+        Consumer<LivingIncomingDamageEvent> counter = event -> {
+            if (event.getEntity() == thanos && event.getSource().is(ModDamageTypes.TELEKINETIC_SLAM)) {
+                slams[0]++;
+            }
+        };
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true, LivingIncomingDamageEvent.class, counter);
+        f.onClose(() -> NeoForge.EVENT_BUS.unregister(counter));
+        int[] thrownAt = {-1, -1};
+        int[] slammedAt = {-1, -1};
+        f.everyTick(110, tick -> {
+            PowerTicker.tick(wanda);
+            if (slams[0] > 0 && slammedAt[0] < 0) {
+                slammedAt[0] = tick;
+            }
+            if (slams[0] > 1 && slammedAt[1] < 0) {
+                slammedAt[1] = tick;
+            }
+            if (thrownAt[0] < 0) {
+                lookAt(wanda, thanos);
+                press(wanda, 3, false);
+                check(Telekinesis.holds(wanda, thanos), "Wanda takes hold of Thanos");
+                look(wanda, EAST, 0.0F);
+                press(wanda, 3, false);
+                thrownAt[0] = tick;
+                return false;
+            }
+            if (thrownAt[1] < 0) {
+                if (BossGrip.regripLeft(thanos) > 0) {
+                    return false;
+                }
+                check(slams[0] == 1 && Integer.bitCount(thanos.plates()) == plates - 1, "the first blow tore a plate: " + slams[0]);
+                check(tick - thrownAt[0] == 20, "she may take hold of him again 20 ticks after the throw: " + (tick - thrownAt[0]));
+                lookAt(wanda, thanos);
+                press(wanda, 3, false);
+                check(Telekinesis.holds(wanda, thanos), "Wanda takes hold of him again as soon as she may");
+                look(wanda, 180.0F, 0.0F); // north, at the second wall
+                press(wanda, 3, false);
+                thrownAt[1] = tick;
+                return false;
+            }
+            if (slams[0] < 2) {
+                return false;
+            }
+            check(slammedAt[1] - slammedAt[0] < 120, "both blows within 6 seconds: " + (slammedAt[1] - slammedAt[0]) + " ticks apart");
+            check(Integer.bitCount(thanos.plates()) == plates - 1, "the second blow tore no plate: once in 6 seconds");
+            return true;
+        });
+    }
+
+    /**
+     * T13, Apocalypse's part (D-T 4.5, 6.3): thrown by Wanda (mind power) with his shield up, he crashes into a zombie in
+     * his path, which takes 15, and then into a wall: the blow wears his shield, not his health.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_throw_apocalypse", timeoutTicks = 60)
+    public static void aThrownApocalypseTakesItThroughHisOwnCaps(GameTestHelper helper) {
+        ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
+        d.f().onClose(Telekinesis::clear);
+        ServerPlayer wanda = d.hero();
+        ApocalypseEntity boss = d.boss();
+        ApocalypseTestSupport.put(d.f(), wanda, 2.5, FLOOR, 10.5);
+        ApocalypseTestSupport.put(d.f(), boss, 7.5, FLOOR, 10.5);
+        // He flies 2.6 blocks in his first tick: the zombie is in his path, the wall after it.
+        Zombie zombie = stillZombie(helper, 10.1, 10.5);
+        zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
+        zombie.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
+        zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 400, 0));
+        wallAt(helper, 15, 6, 15);
+        float health = boss.getHealth();
+        float strength = boss.shield().strength();
+        lookAt(wanda, boss);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, boss), "Wanda (mind power) holds him through his shield");
+        look(wanda, EAST, 0.0F);
+        press(wanda, 3, false);
+        check(!Telekinesis.isHolding(wanda), "and throws him at the wall");
+        d.f().everyTick(50, tick -> {
+            check(boss.getHealth() == health, "his health never changes (tick " + tick + ")");
+            if (boss.shield().strength() >= strength) {
+                return false;
+            }
+            assertNear(zombie.getMaxHealth() - zombie.getHealth(), 15.0, 0.01, "the zombie in his path took 15");
+            check(boss.shield().isUp(), "the blow wore his shield: " + strength + " -> " + boss.shield().strength());
+            return true;
+        });
+    }
+
+    /**
+     * T14, Ultron's part (D-T 4.5, 6.1.2): Ultron thrown out toward his field is stopped dead at it, and flashed back to the
+     * ground three blocks inside it.
+     */
+    @GameTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_home", timeoutTicks = 60)
+    public static void aThrownBossComesBackInsideHisArena(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        clearTheRow(helper);
+        double ground = SokoviaTestSupport.GROUND;
+        double mx = SokoviaTestSupport.MIDDLE_X;
+        double mz = SokoviaTestSupport.MIDDLE_Z;
+        ServerPlayer wanda = f.player(mx, ground, mz, Power.SCARLET_WITCH);
+        UltronTestSupport.tank(wanda);
+        UltronFight fight = UltronTestSupport.onTheGround(f, wanda);
+        UltronTestSupport.calm(fight);
+        UltronEntity body = UltronTestSupport.boss(fight);
+        BossArena arena = fight.arena();
+        UltronTestSupport.put(f, wanda, mx + 8.0, ground, mz);
+        UltronTestSupport.put(f, body, mx + 14.0, ground + 1.0, mz);
+        lookAt(wanda, body);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, body), "Wanda holds Ultron");
+        look(wanda, EAST, 0.0F);
+        press(wanda, 3, false);
+        check(!Telekinesis.isHolding(wanda), "and throws him toward the field");
+        f.everyTick(50, tick -> {
+            check(arena.distance(body.position()) <= arena.containRadius(), "he never crosses the field (tick " + tick + ")");
+            if (BossGrip.stills(body)) {
+                return false;
+            }
+            check(arena.distance(body.position()) <= arena.containRadius() - 3.0 + 0.01,
+                    "he is back three blocks inside the field: " + arena.distance(body.position()));
+            return true;
+        });
+    }
+
+    /**
+     * T14, Thanos's part (D-T 4.5, 6.2.1): his arena is open (no field, no wall): Thanos thrown against a wall past his
+     * carry limit steps back through a Space portal, onto the ground 4 blocks inside his radius (8 here).
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_home_thanos", timeoutTicks = 60)
+    public static void aThrownThanosComesBackInsideHisArena(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(ThanosBossConfig.ARENA_RADIUS, 8);
+        ServerPlayer wanda = ThanosMoveSupport.fighter(f, -5.0, 0.0, Power.SCARLET_WITCH);
+        ThanosEntity thanos = ThanosBossTests.boss(f, wanda);
+        ThanosFight fight = (ThanosFight) BossFights.fightOf(thanos);
+        check(fight != null && fight.arena().radius() == 8.0, "his arena has a radius of 8");
+        BossArena arena = fight.arena();
+        ApocalypseTestSupport.put(f, thanos, ThanosBossTests.CENTRE.x + 3.0, FLOOR, ThanosBossTests.CENTRE.z);
+        wallAt(helper, 19, 6, 15);
+        lookAt(wanda, thanos);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, thanos), "Wanda holds Thanos");
+        look(wanda, EAST, 0.0F);
+        press(wanda, 3, false);
+        check(!Telekinesis.isHolding(wanda), "and throws him at the wall, past his carry limit");
+        double[] farthest = {0.0};
+        f.everyTick(50, tick -> {
+            farthest[0] = Math.max(farthest[0], arena.distance(thanos.position()));
+            if (BossGrip.stills(thanos)) {
+                return false;
+            }
+            check(farthest[0] > arena.radius() - 2.0, "he flew past his carry limit: " + farthest[0]);
+            check(arena.distance(thanos.position()) <= arena.radius() - 4.0 + 0.01,
+                    "he stepped back 4 blocks inside his radius: " + arena.distance(thanos.position()));
+            assertNear(thanos.getY(), arena.center().y, 0.05, "on the ground");
+            return true;
+        });
+    }
+
+    /**
+     * T14, Apocalypse's part (D-T 4.5, 6.3.1): thrown out toward his wall, he is stopped dead at it and comes back to the
+     * middle of his arena, as his leash puts him.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_home_apocalypse", timeoutTicks = 60)
+    public static void aThrownApocalypseComesBackToTheMiddle(GameTestHelper helper) {
+        TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(ApocalypseBossConfig.ARENA_RADIUS, 5);
+        f.config(ApocalypseBossConfig.ARENA_HEIGHT, 16);
+        ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ApocalypseTestSupport.tank(wanda);
+        ApocalypseFight fight = ApocalypseTestSupport.inPhase(f, wanda, 1);
+        ApocalypseEntity boss = ApocalypseTestSupport.boss(fight);
+        BossArena arena = fight.arena();
+        ApocalypseTestSupport.put(f, wanda, 5.5, FLOOR, 10.5);
+        ApocalypseTestSupport.put(f, boss, 12.5, FLOOR, 10.5);
+        lookAt(wanda, boss);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, boss), "Wanda holds Apocalypse");
+        look(wanda, EAST, 0.0F);
+        press(wanda, 3, false);
+        check(!Telekinesis.isHolding(wanda), "and throws him toward his wall");
+        f.everyTick(50, tick -> {
+            check(arena.distance(boss.position()) <= arena.containRadius(), "he never crosses his wall (tick " + tick + ")");
+            if (BossGrip.stills(boss)) {
+                return false;
+            }
+            check(arena.distance(boss.position()) < 0.1, "he is back in the middle: " + arena.distance(boss.position()));
             return true;
         });
     }
