@@ -204,7 +204,8 @@ public final class MagicSelect {
             return;
         }
         if (spanX * spanY * spanZ > MAX_BOUNDS) {
-            refuse(BuildVerdictPayload.TOO_BIG_TO_SELECT, cap);
+            // Its box holds more than that many blocks, however few the thing has: the number said is the box's.
+            refuse(BuildVerdictPayload.TOO_BIG_TO_SELECT, (int) MAX_BOUNDS);
             return;
         }
         queue.enqueue(packed);
@@ -241,7 +242,10 @@ public final class MagicSelect {
         return refusal;
     }
 
-    /** The number the refusal names: the cap, Billy's side, the reach (0 for none). */
+    /**
+     * The number the refusal names: the cap (or {@link #MAX_BOUNDS} for a thing whose box holds more blocks than that),
+     * Billy's side, the reach (0 for none).
+     */
     public int limit() {
         return limit;
     }

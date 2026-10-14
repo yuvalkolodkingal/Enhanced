@@ -702,8 +702,10 @@ public final class BuildMathTests {
             chain.set(i, -60 + i, i, PLANKS);
         }
         MagicSelect diagonal = new MagicSelect(chain, List.of(new BlockPos(0, -60, 0)), 1_000_000).run();
-        check(diagonal.refusal() == BuildVerdictPayload.TOO_BIG_TO_SELECT && diagonal.size() == 0,
+        check(diagonal.refusal() == BuildVerdictPayload.TOO_BIG_TO_SELECT && diagonal.size() == 0 && diagonal.limit() == MagicSelect.MAX_BOUNDS,
                 "257 planks touching at their corners make a box of more than 16,777,216 cells: nothing");
+        check(said(diagonal.message(true), "message.enhanced.build.too_big_to_select", 16_777_216),
+                "and the number said is the box's, not the cap of a million the thing is far under");
         chain.set(256, 196, 256, Blocks.AIR.defaultBlockState());
         check(new MagicSelect(chain, List.of(new BlockPos(0, -60, 0)), 1_000_000).run().size() == 256, "256 make a box of exactly 256^3, which is held");
 
