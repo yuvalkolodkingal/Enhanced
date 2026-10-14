@@ -1342,8 +1342,8 @@ public final class MagnetPull {
      * A player gives one thing (D-M 4.3, R35), the first that applies: the metal item in his main hand, then his off hand,
      * then his metal armour from the head down, which flies into Magneto's inventory (with {@code
      * magneto.pullPlayerGearToFeet}: drops at the player's own feet, unmarked, with a torn-off piece's pickup delay, as
-     * V's would); else an Iron Spider's
-     * nanites scatter; else his metal body is tugged. Then every pull spares him for {@code magneto.pullPlayerGraceTicks}.
+     * V's would); else an Iron Spider's nanites scatter; else his metal body is tugged. Then every pull spares him for
+     * {@code magneto.pullPlayerGraceTicks}.
      */
     private static Taken takeFromPlayer(Job job, ServerPlayer magneto, Player other) {
         for (EquipmentSlot slot : PLAYER_PIECES) {

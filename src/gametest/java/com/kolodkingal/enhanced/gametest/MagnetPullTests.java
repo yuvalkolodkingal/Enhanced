@@ -707,8 +707,9 @@ public final class MagnetPullTests {
     /**
      * M32. A claim that refuses everything: nothing comes, he reads that the metal here is protected, and the pull does not
      * rest. A claim on the chunks west of a border: the ores and the ingot there stay, those east of it come, an ingot found
-     * east of it that drifts onto the claim before its turn stays there, and he reads that the rest is protected. In Adventure the ores stay and a dropped ingot comes. In the cylinder of a running fight,
-     * protected or not (R5), the ore stays and the one outside comes.
+     * east of it that drifts onto the claim before its turn stays there, and he reads that the rest is protected. In
+     * Adventure the ores stay and a dropped ingot comes. In the cylinder of a running fight, protected or not (R5), the
+     * ore stays and the one outside comes.
      */
     @GameTest(template = ARENA, batch = "magnet_pull_rights", timeoutTicks = 100)
     public static void thePullNeverTouchesProtectedPlaces(GameTestHelper helper) {

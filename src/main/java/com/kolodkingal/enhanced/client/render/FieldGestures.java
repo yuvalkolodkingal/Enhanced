@@ -8,8 +8,8 @@ import static com.kolodkingal.enhanced.client.render.Gestures.define;
 
 /**
  * The keys of the gestures of the two heroes who command fields rather than throw spells: Magneto, who draws his
- * magnetic field out around him, rips metal away and pulls it to him, and Vision, who is serene (White Vision mechanical: his arms move
- * with one easing only, see {@link Gestures.Def#sampleArm}).
+ * magnetic field out around him, rips metal away and pulls it to him, and Vision, who is serene (White Vision
+ * mechanical: his arms move with one easing only, see {@link Gestures.Def#sampleArm}).
  *
  * <p>Where a gesture hands over to a stance, its last key is the stance's own pose ({@link StancePoses}), so nothing pops.
  */
