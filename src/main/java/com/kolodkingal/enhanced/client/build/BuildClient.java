@@ -710,6 +710,7 @@ public final class BuildClient {
         endStroke();
         if (holdFor > 0) {
             BuildFeedback.unwound();
+            BuildHud.unwound(holdProgress(), holdHuge());
         }
         stopHold();
     }
@@ -717,6 +718,11 @@ public final class BuildClient {
     /** How full the hold ring is (0 to 1), or -1 with no ring (the HUD draws it). */
     public static float holdProgress() {
         return holdFor > 0 ? Math.min(1.0F, held / (float) holdFor) : -1.0F;
+    }
+
+    /** Whether the ring being held is the long one of a huge spell (the HUD draws it in the hero's colour, not red). */
+    public static boolean holdHuge() {
+        return (holdFlags & BuildCastPayload.HELD_LONG) != 0;
     }
 
     private static void stopHold() {
@@ -859,6 +865,7 @@ public final class BuildClient {
         g.spell(Spell.COPY);
         if (pocketId(player) == 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.build.pocket_empty"), true);
+            BuildTips.nudge(BuildTips.COPY);
             return;
         }
         g.holdGhost();

@@ -47,8 +47,9 @@ import org.lwjgl.glfw.GLFW;
  *     the second knob), else the hotbar's.</li>
  * </ul>
  *
- * <p>At logout everything of the builder is forgotten ({@link BuildClient#clear}, {@link BuildFx#clear},
- * {@link BuildRenderer#clear}).
+ * <p>A right click or a scroll that did nothing shows the tip that says how ({@link BuildTips}). At logout everything
+ * of the builder is forgotten ({@link BuildClient#clear}, {@link BuildFx#clear}, {@link BuildRenderer#clear},
+ * {@link BuildHud#clear}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class BuildInput {
@@ -86,6 +87,7 @@ public final class BuildInput {
             return;
         }
         BuildClient.tick(mc, player);
+        BuildHud.tick(player);
         boolean usable = mc.screen == null && !player.isSpectator() && BuildClient.isBuilder(Powers.power(player));
         if (!usable) {
             magicHeld = 0;
@@ -243,6 +245,9 @@ public final class BuildInput {
         }
         BuildClient.update(player);
         if (!BuildClient.ready()) {
+            // Vanilla's click (a door, a block placed); and if the spell lacks a box or a block, a tip says how.
+            SpellRecipe recipe = BuildClient.recipe();
+            BuildTips.rightClickDidNothing(grammar, recipe != null && recipe.spell().needsMaterial() && BuildClient.material() == null);
             return;
         }
         event.setCanceled(true);
@@ -301,6 +306,7 @@ public final class BuildInput {
             event.setCanceled(true);
         } else {
             scrollRest = 0.0;
+            BuildTips.scrollDidNothing(BuildClient.grammar());
         }
     }
 
@@ -314,6 +320,7 @@ public final class BuildInput {
         BuildClient.clear();
         BuildFx.clear();
         BuildRenderer.clear();
+        BuildHud.clear();
     }
 
     private static void reset() {
