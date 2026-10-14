@@ -41,14 +41,27 @@ The Scarlet Witch has one more key. **Z** is her order to the Vision her Hex rai
 The Scarlet Witch and Billy have one more key: **Y**, for [Build Magic](Build-Magic). It is the sixth line of your hero panel (`[Y] Build Magic  OFF`). It does nothing for any other hero.
 
 * **Tap Y**: build mode on or off.
-* **Hold Y** (a third of a second): the **Spell Wheel**. Move the mouse to a picture and let go to choose it; let go without moving and the wheel stays open for clicking. **Esc** or **Y** again closes it.
+* **Hold Y** (a third of a second): the **Spell Wheel**, a ring of eleven pictures. Out of build mode it turns build mode on first.
+
+In the wheel (the game does not pause):
+
+| Input | Meaning |
+|---|---|
+| **Mouse onto a picture, then let go of Y** | Choose that spell; the wheel closes. |
+| **Let go in the middle** | The wheel stays open for clicking. |
+| **Click a picture** | Choose that spell and stay open (to pick a style); click the chosen one to close. |
+| **1** to **9**, **0** | Choose the first nine spells and the tenth (Land); the wheel closes (also while Y is still held). Grow, the eleventh, has no number. |
+| **Mouse wheel** | Step from spell to spell (down is clockwise). |
+| **Esc** | Close the wheel. (A tap of **Y** closes it too, and build mode stays on.) |
+
+The wheel also has the style row, **Mix** (the dice), your nine hotbar slots, **Undo** and **Redo**, the door that starts or stops building, and **Blocks**: a page of block pictures with a search box and the last 16 you used. See [Build Magic](Build-Magic#the-spell-wheel).
 
 In build mode the mouse works like this (the strip at the bottom right always tells you what the buttons do right now):
 
 | Input | Meaning |
 |---|---|
 | **Left click** | *Where*: the first and second corner of a box. Double click: the whole tree or house. Click the sky: let go (or a corner in the air). A left click never breaks a block. |
-| **Right click** | *Do it*: cast what the ghost shows. Hold it for a big spell (one second for more than 64 blocks removed or replaced, two for a million) and for Paint and Land. With nothing ready it is plain Minecraft. |
+| **Right click** | *Do it*: cast what the ghost shows. Hold it for a big spell (one second for more than 64 blocks removed or replaced, two for a million) and for Paint, Land and Grow. With nothing ready it is plain Minecraft. |
 | **Scroll** | The main number: push the side of the box you look at, size, copies, layers. **Ctrl + scroll**: 8 at a time. |
 | **Alt + scroll** | Which kind: style, shape, turn, gap. |
 | **Middle click** | Take that exact block as your material. |

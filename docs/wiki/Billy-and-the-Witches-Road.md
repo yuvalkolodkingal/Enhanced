@@ -60,6 +60,8 @@ Billy builds too: press **Y**, click two corners and right-click, and a house gr
 | 3 Sorcerer | 8,000 | 2,048 | 32 a second | 40 | 40 | 14 |
 | 4 Wiccan | 30,000 | 4,096 | 40 a second | 48 | 48 | 16 |
 
+He has all eleven spells from the first minute; what grows is how big. Each rank is a step up from the Apprentice's numbers: the meter doubles, the refill grows by half of the first, the side and the reach by 8 blocks, and he can undo 2 more spells. A server can change the numbers, and an operator can set a rank with `/enhanced build rank`.
+
 **Near a Scarlet Witch (16 blocks), his spells cost half**, and a thin scarlet thread runs from her hand to his. A spell too big for him never starts half-built. Everything is on the [Build Magic](Build-Magic) page.
 
 ## Looks

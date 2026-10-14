@@ -170,7 +170,7 @@ You are in control of the Hex, and in *WandaVision* Vision starts to come apart 
 
 ## Build Magic
 
-Wanda can **build with her magic**: press **Y** and click two corners to fill, empty, change or paint them, double-click a whole tree or house, copy a castle and stamp it somewhere else, raise hills. **Her magic has no limit** (only the server's safety keeps the game running smoothly), she points as far as 256 blocks, **and inside her own Hex her spells go twice as fast.** **Ctrl + Z** takes it all back, even tomorrow. And when she stands near Billy, his spells cost half. See [Build Magic](Build-Magic).
+Wanda can **build with her magic**: press **Y** and click two corners to fill, empty, change or paint them, double-click a whole tree or house, copy a castle and stamp it somewhere else, raise hills, swell a rock into a boulder and make flowers bloom. **Her magic has no limit** (only the server's safety keeps the game running smoothly), she points as far as 256 blocks, **and inside her own Hex her spells go twice as fast.** **Ctrl + Z** takes it all back, even tomorrow. And when she stands near Billy, his spells cost half. See [Build Magic](Build-Magic).
 
 ## Critical against Apocalypse
 

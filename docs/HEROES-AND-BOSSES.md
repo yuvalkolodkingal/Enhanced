@@ -98,7 +98,9 @@ half is `client/build/`; design in `DESIGN.md` section 18).
   after you** (Phoenix: before the first Spider-Man entry; the last lane appends at the end), so that two lanes never
   insert at the same place. Prefixes: `phoenix_`, `mind_`, `psionic_` | `web_`, `spider_`, `leg_`, `instant_kill_`,
   `black_eyes_` | `thanos_`, `gauntlet_`, `soul_`, `time_`, `reality_` | `ultron_`, `sentry_` | `apocalypse_`, `sand_`,
-  `entomb`, `essence_`. The six Infinity Stone voices are 2.3's, named `<stone>_stone` and `<stone>_stone_hum`
+  `entomb`, `essence_` | `build_` (3.1, Build Magic's eight; `apocalypse_crit` is Apocalypse's). Files: the 3.0 voices are in
+  `sounds/sfx/` (named `enhanced:sfx/<name>` in `sounds.json`); the nine of 3.1 are at the top of `sounds/` (`sounds/<name>.ogg`,
+  `enhanced:<name>`). The six Infinity Stone voices are 2.3's, named `<stone>_stone` and `<stone>_stone_hum`
   (`space`, `mind`, `power`, `reality`, `soul`, `time`; the enum is `item/InfinityStone`): use them, do not make
   new ones.
 * **Art.** The skeleton drew flat placeholder skins (`textures/entity/suit/*`), item textures, effect icons and the web
@@ -298,14 +300,39 @@ method, and the rules are worth keeping for the next version.
   grip check `Metal.staysMagnetic`, Magneto in the projectile raycast, `MagnetPull.press` for Sneak + R, the time a grip ended), so the
   Magneto lane never opened files the telekinesis lane rewrote. **One owner per file**, the whole merged `press` order written once.
 * **One rule book.** Everything that changes a block asks `BlockRights` (section 3); Build Magic never borrows from an arena.
+* **What Build Magic shipped with.** All eleven spells: Land and Grow (Swell, Shrink, Bloom) are in 3.1, not 3.2; the wheel shows
+  eleven pictures, with the digits 1 to 9 and 0 for the first ten. Nine sounds (eight of Build Magic, Apocalypse's critical hit) and
+  45 pictures of `textures/gui/build/` (11 spells, 19 styles, 8 shapes at 32×32, 7 small ones at 16×16; the four `mouse_*` are spare,
+  the client draws its mice). The server code is `build/` (design `DESIGN.md` 18), the client's `client/build/`; the operator's
+  tools are `/enhanced build` (`BuildCommands`, joined in `EnhancedCommand`).
 * **Journals forget only what a save holds.** The arena journal (`ArenaLoans`, `ArenaJournalWriter`) and the island's note
   (`SokoviaJournal`) retire a repair only after **two** world saves of its dimension (an autosave queues its chunks to the IO worker
   *before* `LevelEvent.Save`; the island's note gets a `<fight>.nbt.retiring` file, state `LANDED`, rewritten with `refund` false at the first
   save and deleted at the second or at `ServerStoppedEvent`; a ritual's note is still deleted at once).
-* **Write ahead.** Build Magic writes a section's undo record before it changes the section's first cell, so a crash never leaves a
-  change its saved record lacks; a Move is compare-and-swap per cell.
+* **Write ahead.** Build Magic writes a section's undo record before it changes the section's first cell (`WriteAhead` reads up to
+  32,768 cells ahead of the writing cursor; `BuildJob.gate` lets a cell be written only when its record is on disk), so a crash never
+  leaves a change its saved record lacks; the history is `data/enhanced/build/<uuid>/` (`history.dat`, `step-*.bin`, `pocket.bin`),
+  written off the main thread and forced at every world save. A Move is compare-and-swap per cell, and its block-entity data is
+  linked from source to target, so a chest is never in two places after an undo or a redo (a Move also spares a full chest at its
+  target).
+* **The budget of memory.** A step is held whole in memory only while it fits (about 14 bytes a cell and 12 KiB a section against
+  `undoMemoryMb` and half of `serverUndoMemoryMb`); a bigger spell is a *lite step* (a bit a cell, its records on disk are the step; a
+  Move is never lite), and past the disk share it asks for the long hold and runs without a step ("Too big to remember"). The caps
+  look at memory and disk once a second. Findings that shaped this: an unbounded working step was 4.5 GB for a radius-400 ball.
+* **Reviews.** Each of the lanes had independent reviews (one for the spec, one that attacked it) with fixer rounds after them,
+  and Build Magic had a joint check of its server and its client in a real game (a dedicated server, two clients, Billy and Wanda, English and Hebrew); the
+  reviews found, among other things, a Move that duplicated chest contents through undo, a Move that overwrote a full chest, Copy and
+  Repeat that read a claim's vault, PvP-off protection that ignored fluids and fire, and Billy's cast arc drawn by nobody. Their
+  tests are `BuildReviewTests`.
 * **Event priorities** (5.6 of the spec; HIGH for the landing guard and the journals' recovery, LOW for Build Magic at server stop, so
   arenas are put back first, islands cleared second and spells last) are in each handler's Javadoc.
 * **Testing.** Server-wide state (`BuildScheduler`, `MagnetPull`, `Telekinesis`, `BossGrip`) gets a batch of its own and
   `TestKit.bossFixture`; a test never names a client type in a signature or lambda, and none touches a class with client-typed static
-  state (the pure `MagnetStreamMath`, `BuildGrammar`, `BuildHints` are tested instead). Every merge passed the full GameTests twice in a row.
+  state (the pure `MagnetStreamMath`, `BuildGrammar`, `BuildHints` are tested instead). Every merge passed the full GameTests twice in a row
+  (1,315 required tests at the end).
+* **The joint check's findings were all fixed** (ten, none blocking), after the lanes were merged: every line the game says is at most 56
+  characters and plural-safe, and the action bar's line stands aside from the hint strip; a scroll gesture keeps the face it pushes; the
+  Copy ghost stays for the next stamp; a tap of Y with the wheel open closes it and build mode stays on (and a digit with Y held closes
+  it for good); the hold rows say each spell's own verb; a spell whose every cell is protected is refused before it is cast
+  (`NOTHING_CAN_CHANGE`, appended as code 41: a fizzle, a grey ghost, no sound, no charge, no step); the cast, the hum and the undo are
+  heard at the caster. Four tests were added (line length, the face latch, the all-protected refusal, the sounds at the caster).

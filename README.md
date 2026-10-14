@@ -16,7 +16,7 @@ Every power's look and colour follows the MCU films and shows, and Vision, Tommy
 (in his Asgardian clothes, the TVA's or the God of Stories'), Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse each have several looks
 (press **H**).
 
-**New in 3.1:** Wanda and Billy build with **Build Magic** (press **Y**; see the [Build Magic page](docs/wiki/Build-Magic.md)), every telekinesis works in the boss fights and Billy moves blocks, Magneto pulls the metal out of everything around him, and Apocalypse never heals while Wanda and the Phoenix hit him critically.
+**New in 3.1:** Wanda and Billy build with **Build Magic** (press **Y**; eleven spells, and **Ctrl + Z** takes it back, even tomorrow; see the [Build Magic page](docs/wiki/Build-Magic.md)), every telekinesis works in the boss fights and Billy moves blocks, Magneto pulls the metal out of everything around him, and Apocalypse never heals while Wanda and the Phoenix hit him critically.
 
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).

@@ -133,6 +133,8 @@ Sections `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]`. The p
 
 ### `[build_magic]`: every builder
 
+**The undo history** is written to the world folder before each spell changes the world (so a crash leaves it undoable), one folder for each player. While a spell works, its step is kept whole in memory at about 14 bytes a block; a spell whose step would not fit in `undoMemoryMb` (or half of `serverUndoMemoryMb`) is kept as a *lite step*, only a bit for each block in memory, and its records on disk are the step. That needs `undoSurvivesRestart` and a record that fits `undoDiskMb` (about half a byte a block); otherwise the spell says *"Too big to undo later"* and runs only if the player holds the right button, and without an undo. A Move is never lite: it is refused. At the defaults the line between whole and lite is about 4 million blocks. The caps are looked at once a second and when a spell ends. `/enhanced build forget` clears a player's.
+
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `build_magic.enabled` | `true` | `true` or `false` | Build Magic exists on this server. |
@@ -156,9 +158,9 @@ Sections `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]`. The p
 | `build_magic.holdGravityBlocks` | `true` | `true` or `false` | Sand, gravel and other falling blocks a spell places in the air stay where magic put them until something touches them. |
 | `build_magic.postEventsPerBlock` | `true` | `true` or `false` | Ask claim mods (the break and place events) for every block. If `false`: once per 16×16×16 section. |
 | `build_magic.previewChecks` | `8192` | 0 to 65536 | Blocks the server checks to preview a spell (more: a spread sample). 0 = no marks. |
-| `build_magic.undoSurvivesRestart` | `true` | `true` or `false` | The undo history and the pocket are kept on disk with the world. |
-| `build_magic.undoMemoryMb` | `64` | 4 to 4096 | Memory (MiB) one player's undo history may use; past it the oldest spells leave memory (they stay on disk). |
-| `build_magic.undoDiskMb` | `512` | 0 to 1048576 | Disk (MiB) one player's undo history may use; past it the oldest spells are forgotten. |
+| `build_magic.undoSurvivesRestart` | `true` | `true` or `false` | The undo history and the pocket are kept on disk with the world (`data/enhanced/build/<player id>/`). If `false`, they live in memory only: a restart loses them, and a history is dropped 30 minutes after its player leaves. |
+| `build_magic.undoMemoryMb` | `64` | 4 to 4096 | Memory (MiB) one player's undo history may use; past it the oldest spells leave memory (they stay on disk and are read back when undone). |
+| `build_magic.undoDiskMb` | `512` | 0 to 1048576 | Disk (MiB) one player's undo history may use; past it the oldest spells are forgotten (the newest never is). |
 | `build_magic.serverUndoMemoryMb` | `512` | 64 to 65536 | Memory (MiB) all undo histories together may use; past it, the spells of the player using the most leave memory (they stay on disk). |
 | `build_magic.serverUndoDiskMb` | `4096` | 0 to 4194304 | Disk (MiB) all undo histories together may use; past it the oldest spell of the player using the most is forgotten. |
 | `build_magic.pocketMaxMb` | `64` | 1 to 4096 | The biggest copy (compressed, in MiB) one player may hold. |
@@ -181,7 +183,7 @@ Her magic has no gameplay limit: what is here is technical safety, and a few swi
 | `build_magic_wanda.volatilePerSpell` | `4096` | 0 to 1000000 | The most TNT, lava and fire blocks one of her spells may make. |
 | `build_magic_wanda.hexBoost` | `2.0` | 1.0 to 8.0 | Inside her own Hex her spells get this many shares of the server's work. |
 | `build_magic_wanda.magicSelectMax` | `100000` | 1000 to 1000000 | The most blocks her double click selects (a selection is held block by block, so it stops at a million). |
-| `build_magic_wanda.brushMax` | `16` | 1 to 64 | Her biggest Paint and Land brush (radius). Technical, not a limit of her magic: a brush pulse every 4 ticks of radius 16 is about 17,000 blocks, which the server keeps up with while she sweeps; at 32 (137,000) the stroke would trail seconds behind the cursor. |
+| `build_magic_wanda.brushMax` | `16` | 1 to 64 | Her biggest Paint, Land and Grow brush (radius). Technical, not a limit of her magic: a brush pulse every 4 ticks of radius 16 is about 17,000 blocks, which the server keeps up with while she sweeps; at 32 (137,000) the stroke would trail seconds behind the cursor. |
 | `build_magic_wanda.shapeMaxRadius` | `512` | 8 to 1024 | Her biggest shape (radius). |
 | `build_magic_wanda.repeatMax` | `0` | 0 to 65536 | 0 = no count, only the spell's blocks. Otherwise the most copies in a Repeat. |
 

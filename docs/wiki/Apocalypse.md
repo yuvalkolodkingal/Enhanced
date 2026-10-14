@@ -90,7 +90,7 @@ The boss bar shows his health in blue (the notches are the floors) and the shiel
 
 **He never heals.** In 3.0 he healed while his shield was up and in his true form; now his health **never comes back** (a splashed potion of Healing does nothing to him either). His **shield** still knits (it mends 3 percent a second after eight seconds without mind power, and re-forms at every phase), and the Escape is unchanged: if you don't stop it he vanishes and returns ten seconds later at 40 percent of his health with a fresh shield 3, a set piece you can stop, not healing.
 
-**Critical hits.** A hit of the **Scarlet Witch's or the Phoenix's mind power** (the Chaos Beam, a telekinetic slam, the Phoenix Burst, and the strains of Mind Control and the Psionic Field) is a **critical hit** on the boss:
+**Critical hits.** A hit of the **Scarlet Witch's or the Phoenix's mind power** (the Chaos Beam, a telekinetic slam, the Phoenix Burst, and the strains of Mind Control and the Psionic Field) is a **critical hit** on the boss, and it is heard: a heavy glassy crack with a low gong under it (the subtitle says "Critical hit on Apocalypse"), across the whole arena, at most once per attacker every half second:
 
 | Where | A critical hit | Everyone else |
 |---|---|---|
