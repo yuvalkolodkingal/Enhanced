@@ -1037,20 +1037,28 @@ public final class CrossHeroBossTests {
         press(magneto, 1);
         check(Telekinesis.holds(magneto, body), "Magneto holds Ultron's vibranium body as a boss");
         int[] held = {0};
+        int[] sentryAt = {-1};
         f.everyTick(150, tick -> {
             PowerTicker.tick(magneto);
-            if (Telekinesis.holds(magneto, body)) {
-                held[0]++;
+            if (sentryAt[0] < 0) {
+                if (Telekinesis.holds(magneto, body)) {
+                    held[0]++;
+                    return false;
+                }
+                check(held[0] == 89, "he broke free at the end of Magneto's hold, 60 x 1.5 ticks: held " + held[0]);
+                UltronTestSupport.put(f, magneto, 3.5, FLOOR, 10.5);
+                liftsTheSentry(helper, magneto, sentry);
+                sentryAt[0] = tick;
                 return false;
             }
-            check(held[0] == 89, "he broke free at the end of Magneto's hold, 60 x 1.5 ticks: held " + held[0]);
-            UltronTestSupport.put(f, magneto, 3.5, FLOOR, 10.5);
-            liftsTheSentry(helper, magneto, sentry);
-            return true;
+            // The Sentry part as it was: held through 20 ticks of the game (the Sentry, the fight and the level ticking).
+            check(Telekinesis.isHolding(magneto) && Powers.get(magneto).heldEntityId() == sentry.getId(),
+                    "and holds it, with no limit of a boss's (tick " + (tick - sentryAt[0]) + ")");
+            return tick - sentryAt[0] >= 20;
         });
     }
 
-    /** The second half of the test above: Magneto's strip takes nothing from a Sentry, and his R lifts it and holds it. */
+    /** The second half of the test above: Magneto's strip takes nothing from a Sentry, and his R lifts it. */
     private static void liftsTheSentry(GameTestHelper helper, ServerPlayer magneto, UltronSentryEntity sentry) {
         lookAt(magneto, sentry);
         float sentryHealth = sentry.getHealth();
@@ -1060,10 +1068,6 @@ public final class CrossHeroBossTests {
         lookAt(magneto, sentry);
         press(magneto, 1);
         check(Telekinesis.isHolding(magneto) && Powers.get(magneto).heldEntityId() == sentry.getId(), "but Magneto lifts the Sentry");
-        for (int tick = 1; tick <= 20; tick++) {
-            PowerTicker.tick(magneto);
-            check(Telekinesis.isHolding(magneto), "and holds it, with no limit of a boss's (tick " + tick + ")");
-        }
     }
 
     // ============================================================================================================

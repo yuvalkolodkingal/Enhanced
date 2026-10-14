@@ -50,6 +50,7 @@ import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -70,10 +71,12 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
@@ -1818,9 +1821,10 @@ public final class BossGripTests {
 
     /**
      * T43 (D-T 7): with PvP off, nothing thrown hurts a player. Ultron thrown by Wanda crashes into a zombie (15) and then
-     * into a Survival player, whose health is unchanged; a boss bolt Billy caught and throws at the player leaves him whole;
-     * two stones Wanda sets down onto the player's cells never become blocks (D-T 2.3 rule 1). (The meteor of D-T 14.2
-     * needs a Thanos fight, and only one fight runs at a time: {@link #aThrownMeteorSparesPlayersWithoutPvP}.)
+     * into a Survival player, whose health is unchanged; a boss bolt Billy caught and throws at the player flies through
+     * him, leaving him whole, and hits the zombie behind him, for Billy; two stones Wanda sets down onto the player's cells
+     * never become blocks (D-T 2.3 rule 1). (The meteor of D-T 14.2 needs a Thanos fight, and only one fight runs at a time:
+     * {@link #aThrownMeteorSparesPlayersWithoutPvP}.)
      */
     @GameTest(template = ARENA, batch = "boss_grip_pvp", timeoutTicks = 160)
     public static void thrownBossesSparePlayersWithoutPvP(GameTestHelper helper) {
@@ -1852,28 +1856,40 @@ public final class BossGripTests {
         look(wanda, EAST, 0.0F);
         press(wanda, 3, false);
         check(!Telekinesis.isHolding(wanda), "and throws him along the row");
+        UltronBoltEntity[] bolt = {null};
+        Zombie[] behind = {null};
         f.everyTick(150, tick -> {
             PowerTicker.tick(wanda);
             PowerTicker.tick(billy);
             check(friend.getHealth() == friendHealth, "nothing thrown hurts the player (tick " + tick + ")");
             if (tick == 6) {
                 assertNear(zombie.getMaxHealth() - zombie.getHealth(), 15.0, 0.01, "the zombie took 15 from the boss crashing into it");
-                // A boss bolt Billy caught, thrown at the player.
+                // A boss bolt Billy caught, thrown at the player, with a zombie on its line just behind him.
                 UltronTestSupport.put(f, friend, 10.5, FLOOR, 17.5);
-                UltronBoltEntity bolt = UltronBoltEntity.create(level, body, billy.position().add(2.0, 1.5, 0.0), Vec3.ZERO, 4.0F,
+                behind[0] = stillZombie(helper, 13.5, 17.5);
+                bolt[0] = UltronBoltEntity.create(level, body, billy.position().add(2.0, 1.5, 0.0), Vec3.ZERO, 4.0F,
                         UltronBoltEntity.Palette.PRIME);
-                fight.adopt(bolt);
-                level.addFreshEntity(bolt);
-                Telekinesis.hold(billy, bolt, Mode.BILLY);
+                fight.adopt(bolt[0]);
+                level.addFreshEntity(bolt[0]);
+                Telekinesis.hold(billy, bolt[0], Mode.BILLY);
                 lookAt(billy, friend);
                 press(billy, 3, false);
                 check(!Telekinesis.isHolding(billy), "Billy throws a caught bolt at the player");
                 return false;
             }
+            if (behind[0] != null && bolt[0].isRemoved()) {
+                Zombie hit = behind[0];
+                check(hit.getHealth() < hit.getMaxHealth() && hit.getLastDamageSource() != null
+                        && hit.getLastDamageSource().is(ModDamageTypes.ULTRON_BOLT) && hit.getLastDamageSource().getEntity() == billy,
+                        "the bolt flew through the player and hit the zombie behind him, for Billy");
+                hit.discard();
+                behind[0] = null;
+            }
             if (tick < 120) {
                 setDownOnto(helper, wanda, friend, tick);
                 return false;
             }
+            check(behind[0] == null && bolt[0] != null, "the bolt reached the zombie behind the player");
             return stonesDidNotStand(helper, friend);
         });
     }
@@ -1971,47 +1987,80 @@ public final class BossGripTests {
     }
 
     /**
-     * T46 (D-T 4.3, 7): a holder who leaves lets the boss go, and his regrip time starts then. Wanda holds Apocalypse in a
-     * window and logs out: the next tick he is not held, his regrip is 39 or 40 of {@code boss.regripTicks} (40 here), and
-     * nothing keeps him still.
+     * T46 (D-T 4.3, 4.4, 7): a holder who leaves lets the boss go, and his regrip time starts then. Wanda holds Apocalypse
+     * in a window (opened with no stagger here, so that nothing but the grip keeps his brain still) and logs out: the next
+     * tick he is not held, his regrip is 39 or 40 of {@code boss.regripTicks} (40 here), nothing keeps him still, and his
+     * brain runs again: he begins an attack within 100 ticks.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_logout", timeoutTicks = 40)
+    @GameTest(template = ARENA, batch = "boss_grip_logout", timeoutTicks = 140)
     public static void aHolderWhoLeavesLetsTheBossGo(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
         d.f().config(BossConfig.REGRIP_TICKS, 40);
+        d.f().config(ApocalypseBossConfig.STAGGER_TICKS, 0);
+        ApocalypseEntity boss = d.boss();
         ApocalypseTestSupport.breakShield(d);
-        lookAt(d.hero(), d.boss());
-        press(d.hero(), 3, false);
-        check(Telekinesis.holds(d.hero(), d.boss()) && BossGrip.stills(d.boss()), "Wanda holds Apocalypse in a window: he is still");
-        Telekinesis.onLogout(d.hero());
-        helper.runAfterDelay(1, () -> {
-            check(!Telekinesis.isHeld(d.boss()), "the tick after she left he is not held");
-            long left = BossGrip.regripLeft(d.boss());
-            check(left >= 39 && left <= 40, "his regrip runs from then: " + left);
-            check(!BossGrip.stills(d.boss()), "and nothing keeps him still");
-            helper.succeed();
+        int[] leftAt = {-1};
+        d.f().everyTick(120, tick -> {
+            if (tick == 1) {
+                return false; // (the fight counts its foes)
+            }
+            if (tick == 2) {
+                lookAt(d.hero(), boss);
+                press(d.hero(), 3, false);
+                check(Telekinesis.holds(d.hero(), boss) && BossGrip.stills(boss) && !boss.brain().isBusy(),
+                        "Wanda holds Apocalypse in a window: he is still, and busy with nothing");
+                boss.brain().setChoosing(true);
+                boss.brain().clearCooldowns();
+                Telekinesis.onLogout(d.hero());
+                leftAt[0] = tick;
+                return false;
+            }
+            if (tick == 3) {
+                check(!Telekinesis.isHeld(boss), "the tick after she left he is not held");
+                long left = BossGrip.regripLeft(boss);
+                check(left >= 39 && left <= 40, "his regrip runs from then: " + left);
+                check(!BossGrip.stills(boss), "and nothing keeps him still");
+            }
+            if (boss.brain().isBusy()) {
+                return true;
+            }
+            check(tick - leftAt[0] < 100, "his brain runs again: he acts within 100 ticks of her leaving");
+            return false;
         });
     }
 
-    /** T46, the second half: the same when the holder dies, Wanda holding Thanos. */
-    @GameTest(template = ARENA, batch = "boss_grip_death", timeoutTicks = 40)
+    /**
+     * T46, the second half: the same when the holder dies, Wanda holding Thanos (no longer passive). The tick after she
+     * died he is not held, his regrip runs from then, nothing keeps him still, and within 100 ticks he begins a move at the
+     * fighter beside him.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_death", timeoutTicks = 140)
     public static void aHolderWhoDiesLetsTheBossGo(GameTestHelper helper) {
-        TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
         f.config(BossConfig.REGRIP_TICKS, 40);
         ServerPlayer wanda = ThanosMoveSupport.fighter(f, -7.0, 0.0, Power.SCARLET_WITCH);
+        ServerPlayer fighter = ThanosMoveSupport.fighter(f, 0.0, 2.0);
         ThanosEntity thanos = ThanosBossTests.boss(f, wanda);
         lookAt(wanda, thanos);
         press(wanda, 3, false);
         check(Telekinesis.holds(wanda, thanos), "Wanda holds Thanos");
+        thanos.setPassive(false);
         wanda.kill();
-        helper.runAfterDelay(1, () -> {
-            check(!Telekinesis.isHeld(thanos), "the tick after she died he is not held");
-            long left = BossGrip.regripLeft(thanos);
-            check(left >= 39 && left <= 40, "his regrip runs from then: " + left);
-            check(!BossGrip.stills(thanos), "and nothing keeps him still");
-            helper.succeed();
+        f.everyTick(120, tick -> {
+            if (tick == 1) {
+                check(!Telekinesis.isHeld(thanos), "the tick after she died he is not held");
+                long left = BossGrip.regripLeft(thanos);
+                check(left >= 39 && left <= 40, "his regrip runs from then: " + left);
+                check(!BossGrip.stills(thanos), "and nothing keeps him still");
+            }
+            if (thanos.currentMove() != null) {
+                check(fighter.isAlive(), "(the fighter beside him is there to act on)");
+                return true;
+            }
+            check(tick < 100, "he acts again within 100 ticks of her death");
+            return false;
         });
     }
 
@@ -2369,6 +2418,42 @@ public final class BossGripTests {
             }
             return false;
         });
+    }
+
+    /**
+     * Spec 5.2, R37 (review fix): a vanilla boss thrown through a portal gets his will back on the other side. Wanda
+     * throws a Warden and, in the still of the throw, a portal takes him to the Nether as it takes a creature (at once, the
+     * chunk there held loaded as a portal holds it: {@link Entity#changeDimension}): the body that arrives has no {@code
+     * NoAI} and no mark, his will his own again (nothing in the level he left could give it back to him there).
+     */
+    @GameTest(template = ARENA, batch = "vanilla_boss_grip_portal", timeoutTicks = 40)
+    public static void aVanillaBossThrownThroughAPortalGetsHisWillBack(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        ServerLevel nether = helper.getLevel().getServer().getLevel(Level.NETHER);
+        check(nether != null, "the server has a Nether");
+        ServerPlayer wanda = creative(f, 3.5, 10.5, Power.SCARLET_WITCH);
+        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 10.5));
+        lookAt(wanda, warden);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, warden) && warden.isNoAi() && marked(warden), "Wanda holds a Warden without his will");
+        look(wanda, EAST, 0.0F);
+        press(wanda, 3, false);
+        check(!Telekinesis.isHolding(wanda) && BossGrip.stills(warden) && warden.isNoAi(), "and throws him: still, without his will");
+
+        // Over the Nether's roof: the chunk is held loaded as a portal holds the one it leads to.
+        BlockPos there = new BlockPos(0, 130, 0);
+        ChunkPos chunk = new ChunkPos(there);
+        nether.getChunkSource().addRegionTicket(TicketType.PORTAL, chunk, 3, there);
+        f.onClose(() -> nether.getChunkSource().removeRegionTicket(TicketType.PORTAL, chunk, 3, there));
+        nether.getChunk(chunk.x, chunk.z);
+        Entity arrived = warden.changeDimension(new DimensionTransition(nether, Vec3.atBottomCenterOf(there), Vec3.ZERO, 0.0F, 0.0F,
+                DimensionTransition.DO_NOTHING));
+        check(arrived instanceof Warden && arrived.level() == nether && warden.isRemoved(), "a portal takes him to the Nether");
+        Warden across = (Warden) arrived;
+        across.discard(); // (looked at at once: he is gone before he could do anything in the Nether)
+        check(!across.isNoAi() && !marked(across), "the body that arrives has his will back: no NoAI, no mark");
+        helper.succeed();
     }
 
     /**

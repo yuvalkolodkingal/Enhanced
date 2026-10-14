@@ -23,6 +23,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +38,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import static com.kolodkingal.enhanced.gametest.BossTestSupport.lastActionBarKey;
@@ -159,6 +161,7 @@ public final class BillyBlockTests {
     @GameTest(template = ARENA, batch = "billy_blocks_limits")
     public static void billysBlocksHaveHisOwnLimits(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
         f.config(EnhancedConfig.BILLY_BLOCK_LIFT_RANGE, 6);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
         BlockPos dirt = new BlockPos(11, 2, 10);
@@ -205,6 +208,7 @@ public final class BillyBlockTests {
     @GameTest(template = ARENA, batch = "billy_blocks_recharge", timeoutTicks = 80)
     public static void billyNeedsAMomentBetweenBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
         f.config(EnhancedConfig.BILLY_BLOCK_LIFT_COOLDOWN, 20);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
         BlockPos first = new BlockPos(7, 2, 10);
@@ -256,6 +260,7 @@ public final class BillyBlockTests {
     @GameTest(template = ARENA, batch = "billy_blocks_long_recharge", timeoutTicks = 260)
     public static void billysRechargeOutlastsHisCrown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
         f.config(EnhancedConfig.BILLY_BLOCK_LIFT_COOLDOWN, 200);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
         BlockPos first = new BlockPos(7, 2, 10);
@@ -305,6 +310,7 @@ public final class BillyBlockTests {
     @GameTest(template = ARENA, batch = "billy_blocks_switch")
     public static void billysBlockLiftingHasASwitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
         f.config(EnhancedConfig.BILLY_BLOCK_LIFTING, false);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
         BlockPos dirt = new BlockPos(8, 2, 10);
@@ -347,6 +353,7 @@ public final class BillyBlockTests {
     @GameTest(template = ARENA, batch = "telekinesis_sneak", timeoutTicks = 60)
     public static void sneakTakesTheBlockBehindACreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
         Power[] heroes = {Power.SCARLET_WITCH, Power.BILLY, Power.PHOENIX};
         ServerPlayer[] players = new ServerPlayer[3];
         Zombie[] zombies = new Zombie[3];
@@ -495,6 +502,7 @@ public final class BillyBlockTests {
     @GameTest(template = ARENA, batch = "telekinesis_place", timeoutTicks = 140)
     public static void aSetDownBlockRespectsClaimsAndArenas(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
         ServerPlayer claimed = f.player(3.5, FLOOR, 16.5, Power.BILLY);
         ServerPlayer billy = f.player(3.5, FLOOR, 3.5, Power.BILLY);
         Consumer<BlockEvent.EntityPlaceEvent> claim = event -> {
@@ -663,6 +671,7 @@ public final class BillyBlockTests {
     @GameTest(template = ARENA, batch = "telekinesis_place_offline", timeoutTicks = 100)
     public static void aBlockOfALoggedOutHolderNeverLands(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
         Block[] kinds = {Blocks.STONE, Blocks.STONE, Blocks.GLASS};
         Item[] drops = {Items.COBBLESTONE, Items.COBBLESTONE, Items.GLASS};
         ServerPlayer[] billies = new ServerPlayer[3];
@@ -717,6 +726,63 @@ public final class BillyBlockTests {
                 check(itemsNear(helper, landing[i], 1.5, drops[i]) == 1, "it drops as one " + drops[i]);
             }
             check(asked[0] == 0, "nobody's rights are asked for a holder who left");
+            return true;
+        });
+    }
+
+    /**
+     * R44 (review fix): a set-down block that may not stand never becomes an item no player could have. Wanda sets an
+     * infested stone and a glass block down onto zombies' cells: neither stands; the infested stone, which Silk Touch gives
+     * as plain stone, does not drop as itself but gives what mining it gives, nothing but its silverfish; the glass, which
+     * Silk Touch gives, drops as one glass block.
+     */
+    @GameTest(template = ARENA, batch = "telekinesis_place_creative", timeoutTicks = 100)
+    public static void aSetDownBlockNeverGivesACreativeOnlyItem(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        Block[] kinds = {Blocks.INFESTED_STONE, Blocks.GLASS};
+        ServerPlayer[] wandas = new ServerPlayer[2];
+        TelekineticBlockEntity[] blocks = new TelekineticBlockEntity[2];
+        BlockPos[] landing = new BlockPos[2];
+        for (int i = 0; i < 2; i++) {
+            int z = 6 + 8 * i;
+            wandas[i] = f.player(3.5, FLOOR, z + 0.5, Power.SCARLET_WITCH);
+            BlockPos pos = new BlockPos(7, 2, z);
+            helper.setBlock(pos, kinds[i]);
+            lookAtBlock(helper, wandas[i], pos);
+            pressV(wandas[i], false);
+            blocks[i] = heldBlock(helper, wandas[i]);
+            check(blocks[i] != null && blocks[i].getBlockState().is(kinds[i]), "Wanda lifts the " + kinds[i].getName().getString());
+        }
+
+        f.everyTick(90, tick -> {
+            for (int i = 0; i < 2; i++) {
+                look(wandas[i], EAST, 0.0F);
+                PowerTicker.tick(wandas[i]);
+            }
+            if (tick < 8) {
+                return false;
+            }
+            if (tick == 8) {
+                for (int i = 0; i < 2; i++) {
+                    landing[i] = cellUnder(helper, blocks[i]);
+                    stillZombie(helper, landing[i].getX() + 0.5, landing[i].getZ() + 0.5);
+                    pressV(wandas[i], true); // set it down onto the zombie
+                    check(!Telekinesis.isHolding(wandas[i]), "let go");
+                }
+                return false;
+            }
+            if (blocks[0].isAlive() || blocks[1].isAlive()) {
+                return false;
+            }
+            for (int i = 0; i < 2; i++) {
+                check(!helper.getBlockState(landing[i]).is(kinds[i]), "the " + kinds[i].getName().getString() + " does not stand on the zombie");
+            }
+            check(itemsNear(helper, landing[1], 2.0, Items.GLASS) == 1 && allItems(helper) == 1,
+                    "one glass block drops, and nothing else: no infested stone");
+            List<Silverfish> silverfish = helper.getEntities(EntityType.SILVERFISH);
+            check(silverfish.size() == 1, "the infested stone broke as when mined: its silverfish came out (" + silverfish.size() + ")");
+            silverfish.forEach(Silverfish::discard);
             return true;
         });
     }

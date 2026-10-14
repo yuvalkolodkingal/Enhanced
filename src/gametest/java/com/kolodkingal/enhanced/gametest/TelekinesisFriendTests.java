@@ -11,8 +11,12 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+
+import java.util.UUID;
 
 import static com.kolodkingal.enhanced.gametest.BossTestSupport.lastActionBarKey;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -22,7 +26,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /**
  * Telekinesis and the players it holds (3.1, D-M 3.8), for every form: a player let go of is not gripped again by the same
- * hero at once.
+ * hero at once, and a friend let go of is spared his landing, until another grip takes him.
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -141,6 +145,46 @@ public final class TelekinesisFriendTests {
             }
             return false;
         });
+    }
+
+    /**
+     * D-M 3.8 (review fix): the landing guard is the last grip's. With PvP on, Wanda lets go of her teammate (friendly fire
+     * off) up in the air: he is spared his landing. Billy, on no team, takes hold of him before he lands: the guard was
+     * hers, not his grip's, and goes; let go by Billy, who may hurt him, he is spared nothing, and a fall hurts him.
+     */
+    @GameTest(template = ARENA, batch = "telekinesis_spared_enemy", timeoutTicks = 20)
+    public static void aFriendsGuardIsNotAnEnemysGrip(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.pvp(true);
+        ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        ServerPlayer billy = f.player(10.5, FLOOR, 3.5, Power.BILLY);
+        ServerPlayer friend = f.player(10.5, FLOOR, 10.5);
+        Scoreboard scoreboard = helper.getLevel().getServer().getScoreboard();
+        PlayerTeam team = scoreboard.addPlayerTeam("telekinesis_test_" + UUID.randomUUID().toString().substring(0, 8));
+        team.setAllowFriendlyFire(false);
+        scoreboard.addPlayerToTeam(wanda.getScoreboardName(), team);
+        scoreboard.addPlayerToTeam(friend.getScoreboardName(), team);
+        f.onClose(() -> scoreboard.removePlayerTeam(team));
+        Vec3 ground = friend.position();
+
+        lookAt(wanda, friend);
+        press(wanda, 3, false);
+        check(Telekinesis.holds(wanda, friend), "Wanda holds her teammate");
+        friend.teleportTo(ground.x, ground.y + 6.0, ground.z);
+        friend.setOnGround(false);
+        press(wanda, 3, true);
+        check(!Telekinesis.isHolding(wanda) && Telekinesis.isSpared(friend), "let go up in the air, he is spared his landing");
+
+        lookAt(billy, friend);
+        press(billy, 3, false);
+        check(Telekinesis.holds(billy, friend), "Billy, on no team, takes hold of him before he lands");
+        check(!Telekinesis.isSpared(friend), "the guard was Wanda's, not his grip's: it goes");
+        press(billy, 3, true);
+        check(!Telekinesis.isHolding(billy) && !Telekinesis.isSpared(friend), "let go by Billy, who may hurt him, he is spared nothing");
+        float health = friend.getHealth();
+        check(friend.hurt(friend.damageSources().fall(), 4.0F) && friend.getHealth() < health, "a fall hurts him");
+        helper.succeed();
     }
 
     private TelekinesisFriendTests() {

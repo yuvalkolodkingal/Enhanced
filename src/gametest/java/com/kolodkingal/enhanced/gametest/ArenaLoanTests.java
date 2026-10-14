@@ -42,6 +42,7 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -198,13 +199,19 @@ public final class ArenaLoanTests {
 
     /** Whether a list of the journal ({@code homes} or {@code standing}) has an entry at the cell (absolute). */
     private static boolean lists(CompoundTag journal, String list, BlockPos pos) {
+        return entries(journal, list, pos) > 0;
+    }
+
+    /** How many entries a list of the journal ({@code homes} or {@code standing}) has at the cell (absolute). */
+    private static int entries(CompoundTag journal, String list, BlockPos pos) {
+        int count = 0;
         for (Tag tag : journal.getList(list, Tag.TAG_COMPOUND)) {
             CompoundTag entry = (CompoundTag) tag;
             if (entry.getInt("x") == pos.getX() && entry.getInt("y") == pos.getY() && entry.getInt("z") == pos.getZ()) {
-                return true;
+                count++;
             }
         }
-        return false;
+        return count;
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -1070,6 +1077,133 @@ public final class ArenaLoanTests {
                 check(now - left[0] <= 20, "A mends within 20 ticks of the zombie's leaving");
                 return false;
             }
+            return true;
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // What the world puts into a hole; a cell lent again and again (review round 1)
+
+    /**
+     * D-T 5.3, 5.7, 5.8 (review fix): what the world puts into an open hole by itself never keeps the ground from coming
+     * back. Three cells of dirt are borrowed and their holes filled as the world would: a snow layer (it snowed into the
+     * hole), ice (the water the hole kept froze) and a poppy (a bone meal grew it on the dirt under the hole). The snow and
+     * the ice are mended over when they are due; the poppy is not a hole any more, so its home waits, and the end of the
+     * fight mends it too, with nothing dropped. After a crash the recovery puts back a hole the snow fell into.
+     */
+    @GameTest(template = ARENA, batch = "arena_loans_weather", timeoutTicks = 100)
+    public static void aHoleTheWorldFillsStillMends(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.ARENA_MEND_TICKS, 20);
+        ServerLevel level = helper.getLevel();
+        MinecraftServer server = level.getServer();
+        ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        TestFight fight = arena(f, wanda, Containment.NONE);
+        BlockPos snowed = new BlockPos(8, 2, 6);
+        BlockPos frozen = new BlockPos(8, 2, 10);
+        BlockPos grown = new BlockPos(8, 2, 14);
+        BlockPos[] cells = {snowed, frozen, grown};
+        BlockState[] fills = {Blocks.SNOW.defaultBlockState(), Blocks.ICE.defaultBlockState(), Blocks.POPPY.defaultBlockState()};
+        helper.setBlock(grown.below(), Blocks.DIRT); // (a poppy grows on dirt, not on the smooth stone of the floor)
+        for (BlockPos cell : cells) {
+            helper.setBlock(cell, Blocks.DIRT);
+        }
+        for (int i = 0; i < cells.length; i++) {
+            dropDust(wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, cells[i]));
+            check(helper.getBlockState(cells[i]).isAir() && fight.loans().isOpenHome(abs(helper, cells[i])), "the dirt at " + cells[i] + " is lent");
+            level.setBlock(abs(helper, cells[i]), fills[i], Block.UPDATE_CLIENTS);
+        }
+        long lent = level.getGameTime();
+        int[] step = {0};
+
+        f.everyTick(90, tick -> {
+            switch (step[0]) {
+                case 0 -> {
+                    if (level.getGameTime() - lent < 20) {
+                        return false;
+                    }
+                    check(helper.getBlockState(snowed).is(Blocks.DIRT) && !fight.loans().isOpenHome(abs(helper, snowed)),
+                            "the hole the snow fell into mends when it is due");
+                    check(helper.getBlockState(frozen).is(Blocks.DIRT) && !fight.loans().isOpenHome(abs(helper, frozen)),
+                            "so does the one whose water froze");
+                    check(helper.getBlockState(grown).is(Blocks.POPPY) && fight.loans().isOpenHome(abs(helper, grown)),
+                            "a poppy is not a hole: its home waits");
+                    fight.end(BossEnd.COMMAND);
+                    step[0] = 1;
+                }
+                case 1 -> {
+                    if (!fight.isFinished()) {
+                        return false;
+                    }
+                    check(helper.getBlockState(grown).is(Blocks.DIRT) && !fight.loans().isOpenHome(abs(helper, grown)),
+                            "the end of the fight mends it all the same: the ground is whole");
+                    check(items(helper) == 0 && lifted(helper) == 0, "nothing dropped, the poppy and the snow included");
+                    // A crash: a hole the snow fell into, and the fight lost without giving anything back.
+                    TestFight crashed = arena(f, wanda, Containment.NONE);
+                    dropDust(wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, snowed));
+                    level.setBlock(abs(helper, snowed), Blocks.SNOW.defaultBlockState(), Block.UPDATE_CLIENTS);
+                    BossFights.forgetForTests(crashed);
+                    ArenaJournalWriter.flush(); // (what was handed over is on the disk, as a crash a moment later leaves it)
+                    ArenaLoansRecovery.recoverAll(server);
+                    step[0] = 2;
+                }
+                default -> {
+                    check(helper.getBlockState(snowed).is(Blocks.DIRT), "the recovery puts the dirt back over the snow");
+                    check(items(helper) == 0, "nothing dropped");
+                    saveHook(level);
+                    saveHook(level); // (the journals are gone)
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    /**
+     * Spec 17, R48 (review fix): the journal keeps one repair of a cell, the newest. With no save of the world between,
+     * Wanda borrows the same dirt three times, each time once it has mended, and twice sets a borrowed block down on the
+     * same cell, each time once the last has crumbled and its home has mended: the snapshot lists the dirt's home once, the
+     * second home once and the standing cell once. (A real autosave between them would change nothing of it: a newer repair
+     * replaces an older one, and only two saves retire one.)
+     */
+    @GameTest(template = ARENA, batch = "arena_loans_repairs", timeoutTicks = 160)
+    public static void aCellLentAgainAndAgainIsJournaledOnce(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        f.config(BossConfig.ARENA_MEND_TICKS, 10);
+        f.config(BossConfig.BORROWED_BLOCK_TICKS, 10);
+        ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        TestFight fight = arena(f, wanda, Containment.NONE);
+        BlockPos home = new BlockPos(7, 2, 8);
+        BlockPos source = new BlockPos(7, 2, 12);
+        BlockPos stand = new BlockPos(12, 2, 14);
+        helper.setBlock(home, Blocks.DIRT);
+        helper.setBlock(source, Blocks.DIRT);
+        int[] lent = {0};
+        int[] stood = {0};
+
+        f.everyTick(150, tick -> {
+            if (lent[0] < 3) {
+                if (helper.getBlockState(home).is(Blocks.DIRT) && !fight.loans().isOpenHome(abs(helper, home))) {
+                    dropDust(wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, home));
+                    lent[0]++;
+                }
+                return false;
+            }
+            if (stood[0] < 2 || fight.loans().isStanding(abs(helper, stand)) || fight.loans().isOpenHome(abs(helper, source))) {
+                if (stood[0] < 2 && !fight.loans().isStanding(abs(helper, stand)) && helper.getBlockState(source).is(Blocks.DIRT)
+                        && !fight.loans().isOpenHome(abs(helper, source))) {
+                    setDown(helper, wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, source), stand);
+                    stood[0]++;
+                }
+                return false;
+            }
+            if (!helper.getBlockState(home).is(Blocks.DIRT) || !helper.getBlockState(stand).isAir()) {
+                return false;
+            }
+            CompoundTag snapshot = fight.loans().snapshot();
+            check(entries(snapshot, "homes", abs(helper, home)) == 1, "the dirt lent three times is one repair: " + snapshot);
+            check(entries(snapshot, "homes", abs(helper, source)) == 1, "so is the home lent twice");
+            check(entries(snapshot, "standing", abs(helper, stand)) == 1, "and the cell two borrowed blocks stood on");
             return true;
         });
     }
