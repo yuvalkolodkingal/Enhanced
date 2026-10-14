@@ -16,6 +16,8 @@ Every power's look and colour follows the MCU films and shows, and Vision, Tommy
 (in his Asgardian clothes, the TVA's or the God of Stories'), Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse each have several looks
 (press **H**).
 
+**New in 3.1:** Wanda and Billy build with **Build Magic** (press **Y**; see the [Build Magic page](docs/wiki/Build-Magic.md)), every telekinesis works in the boss fights and Billy moves blocks, Magneto pulls the metal out of everything around him, and Apocalypse never heals while Wanda and the Phoenix hit him critically.
+
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
 number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs/DESIGN.he.md)).
 
@@ -79,26 +81,28 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 
 | Key | Magneto | Scarlet Witch | Quicksilver | Vision |
 |---|---|---|---|---|
-| **R** | Metal Telekinesis | Chaos Energy Beam (hold) | Quicksilver Time on/off (Sneak: Super Speed) | Mind Stone Beam (hold) |
+| **R** | Metal Telekinesis (Sneak: Magnetic Pull) | Chaos Energy Beam (hold) | Quicksilver Time on/off (Sneak: Super Speed) | Mind Stone Beam (hold) |
 | **G** | Iron Shrapnel Storm (hold) | Enhanced Flight | Speed Blitz | Flight |
-| **V** | Armor & Weapon Strip | Telekinesis (creatures, items, blocks) | Pickpocket | Phase through walls (toggle) |
+| **V** | Armor & Weapon Strip | Telekinesis (creatures, items, blocks; Sneak: a block) | Pickpocket | Phase through walls (toggle) |
 | **B** | Magnetic Shield (toggle) | Chaos Shield (hold) | Wall & Water Run (toggle) | Density (toggle) |
 | **N** | Magnetic Flight | The Hex (again: Hex Control, Sneak: dissolve) | Walkman: music on/off | Human disguise (toggle) |
+| **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel) | | |
 
 | Key | Tommy | Billy | Loki | Thor |
 |---|---|---|---|---|
 | **R** | Super Speed on/off (sprint) | Hex Bolt | Daggers (Sneak: three) | Throw / call back (Sneak: shatter Mjolnir) |
 | **G** | Disarm Blitz | Flight | Duplicates | Flight (weapon in hand) |
-| **V** | Whirlwind | Telekinesis | Shapeshift | Lightning beam (hold) |
+| **V** | Whirlwind | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Shapeshift | Lightning beam (hold) |
 | **B** | Vibrate Through Walls | Freeze | Vanish | God of Thunder (toggle) |
 | **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
+| **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel) | | |
 | **H** | Change look | Change look | Change look | Change look |
 
 | Key | Phoenix |
 |---|---|
 | **R** | Mind Reading on/off (Sneak: Mind Sense through walls) |
 | **G** | Flight |
-| **V** | Telekinesis (creatures, items, arrows, blocks) |
+| **V** | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) |
 | **B** | Mind Control (Sneak: Psionic Field) |
 | **N** | Phoenix Burst (hold to charge, let go to unleash) |
 | **H** | Change look |

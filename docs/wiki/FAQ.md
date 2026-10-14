@@ -49,6 +49,38 @@ No. Thor's recall never takes a Mjolnir that is bound to someone else: he calls 
 
 Mjolnir can't pin the bosses (the Ender Dragon, the Wither and the Warden), players who are in Creative or Spectator mode, or a player at all if the server has PvP off. Only the hammer's owner can pin someone (or any worthy player, with `thor.mjolnirOwnerOnly` off), and only its owner can lift it off again. See [Thor](Thor).
 
+## Build Magic
+
+### Can Billy build as big as Wanda?
+
+Not at first. Wanda's magic has no limit; Billy's is an apprentice's: a meter of 512 blocks that refills 16 a second, 24 blocks on a side, 24 blocks of reach, 10 undos, one spell at a time. It grows as he practises (every block he builds counts), up to Wiccan, who is four times as strong. Near a Scarlet Witch his spells cost half. See [Build Magic](Build-Magic#billy-an-apprentice-who-learns).
+
+### Can someone wreck my house with Build Magic?
+
+Not by accident, and not on your land. A spell asks every claim and protection mod for every block (and the world border, spawn protection and Adventure mode), leaves chests that hold things alone, never touches bedrock-like blocks, spawners or Mjolnir, never buries or lifts another player when PvP is off, and a spell that removes or replaces more than 64 blocks needs the right button held for a second. And **Ctrl + Z** undoes it, even tomorrow, without destroying anything built since. A server can set `build_magic.operatorsOnly`, and an operator can undo a child's mistake with `/enhanced build undo`. See [Build Magic](Build-Magic#what-magic-will-not-touch).
+
+### Does Build Magic lag the server?
+
+It is built not to. Every spell is cut into small slices, and all the spells of the server together get at most 8 milliseconds of a tick (half when the server is struggling), so a huge spell just takes longer and the game keeps its 20 ticks a second. What a big spell does cost is **network**: every changed block is sent to every player who sees it. On a server hosted at home or rented with a modest upload, lower `build_magic.blocksPerTick` (5,000 keeps each watching player under about 0.4 MB a second). See [Server Configuration](Server-Configuration#build-magic).
+
+### Why are some keys red in the Controls screen?
+
+Build Magic uses Ctrl + Z, Ctrl + Y, Ctrl + R, Ctrl + F, Ctrl + C, Ctrl + X and Ctrl + V, and Minecraft's Controls screen marks a key as clashing when it shares a key with another, even though the game sends each press to the right place (Ctrl + Z of a witch never reaches Wanda's Z). So you will see red marks on those keys and on the keys they share (Sprint, Swap Item With Offhand, the toolbar keys, and the mod's **R**, **V**, **Z** and **Y**). It is only the screen being careful. See [Controls](Controls#build-magic-y).
+
+## Magneto
+
+### How do I mine with Magneto?
+
+Crouch and press **R** when R isn't holding anything, ideally facing the wall: every ore within 8 blocks gives you its metal, through the rock, and turns to stone. It recharges in 5 seconds and costs a little hunger. See [Magneto](Magneto#the-magnetic-pull-sneak--r).
+
+### Why didn't the chest give me its iron?
+
+The pull never opens chests, barrels or shulker boxes, or takes what is in item frames and armor stands: it all belongs to someone (a sibling's chest). A server owner can turn `magneto.pullFromStorage` on to let it take the metal stacks out of what you can see. Claims and spawn protection stop it too.
+
+### Why did the lanterns behind me stay?
+
+The metal people build with (lanterns, rails, doors, hoppers) comes only from the cone you face (120 degrees) and only if you can see it, so your own base behind you is safe. Turn round to pull the rest. A hopper or a minecart that holds things, and a piston that is working, never come at all (empty it first).
+
 ## The Phoenix
 
 ### How do I become the Phoenix?
@@ -190,7 +222,7 @@ The action bar says why, and nothing is used up. The most common reasons: the di
 
 ### Why can't I build, dig or run away on the island?
 
-From the ritual until the fight is over, the arena is protected on purpose: nothing can be placed or broken, there is no water, lava or pistons, explosions break nothing, and teleports out are cancelled. Otherwise people would pillar up, dig a hole or hide and cheese the fight. A field pulls anyone who strays too far back onto the island (2 damage that cannot kill), so nobody falls to their death. Everything goes back to normal when the fight ends.
+From the ritual until the fight is over, the arena is protected on purpose: nothing can be placed or broken, there is no water, lava or pistons, explosions break nothing, and teleports out are cancelled. Otherwise people would pillar up, dig a hole or hide and cheese the fight. Telekinesis may still borrow a block to throw: the hole mends in seconds and the block crumbles. A borrowed block you set down stands only 5 seconds, at most 3 of yours at once, never on another one or right next to anyone, so nobody can build a pillar, a wall or a hut out of the arena. Build Magic and Magneto's Magnetic Pull change no block there at all. A field pulls anyone who strays too far back onto the island (2 damage that cannot kill), so nobody falls to their death. Everything goes back to normal when the fight ends.
 
 ## Apocalypse
 
@@ -201,6 +233,10 @@ Craft a **Capstone** (a Nether Star, five Gold Blocks and a Lapis Block) and **S
 ### Why does nothing hurt Apocalypse?
 
 While his golden shield is up, **everything but mind power does exactly nothing to him**: arrows, swords, Mjolnir, lightning, shrapnel, the Mind Stone, tamed wolves, TNT. Only the **Scarlet Witch's Chaos Beam and what she throws with telekinesis**, and the **Phoenix's Burst, her throws and her mind powers**, wear it down. When it breaks he kneels for ten seconds and **everyone** can hurt him, down to a floor; then a stronger shield forms. Bring one of the two, then bring everyone else for the windows. See [Apocalypse](Apocalypse#the-shield-the-one-rule).
+
+### Why does Apocalypse take so little from my sword?
+
+Because only **Wanda's and the Phoenix's mind power** hits him *critically*: twice as strong on his shield and, when the shield is down, on his body. Everything else (a sword, an arrow, Thor's lightning, Magneto's shrapnel) does only 0.4 times as much to his body, even in a window, and nothing at all to his shield. And his health never heals, so the hits you do land stay. See [Apocalypse](Apocalypse#he-never-heals-wanda-and-the-phoenix-hit-critically).
 
 ### Why can I not wake him?
 
@@ -220,7 +256,7 @@ No. He never places or breaks a block: his sand, his waves, his tornadoes and hi
 
 ### I was swallowed by sand and I cannot move. What do I do?
 
-You are **entombed**. Inside it you can do nothing (no key, no blow, no item): **your friends break the cocoon** by hitting it (three sword hits), or a Scarlet Witch, a Phoenix or Billy frees you by taking hold of you with telekinesis. It lets go by itself after five seconds, and the damage inside never takes you below two hearts. To avoid it, keep moving after the stripe of sand locks on your feet.
+You are **entombed**. Inside it you can do nothing (no key, no blow, no item): **your friends break the cocoon** by hitting it (three sword hits), or a Scarlet Witch, a Phoenix, Billy or Magneto (if you wear metal) frees you by taking hold of you with telekinesis (and if you were holding something, you let go of it). It lets go by itself after five seconds, and the damage inside never takes you below two hearts. To avoid it, keep moving after the stripe of sand locks on your feet.
 
 ### What is the Essence of En Sabah Nur?
 
@@ -286,7 +322,7 @@ In `world/serverconfig/enhanced-server.toml`. Every option is on [Server Configu
 
 ### Does it respect claim and protection mods?
 
-Wanda's telekinesis on blocks and Tommy's Molecular Acceleration respect spawn protection, Adventure mode and claim mods.
+Telekinesis on blocks (Wanda, Billy, the Phoenix, Magneto), Build Magic, Magneto's Magnetic Pull and Tommy's Molecular Acceleration respect spawn protection, Adventure mode and claim mods, when a block is torn out and when it is set down. A block is never set down where someone stands, and a block whose holder has left the game falls as an item.
 
 ## This wiki
 
