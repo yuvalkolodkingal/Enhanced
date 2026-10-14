@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
@@ -387,7 +388,11 @@ public final class SpellPlanner {
         int radius = Math.max(0, recipe.size());
         Volume ball = SpellMath.shifted(new Shape(ShapeKind.BALL, radius, 0, 1, false, 0), centre.getX(), centre.getY() - radius, centre.getZ());
         Volume cells = region == null ? ball : SpellMath.within(ball, region);
-        // A dab that misses the selected thing paints nothing.
+        // A dab that misses the selected thing paints nothing: the ball misses its box, or meets the box of a sparse
+        // thing (an L, a ring) without touching one of its cells (counted row by row, at most the ball's rows).
+        if (cells != null && region != null && cells.count() == 0) {
+            cells = null;
+        }
         return new Plan(recipe, NONE, cells, null, cells == null ? null : skin(material), Order.RISE, setup);
     }
 
@@ -777,6 +782,80 @@ public final class SpellPlanner {
             return null;
         }
 
+        /**
+         * The block {@code pos} gets, read against {@code level} now, or null when the plan leaves it (or does not cover
+         * it): one cell out of order, for a preflight that samples a big plan. Unlike a cursor's, it gives no data.
+         */
+        public @Nullable BlockState resolveAt(BlockGetter level, BlockPos pos) {
+            Cell cell = resolveCell(level, pos);
+            return cell == null ? null : cell.state();
+        }
+
+        /**
+         * The cell {@code pos} as the plan resolves it against {@code level} now (its block, its data, a Move's source
+         * cell), or null when the plan leaves it or does not cover it: one cell out of the cursor's order (a Move that
+         * moves a source cell before it writes over it, a preflight's sample).
+         */
+        public @Nullable Cell resolveCell(BlockGetter level, BlockPos pos) {
+            Volume volume = cells();
+            if (volume == null || rule == null || !volume.contains(pos.getX(), pos.getY(), pos.getZ())) {
+                return null;
+            }
+            Cursor cursor = new Cursor(new EmptyWalk(), rule);
+            cursor.pos.set(pos);
+            BlockState state = cursor.resolve(level);
+            return state == null ? null : new Cell(pos.immutable(), state, cursor.data(), cursor.from());
+        }
+
+        /**
+         * For a Move's put-down: the cell its source cell {@code source} lands on (turned and flipped), or null for a
+         * cell outside its source box or a plan that is no Move's.
+         */
+        public @Nullable BlockPos targetOf(BlockPos source) {
+            if (!(cells() instanceof Placed placed) || placed.origin == null) {
+                return null;
+            }
+            Placement placement = placed.placement;
+            int x = source.getX() - placed.origin.getX();
+            int y = source.getY() - placed.origin.getY();
+            int z = source.getZ() - placed.origin.getZ();
+            if (x < 0 || y < 0 || z < 0 || x >= placement.sizeX() || y >= placement.sizeY() || z >= placement.sizeZ()) {
+                return null;
+            }
+            return placed.corner.offset(placement.target(x, y, z));
+        }
+
+        /**
+         * For a Move's put-down: where a point of its source box (in the world) is carried, turned and flipped as the
+         * cells are (a creature or a frame the Move takes along), or null for a plan that is no Move's.
+         */
+        public @Nullable Vec3 carried(Vec3 point) {
+            if (!(cells() instanceof Placed placed) || placed.origin == null) {
+                return null;
+            }
+            Vec3 local = placed.placement.target(point.x - placed.origin.getX(), point.y - placed.origin.getY(), point.z - placed.origin.getZ());
+            return local.add(placed.corner.getX(), placed.corner.getY(), placed.corner.getZ());
+        }
+
+        /** For a Move's put-down: a direction of the source as it points at the target (a frame's facing). */
+        public Direction carried(Direction direction) {
+            return cells() instanceof Placed placed ? placed.placement.target(direction) : direction;
+        }
+
+        /** For a Move's put-down: a yaw of the source as it looks at the target (a creature's). */
+        public float carriedYaw(float yaw) {
+            return cells() instanceof Placed placed ? placed.placement.targetYaw(yaw) : yaw;
+        }
+
+        /**
+         * Whether a Move's put-down is turned or flipped and lands on its own source: then a target cell may be a
+         * source cell not moved yet, which the Move moves first ({@code BuildJob}); a plain shift is ordered instead.
+         */
+        public boolean turnsOverItself() {
+            return cells() instanceof Placed placed && placed.origin != null && order != Order.SHIFT && region != null
+                    && placed.bounds.intersects(region.bounds());
+        }
+
         /** A new walk over its cells, from the first. */
         public Cursor cursor() {
             Volume volume = cells();
@@ -913,6 +992,15 @@ public final class SpellPlanner {
             return from;
         }
 
+        /**
+         * Gives up the rest of the chunk column the cursor is in (a spell over a mostly unloaded box does not walk the cells
+         * of every column): the next {@link #next} is the first cell of the next column. Returns how many cells of its
+         * box the column still spans at most, or 0 for a plan that does not walk by columns.
+         */
+        public long skipColumn() {
+            return walk.skipColumn();
+        }
+
         /** How many cells the cursor has moved over. */
         public long walked() {
             return walked;
@@ -925,11 +1013,13 @@ public final class SpellPlanner {
      * compared), those of them that remove or replace an existing block (not air, not replaceable: the short hold), and
      * those that make a volatile block ({@code enhanced:build_volatile}: Wanda's cap). A cell in a chunk the world has
      * not loaded (D-B 10.3 P1), and then one outside the build height or the world border (P2), is skipped and counted
-     * apart: neither ever changes, so neither is paid for.
+     * apart: neither ever changes, so neither is paid for. A {@link Tally} hears of every cell that changes (the items
+     * a spell needs with {@code requireMaterials}).
      */
     public static final class Count {
         private final Cursor cursor;
         private final BlockGetter level;
+        private @Nullable Tally tally;
         private long walked;
         private long changed;
         private long removed;
@@ -972,8 +1062,17 @@ public final class SpellPlanner {
                 if (now.is(ModTags.BUILD_VOLATILE)) {
                     volatiles++;
                 }
+                if (tally != null) {
+                    tally.cell(old, now);
+                }
             }
             return done;
+        }
+
+        /** Tells {@code tally} of every cell found changing from now on; returns this count. */
+        public Count tally(@Nullable Tally tally) {
+            this.tally = tally;
+            return this;
         }
 
         public boolean done() {
@@ -1003,6 +1102,12 @@ public final class SpellPlanner {
         /** The cells outside the build height or the world border, which no spell writes. */
         public long outside() {
             return outside;
+        }
+
+        /** What a {@link Count} tells of each cell it finds changing: what is there, and what the spell puts there. */
+        @FunctionalInterface
+        public interface Tally {
+            void cell(BlockState old, BlockState now);
         }
     }
 
@@ -1197,6 +1302,14 @@ public final class SpellPlanner {
     private abstract static class Walk {
         /** Moves {@code out} to the next cell; false at the end. */
         abstract boolean next(BlockPos.MutableBlockPos out);
+
+        /**
+         * Gives up the rest of the chunk column the walk is in, when it goes column by column: the next cell is the first of
+         * the next column. Returns how many cells the column's box still spans at most (0: a walk that does not go by columns).
+         */
+        long skipColumn() {
+            return 0L;
+        }
     }
 
     private static final class EmptyWalk extends Walk {
@@ -1325,6 +1438,16 @@ public final class SpellPlanner {
                 column = layers(area);
             }
             return false;
+        }
+
+        @Override
+        final long skipColumn() {
+            if (column == null) {
+                return 0L;
+            }
+            column = null;
+            return (long) (Math.min(box.maxX(), (cx << 4) + 15) - Math.max(box.minX(), cx << 4) + 1) * box.getYSpan()
+                    * (Math.min(box.maxZ(), (cz << 4) + 15) - Math.max(box.minZ(), cz << 4) + 1);
         }
 
         /** Moves {@link #cx}, {@link #cz} to the next column of the box; false after the last. */

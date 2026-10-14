@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.power;
 
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -58,6 +59,7 @@ public final class Powers {
         data.setPowerRaw(power);
         PowerTicker.applyPassives(player, data);
         syncIfDirty(player);
+        BuildMagic.onPowerChanged(player, old, power);
     }
 
     /**

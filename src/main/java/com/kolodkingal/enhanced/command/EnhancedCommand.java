@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
+import com.kolodkingal.enhanced.build.BuildCommands;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.Power;
@@ -43,6 +44,15 @@ import java.util.List;
  * /enhanced boss stop
  * /enhanced boss list
  * /enhanced boss cleanup &lt;center&gt; &lt;radius&gt;
+ * /enhanced build undo &lt;player&gt; [steps]
+ * /enhanced build stop [&lt;player&gt;|all]
+ * /enhanced build list
+ * /enhanced build history &lt;player&gt;
+ * /enhanced build rank &lt;player&gt; [1-4]
+ * /enhanced build meter &lt;player&gt; &lt;value&gt;
+ * /enhanced build forget &lt;player&gt;
+ *
+ * <p>The {@code build} branch is {@link BuildCommands#node()} (Build Magic's operators' tools, D-B 16).
  */
 public final class EnhancedCommand {
     private static final DynamicCommandExceptionType UNKNOWN_POWER =
@@ -92,7 +102,8 @@ public final class EnhancedCommand {
                                 .then(Commands.argument("center", Vec3Argument.vec3())
                                         .then(Commands.argument("radius", IntegerArgumentType.integer(1, 512))
                                                 .executes(ctx -> cleanupBosses(ctx.getSource(), Vec3Argument.getVec3(ctx, "center"),
-                                                        IntegerArgumentType.getInteger(ctx, "radius"))))))));
+                                                        IntegerArgumentType.getInteger(ctx, "radius")))))))
+                .then(BuildCommands.node()));
     }
 
     private static int get(CommandSourceStack source, ServerPlayer player) {

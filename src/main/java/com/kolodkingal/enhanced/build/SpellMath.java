@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -1075,6 +1076,64 @@ public final class SpellMath {
                 case SpellRecipe.FLIP_X -> out.mirror(Mirror.FRONT_BACK);
                 case SpellRecipe.FLIP_Z -> out.mirror(Mirror.LEFT_RIGHT);
                 case SpellRecipe.UPSIDE_DOWN -> upsideDown(out);
+                default -> out;
+            };
+        }
+
+        /**
+         * Where a point of the source box lands in the target box ({@code x, y, z}: offsets from the source's low
+         * corner in blocks, 0 to {@code sizeX} along x), turned and flipped as the cells are: the middle of a cell
+         * lands in the middle of that cell's target. What a Move carries (a creature, a frame) goes there.
+         */
+        public Vec3 target(double x, double y, double z) {
+            double tx;
+            double tz;
+            switch (turn) {
+                case 1 -> {
+                    tx = sizeZ - z;
+                    tz = x;
+                }
+                case 2 -> {
+                    tx = sizeX - x;
+                    tz = sizeZ - z;
+                }
+                case 3 -> {
+                    tx = z;
+                    tz = sizeX - x;
+                }
+                default -> {
+                    tx = x;
+                    tz = z;
+                }
+            }
+            double ty = y;
+            switch (flip) {
+                case SpellRecipe.FLIP_X -> tx = targetSizeX() - tx;
+                case SpellRecipe.FLIP_Z -> tz = targetSizeZ() - tz;
+                case SpellRecipe.UPSIDE_DOWN -> ty = sizeY - ty;
+                default -> {
+                }
+            }
+            return new Vec3(tx, ty, tz);
+        }
+
+        /** A direction of the source as it points in the target: turned clockwise, then flipped. */
+        public Direction target(Direction direction) {
+            Direction out = direction.getAxis().isHorizontal() ? rotation().rotate(direction) : direction;
+            return switch (flip) {
+                case SpellRecipe.FLIP_X -> out.getAxis() == Direction.Axis.X ? out.getOpposite() : out;
+                case SpellRecipe.FLIP_Z -> out.getAxis() == Direction.Axis.Z ? out.getOpposite() : out;
+                case SpellRecipe.UPSIDE_DOWN -> out.getAxis() == Direction.Axis.Y ? out.getOpposite() : out;
+                default -> out;
+            };
+        }
+
+        /** A yaw (degrees, as an entity's) in the target: a quarter turn adds 90, a flip mirrors it as vanilla does. */
+        public float targetYaw(float yaw) {
+            float out = Mth.wrapDegrees(yaw + 90.0F * turn);
+            return switch (flip) {
+                case SpellRecipe.FLIP_X -> -out;
+                case SpellRecipe.FLIP_Z -> Mth.wrapDegrees(180.0F - out);
                 default -> out;
             };
         }

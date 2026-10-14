@@ -19,6 +19,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -37,7 +38,9 @@ import java.util.UUID;
  *     arena was protected since), a slice a tick. Then the items that fell with it get a fresh lifetime, the Program
  *     that started the fight is owed back to whoever used it, and the note is deleted. A note that cannot be read is
  *     set aside and the world is not touched on its account. A note whose island was never placed (it was only about to
- *     be) clears nothing, which is the same job.</li>
+ *     be) clears nothing, which is the same job. A note of an island that had landed (kept until two saves hold the
+ *     landing, R48) is recovered quietly: its column is looked over once more (normally there is nothing left to
+ *     clear), nothing is owed, and nobody is moved (the descent set everyone down).</li>
  *     <li><b>The players.</b> Whoever the note lists is given a record to be set down on the ground when they next log
  *     in inside the box where the island was ({@link SokoviaRelocations}); a player who was saved while carried, with
  *     the lift's marks on them, gets their gravity back and, if they hang in the air, is set down on the ground.</li>
@@ -65,7 +68,22 @@ public final class SokoviaRecovery {
             this.level = level;
         }
 
-        /** Holds the chunks and gives the players their records. */
+        /** The box of the island's columns, from its lowest block to its highest. */
+        BoundingBox box() {
+            int extent = header.spec().extent();
+            return new BoundingBox(header.centre().getX() - extent, header.minY(), header.centre().getZ() - extent,
+                    header.centre().getX() + extent, header.maxY(), header.centre().getZ() + extent);
+        }
+
+        /** Whether the note is of an island that came down by its own descent (R48): its column should be empty. */
+        boolean landed() {
+            return SokoviaJournal.LANDED.equals(header.state());
+        }
+
+        /**
+         * Holds the chunks and gives the players their records (but for a landed island: its descent set everyone
+         * down already).
+         */
         void start() {
             Spec spec = header.spec();
             int reach = spec.extent() + CHUNK_MARGIN;
@@ -80,7 +98,9 @@ public final class SokoviaRecovery {
                     tickets.add(chunk);
                 }
             }
-            sendMembersHome(level.getServer(), header);
+            if (!landed()) {
+                sendMembersHome(level.getServer(), header);
+            }
         }
 
         /** One tick of work; true when the island is gone and the note is deleted. */
@@ -114,7 +134,16 @@ public final class SokoviaRecovery {
             payBack(level.getServer(), header);
             SokoviaJournal.delete(level.getServer(), header.fight());
             release();
-            Enhanced.LOGGER.info("Ultron's floating island of fight {} was cleared", header.fight());
+            int cleared = clearing == null ? 0 : clearing.edits();
+            if (!landed()) {
+                Enhanced.LOGGER.info("Ultron's floating island of fight {} was cleared", header.fight());
+            } else if (cleared > 0) {
+                Enhanced.LOGGER.info("Ultron's island of fight {} had landed; {} blocks left in its column in the sky were cleared",
+                        header.fight(), cleared);
+            } else {
+                // The usual case: the island came down, and its note only waited for two saves (R48). Nothing to say.
+                Enhanced.LOGGER.debug("Ultron's island of fight {} had landed; its column in the sky was empty", header.fight());
+            }
         }
 
         void release() {
@@ -157,7 +186,13 @@ public final class SokoviaRecovery {
             job.start();
             JOBS.add(job);
             began++;
-            Enhanced.LOGGER.warn("Ultron's island of fight {} was left in the sky ({}): clearing it", header.fight(), header.state());
+            if (job.landed()) {
+                // A note kept until two saves hold its landing (R48), found after a stop that was not clean: its column
+                // is looked over once more, quietly (there is normally nothing left up there to clear).
+                Enhanced.LOGGER.debug("Ultron's island of fight {} had landed: its column in the sky is looked over once more", header.fight());
+            } else {
+                Enhanced.LOGGER.warn("Ultron's island of fight {} was left in the sky ({}): clearing it", header.fight(), header.state());
+            }
         }
         return began;
     }
@@ -179,6 +214,20 @@ public final class SokoviaRecovery {
                 JOBS.remove(job);
             }
         }
+    }
+
+    /**
+     * Whether {@code box} meets an island a recovery of this level is still clearing (the columns of its shape's square,
+     * from its lowest block to its highest): no Build Magic spell is cast there until it is gone (D-B 10.2 C9), so
+     * nothing a spell builds is ever cleared with it, and nothing it clears is ever undone into the sky.
+     */
+    public static boolean coversAny(ServerLevel level, BoundingBox box) {
+        for (Job job : JOBS) {
+            if (job.level == level && job.header.maxY() >= job.header.minY() && job.box().intersects(box)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** How many recoveries are still going. */
