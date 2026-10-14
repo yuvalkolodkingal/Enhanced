@@ -181,10 +181,15 @@ public class PowerHud implements LayeredDraw.Layer {
         return left == null ? null : Component.translatable("hud.enhanced.pull_cooldown", left).withStyle(ChatFormatting.GRAY);
     }
 
-    /** The ability's cooldown as the HUD shows it (grey seconds), or null when it is ready. */
+    /**
+     * The ability's cooldown as the HUD shows it (grey seconds), or null when it is ready. The unit comes from the language
+     * ({@code hud.enhanced.seconds}: "4.9s"; in Hebrew the number and then the Hebrew abbreviation): a Latin "s" after the
+     * number on a Hebrew line was drawn apart from it, at the far end of the line.
+     */
     public static Component cooldown(PowerData data, int ability, long now) {
         long left = data.cooldownUntil(ability) - now;
-        return left > 0 ? Component.literal(String.format(Locale.ROOT, "%.1fs", left / 20.0)).withStyle(ChatFormatting.GRAY) : null;
+        return left > 0 ? Component.translatable("hud.enhanced.seconds", String.format(Locale.ROOT, "%.1f", left / 20.0))
+                .withStyle(ChatFormatting.GRAY) : null;
     }
 
     /**

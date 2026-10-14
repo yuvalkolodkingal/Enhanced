@@ -9,8 +9,10 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 
@@ -345,6 +347,12 @@ public final class GestureTable {
      */
     static GestureId predicted(HeroAnimState s, PowerData data, int ability, long now, boolean hasOwnHex, boolean sneaking) {
         switch (s.power) {
+            case MAGNETO -> {
+                // (An empty hunger bar: the server turns the pull down with its line, and no cooldown starts.)
+                LocalPlayer me = Minecraft.getInstance().player;
+                boolean fed = me != null && (me.getAbilities().invulnerable || me.getFoodData().getFoodLevel() > 0);
+                return GestureRoutes.magnetoPredicted(data, ability, now, sneaking, fed);
+            }
             case SCARLET_WITCH -> {
                 if (ability == 4 && !data.chaosShieldActive() && data.isReady(4, now)) {
                     return GestureId.WANDA_SHIELD_RAISE;

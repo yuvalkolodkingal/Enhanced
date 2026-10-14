@@ -1036,11 +1036,14 @@ public final class ApocalypseTests {
         ServerPlayer hero = hero(f, 3.5, 10.5);
         ServerPlayer magneto = f.player(10.5, FLOOR, 10.5, Power.MAGNETO);
 
-        // Magneto cannot lift flesh and bone, unless the hero wears iron.
+        // Magneto cannot lift flesh and bone, unless the hero wears iron or holds it (metal anywhere in his equipment).
         check(!Telekinesis.canLift(magneto, hero, Telekinesis.Mode.MAGNETO), "Magneto's Metal Telekinesis does nothing to him");
         hero.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
         check(Telekinesis.canLift(magneto, hero, Telekinesis.Mode.MAGNETO), "unless he wears iron");
         hero.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
+        hero.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+        check(Telekinesis.canLift(magneto, hero, Telekinesis.Mode.MAGNETO), "or holds an iron sword, with no armour at all");
+        hero.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
 
         // A pin stops levitation.
         ServerPlayer thor = f.player(8.5, FLOOR, 8.5, Power.THOR);
