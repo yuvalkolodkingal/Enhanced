@@ -94,13 +94,14 @@ public final class GestureRoutes {
 
     /**
      * The gesture Magneto's own key press starts before the server answers ({@link GestureTable#predicted}), or null:
-     * Sneak + R with R holding nothing and the pull rested is the Magnetic Pull ({@link GestureId#MAG_PULL}). A rider's
-     * press is never predicted (vanilla owns his body then). The client does not know the server's second of grace after
-     * a grip, nor the short wait after a pull that found nothing: a press the server ignores then shows the gesture to him
-     * alone, as any predicted gesture the server turns down.
+     * Sneak + R with R holding nothing, the pull rested and something in his hunger bar ({@code fed}: food left, or he
+     * cannot starve, as the server asks it) is the Magnetic Pull ({@link GestureId#MAG_PULL}). A rider's press is never
+     * predicted (vanilla owns his body then). The client does not know the server's second of grace after a grip, nor the
+     * short wait after a pull that found nothing: a press the server ignores then shows the gesture to him alone, as any
+     * predicted gesture the server turns down.
      */
-    public static GestureId magnetoPredicted(PowerData data, int ability, long now, boolean sneaking) {
-        return ability == 1 && sneaking && data.heldEntityId() == -1 && data.isReady(1, now) ? GestureId.MAG_PULL : null;
+    public static GestureId magnetoPredicted(PowerData data, int ability, long now, boolean sneaking, boolean fed) {
+        return ability == 1 && sneaking && fed && data.heldEntityId() == -1 && data.isReady(1, now) ? GestureId.MAG_PULL : null;
     }
 
     /** The gesture an ability's cooldown starting stands for, or null. {@code left} is the cooldown in ticks. */

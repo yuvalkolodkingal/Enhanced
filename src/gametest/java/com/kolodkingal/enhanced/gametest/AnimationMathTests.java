@@ -821,9 +821,9 @@ public final class AnimationMathTests {
 
     /**
      * M41. The Magnetic Pull has a gesture of its own: R's cooldown starting plays it for everyone (it starts only when a
-     * pull affected something), as V's plays the strip; his own Sneak + R starts it at once, but only when R holds nothing
-     * and the pull is rested. R itself is still acted by the grab and the fling. The keys fling both arms wide and up at
-     * tick 5, then draw both fists in to the chest with a lean back of 4 degrees at tick 12.
+     * pull affected something), as V's plays the strip; his own Sneak + R starts it at once, but only when R holds nothing,
+     * the pull is rested and his hunger bar is not empty. R itself is still acted by the grab and the fling. The keys fling
+     * both arms wide and up at tick 5, then draw both fists in to the chest with a lean back of 4 degrees at tick 12.
      */
     @GameTest(template = ARENA)
     public static void thePullHasAGesture(GameTestHelper helper) {
@@ -836,17 +836,18 @@ public final class AnimationMathTests {
         // His own press: the client's copy of his data says whether the server will pull.
         PowerData data = new PowerData();
         long now = 1000L;
-        check(GestureRoutes.magnetoPredicted(data, 1, now, true) == GestureId.MAG_PULL, "Sneak + R, holding nothing, rested: the pull at once");
-        check(GestureRoutes.magnetoPredicted(data, 1, now, false) == null, "R without Sneak reaches for one thing: no pull");
+        check(GestureRoutes.magnetoPredicted(data, 1, now, true, true) == GestureId.MAG_PULL, "Sneak + R, holding nothing, rested: the pull at once");
+        check(GestureRoutes.magnetoPredicted(data, 1, now, false, true) == null, "R without Sneak reaches for one thing: no pull");
         for (int ability = 2; ability <= 5; ability++) {
-            check(GestureRoutes.magnetoPredicted(data, ability, now, true) == null, "Sneak + key " + ability + " is not the pull");
+            check(GestureRoutes.magnetoPredicted(data, ability, now, true, true) == null, "Sneak + key " + ability + " is not the pull");
         }
+        check(GestureRoutes.magnetoPredicted(data, 1, now, true, false) == null, "an empty hunger bar: the server only says so, no gesture");
         data.setHeldEntityId(42);
-        check(GestureRoutes.magnetoPredicted(data, 1, now, true) == null, "holding something, Sneak + R sets it down: no pull");
+        check(GestureRoutes.magnetoPredicted(data, 1, now, true, true) == null, "holding something, Sneak + R sets it down: no pull");
         data.setHeldEntityId(-1);
         data.startCooldown(1, now, 100);
-        check(GestureRoutes.magnetoPredicted(data, 1, now + 99, true) == null, "recharging: the server only says so, no gesture");
-        check(GestureRoutes.magnetoPredicted(data, 1, now + 100, true) == GestureId.MAG_PULL, "rested again: the pull");
+        check(GestureRoutes.magnetoPredicted(data, 1, now + 99, true, true) == null, "recharging: the server only says so, no gesture");
+        check(GestureRoutes.magnetoPredicted(data, 1, now + 100, true, true) == GestureId.MAG_PULL, "rested again: the pull");
 
         // Its timing and its keys.
         GestureId pull = GestureId.MAG_PULL;
