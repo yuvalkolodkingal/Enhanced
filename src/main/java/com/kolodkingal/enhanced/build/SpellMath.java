@@ -10,6 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.BlockFamilies;
 import net.minecraft.data.BlockFamily;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * The pure geometry of Build Magic (D-B 4, 11.1, Appendix A): the same numbers on the server, which builds a spell, and
@@ -1115,9 +1118,12 @@ public final class SpellMath {
     /**
      * The hotbar's mix (D-B 5.3): every cell gets one of the blocks, weighted by its stack size (32 stone and 8
      * cobblestone are 80/20), chosen by {@link #hash} of the cell and the cast's seed, so the ghost shows exactly the
-     * mix that will be built.
+     * mix that will be built. A mix depends only on which blocks it has and their weights, never on the order or the
+     * stacks they came in: equal blocks are merged (their weights added) and the parts kept in the order of their
+     * block state's id ({@link Block#getId}, which the server and every client share, as chunks travel with it). The
+     * server and a client make it the same way with {@link #ofHotbar}.
      *
-     * @param blocks the blocks with their weights, at least one, every weight above 0
+     * @param blocks the blocks with their weights, at least one with a weight above 0 (the others are left out)
      */
     public record Mix(List<Part> blocks) {
         /** One block of the mix and its weight (its stack size). */
@@ -1125,10 +1131,37 @@ public final class SpellMath {
         }
 
         public Mix {
-            blocks = blocks.stream().filter(part -> part.weight > 0).toList();
-            if (blocks.isEmpty()) {
+            Map<BlockState, Integer> weights = new HashMap<>();
+            for (Part part : blocks) {
+                if (part.weight > 0) {
+                    weights.merge(part.state, part.weight, Integer::sum);
+                }
+            }
+            if (weights.isEmpty()) {
                 throw new IllegalArgumentException("a mix needs a block");
             }
+            blocks = weights.entrySet().stream().map(entry -> new Part(entry.getKey(), entry.getValue()))
+                    .sorted(Comparator.comparingInt(part -> Block.getId(part.state))).toList();
+        }
+
+        /**
+         * The mix of a hotbar, the one way the server (at the cast) and a client (for its ghost) make it: every block
+         * item of {@code slots} weighted by its stack size, its block as {@code state} gives it (the state it would be
+         * placed in; null leaves the item out); empty slots and items that are not blocks are left out, and the item's
+         * data is never looked at. Null when no block is left.
+         */
+        public static @Nullable Mix ofHotbar(List<ItemStack> slots, Function<ItemStack, BlockState> state) {
+            List<Part> parts = new ArrayList<>();
+            for (ItemStack stack : slots) {
+                if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem)) {
+                    continue;
+                }
+                BlockState block = state.apply(stack);
+                if (block != null) {
+                    parts.add(new Part(block, stack.getCount()));
+                }
+            }
+            return parts.isEmpty() ? null : new Mix(parts);
         }
 
         /** The block of the cell {@code x, y, z} for this seed. */

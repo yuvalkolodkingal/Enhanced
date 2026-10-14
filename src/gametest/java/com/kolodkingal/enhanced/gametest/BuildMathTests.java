@@ -35,6 +35,9 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
@@ -398,6 +401,22 @@ public final class BuildMathTests {
         check(first.equals(second) && first.size() == 300, "the ghost is the mix that will be built");
         List<Cell> other = cells(SpellPlanner.plan(new World(), fill, Setup.at(CASTER).withMaterial(SpellPlanner.Material.mix(server, 43L))), new World());
         check(!other.equals(first), "another seed, another mix");
+        // The same blocks and weights in another order, or in other stacks, are the same mix in every cell: the
+        // server and a client each read their own hotbar.
+        SpellMath.Mix split = new SpellMath.Mix(List.of(new SpellMath.Mix.Part(STONE, 32), new SpellMath.Mix.Part(GLASS, 16),
+                new SpellMath.Mix.Part(STONE, 16)));
+        SpellMath.Mix turned = new SpellMath.Mix(List.of(new SpellMath.Mix.Part(GLASS, 16), new SpellMath.Mix.Part(STONE, 48)));
+        check(split.equals(server) && turned.equals(server) && split.blocks().size() == 2, "two stacks of stone are one part of 48: " + split);
+        for (BlockPos pos : BlockPos.betweenClosed(0, 64, 0, 15, 67, 15)) {
+            BlockState block = server.pick(pos.getX(), pos.getY(), pos.getZ(), 42L);
+            check(split.pick(pos.getX(), pos.getY(), pos.getZ(), 42L) == block && turned.pick(pos.getX(), pos.getY(), pos.getZ(), 42L) == block,
+                    "every cell the same, whatever the order and the stacks, at " + pos);
+        }
+        List<ItemStack> hotbar = List.of(new ItemStack(Items.STONE, 32), ItemStack.EMPTY, new ItemStack(Items.STICK, 5), new ItemStack(Items.GLASS, 16),
+                new ItemStack(Items.STONE, 16), new ItemStack(Items.OAK_DOOR, 3));
+        SpellMath.Mix read = SpellMath.Mix.ofHotbar(hotbar, stack -> stack.is(Items.OAK_DOOR) ? null : ((BlockItem) stack.getItem()).getBlock().defaultBlockState());
+        check(server.equals(read), "a hotbar of 32 stone, a stick, 16 glass and 16 stone (a door left out) is 48 stone and 16 glass: " + read);
+        check(SpellMath.Mix.ofHotbar(List.of(new ItemStack(Items.STICK, 3), ItemStack.EMPTY), stack -> STONE) == null, "a hotbar without a block has no mix");
         helper.succeed();
     }
 
