@@ -353,8 +353,11 @@ public final class ArenaLoans {
      */
     private boolean mendable(ServerLevel level, Home home) {
         BlockPos pos = home.pos;
+        if (!level.isLoaded(pos)) {
+            return false; // asked first: reading the cell of an unloaded chunk would load it
+        }
         boolean open = isHole(level.getBlockState(pos)) || standing.containsKey(pos);
-        if (!level.isLoaded(pos) || !open || occupied(level, pos)) {
+        if (!open || occupied(level, pos)) {
             return false;
         }
         return !(home.state.getBlock() instanceof Fallable) || !homes.containsKey(pos.below());

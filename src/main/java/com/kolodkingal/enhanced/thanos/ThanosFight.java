@@ -66,6 +66,11 @@ public final class ThanosFight extends BossFight {
     private static final int LEAVING_TICKS = 30;
     /** He is put back when he is this far under the centre of his arena (the void hurts far below, in every dimension). */
     private static final double VOID_DEPTH = 24.0;
+    /**
+     * His carry floor ({@link BossFight#carryLimit} of an open arena): he is never carried, nor brought back, further under
+     * the centre of his arena than this.
+     */
+    private static final double CARRY_DEPTH = 8.0;
     /** Brought back, he stands at most this far inside his radius. */
     private static final double BRING_BACK_INSIDE = 4.0;
     /** How high above the landing the portal hangs. */
@@ -205,7 +210,8 @@ public final class ThanosFight extends BossFight {
             return;
         }
         if (boss.getY() < arena().center().y - VOID_DEPTH && boss.state() != ThanosState.DYING) {
-            // Thrown off the edge of the world's ground (an End island): he steps back before the void can kill him.
+            // Thrown off the edge of the world's ground (an End island), or gone far down from the hill he was called on: he
+            // steps back before the void can kill him, onto ground over his carry floor (so once, not every tick).
             BossGrip.forget(boss);
             bringBack(boss);
         }
@@ -223,7 +229,9 @@ public final class ThanosFight extends BossFight {
     /**
      * Thanos thrown out of his arena, or fallen too far under it, steps back through a Space portal: rings at both ends,
      * and he stands on the ground at most {@link #BRING_BACK_INSIDE} blocks inside his radius (where he was, if he was
-     * already that far in), stopped.
+     * already that far in), stopped. Never under his carry floor: where that column has no ground for him above it (the
+     * floor of a valley or a ravine far under the hill he was called on, the edge of an End island, a cave with the hill's
+     * rock over it), he steps onto his landing instead, so the void check of {@link #onTick} never finds him there again.
      */
     @Override
     protected void bringBack(Entity entity) {
@@ -238,7 +246,7 @@ public final class ThanosFight extends BossFight {
         double scale = flat > reach ? reach / flat : 1.0;
         double x = c.x + dx * scale;
         double z = c.z + dz * scale;
-        Vec3 spot = groundUnder(thanos, x, z);
+        Vec3 spot = standingSpot(thanos, x, z);
         Vec3 from = thanos.position();
         ThanosEffects.portal(level(), from.add(0, 0.2, 0), 1.6F, 20);
         ThanosEffects.portal(level(), spot.add(0, 0.2, 0), 1.6F, 20);
@@ -249,13 +257,37 @@ public final class ThanosFight extends BossFight {
         ThanosSounds.PORTAL.play(level(), spot, 1.0F, 1.2F);
     }
 
-    /** Where he stands in the column of {@code (x, z)}: the first block he can stand on, looking down from above the centre. */
-    private Vec3 groundUnder(ThanosEntity thanos, double x, double z) {
-        double top = arena().center().y + 6.0;
-        BlockHitResult hit = level().clip(new ClipContext(new Vec3(x, top, z), new Vec3(x, top - 46.0, z), ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE, thanos));
-        Vec3 spot = hit.getType() == HitResult.Type.MISS ? new Vec3(x, arena().center().y, z) : hit.getLocation();
-        return Teleports.fits(thanos, spot) ? spot : spot.add(0, 1.0, 0);
+    /**
+     * Where he is brought back to, in the column of {@code (x, z)}: the ground he fits on there; else the ground in the column
+     * of his landing; else the landing itself (known ground when the fight began).
+     */
+    private Vec3 standingSpot(ThanosEntity thanos, double x, double z) {
+        Vec3 spot = groundIn(thanos, x, z);
+        if (spot == null) {
+            spot = groundIn(thanos, landing.x, landing.z);
+        }
+        return spot != null ? spot : landing;
+    }
+
+    /**
+     * The first ground he fits on in the column of {@code (x, z)}, looking down from 6 blocks above the centre to his carry
+     * floor; null where there is none: nothing to stand on above the floor (an open drop), or solid rock where the look
+     * begins (a hill over a cave), which would put him inside it.
+     */
+    @Nullable
+    private Vec3 groundIn(ThanosEntity thanos, double x, double z) {
+        double centre = arena().center().y;
+        BlockHitResult hit = level().clip(new ClipContext(new Vec3(x, centre + 6.0, z), new Vec3(x, centre - CARRY_DEPTH, z),
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, thanos));
+        if (hit.getType() == HitResult.Type.MISS || hit.isInside()) {
+            return null;
+        }
+        Vec3 spot = hit.getLocation();
+        if (Teleports.fits(thanos, spot)) {
+            return spot;
+        }
+        Vec3 above = spot.add(0, 1.0, 0);
+        return Teleports.fits(thanos, above) ? above : null;
     }
 
     /** The bar shows his health in the colour of his newest stone, and says what he has become. */
