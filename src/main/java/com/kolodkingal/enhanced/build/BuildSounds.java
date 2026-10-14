@@ -58,8 +58,8 @@ public final class BuildSounds {
     private static final StandIn FIZZLE = new StandIn(ModSounds.BUILD_FIZZLE, 0.6F, 1.0F);
     /** "Reality snaps back": an undo or a redo starts, the cast chord backwards ending in a soft snap. */
     private static final StandIn UNDO = new StandIn(ModSounds.BUILD_UNDO, 0.8F, 1.0F);
-    /** "Billy learns new magic": he ranks up. */
-    private static final StandIn RANK_UP = new StandIn(() -> SoundEvents.PLAYER_LEVELUP, 0.8F, 1.0F);
+    /** "Billy learns new magic": he ranks up, five rising notes and a sparkle. */
+    private static final StandIn RANK_UP = new StandIn(ModSounds.BUILD_RANK_UP, 0.9F, 1.0F);
     /** A spell is done: a vanilla sound, with no event of its own. */
     private static final StandIn DONE = new StandIn(() -> SoundEvents.AMETHYST_CLUSTER_PLACE, 0.6F, 1.0F);
 

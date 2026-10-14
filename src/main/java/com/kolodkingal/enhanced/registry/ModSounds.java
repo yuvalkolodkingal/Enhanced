@@ -193,6 +193,7 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_HUM = register("build_hum");
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_FIZZLE = register("build_fizzle");
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_UNDO = register("build_undo");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_RANK_UP = register("build_rank_up");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));

@@ -1123,5 +1123,13 @@
         "name": "enhanced:build_undo"
       }
     ]
+  },
+  "build_rank_up": {
+    "subtitle": "subtitles.enhanced.build_rank_up",
+    "sounds": [
+      {
+        "name": "enhanced:build_rank_up"
+      }
+    ]
   }
 }
