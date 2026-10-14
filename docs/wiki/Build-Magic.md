@@ -38,12 +38,12 @@ Each button means one thing in every spell, and **the little strip at the bottom
 
 | You do | It means | Where it is a little different |
 |---|---|---|
-| **Left click** a block | **Where**: the first corner, then the second corner. A third click starts a new box. | Shapes: plant the shape here. Paint, Pull & Push and Land: nothing. A left click never breaks a block in build mode. |
+| **Left click** a block | **Where**: the first corner, then the second corner. A third click starts a new box. | Shapes: plant the shape here. Paint, Pull & Push, Land and Grow: nothing. A left click never breaks a block in build mode. |
 | **Left press, look, let go** | Drag a box from where you pressed to where you let go. | |
 | **Double left click** | **Magic select**: the whole thing you clicked (a tree, a house). Double click another thing to add it. | |
 | **Left click the sky** | **Let go** of the box. If nothing is selected, it marks a corner in the air, 6 blocks ahead: you can build a platform in the sky. | |
 | **Left click a creature** | Hits it, as usual. | |
-| **Right click** | **Do it.** With nothing ready it is plain Minecraft (doors, chests, eating, placing one block). | Hold it and sweep: Paint and Land. Copy: the first copies, the next ones stamp. Move: the first picks up, the second puts down. More than 64 blocks removed or replaced: **hold** it for one second until the ring round your crosshair is full; more than a million blocks: two seconds. |
+| **Right click** | **Do it.** With nothing ready it is plain Minecraft (doors, chests, eating, placing one block). | Hold it and sweep: Paint, Land and Grow. Copy: the first copies, the next ones stamp. Move: the first picks up, the second puts down. More than 64 blocks removed or replaced: **hold** it for one second until the ring round your crosshair is full; more than a million blocks: two seconds. |
 | **Scroll** | The main number: push the side of the box you look at, the size of a shape, the number of copies. With nothing to adjust it is your hotbar, as always. | |
 | **Ctrl + scroll** | The same, 8 at a time. | |
 | **Alt + scroll** (Left Alt) | **Which kind**: the style, the shape, turning a quarter, the gap of a Repeat. | |
@@ -245,7 +245,7 @@ Under it there is only **technical safety**, so the game never freezes. You do n
 * a spell changes only the chunks that are **loaded** when it is cast, and never makes new ones (a spell keeps at most 256 chunks loaded at a time while it works; a box with almost nothing loaded ends at once and says how many blocks were too far away);
 * at most 16 spells work or wait on the whole server at any moment ("Too much magic at once on this server: wait a moment");
 * at most 4,096 TNT, lava or fire in one spell;
-* her Paint and Land **brush stops at radius 16**. That is the *server's* limit, not her magic's: a brush spends its work every 4 ticks while she sweeps, and at radius 16 it is about 17,000 blocks a pulse, which the server keeps up with; at 32 it would be 137,000 and the stroke would trail seconds behind her hand. Scroll just stops there, and nothing is ever said.
+* her Paint, Land and Grow **brush stops at radius 16**. That is the *server's* limit, not her magic's: a brush spends its work every 4 ticks while she sweeps, and at radius 16 it is about 17,000 blocks a pulse, which the server keeps up with; at 32 it would be 137,000 and the stroke would trail seconds behind her hand. Scroll just stops there, and nothing is ever said.
 
 ## Undo: Ctrl + Z, even tomorrow
 
