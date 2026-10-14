@@ -31,7 +31,10 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosFight;
+import com.kolodkingal.enhanced.thanos.ThanosMove;
+import com.kolodkingal.enhanced.thanos.ThanosState;
 import com.kolodkingal.enhanced.thanos.ThanosSwordEntity;
+import com.kolodkingal.enhanced.ultron.UltronAttack;
 import com.kolodkingal.enhanced.ultron.UltronBoltEntity;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronFight;
@@ -543,6 +546,173 @@ public final class BossGripTests {
             long brainTicks = body.brain().ticked() - ticksBefore;
             check(brainTicks >= 800, "his brain ran at least two thirds of the time: " + brainTicks + " of 1200");
             check(grabs[0] >= 4, "and he was grabbed at least 4 times: " + grabs[0]);
+            return true;
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // The bosses' own answers (D-T 4.2 rule 4, 6.1.1, 6.2.1, 6.3.1)
+
+    /** Checks that no form of telekinesis may take {@code boss}, each told he cannot be held now. */
+    private static void untouchable(ServerPlayer holder, Entity boss, String when) {
+        for (Mode mode : Mode.values()) {
+            check(BossGrip.UNTOUCHABLE.equals(Telekinesis.refusal(holder, boss, mode)) && !Telekinesis.canLift(holder, boss, mode),
+                    mode + ": he cannot be held " + when);
+        }
+    }
+
+    /** Checks that every form of telekinesis may take {@code boss}. */
+    private static void holdable(ServerPlayer holder, Entity boss, String when) {
+        for (Mode mode : Mode.values()) {
+            check(Telekinesis.refusal(holder, boss, mode) == null && Telekinesis.canLift(holder, boss, mode), mode + ": he can be held " + when);
+        }
+    }
+
+    /**
+     * T9, Ultron's part (D-T 6.1.1): no form holds a body of Ultron while he awakens, from the lift's warning on, nor while
+     * he changes bodies (or dies); on the ground and on the island in between, every form does (Magneto too: vibranium is
+     * metal).
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_states", timeoutTicks = 160)
+    public static void nobodyHoldsABossInHisInvulnerableStates(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        ServerPlayer wanda = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH);
+        UltronTestSupport.tank(wanda);
+        UltronFight fight = UltronTestSupport.start(f, wanda);
+        f.everyTick(140, tick -> {
+            UltronEntity body = fight.boss();
+            if (body == null) {
+                check(fight.phase() == UltronFight.Phase.AWAKENING, "he appears while he awakens");
+                return false;
+            }
+            untouchable(wanda, body, "while he awakens");
+            fight.forceState(UltronFight.Phase.GROUND);
+            UltronTestSupport.calm(fight);
+            holdable(wanda, body, "on the ground");
+            fight.forceState(UltronFight.Phase.LIFT_WARN);
+            untouchable(wanda, body, "from the lift's warning on");
+            fight.forceState(UltronFight.Phase.ISLAND);
+            UltronTestSupport.calm(fight);
+            holdable(wanda, body, "on the island");
+            check(fight.onBodyDestroyed(body, null, null) && (fight.isTransferring() || fight.isDying()), "his body is destroyed");
+            untouchable(wanda, body, "while he changes bodies or dies");
+            return true;
+        });
+    }
+
+    /**
+     * T9, Thanos's part (D-T 6.2.1): no form holds Thanos while he arrives, behind his Space Barrier, nor while he dies;
+     * arrived and in between, every form does (Magneto too: his gold armour and the Gauntlet are metal).
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_states_thanos", timeoutTicks = 200)
+    public static void nobodyHoldsThanosInHisInvulnerableStates(GameTestHelper helper) {
+        TestKit.Fixture f = ThanosBossTests.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        ServerPlayer wanda = ThanosMoveSupport.fighter(f, -7.0, 0.0, Power.SCARLET_WITCH);
+        ThanosFight fight = ThanosFight.spawnAt(f.level(), f.helper().absoluteVec(ThanosBossTests.CENTRE), wanda);
+        ThanosEntity thanos = fight.boss();
+        check(thanos != null && thanos.state() == ThanosState.ARRIVING, "he arrives");
+        untouchable(wanda, thanos, "while he arrives");
+        thanos.forceArrived();
+        thanos.setPassive(true);
+        thanos.forceStones(2);
+        holdable(wanda, thanos, "once he has arrived");
+        thanos.forceMove(ThanosMove.SPACE_BARRIER, wanda);
+        boolean[] barrier = {false};
+        f.everyTick(180, tick -> {
+            if (!barrier[0]) {
+                if (thanos.flag(ThanosEntity.FLAG_BARRIER)) {
+                    barrier[0] = true;
+                    untouchable(wanda, thanos, "behind his Space Barrier");
+                }
+                return false;
+            }
+            if (thanos.flag(ThanosEntity.FLAG_BARRIER)) {
+                return false;
+            }
+            holdable(wanda, thanos, "once his Barrier fell");
+            thanos.setHealth(5.0F);
+            ThanosBossTests.hit(thanos, wanda, 100.0F);
+            check(thanos.state() == ThanosState.DYING, "he is beaten: " + thanos.state());
+            untouchable(wanda, thanos, "while he dies");
+            return true;
+        });
+    }
+
+    /**
+     * T9, Apocalypse's part (D-T 6.3.1): no form holds Apocalypse in a set piece (the first transition) nor while his
+     * shield forms or re-forms; with his shield up, Wanda (mind power) does.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_states_apocalypse", timeoutTicks = 40)
+    public static void nobodyHoldsApocalypseInHisInvulnerableStates(GameTestHelper helper) {
+        ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
+        d.f().onClose(Telekinesis::clear);
+        ServerPlayer wanda = d.hero();
+        ApocalypseEntity boss = d.boss();
+        check(Telekinesis.refusal(wanda, boss, Mode.WANDA) == null, "with his shield up, mind power holds him");
+        d.fight().forceState(ApocalypseFight.Stage.TRANSITION_1, 1);
+        untouchable(wanda, boss, "in his first transition");
+        d.fight().forceState(ApocalypseFight.Stage.FIGHT, 1);
+        boss.shield().reform(boss.shield().max());
+        check(boss.shield().state() == ApocalypseShield.State.REFORMING, "his shield re-forms");
+        untouchable(wanda, boss, "while his shield re-forms");
+        boss.shield().form(boss.shield().max());
+        untouchable(wanda, boss, "while his shield forms");
+        helper.succeed();
+    }
+
+    /**
+     * T48 (D-T 4.4, 6.1.1): a grip drops Ultron's attack but keeps his stagger after a Dive, which counts down in the grip.
+     * Billy takes hold of him on the first tick of the stagger and lets go 20 ticks later: he is still staggered, 20 ticks
+     * of it have passed, and it ends on the tick it would have ended without the grip.
+     */
+    @GameTest(template = ARENA, batch = "boss_grip_stagger", timeoutTicks = 300)
+    public static void aGripKeepsUltronsStagger(GameTestHelper helper) {
+        TestKit.Fixture f = UltronTestSupport.fixture(helper);
+        f.onClose(Telekinesis::clear);
+        f.config(UltronBossConfig.SENTRIES_AT_START, 0);
+        f.config(BossConfig.REGRIP_TICKS, 0);
+        ServerPlayer billy = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.BILLY);
+        UltronTestSupport.tank(billy);
+        UltronFight fight = UltronTestSupport.onTheGround(f, billy);
+        UltronTestSupport.calm(fight);
+        UltronEntity body = UltronTestSupport.boss(fight);
+        UltronTestSupport.put(f, billy, 3.5, FLOOR, 10.5);
+        UltronTestSupport.put(f, body, 12.5, FLOOR + 3.0, 10.5);
+        check(body.brain().force(body, fight, UltronAttack.DIVE), "he dives at Billy");
+        int[] staggeredAt = {-1};
+        int[] left = {0};
+        f.everyTick(280, tick -> {
+            PowerTicker.tick(billy);
+            if (staggeredAt[0] < 0) {
+                if (body.isStaggered()) {
+                    staggeredAt[0] = tick;
+                    left[0] = body.brain().staggerLeft();
+                    check(left[0] > 20, "he is staggered after the Dive: " + left[0]);
+                    lookAt(billy, body);
+                    press(billy, 3, false);
+                    check(Telekinesis.holds(billy, body), "Billy takes hold of him");
+                }
+                return false;
+            }
+            int since = tick - staggeredAt[0];
+            if (since < 20) {
+                check(Telekinesis.holds(billy, body) && body.isStaggered(), "held and still staggered (tick " + since + ")");
+                return false;
+            }
+            if (since == 20) {
+                Telekinesis.release(billy, false);
+                check(body.isStaggered(), "let go after 20 ticks, he is still staggered");
+                check(Math.abs(body.brain().staggerLeft() - (left[0] - 20)) <= 1,
+                        "his stagger counted down in the grip: " + left[0] + " -> " + body.brain().staggerLeft());
+                return false;
+            }
+            if (body.isStaggered()) {
+                return false;
+            }
+            check(Math.abs(since - left[0]) <= 1, "the stagger ends when it would have without the grip: after " + since + " of " + left[0]);
             return true;
         });
     }
