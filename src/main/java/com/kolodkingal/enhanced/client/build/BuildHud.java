@@ -85,6 +85,8 @@ public final class BuildHud implements LayeredDraw.Layer {
     /** How far right of the crosshair the badge starts (D-B 6.3). */
     private static final int BADGE_GAP = 16;
     private static final int PAD = 3;
+    /** The action bar's line stands in the band from this far above the bottom (its text is centred 68 above it). */
+    private static final int MESSAGE_BAND = 62;
     private static final int METER_W = 60;
     private static final int METER_H = 5;
     /** The edge tint's alpha at the very edge (D-B 6.3). */
@@ -120,6 +122,11 @@ public final class BuildHud implements LayeredDraw.Layer {
     private static boolean unwindHuge;
     private static long unwindAt = Long.MIN_VALUE / 2;
     private static boolean tooFar;
+    /** Where the hint strip stood in the last frame (its left edge and top), or {@code Integer.MAX_VALUE} when it was not drawn. */
+    private static int stripLeft = Integer.MAX_VALUE;
+    private static int stripTop = Integer.MAX_VALUE;
+    /** Whether the action bar's line was moved aside this frame (the pose to put back). */
+    private static boolean messageShifted;
 
     private static final Subtitles SUBTITLES = new Subtitles();
     private static boolean listening;
@@ -209,9 +216,44 @@ public final class BuildHud implements LayeredDraw.Layer {
     /** In build mode, in first person, the rune stands where vanilla's crosshair would. */
     @SubscribeEvent
     public static void onLayer(RenderGuiLayerEvent.Pre event) {
-        if (VanillaGuiLayers.CROSSHAIR.equals(event.getName()) && runeShown(Minecraft.getInstance())) {
+        Minecraft mc = Minecraft.getInstance();
+        if (VanillaGuiLayers.CROSSHAIR.equals(event.getName()) && runeShown(mc)) {
             event.setCanceled(true);
+        } else if (VanillaGuiLayers.OVERLAY_MESSAGE.equals(event.getName())) {
+            // The action bar's line (the words of a cast, an undo, a refusal) never runs under the hint strip: it stands aside.
+            float shift = messageShift(mc, event.getGuiGraphics().guiWidth(), event.getGuiGraphics().guiHeight());
+            if (shift != 0.0F) {
+                event.getGuiGraphics().pose().pushPose();
+                event.getGuiGraphics().pose().translate(shift, 0.0F, 0.0F);
+                messageShifted = true;
+            }
         }
+    }
+
+    /** The action bar's layer is drawn: puts back the shift of its line. */
+    @SubscribeEvent
+    public static void onLayerDrawn(RenderGuiLayerEvent.Post event) {
+        if (messageShifted && VanillaGuiLayers.OVERLAY_MESSAGE.equals(event.getName())) {
+            event.getGuiGraphics().pose().popPose();
+            messageShifted = false;
+        }
+    }
+
+    /**
+     * How far left the action bar's line goes so that it ends before the hint strip drawn last frame (0 when it is
+     * clear of it, or when there is no line): the strip's top row stands at the line's height only when the strip is
+     * four rows or more (the line is centred, 68 above the bottom). At most as far as keeps the line on the screen.
+     */
+    private static float messageShift(Minecraft mc, int width, int height) {
+        Component line = mc.gui.overlayMessageString;
+        if (line == null || mc.gui.overlayMessageTime <= 0 || stripLeft == Integer.MAX_VALUE || stripTop >= height - MESSAGE_BAND) {
+            return 0.0F;
+        }
+        int w = mc.font.width(line) + 4;
+        float right = width / 2.0F + w / 2.0F;
+        float shift = Math.min(0.0F, stripLeft - 6 - right);
+        // (A line wider than the room it has keeps the screen's edge, and runs under the strip's corner.)
+        return Math.min(0.0F, Math.max(shift, 2.0F - (width / 2.0F - w / 2.0F)));
     }
 
     private static boolean runeShown(Minecraft mc) {
@@ -235,6 +277,8 @@ public final class BuildHud implements LayeredDraw.Layer {
             mc.getSoundManager().addListener(SUBTITLES);
             listening = true;
         }
+        stripLeft = Integer.MAX_VALUE;
+        stripTop = Integer.MAX_VALUE;
         if (!shown(mc)) {
             return;
         }
@@ -741,6 +785,8 @@ public final class BuildHud implements LayeredDraw.Layer {
             bottom = Math.min(bottom, height - Math.max(22, mc.gui.rightHeight) - 3);
         }
         int top = bottom - h;
+        stripLeft = left;
+        stripTop = top;
         boolean rtl = HudDraw.rtl();
         g.fill(left, top, right, bottom, HudDraw.argb(0x000000, 0.45F));
         for (int i = 0; i < rows.size(); i++) {
