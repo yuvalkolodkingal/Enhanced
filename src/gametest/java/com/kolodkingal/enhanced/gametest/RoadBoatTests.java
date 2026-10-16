@@ -312,6 +312,7 @@ public final class RoadBoatTests {
     public static void whenTheTimeRunsOutTheBoatAndThePlayerAreBackAtTheStartAndTheBarrierIsShutAgain(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.BOAT_RACE_TIME_LIMIT_SECONDS, 5);
+        f.config(WitchesRoadConfig.BOAT_RACE_FAIR_FACTOR, 0.0);
         f.config(WitchesRoadConfig.BOAT_RACE_COUNTDOWN_SECONDS, 1);
         ServerLevel road = RoadDimension.level(helper.getLevel().getServer());
         ServerPlayer player = walker(f, 10.5, 10.5, 6);

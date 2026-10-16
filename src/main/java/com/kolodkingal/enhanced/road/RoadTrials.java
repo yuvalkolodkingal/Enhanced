@@ -16,6 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.portal.DimensionTransition;
@@ -237,20 +238,49 @@ public final class RoadTrials {
         if (cell < 0) {
             return null;
         }
-        try {
-            long seed = seed(owner, challenge.id(), salt);
-            RoadCanvas canvas = new RoadCanvas(cell, road.getMinBuildHeight(), road.getMaxBuildHeight());
-            RoadLayout layout = challenge.build(new RoadBuild(road, seed, canvas));
-            canvas.seal();
-            save.plan(cell, canvas.chunks(), canvas.minY(), canvas.maxY());
-            RoadSweeper.hold(road, owner, canvas.chunks());
-            return new RoadTrial(server, owner, challenge, number, seed, canvas, layout);
-        } catch (RuntimeException e) {
-            Enhanced.LOGGER.error("The Witches' Road could not draw the trial {} for {}", challenge.id(), owner, e);
-            save.release(cell);
-            return null;
+        ensureBorder(road);
+        // A generator may fail for a seed (a parkour that boxes itself in): the next seeds of the same player are tried, the same ones every
+        // time, so his course is still the same course every time.
+        RuntimeException failure = null;
+        for (int attempt = 0; attempt < DRAW_ATTEMPTS; attempt++) {
+            try {
+                long seed = seed(owner, challenge.id(), salt + attempt * 7919L);
+                RoadCanvas canvas = new RoadCanvas(cell, road.getMinBuildHeight(), road.getMaxBuildHeight());
+                RoadLayout layout = challenge.build(new RoadBuild(road, seed, canvas));
+                canvas.seal();
+                save.plan(cell, canvas.chunks(), canvas.minY(), canvas.maxY());
+                RoadSweeper.hold(road, owner, canvas.chunks());
+                return new RoadTrial(server, owner, challenge, number, seed, canvas, layout);
+            } catch (RuntimeException e) {
+                failure = e;
+            }
+        }
+        Enhanced.LOGGER.error("The Witches' Road could not draw the trial {} for {} (even with {} seeds)", challenge.id(), owner, DRAW_ATTEMPTS, failure);
+        save.release(cell);
+        return null;
+    }
+
+    /** How many seeds are tried for a course before the trial is given up. */
+    private static final int DRAW_ATTEMPTS = 8;
+    /** How long the gate waits after a trial could not be drawn before it tries again (3 s). */
+    private static final int ADVANCE_RETRY_TICKS = 60;
+    /** Player → game time the next trial could not be drawn for him. */
+    private static final Map<UUID, Long> ADVANCE_FAILED = new HashMap<>();
+
+    /**
+     * The Road's world border is as big as the world's and centred on the origin, whatever the overworld's is (the overworld's border is
+     * copied to every dimension): the cells lie up to 130,000 blocks out, and outside a border nothing can be built, broken or used.
+     */
+    static void ensureBorder(ServerLevel road) {
+        WorldBorder border = road.getWorldBorder();
+        if (border.getSize() < MAX_BORDER || border.getCenterX() != 0.0 || border.getCenterZ() != 0.0) {
+            border.setCenter(0.0, 0.0);
+            border.setSize(MAX_BORDER);
         }
     }
+
+    /** The biggest world border there is. */
+    private static final double MAX_BORDER = 5.9999968E7;
 
     /** The player is let into the trial that is ready for him. */
     private static void arrive(ServerPlayer player, Pending pending) {
@@ -272,8 +302,10 @@ public final class RoadTrials {
         ServerLevel fromLevel = player.serverLevel();
         Vec3 fromPos = player.position();
         if (road == null || !HexManager.onTeleport(road, player, at.respawn())) {
+            // Something (a boss fight, Mjolnir's pin) does not let him go: the trial is taken down, and he is told.
             PENDING.remove(player.getUUID());
             retire(trial, RoadChallenge.End.REMOVED);
+            player.displayClientMessage(Component.translatable("message.enhanced.road.failed").withStyle(ChatFormatting.GRAY), true);
             return;
         }
         RoadProgress progress = RoadSave.get(server).progress(player.getUUID());
@@ -291,8 +323,17 @@ public final class RoadTrials {
         player.setGameMode(GameType.SURVIVAL);
         if (!moveTo(player, road, at.respawn(), at.yaw(), 0.0F)) {
             ACTIVE.remove(player.getUUID());
+            if (pending.from != null) {
+                // He is still in the trial he won: its gate is open for him to try again.
+                ACTIVE.put(player.getUUID(), pending.from);
+            }
+            if (pending.entry != null) {
+                player.setGameMode(GameType.byId(pending.entry.gameMode()));
+                progress.setEntry(null);
+            }
             progress.setInside(pending.from != null || pending.anchor != null);
             retire(trial, RoadChallenge.End.REMOVED);
+            player.displayClientMessage(Component.translatable("message.enhanced.road.failed").withStyle(ChatFormatting.GRAY), true);
             return;
         }
         if (pending.from == null && pending.anchor == null) {
@@ -317,7 +358,11 @@ public final class RoadTrials {
 
     /** One tick of the server: trials being built are placed, trials being played run, cells being cleared are cleared. */
     public static void serverTick(MinecraftServer server) {
-        RoadSweeper.tick(server);
+        try {
+            RoadSweeper.tick(server);
+        } catch (RuntimeException e) {
+            Enhanced.LOGGER.error("The Witches' Road could not clear a cell", e);
+        }
         if (PENDING.isEmpty() && ACTIVE.isEmpty()) {
             return;
         }
@@ -325,42 +370,95 @@ public final class RoadTrials {
         if (road == null) {
             return;
         }
+        if (road.getGameTime() % 20 == 0) {
+            ensureBorder(road);
+        }
         for (Map.Entry<UUID, Pending> entry : new ArrayList<>(PENDING.entrySet())) {
-            Pending pending = entry.getValue();
-            ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
-            if (player == null || !player.isAlive() || road.getGameTime() - pending.since > GIVE_UP_TICKS) {
-                PENDING.remove(entry.getKey());
-                retire(pending.trial, RoadChallenge.End.REMOVED);
-                continue;
-            }
-            if (pending.anchor != null && RoadDimension.in(player)) {
-                hold(player, pending.anchor);
-            }
-            if (pending.trial.canvas().placeSome(road, WitchesRoadConfig.BUILD_BLOCKS_PER_TICK.get())) {
-                pending.trial.setPhase(RoadTrial.Phase.READY);
-                arrive(player, pending);
+            try {
+                tickPending(server, road, entry.getKey(), entry.getValue());
+            } catch (RuntimeException e) {
+                gaveUp(server, entry.getKey(), e);
             }
         }
         for (Map.Entry<UUID, RoadTrial> entry : new ArrayList<>(ACTIVE.entrySet())) {
-            ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
-            RoadTrial trial = entry.getValue();
-            if (player == null) {
-                continue;
+            try {
+                tickActive(server, entry.getKey(), entry.getValue());
+            } catch (RuntimeException e) {
+                gaveUp(server, entry.getKey(), e);
             }
-            if (!player.isAlive()) {
-                continue;
+        }
+    }
+
+    private static void tickPending(MinecraftServer server, ServerLevel road, UUID id, Pending pending) {
+        ServerPlayer player = server.getPlayerList().getPlayer(id);
+        if (player == null || !player.isAlive() || road.getGameTime() - pending.since > GIVE_UP_TICKS) {
+            PENDING.remove(id);
+            retire(pending.trial, RoadChallenge.End.REMOVED);
+            if (player != null && player.isAlive()) {
+                player.displayClientMessage(Component.translatable("message.enhanced.road.failed").withStyle(ChatFormatting.GRAY), true);
             }
-            if (!RoadDimension.in(player) && !MOVING.contains(entry.getKey())) {
-                // Somebody (an operator) took him out of the Road: it lets him go.
-                dropTaken(player, trial);
-                continue;
+            return;
+        }
+        if (pending.anchor != null && RoadDimension.in(player)) {
+            hold(player, pending.anchor);
+        }
+        if (pending.trial.canvas().placeSome(road, WitchesRoadConfig.BUILD_BLOCKS_PER_TICK.get())) {
+            pending.trial.setPhase(RoadTrial.Phase.READY);
+            arrive(player, pending);
+        }
+    }
+
+    private static void tickActive(MinecraftServer server, UUID id, RoadTrial trial) {
+        ServerPlayer player = server.getPlayerList().getPlayer(id);
+        if (player == null || !player.isAlive()) {
+            return;
+        }
+        if (!RoadDimension.in(player) && !MOVING.contains(id)) {
+            // Somebody (an operator) took him out of the Road: it lets him go.
+            dropTaken(player, trial);
+            return;
+        }
+        if (Powers.power(player).hasPowers() && !RoadEnding.isLeaving(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.road.powers").withStyle(ChatFormatting.GRAY), true);
+            leave(player, RoadChallenge.End.LEFT);
+            return;
+        }
+        trial.tick(player);
+    }
+
+    /**
+     * Something in a trial threw: it is given up, as if the player had left (he is sent back, with his progress and his Gene, and his save no
+     * longer says he is inside), so that one bad course cannot crash the server again at every start.
+     */
+    private static void gaveUp(MinecraftServer server, UUID id, RuntimeException cause) {
+        Enhanced.LOGGER.error("The Witches' Road failed for {} and gives the trial up", id, cause);
+        ServerPlayer player = server.getPlayerList().getPlayer(id);
+        try {
+            if (player != null) {
+                player.displayClientMessage(Component.translatable("message.enhanced.road.failed").withStyle(ChatFormatting.GRAY), true);
+                if (leave(player, RoadChallenge.End.LEFT)) {
+                    return;
+                }
             }
-            if (Powers.power(player).hasPowers() && !RoadEnding.isLeaving(player)) {
-                player.displayClientMessage(Component.translatable("message.enhanced.road.powers").withStyle(ChatFormatting.GRAY), true);
-                leave(player, RoadChallenge.End.LEFT);
-                continue;
+        } catch (RuntimeException e) {
+            Enhanced.LOGGER.error("... and could not send him back either", e);
+        }
+        // Whatever is left of it is forgotten, so the next tick does not meet it again.
+        RoadTrial trial = ACTIVE.remove(id);
+        Pending pending = PENDING.remove(id);
+        try {
+            RoadProgress progress = RoadSave.get(server).existing(id);
+            if (progress != null) {
+                progress.setInside(false);
             }
-            trial.tick(player);
+            if (trial != null) {
+                retire(trial, RoadChallenge.End.REMOVED);
+            }
+            if (pending != null) {
+                retire(pending.trial, RoadChallenge.End.REMOVED);
+            }
+        } catch (RuntimeException e) {
+            Enhanced.LOGGER.error("... and could not take it down", e);
         }
     }
 
@@ -428,11 +526,19 @@ public final class RoadTrials {
         if (next == null) {
             return;
         }
+        long now = player.level().getGameTime();
+        Long failed = ADVANCE_FAILED.get(player.getUUID());
+        if (failed != null && now >= failed && now - failed < ADVANCE_RETRY_TICKS) {
+            // (He stands in the gate: this runs every tick, and a trial that could not be drawn is not drawn again that often.)
+            return;
+        }
         RoadTrial built = plan(player.server, player.getUUID(), next, progress.completed(), progress.salt());
         if (built == null) {
+            ADVANCE_FAILED.put(player.getUUID(), now);
             player.displayClientMessage(Component.translatable("message.enhanced.road.failed").withStyle(ChatFormatting.GRAY), true);
             return;
         }
+        ADVANCE_FAILED.remove(player.getUUID());
         PENDING.put(player.getUUID(), new Pending(built, trial, null, 0, null, player.level().getGameTime()));
         player.displayClientMessage(Component.translatable("message.enhanced.road.opening").withStyle(s -> s.withColor(WitchesRoad.LIGHT)), true);
     }
@@ -442,21 +548,37 @@ public final class RoadTrials {
 
     /**
      * The player leaves the Road, whatever he is doing in it: back to where he entered, in the game mode he entered in,
-     * with his Gene. His progress stays.
+     * with his Gene. His progress stays. If the way out is refused (another mod stops the change of dimension) he stays where he is,
+     * in his trial, and is told; nothing of the Road is taken down.
+     *
+     * @return whether he is out
      */
-    public static void leave(ServerPlayer player, RoadChallenge.End reason) {
+    public static boolean leave(ServerPlayer player, RoadChallenge.End reason) {
         UUID id = player.getUUID();
         LEAVE_ASKED.remove(id);
-        RoadTrial trial = ACTIVE.remove(id);
-        Pending pending = PENDING.remove(id);
         RoadProgress progress = RoadSave.get(player.server).progress(id);
         RoadProgress.Entry entry = progress.entry();
         if (RoadDimension.in(player)) {
             Vec3 from = player.position();
-            sendHome(player, entry);
+            // (The Road's own move: its own checks must not refuse it while the trial still stands.)
+            boolean already = !MOVING.add(id);
+            boolean moved;
+            try {
+                moved = sendHome(player, entry);
+            } finally {
+                if (!already) {
+                    MOVING.remove(id);
+                }
+            }
+            if (!moved) {
+                player.displayClientMessage(Component.translatable("message.enhanced.road.cannot_leave").withStyle(ChatFormatting.GRAY), true);
+                return false;
+            }
             RoadFx.travel(RoadDimension.level(player.server), from, false);
             RoadFx.travel(player.serverLevel(), player.position(), true);
         }
+        RoadTrial trial = ACTIVE.remove(id);
+        Pending pending = PENDING.remove(id);
         if (entry != null) {
             player.setGameMode(GameType.byId(entry.gameMode()));
         }
@@ -481,6 +603,7 @@ public final class RoadTrials {
                 player.displayClientMessage(Component.translatable("message.enhanced.road.walked_all.hint").withStyle(ChatFormatting.GRAY), false);
             }
         }
+        return true;
     }
 
     /**
@@ -502,7 +625,7 @@ public final class RoadTrials {
      * Takes the player to where he entered. If that place is gone or unsafe (a block there now, no floor under it, lava, or its world is
      * not loaded any more) he is put on the door he opened, and failing that on the world's spawn.
      */
-    private static void sendHome(ServerPlayer player, @Nullable RoadProgress.Entry entry) {
+    private static boolean sendHome(ServerPlayer player, @Nullable RoadProgress.Entry entry) {
         MinecraftServer server = player.server;
         ServerLevel level = entry == null ? null : server.getLevel(entry.dimension());
         List<Home> homes = new ArrayList<>();
@@ -515,16 +638,15 @@ public final class RoadTrials {
         }
         for (Home home : homes) {
             Vec3 pos = safeSpot(home.level, player, home.pos);
-            if (pos != null && HexManager.onTeleport(home.level, player, pos)) {
-                moveTo(player, home.level, pos, home.yaw, home.pitch);
-                return;
+            if (pos != null && HexManager.onTeleport(home.level, player, pos) && moveTo(player, home.level, pos, home.yaw, home.pitch)) {
+                return true;
             }
         }
         // The world's spawn, on the surface; if that is refused too, nothing stops him.
         ServerLevel overworld = server.overworld();
         Vec3 spawn = worldSpawn(overworld);
         HexManager.onTeleport(overworld, player, spawn);
-        moveTo(player, overworld, spawn, 0.0F, 0.0F);
+        return moveTo(player, overworld, spawn, 0.0F, 0.0F);
     }
 
     /** A place to put the player back at. */
@@ -649,6 +771,21 @@ public final class RoadTrials {
         moveTo(player, player.serverLevel(), pos, yaw, 0.0F);
     }
 
+    /**
+     * Runs {@code action} as the Road's own move of the player (what it does is never refused: an operator's tool, and the tests that put a
+     * player in the Road the way an operator's /tp would).
+     */
+    public static void moving(ServerPlayer player, Runnable action) {
+        boolean already = !MOVING.add(player.getUUID());
+        try {
+            action.run();
+        } finally {
+            if (!already) {
+                MOVING.remove(player.getUUID());
+            }
+        }
+    }
+
     /** Whether the Road itself is moving the player now (its own travel is never refused). */
     public static boolean isMoving(Entity entity) {
         return MOVING.contains(entity.getUUID());
@@ -659,7 +796,16 @@ public final class RoadTrials {
      * unless it stays in his own cell.
      */
     public static boolean allowsTeleport(Entity entity, ServerLevel destination, Vec3 to) {
-        if (!(entity instanceof ServerPlayer player) || !isInside(player) || isMoving(player)) {
+        if (!(entity instanceof ServerPlayer player) || isMoving(player)) {
+            return true;
+        }
+        if (!isInside(player)) {
+            // Nor can anyone outside the trials travel INTO the Road (another mod's home, a saved place, a /tpa): he would land in the void or
+            // in somebody else's cell. Only the Road moves players in; an operator's /tp is free.
+            if (RoadDimension.is(destination) && !player.hasPermissions(2)) {
+                player.displayClientMessage(Component.translatable("message.enhanced.road.no_teleport").withStyle(ChatFormatting.GRAY), true);
+                return false;
+            }
             return true;
         }
         RoadTrial trial = ACTIVE.get(player.getUUID());
@@ -810,6 +956,7 @@ public final class RoadTrials {
 
     /** Forget all memory (the server stopped; a test that wants a clean slate). */
     public static void clear() {
+        ADVANCE_FAILED.clear();
         ACTIVE.clear();
         PENDING.clear();
         MOVING.clear();

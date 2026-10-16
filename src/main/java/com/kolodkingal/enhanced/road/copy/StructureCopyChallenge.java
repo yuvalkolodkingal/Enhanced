@@ -82,6 +82,12 @@ public final class StructureCopyChallenge implements RoadChallenge {
         return ID;
     }
 
+    /** "2. Copy the Structure" is wider than the screen at the size of a title: the title says "2. The Copy". */
+    @Override
+    public Component titleShort() {
+        return Component.translatable("road.enhanced.challenge.structure_copy.short");
+    }
+
     @Override
     public boolean resumable() {
         // What the player has built is not kept: he starts the room again from the beginning.

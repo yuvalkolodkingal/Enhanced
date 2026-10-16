@@ -278,8 +278,7 @@ public final class RoadEnding {
         if (stage == null || stage == Stage.FAREWELL) {
             return false;
         }
-        RoadTrials.leave(player, RoadChallenge.End.LEFT);
-        return true;
+        return RoadTrials.leave(player, RoadChallenge.End.LEFT);
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -324,10 +323,12 @@ public final class RoadEnding {
      * makes the Road forget his progress.
      */
     private static void depart(ServerPlayer player, State state) {
-        STATES.remove(player.getUUID());
         Power chosen = state.chosen;
         player.removeAllEffects();
-        RoadTrials.leave(player, RoadChallenge.End.WON);
+        if (!RoadTrials.leave(player, RoadChallenge.End.WON)) {
+            // Something refused the way out: he stays in the hall (the farewell is over, so it is tried again every tick).
+            return;
+        }
         player.setHealth(player.getMaxHealth());
         player.getFoodData().setFoodLevel(20);
         player.getFoodData().setSaturation(10.0F);

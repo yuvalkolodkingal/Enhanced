@@ -37,6 +37,14 @@ public interface RoadChallenge {
     }
 
     /**
+     * The name in the big title when the trial begins: "n. name" is drawn four times the size of text, so it must be short (under about 16
+     * characters in both languages). The same as {@link #title()} unless a trial's name is longer.
+     */
+    default Component titleShort() {
+        return title();
+    }
+
+    /**
      * Draws the course on {@code build.canvas()} and says where things are. Pure: the same seed gives the same course.
      * The course may use at most {@link RoadCells#HALF_EXTENT} blocks round the origin.
      */

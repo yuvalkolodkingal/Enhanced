@@ -1407,5 +1407,7 @@
   "screen.enhanced.road.ending": "The Road is walked. Whose road will you walk?",
   "screen.enhanced.road.ending.gene": "One Gene will be used up.",
   "screen.enhanced.road.later": "Not yet",
-  "screen.enhanced.road.leave": "Leave the Road"
+  "screen.enhanced.road.leave": "Leave the Road",
+  "message.enhanced.road.cannot_leave": "The Road could not let you go. Try /road leave again.",
+  "road.enhanced.challenge.structure_copy.short": "The Copy"
 }

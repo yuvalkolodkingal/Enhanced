@@ -44,6 +44,7 @@ public final class WitchesRoadConfig {
     public static ModConfigSpec.BooleanValue BOAT_RACE_BLUE_ICE;
     public static ModConfigSpec.IntValue BOAT_RACE_CHECKPOINT_EVERY;
     public static ModConfigSpec.IntValue BOAT_RACE_TIME_LIMIT_SECONDS;
+    public static ModConfigSpec.DoubleValue BOAT_RACE_FAIR_FACTOR;
     public static ModConfigSpec.DoubleValue BOAT_RACE_PAR_FACTOR;
     public static ModConfigSpec.IntValue BOAT_RACE_RESPAWN_COOLDOWN_SECONDS;
     public static ModConfigSpec.IntValue BOAT_RACE_COUNTDOWN_SECONDS;
@@ -126,9 +127,13 @@ public final class WitchesRoadConfig {
         BOAT_RACE_CHECKPOINT_EVERY = builder.comment("Trial 3, the Ice-Boat Race: a checkpoint about every this many blocks. A boat that falls off the track is put back",
                         "on the last one.")
                 .defineInRange("boatRaceCheckpointEvery", 100, 40, 400);
-        BOAT_RACE_TIME_LIMIT_SECONDS = builder.comment("Trial 3, the Ice-Boat Race: seconds allowed from the start of the trial (a clock shows at the top of the screen).",
+        BOAT_RACE_TIME_LIMIT_SECONDS = builder.comment("Trial 3, the Ice-Boat Race: seconds allowed from the start of the trial (a clock shows at the top of the screen); never less than three times",
+                        "the par time of the course times boatRaceFairFactor, so a long course is fair.",
                         "When it runs out the player is put back at the start. 0 = no limit.")
                 .defineInRange("boatRaceTimeLimitSeconds", 240, 0, 3600);
+        BOAT_RACE_FAIR_FACTOR = builder.comment("Trial 3, the Ice-Boat Race: the time limit is never shorter than the par time times this (a long course with the default limit",
+                        "would otherwise send a driver who is not fast back to the start every time). 0 = the limit is exactly boatRaceTimeLimitSeconds.")
+                .defineInRange("boatRaceFairFactor", 3.0, 0.0, 20.0);
         BOAT_RACE_PAR_FACTOR = builder.comment("Trial 3, the Ice-Boat Race: the par time is the time the boat's physics allow on this course (the fastest way through every curve)",
                         "times this factor. The player is told how he did against it.")
                 .defineInRange("boatRaceParFactor", 1.4, 1.0, 5.0);

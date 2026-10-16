@@ -185,6 +185,11 @@ public final class RoadTrial {
         return entity;
     }
 
+    /** Forgets an entity the trial has taken down itself (a boat that was replaced). */
+    public void untrack(Entity entity) {
+        tracked.remove(entity);
+    }
+
     public List<Entity> tracked() {
         return List.copyOf(tracked);
     }

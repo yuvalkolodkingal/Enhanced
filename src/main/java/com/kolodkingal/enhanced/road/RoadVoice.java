@@ -43,7 +43,7 @@ public final class RoadVoice {
 
     /** The big title of a trial that begins: its number and name, and its goal underneath (a title is drawn four times the size of text: keep it short). */
     public static void begin(ServerPlayer player, RoadChallenge challenge, int number) {
-        Component title = Component.translatable("message.enhanced.road.trial_title", number, challenge.title())
+        Component title = Component.translatable("message.enhanced.road.trial_title", number, challenge.titleShort())
                 .withStyle(s -> s.withColor(WitchesRoad.LIGHT).withBold(true));
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 20));
         player.connection.send(new ClientboundSetTitleTextPacket(title));

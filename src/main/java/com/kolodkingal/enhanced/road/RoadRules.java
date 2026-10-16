@@ -9,11 +9,17 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorStandItem;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.HangingEntityItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MinecartItem;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.GameType;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -51,9 +57,11 @@ public final class RoadRules {
     /** Items that cannot be used in the Road: they would carry the player over a trial. */
     private static final Set<Item> BANNED_ITEMS = Set.of(Items.ENDER_PEARL, Items.CHORUS_FRUIT, Items.WIND_CHARGE, Items.FIREWORK_ROCKET);
 
-    /** Whether the item cannot be used in the Road. */
+    /** Whether the item cannot be used in the Road: the ones that carry him over a trial, and the ones that put an entity in his cell. */
     public static boolean isBanned(ItemStack stack) {
-        return BANNED_ITEMS.contains(stack.getItem());
+        Item item = stack.getItem();
+        return BANNED_ITEMS.contains(item) || item instanceof ArmorStandItem || item instanceof BoatItem || item instanceof MinecartItem
+                || item instanceof HangingEntityItem || item instanceof SpawnEggItem;
     }
 
     /** Every tick of a player in a trial. */
@@ -112,12 +120,14 @@ public final class RoadRules {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onDeath(LivingDeathEvent event) {
-        RoadTrial trial = trialOf(event.getEntity());
-        if (trial != null) {
-            ServerPlayer player = (ServerPlayer) event.getEntity();
+        if (event.getEntity() instanceof ServerPlayer player && RoadTrials.isInside(player)) {
+            // (A player whose trial is still being built has no trial yet: he is only saved.)
             event.setCanceled(true);
             player.setHealth(player.getMaxHealth());
-            trial.putBack(player, true);
+            RoadTrial trial = RoadTrials.trialOf(player.getUUID());
+            if (trial != null) {
+                trial.putBack(player, true);
+            }
         }
     }
 
@@ -209,8 +219,8 @@ public final class RoadRules {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onTravel(EntityTravelToDimensionEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && RoadTrials.isInside(player) && !RoadTrials.isMoving(player)
-                && !player.hasPermissions(2)) {
+        if (event.getEntity() instanceof ServerPlayer player && (RoadTrials.isInside(player) || event.getDimension().equals(RoadDimension.KEY))
+                && !RoadTrials.isMoving(player) && !player.hasPermissions(2)) {
             event.setCanceled(true);
             player.displayClientMessage(Component.translatable("message.enhanced.road.no_teleport").withStyle(ChatFormatting.GRAY), true);
         }
@@ -222,8 +232,27 @@ public final class RoadRules {
     public static void onToss(ItemTossEvent event) {
         if (inRoad(event.getPlayer()) && event.getEntity().getItem().is(ModItems.SCARLET_WITCH_GENE.get())) {
             event.setCanceled(true);
+            // Cancelling only stops the item entity from being made: the game has taken the stack out of the inventory already (Q, Ctrl+Q,
+            // or a click outside the inventory), so it must be given back or the Gene is gone for good.
+            giveBack(event.getPlayer(), event.getEntity().getItem());
             event.getPlayer().displayClientMessage(Component.translatable("message.enhanced.road.keep_gene").withStyle(ChatFormatting.GRAY), true);
         }
+    }
+
+    /** Puts a stack the game took out of the player's hands back: into his inventory, or failing that on the cursor, and tells his client. */
+    static void giveBack(Player player, ItemStack stack) {
+        ItemStack rest = stack.copy();
+        if (!player.getInventory().add(rest) && !rest.isEmpty()) {
+            if (player.containerMenu.getCarried().isEmpty()) {
+                player.containerMenu.setCarried(rest);
+            } else {
+                // (Cannot happen: what he threw left a slot or the cursor, and that is free again.)
+                player.getInventory().placeItemBackInInventory(rest);
+            }
+        }
+        player.containerMenu.broadcastChanges();
+        player.containerMenu.sendAllDataToRemote();
+        player.inventoryMenu.broadcastChanges();
     }
 
     private RoadRules() {

@@ -276,10 +276,10 @@
   "block.enhanced.witches_road_door.desc2": "פתחו אותה כשגן מכשפת השני בידכם",
   "item.enhanced.scarlet_witch_gene.desc3": "...או פתחו איתו דלת של דרך המכשפות",
   "message.enhanced.road.witch_blood": "הדרך נפתחת רק לדם של מכשפות. החזיקו גן מכשפת השני.",
-  "message.enhanced.road.own_road": "כבר יש לך דרך משלך",
-  "message.enhanced.road.sealed": "הדרך לא נפתחת בשבילך",
+  "message.enhanced.road.own_road": "כבר יש לכם דרך משלכם",
+  "message.enhanced.road.sealed": "הדרך לא נפתחת בשבילכם",
   "message.enhanced.road.only_door": "זו הדלת היחידה אל הדרך",
-  "message.enhanced.road.ritual": "הדלת שומעת את דם המכשפות שבך...",
+  "message.enhanced.road.ritual": "הדלת שומעת את דם המכשפות שבכם...",
   "screen.enhanced.road.title": "את הדרך אתם מבקשים?",
   "screen.enhanced.road.billy": "בילי: ויקאן",
   "screen.enhanced.road.billy.desc": "קסם כחול, תעופה וטלקינזיס",
@@ -1407,5 +1407,7 @@
   "screen.enhanced.road.ending": "הלכתם את כל הדרך. את הדרך של מי תבחרו?",
   "screen.enhanced.road.ending.gene": "גן אחד ייעלם.",
   "screen.enhanced.road.later": "עוד לא",
-  "screen.enhanced.road.leave": "לעזוב את הדרך"
+  "screen.enhanced.road.leave": "לעזוב את הדרך",
+  "message.enhanced.road.cannot_leave": "הדרך לא הצליחה לשחרר אתכם. נסו שוב /road leave.",
+  "road.enhanced.challenge.structure_copy.short": "ההעתקה"
 }

@@ -250,7 +250,8 @@ final class RoadTestSupport {
 
     /** Moves the player to a place in the Road (feet), the way an operator's /tp would. */
     static void put(ServerPlayer player, ServerLevel road, Vec3 at) {
-        player.teleportTo(road, at.x, at.y, at.z, player.getYRot(), 0.0F);
+        // (The way an operator's /tp would: the rules of the Road do not stop it.)
+        RoadTrials.moving(player, () -> player.teleportTo(road, at.x, at.y, at.z, player.getYRot(), 0.0F));
     }
 
     /** The middle of a zone, at its bottom. */
