@@ -23,7 +23,7 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/enhanced build meter <player> <value>` | Sets Billy's magic meter (0 up to the top of his rank). Only works on a Billy. |
 | `/enhanced build forget <player>` | Clears that player's Build Magic history and pocket, from memory and from disk. |
 | `/enhanced ward list` | Lists every ward of the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) on the server: whose, its name, where it is (in which world) and how far it reaches. |
-| `/enhanced ward remove <player>` | Takes away every ward of that player (their bases stay as plain saved places). Wards are otherwise kept until their base is forgotten, so this is the operator's way to take one down. |
+| `/enhanced ward remove <profile>` | Takes away every ward of that player (their bases stay as plain saved places). The profile is an online player, a selector, or the name or id of someone who is offline or gone (the wards go by id alone). Wards are otherwise kept until their base is forgotten, so this is the operator's way to take one down. |
 | `/enhanced road status [player]` | How many trials of the [Witches' Road](Witches-Road) a player has won, whether they are on the Road, and how many times they fell. Without a player: you. |
 | `/enhanced road enter <players> [trial]` | Sends players onto the Road at once, with no Gene needed (an operator's way to test). `trial` is 1 (the Parkour), 2 (Copy the Structure) or 3 (the Ice-Boat Race); without it they start the trial they reached. |
 | `/enhanced road leave <players>` | Takes players off the Road, back to where they came in, keeping their Gene and progress. |

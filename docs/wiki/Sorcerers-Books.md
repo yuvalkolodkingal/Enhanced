@@ -42,7 +42,7 @@ Four amethyst shards, an Eye of Ender, two gold ingots, a book and a lapis lazul
 | **Use** (right-click) | Opens the book screen. |
 | **Sneak + use** | Takes you to your base (the first base you saved). |
 
-The screen has a **name field** ("Name this place"), a **Save here** button (Enter in the field does the same), a **Save as base** button, a **Go to my base** button, and a row for each saved place with a **go** button and an **x** to forget it (a base is marked **[Base]**). Three places fit on a page, and the book holds up to **24 places**. The line under the title tells you how far your ward reaches. Saving a name that already exists moves that place to where you stand.
+The screen has a **name field** ("Name this place"), a **Save here** button (Enter in the field does the same), a **Save as base** button, a **Go to my base** button, and a row for each saved place with a **go** button and an **x** to forget it (a base is marked **[Base]**). Three places fit on a page, and the book holds up to **24 places**. The line under the title tells you how far your ward reaches. Saving a name that already exists moves that place to where you stand, and if it is a base its ward moves with it (with the ward's price, recharge and rules) and the book says "A ward rises round it". A ward is a "clear the monsters round me" button and has no claim awareness: it can be raised inside someone else's base, farm or the spawn, where it stops natural and spawner monster spawns and expels monsters (they land just outside the wall), but it touches no block. `maxWardsPerPlayer`, `wardCooldown` and `wardExhaustion` are the dials.
 
 ### Saved places and teleporting
 
@@ -56,12 +56,12 @@ The screen has a **name field** ("Name this place"), a **Save here** button (Ent
 **Save as base** saves the place as a **base** and raises a **ward** round it: a sphere of shimmering light, centred where you stood, that **no monster can enter**.
 
 * **How big.** It depends on the sorcerer, as the first table shows: Wanda 48 blocks, Loki 24, Billy from 12 to 40 by his rank (12, 15, 18, 21, 24, 28, 31, 34, 37 and 40 for ranks 1 to 10). It is a full sphere, so a base under the ground is covered too. The radius is refreshed every five seconds while you are online and whenever you save or forget a place, so a Billy who ranks up sees his ward grow.
-* **What it does.** Monsters (the creatures of the monster category: zombies, skeletons, creepers, spiders, witches, phantoms and so on) **do not spawn inside it** (natural spawns, spawners and structures), and one that is inside is **thrown back out** if it is near the edge, or set down just outside the wall if it is deeper. It looks (once every 5 ticks) at the monsters inside; nothing is placed or broken, so it is no trouble for claims.
-* **What it does not touch.** Bosses (the Ender Dragon, the Wither, the Warden, the Elder Guardian, Thanos, Ultron and Apocalypse and their helpers), anything in a boss fight or arena, pets that have an owner, creatures that ride or are ridden, and every creature that is not a monster (villagers, animals).
+* **What it does.** Monsters (the creatures of the monster category: zombies, skeletons, creepers, spiders, witches, phantoms and so on) **do not spawn inside it** (natural spawns, spawners and structures), and one that is inside is **thrown back out** if it is near the edge, or set down just outside the wall if it is deeper, on safe ground (never in lava, fire, magma, a cactus, a berry bush, a wither rose or a campfire, never on an edge with no floor; a flier or a guardian in the right element). It looks (once every 5 ticks) at the monsters inside; nothing is placed or broken, so it is no trouble for claims.
+* **What it does not touch.** Bosses (the Ender Dragon, the Wither, the Warden, the Elder Guardian, Thanos, Ultron and Apocalypse and their helpers), anything in a boss fight or arena, pets that have an owner, creatures that ride or are ridden, every creature that is not a monster (villagers, animals), and **what the player keeps**: a monster with a **name tag**, one on a **lead**, and a **zombie villager being cured**. Raiders (pillagers, ravagers, evokers), piglins and hoglins of a farm and slime, guardian or zombie farms **are** monsters: a ward is a "no monsters here" shield, so a raid on a warded village is expelled. Name the mob to keep it.
 * **How many.** Up to **2 bases** (so 2 wards) at a time per player (`maxWardsPerPlayer`). Raising one needs **10 seconds** to recharge (`wardCooldown`) and costs **2 food points** of hunger (`wardExhaustion` 8.0). A ward cannot be raised in a boss arena, in the Witches' Road, or where it would reach into a boss arena. Forgetting a base takes its ward with it.
-* **It stays.** Wards are saved with the world and keep working **whoever is online**, as long as their land is loaded. Only raising or forgetting needs the book. A ward whose owner is online but has lost the sorcerer's power sleeps (it is kept, but does nothing and is not drawn) and wakes if he is one again.
-* **You see it:** a faint veil and hexagon lines on a sphere in the sorcerer's colour (crimson for Wanda, blue for Billy, green for Loki) and a ring on the ground, only when you are within 64 blocks of its edge. *Reduced motion* stops the drifting and breathing.
-* **Operators:** `/enhanced ward list` lists every ward (whose, where, how far it reaches), and `/enhanced ward remove <player>` takes away every ward of a player (their bases stay as plain places).
+* **It stays.** Wards are saved with the world and keep working **whoever is online**, as long as their land is loaded. Only raising or forgetting needs the book. Turning wards off on the server (`vishanti.enabled` or `wardsEnabled`) silences every ward, an offline owner's too. A changed radius, or a new Billy rank, reaches the ward of an offline owner only at their next login. A ward whose owner is online but has lost the sorcerer's power sleeps (it is kept, but does nothing and is not drawn) and wakes if he is one again.
+* **You see it:** (the game tells you only of the wards whose edge is within 256 blocks, and of your own wherever they are) a faint veil and hexagon lines on a sphere in the sorcerer's colour (crimson for Wanda, blue for Billy, green for Loki) and a ring on the ground, only when you are within 64 blocks of its edge. *Reduced motion* stops the drifting and breathing.
+* **Operators:** `/enhanced ward list` lists every ward (whose, where, how far it reaches), and `/enhanced ward remove <player>` takes away every ward of a player (their bases stay as plain places). The player can be an online player, a selector, or the name or id of someone who is offline or gone: the wards go by id alone, and a wiped book loses its wards at the next login too.
 
 ## The Darkhold
 
@@ -101,12 +101,12 @@ Hold the right button and a **purple beam with a white core** leaves your hand a
 * **8 damage a second** (a hit of 2 every 5 ticks, four a second, so every hit lands), reach **24 blocks**, and it costs **1 exhaustion a second** (a food point every four seconds). With an empty hunger bar: "Too hungry to fire the Purple Beam".
 * It stops when you let go, put the book away, run out of food, become a Spectator or log out.
 * A complete Chaos Shield stops it at its surface; with PvP off it does not hurt players; against Apocalypse's shield it does nothing. Every boss otherwise takes it by the usual rules.
-* **Billy** fires this beam, not his own Hex Beam, while he holds the book.
+* **Billy** fires this beam, not his own Hex Beam, while he holds the book; letting go of **R** does not stop it, and tapping the use button cannot make it hit faster than four times a second.
 * The R key is not used, so it never clashes with a hero's own key: the Darkhold works for a Loki, a Wanda and a Billy alike.
 
 #### The revenge: poison
 
-When **magic** hits you while you hold the Darkhold, **whoever used it gets Poison** for **10 seconds** (200 ticks, Poison I). What counts as magic: the Hex Beam and Hex Bolt, the Chaos Beam, Thor's lightning beam, a telekinetic slam, the Mind Stone, the Stones' powers, the Phoenix Burst, the Purple Beam, a witch's potions and anything the game itself calls magic.
+When **magic** hits you while you hold the Darkhold, **whoever used it gets Poison** for **10 seconds** (200 ticks, Poison I). What counts as magic: the Hex Beam and Hex Bolt, the Chaos Beam, a telekinetic slam, the Mind Stone, the Stones' powers, the Phoenix Burst, the Purple Beam, Apocalypse's wall and Entomb, a witch's potions and anything the game itself calls magic. **Thor's lightning does not count** (it is his power, not magic). **Spells that put an effect on the holder answer too**: when a living creature lays Confusion or Spellbound on the holder (Loki's Scepter, Billy's Freeze, the Phoenix's mind powers), that creature is poisoned. Shapeshifting and telekinetic grabs are not effects and do not answer.
 
 * It answers the **use** of magic even if a Chaos Shield stops the hit.
 * The same attacker is not poisoned again for 2 seconds (`poisonCooldownTicks`, 40), so a beam does not renew it every tick.
@@ -115,11 +115,11 @@ When **magic** hits you while you hold the Darkhold, **whoever used it gets Pois
 
 #### The hex mark
 
-**Sneak + use** while you look at a creature within **24 blocks**: it is **marked** for 10 seconds. It **glows**, gets **Slowness II**, and takes **half as much damage again** (x1.5) from you, the one who marked it. Cooldown 5 seconds, cost 2 exhaustion. A player is marked only where you could harm them (PvP on).
+**Sneak + use** while you look at a creature within **24 blocks**: it is **marked** for 10 seconds. It **glows**, gets **Slowness II**, and takes **half as much damage again** (x1.5) from you, the one who marked it. **A boss** is marked too (it glows and takes the x1.5) but is **not slowed**. Cooldown 5 seconds, cost 2 exhaustion. A player is marked only where you could harm them (PvP on).
 
 #### The mind glimpse
 
-**Sneak + use** while you look at no creature: every living creature within **24 blocks** (the nearest 16) **glows for 5 seconds**, and the action bar says "The Darkhold shows 2 creatures. Nearest: Zombie, 5.0 of 20 health". Cooldown 10 seconds, cost 1 exhaustion.
+**Sneak + use** while you look at no creature: every living creature within **24 blocks** (the nearest 16) **glows for 5 seconds**, and the action bar says "The Darkhold shows creatures: 2. Nearest: Zombie, 5.0 of 20 health". It does not show what hides: invisible creatures, a Loki in his Vanish, a phased Vision. Cooldown 10 seconds, cost 1 exhaustion.
 
 ## Numbers you can change
 
