@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
+import com.kolodkingal.enhanced.road.RoadTrials;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -312,6 +313,10 @@ public final class HexManager {
         // The arena of a boss fight keeps its fighters in.
         if (!BossFights.allowsTeleport(level, entity, target)) {
             BossFights.tellHeld(entity);
+            return false;
+        }
+        // A player in a trial of the Witches' Road leaves it only the Road's way.
+        if (!RoadTrials.allowsTeleport(entity, level, target)) {
             return false;
         }
         // Whoever Mjolnir pins down teleports nowhere (this is where the mod's own teleports and Ender Pearls are

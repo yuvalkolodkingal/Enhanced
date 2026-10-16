@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.ThanosConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
@@ -410,6 +411,8 @@ public final class EnhancedConfig {
         ApocalypseConfig.define(BUILDER);
         // 3.1: Build Magic, the Scarlet Witch's and Billy's building spells (three sections of their own).
         BuildConfig.define(BUILDER);
+        // 3.2: the Witches' Road trials.
+        WitchesRoadConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();
