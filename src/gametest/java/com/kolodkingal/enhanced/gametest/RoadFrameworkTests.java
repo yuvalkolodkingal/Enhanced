@@ -245,8 +245,9 @@ public final class RoadFrameworkTests {
                     RoadTrials.leave(player, RoadChallenge.End.LEFT);
                     check(RoadTestSupport.blocksIn(road, chunks[0]) > 500, "the course stands when he has just left");
                 })
-                .thenWaitUntil(() -> check(!RoadSweeper.isClearing(cell[0]), "the cell is cleared by the server's own ticks"))
-                .thenExecute(() -> {
+                // (All in the tick it is found cleared: a cell that is free again is the next player's, and the tests run side by side.)
+                .thenWaitUntil(() -> {
+                    check(!RoadSweeper.isClearing(cell[0]), "the cell is cleared by the server's own ticks");
                     check(RoadTestSupport.blocksIn(road, chunks[0]) == 0, "and nothing is left");
                     check(RoadSave.get(server).cell(cell[0]) == null, "the ledger is clear");
                 })
