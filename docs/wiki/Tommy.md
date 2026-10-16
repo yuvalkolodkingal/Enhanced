@@ -4,7 +4,7 @@ Tommy Maximoff (Speed), Wanda's speedster son from *WandaVision*. His speed show
 
 ## Becoming Tommy
 
-Through the Witches' Road, with a Scarlet Witch Gene: craft and place a **Witches' Road Door**, open it holding the gene, and choose **Tommy: Speed** when the Road asks "Seekest thou the Road?". The whole ritual is on [Billy and the Witches' Road](Billy-and-the-Witches-Road), and the first steps are on [Becoming a Hero](Becoming-a-Hero).
+Through the Witches' Road, with a Scarlet Witch Gene: craft and place a **Witches' Road Door**, open it holding the gene, walk the three trials of [The Witches' Road](Witches-Road), and choose **Tommy: Speed** at the end of the Road. The whole ritual is on [Billy and the Witches' Road](Billy-and-the-Witches-Road), and the first steps are on [Becoming a Hero](Becoming-a-Hero).
 
 ## Super speed
 

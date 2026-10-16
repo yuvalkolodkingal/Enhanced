@@ -15,7 +15,9 @@ one of the *Enhanced*:
 * **Peter Parker, Spider-Man**, who goes everywhere on a web, sticks to walls and ceilings, feels danger coming and wears the Homemade Suit, the Iron Spider and the Brand New Day suit **(added in 3.0)**
 * **Thanos, the Mad Titan**: a **boss** who gathers up to five Infinity Stones as he fights, never the sixth, and, for those who beat him, the **Infinity Gauntlet** and a **hero** of five stones **(added in 3.0)**
 * **Ultron**, the artificial intelligence of the Mind Stone: a **boss** with an army of Sentries who lifts the ground into the sky and moves into a new body when one is destroyed, and, for those who beat him, a **hero** of plasma, anti-gravity, uploads and Sentries **(added in 3.0)**
-* **Apocalypse (En Sabah Nur)**, the first mutant: a **boss** whose golden shield stops everything except mind power, and, for those who beat him, a **hero** of sand, levitation, portals and a shield of his own **(added in 3.0)**
+* **Apocalypse (En Sabah Nur)**, the first mutant: a **boss** whose golden shield stops everything except mind power, and, for those who beat him, a **hero** of sand, levitation, portals and a shield of his own **(added in 3.0)**, turned down by one master factor **(3.2)**
+* **The Witches' Road trials**: three challenges (a parkour, a structure to copy, an ice-boat race) in a dimension of their own that lead to the choice of Billy's or Tommy's power **(added in 3.2)**
+* **The Book of the Vishanti**, with which a sorcerer saves places, teleports and raises a ward no monster can enter, and **the Darkhold**, Agatha's book with a purple beam and a retaliation against magic **(added in 3.2)**
 
 This document completes the original concepts by Eilon Kolodkin-Gal (Magneto, the
 Scarlet Witch, and Quicksilver's slow-motion run). Everything the concepts said is kept.
@@ -32,7 +34,7 @@ it (recipes, keys, every server option), in English and Hebrew, is on the
 |---|---|
 | One power per player | A player has exactly one of: *none*, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, Phoenix, Spider-Man, Thanos, Ultron, Apocalypse. Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command can remove it (`/enhanced power set <player> none`). |
-| Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. One more key, **Z** (*Vision, That One!*), belongs to the Scarlet Witch alone: it is her order to the Vision her Hex raises (section 2). **(added in 3.1)** **Y** is the one key outside R to N, H and Z: *Build Magic*, for the Scarlet Witch and Billy alone (section 18). |
+| Ability keys **(added)** | Ability 1–5 are bound to **R, G, V, B, N** by default (rebind under *Options → Controls → Enhanced Powers*). Each key triggers the ability with the same number in that hero's list. One more key, **Z** (*Vision, That One!*), belongs to the Scarlet Witch alone: it is her order to the Vision her Hex raises (section 2). **(added in 3.1)** **Y** is the one key outside R to N, H and Z: *Build Magic*, for the Scarlet Witch and Billy alone (section 18). **(added in 3.2)** **Ctrl + I** (*Build Magic: Instant*) is the Scarlet Witch's Instant switch (18.14), Sneak + **B** is Billy's Hex Barrier (6.5), and the two books of section 20 are used, not bound to a key. |
 | Flight | Flying works like Creative mode: double-tap **Space**, or press the hero's flight key. Quicksilver doesn't fly, he runs; Spider-Man doesn't fly either: he zips and swings on webs (section 14), and Thanos walks and steps through portals (section 15). |
 | Flight and run animation **(added)** | Every hero's pose is blended from the situation instead of switched, so nothing snaps and other players see it too. Each flier has a flight of his own. Magneto glides with his arms spread, leaning about 40° at full speed. Wanda floats upright with her palms open and stretches out, arms ahead, about 60° forward in a sprint. Vision is a straight body with arms at his sides, leaning about 65° at speed. Billy flies like a kid, arms wide, then ahead at a sprint. Thor leans about 90° behind his weapon, which really is in his fist in every pose (Mjolnir's handle and Stormbreaker's pass through it), whirls on its strap with a swoosh while he takes off and hovers, and is thrust ahead of him at speed; he overshoots a little and settles like a heavy hero. Every flier takes off with a gesture of his own, banks into turns, tips over in a dive, leans back when he climbs and brakes when he stops (Thor lands as a hero, planting the weapon). Quicksilver (in Quicksilver Time and in Super Speed) and Tommy at super speed run with their own stride, with ghosts of the stride behind them and a skid when they stop, and everyone else sprints and walks with a character of his own. Every flier leaves a trail of his own along the path he flew (crimson threads from Wanda's hands, golden threads from Vision's shoulders, field lines from Magneto's, a double helix from Billy's, lightning from Thor's boots), with white wind streaks at speed, a ring at take-off, a shockwave when a hero lands and a sonic boom when Thor or Vision break the sound barrier. Three client options (in `config/enhanced-client.toml`, section `[animation]`, and behind the *Config* button of Enhanced in the Mods screen; nothing there is synced) change it: *Hero animations* turns the hero animation off (vanilla poses), *Reduced motion* tones it down (hover bob and drift at a third, no trembling hands, jitter or camera shake), and *Flight effects* turns off the trails, wind and rings. |
 | Ability animation **(added)** | Every ability is acted, not just switched on, and other players see it too. **Magneto** draws his field out around him with both arms, closes a claw on the metal and wrenches it away, and holds what he lifts with a steady open hand. The **Scarlet Witch** gathers her arms across her chest and throws them open to raise the Chaos Shield, thrusts both hands out for the beam, raises both hands overhead to grow the Hex and moves them apart or together to make it bigger or smaller; her lifting hand is a raised, shaking claw. **Quicksilver** taps his goggles, starts like a sprinter, jabs a flurry of fists in his blitz and darts a hand out to snatch. **Vision** puts his fingers to his temple before the beam, floats his arms wide to let go of the world and braces to become dense. **Tommy** shakes his arms out, spins twice in his blitz, shivers before he goes through a wall and holds out a vibrating palm. **Billy** thrusts his hand at the target of the Hex Bolt, throws both hands up to freeze and presses them to his ears for the Noise. **Loki** flicks his daggers from over the shoulder, raises a spread hand to cast and roars as the Frost Giant; his Scepter jabs instead of chopping. **Thor** hauls back and whips his arm to throw the weapon, holds out his hand for it, is slapped by it as it comes home (with sparks), kicks back as the lightning leaves his hand and holds his arm out along the beam while he fires it, thrusts Mjolnir up as it bursts into fragments and closes his fist as they come together, brings it down on whoever he pins, and roars as the God of Thunder. Your own gesture starts the moment you press the key, without waiting for the server. In first person your hands move too (hands in and up for the shield, a palm thrust out for the bolt, the dagger flicked forward, the weapon whirling at the edge of the screen) and the beam, the tether and the bolt leave the hand where it is drawn. |
@@ -297,7 +299,7 @@ To touch the stone, hold the scepter and **right-click** (use it):
 | 2 | G (toggle) | **Enhanced Flight** | Fast, smooth flight with red energy around both hands. |
 | 3 | V | **Telekinesis** | Lift creatures, dropped items **or blocks**, move them with your gaze, then launch them. **(3.1)** Sneak + V with nothing held tears out the block you look at; the three villains and the Wither, the Warden and the Elder Guardian are held as bosses. |
 | (3.1) | Y | **Build Magic** | Tap: build mode on or off; hold: the Spell Wheel. Her magic has no limit: section 18. |
-| 4 | B (hold) | **Chaos Shield** | A red glowing sphere that stops projectiles and melee blows and softens explosions. It takes time to form, wears out and can shatter. |
+| 4 | B (hold) | **Chaos Shield** | A red glowing sphere that stops projectiles and melee blows and softens explosions. It takes time to form; since 3.2 it is **unlimited** (ability 4). |
 | 5 | N | **The Hex** | A giant red energy dome that only Wanda controls. |
 
 #### Ability 1 — Chaos Energy Beam
@@ -368,13 +370,10 @@ To touch the stone, hold the scepter and **right-click** (use it):
   commitment, not a reflex:
   * **It takes 3/4 of a second (15 ticks) to form.** It grows from her hands to its full
     size and **blocks nothing until it is complete.**
-  * **It holds for at most 8 seconds** (160 ticks, counted from when it is complete), then
-    it drops.
-  * **It has 30 points of strength.** Everything it stops wears it down by that much (see
-    below). At 0 it **shatters**: a burst of red shards and a glassy sound.
-  * **It has to recharge** before it can be raised again: **6 seconds** after it drops (B
-    released, or hunger), **15 seconds** if it shattered or was held to its limit. The HUD
-    counts it down, and B does nothing meanwhile.
+    * **(3.2) It is unlimited** (`scarlet_witch.shieldUnlimited`, default true). It costs no hunger, has no strength to wear down, no time limit, never shatters and needs no recharge after it drops: `WandaAbilities.wear` returns the whole amount and changes nothing, and she can hold B as long as she likes and raise it again at once. The HUD shows
+    "∞ unlimited" (`hud.enhanced.shield_unlimited`) where it showed "30/30 8.0s"; the sphere keeps its shape on the client (no guttering). It still takes `chaosShieldWindUpTicks` (15) to form and stops exactly what it stopped before (everything below). The boss rules are as before: the Mind Crush still passes, the Entomb skips a complete shield, anything that `BYPASSES_INVULNERABILITY` still passes.
+  * **The old rules** (`shieldUnlimited` false): it holds for at most 8 seconds (`chaosShieldMaxTicks` 160, counted from when it is complete), has 30 points of strength (`chaosShieldStrength`) that everything it stops wears down (see below; at 0 it **shatters**: a burst of red shards and a glassy sound), costs hunger (`chaosShieldExhaustion` 0.1 a tick) and has to recharge: **6 seconds** after it drops
+    (`chaosShieldCooldown` 120), **15 seconds** if it shattered or was held to its limit (`chaosShieldBrokenCooldown` 300); the HUD counts it down and B does nothing meanwhile. Every "pays" and "costs" below is about these rules. `TestKit.fixture()` switches the option off for every test, so the 52 older shield tests test the limits; `AbwShieldTests` (5, batches `abw_shield_*`) cover both modes.
 * **Blocks every projectile** it meets while it is up: arrows, tridents, Ghast and Blaze
   fireballs, Wither skulls, shulker bullets, potions and snowballs. Projectiles disintegrate
   on the sphere. A projectile costs the shield what it would have done to Wanda: an arrow its
@@ -406,10 +405,8 @@ To touch the stone, hold the scepter and **right-click** (use it):
   beam, thorns and a Warden's sonic boom.
 * **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it
   down; if less strength is left than that, the shield shatters and the rest gets through.
-* **Cost:** it burns hunger quickly while held (about 1 food point every 2 seconds), while it
-  forms too. When the hunger bar is empty the shield collapses (and has to recharge).
-* **HUD:** "forming" while it grows; once it is up, what is left of its strength (green, then
-  yellow, then red) and the seconds it can still be held. The sphere flickers as it weakens
+* **Cost:** none while it is unlimited. With the old rules it burns hunger quickly while held (about 1 food point every 2 seconds), while it forms too. When the hunger bar is empty the shield collapses (and has to recharge).
+* **HUD:** "forming" while it grows; once it is up, "∞ unlimited" (with the old rules: what is left of its strength, green, then yellow, then red, and the seconds it can still be held). The sphere flickers as it weakens
   or when its time is nearly up. Her arms gather across her chest as it forms and are thrown
   open at the very moment it is complete (also with another wind-up in the config: the arms
   keep time with it); let go of before it forms, she only lowers them.
@@ -659,9 +656,8 @@ costume, green and white with amber goggles), and *Your own skin*.
   it fastest; pistons can't push it.
 * **Seeking the Road.** A player **with no power** right-clicks the door **holding a Scarlet Witch
   Gene**. A ring of blue-green light runs around the door for two seconds, the doors open onto a
-  spiral stair among glowing roots, and the Road asks: **"Seekest thou the Road?"** Choose
-  **Billy: Wiccan** or **Tommy: Speed** (section 5). One gene is used up. Anyone else holding a gene
-  can join the ritual and choose too. The door closes again five seconds after it opens.
+  spiral stair among glowing roots, and the Road asks: **"Seekest thou the Road?"** **(3.2)** The
+  Road no longer asks for the choice at once: the screen offers one button, **Walk the Road**, and the player walks the three trials of section 19; only at the end does he choose **Billy: Wiccan** or **Tommy: Speed** (section 5), and only then is one gene used up. The door closes again five seconds after it opens. With `witches_road.enabled` false the door is the 3.1 door: the instant choice, and anyone else holding a gene can join the ritual and choose too.
   * Without a gene the door won't open ("The Road only opens for witch blood").
   * A hero already "walks their own road".
 * **Walking the Road.** The Scarlet Witch and Billy (whose magic made it) can travel the Road:
@@ -676,11 +672,11 @@ Billy's magic is blue with a white-hot core, crackling and branching like a Tesl
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | R | **Hex Bolt** | A crackling blue arc from his hand to the first creature he looks at within 24 blocks: 6 damage, and it forks on to the two nearest creatures within 5 blocks of it (3 damage each). Everyone around sees the bolts. Cooldown half a second. |
+| 1 | R (hold) | **Hex Beam** | **(3.2)** A continuous beam of blue magic from his hand along his look, to be aimed: 6 damage a second and 20 blocks at rank 1, up to 12 and 40 at the top rank, four hits a second, 0.8 exhaustion a second. Section 6.4. With `billy.beam` false it is the 3.1 **Hex Bolt**: a crackling blue arc to the first creature he looks at within 24 blocks, 6 damage, forking on to the two nearest creatures within 5 blocks of it (3 damage each), cooldown half a second. |
 | 2 | G (toggle) | **Flight** | Calm, weightless flight with open hands, like his mother's (speed 0.08). |
 | 3 | V | **Telekinesis** | Wanda's telekinesis, in his blue: creatures, dropped items, minecarts, boats, primed TNT, falling blocks, **and projectiles in flight**: an arrow he catches hangs in front of him, pointing where he looks, and flies off at his command. **(3.1) He tears blocks out of the ground too**: within 16 blocks, hardness 3 at most (stone, ores, planks; not iron blocks), one block a second (`billy.blockLifting`, `blockLiftRange`, `blockLiftMaxHardness`, `blockLiftCooldown`); **Sneak + V** with nothing held takes the block he looks at, even past a creature. He holds the villains and the vanilla bosses as bosses, half as long as Wanda (`boss.billyHoldFactor`); Apocalypse only in a window. Press again to launch, **Sneak** + the key to put down gently (a block becomes a block again where it lands). |
-| (3.1) | Y | **Build Magic** | Tap: build mode on or off; hold: the Spell Wheel. An apprentice who learns: a magic meter, ranks from Apprentice to Wiccan, half the cost near a Scarlet Witch: section 18. |
-| 4 | B | **Freeze** | Every creature and player within 12 blocks in a 90° cone in front of him, in his line of sight, is **spellbound** for 5 seconds: they can't move, jump or attack, can't pick a new target, and blue sparks circle their heads. The Ender Dragon and the Wither are too strong for it. Cooldown 12 seconds. |
+| (3.1) | Y | **Build Magic** | Tap: build mode on or off; hold: the Spell Wheel. An apprentice who learns: a magic meter, ten ranks from Apprentice to Chaos Master (3.2; four in 3.1), half the cost near a Scarlet Witch: section 18. |
+| 4 | B | **Freeze** | Every creature and player within 12 blocks in a 90° cone in front of him, in his line of sight, is **spellbound** for 5 seconds: they can't move, jump or attack, can't pick a new target, and blue sparks circle their heads. The Ender Dragon and the Wither are too strong for it. Cooldown 12 seconds. **(3.2) Sneak + B, held, raises the Hex Barrier**: a directional plate of blue magic that stops what comes from the front, for a limited strength and time (section 6.5). |
 | 5 | N (toggle) | **The Noise** | He hears every mind within 32 blocks: every creature glows through walls, **red** if it is hostile and about to attack, **blue** otherwise. Whispers crowd his head, louder the more minds are near. |
 
 **The crown.** While he flies, and for three seconds after each spell, a glowing chrome crown
@@ -690,6 +686,39 @@ forms on his head, in shades from ice-white to deep blue (the *Wiccan* look alre
 
 *Wiccan* (*Agatha All Along*), *Teen* (on the Witches' Road), *Halloween* (his *WandaVision*
 costume), *Wiccan (comics)*, and *Your own skin*.
+
+### 6.4 The Hex Beam (R, held) **(added in 3.2)**
+
+Eilon asked for "a continuous laser beam instead of a single shot, still requiring the player to aim". **R is held**: a beam leaves his hand along his look (`ContinuousBeam`, section 21; style `billy_hex`: blue `0x5CC8FF`, a white-hot core, a dark blue fringe, strands and forks, flares at both ends) and hurts **what the crosshair is on**: the first creature, dragon part or
+End crystal the line meets within range (a block stops it).
+
+| Number | Option | At rank 1 | At the top rank |
+|---|---|---|---|
+| Damage a second | `beamDamagePerSecond` 6.0 × (1 + `beamRankDamageBonus` 1.0 × *p*) | 6.0 (1.5 a hit) | 12 (3.0 a hit) |
+| Range | `beamRange` 20 × (1 + `beamRankRangeBonus` 1.0 × *p*) | 20 blocks | 40 blocks |
+| Hits | `beamInterval` 5 ticks (four a second); per hit = damage a second × interval ÷ 20 | | |
+| Hunger | `beamExhaustionPerSecond` 0.8 (a food point every 5 s) | | |
+
+The rank progress *p* = (rank − 1) ÷ (`maxRank` − 1), read only through `BillyRanks.rank(BuildData)` and `BillyRanks.maxRank()` (0 when `maxRank` is 1). The damage type is `enhanced:hex_beam`, in the tags `minecraft:bypasses_cooldown`, `no_knockback` and `panic_causes`, so every hit lands (as Thor's beam); death messages in both languages.
+A complete Chaos Shield stops the beam at its surface and pays strength as it does Thor's beam (with PvP rule `canHarmPlayer`); PvP and Creative as `hurt` does; bosses take it through their normal damage rules (**Apocalypse's shield takes nothing from it** and wears none). It stops on release, on starvation ("Too hungry to fire the Hex Beam", `message.enhanced.billy_beam.hungry`),
+as a Spectator, on logout and on losing the power. While the Darkhold's beam is the one burning, his own does not run (20.3). The arm stays out along the look (`Stance.BEAM_HAND`); the start gesture is `BILLY_BOLT`; the loop is the Chaos Beam sound at pitch 1.3; the HUD line is `[R] Hex Beam  6.0 dmg/s, 20 blocks` (green `firing: ...` while held). The ability name is "Hex Beam" / "קרן כישוף".
+**The fallback:** `billy.beam` false brings back the 3.1 Hex Bolt (6 damage, forking to the two nearest creatures within 5 blocks for half, cooldown half a second, no hunger). Differences from the bolt, on purpose: it costs hunger (the lead asked for "like the bolt"; the bolt cost none), the forks are dropped for the beam (the visual branches stay), there is no overheat, and per-tick damage is
+per 5 ticks because creatures' damage cooldown is bypassed by the damage type. A payload (`BeamPayload`) goes out every 8 ticks while held. Tests: `abw_beam_*`.
+
+### 6.5 The Hex Barrier (Sneak + B, held) **(added in 3.2)**
+
+**Sneak + B held** raises a **directional plate** of blue magic (plain B is still Freeze; no new key mapping, so the Controls screen is unchanged; the key is read on the server and the barrier stays up until B is released, even if Sneak is let go). B's recharge is shared with Freeze (cooldown slot 4: 240 ticks after Freeze, `barrierCooldown` 200 after the barrier is lowered or times out,
+`barrierBrokenCooldown` 400 after it breaks; none if B is released before it formed).
+
+* **Shape.** A tall translucent plate `barrierWidth` 1.4 × `barrierHeight` 2.4, held `barrierDistance` 1.6 in front of his body, slightly curved, following his look (pitch too), drawn a little to the off-arm side. It forms in `barrierWindUpTicks` 8 and stops nothing until it is complete. He walks at `barrierSpeedFactor` 0.6 (a movement-speed modifier, removed when it comes down) and it costs `barrierExhaustionPerSecond` 0.4 (not on an empty stomach: "Too hungry to raise the Hex Barrier").
+* **Direction.** It covers a cone of `barrierArc` 60° either side of his look, measured from his body to the attacker, projectile or explosion source; blocks outside the cone pass whole, and an explosion with no source entity has no direction and passes whole.
+* **It stops** (the same predicates as the Chaos Shield): projectiles (the price is `WandaAbilities.projectilePower`; they burst into blue sparks; also scanned where they cross the plate's plane), the blows of creatures and players (the attacker is thrown back 0.6), Thor's lightning, and explosions (`barrierExplosionFactor` 0.5 still gets through). It stops nothing that `BYPASSES_INVULNERABILITY`, nothing the Chaos Shield does not stop (the Mind Crush; the Entomb stays possible: `SandControl.entombRefusal` checks only a complete Chaos Shield).
+* **Limits (unlike Wanda's shield).** Strength `barrierStrength` 20 × (1 + `barrierRankStrengthBonus` 2.0 × *p*) = 20 to 60; time `barrierDuration` 100 ticks × (1 + `barrierRankDurationBonus` 1.0 × *p*) = 100 to 200 (5 to 10 s). Everything it stops wears it down; at 0 it breaks ("The Hex Barrier broke!").
+* **State** reuses the synced Chaos Shield fields of `PowerData` (`chaosShieldActive`, formed-at, strength), because Billy has no other use of them; everyone sees it from those. **HUD:** `[B] Freeze (Sneak: Hex Barrier)`, "forming", `20/20 3.1s`, the recharge.
+* **Look.** Two generated textures (`billy_barrier.png` 128 × 224: engraved nested contours with a wavy top and rounded feet; `billy_seal.png` 128 × 128: a ring of 36 triangular teeth, a dotted ring, a hexagram, a diamond, two arrows), additive blue and white glow on a curved 14 × 20 grid with a translucent veil under it; the seal turns slowly and flickers; a hit flashes, runs a ring across the plate and crackles blue lightning; white cracks grow as strength drops and it gutters below 30%; the first-person plate is fainter (40%).
+  Animation: `Stance.BARRIER_BILLY` (the off forearm raised forward across the chest, the main arm braced back, the body turned 8°, feet apart; first person: the left arm raised), eased in 3 ticks. Sounds are reused (beacon select and deactivate, amethyst, shield block, glass break).
+  Messages: "The Hex Barrier needs N more seconds", "Too hungry to raise the Hex Barrier", "The Hex Barrier broke!". Tests: `abw_barrier_*` (polling one schedule entry at a time).
+
 
 ---
 
@@ -959,9 +988,21 @@ Every power's light follows the films and shows:
 | `/enhanced build stop [<player>\|all]` | Stop the working spells where they are (undoable) and drop the queues: a player's, or everybody's with `all` or no argument. |
 | `/enhanced build list` | The spells working or waiting: player, spell, dimension, percent, blocks. |
 | `/enhanced build history <player>` | That player's steps, oldest first and numbered from 1, then the undone ones (the redo list): "1. Fill, 140 blocks, 2 min ago, overworld". |
-| `/enhanced build rank <player> [1-4]` | Billy's rank and practice; with a number, set the rank (practice becomes at least its threshold, exactly it when the rank goes down; the meter fills). |
+| `/enhanced build rank <player> [1-10]` | Billy's rank and practice; with a number, set the rank (practice becomes at least its threshold, exactly it when the rank goes down; the meter fills). |
 | `/enhanced build meter <player> <value>` | Set Billy's magic meter (0 to its top). |
 | `/enhanced build forget <player>` | Clear that player's history and pocket (memory and disk). |
+| `/enhanced ward list` | **(3.2)** List every ward of the Book of the Vishanti: whose, its name, where and how far it reaches (section 20.2). |
+| `/enhanced ward remove <player>` | **(3.2)** Take away every ward of that player (their bases stay as plain places). |
+| `/enhanced road status [player]` | **(3.2)** Trials of the Witches' Road won, whether on the Road, falls (section 19). |
+| `/enhanced road enter <players> [trial]` | **(3.2)** Send players onto the Road at once, with no Gene; `trial` from 1. |
+| `/enhanced road leave <players>` | **(3.2)** Take players off the Road, keeping Gene and progress. |
+| `/enhanced road reset <players> [newcourse]` | **(3.2)** Forget their Road progress; `newcourse` also deals new courses. |
+| `/enhanced road skip <players>` | **(3.2)** Win the trial they are in (or count the next as won). |
+| `/enhanced road set <players> <won>` | **(3.2)** Set how many trials they have won (0 to 99). |
+| `/enhanced road layout [player]` | **(3.2)** Where the checkpoints, the finish and the gate of his trial are. |
+| `/enhanced road cells` | **(3.2)** Road places in use or being cleared, and players on the Road. |
+| `/road leave`, `/road status`, `/road choose` | **(3.2)** For everyone (a second root command): leave the Road keeping the Gene; how far you are; at the end of the Road, ask the choice again. |
+
 | `/enhanced boss cleanup <center> <radius>` | Remove every entity of a boss's kind within the radius (the bosses, the Sentries, Thanos's sword, meteors, orbs and illusions, the Vibranium Key, the bolts, lances, boulders and cocoons), whether a fight owns it or not; no block is touched. |
 
 **(added)** `/enhanced_anim` is a client-only tool (no operator rights, nothing changes for anyone else) for looking at the
@@ -989,6 +1030,10 @@ cooldown, how far the Phoenix's Mind Reading, Mind Sense and Mind Control reach 
 with two of Thanos's (the music and the atmosphere of his fight, in its `[thanos]` section).
 
 **(added in 3.1)** The server file has three new sections for Build Magic, `[build_magic]` (the time and speed budget, the hold-to-confirm rules, where spells may work, the undo and pocket caps), `[build_magic_wanda]` (her reach and her technical caps: her magic has no gameplay limit) and `[build_magic_billy]` (his meter, refill, side, reach, undos, the three practice numbers, Mom's help); new rows in `[billy]` (block lifting), `[magneto]` (the block reach and hardness, and every number of the Magnetic Pull), `[boss]` (telekinesis in the boss fights and the borrowed arena blocks), the three boss sections (how long each is held), and `[apocalypse_shield]` (the critical hits); and the two healing defaults of `[apocalypse_boss]` are now 0. The client file gains a `[build_magic]` section (*Build Magic hints*, *tips*, *preview detail*, *see the box through walls*, *other builders*).
+
+**(added in 3.2)** `[apocalypse_boss]` gains the master factor `powerFactor` (0.65) and new defaults (shield 100, growth 1.2, 0.3 for each more fighter, a 12-second window, a 4-second stagger, Backhand 12, Boulder 9, ring 10, Entomb 80 ticks, Mind Crush nausea 80, Horsemen at 1.5 times the health and +3 damage), `[apocalypse_shield]` mends 2 percent a second after 200 ticks; `[scarlet_witch]` gains `shieldUnlimited` (true);
+`[billy]` gains 22 options for the Hex Beam (`beam`, `beamDamagePerSecond`, `beamRange`, `beamInterval`, `beamExhaustionPerSecond`, `beamRankDamageBonus`, `beamRankRangeBonus`) and the Hex Barrier (`barrier` and 14 more); `[build_magic_wanda]` gains `instantMaxBlocks` (250,000) and `instantMaxMillis` (5,000), and `[build_magic_billy]` the practice numbers `rank5Practice` to `rank10Practice` and `maxRank` 1 to 10 (10).
+Three new sections: `[vishanti]` (16 options: the teleport, the wards and their radii), `[darkhold]` (24) and `[witches_road]` (35: the Road, the Parkour, the boat race and the structure copy). The wiki's *Server Configuration* page lists every option with its default and range; two new datapack tags, `enhanced:ward_immune` and `enhanced:magic_damage`, and the damage types `enhanced:hex_beam` and `enhanced:darkhold_beam`.
 
 ## 12. Sounds: the voices of the Infinity Stones **(added)**
 
@@ -2393,17 +2438,17 @@ not give him crits) and, on the shield, it is mind power at all (`MindPower.isCr
 
 | Hit | While the shield is up |
 |---|---|
-| Chaos Beam | amount x `chaosBeamFactor` (1) x **`critShieldFactor` (2)**: 10 a hit (5 x 2), one hit per attacker every `mindHitCooldownTicks` (10): shield 1 (150) takes 15 hits instead of 30 |
+| Chaos Beam | amount x `chaosBeamFactor` (1) x **`critShieldFactor` (2)**: 10 a hit (5 x 2), one hit per attacker every `mindHitCooldownTicks` (10): shield 1 (**100** since 3.2) takes **10** hits instead of 20 |
 | A telekinetic throw (a creature, an item, a block) | amount x `slamFactor` (1) x `critShieldFactor` (2); a block borrowed from his arena first x `borrowedSlamFactor` (0.5) |
-| Phoenix Burst | amount x `phoenixBurstFactor` (**5**) x `critShieldFactor` (2): a Burst of 30 takes 300, **breaking any of a lone fighter's three shields at once** (150, 188, 234; 203 for two) |
+| Phoenix Burst | amount x `phoenixBurstFactor` (**5**) x `critShieldFactor` (2): a Burst of 30 takes 300, **breaking any of a lone fighter's three shields at once** (**100, 120, 144**; 130 for two) |
 | Phoenix throws | as the Scarlet Witch's |
 | Phoenix Mind Control, Psionic Field | a **strain** (25 and 60 points, x `critShieldFactor`: **50 and 120**) even if refused, once a cast: a Phoenix strains his shield with each of them at most once per her own recharge of it (`mindControlCooldown`, `psionicCooldown`), however often she presses the key |
-| Everything else (swords, arrows, TNT, fire, potions, pets, Mjolnir, lightning, Magneto's shrapnel, Vision's beam, Billy's Hex Bolt, the stones, the other heroes) | **nothing**: no damage, no knockback, a golden ripple and a chime (`apocalypse_shield_hit`) |
+| Everything else (swords, arrows, TNT, fire, potions, pets, Mjolnir, lightning, Magneto's shrapnel, Vision's beam, Billy's Hex Beam and Bolt, the Darkhold's purple beam, the stones, the other heroes) | **nothing**: no damage, no knockback, a golden ripple and a chime (`apocalypse_shield_hit`) |
 
 The server owner can add `"billy"` or `"vision"` to `mindPowerHeroes` and they then count with the same damage types. The shield's strength is
-`shieldStrength` (150) x `shieldGrowth` (1.25) ^ (phase - 1) x (1 + `shieldPerExtraPlayer` (0.35) (n - 1)): **150, 188, 234** for one fighter,
-255, 319, 398 for three. It knits in 40 ticks, 2 seconds (nothing hurts him then), mends 3 percent a second once 8 seconds (`shieldRegenDelayTicks`
-160) have passed with no mind power. **(3.1) His health never heals**: `regenPerSecond` (the heal while a shield is up, never above the part of the fight he is in)
+`shieldStrength` (**100**; 150 in 3.1) x `shieldGrowth` (**1.2**; 1.25) ^ (phase - 1) x (1 + `shieldPerExtraPlayer` (**0.3**; 0.35) (n - 1)): **100, 120, 144** for one fighter, 130, 156, 187 for two,
+160, 192, 230 for three. It knits in 40 ticks, 2 seconds (nothing hurts him then), mends 2 percent a second (`shieldRegenFraction`; 3 in 3.1) once 10 seconds (`shieldRegenDelayTicks` **200**; 160)
+have passed with no mind power. **(3.1) His health never heals**: `regenPerSecond` (the heal while a shield is up, never above the part of the fight he is in)
 and `trueFormRegenPerSecond` (the true form's) are both **0** by default; a potion of Healing does nothing to him (`heal` is a no-op; the fight's own `heal(points, ceiling)` and the Escape's return
 use `setHealth`); the shield still knits and re-forms. The Apocalypse **hero's** healing factor is unchanged.
 **(3.1) On his body**, when the shield is down (a window, the stagger of an interrupted Escape, the true form): an explosion x `explosionDamageFactor` (0.5), then **a critical hit x `critBodyFactor` (2), any other blow x `othersBodyFactor` (0.4)**, then his armour, then x `windowDamageFactor` (1.25) in a window, then the cap `maxHitFraction` (12%) and the phase's floor. So Wanda's beam of 5 takes 12.5 in a window (5 x 2 x 1.25) and a sword of 7 takes 3.5 (7 x 0.4 x 1.25); in the true form without the 1.25. A critical blow counts double toward `escapeInterruptFraction`. Every critical hit shows 20 `CRIT` and 10 `ENCHANTED_HIT` particles, plays `enhanced:apocalypse_crit` (stand-in: the vanilla critical sound at pitch 0.7 until its file lands) and tells the attacker "Critical hit! ×2" (at most once per attacker every 10 ticks). `FORMING`, `REFORMING`, set pieces and his invulnerable states take nothing. The tests are `ApocalypseCritTests`. The boss bar is blue (his health, with notches at the floors) and a second, yellow bar for the shield ("broken" with the seconds left,
@@ -2414,11 +2459,11 @@ use `setHealth`); the shield still knits and re-forms. The Apocalypse **hero's**
 | Part | What happens |
 |---|---|
 | **Phase 1: The God Awakens** (100% to 66%) | Shield 1. Sand Lances, Sand Wave, Sand Spikes, Boulder Barrage, Portal Step, Backhand. |
-| **Window 1** | The shield breaks: he kneels (staggered 3 s, attacking nothing), 10 s (`windowTicks` 200) in which **everything can hurt him** (critical hits x2, the rest x0.4, then x1.25 for the window: `windowDamageFactor`), armour counting. His health cannot fall below **two thirds** (the floor); reaching it ends the window. If nobody does enough, the shield re-forms at full strength. After the kneel he fights on with Lances, Backhand and Spikes at half speed. |
-| **Transition 1** (6 s) | Untouchable; **the Four Horsemen** step out of four portals; shield 2 forms. *"Rise, my Horsemen."* |
+| **Window 1** | The shield breaks: he kneels (staggered 4 s, `staggerTicks` 80, attacking nothing), 12 s (`windowTicks` 240) in which **everything can hurt him** (critical hits x2, the rest x0.4, then x1.25 for the window: `windowDamageFactor`), armour counting. His health cannot fall below **two thirds** (the floor); reaching it ends the window. If nobody does enough, the shield re-forms at full strength. After the kneel he fights on with Lances, Backhand and Spikes at half speed. |
+| **Transition 1** (6 s) | Untouchable; **his Horsemen** (three at the default factor) step out of portals; shield 2 forms. *"Rise, my Horsemen."* |
 | **Phase 2: The Horsemen** (66% to 33%) | Shield 2. **Entomb, Mind Crush and one Tornado** join. Window 2 (floor at one third). |
 | **Transition 2: the Cairo Collapse** (8 s) | He floats up, the sky goes dark ochre, **three rings of sand** cross the arena (30 ticks apart); any Horseman still alive crumbles; shield 3 forms. *"Everything they've built will fall..."* |
-| **Phase 3: Unmasked** (33% to 5%) | Shield 3. **Three Tornadoes at once.** Its break has **no window**: |
+| **Phase 3: Unmasked** (33% to 5%) | Shield 3. **Two Tornadoes at once** (three at `powerFactor` 1.0). Its break has **no window**: |
 | **The armour falls** | The plates fly off (collar, pauldrons, chest, gauntlets, the crown of the cap), the shield is gone for good, he is in the **true form**, and **everything can hurt him** (critical hits x2, the rest x0.4), with no window; his health stops at 15% until the Escape has been tried, then at 5% (the kneel), so both always happen. He does not heal there either (`trueFormRegenPerSecond` 0). |
 | **The Escape** (once, at 15%) | A hand rises; a violet portal grows over him for 100 ticks (`escapeChannelTicks`). **Interrupted by any lightning damage (Thor's), by `escapeInterruptFraction` (4%) of his health in damage during the channel, or by a Hex wall.** A critical blow counts double. Interrupted: staggered 6 s and never again. Not interrupted: he vanishes and returns 10 s later at `escapeHealTo` (40%) with a fresh shield 3. The blow that earns the Escape starts it before his healing can mend him. |
 | **The end** (5%) | Untouchable and kneeling: *"All is revealed."* He dies **in the Phoenix's fire, layer by layer** if a Phoenix dealt Burst or throw damage in the last `phoenixFinishSeconds` (15), otherwise in a column of sand (`apocalypse_death`). He drops nothing. |
@@ -2434,35 +2479,38 @@ same twice in a row; damage scales with difficulty like a mob's.
 
 | Attack | From | Tell (and the lock) | What it does |
 |---|---|---|---|
-| **Sand Lances** | 1 | The right hand rises, the fingers pinch; five thin ochre lines from the palm to the chest (locked 6 ticks before) | `lanceCount` (5) in a flat fan, **6** each. Billy and the Phoenix can catch them and throw them back |
-| **Sand Wave** | 1 | Both arms sweep low; a faint lane on the ground, 4 wide (locks just over halfway) | A ridge 1.1 blocks tall: **10**, knockback, Slowness II; lower than a jump's peak |
-| **Sand Spikes** | 1 | A fist rises and slams; an amber ring under each of up to four players, tracking, then locked | Spikes in each ring: **9**, launched up |
-| **Boulder Barrage** | 1 | Both arms rise; three blocks of sand tear out of the ground and orbit over his head with a growing hum; amber lines to up to three players | Three boulders: **11** each; can be caught and thrown back |
-| **Portal Step** | all | Violet shards at his feet; a second ring opens at the exit, usually behind the player farthest from him | An arrival shockwave: **6**, knockback. A Hex wall refuses it |
-| **Backhand** | all | The arm drawn across the chest (8 ticks) | **16**, strong knockback |
-| **Entomb** | 2 | His hand reaches to the player who wore the shield most; a stripe of sand crawls to their feet and locks 10 ticks before the hand closes | If still on the spot: a **cocoon** for `entombTicks` (100): no movement, jumping, flight, attacks, items or powers; 1.5 a second, never below two hearts; `cocoonHealth` (20) to break it. A complete Chaos Shield skips it; a phased Vision is intangible; `enhanced:entomb_immune` |
-| **Mind Crush** | 2 | Two fingers to the temple, his eyes flash white-violet, a violet ring contracts from 28 blocks to nothing (2 s) | Everyone within `mindCrushRange` (28): Nausea (120), Slowness 3 s, Blindness 2 s. **Magneto's helmet turns it away.** A Phoenix who touches him with Mind Control or the Psionic Field during the tell interrupts it. The Chaos Shield does not stop it |
-| **Tornado** | 2 (one), 3 (three) | Both arms rise; the sky above darkens; dust spirals up at one to three spots | Funnels for 160 ticks that drift toward the nearest player, slower than a walk: 2 every half second, and they lift what is inside |
-| **Cairo Collapse** | T2 | The ground ripples; he floats up, arms wide | Three rings: **12**, strong knockback |
+| **Sand Lances** | 1 | The right hand rises, the fingers pinch; five thin ochre lines from the palm to the chest (locked 6 ticks before) | `lanceCount` (5, times the factor, rounded up: **4**) in a flat fan, **3.9** each (6 × 0.65). Billy and the Phoenix can catch them and throw them back |
+| **Sand Wave** | 1 | Both arms sweep low; a faint lane on the ground, 4 wide (locks just over halfway) | A ridge 1.1 blocks tall: **6.5** (10), knockback, Slowness II; lower than a jump's peak |
+| **Sand Spikes** | 1 | A fist rises and slams; an amber ring under each of up to four players, tracking, then locked | Spikes in each ring: **5.85** (9), launched up |
+| **Boulder Barrage** | 1 | Both arms rise; three blocks of sand tear out of the ground and orbit over his head with a growing hum; amber lines to up to three players | Three boulders: **5.85** (`boulderDamage` 9) each; can be caught and thrown back |
+| **Portal Step** | all | Violet shards at his feet; a second ring opens at the exit, usually behind the player farthest from him | An arrival shockwave: **3.9** (6), knockback. A Hex wall refuses it |
+| **Backhand** | all | The arm drawn across the chest (8 ticks) | **7.8** (`backhandDamage` 12), strong knockback |
+| **Entomb** | 2 | His hand reaches to the player who wore the shield most; a stripe of sand crawls to their feet and locks 10 ticks before the hand closes | If still on the spot: a **cocoon** for `entombTicks` (**80**; 100 in 3.1): no movement, jumping, flight, attacks, items or powers; 0.98 a second (1.5 × 0.65), never below two hearts; `cocoonHealth` (20) to break it. A complete Chaos Shield skips it; a phased Vision is intangible; `enhanced:entomb_immune` |
+| **Mind Crush** | 2 | Two fingers to the temple, his eyes flash white-violet, a violet ring contracts from 28 blocks to nothing (2 s) | Everyone within `mindCrushRange` (28): Nausea (`mindCrushNauseaTicks` **80**; 120), Slowness 3 s, Blindness 2 s. **Magneto's helmet turns it away.** A Phoenix who touches him with Mind Control or the Psionic Field during the tell interrupts it. The Chaos Shield does not stop it |
+| **Tornado** | 2 (one), 3 (two) | Both arms rise; the sky above darkens; dust spirals up at one to three spots | Funnels for 160 ticks that drift toward the nearest player, slower than a walk: 1.3 (2 × 0.65) every half second, and they lift what is inside |
+| **Cairo Collapse** | T2 | The ground ripples; he floats up, arms wide | Three rings: **6.5** (`ringDamage` 10), strong knockback |
+
+**(3.2) The master factor** `powerFactor` (0.65; 0.1 to 1.0) multiplies each damage in this table (the figures in bold are after it, the option's own number in brackets), the counts of Lances, Horsemen and Tornadoes (`ApocalypseBossConfig.count`: rounded up, never below one, zero stays zero), and divides the pace (`slower`: the pause between two attacks, 30, 25 and 20 ticks by phase, and every attack's
+cooldown, last 1 ÷ factor times as long, about 1.54 at 0.65). It does **not** touch his health, armour, shield, windows, the arena wall's `fieldDamage`, the tells and their lengths or the projectiles' speed, and the Apocalypse hero is unchanged. The Portal Step's shock and the Horsemen's tricks (Famine's bolt 3, Pestilence's leap 7 and Death's slam 9) are scaled too; War's Shard Volley (4 a shard) is not.
 
 The Lances and Boulders are entities (`sand_lance`, `sand_boulder`, both of `AbstractSandProjectile`) that implement `ShieldCost`, so the Chaos Shield
 stops them and pays for their damage, and a projectile that Billy or the Phoenix catches is thrown back like any other. His blows are the damage types `sand`, `apocalypse_blow` and `entomb`.
 **No attack ever changes a block**: the sand wave, the spikes, the tornadoes and the wall are effects and entities, so mobGriefing changes nothing and there is
 nothing to restore after the fight.
 
-### 17.6 The Four Horsemen
+### 17.6 The Horsemen
 
-At Transition 1 he enhances **Husks** (vanilla desert mobs): `min(horsemenMax (4), 1 + fighters)`, in the order War, Famine, Pestilence, Death. Each is
-named, glows, has `horsemanHealthFactor` (2) times a Husk's health, `horsemanDamageBonus` (4) more attack damage, a little more speed and armour,
+At Transition 1 he enhances **Husks** (vanilla desert mobs): `min(count(horsemenMax (4)), 1 + fighters)`, **three** at the default factor (`ceil(4 × 0.65)`), in the order War, Famine, Pestilence, Death (Death comes only when four do). Each is
+named, glows, has `horsemanHealthFactor` (**1.5**; 2 in 3.1) times a Husk's health, `horsemanDamageBonus` (**3**; 4) × the factor (**1.95**) more attack damage, a little more speed and armour,
 and **drops nothing and gives no experience**. They live until killed or until Transition 2. They are ordinary creatures: Wanda can lift them,
 a Phoenix can take one over, Billy can freeze them. A Magneto hears, once, "Join me, Erik." **(3.1)** War's and Pestilence's iron is metal: Magneto can lift them, and his strip or pull tears it off, and it **crumbles** (the Horsemen are never farmed); Famine and Death carry nothing.
 
 | Horseman | Gear | Trick |
 |---|---|---|
 | **War** | iron helmet, chestplate, axe | **Shard Volley** every 5 s: three iron shards hover, then fly in a fan, 4 each (Magneto can catch them) |
-| **Famine** | none | **Gale** every 6 s: white lightning on the hands, a bolt falls beside the target, a gust blows back (3; Thor takes no lightning damage but the wind still pushes) |
-| **Pestilence** | iron sword | **Psi-Blade Dash** every 5 s: the sword glows violet, a six-block leap: 7 and Slowness |
-| **Death** | none | **Dive** every 7 s: he springs up, hangs, dives with a slam: 9 in a radius of 2.5 |
+| **Famine** | none | **Gale** every 6 s: white lightning on the hands, a bolt falls beside the target, a gust blows back (1.95; Thor takes no lightning damage but the wind still pushes) |
+| **Pestilence** | iron sword | **Psi-Blade Dash** every 5 s: the sword glows violet, a six-block leap: 4.55 and Slowness |
+| **Death** | none | **Dive** every 7 s: he springs up, hangs, dives with a slam: 5.85 in a radius of 2.5 |
 
 ### 17.7 The arena, and when it goes wrong
 
@@ -2700,9 +2748,19 @@ gives back `cost × restored ÷ changed` and takes back that practice; redo pays
 | 2 Spellcaster | 2,000 | 1,024 | 24/s | 32 | 32 | 12 | 12 | 4 |
 | 3 Sorcerer | 8,000 | 2,048 | 32/s | 40 | 40 | 14 | 16 | 5 |
 | 4 Wiccan | 30,000 | 4,096 | 40/s | 48 | 48 | 16 | 20 | 6 |
+| 5 Enchanter | 60,000 | 6,144 | 56/s | 56 | 56 | 18 | 24 | 7 |
+| 6 Mystic | 120,000 | 8,192 | 72/s | 64 | 64 | 20 | 28 | 8 |
+| 7 Wizard | 220,000 | 12,288 | 96/s | 72 | 72 | 22 | 32 | 9 |
+| 8 Archmage | 380,000 | 16,384 | 128/s | 80 | 80 | 24 | 36 | 10 |
+| 9 Reality Weaver | 600,000 | 24,576 | 160/s | 88 | 88 | 26 | 40 | 11 |
+| 10 Chaos Master | 1,000,000 | 32,768 | 192/s | 96 | 96 | 28 | 44 | 12 |
 
-From the config numbers: meter = `meter` × 2^(rank−1); refill = `refill` × (1 + (rank−1)/2); side = `maxSide` + 8(rank−1); reach = `reach` + 8(rank−1); undos = `undoSteps` + 2(rank−1);
-repeat = `repeatMax` + 4(rank−1); brush = side ÷ 8; magic select = the meter. `maxRank` caps it. Each rank is the same step up from the Apprentice's five numbers (the meter doubles, the refill gains half of the first, side and reach 8, undos 2, Repeat 4); an operator sets a rank with `/enhanced build rank` (18.12). A rank-up is a moment (the crown flares, runes, a fanfare to everyone near, the meter fills as a gift).
+
+**(3.2) Ten ranks** (`BillyRanks.MAX_RANK` 10; `maxRank` 1 to 10, default 10; ranks 1 to 4 keep their 3.1 numbers exactly, so a rank-4 Billy with 3.1 practice continues smoothly; a server file written by 3.1 holds `maxRank` 4 until its owner changes it). The practice thresholds are the options `rank2Practice` to `rank10Practice` (`BuildConfig.BILLY_PRACTICE`). Ranks 5 to 10 continue by tables:
+meter = `meter` × {1, 2, 4, 8, 12, 16, 24, 32, 48, 64}; refill = `refill` × {1, 1.5, 2, 2.5, 3.5, 4.5, 6, 8, 10, 12}; side = reach = base + 8 (rank − 1); undos = base + 2 (rank − 1); repeat = base + 4 (rank − 1); brush = side ÷ 8; magic select = the meter. Rank 10 is far below Wanda (a side of the whole world, 256 reach, 100,000 selection, no meter, brush 16);
+a full meter at rank 10 refills in about 171 s. Rank-up effects, sound and message are rank-generic (`RANK_UP`, `rankUp(rank)`; names `hud.enhanced.build.rank.1` to `.10`: Apprentice, Spellcaster, Sorcerer, Wiccan, Enchanter, Mystic, Wizard, Archmage, Reality Weaver, Chaos Master; in Hebrew שוליה, מטיל לחשים, מכשף, ויקאן, קוסם, מיסטיקן, אשף, אשף-על, אורג המציאות, אדון הכאוס).
+His Hex Beam and Hex Barrier (6.4, 6.5) and the radius of his ward (20.2) grow with the same rank. For ranks 1 to 4: meter = `meter` × 2^(rank−1); refill = `refill` × (1 + (rank−1)/2); side = `maxSide` + 8(rank−1); reach = `reach` + 8(rank−1); undos = `undoSteps` + 2(rank−1);
+repeat = `repeatMax` + 4(rank−1); brush = side ÷ 8; magic select = the meter. `maxRank` caps it. In ranks 1 to 4 each rank is the same step up from the Apprentice's five numbers (the meter doubles, the refill gains half of the first, side and reach 8, undos 2, Repeat 4); an operator sets a rank with `/enhanced build rank` (18.12). A rank-up is a moment (the crown flares, runes, a fanfare to everyone near, the meter fills as a gift).
 **Mom's help**: a Scarlet Witch (alive, not a Spectator, in his dimension) within `momRange` (16) when he casts halves the cost (`momCostFactor` 0.5, rounded up), with a scarlet thread and "½"; his practice counts the real blocks.
 Limits and what he is told: the meter now (`refilling`), the whole meter (`too_big`), the side (`too_wide`), the reach (`too_far`), undo history, Repeat, one spell at a time with a pause of `castPause` (10 ticks), TNT, lava and fire never
 (`volatile`), copies of containers come out empty (`copiesContents`), Creative changes nothing (`limitsInCreative`).
@@ -2753,7 +2811,7 @@ about 4 million cells is lite. A server stopping finishes what `finishOnStopBloc
 
 ### 18.10 Network, config and tags
 
-Network protocol **"5"** (a 3.0 client cannot join a 3.1 server): `BuildCastPayload` (the recipe: spell, style, region, corners, seeds, anchor, size, turn, flip, material kind, seed, stroke; at most about 140 bytes; the client never sends a block state), `BuildActionPayload`
+Network protocol **"5"** in 3.1 (a 3.0 client could not join a 3.1 server; 3.2 raised it to "6", section 22): `BuildCastPayload` (the recipe: spell, style, region, corners, seeds, anchor, size, turn, flip, material kind, seed, stroke; at most about 140 bytes; the client never sends a block state), `BuildActionPayload`
 (mode, undo, redo, pick, pick block, hand, stroke end, view, pocket), `BuildVerdictPayload`, `BuildFxPayload`, `BuildPocketPayload` (in parts of at most 31 KiB) and, for Magneto, `MagnetPullPayload`; two attachments, `BUILD_DATA` (saved: Billy's meter, rank, practice, the pocket) and
 `BUILD_VIEW` (not saved: mode, spell and box for the people who see him). The server config sections are `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]` (section 11 and the wiki's Server Configuration page; 58 options), the client `[build_magic]` has five. The datapack tags: `enhanced:build_untouchable`, `build_unconjurable`, `build_volatile`, `build_ground`, `build_plants` (blocks)
 and `build_copies_data`, `build_holds_items` (block entity types).
@@ -2772,7 +2830,7 @@ and `build_copies_data`, `build_holds_items` (block entity types).
 `BuildCommands.node()` is the `build` branch of `/enhanced`, which already needs permission level 2; every argument that names a player is an online player (`EntityArgument.player()`), and none of them needs him to be a builder at the moment.
 `undo <player> [steps]` (1 to 1000) takes `UndoHistory.toUndo(steps)` (a partly undone step first, then the newest that can be undone, and so on) and queues each step as a replay job of the player behind what he is doing, with the safe-undo rule and without the build-mode check; a step that left memory is read back
 in the background first (the next waits for it, so the order stays) and one whose file cannot be read is skipped; the answer is "Undid N spells of X". `stop [<player>|all]` is `BuildScheduler.stop` for each named player (everyone who has a job when none is named): the spells stop where they are and the queues are dropped; what was done stays and can be undone. `list` prints each job's player,
-spell (or `undo`/`redo`), dimension, percent and the cells it has walked and has left. `history <player>` prints every step, the ones Ctrl + Z works on and then the ones Ctrl + Y does again, oldest first. `rank <player> [1-4]` and `meter <player> <value>` answer "is not Billy" for anyone else; `BillyMagic.setRank` clamps to 1 to 4, sets the practice to at least the threshold of the rank (exactly it when the rank goes down, so his next spell does not undo the change) and fills the meter;
+spell (or `undo`/`redo`), dimension, percent and the cells it has walked and has left. `history <player>` prints every step, the ones Ctrl + Z works on and then the ones Ctrl + Y does again, oldest first. `rank <player> [1-10]` and `meter <player> <value>` answer "is not Billy" for anyone else; `BillyMagic.setRank` clamps to 1 to `BillyRanks.MAX_RANK` (10), sets the practice to at least the threshold of the rank (exactly it when the rank goes down, so his next spell does not undo the change) and fills the meter;
 `setMeter` clamps to 0 and the top of the rank that applies. `forget <player>` clears the history (memory and `data/enhanced/build/<uuid>/`) and the pocket. The texts are `commands.enhanced.build.*` in both lang files.
 
 ### 18.13 Tests and the checks in game
@@ -2781,3 +2839,241 @@ About 120 game tests in nine classes of the build package, each with batches of 
 `BuildJobTests` (the engine: pace, sections, fair shares, Ctrl + Z on waiting and working spells, the stop at server shutdown), `BuildRulesTests` (the rule book of 18.8), `BuildSpellTests` (every spell and style as a hero casts it), `BuildBrushTests` (Land and Grow), `BuildUndoTests` (the files, the write-ahead, the caps, the pocket, the commands) and `BuildReviewTests` (what the reviews found: the Move and the chest,
 the redo, the memory budget, a job that throws, a claimed vault, PvP-off hazards, a sign beside a vanished wall, unloaded columns). `V31CrossTests` crosses Build Magic with the Magnetic Pull, the island, Mjolnir, pinned creatures, held blocks and the boss telekinesis. The release was also played: a dedicated server and two clients (Billy and Wanda) went through the whole of D-B, every spell and style, a 200,000-block fill at 20 ticks a second
 (a mean tick time of 1.7 ms rising to a peak of 12 ms), the undo of all of it, 101 undos in a row, a server restart with seven steps on disk, Hebrew, the sounds with their subtitles, and a Move while a sister emptied the chest in it.
+
+### 18.14 Wanda's Instant level **(added in 3.2)**
+
+Eilon asked for "an extra level where the structures she creates appear instantly, with no loading or waiting". **Instant** is a switch in build mode, for the Scarlet Witch alone: while it is on, a spell, an undo and a redo write **all their cells in the same tick** they are cast.
+
+* **State.** `BuildSession.instant` (the server's truth), mirrored to the client in `BuildData.instant` (a moment-state field, not saved; a trailing boolean of the stream codec) so the HUD badge and the wheel button read one source. Changed by `BuildActionPayload.INSTANT` (9, value 1 or 0); refused unless Scarlet Witch, in build mode, with `build_magic_wanda.instantMaxBlocks` above 0
+  (`Limits.instantMax()` is 0 for Billy: "Instant is the Scarlet Witch's magic alone"). It turns off when she leaves build mode or her power changes.
+* **Controls.** The key `key.enhanced.build_instant` = **Ctrl + I** in the `BUILD` context (I for Instant; it shares no key with vanilla or Enhanced, so the Controls screen adds no red mark; the name is "Build Magic: Instant (Scarlet Witch)"), and an **Instant** wheel button under Redo (Wanda only, shown while `instantMaxBlocks` is above 0). The HUD notes row shows a gold badge "⚡ Instant".
+* **Engine.** A spell cast with Instant on gets `BuildJob.instant`; its `pace()` is unbounded and the read-ahead reads a whole window a slice. `BuildScheduler.runInstant(job)` (called at the end of `BuildMagic.cast` and of `replay` when the job is at the head of her queue; a job behind another runs its instant turn when it becomes head, in `turn()`) steps the job with an unbounded budget (writes, sections, no `minSpellTicks`,
+  no budget sharing) inside the calling tick. It sends no progress, sync or hum. The write-ahead journal still gates each cell (the loop waits for the writer thread, parking 100 µs, while the guard allows). Undo and redo are instant too when her switch is on (and the step has at most `instantMaxBlocks` cells).
+* **Limits.** Above `instantMaxBlocks` (**250,000**; 0 to 100,000,000; 0 = no Instant level) the spell runs at normal sliced speed from the start and she is told ("Too big for Instant (N of M): normal speed"). A wall-clock guard `instantMaxMillis` (**5,000**; 100 to 50,000; never more than a third of a dedicated server's `max-tick-time`) drops the rest of a slow spell back to normal speed ("Too slow for Instant: the rest goes at normal speed").
+  Measured on the GameTest server (a fill of stone into air, loaded chunks): 8,000 cells 0.12 s; 125,000 cells about 0.3 s (undo in memory) or 0.44 s (undo on disk); **1,000,000 cells 2.1 s with the undo in memory and 4.1 s with `undoSurvivesRestart` (the default; the cost is the journal's read-ahead and recording on the main thread)**. The lead's default of 1,000,000 was lowered to 250,000 (about a second) by the rule "lower it if above about 2 s a million".
+* **Effects.** `BuildFxPayload.POP` (order 4, START and DONE with no progress): the client flashes the box for 8 ticks and sparks fly off its surface instead of the ripple. The brush spells (Paint, Land, Grow) already keep up with the cursor and are not affected.
+* **Rules unchanged.** Every cell still goes through `BuildRules` and `BlockRights`: arenas, claims (events per block), Hex claims, loaded chunks only, the undo caps and lite steps, and the hold for removing or replacing more than 64 blocks or `hugeSpellBlocks`.
+* **Tests.** `BuildInstantTests` (batches `build_instant_cast`, `_limit`, `_undo`, `_rules`, `_billy`, `_time`).
+
+---
+
+## 19. The Witches' Road: three trials (added in 3.2)
+
+Eilon asked for the Witches' Road to be a place with **three challenges** that open one another: a **parkour**, a **structure to copy** so that it looks exactly like the one shown, and a **huge ice-boat race**; at the end the
+player chooses Billy's power or Tommy's and is taken back out. In 3.1 the Road was only a door with an instant choice (section 6.1). The player's guide is the wiki page *The Witches' Road*. Package `road/` (common
+and server code; a few client classes for the screen), config `config/WitchesRoadConfig` (`[witches_road]`), the dimension in the data pack. Everything a trial needs is **built by code, for one player, and taken down again**,
+in the style of the Sokovia island and the boss arenas.
+
+### 19.1 The flow
+
+1. A player with **no power**, in Survival, right-clicks a Witches' Road door **holding a Scarlet Witch Gene** (3.1 up to here: the ring of blue-green light runs for 2 s, the door opens).
+2. The door asks "Seekest thou the Road?" with one big button, **Walk the Road**, and Cancel, and says which trial waits ("Trial 2 of 3"). The same screen (`WitchesRoadScreen`, mode `CHOOSE`) offers Billy and Tommy
+   at the end of the Road, and to a player whose progress says all trials are won. With `witches_road.enabled` false the door is the exact 3.1 door (instant choice).
+3. **Walk the Road**: the server builds the player's trial in a private cell of the dimension `enhanced:witches_road` (a few ticks; the door pours light meanwhile), then moves him there. His entry (dimension, position,
+   rotation, game mode) is saved. The Gene stays in his inventory the whole time.
+4. Trial 1 (**Parkour**) → a finish platform with a gate → stepping into the gate builds trial 2 in a **new cell**, moves him, and clears the old cell; trial 2 (**Copy the Structure**) → gate → trial 3 (**Ice-Boat Race**) → gate → the end (19.10).
+5. Each success unlocks the next trial (`completed` in the saved progress). A trial can be left at any time (the exit door on the start platform, or `/road leave`): he returns to where he entered with his Gene, his progress is kept,
+   and the next time he starts the trial he had reached, at his last checkpoint.
+6. Nobody with a power walks the Road ("You already walk your own road"); the heroes' Walking the Road (a door without a Gene, 6.1) is untouched. Creative and Spectator players are refused ("The Road tests only those who can fall").
+
+### 19.2 The place
+
+* **The dimension** `enhanced:witches_road` (data pack `dimension/witches_road.json`: a flat generator with one layer of air, the biome `enhanced:witches_road`; `dimension_type/witches_road.json`: effects `minecraft:the_nether`, so a constant coloured fog
+  and no sky, no skylight, ambient light 0.25, `min_y` 0, height 320). The biome has a dark teal fog `0x0B3A44`, no spawns, warped spores and the ambient, mood and additions sounds of the Soul Sand Valley.
+* **Cells.** Per-player instance cells on a grid: cell *i* has its origin at x = (*i* mod 64) × 2,048, z = (*i* ÷ 64) × 2,048, y = 96. Neighbours are at least 1,400 blocks apart whatever the course (a course may use ±450 blocks round its origin;
+  `RoadCanvas` refuses more), so nobody sees another cell. The grid fits 4,096 cells; `maxPlayers` (32) bounds the cells in use.
+* **Built by code** at entry (`RoadChallenge.build` draws on a `RoadCanvas`; sliced by `buildBlocksPerTick` 20,000, a first touch of a chunk counts 300), removed at exit or logout (`RoadSweeper`, sliced by `removeBlocksPerTick`). The canvas records every chunk and the Y range
+  it touches and that record is saved in the **cell ledger before the first block is placed**, so a crash leaves nothing unaccounted: at the next start every ledger cell is an orphan and is cleared. Chunks are held by region tickets
+  (`ModTicketTypes.ENHANCED_ROAD`, keyed by the owner) from the moment the cell is planned until it is cleared (the pattern of `BossFight.begin`/`finish`). Entities are discarded **after** the blocks (a filled chest would spill its items otherwise).
+* **One live instance per player** (two while he moves from one trial to the next). Nobody shares a cell: no friends in the trials.
+* **Saved data** `enhanced_witches_road` on the overworld's data storage (`RoadSave`): progress by player UUID, and the cell ledger. Every mutation marks it dirty; it survives logout, restart and crash.
+
+### 19.3 Progress
+
+`RoadProgress`, per player UUID: `completed` (trials won, a prefix: the next to play is trial `completed`), `salt` (changes the course; 0), `checkpoint` (index in the current trial's layout; 0 = the start), `inside` (true from the teleport in to the
+teleport out), the entry (dimension, x y z, yaw, pitch, game mode), counters (falls, trials started) and `data`, a `CompoundTag` per trial id for the trial's own memory (the boat race's best time, the structure trial's put-aside backpack).
+**The course seed** = mix(player UUID, trial id, `salt`, `courseSeed`): the same course for the same player every time (he can learn it), another for another player; `/enhanced road reset <p> newcourse` raises `salt`.
+
+### 19.4 Failure, death, abandon, login, crash
+
+* **Falling.** Below the checkpoint's `failY` (the lowest part of the stretch minus `fallDepth` 12) he is put back at the last checkpoint: no damage, fall distance cleared, a short voice line, `falls` counted. A checkpoint heals him and fills his hunger (`healAtCheckpoint`).
+* **Damage.** All damage is cancelled inside a trial; void damage, `/kill` and anything lethal become a reset to the last checkpoint (`LivingIncomingDamageEvent` first, `LivingDeathEvent` as the net: cancelled, health restored). He never dies on the Road and never respawns in the world;
+  `PlayerRespawnEvent` is the last net (progress says inside → brought back). Hunger is full, air full, fire out.
+* **Abandon.** The exit door (a `WitchesRoadDoorBlock` set in the start platform: right-click twice within `leaveConfirmSeconds` 5), `/road leave` (any player) or an operator's `/enhanced road leave <players>`: back to the entry, game mode restored, Gene kept, progress kept.
+* **Logout inside.** The instance is removed (tickets released), `inside` stays true. At login `RoadTrials.reconcile`: in the Road dimension with `inside` → `resumeOnLogin` (true) rebuilds the trial and puts him at his checkpoint (a trial with `resumable()` false, the structure copy,
+  starts again from its beginning); false → returned to the entry. In the Road dimension without `inside` (an operator's /tp, lost data) → returned to the entry if known, else the world spawn. Not in the Road but `inside` → `inside` false.
+* **Server stop or crash.** Instances vanish; ledger cells are cleared at the next start (in slices, tickets held), and "Clearing N cell(s) of the Witches' Road that the last run left behind" is logged.
+
+### 19.5 The rules inside a trial
+
+Only players with no power get in, so the rules are few and live in one subscriber (`RoadRules`):
+
+1. **Powers.** Entry is refused with a power; a power gained inside takes him out (Gene kept); `AbilityHandler.onKey` ignores keys inside a trial (no ability, build mode, flight toggle, telekinesis or Hex). The Book of the Vishanti and the Darkhold are shut (section 20).
+2. **Teleports.** Ender Pearls, Chorus Fruit, portals (`EntityTravelToDimensionEvent`) and every mod teleport (`HexManager.onTeleport` asks `RoadTrials.allowsTeleport`) are refused, except the Road's own moves. Operators' `/tp` is free.
+3. **Flying.** Forced to Survival (restored on exit), gliding stopped every tick, Levitation, Slow Falling and Jump Boost removed, and Ender Pearls, Chorus Fruit, Wind Charges and firework rockets cannot be used (a Java set in `RoadRules`).
+4. **Blocks.** Nothing is placed or broken in the Road dimension except where the active trial says (`RoadChallenge.mayPlace/mayBreak`: the plot of trial 2). Explosions and fire cannot happen.
+5. **The Gene** cannot be dropped inside (`ItemTossEvent`), so it can always be spent at the end.
+6. **Other players' powers** cannot reach him: another dimension, 1,400+ blocks from any other cell.
+7. **No mob spawns** (the biome has none); anything a trial spawns is tracked and removed with the cell.
+8. **Operators** not in a trial are free of the block and item rules; an operator's /tp out of a trial ends it.
+
+### 19.6 The framework
+
+```
+RoadChallenge (interface)   id(), title(), build(RoadBuild) -> RoadLayout; defaults: onStart, tick, mayPlace, mayBreak, onReset, onEnd, resumable
+RoadBuild                   level, seed, canvas, origin
+RoadCanvas                  set / fill / reserve / live: all tracked; refuses outside the cell; places itself in slices
+RoadLayout                  start + yaw, checkpoints (zone AABB, respawn, failY), finish AABB, gate (centre, facing), timeLimitTicks, exit door
+RoadTrial                   the live instance: phase PLACING/READY/ACTIVE/WON/CLEARING, checkpoint, succeed(), putBack(player, fell), track(entity), data()
+RoadChallenges              the ordered registry; register(challenge) and register(challenge, order): parkour 10, structure copy 20, ice-boat race 30
+RoadTrials                  the facade: enter, leave, advance, won, reconcile, onLogout, serverTick, useExitDoor, allowsTeleport, op tools
+RoadPalette, RoadFx, RoadVoice   the look (dark oak, amethyst, soul lanterns, roots, glow lichen), effects (reused sounds and particles), the Voice of the Road
+RoadSave / RoadProgress / RoadSweeper / RoadRules / RoadEvents / RoadCommands / RoadEnding
+```
+
+A new trial = implement `RoadChallenge` (stateless; one object serves every player), register it (the order of the registry is the order of the trials; the screen says "Trial n of N" by itself), add config keys, lang keys
+`road.enhanced.challenge.<id>` (and `.goal`, a subtitle of at most 32 characters in both languages: a test checks it) and tests with `RoadTestSupport`. Randomness comes only from `new SplittableRandom(build.seed())`: the course is drawn again, identically, when a player logs back in.
+The title of a trial is "<n>. <name>" (a title is drawn four times the size of text). The GameTest server has no Road level of its own, so `RoadTestSupport.ensureRoad` creates it (the JSON itself is asserted by `theRoadIsAVoidDimension`).
+
+### 19.7 Trial 1: the Parkour
+
+A square spiral winding outward from the start platform (legs of 12, 12, 36, 36, 60, 60 blocks...) so that it can never run into itself, with random jumps along the legs (`ParkourGenerator`, `JumpModel`). Dark oak stones; a lit amethyst **checkpoint** pad every `parkourCheckpointEvery` (6) jumps;
+a finish platform with a sealed amethyst gate (`RoadPalette.gate`; the framework opens it when the trial is won). `parkourPads` 40 jumps (8 to 150), `parkourDifficulty` 2 (1 easy: gaps of 1 or 2 blocks and wide stones; 2 normal: gaps up to 3 late, steps up and down; 3 hard: smaller stones, 3-block gaps sooner),
+`parkourTimeLimitSeconds` 0 (none). **No jump is ever beyond a running jump**: gaps never exceed 3 blocks of air, a step up comes only with a gap of 2 or less, stones shrink and gaps grow as it goes. The 40 default jumps stay within about 50 blocks of the start. The goal line is "Cross the void to the gate".
+
+### 19.8 Trial 2: Copy the Structure
+
+*The room.* A big dark oak platform (soul lanterns, roots under it) with the start platform and the exit door at the south edge; looking north, on the left (west) the **model** on a floor with an amethyst outline and on the right (east) the empty **plot**, the same size and the same way
+round, three blocks away, on the same chequered floor with a sea-lantern outline; an aisle between them runs north to the sealed gate. Floating text ("The Model", "Your Plot / Build here, then press Check", which becomes "Correct 41/48" after a check and "Perfect!" at the end).
+In front of the aisle the **console**: two amethyst pillars with a warped button (**Check**) and a cherry button (**Hint**), and the **supply chest** between them. The labels are display entities tracked by the trial.
+
+*The library* (`StructureLibrary`, pure code, `generate(seed, tier[, theme])`): 5 themes and 3 sizes (tier 1 fits 5×5×5, tier 2 9×9×7, tier 3 11×11×9; `structureCopyTier` 2; 0 = a size per player from his seed). **Hut** (a gabled cottage, log corners, stair roof, glass windows, a doorway; from
+tier 2 a plinth and a chimney), **tower** (stone shell with mossy patches, parapet, glass slits; tier 2/3 a plank roof walk, an upside-down slab cornice, a flagpole with a wool flag), **bridge** (a humpback arch of stairs rising 2/3/5 blocks over a tunnel with wall rails and, from tier 2, lanterns),
+**temple** (rings of two wool colours, a pillar colonnade, a two-colour frieze, a slab roof with an open eye, an altar with a lantern; quartz, deepslate/basalt or purpur), **witch's cauldron altar** (magma under a cauldron, a mossy/stone-brick circle, steps, two carved pumpkins, dark-oak posts with log beams and hanging
+soul lanterns). The seed picks the theme and every variable. Every model has 3 to 9 kinds of block (they fit the hotbar and one chest), every block has an item, every block touches another on the way down to the floor, lanterns stand on or hang from something, and no two stairs meet at a corner (the game would round them,
+so two layings would look alike). Tested over 5 themes × 3 tiers × 150 seeds. Average size 60, 159 and 286 blocks (tiers 1 to 3), at most 80, 188 and 324.
+
+*The comparison* (`StructureCompare`, pure): block by block over the footprint and the model's height + 2 layers (scaffolding room; an extra there still counts). A block is right when it is the same block and its **facing, half (stairs), slab type, axis (logs, pillars) and `hanging` (lanterns)** are the same.
+Ignored: stair shape, fence/wall/pane joints, waterlogged, powered, anything else. The result is correct/total and lists of missing, wrong and extra cells; **perfect** = none of them. 47/48 is `percent 97`, never 100.
+
+*Supply* (`StructureSupply`). On entry the player's own backpack (slots 0 to 35 except Scarlet Witch Genes) is put aside, saved in his Road progress, and he is given exactly the kinds of block of the model, `max(16, need × structureCopySupplyPercent ÷ 100)` (150) of each, the first stack of each kind on the hotbar
+(most needed first), the rest in the backpack. Every block carries `custom_data {enhanced_road_supply:1b}` and cannot leave: the stash is returned and every marked stack removed when the trial ends in ANY way (leave, win and step through, time limit, logout (`onLogout` runs before the save),
+operator, server stop), and at login if a crash left them. The supply chest holds 3 full marked stacks of each kind and refills every second; it is emptied before the room is taken down. Breaking a block on the plot is instant (a `BreakSpeed` rule on both sides) and gives the block's item back as marked supply
+(2 for a double slab; glass too); nothing drops on the floor.
+
+*Check and Hint* (`StructureCopyChallenge`, the right clicks in `StructureCopyEvents`). **Check** (cooldown 10 ticks): action bar `Correct n/total`, a chat line `N missing, N wrong, N extra. Look for the glowing marks.` and one of the Road's words (3 variants each for "try" and "close" = 85% or more), and outlines (the 8 corners
+and 12 edge middles of the cell's cube) drawn for 8 s with particles for the player only: blue-green = missing, red dust = wrong, orange dust = extra; at most `structureCopyMarks` (40), the lowest first. A perfect plot wins. **Hint** (cooldown 20 ticks, free): glowing block displays (the Road's teal) of the real blocks that belong in the
+missing (and wrong) cells, at most `structureCopyHintBlocks` (40), lowest first then nearest, for `structureCopyHintSeconds` (8), a wrong block with a slightly bigger ghost around it; off with `structureCopyHints` false. `structureCopyAutoCheck` (true): once a second the Road compares the plot itself and a perfect copy wins without Check.
+
+*Rules in the room.* Place and break only inside the plot volume (its footprint, from the first layer to model height + 2) and only while the trial is active; the model, the floor under the plot, the console, the chest and the platform cannot be built on or broken (a short action-bar reminder only for a block that is refused).
+*No failing:* no health, no timer except the soft `structureCopyTimeLimitSeconds` (5400 = 90 min, 0 none; at the end he is sent home as if he had left and the room is taken down; the framework's `timeLimitTicks` is not used, it would put him back at the start); a fall puts him on the start platform, the build stays. `resumable()` is false: after a logout he
+starts a NEW room (his build is not kept; his things are given back at logout and put aside again at login). Goal line: "Build a copy of the model".
+
+### 19.9 Trial 3: the Ice-Boat Race
+
+*The physics of a boat on ice in 1.21.1* (read from `Boat`, measured on the real entity in GameTests). The rider's **client** moves the boat; the server validates ("moved wrongly" past 0.25 off the server's own collision move) and follows. On land each tick speed is multiplied by the plain friction of the block
+under it (packed ice and ice 0.98, blue ice 0.989, snow block, planks, amethyst 0.6) and W adds 0.04 along the heading (A or D alone 0.005, S -0.005): the top speed is 0.04 ÷ (1 − f): **2.0 blocks a tick (40 blocks a second) on packed ice**, 3.6 (72) on blue ice, 0.1 on snow. A and D add ∓1 degree to a turning speed
+multiplied by the same friction (up to 50 degrees a tick, so the boat spins on if a key is held): the boat turns as fast as anyone needs but cannot change the direction it travels (only the 0.04 push along the heading bends the path): the tightest curve at speed *v* has radius *v*² ÷ 0.04. **A boat climbs nothing** (step height 0: a slab stops it dead), so the course has no ramps up;
+edges down are fine. In the air gravity is 0.04 and speed × 0.9 a tick; it hangs on an edge until its whole box (1.375 wide) is off; a gap is crossed by speed alone (5 blocks of air with the far side 1 lower needs about 0.85 blocks a tick, 17 blocks a second). A boat that lands after a fall of more than 3 blocks breaks, so the trial keeps its fall distance at 0 and makes it invulnerable, and the course has
+no drop above one block except the void. Sneak (Shift) in a boat dismounts the rider (`Player.rideTick`): that is the "stuck? sneak" mechanic.
+
+*The model* (`road/boat/`): `IceBoatModel` (the numbers above as pure functions: terminal speed, turn rate, coast distance, corner speed √(0.5 × 0.04 × R), `airReach`, `minJumpSpeed`, `speedProfile`), `IceTrack` (a course as plain data: lines, pieces, features, checkpoints, loops, and a raster of columns), `IceTrackGenerator` (seeded: straights, quarter turns, S-bends,
+hairpins with a snow braking strip before, narrow stretches (5 wide), snow drifts, snow-wall chicanes, blue-ice stripes (3 wide, 28 long: blue ice's 72 blocks a second is beyond the server's "moved too quickly" check and a child), and loops with a shortcut: a straight across the loop with a 5-block gap, the far side one block lower) and `IceBoatChallenge` (the trial).
+**Generator guarantees** (tested over many seeds): determinism; length within [L, L + 260]; every floor at least 3 wide (normal `boatRaceTrackWidth` 9, narrow 5); every curve a quarter circle with R ≥ 13 (hairpins) or 20 to 50 that a boat can follow at ≥ 10 blocks a second; a straight of ≥ 24 blocks before every curve (a hairpin is preceded by a 44-block straight with a full-width snow strip); every floor cell reachable from the start; inside 436 blocks
+of the cell's middle (the cell allows 450); checkpoints on plain straights; a shortcut = 5-block gap, drop 1, run-up ≥ 70 blocks which gives ≥ 1.5 times the speed the jump needs, saving ≥ 60 blocks. **Winnability proof:** a driver using only W/A/D (`IceBot`: pure pursuit and the physics speed profile) finishes the long way of EVERY tested course (hundreds of seeds, three difficulties, widths 7 to 15, lengths 200 to 1,400) on a
+second simulation of the vanilla boat (`IceBoatSim`, written from the game's code), also a "careless" driver (3-tick delay, 4% random keys), and takes the shortcut in about 99% of the courses where it tries. The simulation is checked against the real `Boat` entity tick by tick (agreement to 1e-5 blocks over 1,500 ticks of a whole course; 1e-3 when walls are rubbed).
+
+*The trial.* The course is drawn on the canvas (packed ice on 2 layers, walls of packed ice 2 high (4 on the outside of curves), a stripped dark oak rail, sea lanterns in the walls, soul lanterns on posts, hanging soul lanterns under the floor, amethyst arches over the start line, the checkpoints and the finish, a purple glass barrier at the start). Start on the Road's usual platform; the boat waits 6 blocks ahead at the start
+line (a checkered stripe), the barrier 5 blocks in front of it; he walks up to the boat (it takes him within 2.4 blocks when he is not sneaking; after he climbs out during the countdown it does not take him again until he has walked 3.5 blocks away). **Countdown** `boatRaceCountdownSeconds` 3 (title 3, 2, 1, "GO!", subtitle "Par time"), the barrier opens, the framework's clock (from the trial's start, so the countdown is part of the time) runs: `boatRaceTimeLimitSeconds` 240.
+**Checkpoint 1 is the start line**; then every ~`boatRaceCheckpointEvery` (100) blocks on a plain straight (amethyst arch, zone 6 deep × the track wide). **Falling** (below the lowest floor ahead − `fallDepth`) or leaving the boat: the boat is REPLACED (a new entity: the only sure way to put the client's idea of the boat right) on the last checkpoint with the player in it. **Sneak out:** back to the checkpoint at most once per `boatRaceRespawnCooldownSeconds` (5);
+an earlier sneak puts him back in the same boat; 4 s without moving: the action bar says how. **Time out** (framework): back to the start platform, boat parked, barrier shut, countdown again. **The finish line** (checkered, arch): the race decides itself (`finish` null): time, par and best; `trial.succeed()`; the boat is removed and he stands on the finish platform in front of the gate.
+HUD: a boss bar (time left, notched, blue → yellow → red; "checkpoint a of b"), the speed in blocks a second in the action bar, snow motes round the boat and aurora motes (`EnergyParticle`, green/blue/violet) high above. **Par time** = `track.parTicks()` (the fastest way through every curve by the model plus a little for snow, walls and drops) × `boatRaceParFactor` (1.4). The best time (ticks since "go") is kept in his saved data (`ice_boat.best`).
+`boatRaceLength` 800 (200 to 1,400), `boatRaceTrackWidth` 9 (7 to 15, odd), `boatRaceDifficulty` 2 (1 easy: wide curves, one hairpin, no snow walls; 3: tighter curves, three hairpins, more snow), `boatRaceShortcuts` 1 (0 to 3), `boatRaceObstacles`, `boatRaceBlueIce`. Goal line: "Sail the ice to the finish". A scripted drive on the real boat tests the whole race (`RoadBoatRunTests`).
+
+### 19.10 The end of the Road
+
+<!-- ROAD-ENDING: this section follows the state of the ending in the ROAD lane's worktree (uncommitted when these docs were written: EndingHall, RoadEnding, endingFarewellSeconds, /road choose). The integrator must check it against the final code: RoadEnding, the hall, the choice, the Gene and the teleport back. -->
+
+The end replaces the stub of `RoadEnding.finish`. The player who has won every trial steps through the last gate and is brought to **`EndingHall`**, a round hall of dark oak and amethyst (radius 9, a dais of radius 2.6 in the middle with a sea lantern, six amethyst pillars with soul lanterns, roots and lichen hanging under it, a door lying in the floor behind him) built in a cell of its own like a trial (it is no trial: nothing is won there and it is not counted; it is held, saved, resumed after a login and taken
+down like one; its id in the ledger is `road_end`). `RoadEnding.arrive`: the Road speaks (title and subtitle), the light gathers for `ASK_DELAY_TICKS` (60), and the Road asks "Seekest thou the Road?" again: `OpenRoadPayload(door, trials, done, total, ending)` opens `WitchesRoadScreen` with the two roads and a button to leave the Road without choosing.
+
+* **The choice** is checked in one place, whatever the client sends (`RoadChoicePayload`: the server goes by where the player is): he is in the hall, in the Road dimension, alive, with no power, his saved progress says every trial is won and he is inside, the hall has asked him, and he carries a Scarlet Witch Gene. Then **one Gene is used up, and only now**, and he awakens exactly as at the door (`Powers.awaken`: title, sound, message to the server).
+* **The farewell.** For `endingFarewellSeconds` (5; 0 to 30; 0 = at once) he is held where he stands in a rising column of light and the Road speaks its farewell; the Road's rules still hold (no ability key, no teleport out). Then `RoadTrials.leave` sends him to the place he entered by, failing that the door he opened, or the world's spawn: his things come back, health and hunger are full, every effect is cleared, the cell is taken down and the Road forgets his progress.
+* **Not choosing.** He may close the screen (the door in the hall and `/road choose` ask again); the button leaves the Road without choosing (`RoadEnding.leaveUnchosen`): back to the entry **with the Gene**, and the door in the world then offers the choice (progress says all trials won).
+* **Logout or crash.** In the hall: at the next login the hall is built again and the question comes back. In the farewell: the power is his already and the login sends him out (`RoadTrials.reconcile`). All the state of the hall is in memory; what lasts is `RoadProgress`.
+
+### 19.11 Commands, configuration, voice, tests
+
+* **Commands.** `/enhanced road status [player]`, `enter <players> [trial]` (numbered from 1, no Gene needed), `leave <players>`, `reset <players> [newcourse]`, `skip <players>`, `set <players> <won>`, `layout [player]`, `cells`; and for everyone `/road leave`, `/road status` and, at the end, `/road choose` (a second root command, because `/enhanced` needs permission level 2 and the way out must be open to all).
+* **Configuration** `[witches_road]`, 35 options (the wiki's Server Configuration page): the Road (`enabled`, `maxPlayers` 32, `courseSeed` 0, `resumeOnLogin`, `resumeAtCheckpoint`, `announce`, `voice`, `healAtCheckpoint`, `fallDepth` 12, `leaveConfirmSeconds` 5, `buildBlocksPerTick` 20,000, `removeBlocksPerTick` 20,000), the Parkour (4), the boat race (11) and the structure copy (8). Constants, not options: the cell spacing 2,048, the course radius 450, 64 cells a row.
+* **The Voice of the Road** speaks in the action bar and the title (`message.enhanced.road.voice.<event>.<n>`, three variants for enter, start, checkpoint, fall, won, leave, back and the structure trial's start, try, close and hint; English and Hebrew). **Sounds** are reused: `witches_road` (a trial opens, go, finish), `road_travel` (in and out), amethyst chimes, note-block hat and pling, boat paddles.
+* **Tests:** `RoadFrameworkTests`, `RoadParkourTests`, `RoadRulesTests`, `RoadLoginTests`, `RoadStopTests`, `RoadDoorTests`, `RoadConfigTests`, `RoadDataTests` (the framework, in batches `road_framework`, `road_parkour`, `road_rules`...), `RoadStructureModelTests`, `RoadStructureTests`, `RoadStructureOptionTests` (the library over 5 × 3 × 150 seeds, the comparison, supply and stash, Check and Hint, a crash),
+  `RoadBoatTrackTests`, `RoadBoatPhysicsTests`, `RoadBoatTests`, `RoadBoatRunTests`. A test that swaps the registry (`RoadChallenges.swap`) has a batch of its own, and a full run needs `run/world` and `run/config/enhanced-server.toml` deleted first. Findings that shaped it: the 3.1 door screen sometimes never showed (the server sent it in the tick the door opened;
+  `OPEN_GRACE_TICKS` 20), a cleared cell with a filled chest spilled its items (entities are now discarded after blocks), and a boat cannot climb a slab (so no ramps).
+
+---
+
+## 20. The sorcerers' books (added in 3.2)
+
+Eilon asked for two items: the **Book of the Vishanti** (a sorcerer can save a place and teleport to it, and raise a protective shield round the base that no monster can enter, larger the stronger the sorcerer) and the **Darkhold** (Agatha's abilities: her purple laser beam, and a retaliation: magic used on the holder poisons for 10 seconds). Both are craftable in Survival and in
+the **Enhanced** creative tab. The player's guide is the wiki page *The Sorcerers' Books*.
+
+### 20.1 Who is a sorcerer
+
+`WardStrength.isSorcerer`: the power is **Loki, the Scarlet Witch or Billy**. Anyone else may hold the books but they only whisper ("The runes swim before your eyes. Only a sorcerer can read this book", "The Darkhold whispers, but only a sorcerer can read it"); `darkhold.anyoneCanUse` (false) lets anyone use the Darkhold.
+
+### 20.2 The Book of the Vishanti
+
+* **Item** `enhanced:book_of_the_vishanti` (`VishantiBookItem`): stack 1, epic, fireproof; an animated 16 × 16 texture (a leather cover, gold corners and clasp, a glowing three-rayed emblem in a ring that pulses; `gen_vishanti.py`, three render-and-inspect rounds). **Recipe** (shaped): `A E A / G B G / A L A` = 4 amethyst shards, an Eye of Ender, 2 gold ingots, a book, a lapis lazuli;
+  the advancement `recipes/equipment/book_of_the_vishanti` unlocks it on getting an Eye of Ender.
+* **Controls.** Use opens the book (`VishantiScreen`: name field, *Save here*, *Save as base*, *Go to my base*, a row per place with *go* and *x*, bases marked, the reader's ward radius; three places a page, up to 24 places); **Sneak + use** goes to the first base. Client → server `VishantiActionPayload`.
+* **Places and the teleport** are the Bifrost's service generalised: `ability/PlaceBook` (`Kind.BIFROST | VISHANTI` = which attachment holds the list and which lang prefix: save, forget, find, safe arrival, cooldown, destination rules, journey: charge, then take); `ThorAbilities` delegates to it with its behaviour unchanged. The record `BifrostData.Place` gained an optional `base` boolean (codec optional, default false;
+  one more BOOL in the stream codec). The Vishanti has its own attachment `vishanti_book` (own list and cooldown). Rules: any dimension; refused by boss arenas (`BossFights.allowsTeleport` asked when the way opens and again at arrival), the Hex wall judge, Mjolnir's pin (all via `HexManager.onTeleport`), `vishanti.deniedDimensions` (default `["enhanced:witches_road"]`; the Road is **always** shut, even if the list is emptied: no saving, no leaving, no entering).
+  `teleportChargeTicks` 20, `teleportCooldown` 600 (refunded if the arrival is refused), `teleportExhaustion` 6.0 (Creative free). Vanilla sounds and particles only (a sorcerer-coloured spark ring).
+* **The ward** is a sphere round a **base** place. `WardStore` (a `SavedData` per dimension, `enhanced_wards`) keeps owner, name, centre and radius; `WardManager` does the look and push, the spawn gate, the refresh and the sync; `WardEvents` the game-bus events; `WardCommands` `/enhanced ward list|remove <player>`. At most `maxWardsPerPlayer` (2) bases; raising or moving one costs `wardCooldown` 200 and `wardExhaustion` 8.0.
+  **Radius** (`WardStrength.radius`, hard cap 128): Wanda `wardRadiusWanda` **48**; Billy lerp(`wardRadiusBillyMin` **12** → `wardRadiusBillyMax` **40**, (rank − 1) ÷ (`maxRank` − 1)) read only through `WardStrength.billyFraction` (`BillyRanks.rank` ÷ `maxRank`): 12, 15, 18, 21, 24, 28, 31, 34, 37, 40 for ranks 1 to 10; Loki `wardRadiusLoki` **24**. It is refreshed at login, every 5 s while the owner is online and on any save or forget.
+* **Effect.** Monsters (`MobCategory.MONSTER`) are refused where a ward is: `MobSpawnEvent.SpawnPlacementCheck` FAIL and `FinalizeSpawnEvent` cancelled (`wardBlocksSpawns`; a spawn egg, command or dispenser spawn is not refused by the event but the look then pushes it out); every `wardCheckTicks` (5) each ward does **one** spatial lookup (`getEntitiesOfClass(Mob, box)`, staggered per ward, only when the ward's centre chunk is
+  entity-ticking, at most 48 monsters a look) and a monster inside is thrown back (`wardPush` 0.8 blocks a tick) when it is within 3 blocks of the edge, else set down just outside on free ground (up to 6 blocks up or down; the throw is the fallback). **Not affected:** the tag `enhanced:ward_immune` (= `#enhanced:bosses` and `#enhanced:boss_minions`, so the Wither, the Ender Dragon, the Warden, the Elder Guardian, Thanos, Ultron, Apocalypse and their helpers),
+  anything in a boss fight or arena, pets with an owner, riders and mounts, and every non-monster. A ward changes **no block** (claim-safe). It cannot be raised in a boss arena, in the Road, or where it would reach into an arena.
+* **Persistence (a decision).** A ward works whenever its chunks are loaded, **whoever is online and whether or not the book is held**; only raising or forgetting needs the book. The ward of an online owner who is no longer a sorcerer sleeps (radius 0, kept, not drawn) and wakes when they are one again. Forgetting a base removes its ward; `/enhanced ward remove` turns all of a player's bases back into plain places.
+* **Look.** `WardSyncPayload` (the awake wards of the dimension; on change, login, dimension change, respawn) and `client/WardFx`: a faint veil and hexagon lines on a sphere in the sorcerer's colour (Wanda crimson, Billy blue, Loki green) and a ground ring, only when the edge is within 64 blocks of the camera; *Reduced motion* stops the drift and the breathing.
+* **Config** `[vishanti]` (16 options) and the tag `enhanced:ward_immune`. **Tests** `ItemsTests` (28, batches `items_vishanti`, `items_ward`, `items_vishanti_shut`, `items_vishanti_cost`, `items_vishanti_boss`, `items_ward_spawns`). Found and fixed in the game: the screen showed one place a page at GUI scale 2 (now three); the arena's ceiling lets the sun in, so the zombies of the push test have Fire Resistance.
+
+### 20.3 The Darkhold
+
+* **Item** `enhanced:darkhold` (`DarkholdItem`; stack 1, epic, fireproof; an animated purple-and-black texture, `gen_darkhold.py`). **Recipe** (shaped, rare on purpose): `N R N / E B E / N S N` = 4 netherite scrap, a wither rose, 2 echo shards, a book, a wither skeleton skull (the rose needs a Wither's kill, the skull a fortress, the shards an ancient city); the advancement `recipes/equipment/darkhold` unlocks it on getting a wither rose.
+* **Who and where.** A sorcerer holds it in either hand (`darkhold.enabled`; anyone with `anyoneCanUse`). None of its powers works in the dimension `enhanced:witches_road`. A small HUD panel (`client/DarkholdHud`) lists the powers while it is held.
+* **The Purple Beam** (**hold use**; the use is held like a bow's, so the holder walks slowly: a vanilla rule of held uses; not R, so it never clashes with a hero's own R). The generic `ContinuousBeam` (21) with the style `DarkholdItem.STYLE` (`darkhold`: core `0xFFFFFF`, inner `0xF0D8FF`, main `0xB45CFF`, body `0x7A2FD6`, fringe `0x3A127A`; the lang name "Purple Beam"). Aimed along the look at the first creature
+  the crosshair meets (blocks stop it); a complete Chaos Shield stops it at its surface; the game's PvP, Creative and boss rules as for Billy's beam. `beamDamagePerSecond` **8** (hits of 2.0 every `beamInterval` 5 ticks, no damage cooldown), `beamRange` 24, `beamExhaustionPerSecond` 1.0 (Creative free). Damage type `enhanced:darkhold_beam` (in `bypasses_cooldown`, `no_knockback`, `panic_causes`; death messages in both languages).
+  It needs food ("Too hungry to fire the Purple Beam"); it ends on release, when the book is put away, on hunger, Spectator and logout. **Billy** holding it fires this beam, not his own (his Hex Beam tick does not run while the Darkhold's beam is the one burning). The Chaos Beam loop at pitch 0.75 is its sound.
+* **Retaliation** (passive, held). When a hit of the damage tag `enhanced:magic_damage` (the mod's Hex Bolt and Beam, Chaos Beam, lightning beam, telekinetic slam, Mind Stone and its beam, the stones' powers, the Phoenix Burst, the purple beam, and the game's `magic` and `indirect_magic`: witch potions) lands on the holder, the **attacker** (`poisonTarget` `ATTACKER`, or `HOLDER`)
+  gets Poison for `poisonTicks` **200** (10 s) at level `poisonAmplifier` 0; the same attacker is not poisoned again for `poisonCooldownTicks` 40. It answers the *use* of magic even if a Chaos Shield stops the hit; a hit with no living attacker, or the holder's own, answers nothing; undead are immune to poison by the game's own rule.
+* **Hex mark** (**Sneak + use** at a creature within `markRange` 24): it glows, gets Slowness (`markSlowAmplifier` 1) and takes `markDamageBonus` 0.5 more (×1.5) damage from the one who marked it, for `markTicks` 200; `markCooldown` 100, `markExhaustion` 2.0; another player only where the marker could harm them (PvP).
+* **Mind glimpse** (**Sneak + use** at no creature): every living creature within `glimpseRange` 24 (the nearest `glimpseMax` 16) glows for `glimpseTicks` 100, and the action bar says how many and the nearest one's name and health ("The Darkhold shows 2 creatures. Nearest: Zombie, 5.0 of 20 health"); `glimpseCooldown` 200, `glimpseExhaustion` 1.0.
+* **Config** `[darkhold]` (24 options), the tag `enhanced:magic_damage`. Server state (marks, cooldowns, who fires) is in static maps cleared on server stop (`DarkholdEvents`). **Tests** `DarkholdTests` (17, batches `items_darkhold`, `_anyone`, `_beam`, `_billy`, `_pvp`, `_holder`, `_marks`, `_glimpse`).
+
+---
+
+## 21. The beam system (added in 3.2)
+
+Billy's Hex Beam and the Darkhold's Purple Beam share one infrastructure; a third beam needs no copy of the renderer, the payload or the server logic.
+
+* `beam/BeamStyle` (record, common): `id` (wire name), `nameKey`, the palette `core`, `inner`, `main`, `body`, `fringe` (white-hot to dark fringe) and `offHand`. `beam/BeamStyles`: the registry (`BILLY` = `billy_hex`, blue `0x5CC8FF` with a white-hot core and a dark blue fringe; `DarkholdItem.STYLE`). A style is registered once in a static initialiser both sides load.
+* `beam/BeamSpec` (record): `style, range, damage (per hit), interval (ticks between hits), exhaustion (per tick), damageType, onHit`. The source works it out every tick from its own config. Its damage type is in the tags `bypasses_cooldown`, `no_knockback` and `panic_causes`, so every hit lands.
+* `beam/ContinuousBeam` (server): `start(player, style, range)` when the key goes down (sets `Live.BEAMING`, sends `BeamPayload`), `tick(player, spec)` every tick while held (hunger exhaustion, a crosshair raycast that hits creatures, dragon parts and crystals and is stopped by blocks, a complete Chaos Shield stopping it at its surface and paying, damage every `interval` ticks, sparks, a keep-alive payload every 8 ticks), `stop`, `isFiring`, `forget`, `clear`.
+  The caller decides when to stop (key up, hunger, Spectator).
+* `network/BeamPayload(shooter id, style id, range, on)` (server → clients) and the client `BeamRenderer`, which draws every active beam in its style's palette, with strands, forks and flares at both ends; clients find the end by looking along the shooter's view. Animation: `Live.BEAMING` drives `Stance.BEAM_HAND` (an arm out along the look, the other braced; first person too) for any power; `GestureRoutes.live` gives the start gesture. Sound: `PowerLoopSounds.Kind.HEX_BEAM` (the Chaos Beam sound at pitch 1.3) and the Darkhold's.
+* **Billy's Hex Beam** (6.4) and **Hex Barrier** (6.5) are built on it and on the synced Chaos Shield fields of `PowerData`. Tests: `abw_beam_*`, `abw_barrier_*`, `AbwShieldTests`.
+
+---
+
+## 22. What else changed in 3.2, and how it was put together
+
+* **Apocalypse was weakened** (17.3 to 17.6): one master factor `apocalypse_boss.powerFactor` (0.65) and retuned defaults; `ApocalypseBossConfig.power/dealt/count/slower`. Existing mechanics tests set `powerFactor` to 1.0 (`ApocalypseTestSupport.fixture`) so they keep the 3.1 pacing; `AbwApocalypseTests` (5, batches `abw_apocalypse_*`) test the new numbers.
+* **Wanda's Chaos Shield is unlimited** (2.3 ability 4): `scarlet_witch.shieldUnlimited` (true); `TestKit.fixture()` switches it off for the 52 old shield tests (`AbwShieldTests`, 5 tests, cover both modes).
+* **Build Magic**: Billy's ten ranks (18.6) and Wanda's Instant level (18.14).
+* **Network protocol "6"** (a 3.1 client cannot join a 3.2 server): the new payloads `BeamPayload`, `VishantiActionPayload`, `WardSyncPayload`, the changed `OpenRoadPayload(door, trials, done, total)` and `RoadChoicePayload(door, Power.NONE)` ("Walk the Road"), `BuildActionPayload.INSTANT`, `BuildFxPayload.POP` and the extra field of `BuildData` (`instant`, not saved). `SkeletonTests.theProtocolIsSix` pins it.
+* **Shared files** were edited additively by the lanes (`EnhancedConfig`, lang files, `ModNetwork`, `ModAttachments`, `ModTags`, `ModItems`, `ClientSetup`, `PowerHud`, `PowerTicker`, `HexManager.onTeleport` and `AbilityHandler.onKey` got one hook each for the Road), then merged in the order ABW → ITEMS → BUILD → ROAD.
+* **Tests.** 3.1 shipped 1,315 game tests; the last merged tree of 3.2 before the Road's ending passes **1,471** (`All 1471 required tests passed`, about 5.4 minutes). The lanes added: the Apocalypse, shield, beam and barrier tests (`Abw*Tests`), 6 for Build Magic (`BuildInstantTests`, and `V31SkeletonTests` now checks all ten ranks), the Book of the Vishanti (28) and the Darkhold (17), and the Road's. A full run needs `run/world` and `run/config/enhanced-server.toml` deleted first (a generated server file from 3.1 keeps the old defaults).
+  `theIslandIsSafeFromEveryFeature` (V31CrossTests) failed in a few early runs under load (the 2 ms preview of the cast timed out); its test now stands the preview's clock still.
+* **Known rough edges.** The javadoc of `ApocalypseShield.strengthFor` and of the `/enhanced build rank [1-4]` line in `BuildCommands` still quote the 3.1 numbers. `mod_version` is still 3.1.0 in `gradle.properties` until the release.

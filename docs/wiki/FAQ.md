@@ -4,7 +4,7 @@
 
 ### How do I become a hero?
 
-Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open, a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, or, for Thanos, Ultron and Apocalypse, a boss to beat. See [Becoming a Hero](Becoming-a-Hero).
+Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open (and the three trials behind it), a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, or, for Thanos, Ultron and Apocalypse, a boss to beat. See [Becoming a Hero](Becoming-a-Hero).
 
 ### I touched Loki's Scepter and died. Why?
 
@@ -53,7 +53,7 @@ Mjolnir can't pin the bosses (the Ender Dragon, the Wither and the Warden), play
 
 ### Can Billy build as big as Wanda?
 
-Not at first. Wanda's magic has no limit; Billy's is an apprentice's: a meter of 512 blocks that refills 16 a second, 24 blocks on a side, 24 blocks of reach, 10 undos, one spell at a time. It grows as he practises (every block he builds counts), up to Wiccan, who is four times as strong. Near a Scarlet Witch his spells cost half. See [Build Magic](Build-Magic#billy-an-apprentice-who-learns).
+Not at first. Wanda's magic has no limit; Billy's is an apprentice's: a meter of 512 blocks that refills 16 a second, 24 blocks on a side, 24 blocks of reach, 10 undos, one spell at a time. It grows as he practises (every block he builds counts) through ten ranks, up to the Chaos Master, whose meter is 64 times as big (and whose Hex Beam is twice as strong). Near a Scarlet Witch his spells cost half. See [Build Magic](Build-Magic#billy-an-apprentice-who-learns).
 
 ### Can someone wreck my house with Build Magic?
 
@@ -70,6 +70,52 @@ It is built not to. Every spell is cut into small slices, and all the spells of 
 ### Why are some keys red in the Controls screen?
 
 Build Magic uses Ctrl + Z, Ctrl + Y, Ctrl + R, Ctrl + F, Ctrl + C, Ctrl + X and Ctrl + V, and Minecraft's Controls screen marks a key as clashing when it shares a key with another, even though the game sends each press to the right place (Ctrl + Z of a witch never reaches Wanda's Z). So you will see red marks on those keys and on the keys they share (Sprint, Swap Item With Offhand, the toolbar keys, and the mod's **R**, **V**, **Z** and **Y**). It is only the screen being careful. See [Controls](Controls#build-magic-y).
+
+## The Witches' Road, the books and the new powers
+
+### I opened the Witches' Road Door and it did not ask me to choose Billy or Tommy. Why?
+
+Since 3.2 the door asks you to **walk the Road** first: three trials (a Parkour, a structure to copy and an ice-boat race), and only at the end do you choose. A server can switch the trials off with `witches_road.enabled`; then the door is the instant choice of 3.1. See [The Witches' Road](Witches-Road).
+
+### I fell off the Road. Did I lose my Gene?
+
+No. Nothing on the Road can hurt you or take your Gene: a fall (or anything that would kill you) puts you back at your last checkpoint. The Gene is used up only at the end, when you choose. You can also leave at any time (right-click the exit door twice, or type `/road leave`) and keep it.
+
+### Can my friends come with me on the Road?
+
+No. Each player walks in a place of their own and nobody sees anybody (this is on purpose, to keep it simple and safe). Your friends can cheer from the world, and the server is told in chat when you win a trial.
+
+### I cannot use my power, or the Book of the Vishanti, on the Road.
+
+That is the rule: the Road is for people with no power, and the books are shut there, so the trials stay the trials.
+
+### The boat does not move, or I am stuck. What do I do?
+
+Hold **W**. If you are stuck against a wall or in the snow, press **Shift**: it puts you back on the last checkpoint, in a new boat (at most once every 5 seconds). The checkpoints cost nothing. See [The Witches' Road](Witches-Road#trial-3-the-ice-boat-race).
+
+### Why can't I use the Book of the Vishanti or the Darkhold?
+
+Only a **sorcerer** (Loki, the Scarlet Witch or Billy) can read them. Anyone else hears the runes whisper. A server can let anyone use the Darkhold with `darkhold.anyoneCanUse`. See [The Sorcerers' Books](Sorcerers-Books).
+
+### Do I have to be nearby for my base's ward to work?
+
+No. A ward keeps working whoever is online, as long as its land is loaded. Only raising or forgetting it needs the book. No monster can spawn or stay inside it; bosses, pets and non-monsters are not affected. An operator can list and remove wards with `/enhanced ward`.
+
+### Why does the Chaos Shield never run out?
+
+Since 3.2 it is unlimited: no hunger, no strength, no time limit, no recharge. It still takes three quarters of a second to form and still stops exactly what it stopped before. A server that wants the old limits sets `scarlet_witch.shieldUnlimited` to `false`. See [Scarlet Witch](Scarlet-Witch#4-chaos-shield).
+
+### What is Instant?
+
+Wanda's Instant level: in build mode, **Ctrl + I** makes her spells, undos and redos appear all at once instead of growing. It works up to 250,000 blocks a spell; a bigger one goes at normal speed. See [Build Magic](Build-Magic#the-instant-level-ctrl--i).
+
+### Why is Apocalypse easier than before?
+
+Because 3.2 weakened him: `apocalypse_boss.powerFactor` is 0.65, so he hits for about two thirds of the old damage, calls fewer lances, Horsemen and tornadoes and attacks more slowly, and his first shield is 100 instead of 150. Put the factor back to 1.0 for the old fight. See [Apocalypse](Apocalypse#how-strong-he-is-the-master-factor).
+
+### The Darkhold poisoned me! Why?
+
+It does not poison its holder by default: it poisons whoever **used magic on the holder**. If you are the one poisoned, the person who hit you with magic was holding a Darkhold. (A server can swap this with `darkhold.poisonTarget`.) Milk cures poison.
 
 ## Magneto
 
@@ -236,7 +282,7 @@ Craft a **Capstone** (a Nether Star, five Gold Blocks and a Lapis Block) and **S
 
 ### Why does nothing hurt Apocalypse?
 
-While his golden shield is up, **everything but mind power does exactly nothing to him**: arrows, swords, Mjolnir, lightning, shrapnel, the Mind Stone, tamed wolves, TNT. Only the **Scarlet Witch's Chaos Beam and what she throws with telekinesis**, and the **Phoenix's Burst, her throws and her mind powers**, wear it down. When it breaks he kneels for ten seconds and **everyone** can hurt him, down to a floor; then a stronger shield forms. Bring one of the two, then bring everyone else for the windows. See [Apocalypse](Apocalypse#the-shield-the-one-rule).
+While his golden shield is up, **everything but mind power does exactly nothing to him**: arrows, swords, Mjolnir, lightning, shrapnel, the Mind Stone, tamed wolves, TNT. Only the **Scarlet Witch's Chaos Beam and what she throws with telekinesis**, and the **Phoenix's Burst, her throws and her mind powers**, wear it down. When it breaks he kneels for twelve seconds and **everyone** can hurt him, down to a floor; then a stronger shield forms. Bring one of the two, then bring everyone else for the windows. See [Apocalypse](Apocalypse#the-shield-the-one-rule).
 
 ### Why does Apocalypse take so little from my sword?
 

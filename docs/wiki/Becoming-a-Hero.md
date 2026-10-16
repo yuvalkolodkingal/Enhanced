@@ -18,7 +18,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Scarlet Witch](Scarlet-Witch) | Find the very rare **Scarlet Witch Gene**. Hold it in one hand and use **Loki's Scepter** with the other to touch the Mind Stone (**without the gene, you explode**), or use the **Tesseract** with the other hand instead. |
 | [Quicksilver](Quicksilver) | Craft **Quicksilver's Goggles** (sugar, iron ingots, glass panes and a Block of Diamond) and put them on. |
 | [Vision](Vision) | Craft a **Synthezoid Core** (Blocks of Redstone, Netherite Ingots and a Nether Star). Hold it in one hand and use **Loki's Scepter** with the other. |
-| [Tommy](Tommy) or [Billy](Billy-and-the-Witches-Road) | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors and an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
+| [Tommy](Tommy) or [Billy](Billy-and-the-Witches-Road) | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors and an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene**, walk the three trials of the Road, and choose which of Wanda's sons you become. |
 | [Loki](Loki) | Find the **Tesseract** and use it: you vanish in a blue flash and reappear far away, as Loki. (With a **Scarlet Witch Gene** in your other hand it makes you the Scarlet Witch instead.) |
 | [Thor](Thor) | Forge **Mjolnir** (Netherite Ingots, a Nether Star, a Heavy Core and a Breeze Rod). Only the worthy can lift it, and the first worthy player who lifts it claims it for good. Lift it, and lightning makes you Thor. |
 | [Phoenix](Phoenix) | Find a very rare **Phoenix Ember** in a chest (End City, Bastion, Ancient City, Stronghold library, Nether Fortress and Woodland Mansion chests), hold it with no power, and **hold right-click for 3 seconds**. The Ember burns into you and you awaken as Jean Grey. |
@@ -54,10 +54,11 @@ Craft the **Synthezoid Core**, hold it in one hand and use **Loki's Scepter** wi
 ### Tommy and Billy
 
 1. Craft a **Witches' Road Door** and place it in the floor.
-2. As a player with no power, right-click it while holding a **Scarlet Witch Gene**. A ring of blue-green light runs around the door, the doors open onto a spiral stair, and the Road asks: **"Seekest thou the Road?"**
-3. Choose **Billy: Wiccan** or **Tommy: Speed**. One gene is used up. Anyone else holding a gene can join the ritual and choose too.
+2. As a player with no power, in Survival mode, right-click it while holding a **Scarlet Witch Gene**. A ring of blue-green light runs around the door, the doors open onto a spiral stair, and the Road asks: **"Seekest thou the Road?"** Press **Walk the Road**.
+3. Walk the **three trials** of [The Witches' Road](Witches-Road), alone, in a place of your own: a Parkour over the void, a structure to copy block by block, and a long ice-boat race. Each success opens the next; falling never hurts, and you can leave at any time with your Gene.
+4. At the end of the Road, choose **Billy: Wiccan** or **Tommy: Speed**. One gene is used up, and you are taken back to the place where you came in. <!-- ROAD-ENDING: planned ending, see Witches-Road -->
 
-Without a gene the door won't open ("The Road only opens for witch blood"). A hero already "walks their own road". See [Billy and the Witches' Road](Billy-and-the-Witches-Road).
+Without a gene the door won't open ("The Road only opens for witch blood"). A hero already "walks their own road". (A server can switch the trials off with `witches_road.enabled`; the door then gives the instant choice of 3.1.) See [Billy and the Witches' Road](Billy-and-the-Witches-Road).
 
 ### Loki
 
@@ -111,6 +112,6 @@ A server can switch Ultron off. Operators can start the fight without the Progra
 
 ### Apocalypse
 
-Apocalypse is the end of a fight, and the only hero who needs a friend with a particular power. Craft the **Capstone** and **Sneak + right-click it on sand** (or sandstone) in daylight under the open sky: a wall of sand rises round a circle of 24 blocks, a violet portal opens and **En Sabah Nur steps out**, inside a golden shield that **stops everything except mind power**. The ritual refuses unless a **Scarlet Witch or a Phoenix** is within 64 blocks, because only they can break the shield; bring them, and bring a team for the ten-second windows when it shatters. Beat him (three shields, three phases, the Four Horsemen, the fall of his armour) and **every fighter who stayed a minute and hurt him or his shield** gets the **Essence of En Sabah Nur**, and so does whoever struck the last blow. **Hold the Essence for three seconds with no power** and you become Apocalypse. The Capstone is used up when the ritual starts and given back if the fight fails for a reason that was not yours. The fight is on [Apocalypse](Apocalypse).
+Apocalypse is the end of a fight, and the only hero who needs a friend with a particular power. Craft the **Capstone** and **Sneak + right-click it on sand** (or sandstone) in daylight under the open sky: a wall of sand rises round a circle of 24 blocks, a violet portal opens and **En Sabah Nur steps out**, inside a golden shield that **stops everything except mind power**. The ritual refuses unless a **Scarlet Witch or a Phoenix** is within 64 blocks, because only they can break the shield; bring them, and bring a team for the twelve-second windows when it shatters. Beat him (three shields, three phases, his Horsemen, the fall of his armour) and **every fighter who stayed a minute and hurt him or his shield** gets the **Essence of En Sabah Nur**, and so does whoever struck the last blow. **Hold the Essence for three seconds with no power** and you become Apocalypse. The Capstone is used up when the ritual starts and given back if the fight fails for a reason that was not yours. The fight is on [Apocalypse](Apocalypse).
 
 Once you hold the Essence you are Apocalypse: **sand waves and entombing** on **R**, **levitation** on **G**, a violet **portal** on **V**, a **golden shield** that stops everything but mind power on **B**, and **power bestowal** (and, with Sneak, a **sandstorm**) on **N**. You can give the Essence to a friend who has no power. See [the hero](Apocalypse#becoming-apocalypse-the-hero).

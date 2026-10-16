@@ -2,7 +2,7 @@
 
 Every balance number of the mod lives in one file, **`world/serverconfig/enhanced-server.toml`** in the world (or server) folder. The mod creates it when the world is first loaded, with every option at its default, and syncs it to the clients. It is a plain text file: open it in any editor, change a value and restart the world or the server.
 
-The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
+The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti) and the [Darkhold](#the-darkhold) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
 
 ```toml
 [scarlet_witch]
@@ -61,13 +61,14 @@ Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 | `scarlet_witch.chaosBeamDamage` | `5.0` | 0.0 to 100.0 | Damage per Chaos Beam hit (5 = 2.5 hearts). Minecraft's damage cooldown allows two hits per second. |
 | `scarlet_witch.chaosBeamRange` | `32` | 4 to 128 | Range in blocks of the Chaos Beam, and also of Vision's Mind Stone beam. |
 | `scarlet_witch.chaosBeamNauseaTicks` | `100` | 0 to 6000 | Duration of the Nausea the Chaos Beam inflicts, in ticks (100 = 5 seconds). |
-| `scarlet_witch.chaosShieldExhaustion` | `0.1` | 0.0 to 4.0 | Food exhaustion per tick while the Chaos Shield is held (4.0 exhaustion = 1 food point, so 0.1 is about 1 food point every 2 seconds). |
+| `scarlet_witch.chaosShieldExhaustion` | `0.1` | 0.0 to 4.0 | The old rules (only when `shieldUnlimited` is `false`): Food exhaustion per tick while the Chaos Shield is held (4.0 exhaustion = 1 food point, so 0.1 is about 1 food point every 2 seconds). |
 | `scarlet_witch.chaosShieldExplosionFactor` | `0.25` | 0.0 to 1.0 | Fraction of explosion damage that still gets through the Chaos Shield (0.25 = 75% less). |
 | `scarlet_witch.chaosShieldWindUpTicks` | `15` | 0 to 200 | How long the Chaos Shield takes to form after B is pressed, in ticks (15 = 3/4 of a second). It blocks nothing until it is complete. Her raise (arms and effects) keeps time with it. |
-| `scarlet_witch.chaosShieldMaxTicks` | `160` | 1 to 6000 | How long a complete Chaos Shield can be held before it drops, in ticks (160 = 8 seconds). |
-| `scarlet_witch.chaosShieldStrength` | `30.0` | 1.0 to 1000.0 | Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down: the damage of a projectile, and the explosion damage it takes away. |
-| `scarlet_witch.chaosShieldCooldown` | `120` | 0 to 6000 | Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds). |
-| `scarlet_witch.chaosShieldBrokenCooldown` | `300` | 0 to 6000 | Ticks before the Chaos Shield can be raised again after it shattered or was held to its limit (300 = 15 seconds). |
+| `scarlet_witch.chaosShieldMaxTicks` | `160` | 1 to 6000 | The old rules (only when `shieldUnlimited` is `false`): How long a complete Chaos Shield can be held before it drops, in ticks (160 = 8 seconds). |
+| `scarlet_witch.chaosShieldStrength` | `30.0` | 1.0 to 1000.0 | The old rules (only when `shieldUnlimited` is `false`): Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down: the damage of a projectile, and the explosion damage it takes away. |
+| `scarlet_witch.chaosShieldCooldown` | `120` | 0 to 6000 | The old rules (only when `shieldUnlimited` is `false`): Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds). |
+| `scarlet_witch.chaosShieldBrokenCooldown` | `300` | 0 to 6000 | The old rules (only when `shieldUnlimited` is `false`): Ticks before the Chaos Shield can be raised again after it shattered or was held to its limit (300 = 15 seconds). |
+| `scarlet_witch.shieldUnlimited` | `true` | `true` or `false` | 3.2: the Chaos Shield is unlimited. It costs no hunger, has no strength to wear down, never shatters, never runs out of time and needs no recharge after it drops (it still takes `chaosShieldWindUpTicks` to form, and it stops exactly what it stops today). `false`: the old rules, with `chaosShieldExhaustion`, `chaosShieldStrength`, `chaosShieldMaxTicks`, `chaosShieldCooldown` and `chaosShieldBrokenCooldown`. |
 | `scarlet_witch.blockLiftRange` | `24` | 2 to 128 | How far away (in blocks) Wanda and the Phoenix can tear a block out of the ground (Billy and Magneto have their own). |
 | `scarlet_witch.blockLiftMaxHardness` | `5.0` | 0.0 to 100.0 | The hardest block Wanda and the Phoenix can lift (stone = 1.5, iron block = 5, obsidian = 50; Billy and Magneto have their own). |
 | `scarlet_witch.hexDefaultRadius` | `32` | 4 to 256 | Radius, in blocks, of a newly created Hex. |
@@ -114,22 +115,44 @@ Section `[quicksilver]`. The hero's page is [Quicksilver](Quicksilver).
 
 ## Billy (Wiccan)
 
-Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road). His block lifting (3.1) is here; his Build Magic numbers are in [Build Magic](#build-magic).
+Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road). His block lifting (3.1), his Hex Beam and his Hex Barrier (3.2) are here; his Build Magic numbers are in [Build Magic](#build-magic).
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `billy.flightSpeed` | `0.08` | 0.01 to 0.5 | Billy's flying speed (Creative flight is 0.05). |
-| `billy.hexBoltDamage` | `6.0` | 0.0 to 100.0 | Damage of a Hex Bolt to the creature it strikes. Each creature it forks to takes half. |
+| `billy.hexBoltDamage` | `6.0` | 0.0 to 100.0 | (Used when `billy.beam` is `false`.) Damage of a Hex Bolt to the creature it strikes. Each creature it forks to takes half. |
 | `billy.freezeDuration` | `100` | 1 to 1200 | How long, in ticks, Billy's Freeze holds creatures spellbound (100 = 5 seconds). |
 | `billy.noiseRange` | `32` | 4 to 64 | How far away (in blocks) Billy hears the thoughts of creatures while The Noise is on. |
 | `billy.blockLifting` | `true` | `true` or `false` | Whether Billy's telekinesis tears blocks out of the ground and sets them down. If `false`: creatures, items and projectiles only (as in 3.0). |
 | `billy.blockLiftRange` | `16` | 2 to 128 | How far away (in blocks) Billy can tear a block out of the ground. |
 | `billy.blockLiftMaxHardness` | `3.0` | 0.0 to 100.0 | The hardest block Billy can lift (stone = 1.5, ores = 3, iron block = 5). |
 | `billy.blockLiftCooldown` | `20` | 0 to 200 | Ticks between two blocks Billy tears out (catching anything else never waits). |
+| `billy.beam` | `true` | `true` or `false` | 3.2: **R** is a continuous Hex Beam: held down, a beam leaves his hand along his look and hurts what the crosshair is on. If `false`: the old single Hex Bolt (`hexBoltDamage`), which forks to creatures near the one it struck. |
+| `billy.beamDamagePerSecond` | `6.0` | 0.0 to 200.0 | Damage a second of the Hex Beam does to what the crosshair is on, at his first rank (6 = three hearts). It lands every `beamInterval` ticks, in equal parts, and grows with his Build Magic rank (`beamRankDamageBonus`). |
+| `billy.beamRange` | `20` | 4 to 128 | How far (in blocks) the Hex Beam reaches at his first rank. It grows with his Build Magic rank (`beamRankRangeBonus`). |
+| `billy.beamInterval` | `5` | 1 to 40 | Ticks between two hits of the Hex Beam (5 = four hits a second). The beam ignores the creature's damage cooldown, so every hit lands. |
+| `billy.beamExhaustionPerSecond` | `0.8` | 0.0 to 40.0 | Food exhaustion a second of the Hex Beam costs (4.0 = 1 food point; the old bolt cost none). He cannot fire it on an empty stomach. |
+| `billy.beamRankDamageBonus` | `1.0` | 0.0 to 10.0 | How much stronger the beam is at his highest rank (`build_magic_billy.maxRank`) than at his first, as a fraction: 1.0 = twice the damage. In between it grows evenly with the rank (rank 1: none). |
+| `billy.beamRankRangeBonus` | `1.0` | 0.0 to 10.0 | The same for the range: 1.0 = twice as far at his highest rank. |
+| `billy.barrier` | `true` | `true` or `false` | 3.2: Sneak + **B**, held, raises Billy's Hex Barrier: a plate of blue magic in front of him that stops projectiles, blows and part of explosions coming from the front (see `barrierArc`), but only up to `barrierStrength`, for `barrierDuration` ticks, and then it has to recharge (B's recharge, shared with Freeze). If `false`: the key does nothing. |
+| `billy.barrierStrength` | `20.0` | 1.0 to 1000.0 | Points of damage the Hex Barrier stops before it breaks, at his first rank (20 is two thirds of what Wanda's Chaos Shield held, which a Scarlet Witch can now hold without end). Everything it stops wears it down. It grows with his Build Magic rank (`barrierRankStrengthBonus`). |
+| `billy.barrierDuration` | `100` | 10 to 6000 | How long (in ticks) a complete Hex Barrier can be held, at his first rank (100 = 5 seconds). It grows with his Build Magic rank (`barrierRankDurationBonus`). |
+| `billy.barrierRankStrengthBonus` | `2.0` | 0.0 to 20.0 | How much stronger the Hex Barrier is at his highest rank (`build_magic_billy.maxRank`) than at his first, as a fraction: 2.0 = three times the strength. In between it grows evenly with the rank. |
+| `billy.barrierRankDurationBonus` | `1.0` | 0.0 to 20.0 | The same for how long it can be held: 1.0 = twice as long at his highest rank. |
+| `billy.barrierWindUpTicks` | `8` | 0 to 100 | How long (in ticks) the Hex Barrier takes to form after the key goes down. It stops nothing until it is complete. |
+| `billy.barrierCooldown` | `200` | 0 to 6000 | Ticks before **B** can be used again after the barrier was lowered or ran out of time (200 = 10 seconds). |
+| `billy.barrierBrokenCooldown` | `400` | 0 to 6000 | Ticks before **B** can be used again after the barrier broke (400 = 20 seconds). |
+| `billy.barrierExhaustionPerSecond` | `0.4` | 0.0 to 40.0 | Food exhaustion a second of the Hex Barrier costs (4.0 = 1 food point). He cannot raise it on an empty stomach. |
+| `billy.barrierArc` | `60.0` | 10.0 to 90.0 | Half the angle (in degrees) of the arc in front of him that the barrier covers: a blow, a projectile or an explosion from further round than this (from the side or from behind) is not stopped at all. |
+| `billy.barrierWidth` | `1.4` | 0.5 to 6.0 | Width (in blocks) of the plate the barrier is drawn as. |
+| `billy.barrierHeight` | `2.4` | 0.5 to 6.0 | Height (in blocks) of the plate. |
+| `billy.barrierDistance` | `1.6` | 0.8 to 4.0 | How far (in blocks) in front of him the plate is held; projectiles are stopped when they reach it. |
+| `billy.barrierSpeedFactor` | `0.6` | 0.1 to 1.0 | How fast he walks while the barrier is raised (1.0 = as usual, 0.6 = at three fifths of the speed). |
+| `billy.barrierExplosionFactor` | `0.5` | 0.0 to 1.0 | The fraction of the damage of an explosion in front of him that still gets through the barrier (the Chaos Shield lets a quarter through). |
 
 ## Build Magic
 
-Sections `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]`. The page is [Build Magic](Build-Magic). In a comment, an option of Billy's or Wanda's is always written with its section (`build_magic_billy.meter`), never as `billy.x`, which is the `[billy]` section of his other powers. Billy's numbers are those of his first rank, an Apprentice: the ranks grow from them. A family that wants him as strong as his mother sets `build_magic_billy.maxRank` to 4, the three practice numbers to 0 and a large meter. Every value is read when it is used, so editing the file changes it live.
+Sections `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]`. The page is [Build Magic](Build-Magic). In a comment, an option of Billy's or Wanda's is always written with its section (`build_magic_billy.meter`), never as `billy.x`, which is the `[billy]` section of his other powers. Billy's numbers are those of his first rank, an Apprentice: the ranks grow from them. A family that wants him as strong as his mother sets the nine practice numbers to 0 and a large meter (`maxRank` is 10 already). Every value is read when it is used, so editing the file changes it live.
 
 ### `[build_magic]`: every builder
 
@@ -186,22 +209,30 @@ Her magic has no gameplay limit: what is here is technical safety, and a few swi
 | `build_magic_wanda.brushMax` | `16` | 1 to 64 | Her biggest Paint, Land and Grow brush (radius). Technical, not a limit of her magic: a brush pulse every 4 ticks of radius 16 is about 17,000 blocks, which the server keeps up with while she sweeps; at 32 (137,000) the stroke would trail seconds behind the cursor. |
 | `build_magic_wanda.shapeMaxRadius` | `512` | 8 to 1024 | Her biggest shape (radius). |
 | `build_magic_wanda.repeatMax` | `0` | 0 to 65536 | 0 = no count, only the spell's blocks. Otherwise the most copies in a Repeat. |
+| `build_magic_wanda.instantMaxBlocks` | `250000` | 0 to 100000000 | Her Instant level (3.2): while its switch is on in build mode, a spell, an undo or a redo of at most this many blocks is written all at once, in the tick it is cast (no growing, no waiting). A bigger one goes at normal speed and she is told. 0 = no Instant level at all. Every rule still holds: arenas, claims, Hexes and loaded chunks only. The server stands still while it writes: 250,000 blocks take about a second, a million about four (with the undo kept on disk), so raise this only on a strong server. |
+| `build_magic_wanda.instantMaxMillis` | `5000` | 100 to 50000 | The longest time (in milliseconds) one Instant spell may hold the server's tick (never more than a third of the server's `max-tick-time`, which kills a server stuck for longer). When the time is up, the blocks left are written at normal speed over the next ticks and she is told. |
 
 ### `[build_magic_billy]`: Billy, and how he learns
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `build_magic_billy.enabled` | `true` | `true` or `false` | Billy has Build Magic. |
-| `build_magic_billy.meter` | `512` | 16 to 65536 | His magic meter (in blocks) as an Apprentice; it doubles with each rank. |
-| `build_magic_billy.refill` | `16.0` | 0.0 to 4096.0 | Blocks of magic he gets back each second as an Apprentice; half of it more each rank. |
-| `build_magic_billy.maxSide` | `24` | 1 to 256 | The longest side of anything he builds, copies or selects as an Apprentice; +8 each rank. |
-| `build_magic_billy.reach` | `24` | 2 to 128 | How far (in blocks) he points as an Apprentice; +8 each rank. |
-| `build_magic_billy.undoSteps` | `10` | 1 to 100 | Spells he can undo as an Apprentice; +2 each rank. |
-| `build_magic_billy.repeatMax` | `8` | 1 to 64 | The most copies in a Repeat as an Apprentice; +4 each rank. |
+| `build_magic_billy.meter` | `512` | 16 to 65536 | His magic meter (in blocks) as an Apprentice; it doubles with each rank to rank 4, and reaches 64 times as much at rank 10. |
+| `build_magic_billy.refill` | `16.0` | 0.0 to 4096.0 | Blocks of magic he gets back each second as an Apprentice; half of it more each rank to rank 4, 12 times as much at rank 10. |
+| `build_magic_billy.maxSide` | `24` | 1 to 256 | The longest side of anything he builds, copies or selects as an Apprentice; +8 each rank (96 at rank 10). |
+| `build_magic_billy.reach` | `24` | 2 to 128 | How far (in blocks) he points as an Apprentice; +8 each rank (96 at rank 10). |
+| `build_magic_billy.undoSteps` | `10` | 1 to 100 | Spells he can undo as an Apprentice; +2 each rank (28 at rank 10). |
+| `build_magic_billy.repeatMax` | `8` | 1 to 64 | The most copies in a Repeat as an Apprentice; +4 each rank (44 at rank 10). |
 | `build_magic_billy.rank2Practice` | `2000` | 0 to 10000000 | Blocks of magic he must cast to become a Spellcaster (rank 2). |
 | `build_magic_billy.rank3Practice` | `8000` | 0 to 10000000 | Blocks of magic he must cast to become a Sorcerer (rank 3). |
 | `build_magic_billy.rank4Practice` | `30000` | 0 to 10000000 | Blocks of magic he must cast to become Wiccan (rank 4). |
-| `build_magic_billy.maxRank` | `4` | 1 to 4 | The highest rank he can reach (1 = he never grows). |
+| `build_magic_billy.rank5Practice` | `60000` | 0 to 10000000 | Blocks of magic he must cast to become an Enchanter (rank 5). |
+| `build_magic_billy.rank6Practice` | `120000` | 0 to 10000000 | Blocks of magic he must cast to become a Mystic (rank 6). |
+| `build_magic_billy.rank7Practice` | `220000` | 0 to 10000000 | Blocks of magic he must cast to become a Wizard (rank 7). |
+| `build_magic_billy.rank8Practice` | `380000` | 0 to 10000000 | Blocks of magic he must cast to become an Archmage (rank 8). |
+| `build_magic_billy.rank9Practice` | `600000` | 0 to 10000000 | Blocks of magic he must cast to become a Reality Weaver (rank 9). |
+| `build_magic_billy.rank10Practice` | `1000000` | 0 to 10000000 | Blocks of magic he must cast to become the Chaos Master (rank 10). |
+| `build_magic_billy.maxRank` | `10` | 1 to 10 | The highest rank he can reach (1 = he never grows; 10 = the Chaos Master). Ranks 1 to 4 are those of 3.1. A server file written by 3.1 holds 4 until the owner changes it. |
 | `build_magic_billy.castPause` | `10` | 0 to 200 | Ticks after one of his spells before the next. |
 | `build_magic_billy.momRange` | `16` | 0 to 128 | How near (in blocks) a Scarlet Witch must be to help him (0 = never). |
 | `build_magic_billy.momCostFactor` | `0.5` | 0.0 to 1.0 | What his spells cost near her (0.5 = half). |
@@ -726,13 +757,13 @@ Section `[ultron]`. The lightning and Vision numbers also apply to the boss, its
 
 ## Apocalypse (the boss, his shield and the hero)
 
-Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The fight itself and the hero are described in the Apocalypse page; the numbers shared by every boss (how many fights run at once, the wipe and abandon clocks, the reward's minimum time, the experience, the time limit, the protection of the arena) are in `[boss]`.
+Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. **3.2: the master factor.** `apocalypse_boss.powerFactor` (0.65 by default) multiplies every damage he and his Horsemen deal and the numbers of his lances, Horsemen and tornadoes (rounded up, never below one), and it divides the speed of his attacks (the pause between two attacks and every cooldown last 1/powerFactor times as long). It does not touch his health, armour, shield, windows, the sand wall or the hero. With 1.0 he is the Apocalypse of 3.1 in everything it multiplies. The damage options below are the numbers before the factor. The fight itself and the hero are described in the Apocalypse page; the numbers shared by every boss (how many fights run at once, the wipe and abandon clocks, the reward's minimum time, the experience, the time limit, the protection of the arena) are in `[boss]`.
 
 ### `[apocalypse_shield]`: what counts as mind power
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
-| `apocalypse_shield.mindPowerHeroes` | `["scarlet_witch", "phoenix"]` | a list of power names | Heroes whose mind power can wear down Apocalypse's shield (the boss's and the hero's). Add `"billy"` or `"vision"` to count theirs (and add their damage types to the datapack tag `enhanced:mind_power`). |
+| `apocalypse_shield.mindPowerHeroes` | `["scarlet_witch", "phoenix"]` | a list of power names | Heroes whose mind power can wear down Apocalypse's shield (the boss's and the hero's). Add `"billy"` or `"vision"` to count theirs (and add their damage types to the datapack tag `enhanced:mind_power`: `enhanced:hex_bolt` and `enhanced:hex_beam` for Billy, `enhanced:mind_stone_beam` for Vision). |
 | `apocalypse_shield.chaosBeamFactor` | `1.0` | 0.0 to 20.0 | Shield strength removed per point of Chaos Beam damage. |
 | `apocalypse_shield.slamFactor` | `1.0` | 0.0 to 20.0 | Per point of telekinetic slam damage (a thing thrown by Wanda or the Phoenix). |
 | `apocalypse_shield.borrowedSlamFactor` | `0.5` | 0.0 to 20.0 | A block borrowed from his own arena and thrown by mind power wears the shield by this many times what `slamFactor` gives. The critical factor comes on top. |
@@ -740,8 +771,8 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse_shield.otherMindFactor` | `1.0` | 0.0 to 20.0 | Per point of any other damage type in `enhanced:mind_power`. |
 | `apocalypse_shield.phoenixMindControlStrain` | `25.0` | 0.0 to 1000.0 | Shield strength a Phoenix's Mind Control (even refused) removes. |
 | `apocalypse_shield.phoenixPsionicStrain` | `60.0` | 0.0 to 1000.0 | Shield strength a Phoenix's Psionic Field that reaches him removes. |
-| `apocalypse_shield.shieldRegenDelayTicks` | `160` | 0 to 2400 | The boss's shield regenerates only after this many ticks without mind-power damage. |
-| `apocalypse_shield.shieldRegenFraction` | `0.03` | 0.0 to 1.0 | Fraction of its strength it regains each second. |
+| `apocalypse_shield.shieldRegenDelayTicks` | `200` | 0 to 2400 | The boss's shield regenerates only after this many ticks without mind-power damage. |
+| `apocalypse_shield.shieldRegenFraction` | `0.02` | 0.0 to 1.0 | Fraction of its strength it regains each second. |
 | `apocalypse_shield.mindHitCooldownTicks` | `10` | 1 to 40 | Ticks between two mind-power hits from the same attacker that the shield will count (the Chaos Beam hits every tick; a shield leaves no invulnerability frames, so it keeps its own). |
 | `apocalypse_shield.critHeroes` | `["scarlet_witch", "phoenix"]` | a list of power names | Heroes whose mind power hits the boss Apocalypse critically, on his shield and on his body (only the boss, never the Apocalypse hero). Kept apart from `mindPowerHeroes`: a hero added there doesn't get critical hits too. |
 | `apocalypse_shield.critShieldFactor` | `2.0` | 1.0 to 10.0 | Their mind power (and the Phoenix's Mind Control and Psionic Field strains) wears the boss's shield this many times as much. |
@@ -752,6 +783,7 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
+| `apocalypse_boss.powerFactor` | `0.65` | 0.1 to 1.0 | 3.2: how strong the boss fights, one master knob (1.0 = the 3.1 numbers). It multiplies every damage he and his Horsemen deal and the number of his lances, Horsemen and tornadoes, and it slows his attacks: the pause between two attacks and every attack's cooldown last 1/powerFactor times as long. His health, his armour and his shield are not touched by it (they have their own options). |
 | `apocalypse_boss.enabled` | `true` | `true` or `false` | If false the Capstone's ritual is refused. |
 | `apocalypse_boss.ritualDimensions` | `["minecraft:overworld"]` | a list of dimension ids | Where he can be woken. |
 | `apocalypse_boss.ritualNeedsSand` | `true` | `true` or `false` | The ritual block must be sand or sandstone (`enhanced:ritual_ground`). |
@@ -767,11 +799,11 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse_boss.armorToughness` | `6.0` | 0.0 to 20.0 | His armour toughness in the armoured form. |
 | `apocalypse_boss.maxHitFraction` | `0.12` | 0.01 to 1.0 | The most one hit can take, as a fraction of his maximum health (before armour). |
 | `apocalypse_boss.explosionDamageFactor` | `0.5` | 0.0 to 1.0 | Explosion damage to him (in a window and in the true form) is multiplied by this. |
-| `apocalypse_boss.shieldStrength` | `150.0` | 10.0 to 10000.0 | Strength of shield 1 for one fighter. |
-| `apocalypse_boss.shieldGrowth` | `1.25` | 1.0 to 3.0 | Each later shield is this many times stronger. |
-| `apocalypse_boss.shieldPerExtraPlayer` | `0.35` | 0.0 to 3.0 | Extra shield strength per additional fighter (a fraction). |
-| `apocalypse_boss.windowTicks` | `200` | 40 to 2400 | How long a broken shield leaves him vulnerable (200 = 10 s). |
-| `apocalypse_boss.staggerTicks` | `60` | 0 to 400 | How long he is staggered and attacks nothing at the start of a window. |
+| `apocalypse_boss.shieldStrength` | `100.0` | 10.0 to 10000.0 | Strength of shield 1 for one fighter. |
+| `apocalypse_boss.shieldGrowth` | `1.2` | 1.0 to 3.0 | Each later shield is this many times stronger. |
+| `apocalypse_boss.shieldPerExtraPlayer` | `0.3` | 0.0 to 3.0 | Extra shield strength per additional fighter (a fraction). |
+| `apocalypse_boss.windowTicks` | `240` | 40 to 2400 | How long a broken shield leaves him vulnerable (240 = 12 s). |
+| `apocalypse_boss.staggerTicks` | `80` | 0 to 400 | How long he is staggered and attacks nothing at the start of a window. |
 | `apocalypse_boss.windowDamageFactor` | `1.25` | 1.0 to 5.0 | Damage taken in a window. |
 | `apocalypse_boss.regenPerSecond` | `0.0` | 0.0 to 100.0 | His healing while a shield is up (never above the phase's ceiling). 0 = his health never heals (his shield still knits). |
 | `apocalypse_boss.trueFormRegenPerSecond` | `0.0` | 0.0 to 100.0 | His healing in the true form after 80 ticks without being hurt. 0 = his health never heals. |
@@ -783,21 +815,21 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse_boss.lanceCount` | `5` | 1 to 9 | Lances in a fan. |
 | `apocalypse_boss.waveDamage` | `10.0` | 0.0 to 100.0 | The Sand Wave. |
 | `apocalypse_boss.spikeDamage` | `9.0` | 0.0 to 100.0 | A Sand Spike. |
-| `apocalypse_boss.boulderDamage` | `11.0` | 0.0 to 100.0 | A Sand Boulder. |
-| `apocalypse_boss.backhandDamage` | `16.0` | 0.0 to 100.0 | The Backhand. |
+| `apocalypse_boss.boulderDamage` | `9.0` | 0.0 to 100.0 | A Sand Boulder. |
+| `apocalypse_boss.backhandDamage` | `12.0` | 0.0 to 100.0 | The Backhand. |
 | `apocalypse_boss.portalShockDamage` | `6.0` | 0.0 to 100.0 | The shockwave where he arrives. |
 | `apocalypse_boss.stormDamage` | `2.0` | 0.0 to 100.0 | A Tornado's damage every 10 ticks. |
 | `apocalypse_boss.tornadoTicks` | `160` | 20 to 1200 | How long a Tornado lasts. |
-| `apocalypse_boss.ringDamage` | `12.0` | 0.0 to 100.0 | A ring of the Cairo Collapse. |
-| `apocalypse_boss.entombTicks` | `100` | 10 to 1200 | How long the Entomb holds. |
+| `apocalypse_boss.ringDamage` | `10.0` | 0.0 to 100.0 | A ring of the Cairo Collapse. |
+| `apocalypse_boss.entombTicks` | `80` | 10 to 1200 | How long the Entomb holds. |
 | `apocalypse_boss.entombDamagePerSecond` | `1.5` | 0.0 to 20.0 | Damage while entombed (never below 2 hearts). |
 | `apocalypse_boss.cocoonHealth` | `20.0` | 1.0 to 200.0 | Health of the boss's cocoon. |
 | `apocalypse_boss.mindCrushRange` | `28` | 8 to 64 | Blocks. |
-| `apocalypse_boss.mindCrushNauseaTicks` | `120` | 0 to 1200 | Nausea of the Mind Crush (Slowness 3 s and Blindness 2 s go with it). |
-| `apocalypse_boss.horsemen` | `true` | `true` or `false` | He calls the Four Horsemen at Transition 1. |
-| `apocalypse_boss.horsemenMax` | `4` | 0 to 8 | The most Horsemen (`min(max, 1 + fighters)`). |
-| `apocalypse_boss.horsemanHealthFactor` | `2.0` | 1.0 to 10.0 | Husk health multiplier. |
-| `apocalypse_boss.horsemanDamageBonus` | `4.0` | 0.0 to 50.0 | Added attack damage. |
+| `apocalypse_boss.mindCrushNauseaTicks` | `80` | 0 to 1200 | Nausea of the Mind Crush (Slowness 3 s and Blindness 2 s go with it). |
+| `apocalypse_boss.horsemen` | `true` | `true` or `false` | He calls his Horsemen at Transition 1. |
+| `apocalypse_boss.horsemenMax` | `4` | 0 to 8 | The most Horsemen: `min(ceil(horsemenMax x powerFactor), 1 + fighters)`, so 3 at the default `powerFactor`. |
+| `apocalypse_boss.horsemanHealthFactor` | `1.5` | 1.0 to 10.0 | Husk health multiplier. |
+| `apocalypse_boss.horsemanDamageBonus` | `3.0` | 0.0 to 50.0 | Added attack damage. |
 | `apocalypse_boss.adaptTicks` | `80` | 0 to 1200 | Quicksilver Time slows him for this long, then he adapts. |
 | `apocalypse_boss.adaptedTicks` | `600` | 0 to 12000 | How long he then ignores it. |
 | `apocalypse_boss.magnetoStripExtendTicks` | `100` | 0 to 1200 | A Magneto's Strip on him in a window extends it by this much (once per window). |
@@ -853,6 +885,101 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. The figh
 | `apocalypse.stormExhaustion` | `8.0` | 0.0 to 40.0 | Hunger the Sandstorm costs. |
 | `apocalypse.essenceRitualTicks` | `60` | 20 to 400 | How long the Essence must be held to awaken. |
 
+## The Witches' Road
+
+Section `[witches_road]`. The page is [The Witches' Road](Witches-Road). Every trial has its options here, with the trial's name in front of the explanation. Every value is read when it is used, so editing the file changes it live. With `witches_road.enabled` set to `false` there are no trials and the door is the instant choice of 3.1.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `witches_road.enabled` | `true` | `true` or `false` | Whether the Witches' Road has trials. On: a player with no power who opens a Witches' Road door with a Scarlet Witch Gene is asked to walk the Road (the trials), and chooses Billy or Tommy at the end. `false`: the door gives the instant choice of Enhanced 3.1, and nobody can enter the Road dimension. |
+| `witches_road.maxPlayers` | `32` | 1 to 512 | The most players walking the trials at once on the whole server (each has a private place). A player who would be one too many is told to wait. |
+| `witches_road.courseSeed` | `0` | -9223372036854775808 to 9223372036854775807 | Mixed into every player's course. The courses are the same for the same player every time; change this to give every player new ones. |
+| `witches_road.resumeOnLogin` | `true` | `true` or `false` | A player who logs in inside the Road (the server stopped, or he left the game, in a trial) goes on at his last checkpoint. `false`: he is taken back to where he entered, with his progress kept. |
+| `witches_road.resumeAtCheckpoint` | `true` | `true` or `false` | A player who left a trial and walks the Road again starts at the checkpoint he had reached. `false`: he starts the trial from its beginning. |
+| `witches_road.announce` | `true` | `true` or `false` | The server is told in chat when somebody finishes a trial of the Road. |
+| `witches_road.voice` | `true` | `true` or `false` | The Road speaks to the player in the action bar and the title (the Voice of the Road). |
+| `witches_road.healAtCheckpoint` | `true` | `true` or `false` | Reaching a checkpoint, or being put back at one, heals the player and fills his hunger. |
+| `witches_road.fallDepth` | `12` | 3 to 64 | How far (in blocks) below the lowest part of a stretch of the course a fall counts: the player is then put back at his last checkpoint (nothing hurts him). |
+| `witches_road.leaveConfirmSeconds` | `5` | 1 to 60 | Right-clicking the exit door asks for a second click within this many seconds to leave the Road. |
+| `witches_road.buildBlocksPerTick` | `20000` | 500 to 1000000 | How many blocks of a new trial are placed in one tick (the Road is laid in a few ticks; a lower number means a smaller hitch on a slow server and a longer wait at the door). |
+| `witches_road.removeBlocksPerTick` | `20000` | 500 to 1000000 | How many blocks of a finished trial are removed in one tick. |
+| `witches_road.parkourPads` | `40` | 8 to 150 | Trial 1, the Parkour: how many jumps there are from the start to the finish. |
+| `witches_road.parkourDifficulty` | `2` | 1 to 3 | Trial 1, the Parkour: 1 = easy (gaps of one or two blocks, wide stones), 2 = normal (gaps up to three blocks late in the course, steps up and down), 3 = hard (smaller stones, gaps of three blocks sooner). No jump is ever beyond what a running jump can do. |
+| `witches_road.parkourCheckpointEvery` | `6` | 2 to 30 | Trial 1, the Parkour: a checkpoint (a lit amethyst stone) after every this many jumps. |
+| `witches_road.parkourTimeLimitSeconds` | `0` | 0 to 7200 | Trial 1, the Parkour: seconds allowed from the start to the finish (the clock shows in the action bar). When it runs out the player is put back at the start. 0 = no limit. |
+| `witches_road.boatRaceLength` | `800` | 200 to 1400 | Trial 3, the Ice-Boat Race: how long the course is, from the start line to the finish line, in blocks. The course winds through the Road's place, so it is never longer than about 1400; the shortcuts make the shortest way shorter. |
+| `witches_road.boatRaceTrackWidth` | `9` | 7 to 15 | Trial 3, the Ice-Boat Race: how wide the track is, in blocks (an odd number; the narrow stretches are 5 wide). |
+| `witches_road.boatRaceDifficulty` | `2` | 1 to 3 | Trial 3, the Ice-Boat Race: 1 = easy (wide curves, one hairpin, no snow walls), 2 = normal, 3 = hard (tighter curves, three hairpins, more snow). Every curve can be driven at the speed the boat can reach on the straight before it. |
+| `witches_road.boatRaceShortcuts` | `1` | 0 to 3 | Trial 3, the Ice-Boat Race: how many shortcuts the course may have. A shortcut is a straight across a loop of the track with a gap in it (the boat has to be fast to jump it, and falls into the void if it is not); the long way round is always open. |
+| `witches_road.boatRaceObstacles` | `true` | `true` or `false` | Trial 3, the Ice-Boat Race: snow drifts (rough snow slows the boat) and snow walls to wind between. Nothing traps the boat. |
+| `witches_road.boatRaceBlueIce` | `true` | `true` or `false` | Trial 3, the Ice-Boat Race: stripes of blue ice (the slipperiest ice, the boat gains speed on it) in the track. |
+| `witches_road.boatRaceCheckpointEvery` | `100` | 40 to 400 | Trial 3, the Ice-Boat Race: a checkpoint about every this many blocks. A boat that falls off the track is put back on the last one. |
+| `witches_road.boatRaceTimeLimitSeconds` | `240` | 0 to 3600 | Trial 3, the Ice-Boat Race: seconds allowed from the start of the trial (a clock shows at the top of the screen). When it runs out the player is put back at the start. 0 = no limit. |
+| `witches_road.boatRaceParFactor` | `1.4` | 1.0 to 5.0 | Trial 3, the Ice-Boat Race: the par time is the time the boat's physics allow on this course (the fastest way through every curve) times this factor. The player is told how he did against it. |
+| `witches_road.boatRaceRespawnCooldownSeconds` | `5` | 0 to 120 | Trial 3, the Ice-Boat Race: a player who is stuck can sneak (Shift) to be put back on the last checkpoint. This many seconds have to pass between two such returns (a sneak before that only keeps him in the boat). |
+| `witches_road.boatRaceCountdownSeconds` | `3` | 1 to 10 | Trial 3, the Ice-Boat Race: the countdown (3, 2, 1, go) once the player is in his boat, before the barrier at the start line opens. |
+| `witches_road.structureCopyTier` | `2` | 0 to 3 | Trial 2, Copy the Structure: how big the model is. 1 = small (up to 5x5x5 blocks), 2 = medium (up to 9x9x7), 3 = large (up to 11x11x9). 0 = it depends on the player (each player gets the same size every time, but not the same for everyone). |
+| `witches_road.structureCopyTimeLimitSeconds` | `5400` | 0 to 86400 | Trial 2, Copy the Structure: seconds a player may stay in the trial. There is no failing: this is only so that nobody leaves a room of the Road standing for ever. When it runs out the room is taken down and the player is sent back to where he entered, with his Gene and his progress (the next time he builds a new model from the beginning). 0 = no limit. |
+| `witches_road.structureCopySupplyPercent` | `150` | 100 to 1000 | Trial 2, Copy the Structure: how much of every block the model needs the player is given, in percent (at least 16 of each). The supply chest on the platform fills itself up again, so he cannot run out. |
+| `witches_road.structureCopyAutoCheck` | `true` | `true` or `false` | Trial 2, Copy the Structure: the trial is won as soon as the plot looks exactly like the model, without pressing Check. `false`: the player has to press the Check button. |
+| `witches_road.structureCopyHints` | `true` | `true` or `false` | Trial 2, Copy the Structure: the Hint button shows ghost outlines of the blocks that are missing. It costs nothing. `false`: the button does nothing. |
+| `witches_road.structureCopyHintSeconds` | `8` | 1 to 60 | Trial 2, Copy the Structure: how long the ghost blocks of a hint stay. |
+| `witches_road.structureCopyHintBlocks` | `40` | 1 to 300 | Trial 2, Copy the Structure: the most ghost blocks a hint shows (the lowest ones that are missing first). |
+| `witches_road.structureCopyMarks` | `40` | 1 to 300 | Trial 2, Copy the Structure: the most places that Check marks with glowing outlines (missing, wrong or extra blocks). The count of correct blocks is always shown in full. |
+
+The grid of places (2,048 blocks apart) and the course radius (450 blocks) are not options: they decide where the Road puts each player.
+
+## The Book of the Vishanti
+
+Section `[vishanti]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-book-of-the-vishanti). The book is read by a sorcerer (Loki, the Scarlet Witch or Billy); the ward's radius follows his strength: Wanda the most, Billy by his Build Magic rank, Loki a fixed size. The ward is never bigger than 128 blocks, whatever these say.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `vishanti.enabled` | `true` | `true` or `false` | The Book of the Vishanti works (`false`: it can be held but nobody can read it). |
+| `vishanti.teleportCooldown` | `600` | 0 to 72000 | Cooldown of the book's teleport, in ticks (600 = 30 seconds; 1200 = a minute). |
+| `vishanti.teleportChargeTicks` | `20` | 1 to 200 | Ticks the sparks gather round the traveller before the book takes them. |
+| `vishanti.teleportExhaustion` | `6.0` | 0.0 to 40.0 | Food exhaustion of one teleport (4.0 = 1 food point). Creative players pay nothing. |
+| `vishanti.deniedDimensions` | `["enhanced:witches_road"]` | a list of dimension ids | Dimensions where the book can neither save a place, raise a ward nor teleport, and that it cannot take anyone into or out of (ids). The Witches' Road is always shut to it, whatever this says. |
+| `vishanti.wardsEnabled` | `true` | `true` or `false` | Bases can carry a ward (`false`: bases are only places; existing wards sleep). |
+| `vishanti.maxWardsPerPlayer` | `2` | 1 to 16 | How many bases (so how many wards) one player can have at a time. |
+| `vishanti.wardCooldown` | `200` | 0 to 72000 | Cooldown, in ticks, between raising (or moving) one player's wards. |
+| `vishanti.wardExhaustion` | `8.0` | 0.0 to 40.0 | Food exhaustion of raising a ward (4.0 = 1 food point). Creative players pay nothing. |
+| `vishanti.wardRadiusWanda` | `48` | 4 to 128 | Radius (in blocks) of the ward of the Scarlet Witch, the strongest sorcerer: the most a ward can be. |
+| `vishanti.wardRadiusBillyMin` | `12` | 4 to 128 | Radius of the ward of Billy at his first Build Magic rank (an Apprentice). |
+| `vishanti.wardRadiusBillyMax` | `40` | 4 to 128 | Radius of the ward of Billy at his highest Build Magic rank (`build_magic_billy.maxRank`); between his first and highest rank it grows evenly. |
+| `vishanti.wardRadiusLoki` | `24` | 4 to 128 | Radius of the ward of Loki. |
+| `vishanti.wardCheckTicks` | `5` | 1 to 40 | Every how many ticks a ward looks for monsters inside it and pushes them out (one spatial lookup per ward; more is cheaper, fewer keeps the edge tighter). |
+| `vishanti.wardPush` | `0.8` | 0.1 to 4.0 | How hard a ward throws a monster at its edge back out (blocks per tick of speed). |
+| `vishanti.wardBlocksSpawns` | `true` | `true` or `false` | No monster spawns inside a ward (natural spawns, spawners, structures). |
+
+## The Darkhold
+
+Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-darkhold). Its powers need the book in hand and never work in the Witches' Road.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `darkhold.enabled` | `true` | `true` or `false` | The Darkhold works (`false`: it can be held but does nothing). |
+| `darkhold.anyoneCanUse` | `false` | `true` or `false` | Anyone can use the Darkhold, not only the sorcerers (Loki, the Scarlet Witch and Billy). |
+| `darkhold.beamDamagePerSecond` | `8.0` | 0.0 to 200.0 | Damage a second of the purple beam does to what the crosshair is on (8 = four hearts). |
+| `darkhold.beamRange` | `24` | 4 to 128 | How far (in blocks) the purple beam reaches. |
+| `darkhold.beamInterval` | `5` | 1 to 40 | Ticks between two hits of the purple beam (5 = four hits a second). The beam ignores the creature's damage cooldown, so every hit lands. |
+| `darkhold.beamExhaustionPerSecond` | `1.0` | 0.0 to 40.0 | Food exhaustion a second of the purple beam costs (4.0 = 1 food point). Creative players pay nothing. |
+| `darkhold.poisonTarget` | `ATTACKER` | `ATTACKER` or `HOLDER` | Who is poisoned when magic is used on the holder of the Darkhold: `ATTACKER` (whoever used it, the default) or `HOLDER` (the holder pays for the magic the book drew). |
+| `darkhold.poisonTicks` | `200` | 20 to 72000 | How long the poison lasts, in ticks (200 = 10 seconds). |
+| `darkhold.poisonAmplifier` | `0` | 0 to 9 | The poison's level (0 = Poison I). |
+| `darkhold.poisonCooldownTicks` | `40` | 0 to 72000 | Ticks before the same attacker can be poisoned again, so a beam does not renew it every tick. |
+| `darkhold.markRange` | `24` | 2 to 128 | How far (in blocks) the hex mark reaches (Sneak + use on the creature you look at). |
+| `darkhold.markTicks` | `200` | 20 to 72000 | How long a hex mark lasts, in ticks (200 = 10 seconds): the creature glows, is slowed and takes extra damage from the one who marked it. |
+| `darkhold.markSlowAmplifier` | `1` | 0 to 9 | The Slowness of a marked creature (0 = Slowness I). |
+| `darkhold.markDamageBonus` | `0.5` | 0.0 to 10.0 | Extra damage the marker does to a marked creature (0.5 = half as much again). |
+| `darkhold.markCooldown` | `100` | 0 to 72000 | Cooldown of the hex mark, in ticks. |
+| `darkhold.markExhaustion` | `2.0` | 0.0 to 40.0 | Food exhaustion of a hex mark (4.0 = 1 food point). Creative players pay nothing. |
+| `darkhold.glimpseRange` | `24` | 2 to 128 | How far (in blocks) the mind glimpse sees (Sneak + use while looking at no creature). |
+| `darkhold.glimpseTicks` | `100` | 20 to 72000 | How long the creatures glow after a mind glimpse, in ticks (100 = 5 seconds). |
+| `darkhold.glimpseMax` | `16` | 1 to 64 | The most creatures one mind glimpse shows (the nearest ones). |
+| `darkhold.glimpseCooldown` | `200` | 0 to 72000 | Cooldown of the mind glimpse, in ticks. |
+| `darkhold.glimpseExhaustion` | `1.0` | 0.0 to 40.0 | Food exhaustion of a mind glimpse (4.0 = 1 food point). Creative players pay nothing. |
+
 ## Datapack tags
 
 Item, block, entity type and damage type tags under `data/enhanced/tags/` decide what the powers affect, so a datapack can change them without touching the mod.
@@ -896,6 +1023,8 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:cannot_cling` | block | Blocks Spider-Man cannot stick to (empty by default; water, cobwebs, vines and ladders never hold him anyway). |
 | `enhanced:ritual_ground` | block | What the Capstone must be planted on to wake Apocalypse (sand, red sand and every sandstone), while `apocalypse_boss.ritualNeedsSand` is on. |
 | `enhanced:sokovia_liftable` | block | The natural blocks the island of Sokovia copies into the sky (stone, dirt, sand, ores, grass, leaves, logs, flowers, snow...); anything else, a house or a chest, is left out of the copy. |
+| `enhanced:ward_immune` | entity type | What the ward of the Book of the Vishanti leaves alone: the bosses and their helpers (`#enhanced:bosses` and `#enhanced:boss_minions`). Anything in a boss fight or arena, pets with an owner and riders are spared too. |
+| `enhanced:magic_damage` | damage type | What counts as magic used on the holder of the Darkhold, so that its revenge poisons the attacker: the Hex Bolt and Beam, the Chaos Beam, Thor's lightning beam, the telekinetic slam, the Mind Stone, the Stones' powers, the Phoenix Burst, the purple beam, and the game's own `magic` and `indirect_magic`. |
 | `enhanced:mind_power` | damage type | Damage that counts as a mind's power: the Chaos Beam, a telekinetic slam and the Phoenix Burst. It is what wears down Apocalypse's shield, when a hero in `apocalypse_shield.mindPowerHeroes` deals it. |
 | `enhanced:stone_born` | damage type | Damage that counts three times toward breaking the Mad Titan's clench, and that his Space Barrier lets through: the Chaos Beam, Vision's Mind Stone beam and Stormbreaker. |
 
