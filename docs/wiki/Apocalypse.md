@@ -1,6 +1,6 @@
 # Apocalypse
 
-En Sabah Nur, "the first mutant", worshipped as a god for five thousand years, buried under his own pyramid and woken in Cairo in 1983 (*X-Men: Apocalypse*). In the mod he is a **boss**: a three-block giant in verdigris armour, wrapped in a **golden energy shield that stops everything except mind power**: the Chaos Beam and the thrown things of the **Scarlet Witch**, and the Burst of the **Phoenix**. He fights with **sand** and violet portals, calls **the Four Horsemen**, and when he falls, everyone who fought gets **the Essence of En Sabah Nur**: hold it for three seconds with no power and you become **Apocalypse**, with sand, levitation, a portal, a golden shield of your own and the power to make your friends stronger.
+En Sabah Nur, "the first mutant", worshipped as a god for five thousand years, buried under his own pyramid and woken in Cairo in 1983 (*X-Men: Apocalypse*). In the mod he is a **boss**: a three-block giant in verdigris armour, wrapped in a **golden energy shield that stops everything except mind power**: the Chaos Beam and the thrown things of the **Scarlet Witch**, and the Burst of the **Phoenix**. He fights with **sand** and violet portals, calls **his Horsemen**, and when he falls, everyone who fought gets **the Essence of En Sabah Nur**: hold it for three seconds with no power and you become **Apocalypse**, with sand, levitation, a portal, a golden shield of your own and the power to make your friends stronger.
 
 Hebrew: [עברית](Apocalypse-HE)
 
@@ -8,8 +8,9 @@ Hebrew: [עברית](Apocalypse-HE)
 
 * **To wake him** you need a **Capstone** (a Nether Star, five Gold Blocks and a Lapis Block), **sand under your feet, daylight and open sky**, and **a Scarlet Witch or a Phoenix within 64 blocks**: without one nobody could break his shield, so he does not wake. **Sneak + right-click** the sand with the Capstone.
 * **His shield is the whole fight.** While it is up, **everything but mind power does exactly nothing to him**: no damage, no knockback, nothing. Arrows, swords, Mjolnir, Thor's lightning, Magneto's shrapnel, the Mind Stone, tamed wolves, TNT: all turned away. Only the **Scarlet Witch's Chaos Beam and what she throws with telekinesis**, and the **Phoenix's Burst, her throws and her mind powers**, wear it down, and **their hits are critical**: twice as strong.
-* **When the shield breaks, it is everyone's turn.** For ten seconds he kneels and **takes damage from everyone** (a quarter more than usual), down to a floor. Then he gets up, a new, stronger shield forms, and the next phase begins. Three shields, three phases.
+* **When the shield breaks, it is everyone's turn.** For twelve seconds he kneels and **takes damage from everyone** (a quarter more than usual), down to a floor. Then he gets up, a new, stronger shield forms, and the next phase begins. Three shields, three phases.
 * **He never heals.** His health never comes back (his shield still knits and re-forms). **Wanda's and the Phoenix's mind power hits him critically**, on his shield and on his body; everyone else hurts him much less. See below.
+* **He is weaker in 3.2.** One master knob, `apocalypse_boss.powerFactor` (0.65 by default), cuts everything he and his Horsemen deal by a third, makes him attack more slowly and call fewer helpers, and his first shield is a third weaker (100 instead of 150). See [How strong he is](#how-strong-he-is-the-master-factor).
 * **Everything he does has a warning**: a pose, a glow and a sound, and a moment after which the attack stops following you. Learn the tells, leave the ring, jump the wave.
 * **When he falls, everyone who fought earns the Essence.** Hold it for three seconds with no power to become Apocalypse.
 
@@ -68,18 +69,18 @@ Here is what counts, in one picture:
 |---|---|
 | **Scarlet Witch: the Chaos Beam** (R) | **Wears the shield down, critically**: 10 a hit (5 twice over), two hits a second: **20 a second** |
 | **Scarlet Witch: telekinesis throws** (a creature, an item or a block that hits him) | **Wears it down, critically**: twice the damage of the hit (12 for a light thing, 30 for a heavy one); a block borrowed from his own arena wears it half as much as other thrown things (0.5, then ×2) |
-| **Phoenix: the Burst** (N) | **Wears it down five times over, and critically**: a Burst of 30 takes 300, **enough to break any of the three shields in one go when she fights him alone** (with two fighters shield 1 has 203) |
+| **Phoenix: the Burst** (N) | **Wears it down five times over, and critically**: a Burst of 30 takes 300, **enough to break any of the three shields in one go when she fights him alone** (with two fighters shield 1 has 130) |
 | **Phoenix: her throws** | Wears it down, critically, as the Scarlet Witch's |
 | **Phoenix: Mind Control and the Psionic Field** | A **strain** on the shield, critical too: 50 and 120 points, even if they are refused, once a cast (pressing the key again before her power has recharged strains it no more) |
-| Billy's Hex Bolt, Vision's Mind Stone beam | Nothing, *unless the server owner adds them* (see [Server Configuration](Server-Configuration)) |
-| Magneto, Thor, Loki, Quicksilver, Tommy, Ultron, Thanos, Spider-Man, any sword, arrow, TNT, fire, potion, tamed animal | **Exactly nothing**: no damage, no knockback, a golden ripple and a chime where it hits |
+| Billy's Hex Beam (and his old Hex Bolt), Vision's Mind Stone beam | Nothing, *unless the server owner adds them* (see [Server Configuration](Server-Configuration)) |
+| Magneto, Thor, Loki, Quicksilver, Tommy, Ultron, Thanos, Spider-Man, the Darkhold's purple beam, any sword, arrow, TNT, fire, potion, tamed animal | **Exactly nothing**: no damage, no knockback, a golden ripple and a chime where it hits |
 
-The shield has **strength** (for one fighter: **150, then 188, then 234** for the three shields; more fighters make it stronger: for three, 255, 319 and 398). When the strength reaches zero it **shatters**, and for a moment he is helpless:
+The shield has **strength** (for one fighter: **100, then 120, then 144** for the three shields; more fighters make it stronger: for two, 130, 156 and 187; for three, 160, 192 and 230). When the strength reaches zero it **shatters**, and for a moment he is helpless:
 
-* **A window (10 seconds).** He kneels and attacks nothing for the first three seconds. For the whole ten, **everything can hurt him**: Wanda's and the Phoenix's mind power twice as much (critical), everything else only 0.4 times as much, and then a quarter more because of the window, armour still counting; no single hit can take more than 12 percent of his health.
+* **A window (12 seconds).** He kneels and attacks nothing for the first four seconds. For the whole twelve, **everything can hurt him**: Wanda's and the Phoenix's mind power twice as much (critical), everything else only 0.4 times as much, and then a quarter more because of the window, armour still counting; no single hit can take more than 12 percent of his health.
 * **A floor.** In the first window his health will not fall below **two thirds**, in the second below **one third**: nobody can kill him early, however much damage they bring. Reaching the floor ends the window and starts the next part of the fight.
 * **If nobody does enough**, the shield re-forms at full strength after a short pause. **He does not heal meanwhile: his health never comes back.**
-* **The shield mends itself** slowly (3 percent a second) once eight seconds have passed without mind power touching it, so a steady beam is never wasted.
+* **The shield mends itself** slowly (2 percent a second) once ten seconds have passed without mind power touching it, so a steady beam is never wasted.
 * The **third shield has no window**: its break is the end of his armour (below).
 
 The Chaos Beam hits every tick, but the shield counts one hit from each attacker every half second, so a Scarlet Witch holding the beam wears it down by 5 every ten ticks, the same as against anything else.
@@ -88,7 +89,7 @@ The boss bar shows his health in blue (the notches are the floors) and the shiel
 
 ## He never heals; Wanda and the Phoenix hit critically
 
-**He never heals.** In 3.0 he healed while his shield was up and in his true form; now his health **never comes back** (a splashed potion of Healing does nothing to him either). His **shield** still knits (it mends 3 percent a second after eight seconds without mind power, and re-forms at every phase), and the Escape is unchanged: if you don't stop it he vanishes and returns ten seconds later at 40 percent of his health with a fresh shield 3, a set piece you can stop, not healing.
+**He never heals.** In 3.0 he healed while his shield was up and in his true form; now his health **never comes back** (a splashed potion of Healing does nothing to him either). His **shield** still knits (it mends 2 percent a second after ten seconds without mind power, and re-forms at every phase), and the Escape is unchanged: if you don't stop it he vanishes and returns ten seconds later at 40 percent of his health with a fresh shield 3, a set piece you can stop, not healing.
 
 **Critical hits.** A hit of the **Scarlet Witch's or the Phoenix's mind power** (the Chaos Beam, a telekinetic slam, the Phoenix Burst, and the strains of Mind Control and the Psionic Field) is a **critical hit** on the boss, and it is heard: a heavy glassy crack with a low gong under it (the subtitle says "Critical hit on Apocalypse"), across the whole arena, at most once per attacker every half second:
 
@@ -97,7 +98,7 @@ The boss bar shows his health in blue (the notches are the floors) and the shiel
 | **His shield** (up) | **twice** as strong | mind power of the others (if the server adds them): as before; anything else does nothing |
 | **His body**, when his shield is down (a window, the stagger of an interrupted Escape, the true form) | **twice** as strong | **0.4 times** as strong |
 
-So, for one fighter, with the defaults: shield 1 (150) takes **15 beam hits instead of 30**; a Phoenix Burst of 30 takes 300, breaking any of the three shields (150, 188, 234) at once; Mind Control strains 50 and a Psionic Field 120. In a window, Wanda's beam of 5 takes 12.5 off his health before his armour counts (5 × 2 × 1.25 for the window), and a sword of 7 takes 3.5 (7 × 0.4 × 1.25). In the true form the same without the 1.25. The cap and the floors still hold, so no phase is skipped. A critical blow also counts **double** toward interrupting the Escape (4 percent of his health in the channel), and Thor's lightning interrupts it whatever its damage. The Phoenix's fire finish is unchanged.
+So, for one fighter, with the defaults: shield 1 (100) takes **10 beam hits instead of 20**; a Phoenix Burst of 30 takes 300, breaking any of the three shields (100, 120, 144) at once; Mind Control strains 50 and a Psionic Field 120. In a window, Wanda's beam of 5 takes 12.5 off his health before his armour counts (5 × 2 × 1.25 for the window), and a sword of 7 takes 3.5 (7 × 0.4 × 1.25). In the true form the same without the 1.25. The cap and the floors still hold, so no phase is skipped. A critical blow also counts **double** toward interrupting the Escape (4 percent of his health in the channel), and Thor's lightning interrupts it whatever its damage. The Phoenix's fire finish is unchanged.
 
 **You see and hear it:** a burst of sparks at the hit (20 critical-hit and 10 enchanted-hit particles), a heavy glassy crack, and "Critical hit! ×2" on the attacker's action bar (at most once every half second per attacker). The golden ripple of a hit that does nothing is unchanged. Only the **boss** is changed: the Apocalypse **hero's** own shield and healing are as they were.
 
@@ -106,11 +107,11 @@ So, for one fighter, with the defaults: shield 1 (150) takes **15 beam hits inst
 | Part | What happens |
 |---|---|
 | **Phase 1: The God Awakens** (100% to 66%) | Shield 1. Lances, Wave, Spikes, Boulders, Portal Step and the Backhand. |
-| **Window 1** | The shield breaks: he kneels, 10 seconds, floor at 66%. After the kneel he fights on with only the Lances, the Backhand and the Spikes, at half speed. |
-| **Transition 1** (6 s) | He is untouchable and rises. **The Four Horsemen** step out of four portals. Shield 2 forms. "Rise, my Horsemen." |
+| **Window 1** | The shield breaks: he kneels, 12 seconds, floor at 66%. After the kneel he fights on with only the Lances, the Backhand and the Spikes, at half speed. |
+| **Transition 1** (6 s) | He is untouchable and rises. **His Horsemen** (three by default) step out of portals. Shield 2 forms. "Rise, my Horsemen." |
 | **Phase 2: The Horsemen** (66% to 33%) | Shield 2. **Entomb, Mind Crush and a Tornado** join his attacks. Window 2, floor at 33%. |
 | **Transition 2: the Cairo Collapse** (8 s) | He floats up, the sky goes dark ochre, and **three rings of sand** cross the arena. Any Horsemen still alive crumble. Shield 3 forms. "Everything they've built will fall..." |
-| **Phase 3: Unmasked** (33% to 5%) | Shield 3, stronger still. **Three Tornadoes at once.** When it breaks there is **no window**: |
+| **Phase 3: Unmasked** (33% to 5%) | Shield 3, stronger still. **Two Tornadoes at once** (three with `powerFactor` 1.0). When it breaks there is **no window**: |
 | **The armour falls** | His plates fly off him (the collar, the pauldrons, the chest plate, the gauntlets, the crown of his cap), the shield is gone **for good**, and in his frail **true form** (smaller, faster, grey-blue, with a cracked cap glowing gold) **everything can hurt him**, with no window (Wanda's and the Phoenix's mind power critically, everyone else's at 0.4); his health stops only at 15 percent (until he has tried the Escape) and at 5 percent, where he kneels. He does not heal there either. |
 | **The Escape** (once, at 15%) | He raises a hand and **a violet portal grows over him for five seconds**: "No!" **Thor's lightning stops it** (as Storm's did in the film), and so does **taking 4 percent of his health in damage** during the channel (a critical blow counts double), or **a Hex wall**. If you stop it he is staggered for six seconds and can never try again. If you do not, he vanishes, and **returns ten seconds later healed to 40 percent with a new shield 3**: a heavy setback, never a loss. |
 | **The end** (5%) | He becomes untouchable and kneels: "All is revealed." Then he dies: **in the Phoenix's fire, layer by layer**, if a Phoenix dealt Burst or throw damage in the last 15 seconds, otherwise in a column of sand. He drops nothing: the reward is the Essence (below). |
@@ -120,8 +121,35 @@ The whole fight is meant to last **six to ten minutes** for two or three well-eq
 ## His health and the numbers
 
 * **900 health for one fighter**, and half as much again for each extra one (up to six counted): 1,350 for two, 1,800 for three, 2,250 for four. Creative and Spectator players do not count. His armour is 10 (toughness 6) in the armoured form, none in the true form.
-* **His biggest hit is 16** (the Backhand); most are 6 to 12. Every damage scales with difficulty as a mob's does.
+* **His biggest hit is 7.8** (the Backhand); most are 4 to 6.5. These are the options' numbers times `powerFactor` (see below). Every damage scales with difficulty as a mob's does.
 * He **cannot be pushed, set on fire, poisoned, withered, drowned or suffocated**, and **every status effect is refused** (except Glowing). The Hex bounces him, Mjolnir cannot pin him, Billy's Freeze and the Scepter do nothing, nobody can shapeshift into him, and the Phoenix cannot read or possess him. **While his shield is up only mind power can hold him** (the Scarlet Witch, the Phoenix); in a window anyone's telekinesis can, as a boss (3 seconds, Billy 1.5, Magneto 4.5 while he wears his armour; then not again for 12 seconds). A block of his own arena thrown at his shield wears it half as much as other thrown things.
+
+## How strong he is: the master factor
+
+In 3.1 he was too strong for most worlds, so 3.2 turns him down with **one master knob**: `apocalypse_boss.powerFactor`, **0.65** by default (allowed 0.1 to 1.0; **1.0 is the 3.1 fight**). It multiplies:
+
+* **Everything he and his Horsemen deal**: Lances, Wave, Spikes, Boulders, the Backhand, the Portal Step's shock, Tornadoes, the rings of the Cairo Collapse, the Entomb's damage a second, and the Horsemen's added damage and their Gale, Dash and Dive.
+* **How many there are**: Lances (5 become 4), Horsemen (4 become 3) and Tornadoes in phase 3 (3 become 2). Rounded up, never fewer than one.
+* **How often he attacks**: the pause between two attacks and every attack's own cooldown last 1 divided by the factor times as long (about 1.5 times as long at 0.65).
+
+It does **not** touch his health, his armour, his shield, the length of his windows, the sand wall's 1 damage, the lengths of his tells or how fast his projectiles fly, and the Apocalypse **hero** (a player) is as he was. His shields, windows and a few hits that were plainly unfair have their own, lower, defaults:
+
+| Option | 3.1 | 3.2 | Now, after the factor |
+|---|---|---|---|
+| Shield 1 / 2 / 3 for one fighter (`shieldStrength`, `shieldGrowth`) | 150 / 188 / 234 | 100 / 120 / 144 | (the factor does not touch shields) |
+| Extra shield for each more fighter (`shieldPerExtraPlayer`) | 0.35 | 0.3 | for three fighters 160 / 192 / 230 |
+| A window (`windowTicks`) | 10 seconds | 12 seconds | |
+| The stagger at its start (`staggerTicks`) | 3 seconds | 4 seconds | |
+| The shield mends itself (`apocalypse_shield.shieldRegenFraction`, `shieldRegenDelayTicks`) | 3 percent a second after 8 seconds | 2 percent a second after 10 seconds | |
+| The Backhand (`backhandDamage`) | 16 | 12 | 7.8 |
+| A Boulder (`boulderDamage`) | 11 | 9 | 5.85 |
+| A ring of the Cairo Collapse (`ringDamage`) | 12 | 10 | 6.5 |
+| The Entomb (`entombTicks`) | 5 seconds | 4 seconds | 0.98 damage a second |
+| Nausea of the Mind Crush (`mindCrushNauseaTicks`) | 6 seconds | 4 seconds | |
+| A Horseman's health and added damage (`horsemanHealthFactor`, `horsemanDamageBonus`) | 2 times, +4 | 1.5 times, +3 | +1.95 |
+| Lance / Wave / Spike / Portal shock / Tornado (`lanceDamage`, `waveDamage`, `spikeDamage`, `portalShockDamage`, `stormDamage`) | 6 / 10 / 9 / 6 / 2 | the same | 3.9 / 6.5 / 5.85 / 3.9 / 1.3 |
+
+Want the old fight back? Set `powerFactor` to 1.0 and put the other numbers of the first column back. Want it even gentler for a younger player? Lower the factor: at 0.4 he hits for 40 percent and attacks about two and a half times as slowly. The numbers in the attack table below are the **defaults, after the factor**.
 
 ## His attacks, and their tells
 
@@ -129,29 +157,29 @@ Every attack that can hurt has a **tell**: a pose, a glow and a sound, then a **
 
 | Attack | From | The tell (and when it locks) | What it does | How to meet it |
 |---|---|---|---|---|
-| **Sand Lances** | phase 1 | His right hand rises and the fingers pinch; **five thin ochre lines** run from his palm to your chest (locked 6 ticks before it fires) | Five lances in a flat fan, **6 damage** each | Strafe and jump. The Chaos Shield stops each. Billy and the Phoenix can catch them in the air and throw them back |
-| **Sand Wave** | phase 1 | Both arms sweep low; a **faint lane** marks the ground, 4 wide (locks just over halfway) | A rolling ridge, 1.1 blocks tall: **10 damage**, knockback, Slowness II | Leave the lane. **Jump it** (the wave is lower than a jump's peak). Fly |
-| **Sand Spikes** | phase 1 | A fist rises and slams; **an amber ring on the ground under each of up to four players**, tracking, then locked | Spikes erupt in each ring: **9 damage**, launched upward | Leave the ring. Fly higher than three blocks |
-| **Boulder Barrage** | phase 1 | Both arms rise; **three blocks of sand tear out of the ground and orbit over his head** with a growing hum; amber lines to the targets | Three boulders, one at each of up to three players: **11 damage** | Sidestep. The Chaos Shield stops them. Billy catches them and throws them back |
-| **Portal Step** | all | Violet shards swirl at his feet and **a second ring opens at the exit**, usually behind the player farthest from him | He steps out of the ring: an arrival shockwave, **6 damage**, knockback | Watch the exit ring. **A Hex wall refuses it**: he walks instead |
-| **Backhand** | all | The arm is drawn across the chest (8 ticks) | **16 damage**, strong knockback | Step back or aside |
-| **Entomb** (the grasp) | phase 2 | His hand reaches toward one player (the one who wore his shield down most); **a stripe of sand crawls across the ground to their feet** and locks 10 ticks before the hand closes | If you are still on that spot: **you are entombed**: a cocoon of sand, five seconds (100 ticks), unable to move, jump, fly, attack, use items or use powers; **1.5 damage a second but never below two hearts** | **Keep moving** after the lock, or fly. **Your friends break the cocoon** (20 health: three sword hits). A complete Chaos Shield is skipped. A phased Vision is intangible |
-| **Mind Crush** | phase 2 | Two fingers to his temple, his eyes flash white-violet and **a violet ring contracts** from 28 blocks to nothing round him (2 seconds) | Everyone within 28 blocks gets **Nausea, Slowness and Blindness** | **Magneto's helmet turns it all away.** **A Phoenix who touches him with Mind Control or the Psionic Field during the tell interrupts it** (the film's duel of minds). The Chaos Shield does not stop it |
-| **Tornado** | phase 2 (one), phase 3 (three) | Both arms rise, the sky above him darkens and **dust spirals up from the ground** at one to three spots | Funnels that last eight seconds and **drift toward the nearest player**, slower than you can walk, hurting (2 every half second) and lifting everything inside | Outrun them or fly out of the column. The Chaos Shield stops the damage |
-| **Cairo Collapse** | transition 2 | The ground ripples outward; he floats up, arms wide | **Three rings of sand** cross the arena, 1.1 blocks tall: **12 damage**, strong knockback | Jump or fly over each ring (30 ticks between them). The Chaos Shield stops each |
+| **Sand Lances** | phase 1 | His right hand rises and the fingers pinch; **four thin ochre lines** run from his palm to your chest (locked 6 ticks before it fires) | Four lances in a flat fan, **3.9 damage** each | Strafe and jump. The Chaos Shield stops each. Billy and the Phoenix can catch them in the air and throw them back |
+| **Sand Wave** | phase 1 | Both arms sweep low; a **faint lane** marks the ground, 4 wide (locks just over halfway) | A rolling ridge, 1.1 blocks tall: **6.5 damage**, knockback, Slowness II | Leave the lane. **Jump it** (the wave is lower than a jump's peak). Fly |
+| **Sand Spikes** | phase 1 | A fist rises and slams; **an amber ring on the ground under each of up to four players**, tracking, then locked | Spikes erupt in each ring: **5.85 damage**, launched upward | Leave the ring. Fly higher than three blocks |
+| **Boulder Barrage** | phase 1 | Both arms rise; **three blocks of sand tear out of the ground and orbit over his head** with a growing hum; amber lines to the targets | Three boulders, one at each of up to three players: **5.85 damage** | Sidestep. The Chaos Shield stops them. Billy catches them and throws them back |
+| **Portal Step** | all | Violet shards swirl at his feet and **a second ring opens at the exit**, usually behind the player farthest from him | He steps out of the ring: an arrival shockwave, **3.9 damage**, knockback | Watch the exit ring. **A Hex wall refuses it**: he walks instead |
+| **Backhand** | all | The arm is drawn across the chest (8 ticks) | **7.8 damage**, strong knockback | Step back or aside |
+| **Entomb** (the grasp) | phase 2 | His hand reaches toward one player (the one who wore his shield down most); **a stripe of sand crawls across the ground to their feet** and locks 10 ticks before the hand closes | If you are still on that spot: **you are entombed**: a cocoon of sand, four seconds (80 ticks), unable to move, jump, fly, attack, use items or use powers; **about 1 damage a second (0.98) but never below two hearts** | **Keep moving** after the lock, or fly. **Your friends break the cocoon** (20 health: three sword hits). A complete Chaos Shield is skipped. A phased Vision is intangible |
+| **Mind Crush** | phase 2 | Two fingers to his temple, his eyes flash white-violet and **a violet ring contracts** from 28 blocks to nothing round him (2 seconds) | Everyone within 28 blocks gets **Nausea (4 seconds), Slowness and Blindness** | **Magneto's helmet turns it all away.** **A Phoenix who touches him with Mind Control or the Psionic Field during the tell interrupts it** (the film's duel of minds). The Chaos Shield does not stop it |
+| **Tornado** | phase 2 (one), phase 3 (two) | Both arms rise, the sky above him darkens and **dust spirals up from the ground** at one to three spots | Funnels that last eight seconds and **drift toward the nearest player**, slower than you can walk, hurting (1.3 every half second) and lifting everything inside | Outrun them or fly out of the column. The Chaos Shield stops the damage |
+| **Cairo Collapse** | transition 2 | The ground ripples outward; he floats up, arms wide | **Three rings of sand** cross the arena, 1.1 blocks tall: **6.5 damage**, strong knockback | Jump or fly over each ring (30 ticks between them). The Chaos Shield stops each |
 
 He chooses his next attack by weight among those that are ready and in range, never the same twice in a row. **He walks** (no flight), keeps 8 to 14 blocks from you, closes in when nobody is near and backs off when you press him; in the true form he is 28 percent faster. When he has found no path to anyone for three seconds, he steps through a portal.
 
-## The Four Horsemen
+## The Horsemen
 
-"Maybe empowering nearby creatures": in the film he **enhances** Storm, Psylocke, Archangel and Magneto. In the mod, at Transition 1 he enhances **Husks** (vanilla desert mobs): one more than there are fighters, up to four, in this order. Each is named, glows, has twice a Husk's health, four more attack damage, a little more speed and armour, and **drops nothing and gives no experience**: they cannot be farmed.
+"Maybe empowering nearby creatures": in the film he **enhances** Storm, Psylocke, Archangel and Magneto. In the mod, at Transition 1 he enhances **Husks** (vanilla desert mobs): one more than there are fighters, up to three by default (`horsemenMax` is 4, times the master factor, rounded up; at `powerFactor` 1.0 all four come), in this order. Each is named, glows, has one and a half times a Husk's health, about two more attack damage (1.95), a little more speed and armour, and **drops nothing and gives no experience**: they cannot be farmed.
 
 | Horseman | Gear | His one trick |
 |---|---|---|
 | **War** | iron helmet, chestplate and axe (so Magneto can lift it, strip it and his shield catches its shards) | **Shard Volley** every five seconds: he raises a hand and three iron shards hover, then fly in a fan, 4 damage each |
-| **Famine** | none | **Gale** every six seconds: white lightning crackles on his hands, then a bolt falls beside you and a gust blows you back (3 damage; Thor is not hurt by the lightning, but the wind still pushes) |
-| **Pestilence** | iron sword | **Psi-Blade Dash** every five seconds: the sword glows violet, then a six-block leap at you: 7 damage and Slowness |
-| **Death** | none | **Dive** every seven seconds: he springs up, hangs, and dives with a slam: 9 damage in a radius of two and a half blocks |
+| **Famine** | none | **Gale** every six seconds: white lightning crackles on his hands, then a bolt falls beside you and a gust blows you back (1.95 damage; Thor is not hurt by the lightning, but the wind still pushes) |
+| **Pestilence** | iron sword | **Psi-Blade Dash** every five seconds: the sword glows violet, then a six-block leap at you: 4.55 damage and Slowness |
+| **Death** | none | **Dive** every seven seconds: he springs up, hangs, and dives with a slam: 5.85 damage in a radius of two and a half blocks. (He is the fourth: he comes only when four Horsemen do.) |
 
 They live until killed, or until Transition 2, when they crumble to sand. They are ordinary creatures: Wanda can lift them, a Phoenix can take one over (a possessed Horseman fights for her), Billy can freeze them. To a **Magneto** he says, once, "Join me, Erik." (it means nothing more).
 
@@ -179,12 +207,12 @@ From the moment the Capstone is planted, a circle of 32 blocks round it (the are
 
 | Hero | Against the boss |
 |---|---|
-| **Scarlet Witch** | The one who breaks his shield. Her **Chaos Beam and telekinesis throws** wear it down, **critically**; in a window they hurt him twice as much as anyone's. She can **hold him even through his shield**, and throwing him wears it; she lifts the Horsemen and **a cocooned friend (the cocoon breaks: she frees him)**. The **Chaos Shield** stops every sand attack (the shield pays the damage) and the Horsemen's iron shards, but not the Mind Crush; his grasp skips her. Her **Hex** is a perfect arena: it bounces him, **refuses his Portal Step and his Escape**, and kills the Horsemen at the wall. |
+| **Scarlet Witch** | The one who breaks his shield. Her **Chaos Beam and telekinesis throws** wear it down, **critically**; in a window they hurt him twice as much as anyone's. She can **hold him even through his shield**, and throwing him wears it; she lifts the Horsemen and **a cocooned friend (the cocoon breaks: she frees him)**. The **Chaos Shield** stops every sand attack and the Horsemen's iron shards, but not the Mind Crush; his grasp skips her. Since 3.2 her shield is unlimited: it pays nothing and never breaks (`scarlet_witch.shieldUnlimited`; with it `false` the shield pays the damage, as in 3.1). Her **Hex** is a perfect arena: it bounces him, **refuses his Portal Step and his Escape**, and kills the Horsemen at the wall. |
 | **Phoenix** | The other breaker. Her **Burst breaks any shield in one go when she fights him alone** (with more fighters it takes most of it), **critically**; her throws, Mind Control and Psionic Field wear and strain it (also critically); touching him interrupts the Mind Crush. He is immune to being read or possessed. **Her fire finishes him**: if she dealt the last blows he dies in orange-gold fire, layer by layer. |
 | **Magneto** | His helmet turns away the Mind Crush entirely. His **Armor & Weapon Strip** on the boss in a window cuts his armour to nothing for that window and **adds five seconds** to it (once per window): "Erik and Jean dismantled it". The War Horseman is iron, so he can lift and strip it. He can hold Apocalypse in a window, until his true form (4.5 seconds), never while the shield is up; his strip and his pull tear War's and Pestilence's iron off them, and it crumbles (the Horsemen are never farmed). His shrapnel and thrown golems are *not* mind power: they hurt the body at 0.4. |
 | **Quicksilver** | Quicksilver Time slows him fully for **four seconds**, then he **adapts** and is immune to it for half a minute, and answers by **entombing the speedster's feet** (the film). Slowed Lances and Boulders hang in the air like arrows. Blitz and punches do nothing while the shield is up, and in a window a Blitz does 12. |
 | **Thor** | Mjolnir cannot pin him. Thrown weapons and fragments are **turned back to Thor, never destroyed**. The lightning beam is deflected while the shield is up, but **lightning interrupts his Escape**. An **entombed Thor** cannot use his abilities. |
-| **Billy** | The Freeze does not touch him. **Telekinesis catches his Lances and Boulders in flight and throws them back** (they hurt him only in a window). He can hold Apocalypse only in a window. His Hex Bolt does not wear the shield. |
+| **Billy** | The Freeze does not touch him. **Telekinesis catches his Lances and Boulders in flight and throws them back** (they hurt him only in a window). He can hold Apocalypse only in a window. His Hex Beam does not wear the shield, and his Hex Barrier stops the sand's blows from the front (it breaks fast: 20 points at his first rank). |
 | **Loki** | The Scepter does not confuse him, nobody can shapeshift into him. Duplicates draw the Horsemen, though he picks only players. |
 | **Vision** | The Mind Stone beam is deflected while the shield is up (7.5 in a window). A **phased Vision cannot be entombed** and his Lances pass through. |
 | **Tommy** | Vibrate cannot free him from a cocoon: no key works while he is entombed, so his friends must break it (or lift him out with telekinesis). The Whirlwind lifts the Horsemen. |
@@ -246,8 +274,9 @@ Every sound is original, synthesised for the mod; none is the film's score. The 
 
 ## For servers
 
-All numbers are in the server config, in the sections `[apocalypse_shield]` (what counts as mind power: to count Billy's or Vision's, add `"billy"` or `"vision"` and also their damage types (`enhanced:hex_bolt`, `enhanced:mind_stone_beam`) to the datapack tag `enhanced:mind_power`), `[apocalypse_boss]` (the fight) and `[apocalypse]` (the hero), and the numbers every boss shares (how many fights at once, the wipe and abandon clocks, the reward's minimum time, the experience, the time limit, the protection of the arena) are in `[boss]`. See [Server Configuration](Server-Configuration#apocalypse-the-boss-his-shield-and-the-hero).
+All numbers are in the server config, in the sections `[apocalypse_shield]` (what counts as mind power: to count Billy's or Vision's, add `"billy"` or `"vision"` and also their damage types (`enhanced:hex_bolt`, `enhanced:hex_beam`, `enhanced:mind_stone_beam`) to the datapack tag `enhanced:mind_power`), `[apocalypse_boss]` (the fight) and `[apocalypse]` (the hero), and the numbers every boss shares (how many fights at once, the wipe and abandon clocks, the reward's minimum time, the experience, the time limit, the protection of the arena) are in `[boss]`. See [Server Configuration](Server-Configuration#apocalypse-the-boss-his-shield-and-the-hero).
 
+* The master factor is `apocalypse_boss.powerFactor` (0.65; 1.0 brings back the 3.1 strength of his blows, his counts and his pace); his shields and windows are `shieldStrength`, `shieldGrowth`, `shieldPerExtraPlayer`, `windowTicks` and `staggerTicks`, and the damage of each attack is its own `...Damage` option. They are all in [Server Configuration](Server-Configuration#apocalypse-the-boss-his-shield-and-the-hero).
 * His health never heals because `apocalypse_boss.regenPerSecond` and `apocalypse_boss.trueFormRegenPerSecond` are **0** by default (put a number back to let him heal). The critical hits are `apocalypse_shield.critHeroes` (which heroes), `critShieldFactor` and `critBodyFactor` (2.0), and `othersBodyFactor` (0.4); `apocalypse_shield.borrowedSlamFactor` is how much a borrowed block wears the shield.
 * `apocalypse_boss.requireBreaker` can be turned off, so the ritual works with nobody who can break his shield (the fail-safe still withdraws him).
 * `apocalypse.shieldOtherWear` set to **0** makes the hero's shield cost nothing for what it stops (the literal rule). **His own shield always uses the literal rule.**
