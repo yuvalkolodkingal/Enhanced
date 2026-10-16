@@ -311,6 +311,51 @@ public final class BuildRulesTests {
         helper.succeed();
     }
 
+    /**
+     * The 2 ms a cast reads its preview by are wall-clock time (D-B 10.1): on a busy machine the preview of a bigger plan
+     * is cut off, and a cut-off preview says nothing of the cells it did not reach, so it cannot refuse the cast. The
+     * spell is then queued like any other and still ends with its own verdict (what was left, counted), never with
+     * none; with a steady clock the same fill is refused before it is cast.
+     */
+    @GameTest(template = ARENA, batch = "build_rules_cut_off")
+    public static void aPreviewCutOffByItsClockStillEndsInTheSpellsVerdict(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        f.config(BossConfig.ANNOUNCE_FIGHTS, false);
+        ServerPlayer starter = f.player(10.5, FLOOR, 12.5);
+        ServerPlayer billy = builder(f, Power.BILLY, 10.5, 6.5, Blocks.STONE);
+        fight(f, starter, BossKind.ULTRON, true);
+        BoundingBox inside = new BoundingBox(7, 2, 7, 13, 3, 11);
+        int cells = 7 * 2 * 5;
+        for (BlockPos pos : BlockPos.betweenClosed(abs(f, 7, 2, 7), abs(f, 13, 3, 11))) {
+            check(BossFights.inAnyArena(f.level(), pos), "the box lies in the arena: " + pos);
+        }
+
+        // A clock that is 3 ms later at every look: the preview's 2 ms are over at its first look.
+        long[] now = {0L};
+        BuildMagic.useClock(() -> now[0] += 3_000_000L);
+        Seen.of(billy);
+        cast(billy, boxSpell(f, Spell.FILL, inside), BuildCastPayload.PREFLIGHT);
+        Seen seen = Seen.of(billy);
+        check(seen.code() == BuildVerdictPayload.READY_PARTLY && (seen.verdict().flags() & BuildVerdictPayload.CUT_OFF) != 0,
+                "the preflight is cut off and says so: " + seen);
+        cast(billy, boxSpell(f, Spell.FILL, inside));
+        seen = Seen.of(billy);
+        check(working(billy) != null && seen.verdicts.isEmpty(), "a cut-off preview cannot refuse, so the spell is cast and waits: " + seen);
+        finish(billy);
+        seen = Seen.of(billy);
+        check(seen.code() == BuildVerdictPayload.DONE_PARTLY && seen.said("message.enhanced.build.left.protected")
+                && seen.arg("message.enhanced.build.left.protected", 0).equals(String.valueOf(cells)),
+                "it ends with its verdict, every cell counted protected: " + seen);
+        check(working(billy) == null && count(f, inside, Blocks.STONE) == 0 && steps(billy).isEmpty(), "and it built nothing");
+
+        BuildMagic.useClock(() -> 0L);
+        billy.setData(ModAttachments.BUILD_DATA, billy.getData(ModAttachments.BUILD_DATA).withPauseUntil(0L)); // (the pause after his spell)
+        cast(billy, boxSpell(f, Spell.FILL, inside));
+        seen = Seen.of(billy);
+        check(working(billy) == null && seen.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE, "with a steady clock it is refused up front: " + seen);
+        helper.succeed();
+    }
+
     // B58
 
     /**

@@ -953,6 +953,7 @@ public final class V31CrossTests {
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
         f.onClose(Telekinesis::clear);
+        BuildTestSupport.steadyClock(); // (the cast's 2 ms preview is wall-clock time: a busy server must not cut it short)
         ServerLevel level = f.level();
         MinecraftServer server = level.getServer();
         BlockPos ore = new BlockPos(24, SokoviaTestSupport.SURFACE - 1, 21);
