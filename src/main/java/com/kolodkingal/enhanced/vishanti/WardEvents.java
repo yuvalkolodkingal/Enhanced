@@ -56,7 +56,8 @@ public final class WardEvents {
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (PlaceBook.Kind.VISHANTI.data(player).bases() > 0) {
+            // A ward whose base is no longer in the book (a wiped book) is taken away too.
+            if (PlaceBook.Kind.VISHANTI.data(player).bases() > 0 || WardManager.count(player.server, player.getUUID()) > 0) {
                 WardManager.refresh(player);
             }
             WardManager.send(player);

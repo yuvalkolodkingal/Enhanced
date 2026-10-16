@@ -8,14 +8,24 @@ import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.monster.Blaze;
+import net.minecraft.world.entity.monster.Guardian;
+import net.minecraft.world.entity.monster.Vex;
+import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -61,9 +71,15 @@ public final class WardManager {
         return type.getCategory() == MobCategory.MONSTER && !type.is(ModTags.WARD_IMMUNE);
     }
 
-    /** Whether this one is let through although it is a monster: a boss, a fight's, a pet, a rider. */
-    private static boolean exempt(Mob mob) {
-        if (mob.getType().is(ModTags.WARD_IMMUNE) || mob.isPassenger() || mob.isVehicle()) {
+    /**
+     * Whether this one is let through although it is a monster: a boss, a fight's, a pet, a rider, one the player keeps (it has a
+     * name, or is on a leash) and a Zombie Villager that is being cured (it would be thrown out of the trading hall it is cured in).
+     */
+    public static boolean exempt(Mob mob) {
+        if (mob.getType().is(ModTags.WARD_IMMUNE) || mob.isPassenger() || mob.isVehicle() || mob.hasCustomName() || mob.isLeashed()) {
+            return true;
+        }
+        if (mob instanceof ZombieVillager villager && villager.isConverting()) {
             return true;
         }
         if (mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null) {
@@ -74,11 +90,19 @@ public final class WardManager {
 
     // ---- the lookups ----
 
+    /**
+     * Whether wards work at all: the book and its wards are on ({@code vishanti.enabled}, {@code wardsEnabled}). Turning them off
+     * silences every ward in the world, those of owners who are offline too.
+     */
+    public static boolean wardsOn() {
+        return VishantiConfig.ENABLED.get() && VishantiConfig.WARDS_ENABLED.get();
+    }
+
     /** The ward that protects this point of the level, or null. */
     @Nullable
     public static Ward wardAt(ServerLevel level, Vec3 point) {
         WardStore store = WardStore.peek(level);
-        return store == null || store.isEmpty() ? null : store.at(point);
+        return store == null || store.isEmpty() || !wardsOn() ? null : store.at(point);
     }
 
     /** Whether a ward protects this point of the level. */
@@ -93,7 +117,7 @@ public final class WardManager {
             return false;
         }
         WardStore store = WardStore.peek(level);
-        return store != null && !store.isEmpty() && VishantiConfig.WARD_BLOCKS_SPAWNS.get() && keepsOut(type) && store.at(point) != null;
+        return store != null && !store.isEmpty() && wardsOn() && VishantiConfig.WARD_BLOCKS_SPAWNS.get() && keepsOut(type) && store.at(point) != null;
     }
 
     // ---- the look every few ticks ----
@@ -101,7 +125,7 @@ public final class WardManager {
     /** Once a tick for every level: each awake ward whose turn it is looks at what is inside it. */
     public static void tickLevel(ServerLevel level) {
         WardStore store = WardStore.peek(level);
-        if (store == null || store.isEmpty()) {
+        if (store == null || store.isEmpty() || !wardsOn()) {
             return;
         }
         int every = VishantiConfig.WARD_CHECK_TICKS.get();
@@ -118,7 +142,7 @@ public final class WardManager {
 
     /** One look: every monster inside the ward is thrown or set outside. Does nothing where nothing is loaded. */
     static int look(ServerLevel level, Ward ward) {
-        if (!level.isPositionEntityTicking(BlockPos.containing(ward.center()))) {
+        if (!playerNear(level, ward)) {
             return 0;
         }
         AABB box = new AABB(ward.center(), ward.center()).inflate(ward.radius());
@@ -133,8 +157,23 @@ public final class WardManager {
         return inside.size();
     }
 
+    /**
+     * Whether a player is close enough for the ward to matter (within its radius and a margin): nobody near, nothing in the ward
+     * is ticking, and a look would be work for nothing. (Each monster is also asked whether it is ticking, so a far corner of a
+     * big ward is looked at when a player is there, whatever the centre's chunk does.)
+     */
+    private static boolean playerNear(ServerLevel level, Ward ward) {
+        double reach = ward.radius() + 96.0;
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(ward.center()) <= reach * reach) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean intrudes(ServerLevel level, Ward ward, Mob mob) {
-        return mob.isAlive() && mob.getType().getCategory() == MobCategory.MONSTER && !exempt(mob)
+        return mob.isAlive() && level.isPositionEntityTicking(mob.blockPosition()) && mob.getType().getCategory() == MobCategory.MONSTER && !exempt(mob)
                 && ward.contains(mob.getBoundingBox().getCenter()) && !BossFights.inAnyArena(level, mob.blockPosition());
     }
 
@@ -165,22 +204,61 @@ public final class WardManager {
         if (!level.hasChunkAt(BlockPos.containing(x, mob.getY(), z))) {
             return false;
         }
-        boolean grounded = mob.onGround();
+        boolean ground = needsGround(mob);
+        boolean water = mob instanceof Guardian;
         for (int i = 0; i <= 2 * SCAN; i++) {
             // 0, +1, -1, +2, -2 ...: the nearest height first.
             int step = (i + 1) / 2 * (i % 2 == 1 ? 1 : -1);
             double y = mob.getY() + step;
             AABB body = mob.getDimensions(mob.getPose()).makeBoundingBox(x, y, z);
-            if (center.distanceToSqr(body.getCenter()) < need * need || !level.noCollision(mob, body)) {
+            if (center.distanceToSqr(body.getCenter()) < need * need || !level.noCollision(mob, body) || hazardous(level, body)) {
                 continue;
             }
-            if (grounded && level.noCollision(mob, body.move(0, -0.6, 0))) {
+            if (ground) {
+                BlockPos below = BlockPos.containing(x, y - 0.05, z);
+                if (!level.getBlockState(below).isFaceSturdy(level, below, Direction.UP)) {
+                    continue;
+                }
+            }
+            if (water && !level.getFluidState(BlockPos.containing(x, y + 0.3, z)).is(FluidTags.WATER)) {
                 continue;
             }
             mob.moveTo(x, y, z, mob.getYRot(), mob.getXRot());
             mob.setDeltaMovement(Vec3.ZERO);
             mob.fallDistance = 0.0F;
             return true;
+        }
+        return false;
+    }
+
+    /** Whether this mob walks on the ground (a flyer or a swimmer is not set down on a floor). */
+    public static boolean needsGround(Mob mob) {
+        return !(mob.isNoGravity() || mob instanceof FlyingMob || mob instanceof Vex || mob instanceof Blaze || mob instanceof Guardian);
+    }
+
+    /**
+     * Whether something in or just under this body would hurt whoever stands there: lava, fire, magma, a cactus, a berry bush, a
+     * wither rose. A monster is never set down on one.
+     */
+    public static boolean hazardous(ServerLevel level, AABB body) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        int x0 = Mth.floor(body.minX + 0.01);
+        int x1 = Mth.floor(body.maxX - 0.01);
+        int y0 = Mth.floor(body.minY + 0.01) - 1;
+        int y1 = Mth.floor(body.maxY - 0.01);
+        int z0 = Mth.floor(body.minZ + 0.01);
+        int z1 = Mth.floor(body.maxZ - 0.01);
+        for (int x = x0; x <= x1; x++) {
+            for (int y = y0; y <= y1; y++) {
+                for (int z = z0; z <= z1; z++) {
+                    BlockState state = level.getBlockState(pos.set(x, y, z));
+                    if (state.is(BlockTags.FIRE) || state.is(Blocks.MAGMA_BLOCK) || state.is(Blocks.CACTUS) || state.is(Blocks.SWEET_BERRY_BUSH)
+                            || state.is(Blocks.WITHER_ROSE) || state.is(Blocks.CAMPFIRE) || state.is(Blocks.SOUL_CAMPFIRE)
+                            || state.getFluidState().is(FluidTags.LAVA)) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
@@ -265,24 +343,45 @@ public final class WardManager {
 
     // ---- the clients ----
 
-    /** Tells everyone in the level which wards stand in it. */
+    /** How far (blocks) beyond a ward's edge a client is told of it: the dome is drawn from 64, and a margin for walking. */
+    public static final double TELL_MARGIN = 256.0;
+
+    /** Tells everyone in the level which wards stand near them (and their own, wherever). */
     public static void send(ServerLevel level) {
-        PacketDistributor.sendToPlayersInDimension(level, payload(level));
+        for (ServerPlayer player : level.players()) {
+            PacketDistributor.sendToPlayer(player, payload(level, player));
+        }
     }
 
-    /** Tells one player which wards stand in the level they are in. */
+    /** Tells one player which wards stand near them in the level they are in. */
     public static void send(ServerPlayer player) {
-        PacketDistributor.sendToPlayer(player, payload(player.serverLevel()));
+        PacketDistributor.sendToPlayer(player, payload(player.serverLevel(), player));
     }
 
+    /** Every awake ward of the level (what the operators see; no client gets this much). */
     public static WardSyncPayload payload(ServerLevel level) {
+        return payload(level, null);
+    }
+
+    /**
+     * The awake wards of the level that {@code viewer} is told of: those within {@link #TELL_MARGIN} blocks of their edge, and the
+     * viewer's own wherever they are (so a base location far from anyone is not handed to every client).
+     */
+    public static WardSyncPayload payload(ServerLevel level, @Nullable ServerPlayer viewer) {
         WardStore store = WardStore.peek(level);
         List<WardSyncPayload.Dome> domes = new ArrayList<>();
         if (store != null) {
             for (Ward ward : store.wards()) {
-                if (ward.awake() && domes.size() < WardSyncPayload.MAX_DOMES) {
-                    domes.add(new WardSyncPayload.Dome(ward.center().x, ward.center().y, ward.center().z, ward.radius(), ward.color()));
+                if (!ward.awake() || domes.size() >= WardSyncPayload.MAX_DOMES) {
+                    continue;
                 }
+                if (viewer != null && !ward.owner().equals(viewer.getUUID())) {
+                    double reach = ward.radius() + TELL_MARGIN;
+                    if (viewer.distanceToSqr(ward.center()) > reach * reach) {
+                        continue;
+                    }
+                }
+                domes.add(new WardSyncPayload.Dome(ward.center().x, ward.center().y, ward.center().z, ward.radius(), ward.color()));
             }
         }
         return new WardSyncPayload(level.dimension(), domes);
