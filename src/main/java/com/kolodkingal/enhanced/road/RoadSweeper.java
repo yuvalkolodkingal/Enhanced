@@ -170,9 +170,6 @@ public final class RoadSweeper {
         int cost = CHUNK_COST;
         AABB area = new AABB(chunkPos.getMinBlockX(), level.getMinBuildHeight() - 64, chunkPos.getMinBlockZ(),
                 chunkPos.getMaxBlockX() + 1, level.getMaxBuildHeight() + 64, chunkPos.getMaxBlockZ() + 1);
-        for (Entity entity : level.getEntities((Entity) null, area, e -> !(e instanceof Player))) {
-            entity.discard();
-        }
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         int low = Math.max(job.minY, level.getMinBuildHeight());
         int high = Math.min(job.maxY, level.getMaxBuildHeight() - 1);
@@ -195,6 +192,10 @@ public final class RoadSweeper {
                 }
             }
             y = top + 1;
+        }
+        // The entities go last: taking a block away may spill what it held (a chest's contents) as items.
+        for (Entity entity : level.getEntities((Entity) null, area, e -> !(e instanceof Player))) {
+            entity.discard();
         }
         return cost;
     }

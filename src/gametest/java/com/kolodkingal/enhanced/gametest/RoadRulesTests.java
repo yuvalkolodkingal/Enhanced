@@ -63,7 +63,7 @@ public final class RoadRulesTests {
         f.onClose(() -> RoadChallenges.unregister(added));
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
         ServerPlayer other = RoadTestSupport.walker(f, 6.5, 6.5);
-        check(RoadTrials.enter(player, RoadChallenges.count() - 1), "he walks the trial with a plot");
+        check(RoadTrials.enter(player, RoadChallenges.indexOf(added)), "he walks the trial with a plot");
         helper.startSequence()
                 .thenWaitUntil(RoadTestSupport.active(player))
                 .thenExecute(() -> {
@@ -220,7 +220,7 @@ public final class RoadRulesTests {
         RoadChallenges.register(added);
         f.onClose(() -> RoadChallenges.unregister(added));
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
-        check(RoadTrials.enter(player, RoadChallenges.count() - 1), "he walks the trial that spawns a boat and forgets an item");
+        check(RoadTrials.enter(player, RoadChallenges.indexOf(added)), "he walks the trial that spawns a boat and forgets an item");
         Boat[] boat = new Boat[1];
         ItemEntity[] item = new ItemEntity[1];
         helper.startSequence()

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.road;
 
 import com.kolodkingal.enhanced.road.boat.IceBoatChallenge;
+import com.kolodkingal.enhanced.road.copy.StructureCopyChallenge;
 import com.kolodkingal.enhanced.road.parkour.ParkourChallenge;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,43 +10,49 @@ import java.util.List;
 
 /**
  * The trials of the Road, in the order they are walked: the first is trial 1, and winning each unlocks the next. The
- * list is built here, in one place; a new trial is one line in the static block below.
+ * list is built here, in one place; a new trial is one line in the static block below. A trial has an order number: the trials
+ * are walked from the lowest to the highest, so that each trial's line can say where it belongs whatever the order the lines
+ * are in (parkour 10, copy the structure 20, the boat race 30).
  */
 public final class RoadChallenges {
-    private static final List<RoadChallenge> ALL = new ArrayList<>();
-    /** The order number each trial was registered with (the list is kept sorted by it). */
-    private static final List<Integer> ORDER = new ArrayList<>();
+    private record Entry(int order, RoadChallenge challenge) {
+    }
+
+    private static final List<Entry> ALL = new ArrayList<>();
 
     static {
-        // Trial 1: the Parkour. (Trial 2, copying a structure, goes between; trial 3, the ice-boat race, has the order number 3.)
-        register(new ParkourChallenge());
-        register(3, new IceBoatChallenge());
+        register(new ParkourChallenge(), 10);
+        register(new StructureCopyChallenge(), 20);
+        register(new IceBoatChallenge(), 30);
     }
 
     /** Adds a trial at the end of the Road. */
     public static synchronized void register(RoadChallenge challenge) {
-        register(ORDER.isEmpty() ? 1 : ORDER.get(ORDER.size() - 1) + 1, challenge);
+        register(challenge, ALL.isEmpty() ? 10 : ALL.get(ALL.size() - 1).order + 10);
     }
 
     /**
-     * Adds a trial with an explicit order number: it comes after every trial with a lower number and before every one with a higher
-     * number, whatever the order they are registered in (so trials made apart from one another can say where they belong).
+     * Adds a trial with an order number: it is walked after the trials with a lower number and before those with the same or a
+     * higher one.
      */
-    public static synchronized void register(int order, RoadChallenge challenge) {
+    public static synchronized void register(RoadChallenge challenge, int order) {
         if (byId(challenge.id()) != null) {
             throw new IllegalArgumentException("Two trials called " + challenge.id());
         }
-        int at = ORDER.size();
-        while (at > 0 && ORDER.get(at - 1) > order) {
-            at--;
+        int at = 0;
+        while (at < ALL.size() && ALL.get(at).order < order) {
+            at++;
         }
-        ALL.add(at, challenge);
-        ORDER.add(at, order);
+        ALL.add(at, new Entry(order, challenge));
     }
 
     /** The trials in order (a copy). */
     public static synchronized List<RoadChallenge> all() {
-        return List.copyOf(ALL);
+        List<RoadChallenge> all = new ArrayList<>();
+        for (Entry entry : ALL) {
+            all.add(entry.challenge);
+        }
+        return List.copyOf(all);
     }
 
     public static synchronized int count() {
@@ -55,30 +62,52 @@ public final class RoadChallenges {
     /** The trial with this number (0 is the first), or null. */
     @Nullable
     public static synchronized RoadChallenge get(int index) {
-        return index >= 0 && index < ALL.size() ? ALL.get(index) : null;
+        return index >= 0 && index < ALL.size() ? ALL.get(index).challenge : null;
     }
 
     @Nullable
     public static synchronized RoadChallenge byId(String id) {
-        for (RoadChallenge challenge : ALL) {
-            if (challenge.id().equals(id)) {
-                return challenge;
+        for (Entry entry : ALL) {
+            if (entry.challenge.id().equals(id)) {
+                return entry.challenge;
             }
         }
         return null;
     }
 
     public static synchronized int indexOf(RoadChallenge challenge) {
-        return ALL.indexOf(challenge);
+        for (int i = 0; i < ALL.size(); i++) {
+            if (ALL.get(i).challenge == challenge) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** Takes a trial out of the Road again (a test that added a trial of its own, when it ends). */
     public static synchronized void unregister(RoadChallenge challenge) {
-        int at = ALL.indexOf(challenge);
-        if (at >= 0) {
-            ALL.remove(at);
-            ORDER.remove(at);
+        ALL.removeIf(entry -> entry.challenge == challenge);
+    }
+
+    /**
+     * For tests: from now on the Road has exactly these trials, in this order, until the returned action is run (it puts back the
+     * trials the Road had, with their order numbers). A test of the framework walks a Road of its own making this way, whatever
+     * trials the mod has.
+     */
+    public static synchronized Runnable swap(List<RoadChallenge> trials) {
+        List<Entry> before = new ArrayList<>(ALL);
+        ALL.clear();
+        int order = 10;
+        for (RoadChallenge trial : trials) {
+            ALL.add(new Entry(order, trial));
+            order += 10;
         }
+        return () -> {
+            synchronized (RoadChallenges.class) {
+                ALL.clear();
+                ALL.addAll(before);
+            }
+        };
     }
 
     private RoadChallenges() {

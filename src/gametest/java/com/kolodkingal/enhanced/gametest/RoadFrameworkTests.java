@@ -462,14 +462,14 @@ public final class RoadFrameworkTests {
 
     // ---- winning, and on to the next trial ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    /** A Road of its own (the registry is swapped): nothing running beside it may see that, so it has a batch of its own. */
+    @GameTest(template = ARENA, batch = "road_framework_swap", timeoutTicks = 600)
     public static void winningUnlocksTheNextTrialAndTheGateLeadsToIt(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
         RoadChallenge added = new RoadTestSupport.ShortParkour("test_second");
-        // Right after the parkour (order 1: after the trials with that number, before the ones with a higher one), whatever other trials the Road has.
-        RoadChallenges.register(1, added);
-        f.onClose(() -> RoadChallenges.unregister(added));
+        // A Road of two trials: the parkour and this one (the mod's later trials are not part of this test).
+        f.onClose(RoadChallenges.swap(List.of(RoadChallenges.byId("parkour"), added)));
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
         check(RoadTrials.enter(player), "he walks the Road");
         RoadTrial[] first = new RoadTrial[1];
@@ -511,7 +511,7 @@ public final class RoadFrameworkTests {
                     check(RoadSave.get(server).cell(firstCell[0]) == null, "and gone");
                     check(RoadTestSupport.tickets(RoadTestSupport.road(helper), player.getUUID()) == second.chunks().length, "only the new trial's chunks are held");
                     check(progress.completed() == 1 && progress.checkpoint() == 0 && progress.inside(), "his progress: one won, at the start of the next");
-                    // He wins that one too: the next trial of the Road is built (the Road has other trials after it).
+                    // He wins that one too: no trial is left, the Road is walked.
                     RoadTestSupport.put(player, RoadTestSupport.road(helper), RoadTestSupport.inside(second.layout().finish()));
                 })
                 .thenExecuteAfter(3, () -> {
@@ -519,14 +519,11 @@ public final class RoadFrameworkTests {
                     check(RoadSave.get(server).progress(player.getUUID()).completed() == 2, "two won");
                     RoadTestSupport.put(player, RoadTestSupport.road(helper), RoadTestSupport.inside(second.layout().gate().zone()));
                 })
-                .thenWaitUntil(() -> {
-                    RoadTrial now = RoadTrials.trialOf(player.getUUID());
-                    check(now != null && now.number() == 2 && now.phase() == RoadTrial.Phase.ACTIVE, "the third trial is ready");
-                    player.hasChangedDimension();
-                })
-                .thenExecute(() -> {
-                    check(RoadTestSupport.trial(player).challenge().id().equals("ice_boat"), "it is the ice-boat race");
-                    check(RoadTrials.isInside(player) && !RoadTrials.walkedAll(player), "he is still on the Road, and has not walked it all");
+                .thenExecuteAfter(3, () -> {
+                    check(!RoadDimension.in(player) && !RoadTrials.isInside(player), "the end of the Road takes him back to the world");
+                    check(RoadTrials.walkedAll(player) && RoadTrials.doorMode(player) == RoadTrials.DoorMode.CHOOSE, "the door now offers the choice");
+                    check(player.getMainHandItem().getCount() == 1, "the Gene is still his");
+                    check(!RoadSave.get(server).progress(player.getUUID()).inside(), "he is not inside");
                 })
                 .thenSucceed();
     }
