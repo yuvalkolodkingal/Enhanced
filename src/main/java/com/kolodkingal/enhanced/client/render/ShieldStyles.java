@@ -47,6 +47,9 @@ public final class ShieldStyles {
         if (!data.chaosShieldUp(now)) {
             return Component.translatable("hud.enhanced.shield_forming").withStyle(ChatFormatting.GOLD);
         }
+        if (Float.isInfinite(max)) {
+            return Component.translatable("hud.enhanced.shield_unlimited").withStyle(ChatFormatting.GREEN);
+        }
         float left = data.shieldStrength();
         ChatFormatting color = left > max * 0.5F ? ChatFormatting.GREEN : left > max * 0.25F ? ChatFormatting.YELLOW : ChatFormatting.RED;
         double seconds = Math.max(0, data.shieldFormedAt() + maxTicks - now) / 20.0;

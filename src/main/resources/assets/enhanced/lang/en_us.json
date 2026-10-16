@@ -1175,5 +1175,6 @@
   "hud.enhanced.seconds": "%ss",
   "subtitles.enhanced.magnet_pull": "Metal is drawn in",
   "message.enhanced.apocalypse.crit": "Critical hit! ×%s",
-  "subtitles.enhanced.apocalypse_crit": "Critical hit on Apocalypse"
+  "subtitles.enhanced.apocalypse_crit": "Critical hit on Apocalypse",
+  "hud.enhanced.shield_unlimited": "∞ unlimited"
 }

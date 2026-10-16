@@ -1175,5 +1175,6 @@
   "hud.enhanced.seconds": "%s ש׳",
   "subtitles.enhanced.magnet_pull": "מתכת נמשכת פנימה",
   "message.enhanced.apocalypse.crit": "פגיעה קריטית! ×%s",
-  "subtitles.enhanced.apocalypse_crit": "פגיעה קריטית באפוקליפסה"
+  "subtitles.enhanced.apocalypse_crit": "פגיעה קריטית באפוקליפסה",
+  "hud.enhanced.shield_unlimited": "∞ ללא הגבלה"
 }

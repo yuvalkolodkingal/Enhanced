@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.HeroServer;
 import com.kolodkingal.enhanced.ability.HeroServers;
 import com.kolodkingal.enhanced.ability.MagnetPull;
@@ -73,6 +74,9 @@ public final class TestKit {
     public static Fixture fixture(GameTestHelper helper) {
         Fixture fixture = new Fixture(helper);
         helper.testInfo.addListener(fixture);
+        // 3.2: the Chaos Shield is unlimited by default; the tests of its limits (strength, hunger, time, recharge) and of
+        // everything else that reads them run under the old rules. A test of the unlimited shield sets it back to true.
+        fixture.config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, false);
         return fixture;
     }
 

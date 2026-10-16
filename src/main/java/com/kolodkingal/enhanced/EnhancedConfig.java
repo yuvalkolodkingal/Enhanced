@@ -65,6 +65,7 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_STRENGTH;
     public static final ModConfigSpec.IntValue CHAOS_SHIELD_COOLDOWN;
     public static final ModConfigSpec.IntValue CHAOS_SHIELD_BROKEN_COOLDOWN;
+    public static final ModConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED;
     public static final ModConfigSpec.IntValue BLOCK_LIFT_RANGE;
     public static final ModConfigSpec.DoubleValue BLOCK_LIFT_MAX_HARDNESS;
     public static final ModConfigSpec.IntValue HEX_DEFAULT_RADIUS;
@@ -246,6 +247,11 @@ public final class EnhancedConfig {
         CHAOS_SHIELD_BROKEN_COOLDOWN = BUILDER.comment("Ticks before the Chaos Shield can be raised again after it shattered or was held to its",
                         "limit (300 = 15 seconds).")
                 .defineInRange("chaosShieldBrokenCooldown", 300, 0, 6000);
+        WANDA_SHIELD_UNLIMITED = BUILDER.comment("3.2: the Chaos Shield is unlimited. It costs no hunger, has no strength to wear down, never shatters,",
+                        "never runs out of time and needs no recharge after it drops (it still takes chaosShieldWindUpTicks to form, and it",
+                        "stops exactly what it stops today). false: the old rules, with chaosShieldExhaustion, chaosShieldStrength,",
+                        "chaosShieldMaxTicks, chaosShieldCooldown and chaosShieldBrokenCooldown.")
+                .define("shieldUnlimited", true);
         BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Wanda and the Phoenix can tear a block out of the ground (Billy and Magneto have",
                         "their own).")
                 .defineInRange("blockLiftRange", 24, 2, 128);
