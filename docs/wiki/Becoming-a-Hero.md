@@ -56,7 +56,7 @@ Craft the **Synthezoid Core**, hold it in one hand and use **Loki's Scepter** wi
 1. Craft a **Witches' Road Door** and place it in the floor.
 2. As a player with no power, in Survival mode, right-click it while holding a **Scarlet Witch Gene**. A ring of blue-green light runs around the door, the doors open onto a spiral stair, and the Road asks: **"Seekest thou the Road?"** Press **Walk the Road**.
 3. Walk the **three trials** of [The Witches' Road](Witches-Road), alone, in a place of your own: a Parkour over the void, a structure to copy block by block, and a long ice-boat race. Each success opens the next; falling never hurts, and you can leave at any time with your Gene.
-4. At the end of the Road, choose **Billy: Wiccan** or **Tommy: Speed**. One gene is used up, and you are taken back to the place where you came in. <!-- ROAD-ENDING: planned ending, see Witches-Road -->
+4. At the end of the Road, choose **Billy: Wiccan** or **Tommy: Speed**. One gene is used up, and you are taken back to the place where you came in.
 
 Without a gene the door won't open ("The Road only opens for witch blood"). A hero already "walks their own road". (A server can switch the trials off with `witches_road.enabled`; the door then gives the instant choice of 3.1.) See [Billy and the Witches' Road](Billy-and-the-Witches-Road).
 
