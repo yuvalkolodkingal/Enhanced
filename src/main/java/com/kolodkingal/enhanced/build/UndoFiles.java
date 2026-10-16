@@ -827,6 +827,17 @@ public final class UndoFiles {
         install(server, owner, read(owner));
     }
 
+    /**
+     * Makes sure the history of {@code owner} is in memory, reading it now when this run has not read it yet (an operator's
+     * command for a player who is away). A history that is already read, or was forgotten, is left as it is.
+     */
+    public static void ensureLoaded(MinecraftServer server, UUID owner) {
+        if (root == null || !LOADED.add(owner)) {
+            return;
+        }
+        loadNow(server, owner);
+    }
+
     private static void install(MinecraftServer server, UUID owner, @Nullable Loaded loaded) {
         if (loaded == null) {
             return;

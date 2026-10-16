@@ -984,10 +984,10 @@ Every power's light follows the films and shows:
 | `/enhanced boss start apocalypse [force]` | With `force`, wakes En Sabah Nur at your feet, with no Capstone, and skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (never the switch that turns him off, Peaceful or the one-fight-at-a-time rule); without `force` the command is the ritual itself and needs a Capstone in hand and a block in sight (section 17.11). |
 | `/enhanced boss stop` | End the running boss fight (a used Program or Capstone is given back, the island of Sokovia is put back); a second stop while a boss is leaving ends it at once. |
 | `/enhanced boss list` | List the running boss fights. |
-| `/enhanced build undo <player> [steps]` | **(3.1)** Undo that player's last Build Magic steps (1 by default, 1 to 1000), newest first, each as a queued job with the same safe rule as Ctrl + Z. The player must be online. |
+| `/enhanced build undo <player> [steps]` | **(3.1)** Undo that player's last Build Magic steps (1 by default, 1 to 1000), newest first, each as a queued job with the same safe rule as Ctrl + Z. **(3.2)** The player may be offline: a word argument resolves his name (online, the profile cache) or UUID, null-safe, `UndoFiles.ensureLoaded` reads his history from the disk once a run, and the job is `BuildJob.replay(profile, ...)`, acted by a fake player of his profile with Wanda's unlimited limits and the safe-undo rule. |
 | `/enhanced build stop [<player>\|all]` | Stop the working spells where they are (undoable) and drop the queues: a player's, or everybody's with `all` or no argument. |
 | `/enhanced build list` | The spells working or waiting: player, spell, dimension, percent, blocks. |
-| `/enhanced build history <player>` | That player's steps, oldest first and numbered from 1, then the undone ones (the redo list): "1. Fill, 140 blocks, 2 min ago, overworld". |
+| `/enhanced build history <player>` | That player's steps, oldest first and numbered from 1, then the undone ones (the redo list): "1. Fill, 140 blocks, 2 min ago, overworld". **(3.2)** Also for an offline player (read from the disk). |
 | `/enhanced build rank <player> [1-10]` | Billy's rank and practice; with a number, set the rank (practice becomes at least its threshold, exactly it when the rank goes down; the meter fills). |
 | `/enhanced build meter <player> <value>` | Set Billy's magic meter (0 to its top). |
 | `/enhanced build forget <player>` | Clear that player's history and pocket (memory and disk). |

@@ -1118,6 +1118,7 @@
   "message.enhanced.build.picked": "Material: %s",
   "message.enhanced.build.hand": "Back to the block in your hand",
   "message.enhanced.build.nothing_grows": "Nothing grows here",
+  "commands.enhanced.build.unknown_player": "Unknown player: not online, not a UUID, and not in the server's list of players who have joined",
   "commands.enhanced.build.undo": "Undid %1$s spells of %2$s",
   "commands.enhanced.build.stop": "Stopped %s spells",
   "commands.enhanced.build.list.entry": "%1$s: %2$s in %3$s, %4$s%% (%5$s blocks)",

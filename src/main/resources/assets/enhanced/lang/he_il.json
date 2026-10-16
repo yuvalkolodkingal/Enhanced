@@ -1118,6 +1118,7 @@
   "message.enhanced.build.picked": "חומר: %s",
   "message.enhanced.build.hand": "חזרה לבלוק שביד",
   "message.enhanced.build.nothing_grows": "שום דבר לא צומח כאן",
+  "commands.enhanced.build.unknown_player": "שחקן לא מוכר: לא מחובר, לא מזהה, ולא ברשימת השחקנים שהצטרפו לשרת",
   "commands.enhanced.build.undo": "בוטלו %1$s קסמים של %2$s",
   "commands.enhanced.build.stop": "נעצרו %s קסמים",
   "commands.enhanced.build.list.entry": "%1$s: %2$s ב-%3$s, %4$s%% (%5$s בלוקים)",

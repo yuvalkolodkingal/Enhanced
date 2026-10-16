@@ -4,19 +4,24 @@ import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,10 +32,11 @@ import java.util.UUID;
  * permission level 2.
  *
  * <pre>
- * /enhanced build undo &lt;player&gt; [steps]       undoes his last steps, as Ctrl + Z would (a parent fixes a child's mistake)
+ * /enhanced build undo &lt;player&gt; [steps]       undoes his last steps, as Ctrl + Z would (a parent fixes a child's mistake);
+ *                                              also for a player who is not online (a name the server knows, or his UUID)
  * /enhanced build stop [&lt;player&gt;|all]        stops working spells where they are (what they did stays, undoable), drops queues
  * /enhanced build list                         the spells working or waiting on the server
- * /enhanced build history &lt;player&gt;            his steps
+ * /enhanced build history &lt;player&gt;            his steps (also for a player who is not online)
  * /enhanced build rank &lt;player&gt; [1-4]         Billy's rank and practice; with a number, sets it
  * /enhanced build meter &lt;player&gt; &lt;value&gt;      sets Billy's meter (0 to its top)
  * /enhanced build forget &lt;player&gt;             clears his history and his pocket, in memory and on disk
@@ -42,7 +48,7 @@ public final class BuildCommands {
     public static LiteralArgumentBuilder<CommandSourceStack> node() {
         return Commands.literal("build")
                 .then(Commands.literal("undo")
-                        .then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.argument("player", StringArgumentType.word()).suggests(BuildCommands::suggestNames)
                                 .executes(ctx -> undo(ctx, 1))
                                 .then(Commands.argument("steps", IntegerArgumentType.integer(1, 1000))
                                         .executes(ctx -> undo(ctx, IntegerArgumentType.getInteger(ctx, "steps"))))))
@@ -53,8 +59,8 @@ public final class BuildCommands {
                                 .executes(ctx -> stop(ctx.getSource(), List.of(EntityArgument.getPlayer(ctx, "player").getUUID())))))
                 .then(Commands.literal("list").executes(ctx -> list(ctx.getSource())))
                 .then(Commands.literal("history")
-                        .then(Commands.argument("player", EntityArgument.player())
-                                .executes(ctx -> history(ctx.getSource(), EntityArgument.getPlayer(ctx, "player")))))
+                        .then(Commands.argument("player", StringArgumentType.word()).suggests(BuildCommands::suggestNames)
+                                .executes(ctx -> history(ctx.getSource(), profile(ctx)))))
                 .then(Commands.literal("rank")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(ctx -> rank(ctx.getSource(), EntityArgument.getPlayer(ctx, "player"), 0))
@@ -71,22 +77,69 @@ public final class BuildCommands {
                                 .executes(ctx -> forget(ctx.getSource(), EntityArgument.getPlayer(ctx, "player")))));
     }
 
+    private static final SimpleCommandExceptionType UNKNOWN_PLAYER = new SimpleCommandExceptionType(
+            Component.translatable("commands.enhanced.build.unknown_player"));
+
+    /**
+     * The player a {@code <player>} word names, online or not: an online player's name, a UUID, or a name in the server's
+     * profile cache ({@code usercache.json}: whoever has joined). Else the command is refused.
+     */
+    private static GameProfile profile(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        MinecraftServer server = ctx.getSource().getServer();
+        String word = StringArgumentType.getString(ctx, "player");
+        ServerPlayer online = server.getPlayerList().getPlayerByName(word);
+        if (online != null) {
+            return online.getGameProfile();
+        }
+        try {
+            UUID id = UUID.fromString(word);
+            ServerPlayer byId = server.getPlayerList().getPlayer(id);
+            if (byId != null) {
+                return byId.getGameProfile();
+            }
+            Optional<GameProfile> known = server.getProfileCache() == null ? Optional.empty() : server.getProfileCache().get(id);
+            return known.orElseGet(() -> new GameProfile(id, id.toString()));
+        } catch (IllegalArgumentException notAnId) {
+            // (a name)
+        }
+        Optional<GameProfile> known = server.getProfileCache() == null ? Optional.empty() : server.getProfileCache().get(word);
+        if (known.isEmpty()) {
+            throw UNKNOWN_PLAYER.create();
+        }
+        return known.get();
+    }
+
+    /** The online players' names, for the tab key. */
+    private static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestNames(
+            CommandContext<CommandSourceStack> ctx, com.mojang.brigadier.suggestion.SuggestionsBuilder builder) {
+        return SharedSuggestionProvider.suggest(ctx.getSource().getServer().getPlayerNames(), builder);
+    }
+
+    /** His history, read from the disk first when he is not online and this run has not read it. */
+    private static UndoHistory historyOf(MinecraftServer server, GameProfile profile) {
+        if (server.getPlayerList().getPlayer(profile.getId()) == null) {
+            UndoFiles.ensureLoaded(server, profile.getId());
+        }
+        return UndoHistory.of(profile.getId());
+    }
+
     /**
      * Undoes the last {@code steps} steps of {@code target}, newest first, each as a job queued behind what he is doing, with
      * the safe-undo rule of Ctrl + Z. A step that left memory is read back in the background first (the next waits for it,
-     * so the order stays); one whose file cannot be read is skipped.
+     * so the order stays); one whose file cannot be read is skipped. He need not be online: his history is read from the
+     * disk, and his profile acts (a fake player), as for the spells of a builder who left while they worked.
      */
     private static int undo(CommandContext<CommandSourceStack> ctx, int steps) throws CommandSyntaxException {
-        ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
+        GameProfile target = profile(ctx);
         MinecraftServer server = ctx.getSource().getServer();
-        UndoHistory history = UndoHistory.of(target.getUUID());
+        UndoHistory history = historyOf(server, target);
         List<UndoStep> list = history.toUndo(steps);
-        ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.build.undo", list.size(), target.getDisplayName()), true);
+        ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.build.undo", list.size(), target.getName()), true);
         queueUndo(server, target, history, list, 0);
         return list.size();
     }
 
-    private static void queueUndo(MinecraftServer server, ServerPlayer target, UndoHistory history, List<UndoStep> list, int i) {
+    private static void queueUndo(MinecraftServer server, GameProfile target, UndoHistory history, List<UndoStep> list, int i) {
         for (; i < list.size(); i++) {
             UndoStep step = list.get(i);
             ServerLevel level = server.getLevel(step.dimension());
@@ -105,18 +158,21 @@ public final class BuildCommands {
             }
             queueOne(server, target, level, step);
         }
-        BuildMagic.sync(server, target.getUUID());
+        BuildMagic.sync(server, target.getId());
     }
 
-    private static void queueOne(MinecraftServer server, ServerPlayer target, ServerLevel level, UndoStep step) {
-        Limits limits = Limits.of(target);
+    private static void queueOne(MinecraftServer server, GameProfile target, ServerLevel level, UndoStep step) {
+        ServerPlayer online = server.getPlayerList().getPlayer(target.getId());
+        Limits limits = online == null ? null : Limits.of(online);
         if (limits == null) {
-            limits = Limits.wanda(Limits.world(level)); // (he is no builder any more: the safe-undo rule is all that is asked)
+            limits = Limits.wanda(Limits.world(level)); // (he is no builder any more, or away: the safe-undo rule is all that is asked)
         }
-        BuildJob job = BuildJob.replay(target, limits, level, step, false, false, BuildScheduler.loaded(target.getUUID(), level));
+        BuildJob job = online != null
+                ? BuildJob.replay(online, limits, level, step, false, false, BuildScheduler.loaded(target.getId(), level))
+                : BuildJob.replay(target, limits, level, step, false);
         BuildScheduler.queue(job, false);
         job.fx(BuildFxPayload.START);
-        BuildMagic.sync(server, target.getUUID());
+        BuildMagic.sync(server, target.getId());
     }
 
     /** Stops the spells of {@code players} (all of them when none is named) and drops their queues. */
@@ -152,14 +208,14 @@ public final class BuildCommands {
         return jobs.size();
     }
 
-    private static int history(CommandSourceStack source, ServerPlayer target) {
-        UndoHistory history = UndoHistory.of(target.getUUID());
+    private static int history(CommandSourceStack source, GameProfile target) {
+        UndoHistory history = historyOf(source.getServer(), target);
         List<UndoStep> steps = history.allSteps();
         if (steps.isEmpty()) {
-            source.sendSuccess(() -> Component.translatable("commands.enhanced.build.history.empty", target.getDisplayName()), false);
+            source.sendSuccess(() -> Component.translatable("commands.enhanced.build.history.empty", target.getName()), false);
             return 0;
         }
-        source.sendSuccess(() -> Component.translatable("commands.enhanced.build.history.header", target.getDisplayName()), false);
+        source.sendSuccess(() -> Component.translatable("commands.enhanced.build.history.header", target.getName()), false);
         long now = source.getServer().overworld().getGameTime();
         List<Component> lines = new ArrayList<>();
         for (int i = 0; i < steps.size(); i++) {

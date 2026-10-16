@@ -572,6 +572,71 @@ public final class BuildUndoTests {
     }
 
     /**
+     * The operator's undo and history for a player who is not online: his history is read from the disk (once), his name (or UUID) is
+     * found, and his profile acts; a name nobody knows undoes nothing; what he did while
+     * he was away comes back as safely as for an online player (a block someone changed since stays).
+     */
+    @GameTest(template = ARENA, batch = "build_undo_offline", timeoutTicks = 300)
+    public static void theOperatorUndoesThePlayerWhoIsAway(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.bossFixture(helper);
+        ServerLevel level = f.level();
+        MinecraftServer server = level.getServer();
+        Path folder = folder(f);
+        ServerPlayer op = f.player(0.5, TestKit.FLOOR, 20.5);
+        ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
+        UUID id = wanda.getUUID();
+        CommandSourceStack operator = op.createCommandSourceStack().withPermission(2);
+        String her = id.toString(); // (the test server has no profile cache: the UUID names her, as an operator may paste it)
+
+        BoundingBox small = new BoundingBox(5, 2, 5, 7, 4, 7);
+        cast(wanda, boxSpell(f, Spell.FILL, small));
+        finish(wanda);
+        BoundingBox other = new BoundingBox(10, 2, 10, 11, 3, 11);
+        cast(wanda, boxSpell(f, Spell.FILL, other));
+        finish(wanda);
+        check(count(f, small, Blocks.STONE) == 27 && count(f, other, Blocks.STONE) == 8, "two spells filled");
+        UndoFiles.drain();
+
+        // She leaves, and the memory is forgotten (a restart): only the disk knows her spells.
+        UndoFiles.onLogout(id); // (a leaving player's index is written)
+        UndoFiles.drain();
+        server.getPlayerList().remove(wanda);
+        UndoHistory.clear();
+        UndoFiles.open(folder); // (the server restarts: nobody has been read yet)
+        check(server.getPlayerList().getPlayer(id) == null && UndoHistory.existing(id) == null, "she is away and the memory is empty");
+
+        BuildTestSupport.Seen.of(op);
+        run(server, operator, "enhanced build history " + her);
+        List<net.minecraft.network.chat.Component> said = BuildTestSupport.Seen.of(op).chat;
+        check(said.stream().filter(line -> BuildTestSupport.Seen.key(line).equals("commands.enhanced.build.history.line")).count() == 2,
+                "the history lists her two spells from the disk: " + said);
+
+        // Someone builds on the first spell's corner meanwhile: the safe rule keeps it.
+        BlockPos mine = abs(f, 5, 2, 5);
+        level.setBlock(mine, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+
+        run(server, operator, "enhanced build undo " + her + " 2");
+        // (Her steps are read back from the disk in the background, one after the other: the test waits for the jobs.)
+        helper.startSequence().thenWaitUntil(() -> {
+            if (BuildScheduler.working(id) != null) {
+                finish(BuildTestSupport.ENDLESS, id);
+            }
+            check(count(f, other, Blocks.AIR) == 8 && count(f, small, Blocks.AIR) == 26, "both spells are taken back: "
+                    + count(f, small, Blocks.AIR) + ", " + count(f, other, Blocks.AIR));
+        }).thenExecute(() -> {
+            check(level.getBlockState(mine).is(Blocks.GOLD_BLOCK), "the gold block someone built meanwhile stays");
+            UndoHistory history = UndoHistory.of(id);
+            check(history.undoCount() == 0 && history.redoCount() == 2, "the history moved them to the redo list: " + history.undoCount()
+                    + ", " + history.redoCount());
+
+            // A name the server does not know: nothing happens.
+            run(server, operator, "enhanced build undo NobodyKnowsThisName");
+            check(BuildScheduler.all().isEmpty(), "an unknown name is refused: no job was queued");
+        }).thenSucceed();
+        return;
+    }
+
+    /**
      * A spell whose record would not fit in what its player may keep on disk (D-B 12.5, the estimate of 0.6 byte a cell and
      * 700 a section) asks for the long hold with {@code NO_UNDO_ROOM}; held for, it runs, and leaves no step.
      */
