@@ -916,13 +916,15 @@ public final class BuildJob {
         }
         sparkle(tick);
         mostInATick = (int) Math.max(mostInATick, writtenThisTick);
-        if (!finished && ticks % PROGRESS_TICKS == 0) {
+        // (An Instant spell steps again and again inside one tick: it sends no progress and hums once, at its cast.)
+        boolean paced = instantMax == 0;
+        if (!finished && paced && ticks % PROGRESS_TICKS == 0) {
             fx(BuildFxPayload.PROGRESS);
         }
-        if (!finished && ticks % SYNC_TICKS == 0) {
+        if (!finished && paced && ticks % SYNC_TICKS == 0) {
             BuildMagic.sync(level.getServer(), caster);
         }
-        if (!finished && ticks % 20 == 0 && kind == Kind.SPELL && phase == Phase.APPLY && cursor != null) {
+        if (!finished && paced && ticks % 20 == 0 && kind == Kind.SPELL && phase == Phase.APPLY && cursor != null) {
             humAlong(Vec3.atCenterOf(cursor.pos()));
         }
         return slice.used();
