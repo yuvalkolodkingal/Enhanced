@@ -34,6 +34,7 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/enhanced road cells` | How many places of the Road are in use or being cleared, and how many players are on it. |
 | `/road leave` | **Anyone** may use it: leaves the Witches' Road, keeping the Gene and the progress. |
 | `/road status` | **Anyone** may use it: how many trials you have won. |
+| `/road choose` | **Anyone** may use it, at the end of the Road: the choice of Billy or Tommy is asked again. |
 
 ## Build Magic: /enhanced build
 

@@ -914,7 +914,7 @@
 | `/enhanced road set <players> <won>` | **(3.2)** קובעת כמה מבחנים ניצחו (0 עד 99). |
 | `/enhanced road layout [player]` | **(3.2)** איפה נקודות השמירה, הסיום והשער של המבחן שלו. |
 | `/enhanced road cells` | **(3.2)** מקומות של הדרך בשימוש או בניקוי, ושחקנים בדרך. |
-| `/road leave`, `/road status` | **(3.2)** לכולם (פקודת שורש שנייה): יוצאים מהדרך ושומרים את הגן; עד איפה הגעתם. |
+| `/road leave`, `/road status`, `/road choose` | **(3.2)** לכולם (פקודת שורש שנייה): יוצאים מהדרך ושומרים את הגן; עד איפה הגעתם; בסוף הדרך, שואלים שוב את הבחירה. |
 
 | `/enhanced boss cleanup <center> <radius>` | מסירה כל יצור מהסוג של בוס בטווח (הבוסים, הזקיפים, החרב, המטאורים, הכדורים והאשליות של תאנוס, מפתח הוויברניום, הקליעים, החניתות, הסלעים והפקעות), בין אם קרב שייך אליו ובין אם לא; אף בלוק לא נוגעים בו. |
 
@@ -2748,15 +2748,19 @@ HUD: פס בוס (הזמן שנשאר, עם חריצים, כחול ← צהוב 
 
 ### 19.10 סוף הדרך
 
-<!-- ROAD-ENDING: this section describes the planned ending of the 3.2 requirements (lane ROAD step 4 was still being built when these docs were written). The integrator must check it against the final code: RoadEnding.finish, the screen inside the Road, where the Gene is consumed and the teleport back. -->
+<!-- ROAD-ENDING: this section follows the state of the ending in the ROAD lane's worktree (uncommitted when these docs were written: EndingHall, RoadEnding, endingFarewellSeconds, /road choose). The integrator must check it against the final code: RoadEnding, the hall, the choice, the Gene and the teleport back. -->
 
-הסוף מחליף את `RoadEnding.finish`, שנקרא כשנכנסים לשער האחרון. **מתוכנן:** מסך הבחירה (`WitchesRoadScreen` במצב `CHOOSE`, `OpenRoadPayload(door, false, done, total)`, נענה ב-`RoadChoicePayload`) נפתח **בתוך הדרך** עם בילי וטומי; `WitchesRoad.choose`
-צורך **גן אחד של מכשפת השני** רק אז (הוא כבר לא דורש דלת פתוחה בטווח 8 בלוקים, בדיקה שהוקלה לבחירה שנעשית בתוך הדרך), השחקן מתעורר עם הכותרת, הצליל וההודעה לשרת הרגילים, ו-`RoadTrials.leave(player, WON)` **מעביר אותו בטלפורט חזרה למקום שבו נכנס** עם מצב המשחק משוחזר. עד שהסוף קיים בקוד
-הקטע הזמני מסמן שהדרך נהלכה, אומר לו, לוקח אותו לכניסה והדלת הבאה מציעה את הבחירה (ההתקדמות אומרת שנוצחו כל המבחנים). שחקן שעוזב לפני שבחר שומר את הגן ויכול לבחור בכל דלת.
+הסוף מחליף את הקטע הזמני של `RoadEnding.finish`. השחקן שניצח בכל המבחנים נכנס בשער האחרון ומובא אל **`EndingHall`**, אולם עגול מאלון כהה ואמטיסט (רדיוס 9, במה ברדיוס 2.6 באמצע עם פנס ים, שישה עמודי אמטיסט עם פנסי נשמות, שורשים וחזזית תלויים מתחת, דלת שוכבת ברצפה מאחוריו) שנבנה בתא משלו כמו מבחן (הוא לא מבחן: שום דבר לא מנצחים בו והוא לא נספר; הוא מוחזק, נשמר,
+ממשיך אחרי כניסה למשחק ומפורק כמו מבחן; המזהה שלו בפנקס הוא `road_end`). `RoadEnding.arrive`: הדרך מדברת (כותרת וכתובית), האור מתאסף `ASK_DELAY_TICKS` (60), והדרך שואלת "את הדרך אתם מבקשים?" שוב: `OpenRoadPayload(door, trials, done, total, ending)` פותח את `WitchesRoadScreen` עם שתי הדרכים וכפתור לעזוב את הדרך בלי לבחור.
+
+* **הבחירה** נבדקת במקום אחד, לא משנה מה הלקוח שולח (`RoadChoicePayload`: השרת הולך לפי איפה השחקן נמצא): הוא באולם, במימד הדרך, חי, בלי כוח, ההתקדמות השמורה שלו אומרת שכל המבחנים נוצחו והוא בפנים, האולם שאל אותו, והוא נושא גן של מכשפת השני. אז **גן אחד נגמר, ורק עכשיו**, והוא מתעורר בדיוק כמו בדלת (`Powers.awaken`: כותרת, צליל, הודעה לשרת).
+* **הפרידה.** במשך `endingFarewellSeconds` (5; 0 עד 30; 0 = מיד) הוא מוחזק איפה שהוא עומד בעמוד אור עולה והדרך נפרדת; הכללים של הדרך עדיין חלים (בלי מקש יכולת, בלי טלפורט החוצה). אחר כך `RoadTrials.leave` שולח אותו למקום שבו נכנס, ואם אי אפשר אל הדלת שפתח, או לנקודת ההתחלה של העולם: הדברים שלו חוזרים, החיים והרעב מלאים, כל אפקט מנוקה, התא מפורק והדרך שוכחת את ההתקדמות שלו.
+* **בלי לבחור.** הוא יכול לסגור את המסך (הדלת באולם ו-`/road choose` שואלות שוב); הכפתור עוזב את הדרך בלי לבחור (`RoadEnding.leaveUnchosen`): חזרה לכניסה **עם הגן**, והדלת בעולם מציעה אז את הבחירה (ההתקדמות אומרת שכל המבחנים נוצחו).
+* **יציאה מהמשחק או קריסה.** באולם: בכניסה הבאה האולם נבנה שוב והשאלה חוזרת. בפרידה: הכוח כבר שלו והכניסה למשחק שולחת אותו החוצה (`RoadTrials.reconcile`). כל המצב של האולם בזיכרון; מה שנשמר הוא `RoadProgress`.
 
 ### 19.11 פקודות, הגדרות, קול, בדיקות
 
-* **פקודות.** `/enhanced road status [player]`, `enter <players> [trial]` (ממוספר מ-1, בלי צורך בגן), `leave <players>`, `reset <players> [newcourse]`, `skip <players>`, `set <players> <won>`, `layout [player]`, `cells`; ולכולם `/road leave`, `/road status` (פקודת שורש שנייה, כי `/enhanced` דורשת רמת הרשאה 2 והדרך החוצה חייבת להיות פתוחה לכולם).
+* **פקודות.** `/enhanced road status [player]`, `enter <players> [trial]` (ממוספר מ-1, בלי צורך בגן), `leave <players>`, `reset <players> [newcourse]`, `skip <players>`, `set <players> <won>`, `layout [player]`, `cells`; ולכולם `/road leave`, `/road status` ובסוף `/road choose` (פקודת שורש שנייה, כי `/enhanced` דורשת רמת הרשאה 2 והדרך החוצה חייבת להיות פתוחה לכולם).
 * **הגדרות** `[witches_road]`, 35 אפשרויות (דף הוויקי הגדרות שרת): הדרך (`enabled`, `maxPlayers` 32, `courseSeed` 0, `resumeOnLogin`, `resumeAtCheckpoint`, `announce`, `voice`, `healAtCheckpoint`, `fallDepth` 12, `leaveConfirmSeconds` 5, `buildBlocksPerTick` 20,000, `removeBlocksPerTick` 20,000), הפרקור (4), מירוץ הסירות (11) והעתקת המבנה (8). קבועים, לא אפשרויות: מרווח התאים 2,048, רדיוס המסלול 450, 64 תאים בשורה.
 * **הקול של הדרך** מדבר בשורת הפעולה ובכותרת (`message.enhanced.road.voice.<event>.<n>`, שלוש גרסאות ל-enter, start, checkpoint, fall, won, leave, back ולהתחלה, ניסיון, קרוב ורמז של מבחן המבנה; באנגלית ובעברית). **צלילים** בשימוש חוזר: `witches_road` (מבחן נפתח, קדימה, סיום), `road_travel` (פנימה והחוצה), צלצולי אמטיסט, הת ופלינג של בלוק תווים, משוטי סירה.
 * **בדיקות:** `RoadFrameworkTests`, `RoadParkourTests`, `RoadRulesTests`, `RoadLoginTests`, `RoadStopTests`, `RoadDoorTests`, `RoadConfigTests`, `RoadDataTests` (המסגרת, בקבוצות `road_framework`, `road_parkour`, `road_rules`...), `RoadStructureModelTests`, `RoadStructureTests`, `RoadStructureOptionTests` (הספרייה על פני 5 × 3 × 150 זרעים, ההשוואה, אספקה וצד, בדיקה ורמז, קריסה),

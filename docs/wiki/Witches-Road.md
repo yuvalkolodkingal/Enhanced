@@ -82,16 +82,16 @@ There are **five kinds of building**: a **hut** (a gabled cottage), a **tower** 
 
 ## The end of the Road
 
-<!-- ROAD-ENDING: this whole section describes the planned ending from the 3.2 requirements (lane ROAD step 4 is still being built). The integrator must check it against the final code: where the choice is shown (inside the Road, after the last gate), when the Gene is used up, and what the player sees when he is taken back. -->
+<!-- ROAD-ENDING: this section follows the state of the ending in the ROAD lane's worktree (uncommitted when these docs were written: EndingHall, RoadEnding, endingFarewellSeconds, /road choose). The integrator must check it against the final code. -->
 
-After the third gate the Road stops asking you to walk. It asks you to **choose**, as the door did in 3.1, and the screen shows the same two roads:
+After the third gate you step into the **end hall**: a round hall of dark oak and amethyst, with a dais in the middle, in a place of its own. The Road gathers its light for three seconds and then asks once more, "Seekest thou the Road?", and the choice screen opens, with the same two roads as the door gave in 3.1:
 
 * **Billy: Wiccan**: blue magic, flight, telekinesis, the Hex Beam and Hex Barrier, and Build Magic that grows with practice. See [Billy](Billy-and-the-Witches-Road).
 * **Tommy: Speed**: super speed, like his uncle. See [Tommy](Tommy).
 
-When you choose, **the Gene is used up** (only now), you awaken with the power you picked, with the title, the sound and the message to the whole server, and the Road **takes you out**: you are teleported back to the place where you came in, in your own game mode. The Road does not need you any more.
+When you choose, **one Gene is used up** (only now, and you must be carrying one), you awaken with the power you picked, with the title, the sound and the message to the whole server, and for a few seconds (`endingFarewellSeconds`, 5 by default, 0 to 30) you stand in a rising column of light while the Road says its farewell. Then the Road **takes you out**: you are teleported back to the place where you came in (failing that, the door you opened, or the world's spawn), in your own game mode, with your things, full health and hunger and every effect cleared. The Road does not need you any more and forgets your progress.
 
-If you leave before choosing (the exit door, `/road leave`, a logout in the wrong moment), the Gene stays in your inventory and the Road remembers that you have walked all of it: open any Witches' Road door with your Gene and you can choose.
+If you close the screen, the door in the floor of the hall, or the command `/road choose`, asks again. A button on the screen lets you **leave without choosing**: the Gene stays in your inventory and the next Witches' Road door you open offers the choice at once, because you have walked all of it. If you log out in the hall it is built again at your next login and the question comes back.
 
 A server that switches the trials off (`witches_road.enabled` is `false`) gets the 3.1 door: right-click it with a Gene and choose at once.
 
@@ -109,6 +109,7 @@ A server that switches the trials off (`witches_road.enabled` is `false`) gets t
 |---|---|---|
 | `/road leave` | everyone | Leaves the Road, keeping the Gene and the progress. |
 | `/road status` | everyone | How many trials you have won, and where you are. |
+| `/road choose` | everyone | At the end of the Road: asks the question again (the choice screen opens). |
 | `/enhanced road status [player]` | operators | The same for any player: trials won, in the Road or not, how many falls. |
 | `/enhanced road enter <players> [trial]` | operators | Sends players onto the Road (no Gene needed); `trial` is 1, 2 or 3. |
 | `/enhanced road leave <players>` | operators | Takes players off the Road. |
