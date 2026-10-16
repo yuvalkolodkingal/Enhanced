@@ -369,6 +369,7 @@ public final class HeroAnimator {
         on[Stance.SHIELD_WANDA.ordinal()] = power == Power.SCARLET_WITCH && data.chaosShieldActive();
         on[Stance.THOR_BEAM.ordinal()] = power == Power.THOR && data.is(Live.CALLING_LIGHTNING);
         on[Stance.BEAM_HAND.ordinal()] = data.is(Live.BEAMING);
+        on[Stance.BARRIER_BILLY.ordinal()] = power == Power.BILLY && data.chaosShieldActive();
         if (on[Stance.BEAM_HAND.ordinal()]) {
             BeamStyle beam = BeamRenderer.styleOf(p.getId());
             s.beamOffHand = beam != null && beam.offHand();

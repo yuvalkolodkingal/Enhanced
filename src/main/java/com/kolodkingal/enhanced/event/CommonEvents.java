@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
+import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.MjolnirShatter;
@@ -253,6 +254,9 @@ public final class CommonEvents {
         if (source.is(DamageTypeTags.IS_FREEZING) && LokiAbilities.isFrostGiant(player)) {
             // A Frost Giant is made of the cold.
             event.setCanceled(true);
+            return;
+        }
+        if (player instanceof ServerPlayer billy && BillyBarrier.isUp(billy) && !unstoppable && BillyBarrier.absorb(billy, event)) {
             return;
         }
         if (player instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(player) && !unstoppable) {

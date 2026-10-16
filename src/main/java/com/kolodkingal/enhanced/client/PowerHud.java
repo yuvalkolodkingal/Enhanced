@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.BillyAbilities;
+import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
@@ -221,11 +222,21 @@ public class PowerHud implements LayeredDraw.Layer {
     private static Component billy(LocalPlayer player, PowerData data, int ability) {
         return switch (ability) {
             case 1 -> BillyAbilities.beamEnabled() ? hexBeam(player, data) : null;
+            case 4 -> BillyBarrier.enabled() && data.chaosShieldActive() ? hexBarrier(player, data) : null;
             case 2 -> onOff(data.flying());
             case 3 -> data.heldEntityId() != -1 ? active("hud.enhanced.holding") : null;
             case 5 -> onOff(data.toggle(Toggle.THE_NOISE));
             default -> null;
         };
+    }
+
+    /**
+     * The Hex Barrier's line while it is up (3.2): "forming", then what is left of its strength and the seconds it can still
+     * be held, as the Chaos Shield's line shows them (its recharge shows instead once it has come down).
+     */
+    private static Component hexBarrier(LocalPlayer player, PowerData data) {
+        BuildData build = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        return shield(data, player.level().getGameTime(), BillyBarrier.maxStrength(build), BillyBarrier.maxTicks(build));
     }
 
     /**

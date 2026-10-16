@@ -264,7 +264,7 @@
   "ability.enhanced.billy.1": "Hex Beam",
   "ability.enhanced.billy.2": "Flight",
   "ability.enhanced.billy.3": "Telekinesis (Sneak: a block)",
-  "ability.enhanced.billy.4": "Freeze",
+  "ability.enhanced.billy.4": "Freeze (Sneak: Hex Barrier)",
   "ability.enhanced.billy.5": "The Noise",
   "variant.enhanced.billy.wiccan": "Wiccan (Agatha All Along)",
   "variant.enhanced.billy.teen": "Teen (on the Witches' Road)",
@@ -1183,5 +1183,8 @@
   "hud.enhanced.billy_beam_firing": "firing: %1$s dmg/s, %2$s blocks",
   "death.attack.enhanced.hex_beam": "%1$s was burned by a Hex Beam",
   "death.attack.enhanced.hex_beam.player": "%1$s was burned by %2$s's Hex Beam",
-  "death.attack.enhanced.hex_beam.item": "%1$s was burned by %2$s's Hex Beam"
+  "death.attack.enhanced.hex_beam.item": "%1$s was burned by %2$s's Hex Beam",
+  "message.enhanced.billy_barrier.recharging": "The Hex Barrier needs %s more seconds",
+  "message.enhanced.billy_barrier.hungry": "Too hungry to raise the Hex Barrier",
+  "message.enhanced.billy_barrier.broken": "The Hex Barrier broke!"
 }

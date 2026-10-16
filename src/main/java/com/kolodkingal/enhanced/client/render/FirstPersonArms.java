@@ -230,6 +230,11 @@ public final class FirstPersonArms {
             both(w, -0.10F, 0.30F, 0.28F, -52, 10, 0);
             tremble(m, o, w, 0.010F, 1.9F, age, calm);
         }
+        if ((w = s.stance(Stance.BARRIER_BILLY)) > 0.001F) {
+            // The plate held up at the left of the screen on the off forearm.
+            o.add(w, -0.05F, 0.22F, 0.34F, -52, -12, 0);
+            tremble(o, null, w, 0.004F, 1.1F, age, calm);
+        }
         if ((w = s.stance(Stance.BEAM_HAND)) > 0.001F) {
             Offset hand = s.beamOffHand ? o : m;
             hand.add(w, 0.0F, 0.14F, 0.42F, -24, 6, 0);

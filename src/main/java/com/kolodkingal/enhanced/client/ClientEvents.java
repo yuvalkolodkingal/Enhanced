@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
+import com.kolodkingal.enhanced.client.render.BarrierRenderer;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.client.render.FlightEffects;
 import com.kolodkingal.enhanced.client.render.GestureEffects;
@@ -112,6 +113,7 @@ public final class ClientEvents {
         BillyCrownLayer.clear();
         WorldEffectsRenderer.clearHexBolts();
         BeamRenderer.clear();
+        BarrierRenderer.clear();
         MagnetStreams.clear();
         HeroClients.clear();
     }

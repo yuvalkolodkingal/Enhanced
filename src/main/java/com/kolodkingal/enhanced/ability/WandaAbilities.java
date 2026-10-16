@@ -397,7 +397,7 @@ public final class WandaAbilities {
     /**
      * A projectile already on its way home to its owner (a weapon of Thor's, Thanos's sword): the shield lets it by.
      */
-    private static boolean isHeadingHome(Projectile projectile) {
+    static boolean isHeadingHome(Projectile projectile) {
         if (projectile instanceof ShieldCost cost && cost.oneOfAKind()) {
             return cost.returning();
         }

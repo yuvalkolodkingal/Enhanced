@@ -85,6 +85,11 @@ public final class BillyAbilities {
     // ---- input ----
 
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        if (ability == 4 && BillyBarrier.enabled() && (data.chaosShieldActive() || (down && player.isShiftKeyDown()))) {
+            // The Hex Barrier is held (Sneak + B): letting go must always get through, even for a Billy who just became a spectator.
+            BillyBarrier.key(player, data, down);
+            return;
+        }
         if (ability == 1 && beamEnabled()) {
             // The Hex Beam is held: letting go must always get through, even for a Billy who just became a spectator.
             hexBeamKey(player, data, down);
@@ -127,6 +132,7 @@ public final class BillyAbilities {
                 spells.crown = Math.max(spells.crown, now + CROWN_TICKS);
             }
         }
+        BillyBarrier.tick(player, data);
         data.set(Live.CASTING, spells != null && now < spells.bolt);
         data.set(Live.FREEZING, spells != null && now < spells.freeze);
         if (spells != null && now >= Math.max(Math.max(spells.crown, spells.blockReady), Math.max(spells.bolt, spells.freeze))) {
@@ -394,6 +400,7 @@ public final class BillyAbilities {
             ContinuousBeam.stop(player);
         }
         data.set(Live.BEAMING, false);
+        BillyBarrier.endAll(player, data);
         data.set(Live.CROWNED, false);
         data.set(Live.CASTING, false);
         data.set(Live.FREEZING, false);

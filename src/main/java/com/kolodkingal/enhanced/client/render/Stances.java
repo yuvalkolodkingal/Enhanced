@@ -178,6 +178,16 @@ final class Stances {
             c.occupy(true, w);
             c.occupy(false, w);
         }
+        if ((w = st.stance(Stance.BARRIER_BILLY)) > 0.001F) {
+            // The plate held up on the left forearm, the body turned behind it, the feet planted wide.
+            pose(c, StancePoses.BARRIER_BILLY_M, StancePoses.BARRIER_BILLY_O, w);
+            c.tremble(false, 1.2F, 0.4F, w);
+            c.twist(StancePoses.BARRIER_BILLY_TWIST, w);
+            c.leg(true, -10, 4, w * (1.0F - st.wAir));
+            c.leg(false, 10, -4, w * (1.0F - st.wAir));
+            c.occupy(true, w);
+            c.occupy(false, w);
+        }
         if ((w = st.stance(Stance.BEAM_HAND)) > 0.001F) {
             // A continuous beam: the hand it leaves from stretched out along the look and trembling a little, the other arm
             // braced back and out, the feet planted.
