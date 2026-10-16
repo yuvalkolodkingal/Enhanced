@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.road.RoadDoors;
 import com.kolodkingal.enhanced.ultron.SokoviaRelocations;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -86,6 +87,17 @@ public final class ModAttachments {
             () -> AttachmentType.builder(() -> HexData.EMPTY)
                     .serialize(HexData.CODEC)
                     .sync(HexData.STREAM_CODEC)
+                    .build());
+
+    /**
+     * What the Witches' Road put aside from a player's backpack while a trial gives him its own blocks (the Copy the Structure trial): saved
+     * WITH the player, so that the stash and the inventory always reach the disk together (a stash in the world's save could outlive an
+     * inventory that already has the things back, and give them twice). Kept on a clone, not synced.
+     */
+    public static final Supplier<AttachmentType<CompoundTag>> ROAD_STASH = ATTACHMENTS.register("road_stash",
+            () -> AttachmentType.builder(() -> new CompoundTag())
+                    .serialize(CompoundTag.CODEC, tag -> !tag.isEmpty())
+                    .copyOnDeath()
                     .build());
 
     /** Every Witches' Road door in a dimension, in the order they were placed. Saved with the level; only the server needs it. */

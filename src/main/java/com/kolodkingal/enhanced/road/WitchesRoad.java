@@ -213,7 +213,7 @@ public final class WitchesRoad {
     private static void offerChoice(ServerPlayer player, BlockPos door) {
         int[] done = RoadTrials.doneAndTotal(player);
         PacketDistributor.sendToPlayer(player, new OpenRoadPayload(door.immutable(), RoadTrials.doorMode(player) == RoadTrials.DoorMode.ENTER,
-                done[0], done[1]));
+                done[0], done[1], false));
     }
 
     /** Called at the end of every level tick: rituals run their course, and open doors pour out light. */
@@ -331,6 +331,8 @@ public final class WitchesRoad {
         }
         player.getItemInHand(hand).consume(1, player);
         Powers.awaken(player, choice);
+        // (A seeker who walked the Road but left before choosing, and chooses at the door instead: the Road has nothing more to remember.)
+        RoadTrials.closeRoad(player.server, player.getUUID());
         return true;
     }
 
@@ -349,7 +351,7 @@ public final class WitchesRoad {
         if (!level.isLoaded(door) || !isOpen(level.getBlockState(door)) || geneHand(player) == null) {
             return false;
         }
-        return RoadTrials.enter(player);
+        return RoadTrials.enter(player, door);
     }
 
     private static boolean near(ServerPlayer player, BlockPos door) {

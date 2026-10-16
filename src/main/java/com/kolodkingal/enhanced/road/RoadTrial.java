@@ -156,7 +156,7 @@ public final class RoadTrial {
      * not got that far or has already won.
      */
     public void succeed() {
-        if (phase == Phase.ACTIVE) {
+        if (phase == Phase.ACTIVE && !challenge.isEnding()) {
             phase = Phase.WON;
             RoadTrials.won(this);
         }
@@ -183,6 +183,11 @@ public final class RoadTrial {
     public <T extends Entity> T track(T entity) {
         tracked.add(entity);
         return entity;
+    }
+
+    /** Forgets an entity the trial has taken down itself (a boat that was replaced). */
+    public void untrack(Entity entity) {
+        tracked.remove(entity);
     }
 
     public List<Entity> tracked() {

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.road;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -18,14 +19,23 @@ import java.util.Optional;
  * save dirty.
  */
 public final class RoadProgress {
-    /** Where a player entered the Road and in what state, to send him back exactly. */
-    public record Entry(ResourceKey<Level> dimension, Vec3 pos, float yaw, float pitch, int gameMode) {
+    /**
+     * Where a player entered the Road and in what state, to send him back exactly. {@code door} is the Witches' Road door he opened
+     * (null when he was sent in by a command): the next best place to put him back if the place he stood on is gone.
+     */
+    public record Entry(ResourceKey<Level> dimension, Vec3 pos, float yaw, float pitch, int gameMode, @Nullable BlockPos door) {
         public static final Codec<Entry> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(Entry::dimension),
                 Vec3.CODEC.fieldOf("pos").forGetter(Entry::pos),
                 Codec.FLOAT.fieldOf("yaw").forGetter(Entry::yaw),
                 Codec.FLOAT.fieldOf("pitch").forGetter(Entry::pitch),
-                Codec.INT.fieldOf("gameMode").forGetter(Entry::gameMode)).apply(i, Entry::new));
+                Codec.INT.fieldOf("gameMode").forGetter(Entry::gameMode),
+                BlockPos.CODEC.optionalFieldOf("door").forGetter(e -> Optional.ofNullable(e.door))).apply(i,
+                (dimension, pos, yaw, pitch, gameMode, door) -> new Entry(dimension, pos, yaw, pitch, gameMode, door.orElse(null))));
+
+        public Entry(ResourceKey<Level> dimension, Vec3 pos, float yaw, float pitch, int gameMode) {
+            this(dimension, pos, yaw, pitch, gameMode, null);
+        }
     }
 
     public static final Codec<RoadProgress> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -173,6 +183,11 @@ public final class RoadProgress {
 
     /** Whether he has nothing to remember (a fresh player): the save does not keep it. */
     public boolean isBlank() {
-        return completed == 0 && !inside && checkpoint == 0 && falls == 0 && started == 0 && data.isEmpty() && salt == 0L;
+        return isUntouched() && salt == 0L;
+    }
+
+    /** Whether he has walked no step of the Road (the course he is dealt does not count). */
+    public boolean isUntouched() {
+        return completed == 0 && !inside && checkpoint == 0 && falls == 0 && started == 0 && data.isEmpty();
     }
 }

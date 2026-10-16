@@ -1,9 +1,8 @@
 package com.kolodkingal.enhanced.road.copy;
 
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
-import com.kolodkingal.enhanced.road.RoadProgress;
-import com.kolodkingal.enhanced.road.RoadSave;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -40,6 +39,13 @@ public final class StructureSupply {
         ItemStack stack = new ItemStack(item, count);
         CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putBoolean(MARK, true));
         return stack;
+    }
+
+    /** Marks a stack as the trial's (what he crafts from its blocks is too: it cannot leave either). */
+    public static void mark(ItemStack stack) {
+        if (!stack.isEmpty()) {
+            CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putBoolean(MARK, true));
+        }
     }
 
     /** Whether the stack is one of the trial's blocks. */
@@ -81,7 +87,6 @@ public final class StructureSupply {
     public static void give(ServerPlayer player, StructureModel model, String challenge) {
         restore(player, challenge);
         Inventory inventory = player.getInventory();
-        RoadProgress progress = RoadSave.get(player.server).progress(player.getUUID());
         ListTag stash = new ListTag();
         for (int slot = 0; slot < SLOTS; slot++) {
             ItemStack stack = inventory.getItem(slot);
@@ -96,7 +101,9 @@ public final class StructureSupply {
         }
         CompoundTag data = new CompoundTag();
         data.put(STASH, stash);
-        progress.putData(challenge, data);
+        CompoundTag all = player.getData(ModAttachments.ROAD_STASH).copy();
+        all.put(challenge, data);
+        player.setData(ModAttachments.ROAD_STASH, all);
         Map<Item, Integer> amounts = amounts(model, WitchesRoadConfig.STRUCTURE_COPY_SUPPLY_PERCENT.get());
         for (Map.Entry<Item, Integer> entry : amounts.entrySet()) {
             int size = entry.getKey().getDefaultMaxStackSize();
@@ -131,8 +138,7 @@ public final class StructureSupply {
     /** Takes the trial's blocks away from the player and gives him back what was put aside. Does nothing if there is nothing to return. */
     public static void restore(ServerPlayer player, String challenge) {
         strip(player);
-        RoadProgress progress = RoadSave.get(player.server).progress(player.getUUID());
-        CompoundTag data = progress.data(challenge);
+        CompoundTag data = player.getData(ModAttachments.ROAD_STASH).getCompound(challenge);
         if (!data.contains(STASH, Tag.TAG_LIST)) {
             return;
         }
@@ -150,14 +156,16 @@ public final class StructureSupply {
                 player.drop(stack, false);
             }
         }
-        progress.clearData(challenge);
+        // (The inventory and the stash are saved with the player: the stash goes in the same breath as the things come back.)
+        CompoundTag all = player.getData(ModAttachments.ROAD_STASH).copy();
+        all.remove(challenge);
+        player.setData(ModAttachments.ROAD_STASH, all);
         player.containerMenu.broadcastChanges();
     }
 
     /** Whether the player has things put aside that he has not got back. */
     public static boolean hasStash(ServerPlayer player, String challenge) {
-        RoadProgress progress = RoadSave.get(player.server).existing(player.getUUID());
-        return progress != null && progress.data(challenge).contains(STASH, Tag.TAG_LIST);
+        return player.getData(ModAttachments.ROAD_STASH).getCompound(challenge).contains(STASH, Tag.TAG_LIST);
     }
 
     /** Takes every block the trial gave out away from the player (his backpack, armour, off hand, the crafting square, the cursor). */
@@ -172,6 +180,11 @@ public final class StructureSupply {
             if (isSupply(slot.getItem())) {
                 slot.set(ItemStack.EMPTY);
             }
+        }
+        // The 2x2 crafting square: what was crafted from the trial's blocks carries no mark, so nothing of the square stays (the blocks in it are
+        // the trial's; whatever else he had there was put aside with the rest of his things).
+        for (int i = 0; i < player.inventoryMenu.getCraftSlots().getContainerSize(); i++) {
+            player.inventoryMenu.getCraftSlots().setItem(i, ItemStack.EMPTY);
         }
         if (isSupply(player.containerMenu.getCarried())) {
             player.containerMenu.setCarried(ItemStack.EMPTY);

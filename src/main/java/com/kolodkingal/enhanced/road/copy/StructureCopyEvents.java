@@ -89,11 +89,21 @@ public final class StructureCopyEvents {
         }
     }
 
-    /** A player who logs in with his things still put aside (the server stopped in the trial) gets them back, unless the trial is taking him in again. */
+    /** What a player crafts in the Road (from the trial's blocks, in the 2x2 square) is the trial's too: marked, so that it is taken back with the rest. */
+    @SubscribeEvent
+    public static void onCrafted(PlayerEvent.ItemCraftedEvent event) {
+        if (RoadDimension.in(event.getEntity())) {
+            StructureSupply.mark(event.getCrafting());
+        }
+    }
+
+    /**
+     * A player who logs in with his things still put aside (the server stopped in the trial) gets them back. If the Road takes him into the trial
+     * again, it puts them aside again; and if it takes him into another trial (an operator forced this one) or sends him home, they are his.
+     */
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && !RoadTrials.isInside(player)
-                && (StructureSupply.hasStash(player, StructureCopyChallenge.ID) || hasSupply(player))) {
+        if (event.getEntity() instanceof ServerPlayer player && (StructureSupply.hasStash(player, StructureCopyChallenge.ID) || hasSupply(player))) {
             StructureSupply.restore(player, StructureCopyChallenge.ID);
         }
     }

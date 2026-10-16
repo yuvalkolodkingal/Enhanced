@@ -20,7 +20,7 @@ import java.util.Collection;
  * The Road's commands.
  * <pre>
  * /enhanced road status [player]
- * /enhanced road enter &lt;players&gt; [trial]     start a trial (the one reached, or the given one), no Gene needed
+ * /enhanced road enter &lt;players&gt; [trial]     start a trial (the one reached, or the given one; the number after the last trial is the end), no Gene needed
  * /enhanced road leave &lt;players&gt;
  * /enhanced road reset &lt;players&gt; [newcourse]  forget their progress (and deal them other courses)
  * /enhanced road skip &lt;players&gt;               win the trial they are in (or count the next one won)
@@ -28,6 +28,7 @@ import java.util.Collection;
  * /enhanced road layout [player]              where the checkpoints, the finish and the gate of his trial are
  * /enhanced road cells                         the cells in use
  * /road leave                                  (anyone) leave the Road, keeping the Gene
+ * /road choose                                 (anyone) at the end of the Road: the choice of Billy or Tommy again
  * /road status                                 (anyone) how far on the Road
  * </pre>
  */
@@ -67,6 +68,7 @@ public final class RoadCommands {
     public static void registerPlayerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("road")
                 .then(Commands.literal("leave").executes(ctx -> leaveSelf(ctx.getSource())))
+                .then(Commands.literal("choose").executes(ctx -> chooseAgain(ctx.getSource())))
                 .then(Commands.literal("status").executes(ctx -> status(ctx.getSource(), ctx.getSource().getPlayerOrException()))));
     }
 
@@ -117,6 +119,11 @@ public final class RoadCommands {
         }
         RoadTrials.leave(player, RoadChallenge.End.LEFT);
         return 1;
+    }
+
+    /** {@code /road choose}: at the end of the Road, the question is asked again (the screen opens). */
+    private static int chooseAgain(CommandSourceStack source) throws CommandSyntaxException {
+        return RoadEnding.reopen(source.getPlayerOrException(), true) ? 1 : 0;
     }
 
     private static int reset(CommandContext<CommandSourceStack> ctx, boolean newCourse) throws CommandSyntaxException {

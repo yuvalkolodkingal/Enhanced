@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.screen;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import com.kolodkingal.enhanced.network.RoadChoicePayload;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.road.RoadDimension;
 import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -21,6 +22,10 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * Road ("Walk the Road": the trials, 3.2) or, once he has won them all (or where the trials are off), he chooses whose road to
  * walk, Billy's or Tommy's. The server checks everything again (still no powers, still a gene, still near the open door, and
  * which of the two he may answer). The screen closes by itself when the door does, or when the seeker walks away.
+ *
+ * <p>At the end of the Road ({@code ending}, 3.2) the same screen is shown inside the Road itself, after the last trial: Billy or
+ * Tommy, "Not yet" (close it; the door in the hall or {@code /road choose} brings it back) and "Leave the Road" (back to the world, the
+ * Gene kept). It closes when the player is no longer in the Road.
  */
 public class WitchesRoadScreen extends Screen {
     private static final int CHOICE_WIDTH = 170;
@@ -33,20 +38,22 @@ public class WitchesRoadScreen extends Screen {
     private final boolean trials;
     private final int done;
     private final int total;
+    private final boolean ending;
     /** Ticks the screen has been up. */
     private int age;
 
-    public WitchesRoadScreen(BlockPos door, boolean trials, int done, int total) {
+    public WitchesRoadScreen(BlockPos door, boolean trials, int done, int total, boolean ending) {
         super(Component.translatable("screen.enhanced.road.title"));
         this.door = door;
         this.trials = trials;
         this.done = done;
         this.total = total;
+        this.ending = ending;
     }
 
-    /** Opens the screen (called when the server says the door opened for us). */
-    public static void open(BlockPos door, boolean trials, int done, int total) {
-        Minecraft.getInstance().setScreen(new WitchesRoadScreen(door, trials, done, total));
+    /** Opens the screen (called when the server says the door opened for us, or the Road asks at its end). */
+    public static void open(BlockPos door, boolean trials, int done, int total, boolean ending) {
+        Minecraft.getInstance().setScreen(new WitchesRoadScreen(door, trials, done, total, ending));
     }
 
     @Override
@@ -60,8 +67,16 @@ public class WitchesRoadScreen extends Screen {
             addRenderableWidget(new Choice(left, top, Power.BILLY, Power.BILLY.color, "screen.enhanced.road.billy"));
             addRenderableWidget(new Choice(left + CHOICE_WIDTH + GAP, top, Power.TOMMY, Power.TOMMY.glow, "screen.enhanced.road.tommy"));
         }
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b -> onClose())
-                .bounds(width / 2 - 50, top + CHOICE_HEIGHT + 16, 100, 20).build());
+        if (ending) {
+            // Close it for now, or leave the Road with the Gene (the answer "none" at the end of the Road means leaving).
+            addRenderableWidget(Button.builder(Component.translatable("screen.enhanced.road.later"), b -> onClose())
+                    .bounds(width / 2 - 105, top + CHOICE_HEIGHT + 16, 100, 20).build());
+            addRenderableWidget(Button.builder(Component.translatable("screen.enhanced.road.leave"), b -> choose(Power.NONE))
+                    .bounds(width / 2 + 5, top + CHOICE_HEIGHT + 16, 100, 20).build());
+        } else {
+            addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b -> onClose())
+                    .bounds(width / 2 - 50, top + CHOICE_HEIGHT + 16, 100, 20).build());
+        }
     }
 
     private void choose(Power power) {
@@ -74,6 +89,13 @@ public class WitchesRoadScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
             onClose();
+            return;
+        }
+        if (ending) {
+            // At the end of the Road there is no open door to watch: the screen stays while he is in the Road.
+            if (!RoadDimension.is(mc.level)) {
+                onClose();
+            }
             return;
         }
         boolean open = mc.level.getBlockState(door).getOptionalValue(WitchesRoadDoorBlock.OPEN).orElse(false);
@@ -95,6 +117,10 @@ public class WitchesRoadScreen extends Screen {
         if (trials) {
             graphics.drawCenteredString(font, Component.translatable("screen.enhanced.road.progress", Math.min(done + 1, total), total)
                     .withStyle(ChatFormatting.GRAY), width / 2, top - 10, 0xFFFFFF);
+        } else if (ending) {
+            graphics.drawCenteredString(font, Component.translatable("screen.enhanced.road.ending").withStyle(ChatFormatting.GRAY), width / 2, top - 10, 0xFFFFFF);
+            graphics.drawCenteredString(font, Component.translatable("screen.enhanced.road.ending.gene").withStyle(ChatFormatting.DARK_GRAY),
+                    width / 2, top + CHOICE_HEIGHT + 4, 0xFFFFFF);
         }
     }
 

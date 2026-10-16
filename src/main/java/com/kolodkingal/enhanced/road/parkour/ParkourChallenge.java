@@ -77,8 +77,9 @@ public final class ParkourChallenge implements RoadChallenge {
             BlockPos origin = canvas.origin();
             Vec3 at = new Vec3(origin.getX() + pad.centerX(), origin.getY() + pad.y() + 1.0, origin.getZ() + pad.centerZ());
             float yaw = (float) (Mth.atan2(-(next.centerX() - pad.centerX()), next.centerZ() - pad.centerZ()) * Mth.RAD_TO_DEG);
-            AABB zone = n == 0 ? null : new AABB(origin.getX() + pad.midX() - 1, origin.getY() + pad.y() + 0.9, origin.getZ() + pad.midZ() - 1,
-                    origin.getX() + pad.midX() + 2, origin.getY() + pad.y() + 3.0, origin.getZ() + pad.midZ() + 2);
+            // (The whole pad counts, rim and all: a player who lands and runs along the edge has reached it as much as one who stands in the middle.)
+            AABB zone = n == 0 ? null : new AABB(origin.getX() + pad.minX(), origin.getY() + pad.y() + 0.9, origin.getZ() + pad.minZ(),
+                    origin.getX() + pad.maxX() + 1, origin.getY() + pad.y() + 3.0, origin.getZ() + pad.maxZ() + 1);
             checkpoints.add(new RoadLayout.Checkpoint(at, yaw, zone, origin.getY() + lowest - fallDepth + 1.0));
         }
         BlockPos origin = canvas.origin();

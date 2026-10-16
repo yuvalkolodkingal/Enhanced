@@ -120,7 +120,16 @@ public final class IceBoatChallenge implements RoadChallenge {
     public RoadLayout build(RoadBuild build) {
         IceTrack track = IceTrackGenerator.generate(build.seed(), params());
         TRACKS.put(build.canvas().cell(), track);
-        return draw(build.canvas(), track, WitchesRoadConfig.FALL_DEPTH.get(), WitchesRoadConfig.BOAT_RACE_TIME_LIMIT_SECONDS.get() * 20);
+        return draw(build.canvas(), track, WitchesRoadConfig.FALL_DEPTH.get(), timeLimitTicks(track));
+    }
+
+    /**
+     * The time allowed: the config's, but never less than {@code boatRaceFairFactor} times the par time of the course (a long course with the
+     * default limit would otherwise be unfair to a driver who is not fast); 0 = none.
+     */
+    public static int timeLimitTicks(IceTrack track) {
+        int limit = WitchesRoadConfig.BOAT_RACE_TIME_LIMIT_SECONDS.get() * 20;
+        return limit == 0 ? 0 : Math.max(limit, (int) Math.round(parSeconds(track) * WitchesRoadConfig.BOAT_RACE_FAIR_FACTOR.get() * 20));
     }
 
     /** The yaw of a boat or a player facing the way of this heading (0 = +x, 1 = +z, 2 = -x, 3 = -z). */
@@ -423,8 +432,11 @@ public final class IceBoatChallenge implements RoadChallenge {
     }
 
     private static void newBoat(RoadTrial trial, Race race, Vec3 at, float yaw) {
-        if (race.boat != null && !race.boat.isRemoved()) {
-            race.boat.discard();
+        if (race.boat != null) {
+            if (!race.boat.isRemoved()) {
+                race.boat.discard();
+            }
+            trial.untrack(race.boat);
         }
         ServerLevel level = trial.level();
         Boat boat = EntityType.BOAT.create(level);

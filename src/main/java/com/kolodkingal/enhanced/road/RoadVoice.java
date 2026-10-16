@@ -24,6 +24,10 @@ public final class RoadVoice {
     public static final String WON = "won";
     public static final String LEAVE = "leave";
     public static final String BACK = "back";
+    /** The end of the Road: he has walked it all; the farewell as the power awakens; the word as he steps back into the world. */
+    public static final String ENDING = "ending";
+    public static final String FAREWELL = "farewell";
+    public static final String HOME = "home";
 
     /** The lang key of one version of a line. */
     public static String key(String event, int variant) {
@@ -39,7 +43,7 @@ public final class RoadVoice {
 
     /** The big title of a trial that begins: its number and name, and its goal underneath (a title is drawn four times the size of text: keep it short). */
     public static void begin(ServerPlayer player, RoadChallenge challenge, int number) {
-        Component title = Component.translatable("message.enhanced.road.trial_title", number, challenge.title())
+        Component title = Component.translatable("message.enhanced.road.trial_title", number, challenge.titleShort())
                 .withStyle(s -> s.withColor(WitchesRoad.LIGHT).withBold(true));
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 20));
         player.connection.send(new ClientboundSetTitleTextPacket(title));
