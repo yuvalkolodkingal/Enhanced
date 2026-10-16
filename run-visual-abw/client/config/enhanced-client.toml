@@ -1,0 +1,33 @@
+[animation]
+	#Animate the heroes: blended poses, flight, running, Thor's weapon. Off: vanilla poses only.
+	animations = true
+	#Calmer animation: hover bob and drift at a third, no trembling hands, jitter or camera shake, and fainter rings.
+	reducedMotion = false
+	#Flight effects: ribbons, rings, wind streaks and shockwaves (trail particles are thinned out when off).
+	flightEffects = true
+
+[appearance]
+	#Don't draw the armour of heroes (yours in third person, and everyone else's): it only hides the characters.
+	#It protects as usual. Elytra, mob heads, carved pumpkins and the hero gear of this mod are always drawn.
+	hideHeroArmour = true
+
+[thanos]
+	#Play the music of the fight while Thanos is near. Off: silence.
+	bossMusic = true
+	#The violet fog and the dark edges of the screen while Thanos is near.
+	bossAtmosphere = true
+
+[build_magic]
+	#The strip of mouse and key pictures while building.
+	hints = true
+	#The little animated tips the first times a spell is used.
+	tips = true
+	#The most blocks drawn in a spell's preview (its ghost); a bigger one is drawn as its outside only, then
+	#as a tinted box.
+	# Default: 32768
+	# Range: 0 ~ 262144
+	ghostDetail = 32768
+	#The box shows faintly through hills and walls.
+	seeThrough = true
+	#See the boxes of other builders near you.
+	showOthers = true

@@ -347,12 +347,13 @@ public final class GestureRoutes {
     public static String reason(Live live) {
         return switch (live) {
             case SPEEDING -> "the run cycle, its start and its skid are driven by the animator from the motion";
-            case WHIRLWIND, CALLING_LIGHTNING, CASTING, BEAMING -> null;
+            case WHIRLWIND, CALLING_LIGHTNING, CASTING -> null;
             case BIFROST -> "a stance (THOR_BIFROST); the arrival is a gesture of the payload";
             case HIDDEN -> "Loki is invisible: nobody sees him";
             case THROWING -> "the cooldown of the daggers starts at the same moment and plays the throw";
             case CROWNED -> "Billy's crown is drawn by its own layer, not a pose";
             case FREEZING -> "the cooldown of Freeze plays the cast; the stance BILLY_FREEZE holds the pose";
+            case BEAMING -> "a stance of any beam (BEAM_HAND, which holds the arm out along the look); Billy's Hex Beam also starts with his BILLY_BOLT gesture";
             case PINNED -> "Mjolnir lying on them is the whole picture: they can't move, so they have no move to make";
             // The states of 3.0 (one region per hero): pending until the hero's lane gives them a gesture or a reason.
             // ===== phoenix =====

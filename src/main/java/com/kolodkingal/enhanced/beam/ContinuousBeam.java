@@ -44,7 +44,7 @@ public final class ContinuousBeam {
 
     private static final class State {
         long nextHit;
-        long lastSent = Long.MIN_VALUE;
+        long lastSent = -1000L;
         BeamStyle style;
         float range;
     }

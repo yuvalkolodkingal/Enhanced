@@ -1,0 +1,2537 @@
+[magneto]
+	#Magneto's flying speed (Creative flight is 0.05).
+	# Default: 0.075
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.075
+	#How far away (blocks) every telekinesis (Magneto, Wanda, Billy, the Phoenix) can grab a target.
+	# Default: 32
+	# Range: 4 ~ 128
+	telekinesisRange = 32
+	#Launch speed (blocks per tick) of a telekinetic throw.
+	# Default: 2.6
+	# Range: 0.5 ~ 6.0
+	throwSpeed = 2.6
+	#Damage of one iron shrapnel shard.
+	# Default: 4.0
+	# Range: 0.0 ~ 100.0
+	shrapnelDamage = 4.0
+	#How many creatures a single shard can pierce through.
+	# Default: 3
+	# Range: 1 ~ 16
+	shrapnelPierce = 3
+	#Ticks between shards while the Shrapnel Storm is held (2 = 10 shards/second).
+	# Default: 2
+	# Range: 1 ~ 20
+	shrapnelFireInterval = 2
+	#Range of Armor & Weapon Strip.
+	# Default: 32
+	# Range: 4 ~ 128
+	disarmRange = 32
+	#Cooldown of Armor & Weapon Strip, in ticks.
+	# Default: 60
+	# Range: 0 ~ 6000
+	disarmCooldown = 60
+	#Chance that a metal projectile caught by the Magnetic Shield flies back at the shooter (otherwise it drops).
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	shieldReflectChance = 0.5
+	#How far away (blocks) Magneto can tear a metal block out of the ground with R.
+	# Default: 24
+	# Range: 2 ~ 128
+	blockLiftRange = 24
+	#Hardest metal block Magneto can lift with R (iron block = 5, ancient debris = 30, block of netherite = 50).
+	# Default: 50.0
+	# Range: 0.0 ~ 100.0
+	blockLiftMaxHardness = 50.0
+	#Radius (blocks) of the Magnetic Pull (Sneak + R holding nothing): a sphere round where he pressed; ores come
+	#through rock.
+	# Default: 8
+	# Range: 2 ~ 32
+	pullRadius = 8
+	#The most things (blocks, items, creatures) one pull takes; the nearest first.
+	# Default: 64
+	# Range: 1 ~ 512
+	pullMaxTargets = 64
+	#Things the pull takes each tick (2 = 40 a second).
+	# Default: 2
+	# Range: 1 ~ 64
+	pullPerTick = 2
+	#Blocks the pull looks at in one tick while it searches (a big radius searches over a few ticks).
+	# Default: 8192
+	# Range: 512 ~ 131072
+	pullScanPerTick = 8192
+	#Ticks before Magneto can pull again (100 = 5 seconds). Starts only if the pull affected something (took,
+	#tugged, dissolved, crumbled, scattered).
+	# Default: 100
+	# Range: 0 ~ 6000
+	pullCooldown = 100
+	#Hunger one pull costs (4 = one hunger point). Nothing if the pull affected nothing.
+	# Default: 4.0
+	# Range: 0.0 ~ 40.0
+	pullExhaustion = 4.0
+	#The pull also takes metal blocks and fixtures people build with (rails, doors, lanterns, anvils, hoppers,
+	#pistons...), whole: never one that holds items, never an extended or powered piston. Off: only ores, raw-metal
+	#blocks, loose metal and creatures' gear.
+	pullTakesBuiltMetal = true
+	#Built metal comes only if Magneto can see it (a clear line from his eyes). Ores and raw-metal blocks
+	#always come through rock. Off: built metal also comes through walls.
+	pullBuiltNeedsSight = true
+	#Built metal comes only from within this cone (degrees) round where he looks, so he turns round to pull the
+	#rest; 360: all round him. Ores, raw-metal blocks, loose metal, gear and carts come from all round.
+	# Default: 120
+	# Range: 0 ~ 360
+	pullBuiltCone = 120
+	#The pull also takes the metal out of chests and other containers, item frames and armour stands he can
+	#see (claims are asked; never a villager's work block); the container, frame or stand stays. Off: what is
+	#stored stays where it is.
+	pullFromStorage = false
+	#The pull tears metal armour and weapons off hostile creatures in reach.
+	pullTakesGear = true
+	#With PvP on, the pull also acts on players Magneto can see: one metal piece into his inventory, an Iron
+	#Spider's nanites scattered, or a metal body tugged, once per player per pullPlayerGraceTicks. Off: the pull never
+	#touches a player.
+	pullTakesPlayerGear = true
+	#The player's piece drops at that player's feet instead of flying into Magneto's inventory.
+	pullPlayerGearToFeet = false
+	#After the pull acted on a player, no pull acts on that player again for this many ticks (200 = 10 seconds).
+	# Default: 200
+	# Range: 0 ~ 6000
+	pullPlayerGraceTicks = 200
+	#Every telekinesis (Magneto, Wanda, Billy, the Phoenix): for this many ticks after one of the hero's grips
+	#ends, Sneak + the key with nothing held does nothing (so a late "put it down" press is not a pull or a torn-out
+	#block).
+	# Default: 20
+	# Range: 0 ~ 100
+	telekinesisSneakGraceTicks = 20
+	#After a pull that found nothing, another press does nothing for this many ticks.
+	# Default: 10
+	# Range: 0 ~ 100
+	pullRetryTicks = 10
+	#The pull takes the netherite scrap out of ancient debris (the debris becomes netherrack).
+	pullAncientDebris = true
+	#How hard the pull tugs Iron Golems and other metal bodies toward him (blocks per tick at most; 0 = it leaves
+	#them where they are).
+	# Default: 1.0
+	# Range: 0.0 ~ 3.0
+	pullTug = 1.0
+	#Every telekinesis (Magneto, Wanda, Billy, the Phoenix): a player, or a creature another player owns (a
+	#pet, a drone, the Vision of a Hex), let go or thrown by someone who may not hurt them (PvP off, a teammate)
+	#takes no fall, wall or slam damage until it lands.
+	telekinesisSparesFriends = true
+	#Every telekinesis: after letting go of a player, the same hero cannot grip that player again for this
+	#many ticks (60 = 3 seconds).
+	# Default: 60
+	# Range: 0 ~ 1200
+	telekinesisPlayerRegripTicks = 60
+
+[scarlet_witch]
+	#Wanda's flying speed (Creative flight is 0.05).
+	# Default: 0.09
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.09
+	#Damage per Chaos Beam hit (5 = 2.5 hearts). Minecraft's damage cooldown allows two hits per second.
+	# Default: 5.0
+	# Range: 0.0 ~ 100.0
+	chaosBeamDamage = 5.0
+	#Range in blocks of the Chaos Beam, and also of Vision's Mind Stone beam.
+	# Default: 32
+	# Range: 4 ~ 128
+	chaosBeamRange = 32
+	#Duration of the Nausea the Chaos Beam inflicts, in ticks.
+	# Default: 100
+	# Range: 0 ~ 6000
+	chaosBeamNauseaTicks = 100
+	#Food exhaustion per tick while the Chaos Shield is held (4.0 exhaustion = 1 food point).
+	# Default: 0.1
+	# Range: 0.0 ~ 4.0
+	chaosShieldExhaustion = 0.1
+	#Fraction of explosion damage that still gets through the Chaos Shield.
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	chaosShieldExplosionFactor = 0.25
+	#How long the Chaos Shield takes to form after B is pressed, in ticks (15 = 3/4 of a second).
+	#It blocks nothing until it is complete.
+	# Default: 15
+	# Range: 0 ~ 200
+	chaosShieldWindUpTicks = 15
+	#How long a complete Chaos Shield can be held before it drops, in ticks (160 = 8 seconds).
+	# Default: 160
+	# Range: 1 ~ 6000
+	chaosShieldMaxTicks = 160
+	#Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down:
+	#the damage of a projectile, and the explosion damage it takes away.
+	# Default: 30.0
+	# Range: 1.0 ~ 1000.0
+	chaosShieldStrength = 30.0
+	#Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds).
+	# Default: 120
+	# Range: 0 ~ 6000
+	chaosShieldCooldown = 120
+	#Ticks before the Chaos Shield can be raised again after it shattered or was held to its
+	#limit (300 = 15 seconds).
+	# Default: 300
+	# Range: 0 ~ 6000
+	chaosShieldBrokenCooldown = 300
+	#3.2: the Chaos Shield is unlimited. It costs no hunger, has no strength to wear down, never shatters,
+	#never runs out of time and needs no recharge after it drops (it still takes chaosShieldWindUpTicks to form, and it
+	#stops exactly what it stops today). false: the old rules, with chaosShieldExhaustion, chaosShieldStrength,
+	#chaosShieldMaxTicks, chaosShieldCooldown and chaosShieldBrokenCooldown.
+	shieldUnlimited = true
+	#How far away (blocks) Wanda and the Phoenix can tear a block out of the ground (Billy and Magneto have
+	#their own).
+	# Default: 24
+	# Range: 2 ~ 128
+	blockLiftRange = 24
+	#Hardest block Wanda and the Phoenix can lift (stone = 1.5, iron block = 5, obsidian = 50; Billy and
+	#Magneto have their own).
+	# Default: 5.0
+	# Range: 0.0 ~ 100.0
+	blockLiftMaxHardness = 5.0
+	#Radius of a newly created Hex.
+	# Default: 32
+	# Range: 4 ~ 256
+	hexDefaultRadius = 32
+	# Default: 8
+	# Range: 4 ~ 256
+	hexMinRadius = 8
+	# Default: 96
+	# Range: 4 ~ 256
+	hexMaxRadius = 96
+	#Chance that an unauthorised creature without powers dies when crossing the Hex wall.
+	# Default: 0.95
+	# Range: 0.0 ~ 1.0
+	hexDeathChance = 0.95
+	#Damage Vision takes the first time he is thrown back at the wall of a Hex he is inside (2 = one heart).
+	#He can't leave a standing Hex, and comes apart a little at its edge; it never kills him.
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	hexHoldDamage = 2.0
+	#The most one throw back at the wall can do to Vision. Each time he pushes again within three
+	#seconds it grows by hexHoldDamage, up to this; it never takes his last half heart.
+	# Default: 8.0
+	# Range: 0.0 ~ 40.0
+	hexHoldDamageMax = 8.0
+	#A badly hurt Wanda can no longer hold Vision in her Hex: at or below this share of her health
+	#(0.3 = 30%) he can leave it. Her death (which dissolves the Hex) always frees him; 0 = only that does.
+	# Default: 0.3
+	# Range: 0.0 ~ 1.0
+	hexHoldReleaseHealth = 0.3
+
+[hex_vision]
+	#If true (the default), a Hex brings a Vision to fight at Wanda's side while it stands.
+	enabled = true
+	#Health of the Vision of the Hex (an Iron Golem has 100; 80 = 40 hearts).
+	# Default: 80.0
+	# Range: 1.0 ~ 1000.0
+	health = 80.0
+	#Damage of one of his dense punches, about one a second (12 = 6 hearts).
+	# Default: 12.0
+	# Range: 0.0 ~ 100.0
+	punchDamage = 12.0
+	#Damage per hit of his Mind Stone beam, two hits a second.
+	# Default: 4.0
+	# Range: 0.0 ~ 100.0
+	beamDamage = 4.0
+	#How far (blocks) his Mind Stone beam reaches. Up close he punches instead.
+	# Default: 16
+	# Range: 2 ~ 64
+	beamRange = 16
+	#How long (ticks) Wanda needs to rebuild him after he falls, while the Hex stands (1200 = a minute).
+	# Default: 1200
+	# Range: 20 ~ 72000
+	rebuildTicks = 1200
+
+[vision]
+	# Default: 0.08
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.08
+	#Damage per hit of the Mind Stone beam (two hits per second at most).
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	mindStoneBeamDamage = 6.0
+
+[quicksilver]
+	#During Quicksilver Time the world around him runs this many times slower.
+	# Default: 5
+	# Range: 2 ~ 20
+	slowMotionFactor = 5
+	#How far (blocks) from Quicksilver time slows down.
+	# Default: 32
+	# Range: 4 ~ 128
+	slowMotionRadius = 32
+	#Extra movement speed while he runs in Quicksilver Time or Super Speed
+	#(3.0 = four times as fast).
+	# Default: 3.0
+	# Range: 0.0 ~ 10.0
+	speedBonus = 3.0
+	#Food exhaustion per tick while he runs in Quicksilver Time or Super Speed
+	#(4.0 = 1 food point). Quicksilver Time also costs half of this while he is not running.
+	# Default: 0.03
+	# Range: 0.0 ~ 4.0
+	exhaustion = 0.03
+	#While Quicksilver Time or Super Speed is on he mines, attacks, eats, drinks,
+	#draws bows, loads crossbows, swims and places blocks this many times as fast (4.0 = four times as fast).
+	# Default: 4.0
+	# Range: 1.0 ~ 10.0
+	actionSpeed = 4.0
+
+[billy]
+	# Default: 0.08
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.08
+	#Damage of a Hex Bolt to the creature it strikes; each creature it forks to takes half.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	hexBoltDamage = 6.0
+	#How long (ticks) Billy's Freeze holds creatures spellbound.
+	# Default: 100
+	# Range: 1 ~ 1200
+	freezeDuration = 100
+	#How far away (blocks) Billy hears the thoughts of creatures while The Noise is on.
+	# Default: 32
+	# Range: 4 ~ 64
+	noiseRange = 32
+	#Whether Billy's telekinesis can tear blocks out of the ground (and set them down). Off: he catches
+	#creatures, items and projectiles only (as in 3.0).
+	blockLifting = true
+	#How far away (blocks) Billy can tear a block out of the ground.
+	# Default: 16
+	# Range: 2 ~ 128
+	blockLiftRange = 16
+	#Hardest block Billy can lift (stone = 1.5, ores = 3, iron block = 5).
+	# Default: 3.0
+	# Range: 0.0 ~ 100.0
+	blockLiftMaxHardness = 3.0
+	#Ticks Billy waits between two blocks torn out of the ground (catching anything else never waits).
+	# Default: 20
+	# Range: 0 ~ 200
+	blockLiftCooldown = 20
+	#3.2: R is a continuous Hex Beam: held down, a beam leaves his hand along his look and hurts what the crosshair
+	#is on. false: the old single Hex Bolt (hexBoltDamage), which forks to creatures near the one it struck.
+	beam = true
+	#Damage a second of the Hex Beam does to what the crosshair is on, at his first rank (6 = three hearts).
+	#It lands every beamInterval ticks, in equal parts. It grows with his Build Magic rank (beamRankDamageBonus).
+	# Default: 6.0
+	# Range: 0.0 ~ 200.0
+	beamDamagePerSecond = 6.0
+	#How far (blocks) the Hex Beam reaches at his first rank. It grows with his Build Magic rank (beamRankRangeBonus).
+	# Default: 20
+	# Range: 4 ~ 128
+	beamRange = 20
+	#Ticks between two hits of the Hex Beam (5 = four hits a second). The beam ignores the creature's damage
+	#cooldown, so every hit lands.
+	# Default: 5
+	# Range: 1 ~ 40
+	beamInterval = 5
+	#Food exhaustion a second of the Hex Beam costs (4.0 = 1 food point; the old bolt cost none).
+	#He cannot fire it on an empty stomach.
+	# Default: 0.8
+	# Range: 0.0 ~ 40.0
+	beamExhaustionPerSecond = 0.8
+	#How much stronger the beam is at his highest rank (build_magic_billy.maxRank) than at his first, as a
+	#fraction: 1.0 = twice the damage. In between it grows evenly with the rank (rank 1: none).
+	# Default: 1.0
+	# Range: 0.0 ~ 10.0
+	beamRankDamageBonus = 1.0
+	#The same for the range: 1.0 = twice as far at his highest rank.
+	# Default: 1.0
+	# Range: 0.0 ~ 10.0
+	beamRankRangeBonus = 1.0
+
+[tommy]
+	#Extra movement speed while Tommy runs at super speed (2.5 = three and a half times as fast).
+	# Default: 2.5
+	# Range: 0.0 ~ 10.0
+	speedBonus = 2.5
+	#Food exhaustion per tick while Tommy runs at super speed (4.0 = 1 food point).
+	# Default: 0.02
+	# Range: 0.0 ~ 4.0
+	exhaustion = 0.02
+
+[loki]
+	#Damage of one of Loki's conjured daggers.
+	# Default: 5.0
+	# Range: 0.0 ~ 100.0
+	daggerDamage = 5.0
+	#How long a creature stays confused after a melee hit with Loki's Scepter, in ticks (120 = 6 seconds).
+	# Default: 120
+	# Range: 0 ~ 6000
+	scepterConfusionTicks = 120
+	#How long a player gets Nausea after a melee hit with Loki's Scepter, in ticks (160 = 8 seconds).
+	# Default: 160
+	# Range: 0 ~ 6000
+	scepterNauseaTicks = 160
+	#How long a player gets Slowness I after a melee hit with Loki's Scepter, in ticks (60 = 3 seconds).
+	# Default: 60
+	# Range: 0 ~ 6000
+	scepterSlownessTicks = 60
+
+[thor]
+	#Thor's flying speed while he holds Mjolnir or Stormbreaker (Creative flight is 0.05).
+	# Default: 0.11
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.11
+	#If true, everyone is worthy of Mjolnir. If false (the default), only Thor, Vision,
+	#Creative and Spectator players and those who have earned the Hero of the Village advancement are worthy: they can
+	#claim a Mjolnir nobody owns yet (see mjolnirOwnerOnly), and lift it.
+	anyoneWorthy = false
+	#If true (the default), each Mjolnir belongs to the first worthy player who lifts it, and
+	#only they can lift it from then on (Creative and Spectator players always can, without taking it).
+	#If false, Mjolnirs are never claimed: the old rule, where any worthy player can lift any Mjolnir.
+	mjolnirOwnerOnly = true
+	#Damage of a thrown Mjolnir, both ways.
+	# Default: 10.0
+	# Range: 0.0 ~ 100.0
+	throwDamage = 10.0
+	#Damage of a thrown Stormbreaker, both ways (a fifth more than Mjolnir's).
+	# Default: 12.0
+	# Range: 0.0 ~ 100.0
+	stormbreakerThrowDamage = 12.0
+	#How far (blocks) a thrown Mjolnir or Stormbreaker flies before it turns back.
+	# Default: 40
+	# Range: 4 ~ 128
+	throwRange = 40
+	#How far away (blocks) Thor can call Mjolnir or Stormbreaker back from.
+	# Default: 64
+	# Range: 4 ~ 256
+	recallRange = 64
+	#Damage of one hit of Thor's lightning beam, bare-handed (2 = one heart).
+	#Mjolnir in hand multiplies it by beamWeaponMultiplier, Stormbreaker by stormbreakerBeamMultiplier, the God
+	#of Thunder by godOfThunderBeamMultiplier on top.
+	# Default: 2.0
+	# Range: 0.0 ~ 100.0
+	beamDamage = 2.0
+	#Ticks between two hits of the lightning beam (5 = four hits a second). The beam ignores
+	#the creature's damage cooldown, so every hit lands.
+	# Default: 5
+	# Range: 1 ~ 40
+	beamInterval = 5
+	#How far (blocks) Thor's lightning beam reaches bare-handed.
+	# Default: 24
+	# Range: 4 ~ 128
+	beamRange = 24
+	#How far (blocks) the beam reaches with Mjolnir in hand.
+	# Default: 48
+	# Range: 4 ~ 256
+	beamWeaponRange = 48
+	#How far (blocks) the beam reaches with Stormbreaker in hand (a fifth farther than Mjolnir's).
+	# Default: 58
+	# Range: 4 ~ 256
+	stormbreakerBeamRange = 58
+	#What Mjolnir in hand multiplies the beam's damage by.
+	#(With Mjolnir or Stormbreaker in hand the first hit on each creature also has the usual effects of lightning on it.)
+	# Default: 2.0
+	# Range: 1.0 ~ 20.0
+	beamWeaponMultiplier = 2.0
+	#What Stormbreaker in hand multiplies the beam's damage by (a fifth more than Mjolnir's).
+	# Default: 2.4
+	# Range: 1.0 ~ 20.0
+	stormbreakerBeamMultiplier = 2.4
+	#What the God of Thunder multiplies the beam's damage by. Every hit also arcs to the
+	#next two creatures nearby.
+	# Default: 1.5
+	# Range: 1.0 ~ 20.0
+	godOfThunderBeamMultiplier = 1.5
+	#Food exhaustion per tick while the lightning beam is fired (4.0 = 1 food point).
+	# Default: 0.03
+	# Range: 0.0 ~ 4.0
+	beamExhaustion = 0.03
+	#Food exhaustion per tick while the God of Thunder is unleashed (4.0 = 1 food point).
+	# Default: 0.04
+	# Range: 0.0 ~ 4.0
+	godOfThunderExhaustion = 0.04
+	#Cooldown of the Bifrost (Thor's, or anyone's who wields Stormbreaker or Mjolnir), in ticks.
+	# Default: 1200
+	# Range: 0 ~ 72000
+	bifrostCooldown = 1200
+	#Cooldown of shattering Mjolnir (Sneak + R), in ticks, from the moment it shatters.
+	# Default: 300
+	# Range: 0 ~ 72000
+	shatterCooldown = 300
+	#Damage of each fragment of a shattered Mjolnir to the enemy it strikes.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	shatterDamage = 6.0
+	#How long (ticks) Mjolnir pins someone down before it lets go by itself (1200 = a minute).
+	# Default: 1200
+	# Range: 20 ~ 72000
+	pinDuration = 1200
+
+[boss]
+	#How many boss fights may run at once on the whole server (Ultron, Thanos and Apocalypse together).
+	#A ritual that would start another one is refused.
+	# Default: 1
+	# Range: 1 ~ 8
+	maxActiveFights = 1
+	#When every fighter is dead, the fight ends after this many seconds (the boss leaves, nobody is rewarded).
+	# Default: 15
+	# Range: 1 ~ 600
+	wipeSeconds = 15
+	#When no fighter has been near the boss for this many seconds, the fight ends and the boss leaves.
+	# Default: 90
+	# Range: 10 ~ 3600
+	abandonSeconds = 90
+	#No fight lasts longer than this: after it the boss leaves (a fail-safe against a stuck fight).
+	# Default: 25
+	# Range: 1 ~ 240
+	maxFightMinutes = 25
+	#A fighter earns the reward only after being in the fight at least this many seconds
+	#(and having hurt the boss; the player who lands the last blow earns it whatever the time).
+	# Default: 60
+	# Range: 0 ~ 3600
+	rewardMinSeconds = 60
+	#If true, Creative players who fought also earn the reward. They never do by default.
+	creativeGetsReward = false
+	#Experience points every rewarded fighter gets when the boss falls.
+	# Default: 1500
+	# Range: 0 ~ 100000
+	xpRewardPerPlayer = 1500
+	#If true (the default), the server is told in chat when a boss is called and when it falls.
+	announceFights = true
+	#If true (the default), blocks in a boss's arena can't be broken, placed, burned or blown up while the
+	#fight lasts, so the world is the same when it ends. (Thanos's arena is never protected.)
+	#The floating island of Ultron's fight is always protected: it is a copy of the ground, not the world.
+	protectArena = true
+	#Multiplies the health and the damage of every boss (1.0 = as designed, 0.5 = half as hard).
+	# Default: 1.0
+	# Range: 0.1 ~ 10.0
+	difficultyScale = 1.0
+	#Telekinesis (Wanda, Billy, the Phoenix, Magneto) can take hold of Ultron, Thanos and Apocalypse, as
+	#bosses: for a short time, then they break free. Off: they cannot be held at all ("too powerful to lift", as in
+	#3.0); Wanda's rip of Ultron's heart still works.
+	telekinesisHoldsBosses = true
+	#Telekinesis can take hold of the Wither, the Warden and the Elder Guardian, as bosses: for a short time,
+	#then they break free (the Ender Dragon is too vast to hold). Off: they are "too powerful to lift".
+	telekinesisHoldsVanillaBosses = true
+	#How long telekinesis holds the Wither, the Warden or the Elder Guardian before he breaks free (before the
+	#hero's factor, billyHoldFactor for Billy; Magneto holds none of the three, they wear no metal).
+	# Default: 60
+	# Range: 10 ~ 600
+	vanillaHoldTicks = 60
+	#Billy and the Phoenix (and Magneto, for metal) can catch Thanos's sword, meteors and orbs, and what they
+	#throw back is theirs (Ultron's bolts and Apocalypse's lances then hit their own side). Off: Thanos's shots
+	#cannot be caught, and a caught bolt or lance stays the boss's (as in 3.0).
+	telekinesisCatchesBossShots = true
+	#After a boss breaks free, is let go or lands from a throw, nobody can take hold of him again for this many ticks.
+	# Default: 240
+	# Range: 0 ~ 2400
+	regripTicks = 240
+	#A boss thrown by telekinesis does nothing for at most this many ticks of his flight (his regrip time
+	#starts after it).
+	# Default: 20
+	# Range: 0 ~ 40
+	thrownStillTicks = 20
+	#Billy holds a boss this many times as long as Wanda (the bosses only: Thanos's sword he holds
+	#thanos_boss.swordHoldTicks, as the Phoenix does).
+	# Default: 0.5
+	# Range: 0.1 ~ 2.0
+	billyHoldFactor = 0.5
+	#Magneto holds a metal boss, and every metal thing of a fight (Thanos's sword), this many times as long
+	#as Wanda.
+	# Default: 1.5
+	# Range: 0.1 ~ 3.0
+	magnetoHoldFactor = 1.5
+	#Block telekinesis can borrow the blocks of a protected arena: the holes mend, a borrowed block crumbles
+	#after a while, and everything goes back when the fight ends. Off: lifting is refused in the arenas (as in 3.0).
+	lendArenaBlocks = true
+	#Ticks after which the hole a borrowed block left mends.
+	# Default: 100
+	# Range: 20 ~ 1200
+	arenaMendTicks = 100
+	#How long (ticks) a borrowed block that is set down stands before it crumbles.
+	# Default: 100
+	# Range: 20 ~ 2400
+	borrowedBlockTicks = 100
+	#At most this many borrowed blocks of one player stand at once; one more set down crumbles at once
+	#(0: every borrowed block crumbles when it is set down).
+	# Default: 3
+	# Range: 0 ~ 48
+	maxStandingPerPlayer = 3
+	#At most this many borrowed blocks (held, flying or standing) per fight.
+	# Default: 48
+	# Range: 1 ~ 512
+	maxBorrowedBlocks = 48
+
+[phoenix]
+	#The Phoenix's flying speed (Creative flight is 0.05).
+	# Default: 0.09
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.09
+	#Fire, lava and burning cannot hurt the Phoenix.
+	fireImmune = true
+	#How far (blocks) Mind Reading reaches (line of sight needed).
+	# Default: 24
+	# Range: 4 ~ 64
+	mindReadRange = 24
+	#If false, Mind Reading cannot read players' minds.
+	mindReadPlayers = true
+	#If true the panel lists a player's whole inventory; if false only the hands and the armour.
+	mindReadInventory = true
+	#The player who is read feels a presence in their mind (once per 10 seconds).
+	mindReadNotifies = true
+	#Food exhaustion per tick while Mind Reading is on (4.0 = 1 food point).
+	# Default: 0.01
+	# Range: 0.0 ~ 4.0
+	mindReadExhaustion = 0.01
+	#How far (blocks) the Mind Sense ping reaches.
+	# Default: 48
+	# Range: 8 ~ 128
+	mindSenseRange = 48
+	#How long the sensed minds glow.
+	# Default: 120
+	# Range: 20 ~ 1200
+	mindSenseTicks = 120
+	#Cooldown of Mind Sense, in ticks (400 = 20 s).
+	# Default: 400
+	# Range: 0 ~ 72000
+	mindSenseCooldown = 400
+	#Exhaustion of one Mind Sense.
+	# Default: 2.0
+	# Range: 0.0 ~ 40.0
+	mindSenseExhaustion = 2.0
+	#How far (blocks) Mind Control reaches (10 = about 33 feet, as in the film).
+	# Default: 10
+	# Range: 2 ~ 32
+	mindControlRange = 10
+	#How long a creature stays possessed (300 = 15 s).
+	# Default: 300
+	# Range: 20 ~ 2400
+	mindControlTicks = 300
+	#How many creatures she can possess at once; taking one more frees the oldest.
+	# Default: 1
+	# Range: 1 ~ 5
+	mindControlMax = 1
+	#How long a player is held by Mind Control (needs PvP). 0 turns it off for players.
+	# Default: 60
+	# Range: 0 ~ 1200
+	mindControlPlayerTicks = 60
+	#Cooldown of Mind Control (ability 4), in ticks.
+	# Default: 400
+	# Range: 0 ~ 72000
+	mindControlCooldown = 400
+	#Exhaustion of Mind Control.
+	# Default: 6.0
+	# Range: 0.0 ~ 40.0
+	mindControlExhaustion = 6.0
+	#Radius (blocks) of the Psionic Field.
+	# Default: 16
+	# Range: 4 ~ 64
+	psionicRadius = 16
+	#How long the Psionic Field holds everyone (needs PvP for players).
+	# Default: 60
+	# Range: 10 ~ 600
+	psionicTicks = 60
+	#Cooldown of the Psionic Field (ability 4), in ticks (1200 = 60 s).
+	# Default: 1200
+	# Range: 0 ~ 72000
+	psionicCooldown = 1200
+	#Exhaustion of the Psionic Field.
+	# Default: 8.0
+	# Range: 0.0 ~ 40.0
+	psionicExhaustion = 8.0
+	#Ticks of charge for a full Phoenix Burst. It fires by itself at full charge.
+	# Default: 60
+	# Range: 10 ~ 200
+	burstChargeTicks = 60
+	#A shorter charge is cancelled.
+	# Default: 12
+	# Range: 0 ~ 100
+	burstMinChargeTicks = 12
+	#Radius (blocks) of a barely charged Burst.
+	# Default: 8
+	# Range: 2 ~ 64
+	burstMinRadius = 8
+	#Radius (blocks) of a fully charged Burst.
+	# Default: 24
+	# Range: 4 ~ 96
+	burstMaxRadius = 24
+	#Damage of a barely charged Burst.
+	# Default: 8.0
+	# Range: 0.0 ~ 200.0
+	burstMinDamage = 8.0
+	#Damage of a fully charged Burst (it fades to 60% at the edge).
+	# Default: 30.0
+	# Range: 0.0 ~ 200.0
+	burstMaxDamage = 30.0
+	#What a player takes of the Burst's damage (only with PvP on).
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	burstPlayerFactor = 0.5
+	#How fast the wave spreads (blocks per tick).
+	# Default: 1.0
+	# Range: 0.2 ~ 4.0
+	burstWaveSpeed = 1.0
+	#Seconds a creature burns after a full Burst (a weaker one burns 40% as long).
+	# Default: 10
+	# Range: 0 ~ 60
+	burstFireSeconds = 10
+	#Knockback of the wave.
+	# Default: 1.2
+	# Range: 0.0 ~ 5.0
+	burstKnockback = 1.2
+	#Whether the wave sets flammable blocks on fire (it also needs mobGriefing).
+	burstSetsFire = true
+	#If true the wave also hurts villagers, golems, animals and other players' pets; by default it hurts only hostile creatures, creatures after her, and players (with PvP on).
+	burstHurtsPassives = false
+	#At most this many fires per Burst.
+	# Default: 40
+	# Range: 0 ~ 400
+	burstMaxFireBlocks = 40
+	#Food points a full Burst costs (and the least hunger needed to start charging).
+	# Default: 6
+	# Range: 0 ~ 20
+	burstFoodCost = 6
+	#Cooldown of the Burst, in ticks (1800 = 90 s).
+	# Default: 1800
+	# Range: 0 ~ 72000
+	burstCooldown = 1800
+	#Cooldown after a cancelled charge, in ticks.
+	# Default: 40
+	# Range: 0 ~ 1200
+	burstCancelCooldown = 40
+	#Weakness and Slowness after a Burst, in ticks.
+	# Default: 100
+	# Range: 0 ~ 1200
+	burstDrainTicks = 100
+	#How long the Phoenix Ember must be held to awaken, in ticks.
+	# Default: 60
+	# Range: 20 ~ 400
+	emberRitualTicks = 60
+
+[spider_man]
+	#Extra walking speed of Spider-Man (a fraction of the normal speed).
+	# Default: 0.15
+	# Range: 0.0 ~ 2.0
+	speedBonus = 0.15
+	#Extra jump strength of Spider-Man (0.3 is a jump of about 2.1 blocks instead of 1.25).
+	# Default: 0.3
+	# Range: 0.0 ~ 2.0
+	jumpBonus = 0.3
+	#Extra melee damage of Spider-Man (his bare fists hit for 3).
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	strengthBonus = 2.0
+	#The part of fall damage Spider-Man does not take.
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	fallDamageReduction = 0.5
+	#How long the Radioactive Spider's bite takes to change a player (a sick 7 seconds).
+	# Default: 140
+	# Range: 20 ~ 1200
+	biteDelayTicks = 140
+	#How far (blocks) Spider-Man feels danger coming.
+	# Default: 12
+	# Range: 4 ~ 48
+	spiderSenseRange = 12
+	#Ticks between two scans of his spider-sense for danger.
+	# Default: 5
+	# Range: 1 ~ 40
+	spiderSenseInterval = 5
+	#Range (blocks) of a Web Shot.
+	# Default: 24
+	# Range: 4 ~ 64
+	webShotRange = 24
+	#Ticks between two Web Shots (hidden: only the Web Burst's cooldown is shown).
+	# Default: 10
+	# Range: 0 ~ 200
+	webShotCooldown = 10
+	#Food exhaustion of one Web Shot (4.0 = 1 food point).
+	# Default: 0.4
+	# Range: 0.0 ~ 4.0
+	webShotExhaustion = 0.4
+	#How long a creature hit by a Web Shot stays webbed (20 ticks = 1 second).
+	# Default: 120
+	# Range: 20 ~ 1200
+	webbedTicks = 120
+	#Organic webs (the Brand New Day look, or the Black Eyes) last this many times as long.
+	# Default: 1.5
+	# Range: 1.0 ~ 5.0
+	organicWebFactor = 1.5
+	#Organic webs cost this many times the hunger.
+	# Default: 2.0
+	# Range: 1.0 ~ 8.0
+	organicWebCostFactor = 2.0
+	#Whether webs also leave temporary web blocks (the cocoon round a creature, the patch on a wall).
+	#With false, webs only entangle creatures.
+	webBlocks = true
+	#How long a web block lasts before it disappears (it only ever replaces air).
+	# Default: 200
+	# Range: 20 ~ 6000
+	webBlockTicks = 200
+	#The radius of the patch a Web Shot leaves on a wall (1 = 3 x 3 blocks).
+	# Default: 1
+	# Range: 0 ~ 2
+	webPatchRadius = 1
+	#The most web blocks one Spider-Man can have at once; the oldest go first.
+	# Default: 64
+	# Range: 8 ~ 512
+	webBlockCap = 64
+	#Strands of a Web Burst (Sneak + R), spread evenly in every direction.
+	# Default: 24
+	# Range: 6 ~ 96
+	webBurstStrands = 24
+	#How far (blocks) a strand of the burst flies.
+	# Default: 10
+	# Range: 3 ~ 24
+	webBurstRange = 10
+	#Cooldown of the Web Burst in ticks.
+	# Default: 240
+	# Range: 0 ~ 6000
+	webBurstCooldown = 240
+	#Food exhaustion of one Web Burst (4.0 = 1 food point).
+	# Default: 2.0
+	# Range: 0.0 ~ 8.0
+	webBurstExhaustion = 2.0
+	#How long a Web Burst keeps a creature webbed.
+	# Default: 80
+	# Range: 20 ~ 1200
+	webBurstWebbedTicks = 80
+	#How far (blocks) a Web Zip reaches.
+	# Default: 40
+	# Range: 8 ~ 96
+	zipRange = 40
+	#Speed of a zip in blocks per tick, before his speed factor (1.3 is 26 blocks a second).
+	# Default: 1.3
+	# Range: 0.3 ~ 3.0
+	zipSpeed = 1.3
+	#Ticks before he can zip again (small, so zips chain).
+	# Default: 6
+	# Range: 0 ~ 200
+	zipCooldown = 6
+	#The longest a zip can take, in ticks.
+	# Default: 60
+	# Range: 10 ~ 400
+	zipMaxTicks = 60
+	#Food exhaustion of one zip (4.0 = 1 food point).
+	# Default: 0.3
+	# Range: 0.0 ~ 4.0
+	zipExhaustion = 0.3
+	#Damage of the kick when a zip aimed at a creature ends on it (0 = no kick, the zip only goes to blocks).
+	# Default: 4.0
+	# Range: 0.0 ~ 40.0
+	zipKickDamage = 4.0
+	#How far (blocks) the anchor of a Web Swing can be.
+	# Default: 40
+	# Range: 8 ~ 96
+	swingRange = 40
+	#The longest a swing can last, in ticks.
+	# Default: 300
+	# Range: 20 ~ 2400
+	swingMaxTicks = 300
+	#His top speed while swinging, in blocks per tick.
+	# Default: 1.8
+	# Range: 0.5 ~ 3.0
+	swingMaxSpeed = 1.8
+	#Gravity while he swings, in blocks per tick squared (vanilla's is 0.08).
+	# Default: 0.06
+	# Range: 0.02 ~ 0.12
+	swingGravity = 0.06
+	#Food exhaustion per tick while he swings (4.0 = 1 food point).
+	# Default: 0.01
+	# Range: 0.0 ~ 1.0
+	swingExhaustion = 0.01
+	#His speed on a wall or ceiling in blocks per tick, before his speed factor.
+	# Default: 0.22
+	# Range: 0.05 ~ 0.6
+	crawlSpeed = 0.22
+	#Food exhaustion per tick while he moves on a wall or ceiling.
+	# Default: 0.005
+	# Range: 0.0 ~ 1.0
+	crawlExhaustion = 0.005
+	#Speed of a leap off a wall, in blocks per tick, before his speed factor.
+	# Default: 0.9
+	# Range: 0.3 ~ 2.0
+	leapSpeed = 0.9
+	#Armor of the Homemade Suit (and of his own skin): a hoodie, no protection.
+	# Default: 0.0
+	# Range: 0.0 ~ 30.0
+	homemadeArmor = 0.0
+	#Armor of the Brand New Day suit.
+	# Default: 8.0
+	# Range: 0.0 ~ 30.0
+	brandNewDayArmor = 8.0
+	#Armor toughness of the Brand New Day suit.
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	brandNewDayToughness = 2.0
+	#Armor of the Iron Spider.
+	# Default: 14.0
+	# Range: 0.0 ~ 30.0
+	ironSpiderArmor = 14.0
+	#Armor toughness of the Iron Spider.
+	# Default: 6.0
+	# Range: 0.0 ~ 20.0
+	ironSpiderToughness = 6.0
+	#Knockback resistance of the Iron Spider.
+	# Default: 0.2
+	# Range: 0.0 ~ 1.0
+	ironSpiderKnockbackResistance = 0.2
+	#How long Magneto's Armor and Weapon Strip scatters the nanites of the Iron Spider
+	#(its armor, its legs and Instant Kill are off meanwhile).
+	# Default: 200
+	# Range: 0 ~ 6000
+	ironSpiderStripTicks = 200
+	#Damage of one jab of the Iron Spider's legs (also all they do to a boss or a boss's minion).
+	# Default: 5.0
+	# Range: 0.0 ~ 100.0
+	legsDamage = 5.0
+	#Ticks between two jabs of the legs when they guard him.
+	# Default: 20
+	# Range: 4 ~ 200
+	legsInterval = 20
+	#How far (blocks) the legs jab a threat.
+	# Default: 4.0
+	# Range: 1.0 ~ 10.0
+	legsRange = 4.0
+	#Extra attack reach (blocks) with the legs out.
+	# Default: 2.0
+	# Range: 0.0 ~ 6.0
+	legsReachBonus = 2.0
+	#Food exhaustion per tick with the legs out.
+	# Default: 0.01
+	# Range: 0.0 ~ 1.0
+	legsExhaustion = 0.01
+	#How far (blocks) Instant Kill reaches.
+	# Default: 5.0
+	# Range: 1.0 ~ 12.0
+	instantKillRange = 5.0
+	#Ticks between the strikes of Instant Kill (each of the four legs strikes one threat).
+	# Default: 5
+	# Range: 1 ~ 40
+	instantKillInterval = 5
+	#Damage of one strike of Instant Kill (a kill). Bosses and their minions take only legsDamage.
+	# Default: 1000.0
+	# Range: 1.0 ~ 10000.0
+	instantKillDamage = 1000.0
+	#The longest Instant Kill lasts, in ticks.
+	# Default: 200
+	# Range: 20 ~ 2400
+	instantKillMaxTicks = 200
+	#Cooldown in ticks after Instant Kill ends.
+	# Default: 600
+	# Range: 0 ~ 12000
+	instantKillCooldown = 600
+	#Food exhaustion per tick while Instant Kill lasts (4.0 = 1 food point).
+	# Default: 0.08
+	# Range: 0.0 ~ 4.0
+	instantKillExhaustion = 0.08
+	#The window in ticks to press Sneak + B a second time to confirm Instant Kill.
+	# Default: 60
+	# Range: 20 ~ 200
+	instantKillConfirmTicks = 60
+	#Whether Instant Kill may strike players (it never does by default; PvP must be on as well).
+	instantKillPlayers = false
+	#Extra speed (a fraction, on top of his own) while the Black Eyes are on.
+	# Default: 0.6
+	# Range: 0.0 ~ 5.0
+	blackEyesSpeedBonus = 0.6
+	#Extra melee damage while the Black Eyes are on
+	#(bare fists: (1 + 2 + 4) x 6 swings a second = 42 damage a second).
+	# Default: 4.0
+	# Range: 0.0 ~ 40.0
+	blackEyesStrengthBonus = 4.0
+	#Extra attack speed (a fraction) while the Black Eyes are on.
+	# Default: 0.5
+	# Range: 0.0 ~ 3.0
+	blackEyesAttackSpeedBonus = 0.5
+	#Extra jump strength (a fraction) while the Black Eyes are on.
+	# Default: 0.25
+	# Range: 0.0 ~ 2.0
+	blackEyesJumpBonus = 0.25
+	#Knockback resistance while the Black Eyes are on.
+	# Default: 0.3
+	# Range: 0.0 ~ 1.0
+	blackEyesKnockbackResistance = 0.3
+	#Food exhaustion per tick while the Black Eyes are on (0.05 = one food point every 4 seconds).
+	# Default: 0.05
+	# Range: 0.0 ~ 4.0
+	blackEyesExhaustion = 0.05
+	#The longest the surge of the Black Eyes lasts, in ticks.
+	# Default: 600
+	# Range: 40 ~ 6000
+	blackEyesMaxTicks = 600
+	#Cooldown in ticks after the surge ends (half of it when he calms himself).
+	# Default: 600
+	# Range: 0 ~ 12000
+	blackEyesCooldown = 600
+	#How long the crash (Slowness II and Weakness) lasts when the surge runs out.
+	# Default: 200
+	# Range: 0 ~ 2400
+	blackEyesCrashTicks = 200
+	#If above 0: the Black Eyes switch on by themselves when his health falls to this many points
+	#(and cannot be calmed for 5 seconds). 0 = never.
+	# Default: 0.0
+	# Range: 0.0 ~ 20.0
+	blackEyesPanicHealth = 0.0
+	#How much the Black Eyes widen his spider-sense (and how much faster it scans).
+	# Default: 2.0
+	# Range: 1.0 ~ 4.0
+	blackEyesSenseFactor = 2.0
+
+[thanos_boss]
+	#Whether the Tesseract and Loki's Scepter, held together, can call Thanos.
+	summonEnabled = true
+	#Whether Thanos answers only in the Overworld.
+	summonOverworldOnly = true
+	#How long the two items are held up before the portal opens (at most the 100 ticks the items can be held).
+	# Default: 100
+	# Range: 20 ~ 100
+	summonChargeTicks = 100
+	#From the portal opening to his arrival.
+	# Default: 120
+	# Range: 20 ~ 1200
+	summonCountdownTicks = 120
+	#Clear air needed above the summoner.
+	# Default: 24
+	# Range: 4 ~ 64
+	summonSkyBlocks = 24
+	#The fraction of the 24 sample spots round the summoner that need standing room.
+	# Default: 0.6
+	# Range: 0.0 ~ 1.0
+	summonOpenFraction = 0.6
+	#The rest after a fight before he can be called again (half after he left or the fighters were wiped).
+	# Default: 12000
+	# Range: 0 ~ 1728000
+	summonCooldownTicks = 12000
+	#His health for one fighter.
+	# Default: 3000.0
+	# Range: 100.0 ~ 100000.0
+	health = 3000.0
+	#The fraction of his health added for each extra fighter.
+	# Default: 0.5
+	# Range: 0.0 ~ 2.0
+	healthPerExtraPlayer = 0.5
+	#How many fighters count for his health and the targets of his area moves.
+	# Default: 4
+	# Range: 1 ~ 16
+	maxFightersCounted = 4
+	#The radius of the fight round the summoning point (the clock and the leash reach 24 blocks beyond it).
+	# Default: 40
+	# Range: 16 ~ 96
+	arenaRadius = 40
+	#The experience dropped when he is defeated.
+	# Default: 12000
+	# Range: 0 ~ 100000
+	xpReward = 12000
+	#The most Infinity Stones he can have. There is no sixth: the Mind Stone never comes.
+	# Default: 5
+	# Range: 1 ~ 5
+	maxStones = 5
+	#Combat time between one stone and the next (1800 = 90 seconds).
+	# Default: 1800
+	# Range: 200 ~ 36000
+	stoneIntervalTicks = 1800
+	#The power surge when a stone arrives: he kneels and takes extra damage.
+	# Default: 60
+	# Range: 0 ~ 200
+	surgeTicks = 60
+	#The damage he takes in the surge, times.
+	# Default: 1.5
+	# Range: 1.0 ~ 4.0
+	surgeDamageFactor = 1.5
+	#The extra damage he deals for each stone beyond the first (0.06 = 6 percent).
+	# Default: 0.06
+	# Range: 0.0 ~ 0.5
+	damageScalePerStone = 0.06
+	#The time after his last stone before his damage starts to grow.
+	# Default: 3600
+	# Range: 0 ~ 72000
+	enrageAfterTicks = 3600
+	#How much his damage grows each minute of enrage (0.04 = 4 percent).
+	# Default: 0.04
+	# Range: 0.0 ~ 0.5
+	enrageStepPerMinute = 0.04
+	#The most the enrage adds to his damage (0.4 = 40 percent).
+	# Default: 0.4
+	# Range: 0.0 ~ 2.0
+	enrageMax = 0.4
+	#Ticks cut from his rest between moves for each extra fighter.
+	# Default: 2
+	# Range: 0 ~ 10
+	gapPerExtraPlayer = 2
+	#If true, and the mobGriefing rule is on, Overload and the meteors break blocks with small explosions.
+	#Nothing else he does ever breaks a block.
+	blockDamage = false
+	#Damage of his attack: A Sword Sweep.
+	# Default: 30.0
+	# Range: 0.0 ~ 400.0
+	swordDamage = 30.0
+	#Damage of his attack: The impact of an Overhead Smash.
+	# Default: 26.0
+	# Range: 0.0 ~ 400.0
+	smashDamage = 26.0
+	#Damage of his attack: The ground ring of an Overhead Smash.
+	# Default: 12.0
+	# Range: 0.0 ~ 400.0
+	smashRingDamage = 12.0
+	#Damage of his attack: Each Gauntlet Jab.
+	# Default: 14.0
+	# Range: 0.0 ~ 400.0
+	jabDamage = 14.0
+	#Damage of his attack: Each pass of the thrown sword.
+	# Default: 22.0
+	# Range: 0.0 ~ 400.0
+	swordThrowDamage = 22.0
+	#Damage of his attack: The whole Choke hold (the throw at the end adds half again).
+	# Default: 16.0
+	# Range: 0.0 ~ 400.0
+	chokeDamage = 16.0
+	#Damage of his attack: The landing of a Leap.
+	# Default: 12.0
+	# Range: 0.0 ~ 400.0
+	leapDamage = 12.0
+	#Damage of his attack: The Power Blast beam.
+	# Default: 20.0
+	# Range: 0.0 ~ 400.0
+	powerBlastDamage = 20.0
+	#Damage of his attack: The explosion at the end of the Power Blast.
+	# Default: 8.0
+	# Range: 0.0 ~ 400.0
+	powerBlastSplash = 8.0
+	#Damage of his attack: Each sigil of Overload.
+	# Default: 16.0
+	# Range: 0.0 ~ 400.0
+	overloadDamage = 16.0
+	#Damage of his attack: The Titan Shockwave ring.
+	# Default: 12.0
+	# Range: 0.0 ~ 400.0
+	shockwaveDamage = 12.0
+	#Damage of his attack: Each meteor.
+	# Default: 16.0
+	# Range: 0.0 ~ 400.0
+	meteorDamage = 16.0
+	#Damage of his attack: The crush at the end of the Gravity Pull.
+	# Default: 10.0
+	# Range: 0.0 ~ 400.0
+	pullCrushDamage = 10.0
+	#Damage of his attack: Each pulse of the Soul Drain (every 10 ticks; ignores armour and enchantments).
+	# Default: 3.0
+	# Range: 0.0 ~ 400.0
+	soulDrainTick = 3.0
+	#Damage of his attack: The Power Pulse that finds a fighter hiding behind walls.
+	# Default: 12.0
+	# Range: 0.0 ~ 400.0
+	pulseDamage = 12.0
+	#Damage of his attack: The Infinity Beam.
+	# Default: 40.0
+	# Range: 0.0 ~ 400.0
+	infinityBeamDamage = 40.0
+	#Damage of his attack: A jab of one of his illusions.
+	# Default: 3.5
+	# Range: 0.0 ~ 400.0
+	phantomDamage = 3.5
+	#What his sword costs a Chaos Shield: this many times the damage it would have done.
+	# Default: 2.0
+	# Range: 1.0 ~ 10.0
+	swordShieldFactor = 2.0
+	#How long that move waits before he can use it again (ticks).
+	# Default: 40
+	# Range: 0 ~ 6000
+	swordCooldown = 40
+	#How long that move waits before he can use it again (ticks).
+	# Default: 100
+	# Range: 0 ~ 6000
+	smashCooldown = 100
+	#How long that move waits before he can use it again (ticks).
+	# Default: 30
+	# Range: 0 ~ 6000
+	jabCooldown = 30
+	#How long that move waits before he can use it again (ticks).
+	# Default: 280
+	# Range: 0 ~ 6000
+	swordThrowCooldown = 280
+	#How long that move waits before he can use it again (ticks).
+	# Default: 400
+	# Range: 0 ~ 6000
+	chokeCooldown = 400
+	#How long that move waits before he can use it again (ticks).
+	# Default: 160
+	# Range: 0 ~ 6000
+	leapCooldown = 160
+	#How long that move waits before he can use it again (ticks).
+	# Default: 120
+	# Range: 0 ~ 6000
+	powerBlastCooldown = 120
+	#How long that move waits before he can use it again (ticks).
+	# Default: 200
+	# Range: 0 ~ 6000
+	overloadCooldown = 200
+	#How long that move waits before he can use it again (ticks).
+	# Default: 240
+	# Range: 0 ~ 6000
+	shockwaveCooldown = 240
+	#How long that move waits before he can use it again (ticks).
+	# Default: 160
+	# Range: 0 ~ 6000
+	stepCooldown = 160
+	#How long that move waits before he can use it again (ticks).
+	# Default: 440
+	# Range: 0 ~ 6000
+	meteorCooldown = 440
+	#How long that move waits before he can use it again (ticks).
+	# Default: 360
+	# Range: 0 ~ 6000
+	pullCooldown = 360
+	#How long that move waits before he can use it again (ticks).
+	# Default: 300
+	# Range: 0 ~ 6000
+	barrierCooldown = 300
+	#How long that move waits before he can use it again (ticks).
+	# Default: 280
+	# Range: 0 ~ 6000
+	veilCooldown = 280
+	#How long that move waits before he can use it again (ticks).
+	# Default: 560
+	# Range: 0 ~ 6000
+	phantomsCooldown = 560
+	#How long that move waits before he can use it again (ticks).
+	# Default: 240
+	# Range: 0 ~ 6000
+	orbCooldown = 240
+	#How long that move waits before he can use it again (ticks).
+	# Default: 240
+	# Range: 0 ~ 6000
+	sightCooldown = 240
+	#How long that move waits before he can use it again (ticks).
+	# Default: 320
+	# Range: 0 ~ 6000
+	drainCooldown = 320
+	#How long that move waits before he can use it again (ticks).
+	# Default: 800
+	# Range: 0 ~ 6000
+	soulworldCooldown = 800
+	#How long that move waits before he can use it again (ticks).
+	# Default: 600
+	# Range: 0 ~ 6000
+	rewindCooldown = 600
+	#How long that move waits before he can use it again (ticks).
+	# Default: 360
+	# Range: 0 ~ 6000
+	snareCooldown = 360
+	#How long that move waits before he can use it again (ticks).
+	# Default: 900
+	# Range: 0 ~ 6000
+	infinityBeamCooldown = 900
+	#How long that move waits before he can use it again (ticks).
+	# Default: 80
+	# Range: 0 ~ 6000
+	pulseCooldown = 80
+	#How long the Space Barrier stands.
+	# Default: 60
+	# Range: 10 ~ 400
+	barrierTicks = 60
+	#How long his Reality Veil stands.
+	# Default: 120
+	# Range: 10 ~ 600
+	veilTicks = 120
+	#How long the Time Snare locks whoever it catches.
+	# Default: 80
+	# Range: 10 ~ 400
+	snareTicks = 80
+	#How long a soul stays in the Soul World.
+	# Default: 80
+	# Range: 10 ~ 400
+	soulworldTicks = 80
+	#The fraction of his maximum health he heals for each soul taken into the Soul World.
+	# Default: 0.03
+	# Range: 0.0 ~ 0.5
+	soulworldHeal = 0.03
+	#How much of the Soul Drain's damage he heals (0.4 = 40 percent).
+	# Default: 0.4
+	# Range: 0.0 ~ 2.0
+	drainHealFraction = 0.4
+	#How far back his Rewind goes, in seconds.
+	# Default: 6
+	# Range: 1 ~ 20
+	rewindSeconds = 6
+	#The most health a Rewind returns (a fraction of his maximum).
+	# Default: 0.08
+	# Range: 0.0 ~ 0.5
+	rewindMaxHeal = 0.08
+	#The damage he took in the window that makes him rewind (a fraction of his maximum).
+	# Default: 0.06
+	# Range: 0.0 ~ 1.0
+	rewindTrigger = 0.06
+	#The share of the damage each intact armour plate takes off (four plates, so 0.1 means 40 percent).
+	# Default: 0.1
+	# Range: 0.0 ~ 0.2
+	plateReduction = 0.1
+	#Seconds of a Scarlet Witch's Chaos Beam on him that tear a plate away.
+	# Default: 3
+	# Range: 1 ~ 30
+	plateTearSeconds = 3
+	#The poise damage during a stone move's wind-up that interrupts it and staggers him.
+	# Default: 100
+	# Range: 10 ~ 1000
+	staggerPoise = 100
+	#Poise per point of damage he takes (three times that for damage born of an Infinity Stone).
+	# Default: 2.0
+	# Range: 0.1 ~ 10.0
+	poiseHit = 2.0
+	#How long his stones stay dark after a stagger.
+	# Default: 80
+	# Range: 10 ~ 400
+	lockTicks = 80
+	#The damage Stormbreaker does to him, times.
+	# Default: 2.5
+	# Range: 1.0 ~ 10.0
+	stormbreakerFactor = 2.5
+	#The most one hit can take from him (a fraction of his maximum health).
+	# Default: 0.06
+	# Range: 0.005 ~ 1.0
+	maxHitFraction = 0.06
+	#The most one second can take from him (a fraction of his maximum health).
+	# Default: 0.15
+	# Range: 0.01 ~ 1.0
+	maxDamagePerSecond = 0.15
+	#What golems, wolves and other creatures that are not players do to him, times.
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	mobDamageFactor = 0.25
+	#Random meteors beyond one for each player.
+	# Default: 4
+	# Range: 0 ~ 8
+	meteorExtra = 4
+	#How long a fighter can hide where he can neither walk nor see before the Power Pulse finds them.
+	# Default: 160
+	# Range: 40 ~ 1200
+	unreachableTicks = 160
+	#His healing per minute while no fighter is in the arena (a fraction of his maximum).
+	# Default: 0.02
+	# Range: 0.0 ~ 0.5
+	idleRegenPerMinute = 0.02
+	#The damage (a fraction of his maximum health) that earns an Infinity Gauntlet, together with the shared
+	#rewardMinSeconds. Whoever strikes the last blow always earns one.
+	# Default: 0.03
+	# Range: 0.0 ~ 0.5
+	rewardMinShare = 0.03
+	#How long the Infinity Gauntlet must be held to become Thanos.
+	# Default: 60
+	# Range: 20 ~ 400
+	gauntletRitualTicks = 60
+	#A Spider-Man's web shot locks his Gauntlet for this long (0 turns it off).
+	# Default: 40
+	# Range: 0 ~ 400
+	webLockTicks = 40
+	#A web can lock his Gauntlet at most this often.
+	# Default: 400
+	# Range: 0 ~ 6000
+	webLockCooldown = 400
+	#How long telekinesis can hold Thanos before he breaks free (before the hero's factor, boss.billyHoldFactor
+	#or boss.magnetoHoldFactor).
+	# Default: 40
+	# Range: 10 ~ 600
+	holdTicks = 40
+	#How long telekinesis can hold his thrown sword before it tears free and flies home (every hero; Magneto
+	#boss.magnetoHoldFactor times as long).
+	# Default: 40
+	# Range: 5 ~ 200
+	swordHoldTicks = 40
+
+[thanos]
+	#Extra health Thanos has (20 = 10 hearts).
+	# Default: 20.0
+	# Range: 0.0 ~ 100.0
+	healthBonus = 20.0
+	#Extra armour points.
+	# Default: 6.0
+	# Range: 0.0 ~ 30.0
+	armorBonus = 6.0
+	#Extra armour toughness.
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	toughnessBonus = 2.0
+	#Knockback resistance (1 = none at all).
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	knockbackResistance = 0.5
+	#Extra attack damage, with a bare fist or any weapon (Titan strength).
+	# Default: 3.0
+	# Range: 0.0 ~ 20.0
+	attackBonus = 3.0
+	#Extra size (0.1 = 10 percent taller and wider).
+	# Default: 0.1
+	# Range: 0.0 ~ 0.5
+	scale = 0.1
+	#Extra reach, in blocks (long arms).
+	# Default: 1.0
+	# Range: 0.0 ~ 4.0
+	reachBonus = 1.0
+	#Extra step height: a Titan's stride walks up whole blocks.
+	# Default: 0.4
+	# Range: 0.0 ~ 1.0
+	stepBonus = 0.4
+	#The Titan healing factor: health regained each second while unhurt.
+	# Default: 0.5
+	# Range: 0.0 ~ 10.0
+	regenPerSecond = 0.5
+	#Ticks without being hurt before the healing factor starts.
+	# Default: 100
+	# Range: 0 ~ 1200
+	regenDelayTicks = 100
+	#Damage of the Power Blast.
+	# Default: 12.0
+	# Range: 0.0 ~ 100.0
+	powerBlastDamage = 12.0
+	#Damage of the explosion at the end of the Power Blast.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	powerBlastSplash = 6.0
+	#Range of the Power Blast, in blocks.
+	# Default: 28.0
+	# Range: 4.0 ~ 64.0
+	powerBlastRange = 28.0
+	#Ticks before the Power Blast can be used again.
+	# Default: 70
+	# Range: 0 ~ 6000
+	powerBlastCooldown = 70
+	#Exhaustion of the Power Blast (4.0 = one food point).
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	powerBlastExhaustion = 2.0
+	#Damage of the Titan Slam.
+	# Default: 10.0
+	# Range: 0.0 ~ 100.0
+	slamDamage = 10.0
+	#Radius of the Titan Slam's ring.
+	# Default: 7.0
+	# Range: 2.0 ~ 24.0
+	slamRadius = 7.0
+	#Ticks before the Titan Slam can be used again.
+	# Default: 160
+	# Range: 0 ~ 6000
+	slamCooldown = 160
+	#Exhaustion of the Titan Slam.
+	# Default: 4.0
+	# Range: 0.0 ~ 20.0
+	slamExhaustion = 4.0
+	#Range of the Portal Step, in blocks.
+	# Default: 40.0
+	# Range: 4.0 ~ 128.0
+	spaceStepRange = 40.0
+	#Ticks before the Portal Step can be used again.
+	# Default: 100
+	# Range: 0 ~ 6000
+	spaceStepCooldown = 100
+	#Exhaustion of the Portal Step.
+	# Default: 1.0
+	# Range: 0.0 ~ 20.0
+	stepExhaustion = 1.0
+	#Range of the Space Pull, in blocks.
+	# Default: 24.0
+	# Range: 4.0 ~ 64.0
+	pullRange = 24.0
+	#Ticks before the Space Pull can be used again.
+	# Default: 220
+	# Range: 0 ~ 6000
+	pullCooldown = 220
+	#Exhaustion of the Space Pull.
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	pullExhaustion = 2.0
+	#Range of the Transmute, in blocks.
+	# Default: 20.0
+	# Range: 4.0 ~ 64.0
+	transmuteRange = 20.0
+	#How long a creature stays stone.
+	# Default: 60
+	# Range: 10 ~ 600
+	transmuteTicks = 60
+	#Ticks before the Transmute can be used again.
+	# Default: 240
+	# Range: 0 ~ 6000
+	transmuteCooldown = 240
+	#Exhaustion of the Transmute.
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	transmuteExhaustion = 2.0
+	#The damage a petrified creature takes, times (it is stone). The boss's Petrify Orb does this too.
+	# Default: 0.5
+	# Range: 0.1 ~ 1.0
+	petrifyDamageFactor = 0.5
+	#How close a projectile must come to be turned into a bubble by the Reality Veil.
+	# Default: 8.0
+	# Range: 2.0 ~ 32.0
+	veilRadius = 8.0
+	#Exhaustion of the Reality Veil each tick it is on.
+	# Default: 0.01
+	# Range: 0.0 ~ 1.0
+	veilExhaustion = 0.01
+	#Range of the Soul Drain, in blocks.
+	# Default: 16.0
+	# Range: 4.0 ~ 64.0
+	drainRange = 16.0
+	#Damage of the Soul Drain each second (it ignores armour and enchantments).
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	drainDamagePerSecond = 6.0
+	#The share of the Soul Drain's damage that heals Thanos.
+	# Default: 0.5
+	# Range: 0.0 ~ 2.0
+	drainHealFraction = 0.5
+	#Exhaustion of the Soul Drain each tick.
+	# Default: 0.02
+	# Range: 0.0 ~ 1.0
+	drainExhaustion = 0.02
+	#Ticks before the Soul Drain can be used again after it ends.
+	# Default: 40
+	# Range: 0 ~ 6000
+	drainCooldown = 40
+	#Range of the Soul Sight, in blocks.
+	# Default: 32.0
+	# Range: 4.0 ~ 64.0
+	sightRange = 32.0
+	#How long the Soul Sight lasts.
+	# Default: 160
+	# Range: 20 ~ 1200
+	sightTicks = 160
+	#Ticks before the Soul Sight can be used again.
+	# Default: 400
+	# Range: 0 ~ 6000
+	sightCooldown = 400
+	#Whether the Soul Sight dissolves Loki's duplicates and ends his disguises.
+	sightBreaksIllusions = true
+	#Exhaustion of the Soul Sight.
+	# Default: 1.0
+	# Range: 0.0 ~ 20.0
+	sightExhaustion = 1.0
+	#How far back the Rewind goes, in seconds.
+	# Default: 5
+	# Range: 1 ~ 15
+	rewindSeconds = 5
+	#The most health the Rewind returns.
+	# Default: 20.0
+	# Range: 0.0 ~ 100.0
+	rewindMaxHeal = 20.0
+	#Ticks before the Rewind can be used again.
+	# Default: 900
+	# Range: 0 ~ 72000
+	rewindCooldown = 900
+	#Exhaustion of the Rewind.
+	# Default: 8.0
+	# Range: 0.0 ~ 20.0
+	rewindExhaustion = 8.0
+	#Radius of the Time Lock's dome.
+	# Default: 6.0
+	# Range: 2.0 ~ 24.0
+	timeLockRadius = 6.0
+	#How long the Time Lock stands.
+	# Default: 100
+	# Range: 10 ~ 600
+	timeLockTicks = 100
+	#Ticks before the Time Lock can be used again.
+	# Default: 600
+	# Range: 0 ~ 72000
+	timeLockCooldown = 600
+	#The share of its speed a projectile loses each tick inside the Time Lock.
+	# Default: 0.65
+	# Range: 0.0 ~ 1.0
+	timeLockProjectileDrag = 0.65
+	#Exhaustion of the Time Lock.
+	# Default: 3.0
+	# Range: 0.0 ~ 20.0
+	timeLockExhaustion = 3.0
+
+[ultron_boss]
+	#Whether the Ultron ritual works at all.
+	enabled = true
+	#Health of the first body, Ultron Prime, for one player.
+	#(A creature can hold 1024 at most: for more, every blow is made smaller in proportion.)
+	# Default: 600.0
+	# Range: 50.0 ~ 20000.0
+	bodyHealth = 600.0
+	#Each new body has this fraction of the last one's health.
+	# Default: 0.8
+	# Range: 0.3 ~ 1.0
+	bodyHealthDecay = 0.8
+	#No body has less than this fraction of the first one's health.
+	# Default: 0.25
+	# Range: 0.05 ~ 1.0
+	bodyHealthFloor = 0.25
+	#Extra health (as a fraction of the first body) for each participant after the first
+	#(at most 6 count).
+	# Default: 0.35
+	# Range: 0.0 ~ 2.0
+	healthPerExtraPlayer = 0.35
+	#Armour of Prime (a body later has less).
+	# Default: 8.0
+	# Range: 0.0 ~ 30.0
+	bodyArmor = 8.0
+	#Armour toughness of Prime (a body later has less).
+	# Default: 4.0
+	# Range: 0.0 ~ 20.0
+	bodyToughness = 4.0
+	#The most a single hit can take from a body, as a fraction of its maximum health (before armour).
+	# Default: 0.15
+	# Range: 0.02 ~ 1.0
+	maxHitFraction = 0.15
+	#Explosion damage to a body is multiplied by this.
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	explosionDamageFactor = 0.5
+	#Prime's health fraction at which the Sokovia phase starts.
+	# Default: 0.55
+	# Range: 0.1 ~ 0.95
+	liftAt = 0.55
+	#A Scarlet Witch can tear a body's core out below this fraction of its health (0 turns it off).
+	# Default: 0.15
+	# Range: 0.0 ~ 0.5
+	heartRipThreshold = 0.15
+	#Damage of one Repulsor Volley bolt (Normal difficulty).
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	volleyBoltDamage = 6.0
+	#Damage of one Finger Beams hit (Normal difficulty).
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	fingerBeamDamage = 6.0
+	#Damage of the Thruster Dive's landing.
+	# Default: 18.0
+	# Range: 0.0 ~ 100.0
+	diveDamage = 18.0
+	#Damage of the Gravity Pull's punch.
+	# Default: 14.0
+	# Range: 0.0 ~ 100.0
+	pullDamage = 14.0
+	#Damage of the Punch.
+	# Default: 12.0
+	# Range: 0.0 ~ 100.0
+	punchDamage = 12.0
+	#Damage of a piece of falling Sokovia.
+	# Default: 10.0
+	# Range: 0.0 ~ 100.0
+	debrisDamage = 10.0
+	#Ticks between falling debris on the island, for every two participants.
+	# Default: 100
+	# Range: 20 ~ 1200
+	debrisInterval = 100
+	#Health of an Ultron Sentry of the fight.
+	# Default: 40.0
+	# Range: 4.0 ~ 500.0
+	sentryHealth = 40.0
+	#Damage of a Sentry's plasma bolt.
+	# Default: 4.0
+	# Range: 0.0 ~ 100.0
+	sentryBoltDamage = 4.0
+	#Damage of a Sentry's punch.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	sentryMeleeDamage = 6.0
+	#How long lightning stuns a Sentry.
+	# Default: 60
+	# Range: 0 ~ 600
+	sentryStunTicks = 60
+	#How many Sentries Ultron can still call, beyond the first ones, for one player.
+	# Default: 20
+	# Range: 4 ~ 200
+	sentryBudgetBase = 20
+	#How many more Sentries Ultron can call for each extra player.
+	# Default: 8
+	# Range: 0 ~ 50
+	sentryBudgetPerPlayer = 8
+	#The Sentries beside him when he wakes.
+	# Default: 6
+	# Range: 0 ~ 40
+	sentriesAtStart = 6
+	#How many Sentries come in a wave.
+	# Default: 4
+	# Range: 1 ~ 20
+	sentryWaveSize = 4
+	#Ticks between waves of Sentries.
+	# Default: 500
+	# Range: 100 ~ 6000
+	sentryWaveInterval = 500
+	#How many Sentries may be alive at once, for one player.
+	# Default: 8
+	# Range: 2 ~ 60
+	sentryMaxAlive = 8
+	#How many more Sentries may be alive for each extra player.
+	# Default: 3
+	# Range: 0 ~ 20
+	sentryMaxAlivePerPlayer = 3
+	#Safety valve: after this many uploads Ultron is destroyed even if Sentries remain.
+	# Default: 12
+	# Range: 1 ~ 100
+	maxUploads = 12
+	#Whether the island rises at all; off means the Tremor (nothing moves).
+	liftEnabled = true
+	#How the island is made: SKY_ISLAND (a copy built in the sky, the ground is never edited),
+	#CUT_GROUND (the real ground is lifted and put back; a later release) or TREMOR (nothing moves).
+	#Allowed Values: SKY_ISLAND, CUT_GROUND, TREMOR
+	liftMode = "SKY_ISLAND"
+	#Sky Island only: clients hide the columns the island was copied from while it is up
+	#(cosmetic; the server's ground never changes).
+	hideGround = true
+	#CUT_GROUND only: if the game rule mobGriefing is off, use the Tremor instead of lifting.
+	liftRequiresMobGriefing = true
+	#Radius of the lifted ground, and of the ground fight before it.
+	# Default: 20
+	# Range: 12 ~ 32
+	islandRadius = 20
+	#How far the island rises.
+	# Default: 40
+	# Range: 16 ~ 80
+	liftHeight = 40
+	#How long the rise and the descent take, in ticks (1 = a cut).
+	# Default: 160
+	# Range: 1 ~ 600
+	liftTicks = 160
+	#Layers of real ground that rise with the island.
+	# Default: 5
+	# Range: 3 ~ 8
+	skinDepth = 5
+	#How far above the ground things are carried (grass, flowers, trees).
+	# Default: 16
+	# Range: 8 ~ 24
+	coverHeight = 16
+	#The depth of the rock cone under the middle of the island.
+	# Default: 14
+	# Range: 6 ~ 24
+	coneDepth = 14
+	#The most the ground may rise and fall inside the island's disc.
+	# Default: 6
+	# Range: 2 ~ 12
+	maxRelief = 6
+	#Block edits per tick while the island is built or taken down (lower it on a weak server).
+	# Default: 2500
+	# Range: 200 ~ 20000
+	editsPerTick = 2500
+	#Damage (never lethal) when the field pulls someone back onto the island.
+	# Default: 2.0
+	# Range: 0.0 ~ 10.0
+	rescueDamage = 2.0
+	#How many times a player may be taken up again by the pit's tractor.
+	# Default: 3
+	# Range: 0 ~ 20
+	rejoinLimit = 3
+	#The Mind Stone beam does this much to Ultron and the Sentries.
+	# Default: 1.5
+	# Range: 1.0 ~ 5.0
+	visionBeamBonus = 1.5
+	#How long telekinesis can hold a body of Ultron before he breaks free (before the hero's factor,
+	#boss.billyHoldFactor or boss.magnetoHoldFactor).
+	# Default: 60
+	# Range: 10 ~ 600
+	holdTicks = 60
+
+[ultron]
+	#Ultron's flying speed (Creative flight is 0.05).
+	# Default: 0.1
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.1
+	#Extra maximum health of the vibranium body.
+	# Default: 10.0
+	# Range: 0.0 ~ 40.0
+	bodyHealth = 10.0
+	#Extra armour of the vibranium body.
+	# Default: 8.0
+	# Range: 0.0 ~ 30.0
+	bodyArmor = 8.0
+	#Extra knockback resistance of the vibranium body.
+	# Default: 0.3
+	# Range: 0.0 ~ 1.0
+	knockbackResistance = 0.3
+	#Lightning does this much to Ultron, his bodies and the Sentries (they are electronics).
+	# Default: 1.25
+	# Range: 1.0 ~ 3.0
+	lightningFactor = 1.25
+	#A Vision this near cuts Ultron's uploads, the boss's and the hero's (0 turns it off).
+	# Default: 48
+	# Range: 0 ~ 128
+	visionCutRange = 48
+	#Damage of a plasma bolt.
+	# Default: 4.0
+	# Range: 0.0 ~ 100.0
+	boltDamage = 4.0
+	#The radius in which others near the bolt's target take half.
+	# Default: 1.2
+	# Range: 0.0 ~ 4.0
+	boltSplash = 1.2
+	#Ticks between bolts while R is held.
+	# Default: 4
+	# Range: 1 ~ 20
+	boltInterval = 4
+	#The plasma pool: how many bolts he can fire before he is empty.
+	# Default: 30
+	# Range: 5 ~ 500
+	boltPool = 30
+	#How fast the plasma pool refills, per second (after half a second without firing).
+	# Default: 4.0
+	# Range: 0.0 ~ 100.0
+	boltRegenPerSecond = 4.0
+	#How much plasma he needs to fire again once the pool is empty.
+	# Default: 6
+	# Range: 1 ~ 100
+	boltRestart = 6
+	#The Overcharge's hit.
+	# Default: 14.0
+	# Range: 0.0 ~ 200.0
+	overchargeDamage = 14.0
+	#The Overcharge's splash damage.
+	# Default: 8.0
+	# Range: 0.0 ~ 200.0
+	overchargeSplash = 8.0
+	#The Overcharge's splash radius.
+	# Default: 3.5
+	# Range: 0.5 ~ 10.0
+	overchargeRadius = 3.5
+	#How much plasma the Overcharge costs.
+	# Default: 10
+	# Range: 0 ~ 100
+	overchargeCost = 10
+	#How long the Overcharge charges.
+	# Default: 15
+	# Range: 1 ~ 100
+	overchargeChargeTicks = 15
+	#How much slower he moves while he charges (0.6 = 40% of his speed).
+	# Default: 0.6
+	# Range: 0.0 ~ 0.95
+	overchargeSlow = 0.6
+	#The Overcharge's cooldown, in ticks.
+	# Default: 160
+	# Range: 0 ~ 6000
+	overchargeCooldown = 160
+	#Gravity Pull: how far it reaches.
+	# Default: 24
+	# Range: 4 ~ 64
+	pullRange = 24
+	#Gravity Pull: its damage.
+	# Default: 3.0
+	# Range: 0.0 ~ 100.0
+	pullDamage = 3.0
+	#Gravity Pull: its cooldown, in ticks.
+	# Default: 80
+	# Range: 0 ~ 6000
+	pullCooldown = 80
+	#Gravity Slam: its radius.
+	# Default: 7.0
+	# Range: 2.0 ~ 24.0
+	slamRadius = 7.0
+	#Gravity Slam: its damage.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	slamDamage = 6.0
+	#Gravity Slam: its cooldown, in ticks.
+	# Default: 160
+	# Range: 0 ~ 6000
+	slamCooldown = 160
+	#Upload: how near a drone must be.
+	# Default: 48
+	# Range: 8 ~ 128
+	uploadRange = 48
+	#Upload: how much health it heals.
+	# Default: 8.0
+	# Range: 0.0 ~ 40.0
+	uploadHeal = 8.0
+	#Upload: its cooldown, in ticks.
+	# Default: 500
+	# Range: 0 ~ 12000
+	uploadCooldown = 500
+	#Second Life: its recharge, in ticks.
+	# Default: 6000
+	# Range: 0 ~ 72000
+	secondLifeCooldown = 6000
+	#Second Life: the health he comes back with, as a fraction of the maximum.
+	# Default: 0.25
+	# Range: 0.05 ~ 1.0
+	secondLifeHealth = 0.25
+	#Second Life: how near a drone must be.
+	# Default: 64
+	# Range: 8 ~ 256
+	secondLifeRange = 64
+	#Hack: how far it reaches.
+	# Default: 32
+	# Range: 4 ~ 64
+	hackRange = 32
+	#Hack: how many hacked Sentries he can have at a time.
+	# Default: 2
+	# Range: 0 ~ 6
+	hackMax = 2
+	#Sentry Army: how many Sentries one use calls.
+	# Default: 3
+	# Range: 1 ~ 6
+	droneCount = 3
+	#Sentry Army: the most drones he can have at a time.
+	# Default: 6
+	# Range: 1 ~ 12
+	droneMax = 6
+	#Sentry Army: how long a drone lasts, in ticks.
+	# Default: 1800
+	# Range: 100 ~ 72000
+	droneLifetime = 1800
+	#Sentry Army: its cooldown, in ticks.
+	# Default: 400
+	# Range: 0 ~ 12000
+	droneCooldown = 400
+	#A drone's health.
+	# Default: 24.0
+	# Range: 4.0 ~ 200.0
+	droneHealth = 24.0
+	#A drone's plasma bolt.
+	# Default: 3.0
+	# Range: 0.0 ~ 100.0
+	droneDamage = 3.0
+
+[apocalypse_shield]
+	#Heroes whose mind power can wear down Apocalypse's shield (the boss's and the hero's).
+	#Add "billy" or "vision" to count theirs (and add their damage types to the datapack tag enhanced:mind_power).
+	mindPowerHeroes = ["scarlet_witch", "phoenix"]
+	#Shield strength removed per point of Chaos Beam damage.
+	# Default: 1.0
+	# Range: 0.0 ~ 20.0
+	chaosBeamFactor = 1.0
+	#Shield strength removed per point of telekinetic slam damage (a thing thrown by Wanda or the Phoenix).
+	# Default: 1.0
+	# Range: 0.0 ~ 20.0
+	slamFactor = 1.0
+	#A block borrowed from his own arena and thrown by mind power wears the shield by this many times what
+	#slamFactor gives (blocks never run out; at 1.0 they wear the shield twice as fast as the Chaos Beam). The critical
+	#factor comes on top.
+	# Default: 0.5
+	# Range: 0.0 ~ 20.0
+	borrowedSlamFactor = 0.5
+	#Shield strength removed per point of Phoenix Burst damage (a full Burst of 30 removes 150).
+	# Default: 5.0
+	# Range: 0.0 ~ 50.0
+	phoenixBurstFactor = 5.0
+	#Shield strength removed per point of any other damage type in enhanced:mind_power.
+	# Default: 1.0
+	# Range: 0.0 ~ 20.0
+	otherMindFactor = 1.0
+	#Shield strength a Phoenix's Mind Control (even refused) removes.
+	# Default: 25.0
+	# Range: 0.0 ~ 1000.0
+	phoenixMindControlStrain = 25.0
+	#Shield strength a Phoenix's Psionic Field that reaches him removes.
+	# Default: 60.0
+	# Range: 0.0 ~ 1000.0
+	phoenixPsionicStrain = 60.0
+	#The boss's shield regenerates only after this many ticks without mind-power damage.
+	# Default: 200
+	# Range: 0 ~ 2400
+	shieldRegenDelayTicks = 200
+	#The fraction of its strength the boss's shield regains each second once it regenerates.
+	# Default: 0.02
+	# Range: 0.0 ~ 1.0
+	shieldRegenFraction = 0.02
+	#Ticks between two mind-power hits from the same attacker that the shield will count
+	#(the Chaos Beam hits every tick, and a shield leaves no invulnerability frames, so it keeps its own).
+	# Default: 10
+	# Range: 1 ~ 40
+	mindHitCooldownTicks = 10
+	#Heroes whose mind power hits the boss Apocalypse critically, on his shield and on his body (only the boss,
+	#never the Apocalypse hero). Kept apart from mindPowerHeroes: a hero added there does not get critical hits too.
+	critHeroes = ["scarlet_witch", "phoenix"]
+	#Their mind power (and the Phoenix's Mind Control and Psionic Field strains) wears the boss's shield this
+	#many times as much.
+	# Default: 2.0
+	# Range: 1.0 ~ 10.0
+	critShieldFactor = 2.0
+	#Their mind power hurts the boss's body this many times as much when his shield is down.
+	# Default: 2.0
+	# Range: 1.0 ~ 10.0
+	critBodyFactor = 2.0
+	#Every other blow to the boss's body is multiplied by this when his shield is down.
+	# Default: 0.4
+	# Range: 0.05 ~ 1.0
+	othersBodyFactor = 0.4
+
+[apocalypse_boss]
+	#3.2: how strong the boss fights, one master knob (1.0 = the 3.1 numbers). It multiplies every damage he and his
+	#Horsemen deal, the number of his lances, Horsemen and tornadoes, and it slows his attacks: the pause between two
+	#attacks and every attack's cooldown last 1/powerFactor times as long. His health, his armour and his shield are not
+	#touched by it (they have their own options).
+	# Default: 0.65
+	# Range: 0.1 ~ 1.0
+	powerFactor = 0.65
+	#If false, the Capstone's ritual is refused.
+	enabled = true
+	#The dimensions where he can be woken.
+	ritualDimensions = ["minecraft:overworld"]
+	#The ritual block must be sand or sandstone (the block tag enhanced:ritual_ground).
+	ritualNeedsSand = true
+	#It must be day, under the open sky, at the start of the ritual.
+	ritualDaylightOnly = true
+	#The ritual is refused unless a hero who can break his shield (one of apocalypse_shield.mindPowerHeroes)
+	#stands within breakerRange: without one nobody could win.
+	requireBreaker = true
+	#Blocks.
+	# Default: 64
+	# Range: 8 ~ 256
+	breakerRange = 64
+	#Radius of the circle he fights in (the sand wall stands 4 blocks further out).
+	# Default: 24
+	# Range: 12 ~ 48
+	arenaRadius = 24
+	#How high the sand wall reaches (nobody flies over it).
+	# Default: 40
+	# Range: 16 ~ 100
+	arenaHeight = 40
+	#Damage (never lethal) a player takes touching the sand wall, once a second.
+	# Default: 1.0
+	# Range: 0.0 ~ 10.0
+	fieldDamage = 1.0
+	#His health for one fighter.
+	# Default: 900.0
+	# Range: 100.0 ~ 50000.0
+	bodyHealth = 900.0
+	#Extra health per additional fighter (a fraction of bodyHealth).
+	# Default: 0.5
+	# Range: 0.0 ~ 3.0
+	healthPerExtraPlayer = 0.5
+	#His armour in the armoured form.
+	# Default: 10.0
+	# Range: 0.0 ~ 30.0
+	armor = 10.0
+	#His armour toughness in the armoured form.
+	# Default: 6.0
+	# Range: 0.0 ~ 20.0
+	armorToughness = 6.0
+	#The most one hit can take while he is vulnerable, as a fraction of his maximum health (before armour).
+	# Default: 0.12
+	# Range: 0.01 ~ 1.0
+	maxHitFraction = 0.12
+	#Explosion damage to him is multiplied by this.
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	explosionDamageFactor = 0.5
+	#Strength of shield 1 for one fighter.
+	# Default: 100.0
+	# Range: 10.0 ~ 10000.0
+	shieldStrength = 100.0
+	#Each later shield is this many times stronger.
+	# Default: 1.2
+	# Range: 1.0 ~ 3.0
+	shieldGrowth = 1.2
+	#Extra shield strength per additional fighter (a fraction).
+	# Default: 0.3
+	# Range: 0.0 ~ 3.0
+	shieldPerExtraPlayer = 0.3
+	#How long a broken shield leaves him vulnerable (240 = 12 seconds).
+	# Default: 240
+	# Range: 40 ~ 2400
+	windowTicks = 240
+	#How long he is staggered and attacks nothing at the start of a window.
+	# Default: 80
+	# Range: 0 ~ 400
+	staggerTicks = 80
+	#Damage he takes in a window is multiplied by this.
+	# Default: 1.25
+	# Range: 1.0 ~ 5.0
+	windowDamageFactor = 1.25
+	#His healing while a shield is up (never above the phase's ceiling). 0: his health never heals (his
+	#shield still knits).
+	# Default: 0.0
+	# Range: 0.0 ~ 100.0
+	regenPerSecond = 0.0
+	#His healing in the true form after 80 ticks without being hurt. 0: his health never heals.
+	# Default: 0.0
+	# Range: 0.0 ~ 100.0
+	trueFormRegenPerSecond = 0.0
+	#How long his escape portal takes to open.
+	# Default: 100
+	# Range: 20 ~ 600
+	escapeChannelTicks = 100
+	#Damage (a fraction of his full health) that interrupts the escape; any lightning damage also does.
+	# Default: 0.04
+	# Range: 0.005 ~ 0.5
+	escapeInterruptFraction = 0.04
+	#The fraction of his health he returns with if the escape was not interrupted.
+	# Default: 0.4
+	# Range: 0.05 ~ 0.9
+	escapeHealTo = 0.4
+	#If a Phoenix dealt Burst or slam damage in this many seconds before the end, he dies in her fire.
+	# Default: 15
+	# Range: 0 ~ 120
+	phoenixFinishSeconds = 15
+	#One Sand Lance.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	lanceDamage = 6.0
+	#Lances in a fan.
+	# Default: 5
+	# Range: 1 ~ 9
+	lanceCount = 5
+	#The Sand Wave.
+	# Default: 10.0
+	# Range: 0.0 ~ 100.0
+	waveDamage = 10.0
+	#A Sand Spike.
+	# Default: 9.0
+	# Range: 0.0 ~ 100.0
+	spikeDamage = 9.0
+	#A Sand Boulder.
+	# Default: 9.0
+	# Range: 0.0 ~ 100.0
+	boulderDamage = 9.0
+	#The Backhand.
+	# Default: 12.0
+	# Range: 0.0 ~ 100.0
+	backhandDamage = 12.0
+	#The shockwave where he arrives from a portal.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	portalShockDamage = 6.0
+	#A Tornado's damage, every 10 ticks.
+	# Default: 2.0
+	# Range: 0.0 ~ 100.0
+	stormDamage = 2.0
+	#How long a Tornado lasts.
+	# Default: 160
+	# Range: 20 ~ 1200
+	tornadoTicks = 160
+	#A ring of the Cairo Collapse.
+	# Default: 10.0
+	# Range: 0.0 ~ 100.0
+	ringDamage = 10.0
+	#How long the Entomb holds.
+	# Default: 80
+	# Range: 10 ~ 1200
+	entombTicks = 80
+	#Damage while entombed (never below 2 hearts).
+	# Default: 1.5
+	# Range: 0.0 ~ 20.0
+	entombDamagePerSecond = 1.5
+	#Health of the boss's cocoon (a friend breaks it by hitting it).
+	# Default: 20.0
+	# Range: 1.0 ~ 200.0
+	cocoonHealth = 20.0
+	#Blocks.
+	# Default: 28
+	# Range: 8 ~ 64
+	mindCrushRange = 28
+	#Nausea of the Mind Crush (Slowness for 3 seconds and Blindness for 2 go with it).
+	# Default: 80
+	# Range: 0 ~ 1200
+	mindCrushNauseaTicks = 80
+	#He calls the Four Horsemen at the first transition.
+	horsemen = true
+	#The most Horsemen (min(max, 1 + fighters)).
+	# Default: 4
+	# Range: 0 ~ 8
+	horsemenMax = 4
+	#Husk health multiplier.
+	# Default: 1.5
+	# Range: 1.0 ~ 10.0
+	horsemanHealthFactor = 1.5
+	#Added attack damage.
+	# Default: 3.0
+	# Range: 0.0 ~ 50.0
+	horsemanDamageBonus = 3.0
+	#Quicksilver Time slows him for this long, then he adapts.
+	# Default: 80
+	# Range: 0 ~ 1200
+	adaptTicks = 80
+	#How long he then ignores it.
+	# Default: 600
+	# Range: 0 ~ 12000
+	adaptedTicks = 600
+	#Magneto's Armor and Weapon Strip on him in a window cuts his armour and extends the window by this much (once per window).
+	# Default: 100
+	# Range: 0 ~ 1200
+	magnetoStripExtendTicks = 100
+	#He withdraws if no one who can break his shield is in the arena while it is up for this long.
+	# Default: 60
+	# Range: 10 ~ 600
+	noBreakerSeconds = 60
+	#Also give a Phoenix Ember (if it exists) to a rewarded fighter with no power.
+	dropsPhoenixEmber = false
+	#How long telekinesis can hold Apocalypse before he breaks free (before the hero's factor,
+	#boss.billyHoldFactor or boss.magnetoHoldFactor).
+	# Default: 60
+	# Range: 10 ~ 600
+	holdTicks = 60
+
+[apocalypse]
+	#Apocalypse's levitation speed (Creative flight is 0.05).
+	# Default: 0.08
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.08
+	#Extra max health (20 = 10 hearts, so 40).
+	# Default: 20.0
+	# Range: 0.0 ~ 200.0
+	bodyHealthBonus = 20.0
+	#Armour while Apocalypse.
+	# Default: 10.0
+	# Range: 0.0 ~ 30.0
+	armor = 10.0
+	#Armour toughness while Apocalypse.
+	# Default: 4.0
+	# Range: 0.0 ~ 20.0
+	armorToughness = 4.0
+	#Knockback resistance while Apocalypse.
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	knockbackResistance = 0.5
+	#Healing factor: health a second after regenDelayTicks without damage. 0 turns it off.
+	# Default: 1.0
+	# Range: 0.0 ~ 20.0
+	regenPerSecond = 1.0
+	#Ticks without damage before the healing factor starts.
+	# Default: 100
+	# Range: 0 ~ 1200
+	regenDelayTicks = 100
+	#The Sand Wave.
+	# Default: 8.0
+	# Range: 0.0 ~ 100.0
+	waveDamage = 8.0
+	#Blocks.
+	# Default: 18
+	# Range: 4 ~ 48
+	waveLength = 18
+	#Blocks per tick.
+	# Default: 0.9
+	# Range: 0.2 ~ 3.0
+	waveSpeed = 0.9
+	#Slowness II duration.
+	# Default: 40
+	# Range: 0 ~ 600
+	waveSlowTicks = 40
+	#Ticks.
+	# Default: 60
+	# Range: 0 ~ 72000
+	waveCooldown = 60
+	#Hunger the Sand Wave costs.
+	# Default: 1.0
+	# Range: 0.0 ~ 40.0
+	waveExhaustion = 1.0
+	#Blocks.
+	# Default: 24
+	# Range: 4 ~ 64
+	entombRange = 24
+	#How long the Entomb holds.
+	# Default: 80
+	# Range: 10 ~ 1200
+	entombTicks = 80
+	#Damage while entombed (never below 2 hearts).
+	# Default: 1.0
+	# Range: 0.0 ~ 20.0
+	entombDamagePerSecond = 1.0
+	#Health of the cocoon (a friend breaks it by hitting it).
+	# Default: 16.0
+	# Range: 1.0 ~ 200.0
+	cocoonHealth = 16.0
+	#Ticks.
+	# Default: 240
+	# Range: 0 ~ 72000
+	entombCooldown = 240
+	#Hunger the Entomb costs.
+	# Default: 3.0
+	# Range: 0.0 ~ 40.0
+	entombExhaustion = 3.0
+	#Blocks.
+	# Default: 40
+	# Range: 4 ~ 128
+	portalRange = 40
+	#Pets, teammates and sneaking players within this come along.
+	# Default: 3
+	# Range: 0 ~ 16
+	portalAllyRadius = 3
+	#Ticks.
+	# Default: 160
+	# Range: 0 ~ 72000
+	portalCooldown = 160
+	#Hunger the Portal costs.
+	# Default: 2.0
+	# Range: 0.0 ~ 40.0
+	portalExhaustion = 2.0
+	#Drawn radius of the sphere (and how close a projectile is neutralised).
+	# Default: 2.4
+	# Range: 1.0 ~ 6.0
+	shieldRadius = 2.4
+	#The shield stops nothing until it is complete.
+	# Default: 10
+	# Range: 0 ~ 200
+	shieldWindUpTicks = 10
+	#How long a complete shield can be held.
+	# Default: 120
+	# Range: 1 ~ 6000
+	shieldMaxTicks = 120
+	#How much mind power it takes to break it.
+	# Default: 60.0
+	# Range: 1.0 ~ 1000.0
+	shieldStrength = 60.0
+	#The part of any other damage it stops that wears it down (0 = it costs nothing, the literal rule;
+	#the boss's shield always uses 0).
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	shieldOtherWear = 0.5
+	#Ticks after a drop.
+	# Default: 160
+	# Range: 0 ~ 6000
+	shieldCooldown = 160
+	#Ticks after it shattered or was held to its limit.
+	# Default: 400
+	# Range: 0 ~ 6000
+	shieldBrokenCooldown = 400
+	#Hunger per tick while held.
+	# Default: 0.1
+	# Range: 0.0 ~ 4.0
+	shieldExhaustion = 0.1
+	#Blocks.
+	# Default: 24
+	# Range: 4 ~ 64
+	bestowRange = 24
+	#How long Empowered lasts.
+	# Default: 1200
+	# Range: 20 ~ 72000
+	bestowTicks = 1200
+	#Allies empowered at once.
+	# Default: 2
+	# Range: 1 ~ 8
+	bestowMax = 2
+	#Ticks.
+	# Default: 400
+	# Range: 0 ~ 72000
+	bestowCooldown = 400
+	#Hunger Power Bestowal costs.
+	# Default: 6.0
+	# Range: 0.0 ~ 40.0
+	bestowExhaustion = 6.0
+	#A hero's ability cooldowns recharge this many times as fast while Empowered.
+	# Default: 1.5
+	# Range: 1.0 ~ 5.0
+	empowerCooldownBoost = 1.5
+	#Blocks.
+	# Default: 7
+	# Range: 2 ~ 32
+	stormRadius = 7
+	#How long the Sandstorm lasts.
+	# Default: 120
+	# Range: 20 ~ 1200
+	stormTicks = 120
+	#Every 10 ticks.
+	# Default: 2.0
+	# Range: 0.0 ~ 100.0
+	stormDamage = 2.0
+	#Ticks.
+	# Default: 600
+	# Range: 0 ~ 72000
+	stormCooldown = 600
+	#Hunger the Sandstorm costs.
+	# Default: 8.0
+	# Range: 0.0 ~ 40.0
+	stormExhaustion = 8.0
+	#How long the Essence must be held to awaken (the shared AwakeningItem; the Ember and the Gauntlet default to 60 too).
+	# Default: 60
+	# Range: 20 ~ 400
+	essenceRitualTicks = 60
+
+[build_magic]
+	#Build Magic exists on this server.
+	enabled = true
+	#Only operators (permission level 2) may use it.
+	operatorsOnly = false
+	#Off: spells conjure their blocks from magic. On: in Survival they take one item per block from the inventory,
+	#vanished blocks go into it, and undo gives back. Creative never pays.
+	requireMaterials = false
+	#Milliseconds of each server tick that all spells together may use (half while the server is slow).
+	# Default: 8
+	# Range: 1 ~ 40
+	millisPerTick = 8
+	#The most block writes all spells together may make in one tick (reads count a quarter).
+	#Every changed block is also sent to each player who sees it: lower this on a server with a slow upload.
+	# Default: 20000
+	# Range: 256 ~ 200000
+	blocksPerTick = 20000
+	#The most 16x16x16 sections spells may start changing in one tick (bounds what clients download).
+	# Default: 16
+	# Range: 1 ~ 256
+	sectionsPerTick = 16
+	#A spell takes at least this long, so it is seen growing.
+	# Default: 10
+	# Range: 1 ~ 100
+	minSpellTicks = 10
+	#Spells of one Scarlet Witch that may wait behind the one at work (Billy has none).
+	# Default: 4
+	# Range: 0 ~ 16
+	maxQueued = 4
+	#Spells working or waiting on the whole server.
+	# Default: 16
+	# Range: 1 ~ 256
+	maxSpellsTotal = 16
+	#A spell that removes or replaces more existing blocks than this needs the right button held
+	#(0: every such spell).
+	# Default: 64
+	# Range: 0 ~ 1000000
+	holdToConfirmBlocks = 64
+	#How long that hold is.
+	# Default: 20
+	# Range: 0 ~ 100
+	holdToConfirmTicks = 20
+	#A spell over this many blocks needs the longer hold.
+	# Default: 1000000
+	# Range: > 1000
+	hugeSpellBlocks = 1000000
+	#How long that hold is.
+	# Default: 40
+	# Range: 0 ~ 200
+	hugeHoldTicks = 40
+	#No Build Magic spell and no Magnetic Pull changes a block in the arena of any running boss fight,
+	#Thanos's included. Off: only the protected arenas (and always the island in the sky). One switch for both,
+	#so the two never disagree about where they may change a block.
+	allArenasProtected = true
+	#Inside a Hex, only its owner and the players she allowed may build with Build Magic or pull with the
+	#Magnetic Pull. (Telekinesis on one block asks the claims as a hand does, and is not covered.)
+	hexIsAClaim = false
+	#A container that holds items in a spell's way: SKIP leaves it as it is, SPILL spills its items on the spot.
+	#A Move always carries it.
+	#Allowed Values: SKIP, SPILL
+	fullContainers = "SKIP"
+	#Creatures inside new blocks are lifted on top (other players only with PvP on; never a creature Mjolnir
+	#pins). Off: their cells stay empty.
+	liftCreatures = true
+	#Move takes the creatures, frames, paintings and armour stands inside along (not one Mjolnir pins).
+	moveCarriesCreatures = true
+	#Sand, gravel and other falling blocks a spell places in the air stay where magic put them until
+	#something touches them.
+	holdGravityBlocks = true
+	#Ask claim mods (the break and place events) for every block; off: once per 16x16x16 section.
+	postEventsPerBlock = true
+	#Blocks the server checks to preview a spell (more: a spread sample); 0: no marks.
+	# Default: 8192
+	# Range: 0 ~ 65536
+	previewChecks = 8192
+	#The undo history and the pocket are kept on disk with the world.
+	undoSurvivesRestart = true
+	#Memory (MiB) one player's undo history may use; past it the oldest spells leave memory (they stay on disk).
+	# Default: 64
+	# Range: 4 ~ 4096
+	undoMemoryMb = 64
+	#Disk (MiB) one player's undo history may use; past it the oldest spells are forgotten.
+	# Default: 512
+	# Range: 0 ~ 1048576
+	undoDiskMb = 512
+	#Memory (MiB) all undo histories together may use; past it, the spells of the player using the most
+	#leave memory (they stay on disk).
+	# Default: 512
+	# Range: 64 ~ 65536
+	serverUndoMemoryMb = 512
+	#Disk (MiB) all undo histories together may use; past it the oldest spell of the player using the most
+	#is forgotten.
+	# Default: 4096
+	# Range: 0 ~ 4194304
+	serverUndoDiskMb = 4096
+	#The biggest copy (compressed, MiB) one player may hold.
+	# Default: 64
+	# Range: 1 ~ 4096
+	pocketMaxMb = 64
+	#When the server stops, the spells still working are finished while their blocks left add up to at most
+	#this; the largest are stopped first (and can be undone).
+	# Default: 200000
+	# Range: 0 ~ 10000000
+	finishOnStopBlocks = 200000
+	#Chunks one spell keeps loaded at once.
+	# Default: 256
+	# Range: 16 ~ 4096
+	maxTicketChunks = 256
+	#Build messages a client may send per second; more are dropped.
+	# Default: 40
+	# Range: 5 ~ 200
+	maxRequestsPerSecond = 40
+	#Dimensions where Build Magic does not work (ids, e.g. "minecraft:the_end").
+	deniedDimensions = []
+
+[build_magic_wanda]
+	#The Scarlet Witch has Build Magic.
+	enabled = true
+	#How far (blocks) she points: anchors, shapes, picks. Her spells themselves have no size limit.
+	# Default: 256
+	# Range: 16 ~ 1024
+	reach = 256
+	#0: as many spells as build_magic.undoMemoryMb and undoDiskMb hold. Otherwise the most she can undo.
+	# Default: 0
+	# Range: 0 ~ 100000
+	undoSteps = 0
+	#0: no ceiling. Otherwise the most blocks one of her spells may cover (for big public servers).
+	# Default: 0
+	# Range: > 0
+	maxBlocks = 0
+	#Her copies keep what is inside chests and other containers.
+	copiesContents = true
+	#The most TNT, lava and fire blocks one of her spells may make.
+	# Default: 4096
+	# Range: 0 ~ 1000000
+	volatilePerSpell = 4096
+	#Inside her own Hex her spells get this many shares of the server's work.
+	# Default: 2.0
+	# Range: 1.0 ~ 8.0
+	hexBoost = 2.0
+	#The most blocks her double click selects (a selection is held block by block, so it stops at a million).
+	# Default: 100000
+	# Range: 1000 ~ 1000000
+	magicSelectMax = 100000
+	#Her biggest Paint and Land brush (radius). Technical, not a limit of her magic: a brush pulse every 4 ticks
+	#of radius 16 is about 17,000 blocks, which the server keeps up with while she sweeps; at 32 (137,000) the
+	#stroke would trail seconds behind the cursor.
+	# Default: 16
+	# Range: 1 ~ 64
+	brushMax = 16
+	#Her biggest shape (radius).
+	# Default: 512
+	# Range: 8 ~ 1024
+	shapeMaxRadius = 512
+	#0: no count, only the spell's blocks. Otherwise the most copies in a Repeat.
+	# Default: 0
+	# Range: 0 ~ 65536
+	repeatMax = 0
+
+[build_magic_billy]
+	#Billy has Build Magic.
+	enabled = true
+	#His magic meter (blocks) as an Apprentice; it doubles with each rank.
+	# Default: 512
+	# Range: 16 ~ 65536
+	meter = 512
+	#Blocks of magic he gets back each second as an Apprentice; half of it more each rank.
+	# Default: 16.0
+	# Range: 0.0 ~ 4096.0
+	refill = 16.0
+	#The longest side of anything he builds, copies or selects as an Apprentice; +8 each rank.
+	# Default: 24
+	# Range: 1 ~ 256
+	maxSide = 24
+	#How far (blocks) he points as an Apprentice; +8 each rank.
+	# Default: 24
+	# Range: 2 ~ 128
+	reach = 24
+	#Spells he can undo as an Apprentice; +2 each rank.
+	# Default: 10
+	# Range: 1 ~ 100
+	undoSteps = 10
+	#The most copies in a Repeat as an Apprentice; +4 each rank.
+	# Default: 8
+	# Range: 1 ~ 64
+	repeatMax = 8
+	#Blocks of magic he must cast to become a Spellcaster (rank 2).
+	# Default: 2000
+	# Range: 0 ~ 10000000
+	rank2Practice = 2000
+	#Blocks of magic he must cast to become a Sorcerer (rank 3).
+	# Default: 8000
+	# Range: 0 ~ 10000000
+	rank3Practice = 8000
+	#Blocks of magic he must cast to become Wiccan (rank 4).
+	# Default: 30000
+	# Range: 0 ~ 10000000
+	rank4Practice = 30000
+	#The highest rank he can reach (1: he never grows).
+	# Default: 4
+	# Range: 1 ~ 4
+	maxRank = 4
+	#Ticks after one of his spells before the next.
+	# Default: 10
+	# Range: 0 ~ 200
+	castPause = 10
+	#How near (blocks) a Scarlet Witch must be to help him (0: never).
+	# Default: 16
+	# Range: 0 ~ 128
+	momRange = 16
+	#What his spells cost near her (0.5: half).
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	momCostFactor = 0.5
+	#His copies keep what is inside containers (off: they come out empty, so nothing is duplicated).
+	copiesContents = false
+	#His limits apply in Creative too.
+	limitsInCreative = true
