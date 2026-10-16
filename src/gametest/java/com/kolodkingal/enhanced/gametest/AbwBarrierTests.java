@@ -198,7 +198,8 @@ public final class AbwBarrierTests {
         check(data.isReady(4, helper.getLevel().getGameTime()), "and a barrier that never formed costs no recharge");
         raise(f, billy, () -> {
             long raisedAt = data.shieldFormedAt();
-            f.everyTick(115, tick -> {
+            // (a poll that starts inside a callback uses `every`: one entry at a time in the test schedule)
+            ApocalypseTestSupport.every(helper, 115, tick -> {
                 PowerTicker.tick(billy);
                 long now = helper.getLevel().getGameTime();
                 if (now < raisedAt + EnhancedConfig.BILLY_BARRIER_DURATION.get() - 1) {
@@ -209,7 +210,7 @@ public final class AbwBarrierTests {
                     return false;
                 }
                 long left = data.cooldownUntil(4) - now;
-                check(left > 190 && left <= 200, "it ran out of time: B recharges 10 seconds: " + left);
+                check(left > 190 && left <= 200, "it ran out of time: B recharges 10 seconds: " + left + " (now " + now + ", formed " + raisedAt + ", until " + data.cooldownUntil(4) + ")");
                 data.startCooldown(4, now, -(int) left); // ready again
                 billy.setShiftKeyDown(true);
                 AbilityHandler.onKey(billy, 4, true);
