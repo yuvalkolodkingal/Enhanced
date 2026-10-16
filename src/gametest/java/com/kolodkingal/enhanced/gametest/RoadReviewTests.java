@@ -579,6 +579,34 @@ public final class RoadReviewTests {
         helper.succeed();
     }
 
+    /**
+     * The race that made {@code anOperatorTakingThePlayerOutOfTheRoadEndsHisTrial} fail once in five full runs: tests of one batch run side by
+     * side and share the ledger. When another test's sweep (RoadSweeper.drain is global) has cleared a cell, the lowest free number goes to the
+     * next trial at once, so "the cell number is not in the ledger" or "is not being cleared" says nothing about THIS player's cell: judge by owner.
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void aCellThatIsFreeAgainIsGivenToTheNextTrialAtOnceSoTestsJudgeByOwner(GameTestHelper helper) {
+        MinecraftServer server = helper.getLevel().getServer();
+        RoadSave save = RoadSave.get(server);
+        UUID first = UUID.randomUUID();
+        UUID second = UUID.randomUUID();
+        int cell = save.allocate(first, "parkour", 64);
+        save.release(cell);
+        int again = save.allocate(second, "parkour", 64);
+        try {
+            check(again <= cell, "the lowest free number is handed out again at once: " + cell + " then " + again);
+            RoadSave.Cell held = save.cell(cell);
+            boolean taken = again == cell;
+            // The check of that test: the number is in the ledger and nothing is clearing it, yet it is not the first player's any more.
+            boolean oldCheckFails = taken && !RoadSweeper.isClearing(cell) && held != null;
+            boolean newCheckHolds = RoadSweeper.isClearing(cell) || held == null || !held.owner().equals(first);
+            check(!taken || (oldCheckFails && newCheckHolds), "judged by number it looks as if the cell were still his; judged by owner it is not");
+        } finally {
+            save.release(again);
+        }
+        helper.succeed();
+    }
+
     @GameTest(template = ARENA, batch = BATCH)
     public static void aWorldOfThreeDotOneWithNothingOfTheRoadLoads(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();

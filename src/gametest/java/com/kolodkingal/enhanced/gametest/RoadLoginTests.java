@@ -182,7 +182,9 @@ public final class RoadLoginTests {
                 })
                 .thenExecuteAfter(3, () -> {
                     check(RoadTrials.trialOf(player.getUUID()) == null, "the Road lets him go: no trial");
-                    check(RoadSweeper.isClearing(cell[0]) || RoadSave.get(server).cell(cell[0]) == null, "and takes it down");
+                    // (Not "the cell is free": another test's sweep may have cleared it already, and the next test's trial may hold the same number.)
+                    RoadSave.Cell held = RoadSave.get(server).cell(cell[0]);
+                    check(RoadSweeper.isClearing(cell[0]) || held == null || !held.owner().equals(player.getUUID()), "and takes it down");
                     check(!RoadSave.get(server).progress(player.getUUID()).inside(), "he is not inside");
                     check(player.gameMode.getGameModeForPlayer() == GameType.SURVIVAL && player.getMainHandItem().getCount() == 1, "with his game mode and his Gene");
                 })
