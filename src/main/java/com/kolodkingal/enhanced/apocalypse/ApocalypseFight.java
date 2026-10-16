@@ -624,7 +624,7 @@ public final class ApocalypseFight extends BossFight {
                     player.hurtMarked = true;
                 }
             }
-            horsemen.spawn(level(), Horsemen.Kind.values()[i % Horsemen.Kind.values().length], ground);
+            horsemen.spawn(level(), Horsemen.kindAt(i, count, fighterCount()), ground);
         }
     }
 

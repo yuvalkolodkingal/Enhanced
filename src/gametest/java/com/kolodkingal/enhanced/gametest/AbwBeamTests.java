@@ -246,10 +246,13 @@ public final class AbwBeamTests {
         check(other.getHealth() == other.getMaxHealth(), "with PvP off the beam hurts no player");
         release(billy);
         f.pvp(true);
-        hold(billy);
-        PowerTicker.tick(billy);
-        check(other.getHealth() < other.getMaxHealth(), "with PvP on it does");
-        helper.succeed();
+        // (the beam's next hit waits its interval, whatever the key did: let it pass)
+        helper.runAfterDelay(EnhancedConfig.BILLY_BEAM_INTERVAL.get() + 1, () -> {
+            hold(billy);
+            PowerTicker.tick(billy);
+            check(other.getHealth() < other.getMaxHealth(), "with PvP on it does");
+            helper.succeed();
+        });
     }
 
     /** A Chaos Shield is solid to the beam: it ends on the sphere and wears the shield, and nothing behind it is hurt. */

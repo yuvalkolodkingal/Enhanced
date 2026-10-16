@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
@@ -369,7 +370,7 @@ public final class WandaAbilities {
     public static void block(ServerPlayer player, Projectile projectile) {
         float power = projectilePower(projectile);
         neutralize(player.serverLevel(), projectile);
-        wear(player, power);
+        wear(player, power, projectile);
     }
 
     /**
@@ -469,7 +470,7 @@ public final class WandaAbilities {
         attacker.knockback(MELEE_KNOCKBACK, -out.x, -out.z);
         attacker.hurtMarked = true;
 
-        wear(player, amount);
+        wear(player, amount, attacker);
     }
 
     // ---- the shield against beams ----
@@ -524,8 +525,18 @@ public final class WandaAbilities {
      * @return how much of {@code amount} the shield took (all of it, unless it had less strength left)
      */
     public static float wear(ServerPlayer player, float amount) {
+        return wear(player, amount, null);
+    }
+
+    /**
+     * {@link #wear(ServerPlayer, float)} for damage that has a known source: with {@code scarlet_witch.shieldUnlimitedVsBosses} off, what a
+     * boss fight deals ({@link #fromBoss}) wears even an unlimited shield down by the old rules.
+     *
+     * @param cause who or what dealt it (a projectile counts as its owner), or null if it is not known
+     */
+    public static float wear(ServerPlayer player, float amount, @Nullable Entity cause) {
         PowerData data = Powers.get(player);
-        if (data.power() == Power.SCARLET_WITCH && shieldUnlimited()) {
+        if (data.power() == Power.SCARLET_WITCH && shieldUnlimited() && (EnhancedConfig.WANDA_SHIELD_UNLIMITED_VS_BOSSES.get() || !fromBoss(cause))) {
             return amount; // 3.2: an unlimited shield stops it all and is never worn down
         }
         float taken = Math.min(amount, data.shieldStrength());
@@ -535,6 +546,17 @@ public final class WandaAbilities {
             shatter(player, data);
         }
         return taken;
+    }
+
+    /** Whether this came from a boss fight: a boss, something a fight made (a minion, a sand lance...), or a projectile of one. */
+    public static boolean fromBoss(@Nullable Entity cause) {
+        for (int i = 0; cause != null && i < 4; i++) {
+            if (cause.getType().is(ModTags.BOSSES) || BossFights.isFightEntity(cause) || BossFights.fightOf(cause) != null) {
+                return true;
+            }
+            cause = cause instanceof Projectile projectile ? projectile.getOwner() : null;
+        }
+        return false;
     }
 
     /** A projectile touching the Chaos Shield turns to red sparks. */

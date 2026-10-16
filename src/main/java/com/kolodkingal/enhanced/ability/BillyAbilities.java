@@ -204,7 +204,8 @@ public final class BillyAbilities {
             return; // (the beam that burns is the Darkhold's: R neither starts nor stops it)
         }
         if (!down || player.isSpectator()) {
-            if (ContinuousBeam.isFiring(player) || data.is(Live.BEAMING)) {
+            // (a Darkhold beam he fires is not his to stop: R lets go of the Hex Beam only)
+            if ((ContinuousBeam.isFiring(player) || data.is(Live.BEAMING)) && !DarkholdBook.firing(player)) {
                 ContinuousBeam.stop(player);
             }
             return;

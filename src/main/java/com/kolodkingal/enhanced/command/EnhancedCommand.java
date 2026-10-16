@@ -50,7 +50,7 @@ import java.util.List;
  * /enhanced build stop [&lt;player&gt;|all]
  * /enhanced build list
  * /enhanced build history &lt;player&gt;
- * /enhanced build rank &lt;player&gt; [1-4]
+ * /enhanced build rank &lt;player&gt; [1-10]
  * /enhanced build meter &lt;player&gt; &lt;value&gt;
  * /enhanced build forget &lt;player&gt;
  * /enhanced ward list

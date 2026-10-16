@@ -262,7 +262,7 @@ public final class CommonEvents {
         if (player instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(player) && !unstoppable) {
             // What the shield stops wears it down (and when nothing is left it shatters).
             if (source.is(DamageTypeTags.IS_PROJECTILE) && source.getDirectEntity() != null && source.getEntity() != player) {
-                WandaAbilities.wear(wanda, event.getAmount());
+                WandaAbilities.wear(wanda, event.getAmount(), source.getEntity() != null ? source.getEntity() : source.getDirectEntity());
                 event.setCanceled(true);
                 return;
             }
@@ -276,7 +276,8 @@ public final class CommonEvents {
             }
             if (source.is(DamageTypeTags.IS_EXPLOSION)) {
                 float absorbable = event.getAmount() * (1.0F - EnhancedConfig.CHAOS_SHIELD_EXPLOSION_FACTOR.get().floatValue());
-                event.setAmount(event.getAmount() - WandaAbilities.wear(wanda, absorbable));
+                event.setAmount(event.getAmount() - WandaAbilities.wear(wanda, absorbable,
+                        source.getEntity() != null ? source.getEntity() : source.getDirectEntity()));
             }
             if (source.is(DamageTypeTags.IS_LIGHTNING) && ThorAbilities.isThor(source.getEntity())) {
                 // Thor's lightning (his beam, and the arcs that leap on from what it hits) never gets through the

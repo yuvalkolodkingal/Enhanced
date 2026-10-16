@@ -139,7 +139,7 @@ public final class StonePowers {
             shield = true;
             block = false;
             if (stop.owner() instanceof ServerPlayer wanda && alreadyHit.add(wanda.getId())) {
-                WandaAbilities.wear(wanda, shieldCost);
+                WandaAbilities.wear(wanda, shieldCost, caster);
             }
         }
         List<LivingEntity> hit = new ArrayList<>();
@@ -155,7 +155,7 @@ public final class StonePowers {
             alreadyHit.add(e.getId());
             if (e instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(wanda)) {
                 // A wide beam that grazes the sphere without its centre line meeting it is stopped by it just the same.
-                WandaAbilities.wear(wanda, shieldCost);
+                WandaAbilities.wear(wanda, shieldCost, caster);
                 shield = true;
                 continue;
             }

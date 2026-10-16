@@ -281,6 +281,7 @@ public final class BuildScheduler {
 
     /** {@code ServerTickEvent.Pre}: the tick's budget, and the jobs that take turns in it. */
     public static void startTick(MinecraftServer server) {
+        instantSpent = 0L;
         TURNS.clear();
         if (QUEUES.isEmpty() || !EnhancedConfig.SPEC.isLoaded()) {
             tick = null;
@@ -364,8 +365,26 @@ public final class BuildScheduler {
         }
     }
 
+    /** Nanoseconds the Instant spells have held the current server tick so far (reset in {@link #startTick}). */
+    private static long instantSpent;
+
     private static void instantTurn(BuildJob job) {
-        Budget budget = new Budget(job.instantNanos(), Integer.MAX_VALUE / BuildJob.WRITE, Integer.MAX_VALUE, 1, System::nanoTime, () -> 0L, 0L, 0);
+        // All Instant spells of one server tick share instantTickMillis (an autoclicker, two Wandas); what is left is this one's.
+        long allowed = Math.min(job.instantNanos(), BuildConfig.WANDA_INSTANT_TICK_MILLIS.get() * 1_000_000L - instantSpent);
+        if (allowed <= 0L) {
+            job.fellBehind(); // the tick's Instant time is spent: normal speed
+            return;
+        }
+        long began = System.nanoTime();
+        try {
+            instantLoop(job, allowed);
+        } finally {
+            instantSpent += System.nanoTime() - began;
+        }
+    }
+
+    private static void instantLoop(BuildJob job, long allowed) {
+        Budget budget = new Budget(allowed, Integer.MAX_VALUE / BuildJob.WRITE, Integer.MAX_VALUE, 1, System::nanoTime, () -> 0L, 0L, 0);
         Tick tick = budget.start();
         while (!job.finished() && job.instant()) {
             try {
@@ -375,6 +394,12 @@ public final class BuildScheduler {
                 break;
             }
             if (job.finished() || !job.instant()) {
+                break;
+            }
+            if (job.waiting()) {
+                // A chunk of its set is not loaded: its ticket can only take effect between ticks, so waiting here would spin until the
+                // clock ran out. Normal speed at once; the tickets load the chunks over the next ticks.
+                job.fellBehind();
                 break;
             }
             if (tick.timeUp()) {

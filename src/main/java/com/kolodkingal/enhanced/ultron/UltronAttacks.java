@@ -237,7 +237,7 @@ final class UltronAttacks {
         }
         for (Player shielded : shields.keySet()) {
             if (shielded instanceof ServerPlayer wanda) {
-                WandaAbilities.wear(wanda, damage);
+                WandaAbilities.wear(wanda, damage, boss);
             }
         }
     }

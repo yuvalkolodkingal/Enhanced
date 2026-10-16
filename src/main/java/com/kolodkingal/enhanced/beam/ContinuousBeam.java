@@ -43,13 +43,17 @@ public final class ContinuousBeam {
     public static final int KEEP_ALIVE_TICKS = 8;
 
     private static final class State {
-        long nextHit;
         long lastSent = -1000L;
         BeamStyle style;
         float range;
     }
 
     private static final Map<UUID, State> STATES = new HashMap<>();
+    /**
+     * When each shooter's beam last hit (game time), kept across {@link #stop} and {@link #start}: tapping the key cannot hit
+     * faster than the spec's interval. Forgotten at logout ({@link #forget}) and when the server stops ({@link #clear}).
+     */
+    private static final Map<UUID, Long> LAST_HIT = new HashMap<>();
 
     /** What a beam can hit: creatures, parts of the Ender Dragon and End Crystals, as Wanda's beam can (alive, pickable). */
     public static Predicate<Entity> targets(Entity shooter) {
@@ -86,10 +90,18 @@ public final class ContinuousBeam {
     /** Forgets the beam without a word (the player logged out, the server stopped). */
     public static void forget(ServerPlayer shooter) {
         STATES.remove(shooter.getUUID());
+        LAST_HIT.remove(shooter.getUUID());
     }
 
     public static void clear() {
         STATES.clear();
+        LAST_HIT.clear();
+    }
+
+    /** Whether the beam of this shooter may hit now ({@code interval} ticks after its last hit, even if the key was let go between). */
+    private static boolean mayHit(ServerPlayer shooter, long now, int interval) {
+        Long last = LAST_HIT.get(shooter.getUUID());
+        return last == null || now - last >= interval || now < last;
     }
 
     /** One tick of a beam that burns. */
@@ -113,14 +125,14 @@ public final class ContinuousBeam {
         // A complete Chaos Shield in the way stops the beam at its surface, and pays for it with its strength.
         WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, shooter, shooter.getEyePosition(), end, 1.0F);
         if (shield != null) {
-            if (now >= state.nextHit) {
-                state.nextHit = now + spec.interval();
+            if (mayHit(shooter, now, spec.interval())) {
+                LAST_HIT.put(shooter.getUUID(), now);
                 shielded(level, shooter, shield, spec);
             }
             return;
         }
-        if (hit instanceof EntityHitResult entityHit && now >= state.nextHit) {
-            state.nextHit = now + spec.interval();
+        if (hit instanceof EntityHitResult entityHit && mayHit(shooter, now, spec.interval())) {
+            LAST_HIT.put(shooter.getUUID(), now);
             Entity target = entityHit.getEntity();
             target.hurt(ModDamageTypes.source(level, spec.damageType(), shooter, shooter), spec.damage());
             if (spec.onHit() != null) {

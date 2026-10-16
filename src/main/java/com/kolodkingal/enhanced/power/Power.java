@@ -92,6 +92,9 @@ public enum Power implements StringRepresentable {
 
     /** Translation key for the given ability (1-5). */
     public String abilityKey(int ability) {
+        if (this == BILLY && ability == 1 && !com.kolodkingal.enhanced.ability.BillyAbilities.beamEnabled()) {
+            return "ability.enhanced.billy.1.bolt"; // (billy.beam false: R is the single Hex Bolt again)
+        }
         return "ability.enhanced." + getSerializedName() + "." + ability;
     }
 
