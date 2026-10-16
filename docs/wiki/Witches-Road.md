@@ -21,7 +21,7 @@ Hebrew: [עברית](Witches-Road-HE)
 4. You play the trial. When you win it, a gate on the finish platform opens ("The Parkour: done!") and the next trial is built while you stand there. Step through the gate to go on.
 5. After the third trial comes [the end](#the-end-of-the-road).
 
-Each trial starts with its name and, underneath, what to do: *The Parkour: Cross the void to the gate*, *Copy the Structure: Build a copy of the model*, *Ice-Boat Race: Sail the ice to the finish*. The **Voice of the Road** speaks in the action bar, a few friendly lines for each moment ("The Road remembers you." "Not yet. Up you go." "Well walked. Step through the gate."), and when you win the whole server is told in chat.
+Each trial starts with its name and, underneath, what to do: *The Parkour: Cross the void to the gate*, *Copy the Structure: Build a copy of the model* (its title is shortened to "2. The Copy" so that it fits the window), *Ice-Boat Race: Sail the ice to the finish*. The **Voice of the Road** speaks in the action bar, a few friendly lines for each moment ("The Road remembers you." "Not yet. Up you go." "Well walked. Step through the gate."), and when you win the whole server is told in chat.
 
 ### What the Road looks like
 
@@ -34,7 +34,8 @@ Only people with no power walk the Road, so the rules are few:
 * You are in **Survival**, and you **cannot fly or glide** (no elytra, Levitation, Slow Falling or Jump Boost). Ender Pearls, Chorus Fruit, Wind Charges and firework rockets do nothing, and no portal or teleport takes you off the Road.
 * **Nothing hurts you.** Anything that would kill you (a fall into the void, `/kill`) puts you back at the last checkpoint instead. Your food bar stays full.
 * **You cannot break or place blocks**, except on the plot of the second trial.
-* **You cannot drop the Gene**, so you will always have it at the end.
+* **You cannot drop the Gene**: if you throw it (the drop key, or dragging it out of your inventory) it jumps straight back, so you will always have it at the end.
+* **You cannot travel into the Road from outside**, only walk in through the door. Boats, minecarts, armor stands, paintings, item frames and spawn eggs cannot be used on the Road.
 * Powers do not work. If an operator gives you one, the Road sends you back to the world.
 * **Everyone has a place of their own.** Friends cannot join your trial (the Road is solo, on purpose, to keep it simple and safe), and at most 32 players walk the Road at once (`witches_road.maxPlayers`); if it is full, wait for somebody to finish.
 * Creative and Spectator players are refused at the door ("The Road tests only those who can fall").
@@ -74,7 +75,7 @@ There are **five kinds of building**: a **hut** (a gabled cottage), a **tower** 
 * **The course:** straights, 90 degree curves, S-bends, hairpins (with a strip of rough snow in front of them to slow you), narrow stretches (5 wide), snow drifts, chicanes of snow walls, and stripes of fast blue ice. Walls do not hurt: you slide along them and keep your speed along the wall.
 * **Checkpoints** (amethyst arches) about every **100 blocks**. If you **fall off** the ice or climb out, you come back in a **new boat on the last checkpoint**. If you are stuck, press **Shift**: it puts you back at the checkpoint (at most once every 5 seconds; an earlier Shift only keeps you in the boat). A hint appears after 4 seconds without moving.
 * **Shortcuts.** Some loops have a **shortcut**: a straight across the loop with a 5-block gap in it, and the far side one block lower. A fast boat jumps it; a slow one falls and goes back to the checkpoint. The long way round is always open.
-* **The clock.** You have **4 minutes** from the start of the trial (a bar at the top shows the time left, from blue to yellow to red), and a **par time**: how fast a perfect driver could go, times 1.4. At the finish you are told your time against par ("Faster than par! Well sailed.") and your best time. If the time runs out you go back to the start platform and try again.
+* **The clock.** You have **4 minutes** from the start of the trial (a bar at the top shows the time left, from blue to yellow to red), and a **par time**: how fast a perfect driver could go, times 1.4. On a long course the limit is stretched so that it is never shorter than 3 times the par time (`boatRaceFairFactor`), so a driver who is not the fastest can still finish. At the finish you are told your time against par ("Faster than par! Well sailed.") and your best time. If the time runs out you go back to the start platform and try again.
 * **Winning:** cross the **finish line** (a checkered stripe and an arch). The boat is taken away, you land on the finish platform, and the gate opens.
 * A speed (blocks a second) shows in the action bar, and frost and aurora lights play in the sky.
 
@@ -82,16 +83,21 @@ There are **five kinds of building**: a **hut** (a gabled cottage), a **tower** 
 
 ## The end of the Road
 
-<!-- ROAD-ENDING: this section follows the state of the ending in the ROAD lane's worktree (uncommitted when these docs were written: EndingHall, RoadEnding, endingFarewellSeconds, /road choose). The integrator must check it against the final code. -->
-
-After the third gate you step into the **end hall**: a round hall of dark oak and amethyst, with a dais in the middle, in a place of its own. The Road gathers its light for three seconds and then asks once more, "Seekest thou the Road?", and the choice screen opens, with the same two roads as the door gave in 3.1:
+After the third gate you step into the **end hall**: a round hall of dark oak and amethyst, with a dais in the middle, in a place of its own. The title says "The Road's End", the Road speaks, the light gathers over the dais for three seconds, and then the Road asks once more, "Seekest thou the Road?" and the choice screen opens. It shows the same two roads as the door gave in 3.1:
 
 * **Billy: Wiccan**: blue magic, flight, telekinesis, the Hex Beam and Hex Barrier, and Build Magic that grows with practice. See [Billy](Billy-and-the-Witches-Road).
 * **Tommy: Speed**: super speed, like his uncle. See [Tommy](Tommy).
 
-When you choose, **one Gene is used up** (only now, and you must be carrying one), you awaken with the power you picked, with the title, the sound and the message to the whole server, and for a few seconds (`endingFarewellSeconds`, 5 by default, 0 to 30) you stand in a rising column of light while the Road says its farewell. Then the Road **takes you out**: you are teleported back to the place where you came in (failing that, the door you opened, or the world's spawn), in your own game mode, with your things, full health and hunger and every effect cleared. The Road does not need you any more and forgets your progress.
+It says "One Gene will be used up." and has two buttons, **Not yet** and **Leave the Road**. You need a Gene anywhere in your inventory: without one the Road says so and does not ask.
 
-If you close the screen, the door in the floor of the hall, or the command `/road choose`, asks again. A button on the screen lets you **leave without choosing**: the Gene stays in your inventory and the next Witches' Road door you open offers the choice at once, because you have walked all of it. If you log out in the hall it is built again at your next login and the question comes back.
+**When you choose,** one Gene is used up (only now) and you awaken with the power you picked, with the title, the sound and the message to the whole server. For a few seconds (`endingFarewellSeconds`, 5 by default, 0 to 30; 0 sends you at once) you are held where you stand in a rising helix of light, with amethyst chimes and a last line from the Road. Then the Road **takes you out**, to the first of these places that is safe: the place where you came in (or up to 6 blocks above it), the Witches' Road door you opened, or the world's spawn on the surface. A place is unsafe when a block is in it now, there is no floor within 24 blocks below, there is lava, fire, a cactus, magma or a campfire, it is outside the world border, or the world is not there. You arrive in your own game mode, with your things, your experience, full health and hunger and every effect cleared, and a chat line tells you what you have become. The Road forgets your progress, and while you have a power you cannot walk it again.
+
+* **Not yet** closes the screen and changes nothing. Right-click the door lying in the floor of the hall, or type `/road choose`, and the Road asks again.
+* **Leave the Road** (or `/road leave`, or the exit door) takes you back to where you came in **with the Gene**. The next Witches' Road door you open offers the choice at once, because you have walked all of it.
+* **Nothing can kill you in the hall.** A fall puts you back at the start of the hall, and the question stands. In the farewell a death is turned away and you still leave.
+* **If you log out in the hall,** it is built again at your next login and the question comes back. If you log out in the farewell, the power is already yours: at your next login the Road sends you home.
+* If another mod refuses the way out, you stay in the hall and the Road tries again every moment.
+* Operators: `/enhanced road enter <players> 4` (one more than the number of trials) sends a player to the hall; he must have won every trial (`/enhanced road set <players> 99`) or the choice is refused. `skip` has nothing to win there, and `set` to fewer trials sends him home from the hall.
 
 A server that switches the trials off (`witches_road.enabled` is `false`) gets the 3.1 door: right-click it with a Gene and choose at once.
 
@@ -111,7 +117,7 @@ A server that switches the trials off (`witches_road.enabled` is `false`) gets t
 | `/road status` | everyone | How many trials you have won, and where you are. |
 | `/road choose` | everyone | At the end of the Road: asks the question again (the choice screen opens). |
 | `/enhanced road status [player]` | operators | The same for any player: trials won, in the Road or not, how many falls. |
-| `/enhanced road enter <players> [trial]` | operators | Sends players onto the Road (no Gene needed); `trial` is 1, 2 or 3. |
+| `/enhanced road enter <players> [trial]` | operators | Sends players onto the Road (no Gene needed); `trial` is 1, 2 or 3 (4 is the end hall). |
 | `/enhanced road leave <players>` | operators | Takes players off the Road. |
 | `/enhanced road reset <players> [newcourse]` | operators | Forgets their progress; with `newcourse` they also get new courses. |
 | `/enhanced road skip <players>` | operators | Wins the trial a player is in, or counts the next as won. |
