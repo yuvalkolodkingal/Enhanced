@@ -13,7 +13,7 @@ the order of Eilon's list.
 
 Each hero has its wiki pages (`docs/wiki/<Hero>.md` and `<Hero>-HE.md`) and a section of `docs/DESIGN.md` and
 `docs/DESIGN.he.md`: **13 Phoenix, 14 Spider-Man, 15 Thanos, 16 Ultron, 17 Apocalypse** (12 is 2.3's voices of the
-Infinity Stones) and, since 3.1, **18 Build Magic**. Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
+Infinity Stones), since 3.1 **18 Build Magic**, and since 3.2 **19 the Witches' Road trials, 20 the sorcerers' books, 21 the beam system, 22 the rest of 3.2** (with Billy's Hex Beam and Barrier in 6.4 and 6.5). Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
 Configuration, FAQ, Becoming a Hero, Credits, the sidebar) and in the README, in both languages. While 3.0 was built
 each lane wrote these as fragments that were stitched in at the end; a change now goes straight into the pages, English
 and Hebrew together.
@@ -116,7 +116,7 @@ half is `client/build/`; design in `DESIGN.md` section 18).
   `forceState` and `everyTick` instead of waiting.
 * `SkeletonTests` pins the skeleton: the order of the powers, the tag files (every entry names something real), the melee
   tag, the Scepter and Tesseract table, the awakening items, the area rule, the boss facade, the payloads, the protocol
-  (`ModNetwork.PROTOCOL_VERSION`, **"5"** since 3.1, and the round trip of the six payloads of 3.1). Keep it green. It runs in its own batch, `skeleton`, on purpose: the grid puts
+  (`ModNetwork.PROTOCOL_VERSION`, **"6"** since 3.2 (`theProtocolIsSix`; "5" in 3.1), and the round trip of the payloads of 3.1). Keep it green. It runs in its own batch, `skeleton`, on purpose: the grid puts
   tests side by side and a test that finishes in its first tick lets go of its chunks. A thrown hammer that overshoots
   its arena (`ThorTests.thrownMjolnirHitsAndComesBack`, `...Stormbreaker...`) then lands in a chunk that has stopped
   ticking, freezes and never comes home (it failed 2 times in 22 runs): those tests now throw only 12 blocks, which
@@ -336,3 +336,19 @@ method, and the rules are worth keeping for the next version.
   it for good); the hold rows say each spell's own verb; a spell whose every cell is protected is refused before it is cast
   (`NOTHING_CAN_CHANGE`, appended as code 41: a fizzle, a grey ghost, no sound, no charge, no step); the cast, the hum and the undo are
   heard at the caster. Four tests were added (line length, the face latch, the all-protected refusal, the sounds at the caster).
+
+## 10. How 3.2 was put together
+
+3.2 (the Witches' Road trials, Billy's Hex Beam and Barrier and ten ranks, Wanda's unlimited shield and Instant level, the Book of the Vishanti and the Darkhold, a weaker Apocalypse) used the method of 3.1 with fewer, bigger lanes, each in its own git worktree and branch, merged into an integration
+branch (`v32`). The player-facing description of every rule is in `DESIGN.md` **19 (the Road), 20 (the books), 21 (the beam system), 22 (the rest of 3.2)** and, for Billy and Wanda, **6.4, 6.5, 18.6 and 18.14**.
+
+* **Lanes.** ABW (the Apocalypse master factor, Wanda's shield, the beam infrastructure, Billy's beam and barrier), BUILD (Billy's ten ranks and the Instant level), ITEMS (the Book of the Vishanti, then the Darkhold on ABW's beam), ROAD (four steps, one agent each: the framework and the Parkour, Copy the Structure, the Ice-Boat Race, the ending) and DOCS. Shared files (`EnhancedConfig` and the config classes,
+  both lang files, `ModNetwork`, `ModAttachments`, `ModTags`, `ClientSetup`, `PowerHud`, `TestKit`, `DataTests`) were edited minimally and additively, every key in both languages; the integrator resolved the conflicts (they were all "keep both sides") and bumped the protocol once.
+* **Protocol "6".** `ModNetwork.PROTOCOL_VERSION` is **"6"** since 3.2 (`SkeletonTests.theProtocolIsSix`): the payloads `BeamPayload`, `VishantiActionPayload`, `WardSyncPayload`, `BuildActionPayload.INSTANT`, `BuildFxPayload.POP` and the changed `OpenRoadPayload` and `RoadChoicePayload`. A 3.1 client cannot join a 3.2 server.
+* **The beam is shared code.** A second beam (the Darkhold's) is a `BeamStyle` and a `BeamSpec` on the one `ContinuousBeam`; see `DESIGN.md` 21 before writing a third.
+* **The Road is a framework.** A trial implements `RoadChallenge`, draws on a `RoadCanvas` for one player in one cell of the dimension `enhanced:witches_road`, and is registered in `RoadChallenges` with an order number; the framework does the cells, tickets, persistence, checkpoints, falls, death, the timer, the gate to the next trial, abandon, login, the rules and the commands (`DESIGN.md` 19.6). A test that swaps the
+  registry (`RoadChallenges.swap`) has a batch of its own.
+* **Tests.** 1,315 game tests in 3.1; **1,471** on the last merged tree before the Road's ending (`All 1471 required tests passed`, about 5.4 minutes), more with the ending. New batch families: `abw_*` (Apocalypse numbers, shield, beam, barrier), `build_instant_*`, `items_*` (Book, ward, Darkhold), `road_*` (framework, Parkour, structure copy, boat). Two things to remember when running them: delete `run/world` **and**
+  `run/config/enhanced-server.toml` first (a generated 3.1 server file keeps the old defaults and fails the new-number tests), and expect the shared memory of a machine running several gradle builds to kill a JVM now and then (exit 137 is not a test failure). `theIslandIsSafeFromEveryFeature` (V31CrossTests) once timed out under load; it now stands the cast preview's clock still.
+  `TestKit.fixture()` switches `scarlet_witch.shieldUnlimited` and `billy.beam` off for every test (so the older shield and Hex Bolt tests keep testing the limits and the bolt); a test of the new behaviour sets them back with `f.config`. A test that polls from inside a callback must use `ApocalypseTestSupport.every` (`f.everyTick` inside a callback crashes the server tick).
+* **The wiki's config page and its checker.** Every option has a row with its real default and range, in both languages; `check_config32.py` (the 3.1 checker with three additions: sections pushed with a comment, helper methods inlined, the rank-practice loop expanded) compares each config class with the page, and `check_wiki.py` and `parity.py` are run on the pages.

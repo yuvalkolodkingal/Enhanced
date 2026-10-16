@@ -103,6 +103,10 @@ Loki's true Jotun form, from his birth. Toggle it with **N**.
 
 Frost Giant is ability 5 in **every** look.
 
+## A sorcerer
+
+Loki is a **sorcerer**, like the Scarlet Witch and Billy: he can read the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) (save places and teleport to them, and raise a ward of **24 blocks** round his base that no monster can enter) and the [Darkhold](Sorcerers-Books#the-darkhold) (the purple beam, the hex mark and the mind glimpse).
+
 ## Numbers you can change
 
 The dagger's damage and how long the Scepter confuses are the Loki options: `loki.daggerDamage`, `loki.scepterConfusionTicks`, `loki.scepterNauseaTicks` and `loki.scepterSlownessTicks` on [Server Configuration](Server-Configuration). The Tesseract's chances are in the loot modifiers (datapacks can change them), listed on [Items and Crafting](Items-and-Crafting).

@@ -16,6 +16,8 @@ Every power's look and colour follows the MCU films and shows, and Vision, Tommy
 (in his Asgardian clothes, the TVA's or the God of Stories'), Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse each have several looks
 (press **H**).
 
+**New in 3.2:** the Witches' Road has three **trials** (a parkour over the void, a structure to copy block by block, an ice-boat race; see [The Witches' Road](docs/wiki/Witches-Road.md)) and you choose Billy or Tommy at the end; Billy fires a continuous **Hex Beam** (hold **R**), raises a **Hex Barrier** (Sneak + **B**) and ranks up to **ten** ranks; Wanda's Chaos Shield is **unlimited** and she can build **instantly** (Ctrl + I); sorcerers can craft the **Book of the Vishanti** (saved places, and a ward round the base that no monster can enter) and the **Darkhold** (Agatha's purple beam; see [The Sorcerers' Books](docs/wiki/Sorcerers-Books.md)); and Apocalypse is weaker (one master factor, `apocalypse_boss.powerFactor`).
+
 **New in 3.1:** Wanda and Billy build with **Build Magic** (press **Y**; eleven spells, and **Ctrl + Z** takes it back, even tomorrow; see the [Build Magic page](docs/wiki/Build-Magic.md)), every telekinesis works in the boss fights and Billy moves blocks, Magneto pulls the metal out of everything around him, and Apocalypse never heals while Wanda and the Phoenix hit him critically.
 
 Original hero concepts by Eilon Kolodkin-Gal. The full design, with every rule and
@@ -49,14 +51,14 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | **Scarlet Witch** | Find the very rare **Scarlet Witch Gene** (mansions, strongholds, fortresses, bastions, ancient and End cities, jungle temples, desert pyramids, witches, evokers). Hold it in one hand and use **Loki's Scepter** (End City treasure and other rare chests) with the other to touch the Mind Stone (**without the gene, you explode**), or use the **Tesseract** with the other hand instead. |
 | **Quicksilver** | Craft **Quicksilver's Goggles** (sugar, iron, glass panes, a Block of Diamond) and put them on. |
 | **Vision** | Craft a **Synthezoid Core** (redstone blocks, netherite ingots, a Nether Star). Hold it in one hand and use **Loki's Scepter** with the other. |
-| **Tommy** or **Billy** | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors, an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** and choose which of Wanda's sons you become. |
+| **Tommy** or **Billy** | Craft the **Witches' Road Door** (amethyst shards, soul lanterns, dark oak trapdoors, an Eye of Ender) and place it in the floor. Open it holding a **Scarlet Witch Gene** (with no power), walk the three trials of the Road, and choose which of Wanda's sons you become. |
 | **Loki** | Find the **Tesseract** (End City, Stronghold library, Ancient City and Woodland Mansion chests) and use it: you vanish in a blue flash and reappear far away as Loki. (With a **Scarlet Witch Gene** in your other hand it awakens the Scarlet Witch instead.) |
 | **Thor** | Forge **Mjolnir** (netherite ingots, a Nether Star, a Heavy Core, a Breeze Rod). The first **worthy** player to lift it (Heroes of the Village: save a village from a raid) claims it, and lightning makes you Thor. From then on only its owner can lift it. |
 | **Phoenix** | Find the very rare **Phoenix Ember** (End City and bastion treasure, Ancient City, stronghold library, Nether fortress and woodland mansion chests), hold it with no power and **hold right-click for 3 seconds**. Mind Reading (**R**) shows the items of whoever you look at, **Sneak + R** senses every mind through the walls, **B** takes over a creature, **Sneak + B** freezes everyone around you, and **N**, held, charges the Phoenix Burst: a wave of cosmic fire in every direction. |
 | **Spider-Man** | Craft a **Radioactive Spider** (Fermented Spider Eyes, Glow Ink Sacs and a Slime Block) or find one in a mineshaft, dungeon, Trial Chambers or Ancient City chest, and **right-click with it** with no power: you are sick for 7 seconds and awaken. **R** webs what you look at (**Sneak + R**: a burst of 24 strands), **G** zips you to the block you look at (**Sneak + G**, held: swing), jump at a wall and push to climb it, **V** switches Wall Crawl, and a spider-sense warns of danger. The Iron Spider suit has **B**, four mechanical legs (twice **Sneak + B**: Instant Kill), and **N** turns his eyes black. |
 | **Thanos** | Hold **the Tesseract and Loki's Scepter** together for five seconds in open country to call the **Mad Titan**, beat him (he takes a new Infinity Stone every 90 seconds) and hold the **Infinity Gauntlet** he rewards for three seconds with no power to become **Thanos**: five Infinity Stones on five keys (Power Blast, Portal Step, Transmute, Soul Drain, Rewind, and a Sneak ability each), no flight and no Snap. |
 | **Ultron** | Beat the **Ultron** boss and take his **Core**. Craft the **Ultron Program** (a Nether Star, 4 Blocks of Iron, 2 Echo Shards, 2 Blocks of Redstone), hold it in one hand and **Sneak + right-click** open, level ground with **Loki's Scepter** in the other: he rises among six Sentries, then the ground you stand on lifts into the sky. Everyone who fights for a minute and hurts him or his Sentries gets a **Core**; hold it in one hand and use the Scepter with the other (with no power) and you become Ultron. |
-| **Apocalypse** | Craft a **Capstone** (a Nether Star, five Gold Blocks, a Lapis Block) and Sneak + right-click it on sand by day with a Scarlet Witch or a Phoenix within 64 blocks to wake **En Sabah Nur**: a boss in a golden shield that stops everything but mind power, with sand, portals and the Four Horsemen. Every fighter who stayed a minute and hurt him or his shield gets the **Essence**; hold it for three seconds with no power to become **Apocalypse**: sand waves and entombing, levitation, a portal, a golden shield of your own and power bestowal (Sneak: a sandstorm). |
+| **Apocalypse** | Craft a **Capstone** (a Nether Star, five Gold Blocks, a Lapis Block) and Sneak + right-click it on sand by day with a Scarlet Witch or a Phoenix within 64 blocks to wake **En Sabah Nur**: a boss in a golden shield that stops everything but mind power, with sand, portals and his Horsemen. Every fighter who stayed a minute and hurt him or his shield gets the **Essence**; hold it for three seconds with no power to become **Apocalypse**: sand waves and entombing, levitation, a portal, a golden shield of your own and power bestowal (Sneak: a sandstorm). |
 
 **Loki's Scepter** is a weapon too (8 damage), and a hit confuses whoever it lands on: a creature forgets its
 target and stumbles about for 6 seconds (the Ender Dragon, the Wither and the Warden are immune), and a player gets
@@ -67,6 +69,8 @@ the Mind Stone in Loki's Scepter and in Vision's forehead a bright, shimmering, 
 under the portal, the awakening or the chime they come with, and hum softly for as long as you hold the Tesseract or
 the scepter (the *Players* volume slider turns them down). The Power, Reality, Soul and Time Stones have voices too:
 the Mad Titan sounds each one as he gathers it, and a Thanos player hears them at every use of a stone.
+
+The **Book of the Vishanti** (amethyst shards, an Eye of Ender, gold ingots, a book and a lapis lazuli) lets a sorcerer (Loki, the Scarlet Witch or Billy) save places and teleport to them (use it; Sneak + use goes to your base) and raise a **ward** round a base that no monster can enter, as large as the sorcerer is strong. The **Darkhold** (netherite scrap, a wither rose, echo shards, a book and a wither skeleton skull) gives a sorcerer Agatha's purple beam (hold use), poisons whoever uses magic on its holder for 10 seconds, and has a hex mark and a mind glimpse (Sneak + use).
 
 **Stormbreaker** (3 netherite ingots, a Nether Star and any log, shaped like an axe) can be wielded by
 anyone: the hardest-hitting axe there is, a fifth stronger than Mjolnir in everything they share (the blow, the
@@ -84,16 +88,16 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 | **R** | Metal Telekinesis (Sneak: Magnetic Pull) | Chaos Energy Beam (hold) | Quicksilver Time on/off (Sneak: Super Speed) | Mind Stone Beam (hold) |
 | **G** | Iron Shrapnel Storm (hold) | Enhanced Flight | Speed Blitz | Flight |
 | **V** | Armor & Weapon Strip | Telekinesis (creatures, items, blocks; Sneak: a block) | Pickpocket | Phase through walls (toggle) |
-| **B** | Magnetic Shield (toggle) | Chaos Shield (hold) | Wall & Water Run (toggle) | Density (toggle) |
+| **B** | Magnetic Shield (toggle) | Chaos Shield (hold; unlimited) | Wall & Water Run (toggle) | Density (toggle) |
 | **N** | Magnetic Flight | The Hex (again: Hex Control, Sneak: dissolve) | Walkman: music on/off | Human disguise (toggle) |
-| **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel) | | |
+| **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel; Ctrl + I: Instant) | | |
 
 | Key | Tommy | Billy | Loki | Thor |
 |---|---|---|---|---|
-| **R** | Super Speed on/off (sprint) | Hex Bolt | Daggers (Sneak: three) | Throw / call back (Sneak: shatter Mjolnir) |
+| **R** | Super Speed on/off (sprint) | Hex Beam (hold) | Daggers (Sneak: three) | Throw / call back (Sneak: shatter Mjolnir) |
 | **G** | Disarm Blitz | Flight | Duplicates | Flight (weapon in hand) |
 | **V** | Whirlwind | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Shapeshift | Lightning beam (hold) |
-| **B** | Vibrate Through Walls | Freeze | Vanish | God of Thunder (toggle) |
+| **B** | Vibrate Through Walls | Freeze (Sneak, hold: Hex Barrier) | Vanish | God of Thunder (toggle) |
 | **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel) | | |
 | **H** | Change look | Change look | Change look | Change look |
@@ -203,9 +207,9 @@ boss framework and its rules) is in [docs/HEROES-AND-BOSSES.md](docs/HEROES-AND-
   `vision`, `tommy`, `billy`, `loki`, `thor`, `phoenix`, `spider_man`, `thanos`, `ultron`, `apocalypse`, optionally followed by a look), `/enhanced look <players> <look>`
   (for example `/enhanced look @a tva`), `/enhanced hex list|clear` and `/enhanced boss start <thanos|ultron|apocalypse> [force]`,
   `/enhanced boss stop`, `/enhanced boss list` and `/enhanced boss cleanup <center> <radius>`, which start, end, list and clean up
-  boss fights (operators only).
+  boss fights, `/enhanced ward list|remove <player>` for the wards of the Book of the Vishanti, and `/enhanced road status|enter|leave|reset|skip|set|layout|cells` for the Witches' Road (operators only; everyone can type `/road leave` and `/road status`).
 * Balance numbers (beam damage, Hex death chance and radius, the Vision of the Hex, flight speeds, shrapnel,
-  how much Quicksilver Time slows the world, the Phoenix's Mind Reading, Mind Control and Burst, Spider-Man's webs, zip, swing, crawl, suits, legs, Instant Kill and Black Eyes, the rules every boss fight shares (`[boss]`), the Mad Titan's clock of stones and every move, Ultron's bodies, Sentries and the Sokovia lift, Apocalypse's shield, attacks and Horsemen, and the three bosses' heroes…) are in `world/serverconfig/enhanced-server.toml`.
+  how much Quicksilver Time slows the world, the Phoenix's Mind Reading, Mind Control and Burst, Spider-Man's webs, zip, swing, crawl, suits, legs, Instant Kill and Black Eyes, the rules every boss fight shares (`[boss]`), the Mad Titan's clock of stones and every move, Ultron's bodies, Sentries and the Sokovia lift, Apocalypse's shield, attacks and Horsemen and his master factor, and the three bosses' heroes, Billy's Hex Beam and Hex Barrier, the ten Build Magic ranks and Wanda's Instant level, the Book of the Vishanti and its wards, the Darkhold, and the Witches' Road trials…) are in `world/serverconfig/enhanced-server.toml`.
 * Item, block and entity tags under `data/enhanced/tags/` decide what counts as
   metal, what can be lifted, what the shield repels and which bosses resist the Hex,
   so datapacks can change them.
