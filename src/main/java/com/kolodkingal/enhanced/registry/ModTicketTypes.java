@@ -21,6 +21,12 @@ public final class ModTicketTypes {
      */
     public static final TicketType<Long> ENHANCED_BUILD = TicketType.create("enhanced_build", Long::compareTo);
 
+    /**
+     * The chunks of a Witches' Road trial (3.2), keyed by the player it is built for: held from the moment the cell is planned
+     * until it has been cleared, so the trial is loaded and ticking exactly while it exists.
+     */
+    public static final TicketType<UUID> ENHANCED_ROAD = TicketType.create("enhanced_road", UUID::compareTo);
+
     private ModTicketTypes() {
     }
 }

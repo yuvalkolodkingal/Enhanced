@@ -1,0 +1,18 @@
+{
+  "type": "enhanced:witches_road",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "enhanced:witches_road",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:air",
+          "height": 1
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.vishanti.WardCommands;
+import com.kolodkingal.enhanced.road.RoadCommands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -55,7 +56,10 @@ import java.util.List;
  * /enhanced ward list
  * /enhanced ward remove &lt;player&gt;
  *
- * <p>The {@code build} branch is {@link BuildCommands#node()} (Build Magic's operators' tools, D-B 16).
+ * /enhanced road status|enter|leave|reset|skip|set|cells
+ *
+ * <p>The {@code build} branch is {@link BuildCommands#node()} (Build Magic's operators' tools, D-B 16); the {@code road}
+ * branch is {@link RoadCommands#node()} (the Witches' Road trials, 3.2), which also gives everyone {@code /road leave}.
  */
 public final class EnhancedCommand {
     private static final DynamicCommandExceptionType UNKNOWN_POWER =
@@ -107,7 +111,9 @@ public final class EnhancedCommand {
                                                 .executes(ctx -> cleanupBosses(ctx.getSource(), Vec3Argument.getVec3(ctx, "center"),
                                                         IntegerArgumentType.getInteger(ctx, "radius")))))))
                 .then(BuildCommands.node())
-                .then(WardCommands.node()));
+                .then(WardCommands.node())
+                .then(RoadCommands.node()));
+        RoadCommands.registerPlayerCommands(dispatcher);
     }
 
     private static int get(CommandSourceStack source, ServerPlayer player) {

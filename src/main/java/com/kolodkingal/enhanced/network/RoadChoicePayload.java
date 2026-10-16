@@ -11,7 +11,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/** Client → server: a seeker chose whose road to walk (Billy's or Tommy's) at an open Witches' Road door. */
+/**
+ * Client → server: a seeker answered at an open Witches' Road door: he chose whose road to walk (Billy's or Tommy's), or, with
+ * {@link Power#NONE}, "Walk the Road" (the trials).
+ */
 public record RoadChoicePayload(BlockPos door, Power choice) implements CustomPacketPayload {
     public static final Type<RoadChoicePayload> TYPE = new Type<>(Enhanced.id("road_choice"));
 
@@ -30,7 +33,11 @@ public record RoadChoicePayload(BlockPos door, Power choice) implements CustomPa
 
     static void handle(RoadChoicePayload payload, IPayloadContext context) {
         if (context.player() instanceof ServerPlayer player) {
-            WitchesRoad.choose(player, payload.door(), payload.choice());
+            if (payload.choice() == Power.NONE) {
+                WitchesRoad.enter(player, payload.door());
+            } else {
+                WitchesRoad.choose(player, payload.door(), payload.choice());
+            }
         }
     }
 }

@@ -44,8 +44,10 @@ import org.jetbrains.annotations.Nullable;
  *
  * <ul>
  *     <li>Seeking the Road: someone without powers who holds a Scarlet Witch Gene right-clicks a door. A ring of
- *     blue-green light runs round its outline, the door opens, and they choose whose road to walk: Billy's (Wiccan)
- *     or Tommy's (Speed). Choosing uses up one gene.</li>
+ *     blue-green light runs round its outline, the door opens, and the Road asks "Seekest thou the Road?": he walks
+ *     the Road, three trials in the dimension {@code enhanced:witches_road} ({@link RoadTrials}), and at the end
+ *     chooses whose road to walk: Billy's (Wiccan) or Tommy's (Speed). Choosing uses up one gene. (With {@code
+ *     witches_road.enabled} off, as in 3.1, the choice is the door's own.)</li>
  *     <li>Walking the Road: the Scarlet Witch and Billy, whose magic made it, step through a door and come up out of the
  *     next one in the same dimension (in the order the doors were placed, wrapping around).</li>
  * </ul>
@@ -100,8 +102,11 @@ public final class WitchesRoad {
         return isDoor(state) && state.getValue(WitchesRoadDoorBlock.OPEN);
     }
 
-    /** A door joins the end of the Road (it was placed). */
+    /** A door joins the end of the Road (it was placed). (The doors inside the trials, the ways out, are no part of it.) */
     public static void addDoor(ServerLevel level, BlockPos pos) {
+        if (RoadDimension.is(level)) {
+            return;
+        }
         RoadDoors doors = doors(level);
         RoadDoors updated = doors.with(pos);
         if (updated != doors) {
@@ -145,10 +150,19 @@ public final class WitchesRoad {
 
     /** Someone right-clicked a door; the gene may be in either hand. */
     public static void use(ServerLevel level, BlockPos pos, ServerPlayer player) {
+        if (RoadDimension.is(level)) {
+            // A door inside the Road is the way out of it.
+            RoadTrials.useExitDoor(player);
+            return;
+        }
         Power power = Powers.power(player);
         if (geneHand(player) != null) {
             if (power.hasPowers()) {
                 player.displayClientMessage(Component.translatable("message.enhanced.road.own_road").withStyle(ChatFormatting.GRAY), true);
+                fizzle(level, pos);
+            } else if (RoadTrials.doorMode(player) == RoadTrials.DoorMode.ENTER && RoadTrials.refusal(player) != null) {
+                // The trials are not for him now (a Creative player, a Road that is full): the door says so before it opens.
+                player.displayClientMessage(Component.translatable(RoadTrials.refusal(player)).withStyle(ChatFormatting.GRAY), true);
                 fizzle(level, pos);
             } else {
                 seek(level, pos, player);
@@ -192,9 +206,14 @@ public final class WitchesRoad {
         }
     }
 
-    /** Shows the seeker the "Seekest thou the Road?" screen. */
+    /**
+     * Shows the seeker the "Seekest thou the Road?" screen: "Walk the Road" (the trials) or, for somebody who has won them all
+     * (or where the trials are switched off), the choice of Billy or Tommy.
+     */
     private static void offerChoice(ServerPlayer player, BlockPos door) {
-        PacketDistributor.sendToPlayer(player, new OpenRoadPayload(door.immutable()));
+        int[] done = RoadTrials.doneAndTotal(player);
+        PacketDistributor.sendToPlayer(player, new OpenRoadPayload(door.immutable(), RoadTrials.doorMode(player) == RoadTrials.DoorMode.ENTER,
+                done[0], done[1]));
     }
 
     /** Called at the end of every level tick: rituals run their course, and open doors pour out light. */
@@ -298,7 +317,8 @@ public final class WitchesRoad {
      */
     public static boolean choose(ServerPlayer player, BlockPos door, Power choice) {
         if ((choice != Power.BILLY && choice != Power.TOMMY) || !player.isAlive() || player.isSpectator()
-                || Powers.power(player).hasPowers() || !near(player, door)) {
+                || Powers.power(player).hasPowers() || !near(player, door)
+                || RoadTrials.doorMode(player) != RoadTrials.DoorMode.CHOOSE) {
             return false;
         }
         ServerLevel level = player.serverLevel();
@@ -312,6 +332,24 @@ public final class WitchesRoad {
         player.getItemInHand(hand).consume(1, player);
         Powers.awaken(player, choice);
         return true;
+    }
+
+    /**
+     * The seeker's answer "Walk the Road" on the screen: the trial he has reached is built for him and he is taken in. He must still
+     * have no powers, hold a gene, stand within {@link #CHOICE_DISTANCE} of the open door, and the trials must be on.
+     *
+     * @return whether the trial is being built
+     */
+    public static boolean enter(ServerPlayer player, BlockPos door) {
+        if (!player.isAlive() || player.isSpectator() || Powers.power(player).hasPowers() || !near(player, door)
+                || RoadTrials.doorMode(player) != RoadTrials.DoorMode.ENTER) {
+            return false;
+        }
+        ServerLevel level = player.serverLevel();
+        if (!level.isLoaded(door) || !isOpen(level.getBlockState(door)) || geneHand(player) == null) {
+            return false;
+        }
+        return RoadTrials.enter(player);
     }
 
     private static boolean near(ServerPlayer player, BlockPos door) {

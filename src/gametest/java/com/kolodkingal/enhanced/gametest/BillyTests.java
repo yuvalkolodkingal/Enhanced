@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
+import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -101,9 +102,12 @@ public final class BillyTests {
 
     // ---- Becoming Billy (or Tommy): the Witches' Road Door ----
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    // (3.2: with the trials on, the door asks to walk the Road and the choice comes at its end: these two tests pin the door as it is
+    // when witches_road.enabled is off, which is the 3.1 door; RoadDoorTests pins the new one.)
+    @GameTest(template = ARENA, timeoutTicks = 200, batch = "witches_road_classic")
     public static void geneAndDoorAwakenBillyOrTommy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(WitchesRoadConfig.ENABLED, false);
         ServerLevel level = helper.getLevel();
         BlockPos door = placeDoor(helper, 10, 10);
         ServerPlayer seeker = f.player(10.5, FLOOR, 12.5);
@@ -131,9 +135,10 @@ public final class BillyTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @GameTest(template = ARENA, batch = "witches_road_classic")
     public static void theRoadOpensOnlyForWitchBloodWithoutPowers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(WitchesRoadConfig.ENABLED, false);
         ServerLevel level = helper.getLevel();
         BlockPos door = placeDoor(helper, 10, 10);
         ServerPlayer nobody = f.player(10.5, FLOOR, 12.5);

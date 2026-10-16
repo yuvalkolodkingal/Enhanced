@@ -17,33 +17,49 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * "Seekest thou the Road?": a Witches' Road door opened for a seeker holding a Scarlet Witch Gene, who chooses whose
- * road to walk, Billy's or Tommy's. The server checks everything again (still no powers, still a gene, still near the
- * open door). The screen closes by itself when the door does, or when the seeker walks away.
+ * "Seekest thou the Road?": a Witches' Road door opened for a seeker holding a Scarlet Witch Gene. Either he is asked to walk the
+ * Road ("Walk the Road": the trials, 3.2) or, once he has won them all (or where the trials are off), he chooses whose road to
+ * walk, Billy's or Tommy's. The server checks everything again (still no powers, still a gene, still near the open door, and
+ * which of the two he may answer). The screen closes by itself when the door does, or when the seeker walks away.
  */
 public class WitchesRoadScreen extends Screen {
     private static final int CHOICE_WIDTH = 170;
     private static final int CHOICE_HEIGHT = 44;
     private static final int GAP = 10;
+    /** How long the door may take to show as open on the client (ticks). */
+    private static final int OPEN_GRACE_TICKS = 20;
 
     private final BlockPos door;
+    private final boolean trials;
+    private final int done;
+    private final int total;
+    /** Ticks the screen has been up. */
+    private int age;
 
-    public WitchesRoadScreen(BlockPos door) {
+    public WitchesRoadScreen(BlockPos door, boolean trials, int done, int total) {
         super(Component.translatable("screen.enhanced.road.title"));
         this.door = door;
+        this.trials = trials;
+        this.done = done;
+        this.total = total;
     }
 
     /** Opens the screen (called when the server says the door opened for us). */
-    public static void open(BlockPos door) {
-        Minecraft.getInstance().setScreen(new WitchesRoadScreen(door));
+    public static void open(BlockPos door, boolean trials, int done, int total) {
+        Minecraft.getInstance().setScreen(new WitchesRoadScreen(door, trials, done, total));
     }
 
     @Override
     protected void init() {
         int top = height / 2 - CHOICE_HEIGHT / 2 - 6;
-        int left = width / 2 - CHOICE_WIDTH - GAP / 2;
-        addRenderableWidget(new Choice(left, top, Power.BILLY, Power.BILLY.color, "screen.enhanced.road.billy"));
-        addRenderableWidget(new Choice(left + CHOICE_WIDTH + GAP, top, Power.TOMMY, Power.TOMMY.glow, "screen.enhanced.road.tommy"));
+        if (trials) {
+            // Power.NONE is the answer "Walk the Road".
+            addRenderableWidget(new Choice(width / 2 - CHOICE_WIDTH / 2, top, Power.NONE, WitchesRoad.LIGHT, "screen.enhanced.road.walk"));
+        } else {
+            int left = width / 2 - CHOICE_WIDTH - GAP / 2;
+            addRenderableWidget(new Choice(left, top, Power.BILLY, Power.BILLY.color, "screen.enhanced.road.billy"));
+            addRenderableWidget(new Choice(left + CHOICE_WIDTH + GAP, top, Power.TOMMY, Power.TOMMY.glow, "screen.enhanced.road.tommy"));
+        }
         addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b -> onClose())
                 .bounds(width / 2 - 50, top + CHOICE_HEIGHT + 16, 100, 20).build());
     }
@@ -62,7 +78,10 @@ public class WitchesRoadScreen extends Screen {
         }
         boolean open = mc.level.getBlockState(door).getOptionalValue(WitchesRoadDoorBlock.OPEN).orElse(false);
         boolean near = mc.player.position().distanceToSqr(Vec3.atBottomCenterOf(door)) <= WitchesRoad.CHOICE_DISTANCE * WitchesRoad.CHOICE_DISTANCE;
-        if (!open || !near) {
+        // The server sends this screen in the same tick it opens the door, and the door's new state can reach us a moment after the
+        // screen does: a door that has not shown as open yet gets a second to do so.
+        age++;
+        if (!near || (!open && age > OPEN_GRACE_TICKS)) {
             onClose();
         }
     }
@@ -73,6 +92,10 @@ public class WitchesRoadScreen extends Screen {
         int top = height / 2 - CHOICE_HEIGHT / 2 - 6;
         graphics.drawCenteredString(font, title.copy().withStyle(s -> s.withColor(WitchesRoad.LIGHT_CORE).withBold(true).withItalic(true)),
                 width / 2, top - 22, 0xFFFFFF);
+        if (trials) {
+            graphics.drawCenteredString(font, Component.translatable("screen.enhanced.road.progress", Math.min(done + 1, total), total)
+                    .withStyle(ChatFormatting.GRAY), width / 2, top - 10, 0xFFFFFF);
+        }
     }
 
     @Override
