@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.BiPredicate;
 import java.util.function.LongSupplier;
 
@@ -55,6 +56,8 @@ public final class BuildScheduler {
     public static final int FLOOR_WRITES = 256;
     /** The most particles all spells together show in a tick (D-B 7.2). */
     public static final int SPARKS = 64;
+    /** How long an Instant spell waits for the disk writer before it looks again (nanoseconds). */
+    private static final long YIELD_NANOS = 50_000L;
 
     private static final Map<UUID, Deque<BuildJob>> QUEUES = new LinkedHashMap<>();
     private static final Set<UUID> MANUAL = new HashSet<>();
@@ -322,7 +325,9 @@ public final class BuildScheduler {
      */
     private static double turn(BuildJob job, Tick tick, double weights) {
         double weight = job.weight();
-        if (!job.finished()) {
+        if (!job.finished() && job.instant()) {
+            instantTurn(job); // (an Instant spell that waited behind another: its turn is all of it)
+        } else if (!job.finished()) {
             long share = weights <= weight ? tick.units() : (long) Math.floor(tick.units() * weight / weights);
             try {
                 tick.use(job.step(tick, share));
@@ -336,6 +341,50 @@ public final class BuildScheduler {
             remove(job);
         }
         return Math.max(0.0, weights - weight);
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Instant (Wanda's Instant level, 3.2)
+
+    /**
+     * Writes an Instant job (one made with {@link BuildJob#instant}) all at once, inside the tick that calls this, when it
+     * is the spell at work of its caster (else its turn comes with the tick that finds it first in her queue, and it is
+     * written then). It takes no share of the shared budget: the writes and the sections of its tick are unbounded, there
+     * is no pace and no growing; only the clock limits it ({@link BuildJob#instantNanos}: {@code instantMaxMillis}, a
+     * third of the server's watchdog at most). If that time runs out before the job is done, it goes on at normal speed
+     * over the next ticks (and its caster is told); the rules of every cell, the undo records written ahead and the chunks
+     * that are loaded are those of any spell.
+     */
+    public static void runInstant(BuildJob job) {
+        if (working(job.caster()) == job) {
+            instantTurn(job);
+            if (job.finished()) {
+                remove(job);
+            }
+        }
+    }
+
+    private static void instantTurn(BuildJob job) {
+        Budget budget = new Budget(job.instantNanos(), Integer.MAX_VALUE / BuildJob.WRITE, Integer.MAX_VALUE, 1, System::nanoTime, () -> 0L, 0L, 0);
+        Tick tick = budget.start();
+        while (!job.finished() && job.instant()) {
+            try {
+                tick.use(job.step(tick, tick.units()));
+            } catch (RuntimeException e) {
+                job.fail(e);
+                break;
+            }
+            if (job.finished() || !job.instant()) {
+                break;
+            }
+            if (tick.timeUp()) {
+                job.fellBehind();
+                break;
+            }
+            if (job.yielded()) {
+                LockSupport.parkNanos(YIELD_NANOS); // (the writer thread is putting the undo records down)
+            }
+        }
     }
 
     // ------------------------------------------------------------------------------------------------------------

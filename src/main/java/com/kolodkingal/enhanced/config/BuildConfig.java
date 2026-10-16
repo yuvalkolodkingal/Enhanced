@@ -7,15 +7,15 @@ import java.util.List;
 /**
  * The numbers of Build Magic, the building spells of the Scarlet Witch and Billy (3.1): the rules every builder shares
  * (TOML section {@code [build_magic]}), Wanda's own ({@code [build_magic_wanda]}: her magic has no limit, only technical
- * safety) and Billy's ({@code [build_magic_billy]}: his magic meter and his four ranks). Its options are defined in
+ * safety) and Billy's ({@code [build_magic_billy]}: his magic meter and his ten ranks). Its options are defined in
  * {@link #define}, which {@code EnhancedConfig} calls while it builds the server config; it pushes the three sections
  * itself. Ticks are 1/20 s. Every option is read when it is used and never cached, so editing the config file changes it
  * live; a value read on the client is guarded with {@code EnhancedConfig.SPEC.isLoaded()}.
  *
  * <p>Billy's numbers are those of his first rank, an Apprentice; {@code BillyRanks} grows them rank by rank. A family that
- * wants him as strong as his mother sets {@code build_magic_billy.maxRank} 4, the three practice numbers 0 and a large
- * meter. A comment names another option with its section ({@code build_magic_billy.meter}), never as {@code billy.x},
- * which is the {@code [billy]} section of his other powers.
+ * wants him as strong as his mother sets the nine practice numbers 0 and a large meter. A comment names another option
+ * with its section ({@code build_magic_billy.meter}), never as {@code billy.x}, which is the {@code [billy]} section of
+ * his other powers.
  */
 public final class BuildConfig {
     /** The TOML section of the rules every builder shares. */
@@ -80,6 +80,8 @@ public final class BuildConfig {
     public static ModConfigSpec.IntValue WANDA_BRUSH_MAX;
     public static ModConfigSpec.IntValue WANDA_SHAPE_MAX_RADIUS;
     public static ModConfigSpec.IntValue WANDA_REPEAT_MAX;
+    public static ModConfigSpec.IntValue WANDA_INSTANT_MAX_BLOCKS;
+    public static ModConfigSpec.IntValue WANDA_INSTANT_MAX_MILLIS;
 
     // ---- [build_magic_billy]: his numbers as an Apprentice, and how he grows ----
     public static ModConfigSpec.BooleanValue BILLY_ENABLED;
@@ -89,9 +91,8 @@ public final class BuildConfig {
     public static ModConfigSpec.IntValue BILLY_REACH;
     public static ModConfigSpec.IntValue BILLY_UNDO_STEPS;
     public static ModConfigSpec.IntValue BILLY_REPEAT_MAX;
-    public static ModConfigSpec.IntValue BILLY_RANK2_PRACTICE;
-    public static ModConfigSpec.IntValue BILLY_RANK3_PRACTICE;
-    public static ModConfigSpec.IntValue BILLY_RANK4_PRACTICE;
+    /** The practice each rank needs ({@code rank2Practice} to {@code rank10Practice}), by rank - 1; the first is unused (null). */
+    public static final ModConfigSpec.IntValue[] BILLY_PRACTICE = new ModConfigSpec.IntValue[10];
     public static ModConfigSpec.IntValue BILLY_MAX_RANK;
     public static ModConfigSpec.IntValue BILLY_CAST_PAUSE;
     public static ModConfigSpec.IntValue BILLY_MOM_RANGE;
@@ -205,31 +206,42 @@ public final class BuildConfig {
                 .defineInRange("shapeMaxRadius", 512, 8, 1024);
         WANDA_REPEAT_MAX = builder.comment("0: no count, only the spell's blocks. Otherwise the most copies in a Repeat.")
                 .defineInRange("repeatMax", 0, 0, 65536);
+        WANDA_INSTANT_MAX_BLOCKS = builder.comment("Her Instant level (3.2): while its switch is on in build mode, a spell, an undo or a redo of at most this many",
+                        "blocks is written all at once, in the tick it is cast (no growing, no waiting). A bigger one goes at normal speed and",
+                        "she is told. 0: no Instant level at all. Every rule still holds: arenas, claims, Hexes and loaded chunks only.",
+                        "The server stands still while it writes: 250,000 blocks take about a second, a million about four (with the undo kept",
+                        "on disk), so raise this only on a strong server.")
+                .defineInRange("instantMaxBlocks", 250000, 0, 100000000);
+        WANDA_INSTANT_MAX_MILLIS = builder.comment("The longest (milliseconds) one Instant spell may hold the server's tick (never more than a third of",
+                        "the server's max-tick-time, which kills a server stuck for longer). When the time is up, the blocks left are written at",
+                        "normal speed over the next ticks and she is told.")
+                .defineInRange("instantMaxMillis", 5000, 100, 50000);
         builder.pop();
 
         builder.push(BILLY_SECTION);
         BILLY_ENABLED = builder.comment("Billy has Build Magic.")
                 .define("enabled", true);
-        BILLY_METER = builder.comment("His magic meter (blocks) as an Apprentice; it doubles with each rank.")
+        BILLY_METER = builder.comment("His magic meter (blocks) as an Apprentice; it doubles with each rank to rank 4, and reaches 64 times as much at rank 10.")
                 .defineInRange("meter", 512, 16, 65536);
-        BILLY_REFILL = builder.comment("Blocks of magic he gets back each second as an Apprentice; half of it more each rank.")
+        BILLY_REFILL = builder.comment("Blocks of magic he gets back each second as an Apprentice; half of it more each rank to rank 4, 12 times as much at rank 10.")
                 .defineInRange("refill", 16.0, 0.0, 4096.0);
-        BILLY_MAX_SIDE = builder.comment("The longest side of anything he builds, copies or selects as an Apprentice; +8 each rank.")
+        BILLY_MAX_SIDE = builder.comment("The longest side of anything he builds, copies or selects as an Apprentice; +8 each rank (96 at rank 10).")
                 .defineInRange("maxSide", 24, 1, 256);
-        BILLY_REACH = builder.comment("How far (blocks) he points as an Apprentice; +8 each rank.")
+        BILLY_REACH = builder.comment("How far (blocks) he points as an Apprentice; +8 each rank (96 at rank 10).")
                 .defineInRange("reach", 24, 2, 128);
-        BILLY_UNDO_STEPS = builder.comment("Spells he can undo as an Apprentice; +2 each rank.")
+        BILLY_UNDO_STEPS = builder.comment("Spells he can undo as an Apprentice; +2 each rank (28 at rank 10).")
                 .defineInRange("undoSteps", 10, 1, 100);
-        BILLY_REPEAT_MAX = builder.comment("The most copies in a Repeat as an Apprentice; +4 each rank.")
+        BILLY_REPEAT_MAX = builder.comment("The most copies in a Repeat as an Apprentice; +4 each rank (44 at rank 10).")
                 .defineInRange("repeatMax", 8, 1, 64);
-        BILLY_RANK2_PRACTICE = builder.comment("Blocks of magic he must cast to become a Spellcaster (rank 2).")
-                .defineInRange("rank2Practice", 2000, 0, 10000000);
-        BILLY_RANK3_PRACTICE = builder.comment("Blocks of magic he must cast to become a Sorcerer (rank 3).")
-                .defineInRange("rank3Practice", 8000, 0, 10000000);
-        BILLY_RANK4_PRACTICE = builder.comment("Blocks of magic he must cast to become Wiccan (rank 4).")
-                .defineInRange("rank4Practice", 30000, 0, 10000000);
-        BILLY_MAX_RANK = builder.comment("The highest rank he can reach (1: he never grows).")
-                .defineInRange("maxRank", 4, 1, 4);
+        String[] names = {null, "a Spellcaster", "a Sorcerer", "Wiccan", "an Enchanter", "a Mystic", "a Wizard", "an Archmage", "a Reality Weaver",
+                "the Chaos Master"};
+        int[] practice = {0, 2000, 8000, 30000, 60000, 120000, 220000, 380000, 600000, 1000000};
+        for (int rank = 2; rank <= BILLY_PRACTICE.length; rank++) {
+            BILLY_PRACTICE[rank - 1] = builder.comment("Blocks of magic he must cast to become " + names[rank - 1] + " (rank " + rank + ").")
+                    .defineInRange("rank" + rank + "Practice", practice[rank - 1], 0, 10000000);
+        }
+        BILLY_MAX_RANK = builder.comment("The highest rank he can reach (1: he never grows; 10: the Chaos Master). Ranks 1 to 4 are those of 3.1.")
+                .defineInRange("maxRank", 10, 1, 10);
         BILLY_CAST_PAUSE = builder.comment("Ticks after one of his spells before the next.")
                 .defineInRange("castPause", 10, 0, 200);
         BILLY_MOM_RANGE = builder.comment("How near (blocks) a Scarlet Witch must be to help him (0: never).")

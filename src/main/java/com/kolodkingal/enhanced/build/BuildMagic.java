@@ -223,6 +223,9 @@ public final class BuildMagic {
             }
         }
         BuildJob job = BuildJob.spell(player, limits, clamped, token, flags, setup, plan, BuildScheduler.loaded(player.getUUID(), level));
+        if (session.instant()) {
+            job.instant(limits.instantMax());
+        }
         BuildScheduler.queue(job, false);
         job.fx(BuildFxPayload.START);
         BuildSounds.cast(level, player.position(), limits.hero(), plan != null && plan.prepared() ? plan.size() : 0L);
@@ -230,6 +233,7 @@ public final class BuildMagic {
             momHelps(player, session);
         }
         sync(player.server, player.getUUID());
+        BuildScheduler.runInstant(job); // (Instant: it is all written before this tick ends; else this does nothing)
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -494,7 +498,7 @@ public final class BuildMagic {
 
     /**
      * One of the builder's actions arrived ({@code BuildActionPayload}'s {@code MODE}, {@code UNDO}, {@code REDO},
-     * {@code PICK}, {@code PICK_BLOCK}, {@code HAND}, {@code STROKE_END}, {@code VIEW}, {@code POCKET}), with its box
+     * {@code PICK}, {@code PICK_BLOCK}, {@code HAND}, {@code STROKE_END}, {@code VIEW}, {@code POCKET}, {@code INSTANT}), with its box
      * {@code a}-{@code b} and its number. UNDO and REDO need no build mode (R42).
      */
     public static void action(ServerPlayer player, int action, BlockPos a, BlockPos b, int value) {
@@ -508,6 +512,7 @@ public final class BuildMagic {
             case BuildActionPayload.MODE -> setMode(player, value != 0);
             case BuildActionPayload.UNDO -> undo(player);
             case BuildActionPayload.REDO -> redo(player);
+            case BuildActionPayload.INSTANT -> setInstant(player, value != 0);
             case BuildActionPayload.PICK -> pick(player, a);
             case BuildActionPayload.PICK_BLOCK -> pickBlock(player, value);
             case BuildActionPayload.HAND -> {
@@ -573,6 +578,35 @@ public final class BuildMagic {
     }
 
     /**
+     * The Scarlet Witch's Instant switch (3.2) on or off: on only for her, in build mode, and while the server allows it
+     * ({@code instantMaxBlocks} above 0); anything else is told why. Her HUD learns it from {@code BuildData.instant}.
+     */
+    public static void setInstant(ServerPlayer player, boolean on) {
+        Limits limits = Limits.of(player);
+        if (limits == null || !player.isAlive() || player.isSpectator()) {
+            return;
+        }
+        BuildSession session = BuildSession.of(player.getUUID());
+        if (!on) {
+            if (session.instant()) {
+                session.setInstant(false);
+                player.displayClientMessage(Component.translatable("message.enhanced.build.instant_off"), true);
+            }
+            sync(player.server, player.getUUID());
+            return;
+        }
+        if (limits.hero() != Power.SCARLET_WITCH) {
+            player.displayClientMessage(Component.translatable("message.enhanced.build.instant_wanda"), true);
+        } else if (limits.instantMax() <= 0) {
+            player.displayClientMessage(Component.translatable("message.enhanced.build.instant_disabled"), true);
+        } else if (session.mode() && !session.instant()) {
+            session.setInstant(true);
+            player.displayClientMessage(Component.translatable("message.enhanced.build.instant_on", Component.keybind("key.enhanced.build_instant")), true);
+        }
+        sync(player.server, player.getUUID());
+    }
+
+    /**
      * Build mode off (the key, a death, a respawn, a logout, a power change, Adventure or Spectator): the view the others
      * see goes; the spells go on. {@code say}: the builder is told.
      */
@@ -581,6 +615,7 @@ public final class BuildMagic {
         boolean was = session != null && session.mode();
         if (session != null) {
             session.setMode(false);
+            session.setInstant(false);
         }
         // (A player who never built has no view, and is given none.)
         BuildView view = player.getExistingData(ModAttachments.BUILD_VIEW).orElse(null);
@@ -588,8 +623,8 @@ public final class BuildMagic {
             player.setData(ModAttachments.BUILD_VIEW, view.withActive(false));
         }
         BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(null);
-        if (data != null && data.momNear()) {
-            player.setData(ModAttachments.BUILD_DATA, data.withMomNear(false));
+        if (data != null && (data.momNear() || data.instant())) {
+            player.setData(ModAttachments.BUILD_DATA, data.withMomNear(false).withInstant(false));
         }
         if (was && say) {
             player.displayClientMessage(Component.translatable("message.enhanced.build.off"), true);
@@ -835,12 +870,18 @@ public final class BuildMagic {
 
     private static void replay(ServerPlayer player, ServerLevel level, UndoStep step, BuildJob job) {
         UUID id = player.getUUID();
+        BuildSession session = BuildSession.existing(id);
+        Limits limits = Limits.of(player);
+        if (session != null && session.instant() && limits != null) {
+            job.instant(limits.instantMax()); // (an undo or a redo is written all at once too)
+        }
         BuildScheduler.queue(job, false);
         job.fx(BuildFxPayload.START);
         BoundingBox box = step.bounds();
         // At the caster, who must hear his own undo (an undo in another dimension than his, at the spell's middle).
         BuildSounds.undo(level, player.level() == level || box == null ? player.position() : Vec3.atCenterOf(box.getCenter()));
         sync(player.server, id);
+        BuildScheduler.runInstant(job);
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -1042,8 +1083,10 @@ public final class BuildMagic {
         BuildJob working = BuildScheduler.working(id);
         // (A player who never built has no data, and is given none while there is nothing to show.)
         BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        BuildSession session = BuildSession.existing(id);
         BuildData next = data.withHistory(history == null ? 0 : history.undoCount(), history == null ? 0 : history.redoCount())
-                .withWork(working != null, BuildScheduler.waiting(id), working == null ? 0 : working.permille());
+                .withWork(working != null, BuildScheduler.waiting(id), working == null ? 0 : working.permille())
+                .withInstant(session != null && session.instant());
         if (!next.equals(data)) {
             player.setData(ModAttachments.BUILD_DATA, next);
         }

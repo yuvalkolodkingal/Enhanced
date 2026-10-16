@@ -21,7 +21,7 @@ import net.minecraft.util.Mth;
  * @param meter      Billy's meter at {@code meterAt}, in blocks of magic; {@link #FULL} or anything at or above the top
  *                   reads full
  * @param meterAt    the game time the meter had {@code meter}
- * @param rank       his rank, 1 (Apprentice) to 4 (Wiccan); it never goes down ({@link BillyRanks})
+ * @param rank       his rank, 1 (Apprentice) to 10 (Chaos Master); it never goes down ({@link BillyRanks})
  * @param practice   the blocks of magic he has cast (an undo takes back those it restores)
  * @param pocket     the id of the copy in the pocket (0: the pocket is empty); a client that lacks it asks for it
  * @param pocketSize the copy's size on each axis
@@ -32,13 +32,16 @@ import net.minecraft.util.Mth;
  * @param queued     how many more wait behind it
  * @param progress   the working spell's progress, in thousandths
  * @param pauseUntil the game time Billy may cast again after his last spell
+ * @param instant    the Scarlet Witch's Instant switch is on (3.2): the HUD's badge and the wheel's button show it
  */
 public record BuildData(double meter, long meterAt, int rank, long practice, int pocket, Vec3i pocketSize, boolean momNear,
-                        int undo, int redo, boolean working, int queued, int progress, long pauseUntil) {
+                        int undo, int redo, boolean working, int queued, int progress, long pauseUntil,
+                        boolean instant) {
     /** A meter that reads full, whatever its top (bigger than any meter can be). */
     public static final double FULL = 1.0E9;
     /** Billy at rank 1 with a full meter, no pocket, nothing to undo: what a player who never built reads as. */
-    public static final BuildData EMPTY = new BuildData(FULL, 0L, BillyRanks.MIN_RANK, 0L, 0, Vec3i.ZERO, false, 0, 0, false, 0, 0, 0L);
+    public static final BuildData EMPTY = new BuildData(FULL, 0L, BillyRanks.MIN_RANK, 0L, 0, Vec3i.ZERO, false, 0, 0, false, 0, 0, 0L,
+            false);
 
     /** Only the saved part: what the moment shows starts empty again after a load (and after a death). */
     public static final Codec<BuildData> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -49,7 +52,7 @@ public record BuildData(double meter, long meterAt, int rank, long practice, int
             Codec.INT.optionalFieldOf("pocket", 0).forGetter(BuildData::pocket),
             Vec3i.CODEC.optionalFieldOf("pocket_size", Vec3i.ZERO).forGetter(BuildData::pocketSize)
     ).apply(i, (meter, meterAt, rank, practice, pocket, pocketSize) ->
-            new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, false, 0, 0, false, 0, 0, 0L)));
+            new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, false, 0, 0, false, 0, 0, 0L, false)));
 
     /** Everything, saved or not, to the player himself. */
     public static final StreamCodec<ByteBuf, BuildData> STREAM_CODEC = StreamCodec.of((buf, d) -> {
@@ -68,12 +71,13 @@ public record BuildData(double meter, long meterAt, int rank, long practice, int
         ByteBufCodecs.VAR_INT.encode(buf, d.queued);
         ByteBufCodecs.VAR_INT.encode(buf, d.progress);
         ByteBufCodecs.VAR_LONG.encode(buf, d.pauseUntil);
+        ByteBufCodecs.BOOL.encode(buf, d.instant);
     }, buf -> new BuildData(ByteBufCodecs.DOUBLE.decode(buf), ByteBufCodecs.VAR_LONG.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
             ByteBufCodecs.VAR_LONG.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
             new Vec3i(ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf)),
             ByteBufCodecs.BOOL.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
             ByteBufCodecs.BOOL.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
-            ByteBufCodecs.VAR_LONG.decode(buf)));
+            ByteBufCodecs.VAR_LONG.decode(buf), ByteBufCodecs.BOOL.decode(buf)));
 
     public BuildData {
         rank = Mth.clamp(rank, BillyRanks.MIN_RANK, BillyRanks.MAX_RANK);
@@ -96,36 +100,41 @@ public record BuildData(double meter, long meterAt, int rank, long practice, int
 
     /** The meter set to {@code meter} at game time {@code gameTime} (a spell paid, an undo refunded, a rank-up's gift). */
     public BuildData withMeter(double meter, long gameTime) {
-        return new BuildData(meter, gameTime, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, gameTime, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 
     public BuildData withRank(int rank) {
-        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 
     public BuildData withPractice(long practice) {
-        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 
     public BuildData withPocket(int pocket, Vec3i pocketSize) {
-        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 
     public BuildData withMomNear(boolean momNear) {
-        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 
     /** How many spells can be undone and redone now. */
     public BuildData withHistory(int undo, int redo) {
-        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 
     /** Whether a spell is at work, how many wait behind it, and how far it is (thousandths). */
     public BuildData withWork(boolean working, int queued, int progress) {
-        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 
     public BuildData withPauseUntil(long pauseUntil) {
-        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil);
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
+    }
+
+    /** The Scarlet Witch's Instant switch on or off (the server sets it; the client only reads it). */
+    public BuildData withInstant(boolean instant) {
+        return new BuildData(meter, meterAt, rank, practice, pocket, pocketSize, momNear, undo, redo, working, queued, progress, pauseUntil, instant);
     }
 }

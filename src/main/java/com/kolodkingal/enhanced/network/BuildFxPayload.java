@@ -25,7 +25,8 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  * @param permille how far the spell is, in thousandths
  * @param cells    how many blocks it changes
  * @param momId    the entity id of the Scarlet Witch who helps Billy (her scarlet thread), or -1
- * @param order    how the ripple sweeps: {@link #RISE}, {@link #MELT}, {@link #SHELLS}, {@link #COLUMNS}
+ * @param order    how the ripple sweeps: {@link #RISE}, {@link #MELT}, {@link #SHELLS}, {@link #COLUMNS}, or {@link #POP}
+ *                 (an Instant spell: no sweep)
  */
 public record BuildFxPayload(int kind, int job, int casterId, int hero, BlockPos min, BlockPos max, BlockPos origin, int permille,
                              int cells, int momId, int order) implements CustomPacketPayload {
@@ -48,6 +49,9 @@ public record BuildFxPayload(int kind, int job, int casterId, int hero, BlockPos
     public static final int SHELLS = 2;
     /** Chunk column by chunk column, outward from the caster (a valley-sized spell). */
     public static final int COLUMNS = 3;
+
+    /** All at once (Wanda's Instant level): no sweep, the box flashes where the blocks appear. */
+    public static final int POP = 4;
 
     /** No Scarlet Witch helps. */
     public static final int NO_MOM = -1;

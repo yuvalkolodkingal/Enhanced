@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
+import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildView;
@@ -308,16 +309,20 @@ public final class V31SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // Billy's ranks (S8, B11)
 
-    /** Every number of Billy's four ranks grows from the five of his first (D-B 8.2), and practice makes the rank. */
+    /**
+     * Every number of Billy's ten ranks grows from the five of his first (D-B 8.2, 3.2: ranks 1 to 4 are those of 3.1), and
+     * practice makes the rank.
+     */
     @GameTest(template = ARENA, batch = "v31_skeleton_ranks")
     public static void billysRanksComeFromFiveNumbers(GameTestHelper helper) {
-        int[] meter = {512, 1024, 2048, 4096};
-        double[] refill = {16, 24, 32, 40};
-        int[] side = {24, 32, 40, 48};
-        int[] undos = {10, 12, 14, 16};
-        int[] repeat = {8, 12, 16, 20};
-        int[] brush = {3, 4, 5, 6};
-        for (int rank = 1; rank <= 4; rank++) {
+        int[] meter = {512, 1024, 2048, 4096, 6144, 8192, 12288, 16384, 24576, 32768};
+        double[] refill = {16, 24, 32, 40, 56, 72, 96, 128, 160, 192};
+        int[] side = {24, 32, 40, 48, 56, 64, 72, 80, 88, 96};
+        int[] undos = {10, 12, 14, 16, 18, 20, 22, 24, 26, 28};
+        int[] repeat = {8, 12, 16, 20, 24, 28, 32, 36, 40, 44};
+        int[] brush = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        check(BillyRanks.MAX_RANK == 10 && BillyRanks.maxRank() == 10, "ten ranks, and the config's default lets him reach the tenth");
+        for (int rank = 1; rank <= 10; rank++) {
             int i = rank - 1;
             check(BillyRanks.meter(rank) == meter[i], "rank " + rank + ": a meter of " + BillyRanks.meter(rank));
             assertNear(BillyRanks.refill(rank), refill[i], 1.0E-9, "rank " + rank + ": the refill a second");
@@ -330,9 +335,33 @@ public final class V31SkeletonTests {
             check(BillyRanks.rank(BuildData.EMPTY.withRank(rank)) == rank, "rank " + rank + " applies");
         }
         check(BillyRanks.rankFor(0) == 1 && BillyRanks.rankFor(1999) == 1 && BillyRanks.rankFor(2000) == 2 && BillyRanks.rankFor(7999) == 2
-                && BillyRanks.rankFor(8000) == 3 && BillyRanks.rankFor(30000) == 4 && BillyRanks.rankFor(Long.MAX_VALUE) == 4,
+                && BillyRanks.rankFor(8000) == 3 && BillyRanks.rankFor(29999) == 3 && BillyRanks.rankFor(30000) == 4,
                 "practice makes the rank: 2,000, 8,000, 30,000");
-        check(BillyRanks.nameKey(4).equals("hud.enhanced.build.rank.4"), "the fourth rank is Wiccan's");
+        long[] practice = {0, 2000, 8000, 30000, 60000, 120000, 220000, 380000, 600000, 1000000};
+        for (int rank = 1; rank <= 10; rank++) {
+            check(BillyRanks.practiceFor(rank) == practice[rank - 1] && BillyRanks.rankFor(practice[rank - 1]) == rank,
+                    "rank " + rank + " needs " + practice[rank - 1] + " blocks of practice");
+            check(rank == 1 || BillyRanks.rankFor(practice[rank - 1] - 1) == rank - 1, "one block short of rank " + rank + " is rank " + (rank - 1));
+            if (rank > 1) {
+                check(BillyRanks.meter(rank) > BillyRanks.meter(rank - 1) && BillyRanks.refill(rank) > BillyRanks.refill(rank - 1)
+                        && BillyRanks.side(rank) > BillyRanks.side(rank - 1) && BillyRanks.undoSteps(rank) > BillyRanks.undoSteps(rank - 1)
+                        && BillyRanks.repeatMax(rank) > BillyRanks.repeatMax(rank - 1) && BillyRanks.brush(rank) > BillyRanks.brush(rank - 1),
+                        "every number of rank " + rank + " is more than the rank before");
+            }
+        }
+        check(BillyRanks.rankFor(Long.MAX_VALUE) == 10, "the most practice is rank 10");
+        check(BillyRanks.nameKey(4).equals("hud.enhanced.build.rank.4") && BillyRanks.nameKey(10).equals("hud.enhanced.build.rank.10"),
+                "the fourth rank is Wiccan's, the tenth has a name key too");
+        check(BillyRanks.meter(10) < 100_000 && BillyRanks.side(10) < 256 && BillyRanks.reach(10) < 256 && BillyRanks.brush(10) < 16,
+                "rank 10 is strong but still under the Scarlet Witch's limitless numbers (a selection of 100,000, a reach of 256, a brush of 16)");
+
+        // A Billy of 3.1 at rank 4 with 30,000 blocks of practice keeps his rank, and 3.2 only adds the way on from there.
+        BuildData old = BuildData.EMPTY.withRank(4).withPractice(30000L);
+        check(BillyRanks.rank(old) == 4 && BillyMagic.practise(old, 0L, 29999L).data().rank() == 4 && !BillyMagic.practise(old, 0L, 29999L).rankedUp(),
+                "a rank-4 Billy of 3.1 stays at rank 4 until his practice reaches 60,000");
+        BuildData grown = BillyMagic.practise(old, 5L, 30000L).data();
+        check(BillyMagic.practise(old, 5L, 30000L).rankedUp() && grown.rank() == 5 && BillyMagic.meter(grown, 5L) == 6144,
+                "at 60,000 he becomes an Enchanter, and his meter is full at 6,144");
 
         // The meter refills by game time, up to its top, and a player who never built has it full.
         check(BillyRanks.meterNow(BuildData.EMPTY, 0L) == 512 && BillyRanks.meterNow(BuildData.EMPTY, 1_000_000L) == 512,
@@ -379,14 +408,14 @@ public final class V31SkeletonTests {
                 "empty is rank 1 with a full meter");
 
         BuildData data = BuildData.EMPTY.withMeter(123.5, 4000L).withRank(3).withPractice(9000L).withPocket(17, new Vec3i(7, 5, 9))
-                .withMomNear(true).withHistory(4, 1).withWork(true, 2, 640).withPauseUntil(4010L);
+                .withMomNear(true).withHistory(4, 1).withWork(true, 2, 640).withPauseUntil(4010L).withInstant(true);
         check(roundTrip(BuildData.STREAM_CODEC, data).equals(data), "the data's stream codec");
         BuildView view = new BuildView(true, Spell.COPY, Optional.of(new BuildView.Box(new BlockPos(5, 1, 5), new BlockPos(-3, 9, 2))));
         check(view.box().get().min().equals(new BlockPos(-3, 1, 2)) && view.box().get().max().equals(new BlockPos(5, 9, 5)),
                 "a box is kept by its low and high corners");
         check(roundTrip(BuildView.STREAM_CODEC, view).equals(view) && roundTrip(BuildView.STREAM_CODEC, BuildView.EMPTY).equals(BuildView.EMPTY),
                 "the view's stream codec");
-        BuildData saved = new BuildData(123.5, 4000L, 3, 9000L, 17, new Vec3i(7, 5, 9), false, 0, 0, false, 0, 0, 0L);
+        BuildData saved = new BuildData(123.5, 4000L, 3, 9000L, 17, new Vec3i(7, 5, 9), false, 0, 0, false, 0, 0, 0L, false);
         Tag nbt = BuildData.CODEC.encodeStart(NbtOps.INSTANCE, data).getOrThrow();
         check(BuildData.CODEC.parse(NbtOps.INSTANCE, nbt).getOrThrow().equals(saved), "only the meter, rank, practice and pocket are saved");
         check(BuildData.CODEC.parse(NbtOps.INSTANCE, new CompoundTag()).getOrThrow().equals(BuildData.EMPTY), "nothing saved reads as empty");

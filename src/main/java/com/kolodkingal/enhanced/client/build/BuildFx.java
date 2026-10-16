@@ -77,6 +77,8 @@ public final class BuildFx {
     static final int REWIND_TICKS = 12;
     /** Ticks a fizzle's flicker lasts. */
     static final int FIZZLE_TICKS = 12;
+    /** Ticks the flash of an Instant spell's box lasts. */
+    static final int POP_TICKS = 8;
     /** Ticks a rank-up's rings and runes last. */
     static final int RANK_TICKS = 40;
     /** How far a builder's hands are worth their particles. */
@@ -243,7 +245,13 @@ public final class BuildFx {
                     }
                 }
             }
-            case BuildFxPayload.DONE -> end(payload.job(), State.DONE, now);
+            case BuildFxPayload.DONE -> {
+                end(payload.job(), State.DONE, now);
+                Run run = RUNS.get(payload.job());
+                if (run != null && run.order == BuildFxPayload.POP && !run.reverse) {
+                    pop(level, run);
+                }
+            }
             case BuildFxPayload.STOPPED -> end(payload.job(), State.REWINDING, now);
             case BuildFxPayload.FIZZLE -> fizzle(level, payload, now);
             case BuildFxPayload.RANK_UP -> {
@@ -291,6 +299,43 @@ public final class BuildFx {
             }
         }
         WorldEffectsRenderer.addHexBolt(new HexBoltPayload(caster.getId(), from, run.origin, forks, run.job * 31L + now));
+    }
+
+    /**
+     * An Instant spell (3.2) appears all at once: sparks fly off the surface of its box, in its hero's colour, at the same
+     * moment the blocks arrive (and {@link #ripple} flashes the box instead of sweeping it).
+     */
+    private static void pop(ClientLevel level, Run run) {
+        RandomSource random = level.getRandom();
+        BoundingBox b = run.box;
+        double sx = b.getXSpan();
+        double sy = b.getYSpan();
+        double sz = b.getZSpan();
+        double faces = sx * sy + sy * sz + sx * sz;
+        int count = (int) Mth.clamp(faces / 8.0, 12.0, EnhancedClientConfig.reducedMotion() ? 16.0 : 64.0);
+        int colour = run.hero == Power.BILLY ? BillyAbilities.MAIN : Power.SCARLET_WITCH.glow;
+        for (int i = 0; i < count; i++) {
+            // A random point of the box's surface: pick a face (by its area), then a spot on it.
+            double pick = random.nextDouble() * faces;
+            double x = b.minX() + random.nextDouble() * sx;
+            double y = b.minY() + random.nextDouble() * sy;
+            double z = b.minZ() + random.nextDouble() * sz;
+            double nx = 0.0;
+            double ny = 0.0;
+            double nz = 0.0;
+            if (pick < sx * sy) {
+                z = random.nextBoolean() ? b.minZ() : b.maxZ() + 1.0;
+                nz = z > b.minZ() ? 1.0 : -1.0;
+            } else if (pick < sx * sy + sy * sz) {
+                x = random.nextBoolean() ? b.minX() : b.maxX() + 1.0;
+                nx = x > b.minX() ? 1.0 : -1.0;
+            } else {
+                y = random.nextBoolean() ? b.minY() : b.maxY() + 1.0;
+                ny = y > b.minY() ? 1.0 : -1.0;
+            }
+            level.addParticle(new EnergyParticleOptions(colour, 0.8F + random.nextFloat() * 0.5F), x, y, z, nx * 0.12 + (random.nextDouble() - 0.5) * 0.04,
+                    ny * 0.12 + (random.nextDouble() - 0.5) * 0.04, nz * 0.12 + (random.nextDouble() - 0.5) * 0.04);
+        }
     }
 
     private static void end(int job, State to, long now) {
@@ -547,6 +592,19 @@ public final class BuildFx {
         float p = run.sweep(time);
         float edge = run.state == State.WORKING ? 1.0F : glow;
         BoundingBox b = run.box;
+        if (run.order == BuildFxPayload.POP) {
+            // Instant (3.2): no sweep, the whole box flashes once where the blocks have just appeared.
+            if (run.state != State.DONE) {
+                return;
+            }
+            float flash = 1.0F - Mth.clamp((time - run.endedAt) / POP_TICKS, 0.0F, 1.0F);
+            if (flash > 0.0F) {
+                slab(pose, vc, new Vec3(b.minX() - camera.x - INFLATE, b.minY() - camera.y, b.minZ() - camera.z - INFLATE),
+                        new Vec3(b.maxX() + 1 - camera.x + INFLATE, b.maxY() + 1 - camera.y, b.maxZ() + 1 - camera.z + INFLATE), run.hero.color,
+                        glowOf(run), 0.3F * flash * flash);
+            }
+            return;
+        }
         double x0 = b.minX() - camera.x - INFLATE;
         double x1 = b.maxX() + 1 - camera.x + INFLATE;
         double y0 = b.minY() - camera.y;

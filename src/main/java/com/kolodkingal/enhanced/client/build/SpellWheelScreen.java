@@ -46,7 +46,8 @@ import java.util.Locale;
  *     (the style row and the blocks follow), a click on the chosen one closes it; <b>1-9</b> and <b>0</b> choose by number
  *     and close; the mouse wheel steps through the spells.</li>
  *     <li><b>The centre disc</b> (a door): stops building, or starts it again.</li>
- *     <li><b>Left</b>: Undo and Redo, with how many there are (grey at 0). <b>Right</b>: the style row of the chosen
+ *     <li><b>Left</b>: Undo and Redo, with how many there are (grey at 0), and, for the Scarlet Witch, her Instant switch
+ *     (3.2). <b>Right</b>: the style row of the chosen
  *     spell, as pictures ({@link StylePictures}); for Shapes also Solid and Hollow. <b>Under the ring</b>: the hotbar's
  *     slots (a click makes that slot's block the material and turns Mix off), the dice (Mix) and the palette
  *     ({@link BlockPaletteScreen}).</li>
@@ -90,7 +91,7 @@ public final class SpellWheelScreen extends Screen {
 
     /** What a rectangle on the wheel is. */
     private enum Kind {
-        UNDO, REDO, MIX, BLOCKS, SLOT, STYLE, SOLID, HOLLOW
+        UNDO, REDO, INSTANT, MIX, BLOCKS, SLOT, STYLE, SOLID, HOLLOW
     }
 
     private record Hit(Kind kind, int index, int x0, int y0, int x1, int y1) {
@@ -180,6 +181,11 @@ public final class SpellWheelScreen extends Screen {
         int left = Math.max(3, right - 70);
         hits.add(new Hit(Kind.UNDO, 0, left, cy - 34, right, cy - 4));
         hits.add(new Hit(Kind.REDO, 0, left, cy + 4, right, cy + 34));
+        Limits limits = mc.player == null ? null : Limits.of(mc.player);
+        if (limits != null && limits.instantMax() > 0) {
+            // Her Instant switch (3.2), under Redo: Billy has no such button.
+            hits.add(new Hit(Kind.INSTANT, 0, left, cy + 42, right, cy + 72));
+        }
 
         // Right: the style row, two tiles wide; Solid and Hollow under the shapes.
         int styles = grammar.spell().styles();
@@ -319,6 +325,7 @@ public final class SpellWheelScreen extends Screen {
 
         // The columns and the row.
         undoRedo(g, font, data, hit, rgb);
+        instantButton(g, font, data, hit, rgb);
         styleRow(g, grammar, hit, rgb);
         hotbar(g, font, player, grammar, hit, rgb);
         if (hit != null && hit.kind() == Kind.SLOT) {
@@ -391,6 +398,9 @@ public final class SpellWheelScreen extends Screen {
                     return new Caption(Component.translatable("screen.enhanced.build.undo", data.undo()), null, WHITE);
                 case REDO:
                     return new Caption(Component.translatable("screen.enhanced.build.redo", data.redo()), null, WHITE);
+                case INSTANT:
+                    return new Caption(Component.translatable(data.instant() ? "screen.enhanced.build.instant_on" : "screen.enhanced.build.instant_off"),
+                            Component.translatable("screen.enhanced.build.instant.desc", BuildKeys.INSTANT.getTranslatedKeyMessage()), rgb);
                 case MIX:
                     return new Caption(Component.translatable("screen.enhanced.build.mix"), null, WHITE);
                 case BLOCKS:
@@ -566,6 +576,31 @@ public final class SpellWheelScreen extends Screen {
         }
     }
 
+    /** Her Instant switch (3.2): a bolt and "Instant", lit in her colour while it is on. */
+    private void instantButton(GuiGraphics g, Font font, BuildData data, @Nullable Hit hit, int rgb) {
+        for (Hit h : hits) {
+            if (h.kind() != Kind.INSTANT) {
+                continue;
+            }
+            boolean on = data.instant();
+            boolean lit = hit == h;
+            button(g, h, lit, on, true, rgb);
+            g.pose().pushPose();
+            g.pose().translate(h.x0() + 6, h.y0() + 5, 0.0F);
+            g.pose().scale(1.8F, 1.8F, 1.0F);
+            g.drawString(font, "⚡", 0, 0, 0xFF000000 | (on || lit ? GOLD : rgb), false);
+            g.pose().popPose();
+            FormattedCharSequence text = HudDraw.visual(Component.translatable("screen.enhanced.build.instant"));
+            int room = h.x1() - h.x0() - 28;
+            float scale = Math.min(1.0F, room / (float) Math.max(1, font.width(text)));
+            g.pose().pushPose();
+            g.pose().translate(h.x0() + 26, h.y0() + (h.y1() - h.y0()) / 2.0F - 4.0F * scale, 0.0F);
+            g.pose().scale(scale, scale, 1.0F);
+            g.drawString(font, text, 0, 0, 0xFF000000 | (on ? WHITE : GREY), true);
+            g.pose().popPose();
+        }
+    }
+
     /** A button's body: a dark plate with an outline, lit when pointed at or switched on. */
     private void button(GuiGraphics g, Hit h, boolean lit, boolean on, boolean live, int rgb) {
         g.fill(h.x0(), h.y0(), h.x1(), h.y1(), HudDraw.argb(on ? HudDraw.darker(rgb) : lit ? 0x1B2840 : 0x101826, 0.9F));
@@ -710,6 +745,10 @@ public final class SpellWheelScreen extends Screen {
                         BuildFeedback.clicked(1.0F);
                         BuildClient.redo();
                     }
+                }
+                case INSTANT -> {
+                    BuildFeedback.clicked(player.getData(ModAttachments.BUILD_DATA).instant() ? 0.8F : 1.4F);
+                    BuildClient.toggleInstant(player);
                 }
                 case MIX -> {
                     BuildFeedback.clicked(grammar.mix() ? 0.9F : 1.3F);

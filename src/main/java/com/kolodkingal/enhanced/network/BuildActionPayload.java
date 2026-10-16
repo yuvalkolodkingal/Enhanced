@@ -23,6 +23,8 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  *     <li>{@link #STROKE_END}: the right button let go of a Paint or brush stroke; {@code value} is the stroke.</li>
  *     <li>{@link #VIEW}: the box others see, {@code a}-{@code b}; {@code value} 0 for none, else the spell's id + 1.</li>
  *     <li>{@link #POCKET}: the client lacks the copy {@code value} (after a relog) and asks for it.</li>
+ *     <li>{@link #INSTANT}: the Scarlet Witch's Instant switch on ({@code value} 1) or off (0); the server answers by
+ *     syncing {@code BuildData.instant}.</li>
  * </ul>
  */
 public record BuildActionPayload(int action, BlockPos a, BlockPos b, int value) implements CustomPacketPayload {
@@ -35,6 +37,7 @@ public record BuildActionPayload(int action, BlockPos a, BlockPos b, int value) 
     public static final int STROKE_END = 6;
     public static final int VIEW = 7;
     public static final int POCKET = 8;
+    public static final int INSTANT = 9;
 
     public static final Type<BuildActionPayload> TYPE = new Type<>(Enhanced.id("build_action"));
 

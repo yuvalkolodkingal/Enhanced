@@ -222,6 +222,11 @@ public final class BuildJob {
     private boolean force;
     /** Whether the spell's chunks are known (at the cast, or once its selected thing or surface is). */
     private boolean chunksKnown = true;
+    /**
+     * Wanda's Instant level (3.2): the most cells it may write in the tick it is cast ({@code instantMaxBlocks}), or 0 when
+     * it works at the normal pace (the switch was off, or it fell back).
+     */
+    private int instantMax;
 
     private final LongOpenHashSet ticketed = new LongOpenHashSet();
     private final LongArrayFIFOQueue ticketOrder = new LongArrayFIFOQueue();
@@ -419,6 +424,65 @@ public final class BuildJob {
         volume = Math.max(1, step.changed());
         paying = step.paid() && BuildRules.paysMaterials(online());
         return this;
+    }
+
+    /**
+     * Makes this job an Instant one (Wanda's Instant level, 3.2): it is written all at once, in the tick it is cast
+     * ({@link BuildScheduler#runInstant}), with no pace, no budget share and no growing ripple, if it is no more than
+     * {@code max} cells; a bigger one is told so and works at the normal pace. A job whose size is known only once it
+     * has flooded or surfaced its thing makes the same choice then.
+     */
+    public void instant(int max) {
+        instantMax = Math.max(0, max);
+        if (instantMax == 0) {
+            return;
+        }
+        if (kind != Kind.SPELL) {
+            tooBigForInstant(step.changed());
+        } else if (plan != null && plan.prepared()) {
+            tooBigForInstant(plan.size());
+        }
+    }
+
+    /** Whether it is still to be written at once (Instant, not finished). */
+    public boolean instant() {
+        return instantMax > 0 && !finished;
+    }
+
+    /** The longest it may hold the tick: {@code instantMaxMillis}, and a third of the server's watchdog at most (nanoseconds). */
+    long instantNanos() {
+        long millis = BuildConfig.WANDA_INSTANT_MAX_MILLIS.get();
+        if (level.getServer() instanceof net.minecraft.server.dedicated.DedicatedServer dedicated && dedicated.getMaxTickLength() > 0L) {
+            millis = Math.min(millis, Math.max(100L, dedicated.getMaxTickLength() / 3L));
+        }
+        return millis * 1_000_000L;
+    }
+
+    /** Whether the job sits on a cell it cannot write yet (its record is on its way to the disk, its chunk is loading). */
+    boolean yielded() {
+        return holding || waiting;
+    }
+
+    /** It is more than Instant writes in one tick: normal speed, and its caster is told. */
+    private void tooBigForInstant(long size) {
+        if (instantMax > 0 && size > instantMax) {
+            ServerPlayer online = online();
+            if (online != null) {
+                online.displayClientMessage(Component.translatable("message.enhanced.build.instant_big", size, instantMax), true);
+            }
+            instantMax = 0;
+        }
+    }
+
+    /** The tick's time ran out in the middle of an Instant spell: what is left goes at normal speed, and its caster is told. */
+    void fellBehind() {
+        if (instantMax > 0) {
+            ServerPlayer online = online();
+            if (online != null) {
+                online.displayClientMessage(Component.translatable("message.enhanced.build.instant_slow"), true);
+            }
+            instantMax = 0;
+        }
     }
 
     /**
@@ -827,7 +891,7 @@ public final class BuildJob {
             checkStillAllowed();
         }
         if (ahead != null && phase == Phase.APPLY && stopCode < 0) {
-            slice.use(ahead.scan(walked, WriteAhead.PER_SLICE) * (long) SKIP);
+            slice.use(ahead.scan(walked, instantMax > 0 ? WriteAhead.WINDOW : WriteAhead.PER_SLICE) * (long) SKIP);
         }
         while (!finished && !slice.spent()) {
             boolean more = switch (phase) {
@@ -1262,6 +1326,7 @@ public final class BuildJob {
             return;
         }
         volume = Math.max(1, plan.size());
+        tooBigForInstant(volume);
         cursor = plan.cursor();
         phase = Phase.APPLY;
         step.setFxOrder(plan.order());
@@ -1628,8 +1693,8 @@ public final class BuildJob {
      * grow; a dab of a stroke as many as the budget lets it.
      */
     private long pace(BuildScheduler.Tick tick) {
-        if (stroke != null) {
-            return Long.MAX_VALUE; // a brush keeps up with the cursor (its stroke is what grows)
+        if (stroke != null || instantMax > 0) {
+            return Long.MAX_VALUE; // a brush keeps up with the cursor (its stroke is what grows); an Instant spell has no pace
         }
         long ticksAtLeast = Math.max(1, tick.minSpellTicks());
         return Math.max(1, (volume + ticksAtLeast - 1) / ticksAtLeast);
@@ -3140,7 +3205,9 @@ public final class BuildJob {
         BlockPos origin = new BlockPos(Math.clamp((long) Math.floor(eyes.x), box.minX(), box.maxX()), Math.clamp((long) Math.floor(eyes.y), box.minY(),
                 box.maxY()), Math.clamp((long) Math.floor(eyes.z), box.minZ(), box.maxZ()));
         int order = plan != null && plan.prepared() ? plan.order() : step.fxOrder();
-        if (kind == Kind.REDO) {
+        if (instantMax > 0) {
+            order = BuildFxPayload.POP;
+        } else if (kind == Kind.REDO) {
             // (the client plays an undo's ripple backwards: a redo writes the way the spell did, so its band sweeps the other way round)
             order = order == BuildFxPayload.RISE ? BuildFxPayload.MELT : order == BuildFxPayload.MELT ? BuildFxPayload.RISE : order;
         }

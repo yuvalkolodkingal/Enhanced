@@ -45,6 +45,7 @@ public final class BuildSession {
 
     private final UUID player;
     private boolean mode;
+    private boolean instant;
     private @Nullable BlockState picked;
     private @Nullable Block pickedBlock;
     private int pickedSlot = -1;
@@ -101,6 +102,15 @@ public final class BuildSession {
 
     public void setMode(boolean mode) {
         this.mode = mode;
+    }
+
+    /** Whether the Scarlet Witch's Instant switch is on (3.2): her spells and their undos are written in one go. */
+    public boolean instant() {
+        return instant;
+    }
+
+    public void setInstant(boolean instant) {
+        this.instant = instant;
     }
 
     /** The block she last picked with the middle button (the server's own read of it), or null for the hand. */

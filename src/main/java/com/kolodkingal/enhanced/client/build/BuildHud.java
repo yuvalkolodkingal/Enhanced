@@ -461,6 +461,9 @@ public final class BuildHud implements LayeredDraw.Layer {
         if (power == Power.BILLY && data.momNear()) {
             notes.append(Component.translatable("hud.enhanced.build.mom").withStyle(s -> s.withColor(Power.SCARLET_WITCH.glow)));
         }
+        if (power == Power.SCARLET_WITCH && data.instant()) {
+            notes.append(Component.translatable("hud.enhanced.build.instant").withStyle(s -> s.withColor(GOLD)));
+        }
         if (tooFar) {
             notes.append(notes.getSiblings().isEmpty() ? "" : "  ").append(Component.translatable("hud.enhanced.build.too_far")
                     .withStyle(s -> s.withColor(ORANGE)));
