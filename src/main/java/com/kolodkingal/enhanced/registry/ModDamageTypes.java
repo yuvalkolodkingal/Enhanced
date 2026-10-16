@@ -27,6 +27,8 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> LOKI_DAGGER = key("loki_dagger");
     public static final ResourceKey<DamageType> HEX_BOLT = key("hex_bolt");
     public static final ResourceKey<DamageType> LIGHTNING_BEAM = key("lightning_beam");
+    /** 3.2: the hits of Billy's continuous Hex Beam (they bypass the damage cooldown, as the lightning beam's do). */
+    public static final ResourceKey<DamageType> HEX_BEAM = key("hex_beam");
 
     // ===== phoenix =====
     public static final ResourceKey<DamageType> PHOENIX_BURST = key("phoenix_burst");

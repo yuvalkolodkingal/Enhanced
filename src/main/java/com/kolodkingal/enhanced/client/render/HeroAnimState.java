@@ -203,6 +203,8 @@ public final class HeroAnimState {
     public int caughtCount;
     public Vec3 boltTarget;
     public long boltTick;
+    /** 3.2: the continuous beam this player fires leaves the off hand (the pose aims that arm). */
+    public boolean beamOffHand;
     public Vec3 strikeTarget;
     public long strikeTick;
     /** Thor holds a weapon: 0 none, 1 Mjolnir, 2 Stormbreaker (as the tick last saw it). */

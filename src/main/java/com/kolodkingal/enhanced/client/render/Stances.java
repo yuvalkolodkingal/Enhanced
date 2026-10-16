@@ -178,6 +178,17 @@ final class Stances {
             c.occupy(true, w);
             c.occupy(false, w);
         }
+        if ((w = st.stance(Stance.BEAM_HAND)) > 0.001F) {
+            // A continuous beam: the hand it leaves from stretched out along the look and trembling a little, the other arm
+            // braced back and out, the feet planted.
+            boolean main = !st.beamOffHand;
+            c.aim(main, Target.LOOK, 0, main ? -3 : 3, 0, w);
+            c.tremble(main, 1.4F, 2.3F, w);
+            c.arm(!main, 14, main ? -10 : 10, main ? -22 : 22, w);
+            c.leg(true, -10, 2, w * (1.0F - st.wAir));
+            c.leg(false, 10, -2, w * (1.0F - st.wAir));
+            c.occupy(main, w);
+        }
         if ((w = st.stance(Stance.THOR_BEAM)) > 0.001F) {
             float pw = HeroAnimator.beamPower(st);
             if (st.weaponKind > 0) {

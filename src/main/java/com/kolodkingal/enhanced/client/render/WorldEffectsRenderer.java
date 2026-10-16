@@ -132,6 +132,7 @@ public final class WorldEffectsRenderer {
             }
         }
         renderHexBolts(mc, level, pose, beams, camera, partialTick, time);
+        BeamRenderer.render(mc, level, pose, beams, camera, partialTick, time);
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
         // The Magnetic Pull: its pulse and lines of force, then the items flying to his hand (it ends its own batches).
         MagnetStreams.render(mc, level, buffers, camera, partialTick, level.getGameTime());

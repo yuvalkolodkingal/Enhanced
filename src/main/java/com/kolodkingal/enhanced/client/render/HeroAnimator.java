@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
@@ -367,6 +368,11 @@ public final class HeroAnimator {
         on[Stance.BEAM_WANDA.ordinal()] = power == Power.SCARLET_WITCH && data.beamActive();
         on[Stance.SHIELD_WANDA.ordinal()] = power == Power.SCARLET_WITCH && data.chaosShieldActive();
         on[Stance.THOR_BEAM.ordinal()] = power == Power.THOR && data.is(Live.CALLING_LIGHTNING);
+        on[Stance.BEAM_HAND.ordinal()] = data.is(Live.BEAMING);
+        if (on[Stance.BEAM_HAND.ordinal()]) {
+            BeamStyle beam = BeamRenderer.styleOf(p.getId());
+            s.beamOffHand = beam != null && beam.offHand();
+        }
         on[Stance.TOMMY_WHIRL.ordinal()] = power == Power.TOMMY && data.is(Live.WHIRLWIND);
         HeroClient hero = HeroClients.of(power);
         if (hero != null) {

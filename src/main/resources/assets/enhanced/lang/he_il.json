@@ -261,7 +261,7 @@
   "power.enhanced.billy": "בילי (ויקאן)",
   "power.enhanced.billy.awaken": "הקסם שלך עונה לך סוף סוף",
   "power.enhanced.billy.broadcast": "%s הפך לבילי מקסימוף (ויקאן)!",
-  "ability.enhanced.billy.1": "ברק כישוף",
+  "ability.enhanced.billy.1": "קרן כישוף",
   "ability.enhanced.billy.2": "תעופה",
   "ability.enhanced.billy.3": "טלקינזיס (התכופפות: בלוק)",
   "ability.enhanced.billy.4": "הקפאה",
@@ -1176,5 +1176,12 @@
   "subtitles.enhanced.magnet_pull": "מתכת נמשכת פנימה",
   "message.enhanced.apocalypse.crit": "פגיעה קריטית! ×%s",
   "subtitles.enhanced.apocalypse_crit": "פגיעה קריטית באפוקליפסה",
-  "hud.enhanced.shield_unlimited": "∞ ללא הגבלה"
+  "hud.enhanced.shield_unlimited": "∞ ללא הגבלה",
+  "beam.enhanced.billy_hex": "קרן כישוף",
+  "message.enhanced.billy_beam.hungry": "רעבים מדי בשביל לירות את קרן הכישוף",
+  "hud.enhanced.billy_beam": "%1$s נזק לשנייה, %2$s בלוקים",
+  "hud.enhanced.billy_beam_firing": "יורה: %1$s נזק לשנייה, %2$s בלוקים",
+  "death.attack.enhanced.hex_beam": "%1$s נשרף מקרן כישוף",
+  "death.attack.enhanced.hex_beam.player": "%1$s נשרף מקרן הכישוף של %2$s",
+  "death.attack.enhanced.hex_beam.item": "%1$s נשרף מקרן הכישוף של %2$s"
 }

@@ -48,6 +48,8 @@ public final class ModNetwork {
         registrar.playToClient(BuildFxPayload.TYPE, BuildFxPayload.STREAM_CODEC, BuildFxPayload::handle);
         registrar.playToClient(BuildPocketPayload.TYPE, BuildPocketPayload.STREAM_CODEC, BuildPocketPayload::handle);
         registrar.playToClient(MagnetPullPayload.TYPE, MagnetPullPayload.STREAM_CODEC, MagnetPullPayload::handle);
+        // 3.2: continuous beams (Billy's Hex Beam, and any other source of one).
+        registrar.playToClient(BeamPayload.TYPE, BeamPayload.STREAM_CODEC, BeamPayload::handle);
     }
 
     private ModNetwork() {

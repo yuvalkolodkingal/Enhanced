@@ -230,6 +230,11 @@ public final class FirstPersonArms {
             both(w, -0.10F, 0.30F, 0.28F, -52, 10, 0);
             tremble(m, o, w, 0.010F, 1.9F, age, calm);
         }
+        if ((w = s.stance(Stance.BEAM_HAND)) > 0.001F) {
+            Offset hand = s.beamOffHand ? o : m;
+            hand.add(w, 0.0F, 0.14F, 0.42F, -24, 6, 0);
+            tremble(hand, null, w, 0.008F, 1.9F, age, calm);
+        }
         if ((w = s.stance(Stance.THOR_BEAM)) > 0.001F) {
             m.add(w, 0.0F, 0.14F, 0.42F, -24, 6, 0);
             tremble(m, null, w, 0.008F * HeroAnimator.beamPower(s), 1.9F, age, calm);

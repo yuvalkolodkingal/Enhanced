@@ -105,6 +105,14 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_RANGE;
     public static final ModConfigSpec.DoubleValue BILLY_BLOCK_LIFT_MAX_HARDNESS;
     public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_COOLDOWN;
+    // 3.2: Billy's continuous Hex Beam
+    public static final ModConfigSpec.BooleanValue BILLY_BEAM;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_DAMAGE_PER_SECOND;
+    public static final ModConfigSpec.IntValue BILLY_BEAM_RANGE;
+    public static final ModConfigSpec.IntValue BILLY_BEAM_INTERVAL;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_EXHAUSTION_PER_SECOND;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_RANK_DAMAGE_BONUS;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_RANK_RANGE_BONUS;
 
     // ---- Tommy (Speed) ----
     public static final ModConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
@@ -329,6 +337,25 @@ public final class EnhancedConfig {
                 .defineInRange("blockLiftMaxHardness", 3.0, 0.0, 100.0);
         BILLY_BLOCK_LIFT_COOLDOWN = BUILDER.comment("Ticks Billy waits between two blocks torn out of the ground (catching anything else never waits).")
                 .defineInRange("blockLiftCooldown", 20, 0, 200);
+        BILLY_BEAM = BUILDER.comment("3.2: R is a continuous Hex Beam: held down, a beam leaves his hand along his look and hurts what the crosshair",
+                        "is on. false: the old single Hex Bolt (hexBoltDamage), which forks to creatures near the one it struck.")
+                .define("beam", true);
+        BILLY_BEAM_DAMAGE_PER_SECOND = BUILDER.comment("Damage a second of the Hex Beam does to what the crosshair is on, at his first rank (6 = three hearts).",
+                        "It lands every beamInterval ticks, in equal parts. It grows with his Build Magic rank (beamRankDamageBonus).")
+                .defineInRange("beamDamagePerSecond", 6.0, 0.0, 200.0);
+        BILLY_BEAM_RANGE = BUILDER.comment("How far (blocks) the Hex Beam reaches at his first rank. It grows with his Build Magic rank (beamRankRangeBonus).")
+                .defineInRange("beamRange", 20, 4, 128);
+        BILLY_BEAM_INTERVAL = BUILDER.comment("Ticks between two hits of the Hex Beam (5 = four hits a second). The beam ignores the creature's damage",
+                        "cooldown, so every hit lands.")
+                .defineInRange("beamInterval", 5, 1, 40);
+        BILLY_BEAM_EXHAUSTION_PER_SECOND = BUILDER.comment("Food exhaustion a second of the Hex Beam costs (4.0 = 1 food point; the old bolt cost none).",
+                        "He cannot fire it on an empty stomach.")
+                .defineInRange("beamExhaustionPerSecond", 0.8, 0.0, 40.0);
+        BILLY_BEAM_RANK_DAMAGE_BONUS = BUILDER.comment("How much stronger the beam is at his highest rank (build_magic_billy.maxRank) than at his first, as a",
+                        "fraction: 1.0 = twice the damage. In between it grows evenly with the rank (rank 1: none).")
+                .defineInRange("beamRankDamageBonus", 1.0, 0.0, 10.0);
+        BILLY_BEAM_RANK_RANGE_BONUS = BUILDER.comment("The same for the range: 1.0 = twice as far at his highest rank.")
+                .defineInRange("beamRankRangeBonus", 1.0, 0.0, 10.0);
         BUILDER.pop();
 
         BUILDER.push("tommy");

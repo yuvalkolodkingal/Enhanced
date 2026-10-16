@@ -81,6 +81,13 @@ public enum Live {
     // ===== apocalypse =====
     /** Apocalypse is calling a sandstorm. */
     SANDSTORM,
+
+    // ===== beam (3.2: any source of a continuous beam sets it while it fires; the style is the beam payload's) =====
+    /**
+     * A continuous beam (Billy's Hex Beam; see {@code ContinuousBeam}) leaves this player's hand: the key is held. Every
+     * client draws it from the {@code BeamPayload}s, holds the arm out along the look, and loops its sound.
+     */
+    BEAMING,
     ;
 
     final long bit() {

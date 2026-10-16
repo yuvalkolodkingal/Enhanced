@@ -180,6 +180,8 @@ public final class GestureRoutes {
         return switch (live) {
             case WHIRLWIND -> power == Power.TOMMY ? GestureId.TOMMY_WHIRL_START : null;
             case CALLING_LIGHTNING -> power == Power.THOR ? (armed ? GestureId.THOR_BEAM_KICK : GestureId.THOR_BEAM_KICK_BARE) : null;
+            // 3.2: the Hex Beam begins as the Hex Bolt was cast (the hand pulled back, then thrust out); the stance BEAM_HAND holds it.
+            case BEAMING -> power == Power.BILLY ? GestureId.BILLY_BOLT : null;
             // Both of Loki's tricks that cast (shapeshift and vanish) raise this.
             case CASTING -> power == Power.LOKI ? GestureId.LOKI_CAST : null;
             default -> null;
@@ -276,7 +278,8 @@ public final class GestureRoutes {
                 default -> "live:WHIRLWIND";
             };
             case BILLY -> switch (ability) {
-                case 1, 4 -> "cooldown";
+                case 1 -> "live:BEAMING";
+                case 4 -> "cooldown";
                 case 2 -> "flight";
                 case 3 -> "held";
                 default -> "toggle:THE_NOISE";
@@ -344,7 +347,7 @@ public final class GestureRoutes {
     public static String reason(Live live) {
         return switch (live) {
             case SPEEDING -> "the run cycle, its start and its skid are driven by the animator from the motion";
-            case WHIRLWIND, CALLING_LIGHTNING, CASTING -> null;
+            case WHIRLWIND, CALLING_LIGHTNING, CASTING, BEAMING -> null;
             case BIFROST -> "a stance (THOR_BIFROST); the arrival is a gesture of the payload";
             case HIDDEN -> "Loki is invisible: nobody sees him";
             case THROWING -> "the cooldown of the daggers starts at the same moment and plays the throw";

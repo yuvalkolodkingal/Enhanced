@@ -261,7 +261,7 @@
   "power.enhanced.billy": "Billy (Wiccan)",
   "power.enhanced.billy.awaken": "Your magic answers at last",
   "power.enhanced.billy.broadcast": "%s has become Billy Maximoff (Wiccan)!",
-  "ability.enhanced.billy.1": "Hex Bolt",
+  "ability.enhanced.billy.1": "Hex Beam",
   "ability.enhanced.billy.2": "Flight",
   "ability.enhanced.billy.3": "Telekinesis (Sneak: a block)",
   "ability.enhanced.billy.4": "Freeze",
@@ -1176,5 +1176,12 @@
   "subtitles.enhanced.magnet_pull": "Metal is drawn in",
   "message.enhanced.apocalypse.crit": "Critical hit! ×%s",
   "subtitles.enhanced.apocalypse_crit": "Critical hit on Apocalypse",
-  "hud.enhanced.shield_unlimited": "∞ unlimited"
+  "hud.enhanced.shield_unlimited": "∞ unlimited",
+  "beam.enhanced.billy_hex": "Hex Beam",
+  "message.enhanced.billy_beam.hungry": "Too hungry to fire the Hex Beam",
+  "hud.enhanced.billy_beam": "%1$s dmg/s, %2$s blocks",
+  "hud.enhanced.billy_beam_firing": "firing: %1$s dmg/s, %2$s blocks",
+  "death.attack.enhanced.hex_beam": "%1$s was burned by a Hex Beam",
+  "death.attack.enhanced.hex_beam.player": "%1$s was burned by %2$s's Hex Beam",
+  "death.attack.enhanced.hex_beam.item": "%1$s was burned by %2$s's Hex Beam"
 }
