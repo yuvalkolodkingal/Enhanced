@@ -8,7 +8,6 @@ import com.kolodkingal.enhanced.client.screen.BifrostScreen;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
-import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -18,7 +17,6 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
-import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -49,7 +47,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -95,8 +92,6 @@ public final class ThorAbilities {
     /** Ticks the Bifrost's light gathers around its traveller before it takes them. */
     public static final int BIFROST_CHARGE = 30;
     public static final int BIFROST_LOOK_RANGE = 512;
-    /** If a saved place has been built over, the Bifrost sets its traveller down on the first free spot up to this high. */
-    private static final int ARRIVAL_SEARCH = 24;
 
     /**
      * What Thor's lightning beam can hit: creatures (other Thors excepted: lightning never hurts them), the parts of
@@ -113,8 +108,6 @@ public final class ThorAbilities {
         return e -> BEAM_TARGET.test(e) && !thor.isPassengerOfSameVehicle(e);
     }
 
-    /** Traveller → the Bifrost that is about to take them. */
-    private static final Map<UUID, Journey> JOURNEYS = new HashMap<>();
     /** Thor → his lightning beam while V is held. */
     private static final Map<UUID, Beam> BEAMS = new HashMap<>();
 
@@ -125,10 +118,6 @@ public final class ThorAbilities {
     private static final class Beam {
         long nextHit;
         final IntSet struck = new IntOpenHashSet();
-    }
-
-    /** Where the Bifrost is taking someone, and the game time it takes them. */
-    private record Journey(ResourceKey<Level> dimension, Vec3 to, float yaw, long arrivesAt) {
     }
 
     // ---- input ----
@@ -822,39 +811,33 @@ public final class ThorAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
             return;
         }
-        BifrostData bifrost = player.getData(ModAttachments.BIFROST);
-        BlockPos at = player.blockPosition();
-        String name = BifrostData.cleanName(typed, at.getX() + ", " + at.getY() + ", " + at.getZ());
-        BifrostData updated = bifrost.with(new BifrostData.Place(name, player.level().dimension(), player.position(), player.getYRot()));
-        if (updated == bifrost) {
+        BifrostData.Place place = PlaceBook.save(player, PlaceBook.Kind.BIFROST, typed, false);
+        if (place == null) {
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.full", BifrostData.MAX_PLACES), true);
             return;
         }
-        player.setData(ModAttachments.BIFROST, updated);
         ServerLevel level = player.serverLevel();
         mark(level, player.position());
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.2F, 1.2F);
-        player.displayClientMessage(Component.translatable("message.enhanced.bifrost.saved", name), true);
+        player.displayClientMessage(Component.translatable("message.enhanced.bifrost.saved", place.name()), true);
     }
 
     /** Forgets the saved place at {@code index}, if it is still the one called {@code name}. */
     public static void forgetPlace(ServerPlayer player, int index, String name) {
-        BifrostData.Place place = placeAt(player, index, name);
+        BifrostData.Place place = PlaceBook.forget(player, PlaceBook.Kind.BIFROST, index, name);
         if (place != null) {
-            player.setData(ModAttachments.BIFROST, player.getData(ModAttachments.BIFROST).without(index));
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.forgotten", place.name()), true);
         }
     }
 
     @Nullable
     private static BifrostData.Place placeAt(ServerPlayer player, int index, String name) {
-        List<BifrostData.Place> places = player.getData(ModAttachments.BIFROST).places();
-        return index >= 0 && index < places.size() && places.get(index).name().equals(name) ? places.get(index) : null;
+        return PlaceBook.placeAt(player, PlaceBook.Kind.BIFROST, index, name);
     }
 
     /** The Bifrost answers whoever holds Mjolnir or Stormbreaker, once it has gathered its strength again. */
     private static boolean mayOpenBifrost(ServerPlayer player) {
-        if (player.isSpectator() || JOURNEYS.containsKey(player.getUUID())) {
+        if (player.isSpectator() || PlaceBook.travelling(player)) {
             return false;
         }
         if (MjolnirPin.isPinned(player)) {
@@ -865,7 +848,7 @@ public final class ThorAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
             return false;
         }
-        long wait = player.getData(ModAttachments.BIFROST).cooldown(player.level().getGameTime());
+        long wait = PlaceBook.cooldown(player, PlaceBook.Kind.BIFROST);
         if (wait > 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.not_ready", (wait + 19) / 20), true);
             return false;
@@ -877,63 +860,42 @@ public final class ThorAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         int cooldown = EnhancedConfig.BIFROST_COOLDOWN.get();
-        player.setData(ModAttachments.BIFROST, player.getData(ModAttachments.BIFROST).readyAt(now + cooldown));
+        PlaceBook.readyAt(player, PlaceBook.Kind.BIFROST, now + cooldown);
         PowerData data = Powers.get(player);
         if (data.power() == Power.THOR) {
             // The same cooldown, shown on Thor's HUD.
             data.startCooldown(5, now, cooldown);
         }
-        JOURNEYS.put(player.getUUID(), new Journey(dimension, to, yaw, now + BIFROST_CHARGE));
+        PlaceBook.begin(player, PlaceBook.Kind.BIFROST, dimension, to, yaw, BIFROST_CHARGE);
         data.set(Live.BIFROST, true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_CHARGE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
     }
 
     private static void bifrostTick(ServerPlayer player, PowerData data) {
-        Journey journey = JOURNEYS.get(player.getUUID());
+        PlaceBook.Journey journey = PlaceBook.journey(player, PlaceBook.Kind.BIFROST);
         if (journey == null) {
             data.set(Live.BIFROST, false);
             return;
         }
-        long now = player.level().getGameTime();
-        if (now < journey.arrivesAt()) {
+        if (PlaceBook.waiting(player, journey)) {
             // Held in the beam: rising slightly, unable to walk away.
             player.setDeltaMovement(0, 0.02, 0);
             player.hurtMarked = true;
             player.resetFallDistance();
             return;
         }
-        JOURNEYS.remove(player.getUUID());
         data.set(Live.BIFROST, false);
-        ServerLevel destination = player.server.getLevel(journey.dimension());
-        if (destination == null || now > journey.arrivesAt() + 5) {
-            // The world is gone, or the traveller wasn't there to be taken (dead, or away): the light went out.
+        PlaceBook.Landing landing = PlaceBook.complete(player, journey);
+        if (landing == null) {
+            // The world is gone, or the traveller wasn't there to be taken (dead, or away), or a rule refused: the light went out.
             return;
         }
-        Vec3 to = safeArrival(destination, player, journey.to());
-        if (!HexManager.onTeleport(destination, player, to)) {
-            return;
-        }
-        ServerLevel from = player.serverLevel();
-        mark(from, player.position());
-        player.teleportTo(destination, to.x, to.y, to.z, journey.yaw(), player.getXRot());
-        player.resetFallDistance();
+        mark(landing.from(), landing.left());
+        ServerLevel destination = landing.to();
         destination.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_ARRIVE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
         PacketDistributor.sendToPlayersNear(destination, null, player.getX(), player.getY(), player.getZ(), 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_ARRIVAL, player.getId(), List.of(player.position())));
         mark(destination, player.position());
-    }
-
-    /** {@code to}, or the first spot above it where the traveller fits (a saved place may have been built over since). */
-    private static Vec3 safeArrival(ServerLevel level, ServerPlayer player, Vec3 to) {
-        // Collision checks treat unloaded chunks as empty air: load the landing chunk first.
-        level.getChunkAt(BlockPos.containing(to));
-        AABB body = player.getDimensions(Pose.STANDING).makeBoundingBox(to);
-        for (int up = 0; up <= ARRIVAL_SEARCH && to.y + up < level.getMaxBuildHeight(); up++) {
-            if (level.noCollision(player, body.move(0, up, 0))) {
-                return to.add(0, up, 0);
-            }
-        }
-        return to;
     }
 
     /** The Bifrost's circle of runes, burned into the ground (seen by everyone nearby, fading after a minute). */
@@ -944,7 +906,7 @@ public final class ThorAbilities {
     }
 
     public static boolean inBifrost(Player player) {
-        return JOURNEYS.containsKey(player.getUUID());
+        return PlaceBook.journey(player, PlaceBook.Kind.BIFROST) != null;
     }
 
     // ---- cleanup ----
@@ -967,7 +929,7 @@ public final class ThorAbilities {
     }
 
     public static void clear() {
-        JOURNEYS.clear();
+        PlaceBook.clear();
         BEAMS.clear();
         MjolnirShatter.clear();
         MjolnirPin.clear();

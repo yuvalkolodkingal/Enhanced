@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.vishanti.WardCommands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -51,6 +52,8 @@ import java.util.List;
  * /enhanced build rank &lt;player&gt; [1-4]
  * /enhanced build meter &lt;player&gt; &lt;value&gt;
  * /enhanced build forget &lt;player&gt;
+ * /enhanced ward list
+ * /enhanced ward remove &lt;player&gt;
  *
  * <p>The {@code build} branch is {@link BuildCommands#node()} (Build Magic's operators' tools, D-B 16).
  */
@@ -103,7 +106,8 @@ public final class EnhancedCommand {
                                         .then(Commands.argument("radius", IntegerArgumentType.integer(1, 512))
                                                 .executes(ctx -> cleanupBosses(ctx.getSource(), Vec3Argument.getVec3(ctx, "center"),
                                                         IntegerArgumentType.getInteger(ctx, "radius")))))))
-                .then(BuildCommands.node()));
+                .then(BuildCommands.node())
+                .then(WardCommands.node()));
     }
 
     private static int get(CommandSourceStack source, ServerPlayer player) {

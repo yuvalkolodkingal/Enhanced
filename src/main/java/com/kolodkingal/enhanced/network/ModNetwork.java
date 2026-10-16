@@ -48,6 +48,9 @@ public final class ModNetwork {
         registrar.playToClient(BuildFxPayload.TYPE, BuildFxPayload.STREAM_CODEC, BuildFxPayload::handle);
         registrar.playToClient(BuildPocketPayload.TYPE, BuildPocketPayload.STREAM_CODEC, BuildPocketPayload::handle);
         registrar.playToClient(MagnetPullPayload.TYPE, MagnetPullPayload.STREAM_CODEC, MagnetPullPayload::handle);
+        // 3.2: the Book of the Vishanti's screen and the wards it raises.
+        registrar.playToServer(VishantiActionPayload.TYPE, VishantiActionPayload.STREAM_CODEC, VishantiActionPayload::handle);
+        registrar.playToClient(WardSyncPayload.TYPE, WardSyncPayload.STREAM_CODEC, WardSyncPayload::handle);
     }
 
     private ModNetwork() {

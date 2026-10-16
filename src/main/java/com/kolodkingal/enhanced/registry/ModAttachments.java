@@ -37,6 +37,17 @@ public final class ModAttachments {
                     .build());
 
     /**
+     * A sorcerer's Book of the Vishanti (3.2): the places they saved with it (some of them bases, which carry a ward) and its
+     * cooldown, the same record as the Bifrost's with a list of its own. Saved, kept on death, synced to that player only.
+     */
+    public static final Supplier<AttachmentType<BifrostData>> VISHANTI = ATTACHMENTS.register("vishanti",
+            () -> AttachmentType.builder(() -> BifrostData.EMPTY)
+                    .serialize(BifrostData.CODEC)
+                    .copyOnDeath()
+                    .sync((holder, to) -> holder == to, BifrostData.STREAM_CODEC)
+                    .build());
+
+    /**
      * A builder's own Build Magic (3.1): Billy's magic meter, rank and practice, the pocket's id and size (saved), and what
      * the HUD shows of the builder's history and spells at work (not saved). Kept on death, synced to that player only (as the
      * Bifrost). A player saved before 3.1 has none and reads as {@link BuildData#EMPTY}: Billy at rank 1 with a full meter.

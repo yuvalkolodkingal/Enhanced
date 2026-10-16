@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.item.SynthezoidCoreItem;
 import com.kolodkingal.enhanced.item.TesseractItem;
 import com.kolodkingal.enhanced.item.UltronCoreItem;
 import com.kolodkingal.enhanced.item.UltronProgramItem;
+import com.kolodkingal.enhanced.item.VishantiBookItem;
 import com.kolodkingal.enhanced.item.WandaCrownItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ArmorItem;
@@ -67,6 +68,10 @@ public final class ModItems {
             () -> new TesseractItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<BlockItem> WITCHES_ROAD_DOOR = ITEMS.registerSimpleBlockItem(ModBlocks.WITCHES_ROAD_DOOR,
             new Item.Properties().rarity(Rarity.RARE));
+
+    /** The old tome of the sorcerers (3.2): only Loki, the Scarlet Witch or Billy can read it. Craftable. */
+    public static final DeferredItem<VishantiBookItem> BOOK_OF_THE_VISHANTI = ITEMS.register("book_of_the_vishanti",
+            () -> new VishantiBookItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
     // The items of 3.0, in one region per hero (the // ===== lines). All stack to one, are fire-resistant and epic,
     // except the spider, which stacks to sixteen.
