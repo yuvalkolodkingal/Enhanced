@@ -1,7 +1,6 @@
 package com.kolodkingal.enhanced.road;
 
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -277,11 +276,5 @@ public final class RoadTrial {
     /** Seconds as m:ss. */
     public static String clock(long seconds) {
         return String.format("%d:%02d", seconds / 60, seconds % 60);
-    }
-
-    /** The block the exit door is set at, if the trial has one. */
-    @Nullable
-    public BlockPos exitDoor() {
-        return layout.exitDoor();
     }
 }

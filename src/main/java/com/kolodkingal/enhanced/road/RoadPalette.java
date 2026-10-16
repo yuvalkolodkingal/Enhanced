@@ -4,7 +4,6 @@ import com.kolodkingal.enhanced.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -150,12 +149,6 @@ public final class RoadPalette {
                 canvas.live(level, base.offset(alongX ? w : 0, h, alongX ? 0 : w), AIR);
             }
         }
-    }
-
-    /** Whether the state is a block the Road draws for its look (used by tests to find what a trial left behind). */
-    public static boolean isRoadBlock(BlockState state) {
-        Block block = state.getBlock();
-        return !state.isAir() && (block == Blocks.DARK_OAK_PLANKS || block == Blocks.AMETHYST_BLOCK || block == Blocks.SOUL_LANTERN);
     }
 
     private RoadPalette() {

@@ -138,6 +138,12 @@ public final class RoadTrials {
     /** The lang key of why the player may not walk the Road now, or null if he may. */
     @Nullable
     public static String refusal(ServerPlayer player) {
+        return refusal(player, false);
+    }
+
+    /** {@link #refusal(ServerPlayer)}; {@code forced}: an operator sends him into a given trial, so having walked the Road does not stop him. */
+    @Nullable
+    private static String refusal(ServerPlayer player, boolean forced) {
         MinecraftServer server = player.server;
         if (!WitchesRoadConfig.ENABLED.get() || RoadDimension.level(server) == null) {
             return "message.enhanced.road.off";
@@ -152,7 +158,7 @@ public final class RoadTrials {
             return "message.enhanced.road.own_road";
         }
         RoadProgress progress = RoadSave.get(server).existing(player.getUUID());
-        if (progress != null && progress.completed() >= RoadChallenges.count()) {
+        if (!forced && progress != null && progress.completed() >= RoadChallenges.count()) {
             return "message.enhanced.road.walked";
         }
         if (playing() >= WitchesRoadConfig.MAX_PLAYERS.get()) {
@@ -176,7 +182,7 @@ public final class RoadTrials {
 
     /** {@link #enter(ServerPlayer)} into a given trial instead of the one he has reached (an operator's tool; -1 = as usual). */
     public static boolean enter(ServerPlayer player, int forcedTrial) {
-        String refusal = refusal(player);
+        String refusal = refusal(player, forcedTrial >= 0);
         if (refusal != null) {
             player.displayClientMessage(Component.translatable(refusal).withStyle(ChatFormatting.GRAY), true);
             return false;
@@ -277,7 +283,7 @@ public final class RoadTrials {
         }
         RoadFx.travel(road, at.respawn(), true);
         restore(player);
-        RoadVoice.begin(player, trial.challenge(), trial.number() + 1, RoadChallenges.count());
+        RoadVoice.begin(player, trial.challenge(), trial.number() + 1);
         RoadVoice.say(player, pending.from == null && pending.anchor == null ? RoadVoice.ENTER : pending.anchor != null ? RoadVoice.BACK
                 : RoadVoice.START, progress.started());
         trial.challenge().onStart(trial, player);
@@ -483,7 +489,8 @@ public final class RoadTrials {
         level.getChunkAt(BlockPos.containing(pos));
         for (int up = 0; up <= 6; up++) {
             Vec3 candidate = pos.add(0, up, 0);
-            AABB box = player.getBoundingBox().move(candidate.subtract(player.position()));
+            // (Built from the position, not moved by a difference: far from the origin that leaves a rounding error that touches the floor.)
+            AABB box = player.getDimensions(player.getPose()).makeBoundingBox(candidate).deflate(1.0E-3);
             if (level.getWorldBorder().isWithinBounds(box) && level.noCollision(player, box)) {
                 return candidate;
             }
@@ -668,9 +675,19 @@ public final class RoadTrials {
     // ------------------------------------------------------------------------------------------------------------
     // The server's life
 
-    /** The server has started: every cell the last run left in the ledger is cleared. */
+    /** The server has started: every cell the last run left in the ledger (none belongs to a live trial yet) is cleared. */
     public static void onServerStarted(MinecraftServer server) {
-        RoadSweeper.queueOrphans(server, Set.of());
+        Set<Integer> inUse = new HashSet<>();
+        for (RoadTrial trial : ACTIVE.values()) {
+            inUse.add(trial.cell());
+        }
+        for (Pending pending : PENDING.values()) {
+            inUse.add(pending.trial.cell());
+            if (pending.from != null) {
+                inUse.add(pending.from.cell());
+            }
+        }
+        RoadSweeper.queueOrphans(server, inUse);
     }
 
     /** The server is stopping: the trials come down now, so the world is saved without them. */

@@ -10,6 +10,9 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -22,6 +25,7 @@ import java.util.Collection;
  * /enhanced road reset &lt;players&gt; [newcourse]  forget their progress (and deal them other courses)
  * /enhanced road skip &lt;players&gt;               win the trial they are in (or count the next one won)
  * /enhanced road set &lt;players&gt; &lt;won&gt;          set how many trials they have won
+ * /enhanced road layout [player]              where the checkpoints, the finish and the gate of his trial are
  * /enhanced road cells                         the cells in use
  * /road leave                                  (anyone) leave the Road, keeping the Gene
  * /road status                                 (anyone) how far on the Road
@@ -52,6 +56,10 @@ public final class RoadCommands {
                 .then(Commands.literal("set")
                         .then(Commands.argument("players", EntityArgument.players())
                                 .then(Commands.argument("won", IntegerArgumentType.integer(0, 99)).executes(RoadCommands::set))))
+                .then(Commands.literal("layout")
+                        .executes(ctx -> layout(ctx.getSource(), ctx.getSource().getPlayerOrException()))
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(ctx -> layout(ctx.getSource(), EntityArgument.getPlayer(ctx, "player")))))
                 .then(Commands.literal("cells").executes(ctx -> cells(ctx.getSource())));
     }
 
@@ -140,6 +148,30 @@ public final class RoadCommands {
         }
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.road.set", players.size(), Math.min(won, RoadChallenges.count())), true);
         return players.size();
+    }
+
+    private static String at(Vec3 pos) {
+        return String.format("%.1f %.1f %.1f", pos.x, pos.y, pos.z);
+    }
+
+    private static String at(@Nullable AABB zone) {
+        return zone == null ? "-" : at(zone.getCenter());
+    }
+
+    private static int layout(CommandSourceStack source, ServerPlayer player) {
+        RoadTrial trial = RoadTrials.trialOf(player.getUUID());
+        if (trial == null) {
+            source.sendFailure(Component.translatable("commands.enhanced.road.layout.none", player.getDisplayName()));
+            return 0;
+        }
+        RoadLayout layout = trial.layout();
+        source.sendSuccess(() -> Component.translatable("commands.enhanced.road.layout", trial.challenge().title(), at(layout.start()), at(layout.finish()),
+                layout.gate() == null ? "-" : at(layout.gate().zone()), layout.exitDoor() == null ? "-" : layout.exitDoor().toShortString()), false);
+        for (int i = 1; i < layout.checkpoints().size(); i++) {
+            int n = i;
+            source.sendSuccess(() -> Component.translatable("commands.enhanced.road.layout.checkpoint", n, at(layout.checkpoint(n).respawn())), false);
+        }
+        return layout.checkpoints().size();
     }
 
     private static int cells(CommandSourceStack source) {

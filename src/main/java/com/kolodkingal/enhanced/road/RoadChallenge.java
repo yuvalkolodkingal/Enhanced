@@ -3,7 +3,6 @@ package com.kolodkingal.enhanced.road;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * One trial of the Witches' Road. To add a trial: implement this interface, add it to {@link RoadChallenges} (the order
@@ -75,12 +74,5 @@ public interface RoadChallenge {
      */
     default boolean resumable() {
         return true;
-    }
-
-    /** Convenience for the framework: the next trial's number, 1-based, for messages. */
-    @Nullable
-    default RoadChallenge next() {
-        int index = RoadChallenges.indexOf(this);
-        return index < 0 ? null : RoadChallenges.get(index + 1);
     }
 }

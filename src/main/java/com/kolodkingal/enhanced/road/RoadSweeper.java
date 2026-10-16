@@ -91,10 +91,15 @@ public final class RoadSweeper {
 
     /** Queues every cell of the ledger that is not in use (the server has just started: none is). */
     public static void queueOrphans(MinecraftServer server, java.util.Set<Integer> inUse) {
+        int found = 0;
         for (RoadSave.Cell cell : RoadSave.get(server).cells()) {
             if (!inUse.contains(cell.index())) {
                 queue(server, cell.index(), false);
+                found++;
             }
+        }
+        if (found > 0) {
+            Enhanced.LOGGER.info("Clearing {} cell(s) of the Witches' Road that the last run left behind", found);
         }
     }
 

@@ -1188,7 +1188,7 @@
   "message.enhanced.road.no_item": "זה לא עובד בדרך.",
   "message.enhanced.road.keep_gene": "שמרו על הגן. תצטרכו אותו בסוף.",
   "message.enhanced.road.leave_ask": "לחצו שוב קליק ימני כדי לצאת מהדרך. הגן נשאר אצלכם.",
-  "message.enhanced.road.trial_title": "מבחן %s מתוך %s: %s",
+  "message.enhanced.road.trial_title": "%s. %s",
   "message.enhanced.road.checkpoint": "נקודת שמירה %s מתוך %s",
   "message.enhanced.road.clock": "הזמן שנשאר: %s",
   "message.enhanced.road.time_up": "הזמן נגמר. חוזרים להתחלה.",
@@ -1232,5 +1232,8 @@
   "commands.enhanced.road.reset": "ההתקדמות בדרך של %s שחקנים נמחקה",
   "commands.enhanced.road.skip": "המבחן נוצח עבור %s שחקנים",
   "commands.enhanced.road.set": "ל-%s שחקנים יש עכשיו %s מבחנים שנוצחו",
-  "commands.enhanced.road.cells": "%s תאים בשימוש, %s בניקוי, %s שחקנים בדרך"
+  "commands.enhanced.road.cells": "%s תאים בשימוש, %s בניקוי, %s שחקנים בדרך",
+  "commands.enhanced.road.layout": "%s: התחלה %s, סיום %s, שער %s, דלת יציאה %s",
+  "commands.enhanced.road.layout.checkpoint": "נקודת שמירה %s: %s",
+  "commands.enhanced.road.layout.none": "%s לא נמצא במבחן"
 }

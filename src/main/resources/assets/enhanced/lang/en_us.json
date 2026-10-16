@@ -1188,7 +1188,7 @@
   "message.enhanced.road.no_item": "That does not work on the Road.",
   "message.enhanced.road.keep_gene": "Keep the Gene. You will need it at the end.",
   "message.enhanced.road.leave_ask": "Right-click again to leave the Road. Your Gene stays with you.",
-  "message.enhanced.road.trial_title": "Trial %s of %s: %s",
+  "message.enhanced.road.trial_title": "%s. %s",
   "message.enhanced.road.checkpoint": "Checkpoint %s of %s",
   "message.enhanced.road.clock": "Time left: %s",
   "message.enhanced.road.time_up": "Time is up. Back to the start.",
@@ -1232,5 +1232,8 @@
   "commands.enhanced.road.reset": "Forgot the Road progress of %s player(s)",
   "commands.enhanced.road.skip": "Won the trial for %s player(s)",
   "commands.enhanced.road.set": "%s player(s) have now won %s trial(s)",
-  "commands.enhanced.road.cells": "%s cell(s) in use, %s being cleared, %s player(s) on the Road"
+  "commands.enhanced.road.cells": "%s cell(s) in use, %s being cleared, %s player(s) on the Road",
+  "commands.enhanced.road.layout": "%s: start %s, finish %s, gate %s, exit door %s",
+  "commands.enhanced.road.layout.checkpoint": "checkpoint %s: %s",
+  "commands.enhanced.road.layout.none": "%s is not in a trial"
 }

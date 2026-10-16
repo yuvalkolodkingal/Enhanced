@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModTicketTypes;
 import com.kolodkingal.enhanced.road.RoadChallenge;
 import com.kolodkingal.enhanced.road.RoadBuild;
 import com.kolodkingal.enhanced.road.RoadDimension;
@@ -31,6 +32,15 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import net.minecraft.server.level.DistanceManager;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.Ticket;
+import net.minecraft.util.SortedArraySet;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -54,7 +64,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
  */
 final class RoadTestSupport {
     /** A small trial of the Road that is not the real thing: three jumps, so a test of the framework can have a second trial. */
-    static final class ShortParkour implements RoadChallenge {
+    static class ShortParkour implements RoadChallenge {
         private final String id;
 
         ShortParkour(String id) {
@@ -133,6 +143,44 @@ final class RoadTestSupport {
         return TestKit.fixture(helper);
     }
 
+    /**
+     * A small trial that lets the player place a block one block above the start platform's middle and break the one under it, and
+     * that spawns a boat of its own (tracked) when it begins, next to an item it forgets (not tracked).
+     */
+    static final class PlotParkour extends ShortParkour {
+        PlotParkour(String id) {
+            super(id);
+        }
+
+        static BlockPos plot(RoadTrial trial) {
+            return BlockPos.containing(trial.layout().start()).above(3);
+        }
+
+        @Override
+        public boolean mayPlace(RoadTrial trial, ServerPlayer player, BlockPos pos) {
+            return pos.equals(plot(trial));
+        }
+
+        @Override
+        public boolean mayBreak(RoadTrial trial, ServerPlayer player, BlockPos pos) {
+            return pos.equals(plot(trial));
+        }
+
+        @Override
+        public void onStart(RoadTrial trial, ServerPlayer player) {
+            ServerLevel level = trial.level();
+            Boat boat = EntityType.BOAT.create(level);
+            boat.moveTo(trial.layout().start().add(2.0, 0.0, 0.0));
+            level.addFreshEntity(trial.track(boat));
+            ItemEntity item = new ItemEntity(level, trial.layout().start().x + 2.5, trial.layout().start().y + 1.0, trial.layout().start().z, new ItemStack(Items.STICK));
+            level.addFreshEntity(item);
+            forgotten.put(trial.owner(), item);
+        }
+
+        /** The item each player's trial spawned and forgot. */
+        static final Map<java.util.UUID, ItemEntity> forgotten = new java.util.concurrent.ConcurrentHashMap<>();
+    }
+
     /** A Survival player without powers holding a Scarlet Witch Gene, in the arena. */
     static ServerPlayer walker(TestKit.Fixture f, double x, double z) {
         ServerPlayer player = f.player(x, FLOOR, z);
@@ -169,6 +217,31 @@ final class RoadTestSupport {
         RoadTrial trial = RoadTrials.trialOf(player.getUUID());
         TestKit.check(trial != null, "he has a trial");
         return trial;
+    }
+
+    /** How many chunk tickets of the Road the level holds for this player (read from the chunk system, which keeps no public count). */
+    @SuppressWarnings("unchecked")
+    static int tickets(ServerLevel level, java.util.UUID owner) {
+        try {
+            Field manager = ServerChunkCache.class.getDeclaredField("distanceManager");
+            manager.setAccessible(true);
+            Object distanceManager = manager.get(level.getChunkSource());
+            Field ticketsField = DistanceManager.class.getDeclaredField("tickets");
+            ticketsField.setAccessible(true);
+            Field keyField = Ticket.class.getDeclaredField("key");
+            keyField.setAccessible(true);
+            int count = 0;
+            for (SortedArraySet<Ticket<?>> set : ((Long2ObjectOpenHashMap<SortedArraySet<Ticket<?>>>) ticketsField.get(distanceManager)).values()) {
+                for (Ticket<?> ticket : set) {
+                    if (ticket.getType() == ModTicketTypes.ENHANCED_ROAD && owner.equals(keyField.get(ticket))) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     static ServerLevel road(GameTestHelper helper) {

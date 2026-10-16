@@ -55,10 +55,9 @@ public final class RoadChallenges {
         return ALL.indexOf(challenge);
     }
 
-    /** Puts the list back as it was (tests that add a trial of their own). */
-    public static synchronized void restore(List<RoadChallenge> saved) {
-        ALL.clear();
-        ALL.addAll(saved);
+    /** Takes a trial out of the Road again (a test that added a trial of its own, when it ends). */
+    public static synchronized void unregister(RoadChallenge challenge) {
+        ALL.remove(challenge);
     }
 
     private RoadChallenges() {

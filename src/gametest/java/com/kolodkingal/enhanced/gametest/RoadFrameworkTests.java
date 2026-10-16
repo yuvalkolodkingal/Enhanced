@@ -206,6 +206,8 @@ public final class RoadFrameworkTests {
                     check(record != null && record.owner().equals(player.getUUID()) && record.chunks().length > 3, "the ledger has his cell with its chunks");
                     check(trial.canvas().isPlaced() && RoadTestSupport.blocksIn(road, trial.chunks()) > 500, "the course is there");
                     check(player.getMainHandItem().getCount() == 1, "he still has his Gene");
+                    check(RoadTestSupport.tickets(road, player.getUUID()) == trial.chunks().length, "his chunks are held by tickets: " + RoadTestSupport.tickets(road, player.getUUID())
+                            + " for " + trial.chunks().length);
                     chunks[0] = trial.chunks();
                     cell[0] = trial.cell();
                     RoadTrials.leave(player, RoadChallenge.End.LEFT);
@@ -216,11 +218,11 @@ public final class RoadFrameworkTests {
                     check(!progress.inside() && progress.entry() == null, "nothing says he is inside");
                     check(RoadTrials.trialOf(player.getUUID()) == null && !RoadTrials.isInside(player), "no trial");
                     check(RoadSweeper.isClearing(cell[0]), "his cell is queued for clearing");
-                })
-                .thenExecuteAfter(2, () -> {
+                    // (In the same tick: a cell that is free again is the next player's, and the tests run side by side.)
                     RoadSweeper.drain(server);
                     check(RoadTestSupport.blocksIn(road, chunks[0]) == 0, "nothing of the course is left");
                     check(RoadSave.get(server).cell(cell[0]) == null, "the cell is free again");
+                    check(RoadTestSupport.tickets(road, player.getUUID()) == 0, "and its chunks are let go: " + RoadTestSupport.tickets(road, player.getUUID()) + " tickets left");
                 })
                 .thenSucceed();
     }
@@ -464,9 +466,9 @@ public final class RoadFrameworkTests {
     public static void winningUnlocksTheNextTrialAndTheGateLeadsToIt(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
-        List<RoadChallenge> saved = RoadChallenges.all();
-        RoadChallenges.register(new RoadTestSupport.ShortParkour("test_second"));
-        f.onClose(() -> RoadChallenges.restore(saved));
+        RoadChallenge added = new RoadTestSupport.ShortParkour("test_second");
+        RoadChallenges.register(added);
+        f.onClose(() -> RoadChallenges.unregister(added));
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
         check(RoadTrials.enter(player), "he walks the Road");
         RoadTrial[] first = new RoadTrial[1];
@@ -506,6 +508,7 @@ public final class RoadFrameworkTests {
                     check(first[0].phase() == RoadTrial.Phase.CLEARING, "the old one is coming down");
                     RoadSweeper.drain(server);
                     check(RoadSave.get(server).cell(firstCell[0]) == null, "and gone");
+                    check(RoadTestSupport.tickets(RoadTestSupport.road(helper), player.getUUID()) == second.chunks().length, "only the new trial's chunks are held");
                     check(progress.completed() == 1 && progress.checkpoint() == 0 && progress.inside(), "his progress: one won, at the start of the next");
                     // He wins that one too: no trial is left, the Road is walked.
                     RoadTestSupport.put(player, RoadTestSupport.road(helper), RoadTestSupport.inside(second.layout().finish()));
@@ -520,6 +523,56 @@ public final class RoadFrameworkTests {
                     check(RoadTrials.walkedAll(player) && RoadTrials.doorMode(player) == RoadTrials.DoorMode.CHOOSE, "the door now offers the choice");
                     check(player.getMainHandItem().getCount() == 1, "the Gene is still his");
                     check(!RoadSave.get(server).progress(player.getUUID()).inside(), "he is not inside");
+                })
+                .thenSucceed();
+    }
+
+    // ---- the commands ----
+
+    private static void run(MinecraftServer server, ServerPlayer as, int permission, String command) {
+        server.getCommands().performPrefixedCommand(as.createCommandSourceStack().withPermission(permission), command);
+    }
+
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    public static void operatorsCanSetSkipAndResetTheTrialsAndAnyoneCanLeave(GameTestHelper helper) {
+        TestKit.Fixture f = RoadTestSupport.fixture(helper);
+        MinecraftServer server = helper.getLevel().getServer();
+        ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
+        String name = player.getGameProfile().getName();
+        RoadSave save = RoadSave.get(server);
+        // Players are not operators: nothing happens.
+        run(server, player, 0, "enhanced road skip " + name);
+        check(save.existing(player.getUUID()) == null || save.existing(player.getUUID()).completed() == 0, "a player cannot skip a trial");
+        run(server, player, 2, "enhanced road skip " + name);
+        check(save.progress(player.getUUID()).completed() == 1, "an operator counts the next trial as won");
+        run(server, player, 2, "enhanced road set " + name + " 0");
+        check(save.progress(player.getUUID()).completed() == 0, "and sets how many are won");
+        run(server, player, 2, "enhanced road set " + name + " 99");
+        check(save.progress(player.getUUID()).completed() == RoadChallenges.count(), "(never more than there are)");
+        run(server, player, 2, "enhanced road reset " + name);
+        check(save.existing(player.getUUID()) == null || save.existing(player.getUUID()).completed() == 0 && save.existing(player.getUUID()).salt() == 0L, "reset forgets it");
+        run(server, player, 2, "enhanced road reset " + name + " newcourse");
+        check(save.progress(player.getUUID()).salt() == 1L, "and with newcourse deals other courses");
+        run(server, player, 2, "enhanced road status " + name);
+        run(server, player, 2, "enhanced road cells");
+        run(server, player, 2, "enhanced road enter " + name);
+        helper.startSequence()
+                .thenWaitUntil(RoadTestSupport.active(player))
+                .thenExecute(() -> {
+                    run(server, player, 2, "enhanced road layout " + name);
+                    check(RoadDimension.in(player), "an operator sent him onto the Road without a Gene or a door");
+                    run(server, player, 2, "enhanced road skip " + name);
+                })
+                .thenExecuteAfter(2, () -> {
+                    check(save.progress(player.getUUID()).completed() == 1, "skip wins the trial he is in");
+                    run(server, player, 0, "road leave");
+                    check(!RoadDimension.in(player) && !RoadTrials.isInside(player), "/road leave: anyone can leave the Road");
+                    run(server, player, 0, "road leave");
+                    run(server, player, 0, "road status");
+                    run(server, player, 2, "enhanced road enter " + name + " 1");
+                    check(RoadTrials.isInside(player), "an operator can send him into a given trial");
+                    run(server, player, 2, "enhanced road leave " + name);
+                    check(!RoadTrials.isInside(player), "and take him out");
                 })
                 .thenSucceed();
     }

@@ -89,8 +89,9 @@ public final class RoadRules {
         return entity instanceof ServerPlayer player ? RoadTrials.trialOf(player.getUUID()) : null;
     }
 
+    /** Whether the rules of the Road apply to this entity: a player in a trial, or in the Road at all (but an operator who is not in a trial is free). */
     private static boolean inRoad(Object entity) {
-        return entity instanceof ServerPlayer player && (RoadTrials.isInside(player) || RoadDimension.in(player));
+        return entity instanceof ServerPlayer player && (RoadTrials.isInside(player) || RoadDimension.in(player) && !player.hasPermissions(2));
     }
 
     // ---- damage and death ----
@@ -124,7 +125,7 @@ public final class RoadRules {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onBreak(BlockEvent.BreakEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || !RoadDimension.is(level)) {
+        if (!(event.getLevel() instanceof ServerLevel level) || !RoadDimension.is(level) || !inRoad(event.getPlayer())) {
             return;
         }
         RoadTrial trial = trialOf(event.getPlayer());
@@ -135,7 +136,7 @@ public final class RoadRules {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlace(BlockEvent.EntityPlaceEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || !RoadDimension.is(level)) {
+        if (!(event.getLevel() instanceof ServerLevel level) || !RoadDimension.is(level) || event.getEntity() instanceof ServerPlayer player && !inRoad(player)) {
             return;
         }
         RoadTrial trial = trialOf(event.getEntity());
@@ -146,7 +147,7 @@ public final class RoadRules {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLeftClick(PlayerInteractEvent.LeftClickBlock event) {
-        if (!(event.getEntity() instanceof ServerPlayer player) || !RoadDimension.in(player)) {
+        if (!(event.getEntity() instanceof ServerPlayer player) || !inRoad(player)) {
             return;
         }
         RoadTrial trial = RoadTrials.trialOf(player.getUUID());

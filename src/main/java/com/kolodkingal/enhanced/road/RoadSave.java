@@ -19,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.LongStream;
 
 /**
  * What the Road keeps in the world's save (the overworld's data storage, {@code data/enhanced_witches_road.dat}): every
@@ -168,10 +167,5 @@ public final class RoadSave extends SavedData {
     /** The players with a progress to keep (for the commands). */
     public Map<UUID, RoadProgress> players() {
         return Map.copyOf(players);
-    }
-
-    /** The cell's chunks as a stream (for the sweeper). */
-    public static LongStream chunksOf(Cell cell) {
-        return Arrays.stream(cell.chunks());
     }
 }

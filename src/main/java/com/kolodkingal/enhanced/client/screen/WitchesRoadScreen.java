@@ -26,11 +26,15 @@ public class WitchesRoadScreen extends Screen {
     private static final int CHOICE_WIDTH = 170;
     private static final int CHOICE_HEIGHT = 44;
     private static final int GAP = 10;
+    /** How long the door may take to show as open on the client (ticks). */
+    private static final int OPEN_GRACE_TICKS = 20;
 
     private final BlockPos door;
     private final boolean trials;
     private final int done;
     private final int total;
+    /** Ticks the screen has been up. */
+    private int age;
 
     public WitchesRoadScreen(BlockPos door, boolean trials, int done, int total) {
         super(Component.translatable("screen.enhanced.road.title"));
@@ -74,7 +78,10 @@ public class WitchesRoadScreen extends Screen {
         }
         boolean open = mc.level.getBlockState(door).getOptionalValue(WitchesRoadDoorBlock.OPEN).orElse(false);
         boolean near = mc.player.position().distanceToSqr(Vec3.atBottomCenterOf(door)) <= WitchesRoad.CHOICE_DISTANCE * WitchesRoad.CHOICE_DISTANCE;
-        if (!open || !near) {
+        // The server sends this screen in the same tick it opens the door, and the door's new state can reach us a moment after the
+        // screen does: a door that has not shown as open yet gets a second to do so.
+        age++;
+        if (!near || (!open && age > OPEN_GRACE_TICKS)) {
             onClose();
         }
     }
