@@ -14,6 +14,8 @@ public final class ApocalypseBossConfig {
     /** The TOML section of these options. */
     public static final String SECTION = "apocalypse_boss";
 
+    // 3.2: the master factor
+    public static ModConfigSpec.DoubleValue POWER_FACTOR;
     // the ritual
     public static ModConfigSpec.BooleanValue ENABLED;
     public static ModConfigSpec.ConfigValue<List<? extends String>> RITUAL_DIMENSIONS;
@@ -77,6 +79,11 @@ public final class ApocalypseBossConfig {
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
+        POWER_FACTOR = builder.comment("3.2: how strong the boss fights, one master knob (1.0 = the 3.1 numbers). It multiplies every damage he and his",
+                        "Horsemen deal, the number of his lances, Horsemen and tornadoes, and it slows his attacks: the pause between two",
+                        "attacks and every attack's cooldown last 1/powerFactor times as long. His health, his armour and his shield are not",
+                        "touched by it (they have their own options).")
+                .defineInRange("powerFactor", 0.65, 0.1, 1.0);
         ENABLED = builder.comment("If false, the Capstone's ritual is refused.")
                 .define("enabled", true);
         RITUAL_DIMENSIONS = builder.comment("The dimensions where he can be woken.")
@@ -113,15 +120,15 @@ public final class ApocalypseBossConfig {
                 .defineInRange("explosionDamageFactor", 0.5, 0.0, 1.0);
 
         SHIELD_STRENGTH = builder.comment("Strength of shield 1 for one fighter.")
-                .defineInRange("shieldStrength", 150.0, 10.0, 10000.0);
+                .defineInRange("shieldStrength", 100.0, 10.0, 10000.0);
         SHIELD_GROWTH = builder.comment("Each later shield is this many times stronger.")
-                .defineInRange("shieldGrowth", 1.25, 1.0, 3.0);
+                .defineInRange("shieldGrowth", 1.2, 1.0, 3.0);
         SHIELD_PER_EXTRA_PLAYER = builder.comment("Extra shield strength per additional fighter (a fraction).")
-                .defineInRange("shieldPerExtraPlayer", 0.35, 0.0, 3.0);
-        WINDOW_TICKS = builder.comment("How long a broken shield leaves him vulnerable (200 = 10 seconds).")
-                .defineInRange("windowTicks", 200, 40, 2400);
+                .defineInRange("shieldPerExtraPlayer", 0.3, 0.0, 3.0);
+        WINDOW_TICKS = builder.comment("How long a broken shield leaves him vulnerable (240 = 12 seconds).")
+                .defineInRange("windowTicks", 240, 40, 2400);
         STAGGER_TICKS = builder.comment("How long he is staggered and attacks nothing at the start of a window.")
-                .defineInRange("staggerTicks", 60, 0, 400);
+                .defineInRange("staggerTicks", 80, 0, 400);
         WINDOW_DAMAGE_FACTOR = builder.comment("Damage he takes in a window is multiplied by this.")
                 .defineInRange("windowDamageFactor", 1.25, 1.0, 5.0);
         REGEN_PER_SECOND = builder.comment("His healing while a shield is up (never above the phase's ceiling). 0: his health never heals (his",
@@ -148,9 +155,9 @@ public final class ApocalypseBossConfig {
         SPIKE_DAMAGE = builder.comment("A Sand Spike.")
                 .defineInRange("spikeDamage", 9.0, 0.0, 100.0);
         BOULDER_DAMAGE = builder.comment("A Sand Boulder.")
-                .defineInRange("boulderDamage", 11.0, 0.0, 100.0);
+                .defineInRange("boulderDamage", 9.0, 0.0, 100.0);
         BACKHAND_DAMAGE = builder.comment("The Backhand.")
-                .defineInRange("backhandDamage", 16.0, 0.0, 100.0);
+                .defineInRange("backhandDamage", 12.0, 0.0, 100.0);
         PORTAL_SHOCK_DAMAGE = builder.comment("The shockwave where he arrives from a portal.")
                 .defineInRange("portalShockDamage", 6.0, 0.0, 100.0);
         STORM_DAMAGE = builder.comment("A Tornado's damage, every 10 ticks.")
@@ -158,9 +165,9 @@ public final class ApocalypseBossConfig {
         TORNADO_TICKS = builder.comment("How long a Tornado lasts.")
                 .defineInRange("tornadoTicks", 160, 20, 1200);
         RING_DAMAGE = builder.comment("A ring of the Cairo Collapse.")
-                .defineInRange("ringDamage", 12.0, 0.0, 100.0);
+                .defineInRange("ringDamage", 10.0, 0.0, 100.0);
         ENTOMB_TICKS = builder.comment("How long the Entomb holds.")
-                .defineInRange("entombTicks", 100, 10, 1200);
+                .defineInRange("entombTicks", 80, 10, 1200);
         ENTOMB_DAMAGE_PER_SECOND = builder.comment("Damage while entombed (never below 2 hearts).")
                 .defineInRange("entombDamagePerSecond", 1.5, 0.0, 20.0);
         COCOON_HEALTH = builder.comment("Health of the boss's cocoon (a friend breaks it by hitting it).")
@@ -168,16 +175,16 @@ public final class ApocalypseBossConfig {
         MIND_CRUSH_RANGE = builder.comment("Blocks.")
                 .defineInRange("mindCrushRange", 28, 8, 64);
         MIND_CRUSH_NAUSEA_TICKS = builder.comment("Nausea of the Mind Crush (Slowness for 3 seconds and Blindness for 2 go with it).")
-                .defineInRange("mindCrushNauseaTicks", 120, 0, 1200);
+                .defineInRange("mindCrushNauseaTicks", 80, 0, 1200);
 
         HORSEMEN = builder.comment("He calls the Four Horsemen at the first transition.")
                 .define("horsemen", true);
         HORSEMEN_MAX = builder.comment("The most Horsemen (min(max, 1 + fighters)).")
                 .defineInRange("horsemenMax", 4, 0, 8);
         HORSEMAN_HEALTH_FACTOR = builder.comment("Husk health multiplier.")
-                .defineInRange("horsemanHealthFactor", 2.0, 1.0, 10.0);
+                .defineInRange("horsemanHealthFactor", 1.5, 1.0, 10.0);
         HORSEMAN_DAMAGE_BONUS = builder.comment("Added attack damage.")
-                .defineInRange("horsemanDamageBonus", 4.0, 0.0, 50.0);
+                .defineInRange("horsemanDamageBonus", 3.0, 0.0, 50.0);
 
         ADAPT_TICKS = builder.comment("Quicksilver Time slows him for this long, then he adapts.")
                 .defineInRange("adaptTicks", 80, 0, 1200);
@@ -193,6 +200,26 @@ public final class ApocalypseBossConfig {
                         "boss.billyHoldFactor or boss.magnetoHoldFactor).")
                 .defineInRange("holdTicks", 60, 10, 600);
         builder.pop();
+    }
+
+    /** The master factor {@code powerFactor}. */
+    public static double power() {
+        return POWER_FACTOR.get();
+    }
+
+    /** A damage he or a Horseman deals, after the master factor. */
+    public static float dealt(double damage) {
+        return (float) (damage * power());
+    }
+
+    /** A number of lances, Horsemen or tornadoes, after the master factor: rounded up, never below one (zero stays zero). */
+    public static int count(int count) {
+        return count <= 0 ? 0 : Math.max(1, (int) Math.ceil(count * power() - 1.0E-9));
+    }
+
+    /** A pause or cooldown of his attacks in ticks, after the master factor: the lower the factor, the longer. */
+    public static int slower(int ticks) {
+        return (int) Math.round(ticks / power());
     }
 
     private ApocalypseBossConfig() {

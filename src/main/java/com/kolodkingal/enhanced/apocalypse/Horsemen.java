@@ -131,7 +131,7 @@ public final class Horsemen {
 
     /** How many Horsemen the fight calls for {@code fighters} fighters: {@code min(horsemenMax, 1 + fighters)}. */
     public static int countFor(int fighters) {
-        return ApocalypseBossConfig.HORSEMEN.get() ? Math.max(0, Math.min(ApocalypseBossConfig.HORSEMEN_MAX.get(), 1 + fighters)) : 0;
+        return ApocalypseBossConfig.HORSEMEN.get() ? Math.max(0, Math.min(ApocalypseBossConfig.count(ApocalypseBossConfig.HORSEMEN_MAX.get()), 1 + fighters)) : 0;
     }
 
     /** The Horsemen who are alive. */
@@ -183,7 +183,7 @@ public final class Horsemen {
     /** Twice the health, four more damage, quicker, harder: what he does to the Husks he calls. */
     private static void enhance(Husk husk) {
         modify(husk, Attributes.MAX_HEALTH, HEALTH_ID, ApocalypseBossConfig.HORSEMAN_HEALTH_FACTOR.get() - 1.0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-        modify(husk, Attributes.ATTACK_DAMAGE, DAMAGE_ID, ApocalypseBossConfig.HORSEMAN_DAMAGE_BONUS.get(), AttributeModifier.Operation.ADD_VALUE);
+        modify(husk, Attributes.ATTACK_DAMAGE, DAMAGE_ID, ApocalypseBossConfig.HORSEMAN_DAMAGE_BONUS.get() * ApocalypseBossConfig.power(), AttributeModifier.Operation.ADD_VALUE);
         modify(husk, Attributes.MOVEMENT_SPEED, SPEED_ID, 0.04, AttributeModifier.Operation.ADD_VALUE);
         modify(husk, Attributes.ARMOR, ARMOR_ID, 4.0, AttributeModifier.Operation.ADD_VALUE);
         husk.setHealth(husk.getMaxHealth());
@@ -328,7 +328,7 @@ public final class Horsemen {
                     if (victim.position().distanceToSqr(at) > 36.0) {
                         continue;
                     }
-                    victim.hurt(level.damageSources().mobAttack(husk), 3.0F);
+                    victim.hurt(level.damageSources().mobAttack(husk), ApocalypseBossConfig.dealt(3.0));
                     Vec3 out = SandControl.flat(at, victim.position());
                     victim.knockback(1.6, -out.x, -out.z);
                     victim.hurtMarked = true;
@@ -364,7 +364,7 @@ public final class Horsemen {
         }
         if (rider.kind == Kind.PESTILENCE) {
             for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, husk.getBoundingBox().inflate(0.9), e -> e != husk && SandControl.canHurt(husk, e))) {
-                victim.hurt(level.damageSources().mobAttack(husk), 7.0F);
+                victim.hurt(level.damageSources().mobAttack(husk), ApocalypseBossConfig.dealt(7.0));
                 victim.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0), husk);
                 rider.struck = true;
                 break;
@@ -373,7 +373,7 @@ public final class Horsemen {
             Vec3 at = husk.position();
             for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, husk.getBoundingBox().inflate(2.5, 1.5, 2.5), e -> e != husk && SandControl.canHurt(husk, e))) {
                 if (Math.hypot(victim.getX() - at.x, victim.getZ() - at.z) <= 2.5) {
-                    victim.hurt(level.damageSources().mobAttack(husk), 9.0F);
+                    victim.hurt(level.damageSources().mobAttack(husk), ApocalypseBossConfig.dealt(9.0));
                 }
             }
             SandControl.puff(level, at.add(0, 0.3, 0), 20, 0.8);

@@ -54,6 +54,9 @@ final class ApocalypseTestSupport {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
         f.config(ApocalypseBossConfig.ARENA_RADIUS, 9);
+        // 3.2: the master factor is 1.0 here, so that the tests of the boss's mechanics keep the 3.1 damage, counts and
+        // pace; the tests of the factor itself (AbwApocalypseTests) use a fixture of their own.
+        f.config(ApocalypseBossConfig.POWER_FACTOR, 1.0);
         return f;
     }
 
