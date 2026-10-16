@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.darkhold;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -9,6 +10,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
@@ -40,6 +42,21 @@ public final class DarkholdEvents {
         DamageSource source = event.getSource();
         if (source.is(ModTags.MAGIC_DAMAGE) && source.getEntity() instanceof LivingEntity attacker && DarkholdBook.active(holder)) {
             DarkholdBook.retaliate(holder, attacker);
+        }
+    }
+
+    /**
+     * Magic that does no damage answers too, where it is simple: the spell of Loki's Scepter and the mind powers (Confused and
+     * Spellbound) laid on the holder by a living creature poison that creature, as a hit of magic does.
+     */
+    @SubscribeEvent
+    public static void onMagicEffect(MobEffectEvent.Added event) {
+        if (!(event.getEntity() instanceof ServerPlayer holder) || !(event.getEffectSource() instanceof LivingEntity caster)) {
+            return;
+        }
+        var effect = event.getEffectInstance().getEffect();
+        if ((effect.is(ModEffects.CONFUSED) || effect.is(ModEffects.SPELLBOUND)) && DarkholdBook.active(holder)) {
+            DarkholdBook.retaliate(holder, caster);
         }
     }
 

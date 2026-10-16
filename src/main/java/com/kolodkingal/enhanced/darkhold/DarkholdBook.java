@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.darkhold;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.DarkholdConfig;
@@ -11,6 +12,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.vishanti.VishantiBook;
 import com.kolodkingal.enhanced.vishanti.WardStrength;
 import net.minecraft.network.chat.Component;
@@ -194,6 +196,11 @@ public final class DarkholdBook {
 
     /** Every player, every tick: a beam whose holder no longer uses the book is over. */
     public static void everyPlayerTick(ServerPlayer player) {
+        if (!MARKS.isEmpty() && player.tickCount % 20 == 3) {
+            // Marks on creatures that died or were never hit again end with the second they run out.
+            long now = player.level().getGameTime();
+            MARKS.values().removeIf(mark -> mark.until() <= now);
+        }
         if (FIRING.isEmpty() || !firing(player)) {
             return;
         }
@@ -247,12 +254,25 @@ public final class DarkholdBook {
         MARK_READY.put(player.getUUID(), level.getGameTime() + DarkholdConfig.MARK_COOLDOWN.get());
         MARKS.put(target.getUUID(), new Mark(player.getUUID(), level.getGameTime() + ticks));
         target.addEffect(new MobEffectInstance(MobEffects.GLOWING, ticks, 0, false, false), player);
-        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, ticks, DarkholdConfig.MARK_SLOW_AMPLIFIER.get(), false, true), player);
+        if (!bossLike(target)) {
+            // (A boss keeps its pace: the mark glows and costs it more damage, but the fight's balance is not the book's to change.)
+            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, ticks, DarkholdConfig.MARK_SLOW_AMPLIFIER.get(), false, true), player);
+        }
         pay(player, DarkholdConfig.MARK_EXHAUSTION.get());
         Vec3 at = target.position().add(0, target.getBbHeight() * 0.5, 0);
         level.sendParticles(new EnergyParticleOptions(DarkholdItem.STYLE.main(), 1.4F), at.x, at.y, at.z, 24, 0.4, 0.5, 0.4, 0.05);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 1.0F, 0.5F);
         player.displayClientMessage(Component.translatable("message.enhanced.darkhold.marked", target.getDisplayName()), true);
+    }
+
+    /** Whether the creature is a boss or too powerful for a hex (the tags {@code enhanced:bosses} and {@code enhanced:hex_resistant}). */
+    public static boolean bossLike(LivingEntity target) {
+        return target.getType().is(ModTags.BOSSES) || target.getType().is(ModTags.HEX_RESISTANT);
+    }
+
+    /** How many hex marks are kept (the ones that ran out are dropped within a second). */
+    public static int markCount() {
+        return MARKS.size();
     }
 
     /** Whether this creature is hex-marked by someone, and who by. */
@@ -278,6 +298,11 @@ public final class DarkholdBook {
         return marker != null && marker.equals(attacker.getUUID()) ? 1.0F + DarkholdConfig.MARK_DAMAGE_BONUS.get().floatValue() : 1.0F;
     }
 
+    /** Whether the creature hides from sight (invisible, Loki's Vanish, Vision's phase): the glimpse does not show it. */
+    public static boolean hidden(LivingEntity e) {
+        return e.isInvisible() || (e instanceof Player player && (Powers.get(player).is(Live.HIDDEN) || VisionAbilities.isPhased(player)));
+    }
+
     /** The mind glimpse: every living creature near glows for a few seconds, and the action bar says how many and how the nearest fares. */
     public static void glimpse(ServerPlayer player) {
         long wait = wait(GLIMPSE_READY, player);
@@ -291,7 +316,8 @@ public final class DarkholdBook {
         double range = DarkholdConfig.GLIMPSE_RANGE.get();
         AABB box = player.getBoundingBox().inflate(range);
         List<LivingEntity> near = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, box,
-                e -> e != player && e.isAlive() && !e.isSpectator() && !(e instanceof ArmorStand) && e.distanceToSqr(player) <= range * range));
+                e -> e != player && e.isAlive() && !e.isSpectator() && !(e instanceof ArmorStand) && !hidden(e)
+                        && e.distanceToSqr(player) <= range * range));
         near.sort(Comparator.comparingDouble(e -> e.distanceToSqr(player)));
         if (near.size() > DarkholdConfig.GLIMPSE_MAX.get()) {
             near = near.subList(0, DarkholdConfig.GLIMPSE_MAX.get());

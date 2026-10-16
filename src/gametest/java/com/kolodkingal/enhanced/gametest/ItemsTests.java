@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.vishanti.VishantiBook;
 import com.kolodkingal.enhanced.vishanti.Ward;
+import com.kolodkingal.enhanced.vishanti.WardEvents;
 import com.kolodkingal.enhanced.vishanti.WardManager;
 import com.kolodkingal.enhanced.vishanti.WardStore;
 import com.kolodkingal.enhanced.vishanti.WardStrength;
@@ -51,6 +52,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -59,18 +61,21 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.kolodkingal.enhanced.gametest.BossTestSupport.lastActionBarKey;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -595,7 +600,9 @@ public final class ItemsTests {
         VishantiBook.savePlace(loki, "one", true);
         check(book(loki).bases() == 2 && wardOf(level, loki, "One").center().distanceTo(moved) < 1.0E-6, "saving a base's name again moves its ward");
         VishantiBook.savePlace(loki, "Two", false);
-        check(book(loki).bases() == 1 && wardOf(level, loki, "Two") == null, "a base saved as a plain place loses its ward");
+        check(book(loki).bases() == 2 && wardOf(level, loki, "Two") != null && wardOf(level, loki, "Two").center().distanceTo(moved) < 1.0E-6,
+                "saving a base's name as a plain place moves the base (and its ward) instead of dropping the ward unseen");
+        check("message.enhanced.vishanti.ward_raised".equals(lastActionBarKey(loki)), "and says so");
         helper.succeed();
     }
 
@@ -797,7 +804,7 @@ public final class ItemsTests {
         check(!server.getCommands().getDispatcher().getRoot().getChild("enhanced").getRequirement().test(
                 server.createCommandSourceStack().withPermission(0)), "and only operators can use it");
         said.clear();
-        int removed = server.getCommands().getDispatcher().execute("enhanced ward remove " + loki.getGameProfile().getName(), source);
+        int removed = server.getCommands().getDispatcher().execute("enhanced ward remove @a[name=" + loki.getGameProfile().getName() + "]", source);
         check(removed == 1 && wardOf(level, loki, "Fort") == null, "remove takes the ward away");
         check(book(loki).places().size() == 1 && book(loki).bases() == 0, "and the base becomes a plain place, so the ward does not come back");
         WardManager.refresh(loki);
@@ -837,6 +844,136 @@ public final class ItemsTests {
             WardManager.tickLevel(level);
         }
         check(!level.hasChunkAt(BlockPos.containing(far)), "looking at it loaded nothing");
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Review fixes
+
+    @GameTest(template = ARENA, batch = WARD)
+    public static void aWardWhoseBaseIsGoneIsTakenAwayAtLoginAndByIdAlone(GameTestHelper helper) {
+        TestKit.Fixture f = wardFixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
+        WardStore.get(level).put(new Ward(loki.getUUID(), "Lost", loki.position(), 6, Power.LOKI.color));
+        check(book(loki).bases() == 0 && wardOf(level, loki, "Lost") != null, "a ward stands that the book knows nothing of");
+        WardEvents.onLogin(new PlayerEvent.PlayerLoggedInEvent(loki));
+        check(wardOf(level, loki, "Lost") == null, "logging in takes it away");
+        UUID gone = UUID.randomUUID();
+        WardStore.get(level).put(new Ward(gone, "Old", loki.position(), 6, Power.LOKI.color));
+        check(WardManager.count(level.getServer(), gone) == 1 && WardManager.removeAll(level.getServer(), gone) == 1, "a player who never comes back: removed by id alone");
+        check(WardManager.count(level.getServer(), gone) == 0, "and gone");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 60, batch = "items_ward_off")
+    public static void turningWardsOffSilencesEveryWardEvenOfOfflineOwners(GameTestHelper helper) {
+        TestKit.Fixture f = wardFixture(helper);
+        f.config(VishantiConfig.WARDS_ENABLED, false);
+        ServerLevel level = helper.getLevel();
+        UUID offline = UUID.randomUUID();
+        Vec3 center = helper.absoluteVec(new Vec3(10.5, FLOOR, 10.5));
+        WardStore store = WardStore.get(level);
+        store.put(new Ward(offline, "Away", center, 6, Power.LOKI.color));
+        f.onClose(() -> WardManager.removeAll(level.getServer(), offline));
+        ServerPlayer watcher = f.player(3.5, FLOOR, 3.5);
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1000));
+        Vec3 at = zombie.position();
+        check(!WardManager.protects(level, center) && !WardManager.forbidsSpawn(level, EntityType.ZOMBIE, center), "the ward protects nothing and refuses no spawn");
+        f.everyTick(30, tick -> {
+            if (tick < 30) {
+                return false;
+            }
+            check(zombie.position().distanceTo(at) < 0.5 && watcher.isAlive(), "and pushes nobody");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, timeoutTicks = 100, batch = WARD)
+    public static void aWardKeepsWhatThePlayerKeepsAndWhatIsBeingCured(GameTestHelper helper) {
+        TestKit.Fixture f = wardFixture(helper);
+        ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
+        VishantiBook.savePlace(loki, "Fort", true);
+        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 10.5));
+        Zombie named = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 9.0));
+        named.setCustomName(Component.literal("Zed"));
+        Zombie leashed = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.0));
+        leashed.setLeashedTo(loki, true);
+        ZombieVillager curing = helper.spawnWithNoFreeWill(EntityType.ZOMBIE_VILLAGER, new Vec3(10.5, FLOOR, 13.5));
+        // (The cure: weakness, then a golden apple.)
+        curing.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 1000, 0));
+        loki.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GOLDEN_APPLE));
+        curing.mobInteract(loki, InteractionHand.MAIN_HAND);
+        check(curing.isConverting(), "the villager is being cured");
+        for (Zombie zombie : List.of(plain, named, leashed)) {
+            zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1000));
+        }
+        curing.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1000));
+        check(!WardManager.exempt(plain) && WardManager.exempt(named) && WardManager.exempt(leashed) && WardManager.exempt(curing),
+                "a named, a leashed and a curing monster are let be; a plain one is not");
+        Vec3 namedAt = named.position();
+        Vec3 curingAt = curing.position();
+        f.everyTick(50, tick -> {
+            PowerTicker.tick(loki);
+            if (tick < 50) {
+                return false;
+            }
+            check(plain.position().distanceTo(loki.position()) > 6.0, "the plain zombie was pushed out");
+            check(named.position().distanceTo(namedAt) < 0.5 && curing.position().distanceTo(curingAt) < 0.5, "the others were not moved");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = WARD)
+    public static void aMonsterIsNeverSetDownInLavaFireOrOnAnEdge(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos spot = helper.absolutePos(new BlockPos(5, 2, 5));
+        Vec3 c = Vec3.atBottomCenterOf(spot);
+        net.minecraft.world.phys.AABB body = new net.minecraft.world.phys.AABB(c.x - 0.3, c.y, c.z - 0.3, c.x + 0.3, c.y + 1.9, c.z + 0.3);
+        check(!WardManager.hazardous(level, body), "open air over the floor is fine");
+        level.setBlockAndUpdate(spot, Blocks.LAVA.defaultBlockState());
+        check(WardManager.hazardous(level, body), "lava in the body is a hazard");
+        level.setBlockAndUpdate(spot, Blocks.FIRE.defaultBlockState());
+        check(WardManager.hazardous(level, body), "so is fire");
+        level.setBlockAndUpdate(spot, Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(spot.below(), Blocks.MAGMA_BLOCK.defaultBlockState());
+        check(WardManager.hazardous(level, body), "and magma underfoot");
+        level.setBlockAndUpdate(spot.below(), Blocks.SMOOTH_STONE.defaultBlockState());
+        check(!WardManager.hazardous(level, body), "the floor is back");
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        Mob phantom = helper.spawnWithNoFreeWill(EntityType.PHANTOM, new Vec3(8.5, FLOOR + 3.0, 6.5));
+        Mob guardian = helper.spawnWithNoFreeWill(EntityType.GUARDIAN, new Vec3(8.5, FLOOR + 3.0, 4.5));
+        check(WardManager.needsGround(zombie) && !WardManager.needsGround(phantom) && !WardManager.needsGround(guardian),
+                "a walker needs a floor, a flier and a swimmer do not (whatever they are doing at the instant of the look)");
+        phantom.discard();
+        guardian.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = WARD)
+    public static void everyoneIsToldOnlyOfTheWardsNearThemAndTheirOwn(GameTestHelper helper) {
+        TestKit.Fixture f = wardFixture(helper);
+        ServerLevel level = helper.getLevel();
+        ServerPlayer viewer = f.player(10.5, FLOOR, 10.5);
+        UUID stranger = UUID.randomUUID();
+        UUID someone = UUID.randomUUID();
+        WardStore store = WardStore.get(level);
+        Vec3 near = viewer.position().add(100, 0, 0);
+        Vec3 far = viewer.position().add(5000, 0, 0);
+        store.put(new Ward(stranger, "Near", near, 20, Power.LOKI.color));
+        store.put(new Ward(someone, "Far", far, 20, Power.LOKI.color));
+        store.put(new Ward(viewer.getUUID(), "Mine", far.add(0, 0, 5000), 20, Power.BILLY.color));
+        f.onClose(() -> {
+            WardManager.removeAll(level.getServer(), stranger);
+            WardManager.removeAll(level.getServer(), someone);
+            WardManager.removeAll(level.getServer(), viewer.getUUID());
+        });
+        var told = WardManager.payload(level, viewer).domes();
+        check(told.stream().anyMatch(d -> Math.abs(d.x() - near.x) < 1.0E-6), "a ward a hundred blocks away is told");
+        check(told.stream().noneMatch(d -> Math.abs(d.x() - far.x) < 1.0E-6 && Math.abs(d.z() - far.z) < 1.0E-6), "a stranger's ward five thousand blocks away is not");
+        check(told.stream().anyMatch(d -> Math.abs(d.z() - (far.z + 5000)) < 1.0E-6), "the viewer's own is, wherever it is");
+        check(WardManager.payload(level).domes().size() >= 3, "the operators' view has them all");
         helper.succeed();
     }
 }

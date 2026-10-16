@@ -205,6 +205,8 @@ public final class VishantiBook {
             player.displayClientMessage(Component.translatable("message.enhanced.vishanti.shut"), true);
             return;
         }
+        // Saving the name of a base as a plain place would take its ward away without a word: it moves the base instead.
+        base |= namesABase(player, typed);
         if (base && !mayRaiseWard(player, typed)) {
             return;
         }
@@ -229,6 +231,18 @@ public final class VishantiBook {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.2F, 1.2F);
             player.displayClientMessage(Component.translatable("message.enhanced.vishanti.saved", place.name()), true);
         }
+    }
+
+    /** Whether {@code typed} names (ignoring case) a base of the player's book. */
+    private static boolean namesABase(ServerPlayer player, String typed) {
+        BlockPos at = player.blockPosition();
+        String name = BifrostData.cleanName(typed, at.getX() + ", " + at.getY() + ", " + at.getZ());
+        for (BifrostData.Place place : PlaceBook.Kind.VISHANTI.data(player).places()) {
+            if (place.base() && place.name().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Whether a ward may be raised where the player stands now (and says why not). */
@@ -295,6 +309,10 @@ public final class VishantiBook {
         }
         if (player.tickCount % 100 == 11 && PlaceBook.Kind.VISHANTI.data(player).bases() > 0) {
             WardManager.refresh(player);
+        }
+        if (player.tickCount % 200 == 37) {
+            // The clients are told of the wards near them: tell again as the player walks about.
+            WardManager.send(player);
         }
     }
 

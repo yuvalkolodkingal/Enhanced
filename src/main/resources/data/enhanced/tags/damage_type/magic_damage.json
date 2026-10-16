@@ -4,7 +4,6 @@
     "enhanced:hex_bolt",
     "enhanced:hex_beam",
     "enhanced:chaos_beam",
-    "enhanced:lightning_beam",
     "enhanced:telekinetic_slam",
     "enhanced:mind_stone",
     "enhanced:mind_stone_beam",
@@ -13,6 +12,8 @@
     "enhanced:stone_blast",
     "enhanced:phoenix_burst",
     "enhanced:darkhold_beam",
+    "enhanced:hex_wall",
+    "enhanced:entomb",
     "minecraft:magic",
     "minecraft:indirect_magic"
   ]

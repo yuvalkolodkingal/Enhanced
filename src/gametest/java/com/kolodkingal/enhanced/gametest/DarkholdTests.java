@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.BeamStyles;
@@ -12,6 +13,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.registries.Registries;
@@ -31,6 +33,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.Item;
@@ -167,9 +170,13 @@ public final class DarkholdTests {
     public static void theMagicTagNamesTheMagicOfTheMod(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         for (ResourceKey<DamageType> key : List.of(ModDamageTypes.HEX_BOLT, ModDamageTypes.HEX_BEAM,
-                ModDamageTypes.CHAOS_BEAM, ModDamageTypes.LIGHTNING_BEAM, ModDamageTypes.TELEKINETIC_SLAM, ModDamageTypes.DARKHOLD_BEAM)) {
+                ModDamageTypes.CHAOS_BEAM, ModDamageTypes.HEX_WALL, ModDamageTypes.TELEKINETIC_SLAM, ModDamageTypes.DARKHOLD_BEAM)) {
             check(ModDamageTypes.source(level, key, null, null).is(ModTags.MAGIC_DAMAGE), key.location() + " is magic");
         }
+        check(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id("entomb")))
+                .map(h -> new DamageSource(h).is(ModTags.MAGIC_DAMAGE)).orElse(false), "Apocalypse's entomb is magic");
+        check(!ModDamageTypes.source(level, ModDamageTypes.LIGHTNING_BEAM, null, null).is(ModTags.MAGIC_DAMAGE),
+                "Thor's lightning is his power but not magic: it does not set the book off");
         check(level.damageSources().magic().is(ModTags.MAGIC_DAMAGE) && level.damageSources().indirectMagic(null, null).is(ModTags.MAGIC_DAMAGE),
                 "so is the game's own");
         check(!level.damageSources().generic().is(ModTags.MAGIC_DAMAGE) && !level.damageSources().fall().is(ModTags.MAGIC_DAMAGE),
@@ -526,5 +533,92 @@ public final class DarkholdTests {
         check(far.getEffect(MobEffects.GLOWING) == null, "a creature beyond the range does not glow");
         check("message.enhanced.darkhold.glimpse_none".equals(lastActionBarKey(loki)), "and the book says nothing living is near");
         helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Review fixes
+
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void magicEffectsOnTheHolderAnswerToo(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
+        Pig caster = dummy(helper, 14.5, 10.5);
+        loki.addEffect(new MobEffectInstance(ModEffects.CONFUSED, 100, 0), caster);
+        check(poison(caster) != null, "a spell of confusion laid on the holder poisons whoever laid it");
+        Pig other = dummy(helper, 14.5, 14.5);
+        loki.addEffect(new MobEffectInstance(ModEffects.SPELLBOUND, 100, 0), other);
+        check(poison(other) != null, "so does a freeze");
+        Pig harmless = dummy(helper, 16.5, 16.5);
+        loki.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 0), harmless);
+        check(poison(harmless) == null, "an ordinary effect does not");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "items_darkhold_billy_r", timeoutTicks = 60)
+    public static void releasingRDoesNotStopTheDarkholdsBeam(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer billy = holder(f, 3.5, 10.5, Power.BILLY);
+        PowerTicker.tick(billy);
+        use(billy, false);
+        check(DarkholdBook.firing(billy), "the Darkhold's beam burns");
+        AbilityHandler.onKey(billy, 1, false);
+        check(DarkholdBook.firing(billy) && ContinuousBeam.isFiring(billy), "R coming up does not put it out");
+        AbilityHandler.onKey(billy, 1, true);
+        AbilityHandler.onKey(billy, 1, false);
+        check(DarkholdBook.firing(billy) && ContinuousBeam.isFiring(billy), "nor does a tap of R");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "items_darkhold_boss_mark")
+    public static void aBossIsMarkedButNotSlowed(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer loki = holder(f, 3.5, 10.5, Power.LOKI);
+        Mob wither = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 10.5));
+        lookAt(loki, wither);
+        TestKit.sentPackets(loki);
+        DarkholdBook.mark(loki, wither);
+        check(wither.getEffect(MobEffects.GLOWING) != null, "the boss glows (" + wither.getActiveEffects() + ")");
+        check(wither.getEffect(MobEffects.MOVEMENT_SLOWDOWN) == null, "but is not slowed");
+        assertNear(DarkholdBook.markedFactor(wither, loki), 1.5, 1.0E-6, "and takes the marker's extra damage");
+        check(DarkholdBook.bossLike(wither) && !DarkholdBook.bossLike(helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 12.5))), "bosses are told from the rest");
+        wither.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theGlimpseDoesNotShowWhatHides(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
+        Pig seen = dummy(helper, 14.5, 10.5);
+        Pig invisible = dummy(helper, 14.5, 12.5);
+        invisible.setInvisible(true);
+        ServerPlayer hiding = f.player(12.5, FLOOR, 14.5, Power.LOKI);
+        Powers.get(hiding).set(Live.HIDDEN, true);
+        check(DarkholdBook.hidden(invisible) && DarkholdBook.hidden(hiding) && !DarkholdBook.hidden(seen), "what is invisible or in Vanish hides");
+        TestKit.look(loki, 0.0F, -90.0F);
+        use(loki, true);
+        check(seen.getEffect(MobEffects.GLOWING) != null, "the one in plain sight glows");
+        check(invisible.getEffect(MobEffects.GLOWING) == null && hiding.getEffect(MobEffects.GLOWING) == null, "the hidden do not");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = "items_darkhold_marks_prune", timeoutTicks = 80)
+    public static void endedMarksAreDropped(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(DarkholdConfig.MARK_TICKS, 20);
+        ServerPlayer loki = holder(f, 3.5, 10.5, Power.LOKI);
+        Pig pig = dummy(helper, 10.5, 10.5);
+        int before = DarkholdBook.markCount();
+        DarkholdBook.mark(loki, pig);
+        check(DarkholdBook.markCount() == before + 1, "the mark is kept");
+        f.everyTick(60, tick -> {
+            loki.tickCount = 3 + 20 * tick; // (the second of the prune)
+            PowerTicker.tick(loki);
+            if (tick < 40) {
+                return false;
+            }
+            check(DarkholdBook.markCount() == before, "the mark that ran out is gone, though the pig was never hit again");
+            return true;
+        });
     }
 }
