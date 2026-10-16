@@ -3,7 +3,7 @@
 Wanda and Billy can **build with their magic**, the way builders do with Axiom or WorldEdit, but with no commands to type: you click, you see what will happen, you click again, and it happens. Everything is seen before it is done, and **Ctrl + Z takes it back**, even tomorrow.
 
 * **Wanda's magic has no limit.** She can fill a valley, grow a mountain, copy a castle. Only the server's safety keeps her from freezing the game (see [her part](#wandas-magic-has-no-limit)).
-* **Billy's magic is an apprentice's, and it grows.** Every block he builds is practice. He starts small (a house at a time) and learns his way up to **Wiccan**, four times as strong. Near his mother his spells cost half. See [Billy](#billy-an-apprentice-who-learns).
+* **Billy's magic is an apprentice's, and it grows.** Every block he builds is practice. He starts small (a house at a time) and learns his way up through **ten ranks** to the **Chaos Master**, whose meter is 64 times as big. Near his mother his spells cost half. See [Billy](#billy-an-apprentice-who-learns).
 
 The two heroes have the same **eleven spells** and the same keys. What differs is *how big*.
 
@@ -28,7 +28,7 @@ Hold **Y** and a ring of eleven pictures opens round your crosshair, one for eac
 * **Choose with the keys.** **1** to **9** choose the first nine spells and **0** the tenth (Land), and the wheel closes (also while Y is still held; the hold does not open it again). Grow, the eleventh, has no number: use the mouse. The **mouse wheel** steps from spell to spell (down is clockwise).
 * **Esc** closes the wheel and changes nothing. A tap of **Y** closes it too, and build mode stays on.
 * **The right side** shows the styles of the chosen spell (Solid, Walls, Room... for Fill; Ball, Dome... for Shapes, with a Solid or Hollow switch). Under the ring are the **dice** (Mix), your nine hotbar slots, and the **Blocks** button.
-* **The left side** has **Undo** and **Redo** with how many steps each holds (grey at 0). The **door** in the middle starts or stops building.
+* **The left side** has **Undo** and **Redo** with how many steps each holds (grey at 0), and, for Wanda only, the **Instant** button under them (see [below](#the-instant-level-ctrl--i)). The **door** in the middle starts or stops building.
 * **Over the ring** Wanda's says "Chaos Magic" and "∞"; Billy's shows his name, his stars and rank, his meter and how many blocks of magic he still needs for the next rank.
 * **Blocks** opens a page of big block pictures from the game's four creative tabs (Building, Coloured, Natural and Functional), with a row of the last 16 you used and a search box. Click one and your magic makes that block, even if you do not carry it (in Survival with `requireMaterials` on, only what your inventory holds is shown). It lasts until you change the hotbar slot or what is in your hand.
 
@@ -206,7 +206,7 @@ Billy has every spell from the first minute. What grows is **how big**.
 
 * **The magic meter.** A spell costs one point per block it really changes (copying and looking are free). The meter refills all the time, also when you are not building, and even when you are logged out. A spell that costs more than you have **does not start** (never a half-built house), and says what to do: *wait*, *make it smaller*, *try a hollow style* or *find Mom*.
 * **Undo gives the points back.** Redo costs them again.
-* **Practice.** Every block of magic you cast is practice, and **an undo takes the practice back**, so fill-and-undo cannot make you a Wiccan. Your rank never goes down.
+* **Practice.** Every block of magic you cast is practice, and **an undo takes the practice back**, so fill-and-undo cannot make you a Chaos Master. Your rank never goes down.
 
 | Rank | Practice (blocks of magic) | Meter | Refills | Longest side | Reach | Undos | Repeat | Brush |
 |---|---|---|---|---|---|---|---|---|
@@ -214,8 +214,14 @@ Billy has every spell from the first minute. What grows is **how big**.
 | 2 **Spellcaster** | 2,000 | 1,024 | 24 a second | 32 | 32 | 12 | 12 | 4 |
 | 3 **Sorcerer** | 8,000 | 2,048 | 32 a second | 40 | 40 | 14 | 16 | 5 |
 | 4 **Wiccan** | 30,000 | 4,096 | 40 a second | 48 | 48 | 16 | 20 | 6 |
+| 5 **Enchanter** | 60,000 | 6,144 | 56 a second | 56 | 56 | 18 | 24 | 7 |
+| 6 **Mystic** | 120,000 | 8,192 | 72 a second | 64 | 64 | 20 | 28 | 8 |
+| 7 **Wizard** | 220,000 | 12,288 | 96 a second | 72 | 72 | 22 | 32 | 9 |
+| 8 **Archmage** | 380,000 | 16,384 | 128 a second | 80 | 80 | 24 | 36 | 10 |
+| 9 **Reality Weaver** | 600,000 | 24,576 | 160 a second | 88 | 88 | 26 | 40 | 11 |
+| 10 **Chaos Master** | 1,000,000 | 32,768 | 192 a second | 96 | 96 | 28 | 44 | 12 |
 
-Each rank adds the same step to the Apprentice's numbers: the meter **doubles** (512, 1,024, 2,048, 4,096), the refill grows by half of the first (16, 24, 32, 40 a second), the longest side and the reach grow by **8 blocks**, he can undo **2** more spells and Repeat **4** more copies, and the brush is an eighth of the side. A server can change all of it (see [Server Configuration](Server-Configuration#build-magic)), and an operator can set a rank with `/enhanced build rank`. Rank 1 fills the meter from empty in 32 seconds. When you rank up, your crown flares white, runes spin round you, everyone near hears a fanfare, and the meter fills to its new top as a gift: *"More magic! Rank 2: Spellcaster."*
+In the first four ranks (those of 3.1) each rank adds the same step to the Apprentice's numbers: the meter **doubles** (512, 1,024, 2,048, 4,096) and the refill grows by half of the first (16, 24, 32, 40 a second). From rank 5 they grow faster: the meter is **12, 16, 24, 32, 48 and 64 times** the Apprentice's, and the refill **3.5, 4.5, 6, 8, 10 and 12 times**. All the way up the longest side and the reach grow by **8 blocks** a rank, he can undo **2** more spells and Repeat **4** more copies, and the brush is an eighth of the side. The practice grows too: the ranks above Wiccan want 60,000, 120,000, 220,000, 380,000, 600,000 and a million blocks of magic. Even the Chaos Master is far below Wanda (a side of the whole world, 256 reach, no meter). A server can change all of it (see [Server Configuration](Server-Configuration#build-magic)), including the highest rank: `build_magic_billy.maxRank` runs from 1 to 10 and is 10 by default (a server file written by 3.1 holds 4 until its owner changes it). An operator can set a rank with `/enhanced build rank`. Rank 1 fills the meter from empty in 32 seconds, and a Chaos Master's meter fills in about three minutes. When you rank up, your crown flares white, runes spin round you, everyone near hears a fanfare, and the meter fills to its new top as a gift: *"More magic! Rank 2: Spellcaster."*
 
 **Mom's help.** When a Scarlet Witch (any player with her power, alive, not in Spectator mode and in the same world) is within **16 blocks**, your spell costs **half** (rounded up). A thin scarlet thread runs from her hand to yours, the badge shows a scarlet stripe and "½", and the first time it says *"Mom is near: your magic costs half."* Your practice still counts the real blocks. Wanda just has to be there.
 
@@ -247,6 +253,17 @@ Under it there is only **technical safety**, so the game never freezes. You do n
 * at most 4,096 TNT, lava or fire in one spell;
 * her Paint, Land and Grow **brush stops at radius 16**. That is the *server's* limit, not her magic's: a brush spends its work every 4 ticks while she sweeps, and at radius 16 it is about 17,000 blocks a pulse, which the server keeps up with; at 32 it would be 137,000 and the stroke would trail seconds behind her hand. Scroll just stops there, and nothing is ever said.
 
+## The Instant level (Ctrl + I)
+
+Wanda has one more switch, for when waiting is the only thing left in her way: **Instant**. In build mode press **Ctrl + I**, or click the **Instant** button in the Spell Wheel (it sits under Redo, for Wanda only). A gold badge **"⚡ Instant"** shows in the badge's notes row, and from then on:
+
+* **A spell, an undo and a redo write all their blocks in the same tick** she casts them: no growing, no waiting, no ripple. A quick flash of light fills the box and sparks fly off it instead, so everyone sees that something happened.
+* **It is for spells of up to 250,000 blocks** (`build_magic_wanda.instantMaxBlocks`). A bigger spell does not stop: it goes at normal speed and she is told ("Too big for Instant (300,000 of 250,000): normal speed"). The same limit holds for an Instant undo and redo.
+* **The server stands still while it writes**, about a second for 250,000 blocks. If a spell takes more than 5 seconds of the server's time (`instantMaxMillis`, and never more than a third of the server's own watchdog), the rest of it goes at normal speed and she is told ("Too slow for Instant: the rest goes at normal speed"). A server owner who wants no Instant at all sets `instantMaxBlocks` to 0 ("Instant is turned off on this server").
+* **Every rule is the same.** Instant changes only the speed: arenas, claims (asked for every block), Hexes, loaded chunks only, the spell caps and the undo history with its memory and disk limits all work as for any other spell, and a spell that removes or replaces more than 64 blocks still wants the right button held.
+* **The brush spells** (Paint, Land and Grow) already keep up with her hand, so Instant does not change them.
+* It turns itself off when she leaves build mode or changes power, and **Billy cannot have it**: his key says "Instant is the Scarlet Witch's magic alone".
+
 ## Undo: Ctrl + Z, even tomorrow
 
 **Ctrl + Z** takes back your last spell, **Ctrl + Y** does it again. They work **even after you turned build mode off**. What Ctrl + Z does, in order:
@@ -269,7 +286,7 @@ Your spells are kept **on the server's disk**, in the world's folder, one folder
 
 ### How much is kept
 
-* **How many spells:** Billy 10 and 2 more a rank (up to 16); Wanda as many as fit.
+* **How many spells:** Billy 10 and 2 more a rank (up to 28); Wanda as many as fit.
 * **Memory and disk.** Each player may use 64 MiB of the server's memory and 512 MiB of its disk for the history (`undoMemoryMb`, `undoDiskMb`), and all players together 512 MiB and 4,096 MiB (`serverUndoMemoryMb`, `serverUndoDiskMb`). Past the memory limit the **oldest** spells leave memory (they stay on the disk, and come back when you undo them). Past a disk limit the oldest spell is **forgotten** (of the player using the most, for the server's limit) and you are told *"Your oldest spell can no longer be undone"*. Your newest spell is never lost to a disk limit.
 * **Huge spells ("lite steps").** While a spell works, its step is kept whole in memory, about 14 bytes for every block. A spell of more than about 4 million blocks (at the start settings) would not fit, so the server keeps only a bit for each block and lets the file's records on disk be the step. You notice nothing: it is undone like any other, read back from the disk. This needs the history to be written to disk, and the record of the spell (about half a byte for every block) to fit in your disk share, which at the start settings is hundreds of millions of blocks.
 * **Too big to undo later.** If even that does not fit (the disk share is full or switched off), the game says *"Too big to undo later. Hold the right button to cast it"* Holding the right button casts it without a step, and nothing can bring it back. A **Move** that does not fit is refused outright, held or not.
@@ -303,7 +320,7 @@ Witches' Road doors are ordinary blocks to magic: build or vanish one and it joi
 
 **Why does my sand float?** Magic holds what it places until something touches it. Break a block next to it and it falls.
 
-**Why can't Billy build a castle in one go?** His meter holds 512 blocks at the start, and a spell that doesn't fit never starts half-built. Make it hollow, build it in pieces, build next to Wanda (half the cost), and practise: at Wiccan his meter holds 4,096.
+**Why can't Billy build a castle in one go?** His meter holds 512 blocks at the start, and a spell that doesn't fit never starts half-built. Make it hollow, build it in pieces, build next to Wanda (half the cost), and practise: at Wiccan his meter holds 4,096, and at Chaos Master 32,768.
 
 **Nothing happens when I right click.** Build mode needs something *ready*: a box (or a thing you double clicked) for Fill, Vanish, Change, Copy, Move and Repeat, and a block in your hand for Fill, Change, Paint and Shapes. The strip at the bottom right says what is missing.
 
@@ -311,6 +328,6 @@ Witches' Road doors are ordinary blocks to magic: build or vanish one and it joi
 
 ## For servers
 
-Build Magic has three sections in the server config: `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]` (the time and the speed budget, the undo history with its memory and disk limits, the hold-to-confirm rules, Wanda's reach and caps, Billy's meter and ranks, and a switch for each hero), and five client options. See [Server Configuration](Server-Configuration#build-magic). Operators can undo, stop and inspect spells with `/enhanced build ...`: see [Commands](Commands#build-magic-enhanced-build).
+Build Magic has three sections in the server config: `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]` (the time and the speed budget, the undo history with its memory and disk limits, the hold-to-confirm rules, Wanda's reach and caps and her Instant level, Billy's meter and ten ranks, and a switch for each hero), and five client options. See [Server Configuration](Server-Configuration#build-magic). Operators can undo, stop and inspect spells with `/enhanced build ...`: see [Commands](Commands#build-magic-enhanced-build).
 
 A few notes for hosting: every block a spell changes is also sent to every player who sees it. For a server at home or with a modest upload, lower `build_magic.blocksPerTick` (5,000 keeps each watching player under about 0.4 MB a second). The undo histories live in `data/enhanced/build/` in the world folder: with the defaults they may take up to 4 GiB of the disk and 512 MiB of the memory in all, and `/enhanced build forget <player>` clears one player's. A boss arena is always safe from Build Magic while `build_magic.allArenasProtected` is on. And `build_magic.operatorsOnly` limits it to operators, if you prefer.
