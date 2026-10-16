@@ -462,13 +462,14 @@ public final class RoadFrameworkTests {
 
     // ---- winning, and on to the next trial ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    /** A Road of its own (the registry is swapped): nothing running beside it may see that, so it has a batch of its own. */
+    @GameTest(template = ARENA, batch = "road_framework_swap", timeoutTicks = 600)
     public static void winningUnlocksTheNextTrialAndTheGateLeadsToIt(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
         RoadChallenge added = new RoadTestSupport.ShortParkour("test_second");
-        RoadChallenges.register(added);
-        f.onClose(() -> RoadChallenges.unregister(added));
+        // A Road of two trials: the parkour and this one (the mod's later trials are not part of this test).
+        f.onClose(RoadChallenges.swap(List.of(RoadChallenges.byId("parkour"), added)));
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
         check(RoadTrials.enter(player), "he walks the Road");
         RoadTrial[] first = new RoadTrial[1];

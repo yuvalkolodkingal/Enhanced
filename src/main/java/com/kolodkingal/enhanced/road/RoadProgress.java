@@ -164,6 +164,13 @@ public final class RoadProgress {
         changed();
     }
 
+    /** Forgets what a trial kept. */
+    public void clearData(String challenge) {
+        if (data.remove(challenge) != null) {
+            changed();
+        }
+    }
+
     /** Whether he has nothing to remember (a fresh player): the save does not keep it. */
     public boolean isBlank() {
         return completed == 0 && !inside && checkpoint == 0 && falls == 0 && started == 0 && data.isEmpty() && salt == 0L;

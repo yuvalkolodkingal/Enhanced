@@ -33,6 +33,16 @@ public final class WitchesRoadConfig {
     public static ModConfigSpec.IntValue PARKOUR_CHECKPOINT_EVERY;
     public static ModConfigSpec.IntValue PARKOUR_TIME_LIMIT_SECONDS;
 
+    // ---- trial 2: Copy the Structure ----
+    public static ModConfigSpec.IntValue STRUCTURE_COPY_TIER;
+    public static ModConfigSpec.IntValue STRUCTURE_COPY_TIME_LIMIT_SECONDS;
+    public static ModConfigSpec.IntValue STRUCTURE_COPY_SUPPLY_PERCENT;
+    public static ModConfigSpec.BooleanValue STRUCTURE_COPY_AUTO_CHECK;
+    public static ModConfigSpec.BooleanValue STRUCTURE_COPY_HINTS;
+    public static ModConfigSpec.IntValue STRUCTURE_COPY_HINT_SECONDS;
+    public static ModConfigSpec.IntValue STRUCTURE_COPY_HINT_BLOCKS;
+    public static ModConfigSpec.IntValue STRUCTURE_COPY_MARKS;
+
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Whether the Witches' Road has trials. On (the default): a player with no power who opens a Witches' Road",
@@ -79,7 +89,35 @@ public final class WitchesRoadConfig {
         PARKOUR_TIME_LIMIT_SECONDS = builder.comment("Trial 1, the Parkour: seconds allowed from the start to the finish (the clock shows in the action bar).",
                         "When it runs out the player is put back at the start. 0 = no limit.")
                 .defineInRange("parkourTimeLimitSeconds", 0, 0, 7200);
+        defineStructureCopy(builder);
         builder.pop();
+    }
+
+    /** The options of trial 2, Copy the Structure (inside the {@code witches_road} section). */
+    private static void defineStructureCopy(ModConfigSpec.Builder builder) {
+        STRUCTURE_COPY_TIER = builder.comment("Trial 2, Copy the Structure: how big the model is. 1 = small (up to 5x5x5 blocks), 2 = medium (up to 9x9x7),",
+                        "3 = large (up to 11x11x9). 0 = it depends on the player (each player gets the same size every time, but not the same for everyone).")
+                .defineInRange("structureCopyTier", 2, 0, 3);
+        STRUCTURE_COPY_TIME_LIMIT_SECONDS = builder.comment("Trial 2, Copy the Structure: seconds a player may stay in the trial. There is no failing: this is only",
+                        "so that nobody leaves a room of the Road standing for ever. When it runs out the room is taken down and the player is sent back to",
+                        "where he entered, with his Gene and his progress (the next time he builds a new model from the beginning). 0 = no limit.")
+                .defineInRange("structureCopyTimeLimitSeconds", 5400, 0, 86400);
+        STRUCTURE_COPY_SUPPLY_PERCENT = builder.comment("Trial 2, Copy the Structure: how much of every block the model needs the player is given, in percent",
+                        "(at least 16 of each). The supply chest on the platform fills itself up again, so he cannot run out.")
+                .defineInRange("structureCopySupplyPercent", 150, 100, 1000);
+        STRUCTURE_COPY_AUTO_CHECK = builder.comment("Trial 2, Copy the Structure: the trial is won as soon as the plot looks exactly like the model, without pressing",
+                        "Check. Off: the player has to press the Check button.")
+                .define("structureCopyAutoCheck", true);
+        STRUCTURE_COPY_HINTS = builder.comment("Trial 2, Copy the Structure: the Hint button shows ghost outlines of the blocks that are missing.",
+                        "It costs nothing. Off: the button does nothing.")
+                .define("structureCopyHints", true);
+        STRUCTURE_COPY_HINT_SECONDS = builder.comment("Trial 2, Copy the Structure: how long the ghost blocks of a hint stay.")
+                .defineInRange("structureCopyHintSeconds", 8, 1, 60);
+        STRUCTURE_COPY_HINT_BLOCKS = builder.comment("Trial 2, Copy the Structure: the most ghost blocks a hint shows (the lowest ones that are missing first).")
+                .defineInRange("structureCopyHintBlocks", 40, 1, 300);
+        STRUCTURE_COPY_MARKS = builder.comment("Trial 2, Copy the Structure: the most places that Check marks with glowing outlines (missing, wrong or extra blocks).",
+                        "The count of correct blocks is always shown in full.")
+                .defineInRange("structureCopyMarks", 40, 1, 300);
     }
 
     private WitchesRoadConfig() {
