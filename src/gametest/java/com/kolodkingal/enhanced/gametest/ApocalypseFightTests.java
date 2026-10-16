@@ -118,11 +118,11 @@ public final class ApocalypseFightTests {
                     for (Husk husk : horsemen) {
                         Horsemen.Kind kind = Horsemen.kindOf(husk);
                         check(kind != null && kinds.add(kind), "each of a different kind");
-                        assertNear(husk.getMaxHealth(), 40.0, 1.0E-3, "twice the health of a Husk");
+                        assertNear(husk.getMaxHealth(), 30.0, 1.0E-3, "one and a half times the health of a Husk (3.2: was twice)");
                         if (kind == Horsemen.Kind.FAMINE || kind == Horsemen.Kind.DEATH) {
-                            assertNear(husk.getAttributeValue(Attributes.ATTACK_DAMAGE), 7.0, 1.0E-3, "four more damage than a Husk (3)");
+                            assertNear(husk.getAttributeValue(Attributes.ATTACK_DAMAGE), 6.0, 1.0E-3, "three more damage than a Husk (3; 3.2: was four more)");
                         } else {
-                            check(husk.getAttributeValue(Attributes.ATTACK_DAMAGE) >= 7.0, "four more damage, and its weapon on top");
+                            check(husk.getAttributeValue(Attributes.ATTACK_DAMAGE) >= 6.0, "three more damage, and its weapon on top");
                         }
                         check(husk.hasCustomName() && husk.isCustomNameVisible() && husk.isCurrentlyGlowing(), "a name above its head, glowing");
                         check(fight.owns(husk) && BossFights.fightOf(husk) == fight, "the fight's own");
@@ -303,7 +303,7 @@ public final class ApocalypseFightTests {
             every(helper, 200, tick -> {
                 if (fight.stage() == ApocalypseFight.Stage.TRANSITION_2) {
                     if (fight.stageTicks() == 110) {
-                        assertNear(lowHealth - low.getHealth(), 36.0, 1.0E-3, "three rings, 12 each, to whoever stands on the ground");
+                        assertNear(lowHealth - low.getHealth(), 30.0, 1.0E-3, "three rings, 10 each (3.2: was 12), to whoever stands on the ground");
                         check(flier.getHealth() == flierHealth, "and none to the one who flies two blocks up");
                     }
                     if (fight.stageTicks() == 125) {

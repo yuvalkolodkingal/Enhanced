@@ -320,7 +320,7 @@ public final class CrossHeroBossTests {
         lookAt(jean, boss);
         float health = boss.getHealth();
         float max = boss.shield().strength();
-        check(max == 150.0F, "shield 1 of one fighter has 150 points: " + max);
+        check(max == 100.0F, "shield 1 of one fighter has 100 points (3.2: was 150): " + max);
         List<Float> told = new ArrayList<>();
         PhoenixPower.Listener listener = (phoenix, target, kind, amount) -> {
             if (phoenix == jean && target == boss && kind == PhoenixPower.Kind.BURST) {
@@ -361,7 +361,7 @@ public final class CrossHeroBossTests {
                 return false;
             }
             assertNear(told.get(1), 30.0, 0.01, "the full Burst reached him with all of its 30");
-            check(boss.shield().state() == ApocalypseShield.State.BROKEN, "and broke shield 1 (150): " + boss.shield().state());
+            check(boss.shield().state() == ApocalypseShield.State.BROKEN, "and broke shield 1 (100): " + boss.shield().state());
             check(boss.getHealth() == health, "with what was left over thrown away, not taken from his health");
             assertNear(d.fight().participant(jean.getUUID()).counter("shield"), max, 1.0E-3,
                     "the Phoenix is credited with the whole shield she wore away");

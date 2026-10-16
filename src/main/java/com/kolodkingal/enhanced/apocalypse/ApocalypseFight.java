@@ -528,7 +528,7 @@ public final class ApocalypseFight extends BossFight {
             }
         }
         if (speedster != null) {
-            SandControl.entomb(level(), boss, speedster, 40, ApocalypseBossConfig.ENTOMB_DAMAGE_PER_SECOND.get().floatValue(),
+            SandControl.entomb(level(), boss, speedster, 40, ApocalypseBossConfig.dealt(ApocalypseBossConfig.ENTOMB_DAMAGE_PER_SECOND.get()),
                     ApocalypseBossConfig.COCOON_HEALTH.get().floatValue(), this);
         }
     }
@@ -651,7 +651,7 @@ public final class ApocalypseFight extends BossFight {
         for (int at : new int[]{40, 70, 100}) {
             if (stageTicks == at) {
                 SandHazards.ring(level, boss, id(), new Vec3(boss.getX(), centre.y, boss.getZ()), 0.9, 1.5, 1.1, maxRadius,
-                        ApocalypseBossConfig.RING_DAMAGE.get().floatValue());
+                        ApocalypseBossConfig.dealt(ApocalypseBossConfig.RING_DAMAGE.get()));
                 level.playSound(null, centre.x, centre.y, centre.z, ModSounds.SAND_WAVE.get(), SoundSource.HOSTILE, 3.0F, 0.6F);
             }
         }

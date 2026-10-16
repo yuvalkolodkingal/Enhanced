@@ -165,9 +165,17 @@ public final class WandaAbilities {
     /** How many red shards fly out when the shield shatters. */
     private static final int SHATTER_SHARDS = 56;
 
+    /**
+     * 3.2: whether the Chaos Shield is unlimited ({@code scarlet_witch.shieldUnlimited}): no hunger, no strength to wear
+     * down, no time limit, no recharge. (Before the config loads, on a client that has not joined yet, it is the default.)
+     */
+    public static boolean shieldUnlimited() {
+        return !EnhancedConfig.SPEC.isLoaded() || EnhancedConfig.WANDA_SHIELD_UNLIMITED.get();
+    }
+
     /** Whether the Chaos Shield can be held: it costs hunger, so a hungry Scarlet Witch is refused (the client's animation asks too). */
     public static boolean canAffordShield(Player player) {
-        return player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
+        return shieldUnlimited() || player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
     }
 
     /** The shield is held and complete: only then does it stop anything (it takes time to form, and wears out). */
@@ -176,8 +184,19 @@ public final class WandaAbilities {
         return data.power() == Power.SCARLET_WITCH && data.chaosShieldUp(player.level().getGameTime());
     }
 
-    /** The strength a fresh Chaos Shield has, in points (this is also the most a client can show). */
+    /**
+     * The strength a fresh Chaos Shield has, in points (this is also the most a client can show); infinite while it is
+     * {@linkplain #shieldUnlimited unlimited}.
+     */
     public static float maxShieldStrength() {
+        if (shieldUnlimited()) {
+            return Float.POSITIVE_INFINITY;
+        }
+        return configuredShieldStrength();
+    }
+
+    /** The strength a fresh shield is given (it is never worn down while the shield is unlimited, but the rules can be switched back). */
+    private static float configuredShieldStrength() {
         return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_SHIELD_STRENGTH.get().floatValue() : 30.0F;
     }
 
@@ -186,8 +205,11 @@ public final class WandaAbilities {
         return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get() : 15;
     }
 
-    /** How long a complete Chaos Shield can be held, in ticks. */
+    /** How long a complete Chaos Shield can be held, in ticks ({@link Integer#MAX_VALUE} while it is unlimited). */
     public static int maxShieldTicks() {
+        if (shieldUnlimited()) {
+            return Integer.MAX_VALUE;
+        }
         return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_SHIELD_MAX_TICKS.get() : 160;
     }
 
@@ -206,7 +228,7 @@ public final class WandaAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.chaos_shield.hungry"), true);
             return;
         }
-        data.raiseChaosShield(now, EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get(), maxShieldStrength());
+        data.raiseChaosShield(now, EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get(), configuredShieldStrength());
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.7F, 1.6F);
     }
 
@@ -216,6 +238,10 @@ public final class WandaAbilities {
      */
     private static void dropShield(ServerPlayer player, PowerData data, boolean worn) {
         data.setChaosShieldActive(false);
+        if (shieldUnlimited()) {
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.6F, 1.7F);
+            return; // nothing was spent, so nothing has to recharge
+        }
         data.startCooldown(4, player.level().getGameTime(),
                 (worn ? EnhancedConfig.CHAOS_SHIELD_BROKEN_COOLDOWN : EnhancedConfig.CHAOS_SHIELD_COOLDOWN).get());
         if (worn) {
@@ -256,18 +282,21 @@ public final class WandaAbilities {
             data.setChaosShieldActive(false);
             return;
         }
-        if (!canAffordShield(player)) {
+        boolean unlimited = shieldUnlimited();
+        if (!unlimited && !canAffordShield(player)) {
             dropShield(player, data, false);
             player.displayClientMessage(Component.translatable("message.enhanced.chaos_shield.hungry"), true);
             return;
         }
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (now >= data.shieldFormedAt() + EnhancedConfig.CHAOS_SHIELD_MAX_TICKS.get()) {
-            dropShield(player, data, true);
-            return;
+        if (!unlimited) {
+            if (now >= data.shieldFormedAt() + EnhancedConfig.CHAOS_SHIELD_MAX_TICKS.get()) {
+                dropShield(player, data, true);
+                return;
+            }
+            player.causeFoodExhaustion(EnhancedConfig.CHAOS_SHIELD_EXHAUSTION.get().floatValue());
         }
-        player.causeFoodExhaustion(EnhancedConfig.CHAOS_SHIELD_EXHAUSTION.get().floatValue());
 
         Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
         if (!data.chaosShieldUp(now)) {
@@ -368,7 +397,7 @@ public final class WandaAbilities {
     /**
      * A projectile already on its way home to its owner (a weapon of Thor's, Thanos's sword): the shield lets it by.
      */
-    private static boolean isHeadingHome(Projectile projectile) {
+    static boolean isHeadingHome(Projectile projectile) {
         if (projectile instanceof ShieldCost cost && cost.oneOfAKind()) {
             return cost.returning();
         }
@@ -496,6 +525,9 @@ public final class WandaAbilities {
      */
     public static float wear(ServerPlayer player, float amount) {
         PowerData data = Powers.get(player);
+        if (data.power() == Power.SCARLET_WITCH && shieldUnlimited()) {
+            return amount; // 3.2: an unlimited shield stops it all and is never worn down
+        }
         float taken = Math.min(amount, data.shieldStrength());
         data.setShieldStrength(data.shieldStrength() - taken);
         if (data.shieldStrength() <= 1.0E-4F) {

@@ -161,14 +161,14 @@ public final class ApocalypseShieldTests {
 
     @GameTest(template = ARENA, batch = "apocalypse_pure")
     public static void shieldStrengthScalesWithPlayersAndPhase(GameTestHelper helper) {
-        check(Math.round(ApocalypseShield.strengthFor(1, 1)) == 150, "shield 1, one fighter: 150");
-        check(Math.round(ApocalypseShield.strengthFor(2, 1)) == 188, "shield 2: 187.5, shown 188: " + ApocalypseShield.strengthFor(2, 1));
-        check(Math.round(ApocalypseShield.strengthFor(3, 1)) == 234, "shield 3: 234");
-        check(Math.round(ApocalypseShield.strengthFor(1, 3)) == 255, "three fighters: 255");
-        check(Math.round(ApocalypseShield.strengthFor(2, 3)) == 319, "319");
-        check(Math.round(ApocalypseShield.strengthFor(3, 3)) == 398, "398");
-        assertNear(ApocalypseShield.strengthFor(1, 0), 150.0, 1.0E-4, "no fighters counts as one");
-        assertNear(ApocalypseShield.strengthFor(0, 1), 150.0, 1.0E-4, "and so does phase zero");
+        check(Math.round(ApocalypseShield.strengthFor(1, 1)) == 100, "shield 1, one fighter: 100 (3.2: was 150)");
+        check(Math.round(ApocalypseShield.strengthFor(2, 1)) == 120, "shield 2: 120 (was 188): " + ApocalypseShield.strengthFor(2, 1));
+        check(Math.round(ApocalypseShield.strengthFor(3, 1)) == 144, "shield 3: 144 (was 234)");
+        check(Math.round(ApocalypseShield.strengthFor(1, 3)) == 160, "three fighters: 160 (was 255)");
+        check(Math.round(ApocalypseShield.strengthFor(2, 3)) == 192, "192 (was 319)");
+        check(Math.round(ApocalypseShield.strengthFor(3, 3)) == 230, "230.4, shown 230 (was 398)");
+        assertNear(ApocalypseShield.strengthFor(1, 0), 100.0, 1.0E-4, "no fighters counts as one");
+        assertNear(ApocalypseShield.strengthFor(0, 1), 100.0, 1.0E-4, "and so does phase zero");
         check(ApocalypseShield.strengthFor(1, 6) > ApocalypseShield.strengthFor(1, 5), "every fighter adds");
         // His body is the same sentence.
         assertNear(ApocalypseEntity.designHealthFor(1), 900.0, 1.0E-3, "900 health for one");
@@ -416,13 +416,13 @@ public final class ApocalypseShieldTests {
         float health = boss.getHealth();
         // Five times its damage, then critical (3.1, critShieldFactor 2).
         check(d.hit(ModDamageTypes.PHOENIX_BURST, 8.0F), "a Burst of 8 counts");
-        assertNear(boss.shield().strength(), 70.0, 1.0E-3, "it removes 80 of the 150");
+        assertNear(boss.shield().strength(), 20.0, 1.0E-3, "it removes 80 of the 100");
         check(boss.getHealth() == health && boss.shield().isUp(), "and nothing of his health");
         helper.runAfterDelay(12, () -> {
             check(d.hit(ModDamageTypes.PHOENIX_BURST, 30.0F), "a Burst of 30");
             check(boss.shield().state() == ApocalypseShield.State.BROKEN, "removes 300 and breaks even the whole of shield 1");
             check(boss.getHealth() == health, "with the excess thrown away");
-            assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 80.0 + 70.0, 1.0E-3,
+            assertNear(d.fight().participant(d.hero().getUUID()).counter("shield"), 80.0 + 20.0, 1.0E-3,
                     "the Phoenix is credited with what the shield lost, no more");
             helper.succeed();
         });

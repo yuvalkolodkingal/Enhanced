@@ -66,6 +66,7 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_STRENGTH;
     public static final ModConfigSpec.IntValue CHAOS_SHIELD_COOLDOWN;
     public static final ModConfigSpec.IntValue CHAOS_SHIELD_BROKEN_COOLDOWN;
+    public static final ModConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED;
     public static final ModConfigSpec.IntValue BLOCK_LIFT_RANGE;
     public static final ModConfigSpec.DoubleValue BLOCK_LIFT_MAX_HARDNESS;
     public static final ModConfigSpec.IntValue HEX_DEFAULT_RADIUS;
@@ -105,6 +106,30 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_RANGE;
     public static final ModConfigSpec.DoubleValue BILLY_BLOCK_LIFT_MAX_HARDNESS;
     public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_COOLDOWN;
+    // 3.2: Billy's continuous Hex Beam
+    public static final ModConfigSpec.BooleanValue BILLY_BEAM;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_DAMAGE_PER_SECOND;
+    public static final ModConfigSpec.IntValue BILLY_BEAM_RANGE;
+    public static final ModConfigSpec.IntValue BILLY_BEAM_INTERVAL;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_EXHAUSTION_PER_SECOND;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_RANK_DAMAGE_BONUS;
+    public static final ModConfigSpec.DoubleValue BILLY_BEAM_RANK_RANGE_BONUS;
+    // 3.2: Billy's Hex Barrier (Sneak + B held)
+    public static final ModConfigSpec.BooleanValue BILLY_BARRIER;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_STRENGTH;
+    public static final ModConfigSpec.IntValue BILLY_BARRIER_DURATION;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_RANK_STRENGTH_BONUS;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_RANK_DURATION_BONUS;
+    public static final ModConfigSpec.IntValue BILLY_BARRIER_WIND_UP;
+    public static final ModConfigSpec.IntValue BILLY_BARRIER_COOLDOWN;
+    public static final ModConfigSpec.IntValue BILLY_BARRIER_BROKEN_COOLDOWN;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_EXHAUSTION_PER_SECOND;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_ARC;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_WIDTH;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_HEIGHT;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_DISTANCE;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_SPEED_FACTOR;
+    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_EXPLOSION_FACTOR;
 
     // ---- Tommy (Speed) ----
     public static final ModConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
@@ -247,6 +272,11 @@ public final class EnhancedConfig {
         CHAOS_SHIELD_BROKEN_COOLDOWN = BUILDER.comment("Ticks before the Chaos Shield can be raised again after it shattered or was held to its",
                         "limit (300 = 15 seconds).")
                 .defineInRange("chaosShieldBrokenCooldown", 300, 0, 6000);
+        WANDA_SHIELD_UNLIMITED = BUILDER.comment("3.2: the Chaos Shield is unlimited. It costs no hunger, has no strength to wear down, never shatters,",
+                        "never runs out of time and needs no recharge after it drops (it still takes chaosShieldWindUpTicks to form, and it",
+                        "stops exactly what it stops today). false: the old rules, with chaosShieldExhaustion, chaosShieldStrength,",
+                        "chaosShieldMaxTicks, chaosShieldCooldown and chaosShieldBrokenCooldown.")
+                .define("shieldUnlimited", true);
         BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Wanda and the Phoenix can tear a block out of the ground (Billy and Magneto have",
                         "their own).")
                 .defineInRange("blockLiftRange", 24, 2, 128);
@@ -324,6 +354,63 @@ public final class EnhancedConfig {
                 .defineInRange("blockLiftMaxHardness", 3.0, 0.0, 100.0);
         BILLY_BLOCK_LIFT_COOLDOWN = BUILDER.comment("Ticks Billy waits between two blocks torn out of the ground (catching anything else never waits).")
                 .defineInRange("blockLiftCooldown", 20, 0, 200);
+        BILLY_BEAM = BUILDER.comment("3.2: R is a continuous Hex Beam: held down, a beam leaves his hand along his look and hurts what the crosshair",
+                        "is on. false: the old single Hex Bolt (hexBoltDamage), which forks to creatures near the one it struck.")
+                .define("beam", true);
+        BILLY_BEAM_DAMAGE_PER_SECOND = BUILDER.comment("Damage a second of the Hex Beam does to what the crosshair is on, at his first rank (6 = three hearts).",
+                        "It lands every beamInterval ticks, in equal parts. It grows with his Build Magic rank (beamRankDamageBonus).")
+                .defineInRange("beamDamagePerSecond", 6.0, 0.0, 200.0);
+        BILLY_BEAM_RANGE = BUILDER.comment("How far (blocks) the Hex Beam reaches at his first rank. It grows with his Build Magic rank (beamRankRangeBonus).")
+                .defineInRange("beamRange", 20, 4, 128);
+        BILLY_BEAM_INTERVAL = BUILDER.comment("Ticks between two hits of the Hex Beam (5 = four hits a second). The beam ignores the creature's damage",
+                        "cooldown, so every hit lands.")
+                .defineInRange("beamInterval", 5, 1, 40);
+        BILLY_BEAM_EXHAUSTION_PER_SECOND = BUILDER.comment("Food exhaustion a second of the Hex Beam costs (4.0 = 1 food point; the old bolt cost none).",
+                        "He cannot fire it on an empty stomach.")
+                .defineInRange("beamExhaustionPerSecond", 0.8, 0.0, 40.0);
+        BILLY_BEAM_RANK_DAMAGE_BONUS = BUILDER.comment("How much stronger the beam is at his highest rank (build_magic_billy.maxRank) than at his first, as a",
+                        "fraction: 1.0 = twice the damage. In between it grows evenly with the rank (rank 1: none).")
+                .defineInRange("beamRankDamageBonus", 1.0, 0.0, 10.0);
+        BILLY_BEAM_RANK_RANGE_BONUS = BUILDER.comment("The same for the range: 1.0 = twice as far at his highest rank.")
+                .defineInRange("beamRankRangeBonus", 1.0, 0.0, 10.0);
+        BILLY_BARRIER = BUILDER.comment("3.2: Sneak + B, held, raises Billy's Hex Barrier: a plate of blue magic in front of him that stops projectiles,",
+                        "blows and part of explosions coming from the front (see barrierArc), but only up to barrierStrength, for",
+                        "barrierDuration ticks, and then it has to recharge (B's recharge, shared with Freeze). false: the key does nothing.")
+                .define("barrier", true);
+        BILLY_BARRIER_STRENGTH = BUILDER.comment("Points of damage the Hex Barrier stops before it breaks, at his first rank (20 is two thirds of what Wanda's",
+                        "Chaos Shield held, which a Scarlet Witch can now hold without end). Everything it stops wears it down. It grows with",
+                        "his Build Magic rank (barrierRankStrengthBonus).")
+                .defineInRange("barrierStrength", 20.0, 1.0, 1000.0);
+        BILLY_BARRIER_DURATION = BUILDER.comment("How long (ticks) a complete Hex Barrier can be held, at his first rank (100 = 5 seconds). It grows with his",
+                        "Build Magic rank (barrierRankDurationBonus).")
+                .defineInRange("barrierDuration", 100, 10, 6000);
+        BILLY_BARRIER_RANK_STRENGTH_BONUS = BUILDER.comment("How much stronger the Hex Barrier is at his highest rank (build_magic_billy.maxRank) than at his first, as a",
+                        "fraction: 2.0 = three times the strength. In between it grows evenly with the rank.")
+                .defineInRange("barrierRankStrengthBonus", 2.0, 0.0, 20.0);
+        BILLY_BARRIER_RANK_DURATION_BONUS = BUILDER.comment("The same for how long it can be held: 1.0 = twice as long at his highest rank.")
+                .defineInRange("barrierRankDurationBonus", 1.0, 0.0, 20.0);
+        BILLY_BARRIER_WIND_UP = BUILDER.comment("How long (ticks) the Hex Barrier takes to form after the key goes down. It stops nothing until it is complete.")
+                .defineInRange("barrierWindUpTicks", 8, 0, 100);
+        BILLY_BARRIER_COOLDOWN = BUILDER.comment("Ticks before B can be used again after the barrier was lowered or ran out of time (200 = 10 seconds).")
+                .defineInRange("barrierCooldown", 200, 0, 6000);
+        BILLY_BARRIER_BROKEN_COOLDOWN = BUILDER.comment("Ticks before B can be used again after the barrier broke (400 = 20 seconds).")
+                .defineInRange("barrierBrokenCooldown", 400, 0, 6000);
+        BILLY_BARRIER_EXHAUSTION_PER_SECOND = BUILDER.comment("Food exhaustion a second of the Hex Barrier costs (4.0 = 1 food point). He cannot raise it on an empty stomach.")
+                .defineInRange("barrierExhaustionPerSecond", 0.4, 0.0, 40.0);
+        BILLY_BARRIER_ARC = BUILDER.comment("Half the angle (degrees) of the arc in front of him that the barrier covers: a blow, a projectile or an explosion",
+                        "from further round than this (from the side or from behind) is not stopped at all.")
+                .defineInRange("barrierArc", 60.0, 10.0, 90.0);
+        BILLY_BARRIER_WIDTH = BUILDER.comment("Width (blocks) of the plate the barrier is drawn as.")
+                .defineInRange("barrierWidth", 1.4, 0.5, 6.0);
+        BILLY_BARRIER_HEIGHT = BUILDER.comment("Height (blocks) of the plate.")
+                .defineInRange("barrierHeight", 2.4, 0.5, 6.0);
+        BILLY_BARRIER_DISTANCE = BUILDER.comment("How far (blocks) in front of him the plate is held; projectiles are stopped when they reach it.")
+                .defineInRange("barrierDistance", 1.6, 0.8, 4.0);
+        BILLY_BARRIER_SPEED_FACTOR = BUILDER.comment("How fast he walks while the barrier is raised (1.0 = as usual, 0.6 = at three fifths of the speed).")
+                .defineInRange("barrierSpeedFactor", 0.6, 0.1, 1.0);
+        BILLY_BARRIER_EXPLOSION_FACTOR = BUILDER.comment("The fraction of the damage of an explosion in front of him that still gets through the barrier (the Chaos Shield lets",
+                        "a quarter through).")
+                .defineInRange("barrierExplosionFactor", 0.5, 0.0, 1.0);
         BUILDER.pop();
 
         BUILDER.push("tommy");

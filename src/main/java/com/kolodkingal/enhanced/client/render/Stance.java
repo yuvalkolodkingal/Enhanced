@@ -26,6 +26,10 @@ public enum Stance {
     BEAM_WANDA(1.2F, 3, true),
     SHIELD_WANDA(1.5F, 3, true),
     THOR_BEAM(1, 3, true),
+    /** 3.2: a continuous beam (Billy's Hex Beam, or any other source: {@code Live.BEAMING}): one arm out along the look, the other braced. */
+    BEAM_HAND(1, 3, true),
+    /** 3.2: Billy's Hex Barrier is up: the off forearm raised forward holding the plate, the other arm braced back, the body turned a little. */
+    BARRIER_BILLY(1.5F, 3, true),
     TOMMY_WHIRL(3, 5, true),
 
     // The stances of 3.0, in one region per hero (the // ===== lines), each lane's own. Whatever the order here, the

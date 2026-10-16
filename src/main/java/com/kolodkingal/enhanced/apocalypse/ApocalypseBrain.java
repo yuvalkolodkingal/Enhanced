@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.apocalypse;
 
+import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -360,9 +361,9 @@ public final class ApocalypseBrain {
     }
 
     private void finish(ApocalypseEntity boss, ApocalypseFight fight, ApocalypseAttack done, long now) {
-        readyAt.put(done, now + done.cooldown() * (inWindow ? 2L : 1L));
+        readyAt.put(done, now + ApocalypseBossConfig.slower(done.cooldown()) * (inWindow ? 2L : 1L));
         last = done;
-        gapUntil = now + gap(fight.attackPhase());
+        gapUntil = now + ApocalypseBossConfig.slower(gap(fight.attackPhase()));
         afterStagger = false;
         if (done == ApocalypseAttack.ENTOMB) {
             lastEntomb = now;

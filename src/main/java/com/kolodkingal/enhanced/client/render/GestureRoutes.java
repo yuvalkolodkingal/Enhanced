@@ -180,6 +180,8 @@ public final class GestureRoutes {
         return switch (live) {
             case WHIRLWIND -> power == Power.TOMMY ? GestureId.TOMMY_WHIRL_START : null;
             case CALLING_LIGHTNING -> power == Power.THOR ? (armed ? GestureId.THOR_BEAM_KICK : GestureId.THOR_BEAM_KICK_BARE) : null;
+            // 3.2: the Hex Beam begins as the Hex Bolt was cast (the hand pulled back, then thrust out); the stance BEAM_HAND holds it.
+            case BEAMING -> power == Power.BILLY ? GestureId.BILLY_BOLT : null;
             // Both of Loki's tricks that cast (shapeshift and vanish) raise this.
             case CASTING -> power == Power.LOKI ? GestureId.LOKI_CAST : null;
             default -> null;
@@ -276,7 +278,8 @@ public final class GestureRoutes {
                 default -> "live:WHIRLWIND";
             };
             case BILLY -> switch (ability) {
-                case 1, 4 -> "cooldown";
+                case 1 -> "live:BEAMING";
+                case 4 -> "cooldown";
                 case 2 -> "flight";
                 case 3 -> "held";
                 default -> "toggle:THE_NOISE";
@@ -350,6 +353,7 @@ public final class GestureRoutes {
             case THROWING -> "the cooldown of the daggers starts at the same moment and plays the throw";
             case CROWNED -> "Billy's crown is drawn by its own layer, not a pose";
             case FREEZING -> "the cooldown of Freeze plays the cast; the stance BILLY_FREEZE holds the pose";
+            case BEAMING -> "a stance of any beam (BEAM_HAND, which holds the arm out along the look); Billy's Hex Beam also starts with his BILLY_BOLT gesture";
             case PINNED -> "Mjolnir lying on them is the whole picture: they can't move, so they have no move to make";
             // The states of 3.0 (one region per hero): pending until the hero's lane gives them a gesture or a reason.
             // ===== phoenix =====

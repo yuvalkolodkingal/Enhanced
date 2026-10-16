@@ -347,7 +347,7 @@ public final class ApocalypseBossTests {
                 check(aimedAt.size() == 3, "each at a different player");
                 helper.runAfterDelay(16, () -> {
                     for (int i = 0; i < 3; i++) {
-                        assertNear(before[i] - players.get(i).getHealth(), 11.0, 1.0E-3, "each player took one boulder: 11");
+                        assertNear(before[i] - players.get(i).getHealth(), 9.0, 1.0E-3, "each player took one boulder: 9 (3.2: was 11)");
                     }
                     helper.succeed();
                 });
@@ -397,7 +397,7 @@ public final class ApocalypseBossTests {
                 }
                 SandCocoonEntity cocoon = SandCocoonEntity.cocoonOf(hero);
                 check(cocoon != null && hero.hasEffect(ModEffects.ENTOMBED), "one who did not is entombed: the cocoon and the effect");
-                check(cocoon.health() == 20.0F && cocoon.ticksLeft() > 90, "a cocoon of 20 health for 100 ticks: " + cocoon.ticksLeft());
+                check(cocoon.health() == 20.0F && cocoon.ticksLeft() > 70, "a cocoon of 20 health for 80 ticks (3.2: was 100): " + cocoon.ticksLeft());
                 check(d.fight().owns(cocoon), "the cocoon belongs to the fight");
                 phase[0] = 2;
                 return false;
@@ -598,7 +598,7 @@ public final class ApocalypseBossTests {
         helper.runAfterDelay(WARM, () -> {
             check(boss.brain().force(boss, d.fight(), ApocalypseAttack.BACKHAND), "he swings");
             helper.runAfterDelay(ApocalypseAttack.BACKHAND.tellTicks() + 3, () -> {
-                assertNear(health - hero.getHealth(), 16.0, 1.0E-3, "the fist lands on a player in front of him: 16");
+                assertNear(health - hero.getHealth(), 12.0, 1.0E-3, "the fist lands on a player in front of him: 12 (3.2: was 16)");
                 check(hero.getLastDamageSource() != null && hero.getLastDamageSource().is(ModDamageTypes.APOCALYPSE_BLOW), "it is a blow of his");
                 // Out of reach it finds no one.
                 float after = hero.getHealth();

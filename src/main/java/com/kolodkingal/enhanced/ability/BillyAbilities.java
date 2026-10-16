@@ -1,6 +1,11 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.beam.BeamSpec;
+import com.kolodkingal.enhanced.beam.BeamStyles;
+import com.kolodkingal.enhanced.beam.ContinuousBeam;
+import com.kolodkingal.enhanced.build.BillyRanks;
+import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -80,6 +85,16 @@ public final class BillyAbilities {
     // ---- input ----
 
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        if (ability == 4 && BillyBarrier.enabled() && (data.chaosShieldActive() || (down && player.isShiftKeyDown()))) {
+            // The Hex Barrier is held (Sneak + B): letting go must always get through, even for a Billy who just became a spectator.
+            BillyBarrier.key(player, data, down);
+            return;
+        }
+        if (ability == 1 && beamEnabled()) {
+            // The Hex Beam is held: letting go must always get through, even for a Billy who just became a spectator.
+            hexBeamKey(player, data, down);
+            return;
+        }
         if (!down || player.isSpectator()) {
             return;
         }
@@ -111,6 +126,13 @@ public final class BillyAbilities {
         boolean flying = player.getAbilities().flying;
         boolean building = player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
         data.set(Live.CROWNED, flying || building || (spells != null && now < spells.crown));
+        if (data.is(Live.BEAMING) || ContinuousBeam.isFiring(player)) {
+            hexBeamTick(player, data);
+            if (spells != null && data.is(Live.BEAMING)) {
+                spells.crown = Math.max(spells.crown, now + CROWN_TICKS);
+            }
+        }
+        BillyBarrier.tick(player, data);
         data.set(Live.CASTING, spells != null && now < spells.bolt);
         data.set(Live.FREEZING, spells != null && now < spells.freeze);
         if (spells != null && now >= Math.max(Math.max(spells.crown, spells.blockReady), Math.max(spells.bolt, spells.freeze))) {
@@ -134,7 +156,89 @@ public final class BillyAbilities {
         spells(player).blockReady = player.level().getGameTime() + EnhancedConfig.BILLY_BLOCK_LIFT_COOLDOWN.get();
     }
 
-    // ---- Ability 1: Hex Bolt ----
+    // ---- Ability 1: the Hex Beam (3.2: R held) ----
+
+    /** Whether R is the continuous Hex Beam ({@code billy.beam}) and not the single Hex Bolt. (Before the config loads: the beam.) */
+    public static boolean beamEnabled() {
+        return !EnhancedConfig.SPEC.isLoaded() || EnhancedConfig.BILLY_BEAM.get();
+    }
+
+    /**
+     * How far along his ladder this Billy is, from 0 (his first rank) to 1 (the highest, {@code build_magic_billy.maxRank}):
+     * {@code (rank - 1) / (maxRank - 1)}, read through {@link BillyRanks#rank} and {@link BillyRanks#maxRank} alone. The
+     * beam's damage and range grow with it.
+     */
+    public static double beamProgress(BuildData build) {
+        int max = BillyRanks.maxRank();
+        return max <= 1 ? 0.0 : Math.max(0.0, Math.min(1.0, (BillyRanks.rank(build) - 1) / (double) (max - 1)));
+    }
+
+    /** Damage a second of his beam does at this rank. */
+    public static float beamDamagePerSecond(BuildData build) {
+        return (float) (EnhancedConfig.BILLY_BEAM_DAMAGE_PER_SECOND.get() * (1.0 + EnhancedConfig.BILLY_BEAM_RANK_DAMAGE_BONUS.get() * beamProgress(build)));
+    }
+
+    /** How far his beam reaches at this rank, in blocks. */
+    public static double beamRange(BuildData build) {
+        return EnhancedConfig.BILLY_BEAM_RANGE.get() * (1.0 + EnhancedConfig.BILLY_BEAM_RANK_RANGE_BONUS.get() * beamProgress(build));
+    }
+
+    /** The numbers of his beam for one tick, for his rank now. */
+    public static BeamSpec beamSpec(ServerPlayer player) {
+        BuildData build = player.getData(ModAttachments.BUILD_DATA);
+        int interval = EnhancedConfig.BILLY_BEAM_INTERVAL.get();
+        float perHit = beamDamagePerSecond(build) * interval / 20.0F;
+        float exhaustion = EnhancedConfig.BILLY_BEAM_EXHAUSTION_PER_SECOND.get().floatValue() / 20.0F;
+        return new BeamSpec(BeamStyles.BILLY, beamRange(build), perHit, interval, exhaustion, ModDamageTypes.HEX_BEAM, null);
+    }
+
+    /** With an empty hunger bar there is nothing left to fuel the beam (not in Creative). */
+    private static boolean starving(Player player) {
+        return !player.getAbilities().invulnerable && player.getFoodData().getFoodLevel() <= 0;
+    }
+
+    /** R down: the beam begins (if he is fed and not a spectator); R up: it stops. */
+    private static void hexBeamKey(ServerPlayer player, PowerData data, boolean down) {
+        if (!down || player.isSpectator()) {
+            if (ContinuousBeam.isFiring(player) || data.is(Live.BEAMING)) {
+                ContinuousBeam.stop(player);
+            }
+            return;
+        }
+        if (ContinuousBeam.isFiring(player)) {
+            return;
+        }
+        if (starving(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.billy_beam.hungry"), true);
+            return;
+        }
+        BuildData build = player.getData(ModAttachments.BUILD_DATA);
+        ContinuousBeam.start(player, BeamStyles.BILLY, beamRange(build));
+        spells(player).crown = player.level().getGameTime() + CROWN_TICKS;
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.HEX_BOLT.get(), SoundSource.PLAYERS, 0.8F, 0.8F);
+    }
+
+    /** One tick of a held beam: it ends when he can no longer feed it, otherwise it burns. */
+    private static void hexBeamTick(ServerPlayer player, PowerData data) {
+        if (ContinuousBeam.isFiring(player) && !data.is(Live.BEAMING)) {
+            ContinuousBeam.stop(player); // (something that lets go of every held ability took the flag away)
+            return;
+        }
+        if (player.isSpectator() || starving(player) || !beamEnabled()) {
+            if (starving(player)) {
+                player.displayClientMessage(Component.translatable("message.enhanced.billy_beam.hungry"), true);
+            }
+            ContinuousBeam.stop(player);
+            return;
+        }
+        if (!ContinuousBeam.isFiring(player)) {
+            data.set(Live.BEAMING, false); // (the flag outlived the beam: a server that restarted, a state cleared)
+            return;
+        }
+        ContinuousBeam.tick(player, beamSpec(player));
+    }
+
+    // ---- Ability 1: Hex Bolt (the old single shot, billy.beam = false) ----
 
     /** What a Hex Bolt can strike first: creatures, Ender Dragon parts and End Crystals (like the Chaos Beam). */
     private static boolean canStrike(Entity e) {
@@ -292,6 +396,11 @@ public final class BillyAbilities {
     /** Ends everything this hero left in the world (the power is being taken away). */
     public static void endAll(ServerPlayer player, PowerData data) {
         SPELLS.remove(player.getUUID());
+        if (ContinuousBeam.isFiring(player)) {
+            ContinuousBeam.stop(player);
+        }
+        data.set(Live.BEAMING, false);
+        BillyBarrier.endAll(player, data);
         data.set(Live.CROWNED, false);
         data.set(Live.CASTING, false);
         data.set(Live.FREEZING, false);
@@ -299,6 +408,7 @@ public final class BillyAbilities {
 
     public static void clear() {
         SPELLS.clear();
+        ContinuousBeam.clear();
     }
 
     private BillyAbilities() {

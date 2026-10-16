@@ -106,7 +106,7 @@ final class ApocalypseAttacks {
             }
             case BACKHAND -> boss.swing(InteractionHand.MAIN_HAND);
             case TORNADO -> {
-                int count = fight.attackPhase() >= 3 ? 3 : 1;
+                int count = ApocalypseBossConfig.count(fight.attackPhase() >= 3 ? 3 : 1);
                 List<ServerPlayer> picked = pick(fight.foes(), count, boss);
                 for (ServerPlayer foe : picked) {
                     Vec3 spot = tornadoSpot(fight, boss, foe);
@@ -200,7 +200,7 @@ final class ApocalypseAttacks {
             case SPIKES -> {
                 for (Vec3 point : brain.points) {
                     Vec3 ground = new Vec3(point.x, SandControl.groundAt(level, point.x, point.y + 1.0, point.z), point.z);
-                    SandHazards.spikes(level, boss, fight.id(), ground, SPIKE_RADIUS, 0, ApocalypseBossConfig.SPIKE_DAMAGE.get().floatValue());
+                    SandHazards.spikes(level, boss, fight.id(), ground, SPIKE_RADIUS, 0, ApocalypseBossConfig.dealt(ApocalypseBossConfig.SPIKE_DAMAGE.get()));
                 }
                 sound(level, boss, ModSounds.SAND_SPIKE.get(), 1.2F, 0.9F);
             }
@@ -212,7 +212,7 @@ final class ApocalypseAttacks {
             case TORNADO -> {
                 for (Vec3 spot : brain.points) {
                     SandHazards.tornado(level, boss, fight.id(), spot, TORNADO_RADIUS, ApocalypseBossConfig.TORNADO_TICKS.get(),
-                            ApocalypseBossConfig.STORM_DAMAGE.get().floatValue(), fight.arena().center(), fight.arena().containRadius());
+                            ApocalypseBossConfig.dealt(ApocalypseBossConfig.STORM_DAMAGE.get()), fight.arena().center(), fight.arena().containRadius());
                 }
                 sound(level, boss, ModSounds.SAND_SPIKE.get(), 1.0F, 0.6F);
             }
@@ -225,8 +225,8 @@ final class ApocalypseAttacks {
         if (toward.lengthSqr() < 1.0E-6) {
             toward = Vec3.directionFromRotation(0.0F, boss.getYRot());
         }
-        int count = ApocalypseBossConfig.LANCE_COUNT.get();
-        float damage = ApocalypseBossConfig.LANCE_DAMAGE.get().floatValue();
+        int count = ApocalypseBossConfig.count(ApocalypseBossConfig.LANCE_COUNT.get());
+        float damage = ApocalypseBossConfig.dealt(ApocalypseBossConfig.LANCE_DAMAGE.get());
         for (int i = 0; i < count; i++) {
             double angle = count == 1 ? 0.0 : -FAN_DEGREES + 2.0 * FAN_DEGREES * i / (count - 1);
             SandLanceEntity lance = new SandLanceEntity(ModEntities.SAND_LANCE.get(), level);
@@ -242,13 +242,13 @@ final class ApocalypseAttacks {
             dir = Vec3.directionFromRotation(0.0F, boss.getYRot());
         }
         SandHazards.WaveSpec spec = new SandHazards.WaveSpec(WAVE_SPEED, WAVE_LENGTH, WAVE_WIDTH, WAVE_HEIGHT,
-                ApocalypseBossConfig.WAVE_DAMAGE.get().floatValue(), 40, 1.0);
+                ApocalypseBossConfig.dealt(ApocalypseBossConfig.WAVE_DAMAGE.get()), 40, 1.0);
         SandHazards.wave(level, boss, fight.id(), boss.position(), dir, spec, fight.arena().center(), fight.arena().radius());
         sound(level, boss, ModSounds.SAND_WAVE.get(), 1.3F, 0.8F);
     }
 
     private static void boulders(ApocalypseBrain brain, ApocalypseEntity boss, ApocalypseFight fight, ServerLevel level) {
-        float damage = ApocalypseBossConfig.BOULDER_DAMAGE.get().floatValue();
+        float damage = ApocalypseBossConfig.dealt(ApocalypseBossConfig.BOULDER_DAMAGE.get());
         for (int i = 0; i < brain.points.size(); i++) {
             // They tear out of the ground and orbit over his head: they start there, spread round it.
             double angle = Math.PI * 2.0 * i / Math.max(1, brain.points.size());
@@ -275,7 +275,7 @@ final class ApocalypseAttacks {
             }
             return;
         }
-        SandControl.entomb(level, boss, victim, ApocalypseBossConfig.ENTOMB_TICKS.get(), ApocalypseBossConfig.ENTOMB_DAMAGE_PER_SECOND.get().floatValue(),
+        SandControl.entomb(level, boss, victim, ApocalypseBossConfig.ENTOMB_TICKS.get(), ApocalypseBossConfig.dealt(ApocalypseBossConfig.ENTOMB_DAMAGE_PER_SECOND.get()),
                 ApocalypseBossConfig.COCOON_HEALTH.get().floatValue(), fight);
         sound(level, boss, ModSounds.ENTOMB.get(), 1.2F, 1.0F);
     }
@@ -311,7 +311,7 @@ final class ApocalypseAttacks {
         boss.moveTo(exit.x, exit.y, exit.z, boss.getYRot(), boss.getXRot());
         boss.getNavigation().stop();
         boss.setDeltaMovement(Vec3.ZERO);
-        float damage = ApocalypseBossConfig.PORTAL_SHOCK_DAMAGE.get().floatValue();
+        float damage = ApocalypseBossConfig.dealt(ApocalypseBossConfig.PORTAL_SHOCK_DAMAGE.get());
         for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, boss.getBoundingBox().inflate(3.0, 1.5, 3.0), e -> e != boss && SandControl.canHurt(boss, e))) {
             if (victim.distanceTo(boss) > 3.0F + victim.getBbWidth()) {
                 continue;
@@ -327,7 +327,7 @@ final class ApocalypseAttacks {
     }
 
     private static void backhand(ApocalypseEntity boss, ServerLevel level) {
-        float damage = ApocalypseBossConfig.BACKHAND_DAMAGE.get().floatValue();
+        float damage = ApocalypseBossConfig.dealt(ApocalypseBossConfig.BACKHAND_DAMAGE.get());
         Vec3 forward = Vec3.directionFromRotation(0.0F, boss.yBodyRot);
         for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, boss.getBoundingBox().inflate(BACKHAND_REACH, 1.0, BACKHAND_REACH),
                 e -> e != boss && SandControl.canHurt(boss, e))) {

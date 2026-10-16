@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
+import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.MjolnirShatter;
@@ -17,9 +18,11 @@ import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.command.EnhancedCommand;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -164,6 +167,8 @@ public final class CommonEvents {
             Powers.get(player).setChaosShieldActive(false);
             Powers.get(player).setShrapnelActive(false);
             ThorAbilities.onLogout(player);
+            ContinuousBeam.forget(player);
+            Powers.get(player).set(Live.BEAMING, false);
             MjolnirShatter.onGone(player);
             MjolnirPin.onOwnerGone(player);
             WitchesRoad.forget(player.getUUID());
@@ -249,6 +254,9 @@ public final class CommonEvents {
         if (source.is(DamageTypeTags.IS_FREEZING) && LokiAbilities.isFrostGiant(player)) {
             // A Frost Giant is made of the cold.
             event.setCanceled(true);
+            return;
+        }
+        if (player instanceof ServerPlayer billy && BillyBarrier.isUp(billy) && !unstoppable && BillyBarrier.absorb(billy, event)) {
             return;
         }
         if (player instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(player) && !unstoppable) {

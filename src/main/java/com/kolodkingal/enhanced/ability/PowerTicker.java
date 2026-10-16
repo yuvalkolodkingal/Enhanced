@@ -114,6 +114,7 @@ public final class PowerTicker {
         data.setSlowMo(false);
         data.set(Live.SPEEDING, false);
         data.set(Live.CALLING_LIGHTNING, false);
+        data.set(Live.BEAMING, false);
         HeroServers.stopHold(data);
     }
 

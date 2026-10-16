@@ -62,9 +62,9 @@ public final class ApocalypseShieldConfig {
         PHOENIX_PSIONIC_STRAIN = builder.comment("Shield strength a Phoenix's Psionic Field that reaches him removes.")
                 .defineInRange("phoenixPsionicStrain", 60.0, 0.0, 1000.0);
         SHIELD_REGEN_DELAY_TICKS = builder.comment("The boss's shield regenerates only after this many ticks without mind-power damage.")
-                .defineInRange("shieldRegenDelayTicks", 160, 0, 2400);
+                .defineInRange("shieldRegenDelayTicks", 200, 0, 2400);
         SHIELD_REGEN_FRACTION = builder.comment("The fraction of its strength the boss's shield regains each second once it regenerates.")
-                .defineInRange("shieldRegenFraction", 0.03, 0.0, 1.0);
+                .defineInRange("shieldRegenFraction", 0.02, 0.0, 1.0);
         MIND_HIT_COOLDOWN_TICKS = builder.comment("Ticks between two mind-power hits from the same attacker that the shield will count",
                         "(the Chaos Beam hits every tick, and a shield leaves no invulnerability frames, so it keeps its own).")
                 .defineInRange("mindHitCooldownTicks", 10, 1, 40);

@@ -64,7 +64,7 @@ public final class ApocalypseCritTests {
     private static final int CRIT_GAP = ApocalypseEntity.CRIT_EFFECT_TICKS + 1;
 
     /**
-     * T63 (8a.2): on shield 1 of a lone fighter (150), with the default factors, one beam hit of 5 by Wanda removes 10;
+     * T63 (8a.2): on shield 1 of a lone fighter (100 since 3.2), with the default factors, one beam hit of 5 by Wanda removes 10;
      * a {@code telekinetic_slam} of 8 caused by her removes 16; the Phoenix's Burst of 30 removes the rest (300 against
      * what is left); on a fresh shield her Mind Control removes 50 and her Psionic Field 120; a borrowed block of 10.4
      * removes {@code 10.4 x 0.5 x 2}.
@@ -74,7 +74,7 @@ public final class ApocalypseCritTests {
         shieldWear(helper, true);
     }
 
-    /** T63 with the three factors 1.0: the 3.0 numbers (5, 8, 150, 25, 60, 5.2) and no crit effect. */
+    /** T63 with the three factors 1.0: the 3.0 numbers (5, 8, 25, 60, 5.2) and no crit effect. */
     @GameTest(template = ARENA, batch = "apocalypse_crit_off", timeoutTicks = 80)
     public static void mindPowerIsNotCriticalWithTheFactorsAtOne(GameTestHelper helper) {
         shieldWear(helper, false);
@@ -95,7 +95,7 @@ public final class ApocalypseCritTests {
         List<Object> wandaSaw = new ArrayList<>();
         List<Object> phoenixSaw = new ArrayList<>();
         float max = boss.shield().max();
-        assertNear(max, 150.0, 1.0E-3, "shield 1 of a lone fighter");
+        assertNear(max, 100.0, 1.0E-3, "shield 1 of a lone fighter (3.2: was 150)");
 
         // Her beam, and the Phoenix's strains, each on a fresh shield.
         float before = boss.shield().strength();
@@ -106,7 +106,7 @@ public final class ApocalypseCritTests {
         assertNear(max - boss.shield().strength(), 25.0 * k, 1.0E-3, "her Mind Control removes " + 25.0 * k);
         boss.shield().raiseNow(max);
         PhoenixPower.touched(phoenix, boss, PhoenixPower.Kind.PSIONIC_FIELD, 0.0F);
-        assertNear(max - boss.shield().strength(), 60.0 * k, 1.0E-3, "her Psionic Field removes " + 60.0 * k);
+        assertNear(max - boss.shield().strength(), Math.min(max, 60.0 * k), 1.0E-3, "her Psionic Field removes " + 60.0 * k + " (at most the whole shield of "+ max + ")");
         boss.shield().raiseNow(max);
         check(boss.getHealth() == boss.getMaxHealth(), "none of it touched his health");
         drain(wanda, wandaSaw);
@@ -131,7 +131,7 @@ public final class ApocalypseCritTests {
                 assertNear(max - left, 8.0 * k, 1.0E-3, "a slam of 8 caused by her removes " + 8.0 * k);
                 boss.invulnerableTime = 0;
                 check(boss.hurt(ModDamageTypes.source(level, ModDamageTypes.PHOENIX_BURST, phoenix, phoenix), 30.0F), "the Burst reaches it");
-                check(boss.shield().state() == ApocalypseShield.State.BROKEN, "a Burst of 30 (" + 150.0 * k + ") removes the rest and breaks it");
+                check(boss.shield().state() == ApocalypseShield.State.BROKEN, "a Burst of 30 (" + 150.0 * k + " against what is left) removes the rest and breaks it");
                 check(boss.getHealth() == boss.getMaxHealth(), "and his health is whole");
                 drain(wanda, wandaSaw);
                 drain(phoenix, phoenixSaw);
@@ -348,7 +348,7 @@ public final class ApocalypseCritTests {
      * (nor by the game's own healing, a potion's); in the true form at 30 %, 200 ticks after a blow, it does not
      * either; and his shield, worn to 30, still mends once it has had 160 ticks without mind power.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_no_regen", timeoutTicks = 440)
+    @GameTest(template = ARENA, batch = "apocalypse_no_regen", timeoutTicks = 500)
     public static void heNeverHealsByDefault(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -361,17 +361,18 @@ public final class ApocalypseCritTests {
         // Wear the shield to 30: (150 - 30) / 2, a critical beam.
         float max = boss.shield().strength();
         check(d.hit(ModDamageTypes.CHAOS_BEAM, (max - 30.0F) / 2.0F), "her beam wears the shield");
+        // 3.2: the shield waits 200 ticks (was 160) and knits 2 percent a second (was 3); the test looks at tick 250.
         assertNear(boss.shield().strength(), 30.0, 1.0E-3, "to 30");
         int delay = ApocalypseShieldConfig.SHIELD_REGEN_DELAY_TICKS.get();
         float[] afterBlow = {-1.0F};
-        every(helper, 420, tick -> {
-            if (tick <= 200) {
+        every(helper, 470, tick -> {
+            if (tick <= 250) {
                 check(boss.shield().isUp(), "the shield stays up (tick " + tick + ")");
                 check(boss.getHealth() == half, "his health does not rise behind his shield (tick " + tick + "): " + boss.getHealth());
                 if (tick == delay - 2) {
                     assertNear(boss.shield().strength(), 30.0, 1.0E-3, "the shield waits " + delay + " ticks without mind power");
                 }
-                if (tick == 200) {
+                if (tick == 250) {
                     check(boss.shield().strength() > 30.5F, "then it mends: " + boss.shield().strength());
                     fight.forceState(ApocalypseFight.Stage.TRUE_FORM, 3);
                     calm(fight);
@@ -385,7 +386,7 @@ public final class ApocalypseCritTests {
             }
             check(fight.stage() == ApocalypseFight.Stage.TRUE_FORM, "still the true form (tick " + tick + "): " + fight.stage());
             check(boss.getHealth() == afterBlow[0], "his health does not rise in the true form (tick " + tick + "): " + boss.getHealth());
-            return tick >= 400;
+            return tick >= 450;
         });
     }
 

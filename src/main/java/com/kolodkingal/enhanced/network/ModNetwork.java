@@ -51,6 +51,8 @@ public final class ModNetwork {
         // 3.2: the Book of the Vishanti's screen and the wards it raises.
         registrar.playToServer(VishantiActionPayload.TYPE, VishantiActionPayload.STREAM_CODEC, VishantiActionPayload::handle);
         registrar.playToClient(WardSyncPayload.TYPE, WardSyncPayload.STREAM_CODEC, WardSyncPayload::handle);
+        // 3.2: continuous beams (Billy's Hex Beam, and any other source of one).
+        registrar.playToClient(BeamPayload.TYPE, BeamPayload.STREAM_CODEC, BeamPayload::handle);
     }
 
     private ModNetwork() {

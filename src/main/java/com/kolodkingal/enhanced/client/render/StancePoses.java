@@ -23,6 +23,10 @@ public final class StancePoses {
     /** Billy's freeze: both hands raised toward the spellbound. */
     public static final float[] BILLY_FREEZE_M = {-126, 8, 11};
     public static final float[] BILLY_FREEZE_O = {-126, -8, -11};
+    /** Billy's Hex Barrier (3.2): the off arm bent forward across the chest holding the plate, the main arm braced back and out. */
+    public static final float[] BARRIER_BILLY_M = {10, 8, 20};
+    public static final float[] BARRIER_BILLY_O = {-80, 25, -6};
+    public static final float BARRIER_BILLY_TWIST = 8;
     /** The God of Thunder and the Frost Giant spread their arms a little (added to the arm below). */
     public static final float THOR_UNLEASHED_Z = 13;
     public static final float LOKI_FROST_Z = 11;
