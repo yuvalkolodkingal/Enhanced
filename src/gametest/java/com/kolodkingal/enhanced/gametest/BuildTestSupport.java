@@ -317,7 +317,17 @@ final class BuildTestSupport {
         }
         BuildMagic.setMode(player, true);
         BuildScheduler.manual(player.getUUID(), null);
+        steadyClock();
         return player;
+    }
+
+    /**
+     * Makes the 2 ms a cast reads its preview by (D-B 10.1) stand still, until the fixture closes: that budget is wall-clock
+     * time, and on a busy machine the preview of a plan of 64 cells or more is cut off, which cannot refuse the cast, so
+     * a test that expects the up-front refusal (or the preflight's exact counts) would see a queued spell instead.
+     */
+    static void steadyClock() {
+        BuildMagic.useClock(() -> 0L);
     }
 
     /** The arena's cell {@code x, y, z} in the world. */
