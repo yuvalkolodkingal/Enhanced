@@ -33,6 +33,19 @@ public final class WitchesRoadConfig {
     public static ModConfigSpec.IntValue PARKOUR_CHECKPOINT_EVERY;
     public static ModConfigSpec.IntValue PARKOUR_TIME_LIMIT_SECONDS;
 
+    // ---- trial 3: the Ice-Boat Race ----
+    public static ModConfigSpec.IntValue BOAT_RACE_LENGTH;
+    public static ModConfigSpec.IntValue BOAT_RACE_TRACK_WIDTH;
+    public static ModConfigSpec.IntValue BOAT_RACE_DIFFICULTY;
+    public static ModConfigSpec.IntValue BOAT_RACE_SHORTCUTS;
+    public static ModConfigSpec.BooleanValue BOAT_RACE_OBSTACLES;
+    public static ModConfigSpec.BooleanValue BOAT_RACE_BLUE_ICE;
+    public static ModConfigSpec.IntValue BOAT_RACE_CHECKPOINT_EVERY;
+    public static ModConfigSpec.IntValue BOAT_RACE_TIME_LIMIT_SECONDS;
+    public static ModConfigSpec.DoubleValue BOAT_RACE_PAR_FACTOR;
+    public static ModConfigSpec.IntValue BOAT_RACE_RESPAWN_COOLDOWN_SECONDS;
+    public static ModConfigSpec.IntValue BOAT_RACE_COUNTDOWN_SECONDS;
+
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Whether the Witches' Road has trials. On (the default): a player with no power who opens a Witches' Road",
@@ -79,6 +92,36 @@ public final class WitchesRoadConfig {
         PARKOUR_TIME_LIMIT_SECONDS = builder.comment("Trial 1, the Parkour: seconds allowed from the start to the finish (the clock shows in the action bar).",
                         "When it runs out the player is put back at the start. 0 = no limit.")
                 .defineInRange("parkourTimeLimitSeconds", 0, 0, 7200);
+
+        BOAT_RACE_LENGTH = builder.comment("Trial 3, the Ice-Boat Race: how long the course is, from the start line to the finish line, in blocks.",
+                        "The course winds through the Road's cell, so it is never longer than about 1400; the shortcuts make the shortest way shorter.")
+                .defineInRange("boatRaceLength", 800, 200, 1400);
+        BOAT_RACE_TRACK_WIDTH = builder.comment("Trial 3, the Ice-Boat Race: how wide the track is, in blocks (an odd number; the narrow stretches are 5 wide).")
+                .defineInRange("boatRaceTrackWidth", 9, 7, 15);
+        BOAT_RACE_DIFFICULTY = builder.comment("Trial 3, the Ice-Boat Race: 1 = easy (wide curves, one hairpin, no snow walls), 2 = normal, 3 = hard (tighter curves,",
+                        "three hairpins, more snow). Every curve can be driven at the speed the boat can reach on the straight before it.")
+                .defineInRange("boatRaceDifficulty", 2, 1, 3);
+        BOAT_RACE_SHORTCUTS = builder.comment("Trial 3, the Ice-Boat Race: how many shortcuts the course may have. A shortcut is a straight across a loop of the track with a",
+                        "gap in it (the boat has to be fast to jump it, and falls into the void if it is not); the long way round is always open.")
+                .defineInRange("boatRaceShortcuts", 1, 0, 3);
+        BOAT_RACE_OBSTACLES = builder.comment("Trial 3, the Ice-Boat Race: snow drifts (rough snow slows the boat) and snow walls to wind between. Nothing traps the boat.")
+                .define("boatRaceObstacles", true);
+        BOAT_RACE_BLUE_ICE = builder.comment("Trial 3, the Ice-Boat Race: stripes of blue ice (the slipperiest ice, the boat gains speed on it) in the track.")
+                .define("boatRaceBlueIce", true);
+        BOAT_RACE_CHECKPOINT_EVERY = builder.comment("Trial 3, the Ice-Boat Race: a checkpoint about every this many blocks. A boat that falls off the track is put back",
+                        "on the last one.")
+                .defineInRange("boatRaceCheckpointEvery", 100, 40, 400);
+        BOAT_RACE_TIME_LIMIT_SECONDS = builder.comment("Trial 3, the Ice-Boat Race: seconds allowed from the start of the trial (a clock shows at the top of the screen).",
+                        "When it runs out the player is put back at the start. 0 = no limit.")
+                .defineInRange("boatRaceTimeLimitSeconds", 240, 0, 3600);
+        BOAT_RACE_PAR_FACTOR = builder.comment("Trial 3, the Ice-Boat Race: the par time is the time the boat's physics allow on this course (the fastest way through every curve)",
+                        "times this factor. The player is told how he did against it.")
+                .defineInRange("boatRaceParFactor", 1.4, 1.0, 5.0);
+        BOAT_RACE_RESPAWN_COOLDOWN_SECONDS = builder.comment("Trial 3, the Ice-Boat Race: a player who is stuck can sneak (Shift) to be put back on the last checkpoint.",
+                        "This many seconds have to pass between two such returns (a sneak before that only keeps him in the boat).")
+                .defineInRange("boatRaceRespawnCooldownSeconds", 5, 0, 120);
+        BOAT_RACE_COUNTDOWN_SECONDS = builder.comment("Trial 3, the Ice-Boat Race: the countdown (3, 2, 1, go) once the player is in his boat, before the barrier at the start line opens.")
+                .defineInRange("boatRaceCountdownSeconds", 3, 1, 10);
         builder.pop();
     }
 

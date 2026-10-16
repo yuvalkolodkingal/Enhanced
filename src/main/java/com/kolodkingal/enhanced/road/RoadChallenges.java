@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.road;
 
+import com.kolodkingal.enhanced.road.boat.IceBoatChallenge;
 import com.kolodkingal.enhanced.road.parkour.ParkourChallenge;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,18 +13,34 @@ import java.util.List;
  */
 public final class RoadChallenges {
     private static final List<RoadChallenge> ALL = new ArrayList<>();
+    /** The order number each trial was registered with (the list is kept sorted by it). */
+    private static final List<Integer> ORDER = new ArrayList<>();
 
     static {
-        // Trial 1: the Parkour. (Trial 2, copying a structure, and trial 3, the ice-boat race, are added here.)
+        // Trial 1: the Parkour. (Trial 2, copying a structure, goes between; trial 3, the ice-boat race, has the order number 3.)
         register(new ParkourChallenge());
+        register(3, new IceBoatChallenge());
     }
 
     /** Adds a trial at the end of the Road. */
     public static synchronized void register(RoadChallenge challenge) {
+        register(ORDER.isEmpty() ? 1 : ORDER.get(ORDER.size() - 1) + 1, challenge);
+    }
+
+    /**
+     * Adds a trial with an explicit order number: it comes after every trial with a lower number and before every one with a higher
+     * number, whatever the order they are registered in (so trials made apart from one another can say where they belong).
+     */
+    public static synchronized void register(int order, RoadChallenge challenge) {
         if (byId(challenge.id()) != null) {
             throw new IllegalArgumentException("Two trials called " + challenge.id());
         }
-        ALL.add(challenge);
+        int at = ORDER.size();
+        while (at > 0 && ORDER.get(at - 1) > order) {
+            at--;
+        }
+        ALL.add(at, challenge);
+        ORDER.add(at, order);
     }
 
     /** The trials in order (a copy). */
@@ -57,7 +74,11 @@ public final class RoadChallenges {
 
     /** Takes a trial out of the Road again (a test that added a trial of its own, when it ends). */
     public static synchronized void unregister(RoadChallenge challenge) {
-        ALL.remove(challenge);
+        int at = ALL.indexOf(challenge);
+        if (at >= 0) {
+            ALL.remove(at);
+            ORDER.remove(at);
+        }
     }
 
     private RoadChallenges() {
