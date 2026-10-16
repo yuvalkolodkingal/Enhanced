@@ -94,7 +94,7 @@ public final class RoadDataTests {
     @GameTest(template = ARENA, batch = BATCH)
     public static void theScreensMessagesTravelIntact(GameTestHelper helper) {
         for (boolean trials : new boolean[]{true, false}) {
-            OpenRoadPayload open = new OpenRoadPayload(new BlockPos(-5, 70, 12), trials, 2, 3);
+            OpenRoadPayload open = new OpenRoadPayload(new BlockPos(-5, 70, 12), trials, 2, 3, !trials);
             ByteBuf buf = Unpooled.buffer();
             OpenRoadPayload.STREAM_CODEC.encode(buf, open);
             check(OpenRoadPayload.STREAM_CODEC.decode(buf).equals(open) && buf.readableBytes() == 0, "the screen's message: " + open);

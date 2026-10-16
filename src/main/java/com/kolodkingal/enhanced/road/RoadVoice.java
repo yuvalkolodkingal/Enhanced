@@ -24,6 +24,10 @@ public final class RoadVoice {
     public static final String WON = "won";
     public static final String LEAVE = "leave";
     public static final String BACK = "back";
+    /** The end of the Road: he has walked it all; the farewell as the power awakens; the word as he steps back into the world. */
+    public static final String ENDING = "ending";
+    public static final String FAREWELL = "farewell";
+    public static final String HOME = "home";
 
     /** The lang key of one version of a line. */
     public static String key(String event, int variant) {

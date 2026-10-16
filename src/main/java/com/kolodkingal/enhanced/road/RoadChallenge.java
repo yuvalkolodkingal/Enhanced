@@ -69,6 +69,15 @@ public interface RoadChallenge {
     }
 
     /**
+     * Whether this is not a trial but the end of the Road ({@link RoadEnding}): the hall where the player chooses whose road to walk. It
+     * is never won (it has no gate and does not count), a power is no reason to take the player out of it once he has chosen, and its
+     * exit door asks the question again instead of leaving.
+     */
+    default boolean isEnding() {
+        return false;
+    }
+
+    /**
      * Whether the trial can be taken up again where the player left off after he logged out (it is built again, and he is put
      * at his checkpoint). A trial that cannot (it keeps something the player built) is started over from the beginning.
      */

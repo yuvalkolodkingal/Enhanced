@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.road.RoadSave;
 import com.kolodkingal.enhanced.road.RoadSweeper;
 import com.kolodkingal.enhanced.road.RoadTrial;
 import com.kolodkingal.enhanced.road.RoadTrials;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
@@ -100,7 +101,9 @@ public final class RoadLoginTests {
         RoadTrials.reconcile(lost);
         RoadTrials.reconcile(known);
         check(!RoadDimension.in(lost) && lost.serverLevel() == server.overworld(), "the first is taken to the world");
-        check(lost.position().distanceTo(Vec3.atBottomCenterOf(server.overworld().getSharedSpawnPos())) < 8.0, "to its spawn: " + lost.position());
+        BlockPos spawn = server.overworld().getSharedSpawnPos();
+        check(Math.abs(lost.getX() - (spawn.getX() + 0.5)) < 1.0 && Math.abs(lost.getZ() - (spawn.getZ() + 0.5)) < 1.0 && server.overworld().noCollision(lost),
+                "to its spawn, in the open: " + lost.position());
         check(!RoadDimension.in(known) && known.serverLevel() == helper.getLevel() && known.position().distanceTo(home) < 0.01, "the second is taken to where he came from");
         check(known.getYRot() == 90.0F, "looking the way he looked");
         check(!RoadSave.get(server).progress(known.getUUID()).inside() && RoadSave.get(server).progress(known.getUUID()).entry() == null, "and the save is clean");

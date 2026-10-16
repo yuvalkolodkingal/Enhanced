@@ -26,6 +26,8 @@ public final class WitchesRoadConfig {
     public static ModConfigSpec.IntValue LEAVE_CONFIRM_SECONDS;
     public static ModConfigSpec.IntValue BUILD_BLOCKS_PER_TICK;
     public static ModConfigSpec.IntValue REMOVE_BLOCKS_PER_TICK;
+    // ---- the ending ----
+    public static ModConfigSpec.IntValue ENDING_FAREWELL_SECONDS;
 
     // ---- trial 1: the Parkour ----
     public static ModConfigSpec.IntValue PARKOUR_PADS;
@@ -89,6 +91,10 @@ public final class WitchesRoadConfig {
                 .defineInRange("buildBlocksPerTick", 20000, 500, 1000000);
         REMOVE_BLOCKS_PER_TICK = builder.comment("How many blocks of a finished trial are removed in one tick.")
                 .defineInRange("removeBlocksPerTick", 20000, 500, 1000000);
+        ENDING_FAREWELL_SECONDS = builder.comment("The ending: after the player has chosen Billy or Tommy in the Road (the Gene is used up and the power awakens), the Road",
+                        "says its farewell in a column of light for this many seconds, and then sends him back to where he entered.",
+                        "0 = he is sent back at once.")
+                .defineInRange("endingFarewellSeconds", 5, 0, 30);
 
         PARKOUR_PADS = builder.comment("Trial 1, the Parkour: how many jumps there are from the start to the finish.")
                 .defineInRange("parkourPads", 40, 8, 150);

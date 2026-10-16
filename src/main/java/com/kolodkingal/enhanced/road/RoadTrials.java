@@ -10,9 +10,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -177,11 +182,23 @@ public final class RoadTrials {
      * @return whether the trial is being built (otherwise he was told why not)
      */
     public static boolean enter(ServerPlayer player) {
-        return enter(player, -1);
+        return enter(player, -1, null);
     }
 
-    /** {@link #enter(ServerPlayer)} into a given trial instead of the one he has reached (an operator's tool; -1 = as usual). */
+    /** {@link #enter(ServerPlayer)}: the player opened this Witches' Road door (it is where he is put back if the place he stood on is gone). */
+    public static boolean enter(ServerPlayer player, BlockPos door) {
+        return enter(player, -1, door);
+    }
+
+    /**
+     * {@link #enter(ServerPlayer)} into a given trial instead of the one he has reached (an operator's tool; -1 = as usual). The number
+     * after the last trial is the end of the Road, the hall where the choice is made ({@link RoadEnding}).
+     */
     public static boolean enter(ServerPlayer player, int forcedTrial) {
+        return enter(player, forcedTrial, null);
+    }
+
+    private static boolean enter(ServerPlayer player, int forcedTrial, @Nullable BlockPos door) {
         String refusal = refusal(player, forcedTrial >= 0);
         if (refusal != null) {
             player.displayClientMessage(Component.translatable(refusal).withStyle(ChatFormatting.GRAY), true);
@@ -190,7 +207,7 @@ public final class RoadTrials {
         MinecraftServer server = player.server;
         RoadProgress progress = RoadSave.get(server).progress(player.getUUID());
         int number = forcedTrial >= 0 ? forcedTrial : progress.completed();
-        RoadChallenge challenge = RoadChallenges.get(number);
+        RoadChallenge challenge = RoadChallenges.stage(number);
         if (challenge == null) {
             return false;
         }
@@ -201,7 +218,7 @@ public final class RoadTrials {
             return false;
         }
         RoadProgress.Entry entry = new RoadProgress.Entry(player.level().dimension(), player.position(), player.getYRot(), player.getXRot(),
-                player.gameMode.getGameModeForPlayer().getId());
+                player.gameMode.getGameModeForPlayer().getId(), door == null ? null : door.immutable());
         PENDING.put(player.getUUID(), new Pending(trial, null, entry, Math.min(checkpoint, trial.layout().checkpoints().size() - 1), null,
                 player.level().getGameTime()));
         player.displayClientMessage(Component.translatable("message.enhanced.road.opening").withStyle(s -> s.withColor(WitchesRoad.LIGHT)), true);
@@ -283,9 +300,12 @@ public final class RoadTrials {
         }
         RoadFx.travel(road, at.respawn(), true);
         restore(player);
-        RoadVoice.begin(player, trial.challenge(), trial.number() + 1);
-        RoadVoice.say(player, pending.from == null && pending.anchor == null ? RoadVoice.ENTER : pending.anchor != null ? RoadVoice.BACK
-                : RoadVoice.START, progress.started());
+        if (!trial.challenge().isEnding()) {
+            // (The end of the Road speaks for itself.)
+            RoadVoice.begin(player, trial.challenge(), trial.number() + 1);
+            RoadVoice.say(player, pending.from == null && pending.anchor == null ? RoadVoice.ENTER : pending.anchor != null ? RoadVoice.BACK
+                    : RoadVoice.START, progress.started());
+        }
         trial.challenge().onStart(trial, player);
         if (pending.from != null) {
             retire(pending.from, RoadChallenge.End.MOVED_ON);
@@ -335,7 +355,7 @@ public final class RoadTrials {
                 dropTaken(player, trial);
                 continue;
             }
-            if (Powers.power(player).hasPowers()) {
+            if (Powers.power(player).hasPowers() && !RoadEnding.isLeaving(player)) {
                 player.displayClientMessage(Component.translatable("message.enhanced.road.powers").withStyle(ChatFormatting.GRAY), true);
                 leave(player, RoadChallenge.End.LEFT);
                 continue;
@@ -403,9 +423,9 @@ public final class RoadTrials {
             return;
         }
         RoadProgress progress = trial.progress();
-        RoadChallenge next = RoadChallenges.get(progress.completed());
+        // After the last trial comes the end of the Road: the hall where he chooses.
+        RoadChallenge next = RoadChallenges.stage(progress.completed());
         if (next == null) {
-            RoadEnding.finish(player);
             return;
         }
         RoadTrial built = plan(player.server, player.getUUID(), next, progress.completed(), progress.salt());
@@ -450,52 +470,124 @@ public final class RoadTrials {
             retire(pending.trial, RoadChallenge.End.REMOVED);
         }
         restore(player);
-        RoadVoice.say(player, RoadVoice.LEAVE, progress.started());
+        if (Powers.power(player).hasPowers()) {
+            // He has a power now (he chose at the end of the Road, or an operator gave him one): the Road is behind him and remembers nothing.
+            closeRoad(player.server, id);
+        } else if (reason != RoadChallenge.End.WON) {
+            RoadVoice.say(player, RoadVoice.LEAVE, progress.started());
+            if (progress.completed() >= RoadChallenges.count()) {
+                // He walked the whole Road but did not choose: the door still offers the choice.
+                player.displayClientMessage(Component.translatable("message.enhanced.road.walked_all").withStyle(s -> s.withColor(WitchesRoad.LIGHT_CORE)), false);
+                player.displayClientMessage(Component.translatable("message.enhanced.road.walked_all.hint").withStyle(ChatFormatting.GRAY), false);
+            }
+        }
     }
 
-    /** Takes the player to where he entered, or failing that to the world's spawn. */
+    /**
+     * The Road is done with the player (he has his power): his progress is forgotten, and the courses he is dealt next time are other ones.
+     * He can walk the Road again only with another Gene and no power.
+     */
+    public static void closeRoad(MinecraftServer server, UUID id) {
+        RoadSave save = RoadSave.get(server);
+        RoadProgress progress = save.existing(id);
+        if (progress == null || progress.isUntouched()) {
+            return;
+        }
+        long salt = progress.salt();
+        save.forget(id);
+        save.progress(id).setSalt(salt + 1);
+    }
+
+    /**
+     * Takes the player to where he entered. If that place is gone or unsafe (a block there now, no floor under it, lava, or its world is
+     * not loaded any more) he is put on the door he opened, and failing that on the world's spawn.
+     */
     private static void sendHome(ServerPlayer player, @Nullable RoadProgress.Entry entry) {
         MinecraftServer server = player.server;
         ServerLevel level = entry == null ? null : server.getLevel(entry.dimension());
-        if (level == null) {
-            level = server.overworld();
-            entry = null;
+        List<Home> homes = new ArrayList<>();
+        if (entry != null && level != null) {
+            homes.add(new Home(level, entry.pos(), entry.yaw(), entry.pitch()));
+            if (entry.door() != null && WitchesRoad.isDoor(level.getBlockState(entry.door()))) {
+                Vec3 top = new Vec3(entry.door().getX() + 0.5, entry.door().getY() + WitchesRoad.DOOR_HEIGHT, entry.door().getZ() + 0.5);
+                homes.add(new Home(level, top, entry.yaw(), entry.pitch()));
+            }
         }
-        Vec3 pos;
-        float yaw;
-        float pitch;
-        if (entry != null) {
-            pos = entry.pos();
-            yaw = entry.yaw();
-            pitch = entry.pitch();
-        } else {
-            BlockPos spawn = level.getSharedSpawnPos();
-            pos = Vec3.atBottomCenterOf(spawn);
-            yaw = 0.0F;
-            pitch = 0.0F;
+        for (Home home : homes) {
+            Vec3 pos = safeSpot(home.level, player, home.pos);
+            if (pos != null && HexManager.onTeleport(home.level, player, pos)) {
+                moveTo(player, home.level, pos, home.yaw, home.pitch);
+                return;
+            }
         }
-        pos = safeSpot(level, player, pos);
-        if (!HexManager.onTeleport(level, player, pos)) {
-            // A Hex wall or a fight in the way: the world's spawn, and if that is refused too, nothing stops him.
-            BlockPos spawn = server.overworld().getSharedSpawnPos();
-            level = server.overworld();
-            pos = safeSpot(level, player, Vec3.atBottomCenterOf(spawn));
-        }
-        moveTo(player, level, pos, yaw, pitch);
+        // The world's spawn, on the surface; if that is refused too, nothing stops him.
+        ServerLevel overworld = server.overworld();
+        Vec3 spawn = worldSpawn(overworld);
+        HexManager.onTeleport(overworld, player, spawn);
+        moveTo(player, overworld, spawn, 0.0F, 0.0F);
     }
 
-    /** The position, or the nearest free one above it if a block is there now. */
-    private static Vec3 safeSpot(ServerLevel level, ServerPlayer player, Vec3 pos) {
+    /** A place to put the player back at. */
+    private record Home(ServerLevel level, Vec3 pos, float yaw, float pitch) {
+    }
+
+    /** The surface at the world's spawn point. */
+    static Vec3 worldSpawn(ServerLevel level) {
+        BlockPos spawn = level.getSharedSpawnPos();
+        level.getChunkAt(spawn);
+        BlockPos top = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, spawn);
+        return Vec3.atBottomCenterOf(top.getY() > level.getMinBuildHeight() ? top : spawn);
+    }
+
+    /** How far below the player's feet a floor must be for the place to count as safe. */
+    private static final int FLOOR_SEARCH = 24;
+
+    /**
+     * The position, or the nearest free one above it (up to six blocks) if a block is there now; null if there is none or the place is
+     * not safe to stand in (fire or lava at the feet, harmful blocks or lava for a floor, no floor within {@value #FLOOR_SEARCH} blocks).
+     */
+    @Nullable
+    static Vec3 safeSpot(ServerLevel level, ServerPlayer player, Vec3 pos) {
         level.getChunkAt(BlockPos.containing(pos));
         for (int up = 0; up <= 6; up++) {
             Vec3 candidate = pos.add(0, up, 0);
+            if (candidate.y < level.getMinBuildHeight() || candidate.y > level.getMaxBuildHeight() - 2) {
+                break;
+            }
             // (Built from the position, not moved by a difference: far from the origin that leaves a rounding error that touches the floor.)
             AABB box = player.getDimensions(player.getPose()).makeBoundingBox(candidate).deflate(1.0E-3);
-            if (level.getWorldBorder().isWithinBounds(box) && level.noCollision(player, box)) {
+            if (level.getWorldBorder().isWithinBounds(box) && level.noCollision(player, box) && hasSafeFloor(level, BlockPos.containing(candidate))) {
                 return candidate;
             }
         }
-        return Vec3.atBottomCenterOf(level.getSharedSpawnPos());
+        return null;
+    }
+
+    /** Whether a player whose feet are in this block has something to stand on that does not hurt him (or water to swim in) just below. */
+    private static boolean hasSafeFloor(ServerLevel level, BlockPos feet) {
+        BlockState at = level.getBlockState(feet);
+        if (at.is(BlockTags.FIRE) || level.getFluidState(feet).is(FluidTags.LAVA) || at.is(Blocks.CACTUS)) {
+            return false;
+        }
+        BlockPos.MutableBlockPos pos = feet.mutable();
+        for (int i = 0; i <= FLOOR_SEARCH; i++) {
+            BlockState state = level.getBlockState(pos);
+            if (state.getFluidState().is(FluidTags.LAVA)) {
+                return false;
+            }
+            if (!state.getFluidState().isEmpty()) {
+                return true;
+            }
+            if (i > 0 && !state.getCollisionShape(level, pos).isEmpty()) {
+                return !state.is(Blocks.MAGMA_BLOCK) && !state.is(Blocks.CACTUS) && !state.is(BlockTags.FIRE) && !state.is(Blocks.CAMPFIRE)
+                        && !state.is(Blocks.SOUL_CAMPFIRE) && !state.is(Blocks.SWEET_BERRY_BUSH);
+            }
+            pos.move(0, -1, 0);
+            if (pos.getY() < level.getMinBuildHeight()) {
+                return false;
+            }
+        }
+        return false;
     }
 
     /** An operator took the player out of the Road: nothing is moved, the trial is taken down, his game mode comes back. */
@@ -587,6 +679,11 @@ public final class RoadTrials {
         if (trial == null) {
             return;
         }
+        if (trial.challenge().isEnding()) {
+            // At the end of the Road the door asks the question again.
+            RoadEnding.reopen(player, true);
+            return;
+        }
         long now = player.level().getGameTime();
         Long asked = LEAVE_ASKED.get(player.getUUID());
         if (asked != null && now - asked <= WitchesRoadConfig.LEAVE_CONFIRM_SECONDS.get() * 20L) {
@@ -645,8 +742,13 @@ public final class RoadTrials {
             return;
         }
         if (inRoad) {
+            if (Powers.power(player).hasPowers()) {
+                // He chose (the power awakened) and the server stopped in the farewell: the Road lets him go, as it would have.
+                leave(player, progress != null && progress.completed() >= RoadChallenges.count() ? RoadChallenge.End.WON : RoadChallenge.End.LEFT);
+                return;
+            }
             if (progress != null && progress.inside() && WitchesRoadConfig.RESUME_ON_LOGIN.get() && WitchesRoadConfig.ENABLED.get()
-                    && progress.completed() < RoadChallenges.count() && resume(player, progress)) {
+                    && RoadChallenges.stage(progress.completed()) != null && resume(player, progress)) {
                 return;
             }
             leave(player, RoadChallenge.End.LEFT);
@@ -658,7 +760,7 @@ public final class RoadTrials {
 
     /** A player who logged in inside the Road: his trial is built again and he is put at his checkpoint. */
     private static boolean resume(ServerPlayer player, RoadProgress progress) {
-        RoadChallenge challenge = RoadChallenges.get(progress.completed());
+        RoadChallenge challenge = RoadChallenges.stage(progress.completed());
         if (challenge == null) {
             return false;
         }
@@ -713,6 +815,7 @@ public final class RoadTrials {
         MOVING.clear();
         LEAVE_ASKED.clear();
         RoadSweeper.clear();
+        RoadEnding.clear();
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -721,6 +824,10 @@ public final class RoadTrials {
     /** Wins the trial the player is in; otherwise counts the next trial as won. @return whether anything happened */
     public static boolean skip(ServerPlayer player) {
         RoadTrial trial = ACTIVE.get(player.getUUID());
+        if (trial != null && trial.challenge().isEnding()) {
+            // (There is nothing to win at the end of the Road: he chooses.)
+            return false;
+        }
         if (trial != null && trial.phase() == RoadTrial.Phase.ACTIVE) {
             trial.succeed();
             return true;

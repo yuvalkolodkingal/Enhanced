@@ -156,7 +156,7 @@ public final class RoadTrial {
      * not got that far or has already won.
      */
     public void succeed() {
-        if (phase == Phase.ACTIVE) {
+        if (phase == Phase.ACTIVE && !challenge.isEnding()) {
             phase = Phase.WON;
             RoadTrials.won(this);
         }

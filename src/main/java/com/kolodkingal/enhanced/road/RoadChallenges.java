@@ -19,6 +19,8 @@ public final class RoadChallenges {
     }
 
     private static final List<Entry> ALL = new ArrayList<>();
+    /** The hall at the end of the Road: not a trial, it is never in the list. */
+    private static final EndingHall ENDING = new EndingHall();
 
     static {
         register(new ParkourChallenge(), 10);
@@ -63,6 +65,20 @@ public final class RoadChallenges {
     @Nullable
     public static synchronized RoadChallenge get(int index) {
         return index >= 0 && index < ALL.size() ? ALL.get(index).challenge : null;
+    }
+
+    /** The end of the Road: the hall where the player who has won every trial chooses ({@link RoadEnding}). */
+    public static EndingHall ending() {
+        return ENDING;
+    }
+
+    /**
+     * What the player plays when he has won {@code index} trials: the trial with that number, or, after the last, the end of the Road;
+     * null beyond that.
+     */
+    @Nullable
+    public static synchronized RoadChallenge stage(int index) {
+        return index == ALL.size() ? ENDING : get(index);
     }
 
     @Nullable

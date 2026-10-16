@@ -384,12 +384,10 @@ public final class RoadBoatTests {
                     RoadTestSupport.put(player, road, gate.zone().getCenter().subtract(0.0, 1.0, 0.0));
                 })
                 .thenExecuteAfter(3, () -> {
+                    // The gate leads on: to the next trial, or after the last one to the end of the Road (the hall where he chooses).
+                    check(RoadDimension.in(player) && RoadTrials.isInside(player), "the gate leads on");
                     if (RoadChallenges.count() == trialNumber() + 1) {
-                        // The last trial: the gate is the end of the Road, and he is taken back to the world with his Gene.
-                        check(!RoadDimension.in(player) && !RoadTrials.isInside(player), "the end of the Road takes him back to the world");
                         check(RoadTrials.walkedAll(player), "he has walked the whole Road");
-                    } else {
-                        check(RoadTrials.trialOf(player.getUUID()) != null || RoadDimension.in(player), "the gate leads on to the next trial");
                     }
                 })
                 .thenSucceed();

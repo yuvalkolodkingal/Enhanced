@@ -519,11 +519,16 @@ public final class RoadFrameworkTests {
                     check(RoadSave.get(server).progress(player.getUUID()).completed() == 2, "two won");
                     RoadTestSupport.put(player, RoadTestSupport.road(helper), RoadTestSupport.inside(second.layout().gate().zone()));
                 })
-                .thenExecuteAfter(3, () -> {
-                    check(!RoadDimension.in(player) && !RoadTrials.isInside(player), "the end of the Road takes him back to the world");
-                    check(RoadTrials.walkedAll(player) && RoadTrials.doorMode(player) == RoadTrials.DoorMode.CHOOSE, "the door now offers the choice");
-                    check(player.getMainHandItem().getCount() == 1, "the Gene is still his");
-                    check(!RoadSave.get(server).progress(player.getUUID()).inside(), "he is not inside");
+                .thenWaitUntil(() -> {
+                    RoadTrial now = RoadTrials.trialOf(player.getUUID());
+                    check(now != null && now.challenge().isEnding() && now.phase() == RoadTrial.Phase.ACTIVE, "the end of the Road is ready");
+                    player.hasChangedDimension();
+                })
+                .thenExecute(() -> {
+                    check(RoadDimension.in(player) && RoadTrials.isInside(player), "the last gate leads to the end of the Road, still in the Road");
+                    check(RoadTrials.walkedAll(player) && RoadTrials.doorMode(player) == RoadTrials.DoorMode.CHOOSE, "he has walked it all");
+                    check(player.getMainHandItem().getCount() == 1, "the Gene is still his: it is used only when he chooses");
+                    check(RoadSave.get(server).progress(player.getUUID()).inside(), "he is inside");
                 })
                 .thenSucceed();
     }
