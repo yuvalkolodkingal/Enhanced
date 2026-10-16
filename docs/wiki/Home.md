@@ -18,20 +18,31 @@ Hebrew: [עברית, דף הבית](Home-HE)
 | Hero | Who | How you become one | Known for |
 |---|---|---|---|
 | [Magneto](Magneto) | The Master of Magnetism | Craft Magneto's Helmet and put it on | Metal telekinesis, the magnetic pull, iron shrapnel storm, magnetic shield |
-| [Scarlet Witch](Scarlet-Witch) | Wanda Maximoff | Touch the Mind Stone in Loki's Scepter (or use the Tesseract) while holding the Scarlet Witch Gene | Chaos beam, telekinesis, the Hex |
+| [Scarlet Witch](Scarlet-Witch) | Wanda Maximoff | Touch the Mind Stone in Loki's Scepter (or use the Tesseract) while holding the Scarlet Witch Gene | Chaos beam, an unlimited shield, telekinesis, the Hex, Build Magic with an Instant level |
 | [Quicksilver](Quicksilver) | Peter Maximoff | Craft Quicksilver's Goggles and put them on | Quicksilver Time: the world slows down and plays *Sweet Dreams*; or Super Speed, where only he is fast |
 | [Vision](Vision) | The Mind Stone in a synthetic body | Touch the Mind Stone while holding a Synthezoid Core | Mind Stone beam, phasing through walls, density; White Vision look |
-| [Tommy](Tommy) | Tommy Maximoff (Speed) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Tommy | Super speed, disarm blitz, whirlwind |
-| [Billy](Billy-and-the-Witches-Road) | Billy Maximoff (Wiccan) | Open the Witches' Road Door with a Scarlet Witch Gene and choose Billy | Hex Bolt, flight, freeze, The Noise |
+| [Tommy](Tommy) | Tommy Maximoff (Speed) | Open the Witches' Road Door with a Scarlet Witch Gene, walk the Road's three trials and choose Tommy | Super speed, disarm blitz, whirlwind |
+| [Billy](Billy-and-the-Witches-Road) | Billy Maximoff (Wiccan) | Open the Witches' Road Door with a Scarlet Witch Gene, walk the Road's three trials and choose Billy | Hex Beam and Hex Barrier, flight, freeze, The Noise, Build Magic with ten ranks |
 | [Loki](Loki) | The God of Mischief | Use the Tesseract (without a gene in your other hand) | Daggers, duplicates, shapeshifting, vanishing, Frost Giant form |
 | [Thor](Thor) | The God of Thunder | Be worthy and lift Mjolnir | Throwing, shattering and pinning with Mjolnir, flight, the lightning beam, the Bifrost |
 | [Phoenix](Phoenix) | Jean Grey | Find the very rare **Phoenix Ember** in a chest and hold right-click on it for 3 seconds, with no power | Mind Reading (the items of whoever you look at), Mind Sense through walls, Mind Control, the Psionic Field, telekinesis, flight, the Phoenix Burst |
 | [Spider-Man](Spider-Man) | Peter Parker | Get bitten: **craft** or find a **Radioactive Spider** and right-click it with no power | Web Shot and Web Burst, Web Zip and Web Swing, walking on walls and ceilings, Spider-Sense; three suits (the Iron Spider has four mechanical legs and Instant Kill) and the Black Eyes |
 | [Thanos](Thanos) | The Mad Titan (a boss) | Call him with the Tesseract and Loki's Scepter held together, beat him, and hold the Infinity Gauntlet he rewards | A fight on a clock of five Infinity Stones, armour plates and poise; the hardest boss in the mod. The reward makes you Thanos: five stones, five keys |
 | [Ultron](Ultron) | The AI of the Mind Stone (a boss) | Beat the Ultron boss, then use his Core with Loki's Scepter | Plasma from the fingers, anti-gravity flight, gravity pull and slam, uploads into drones, an army of Sentries |
-| [Apocalypse](Apocalypse) | En Sabah Nur, the first mutant (a boss) | Plant a Capstone in the sand by day with a Scarlet Witch or a Phoenix near, beat him, and hold the Essence he leaves for three seconds | A fight against a golden shield that only mind power breaks, sand, portals and the Four Horsemen. The reward makes you Apocalypse: sand waves, levitation, a portal, a shield of your own and power bestowal |
+| [Apocalypse](Apocalypse) | En Sabah Nur, the first mutant (a boss) | Plant a Capstone in the sand by day with a Scarlet Witch or a Phoenix near, beat him, and hold the Essence he leaves for three seconds | A fight against a golden shield that only mind power breaks, sand, portals and his Horsemen. The reward makes you Apocalypse: sand waves, levitation, a portal, a shield of your own and power bestowal |
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse) are on [Looks](Looks).
+
+## What's new in 3.2
+
+Eilon asked for these.
+
+* **The Witches' Road has trials.** Open a Witches' Road Door with a Scarlet Witch Gene and, instead of choosing at once, **walk the Road**: a dimension of its own with three trials, each built for you alone. A **Parkour** over the void, a structure to **copy** block by block, and a long **ice-boat race**. Each success opens the next; at the end you choose to become Billy or Tommy. Falling never hurts, you can leave at any time, and your Gene is used up only at the end. See [The Witches' Road](Witches-Road).
+* **Billy fires a beam, and has ten ranks.** Hold **R** for a continuous **Hex Beam** that you aim, stronger and longer-reaching as he ranks up; **Sneak + B** raises the **Hex Barrier**, a plate of blue magic that stops what comes at him from the front. His Build Magic ranks go from 4 up to **10** (Apprentice to Chaos Master), with a meter that grows to 32,768. See [Billy](Billy-and-the-Witches-Road) and [Build Magic](Build-Magic).
+* **Wanda has an unlimited shield and an Instant level.** The Chaos Shield costs nothing and never breaks or runs out (a server can bring the old limits back). Press **Ctrl + I** in build mode and her spells, undos and redos appear all at once, with no waiting. See [Scarlet Witch](Scarlet-Witch) and [Build Magic](Build-Magic#the-instant-level-ctrl--i).
+* **Two books of magic.** The **Book of the Vishanti** lets a sorcerer (Loki, Wanda or Billy) save places and teleport to them, and raise a **ward** round the base that no monster can enter, as big as the sorcerer is strong. The **Darkhold**, Agatha's book, gives a purple beam, poisons whoever uses magic on you, and has a hex mark and a mind glimpse. Both are crafted. See [The Sorcerers' Books](Sorcerers-Books) and [Items and Crafting](Items-and-Crafting).
+* **Apocalypse is weaker.** One master knob, `apocalypse_boss.powerFactor` (0.65), cuts his damage and the number of his lances, Horsemen and tornadoes by about a third and slows his attacks; his shields start at 100 instead of 150, and his windows last 12 seconds. See [Apocalypse](Apocalypse#how-strong-he-is-the-master-factor).
+* **Update the server and every player together.** A 3.2 server and a 3.1 player (or the other way round) cannot play together. Worlds from 3.1 open in 3.2 as they were.
 
 ## What's new in 3.1
 
@@ -93,6 +104,7 @@ Put the jar in the `mods` folder and start the game. The details are on [Install
 
 * New here? [Installation](Installation), then [Becoming a Hero](Becoming-a-Hero), then [Controls](Controls).
 * Recipes and where the rare items are found: [Items and Crafting](Items-and-Crafting).
+* Becoming Billy or Tommy by walking the three trials: [The Witches' Road](Witches-Road). The two books of the sorcerers: [The Sorcerers' Books](Sorcerers-Books).
 * Running a server: [Commands](Commands) and [Server Configuration](Server-Configuration).
 * Questions and mysteries (why can't I lift Mjolnir?): [FAQ](FAQ).
 * Building the mod yourself, or improving this wiki: [Building from Source](Building-from-Source).

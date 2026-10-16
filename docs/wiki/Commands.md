@@ -1,6 +1,6 @@
 # Commands
 
-All commands start with `/enhanced` and are for **operators** (permission level 2): server owners and players who can use `/gamemode`. Heroes are otherwise permanent, so these commands are also the only way to take a power away. (The exceptions are `/enhanced_anim`, `/enhanced_model` and `/enhanced_ultron_fx`, for looking at the animations, the bosses and Ultron's effects: see below.)
+All commands start with `/enhanced` and are for **operators** (permission level 2): server owners and players who can use `/gamemode`. (Two small commands are for everyone: `/road leave` and `/road status`, below.) Heroes are otherwise permanent, so these commands are also the only way to take a power away. (The exceptions are `/enhanced_anim`, `/enhanced_model` and `/enhanced_ultron_fx`, for looking at the animations, the bosses and Ultron's effects: see below.)
 
 | Command | Effect |
 |---|---|
@@ -19,9 +19,21 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/enhanced build stop [<player>\|all]` | Stops the Build Magic spells that are working, where they are (what they did stays, and can be undone), and drops the ones waiting. With a player, only his; with `all` or nothing, everybody's. |
 | `/enhanced build list` | Lists the spells working or waiting on the server: the player, the spell, the dimension, the percent done and the blocks. |
 | `/enhanced build history <player>` | Lists that player's steps, oldest first, numbered from 1: "1. Fill, 140 blocks, 2 min ago, overworld". The steps he has undone (the ones Ctrl + Y could do again) come last. |
-| `/enhanced build rank <player> [1-4]` | Shows Billy's rank and practice. With a number it sets the rank (his practice becomes that rank's number, or stays above it if it was higher and the rank goes up, and his meter fills to its new top). Only works on a Billy. |
+| `/enhanced build rank <player> [1-10]` | Shows Billy's rank and practice. With a number it sets the rank (his practice becomes that rank's number, or stays above it if it was higher and the rank goes up, and his meter fills to its new top). Only works on a Billy. |
 | `/enhanced build meter <player> <value>` | Sets Billy's magic meter (0 up to the top of his rank). Only works on a Billy. |
 | `/enhanced build forget <player>` | Clears that player's Build Magic history and pocket, from memory and from disk. |
+| `/enhanced ward list` | Lists every ward of the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) on the server: whose, its name, where it is (in which world) and how far it reaches. |
+| `/enhanced ward remove <player>` | Takes away every ward of that player (their bases stay as plain saved places). Wards are otherwise kept until their base is forgotten, so this is the operator's way to take one down. |
+| `/enhanced road status [player]` | How many trials of the [Witches' Road](Witches-Road) a player has won, whether they are on the Road, and how many times they fell. Without a player: you. |
+| `/enhanced road enter <players> [trial]` | Sends players onto the Road at once, with no Gene needed (an operator's way to test). `trial` is 1 (the Parkour), 2 (Copy the Structure) or 3 (the Ice-Boat Race); without it they start the trial they reached. |
+| `/enhanced road leave <players>` | Takes players off the Road, back to where they came in, keeping their Gene and progress. |
+| `/enhanced road reset <players> [newcourse]` | Forgets their Road progress; with `newcourse` they also get new courses. |
+| `/enhanced road skip <players>` | Wins the trial they are in (or counts the next as won). |
+| `/enhanced road set <players> <won>` | Sets how many trials they have won (0 to 99). |
+| `/enhanced road layout [player]` | Shows where the checkpoints, the finish and the gate of a player's trial are. |
+| `/enhanced road cells` | How many places of the Road are in use or being cleared, and how many players are on it. |
+| `/road leave` | **Anyone** may use it: leaves the Witches' Road, keeping the Gene and the progress. |
+| `/road status` | **Anyone** may use it: how many trials you have won. |
 
 ## Build Magic: /enhanced build
 
@@ -29,7 +41,7 @@ The `build` commands are for the operator who looks after the builders: they use
 
 * **`undo`** takes back a player's steps one by one, newest first, even a step from another day, as long as it is still in their history. Each step runs as a spell of that player, queued behind whatever he is doing, with the ripple running backwards, and the answer says how many steps were queued ("Undid 3 spells of Steve"). A block that someone has changed since stays as it is (the player is told how many), and a part that is protected now can be tried again later. A step whose file cannot be read is skipped.
 * **`stop`** is the emergency brake for a spell that is eating the server's time: it stops where it is and leaves what it did. `/enhanced build list` shows what is working.
-* **`rank`** and **`meter`** are for Billy only (they say "is not Billy" for anyone else): `rank` shows or sets his rank, `meter` sets how much magic he has right now.
+* **`rank`** and **`meter`** are for Billy only (they say "is not Billy" for anyone else): `rank` shows or sets his rank (1 to 10, or up to the server's `build_magic_billy.maxRank`), `meter` sets how much magic he has right now.
 * **`forget`** deletes a player's history and pocket, from the memory and from the disk (`data/enhanced/build/<id>/` in the world folder): use it when one player's history has grown big. (For a player who is gone for good, delete his folder there while the server is stopped.)
 
 | Example | What it does |
@@ -38,6 +50,7 @@ The `build` commands are for the operator who looks after the builders: they use
 | `/enhanced build undo Steve 5` | Takes back his last five. |
 | `/enhanced build stop all` | Stops every spell on the server. |
 | `/enhanced build rank Eilon 4` | Makes Billy a Wiccan. |
+| `/enhanced build rank Eilon 10` | Makes Billy the Chaos Master. |
 | `/enhanced build meter Eilon 0` | Empties his meter. |
 
 ## Powers
@@ -102,6 +115,9 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced l
 | `/enhanced boss start ultron force` | Wakes Ultron where you stand, with no Program or Scepter. |
 | `/enhanced boss start apocalypse force` | Wakes En Sabah Nur where you stand, with no Capstone and no one to break his shield. |
 | `/enhanced boss cleanup ~ ~ ~ 40` | Removes whatever a boss left within 40 blocks of you: his creatures and his projectiles. |
+| `/enhanced road enter Steve 2` | Sends Steve to the second trial of the Witches' Road, Copy the Structure. |
+| `/enhanced road skip Steve` | Wins the trial Steve is in. |
+| `/enhanced ward list` | Lists every ward of the Book of the Vishanti. |
 
 ## Looking at the animations: /enhanced_anim
 

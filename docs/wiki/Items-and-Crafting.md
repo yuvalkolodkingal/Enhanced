@@ -1,6 +1,6 @@
 # Items and Crafting
 
-Every item you can use is in the **Enhanced** creative tab. Ten are crafted, four more are found in chests (or dropped), and three more are the rewards of the bosses. The Radioactive Spider is both: you can craft it and find it. In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
+Every item you can use is in the **Enhanced** creative tab. Twelve are crafted, four more are found in chests (or dropped), and three more are the rewards of the bosses. The Radioactive Spider is both: you can craft it and find it. In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
 
 ## Crafted items
 
@@ -16,6 +16,8 @@ Every item you can use is in the **Enhanced** creative tab. Ten are crafted, fou
 | [Radioactive Spider](#radioactive-spider) | [Spider-Man](Spider-Man) (by its bite) | Picking up a Glow Ink Sac |
 | [The Ultron Program](#the-ultron-program) | Wakes [Ultron](Ultron), the boss (with Loki's Scepter) | Picking up a Nether Star |
 | [Capstone](#capstone) | Wakes [Apocalypse](Apocalypse), the boss (planted in sand by day) | Picking up a Nether Star |
+| [Book of the Vishanti](#book-of-the-vishanti) | A sorcerer's book of saved places and a ward round the base | Picking up an Eye of Ender |
+| [Darkhold](#darkhold) | Agatha's purple beam, and revenge on magic used against you | Picking up a Wither Rose |
 
 ### Magneto's Helmet
 
@@ -81,7 +83,7 @@ T = Dark Oak Trapdoor
 E = Eye of Ender
 ```
 
-A door that is placed flat in the floor. Open it holding a Scarlet Witch Gene: see [Billy and the Witches' Road](Billy-and-the-Witches-Road). An axe breaks it fastest, pistons can't push it, and breaking it drops it again.
+A door that is placed flat in the floor. Open it holding a Scarlet Witch Gene, with no power, to walk the three trials of [The Witches' Road](Witches-Road) and become Billy or Tommy: see [Billy and the Witches' Road](Billy-and-the-Witches-Road). An axe breaks it fastest, pistons can't push it, and breaking it drops it again.
 
 ### Mjolnir
 
@@ -162,6 +164,38 @@ L = Lapis Block
 ```
 
 "The golden tip of the pyramid. The sun feeds it." A golden pyramid tip with a sapphire pulse running down its edge. **Sneak + right-click on sand (or sandstone) by day, under the open sky, with a Scarlet Witch or a Phoenix within 64 blocks**, and En Sabah Nur wakes: see [Apocalypse](Apocalypse#waking-him). It is used up only when the ritual starts, and is given back if the fight is stopped, the server stops, the world goes Peaceful or he withdraws because nobody could break his shield (not after a wipe, an abandoned fight or the time limit). Fireproof, does not stack. To make one you need a Wither and forty-five gold ingots.
+
+### Book of the Vishanti
+
+```
+A E A
+G B G
+A L A
+
+A = Amethyst Shard
+E = Eye of Ender
+G = Gold Ingot
+B = Book
+L = Lapis Lazuli
+```
+
+"The old book of the sorcerers: the spells of Oshtur, Hoggoth and Agamotto." Only a **sorcerer** (Loki, the Scarlet Witch or Billy) can read it. **Use** opens the book (save places and teleport to them, in any world); **Sneak + use** goes to your base; **Save as base** raises a **ward** round it that no monster can enter, as big as the sorcerer is strong. An epic item, fireproof, does not stack. See [The Sorcerers' Books](Sorcerers-Books#the-book-of-the-vishanti).
+
+### Darkhold
+
+```
+N R N
+E B E
+N S N
+
+N = Netherite Scrap
+R = Wither Rose
+E = Echo Shard
+B = Book
+S = Wither Skeleton Skull
+```
+
+"Agatha's book of dark magic: it corrupts whoever reads it." Held by a **sorcerer**, it gives Agatha's **purple beam** (hold use), a **revenge** (whoever uses magic on you is poisoned for 10 seconds), a **hex mark** and a **mind glimpse** (Sneak + use). It is rare on purpose: the rose needs a Wither, the skull a Nether Fortress, the echo shards an Ancient City. An epic item, fireproof, does not stack. See [The Sorcerers' Books](Sorcerers-Books#the-darkhold).
 
 ## Items found in the world
 
