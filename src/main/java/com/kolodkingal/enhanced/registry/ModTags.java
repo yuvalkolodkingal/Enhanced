@@ -97,6 +97,11 @@ public final class ModTags {
     public static final TagKey<EntityType<?>> BOSS_MINIONS = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("boss_minions"));
     /** Minds too vast to read (the Phoenix's Mind Reading and Mind Control): the bosses. */
     public static final TagKey<EntityType<?>> TELEPATHY_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("telepathy_immune"));
+    /**
+     * Magic: what the retaliation of the Darkhold answers when it is used on the holder (the powers' own hits, the Infinity
+     * Stones' and the game's magic damage).
+     */
+    public static final TagKey<DamageType> MAGIC_DAMAGE = TagKey.create(Registries.DAMAGE_TYPE, Enhanced.id("magic_damage"));
     /** Damage that is the power of a mind: Wanda's beam and slam, the Phoenix Burst. Breaks Apocalypse's shield. */
     public static final TagKey<DamageType> MIND_POWER = TagKey.create(Registries.DAMAGE_TYPE, Enhanced.id("mind_power"));
     /**

@@ -29,6 +29,8 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> LIGHTNING_BEAM = key("lightning_beam");
     /** 3.2: the hits of Billy's continuous Hex Beam (they bypass the damage cooldown, as the lightning beam's do). */
     public static final ResourceKey<DamageType> HEX_BEAM = key("hex_beam");
+    /** 3.2: the hits of the Darkhold's purple beam (like the Hex Beam's: no damage cooldown, no knockback). */
+    public static final ResourceKey<DamageType> DARKHOLD_BEAM = key("darkhold_beam");
 
     // ===== phoenix =====
     public static final ResourceKey<DamageType> PHOENIX_BURST = key("phoenix_burst");

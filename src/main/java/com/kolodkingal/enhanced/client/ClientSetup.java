@@ -219,6 +219,8 @@ public final class ClientSetup {
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("apocalypse"), new ApocalypseOverlay());
         // 3.1: Build Magic's badge, rings, hint strip and tips.
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("build_magic"), new BuildHud());
+        // 3.2: the Darkhold's hint panel while it is held.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("darkhold"), new DarkholdHud());
     }
 
     private ClientSetup() {

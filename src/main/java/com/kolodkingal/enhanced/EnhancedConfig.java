@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.BuildConfig;
+import com.kolodkingal.enhanced.config.DarkholdConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
@@ -500,6 +501,8 @@ public final class EnhancedConfig {
         BuildConfig.define(BUILDER);
         // 3.2: the Book of the Vishanti (section [vishanti]).
         VishantiConfig.define(BUILDER);
+        // 3.2: the Darkhold (section [darkhold]).
+        DarkholdConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

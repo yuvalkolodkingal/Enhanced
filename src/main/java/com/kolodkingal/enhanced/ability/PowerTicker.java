@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.vishanti.VishantiBook;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -34,6 +35,7 @@ public final class PowerTicker {
         QuicksilverAbilities.gogglesTick(player, data);
         ThorAbilities.everyPlayerTick(player, data);
         VishantiBook.everyPlayerTick(player);
+        DarkholdBook.everyPlayerTick(player);
         HeroServers.everyPlayerTick(player, data);
         applyPassives(player, data);
         switch (data.power()) {

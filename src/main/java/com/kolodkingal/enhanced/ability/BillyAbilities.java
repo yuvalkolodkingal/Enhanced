@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
+import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildView;
@@ -126,7 +127,7 @@ public final class BillyAbilities {
         boolean flying = player.getAbilities().flying;
         boolean building = player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
         data.set(Live.CROWNED, flying || building || (spells != null && now < spells.crown));
-        if (data.is(Live.BEAMING) || ContinuousBeam.isFiring(player)) {
+        if ((data.is(Live.BEAMING) || ContinuousBeam.isFiring(player)) && !DarkholdBook.firing(player)) {
             hexBeamTick(player, data);
             if (spells != null && data.is(Live.BEAMING)) {
                 spells.crown = Math.max(spells.crown, now + CROWN_TICKS);
