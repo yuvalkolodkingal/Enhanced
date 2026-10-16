@@ -87,6 +87,7 @@ public final class BuildInput {
         boolean cut = clicked(BuildKeys.CUT);
         boolean paste = clicked(BuildKeys.PASTE);
         boolean vanish = clicked(BuildKeys.VANISH);
+        boolean instant = clicked(BuildKeys.INSTANT);
         if (player == null || mc.level == null) {
             reset();
             return;
@@ -131,6 +132,9 @@ public final class BuildInput {
         }
         if (vanish) {
             vanishTheBox(player);
+        }
+        if (instant) {
+            BuildClient.toggleInstant(player);
         }
         buttons(mc, player);
     }

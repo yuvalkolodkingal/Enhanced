@@ -12,7 +12,8 @@ import net.neoforged.neoforge.client.settings.KeyModifier;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * Build Magic's ten key mappings (D-B 14.6, spec 4.6), registered with the hero keys in {@code ClientSetup.onRegisterKeys}
+ * Build Magic's eleven key mappings (D-B 14.6, spec 4.6, and 3.2's {@link #INSTANT}), registered with the hero keys in
+ * {@code ClientSetup.onRegisterKeys}
  * under "Enhanced Powers":
  *
  * <ul>
@@ -23,6 +24,7 @@ import org.lwjgl.glfw.GLFW;
  *     <li>{@link #MORE} (Left Alt, held: the second knob with the scroll wheel), {@link #TURN} (Ctrl + R), {@link #FLIP}
  *     (Ctrl + F), {@link #COPY} (Ctrl + C), {@link #CUT} (Ctrl + X), {@link #PASTE} (Ctrl + V) and {@link #VANISH}
  *     (Delete) in the {@link Context#BUILD} context: only while build mode is on.</li>
+ *     <li>{@link #INSTANT} (Ctrl + I, 3.2) in the same context: the Scarlet Witch's Instant switch (Billy is told it is hers).</li>
  * </ul>
  *
  * <p>Why the Ctrl shortcuts never press a hero key: with Ctrl held, NeoForge's lookup ({@code KeyMappingLookup.getAll})
@@ -32,7 +34,7 @@ import org.lwjgl.glfw.GLFW;
  * key is what it was, Ctrl held or not. The mouse buttons and the wheel are vanilla's, taken through the input events (lane
  * BC, D-B 11.10).
  *
- * <p>The Controls screen marks the seven Ctrl shortcuts in red, and the keys they share (Sprint on Left Control, F, C, X,
+ * <p>The Controls screen marks the eight Ctrl shortcuts in red, and the keys they share (Sprint on Left Control, F, C, X,
  * and the hero keys R, V, Z and Y): it compares keys whatever the contexts. The marks are display only (spec 4.6).
  */
 public final class BuildKeys {
@@ -58,8 +60,11 @@ public final class BuildKeys {
     /** Delete: vanish everything in the box (with its hold). */
     public static final KeyMapping VANISH = create("build_vanish", Context.BUILD, KeyModifier.NONE, GLFW.GLFW_KEY_DELETE);
 
-    /** The ten, in the order of the spec's table. */
-    public static final KeyMapping[] ALL = {MAGIC, MORE, UNDO, REDO, TURN, FLIP, COPY, CUT, PASTE, VANISH};
+    /** Ctrl + I (3.2): the Scarlet Witch's Instant switch on or off; her spells, undos and redos are then written all at once. */
+    public static final KeyMapping INSTANT = create("build_instant", Context.BUILD, KeyModifier.CONTROL, GLFW.GLFW_KEY_I);
+
+    /** The eleven, in the order of the spec's table (the Instant switch of 3.2 last). */
+    public static final KeyMapping[] ALL = {MAGIC, MORE, UNDO, REDO, TURN, FLIP, COPY, CUT, PASTE, VANISH, INSTANT};
 
     /** When the build mappings are read. */
     public enum Context implements IKeyConflictContext {

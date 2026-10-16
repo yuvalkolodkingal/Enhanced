@@ -912,6 +912,21 @@ public final class BuildClient {
     // ------------------------------------------------------------------------------------------------------------
     // The other keys
 
+    /**
+     * Ctrl + I or the wheel's button (3.2): the Scarlet Witch's Instant switch, on if it is off and off if it is on. The
+     * server decides (it tells Billy the switch is hers, and turns it down where {@code instantMaxBlocks} is 0); the badge
+     * and the button show what {@code BuildData.instant} says.
+     */
+    static void toggleInstant(LocalPlayer player) {
+        boolean on = player.getData(ModAttachments.BUILD_DATA).instant();
+        send(new BuildActionPayload(BuildActionPayload.INSTANT, on ? 0 : 1));
+    }
+
+    /** Whether the Instant switch is on for the local player (the server's word, synced). */
+    public static boolean instant(LocalPlayer player) {
+        return player.getData(ModAttachments.BUILD_DATA).instant();
+    }
+
     /** Ctrl + Z (also out of build mode, R42): undo, or stop and take back a working spell, or drop a waiting one. */
     static void undo() {
         send(new BuildActionPayload(BuildActionPayload.UNDO, 0));

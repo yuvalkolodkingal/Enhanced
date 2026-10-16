@@ -249,6 +249,18 @@ public final class Limits implements RecipeLimits {
         return loaded() ? BuildConfig.WANDA_UNDO_STEPS.get() : 0;
     }
 
+    /**
+     * The most blocks one of her spells, undos or redos may write in the tick it is cast when her Instant switch is on
+     * ({@code build_magic_wanda.instantMaxBlocks}, 3.2); 0 for Billy, who has no Instant level, and when the server turned
+     * it off.
+     */
+    public int instantMax() {
+        if (hero != Power.SCARLET_WITCH) {
+            return 0;
+        }
+        return loaded() ? BuildConfig.WANDA_INSTANT_MAX_BLOCKS.get() : 250000;
+    }
+
     /** The most blocks one spell may cover ({@code build_magic_wanda.maxBlocks}, C11, {@code CEILING}); 0 for none. */
     public int maxBlocks() {
         if (limited) {
