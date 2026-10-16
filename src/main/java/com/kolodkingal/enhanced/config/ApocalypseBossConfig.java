@@ -148,7 +148,7 @@ public final class ApocalypseBossConfig {
 
         LANCE_DAMAGE = builder.comment("One Sand Lance.")
                 .defineInRange("lanceDamage", 6.0, 0.0, 100.0);
-        LANCE_COUNT = builder.comment("Lances in a fan.")
+        LANCE_COUNT = builder.comment("Lances in a fan (scaled by powerFactor, rounded up: 5 lances are 4 at the default 0.65).")
                 .defineInRange("lanceCount", 5, 1, 9);
         WAVE_DAMAGE = builder.comment("The Sand Wave.")
                 .defineInRange("waveDamage", 10.0, 0.0, 100.0);
@@ -160,7 +160,7 @@ public final class ApocalypseBossConfig {
                 .defineInRange("backhandDamage", 12.0, 0.0, 100.0);
         PORTAL_SHOCK_DAMAGE = builder.comment("The shockwave where he arrives from a portal.")
                 .defineInRange("portalShockDamage", 6.0, 0.0, 100.0);
-        STORM_DAMAGE = builder.comment("A Tornado's damage, every 10 ticks.")
+        STORM_DAMAGE = builder.comment("A Tornado's damage, every 10 ticks. (The number of tornadoes, one in phase 2 and three in phase 3, is scaled by powerFactor too.)")
                 .defineInRange("stormDamage", 2.0, 0.0, 100.0);
         TORNADO_TICKS = builder.comment("How long a Tornado lasts.")
                 .defineInRange("tornadoTicks", 160, 20, 1200);
@@ -179,7 +179,8 @@ public final class ApocalypseBossConfig {
 
         HORSEMEN = builder.comment("He calls the Four Horsemen at the first transition.")
                 .define("horsemen", true);
-        HORSEMEN_MAX = builder.comment("The most Horsemen (min(max, 1 + fighters)).")
+        HORSEMEN_MAX = builder.comment("The most Horsemen (min(max, 1 + fighters)); max is scaled by powerFactor, rounded up (4 is 3 at the default 0.65, and then Death, the",
+                        "fourth, takes the place of the third in a fight big enough for four).")
                 .defineInRange("horsemenMax", 4, 0, 8);
         HORSEMAN_HEALTH_FACTOR = builder.comment("Husk health multiplier.")
                 .defineInRange("horsemanHealthFactor", 1.5, 1.0, 10.0);

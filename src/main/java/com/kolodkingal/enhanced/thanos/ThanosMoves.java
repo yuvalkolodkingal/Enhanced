@@ -724,7 +724,7 @@ final class ThanosMoves {
             Vec3 to = chestOf(target);
             WandaAbilities.ShieldStop stop = WandaAbilities.shieldAcross(level, boss, from, to, 1.0F);
             if (stop != null && stop.owner() instanceof ServerPlayer wanda) {
-                WandaAbilities.wear(wanda, ThanosBossConfig.PULSE_DAMAGE.get().floatValue());
+                WandaAbilities.wear(wanda, ThanosBossConfig.PULSE_DAMAGE.get().floatValue(), boss);
             } else {
                 StonePowers.hurt(level, boss, target, ModDamageTypes.STONE_POWER, ThanosBossConfig.PULSE_DAMAGE.get().floatValue() * boss.damageScale(), boss);
             }
@@ -961,7 +961,7 @@ final class ThanosMoves {
             }
             WandaAbilities.ShieldStop stop = WandaAbilities.shieldAcross(level, boss, boss.handPosition(), chestOf(target), 1.0F);
             if (stop != null && stop.owner() instanceof ServerPlayer wanda) {
-                WandaAbilities.wear(wanda, 12.0F);
+                WandaAbilities.wear(wanda, 12.0F, boss);
                 c.targets.remove(target);
                 continue;
             }

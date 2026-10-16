@@ -126,7 +126,7 @@ public final class BuildFx {
         final Power hero;
         final BoundingBox box;
         final Vec3 origin;
-        final int order;
+        int order;
         final int momId;
         final boolean reverse;
         final long seed;
@@ -237,6 +237,9 @@ public final class BuildFx {
                 Run run = RUNS.get(payload.job());
                 if (run != null) {
                     run.heard = now;
+                    if (run.order == BuildFxPayload.POP && payload.order() != BuildFxPayload.POP) {
+                        run.order = payload.order(); // (an Instant spell that fell behind goes on at normal speed: its real ripple)
+                    }
                     if (payload.permille() != run.permille) {
                         run.previous = run.permille;
                         run.previousAt = run.progressAt;

@@ -201,7 +201,8 @@ public final class BillyAbilities {
     /** R down: the beam begins (if he is fed and not a spectator); R up: it stops. */
     private static void hexBeamKey(ServerPlayer player, PowerData data, boolean down) {
         if (!down || player.isSpectator()) {
-            if (ContinuousBeam.isFiring(player) || data.is(Live.BEAMING)) {
+            // (a Darkhold beam he fires is not his to stop: R lets go of the Hex Beam only)
+            if ((ContinuousBeam.isFiring(player) || data.is(Live.BEAMING)) && !DarkholdBook.firing(player)) {
                 ContinuousBeam.stop(player);
             }
             return;

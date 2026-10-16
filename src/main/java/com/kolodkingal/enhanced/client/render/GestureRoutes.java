@@ -278,7 +278,7 @@ public final class GestureRoutes {
                 default -> "live:WHIRLWIND";
             };
             case BILLY -> switch (ability) {
-                case 1 -> "live:BEAMING";
+                case 1 -> com.kolodkingal.enhanced.ability.BillyAbilities.beamEnabled() ? "live:BEAMING" : "cooldown"; // (the single bolt: its cooldown)
                 case 4 -> "cooldown";
                 case 2 -> "flight";
                 case 3 -> "held";

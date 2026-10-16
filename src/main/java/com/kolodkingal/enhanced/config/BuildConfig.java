@@ -81,7 +81,8 @@ public final class BuildConfig {
     public static ModConfigSpec.IntValue WANDA_SHAPE_MAX_RADIUS;
     public static ModConfigSpec.IntValue WANDA_REPEAT_MAX;
     public static ModConfigSpec.IntValue WANDA_INSTANT_MAX_BLOCKS;
-    public static ModConfigSpec.IntValue WANDA_INSTANT_MAX_MILLIS;
+        public static ModConfigSpec.IntValue WANDA_INSTANT_MAX_MILLIS;
+    public static ModConfigSpec.IntValue WANDA_INSTANT_TICK_MILLIS;
 
     // ---- [build_magic_billy]: his numbers as an Apprentice, and how he grows ----
     public static ModConfigSpec.BooleanValue BILLY_ENABLED;
@@ -216,6 +217,10 @@ public final class BuildConfig {
                         "the server's max-tick-time, which kills a server stuck for longer). When the time is up, the blocks left are written at",
                         "normal speed over the next ticks and she is told.")
                 .defineInRange("instantMaxMillis", 5000, 100, 50000);
+        WANDA_INSTANT_TICK_MILLIS = builder.comment("The longest (milliseconds) ALL Instant spells together may hold ONE server tick: the casts, undos and redos of every",
+                        "Scarlet Witch that arrive in the same tick share it (so an autoclicker or two Wandas cannot pass the watchdog). When it is",
+                        "spent, the next Instant spell of that tick goes at normal speed and she is told. Never more than instantMaxMillis for one spell.")
+                .defineInRange("instantTickMillis", 2000, 100, 50000);
         builder.pop();
 
         builder.push(BILLY_SECTION);
@@ -240,7 +245,9 @@ public final class BuildConfig {
             BILLY_PRACTICE[rank - 1] = builder.comment("Blocks of magic he must cast to become " + names[rank - 1] + " (rank " + rank + ").")
                     .defineInRange("rank" + rank + "Practice", practice[rank - 1], 0, 10000000);
         }
-        BILLY_MAX_RANK = builder.comment("The highest rank he can reach (1: he never grows; 10: the Chaos Master). Ranks 1 to 4 are those of 3.1.")
+        BILLY_MAX_RANK = builder.comment("The highest rank he can reach (1: he never grows; 10: the Chaos Master). Ranks 1 to 4 are those of 3.1.",
+                        "A server that kept its 3.1 file still says maxRank = 4 here (the game never rewrites a value): set it to 10 to have all ten ranks",
+                        "(this also sets how far the Hex Beam and the Hex Barrier grow with his rank).")
                 .defineInRange("maxRank", 10, 1, 10);
         BILLY_CAST_PAUSE = builder.comment("Ticks after one of his spells before the next.")
                 .defineInRange("castPause", 10, 0, 200);

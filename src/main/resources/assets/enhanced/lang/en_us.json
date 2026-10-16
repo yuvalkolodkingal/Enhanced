@@ -1387,5 +1387,6 @@
   "message.enhanced.road.voice.copy_close.3": "Nearly there, little witch.",
   "message.enhanced.road.voice.copy_hint.1": "A little help from the Road.",
   "message.enhanced.road.voice.copy_hint.2": "The ghosts remember the model.",
-  "message.enhanced.road.voice.copy_hint.3": "Follow the glow."
+  "message.enhanced.road.voice.copy_hint.3": "Follow the glow.",
+  "ability.enhanced.billy.1.bolt": "Hex Bolt"
 }

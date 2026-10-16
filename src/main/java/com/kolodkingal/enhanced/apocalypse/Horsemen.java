@@ -134,6 +134,19 @@ public final class Horsemen {
         return ApocalypseBossConfig.HORSEMEN.get() ? Math.max(0, Math.min(ApocalypseBossConfig.count(ApocalypseBossConfig.HORSEMEN_MAX.get()), 1 + fighters)) : 0;
     }
 
+    /**
+     * The kind of the {@code i}th of {@code count} Horsemen in a fight of {@code fighters}: War, Famine, Pestilence, Death in that order; but when
+     * {@code powerFactor} has cut the Four to fewer in a fight big enough for four, the last that is called is Death, so he is never missing.
+     */
+    public static Kind kindAt(int i, int count, int fighters) {
+        Kind[] kinds = Kind.values();
+        boolean fullFight = ApocalypseBossConfig.HORSEMEN.get() && Math.min(ApocalypseBossConfig.HORSEMEN_MAX.get(), 1 + fighters) >= kinds.length;
+        if (fullFight && count < kinds.length && count > 0 && i == count - 1) {
+            return Kind.DEATH;
+        }
+        return kinds[i % kinds.length];
+    }
+
     /** The Horsemen who are alive. */
     public List<Husk> alive() {
         List<Husk> alive = new ArrayList<>();

@@ -69,6 +69,7 @@ public final class EnhancedConfig {
     public static final ModConfigSpec.IntValue CHAOS_SHIELD_COOLDOWN;
     public static final ModConfigSpec.IntValue CHAOS_SHIELD_BROKEN_COOLDOWN;
     public static final ModConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED;
+    public static final ModConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED_VS_BOSSES;
     public static final ModConfigSpec.IntValue BLOCK_LIFT_RANGE;
     public static final ModConfigSpec.DoubleValue BLOCK_LIFT_MAX_HARDNESS;
     public static final ModConfigSpec.IntValue HEX_DEFAULT_RADIUS;
@@ -279,6 +280,11 @@ public final class EnhancedConfig {
                         "stops exactly what it stops today). false: the old rules, with chaosShieldExhaustion, chaosShieldStrength,",
                         "chaosShieldMaxTicks, chaosShieldCooldown and chaosShieldBrokenCooldown.")
                 .define("shieldUnlimited", true);
+        WANDA_SHIELD_UNLIMITED_VS_BOSSES = BUILDER.comment("Whether the unlimited Chaos Shield (shieldUnlimited) is unlimited against bosses too. true: it is (it never wears",
+                        "down, whoever hits it). false: damage that comes from a boss fight (a boss, a minion of one, a projectile one of them shot) wears the",
+                        "shield down by the old rules (chaosShieldStrength points, then it shatters and needs chaosShieldBrokenCooldown), while ordinary mobs and",
+                        "players still cannot wear it. The time limit and the hunger stay off in both cases.")
+                .define("shieldUnlimitedVsBosses", true);
         BLOCK_LIFT_RANGE = BUILDER.comment("How far away (blocks) Wanda and the Phoenix can tear a block out of the ground (Billy and Magneto have",
                         "their own).")
                 .defineInRange("blockLiftRange", 24, 2, 128);

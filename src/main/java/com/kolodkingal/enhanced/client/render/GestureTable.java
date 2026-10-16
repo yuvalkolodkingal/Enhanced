@@ -104,6 +104,9 @@ public final class GestureTable {
                 if (i == 1 && power == Power.THOR) {
                     thrown1 = true;
                 }
+                if (i == 4 && power == Power.BILLY && s.stance(Stance.BARRIER_BILLY) > 0.05F) {
+                    continue; // (the recharge of the Hex Barrier coming down is not a Freeze)
+                }
                 fire(s, p, GestureRoutes.cooldown(power, i, until - now), age);
             }
         }

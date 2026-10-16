@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.client;
 
+import com.kolodkingal.enhanced.beam.BeamStyles;
+import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
+import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -40,9 +43,9 @@ public final class PowerLoopSounds {
         /** Thor's lightning beam: the same crackle as the Chaos Beam, higher and sharper. */
         LIGHTNING_BEAM(ModSounds.CHAOS_BEAM, 0.8F, 1.45F, (p, d) -> d.power() == Power.THOR && d.is(Live.CALLING_LIGHTNING)),
         /** Billy's Hex Beam: the Chaos Beam's crackle, higher and thinner (3.2). Another source of a beam adds its own line. */
-        HEX_BEAM(ModSounds.CHAOS_BEAM, 0.7F, 1.3F, (p, d) -> d.power() == Power.BILLY && d.is(Live.BEAMING) && !holds(p, ModItems.DARKHOLD.get())),
+        HEX_BEAM(ModSounds.CHAOS_BEAM, 0.7F, 1.3F, (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == BeamStyles.BILLY),
         /** The Darkhold's purple beam, whoever fires it: the Chaos Beam's crackle, lower and darker (3.2). */
-        DARKHOLD_BEAM(ModSounds.CHAOS_BEAM, 0.8F, 0.75F, (p, d) -> d.is(Live.BEAMING) && holds(p, ModItems.DARKHOLD.get())),
+        DARKHOLD_BEAM(ModSounds.CHAOS_BEAM, 0.8F, 0.75F, (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == DarkholdItem.STYLE),
         /** The Space Stone in the Tesseract: far quieter than the powers' loops, only just there. */
         SPACE_STONE_HUM(ModSounds.SPACE_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holds(p, ModItems.TESSERACT.get())),
         /** The Mind Stone in Loki's Scepter. */
