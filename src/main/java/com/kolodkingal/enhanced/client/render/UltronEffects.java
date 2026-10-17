@@ -200,7 +200,7 @@ public final class UltronEffects {
         float u = e.progress(now, partial);
         float time = now + partial;
         switch (e.kind) {
-            case UltronFxPayload.ASSEMBLE -> assemble(level, e, u, camera, pose, vc);
+            case UltronFxPayload.ASSEMBLE -> assemble(level, e, u, age, camera, pose, vc);
             case UltronFxPayload.FLASH -> {
                 float grow = Mth.clamp(age / Math.max(2.0F, e.ticks * 0.4F), 0.0F, 1.0F);
                 float fade = 1.0F - u;
@@ -241,9 +241,11 @@ public final class UltronEffects {
     // ---- the ritual and the flashes ----
 
     /** The standing silhouette that scrap assembles into: built from the feet up as the ritual goes on. */
-    private static void assemble(ClientLevel level, Effect e, float u, Vec3 camera, Matrix4f pose, VertexConsumer vc) {
+    private static void assemble(ClientLevel level, Effect e, float u, float age, Vec3 camera, Matrix4f pose,
+            VertexConsumer vc) {
         float built = Mth.clamp(u * 1.15F, 0.0F, 1.0F);
-        float flicker = 0.7F + 0.3F * Mth.sin((level.getGameTime() + u * 20.0F) * 1.3F);
+        // (3.3) Timed with the partial tick (it was the game time alone: a jump every tick) and slower.
+        float flicker = 0.7F + 0.3F * Mth.sin(age * 0.6F);
         UltronGeometry.silhouette(pose, vc, e.at.subtract(camera), e.radius, 0.0F, built, EnergyGeometry.argb(GRAV_MAIN, 0.22F * flicker * (0.4F + 0.6F * u)));
         UltronGeometry.Ground ground = UltronGeometry.ground(level, e.at.y);
         UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, 1.7F - 0.5F * u, 0.14F, 40, EnergyGeometry.argb(GRAV_MAIN, 0.5F * u + 0.1F));

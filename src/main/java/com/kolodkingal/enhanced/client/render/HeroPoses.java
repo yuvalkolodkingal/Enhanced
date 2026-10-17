@@ -281,19 +281,27 @@ public final class HeroPoses {
     }
 
     /**
-     * Tommy's molecules shiver: every limb jitters a few degrees at 30 Hz, a different jitter each, the same every time for
-     * a given player (so it does not depend on the frame rate or on who looks).
+     * Tommy's molecules shiver: every limb trembles a few degrees at 30 Hz, a different tremble each, the same every
+     * time for a given player (so it does not depend on the frame rate or on who looks). (3.3) It glides from one
+     * random offset to the next instead of jumping to it, so it trembles without snapping.
      */
     private static void shiver(PoseContext c, float w) {
         if (EnhancedClientConfig.reducedMotion()) {
             return;
         }
-        long k = (long) Math.floor(c.age * 1.5F);
+        float steps = c.age * 1.5F;
+        long k = (long) Math.floor(steps);
+        float f = AnimMath.ss(0.0F, 1.0F, steps - k);
         int id = c.player.getId();
-        c.armAdd(true, 6.0F * HeroAnimator.noise(k, id), 6.0F * HeroAnimator.noise(k + 1, id), 0.0F, w);
-        c.armAdd(false, 6.0F * HeroAnimator.noise(k + 2, id), 6.0F * HeroAnimator.noise(k + 3, id), 0.0F, w);
-        c.legAdd(true, 6.0F * HeroAnimator.noise(k + 4, id), 0.0F, w);
-        c.legAdd(false, 6.0F * HeroAnimator.noise(k + 5, id), 0.0F, w);
+        c.armAdd(true, 6.0F * shake(k, f, id), 6.0F * shake(k + 1, f, id), 0.0F, w);
+        c.armAdd(false, 6.0F * shake(k + 2, f, id), 6.0F * shake(k + 3, f, id), 0.0F, w);
+        c.legAdd(true, 6.0F * shake(k + 4, f, id), 0.0F, w);
+        c.legAdd(false, 6.0F * shake(k + 5, f, id), 0.0F, w);
+    }
+
+    /** The noise of step {@code k}, {@code f} of the way to that of the next step. */
+    private static float shake(long k, float f, int id) {
+        return Mth.lerp(f, HeroAnimator.noise(k, id), HeroAnimator.noise(k + 1, id));
     }
 
     // ---------------------------------------------------------------------------------------------------------------

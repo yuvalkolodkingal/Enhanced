@@ -112,6 +112,8 @@ public final class ClientEvents {
         TheNoise.stop();
         BillyCrownLayer.clear();
         WorldEffectsRenderer.clearHexBolts();
+        WorldEffectsRenderer.clearHexes();
+        WorldEffectsRenderer.clearShields();
         BeamRenderer.clear();
         BarrierRenderer.clear();
         MagnetStreams.clear();

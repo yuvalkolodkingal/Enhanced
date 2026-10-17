@@ -235,7 +235,7 @@ public final class ShieldFx {
         float fraction = boss.shieldFraction();
         float grown = state == ApocalypseShield.State.UP ? 1.0F : knit(time - mark.since);
         float flicker = fraction < 0.25F && state == ApocalypseShield.State.UP && !EnhancedClientConfig.reducedMotion()
-                ? 0.75F + 0.25F * Mth.sin(time * 1.9F) : 1.0F;
+                ? 0.75F + 0.25F * Mth.sin(time * 0.8F) : 1.0F; // (3.3) a slow throb, not a six-a-second strobe
         float alpha = (0.4F + 0.6F * grown) * flicker;
         float radius = (float) ApocalypseShield.RADIUS;
         float groundLat = (float) Math.asin(-Math.min(0.95, boss.getBbHeight() * 0.5 / radius));

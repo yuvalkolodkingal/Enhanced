@@ -31,12 +31,16 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 /**
@@ -71,12 +75,14 @@ public final class WorldEffectsRenderer {
         float time = level.getGameTime() + partialTick;
 
         double renderDistance = mc.options.getEffectiveRenderDistance() * 16.0;
+        updateHexes(level, time);
+        updateShields(level, time);
         // Two passes for every energy dome: a see-through red veil, then glowing lines on top (the Hex's scanlines and
         // bricks; the Chaos Shield's hexagons).
         for (int pass = 0; pass < 2; pass++) {
             boolean lines = pass == 1;
             RenderType hexType = lines ? EnhancedRenderTypes.energyField(HEX_BARRIER) : EnhancedRenderTypes.ENERGY_VEIL;
-            renderHexes(level, pose, buffers.getBuffer(hexType), lines, camera, time, renderDistance);
+            renderHexes(pose, buffers.getBuffer(hexType), lines, camera, time, renderDistance);
             buffers.endBatch(hexType);
             // Every shield that is up, of whichever hero (the Chaos Shield, and the shields of the heroes of 3.0).
             Set<RenderType> drawn = new HashSet<>();
@@ -97,6 +103,28 @@ public final class WorldEffectsRenderer {
                         EnergyGeometry.veil(pose, vc, center, look.radius(), 32, 16, style.veil(), 0.12F * look.flicker(),
                                 0.45F * look.flicker());
                     }
+                }
+            }
+            // The shields just lowered or broken, swelling a little as they fade.
+            for (Map.Entry<Integer, Shield> going : SHIELDS_GOING.entrySet()) {
+                Shield shield = going.getValue();
+                if (!(level.getEntity(going.getKey()) instanceof AbstractClientPlayer player)) {
+                    continue;
+                }
+                float u = Mth.clamp((time - shield.at()) / SHIELD_FADE_TICKS, 0.0F, 1.0F);
+                float alpha = shield.flicker() * (1.0F - u) * (1.0F - u);
+                float radius = shield.radius() * (1.0F + 0.2F * u);
+                ShieldStyle style = shield.style();
+                RenderType type = lines ? EnhancedRenderTypes.energyField(style.texture())
+                        : EnhancedRenderTypes.ENERGY_VEIL;
+                VertexConsumer vc = buffers.getBuffer(type);
+                drawn.add(type);
+                Vec3 center = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
+                if (lines) {
+                    EnergyGeometry.sphere(pose, vc, center, radius, 32, 16, 6, 3, time * 0.01F, style.lines(),
+                            0.35F * alpha, 0.65F * alpha);
+                } else {
+                    EnergyGeometry.veil(pose, vc, center, radius, 32, 16, style.veil(), 0.12F * alpha, 0.45F * alpha);
                 }
             }
             for (RenderType type : drawn) {
@@ -139,15 +167,111 @@ public final class WorldEffectsRenderer {
         MagnetStreams.render(mc, level, buffers, camera, partialTick, level.getGameTime());
     }
 
+    // ---- Shields going down ----
+
+    /** A shield as it was last drawn: its style, size and brightness,
+            and when (the game time with the partial tick). */
+    private record Shield(ShieldStyle style, float radius, float flicker, float at) {
+    }
+
+    /** How long a lowered or broken shield takes to fade away (3.3: it vanished from one frame to the next). */
+    private static final float SHIELD_FADE_TICKS = 6.0F;
+    private static final Map<Integer, Shield> SHIELDS_UP = new HashMap<>();
+    private static final Map<Integer, Shield> SHIELDS_GOING = new HashMap<>();
+
+    /** Remembers every shield that is up, and starts the fade of each one that has just gone down. */
+    private static void updateShields(ClientLevel level, float time) {
+        Set<Integer> up = new HashSet<>();
+        for (AbstractClientPlayer player : level.players()) {
+            PowerData data = Powers.get(player);
+            ShieldStyle style = ShieldStyles.of(data.power());
+            if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
+                ShieldStyle.Look look = style.look(data, time);
+                SHIELDS_UP.put(player.getId(), new Shield(style, look.radius(), look.flicker(), time));
+                SHIELDS_GOING.remove(player.getId());
+                up.add(player.getId());
+            }
+        }
+        SHIELDS_UP.entrySet().removeIf(entry -> {
+            if (up.contains(entry.getKey())) {
+                return false;
+            }
+            // (Not for one who turned invisible: his shield is not drawn either.)
+            if (level.getEntity(entry.getKey()) instanceof AbstractClientPlayer player && !player.isInvisible()) {
+                Shield last = entry.getValue();
+                SHIELDS_GOING.put(entry.getKey(), new Shield(last.style(), last.radius(), last.flicker(), time));
+            }
+            return true;
+        });
+        SHIELDS_GOING.values().removeIf(shield -> time - shield.at() > SHIELD_FADE_TICKS || time < shield.at() - 1.0F);
+    }
+
+    public static void clearShields() {
+        SHIELDS_UP.clear();
+        SHIELDS_GOING.clear();
+    }
+
     // ---- The Hex ----
 
-    private static void renderHexes(ClientLevel level, Matrix4f pose, VertexConsumer vc, boolean lines, Vec3 camera, float time,
-                                    double renderDistance) {
+    /**
+     * What the client shows of each Hex (3.3): the radius it is drawn at, easing to the real one when the Scarlet Witch
+     * resizes it (it jumped), and a Hex that was just dissolved, sinking and fading away for {@link #HEX_FADE_TICKS}
+     * (it vanished at once). Only the picture lingers: the wall is gone on the server the moment it is dissolved.
+     */
+    private static final class ShownHex {
+        Hex hex;
+        float radius;
+        float fade = 1.0F;
+        boolean gone;
+    }
+
+    private static final Map<UUID, ShownHex> SHOWN_HEXES = new HashMap<>();
+    private static final float HEX_FADE_TICKS = 30.0F;
+    private static float hexClock = Float.NaN;
+    @Nullable
+    private static ClientLevel hexLevel;
+
+    public static void clearHexes() {
+        SHOWN_HEXES.clear();
+        hexClock = Float.NaN;
+        hexLevel = null;
+    }
+
+    /** Moves the shown Hexes on to this frame (once a frame, before the two passes draw them). */
+    private static void updateHexes(ClientLevel level, float time) {
+        if (level != hexLevel) {
+            // Another world or dimension: its Hexes are its own.
+            clearHexes();
+            hexLevel = level;
+        }
+        float dt = Float.isNaN(hexClock) ? 0.0F : Mth.clamp(time - hexClock, 0.0F, 4.0F);
+        hexClock = time;
+        for (ShownHex shown : SHOWN_HEXES.values()) {
+            shown.gone = true;
+        }
         for (Hex hex : level.getData(ModAttachments.HEXES).hexes()) {
+            ShownHex shown = SHOWN_HEXES.computeIfAbsent(hex.id(), id -> new ShownHex());
+            if (shown.hex == null) {
+                shown.radius = hex.radius();
+            }
+            shown.hex = hex;
+            shown.gone = false;
+            shown.fade = 1.0F;
+            shown.radius = AnimMath.ease(shown.radius, hex.radius(), dt, 5.0F);
+        }
+        SHOWN_HEXES.values().removeIf(shown -> shown.gone && (shown.fade -= dt / HEX_FADE_TICKS) <= 0.0F);
+    }
+
+    private static void renderHexes(Matrix4f pose, VertexConsumer vc, boolean lines, Vec3 camera, float time,
+            double renderDistance) {
+        for (ShownHex shown : SHOWN_HEXES.values()) {
+            Hex hex = shown.hex;
             float grow = Mth.clamp((time - hex.createdAt()) / 50F, 0F, 1F);
             grow = grow * grow * (3 - 2 * grow);
-            float radius = hex.radius() * grow;
-            if (radius < 0.5F) {
+            // A dissolved Hex sinks a little as it fades.
+            float fade = AnimMath.ss(0.0F, 1.0F, shown.fade);
+            float radius = shown.radius * grow * (0.85F + 0.15F * fade);
+            if (radius < 0.5F || fade <= 0.0F) {
                 continue;
             }
             Vec3 center = hex.center().subtract(camera);
@@ -158,8 +282,8 @@ public final class WorldEffectsRenderer {
             // (3.3) The mesh and the tiling of the bricks are those of the finished wall: counted from the growing
             // radius
             // they changed every few frames while it rose, and the bricks jumped.
-            int segments = Mth.clamp((int) (hex.radius() * 2), 32, 128);
-            float pulse = 0.85F + 0.15F * Mth.sin(time * 0.06F);
+            int segments = Mth.clamp(hex.radius() * 2, 32, 128);
+            float pulse = (0.85F + 0.15F * Mth.sin(time * 0.06F)) * fade;
             // A wall that is still rising glows brighter.
             float rising = 1F + (1F - grow) * 1.5F;
             if (lines) {

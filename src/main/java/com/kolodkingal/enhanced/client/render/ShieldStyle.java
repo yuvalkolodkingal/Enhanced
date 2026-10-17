@@ -44,7 +44,8 @@ public record ShieldStyle(int veil, int lines, ResourceLocation texture, float r
         float weak = Float.isInfinite(max) ? 0F : 1F - Mth.clamp(data.shieldStrength() / max / 0.4F, 0F, 1F);
         float ending = Mth.clamp((20F - (data.shieldFormedAt() + maxTicks.getAsInt() - time)) / 20F, 0F, 1F);
         float failing = formed < 1F ? 0F : Math.max(weak, ending);
-        flicker *= 1F - failing * 0.5F * (0.5F + 0.5F * Mth.sin(time * 2.2F));
+        // (3.3) A slow throb, about twice a second: at seven times a second it was a strobe.
+        flicker *= 1F - failing * 0.5F * (0.5F + 0.5F * Mth.sin(time * 0.8F));
         return new Look(size, flicker);
     }
 }

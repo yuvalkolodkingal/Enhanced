@@ -129,8 +129,13 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
         graphics.fill(width - 5, height - 1, width, height, mark);
         graphics.fill(width - 1, height - 5, width, height, mark);
         // A bright line drifting down the panel at 20 pixels a second (one a tick); still with reduced motion.
-        int scan = calm ? height / 3 : (int) (time % Math.max(1, height - 2)) + 1;
-        graphics.fill(1, scan, width - 1, scan + 1, withAlpha(0x30000000 | PhoenixAbilities.PSY_MAIN, fade));
+        // (3.3) It glides between pixels with the partial tick instead of stepping one pixel a tick.
+        float scan = calm ? height / 3 : time % Math.max(1, height - 2) + 1.0F;
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0F, scan - Mth.floor(scan), 0.0F);
+        graphics.fill(1, Mth.floor(scan), width - 1, Mth.floor(scan) + 1,
+                withAlpha(0x30000000 | PhoenixAbilities.PSY_MAIN, fade));
+        graphics.pose().popPose();
 
         Painter painter = new Painter(graphics, mc.font, PAD, PAD, fade, time);
         painter.paint(snapshot);

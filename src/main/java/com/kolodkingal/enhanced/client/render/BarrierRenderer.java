@@ -47,7 +47,13 @@ public final class BarrierRenderer {
         float peak;
         float strength;
         float hitAt = -100.0F;
+        /** How far it had formed when last drawn up, and when it was lowered (NaN while it is up). */
+        float formed;
+        float loweredAt = Float.NaN;
     }
+
+    /** How long a lowered barrier takes to fade away (3.3: it vanished from one frame to the next). */
+    private static final float FADE_TICKS = 5.0F;
 
     private static final Map<Integer, Mark> MARKS = new HashMap<>();
 
@@ -70,7 +76,23 @@ public final class BarrierRenderer {
         boolean any = false;
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() != Power.BILLY || !data.chaosShieldActive() || player.isInvisible() || player.isSpectator()) {
+            boolean up = data.power() == Power.BILLY && data.chaosShieldActive();
+            Mark lowered = MARKS.get(player.getId());
+            if (!up && lowered != null && !player.isInvisible() && !player.isSpectator()
+                    && data.power() == Power.BILLY) {
+                // Lowered or broken: it fades away where he holds it.
+                if (Float.isNaN(lowered.loweredAt)) {
+                    lowered.loweredAt = time;
+                }
+                float out = 1.0F - (time - lowered.loweredAt) / FADE_TICKS;
+                if (out > 0.0F && time >= lowered.loweredAt) {
+                    any = true;
+                    Vec3 body = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.55, 0);
+                    draw(mc, player, lowered.formed, out, lowered, body, buffers, pose, camera, partialTick, time);
+                    continue;
+                }
+            }
+            if (!up || player.isInvisible() || player.isSpectator()) {
                 MARKS.remove(player.getId());
                 continue;
             }
@@ -80,6 +102,8 @@ public final class BarrierRenderer {
             }
             any = true;
             Mark mark = MARKS.computeIfAbsent(player.getId(), id -> new Mark());
+            mark.loweredAt = Float.NaN;
+            mark.formed = data.chaosShieldProgress(time);
             float strength = data.shieldStrength();
             if (strength > mark.peak || mark.peak <= 0.0F) {
                 mark.peak = strength;
@@ -87,25 +111,32 @@ public final class BarrierRenderer {
                 mark.hitAt = time;
             }
             mark.strength = strength;
-            draw(mc, player, data, mark, body, buffers, pose, camera, partialTick, time);
+            draw(mc, player, mark.formed, 1.0F, mark, body, buffers, pose, camera, partialTick, time);
         }
         if (!any) {
             MARKS.clear();
         }
     }
 
-    private static void draw(Minecraft mc, AbstractClientPlayer player, PowerData data, Mark mark, Vec3 body, MultiBufferSource.BufferSource buffers,
-                             Matrix4f pose, Vec3 camera, float partialTick, float time) {
-        float formed = data.chaosShieldProgress(time);
+    /**
+     * Draws one barrier.
+     *
+     * @param formed how far it has formed (0 to 1)
+     * @param out    how much of it is still there (1 while it is up; down to 0 as a lowered one fades)
+     */
+    private static void draw(Minecraft mc, AbstractClientPlayer player, float formed, float out, Mark mark, Vec3 body,
+                             MultiBufferSource.BufferSource buffers, Matrix4f pose, Vec3 camera, float partialTick,
+                                     float time) {
         float grow = formed * formed * (3.0F - 2.0F * formed);
         float fraction = mark.peak <= 0.0F ? 1.0F : Mth.clamp(mark.strength / mark.peak, 0.0F, 1.0F);
         boolean reduced = EnhancedClientConfig.reducedMotion();
         // It gutters as it nears breaking.
-        float flicker = fraction < 0.3F && !reduced ? 0.7F + 0.3F * Mth.sin(time * 2.1F) : 1.0F;
+        // (3.3) A slow throb, about twice a second: at seven times a second it was a strobe.
+        float flicker = fraction < 0.3F && !reduced ? 0.7F + 0.3F * Mth.sin(time * 0.8F) : 1.0F;
         float hit = Mth.clamp(1.0F - (time - mark.hitAt) / 7.0F, 0.0F, 1.0F);
         boolean mine = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         float see = mine ? 0.4F : 1.0F; // the plate is right in front of his own eyes: fainter there
-        float alpha = (0.35F + 0.65F * grow) * (0.55F + 0.45F * fraction) * flicker * see;
+        float alpha = (0.35F + 0.65F * grow) * (0.55F + 0.45F * fraction) * flicker * see * out;
 
         BillyBarrier.Frame plate = BillyBarrier.frame(body, player.getViewVector(partialTick));
         double width = BillyBarrier.width() * (0.4 + 0.6 * grow);

@@ -16,7 +16,11 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Swirling energy drawn over the body:
@@ -27,6 +31,8 @@ import org.joml.Matrix4f;
  */
 public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     public static final ResourceLocation SWIRL = Enhanced.id("textures/entity/energy_swirl.png");
+    /** How much of each player's aura shows: the hands, the phased body, and the clock of the last frame. */
+    private static final Map<Integer, float[]> SHOWN = new HashMap<>();
 
     private final PlayerModel<AbstractClientPlayer> model;
 
@@ -41,30 +47,47 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         PowerData data = Powers.get(player);
         boolean hands = data.power() == Power.SCARLET_WITCH && data.flying();
         boolean phased = data.power() == Power.VISION && data.visionPhased();
-        if ((!hands && !phased) || player.isInvisible()) {
+        if (player.isInvisible()) {
+            SHOWN.remove(player.getId());
             return;
         }
         float t = player.tickCount + partialTicks;
+        // (3.3) The aura eases in and out over a few ticks instead of popping on and off.
+        float[] shown = SHOWN.computeIfAbsent(player.getId(), id -> new float[]{0.0F, 0.0F, t});
+        float dt = Mth.clamp(t - shown[2], 0.0F, 4.0F);
+        shown[2] = t;
+        shown[0] = AnimMath.ease(shown[0], hands ? 1.0F : 0.0F, dt, 1.5F);
+        shown[1] = AnimMath.ease(shown[1], phased ? 1.0F : 0.0F, dt, 1.5F);
+        float handsW = shown[0];
+        float phasedW = shown[1];
+        if (handsW < 0.01F && phasedW < 0.01F) {
+            if (!hands && !phased) {
+                SHOWN.remove(player.getId());
+            }
+            return;
+        }
         model.prepareMobModel(player, limbSwing, limbSwingAmount, partialTicks);
         getParentModel().copyPropertiesTo(model);
         model.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
-        model.setAllVisible(phased);
-        if (hands) {
+        boolean body = phasedW >= 0.01F;
+        model.setAllVisible(body);
+        if (!body) {
             model.rightArm.visible = true;
             model.leftArm.visible = true;
             model.rightSleeve.visible = false;
             model.leftSleeve.visible = false;
         }
-        int color = phased ? ("white_vision".equals(data.variant()) ? 0x90F4F8FF : 0x90E3DC6E) : 0x90E0193F;
+        int rgb = body ? ("white_vision".equals(data.variant()) ? 0xF4F8FF : 0xE3DC6E) : 0xE0193F;
+        int color = Math.round(0x90 * (body ? phasedW : handsW)) << 24 | rgb;
         VertexConsumer swirl = buffer.getBuffer(RenderType.energySwirl(SWIRL, (t * 0.02F) % 1F, (t * 0.013F) % 1F));
         model.renderToBuffer(poseStack, swirl, packedLight, OverlayTexture.NO_OVERLAY, color);
 
-        if (hands) {
+        if (handsW >= 0.01F) {
             VertexConsumer glow = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
             // The orbs swell as she speeds up.
             HeroAnimState state = HeroAnimator.peek(player);
-            float swell = state == null ? 1F : 1F + 0.35F * AnimMath.ss(1F, 2F, state.s);
+            float swell = (state == null ? 1F : 1F + 0.35F * AnimMath.ss(1F, 2F, state.s)) * handsW;
             handOrb(poseStack, glow, model.rightArm, -1F / 16F, t, swell);
             handOrb(poseStack, glow, model.leftArm, 1F / 16F, t + 20F, swell);
         }
