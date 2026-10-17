@@ -72,7 +72,7 @@ public class ChooseHeroScreen extends Screen {
         }
         int bottom = height - BOTTOM + 4;
         addRenderableWidget(Button.builder(Component.translatable("gui.back"), b -> Minecraft.getInstance().setScreen(parent))
-                .bounds(8, height - 26, 60, 20).build());
+                .bounds(6, 4, 50, 18).build());
         if (chosen == null) {
             return;
         }

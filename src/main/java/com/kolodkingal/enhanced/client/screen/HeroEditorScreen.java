@@ -241,7 +241,7 @@ public class HeroEditorScreen extends Screen {
                 }
             }));
             // Its own colour, or the hero's (the first swatch, framed when chosen).
-            int sx = x0;
+            int sx = x0 + font.width(Component.translatable("screen.enhanced.hero_creator.own_color")) + 4;
             int sy = y + 52;
             int[] colours = {-1, 0xE53935, 0xFB8C00, 0xFDD835, 0x43A047, 0x00ACC1, 0x1E88E5, 0x8E24AA, 0xD81B60, 0xF5F5F5};
             for (int i = 0; i < colours.length; i++) {
@@ -564,22 +564,23 @@ public class HeroEditorScreen extends Screen {
         // The numbers this strength gives (the live preview of F5), and what it costs.
         int sx = x0 + 150;
         int sy = y + 40;
+        int colW = Math.max(40, (right() - sx) / 2 - 3);
         g.drawString(font, Component.translatable("screen.enhanced.hero_creator.costs", m.cost(strength))
                 .withStyle(ChatFormatting.YELLOW), sx, sy, 0xFFFFFF);
         PowerModule.Act act = m.act(option);
-        g.drawString(font, Component.translatable("screen.enhanced.hero_creator.act." + act.name().toLowerCase(java.util.Locale.ROOT))
-                .withStyle(ChatFormatting.AQUA), sx + 90, sy, 0xFFFFFF);
+        CreatorUi.drawFitted(g, font, Component.translatable("screen.enhanced.hero_creator.act." + act.name().toLowerCase(java.util.Locale.ROOT))
+                .withStyle(ChatFormatting.AQUA), sx + colW + 4, sy, colW, 0xFFFFFF);
         int line = 0;
         for (ModuleStats.Stat stat : ModuleStats.of(m, option)) {
             Component text = Component.translatable(stat.nameKey()).withStyle(ChatFormatting.GRAY).append(": ")
                     .append(Component.translatable(stat.unitKey(), stat.shown(strength)).withStyle(s -> s.withColor(draft.colorOf(pick))));
             int col = line % 2;
             int row = line / 2;
-            CreatorUi.drawFitted(g, font, text, sx + col * 100, sy + 12 + row * 10, 96, 0xFFFFFF);
+            CreatorUi.drawFitted(g, font, text, sx + col * (colW + 4), sy + 12 + row * 10, colW, 0xFFFFFF);
             line++;
         }
         if (pick != null) {
-            g.drawString(font, Component.translatable("screen.enhanced.hero_creator.own_color").withStyle(ChatFormatting.GRAY), x0, y + 66, 0xFFFFFF);
+            g.drawString(font, Component.translatable("screen.enhanced.hero_creator.own_color").withStyle(ChatFormatting.GRAY), x0, y + 68, 0xFFFFFF);
         }
     }
 
