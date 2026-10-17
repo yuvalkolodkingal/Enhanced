@@ -122,7 +122,8 @@ public final class ItemsTests {
     }
 
     private static boolean sorcerer(Power power) {
-        return power == Power.LOKI || power == Power.SCARLET_WITCH || power == Power.BILLY;
+        // (3.3: Agatha Harkness is a sorcerer too.)
+        return power == Power.LOKI || power == Power.SCARLET_WITCH || power == Power.BILLY || power == Power.AGATHA;
     }
 
     private static boolean tooltipHas(ItemStack stack, String key) {

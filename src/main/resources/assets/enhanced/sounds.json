@@ -1139,5 +1139,53 @@
         "name": "enhanced:apocalypse_crit"
       }
     ]
+  },
+  "agatha_awaken": {
+    "subtitle": "subtitles.enhanced.agatha_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:agatha_awaken"
+      }
+    ]
+  },
+  "agatha_drain": {
+    "subtitle": "subtitles.enhanced.agatha_drain",
+    "sounds": [
+      {
+        "name": "enhanced:agatha_drain"
+      }
+    ]
+  },
+  "agatha_runes": {
+    "subtitle": "subtitles.enhanced.agatha_runes",
+    "sounds": [
+      {
+        "name": "enhanced:agatha_runes"
+      }
+    ]
+  },
+  "agatha_shield_up": {
+    "subtitle": "subtitles.enhanced.agatha_shield_up",
+    "sounds": [
+      {
+        "name": "enhanced:agatha_shield_up"
+      }
+    ]
+  },
+  "agatha_shield_hit": {
+    "subtitle": "subtitles.enhanced.agatha_shield_hit",
+    "sounds": [
+      {
+        "name": "enhanced:agatha_shield_hit"
+      }
+    ]
+  },
+  "agatha_shield_break": {
+    "subtitle": "subtitles.enhanced.agatha_shield_break",
+    "sounds": [
+      {
+        "name": "enhanced:agatha_shield_break"
+      }
+    ]
   }
 }

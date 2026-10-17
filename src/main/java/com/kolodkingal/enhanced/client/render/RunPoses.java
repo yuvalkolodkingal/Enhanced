@@ -91,6 +91,10 @@ final class RunPoses {
     /** An unhurried, upright god's walk: little arm swing and almost no bounce. */
     private static final Character APOCALYPSE = new Character(0.55F, 0.80F, 0.90F, 3, 2, 0.008F);
 
+    // ===== agatha (3.3) =====
+    /** Agatha: a witch's measured, self-assured stride, the hands swinging little, the sprint a hurried glide. */
+    private static final Character AGATHA = new Character(0.70F, 0.95F, 1.0F, 4, 3, 0.012F);
+
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
             case MAGNETO -> MAGNETO;
@@ -106,6 +110,7 @@ final class RunPoses {
             case THANOS -> THANOS;
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
+            case AGATHA -> AGATHA;
             default -> DEFAULT;
         };
     }

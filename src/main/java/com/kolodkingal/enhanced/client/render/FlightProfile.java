@@ -157,6 +157,19 @@ public final class FlightProfile {
             pose(-14, 0, 20, -14, 0, -20, 4, 1, 3, -1),
             pose(-26, 0, 26, -26, 0, -26, 6, 1, 5, -2)});
 
+    // ===== agatha (3.3) =====
+    /**
+     * Agatha: a witch lifted by her own magic, upright and unhurried (WandaVision's finale), the arms a little open with the
+     * hands low, the legs together like a skirt's. She leans little into a cruise, glides with the arms trailing back at a
+     * sprint, and sways a little as she hovers.
+     */
+    private static final FlightProfile AGATHA = new FlightProfile(
+            new float[]{22, 48, -6}, 0.35F, 22, 12, 3.0F, 9, 5, false, new float[]{4.0F, 2.5F}, new float[]{0.04F, 84}, 2.5F, 1.0F, 0.6F, 1.0F,
+            false, 0.085F, false, new float[][]{
+            pose(-14, 0, 26, -14, 0, -26, 2, 1, 1, -1),    // hover: the hands low and open, the legs together
+            pose(-4, 0, 30, -4, 0, -30, 6, 1, 4, -1),      // cruise: the arms drift back a little
+            pose(18, 0, 40, 18, 0, -40, 10, 1, 8, -1)});   // sprint: the arms trail behind, open
+
     /** The profile of a flier, or null for a hero that does not fly. */
     public static FlightProfile of(Power power, boolean whiteVision) {
         return switch (power) {
@@ -171,6 +184,7 @@ public final class FlightProfile {
             case THANOS -> null; // he does not fly: no take-off, banking or braking (his landings are ThanosActing's)
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
+            case AGATHA -> AGATHA;
             case NONE, QUICKSILVER, TOMMY, LOKI -> null;
         };
     }

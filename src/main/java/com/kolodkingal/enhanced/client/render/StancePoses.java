@@ -52,6 +52,12 @@ public final class StancePoses {
     public static final float APOC_STORM_HEAD = -12;
     public static final float APOC_STORM_LEAN = -3;
 
+    // ===== agatha (3.3) =====
+    /** Agatha's Witch's Shield: both hands held out before her at the height of the chest, a little apart, fingers spread. */
+    public static final float[] AGATHA_SHIELD_M = {-70, 14, 16};
+    public static final float[] AGATHA_SHIELD_O = {-70, -14, -16};
+    public static final float AGATHA_SHIELD_HEAD = -2;
+
     private StancePoses() {
     }
 }

@@ -196,6 +196,17 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_RANK_UP = register("build_rank_up");
     public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_CRIT = register("apocalypse_crit");
 
+    // ===== agatha (3.3) =====
+    /** The Darkhold's whispers rise round the one who reads it, and Agatha wakes. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_AWAKEN = register("agatha_awaken");
+    /** The Power Drain: a hollow, sucking swell drawn into her hands. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_DRAIN = register("agatha_drain");
+    /** The Rune Trap is laid: a low choir chord and a ring of chimes. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_RUNES = register("agatha_runes");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_SHIELD_UP = register("agatha_shield_up");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_SHIELD_HIT = register("agatha_shield_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_SHIELD_BREAK = register("agatha_shield_break");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

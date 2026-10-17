@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.power;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
@@ -34,7 +35,10 @@ public enum Power implements StringRepresentable {
     SPIDER_MAN(0xDC2B2F, 0xDCE6F2),
     THANOS(0x9B4DEB, 0xE6D2FF),
     ULTRON(0xFFA23A, 0xFFE9B8),
-    APOCALYPSE(0xF2B84B, 0xFFF0B8);
+    APOCALYPSE(0xF2B84B, 0xFFF0B8),
+    // The heroes of 3.3, appended in this order (AGATHA, CYCLOPS, PROFESSOR_X), for the same reason. Agatha's dark magic
+    // is the violet of WandaVision ("It's been Agatha all along"), with a pale lilac glow.
+    AGATHA(0x9A3FE0, 0xE2C2FF);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -104,7 +108,7 @@ public enum Power implements StringRepresentable {
      */
     public boolean canFly() {
         return switch (this) {
-            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> true;
+            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA -> true;
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> false;
         };
     }
@@ -119,6 +123,7 @@ public enum Power implements StringRepresentable {
             case PHOENIX -> PhoenixConfig.FLIGHT_SPEED.get().floatValue();
             case ULTRON -> UltronConfig.FLIGHT_SPEED.get().floatValue();
             case APOCALYPSE -> ApocalypseConfig.FLIGHT_SPEED.get().floatValue();
+            case AGATHA -> AgathaConfig.FLIGHT_SPEED.get().floatValue();
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> 0.05F;
         };
     }
@@ -127,7 +132,7 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> 2;
+            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA -> 2;
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> -1;
         };
     }

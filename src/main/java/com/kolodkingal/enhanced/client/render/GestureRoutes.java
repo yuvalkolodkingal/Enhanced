@@ -339,6 +339,14 @@ public final class GestureRoutes {
                 case 2 -> "flight";
                 default -> "flag:CHAOS_SHIELD";
             };
+            // ===== agatha (3.3) =====
+            // (Sneak + R, the hex mark or the mind glimpse, is live:CASTING: routed by her plug-in.)
+            case AGATHA -> switch (ability) {
+                case 1 -> "live:BEAMING";
+                case 2 -> "flight";
+                case 3, 5 -> "cooldown";
+                default -> "flag:CHAOS_SHIELD";
+            };
             default -> "none: no abilities";
         };
     }

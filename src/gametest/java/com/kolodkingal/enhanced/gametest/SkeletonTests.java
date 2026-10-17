@@ -175,9 +175,9 @@ public final class SkeletonTests {
     public static void theFiveNewHeroesComeLastInEilonsOrder(GameTestHelper helper) {
         Power[] all = Power.values();
         for (int i = 0; i < NEW_HEROES.size(); i++) {
-            check(all[all.length - NEW_HEROES.size() + i] == NEW_HEROES.get(i), "hero " + i + " of 3.0 is " + NEW_HEROES.get(i));
+            check(all[Power.THOR.ordinal() + 1 + i] == NEW_HEROES.get(i), "hero " + i + " of 3.0 is " + NEW_HEROES.get(i));
         }
-        check(all[all.length - NEW_HEROES.size() - 1] == Power.THOR, "the heroes of 3.0 follow Thor (the stream sends the ordinal)");
+        check(all[Power.APOCALYPSE.ordinal() + 1] == Power.AGATHA, "the heroes of 3.3 are appended after them (Agatha first)");
         check(Power.THOR.ordinal() == 8, "and nobody before them moved: Thor is still the ninth power");
         helper.succeed();
     }
@@ -580,7 +580,9 @@ public final class SkeletonTests {
             check(HeroServers.of(hero) != null && HeroServers.of(hero).power() == hero, hero + " has a server plug-in");
             check(HeroClients.of(hero) != null, hero + " has a client plug-in");
         }
-        check(HeroServers.all().size() == NEW_HEROES.size(), "and nobody else is a plug-in");
+        // (3.3: the heroes after the five of 3.0 are plug-ins too: Agatha's is AgathaTests'.)
+        check(HeroServers.of(Power.AGATHA) != null && HeroClients.of(Power.AGATHA) != null, "Agatha is a plug-in of 3.3");
+        check(HeroServers.all().size() == NEW_HEROES.size() + 1, "and nobody else is a plug-in");
         for (Power old : List.of(Power.NONE, Power.MAGNETO, Power.SCARLET_WITCH, Power.QUICKSILVER, Power.VISION, Power.BILLY,
                 Power.TOMMY, Power.LOKI, Power.THOR)) {
             check(HeroServers.of(old) == null, old + " keeps its switch arms");
@@ -1166,8 +1168,8 @@ public final class SkeletonTests {
     // The network
 
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theProtocolIsSix(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("6"), "3.2 bumps the protocol from 5 to 6, once: " + ModNetwork.PROTOCOL_VERSION);
+    public static void theProtocolIsSeven(GameTestHelper helper) {
+        check(ModNetwork.PROTOCOL_VERSION.equals("7"), "3.3 bumps the protocol from 6 to 7, once: " + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 

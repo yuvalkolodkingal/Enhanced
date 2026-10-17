@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.effect.ConfusedEffect;
+import com.kolodkingal.enhanced.effect.DrainedEffect;
 import com.kolodkingal.enhanced.effect.EmpoweredEffect;
 import com.kolodkingal.enhanced.effect.EntombedEffect;
 import com.kolodkingal.enhanced.effect.PossessedEffect;
@@ -47,6 +48,10 @@ public final class ModEffects {
     // ===== apocalypse =====
     public static final DeferredHolder<MobEffect, EntombedEffect> ENTOMBED = EFFECTS.register("entombed", EntombedEffect::new);
     public static final DeferredHolder<MobEffect, EmpoweredEffect> EMPOWERED = EFFECTS.register("empowered", EmpoweredEffect::new);
+
+    // ===== agatha (3.3) =====
+    /** A hero whose power Agatha has drained: no ability, no flight, for a while. */
+    public static final DeferredHolder<MobEffect, DrainedEffect> DRAINED = EFFECTS.register("drained", DrainedEffect::new);
 
     private ModEffects() {
     }

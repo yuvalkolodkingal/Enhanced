@@ -505,6 +505,8 @@ public final class AnimationMathTests {
                 Power.ULTRON,
                 // ===== apocalypse =====
                 Power.APOCALYPSE,
+                // ===== agatha (3.3) =====
+                Power.AGATHA,
         }) {
             FlightProfile profile = FlightProfile.of(power, false);
             check(profile != null, power + " flies");
@@ -562,6 +564,8 @@ public final class AnimationMathTests {
                 GestureId.TAKEOFF_ULTRON,
                 // ===== apocalypse =====
                 GestureId.TAKEOFF_APOC,
+                // ===== agatha (3.3) =====
+                GestureId.TAKEOFF_AGATHA,
         };
         Power[] powers = {Power.MAGNETO, Power.SCARLET_WITCH, Power.VISION, Power.BILLY, Power.THOR,
                 // ===== phoenix =====
@@ -570,6 +574,8 @@ public final class AnimationMathTests {
                 Power.ULTRON,
                 // ===== apocalypse =====
                 Power.APOCALYPSE,
+                // ===== agatha (3.3) =====
+                Power.AGATHA,
         };
         for (int k = 0; k < ids.length; k++) {
             Gestures.Def def = Gestures.get(ids[k]);
@@ -652,6 +658,8 @@ public final class AnimationMathTests {
                 // ===== apocalypse =====
                 {GestureId.APOC_SHIELD_RAISE, StancePoses.APOC_SHIELD_M, StancePoses.APOC_SHIELD_O},
                 {GestureId.APOC_STORM_START, StancePoses.APOC_STORM_M, StancePoses.APOC_STORM_O},
+                // ===== agatha (3.3) =====
+                {GestureId.AGATHA_SHIELD_RAISE, StancePoses.AGATHA_SHIELD_M, StancePoses.AGATHA_SHIELD_O},
         };
         for (Object[] pair : pairs) {
             Gestures.Def def = Gestures.get((GestureId) pair[0]);

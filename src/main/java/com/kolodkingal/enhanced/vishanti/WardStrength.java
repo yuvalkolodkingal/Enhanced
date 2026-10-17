@@ -12,13 +12,17 @@ import net.minecraft.world.entity.player.Player;
 /**
  * How far a sorcerer's ward reaches: the stronger the sorcerer, the larger the ward. The Scarlet Witch, the strongest,
  * has the biggest ({@code wardRadiusWanda}); Billy's grows from {@code wardRadiusBillyMin} as an Apprentice to {@code
- * wardRadiusBillyMax} at his highest Build Magic rank; Loki has one fixed size ({@code wardRadiusLoki}). Nobody else has
+ * wardRadiusBillyMax} at his highest Build Magic rank; Loki has one fixed size ({@code wardRadiusLoki}), and so has Agatha
+ * ({@code wardRadiusAgatha}, 3.3). Nobody else has
  * a ward at all (0). Read live, on both sides (the server config is synced).
  */
 public final class WardStrength {
-    /** Whether the Book of the Vishanti can be read by someone with this power: Loki, the Scarlet Witch and Billy. */
+    /**
+     * Whether the Book of the Vishanti can be read by someone with this power: Loki, the Scarlet Witch, Billy and (3.3)
+     * Agatha Harkness. The one list of the sorcerers: the Darkhold, the Hex Runes and the Witches' Road ask it too.
+     */
     public static boolean isSorcerer(Power power) {
-        return power == Power.LOKI || power == Power.SCARLET_WITCH || power == Power.BILLY;
+        return power == Power.LOKI || power == Power.SCARLET_WITCH || power == Power.BILLY || power == Power.AGATHA;
     }
 
     /** Whether this player is a sorcerer. */
@@ -52,6 +56,7 @@ public final class WardStrength {
                 yield low + (high - low) * Mth.clamp(billyFraction, 0.0, 1.0);
             }
             case LOKI -> VishantiConfig.WARD_RADIUS_LOKI.get();
+            case AGATHA -> VishantiConfig.WARD_RADIUS_AGATHA.get();
             default -> 0;
         };
         return radius <= 0 ? 0 : Mth.clamp((int) Math.round(radius), 1, VishantiConfig.MAX_RADIUS);

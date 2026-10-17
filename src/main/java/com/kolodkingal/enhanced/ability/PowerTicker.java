@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.vishanti.VishantiBook;
 import net.minecraft.core.Holder;
@@ -47,7 +48,7 @@ public final class PowerTicker {
             case TOMMY -> TommyAbilities.tick(player, data);
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE -> HeroServers.tick(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA -> HeroServers.tick(player, data);
             case NONE -> {
             }
         }
@@ -60,8 +61,9 @@ public final class PowerTicker {
     public static void applyPassives(ServerPlayer player, PowerData data) {
         Power power = data.power();
         // Vision's dense body is too heavy to fly, and Thor needs his weapon to fly.
+        // (3.3: a power Agatha has drained does not fly either.)
         boolean canFly = power.canFly() && !(power == Power.VISION && data.dense())
-                && !(power == Power.THOR && !ThorAbilities.canFly(player, data));
+                && !(power == Power.THOR && !ThorAbilities.canFly(player, data)) && !player.hasEffect(ModEffects.DRAINED);
         setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
@@ -99,7 +101,7 @@ public final class PowerTicker {
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);
             case TOMMY -> TommyAbilities.endAll(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE -> HeroServers.endAll(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA -> HeroServers.endAll(player, data);
             default -> {
             }
         }

@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced;
 
+import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
@@ -512,6 +513,8 @@ public final class EnhancedConfig {
         DarkholdConfig.define(BUILDER);
         // 3.2: the Witches' Road trials.
         WitchesRoadConfig.define(BUILDER);
+        // 3.3: Agatha Harkness (section [agatha]).
+        AgathaConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

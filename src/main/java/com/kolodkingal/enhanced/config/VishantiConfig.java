@@ -31,6 +31,8 @@ public final class VishantiConfig {
     public static ModConfigSpec.IntValue WARD_RADIUS_BILLY_MIN;
     public static ModConfigSpec.IntValue WARD_RADIUS_BILLY_MAX;
     public static ModConfigSpec.IntValue WARD_RADIUS_LOKI;
+    /** 3.3: Agatha reads the book too. */
+    public static ModConfigSpec.IntValue WARD_RADIUS_AGATHA;
     public static ModConfigSpec.IntValue WARD_CHECK_TICKS;
     public static ModConfigSpec.DoubleValue WARD_PUSH;
     public static ModConfigSpec.BooleanValue WARD_BLOCKS_SPAWNS;
@@ -39,7 +41,7 @@ public final class VishantiConfig {
     public static final int MAX_RADIUS = 128;
 
     public static void define(ModConfigSpec.Builder builder) {
-        builder.comment("The Book of the Vishanti: a sorcerer (Loki, the Scarlet Witch or Billy) saves places and teleports to them,",
+        builder.comment("The Book of the Vishanti: a sorcerer (Loki, the Scarlet Witch, Billy or Agatha) saves places and teleports to them,",
                 "and raises a ward round a base that no monster can enter.").push(SECTION);
         ENABLED = builder.comment("The Book of the Vishanti works (false: it can be held but nobody can read it).")
                 .define("enabled", true);
@@ -71,6 +73,8 @@ public final class VishantiConfig {
                 .defineInRange("wardRadiusBillyMax", 40, 4, MAX_RADIUS);
         WARD_RADIUS_LOKI = builder.comment("Radius of the ward of Loki.")
                 .defineInRange("wardRadiusLoki", 24, 4, MAX_RADIUS);
+        WARD_RADIUS_AGATHA = builder.comment("Radius of the ward of Agatha Harkness (3.3).")
+                .defineInRange("wardRadiusAgatha", 24, 4, MAX_RADIUS);
         WARD_CHECK_TICKS = builder.comment("Every how many ticks a ward looks for monsters inside it and pushes them out (one",
                         "spatial lookup per ward; more is cheaper, fewer keeps the edge tighter).")
                 .defineInRange("wardCheckTicks", 5, 1, 40);

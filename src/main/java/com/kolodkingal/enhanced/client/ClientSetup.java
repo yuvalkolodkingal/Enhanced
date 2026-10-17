@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
 import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
+import com.kolodkingal.enhanced.client.render.AgathaHatLayer;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.BlackEyesLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
@@ -165,6 +166,8 @@ public final class ClientSetup {
         // ===== apocalypse =====
         event.registerLayerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
         event.registerLayerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);
+        // ===== agatha (3.3) =====
+        event.registerLayerDefinition(AgathaHatLayer.LAYER, AgathaHatLayer::createLayer);
     }
 
     @SubscribeEvent
@@ -190,6 +193,8 @@ public final class ClientSetup {
                 // ===== ultron =====
                 // ===== apocalypse =====
                 renderer.addLayer(new ApocalypseAuraLayer(renderer, energy));
+                // ===== agatha (3.3) =====
+                renderer.addLayer(new AgathaHatLayer(renderer, event.getContext().bakeLayer(AgathaHatLayer.LAYER)));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }

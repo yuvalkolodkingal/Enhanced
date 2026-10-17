@@ -72,7 +72,11 @@ public enum Stance {
     /** Apocalypse's Shield: both forearms raised before the chest, palms out. */
     APOC_SHIELD(1.5F, 3.0F, true),
     /** The Sandstorm: both arms flung wide and up, the head back. */
-    APOC_STORM(3.0F, 5.0F, true)
+    APOC_STORM(3.0F, 5.0F, true),
+
+    // ===== agatha (3.3) =====
+    /** Agatha's Witch's Shield: both hands held out before her, fingers spread, a little apart. */
+    AGATHA_SHIELD(1.5F, 3.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

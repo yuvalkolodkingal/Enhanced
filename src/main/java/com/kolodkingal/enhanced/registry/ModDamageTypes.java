@@ -56,6 +56,14 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> APOCALYPSE_BLOW = key("apocalypse_blow");
     public static final ResourceKey<DamageType> ENTOMB = key("entomb");
 
+    // ===== agatha (3.3) =====
+    // Agatha's dark magic: her Purple Beam is the Darkhold's own (DARKHOLD_BEAM); these two and that one are the tag
+    // enhanced:dark_magic (ModTags.DARK_MAGIC), what the ward of the Book of the Vishanti keeps out.
+    /** The Power Drain's hit on a creature: its life drawn out into her. */
+    public static final ResourceKey<DamageType> AGATHA_DRAIN = key("agatha_drain");
+    /** The burning of the Rune Trap on what stands bound in it. */
+    public static final ResourceKey<DamageType> AGATHA_RUNES = key("agatha_runes");
+
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }
