@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.ultron;
 
+import com.kolodkingal.enhanced.hex.Hex;
+import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -68,6 +70,10 @@ public final class SokoviaValidator {
         if (!skyIsEmpty(level, spec, centre)) {
             return Component.translatable("message.enhanced.ultron.refuse.sky");
         }
+        if (cutByHex(level, spec, centre)) {
+            // 3.3: the island carries no one through the wall of a Hex (only those Wanda lets in may cross it)
+            return Component.translatable("message.enhanced.ultron.refuse.hex");
+        }
         if (starter != null) {
             for (BlockPos probe : probes(spec, centre)) {
                 BlockPos sky = probe.above(spec.height());
@@ -78,6 +84,32 @@ public final class SokoviaValidator {
             }
         }
         return null;
+    }
+
+    /**
+     * Whether the wall of a Hex cuts the column the island rises through (from under the ground it takes to the sky it is lifted
+     * to, with the margin round it): part of the column in a Hex and part out. A Hex all round the column, or far off, is no
+     * matter.
+     */
+    public static boolean cutByHex(ServerLevel level, Spec spec, BlockPos centre) {
+        double radius = spec.extent() + SKY_MARGIN;
+        double low = centre.getY() - spec.skin() - spec.cone() - SKY_MARGIN;
+        double high = centre.getY() + spec.height() + spec.cover() + SKY_MARGIN;
+        for (Hex hex : HexManager.data(level).hexes()) {
+            Vec3 c = hex.center();
+            double flat = Math.hypot(c.x - (centre.getX() + 0.5), c.z - (centre.getZ() + 0.5));
+            double nearFlat = Math.max(0.0, flat - radius);
+            double nearUp = c.y < low ? low - c.y : c.y > high ? c.y - high : 0.0;
+            double farFlat = flat + radius;
+            double farUp = Math.max(Math.abs(c.y - low), Math.abs(c.y - high));
+            double r2 = (double) hex.radius() * hex.radius();
+            boolean meets = nearFlat * nearFlat + nearUp * nearUp < r2;
+            boolean within = farFlat * farFlat + farUp * farUp < r2;
+            if (meets && !within) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** The first thing that hangs on to a block or a vehicle inside the island's cylinder, as a refusal, or null. */

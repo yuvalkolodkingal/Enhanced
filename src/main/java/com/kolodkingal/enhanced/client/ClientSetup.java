@@ -221,6 +221,8 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("build_magic"), new BuildHud());
         // 3.2: the Darkhold's hint panel while it is held.
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("darkhold"), new DarkholdHud());
+        // 3.3, lane PROT: the Hex Barrier's health bar and the Hex Runes' line.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("protect"), new ProtectHud());
     }
 
     private ClientSetup() {

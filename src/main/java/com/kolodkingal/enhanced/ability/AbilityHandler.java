@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.road.RoadTrials;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,6 +25,10 @@ public final class AbilityHandler {
         }
         // Held in a cocoon of sand: the hands are covered. (A release still goes through, as above.)
         if (down && player.hasEffect(ModEffects.ENTOMBED)) {
+            return;
+        }
+        // 3.3: the runes on the walls of a Hex hold every other sorcerer inside it: no power answers.
+        if (down && HexRunes.refuse(player)) {
             return;
         }
         PowerData data = Powers.get(player);

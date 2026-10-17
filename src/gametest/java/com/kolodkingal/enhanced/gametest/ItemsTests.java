@@ -659,14 +659,14 @@ public final class ItemsTests {
     }
 
     @GameTest(template = ARENA, timeoutTicks = 60, batch = WARD)
-    public static void bossesAndAFightsCreaturesAreLetThrough(GameTestHelper helper) {
+    public static void bossesAndAFightsCreaturesAreKeptOutToo(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
         VishantiBook.savePlace(loki, "Fort", true);
         List<EntityType<?>> bosses = List.of(EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.WARDEN, EntityType.ELDER_GUARDIAN,
                 ModEntities.THANOS.get(), ModEntities.ULTRON.get(), ModEntities.APOCALYPSE.get(), ModEntities.ULTRON_SENTRY.get());
         for (EntityType<?> boss : bosses) {
-            check(!WardManager.keepsOut(boss), boss + " is no business of a ward");
+            check(WardManager.keepsOut(boss), boss + " is kept out of a ward too (3.3)");
         }
         check(WardManager.keepsOut(EntityType.ZOMBIE) && WardManager.keepsOut(EntityType.CREEPER) && WardManager.keepsOut(EntityType.SKELETON)
                         && WardManager.keepsOut(EntityType.PHANTOM) && WardManager.keepsOut(EntityType.WITCH),
@@ -675,16 +675,10 @@ public final class ItemsTests {
                         && !WardManager.keepsOut(EntityType.PLAYER),
                 "animals, villagers, golems and players are not monsters");
         Mob wither = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(12.5, FLOOR + 1.0, 10.5));
-        Vec3 at = wither.position();
-        f.everyTick(40, tick -> {
-            if (tick < 40) {
-                return false;
-            }
-            double sideways = Math.hypot(wither.getX() - at.x, wither.getZ() - at.z);
-            check(wither.isAlive() && sideways < 0.5, "a Wither inside the ward is not pushed sideways: " + wither.position() + " from " + at);
-            wither.discard();
-            return true;
-        });
+        wither.setCustomName(net.minecraft.network.chat.Component.literal("Named"));
+        check(!WardManager.exempt(wither), "a boss is never let through, whatever it is called (it is pushed out like any monster)");
+        wither.discard();
+        helper.succeed();
     }
 
     @GameTest(template = ARENA, batch = WARD)
@@ -698,7 +692,7 @@ public final class ItemsTests {
         check(WardManager.forbidsSpawn(level, EntityType.ZOMBIE, Vec3.atCenterOf(inside)), "a zombie may not spawn inside");
         check(!WardManager.forbidsSpawn(level, EntityType.ZOMBIE, Vec3.atCenterOf(outside)), "but may outside");
         check(!WardManager.forbidsSpawn(level, EntityType.PIG, Vec3.atCenterOf(inside)), "a pig may spawn inside");
-        check(!WardManager.forbidsSpawn(level, EntityType.WITHER, Vec3.atCenterOf(inside)), "and a boss");
+        check(WardManager.forbidsSpawn(level, EntityType.WITHER, Vec3.atCenterOf(inside)), "nor a boss (3.3)");
         // The spawn placement check every natural spawn and every spawner goes through.
         MobSpawnEvent.SpawnPlacementCheck placement = new MobSpawnEvent.SpawnPlacementCheck(EntityType.ZOMBIE, level, MobSpawnType.NATURAL,
                 inside, level.getRandom(), true);

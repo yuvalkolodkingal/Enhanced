@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModTags;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -163,7 +164,10 @@ public final class PhoenixBurst {
         }
         // The listeners hear of it before anything refuses it (a phased Vision, a shield).
         PhoenixPower.touched(owner, target, PhoenixPower.Kind.BURST, amount);
-        target.hurt(ModDamageTypes.source(level, ModDamageTypes.PHOENIX_BURST, owner, owner), amount);
+        boolean landed = target.hurt(ModDamageTypes.source(level, ModDamageTypes.PHOENIX_BURST, owner, owner), amount);
+        if (!landed && Shelters.shelters(owner, wave.centre, target)) {
+            return; // 3.3: Billy's barrier faced the wave and stopped all of it (its push and its fire too)
+        }
 
         double push = PhoenixConfig.BURST_KNOCKBACK.get() * cover;
         if (push > 0.0 && !target.getType().is(ModTags.PIN_IMMUNE) && !MjolnirPin.isPinned(target)) {
@@ -198,7 +202,7 @@ public final class PhoenixBurst {
                 }
                 BlockPos above = floor.above();
                 if (state.isFlammable(level, floor, Direction.UP) && level.isEmptyBlock(above)
-                        && !BossFights.protects(level, above) && level.mayInteract(owner, above)) {
+                        && !BossFights.protects(level, above) && level.mayInteract(owner, above) && !BlockRights.behindTheWall(owner, level, above)) {
                     BlockState fire = BaseFireBlock.getState(level, above);
                     if (fire.canSurvive(level, above) && level.setBlockAndUpdate(above, fire)) {
                         wave.fires++;

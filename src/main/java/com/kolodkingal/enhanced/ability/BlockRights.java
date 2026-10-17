@@ -23,6 +23,9 @@ import net.neoforged.neoforge.event.level.BlockEvent;
  *
  * <p>{@code player} is whoever acts: the holder of a lifted block, the caster of a spell (a fake player of his profile
  * when Build Magic works for him while he is away).
+ *
+ * <p>3.3: no block of a Hex is changed by a power from outside its wall, by anyone Wanda has not let in ({@link
+ * #behindTheWall}): every question here asks it first.
  */
 public final class BlockRights {
 
@@ -62,8 +65,8 @@ public final class BlockRights {
      * lets him, and no listener cancels the break.
      */
     public static boolean mayBreak(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState old) {
-        if (BossFights.protects(level, pos)) {
-            return false; // the arena of a boss fight stays as it is
+        if (BossFights.protects(level, pos) || behindTheWall(player, level, pos)) {
+            return false; // the arena of a boss fight stays as it is; the Hex keeps its own
         }
         return vanillaRights(player, level, pos) && postBreak(player, level, pos, old);
     }
@@ -73,7 +76,7 @@ public final class BlockRights {
      * listener cancels the placing.
      */
     public static boolean mayPlace(ServerPlayer player, ServerLevel level, BlockPos pos) {
-        if (BossFights.protects(level, pos)) {
+        if (BossFights.protects(level, pos) || behindTheWall(player, level, pos)) {
             return false;
         }
         return vanillaRights(player, level, pos) && postPlace(player, level, pos);
@@ -96,14 +99,28 @@ public final class BlockRights {
         if (BossFights.hidesGround(level, pos)) {
             return true;
         }
-        return BuildConfig.HEX_IS_A_CLAIM.get() && inAStrangersHex(player, level, pos);
+        return inAStrangersHex(player, level, pos, BuildConfig.HEX_IS_A_CLAIM.get());
     }
 
-    /** Whether the cell lies in a Hex whose owner is not the player and who has not allowed him in. */
-    private static boolean inAStrangersHex(ServerPlayer player, ServerLevel level, BlockPos pos) {
+    /**
+     * 3.3: whether the cell lies in a Hex that keeps the player out while he is outside its wall (a power from outside changes
+     * no block of it: Build Magic, block telekinesis, the Magnetic Pull, Tommy's acceleration, Loki's ice...). A fake player of
+     * an absent caster stands nowhere near: it is outside.
+     */
+    public static boolean behindTheWall(ServerPlayer player, ServerLevel level, BlockPos pos) {
+        return inAStrangersHex(player, level, pos, false);
+    }
+
+    /**
+     * Whether the cell lies in a Hex whose owner is not the player and who has not allowed him in, and he is outside it (or,
+     * with {@code evenInside}, wherever he is: {@code build_magic.hexIsAClaim}).
+     */
+    private static boolean inAStrangersHex(ServerPlayer player, ServerLevel level, BlockPos pos, boolean evenInside) {
         Vec3 centre = Vec3.atCenterOf(pos);
+        Vec3 actor = player.position().add(0, player.getBbHeight() * 0.5, 0);
         for (Hex hex : HexManager.data(level).hexes()) {
-            if (hex.contains(centre) && !hex.owner().equals(player.getUUID()) && !hex.allowed().contains(player.getUUID())) {
+            if (hex.contains(centre) && !hex.owner().equals(player.getUUID()) && !hex.allowed().contains(player.getUUID())
+                    && (evenInside || !hex.contains(actor) || player.level() != level)) {
                 return true;
             }
         }

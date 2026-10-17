@@ -10,6 +10,8 @@ import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.HexRunes;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -111,7 +113,7 @@ public final class DarkholdBook {
 
     /** Whether the player can use the book now: it is on, they are a sorcerer (or anyone may), and they are not in the Road. Both sides. */
     public static boolean mayUse(Player player) {
-        return enabled() && !inTheRoad(player) && (WardStrength.isSorcerer(player) || anyoneCanUse());
+        return enabled() && !inTheRoad(player) && (WardStrength.isSorcerer(player) || anyoneCanUse()) && !HexRunes.silences(player);
     }
 
     /** Whether the player holds the book and may use it: what the retaliation asks, and the abilities. */
@@ -125,6 +127,8 @@ public final class DarkholdBook {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.disabled"), true);
         } else if (inTheRoad(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.road"), true);
+        } else if (HexRunes.refuse(player)) {
+            return true; // 3.3: the runes of a Hex hold the book shut
         } else if (!mayUse(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.not_sorcerer"), true);
         } else {
@@ -249,6 +253,12 @@ public final class DarkholdBook {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.mark_refused"), true);
             return;
         }
+        if (Shelters.keepsOut(player.level(), player, player.getEyePosition(), Shelters.middle(target), true)
+                || Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
+            // 3.3: dark magic stops at a ward's edge (and at a Hex's wall, and at Billy's barrier from the front)
+            player.displayClientMessage(Component.translatable("message.enhanced.shelter.power_stopped"), true);
+            return;
+        }
         ServerLevel level = player.serverLevel();
         int ticks = DarkholdConfig.MARK_TICKS.get();
         MARK_READY.put(player.getUUID(), level.getGameTime() + DarkholdConfig.MARK_COOLDOWN.get());
@@ -317,7 +327,8 @@ public final class DarkholdBook {
         AABB box = player.getBoundingBox().inflate(range);
         List<LivingEntity> near = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, box,
                 e -> e != player && e.isAlive() && !e.isSpectator() && !(e instanceof ArmorStand) && !hidden(e)
-                        && e.distanceToSqr(player) <= range * range));
+                        && e.distanceToSqr(player) <= range * range
+                        && !Shelters.keepsOut(level, player, player.getEyePosition(), Shelters.middle(e), true)));
         near.sort(Comparator.comparingDouble(e -> e.distanceToSqr(player)));
         if (near.size() > DarkholdConfig.GLIMPSE_MAX.get()) {
             near = near.subList(0, DarkholdConfig.GLIMPSE_MAX.get());
@@ -354,6 +365,9 @@ public final class DarkholdBook {
         }
         POISONED_UNTIL.put(attacker.getUUID(), now + DarkholdConfig.POISON_COOLDOWN_TICKS.get());
         LivingEntity victim = DarkholdConfig.POISON_TARGET.get() == DarkholdConfig.PoisonTarget.HOLDER ? holder : attacker;
+        if (victim != holder && Shelters.keepsOut(level, holder, Shelters.middle(holder), Shelters.middle(victim), true)) {
+            return false; // 3.3: the book's poison is dark magic: it does not reach into a ward, nor across a Hex's wall
+        }
         victim.addEffect(new MobEffectInstance(MobEffects.POISON, DarkholdConfig.POISON_TICKS.get(), DarkholdConfig.POISON_AMPLIFIER.get()), holder);
         Vec3 at = victim.position().add(0, victim.getBbHeight() * 0.6, 0);
         level.sendParticles(new EnergyParticleOptions(DarkholdItem.STYLE.main(), 1.3F), at.x, at.y, at.z, 16, 0.3, 0.4, 0.3, 0.05);

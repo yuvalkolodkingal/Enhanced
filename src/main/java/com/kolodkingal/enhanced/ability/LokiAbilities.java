@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
@@ -46,6 +47,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.EventHooks;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -196,8 +198,17 @@ public final class LokiAbilities {
      * @return how many copies dissolved
      */
     public static int dissolveDuplicates(ServerLevel level, Vec3 center, double radius) {
+        return dissolveDuplicates(level, center, radius, null);
+    }
+
+    /**
+     * {@link #dissolveDuplicates(ServerLevel, Vec3, double)} for what {@code seer} (the one whose Soul Stone it is) can reach:
+     * a copy behind the wall of a Hex that keeps the seer out, or in a ward against a boss's sight, is not seen through (3.3).
+     */
+    public static int dissolveDuplicates(ServerLevel level, Vec3 center, double radius, @Nullable LivingEntity seer) {
         int dissolved = 0;
-        for (LokiIllusionEntity illusion : level.getEntitiesOfClass(LokiIllusionEntity.class, new net.minecraft.world.phys.AABB(center, center).inflate(radius))) {
+        for (LokiIllusionEntity illusion : level.getEntitiesOfClass(LokiIllusionEntity.class, new net.minecraft.world.phys.AABB(center, center).inflate(radius),
+                copy -> seer == null || !Shelters.shelters(seer, copy))) {
             illusion.dissolve(null);
             dissolved++;
         }
@@ -289,7 +300,8 @@ public final class LokiAbilities {
         gesture(player, data, Live.HIDDEN, HIDE_TICKS);
 
         for (Mob mob : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(DECOY_RADIUS),
-                mob -> mob.isAlive() && hunts(mob, player) && mob.distanceToSqr(player) <= DECOY_RADIUS * DECOY_RADIUS)) {
+                mob -> mob.isAlive() && hunts(mob, player) && mob.distanceToSqr(player) <= DECOY_RADIUS * DECOY_RADIUS
+                        && !Shelters.shelters(player, mob))) {
             LokiIllusionEntity decoy = copies.stream().min(Comparator.comparingDouble(c -> c.distanceToSqr(mob))).orElseThrow();
             mob.setTarget(decoy);
             if (mob.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
@@ -343,7 +355,7 @@ public final class LokiAbilities {
         if (!form.isPlayer()) {
             // Creatures of his new kind stop hunting him at once.
             for (Mob mob : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(48.0),
-                    mob -> mob.getType() == form.type() && hunts(mob, player))) {
+                    mob -> mob.getType() == form.type() && hunts(mob, player) && !Shelters.shelters(player, mob))) {
                 mob.setTarget(null);
                 mob.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
             }
@@ -461,7 +473,7 @@ public final class LokiAbilities {
         for (BlockPos pos : BlockPos.betweenClosed(below.offset(-FROST_WALK_RADIUS, 0, -FROST_WALK_RADIUS),
                 below.offset(FROST_WALK_RADIUS, 0, FROST_WALK_RADIUS))) {
             if (pos.distToCenterSqr(player.getX(), pos.getY() + 0.5, player.getZ()) >= r2
-                    || !level.getBlockState(pos.above()).isAir() || BossFights.protects(level, pos)) {
+                    || !level.getBlockState(pos.above()).isAir() || BossFights.protects(level, pos) || BlockRights.behindTheWall(player, level, pos)) {
                 continue;
             }
             BlockState state = level.getBlockState(pos);

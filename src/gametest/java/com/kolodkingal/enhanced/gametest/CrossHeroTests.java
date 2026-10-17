@@ -37,7 +37,6 @@ import com.kolodkingal.enhanced.ultron.SokoviaLift;
 import com.kolodkingal.enhanced.ultron.SokoviaRecovery;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronFight;
-import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.config.UltronConfig;
@@ -1080,12 +1079,12 @@ public final class CrossHeroTests {
     }
 
     /**
-     * Wanda's Hex stands over the ground where Ultron fights, and the island rises through its wall: from the lock until the
-     * descent the Hex lets the fight's members through (ultron.md 3.14), so the Sentries do not die at the wall, the body is
-     * not thrown back down and a hero she never allowed in is carried up with the rest.
+     * 3.3: Wanda's Hex stands over the ground where Ultron fights: the island carries no one through its wall (only those she
+     * lets in come in), so at the warning the lift is refused and the fight goes on as the Tremor (ultron.md: the lift's
+     * warning asks whether the sky is still free).
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "cross_hex_lift", timeoutTicks = 500)
-    public static void theSokoviaLiftCarriesUltronsFightThroughAHexWall(GameTestHelper helper) {
+    @GameTest(template = SokoviaTestSupport.PAD, batch = "cross_hex_lift", timeoutTicks = 200)
+    public static void theSokoviaLiftDoesNotRiseThroughAHexWall(GameTestHelper helper) {
         TestKit.Fixture f = SokoviaTestSupport.pad(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
@@ -1098,41 +1097,14 @@ public final class CrossHeroTests {
         UltronTestSupport.calm(fight);
         HexManager.create(wanda);
         f.onClose(() -> HexManager.dissolveAllOwnedBy(f.level().getServer(), wanda.getUUID()));
-        UltronEntity body = UltronTestSupport.boss(fight);
-        List<Entity> members = new ArrayList<>();
-        Map<Entity, Double> heights = new LinkedHashMap<>();
         SokoviaTestSupport.Script script = new SokoviaTestSupport.Script();
         script.step("the fighters join", () -> fight.participants().size() == 2);
-        script.then("the lock", () -> {
-            members.add(body);
-            members.addAll(fight.sentries());
-            members.add(spider);
-            check(fight.sentries().size() == 2, "two Sentries stand with him");
-            for (Entity member : members) {
-                heights.put(member, member.getY());
-            }
+        script.then("the warning", () -> {
             fight.forceState(UltronFight.Phase.LIFT_WARN);
-            fight.forceState(UltronFight.Phase.LIFT_LOCK);
-            check(fight.hexExempt(), "from the lock the Hex lets the fight's members through");
+            check(!fight.isLifting(), "a Hex wall cuts the island's way: no lift, the Tremor instead");
+            check(!fight.hexExempt() && spider.isAlive(), "and nobody is carried through the wall");
         });
-        script.step("the rise", () -> {
-            SokoviaTestSupport.client(wanda, spider);
-            for (Entity member : members) {
-                check(member.isAlive(), member.getName().getString() + " is still there (" + rel(helper, member) + ")");
-            }
-            return fight.phase() == UltronFight.Phase.ISLAND;
-        });
-        script.then("up there, through the wall", () -> {
-            for (Entity member : members) {
-                double risen = member.getY() - heights.get(member);
-                check(member.isAlive() && Math.abs(risen - SokoviaTestSupport.LIFT) < 0.7,
-                        member.getName().getString() + " rose with the island through the Hex wall: " + risen + " of " + SokoviaTestSupport.LIFT);
-            }
-            for (UltronSentryEntity sentry : fight.sentries()) {
-                check(sentry.isAlive(), "a Sentry did not come apart at the wall");
-            }
-        });
-        script.run(f, 480);
+        script.run(f, 180);
     }
 
     private static Vec3 rel(GameTestHelper helper, Entity entity) {

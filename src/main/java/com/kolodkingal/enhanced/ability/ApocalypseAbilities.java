@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -545,7 +546,7 @@ public final class ApocalypseAbilities {
     private static boolean slowable(ServerPlayer hero, Projectile projectile, double radius) {
         Entity owner = projectile.getOwner();
         return owner != hero && !(owner != null && owner.isAlliedTo(hero)) && !projectile.getPersistentData().getBoolean(SLOWED_TAG)
-                && !ApocalypseGuard.headingHome(projectile)
+                && !ApocalypseGuard.headingHome(projectile) && !Shelters.keepsOut(hero.level(), hero, hero.getEyePosition(), projectile.position(), false)
                 && Math.hypot(projectile.getX() - hero.getX(), projectile.getZ() - hero.getZ()) <= radius;
     }
 

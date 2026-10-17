@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -246,6 +247,11 @@ public final class MagnetoAbilities {
             return;
         }
         LivingEntity target = (LivingEntity) hit.getEntity();
+        if (Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
+            // 3.3: Billy's Hex Barrier faces him: the field does not reach past it
+            player.displayClientMessage(Component.translatable("message.enhanced.shelter.power_stopped"), true);
+            return;
+        }
         if (target instanceof Player other && !AreaTargets.mayHurt(player, other, false)) {
             // PvP rules apply to players: nothing is taken and nothing is spent, and he is told why.
             player.displayClientMessage(Component.translatable(player.server.isPvpAllowed()
@@ -348,7 +354,8 @@ public final class MagnetoAbilities {
     private static void shieldTick(ServerPlayer player) {
         Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
         for (Projectile projectile : player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(SHIELD_RADIUS + 3),
-                p -> isMetalProjectile(p) && p.getOwner() != player && !p.getPersistentData().getBoolean(DEMAGNETIZED_TAG) && !isHeld(p))) {
+                p -> isMetalProjectile(p) && p.getOwner() != player && !p.getPersistentData().getBoolean(DEMAGNETIZED_TAG) && !isHeld(p)
+                        && !Shelters.keepsOut(player.level(), player, center, p.position(), false))) {
             Vec3 velocity = projectile.getDeltaMovement();
             Vec3 toPlayer = center.subtract(projectile.position());
             double reach = SHIELD_RADIUS + velocity.length();

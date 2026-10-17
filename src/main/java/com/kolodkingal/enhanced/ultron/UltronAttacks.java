@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
@@ -321,8 +322,9 @@ final class UltronAttacks {
         if (t >= PULL_START && t < PULL_START + PULL_TICKS) {
             Vec3 chest = chest(boss);
             for (ServerPlayer player : fight.fighters()) {
-                if (player.isCreative() || player.position().distanceTo(position) > PULL_RANGE || !boss.hasLineOfSight(player)) {
-                    continue;
+                if (player.isCreative() || player.position().distanceTo(position) > PULL_RANGE || !boss.hasLineOfSight(player)
+                        || Shelters.shelters(boss, chest, player)) {
+                    continue; // (3.3: a Hex's wall, a ward, Billy's barrier facing him: the pull does not reach them)
                 }
                 Vec3 toward = chest.subtract(player.position().add(0, player.getBbHeight() * 0.5, 0));
                 double distance = toward.length();

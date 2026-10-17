@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -275,13 +276,19 @@ public final class BillyAbilities {
         Vec3 end = hit.getLocation();
         List<Vec3> forks = new ArrayList<>();
         float damage = EnhancedConfig.HEX_BOLT_DAMAGE.get().floatValue();
-        if (hit instanceof EntityHitResult entityHit) {
+        // 3.3: a wall in the way (a Chaos Shield, another Billy's barrier from the front, a Hex that keeps him out) takes the bolt.
+        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, player, player.getEyePosition(), end, 1.0F);
+        if (shield != null) {
+            end = shield.point();
+            WandaAbilities.pay(shield, player, damage);
+        } else if (hit instanceof EntityHitResult entityHit) {
             Entity struck = entityHit.getEntity();
             end = struck.position().add(0, struck.getBbHeight() * 0.5, 0);
             DamageSource source = ModDamageTypes.source(level, ModDamageTypes.HEX_BOLT, player, player);
             struck.hurt(source, damage);
+            Vec3 strikeAt = end;
             List<LivingEntity> near = level.getEntitiesOfClass(LivingEntity.class, struck.getBoundingBox().inflate(FORK_RANGE),
-                    e -> canFork(player, struck, e));
+                    e -> canFork(player, struck, e) && !Shelters.shelters(player, strikeAt, e));
             near.sort(Comparator.comparingDouble(e -> e.distanceToSqr(struck)));
             for (LivingEntity fork : near.subList(0, Math.min(FORK_TARGETS, near.size()))) {
                 fork.hurt(source, damage * 0.5F);

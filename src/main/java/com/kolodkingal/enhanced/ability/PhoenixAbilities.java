@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -416,6 +417,11 @@ public final class PhoenixAbilities {
             return;
         }
         LivingEntity target = (LivingEntity) hit.getEntity();
+        if (Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
+            // 3.3: Billy's Hex Barrier faces her (a Hex's wall was already in the way of her look)
+            player.displayClientMessage(Component.translatable("message.enhanced.shelter.power_stopped"), true);
+            return;
+        }
         PhoenixPower.touched(player, target, PhoenixPower.Kind.MIND_CONTROL, 0.0F);
 
         String refusal = controlRefusal(player, target);
@@ -706,7 +712,7 @@ public final class PhoenixAbilities {
         int ticks = PhoenixConfig.PSIONIC_TICKS.get();
         int held = 0;
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius),
-                e -> e != player && hasMind(e) && e.distanceToSqr(player) <= radius * radius)) {
+                e -> e != player && hasMind(e) && e.distanceToSqr(player) <= radius * radius && !Shelters.shelters(player, e))) {
             PhoenixPower.touched(player, e, PhoenixPower.Kind.PSIONIC_FIELD, 0.0F);
             if (!fieldHolds(player, e)) {
                 continue;

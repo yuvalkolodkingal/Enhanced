@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -830,7 +831,8 @@ public class ThanosEntity extends Monster implements BossHooks {
         ThanosEffects.shockRing(level, position(), 6.0F, 10, StoneKind.POWER.color());
         ThanosSounds.ARRIVE.play(level, position());
         ThanosSounds.ROAR.play(level, position());
-        for (LivingEntity near : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(6.0), e -> e != this && e.isAlive())) {
+        for (LivingEntity near : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(6.0), e -> e != this && e.isAlive()
+                && !Shelters.shelters(this, e))) {
             StonePowers.shove(near, position(), 0.6, 0.0);
         }
     }
@@ -916,7 +918,8 @@ public class ThanosEntity extends Monster implements BossHooks {
         ThanosSounds.ROAR.play(level, position());
         ThanosSounds.SURGE.play(level, position());
         stone.voice().use(level, position(), 1.0F, 1.0F);
-        for (LivingEntity near : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(6.0), e -> e != this && e.isAlive())) {
+        for (LivingEntity near : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(6.0), e -> e != this && e.isAlive()
+                && !Shelters.shelters(this, e))) {
             StonePowers.shove(near, position(), 0.6, 0.0);
         }
     }

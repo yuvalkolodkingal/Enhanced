@@ -121,7 +121,7 @@ public final class HexTests {
             if (tick >= 6) {
                 check(player.isAlive(), "the survivor lives");
                 check(Powers.is(player, Power.NONE), "and is still just a player");
-                check(inside(f, wanda, player), "and is inside the Hex");
+                check(!inside(f, wanda, player), "but is thrown back out: 3.3, only those Wanda allows come in");
                 return true;
             }
             return false;

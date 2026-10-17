@@ -62,8 +62,8 @@ public final class ModTags {
     /** The bosses: Mjolnir can't pin them down. */
     public static final TagKey<EntityType<?>> PIN_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("pin_immune"));
     /**
-     * Creatures the ward of the Book of the Vishanti lets through although they are monsters: the bosses and what a boss
-     * fight makes. (Only monsters, in the sense of the spawn category, are kept out of a ward at all.)
+     * Creatures the ward of the Book of the Vishanti lets through although it keeps their kind out (monsters, bosses, boss
+     * minions). Empty since 3.3, when the ward began to keep the bosses out too: a datapack's way to let a kind in.
      */
     public static final TagKey<EntityType<?>> WARD_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("ward_immune"));
     /** Entities too powerful for the confusion of Loki's Scepter. */

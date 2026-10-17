@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
+import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.vishanti.VishantiBook;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -61,7 +62,8 @@ public final class PowerTicker {
         Power power = data.power();
         // Vision's dense body is too heavy to fly, and Thor needs his weapon to fly.
         boolean canFly = power.canFly() && !(power == Power.VISION && data.dense())
-                && !(power == Power.THOR && !ThorAbilities.canFly(player, data));
+                && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
+                && !HexRunes.silences(player); // 3.3: the Hex Runes hold a sorcerer's powers, flight too
         setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();

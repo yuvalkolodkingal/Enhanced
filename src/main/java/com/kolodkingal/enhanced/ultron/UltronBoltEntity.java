@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.particles.ParticleTypes;
@@ -256,7 +257,9 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
             if (getOwner() instanceof Player) {
                 victim.invulnerableTime = 0;
             }
-            victim.hurt(source, splashDamage);
+            if (!victim.hurt(source, splashDamage) && Shelters.shelters(shooter, hit.position(), victim)) {
+                continue; // 3.3: Billy's barrier faced the splash and stopped all of it
+            }
             if (knockback > 0.0F) {
                 Vec3 out = victim.position().subtract(hit.position());
                 victim.knockback(knockback * 0.5, -out.x, -out.z);

@@ -42,12 +42,14 @@ import java.util.UUID;
 
 /**
  * The wards of the Book of the Vishanti at work. A ward is a sphere round a sorcerer's base: no monster (a creature of the
- * spawn category MONSTER) can be inside it. New ones are refused where it is (the spawn placement, and the finalizing of any
- * spawn), and every {@code wardCheckTicks} ticks the ward looks, with one spatial lookup of the creatures in the box round
- * it, for monsters that are inside: one at the edge is thrown back out, one deeper in (a monster that was there when the
- * ward rose, or got in by a portal) is set down just outside. Not touched: the bosses and what a boss fight makes
- * ({@link ModTags#WARD_IMMUNE}, a fight's members, everything in an arena), someone's pet, a rider. Nothing here changes a block,
- * so a ward is no matter for a claim.
+ * spawn category MONSTER), no boss and no boss's minion (3.3) can be inside it. New ones are refused where it is (the spawn
+ * placement, and the finalizing of any spawn), and every {@code wardCheckTicks} ticks the ward looks, with one spatial lookup
+ * of the creatures in the box round it, for monsters that are inside: one at the edge is thrown back out, one deeper in (a
+ * monster that was there when the ward rose, or got in by a portal) is set down just outside. Not touched: what a player keeps
+ * (someone's pet, a named or leashed creature), a rider, a Zombie Villager being cured, the tag {@link ModTags#WARD_IMMUNE}
+ * (empty since 3.3: a datapack's way to let a kind in), and anything in a boss's arena (a ward cannot reach into one). What
+ * monsters and bosses launch at the ward, and dark magic, stop at its edge ({@link com.kolodkingal.enhanced.protect.Shelters});
+ * the powers of players pass. Nothing here changes a block, so a ward is no matter for a claim.
  *
  * <p>The ward belongs to a base place of the owner's book ({@link BifrostData.Place#base}); {@link #refresh} keeps the wards of
  * a level the same as the bases of the owner's book and as strong as the owner is. A ward keeps working with nobody
@@ -66,26 +68,32 @@ public final class WardManager {
 
     // ---- who is kept out ----
 
-    /** Whether a ward keeps this kind of creature out: it is a monster, and no boss. */
+    /** Whether a ward keeps this kind of creature out: a monster, a boss or a boss's minion (3.3: every boss too). */
     public static boolean keepsOut(EntityType<?> type) {
-        return type.getCategory() == MobCategory.MONSTER && !type.is(ModTags.WARD_IMMUNE);
+        return (type.getCategory() == MobCategory.MONSTER || type.is(ModTags.BOSSES) || type.is(ModTags.BOSS_MINIONS))
+                && !type.is(ModTags.WARD_IMMUNE);
     }
 
     /**
-     * Whether this one is let through although it is a monster: a boss, a fight's, a pet, a rider, one the player keeps (it has a
-     * name, or is on a leash) and a Zombie Villager that is being cured (it would be thrown out of the trading hall it is cured in).
+     * Whether this one is let through although the ward keeps its kind out: a pet, a rider, one the player keeps (it has a name,
+     * or is on a leash) and a Zombie Villager that is being cured (it would be thrown out of the trading hall it is cured in). A
+     * boss, or a minion a boss fight brought, is never let through (3.3), whatever it is called.
      */
     public static boolean exempt(Mob mob) {
-        if (mob.getType().is(ModTags.WARD_IMMUNE) || mob.isPassenger() || mob.isVehicle() || mob.hasCustomName() || mob.isLeashed()) {
+        if (mob.getType().is(ModTags.WARD_IMMUNE)) {
+            return true;
+        }
+        boolean boss = mob.getType().is(ModTags.BOSSES) || BossFights.isMember(mob) || BossFights.fightOf(mob) != null;
+        if (boss) {
+            return false;
+        }
+        if (mob.isPassenger() || mob.isVehicle() || mob.hasCustomName() || mob.isLeashed()) {
             return true;
         }
         if (mob instanceof ZombieVillager villager && villager.isConverting()) {
             return true;
         }
-        if (mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null) {
-            return true;
-        }
-        return BossFights.isMember(mob) || BossFights.isFightEntity(mob);
+        return mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null;
     }
 
     // ---- the lookups ----
@@ -113,7 +121,7 @@ public final class WardManager {
     /** Whether a monster of this type may not spawn at this point (a ward protects it, and wards stop spawns). */
     public static boolean forbidsSpawn(ServerLevel level, EntityType<?> type, Vec3 point) {
         // The cheap questions first: this is asked for every spawn attempt of the server.
-        if (type.getCategory() != MobCategory.MONSTER) {
+        if (type.getCategory() != MobCategory.MONSTER && !type.is(ModTags.BOSSES) && !type.is(ModTags.BOSS_MINIONS)) {
             return false;
         }
         WardStore store = WardStore.peek(level);
@@ -173,7 +181,7 @@ public final class WardManager {
     }
 
     private static boolean intrudes(ServerLevel level, Ward ward, Mob mob) {
-        return mob.isAlive() && level.isPositionEntityTicking(mob.blockPosition()) && mob.getType().getCategory() == MobCategory.MONSTER && !exempt(mob)
+        return mob.isAlive() && level.isPositionEntityTicking(mob.blockPosition()) && keepsOut(mob.getType()) && !exempt(mob)
                 && ward.contains(mob.getBoundingBox().getCenter()) && !BossFights.inAnyArena(level, mob.blockPosition());
     }
 

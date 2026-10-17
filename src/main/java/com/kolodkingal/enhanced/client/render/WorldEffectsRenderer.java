@@ -188,7 +188,10 @@ public final class WorldEffectsRenderer {
     private static void renderBeam(Minecraft mc, AbstractClientPlayer player, Vec3 origin, Palette palette, Predicate<Entity> targets,
                                    Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick, float time) {
         double range = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.CHAOS_BEAM_RANGE.get() : 32;
-        Vec3 end = Raycasts.any(player, range, targets, partialTick).getLocation().subtract(camera);
+        Vec3 target = Raycasts.any(player, range, targets, partialTick).getLocation();
+        // 3.3: drawn to the wall that stops it, as the server stops it (a Chaos Shield, a Hex Barrier, a Hex's wall).
+        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(partialTick), target, partialTick);
+        Vec3 end = (shield != null ? shield.point() : target).subtract(camera);
         drawBeam(origin.subtract(camera), end, palette, player.getId(), pose, vc, time);
     }
 

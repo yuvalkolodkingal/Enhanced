@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -495,11 +496,9 @@ public final class SpiderServer implements HeroServer {
         send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.SHOT, player.getId(), from, to, normal, targetId, 0F, organic, 0L, List.of()));
     }
 
-    /** A shield that a web ended on pays for it (only if PvP lets him harm its owner). */
+    /** A shield (or a Hex Barrier) that a web ended on pays for it (only if PvP lets him harm its owner; a Hex's wall pays nothing). */
     private static void payShield(ServerPlayer spider, WandaAbilities.ShieldStop shield, float amount) {
-        if (shield.owner() instanceof ServerPlayer wanda && spider.canHarmPlayer(wanda)) {
-            WandaAbilities.wear(wanda, amount);
-        }
+        WandaAbilities.pay(shield, spider, amount);
     }
 
     private static void webBurst(ServerPlayer player, PowerData data, SpiderState state) {
@@ -634,7 +633,10 @@ public final class SpiderServer implements HeroServer {
         double kick = SpiderConfig.ZIP_KICK_DAMAGE.get();
         HitResult hit = kick > 0.0 ? Raycasts.any(player, range, e -> kickable(player, e), 1.0F) : Raycasts.block(player, range, 1.0F);
         if (hit.getType() == HitResult.Type.MISS) {
-            say(player, "message.enhanced.zip.no_anchor");
+            // (3.3: the line ended at the wall of a Hex that keeps him out: it is the Hex that refuses him)
+            Vec3 far = player.getEyePosition().add(player.getLookAngle().scale(range));
+            boolean walled = Shelters.hexClip(level, player, player.getEyePosition(), far) != far;
+            say(player, walled ? "message.enhanced.zip.hex" : "message.enhanced.zip.no_anchor");
             refuse(player, false);
             return;
         }

@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.network.SlowedProjectilePayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +47,7 @@ import java.util.WeakHashMap;
 public final class SlowMotion {
     private static final String SLOWED_TAG = "enhanced:slowed";
 
-    private record Zones(long gameTime, List<Vec3> centers) {
+    private record Zones(long gameTime, List<Vec3> centers, List<Player> speedsters) {
     }
 
     private static final Map<Level, Zones> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
@@ -69,24 +70,32 @@ public final class SlowMotion {
             return cached.centers;
         }
         List<Vec3> centers = new ArrayList<>(1);
+        List<Player> speedsters = new ArrayList<>(1);
         for (Player player : level.players()) {
             PowerData data = Powers.get(player);
             if (data.power() == Power.QUICKSILVER && data.slowMo() && player.isAlive()) {
                 centers.add(player.position());
+                speedsters.add(player);
             }
         }
-        CACHE.put(level, new Zones(time, centers));
+        CACHE.put(level, new Zones(time, centers, speedsters));
         return centers;
     }
 
+    /**
+     * Whether Quicksilver Time slows what is at {@code pos}: it is within the radius of a running zone, and (3.3) not behind
+     * the wall of a Hex that keeps that Quicksilver out.
+     */
     public static boolean isInZone(Level level, Vec3 pos) {
         List<Vec3> zones = zones(level);
         if (zones.isEmpty()) {
             return false;
         }
         double r2 = radius() * radius();
-        for (Vec3 center : zones) {
-            if (center.distanceToSqr(pos) < r2) {
+        List<Player> speedsters = CACHE.get(level).speedsters();
+        for (int i = 0; i < zones.size(); i++) {
+            Vec3 center = zones.get(i);
+            if (center.distanceToSqr(pos) < r2 && !Shelters.keepsOut(level, speedsters.get(i), center.add(0, 1, 0), pos, false)) {
                 return true;
             }
         }
@@ -150,13 +159,14 @@ public final class SlowMotion {
             AABB box = new AABB(center, center).inflate(radius);
             for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box,
                     p -> slowedBySpeed(p) && !returning(p) && !p.getPersistentData().contains(SLOWED_TAG) && !MagnetoAbilities.isHeld(p)
-                            && factorOf(p) > 1 && p.position().distanceToSqr(center) < radius * radius)) {
+                            && factorOf(p) > 1 && isInZone(level, p.position()))) {
                 slow(projectile, factorOf(projectile));
             }
             for (Player player : level.players()) {
                 PowerData data = Powers.get(player);
                 boolean speedster = data.power() == Power.QUICKSILVER && data.slowMo();
-                if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius) {
+                if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius
+                        && isInZone(level, player.position())) {
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 3, true, false, false));
                     // Whatever he rides isn't tick-skipped (he steers it), so it is slowed the same way.
                     if (player.getVehicle() instanceof LivingEntity mount) {

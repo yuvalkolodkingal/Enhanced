@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -347,7 +348,9 @@ final class ThanosMoves {
     private static List<LivingEntity> pickTargets(ThanosEntity boss, int count, double range, boolean needSight) {
         List<ServerPlayer> pool = new ArrayList<>();
         for (ServerPlayer player : boss.mortals()) {
-            if (boss.distanceTo(player) <= range && (!needSight || boss.hasLineOfSight(player))) {
+            // (3.3: never one behind a Hex's wall or in a ward: his powers do not reach them)
+            if (boss.distanceTo(player) <= range && (!needSight || boss.hasLineOfSight(player))
+                    && !Shelters.keepsOut(boss.level(), boss, boss.getEyePosition(), Shelters.middle(player), false)) {
                 pool.add(player);
             }
         }
@@ -570,8 +573,9 @@ final class ThanosMoves {
         for (ServerPlayer player : boss.mortals()) {
             Vec3 to = new Vec3(player.getX() - boss.getX(), 0, player.getZ() - boss.getZ());
             double distance = to.length();
-            if (distance > 3.2 || !StonePowers.graspable(player) || distance > 1.0E-4 && flat(to).dot(direction) < cos) {
-                continue;
+            if (distance > 3.2 || !StonePowers.graspable(player) || distance > 1.0E-4 && flat(to).dot(direction) < cos
+                    || Shelters.shelters(boss, player)) {
+                continue; // (3.3: a Hex's wall, a ward, Billy's barrier facing him: his hand does not get through)
             }
             boolean preferred = Powers.is(player, Power.LOKI) || Powers.is(player, Power.VISION);
             if (best == null || preferred && !(Powers.is(best, Power.LOKI) || Powers.is(best, Power.VISION))) {
@@ -833,7 +837,8 @@ final class ThanosMoves {
             c.targets.clear();
             for (ServerPlayer player : boss.mortals()) {
                 double distance = boss.distanceTo(player);
-                if (distance >= 4.0 && distance <= 22.0 && boss.hasLineOfSight(player) && StonePowers.graspable(player)) {
+                if (distance >= 4.0 && distance <= 22.0 && boss.hasLineOfSight(player) && StonePowers.graspable(player)
+                        && !Shelters.stops(boss, boss.getEyePosition(), player, ThanosBossConfig.CHOKE_DAMAGE.get().floatValue() / 4.0F)) {
                     c.targets.add(player);
                 }
             }
@@ -842,7 +847,7 @@ final class ThanosMoves {
         if (k >= 1 && k <= 16) {
             Vec3 center = boss.position().add(0, 1.2, 0);
             for (LivingEntity victim : c.targets) {
-                if (!victim.isAlive() || !boss.hasLineOfSight(victim) || !StonePowers.graspable(victim)) {
+                if (!victim.isAlive() || !boss.hasLineOfSight(victim) || !StonePowers.graspable(victim) || Shelters.shelters(boss, center, victim)) {
                     continue;
                 }
                 Vec3 pull = center.subtract(victim.position().add(0, victim.getBbHeight() * 0.5, 0));
@@ -914,10 +919,10 @@ final class ThanosMoves {
             level.sendParticles(new EnergyParticleOptions(StoneKind.SOUL.color(), 1.4F), boss.getX(), boss.getY() + 2.9, boss.getZ(), 10, 0.3, 0.1, 0.3, 0.02);
         }
         if (t == fire) {
-            LokiAbilities.dissolveDuplicates(level, boss.position(), 40.0);
+            LokiAbilities.dissolveDuplicates(level, boss.position(), 40.0, boss);
             for (ServerPlayer player : level.players()) {
-                if (!player.isAlive() || player.isSpectator() || boss.distanceTo(player) > 40.0) {
-                    continue;
+                if (!player.isAlive() || player.isSpectator() || boss.distanceTo(player) > 40.0 || Shelters.shelters(boss, player)) {
+                    continue; // (3.3: not behind a Hex's wall, in a ward, or behind Billy's barrier)
                 }
                 LokiAbilities.unmask(player);
                 if (player.isInvisible()) {
@@ -999,6 +1004,7 @@ final class ThanosMoves {
             int taken = 0;
             for (ServerPlayer player : boss.mortals()) {
                 if (Math.hypot(player.getX() - c.spot.x, player.getZ() - c.spot.z) <= 3.0 && StonePowers.graspable(player)
+                        && !Shelters.stops(boss, boss.getEyePosition(), player, 6.0F)
                         && player.addEffect(new MobEffectInstance(ModEffects.SOULWORLD, ThanosBossConfig.SOULWORLD_TICKS.get(), 0, false, false, true), boss)) {
                     taken++;
                     ThanosEffects.soulworld(level, player, ThanosBossConfig.SOULWORLD_TICKS.get());

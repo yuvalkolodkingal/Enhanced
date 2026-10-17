@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -446,7 +447,7 @@ public final class ApocalypseFight extends BossFight {
         }
         // Everyone close is pushed back (no damage), and he kneels, staggered, for the first moments of the window.
         for (ServerPlayer player : foes) {
-            if (player.distanceTo(boss) <= 6.0F) {
+            if (player.distanceTo(boss) <= 6.0F && !Shelters.shelters(boss, player)) {
                 Vec3 out = SandControl.flat(boss.position(), player.position());
                 player.knockback(1.0, -out.x, -out.z);
                 player.hurtMarked = true;
@@ -618,7 +619,7 @@ public final class ApocalypseFight extends BossFight {
             Vec3 ground = new Vec3(point.x, SandControl.groundAt(level(), point.x, centre.y + 4.0, point.z), point.z);
             // Whoever stands in the portal is pushed out of it (no damage).
             for (ServerPlayer player : foes) {
-                if (player.position().distanceTo(ground) < 1.8) {
+                if (player.position().distanceTo(ground) < 1.8 && !Shelters.shelters(boss, ground, player)) {
                     Vec3 out = SandControl.flat(ground, player.position());
                     player.knockback(1.0, -out.x, -out.z);
                     player.hurtMarked = true;
@@ -680,7 +681,7 @@ public final class ApocalypseFight extends BossFight {
         boss.brain().reset();
         bars().showSecond(false);
         for (ServerPlayer player : foes) {
-            if (player.distanceTo(boss) <= 8.0F) {
+            if (player.distanceTo(boss) <= 8.0F && !Shelters.shelters(boss, player)) {
                 Vec3 out = SandControl.flat(boss.position(), player.position());
                 player.knockback(1.2, -out.x, -out.z);
                 player.hurtMarked = true;

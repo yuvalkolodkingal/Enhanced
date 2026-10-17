@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -64,8 +65,9 @@ public final class MindSense {
         if (data.power() != Power.PHOENIX || !data.is(Live.MIND_SENSING)) {
             return false;
         }
-        if (!PhoenixAbilities.hasMind(entity) || PhoenixAbilities.isShielded(entity)) {
-            return false;
+        if (!PhoenixAbilities.hasMind(entity) || PhoenixAbilities.isShielded(entity)
+                || Shelters.keepsOut(me.level(), me, me.getEyePosition(), Shelters.middle(entity), false)) {
+            return false; // (3.3: no mind is sensed through the wall of a Hex that keeps her out)
         }
         Vec3 at = entity.position().add(0, entity.getBbHeight() * 0.5, 0);
         return PhoenixMath.senseReaches(at.distanceTo(ping.origin()), PhoenixConfig.senseRange(), mc.level.getGameTime() - ping.start());

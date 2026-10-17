@@ -67,7 +67,7 @@ public class HexScreen extends Screen {
     }
 
     private int perPage() {
-        return Math.max(1, (height - 150 - ROW) / ROW);
+        return Math.max(1, (height - 150 - 2 * ROW) / ROW);
     }
 
     @Override
@@ -98,6 +98,15 @@ public class HexScreen extends Screen {
         Component keys = KeyBindings.VISION_COMMAND.getTranslatedKeyMessage();
         addRenderableWidget(Button.builder(visionOrder, b -> send(HexAction.SET_VISION_STAYS, null, hex.visionStays() ? 0 : 1))
                 .tooltip(Tooltip.create(Component.translatable("screen.enhanced.hex.vision_tooltip", keys, keys)))
+                .bounds(left, y, WIDTH, 20).build());
+        y += ROW;
+
+        // 3.3: the Hex Runes on the four walls
+        Component runes = Component.translatable("screen.enhanced.hex.runes", hex.runes()
+                ? Component.translatable("screen.enhanced.hex.runes_on").withStyle(ChatFormatting.RED)
+                : Component.translatable("screen.enhanced.hex.runes_off").withStyle(ChatFormatting.GRAY));
+        addRenderableWidget(Button.builder(runes, b -> send(HexAction.SET_RUNES, null, hex.runes() ? 0 : 1))
+                .tooltip(Tooltip.create(Component.translatable("screen.enhanced.hex.runes_tooltip")))
                 .bounds(left, y, WIDTH, 20).build());
         y += ROW + 8;
 
@@ -146,7 +155,7 @@ public class HexScreen extends Screen {
     }
 
     private int stateHash(Hex hex) {
-        return Objects.hash(hex.radius(), hex.allowCreatures(), hex.visionStays(), hex.allowed(), otherPlayers().size());
+        return Objects.hash(hex.radius(), hex.allowCreatures(), hex.visionStays(), hex.runes(), hex.allowed(), otherPlayers().size());
     }
 
     @Override
@@ -169,7 +178,7 @@ public class HexScreen extends Screen {
             graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.radius", hex.radius()), width / 2, 42, 0xFFFFFF);
             if (otherPlayers().isEmpty()) {
                 graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.no_players").withStyle(ChatFormatting.GRAY),
-                        width / 2, 36 + ROW * 3 + 14, 0xFFFFFF);
+                        width / 2, 36 + ROW * 4 + 14, 0xFFFFFF);
             }
         });
         long deathPercent = EnhancedConfig.SPEC.isLoaded() ? Math.round(EnhancedConfig.HEX_DEATH_CHANCE.get() * 100) : 95;

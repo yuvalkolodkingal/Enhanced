@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -139,6 +140,9 @@ public final class SandControl {
                                           float damagePerSecond, float health, @Nullable BossFight fight) {
         if (entombRefusal(victim) != null) {
             return null;
+        }
+        if (owner != null && Shelters.stops(owner, owner.getEyePosition(), victim, Math.max(damagePerSecond * ticks / 20.0F, ENTOMB_FLOOR))) {
+            return null; // 3.3: the sand does not cross a Hex's wall or a ward from outside, nor Billy's barrier from the front
         }
         SandCocoonEntity cocoon = new SandCocoonEntity(level, victim, owner, ticks, damagePerSecond, health);
         if (victim instanceof ServerPlayer holder) {

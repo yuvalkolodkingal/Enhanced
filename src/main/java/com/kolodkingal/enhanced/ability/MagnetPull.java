@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
@@ -660,6 +661,9 @@ public final class MagnetPull {
             if (!seen(player, e)) {
                 continue;
             }
+            if (Shelters.stops(player, player.getEyePosition(), e, 0.0F)) {
+                continue; // 3.3: behind a Hex's wall, or Billy's barrier faces him
+            }
             job.offer(new Target(Kind.ENTITY, null, null, e, distSq));
         }
     }
@@ -1269,8 +1273,8 @@ public final class MagnetPull {
             return Taken.GONE;
         }
         Act act = actOn(player, e);
-        if (act == null || !seen(player, e)) {
-            return Taken.GONE;
+        if (act == null || !seen(player, e) || Shelters.shelters(player, player.getEyePosition(), e)) {
+            return Taken.GONE; // (3.3: it went behind a wall since the search)
         }
         if (!claimAllows(job, player, e) || isBuild(act) && buildRefused(player, job.level, e, true)) {
             job.refused = true;

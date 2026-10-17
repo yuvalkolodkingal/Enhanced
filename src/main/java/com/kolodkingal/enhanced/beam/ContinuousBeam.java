@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.DarkMagic;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -123,7 +124,7 @@ public final class ContinuousBeam {
         HitResult hit = Raycasts.any(shooter, spec.range(), targets(shooter), 1.0F);
         Vec3 end = hit.getLocation();
         // A complete Chaos Shield in the way stops the beam at its surface, and pays for it with its strength.
-        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, shooter, shooter.getEyePosition(), end, 1.0F);
+        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, shooter, shooter.getEyePosition(), end, 1.0F, DarkMagic.isDark(spec.style()));
         if (shield != null) {
             if (mayHit(shooter, now, spec.interval())) {
                 LAST_HIT.put(shooter.getUUID(), now);
@@ -154,16 +155,17 @@ public final class ContinuousBeam {
         }
     }
 
-    /** The beam meets a Chaos Shield: it spends itself on the sphere and takes the hit's damage off the shield's strength. */
+    /**
+     * The beam meets a wall (a Chaos Shield, a Hex Barrier, the wall of a Hex, a ward): it spends itself there and takes the
+     * hit's damage off the shield's or the barrier's strength (a Hex's or a ward's wall pays nothing).
+     */
     private static void shielded(ServerLevel level, ServerPlayer shooter, WandaAbilities.ShieldStop shield, BeamSpec spec) {
         Vec3 at = shield.point();
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.2F), at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.12);
+        level.sendParticles(new EnergyParticleOptions(shield.color(), 1.2F), at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.12);
         level.sendParticles(new EnergyParticleOptions(spec.style().main(), 0.9F), at.x, at.y, at.z, 4, 0.1, 0.1, 0.1, 0.1);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.25F, 1.9F);
         // (With PvP off the beam would not have hurt her: it costs the shield nothing either.)
-        if (shield.owner() instanceof ServerPlayer wanda && shooter.canHarmPlayer(wanda)) {
-            WandaAbilities.wear(wanda, spec.damage());
-        }
+        WandaAbilities.pay(shield, shooter, spec.damage());
     }
 
     private static void send(ServerPlayer shooter, BeamStyle style, float range, boolean on) {
