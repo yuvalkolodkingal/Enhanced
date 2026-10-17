@@ -189,6 +189,7 @@ public final class WitchesRoad {
 
     /** Witch blood asks the door to open: the ritual starts (others with the gene can join it before it ends). */
     private static void seek(ServerLevel level, BlockPos pos, ServerPlayer player) {
+        RoadMusic.seeking(player, GlobalPos.of(level.dimension(), pos.immutable()));
         if (isOpen(level.getBlockState(pos))) {
             // Already open: the Road asks them straight away.
             offerChoice(player, pos);
@@ -467,6 +468,16 @@ public final class WitchesRoad {
     }
 
     // ------------------------------------------------------------------------------------------------------------
+
+    /** Whether the ritual of the door at {@code door} is running. */
+    static boolean ritualRunning(GlobalPos door) {
+        return RITUALS.containsKey(door);
+    }
+
+    /** Whether there is an open Witches' Road door at {@code pos}. */
+    static boolean isOpenDoor(Level level, BlockPos pos) {
+        return isOpen(level.getBlockState(pos));
+    }
 
     /** A player left the game. */
     public static void forget(UUID player) {

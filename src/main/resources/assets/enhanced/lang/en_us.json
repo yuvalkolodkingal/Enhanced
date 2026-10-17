@@ -1411,5 +1411,12 @@
   "screen.enhanced.road.later": "Not yet",
   "screen.enhanced.road.leave": "Leave the Road",
   "message.enhanced.road.cannot_leave": "The Road could not let you go. Try /road leave again.",
-  "road.enhanced.challenge.structure_copy.short": "The Copy"
+  "road.enhanced.challenge.structure_copy.short": "The Copy",
+  "sign.enhanced.hydra.line2": "HYDRA",
+  "sign.enhanced.hydra.line3": "Restricted Area",
+  "sign.enhanced.hydra.line4": "Keep Out!",
+  "sign.enhanced.school.line1": "Xavier's",
+  "sign.enhanced.school.line2": "School for",
+  "sign.enhanced.school.line3": "Gifted",
+  "sign.enhanced.school.line4": "Youngsters"
 }

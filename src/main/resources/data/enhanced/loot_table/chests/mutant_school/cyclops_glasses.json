@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "enhanced:cyclops_glasses"
+    }
+  ],
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "enhanced:cyclops_glasses"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "enhanced:chests/mutant_school/cyclops_glasses"
+}

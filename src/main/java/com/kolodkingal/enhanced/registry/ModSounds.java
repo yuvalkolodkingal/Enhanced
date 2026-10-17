@@ -196,6 +196,13 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_RANK_UP = register("build_rank_up");
     public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_CRIT = register("apocalypse_crit");
 
+    // ===== 3.3 world: the music of the Witches' Road, one arrangement for each stage (a resource pack can replace any) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_ENTRANCE = register("music.road.entrance");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_PARKOUR = register("music.road.parkour");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_COPY = register("music.road.copy");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_BOAT = register("music.road.boat");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_ENDING = register("music.road.ending");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

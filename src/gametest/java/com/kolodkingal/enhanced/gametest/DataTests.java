@@ -78,8 +78,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 @PrefixGameTestTemplate(false)
 public final class DataTests {
 
+    /**
+     * The Scarlet Witch Gene is still in End City treasure; Loki's Scepter is not any more (3.3: it is found in the Hydra
+     * outposts, see WorldStructureTests), nor in any other chest it was in before.
+     */
     @GameTest(template = ARENA)
-    public static void endCityLootHasScepterAndGene(GameTestHelper helper) {
+    public static void endCityLootHasGeneButNoScepter(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         LootTable table = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.END_CITY_TREASURE);
         check(table != LootTable.EMPTY, "end city treasure loot table exists");
@@ -101,9 +105,18 @@ public final class DataTests {
             }
         }
         Enhanced.LOGGER.info("End city treasure x{}: {} Loki's Scepters, {} Scarlet Witch Genes", rolls, scepters, genes);
-        // Expected 10% (300) and 5% (150); the bounds are more than 5 standard deviations wide.
-        check(scepters >= 210 && scepters <= 390, "Loki's Scepter should be in ~10% of End City treasure chests, got " + scepters + "/" + rolls);
+        check(scepters == 0, "Loki's Scepter is no longer in End City treasure chests, got " + scepters + "/" + rolls);
+        // Expected 5% (150); the bounds are more than 5 standard deviations wide.
         check(genes >= 85 && genes <= 215, "the Scarlet Witch Gene should be in ~5% of End City treasure chests, got " + genes + "/" + rolls);
+        for (var chest : List.of(BuiltInLootTables.STRONGHOLD_LIBRARY, BuiltInLootTables.BASTION_TREASURE, BuiltInLootTables.ANCIENT_CITY,
+                BuiltInLootTables.WOODLAND_MANSION)) {
+            LootTable other = level.getServer().reloadableRegistries().getLootTable(chest);
+            for (int i = 0; i < 500; i++) {
+                for (ItemStack stack : other.getRandomItems(params, random)) {
+                    check(!stack.is(ModItems.LOKIS_SCEPTER.get()), chest.location() + " no longer gives Loki's Scepter");
+                }
+            }
+        }
         helper.succeed();
     }
 

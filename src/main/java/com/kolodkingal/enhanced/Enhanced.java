@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModParticles;
 import com.kolodkingal.enhanced.registry.ModSounds;
+import com.kolodkingal.enhanced.registry.ModStructures;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -40,6 +41,10 @@ public class Enhanced {
         ModAttachments.ATTACHMENTS.register(modBus);
         ModParticles.PARTICLES.register(modBus);
         ModSounds.SOUNDS.register(modBus);
+        // 3.3: the world structures (the Hydra outposts, Mjolnir's landing sites, the Mutant School).
+        ModStructures.STRUCTURE_TYPES.register(modBus);
+        ModStructures.STRUCTURE_PIECES.register(modBus);
+        ModStructures.PROCESSORS.register(modBus);
         ModCreativeTab.TABS.register(modBus);
         modBus.addListener(ModNetwork::register);
         modBus.addListener(ModEntities::registerAttributes);

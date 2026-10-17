@@ -1139,5 +1139,45 @@
         "name": "enhanced:apocalypse_crit"
       }
     ]
+  },
+  "music.road.entrance": {
+    "sounds": [
+      {
+        "name": "enhanced:music/road_entrance",
+        "stream": true
+      }
+    ]
+  },
+  "music.road.parkour": {
+    "sounds": [
+      {
+        "name": "enhanced:music/road_parkour",
+        "stream": true
+      }
+    ]
+  },
+  "music.road.copy": {
+    "sounds": [
+      {
+        "name": "enhanced:music/road_copy",
+        "stream": true
+      }
+    ]
+  },
+  "music.road.boat": {
+    "sounds": [
+      {
+        "name": "enhanced:music/road_boat",
+        "stream": true
+      }
+    ]
+  },
+  "music.road.ending": {
+    "sounds": [
+      {
+        "name": "enhanced:music/road_ending",
+        "stream": true
+      }
+    ]
   }
 }
