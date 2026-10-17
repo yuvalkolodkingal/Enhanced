@@ -97,8 +97,8 @@ public final class CyclopsFx {
             }
             case CyclopsFxPayload.CONCUSSION -> {
                 if (points.size() >= 2) {
-                    Vec3 eye = points.get(0);
                     Vec3 dir = points.get(1).normalize();
+                    Vec3 eye = points.get(0).add(dir.scale(1.2)); // (ahead of the visor: never in the eyes of the one who fires)
                     for (int k = 0; k < 12; k++) {
                         Vec3 v = dir.scale(0.4 + r.nextDouble() * 0.4).add((r.nextDouble() - 0.5) * 0.3, (r.nextDouble() - 0.5) * 0.3,
                                 (r.nextDouble() - 0.5) * 0.3);

@@ -24,11 +24,11 @@ public final class CyclopsBeamFx {
     private static final Vec3 UP = new Vec3(0, 1, 0);
 
     /** The controlled Optic Blast: the widths (blocks) of its fringe, body, light, inner light and core. */
-    private static final float[] OPTIC_WIDTHS = {0.34F, 0.21F, 0.12F, 0.065F, 0.028F};
-    private static final float[] OPTIC_ALPHAS = {0.20F, 0.45F, 0.85F, 0.95F, 1.0F};
+    private static final float[] OPTIC_WIDTHS = {0.34F, 0.21F, 0.12F, 0.05F, 0.02F};
+    private static final float[] OPTIC_ALPHAS = {0.22F, 0.5F, 0.7F, 0.55F, 0.75F};
     /** The giant beam. */
-    private static final float[] UNLEASHED_WIDTHS = {1.55F, 1.0F, 0.62F, 0.32F, 0.12F};
-    private static final float[] UNLEASHED_ALPHAS = {0.16F, 0.36F, 0.72F, 0.9F, 1.0F};
+    private static final float[] UNLEASHED_WIDTHS = {1.55F, 1.0F, 0.6F, 0.2F, 0.07F};
+    private static final float[] UNLEASHED_ALPHAS = {0.24F, 0.42F, 0.5F, 0.45F, 0.7F};
 
     /** The Optic Blast: from the eyes to what the crosshair is on. */
     public static final BeamRenderer.Drawer OPTIC = new BeamRenderer.Drawer() {
@@ -94,9 +94,9 @@ public final class CyclopsBeamFx {
         Vec3 up = right.cross(look).normalize();
         // The camera is at the eye: the two beams start a little ahead of it, below it and to each side.
         Vec3 eye = a.subtract(look.scale(0.3));
-        float scale = giant ? 0.55F : 0.8F;
+        float scale = giant ? 0.4F : 0.45F;
         for (int side = -1; side <= 1; side += 2) {
-            Vec3 from = eye.add(look.scale(0.45)).add(right.scale(0.11 * side)).add(up.scale(-0.12));
+            Vec3 from = eye.add(look.scale(0.6)).add(right.scale(0.06 * side)).add(up.scale(-0.08));
             beam(pose, vc, from, b, style, time, widths, alphas, scale, giant, player.getId() * 31 + side);
         }
     }
@@ -164,8 +164,8 @@ public final class CyclopsBeamFx {
                 double angle = phase0 + s * 0.9;
                 Vec3 at = a.add(dir.scale(s)).add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
                 if (prev != null) {
-                    EnergyGeometry.ribbon(pose, vc, prev, at, 0.07F * scale, 0.07F * scale, EnergyGeometry.argb(style.inner(), 0.55F),
-                            EnergyGeometry.argb(style.inner(), 0.55F));
+                    EnergyGeometry.ribbon(pose, vc, prev, at, 0.07F * scale, 0.07F * scale, EnergyGeometry.argb(style.main(), 0.5F),
+                            EnergyGeometry.argb(style.main(), 0.5F));
                 }
                 prev = at;
             }
