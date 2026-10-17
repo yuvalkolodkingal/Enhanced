@@ -24,7 +24,7 @@ import java.util.UUID;
  * he is off the Road.
  * <ul>
  *     <li>{@code entrance}: from the moment he asks a door for the Road (its ritual) while the door is open and he stays
- *     by it, and while he is being taken into the Road;</li>
+ *     by it (until he goes in), and while he is being taken into the Road;</li>
  *     <li>the id of the trial he is in ({@code parkour}, {@code structure_copy}, {@code ice_boat}), and {@code road_end}
  *     in the hall at the end;</li>
  *     <li>nothing anywhere else.</li>
@@ -71,15 +71,18 @@ public final class RoadMusic {
         UUID id = player.getUUID();
         RoadTrial trial = RoadTrials.trialOf(id);
         if (trial != null) {
+            SEEKING.remove(id);
             return trial.challenge().id();
         }
         if (RoadTrials.isInside(player)) {
+            SEEKING.remove(id);
             return ENTRANCE;
         }
         GlobalPos door = SEEKING.get(id);
         if (door != null) {
             ServerLevel level = player.server.getLevel(door.dimension());
-            boolean open = level != null && level.isLoaded(door.pos()) && (WitchesRoad.ritualRunning(door) || WitchesRoad.isOpenDoor(level, door.pos()));
+            boolean open = level != null && level.isLoaded(door.pos())
+                    && (WitchesRoad.ritualRunning(door) || WitchesRoad.isOpenDoor(level, door.pos()));
             if (open && player.level().dimension().equals(door.dimension())
                     && player.position().distanceToSqr(Vec3.atBottomCenterOf(door.pos())) <= DOOR_REACH * DOOR_REACH) {
                 return ENTRANCE;

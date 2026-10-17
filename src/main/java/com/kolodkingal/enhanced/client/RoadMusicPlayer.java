@@ -65,6 +65,7 @@ public final class RoadMusicPlayer {
         if (current == null && wanted != null) {
             current = new Loop(wanted);
             mc.getSoundManager().play(current);
+            Enhanced.LOGGER.debug("The Witches' Road plays {} ({})", wanted.getLocation(), stage);
         }
         FADING.removeIf(Loop::isStopped);
         if (isPlaying() && mc.getMusicManager() != null) {
