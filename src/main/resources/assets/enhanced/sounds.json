@@ -1139,5 +1139,77 @@
         "name": "enhanced:apocalypse_crit"
       }
     ]
+  },
+  "cyclops_optic_start": {
+    "subtitle": "subtitles.enhanced.cyclops_optic_start",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_optic_start"
+      }
+    ]
+  },
+  "cyclops_optic_loop": {
+    "subtitle": "subtitles.enhanced.cyclops_optic_loop",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_optic_loop"
+      }
+    ]
+  },
+  "cyclops_unleashed_start": {
+    "subtitle": "subtitles.enhanced.cyclops_unleashed_start",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_unleashed_start"
+      }
+    ]
+  },
+  "cyclops_unleashed_loop": {
+    "subtitle": "subtitles.enhanced.cyclops_unleashed_loop",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_unleashed_loop"
+      }
+    ]
+  },
+  "cyclops_ricochet": {
+    "subtitle": "subtitles.enhanced.cyclops_ricochet",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_ricochet"
+      }
+    ]
+  },
+  "cyclops_concussion": {
+    "subtitle": "subtitles.enhanced.cyclops_concussion",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_concussion"
+      }
+    ]
+  },
+  "cyclops_leap": {
+    "subtitle": "subtitles.enhanced.cyclops_leap",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_leap"
+      }
+    ]
+  },
+  "cyclops_rally": {
+    "subtitle": "subtitles.enhanced.cyclops_rally",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_rally"
+      }
+    ]
+  },
+  "cyclops_visor": {
+    "subtitle": "subtitles.enhanced.cyclops_visor",
+    "sounds": [
+      {
+        "name": "enhanced:cyclops/cyclops_visor"
+      }
+    ]
   }
 }

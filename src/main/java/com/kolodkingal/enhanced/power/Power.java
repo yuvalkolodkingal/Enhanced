@@ -34,7 +34,10 @@ public enum Power implements StringRepresentable {
     SPIDER_MAN(0xDC2B2F, 0xDCE6F2),
     THANOS(0x9B4DEB, 0xE6D2FF),
     ULTRON(0xFFA23A, 0xFFE9B8),
-    APOCALYPSE(0xF2B84B, 0xFFF0B8);
+    APOCALYPSE(0xF2B84B, 0xFFF0B8),
+    // The heroes of 3.3, appended after Apocalypse in this order (Agatha, Cyclops, Professor X; each lane adds its own).
+    // Cyclops's optic blast is ruby red with a hot pink-white core: the colour his ruby-quartz glasses give it.
+    CYCLOPS(0xE8323A, 0xFFB3A8);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -99,13 +102,13 @@ public enum Power implements StringRepresentable {
     }
 
     /**
-     * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, and Loki walks; everyone else can
-     * fly (Thor only with Mjolnir, see ThorAbilities).
+     * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, Loki walks and Cyclops runs and leaps
+     * on his optic blast; everyone else can fly (Thor only with Mjolnir, see ThorAbilities).
      */
     public boolean canFly() {
         return switch (this) {
             case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> true;
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> false;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS -> false;
         };
     }
 
@@ -119,7 +122,7 @@ public enum Power implements StringRepresentable {
             case PHOENIX -> PhoenixConfig.FLIGHT_SPEED.get().floatValue();
             case ULTRON -> UltronConfig.FLIGHT_SPEED.get().floatValue();
             case APOCALYPSE -> ApocalypseConfig.FLIGHT_SPEED.get().floatValue();
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> 0.05F;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS -> 0.05F;
         };
     }
 
@@ -128,7 +131,7 @@ public enum Power implements StringRepresentable {
         return switch (this) {
             case MAGNETO -> 5;
             case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> 2;
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS -> -1;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS -> -1;
         };
     }
 

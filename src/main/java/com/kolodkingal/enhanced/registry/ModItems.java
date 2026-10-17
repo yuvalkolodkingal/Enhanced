@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.item.MjolnirItem;
 import com.kolodkingal.enhanced.item.PhoenixEmberItem;
 import com.kolodkingal.enhanced.item.QuicksilverGogglesItem;
 import com.kolodkingal.enhanced.item.RadioactiveSpiderItem;
+import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.item.ScarletWitchGeneItem;
 import com.kolodkingal.enhanced.item.StormbreakerItem;
 import com.kolodkingal.enhanced.item.SynthezoidCoreItem;
@@ -110,6 +111,15 @@ public final class ModItems {
     /** The reward of the Apocalypse fight; hold right-click for three seconds with no power to become Apocalypse. */
     public static final DeferredItem<EssenceItem> ESSENCE = ITEMS.register("essence",
             () -> new EssenceItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    // ===== cyclops (3.3) =====
+    /**
+     * Found in the Mutant School (its chest table names {@code enhanced:inject/ruby_quartz_glasses}), and rarely in a woodland
+     * mansion or a stronghold library; put on with no power, they make Cyclops. No durability component: they never break.
+     */
+    public static final DeferredItem<RubyQuartzGlassesItem> RUBY_QUARTZ_GLASSES = ITEMS.register("ruby_quartz_glasses",
+            () -> new RubyQuartzGlassesItem(ModArmorMaterials.RUBY_QUARTZ, ArmorItem.Type.HELMET,
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
     /** Projectile sprites only; not in the creative tab. */
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");

@@ -72,6 +72,14 @@ public final class Variants {
                 new Variant("apocalypse", Power.APOCALYPSE, Variant.suit("apocalypse"), Variant.suit("apocalypse_cape"), false, 0xF2B84B, 0xFFF0B8),
                 new Variant("en_sabah_nur", Power.APOCALYPSE, Variant.suit("apocalypse_ancient"), null, false, 0xD9A93A, 0x7ADBC6),
                 own(Power.APOCALYPSE));
+
+        // ===== cyclops (3.3) =====
+        // X-Men: Apocalypse's dark blue and black field suit, and the comics' blue and yellow. The visor is not in the skins:
+        // it is his glasses, drawn by their own layer while they are on.
+        add(Power.CYCLOPS,
+                new Variant("apocalypse", Power.CYCLOPS, Variant.suit("cyclops_apocalypse"), null, false, 0xE8323A, 0xFFB3A8),
+                new Variant("classic", Power.CYCLOPS, Variant.suit("cyclops_classic"), null, false, 0xF0303A, 0xFFD27A),
+                own(Power.CYCLOPS));
     }
 
     private static void add(Power power, Variant... variants) {

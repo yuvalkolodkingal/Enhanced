@@ -66,6 +66,23 @@ public final class ModArmorMaterials {
             0.0F,
             0.0F));
 
+    /**
+     * Cyclops's ruby-quartz glasses (3.3): a little protection, like a leather cap. Their armour texture is empty: they are
+     * drawn on the head by their own layer (the visor of his look, or red sunglasses on anyone else).
+     */
+    public static final Holder<ArmorMaterial> RUBY_QUARTZ = ARMOR_MATERIALS.register("ruby_quartz", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                for (ArmorItem.Type type : ArmorItem.Type.values()) {
+                    map.put(type, 1);
+                }
+            }),
+            15,
+            SoundEvents.ARMOR_EQUIP_GENERIC,
+            () -> Ingredient.of(Items.QUARTZ),
+            List.of(new ArmorMaterial.Layer(Enhanced.id("ruby_quartz_glasses"))),
+            0.0F,
+            0.0F));
+
     private ModArmorMaterials() {
     }
 }
