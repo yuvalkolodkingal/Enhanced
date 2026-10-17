@@ -23,6 +23,8 @@ public final class HeroServers {
         register(new ThanosServer());
         register(new UltronServer());
         register(new ApocalypseServer());
+        // 3.3
+        register(new XavierServer());
     }
 
     /**

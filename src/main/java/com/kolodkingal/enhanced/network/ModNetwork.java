@@ -13,9 +13,10 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 public final class ModNetwork {
     /**
      * The version of the messages and synced data: a client and a server with different versions can't play together.
-     * Bumped once for all of 3.1, and once for 3.2 (the Witches' Road screen got a mode and the trials' progress).
+     * Bumped once for all of 3.1, once for 3.2 (the Witches' Road screen got a mode and the trials' progress), and once
+     * for 3.3 (the new heroes' messages).
      */
-    public static final String PROTOCOL_VERSION = "6";
+    public static final String PROTOCOL_VERSION = "7";
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // (2.2 renumbered Thor's effects and added the Chaos Shield's state to the power data; 2.3 added the order to
@@ -53,6 +54,12 @@ public final class ModNetwork {
         registrar.playToClient(WardSyncPayload.TYPE, WardSyncPayload.STREAM_CODEC, WardSyncPayload::handle);
         // 3.2: continuous beams (Billy's Hex Beam, and any other source of one).
         registrar.playToClient(BeamPayload.TYPE, BeamPayload.STREAM_CODEC, BeamPayload::handle);
+        // 3.3: Professor X (his screen and his mind in another body, the thoughts he and Billy hear, Cerebro).
+        registrar.playToClient(XavierPayload.TYPE, XavierPayload.STREAM_CODEC, XavierPayload::handle);
+        registrar.playToServer(XavierInputPayload.TYPE, XavierInputPayload.STREAM_CODEC, XavierInputPayload::handle);
+        registrar.playToServer(XavierChoicePayload.TYPE, XavierChoicePayload.STREAM_CODEC, XavierChoicePayload::handle);
+        registrar.playToClient(ThoughtsPayload.TYPE, ThoughtsPayload.STREAM_CODEC, ThoughtsPayload::handle);
+        registrar.playToClient(CerebroPayload.TYPE, CerebroPayload.STREAM_CODEC, CerebroPayload::handle);
     }
 
     private ModNetwork() {

@@ -88,6 +88,19 @@ public enum Live {
      * client draws it from the {@code BeamPayload}s, holds the arm out along the look, and loops its sound.
      */
     BEAMING,
+
+    // ===== professor_x =====
+    /** Professor X is inside another body ({@code MindLink}): his own sits still, two fingers at his temple. */
+    MIND_LINKED,
+    /**
+     * Professor X steers this player's body (any player): their own client stops their keys, as for a pinned player, and
+     * the server moves them.
+     */
+    MIND_CONTROLLED,
+    /** Professor X concentrates for a moment (a Mental Blast, Freeze Minds): two fingers to his temple. */
+    XAVIER_FOCUS,
+    /** Professor X wears Cerebro's helmet and searches every mind far around him. */
+    CEREBRO,
     ;
 
     final long bit() {

@@ -56,6 +56,10 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> APOCALYPSE_BLOW = key("apocalypse_blow");
     public static final ResourceKey<DamageType> ENTOMB = key("entomb");
 
+    // ===== professor_x (3.3) =====
+    /** Professor X's Mental Blast (it ignores armour), and the backlash of a stronger telepath who throws him out. */
+    public static final ResourceKey<DamageType> MIND_BLAST = key("mind_blast");
+
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }

@@ -154,6 +154,8 @@ public final class SkeletonTests {
 
     /** The heroes of 3.0, in Eilon's order: the last five of {@link Power}. */
     private static final List<Power> NEW_HEROES = List.of(Power.PHOENIX, Power.SPIDER_MAN, Power.THANOS, Power.ULTRON, Power.APOCALYPSE);
+    /** The heroes of 3.3, appended after them (plug-ins too; each lane adds its own). */
+    private static final List<Power> V33_HEROES = List.of(Power.PROFESSOR_X);
 
     /**
      * Whether the hero's lane is built: its plug-in does something with the keys, so the tests that pin a stub ("does
@@ -174,10 +176,10 @@ public final class SkeletonTests {
     @GameTest(template = ARENA, batch = SKELETON)
     public static void theFiveNewHeroesComeLastInEilonsOrder(GameTestHelper helper) {
         Power[] all = Power.values();
+        // (The heroes of 3.3 are appended after them: the five of 3.0 are the five after Thor.)
         for (int i = 0; i < NEW_HEROES.size(); i++) {
-            check(all[all.length - NEW_HEROES.size() + i] == NEW_HEROES.get(i), "hero " + i + " of 3.0 is " + NEW_HEROES.get(i));
+            check(all[Power.THOR.ordinal() + 1 + i] == NEW_HEROES.get(i), "hero " + i + " of 3.0 is " + NEW_HEROES.get(i));
         }
-        check(all[all.length - NEW_HEROES.size() - 1] == Power.THOR, "the heroes of 3.0 follow Thor (the stream sends the ordinal)");
         check(Power.THOR.ordinal() == 8, "and nobody before them moved: Thor is still the ninth power");
         helper.succeed();
     }
@@ -580,7 +582,10 @@ public final class SkeletonTests {
             check(HeroServers.of(hero) != null && HeroServers.of(hero).power() == hero, hero + " has a server plug-in");
             check(HeroClients.of(hero) != null, hero + " has a client plug-in");
         }
-        check(HeroServers.all().size() == NEW_HEROES.size(), "and nobody else is a plug-in");
+        for (Power hero : V33_HEROES) {
+            check(HeroServers.of(hero) != null && HeroClients.of(hero) != null, hero + " (3.3) is a plug-in too");
+        }
+        check(HeroServers.all().size() == NEW_HEROES.size() + V33_HEROES.size(), "and nobody else is a plug-in");
         for (Power old : List.of(Power.NONE, Power.MAGNETO, Power.SCARLET_WITCH, Power.QUICKSILVER, Power.VISION, Power.BILLY,
                 Power.TOMMY, Power.LOKI, Power.THOR)) {
             check(HeroServers.of(old) == null, old + " keeps its switch arms");
@@ -1166,8 +1171,8 @@ public final class SkeletonTests {
     // The network
 
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theProtocolIsSix(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("6"), "3.2 bumps the protocol from 5 to 6, once: " + ModNetwork.PROTOCOL_VERSION);
+    public static void theProtocolIsSeven(GameTestHelper helper) {
+        check(ModNetwork.PROTOCOL_VERSION.equals("7"), "3.3 bumps the protocol from 6 to 7, once: " + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 
@@ -1471,7 +1476,7 @@ public final class SkeletonTests {
                 continue; // (the states of the heroes before them are checked by AnimationMathTests)
             }
             boolean acted = false;
-            for (Power hero : NEW_HEROES) {
+            for (Power hero : java.util.stream.Stream.concat(NEW_HEROES.stream(), V33_HEROES.stream()).toList()) {
                 acted |= GestureRoutes.live(hero, live, true) != null;
             }
             check(acted || GestureRoutes.reason(live) != null, "the state " + live + " has neither a gesture nor a reason");

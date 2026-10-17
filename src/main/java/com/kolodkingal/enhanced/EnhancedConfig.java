@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.config.XavierConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
@@ -512,6 +513,8 @@ public final class EnhancedConfig {
         DarkholdConfig.define(BUILDER);
         // 3.2: the Witches' Road trials.
         WitchesRoadConfig.define(BUILDER);
+        // 3.3: Professor X (section [professor_x]).
+        XavierConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

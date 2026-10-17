@@ -44,6 +44,7 @@ import com.kolodkingal.enhanced.client.render.UltronSentryRenderer;
 import com.kolodkingal.enhanced.client.render.UltronViewer;
 import com.kolodkingal.enhanced.client.render.VibraniumKeyModel;
 import com.kolodkingal.enhanced.client.render.VibraniumKeyRenderer;
+import com.kolodkingal.enhanced.client.render.XavierChair;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModParticles;
 import net.minecraft.client.KeyMapping;
@@ -165,6 +166,9 @@ public final class ClientSetup {
         // ===== apocalypse =====
         event.registerLayerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
         event.registerLayerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);
+        // ===== professor_x (3.3) =====
+        event.registerLayerDefinition(XavierChair.LAYER, XavierChair::createChairLayer);
+        event.registerLayerDefinition(XavierChair.HELMET_LAYER, XavierChair::createHelmetLayer);
     }
 
     @SubscribeEvent
@@ -190,6 +194,9 @@ public final class ClientSetup {
                 // ===== ultron =====
                 // ===== apocalypse =====
                 renderer.addLayer(new ApocalypseAuraLayer(renderer, energy));
+                // ===== professor_x (3.3) =====
+                renderer.addLayer(new XavierChair(renderer, event.getContext().bakeLayer(XavierChair.LAYER),
+                        event.getContext().bakeLayer(XavierChair.HELMET_LAYER)));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
@@ -217,6 +224,8 @@ public final class ClientSetup {
         // ===== ultron =====
         // ===== apocalypse =====
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("apocalypse"), new ApocalypseOverlay());
+        // ===== professor_x (3.3) =====
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("xavier"), new XavierOverlay());
         // 3.1: Build Magic's badge, rings, hint strip and tips.
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("build_magic"), new BuildHud());
         // 3.2: the Darkhold's hint panel while it is held.

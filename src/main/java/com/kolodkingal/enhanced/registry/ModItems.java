@@ -19,6 +19,7 @@ import com.kolodkingal.enhanced.item.UltronCoreItem;
 import com.kolodkingal.enhanced.item.UltronProgramItem;
 import com.kolodkingal.enhanced.item.VishantiBookItem;
 import com.kolodkingal.enhanced.item.WandaCrownItem;
+import com.kolodkingal.enhanced.item.XavierWheelchairItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BlockItem;
@@ -110,6 +111,14 @@ public final class ModItems {
     /** The reward of the Apocalypse fight; hold right-click for three seconds with no power to become Apocalypse. */
     public static final DeferredItem<EssenceItem> ESSENCE = ITEMS.register("essence",
             () -> new EssenceItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    // ===== professor_x (3.3) =====
+    /**
+     * Crafted (or found in the Mutant School); hold right-click for three seconds with no power to become Professor X, who
+     * then chooses his version.
+     */
+    public static final DeferredItem<XavierWheelchairItem> XAVIER_WHEELCHAIR = ITEMS.register("xavier_wheelchair",
+            () -> new XavierWheelchairItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
     /** Projectile sprites only; not in the creative tab. */
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");

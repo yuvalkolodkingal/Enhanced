@@ -72,6 +72,13 @@ public final class Variants {
                 new Variant("apocalypse", Power.APOCALYPSE, Variant.suit("apocalypse"), Variant.suit("apocalypse_cape"), false, 0xF2B84B, 0xFFF0B8),
                 new Variant("en_sabah_nur", Power.APOCALYPSE, Variant.suit("apocalypse_ancient"), null, false, 0xD9A93A, 0x7ADBC6),
                 own(Power.APOCALYPSE));
+
+        // The hero of 3.3 (lane XAVIER): Charles Xavier young (First Class, Days of Future Past: he walks, thanks to
+        // Hank's serum) and old (the professor in his wheelchair); he chooses one when he awakens.
+        add(Power.PROFESSOR_X,
+                new Variant("young", Power.PROFESSOR_X, Variant.suit("xavier_young"), null, false, 0x6F8CFF, 0xDCE4FF),
+                new Variant("old", Power.PROFESSOR_X, Variant.suit("xavier_old"), null, false, 0x8FA6FF, 0xF2F5FF),
+                own(Power.PROFESSOR_X));
     }
 
     private static void add(Power power, Variant... variants) {

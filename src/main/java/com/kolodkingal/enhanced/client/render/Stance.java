@@ -72,7 +72,15 @@ public enum Stance {
     /** Apocalypse's Shield: both forearms raised before the chest, palms out. */
     APOC_SHIELD(1.5F, 3.0F, true),
     /** The Sandstorm: both arms flung wide and up, the head back. */
-    APOC_STORM(3.0F, 5.0F, true)
+    APOC_STORM(3.0F, 5.0F, true),
+
+    // ===== professor_x (3.3) =====
+    /** The old Professor X sits in his wheelchair: the legs forward on the footrest, the forearms on the armrests. */
+    XAVIER_SEATED(4.0F, 4.0F, false),
+    /** His mind is in another body: two fingers at his temple, the head bowed, still. */
+    XAVIER_TRANCE(2.0F, 4.0F, true),
+    /** Cerebro's helmet is on: both hands at its sides. */
+    XAVIER_CEREBRO(2.0F, 4.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

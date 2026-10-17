@@ -1139,5 +1139,69 @@
         "name": "enhanced:apocalypse_crit"
       }
     ]
+  },
+  "xavier_awaken": {
+    "subtitle": "subtitles.enhanced.xavier_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_awaken"
+      }
+    ]
+  },
+  "xavier_blast": {
+    "subtitle": "subtitles.enhanced.xavier_blast",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_blast"
+      }
+    ]
+  },
+  "xavier_thoughts": {
+    "subtitle": "subtitles.enhanced.xavier_thoughts",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_thoughts"
+      }
+    ]
+  },
+  "xavier_link": {
+    "subtitle": "subtitles.enhanced.xavier_link",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_link"
+      }
+    ]
+  },
+  "xavier_unlink": {
+    "subtitle": "subtitles.enhanced.xavier_unlink",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_unlink"
+      }
+    ]
+  },
+  "xavier_backlash": {
+    "subtitle": "subtitles.enhanced.xavier_backlash",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_backlash"
+      }
+    ]
+  },
+  "xavier_freeze": {
+    "subtitle": "subtitles.enhanced.xavier_freeze",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_freeze"
+      }
+    ]
+  },
+  "xavier_cerebro": {
+    "subtitle": "subtitles.enhanced.xavier_cerebro",
+    "sounds": [
+      {
+        "name": "enhanced:xavier_cerebro"
+      }
+    ]
   }
 }

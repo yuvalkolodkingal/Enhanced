@@ -196,6 +196,16 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_RANK_UP = register("build_rank_up");
     public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_CRIT = register("apocalypse_crit");
 
+    // ===== professor_x (3.3) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_AWAKEN = register("xavier_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_BLAST = register("xavier_blast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_THOUGHTS = register("xavier_thoughts");
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_LINK = register("xavier_link");
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_UNLINK = register("xavier_unlink");
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_BACKLASH = register("xavier_backlash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_FREEZE = register("xavier_freeze");
+    public static final DeferredHolder<SoundEvent, SoundEvent> XAVIER_CEREBRO = register("xavier_cerebro");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

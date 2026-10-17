@@ -214,7 +214,21 @@ public enum GestureId {
     /** The hand held out, palm up, to the ally; the other hand on the chest. */
     APOC_BESTOW(Group.CAST, 22, 2, 7, false),
     /** The arms gather, then are flung wide and up into the stance of the storm. */
-    APOC_STORM_START(Group.CAST, 18, 2, 6, true)
+    APOC_STORM_START(Group.CAST, 18, 2, 6, true),
+
+    // ===== professor_x (3.3) =====
+    /** Professor X's Mental Blast: two fingers to his temple, the head pushed a little forward. */
+    XAVIER_BLAST(Group.CAST, 16, 2, 5, false),
+    /** Freeze Minds: two fingers to his temple, the other hand held out, palm open. */
+    XAVIER_FREEZE(Group.CAST, 24, 3, 6, false),
+    /** His mind leaves for another body: the fingers go to the temple and the head bows, into the trance. */
+    XAVIER_LINK(Group.CAST, 14, 2, 4, false),
+    /** Cerebro: both hands lift the helmet onto his head and stay at its sides. */
+    XAVIER_CEREBRO(Group.CAST, 18, 2, 5, false),
+    /** Hear Thoughts on: the fingers brush the temple, the head tilts to listen. */
+    XAVIER_THOUGHTS_ON(Group.CAST, 14, 2, 5, false),
+    /** Hear Thoughts off: a small shake of the head. */
+    XAVIER_THOUGHTS_OFF(Group.CAST, 10, 1, 4, false)
     ;
 
     /** Gestures of one group never play together. */
