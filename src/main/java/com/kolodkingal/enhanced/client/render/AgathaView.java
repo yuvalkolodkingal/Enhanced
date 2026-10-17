@@ -13,7 +13,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -21,18 +20,11 @@ import java.util.Locale;
 /**
  * What the client shows of Agatha besides her body: the lines of her HUD (the beam burning, flight, the drain's recharge,
  * her shield's strength and time, how long her runes still burn), the violet glow of her eyes while she works magic
- * ("It's been Agatha all along": her eyes burn purple in WandaVision), and the look of her shield.
+ * ("It's been Agatha all along": her eyes burn purple in WandaVision). (The look of her shield is {@link AgathaClient}'s.)
  */
 final class AgathaView {
-    /** Her shield: a violet veil with a lattice of runes. */
-    private static final ResourceLocation RUNE_LATTICE = Enhanced.id("textures/entity/agatha_shield.png");
-    private static final int SHIELD_VEIL = 0x7A2FD6;
-    private static final int SHIELD_LINES = 0xC48CFF;
     /** The mask of her glowing eyes: the eyes of the skin (and of every ordinary skin), on the face's fifth row. */
     private static final RenderType EYES = RenderType.eyes(Enhanced.id("textures/entity/agatha_eyes.png"));
-
-    @Nullable
-    private static ShieldStyle shield;
 
     private AgathaView() {
     }
@@ -83,16 +75,5 @@ final class AgathaView {
             return 0;
         }
         return ability == 3 ? AgathaConfig.DRAIN_COOLDOWN.get() : AgathaConfig.RUNE_COOLDOWN.get();
-    }
-
-    // ---- the shield ----
-
-    /** The look of her shield: violet, the lattice of runes, the radius of the config (the style is remade when it changes). */
-    static ShieldStyle shieldStyle() {
-        float radius = (float) AgathaShield.radius();
-        if (shield == null || shield.radius() != radius) {
-            shield = new ShieldStyle(SHIELD_VEIL, SHIELD_LINES, RUNE_LATTICE, radius, AgathaShield::maxStrength, AgathaShield::maxTicks);
-        }
-        return shield;
     }
 }

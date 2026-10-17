@@ -91,7 +91,9 @@ public enum Power implements StringRepresentable {
      * wide (the default 854x480 window 427): "Jean Grey (Phoenix)" was cut at both ends, so the Phoenix wakes as "The Phoenix".
      */
     public Component awakeningTitle() {
-        return this == PHOENIX ? Component.translatable("power.enhanced.phoenix.title") : displayName();
+        // (3.3: "Agatha Harkness" is one character too wide: she wakes as "Agatha".)
+        return this == PHOENIX || this == AGATHA ? Component.translatable("power.enhanced." + getSerializedName() + ".title")
+                : displayName();
     }
 
     /** Translation key for the given ability (1-5). */

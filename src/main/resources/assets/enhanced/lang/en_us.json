@@ -1415,7 +1415,7 @@
   "power.enhanced.agatha": "Agatha Harkness",
   "power.enhanced.agatha.awaken": "The Darkhold opens to you",
   "power.enhanced.agatha.broadcast": "%s read the Darkhold: it was Agatha Harkness all along!",
-  "ability.enhanced.agatha.1": "Purple Beam (hold; Sneak: Hex Mark or Glimpse)",
+  "ability.enhanced.agatha.1": "Purple Beam (Sneak: Hex Mark)",
   "ability.enhanced.agatha.2": "Flight",
   "ability.enhanced.agatha.3": "Power Drain",
   "ability.enhanced.agatha.4": "Witch's Shield (hold)",
@@ -1446,5 +1446,6 @@
   "death.attack.enhanced.agatha_drain.item": "%1$s was drained dry by %2$s",
   "death.attack.enhanced.agatha_runes": "%1$s burned in a circle of runes",
   "death.attack.enhanced.agatha_runes.player": "%1$s burned in the runes of %2$s",
-  "death.attack.enhanced.agatha_runes.item": "%1$s burned in the runes of %2$s"
+  "death.attack.enhanced.agatha_runes.item": "%1$s burned in the runes of %2$s",
+  "power.enhanced.agatha.title": "Agatha"
 }

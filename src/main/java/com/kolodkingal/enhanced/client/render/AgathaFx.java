@@ -247,9 +247,9 @@ public final class AgathaFx {
             return;
         }
         Vec3 o = c.center.add(0, LIFT + 0.005, 0).subtract(camera);
-        float r = c.radius * 0.87F;
+        float r = c.radius * 0.86F;
         int count = Math.max(8, Math.round(c.radius * 3.0F));
-        float size = Math.min(0.75F, c.radius * 0.15F);
+        float size = Math.min(0.95F, c.radius * 0.21F);
         float turn = time * 0.012F;
         for (int i = 0; i < count; i++) {
             double angle = turn + i * Mth.TWO_PI / count;

@@ -1415,7 +1415,7 @@
   "power.enhanced.agatha": "אגתה הארקנס",
   "power.enhanced.agatha.awaken": "הדארקהולד נפתח בפניך",
   "power.enhanced.agatha.broadcast": "%s קרא בדארקהולד: זו הייתה אגתה הארקנס כל הזמן!",
-  "ability.enhanced.agatha.1": "הקרן הסגולה (לחיצה ארוכה; התכופפות: סימן קסם או הצצה)",
+  "ability.enhanced.agatha.1": "הקרן הסגולה (התכופפות: סימן קסם)",
   "ability.enhanced.agatha.2": "תעופה",
   "ability.enhanced.agatha.3": "שאיבת כוח",
   "ability.enhanced.agatha.4": "מגן המכשפה (לחיצה ארוכה)",
@@ -1446,5 +1446,6 @@
   "death.attack.enhanced.agatha_drain.item": "%1$s נשאב עד תום על ידי %2$s",
   "death.attack.enhanced.agatha_runes": "%1$s נשרף במעגל רונות",
   "death.attack.enhanced.agatha_runes.player": "%1$s נשרף ברונות של %2$s",
-  "death.attack.enhanced.agatha_runes.item": "%1$s נשרף ברונות של %2$s"
+  "death.attack.enhanced.agatha_runes.item": "%1$s נשרף ברונות של %2$s",
+  "power.enhanced.agatha.title": "אגתה"
 }

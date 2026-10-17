@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.ability.AgathaShield;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -9,6 +11,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -23,6 +26,16 @@ import org.jetbrains.annotations.Nullable;
  * class except in a signature of {@link HeroClient}.
  */
 public final class AgathaClient implements HeroClient {
+    /**
+     * Her shield: a violet veil with a lattice of runes, the radius of the config (the style is remade when it changes).
+     * Kept here, with no client class in it, because the shield's style is asked on a server too (the tests).
+     */
+    private static final ResourceLocation RUNE_LATTICE = Enhanced.id("textures/entity/agatha_shield.png");
+    private static final int SHIELD_VEIL = 0x7A2FD6;
+    private static final int SHIELD_LINES = 0xC48CFF;
+    @Nullable
+    private static ShieldStyle shield;
+
     @Override
     public Power power() {
         return Power.AGATHA;
@@ -39,7 +52,11 @@ public final class AgathaClient implements HeroClient {
     @Override
     @Nullable
     public ShieldStyle shieldStyle() {
-        return AgathaView.shieldStyle();
+        float radius = (float) AgathaShield.radius();
+        if (shield == null || shield.radius() != radius) {
+            shield = new ShieldStyle(SHIELD_VEIL, SHIELD_LINES, RUNE_LATTICE, radius, AgathaShield::maxStrength, AgathaShield::maxTicks);
+        }
+        return shield;
     }
 
     @Override
