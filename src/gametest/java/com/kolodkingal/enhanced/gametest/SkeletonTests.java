@@ -580,7 +580,10 @@ public final class SkeletonTests {
             check(HeroServers.of(hero) != null && HeroServers.of(hero).power() == hero, hero + " has a server plug-in");
             check(HeroClients.of(hero) != null, hero + " has a client plug-in");
         }
-        check(HeroServers.all().size() == NEW_HEROES.size(), "and nobody else is a plug-in");
+        // (3.3: and the heroes of 3.3 that are plug-ins, the custom hero among them; none of the heroes before Thor.)
+        for (HeroServer server : HeroServers.all()) {
+            check(server.power().ordinal() > Power.THOR.ordinal(), server.power() + " is a hero after Thor");
+        }
         for (Power old : List.of(Power.NONE, Power.MAGNETO, Power.SCARLET_WITCH, Power.QUICKSILVER, Power.VISION, Power.BILLY,
                 Power.TOMMY, Power.LOKI, Power.THOR)) {
             check(HeroServers.of(old) == null, old + " keeps its switch arms");
