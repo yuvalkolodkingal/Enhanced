@@ -31,6 +31,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -458,9 +459,12 @@ public final class BuildRenderer {
         Vec3 to = a.lerp(b, (start + piece) / length);
         float fade = Mth.sin(Mth.frac(time / 10.0F) * Mth.PI);
         float scale = grow(from, 16.0);
-        long flicker = Mth.floor(time / 2.0F);
-        EnergyGeometry.bolt(pose, vc, from, to, 0.05F * scale, 0.14F * scale, EnergyGeometry.argb(BillyAbilities.MAIN, 0.6F * fade), flicker);
-        EnergyGeometry.bolt(pose, vc, from, to, 0.022F * scale, 0.14F * scale, EnergyGeometry.argb(BillyAbilities.CORE, 0.9F * fade), flicker);
+        // (3.3) It writhes from one shape to the next instead of jumping every other tick.
+        EnergyGeometry.bolt(pose, vc, from, to, 0.05F * scale, 0.14F * scale, EnergyGeometry.argb(BillyAbilities.MAIN,
+                0.6F * fade), slot, time / 2.0F);
+        EnergyGeometry.bolt(pose, vc, from, to, 0.022F * scale, 0.14F * scale, EnergyGeometry.argb(BillyAbilities.CORE,
+                0.9F * fade), slot,
+                time / 2.0F);
     }
 
     /**
@@ -767,8 +771,9 @@ public final class BuildRenderer {
         }
         int colour = 0xFFFFFF;
         if (g.heldBack()) {
-            // Billy's side holds the rubber band: the label flashes.
-            colour = calm || Mth.floor(time / 3.0F) % 2 == 0 ? ORANGE : 0xFFFFFF;
+            // Billy's side holds the rubber band: the label pulses orange and white (3.3: a smooth pulse, not a blink).
+            colour = calm ? ORANGE : FastColor.ARGB32.lerp(0.5F + 0.5F * Mth.cos(time * Mth.PI / 3.0F), 0xFFFFFF,
+                    ORANGE);
         }
         Vec3 top = new Vec3((over.minX() + over.maxX() + 1) / 2.0, over.maxY() + 1.0, (over.minZ() + over.maxZ() + 1) / 2.0);
         return new Label(top, text, colour);

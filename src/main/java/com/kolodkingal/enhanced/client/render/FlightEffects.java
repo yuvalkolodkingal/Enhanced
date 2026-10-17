@@ -710,21 +710,25 @@ public final class FlightEffects {
                 helix(pose, vc, camera, fx, HAND_L, 3.0, time);
             }
             case THOR -> {
-                // Lightning from the boots along their path, reshaped every other tick.
+                // Lightning from the boots along their path, writhing (3.3: it jumped to a new shape every other tick).
                 for (int source : new int[]{FOOT_R, FOOT_L}) {
                     Vec3 head = fx.live[source];
                     if (head == null || fx.count[source] < 2) {
                         continue;
                     }
-                    long seed = (long) (time / 2) * 31L + id + source;
+                    long seed = (id + source) * 7919L;
                     Vec3 prev = head;
                     double length = 0.0;
                     for (int k = 0; k < fx.count[source] && length < 4.0; k++) {
                         Vec3 next = fx.hist[source][k];
                         length += prev.distanceTo(next);
                         float fade = (float) Math.max(0.0, 1.0 - length / 4.0);
-                        EnergyGeometry.bolt(pose, vc, prev.subtract(camera), next.subtract(camera), 0.04F, 0.12F, EnergyGeometry.argb(BLUE, 0.8F * fade), seed + k);
-                        EnergyGeometry.bolt(pose, vc, prev.subtract(camera), next.subtract(camera), 0.015F, 0.12F, EnergyGeometry.argb(WHITE, 0.8F * fade), seed + k);
+                        EnergyGeometry.bolt(pose, vc, prev.subtract(camera), next.subtract(camera), 0.04F, 0.12F,
+                                EnergyGeometry.argb(BLUE, 0.8F * fade),
+                                seed + k, time / 2.0F);
+                        EnergyGeometry.bolt(pose, vc, prev.subtract(camera), next.subtract(camera), 0.015F, 0.12F,
+                                EnergyGeometry.argb(WHITE, 0.8F * fade),
+                                seed + k, time / 2.0F);
                         prev = next;
                     }
                 }
@@ -841,30 +845,45 @@ public final class FlightEffects {
         }
     }
 
-    /** Short arcs of lightning crawling over a fast Thor's torso, changing every other tick. */
+    /** Short arcs of lightning crawling over a fast Thor's torso, a new pair every other tick,
+            fading in and out (3.3). */
     private static void torsoArcs(Matrix4f pose, VertexConsumer vc, Vec3 camera, AbstractClientPlayer player, float partialTick, float time) {
-        RandomSource random = RandomSource.create((long) (time / 2) * 31L + player.getId());
         Vec3 feet = player.getPosition(partialTick);
-        for (int i = 0; i < 2; i++) {
-            double angle = random.nextDouble() * Mth.TWO_PI;
-            double y = 0.5 + random.nextDouble() * 1.0;
-            Vec3 a = BodyLean.follow(player, feet.add(Math.cos(angle) * 0.3, y, Math.sin(angle) * 0.3), partialTick).subtract(camera);
-            Vec3 b = a.add((random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.6);
-            EnergyGeometry.bolt(pose, vc, a, b, 0.03F, 0.1F, EnergyGeometry.argb(BLUE, 0.8F), random.nextLong());
-            EnergyGeometry.bolt(pose, vc, a, b, 0.012F, 0.1F, EnergyGeometry.argb(WHITE, 0.9F), random.nextLong());
-        }
+        EnergyGeometry.crossfade(player.getId() * 31L, time / 2.0F, (random, weight) -> {
+            for (int i = 0; i < 2; i++) {
+                double angle = random.nextDouble() * Mth.TWO_PI;
+                double y = 0.5 + random.nextDouble() * 1.0;
+                Vec3 a = BodyLean.follow(player, feet.add(Math.cos(angle) * 0.3, y, Math.sin(angle) * 0.3),
+                        partialTick).subtract(camera);
+                Vec3 b = a.add((random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.6,
+                        (random.nextDouble() - 0.5) * 0.6);
+                EnergyGeometry.bolt(pose, vc, a, b, 0.03F, 0.1F, EnergyGeometry.argb(BLUE, 0.8F * weight),
+                        random.nextLong());
+                EnergyGeometry.bolt(pose, vc, a, b, 0.012F, 0.1F, EnergyGeometry.argb(WHITE, 0.9F * weight),
+                        random.nextLong());
+            }
+        });
     }
 
-    /** A short bolt from the whirling weapon's head to a point half a block away, reshaped every other tick. */
+    /**
+     * A short bolt from the whirling weapon's head to a point half a block away, a new one every other tick, fading in
+     * and out (3.3).
+     */
     private static void weaponBolt(Matrix4f pose, VertexConsumer vc, Vec3 camera, AbstractClientPlayer player, Fx fx, float time) {
         Vec3 head = fx.live[WEAPON];
         if (head == null) {
             return;
         }
-        RandomSource random = RandomSource.create((long) (time / 2) * 31L + player.getId());
-        Vec3 end = head.add((random.nextDouble() - 0.5) * 1.0, (random.nextDouble() - 0.5) * 1.0, (random.nextDouble() - 0.5) * 1.0);
-        EnergyGeometry.bolt(pose, vc, head.subtract(camera), end.subtract(camera), 0.02F, 0.10F, EnergyGeometry.argb(BLUE, 0.8F), random.nextLong());
-        EnergyGeometry.bolt(pose, vc, head.subtract(camera), end.subtract(camera), 0.01F, 0.10F, EnergyGeometry.argb(WHITE, 0.9F), random.nextLong());
+        EnergyGeometry.crossfade(player.getId() * 31L + 7L, time / 2.0F, (random, weight) -> {
+            Vec3 end = head.add((random.nextDouble() - 0.5) * 1.0, (random.nextDouble() - 0.5) * 1.0,
+                    (random.nextDouble() - 0.5) * 1.0);
+            EnergyGeometry.bolt(pose, vc, head.subtract(camera), end.subtract(camera), 0.02F, 0.10F,
+                    EnergyGeometry.argb(BLUE, 0.8F * weight),
+                    random.nextLong());
+            EnergyGeometry.bolt(pose, vc, head.subtract(camera), end.subtract(camera), 0.01F, 0.10F,
+                    EnergyGeometry.argb(WHITE, 0.9F * weight),
+                    random.nextLong());
+        });
     }
 
     /** A hard landing shakes the camera: a quick roll that dies away, strongest near the impact. */

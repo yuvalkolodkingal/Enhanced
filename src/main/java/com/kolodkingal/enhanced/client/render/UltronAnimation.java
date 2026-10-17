@@ -88,7 +88,8 @@ public final class UltronAnimation {
         Long until = FLICKERS.get(sentry.getId());
         boolean flicker = until != null && now <= until || sentry.isHacked() && sentry.tickCount < HACK_FLICKER;
         if (flicker) {
-            return UltronSentryEntity.Eyes.values()[((int) (age * 0.7F) % 3 + 3) % 3];
+            // (3.3) A colour every four ticks, eased into by the pose (it changed every tick and a half: a strobe).
+            return UltronSentryEntity.Eyes.values()[((int) (age * 0.25F) % 3 + 3) % 3];
         }
         return sentry.eyes();
     }

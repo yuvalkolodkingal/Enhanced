@@ -107,8 +107,8 @@ public final class UltronPoses {
                 out.arms(14.0F, 0.0F, 5.0F, -6.0F, 0.2F, 1.0F);
                 out.to(UltronPose.HIPS_X, 12.0F, 1.0F);
                 out.to(UltronPose.SHAKE, 3.0F, 1.0F);
-                // The eyes flicker blue, off and on.
-                out.to(UltronPose.EYES, Mth.sin(age * 2.3F) > 0.0F ? 0.9F : 0.15F, 1.0F);
+                // The eyes waver blue, dim and bright (3.3: a smooth waver, not an on-off strobe).
+                out.to(UltronPose.EYES, waver(age, 0.15F, 0.9F), 1.0F);
                 out.to(UltronPose.PALM_GLOW, 0.1F, 1.0F);
             }
             case ASSEMBLING -> {
@@ -118,7 +118,7 @@ public final class UltronPoses {
                 out.arms(lerp(limbs, 28.0F, 10.0F), 0.0F, lerp(limbs, 2.0F, 12.0F), lerp(limbs, -50.0F, -14.0F), 0.8F, 1.0F);
                 out.to(UltronPose.HIPS_X, lerp(limbs, 25.0F, 5.0F), 1.0F);
                 out.to(UltronPose.SCALE, 0.25F + 0.75F * AnimMath.easeOutBack(u), 1.0F);
-                out.to(UltronPose.EYES, u > 0.7F && Mth.sin(age * 3.1F) > -0.3F ? 0.8F : 0.0F, 1.0F);
+                out.to(UltronPose.EYES, ss(0.7F, 0.85F, u) * waver(age, 0.3F, 0.8F), 1.0F);
                 out.to(UltronPose.FLASH, 0.5F * (1.0F - u), 1.0F);
                 out.to(UltronPose.PALM_GLOW, 0.0F, 1.0F);
             }
@@ -240,9 +240,8 @@ public final class UltronPoses {
         p.to(UltronPose.HIPS_X, -5.0F, w);
         float pulse = 0.5F + 0.5F * Mth.sin(t * 0.9F);
         p.to(UltronPose.TORSO_GLOW, 1.0F + 0.6F * pulse, w);
-        // Eyes and mouth flash white and red.
-        boolean white = ((int) (age * 0.5F)) % 2 == 0;
-        float[] c = white ? WHITE : RED;
+        // Eyes and mouth pulse white and red (3.3: they swapped colour every other tick).
+        float[] c = mix(RED, WHITE, waver(age, 0.0F, 1.0F));
         p.eyeColor(c[0], c[1], c[2], w);
         p.to(UltronPose.EYES, 1.4F, w);
         p.to(UltronPose.FLASH, 0.25F * pulse, w);
@@ -312,23 +311,22 @@ public final class UltronPoses {
             float u = t / TRANSFER_SHUDDER;
             slump = ss(0, 1, u);
             open = ss(0, 0.75F, u);
-            eyes = (1.0F - ss(0.2F, 1.0F, u)) * (Mth.sin(age * 2.7F) > -0.4F ? 1.0F : 0.2F);
+            eyes = (1.0F - ss(0.2F, 1.0F, u)) * waver(age, 0.2F, 1.0F);
             shake = 1.0F + 5.0F * u;
         } else {
             float u = (t - TRANSFER_SHUDDER) / (TRANSFER_TOTAL - TRANSFER_SHUDDER);
             slump = 1.0F - ss(0.15F, 0.95F, u);
             open = 1.0F - ss(0.0F, 0.8F, u);
-            // Dark until the last third, then flickering on.
+            // Dark until the last third, then wavering on.
             float wake = ss(0.6F, 1.0F, u);
-            eyes = wake * (wake < 0.95F && Mth.sin(age * 3.3F) < -0.3F ? 0.2F : 1.0F);
+            eyes = wake * Mth.lerp(ss(0.8F, 0.95F, wake), waver(age, 0.2F, 1.0F), 1.0F);
             shake = 3.0F * (1.0F - u);
         }
         slump(p, slump);
         p.to(UltronPose.OPEN, open, 1.0F);
         p.to(UltronPose.SHAKE, shake, 1.0F);
         p.to(UltronPose.EYES, eyes, 1.0F);
-        boolean white = ((int) (age * 0.7F)) % 2 == 0;
-        float[] c = white ? WHITE : RED;
+        float[] c = mix(RED, WHITE, waver(age, 0.0F, 1.0F));
         p.eyeColor(c[0], c[1], c[2], t < TRANSFER_SHUDDER ? 1.0F : 0.0F);
         p.to(UltronPose.TORSO_GLOW, 0.3F + 0.7F * eyes, 1.0F);
         p.to(UltronPose.PALM_GLOW, 0.15F, slump);
@@ -341,9 +339,8 @@ public final class UltronPoses {
         slump(p, ss(0, 0.65F, u));
         p.to(UltronPose.OPEN, ss(0, 0.6F, u), 1.0F);
         float dying = ss(0.15F, 0.7F, u);
-        p.to(UltronPose.EYES, (1.0F - dying) * (u > 0.15F && Mth.sin(age * 2.9F) < -0.3F ? 0.25F : 1.0F), 1.0F);
-        boolean white = ((int) (age * 0.6F)) % 2 == 0;
-        float[] c = white ? WHITE : RED;
+        p.to(UltronPose.EYES, (1.0F - dying) * Mth.lerp(ss(0.1F, 0.2F, u), 1.0F, waver(age, 0.25F, 1.0F)), 1.0F);
+        float[] c = mix(RED, WHITE, waver(age, 0.0F, 1.0F));
         p.eyeColor(c[0], c[1], c[2], dying);
         p.to(UltronPose.SHAKE, 4.0F * (1.0F - ss(0.5F, 0.8F, u)), 1.0F);
         p.to(UltronPose.TORSO_GLOW, 1.0F - ss(0.0F, 0.8F, u), 1.0F);
@@ -360,6 +357,20 @@ public final class UltronPoses {
         p.to(UltronPose.EYES, 0.0F, 1.0F);
         p.to(UltronPose.TORSO_GLOW, 0.3F + 0.1F * Mth.sin(age * 0.2F), 1.0F);
         p.to(UltronPose.PALM_GLOW, 0.2F, 1.0F);
+    }
+
+    /**
+     * A light that wavers between {@code low} and {@code high} about twice a second (3.3): the flickers and colour
+     * swaps
+     * of the eyes were on-off steps several times a second, a strobe.
+     */
+    private static float waver(float age, float low, float high) {
+        return Mth.lerp(0.5F + 0.5F * Mth.sin(age * 0.6F), low, high);
+    }
+
+    /** The colour {@code f} of the way from {@code a} to {@code b}. */
+    private static float[] mix(float[] a, float[] b, float f) {
+        return new float[]{Mth.lerp(f, a[0], b[0]), Mth.lerp(f, a[1], b[1]), Mth.lerp(f, a[2], b[2])};
     }
 
     /** Hanging dead weight: the head down, the arms limp, the legs loose (the weight is how far, 0 to 1). */

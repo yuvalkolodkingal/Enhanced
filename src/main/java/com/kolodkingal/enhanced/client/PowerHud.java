@@ -39,6 +39,13 @@ import java.util.Locale;
  * and Billy have a sixth line, Build Magic's key and whether build mode is on (D-B 6.6).
  */
 public class PowerHud implements LayeredDraw.Layer {
+    /**
+     * The width the panel is drawn at, and until when it holds (3.3): it widens at once but narrows only after a
+     * second,
+     * so a cooldown counting down ("10.0s", "9.9s") does not make its right edge twitch every tick.
+     */
+    private static int shownWidth;
+    private static long shownUntil;
 
     @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
@@ -85,6 +92,13 @@ public class PowerHud implements LayeredDraw.Layer {
             width = Math.max(width, font.width(line));
         }
 
+        if (width >= shownWidth || now > shownUntil || now < shownUntil - 20) {
+            if (width != shownWidth) {
+                shownUntil = now + 20;
+            }
+            shownWidth = width;
+        }
+        width = shownWidth;
         int x = 4;
         // Under the boss bars, when a fight's bars and their names would run into the panel.
         int y = 4 + BossBarOverride.clearance(x + width + 4);

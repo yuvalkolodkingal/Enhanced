@@ -22,6 +22,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.HumanoidArm;
@@ -559,10 +560,10 @@ public final class BuildFx {
         return false;
     }
 
-    /** The colour of a spell's frame: its hero's, grey and red flickering when refused. */
+    /** The colour of a spell's frame: its hero's, pulsing between grey and red when refused (3.3: it blinked). */
     private static int core(Run run, float time) {
         if (run.state == State.FIZZLED) {
-            return ((int) (time / 2) & 1) == 0 ? RED : GREY;
+            return FastColor.ARGB32.lerp(0.5F + 0.5F * Mth.cos(time * Mth.PI / 2.0F), GREY, RED);
         }
         return run.hero.color;
     }
@@ -731,15 +732,17 @@ public final class BuildFx {
         double top = Mth.clamp(y, y0, y0 + height) + 0.02;
         float alpha = 0.55F * (run.state == State.WORKING ? 1.0F : glow);
         if (run.hero == Power.BILLY) {
-            RandomSource random = RandomSource.create(run.seed + Mth.floor(time / 2.0F) * 7919L);
-            for (int i = 0; i < 14; i++) {
-                double x = Mth.lerp(random.nextDouble(), x0, x1);
-                double z = Mth.lerp(random.nextDouble(), z0, z1);
-                double s = 0.18 + random.nextDouble() * 0.2;
-                int white = EnergyGeometry.argb(WHITE, alpha + 0.3F);
-                BuildRenderer.line(pose, vc, new Vec3(x - s, top, z), new Vec3(x + s, top, z), 0.05F, white);
-                BuildRenderer.line(pose, vc, new Vec3(x, top, z - s), new Vec3(x, top, z + s), 0.05F, white);
-            }
+            // White-hot points, a new set every other tick, each fading in and out (3.3: they popped).
+            EnergyGeometry.crossfade(run.seed, time / 2.0F, (random, weight) -> {
+                for (int i = 0; i < 14; i++) {
+                    double x = Mth.lerp(random.nextDouble(), x0, x1);
+                    double z = Mth.lerp(random.nextDouble(), z0, z1);
+                    double s = 0.18 + random.nextDouble() * 0.2;
+                    int white = EnergyGeometry.argb(WHITE, (alpha + 0.3F) * weight);
+                    BuildRenderer.line(pose, vc, new Vec3(x - s, top, z), new Vec3(x + s, top, z), 0.05F, white);
+                    BuildRenderer.line(pose, vc, new Vec3(x, top, z - s), new Vec3(x, top, z + s), 0.05F, white);
+                }
+            });
             return;
         }
         double step = Math.max(2.0, Math.max(x1 - x0, z1 - z0) / 8.0);
@@ -771,9 +774,12 @@ public final class BuildFx {
         }
         Vec3 start = WorldEffectsRenderer.handPosition(mc, mom, partialTick).subtract(camera);
         Vec3 end = WorldEffectsRenderer.handPosition(mc, billy, partialTick).subtract(camera);
-        long seed = ((long) time / 3) * 6364136223846793005L + mom.getId();
-        EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.25F, EnergyGeometry.argb(Power.SCARLET_WITCH.color, 0.7F), seed);
-        EnergyGeometry.bolt(pose, vc, start, end, 0.018F, 0.4F, EnergyGeometry.argb(Power.SCARLET_WITCH.glow, 0.45F), seed + 31);
+        // (3.3) It writhes from one shape to the next instead of jumping every third tick.
+        long seed = mom.getId() * 6364136223846793005L;
+        EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.25F, EnergyGeometry.argb(Power.SCARLET_WITCH.color, 0.7F),
+                seed, time / 3.0F);
+        EnergyGeometry.bolt(pose, vc, start, end, 0.018F, 0.4F, EnergyGeometry.argb(Power.SCARLET_WITCH.glow, 0.45F),
+                seed + 31, time / 3.0F);
     }
 
     // ---- Billy's rank-up
@@ -859,15 +865,21 @@ public final class BuildFx {
                 }
                 hand = WorldEffectsRenderer.handPosition(mc, player, partialTick);
             }
-            long flicker = (long) time + player.getId();
-            RandomSource random = RandomSource.create(flicker * 341873128712L);
-            Vec3 along = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.2, random.nextDouble() - 0.5).normalize()
-                    .scale(0.14 + random.nextDouble() * 0.1);
-            Vec3 a = hand.subtract(camera).subtract(along.scale(0.5));
-            Vec3 b = a.add(along);
+            // A new spark every tick, each fading into the next (3.3: they jumped).
+            Vec3 at = hand.subtract(camera);
             float fade = 1.0F - phase / 3.0F;
-            EnergyGeometry.bolt(pose, vc, a, b, 0.02F, 0.03F, EnergyGeometry.argb(BillyAbilities.MAIN, 0.7F * fade), flicker);
-            EnergyGeometry.bolt(pose, vc, a, b, 0.009F, 0.03F, EnergyGeometry.argb(BillyAbilities.CORE, 0.95F * fade), flicker + 1);
+            EnergyGeometry.crossfade(player.getId() * 341873128712L, time, (random, weight) -> {
+                Vec3 along = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.2,
+                        random.nextDouble() - 0.5).normalize()
+                        .scale(0.14 + random.nextDouble() * 0.1);
+                Vec3 a = at.subtract(along.scale(0.5));
+                Vec3 b = a.add(along);
+                long seed = random.nextLong();
+                EnergyGeometry.bolt(pose, vc, a, b, 0.02F, 0.03F, EnergyGeometry.argb(BillyAbilities.MAIN,
+                        0.7F * fade * weight), seed);
+                EnergyGeometry.bolt(pose, vc, a, b, 0.009F, 0.03F, EnergyGeometry.argb(BillyAbilities.CORE,
+                        0.95F * fade * weight), seed + 1);
+            });
         }
     }
 

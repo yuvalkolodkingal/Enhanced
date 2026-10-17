@@ -155,13 +155,16 @@ public final class WorldEffectsRenderer {
             if (distance - radius > renderDistance + 32 || radius - distance > renderDistance + 32) {
                 continue;
             }
-            int segments = Mth.clamp((int) (radius * 2), 32, 128);
+            // (3.3) The mesh and the tiling of the bricks are those of the finished wall: counted from the growing
+            // radius
+            // they changed every few frames while it rose, and the bricks jumped.
+            int segments = Mth.clamp((int) (hex.radius() * 2), 32, 128);
             float pulse = 0.85F + 0.15F * Mth.sin(time * 0.06F);
             // A wall that is still rising glows brighter.
             float rising = 1F + (1F - grow) * 1.5F;
             if (lines) {
-                float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 6F));
-                float tilesV = Math.max(3, Math.round(Mth.PI * radius / 6F));
+                float tilesU = Math.max(6, Math.round(Mth.TWO_PI * hex.radius() / 6F));
+                float tilesV = Math.max(3, Math.round(Mth.PI * hex.radius() / 6F));
                 EnergyGeometry.sphere(pose, vc, center, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F,
                         HEX_LINES, 0.32F * pulse * rising, 0.68F * pulse * rising);
             } else {
@@ -214,9 +217,11 @@ public final class WorldEffectsRenderer {
         EnergyGeometry.ribbon(pose, vc, start, end, 0.06F * near, 0.26F * flicker, EnergyGeometry.argb(palette.glow, 0.45F), EnergyGeometry.argb(palette.glow, 0.55F));
         EnergyGeometry.ribbon(pose, vc, start, end, 0.02F * near, 0.08F, EnergyGeometry.argb(palette.core, 0.75F), EnergyGeometry.argb(palette.core, 0.85F));
 
-        long seed = ((long) time / 2) * 341873128712L + seedId * 132897987541L;
+        // (3.3) The bolts writhe from one shape to the next instead of jumping every other tick.
+        long seed = seedId * 132897987541L;
         for (int k = 0; k < 3; k++) {
-            EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.28F, EnergyGeometry.argb(palette.bolt, 0.8F), seed + k * 7919L);
+            EnergyGeometry.bolt(pose, vc, start, end, 0.03F, 0.28F, EnergyGeometry.argb(palette.bolt, 0.8F),
+                    seed + k * 7919L, time / 2.0F);
         }
         // A flare where the beam hits.
         float flare = 0.5F + 0.2F * Mth.sin(time * 2.3F);
@@ -275,9 +280,9 @@ public final class WorldEffectsRenderer {
             Vec3 at = projectile.getPosition(partialTick).add(0, projectile.getBbHeight() * 0.5, 0).subtract(camera);
             float pulse = 0.28F + 0.06F * Mth.sin(time * 0.5F + projectile.getId());
             EnergyGeometry.ring(pose, vc, at, at.scale(-1).normalize(), pulse, 0.03F, 16, EnergyGeometry.argb(Power.MAGNETO.glow, 0.7F));
-            long seed = ((long) time / 3) * 2862933555777941757L + projectile.getId();
             EnergyGeometry.bolt(pose, vc, handPosition(mc, player, partialTick).subtract(camera), at, 0.018F, 0.12F,
-                    EnergyGeometry.argb(Power.MAGNETO.glow, 0.35F), seed);
+                    EnergyGeometry.argb(Power.MAGNETO.glow, 0.35F), projectile.getId() * 2862933555777941757L,
+                            time / 3.0F);
         }
     }
 
@@ -363,12 +368,13 @@ public final class WorldEffectsRenderer {
                                      VertexConsumer vc, Vec3 camera, float partialTick, float time) {
         Vec3 start = handPosition(mc, player, partialTick).subtract(camera);
         Vec3 end = held.getPosition(partialTick).add(0, held.getBbHeight() * 0.5, 0).subtract(camera);
-        long seed = ((long) time / 3) * 6364136223846793005L + player.getId();
+        long seed = player.getId() * 6364136223846793005L;
+        float phase = time / 3.0F;
         // The Phoenix's telekinesis is of the mind: violet, where the others' take their hero's colour.
         int main = power == Power.PHOENIX ? PhoenixAbilities.PSY_MAIN : power.color;
         int glow = power == Power.PHOENIX ? PhoenixAbilities.PSY_CORE : power.glow;
-        EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.35F, EnergyGeometry.argb(main, 0.7F), seed);
-        EnergyGeometry.bolt(pose, vc, start, end, 0.025F, 0.5F, EnergyGeometry.argb(glow, 0.4F), seed + 31);
+        EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.35F, EnergyGeometry.argb(main, 0.7F), seed, phase);
+        EnergyGeometry.bolt(pose, vc, start, end, 0.025F, 0.5F, EnergyGeometry.argb(glow, 0.4F), seed + 31, phase);
     }
 
     /** Vision's Mind Stone, in the middle of his forehead (just above the screen centre in first person). */

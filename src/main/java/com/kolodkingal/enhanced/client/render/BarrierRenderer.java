@@ -193,14 +193,18 @@ public final class BarrierRenderer {
     /** Tesla crackle over the plate, the cracks of a weak one, and the ring that runs out from a hit. */
     private static void crackle(VertexConsumer vc, Matrix4f pose, Vec3 c, BillyBarrier.Frame plate, double width, double height, Mark mark,
                                 float fraction, float hit, int id, float time, float alpha, boolean reduced) {
-        RandomSource random = RandomSource.create((long) (time / 2.0F) * 7919L + id * 104729L);
-        // A little lightning along the edge, more when it has been hit.
+        // A little lightning along the edge, more when it has been hit. (3.3) Each arc fades in and out over two ticks
+        // instead of popping up somewhere new every other tick.
         int arcs = reduced ? 0 : 1 + (hit > 0.0F ? 3 : 0);
-        for (int n = 0; n < arcs; n++) {
-            Vec3 from = surfacePoint(c, plate, width, height, random.nextFloat() * 2.0F - 1.0F, random.nextFloat());
-            Vec3 to = surfacePoint(c, plate, width, height, Mth.clamp((float) (from.subtract(c).dot(plate.right()) / (width * 0.5)) + (random.nextFloat() - 0.5F) * 0.9F, -1.0F, 1.0F), random.nextFloat());
-            jag(vc, pose, from, to, 0.5F + hit, alpha, random);
-        }
+        EnergyGeometry.crossfade(id * 104729L, time / 2.0F, (random, weight) -> {
+            for (int n = 0; n < arcs; n++) {
+                Vec3 from = surfacePoint(c, plate, width, height, random.nextFloat() * 2.0F - 1.0F, random.nextFloat());
+                Vec3 to = surfacePoint(c, plate, width, height,
+                        Mth.clamp((float) (from.subtract(c).dot(plate.right()) / (width * 0.5))
+                        + (random.nextFloat() - 0.5F) * 0.9F, -1.0F, 1.0F), random.nextFloat());
+                jag(vc, pose, from, to, 0.5F + hit, alpha * weight, random);
+            }
+        });
         // Cracks: white jagged lines across it, more as its strength goes.
         int cracks = Math.round((1.0F - fraction) * 7.0F);
         RandomSource fixed = RandomSource.create(id * 31L + Math.round(mark.peak * 10.0F));

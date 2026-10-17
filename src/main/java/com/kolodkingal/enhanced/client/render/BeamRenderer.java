@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -25,14 +24,17 @@ import java.util.Map;
  * Draws every continuous beam there is (3.2, see {@code ContinuousBeam}) in the {@link BeamStyle} the server named: a
  * jagged bolt from the shooter's hand to what his crosshair is on (found here by looking along his view, as the server
  * does, and stopped at a complete Chaos Shield), made of a dark fringe, a body, a pale inner light and a white-hot core
- * that reshape every half tick, with loose strands crackling beside it, short forks branching off, and flares where it
- * leaves and where it lands. Billy's is blue; another source brings its palette in its style and uses this class as it is.
+ * that writhe from one shape to the next (never jumping), with loose strands crackling beside it, short forks branching
+ * off, and flares where it leaves and where it lands. Billy's is blue; another source brings its palette in its style and
+ * uses this class as it is.
  *
  * <p>A beam is shown from the {@link BeamPayload}s (start, every few ticks, stop) and lapses if none comes for a moment.
  */
 public final class BeamRenderer {
     /** A beam nobody has mentioned for this long is gone (the server repeats itself every 8 ticks). */
     private static final int LAPSE_TICKS = 24;
+    /** How long one shape of the bolt lasts before it has flowed into the next (ticks). */
+    static final float SHAPE_TICKS = 1.5F;
 
     private record Active(BeamStyle style, float range, long seen) {
     }
@@ -108,30 +110,35 @@ public final class BeamRenderer {
             return;
         }
         float flicker = 0.85F + 0.15F * Mth.sin(time * 2.9F) * Mth.cos(time * 1.3F);
-        RandomSource random = RandomSource.create((long) (time * 2.0F) * 7919L + player.getId() * 104729L);
+        long seed = player.getId() * 104729L;
+        // (3.3) The bolt flows from one shape to the next, and the strands and forks fade across, instead of jumping.
+        float phase = time / SHAPE_TICKS;
         double jitter = Math.max(0.1, Math.min(0.9, length * 0.03));
 
         // A soft glow all along the line.
         EnergyGeometry.ribbon(pose, vc, a, b, 0.14F, 0.18F, EnergyGeometry.argb(style.fringe(), 0.10F * flicker), EnergyGeometry.argb(style.fringe(), 0.14F * flicker));
-        List<Vec3> path = EnergyGeometry.lightningPath(a, b, jitter, random);
+        List<Vec3> path = EnergyGeometry.flowingPath(a, b, jitter, seed, phase);
         layers(pose, vc, path, style, 1.0F, flicker);
-        // Loose strands that crackle round the main bolt.
-        for (int i = 0; i < 2; i++) {
-            List<Vec3> strand = EnergyGeometry.lightningPath(a, b, jitter * 1.7, random);
-            tapered(pose, vc, strand, 0.05F, EnergyGeometry.argb(style.main(), 0.55F));
-            tapered(pose, vc, strand, 0.018F, EnergyGeometry.argb(style.inner(), 0.7F));
-        }
-        // Forks branching off, like his bolt.
         Vec3 dir = b.subtract(a).scale(1.0 / length);
-        for (int i = 0; i < 3 && path.size() > 3; i++) {
-            Vec3 start = path.get(1 + random.nextInt(path.size() - 2));
-            double reach = 0.5 + random.nextDouble() * Math.min(2.0, length * 0.15);
-            Vec3 side = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5).normalize();
-            Vec3 end = start.add(dir.scale(reach * 0.6)).add(side.scale(reach * 0.8));
-            List<Vec3> fork = EnergyGeometry.lightningPath(start, end, reach * 0.2, random);
-            EnergyGeometry.polyline(pose, vc, fork, 0.07F, EnergyGeometry.argb(style.body(), 0.6F));
-            EnergyGeometry.polyline(pose, vc, fork, 0.025F, EnergyGeometry.argb(style.core(), 0.85F));
-        }
+        EnergyGeometry.crossfade(seed + 31L, phase, (random, weight) -> {
+            // Loose strands that crackle round the main bolt.
+            for (int i = 0; i < 2; i++) {
+                List<Vec3> strand = EnergyGeometry.lightningPath(a, b, jitter * 1.7, random);
+                tapered(pose, vc, strand, 0.05F, EnergyGeometry.argb(style.main(), 0.55F * weight));
+                tapered(pose, vc, strand, 0.018F, EnergyGeometry.argb(style.inner(), 0.7F * weight));
+            }
+            // Forks branching off, like his bolt.
+            for (int i = 0; i < 3 && path.size() > 3; i++) {
+                Vec3 start = path.get(1 + random.nextInt(path.size() - 2));
+                double reach = 0.5 + random.nextDouble() * Math.min(2.0, length * 0.15);
+                Vec3 side = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5,
+                        random.nextDouble() - 0.5).normalize();
+                Vec3 end = start.add(dir.scale(reach * 0.6)).add(side.scale(reach * 0.8));
+                List<Vec3> fork = EnergyGeometry.lightningPath(start, end, reach * 0.2, random);
+                EnergyGeometry.polyline(pose, vc, fork, 0.07F, EnergyGeometry.argb(style.body(), 0.6F * weight));
+                EnergyGeometry.polyline(pose, vc, fork, 0.025F, EnergyGeometry.argb(style.core(), 0.85F * weight));
+            }
+        });
         // Flares where it leaves (smaller the closer it is to the camera) and where it lands.
         float near = (float) Mth.clamp(a.length() / 2.5, 0.12, 1.0);
         flare(pose, vc, a, 0.2F * flicker * near, style);

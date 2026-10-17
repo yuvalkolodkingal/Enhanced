@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -71,13 +70,18 @@ public class UltronBoltRenderer extends EntityRenderer<UltronBoltEntity> {
         EnergyGeometry.ring(pose, vc, centre, toCamera, 0.16F * size, 0.16F * size, 12, EnergyGeometry.argb(colors.main(), 0.85F));
         EnergyGeometry.ring(pose, vc, centre, toCamera, 0.07F * size, 0.1F * size, 10, EnergyGeometry.argb(colors.core(), 1.0F));
         if (bolt.isHeavy()) {
-            // A crown of short arcs round the blast, changing every other tick.
-            RandomSource random = RandomSource.create((long) ((bolt.tickCount + partialTick) / 2.0F) * 7919L + bolt.getId());
-            for (int i = 0; i < 4; i++) {
-                Vec3 end = centre.add((random.nextDouble() - 0.5) * 1.5, (random.nextDouble() - 0.5) * 1.5, (random.nextDouble() - 0.5) * 1.5);
-                EnergyGeometry.bolt(pose, vc, centre, end, 0.05F, 0.12F, EnergyGeometry.argb(colors.main(), 0.9F), random.nextLong());
-                EnergyGeometry.bolt(pose, vc, centre, end, 0.02F, 0.12F, EnergyGeometry.argb(colors.core(), 0.95F), random.nextLong());
-            }
+            // A crown of short arcs round the blast, a new crown every other tick fading into the next (3.3: it
+            // jumped).
+            EnergyGeometry.crossfade(bolt.getId() * 7919L, (bolt.tickCount + partialTick) / 2.0F, (random, weight) -> {
+                for (int i = 0; i < 4; i++) {
+                    Vec3 end = centre.add((random.nextDouble() - 0.5) * 1.5, (random.nextDouble() - 0.5) * 1.5,
+                            (random.nextDouble() - 0.5) * 1.5);
+                    EnergyGeometry.bolt(pose, vc, centre, end, 0.05F, 0.12F, EnergyGeometry.argb(colors.main(),
+                            0.9F * weight), random.nextLong());
+                    EnergyGeometry.bolt(pose, vc, centre, end, 0.02F, 0.12F, EnergyGeometry.argb(colors.core(),
+                            0.95F * weight), random.nextLong());
+                }
+            });
         }
     }
 

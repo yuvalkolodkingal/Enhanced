@@ -46,7 +46,24 @@ public final class EnergyGeometry {
      * @param seed changes the shape; change it every few ticks to make the bolt flicker
      */
     public static void bolt(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, float jitter, int color, long seed) {
-        RandomSource random = RandomSource.create(seed);
+        polyline(pose, vc, boltPoints(a, b, jitter, RandomSource.create(seed)), width, color);
+    }
+
+    /**
+     * A crackling bolt that never jumps (3.3): its shape flows from shape {@code floor(phase)} of {@code seed} to the
+     * next as {@code phase} grows by one, so a tether or a field line writhes instead of flickering.
+     *
+     * @param phase the time in shapes (for example the time in ticks divided by the ticks one shape lasts)
+     */
+    public static void bolt(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, float jitter, int color,
+            long seed, float phase) {
+        long step = Mth.floor(phase);
+        polyline(pose, vc, blend(boltPoints(a, b, jitter, shape(seed, step)), boltPoints(a, b, jitter, shape(seed,
+                step + 1)), flow(phase)),
+                width, color);
+    }
+
+    private static List<Vec3> boltPoints(Vec3 a, Vec3 b, double jitter, RandomSource random) {
         double length = a.distanceTo(b);
         int segments = Math.max(2, (int) (length * 2.0));
         Vec3 dir = b.subtract(a);
@@ -56,7 +73,8 @@ public final class EnergyGeometry {
         }
         perp1 = perp1.normalize();
         Vec3 perp2 = dir.cross(perp1).normalize();
-        Vec3 prev = a;
+        List<Vec3> points = new ArrayList<>(segments + 1);
+        points.add(a);
         for (int i = 1; i <= segments; i++) {
             double t = i / (double) segments;
             Vec3 next = a.add(dir.scale(t));
@@ -64,9 +82,69 @@ public final class EnergyGeometry {
                 double amount = jitter * Math.sin(t * Math.PI);
                 next = next.add(perp1.scale((random.nextDouble() - 0.5) * 2 * amount)).add(perp2.scale((random.nextDouble() - 0.5) * 2 * amount));
             }
-            ribbon(pose, vc, prev, next, width, color, color);
-            prev = next;
+            points.add(next);
         }
+        return points;
+    }
+
+    /**
+     * The random source of one shape of a crackling effect (3.3): shape {@code step} of the effect {@code seed}. A
+     * crackle
+     * draws shape {@code floor(phase)} flowing or fading into the next, never jumping from one to the other.
+     */
+    public static RandomSource shape(long seed, long step) {
+        return RandomSource.create(seed + step * 0x9E3779B97F4A7C15L);
+    }
+
+    /** How far shape {@code floor(phase)} has flowed into the next one, eased (0 to 1). */
+    public static float flow(float phase) {
+        float f = phase - Mth.floor(phase);
+        return f * f * (3.0F - 2.0F * f);
+    }
+
+    /**
+     * Arcs that appear at random places without popping (3.3): {@code draw} is called for shape {@code floor(phase)}
+     * with the weight {@code 1 - f} and for the next shape with the weight {@code f} ({@link #flow}), each with its own
+     * random source, so every arc fades in over one step and out over the next. Multiply the alpha of what is drawn by
+     * the weight.
+     */
+    public static void crossfade(long seed, float phase, Shapes draw) {
+        long step = Mth.floor(phase);
+        float f = flow(phase);
+        if (f < 1.0F) {
+            draw.draw(shape(seed, step), 1.0F - f);
+        }
+        if (f > 0.0F) {
+            draw.draw(shape(seed, step + 1), f);
+        }
+    }
+
+    /** One shape of a crossfading crackle ({@link #crossfade}). */
+    @FunctionalInterface
+    public interface Shapes {
+        void draw(RandomSource random, float weight);
+    }
+
+    /** Two paths of the same length, {@code f} of the way from the first to the second. */
+    private static List<Vec3> blend(List<Vec3> from, List<Vec3> to, float f) {
+        if (from.size() != to.size()) {
+            return f < 0.5F ? from : to;
+        }
+        List<Vec3> path = new ArrayList<>(from.size());
+        for (int i = 0; i < from.size(); i++) {
+            path.add(from.get(i).lerp(to.get(i), f));
+        }
+        return path;
+    }
+
+    /**
+     * A jagged lightning path that flows from one random shape to the next as {@code phase} grows by one (3.3), instead
+     * of jumping to a new shape: a held beam writhes but never strobes. See {@link #lightningPath}.
+     */
+    public static List<Vec3> flowingPath(Vec3 a, Vec3 b, double jitter, long seed, float phase) {
+        long step = Mth.floor(phase);
+        return blend(lightningPath(a, b, jitter, shape(seed, step)), lightningPath(a, b, jitter, shape(seed,
+                step + 1)), flow(phase));
     }
 
     /**

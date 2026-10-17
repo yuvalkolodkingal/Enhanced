@@ -31,6 +31,7 @@ import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -57,7 +58,7 @@ import java.util.Map;
  *     <li><b>The badge</b>, 16 pixels right of the crosshair (left of it when the screen is too narrow): the spell's
  *     picture and the material's (a pulsing "?" with none, a small eye on a picked block, two of the hotbar's blocks
  *     for a mix), the spell and its style over the size; Billy's meter (60 pixels, refilling smoothly, the cost a
- *     darker chunk at its end; orange with a clock and the seconds while it does not fit yet; flashing red when it
+ *     darker chunk at its end; orange with a clock and the seconds while it does not fit yet; pulsing red when it
  *     never will), "cost / meter ✦", his stars and rank (a "+" sparkle and the new star growing at a rank-up), Mom's
  *     scarlet stripe and "½ Mom's help", "too far"; the Scarlet Witch's "∞" and the blocks her spell changes.</li>
  *     <li><b>The rings</b> round the crosshair: the hold ring (red for a removal, the hero's colour for a huge spell;
@@ -502,7 +503,8 @@ public final class BuildHud implements LayeredDraw.Layer {
 
         row += 20;
         boolean never = limited && cost > top;
-        boolean flash = never && !calm && Mth.floor(time / 4.0F) % 2 == 1;
+        // (3.3) A smooth pulse, not a blink: 0 to 1 and back every eight ticks.
+        float flash = never && !calm ? 0.5F - 0.5F * Mth.cos(time * Mth.PI / 4.0F) : 0.0F;
         int at;
         if (limited) {
             meter(g, left, row + 2, power, data, meterNow, top, cost, never, flash);
@@ -511,7 +513,7 @@ public final class BuildHud implements LayeredDraw.Layer {
             at = left + HudDraw.text(g, font, infinity, left, row + 1, HudDraw.argb(power.glow, 1.0F), true);
         }
         if (amountText != null) {
-            int colour = never ? (flash ? WHITE : RED) : waits ? ORANGE : WHITE;
+            int colour = never ? FastColor.ARGB32.lerp(flash, RED, WHITE) : waits ? ORANGE : WHITE;
             at += 4;
             at += HudDraw.text(g, font, amountText, at, row + 1, HudDraw.argb(colour, 1.0F), true);
         }
@@ -627,18 +629,18 @@ public final class BuildHud implements LayeredDraw.Layer {
     /**
      * Billy's meter, 60 by 5 pixels: what he has now in his blue, refilling smoothly; the cost a darker chunk at its
      * end; more than he has now, all he has orange and what is missing faintly orange after it; more than his whole
-     * meter, flashing red. Mom's help: a scarlet stripe along its top.
+     * meter, pulsing red. Mom's help: a scarlet stripe along its top.
      */
     private static void meter(GuiGraphics g, int x, int y, Power power, BuildData data, double now, int top, long cost, boolean never,
-                              boolean flash) {
+                              float flash) {
         g.fill(x - 1, y - 1, x + METER_W + 1, y + METER_H + 1, HudDraw.argb(0x000000, 0.85F));
         g.fill(x, y, x + METER_W, y + METER_H, HudDraw.argb(0x1C2833, 1.0F));
         int has = top <= 0 ? 0 : Mth.clamp(Mth.floor(now / top * METER_W), 0, METER_W);
         if (cost <= 0) {
             HudDraw.box(g, x, y, x + has, y + METER_H, power.color, 1.0F);
         } else if (never) {
-            HudDraw.box(g, x, y, x + METER_W, y + METER_H, RED, flash ? 0.25F : 0.55F);
-            HudDraw.box(g, x, y, x + has, y + METER_H, RED, flash ? 0.6F : 1.0F);
+            HudDraw.box(g, x, y, x + METER_W, y + METER_H, RED, Mth.lerp(flash, 0.55F, 0.25F));
+            HudDraw.box(g, x, y, x + has, y + METER_H, RED, Mth.lerp(flash, 1.0F, 0.6F));
         } else if (cost > now) {
             int needs = Mth.clamp(Mth.ceil((double) cost / top * METER_W), has, METER_W);
             HudDraw.box(g, x, y, x + has, y + METER_H, ORANGE, 1.0F);

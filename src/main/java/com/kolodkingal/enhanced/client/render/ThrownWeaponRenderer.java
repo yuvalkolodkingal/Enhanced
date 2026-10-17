@@ -15,6 +15,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 /**
  * Mjolnir or Stormbreaker in flight: thrown, it tumbles end over end; coming home, it flies head first with the handle
  * trailing, the way it always returns to Thor's hand.
@@ -28,6 +31,19 @@ public class ThrownWeaponRenderer extends EntityRenderer<ThrownWeaponEntity> {
     private static final float STORMBREAKER_SCALE = 1.3F;
 
     private final ItemRenderer itemRenderer;
+    /**
+     * The heading and pitch of each weapon in flight at its last two ticks (3.3): drawn eased between them, as the game
+     * draws a body's turn; read from the motion of this tick alone, a weapon curving home turned in steps, one a tick.
+     */
+    private final Map<ThrownWeaponEntity, Aim> aims = new WeakHashMap<>();
+
+    private static final class Aim {
+        int tick = Integer.MIN_VALUE;
+        float yaw0;
+        float pitch0;
+        float yaw1;
+        float pitch1;
+    }
 
     public ThrownWeaponRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -37,10 +53,21 @@ public class ThrownWeaponRenderer extends EntityRenderer<ThrownWeaponEntity> {
 
     @Override
     public void render(ThrownWeaponEntity entity, float yaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        Vec3 motion = entity.getDeltaMovement();
-        float heading = motion.horizontalDistanceSqr() < 1.0E-6 ? entity.getYRot()
-                : (float) (Mth.atan2(motion.x, motion.z) * Mth.RAD_TO_DEG);
-        float pitch = (float) (Mth.atan2(motion.y, Math.sqrt(motion.horizontalDistanceSqr())) * Mth.RAD_TO_DEG);
+        Aim aim = aims.computeIfAbsent(entity, e -> new Aim());
+        if (aim.tick != entity.tickCount) {
+            Vec3 motion = entity.getDeltaMovement();
+            float turn = motion.horizontalDistanceSqr() < 1.0E-6 ? entity.getYRot()
+                    : (float) (Mth.atan2(motion.x, motion.z) * Mth.RAD_TO_DEG);
+            float tilt = (float) (Mth.atan2(motion.y, Math.sqrt(motion.horizontalDistanceSqr())) * Mth.RAD_TO_DEG);
+            boolean next = aim.tick == entity.tickCount - 1;
+            aim.yaw0 = next ? aim.yaw1 : turn;
+            aim.pitch0 = next ? aim.pitch1 : tilt;
+            aim.yaw1 = turn;
+            aim.pitch1 = tilt;
+            aim.tick = entity.tickCount;
+        }
+        float heading = Mth.rotLerp(partialTick, aim.yaw0, aim.yaw1);
+        float pitch = Mth.lerp(partialTick, aim.pitch0, aim.pitch1);
         poseStack.pushPose();
         poseStack.translate(0.0F, 0.3F, 0.0F);
         poseStack.mulPose(Axis.YP.rotationDegrees(heading));

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.render.AnimMath;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.network.WardSyncPayload;
@@ -36,6 +37,8 @@ import java.util.Map;
 public final class WardFx {
     /** A ward is drawn while its edge is closer to the camera than this. */
     private static final double REACH = 64.0;
+    /** Over the last blocks of its reach a ward fades out (3.3). */
+    private static final float FADE = 16.0F;
     private static final ResourceLocation HEXAGONS = Enhanced.id("textures/entity/hex_wall.png");
 
     private static final Map<ResourceKey<Level>, List<WardSyncPayload.Dome>> DOMES = new HashMap<>();
@@ -76,14 +79,17 @@ public final class WardFx {
             for (WardSyncPayload.Dome dome : domes) {
                 Vec3 center = new Vec3(dome.x(), dome.y(), dome.z()).subtract(camera);
                 float radius = dome.radius();
-                if (Math.abs(center.length() - radius) > REACH) {
+                double edge = Math.abs(center.length() - radius);
+                if (edge > REACH) {
                     continue;
                 }
+                // (3.3) It fades in over the last blocks of its reach instead of popping in and out at the limit.
+                float reach = 1.0F - AnimMath.ss((float) REACH - FADE, (float) REACH, (float) edge);
                 if (vc == null) {
                     vc = buffers.getBuffer(type);
                 }
                 int segments = Mth.clamp((int) (radius * 1.5F), 24, 96);
-                float breath = still ? 1.0F : 0.85F + 0.15F * Mth.sin(time * 0.05F);
+                float breath = (still ? 1.0F : 0.85F + 0.15F * Mth.sin(time * 0.05F)) * reach;
                 if (lines) {
                     float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 8F));
                     float tilesV = Math.max(3, Math.round(Mth.PI * radius / 8F));

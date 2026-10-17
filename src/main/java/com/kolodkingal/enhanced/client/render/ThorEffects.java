@@ -136,9 +136,11 @@ public final class ThorEffects {
             switch (e.kind()) {
                 case ThorFxPayload.ARC -> {
                     float fade = 1.0F - age / ARC_TICKS;
-                    long seed = (long) (time / 2) * 104729L + e.start();
+                    long seed = e.start() * 104729L;
                     for (int i = 0; i + 1 < e.points().size(); i++) {
-                        lightning(pose, vc, e.points().get(i).subtract(camera), e.points().get(i + 1).subtract(camera), 0.2F, fade, seed + i);
+                        lightning(pose, vc, e.points().get(i).subtract(camera), e.points().get(i + 1).subtract(camera),
+                                0.2F, fade, seed + i,
+                                time / 2.0F);
                     }
                 }
                 case ThorFxPayload.BIFROST_ARRIVAL -> {
@@ -179,9 +181,9 @@ public final class ThorEffects {
 
     /**
      * Thor's lightning beam, from his hand (or the head of the weapon in it) to what he looks at: a jagged bolt with a
-     * white-hot core, an electric blue body and a deep blue halo, reshaping itself every half tick, with a few strands
-     * crackling beside it and short forks branching off. Through Mjolnir or Stormbreaker it is thicker and brighter,
-     * and the God of Thunder's is thicker still. It starts thin, so it never fills the screen in first person.
+     * white-hot core, an electric blue body and a deep blue halo, writhing from one shape to the next, with a few
+     * strands crackling beside it and short forks branching off. Through Mjolnir or Stormbreaker it is thicker and
+     * brighter, and the God of Thunder's is thicker still. It starts thin, so it never fills the screen in first person.
      */
     private static void beam(Minecraft mc, AbstractClientPlayer player, boolean weapon, boolean thunder, Matrix4f pose, VertexConsumer vc,
                              Vec3 camera, float partialTick, float time) {
@@ -201,34 +203,38 @@ public final class ThorEffects {
         }
         float scale = (weapon ? 1.9F : 1.0F) * (thunder ? 1.2F : 1.0F);
         float flicker = 0.85F + 0.15F * Mth.sin(time * 2.9F) * Mth.cos(time * 1.3F);
-        long seed = (long) (time * 2.0F) * 7919L + player.getId() * 104729L;
-        RandomSource random = RandomSource.create(seed);
+        long seed = player.getId() * 104729L;
+        // (3.3) The bolt flows from one shape to the next, and the strands and forks fade across, instead of jumping.
+        float phase = time / BeamRenderer.SHAPE_TICKS;
         double jitter = Math.max(0.12, Math.min(1.2, length * 0.035)) * (weapon ? 1.3 : 1.0);
 
         // A soft glow all along the line, brighter through the weapon.
         EnergyGeometry.ribbon(pose, vc, a, b, 0.12F * scale, 0.16F * scale, EnergyGeometry.argb(HALO, 0.10F * flicker), EnergyGeometry.argb(HALO, 0.14F * flicker));
-        List<Vec3> path = EnergyGeometry.lightningPath(a, b, jitter, random);
+        List<Vec3> path = EnergyGeometry.flowingPath(a, b, jitter, seed, phase);
         taperedLine(pose, vc, path, 0.30F * scale, EnergyGeometry.argb(HALO, 0.30F * flicker));
         taperedLine(pose, vc, path, 0.15F * scale, EnergyGeometry.argb(BLUE, 0.75F * flicker));
         taperedLine(pose, vc, path, 0.055F * scale, EnergyGeometry.argb(CORE, 0.97F));
-        // Loose strands that crackle round the main bolt.
-        int strands = weapon ? 3 : 2;
-        for (int i = 0; i < strands; i++) {
-            List<Vec3> strand = EnergyGeometry.lightningPath(a, b, jitter * 1.6, random);
-            taperedLine(pose, vc, strand, 0.05F * scale, EnergyGeometry.argb(BLUE, 0.55F));
-        }
-        // Forks.
-        int forks = weapon ? 4 : 2;
         Vec3 dir = b.subtract(a).scale(1.0 / length);
-        for (int i = 0; i < forks && path.size() > 3; i++) {
-            Vec3 start = path.get(1 + random.nextInt(path.size() - 2));
-            double reach = 0.5 + random.nextDouble() * Math.min(2.0, length * 0.15);
-            Vec3 side = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5).normalize();
-            Vec3 end = start.add(dir.scale(reach * 0.6)).add(side.scale(reach * 0.8));
-            List<Vec3> fork = EnergyGeometry.lightningPath(start, end, reach * 0.2, random);
-            EnergyGeometry.polyline(pose, vc, fork, 0.06F * scale, EnergyGeometry.argb(BLUE, 0.6F));
-            EnergyGeometry.polyline(pose, vc, fork, 0.02F * scale, EnergyGeometry.argb(CORE, 0.8F));
-        }
+        EnergyGeometry.crossfade(seed + 31L, phase, (random, weight) -> {
+            // Loose strands that crackle round the main bolt.
+            int strands = weapon ? 3 : 2;
+            for (int i = 0; i < strands; i++) {
+                List<Vec3> strand = EnergyGeometry.lightningPath(a, b, jitter * 1.6, random);
+                taperedLine(pose, vc, strand, 0.05F * scale, EnergyGeometry.argb(BLUE, 0.55F * weight));
+            }
+            // Forks.
+            int forks = weapon ? 4 : 2;
+            for (int i = 0; i < forks && path.size() > 3; i++) {
+                Vec3 start = path.get(1 + random.nextInt(path.size() - 2));
+                double reach = 0.5 + random.nextDouble() * Math.min(2.0, length * 0.15);
+                Vec3 side = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5,
+                        random.nextDouble() - 0.5).normalize();
+                Vec3 end = start.add(dir.scale(reach * 0.6)).add(side.scale(reach * 0.8));
+                List<Vec3> fork = EnergyGeometry.lightningPath(start, end, reach * 0.2, random);
+                EnergyGeometry.polyline(pose, vc, fork, 0.06F * scale, EnergyGeometry.argb(BLUE, 0.6F * weight));
+                EnergyGeometry.polyline(pose, vc, fork, 0.02F * scale, EnergyGeometry.argb(CORE, 0.8F * weight));
+            }
+        });
         // Flares where it leaves (smaller the closer it is to the camera) and where it lands.
         float near = (float) Mth.clamp(a.length() / 2.5, 0.12, 1.0);
         flare(pose, vc, a, 0.2F * scale * flicker * near, 0.9F);
@@ -334,42 +340,61 @@ public final class ThorEffects {
             EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.07F * near, EnergyGeometry.argb(CORE, 0.0F), EnergyGeometry.argb(CORE, 0.85F));
         }
         flare(pose, vc, c, 0.34F * flicker * near, 0.9F);
-        RandomSource random = RandomSource.create((long) (time * 2.0F) * 31L + fragment.getId());
-        for (int i = 0; i < 2; i++) {
-            Vec3 end = c.add((random.nextDouble() - 0.5) * 0.9, (random.nextDouble() - 0.5) * 0.9, (random.nextDouble() - 0.5) * 0.9);
-            EnergyGeometry.bolt(pose, vc, c, end, 0.03F, 0.08F, EnergyGeometry.argb(BLUE, 0.8F), random.nextLong());
-        }
+        EnergyGeometry.crossfade(fragment.getId() * 31L, time * 2.0F, (random, weight) -> {
+            for (int i = 0; i < 2; i++) {
+                Vec3 end = c.add((random.nextDouble() - 0.5) * 0.9, (random.nextDouble() - 0.5) * 0.9,
+                        (random.nextDouble() - 0.5) * 0.9);
+                EnergyGeometry.bolt(pose, vc, c, end, 0.03F, 0.08F, EnergyGeometry.argb(BLUE, 0.8F * weight),
+                        random.nextLong());
+            }
+        });
     }
 
-    /** A bolt of MCU lightning: a wide deep-blue halo, an electric blue bolt and a white-hot core, flickering. */
-    private static void lightning(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, float fade, long seed) {
+    /**
+     * A bolt of MCU lightning: a wide deep-blue halo, an electric blue bolt and a white-hot core, writhing from one
+     * shape
+     * to the next as {@code phase} grows (3.3: it jumped to a new shape every other tick).
+     */
+    private static void lightning(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float width, float fade, long seed,
+            float phase) {
         if (fade <= 0) {
             return;
         }
         float jitter = (float) Math.min(1.6, a.distanceTo(b) * 0.06 + 0.2);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(HALO, 0.3F * fade), seed);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 0.7F, jitter, EnergyGeometry.argb(BLUE, 0.75F * fade), seed);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 0.25F, jitter, EnergyGeometry.argb(CORE, 0.95F * fade), seed);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(HALO, 0.3F * fade), seed, phase);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 0.7F, jitter, EnergyGeometry.argb(BLUE, 0.75F * fade), seed, phase);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 0.25F, jitter, EnergyGeometry.argb(CORE, 0.95F * fade), seed,
+                phase);
         // A forked branch.
         Vec3 mid = a.lerp(b, 0.45);
         Vec3 fork = mid.add(new Vec3((seed % 7) - 3, -Math.abs(seed % 5), (seed % 3) - 1).normalize().scale(a.distanceTo(b) * 0.15));
-        EnergyGeometry.bolt(pose, vc, mid, fork, width * 0.35F, jitter * 0.6F, EnergyGeometry.argb(BLUE, 0.5F * fade), seed + 5);
+        EnergyGeometry.bolt(pose, vc, mid, fork, width * 0.35F, jitter * 0.6F, EnergyGeometry.argb(BLUE, 0.5F * fade),
+                seed + 5, phase);
     }
 
-    /** Short arcs of lightning crawling over the God of Thunder's body, changing every other tick. */
+    /**
+     * Short arcs of lightning crawling over the God of Thunder's body, a new set every other tick, each fading in and
+     * out
+     * (3.3: they popped).
+     */
     private static void crackle(Matrix4f pose, VertexConsumer vc, AbstractClientPlayer player, Vec3 camera, float partialTick, float time) {
-        RandomSource random = RandomSource.create((long) (time / 2) * 31L + player.getId());
         Vec3 feet = player.getPosition(partialTick);
-        for (int i = 0; i < 4; i++) {
-            double angle = random.nextDouble() * Mth.TWO_PI;
-            double y = 0.2 + random.nextDouble() * 1.6;
-            // Over the body as it is drawn, leaning into a flight or not.
-            Vec3 a = BodyLean.follow(player, feet.add(Math.cos(angle) * 0.38, y, Math.sin(angle) * 0.38), partialTick)
-                    .subtract(camera);
-            Vec3 b = a.add((random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.7, (random.nextDouble() - 0.5) * 0.6);
-            EnergyGeometry.bolt(pose, vc, a, b, 0.03F, 0.12F, EnergyGeometry.argb(BLUE, 0.8F), random.nextLong());
-            EnergyGeometry.bolt(pose, vc, a, b, 0.012F, 0.12F, EnergyGeometry.argb(CORE, 0.9F), random.nextLong());
-        }
+        EnergyGeometry.crossfade(player.getId() * 31L, time / 2.0F, (random, weight) -> {
+            for (int i = 0; i < 4; i++) {
+                double angle = random.nextDouble() * Mth.TWO_PI;
+                double y = 0.2 + random.nextDouble() * 1.6;
+                // Over the body as it is drawn, leaning into a flight or not.
+                Vec3 a = BodyLean.follow(player, feet.add(Math.cos(angle) * 0.38, y, Math.sin(angle) * 0.38),
+                        partialTick)
+                        .subtract(camera);
+                Vec3 b = a.add((random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.7,
+                        (random.nextDouble() - 0.5) * 0.6);
+                EnergyGeometry.bolt(pose, vc, a, b, 0.03F, 0.12F, EnergyGeometry.argb(BLUE, 0.8F * weight),
+                        random.nextLong());
+                EnergyGeometry.bolt(pose, vc, a, b, 0.012F, 0.12F, EnergyGeometry.argb(CORE, 0.9F * weight),
+                        random.nextLong());
+            }
+        });
     }
 
     /** The Bifrost: a column of rainbow light, its colours swirling round, a white core, from the sky to {@code feet}. */
