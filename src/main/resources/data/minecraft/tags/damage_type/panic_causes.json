@@ -13,6 +13,8 @@
     "enhanced:hex_bolt",
     "enhanced:lightning_beam",
     "enhanced:hex_beam",
-    "enhanced:darkhold_beam"
+    "enhanced:darkhold_beam",
+    "enhanced:hero_power",
+    "enhanced:hero_beam"
   ]
 }

@@ -75,6 +75,10 @@ public final class SuitSkins {
             // In disguise Vision looks human (WandaVision).
             return VISION_HUMAN;
         }
+        if (power == Power.CUSTOM) {
+            // 3.3: a custom hero wears his own PNG, a look of one of the mod's heroes, or his own skin.
+            return com.kolodkingal.enhanced.client.custom.CustomSkins.suitFor(player);
+        }
         // Vision's body is synthetic, so he is always in his look; the newer heroes always wear theirs too.
         Variant look = Powers.variant(player);
         return look.ownSkin() ? null : skinOf(look);

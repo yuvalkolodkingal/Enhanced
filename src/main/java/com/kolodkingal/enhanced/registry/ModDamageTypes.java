@@ -56,6 +56,12 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> APOCALYPSE_BLOW = key("apocalypse_blow");
     public static final ResourceKey<DamageType> ENTOMB = key("entomb");
 
+    // ===== 3.3 custom heroes =====
+    /** The blows, bolts, blasts and elements of a custom hero's powers (3.3). */
+    public static final ResourceKey<DamageType> HERO_POWER = key("hero_power");
+    /** The hits of a custom hero's continuous beam (Energy Blast's beam, the flamethrower, the water jet): no damage cooldown. */
+    public static final ResourceKey<DamageType> HERO_BEAM = key("hero_beam");
+
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }

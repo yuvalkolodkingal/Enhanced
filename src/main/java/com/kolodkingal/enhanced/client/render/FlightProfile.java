@@ -171,7 +171,8 @@ public final class FlightProfile {
             case THANOS -> null; // he does not fly: no take-off, banking or braking (his landings are ThanosActing's)
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
-            case NONE, QUICKSILVER, TOMMY, LOKI -> null;
+            // 3.3: a custom hero flies in the plain pose of the game (his look and his powers are anyone's).
+            case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;
         };
     }
 

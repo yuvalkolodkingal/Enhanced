@@ -193,7 +193,7 @@ public final class BlockLifting {
         double maxHardness = switch (mode) {
             case BILLY -> EnhancedConfig.BILLY_BLOCK_LIFT_MAX_HARDNESS.get();
             case MAGNETO -> EnhancedConfig.MAGNETO_BLOCK_LIFT_MAX_HARDNESS.get();
-            case WANDA, JEAN -> EnhancedConfig.BLOCK_LIFT_MAX_HARDNESS.get();
+            case WANDA, JEAN, CUSTOM, CUSTOM_BLOCKS -> EnhancedConfig.BLOCK_LIFT_MAX_HARDNESS.get();
         };
         float hardness = state.getDestroySpeed(level, pos);
         return hardness >= 0 && hardness <= maxHardness;

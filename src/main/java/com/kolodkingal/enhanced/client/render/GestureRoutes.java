@@ -339,6 +339,9 @@ public final class GestureRoutes {
                 case 2 -> "flight";
                 default -> "flag:CHAOS_SHIELD";
             };
+            // 3.3: a custom hero's keys are whatever powers he put on them; each press that starts a cooldown is a cast
+            // (CustomClient.cooldownGesture), a held beam the stance of any beam.
+            case CUSTOM -> "cooldown";
             default -> "none: no abilities";
         };
     }

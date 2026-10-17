@@ -34,6 +34,7 @@ public final class ModCreativeTab {
                         output.accept(ModItems.ULTRON_CORE.get());
                         output.accept(ModItems.CAPSTONE.get());
                         output.accept(ModItems.ESSENCE.get());
+                        output.accept(ModItems.HERO_CREATOR.get());
                     })
                     .build());
 

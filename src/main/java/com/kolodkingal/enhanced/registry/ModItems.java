@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.item.CapstoneItem;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.item.EssenceItem;
+import com.kolodkingal.enhanced.item.HeroCreatorItem;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
 import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
@@ -112,6 +113,10 @@ public final class ModItems {
             () -> new EssenceItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
     /** Projectile sprites only; not in the creative tab. */
+    /** 3.3: the Hero Creator, a Creative-only item (the Creative tab, no recipe, no loot). */
+    public static final DeferredItem<HeroCreatorItem> HERO_CREATOR = ITEMS.register("hero_creator",
+            () -> new HeroCreatorItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
     public static final DeferredItem<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");
     public static final DeferredItem<Item> LOKI_DAGGER = ITEMS.registerSimpleItem("loki_dagger");
 

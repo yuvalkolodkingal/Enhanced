@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -47,7 +48,7 @@ public final class PowerTicker {
             case TOMMY -> TommyAbilities.tick(player, data);
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE -> HeroServers.tick(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CUSTOM -> HeroServers.tick(player, data);
             case NONE -> {
             }
         }
@@ -61,12 +62,13 @@ public final class PowerTicker {
         Power power = data.power();
         // Vision's dense body is too heavy to fly, and Thor needs his weapon to fly.
         boolean canFly = power.canFly() && !(power == Power.VISION && data.dense())
-                && !(power == Power.THOR && !ThorAbilities.canFly(player, data));
+                && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
+                && !(power == Power.CUSTOM && !CustomHeroes.canFly(player));
         setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
         boolean survivalLike = !player.isCreative() && !player.isSpectator();
-        float speed = survivalLike && canFly ? power.flightSpeed() : 0.05F;
+        float speed = survivalLike && canFly ? (power == Power.CUSTOM ? CustomHeroes.flightSpeed(player) : power.flightSpeed()) : 0.05F;
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);
@@ -99,7 +101,7 @@ public final class PowerTicker {
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);
             case TOMMY -> TommyAbilities.endAll(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE -> HeroServers.endAll(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CUSTOM -> HeroServers.endAll(player, data);
             default -> {
             }
         }
@@ -121,7 +123,7 @@ public final class PowerTicker {
     }
 
     /** The hero's flight key: take off or land, the same as double-tapping Space. */
-    static void toggleFlight(ServerPlayer player) {
+    public static void toggleFlight(ServerPlayer player) {
         if (!player.mayFly() || MjolnirPin.isPinned(player)) {
             return;
         }

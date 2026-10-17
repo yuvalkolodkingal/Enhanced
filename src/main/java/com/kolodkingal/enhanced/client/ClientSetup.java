@@ -93,6 +93,8 @@ public final class ClientSetup {
             UltronViewer.register();
             // ===== apocalypse =====
             ApocalypseViewer.register();
+            // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
+            EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
         });
     }
 
@@ -221,6 +223,8 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("build_magic"), new BuildHud());
         // 3.2: the Darkhold's hint panel while it is held.
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("darkhold"), new DarkholdHud());
+        // 3.3: a custom hero's panel, in his colours.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("custom_hero"), new com.kolodkingal.enhanced.client.custom.CustomHeroHud());
     }
 
     private ClientSetup() {

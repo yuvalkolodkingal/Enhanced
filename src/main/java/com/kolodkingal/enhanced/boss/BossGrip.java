@@ -188,7 +188,7 @@ public final class BossGrip {
         double factor = switch (mode) {
             case BILLY -> BossConfig.BILLY_HOLD_FACTOR.get();
             case MAGNETO -> BossConfig.MAGNETO_HOLD_FACTOR.get();
-            case WANDA, JEAN -> 1.0;
+            case WANDA, JEAN, CUSTOM, CUSTOM_BLOCKS -> 1.0;
         };
         return Math.max(MIN_HOLD_TICKS, (int) Math.round(ticks * factor));
     }

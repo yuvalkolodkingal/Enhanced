@@ -50,8 +50,8 @@ public class PowerHud implements LayeredDraw.Layer {
         }
         PowerData data = Powers.get(player);
         Power power = data.power();
-        if (!power.hasPowers()) {
-            return;
+        if (!power.hasPowers() || power == Power.CUSTOM) {
+            return; // (3.3: a custom hero's panel is drawn in his own colours by CustomHeroHud)
         }
         Font font = mc.font;
         long now = mc.level.getGameTime();
@@ -147,7 +147,7 @@ public class PowerHud implements LayeredDraw.Layer {
             case TOMMY -> tommy(player, data, ability);
             case LOKI -> loki(player, data, ability);
             case THOR -> thor(player, data, ability);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, NONE -> null;
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CUSTOM, NONE -> null;
         };
     }
 

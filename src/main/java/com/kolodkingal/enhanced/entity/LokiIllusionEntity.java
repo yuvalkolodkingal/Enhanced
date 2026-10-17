@@ -1,5 +1,8 @@
 package com.kolodkingal.enhanced.entity;
 
+import com.kolodkingal.enhanced.ability.AreaTargets;
+import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -17,6 +20,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -49,7 +55,12 @@ public class LokiIllusionEntity extends PathfinderMob {
     /** What an illusion is for. New modes (copies that fight) are added here. */
     public enum Mode {
         /** Walks off on its own to draw attention away from Loki; it deals no damage. */
-        DECOY
+        DECOY,
+        /**
+         * 3.3: a custom hero's Duplication ("clones"): it fights for its caster, the creatures that hurt him or that he hurt,
+         * else the nearest monster (one hit still makes it dissolve).
+         */
+        FIGHTER
     }
 
     /** The warm-white light an illusion dissolves into (Thor, 2011). */
@@ -77,7 +88,8 @@ public class LokiIllusionEntity extends PathfinderMob {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 1.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
-                .add(Attributes.FOLLOW_RANGE, 16.0);
+                .add(Attributes.FOLLOW_RANGE, 16.0)
+                .add(Attributes.ATTACK_DAMAGE, 3.0);
     }
 
     /**
@@ -124,6 +136,7 @@ public class LokiIllusionEntity extends PathfinderMob {
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new WalkAwayGoal());
+        goalSelector.addGoal(2, new FighterAttackGoal());
         goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -157,10 +170,15 @@ public class LokiIllusionEntity extends PathfinderMob {
             return;
         }
         if (tickCount % 10 == 0) {
-            // Without its caster (gone, dead, or no longer Loki) the spell breaks.
+            // Without its caster (gone, dead, or no longer Loki, or a custom hero who duplicates) the spell breaks.
             Player owner = owner();
-            if (owner == null || !owner.isAlive() || !Powers.is(owner, Power.LOKI)) {
+            if (owner == null || !owner.isAlive() || !Powers.is(owner, Power.LOKI)
+                    && CustomHeroes.pick(owner, PowerModule.DUPLICATION) == null) {
                 dissolve(null);
+                return;
+            }
+            if (mode() == Mode.FIGHTER) {
+                chooseFoe(owner);
             }
         }
     }
@@ -232,6 +250,49 @@ public class LokiIllusionEntity extends PathfinderMob {
     public boolean doHurtTarget(Entity target) {
         // A decoy can't hurt anyone.
         return mode() != Mode.DECOY && super.doHurtTarget(target);
+    }
+
+    /** A fighter's foe: whoever hurt its caster, or whom he hurt, or the nearest monster; never its caster or his friends. */
+    private void chooseFoe(Player owner) {
+        LivingEntity current = getTarget();
+        if (current != null && current.isAlive() && current != owner && distanceToSqr(current) < 24 * 24) {
+            return;
+        }
+        LivingEntity foe = null;
+        for (LivingEntity candidate : new LivingEntity[]{owner.getLastHurtByMob(), owner.getLastHurtMob()}) {
+            if (candidate != null && candidate.isAlive() && !(candidate instanceof LokiIllusionEntity) && distanceToSqr(candidate) < 16 * 16
+                    && AreaTargets.mayHurt(owner, candidate, false)) {
+                foe = candidate;
+                break;
+            }
+        }
+        if (foe == null) {
+            double best = 12 * 12;
+            for (Mob mob : level().getEntitiesOfClass(Mob.class, getBoundingBox().inflate(12), m -> m instanceof Enemy && m.isAlive())) {
+                if (distanceToSqr(mob) < best && AreaTargets.mayHurt(owner, mob, false)) {
+                    best = distanceToSqr(mob);
+                    foe = mob;
+                }
+            }
+        }
+        setTarget(foe);
+    }
+
+    /** A fighter walks at its foe and strikes it, as a monster would. */
+    private class FighterAttackGoal extends MeleeAttackGoal {
+        FighterAttackGoal() {
+            super(LokiIllusionEntity.this, 1.2, true);
+        }
+
+        @Override
+        public boolean canUse() {
+            return mode() == Mode.FIGHTER && super.canUse();
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return mode() == Mode.FIGHTER && super.canContinueToUse();
+        }
     }
 
     /** A decoy walks off in its own direction, like the real Loki slipping away. */

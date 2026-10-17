@@ -196,6 +196,20 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUILD_RANK_UP = register("build_rank_up");
     public static final DeferredHolder<SoundEvent, SoundEvent> APOCALYPSE_CRIT = register("apocalypse_crit");
 
+    // ===== 3.3 custom heroes (the Hero Creator's sounds and the custom powers') =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_AWAKEN = register("custom_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_BLAST = register("custom_blast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_ZAP = register("custom_zap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_IMPACT = register("custom_impact");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_HEAL = register("custom_heal");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_SHIFT = register("custom_shift");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_WHOOSH = register("custom_whoosh");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_TELEPORT = register("custom_teleport");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_SHIELD = register("custom_shield");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_SPELL = register("custom_spell");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CUSTOM_SCREAM = register("custom_scream");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HERO_CREATOR_OPEN = register("hero_creator_open");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }
