@@ -174,10 +174,10 @@ public final class SkeletonTests {
     @GameTest(template = ARENA, batch = SKELETON)
     public static void theFiveNewHeroesComeLastInEilonsOrder(GameTestHelper helper) {
         Power[] all = Power.values();
+        // (3.3 appends its heroes after Apocalypse: the five of 3.0 keep their places right after Thor.)
         for (int i = 0; i < NEW_HEROES.size(); i++) {
-            check(all[all.length - NEW_HEROES.size() + i] == NEW_HEROES.get(i), "hero " + i + " of 3.0 is " + NEW_HEROES.get(i));
+            check(all[Power.THOR.ordinal() + 1 + i] == NEW_HEROES.get(i), "hero " + i + " of 3.0 is " + NEW_HEROES.get(i));
         }
-        check(all[all.length - NEW_HEROES.size() - 1] == Power.THOR, "the heroes of 3.0 follow Thor (the stream sends the ordinal)");
         check(Power.THOR.ordinal() == 8, "and nobody before them moved: Thor is still the ninth power");
         helper.succeed();
     }
@@ -1166,8 +1166,8 @@ public final class SkeletonTests {
     // The network
 
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theProtocolIsSix(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("6"), "3.2 bumps the protocol from 5 to 6, once: " + ModNetwork.PROTOCOL_VERSION);
+    public static void theProtocolIsSeven(GameTestHelper helper) {
+        check(ModNetwork.PROTOCOL_VERSION.equals("7"), "3.3 bumps the protocol from 6 to 7, once: " + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 
