@@ -36,5 +36,8 @@ public enum Resource {
     /** The one Hex a player may own. */
     HEX,
     /** Ultron's drones and his Second Life. */
-    DRONES
+    DRONES,
+    // (L4, 3.4) ----
+    /** {@code PowerData.ironCharge}: Magneto's shrapnel charge, which is also Ultron's plasma pool. */
+    IRON_CHARGE
 }

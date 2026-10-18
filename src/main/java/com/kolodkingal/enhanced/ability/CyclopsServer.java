@@ -21,6 +21,11 @@ public final class CyclopsServer implements HeroServer {
     }
 
     @Override
+    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        CyclopsAbilities.onKey(player, data, ability, down, alt);
+    }
+
+    @Override
     public void tick(ServerPlayer player, PowerData data) {
         CyclopsAbilities.tick(player, data);
     }

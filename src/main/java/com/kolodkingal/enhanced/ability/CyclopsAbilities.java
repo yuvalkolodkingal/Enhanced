@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.CyclopsConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.network.CyclopsFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -97,6 +98,14 @@ public final class CyclopsAbilities {
     // ---- input ----
 
     static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /**
+     * A key of his, with its Sneak variant said explicitly ({@code alt}): the Sneak of Cyclops himself, or the binding of a
+     * custom hero with his abilities (3.4).
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (!down) {
             if (ability == 1 && opticFiring(player)) {
                 ContinuousBeam.stop(player);
@@ -108,7 +117,7 @@ public final class CyclopsAbilities {
         }
         switch (ability) {
             case 1 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     ricochet(player, data);
                 } else {
                     opticStart(player, data);
@@ -118,7 +127,7 @@ public final class CyclopsAbilities {
             case 3 -> leap(player, data);
             case 4 -> rally(player, data);
             case 5 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     CyclopsGlasses.takeOff(player, data);
                 } else {
                     CyclopsGlasses.putOn(player, data);
@@ -130,15 +139,24 @@ public final class CyclopsAbilities {
     }
 
     /**
+     * Whether the blasts of this player's eyes need the ruby-quartz glasses: Cyclops's do; a custom hero's with his abilities
+     * (3.4) never do, he aims his eyes as he likes, and his "glasses" key opens and shuts them ({@link CyclopsGlasses}).
+     */
+    public static boolean needsGlasses(PowerData data) {
+        return data.power() == Power.CYCLOPS;
+    }
+
+    /**
      * Whether his eyes can be aimed now: the glasses are on and nothing is pouring out. Otherwise he is told why, and the
      * blast that needs them does nothing.
      */
     private static boolean canAim(ServerPlayer player, PowerData data) {
         if (data.is(Live.CYCLOPS_UNLEASHED)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.cyclops.unleashed_busy"), true);
+            player.displayClientMessage(Component.translatable(needsGlasses(data) ? "message.enhanced.cyclops.unleashed_busy"
+                    : "message.enhanced.cyclops.eyes_open_busy"), true);
             return false;
         }
-        if (!CyclopsGlasses.wears(player)) {
+        if (needsGlasses(data) && !CyclopsGlasses.wears(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.cyclops.no_glasses"), true);
             return false;
         }
@@ -148,10 +166,14 @@ public final class CyclopsAbilities {
     // ---- every tick ----
 
     static void tick(ServerPlayer player, PowerData data) {
-        CyclopsGlasses.tick(player, data);
-        if (data.is(Live.CYCLOPS_UNLEASHED)) {
+        // (3.4: each part for the ability it belongs to: a custom hero ticks here with any of Cyclops's abilities.)
+        if (needsGlasses(data)) {
+            CyclopsGlasses.tick(player, data);
+        }
+        if (data.is(Live.CYCLOPS_UNLEASHED) && data.has(HeroAbility.CYCLOPS_GLASSES)) {
             CyclopsGlasses.unleashedTick(player, data);
-        } else if (opticFiring(player) || (data.is(Live.BEAMING) && ContinuousBeam.isFiring(player))) {
+        } else if (data.has(HeroAbility.CYCLOPS_OPTIC_BLAST)
+                && (opticFiring(player) || (data.is(Live.BEAMING) && ContinuousBeam.isFiring(player)))) {
             opticTick(player, data);
         }
         State state = STATES.get(player.getUUID());
@@ -179,9 +201,11 @@ public final class CyclopsAbilities {
      * of it on anyone else. The modifiers are permanent, so they are already right when a player logs in.
      */
     static void applyBody(ServerPlayer player, PowerData data) {
-        boolean hero = data.power() == Power.CYCLOPS;
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, hero ? CyclopsConfig.BODY_HEALTH_BONUS.get() : 0.0, hero);
-        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, hero ? CyclopsConfig.ARMOR.get() : 0.0, hero);
+        // (3.4: and a custom hero with his body, its amounts times the strength's factor.)
+        boolean hero = data.has(HeroAbility.CYCLOPS_BODY);
+        double scale = data.bodyScale(HeroAbility.CYCLOPS_BODY);
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, hero ? CyclopsConfig.BODY_HEALTH_BONUS.get() * scale : 0.0, hero);
+        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, hero ? CyclopsConfig.ARMOR.get() * scale : 0.0, hero);
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
@@ -231,7 +255,7 @@ public final class CyclopsAbilities {
             data.set(Live.BEAMING, false); // (the flag outlived the beam: a server that restarted, a state cleared)
             return;
         }
-        if (player.isSpectator() || starving(player) || !CyclopsGlasses.wears(player)) {
+        if (player.isSpectator() || starving(player) || needsGlasses(data) && !CyclopsGlasses.wears(player)) {
             if (starving(player)) {
                 player.displayClientMessage(Component.translatable("message.enhanced.cyclops.hungry"), true);
             }
@@ -273,7 +297,7 @@ public final class CyclopsAbilities {
     public static List<LivingEntity> ricochet(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(RICOCHET_SLOT, now) || !canAim(player, data)) {
+        if (!data.isReady(HeroAbility.CYCLOPS_OPTIC_BLAST, now) || !canAim(player, data)) {
             return List.of();
         }
         List<Vec3> path = new ArrayList<>();
@@ -316,7 +340,7 @@ public final class CyclopsAbilities {
             level.sendParticles(new EnergyParticleOptions(RED, 1.0F), end.x, end.y, end.z, 6, 0.08, 0.08, 0.08, 0.12);
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, end.x, end.y, end.z, 3, 0.1, 0.1, 0.1, 0.2);
         }
-        data.startCooldown(RICOCHET_SLOT, now, CyclopsConfig.RICOCHET_COOLDOWN.get());
+        data.startCooldown(HeroAbility.CYCLOPS_OPTIC_BLAST, now, CyclopsConfig.RICOCHET_COOLDOWN.get());
         player.causeFoodExhaustion(CyclopsConfig.RICOCHET_EXHAUSTION.get().floatValue());
         send(player, CyclopsFxPayload.RICOCHET, path, hit.size());
         level.playSound(null, player.getX(), player.getEyeY(), player.getZ(), ModSounds.CYCLOPS_RICOCHET.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -369,7 +393,7 @@ public final class CyclopsAbilities {
     public static int concussion(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(CONCUSSION_SLOT, now) || !canAim(player, data)) {
+        if (!data.isReady(HeroAbility.CYCLOPS_CONCUSSION, now) || !canAim(player, data)) {
             return 0;
         }
         Vec3 eye = player.getEyePosition();
@@ -398,7 +422,7 @@ public final class CyclopsAbilities {
                 projectile.hurtMarked = true;
             }
         }
-        data.startCooldown(CONCUSSION_SLOT, now, CyclopsConfig.CONCUSSION_COOLDOWN.get());
+        data.startCooldown(HeroAbility.CYCLOPS_CONCUSSION, now, CyclopsConfig.CONCUSSION_COOLDOWN.get());
         player.causeFoodExhaustion(CyclopsConfig.CONCUSSION_EXHAUSTION.get().floatValue());
         send(player, CyclopsFxPayload.CONCUSSION, List.of(eye, look), (int) Math.round(range * 10.0));
         level.playSound(null, player.getX(), player.getEyeY(), player.getZ(), ModSounds.CYCLOPS_CONCUSSION.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -431,7 +455,7 @@ public final class CyclopsAbilities {
     public static boolean leap(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(LEAP_SLOT, now) || !canAim(player, data)) {
+        if (!data.isReady(HeroAbility.CYCLOPS_LEAP, now) || !canAim(player, data)) {
             return false;
         }
         if (MjolnirPin.isPinned(player)) {
@@ -466,7 +490,7 @@ public final class CyclopsAbilities {
                 shove(player, victim, victim.position().subtract(spot), 0.8, 0.35);
             }
         }
-        data.startCooldown(LEAP_SLOT, now, CyclopsConfig.LEAP_COOLDOWN.get());
+        data.startCooldown(HeroAbility.CYCLOPS_LEAP, now, CyclopsConfig.LEAP_COOLDOWN.get());
         player.causeFoodExhaustion(CyclopsConfig.LEAP_EXHAUSTION.get().floatValue());
         send(player, CyclopsFxPayload.LEAP, List.of(spot, player.getEyePosition()), (int) Math.round(radius * 10.0));
         level.playSound(null, spot.x, spot.y, spot.z, ModSounds.CYCLOPS_LEAP.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -495,7 +519,7 @@ public final class CyclopsAbilities {
     public static int rally(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(RALLY_SLOT, now)) {
+        if (!data.isReady(HeroAbility.CYCLOPS_RALLY, now)) {
             return 0;
         }
         int radius = CyclopsConfig.RALLY_RADIUS.get();
@@ -511,7 +535,7 @@ public final class CyclopsAbilities {
             ally.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, ticks, 0, false, true, true), player);
             count++;
         }
-        data.startCooldown(RALLY_SLOT, now, CyclopsConfig.RALLY_COOLDOWN.get());
+        data.startCooldown(HeroAbility.CYCLOPS_RALLY, now, CyclopsConfig.RALLY_COOLDOWN.get());
         player.causeFoodExhaustion(CyclopsConfig.RALLY_EXHAUSTION.get().floatValue());
         player.displayClientMessage(Component.translatable("message.enhanced.cyclops.rally", count - 1), true);
         send(player, CyclopsFxPayload.RALLY, List.of(player.position()), radius);
@@ -540,7 +564,7 @@ public final class CyclopsAbilities {
     /** He died or left: whatever pours from his eyes ends (it never outlives him), and his record goes when he leaves. */
     static void onGone(ServerPlayer player, boolean leaving) {
         PowerData data = Powers.get(player);
-        if (data.power() == Power.CYCLOPS) {
+        if (data.acts(Power.CYCLOPS)) {
             CyclopsGlasses.end(player, data, false);
             if (ContinuousBeam.isFiring(player) && !leaving) {
                 ContinuousBeam.stop(player);

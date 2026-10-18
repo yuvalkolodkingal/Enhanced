@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.ApocalypseMusic;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -57,7 +58,8 @@ public final class ApocalypseClient implements HeroClient {
 
     @Override
     public void stanceTargets(HeroAnimState s, AbstractClientPlayer p, PowerData data, boolean[] on, long now) {
-        on[Stance.APOC_SHIELD.ordinal()] = data.chaosShieldActive();
+        on[Stance.APOC_SHIELD.ordinal()] = (data.power() != Power.CUSTOM || data.has(HeroAbility.APOCALYPSE_SHIELD)) // (3.4: his shield's)
+                && data.chaosShieldActive();
         on[Stance.APOC_STORM.ordinal()] = data.is(Live.SANDSTORM);
     }
 

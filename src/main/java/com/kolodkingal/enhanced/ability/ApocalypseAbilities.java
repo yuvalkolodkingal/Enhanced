@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseFx;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
 import com.kolodkingal.enhanced.apocalypse.SandHazards;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
@@ -112,6 +113,14 @@ public final class ApocalypseAbilities {
     // ---- input ----
 
     static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /**
+     * A key of his, with its Sneak variant said explicitly ({@code alt}): the Sneak of Apocalypse himself, or the binding of a
+     * custom hero with his abilities (3.4).
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (!down) {
             if (ability == ApocalypseGuard.SLOT && data.chaosShieldActive()) {
                 ApocalypseGuard.drop(player, data, false);
@@ -123,7 +132,7 @@ public final class ApocalypseAbilities {
         }
         switch (ability) {
             case 1 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     entomb(player, data);
                 } else {
                     wave(player, data);
@@ -133,7 +142,7 @@ public final class ApocalypseAbilities {
             case 3 -> portal(player, data);
             case 4 -> ApocalypseGuard.raise(player, data);
             case 5 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     sandstorm(player, data);
                 } else {
                     bestow(player, data);
@@ -147,11 +156,16 @@ public final class ApocalypseAbilities {
     // ---- every tick ----
 
     static void tick(ServerPlayer player, PowerData data) {
-        healingFactor(player);
-        if (data.chaosShieldActive()) {
+        // (3.4: each part for the ability it belongs to: a custom hero ticks here with any of Apocalypse's abilities.)
+        if (data.has(HeroAbility.APOCALYPSE_BODY)) {
+            healingFactor(player);
+        }
+        if (data.chaosShieldActive() && data.has(HeroAbility.APOCALYPSE_SHIELD)) {
             ApocalypseGuard.tick(player, data);
         }
-        stormTick(player, data);
+        if (data.has(HeroAbility.APOCALYPSE_BESTOW)) {
+            stormTick(player, data);
+        }
     }
 
     /** For every player: a cocoon covers the hands (a held ability lets go), and Empowered recharges cooldowns faster. */
@@ -176,12 +190,15 @@ public final class ApocalypseAbilities {
      * and nothing of it on anyone else. The modifiers are permanent, so they are already right when a player logs in.
      */
     static void applyBody(ServerPlayer player, PowerData data) {
-        boolean hero = data.power() == Power.APOCALYPSE;
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, hero ? ApocalypseConfig.BODY_HEALTH_BONUS.get() : 0.0, hero);
-        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, hero ? ApocalypseConfig.ARMOR.get() : 0.0, hero);
-        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, BODY_TOUGHNESS, hero ? ApocalypseConfig.ARMOR_TOUGHNESS.get() : 0.0, hero);
+        // (3.4: and a custom hero with his body, its amounts times the strength's factor.)
+        boolean hero = data.has(HeroAbility.APOCALYPSE_BODY);
+        double scale = data.bodyScale(HeroAbility.APOCALYPSE_BODY);
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, hero ? ApocalypseConfig.BODY_HEALTH_BONUS.get() * scale : 0.0, hero);
+        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, hero ? ApocalypseConfig.ARMOR.get() * scale : 0.0, hero);
+        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, BODY_TOUGHNESS,
+                hero ? ApocalypseConfig.ARMOR_TOUGHNESS.get() * scale : 0.0, hero);
         PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, BODY_KNOCKBACK,
-                hero ? ApocalypseConfig.KNOCKBACK_RESISTANCE.get() : 0.0, hero);
+                hero ? Math.min(1.0, ApocalypseConfig.KNOCKBACK_RESISTANCE.get() * scale) : 0.0, hero);
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
@@ -214,7 +231,7 @@ public final class ApocalypseAbilities {
     private static void wave(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(WAVE_SLOT, now)) {
+        if (!data.isReady(HeroAbility.APOCALYPSE_SAND, now)) {
             return;
         }
         // A levitating Apocalypse casts it at the ground beneath; with none in reach there is no sand to pull.
@@ -230,7 +247,7 @@ public final class ApocalypseAbilities {
         SandHazards.WaveSpec spec = new SandHazards.WaveSpec(ApocalypseConfig.WAVE_SPEED.get(), ApocalypseConfig.WAVE_LENGTH.get(),
                 WAVE_WIDTH, WAVE_HEIGHT, ApocalypseConfig.WAVE_DAMAGE.get().floatValue(), ApocalypseConfig.WAVE_SLOW_TICKS.get(), WAVE_KNOCKBACK);
         SandHazards.wave(level, player, null, new Vec3(player.getX(), ground, player.getZ()), dir, spec, null, 0.0);
-        data.startCooldown(WAVE_SLOT, now, ApocalypseConfig.WAVE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.APOCALYPSE_SAND, now, ApocalypseConfig.WAVE_COOLDOWN.get());
         player.causeFoodExhaustion(ApocalypseConfig.WAVE_EXHAUSTION.get().floatValue());
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.SAND_WAVE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
@@ -245,7 +262,7 @@ public final class ApocalypseAbilities {
     private static void entomb(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(WAVE_SLOT, now)) {
+        if (!data.isReady(HeroAbility.APOCALYPSE_SAND, now)) {
             return;
         }
         EntityHitResult hit = ApocalypseAim.entombTarget(player);
@@ -270,7 +287,7 @@ public final class ApocalypseAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.entomb.slips"), true);
             return;
         }
-        data.startCooldown(WAVE_SLOT, now, ApocalypseConfig.ENTOMB_COOLDOWN.get());
+        data.startCooldown(HeroAbility.APOCALYPSE_SAND, now, ApocalypseConfig.ENTOMB_COOLDOWN.get());
         player.causeFoodExhaustion(ApocalypseConfig.ENTOMB_EXHAUSTION.get().floatValue());
         ApocalypseFx.send(level, victim.position(), ApocalypseFxPayload.ENTOMB, player.getId(), player.position(), victim.position(),
                 victim.getId(), ENTOMB_CLOSE_TICKS);
@@ -288,7 +305,7 @@ public final class ApocalypseAbilities {
     private static void portal(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(PORTAL_SLOT, now)) {
+        if (!data.isReady(HeroAbility.APOCALYPSE_PORTAL, now)) {
             return;
         }
         BlockHitResult hit = ApocalypseAim.portalTarget(player);
@@ -305,7 +322,7 @@ public final class ApocalypseAbilities {
         if (!HexManager.onTeleport(level, player, to)) {
             return; // a Hex wall, the arena of a boss fight, or Mjolnir holds him
         }
-        data.startCooldown(PORTAL_SLOT, now, ApocalypseConfig.PORTAL_COOLDOWN.get());
+        data.startCooldown(HeroAbility.APOCALYPSE_PORTAL, now, ApocalypseConfig.PORTAL_COOLDOWN.get());
         player.causeFoodExhaustion(ApocalypseConfig.PORTAL_EXHAUSTION.get().floatValue());
         Vec3 from = player.position();
         player.teleportTo(level, to.x, to.y, to.z, player.getYRot(), player.getXRot());
@@ -381,7 +398,7 @@ public final class ApocalypseAbilities {
     private static void bestow(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(BESTOW_SLOT, now)) {
+        if (!data.isReady(HeroAbility.APOCALYPSE_BESTOW, now)) {
             return;
         }
         EntityHitResult hit = Raycasts.entity(player, ApocalypseConfig.BESTOW_RANGE.get(), 0.3,
@@ -408,7 +425,7 @@ public final class ApocalypseAbilities {
         state.bestowed.addLast(target.getUUID());
         target.addEffect(new MobEffectInstance(ModEffects.EMPOWERED, ApocalypseConfig.BESTOW_TICKS.get(), 0, false, true, true), player);
 
-        data.startCooldown(BESTOW_SLOT, now, ApocalypseConfig.BESTOW_COOLDOWN.get());
+        data.startCooldown(HeroAbility.APOCALYPSE_BESTOW, now, ApocalypseConfig.BESTOW_COOLDOWN.get());
         player.causeFoodExhaustion(ApocalypseConfig.BESTOW_EXHAUSTION.get().floatValue());
         player.displayClientMessage(Component.translatable("message.enhanced.bestow.done", target.getDisplayName()), true);
         flow(level, player.getEyePosition().add(player.getLookAngle().scale(0.6)).subtract(0, 0.4, 0), target.position().add(0, target.getBbHeight() * 0.6, 0));
@@ -483,14 +500,14 @@ public final class ApocalypseAbilities {
     private static void sandstorm(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(BESTOW_SLOT, now) || data.is(Live.SANDSTORM)) {
+        if (!data.isReady(HeroAbility.APOCALYPSE_BESTOW, now) || data.is(Live.SANDSTORM)) {
             return;
         }
         State state = state(player.getUUID());
         state.stormStart = now;
         state.stormEnd = now + ApocalypseConfig.STORM_TICKS.get();
         data.set(Live.SANDSTORM, true);
-        data.startCooldown(BESTOW_SLOT, now, ApocalypseConfig.STORM_COOLDOWN.get());
+        data.startCooldown(HeroAbility.APOCALYPSE_BESTOW, now, ApocalypseConfig.STORM_COOLDOWN.get());
         player.causeFoodExhaustion(ApocalypseConfig.STORM_EXHAUSTION.get().floatValue());
         ApocalypseFx.send(level, player.position(), ApocalypseFxPayload.SANDSTORM, player.getId(), player.position(), Vec3.ZERO,
                 ApocalypseConfig.STORM_TICKS.get(), (int) Math.round(ApocalypseConfig.STORM_RADIUS.get() * 10.0));
@@ -611,7 +628,7 @@ public final class ApocalypseAbilities {
     /** The hero died or left: what he was holding ends (the storm, the shield, the sand still rolling). */
     static void onGone(ServerPlayer player, boolean leaving) {
         PowerData data = Powers.get(player);
-        if (data.power() == Power.APOCALYPSE) {
+        if (data.acts(Power.APOCALYPSE)) {
             endStorm(player, data, STATES.get(player.getUUID()));
             data.setChaosShieldActive(false);
             SandHazards.clearOwnedBy(player.getUUID());

@@ -23,6 +23,11 @@ public final class ApocalypseServer implements HeroServer {
     }
 
     @Override
+    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        ApocalypseAbilities.onKey(player, data, ability, down, alt);
+    }
+
+    @Override
     public void tick(ServerPlayer player, PowerData data) {
         ApocalypseAbilities.tick(player, data);
     }

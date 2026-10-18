@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.XavierConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.ThoughtsPayload;
 import com.kolodkingal.enhanced.power.Power;
@@ -97,7 +98,7 @@ public final class Thoughts {
     /** Whether this player hears thoughts right now: Billy with The Noise on, Professor X with Hear Thoughts on (and not away in a body). */
     public static boolean listens(Player player, PowerData data) {
         return (data.power() == Power.BILLY && data.toggle(Toggle.THE_NOISE))
-                || (data.power() == Power.PROFESSOR_X && data.toggle(Toggle.HEAR_THOUGHTS) && !MindLink.isLinked(player));
+                || (data.has(HeroAbility.XAVIER_THOUGHTS) && data.toggle(Toggle.HEAR_THOUGHTS) && !MindLink.isLinked(player)); // (3.4: a custom too)
     }
 
     /** How far the listener hears (the server's config; Billy's is The Noise's range). */

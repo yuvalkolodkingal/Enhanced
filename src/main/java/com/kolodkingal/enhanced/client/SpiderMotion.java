@@ -10,6 +10,8 @@ import com.kolodkingal.enhanced.ability.SpiderWebs;
 import com.kolodkingal.enhanced.ability.SwingAssist;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSwingPayload;
@@ -18,7 +20,6 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
-import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
@@ -313,15 +314,36 @@ public final class SpiderMotion {
     private static void pressedKey(InputConstants.Key key) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || mc.level == null || mc.screen != null || player.isSpectator() || Powers.get(player).power() != Power.SPIDER_MAN) {
+        if (player == null || mc.level == null || mc.screen != null || player.isSpectator() || !Powers.get(player).acts(Power.SPIDER_MAN)) {
             return;
         }
+        PowerData data = Powers.get(player);
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             if (KeyBindings.ability(i).isActiveAndMatches(key)) {
                 // (Sneak as the keys are now: a press of Sneak and G together comes before the tick that crouches him.)
-                pressed(player, Powers.get(player), i, player.isShiftKeyDown() || mc.options.keyShift.isDown());
+                boolean sneaking = player.isShiftKeyDown() || mc.options.keyShift.isDown();
+                HeroKit kit = data.kit();
+                if (data.power() == Power.SPIDER_MAN) {
+                    pressed(player, data, i, sneaking);
+                } else if (kit != null) {
+                    // (3.4: a custom hero's key is the Spider-Man key its binding holds, and its Sneak variant the binding's.)
+                    HeroKit.Binding binding = kit.binding(i, sneaking);
+                    HeroAbility row = binding == null ? null : binding.ability();
+                    if (row != null && row.hero == Power.SPIDER_MAN) {
+                        pressed(player, data, row.home, binding.isAlt());
+                    }
+                }
             }
         }
+    }
+
+    /**
+     * The key the zip and the swing are on, which a swing and Web Assist's next web wait on while it is held: G for
+     * Spider-Man, the column of a custom hero's zip (3.4).
+     */
+    private static boolean zipKeyDown(PowerData data) {
+        int column = data.power() == Power.CUSTOM ? data.slot(HeroAbility.SPIDER_ZIP) : 2;
+        return column >= 1 && KeyBindings.ability(column).isDown();
     }
 
     private static void pressed(LocalPlayer player, PowerData data, int ability, boolean sneaking) {
@@ -332,7 +354,7 @@ public final class SpiderMotion {
             pressAssisted(player, data, sneaking);
         } else if (ability == 4 && sneaking && !keysIgnored(player, data)) {
             // The same asking as the server's, so that the HUD can say "confirm?" (nothing is decided here).
-            if (data.is(Live.INSTANT_KILL) || !legsOut(data) || !data.isReady(4, now)) {
+            if (data.is(Live.INSTANT_KILL) || !legsOut(data) || !data.isReady(HeroAbility.SPIDER_LEGS, now)) {
                 confirmUntil = 0;
             } else if (now > confirmUntil) {
                 confirmUntil = now + value(SpiderConfig.INSTANT_KILL_CONFIRM_TICKS, 60);
@@ -373,7 +395,7 @@ public final class SpiderMotion {
             owner = player;
         }
         PowerData data = Powers.get(player);
-        if (data.power() != Power.SPIDER_MAN) {
+        if (!data.acts(Power.SPIDER_MAN)) {
             if (mode != Mode.NONE || mantleTicks > 0) {
                 mode = Mode.NONE;
                 mantleTicks = 0;
@@ -457,7 +479,7 @@ public final class SpiderMotion {
      * alone, and the others see what the server says. Nothing is sent by anyone who is not Spider-Man.
      */
     private static void tellTheServer(LocalPlayer player) {
-        if (Powers.get(player).power() != Power.SPIDER_MAN) {
+        if (!Powers.get(player).acts(Power.SPIDER_MAN)) {
             toldKind = -1;
             return;
         }
@@ -508,7 +530,7 @@ public final class SpiderMotion {
     }
 
     private static boolean legsOut(PowerData data) {
-        return data.power() == Power.SPIDER_MAN && data.toggle(Toggle.SPIDER_LEGS) && SpiderServer.IRON_SPIDER.equals(Variants.current(data).id());
+        return data.toggle(Toggle.SPIDER_LEGS) && SpiderServer.mayGrowLegs(data);
     }
 
     private static double value(ModConfigSpec.DoubleValue option, double fallback) {
@@ -660,7 +682,7 @@ public final class SpiderMotion {
     /** G was pressed: if the aim finds a block, the zip begins at once on this client's own reckoning. */
     private static void predictZip(LocalPlayer player, PowerData data) {
         long now = player.level().getGameTime();
-        if (!data.isReady(2, now)) {
+        if (!data.isReady(HeroAbility.SPIDER_ZIP, now)) {
             return;
         }
         double range = value(SpiderConfig.ZIP_RANGE, 40);
@@ -785,7 +807,7 @@ public final class SpiderMotion {
     /** Sneak + G was pressed: if the aim finds a block, the swing begins at once on this client's own reckoning. */
     private static void predictSwing(LocalPlayer player, PowerData data) {
         long now = player.level().getGameTime();
-        if (!data.isReady(2, now) || mode == Mode.SWING) {
+        if (!data.isReady(HeroAbility.SPIDER_ZIP, now) || mode == Mode.SWING) {
             return;
         }
         double range = value(SpiderConfig.SWING_RANGE, 40);
@@ -830,7 +852,7 @@ public final class SpiderMotion {
             stopSwing(player, CANCELLED, false);
             return;
         }
-        if (!KeyBindings.ability(2).isDown() || mc.screen != null) {
+        if (!zipKeyDown(data) || mc.screen != null) {
             stopSwing(player, RELEASED, false);
             return;
         }
@@ -957,7 +979,7 @@ public final class SpiderMotion {
 
     /** Whether Web Assist may send a web now (the same asking as the server's). */
     private static boolean assistReady(LocalPlayer player, PowerData data) {
-        return assistOn() && !keysIgnored(player, data) && data.isReady(2, player.level().getGameTime())
+        return assistOn() && !keysIgnored(player, data) && data.isReady(HeroAbility.SPIDER_ZIP, player.level().getGameTime())
                 && !(SpiderServer.organic(player, data) && starving(player));
     }
 
@@ -1018,7 +1040,7 @@ public final class SpiderMotion {
             player.setDeltaMovement(heading.x * flat, Math.max(v.y, BOOST_UP), heading.z * flat);
             player.resetFallDistance();
             carry = CARRY_TICKS;
-            chain = KeyBindings.ability(2).isDown();
+            chain = zipKeyDown(Powers.get(player));
             chainTicks = 0;
             return;
         }
@@ -1045,7 +1067,7 @@ public final class SpiderMotion {
         PacketDistributor.sendToServer(new SpiderSwingPayload(SpiderSwingPayload.RELEASE, swingAnchor, 0, 0.0F, swingSky));
         stopSwing(player, RELEASED, true);
         carry = CARRY_TICKS;
-        chain = KeyBindings.ability(2).isDown();
+        chain = zipKeyDown(Powers.get(player));
         chainTicks = 0;
     }
 
@@ -1069,7 +1091,7 @@ public final class SpiderMotion {
                 player.setDeltaMovement(v.x * kept / flat, v.y, v.z * kept / flat);
             }
         }
-        if (chain && (!free || player.isInWaterOrBubble() || player.isInLava() || !KeyBindings.ability(2).isDown() || mc.screen != null)) {
+        if (chain && (!free || player.isInWaterOrBubble() || player.isInLava() || !zipKeyDown(data) || mc.screen != null)) {
             chain = false;
         }
         boolean show = free && assistOn() && EnhancedClientConfig.webAssistPreview() && (airborne || player.isShiftKeyDown());
@@ -1105,7 +1127,7 @@ public final class SpiderMotion {
      */
     public static void onFx(SpiderFxPayload payload) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || player.getId() != payload.player() || Powers.get(player).power() != Power.SPIDER_MAN) {
+        if (player == null || player.getId() != payload.player() || !Powers.get(player).acts(Power.SPIDER_MAN)) {
             return;
         }
         switch (payload.kind()) {

@@ -32,7 +32,7 @@ public enum HeroAbility implements CatalogEntry {
     MAGNETO_METAL(Power.MAGNETO, 1, "metal", press().alt(Act.PRESS).cost(2).group(Group.MIND).icon("minecraft:iron_ingot")
             .res(Resource.GRIP).family(Family.TELEKINESIS)),
     MAGNETO_SHRAPNEL(Power.MAGNETO, 2, "shrapnel", hold().cost(2).group(Group.ENERGY).icon("minecraft:iron_nugget")
-            .on(PowerData::shrapnelActive)),
+            .res(Resource.IRON_CHARGE).on(PowerData::shrapnelActive)),
     MAGNETO_DISARM(Power.MAGNETO, 3, "disarm", press().cost(2).group(Group.MIND).icon("minecraft:iron_sword")),
     MAGNETO_SHIELD(Power.MAGNETO, 4, "shield", toggle().cost(2).group(Group.ENERGY).icon("minecraft:lodestone")
             .on(PowerData::magneticShield)),
@@ -146,7 +146,7 @@ public enum HeroAbility implements CatalogEntry {
 
     // ===== ultron =====
     ULTRON_REPULSOR(Power.ULTRON, 1, "repulsor", hold().alt(Act.PRESS).cost(2).group(Group.ENERGY).icon("minecraft:redstone_torch")
-            .res(Resource.BEAM_FLAG).family(Family.BEAM).on(PowerData::beamActive)),
+            .res(Resource.BEAM_FLAG, Resource.IRON_CHARGE).family(Family.BEAM).on(PowerData::beamActive)),
     ULTRON_GRAVITY(Power.ULTRON, 3, "gravity", press().alt(Act.PRESS).cost(2).group(Group.ELEMENT).icon("minecraft:heavy_core")),
     ULTRON_UPLOAD(Power.ULTRON, 4, "upload", press().alt(Act.PRESS).cost(3).group(Group.MIND).icon("minecraft:comparator")
             .res(Resource.DRONES).world()),

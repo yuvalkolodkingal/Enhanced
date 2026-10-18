@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.Thoughts;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -39,7 +40,7 @@ public final class TheNoise {
         }
         PowerData data = Powers.get(player);
         return (data.power() == Power.BILLY && data.toggle(Toggle.THE_NOISE))
-                || (data.power() == Power.PROFESSOR_X && data.toggle(Toggle.HEAR_THOUGHTS) && !data.is(Live.MIND_LINKED));
+                || (data.has(HeroAbility.XAVIER_THOUGHTS) && data.toggle(Toggle.HEAR_THOUGHTS) && !data.is(Live.MIND_LINKED)); // (3.4: a custom too)
     }
 
     /** How far the local listener hears (Billy: The Noise's range; Professor X: Hear Thoughts'). */

@@ -6,7 +6,7 @@ import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
-import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import net.minecraft.server.level.ServerLevel;
@@ -104,7 +104,7 @@ public final class ApocalypseEvents {
     /** The healing factor of the hero waits for quiet: any damage that reached him starts the wait over. */
     @SubscribeEvent
     public static void onDamaged(LivingDamageEvent.Post event) {
-        if (event.getEntity() instanceof ServerPlayer player && Powers.is(player, Power.APOCALYPSE)) {
+        if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.APOCALYPSE_BODY)) {
             ApocalypseAbilities.hurt(player);
         }
     }

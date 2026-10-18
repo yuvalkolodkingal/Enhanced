@@ -7,11 +7,11 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.apocalypse.MindPower;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -104,7 +104,7 @@ public final class ApocalypseGuard {
     /** The shield is held and complete: only then does it stop anything. */
     public static boolean isUp(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.APOCALYPSE && data.chaosShieldUp(player.level().getGameTime());
+        return data.has(HeroAbility.APOCALYPSE_SHIELD) && data.chaosShieldUp(player.level().getGameTime());
     }
 
     // ---- the rule ----
@@ -260,9 +260,9 @@ public final class ApocalypseGuard {
             return;
         }
         long now = player.level().getGameTime();
-        if (!data.isReady(SLOT, now)) {
+        if (!data.isReady(HeroAbility.APOCALYPSE_SHIELD, now)) {
             player.displayClientMessage(Component.translatable("message.enhanced.shield.recharging",
-                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(SLOT) - now) / 20.0)), true);
+                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(data.slot(HeroAbility.APOCALYPSE_SHIELD)) - now) / 20.0)), true);
             return;
         }
         if (!canAfford(player)) {
@@ -280,7 +280,7 @@ public final class ApocalypseGuard {
      */
     static void drop(ServerPlayer player, PowerData data, boolean worn) {
         data.setChaosShieldActive(false);
-        data.startCooldown(SLOT, player.level().getGameTime(),
+        data.startCooldown(HeroAbility.APOCALYPSE_SHIELD, player.level().getGameTime(),
                 (worn ? ApocalypseConfig.SHIELD_BROKEN_COOLDOWN : ApocalypseConfig.SHIELD_COOLDOWN).get());
         forget(player.getUUID());
         ServerLevel level = player.serverLevel();
@@ -296,7 +296,7 @@ public final class ApocalypseGuard {
         data.setChaosShieldActive(false);
         data.setShieldStrength(0.0F);
         ServerLevel level = player.serverLevel();
-        data.startCooldown(SLOT, level.getGameTime(), ApocalypseConfig.SHIELD_BROKEN_COOLDOWN.get());
+        data.startCooldown(HeroAbility.APOCALYPSE_SHIELD, level.getGameTime(), ApocalypseConfig.SHIELD_BROKEN_COOLDOWN.get());
         forget(player.getUUID());
         Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
         RandomSource random = player.getRandom();
