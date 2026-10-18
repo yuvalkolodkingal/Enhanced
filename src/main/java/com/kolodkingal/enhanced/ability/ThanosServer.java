@@ -22,7 +22,13 @@ public final class ThanosServer implements HeroServer {
 
     @Override
     public void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
-        ThanosAbilities.onKey(player, data, ability, down);
+        ThanosAbilities.onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /** 3.4: a key of his with its Sneak variant said explicitly (a custom hero's, or his own through the 4-argument form). */
+    @Override
+    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        ThanosAbilities.onKey(player, data, ability, down, alt);
     }
 
     @Override
@@ -66,10 +72,13 @@ public final class ThanosServer implements HeroServer {
         ThanosSummon.clear();
     }
 
-    /** What stands in the world for him ends with his session, his life and his dimension (the power stays). */
+    /**
+     * What stands in the world for him ends with his session, his life and his dimension (the power stays); 3.4: a custom
+     * hero's with any of his stones too.
+     */
     private static void goneIfThanos(ServerPlayer player) {
         PowerData data = Powers.get(player);
-        if (data.power() == Power.THANOS) {
+        if (data.acts(Power.THANOS)) {
             ThanosAbilities.gone(player, data);
         }
     }

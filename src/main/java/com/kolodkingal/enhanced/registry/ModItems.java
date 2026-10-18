@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
 import com.kolodkingal.enhanced.item.MagnetoHelmetItem;
 import com.kolodkingal.enhanced.item.MjolnirItem;
+import com.kolodkingal.enhanced.item.MutantCureItem;
 import com.kolodkingal.enhanced.item.PhoenixEmberItem;
 import com.kolodkingal.enhanced.item.QuicksilverGogglesItem;
 import com.kolodkingal.enhanced.item.RadioactiveSpiderItem;
@@ -129,6 +130,11 @@ public final class ModItems {
      */
     public static final DeferredItem<XavierWheelchairItem> XAVIER_WHEELCHAIR = ITEMS.register("xavier_wheelchair",
             () -> new XavierWheelchairItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
+    // ===== the Mutant Cure (3.3.1) =====
+    /** Crafted; hold right-click for two seconds to take your power away (or another player's: an operator, or with PvP on). */
+    public static final DeferredItem<MutantCureItem> MUTANT_CURE = ITEMS.register("mutant_cure",
+            () -> new MutantCureItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
 
     /** Projectile sprites only; not in the creative tab. */
     /** 3.3: the Hero Creator, a Creative-only item (the Creative tab, no recipe, no loot). */

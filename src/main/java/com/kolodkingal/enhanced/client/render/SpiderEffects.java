@@ -283,7 +283,7 @@ public final class SpiderEffects {
         List<Integer> seen = new ArrayList<>();
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() != Power.SPIDER_MAN || player.isSpectator()) {
+            if (!data.acts(Power.SPIDER_MAN) || player.isSpectator()) {
                 continue;
             }
             seen.add(player.getId());

@@ -181,8 +181,8 @@ public class BifrostScreen extends Screen {
     @Override
     public void tick() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || !player.isAlive() || !ThorAbilities.holdsWeapon(player)) {
-            // The Bifrost answers the weapon: put it away and the screen goes too.
+        if (player == null || !player.isAlive() || !ThorAbilities.callsBifrost(player)) {
+            // The Bifrost answers the weapon (3.4: or a custom hero's Bifrost): put it away and the screen goes too.
             onClose();
             return;
         }

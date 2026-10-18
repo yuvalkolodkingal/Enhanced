@@ -38,6 +38,8 @@ final class SpiderState {
         int groundTicks;
         /** A swing of Web Assist on a point of the open sky (no block holds it). */
         boolean sky;
+        /** A swing of Web Assist (3.3.1: its first ticks allow the server's copy of him a longer step, see SpiderServer). */
+        boolean assisted;
 
         Line(Vec3 anchor, Direction face, Vec3 stand, double rope, long start, @Nullable UUID kick, Vec3 at) {
             this.anchor = anchor;
@@ -52,8 +54,12 @@ final class SpiderState {
 
     /** Web Shot: when the next may be cast (a hidden timer). */
     long shotReadyAt;
+    /** Web Assist's climb out of a forest (3.3.1): when he last leapt (the key that follows it stays quiet). */
+    long climbAt = Long.MIN_VALUE / 2;
     /** Until when the hand pose of a Web Shot shows ({@code Live.CASTING}). */
     long castUntil;
+    /** Whether the web shot's cast flag was up at the last tick (3.4: a custom hero's flag is only changed on its edges). */
+    boolean casting;
     /** Until when the spider-sense pose shows ({@code Live.SENSING}). */
     long senseUntil;
     @Nullable

@@ -20,12 +20,15 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  *       open sky when {@code sky}, with a rope of {@code rope}.</li>
  *   <li>{@link #RELEASE}: the assist let go of the swing at its best moment (G is still held).</li>
  *   <li>{@link #BOOST}: the open-land fallback "zip": a short web boost towards {@code anchor}.</li>
+ *   <li>{@link #CLIMB} (3.3.1): from the floor of a forest, a web leap up through the gap in the canopy whose top is
+ *       {@code anchor}.</li>
  * </ul>
  */
 public record SpiderSwingPayload(int action, Vec3 anchor, int face, float rope, boolean sky) implements CustomPacketPayload {
     public static final int ATTACH = 0;
     public static final int RELEASE = 1;
     public static final int BOOST = 2;
+    public static final int CLIMB = 3;
 
     public static final Type<SpiderSwingPayload> TYPE = new Type<>(Enhanced.id("spider_swing"));
 

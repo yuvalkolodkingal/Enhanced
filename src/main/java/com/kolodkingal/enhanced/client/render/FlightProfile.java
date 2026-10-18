@@ -170,6 +170,14 @@ public final class FlightProfile {
             pose(-4, 0, 30, -4, 0, -30, 6, 1, 4, -1),      // cruise: the arms drift back a little
             pose(18, 0, 40, 18, 0, -40, 10, 1, 8, -1)});   // sprint: the arms trail behind, open
 
+    /**
+     * The profile a hero flies with: his own for a built-in hero, the one of his flight style for a custom hero (3.4,
+     * {@link HeroAnimState#flightAs}), or null.
+     */
+    public static FlightProfile of(HeroAnimState st) {
+        return of(st.flightAs, st.flightWhite);
+    }
+
     /** The profile of a flier, or null for a hero that does not fly. */
     public static FlightProfile of(Power power, boolean whiteVision) {
         return switch (power) {
@@ -188,7 +196,8 @@ public final class FlightProfile {
             // ===== cyclops (3.3) =====
             case CYCLOPS -> null; // he runs, and leaps on his blast: no take-off, banking or braking
             case PROFESSOR_X -> null; // 3.3: he walks, or rolls in his chair
-            // 3.3: a custom hero flies in the plain pose of the game (his look and his powers are anyone's).
+            // A custom hero flies with the profile of his flight style (3.4: of(HeroAnimState)); the plain style is the
+            // game's own pose.
             case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;
         };
     }

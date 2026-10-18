@@ -4,10 +4,10 @@ import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
@@ -112,7 +112,7 @@ public final class UltronDrones {
     public static void army(ServerPlayer hero, PowerData data) {
         ServerLevel level = hero.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(5, now)) {
+        if (!data.isReady(HeroAbility.ULTRON_ARMY, now)) {
             return;
         }
         int room = UltronConfig.DRONE_MAX.get() - drones(hero).size();
@@ -128,7 +128,7 @@ public final class UltronDrones {
             level.addFreshEntity(drone);
             UltronFx.from(level, UltronFxPayload.DRONE_ASSEMBLE, drone, drone.position(), Vec3.ZERO, 0.0F, UltronSentryEntity.ASSEMBLE_TICKS);
         }
-        data.startCooldown(5, now, UltronConfig.DRONE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.ULTRON_ARMY, now, UltronConfig.DRONE_COOLDOWN.get());
         UltronSounds.UPLOAD.play(level, hero.position(), SoundSource.PLAYERS, 0.8F, 0.8F);
     }
 
@@ -201,7 +201,7 @@ public final class UltronDrones {
     public static void upload(ServerPlayer hero, PowerData data) {
         ServerLevel level = hero.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now) || cutOff(hero)) {
+        if (!data.isReady(HeroAbility.ULTRON_UPLOAD, now) || cutOff(hero)) {
             return;
         }
         int range = UltronConfig.UPLOAD_RANGE.get();
@@ -223,7 +223,7 @@ public final class UltronDrones {
             hero.removeEffect(effect);
         }
         hero.clearFire();
-        data.startCooldown(4, now, UltronConfig.UPLOAD_COOLDOWN.get());
+        data.startCooldown(HeroAbility.ULTRON_UPLOAD, now, UltronConfig.UPLOAD_COOLDOWN.get());
     }
 
     @Nullable
@@ -276,7 +276,8 @@ public final class UltronDrones {
         PowerData data = Powers.get(hero);
         ServerLevel level = hero.serverLevel();
         long now = level.getGameTime();
-        if (data.power() != Power.ULTRON || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) || !data.isReady(4, now) || isCut(hero)) {
+        if (!data.has(HeroAbility.ULTRON_UPLOAD) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)
+                || !data.isReady(HeroAbility.ULTRON_UPLOAD, now) || isCut(hero)) {
             return false;
         }
         UltronSentryEntity drone = nearest(hero, UltronConfig.SECOND_LIFE_RANGE.get());
@@ -292,7 +293,7 @@ public final class UltronDrones {
             UltronFx.at(level, UltronFxPayload.NETWORK_FLASH, hero.position().add(0, 1.0, 0), 3.0F, 10);
         }
         hero.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 3));
-        data.startCooldown(4, now, UltronConfig.SECOND_LIFE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.ULTRON_UPLOAD, now, UltronConfig.SECOND_LIFE_COOLDOWN.get());
         return true;
     }
 

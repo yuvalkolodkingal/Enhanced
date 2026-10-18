@@ -3,10 +3,14 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.build.BuildData;
+import com.kolodkingal.enhanced.custom.CustomHero;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.DarkMagic;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -47,10 +51,10 @@ import java.util.UUID;
  * Shield: it is a plate, not a dome.
  *
  * <p>It has no time limit and costs no hunger: it stays up while B is held. It has <em>health</em> ({@code billy.barrierHealth},
- * 30): every hit it stops takes what that hit would have done off it; at 0 it shatters (shards and a glassy crash) and cannot be
- * raised for {@code billy.barrierShatterCooldown} ticks. Its health is kept while it is down and mends slowly ({@code
- * billy.barrierRegenPerSecond}). Chaos magic breaks it at once: any power of the Scarlet Witch that hits it shatters it, whatever
- * health it has ({@link #isChaos}).
+ * 60). 3.3.1: only chaos magic ({@link #isChaos}: a power of the Scarlet Witch, or the Chaos Beam) and dark magic ({@link
+ * #isDark}: the Darkhold's, Agatha's) wear it down, each by what its hit would have done; everything else it stops whole and is
+ * not worn by at all. At 0 it shatters (shards and a glassy crash) and cannot be raised for {@code billy.barrierShatterCooldown}
+ * ticks. Its health is kept while it is down and mends slowly ({@code billy.barrierRegenPerSecond}).
  *
  * <p>State: it reuses the synced fields of the Chaos Shield in {@link PowerData} ({@code chaosShieldActive}, when it formed, its
  * strength = its health), which no other power of Billy's uses, so the clients know it is up and how much is left; while it is
@@ -67,8 +71,10 @@ public final class BillyBarrier {
     }
 
     private static final Map<UUID, Kept> KEPT = new HashMap<>();
-    /** When each Billy's barrier last paid for a power that reached for him (a grip, a pull): such a power costs at most twice a second. */
+    /** When each Billy's barrier last rang for a power that reached for him (a grip, a pull): at most twice a second. */
     private static final Map<UUID, Long> LAST_POWER = new HashMap<>();
+    /** When it last paid for a chaos or dark power that reached for him: such a power costs at most twice a second. */
+    private static final Map<UUID, Long> LAST_WEAR = new HashMap<>();
 
     // ---- the numbers (read on both sides: the server config is synced to the clients) ----
 
@@ -79,7 +85,7 @@ public final class BillyBarrier {
 
     /** The health of a whole barrier at this rank ({@code billy.barrierHealth}, and more with the rank if the server says so). */
     public static float maxStrength(BuildData build) {
-        double health = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.BILLY_BARRIER_HEALTH.get() : 30.0;
+        double health = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.BILLY_BARRIER_HEALTH.get() : 60.0;
         double bonus = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.BILLY_BARRIER_RANK_STRENGTH_BONUS.get() : 0.0;
         return (float) (health * (1.0 + bonus * BillyAbilities.beamProgress(build)));
     }
@@ -155,7 +161,21 @@ public final class BillyBarrier {
     /** Whether this player holds a complete Hex Barrier (Billy, raised and formed). */
     public static boolean isUp(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.BILLY && data.chaosShieldUp(player.level().getGameTime());
+        return owns(data) && data.chaosShieldUp(player.level().getGameTime());
+    }
+
+    /**
+     * Whether the shield fields of this player's data are his Hex Barrier's when raised: Billy, or (3.4) a custom hero with
+     * Billy's Freeze and its Sneak variant (the barrier) on. (The fields are shared by every hero's shield; a custom hero
+     * has one shield at most: {@code Resource.SHIELD}.) Both sides.
+     */
+    public static boolean owns(PowerData data) {
+        if (data.power() == Power.BILLY) {
+            return true;
+        }
+        HeroKit kit = data.power() == Power.CUSTOM ? data.kit() : null;
+        CustomHero.Pick pick = kit == null ? null : kit.hero().pick(HeroAbility.BILLY_FREEZE);
+        return pick != null && !HeroAbility.MAIN.equals(pick.option());
     }
 
     /** Whether a point is in the arc the barrier covers: within the half-angle of the way he looks, seen from his body. */
@@ -180,9 +200,9 @@ public final class BillyBarrier {
             return;
         }
         long now = player.level().getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.BILLY_FREEZE, now)) {
             player.displayClientMessage(Component.translatable("message.enhanced.billy_barrier.recharging",
-                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(4) - now) / 20.0)), true);
+                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(data.slot(HeroAbility.BILLY_FREEZE)) - now) / 20.0)), true);
             return;
         }
         float health = health(player);
@@ -206,7 +226,7 @@ public final class BillyBarrier {
         data.setChaosShieldActive(false);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         if (formed) {
-            data.startCooldown(4, now, EnhancedConfig.BILLY_BARRIER_COOLDOWN.get());
+            data.startCooldown(HeroAbility.BILLY_FREEZE, now, EnhancedConfig.BILLY_BARRIER_COOLDOWN.get());
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.5F, 1.9F);
     }
@@ -320,21 +340,27 @@ public final class BillyBarrier {
     }
 
     /**
-     * A power that is not a hit reaches for him from the front (a grip, a pull, a curse, a boss's spell): the plate stops it, sparks
-     * and pays {@code cost} (at most twice a second for the same Billy; the Scarlet Witch's shatters it at once). Called from
+     * A power that is not a hit reaches for him from the front (a grip, a pull, a curse, a boss's spell): the plate stops it and
+     * sparks; chaos or dark magic wears it down by {@code cost} (at most twice a second for the same Billy). Called from
      * {@link com.kolodkingal.enhanced.protect.Shelters#stops}.
      */
     public static void stopPower(ServerPlayer billy, @Nullable Entity source, Vec3 from, float cost) {
         sparks(billy, from);
         long now = billy.level().getGameTime();
-        Long last = LAST_POWER.get(billy.getUUID());
-        if (!isChaos(source) && last != null && now - last < 10 && now >= last) {
-            return;
+        boolean wears = isChaos(source) || isDark(source, null);
+        UUID id = billy.getUUID();
+        Long last = LAST_POWER.get(id);
+        if (last == null || now - last >= 10 || now < last) {
+            LAST_POWER.put(id, now);
+            ServerLevel level = billy.serverLevel();
+            level.playSound(null, from.x, from.y, from.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.7F);
         }
-        LAST_POWER.put(billy.getUUID(), now);
-        ServerLevel level = billy.serverLevel();
-        level.playSound(null, from.x, from.y, from.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.7F);
-        wear(billy, Powers.get(billy), cost, source);
+        // (3.3.1: only chaos and dark magic wear it, at most twice a second for the same Billy)
+        Long worn = LAST_WEAR.get(id);
+        if (wears && (worn == null || now - worn >= 10 || now < worn)) {
+            LAST_WEAR.put(id, now);
+            wear(billy, Powers.get(billy), cost, source);
+        }
     }
 
     /** A creature's or player's blow lands on the plate: sparks and a ring of sound there, the attacker thrown back, and the price paid. */
@@ -369,16 +395,28 @@ public final class BillyBarrier {
 
     /**
      * Whether a power is the Scarlet Witch's chaos magic: whoever is behind it (a projectile's owner, a thrown block's thrower...)
-     * is a Scarlet Witch. It shatters a Hex Barrier at once.
+     * is a Scarlet Witch (3.4: or a custom hero with any of her abilities). It wears a Hex Barrier down (3.3.1: it no longer
+     * shatters it at once).
      */
     public static boolean isChaos(@Nullable Entity cause) {
         Entity maker = com.kolodkingal.enhanced.protect.Shelters.maker(cause);
-        return maker instanceof Player player && Powers.is(player, Power.SCARLET_WITCH);
+        return maker instanceof Player player && Powers.get(player).acts(Power.SCARLET_WITCH);
     }
 
     /**
-     * Wears the barrier down by what it just stopped; when nothing is left it shatters. Chaos magic ({@link #isChaos}) shatters
-     * it whatever it had left.
+     * Whether what hit the barrier is dark magic (3.3.1): dark magic harm, a dark magic thing (a projectile, a conjured
+     * creature), or whoever is behind it works dark magic (the Darkhold's beam, Agatha). See {@link DarkMagic}.
+     */
+    public static boolean isDark(@Nullable Entity cause, @Nullable DamageSource source) {
+        if (source != null && (DarkMagic.is(source) || DarkMagic.is(source.getDirectEntity()) || DarkMagic.casts(source.getEntity()))) {
+            return true;
+        }
+        return DarkMagic.is(cause) || DarkMagic.casts(cause) || DarkMagic.casts(com.kolodkingal.enhanced.protect.Shelters.maker(cause));
+    }
+
+    /**
+     * What it just stopped wears it down, if it is chaos or dark magic (3.3.1: nothing else does), by what it would have done;
+     * when nothing is left it shatters.
      *
      * @param cause who or what dealt it (a projectile counts as its owner), or null if it is not known
      * @return how much of {@code amount} it took (all of it: it stops the hit that breaks it too)
@@ -391,21 +429,20 @@ public final class BillyBarrier {
         if (!data.chaosShieldActive()) {
             return 0.0F;
         }
-        if (isChaos(cause) || (source != null && source.is(ModDamageTypes.CHAOS_BEAM))) {
-            data.setShieldStrength(0F);
-            shatter(billy, data, true);
-            return amount;
+        boolean chaos = isChaos(cause) || (source != null && (source.is(ModDamageTypes.CHAOS_BEAM) || isChaos(source.getEntity())));
+        if (!chaos && !isDark(cause, source)) {
+            return amount; // stopped whole, and it does not wear the barrier at all
         }
         data.setShieldStrength(Math.max(0.0F, data.shieldStrength() - amount));
         if (data.shieldStrength() <= 1.0E-4F) {
             data.setShieldStrength(0F);
-            shatter(billy, data, false);
+            shatter(billy, data, chaos);
         }
         return amount;
     }
 
     /**
-     * The barrier took all it could (or chaos magic hit it): it bursts into blue shards with a glassy crash that everyone near
+     * The barrier took all it could: it bursts into blue shards with a glassy crash that everyone near
      * hears, its health is gone (it mends from nothing) and it cannot be raised for {@code billy.barrierShatterCooldown}.
      */
     private static void shatter(ServerPlayer billy, PowerData data, boolean chaos) {
@@ -413,7 +450,7 @@ public final class BillyBarrier {
         keep(billy, 0.0F);
         data.setChaosShieldActive(false);
         PowerTicker.setModifier(billy, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        data.startCooldown(4, level.getGameTime(), EnhancedConfig.BILLY_BARRIER_SHATTER_COOLDOWN.get());
+        data.startCooldown(HeroAbility.BILLY_FREEZE, level.getGameTime(), EnhancedConfig.BILLY_BARRIER_SHATTER_COOLDOWN.get());
         Frame plate = frame(body(billy), billy.getLookAngle());
         RandomSource random = billy.getRandom();
         ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.LIGHT_BLUE_DYE));
@@ -457,6 +494,7 @@ public final class BillyBarrier {
     public static void clear() {
         KEPT.clear();
         LAST_POWER.clear();
+        LAST_WEAR.clear();
     }
 
     private BillyBarrier() {

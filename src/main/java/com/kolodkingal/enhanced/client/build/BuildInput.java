@@ -5,7 +5,6 @@ import com.kolodkingal.enhanced.build.BuildGrammar;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
-import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -95,7 +94,7 @@ public final class BuildInput {
         BuildClient.tick(mc, player);
         BuildHud.tick(player);
         BuildFx.tick(mc, mc.level);
-        boolean usable = mc.screen == null && !player.isSpectator() && BuildClient.isBuilder(Powers.power(player));
+        boolean usable = mc.screen == null && !player.isSpectator() && BuildClient.isBuilder(BuildClient.hero(player));
         if (!usable) {
             magicHeld = 0;
             letGoOfButtons();

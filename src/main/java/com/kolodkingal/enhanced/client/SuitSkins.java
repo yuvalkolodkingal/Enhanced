@@ -7,7 +7,6 @@ import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -48,18 +47,16 @@ public final class SuitSkins {
     public static PlayerSkin skinFor(AbstractClientPlayer player, PlayerSkin own) {
         PlayerSkin suit = suitFor(player);
         PlayerSkin skin = suit != null ? suit : own;
-        // (3.4) Loki's, or a custom hero's with Loki's Shapeshift or Frost Giant.
-        PowerData data = Powers.get(player);
-        if (data.has(HeroAbility.LOKI_SHAPESHIFT)) {
+        if (Shapeshifts.changesSkin(player)) {
             PlayerSkin copied = Shapeshifts.copiedSkin(player);
             if (copied != null) {
                 return copied;
             }
+            if (LokiAbilities.isFrostGiant(player)) {
+                skin = FrostGiantSkins.of(skin);
+            }
         }
-        if (data.has(HeroAbility.LOKI_FROST_GIANT) && LokiAbilities.isFrostGiant(player)) {
-            skin = FrostGiantSkins.of(skin);
-        }
-        if (data.power() == Power.CUSTOM) {
+        if (Powers.power(player) == Power.CUSTOM) {
             // 3.4: the cape of a custom hero's look, on whatever skin he wears.
             skin = com.kolodkingal.enhanced.client.custom.CustomLooks.withCape(player, skin);
         }
@@ -86,7 +83,7 @@ public final class SuitSkins {
         if (power == Power.CUSTOM) {
             // 3.3: a custom hero wears his own PNG, a look of one of the mod's heroes, or his own skin. 3.4: in Vision's
             // disguise (his ability) he looks like himself: the player's own skin.
-            if (Powers.get(player).has(com.kolodkingal.enhanced.custom.HeroAbility.VISION_DISGUISE) && Powers.get(player).disguise()) {
+            if (Powers.get(player).has(HeroAbility.VISION_DISGUISE) && Powers.get(player).disguise()) {
                 return null;
             }
             return com.kolodkingal.enhanced.client.custom.CustomSkins.suitFor(player);

@@ -234,6 +234,14 @@ public final class Telekinesis {
      * </ol>
      */
     public static void press(ServerPlayer player, Mode mode) {
+        press(player, mode, player.isShiftKeyDown());
+    }
+
+    /**
+     * The key, with Sneak's choice for "nothing held" given ({@code sneak}: the Sneak variant, 3.4: as a custom hero's key
+     * router calls it for Magneto's R); while something is held, the real Sneak puts it down, as ever.
+     */
+    public static void press(ServerPlayer player, Mode mode, boolean sneak) {
         if (player.isSpectator()) {
             return;
         }
@@ -251,7 +259,7 @@ public final class Telekinesis {
             player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.carried"), true);
             return;
         }
-        if (player.isShiftKeyDown()) {
+        if (sneak) {
             if (mode != Mode.MAGNETO) {
                 pressForABlock(player, mode);
                 return;

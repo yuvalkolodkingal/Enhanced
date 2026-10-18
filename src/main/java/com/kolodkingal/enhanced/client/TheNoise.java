@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.Thoughts;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -38,14 +39,15 @@ public final class TheNoise {
             return false;
         }
         PowerData data = Powers.get(player);
-        return (data.power() == Power.BILLY && data.toggle(Toggle.THE_NOISE))
-                || (data.power() == Power.PROFESSOR_X && data.toggle(Toggle.HEAR_THOUGHTS) && !data.is(Live.MIND_LINKED));
+        // (3.4: a custom hero with The Noise or Hear Thoughts, as the server's Thoughts.listens.)
+        return (data.has(HeroAbility.BILLY_NOISE) && data.toggle(Toggle.THE_NOISE))
+                || (data.has(HeroAbility.XAVIER_THOUGHTS) && data.toggle(Toggle.HEAR_THOUGHTS) && !data.is(Live.MIND_LINKED));
     }
 
     /** How far the local listener hears (Billy: The Noise's range; Professor X: Hear Thoughts'). */
     public static double range() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return Thoughts.range(player == null ? Power.BILLY : Powers.power(player));
+        return Thoughts.range(player == null ? Power.BILLY : Thoughts.hearsAs(Powers.get(player)));
     }
 
     /** Whether Billy hears this creature right now (so it glows for him). */
@@ -63,7 +65,7 @@ public final class TheNoise {
     /** The colour a creature he hears glows in: its mood. */
     public static int moodColor(Entity entity) {
         LocalPlayer player = Minecraft.getInstance().player;
-        return BillyAbilities.meansHarm(entity) ? HOSTILE : player != null && Powers.power(player) == Power.PROFESSOR_X ? Power.PROFESSOR_X.color : Power.BILLY.color;
+        return BillyAbilities.meansHarm(entity) ? HOSTILE : player != null && Thoughts.hearsAs(Powers.get(player)) == Power.PROFESSOR_X ? Power.PROFESSOR_X.color : Power.BILLY.color;
     }
 
     static void tick(Minecraft mc) {

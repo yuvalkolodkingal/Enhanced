@@ -14,7 +14,6 @@ import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -432,7 +431,7 @@ public final class BuildFx {
             if (player.distanceToSqr(camera) > HAND_RANGE * HAND_RANGE) {
                 continue;
             }
-            Power power = Powers.power(player);
+            Power power = BuildClient.hero(player);
             BuildView view = player.getExistingData(ModAttachments.BUILD_VIEW).orElse(BuildView.EMPTY);
             if (!BuildClient.isBuilder(power) || !view.active() || player.isSpectator() || player.isInvisible()) {
                 continue;
@@ -553,7 +552,7 @@ public final class BuildFx {
 
     private static boolean anyBilly(ClientLevel level) {
         for (AbstractClientPlayer player : level.players()) {
-            if (Powers.power(player) == Power.BILLY && player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false)) {
+            if (BuildClient.hero(player) == Power.BILLY && player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false)) {
                 return true;
             }
         }
@@ -848,7 +847,7 @@ public final class BuildFx {
     /** A tiny arc between Billy's fingers every second, while he is in build mode (D-B 7.1). */
     private static void fingers(Minecraft mc, ClientLevel level, Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick, float time) {
         for (AbstractClientPlayer player : level.players()) {
-            if (Powers.power(player) != Power.BILLY || player.isInvisible() || player.isSpectator()
+            if (BuildClient.hero(player) != Power.BILLY || player.isInvisible() || player.isSpectator()
                     || player.distanceToSqr(camera) > HAND_RANGE * HAND_RANGE
                     || !player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false)) {
                 continue;

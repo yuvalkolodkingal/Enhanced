@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import net.minecraft.ChatFormatting;
@@ -21,8 +22,28 @@ public final class ShieldStyles {
             Enhanced.id("textures/entity/hex_wall.png"), (float) WandaAbilities.SHIELD_RADIUS, WandaAbilities::maxShieldStrength,
             WandaAbilities::maxShieldTicks);
 
-    /** The style of this power's shield, or null if it raises none. */
+    /**
+     * The style of the shield of this player's data: his power's ({@link #of(Power)}), or (3.4) for a custom hero the style
+     * of the hero whose shield ability he has (the Chaos Shield, Agatha's, Apocalypse's; one at most, {@code Resource.SHIELD});
+     * null for Billy's Hex Barrier, which {@code BarrierRenderer} draws.
+     */
     @Nullable
+    public static ShieldStyle of(PowerData data) {
+        if (data.power() != Power.CUSTOM) {
+            return of(data.power());
+        }
+        for (HeroAbility row : SHIELDS) {
+            if (data.has(row)) {
+                return of(row.hero);
+            }
+        }
+        return null;
+    }
+
+    /** The heroes' shield abilities that draw a dome (3.4: what a custom hero's shield looks like). */
+    private static final HeroAbility[] SHIELDS = {HeroAbility.WANDA_CHAOS_SHIELD, HeroAbility.AGATHA_SHIELD, HeroAbility.APOCALYPSE_SHIELD};
+
+    /** The style of a hero's own shield, or null. */
     public static ShieldStyle of(Power power) {
         if (power == Power.SCARLET_WITCH) {
             return CHAOS_SHIELD;

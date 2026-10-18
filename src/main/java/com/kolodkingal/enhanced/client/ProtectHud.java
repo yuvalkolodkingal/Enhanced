@@ -1,7 +1,6 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.BillyBarrier;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.HexRunes;
@@ -52,7 +51,7 @@ public class ProtectHud implements LayeredDraw.Layer {
 
     private void barrier(GuiGraphics graphics, Minecraft mc, LocalPlayer player, float time) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.BILLY || !data.chaosShieldActive() || !BillyBarrier.enabled()) {
+        if (!BillyBarrier.owns(data) || !data.chaosShieldActive() || !BillyBarrier.enabled()) {
             shown = -1.0F;
             last = -1.0F;
             return;

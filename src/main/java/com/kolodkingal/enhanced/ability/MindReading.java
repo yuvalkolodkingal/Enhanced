@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.MindReadPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -278,10 +279,10 @@ public final class MindReading {
     private static String extra(LivingEntity target) {
         if (target instanceof Player player) {
             PowerData data = Powers.get(player);
-            if (data.power() == Power.LOKI && !data.form().isEmpty()) {
+            if ((data.power() == Power.LOKI || data.power() == Power.CUSTOM) && !data.form().isEmpty()) {
                 return "shaped:" + data.form();
             }
-            if (data.power() == Power.VISION && data.disguise()) {
+            if (data.has(HeroAbility.VISION_DISGUISE) && data.disguise()) {
                 return "disguised";
             }
         }

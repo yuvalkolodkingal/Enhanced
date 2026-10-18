@@ -1,8 +1,11 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -91,7 +94,16 @@ public final class PhoenixPower {
      * the slam) caused by a Phoenix.
      */
     public static boolean isPhoenixMindPower(DamageSource source) {
-        return source.is(ModTags.MIND_POWER) && isPhoenix(source.getEntity());
+        if (!source.is(ModTags.MIND_POWER) || !(source.getEntity() instanceof Player player)) {
+            return false;
+        }
+        if (isPhoenix(player)) {
+            return true;
+        }
+        // 3.4: a custom hero's Burst, or the slam of what he threw with her telekinesis.
+        PowerData data = Powers.get(player);
+        return source.is(ModDamageTypes.PHOENIX_BURST) && data.has(HeroAbility.PHOENIX_BURST)
+                || source.is(ModDamageTypes.TELEKINETIC_SLAM) && data.has(HeroAbility.PHOENIX_TELEKINESIS);
     }
 
     private PhoenixPower() {

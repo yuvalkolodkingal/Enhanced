@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -19,9 +20,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -131,7 +134,7 @@ public final class MagnetStreams {
                     MagnetStreamMath.flightTicks(distance), MagnetStreamMath.arcHeight(distance, calm), now, random.nextFloat() * 360.0F));
             // (A block crumbles with its own break particles from the server: these are the field taking hold.)
             for (int i = 0; i < 4; i++) {
-                level.addParticle(new EnergyParticleOptions(Power.MAGNETO.color, 0.8F), s.from().x + (random.nextDouble() - 0.5) * 0.5,
+                level.addParticle(new EnergyParticleOptions(color(magneto), 0.8F), s.from().x + (random.nextDouble() - 0.5) * 0.5,
                         s.from().y + (random.nextDouble() - 0.5) * 0.5, s.from().z + (random.nextDouble() - 0.5) * 0.5,
                         (random.nextDouble() - 0.5) * 0.04, 0.02 + random.nextDouble() * 0.03, (random.nextDouble() - 0.5) * 0.04);
             }
@@ -182,7 +185,7 @@ public final class MagnetStreams {
         boolean firstPerson = magneto == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         float size = firstPerson ? 0.32F : 0.8F;
         for (int i = 0; i < 2; i++) {
-            level.addParticle(new EnergyParticleOptions(Power.MAGNETO.color, size), hand.x + (random.nextDouble() - 0.5) * 0.15,
+            level.addParticle(new EnergyParticleOptions(color(magneto), size), hand.x + (random.nextDouble() - 0.5) * 0.15,
                     hand.y + (random.nextDouble() - 0.5) * 0.15, hand.z + (random.nextDouble() - 0.5) * 0.15, 0.0, 0.01, 0.0);
         }
     }
@@ -226,10 +229,11 @@ public final class MagnetStreams {
             float fade = MagnetStreamMath.pulseFade(age);
             int segments = Mth.clamp((int) (radius * 8.0F), 24, 96);
             Vec3 centre = feet.subtract(camera);
-            EnergyGeometry.ring(pose, light, centre, UP, radius, 0.14F, segments, EnergyGeometry.argb(Power.MAGNETO.glow, PULSE_ALPHA * fade));
+            int glow = glow(magneto);
+            EnergyGeometry.ring(pose, light, centre, UP, radius, 0.14F, segments, EnergyGeometry.argb(glow, PULSE_ALPHA * fade));
             // A fainter echo just inside it, so the field reads as a wave rather than a hoop.
             EnergyGeometry.ring(pose, light, centre, UP, radius * 0.85F, 0.06F, segments,
-                    EnergyGeometry.argb(Power.MAGNETO.glow, PULSE_ALPHA * 0.5F * fade));
+                    EnergyGeometry.argb(glow, PULSE_ALPHA * 0.5F * fade));
         }
         // Each Magneto's hand, once a frame (most streams of a frame fly to the same one).
         Map<Integer, Vec3> hands = new HashMap<>();
@@ -239,7 +243,7 @@ public final class MagnetStreams {
                 return magneto == null ? null : hand(mc, magneto, partialTick);
             });
             if (hand != null && s.arrived < s.count) {
-                lineOfForce(s, hand, pose, light, camera, age(gameTime, s.leaves(s.arrived), partialTick));
+                lineOfForce(s, hand, glow(level.getEntity(s.magneto)), pose, light, camera, age(gameTime, s.leaves(s.arrived), partialTick));
             }
         }
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
@@ -296,7 +300,7 @@ public final class MagnetStreams {
      * The thin colourless line of force behind the leading icon ({@code age}: ticks since it left): the curve from where it
      * left to where it is now, fainter toward where it left and fading out as it arrives (the look of his field).
      */
-    private static void lineOfForce(Stream s, Vec3 hand, Matrix4f pose, VertexConsumer vc, Vec3 camera, float age) {
+    private static void lineOfForce(Stream s, Vec3 hand, int glow, Matrix4f pose, VertexConsumer vc, Vec3 camera, float age) {
         if (age <= 0.0F) {
             return;
         }
@@ -308,10 +312,19 @@ public final class MagnetStreams {
         for (int i = 1; i <= steps; i++) {
             Vec3 next = MagnetStreamMath.point(s.from, hand, s.height, head * i / steps).subtract(camera);
             float a = LINE_ALPHA * out * (0.35F + 0.65F * i / steps);
-            EnergyGeometry.ribbon(pose, vc, prev, next, 0.035F, EnergyGeometry.argb(Power.MAGNETO.glow, a * 0.9F),
-                    EnergyGeometry.argb(Power.MAGNETO.glow, a));
+            EnergyGeometry.ribbon(pose, vc, prev, next, 0.035F, EnergyGeometry.argb(glow, a * 0.9F), EnergyGeometry.argb(glow, a));
             prev = next;
         }
+    }
+
+    /** The deep colour of a pull's field: Magneto's, or (3.4) the colour of a custom hero who pulls with his ability. */
+    private static int color(@Nullable Entity magneto) {
+        return magneto instanceof Player player && Powers.get(player).power() == Power.CUSTOM ? Powers.color(player) : Power.MAGNETO.color;
+    }
+
+    /** The glow of a pull's field (its rings and lines of force), as {@link #color}. */
+    private static int glow(@Nullable Entity magneto) {
+        return magneto instanceof Player player && Powers.get(player).power() == Power.CUSTOM ? Powers.glow(player) : Power.MAGNETO.glow;
     }
 
     /** Where the streams fly: his hand (where every hero's energy leaves it), or the middle of a body that is not a player. */

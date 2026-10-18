@@ -77,11 +77,11 @@ public final class PowerTicker {
         }
         WandaAbilities.applyCrown(player, data);
         VisionAbilities.applyBody(player, data);
-        if (data.power() != Power.QUICKSILVER && data.power() != Power.TOMMY) {
-            // (Tommy's slow time, 3.3, is set by his own tick, like Quicksilver Time.)
+        if (SlowMotion.slowTimeOf(data) == Power.NONE) {
+            // (Tommy's slow time, 3.3, is set by his own tick, like Quicksilver Time; 3.4: so is a custom hero's with one.)
             data.setSlowMo(false);
         }
-        if (data.power() != Power.QUICKSILVER) {
+        if (!data.acts(Power.QUICKSILVER)) {
             QuicksilverAbilities.applySpeed(player, data);
         }
         TommyAbilities.applySpeed(player, data);
@@ -119,6 +119,7 @@ public final class PowerTicker {
     public static void heroEnd(Power hero, ServerPlayer player, PowerData data) {
         switch (hero) {
             case MAGNETO -> MagnetoAbilities.endAll(player, data);
+            case SCARLET_WITCH -> WandaAbilities.endAll(player, data);
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);

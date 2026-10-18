@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.config.XavierConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.CerebroPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -244,7 +245,7 @@ public final class XavierAbilities {
     static void mentalBlast(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(1, now)) {
+        if (!data.isReady(HeroAbility.XAVIER_MENTAL_BLAST, now)) {
             return;
         }
         EntityHitResult hit = Raycasts.entity(player, XavierConfig.BLAST_RANGE.get(), 0.3, e -> aimable(player, e), 1.0F);
@@ -270,7 +271,7 @@ public final class XavierAbilities {
             target.addEffect(new MobEffectInstance(MobEffects.CONFUSION, dizzy + 40, 0, false, true, true), player);
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, dizzy, 1, false, true, true), player);
         }
-        data.startCooldown(1, now, XavierConfig.BLAST_COOLDOWN.get());
+        data.startCooldown(HeroAbility.XAVIER_MENTAL_BLAST, now, XavierConfig.BLAST_COOLDOWN.get());
         focus(player, data);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), ModSounds.XAVIER_BLAST.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         ripple(level, player, target);
@@ -307,7 +308,7 @@ public final class XavierAbilities {
 
     private static void takeOver(ServerPlayer player, PowerData data) {
         long now = player.level().getGameTime();
-        if (!data.isReady(3, now)) {
+        if (!data.isReady(HeroAbility.XAVIER_TAKE_OVER, now)) {
             return;
         }
         EntityHitResult hit = Raycasts.entity(player, XavierConfig.LINK_RANGE.get(), 0.3, e -> aimable(player, e), 1.0F);
@@ -329,7 +330,7 @@ public final class XavierAbilities {
     static int freezeMinds(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.XAVIER_FREEZE_MINDS, now)) {
             return 0;
         }
         double radius = XavierConfig.FREEZE_RADIUS.get();
@@ -354,7 +355,7 @@ public final class XavierAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.xavier.freeze.nothing"), true);
             return 0;
         }
-        data.startCooldown(4, now, XavierConfig.FREEZE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.XAVIER_FREEZE_MINDS, now, XavierConfig.FREEZE_COOLDOWN.get());
         focus(player, data);
         player.displayClientMessage(Component.translatable("message.enhanced.xavier.freeze", held), true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.XAVIER_FREEZE.get(), SoundSource.PLAYERS, 1.4F, 1.0F);
@@ -385,14 +386,14 @@ public final class XavierAbilities {
     static void cerebro(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(5, now)) {
+        if (!data.isReady(HeroAbility.XAVIER_CEREBRO, now)) {
             return;
         }
         int ticks = XavierConfig.CEREBRO_TICKS.get();
         State state = state(player);
         state.cerebroUntil = now + ticks;
         data.set(Live.CEREBRO, true);
-        data.startCooldown(5, now, XavierConfig.CEREBRO_COOLDOWN.get());
+        data.startCooldown(HeroAbility.XAVIER_CEREBRO, now, XavierConfig.CEREBRO_COOLDOWN.get());
         List<CerebroPayload.Mind> found = ping(player, ticks);
         for (ServerPlayer other : level.players()) {
             if (other != player && found.stream().anyMatch(m -> m.name().equals(other.getGameProfile().getName()))) {

@@ -371,8 +371,10 @@ public final class GestureRoutes {
             // (R held, the Optic Blast, is the stance CYCLOPS_BLAST: the hand eases up to the visor with it; R's cooldown is the
             // Ricochet's. N's cooldown tells the glasses coming off from going on by its length, see CyclopsHeroMath.)
             case CYCLOPS -> "cooldown";
-            // 3.3: a custom hero's keys are whatever powers he put on them; each press that starts a cooldown is a cast
-            // (CustomClient.cooldownGesture), a held beam the stance of any beam.
+            // 3.4: a custom hero's keys are whatever powers he put on them: every key that acts moves his cast marker, and
+            // the binding it names plays its gesture (CustomActing.castEdge: the move chosen, the borrowed ability's own, a
+            // module's default); the cooldown's route stands for that (CustomClient.cooldownGesture, a generic press's cast).
+            // The bits a borrowed ability flips are routed by the hero who owns them in his kit.
             case CUSTOM -> "cooldown";
             // ===== professor_x =====
             // (The Mental Blast and Freeze Minds play their gestures when their cooldowns start; the trance and Cerebro are

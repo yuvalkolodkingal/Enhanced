@@ -7,6 +7,8 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.client.Minecraft;
@@ -95,14 +97,26 @@ public final class GestureTable {
         Power power = s.power;
         float age = p.tickCount;
         boolean white = "white_vision".equals(data.variant());
+        // 3.4: a custom hero's keys are told by his cast marker; the bits a borrowed ability flips by its owner in his kit.
+        boolean custom = power == Power.CUSTOM;
+        HeroKit kit = custom ? CustomActing.kit(p, data) : null;
+        if (custom) {
+            CustomActing.castEdge(s, p, data, age);
+        }
 
         // 5: an ability's cooldown starts.
         boolean thrown1 = false;
+        int hammerKey = data.slot(HeroAbility.THOR_HAMMER);
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             long until = data.cooldownUntil(i);
             if (until > m.cooldown[i] && until > now) {
-                if (i == 1 && power == Power.THOR) {
+                if (i == hammerKey) {
                     thrown1 = true;
+                }
+                if (custom) {
+                    // (The marker played the key; strength changes how long a cooldown is, so its length tells nothing.)
+                    CustomActing.cooldownRose(s, p, data, i, age);
+                    continue;
                 }
                 if (i == 4 && power == Power.BILLY && s.stance(Stance.BARRIER_BILLY) > 0.05F) {
                     continue; // (the recharge of the Hex Barrier coming down is not a Freeze)
@@ -116,14 +130,15 @@ public final class GestureTable {
             Entity let = m.released;
             m.released = null;
             if (!let.isRemoved()) {
-                fire(s, p, let.getDeltaMovement().lengthSqr() > 0.25 ? GestureRoutes.fling(power) : GestureId.TK_RELEASE, age);
+                GestureId fling = custom ? CustomActing.fling(kit) : GestureRoutes.fling(power);
+                fire(s, p, let.getDeltaMovement().lengthSqr() > 0.25 ? fling : GestureId.TK_RELEASE, age);
             }
         }
 
         // 6 and 7: telekinesis takes hold of something, or lets go.
         int held = data.heldEntityId();
         if (m.held == -1 && held != -1) {
-            fire(s, p, GestureRoutes.grab(power), age);
+            fire(s, p, custom ? CustomActing.grab(kit) : GestureRoutes.grab(power), age);
         } else if (m.held != -1 && held == -1) {
             Entity gone = m.heldEntity;
             if (gone != null && !gone.isRemoved()) {
@@ -137,7 +152,7 @@ public final class GestureTable {
         }
 
         // 8 and Thor's throw, summon and draw: his weapon.
-        if (power == Power.THOR) {
+        if (data.has(HeroAbility.THOR_HAMMER)) {
             hammer(s, p, data, m, thrown1, age);
         }
 
@@ -145,7 +160,7 @@ public final class GestureTable {
         for (Toggle toggle : TOGGLES) {
             boolean on = data.toggle(toggle);
             if (on != m.toggles[toggle.ordinal()]) {
-                fire(s, p, GestureRoutes.toggle(power, toggle, on), age);
+                fire(s, p, custom ? CustomActing.toggle(s, kit, toggle, on, age) : GestureRoutes.toggle(power, toggle, on), age);
             }
         }
 
@@ -154,7 +169,7 @@ public final class GestureTable {
         for (GestureRoutes.Flag flag : FLAGS) {
             boolean on = flag(data, flag);
             if (on != m.flags[flag.ordinal()]) {
-                GestureId id = GestureRoutes.flag(power, flag, on, white, phased);
+                GestureId id = custom ? CustomActing.flag(s, kit, flag, on, phased, age) : GestureRoutes.flag(power, flag, on, white, phased);
                 if (id == GestureId.WANDA_SHIELD_DROP && now < m.shieldFormedAt) {
                     // Let go of before it formed: there is no shield to drop, the arms only go back down.
                     HeroAnimator.release(s, GestureId.WANDA_SHIELD_RAISE, age);
@@ -172,17 +187,17 @@ public final class GestureTable {
         // 11: a momentary state begins.
         for (Live live : LIVES) {
             if (data.is(live) && !m.lives[live.ordinal()]) {
-                fire(s, p, GestureRoutes.live(power, live, s.weaponKind > 0), age);
+                fire(s, p, custom ? CustomActing.live(s, kit, live, s.weaponKind > 0, age) : GestureRoutes.live(power, live, s.weaponKind > 0), age);
             }
         }
 
         // 12: Loki takes a shape or his own again.
-        if (power == Power.LOKI && !data.form().equals(m.form)) {
+        if (data.has(HeroAbility.LOKI_SHAPESHIFT) && !data.form().equals(m.form)) {
             fire(s, p, GestureId.LOKI_CAST, age);
         }
 
         // 13: the Scarlet Witch's Hex.
-        if (power == Power.SCARLET_WITCH) {
+        if (data.has(HeroAbility.WANDA_HEX)) {
             hex(s, p, level, m, now, age);
         }
 
@@ -278,7 +293,10 @@ public final class GestureTable {
         m.fragments = m.hammer != -1 && (inFlight instanceof MjolnirFragmentEntity || m.fragments && inFlight == null);
         m.returning = s.thrownWeapon instanceof ThrownWeaponEntity flying && flying.isReturning();
         m.weaponKind = s.weaponKind;
-        if (s.power == Power.SCARLET_WITCH) {
+        if (s.power == Power.CUSTOM) {
+            CustomActing.remember(s, p);
+        }
+        if (data.has(HeroAbility.WANDA_HEX)) {
             Optional<Hex> hex = level.getData(ModAttachments.HEXES).byOwner(p.getUUID());
             m.hasHex = hex.isPresent();
             m.hexRadius = hex.map(Hex::radius).orElse(0);
@@ -311,9 +329,12 @@ public final class GestureTable {
         fire(s, p, id, 0.0F, age);
     }
 
-    /** As above, for a gesture that takes a number ({@link HeroAnimator#start}). */
-    private static void fire(HeroAnimState s, AbstractClientPlayer p, GestureId id, float param, float age) {
-        if (id == null) {
+    /**
+     * As above, for a gesture that takes a number ({@link HeroAnimator#start}). A custom hero's passes the filter of his
+     * kit (3.4): he acts only what his abilities, his modules and his chosen moves do.
+     */
+    static void fire(HeroAnimState s, AbstractClientPlayer p, GestureId id, float param, float age) {
+        if (id == null || s.power == Power.CUSTOM && !CustomActing.allowed(p, id)) {
             return;
         }
         for (HeroAnimState.Slot slot : s.slots) {

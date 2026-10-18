@@ -388,10 +388,11 @@ public final class EnhancedConfig {
                         "and the attacks of bosses. 3.3: it has no time limit and costs no hunger; it has barrierHealth. false: the key does",
                         "nothing.")
                 .define("barrier", true);
-        BILLY_BARRIER_HEALTH = BUILDER.comment("3.3: the health of the Hex Barrier. Every hit it stops takes what that hit would have done off it; at 0 it",
-                        "shatters and cannot be raised for barrierShatterCooldown ticks. Any power of the Scarlet Witch (chaos magic) that hits",
-                        "it shatters it at once, whatever it has left. It keeps what it has left while it is down and mends (barrierRegenPerSecond).")
-                .defineInRange("barrierHealth", 30.0, 1.0, 1000.0);
+        BILLY_BARRIER_HEALTH = BUILDER.comment("3.3.1: the health of the Hex Barrier. Only chaos magic (the Scarlet Witch's powers, the Chaos Beam) and dark",
+                        "magic (the Darkhold's, Agatha's) wear it down, each hit by what it would have done; everything else it stops without",
+                        "wearing. At 0 it shatters and cannot be raised for barrierShatterCooldown ticks. It keeps what it has left while it is",
+                        "down and mends (barrierRegenPerSecond).")
+                .defineInRange("barrierHealth", 60.0, 1.0, 1000.0);
         BILLY_BARRIER_RANK_STRENGTH_BONUS = BUILDER.comment("How much more health the Hex Barrier has at his highest rank (build_magic_billy.maxRank) than at his first,",
                         "as a fraction: 1.0 = twice the health. In between it grows evenly with the rank. 0 = barrierHealth at every rank.")
                 .defineInRange("barrierRankHealthBonus", 0.0, 0.0, 20.0);
@@ -520,6 +521,8 @@ public final class EnhancedConfig {
         AgathaConfig.define(BUILDER);
         // 3.3: the speedsters' walls and ceilings, Tommy's slow time and the speed strikes (section [speedsters]).
         com.kolodkingal.enhanced.config.SpeedConfig.define(BUILDER);
+        // 3.3.1: the Mutant Cure (section [mutant_cure]).
+        com.kolodkingal.enhanced.config.CureConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

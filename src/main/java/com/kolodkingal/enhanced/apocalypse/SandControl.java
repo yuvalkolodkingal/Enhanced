@@ -4,8 +4,8 @@ import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.boss.BossFight;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
@@ -99,7 +99,9 @@ public final class SandControl {
     /** Whether the player holds a complete shield of their own: a Chaos Shield or Apocalypse's, which the grasp skips. */
     public static boolean hasCompleteShield(Player player) {
         PowerData data = Powers.get(player);
-        return (data.power() == Power.SCARLET_WITCH || data.power() == Power.APOCALYPSE) && data.chaosShieldUp(player.level().getGameTime());
+        // (3.4: a custom hero's Chaos Shield or Apocalypse's shield too.)
+        return (data.has(HeroAbility.WANDA_CHAOS_SHIELD) || data.has(HeroAbility.APOCALYPSE_SHIELD))
+                && data.chaosShieldUp(player.level().getGameTime());
     }
 
     /**

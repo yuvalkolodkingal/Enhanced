@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -45,7 +46,12 @@ public final class SwingAssist {
         /** A point of the open sky ahead and above him (the open-land fallback). */
         SKY,
         /** No swing: a short web boost forward and up (the other open-land fallback). */
-        BOOST
+        BOOST,
+        /**
+         * No swing (3.3.1): from the floor of a forest, a dash to a gap in the canopy and a web leap up through it, to swing
+         * on from above it (see {@link #climb}). The anchor's point is the top of the gap, its pivot the foot of it.
+         */
+        CLIMB
     }
 
     /** What the assist does where there is nothing to swing from (the config's {@code webAssistOpenLand}). */
@@ -63,7 +69,8 @@ public final class SwingAssist {
 
     /**
      * An anchor the assist chose: where the web is fixed, on which face, of what kind, the point he swings about (see
-     * {@link #pivot}), the rope to start with (from the middle of his body to the pivot), and its score.
+     * {@link #pivot}), the rope to start with (from the middle of his body to the pivot), and its score. (For a
+     * {@link Kind#CLIMB} the point is the top of the gap and the pivot the foot of it, where he leaps.)
      */
     public record Anchor(Vec3 point, Direction face, Kind kind, Vec3 pivot, double rope, double score) {
         /** The length of the web itself, from the middle of his body to where it is fixed. */
@@ -110,6 +117,29 @@ public final class SwingAssist {
     private static final int SKY_OPEN = 24;
     /** How far down the ground is looked for under a point. */
     private static final int DEPTH = 48;
+    /** A swing begun on the ground may rise over a step this high in its first ticks (as his body does when he hops). */
+    private static final double STEP = 1.0;
+    private static final int STEP_TICKS = 5;
+
+    // ---- the climb out of a forest (3.3.1) ----
+    /** The physics of his leap: the game's gravity and vertical drag, and the horizontal drag kept between two webs. */
+    public static final double LEAP_GRAVITY = 0.08;
+    public static final double LEAP_DRAG = 0.98;
+    /** The fastest leap up (a leap of about 12 blocks), and the slowest that is tried. */
+    private static final double LEAP_MAX_UP = 1.6;
+    private static final double LEAP_MIN_UP = 0.7;
+    /** At the top of the leap his feet are this far above the canopy round the gap. */
+    private static final double LEAP_CLEAR = 1.0;
+    /** The gaps looked for: this many blocks ahead of him, this many to each side. */
+    public static final int CLIMB_AHEAD = 5;
+    private static final int CLIMB_SIDE = 2;
+    /** How fast he dashes along the floor to the foot of the gap, and for how long at most. */
+    public static final double CLIMB_DASH = 0.45;
+    public static final int CLIMB_DASH_TICKS = 16;
+    /** A canopy is what stands over him within this many blocks (higher than that, the leap would not get out of it). */
+    public static final int CLIMB_HEIGHT = 12;
+    /** How near the ground he must be for a climb (his feet over the ground under him). */
+    public static final double CLIMB_NEAR_GROUND = 1.5;
 
     // =================================================================================================================
     // Choosing
@@ -177,8 +207,19 @@ public final class SwingAssist {
                 return candidate;
             }
         }
+        if (openLand == OpenLand.SKY) {
+            Anchor sky = sky(level, body, ground, feet, eye, heading, velocity, params);
+            if (sky != null) {
+                return sky;
+            }
+        }
+        // (3.3.1) On the floor of a forest nothing is clear to swing from, nor the sky: up through a gap in the canopy first.
+        Anchor climb = climb(level, body, ground, feet, heading, bounds);
+        if (climb != null) {
+            return climb;
+        }
         return switch (openLand) {
-            case SKY -> sky(level, body, ground, feet, eye, heading, velocity, params);
+            case SKY -> null;
             case ZIP -> {
                 Vec3 toward = eye.add(heading.scale(8.0)).add(0, 4.0, 0);
                 yield new Anchor(toward, Direction.DOWN, Kind.BOOST, toward, 0.0, 0.0);
@@ -305,12 +346,21 @@ public final class SwingAssist {
         Vec3 v = velocity;
         double length = rope;
         double lowest = Double.MAX_VALUE;
+        boolean grounded = feet.y - ground.below(feet.x, feet.y + 0.01, feet.z) < 0.05;
         for (int tick = 1; tick <= LOOK_AHEAD; tick++) {
             length = reel(ground, anchor, length, centre, v);
             SpiderMath.Swing step = SpiderMath.swingStep(centre, v, anchor, length, pump(v, centre, anchor, 0, params.maxSpeed()),
                     params.gravity(), DRAG, params.maxSpeed());
             Vec3 next = step.position();
             if (!fits(level, body, centre.lerp(next, 0.5)) || !fits(level, body, next)) {
+                // (Begun on the ground, a step of the forest floor in front of him only holds him back while he rises
+                // over it, as the game moves his body: not a snag. A trunk or a wall is higher than a step.)
+                Vec3 up = new Vec3(centre.x, next.y, centre.z);
+                if (grounded && tick <= STEP_TICKS && next.y >= centre.y && fits(level, body, next.add(0, STEP, 0)) && fits(level, body, up)) {
+                    centre = up;
+                    v = new Vec3(0, step.velocity().y, 0);
+                    continue;
+                }
                 return new Flight(false, tick, lowest);
             }
             lowest = Math.min(lowest, next.y - ground.below(next.x, next.y, next.z));
@@ -332,6 +382,163 @@ public final class SwingAssist {
         double height = body.getBbHeight() - 0.02;
         double y = centre.y - CENTRE + 0.01;
         return level.noCollision(body, new AABB(centre.x - half, y, centre.z - half, centre.x + half, y + height, centre.z + half));
+    }
+
+    // =================================================================================================================
+    // The climb out of a forest (3.3.1)
+    // =================================================================================================================
+
+    /**
+     * A climb up through a gap in the canopy, for when he stands on the floor of a forest (or near it) under leaves or
+     * branches and nothing is clear to swing from: the gaps ahead of him (up to {@link #CLIMB_AHEAD} blocks ahead and two
+     * to each side, the nearest and straightest first) whose column is open from the floor to the sky. He dashes along
+     * the floor to the foot of the gap and leaps straight up it, his feet {@link #LEAP_CLEAR} over the canopy round it at
+     * the top; both are flown through (his body touches nothing on the way). From the top of the leap the next web swings
+     * him over the trees. Null when he is not near the ground, nothing stands over him, or no gap lets him out.
+     *
+     * <p>The anchor's point is the top of the gap (two blocks over the top of the leap), its pivot the foot of the gap
+     * where the leap begins ({@link #leapUp} is the speed of the leap).
+     */
+    @Nullable
+    public static Anchor climb(Level level, Entity body, Vec3 feet, Vec3 heading, @Nullable AABB bounds) {
+        return climb(level, body, new Ground(level), feet, heading, bounds);
+    }
+
+    @Nullable
+    private static Anchor climb(Level level, Entity body, Ground ground, Vec3 feet, Vec3 heading, @Nullable AABB bounds) {
+        if (feet.y - ground.below(feet.x, feet.y + 0.01, feet.z) > CLIMB_NEAR_GROUND || !covered(level, body, feet)) {
+            return null;
+        }
+        Vec3 ahead = new Vec3(heading.x, 0, heading.z).normalize();
+        Vec3 side = new Vec3(-ahead.z, 0, ahead.x);
+        for (int forward = 0; forward <= CLIMB_AHEAD; forward++) {
+            for (int across = 0; across <= 2 * CLIMB_SIDE; across++) {
+                int sideways = (across + 1) / 2 * (across % 2 == 0 ? 1 : -1);
+                Vec3 at = feet.add(ahead.scale(forward)).add(side.scale(sideways));
+                Vec3 spot = new Vec3(Mth.floor(at.x) + 0.5, feet.y, Mth.floor(at.z) + 0.5);
+                if (bounds != null && !bounds.contains(spot.add(0, 1.0, 0)) || !open(level, feet, spot)) {
+                    continue;
+                }
+                // (The foot of the gap may be a step up, or down, from where he stands.)
+                double floor = ground.below(spot.x, feet.y + STEP + 0.01, spot.z);
+                if (floor < feet.y - CLIMB_NEAR_GROUND) {
+                    continue;
+                }
+                spot = new Vec3(spot.x, floor, spot.z);
+                double top = Math.max(canopy(level, spot, 2), feet.y) + LEAP_CLEAR;
+                if (top - feet.y > CLIMB_HEIGHT + LEAP_CLEAR) {
+                    continue;
+                }
+                double up = leapUp(top - feet.y);
+                if (!Double.isNaN(up) && dashClear(level, body, feet, spot) && leapClear(level, body, spot, new Vec3(0, up, 0))) {
+                    return new Anchor(new Vec3(spot.x, top + 2.0, spot.z), Direction.DOWN, Kind.CLIMB, spot, 0.0, 0.0);
+                }
+            }
+        }
+        return null;
+    }
+
+    /** The speed of the leap of a climb (see {@link #climb}): up from its pivot to two blocks under its point. */
+    public static double leapUp(Anchor climb) {
+        double up = leapUp(climb.point().y - 2.0 - climb.pivot().y);
+        return Double.isNaN(up) ? LEAP_MAX_UP : up;
+    }
+
+    /** Whether the column of {@code column} is open from about his feet up to the sky (nothing that blocks motion over it). */
+    public static boolean open(Level level, Vec3 feet, Vec3 column) {
+        return level.getHeight(Heightmap.Types.MOTION_BLOCKING, Mth.floor(column.x), Mth.floor(column.z)) <= Mth.floor(feet.y) + 1;
+    }
+
+    /** The highest top of what blocks motion in the square of the radius round a point, as high as {@link #CLIMB_HEIGHT} over it. */
+    private static double canopy(Level level, Vec3 at, int radius) {
+        int x0 = Mth.floor(at.x);
+        int z0 = Mth.floor(at.z);
+        int limit = Mth.floor(at.y) + CLIMB_HEIGHT + 1;
+        double top = Double.NEGATIVE_INFINITY;
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                top = Math.max(top, Math.min(limit, level.getHeight(Heightmap.Types.MOTION_BLOCKING, x0 + dx, z0 + dz)));
+            }
+        }
+        return top;
+    }
+
+    /**
+     * Whether he is among trees: leaves or branches over him or round him (within three blocks), a block over the height of
+     * his head with room under it (a wall or a trunk is no canopy, the crown on it is).
+     */
+    private static boolean covered(Level level, Entity body, Vec3 feet) {
+        BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
+        int x0 = Mth.floor(feet.x);
+        int z0 = Mth.floor(feet.z);
+        int head = Mth.floor(feet.y + body.getBbHeight());
+        for (int dx = -3; dx <= 3; dx++) {
+            for (int dz = -3; dz <= 3; dz++) {
+                at.set(x0 + dx, head, z0 + dz);
+                if (!level.getBlockState(at).getCollisionShape(level, at).isEmpty()) {
+                    continue;
+                }
+                for (int y = head + 1; y <= Mth.floor(feet.y) + CLIMB_HEIGHT; y++) {
+                    at.set(x0 + dx, y, z0 + dz);
+                    if (!level.getBlockState(at).getCollisionShape(level, at).isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /** The slowest leap straight up (the game's gravity and drag) that rises {@code rise} blocks, or NaN when none does. */
+    public static double leapUp(double rise) {
+        for (double up = LEAP_MIN_UP; up <= LEAP_MAX_UP + 1.0E-9; up += 0.05) {
+            double y = 0.0;
+            double vy = up;
+            while (vy > 0.0) {
+                y += vy;
+                vy = (vy - LEAP_GRAVITY) * LEAP_DRAG;
+            }
+            if (y >= rise) {
+                return up;
+            }
+        }
+        return Double.NaN;
+    }
+
+    /**
+     * Whether his body fits all along the way from {@code feet} to {@code spot} on the floor: a step up of one block on
+     * the way is hopped over (his client hops when the dash meets one), a step down is walked off.
+     */
+    private static boolean dashClear(Level level, Entity body, Vec3 feet, Vec3 spot) {
+        double length = Math.hypot(spot.x - feet.x, spot.z - feet.z);
+        int steps = Math.max(1, Mth.ceil(length / 0.25));
+        double y = feet.y;
+        for (int i = 1; i <= steps; i++) {
+            Vec3 at = feet.lerp(spot, i / (double) steps);
+            if (fits(level, body, new Vec3(at.x, y + CENTRE + 0.01, at.z))) {
+                continue;
+            }
+            if (y + STEP > feet.y + STEP + 1.0E-6 || !fits(level, body, new Vec3(at.x, y + STEP + CENTRE + 0.01, at.z))) {
+                return false;
+            }
+            y += STEP;
+        }
+        return true;
+    }
+
+    /** Whether his body touches no block on the way up a leap of {@code velocity} from {@code feet}, to its top. */
+    public static boolean leapClear(Level level, Entity body, Vec3 feet, Vec3 velocity) {
+        Vec3 centre = feet.add(0, CENTRE, 0);
+        Vec3 v = velocity;
+        for (int tick = 0; tick < 60 && v.y > 0.0; tick++) {
+            Vec3 next = centre.add(v);
+            if (!fits(level, body, centre.lerp(next, 0.5)) || !fits(level, body, next)) {
+                return false;
+            }
+            centre = next;
+            v = new Vec3(v.x * LEAP_DRAG, (v.y - LEAP_GRAVITY) * LEAP_DRAG, v.z * LEAP_DRAG);
+        }
+        return true;
     }
 
     // =================================================================================================================

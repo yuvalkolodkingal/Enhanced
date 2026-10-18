@@ -43,8 +43,8 @@ import java.util.UUID;
  *     creatures if she let creatures in; never a boss);</li>
  *     <li>a <b>ward</b> of the Book of the Vishanti: what a monster, a boss or a boss's minion launches ({@link #hostile}) and dark
  *     magic ({@link DarkMagic}) stop at its edge; the powers of players pass;</li>
- *     <li>Billy's <b>Hex Barrier</b>: whatever comes at him from the front stops at the plate and wears it down
- *     ({@link BillyBarrier}); the Scarlet Witch's chaos magic shatters it at once;</li>
+ *     <li>Billy's <b>Hex Barrier</b>: whatever comes at him from the front stops at the plate; only chaos and dark magic wear
+ *     it down ({@link BillyBarrier});</li>
  *     <li>the Scarlet Witch's <b>Chaos Shield</b> (beams only; the rest of its rules are {@link WandaAbilities}').</li>
  * </ul>
  * A power that starts inside a wall's sphere is never stopped by it: the walls keep out, they do not keep in.
@@ -259,7 +259,7 @@ public final class Shelters {
         WandaAbilities.ShieldStop chaos = WandaAbilities.chaosShieldAcross(level, firer, from, to, partialTick);
         if (chaos != null) {
             best = chaos.point().distanceTo(from);
-            nearest = new Stop(Wall.CHAOS_SHIELD, chaos.owner(), chaos.point(), Power.SCARLET_WITCH.glow, chaos.owner().getUUID());
+            nearest = new Stop(Wall.CHAOS_SHIELD, chaos.owner(), chaos.point(), WandaAbilities.glow(chaos.owner()), chaos.owner().getUUID());
         }
         AABB reach = new AABB(from, to).inflate(BillyBarrier.distance() + BillyBarrier.height());
         for (Player billy : level.getEntitiesOfClass(Player.class, reach, p -> p != firer && !p.isSpectator() && BillyBarrier.isUp(p))) {

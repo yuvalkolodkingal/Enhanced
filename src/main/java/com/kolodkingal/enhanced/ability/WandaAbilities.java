@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
@@ -75,14 +76,17 @@ public final class WandaAbilities {
     // ---- input ----
 
     /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
+     * The key of old, which reads Sneak from the player (the Scarlet Witch herself: {@code AbilityHandler}).
      */
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * A key of hers (3.4: also one of a custom hero's bindings, {@code HeroKeys.press}, with the key the ability has for
+     * her). {@code alt}: its Sneak variant (only the Hex has one: Sneak + N dissolves it).
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         switch (ability) {
             case 1 -> {
                 boolean start = down && !player.isSpectator();
@@ -110,7 +114,7 @@ public final class WandaAbilities {
             }
             case 5 -> {
                 if (down) {
-                    HexManager.onHexKey(player);
+                    HexManager.onHexKey(player, alt);
                 }
             }
             default -> {
@@ -118,13 +122,43 @@ public final class WandaAbilities {
         }
     }
 
+    /** Her upkeep (3.4: a custom hero's too, of the abilities of hers he has: the beam flag and the shield are shared fields). */
     static void tick(ServerPlayer player, PowerData data) {
-        if (data.beamActive()) {
+        if (data.beamActive() && data.has(HeroAbility.WANDA_CHAOS_BEAM)) {
             beamTick(player);
         }
-        if (data.chaosShieldActive()) {
+        if (data.chaosShieldActive() && data.has(HeroAbility.WANDA_CHAOS_SHIELD)) {
             shieldTick(player, data);
         }
+    }
+
+    /**
+     * 3.4: the abilities of hers a custom hero had end (he lost them, was redefined, died or left): the beam goes out and the
+     * shield comes down. (Her Hex goes with the Hex ability: {@code Powers.setPower}, {@link HexManager#tickLevel}.)
+     */
+    static void endAll(ServerPlayer player, PowerData data) {
+        if (data.power() != Power.CUSTOM) {
+            return; // (the Scarlet Witch losing her power: Powers.setPower, as before)
+        }
+        if (data.has(HeroAbility.WANDA_CHAOS_BEAM)) {
+            data.setBeamActive(false);
+        }
+        if (data.has(HeroAbility.WANDA_CHAOS_SHIELD)) {
+            data.setChaosShieldActive(false);
+        }
+    }
+
+    /**
+     * The colour of her magic for this player: the Scarlet Witch's red, or (3.4) a custom hero's own colour ({@link
+     * Powers#color}); {@link #glow} likewise.
+     */
+    public static int color(Player player) {
+        return Powers.power(player) == Power.SCARLET_WITCH ? Power.SCARLET_WITCH.color : Powers.color(player);
+    }
+
+    /** The bright colour of her magic for this player (see {@link #color}). */
+    public static int glow(Player player) {
+        return Powers.power(player) == Power.SCARLET_WITCH ? Power.SCARLET_WITCH.glow : Powers.glow(player);
     }
 
     // ---- Wanda's Crown ----
@@ -150,7 +184,7 @@ public final class WandaAbilities {
         ServerLevel level = player.serverLevel();
         HitResult hit = Raycasts.any(player, EnhancedConfig.CHAOS_BEAM_RANGE.get(), beamTargets(player), 1.0F);
         // 3.3: a wall in the way (another's Chaos Shield, Billy's barrier, a ward is no matter to her) ends the beam there; chaos
-        // magic shatters a Hex Barrier at once.
+        // magic wears a Hex Barrier down (3.3.1: by its damage, no longer at once).
         ShieldStop shield = shieldAcross(level, player, player.getEyePosition(), hit.getLocation(), 1.0F);
         if (shield != null) {
             if (player.tickCount % 10 == 0) {
@@ -175,7 +209,7 @@ public final class WandaAbilities {
         }
         Vec3 end = hit.getLocation();
         if (player.tickCount % 2 == 0) {
-            level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.4F), end.x, end.y, end.z, 4, 0.12, 0.12, 0.12, 0.12);
+            level.sendParticles(new EnergyParticleOptions(glow(player), 1.4F), end.x, end.y, end.z, 4, 0.12, 0.12, 0.12, 0.12);
         }
         if (hit.getType() == HitResult.Type.BLOCK && player.tickCount % 4 == 0) {
             level.sendParticles(ParticleTypes.SMOKE, end.x, end.y, end.z, 1, 0.05, 0.05, 0.05, 0.01);
@@ -205,7 +239,7 @@ public final class WandaAbilities {
     /** The shield is held and complete: only then does it stop anything (it takes time to form, and wears out). */
     public static boolean hasShieldUp(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.SCARLET_WITCH && data.chaosShieldUp(player.level().getGameTime());
+        return data.has(HeroAbility.WANDA_CHAOS_SHIELD) && data.chaosShieldUp(player.level().getGameTime());
     }
 
     /**
@@ -243,9 +277,9 @@ public final class WandaAbilities {
             return;
         }
         long now = player.level().getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.WANDA_CHAOS_SHIELD, now)) {
             player.displayClientMessage(Component.translatable("message.enhanced.chaos_shield.recharging",
-                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(4) - now) / 20.0)), true);
+                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(data.slot(HeroAbility.WANDA_CHAOS_SHIELD)) - now) / 20.0)), true);
             return;
         }
         if (!canAffordShield(player)) {
@@ -266,11 +300,11 @@ public final class WandaAbilities {
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.6F, 1.7F);
             return; // nothing was spent, so nothing has to recharge
         }
-        data.startCooldown(4, player.level().getGameTime(),
+        data.startCooldown(HeroAbility.WANDA_CHAOS_SHIELD, player.level().getGameTime(),
                 (worn ? EnhancedConfig.CHAOS_SHIELD_BROKEN_COOLDOWN : EnhancedConfig.CHAOS_SHIELD_COOLDOWN).get());
         if (worn) {
             ServerLevel level = player.serverLevel();
-            level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.2F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
+            level.sendParticles(new EnergyParticleOptions(glow(player), 1.2F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
                     player.getZ(), 24, SHIELD_RADIUS * 0.5, 0.7, SHIELD_RADIUS * 0.5, 0.05);
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.6F, 1.7F);
@@ -280,7 +314,7 @@ public final class WandaAbilities {
     private static void shatter(ServerPlayer player, PowerData data) {
         data.setChaosShieldActive(false);
         ServerLevel level = player.serverLevel();
-        data.startCooldown(4, level.getGameTime(), EnhancedConfig.CHAOS_SHIELD_BROKEN_COOLDOWN.get());
+        data.startCooldown(HeroAbility.WANDA_CHAOS_SHIELD, level.getGameTime(), EnhancedConfig.CHAOS_SHIELD_BROKEN_COOLDOWN.get());
         Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
         RandomSource random = player.getRandom();
         // Chips of bright red. (A red stained glass block's own particles are see-through and a dull grey-violet in the
@@ -292,7 +326,7 @@ public final class WandaAbilities {
             Vec3 at = center.add(out.scale(SHIELD_RADIUS));
             level.sendParticles(shard, at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             if (i % 2 == 0) {
-                level.sendParticles(new EnergyParticleOptions(i % 4 == 0 ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 1.5F),
+                level.sendParticles(new EnergyParticleOptions(i % 4 == 0 ? glow(player) : color(player), 1.5F),
                         at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             }
         }
@@ -330,7 +364,7 @@ public final class WandaAbilities {
             for (int i = 0; i < 2; i++) {
                 Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
                 Vec3 at = center.add(out.scale(SHIELD_RADIUS * Math.max(0.3, grown)));
-                level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.0F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
+                level.sendParticles(new EnergyParticleOptions(glow(player), 1.0F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
             }
             return;
         }
@@ -392,7 +426,7 @@ public final class WandaAbilities {
      */
     public static void block(ServerPlayer player, Projectile projectile) {
         float power = projectilePower(projectile);
-        neutralize(player.serverLevel(), projectile);
+        neutralize(player.serverLevel(), projectile, color(player));
         wear(player, power, projectile);
     }
 
@@ -480,8 +514,8 @@ public final class WandaAbilities {
         double distance = away.length();
         // The blow struck the sphere (or the attacker, if it is inside it): sparks and a ring of sound there.
         Vec3 contact = distance < 1.0E-3 ? center : center.add(away.scale(Math.min(distance, SHIELD_RADIUS) / distance));
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.4F), contact.x, contact.y, contact.z, 8, 0.15, 0.15, 0.15, 0.1);
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.2F), contact.x, contact.y, contact.z, 10, 0.2, 0.2, 0.2, 0.15);
+        level.sendParticles(new EnergyParticleOptions(glow(player), 1.4F), contact.x, contact.y, contact.z, 8, 0.15, 0.15, 0.15, 0.1);
+        level.sendParticles(new EnergyParticleOptions(color(player), 1.2F), contact.x, contact.y, contact.z, 10, 0.2, 0.2, 0.2, 0.15);
         level.playSound(null, contact.x, contact.y, contact.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F, 1.9F);
         level.playSound(null, contact.x, contact.y, contact.z, SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.8F, 1.5F);
 
@@ -592,10 +626,10 @@ public final class WandaAbilities {
      */
     public static float wear(ServerPlayer player, float amount, @Nullable Entity cause) {
         PowerData data = Powers.get(player);
-        if (data.power() == Power.BILLY) {
+        if (BillyBarrier.owns(data)) {
             return BillyBarrier.wear(player, data, amount, cause); // 3.3: the wall it stopped at was his Hex Barrier
         }
-        if (data.power() == Power.SCARLET_WITCH && shieldUnlimited() && (EnhancedConfig.WANDA_SHIELD_UNLIMITED_VS_BOSSES.get() || !fromBoss(cause))) {
+        if (data.has(HeroAbility.WANDA_CHAOS_SHIELD) && shieldUnlimited() && (EnhancedConfig.WANDA_SHIELD_UNLIMITED_VS_BOSSES.get() || !fromBoss(cause))) {
             return amount; // 3.2: an unlimited shield stops it all and is never worn down
         }
         float taken = Math.min(amount, data.shieldStrength());

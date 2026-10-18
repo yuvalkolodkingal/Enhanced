@@ -267,11 +267,30 @@ public final class MovePowers {
         @Override
         public void tick(Ctx c) {
             ServerPlayer p = c.player;
-            if (c.state.isOn(PowerModule.WALL_CRAWL) && touchesWall(p)) {
+            boolean on = c.state.isOn(PowerModule.WALL_CRAWL);
+            boolean wall = on && touchesWall(p);
+            if (wall) {
                 p.resetFallDistance();
                 p.connection.aboveGroundTickCount = 0;
             }
+            // (3.4) The flags everyone's client reads for Spider-Man's cling stances: on a wall off the ground, or under a
+            // ceiling with no wall beside him.
+            boolean aloft = !p.onGround() && !p.isInWaterOrBubble();
+            c.data.set(Live.CLINGING_WALL, wall && aloft);
+            c.data.set(Live.CLINGING_CEILING, on && !wall && aloft && touchesCeiling(p));
         }
+
+        @Override
+        public void end(Ctx c) {
+            c.data.set(Live.CLINGING_WALL, false);
+            c.data.set(Live.CLINGING_CEILING, false);
+        }
+    }
+
+    /** Whether a solid block is right above his head. */
+    public static boolean touchesCeiling(ServerPlayer p) {
+        AABB box = p.getBoundingBox().move(0, 0.12, 0);
+        return !p.level().noCollision(p, box);
     }
 
     /** Whether a solid block is right beside him (at his feet or his head). */

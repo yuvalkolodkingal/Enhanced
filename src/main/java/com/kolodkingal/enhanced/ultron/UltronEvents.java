@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -40,7 +41,7 @@ public final class UltronEvents {
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         LivingEntity target = event.getEntity();
         boolean robot = target.getType().is(ModTags.ULTRON_ROBOTS);
-        boolean hero = target instanceof ServerPlayer player && Powers.is(player, Power.ULTRON);
+        boolean hero = target instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.ULTRON_BODY); // (3.4: his body's)
         if (!robot && !hero) {
             return;
         }
@@ -57,7 +58,7 @@ public final class UltronEvents {
     /** HIGH: a machine takes no Poison and no Wither. */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
-        if (event.getEntity() instanceof ServerPlayer player && Powers.is(player, Power.ULTRON)
+        if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.ULTRON_BODY)
                 && (event.getEffectInstance().is(MobEffects.POISON) || event.getEffectInstance().is(MobEffects.WITHER))) {
             event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
         }
@@ -70,7 +71,8 @@ public final class UltronEvents {
      */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onSecondLife(LivingDeathEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && Powers.is(player, Power.ULTRON) && UltronDrones.secondLife(player, event.getSource())) {
+        if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.ULTRON_UPLOAD)
+                && UltronDrones.secondLife(player, event.getSource())) {
             event.setCanceled(true);
         }
     }
@@ -84,12 +86,13 @@ public final class UltronEvents {
     public static void onDamaged(LivingDamageEvent.Post event) {
         LivingEntity victim = event.getEntity();
         Entity cause = event.getSource().getEntity();
-        if (cause instanceof ServerPlayer hero && hero != victim && Powers.is(hero, Power.ULTRON) && !UltronDrones.isDroneBlow(event.getSource())
+        if (cause instanceof ServerPlayer hero && hero != victim && Powers.get(hero).acts(Power.ULTRON)
+                && !UltronDrones.isDroneBlow(event.getSource())
                 && !(victim instanceof UltronSentryEntity sentry && hero.getUUID().equals(sentry.getOwnerUUID()))) {
             hero.setLastHurtMob(victim);
         }
         if (cause instanceof ServerPlayer attacker) {
-            ServerPlayer hero = victim instanceof ServerPlayer player && Powers.is(player, Power.ULTRON) ? player
+            ServerPlayer hero = victim instanceof ServerPlayer player && Powers.get(player).acts(Power.ULTRON) ? player
                     : victim instanceof UltronSentryEntity sentry && sentry.getOwner() instanceof ServerPlayer owner ? owner : null;
             if (hero != null && hero != attacker) {
                 UltronDrones.provoke(hero, attacker);

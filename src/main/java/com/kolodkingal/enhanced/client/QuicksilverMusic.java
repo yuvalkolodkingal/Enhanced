@@ -3,7 +3,7 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
-import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -81,7 +81,7 @@ public final class QuicksilverMusic {
         double range = SlowMotion.radius() + 16;
         for (Player player : listener.level().players()) {
             PowerData data = Powers.get(player);
-            if (data.power() == Power.QUICKSILVER && data.slowMo() && data.walkman()
+            if (data.has(HeroAbility.QUICKSILVER_TIME) && data.slowMo() && data.walkman()
                     && player.distanceToSqr(listener) < range * range) {
                 return true;
             }

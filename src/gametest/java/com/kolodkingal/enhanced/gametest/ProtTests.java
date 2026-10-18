@@ -388,7 +388,7 @@ public final class ProtTests {
         return billy;
     }
 
-    /** A beam from the front ends at the plate and wears it; one from behind reaches him. */
+    /** A beam from the front ends at the plate (3.3.1: Thor's does not wear it); one from behind reaches him. */
     @GameTest(template = ARENA, batch = "prot_barrier_beam", timeoutTicks = 40)
     public static void theBarrierStopsBeamsFromTheFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
@@ -400,16 +400,16 @@ public final class ProtTests {
             WandaAbilities.ShieldStop stop = WandaAbilities.shieldAcross(helper.getLevel(), thor, thor.getEyePosition(), Shelters.middle(billy[0]), 1.0F);
             check(stop != null && stop.wall() == Shelters.Wall.HEX_BARRIER, "Thor's beam ends at the plate: " + stop);
             WandaAbilities.pay(stop, thor, 5.0F);
-            assertNear(Powers.get(billy[0]).shieldStrength(), 25.0, 1.0E-3, "and it pays the hit");
+            assertNear(Powers.get(billy[0]).shieldStrength(), 60.0, 1.0E-3, "and it is not worn by it (3.3.1)");
             check(WandaAbilities.shieldAcross(helper.getLevel(), behind, behind.getEyePosition(), Shelters.middle(billy[0]), 1.0F) == null,
                     "from behind nothing stops it");
             helper.succeed();
         });
     }
 
-    /** Grips and curses from the front are stopped; any power of the Scarlet Witch shatters it at once. */
+    /** Grips and curses from the front are stopped; a power of the Scarlet Witch wears it down (3.3.1), until it shatters. */
     @GameTest(template = ARENA, batch = "prot_barrier_chaos", timeoutTicks = 40)
-    public static void chaosMagicShattersTheBarrier(GameTestHelper helper) {
+    public static void chaosMagicWearsTheBarrierDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(10.5, FLOOR, 14.5, Power.MAGNETO);
         ServerPlayer wanda = f.player(12.5, FLOOR, 14.5, Power.SCARLET_WITCH);
@@ -419,8 +419,15 @@ public final class ProtTests {
             check(!b.addEffect(new MobEffectInstance(ModEffects.SPELLBOUND, 100), magneto), "a curse from the front does not take");
             check(Shelters.stops(magneto, magneto.getEyePosition(), b, 0.0F), "Magneto's pull is stopped");
             check(BillyBarrier.isUp(b), "and the barrier stands");
-            check(Shelters.stops(wanda, wanda.getEyePosition(), b, 0.0F), "Wanda's grip is stopped too");
-            check(!BillyBarrier.isUp(b), "but her chaos magic shattered it");
+            check(Shelters.stops(magneto, magneto.getEyePosition(), b, 9.0F), "a pull that would cost 9 is stopped");
+            assertNear(Powers.get(b).shieldStrength(), 60.0, 1.0E-3, "and does not wear it");
+            check(Shelters.stops(wanda, wanda.getEyePosition(), b, 9.0F), "Wanda's grip is stopped too");
+            check(BillyBarrier.isUp(b), "her chaos magic no longer shatters it at once");
+            assertNear(Powers.get(b).shieldStrength(), 51.0, 1.0E-3, "it wears it down by its cost");
+            check(Shelters.stops(wanda, wanda.getEyePosition(), b, 9.0F), "again at once");
+            assertNear(Powers.get(b).shieldStrength(), 51.0, 1.0E-3, "a power costs at most twice a second");
+            BillyBarrier.wear(b, Powers.get(b), 60.0F, wanda);
+            check(!BillyBarrier.isUp(b), "enough chaos magic shatters it");
             long left = Powers.get(b).cooldownUntil(4) - helper.getLevel().getGameTime();
             check(left > 150, "and it cannot be raised for a while: " + left);
             helper.succeed();

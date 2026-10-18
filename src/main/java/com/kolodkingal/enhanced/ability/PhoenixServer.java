@@ -20,7 +20,13 @@ public final class PhoenixServer implements HeroServer {
 
     @Override
     public void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
-        PhoenixAbilities.onKey(player, data, ability, down);
+        PhoenixAbilities.onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /** 3.4: a key of hers with its Sneak variant said explicitly (a custom hero's, or her own through the 4-argument form). */
+    @Override
+    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        PhoenixAbilities.onKey(player, data, ability, down, alt);
     }
 
     @Override

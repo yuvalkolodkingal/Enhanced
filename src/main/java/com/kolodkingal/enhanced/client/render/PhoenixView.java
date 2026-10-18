@@ -5,8 +5,8 @@ import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.client.MindReadingOverlay;
 import com.kolodkingal.enhanced.client.MindSense;
 import com.kolodkingal.enhanced.client.PowerHud;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -125,7 +125,7 @@ final class PhoenixView {
     private static void lookForHost(Minecraft mc, ClientLevel level) {
         host = null;
         LocalPlayer me = mc.player;
-        if (me == null || !me.isAlive() || Powers.get(me).power() != Power.PHOENIX) {
+        if (me == null || !me.isAlive() || !Powers.get(me).has(HeroAbility.PHOENIX_CONTROL)) {
             return;
         }
         double best = Double.MAX_VALUE;

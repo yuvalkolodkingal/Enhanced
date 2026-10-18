@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
@@ -125,6 +126,9 @@ public final class SpiderServer implements HeroServer {
      */
     private static final double HITCH_STEP = 1.6;
     private static final int HITCH_TICKS = 12;
+    /** 3.3.1: the room a fresh assisted swing gives the server's copy of him to catch up (blocks), for its first ticks. */
+    private static final double ASSIST_FRESH_STEP = 6.0;
+    private static final int ASSIST_FRESH_TICKS = 4;
     /** What the cling's flag outlives the contact by. */
     private static final int CLING_HYSTERESIS = 4;
     /** What his client says he clings to counts for this many ticks (it says it again every few). */
@@ -149,8 +153,9 @@ public final class SpiderServer implements HeroServer {
 
     // ---- who and what ----
 
+    /** Spider-Man, or (3.4) a custom hero with any of his abilities (his webs are theirs, the web blocks let them through). */
     public static boolean isSpiderMan(Entity entity) {
-        return entity instanceof Player player && Powers.is(player, Power.SPIDER_MAN);
+        return entity instanceof Player player && Powers.get(player).acts(Power.SPIDER_MAN);
     }
 
     /** Spider-Man in the Iron Spider look: a metal suit, which Magneto can lift and whose nanites his strip scatters. */
@@ -162,6 +167,11 @@ public final class SpiderServer implements HeroServer {
 
     private static boolean isIronLook(PowerData data) {
         return data.power() == Power.SPIDER_MAN && IRON_SPIDER.equals(Variants.current(data).id());
+    }
+
+    /** Whether the legs may come out: Spider-Man's in the Iron Spider look, a custom hero's with the legs in any look (3.4). */
+    public static boolean mayGrowLegs(PowerData data) {
+        return data.power() == Power.SPIDER_MAN ? isIronLook(data) : data.has(HeroAbility.SPIDER_LEGS);
     }
 
     /** Whether his webs are organic: the Brand New Day look, or the Black Eyes in any look. */
@@ -262,6 +272,15 @@ public final class SpiderServer implements HeroServer {
 
     @Override
     public void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /**
+     * A key of his, with its Sneak variant said explicitly ({@code alt}): the Sneak of Spider-Man himself, or the binding of a
+     * custom hero with his abilities (3.4).
+     */
+    @Override
+    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (ability == 2 && !down) {
             // A swing lasts while G is held, and letting go always gets through.
             SpiderState state = STATES.get(player.getUUID());
@@ -275,12 +294,16 @@ public final class SpiderServer implements HeroServer {
         }
         if (blocked(player, data)) {
             if (ability == 2) {
-                refuse(player, player.isShiftKeyDown());
+                refuse(player, alt);
             }
             return;
         }
         SpiderState state = state(player);
-        boolean sneak = player.isShiftKeyDown();
+        boolean sneak = alt;
+        if (ability == 2 && player.serverLevel().getGameTime() - state.climbAt <= 3) {
+            // (Web Assist has just leapt him up out of a forest: the key that came with it is not a swing nor a zip.)
+            return;
+        }
         switch (ability) {
             case 1 -> {
                 if (sneak) {
@@ -325,20 +348,25 @@ public final class SpiderServer implements HeroServer {
      */
     @Override
     public void applyBody(ServerPlayer player, PowerData data) {
+        // (3.4: the suit is the hero's own, by his look; a custom hero gets the body with its row, its amounts times the
+        // strength's factor, and the legs and the Black Eyes with theirs.)
         boolean spider = data.power() == Power.SPIDER_MAN;
-        SpiderState state = spider ? STATES.get(player.getUUID()) : null;
+        boolean body = data.has(HeroAbility.SPIDER_BODY);
+        double scale = data.bodyScale(HeroAbility.SPIDER_BODY);
+        SpiderState state = data.acts(Power.SPIDER_MAN) ? STATES.get(player.getUUID()) : null;
         String look = spider ? Variants.current(data).id() : "";
         boolean stripped = state != null && player.level().getGameTime() < state.stripUntil;
         boolean iron = spider && IRON_SPIDER.equals(look) && !stripped;
-        boolean legs = iron && data.toggle(Toggle.SPIDER_LEGS);
-        boolean eyes = spider && data.is(Live.BLACK_EYES);
+        boolean legs = mayGrowLegs(data) && !stripped && data.toggle(Toggle.SPIDER_LEGS);
+        boolean eyes = data.has(HeroAbility.SPIDER_BLACK_EYES) && data.is(Live.BLACK_EYES);
         AttributeModifier.Operation base = AttributeModifier.Operation.ADD_MULTIPLIED_BASE;
         AttributeModifier.Operation total = AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
 
-        PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SPEED, SpiderConfig.SPEED_BONUS.get(), spider, base);
-        PowerTicker.setModifier(player, Attributes.JUMP_STRENGTH, JUMP, SpiderConfig.JUMP_BONUS.get(), spider, base);
-        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, STRENGTH, SpiderConfig.STRENGTH_BONUS.get(), spider);
-        PowerTicker.setModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL, -SpiderConfig.FALL_DAMAGE_REDUCTION.get(), spider);
+        PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SPEED, SpiderConfig.SPEED_BONUS.get() * scale, body, base);
+        PowerTicker.setModifier(player, Attributes.JUMP_STRENGTH, JUMP, SpiderConfig.JUMP_BONUS.get() * scale, body, base);
+        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, STRENGTH, SpiderConfig.STRENGTH_BONUS.get() * scale, body);
+        PowerTicker.setModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL,
+                -Math.min(1.0, SpiderConfig.FALL_DAMAGE_REDUCTION.get() * scale), body);
 
         double armor = 0.0;
         double toughness = 0.0;
@@ -380,7 +408,7 @@ public final class SpiderServer implements HeroServer {
 
         // The suit decides what he has: the legs are the Iron Spider's alone, and not while the nanites are scattered.
         boolean stripped = now < state.stripUntil;
-        if ((!isIronLook(data) || stripped) && data.toggle(Toggle.SPIDER_LEGS)) {
+        if ((!mayGrowLegs(data) || stripped) && data.toggle(Toggle.SPIDER_LEGS)) {
             data.setToggle(Toggle.SPIDER_LEGS, false);
         }
 
@@ -398,12 +426,24 @@ public final class SpiderServer implements HeroServer {
         if (state.swing != null) {
             swingTick(player, data, state, now);
         }
-        clingTick(player, data, state, now, blockers);
-        legsTick(player, data, state, now, blockers != 0);
-        eyesTick(player, data, state, now);
-        senseTick(player, data, state, now);
+        // (3.4: each part for the ability it belongs to: a custom hero ticks here with any of Spider-Man's abilities.)
+        if (data.has(HeroAbility.SPIDER_CRAWL)) {
+            clingTick(player, data, state, now, blockers);
+            senseTick(player, data, state, now);
+        }
+        if (data.has(HeroAbility.SPIDER_LEGS)) {
+            legsTick(player, data, state, now, blockers != 0);
+        }
+        if (data.has(HeroAbility.SPIDER_BLACK_EYES)) {
+            eyesTick(player, data, state, now);
+        }
 
-        data.set(Live.CASTING, now < state.castUntil);
+        boolean casting = now < state.castUntil;
+        if (data.power() == Power.SPIDER_MAN || casting != state.casting) {
+            // (A custom hero's flag is shared with his other heroes' casts: it is only changed when the web shot's changes.)
+            data.set(Live.CASTING, casting);
+        }
+        state.casting = casting;
         data.set(Live.SENSING, now < state.senseUntil);
         state.lastPosition = player.position();
     }
@@ -509,7 +549,7 @@ public final class SpiderServer implements HeroServer {
     private static void webBurst(ServerPlayer player, PowerData data, SpiderState state) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(1, now)) {
+        if (!data.isReady(HeroAbility.SPIDER_WEB, now)) {
             return;
         }
         boolean organic = organic(player, data);
@@ -603,7 +643,7 @@ public final class SpiderServer implements HeroServer {
             }
         }
         spend(player, SpiderConfig.WEB_BURST_EXHAUSTION.get(), organic);
-        data.startCooldown(1, now, SpiderConfig.WEB_BURST_COOLDOWN.get());
+        data.startCooldown(HeroAbility.SPIDER_WEB, now, SpiderConfig.WEB_BURST_COOLDOWN.get());
         sound(level, player.position(), ModSounds.WEB_BURST.get(), 1.0F, 1.0F);
         send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.BURST, player.getId(), chest, chest, Vec3.ZERO, blockedByShield, 0F, organic,
                 seed, ends));
@@ -624,7 +664,7 @@ public final class SpiderServer implements HeroServer {
     private static void webZip(ServerPlayer player, PowerData data, SpiderState state) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(2, now)) {
+        if (!data.isReady(HeroAbility.SPIDER_ZIP, now)) {
             refuse(player, false);
             return;
         }
@@ -689,7 +729,7 @@ public final class SpiderServer implements HeroServer {
         state.zip = new SpiderState.Line(anchor, face, stand, 0.0, now, creature, player.position());
         dropCling(state, data);
         data.set(Live.ZIPPING, true);
-        data.startCooldown(2, now, SpiderConfig.ZIP_COOLDOWN.get());
+        data.startCooldown(HeroAbility.SPIDER_ZIP, now, SpiderConfig.ZIP_COOLDOWN.get());
         spend(player, SpiderConfig.ZIP_EXHAUSTION.get(), organic);
         sound(level, player.position(), ModSounds.WEB_ZIP.get(), 0.9F, 1.0F);
         send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.ZIP_START, player.getId(), hand(player), anchor,
@@ -721,7 +761,7 @@ public final class SpiderServer implements HeroServer {
     private static void webSwing(ServerPlayer player, PowerData data, SpiderState state) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(2, now) || state.swing != null) {
+        if (!data.isReady(HeroAbility.SPIDER_ZIP, now) || state.swing != null) {
             // (A swing that is already on is not told it was refused: it goes on.)
             if (state.swing == null) {
                 refuse(player, true);
@@ -794,18 +834,27 @@ public final class SpiderServer implements HeroServer {
             return;
         }
         boolean boost = action == SpiderSwingPayload.BOOST;
-        if (action != SpiderSwingPayload.ATTACH && !boost) {
+        boolean climb = action == SpiderSwingPayload.CLIMB;
+        if (action != SpiderSwingPayload.ATTACH && !boost && !climb) {
             return;
         }
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         SwingAssist.OpenLand openLand = SwingAssist.OpenLand.of(SpiderConfig.WEB_ASSIST_OPEN_LAND.get());
         boolean organic = organic(player, data);
-        boolean allowed = SpiderConfig.WEB_ASSIST.get() && !blocked(player, data) && data.isReady(2, now) && !(organic && starving(player))
+        boolean allowed = SpiderConfig.WEB_ASSIST.get() && !blocked(player, data) && data.isReady(HeroAbility.SPIDER_ZIP, now) && !(organic && starving(player))
                 && Double.isFinite(anchor.x) && Double.isFinite(anchor.y) && Double.isFinite(anchor.z);
         if (boost) {
             if (allowed && openLand == SwingAssist.OpenLand.ZIP) {
                 webBoost(player, data, state, anchor, organic);
+            }
+            return;
+        }
+        if (climb) {
+            if (allowed && validClimb(player, anchor)) {
+                webClimb(player, data, state, anchor, organic);
+            } else if (state.swing == null) {
+                refuse(player, true);
             }
             return;
         }
@@ -831,6 +880,9 @@ public final class SpiderServer implements HeroServer {
         double centre = player.position().add(0, SwingAssist.CENTRE, 0).distanceTo(anchor);
         double rope = Mth.clamp(Double.isFinite(ropeAsked) ? ropeAsked : centre, SwingAssist.MIN_ROPE, Math.min(range + 3.0, centre + 3.0));
         beginSwing(player, data, state, anchor, face, rope, sky, organic);
+        if (state.swing != null) {
+            state.swing.assisted = true;
+        }
     }
 
     /** How much further than its range the server lets an anchor be, for the lag of its copy of him. */
@@ -856,6 +908,42 @@ public final class SpiderServer implements HeroServer {
         return anchor.y >= eye.y + 2.0 && eye.distanceTo(anchor) <= 24.0 + ASSIST_SLACK && SwingAssist.openSky(player.serverLevel(), player, eye, anchor);
     }
 
+    /** How long after a climb out of a forest the next web may go (the next web goes at the top of the leap). */
+    private static final int CLIMB_COOLDOWN = 8;
+
+    /**
+     * A climb out of a forest (3.3.1): he is near the ground, the top of the gap is above him, not far to the side, no
+     * higher than a canopy, and its column is open to the sky (with room for the lag of the server's copy of him).
+     */
+    private static boolean validClimb(ServerPlayer player, Vec3 top) {
+        ServerLevel level = player.serverLevel();
+        Vec3 feet = player.position();
+        double flat = Math.hypot(top.x - feet.x, top.z - feet.z);
+        double near = feet.y - SwingAssist.groundBelow(level, feet.add(0, 0.01, 0));
+        return near <= SwingAssist.CLIMB_NEAR_GROUND + 1.5 && flat <= SwingAssist.CLIMB_AHEAD + 2.5 + ASSIST_SLACK
+                && top.y > player.getEyeY() && top.y - feet.y <= SwingAssist.CLIMB_HEIGHT + 4.0
+                && SwingAssist.open(level, feet.add(0, 1.0, 0), top);
+    }
+
+    /**
+     * Web Assist's climb out of a forest (3.3.1): a web shot up through the gap, and he leaps after it (his client gives
+     * him the speed); a short cooldown, a zip's hunger. The key that follows it is not a swing nor a zip of its own.
+     */
+    private static void webClimb(ServerPlayer player, PowerData data, SpiderState state, Vec3 top, boolean organic) {
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
+        if (state.swing != null) {
+            endSwing(player, data, state, 1);
+        }
+        dropCling(state, data);
+        state.climbAt = now;
+        data.startCooldown(HeroAbility.SPIDER_ZIP, now, CLIMB_COOLDOWN);
+        spend(player, SpiderConfig.ZIP_EXHAUSTION.get(), organic);
+        keepAloft(player);
+        sound(level, player.position(), ModSounds.WEB_ZIP.get(), 0.9F, 1.1F);
+        send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.SHOT, player.getId(), hand(player), top, Vec3.ZERO, -1, 0F, organic, 0L, List.of()));
+    }
+
     /**
      * The open-land "zip" of Web Assist: a web shot ahead and up that boosts him (his client gives him the speed), on its
      * own cooldown; it costs a zip's hunger.
@@ -869,7 +957,7 @@ public final class SpiderServer implements HeroServer {
         if (state.swing != null) {
             endSwing(player, data, state, 1);
         }
-        data.startCooldown(2, now, SpiderConfig.WEB_BOOST_COOLDOWN.get());
+        data.startCooldown(HeroAbility.SPIDER_ZIP, now, SpiderConfig.WEB_BOOST_COOLDOWN.get());
         spend(player, SpiderConfig.ZIP_EXHAUSTION.get(), organic);
         keepAloft(player);
         sound(level, player.position(), ModSounds.WEB_ZIP.get(), 0.9F, 1.15F);
@@ -1002,7 +1090,10 @@ public final class SpiderServer implements HeroServer {
         // gives his position in steps of several ticks at once: a step is a jump only beyond what the ticks it was held
         // could hold, and twice the step before it.
         double step = position.distanceTo(line.last);
-        if (step > 3.0 + HITCH_STEP * Math.min(line.still, HITCH_TICKS) + 2.0 * line.lastStep) {
+        // (3.3.1) An assisted web goes out while he flies fast, chained from the last one: in its first ticks the server's
+        // copy of him catches up with where his client already is, a step of several blocks that is no jump.
+        double fresh = line.assisted && now - line.start <= ASSIST_FRESH_TICKS ? ASSIST_FRESH_STEP : 0.0;
+        if (step > 3.0 + fresh + HITCH_STEP * Math.min(line.still, HITCH_TICKS) + 2.0 * line.lastStep) {
             return 1;
         }
         boolean held = Math.hypot(position.x - line.last.x, position.z - line.last.z) < 0.05
@@ -1184,7 +1275,7 @@ public final class SpiderServer implements HeroServer {
     // ---- Ability 4: the Iron Spider's legs and Instant Kill ----
 
     private static void toggleLegs(ServerPlayer player, PowerData data) {
-        if (!isIronLook(data)) {
+        if (!mayGrowLegs(data)) {
             say(player, "message.enhanced.legs.iron_only");
             return;
         }
@@ -1213,7 +1304,7 @@ public final class SpiderServer implements HeroServer {
             say(player, "message.enhanced.instant_kill.off");
             return;
         }
-        if (!isIronLook(data)) {
+        if (!mayGrowLegs(data)) {
             say(player, "message.enhanced.legs.iron_only");
             return;
         }
@@ -1225,7 +1316,7 @@ public final class SpiderServer implements HeroServer {
             say(player, "message.enhanced.instant_kill.legs_first");
             return;
         }
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.SPIDER_LEGS, now)) {
             say(player, "message.enhanced.instant_kill.recharging");
             return;
         }
@@ -1241,7 +1332,7 @@ public final class SpiderServer implements HeroServer {
         state.killArmedUntil = 0;
         state.nextKill = now;
         data.set(Live.INSTANT_KILL, true);
-        data.startCooldown(4, now, SpiderConfig.INSTANT_KILL_MAX_TICKS.get());
+        data.startCooldown(HeroAbility.SPIDER_LEGS, now, SpiderConfig.INSTANT_KILL_MAX_TICKS.get());
         sound(level, player.position(), ModSounds.INSTANT_KILL_ON.get(), 1.0F, 1.0F);
         say(player, "message.enhanced.instant_kill.on");
     }
@@ -1252,7 +1343,7 @@ public final class SpiderServer implements HeroServer {
             return;
         }
         data.set(Live.INSTANT_KILL, false);
-        data.startCooldown(4, now, SpiderConfig.INSTANT_KILL_COOLDOWN.get());
+        data.startCooldown(HeroAbility.SPIDER_LEGS, now, SpiderConfig.INSTANT_KILL_COOLDOWN.get());
     }
 
     /**
@@ -1308,7 +1399,7 @@ public final class SpiderServer implements HeroServer {
         }
         player.causeFoodExhaustion(SpiderConfig.LEGS_EXHAUSTION.get().floatValue());
         if (data.is(Live.INSTANT_KILL)) {
-            if (blocked || starving(player) || now >= data.cooldownUntil(4)) {
+            if (blocked || starving(player) || now >= data.cooldownUntil(data.slot(HeroAbility.SPIDER_LEGS))) {
                 endKill(player, data, now);
                 return;
             }
@@ -1386,7 +1477,7 @@ public final class SpiderServer implements HeroServer {
             endEyes(player, data, state, now, true);
             return;
         }
-        if (!data.isReady(5, now)) {
+        if (!data.isReady(HeroAbility.SPIDER_BLACK_EYES, now)) {
             say(player, "message.enhanced.black_eyes.recharging");
             return;
         }
@@ -1402,7 +1493,7 @@ public final class SpiderServer implements HeroServer {
         int ticks = SpiderConfig.BLACK_EYES_MAX_TICKS.get();
         state.eyesEndsAt = now + ticks;
         data.set(Live.BLACK_EYES, true);
-        data.startCooldown(5, now, ticks);
+        data.startCooldown(HeroAbility.SPIDER_BLACK_EYES, now, ticks);
         sound(level, player.position(), ModSounds.BLACK_EYES_ON.get(), 1.0F, 1.0F);
         say(player, "message.enhanced.black_eyes.on");
     }
@@ -1420,7 +1511,7 @@ public final class SpiderServer implements HeroServer {
         data.set(Live.BLACK_EYES, false);
         state.eyesLockedUntil = 0;
         int cooldown = SpiderConfig.BLACK_EYES_COOLDOWN.get();
-        data.startCooldown(5, now, calm ? cooldown / 2 : cooldown);
+        data.startCooldown(HeroAbility.SPIDER_BLACK_EYES, now, calm ? cooldown / 2 : cooldown);
         if (!loud) {
             return;
         }
@@ -1446,7 +1537,7 @@ public final class SpiderServer implements HeroServer {
             return;
         }
         double panic = SpiderConfig.BLACK_EYES_PANIC_HEALTH.get();
-        if (panic > 0.0 && player.getHealth() <= panic && data.isReady(5, now) && !starving(player) && !blocked(player, data)) {
+        if (panic > 0.0 && player.getHealth() <= panic && data.isReady(HeroAbility.SPIDER_BLACK_EYES, now) && !starving(player) && !blocked(player, data)) {
             // His spider genes take over, and he cannot calm them for a while.
             startEyes(player, data, state, now);
             state.eyesLockedUntil = now + PANIC_LOCK_TICKS;
@@ -1489,7 +1580,7 @@ public final class SpiderServer implements HeroServer {
      */
     public static void warnOf(ServerPlayer spider, Entity source, boolean strong) {
         PowerData data = Powers.get(spider);
-        if (data.power() != Power.SPIDER_MAN || !data.toggle(Toggle.SPIDER_SENSE)) {
+        if (!data.has(HeroAbility.SPIDER_CRAWL) || !data.toggle(Toggle.SPIDER_SENSE)) {
             return;
         }
         SpiderState state = state(spider);

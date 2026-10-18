@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
-import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -45,7 +45,7 @@ public final class SpiderAssistKey {
         }
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (clicked && player != null && mc.screen == null && !player.isSpectator() && Powers.get(player).power() == Power.SPIDER_MAN) {
+        if (clicked && player != null && mc.screen == null && !player.isSpectator() && Powers.get(player).has(HeroAbility.SPIDER_ZIP)) {
             SpiderMotion.toggleAssist(player);
         }
     }

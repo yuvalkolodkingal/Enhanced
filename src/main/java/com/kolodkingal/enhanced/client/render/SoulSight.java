@@ -1,8 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
@@ -29,7 +29,7 @@ public final class SoulSight {
             return false;
         }
         PowerData data = Powers.get(player);
-        return data.power() == Power.THANOS && data.is(Live.SOUL_SIGHT);
+        return data.has(HeroAbility.THANOS_SOUL) && data.is(Live.SOUL_SIGHT);
     }
 
     /** Whether the local Thanos sees this entity glow right now. */

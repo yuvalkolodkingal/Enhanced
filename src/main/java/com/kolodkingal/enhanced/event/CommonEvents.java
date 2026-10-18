@@ -20,10 +20,10 @@ import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.command.EnhancedCommand;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -209,7 +209,7 @@ public final class CommonEvents {
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Telekinesis.release(player, false);
-            if (Powers.is(player, Power.SCARLET_WITCH)) {
+            if (Powers.get(player).has(HeroAbility.WANDA_HEX)) { // (3.4: or a custom hero with her Hex)
                 HexManager.onOwnerDeath(player);
             }
             // A Mjolnir in pieces comes together and falls where he dies; whoever he pinned is free.
@@ -404,7 +404,8 @@ public final class CommonEvents {
     /** The Chaos Beam, or anything a Scarlet Witch hurled with telekinesis. */
     private static boolean isWandasAttack(DamageSource source) {
         return source.is(ModDamageTypes.CHAOS_BEAM)
-                || (source.is(ModDamageTypes.TELEKINETIC_SLAM) && source.getEntity() instanceof Player thrower && Powers.is(thrower, Power.SCARLET_WITCH));
+                || (source.is(ModDamageTypes.TELEKINETIC_SLAM) && source.getEntity() instanceof Player thrower
+                && Powers.get(thrower).has(HeroAbility.WANDA_TELEKINESIS));
     }
 
     /** A slowed projectile gets its full speed back the moment it hits someone, so it hits as hard as it would have. */

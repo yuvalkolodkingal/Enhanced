@@ -2,7 +2,9 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.PlayerModel;
@@ -46,7 +48,8 @@ public final class ThorGrip {
             return false;
         }
         HeroAnimState state = HeroAnimator.peek(player);
-        if (state == null || state.power != Power.THOR || state.wVanilla > 0.0F) {
+        // (3.4: a custom hero with Thor's hammer holds the weapon as Thor does.)
+        if (state == null || state.power != Power.THOR && !Powers.get(player).has(HeroAbility.THOR_HAMMER) || state.wVanilla > 0.0F) {
             return false;
         }
         GripMath.Kind kind = ThorAbilities.isStormbreaker(stack) ? GripMath.Kind.STORMBREAKER : GripMath.Kind.MJOLNIR;

@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.AgathaConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
@@ -122,6 +123,14 @@ public final class AgathaAbilities {
         return e instanceof Player player && Powers.is(player, Power.AGATHA);
     }
 
+    /**
+     * Whether this player has this ability of hers: Agatha, or (3.4) a custom hero who picked it (her body: the poison that
+     * answers magic used on her; her shield).
+     */
+    public static boolean has(@Nullable Entity e, HeroAbility ability) {
+        return e instanceof Player player && Powers.get(player).has(ability);
+    }
+
     /** Agatha's Rune Trap, or null. */
     @Nullable
     public static RuneTrap trapOf(Player agatha) {
@@ -156,11 +165,15 @@ public final class AgathaAbilities {
     // ------------------------------------------------------------------------------------------------------------
     // Input and ticks
 
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * A key of hers (3.4: also one of a custom hero's bindings, with the key the ability has for her). {@code alt}: its Sneak
+     * variant (Sneak + R is the hex mark).
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (!down) {
             if (ability == 1) {
                 beamKey(player, data, false);
-            } else if (ability == AgathaShield.SLOT && data.chaosShieldActive()) {
+            } else if (ability == AgathaShield.SLOT && data.chaosShieldActive() && data.has(HeroAbility.AGATHA_SHIELD)) {
                 AgathaShield.drop(player, data, false);
             }
             return;
@@ -170,7 +183,7 @@ public final class AgathaAbilities {
         }
         switch (ability) {
             case 1 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     hex(player, data);
                 } else {
                     beamKey(player, data, true);
@@ -192,7 +205,7 @@ public final class AgathaAbilities {
             data.set(Live.CASTING, false);
         }
         beamTick(player, data);
-        if (data.chaosShieldActive()) {
+        if (data.chaosShieldActive() && data.has(HeroAbility.AGATHA_SHIELD)) { // (3.4: the shield fields may be another hero's)
             AgathaShield.tick(player, data);
         }
         trapTick(player);
@@ -208,10 +221,14 @@ public final class AgathaAbilities {
         }
     }
 
-    /** Her body: 40 health (with the default bonus) while she is Agatha, and nothing of it on anyone else. */
+    /**
+     * Her body: 40 health (with the default bonus) while she is Agatha, and nothing of it on anyone else; 3.4: a custom hero
+     * with her body gets the bonus at his strength ({@link PowerData#bodyScale}).
+     */
     static void applyBody(ServerPlayer player, PowerData data) {
-        boolean agatha = data.power() == Power.AGATHA;
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, agatha ? AgathaConfig.BODY_HEALTH_BONUS.get() : 0.0, agatha);
+        boolean agatha = data.has(HeroAbility.AGATHA_BODY);
+        double bonus = agatha ? AgathaConfig.BODY_HEALTH_BONUS.get() * data.bodyScale(HeroAbility.AGATHA_BODY) : 0.0;
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, bonus, agatha);
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
@@ -222,7 +239,7 @@ public final class AgathaAbilities {
         if (FIRING.remove(player.getUUID())) {
             ContinuousBeam.stop(player);
         }
-        if (data.chaosShieldActive()) {
+        if (data.chaosShieldActive() && data.has(HeroAbility.AGATHA_SHIELD)) {
             data.setChaosShieldActive(false);
             AgathaShield.forget(player.getUUID());
         }
@@ -417,7 +434,7 @@ public final class AgathaAbilities {
     private static void drain(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(DRAIN_SLOT, now)) {
+        if (!data.isReady(HeroAbility.AGATHA_DRAIN, now)) {
             return;
         }
         LivingEntity target = sight(player, AgathaConfig.DRAIN_RANGE.get());
@@ -448,7 +465,7 @@ public final class AgathaAbilities {
             target.hurt(ModDamageTypes.source(level, ModDamageTypes.AGATHA_DRAIN, player, player), AgathaConfig.DRAIN_DAMAGE.get().floatValue());
         }
         player.heal(AgathaConfig.DRAIN_HEAL.get().floatValue());
-        data.startCooldown(DRAIN_SLOT, now, AgathaConfig.DRAIN_COOLDOWN.get());
+        data.startCooldown(HeroAbility.AGATHA_DRAIN, now, AgathaConfig.DRAIN_COOLDOWN.get());
         pay(player, AgathaConfig.DRAIN_EXHAUSTION.get());
         Vec3 at = target.position().add(0, target.getBbHeight() * 0.6, 0);
         level.sendParticles(new EnergyParticleOptions(VIOLET, 1.2F), at.x, at.y, at.z, 14, 0.3, 0.4, 0.3, 0.04);
@@ -488,7 +505,7 @@ public final class AgathaAbilities {
     private static void runes(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(RUNE_SLOT, now)) {
+        if (!data.isReady(HeroAbility.AGATHA_RUNES, now)) {
             return;
         }
         Vec3 center = runeCenter(player);
@@ -497,7 +514,7 @@ public final class AgathaAbilities {
             return;
         }
         lay(player, center);
-        data.startCooldown(RUNE_SLOT, now, AgathaConfig.RUNE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.AGATHA_RUNES, now, AgathaConfig.RUNE_COOLDOWN.get());
         pay(player, AgathaConfig.RUNE_EXHAUSTION.get());
     }
 

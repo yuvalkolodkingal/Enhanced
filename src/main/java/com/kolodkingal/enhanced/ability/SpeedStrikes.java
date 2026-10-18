@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.particles.ParticleTypes;
@@ -57,6 +58,14 @@ public final class SpeedStrikes {
     public record Style(int color, int glow) {
         public static Style of(Power power) {
             return new Style(power.color, power.glow);
+        }
+
+        /**
+         * 3.4: the colours of {@code hero}'s strike as this player makes it: the hero's own, or a custom hero's two colours
+         * when he makes it with one of the hero's abilities.
+         */
+        public static Style of(Player player, Power hero) {
+            return Powers.get(player).power() == hero ? of(hero) : new Style(Powers.color(player), Powers.glow(player));
         }
     }
 

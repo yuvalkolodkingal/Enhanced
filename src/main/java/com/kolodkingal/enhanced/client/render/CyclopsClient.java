@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.CyclopsAbilities;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -49,9 +50,14 @@ public final class CyclopsClient implements HeroClient {
 
     @Override
     public void stanceTargets(HeroAnimState s, AbstractClientPlayer p, PowerData data, boolean[] on, long now) {
-        boolean open = data.is(Live.CYCLOPS_UNLEASHED);
-        on[Stance.BEAM_HAND.ordinal()] = false;
-        on[Stance.CYCLOPS_BLAST.ordinal()] = data.is(Live.BEAMING) && !open;
+        // (3.4: a custom hero's beam is his eyes' only with Cyclops's beam abilities; another hero's keeps its hand.)
+        boolean hero = data.power() != Power.CUSTOM;
+        boolean optic = hero || data.has(HeroAbility.CYCLOPS_OPTIC_BLAST);
+        boolean open = data.is(Live.CYCLOPS_UNLEASHED) && (hero || data.has(HeroAbility.CYCLOPS_GLASSES));
+        if (optic || hero || data.has(HeroAbility.CYCLOPS_GLASSES)) {
+            on[Stance.BEAM_HAND.ordinal()] = false;
+        }
+        on[Stance.CYCLOPS_BLAST.ordinal()] = optic && data.is(Live.BEAMING) && !open;
         on[Stance.CYCLOPS_UNLEASHED.ordinal()] = open;
     }
 

@@ -23,6 +23,11 @@ public final class UltronServer implements HeroServer {
     }
 
     @Override
+    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        UltronAbilities.onKey(player, data, ability, down, alt);
+    }
+
+    @Override
     public void tick(ServerPlayer player, PowerData data) {
         UltronAbilities.tick(player, data);
     }
@@ -65,7 +70,7 @@ public final class UltronServer implements HeroServer {
     /** His army dies with him, with his session and with his world: it is his only as long as he is here and Ultron. */
     private static void goneIfUltron(ServerPlayer player) {
         PowerData data = Powers.get(player);
-        if (data.power() == Power.ULTRON) {
+        if (data.acts(Power.ULTRON)) {
             UltronAbilities.gone(player, data);
         }
     }

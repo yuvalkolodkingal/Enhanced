@@ -8,7 +8,6 @@ import com.kolodkingal.enhanced.build.ShapeKind;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
@@ -128,7 +127,7 @@ public final class SpellWheelScreen extends Screen {
             return;
         }
         mc.setScreen(new SpellWheelScreen(true));
-        BuildFeedback.wheel(Powers.power(player), 1.0F);
+        BuildFeedback.wheel(BuildClient.hero(player), 1.0F);
     }
 
     /** The wheel again, from the palette page's way back. */
@@ -152,7 +151,7 @@ public final class SpellWheelScreen extends Screen {
     @Override
     public void tick() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || player.isSpectator() || !BuildClient.isBuilder(Powers.power(player))) {
+        if (player == null || player.isSpectator() || !BuildClient.isBuilder(BuildClient.hero(player))) {
             onClose();
         }
     }
@@ -273,7 +272,7 @@ public final class SpellWheelScreen extends Screen {
         }
         Font font = mc.font;
         super.render(g, mx, my, partialTick);
-        Power hero = Powers.power(player);
+        Power hero = BuildClient.hero(player);
         int rgb = hero.color;
         BuildGrammar grammar = BuildClient.grammar();
         BuildData data = player.getData(ModAttachments.BUILD_DATA);
@@ -804,7 +803,7 @@ public final class SpellWheelScreen extends Screen {
         int now = Math.max(0, indexOf(BuildClient.grammar().spell()));
         // Scrolling up goes round the ring clockwise, as the numbers go.
         choose(SPELLS[Math.floorMod(now - steps, SPELLS.length)]);
-        BuildFeedback.wheel(Powers.power(Minecraft.getInstance().player), 1.1F);
+        BuildFeedback.wheel(BuildClient.hero(Minecraft.getInstance().player), 1.1F);
         return true;
     }
 

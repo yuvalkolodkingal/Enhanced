@@ -3,10 +3,13 @@ package com.kolodkingal.enhanced.hex;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -114,7 +117,15 @@ public final class HexManager {
 
     /** Ability 5: raise the Hex, or (sneaking) dissolve it. With a Hex already up, the client opens the control screen. */
     public static void onHexKey(ServerPlayer wanda) {
-        if (wanda.isShiftKeyDown()) {
+        onHexKey(wanda, wanda.isShiftKeyDown());
+    }
+
+    /**
+     * The Hex key with its Sneak variant said explicitly (3.4: a custom hero's binding of the Hex, {@code alt} = its Sneak
+     * cell): raise the Hex, or ({@code dissolve}) dissolve it.
+     */
+    public static void onHexKey(ServerPlayer wanda, boolean dissolve) {
+        if (dissolve) {
             if (dissolveAllOwnedBy(wanda.server, wanda.getUUID())) {
                 wanda.displayClientMessage(Component.translatable("message.enhanced.hex.dissolved"), true);
             } else {
@@ -144,7 +155,7 @@ public final class HexManager {
         save(level, data(level).with(hex));
         // Volume above 1 widens the range: everyone inside the new Hex hears it rise.
         level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), ModSounds.HEX_RISE.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 16.0F), 1.0F);
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 2.0F), wanda.getX(), wanda.getY() + 1, wanda.getZ(),
+        level.sendParticles(new EnergyParticleOptions(WandaAbilities.color(wanda), 2.0F), wanda.getX(), wanda.getY() + 1, wanda.getZ(),
                 150, 1.5, 1.5, 1.5, 0.4);
         wanda.displayClientMessage(Component.translatable("message.enhanced.hex.created"), true);
         // "When Wanda raises the Hex, Vision appears": the one who will fight at her side while it stands.
@@ -158,7 +169,7 @@ public final class HexManager {
 
     /** Applies a change from Wanda's Hex Control screen. Only the owner can change her Hex. */
     public static void handleAction(ServerPlayer wanda, HexAction action, Optional<UUID> target, int value) {
-        if (!Powers.is(wanda, Power.SCARLET_WITCH)) {
+        if (!Powers.get(wanda).has(HeroAbility.WANDA_HEX)) { // (3.4: or a custom hero with her Hex)
             return;
         }
         ServerLevel level = wanda.serverLevel();
@@ -217,6 +228,28 @@ public final class HexManager {
         return any;
     }
 
+    /**
+     * 3.4: the Hex of a custom hero who no longer has the Hex ability (he was made into another hero without it) dissolves,
+     * as the Scarlet Witch's does when she loses her power ({@code Powers.setPower}). An owner who is away keeps it, as she
+     * does.
+     *
+     * @return whether any was dissolved
+     */
+    private static boolean dissolveUnowned(ServerLevel level, HexData data) {
+        boolean any = false;
+        for (Hex hex : data.hexes()) {
+            ServerPlayer owner = level.getServer().getPlayerList().getPlayer(hex.owner());
+            if (owner != null) {
+                PowerData power = Powers.get(owner);
+                if (power.power() == Power.CUSTOM && !power.has(HeroAbility.WANDA_HEX)) {
+                    dissolve(level, hex);
+                    any = true;
+                }
+            }
+        }
+        return any;
+    }
+
     public static int clear(ServerLevel level) {
         int n = data(level).hexes().size();
         for (Hex hex : data(level).hexes()) {
@@ -235,6 +268,9 @@ public final class HexManager {
         HexData data = data(level);
         if (data.hexes().isEmpty()) {
             return;
+        }
+        if (dissolveUnowned(level, data)) {
+            data = data(level);
         }
         for (Hex hex : data.hexes()) {
             Map<UUID, Boolean> sides = SIDES.computeIfAbsent(hex.id(), k -> new HashMap<>());

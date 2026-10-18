@@ -17,7 +17,13 @@ public final class AgathaServer implements HeroServer {
 
     @Override
     public void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
-        AgathaAbilities.onKey(player, data, ability, down);
+        AgathaAbilities.onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /** 3.4: the key with its Sneak variant said by the caller (a custom hero's binding). */
+    @Override
+    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        AgathaAbilities.onKey(player, data, ability, down, alt);
     }
 
     @Override

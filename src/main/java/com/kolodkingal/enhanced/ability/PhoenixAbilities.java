@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.PhoenixBurstPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -154,13 +156,14 @@ public final class PhoenixAbilities {
 
     /** Whether the player is a Phoenix who may not be burned (the server option is on). */
     public static boolean isFireImmune(Entity e) {
-        return PhoenixPower.isPhoenix(e) && PhoenixConfig.FIRE_IMMUNE.get();
+        // (3.4: her body makes a custom hero fire-immune too; the generic Fire module has its own rule.)
+        return e instanceof Player player && Powers.get(player).has(HeroAbility.PHOENIX_BODY) && PhoenixConfig.FIRE_IMMUNE.get();
     }
 
     /** Whether the player is charging a Burst (N is down and the charge has begun). */
     public static boolean isCharging(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.PHOENIX && data.is(Live.PHOENIX_CHARGING);
+        return data.has(HeroAbility.PHOENIX_BURST) && data.is(Live.PHOENIX_CHARGING);
     }
 
     /** Whether this creature is possessed by a Phoenix right now. */
@@ -213,7 +216,16 @@ public final class PhoenixAbilities {
     // ------------------------------------------------------------------------------------------------------------
     // Input
 
+    /** Her own key: Sneak chooses the variant (Mind Sense, the Psionic Field). */
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /**
+     * A key of the Phoenix's, her own or (3.4) a custom hero's who has the ability ({@code HeroKeys.press}): {@code ability}
+     * is its key for her, {@code alt} whether it is the Sneak variant.
+     */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (ability == 5) {
             // N is held: both edges count (a release always goes through, so a charge never sticks).
             if (down) {
@@ -228,7 +240,7 @@ public final class PhoenixAbilities {
         }
         switch (ability) {
             case 1 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     mindSense(player, data);
                 } else {
                     toggleMindReading(player, data);
@@ -237,7 +249,7 @@ public final class PhoenixAbilities {
             case 2 -> PowerTicker.toggleFlight(player);
             case 3 -> Telekinesis.press(player, Telekinesis.Mode.JEAN);
             case 4 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     psionicField(player, data);
                 } else {
                     mindControl(player, data);
@@ -248,17 +260,26 @@ public final class PhoenixAbilities {
         }
     }
 
-    /** The Phoenix's own tick (alive): the fire, the timers, Mind Reading, the charge, the upkeep of her hosts. */
+    /**
+     * The Phoenix's own tick (alive): the fire, the timers, Mind Reading, the charge, the upkeep of her hosts. (3.4: also a
+     * custom hero's with any of her abilities: what belongs to one ability only runs with it.)
+     */
     public static void tick(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        if (player.getRemainingFireTicks() > 0 && PhoenixConfig.FIRE_IMMUNE.get()) {
+        if (player.getRemainingFireTicks() > 0 && isFireImmune(player)) {
             player.clearFire();
         }
         // The poses and effects that last a moment.
         data.set(Live.MIND_SENSING, now < state.sensingUntil);
-        data.set(Live.CASTING, now < state.castingUntil);
+        if (state.castingUntil != 0L) {
+            // (Only her own cast's end: a custom hero's other heroes show CASTING too.)
+            data.set(Live.CASTING, now < state.castingUntil);
+            if (now >= state.castingUntil) {
+                state.castingUntil = 0L;
+            }
+        }
         data.set(Live.PHOENIX_PSIONIC, now < state.psionicUntil);
         if (state.chargeStart >= 0) {
             chargeTick(player, data, state, now);
@@ -271,7 +292,7 @@ public final class PhoenixAbilities {
             stream(level, player, host);
         }
 
-        if (data.toggle(Toggle.MIND_READING)) {
+        if (data.has(HeroAbility.PHOENIX_MIND) && data.toggle(Toggle.MIND_READING)) {
             // Reading is not free: a whiff of hunger every tick (none in Creative).
             player.causeFoodExhaustion(PhoenixConfig.MIND_READ_EXHAUSTION.get().floatValue());
             MindReading.tick(player, data);
@@ -293,12 +314,14 @@ public final class PhoenixAbilities {
      * the tick after).
      */
     public static void applyBody(ServerPlayer player, PowerData data) {
-        boolean charging = data.power() == Power.PHOENIX && data.is(Live.PHOENIX_CHARGING);
+        boolean charging = data.has(HeroAbility.PHOENIX_BURST) && data.is(Live.PHOENIX_CHARGING);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, CHARGE_SLOW_ID, CHARGE_SLOW, charging,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         if (charging) {
             Abilities abilities = player.getAbilities();
-            float base = player.isCreative() || player.isSpectator() ? CREATIVE_FLYING_SPEED : Power.PHOENIX.flightSpeed();
+            // (3.4: a custom hero's own flying speed, that of his Flight.)
+            float base = player.isCreative() || player.isSpectator() || !player.mayFly() ? CREATIVE_FLYING_SPEED
+                    : data.power() == Power.CUSTOM ? CustomHeroes.flightSpeed(player) : Power.PHOENIX.flightSpeed();
             float slowed = base * (1.0F + (float) CHARGE_SLOW);
             if (Math.abs(abilities.getFlyingSpeed() - slowed) > 1.0E-4F) {
                 abilities.setFlyingSpeed(slowed);
@@ -373,11 +396,12 @@ public final class PhoenixAbilities {
     private static void mindSense(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(1, now)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.mind_sense.recovering", seconds(data.cooldownUntil(1) - now)), true);
+        if (!data.isReady(HeroAbility.PHOENIX_MIND, now)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.mind_sense.recovering",
+                    seconds(data.cooldownUntil(data.slot(HeroAbility.PHOENIX_MIND)) - now)), true);
             return;
         }
-        data.startCooldown(1, now, PhoenixConfig.MIND_SENSE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.PHOENIX_MIND, now, PhoenixConfig.MIND_SENSE_COOLDOWN.get());
         player.causeFoodExhaustion(PhoenixConfig.MIND_SENSE_EXHAUSTION.get().floatValue());
         state(player).sensingUntil = now + PhoenixConfig.MIND_SENSE_TICKS.get();
         data.set(Live.MIND_SENSING, true);
@@ -406,7 +430,7 @@ public final class PhoenixAbilities {
     private static void mindControl(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.PHOENIX_CONTROL, now)) {
             return;
         }
         EntityHitResult hit = Raycasts.entity(player, PhoenixConfig.MIND_CONTROL_RANGE.get(), 0.3,
@@ -444,7 +468,7 @@ public final class PhoenixAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.mind_control.cannot"), true);
             return;
         }
-        data.startCooldown(4, now, PhoenixConfig.MIND_CONTROL_COOLDOWN.get());
+        data.startCooldown(HeroAbility.PHOENIX_CONTROL, now, PhoenixConfig.MIND_CONTROL_COOLDOWN.get());
         player.causeFoodExhaustion(PhoenixConfig.MIND_CONTROL_EXHAUSTION.get().floatValue());
         State state = state(player);
         state.castingUntil = now + MIND_CAST_TICKS;
@@ -605,7 +629,7 @@ public final class PhoenixAbilities {
         UUID ownerId = HOST_OWNER.get(host.getUUID());
         MinecraftServer server = host.getServer();
         ServerPlayer owner = ownerId == null || server == null ? null : server.getPlayerList().getPlayer(ownerId);
-        if (owner == null || !owner.isAlive() || owner.level() != host.level() || !PhoenixPower.isPhoenix(owner)) {
+        if (owner == null || !owner.isAlive() || owner.level() != host.level() || !Powers.get(owner).has(HeroAbility.PHOENIX_CONTROL)) {
             return false;
         }
         LivingEntity goal = goal(owner, host);
@@ -705,7 +729,7 @@ public final class PhoenixAbilities {
     private static void psionicField(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.PHOENIX_CONTROL, now)) {
             return;
         }
         double radius = PhoenixConfig.PSIONIC_RADIUS.get();
@@ -731,7 +755,7 @@ public final class PhoenixAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.psionic_field.nothing"), true);
             return;
         }
-        data.startCooldown(4, now, PhoenixConfig.PSIONIC_COOLDOWN.get());
+        data.startCooldown(HeroAbility.PHOENIX_CONTROL, now, PhoenixConfig.PSIONIC_COOLDOWN.get());
         player.causeFoodExhaustion(PhoenixConfig.PSIONIC_EXHAUSTION.get().floatValue());
         State state = state(player);
         state.psionicUntil = now + PSIONIC_POSE_TICKS;
@@ -773,8 +797,9 @@ public final class PhoenixAbilities {
         }
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(5, now)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.phoenix.not_ready", seconds(data.cooldownUntil(5) - now)), true);
+        if (!data.isReady(HeroAbility.PHOENIX_BURST, now)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.phoenix.not_ready",
+                    seconds(data.cooldownUntil(data.slot(HeroAbility.PHOENIX_BURST)) - now)), true);
             return;
         }
         if (!player.getAbilities().invulnerable && player.getFoodData().getFoodLevel() < PhoenixConfig.BURST_FOOD_COST.get()) {
@@ -796,7 +821,7 @@ public final class PhoenixAbilities {
         long ticks = player.level().getGameTime() - state.chargeStart;
         endCharge(player, data, state);
         if (ticks < PhoenixConfig.BURST_MIN_CHARGE_TICKS.get()) {
-            data.startCooldown(5, player.level().getGameTime(), PhoenixConfig.BURST_CANCEL_COOLDOWN.get());
+            data.startCooldown(HeroAbility.PHOENIX_BURST, player.level().getGameTime(), PhoenixConfig.BURST_CANCEL_COOLDOWN.get());
             player.displayClientMessage(Component.translatable("message.enhanced.phoenix.cancelled"), true);
             stopSound(player.serverLevel(), player, ModSounds.PHOENIX_CHARGE.getId());
             data.set(Live.PHOENIX_BLAZE, false);
@@ -911,7 +936,7 @@ public final class PhoenixAbilities {
     private static void burst(ServerPlayer player, PowerData data, State state, float f) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        data.startCooldown(5, now, PhoenixConfig.BURST_COOLDOWN.get());
+        data.startCooldown(HeroAbility.PHOENIX_BURST, now, PhoenixConfig.BURST_COOLDOWN.get());
         state.blazeUntil = now + BLAZE_AFTER_TICKS;
         data.set(Live.PHOENIX_BLAZE, true);
         player.causeFoodExhaustion(4.0F * PhoenixConfig.BURST_FOOD_COST.get() * Math.max(0.3F, f));

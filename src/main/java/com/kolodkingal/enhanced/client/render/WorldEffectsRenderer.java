@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -88,7 +89,7 @@ public final class WorldEffectsRenderer {
             Set<RenderType> drawn = new HashSet<>();
             for (AbstractClientPlayer player : level.players()) {
                 PowerData data = Powers.get(player);
-                ShieldStyle style = ShieldStyles.of(data.power());
+                ShieldStyle style = ShieldStyles.of(data); // (3.4: a custom hero's shield too)
                 if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
                     RenderType type = lines ? EnhancedRenderTypes.energyField(style.texture()) : EnhancedRenderTypes.ENERGY_VEIL;
                     VertexConsumer vc = buffers.getBuffer(type);
@@ -135,11 +136,12 @@ public final class WorldEffectsRenderer {
         VertexConsumer beams = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() == Power.SCARLET_WITCH && data.beamActive()) {
+            // (3.4: by the ability, so a custom hero who has it fires it too.)
+            if (data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive()) {
                 renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS, WandaAbilities.beamTargets(player), pose, beams, camera,
                         partialTick, time);
             }
-            if (data.power() == Power.VISION && data.beamActive()) {
+            if (data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive()) {
                 Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION : MIND_STONE;
                 renderBeam(mc, player, foreheadPosition(mc, player, partialTick), palette, WandaAbilities.BEAM_TARGET, pose, beams, camera,
                         partialTick, time);
@@ -147,10 +149,10 @@ public final class WorldEffectsRenderer {
             if (data.heldEntityId() != -1) {
                 Entity held = level.getEntity(data.heldEntityId());
                 if (held != null) {
-                    renderTether(mc, player, held, data.power(), pose, beams, camera, partialTick, time);
+                    renderTether(mc, player, held, data, pose, beams, camera, partialTick, time);
                 }
             }
-            if (data.power() == Power.MAGNETO && data.magneticShield() && !player.isInvisible()) {
+            if (data.has(HeroAbility.MAGNETO_SHIELD) && data.magneticShield() && !player.isInvisible()) {
                 renderMagneticField(mc, player, pose, beams, camera, partialTick, time);
             }
         }
@@ -184,7 +186,7 @@ public final class WorldEffectsRenderer {
         Set<Integer> up = new HashSet<>();
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            ShieldStyle style = ShieldStyles.of(data.power());
+            ShieldStyle style = ShieldStyles.of(data); // (3.4: a custom hero's shield too)
             if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
                 ShieldStyle.Look look = style.look(data, time);
                 SHIELDS_UP.put(player.getId(), new Shield(style, look.radius(), look.flicker(), time));
@@ -491,15 +493,18 @@ public final class WorldEffectsRenderer {
 
     // ---- Telekinesis ----
 
-    private static void renderTether(Minecraft mc, AbstractClientPlayer player, Entity held, Power power, Matrix4f pose,
+    private static void renderTether(Minecraft mc, AbstractClientPlayer player, Entity held, PowerData data, Matrix4f pose,
                                      VertexConsumer vc, Vec3 camera, float partialTick, float time) {
+        Power power = data.power();
         Vec3 start = handPosition(mc, player, partialTick).subtract(camera);
         Vec3 end = held.getPosition(partialTick).add(0, held.getBbHeight() * 0.5, 0).subtract(camera);
         long seed = player.getId() * 6364136223846793005L;
         float phase = time / 3.0F;
         // The Phoenix's telekinesis is of the mind: violet, where the others' take their hero's colour.
-        int main = power == Power.PHOENIX ? PhoenixAbilities.PSY_MAIN : power.color;
-        int glow = power == Power.PHOENIX ? PhoenixAbilities.PSY_CORE : power.glow;
+        // (3.4: a custom hero's in his own colours, the Phoenix's grip in hers.)
+        boolean mind = data.has(HeroAbility.PHOENIX_TELEKINESIS);
+        int main = mind ? PhoenixAbilities.PSY_MAIN : CustomActing.tint(player, power.color, false);
+        int glow = mind ? PhoenixAbilities.PSY_CORE : CustomActing.tint(player, power.glow, true);
         EnergyGeometry.bolt(pose, vc, start, end, 0.04F, 0.35F, EnergyGeometry.argb(main, 0.7F), seed, phase);
         EnergyGeometry.bolt(pose, vc, start, end, 0.025F, 0.5F, EnergyGeometry.argb(glow, 0.4F), seed + 31, phase);
     }
