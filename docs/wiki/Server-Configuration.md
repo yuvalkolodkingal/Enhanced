@@ -1030,21 +1030,23 @@ Section `[professor_x]` (3.3). The hero's page is [Professor X](Professor-X): th
 
 ## The Hero Creator
 
-Section `[custom_hero]` (3.3). The page is [Hero Creator](Hero-Creator): whether the creator works and for whom, the limits of a custom hero, and the balance of the thirty powers. The numbers of each power follow its strength (1 to 10); the scales below multiply them all. Every option is read when it is used; a hero already made keeps its powers and is judged by the new limits the next time it is saved. The ids for `disabledPowers` are in the table of [the thirty powers](Hero-Creator#the-thirty-powers).
+Section `[custom_hero]` (3.3; five options added in 3.4). The page is [Hero Creator](Hero-Creator): whether the creator works and for whom, the limits of a custom hero, the balance of the thirty powers, and (3.4) whether a custom hero may take the heroes' own abilities and look extras. The numbers of each power follow its strength (1 to 10); the scales below multiply them all. Every option is read when it is used; a hero already made keeps its powers and is judged by the new limits the next time it is saved. The ids for `disabledPowers` are in the table of [the thirty powers](Hero-Creator#the-thirty-powers) and on [Heroes' Abilities](Hero-Abilities).
+
+**From 3.3:** 3.4 raised the defaults of `budget` (60 to 90) and `maxPowers` (8 to 10). A server file written by 3.3 still says 60 and 8 (the game never rewrites a value already in the file): set the new numbers, or delete the two lines. Every ready-made hero of the editor fits in 60.
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `custom_hero.enabled` | `true` | `true` or `false` | The Hero Creator works (false: its screen says it is switched off, and custom heroes are judged by these limits when they are saved). |
 | `custom_hero.operatorsOnly` | `false` | `true` or `false` | Only operators may use the Hero Creator (false: any player in Creative mode, and operators). |
 | `custom_hero.allowChooseExisting` | `true` | `true` or `false` | The creator can also turn its user into any hero of the mod, in any look, at once. |
-| `custom_hero.budget` | `60` | 1 to 600 | Power points a custom hero may spend: each power costs 1 to 3 points for each point of its strength (flight 2, durability 1, phasing 3...; strength 1 to 10). The screen shows what is left. |
-| `custom_hero.maxPowers` | `8` | 1 to 30 | How many different powers a custom hero may have. |
+| `custom_hero.budget` | `90` | 1 to 600 | Power points a custom hero may spend: each power costs 1 to 3 points for each point of its strength (flight 2, durability 1, phasing 3...; strength 1 to 10); an ability with no slider costs as at strength 5; a power's other option on a Sneak box costs half the power again. The screen shows what is left. (60 before 3.4.) |
+| `custom_hero.maxPowers` | `10` | 1 to 30 | How many different powers a custom hero may have (a hero's ability and its Sneak variant are one). (8 before 3.4.) |
 | `custom_hero.maxStrength` | `10` | 1 to 10 | The highest strength of a power (the editor's slider goes from 1 to this). |
 | `custom_hero.maxSkinBytes` | `16384` | 1024 to 24576 | The biggest custom skin (a 64x64 PNG) the server accepts and sends to everyone, in bytes. |
-| `custom_hero.disabledPowers` | `[]` | a list of power ids | Powers a custom hero may not have on this server (their ids, e.g. "time", "weather"). |
+| `custom_hero.disabledPowers` | `[]` | a list of power ids | Powers a custom hero may not have on this server: their ids, e.g. `"time"`, `"weather"`; since 3.4 also a hero's ability (`"thor.lightning"`) or all of a hero's abilities (`"thor.*"`). |
 | `custom_hero.applyCooldownTicks` | `40` | 0 to 1200 | Ticks a player waits between two heroes made or chosen with the creator. |
-| `custom_hero.damageScale` | `1.0` | 0.0 to 10.0 | Multiplies the damage of every custom power. |
-| `custom_hero.cooldownScale` | `1.0` | 0.1 to 10.0 | Multiplies the cooldown of every custom power. |
+| `custom_hero.damageScale` | `1.0` | 0.0 to 10.0 | Multiplies the damage of every custom power (since 3.4 also of the heroes' abilities a custom hero has). |
+| `custom_hero.cooldownScale` | `1.0` | 0.1 to 10.0 | Multiplies the cooldown of every custom power (since 3.4 also of the heroes' abilities a custom hero has). |
 | `custom_hero.exhaustionScale` | `1.0` | 0.0 to 10.0 | Multiplies the hunger every custom power costs (0: free). |
 | `custom_hero.flightSpeed` | `0.08` | 0.01 to 0.5 | Scales Flight's speed: at the default 0.08, strength 1 flies at 0.06 and strength 10 at 0.13; another value scales them all by it / 0.08 (Creative flight is 0.05). |
 | `custom_hero.forceFieldStrength` | `35.0` | 1.0 to 1000.0 | Scales the Force Field: at the default 35, it takes 10 damage before it breaks at strength 1 and 80 at strength 10; another value scales them by it / 35. |
@@ -1053,6 +1055,11 @@ Section `[custom_hero]` (3.3). The page is [Hero Creator](Hero-Creator): whether
 | `custom_hero.suppressSeconds` | `8` | 1 to 120 | Scales how long Power Absorption takes another hero's powers away (PvP only): at the default 8, from 3 seconds (strength 1) to 12 (strength 10); another value scales them by it / 8. |
 | `custom_hero.blockChanges` | `false` | `true` or `false` | Custom powers may change blocks: the Sonic Scream shatters glass (doors, levers and frozen water are always allowed, and every change still asks the claims, spawn protection and boss arenas). |
 | `custom_hero.weatherChangesWorld` | `true` | `true` or `false` | Weather Control's "cycle" changes the world's weather (false: it only says it cannot). |
+| `custom_hero.heroModules` | `true` | `true` or `false` | 3.4: a custom hero may take the abilities of the mod's own heroes (Thor's lightning, Agatha's shield...; the [81 abilities](Hero-Abilities)). False: only the thirty powers, and a hero file's abilities are left out with a note. |
+| `custom_hero.worldPowers` | `true` | `true` or `false` | 3.4: a custom hero may take the heroes' world-scale abilities: the Hex, the Bifrost, Thanos's Time Stone, Ultron's Upload and Sentry Army, Professor X's Take Over a Body. |
+| `custom_hero.heroStrengthSpread` | `0.5` | 0.0 to 1.0 | 3.4: how much the strength (1 to 10) of a hero's ability changes it: its damage and its body times 1 + spread × (strength − 5) / 5, its cooldown divided by that. At 0.5, strength 1 is ×0.6 and strength 10 is ×1.5; at 0 strength changes nothing (every ability is the hero's own). Strength 5 is always the hero himself. |
+| `custom_hero.layers` | `true` | `true` or `false` | 3.4: a custom hero's look may have extras: a cape, a hat, a visor or mask, glowing eyes, an aura (false: they are taken off, with a note). |
+| `custom_hero.chooseGivesItems` | `true` | `true` or `false` | 3.4: "Choose a Hero" also gives the hero's own items, as becoming him the usual way leaves them with him (Thor's Mjolnir or Stormbreaker, claimed; Magneto's helmet, Quicksilver's goggles and Cyclops's glasses, worn; Loki's Scepter, the Gauntlet, Ultron's Core, the wheelchair, the Darkhold). Never a second one. |
 
 ## The Witches' Road
 

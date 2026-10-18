@@ -27,6 +27,7 @@
 * [Cyclops](Cyclops)
 * [Professor X](Professor-X)
 * [Hero Creator](Hero-Creator)
+* [Heroes' Abilities](Hero-Abilities)
 
 **Reference**
 
@@ -69,6 +70,7 @@
 * [סייקלופס](Cyclops-HE)
 * [פרופסור X](Professor-X-HE)
 * [יוצר הגיבורים](Hero-Creator-HE)
+* [יכולות הגיבורים](Hero-Abilities-HE)
 
 **מידע**
 
