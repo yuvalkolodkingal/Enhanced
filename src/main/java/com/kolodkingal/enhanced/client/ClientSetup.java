@@ -158,7 +158,12 @@ public final class ClientSetup {
         // ===== heimdall (3.5) =====
         // ===== odin (3.5) =====
         // ===== hela (3.5) =====
-        event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), com.kolodkingal.enhanced.client.render.HelaShadowRenderer::new);
+        event.registerEntityRenderer(ModEntities.HELA.get(), com.kolodkingal.enhanced.client.render.HelaRenderer::new);
+        event.registerEntityRenderer(ModEntities.BERSERKER.get(), com.kolodkingal.enhanced.client.render.BerserkerRenderer::new);
+        event.registerEntityRenderer(ModEntities.FENRIS.get(), com.kolodkingal.enhanced.client.render.FenrisRenderer::new);
+        event.registerEntityRenderer(ModEntities.NECROSWORD.get(), com.kolodkingal.enhanced.client.render.NecroswordRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLADE_SPIKE.get(), com.kolodkingal.enhanced.client.render.BladeSpikeRenderer::new);
         // ===== asgardians (3.5) =====
         event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), NoopRenderer::new);
     }
@@ -203,6 +208,16 @@ public final class ClientSetup {
         // ===== heimdall (3.5) =====
         // ===== odin (3.5) =====
         // ===== hela (3.5) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.LAYER, com.kolodkingal.enhanced.client.render.HelaModel::createBodyLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.CLOAK,
+                com.kolodkingal.enhanced.client.render.HelaModel::createCloakLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER,
+                com.kolodkingal.enhanced.client.render.HelaHeaddressLayer::createLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER,
+                com.kolodkingal.enhanced.client.render.NecroswordModel::createBodyLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.BerserkerModel.LAYER,
+                com.kolodkingal.enhanced.client.render.BerserkerModel::createBodyLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.FenrisModel.LAYER, com.kolodkingal.enhanced.client.render.FenrisModel::createBodyLayer);
         // ===== asgardians (3.5) =====
     }
 
@@ -239,6 +254,10 @@ public final class ClientSetup {
                 // ===== heimdall (3.5) =====
                 // ===== odin (3.5) =====
                 // ===== hela (3.5) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.HelaHeaddressLayer(renderer,
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER)));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.HelaBladesLayer(renderer, new com.kolodkingal.enhanced.client.render.NecroswordModel(
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER))));
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),

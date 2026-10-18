@@ -39,7 +39,9 @@ public enum RunCharacter {
     /** The old professor rolls in his chair: no swing of the arms, no lean, no bob (the chair carries him). */
     XAVIER_SEATED(0.0F, 0.0F, 1.0F, 0, 0, 0.0F),
     /** Agatha: a witch's measured, self-assured stride, the hands swinging little, the sprint a hurried glide. */
-    AGATHA(0.70F, 0.95F, 1.0F, 4, 3, 0.012F);
+    AGATHA(0.70F, 0.95F, 1.0F, 4, 3, 0.012F),
+    /** Hela (3.5): an upright glide, the arms hardly swinging, the sprint long and smooth, no bounce. */
+    HELA(0.45F, 0.70F, 1.10F, 3, 2, 0.006F);
 
     public final float walkArms;
     public final float sprintArms;
@@ -74,6 +76,7 @@ public enum RunCharacter {
             case CYCLOPS -> CYCLOPS;
             case PROFESSOR_X -> XAVIER;
             case AGATHA -> AGATHA;
+            case HELA -> HELA; // (3.5)
             default -> DEFAULT;
         };
     }

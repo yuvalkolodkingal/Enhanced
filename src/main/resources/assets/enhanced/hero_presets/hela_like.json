@@ -1,0 +1,73 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#2E7D4F",
+  "glow": "#9CF2B5",
+  "look": {
+    "base": "hela/goddess",
+    "slim": true,
+    "eyes": {
+      "style": "glow",
+      "color": "#7CFFB0",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "hela.necroswords",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "hela.blade_wall",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "hela.goddess",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "hela.army",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "hela.grasp",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "hela.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "hela.necroswords",
+    "hela.blade_wall",
+    "hela.goddess",
+    "hela.army",
+    "hela.grasp"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:netherite_sword",
+    "hero": "hela"
+  }
+}

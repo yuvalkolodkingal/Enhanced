@@ -88,7 +88,12 @@ public enum Stance {
     XAVIER_CEREBRO(2.0F, 4.0F, true),
     // ===== agatha (3.3) =====
     /** Agatha's Witch's Shield: both hands held out before her, fingers spread, a little apart. */
-    AGATHA_SHIELD(1.5F, 3.0F, true)
+    AGATHA_SHIELD(1.5F, 3.0F, true),
+    // ===== hela (3.5) =====
+    /** Hela with her form on: a necrosword in each hand, held low and out, the points turned outward. */
+    HELA_BLADES(3.0F, 5.0F, false),
+    /** Death's Grasp: one hand held out before her, fingers spread and clawed, the other drawn back. */
+    HELA_GRASP(1.5F, 3.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

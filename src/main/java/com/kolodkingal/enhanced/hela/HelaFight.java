@@ -64,9 +64,14 @@ import java.util.UUID;
 public final class HelaFight extends BossFight {
     /** The colour of her lines: the green of her blades. */
     public static final int SPEECH_COLOR = 0x3FBF6F;
-    /** When in her arrival the headdress grows (the client's 30-tick animation begins here), and when she speaks. */
-    public static final int FORM_AT = 60;
-    public static final int SPEAK_AT = 70;
+    /**
+     * When in her arrival the headdress begins to grow (it is grown at {@link #BOOM_AT}), the boom of {@code hela_arrive}
+     * (5.2 s into the 6-s sound, played at the fight's first tick: she is whole and flings her arms wide at it), and when
+     * she speaks.
+     */
+    public static final int FORM_AT = 90;
+    public static final int BOOM_AT = 104;
+    public static final int SPEAK_AT = 108;
     /** Fighters who come within the first 20 seconds make her stronger. */
     public static final int SCALE_TICKS = 400;
     /** The radius of the throne room's arena, and its join radius. */
@@ -531,6 +536,7 @@ public final class HelaFight extends BossFight {
             hela.setState(HelaState.STUNNED);
             HelaFx.send(level, HelaFx.CHANNEL_BREAK, hela.getId(), hela.position().add(0.0, 1.4, 0.0), 0);
             HelaFx.send(level, HelaFx.CHANNEL, hela.getId(), hela.position(), 0);
+            stopChannelSound(level, hela);
             level.playSound(null, hela.getX(), hela.getY(), hela.getZ(), ModSounds.HELA_CHANNEL_BREAK.get(), SoundSource.HOSTILE, 3.0F, 1.0F);
             tell(Component.translatable("boss.enhanced.hela.channel_broken").withColor(SPEECH_COLOR), true);
             nextChannelAt = now + HelaBossConfig.CHANNEL_EVERY.get() * 20L;
@@ -545,6 +551,17 @@ public final class HelaFight extends BossFight {
             hela.brain().reset(now);
             nextChannelAt = now + HelaBossConfig.CHANNEL_EVERY.get() * 20L;
             bar.setColor(BossEvent.BossBarColor.GREEN);
+        }
+    }
+
+    /** The channel's sound never resolves by itself (L6): it is stopped for everyone near when the channel breaks. */
+    private static void stopChannelSound(ServerLevel level, HelaEntity hela) {
+        net.minecraft.network.protocol.game.ClientboundStopSoundPacket stop =
+                new net.minecraft.network.protocol.game.ClientboundStopSoundPacket(ModSounds.HELA_CHANNEL.getId(), SoundSource.HOSTILE);
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(hela) <= 96.0 * 96.0) {
+                player.connection.send(stop);
+            }
         }
     }
 

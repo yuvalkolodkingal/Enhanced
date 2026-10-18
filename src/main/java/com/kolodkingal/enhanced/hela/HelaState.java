@@ -7,7 +7,7 @@ package com.kolodkingal.enhanced.hela;
  */
 public enum HelaState {
     /** She forms on the dais out of the smoke of the seal; the headdress grows. Nothing hurts her. */
-    ARRIVING(120, true),
+    ARRIVING(130, true),
     /** Between her attacks: she walks toward her target, the blades turning in her hands. */
     IDLE(0, false),
     /** The Necrosword Volley: the blades appear behind her (the tell), then fly. */
