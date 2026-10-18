@@ -8,9 +8,9 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 |---|---|---|---|---|---|
 | [Magneto](Magneto) | Metal Telekinesis (Sneak: Magnetic Pull) | Iron Shrapnel Storm (hold) | Armor & Weapon Strip | Magnetic Shield (toggle) | Magnetic Flight (toggle) |
 | [Scarlet Witch](Scarlet-Witch) | Chaos Energy Beam (hold) | Enhanced Flight (toggle) | Telekinesis (creatures, items, blocks; Sneak: a block) | Chaos Shield (hold) | The Hex (again: Hex Control; Sneak: dissolve) |
-| [Quicksilver](Quicksilver) | Quicksilver Time on/off (Sneak: Super Speed) | Speed Blitz | Pickpocket | Wall & Water Run (toggle) | Walkman: music on/off |
+| [Quicksilver](Quicksilver) | Quicksilver Time on/off (Sneak: Walkman on/off) | Super Speed on/off (Sneak: Dash Strike) | Speed Blitz (Sneak: Pickpocket) | Wall & Water Run (toggle) | Pebble Barrage |
 | [Vision](Vision) | Mind Stone Beam (hold) | Flight (toggle) | Phase through walls (toggle) | Density (toggle) | Human Disguise (toggle) |
-| [Tommy](Tommy) | Super Speed on/off (sprint) | Disarm Blitz | Whirlwind | Vibrate Through Walls | Molecular Acceleration |
+| [Tommy](Tommy) | Slow Time on/off (Sneak: Wall Run on/off) | Super Speed on/off (Sneak: Dash Strike) | Whirlwind (Sneak: Sonic Boom) | Vibrate Through Walls (Sneak: Disarm Blitz) | Molecular Acceleration |
 | [Billy](Billy-and-the-Witches-Road) | Hex Beam (hold) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Freeze (Sneak, hold: Hex Barrier) | The Noise (toggle) |
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |
 | [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
@@ -142,7 +142,12 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **B** as Billy, held | Raises the **Hex Barrier**, a plate of blue magic in front of you, instead of the Freeze. Let go of **B** to lower it. |
 | Sneak + **N** as the Scarlet Witch | Dissolves your Hex. |
 | Sneak + **Z** as the Scarlet Witch | Your Hex's Vision holds his post, or follows you again. |
-| Sneak + **R** as Quicksilver | Turns Super Speed on or off, instead of Quicksilver Time. |
+| Sneak + **R** as Quicksilver | Turns the Walkman (his music) on or off, instead of Quicksilver Time. |
+| Sneak + **G** as Quicksilver or Tommy | The **Dash Strike**: a 12-block dash along your look that hits everything in the path, instead of switching Super Speed. |
+| Sneak + **V** as Quicksilver | The **Pickpocket**, instead of the Speed Blitz. |
+| Sneak + **R** as Tommy | Turns Wall Run on or off, instead of Slow Time. |
+| Sneak + **V** as Tommy | The **Sonic Boom**, a shockwave round you, instead of the Whirlwind. |
+| Sneak + **B** as Tommy | The **Disarm Blitz**, instead of Vibrate Through Walls. |
 | Sneak + **R** as Loki | Throws a fan of three daggers. |
 | Sneak + **R** as Thor, with Mjolnir in hand | Shatters Mjolnir into fragments that strike his enemies (with Stormbreaker it throws it, as R does). |
 | Sneak + right-click on a creature or player, with Mjolnir in hand | Pins them down under Mjolnir. Right-click them again, without Sneak, to lift it (only its owner can). |
@@ -224,7 +229,7 @@ With telekinesis, pressing the key again **launches** what you hold.
 **Zipping and swinging (G)**
 
 1. Look at a block, up to 40 blocks away, and press **G**. The web pulls you there, then it vanishes and you stick to the wall or ceiling you came to. Press **G** again for the next one.
-2. To swing, hold **Sneak**, press **G** and **keep holding it**: you swing like a pendulum (**W** reels the web in, **S** lets it out). Let go of **G** and you fly off with your speed.
+2. To swing, hold **Sneak**, press **G** and **keep holding it**. With **Web Assist** (on by default) the web finds its own anchor ahead and above (trees, houses, cliffs), never runs you into the ground or the leaves, lets go at the right moment and sends the next web while you keep holding **G**: **W** pushes the swing, **S** brakes, **A**/**D** push sideways, and a small white web shows where the next one will go. **G** alone in mid-air swings too. Without Web Assist (the **J** key) it is the manual swing: aimed with the crosshair, **W** reels the web in, **S** lets it out. Let go of **G** and you fly off with your speed. See [Web Assist](Spider-Man#web-assist-easy-swinging-33).
 3. **Space** during a zip cancels it (you keep your speed). A swing also ends if you stay on the ground for half a second, after 15 seconds, or if you are held.
 
 **Climbing (V, on by default)**
@@ -247,10 +252,10 @@ The top-left corner of the screen always shows your hero, each ability with its 
 
 ## Rebinding keys
 
-All eighteen keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look*, *Vision, That One! (Scarlet Witch)* and eleven *Build Magic* keys (the first is *Build Magic (Scarlet Witch, Billy)*, which is **Y**; the last is *Build Magic: Instant (Scarlet Witch)*, **Ctrl + I**). Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
+All nineteen keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look*, *Vision, That One! (Scarlet Witch)*, *Web Assist (Spider-Man)* (**J**, 3.3) and eleven *Build Magic* keys (the first is *Build Magic (Scarlet Witch, Billy)*, which is **Y**; the last is *Build Magic: Instant (Scarlet Witch)*, **Ctrl + I**). Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
 
 ## Sprinting heroes
 
-Tommy's Super Speed starts when you **sprint**. His key (**R**) turns the ability on or off: with it off, you sprint like anyone else.
+Quicksilver and Tommy each have two separate powers in 3.3. **G** turns **Super Speed** on or off: with it on, **sprinting** is super speed (Tommy's is on from the start). **R** turns the slowing of time on or off (**Quicksilver Time**, **Tommy's Slow Time**): the world slows down around him whether he sprints or not. Use one, or both. While either is on, Quicksilver also mines, attacks, swims and uses items faster without sprinting; only the running speed and the step-up need a sprint.
 
-Quicksilver is different. **R** turns Quicksilver Time on or off, and the world slows down around him whether he sprints or not. **Sneak + R** turns Super Speed on or off instead, which speeds up only him (the two modes exclude each other). In both modes he also mines, attacks, swims and uses items faster without sprinting, and only the running speed and the step-up need a sprint. See [Quicksilver](Quicksilver).
+**Running up walls:** with super speed on, sprint into a wall (holding **W**) and he runs up it, along a ceiling, round an overhang and down the far wall; keep **W** held and keep sprinting, or he slows and drops off; **Space** leaps off. Quicksilver needs **Wall & Water Run** on (**B**); Tommy's **Wall Run** is on unless **Sneak + R** turns it off. See [Quicksilver](Quicksilver#running-up-walls-and-across-ceilings).

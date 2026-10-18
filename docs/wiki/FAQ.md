@@ -171,6 +171,22 @@ The skin you chose was refused: it must be a PNG of exactly 64x64 pixels, no big
 
 The server judged the file by its own rules: its budget, how many powers, the highest strength, and the powers it does not allow. You are told what changed. See [Hero Creator](Hero-Creator#saving-sharing-and-loading-the-json-file).
 
+### Quicksilver Time no longer makes me fast!
+
+In 3.3 slowing time and running are two keys: **R** slows the world, **G** turns Super Speed on (then sprint). Turn on both for the old feeling of running through a slowed world. Tommy has the same two (his Slow Time is new). See [Quicksilver](Quicksilver#two-powers-two-keys-33).
+
+### How do I run up a wall as Quicksilver or Tommy?
+
+Turn Super Speed on (**G**) and sprint straight into the wall, holding **W**. Quicksilver also needs **Wall & Water Run** on (**B**); Tommy's Wall Run is on unless you turned it off (**Sneak + R**). Keep **W** and the sprint going or you slow down and drop off; **Space** leaps off. You take no fall damage afterwards. See [Quicksilver](Quicksilver#running-up-walls-and-across-ceilings).
+
+### Swinging as Spider-Man is too hard.
+
+Make sure **Web Assist** is on (the **J** key; the HUD's G line says `assist`). Then **Sneak + G** and keep holding **G**: the web picks its own anchor, keeps you off the ground and out of the leaves, and swings on from web to web. In open land it swings from the sky (if the server allows it). Under a very dense, low canopy (a dark forest) there is nothing to swing from: climb up or zip out first. See [Spider-Man](Spider-Man#web-assist-easy-swinging-33).
+
+### I want to aim my swings myself.
+
+Press **J** to turn Web Assist off: the swing is the manual one again, aimed with the crosshair, **W** reels in and **S** lets out. A server can also turn Web Assist off for everyone.
+
 ## Magneto
 
 ### How do I mine with Magneto?

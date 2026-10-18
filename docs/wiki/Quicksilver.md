@@ -20,33 +20,43 @@ D = Block of Diamond
 
 While he wears the goggles, Quicksilver's skin becomes Peter Maximoff's outfit from the movies: silver hair, a shiny silver jacket over a grey T-shirt, headphones and jeans. The goggles protect like an iron helmet and never break.
 
-## Quicksilver Time
+## Two powers, two keys (3.3)
 
-The main power. **Press R and time slows down around him, whether he runs or not.** He can stand still, walk, mine, build, fight or eat in the middle of it.
+In 3.3 Quicksilver's two powers are **separate**: **R** slows time, **G** makes him run. Use either one alone, or both together.
+
+| You want | Press |
+|---|---|
+| The world slowed, *Sweet Dreams* playing, and you at your normal pace | **R** (Quicksilver Time) |
+| Only you fast, the world as usual | **G** (Super Speed), then sprint |
+| The X-Men kitchen scene: the world slowed **and** you running through it | **R** and **G**, then sprint |
+
+## Quicksilver Time (R)
+
+**Press R and time slows down around him, whether he runs or not.** He can stand still, walk, mine, build, fight or eat in the middle of it.
 
 * Everything within **32 blocks** runs **5 times slower**: monsters, animals, villagers, falling blocks, TNT fuses, dropped items, smoke, sparks and splashes, and **arrows and thrown things, which hang in the air** and crawl forward. An arrow that finally lands still hits as hard as it would have.
 * Other players in range are slowed down heavily (a strong Slowness).
-* **Quicksilver speeds up when he sprints:** he runs **4 times faster** than normal and steps up whole blocks without jumping. He takes no fall damage while running. Walking, he moves at his normal speed, so he can still do precise work.
-* **The world starts playing his song.** Everyone near him hears the theme from his Walkman for as long as Quicksilver Time is on, running or not (if his Walkman is on). It fades in when he turns Quicksilver Time on, keeps playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
-* A cool grey shade at the edges of the screen shows that time is slowed, and while he runs Quicksilver leaves a grey blur and fading afterimages behind him (in the X-Men films his speed has no coloured glow).
-* **Cost:** it burns hunger the whole time it is on, **half** as fast while he stands or walks and at the full rate while he runs. When the hunger bar is empty, Quicksilver Time switches itself off (with a message) and can't be switched on again until he has eaten. Creative players never run out.
+* **The world starts playing his song.** Everyone near him hears the theme from his Walkman for as long as Quicksilver Time is on (if his Walkman is on: **Sneak + R**). It fades in when he turns Quicksilver Time on, keeps playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
+* A cool grey-blue shade at the edges of the screen, and a tint of the world, show that time is slowed; everyone inside his zone sees it. (Inside [Tommy](Tommy)'s slow time it is teal.)
+* **Cost:** hunger, at half the rate of running while he does not run. When the hunger bar is empty, Quicksilver Time switches itself off (with a message) and can't be switched on again until he has eaten. Creative players never run out.
 
 ![Quicksilver Time: sand and arrows hang in the air](images/quicksilver-time.png)
 
+## Super Speed (G)
+
+**Press G and he runs.** With Super Speed on, **sprinting** is super speed:
+
+* He runs **4 times faster** than normal, steps up whole blocks without jumping, and takes no fall damage while running. Walking, he moves at his normal speed, so he can still do precise work.
+* He leaves a grey blur and fading afterimages behind him (in the X-Men films his speed has no coloured glow).
+* With **Wall & Water Run** on (**B**) he runs across water and **up walls and along ceilings**: see [below](#running-up-walls-and-across-ceilings).
+* **Cost:** hunger only while he runs, at the full rate (running inside his own Quicksilver Time costs the same, not more). With an empty hunger bar he can't run, but Super Speed stays on.
+* Quicksilver Time and Super Speed start off, and both are saved with the player.
+
 ![Quicksilver running past, as another player sees him](images/quicksilver-run.png)
-
-## Super Speed
-
-A second mode, for when only **he** should be fast. **Sneak + R** turns Super Speed on or off.
-
-* **The world is not slowed at all:** no slow motion, no song, no grey shade. Everyone else lives at the normal pace.
-* When he sprints he runs at the **same super speed** as in Quicksilver Time (4 times faster, steps up whole blocks, no fall damage), with the same grey blur and afterimages, and Wall & Water Run works too.
-* **Cost:** hunger only while he runs, at the full rate. With an empty hunger bar he can't run, but Super Speed stays on.
-* **One mode at a time:** turning one on turns the other off. Both start off, and the choice is saved with the player.
 
 ## Doing everything faster
 
-While Quicksilver Time **or** Super Speed is on, Quicksilver does everything **4 times as fast**, whether he runs or not:
+While Quicksilver Time **or** Super Speed (or both) is on, Quicksilver does everything **4 times as fast**, whether he runs or not:
 
 | What | How it is faster |
 |---|---|
@@ -62,11 +72,23 @@ The movement speed bonus and the step-up still need **sprinting**, so he can sti
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
-| 1 | **R** (toggle) | Quicksilver Time | Turn Quicksilver Time on or off: the world around him is slowed, whether he runs or not. Off by default. **Sneak + R** turns Super Speed on or off instead: only he is fast. |
-| 2 | **G** | Speed Blitz | Look at a creature up to 24 blocks away: Quicksilver is next to it in an instant and lands 6 rapid punches (2 damage each, ignoring the hit cooldown), then knocks it back. Cooldown 4 seconds. |
-| 3 | **V** | Pickpocket | Snatch whatever the creature or player you look at (up to 24 blocks) holds in its hand, straight into your inventory. Cooldown 5 seconds. |
-| 4 | **B** (toggle) | Wall & Water Run | While running (in Quicksilver Time or Super Speed), run straight up walls you run into, and across water as long as you keep running. |
-| 5 | **N** (toggle) | Walkman | Turn the theme music on or off. |
+| 1 | **R** (toggle) | Quicksilver Time (Sneak: Walkman) | The world around him slows down, whether he runs or not (above). Off by default. **Sneak + R** turns the Walkman, his theme music, on or off. |
+| 2 | **G** (toggle) | Super Speed (Sneak: Dash Strike) | Sprinting is super speed (above). Off by default. **Sneak + G** is the **Dash Strike**: in a blink he dashes up to **12 blocks** along his look, never into a block (he stops at the first wall), and everything in his path takes **5 damage** and is knocked aside. Cooldown 5 seconds. |
+| 3 | **V** | Speed Blitz (Sneak: Pickpocket) | Look at a creature up to 24 blocks away: Quicksilver is next to it in an instant and lands 6 rapid punches (2 damage each, ignoring the hit cooldown), then knocks it back. Cooldown 4 seconds. **Sneak + V** is the **Pickpocket**: snatch whatever the creature or player you look at (up to 24 blocks) holds in its hand, straight into your inventory (cooldown 5 seconds, on the same key). |
+| 4 | **B** (toggle) | Wall & Water Run | While he runs at super speed: across water, **up walls and along ceilings** ([below](#running-up-walls-and-across-ceilings)). |
+| 5 | **N** | Pebble Barrage | He scoops up a handful of pebbles and flings them at super speed: **8 pebbles** in a narrow cone, up to **24 blocks**, **1.5 damage** each, and they add up (no hit cooldown between them). Grey streaks show their paths. Cooldown 6 seconds. |
+
+The Dash Strike and the Pebble Barrage hurt players only with PvP on, and do not cross a Hex wall.
+
+## Running up walls and across ceilings
+
+*The speedster way, not the spider's: he does not cling, he runs, and only as long as he is fast.* (3.3, Quicksilver and Tommy.)
+
+* **Start:** with super speed on, **sprint into a wall** (holding **W** towards it). He runs **straight up** it. Quicksilver needs **Wall & Water Run** on (**B**); Tommy's **Wall Run** is on from the start (**Sneak + R** switches it).
+* **At the top** he hops over onto the roof. **Under a ceiling or an overhang** he runs on **along the ceiling**, upside down, the way he looks; a wall ahead turns him **down** it to the floor, and the edge of an overhang takes him round its lip and up its outer face. The camera turns round smoothly so that **W** keeps meaning "on".
+* **Keep going:** hold **W** and keep sprinting. On a wall or a ceiling he runs at four fifths of his ground speed. Let go of **W**, lose the sprint or run out of food and he slows down; too slow, he **drops off** (pushed a little away from the surface). A hole in the ceiling or the end of a wall in mid-air drops him too. **Space** leaps off.
+* **Safe:** he never goes inside a block (his body keeps its size and every move is checked like a normal one), and he **takes no fall damage** after a wall or ceiling run until he lands. The server keeps him from being kicked for flying.
+* **Everyone sees it:** his body turns with his feet on the surface (horizontal on a wall, upside down on a ceiling), the run cycle keeps going, and the blur and afterimages follow him in his colours. On his own screen, speed lines (off with the client option *Flight effects*), and the HUD says `on the wall` or `on the ceiling`.
 
 ## The song and your own music
 
@@ -83,4 +105,4 @@ The song is played by each player's own game, from that player's own folder: who
 
 ## Numbers you can change
 
-How many times slower the world runs (5), how far time slows (32 blocks), Quicksilver's speed bonus (3.0, which is four times as fast), how many times as fast he does everything else (`actionSpeed`, 4) and the hunger cost are the `quicksilver.*` options on [Server Configuration](Server-Configuration).
+How many times slower the world runs (5), how far time slows (32 blocks), Quicksilver's speed bonus (3.0, which is four times as fast), how many times as fast he does everything else (`actionSpeed`, 4) and the hunger cost are the `quicksilver.*` options on [Server Configuration](Server-Configuration). Wall and ceiling running (on or off, speed on a surface, the slowest speed that holds), the Dash Strike and the Pebble Barrage are the `speedsters.*` options, shared with Tommy: see [Server Configuration](Server-Configuration#the-speedsters).

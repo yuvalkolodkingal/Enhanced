@@ -7,7 +7,7 @@ Tom Holland's Peter Parker, the friendly neighbourhood Spider-Man. He cannot fly
 Four tricks, in plain words. (**Sneak** is the Shift key, unless you changed it. Everyone nearby sees all of them.)
 
 * **Press R while looking at a creature: web it.** A silver web flies out of your wrist, and the creature is wrapped for 6 seconds: it can barely move and can't jump. Web blocks appear round it and vanish by themselves after 10 seconds. Look at a block and you leave a patch of web on it instead. **Sneak + R** is the **Web Burst**: 24 strands fly out in every direction and wrap the hostile creatures near you. Then wait 12 seconds.
-* **Press G while looking at a block: zip to it.** The web pulls you there, then it vanishes and you stick to the wall (or the ceiling) you arrived at. **Press G again** to zip on to the next one, as fast as you like. **Sneak + G, and keep holding G**, is the **Web Swing**: you swing on the web until you let go.
+* **Press G while looking at a block: zip to it.** The web pulls you there, then it vanishes and you stick to the wall (or the ceiling) you arrived at. **Press G again** to zip on to the next one, as fast as you like. **Sneak + G, and keep holding G**, is the **Web Swing**: you swing on the web until you let go. With **Web Assist** (on by default) the swing picks its own anchor in trees, houses and cliffs, and swings on from web to web while you hold G.
 * **Jump at a wall and keep pushing: climb it.** You stick to the wall and walk along it, up it and over the top, and even upside down on a ceiling. Press **Space** to leap off.
 * **Sneak + B, twice** (Iron Spider only): **Instant Kill**. And **N**: the **Black Eyes**.
 
@@ -102,6 +102,23 @@ For scale, a full diamond set is 20 armor and 8 toughness. Nothing is worn: the 
 
 **Web Swing (Sneak + G, hold G).** The same aim, up to 40 blocks, and a web from your hand to the anchor. **While you hold G** you swing on it like a pendulum, a little lighter than vanilla gravity, with a top speed of 1.8 blocks a tick. **W** reels the web in, **S** lets it out, the sideways keys push you a little. **Let go of G** and you fly off with the speed you had (**Space** gives it a push). The web also lets go if you touch the ground for half a second, if the anchor block is gone, after 15 seconds, or if you are held. **Press G without Sneak** while swinging to let go and zip to the new aim: a chain from swing to wall. Costs a food point every 20 seconds of swinging (twice that with organic webs). Everyone hears a creaking while you swing.
 
+### Web Assist: easy swinging (3.3)
+
+Swinging is easy now, in a city, a forest or open land. **Web Assist** is **on by default**.
+
+* **Swing:** **Sneak + G**, then **keep holding G** (you may let go of Sneak). **G alone in mid-air**, looking at nothing, is an assisted swing too.
+* **The web finds its anchor.** It goes to the best point **ahead and above** within 30 blocks: tree leaves and logs (tall trees first), houses, cliffs, not only where the crosshair is (among good points, the block under the crosshair wins).
+* **It never snags.** Each swing is flown through before it is taken, so it never runs you into the ground, into leaves or into a trunk: near the ground (or water) the web is drawn in.
+* **Steering:** **W** pushes the swing along, **S** brakes, **A** and **D** push sideways, and the swing turns gently where you look.
+* **Chain:** it lets go by itself at the best moment with a little launch, and **while G is held the next web goes out** as you begin to fall (or a moment after you land on a roof or a tree top). Between two webs the air slows you much less, so you keep your speed.
+* **Stop:** let go of **G**. **Space** lets go with a leap, as before.
+* **Preview:** a small **white web** (a ring with six spokes) shows where the next web would go, while you are in the air or sneaking; **pale blue** when it is a point of the open sky.
+* **Open land.** Where there is nothing to swing from, the server decides: a web to the **open sky** ahead and above (`sky`, the default; only under open sky, at most 3 seconds a swing), a short **web boost** forward and up (`zip`, once a second), or nothing (`none`).
+* **One place it cannot help:** under a **dense, low canopy** (a dark forest, leaves 3 or 4 blocks up) there is nothing safe to swing from and no sky: climb, zip or swing by hand there.
+* **Switch it:** the **J** key (*Web Assist (Spider-Man)* in the key settings) turns it on or off ("Web Assist off: manual swing, aim with the crosshair"), and so does the client option *Spider-Man → Web Assist* in the mod's config screen; your choice is remembered. *Web Assist preview* turns the white web off. A server can switch Web Assist off for everyone (`spider_man.webAssist`): then every swing is manual.
+* **Manual mode** (assist off) is the swing described above, exactly as in 3.2: aimed with the crosshair, **W** reels in, **S** lets out.
+* The server checks every assisted web like a manual swing (range, a solid block behind the anchor or open sky above it, hunger, cooldowns, the Chaos Shield) and refuses the rest.
+
 ### Wall Crawl (V)
 
 Wall Crawl is **on by default**. With it on:
@@ -163,7 +180,7 @@ His arm thrusts at what he aims at and a silver strand flies to it, with a splat
 | Key | Shows |
 |---|---|
 | **R** | `burst 9.5s` in grey while the burst recharges, `organic` in aqua when his webs are organic |
-| **G** | `zipping` or `swinging` in aqua while it lasts |
+| **G** | `zipping` or `swinging` in aqua while it lasts; otherwise `assist` (dark aqua) or `manual` (grey), the state of Web Assist |
 | **V** | `ON` or `OFF`, then `clinging` in aqua while he clings, `sense OFF` if spider-sense is off, and `DANGER!` in red for a second after a warning |
 | **B** | `Iron Spider only` in another suit; `nanites scattered` in red; the legs `ON` or `OFF`; `confirm?` in gold while he waits for the second press; `INSTANT KILL 7.5s` in bold red; `recharging 21.0s` |
 | **N** | `ON 18.4s` in red while it lasts, `recharging 24.0s` after |
@@ -191,4 +208,4 @@ His arm thrusts at what he aims at and a silver strand flies to it, with a splat
 
 ## Numbers you can change
 
-His speed, jump, strength and fall damage; how long the bite takes; how far spider-sense reaches and how often it scans; the Web Shot's range, pause, hunger and how long a creature stays wrapped; organic webs' length and cost; whether webs leave web blocks, how long they last, the patch size and the cap per player; every number of the Web Burst (strands, range, cooldown, hunger, how long it wraps); the zip's range, speed, cooldown, longest time, hunger and kick; the swing's range, longest time, top speed, gravity and hunger; the crawl's speed and hunger and the leap's speed; each suit's protection and how long Magneto's strip lasts; the legs' damage, pace, range, reach and hunger; every number of Instant Kill (range, pace, damage, longest, cooldown, hunger, confirm window, whether it may hit players); and every number of the Black Eyes (speed, strength, attack speed, jump, knockback resistance, hunger, longest, cooldown, crash, stress surge, sense) are the `spider_man.*` options on [Server Configuration](Server-Configuration#spider-man). Three datapack tags (`enhanced:web_immune`, `enhanced:instant_kill_immune`, `enhanced:cannot_cling`) change who is webbed, who Instant Kill spares and what he can stick to.
+His speed, jump, strength and fall damage; how long the bite takes; how far spider-sense reaches and how often it scans; the Web Shot's range, pause, hunger and how long a creature stays wrapped; organic webs' length and cost; whether webs leave web blocks, how long they last, the patch size and the cap per player; every number of the Web Burst (strands, range, cooldown, hunger, how long it wraps); the zip's range, speed, cooldown, longest time, hunger and kick; the swing's range, longest time, top speed, gravity and hunger; Web Assist (whether it may be used, what it does in open land, how far it looks, the longest sky swing, the boost's cooldown); the crawl's speed and hunger and the leap's speed; each suit's protection and how long Magneto's strip lasts; the legs' damage, pace, range, reach and hunger; every number of Instant Kill (range, pace, damage, longest, cooldown, hunger, confirm window, whether it may hit players); and every number of the Black Eyes (speed, strength, attack speed, jump, knockback resistance, hunger, longest, cooldown, crash, stress surge, sense) are the `spider_man.*` options on [Server Configuration](Server-Configuration#spider-man). Three datapack tags (`enhanced:web_immune`, `enhanced:instant_kill_immune`, `enhanced:cannot_cling`) change who is webbed, who Instant Kill spares and what he can stick to.

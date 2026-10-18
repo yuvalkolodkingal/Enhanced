@@ -19,7 +19,7 @@ Every power's look and colour follows the MCU films and shows, and Vision, Tommy
 (in his Asgardian clothes, the TVA's or the God of Stories'), Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops and Professor X each have several looks
 (press **H**).
 
-**New in 3.3:** three new heroes: [Agatha](docs/wiki/Agatha.md) (read the Darkhold with no power: its purple beam, flight, the Power Drain, a witch's shield and a Rune Trap), [Cyclops](docs/wiki/Cyclops.md) (put on his ruby-quartz glasses: the Optic Blast, and a giant beam whenever they come off) and [Professor X](docs/wiki/Professor-X.md) (craft his wheelchair: hear thoughts, take over bodies, Cerebro; young or old); the [Hero Creator](docs/wiki/Hero-Creator.md) (Creative: become any hero, or make your own from thirty powers with a strength each, your keys, colours and skin, saved as JSON); [Hydra outposts, Mjolnir's craters and the Mutant School](docs/wiki/Structures.md) in the world (Loki's Scepter is now found only in the outposts' vaults); Billy's Hex Barrier stops everything from the front, with 30 health and no time limit, and chaos magic shatters it; Wanda's Hex lets in only those she approves and no power crosses its wall, and her **Hex Runes** silence every other sorcerer inside; the ward of the Book of the Vishanti keeps out monsters, bosses, what they shoot and dark magic; the Witches' Road plays an original ballad in a new arrangement at each stage; and smoother animations everywhere.
+**New in 3.3:** three new heroes: [Agatha](docs/wiki/Agatha.md) (read the Darkhold with no power: its purple beam, flight, the Power Drain, a witch's shield and a Rune Trap), [Cyclops](docs/wiki/Cyclops.md) (put on his ruby-quartz glasses: the Optic Blast, and a giant beam whenever they come off) and [Professor X](docs/wiki/Professor-X.md) (craft his wheelchair: hear thoughts, take over bodies, Cerebro; young or old); the [Hero Creator](docs/wiki/Hero-Creator.md) (Creative: become any hero, or make your own from thirty powers with a strength each, your keys, colours and skin, saved as JSON); [Hydra outposts, Mjolnir's craters and the Mutant School](docs/wiki/Structures.md) in the world (Loki's Scepter is now found only in the outposts' vaults); Billy's Hex Barrier stops everything from the front, with 30 health and no time limit, and chaos magic shatters it; Wanda's Hex lets in only those she approves and no power crosses its wall, and her **Hex Runes** silence every other sorcerer inside; the ward of the Book of the Vishanti keeps out monsters, bosses, what they shoot and dark magic; the Witches' Road plays an original ballad in a new arrangement at each stage; Quicksilver and Tommy each get separate **slow time** (R) and **super speed** (G) keys, **run up walls and along ceilings**, and new attacks (Dash Strike, Pebble Barrage, Sonic Boom); Spider-Man's **Web Assist** makes swinging easy in forests and open land (J switches it); and smoother animations everywhere.
 
 **New in 3.2:** the Witches' Road has three **trials** (a parkour over the void, a structure to copy block by block, an ice-boat race; see [The Witches' Road](docs/wiki/Witches-Road.md)) and you choose Billy or Tommy at the end; Billy fires a continuous **Hex Beam** (hold **R**), raises a **Hex Barrier** (Sneak + **B**) and ranks up to **ten** ranks; Wanda's Chaos Shield is **unlimited** and she can build **instantly** (Ctrl + I); sorcerers can craft the **Book of the Vishanti** (saved places, and a ward round the base that no monster can enter) and the **Darkhold** (Agatha's purple beam; see [The Sorcerers' Books](docs/wiki/Sorcerers-Books.md)); and Apocalypse is weaker (one master factor, `apocalypse_boss.powerFactor`).
 
@@ -94,19 +94,19 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 
 | Key | Magneto | Scarlet Witch | Quicksilver | Vision |
 |---|---|---|---|---|
-| **R** | Metal Telekinesis (Sneak: Magnetic Pull) | Chaos Energy Beam (hold) | Quicksilver Time on/off (Sneak: Super Speed) | Mind Stone Beam (hold) |
-| **G** | Iron Shrapnel Storm (hold) | Enhanced Flight | Speed Blitz | Flight |
-| **V** | Armor & Weapon Strip | Telekinesis (creatures, items, blocks; Sneak: a block) | Pickpocket | Phase through walls (toggle) |
-| **B** | Magnetic Shield (toggle) | Chaos Shield (hold; unlimited) | Wall & Water Run (toggle) | Density (toggle) |
-| **N** | Magnetic Flight | The Hex (again: Hex Control, Sneak: dissolve) | Walkman: music on/off | Human disguise (toggle) |
+| **R** | Metal Telekinesis (Sneak: Magnetic Pull) | Chaos Energy Beam (hold) | Quicksilver Time on/off (Sneak: Walkman) | Mind Stone Beam (hold) |
+| **G** | Iron Shrapnel Storm (hold) | Enhanced Flight | Super Speed on/off (Sneak: Dash Strike) | Flight |
+| **V** | Armor & Weapon Strip | Telekinesis (creatures, items, blocks; Sneak: a block) | Speed Blitz (Sneak: Pickpocket) | Phase through walls (toggle) |
+| **B** | Magnetic Shield (toggle) | Chaos Shield (hold; unlimited) | Wall & Water Run: walls, ceilings, water (toggle) | Density (toggle) |
+| **N** | Magnetic Flight | The Hex (again: Hex Control, Sneak: dissolve) | Pebble Barrage | Human disguise (toggle) |
 | **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel; Ctrl + I: Instant) | | |
 
 | Key | Tommy | Billy | Loki | Thor |
 |---|---|---|---|---|
-| **R** | Super Speed on/off (sprint) | Hex Beam (hold) | Daggers (Sneak: three) | Throw / call back (Sneak: shatter Mjolnir) |
-| **G** | Disarm Blitz | Flight | Duplicates | Flight (weapon in hand) |
-| **V** | Whirlwind | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Shapeshift | Lightning beam (hold) |
-| **B** | Vibrate Through Walls | Freeze (Sneak, hold: Hex Barrier) | Vanish | God of Thunder (toggle) |
+| **R** | Slow Time on/off (Sneak: Wall Run on/off) | Hex Beam (hold) | Daggers (Sneak: three) | Throw / call back (Sneak: shatter Mjolnir) |
+| **G** | Super Speed on/off (Sneak: Dash Strike) | Flight | Duplicates | Flight (weapon in hand) |
+| **V** | Whirlwind (Sneak: Sonic Boom) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Shapeshift | Lightning beam (hold) |
+| **B** | Vibrate Through Walls (Sneak: Disarm Blitz) | Freeze (Sneak, hold: Hex Barrier) | Vanish | God of Thunder (toggle) |
 | **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
 | **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel) | | |
 | **H** | Change look | Change look | Change look | Change look |
@@ -150,9 +150,15 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 A custom hero of the Hero Creator has the powers you chose on **R G V B N**.
 
 **Quicksilver Time:** as Quicksilver, press **R**. Everything within 32 blocks slows to a fifth of its speed
-(arrows hang in the air) and the music starts, whether you run or just stand there; sprint, and you run four times
-faster. Press **Sneak + R** for **Super Speed** instead: only you are fast, and the world is not slowed. In either mode
-you also mine, attack, eat, shoot a bow and swim four times as fast.
+(arrows hang in the air) and the music starts, whether you run or just stand there. **G** is **Super Speed**, a
+separate power: sprint, and you run four times faster. Use one, the other, or both (the world slowed while you run
+through it). While either is on you also mine, attack, eat, shoot a bow and swim four times as fast. Tommy has the
+same two: **R** Slow Time (teal) and **G** Super Speed. With super speed on, both **run up walls and along
+ceilings** when they sprint into a wall.
+
+**Web Assist:** Spider-Man's **Sneak + G**, held, swings on a web that finds its own anchor in trees, houses and
+cliffs, never snags on the ground or the leaves, and sends the next web while **G** is held. **J** switches it to the
+manual swing.
 
 **The Hex's Vision:** when the Scarlet Witch raises a Hex, a Vision appears at her side and fights for her
 while it stands (he can never leave it). Look at a creature and press **Z** to send him at it, at nothing to

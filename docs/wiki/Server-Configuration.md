@@ -118,8 +118,8 @@ Section `[quicksilver]`. The hero's page is [Quicksilver](Quicksilver).
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
-| `quicksilver.slowMotionFactor` | `5` | 2 to 20 | During Quicksilver Time the world around him runs this many times slower. |
-| `quicksilver.slowMotionRadius` | `32` | 4 to 128 | How far (in blocks) from Quicksilver time slows down. |
+| `quicksilver.slowMotionFactor` | `5` | 2 to 20 | During Quicksilver Time the world around him runs this many times slower (Tommy's Slow Time too, since 3.3). |
+| `quicksilver.slowMotionRadius` | `32` | 4 to 128 | How far (in blocks) from Quicksilver time slows down (and from Tommy, in his Slow Time). |
 | `quicksilver.speedBonus` | `3.0` | 0.0 to 10.0 | Extra movement speed while he runs in Quicksilver Time or Super Speed (3.0 = four times as fast). |
 | `quicksilver.exhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion per tick while he runs in Quicksilver Time or Super Speed (4.0 = 1 food point). Quicksilver Time also costs half of this while he is not running. |
 | `quicksilver.actionSpeed` | `4.0` | 1.0 to 10.0 | While Quicksilver Time or Super Speed is on he mines, attacks, eats, drinks, draws bows, loads crossbows, swims and places blocks this many times as fast (4.0 = four times as fast). |
@@ -344,6 +344,29 @@ Section `[phoenix]`. The hero's page is [Phoenix](Phoenix). Her telekinesis has 
 | `phoenix.burstDrainTicks` | `100` | 0 to 1200 | How long (in ticks) Weakness and Slowness last after a Burst (none in Creative). |
 | `phoenix.emberRitualTicks` | `60` | 20 to 400 | How long (in ticks) the Phoenix Ember must be held with right-click to awaken (60 = 3 seconds). |
 
+## The speedsters
+
+Section `[speedsters]` (3.3), shared by [Quicksilver](Quicksilver) and [Tommy](Tommy): running up walls and along ceilings, Tommy's Slow Time and the speed strikes (the Dash Strike of both, Quicksilver's Pebble Barrage, Tommy's Sonic Boom). Tommy's Slow Time uses Quicksilver's `quicksilver.slowMotionFactor` and `slowMotionRadius`.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `speedsters.wallRun` | `true` | `true` or `false` | Speedsters run up walls they sprint into at super speed (Quicksilver: Wall & Water Run on; Tommy: Wall Run on). False: they stop at walls as in 3.2. |
+| `speedsters.ceilingRun` | `true` | `true` or `false` | A speedster running up a wall goes on along a ceiling or roof above it, and round the lip of an overhang. |
+| `speedsters.surfaceSpeedFactor` | `0.8` | 0.1 to 2.0 | Speed on a wall or a ceiling, as a part of his speed on the ground (0.8 = four fifths). |
+| `speedsters.surfaceMaxSpeed` | `1.0` | 0.1 to 3.0 | The fastest he runs on a wall or a ceiling, in blocks per tick (1.0 = 20 blocks a second). |
+| `speedsters.surfaceMinSpeed` | `0.22` | 0.01 to 1.0 | Below this speed (blocks per tick) he can no longer hold a wall or a ceiling and drops off. |
+| `speedsters.tommyTimeExhaustion` | `0.01` | 0.0 to 4.0 | Food exhaustion per tick of Tommy's slow time while he is not running (4.0 = 1 food point). (Running costs the exhaustion of his Super Speed instead.) |
+| `speedsters.dashRange` | `12` | 2 to 32 | How far the Dash Strike (Sneak + G) carries him, in blocks. |
+| `speedsters.dashDamage` | `5.0` | 0.0 to 100.0 | Damage of the Dash Strike to each creature in its path. |
+| `speedsters.dashCooldown` | `100` | 0 to 72000 | Cooldown of the Dash Strike, in ticks. |
+| `speedsters.barragePebbles` | `8` | 1 to 32 | How many pebbles Quicksilver's Pebble Barrage (N) flings. |
+| `speedsters.barrageDamage` | `1.5` | 0.0 to 50.0 | Damage of each pebble (it ignores the hit cooldown, so pebbles add up). |
+| `speedsters.barrageRange` | `24` | 4 to 64 | How far the pebbles fly, in blocks. |
+| `speedsters.barrageCooldown` | `120` | 0 to 72000 | Cooldown of the Pebble Barrage, in ticks. |
+| `speedsters.sonicBoomRadius` | `6.0` | 1.0 to 16.0 | Radius of Tommy's Sonic Boom (Sneak + V), in blocks. |
+| `speedsters.sonicBoomDamage` | `4.0` | 0.0 to 100.0 | Damage of the Sonic Boom (half as much again when he was running at super speed). |
+| `speedsters.sonicBoomCooldown` | `160` | 0 to 72000 | Cooldown of the Sonic Boom, in ticks. |
+
 ## Spider-Man
 
 Section `[spider_man]`. The hero's page is [Spider-Man](Spider-Man). Ticks are 1/20 of a second, and "exhaustion" 4.0 is one food point. Every option is read when it is used, so editing the config file changes it live. There is no web fluid: hunger is the only resource.
@@ -383,6 +406,11 @@ Section `[spider_man]`. The hero's page is [Spider-Man](Spider-Man). Ticks are 1
 | `spider_man.swingMaxSpeed` | `1.8` | 0.5 to 3.0 | His top speed while swinging, in blocks per tick. |
 | `spider_man.swingGravity` | `0.06` | 0.02 to 0.12 | Gravity while he swings, in blocks per tick squared (the normal one is 0.08). |
 | `spider_man.swingExhaustion` | `0.01` | 0.0 to 1.0 | Food exhaustion per tick while he swings (4.0 = 1 food point; 0.01 is a food point every 20 seconds). |
+| `spider_man.webAssist` | `true` | `true` or `false` | Whether Web Assist may be used: the swing chooses its own anchor ahead and above (trees count), keeps clear of the ground and the leaves, lets go at the best moment and swings on while G is held. Each Spider-Man switches it with the Web Assist key (J); it is on for him from the start. Off: every swing is manual. |
+| `spider_man.webAssistOpenLand` | `sky` | `sky`, `zip` or `none` | What Web Assist does where there is nothing to swing from: "sky" (a web to the open sky ahead and above), "zip" (a short web boost forward and up) or "none". |
+| `spider_man.webAssistRange` | `30` | 8 to 96 | How far (blocks) Web Assist looks for an anchor (never further than swingRange). |
+| `spider_man.skyAnchorMaxTicks` | `60` | 10 to 400 | The longest a swing on a sky anchor lasts, in ticks. |
+| `spider_man.webBoostCooldown` | `20` | 0 to 400 | Ticks between two web boosts (the "zip" of webAssistOpenLand). |
 | `spider_man.crawlSpeed` | `0.22` | 0.05 to 0.6 | His speed on a wall or ceiling, in blocks per tick, before his speed factor (0.22 = 4.4 blocks a second). |
 | `spider_man.crawlExhaustion` | `0.005` | 0.0 to 1.0 | Food exhaustion per tick while he moves on a wall or ceiling. |
 | `spider_man.leapSpeed` | `0.9` | 0.3 to 2.0 | Speed of a leap off a wall, in blocks per tick, before his speed factor. |
@@ -1182,7 +1210,7 @@ The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_
 
 ## Client options: animations, effects and looks
 
-Nine options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]` and `[build_magic]` sections (the last is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
+Eleven options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]` and `[spider_man]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
 
 ```toml
 [animation]
@@ -1199,6 +1227,10 @@ Nine options are about your own game only. They are not synced, and a server can
     ghostDetail = 32768
     seeThrough = true
     showOthers = true
+
+[spider_man]
+    webAssist = true
+    webAssistPreview = true
 ```
 
 | Option | Setting in the file | Default | What it does |
@@ -1212,6 +1244,8 @@ Nine options are about your own game only. They are not synced, and a server can
 | Preview detail | `ghostDetail` | `32768` | The most blocks drawn one by one in a spell's preview (0 to 262144): a bigger one is drawn as its outside only, then as a tinted box. |
 | See the box through walls | `seeThrough` | `true` | The box shows faintly through hills and walls. |
 | Other builders | `showOthers` | `true` | See the boxes of other builders near you. |
+| Web Assist | `webAssist` | `true` | 3.3: Spider-Man's [Web Assist](Spider-Man#web-assist-easy-swinging-33): the swing chooses its own anchor ahead and above (trees count), keeps clear of the ground and the leaves, lets go at the best moment and swings on while G is held. Off: the manual swing, aimed with the crosshair. The **J** key switches it too. |
+| Web Assist preview | `webAssistPreview` | `true` | Show where Web Assist's next web would go (a small white web) while you are in the air or sneaking. |
 
 Two more client options, for the music and the air of the Thanos fight, are in a `[thanos]` section of the same file: see [above](#your-own-game-the-music-and-the-atmosphere-of-the-fight).
 
