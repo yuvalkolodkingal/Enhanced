@@ -155,7 +155,7 @@ public final class SkeletonTests {
     /** The heroes of 3.0, in Eilon's order: the last five of {@link Power}. */
     private static final List<Power> NEW_HEROES = List.of(Power.PHOENIX, Power.SPIDER_MAN, Power.THANOS, Power.ULTRON, Power.APOCALYPSE);
     /** The heroes of 3.3, appended after them (plug-ins too; each lane adds its own). */
-    private static final List<Power> V33_HEROES = List.of(Power.CYCLOPS, Power.PROFESSOR_X, Power.CUSTOM);
+    private static final List<Power> V33_HEROES = List.of(Power.AGATHA, Power.CYCLOPS, Power.PROFESSOR_X, Power.CUSTOM);
 
     /**
      * Whether the hero's lane is built: its plug-in does something with the keys, so the tests that pin a stub ("does
@@ -181,6 +181,7 @@ public final class SkeletonTests {
             check(all[Power.THOR.ordinal() + 1 + i] == NEW_HEROES.get(i), "hero " + i + " of 3.0 is " + NEW_HEROES.get(i));
         }
         check(all[Power.PHOENIX.ordinal() - 1] == Power.THOR, "the heroes of 3.0 follow Thor (the stream sends the ordinal)");
+        check(all[Power.APOCALYPSE.ordinal() + 1] == Power.AGATHA, "the heroes of 3.3 are appended after them (Agatha first)");
         check(Power.THOR.ordinal() == 8, "and nobody before them moved: Thor is still the ninth power");
         helper.succeed();
     }

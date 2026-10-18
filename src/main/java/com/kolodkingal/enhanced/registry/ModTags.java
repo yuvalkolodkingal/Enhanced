@@ -138,6 +138,13 @@ public final class ModTags {
     /** Blocks the Capstone can be planted on: sand and sandstone. */
     public static final TagKey<Block> RITUAL_GROUND = TagKey.create(Registries.BLOCK, Enhanced.id("ritual_ground"));
 
+    // ===== agatha (3.3) =====
+    /**
+     * Dark magic: the Darkhold's Purple Beam (whoever fires it, Agatha or a sorcerer holding the book) and Agatha's Power
+     * Drain and Rune Trap. What the ward of the Book of the Vishanti keeps out.
+     */
+    public static final TagKey<DamageType> DARK_MAGIC = TagKey.create(Registries.DAMAGE_TYPE, Enhanced.id("dark_magic"));
+
     // ===== 3.1 build =====
     /**
      * Blocks no Build Magic spell changes, vanishes or moves, and a copy leaves out: what the Wither cannot break

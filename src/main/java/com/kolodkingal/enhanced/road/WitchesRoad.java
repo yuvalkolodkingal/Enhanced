@@ -48,8 +48,8 @@ import org.jetbrains.annotations.Nullable;
  *     the Road, three trials in the dimension {@code enhanced:witches_road} ({@link RoadTrials}), and at the end
  *     chooses whose road to walk: Billy's (Wiccan) or Tommy's (Speed). Choosing uses up one gene. (With {@code
  *     witches_road.enabled} off, as in 3.1, the choice is the door's own.)</li>
- *     <li>Walking the Road: the Scarlet Witch and Billy, whose magic made it, step through a door and come up out of the
- *     next one in the same dimension (in the order the doors were placed, wrapping around).</li>
+ *     <li>Walking the Road: the Scarlet Witch and Billy, whose magic made it, and Agatha (3.3), step through a door and come
+ *     up out of the next one in the same dimension (in the order the doors were placed, wrapping around).</li>
  * </ul>
  * An open door closes again {@link #OPEN_TICKS} after it opened, whatever happened.
  */
@@ -167,7 +167,8 @@ public final class WitchesRoad {
             } else {
                 seek(level, pos, player);
             }
-        } else if (power == Power.SCARLET_WITCH || power == Power.BILLY) {
+        } else if (power == Power.SCARLET_WITCH || power == Power.BILLY || power == Power.AGATHA) {
+            // (3.3: Agatha, who led the coven down the Road, walks it from door to door too.)
             walk(level, pos, player);
         } else {
             player.displayClientMessage(Component.translatable(power.hasPowers()

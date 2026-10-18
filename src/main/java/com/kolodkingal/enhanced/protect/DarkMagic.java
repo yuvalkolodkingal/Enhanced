@@ -46,7 +46,9 @@ public final class DarkMagic {
      * fires its purple beam.
      */
     public static boolean casts(@Nullable Entity entity) {
-        return entity instanceof Player player && DarkholdBook.firing(player);
+        // (3.3: every power of Agatha's is the Darkhold's magic.)
+        return entity instanceof Player player
+                && (DarkholdBook.firing(player) || com.kolodkingal.enhanced.power.Powers.power(player) == com.kolodkingal.enhanced.power.Power.AGATHA);
     }
 
     private DarkMagic() {

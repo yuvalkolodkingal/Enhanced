@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.item;
 
+import com.kolodkingal.enhanced.ability.AgathaAbilities;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
@@ -19,8 +20,9 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * The Darkhold, the book of the dark magic of Mount Wundagore, which corrupts whoever reads it (Agatha Harkness's). Held
- * in either hand, it gives a sorcerer (Loki, the Scarlet Witch, Billy; anyone, if {@code darkhold.anyoneCanUse}) Agatha's
+ * The Darkhold, the book of the dark magic of Mount Wundagore, which corrupts whoever reads it (Agatha Harkness's). A
+ * player with no power who holds use on it becomes Agatha (3.3; the book is kept). Held in either hand, it gives a
+ * sorcerer (Loki, the Scarlet Witch, Billy, Agatha; anyone, if {@code darkhold.anyoneCanUse}) Agatha's
  * abilities (see {@link DarkholdBook}): hold use fires her purple beam (the use is held like a bow's, so the holder moves
  * slowly while it burns), Sneak + use is the hex mark or the mind glimpse, and magic used on the holder poisons whoever used it.
  */
@@ -39,6 +41,11 @@ public class DarkholdItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (DarkholdBook.awakens(player)) {
+            // (3.3) Someone with no power reads it, held: Agatha wakes in them (see AgathaAbilities.reading).
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(stack);
+        }
         if (player instanceof ServerPlayer server) {
             if (DarkholdBook.refuse(server)) {
                 return InteractionResultHolder.fail(stack);
@@ -74,6 +81,10 @@ public class DarkholdItem extends Item {
     @Override
     public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int remaining) {
         if (entity instanceof ServerPlayer player) {
+            if (!DarkholdBook.firing(player) && DarkholdBook.awakens(player)) {
+                AgathaAbilities.reading(player, getUseDuration(stack, player) - remaining);
+                return;
+            }
             DarkholdBook.beamTick(player);
         }
     }
@@ -85,17 +96,19 @@ public class DarkholdItem extends Item {
         }
     }
 
-    /** However the use ends (the key came up, the book was put away, a death): the beam ends. */
+    /** However the use ends (the key came up, the book was put away, a death): the beam ends, and a reading cut short fades. */
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         if (entity instanceof ServerPlayer player) {
             DarkholdBook.beamStop(player);
+            AgathaAbilities.stopReading(player);
         }
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.enhanced.darkhold.desc").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+        tooltip.add(Component.translatable("item.enhanced.darkhold.agatha").withStyle(ChatFormatting.LIGHT_PURPLE));
         tooltip.add(Component.translatable("item.enhanced.darkhold.sorcerers").withStyle(ChatFormatting.LIGHT_PURPLE));
         tooltip.add(Component.translatable("item.enhanced.darkhold.beam").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.enhanced.darkhold.retaliation").withStyle(ChatFormatting.GRAY));

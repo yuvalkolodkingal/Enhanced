@@ -241,7 +241,22 @@ public enum GestureId {
     /** Hear Thoughts on: the fingers brush the temple, the head tilts to listen. */
     XAVIER_THOUGHTS_ON(Group.CAST, 14, 2, 5, false),
     /** Hear Thoughts off: a small shake of the head. */
-    XAVIER_THOUGHTS_OFF(Group.CAST, 10, 1, 4, false)
+    XAVIER_THOUGHTS_OFF(Group.CAST, 10, 1, 4, false),
+    // ===== agatha (3.3) =====
+    /** Agatha rises like a witch lifted by her own magic: the arms swept up and open, then settled on the hover pose. */
+    TAKEOFF_AGATHA(Group.TAKEOFF, 20, 2, 8, true),
+    /** The Purple Beam begins (R): the hand drawn back to the shoulder, then thrust out along the look. */
+    AGATHA_BEAM(Group.CAST, 10, 1, 4, false),
+    /** The hex mark or the mind glimpse (Sneak + R): the hand raised, the fingers flicked open at the target. */
+    AGATHA_HEX(Group.CAST, 14, 2, 5, false),
+    /** The Power Drain (V): both hands thrust at the target, clawed, and dragged back to the chest. */
+    AGATHA_DRAIN(Group.CAST, 22, 2, 7, true),
+    /** The Witch's Shield forms (B): the hands drawn in, then pushed out into the shield's stance. */
+    AGATHA_SHIELD_RAISE(Group.CAST, 10, 2, 4, true),
+    /** The shield is let go of: the arms fall. */
+    AGATHA_SHIELD_DROP(Group.CAST, 8, 1, 4, false),
+    /** The Rune Trap (N): the hand draws a circle in the air, then both palms are driven down at the ground. */
+    AGATHA_RUNES(Group.CAST, 24, 2, 8, true)
     ;
 
     /** Gestures of one group never play together. */

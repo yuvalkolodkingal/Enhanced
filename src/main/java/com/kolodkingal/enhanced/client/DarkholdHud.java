@@ -17,7 +17,8 @@ import java.util.List;
 /**
  * A small hint panel at the top right while the Darkhold is in hand (3.2): its name in purple, what use does, what Sneak + use
  * does, and that magic used on the holder poisons the attacker; green while the beam burns. For someone who cannot read the book
- * it only says so. Nothing is drawn with the book away, or with the GUI hidden.
+ * it only says so; for someone with no power it says that holding use makes them Agatha (3.3). Nothing is drawn with the
+ * book away, or with the GUI hidden.
  */
 public class DarkholdHud implements LayeredDraw.Layer {
     private static final int PURPLE = 0xB45CFF;
@@ -31,7 +32,10 @@ public class DarkholdHud implements LayeredDraw.Layer {
         }
         Font font = mc.font;
         boolean firing = Powers.get(player).is(Live.BEAMING);
-        List<Component> lines = DarkholdBook.mayUse(player)
+        List<Component> lines = DarkholdBook.awakens(player)
+                ? List.of(Component.translatable("item.enhanced.darkhold").withStyle(s -> s.withBold(true).withColor(PURPLE)),
+                        Component.translatable("hud.enhanced.darkhold.awaken").withStyle(ChatFormatting.LIGHT_PURPLE))
+                : DarkholdBook.mayUse(player)
                 ? List.of(Component.translatable("item.enhanced.darkhold").withStyle(s -> s.withBold(true).withColor(PURPLE)),
                         Component.translatable(firing ? "hud.enhanced.darkhold.beam_firing" : "hud.enhanced.darkhold.beam")
                                 .withStyle(firing ? ChatFormatting.GREEN : ChatFormatting.GRAY),

@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced;
 
+import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
@@ -515,6 +516,8 @@ public final class EnhancedConfig {
         HexRunesConfig.define(BUILDER);
         // 3.3: Professor X (section [professor_x]).
         XavierConfig.define(BUILDER);
+        // 3.3: Agatha Harkness (section [agatha]).
+        AgathaConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

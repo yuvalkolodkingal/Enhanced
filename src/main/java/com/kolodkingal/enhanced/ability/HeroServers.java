@@ -10,7 +10,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * The registry of {@link HeroServer}s: the heroes of 3.0 (the heroes before them are still routed by the {@code switch}
+ * The registry of {@link HeroServer}s: the heroes of 3.0 and after (the heroes before them are still routed by the {@code switch}
  * statements of {@link AbilityHandler} and {@link PowerTicker}). The shared code calls the registry once; a hero is
  * added here with one line, and everything else about it is in its own class.
  */
@@ -28,6 +28,7 @@ public final class HeroServers {
         // 3.3: the custom hero of the Hero Creator.
         register(new com.kolodkingal.enhanced.custom.CustomHeroServer());
         register(new XavierServer());
+        register(new AgathaServer());
     }
 
     /**

@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.road.RoadTrials;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 /** Routes an ability key press/release from a client to the right hero. */
@@ -41,6 +42,11 @@ public final class AbilityHandler {
         if (down && MindLink.isHost(player)) {
             return;
         }
+        // Drained by Agatha (3.3): the power is hers for a while. (A release still goes through.)
+        if (down && player.hasEffect(ModEffects.DRAINED)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.agatha.you_are_drained"), true);
+            return;
+        }
         PowerData data = Powers.get(player);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down);
@@ -52,7 +58,7 @@ public final class AbilityHandler {
             case LOKI -> LokiAbilities.onKey(player, data, ability, down);
             case THOR -> ThorAbilities.onKey(player, data, ability, down);
             // The heroes of 3.0 are plug-ins (HeroServer): their keys are theirs.
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.onKey(player, data, ability, down);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.onKey(player, data, ability, down);
             case NONE -> {
             }
         }

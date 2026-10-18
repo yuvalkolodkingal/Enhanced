@@ -85,7 +85,10 @@ public enum Stance {
     /** His mind is in another body: two fingers at his temple, the head bowed, still. */
     XAVIER_TRANCE(2.0F, 4.0F, true),
     /** Cerebro's helmet is on: both hands at its sides. */
-    XAVIER_CEREBRO(2.0F, 4.0F, true)
+    XAVIER_CEREBRO(2.0F, 4.0F, true),
+    // ===== agatha (3.3) =====
+    /** Agatha's Witch's Shield: both hands held out before her, fingers spread, a little apart. */
+    AGATHA_SHIELD(1.5F, 3.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

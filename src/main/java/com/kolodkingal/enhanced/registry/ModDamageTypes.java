@@ -67,6 +67,13 @@ public final class ModDamageTypes {
     // ===== professor_x (3.3) =====
     /** Professor X's Mental Blast (it ignores armour), and the backlash of a stronger telepath who throws him out. */
     public static final ResourceKey<DamageType> MIND_BLAST = key("mind_blast");
+    // ===== agatha (3.3) =====
+    // Agatha's dark magic: her Purple Beam is the Darkhold's own (DARKHOLD_BEAM); these two and that one are the tag
+    // enhanced:dark_magic (ModTags.DARK_MAGIC), what the ward of the Book of the Vishanti keeps out.
+    /** The Power Drain's hit on a creature: its life drawn out into her. */
+    public static final ResourceKey<DamageType> AGATHA_DRAIN = key("agatha_drain");
+    /** The burning of the Rune Trap on what stands bound in it. */
+    public static final ResourceKey<DamageType> AGATHA_RUNES = key("agatha_runes");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

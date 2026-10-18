@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
+import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.DarkholdConfig;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -49,8 +50,9 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * The Darkhold in use (3.2): Agatha Harkness's book, held in either hand. It gives its holder, a sorcerer (Loki, the
- * Scarlet Witch or Billy) or anyone at all if {@code darkhold.anyoneCanUse}:
+ * The Darkhold in use (3.2): Agatha Harkness's book, held in either hand. Since 3.3 a player with no power who holds use
+ * on it becomes Agatha ({@link #awakens}; her abilities are {@code AgathaAbilities}, and she is a sorcerer). It gives its
+ * holder, a sorcerer (Loki, the Scarlet Witch, Billy or Agatha) or anyone at all if {@code darkhold.anyoneCanUse}:
  * <ul>
  *     <li>Agatha's purple beam: hold use, a continuous beam of purple magic with a white core (the generic {@link
  *     ContinuousBeam} with the {@link DarkholdItem#STYLE} palette), aimed along the look, at a cost in hunger;</li>
@@ -114,6 +116,15 @@ public final class DarkholdBook {
     /** Whether the player can use the book now: it is on, they are a sorcerer (or anyone may), and they are not in the Road. Both sides. */
     public static boolean mayUse(Player player) {
         return enabled() && !inTheRoad(player) && (WardStrength.isSorcerer(player) || anyoneCanUse()) && !HexRunes.silences(player);
+    }
+
+    /**
+     * Whether reading the book now would make this player Agatha Harkness (3.3): the book works, they have no power, they
+     * are not in the Road, and {@code agatha.darkholdAwakens} is on. Then use, held, is the awakening and not the beam
+     * (even where {@code anyoneCanUse} would let them fire it). Both sides.
+     */
+    public static boolean awakens(Player player) {
+        return enabled() && loaded() && AgathaConfig.DARKHOLD_AWAKENS.get() && !inTheRoad(player) && !Powers.power(player).hasPowers();
     }
 
     /** Whether the player holds the book and may use it: what the retaliation asks, and the abilities. */
@@ -220,16 +231,25 @@ public final class DarkholdBook {
         if (player.isSpectator() || refuse(player)) {
             return;
         }
+        hexOrGlimpse(player);
+    }
+
+    /**
+     * The hex mark on the creature looked at, or, with none in sight, the mind glimpse, for someone who may use them (the
+     * holder of the book, after {@link #refuse}; Agatha, whose Sneak + R they are, without the book).
+     *
+     * @return whether a mark or a glimpse was cast (false: it was not ready, or the mark was refused)
+     */
+    public static boolean hexOrGlimpse(ServerPlayer player) {
         Entity seen = null;
         HitResult hit = Raycasts.any(player, DarkholdConfig.MARK_RANGE.get(), ContinuousBeam.targets(player), 1.0F);
         if (hit instanceof EntityHitResult entityHit) {
             seen = entityHit.getEntity() instanceof PartEntity<?> part ? part.getParent() : entityHit.getEntity();
         }
         if (seen instanceof LivingEntity target && !(seen instanceof ArmorStand)) {
-            mark(player, target);
-        } else {
-            glimpse(player);
+            return mark(player, target);
         }
+        return glimpse(player);
     }
 
     private static long wait(Map<UUID, Long> ready, ServerPlayer player) {
@@ -242,16 +262,20 @@ public final class DarkholdBook {
         }
     }
 
-    /** The hex mark: the creature glows, is slowed, and takes more damage from this player until it ends. */
-    public static void mark(ServerPlayer player, LivingEntity target) {
+    /**
+     * The hex mark: the creature glows, is slowed, and takes more damage from this player until it ends.
+     *
+     * @return whether it was cast
+     */
+    public static boolean mark(ServerPlayer player, LivingEntity target) {
         long wait = wait(MARK_READY, player);
         if (wait > 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.not_ready", (wait + 19) / 20), true);
-            return;
+            return false;
         }
         if (target instanceof ServerPlayer other && !player.canHarmPlayer(other)) {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.mark_refused"), true);
-            return;
+            return false;
         }
         if (Shelters.keepsOut(player.level(), player, player.getEyePosition(), Shelters.middle(target), true)
                 || Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
@@ -273,6 +297,7 @@ public final class DarkholdBook {
         level.sendParticles(new EnergyParticleOptions(DarkholdItem.STYLE.main(), 1.4F), at.x, at.y, at.z, 24, 0.4, 0.5, 0.4, 0.05);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 1.0F, 0.5F);
         player.displayClientMessage(Component.translatable("message.enhanced.darkhold.marked", target.getDisplayName()), true);
+        return true;
     }
 
     /** Whether the creature is a boss or too powerful for a hex (the tags {@code enhanced:bosses} and {@code enhanced:hex_resistant}). */
@@ -313,12 +338,17 @@ public final class DarkholdBook {
         return e.isInvisible() || (e instanceof Player player && (Powers.get(player).is(Live.HIDDEN) || VisionAbilities.isPhased(player)));
     }
 
-    /** The mind glimpse: every living creature near glows for a few seconds, and the action bar says how many and how the nearest fares. */
-    public static void glimpse(ServerPlayer player) {
+    /**
+     * The mind glimpse: every living creature near glows for a few seconds, and the action bar says how many and how the
+     * nearest fares.
+     *
+     * @return whether it was cast (false: not ready yet)
+     */
+    public static boolean glimpse(ServerPlayer player) {
         long wait = wait(GLIMPSE_READY, player);
         if (wait > 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.not_ready", (wait + 19) / 20), true);
-            return;
+            return false;
         }
         ServerLevel level = player.serverLevel();
         GLIMPSE_READY.put(player.getUUID(), level.getGameTime() + DarkholdConfig.GLIMPSE_COOLDOWN.get());
@@ -336,7 +366,7 @@ public final class DarkholdBook {
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 1.2F, 0.8F);
         if (near.isEmpty()) {
             player.displayClientMessage(Component.translatable("message.enhanced.darkhold.glimpse_none"), true);
-            return;
+            return true;
         }
         for (LivingEntity creature : near) {
             creature.addEffect(new MobEffectInstance(MobEffects.GLOWING, DarkholdConfig.GLIMPSE_TICKS.get(), 0, false, false), player);
@@ -344,6 +374,7 @@ public final class DarkholdBook {
         LivingEntity nearest = near.get(0);
         player.displayClientMessage(Component.translatable("message.enhanced.darkhold.glimpse", near.size(), nearest.getDisplayName(),
                 String.format(Locale.ROOT, "%.1f", nearest.getHealth()), String.format(Locale.ROOT, "%.0f", nearest.getMaxHealth())), true);
+        return true;
     }
 
     // ---- the retaliation ----

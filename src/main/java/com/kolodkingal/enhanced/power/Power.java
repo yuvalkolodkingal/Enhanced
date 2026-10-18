@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.power;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
@@ -36,6 +37,8 @@ public enum Power implements StringRepresentable {
     ULTRON(0xFFA23A, 0xFFE9B8),
     APOCALYPSE(0xF2B84B, 0xFFF0B8),
     // The heroes of 3.3, appended after Apocalypse in this order (Agatha, Cyclops, Professor X; each lane adds its own).
+    // Agatha's dark magic is the violet of WandaVision ("It's been Agatha all along"), with a pale lilac glow.
+    AGATHA(0x9A3FE0, 0xE2C2FF),
     // Cyclops's optic blast is ruby red with a hot pink-white core: the colour his ruby-quartz glasses give it.
     CYCLOPS(0xE8323A, 0xFFB3A8),
     // Professor X's telepathy has the cold blue-white of Cerebro.
@@ -96,7 +99,9 @@ public enum Power implements StringRepresentable {
      * wide (the default 854x480 window 427): "Jean Grey (Phoenix)" was cut at both ends, so the Phoenix wakes as "The Phoenix".
      */
     public Component awakeningTitle() {
-        return this == PHOENIX ? Component.translatable("power.enhanced.phoenix.title") : displayName();
+        // (3.3: "Agatha Harkness" is one character too wide: she wakes as "Agatha".)
+        return this == PHOENIX || this == AGATHA ? Component.translatable("power.enhanced." + getSerializedName() + ".title")
+                : displayName();
     }
 
     /** Translation key for the given ability (1-5). */
@@ -114,7 +119,7 @@ public enum Power implements StringRepresentable {
     public boolean canFly() {
         return switch (this) {
             // (A custom hero flies only if Flight is one of its powers: PowerTicker asks its definition.)
-            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, CUSTOM -> true;
+            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, CUSTOM -> true;
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X -> false;
         };
     }
@@ -129,6 +134,7 @@ public enum Power implements StringRepresentable {
             case PHOENIX -> PhoenixConfig.FLIGHT_SPEED.get().floatValue();
             case ULTRON -> UltronConfig.FLIGHT_SPEED.get().floatValue();
             case APOCALYPSE -> ApocalypseConfig.FLIGHT_SPEED.get().floatValue();
+            case AGATHA -> AgathaConfig.FLIGHT_SPEED.get().floatValue();
             // (A custom hero's speed is its Flight's level: PowerTicker asks its definition.)
             case CUSTOM -> com.kolodkingal.enhanced.config.CustomHeroConfig.FLIGHT_SPEED.get().floatValue();
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X -> 0.05F;
@@ -139,7 +145,7 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> 2;
+            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA -> 2;
             // (A custom hero's Flight is on whichever key its player put it.)
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM -> -1;
         };

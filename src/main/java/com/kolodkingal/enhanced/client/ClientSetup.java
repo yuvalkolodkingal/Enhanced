@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
+import com.kolodkingal.enhanced.client.render.AgathaHatLayer;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.BlackEyesLayer;
 import com.kolodkingal.enhanced.client.render.CyclopsBeamFx;
@@ -180,6 +181,8 @@ public final class ClientSetup {
         // ===== professor_x (3.3) =====
         event.registerLayerDefinition(XavierChair.LAYER, XavierChair::createChairLayer);
         event.registerLayerDefinition(XavierChair.HELMET_LAYER, XavierChair::createHelmetLayer);
+        // ===== agatha (3.3) =====
+        event.registerLayerDefinition(AgathaHatLayer.LAYER, AgathaHatLayer::createLayer);
     }
 
     @SubscribeEvent
@@ -210,6 +213,8 @@ public final class ClientSetup {
                 // ===== professor_x (3.3) =====
                 renderer.addLayer(new XavierChair(renderer, event.getContext().bakeLayer(XavierChair.LAYER),
                         event.getContext().bakeLayer(XavierChair.HELMET_LAYER)));
+                // ===== agatha (3.3) =====
+                renderer.addLayer(new AgathaHatLayer(renderer, event.getContext().bakeLayer(AgathaHatLayer.LAYER)));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }

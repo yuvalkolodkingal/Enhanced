@@ -27,6 +27,7 @@ public final class HeroClients {
         // 3.3: the custom hero of the Hero Creator.
         register(new com.kolodkingal.enhanced.client.custom.CustomClient());
         register(new XavierClient());
+        register(new AgathaClient());
     }
 
     /**

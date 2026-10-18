@@ -66,6 +66,8 @@ public final class ModNetwork {
         registrar.playToServer(XavierChoicePayload.TYPE, XavierChoicePayload.STREAM_CODEC, XavierChoicePayload::handle);
         registrar.playToClient(ThoughtsPayload.TYPE, ThoughtsPayload.STREAM_CODEC, ThoughtsPayload::handle);
         registrar.playToClient(CerebroPayload.TYPE, CerebroPayload.STREAM_CODEC, CerebroPayload::handle);
+        // 3.3: Agatha's effects (the Rune Trap, the Power Drain, her shield breaking).
+        registrar.playToClient(AgathaFxPayload.TYPE, AgathaFxPayload.STREAM_CODEC, AgathaFxPayload::handle);
     }
 
     private ModNetwork() {

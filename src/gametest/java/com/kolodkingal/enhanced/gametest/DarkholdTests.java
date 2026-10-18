@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
+import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.DarkholdConfig;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.network.BeamPayload;
@@ -81,7 +82,8 @@ public final class DarkholdTests {
     }
 
     private static boolean sorcerer(Power power) {
-        return power == Power.LOKI || power == Power.SCARLET_WITCH || power == Power.BILLY;
+        // (3.3: Agatha Harkness is a sorcerer too.)
+        return power == Power.LOKI || power == Power.SCARLET_WITCH || power == Power.BILLY || power == Power.AGATHA;
     }
 
     private static boolean says(Component text, String key) {
@@ -216,7 +218,8 @@ public final class DarkholdTests {
     public static void anyoneElseHearsOnlyWhispers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Pig pig = dummy(helper, 14.5, 10.5);
-        for (Power power : new Power[]{Power.NONE, Power.TOMMY, Power.THOR, Power.VISION}) {
+        // (3.3: a player with no power who reads it becomes Agatha instead: AgathaTests.)
+        for (Power power : new Power[]{Power.TOMMY, Power.THOR, Power.VISION}) {
             ServerPlayer player = holder(f, 4.5, 10.5, power);
             lookAt(player, pig);
             TestKit.sentPackets(player);
@@ -236,6 +239,8 @@ public final class DarkholdTests {
     public static void anyoneCanUseItWhenTheConfigSaysSo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DarkholdConfig.ANYONE_CAN_USE, true);
+        // (3.3: with agatha.darkholdAwakens on, a player with no power who reads it becomes Agatha instead.)
+        f.config(AgathaConfig.DARKHOLD_AWAKENS, false);
         ServerPlayer nobody = holder(f, 4.5, 10.5, Power.NONE);
         Pig pig = dummy(helper, 14.5, 10.5);
         check(DarkholdBook.mayUse(nobody) && DarkholdBook.active(nobody), "with anyoneCanUse a player with no power may");

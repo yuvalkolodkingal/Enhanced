@@ -86,6 +86,12 @@ public final class Variants {
                 new Variant("young", Power.PROFESSOR_X, Variant.suit("xavier_young"), null, false, 0x6F8CFF, 0xDCE4FF),
                 new Variant("old", Power.PROFESSOR_X, Variant.suit("xavier_old"), null, false, 0x8FA6FF, 0xF2F5FF),
                 own(Power.PROFESSOR_X));
+        // 3.3. Agatha of WandaVision (her witch's dress, the brooch at the throat; Agnes no more) and of Agatha All Along
+        // (the Witches' Road: dark green and black, and the hat, which AgathaHatLayer draws).
+        add(Power.AGATHA,
+                new Variant("wandavision", Power.AGATHA, Variant.suit("agatha_wandavision"), null, true, 0x9A3FE0, 0xE2C2FF),
+                new Variant("all_along", Power.AGATHA, Variant.suit("agatha_all_along"), null, true, 0x8E4FD6, 0xB8E6A8),
+                own(Power.AGATHA));
     }
 
     private static void add(Power power, Variant... variants) {

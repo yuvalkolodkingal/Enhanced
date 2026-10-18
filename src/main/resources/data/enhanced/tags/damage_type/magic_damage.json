@@ -16,6 +16,8 @@
     "enhanced:entomb",
     "minecraft:magic",
     "minecraft:indirect_magic",
-    "enhanced:mind_blast"
+    "enhanced:mind_blast",
+    "enhanced:agatha_drain",
+    "enhanced:agatha_runes"
   ]
 }

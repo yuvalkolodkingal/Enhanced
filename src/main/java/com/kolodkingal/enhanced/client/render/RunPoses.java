@@ -99,6 +99,9 @@ final class RunPoses {
     private static final Character XAVIER = new Character(0.85F, 1.10F, 1.05F, 5, 3, 0.012F);
     /** The old professor rolls in his chair: no swing of the arms, no lean, no bob (the chair carries him). */
     private static final Character XAVIER_SEATED = new Character(0.0F, 0.0F, 1.0F, 0, 0, 0.0F);
+    // ===== agatha (3.3) =====
+    /** Agatha: a witch's measured, self-assured stride, the hands swinging little, the sprint a hurried glide. */
+    private static final Character AGATHA = new Character(0.70F, 0.95F, 1.0F, 4, 3, 0.012F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
@@ -117,6 +120,7 @@ final class RunPoses {
             case APOCALYPSE -> APOCALYPSE;
             case CYCLOPS -> CYCLOPS;
             case PROFESSOR_X -> XAVIER;
+            case AGATHA -> AGATHA;
             default -> DEFAULT;
         };
     }

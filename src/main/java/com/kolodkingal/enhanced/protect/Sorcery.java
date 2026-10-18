@@ -19,7 +19,7 @@ public final class Sorcery {
     /** Whether the player is a sorcerer now: by power, or by a book of magic held in either hand. Both sides. */
     public static boolean isSorcerer(Player player) {
         Power power = Powers.power(player);
-        return power == Power.LOKI || power == Power.BILLY || power == Power.SCARLET_WITCH
+        return power == Power.LOKI || power == Power.BILLY || power == Power.SCARLET_WITCH || power == Power.AGATHA
                 || DarkholdBook.holds(player) || VishantiBook.holds(player);
     }
 

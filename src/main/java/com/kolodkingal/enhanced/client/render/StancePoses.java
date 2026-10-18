@@ -63,6 +63,11 @@ public final class StancePoses {
     public static final float[] CYCLOPS_UNLEASHED_M = {-150, -38, -8};
     public static final float[] CYCLOPS_UNLEASHED_O = {-150, 38, 8};
     public static final float CYCLOPS_UNLEASHED_LEAN = -4;
+    // ===== agatha (3.3) =====
+    /** Agatha's Witch's Shield: both hands held out before her at the height of the chest, a little apart, fingers spread. */
+    public static final float[] AGATHA_SHIELD_M = {-70, 14, 16};
+    public static final float[] AGATHA_SHIELD_O = {-70, -14, -16};
+    public static final float AGATHA_SHIELD_HEAD = -2;
 
     private StancePoses() {
     }
