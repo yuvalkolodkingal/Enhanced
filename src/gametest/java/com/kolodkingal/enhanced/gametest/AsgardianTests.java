@@ -136,10 +136,14 @@ public final class AsgardianTests {
 
     // ---- the keeper ----
 
+    /** Each running test's own records (the tests of a batch run side by side: each keeps its book to itself). */
+    private static final Map<TestKit.Fixture, AsgardPopulation.Residents> BOOKS =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
     /** Two homes in the arena and a test's own records. */
     static Map<String, UUID> records(TestKit.Fixture fx) {
         Map<String, UUID> table = new HashMap<>();
-        AsgardPopulation.useResidents(fx.level(), new AsgardPopulation.Residents() {
+        AsgardPopulation.Residents book = new AsgardPopulation.Residents() {
             @Override
             public UUID resident(String slot) {
                 return table.get(slot);
@@ -153,9 +157,14 @@ public final class AsgardianTests {
                     table.put(slot, id);
                 }
             }
-        });
+        };
+        BOOKS.put(fx, book);
+        AsgardPopulation.useResidents(fx.level(), book);
         fx.onClose(() -> {
-            AsgardPopulation.useResidents(fx.level(), null);
+            BOOKS.remove(fx);
+            if (AsgardPopulation.residents(fx.level()) == book) {
+                AsgardPopulation.useResidents(fx.level(), null);
+            }
             for (UUID id : table.values()) {
                 Entity e = fx.level().getEntity(id);
                 if (e != null) {
@@ -166,8 +175,22 @@ public final class AsgardianTests {
         return table;
     }
 
+    /** The test's own records (not the level's hook, which another test of the batch may have set since). */
     static AsgardPopulation.Residents residents(TestKit.Fixture fx) {
-        return AsgardPopulation.residents(fx.level());
+        return BOOKS.get(fx);
+    }
+
+    /** Whether the entities round a home are loaded, as the keeper asks (its {@code AREA} chunks each way). */
+    static boolean areaLoaded(ServerLevel level, BlockPos home) {
+        net.minecraft.world.level.ChunkPos center = new net.minecraft.world.level.ChunkPos(home);
+        for (int dx = -AsgardPopulation.AREA; dx <= AsgardPopulation.AREA; dx++) {
+            for (int dz = -AsgardPopulation.AREA; dz <= AsgardPopulation.AREA; dz++) {
+                if (!level.areEntitiesLoaded(net.minecraft.world.level.ChunkPos.asLong(center.x + dx, center.z + dz))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @GameTest(template = ARENA, batch = BATCH)
@@ -177,24 +200,32 @@ public final class AsgardianTests {
         BlockPos floor = helper.absolutePos(new BlockPos(5, 2, 5));
         List<CityPlan.Home> homes = List.of(new CityPlan.Home(Role.FRIGGA, 0, floor, 4),
                 new CityPlan.Home(Role.CITIZEN, 3, floor.east(6), 4));
-        List<AsgardianEntity> made = AsgardPopulation.keep(fx.level(), homes, residents(fx));
-        check(made.size() == 2 && table.size() == 2, "both slots made: " + made.size());
-        check(made.get(0).role() == Role.FRIGGA && "FRIGGA".equals(made.get(0).slot()), "Frigga in her slot");
-        check(made.get(1).role() == Role.CITIZEN && made.get(1).variant() == 3 && "CITIZEN#3".equals(made.get(1).slot()),
-                "the citizen of slot 3 wears skin 3");
-        check(AsgardPopulation.keep(fx.level(), homes, residents(fx)).isEmpty(), "a second beat makes nobody");
-        // A copy of Frigga (her slot, another UUID) is refused as it joins.
-        AsgardianEntity copy = ModEntities.ASGARDIAN.get().create(fx.level());
-        copy.setRole(Role.FRIGGA, 0);
-        copy.setHome("FRIGGA", floor, 4);
-        copy.moveTo(floor.getX() + 0.5, floor.getY(), floor.getZ() + 0.5);
-        check(!fx.level().addFreshEntity(copy), "a duplicate of a slot is refused");
-        // Gone: made again, once.
-        made.get(1).discard();
-        List<AsgardianEntity> again = AsgardPopulation.keep(fx.level(), homes, residents(fx));
-        check(again.size() == 1 && again.get(0).role() == Role.CITIZEN && table.get("CITIZEN#3").equals(again.get(0).getUUID()),
-                "the missing citizen is made again and recorded");
-        helper.succeed();
+        // The keeper makes nobody where the entities round a home are not loaded yet (a fresh arena loads them in a
+        // tick or two): wait for them, as the keeper would.
+        fx.everyTick(80, tick -> {
+            if (!areaLoaded(fx.level(), floor) || !areaLoaded(fx.level(), floor.east(6))) {
+                return false;
+            }
+            AsgardPopulation.useResidents(fx.level(), residents(fx)); // (the joins ask the level's hook: this test's)
+            List<AsgardianEntity> made = AsgardPopulation.keep(fx.level(), homes, residents(fx));
+            check(made.size() == 2 && table.size() == 2, "both slots made: " + made.size());
+            check(made.get(0).role() == Role.FRIGGA && "FRIGGA".equals(made.get(0).slot()), "Frigga in her slot");
+            check(made.get(1).role() == Role.CITIZEN && made.get(1).variant() == 3 && "CITIZEN#3".equals(made.get(1).slot()),
+                    "the citizen of slot 3 wears skin 3");
+            check(AsgardPopulation.keep(fx.level(), homes, residents(fx)).isEmpty(), "a second beat makes nobody");
+            // A copy of Frigga (her slot, another UUID) is refused as it joins.
+            AsgardianEntity copy = ModEntities.ASGARDIAN.get().create(fx.level());
+            copy.setRole(Role.FRIGGA, 0);
+            copy.setHome("FRIGGA", floor, 4);
+            copy.moveTo(floor.getX() + 0.5, floor.getY(), floor.getZ() + 0.5);
+            check(!fx.level().addFreshEntity(copy), "a duplicate of a slot is refused");
+            // Gone: made again, once.
+            made.get(1).discard();
+            List<AsgardianEntity> again = AsgardPopulation.keep(fx.level(), homes, residents(fx));
+            check(again.size() == 1 && again.get(0).role() == Role.CITIZEN && table.get("CITIZEN#3").equals(again.get(0).getUUID()),
+                    "the missing citizen is made again and recorded");
+            return true;
+        });
     }
 
     @GameTest(template = ARENA, batch = BATCH)
@@ -215,11 +246,18 @@ public final class AsgardianTests {
         Map<String, UUID> table = records(fx);
         BlockPos floor = helper.absolutePos(new BlockPos(5, 2, 5));
         List<CityPlan.Home> homes = List.of(new CityPlan.Home(Role.HOGUN, 0, floor, 4));
-        AsgardianEntity hogun = AsgardPopulation.keep(fx.level(), homes, residents(fx)).get(0);
-        fx.config(AsgardConfig.NPCS, false);
-        check(AsgardPopulation.keep(fx.level(), homes, residents(fx)).isEmpty(), "none made");
-        check(hogun.isRemoved() && table.isEmpty(), "and the keeper's own is gone");
-        helper.succeed();
+        fx.everyTick(80, tick -> {
+            if (!areaLoaded(fx.level(), floor)) {
+                return false;
+            }
+            List<AsgardianEntity> made = AsgardPopulation.keep(fx.level(), homes, residents(fx));
+            check(made.size() == 1, "Hogun made: " + made.size());
+            AsgardianEntity hogun = made.get(0);
+            fx.config(AsgardConfig.NPCS, false);
+            check(AsgardPopulation.keep(fx.level(), homes, residents(fx)).isEmpty(), "none made");
+            check(hogun.isRemoved() && table.isEmpty(), "and the keeper's own is gone");
+            return true;
+        });
     }
 
     // ---- the dialogue ----
