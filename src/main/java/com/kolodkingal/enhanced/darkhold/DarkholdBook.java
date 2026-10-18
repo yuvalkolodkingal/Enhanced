@@ -281,7 +281,7 @@ public final class DarkholdBook {
                 || Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
             // 3.3: dark magic stops at a ward's edge (and at a Hex's wall, and at Billy's barrier from the front)
             player.displayClientMessage(Component.translatable("message.enhanced.shelter.power_stopped"), true);
-            return;
+            return false;
         }
         ServerLevel level = player.serverLevel();
         int ticks = DarkholdConfig.MARK_TICKS.get();
