@@ -26,6 +26,12 @@ public final class AbilityHandler {
         if (down && player.hasEffect(ModEffects.ENTOMBED)) {
             return;
         }
+        // 3.3: Power Absorption has taken this hero's powers for a moment.
+        if (down && com.kolodkingal.enhanced.custom.CustomHeroes.isSuppressed(player)) {
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.enhanced.custom.suppressed")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY), true);
+            return;
+        }
         PowerData data = Powers.get(player);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down);
@@ -37,7 +43,7 @@ public final class AbilityHandler {
             case LOKI -> LokiAbilities.onKey(player, data, ability, down);
             case THOR -> ThorAbilities.onKey(player, data, ability, down);
             // The heroes of 3.0 are plug-ins (HeroServer): their keys are theirs.
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS -> HeroServers.onKey(player, data, ability, down);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, CUSTOM -> HeroServers.onKey(player, data, ability, down);
             case NONE -> {
             }
         }

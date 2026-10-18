@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildView;
+import com.kolodkingal.enhanced.custom.CustomHero;
+import com.kolodkingal.enhanced.custom.CustomState;
 import com.kolodkingal.enhanced.hex.HexData;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -122,6 +124,27 @@ public final class ModAttachments {
     public static final Supplier<AttachmentType<SokoviaRelocations>> SOKOVIA_RELOCATIONS = ATTACHMENTS.register("sokovia_relocations",
             () -> AttachmentType.builder(() -> SokoviaRelocations.EMPTY)
                     .serialize(SokoviaRelocations.CODEC)
+                    .build());
+
+    /**
+     * 3.3: the hero a player made with the Hero Creator (its name, powers, keys, colours and skin), what {@code Power.CUSTOM}
+     * is for him. Saved (as the JSON of its export), kept on death and kept when he becomes another hero (so the creator
+     * can give it back), synced to everyone who can see him: their clients draw his skin and his colours.
+     */
+    public static final Supplier<AttachmentType<CustomHero>> CUSTOM_HERO = ATTACHMENTS.register("custom_hero",
+            () -> AttachmentType.builder(() -> CustomHero.EMPTY)
+                    .serialize(CustomHero.CODEC, hero -> !hero.isEmpty())
+                    .copyOnDeath()
+                    .sync(CustomHero.STREAM_CODEC)
+                    .build());
+
+    /**
+     * 3.3: what a custom hero is doing right now (the powers switched on, stored energy, the Force Field). Not saved; synced
+     * to everyone who can see him.
+     */
+    public static final Supplier<AttachmentType<CustomState>> CUSTOM_STATE = ATTACHMENTS.register("custom_state",
+            () -> AttachmentType.builder(CustomState::new)
+                    .sync(CustomState.STREAM_CODEC)
                     .build());
 
     private ModAttachments() {

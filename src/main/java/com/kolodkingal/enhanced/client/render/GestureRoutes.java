@@ -343,6 +343,9 @@ public final class GestureRoutes {
             // (R held, the Optic Blast, is the stance CYCLOPS_BLAST: the hand eases up to the visor with it; R's cooldown is the
             // Ricochet's. N's cooldown tells the glasses coming off from going on by its length, see CyclopsHeroMath.)
             case CYCLOPS -> "cooldown";
+            // 3.3: a custom hero's keys are whatever powers he put on them; each press that starts a cooldown is a cast
+            // (CustomClient.cooldownGesture), a held beam the stance of any beam.
+            case CUSTOM -> "cooldown";
             default -> "none: no abilities";
         };
     }

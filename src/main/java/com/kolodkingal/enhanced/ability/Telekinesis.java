@@ -5,6 +5,9 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.CustomTelekinesis;
+import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -86,7 +89,11 @@ public final class Telekinesis {
         WANDA(Power.SCARLET_WITCH),
         BILLY(Power.BILLY),
         /** Jean Grey: Wanda's telekinesis, in the violet of her mind. */
-        JEAN(Power.PHOENIX, PhoenixAbilities.PSY_MAIN);
+        JEAN(Power.PHOENIX, PhoenixAbilities.PSY_MAIN),
+        /** 3.3: a custom hero's Telekinesis ("creatures": anything loose, projectiles in flight, no blocks), in his colour. */
+        CUSTOM(Power.CUSTOM),
+        /** 3.3: a custom hero's Telekinesis "everything": blocks too, as Wanda's. */
+        CUSTOM_BLOCKS(Power.CUSTOM);
 
         final Power power;
         /** The colour of the particles, the tether and the block it lifts. */
@@ -99,6 +106,11 @@ public final class Telekinesis {
         Mode(Power power, int color) {
             this.power = power;
             this.color = color;
+        }
+
+        /** The colour of this holder's telekinesis: the mode's, or a custom hero's own. */
+        public int colorOf(Player holder) {
+            return power == Power.CUSTOM ? CustomHeroes.hero(holder).colorOf(CustomHeroes.hero(holder).pick(PowerModule.TELEKINESIS)) : color;
         }
     }
 
@@ -240,7 +252,7 @@ public final class Telekinesis {
             return; // a boss has its own use for her hand (Ultron's heart)
         }
 
-        double range = EnhancedConfig.TELEKINESIS_RANGE.get();
+        double range = mode.power == Power.CUSTOM ? CustomTelekinesis.range(player) : EnhancedConfig.TELEKINESIS_RANGE.get();
         // One ray, nearest first, for what the form could take whether or not it may: a refused boss (or a creature someone
         // else holds) answers the press, and nothing standing behind it is taken instead (D-T 4.6).
         EntityHitResult hit = Raycasts.entity(player, range, 0.3, e -> canLift(player, e, mode) || refusal(player, e, mode) != null, 1.0F);
@@ -257,7 +269,7 @@ public final class Telekinesis {
             }
             return;
         }
-        if (mode == Mode.BILLY || mode == Mode.JEAN || mode == Mode.MAGNETO) {
+        if (mode == Mode.BILLY || mode == Mode.JEAN || mode == Mode.MAGNETO || mode.power == Power.CUSTOM) {
             // Arrows are small and fast: aim a little more generously at them (Magneto: at the metal ones).
             hit = Raycasts.entity(player, range, 1.0, e -> e instanceof Projectile && canLift(player, e, mode), 1.0F);
             if (hit != null) {
@@ -312,7 +324,7 @@ public final class Telekinesis {
      * billy.blockLifting}, and Magneto's for metal blocks ({@link BlockLifting#tryLift}).
      */
     private static boolean liftsBlocks(Mode mode) {
-        return mode != Mode.BILLY || EnhancedConfig.BILLY_BLOCK_LIFTING.get();
+        return mode == Mode.CUSTOM_BLOCKS || mode != Mode.CUSTOM && (mode != Mode.BILLY || EnhancedConfig.BILLY_BLOCK_LIFTING.get());
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -379,7 +391,7 @@ public final class Telekinesis {
         return switch (mode) {
             case MAGNETO -> Metal.isMagnetic(e);
             case WANDA -> isLoose(e);
-            case BILLY, JEAN -> isLoose(e) || (e instanceof Projectile projectile && Metal.inFlight(projectile));
+            case BILLY, JEAN, CUSTOM, CUSTOM_BLOCKS -> isLoose(e) || (e instanceof Projectile projectile && Metal.inFlight(projectile));
         };
     }
 
@@ -521,7 +533,7 @@ public final class Telekinesis {
             }
         }
         if (target instanceof TelekineticBlockEntity block) {
-            block.grab(player, mode.color);
+            block.grab(player, mode.colorOf(player));
         }
         if (target instanceof Projectile projectile) {
             // Caught: it stops dead and hangs weightless in front of the holder.
@@ -576,7 +588,7 @@ public final class Telekinesis {
         if (grip.limit > 0) {
             if (grip.ticks >= grip.limit) {
                 end(player, false, true);
-                BossGrip.breakFree(player, e, grip.mode.color);
+                BossGrip.breakFree(player, e, grip.mode.colorOf(player));
                 return;
             }
             BossGrip.struggle(player, e, grip.ticks, grip.limit);
@@ -612,7 +624,7 @@ public final class Telekinesis {
             }
         }
         if (grip.ticks % 2 == 0) {
-            level.sendParticles(new EnergyParticleOptions(grip.mode.color, 1.2F),
+            level.sendParticles(new EnergyParticleOptions(grip.mode.colorOf(player), 1.2F),
                     e.getX(), e.getY() + e.getBbHeight() * 0.5, e.getZ(), 3,
                     e.getBbWidth() * 0.6, e.getBbHeight() * 0.5, e.getBbWidth() * 0.6, 0.02);
         }
@@ -666,7 +678,7 @@ public final class Telekinesis {
         if (e == null) {
             return;
         }
-        double speed = EnhancedConfig.THROW_SPEED.get();
+        double speed = EnhancedConfig.THROW_SPEED.get() * (grip.mode.power == Power.CUSTOM ? CustomTelekinesis.throwFactor(player) : 1.0);
         Vec3 vel = player.getLookAngle().scale(speed);
         letGo(e);
         if (e instanceof BossHooks hooks && hooks.throwBack(player, vel)) {
@@ -687,7 +699,7 @@ public final class Telekinesis {
             e.hasImpulse = true;
             boolean golem = e instanceof IronGolem;
             FLIGHTS.put(e.getUUID(), new Flight(player.getUUID(), player.level().dimension(), e.position(), vel,
-                    golem || BossGrip.isBoss(e), !golem, grip.mode.color));
+                    golem || BossGrip.isBoss(e), !golem, grip.mode.colorOf(player)));
         }
         BossGrip.letGo(player, e, true, false);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);

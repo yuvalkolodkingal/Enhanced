@@ -173,7 +173,8 @@ public final class FlightProfile {
             case APOCALYPSE -> APOCALYPSE;
             // ===== cyclops (3.3) =====
             case CYCLOPS -> null; // he runs, and leaps on his blast: no take-off, banking or braking
-            case NONE, QUICKSILVER, TOMMY, LOKI -> null;
+            // 3.3: a custom hero flies in the plain pose of the game (his look and his powers are anyone's).
+            case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;
         };
     }
 

@@ -58,6 +58,8 @@ public final class ModNetwork {
         registrar.playToClient(RoadMusicPayload.TYPE, RoadMusicPayload.STREAM_CODEC, RoadMusicPayload::handle);
         // 3.3: Cyclops's blasts (his beams are BeamPayloads).
         registrar.playToClient(CyclopsFxPayload.TYPE, CyclopsFxPayload.STREAM_CODEC, CyclopsFxPayload::handle);
+        // 3.3: the Hero Creator's buttons (the custom hero's definition and state travel as synced attachments).
+        registrar.playToServer(HeroCreatorPayload.TYPE, HeroCreatorPayload.STREAM_CODEC, HeroCreatorPayload::handle);
     }
 
     private ModNetwork() {

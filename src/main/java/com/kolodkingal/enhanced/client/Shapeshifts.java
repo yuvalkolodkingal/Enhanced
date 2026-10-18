@@ -142,7 +142,8 @@ public final class Shapeshifts {
     @Nullable
     private static LivingEntity body(Player player) {
         PowerData data = Powers.get(player);
-        LokiForm form = data.power() == Power.LOKI && !data.form().isEmpty() ? LokiForm.of(data).orElse(null) : null;
+        // (3.3: a custom hero's Shapeshifting "creature" takes a shape the same way.)
+        LokiForm form = (data.power() == Power.LOKI || data.power() == Power.CUSTOM) && !data.form().isEmpty() ? LokiForm.of(data).orElse(null) : null;
         if (form == null || form.isPlayer() || BROKEN.contains(form.type())) {
             return null;
         }

@@ -108,9 +108,10 @@ public final class Powers {
         return Language.getInstance().getOrDefault(lineKey).length() <= SUBTITLE_CHARS;
     }
 
-    /** The player's current look. */
+    /** The player's current look (a custom hero's is his own colours, see {@code CustomHeroes.variant}). */
     public static Variant variant(Player player) {
-        return Variants.current(get(player));
+        PowerData data = get(player);
+        return data.power() == Power.CUSTOM ? com.kolodkingal.enhanced.custom.CustomHeroes.variant(player) : Variants.current(data);
     }
 
     /** Main energy colour of the player's hero, in their current look. */

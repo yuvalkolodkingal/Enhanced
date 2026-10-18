@@ -24,6 +24,8 @@ public final class HeroClients {
         register(new ApocalypseClient());
         // 3.3
         register(new CyclopsClient());
+        // 3.3: the custom hero of the Hero Creator.
+        register(new com.kolodkingal.enhanced.client.custom.CustomClient());
     }
 
     /**

@@ -1251,5 +1251,101 @@
         "name": "enhanced:cyclops/cyclops_visor"
       }
     ]
+  },
+  "custom_awaken": {
+    "subtitle": "subtitles.enhanced.custom_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:custom_awaken"
+      }
+    ]
+  },
+  "custom_blast": {
+    "subtitle": "subtitles.enhanced.custom_blast",
+    "sounds": [
+      {
+        "name": "enhanced:custom_blast"
+      }
+    ]
+  },
+  "custom_zap": {
+    "subtitle": "subtitles.enhanced.custom_zap",
+    "sounds": [
+      {
+        "name": "enhanced:custom_zap"
+      }
+    ]
+  },
+  "custom_impact": {
+    "subtitle": "subtitles.enhanced.custom_impact",
+    "sounds": [
+      {
+        "name": "enhanced:custom_impact"
+      }
+    ]
+  },
+  "custom_heal": {
+    "subtitle": "subtitles.enhanced.custom_heal",
+    "sounds": [
+      {
+        "name": "enhanced:custom_heal"
+      }
+    ]
+  },
+  "custom_shift": {
+    "subtitle": "subtitles.enhanced.custom_shift",
+    "sounds": [
+      {
+        "name": "enhanced:custom_shift"
+      }
+    ]
+  },
+  "custom_whoosh": {
+    "subtitle": "subtitles.enhanced.custom_whoosh",
+    "sounds": [
+      {
+        "name": "enhanced:custom_whoosh"
+      }
+    ]
+  },
+  "custom_teleport": {
+    "subtitle": "subtitles.enhanced.custom_teleport",
+    "sounds": [
+      {
+        "name": "enhanced:custom_teleport"
+      }
+    ]
+  },
+  "custom_shield": {
+    "subtitle": "subtitles.enhanced.custom_shield",
+    "sounds": [
+      {
+        "name": "enhanced:custom_shield"
+      }
+    ]
+  },
+  "custom_spell": {
+    "subtitle": "subtitles.enhanced.custom_spell",
+    "sounds": [
+      {
+        "name": "enhanced:custom_spell"
+      }
+    ]
+  },
+  "custom_scream": {
+    "subtitle": "subtitles.enhanced.custom_scream",
+    "sounds": [
+      {
+        "name": "enhanced:custom_scream"
+      }
+    ]
+  },
+  "hero_creator_open": {
+    "subtitle": "subtitles.enhanced.hero_creator_open",
+    "sounds": [
+      {
+        "name": "enhanced:hero_creator_open"
+      }
+    ]
   }
 }

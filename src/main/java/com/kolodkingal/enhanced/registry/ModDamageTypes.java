@@ -59,6 +59,11 @@ public final class ModDamageTypes {
     // ===== cyclops (3.3) =====
     /** Every blast of Cyclops's eyes: the optic blast, the giant beam, the ricochet, the concussion and the leap's. Not magic. */
     public static final ResourceKey<DamageType> OPTIC_BLAST = key("optic_blast");
+    // ===== 3.3 custom heroes =====
+    /** The blows, bolts, blasts and elements of a custom hero's powers (3.3). */
+    public static final ResourceKey<DamageType> HERO_POWER = key("hero_power");
+    /** The hits of a custom hero's continuous beam (Energy Blast's beam, the flamethrower, the water jet): no damage cooldown. */
+    public static final ResourceKey<DamageType> HERO_BEAM = key("hero_beam");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

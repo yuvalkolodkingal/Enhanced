@@ -24,10 +24,17 @@ public final class BeamStyles {
         return style;
     }
 
-    /** The style of this id, or null. */
+    /** The style of this id, or null. (A custom hero's beam, {@code custom_RRGGBB_RRGGBB}, is made from its name the first time.) */
     @Nullable
     public static synchronized BeamStyle byId(String id) {
-        return BY_ID.get(id);
+        BeamStyle style = BY_ID.get(id);
+        if (style == null) {
+            style = com.kolodkingal.enhanced.custom.CustomBeams.parse(id);
+            if (style != null) {
+                BY_ID.put(id, style);
+            }
+        }
+        return style;
     }
 
     /** Every style, in the order they were registered. */

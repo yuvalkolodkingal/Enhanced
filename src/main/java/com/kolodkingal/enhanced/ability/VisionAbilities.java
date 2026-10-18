@@ -123,9 +123,10 @@ public final class VisionAbilities {
         }
     }
 
+    /** Vision phasing, or (3.3) a custom hero whose Phasing passes through walls: the same rules for both. */
     public static boolean isPhased(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.VISION && data.visionPhased();
+        return data.power() == Power.VISION && data.visionPhased() || com.kolodkingal.enhanced.custom.CustomHeroes.isPhased(player);
     }
 
     public static boolean isDense(Player player) {
