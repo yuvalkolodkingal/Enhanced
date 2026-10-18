@@ -20,7 +20,7 @@ public final class HexRunesConfig {
     public static void define(ModConfigSpec.Builder builder) {
         builder.comment("3.3: the Hex Runes. The Scarlet Witch inscribes them on the four walls of her Hex (and wipes them) from her Hex",
                 "Control screen (N with a Hex up). While they glow, every other sorcerer inside the Hex cannot use powers: Loki, Billy,",
-                "another Scarlet Witch, and anyone holding the Darkhold or the Book of the Vishanti. She keeps hers.").push(SECTION);
+                "Agatha, another Scarlet Witch, and anyone holding the Darkhold or the Book of the Vishanti. She keeps hers.").push(SECTION);
         ENABLED = builder.comment("The Hex Runes can be inscribed (false: the button does nothing and runes already up do nothing).")
                 .define("enabled", true);
         COOLDOWN = builder.comment("Ticks after inscribing the runes before she can inscribe them again (wiping them is free and at once).")

@@ -150,7 +150,7 @@ Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road). His b
 | `billy.barrierRankHealthBonus` | `0.0` | 0.0 to 20.0 | How much more health the Hex Barrier has at his highest rank (`build_magic_billy.maxRank`) than at his first, as a fraction: 1.0 = twice the health. In between it grows evenly with the rank. 0 = `barrierHealth` at every rank. |
 | `billy.barrierRegenPerSecond` | `1.5` | 0.0 to 100.0 | 3.3: health the Hex Barrier mends a second while it is lowered (1.5: from nothing to 30 in 20 seconds). It does not mend while it is raised. |
 | `billy.barrierWindUpTicks` | `8` | 0 to 100 | How long (in ticks) the Hex Barrier takes to form after the key goes down. It stops nothing until it is complete. |
-| `billy.barrierCooldown` | `10` | 0 to 6000 | Ticks before **B** can be used again after the barrier was lowered (it was complete). **A server file written by 3.2 still says `200`** (the game never rewrites a value that is in the file): set it to 10 for the 3.3 barrier. |
+| `billy.barrierLowerCooldown` | `10` | 0 to 6000 | Ticks before **B** can be used again after the barrier was lowered (it was complete). (Called `barrierCooldown` in 3.2: renamed so the new default applies.) |
 | `billy.barrierShatterCooldown` | `200` | 0 to 6000 | 3.3: ticks before the Hex Barrier (and **B**) can be used again after it shattered (200 = 10 seconds). |
 | `billy.barrierArc` | `60.0` | 10.0 to 90.0 | Half the angle (in degrees) of the arc in front of him that the barrier covers: a blow, a projectile, a beam or an explosion from further round than this (from the side or from behind) is not stopped at all. |
 | `billy.barrierWidth` | `1.4` | 0.5 to 6.0 | Width (in blocks) of the plate the barrier is drawn as. |

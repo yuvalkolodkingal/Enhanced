@@ -69,14 +69,14 @@ public final class CustomHeroConfig {
                 .defineInRange("cooldownScale", 1.0, 0.1, 10.0);
         EXHAUSTION_SCALE = builder.comment("Multiplies the hunger every custom power costs (0: free).")
                 .defineInRange("exhaustionScale", 1.0, 0.0, 10.0);
-        FLIGHT_SPEED = builder.comment("Flight's speed at level 2 (level 1 flies at 3/4 of it, level 3 at 1.4 times; Creative flight is 0.05).")
+        FLIGHT_SPEED = builder.comment("Flight's base speed (Creative flight is 0.05); the power's strength (1-10) scales it (see ModuleStats).")
                 .defineInRange("flightSpeed", 0.08, 0.01, 0.5);
-        FORCE_FIELD_STRENGTH = builder.comment("The damage a Force Field of level 2 takes before it breaks (level 1: 0.6 times, level 3: 1.45).")
+        FORCE_FIELD_STRENGTH = builder.comment("The base damage a Force Field takes before it breaks; its strength (1-10) scales it (see ModuleStats).")
                 .defineInRange("forceFieldStrength", 35.0, 1.0, 1000.0);
-        CONTROL_SECONDS = builder.comment("Seconds Mind Control, Animal Control and Technopathy hold a creature at level 2 (level 1: half,",
-                        "level 3: 1.5 times).")
+        CONTROL_SECONDS = builder.comment("Base seconds Mind Control, Animal Control and Technopathy hold a creature; the power's strength (1-10) scales it",
+                        "(see ModuleStats).")
                 .defineInRange("controlSeconds", 20, 1, 600);
-        TELEPORT_RANGE = builder.comment("Teleportation's reach at level 2, in blocks (level 1: half, level 3: 1.5 times).")
+        TELEPORT_RANGE = builder.comment("Teleportation's base reach, in blocks; its strength (1-10) scales it (see ModuleStats).")
                 .defineInRange("teleportRange", 32, 4, 128);
         SUPPRESS_SECONDS = builder.comment("Seconds Power Absorption takes another hero's powers away (PvP only).")
                 .defineInRange("suppressSeconds", 8, 1, 120);

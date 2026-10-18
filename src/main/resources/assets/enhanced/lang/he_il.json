@@ -1908,7 +1908,7 @@
   "screen.enhanced.hex.runes": "רוני ההקס: %s",
   "screen.enhanced.hex.runes_on": "זוהרות",
   "screen.enhanced.hex.runes_off": "אין",
-  "screen.enhanced.hex.runes_tooltip": "רונות על ארבעת הקירות: כל מכשף אחר בפנים (לוקי, בילי, מי שמחזיק את הדארקהולד או את ספר הווישאנטי) לא יכול להשתמש בכוחות. אתם שומרים על שלכם.",
+  "screen.enhanced.hex.runes_tooltip": "רונות על ארבעת הקירות: כל מכשף אחר בפנים (לוקי, בילי, אגתה, מי שמחזיק את הדארקהולד או את ספר הווישאנטי) לא יכול להשתמש בכוחות. אתם שומרים על שלכם.",
   "power.enhanced.professor_x": "פרופסור X",
   "power.enhanced.professor_x.awaken": "כל המוחות פתוחים בפניך",
   "power.enhanced.professor_x.broadcast": "%s הפך לפרופסור X, צ'ארלס אקסבייר!",

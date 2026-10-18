@@ -1908,7 +1908,7 @@
   "screen.enhanced.hex.runes": "Hex Runes: %s",
   "screen.enhanced.hex.runes_on": "glowing",
   "screen.enhanced.hex.runes_off": "none",
-  "screen.enhanced.hex.runes_tooltip": "Runes on the four walls: every other sorcerer inside (Loki, Billy, whoever holds the Darkhold or the Book of the Vishanti) cannot use powers. You keep yours.",
+  "screen.enhanced.hex.runes_tooltip": "Runes on the four walls: every other sorcerer inside (Loki, Billy, Agatha, whoever holds the Darkhold or the Book of the Vishanti) cannot use powers. You keep yours.",
   "power.enhanced.professor_x": "Professor X",
   "power.enhanced.professor_x.awaken": "Every mind is open to you",
   "power.enhanced.professor_x.broadcast": "%s has become Professor X, Charles Xavier!",

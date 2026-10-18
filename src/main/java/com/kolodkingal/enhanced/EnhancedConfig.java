@@ -401,7 +401,7 @@ public final class EnhancedConfig {
         BILLY_BARRIER_WIND_UP = BUILDER.comment("How long (ticks) the Hex Barrier takes to form after the key goes down. It stops nothing until it is complete.")
                 .defineInRange("barrierWindUpTicks", 8, 0, 100);
         BILLY_BARRIER_COOLDOWN = BUILDER.comment("Ticks before B can be used again after the barrier was lowered (it was complete).")
-                .defineInRange("barrierCooldown", 10, 0, 6000);
+                .defineInRange("barrierLowerCooldown", 10, 0, 6000); // (3.3: renamed, so a 3.2 file's 200 does not stay)
         BILLY_BARRIER_SHATTER_COOLDOWN = BUILDER.comment("3.3: ticks before the Hex Barrier (and B) can be used again after it shattered (200 = 10 seconds).")
                 .defineInRange("barrierShatterCooldown", 200, 0, 6000);
         BILLY_BARRIER_ARC = BUILDER.comment("Half the angle (degrees) of the arc in front of him that the barrier covers: a blow, a projectile or an explosion",
