@@ -399,7 +399,7 @@ public final class GestureRoutes {
             // ===== speed (3.3) =====
             case SURFACE_WALL, SURFACE_CEILING -> "stances (SPEED_WALL, SPEED_CEILING): the body is turned to the surface he runs on, in his run"
                     + " cycle; the turn on and off is the stance's easing";
-            case SONIC_BOOM -> null;
+            case SONIC_BOOM -> "Tommy's (a hero of before 3.0): his live gesture TOMMY_BOOM acts it, and the shockwave is the server's particles";
         };
     }
 

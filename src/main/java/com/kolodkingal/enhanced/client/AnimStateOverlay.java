@@ -31,6 +31,8 @@ public class AnimStateOverlay implements LayeredDraw.Layer {
                 String.format(Locale.ROOT, "pitch %.1f (+%.1f)  roll %.1f  yaw %.1f  bob %.3f  drop %.3f", s.pitch.x, s.addPitch, s.roll, s.yawAdd, s.bob, s.drop.x),
                 String.format(Locale.ROOT, "wAir %.2f  wRun %.2f  wSprint %.2f  wSpin %.2f  lead %.2f  spin %.0f", s.wAir, s.wRun, s.wSprint, s.wSpin, s.leadForce, s.spinAngle),
                 String.format(Locale.ROOT, "run phase %.2f amp %.2f omega %.2f  speed %.3f  limb %.2f/%.2f", s.runPhase, s.runAmp, s.runOmega, s.speed, s.limbSwing, s.limbAmount),
+                String.format(Locale.ROOT, "surface %d  pitch %.1f  face %.2f  lift %.2f  pivot %.2f  drawn pitch %.1f", s.surfaceKind, s.surfacePitch,
+                        s.surfaceFace, s.surfaceLift, s.surfacePivot, s.renderPitch),
         };
         for (String line : lines) {
             graphics.drawString(mc.font, line, 4, y, 0xFFFF55, true);

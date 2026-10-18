@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
  */
 final class SpeedSurfacePoses {
     /** The time constant (ticks) of the turn onto and off the surface, and of the yaw. */
-    private static final float TAU = 2.2F;
+    private static final float TAU = 1.0F;
     /** The pivot of the turn up a wall (the feet then touch the wall: half the box's width) and on a ceiling (the middle). */
     private static final float WALL_PIVOT = 0.3F;
     private static final float CEILING_PIVOT = 0.9F;
@@ -52,8 +52,21 @@ final class SpeedSurfacePoses {
         } else {
             boolean wall = data.is(Live.SURFACE_WALL);
             boolean ceiling = data.is(Live.SURFACE_CEILING);
-            Vec3 hint = s.surfaceKind == 1 || s.surfaceKind == 3 ? s.surfaceNormal.scale(-1) : Vec3.ZERO;
-            surface = wall || ceiling ? SurfaceRun.touched(p.level(), p, ceiling, hint) : SurfaceRun.Surface.NONE;
+            // He faces the wall he runs up or down (his own client turns his camera to it).
+            float yaw = p.getYRot() * Mth.DEG_TO_RAD;
+            Vec3 facing = new Vec3(-Mth.sin(yaw), 0.0, Mth.cos(yaw));
+            surface = wall || ceiling ? SurfaceRun.touched(p.level(), p, ceiling, facing) : SurfaceRun.Surface.NONE;
+            if (!surface.touches() && (wall || ceiling)) {
+                // The flag comes a moment before his position (which is eased in on this client) reaches the surface: keep
+                // what he ran on, or take the wall he faces, rather than drop the pose for a tick or two.
+                if (ceiling) {
+                    surface = SurfaceRun.Surface.CEILING;
+                } else if (s.surfaceKind == 1 || s.surfaceKind == 3) {
+                    surface = SurfaceRun.Surface.wall(net.minecraft.core.Direction.getNearest(s.surfaceNormal.x, 0.0, s.surfaceNormal.z));
+                } else {
+                    surface = SurfaceRun.Surface.wall(net.minecraft.core.Direction.getNearest(-facing.x, 0.0, -facing.z));
+                }
+            }
             vertical = d.y > 0.02 ? 1 : d.y < -0.02 ? -1 : s.surfaceKind == 3 ? -1 : 1;
             double flat = Math.hypot(d.x, d.z);
             heading = flat > 0.05 ? new Vec3(d.x / flat, 0.0, d.z / flat) : s.surfaceHeading;
