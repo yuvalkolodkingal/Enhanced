@@ -1,0 +1,65 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#FFD23F",
+  "glow": "#FFF4B0",
+  "look": {
+    "base": "own",
+    "slim": false,
+    "visor": {
+      "style": "domino_mask",
+      "color": "#C8281E"
+    },
+    "aura": {
+      "style": "sparks",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "super_speed",
+      "strength": 6,
+      "option": "run"
+    },
+    {
+      "id": "quicksilver.blitz",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "tommy.whirlwind",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "durability",
+      "strength": 4,
+      "option": "armor"
+    }
+  ],
+  "keys": [
+    "",
+    "super_speed",
+    "quicksilver.blitz",
+    "tommy.whirlwind",
+    ""
+  ],
+  "sneakKeys": [
+    "",
+    "super_speed#blitz",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "qs_speed",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:sugar"
+  }
+}

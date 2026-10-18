@@ -1,0 +1,72 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#FF8A1F",
+  "glow": "#FFD65A",
+  "look": {
+    "base": "phoenix/apocalypse",
+    "slim": false,
+    "aura": {
+      "style": "flames",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "phoenix.mind",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "wings"
+    },
+    {
+      "id": "phoenix.telekinesis",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "phoenix.control",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "phoenix.burst",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "phoenix.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "phoenix.mind",
+    "flight",
+    "phoenix.telekinesis",
+    "phoenix.control",
+    "phoenix.burst"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "phoenix",
+    "run": "phoenix",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:blaze_powder",
+    "hero": "phoenix"
+  }
+}

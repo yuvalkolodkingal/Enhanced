@@ -1,0 +1,74 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#E0193F",
+  "glow": "#FF6F86",
+  "look": {
+    "base": "scarlet_witch/suit",
+    "slim": false,
+    "cape": {
+      "style": "scarlet_witch"
+    },
+    "hat": {
+      "style": "wanda_crown"
+    },
+    "eyes": {
+      "style": "glow",
+      "color": "#E0193F",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "wanda.chaos_beam",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "hover"
+    },
+    {
+      "id": "wanda.telekinesis",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "wanda.chaos_shield",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "wanda.hex",
+      "strength": 3,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "wanda.chaos_beam",
+    "flight",
+    "wanda.telekinesis",
+    "wanda.chaos_shield",
+    "wanda.hex"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "wanda",
+    "run": "wanda",
+    "speedRun": "auto",
+    "idle": "ready"
+  },
+  "preset": {
+    "icon": "minecraft:redstone",
+    "hero": "scarlet_witch"
+  }
+}

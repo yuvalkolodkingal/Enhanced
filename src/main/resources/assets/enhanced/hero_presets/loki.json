@@ -1,0 +1,66 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#76B154",
+  "glow": "#CAF297",
+  "look": {
+    "base": "loki/loki",
+    "slim": false,
+    "cape": {
+      "style": "loki"
+    }
+  },
+  "powers": [
+    {
+      "id": "loki.daggers",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "loki.duplicates",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "loki.shapeshift",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "loki.vanish",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "loki.frost_giant",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "loki.daggers",
+    "loki.duplicates",
+    "loki.shapeshift",
+    "loki.vanish",
+    "loki.frost_giant"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "loki",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:iron_sword",
+    "hero": "loki"
+  }
+}

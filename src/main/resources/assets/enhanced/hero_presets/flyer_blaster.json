@@ -1,0 +1,59 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#3FA9F5",
+  "glow": "#E0F4FF",
+  "look": {
+    "base": "own",
+    "slim": false,
+    "cape": {
+      "style": "plain"
+    },
+    "eyes": {
+      "style": "glow",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "jet"
+    },
+    {
+      "id": "energy_blast",
+      "strength": 6,
+      "option": "beam"
+    },
+    {
+      "id": "force_field",
+      "strength": 4,
+      "option": "bubble"
+    }
+  ],
+  "keys": [
+    "energy_blast",
+    "flight",
+    "",
+    "force_field",
+    ""
+  ],
+  "sneakKeys": [
+    "energy_blast#bolts",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "thor",
+    "run": "auto",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:nether_star"
+  }
+}

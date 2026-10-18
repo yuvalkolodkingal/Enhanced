@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#DC2B2F",
+  "glow": "#DCE6F2",
+  "look": {
+    "base": "spider_man/homemade",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "spider.web",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "spider.zip",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "spider.crawl",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "spider.legs",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "spider.black_eyes",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "spider.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "spider.web",
+    "spider.zip",
+    "spider.crawl",
+    "spider.legs",
+    "spider.black_eyes"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "spider",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:cobweb",
+    "hero": "spider_man"
+  }
+}

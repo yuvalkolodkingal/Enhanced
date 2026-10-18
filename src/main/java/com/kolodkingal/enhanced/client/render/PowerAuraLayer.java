@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -46,7 +47,8 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
         boolean hands = data.power() == Power.SCARLET_WITCH && data.flying();
-        boolean phased = data.power() == Power.VISION && data.visionPhased();
+        // (3.4) A custom hero with Vision's Phase glows as Vision does, in his own colour.
+        boolean phased = data.has(HeroAbility.VISION_PHASE) && data.visionPhased();
         if (player.isInvisible()) {
             SHOWN.remove(player.getId());
             return;
@@ -78,10 +80,10 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             model.rightSleeve.visible = false;
             model.leftSleeve.visible = false;
         }
-        int rgb = body ? ("white_vision".equals(data.variant()) ? 0xF4F8FF : 0xE3DC6E) : 0xE0193F;
+        int rgb = body ? (data.power() == Power.CUSTOM ? Powers.color(player) : "white_vision".equals(data.variant()) ? 0xF4F8FF : 0xE3DC6E)
+                : 0xE0193F;
         int color = Math.round(0x90 * (body ? phasedW : handsW)) << 24 | rgb;
-        VertexConsumer swirl = buffer.getBuffer(RenderType.energySwirl(SWIRL, (t * 0.02F) % 1F, (t * 0.013F) % 1F));
-        model.renderToBuffer(poseStack, swirl, packedLight, OverlayTexture.NO_OVERLAY, color);
+        drawSwirl(poseStack, buffer, packedLight, model, SWIRL, t, 1.0F, color);
 
         if (handsW >= 0.01F) {
             VertexConsumer glow = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
@@ -91,6 +93,16 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             handOrb(poseStack, glow, model.rightArm, -1F / 16F, t, swell);
             handOrb(poseStack, glow, model.leftArm, 1F / 16F, t + 20F, swell);
         }
+    }
+
+    /**
+     * A swirl of energy over a (posed) model: {@code texture} scrolling at {@code speed} times the usual pace, tinted
+     * {@code argb}. The Scarlet Witch's and Vision's, and (3.4) the auras of a custom hero's look.
+     */
+    public static void drawSwirl(PoseStack poseStack, MultiBufferSource buffer, int light, PlayerModel<AbstractClientPlayer> model,
+                                 ResourceLocation texture, float t, float speed, int argb) {
+        VertexConsumer swirl = buffer.getBuffer(RenderType.energySwirl(texture, (t * 0.02F * speed) % 1F, (t * 0.013F * speed) % 1F));
+        model.renderToBuffer(poseStack, swirl, light, OverlayTexture.NO_OVERLAY, argb);
     }
 
     /** A spinning ball of chaos energy cupped in the hand. */

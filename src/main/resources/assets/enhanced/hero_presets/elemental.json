@@ -1,0 +1,64 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#FF6A2A",
+  "glow": "#FFD27A",
+  "look": {
+    "base": "own",
+    "slim": false,
+    "eyes": {
+      "style": "fire"
+    },
+    "aura": {
+      "style": "energy",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "fire",
+      "strength": 5,
+      "option": "fireball"
+    },
+    {
+      "id": "ice",
+      "strength": 4,
+      "option": "freeze_ray"
+    },
+    {
+      "id": "lightning",
+      "strength": 4,
+      "option": "strike"
+    },
+    {
+      "id": "wind",
+      "strength": 4,
+      "option": "gust"
+    }
+  ],
+  "keys": [
+    "fire",
+    "wind",
+    "ice",
+    "lightning",
+    ""
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:fire_charge"
+  }
+}

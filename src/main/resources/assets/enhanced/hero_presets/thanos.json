@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#9B4DEB",
+  "glow": "#E6D2FF",
+  "look": {
+    "base": "thanos/infinity_war",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "thanos.power",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "thanos.space",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "thanos.reality",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "thanos.soul",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "thanos.time",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "thanos.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "thanos.power",
+    "thanos.space",
+    "thanos.reality",
+    "thanos.soul",
+    "thanos.time"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "thanos",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:purple_dye",
+    "hero": "thanos"
+  }
+}

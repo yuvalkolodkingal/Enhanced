@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -55,7 +56,8 @@ public final class ApocalypseAuraLayer extends RenderLayer<AbstractClientPlayer,
             return;
         }
         PowerData data = Powers.get(player);
-        boolean shielded = data.power() == Power.APOCALYPSE && data.chaosShieldUp(player.level().getGameTime());
+        // (3.4) Apocalypse, or a custom hero with his shield.
+        boolean shielded = data.has(HeroAbility.APOCALYPSE_SHIELD) && data.chaosShieldUp(player.level().getGameTime());
         float transference = transference(player);
         if (!shielded && transference <= 0.0F) {
             return;

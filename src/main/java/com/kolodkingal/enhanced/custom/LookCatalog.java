@@ -35,6 +35,55 @@ public final class LookCatalog {
         };
     }
 
+    /** The fixed colour of each eye style that has one (the others take the layer's colour). */
+    public static int eyeColor(String style) {
+        return switch (style) {
+            case "lightning" -> 0xCFEFFF;
+            case "fire" -> 0xFFA43A;
+            case "optic" -> 0xFF2A2A;
+            case "machine" -> 0xFF5A1F;
+            case "black" -> 0x000000;
+            default -> -1;
+        };
+    }
+
+    /**
+     * The textures a style draws with (paths under {@code assets/enhanced/}), from the mod's own art and the few made for
+     * the layers ({@code textures/entity/custom/}); a style drawn as geometry only (Billy's crown) has none.
+     */
+    public static List<String> textures(int kind, String style) {
+        if (CustomHero.NONE.equals(style)) {
+            return List.of();
+        }
+        return switch (kind) {
+            case 0 -> List.of("plain".equals(style) ? CUSTOM + "cape_plain.png" : ENTITY + "suit/" + style + "_cape.png");
+            case 1 -> switch (style) {
+                case "witch_hat" -> List.of(CUSTOM + "witch_hat.png");
+                case "cerebro" -> List.of(ENTITY + "cerebro_helmet.png");
+                case "magneto_helmet", "wanda_crown" -> List.of(ARMOR + style + "_layer_1.png");
+                default -> List.of();
+            };
+            case 2 -> switch (style) {
+                case "cyclops_classic", "cyclops_apocalypse" -> List.of(ENTITY + "cyclops_visor_" + style.substring(8) + ".png",
+                        ENTITY + "cyclops_visor_" + style.substring(8) + "_glow.png");
+                case "ruby_quartz" -> List.of(ENTITY + "ruby_quartz_glasses_worn.png", ENTITY + "ruby_quartz_glasses_worn_glow.png");
+                case "quicksilver_goggles" -> List.of(ARMOR + "quicksilver_goggles_layer_1.png");
+                case "domino_mask" -> List.of(CUSTOM + "mask_domino.png");
+                default -> List.of(CUSTOM + "mask_full.png", CUSTOM + "mask_full_lenses.png");
+            };
+            case 3 -> List.of(CUSTOM + "eyes_row0.png", CUSTOM + "eyes_row1.png", CUSTOM + "eyes_row2.png", CUSTOM + "eyes_row3.png");
+            default -> switch (style) {
+                case "flames" -> List.of(ENTITY + "phoenix_flame.png");
+                case "sand" -> List.of(ENTITY + "sand_swirl.png");
+                default -> List.of(ENTITY + "energy_swirl.png");
+            };
+        };
+    }
+
+    private static final String ENTITY = "textures/entity/";
+    private static final String CUSTOM = ENTITY + "custom/";
+    private static final String ARMOR = "textures/models/armor/";
+
     /** Whether the layer kind {@code i} has a "when" (the eyes and the aura). */
     public static boolean hasWhen(int kind) {
         return kind == 3 || kind == 4;

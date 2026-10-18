@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -75,7 +76,8 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.BILLY) {
+        // (3.4) Billy's, or a custom hero's with one of Billy's abilities: CROWNED is set by Billy's code for either.
+        if (!data.acts(Power.BILLY)) {
             FORMING.remove(player.getId());
             return;
         }
@@ -91,17 +93,25 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         // Growing in: each stroke starts after the ones it grows out of. Fading out: it just fades.
         float grown = shown ? form.progress : 1.0F;
         float alpha = shown ? 1.0F : form.progress;
-        float glint = (ageInTicks * 0.02F) % 1.6F - 0.3F;
+        drawCrown(poseStack, buffer, getParentModel().head, ageInTicks, grown, alpha, -1);
+    }
 
+    /**
+     * The crown on a head, {@code grown} (0-1) of it, faded to {@code alpha}: Billy's in its blue chrome ({@code tint} -1),
+     * or (3.4) the crown of a custom hero's look, its chrome shaded toward his colour {@code tint} (0xRRGGBB).
+     */
+    public static void drawCrown(PoseStack poseStack, MultiBufferSource buffer, ModelPart head, float ageInTicks, float grown, float alpha,
+                                 int tint) {
+        float glint = (ageInTicks * 0.02F) % 1.6F - 0.3F;
+        int halo = tint < 0 ? BillyAbilities.MAIN : tint;
         poseStack.pushPose();
-        getParentModel().head.translateAndRotate(poseStack);
+        head.translateAndRotate(poseStack);
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         Matrix4f m = poseStack.last().pose();
         float pulse = 0.85F + 0.15F * Mth.sin(ageInTicks * 0.15F);
         // Two passes, one buffer each: the chrome first, then the glow round it.
         for (int pass = 0; pass < 2; pass++) {
-            boolean halo = pass == 1;
-            VertexConsumer vc = buffer.getBuffer(halo ? EnhancedRenderTypes.ENERGY_BEAM : EnhancedRenderTypes.ENERGY_VEIL);
+            VertexConsumer vc = buffer.getBuffer(pass == 1 ? EnhancedRenderTypes.ENERGY_BEAM : EnhancedRenderTypes.ENERGY_VEIL);
             for (Stroke stroke : STROKES) {
                 float length = Mth.clamp((grown * 1.6F - stroke.delay()) / (1.0F - stroke.delay()), 0.0F, 1.0F);
                 if (length <= 0.0F) {
@@ -112,7 +122,7 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
                     if (side < 0) {
                         points = points.stream().map(p -> new Vec3(-p.x, p.y, p.z)).toList();
                     }
-                    draw(m, vc, halo, points, length, stroke.widthStart(), stroke.widthEnd(), alpha, pulse, glint);
+                    draw(m, vc, pass == 1, points, length, stroke.widthStart(), stroke.widthEnd(), alpha, pulse, glint, halo, tint);
                 }
             }
         }
@@ -121,7 +131,7 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
 
     /** One stroke: in chrome as two crossed ribbons (so it shows from every side), or the soft glow round it. */
     private static void draw(Matrix4f m, VertexConsumer vc, boolean halo, List<Vec3> points, float length,
-                             float widthStart, float widthEnd, float alpha, float pulse, float glint) {
+                             float widthStart, float widthEnd, float alpha, float pulse, float glint, int haloRgb, int tint) {
         int last = Math.max(1, Math.round((points.size() - 1) * length));
         for (int i = 0; i < last; i++) {
             Vec3 a = points.get(i);
@@ -134,25 +144,29 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
             Vec3 across = dir.cross(new Vec3(0, 0, 1));
             across = across.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : across.normalize();
             if (halo) {
-                int glow = EnergyGeometry.argb(BillyAbilities.MAIN, 0.22F * alpha * pulse);
+                int glow = EnergyGeometry.argb(haloRgb, 0.22F * alpha * pulse);
                 quad(m, vc, a, b, across, wa * 2.6F, wb * 2.6F, glow, glow);
                 continue;
             }
             Vec3 depth = dir.cross(across).normalize();
-            int ca = chrome(a, glint, alpha);
-            int cb = chrome(b, glint, alpha);
+            int ca = chrome(a, glint, alpha, tint);
+            int cb = chrome(b, glint, alpha, tint);
             quad(m, vc, a, b, across, wa, wb, ca, cb);
             quad(m, vc, a, b, depth, wa * 0.8F, wb * 0.8F, ca, cb);
         }
     }
 
     /** The chrome colour at a point: by height, with a slow glint running up the crown. */
-    private static int chrome(Vec3 p, float glint, float alpha) {
+    private static int chrome(Vec3 p, float glint, float alpha, int tint) {
         float t = Mth.clamp((float) ((-p.y - 4.8) / 7.0), 0.0F, 1.0F);
         float f = (1.0F - t) * (CHROME.length - 1);
         int i = Math.min(CHROME.length - 2, (int) f);
         int rgb = lerpColor(CHROME[i], CHROME[i + 1], f - i);
         float shine = Math.max(0.0F, 1.0F - Math.abs(t - glint) * 6.0F);
+        if (tint >= 0) {
+            // The same light and shade, in the custom hero's colour.
+            rgb = lerpColor(rgb, lerpColor(tint, rgb, 0.25F), 0.75F);
+        }
         rgb = lerpColor(rgb, 0xFFFFFF, shine * 0.6F);
         return EnergyGeometry.argb(rgb, 0.95F * alpha);
     }

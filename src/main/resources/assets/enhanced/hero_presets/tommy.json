@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#2E9C7E",
+  "glow": "#7FD8B8",
+  "look": {
+    "base": "tommy/halloween",
+    "slim": false,
+    "aura": {
+      "style": "sparks",
+      "color": "#7FD8B8",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "tommy.time",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "tommy.speed",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "tommy.whirlwind",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "tommy.vibrate",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "tommy.accelerate",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "tommy.time",
+    "tommy.speed",
+    "tommy.whirlwind",
+    "tommy.vibrate",
+    "tommy.accelerate"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "tommy",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:sugar",
+    "hero": "tommy"
+  }
+}

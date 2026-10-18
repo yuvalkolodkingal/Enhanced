@@ -1,0 +1,77 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#9A3FE0",
+  "glow": "#E2C2FF",
+  "look": {
+    "base": "agatha/wandavision",
+    "slim": false,
+    "hat": {
+      "style": "witch_hat",
+      "color": "#3A2F48"
+    },
+    "eyes": {
+      "style": "glow",
+      "color": "#B565FF",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "agatha.purple_beam",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "hover"
+    },
+    {
+      "id": "agatha.drain",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "agatha.shield",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "agatha.runes",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "agatha.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "agatha.purple_beam",
+    "flight",
+    "agatha.drain",
+    "agatha.shield",
+    "agatha.runes"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "agatha",
+    "run": "agatha",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:amethyst_block",
+    "hero": "agatha"
+  }
+}

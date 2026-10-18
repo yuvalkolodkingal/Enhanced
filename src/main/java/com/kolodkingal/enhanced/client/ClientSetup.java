@@ -216,7 +216,12 @@ public final class ClientSetup {
                 // ===== agatha (3.3) =====
                 renderer.addLayer(new AgathaHatLayer(renderer, event.getContext().bakeLayer(AgathaHatLayer.LAYER)));
                 // ===== custom hero (3.4): the layers of his look =====
-                renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
+                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
+                        event.getContext().bakeLayer(AgathaHatLayer.LAYER), event.getContext().bakeLayer(XavierChair.HELMET_LAYER),
+                        event.getContext().bakeLayer(CyclopsVisorLayer.LAYER),
+                        new net.minecraft.client.model.HumanoidModel<>(event.getContext().bakeLayer(
+                                net.minecraft.client.model.geom.ModelLayers.PLAYER_OUTER_ARMOR))));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }

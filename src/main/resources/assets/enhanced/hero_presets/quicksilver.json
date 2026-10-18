@@ -1,0 +1,66 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#9AA3AD",
+  "glow": "#C8D0D8",
+  "look": {
+    "base": "quicksilver/suit",
+    "slim": false,
+    "visor": {
+      "style": "quicksilver_goggles"
+    }
+  },
+  "powers": [
+    {
+      "id": "quicksilver.time",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "quicksilver.speed",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "quicksilver.blitz",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "quicksilver.wall_run",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "quicksilver.barrage",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "quicksilver.time",
+    "quicksilver.speed",
+    "quicksilver.blitz",
+    "quicksilver.wall_run",
+    "quicksilver.barrage"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "qs_speed",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:rabbit_foot",
+    "hero": "quicksilver"
+  }
+}

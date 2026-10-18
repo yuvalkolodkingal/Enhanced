@@ -1,0 +1,71 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#FFA23A",
+  "glow": "#FFE9B8",
+  "look": {
+    "base": "ultron/prime",
+    "slim": false,
+    "eyes": {
+      "style": "machine"
+    }
+  },
+  "powers": [
+    {
+      "id": "ultron.repulsor",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "jet"
+    },
+    {
+      "id": "ultron.gravity",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "ultron.upload",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "ultron.army",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "ultron.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "ultron.repulsor",
+    "flight",
+    "ultron.gravity",
+    "ultron.upload",
+    "ultron.army"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "ultron",
+    "run": "ultron",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:redstone_torch",
+    "hero": "ultron"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#4DB8FF",
+  "glow": "#BFE6FF",
+  "look": {
+    "base": "thor/thor",
+    "slim": false,
+    "cape": {
+      "style": "thor"
+    }
+  },
+  "powers": [
+    {
+      "id": "thor.hammer",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "thor.lightning",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "thor.thunder",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "thor.bifrost",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "jet"
+    },
+    {
+      "id": "thor.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "thor.hammer",
+    "flight",
+    "thor.lightning",
+    "thor.thunder",
+    "thor.bifrost"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "thor",
+    "run": "thor",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:mace",
+    "hero": "thor"
+  }
+}

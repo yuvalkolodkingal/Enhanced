@@ -1,0 +1,69 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#8A9096",
+  "glow": "#D2D6DA",
+  "look": {
+    "base": "magneto/suit",
+    "slim": false,
+    "cape": {
+      "style": "magneto"
+    },
+    "hat": {
+      "style": "magneto_helmet"
+    }
+  },
+  "powers": [
+    {
+      "id": "magneto.metal",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "magneto.shrapnel",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "magneto.disarm",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "magneto.shield",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "hover"
+    }
+  ],
+  "keys": [
+    "magneto.metal",
+    "magneto.shrapnel",
+    "magneto.disarm",
+    "magneto.shield",
+    "flight"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "magneto",
+    "run": "magneto",
+    "speedRun": "auto",
+    "idle": "regal"
+  },
+  "preset": {
+    "icon": "minecraft:iron_ingot",
+    "hero": "magneto"
+  }
+}

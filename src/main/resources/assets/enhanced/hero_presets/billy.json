@@ -1,0 +1,71 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#5CC8FF",
+  "glow": "#CFEFFF",
+  "look": {
+    "base": "billy/wiccan",
+    "slim": false,
+    "cape": {
+      "style": "billy_wiccan"
+    }
+  },
+  "powers": [
+    {
+      "id": "billy.hex_beam",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "hover"
+    },
+    {
+      "id": "billy.telekinesis",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "billy.freeze",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "billy.noise",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "billy.build_magic",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "billy.hex_beam",
+    "flight",
+    "billy.telekinesis",
+    "billy.freeze",
+    "billy.noise"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "billy",
+    "run": "billy",
+    "speedRun": "auto",
+    "idle": "calm"
+  },
+  "preset": {
+    "icon": "minecraft:light_blue_dye",
+    "hero": "billy"
+  }
+}

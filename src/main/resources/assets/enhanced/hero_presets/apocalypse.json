@@ -1,0 +1,75 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#F2B84B",
+  "glow": "#FFF0B8",
+  "look": {
+    "base": "apocalypse/apocalypse",
+    "slim": false,
+    "cape": {
+      "style": "apocalypse"
+    },
+    "aura": {
+      "style": "sand",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "apocalypse.sand",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "hover"
+    },
+    {
+      "id": "apocalypse.portal",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "apocalypse.shield",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "apocalypse.bestow",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "apocalypse.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "apocalypse.sand",
+    "flight",
+    "apocalypse.portal",
+    "apocalypse.shield",
+    "apocalypse.bestow"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "apocalypse",
+    "run": "apocalypse",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:sand",
+    "hero": "apocalypse"
+  }
+}

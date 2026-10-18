@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -41,7 +42,8 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.PHOENIX || !data.is(Live.PHOENIX_BLAZE) || player.isInvisible()) {
+        // (3.4) Phoenix, or a custom hero with her Burst.
+        if (!data.has(HeroAbility.PHOENIX_BURST) || !data.is(Live.PHOENIX_BLAZE) || player.isInvisible()) {
             return;
         }
         float t = player.tickCount + partialTicks;
@@ -50,6 +52,23 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         model.prepareMobModel(player, limbSwing, limbSwingAmount, partialTicks);
         getParentModel().copyPropertiesTo(model);
         model.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        float pulse = 0.7F + 0.3F * Mth.sin(0.5F * t);
+        drawFlames(poseStack, buffer, model, t, pulse * (bright ? 1.3F : 1.0F), FLAME, GLOW);
+
+        if (data.is(Live.PHOENIX_CHARGING)) {
+            VertexConsumer orbs = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
+            float swell = 1.0F + 0.5F * Math.max(charge, 0.0F);
+            handOrb(poseStack, orbs, model.rightArm, -1.0F / 16.0F, t, swell);
+            handOrb(poseStack, orbs, model.leftArm, 1.0F / 16.0F, t + 20.0F, swell);
+        }
+    }
+
+    /**
+     * The flames over a (posed) model at {@code strength} (1: as hers at rest), in two colours (ARGB, the alpha their full
+     * strength): the Phoenix's, and (3.4) the flame aura of a custom hero's look, in his colours.
+     */
+    public static void drawFlames(PoseStack poseStack, MultiBufferSource buffer, PlayerModel<AbstractClientPlayer> model, float t,
+                                  float strength, int flameArgb, int glowArgb) {
         model.setAllVisible(true);
         // The second layers of the skin are not part of the flame.
         model.hat.visible = false;
@@ -58,24 +77,14 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         model.rightSleeve.visible = false;
         model.leftPants.visible = false;
         model.rightPants.visible = false;
-
-        float pulse = 0.7F + 0.3F * Mth.sin(0.5F * t);
-        float strength = pulse * (bright ? 1.3F : 1.0F);
         // Fatter and slower behind, then the main tongues scrolling upward over the body.
         poseStack.pushPose();
         poseStack.scale(1.1F, 1.0F, 1.1F);
         VertexConsumer glow = buffer.getBuffer(RenderType.energySwirl(PhoenixFx.FLAME_TEXTURE, (t * 0.004F) % 1.0F, (-t * 0.02F) % 1.0F));
-        model.renderToBuffer(poseStack, glow, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, scaleAlpha(GLOW, strength));
+        model.renderToBuffer(poseStack, glow, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, scaleAlpha(glowArgb, strength));
         poseStack.popPose();
         VertexConsumer flame = buffer.getBuffer(RenderType.energySwirl(PhoenixFx.FLAME_TEXTURE, (t * 0.01F) % 1.0F, (-t * 0.04F) % 1.0F));
-        model.renderToBuffer(poseStack, flame, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, scaleAlpha(FLAME, strength));
-
-        if (data.is(Live.PHOENIX_CHARGING)) {
-            VertexConsumer orbs = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-            float swell = 1.0F + 0.5F * Math.max(charge, 0.0F);
-            handOrb(poseStack, orbs, model.rightArm, -1.0F / 16.0F, t, swell);
-            handOrb(poseStack, orbs, model.leftArm, 1.0F / 16.0F, t + 20.0F, swell);
-        }
+        model.renderToBuffer(poseStack, flame, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, scaleAlpha(flameArgb, strength));
     }
 
     /** An ARGB colour with its alpha multiplied (and kept in range). */

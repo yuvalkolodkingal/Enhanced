@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#6F8CFF",
+  "glow": "#DCE4FF",
+  "look": {
+    "base": "professor_x/young",
+    "slim": false,
+    "eyes": {
+      "style": "glow",
+      "color": "#9FB3FF",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "xavier.mental_blast",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "xavier.thoughts",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "xavier.take_over",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "xavier.freeze_minds",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "xavier.cerebro",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "xavier.mental_blast",
+    "xavier.thoughts",
+    "xavier.take_over",
+    "xavier.freeze_minds",
+    "xavier.cerebro"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "xavier",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:echo_shard",
+    "hero": "professor_x"
+  }
+}

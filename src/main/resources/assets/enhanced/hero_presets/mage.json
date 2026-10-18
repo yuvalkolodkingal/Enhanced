@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#8E4FD6",
+  "glow": "#E2C2FF",
+  "look": {
+    "base": "own",
+    "slim": false,
+    "hat": {
+      "style": "witch_hat"
+    },
+    "cape": {
+      "style": "plain",
+      "color": "#3A1F5C"
+    },
+    "aura": {
+      "style": "mist",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "agatha.purple_beam",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "agatha.shield",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "magic",
+      "strength": 4,
+      "option": "ward"
+    },
+    {
+      "id": "teleport",
+      "strength": 4,
+      "option": "blink"
+    }
+  ],
+  "keys": [
+    "agatha.purple_beam",
+    "teleport",
+    "magic",
+    "agatha.shield",
+    ""
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "agatha",
+    "speedRun": "auto",
+    "idle": "calm"
+  },
+  "preset": {
+    "icon": "minecraft:enchanted_book"
+  }
+}

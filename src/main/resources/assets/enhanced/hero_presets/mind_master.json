@@ -1,0 +1,64 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#B57BEA",
+  "glow": "#F1E2FF",
+  "look": {
+    "base": "own",
+    "slim": false,
+    "hat": {
+      "style": "cerebro"
+    },
+    "eyes": {
+      "style": "glow",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "xavier.mental_blast",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "phoenix.telekinesis",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "telepathy",
+      "strength": 5,
+      "option": "sense"
+    },
+    {
+      "id": "mind_control",
+      "strength": 3,
+      "option": "ally"
+    }
+  ],
+  "keys": [
+    "xavier.mental_blast",
+    "telepathy",
+    "phoenix.telekinesis",
+    "mind_control",
+    ""
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "xavier",
+    "speedRun": "auto",
+    "idle": "calm"
+  },
+  "preset": {
+    "icon": "minecraft:ender_eye"
+  }
+}

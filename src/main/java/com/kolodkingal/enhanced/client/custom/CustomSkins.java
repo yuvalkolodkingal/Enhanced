@@ -145,6 +145,8 @@ public final class CustomSkins {
         }
         BY_HASH.clear();
         SKINS.clear();
+        CustomLooks.clear();
+        CustomLooksLayer.clear();
     }
 
     private CustomSkins() {

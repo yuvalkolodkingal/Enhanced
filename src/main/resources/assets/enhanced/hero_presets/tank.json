@@ -1,0 +1,64 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#8C8C8C",
+  "glow": "#FFB347",
+  "look": {
+    "base": "own",
+    "slim": false,
+    "visor": {
+      "style": "full_mask",
+      "color": "#5A5F66"
+    },
+    "eyes": {
+      "style": "machine"
+    }
+  },
+  "powers": [
+    {
+      "id": "durability",
+      "strength": 8,
+      "option": "armor"
+    },
+    {
+      "id": "super_strength",
+      "strength": 6,
+      "option": "slam"
+    },
+    {
+      "id": "thor.body",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "healing",
+      "strength": 4,
+      "option": "steady"
+    }
+  ],
+  "keys": [
+    "",
+    "",
+    "",
+    "super_strength",
+    ""
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "thanos",
+    "speedRun": "auto",
+    "idle": "heavy"
+  },
+  "preset": {
+    "icon": "minecraft:anvil"
+  }
+}

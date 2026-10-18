@@ -1,0 +1,71 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#E8323A",
+  "glow": "#FFB3A8",
+  "look": {
+    "base": "cyclops/classic",
+    "slim": false,
+    "visor": {
+      "style": "cyclops_classic"
+    }
+  },
+  "powers": [
+    {
+      "id": "cyclops.optic_blast",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "cyclops.concussion",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "cyclops.leap",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "cyclops.rally",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "cyclops.glasses",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "cyclops.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "cyclops.optic_blast",
+    "cyclops.concussion",
+    "cyclops.leap",
+    "cyclops.rally",
+    "cyclops.glasses"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "cyclops",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:red_stained_glass_pane",
+    "hero": "cyclops"
+  }
+}

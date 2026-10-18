@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -111,7 +112,8 @@ public class SpiderLegsLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player, float limbSwing,
                        float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.SPIDER_MAN || player.isInvisible()) {
+        // (3.4) Spider-Man, or a custom hero with his legs (in any look).
+        if (!data.has(HeroAbility.SPIDER_LEGS) || player.isInvisible()) {
             return;
         }
         State state = STATES.computeIfAbsent(player.getId(), id -> new State());

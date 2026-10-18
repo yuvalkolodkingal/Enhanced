@@ -1,0 +1,66 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#F5D77A",
+  "glow": "#FFF6D5",
+  "look": {
+    "base": "vision/vision",
+    "slim": false,
+    "cape": {
+      "style": "vision"
+    }
+  },
+  "powers": [
+    {
+      "id": "vision.mind_beam",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "hover"
+    },
+    {
+      "id": "vision.phase",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "vision.density",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "vision.disguise",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "vision.mind_beam",
+    "flight",
+    "vision.phase",
+    "vision.density",
+    "vision.disguise"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "vision",
+    "run": "vision",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:glowstone_dust",
+    "hero": "vision"
+  }
+}

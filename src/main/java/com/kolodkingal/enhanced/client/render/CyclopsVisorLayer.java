@@ -81,6 +81,27 @@ public class CyclopsVisorLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         return texture == VISOR_APOCALYPSE ? GLOW_APOCALYPSE : texture == VISOR_CLASSIC ? GLOW_CLASSIC : GLOW_GLASSES;
     }
 
+    /**
+     * The band on a head in one of the three textures ({@link #VISOR_APOCALYPSE}, {@link #VISOR_CLASSIC}, {@link #GLASSES}),
+     * and its lens glowing {@code glow} (0 to 1; nothing at 0): Cyclops's, and (3.4) the visor of a custom hero's look.
+     */
+    public static void drawVisor(PoseStack poseStack, MultiBufferSource buffer, int light, ModelPart visor, ModelPart head,
+                                 ResourceLocation texture, float glow) {
+        visor.copyFrom(head);
+        visor.render(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(texture)), light, OverlayTexture.NO_OVERLAY);
+        if (glow > 0.0F) {
+            int g = Mth.clamp((int) (glow * 255.0F), 0, 255);
+            visor.render(poseStack, buffer.getBuffer(glowFor(texture)), 0xF00000, OverlayTexture.NO_OVERLAY, 0xFF000000 | g << 16 | g << 8 | g);
+        }
+    }
+
+    /** How brightly a lens glows: a little at rest, up to full with the weight of the Optic Blast's stance. */
+    public static float lensGlow(AbstractClientPlayer player, PowerData data, float ageInTicks) {
+        HeroAnimState state = HeroAnimator.peek(player);
+        float blast = state == null ? (data.is(Live.BEAMING) ? 1.0F : 0.0F) : state.stance(Stance.CYCLOPS_BLAST);
+        return IDLE_GLOW + (1.0F - IDLE_GLOW) * blast * (0.9F + 0.1F * Mth.sin(ageInTicks * 0.9F));
+    }
+
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player, float limbSwing,
                        float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -88,16 +109,7 @@ public class CyclopsVisorLayer extends RenderLayer<AbstractClientPlayer, PlayerM
             return;
         }
         PowerData data = Powers.get(player);
-        ResourceLocation texture = textureFor(data);
-        visor.copyFrom(getParentModel().head);
-        visor.render(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(texture)), packedLight, OverlayTexture.NO_OVERLAY);
-        if (data.power() != Power.CYCLOPS || data.is(Live.CYCLOPS_UNLEASHED)) {
-            return;
-        }
-        HeroAnimState state = HeroAnimator.peek(player);
-        float blast = state == null ? (data.is(Live.BEAMING) ? 1.0F : 0.0F) : state.stance(Stance.CYCLOPS_BLAST);
-        float glow = IDLE_GLOW + (1.0F - IDLE_GLOW) * blast * (0.9F + 0.1F * Mth.sin(ageInTicks * 0.9F));
-        int g = Mth.clamp((int) (glow * 255.0F), 0, 255);
-        visor.render(poseStack, buffer.getBuffer(glowFor(texture)), 0xF00000, OverlayTexture.NO_OVERLAY, 0xFF000000 | g << 16 | g << 8 | g);
+        boolean lit = data.power() == Power.CYCLOPS && !data.is(Live.CYCLOPS_UNLEASHED);
+        drawVisor(poseStack, buffer, packedLight, visor, getParentModel().head, textureFor(data), lit ? lensGlow(player, data, ageInTicks) : 0.0F);
     }
 }

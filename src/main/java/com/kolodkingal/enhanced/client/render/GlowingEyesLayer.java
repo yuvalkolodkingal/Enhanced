@@ -75,6 +75,15 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
         if (type == null || player.isInvisible()) {
             return;
         }
-        getParentModel().renderToBuffer(poseStack, buffer.getBuffer(type), 0xF00000, OverlayTexture.NO_OVERLAY);
+        drawEyes(poseStack, buffer, getParentModel(), type, 0xFFFFFFFF);
+    }
+
+    /**
+     * Glowing eyes over a model: a mask in {@code type} (an eyes render type: full-bright, added to the colours below),
+     * tinted {@code argb}. A custom hero's eyes (3.4) use it with the generic eye mask of {@code CustomLooksLayer}.
+     */
+    public static void drawEyes(PoseStack poseStack, MultiBufferSource buffer, PlayerModel<AbstractClientPlayer> model, RenderType type,
+                                int argb) {
+        model.renderToBuffer(poseStack, buffer.getBuffer(type), 0xF00000, OverlayTexture.NO_OVERLAY, argb);
     }
 }

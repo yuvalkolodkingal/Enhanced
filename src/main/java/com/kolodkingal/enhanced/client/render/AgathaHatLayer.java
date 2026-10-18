@@ -76,10 +76,19 @@ public class AgathaHatLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         if (!wears(player, Powers.get(player))) {
             return;
         }
+        drawHat(poseStack, buffer, packedLight, LivingEntityRenderer.getOverlayCoords(player, 0.0F), getParentModel().head, hat, TEXTURE,
+                0xFFFFFFFF);
+    }
+
+    /**
+     * The hat on a head, in a texture and a tint (ARGB; white for its own colours): Agatha's, and (3.4) the witch's hat of a
+     * custom hero's look, which is the same model in a grey copy of the texture, tinted.
+     */
+    public static void drawHat(PoseStack poseStack, MultiBufferSource buffer, int light, int overlay, ModelPart head, ModelPart hat,
+                               ResourceLocation texture, int argb) {
         poseStack.pushPose();
-        getParentModel().head.translateAndRotate(poseStack);
-        hat.render(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)), packedLight,
-                LivingEntityRenderer.getOverlayCoords(player, 0.0F));
+        head.translateAndRotate(poseStack);
+        hat.render(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(texture)), light, overlay, argb);
         poseStack.popPose();
     }
 }
