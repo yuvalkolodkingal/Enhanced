@@ -146,7 +146,8 @@ public final class CustomLooksTests {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");
         List<String> ids = HeroPresets.ids();
-        check(ids.size() == 22 && HeroPresets.HEROES.size() == 16 && HeroPresets.ARCHETYPES.size() == 6, "22 presets: " + ids);
+        // (3.5: + Odin-like.)
+        check(ids.size() == 23 && HeroPresets.HEROES.size() == 17 && HeroPresets.ARCHETYPES.size() == 6, "23 presets: " + ids);
         CustomHeroRules.Limits sixty = CustomHeroRules.Limits.DEFAULT.withBudget(HeroPresets.MAX_POINTS);
         for (String id : ids) {
             HeroPresets.Preset preset = HeroPresets.read(id, text(HeroPresets.path(id)));

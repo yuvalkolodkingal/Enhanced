@@ -239,6 +239,33 @@ public enum GestureId {
     CYCLOPS_GLASSES_OFF(Group.CAST, 24, 2, 8, false),
     /** The hand brings the glasses up to his face and lets go. */
     CYCLOPS_GLASSES_ON(Group.CAST, 12, 2, 5, false),
+    // ===== odin (3.5) =====
+    /** The Gungnir Blast: the spear levelled and thrust along the look as the bolt leaves its tip. */
+    ODIN_BLAST(Group.CAST, 14, 1, 5, false),
+    /** The Gungnir Throw: the spear drawn back over the shoulder, then hurled with the whole body. */
+    ODIN_THROW(Group.CAST, 16, 1, 6, true),
+    /** Gungnir comes home: the open hand out, the spear slaps into it and the arm gives with it. */
+    ODIN_CATCH(Group.CAST, 12, 1, 5, false),
+    /** The Odinforce Shield: the spear's butt struck down and planted upright, the other hand opened at the dome. */
+    ODIN_SHIELD_UP(Group.CAST, 10, 2, 4, true),
+    /** The shield is let go of: the spear lifts from the ground, the hand falls. */
+    ODIN_SHIELD_DOWN(Group.CAST, 8, 1, 4, false),
+    /** The Odinforce Heal: the open palm swept slowly round before him. */
+    ODIN_HEAL(Group.CAST, 22, 3, 7, false),
+    /** Banish: the spear's point levelled at the one he banishes, held, then raised. */
+    ODIN_BANISH(Group.CAST, 18, 2, 6, true),
+    /** The Odinforce Wave: the spear raised, then its butt driven into the ground. */
+    ODIN_WAVE(Group.CAST, 16, 1, 6, true),
+    /** Huginn and Muninn: the free arm flung out from the shoulder, and the ravens leave it. */
+    ODIN_RAVENS(Group.CAST, 16, 2, 6, false),
+    /** The Allfather's Command: the spear raised high over his head. */
+    ODIN_COMMAND(Group.CAST, 26, 3, 8, false),
+    /** The Odinsleep: he sinks to one knee, the head bowed. */
+    ODIN_KNEEL(Group.CAST, 18, 2, 6, true),
+    /** He wakes from the Odinsleep and rises. */
+    ODIN_RISE(Group.CAST, 16, 2, 6, true),
+    /** The coronation: the spear lifted high with both hands, then brought down to rest upright. */
+    ODIN_CROWN(Group.CAST, 40, 4, 10, false),
     // ===== professor_x (3.3) =====
     /** Professor X's Mental Blast: two fingers to his temple, the head pushed a little forward. */
     XAVIER_BLAST(Group.CAST, 16, 2, 5, false),

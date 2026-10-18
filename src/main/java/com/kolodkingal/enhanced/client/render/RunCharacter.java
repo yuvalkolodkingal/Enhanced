@@ -34,6 +34,8 @@ public enum RunCharacter {
     APOCALYPSE(0.55F, 0.80F, 0.90F, 3, 2, 0.008F),
     /** Cyclops: a field leader's run, purposeful and squared, a little lean into the sprint. */
     CYCLOPS(0.90F, 1.15F, 1.10F, 8, 4, 0.016F),
+    /** Odin: an old king's stately stride, the arms swinging little, upright even in a sprint, a slow heavy bob. */
+    ODIN(0.55F, 0.75F, 0.95F, 2, 2, 0.012F),
     /** The young Charles: an easy, unhurried walk with a little swing. */
     XAVIER(0.85F, 1.10F, 1.05F, 5, 3, 0.012F),
     /** The old professor rolls in his chair: no swing of the arms, no lean, no bob (the chair carries him). */
@@ -72,6 +74,7 @@ public enum RunCharacter {
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
             case CYCLOPS -> CYCLOPS;
+            case ODIN -> ODIN;
             case PROFESSOR_X -> XAVIER;
             case AGATHA -> AGATHA;
             default -> DEFAULT;
