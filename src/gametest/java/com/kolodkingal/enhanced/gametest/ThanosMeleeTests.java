@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.power.Power;
@@ -240,6 +241,9 @@ public final class ThanosMeleeTests {
     @GameTest(template = ARENA, batch = "thanos_melee_choke", timeoutTicks = 200)
     public static void theChokeHoldsOneVictimLiftsThrowsAndHurts(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
+        // (3.5: Loki's body has armor; the numbers here are the choke's own, so his body wears none in this test.)
+        f.config(EnhancedConfig.LOKI_BODY_ARMOR, 0.0);
+        f.config(EnhancedConfig.LOKI_BODY_TOUGHNESS, 0.0);
         ServerPlayer victim = fighter(f, 0, 2, Power.LOKI);
         ServerPlayer bystander = fighter(f, 1.6, 2.2);
         ThanosEntity boss = boss(f, victim);
