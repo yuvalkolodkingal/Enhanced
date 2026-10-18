@@ -299,7 +299,7 @@ The heart Wanda tore out, in a cage of three gunmetal bars: a glowing red-orange
 
 ## Hero Creator
 
-"Become any hero, or make your own." A gold medallion, only in the **creative tab**: it has no recipe and is never found. It works for a player in Creative mode or an operator. Use it to open the Hero Creator: become any hero of the mod in any look, or make a hero of your own with powers from a catalogue of thirty, your keys, your colours and your skin, and save it to a file. See [Hero Creator](Hero-Creator).
+"Become any hero, or make your own." A gold medallion, only in the **creative tab**: it has no recipe and is never found. It works for a player in Creative mode or an operator. Use it to open the Hero Creator: become any hero of the mod in any look, or make a hero of your own with powers from a catalogue of thirty and (since 3.4) the 81 abilities of the heroes, your keys, your moves, your colours, your skin and its extras, and save it to a file. Since 3.4, choosing a hero also gives you his items: Magneto's Helmet, Quicksilver's Goggles, the Ruby-Quartz Glasses, Mjolnir (claimed by you) or Stormbreaker, Loki's Scepter, the Infinity Gauntlet, Ultron's Core, the wheelchair or the Darkhold, never a second one (`custom_hero.chooseGivesItems`). See [Hero Creator](Hero-Creator).
 
 ## Spider Web (a block, not an item)
 
