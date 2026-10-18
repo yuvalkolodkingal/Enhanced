@@ -539,6 +539,8 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.OdinConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HelaConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HelaBossConfig.define(BUILDER);
+        // 3.5: the world's own music (section [music]).
+        com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

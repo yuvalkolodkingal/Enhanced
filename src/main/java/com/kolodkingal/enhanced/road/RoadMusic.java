@@ -26,18 +26,22 @@ import java.util.UUID;
  *     <li>{@code entrance}: from the moment he asks a door for the Road (its ritual) while the door is open and he stays
  *     by it (until he goes in), and while he is being taken into the Road;</li>
  *     <li>the id of the trial he is in ({@code parkour}, {@code structure_copy}, {@code ice_boat}), and {@code road_end}
- *     in the hall at the end;</li>
+ *     in the hall at the end, but {@code choice} (3.5) while the Road waits for him to choose Billy or Tommy there;</li>
  *     <li>nothing anywhere else.</li>
  * </ul>
- * The sound events are {@code enhanced:music.road.entrance}, {@code .parkour}, {@code .copy}, {@code .boat} and
- * {@code .ending}: a resource pack replaces the music by giving them other files. A trial added later that has no
- * arrangement of its own plays the parkour's.
+ * The sound events are {@code enhanced:music.road.entrance}, {@code .parkour}, {@code .copy}, {@code .boat},
+ * {@code .choice} (3.5) and {@code .ending}: a resource pack replaces the music by giving them other files, and since 3.5 a
+ * server (its world's music folder) or a player (his config/enhanced/music) by a file per stage, {@code
+ * witches_road_<stage>.ogg}, or one for the whole Road (see {@link com.kolodkingal.enhanced.music.MusicTracks}). A trial added
+ * later that has no arrangement of its own plays the parkour's.
  */
 public final class RoadMusic {
     /** No music: the player is not on the Road. */
     public static final String NONE = "";
     /** At the door and on the way in. */
     public static final String ENTRANCE = "entrance";
+    /** 3.5: in the hall at the end, while the Road asks him to choose Billy or Tommy. */
+    public static final String CHOICE = "choice";
     /** How often the stage of every player is looked at (half a second). */
     static final int INTERVAL = 10;
     /** How far from the door he asked a seeker may stand and still hear the entrance. */
@@ -54,6 +58,7 @@ public final class RoadMusic {
         return switch (stage) {
             case NONE -> null;
             case ENTRANCE -> ModSounds.ROAD_MUSIC_ENTRANCE.get();
+            case CHOICE -> ModSounds.ROAD_MUSIC_CHOICE.get();
             case StructureCopyChallenge.ID -> ModSounds.ROAD_MUSIC_COPY.get();
             case IceBoatChallenge.ID -> ModSounds.ROAD_MUSIC_BOAT.get();
             case EndingHall.ID -> ModSounds.ROAD_MUSIC_ENDING.get();
@@ -72,6 +77,9 @@ public final class RoadMusic {
         RoadTrial trial = RoadTrials.trialOf(id);
         if (trial != null) {
             SEEKING.remove(id);
+            if (trial.challenge().isEnding() && RoadEnding.stage(player) == RoadEnding.Stage.ASKING) {
+                return CHOICE;
+            }
             return trial.challenge().id();
         }
         if (RoadTrials.isInside(player)) {

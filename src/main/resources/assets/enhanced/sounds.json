@@ -1180,6 +1180,32 @@
       }
     ]
   },
+  "music.road.choice": {
+    "sounds": [
+      {
+        "name": "enhanced:music/road_choice",
+        "stream": true
+      }
+    ]
+  },
+  "music.quicksilver": {
+    "subtitle": "subtitles.enhanced.music.quicksilver",
+    "sounds": [
+      {
+        "name": "enhanced:music/quicksilver_theme",
+        "stream": true
+      }
+    ]
+  },
+  "music.speed": {
+    "subtitle": "subtitles.enhanced.music.speed",
+    "sounds": [
+      {
+        "name": "enhanced:music/speed_theme",
+        "stream": true
+      }
+    ]
+  },
   "cyclops_optic_start": {
     "subtitle": "subtitles.enhanced.cyclops_optic_start",
     "sounds": [

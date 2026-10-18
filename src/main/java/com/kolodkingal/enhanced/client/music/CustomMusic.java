@@ -1,11 +1,11 @@
 package com.kolodkingal.enhanced.client.music;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.music.MusicTracks;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.JOrbisAudioStream;
 import net.minecraft.client.sounds.LoopingAudioStream;
 import net.neoforged.fml.loading.FMLPaths;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -13,25 +13,36 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.Locale;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * Lets a player swap Quicksilver's song: any .mp3, .ogg or .wav file placed in {@code config/enhanced/music} is played
- * instead of the built-in "Sweet Dreams (Are Made of This)". Nothing is downloaded.
+ * The player's own music: song files (.mp3, .ogg or .wav) placed in {@code config/enhanced/music} play instead of the
+ * mod's, for him only. Since 3.5 each piece of music has a name ({@code quicksilver.*}, {@code speed.*}, {@code
+ * witches_road.*}, {@code witches_road_<part>.*}); any other song there is Quicksilver's, as before 3.5 (see
+ * {@link MusicTracks#resolvePersonal}). Nothing is downloaded.
  */
 public final class CustomMusic {
     private static final String README = """
-            Quicksilver's Walkman
-            =====================
+            Your own music (Enhanced)
+            =========================
 
-            Quicksilver's Walkman plays "Sweet Dreams (Are Made of This)" whenever he runs
-            in Quicksilver Time. To play a different song, put a song file here (.mp3, .ogg
-            or .wav). If there is more than one, the first one in alphabetical order is
-            used. Changes are picked up the next time the music starts. Remove the file to
-            go back to Sweet Dreams.
+            Songs put here play instead of the mod's music, for you only (.mp3, .ogg or .wav).
+            Name each file after the music it replaces:
+
+              quicksilver.mp3          Quicksilver's Walkman song (in Quicksilver Time)
+              speed.mp3                Speed's Walkman song (Super Speed or his slow time)
+              witches_road.mp3         the Witches' Road, all of it
+              witches_road_<part>.mp3  one part of the Road only: entrance, parkour,
+                                       structure_copy, ice_boat, choice or ending
+
+            Any other song file here (say "my song.mp3") is Quicksilver's, as before 3.5;
+            if there is more than one, the first in alphabetical order is used.
+
+            Your songs win over the songs of a server or world (which it sends to you and
+            keeps in config/enhanced/music_cache). Changes are picked up the next time the
+            music starts. Remove a file to go back to the usual music.
             """;
 
     public static Path folder() {
@@ -44,7 +55,7 @@ public final class CustomMusic {
             Path folder = folder();
             Files.createDirectories(folder);
             Path readme = folder.resolve("README.txt");
-            // Kept up to date: it is the mod's own file, and older versions described the song differently.
+            // Kept up to date: it is the mod's own file, and older versions described the songs differently.
             if (!Files.exists(readme) || !Files.readString(readme, StandardCharsets.UTF_8).equals(README)) {
                 Files.writeString(readme, README, StandardCharsets.UTF_8);
             }
@@ -53,62 +64,38 @@ public final class CustomMusic {
         }
     }
 
-    /** Opens the song the player put in config/enhanced/music, if any. Empty means: play the built-in song. */
-    public static Optional<AudioStream> openSong(boolean looping) throws IOException {
-        Optional<Path> file = find();
-        if (file.isEmpty()) {
-            return Optional.empty();
-        }
-        Enhanced.LOGGER.info("Quicksilver's Walkman plays {}", file.get().getFileName());
-        InputStream in = new BufferedInputStream(Files.newInputStream(file.get()));
-        try {
-            return Optional.of(open(typeOf(file.get()), in, looping));
-        } catch (IOException | RuntimeException e) {
-            // Not a song we can play: let go of the file (the caller falls back to Sweet Dreams).
-            in.close();
-            throw e;
-        }
-    }
-
-    /** The player's song, if they put one in the folder. */
-    public static Optional<Path> find() {
+    /** The player's own song for a track, if he put one in the folder. */
+    public static Optional<Path> find(String track) {
         Path folder = folder();
         if (!Files.isDirectory(folder)) {
             return Optional.empty();
         }
+        List<String> names;
         try (Stream<Path> files = Files.list(folder)) {
-            return files.filter(Files::isRegularFile)
-                    .filter(p -> typeOf(p) != null)
-                    .min(Comparator.comparing(p -> p.getFileName().toString().toLowerCase(Locale.ROOT)));
+            names = files.filter(Files::isRegularFile).map(p -> p.getFileName().toString()).toList();
         } catch (IOException e) {
             return Optional.empty();
         }
+        return MusicTracks.resolvePersonal(track, names).map(folder::resolve);
     }
 
-    @Nullable
-    private static String typeOf(Path file) {
-        String name = file.getFileName().toString().toLowerCase(Locale.ROOT);
-        if (name.endsWith(".mp3")) {
-            return "mp3";
-        }
-        if (name.endsWith(".ogg")) {
-            return "ogg";
-        }
-        if (name.endsWith(".wav")) {
-            return "wav";
-        }
-        return null;
-    }
-
-    /** Opens a song as a looping (or one-shot) stream the sound engine can play. */
-    private static AudioStream open(@Nullable String type, InputStream in, boolean looping) throws IOException {
-        LoopingAudioStream.AudioStreamProvider provider = switch (type == null ? "" : type) {
+    /** Opens a song file (by its extension) as a looping (or one-shot) stream the sound engine can play. */
+    public static AudioStream open(Path file, boolean looping) throws IOException {
+        String type = MusicTracks.extension(file.getFileName().toString());
+        LoopingAudioStream.AudioStreamProvider provider = switch (type) {
             case "mp3" -> Mp3AudioStream::new;
             case "wav" -> PcmAudioStream::fromWav;
             case "ogg" -> JOrbisAudioStream::new;
-            default -> throw new IOException("Unsupported audio file");
+            default -> throw new IOException("Unsupported audio file " + file.getFileName());
         };
-        return looping ? new LoopingAudioStream(provider, in) : provider.create(in);
+        InputStream in = new BufferedInputStream(Files.newInputStream(file));
+        try {
+            return looping ? new LoopingAudioStream(provider, in) : provider.create(in);
+        } catch (IOException | RuntimeException e) {
+            // Not a song we can play: let go of the file (the caller falls back to the built-in song).
+            in.close();
+            throw e;
+        }
     }
 
     private CustomMusic() {

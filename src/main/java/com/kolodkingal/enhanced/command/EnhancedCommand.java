@@ -116,7 +116,8 @@ public final class EnhancedCommand {
                 .then(BuildCommands.node())
                 .then(WardCommands.node())
                 .then(RoadCommands.node())
-                .then(SchoolRepair.node()));
+                .then(SchoolRepair.node())
+                .then(com.kolodkingal.enhanced.music.MusicCommands.node()));
         RoadCommands.registerPlayerCommands(dispatcher);
     }
 
