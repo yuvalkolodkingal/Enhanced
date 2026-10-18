@@ -197,7 +197,7 @@ public final class HelaAbilities {
      * Her body: 10 more health and 4 armour, for the hero (scaled by the strength of a custom hero's body), and none of it
      * on anyone else.
      */
-    static void applyBody(ServerPlayer player, PowerData data) {
+    public static void applyBody(ServerPlayer player, PowerData data) {
         boolean body = data.has(HeroAbility.HELA_BODY);
         float scale = body ? data.bodyScale(HeroAbility.HELA_BODY) : 0.0F;
         setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, BODY_HEALTH_BONUS * scale, body);
@@ -348,7 +348,7 @@ public final class HelaAbilities {
                 SoundSource.PLAYERS, 1.2F, 1.0F);
         HelaFx.send(level, HelaFx.FORM, player.getId(), player.position().add(0.0, player.getBbHeight(), 0.0), on ? 1 : 0);
         if (on) {
-            formTick(player, data, level.getGameTime());
+            strength(player);
         } else {
             clearForm(player);
         }
@@ -357,9 +357,7 @@ public final class HelaAbilities {
     /** Her form, each tick it is on: its strength and its hunger. */
     private static void formTick(ServerPlayer player, PowerData data, long now) {
         if (now % 10 == 0) {
-            int strength = Math.max(0, HelaConfig.FORM_STRENGTH.get() - 1);
-            refresh(player, MobEffects.DAMAGE_BOOST, strength);
-            refresh(player, MobEffects.DAMAGE_RESISTANCE, 0);
+            strength(player);
         }
         if (now % FORM_HUNGER_EVERY == 0 && !player.isCreative()) {
             player.causeFoodExhaustion(4.0F);
@@ -369,6 +367,12 @@ public final class HelaAbilities {
                 player.displayClientMessage(Component.translatable("message.enhanced.hela.hungry"), true);
             }
         }
+    }
+
+    /** The form's strength: Strength ({@code formStrength}) and Resistance I, renewed while it is on. */
+    private static void strength(ServerPlayer player) {
+        refresh(player, MobEffects.DAMAGE_BOOST, Math.max(0, HelaConfig.FORM_STRENGTH.get() - 1));
+        refresh(player, MobEffects.DAMAGE_RESISTANCE, 0);
     }
 
     private static void refresh(ServerPlayer player, Holder<MobEffect> effect, int amplifier) {

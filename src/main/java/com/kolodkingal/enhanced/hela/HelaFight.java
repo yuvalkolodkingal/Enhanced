@@ -581,6 +581,16 @@ public final class HelaFight extends BossFight {
         }
     }
 
+    /** For the tests: her arrival is over at once (she stands on the dais, ready, choosing nothing until told). */
+    @VisibleForTesting
+    public void skipArrival() {
+        if (boss != null) {
+            boss.setState(HelaState.IDLE);
+            boss.brain().reset(level().getGameTime());
+            boss.brain().setPassive(true);
+        }
+    }
+
     /** For the tests: the next Mjolnir may be caught at once. */
     @VisibleForTesting
     public void readyCatch() {

@@ -66,7 +66,13 @@ public class NecroswordEntity extends ThrowableProjectile implements ShieldCost 
         NecroswordEntity blade = new NecroswordEntity(ModEntities.NECROSWORD.get(), level);
         blade.setOwner(owner);
         blade.damage = damage;
-        blade.setPos(mark.x, mark.y + RAIN_HEIGHT, mark.z);
+        // (Under a low roof it hangs a little under the roof, not inside it.)
+        net.minecraft.world.phys.BlockHitResult roof = level.clip(new net.minecraft.world.level.ClipContext(mark.add(0.0, 1.0, 0.0),
+                mark.add(0.0, RAIN_HEIGHT + 0.5, 0.0), net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                net.minecraft.world.level.ClipContext.Fluid.NONE, net.minecraft.world.phys.shapes.CollisionContext.empty()));
+        double height = roof.getType() == net.minecraft.world.phys.HitResult.Type.MISS ? RAIN_HEIGHT
+                : Math.max(1.5, roof.getLocation().y - mark.y - 1.0);
+        blade.setPos(mark.x, mark.y + height, mark.z);
         blade.entityData.set(DATA_FALLING, true);
         blade.entityData.set(DATA_HANG, Math.max(0, hang));
         blade.setDeltaMovement(Vec3.ZERO);

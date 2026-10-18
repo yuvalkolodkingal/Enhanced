@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.render.HelaMusicMath;
 import com.kolodkingal.enhanced.hela.HelaEntity;
 import com.kolodkingal.enhanced.hela.HelaState;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -25,14 +26,13 @@ import java.util.function.Supplier;
  * (lane L6: the drone and war drums; low strings and a choir; high brass and faster drums). All three start at the same
  * moment, so they stay in step for as long as they loop, the layers not yet due at nothing; layer {@code n} fades in when
  * the fight reaches phase {@code n} (her synced phase) and the whole fades with the distance to her (all of it within
- * {@link #FULL} blocks, none at {@link #REACH}). It is a music-volume sound (the Music slider), ducks the game's own
+ * {@link HelaMusicMath#FULL} blocks, none at {@link HelaMusicMath#REACH}). It is a music-volume sound (the Music slider), ducks the game's own
  * music, follows no packet (the boss the client can see), and is silent with the client option {@code bossMusic} off.
  * Original music, not the film's.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class HelaMusic {
-    public static final double FULL = 48.0;
-    public static final double REACH = 96.0;
+    public static final double REACH = HelaMusicMath.REACH;
     private static final float FADE_IN = 1.0F / 40.0F;
     private static final float FADE_OUT = 1.0F / 100.0F;
     /** How fast a layer comes in or goes (two seconds: a bar of the music). */
@@ -43,17 +43,12 @@ public final class HelaMusic {
     private static int phase = 1;
     private static boolean playing;
 
-    /** How loud the music is at {@code distance} blocks from her (0 to 1). */
-    public static float volumeAt(double distance) {
-        if (distance <= FULL) {
-            return 1.0F;
-        }
-        return distance >= REACH ? 0.0F : (float) (1.0 - (distance - FULL) / (REACH - FULL));
+    private static float volumeAt(double distance) {
+        return HelaMusicMath.volumeAt(distance);
     }
 
-    /** Whether layer {@code n} (1-3) plays in {@code phase}. */
-    public static boolean layerWanted(int n, int phase) {
-        return n <= phase;
+    private static boolean layerWanted(int n, int phase) {
+        return HelaMusicMath.layerWanted(n, phase);
     }
 
     @Nullable
