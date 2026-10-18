@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.CerebroPayload;
 import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.ChatFormatting;
@@ -56,10 +58,10 @@ public class XavierOverlay implements LayeredDraw.Layer {
         int w = graphics.guiWidth();
         int h = graphics.guiHeight();
         if (cerebro > 0.01F) {
-            shade(graphics, CEREBRO_BLUE, 0.35F * cerebro);
+            shade(graphics, AbilityColors.color(mc.player, HeroAbility.XAVIER_CEREBRO, CEREBRO_BLUE), 0.35F * cerebro);
         }
         if (link > 0.01F) {
-            shade(graphics, LINK_BLUE, 0.4F * link);
+            shade(graphics, AbilityColors.color(mc.player, HeroAbility.XAVIER_TAKE_OVER, LINK_BLUE), 0.4F * link);
             Entity host = XavierControl.host();
             if (host != null && XavierControl.inBody()) {
                 Component line = Component.translatable("hud.enhanced.xavier.in_body", host.getDisplayName(),
@@ -96,7 +98,8 @@ public class XavierOverlay implements LayeredDraw.Layer {
         int y = 6;
         Component title = Component.translatable("hud.enhanced.xavier.cerebro", minds.size(),
                 String.format(Locale.ROOT, "%.0f", CerebroView.ticksLeft() / 20.0));
-        graphics.drawString(font, title.copy().withStyle(s -> s.withColor(CEREBRO_BLUE).withBold(true)), w - font.width(title) - 8, y, 0xFFFFFF);
+        graphics.drawString(font, title.copy().withStyle(s -> s.withColor(AbilityColors.color(Minecraft.getInstance().player,
+                HeroAbility.XAVIER_CEREBRO, CEREBRO_BLUE)).withBold(true)), w - font.width(title) - 8, y, 0xFFFFFF);
         y += 12;
         Power[] powers = Power.values();
         Vec3 eye = mc.player.getEyePosition();

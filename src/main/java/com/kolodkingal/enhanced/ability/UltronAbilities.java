@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
@@ -382,7 +383,8 @@ public final class UltronAbilities {
         Vec3 direction = Vec3.directionFromRotation(player.getXRot() + spread(player), player.getYRot() + spread(player));
         Vec3 from = fingertip(player, plasma.hand++ % 2 == 0 ? 1.0 : -1.0);
         UltronBoltEntity bolt = UltronBoltEntity.create(level, player, from, direction.scale(BOLT_SPEED),
-                UltronConfig.BOLT_DAMAGE.get().floatValue(), palette(player));
+                UltronConfig.BOLT_DAMAGE.get().floatValue(), palette(player)).tint(AbilityColors.chosen(player,
+                        HeroAbility.ULTRON_REPULSOR));
         float splash = UltronConfig.BOLT_SPLASH.get().floatValue();
         if (splash > 0.0F) {
             bolt.splash(splash);
@@ -457,7 +459,7 @@ public final class UltronAbilities {
         Vec3 look = player.getLookAngle();
         Vec3 from = fingertip(player, 1.0);
         UltronBoltEntity blast = UltronBoltEntity.create(level, player, from, look.scale(BLAST_SPEED), UltronConfig.OVERCHARGE_DAMAGE.get().floatValue(),
-                palette(player));
+                palette(player)).tint(AbilityColors.chosen(player, HeroAbility.ULTRON_OVERCHARGE));
         blast.heavy(UltronConfig.OVERCHARGE_RADIUS.get().floatValue(), UltronConfig.OVERCHARGE_SPLASH.get().floatValue(), BLAST_KNOCKBACK);
         level.addFreshEntity(blast);
         UltronFx.from(level, UltronFxPayload.OVERCHARGE_FLASH, player, from, look, 2.0F, 6);

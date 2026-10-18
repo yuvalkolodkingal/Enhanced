@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.build.BuildMagic;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
@@ -145,6 +147,10 @@ public final class WandaAbilities {
         }
         if (data.has(HeroAbility.WANDA_CHAOS_SHIELD)) {
             data.setChaosShieldActive(false);
+        }
+        if (data.has(HeroAbility.WANDA_BUILD_MAGIC)) {
+            // 3.5: a custom hero's Build Magic of hers ends with it (as Billy's does in BillyAbilities.endAll).
+            BuildMagic.onPowerChanged(player, Power.SCARLET_WITCH, Power.CUSTOM);
         }
     }
 
@@ -319,14 +325,17 @@ public final class WandaAbilities {
         RandomSource random = player.getRandom();
         // Chips of bright red. (A red stained glass block's own particles are see-through and a dull grey-violet in the
         // air, and every block's are darkened; the red dye's chips stay a clear red and fly the way they are sent.)
-        ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.RED_DYE));
+        ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM,
+                new ItemStack(AbilityColors.dye(player, HeroAbility.WANDA_CHAOS_SHIELD, Items.RED_DYE)));
         for (int i = 0; i < SHATTER_SHARDS; i++) {
             // Out from a random spot on the sphere, along the way out.
             Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
             Vec3 at = center.add(out.scale(SHIELD_RADIUS));
             level.sendParticles(shard, at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             if (i % 2 == 0) {
-                level.sendParticles(new EnergyParticleOptions(i % 4 == 0 ? glow(player) : color(player), 1.5F),
+                level.sendParticles(new EnergyParticleOptions(i % 4 == 0
+                        ? AbilityColors.glow(player, HeroAbility.WANDA_CHAOS_SHIELD, glow(player))
+                                : AbilityColors.color(player, HeroAbility.WANDA_CHAOS_SHIELD, color(player)), 1.5F),
                         at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             }
         }
@@ -426,7 +435,8 @@ public final class WandaAbilities {
      */
     public static void block(ServerPlayer player, Projectile projectile) {
         float power = projectilePower(projectile);
-        neutralize(player.serverLevel(), projectile, color(player));
+        neutralize(player.serverLevel(), projectile, AbilityColors.color(player, HeroAbility.WANDA_CHAOS_SHIELD,
+                color(player)));
         wear(player, power, projectile);
     }
 

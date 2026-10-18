@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.power.PowerData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -23,6 +24,12 @@ import java.util.function.Supplier;
  * @param maxTicks    how long a complete shield can be held, in ticks
  */
 public record ShieldStyle(int veil, int lines, ResourceLocation texture, float radius, Supplier<Float> maxStrength, IntSupplier maxTicks) {
+
+    /** 3.5: this style in another colour (its veil and its lines recoloured, {@code AbilityColors.recolor}). */
+    public ShieldStyle tinted(int color) {
+        return new ShieldStyle(AbilityColors.recolor(veil, color), AbilityColors.recolor(lines, color), texture,
+                radius, maxStrength, maxTicks);
+    }
 
     /** What one frame of the shield looks like. */
     public record Look(float radius, float flicker) {

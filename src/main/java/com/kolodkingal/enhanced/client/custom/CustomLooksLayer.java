@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.client.render.CyclopsVisorLayer;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.PhoenixFlameLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -33,6 +34,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
@@ -223,7 +226,7 @@ public final class CustomLooksLayer extends RenderLayer<AbstractClientPlayer, Pl
             dark(poseStack, buffers, light, parent, row, 1.0F);
             return;
         }
-        int ability = abilityEyes(data);
+        int ability = abilityEyes(player, data);
         if (ability >= 0) {
             GlowingEyesLayer.drawEyes(poseStack, buffers, parent, EYES[row], 0xFF000000 | ability);
             return;
@@ -257,22 +260,37 @@ public final class CustomLooksLayer extends RenderLayer<AbstractClientPlayer, Pl
      * The colour the eyes glow because of a borrowed ability that is on now (the colours of the heroes' own eyes), or -1.
      */
     public static int abilityEyes(PowerData data) {
-        if (data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER)
-                || data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
-            return 0xCFEFFF;
+        return abilityEyes(null, data);
+    }
+
+    /** {@link #abilityEyes(PowerData)}, 3.5: in the colour the player's pick of the ability that lights them chose. */
+    public static int abilityEyes(@Nullable Player player, PowerData data) {
+        if (data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
+            return AbilityColors.shade(player, HeroAbility.THOR_LIGHTNING, 0xCFEFFF);
         }
-        if (data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive() || data.has(HeroAbility.WANDA_CHAOS_SHIELD) && data.chaosShieldActive()
-                || data.has(HeroAbility.WANDA_TELEKINESIS) && data.heldEntityId() != -1) {
-            return 0xFF2A4A;
+        if (data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER)) {
+            return AbilityColors.shade(player, HeroAbility.THOR_THUNDER, 0xCFEFFF);
         }
-        if (data.has(HeroAbility.PHOENIX_MIND) && data.toggle(Toggle.MIND_READING) || data.has(HeroAbility.PHOENIX_BURST) && data.is(Live.PHOENIX_BLAZE)) {
-            return 0xFFA43A;
+        if (data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive()) {
+            return AbilityColors.shade(player, HeroAbility.WANDA_CHAOS_BEAM, 0xFF2A4A);
+        }
+        if (data.has(HeroAbility.WANDA_CHAOS_SHIELD) && data.chaosShieldActive()) {
+            return AbilityColors.shade(player, HeroAbility.WANDA_CHAOS_SHIELD, 0xFF2A4A);
+        }
+        if (data.has(HeroAbility.WANDA_TELEKINESIS) && data.heldEntityId() != -1) {
+            return AbilityColors.shade(player, HeroAbility.WANDA_TELEKINESIS, 0xFF2A4A);
+        }
+        if (data.has(HeroAbility.PHOENIX_MIND) && data.toggle(Toggle.MIND_READING)) {
+            return AbilityColors.shade(player, HeroAbility.PHOENIX_MIND, 0xFFA43A);
+        }
+        if (data.has(HeroAbility.PHOENIX_BURST) && data.is(Live.PHOENIX_BLAZE)) {
+            return AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, 0xFFA43A);
         }
         if (data.has(HeroAbility.AGATHA_PURPLE_BEAM) && data.is(Live.BEAMING)) {
-            return 0xB565FF;
+            return AbilityColors.shade(player, HeroAbility.AGATHA_PURPLE_BEAM, 0xB565FF);
         }
         if (data.has(HeroAbility.CYCLOPS_GLASSES) && data.is(Live.CYCLOPS_UNLEASHED)) {
-            return 0xFF2A2A;
+            return AbilityColors.shade(player, HeroAbility.CYCLOPS_OPEN_EYES, 0xFF2A2A);
         }
         return -1;
     }

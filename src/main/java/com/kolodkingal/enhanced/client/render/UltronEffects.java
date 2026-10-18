@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
 import com.kolodkingal.enhanced.ultron.UltronAttack;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
@@ -15,6 +17,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -151,8 +155,10 @@ public final class UltronEffects {
             return;
         }
         for (Effect e : EFFECTS) {
+            tint = tintOf(level, e);
             UltronParticles.tick(level, e, now);
         }
+        tint = -1;
         UltronParticles.tickBodies(level, now);
     }
 
@@ -181,6 +187,7 @@ public final class UltronEffects {
                 continue;
             }
             draw(level, e, now, partial, camera, pose, light);
+            tint = -1;
             if (e.kind == UltronFxPayload.WRECK) {
                 (scrap == null ? scrap = new ArrayList<>() : scrap).add(e);
             }
@@ -195,7 +202,41 @@ public final class UltronEffects {
         }
     }
 
+    /** 3.5: the colour a custom hero's pick chose for the effect being drawn, or -1 (Ultron's own). */
+    static int tint = -1;
+
+    /** One of Ultron's colours, or it recoloured to the colour chosen for the effect being drawn. */
+    static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
+    /**
+     * The colour chosen for an effect of a custom hero's ability (the caster's pick of it), or -1: Ultron's own
+     * effects.
+     */
+    static int tintOf(ClientLevel level, Effect e) {
+        HeroAbility row = switch (e.kind) {
+            case UltronFxPayload.GRAVITY_PULL -> HeroAbility.ULTRON_GRAVITY;
+            case UltronFxPayload.GRAVITY_SLAM -> HeroAbility.ULTRON_SLAM;
+            case UltronFxPayload.OVERCHARGE_FLASH -> HeroAbility.ULTRON_OVERCHARGE;
+            case UltronFxPayload.HACK_BEAM -> HeroAbility.ULTRON_HACK;
+            case UltronFxPayload.COMMAND_MARK, UltronFxPayload.DRONE_ASSEMBLE -> HeroAbility.ULTRON_ARMY;
+            case UltronFxPayload.NETWORK_FLASH, UltronFxPayload.DATA_LINE -> HeroAbility.ULTRON_UPLOAD;
+            default -> null;
+        };
+        if (row == null || e.entityId < 0) {
+            return -1;
+        }
+        Entity caster = level.getEntity(e.entityId);
+        if (caster instanceof OwnableEntity drone && !(caster instanceof Player)) {
+            caster = drone.getOwner();
+        }
+        return AbilityColors.chosen(caster, row == HeroAbility.ULTRON_ARMY && e.kind == UltronFxPayload.COMMAND_MARK
+                ? HeroAbility.ULTRON_COMMAND : row);
+    }
+
     private static void draw(ClientLevel level, Effect e, long now, float partial, Vec3 camera, Matrix4f pose, VertexConsumer vc) {
+        tint = tintOf(level, e);
         float age = e.age(now, partial);
         float u = e.progress(now, partial);
         float time = now + partial;
@@ -204,7 +245,7 @@ public final class UltronEffects {
             case UltronFxPayload.FLASH -> {
                 float grow = Mth.clamp(age / Math.max(2.0F, e.ticks * 0.4F), 0.0F, 1.0F);
                 float fade = 1.0F - u;
-                UltronGeometry.flare(pose, vc, e.at.subtract(camera), e.radius * (0.15F + 0.85F * grow), fade, PLASMA_HALO, PLASMA_GOLD, 0xFFFFFF);
+                UltronGeometry.flare(pose, vc, e.at.subtract(camera), e.radius * (0.15F + 0.85F * grow), fade, c(PLASMA_HALO), c(PLASMA_GOLD), 0xFFFFFF);
             }
             case UltronFxPayload.GLINT -> glint(level, e, u, partial, camera, pose, vc);
             case UltronFxPayload.BEAMS_AIM -> beamsAim(level, e, now, time, partial, camera, pose, vc);
@@ -213,14 +254,14 @@ public final class UltronEffects {
             case UltronFxPayload.DEBRIS_RING -> debrisRing(level, e, age, u, time, camera, pose, vc);
             case UltronFxPayload.PULL_RING -> pullRing(level, e, u, time, camera, pose, vc);
             case UltronFxPayload.SPAWN_PILLAR -> spawnPillar(level, e, u, time, camera, pose, vc);
-            case UltronFxPayload.SHOCKWAVE -> shockwave(level, e, u, GRAV_MAIN, 0xFFE0B0, camera, pose, vc);
+            case UltronFxPayload.SHOCKWAVE -> shockwave(level, e, u, c(GRAV_MAIN), 0xFFE0B0, camera, pose, vc);
             case UltronFxPayload.DATA_LINE -> dataLine(e.at, e.to, e.ticks, age, time, camera, pose, vc, 1.0F);
             case UltronFxPayload.WRECK -> {
                 // The heat of the wreck, a red glow on the ground that cools.
                 UltronGeometry.Ground ground = UltronGeometry.ground(level, e.at.y);
                 float cool = 1.0F - u;
-                UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, 1.6F, 16, EnergyGeometry.argb(NET_RED, 0.10F * cool),
-                        EnergyGeometry.argb(NET_DARK, 0.0F));
+                UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, 1.6F, 16, EnergyGeometry.argb(c(NET_RED), 0.10F * cool),
+                        EnergyGeometry.argb(c(NET_DARK), 0.0F));
             }
             case UltronFxPayload.LIFT_RING -> liftRing(level, e, age, u, time, camera, pose, vc);
             case UltronFxPayload.DEATH -> death(level, e, u, partial, camera, pose, vc);
@@ -246,10 +287,10 @@ public final class UltronEffects {
         float built = Mth.clamp(u * 1.15F, 0.0F, 1.0F);
         // (3.3) Timed with the partial tick (it was the game time alone: a jump every tick) and slower.
         float flicker = 0.7F + 0.3F * Mth.sin(age * 0.6F);
-        UltronGeometry.silhouette(pose, vc, e.at.subtract(camera), e.radius, 0.0F, built, EnergyGeometry.argb(GRAV_MAIN, 0.22F * flicker * (0.4F + 0.6F * u)));
+        UltronGeometry.silhouette(pose, vc, e.at.subtract(camera), e.radius, 0.0F, built, EnergyGeometry.argb(c(GRAV_MAIN), 0.22F * flicker * (0.4F + 0.6F * u)));
         UltronGeometry.Ground ground = UltronGeometry.ground(level, e.at.y);
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, 1.7F - 0.5F * u, 0.14F, 40, EnergyGeometry.argb(GRAV_MAIN, 0.5F * u + 0.1F));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, 2.6F * (1.0F - u) + 0.4F, 0.1F, 40, EnergyGeometry.argb(NET_WHITE, 0.3F * u));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, 1.7F - 0.5F * u, 0.14F, 40, EnergyGeometry.argb(c(GRAV_MAIN), 0.5F * u + 0.1F));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, 2.6F * (1.0F - u) + 0.4F, 0.1F, 40, EnergyGeometry.argb(c(NET_WHITE), 0.3F * u));
     }
 
     // ---- the Volley and the Finger Beams ----
@@ -269,9 +310,9 @@ public final class UltronEffects {
             Vec3 a = palm.subtract(camera);
             Vec3 b = target.subtract(camera);
             float alpha = 0.35F + 0.65F * u;
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.09F, 0.09F, EnergyGeometry.argb(PLASMA_HALO, 0.18F * alpha), EnergyGeometry.argb(PLASMA_HALO, 0.1F * alpha));
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.03F, 0.03F, EnergyGeometry.argb(PLASMA_GOLD, 0.9F * alpha), EnergyGeometry.argb(PLASMA_GOLD, 0.5F * alpha));
-            UltronGeometry.flare(pose, vc, a, 0.22F * alpha, 0.9F, PLASMA_HALO, PLASMA_GOLD, 0xFFFFFF);
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.09F, 0.09F, EnergyGeometry.argb(c(PLASMA_HALO), 0.18F * alpha), EnergyGeometry.argb(c(PLASMA_HALO), 0.1F * alpha));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.03F, 0.03F, EnergyGeometry.argb(c(PLASMA_GOLD), 0.9F * alpha), EnergyGeometry.argb(c(PLASMA_GOLD), 0.5F * alpha));
+            UltronGeometry.flare(pose, vc, a, 0.22F * alpha, 0.9F, c(PLASMA_HALO), c(PLASMA_GOLD), 0xFFFFFF);
         }
     }
 
@@ -316,22 +357,22 @@ public final class UltronEffects {
         for (int k = 0; k < tips.length; k++) {
             Vec3 a = tips[k].subtract(camera);
             Vec3 b = point.subtract(camera);
-            UltronGeometry.dotted(pose, vc, a, b, 0.05F, 0.35F, time * 0.35F + k * 0.13F, EnergyGeometry.argb(DANGER_GLOW, 0.9F * strength));
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.02F, 0.02F, EnergyGeometry.argb(DANGER, 0.18F * strength), EnergyGeometry.argb(DANGER, 0.35F * strength));
+            UltronGeometry.dotted(pose, vc, a, b, 0.05F, 0.35F, time * 0.35F + k * 0.13F, EnergyGeometry.argb(c(DANGER_GLOW), 0.9F * strength));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.02F, 0.02F, EnergyGeometry.argb(c(DANGER), 0.18F * strength), EnergyGeometry.argb(c(DANGER), 0.35F * strength));
         }
         // The mark where they meet: rings that tighten as the lock comes, a cross, a faint disc.
         UltronGeometry.Ground ground = UltronGeometry.ground(level, e.at.y);
         float pulse = 1.0F + 0.08F * Mth.sin(time * 0.9F);
         float r = (1.5F - 0.6F * held) * pulse;
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r, 0.14F, 36, EnergyGeometry.argb(DANGER, 0.85F * strength));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r * 0.45F, 0.1F, 24, EnergyGeometry.argb(DANGER_GLOW, 0.8F * strength));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r, 0.14F, 36, EnergyGeometry.argb(c(DANGER), 0.85F * strength));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r * 0.45F, 0.1F, 24, EnergyGeometry.argb(c(DANGER_GLOW), 0.8F * strength));
         for (int i = 0; i < 4; i++) {
             double angle = i * Math.PI / 2.0 + Math.PI / 4.0;
             UltronGeometry.line(pose, vc, camera, ground, e.at.x + Math.cos(angle) * r * 0.6, e.at.z + Math.sin(angle) * r * 0.6,
-                    e.at.x + Math.cos(angle) * (r + 0.5), e.at.z + Math.sin(angle) * (r + 0.5), 0.1F, EnergyGeometry.argb(DANGER, 0.9F * strength),
-                    EnergyGeometry.argb(DANGER, 0.5F * strength));
+                    e.at.x + Math.cos(angle) * (r + 0.5), e.at.z + Math.sin(angle) * (r + 0.5), 0.1F, EnergyGeometry.argb(c(DANGER), 0.9F * strength),
+                    EnergyGeometry.argb(c(DANGER), 0.5F * strength));
         }
-        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, r, 28, EnergyGeometry.argb(DANGER, 0.14F * strength), EnergyGeometry.argb(DANGER, 0.04F * strength));
+        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, r, 28, EnergyGeometry.argb(c(DANGER), 0.14F * strength), EnergyGeometry.argb(c(DANGER), 0.04F * strength));
     }
 
     /** The beams: ten ribbons fan ten degrees either side of the locked line from the fingertips, each ending on the first block. */
@@ -361,10 +402,10 @@ public final class UltronEffects {
             Vec3 a = origin.subtract(camera);
             Vec3 b = end.subtract(camera);
             float taper = 0.0F;
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.30F, 0.34F, EnergyGeometry.argb(PLASMA_HALO, 0.22F * alpha * flicker), EnergyGeometry.argb(PLASMA_HALO, 0.30F * alpha * flicker));
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.11F, 0.13F, EnergyGeometry.argb(PLASMA_MAIN, 0.8F * alpha * flicker), EnergyGeometry.argb(PLASMA_EDGE, 0.7F * alpha * flicker));
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.04F, 0.05F, EnergyGeometry.argb(PLASMA_CORE, 0.95F * alpha), EnergyGeometry.argb(PLASMA_CORE, 0.8F * alpha));
-            UltronGeometry.flare(pose, vc, b, 0.34F * flicker, alpha, PLASMA_HALO, PLASMA_GOLD, PLASMA_CORE);
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.30F, 0.34F, EnergyGeometry.argb(c(PLASMA_HALO), 0.22F * alpha * flicker), EnergyGeometry.argb(c(PLASMA_HALO), 0.30F * alpha * flicker));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.11F, 0.13F, EnergyGeometry.argb(c(PLASMA_MAIN), 0.8F * alpha * flicker), EnergyGeometry.argb(c(PLASMA_EDGE), 0.7F * alpha * flicker));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.04F, 0.05F, EnergyGeometry.argb(c(PLASMA_CORE), 0.95F * alpha), EnergyGeometry.argb(c(PLASMA_CORE), 0.8F * alpha));
+            UltronGeometry.flare(pose, vc, b, 0.34F * flicker, alpha, c(PLASMA_HALO), c(PLASMA_GOLD), c(PLASMA_CORE));
         }
     }
 
@@ -385,18 +426,18 @@ public final class UltronEffects {
         UltronGeometry.Ground ground = UltronGeometry.ground(level, e.at.y);
         float area = e.radius + 0.5F;
         float pulse = 0.5F + 0.5F * Mth.sin(time * 0.8F);
-        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, area, 40, EnergyGeometry.argb(DANGER, 0.10F + 0.06F * pulse),
-                EnergyGeometry.argb(DANGER, 0.22F + 0.08F * pulse));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, area, 0.28F, 48, EnergyGeometry.argb(DANGER, 0.7F));
+        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, area, 40, EnergyGeometry.argb(c(DANGER), 0.10F + 0.06F * pulse),
+                EnergyGeometry.argb(c(DANGER), 0.22F + 0.08F * pulse));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, area, 0.28F, 48, EnergyGeometry.argb(c(DANGER), 0.7F));
         // The timer: from the rim to the middle.
         float shrink = Mth.lerp(AnimMath.ss(0.0F, 1.0F, u), e.radius, 0.4F);
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, shrink, 0.3F, 48, EnergyGeometry.argb(DANGER_GLOW, 0.95F));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, shrink, 0.3F, 48, EnergyGeometry.argb(c(DANGER_GLOW), 0.95F));
         // Eight marks pointing in: the eye reads "leave".
         for (int i = 0; i < 8; i++) {
             double angle = i * Math.PI / 4.0 + time * 0.05;
             UltronGeometry.line(pose, vc, camera, ground, e.at.x + Math.cos(angle) * (area + 0.6), e.at.z + Math.sin(angle) * (area + 0.6),
-                    e.at.x + Math.cos(angle) * (area - 0.2), e.at.z + Math.sin(angle) * (area - 0.2), 0.16F, EnergyGeometry.argb(DANGER_GLOW, 0.0F),
-                    EnergyGeometry.argb(DANGER_GLOW, 0.85F));
+                    e.at.x + Math.cos(angle) * (area - 0.2), e.at.z + Math.sin(angle) * (area - 0.2), 0.16F, EnergyGeometry.argb(c(DANGER_GLOW), 0.0F),
+                    EnergyGeometry.argb(c(DANGER_GLOW), 0.85F));
         }
     }
 
@@ -404,10 +445,10 @@ public final class UltronEffects {
     private static void debrisRing(ClientLevel level, Effect e, float age, float u, float time, Vec3 camera, Matrix4f pose, VertexConsumer vc) {
         UltronGeometry.Ground ground = UltronGeometry.ground(level, e.at.y);
         float pulse = 0.5F + 0.5F * Mth.sin(time * (0.5F + 1.2F * u));
-        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, e.radius, 32, EnergyGeometry.argb(DANGER, 0.06F + 0.1F * u + 0.04F * pulse),
-                EnergyGeometry.argb(DANGER, 0.14F + 0.14F * u));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius, 0.24F, 40, EnergyGeometry.argb(DANGER, 0.55F + 0.35F * pulse));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, Math.max(0.3F, e.radius * u), 0.2F, 32, EnergyGeometry.argb(DANGER_GLOW, 0.85F));
+        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, e.radius, 32, EnergyGeometry.argb(c(DANGER), 0.06F + 0.1F * u + 0.04F * pulse),
+                EnergyGeometry.argb(c(DANGER), 0.14F + 0.14F * u));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius, 0.24F, 40, EnergyGeometry.argb(c(DANGER), 0.55F + 0.35F * pulse));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, Math.max(0.3F, e.radius * u), 0.2F, 32, EnergyGeometry.argb(c(DANGER_GLOW), 0.85F));
     }
 
     /** The Pull's ring of anti-gravity contracts from the edge of his reach to where he stands. */
@@ -416,15 +457,15 @@ public final class UltronEffects {
         float eased = u * u * (3.0F - 2.0F * u);
         float r = Mth.lerp(eased, e.radius, 3.0F);
         float alpha = 0.35F + 0.5F * u;
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r, 0.35F, 64, EnergyGeometry.argb(GRAV_MAIN, alpha));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r + 1.2F, 0.18F, 64, EnergyGeometry.argb(GRAV_FRINGE, alpha * 0.55F));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r + 2.6F, 0.1F, 64, EnergyGeometry.argb(GRAV_FRINGE, alpha * 0.3F));
-        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, 3.0F, 28, EnergyGeometry.argb(GRAV_MAIN, 0.06F + 0.08F * u), EnergyGeometry.argb(GRAV_MAIN, 0.12F + 0.1F * u));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r, 0.35F, 64, EnergyGeometry.argb(c(GRAV_MAIN), alpha));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r + 1.2F, 0.18F, 64, EnergyGeometry.argb(c(GRAV_FRINGE), alpha * 0.55F));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r + 2.6F, 0.1F, 64, EnergyGeometry.argb(c(GRAV_FRINGE), alpha * 0.3F));
+        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, 3.0F, 28, EnergyGeometry.argb(c(GRAV_MAIN), 0.06F + 0.08F * u), EnergyGeometry.argb(c(GRAV_MAIN), 0.12F + 0.1F * u));
         for (int i = 0; i < 6; i++) {
             double angle = i * Math.PI / 3.0 + time * 0.06;
             UltronGeometry.line(pose, vc, camera, ground, e.at.x + Math.cos(angle) * (r + 1.0), e.at.z + Math.sin(angle) * (r + 1.0),
-                    e.at.x + Math.cos(angle) * (r - 0.4), e.at.z + Math.sin(angle) * (r - 0.4), 0.12F, EnergyGeometry.argb(GRAV_CORE, 0.0F),
-                    EnergyGeometry.argb(GRAV_CORE, 0.7F * alpha));
+                    e.at.x + Math.cos(angle) * (r - 0.4), e.at.z + Math.sin(angle) * (r - 0.4), 0.12F, EnergyGeometry.argb(c(GRAV_CORE), 0.0F),
+                    EnergyGeometry.argb(c(GRAV_CORE), 0.7F * alpha));
         }
     }
 
@@ -435,19 +476,19 @@ public final class UltronEffects {
         long seed = e.start * 31L + (long) (e.at.x * 7) + (long) (e.at.z * 13);
         for (int i = 0; i < 6; i++) {
             UltronGeometry.crack(pose, vc, camera, ground, e.at.x, e.at.z, i * Math.PI / 3.0 + (seed % 7) * 0.1, 1.5F * grow, 0.1F,
-                    EnergyGeometry.argb(GRAV_CORE, 0.9F), seed + i);
+                    EnergyGeometry.argb(c(GRAV_CORE), 0.9F), seed + i);
         }
         float pulse = 0.5F + 0.5F * Mth.sin(time * 1.1F);
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, 0.8F + 0.25F * pulse, 0.14F, 24, EnergyGeometry.argb(GRAV_MAIN, 0.4F + 0.5F * u));
-        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, 0.9F, 20, EnergyGeometry.argb(GRAV_MAIN, 0.2F * u), EnergyGeometry.argb(GRAV_MAIN, 0.04F));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, 0.8F + 0.25F * pulse, 0.14F, 24, EnergyGeometry.argb(c(GRAV_MAIN), 0.4F + 0.5F * u));
+        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, 0.9F, 20, EnergyGeometry.argb(c(GRAV_MAIN), 0.2F * u), EnergyGeometry.argb(c(GRAV_MAIN), 0.04F));
         float rise = AnimMath.ss(0.2F, 1.0F, u);
         float height = 6.0F * rise;
-        UltronGeometry.pillar(pose, vc, camera, e.at.x, e.at.y, e.at.z, 0.4F, height, 14, EnergyGeometry.argb(GRAV_FRINGE, 0.35F + 0.4F * u),
-                EnergyGeometry.argb(GRAV_FRINGE, 0.0F));
-        UltronGeometry.pillar(pose, vc, camera, e.at.x, e.at.y, e.at.z, 0.16F, height, 10, EnergyGeometry.argb(GRAV_CORE, 0.45F + 0.5F * u),
-                EnergyGeometry.argb(GRAV_CORE, 0.0F));
+        UltronGeometry.pillar(pose, vc, camera, e.at.x, e.at.y, e.at.z, 0.4F, height, 14, EnergyGeometry.argb(c(GRAV_FRINGE), 0.35F + 0.4F * u),
+                EnergyGeometry.argb(c(GRAV_FRINGE), 0.0F));
+        UltronGeometry.pillar(pose, vc, camera, e.at.x, e.at.y, e.at.z, 0.16F, height, 10, EnergyGeometry.argb(c(GRAV_CORE), 0.45F + 0.5F * u),
+                EnergyGeometry.argb(c(GRAV_CORE), 0.0F));
         if (u > 0.7F) {
-            UltronGeometry.flare(pose, vc, e.at.add(0, 0.4, 0).subtract(camera), 0.9F * (u - 0.7F) / 0.3F, 0.8F, GRAV_FRINGE, GRAV_MAIN, GRAV_CORE);
+            UltronGeometry.flare(pose, vc, e.at.add(0, 0.4, 0).subtract(camera), 0.9F * (u - 0.7F) / 0.3F, 0.8F, c(GRAV_FRINGE), c(GRAV_MAIN), c(GRAV_CORE));
         }
     }
 
@@ -467,11 +508,11 @@ public final class UltronEffects {
         UltronGeometry.Ground ground = UltronGeometry.ground(level, e.at.y);
         float alpha = 0.3F + 0.5F * u;
         int segments = Math.max(48, (int) (e.radius * 5.0F));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius, 0.35F, segments, EnergyGeometry.argb(GRAV_MAIN, alpha));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius - 0.5F, 0.12F, segments, EnergyGeometry.argb(GRAV_CORE, alpha * 0.8F));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius, 0.35F, segments, EnergyGeometry.argb(c(GRAV_MAIN), alpha));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius - 0.5F, 0.12F, segments, EnergyGeometry.argb(c(GRAV_CORE), alpha * 0.8F));
         // A wave of light runs in from the rim every second.
         float wave = (age % 20.0F) / 20.0F;
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius * (1.0F - wave * 0.15F), 0.2F, segments, EnergyGeometry.argb(GRAV_FRINGE, 0.4F * (1.0F - wave)));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, e.radius * (1.0F - wave * 0.15F), 0.2F, segments, EnergyGeometry.argb(c(GRAV_FRINGE), 0.4F * (1.0F - wave)));
     }
 
     // ---- the body ----
@@ -481,7 +522,7 @@ public final class UltronEffects {
         Entity body = level.getEntity(e.entityId);
         Vec3 chest = body == null ? e.at.add(0, 1.5, 0) : chestOf(body, partial);
         float grow = AnimMath.ss(0.3F, 1.0F, u);
-        UltronGeometry.flare(pose, vc, chest.subtract(camera), 0.4F + 3.4F * grow * grow, 0.9F * grow, GRAV_FRINGE, GRAV_MAIN, 0xFFFFFF);
+        UltronGeometry.flare(pose, vc, chest.subtract(camera), 0.4F + 3.4F * grow * grow, 0.9F * grow, c(GRAV_FRINGE), c(GRAV_MAIN), 0xFFFFFF);
     }
 
     /** The eyes flash or the core pulses: a small glow at the chest for a moment. */
@@ -489,7 +530,7 @@ public final class UltronEffects {
         Entity body = e.entityId < 0 ? null : level.getEntity(e.entityId);
         Vec3 chest = body == null ? e.at.add(0, 1.5, 0) : chestOf(body, partial);
         float beat = Mth.sin(u * Mth.PI);
-        UltronGeometry.flare(pose, vc, chest.subtract(camera), 0.5F + 0.9F * beat, 0.8F * beat, PLASMA_EDGE, 0xFF8A5C, 0xFFFFFF);
+        UltronGeometry.flare(pose, vc, chest.subtract(camera), 0.5F + 0.9F * beat, 0.8F * beat, c(PLASMA_EDGE), 0xFF8A5C, 0xFFFFFF);
     }
 
     /** The middle of the chest of a body, tracked if it was just drawn. */
@@ -537,18 +578,18 @@ public final class UltronEffects {
             return;
         }
         float life = Mth.clamp(Math.min(age / 3.0F, (ticks - age) / 4.0F), 0.0F, 1.0F) * strength;
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.03F, 0.03F, EnergyGeometry.argb(NET_DARK, 0.3F * life), EnergyGeometry.argb(NET_DARK, 0.3F * life));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.03F, 0.03F, EnergyGeometry.argb(c(NET_DARK), 0.3F * life), EnergyGeometry.argb(c(NET_DARK), 0.3F * life));
         int count = Mth.clamp((int) (length * 1.6), 6, 42);
         for (int i = 0; i < count; i++) {
             float t = ((i + 0.5F) / count + time * 0.07F + (i % 3) * 0.013F) % 1.0F;
             Vec3 p = a.lerp(b, t);
-            int colour = i % 3 == 0 ? NET_RED : NET_WHITE;
+            int colour = i % 3 == 0 ? c(NET_RED) : c(NET_WHITE);
             UltronGeometry.square(pose, vc, p, i % 4 == 0 ? 0.2F : 0.12F, EnergyGeometry.argb(colour, 0.9F * life));
             if (i % 5 == 0) {
                 // A scanline streak across the line.
                 Vec3 side = b.subtract(a).cross(p).normalize().scale(0.35);
-                EnergyGeometry.ribbon(pose, vc, p.subtract(side), p.add(side), 0.012F, 0.012F, EnergyGeometry.argb(i % 2 == 0 ? NET_RED : NET_DARK, 0.7F * life),
-                        EnergyGeometry.argb(i % 2 == 0 ? NET_RED : NET_DARK, 0.7F * life));
+                EnergyGeometry.ribbon(pose, vc, p.subtract(side), p.add(side), 0.012F, 0.012F, EnergyGeometry.argb(i % 2 == 0 ? c(NET_RED) : c(NET_DARK), 0.7F * life),
+                        EnergyGeometry.argb(i % 2 == 0 ? c(NET_RED) : c(NET_DARK), 0.7F * life));
             }
         }
     }
@@ -561,9 +602,9 @@ public final class UltronEffects {
         float eased = 1.0F - (1.0F - u) * (1.0F - u);
         float r = Math.max(0.4F, e.radius * eased);
         float fade = 1.0F - u * u;
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r, 0.5F, 56, EnergyGeometry.argb(GRAV_MAIN, 0.85F * fade));
-        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r * 0.7F, 0.3F, 48, EnergyGeometry.argb(GRAV_FRINGE, 0.5F * fade));
-        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, r, 32, EnergyGeometry.argb(GRAV_CORE, 0.18F * fade), EnergyGeometry.argb(GRAV_MAIN, 0.04F * fade));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r, 0.5F, 56, EnergyGeometry.argb(c(GRAV_MAIN), 0.85F * fade));
+        UltronGeometry.ring(pose, vc, camera, ground, e.at.x, e.at.z, r * 0.7F, 0.3F, 48, EnergyGeometry.argb(c(GRAV_FRINGE), 0.5F * fade));
+        UltronGeometry.disc(pose, vc, camera, ground, e.at.x, e.at.z, r, 32, EnergyGeometry.argb(c(GRAV_CORE), 0.18F * fade), EnergyGeometry.argb(c(GRAV_MAIN), 0.04F * fade));
     }
 
     /** Gravity Pull: the target is wrapped in a contracting ring, and dashes of pale blue run from it to his palm. */
@@ -573,14 +614,14 @@ public final class UltronEffects {
         float fade = 1.0F - u * 0.6F;
         for (int i = -1; i <= 1; i++) {
             Vec3 offset = new Vec3(0, 0.12 * i, 0);
-            UltronGeometry.dotted(pose, vc, target.add(offset), palm.add(offset), 0.07F, 0.3F, -time * 0.6F + i * 0.3F, EnergyGeometry.argb(GRAV_MAIN, 0.9F * fade));
+            UltronGeometry.dotted(pose, vc, target.add(offset), palm.add(offset), 0.07F, 0.3F, -time * 0.6F + i * 0.3F, EnergyGeometry.argb(c(GRAV_MAIN), 0.9F * fade));
         }
-        EnergyGeometry.ribbon(pose, vc, target, palm, 0.03F, 0.03F, EnergyGeometry.argb(GRAV_FRINGE, 0.35F * fade), EnergyGeometry.argb(GRAV_CORE, 0.55F * fade));
+        EnergyGeometry.ribbon(pose, vc, target, palm, 0.03F, 0.03F, EnergyGeometry.argb(c(GRAV_FRINGE), 0.35F * fade), EnergyGeometry.argb(c(GRAV_CORE), 0.55F * fade));
         Vec3 direction = palm.subtract(target);
         float r = Mth.lerp(u, 1.3F, 0.3F);
-        EnergyGeometry.ring(pose, vc, target, direction, r, 0.12F, 20, EnergyGeometry.argb(GRAV_MAIN, 0.8F * fade));
-        EnergyGeometry.ring(pose, vc, target, direction, r * 1.5F, 0.08F, 20, EnergyGeometry.argb(GRAV_FRINGE, 0.5F * fade));
-        UltronGeometry.flare(pose, vc, palm, 0.28F * (1.0F - u), 0.9F, GRAV_FRINGE, GRAV_MAIN, GRAV_CORE);
+        EnergyGeometry.ring(pose, vc, target, direction, r, 0.12F, 20, EnergyGeometry.argb(c(GRAV_MAIN), 0.8F * fade));
+        EnergyGeometry.ring(pose, vc, target, direction, r * 1.5F, 0.08F, 20, EnergyGeometry.argb(c(GRAV_FRINGE), 0.5F * fade));
+        UltronGeometry.flare(pose, vc, palm, 0.28F * (1.0F - u), 0.9F, c(GRAV_FRINGE), c(GRAV_MAIN), c(GRAV_CORE));
     }
 
     /** The heavy blast leaves the palm: a flash of white-orange and a short spray of streaks along the line of fire. */
@@ -589,13 +630,13 @@ public final class UltronEffects {
         float fade = 1.0F - u;
         // (Seen from the palm itself, in the caster's own first person, the flash would fill the screen: it shrinks with how near the eye is.)
         float near = Mth.clamp((float) palm.length() / 3.0F, 0.2F, 1.0F);
-        UltronGeometry.flare(pose, vc, palm, e.radius * near * (0.4F + 0.6F * u), fade * (0.5F + 0.5F * near), PLASMA_HALO, PLASMA_GOLD, 0xFFFFFF);
+        UltronGeometry.flare(pose, vc, palm, e.radius * near * (0.4F + 0.6F * u), fade * (0.5F + 0.5F * near), c(PLASMA_HALO), c(PLASMA_GOLD), 0xFFFFFF);
         Vec3 dir = e.to.normalize();
         for (int i = 0; i < 5; i++) {
             RandomSource random = RandomSource.create(i * 977L + (long) (e.at.x * 13));
             Vec3 spread = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5).scale(0.5);
             Vec3 end = palm.add(dir.add(spread).normalize().scale(1.5 + 2.5 * u));
-            EnergyGeometry.ribbon(pose, vc, palm, end, 0.1F * fade, 0.02F, EnergyGeometry.argb(PLASMA_GOLD, 0.8F * fade), EnergyGeometry.argb(PLASMA_HALO, 0.0F));
+            EnergyGeometry.ribbon(pose, vc, palm, end, 0.1F * fade, 0.02F, EnergyGeometry.argb(c(PLASMA_GOLD), 0.8F * fade), EnergyGeometry.argb(c(PLASMA_HALO), 0.0F));
         }
     }
 
@@ -607,21 +648,21 @@ public final class UltronEffects {
         for (int i = 0; i < 16; i++) {
             Vec3 dir = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.4, random.nextDouble() - 0.5).normalize();
             double reach = e.radius * (0.5 + 0.5 * random.nextDouble()) * (0.2 + 0.8 * u);
-            UltronGeometry.square(pose, vc, centre.add(dir.scale(reach)), 0.16F * fade + 0.04F, EnergyGeometry.argb(i % 3 == 0 ? NET_RED : NET_WHITE, 0.95F * fade));
+            UltronGeometry.square(pose, vc, centre.add(dir.scale(reach)), 0.16F * fade + 0.04F, EnergyGeometry.argb(i % 3 == 0 ? c(NET_RED) : c(NET_WHITE), 0.95F * fade));
         }
         for (int i = 0; i < 4; i++) {
             double y = (i - 1.5) * 0.28 * e.radius * 0.5;
             Vec3 side = new Vec3(1, 0, 0);
             Vec3 a = centre.add(0, y, 0).subtract(side.scale(e.radius * 0.9));
             Vec3 b = centre.add(0, y, 0).add(side.scale(e.radius * 0.9));
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.015F, 0.015F, EnergyGeometry.argb(i % 2 == 0 ? NET_RED : NET_DARK, 0.8F * fade), EnergyGeometry.argb(i % 2 == 0 ? NET_RED : NET_DARK, 0.0F));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.015F, 0.015F, EnergyGeometry.argb(i % 2 == 0 ? c(NET_RED) : c(NET_DARK), 0.8F * fade), EnergyGeometry.argb(i % 2 == 0 ? c(NET_RED) : c(NET_DARK), 0.0F));
         }
-        UltronGeometry.flare(pose, vc, centre, e.radius * 0.5F * fade, 0.7F, NET_DARK, NET_RED, NET_WHITE);
+        UltronGeometry.flare(pose, vc, centre, e.radius * 0.5F * fade, 0.7F, c(NET_DARK), c(NET_RED), c(NET_WHITE));
     }
 
     /** A drone forms: a Sentry's silhouette built from the feet up, blue turning red as it is finished. */
     private static void droneAssemble(ClientLevel level, Effect e, float u, Vec3 camera, Matrix4f pose, VertexConsumer vc) {
-        int colour = blend(0x45B4F5, NET_RED, u);
+        int colour = blend(0x45B4F5, c(NET_RED), u);
         UltronGeometry.silhouette(pose, vc, e.at.subtract(camera), 1.7F, 0.0F, Math.min(1.0F, u * 1.2F), EnergyGeometry.argb(colour, 0.3F * (1.0F - u * 0.5F)));
     }
 
@@ -633,7 +674,7 @@ public final class UltronEffects {
         // A gentle curve through the middle, drawn as two lines.
         dataLine(a, mid, e.ticks, age, time, camera, pose, vc, 0.8F + 0.2F * u);
         dataLine(mid, b, e.ticks, age, time + 5.0F, camera, pose, vc, 0.8F + 0.2F * u);
-        UltronGeometry.flare(pose, vc, a.subtract(camera), 0.3F, 0.7F, NET_DARK, NET_RED, NET_WHITE);
+        UltronGeometry.flare(pose, vc, a.subtract(camera), 0.3F, 0.7F, c(NET_DARK), c(NET_RED), c(NET_WHITE));
     }
 
     /** A pale ring of anti-gravity round the creature the drones are sent at, or round him as they gather. */
@@ -641,11 +682,11 @@ public final class UltronEffects {
         Vec3 centre = e.at.subtract(camera);
         float r = Mth.lerp(u, e.radius * 1.6F, e.radius * 0.7F);
         float fade = 1.0F - u * u;
-        EnergyGeometry.ring(pose, vc, centre, new Vec3(0, 1, 0), r, 0.1F, 24, EnergyGeometry.argb(GRAV_MAIN, 0.9F * fade));
-        EnergyGeometry.ring(pose, vc, centre, new Vec3(0, 1, 0), r * 1.4F, 0.06F, 24, EnergyGeometry.argb(GRAV_FRINGE, 0.5F * fade));
+        EnergyGeometry.ring(pose, vc, centre, new Vec3(0, 1, 0), r, 0.1F, 24, EnergyGeometry.argb(c(GRAV_MAIN), 0.9F * fade));
+        EnergyGeometry.ring(pose, vc, centre, new Vec3(0, 1, 0), r * 1.4F, 0.06F, 24, EnergyGeometry.argb(c(GRAV_FRINGE), 0.5F * fade));
         for (int i = 0; i < 4; i++) {
             double angle = i * Math.PI / 2.0 + age * 0.4;
-            UltronGeometry.square(pose, vc, centre.add(Math.cos(angle) * r, 0.0, Math.sin(angle) * r), 0.12F, EnergyGeometry.argb(GRAV_CORE, 0.9F * fade));
+            UltronGeometry.square(pose, vc, centre.add(Math.cos(angle) * r, 0.0, Math.sin(angle) * r), 0.12F, EnergyGeometry.argb(c(GRAV_CORE), 0.9F * fade));
         }
     }
 

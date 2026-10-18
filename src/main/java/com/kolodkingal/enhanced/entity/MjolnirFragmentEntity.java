@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.entity;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -99,7 +101,8 @@ public class MjolnirFragmentEntity extends Projectile {
                         getZ() + (random.nextDouble() - 0.5) * 0.2, 0, 0, 0);
             }
             if (random.nextInt(3) == 0) {
-                level().addParticle(new EnergyParticleOptions(random.nextBoolean() ? Power.THOR.color : Power.THOR.glow, 0.7F), getX(), getY(), getZ(), 0, 0, 0);
+                level().addParticle(new EnergyParticleOptions(AbilityColors.shade(getOwner(), HeroAbility.THOR_SHATTER,
+                        random.nextBoolean() ? Power.THOR.color : Power.THOR.glow), 0.7F), getX(), getY(), getZ(), 0, 0, 0);
             }
             return;
         }
@@ -172,7 +175,8 @@ public class MjolnirFragmentEntity extends Projectile {
         }
         level.playSound(null, getX(), getY(), getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.8F, 1.35F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY(), getZ(), 14, 0.15, 0.15, 0.15, 0.3);
-        level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.2F), getX(), getY(), getZ(), 6, 0.1, 0.1, 0.1, 0.12);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(getOwner(), HeroAbility.THOR_SHATTER, Power.THOR.glow), 1.2F), getX(), getY(), getZ(),
+                6, 0.1, 0.1, 0.1, 0.12);
     }
 
     /** Home: a spark, and the fragment is part of the hammer again. */

@@ -44,5 +44,8 @@ public enum Resource {
     /** Odin's thrown Gungnir: the one spear entity of the player ({@code Live.ODIN_THROWN}). */
     GUNGNIR,
     /** Hela's allies: the berserkers and Fenris she raised (one list per player). */
-    UNDEAD
+    UNDEAD,
+    // (3.5, the creator lane) ----
+    /** Build Magic (the Y key, its mode and its numbers): Billy's or the Scarlet Witch's, one of the two. */
+    BUILD
 }

@@ -2,7 +2,6 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpeedConfig;
-import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
@@ -79,8 +78,7 @@ public final class SpeedSurfaces {
         if (data.power() != Power.CUSTOM || kit == null || !kit.has(HeroAbility.TOMMY_TIME)) {
             return false;
         }
-        CustomHero.Pick pick = kit.hero().pick(HeroAbility.TOMMY_TIME);
-        return pick != null && !HeroAbility.MAIN.equals(pick.option());
+        return kit.hasVariant(HeroAbility.TOMMY_TIME); // (3.5: or Tommy's Wall Run picked as a card of its own)
     }
 
     /** Whether his toggle for running on walls is on: Quicksilver's Wall &amp; Water Run, Tommy's Wall Run. */

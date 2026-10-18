@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.AgathaConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
@@ -391,6 +392,8 @@ public final class AgathaAbilities {
         if (DarkholdBook.hexOrGlimpse(player)) {
             CASTING_UNTIL.put(player.getUUID(), player.level().getGameTime() + CAST_TICKS);
             data.set(Live.CASTING, true);
+            AbilityColors.mark(player,
+                    HeroAbility.AGATHA_HEX_MARK); // (3.5: the mark's own colour, when one was chosen)
         }
     }
 
@@ -499,7 +502,9 @@ public final class AgathaAbilities {
         data.startCooldown(HeroAbility.AGATHA_DRAIN, now, AgathaConfig.DRAIN_COOLDOWN.get());
         pay(player, AgathaConfig.DRAIN_EXHAUSTION.get());
         Vec3 at = target.position().add(0, target.getBbHeight() * 0.6, 0);
-        level.sendParticles(new EnergyParticleOptions(VIOLET, 1.2F), at.x, at.y, at.z, 14, 0.3, 0.4, 0.3, 0.04);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.AGATHA_DRAIN, VIOLET),
+                1.2F), at.x, at.y, at.z, 14,
+                0.3, 0.4, 0.3, 0.04);
         level.playSound(null, at.x, at.y, at.z, ModSounds.AGATHA_DRAIN.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         send(level, new AgathaFxPayload(AgathaFxPayload.DRAIN, player.getId(), at, target.getId(), DRAIN_STREAM_TICKS, power ? 1 : 0));
     }

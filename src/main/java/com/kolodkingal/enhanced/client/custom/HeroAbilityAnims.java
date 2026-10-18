@@ -201,6 +201,26 @@ public final class HeroAbilityAnims {
         row(HeroAbility.HELA_ARMY);
         row(HeroAbility.HELA_GRASP);
         row(HeroAbility.HELA_BODY);
+        // ===== variants (3.5, the creator lane) =====
+        // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own
+        // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's
+        // moves.)
+        row(HeroAbility.WANDA_BUILD_MAGIC);
+        for (HeroAbility a : HeroAbility.values()) {
+            HeroAbility parent = a.parent();
+            if (parent == null || ROWS.containsKey(a)) {
+                continue;
+            }
+            Row of = ROWS.get(parent);
+            Builder b = row(a);
+            if (of != null) {
+                if (of.alt != null && of.altCd) {
+                    b.mainCd(of.alt);
+                }
+                b.row.gestures.addAll(of.gestures);
+                b.row.stances.addAll(of.stances);
+            }
+        }
 
         // Who owns each synced bit (the first of the kit's rows in this order; the cast marker settles a shared one).
         live(Live.SPEEDING, HeroAbility.QUICKSILVER_SPEED, HeroAbility.QUICKSILVER_TIME, HeroAbility.TOMMY_SPEED);

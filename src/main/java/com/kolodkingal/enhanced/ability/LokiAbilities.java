@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
@@ -283,6 +284,7 @@ public final class LokiAbilities {
         float damage = EnhancedConfig.LOKI_DAGGER_DAMAGE.get().floatValue();
         for (float spread : fan ? new float[]{-FAN_ANGLE, 0.0F, FAN_ANGLE} : new float[]{0.0F}) {
             LokiDaggerEntity dagger = new LokiDaggerEntity(level, player, damage);
+            dagger.tint(AbilityColors.chosen(player, fan ? HeroAbility.LOKI_DAGGER_FAN : HeroAbility.LOKI_DAGGERS));
             dagger.shootFromRotation(player, player.getXRot(), player.getYRot() + spread, 0.0F, DAGGER_SPEED, 0.5F);
             level.addFreshEntity(dagger);
         }
@@ -317,7 +319,8 @@ public final class LokiAbilities {
             }
             copies.add(LokiIllusionEntity.conjure(player, at, player.position().add(dir.scale(DECOY_WALK)),
                     LokiIllusionEntity.Mode.DECOY, DUPLICATE_TICKS));
-            level.sendParticles(new EnergyParticleOptions(LokiIllusionEntity.LIGHT_COLOR, 1.2F), at.x, at.y + 1.0, at.z, 12, 0.25, 0.6, 0.25, 0.02);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.LOKI_DUPLICATES, LokiIllusionEntity.LIGHT_COLOR), 1.2F),
+                    at.x, at.y + 1.0, at.z, 12, 0.25, 0.6, 0.25, 0.02);
         }
 
         player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, HIDE_TICKS, 0, false, false, true), player);
@@ -393,10 +396,10 @@ public final class LokiAbilities {
     private static void shimmer(ServerPlayer player, PowerData data) {
         Variant look = Powers.variant(player);
         ServerLevel level = player.serverLevel();
-        level.sendParticles(new EnergyParticleOptions(look.color(), 1.6F), player.getX(), player.getY() + 1.0, player.getZ(),
-                60, 0.35, 0.8, 0.35, 0.03);
-        level.sendParticles(new EnergyParticleOptions(look.glow(), 1.2F), player.getX(), player.getY() + 1.0, player.getZ(),
-                24, 0.3, 0.7, 0.3, 0.06);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.LOKI_SHAPESHIFT, look.color()), 1.6F), player.getX(),
+                player.getY() + 1.0, player.getZ(), 60, 0.35, 0.8, 0.35, 0.03);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.glow(player, HeroAbility.LOKI_SHAPESHIFT, look.glow()), 1.2F), player.getX(),
+                player.getY() + 1.0, player.getZ(), 24, 0.3, 0.7, 0.3, 0.06);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.LOKI_SHAPESHIFT.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
         gesture(player, data, Live.CASTING, GESTURE_TICKS);
     }
@@ -445,20 +448,23 @@ public final class LokiAbilities {
         }
         data.startCooldown(HeroAbility.LOKI_VANISH, now, VANISH_COOLDOWN);
         Variant look = Powers.variant(player);
+        // (3.5: the flash in the colour its pick chose.)
+        int color = AbilityColors.color(player, HeroAbility.LOKI_VANISH, look.color());
+        int glow = AbilityColors.glow(player, HeroAbility.LOKI_VANISH, look.glow());
         Vec3 from = player.position();
-        vanishFlash(level, from, look);
+        vanishFlash(level, from, color, glow);
         level.playSound(null, from.x, from.y, from.z, ModSounds.LOKI_VANISH.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         player.teleportTo(level, to.x, to.y, to.z, yaw, pitch);
         player.setYHeadRot(yaw);
         player.resetFallDistance();
-        vanishFlash(level, to, look);
+        vanishFlash(level, to, color, glow);
         level.playSound(null, to.x, to.y, to.z, ModSounds.LOKI_VANISH.get(), SoundSource.PLAYERS, 1.0F, 1.2F);
         gesture(player, data, Live.CASTING, GESTURE_TICKS);
     }
 
-    private static void vanishFlash(ServerLevel level, Vec3 at, Variant look) {
-        level.sendParticles(new EnergyParticleOptions(look.color(), 1.8F), at.x, at.y + 1.0, at.z, 36, 0.3, 0.7, 0.3, 0.08);
-        level.sendParticles(new EnergyParticleOptions(look.glow(), 2.4F), at.x, at.y + 1.0, at.z, 10, 0.1, 0.3, 0.1, 0.02);
+    private static void vanishFlash(ServerLevel level, Vec3 at, int color, int glow) {
+        level.sendParticles(new EnergyParticleOptions(color, 1.8F), at.x, at.y + 1.0, at.z, 36, 0.3, 0.7, 0.3, 0.08);
+        level.sendParticles(new EnergyParticleOptions(glow, 2.4F), at.x, at.y + 1.0, at.z, 10, 0.1, 0.3, 0.1, 0.02);
     }
 
     // ---- Ability 5: Frost Giant ----
@@ -470,10 +476,10 @@ public final class LokiAbilities {
         applyForm(player, data);
         ServerLevel level = player.serverLevel();
         Variant look = Powers.variant(player);
-        level.sendParticles(new EnergyParticleOptions(frost ? FROST_COLOR : look.color(), 1.5F), player.getX(), player.getY() + 1.0, player.getZ(),
-                50, 0.35, 0.8, 0.35, 0.03);
-        level.sendParticles(new EnergyParticleOptions(frost ? FROST_GLOW : look.glow(), 1.2F), player.getX(), player.getY() + 1.0, player.getZ(),
-                20, 0.3, 0.7, 0.3, 0.05);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.LOKI_FROST_GIANT, frost ? FROST_COLOR : look.color()), 1.5F),
+                player.getX(), player.getY() + 1.0, player.getZ(), 50, 0.35, 0.8, 0.35, 0.03);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.LOKI_FROST_GIANT, frost ? FROST_GLOW : look.glow()), 1.2F),
+                player.getX(), player.getY() + 1.0, player.getZ(), 20, 0.3, 0.7, 0.3, 0.05);
         if (frost) {
             level.sendParticles(ParticleTypes.SNOWFLAKE, player.getX(), player.getY() + 1.0, player.getZ(), 30, 0.4, 0.8, 0.4, 0.02);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.FROST_GIANT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -521,7 +527,8 @@ public final class LokiAbilities {
         ServerLevel level = player.serverLevel();
         level.sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getY() + target.getBbHeight() * 0.6, target.getZ(),
                 20, target.getBbWidth() * 0.4, target.getBbHeight() * 0.3, target.getBbWidth() * 0.4, 0.03);
-        level.sendParticles(new EnergyParticleOptions(FROST_GLOW, 1.2F), target.getX(), target.getY() + target.getBbHeight() * 0.6,
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.LOKI_FROST_GIANT, FROST_GLOW), 1.2F), target.getX(),
+                target.getY() + target.getBbHeight() * 0.6,
                 target.getZ(), 10, target.getBbWidth() * 0.3, target.getBbHeight() * 0.3, target.getBbWidth() * 0.3, 0.02);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.PLAYER_HURT_FREEZE, SoundSource.PLAYERS, 0.8F, 1.2F);
     }

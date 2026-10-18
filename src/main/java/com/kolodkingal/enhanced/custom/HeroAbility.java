@@ -81,7 +81,7 @@ public enum HeroAbility implements CatalogEntry {
             .fixed().traits(Trait.SORCERER, Trait.TELEPATH_STRONG).family(Family.MIND).on(d -> d.toggle(Toggle.THE_NOISE))),
     /** Billy's Build Magic: the sixth key (Y) and its wheel, with Billy's rules (the meter, no Instant). */
     BILLY_BUILD_MAGIC(Power.BILLY, 6, "build_magic", press().cost(2).group(Group.ELEMENT).icon("minecraft:bricks")
-            .fixed().traits(Trait.SORCERER, Trait.TELEPATH_STRONG)),
+            .fixed().res(Resource.BUILD).traits(Trait.SORCERER, Trait.TELEPATH_STRONG)),
 
     // ===== tommy =====
     TOMMY_TIME(Power.TOMMY, 1, "time", toggle().alt(Act.TOGGLE).cost(3).group(Group.MOVE).icon("minecraft:clock")
@@ -238,7 +238,67 @@ public enum HeroAbility implements CatalogEntry {
     HELA_GRASP(Power.HELA, 5, "grasp", hold().cost(2).group(Group.ENERGY).icon("minecraft:crying_obsidian")
             .traits(Trait.DARK_MAGIC).on(d -> d.is(Live.HELA_GRASPING))),
     HELA_BODY(Power.HELA, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:netherite_helmet")
-            .traits(Trait.DARK_MAGIC).family(Family.BODY));
+            .traits(Trait.DARK_MAGIC).family(Family.BODY)),
+
+    // ===== variants (3.5, the creator lane) =====
+    // Every Sneak variant of a built-in hero's key as a card of its own (the user: "all abilities listed, like Billy's
+    // shield"). A variant row is its parent's Sneak half: picked alone it sits on any key (plain or Sneak) and presses
+    // the parent's key with the variant (HeroKit binds it as the parent's ALT), so nothing of the hero is copied; the
+    // kit counts the parent as had ({@link HeroKit#has}) so the hero's code runs for it. Picked with its parent, the
+    // parent keeps its main action only (the rules). A variant that only undoes or steers what its parent made needs
+    // the parent.
+    MAGNETO_MAGNETIC_PULL(MAGNETO_METAL, "magnetic_pull", variant(MAGNETO_METAL).icon("minecraft:lodestone")),
+    WANDA_HEX_DISSOLVE(WANDA_HEX, "hex_dissolve", variant(WANDA_HEX).icon("minecraft:glass").requires("wanda.hex")),
+    // (Not a variant: the Scarlet Witch's own Build Magic, with her numbers and her Instant switch, beside Billy's.)
+    WANDA_BUILD_MAGIC(Power.SCARLET_WITCH, 6, "build_magic",
+            press().cost(2).group(Group.ELEMENT).icon("minecraft:quartz_bricks")
+            .fixed().res(Resource.BUILD).traits(Trait.SORCERER, Trait.TELEPATH_STRONG)),
+    QUICKSILVER_WALKMAN(QUICKSILVER_TIME, "walkman", variant(QUICKSILVER_TIME).icon("minecraft:music_disc_cat")
+            .requires("quicksilver.time").on(PowerData::walkman)),
+    QUICKSILVER_DASH(QUICKSILVER_SPEED, "dash", variant(QUICKSILVER_SPEED).icon("minecraft:feather")),
+    QUICKSILVER_PICKPOCKET(QUICKSILVER_BLITZ, "pickpocket", variant(QUICKSILVER_BLITZ).icon("minecraft:bundle")),
+    BILLY_HEX_BARRIER(BILLY_FREEZE, "hex_barrier", variant(BILLY_FREEZE).icon("minecraft:light_blue_stained_glass")
+            .family(Family.SHIELD).on(PowerData::chaosShieldActive)),
+    TOMMY_WALL_RUN(TOMMY_TIME, "wall_run", variant(TOMMY_TIME).icon("minecraft:chainmail_boots")
+            .requires("tommy.speed", "quicksilver.speed", "tommy.time", "quicksilver.time").on(d
+                    -> !d.toggle(Toggle.TOMMY_WALL_RUN_OFF))),
+    TOMMY_DASH(TOMMY_SPEED, "dash", variant(TOMMY_SPEED).icon("minecraft:wind_charge")),
+    TOMMY_SONIC_BOOM(TOMMY_WHIRLWIND, "sonic_boom", variant(TOMMY_WHIRLWIND).icon("minecraft:firework_rocket")
+            .on(d -> d.is(Live.SONIC_BOOM))),
+    TOMMY_DISARM_BLITZ(TOMMY_VIBRATE, "disarm_blitz", variant(TOMMY_VIBRATE).icon("minecraft:golden_sword")),
+    LOKI_DAGGER_FAN(LOKI_DAGGERS, "dagger_fan", variant(LOKI_DAGGERS).icon("minecraft:golden_sword")),
+    THOR_SHATTER(THOR_HAMMER, "shatter", variant(THOR_HAMMER).icon("minecraft:heavy_core")),
+    THOR_BIFROST_LOOK(THOR_BIFROST, "bifrost_look", variant(THOR_BIFROST).icon("minecraft:spyglass")),
+    PHOENIX_MIND_SENSE(PHOENIX_MIND, "mind_sense", variant(PHOENIX_MIND).icon("minecraft:sculk_sensor")
+            .on(d -> d.is(Live.MIND_SENSING))),
+    PHOENIX_PSIONIC_FIELD(PHOENIX_CONTROL, "psionic_field", variant(PHOENIX_CONTROL).icon("minecraft:fire_charge")
+            .on(d -> d.is(Live.PHOENIX_PSIONIC))),
+    SPIDER_WEB_BURST(SPIDER_WEB, "web_burst", variant(SPIDER_WEB).icon("minecraft:white_wool")),
+    SPIDER_WEB_SWING(SPIDER_ZIP, "web_swing", variant(SPIDER_ZIP).icon("minecraft:lead").on(d -> d.is(Live.SWINGING))),
+    SPIDER_SENSE(SPIDER_CRAWL, "sense", variant(SPIDER_CRAWL).icon("minecraft:bell").family(Family.MIND)
+            .on(d -> d.toggle(Toggle.SPIDER_SENSE))),
+    SPIDER_INSTANT_KILL(SPIDER_LEGS, "instant_kill", variant(SPIDER_LEGS).icon("minecraft:iron_sword")
+            .requires("spider.legs").on(d -> d.is(Live.INSTANT_KILL))),
+    THANOS_TITAN_SLAM(THANOS_POWER, "titan_slam", variant(THANOS_POWER).icon("minecraft:mace")),
+    THANOS_SPACE_PULL(THANOS_SPACE, "space_pull", variant(THANOS_SPACE).icon("minecraft:fishing_rod")),
+    THANOS_REALITY_VEIL(THANOS_REALITY, "reality_veil", variant(THANOS_REALITY).icon("minecraft:red_stained_glass")
+            .on(d -> d.toggle(Toggle.REALITY_VEIL))),
+    THANOS_SOUL_SIGHT(THANOS_SOUL, "soul_sight", variant(THANOS_SOUL).icon("minecraft:ender_eye").on(d
+            -> d.is(Live.SOUL_SIGHT))),
+    THANOS_TIME_LOCK(THANOS_TIME, "time_lock", variant(THANOS_TIME).icon("minecraft:clock")),
+    ULTRON_OVERCHARGE(ULTRON_REPULSOR, "overcharge", variant(ULTRON_REPULSOR).icon("minecraft:redstone_block")
+            .on(d -> d.is(Live.ULTRON_CHARGING))),
+    ULTRON_SLAM(ULTRON_GRAVITY, "slam", variant(ULTRON_GRAVITY).icon("minecraft:anvil")),
+    ULTRON_HACK(ULTRON_UPLOAD, "hack", variant(ULTRON_UPLOAD).icon("minecraft:repeater")),
+    ULTRON_COMMAND(ULTRON_ARMY, "command", variant(ULTRON_ARMY).icon("minecraft:target").requires("ultron.army")),
+    APOCALYPSE_ENTOMB(APOCALYPSE_SAND, "entomb", variant(APOCALYPSE_SAND).icon("minecraft:sandstone")),
+    APOCALYPSE_SANDSTORM(APOCALYPSE_BESTOW, "sandstorm", variant(APOCALYPSE_BESTOW).icon("minecraft:suspicious_sand")
+            .on(d -> d.is(Live.SANDSTORM))),
+    AGATHA_HEX_MARK(AGATHA_PURPLE_BEAM, "hex_mark", variant(AGATHA_PURPLE_BEAM).icon("minecraft:purple_dye")),
+    CYCLOPS_RICOCHET(CYCLOPS_OPTIC_BLAST, "ricochet",
+            variant(CYCLOPS_OPTIC_BLAST).icon("minecraft:prismarine_crystals")),
+    CYCLOPS_OPEN_EYES(CYCLOPS_GLASSES, "open_eyes", variant(CYCLOPS_GLASSES).icon("minecraft:red_stained_glass")
+            .family(Family.BEAM).requires("cyclops.glasses").on(d -> d.is(Live.CYCLOPS_UNLEASHED)));
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {
@@ -291,6 +351,14 @@ public enum HeroAbility implements CatalogEntry {
     private final Predicate<PowerData> on;
     @Nullable
     private final Family family;
+    /** 3.5: the row whose Sneak variant this row is, or null for a row of its own. */
+    @Nullable
+    private final HeroAbility parent;
+
+    /** A variant row (3.5): its parent's Sneak half, on its parent's hero and key. */
+    HeroAbility(HeroAbility parent, String name, Spec spec) {
+        this(parent.hero, parent.home, name, spec.parent(parent));
+    }
 
     HeroAbility(Power hero, int home, String name, Spec spec) {
         this.hero = hero;
@@ -312,6 +380,7 @@ public enum HeroAbility implements CatalogEntry {
         this.requires = List.copyOf(spec.requires);
         this.on = spec.on;
         this.family = spec.family;
+        this.parent = spec.parent;
     }
 
     // ---- CatalogEntry ----
@@ -454,6 +523,42 @@ public enum HeroAbility implements CatalogEntry {
         return on != null;
     }
 
+    /**
+     * 3.5: the row whose Sneak variant this row is (Billy's Hex Barrier is {@link #BILLY_FREEZE}'s), or null. A custom
+     * hero who picks it has its parent's code run for it: its key presses the parent's with the variant.
+     */
+    @Nullable
+    public HeroAbility parent() {
+        return parent;
+    }
+
+    /** 3.5: whether it is a Sneak variant with a card of its own ({@link #parent}). */
+    public boolean isVariant() {
+        return parent != null;
+    }
+
+    /** 3.5: the variant row of a row with a Sneak variant, or null (its variant has no card, or it has none). */
+    @Nullable
+    public HeroAbility variant() {
+        return Variants.OF.get(this);
+    }
+
+    /** The variant row of each parent (built once, after the table). */
+    private static final class Variants {
+        static final java.util.Map<HeroAbility, HeroAbility> OF = new java.util.EnumMap<>(HeroAbility.class);
+
+        static {
+            for (HeroAbility a : values()) {
+                if (a.parent != null) {
+                    OF.put(a.parent, a);
+                }
+            }
+        }
+
+        private Variants() {
+        }
+    }
+
     // ---- lookup ----
 
     /** The row of this id ({@code thor.lightning}, any case), or null. */
@@ -511,6 +616,20 @@ public enum HeroAbility implements CatalogEntry {
         return new Spec(PowerModule.Act.NONE);
     }
 
+    /**
+     * A variant row's data (3.5): it acts as its parent's Sneak variant acts, costs as its parent, scales as it, gives
+     * its roles, is world-scale if it is, and holds every resource its parent holds (the parent's code runs for it).
+     */
+    private static Spec variant(HeroAbility parent) {
+        Spec spec = new Spec(parent.alt).cost(parent.costPerPoint).group(parent.group).icon(parent.icon);
+        spec.resources.addAll(parent.resources);
+        spec.resources.addAll(parent.altResources);
+        spec.traits.addAll(parent.traits);
+        spec.scales = parent.scales.isEmpty() ? EnumSet.noneOf(Scales.class) : EnumSet.copyOf(parent.scales);
+        spec.world = parent.world;
+        return spec;
+    }
+
     private static final class Group {
         static final PowerModule.Group BODY = PowerModule.Group.BODY;
         static final PowerModule.Group MOVE = PowerModule.Group.MOVE;
@@ -537,6 +656,7 @@ public enum HeroAbility implements CatalogEntry {
         final List<String> requires = new ArrayList<>();
         Predicate<PowerData> on;
         Family family;
+        HeroAbility parent;
 
         Spec(PowerModule.Act act) {
             this.act = act;
@@ -600,6 +720,11 @@ public enum HeroAbility implements CatalogEntry {
 
         Spec family(Family family) {
             this.family = family;
+            return this;
+        }
+
+        Spec parent(HeroAbility parent) {
+            this.parent = parent;
             return this;
         }
     }

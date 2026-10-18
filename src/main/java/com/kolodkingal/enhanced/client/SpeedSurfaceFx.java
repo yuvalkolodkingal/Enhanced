@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.ability.SpeedSurfaces;
 import com.kolodkingal.enhanced.client.render.HeroAnimState;
 import com.kolodkingal.enhanced.client.render.HeroAnimator;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -19,6 +21,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -28,6 +31,11 @@ import net.minecraft.world.phys.Vec3;
  * teal-green for Tommy), so a run up a wall reads in first person too. Both fade in and out.
  */
 public final class SpeedSurfaceFx {
+    /** 3.5: the wall-run ability of a custom hero (Quicksilver's or Tommy's), for its colour. */
+    private static HeroAbility wallRow(Player player) {
+        return AbilityColors.first(player, HeroAbility.QUICKSILVER_WALL_RUN, HeroAbility.TOMMY_WALL_RUN);
+    }
+
     private SpeedSurfaceFx() {
     }
 
@@ -55,6 +63,7 @@ public final class SpeedSurfaceFx {
             int color = custom ? (i == 0 ? Powers.glow(player) : Powers.color(player))
                     : tommy ? (i == 0 ? 0xE6FFF5 : i == 1 ? Power.TOMMY.glow : Power.TOMMY.color)
                     : (i == 0 ? Power.QUICKSILVER.glow : Power.QUICKSILVER.color);
+            color = AbilityColors.shade(player, wallRow(player), color); // (3.5: the wall run's own colour)
             level.addParticle(new EnergyParticleOptions(color, 1.0F + random.nextFloat() * 0.3F),
                     feet.x - dx * back + axis.x * along + (random.nextDouble() - 0.5) * 0.4,
                     feet.y - dy * back + axis.y * along + (random.nextDouble() - 0.5) * 0.4,
@@ -80,6 +89,7 @@ public final class SpeedSurfaceFx {
                 return;
             }
             int rgb = data.power() == Power.CUSTOM ? Powers.glow(player) : data.power() == Power.TOMMY ? Power.TOMMY.glow : Power.QUICKSILVER.glow;
+            rgb = AbilityColors.glow(player, wallRow(player), rgb);
             float time = player.tickCount + deltaTracker.getGameTimeDeltaPartialTick(false);
             int w = graphics.guiWidth();
             int h = graphics.guiHeight();

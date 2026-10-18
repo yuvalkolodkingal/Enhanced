@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.CyclopsAbilities;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.CyclopsFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -56,6 +58,25 @@ public final class CyclopsFx {
     }
 
     private static final List<Effect> EFFECTS = new ArrayList<>();
+    /** 3.5: the colour a custom hero's pick chose for the effect being made, or -1 (the Optic Blast's red). */
+    private static int tint = -1;
+
+    /** One of the red's colours, or it recoloured to the colour chosen for the effect being made. */
+    private static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
+    /** The colour the shooter's pick of the ability chose for a payload, or -1. */
+    private static int tintOf(ClientLevel level, CyclopsFxPayload p) {
+        HeroAbility row = switch (p.kind()) {
+            case CyclopsFxPayload.RICOCHET -> HeroAbility.CYCLOPS_RICOCHET;
+            case CyclopsFxPayload.CONCUSSION -> HeroAbility.CYCLOPS_CONCUSSION;
+            case CyclopsFxPayload.LEAP -> HeroAbility.CYCLOPS_LEAP;
+            case CyclopsFxPayload.RALLY -> HeroAbility.CYCLOPS_RALLY;
+            default -> null;
+        };
+        return row == null ? -1 : AbilityColors.chosen(level.getEntity(p.shooter()), row);
+    }
 
     /** A blast of his: drawn from now on for its life, with a few particles where it strikes. */
     public static void handle(CyclopsFxPayload payload) {
@@ -69,6 +90,7 @@ public final class CyclopsFx {
         EFFECTS.add(new Effect(payload, level.getGameTime()));
         RandomSource r = level.random;
         List<Vec3> points = payload.points();
+        tint = tintOf(level, payload);
         switch (payload.kind()) {
             case CyclopsFxPayload.RICOCHET -> {
                 for (int i = 1; i < points.size(); i++) {
@@ -91,7 +113,7 @@ public final class CyclopsFx {
                     }
                 }
                 for (int k = 0; k < 10; k++) {
-                    level.addParticle(new EnergyParticleOptions(k % 2 == 0 ? RED : CORE, 1.0F), spot.x, spot.y + 0.1, spot.z,
+                    level.addParticle(new EnergyParticleOptions(k % 2 == 0 ? c(RED) : c(CORE), 1.0F), spot.x, spot.y + 0.1, spot.z,
                             (r.nextDouble() - 0.5) * 0.3, 0.05 + r.nextDouble() * 0.1, (r.nextDouble() - 0.5) * 0.3);
                 }
             }
@@ -102,13 +124,14 @@ public final class CyclopsFx {
                     for (int k = 0; k < 12; k++) {
                         Vec3 v = dir.scale(0.4 + r.nextDouble() * 0.4).add((r.nextDouble() - 0.5) * 0.3, (r.nextDouble() - 0.5) * 0.3,
                                 (r.nextDouble() - 0.5) * 0.3);
-                        level.addParticle(new EnergyParticleOptions(k % 3 == 0 ? CORE : RED, 0.9F), eye.x, eye.y, eye.z, v.x, v.y, v.z);
+                        level.addParticle(new EnergyParticleOptions(k % 3 == 0 ? c(CORE) : c(RED), 0.9F), eye.x, eye.y, eye.z, v.x, v.y, v.z);
                     }
                 }
             }
             default -> {
             }
         }
+        tint = -1;
     }
 
     /** Once per client tick: the effects whose time is over go. */
@@ -145,6 +168,7 @@ public final class CyclopsFx {
             }
             float u = age / life;
             CyclopsFxPayload p = effect.payload();
+            tint = tintOf(level, p);
             switch (p.kind()) {
                 case CyclopsFxPayload.RICOCHET -> ricochet(pose, vc, p.points(), camera, age, u);
                 case CyclopsFxPayload.CONCUSSION -> concussion(pose, vc, p, camera, age);
@@ -154,6 +178,7 @@ public final class CyclopsFx {
                 }
             }
         }
+        tint = -1;
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
 
@@ -179,11 +204,11 @@ public final class CyclopsFx {
             Vec3 end = along + length <= reach ? b : a.add(b.subtract(a).scale((reach - along) / Math.max(1.0E-6, length)));
             Vec3 ca = a.subtract(camera);
             Vec3 cb = end.subtract(camera);
-            EnergyGeometry.ribbon(pose, vc, ca, cb, 0.22F, argb(DEEP, 0.30F * fade), argb(DEEP, 0.30F * fade));
-            EnergyGeometry.ribbon(pose, vc, ca, cb, 0.11F, argb(RED, 0.85F * fade), argb(RED, 0.85F * fade));
-            EnergyGeometry.ribbon(pose, vc, ca, cb, 0.035F, argb(CORE, fade), argb(CORE, fade));
+            EnergyGeometry.ribbon(pose, vc, ca, cb, 0.22F, argb(c(DEEP), 0.30F * fade), argb(c(DEEP), 0.30F * fade));
+            EnergyGeometry.ribbon(pose, vc, ca, cb, 0.11F, argb(c(RED), 0.85F * fade), argb(c(RED), 0.85F * fade));
+            EnergyGeometry.ribbon(pose, vc, ca, cb, 0.035F, argb(c(CORE), fade), argb(c(CORE), fade));
             if (end == b && i < points.size() - 1) {
-                EnergyGeometry.ring(pose, vc, cb, cb.scale(-1), 0.18F, 0.08F, 10, argb(CORE, 0.8F * fade));
+                EnergyGeometry.ring(pose, vc, cb, cb.scale(-1), 0.18F, 0.08F, 10, argb(c(CORE), 0.8F * fade));
             }
             along += length;
         }
@@ -207,14 +232,15 @@ public final class CyclopsFx {
             float radius = (float) (0.2 + d * spread);
             float alpha = (1.0F - t) * (1.0F - t);
             Vec3 at = eye.add(dir.scale(d)).subtract(camera);
-            EnergyGeometry.ring(pose, vc, at, dir, radius, 0.35F * (1.0F - t) + 0.08F, 24, argb(RED, 0.75F * alpha));
-            EnergyGeometry.ring(pose, vc, at, dir, radius * 0.92F, 0.08F, 24, argb(CORE, 0.7F * alpha));
+            EnergyGeometry.ring(pose, vc, at, dir, radius, 0.35F * (1.0F - t) + 0.08F, 24, argb(c(RED), 0.75F * alpha));
+            EnergyGeometry.ring(pose, vc, at, dir, radius * 0.92F, 0.08F, 24, argb(c(CORE), 0.7F * alpha));
         }
         // The flash at the visor as it leaves.
         float flash = 1.0F - Mth.clamp(age / 3.0F, 0.0F, 1.0F);
         if (flash > 0.0F) {
             Vec3 at = eye.add(dir.scale(0.4)).subtract(camera);
-            EnergyGeometry.ring(pose, vc, at, at.scale(-1), 0.25F * flash, 0.3F * flash, 12, argb(CORE, 0.9F * flash));
+            EnergyGeometry.ring(pose, vc, at, at.scale(-1), 0.25F * flash, 0.3F * flash, 12,
+                    argb(c(CORE), 0.9F * flash));
         }
     }
 
@@ -230,14 +256,15 @@ public final class CyclopsFx {
             }
             Vec3 a = from.subtract(camera);
             Vec3 b = spot.subtract(camera);
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.12F, 0.5F, argb(DEEP, 0.35F * beam), argb(DEEP, 0.35F * beam));
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.06F, 0.28F, argb(RED, 0.85F * beam), argb(RED, 0.85F * beam));
-            EnergyGeometry.ribbon(pose, vc, a, b, 0.02F, 0.08F, argb(CORE, beam), argb(CORE, beam));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.12F, 0.5F, argb(c(DEEP), 0.35F * beam),
+                    argb(c(DEEP), 0.35F * beam));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.06F, 0.28F, argb(c(RED), 0.85F * beam), argb(c(RED), 0.85F * beam));
+            EnergyGeometry.ribbon(pose, vc, a, b, 0.02F, 0.08F, argb(c(CORE), beam), argb(c(CORE), beam));
         }
         float t = Mth.clamp(age / 8.0F, 0.0F, 1.0F);
         float alpha = (1.0F - t) * (1.0F - t);
         Vec3 at = spot.add(0, 0.08, 0).subtract(camera);
-        EnergyGeometry.ring(pose, vc, at, new Vec3(0, 1, 0), 0.3F + radius * t, 0.4F * (1.0F - t) + 0.06F, 28, argb(RED, 0.8F * alpha));
+        EnergyGeometry.ring(pose, vc, at, new Vec3(0, 1, 0), 0.3F + radius * t, 0.4F * (1.0F - t) + 0.06F, 28, argb(c(RED), 0.8F * alpha));
     }
 
     /** Two rings spread over the ground from his feet to the edge of the Rally, the second a moment after the first. */
@@ -251,8 +278,8 @@ public final class CyclopsFx {
             }
             float ease = 1.0F - (1.0F - t) * (1.0F - t);
             float alpha = 1.0F - t;
-            EnergyGeometry.ring(pose, vc, feet, new Vec3(0, 1, 0), 0.5F + radius * ease, 0.5F * alpha + 0.05F, 48, argb(RED, 0.6F * alpha));
-            EnergyGeometry.ring(pose, vc, feet, new Vec3(0, 1, 0), 0.45F + radius * ease, 0.1F, 48, argb(CORE, 0.5F * alpha));
+            EnergyGeometry.ring(pose, vc, feet, new Vec3(0, 1, 0), 0.5F + radius * ease, 0.5F * alpha + 0.05F, 48, argb(c(RED), 0.6F * alpha));
+            EnergyGeometry.ring(pose, vc, feet, new Vec3(0, 1, 0), 0.45F + radius * ease, 0.1F, 48, argb(c(CORE), 0.5F * alpha));
         }
     }
 

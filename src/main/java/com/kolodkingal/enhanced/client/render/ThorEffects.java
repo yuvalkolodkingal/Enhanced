@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
@@ -50,6 +51,13 @@ public final class ThorEffects {
     private static final int CORE = 0xFFFFFF;
     private static final int BLUE = 0x4DB8FF;
     private static final int HALO = 0x1E6BFF;
+    /** 3.5: the colour a custom hero's pick chose for what is being drawn now, or -1 (Thor's blues and white). */
+    private static int tint = -1;
+
+    /** One of Thor's colours, or it recoloured to the colour chosen for what is being drawn. */
+    private static int col(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
     private static final int ARC_TICKS = 6;
     private static final int ARRIVAL_TICKS = 24;
     private static final int MARK_TICKS = 1200;
@@ -137,6 +145,9 @@ public final class ThorEffects {
             float age = time - e.start();
             switch (e.kind()) {
                 case ThorFxPayload.ARC -> {
+                    Entity thor = level.getEntity(e.entityId());
+                    tint = AbilityColors.chosen(thor, AbilityColors.first(thor, HeroAbility.THOR_THUNDER,
+                            HeroAbility.THOR_LIGHTNING));
                     float fade = 1.0F - age / ARC_TICKS;
                     long seed = e.start() * 104729L;
                     for (int i = 0; i + 1 < e.points().size(); i++) {
@@ -146,6 +157,9 @@ public final class ThorEffects {
                     }
                 }
                 case ThorFxPayload.BIFROST_ARRIVAL -> {
+                    Entity traveller = level.getEntity(e.entityId());
+                    tint = AbilityColors.chosen(traveller, AbilityColors.first(traveller, HeroAbility.THOR_BIFROST,
+                            HeroAbility.HEIMDALL_BIFROST));
                     float fade = 1.0F - age / ARRIVAL_TICKS;
                     rainbowBeam(pose, vc, e.points().get(0).subtract(camera), 1.6F + 0.8F * fade, time, fade);
                 }
@@ -155,7 +169,10 @@ public final class ThorEffects {
         }
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
+            tint = -1;
             if (data.is(Live.BIFROST)) {
+                tint = AbilityColors.chosen(player, AbilityColors.first(player, HeroAbility.THOR_BIFROST,
+                        HeroAbility.HEIMDALL_BIFROST));
                 Vec3 feet = player.getPosition(partialTick).subtract(camera);
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.9F);
                 rainbowBeam(pose, vc, feet, 1.3F * pulse, time, 1.0F);
@@ -164,8 +181,10 @@ public final class ThorEffects {
                 continue;
             }
             if (data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER) && !player.isInvisible()) {
+                tint = AbilityColors.chosen(player, HeroAbility.THOR_THUNDER);
                 crackle(pose, vc, player, camera, partialTick, time);
             }
+            tint = AbilityColors.chosen(player, HeroAbility.THOR_LIGHTNING);
             // The beam is drawn even for an invisible Thor: it hurts all the same.
             if (data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
                 beam(mc, player, ThorAbilities.holdsWeapon(player), data.toggle(Toggle.GOD_OF_THUNDER), pose, vc, camera, partialTick, time);
@@ -173,9 +192,11 @@ public final class ThorEffects {
         }
         for (Entity entity : level.entitiesForRendering()) {
             if (entity instanceof MjolnirFragmentEntity fragment) {
+                tint = AbilityColors.chosen(fragment.getOwner(), HeroAbility.THOR_SHATTER);
                 fragmentGlow(fragment, pose, vc, camera, partialTick, time);
             }
         }
+        tint = -1;
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
 
@@ -211,18 +232,18 @@ public final class ThorEffects {
         double jitter = Math.max(0.12, Math.min(1.2, length * 0.035)) * (weapon ? 1.3 : 1.0);
 
         // A soft glow all along the line, brighter through the weapon.
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.12F * scale, 0.16F * scale, EnergyGeometry.argb(HALO, 0.10F * flicker), EnergyGeometry.argb(HALO, 0.14F * flicker));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.12F * scale, 0.16F * scale, EnergyGeometry.argb(col(HALO), 0.10F * flicker), EnergyGeometry.argb(col(HALO), 0.14F * flicker));
         List<Vec3> path = EnergyGeometry.flowingPath(a, b, jitter, seed, phase);
-        taperedLine(pose, vc, path, 0.30F * scale, EnergyGeometry.argb(HALO, 0.30F * flicker));
-        taperedLine(pose, vc, path, 0.15F * scale, EnergyGeometry.argb(BLUE, 0.75F * flicker));
-        taperedLine(pose, vc, path, 0.055F * scale, EnergyGeometry.argb(CORE, 0.97F));
+        taperedLine(pose, vc, path, 0.30F * scale, EnergyGeometry.argb(col(HALO), 0.30F * flicker));
+        taperedLine(pose, vc, path, 0.15F * scale, EnergyGeometry.argb(col(BLUE), 0.75F * flicker));
+        taperedLine(pose, vc, path, 0.055F * scale, EnergyGeometry.argb(col(CORE), 0.97F));
         Vec3 dir = b.subtract(a).scale(1.0 / length);
         EnergyGeometry.crossfade(seed + 31L, phase, (random, weight) -> {
             // Loose strands that crackle round the main bolt.
             int strands = weapon ? 3 : 2;
             for (int i = 0; i < strands; i++) {
                 List<Vec3> strand = EnergyGeometry.lightningPath(a, b, jitter * 1.6, random);
-                taperedLine(pose, vc, strand, 0.05F * scale, EnergyGeometry.argb(BLUE, 0.55F * weight));
+                taperedLine(pose, vc, strand, 0.05F * scale, EnergyGeometry.argb(col(BLUE), 0.55F * weight));
             }
             // Forks.
             int forks = weapon ? 4 : 2;
@@ -233,8 +254,8 @@ public final class ThorEffects {
                         random.nextDouble() - 0.5).normalize();
                 Vec3 end = start.add(dir.scale(reach * 0.6)).add(side.scale(reach * 0.8));
                 List<Vec3> fork = EnergyGeometry.lightningPath(start, end, reach * 0.2, random);
-                EnergyGeometry.polyline(pose, vc, fork, 0.06F * scale, EnergyGeometry.argb(BLUE, 0.6F * weight));
-                EnergyGeometry.polyline(pose, vc, fork, 0.02F * scale, EnergyGeometry.argb(CORE, 0.8F * weight));
+                EnergyGeometry.polyline(pose, vc, fork, 0.06F * scale, EnergyGeometry.argb(col(BLUE), 0.6F * weight));
+                EnergyGeometry.polyline(pose, vc, fork, 0.02F * scale, EnergyGeometry.argb(col(CORE), 0.8F * weight));
             }
         });
         // Flares where it leaves (smaller the closer it is to the camera) and where it lands.
@@ -271,14 +292,14 @@ public final class ThorEffects {
         Vec3 side = toCamera.cross(new Vec3(0, 1, 0));
         side = side.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : side.normalize();
         Vec3 up = side.cross(toCamera.normalize()).normalize();
-        EnergyGeometry.ring(pose, vc, center, toCamera, radius * 0.8F, radius * 0.45F, 14, EnergyGeometry.argb(HALO, 0.16F * alpha));
-        EnergyGeometry.ring(pose, vc, center, toCamera, radius * 0.5F, radius * 0.4F, 14, EnergyGeometry.argb(BLUE, 0.3F * alpha));
-        EnergyGeometry.ring(pose, vc, center, toCamera, radius * 0.22F, radius * 0.3F, 12, EnergyGeometry.argb(CORE, 0.85F * alpha));
+        EnergyGeometry.ring(pose, vc, center, toCamera, radius * 0.8F, radius * 0.45F, 14, EnergyGeometry.argb(col(HALO), 0.16F * alpha));
+        EnergyGeometry.ring(pose, vc, center, toCamera, radius * 0.5F, radius * 0.4F, 14, EnergyGeometry.argb(col(BLUE), 0.3F * alpha));
+        EnergyGeometry.ring(pose, vc, center, toCamera, radius * 0.22F, radius * 0.3F, 12, EnergyGeometry.argb(col(CORE), 0.85F * alpha));
         for (int i = 0; i < 4; i++) {
             double angle = i * Math.PI / 4.0;
             Vec3 spike = side.scale(Math.cos(angle)).add(up.scale(Math.sin(angle))).scale(radius * (i % 2 == 0 ? 1.5 : 1.0));
-            EnergyGeometry.ribbon(pose, vc, center.subtract(spike), center.add(spike), radius * 0.07F, EnergyGeometry.argb(BLUE, 0.6F * alpha),
-                    EnergyGeometry.argb(BLUE, 0.6F * alpha));
+            EnergyGeometry.ribbon(pose, vc, center.subtract(spike), center.add(spike), radius * 0.07F, EnergyGeometry.argb(col(BLUE), 0.6F * alpha),
+                    EnergyGeometry.argb(col(BLUE), 0.6F * alpha));
         }
     }
 
@@ -338,15 +359,15 @@ public final class ThorEffects {
         float near = (float) Mth.clamp(c.length() / 3.0, 0.15, 1.0);
         if (motion.lengthSqr() > 1.0E-4) {
             Vec3 tail = c.subtract(motion.normalize().scale(Math.min(2.4, motion.length() * 1.2)));
-            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.20F * near, EnergyGeometry.argb(HALO, 0.0F), EnergyGeometry.argb(BLUE, 0.55F * flicker));
-            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.07F * near, EnergyGeometry.argb(CORE, 0.0F), EnergyGeometry.argb(CORE, 0.85F));
+            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.20F * near, EnergyGeometry.argb(col(HALO), 0.0F), EnergyGeometry.argb(col(BLUE), 0.55F * flicker));
+            EnergyGeometry.ribbon(pose, vc, tail, c, 0.0F, 0.07F * near, EnergyGeometry.argb(col(CORE), 0.0F), EnergyGeometry.argb(col(CORE), 0.85F));
         }
         flare(pose, vc, c, 0.34F * flicker * near, 0.9F);
         EnergyGeometry.crossfade(fragment.getId() * 31L, time * 2.0F, (random, weight) -> {
             for (int i = 0; i < 2; i++) {
                 Vec3 end = c.add((random.nextDouble() - 0.5) * 0.9, (random.nextDouble() - 0.5) * 0.9,
                         (random.nextDouble() - 0.5) * 0.9);
-                EnergyGeometry.bolt(pose, vc, c, end, 0.03F, 0.08F, EnergyGeometry.argb(BLUE, 0.8F * weight),
+                EnergyGeometry.bolt(pose, vc, c, end, 0.03F, 0.08F, EnergyGeometry.argb(col(BLUE), 0.8F * weight),
                         random.nextLong());
             }
         });
@@ -363,14 +384,17 @@ public final class ThorEffects {
             return;
         }
         float jitter = (float) Math.min(1.6, a.distanceTo(b) * 0.06 + 0.2);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(HALO, 0.3F * fade), seed, phase);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 0.7F, jitter, EnergyGeometry.argb(BLUE, 0.75F * fade), seed, phase);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 0.25F, jitter, EnergyGeometry.argb(CORE, 0.95F * fade), seed,
+        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(col(HALO), 0.3F * fade), seed,
+                phase);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 0.7F, jitter, EnergyGeometry.argb(col(BLUE), 0.75F * fade), seed,
+                phase);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 0.25F, jitter, EnergyGeometry.argb(col(CORE), 0.95F * fade), seed,
                 phase);
         // A forked branch.
         Vec3 mid = a.lerp(b, 0.45);
         Vec3 fork = mid.add(new Vec3((seed % 7) - 3, -Math.abs(seed % 5), (seed % 3) - 1).normalize().scale(a.distanceTo(b) * 0.15));
-        EnergyGeometry.bolt(pose, vc, mid, fork, width * 0.35F, jitter * 0.6F, EnergyGeometry.argb(BLUE, 0.5F * fade),
+        EnergyGeometry.bolt(pose, vc, mid, fork, width * 0.35F, jitter * 0.6F,
+                EnergyGeometry.argb(col(BLUE), 0.5F * fade),
                 seed + 5, phase);
     }
 
@@ -391,9 +415,9 @@ public final class ThorEffects {
                         .subtract(camera);
                 Vec3 b = a.add((random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.7,
                         (random.nextDouble() - 0.5) * 0.6);
-                EnergyGeometry.bolt(pose, vc, a, b, 0.03F, 0.12F, EnergyGeometry.argb(BLUE, 0.8F * weight),
+                EnergyGeometry.bolt(pose, vc, a, b, 0.03F, 0.12F, EnergyGeometry.argb(col(BLUE), 0.8F * weight),
                         random.nextLong());
-                EnergyGeometry.bolt(pose, vc, a, b, 0.012F, 0.12F, EnergyGeometry.argb(CORE, 0.9F * weight),
+                EnergyGeometry.bolt(pose, vc, a, b, 0.012F, 0.12F, EnergyGeometry.argb(col(CORE), 0.9F * weight),
                         random.nextLong());
             }
         });
@@ -406,7 +430,9 @@ public final class ThorEffects {
         for (int k = 0; k < sides; k++) {
             float a0 = Mth.TWO_PI * k / sides + time * 0.05F;
             float a1 = Mth.TWO_PI * (k + 1) / sides + time * 0.05F;
-            int color = hue((float) k / sides + time * 0.01F);
+            int color = tint < 0 ? hue((float) k / sides + time * 0.01F)
+                    : AbilityColors.recolor(hue((float) k / sides + time * 0.01F),
+                            tint); // (3.5: a beam of one chosen colour)
             Vec3 p0 = feet.add(Math.cos(a0) * radius, 0, Math.sin(a0) * radius);
             Vec3 p1 = feet.add(Math.cos(a1) * radius, 0, Math.sin(a1) * radius);
             quad(pose, vc, p0, p1, height, EnergyGeometry.argb(color, 0.42F * fade), EnergyGeometry.argb(color, 0.0F));

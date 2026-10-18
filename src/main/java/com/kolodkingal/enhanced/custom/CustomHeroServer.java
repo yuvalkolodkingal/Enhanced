@@ -113,7 +113,12 @@ public final class CustomHeroServer implements HeroServer {
         Snap before = down ? new Snap(data, state) : null;
         HeroAbility ability = binding.ability();
         if (ability != null) {
-            HeroKeys.press(player, data, ability, down, binding.isAlt());
+            data.pressing(column, binding.sneak());
+            try {
+                HeroKeys.press(player, data, ability, down, binding.isAlt());
+            } finally {
+                data.pressing(0, false);
+            }
         } else {
             PowerModule module = binding.module();
             CustomHero.Pick pick = module == null ? null : hero.pick(module);

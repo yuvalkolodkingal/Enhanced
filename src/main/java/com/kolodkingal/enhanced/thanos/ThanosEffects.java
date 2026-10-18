@@ -65,9 +65,14 @@ public final class ThanosEffects {
 
     /** A ring portal. */
     public static void portal(ServerLevel level, Vec3 at, float radius, int ticks) {
-        send(level, at, fx(ThanosFxPayload.PORTAL, StoneKind.SPACE.color(), -1, ticks, radius, List.of(at)));
+        portal(level, at, radius, ticks, StoneKind.SPACE.color());
+    }
+
+    /** 3.5: a portal in another colour than the Space Stone's blue (a custom hero's, in the colour his pick chose). */
+    public static void portal(ServerLevel level, Vec3 at, float radius, int ticks, int color) {
+        send(level, at, fx(ThanosFxPayload.PORTAL, color, -1, ticks, radius, List.of(at)));
         if (PARTICLES) {
-            ringParticles(level, at.add(0, radius, 0), radius, StoneKind.SPACE.color(), SEGMENTS, 0.2);
+            ringParticles(level, at.add(0, radius, 0), radius, color, SEGMENTS, 0.2);
         }
     }
 

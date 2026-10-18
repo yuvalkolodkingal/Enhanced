@@ -262,11 +262,19 @@ public final class PowersTab extends EditorTab {
         }
         numbersY = yy;
         coloursY = -1;
-        if (pick != null && e instanceof PowerModule) {
+        // 3.5: every power has its colour (the heroes' abilities too), and a button for the whole colour picker.
+        if (pick != null) {
             int size = 11;
             coloursY = y + h - size - 2;
             int sx = x + Math.min(w / 3, font().width(Component.translatable("screen.enhanced.hero_creator.own_color")) + 4);
-            int per = Math.max(1, Math.min(SWATCHES.length, (x + w - sx) / (size + 2)));
+            int more = Math.min(40, font().width(Component.translatable("screen.enhanced.hero_creator.color.button"))
+                    + 8);
+            add(new CreatorUi.BigButton(x + w - more, coloursY - 2, more, size + 4,
+                    Component.translatable("screen.enhanced.hero_creator.color.button"),
+                    null, pick.color() < 0 ? draft().color() : pick.color(), () -> ColorPickerScreen.open(screen, e)))
+                    .setTooltip(Tooltip.create(Component.translatable("screen.enhanced.hero_creator.color.button.desc",
+                            CreatorUi.name(e))));
+            int per = Math.max(1, Math.min(SWATCHES.length, (x + w - more - 2 - sx) / (size + 2)));
             for (int i = 0; i < per; i++) {
                 int c = SWATCHES[i];
                 add(new CreatorUi.Swatch(sx + i * (size + 2), coloursY, size, c < 0 ? draft().color() : c, chosen -> {
@@ -284,8 +292,21 @@ public final class PowersTab extends EditorTab {
 
     private void add(CatalogEntry e) {
         String option = e instanceof PowerModule m ? m.defaultOption().id() : HeroAbility.BOTH;
+        // 3.5: a hero's ability and its variant row: the variant is the row's, the ability keeps its main action.
+        if (e instanceof HeroAbility a && a.variant() != null && draft().has(a.variant())) {
+            option = HeroAbility.MAIN;
+        }
         int strength = e.scales() ? CustomHeroJson.DEFAULT_STRENGTH : HeroAbility.FIXED_STRENGTH;
         CustomHero hero = draft().with(new CustomHero.Pick(e.id(), strength, option, -1));
+        if (e instanceof HeroAbility v && v.parent() != null && hero.pick(v.parent()) != null) {
+            CustomHero.Pick parent = hero.pick(v.parent());
+            hero = hero.with(parent.withOption(HeroAbility.MAIN));
+            for (int c = 1; c <= CustomHero.KEYS; c++) {
+                if ((v.parent().id() + "#" + HeroKit.ALT).equals(hero.binding(c, true))) {
+                    hero = hero.withBinding(c, true, "");
+                }
+            }
+        }
         set(autoKey(hero, e));
         screen.say(Component.translatable("screen.enhanced.hero_creator.added", CreatorUi.name(e)), true);
     }

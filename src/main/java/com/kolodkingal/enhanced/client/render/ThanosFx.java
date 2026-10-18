@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ThanosAbilities;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.ThanosAtmosphere;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -387,10 +388,10 @@ public final class ThanosFx {
                 // A portal on the ground is a ring the eye misses from afar: let a veil of light rise out of it.
                 float open = Mth.clamp(Math.min(age / 5.0F, (e.life() - age) / 8.0F), 0.0F, 1.0F);
                 float rise = 3.2F * (0.4F + 0.6F * open);
-                FxShapes.cylinder(pose, vc, at, e.radius() * 1.1F, e.radius() * 0.55F, rise, 24, argb(StoneKind.SPACE.color(), 0.42F * open),
-                        argb(StoneKind.SPACE.core(), 0.0F));
-                FxShapes.disc(pose, vc, at.add(0.0, 0.03, 0.0), e.radius() * 1.1F, 24, argb(StoneKind.SPACE.color(), 0.30F * open),
-                        argb(StoneKind.SPACE.color(), 0.16F * open));
+                FxShapes.cylinder(pose, vc, at, e.radius() * 1.1F, e.radius() * 0.55F, rise, 24, argb(space(e, StoneKind.SPACE.color()), 0.42F * open),
+                        argb(space(e, StoneKind.SPACE.core()), 0.0F));
+                FxShapes.disc(pose, vc, at.add(0.0, 0.03, 0.0), e.radius() * 1.1F, 24, argb(space(e, StoneKind.SPACE.color()), 0.30F * open),
+                        argb(space(e, StoneKind.SPACE.color()), 0.16F * open));
             }
             case ThanosFxPayload.DOME -> {
                 float fade = domeFade(age, e.ticks());
@@ -452,8 +453,9 @@ public final class ThanosFx {
             at = at.add(0.0, 30.0, 0.0);
         }
         float half = e.radius() * 1.25F * (0.6F + 0.4F * open);
-        FxShapes.flatTexture(pose, vc, at.add(0.0, 0.02, 0.0), half, age * 0.06F, argb(0xFFFFFF, 0.9F * open));
-        FxShapes.flatTexture(pose, vc, at.add(0.0, 0.04, 0.0), half * 0.72F, -age * 0.11F, argb(StoneKind.SPACE.core(), 0.7F * open));
+        FxShapes.flatTexture(pose, vc, at.add(0.0, 0.02, 0.0), half, age * 0.06F, argb(space(e, 0xFFFFFF), 0.9F * open));
+        FxShapes.flatTexture(pose, vc, at.add(0.0, 0.04, 0.0), half * 0.72F, -age * 0.11F,
+                argb(space(e, StoneKind.SPACE.core()), 0.7F * open));
     }
 
     private static void mandala(Effect e, Matrix4f pose, VertexConsumer vc, Vec3 camera, float age, boolean calm) {
@@ -663,12 +665,23 @@ public final class ThanosFx {
             return;
         }
         // A ring portal: a bright rim and sparks that orbit it.
-        FxShapes.annulus(pose, vc, at.add(0.0, 0.1, 0.0), radius * 0.86F, radius, 48, argb(StoneKind.SPACE.color(), 0.0F), argb(0xBFE6FF, 0.95F * open));
-        FxShapes.annulus(pose, vc, at.add(0.0, 0.1, 0.0), radius * 0.0F, radius * 0.86F, 48, argb(0x0A1A40, 0.0F), argb(StoneKind.SPACE.color(), 0.12F * open));
+        FxShapes.annulus(pose, vc, at.add(0.0, 0.1, 0.0), radius * 0.86F, radius, 48, argb(space(e, StoneKind.SPACE.color()), 0.0F),
+                argb(space(e, 0xBFE6FF), 0.95F * open));
+        FxShapes.annulus(pose, vc, at.add(0.0, 0.1, 0.0), radius * 0.0F, radius * 0.86F, 48, argb(space(e, 0x0A1A40), 0.0F),
+                argb(space(e, StoneKind.SPACE.color()), 0.12F * open));
         for (int i = 0; i < 6; i++) {
             float a = age * 0.2F + i * Mth.TWO_PI / 6.0F;
-            FxShapes.glow(pose, vc, at.add(Mth.cos(a) * radius, 0.12, Mth.sin(a) * radius), radius * 0.16F, argb(0xBFE6FF, 0.7F * open), argb(0xFFFFFF, 0.9F * open));
+            FxShapes.glow(pose, vc, at.add(Mth.cos(a) * radius, 0.12, Mth.sin(a) * radius), radius * 0.16F, argb(space(e, 0xBFE6FF), 0.7F * open),
+                    argb(0xFFFFFF, 0.9F * open));
         }
+    }
+
+    /**
+     * 3.5: one of the Space Stone's colours of a portal, or it recoloured to the portal's own colour when the portal is
+     * not the stone's blue (a custom hero's, in the colour his pick chose; the server sends it in the payload).
+     */
+    private static int space(Effect e, int rgb) {
+        return e.color() == -1 || e.color() == StoneKind.SPACE.color() ? rgb : AbilityColors.recolor(rgb, e.color());
     }
 
     /** Where a falling star's head is {@code age} ticks in. */
