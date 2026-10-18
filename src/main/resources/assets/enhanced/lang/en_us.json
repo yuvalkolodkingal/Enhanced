@@ -2639,5 +2639,9 @@
   "message.enhanced.mutant_cure.too_far": "Too far away: the cure did not go in",
   "message.enhanced.mutant_cure.cured": "The cure takes hold. You are no longer %s",
   "message.enhanced.mutant_cure.cured_other": "%s is cured: no longer %s",
-  "subtitles.enhanced.mutant_cure": "The cure is injected"
+  "subtitles.enhanced.mutant_cure": "The cure is injected",
+  "commands.enhanced.structure.repair_school.none": "No Mutant School within %s blocks of here",
+  "commands.enhanced.structure.repair_school.done": "Mutant School at %1$s %2$s %3$s: repaired %4$s blocks round the front door; %5$s blocks changed by players were left as they are",
+  "commands.enhanced.structure.repair_school.nothing": "Mutant School at %1$s %2$s %3$s: nothing repaired; %5$s blocks changed by players were left as they are",
+  "commands.enhanced.structure.repair_school.already": "The Mutant School at %1$s %2$s %3$s is already whole: nothing to repair"
 }

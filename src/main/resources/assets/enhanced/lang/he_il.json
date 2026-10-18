@@ -2639,5 +2639,9 @@
   "message.enhanced.mutant_cure.too_far": "רחוק מדי: התרופה לא הוזרקה",
   "message.enhanced.mutant_cure.cured": "התרופה פועלת. אתם כבר לא %s",
   "message.enhanced.mutant_cure.cured_other": "%s נרפא: כבר לא %s",
-  "subtitles.enhanced.mutant_cure": "התרופה מוזרקת"
+  "subtitles.enhanced.mutant_cure": "התרופה מוזרקת",
+  "commands.enhanced.structure.repair_school.none": "אין בית ספר למוטנטים במרחק %s בלוקים מכאן",
+  "commands.enhanced.structure.repair_school.done": "בית הספר למוטנטים ב-%1$s %2$s %3$s: תוקנו %4$s בלוקים סביב הדלת הראשית; %5$s בלוקים ששחקנים שינו נשארו כמו שהם",
+  "commands.enhanced.structure.repair_school.nothing": "בית הספר למוטנטים ב-%1$s %2$s %3$s: לא תוקן כלום; %5$s בלוקים ששחקנים שינו נשארו כמו שהם",
+  "commands.enhanced.structure.repair_school.already": "בית הספר למוטנטים ב-%1$s %2$s %3$s כבר שלם: אין מה לתקן"
 }
