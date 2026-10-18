@@ -63,7 +63,6 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -631,8 +630,10 @@ public final class OdinTests {
         for (BlockPos pos : BlockPos.betweenClosed(CityPlan.VAULT_DOOR.minX(), CityPlan.VAULT_DOOR.minY(), CityPlan.VAULT_DOOR.minZ(),
                 CityPlan.VAULT_DOOR.maxX(), CityPlan.VAULT_DOOR.maxY(), CityPlan.VAULT_DOOR.maxZ())) {
             asgard.getChunk(pos);
-            asgard.setBlockAndUpdate(pos, Blocks.GOLD_BLOCK.defaultBlockState());
         }
+        // The door of the city (lane L1's), shut again afterwards: Asgard's level is shared by every test.
+        com.kolodkingal.enhanced.asgard.CityBuild.setVaultDoor(asgard, false);
+        f.onClose(() -> com.kolodkingal.enhanced.asgard.CityBuild.setVaultDoor(asgard, false));
         check(!Vault.isOpen(asgard), "shut");
         Vault.open(asgard);
         check(Vault.isOpen(asgard) && told.size() == 1, "open, and told once");

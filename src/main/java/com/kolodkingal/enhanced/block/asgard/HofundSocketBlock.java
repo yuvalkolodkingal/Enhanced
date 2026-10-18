@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The Hofund socket (3.5), in the middle of Heimdall's Observatory ({@code CityPlan.OBSERVATORY_SOCKET}): a gold drum
  * in which the client shows Hofund (when no player near it holds one). A player with no Hofund who touches it is told
- * that the sword is Heimdall's to give.
+ * that the sword is Heimdall's to give, unless Heimdall stands near enough to talk: then his talk opens.
  */
 public class HofundSocketBlock extends BaseEntityBlock {
     public static final MapCodec<HofundSocketBlock> CODEC = simpleCodec(HofundSocketBlock::new);
@@ -50,10 +50,26 @@ public class HofundSocketBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && !HofundItem.isHofund(player.getMainHandItem()) && !HofundItem.isHofund(player.getOffhandItem())) {
+        if (!level.isClientSide && !HofundItem.isHofund(player.getMainHandItem())
+                && !HofundItem.isHofund(player.getOffhandItem()) && !heimdallAnswers(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.asgard.socket").withStyle(ChatFormatting.GOLD), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** Heimdall of the city, near enough to talk, answers a touch of his socket: his talk opens. */
+    private static boolean heimdallAnswers(Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer server)) {
+            return false;
+        }
+        for (com.kolodkingal.enhanced.asgard.npc.AsgardianEntity npc : server.level().getEntitiesOfClass(
+                com.kolodkingal.enhanced.asgard.npc.AsgardianEntity.class, server.getBoundingBox().inflate(8.0),
+                npc -> npc.role() == com.kolodkingal.enhanced.asgard.npc.Role.HEIMDALL && !npc.summoned())) {
+            if (com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(server, npc)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Nullable
