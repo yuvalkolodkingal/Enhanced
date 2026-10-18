@@ -14,12 +14,15 @@ import com.kolodkingal.enhanced.bifrost.BifrostKeys;
 import com.kolodkingal.enhanced.bifrost.BifrostMenu;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.heimdall.GuardiansWatch;
+import com.kolodkingal.enhanced.heimdall.HeimdallFx;
 import com.kolodkingal.enhanced.heimdall.HeimdallAbilities;
 import com.kolodkingal.enhanced.heimdall.HeimdallServer;
 import com.kolodkingal.enhanced.heimdall.HeimdallSight;
 import com.kolodkingal.enhanced.heimdall.HeimdallTalk;
 import com.kolodkingal.enhanced.heimdall.HofundBond;
 import com.kolodkingal.enhanced.item.HofundItem;
+import com.kolodkingal.enhanced.network.AbilityKeyPayload;
+import com.kolodkingal.enhanced.network.AsgardFxPayload;
 import com.kolodkingal.enhanced.network.BifrostActionPayload;
 import com.kolodkingal.enhanced.network.HeimdallSightPayload;
 import com.kolodkingal.enhanced.power.BifrostData;
@@ -32,6 +35,9 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -416,6 +422,51 @@ public final class HeimdallTests {
         far.teleportTo(far.getX() + 60, far.getY(), far.getZ());
         ready(heimdall, 5);
         check(!Bifrost.send(heimdall, far.getId(), "home"), "a friend beyond sendRange cannot be sent");
+        helper.succeed();
+    }
+
+    /** Whether Heimdall's screen was opened in Send mode for him since the last look at his packets. */
+    private static boolean sendOpened(ServerPlayer player) {
+        for (Object packet : TestKit.sentPackets(player)) {
+            if (packet instanceof ClientboundCustomPayloadPacket custom && custom.payload() instanceof AsgardFxPayload fx
+                    && fx.kind() == HeimdallFx.OPEN_SEND) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 3.5 QA: a quick Sneak + N reached the server before its Sneak did and struck instead of sending. The key carries the
+     * client's Sneak at the press: it decides the variant whatever the server's (lagging) crouch says, and the crouch is
+     * left as it was.
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theKeyCarriesTheSneakItWasPressedWith(GameTestHelper helper) {
+        ByteBuf buf = Unpooled.buffer();
+        AbilityKeyPayload sent = new AbilityKeyPayload(5, true, true);
+        AbilityKeyPayload.STREAM_CODEC.encode(buf, sent);
+        check(AbilityKeyPayload.STREAM_CODEC.decode(buf).equals(sent), "the key's Sneak travels with it");
+
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer heimdall = heimdall(f, 4.5, 4.5);
+        ServerPlayer friend = f.player(4.5, FLOOR, 10.5);
+        heimdall.lookAt(EntityAnchorArgument.Anchor.EYES, friend.getEyePosition());
+        TestKit.sentPackets(heimdall);
+        // The server has not heard of his Sneak yet; the key says it was held.
+        heimdall.setShiftKeyDown(false);
+        AbilityHandler.onKey(heimdall, 5, true, true);
+        AbilityHandler.onKey(heimdall, 5, false, true);
+        check(sendOpened(heimdall), "Sneak + N opens the Send for the friend he looks at");
+        check(Powers.get(heimdall).isReady(HeroAbility.HEIMDALL_STRIKE, heimdall.level().getGameTime()), "and strikes nothing");
+        check(!heimdall.isShiftKeyDown(), "the server's crouch is left as it was");
+        // The other way: the server still thinks he sneaks, the key was pressed without it.
+        heimdall.setShiftKeyDown(true);
+        AbilityHandler.onKey(heimdall, 5, true, false);
+        AbilityHandler.onKey(heimdall, 5, false, false);
+        check(!sendOpened(heimdall), "a plain N does not open the Send");
+        check(heimdall.isShiftKeyDown(), "and the crouch is still the server's");
+        heimdall.setShiftKeyDown(false);
         helper.succeed();
     }
 

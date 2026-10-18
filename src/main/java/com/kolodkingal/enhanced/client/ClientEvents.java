@@ -66,6 +66,37 @@ import java.util.Optional;
 public final class ClientEvents {
     /** Whether we told the server that ability key i is down. */
     private static final boolean[] SENT_DOWN = new boolean[PowerData.ABILITIES + 1];
+    /**
+     * 3.5: the Sneak key's state at the moment ability key i went down (0 not pressed since the last tick, 1 without
+     * Sneak, 2 with it). The keys are handled once a tick, and by then a quick Sneak may already be let go of (or the
+     * server not yet told of it), so a press carries the Sneak it was made with.
+     */
+    private static final byte[] PRESS_SNEAK = new byte[PowerData.ABILITIES + 1];
+
+    /** 3.5: an ability key went down: remember whether Sneak was held at that moment. */
+    @SubscribeEvent
+    public static void onKeyInput(net.neoforged.neoforge.client.event.InputEvent.Key event) {
+        if (event.getAction() == org.lwjgl.glfw.GLFW.GLFW_PRESS) {
+            pressed(com.mojang.blaze3d.platform.InputConstants.getKey(event.getKey(), event.getScanCode()));
+        }
+    }
+
+    /** 3.5: the same for an ability bound to a mouse button. */
+    @SubscribeEvent
+    public static void onMouseInput(net.neoforged.neoforge.client.event.InputEvent.MouseButton.Post event) {
+        if (event.getAction() == org.lwjgl.glfw.GLFW.GLFW_PRESS) {
+            pressed(com.mojang.blaze3d.platform.InputConstants.Type.MOUSE.getOrCreate(event.getButton()));
+        }
+    }
+
+    private static void pressed(com.mojang.blaze3d.platform.InputConstants.Key input) {
+        Minecraft mc = Minecraft.getInstance();
+        for (int i = 1; i <= PowerData.ABILITIES; i++) {
+            if (PRESS_SNEAK[i] == 0 && KeyBindings.ability(i).isActiveAndMatches(input)) {
+                PRESS_SNEAK[i] = (byte) (mc.options.keyShift.isDown() ? 2 : 1);
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
@@ -73,6 +104,7 @@ public final class ClientEvents {
         LocalPlayer player = mc.player;
         if (player == null || mc.level == null) {
             java.util.Arrays.fill(SENT_DOWN, false);
+            java.util.Arrays.fill(PRESS_SNEAK, (byte) 0);
             return;
         }
         HeroAnimator.tick(mc.level);
@@ -287,18 +319,21 @@ public final class ClientEvents {
             // (3.3: the Hex Runes hold a sorcerer's powers: no gesture is predicted for a press the server refuses)
             boolean usable = power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
             boolean down = usable && key.isDown();
+            // (3.5: the Sneak the key was pressed with, not the one the tick read; see PRESS_SNEAK)
+            boolean sneak = PRESS_SNEAK[i] != 0 ? PRESS_SNEAK[i] == 2 : mc.options.keyShift.isDown();
+            PRESS_SNEAK[i] = 0;
             if (usable && clicked && !SENT_DOWN[i]) {
-                if (HexScreen.opens(player, i, player.isShiftKeyDown())) { // (3.4: a custom hero's Hex key too)
+                if (HexScreen.opens(player, i, sneak)) { // (3.4: a custom hero's Hex key too)
                     mc.setScreen(new HexScreen());
                     continue;
                 }
-                if (BifrostKeys.opensScreen(player, i, player.isShiftKeyDown())) { mc.setScreen(new BifrostScreen()); continue; }
-                PacketDistributor.sendToServer(new AbilityKeyPayload(i, true));
+                if (BifrostKeys.opensScreen(player, i, sneak)) { mc.setScreen(new BifrostScreen()); continue; }
+                PacketDistributor.sendToServer(new AbilityKeyPayload(i, true, sneak));
                 SENT_DOWN[i] = true;
                 HeroAnimator.predict(player, i);
             }
             if (!down && SENT_DOWN[i]) {
-                PacketDistributor.sendToServer(new AbilityKeyPayload(i, false));
+                PacketDistributor.sendToServer(new AbilityKeyPayload(i, false, mc.options.keyShift.isDown()));
                 SENT_DOWN[i] = false;
             }
         }

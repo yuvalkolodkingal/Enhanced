@@ -9,13 +9,17 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/** Client → server: an ability key went down or came up. */
-public record AbilityKeyPayload(int ability, boolean down) implements CustomPacketPayload {
+/**
+ * Client → server: an ability key went down or came up, with the client's Sneak at that moment (3.5: the server's crouch
+ * lags behind a quick Sneak + key).
+ */
+public record AbilityKeyPayload(int ability, boolean down, boolean sneak) implements CustomPacketPayload {
     public static final Type<AbilityKeyPayload> TYPE = new Type<>(Enhanced.id("ability_key"));
 
     public static final StreamCodec<ByteBuf, AbilityKeyPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, AbilityKeyPayload::ability,
             ByteBufCodecs.BOOL, AbilityKeyPayload::down,
+            ByteBufCodecs.BOOL, AbilityKeyPayload::sneak,
             AbilityKeyPayload::new);
 
     @Override
@@ -25,7 +29,7 @@ public record AbilityKeyPayload(int ability, boolean down) implements CustomPack
 
     static void handle(AbilityKeyPayload payload, IPayloadContext context) {
         if (context.player() instanceof ServerPlayer player) {
-            AbilityHandler.onKey(player, payload.ability(), payload.down());
+            AbilityHandler.onKey(player, payload.ability(), payload.down(), payload.sneak());
         }
     }
 }
