@@ -303,9 +303,7 @@ public final class CyclopsAbilities {
             }
             path.add(end);
             if (shield != null) {
-                if (shield.owner() instanceof ServerPlayer wanda && player.canHarmPlayer(wanda)) {
-                    WandaAbilities.wear(wanda, damage);
-                }
+                WandaAbilities.pay(shield, player, damage); // (3.3: a Chaos Shield or a Hex Barrier pays; a Hex or a ward stops it free)
                 break;
             }
             if (block.getType() == HitResult.Type.MISS || path.size() >= CyclopsFxPayload.MAX_POINTS) {
