@@ -165,7 +165,7 @@ public final class PhoenixFx {
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
             int id = player.getId();
-            if (data.power() != Power.PHOENIX) {
+            if (!data.acts(Power.PHOENIX)) {
                 continue;
             }
             seen.add(id);
@@ -379,7 +379,7 @@ public final class PhoenixFx {
         List<AbstractClientPlayer> charging = new ArrayList<>();
         List<AbstractClientPlayer> fields = new ArrayList<>();
         for (AbstractClientPlayer player : level.players()) {
-            if (Powers.get(player).power() != Power.PHOENIX || player.isInvisible() || player.isSpectator()) {
+            if (!Powers.get(player).acts(Power.PHOENIX) || player.isInvisible() || player.isSpectator()) {
                 continue;
             }
             if (CHARGING.containsKey(player.getId()) && Powers.get(player).is(Live.PHOENIX_CHARGING)) {

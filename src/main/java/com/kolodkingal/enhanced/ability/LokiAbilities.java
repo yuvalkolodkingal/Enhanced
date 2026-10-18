@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -14,7 +15,6 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.power.Variant;
-import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -105,20 +105,21 @@ public final class LokiAbilities {
 
     // ---- input ----
 
-    /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
-     */
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    /** Loki's own key: Sneak chooses the variant (a fan of daggers). */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * A key of Loki's, his own or (3.4) a custom hero's who has the ability ({@code HeroKeys.press}): {@code ability} is
+     * its key for Loki, {@code alt} whether it is the Sneak variant.
+     */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (!down || player.isSpectator()) {
             return;
         }
         switch (ability) {
-            case 1 -> daggers(player, data);
+            case 1 -> daggers(player, data, alt);
             case 2 -> duplicates(player, data);
             case 3 -> shapeshift(player, data);
             case 4 -> vanish(player, data);
@@ -128,27 +129,36 @@ public final class LokiAbilities {
         }
     }
 
+    /** Loki's tick, or (3.4) a custom hero's with any of his abilities: each part only for the ability it belongs to. */
     public static void tick(ServerPlayer player, PowerData data) {
         long now = player.level().getGameTime();
         Map<Live, Long> until = UNTIL.get(player.getUUID());
         for (Live state : TIMED) {
-            boolean on = until != null && until.getOrDefault(state, 0L) > now;
+            if (until == null || !until.containsKey(state)) {
+                // (Not his to end: a custom hero's other heroes show CASTING too.)
+                continue;
+            }
+            boolean on = until.get(state) > now;
+            if (!on) {
+                until.remove(state);
+            }
             // Drinking milk (or anything else that ends the invisibility) ends the trick.
             data.set(state, on && (state != Live.HIDDEN || player.hasEffect(MobEffects.INVISIBILITY)));
         }
-        if (!data.form().isEmpty() && LokiForm.of(data).isEmpty()) {
+        if (data.has(HeroAbility.LOKI_SHAPESHIFT) && !data.form().isEmpty() && LokiForm.of(data).isEmpty()) {
             // The creature he copied no longer exists (a removed mod): he is himself again.
             data.setForm("");
         }
-        if (data.toggle(Toggle.FROST_GIANT)) {
+        if (data.has(HeroAbility.LOKI_FROST_GIANT) && data.toggle(Toggle.FROST_GIANT)) {
             frostTick(player);
         }
     }
 
     /** Keeps Loki's body in step with his Frost Giant form and his shapeshifted form; also called when the power changes. */
     public static void applyForm(ServerPlayer player, PowerData data) {
+        // (3.4: Loki's Asgardian body is his own; a custom hero's Frost Giant form armours him too.)
         boolean loki = data.power() == Power.LOKI;
-        boolean frost = loki && data.toggle(Toggle.FROST_GIANT);
+        boolean frost = data.has(HeroAbility.LOKI_FROST_GIANT) && data.toggle(Toggle.FROST_GIANT);
         PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, BODY_HEALTH_BONUS, loki);
         PowerTicker.setModifier(player, Attributes.ARMOR, FROST_ARMOR, FROST_ARMOR_BONUS, frost);
         if (player.getHealth() > player.getMaxHealth()) {
@@ -170,7 +180,10 @@ public final class LokiAbilities {
         for (Live state : TIMED) {
             data.set(state, false);
         }
-        data.setForm("");
+        if (data.has(HeroAbility.LOKI_SHAPESHIFT)) {
+            // (3.4: a custom hero's creature shape of his generic Shapeshifting is not Loki's to end.)
+            data.setForm("");
+        }
         data.setToggle(Toggle.FROST_GIANT, false);
     }
 
@@ -182,19 +195,19 @@ public final class LokiAbilities {
 
     public static boolean isFrostGiant(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.LOKI && data.toggle(Toggle.FROST_GIANT);
+        return data.has(HeroAbility.LOKI_FROST_GIANT) && data.toggle(Toggle.FROST_GIANT);
     }
 
     /** Loki is invisible behind his duplicates: nothing of him is drawn, not even what he holds. */
     public static boolean isHidden(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.LOKI && data.is(Live.HIDDEN);
+        return data.has(HeroAbility.LOKI_DUPLICATES) && data.is(Live.HIDDEN);
     }
 
-    /** Whether {@code player} is a Loki who has taken the shape of this kind of creature. */
+    /** Whether {@code player} is a Loki (3.4: or has his Shapeshift) who has taken the shape of this kind of creature. */
     public static boolean passesAs(Player player, EntityType<?> type) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.LOKI && !data.form().isEmpty()
+        return data.has(HeroAbility.LOKI_SHAPESHIFT) && !data.form().isEmpty()
                 && LokiForm.of(data).filter(form -> !form.isPlayer() && form.type() == type).isPresent();
     }
 
@@ -231,11 +244,11 @@ public final class LokiAbilities {
      */
     public static boolean unmask(ServerPlayer loki) {
         PowerData data = Powers.get(loki);
-        if (data.power() != Power.LOKI) {
+        if (!data.acts(Power.LOKI)) {
             return false;
         }
         boolean changed = false;
-        if (data.is(Live.HIDDEN) || loki.hasEffect(MobEffects.INVISIBILITY)) {
+        if (data.has(HeroAbility.LOKI_DUPLICATES) && (data.is(Live.HIDDEN) || loki.hasEffect(MobEffects.INVISIBILITY))) {
             loki.removeEffect(MobEffects.INVISIBILITY);
             Map<Live, Long> until = UNTIL.get(loki.getUUID());
             if (until != null) {
@@ -244,7 +257,7 @@ public final class LokiAbilities {
             data.set(Live.HIDDEN, false);
             changed = true;
         }
-        if (!data.form().isEmpty()) {
+        if (data.has(HeroAbility.LOKI_SHAPESHIFT) && !data.form().isEmpty()) {
             data.setForm("");
             shimmer(loki, data);
             changed = true;
@@ -255,14 +268,13 @@ public final class LokiAbilities {
     // ---- Ability 1: Daggers ----
 
     /** A conjured dagger thrown from the hand, or (sneaking) a fan of three. */
-    private static void daggers(ServerPlayer player, PowerData data) {
+    private static void daggers(ServerPlayer player, PowerData data, boolean fan) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(1, now)) {
+        if (!data.isReady(HeroAbility.LOKI_DAGGERS, now)) {
             return;
         }
-        boolean fan = player.isShiftKeyDown();
-        data.startCooldown(1, now, fan ? FAN_COOLDOWN : DAGGER_COOLDOWN);
+        data.startCooldown(HeroAbility.LOKI_DAGGERS, now, fan ? FAN_COOLDOWN : DAGGER_COOLDOWN);
         float damage = EnhancedConfig.LOKI_DAGGER_DAMAGE.get().floatValue();
         for (float spread : fan ? new float[]{-FAN_ANGLE, 0.0F, FAN_ANGLE} : new float[]{0.0F}) {
             LokiDaggerEntity dagger = new LokiDaggerEntity(level, player, damage);
@@ -283,11 +295,11 @@ public final class LokiAbilities {
     private static void duplicates(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(2, now)) {
+        if (!data.isReady(HeroAbility.LOKI_DUPLICATES, now)) {
             return;
         }
-        data.startCooldown(2, now, DUPLICATES_COOLDOWN);
-        Variant look = Variants.current(data);
+        data.startCooldown(HeroAbility.LOKI_DUPLICATES, now, DUPLICATES_COOLDOWN);
+        Variant look = Powers.variant(player);
 
         // The copies are conjured first, so they look like him (and hold what he holds) before he disappears.
         List<LokiIllusionEntity> copies = new ArrayList<>();
@@ -374,7 +386,7 @@ public final class LokiAbilities {
 
     /** The flash of green light of a change of shape. */
     private static void shimmer(ServerPlayer player, PowerData data) {
-        Variant look = Variants.current(data);
+        Variant look = Powers.variant(player);
         ServerLevel level = player.serverLevel();
         level.sendParticles(new EnergyParticleOptions(look.color(), 1.6F), player.getX(), player.getY() + 1.0, player.getZ(),
                 60, 0.35, 0.8, 0.35, 0.03);
@@ -393,7 +405,7 @@ public final class LokiAbilities {
     private static void vanish(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.LOKI_VANISH, now)) {
             return;
         }
         HitResult hit = Raycasts.any(player, VANISH_RANGE, e -> e instanceof LivingEntity living && living.isAlive() && e != player
@@ -426,8 +438,8 @@ public final class LokiAbilities {
         if (!HexManager.onTeleport(level, player, to)) {
             return;
         }
-        data.startCooldown(4, now, VANISH_COOLDOWN);
-        Variant look = Variants.current(data);
+        data.startCooldown(HeroAbility.LOKI_VANISH, now, VANISH_COOLDOWN);
+        Variant look = Powers.variant(player);
         Vec3 from = player.position();
         vanishFlash(level, from, look);
         level.playSound(null, from.x, from.y, from.z, ModSounds.LOKI_VANISH.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -452,7 +464,7 @@ public final class LokiAbilities {
         data.setToggle(Toggle.FROST_GIANT, frost);
         applyForm(player, data);
         ServerLevel level = player.serverLevel();
-        Variant look = Variants.current(data);
+        Variant look = Powers.variant(player);
         level.sendParticles(new EnergyParticleOptions(frost ? FROST_COLOR : look.color(), 1.5F), player.getX(), player.getY() + 1.0, player.getZ(),
                 50, 0.35, 0.8, 0.35, 0.03);
         level.sendParticles(new EnergyParticleOptions(frost ? FROST_GLOW : look.glow(), 1.2F), player.getX(), player.getY() + 1.0, player.getZ(),

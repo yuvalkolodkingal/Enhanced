@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -198,7 +199,16 @@ public final class ThanosAbilities {
 
     // ---- input ----
 
+    /** His own key: Sneak chooses the variant. */
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /**
+     * A key of Thanos's, his own or (3.4) a custom hero's who has the stone ({@code HeroKeys.press}): {@code ability} is
+     * its key for Thanos, {@code alt} whether it is the Sneak variant.
+     */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         // Letting go of the Soul Drain always gets through, even for a Thanos who just became a spectator or was held.
         if (ability == 4 && !down) {
             endDrain(player, data);
@@ -211,7 +221,7 @@ public final class ThanosAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.thanos.held"), true);
             return;
         }
-        boolean sneak = player.isShiftKeyDown();
+        boolean sneak = alt;
         switch (ability) {
             case 1 -> {
                 if (sneak) {
@@ -267,7 +277,7 @@ public final class ThanosAbilities {
     }
 
     /** Whether the ability's cooldown is over and, if it costs hunger, he is not starving; says why if not. */
-    private static boolean mayStart(ServerPlayer player, PowerData data, int ability, long now) {
+    private static boolean mayStart(ServerPlayer player, PowerData data, HeroAbility ability, long now) {
         if (!data.isReady(ability, now)) {
             return false;
         }
@@ -282,26 +292,29 @@ public final class ThanosAbilities {
 
     /**
      * A Titan's body: more health, armour and toughness, hard to knock back, strong, a little taller, with long arms
-     * and a long stride, and a gentler landing. Applied while the power is his, and taken off whoever is not Thanos.
+     * and a long stride, and a gentler landing. Applied while the power is his, and taken off whoever is not Thanos. (3.4:
+     * a custom hero with his body has it too, its amounts by its strength.)
      */
     public static void applyBody(ServerPlayer player, PowerData data) {
-        if (data.power() != Power.THANOS) {
+        if (!data.has(HeroAbility.THANOS_BODY)) {
             // (Nearly every player, every tick: one lookup says whether there is anything to take off.)
             if (player.getAttribute(Attributes.MAX_HEALTH).getModifier(BODY_HEALTH) != null) {
                 removeBody(player);
             }
             return;
         }
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, ThanosConfig.HEALTH_BONUS.get(), true);
-        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, ThanosConfig.ARMOR_BONUS.get(), true);
-        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, BODY_TOUGHNESS, ThanosConfig.TOUGHNESS_BONUS.get(), true);
-        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, BODY_KNOCKBACK, ThanosConfig.KNOCKBACK_RESISTANCE.get(), true);
-        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, BODY_ATTACK, ThanosConfig.ATTACK_BONUS.get(), true);
-        PowerTicker.setModifier(player, Attributes.SCALE, BODY_SCALE, ThanosConfig.SCALE.get(), true,
+        double k = data.bodyScale(HeroAbility.THANOS_BODY);
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, ThanosConfig.HEALTH_BONUS.get() * k, true);
+        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, ThanosConfig.ARMOR_BONUS.get() * k, true);
+        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, BODY_TOUGHNESS, ThanosConfig.TOUGHNESS_BONUS.get() * k, true);
+        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, BODY_KNOCKBACK,
+                Math.min(1.0, ThanosConfig.KNOCKBACK_RESISTANCE.get() * k), true);
+        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, BODY_ATTACK, ThanosConfig.ATTACK_BONUS.get() * k, true);
+        PowerTicker.setModifier(player, Attributes.SCALE, BODY_SCALE, ThanosConfig.SCALE.get() * k, true,
                 AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-        PowerTicker.setModifier(player, Attributes.ENTITY_INTERACTION_RANGE, BODY_REACH, ThanosConfig.REACH_BONUS.get(), true);
-        PowerTicker.setModifier(player, Attributes.STEP_HEIGHT, BODY_STEP, ThanosConfig.STEP_BONUS.get(), true);
-        PowerTicker.setModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, BODY_FALL, -0.5, true);
+        PowerTicker.setModifier(player, Attributes.ENTITY_INTERACTION_RANGE, BODY_REACH, ThanosConfig.REACH_BONUS.get() * k, true);
+        PowerTicker.setModifier(player, Attributes.STEP_HEIGHT, BODY_STEP, ThanosConfig.STEP_BONUS.get() * k, true);
+        PowerTicker.setModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, BODY_FALL, Math.max(-1.0, -0.5 * k), true);
     }
 
     private static void removeBody(ServerPlayer player) {
@@ -321,13 +334,23 @@ public final class ThanosAbilities {
 
     // ---- every tick (his own, alive) ----
 
+    /**
+     * His tick, or (3.4) a custom hero's with any of his stones: the history only for the Time Stone, the healing factor
+     * only with his body, the Veil only with the Reality Stone (the rest only runs on what a stone started).
+     */
     public static void tick(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        remember(player, state, now);
-        healingFactor(player, state, now);
-        veilTick(player, data, level);
+        if (data.has(HeroAbility.THANOS_TIME)) {
+            remember(player, state, now);
+        }
+        if (data.has(HeroAbility.THANOS_BODY)) {
+            healingFactor(player, state, now, data.bodyScale(HeroAbility.THANOS_BODY));
+        }
+        if (data.has(HeroAbility.THANOS_REALITY)) {
+            veilTick(player, data, level);
+        }
         slamTick(player, state, level);
         sphereTick(player, state, level, now);
         vortexTick(player, state, level, now);
@@ -342,11 +365,11 @@ public final class ThanosAbilities {
     /**
      * The Titan healing factor: when he has not been hurt for a while he heals, slowly, at the cost of a little hunger.
      */
-    private static void healingFactor(ServerPlayer player, State state, long now) {
+    private static void healingFactor(ServerPlayer player, State state, long now, float scale) {
         if (player.getHealth() >= player.getMaxHealth() || now - state.lastHurt < ThanosConfig.REGEN_DELAY_TICKS.get() || starving(player)) {
             return;
         }
-        float heal = ThanosConfig.REGEN_PER_SECOND.get().floatValue() / 20.0F;
+        float heal = ThanosConfig.REGEN_PER_SECOND.get().floatValue() / 20.0F * scale;
         if (heal > 0.0F) {
             player.heal(heal);
             player.causeFoodExhaustion(0.01F);
@@ -477,7 +500,7 @@ public final class ThanosAbilities {
     private static void powerBlast(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!mayStart(player, data, 1, now)) {
+        if (!mayStart(player, data, HeroAbility.THANOS_POWER, now)) {
             return;
         }
         double range = ThanosConfig.POWER_BLAST_RANGE.get();
@@ -487,7 +510,7 @@ public final class ThanosAbilities {
         }
         Vec3 hand = handPosition(player);
         Vec3 end = aim.point();
-        data.startCooldown(1, now, ThanosConfig.POWER_BLAST_COOLDOWN.get());
+        data.startCooldown(HeroAbility.THANOS_POWER, now, ThanosConfig.POWER_BLAST_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.POWER_BLAST_EXHAUSTION.get().floatValue());
         ThanosSounds.CLENCH.play(level, player.position());
         ThanosSounds.POWER_BLAST.play(level, player.position());
@@ -531,10 +554,10 @@ public final class ThanosAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        if (!mayStart(player, data, 1, now) || state.slam != null) {
+        if (!mayStart(player, data, HeroAbility.THANOS_POWER, now) || state.slam != null) {
             return;
         }
-        data.startCooldown(1, now, ThanosConfig.SLAM_COOLDOWN.get());
+        data.startCooldown(HeroAbility.THANOS_POWER, now, ThanosConfig.SLAM_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.SLAM_EXHAUSTION.get().floatValue());
         state.slam = new Slam(player.position());
         float radius = ThanosConfig.SLAM_RADIUS.get().floatValue();
@@ -571,7 +594,7 @@ public final class ThanosAbilities {
     private static void portalStep(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!mayStart(player, data, 2, now)) {
+        if (!mayStart(player, data, HeroAbility.THANOS_SPACE, now)) {
             return;
         }
         double range = ThanosConfig.SPACE_STEP_RANGE.get();
@@ -595,7 +618,7 @@ public final class ThanosAbilities {
         if (!HexManager.onTeleport(level, player, spot)) {
             return;
         }
-        data.startCooldown(2, now, ThanosConfig.SPACE_STEP_COOLDOWN.get());
+        data.startCooldown(HeroAbility.THANOS_SPACE, now, ThanosConfig.SPACE_STEP_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.STEP_EXHAUSTION.get().floatValue());
         Vec3 from = player.position();
         ThanosEffects.portal(level, from.add(0.0, 0.2, 0.0), 1.6F, 60);
@@ -627,7 +650,7 @@ public final class ThanosAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        if (!mayStart(player, data, 2, now) || state.vortex != null) {
+        if (!mayStart(player, data, HeroAbility.THANOS_SPACE, now) || state.vortex != null) {
             return;
         }
         Aim aim = aim(player, ThanosConfig.PULL_RANGE.get(), 0.3, target -> !(target instanceof ArmorStand));
@@ -644,7 +667,7 @@ public final class ThanosAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.shelter.power_stopped"), true);
             return;
         }
-        data.startCooldown(2, now, ThanosConfig.PULL_COOLDOWN.get());
+        data.startCooldown(HeroAbility.THANOS_SPACE, now, ThanosConfig.PULL_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.PULL_EXHAUSTION.get().floatValue());
         state.vortex = new Vortex(target.getId(), now + FLIGHT_TICKS);
         ThanosEffects.mandala(level, target.position().add(0.0, 0.05, 0.0), 1.6F, FLIGHT_TICKS, StoneKind.SPACE.color());
@@ -711,7 +734,7 @@ public final class ThanosAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        if (!mayStart(player, data, 3, now) || state.sphere != null) {
+        if (!mayStart(player, data, HeroAbility.THANOS_REALITY, now) || state.sphere != null) {
             return;
         }
         Aim aim = aim(player, ThanosConfig.TRANSMUTE_RANGE.get(), 0.3, target -> !(target instanceof ArmorStand));
@@ -723,7 +746,7 @@ public final class ThanosAbilities {
         if (pvpRefuses(player, target)) {
             return;
         }
-        data.startCooldown(3, now, ThanosConfig.TRANSMUTE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.THANOS_REALITY, now, ThanosConfig.TRANSMUTE_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.TRANSMUTE_EXHAUSTION.get().floatValue());
         state.sphere = new Sphere(target.getId(), now + FLIGHT_TICKS);
         ThanosEffects.beam(level, player, handPosition(player), chestOf(target), 0.35F, FLIGHT_TICKS, StoneKind.REALITY.color());
@@ -825,7 +848,7 @@ public final class ThanosAbilities {
      * @return whether the Veil took it
      */
     public static boolean veilTakes(ServerPlayer thanos, Projectile projectile) {
-        if (!Powers.is(thanos, Power.THANOS) || !Powers.get(thanos).toggle(Toggle.REALITY_VEIL)
+        if (!Powers.get(thanos).has(HeroAbility.THANOS_REALITY) || !Powers.get(thanos).toggle(Toggle.REALITY_VEIL)
                 || projectile.getType().is(ModTags.REALITY_PROOF) || isOwnedBy(projectile.getOwner(), thanos)) {
             return false;
         }
@@ -847,7 +870,7 @@ public final class ThanosAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        if (!mayStart(player, data, 4, now) || state.drain != null) {
+        if (!mayStart(player, data, HeroAbility.THANOS_SOUL, now) || state.drain != null) {
             return;
         }
         double range = ThanosConfig.DRAIN_RANGE.get();
@@ -918,7 +941,7 @@ public final class ThanosAbilities {
         data.set(Live.SOUL_DRAINING, false);
         if (state != null && state.drain != null) {
             state.drain = null;
-            data.startCooldown(4, player.level().getGameTime(), ThanosConfig.DRAIN_COOLDOWN.get());
+            data.startCooldown(HeroAbility.THANOS_SOUL, player.level().getGameTime(), ThanosConfig.DRAIN_COOLDOWN.get());
         }
     }
 
@@ -931,7 +954,7 @@ public final class ThanosAbilities {
     private static void soulSight(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!mayStart(player, data, 4, now)) {
+        if (!mayStart(player, data, HeroAbility.THANOS_SOUL, now)) {
             return;
         }
         State state = state(player);
@@ -939,7 +962,7 @@ public final class ThanosAbilities {
         state.sightEnds = now + ThanosConfig.SIGHT_TICKS.get();
         data.set(Live.SOUL_SIGHT, true);
         if (!player.isCreative()) {
-            data.startCooldown(4, now, ThanosConfig.SIGHT_COOLDOWN.get());
+            data.startCooldown(HeroAbility.THANOS_SOUL, now, ThanosConfig.SIGHT_COOLDOWN.get());
         }
         player.causeFoodExhaustion(ThanosConfig.SIGHT_EXHAUSTION.get().floatValue());
         if (ThanosConfig.SIGHT_BREAKS_ILLUSIONS.get()) {
@@ -1020,7 +1043,7 @@ public final class ThanosAbilities {
     private static void rewind(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!mayStart(player, data, 5, now)) {
+        if (!mayStart(player, data, HeroAbility.THANOS_TIME, now)) {
             return;
         }
         if (MjolnirPin.isPinned(player)) {
@@ -1042,7 +1065,7 @@ public final class ThanosAbilities {
         if (back != null && !HexManager.onTeleport(level, player, back)) {
             back = null; // (a Hex wall or the arena of a boss refuses the place; the rest of the Rewind still happens)
         }
-        data.startCooldown(5, now, ThanosConfig.REWIND_COOLDOWN.get());
+        data.startCooldown(HeroAbility.THANOS_TIME, now, ThanosConfig.REWIND_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.REWIND_EXHAUSTION.get().floatValue());
         if (past.health() > player.getHealth()) {
             float most = ThanosConfig.REWIND_MAX_HEAL.get().floatValue();
@@ -1100,11 +1123,11 @@ public final class ThanosAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        if (!mayStart(player, data, 5, now) || state.lock != null) {
+        if (!mayStart(player, data, HeroAbility.THANOS_TIME, now) || state.lock != null) {
             return;
         }
         int ticks = ThanosConfig.TIME_LOCK_TICKS.get();
-        data.startCooldown(5, now, ThanosConfig.TIME_LOCK_COOLDOWN.get());
+        data.startCooldown(HeroAbility.THANOS_TIME, now, ThanosConfig.TIME_LOCK_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.TIME_LOCK_EXHAUSTION.get().floatValue());
         state.lock = new Lock(level.dimension(), player.position(), now + ticks);
         float radius = ThanosConfig.TIME_LOCK_RADIUS.get().floatValue();

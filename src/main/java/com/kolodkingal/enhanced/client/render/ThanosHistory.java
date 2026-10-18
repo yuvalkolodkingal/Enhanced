@@ -1,7 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.config.CustomHeroConfig;
 import com.kolodkingal.enhanced.config.ThanosConfig;
-import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.client.Minecraft;
@@ -33,16 +34,19 @@ final class ThanosHistory {
     /** Counts a tick: the history grows while he lives, and starts over with a new world, a death or a Rewind. */
     static void tick(Minecraft mc) {
         LocalPlayer player = mc.player;
-        if (player == null || mc.level == null || Powers.get(player).power() != Power.THANOS) {
+        if (player == null || mc.level == null || !Powers.get(player).has(HeroAbility.THANOS_TIME)) {
             ticks = 0;
             counted = null;
             return;
         }
         PowerData data = Powers.get(player);
         long now = mc.level.getGameTime();
-        long rewindUntil = data.cooldownUntil(5);
-        // A cooldown that has just begun with the Rewind's length is a Rewind (the Time Lock's is shorter).
-        boolean rewound = rewindUntil > rewindUntilSeen && rewindUntil - now > ThanosConfig.REWIND_COOLDOWN.get() - 10;
+        int slot = data.slot(HeroAbility.THANOS_TIME);
+        long rewindUntil = slot == 0 ? 0L : data.cooldownUntil(slot);
+        // A cooldown that has just begun with the Rewind's length is a Rewind (the Time Lock's is shorter). (3.4: a custom
+        // hero's is as long as his Time Stone's strength makes it.)
+        double factor = data.kit() == null ? 1.0 : data.kit().cooldownFactor(HeroAbility.THANOS_TIME) * CustomHeroConfig.COOLDOWN_SCALE.get();
+        boolean rewound = rewindUntil > rewindUntilSeen && rewindUntil - now > (ThanosConfig.REWIND_COOLDOWN.get() - 10) * factor;
         rewindUntilSeen = rewindUntil;
         if (counted != player || player.isDeadOrDying() || rewound) {
             ticks = 0;

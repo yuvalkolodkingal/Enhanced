@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -107,6 +108,15 @@ public final class Shapeshifts {
     }
 
     /**
+     * Whether Loki's tricks change the skin this player is drawn with: Loki, or (3.4) a custom hero with his Shapeshift
+     * or his Frost Giant form (which paints whatever skin the custom hero wears).
+     */
+    public static boolean changesSkin(Player player) {
+        PowerData data = Powers.get(player);
+        return data.has(HeroAbility.LOKI_SHAPESHIFT) || data.has(HeroAbility.LOKI_FROST_GIANT);
+    }
+
+    /**
      * The skin of the player Loki copied, or null if he isn't in a player's shape (or it is his own first-person
      * view, which never changes): their current skin if they are nearby, otherwise the skin they joined with.
      */
@@ -132,7 +142,7 @@ public final class Shapeshifts {
     @Nullable
     private static LokiForm playerForm(Player player) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.LOKI || data.form().isEmpty()) {
+        if (!data.has(HeroAbility.LOKI_SHAPESHIFT) || data.form().isEmpty()) {
             return null;
         }
         return LokiForm.of(data).filter(LokiForm::isPlayer).orElse(null);

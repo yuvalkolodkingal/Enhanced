@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
@@ -123,15 +124,16 @@ public final class ThorAbilities {
 
     // ---- input ----
 
-    /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
-     */
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    /** Thor's own key: Sneak chooses the variant (Mjolnir shatters, the Bifrost opens to where he looks). */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * A key of Thor's, his own or (3.4) a custom hero's who has the ability ({@code HeroKeys.press}): {@code ability} is
+     * its key for Thor, {@code alt} whether it is the Sneak variant.
+     */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         // The lightning beam is held: letting go must always get through, even for a Thor who just became a spectator.
         if (ability == 3) {
             lightningBeam(player, data, down);
@@ -143,7 +145,7 @@ public final class ThorAbilities {
         switch (ability) {
             case 1 -> {
                 InteractionHand hand = weaponHand(player);
-                if (player.isShiftKeyDown() && hand != null && isMjolnir(player.getItemInHand(hand))) {
+                if (alt && hand != null && isMjolnir(player.getItemInHand(hand))) {
                     // Sneak + R: Mjolnir shatters (Stormbreaker doesn't: it is thrown as usual).
                     MjolnirShatter.shatter(player, data, hand);
                 } else {
@@ -173,7 +175,7 @@ public final class ThorAbilities {
             }
             // Without Sneak the client opens the Bifrost screen instead; a bare key press goes home.
             case 5 -> {
-                if (player.isShiftKeyDown()) {
+                if (alt) {
                     bifrostToLook(player);
                 } else {
                     bifrostHome(player);
@@ -337,13 +339,14 @@ public final class ThorAbilities {
 
     // ---- passives ----
 
+    /** Thor's tick, or (3.4) a custom hero's with any of his abilities: each part only for the ability it belongs to. */
     public static void tick(ServerPlayer player, PowerData data) {
         // The weapon in flight (or the fragments of the shattered one) may have been caught, dropped or unloaded.
-        if (data.hammerEntityId() != -1 && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity)
+        if (data.has(HeroAbility.THOR_HAMMER) && data.hammerEntityId() != -1 && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof ThrownWeaponEntity)
                 && !(player.serverLevel().getEntity(data.hammerEntityId()) instanceof MjolnirFragmentEntity)) {
             data.setHammerEntityId(-1);
         }
-        if (data.toggle(Toggle.GOD_OF_THUNDER)) {
+        if (data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER)) {
             if (starving(player)) {
                 data.setToggle(Toggle.GOD_OF_THUNDER, false);
                 player.displayClientMessage(Component.translatable("message.enhanced.god_of_thunder.off"), true);
@@ -351,7 +354,7 @@ public final class ThorAbilities {
                 player.causeFoodExhaustion(EnhancedConfig.GOD_OF_THUNDER_EXHAUSTION.get().floatValue());
             }
         }
-        if (data.is(Live.CALLING_LIGHTNING)) {
+        if (data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
             beamTick(player, data);
         }
     }
@@ -366,22 +369,37 @@ public final class ThorAbilities {
         return holdsWeapon(player) || data.hammerEntityId() != -1;
     }
 
-    /** Asgardian body (30 health, 6 armor, hard to knock back); the God of Thunder hits harder and takes less. */
+    /**
+     * Asgardian body (30 health, 6 armor, hard to knock back); the God of Thunder hits harder and takes less. (3.4: a
+     * custom hero has the body with Thor's body ability, its amounts by its strength, and the God of Thunder's with
+     * that ability, by its strength.)
+     */
     public static void applyBody(ServerPlayer player, PowerData data) {
-        boolean thor = data.power() == Power.THOR;
-        boolean unleashed = thor && data.toggle(Toggle.GOD_OF_THUNDER);
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, 10.0, thor);
-        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, 6.0, thor);
-        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, BODY_KNOCKBACK, 0.5, thor);
-        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, THUNDER_DAMAGE, 4.0, unleashed);
-        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, THUNDER_TOUGHNESS, 6.0, unleashed);
+        boolean thor = data.has(HeroAbility.THOR_BODY);
+        double body = data.bodyScale(HeroAbility.THOR_BODY);
+        boolean unleashed = data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER);
+        double thunder = data.kit() != null ? data.kit().damageFactor(HeroAbility.THOR_THUNDER) : 1.0;
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, 10.0 * body, thor);
+        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, 6.0 * body, thor);
+        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, BODY_KNOCKBACK, Math.min(1.0, 0.5 * body), thor);
+        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, THUNDER_DAMAGE, 4.0 * thunder, unleashed);
+        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, THUNDER_TOUGHNESS, 6.0 * thunder, unleashed);
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
     }
 
+    /**
+     * A God of Thunder, whom lightning never hurts: Thor, or (3.4) a custom hero with his hammer, his lightning, his God
+     * of Thunder or his body (not one who only calls the Bifrost).
+     */
     public static boolean isThor(Entity entity) {
-        return entity instanceof Player player && Powers.is(player, Power.THOR);
+        if (!(entity instanceof Player player)) {
+            return false;
+        }
+        PowerData data = Powers.get(player);
+        return data.power() == Power.THOR || data.has(HeroAbility.THOR_HAMMER) || data.has(HeroAbility.THOR_LIGHTNING)
+                || data.has(HeroAbility.THOR_THUNDER) || data.has(HeroAbility.THOR_BODY);
     }
 
     // ---- Ability 1: throw the weapon, or call it back ----
@@ -389,7 +407,7 @@ public final class ThorAbilities {
     private static void throwOrRecall(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(1, now)) {
+        if (!data.isReady(HeroAbility.THOR_HAMMER, now)) {
             return;
         }
         InteractionHand hand = weaponHand(player);
@@ -399,13 +417,13 @@ public final class ThorAbilities {
             player.setItemInHand(hand, ItemStack.EMPTY);
             level.addFreshEntity(thrown);
             data.setHammerEntityId(thrown.getId());
-            data.startCooldown(1, now, THROW_COOLDOWN);
+            data.startCooldown(HeroAbility.THOR_HAMMER, now, THROW_COOLDOWN);
             player.swing(hand, true);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.MJOLNIR_THROW.get(), SoundSource.PLAYERS, 1.2F, isStormbreaker(weapon) ? 0.85F : 1.0F);
             return;
         }
         if (recall(player, data)) {
-            data.startCooldown(1, now, THROW_COOLDOWN);
+            data.startCooldown(HeroAbility.THOR_HAMMER, now, THROW_COOLDOWN);
         } else {
             player.displayClientMessage(Component.translatable("message.enhanced.thor.weapon_out_of_reach"), true);
         }
@@ -750,7 +768,7 @@ public final class ThorAbilities {
     /** A melee hit by the God of Thunder arcs lightning (called for every hit Thor lands). */
     public static void onMeleeHit(ServerPlayer thor, LivingEntity target) {
         PowerData data = Powers.get(thor);
-        if (data.power() == Power.THOR && data.toggle(Toggle.GOD_OF_THUNDER)) {
+        if (data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER)) {
             arc(thor.serverLevel(), thor, thor.getEyePosition().subtract(0, 0.4, 0), target);
         }
     }
@@ -823,7 +841,7 @@ public final class ThorAbilities {
         if (player.isSpectator()) {
             return;
         }
-        if (!holdsWeapon(player)) {
+        if (!callsBifrost(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
             return;
         }
@@ -851,6 +869,18 @@ public final class ThorAbilities {
         return PlaceBook.placeAt(player, PlaceBook.Kind.BIFROST, index, name);
     }
 
+    /**
+     * Whether the Bifrost answers this player: whoever holds Mjolnir or Stormbreaker, and (3.4) a custom hero with Thor's
+     * Bifrost ability, whose power calls it without a weapon. (Both sides: the Bifrost screen asks it too.)
+     */
+    public static boolean callsBifrost(Player player) {
+        if (holdsWeapon(player)) {
+            return true;
+        }
+        PowerData data = Powers.get(player);
+        return data.power() == Power.CUSTOM && data.has(HeroAbility.THOR_BIFROST);
+    }
+
     /** The Bifrost answers whoever holds Mjolnir or Stormbreaker, once it has gathered its strength again. */
     private static boolean mayOpenBifrost(ServerPlayer player) {
         if (player.isSpectator() || PlaceBook.travelling(player)) {
@@ -860,7 +890,7 @@ public final class ThorAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
             return false;
         }
-        if (!holdsWeapon(player)) {
+        if (!callsBifrost(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
             return false;
         }
@@ -876,12 +906,17 @@ public final class ThorAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         int cooldown = EnhancedConfig.BIFROST_COOLDOWN.get();
-        PlaceBook.readyAt(player, PlaceBook.Kind.BIFROST, now + cooldown);
+        long ready = now + cooldown;
         PowerData data = Powers.get(player);
-        if (data.power() == Power.THOR) {
-            // The same cooldown, shown on Thor's HUD.
-            data.startCooldown(5, now, cooldown);
+        if (data.has(HeroAbility.THOR_BIFROST)) {
+            // The same cooldown, shown on Thor's HUD (3.4: on a custom hero's key, by the strength of his Bifrost).
+            data.startCooldown(HeroAbility.THOR_BIFROST, now, cooldown);
+            int slot = data.slot(HeroAbility.THOR_BIFROST);
+            if (data.power() == Power.CUSTOM && slot > 0) {
+                ready = data.cooldownUntil(slot);
+            }
         }
+        PlaceBook.readyAt(player, PlaceBook.Kind.BIFROST, ready);
         PlaceBook.begin(player, PlaceBook.Kind.BIFROST, dimension, to, yaw, BIFROST_CHARGE);
         data.set(Live.BIFROST, true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_CHARGE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);

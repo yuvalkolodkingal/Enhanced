@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -41,19 +42,22 @@ public final class ThanosHeroGlow {
     /** Watches every Thanos in view: a cooldown that has just started is a stone being used. Once per client tick. */
     public static void tick(ClientLevel level) {
         long now = level.getGameTime();
-        STATES.keySet().removeIf(id -> !(level.getEntity(id) instanceof AbstractClientPlayer p) || Powers.get(p).power() != Power.THANOS);
+        STATES.keySet().removeIf(id -> !(level.getEntity(id) instanceof AbstractClientPlayer p) || !Powers.get(p).acts(Power.THANOS));
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() != Power.THANOS) {
+            if (!data.acts(Power.THANOS)) {
                 continue;
             }
             State state = STATES.computeIfAbsent(player.getId(), id -> new State());
-            for (int slot = 1; slot <= PowerData.ABILITIES; slot++) {
-                long until = data.cooldownUntil(slot);
-                if (until > state.seenUntil[slot] && until > now + 1) {
-                    state.flaredAt[slot] = now;
+            // Each stone by its key for Thanos (3.4: a custom hero's stone is on whichever of his keys holds it).
+            for (int stone = 1; stone <= PowerData.ABILITIES; stone++) {
+                HeroAbility row = HeroAbility.at(Power.THANOS, stone);
+                int slot = row == null ? 0 : data.slot(row);
+                long until = slot == 0 ? 0L : data.cooldownUntil(slot);
+                if (until > state.seenUntil[stone] && until > now + 1) {
+                    state.flaredAt[stone] = now;
                 }
-                state.seenUntil[slot] = until;
+                state.seenUntil[stone] = until;
             }
             boolean draining = data.is(Live.SOUL_DRAINING);
             if (draining && !state.wasDraining) {

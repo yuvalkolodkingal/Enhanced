@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
@@ -42,7 +43,7 @@ public final class PowerLoopSounds {
         MAGNET_HUM(ModSounds.MAGNET_HUM, 0.6F, 1.0F, (p, d) -> d.power() == Power.MAGNETO && d.heldEntityId() != -1),
         WHIRLWIND(ModSounds.WHIRLWIND, 0.9F, 1.0F, (p, d) -> d.power() == Power.TOMMY && d.is(Live.WHIRLWIND)),
         /** Thor's lightning beam: the same crackle as the Chaos Beam, higher and sharper. */
-        LIGHTNING_BEAM(ModSounds.CHAOS_BEAM, 0.8F, 1.45F, (p, d) -> d.power() == Power.THOR && d.is(Live.CALLING_LIGHTNING)),
+        LIGHTNING_BEAM(ModSounds.CHAOS_BEAM, 0.8F, 1.45F, (p, d) -> d.has(HeroAbility.THOR_LIGHTNING) && d.is(Live.CALLING_LIGHTNING)),
         /** Billy's Hex Beam: the Chaos Beam's crackle, higher and thinner (3.2). Another source of a beam adds its own line. */
         HEX_BEAM(ModSounds.CHAOS_BEAM, 0.7F, 1.3F, (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == BeamStyles.BILLY),
         /** The Darkhold's purple beam, whoever fires it: the Chaos Beam's crackle, lower and darker (3.2). */
@@ -57,7 +58,7 @@ public final class PowerLoopSounds {
         // The loops of 3.0, in one region per hero (the // ===== lines), each lane's own.
         // ===== phoenix =====
         /** The flames round the Phoenix while she charges the Burst (and for a moment after it). */
-        PHOENIX_BLAZE(ModSounds.PHOENIX_BLAZE, 0.9F, 1.0F, (p, d) -> d.power() == Power.PHOENIX && d.is(Live.PHOENIX_BLAZE)),
+        PHOENIX_BLAZE(ModSounds.PHOENIX_BLAZE, 0.9F, 1.0F, (p, d) -> d.has(HeroAbility.PHOENIX_BURST) && d.is(Live.PHOENIX_BLAZE)),
 
         // ===== spider =====
         /** The creak of the taut web while Spider-Man swings. */
@@ -65,7 +66,7 @@ public final class PowerLoopSounds {
 
         // ===== thanos =====
         /** The Soul Drain's chains: a choir shimmer with the click of chain links. */
-        SOUL_DRAIN(ModSounds.SOUL_DRAIN, 0.8F, 1.0F, (p, d) -> d.power() == Power.THANOS && d.is(Live.SOUL_DRAINING)),
+        SOUL_DRAIN(ModSounds.SOUL_DRAIN, 0.8F, 1.0F, (p, d) -> d.has(HeroAbility.THANOS_SOUL) && d.is(Live.SOUL_DRAINING)),
 
         // ===== ultron =====
         /** Ultron's anti-gravity flight: the thrusters' hiss of the Sentries, low and soft (it has no jets and no flame). */

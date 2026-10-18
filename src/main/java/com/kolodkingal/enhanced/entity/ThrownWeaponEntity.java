@@ -3,7 +3,7 @@ package com.kolodkingal.enhanced.entity;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
-import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -197,10 +197,10 @@ public class ThrownWeaponEntity extends Projectile {
         }
     }
 
-    /** Thor, if he can still catch it: alive, in this dimension, still Thor. */
+    /** Thor, if he can still catch it: alive, in this dimension, still Thor (3.4: or a custom hero with Thor's hammer). */
     private ServerPlayer thor() {
         return getOwner() instanceof ServerPlayer player && player.isAlive() && !player.isRemoved() && player.level() == level()
-                && Powers.is(player, Power.THOR) ? player : null;
+                && Powers.get(player).has(HeroAbility.THOR_HAMMER) ? player : null;
     }
 
     /** Back in Thor's hand (or his inventory, if his hand is full). A Mjolnir nobody owned yet is his from now on. */

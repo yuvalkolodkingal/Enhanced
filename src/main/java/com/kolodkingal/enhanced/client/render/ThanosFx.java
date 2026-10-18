@@ -750,7 +750,7 @@ public final class ThanosFx {
             Vec3 shift = boss.getPosition(partial).subtract(boss.position());
             return boss.handPosition().add(shift);
         }
-        if (caster instanceof AbstractClientPlayer player && Powers.get(player).power() == Power.THANOS) {
+        if (caster instanceof AbstractClientPlayer player && Powers.get(player).acts(Power.THANOS)) {
             return gauntletHand(Minecraft.getInstance(), player, partial, fallback);
         }
         return fallback;

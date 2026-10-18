@@ -98,10 +98,10 @@ public enum HeroAbility implements CatalogEntry {
     LOKI_DUPLICATES(Power.LOKI, 2, "duplicates", press().cost(2).group(Group.MIND).icon("minecraft:armor_stand")
             .traits(Trait.SORCERER)),
     LOKI_SHAPESHIFT(Power.LOKI, 3, "shapeshift", press().cost(1).group(Group.BODY).icon("minecraft:slime_ball")
-            .res(Resource.FORM).traits(Trait.SORCERER).family(Family.SHAPE)),
+            .fixed().res(Resource.FORM).traits(Trait.SORCERER).family(Family.SHAPE)),
     LOKI_VANISH(Power.LOKI, 4, "vanish", press().cost(2).group(Group.MOVE).icon("minecraft:ender_pearl").traits(Trait.SORCERER)),
     LOKI_FROST_GIANT(Power.LOKI, 5, "frost_giant", toggle().cost(1).group(Group.BODY).icon("minecraft:packed_ice")
-            .res(Resource.SCALE).traits(Trait.SORCERER).family(Family.SHAPE).on(d -> d.toggle(Toggle.FROST_GIANT))),
+            .fixed().traits(Trait.SORCERER).family(Family.SHAPE).on(d -> d.toggle(Toggle.FROST_GIANT))),
 
     // ===== thor =====
     THOR_HAMMER(Power.THOR, 1, "hammer", press().alt(Act.PRESS).cost(2).group(Group.BODY).icon("minecraft:mace")
@@ -123,7 +123,7 @@ public enum HeroAbility implements CatalogEntry {
     PHOENIX_BURST(Power.PHOENIX, 5, "burst", hold().cost(3).group(Group.ENERGY).icon("minecraft:blaze_powder")
             .on(d -> d.is(Live.PHOENIX_CHARGING))),
     PHOENIX_BODY(Power.PHOENIX, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:blaze_rod")
-            .traits(Trait.FIRE_IMMUNE).family(Family.BODY)),
+            .fixed().traits(Trait.FIRE_IMMUNE).family(Family.BODY)),
 
     // ===== spider_man =====
     SPIDER_WEB(Power.SPIDER_MAN, 1, "web", press().alt(Act.PRESS).cost(2).group(Group.ENERGY).icon("minecraft:cobweb")),

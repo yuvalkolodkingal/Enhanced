@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.power.Live;
@@ -95,7 +96,7 @@ public final class ThorEffects {
                             player.getZ() + Math.sin(angle) * 1.4, 0, 0.25, 0);
                 }
             }
-            if (data.power() == Power.THOR && !player.isInvisible() && data.toggle(Toggle.GOD_OF_THUNDER) && random.nextInt(2) == 0) {
+            if (data.has(HeroAbility.THOR_THUNDER) && !player.isInvisible() && data.toggle(Toggle.GOD_OF_THUNDER) && random.nextInt(2) == 0) {
                 level.addParticle(ParticleTypes.ELECTRIC_SPARK, player.getRandomX(0.7), player.getRandomY(), player.getRandomZ(0.7),
                         (random.nextDouble() - 0.5) * 0.2, random.nextDouble() * 0.1, (random.nextDouble() - 0.5) * 0.2);
             }
@@ -158,14 +159,14 @@ public final class ThorEffects {
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.9F);
                 rainbowBeam(pose, vc, feet, 1.3F * pulse, time, 1.0F);
             }
-            if (data.power() != Power.THOR) {
+            if (!data.acts(Power.THOR)) {
                 continue;
             }
-            if (data.toggle(Toggle.GOD_OF_THUNDER) && !player.isInvisible()) {
+            if (data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER) && !player.isInvisible()) {
                 crackle(pose, vc, player, camera, partialTick, time);
             }
             // The beam is drawn even for an invisible Thor: it hurts all the same.
-            if (data.is(Live.CALLING_LIGHTNING)) {
+            if (data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
                 beam(mc, player, ThorAbilities.holdsWeapon(player), data.toggle(Toggle.GOD_OF_THUNDER), pose, vc, camera, partialTick, time);
             }
         }
