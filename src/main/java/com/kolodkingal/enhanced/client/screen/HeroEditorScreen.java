@@ -239,7 +239,8 @@ public class HeroEditorScreen extends Screen {
                 column = c;
             }
         }
-        if (column == 0) {
+        boolean box = !(entry instanceof HeroAbility a && !a.takesBox());
+        if (column == 0 && box) {
             column = KeyLayout.preferred(entry);
             hero = hero.withKey(column, entry.id());
         }
@@ -250,7 +251,7 @@ public class HeroEditorScreen extends Screen {
         if (act == PowerModule.Act.HOLD || act == PowerModule.Act.TOGGLE) {
             puppet.tryHold(entry, true);
             holding = entry;
-        } else {
+        } else if (column > 0) {
             puppet.tryBinding(column, false);
         }
     }

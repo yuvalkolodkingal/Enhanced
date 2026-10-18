@@ -25,7 +25,7 @@ public final class KeyLayout {
                 continue;
             }
             if (entry instanceof HeroAbility a) {
-                if (a.home < 1 || a.home > CustomHero.KEYS) {
+                if (!a.takesBox()) {
                     continue;
                 }
                 if (plain[a.home] == null) {

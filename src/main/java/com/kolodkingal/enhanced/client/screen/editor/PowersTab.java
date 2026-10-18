@@ -283,7 +283,7 @@ public final class PowersTab extends EditorTab {
     /** A power just picked (or switched to an option with a key) goes on its own key if free, else on the first free one. */
     private static CustomHero autoKey(CustomHero hero, CatalogEntry e) {
         CustomHero.Pick pick = hero.pick(e);
-        if (pick == null || pick.act() == PowerModule.Act.NONE || e instanceof HeroAbility a && (a.home < 1 || a.home > CustomHero.KEYS)) {
+        if (pick == null || pick.act() == PowerModule.Act.NONE || e instanceof HeroAbility a && !a.takesBox()) {
             return hero;
         }
         for (int c = 1; c <= CustomHero.KEYS; c++) {

@@ -29,7 +29,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Agatha](Agatha) | Craft the **Darkhold** and, with no power, **hold right-click on it for 3 seconds**. You keep the book. |
 | [Cyclops](Cyclops) | Find his **Ruby-Quartz Glasses** (in Scott Summers' room of the [Mutant School](Structures#the-mutant-school), or rarely in a woodland mansion or stronghold library) and **put them on** with no power. |
 | [Professor X](Professor-X) | **Craft** his **Wheelchair** (leather, iron ingots and an Eye of Ender) or find it in the Professor's study of the Mutant School, and with no power **hold right-click on it for 3 seconds**. Then choose the young or the old Charles. |
-| [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once, or make your own. |
+| [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once (since 3.4 with that hero's items), or make your own. |
 
 ## Step by step
 
@@ -139,4 +139,4 @@ Once you hold the Essence you are Apocalypse: **sand waves and entombing** on **
 
 ### A hero of your own
 
-In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty (each with a strength from 1 to 10, within a budget of points), your keys, your colours and your own skin, which everyone on the server sees. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).
+In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty and, since 3.4, any of the 81 abilities of the mod's heroes (each with a strength from 1 to 10, within a budget of points), on your keys plain or with Sneak, with the heroes' moves, your colours, your own skin and extras like a cape, which everyone on the server sees. Since 3.4, **Choose a Hero** also gives you that hero's items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).

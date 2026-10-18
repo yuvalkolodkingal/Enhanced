@@ -2167,6 +2167,7 @@
   "screen.enhanced.hero_creator.key.press": "Press",
   "screen.enhanced.hero_creator.key.sneak": "Sneak +",
   "screen.enhanced.hero_creator.keys.no_key": "With no key:",
+  "screen.enhanced.hero_creator.keys.own_key": "%s uses its own key, %s, with no box.",
   "screen.enhanced.hero_creator.look.color": "Colour:",
   "screen.enhanced.hero_creator.look.hero.desc": "Click a hero's look to wear it",
   "screen.enhanced.hero_creator.look.hero_color": "Your hero's colour",

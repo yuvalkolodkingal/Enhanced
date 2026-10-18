@@ -169,7 +169,7 @@ The skin you chose was refused: it must be a PNG of exactly 64x64 pixels, no big
 
 ### Some powers of my hero file were left out.
 
-The server judged the file by its own rules: its budget, how many powers, the highest strength, and the powers it does not allow. You are told what changed. See [Hero Creator](Hero-Creator#saving-sharing-and-loading-the-json-file).
+The server judged the file by its own rules: its budget, how many powers, the highest strength, and the powers it does not allow (since 3.4 also: an ability that needs another, two powers that drive the same thing, the heroes' abilities, world powers or look extras switched off). You are told what changed. See [Hero Creator](Hero-Creator#saving-sharing-and-loading-the-json-file).
 
 ### Quicksilver Time no longer makes me fast!
 
@@ -186,6 +186,44 @@ Make sure **Web Assist** is on (the **J** key; the HUD's G line says `assist`). 
 ### I want to aim my swings myself.
 
 Press **J** to turn Web Assist off: the swing is the manual one again, aimed with the crosshair, **W** reels in and **S** lets out. A server can also turn Web Assist off for everyone.
+
+## Your own hero with the heroes' abilities (3.4)
+
+### My friend cannot join my server (or I cannot join theirs).
+
+3.4 and 3.3 cannot play together: the server and every player need 3.4 (the network protocol is now 8). Worlds, saved heroes and hero files of 3.3 all open in 3.4.
+
+### Will my hero file from 3.3 still work?
+
+Yes. A 3.3 file (or a hero copied to the clipboard, or the hero saved with your player) is turned into the new format when it is read: the same powers, keys and look, with empty Sneak boxes, automatic moves and no extras. Save it again to write the new format. See [Hero Creator](Hero-Creator#saving-sharing-and-loading-the-json-file).
+
+### Why can't I pick Magneto's Iron Shrapnel Storm and Ultron's Repulsor Fire together?
+
+They drive the same thing: Magneto's shrapnel charge is Ultron's plasma pool. Two powers of different heroes that drive the same thing (one telekinetic grip, one shield, one beam, one shape, super speed, slow time...) cannot be on one hero; the card says which one is in the way. Abilities of the same hero always go together. See [Powers that cannot go together](Hero-Creator#5-powers-that-cannot-go-together).
+
+### Thor's Mjolnir Throw does nothing on my hero.
+
+It needs **Mjolnir or Stormbreaker in your hand**, as Thor does. Forge Mjolnir, find one in a Mjolnir's crater, or craft Stormbreaker (anyone can); the ability makes you worthy, so you can lift Mjolnir if nobody else owns it. Thor's Lightning Beam and his Bifrost work without a weapon. See [Abilities and items](Hero-Creator#abilities-and-items).
+
+### Does my hero need Cyclops's glasses?
+
+No. A custom hero's Optic Blast, Concussion Blast and the others work without them, and *Shut Eyes* / *Open Eyes* (the key without and with Sneak) stops or starts the giant beam.
+
+### Why does Sneak + R do something I did not choose?
+
+A hero's ability with a Sneak variant fills the Sneak box of its key by itself: Thor's Mjolnir Throw on **R** puts Shatter Mjolnir on **Sneak + R**. To use that box for something else, switch the variant off on the Powers tab.
+
+### I chose Thor again and did not get a second Mjolnir.
+
+Choose a Hero never gives an item you already have, anywhere in your inventory. See [The hero's items come with him](Hero-Creator#the-heros-items-come-with-him-34).
+
+### My hero flies like Thor but does not fly.
+
+The flight style is only how your hero looks in the air. To fly, your hero needs the **Flight** power (or Vision's Phase, which floats). See [Animations](Hero-Creator#7-animations-how-your-hero-moves).
+
+### The budget on my server is still 60.
+
+The server file was written by 3.3, and the game never rewrites a value already in the file. Set `custom_hero.budget = 90` and `maxPowers = 10`, or delete the two lines. See [Server Configuration](Server-Configuration#the-hero-creator).
 
 ## Magneto
 

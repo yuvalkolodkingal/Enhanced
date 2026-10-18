@@ -243,6 +243,28 @@ public final class CustomLooksTests {
     }
 
     @GameTest(template = ARENA, batch = BATCH)
+    public static void buildMagicTakesNoKeyBox(GameTestHelper helper) {
+        // Billy's Build Magic is used with its own Y key: no box holds it, by Auto or by hand (its box would do nothing).
+        CustomHero raw = CustomKitSupport.def().raw().withPowers(List.of(new CustomHero.Pick("billy.build_magic", 5, "both", -1),
+                new CustomHero.Pick("energy_blast", 4, "beam", -1)));
+        check(!HeroAbility.BILLY_BUILD_MAGIC.takesBox() && HeroAbility.THOR_LIGHTNING.takesBox(), "Build Magic is no box's");
+        CustomHero laid = KeyLayout.auto(raw, CustomHeroRules.Limits.DEFAULT);
+        for (int c = 1; c <= CustomHero.KEYS; c++) {
+            check(!laid.binding(c, false).startsWith("billy.build_magic") && !laid.binding(c, true).startsWith("billy.build_magic"),
+                    "Auto leaves Build Magic off the boxes: " + laid.keys() + " " + laid.sneakKeys());
+        }
+        check(laid.binding(1, false).equals("energy_blast"), "and R is the Energy power's: " + laid.keys());
+        CustomHero byHand = raw.withKey(2, "billy.build_magic").withBinding(3, true, "billy.build_magic");
+        CustomHeroRules.Result r = CustomHeroRules.sanitize(byHand, CustomHeroRules.Limits.DEFAULT);
+        check(r.hero().binding(2, false).isEmpty() && r.hero().binding(3, true).isEmpty(),
+                "the rules take Build Magic off a box put by hand: " + r.hero().keys() + " " + r.hero().sneakKeys());
+        check(r.notes().stream().filter(n -> n.key().equals("message.enhanced.hero_creator.rule.key")).count() == 2,
+                "and say so for both boxes: " + r.notes());
+        check(r.hero().has(HeroAbility.BILLY_BUILD_MAGIC), "while the power stays picked (Y)");
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = BATCH)
     public static void theMovesAndLooksHaveTheirWords(GameTestHelper helper) throws IOException {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");

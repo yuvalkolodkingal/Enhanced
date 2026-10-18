@@ -23,7 +23,7 @@ public final class HeroKeys {
      * @param alt whether the binding is the ability's Sneak variant
      */
     public static void press(ServerPlayer player, PowerData data, HeroAbility a, boolean down, boolean alt) {
-        if (a.home < 1 || a.home > PowerData.ABILITIES) {
+        if (!a.takesBox()) {
             return; // (a body has no key; Build Magic's Y key is its own)
         }
         AbilityHandler.heroKey(a.hero, player, data, a.home, down, alt);
