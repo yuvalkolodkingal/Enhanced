@@ -2105,5 +2105,16 @@
   "config.enhanced.web_assist": "עזרת קורים",
   "config.enhanced.web_assist.tooltip": "ההתנדנדות בוחרת לבד נקודת עיגון לפנים ולמעלה (גם עצים), מתרחקת מהקרקע ומהעלים, משחררת ברגע הטוב ביותר וממשיכה להתנדנד כל עוד מחזיקים G. כבוי: התנדנדות ידנית, מכוונים עם הכוונת. גם המקש J מחליף אותה.",
   "config.enhanced.web_assist_preview": "תצוגת עזרת קורים",
-  "config.enhanced.web_assist_preview.tooltip": "מראה לאן ילך הקור הבא (קור לבן קטן) כשאתם באוויר או מתכופפים."
+  "config.enhanced.web_assist_preview.tooltip": "מראה לאן ילך הקור הבא (קור לבן קטן) כשאתם באוויר או מתכופפים.",
+  "item.enhanced.mutant_cure": "תרופת המוטנטים",
+  "item.enhanced.mutant_cure.desc": "מזרק של התרופה. אין דרך חזרה",
+  "item.enhanced.mutant_cure.desc2": "החזיקו קליק ימני שתי שניות כדי להסיר את הכוח שלכם לתמיד. על שחקן אחר: רק אופרטור, או כש-PvP פעיל",
+  "message.enhanced.mutant_cure.no_power": "אין לכם כוח לרפא",
+  "message.enhanced.mutant_cure.no_power_other": "ל-%s אין כוח לרפא",
+  "message.enhanced.mutant_cure.not_allowed": "רק אופרטור יכול לרפא שחקן אחר, או כל אחד כש-PvP פעיל",
+  "message.enhanced.mutant_cure.disabled": "תרופת המוטנטים לא פועלת בשרת הזה",
+  "message.enhanced.mutant_cure.too_far": "רחוק מדי: התרופה לא הוזרקה",
+  "message.enhanced.mutant_cure.cured": "התרופה פועלת. אתם כבר לא %s",
+  "message.enhanced.mutant_cure.cured_other": "%s נרפא: כבר לא %s",
+  "subtitles.enhanced.mutant_cure": "התרופה מוזרקת"
 }

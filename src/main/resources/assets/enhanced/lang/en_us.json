@@ -2105,5 +2105,16 @@
   "config.enhanced.web_assist": "Web Assist",
   "config.enhanced.web_assist.tooltip": "The swing chooses its own anchor ahead and above (trees count), keeps clear of the ground and the leaves, lets go at the best moment and swings on while G is held. Off: the manual swing, aimed with the crosshair. The J key switches it too.",
   "config.enhanced.web_assist_preview": "Web Assist preview",
-  "config.enhanced.web_assist_preview.tooltip": "Show where the next web would go (a small white web) while you are in the air or sneaking."
+  "config.enhanced.web_assist_preview.tooltip": "Show where the next web would go (a small white web) while you are in the air or sneaking.",
+  "item.enhanced.mutant_cure": "Mutant Cure",
+  "item.enhanced.mutant_cure.desc": "An injector of the cure. There is no going back",
+  "item.enhanced.mutant_cure.desc2": "Hold right-click for two seconds to take your power away for good. On another player: an operator, or with PvP on",
+  "message.enhanced.mutant_cure.no_power": "You have no power to cure",
+  "message.enhanced.mutant_cure.no_power_other": "%s has no power to cure",
+  "message.enhanced.mutant_cure.not_allowed": "Only an operator may cure another player, or anyone while PvP is on",
+  "message.enhanced.mutant_cure.disabled": "The Mutant Cure does not work on this server",
+  "message.enhanced.mutant_cure.too_far": "Too far away: the cure did not go in",
+  "message.enhanced.mutant_cure.cured": "The cure takes hold. You are no longer %s",
+  "message.enhanced.mutant_cure.cured_other": "%s is cured: no longer %s",
+  "subtitles.enhanced.mutant_cure": "The cure is injected"
 }

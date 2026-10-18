@@ -520,6 +520,8 @@ public final class EnhancedConfig {
         AgathaConfig.define(BUILDER);
         // 3.3: the speedsters' walls and ceilings, Tommy's slow time and the speed strikes (section [speedsters]).
         com.kolodkingal.enhanced.config.SpeedConfig.define(BUILDER);
+        // 3.3.1: the Mutant Cure (section [mutant_cure]).
+        com.kolodkingal.enhanced.config.CureConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

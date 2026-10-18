@@ -38,6 +38,8 @@ public final class ModCreativeTab {
                         output.accept(ModItems.RUBY_QUARTZ_GLASSES.get());
                         output.accept(ModItems.HERO_CREATOR.get());
                         output.accept(ModItems.XAVIER_WHEELCHAIR.get());
+                        // 3.3.1
+                        output.accept(ModItems.MUTANT_CURE.get());
                     })
                     .build());
 

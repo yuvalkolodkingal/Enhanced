@@ -245,6 +245,10 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_SHIELD_HIT = register("agatha_shield_hit");
     public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_SHIELD_BREAK = register("agatha_shield_break");
 
+    // ===== the Mutant Cure (3.3.1) =====
+    /** The cure goes in: the hiss of the injector and a hollow tone falling away. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUTANT_CURE = register("mutant_cure");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }
