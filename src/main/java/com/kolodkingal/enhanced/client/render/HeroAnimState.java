@@ -101,6 +101,8 @@ public final class HeroAnimState {
     public HeroAnimator.PreviewMotion preview;
     /** The puppet's own clock (ticks, with the fraction): it lives outside the world, so it has no game time. */
     public double previewClock;
+    /** The fraction of a tick the puppet's clock is at (its frame's partial tick). */
+    public float previewPt;
     /** The nanosecond time of the last preview call (to advance the clock), and the whole tick last run. */
     public long previewNanos;
     public long previewTick = Long.MIN_VALUE;

@@ -74,7 +74,7 @@ public class PowerHud implements LayeredDraw.Layer {
                     .append(look.displayName().copy().withStyle(s -> s.withBold(false).withColor(ChatFormatting.GRAY)));
         }
 
-        Component[] lines = new Component[PowerData.ABILITIES + extraLines(power)];
+        Component[] lines = new Component[PowerData.ABILITIES + extraLines(data)];
         int width = font.width(title) + 4;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
@@ -87,7 +87,7 @@ public class PowerHud implements LayeredDraw.Layer {
             lines[i - 1] = line;
             width = Math.max(width, font.width(line));
         }
-        if (extraLines(power) > 0) {
+        if (extraLines(data) > 0) {
             Component line = buildLine(player, power, now);
             lines[PowerData.ABILITIES] = line;
             width = Math.max(width, font.width(line));
@@ -169,6 +169,11 @@ public class PowerHud implements LayeredDraw.Layer {
     /** How many lines the panel has after the five abilities: Build Magic's for the Scarlet Witch and Billy, else none. */
     public static int extraLines(Power power) {
         return BuildClient.isBuilder(power) ? 1 : 0;
+    }
+
+    /** As {@link #extraLines(Power)}, by the ability (3.4: Billy's Build Magic, the hero's or a custom hero's row). */
+    public static int extraLines(PowerData data) {
+        return extraLines(data.power()) > 0 || data.has(com.kolodkingal.enhanced.custom.HeroAbility.BILLY_BUILD_MAGIC) ? 1 : 0;
     }
 
     /**

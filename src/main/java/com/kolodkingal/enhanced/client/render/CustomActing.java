@@ -259,7 +259,11 @@ public final class CustomActing {
      * is rested; a built-in hero's ability waits for the server's answer (one round trip).
      */
     @Nullable
-    public static GestureId predicted(PowerData data, int column, long now, boolean sneaking, Player player) {
+    public static GestureId predicted(PowerData data, int column, long now, boolean sneaking) {
+        LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
+        if (player == null) {
+            return null;
+        }
         HeroKit kit = kit(player, data);
         HeroKit.Binding binding = kit.binding(column, sneaking);
         if (binding == null || binding.module() == null || !data.isReady(column, now)) {

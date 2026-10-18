@@ -68,6 +68,13 @@ public final class HeroPoses {
             st.posed = false;
         }
         float pt = ageInTicks - player.tickCount;
+        if (st != null && st.preview != null) {
+            // 3.4: the editor's puppet runs on its own clock (it may be drawn with the inventory's partial tick of 1):
+            // its walk is put on that clock too.
+            pt = st.previewPt;
+            ageInTicks = (float) st.time;
+            previewWalk(model, player, limbSwing, limbSwingAmount, pt);
+        }
         if (st == null || pt >= 1.0F || st.wVanilla > 0.0F || Math.abs(st.time - ageInTicks) > 1.5 || !EnhancedClientConfig.animations()) {
             return;
         }
@@ -215,6 +222,23 @@ public final class HeroPoses {
     }
 
     /** Plays the gestures, the oldest first, so the newest wins where they overlap. */
+    /**
+     * Moves vanilla's walk swing of the arms and legs (made from {@code limbSwing} and {@code amount}) to the walk at the
+     * partial tick {@code pt}: the same swing, smooth between the ticks.
+     */
+    private static void previewWalk(PlayerModel<?> model, Player player, float limbSwing, float amount, float pt) {
+        float ls = player.walkAnimation.position(pt);
+        float la = Math.min(1.0F, player.walkAnimation.speed(pt));
+        float legNow = Mth.cos(ls * 0.6662F) * 1.4F * la;
+        float legThen = Mth.cos(limbSwing * 0.6662F) * 1.4F * amount;
+        float armNow = Mth.cos(ls * 0.6662F) * la;
+        float armThen = Mth.cos(limbSwing * 0.6662F) * amount;
+        model.rightLeg.xRot += legNow - legThen;
+        model.leftLeg.xRot -= legNow - legThen;
+        model.leftArm.xRot += armNow - armThen;
+        model.rightArm.xRot -= armNow - armThen;
+    }
+
     private static void applyGestures(PoseContext c) {
         HeroAnimState.Slot[] slots = c.st.slots;
         // Three slots at most: pick them oldest first (ties by slot) without allocating.

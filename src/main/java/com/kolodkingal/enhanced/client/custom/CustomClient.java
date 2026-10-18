@@ -73,8 +73,8 @@ public final class CustomClient implements HeroClient {
     @Nullable
     @Override
     public GestureId predictedGesture(HeroAnimState s, PowerData data, int ability, long now, boolean sneaking) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        return player == null ? null : CustomActing.predicted(data, ability, now, sneaking, player);
+        // (The local player is found there: this class names no client class outside the signatures of HeroClient.)
+        return CustomActing.predicted(data, ability, now, sneaking);
     }
 
     @Override

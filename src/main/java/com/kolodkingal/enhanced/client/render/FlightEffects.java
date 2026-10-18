@@ -2,9 +2,12 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -139,8 +142,9 @@ public final class FlightEffects {
             } else {
                 fx.spinning = false;
             }
-            if (st.power == Power.QUICKSILVER || st.power == Power.TOMMY || st.kitSources.contains(Power.QUICKSILVER)
-                    || st.kitSources.contains(Power.TOMMY)) {
+            // (3.4: by the speedster's abilities, so a custom hero who runs with one splashes too.)
+            PowerData data = Powers.get(player);
+            if (data.has(HeroAbility.QUICKSILVER_SPEED) || data.has(HeroAbility.QUICKSILVER_TIME) || data.has(HeroAbility.TOMMY_SPEED)) {
                 footSplashes(level, player, st, fx);
             }
         }

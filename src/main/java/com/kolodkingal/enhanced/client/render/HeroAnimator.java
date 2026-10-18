@@ -422,11 +422,15 @@ public final class HeroAnimator {
      */
     public static HeroAnimState frame(AbstractClientPlayer player, float yBodyRot, float pt) {
         HeroAnimState s = STATES.get(player.getUUID());
+        if (s == null && !PREVIEWS.isEmpty() && (s = PREVIEWS.get(player.getUUID())) != null) {
+            // The editor's puppet runs on its own clock, whatever partial tick it is drawn with.
+            pt = s.previewPt;
+        }
         // The inventory preview draws the player with a partial tick of 1 and its own made-up turn.
         if (s == null || pt >= 1.0F || !EnhancedClientConfig.animations()) {
             return null;
         }
-        double time = player.tickCount + pt;
+        double time = s.preview != null ? s.previewClock : player.tickCount + pt;
         if (debugFrozen && isDebugTarget(player) && !s.fresh) {
             // A frozen frame: keep every weight and spring, but stay current.
             s.time = time;
@@ -588,10 +592,18 @@ public final class HeroAnimator {
             dz = 0.0;
         }
         float yaw = yBodyRot * Mth.DEG_TO_RAD;
-        s.fwd = smooth(s.fwd, (float) (-dx * Mth.sin(yaw) + dz * Mth.cos(yaw)), dt, TAU_MOTION);
-        s.side = smooth(s.side, (float) (-dx * Mth.cos(yaw) - dz * Mth.sin(yaw)), dt, TAU_MOTION);
+        float forward = (float) (-dx * Mth.sin(yaw) + dz * Mth.cos(yaw));
+        float sideways = (float) (-dx * Mth.cos(yaw) - dz * Mth.sin(yaw));
+        if (s.preview != null) {
+            // The puppet stands still: it moves as it is said to.
+            forward = previewSpeed(s, profile);
+            sideways = 0.0F;
+            dy = 0.0;
+        }
+        s.fwd = smooth(s.fwd, forward, dt, TAU_MOTION);
+        s.side = smooth(s.side, sideways, dt, TAU_MOTION);
         s.climb = smooth(s.climb, (float) dy, dt, TAU_MOTION);
-        s.turn = smooth(s.turn, Mth.wrapDegrees(p.yBodyRot - p.yBodyRotO), dt, TAU_MOTION);
+        s.turn = s.preview != null ? 0.0F : smooth(s.turn, Mth.wrapDegrees(p.yBodyRot - p.yBodyRotO), dt, TAU_MOTION);
         s.speed = Mth.sqrt(s.fwd * s.fwd + s.side * s.side);
         if (profile != null) {
             float fs = flightSpeed(s, profile);
@@ -877,16 +889,172 @@ public final class HeroAnimator {
         IDLE, WALK, RUN, SPEED_RUN, FLY_HOVER, FLY_CRUISE, FLY_SPRINT
     }
 
-    /** Sets the motion of the puppet's state for this frame (the puppet stands still; its pose moves). */
+    /**
+     * Sets the motion of the puppet's state for this frame (the puppet stands still; its pose moves), and moves its own clock
+     * on: call it once every frame the puppet is drawn, before it is drawn. The puppet is a player outside the world (the
+     * editor's), whose attachments say what it is: its power data, and for a custom hero his definition and state. Its
+     * {@code tickCount} and walk are set here from the clock; draw it with {@link #previewPartialTick} (a partial tick of 1,
+     * as the inventory's preview passes, works too: the animation then takes its own).
+     */
     public static void preview(AbstractClientPlayer puppet, PreviewMotion motion, float partialTick) {
+        if (!EnhancedClientConfig.animations()) {
+            PREVIEWS.remove(puppet.getUUID());
+            return;
+        }
+        PowerData data = Powers.get(puppet);
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        long nanos = System.nanoTime();
+        if (s == null || s.power != data.power()) {
+            s = new HeroAnimState(puppet.getUUID());
+            s.reseed(data.power());
+            s.previewNanos = nanos;
+            s.previewClock = puppet.tickCount;
+            PREVIEWS.put(puppet.getUUID(), s);
+        }
+        s.entityId = puppet.getId();
+        s.preview = motion;
+        // 20 ticks a second of real time (at most 4 at once, after a pause).
+        s.previewClock += Mth.clamp((nanos - s.previewNanos) / 5.0E7, 0.0, 4.0);
+        s.previewNanos = nanos;
+        long tick = (long) Math.floor(s.previewClock);
+        s.previewPt = (float) (s.previewClock - tick);
+        if (s.previewTick == Long.MIN_VALUE || tick - s.previewTick > 4) {
+            s.previewTick = tick - 1;
+        }
+        while (s.previewTick < tick) {
+            s.previewTick++;
+            puppet.tickCount = (int) s.previewTick;
+            previewTick(s, puppet, data);
+        }
     }
 
-    /** Plays on the puppet exactly what a cast marker of binding ({@code column} 1-5, plain or with Sneak) plays. */
+    /** The partial tick the puppet's clock is at (draw it with this one). */
+    public static float previewPartialTick(AbstractClientPlayer puppet) {
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        return s == null ? 0.0F : s.previewPt;
+    }
+
+    /** The puppet is gone (the editor closed): forget its state. */
+    public static void previewEnd(AbstractClientPlayer puppet) {
+        PREVIEWS.remove(puppet.getUUID());
+    }
+
+    /**
+     * Plays on the puppet exactly what a cast marker of binding ({@code column} 1-5, plain or with Sneak) plays; where its
+     * hero ability is acted by a route of its hero (a toggle, a state), the gesture that route plays.
+     */
     public static void previewCast(AbstractClientPlayer puppet, int column, boolean sneak) {
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        PowerData data = Powers.get(puppet);
+        if (s == null || data.power() != Power.CUSTOM) {
+            return;
+        }
+        com.kolodkingal.enhanced.custom.HeroKit kit = CustomActing.kit(puppet, data);
+        com.kolodkingal.enhanced.custom.CustomHero hero = kit.hero();
+        com.kolodkingal.enhanced.custom.HeroKit.Binding binding = sneak ? kit.sneak(column) : kit.plain(column);
+        if (binding == null && sneak) {
+            binding = kit.plain(column);
+            sneak = false;
+        }
+        if (binding == null) {
+            return;
+        }
+        GestureId id = com.kolodkingal.enhanced.client.custom.CustomAnimRoutes.cast(hero, kit, column, sneak, true);
+        HeroAbility row = binding.ability();
+        if (id == null && row != null && !com.kolodkingal.enhanced.client.custom.CustomAnimRoutes.chosen(hero, column, sneak)) {
+            id = com.kolodkingal.enhanced.client.custom.HeroAbilityAnims.shown(row, binding.isAlt());
+        }
+        if (id != null) {
+            start(s, id, id == GestureId.WANDA_SHIELD_RAISE ? GestureRoutes.SHIELD_KEYED_WIND_UP : 0.0F, (float) s.previewClock);
+        }
     }
 
     /** Raises (or lowers) on the puppet the stance of a held or switched-on power. */
     public static void previewHold(AbstractClientPlayer puppet, com.kolodkingal.enhanced.custom.CatalogEntry entry, boolean on) {
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        PowerData data = Powers.get(puppet);
+        if (s == null || data.power() != Power.CUSTOM) {
+            return;
+        }
+        Stance stance = com.kolodkingal.enhanced.client.custom.CustomAnimRoutes.previewStance(CustomActing.kit(puppet, data).hero(), entry);
+        if (stance != null) {
+            s.previewHeld[stance.ordinal()] = on;
+        }
+    }
+
+    /** One tick of the puppet: what the tick samples for a hero in the world, made up from the motion it is said to have. */
+    private static void previewTick(HeroAnimState s, AbstractClientPlayer puppet, PowerData data) {
+        PreviewMotion m = s.preview;
+        CustomActing.identity(s, puppet, data);
+        boolean fly = m == PreviewMotion.FLY_HOVER || m == PreviewMotion.FLY_CRUISE || m == PreviewMotion.FLY_SPRINT;
+        FlightProfile profile = FlightProfile.of(s);
+        float speed = previewSpeed(s, profile);
+        shift(s.dy, 0.0F);
+        shift(s.hv, speed);
+        shift(s.sRing, s.s);
+        s.prevAirTicks = s.airTicks;
+        s.wasOnGround = s.onGround;
+        s.onGround = !fly;
+        s.airTicks = fly ? s.airTicks + 1 : 0;
+        s.groundTicks = fly ? 0 : s.groundTicks + 1;
+        s.prevFlyingEff = s.flyingEff;
+        s.flyingEff = fly;
+        s.sinceFlying = fly ? 0 : Math.min(100, s.sinceFlying + 1);
+        s.sprinting = m == PreviewMotion.RUN;
+        s.crouching = false;
+        s.speeding = m == PreviewMotion.SPEED_RUN;
+        s.slowMo = false;
+        s.walkman = false;
+        s.wallRunning = false;
+        s.surfaceKind = 0;
+        if (s.speeding) {
+            s.styleKind = data.power() == Power.CUSTOM ? CustomActing.styleKind(s, puppet, data)
+                    : data.power() == Power.TOMMY ? 3 : 2;
+        } else {
+            s.styleKind = 0;
+        }
+        if (s.seeded && profile != null && s.flyingEff && !s.prevFlyingEff) {
+            // The take-off of the flight style (without its effects: the puppet is not in the world).
+            HeroClient hero = HeroClients.of(s.flightAs);
+            GestureId own = switch (s.flightAs) {
+                case MAGNETO -> GestureId.TAKEOFF_MAGNETO;
+                case SCARLET_WITCH -> GestureId.TAKEOFF_WANDA;
+                case VISION -> GestureId.TAKEOFF_VISION;
+                case BILLY -> GestureId.TAKEOFF_BILLY;
+                default -> hero == null || hero.takeoffGesture() == null ? GestureId.TAKEOFF_THOR : hero.takeoffGesture();
+            };
+            start(s, own, 0.0F, (float) s.previewClock);
+        }
+        boolean[] on = s.stanceOn;
+        java.util.Arrays.fill(on, false);
+        for (int i = 0; i < on.length; i++) {
+            on[i] = s.previewHeld[i];
+        }
+        if (m == PreviewMotion.IDLE) {
+            CustomActing.idle(s, on);
+        }
+        CustomActing.rowHeroes(s, on);
+        // The walk of the model (vanilla's swing of the arms and legs), as a walking player's.
+        float walk = switch (m) {
+            case WALK -> 0.8F;
+            case RUN, SPEED_RUN -> 1.0F;
+            default -> 0.0F;
+        };
+        puppet.walkAnimation.update(walk, 0.4F);
+        s.seeded = true;
+    }
+
+    /** How fast (blocks a tick, forward) the puppet is said to move. */
+    private static float previewSpeed(HeroAnimState s, FlightProfile profile) {
+        float vRef = profile == null ? 1.0F : FlightProfile.vRef(flightSpeed(s, profile));
+        return switch (s.preview) {
+            case WALK -> 0.215F;
+            case RUN -> 0.28F;
+            case SPEED_RUN -> 1.2F;
+            case FLY_CRUISE -> 1.0F * vRef;
+            case FLY_SPRINT -> 2.0F * vRef;
+            default -> 0.0F;
+        };
     }
 
     /** Plays a gesture on a hero, ignoring its usual trigger (the hook of the branches that add moves). */
