@@ -88,6 +88,14 @@ public enum Live {
      * client draws it from the {@code BeamPayload}s, holds the arm out along the look, and loops its sound.
      */
     BEAMING,
+
+    // ===== speed (3.3) =====
+    /** A speedster (Quicksilver or Tommy) runs on a wall (up it, or down it). */
+    SURFACE_WALL,
+    /** A speedster runs along a ceiling, upside down. */
+    SURFACE_CEILING,
+    /** Tommy's Sonic Boom has just broken around him (a moment, so every client acts it). */
+    SONIC_BOOM,
     ;
 
     final long bit() {

@@ -512,6 +512,8 @@ public final class EnhancedConfig {
         DarkholdConfig.define(BUILDER);
         // 3.2: the Witches' Road trials.
         WitchesRoadConfig.define(BUILDER);
+        // 3.3: the speedsters' walls and ceilings, Tommy's slow time and the speed strikes (section [speedsters]).
+        com.kolodkingal.enhanced.config.SpeedConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

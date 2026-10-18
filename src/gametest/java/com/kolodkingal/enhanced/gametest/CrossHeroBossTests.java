@@ -1106,8 +1106,8 @@ public final class CrossHeroBossTests {
             if (tick == 81) {
                 check(counter.ticks(boss) >= 39, "and Quicksilver Time slows him no more: " + counter.ticks(boss) + " of 40");
                 press(peter, 1);
-                sneakPress(peter, 1);
-                check(Powers.get(peter).superSpeed() && !Powers.get(peter).quicksilverTime(), "Super Speed instead");
+                press(peter, 2);
+                check(Powers.get(peter).superSpeed() && !Powers.get(peter).quicksilverTime(), "Super Speed (G) instead");
                 boss.forceStones(1);
                 counter.reset();
             }

@@ -67,8 +67,8 @@ public final class TommyTests {
         check(!data.is(Live.SPEEDING), "walking ends super speed");
         check(Math.abs(tommy.getAttributeValue(Attributes.MOVEMENT_SPEED) - walking) < 1.0E-6, "back to normal speed");
 
-        press(tommy, 1);
-        check(!data.toggle(Toggle.SUPER_SPEED), "ability 1 turns super speed off");
+        press(tommy, 2);
+        check(!data.toggle(Toggle.SUPER_SPEED), "G turns super speed off (3.3: R is his slow time)");
         tommy.setSprinting(true);
         PowerTicker.tick(tommy);
         check(!data.is(Live.SPEEDING), "with super speed off, sprinting is just sprinting");
@@ -91,7 +91,9 @@ public final class TommyTests {
         Pillager far = helper.spawnWithNoFreeWill(EntityType.PILLAGER, new Vec3(10.5, FLOOR, 10.5 + TommyAbilities.BLITZ_RADIUS + 3));
         far.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.CROSSBOW));
 
-        press(tommy, 2);
+        tommy.setShiftKeyDown(true); // (3.3: Sneak + B)
+        press(tommy, 4);
+        tommy.setShiftKeyDown(false);
 
         check(zombie.getMainHandItem().isEmpty(), "the zombie's sword is gone");
         check(skeleton.getMainHandItem().isEmpty() && skeleton.getOffhandItem().isEmpty(), "the skeleton lost its bow and shield");
@@ -101,7 +103,7 @@ public final class TommyTests {
         for (var item : new net.minecraft.world.item.Item[]{Items.IRON_SWORD, Items.BOW, Items.SHIELD, Items.DIAMOND_SWORD}) {
             check(tommy.getInventory().countItem(item) == 1, "Tommy now has the " + item);
         }
-        check(!Powers.get(tommy).isReady(2, helper.getLevel().getGameTime()), "the blitz has a cooldown");
+        check(!Powers.get(tommy).isReady(4, helper.getLevel().getGameTime()), "the blitz has a cooldown");
         helper.succeed();
     }
 

@@ -36,6 +36,12 @@ public enum Toggle {
     // ===== ultron =====
 
     // ===== apocalypse =====
+
+    // ===== speed (3.3) =====
+    /** Tommy: his slow time is on (the world around him runs slower), apart from his Super Speed. */
+    TOMMY_TIME,
+    /** Tommy: running up walls and along ceilings is switched off (it is on unless he turns it off). */
+    TOMMY_WALL_RUN_OFF,
     ;
 
     final int bit() {

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.config.SpeedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -81,28 +82,110 @@ public final class TommyAbilities {
         if (!down || player.isSpectator()) {
             return;
         }
+        boolean sneaking = player.isShiftKeyDown();
         switch (ability) {
             case 1 -> {
-                data.setToggle(Toggle.SUPER_SPEED, !data.toggle(Toggle.SUPER_SPEED));
-                player.displayClientMessage(Component.translatable(data.toggle(Toggle.SUPER_SPEED)
-                        ? "message.enhanced.super_speed.on" : "message.enhanced.super_speed.off"), true);
+                if (sneaking) {
+                    boolean off = !data.toggle(Toggle.TOMMY_WALL_RUN_OFF);
+                    data.setToggle(Toggle.TOMMY_WALL_RUN_OFF, off);
+                    player.displayClientMessage(Component.translatable(off
+                            ? "message.enhanced.tommy_wall_run.off" : "message.enhanced.tommy_wall_run.on"), true);
+                } else {
+                    toggleTime(player, data);
+                }
             }
-            case 2 -> disarmBlitz(player, data);
-            case 3 -> whirlwind(player, data);
-            case 4 -> vibrate(player, data);
+            case 2 -> {
+                if (sneaking) {
+                    dash(player, data);
+                } else {
+                    data.setToggle(Toggle.SUPER_SPEED, !data.toggle(Toggle.SUPER_SPEED));
+                    player.displayClientMessage(Component.translatable(data.toggle(Toggle.SUPER_SPEED)
+                            ? "message.enhanced.super_speed.on" : "message.enhanced.super_speed.off"), true);
+                }
+            }
+            case 3 -> {
+                if (sneaking) {
+                    sonicBoom(player, data);
+                } else {
+                    whirlwind(player, data);
+                }
+            }
+            case 4 -> {
+                if (sneaking) {
+                    disarmBlitz(player, data);
+                } else {
+                    vibrate(player, data);
+                }
+            }
             case 5 -> accelerate(player, data);
             default -> {
             }
         }
     }
 
+    // ---- Ability 1: Slow Time (3.3) ----
+
+    /** R: Tommy's slow time on or off: the world around him runs slower, as in Quicksilver Time (his Super Speed apart). */
+    private static void toggleTime(ServerPlayer player, PowerData data) {
+        boolean on = !data.toggle(Toggle.TOMMY_TIME);
+        if (on && !fed(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.tommy_time.starving"), true);
+            return;
+        }
+        data.setToggle(Toggle.TOMMY_TIME, on);
+        player.displayClientMessage(Component.translatable(on ? "message.enhanced.tommy_time.on" : "message.enhanced.tommy_time.off"), true);
+        QuicksilverAbilities.timeSound(player, on, 1.0F);
+    }
+
+    private static boolean fed(ServerPlayer player) {
+        return player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
+    }
+
+    // ---- Ability 2 (Sneak): Dash Strike; Ability 3 (Sneak): Sonic Boom (3.3) ----
+
+    /** Sneak + G: the Dash Strike, in his teal and green (the cooldown of G). */
+    private static void dash(ServerPlayer player, PowerData data) {
+        long now = player.serverLevel().getGameTime();
+        if (!data.isReady(2, now)) {
+            return;
+        }
+        if (MjolnirPin.isPinned(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
+            return;
+        }
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(Power.TOMMY)).moved()) {
+            player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
+            return;
+        }
+        data.startCooldown(2, now, SpeedStrikes.value(SpeedConfig.DASH_COOLDOWN, 100));
+    }
+
+    /** Sneak + V: the Sonic Boom (on the Whirlwind's cooldown: both are his storms). */
+    private static void sonicBoom(ServerPlayer player, PowerData data) {
+        long now = player.serverLevel().getGameTime();
+        if (!data.isReady(3, now) || WHIRLWINDS.containsKey(player.getUUID())) {
+            return;
+        }
+        SpeedStrikes.sonicBoom(player, data, SpeedStrikes.Style.of(Power.TOMMY), SpeedStrikes.value(SpeedConfig.BOOM_RADIUS, 6.0),
+                (float) SpeedStrikes.value(SpeedConfig.BOOM_DAMAGE, 4.0));
+        data.startCooldown(3, now, SpeedStrikes.value(SpeedConfig.BOOM_COOLDOWN, 160));
+    }
+
     // ---- Ability 1: Super Speed ----
 
     public static void tick(ServerPlayer player, PowerData data) {
+        boolean fed = fed(player);
         boolean canRun = data.toggle(Toggle.SUPER_SPEED) && player.isSprinting() && !player.isPassenger()
-                && !player.getAbilities().flying && (player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0);
+                && !player.getAbilities().flying && fed;
         boolean was = data.is(Live.SPEEDING);
         data.set(Live.SPEEDING, canRun);
+        if (data.toggle(Toggle.TOMMY_TIME) && !fed) {
+            // Starving: his slow time runs out of strength and stops by itself.
+            data.setToggle(Toggle.TOMMY_TIME, false);
+            player.displayClientMessage(Component.translatable("message.enhanced.tommy_time.starving"), true);
+        }
+        boolean slowing = data.toggle(Toggle.TOMMY_TIME) && !player.isSpectator();
+        data.setSlowMo(slowing);
         if (canRun) {
             player.causeFoodExhaustion(EnhancedConfig.TOMMY_EXHAUSTION.get().floatValue());
             player.resetFallDistance();
@@ -110,7 +193,11 @@ public final class TommyAbilities {
                 player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_WHOOSH.get(),
                         SoundSource.PLAYERS, 0.9F, 1.25F);
             }
+        } else if (slowing) {
+            player.causeFoodExhaustion((float) SpeedStrikes.value(SpeedConfig.TOMMY_TIME_EXHAUSTION, 0.01));
         }
+        SpeedSurfaces.tick(player, data);
+        SpeedStrikes.tick(player, data);
         applySpeed(player, data);
         whirlwindTick(player, data);
     }
@@ -128,7 +215,7 @@ public final class TommyAbilities {
         return data.power() == Power.TOMMY && data.is(Live.SPEEDING);
     }
 
-    // ---- Ability 2: Disarm Blitz ----
+    // ---- Ability 4 (Sneak): Disarm Blitz ----
 
     /**
      * The Battle of Westview: Tommy circles everyone armed around him and is back before they notice, their weapons in
@@ -137,7 +224,7 @@ public final class TommyAbilities {
     private static void disarmBlitz(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(2, now)) {
+        if (!data.isReady(4, now)) {
             return;
         }
         // A conjured body (a Loki illusion) is passed by: what it holds is a copy of Loki's, and snatching it would make one.
@@ -150,7 +237,7 @@ public final class TommyAbilities {
             return;
         }
         targets.sort((a, b) -> Double.compare(a.distanceToSqr(player), b.distanceToSqr(player)));
-        data.startCooldown(2, now, BLITZ_COOLDOWN);
+        data.startCooldown(4, now, BLITZ_COOLDOWN);
         Vec3 from = player.position();
         int taken = 0;
         for (LivingEntity target : targets.subList(0, Math.min(BLITZ_MAX_TARGETS, targets.size()))) {
@@ -407,6 +494,10 @@ public final class TommyAbilities {
         WHIRLWINDS.remove(player.getUUID());
         data.set(Live.WHIRLWIND, false);
         data.set(Live.SPEEDING, false);
+        data.setToggle(Toggle.TOMMY_TIME, false);
+        data.setSlowMo(false);
+        SpeedSurfaces.end(player, data);
+        SpeedStrikes.end(player, data);
     }
 
     public static void clear() {

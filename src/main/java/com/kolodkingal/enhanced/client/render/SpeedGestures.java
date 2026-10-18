@@ -16,6 +16,42 @@ final class SpeedGestures {
     static void register() {
         quicksilver();
         tommy();
+        strikes();
+    }
+
+    /** The speed strikes of 3.3 (and Tommy's slow time). */
+    private static void strikes() {
+        // The Dash Strike: a crouch to launch, then the shoulder thrown forward, the off fist cocked back.
+        define(GestureId.SPEED_DASH)
+                .key(0, S).m(-10, 0, 6).o(-10, 0, -6).lean(0).drop(0).legs(0, 0)
+                .key(2, O).m(40, 0, 10).o(40, 0, -10).lean(18).drop(0.10F).legs(-30, 20)
+                .key(4, E).m(-80, -20, 0).o(30, 0, -20).lean(30).twist(-18).drop(0).legs(-40, 30)
+                .key(8, S).m(-80, -20, 0).o(30, 0, -20).lean(24).twist(-18)
+                .key(12, S).m(-10, 0, 6).o(-10, 0, -6).lean(0).twist(0).legs(0, 0);
+
+        // Slow time: both palms pushed out at the world, then drawn back slowly, as if holding it back.
+        define(GestureId.SPEED_TIME)
+                .key(0, S).m(-10, 0, 6).o(-10, 0, -6).head(0, 0, 0)
+                .key(4, O).mAim(LOOK, 0, -10, 0).oAim(LOOK, 0, 10, 0).head(-6, 0, 0)
+                .key(12, S).m(-60, -15, 0).o(-60, 15, 0)
+                .key(18, S).m(-10, 0, 6).o(-10, 0, -6).head(0, 0, 0);
+
+        // The Pebble Barrage: the hand scoops low, then flicks along the look three times in a blur.
+        define(GestureId.QS_BARRAGE)
+                .key(0, S).m(-10, 0, 6).lean(0).head(0, 0, 0)
+                .key(2, O).m(30, 10, 10).lean(14).head(14, 0, 0)
+                .key(4, E).mAim(LOOK, 0, 0, 0).lean(6).head(0, 0, 0)
+                .key(6, O).m(-60, -10, 10)
+                .key(8, E).mAim(LOOK, 0, 0, 0)
+                .key(10, O).m(-60, -10, 10)
+                .key(14, S).m(-10, 0, 6).lean(0);
+
+        // The Sonic Boom: braced to a dead stop, arms flung out and down, the head thrown back by the blast.
+        define(GestureId.TOMMY_BOOM)
+                .key(0, S).m(-10, 0, 6).o(-10, 0, -6).lean(0).drop(0).legs(0, 0).head(0, 0, 0)
+                .key(2, O).m(-20, 0, 80).o(-20, 0, -80).lean(-14).drop(0.12F).legs(-24, 24).head(-16, 0, 0)
+                .key(8, S).m(-20, 0, 70).o(-20, 0, -70).lean(-8).drop(0.06F).legs(-18, 18).head(-10, 0, 0)
+                .key(14, S).m(-10, 0, 6).o(-10, 0, -6).lean(0).drop(0).legs(0, 0).head(0, 0, 0);
     }
 
     private static void quicksilver() {

@@ -175,6 +175,9 @@ public final class ClientEvents {
             double dx = player.getX() - player.xOld;
             double dy = player.getY() - player.yOld;
             double dz = player.getZ() - player.zOld;
+            if (SpeedSurfaceFx.trail(level, player, data, random, dx, dy, dz)) {
+                continue; // (3.3: on a wall or a ceiling the blur follows the body turned onto it)
+            }
             if (dx * dx + dz * dz < 0.04) {
                 continue;
             }
@@ -215,8 +218,9 @@ public final class ClientEvents {
     }
 
     /**
-     * Quicksilver's footwork, done on the client because players move themselves: while he runs (in Quicksilver Time
-     * or Super Speed) he runs straight up walls he runs into, and across water as long as he keeps running.
+     * Quicksilver's footwork on water, done on the client because players move themselves: while he runs at super speed
+     * with Wall &amp; Water Run on, he runs across water as long as he keeps running. (Walls and ceilings are
+     * {@link SpeedsterMotion}'s, since 3.3.)
      */
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
@@ -224,17 +228,10 @@ public final class ClientEvents {
             return;
         }
         PowerData data = Powers.get(player);
-        if (!QuicksilverAbilities.isRunning(player) || !data.wallRun() || player.getAbilities().flying) {
+        if (!QuicksilverAbilities.isRunning(player) || !data.wallRun() || player.getAbilities().flying || SpeedsterMotion.runner().active()) {
             return;
         }
         Vec3 motion = player.getDeltaMovement();
-        if (player.horizontalCollision && player.zza > 0) {
-            player.setDeltaMovement(motion.x, Math.max(motion.y, 0.42), motion.z);
-            player.resetFallDistance();
-            // Running into the wall would otherwise cancel the sprint (and with it his run) later this tick.
-            player.minorHorizontalCollision = true;
-            return;
-        }
         BlockPos below = BlockPos.containing(player.getX(), player.getY() - 0.05, player.getZ());
         if (!player.isInWater() && motion.y <= 0 && player.level().getFluidState(below).is(FluidTags.WATER)
                 && player.level().getBlockState(below.above()).isAir()) {

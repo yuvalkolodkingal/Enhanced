@@ -31,8 +31,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Quicksilver Time: while it is on, everything near Quicksilver runs several times slower, whether he runs or not. (His
- * Super Speed slows nothing: only {@link PowerData#slowMo()}, which just Quicksilver Time sets, counts here.)
+ * Quicksilver Time (and, since 3.3, Tommy's slow time): while it is on, everything near the speedster runs several times
+ * slower, whether he runs or not. (Super Speed slows nothing: only {@link PowerData#slowMo()}, which just the slow time
+ * of a speedster sets, counts here.)
  *
  * <ul>
  *     <li>Creatures and most other entities only get every Nth tick (on the server; clients smooth the movement).</li>
@@ -71,12 +72,36 @@ public final class SlowMotion {
         List<Vec3> centers = new ArrayList<>(1);
         for (Player player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() == Power.QUICKSILVER && data.slowMo() && player.isAlive()) {
+            if (slowsTime(data) && player.isAlive()) {
                 centers.add(player.position());
             }
         }
         CACHE.put(level, new Zones(time, centers));
         return centers;
+    }
+
+    /** Whether this hero's slow time is running: Quicksilver Time, or (3.3) Tommy's slow time. */
+    public static boolean slowsTime(PowerData data) {
+        return (data.power() == Power.QUICKSILVER || data.power() == Power.TOMMY) && data.slowMo();
+    }
+
+    /**
+     * Whose slow time holds this point: the power of the nearest speedster whose zone it is in (the screen shade and the
+     * world's tint take his colours), or {@link Power#NONE}.
+     */
+    public static Power zoneOwner(Level level, Vec3 pos) {
+        double r2 = radius() * radius();
+        Power owner = Power.NONE;
+        double best = Double.MAX_VALUE;
+        for (Player player : level.players()) {
+            PowerData data = Powers.get(player);
+            double d = player.position().distanceToSqr(pos);
+            if (slowsTime(data) && player.isAlive() && d < r2 && d < best) {
+                best = d;
+                owner = data.power();
+            }
+        }
+        return owner;
     }
 
     public static boolean isInZone(Level level, Vec3 pos) {
@@ -155,7 +180,7 @@ public final class SlowMotion {
             }
             for (Player player : level.players()) {
                 PowerData data = Powers.get(player);
-                boolean speedster = data.power() == Power.QUICKSILVER && data.slowMo();
+                boolean speedster = slowsTime(data);
                 if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius) {
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 3, true, false, false));
                     // Whatever he rides isn't tick-skipped (he steers it), so it is slowed the same way.

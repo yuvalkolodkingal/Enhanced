@@ -39,6 +39,12 @@ public final class GestureRoutes {
     /** What {@link #reason} says of a momentary state of a hero of 3.0 that is not acted yet (it begins with this). */
     public static final String PENDING_REASON = "pending lane";
 
+    /** The cooldowns (ticks) that tell two abilities on one key apart (3.3; the abilities' own constants). */
+    static final int QS_BLITZ_COOLDOWN = com.kolodkingal.enhanced.ability.QuicksilverAbilities.BLITZ_COOLDOWN;
+    static final int QS_PICKPOCKET_COOLDOWN = com.kolodkingal.enhanced.ability.QuicksilverAbilities.PICKPOCKET_COOLDOWN;
+    static final int TOMMY_VIBRATE_COOLDOWN = com.kolodkingal.enhanced.ability.TommyAbilities.VIBRATE_COOLDOWN;
+    static final int TOMMY_BLITZ_COOLDOWN = com.kolodkingal.enhanced.ability.TommyAbilities.BLITZ_COOLDOWN;
+
     /** A Boolean flag of the synced power data (the ones that are not a {@link Toggle} or a {@link Live} bit). */
     public enum Flag {
         MAGNETIC_SHIELD, SHRAPNEL, BEAM, CHAOS_SHIELD, VISION_PHASED, DENSE, DISGUISE, QUICKSILVER_TIME, SUPER_SPEED, WALKMAN
@@ -113,10 +119,19 @@ public final class GestureRoutes {
         return switch (power) {
             // R's cooldown is the Magnetic Pull's alone (it starts only when a pull affected something).
             case MAGNETO -> ability == 1 ? GestureId.MAG_PULL : ability == 3 ? GestureId.MAG_DISARM : null;
-            case QUICKSILVER -> ability == 2 ? GestureId.QS_BLITZ : ability == 3 ? GestureId.QS_SNATCH : null;
+            // 3.3: Sneak + G is the Dash Strike (G itself has no cooldown); V's cooldown is the Speed Blitz's (80 ticks) or
+            // Sneak + V's Pickpocket's (100); N is the Pebble Barrage.
+            case QUICKSILVER -> switch (ability) {
+                case 2 -> GestureId.SPEED_DASH;
+                case 3 -> left > (QS_BLITZ_COOLDOWN + QS_PICKPOCKET_COOLDOWN) / 2 ? GestureId.QS_SNATCH : GestureId.QS_BLITZ;
+                case 5 -> GestureId.QS_BARRAGE;
+                default -> null;
+            };
+            // 3.3: Sneak + G is the Dash Strike; B's cooldown is Vibrate's (40 ticks) or Sneak + B's Disarm Blitz's (160); the
+            // Whirlwind and the Sonic Boom (V, Sneak + V) are acted by their momentary states.
             case TOMMY -> switch (ability) {
-                case 2 -> GestureId.TOMMY_BLITZ;
-                case 4 -> GestureId.TOMMY_VIBRATE;
+                case 2 -> GestureId.SPEED_DASH;
+                case 4 -> left > (TOMMY_VIBRATE_COOLDOWN + TOMMY_BLITZ_COOLDOWN) / 2 ? GestureId.TOMMY_BLITZ : GestureId.TOMMY_VIBRATE;
                 case 5 -> GestureId.TOMMY_ACCEL;
                 default -> null;
             };
@@ -146,6 +161,10 @@ public final class GestureRoutes {
             case REALITY_VEIL -> power == Power.THANOS ? (on ? GestureId.THANOS_VEIL_ON : GestureId.THANOS_VEIL_OFF) : null;
             // ===== ultron =====
             // ===== apocalypse =====
+            // ===== speed (3.3) =====
+            case TOMMY_TIME -> power == Power.TOMMY && on ? GestureId.SPEED_TIME : null;
+            // (Wall Run on or off: he shakes his arms out, as for his Super Speed.)
+            case TOMMY_WALL_RUN_OFF -> power == Power.TOMMY ? GestureId.TOMMY_READY : null;
         };
     }
 
@@ -166,6 +185,7 @@ public final class GestureRoutes {
             case DENSE -> power == Power.VISION ? (on ? GestureId.VISION_DENSE_ON : GestureId.VISION_DENSE_OFF) : null;
             case DISGUISE -> power == Power.VISION ? GestureId.VISION_DISGUISE : null;
             case QUICKSILVER_TIME -> power == Power.QUICKSILVER && on ? GestureId.QS_GOGGLES : null;
+            // (3.3: Super Speed is G now, a key of its own.)
             case SUPER_SPEED -> power == Power.QUICKSILVER && on ? GestureId.QS_START : null;
             case WALKMAN -> power == Power.QUICKSILVER && on ? GestureId.QS_WALKMAN : null;
         };
@@ -179,6 +199,7 @@ public final class GestureRoutes {
         }
         return switch (live) {
             case WHIRLWIND -> power == Power.TOMMY ? GestureId.TOMMY_WHIRL_START : null;
+            case SONIC_BOOM -> power == Power.TOMMY ? GestureId.TOMMY_BOOM : null;
             case CALLING_LIGHTNING -> power == Power.THOR ? (armed ? GestureId.THOR_BEAM_KICK : GestureId.THOR_BEAM_KICK_BARE) : null;
             // 3.2: the Hex Beam begins as the Hex Bolt was cast (the hand pulled back, then thrust out); the stance BEAM_HAND holds it.
             case BEAMING -> power == Power.BILLY ? GestureId.BILLY_BOLT : null;
@@ -259,11 +280,13 @@ public final class GestureRoutes {
                 case 4 -> "flag:CHAOS_SHIELD";
                 default -> "hex";
             };
+            // (3.3: Sneak + R, the Walkman, is flag:WALKMAN; Sneak + G, the Dash Strike, the cooldown of G; Sneak + V, Pickpocket, the
+            // cooldown of V told by its length.)
             case QUICKSILVER -> switch (ability) {
                 case 1 -> "flag:QUICKSILVER_TIME";
-                case 2, 3 -> "cooldown";
-                case 4 -> "none: running up walls and over water is only a message and a change in how he runs";
-                default -> "flag:WALKMAN";
+                case 2 -> "flag:SUPER_SPEED";
+                case 3, 5 -> "cooldown";
+                default -> "none: Wall & Water Run is a message; running on a wall or a ceiling is the stance of the surface (SPEED_WALL, SPEED_CEILING)";
             };
             case VISION -> switch (ability) {
                 case 1 -> "flag:BEAM";
@@ -272,9 +295,12 @@ public final class GestureRoutes {
                 case 4 -> "flag:DENSE";
                 default -> "flag:DISGUISE";
             };
+            // (3.3: Sneak + R, Wall Run, is a message; Sneak + G, the Dash Strike, the cooldown of G; Sneak + V, the Sonic Boom,
+            // live:SONIC_BOOM; Sneak + B, the Disarm Blitz, the cooldown of B told by its length.)
             case TOMMY -> switch (ability) {
-                case 1 -> "toggle:SUPER_SPEED";
-                case 2, 4, 5 -> "cooldown";
+                case 1 -> "toggle:TOMMY_TIME";
+                case 2 -> "toggle:SUPER_SPEED";
+                case 4, 5 -> "cooldown";
                 default -> "live:WHIRLWIND";
             };
             case BILLY -> switch (ability) {
@@ -370,6 +396,10 @@ public final class GestureRoutes {
             case LIFTED -> "Sokovia carries them: like a pinned player they can't move, so they have no move to make";
             // ===== apocalypse =====
             case SANDSTORM -> null;
+            // ===== speed (3.3) =====
+            case SURFACE_WALL, SURFACE_CEILING -> "stances (SPEED_WALL, SPEED_CEILING): the body is turned to the surface he runs on, in his run"
+                    + " cycle; the turn on and off is the stance's easing";
+            case SONIC_BOOM -> null;
         };
     }
 

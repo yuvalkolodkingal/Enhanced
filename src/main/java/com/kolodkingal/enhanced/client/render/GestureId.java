@@ -74,6 +74,16 @@ public enum GestureId {
     TOMMY_VIBRATE(Group.CAST, 10, 1, 4, false),
     TOMMY_ACCEL(Group.CAST, 12, 1, 5, false),
 
+    // ===== speed (3.3) =====
+    /** The Dash Strike (both speedsters): crouched to launch, then thrown forward with the shoulder leading. */
+    SPEED_DASH(Group.CAST, 12, 1, 5, true),
+    /** Tommy's slow time going on: both palms pushed out and slowly drawn back, as if holding the world back. */
+    SPEED_TIME(Group.CAST, 18, 3, 6, false),
+    /** Quicksilver's Pebble Barrage: a scoop low with the main hand, then a whip of flicks along the look. */
+    QS_BARRAGE(Group.CAST, 14, 1, 5, true),
+    /** Tommy's Sonic Boom: braced to a dead stop, both arms thrown out and down, the head back. */
+    TOMMY_BOOM(Group.CAST, 14, 1, 6, true),
+
     BILLY_BOLT(Group.CAST, 8, 1, 5, true),
     BILLY_FREEZE_CAST(Group.CAST, 22, 3, 6, false),
     BILLY_NOISE_ON(Group.CAST, 14, 2, 5, false),

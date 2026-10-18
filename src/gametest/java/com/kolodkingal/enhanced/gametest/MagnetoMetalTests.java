@@ -604,15 +604,17 @@ public final class MagnetoMetalTests {
         ServerPlayer tommy = f.player(17.5, FLOOR, 17.5, Power.TOMMY);
         check(tommy.distanceTo(loki) > 12.0, "the real Loki is out of the Blitz's reach");
 
-        AbilityHandler.onKey(tommy, 2, true);
-        AbilityHandler.onKey(tommy, 2, false);
+        tommy.setShiftKeyDown(true); // (3.3: the Disarm Blitz is Sneak + B)
+        AbilityHandler.onKey(tommy, 4, true);
+        AbilityHandler.onKey(tommy, 4, false);
         check(tommy.getInventory().countItem(Items.IRON_SWORD) == 0, "the Blitz takes nothing from an illusion");
         check(countDropped(helper, Items.IRON_SWORD) == 0, "and no sword falls");
         check(!copy.isRemoved() && copy.getMainHandItem().is(Items.IRON_SWORD), "the illusion was passed by");
 
         Zombie zombie = wearing(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 17.5), EquipmentSlot.MAINHAND, Items.IRON_SWORD);
-        AbilityHandler.onKey(tommy, 2, true);
-        AbilityHandler.onKey(tommy, 2, false);
+        AbilityHandler.onKey(tommy, 4, true);
+        AbilityHandler.onKey(tommy, 4, false);
+        tommy.setShiftKeyDown(false);
         check(zombie.getMainHandItem().isEmpty() && tommy.getInventory().countItem(Items.IRON_SWORD) == 1,
                 "a zombie's sword still comes to Tommy");
         check(copy.getMainHandItem().is(Items.IRON_SWORD) && countDropped(helper, Items.IRON_SWORD) == 0,

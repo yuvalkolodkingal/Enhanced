@@ -130,9 +130,9 @@ public class PowerHud implements LayeredDraw.Layer {
                 default -> null;
             };
             case QUICKSILVER -> switch (ability) {
-                case 1 -> quicksilverMode(data);
+                case 1 -> slowTime(data.quicksilverTime(), data.walkman());
+                case 2 -> running(data, data.superSpeed());
                 case 4 -> onOff(data.wallRun());
-                case 5 -> onOff(data.walkman());
                 default -> null;
             };
             case VISION -> switch (ability) {
@@ -207,16 +207,24 @@ public class PowerHud implements LayeredDraw.Layer {
     }
 
     /** Which of Quicksilver's modes is on ("Time" or "Speed", or OFF), and "running" while he runs in it. */
-    private static Component quicksilverMode(PowerData data) {
-        if (!data.quicksilverTime() && !data.superSpeed()) {
-            return onOff(false);
+    /** A speedster's slow time (3.3): ON or OFF, and Quicksilver's Walkman note while his song can play. */
+    private static Component slowTime(boolean on, boolean walkman) {
+        MutableComponent line = onOff(on).copy();
+        if (on && walkman) {
+            line.append(Component.literal(" ")).append(Component.translatable("hud.enhanced.walkman_note").withStyle(ChatFormatting.LIGHT_PURPLE));
         }
-        MutableComponent mode = Component.translatable(data.quicksilverTime() ? "hud.enhanced.time" : "hud.enhanced.speed")
-                .withStyle(ChatFormatting.GREEN);
-        if (data.is(Live.SPEEDING)) {
-            mode.append(Component.literal(" ")).append(active("hud.enhanced.running"));
+        return line;
+    }
+
+    /** A speedster's running (3.3): ON or OFF, "running" while he runs, and the wall or the ceiling he runs on. */
+    private static Component running(PowerData data, boolean on) {
+        MutableComponent line = onOff(on).copy();
+        if (data.is(Live.SURFACE_WALL) || data.is(Live.SURFACE_CEILING)) {
+            line.append(Component.literal(" ")).append(active(data.is(Live.SURFACE_CEILING) ? "hud.enhanced.on_ceiling" : "hud.enhanced.on_wall"));
+        } else if (data.is(Live.SPEEDING)) {
+            line.append(Component.literal(" ")).append(active("hud.enhanced.running"));
         }
-        return mode;
+        return line;
     }
 
     private static Component billy(LocalPlayer player, PowerData data, int ability) {
@@ -254,7 +262,14 @@ public class PowerHud implements LayeredDraw.Layer {
 
     private static Component tommy(LocalPlayer player, PowerData data, int ability) {
         return switch (ability) {
-            case 1 -> onOff(data.toggle(Toggle.SUPER_SPEED));
+            case 1 -> {
+                MutableComponent line = slowTime(data.toggle(Toggle.TOMMY_TIME), false).copy();
+                if (data.toggle(Toggle.TOMMY_WALL_RUN_OFF)) {
+                    line.append(Component.literal(" ")).append(Component.translatable("hud.enhanced.walls_off").withStyle(ChatFormatting.DARK_GRAY));
+                }
+                yield line;
+            }
+            case 2 -> running(data, data.toggle(Toggle.SUPER_SPEED));
             default -> null;
         };
     }
