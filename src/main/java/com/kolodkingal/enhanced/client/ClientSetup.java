@@ -103,6 +103,8 @@ public final class ClientSetup {
             // ===== cyclops (3.3) =====
             BeamRenderer.registerDrawer(RubyQuartzGlassesItem.OPTIC, CyclopsBeamFx.OPTIC);
             BeamRenderer.registerDrawer(RubyQuartzGlassesItem.UNLEASHED, CyclopsBeamFx.UNLEASHED);
+            // ===== odin (3.5) =====
+            com.kolodkingal.enhanced.client.render.OdinClient.setup();
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
         });
@@ -157,6 +159,10 @@ public final class ClientSetup {
         // ===== asgard (3.5) =====
         // ===== heimdall (3.5) =====
         // ===== odin (3.5) =====
+        event.registerEntityRenderer(ModEntities.GUNGNIR.get(),
+                com.kolodkingal.enhanced.client.render.GungnirRenderer::new);
+        event.registerEntityRenderer(ModEntities.RAVEN.get(),
+                com.kolodkingal.enhanced.client.render.RavenRenderer::new);
         // ===== hela (3.5) =====
         event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), NoopRenderer::new);
         // ===== asgardians (3.5) =====
@@ -204,6 +210,10 @@ public final class ClientSetup {
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER,
                 com.kolodkingal.enhanced.client.render.HeimdallHelmLayer::createLayer);
         // ===== odin (3.5) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER,
+                com.kolodkingal.enhanced.client.render.OdinHelmLayer::createLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.RavenModel.LAYER,
+                com.kolodkingal.enhanced.client.render.RavenModel::createBodyLayer);
         // ===== hela (3.5) =====
         // ===== asgardians (3.5) =====
     }
@@ -242,6 +252,8 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.HeimdallHelmLayer(renderer,
                         event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER)));
                 // ===== odin (3.5) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.OdinHelmLayer(renderer,
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER)));
                 // ===== hela (3.5) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,

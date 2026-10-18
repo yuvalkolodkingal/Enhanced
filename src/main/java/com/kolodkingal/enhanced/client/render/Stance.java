@@ -79,6 +79,13 @@ public enum Stance {
     CYCLOPS_BLAST(1.5F, 3.0F, true),
     /** The glasses are off and the giant beam pours out: both hands at his face, straining, braced against it. */
     CYCLOPS_UNLEASHED(2.0F, 4.0F, true),
+    // ===== odin (3.5) =====
+    /** The Odinforce Shield: Gungnir planted upright before him in the main hand, the other hand open toward the dome. */
+    ODIN_SHIELD(1.5F, 3.0F, true),
+    /** The Odinsleep: kneeling on one knee, the head bowed, both hands resting on the spear. */
+    ODIN_SLEEP(3.0F, 4.0F, true),
+    /** At rest with Gungnir: both hands on the upright spear, the head high (the king's bearing). */
+    ODIN_REGAL(8.0F, 4.0F, false),
     // ===== professor_x (3.3) =====
     /** The old Professor X sits in his wheelchair: the legs forward on the footrest, the forearms on the armrests. */
     XAVIER_SEATED(4.0F, 4.0F, false),

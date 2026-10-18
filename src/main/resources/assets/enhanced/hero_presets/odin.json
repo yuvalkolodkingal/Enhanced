@@ -1,0 +1,72 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#D9A63A",
+  "glow": "#FFF0C2",
+  "look": {
+    "base": "odin/allfather",
+    "slim": false,
+    "cape": {
+      "style": "plain",
+      "color": "#9E1B1B"
+    }
+  },
+  "powers": [
+    {
+      "id": "odin.gungnir",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "odin.odinforce",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "odin.banish",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "odin.ravens",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "odin.command",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "odin.body",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "odin.gungnir",
+    "odin.odinforce",
+    "odin.banish",
+    "odin.ravens",
+    "odin.command"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "enhanced:gungnir",
+    "hero": "odin"
+  }
+}

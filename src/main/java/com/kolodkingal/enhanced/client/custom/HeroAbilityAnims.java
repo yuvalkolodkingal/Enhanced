@@ -185,12 +185,15 @@ public final class HeroAbilityAnims {
         row(HeroAbility.HEIMDALL_STRIKE).also(GestureId.HEIMDALL_STRIKE, GestureId.HEIMDALL_SEND);
         row(HeroAbility.HEIMDALL_BODY);
         // ===== odin (3.5) =====
-        row(HeroAbility.ODIN_GUNGNIR);
-        row(HeroAbility.ODIN_ODINFORCE);
-        row(HeroAbility.ODIN_BANISH);
-        row(HeroAbility.ODIN_RAVENS);
-        row(HeroAbility.ODIN_COMMAND);
-        row(HeroAbility.ODIN_BODY);
+        row(HeroAbility.ODIN_GUNGNIR).mainCd(GestureId.ODIN_BLAST).alt(GestureId.ODIN_THROW).also(GestureId.ODIN_CATCH)
+                .stances(Stance.ODIN_REGAL);
+        row(HeroAbility.ODIN_ODINFORCE).main(GestureId.ODIN_SHIELD_UP).altCd(GestureId.ODIN_HEAL).also(GestureId.ODIN_SHIELD_DOWN)
+                .stances(Stance.ODIN_SHIELD);
+        row(HeroAbility.ODIN_BANISH).mainCd(GestureId.ODIN_BANISH).altCd(GestureId.ODIN_WAVE);
+        row(HeroAbility.ODIN_RAVENS).main(GestureId.ODIN_RAVENS).alt(GestureId.ODIN_RAVENS);
+        row(HeroAbility.ODIN_COMMAND).mainCd(GestureId.ODIN_COMMAND).alt(GestureId.ODIN_KNEEL).also(GestureId.ODIN_RISE)
+                .stances(Stance.ODIN_SLEEP);
+        row(HeroAbility.ODIN_BODY).also(GestureId.ODIN_CROWN);
         // ===== hela (3.5) =====
         row(HeroAbility.HELA_NECROSWORDS);
         row(HeroAbility.HELA_BLADE_WALL);
@@ -262,7 +265,7 @@ public final class HeroAbilityAnims {
         flag(GestureRoutes.Flag.SHRAPNEL, HeroAbility.MAGNETO_SHRAPNEL);
         flag(GestureRoutes.Flag.BEAM, HeroAbility.WANDA_CHAOS_BEAM, HeroAbility.VISION_MIND_BEAM, HeroAbility.ULTRON_REPULSOR);
         flag(GestureRoutes.Flag.CHAOS_SHIELD, HeroAbility.WANDA_CHAOS_SHIELD, HeroAbility.APOCALYPSE_SHIELD, HeroAbility.AGATHA_SHIELD,
-                HeroAbility.BILLY_FREEZE);
+                HeroAbility.BILLY_FREEZE, HeroAbility.ODIN_ODINFORCE);
         flag(GestureRoutes.Flag.VISION_PHASED, HeroAbility.VISION_PHASE);
         flag(GestureRoutes.Flag.DENSE, HeroAbility.VISION_DENSITY);
         flag(GestureRoutes.Flag.DISGUISE, HeroAbility.VISION_DISGUISE);

@@ -1,6 +1,26 @@
 {
-  "parent": "minecraft:item/handheld",
-  "textures": {
-    "layer0": "enhanced:item/gungnir"
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "enhanced:item/gungnir_spear"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/handheld",
+      "textures": {
+        "layer0": "enhanced:item/gungnir"
+      }
+    },
+    "fixed": {
+      "parent": "minecraft:item/handheld",
+      "textures": {
+        "layer0": "enhanced:item/gungnir"
+      }
+    },
+    "ground": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "enhanced:item/gungnir"
+      }
+    }
   }
 }

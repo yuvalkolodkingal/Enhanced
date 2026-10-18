@@ -171,7 +171,8 @@ public final class GestureRoutes {
             case HEIMDALL_SIGHT -> power == Power.HEIMDALL ? (on ? GestureId.HEIMDALL_SIGHT_ON : GestureId.HEIMDALL_SIGHT_OFF) : null;
             // (The toggles of 3.5 stand in with the pending gesture, for their own hero only, until their lanes route them.)
             // ===== odin (3.5) =====
-            case ODINSLEEP -> power == Power.ODIN ? PENDING_GESTURE : null;
+            // (The Odinsleep: he sinks to one knee, and rises when he wakes.)
+            case ODINSLEEP -> power == Power.ODIN ? (on ? GestureId.ODIN_KNEEL : GestureId.ODIN_RISE) : null;
             // ===== hela (3.5) =====
             case HELA_FORM -> power == Power.HELA ? PENDING_GESTURE : null;
         };
@@ -413,7 +414,15 @@ public final class GestureRoutes {
                 default -> "none: the Bifrost Strike and the Bifrost for a friend are told by the payloads of their light, which name the caster";
             };
             // ===== odin (3.5) =====
-            case ODIN -> PENDING_ACTING; // (lane L3 of 3.5)
+            // (R's cooldown tells the blast from a new Gungnir coming to his hand by its length; Sneak + R, the throw, is
+            // live:ODIN_THROWN. Sneak + G, the Heal, is the cooldown of G told by its length; V's cooldown tells Banish from the
+            // Odinforce Wave. Sneak + B, the Ravens' Report, is live:ODIN_RAVENS too; Sneak + N, the Odinsleep, is
+            // toggle:ODINSLEEP. See OdinHeroMath.)
+            case ODIN -> switch (ability) {
+                case 2 -> "flag:CHAOS_SHIELD";
+                case 4 -> "live:ODIN_RAVENS";
+                default -> "cooldown";
+            };
             // ===== hela (3.5) =====
             case HELA -> PENDING_ACTING; // (lane L4 of 3.5)
             default -> "none: no abilities";
@@ -465,7 +474,10 @@ public final class GestureRoutes {
             case HEIMDALL_FARSIGHT -> "a stance (HEIMDALL_FARSIGHT): the hand shading his eyes while he looks far";
             case HEIMDALL_SLASHING -> "each blow of the combo: HeimdallClient's edges count the rises of the state into HEIMDALL_SLASH_1, 2 and 3";
             // ===== odin (3.5) =====
-            case ODIN_THROWN, ODIN_RAVENS -> "no pose yet: Odin's lane (L3 of 3.5) gives it a gesture or a reason";
+            // (Both have gestures of his own, ODIN_THROW and ODIN_RAVENS, which his plug-in's liveGesture gives for Odin; the
+            // checks that ask only the heroes of 3.0 and 3.3 read this instead.)
+            case ODIN_THROWN -> "Odin's own gesture ODIN_THROW, from his plug-in (OdinClient.liveGesture)";
+            case ODIN_RAVENS -> "Odin's own gesture ODIN_RAVENS, from his plug-in (OdinClient.liveGesture)";
             // ===== hela (3.5) =====
             case HELA_GRASPING, HELA_SUMMONING -> "no pose yet: Hela's lane (L4 of 3.5) gives it a gesture or a reason";
         };

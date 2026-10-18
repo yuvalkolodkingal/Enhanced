@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
 import com.kolodkingal.enhanced.hela.HelaShadowEntity;
+import com.kolodkingal.enhanced.odin.GungnirEntity;
+import com.kolodkingal.enhanced.odin.RavenEntity;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
@@ -233,6 +235,24 @@ public final class ModEntities {
     // (The skeleton registers the two entities another lane needs by name; each lane adds its own in its region below.)
     // ===== heimdall (3.5) =====
     // ===== odin (3.5) =====
+    /** Gungnir in flight: Odin's Gungnir Throw (it comes home to his hand). */
+    public static final DeferredHolder<EntityType<?>, EntityType<GungnirEntity>> GUNGNIR = ENTITIES.register("gungnir",
+            () -> EntityType.Builder.<GungnirEntity>of(GungnirEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .fireImmune()
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("gungnir"));
+    /** Huginn or Muninn, one of Odin's two ravens (never saved). */
+    public static final DeferredHolder<EntityType<?>, EntityType<RavenEntity>> RAVEN = ENTITIES.register("raven",
+            () -> EntityType.Builder.<RavenEntity>of(RavenEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.4F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("raven"));
     // ===== hela (3.5) =====
     /** A Shadow of Hela of the Guardian's Watch (lane L2 spawns them; lane L4 owns the entity). Never saved. */
     public static final DeferredHolder<EntityType<?>, EntityType<HelaShadowEntity>> HELA_SHADOW = ENTITIES.register("hela_shadow",
@@ -262,6 +282,8 @@ public final class ModEntities {
         event.put(APOCALYPSE.get(), ApocalypseEntity.createAttributes().build());
         // 3.5
         event.put(HELA_SHADOW.get(), HelaShadowEntity.createAttributes().build());
+        // ===== odin (3.5) =====
+        event.put(RAVEN.get(), RavenEntity.createAttributes().build());
         event.put(ASGARDIAN.get(), AsgardianEntity.createAttributes().build());
     }
 

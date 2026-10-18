@@ -41,7 +41,8 @@ public final class ShieldStyles {
     }
 
     /** The heroes' shield abilities that draw a dome (3.4: what a custom hero's shield looks like). */
-    private static final HeroAbility[] SHIELDS = {HeroAbility.WANDA_CHAOS_SHIELD, HeroAbility.AGATHA_SHIELD, HeroAbility.APOCALYPSE_SHIELD};
+    private static final HeroAbility[] SHIELDS = {HeroAbility.WANDA_CHAOS_SHIELD, HeroAbility.AGATHA_SHIELD, HeroAbility.APOCALYPSE_SHIELD,
+            HeroAbility.ODIN_ODINFORCE};
 
     /** The style of a hero's own shield, or null. */
     public static ShieldStyle of(Power power) {
