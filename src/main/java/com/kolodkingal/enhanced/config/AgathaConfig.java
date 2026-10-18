@@ -36,6 +36,7 @@ public final class AgathaConfig {
     public static ModConfigSpec.DoubleValue DRAIN_HEAL;
     public static ModConfigSpec.IntValue DRAIN_COOLDOWN;
     public static ModConfigSpec.DoubleValue DRAIN_EXHAUSTION;
+    public static ModConfigSpec.BooleanValue DRAIN_ONLY_SORCERERS;
 
     // ---- B: the Witch's Shield ----
     public static ModConfigSpec.DoubleValue SHIELD_RADIUS;
@@ -94,6 +95,10 @@ public final class AgathaConfig {
                 .defineInRange("drainCooldown", 300, 0, 72000);
         DRAIN_EXHAUSTION = builder.comment("Food exhaustion of a Power Drain (4.0 = 1 food point). Creative players pay nothing.")
                 .defineInRange("drainExhaustion", 2.0, 0.0, 40.0);
+        DRAIN_ONLY_SORCERERS = builder.comment("If true (the default), the Power Drain takes only a witch's or sorcerer's power: Loki, the Scarlet",
+                        "Witch, Billy, Agatha, and a custom hero with an ability of theirs. Any other hero is refused. If false, it takes any",
+                        "hero's power (the rule before 3.5). A creature's life is drained either way.")
+                .define("drainOnlySorcerers", true);
 
         SHIELD_RADIUS = builder.comment("The radius (blocks) of the Witch's Shield (B, hold), the purple sphere round her.")
                 .defineInRange("shieldRadius", 1.9, 1.0, 6.0);
