@@ -5,6 +5,7 @@
     "minecraft:wither",
     "minecraft:warden",
     "minecraft:elder_guardian",
-    "enhanced:apocalypse"
+    "enhanced:apocalypse",
+    "enhanced:hela"
   ]
 }

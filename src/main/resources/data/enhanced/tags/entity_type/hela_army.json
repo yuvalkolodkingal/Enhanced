@@ -1,4 +1,7 @@
 {
   "replace": false,
-  "values": []
+  "values": [
+    "enhanced:berserker",
+    "enhanced:fenris"
+  ]
 }

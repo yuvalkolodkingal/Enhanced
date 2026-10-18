@@ -1,7 +1,12 @@
 package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
+import com.kolodkingal.enhanced.hela.BerserkerEntity;
+import com.kolodkingal.enhanced.hela.BladeSpikeEntity;
+import com.kolodkingal.enhanced.hela.FenrisEntity;
+import com.kolodkingal.enhanced.hela.HelaEntity;
 import com.kolodkingal.enhanced.hela.HelaShadowEntity;
+import com.kolodkingal.enhanced.hela.NecroswordEntity;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
@@ -243,6 +248,52 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("hela_shadow"));
+    /** Hela, the boss of the throne room (lane L4): made only by her fight. */
+    public static final DeferredHolder<EntityType<?>, EntityType<HelaEntity>> HELA = ENTITIES.register("hela",
+            () -> EntityType.Builder.<HelaEntity>of(HelaEntity::new, MobCategory.MONSTER)
+                    .sized(0.7F, 2.1F)
+                    .eyeHeight(1.85F)
+                    .fireImmune()
+                    .clientTrackingRange(12)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("hela"));
+    /** A berserker of her army (the boss's waves, the hero's Raise the Dead). Never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<BerserkerEntity>> BERSERKER = ENTITIES.register("berserker",
+            () -> EntityType.Builder.<BerserkerEntity>of(BerserkerEntity::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(10)
+                    .noSave()
+                    .noSummon()
+                    .build("berserker"));
+    /** Fenris, her giant wolf. Never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<FenrisEntity>> FENRIS = ENTITIES.register("fenris",
+            () -> EntityType.Builder.<FenrisEntity>of(FenrisEntity::new, MobCategory.MONSTER)
+                    .sized(1.6F, 2.4F)
+                    .eyeHeight(2.0F)
+                    .clientTrackingRange(12)
+                    .noSave()
+                    .noSummon()
+                    .build("fenris"));
+    /** A necrosword in flight, or hanging over a Blade Rain. */
+    public static final DeferredHolder<EntityType<?>, EntityType<NecroswordEntity>> NECROSWORD = ENTITIES.register("necrosword",
+            () -> EntityType.Builder.<NecroswordEntity>of(NecroswordEntity::new, MobCategory.MISC)
+                    .sized(0.4F, 0.4F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("necrosword"));
+    /** A spike of a Blade Wall or a Blade Burst: solid while it stands. */
+    public static final DeferredHolder<EntityType<?>, EntityType<BladeSpikeEntity>> BLADE_SPIKE = ENTITIES.register("blade_spike",
+            () -> EntityType.Builder.<BladeSpikeEntity>of(BladeSpikeEntity::new, MobCategory.MISC)
+                    .sized(0.7F, 1.7F)
+                    .clientTrackingRange(8)
+                    .updateInterval(2)
+                    .noSave()
+                    .noSummon()
+                    .build("blade_spike"));
     // ===== asgardians (3.5) =====
     /** An Asgardian of any role (lane L5). Saved; the keeper makes and keeps them. */
     public static final DeferredHolder<EntityType<?>, EntityType<AsgardianEntity>> ASGARDIAN = ENTITIES.register("asgardian",
@@ -262,6 +313,9 @@ public final class ModEntities {
         event.put(APOCALYPSE.get(), ApocalypseEntity.createAttributes().build());
         // 3.5
         event.put(HELA_SHADOW.get(), HelaShadowEntity.createAttributes().build());
+        event.put(HELA.get(), HelaEntity.createAttributes().build());
+        event.put(BERSERKER.get(), BerserkerEntity.createAttributes().build());
+        event.put(FENRIS.get(), FenrisEntity.createAttributes().build());
         event.put(ASGARDIAN.get(), AsgardianEntity.createAttributes().build());
     }
 
