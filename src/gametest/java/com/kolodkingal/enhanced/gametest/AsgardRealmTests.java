@@ -165,6 +165,11 @@ public final class AsgardRealmTests {
         check(at(asgard, CityPlan.THRONE_ROOM_CENTER).getCollisionShape(asgard, CityPlan.THRONE_ROOM_CENTER).max(Direction.Axis.Y) < 0.1
                 && at(asgard, CityPlan.THRONE_ROOM_CENTER.above()).isAir() && !at(asgard, CityPlan.THRONE_ROOM_CENTER.below()).isAir(),
                 "the throne room's floor at 82");
+        // (integration: lane L4's dais, where Hela forms and channels, stands on lane L1's dais before the throne, with room)
+        net.minecraft.world.phys.Vec3 dais = com.kolodkingal.enhanced.hela.HelaLane.dais(asgard);
+        check(dais.y > CityPlan.THRONE_ROOM_FLOOR && dais.y <= CityPlan.THRONE.getY() + 1 && dais.z < CityPlan.THRONE.getZ() + 6
+                && asgard.noCollision(new net.minecraft.world.phys.AABB(dais.x - 0.4, dais.y + 0.01, dais.z - 0.4,
+                        dais.x + 0.4, dais.y + 2.5, dais.z + 0.4)), "Hela's place on the throne's dais: " + dais);
         BifrostMechanismBlockEntity mechanism = (BifrostMechanismBlockEntity) asgard.getBlockEntity(CityPlan.MECHANISM);
         check(AsgardRules.spinNear(asgard, CityPlan.ARRIVAL) && mechanism.spinStart() == asgard.getGameTime(), "the Bifrost spins the mechanism");
         check(!AsgardRules.spinNear(asgard, CityPlan.ARRIVAL.add(0, 0, -60)), "but not from far away");

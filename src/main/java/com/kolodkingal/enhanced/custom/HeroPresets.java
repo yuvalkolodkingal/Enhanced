@@ -20,7 +20,7 @@ public final class HeroPresets {
     public static final List<String> HEROES = List.of("magneto", "wanda", "quicksilver", "vision", "billy", "tommy", "loki", "thor",
             "phoenix", "spider", "thanos", "ultron", "apocalypse", "agatha", "cyclops", "xavier",
             // 3.5 (one per lane: the heroes of Asgard)
-            "heimdall", "odin");
+            "heimdall", "odin", "hela");
     /** The archetypes. */
     public static final List<String> ARCHETYPES = List.of("speedster", "flyer_blaster", "tank", "mage", "mind_master", "elemental");
     /** The most points a preset may cost. */

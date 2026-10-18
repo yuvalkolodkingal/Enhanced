@@ -137,6 +137,48 @@ public final class MjolnirShatter {
     }
 
     /**
+     * 3.5 (Hela's lane): a thrown Mjolnir caught in Hela's hand and crushed at {@code at} (the moment of Ragnarok). The
+     * hammer, already out of Thor's hand (the thrown weapon is gone), bursts into fragments there as his own Sneak + R
+     * makes it burst: they strike his enemies and fly home, and the last one back makes it whole in his hand. Thor's own
+     * cooldown of the shatter is neither asked nor started. Returns false (and nothing happens) if his hammer is already in
+     * pieces: the caller then gives the hammer back as it would.
+     */
+    public static boolean shatterCaught(ServerPlayer thor, ItemStack hammer, Vec3 at) {
+        UUID id = thor.getUUID();
+        if (ACTIVE.containsKey(id)) {
+            return false;
+        }
+        ServerLevel level = thor.serverLevel();
+        long now = level.getGameTime();
+        ItemStack whole = hammer.copyWithCount(1);
+        Worthiness.claim(thor, whole);
+        List<LivingEntity> enemies = enemies(thor);
+        RandomSource random = thor.getRandom();
+        int count = enemies.isEmpty() ? RING_FRAGMENTS : enemies.size();
+        List<UUID> fragments = new ArrayList<>();
+        int first = -1;
+        for (int i = 0; i < count; i++) {
+            double angle = (i + random.nextDouble() * 0.6) * Mth.TWO_PI / count;
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+            Vec3 burst = new Vec3(cos * 0.9, 0.3 + random.nextDouble() * 0.5, sin * 0.9);
+            Vec3 ring = at.add(cos * RING_RADIUS, 0.5 + random.nextDouble() * 1.5, sin * RING_RADIUS);
+            MjolnirFragmentEntity fragment = new MjolnirFragmentEntity(level, thor, at, burst, enemies.isEmpty() ? null : enemies.get(i), ring);
+            level.addFreshEntity(fragment);
+            fragments.add(fragment.getUUID());
+            if (first == -1) {
+                first = fragment.getId();
+            }
+        }
+        thor.setData(ModAttachments.SHATTERED_MJOLNIR, whole);
+        ACTIVE.put(id, new Shattered(whole, InteractionHand.MAIN_HAND, fragments, now, level.dimension(), thor.position()));
+        Powers.get(thor).setHammerEntityId(first);
+        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 40, 0.3, 0.3, 0.3, 0.5);
+        level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.6F), at.x, at.y, at.z, 24, 0.25, 0.25, 0.25, 0.3);
+        return true;
+    }
+
+    /**
      * Where the fragments burst out and come together: out in front of him, where the hammer is held. (A burst of
      * sparks at his eyes would fill the whole screen of his first-person view.)
      */

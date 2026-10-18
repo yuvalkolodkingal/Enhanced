@@ -174,7 +174,7 @@ public final class GestureRoutes {
             // (The Odinsleep: he sinks to one knee, and rises when he wakes.)
             case ODINSLEEP -> power == Power.ODIN ? (on ? GestureId.ODIN_KNEEL : GestureId.ODIN_RISE) : null;
             // ===== hela (3.5) =====
-            case HELA_FORM -> power == Power.HELA ? PENDING_GESTURE : null;
+            case HELA_FORM -> power == Power.HELA ? (on ? GestureId.HELA_FORM_ON : GestureId.HELA_FORM_OFF) : null;
         };
     }
 
@@ -424,7 +424,15 @@ public final class GestureRoutes {
                 default -> "cooldown";
             };
             // ===== hela (3.5) =====
-            case HELA -> PENDING_ACTING; // (lane L4 of 3.5)
+            // (Sneak + V, the Death Dash, and Sneak + B, Fenris, are told by the payload of their effect, as R and G are; the
+            // form's toggle plays the headdress's gesture, the raising of the dead and the grasp their states'.)
+            case HELA -> switch (ability) {
+                case 1 -> "none: the volley and the rain are told by the payload of their blades, which names the caster";
+                case 2 -> "none: the wall and the burst are told by the payload of their spikes, which names the caster";
+                case 3 -> "toggle:HELA_FORM";
+                case 4 -> "live:HELA_SUMMONING";
+                default -> "live:HELA_GRASPING";
+            };
             default -> "none: no abilities";
         };
     }
@@ -479,7 +487,7 @@ public final class GestureRoutes {
             case ODIN_THROWN -> "Odin's own gesture ODIN_THROW, from his plug-in (OdinClient.liveGesture)";
             case ODIN_RAVENS -> "Odin's own gesture ODIN_RAVENS, from his plug-in (OdinClient.liveGesture)";
             // ===== hela (3.5) =====
-            case HELA_GRASPING, HELA_SUMMONING -> "no pose yet: Hela's lane (L4 of 3.5) gives it a gesture or a reason";
+            case HELA_GRASPING, HELA_SUMMONING -> null;
         };
     }
 
