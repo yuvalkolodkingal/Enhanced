@@ -3,6 +3,9 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.build.BuildData;
+import com.kolodkingal.enhanced.custom.CustomHero;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -155,7 +158,21 @@ public final class BillyBarrier {
     /** Whether this player holds a complete Hex Barrier (Billy, raised and formed). */
     public static boolean isUp(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.BILLY && data.chaosShieldUp(player.level().getGameTime());
+        return owns(data) && data.chaosShieldUp(player.level().getGameTime());
+    }
+
+    /**
+     * Whether the shield fields of this player's data are his Hex Barrier's when raised: Billy, or (3.4) a custom hero with
+     * Billy's Freeze and its Sneak variant (the barrier) on. (The fields are shared by every hero's shield; a custom hero
+     * has one shield at most: {@code Resource.SHIELD}.) Both sides.
+     */
+    public static boolean owns(PowerData data) {
+        if (data.power() == Power.BILLY) {
+            return true;
+        }
+        HeroKit kit = data.power() == Power.CUSTOM ? data.kit() : null;
+        CustomHero.Pick pick = kit == null ? null : kit.hero().pick(HeroAbility.BILLY_FREEZE);
+        return pick != null && !HeroAbility.MAIN.equals(pick.option());
     }
 
     /** Whether a point is in the arc the barrier covers: within the half-angle of the way he looks, seen from his body. */
@@ -180,9 +197,9 @@ public final class BillyBarrier {
             return;
         }
         long now = player.level().getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.BILLY_FREEZE, now)) {
             player.displayClientMessage(Component.translatable("message.enhanced.billy_barrier.recharging",
-                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(4) - now) / 20.0)), true);
+                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(data.slot(HeroAbility.BILLY_FREEZE)) - now) / 20.0)), true);
             return;
         }
         float health = health(player);
@@ -206,7 +223,7 @@ public final class BillyBarrier {
         data.setChaosShieldActive(false);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         if (formed) {
-            data.startCooldown(4, now, EnhancedConfig.BILLY_BARRIER_COOLDOWN.get());
+            data.startCooldown(HeroAbility.BILLY_FREEZE, now, EnhancedConfig.BILLY_BARRIER_COOLDOWN.get());
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.5F, 1.9F);
     }
@@ -369,11 +386,11 @@ public final class BillyBarrier {
 
     /**
      * Whether a power is the Scarlet Witch's chaos magic: whoever is behind it (a projectile's owner, a thrown block's thrower...)
-     * is a Scarlet Witch. It shatters a Hex Barrier at once.
+     * is a Scarlet Witch (3.4: or a custom hero with any of her abilities). It shatters a Hex Barrier at once.
      */
     public static boolean isChaos(@Nullable Entity cause) {
         Entity maker = com.kolodkingal.enhanced.protect.Shelters.maker(cause);
-        return maker instanceof Player player && Powers.is(player, Power.SCARLET_WITCH);
+        return maker instanceof Player player && Powers.get(player).acts(Power.SCARLET_WITCH);
     }
 
     /**
@@ -413,7 +430,7 @@ public final class BillyBarrier {
         keep(billy, 0.0F);
         data.setChaosShieldActive(false);
         PowerTicker.setModifier(billy, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        data.startCooldown(4, level.getGameTime(), EnhancedConfig.BILLY_BARRIER_SHATTER_COOLDOWN.get());
+        data.startCooldown(HeroAbility.BILLY_FREEZE, level.getGameTime(), EnhancedConfig.BILLY_BARRIER_SHATTER_COOLDOWN.get());
         Frame plate = frame(body(billy), billy.getLookAngle());
         RandomSource random = billy.getRandom();
         ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.LIGHT_BLUE_DYE));

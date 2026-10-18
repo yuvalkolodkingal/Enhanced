@@ -7,10 +7,13 @@ import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
+import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildView;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
+import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.protect.Shelters;
@@ -86,16 +89,17 @@ public final class BillyAbilities {
 
     // ---- input ----
 
-    /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
-     */
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    /** The key of old, which reads Sneak from the player (Billy himself: {@code AbilityHandler}). */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
-        if (ability == 4 && BillyBarrier.enabled() && (data.chaosShieldActive() || (down && player.isShiftKeyDown()))) {
+    /**
+     * A key of his (3.4: also one of a custom hero's bindings, {@code HeroKeys.press}, with the key the ability has for him).
+     * {@code alt}: its Sneak variant (Sneak + B is the Hex Barrier).
+     */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        if (ability == 4 && BillyBarrier.enabled() && ((data.chaosShieldActive() && BillyBarrier.owns(data)) || (down && alt))) {
             // The Hex Barrier is held (Sneak + B): letting go must always get through, even for a Billy who just became a spectator.
             BillyBarrier.key(player, data, down);
             return;
@@ -136,13 +140,16 @@ public final class BillyAbilities {
         boolean flying = player.getAbilities().flying;
         boolean building = player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
         data.set(Live.CROWNED, flying || building || (spells != null && now < spells.crown));
-        if ((data.is(Live.BEAMING) || ContinuousBeam.isFiring(player)) && !DarkholdBook.firing(player)) {
+        // (3.4: a custom hero's beam is his Hex Beam only if he has it: the one continuous beam may be another hero's.)
+        if ((data.is(Live.BEAMING) || ContinuousBeam.isFiring(player)) && !DarkholdBook.firing(player) && data.has(HeroAbility.BILLY_HEX_BEAM)) {
             hexBeamTick(player, data);
             if (spells != null && data.is(Live.BEAMING)) {
                 spells.crown = Math.max(spells.crown, now + CROWN_TICKS);
             }
         }
-        BillyBarrier.tick(player, data);
+        if (BillyBarrier.owns(data)) {
+            BillyBarrier.tick(player, data);
+        }
         data.set(Live.CASTING, spells != null && now < spells.bolt);
         data.set(Live.FREEZING, spells != null && now < spells.freeze);
         if (spells != null && now >= Math.max(Math.max(spells.crown, spells.blockReady), Math.max(spells.bolt, spells.freeze))) {
@@ -274,10 +281,10 @@ public final class BillyAbilities {
     private static void hexBolt(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(1, now)) {
+        if (!data.isReady(HeroAbility.BILLY_HEX_BEAM, now)) {
             return;
         }
-        data.startCooldown(1, now, HEX_BOLT_COOLDOWN);
+        data.startCooldown(HeroAbility.BILLY_HEX_BEAM, now, HEX_BOLT_COOLDOWN);
         spells(player).bolt = now + BOLT_POSE_TICKS;
 
         HitResult hit = Raycasts.any(player, HEX_BOLT_RANGE, BillyAbilities::canStrike, 1.0F);
@@ -329,7 +336,7 @@ public final class BillyAbilities {
     private static void freeze(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.BILLY_FREEZE, now)) {
             return;
         }
         Vec3 eye = player.getEyePosition();
@@ -355,7 +362,7 @@ public final class BillyAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.freeze.nothing"), true);
             return;
         }
-        data.startCooldown(4, now, FREEZE_COOLDOWN);
+        data.startCooldown(HeroAbility.BILLY_FREEZE, now, FREEZE_COOLDOWN);
         spells(player).freeze = now + FREEZE_POSE_TICKS;
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.FREEZE_SPELL.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
@@ -416,11 +423,19 @@ public final class BillyAbilities {
     /** Ends everything this hero left in the world (the power is being taken away). */
     public static void endAll(ServerPlayer player, PowerData data) {
         SPELLS.remove(player.getUUID());
-        if (ContinuousBeam.isFiring(player)) {
-            ContinuousBeam.stop(player);
+        if (data.has(HeroAbility.BILLY_HEX_BEAM)) { // (3.4: a custom hero's beam may be another hero's)
+            if (ContinuousBeam.isFiring(player)) {
+                ContinuousBeam.stop(player);
+            }
+            data.set(Live.BEAMING, false);
         }
-        data.set(Live.BEAMING, false);
-        BillyBarrier.endAll(player, data);
+        if (BillyBarrier.owns(data)) {
+            BillyBarrier.endAll(player, data);
+        }
+        if (data.power() == Power.CUSTOM && data.has(HeroAbility.BILLY_BUILD_MAGIC)) {
+            // 3.4: a custom hero's Build Magic ends with it (Billy's own ends when his power changes: BuildMagic.onPowerChanged).
+            BuildMagic.onPowerChanged(player, Power.BILLY, Power.CUSTOM);
+        }
         data.set(Live.CROWNED, false);
         data.set(Live.CASTING, false);
         data.set(Live.FREEZING, false);

@@ -88,7 +88,7 @@ public final class WorldEffectsRenderer {
             Set<RenderType> drawn = new HashSet<>();
             for (AbstractClientPlayer player : level.players()) {
                 PowerData data = Powers.get(player);
-                ShieldStyle style = ShieldStyles.of(data.power());
+                ShieldStyle style = ShieldStyles.of(data); // (3.4: a custom hero's shield too)
                 if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
                     RenderType type = lines ? EnhancedRenderTypes.energyField(style.texture()) : EnhancedRenderTypes.ENERGY_VEIL;
                     VertexConsumer vc = buffers.getBuffer(type);
@@ -184,7 +184,7 @@ public final class WorldEffectsRenderer {
         Set<Integer> up = new HashSet<>();
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            ShieldStyle style = ShieldStyles.of(data.power());
+            ShieldStyle style = ShieldStyles.of(data); // (3.4: a custom hero's shield too)
             if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
                 ShieldStyle.Look look = style.look(data, time);
                 SHIELDS_UP.put(player.getId(), new Shield(style, look.radius(), look.flicker(), time));

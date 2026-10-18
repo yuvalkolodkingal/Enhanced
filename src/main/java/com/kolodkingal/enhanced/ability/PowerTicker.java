@@ -119,6 +119,7 @@ public final class PowerTicker {
     public static void heroEnd(Power hero, ServerPlayer player, PowerData data) {
         switch (hero) {
             case MAGNETO -> MagnetoAbilities.endAll(player, data);
+            case SCARLET_WITCH -> WandaAbilities.endAll(player, data);
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);

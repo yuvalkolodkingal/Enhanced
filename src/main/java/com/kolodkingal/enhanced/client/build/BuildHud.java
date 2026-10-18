@@ -15,7 +15,6 @@ import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.build.HudDraw.Picture;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
@@ -265,7 +264,7 @@ public final class BuildHud implements LayeredDraw.Layer {
     private static boolean shown(Minecraft mc) {
         LocalPlayer player = mc.player;
         return player != null && mc.level != null && !mc.options.hideGui && !mc.getDebugOverlay().showDebugScreen() && !player.isDeadOrDying()
-                && BuildClient.isBuilder(Powers.power(player));
+                && BuildClient.isBuilder(BuildClient.hero(player));
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -284,7 +283,7 @@ public final class BuildHud implements LayeredDraw.Layer {
             return;
         }
         LocalPlayer player = mc.player;
-        Power power = Powers.power(player);
+        Power power = BuildClient.hero(player);
         float partial = deltaTracker.getGameTimeDeltaPartialTick(false);
         float time = BuildClient.now() + partial;
         boolean calm = EnhancedClientConfig.reducedMotion();

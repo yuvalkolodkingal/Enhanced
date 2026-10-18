@@ -66,7 +66,7 @@ public final class Powers {
         }
         Telekinesis.release(player, false);
         PowerTicker.endPower(player, data);
-        if (old == Power.SCARLET_WITCH) {
+        if (data.has(com.kolodkingal.enhanced.custom.HeroAbility.WANDA_HEX)) { // (3.4: or a custom hero with her Hex)
             HexManager.dissolveAllOwnedBy(player.server, player.getUUID());
         }
         data.setPowerRaw(power);

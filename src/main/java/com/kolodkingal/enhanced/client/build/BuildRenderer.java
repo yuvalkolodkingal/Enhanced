@@ -14,7 +14,6 @@ import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -193,7 +192,7 @@ public final class BuildRenderer {
         if (ghost) {
             // The ghost, after the world's translucent blocks: it blends over water (D-B 11.10).
             if (BuildClient.buildMode()) {
-                Look look = Look.of(Powers.power(player));
+                Look look = Look.of(BuildClient.hero(player));
                 Ghost.draw(event, player, look.core(), look.glow(), time, calm);
             }
             return;
@@ -212,7 +211,7 @@ public final class BuildRenderer {
             SelectGlow.clear();
             return;
         }
-        Look look = Look.of(Powers.power(player));
+        Look look = Look.of(BuildClient.hero(player));
         BuildGrammar g = BuildClient.grammar();
         MagicSelect flood = g.hasMask() ? BuildClient.flood() : null;
         BoundingBox box = g.box();
@@ -711,7 +710,7 @@ public final class BuildRenderer {
             if (other == self || other.distanceToSqr(self) > (double) OTHERS_RANGE * OTHERS_RANGE) {
                 continue;
             }
-            Power power = Powers.power(other);
+            Power power = BuildClient.hero(other);
             BuildView view = other.getExistingData(ModAttachments.BUILD_VIEW).orElse(BuildView.EMPTY);
             if (!BuildClient.isBuilder(power) || !view.active() || view.box().isEmpty()) {
                 continue;
@@ -806,7 +805,7 @@ public final class BuildRenderer {
         BuildVerdictPayload preflight = BuildClient.preflight();
         long changed = BuildClient.changed();
         boolean about = count.unloaded() > 0 || preflight != null && (preflight.flags() & BuildVerdictPayload.UNLOADED) != 0;
-        if (Powers.power(player) != Power.BILLY) {
+        if (BuildClient.hero(player) != Power.BILLY) {
             return about ? Component.translatable("hud.enhanced.build.about", number(changed)) : Component.literal(number(changed));
         }
         BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);

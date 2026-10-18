@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.build;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.BuildConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -60,7 +61,8 @@ public final class Limits implements RecipeLimits {
 
     /**
      * The numbers of {@code player} now: the Scarlet Witch's, or Billy's by the rank that applies to him (his
-     * {@link BuildData}), in the world he stands in; null for anyone else (Build Magic is theirs alone).
+     * {@link BuildData}), in the world he stands in; null for anyone else (Build Magic is theirs alone). 3.4: a custom hero with
+     * Billy's Build Magic has Billy's rules (the meter, his rank, no Instant).
      */
     public static @Nullable Limits of(Player player) {
         Power power = Powers.power(player);
@@ -68,7 +70,7 @@ public final class Limits implements RecipeLimits {
         if (power == Power.SCARLET_WITCH) {
             return wanda(world);
         }
-        if (power == Power.BILLY) {
+        if (power == Power.BILLY || power == Power.CUSTOM && Powers.get(player).has(HeroAbility.BILLY_BUILD_MAGIC)) {
             int rank = BillyRanks.rank(player.getData(ModAttachments.BUILD_DATA));
             return player.isCreative() && !limitsInCreative() ? new Limits(Power.BILLY, rank, false, world) : billy(rank, world);
         }

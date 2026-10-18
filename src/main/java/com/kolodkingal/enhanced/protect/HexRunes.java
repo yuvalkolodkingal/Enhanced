@@ -178,7 +178,7 @@ public final class HexRunes {
         if (DarkholdBook.firing(player)) {
             DarkholdBook.beamStop(player);
         }
-        if (data.power() == Power.BILLY) {
+        if (BillyBarrier.owns(data)) {
             BillyBarrier.lower(player, data);
         }
         PowerTicker.endPower(player, data);

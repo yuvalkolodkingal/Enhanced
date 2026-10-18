@@ -4,7 +4,6 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -76,10 +75,10 @@ public final class BarrierRenderer {
         boolean any = false;
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            boolean up = data.power() == Power.BILLY && data.chaosShieldActive();
+            boolean up = BillyBarrier.owns(data) && data.chaosShieldActive(); // (3.4: or a custom hero's barrier)
             Mark lowered = MARKS.get(player.getId());
             if (!up && lowered != null && !player.isInvisible() && !player.isSpectator()
-                    && data.power() == Power.BILLY) {
+                    && BillyBarrier.owns(data)) {
                 // Lowered or broken: it fades away where he holds it.
                 if (Float.isNaN(lowered.loweredAt)) {
                     lowered.loweredAt = time;

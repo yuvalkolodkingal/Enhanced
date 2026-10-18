@@ -3,7 +3,6 @@ package com.kolodkingal.enhanced.client.build;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -159,7 +158,7 @@ public final class BlockPaletteScreen extends Screen {
     @Override
     public void tick() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || player.isSpectator() || !BuildClient.isBuilder(Powers.power(player))) {
+        if (player == null || player.isSpectator() || !BuildClient.isBuilder(BuildClient.hero(player))) {
             onClose();
         }
     }
@@ -230,7 +229,7 @@ public final class BlockPaletteScreen extends Screen {
         }
         Font font = mc.font;
         super.render(g, mx, my, partialTick);
-        Power hero = Powers.power(player);
+        Power hero = BuildClient.hero(player);
         int rgb = hero.color;
         List<Block> blocks = shown();
         scroll = Mth.clamp(scroll, 0, maxScroll(blocks.size()));

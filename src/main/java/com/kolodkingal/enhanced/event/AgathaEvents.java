@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.AgathaAbilities;
 import com.kolodkingal.enhanced.ability.AgathaShield;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.config.AgathaConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -33,14 +34,17 @@ public final class AgathaEvents {
     /** Her shield, complete, takes the blow (or what it can of it). */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onShieldDamage(LivingIncomingDamageEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && AgathaAbilities.isAgatha(player)) {
+        if (event.getEntity() instanceof ServerPlayer player && AgathaAbilities.has(player, HeroAbility.AGATHA_SHIELD)) {
             AgathaShield.guard(player, event);
         }
     }
 
-    /** Whether magic used on this player is answered with the poison because she is Agatha (the book in hand answers by itself). */
+    /**
+     * Whether magic used on this player is answered with the poison because she is Agatha (the book in hand answers by itself);
+     * 3.4: a custom hero with her body (the dark magic in her) too.
+     */
     private static boolean retaliates(ServerPlayer player) {
-        return AgathaAbilities.isAgatha(player) && AgathaConfig.RETALIATES.get() && !DarkholdBook.inTheRoad(player);
+        return AgathaAbilities.has(player, HeroAbility.AGATHA_BODY) && AgathaConfig.RETALIATES.get() && !DarkholdBook.inTheRoad(player);
     }
 
     /** Magic used on her: whoever used it is poisoned. */

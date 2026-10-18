@@ -17,11 +17,13 @@ import com.kolodkingal.enhanced.build.SpellPlanner;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
 import com.kolodkingal.enhanced.config.BuildConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildPocketPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -34,6 +36,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -205,12 +208,22 @@ public final class BuildClient {
     }
 
     /**
+     * Whose Build Magic this player has, for everything the client draws and plays of it: the Scarlet Witch's, Billy's, or
+     * (3.4) Billy's for a custom hero with his Build Magic (his rules, his looks and sounds); for anyone else his own power,
+     * which {@link #isBuilder} refuses.
+     */
+    public static Power hero(Player player) {
+        PowerData data = Powers.get(player);
+        return data.power() == Power.CUSTOM && data.has(HeroAbility.BILLY_BUILD_MAGIC) ? Power.BILLY : data.power();
+    }
+
+    /**
      * Whether the local player is in build mode: what the {@link BuildKeys.Context#BUILD} keys and the panel's sixth
      * line follow. False for anyone who is not a Scarlet Witch or Billy, and for a Spectator.
      */
     public static boolean buildMode() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return mode && player != null && !player.isSpectator() && isBuilder(Powers.power(player));
+        return mode && player != null && !player.isSpectator() && isBuilder(hero(player));
     }
 
     /** The grammar of what the builder is about to cast (made at first use, with the numbers of the last tick). */
@@ -278,7 +291,7 @@ public final class BuildClient {
             }
         }
         // A change of power ends build mode (D-B 11.9), between the two witches too; so does Spectator mode.
-        Power power = Powers.power(player);
+        Power power = hero(player);
         if (mode && (player.isSpectator() || !isBuilder(power) || seenPower != null && power != seenPower)) {
             leaveMode();
         }
@@ -488,7 +501,7 @@ public final class BuildClient {
             return;
         }
         // Over the limit nothing is selected, never a part of the thing (D-B 3.4).
-        Component why = flood.message(Powers.power(player) == Power.SCARLET_WITCH);
+        Component why = flood.message(hero(player) == Power.SCARLET_WITCH);
         if (why != null && !quietFlood) {
             player.displayClientMessage(why, true);
         }
