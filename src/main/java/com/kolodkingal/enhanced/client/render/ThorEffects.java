@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
@@ -57,7 +58,7 @@ public final class ThorEffects {
         int length() {
             return switch (kind) {
                 case ThorFxPayload.ARC -> ARC_TICKS;
-                case ThorFxPayload.BIFROST_ARRIVAL -> ARRIVAL_TICKS;
+                case ThorFxPayload.BIFROST_ARRIVAL, ThorFxPayload.BIFROST_DEPART -> ARRIVAL_TICKS;
                 default -> MARK_TICKS;
             };
         }
@@ -126,7 +127,7 @@ public final class ThorEffects {
                 float age = (time - e.start()) / MARK_TICKS;
                 // Burning bright at first, then slowly cooling and fading.
                 float alpha = age < 0.02F ? age / 0.02F : 1.0F - Mth.clamp((age - 0.15F) / 0.85F, 0, 1);
-                runeCircle(pose, marks, e.points().get(0).subtract(camera), 3.2F, alpha);
+                runeCircle(pose, marks, e.points().get(0).subtract(camera), (float) Bifrost.CIRCLE_RADIUS, alpha);
             }
         }
         buffers.endBatch(EnhancedRenderTypes.energyField(BIFROST_MARK));

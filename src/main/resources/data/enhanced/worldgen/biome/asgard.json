@@ -1,0 +1,28 @@
+{
+  "has_precipitation": false,
+  "temperature": 0.8,
+  "downfall": 0.0,
+  "effects": {
+    "fog_color": 14207392,
+    "sky_color": 10405104,
+    "water_color": 4159204,
+    "water_fog_color": 1981038,
+    "grass_color": 8372047,
+    "foliage_color": 10210108,
+    "music": {
+      "sound": "enhanced:music.asgard",
+      "min_delay": 1200,
+      "max_delay": 3600,
+      "replace_current_music": false
+    },
+    "ambient_sound": "enhanced:ambient.asgard.loop",
+    "additions_sound": {
+      "sound": "enhanced:ambient.asgard.additions",
+      "tick_chance": 0.008
+    }
+  },
+  "spawners": {},
+  "spawn_costs": {},
+  "carvers": {},
+  "features": []
+}

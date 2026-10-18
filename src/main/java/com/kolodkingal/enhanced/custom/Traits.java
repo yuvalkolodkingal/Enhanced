@@ -46,6 +46,9 @@ public final class Traits {
             case THOR -> traits.add(Trait.WORTHY);
             case VISION -> traits.addAll(Set.of(Trait.WORTHY, Trait.METAL_BODY));
             case ULTRON -> traits.add(Trait.METAL_BODY);
+            // 3.5: none yet (their lanes say: Hela's rows are dark magic, Odin's Odinforce a sorcerer's, see HeroAbility).
+            case HEIMDALL, ODIN, HELA -> {
+            }
             default -> {
             }
         }

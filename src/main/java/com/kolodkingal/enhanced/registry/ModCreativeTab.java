@@ -40,6 +40,10 @@ public final class ModCreativeTab {
                         output.accept(ModItems.XAVIER_WHEELCHAIR.get());
                         // 3.3.1
                         output.accept(ModItems.MUTANT_CURE.get());
+                        // 3.5
+                        output.accept(ModItems.HOFUND.get());
+                        output.accept(ModItems.GUNGNIR.get());
+                        output.accept(ModItems.HELA_HEADDRESS.get());
                     })
                     .build());
 

@@ -76,6 +76,13 @@ public final class HeroDamage {
         first(ModDamageTypes.MIND_BLAST, HeroAbility.XAVIER_MENTAL_BLAST);
         first(ModDamageTypes.AGATHA_DRAIN, HeroAbility.AGATHA_DRAIN);
         first(ModDamageTypes.AGATHA_RUNES, HeroAbility.AGATHA_RUNES);
+        // 3.5 (the skeleton): the gods of Asgard.
+        first(ModDamageTypes.HOFUND, HeroAbility.HEIMDALL_HOFUND);
+        first(ModDamageTypes.BIFROST_STRIKE, HeroAbility.HEIMDALL_STRIKE);
+        first(ModDamageTypes.GUNGNIR, HeroAbility.ODIN_GUNGNIR);
+        first(ModDamageTypes.ODINFORCE, HeroAbility.ODIN_BANISH);
+        first(ModDamageTypes.NECROSWORD, HeroAbility.HELA_NECROSWORDS);
+        first(ModDamageTypes.BLADE_WALL, HeroAbility.HELA_BLADE_WALL);
     }
 
     private static void first(ResourceKey<DamageType> type, HeroAbility... rows) {

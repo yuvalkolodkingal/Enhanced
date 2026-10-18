@@ -44,6 +44,8 @@ public class Enhanced {
         // 3.3: the world structures (the Hydra outposts, Mjolnir's landing sites, the Mutant School).
         ModStructures.STRUCTURE_TYPES.register(modBus);
         ModStructures.STRUCTURE_PIECES.register(modBus);
+        // 3.5: the chunk generator of Asgard.
+        com.kolodkingal.enhanced.registry.ModChunkGenerators.CHUNK_GENERATORS.register(modBus);
         ModStructures.PROCESSORS.register(modBus);
         ModCreativeTab.TABS.register(modBus);
         modBus.addListener(ModNetwork::register);

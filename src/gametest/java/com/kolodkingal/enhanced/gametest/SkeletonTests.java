@@ -1177,8 +1177,8 @@ public final class SkeletonTests {
     // The network
 
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theProtocolIsEight(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("8"), "3.4 bumps the protocol from 7 to 8, once: " + ModNetwork.PROTOCOL_VERSION);
+    public static void theProtocolIsNine(GameTestHelper helper) {
+        check(ModNetwork.PROTOCOL_VERSION.equals("9"), "3.5 bumps the protocol from 8 to 9, once: " + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 

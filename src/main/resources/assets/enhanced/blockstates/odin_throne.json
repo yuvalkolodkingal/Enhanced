@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "enhanced:block/odin_throne"
+    },
+    "facing=east": {
+      "model": "enhanced:block/odin_throne",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "enhanced:block/odin_throne",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "enhanced:block/odin_throne",
+      "y": 270
+    }
+  }
+}

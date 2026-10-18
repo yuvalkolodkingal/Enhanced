@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
-import com.kolodkingal.enhanced.ability.BifrostKeys;
+import com.kolodkingal.enhanced.bifrost.BifrostKeys;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;

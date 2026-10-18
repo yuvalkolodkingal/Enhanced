@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.block.asgard.GungnirStandBlock;
+import com.kolodkingal.enhanced.block.asgard.HelaSealBlock;
+import com.kolodkingal.enhanced.block.asgard.OdinThroneBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.SpiderWebBlock;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
@@ -53,6 +56,41 @@ public final class ModBlocks {
                     .strength(0.5F)
                     .pushReaction(PushReaction.DESTROY)
                     .noLootTable());
+
+    // ===== asgard (3.5) =====
+    // (The skeleton registers the three blocks whose behaviour is another lane's; lane L1 adds the realm's blocks here.)
+    /** Hela's Seal behind the throne: unbreakable, no item; its click calls Hela (lane L4). */
+    public static final DeferredBlock<HelaSealBlock> HELA_SEAL = BLOCKS.registerBlock("hela_seal",
+            HelaSealBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.DEEPSLATE)
+                    .lightLevel(state -> 4)
+                    .pushReaction(PushReaction.BLOCK)
+                    .noLootTable()
+                    .isValidSpawn(Blocks::never));
+    /** The Throne of Asgard: unbreakable in the city; sitting on it is the coronation (lane L3). */
+    public static final DeferredBlock<OdinThroneBlock> ODIN_THRONE = BLOCKS.registerBlock("odin_throne",
+            OdinThroneBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.GOLD)
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .noLootTable());
+    /** Gungnir's stand in the vault: what it gives is lane L3's. */
+    public static final DeferredBlock<GungnirStandBlock> GUNGNIR_STAND = BLOCKS.registerBlock("gungnir_stand",
+            GungnirStandBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.GOLD)
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .noLootTable());
+    // ===== heimdall (3.5) =====
+    // ===== odin (3.5) =====
+    // ===== hela (3.5) =====
+    // ===== asgardians (3.5) =====
 
     private ModBlocks() {
     }

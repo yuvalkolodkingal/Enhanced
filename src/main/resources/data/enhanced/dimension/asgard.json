@@ -1,0 +1,10 @@
+{
+  "type": "enhanced:asgard",
+  "generator": {
+    "type": "enhanced:asgard",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "enhanced:asgard"
+    }
+  }
+}

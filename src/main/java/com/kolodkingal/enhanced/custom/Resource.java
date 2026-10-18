@@ -39,5 +39,10 @@ public enum Resource {
     DRONES,
     // (L4, 3.4) ----
     /** {@code PowerData.ironCharge}: Magneto's shrapnel charge, which is also Ultron's plasma pool. */
-    IRON_CHARGE
+    IRON_CHARGE,
+    // (3.5, the skeleton) ----
+    /** Odin's thrown Gungnir: the one spear entity of the player ({@code Live.ODIN_THROWN}). */
+    GUNGNIR,
+    /** Hela's allies: the berserkers and Fenris she raised (one list per player). */
+    UNDEAD
 }

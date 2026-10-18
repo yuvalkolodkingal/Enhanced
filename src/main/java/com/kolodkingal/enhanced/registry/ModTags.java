@@ -145,6 +145,12 @@ public final class ModTags {
      */
     public static final TagKey<DamageType> DARK_MAGIC = TagKey.create(Registries.DAMAGE_TYPE, Enhanced.id("dark_magic"));
 
+    // ===== asgard (3.5) =====
+    /** Hela's army: her berserkers and Fenris (lane L4 fills it). The Asgardians fight it first; Hela's allies are it. */
+    public static final TagKey<EntityType<?>> HELA_ARMY = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("hela_army"));
+    /** The people of Asgard: the Asgardians (lane L5). */
+    public static final TagKey<EntityType<?>> ASGARDIANS = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("asgardians"));
+
     // ===== 3.1 build =====
     /**
      * Blocks no Build Magic spell changes, vanishes or moves, and a copy leaves out: what the Wither cannot break

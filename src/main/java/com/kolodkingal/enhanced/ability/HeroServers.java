@@ -29,6 +29,10 @@ public final class HeroServers {
         register(new com.kolodkingal.enhanced.custom.CustomHeroServer());
         register(new XavierServer());
         register(new AgathaServer());
+        // 3.5: the heroes of Asgard (each in its own package, filled by its lane).
+        register(new com.kolodkingal.enhanced.heimdall.HeimdallServer());
+        register(new com.kolodkingal.enhanced.odin.OdinServer());
+        register(new com.kolodkingal.enhanced.hela.HelaServer());
     }
 
     /**

@@ -4,7 +4,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
-import com.kolodkingal.enhanced.client.screen.BifrostScreen;
+import com.kolodkingal.enhanced.bifrost.Bifrost;
+import com.kolodkingal.enhanced.bifrost.BifrostKeys;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
@@ -92,8 +93,8 @@ public final class ThorAbilities {
     public static final double ARC_RANGE = 6.0;
     public static final int ARC_JUMPS = 2;
     /** Ticks the Bifrost's light gathers around its traveller before it takes them. */
-    public static final int BIFROST_CHARGE = 30;
-    public static final int BIFROST_LOOK_RANGE = 512;
+    public static final int BIFROST_CHARGE = Bifrost.CHARGE;
+    public static final int BIFROST_LOOK_RANGE = Bifrost.LOOK_RANGE;
 
     /**
      * What Thor's lightning beam can hit: creatures (other Thors excepted: lightning never hurts them), the parts of
@@ -235,7 +236,7 @@ public final class ThorAbilities {
      * not, is held in its light.
      */
     public static void everyPlayerTick(ServerPlayer player, PowerData data) {
-        bifrostTick(player, data);
+        Bifrost.tick(player, data);
         MjolnirShatter.tick(player);
         MjolnirPin.tickPlayer(player);
         if (player.isSpectator()) {
@@ -724,13 +725,6 @@ public final class ThorAbilities {
                 : isMjolnir(weapon) ? EnhancedConfig.MJOLNIR_BEAM_RANGE.get() : EnhancedConfig.THOR_BEAM_RANGE.get();
     }
 
-    /** The first solid ground at or below a point (up to 32 blocks down). */
-    private static Vec3 ground(ServerLevel level, Vec3 point) {
-        BlockHitResult down = level.clip(new ClipContext(point, point.subtract(0, 32, 0), ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE, CollisionContext.empty()));
-        return down.getType() == HitResult.Type.MISS ? point : down.getLocation();
-    }
-
     /**
      * The God of Thunder's lightning leaps from a hit to the target and on to the next creatures nearby, up to two
      * jumps. Seen by everyone around.
@@ -774,190 +768,51 @@ public final class ThorAbilities {
     }
 
     // ---- the Bifrost: Thor's ability 5, and anyone's who holds Mjolnir or Stormbreaker ----
+    // (3.5: the Bifrost is com.kolodkingal.enhanced.bifrost.Bifrost; these are its old names, one line each.)
 
     /**
      * Using Mjolnir or Stormbreaker (right-click): the Bifrost screen opens on the client (home, the saved places, save
      * this one); with Sneak, the Bifrost opens to where the player looks.
      */
     public static InteractionResultHolder<ItemStack> useWeapon(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (player.isShiftKeyDown()) {
-            if (player instanceof ServerPlayer server) {
-                bifrostToLook(server);
-            }
-        } else if (level.isClientSide) {
-            // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
-            BifrostScreen.open();
-        }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return Bifrost.useKey(level, player, hand);
     }
 
-    /**
-     * "Heimdall! Open the Bifrost!": a beam of rainbow light gathers around the traveller and, a moment later, takes
-     * them home to their respawn point (bed or respawn anchor, otherwise the world spawn), even in another dimension.
-     * The Bifrost burns its circle of runes into the ground where it lands and where it left.
-     */
+    /** "Heimdall! Open the Bifrost!": home, to the respawn point, even in another dimension (see {@link Bifrost#home}). */
     public static void bifrostHome(ServerPlayer player) {
-        if (mayOpenBifrost(player)) {
-            DimensionTransition home = player.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING);
-            openBifrost(player, home.newLevel().dimension(), home.pos(), player.getYRot());
-        }
+        Bifrost.home(player);
     }
 
     /** The Bifrost to the spot the player looks at, up to 512 blocks away. */
     public static void bifrostToLook(ServerPlayer player) {
-        if (!mayOpenBifrost(player)) {
-            return;
-        }
-        BlockHitResult hit = Raycasts.block(player, BIFROST_LOOK_RANGE, 1.0F);
-        if (hit.getType() == HitResult.Type.MISS) {
-            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.no_ground"), true);
-            return;
-        }
-        openBifrost(player, player.level().dimension(), Vec3.atBottomCenterOf(hit.getBlockPos().above()), player.getYRot());
+        Bifrost.toLook(player);
     }
 
-    /**
-     * The Bifrost to the saved place at {@code index}, in whatever dimension it is, if it is still the one called
-     * {@code name} (the list may have changed since the screen showed it).
-     */
+    /** The Bifrost to the saved place at {@code index}, if it is still the one called {@code name}. */
     public static void bifrostToPlace(ServerPlayer player, int index, String name) {
-        BifrostData.Place place = placeAt(player, index, name);
-        if (place == null || !mayOpenBifrost(player)) {
-            return;
-        }
-        if (player.server.getLevel(place.dimension()) == null) {
-            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.no_world"), true);
-            return;
-        }
-        openBifrost(player, place.dimension(), place.pos(), place.yaw());
+        Bifrost.toPlace(player, index, name);
     }
 
-    /**
-     * Marks where the player stands, facing the way they face, as a place the Bifrost can take them back to. Saving a
-     * name again moves that place; the Bifrost's runes flare at their feet.
-     */
+    /** Marks where the player stands as a place the Bifrost can take them back to. */
     public static void savePlace(ServerPlayer player, String typed) {
-        if (player.isSpectator()) {
-            return;
-        }
-        if (!callsBifrost(player)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
-            return;
-        }
-        BifrostData.Place place = PlaceBook.save(player, PlaceBook.Kind.BIFROST, typed, false);
-        if (place == null) {
-            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.full", BifrostData.MAX_PLACES), true);
-            return;
-        }
-        ServerLevel level = player.serverLevel();
-        mark(level, player.position());
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.2F, 1.2F);
-        player.displayClientMessage(Component.translatable("message.enhanced.bifrost.saved", place.name()), true);
+        Bifrost.savePlace(player, typed);
     }
 
     /** Forgets the saved place at {@code index}, if it is still the one called {@code name}. */
     public static void forgetPlace(ServerPlayer player, int index, String name) {
-        BifrostData.Place place = PlaceBook.forget(player, PlaceBook.Kind.BIFROST, index, name);
-        if (place != null) {
-            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.forgotten", place.name()), true);
-        }
-    }
-
-    @Nullable
-    private static BifrostData.Place placeAt(ServerPlayer player, int index, String name) {
-        return PlaceBook.placeAt(player, PlaceBook.Kind.BIFROST, index, name);
+        Bifrost.forgetPlace(player, index, name);
     }
 
     /**
-     * Whether the Bifrost answers this player: whoever holds Mjolnir or Stormbreaker, and (3.4) a custom hero with Thor's
-     * Bifrost ability, whose power calls it without a weapon. (Both sides: the Bifrost screen asks it too.)
+     * Whether the Bifrost answers this player: whoever holds Mjolnir or Stormbreaker, (3.4) a custom hero with Thor's
+     * Bifrost ability, and (3.5) the other keys of {@link BifrostKeys}. (Both sides: the Bifrost screen asks it too.)
      */
     public static boolean callsBifrost(Player player) {
-        if (holdsWeapon(player)) {
-            return true;
-        }
-        PowerData data = Powers.get(player);
-        return data.power() == Power.CUSTOM && data.has(HeroAbility.THOR_BIFROST);
-    }
-
-    /** The Bifrost answers whoever holds Mjolnir or Stormbreaker, once it has gathered its strength again. */
-    private static boolean mayOpenBifrost(ServerPlayer player) {
-        if (player.isSpectator() || PlaceBook.travelling(player)) {
-            return false;
-        }
-        if (MjolnirPin.isPinned(player)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
-            return false;
-        }
-        if (!callsBifrost(player)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.needs_weapon"), true);
-            return false;
-        }
-        long wait = PlaceBook.cooldown(player, PlaceBook.Kind.BIFROST);
-        if (wait > 0) {
-            player.displayClientMessage(Component.translatable("message.enhanced.bifrost.not_ready", (wait + 19) / 20), true);
-            return false;
-        }
-        return true;
-    }
-
-    private static void openBifrost(ServerPlayer player, ResourceKey<Level> dimension, Vec3 to, float yaw) {
-        ServerLevel level = player.serverLevel();
-        long now = level.getGameTime();
-        int cooldown = EnhancedConfig.BIFROST_COOLDOWN.get();
-        long ready = now + cooldown;
-        PowerData data = Powers.get(player);
-        if (data.has(HeroAbility.THOR_BIFROST)) {
-            // The same cooldown, shown on Thor's HUD (3.4: on a custom hero's key, by the strength of his Bifrost).
-            data.startCooldown(HeroAbility.THOR_BIFROST, now, cooldown);
-            int slot = data.slot(HeroAbility.THOR_BIFROST);
-            if (data.power() == Power.CUSTOM && slot > 0) {
-                ready = data.cooldownUntil(slot);
-            }
-        }
-        PlaceBook.readyAt(player, PlaceBook.Kind.BIFROST, ready);
-        PlaceBook.begin(player, PlaceBook.Kind.BIFROST, dimension, to, yaw, BIFROST_CHARGE);
-        data.set(Live.BIFROST, true);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_CHARGE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-    }
-
-    private static void bifrostTick(ServerPlayer player, PowerData data) {
-        PlaceBook.Journey journey = PlaceBook.journey(player, PlaceBook.Kind.BIFROST);
-        if (journey == null) {
-            data.set(Live.BIFROST, false);
-            return;
-        }
-        if (PlaceBook.waiting(player, journey)) {
-            // Held in the beam: rising slightly, unable to walk away.
-            player.setDeltaMovement(0, 0.02, 0);
-            player.hurtMarked = true;
-            player.resetFallDistance();
-            return;
-        }
-        data.set(Live.BIFROST, false);
-        PlaceBook.Landing landing = PlaceBook.complete(player, journey);
-        if (landing == null) {
-            // The world is gone, or the traveller wasn't there to be taken (dead, or away), or a rule refused: the light went out.
-            return;
-        }
-        mark(landing.from(), landing.left());
-        ServerLevel destination = landing.to();
-        destination.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_ARRIVE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-        PacketDistributor.sendToPlayersNear(destination, null, player.getX(), player.getY(), player.getZ(), 128,
-                new ThorFxPayload(ThorFxPayload.BIFROST_ARRIVAL, player.getId(), List.of(player.position())));
-        mark(destination, player.position());
-    }
-
-    /** The Bifrost's circle of runes, burned into the ground (seen by everyone nearby, fading after a minute). */
-    private static void mark(ServerLevel level, Vec3 at) {
-        Vec3 ground = ground(level, at.add(0, 0.5, 0));
-        PacketDistributor.sendToPlayersNear(level, null, ground.x, ground.y, ground.z, 128,
-                new ThorFxPayload(ThorFxPayload.BIFROST_MARK, -1, List.of(ground)));
+        return BifrostKeys.holdsKey(player);
     }
 
     public static boolean inBifrost(Player player) {
-        return PlaceBook.journey(player, PlaceBook.Kind.BIFROST) != null;
+        return Bifrost.inBifrost(player);
     }
 
     // ---- cleanup ----
@@ -981,6 +836,7 @@ public final class ThorAbilities {
 
     public static void clear() {
         PlaceBook.clear();
+        Bifrost.clear();
         BEAMS.clear();
         MjolnirShatter.clear();
         MjolnirPin.clear();

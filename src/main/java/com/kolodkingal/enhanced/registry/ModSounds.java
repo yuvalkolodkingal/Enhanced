@@ -249,6 +249,88 @@ public final class ModSounds {
     /** The cure goes in: the hiss of the injector and a hollow tone falling away. */
     public static final DeferredHolder<SoundEvent, SoundEvent> MUTANT_CURE = register("mutant_cure");
 
+    // ===== asgard (3.5: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_ASGARD = register("music.asgard");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_ASGARD_LOOP = register("ambient.asgard.loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_ASGARD_ADDITIONS = register("ambient.asgard.additions");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ASGARD_FALLS = register("asgard_falls");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BIFROST_MECHANISM_SPIN = register("bifrost_mechanism_spin");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RUNE_STONE_CALL = register("rune_stone_call");
+    public static final DeferredHolder<SoundEvent, SoundEvent> THRONE_SIT = register("throne_sit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CORONATION = register("coronation");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MURAL_CRACK = register("mural_crack");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SEAL_BREAK = register("seal_break");
+
+    // ===== heimdall (3.5: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_SLASH = register("heimdall_slash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_LUNGE = register("heimdall_lunge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_SIGHT_ON = register("heimdall_sight_on");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_SIGHT_OFF = register("heimdall_sight_off");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_FARSIGHT = register("heimdall_farsight");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_WARD_UP = register("heimdall_ward_up");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_WARD_DOWN = register("heimdall_ward_down");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEIMDALL_CALL = register("heimdall_call");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BIFROST_STRIKE = register("bifrost_strike");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HOFUND_RETURN = register("hofund_return");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WATCH_START = register("watch_start");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WATCH_WIN = register("watch_win");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WATCH_LOSE = register("watch_lose");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHADOW_STRUCK = register("shadow_struck");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_WATCH = register("music.watch");
+
+    // ===== odin (3.5: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> GUNGNIR_BLAST = register("gungnir_blast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GUNGNIR_THROW = register("gungnir_throw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GUNGNIR_CATCH = register("gungnir_catch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ODINFORCE_SHIELD_UP = register("odinforce_shield_up");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ODINFORCE_SHIELD_DOWN = register("odinforce_shield_down");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ODINFORCE_HEAL = register("odinforce_heal");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BANISH = register("banish");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ODINFORCE_WAVE = register("odinforce_wave");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RAVEN_CAW = register("raven_caw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RAVEN_FLAP = register("raven_flap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ODIN_COMMAND = register("odin_command");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ODINSLEEP_START = register("odinsleep_start");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ODINSLEEP_END = register("odinsleep_end");
+
+    // ===== hela (3.5: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_ARRIVE = register("hela_arrive");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_VOICE = register("hela_voice");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NECROSWORD_THROW = register("necrosword_throw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NECROSWORD_HIT = register("necrosword_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BLADE_WALL = register("blade_wall");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BLADE_RAIN = register("blade_rain");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BLADE_STORM = register("blade_storm");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_SHADOW_STEP = register("hela_shadow_step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_CHANNEL = register("hela_channel");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_CHANNEL_BREAK = register("hela_channel_break");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_FORM_ON = register("hela_form_on");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_FORM_OFF = register("hela_form_off");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_GRASP = register("hela_grasp");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MJOLNIR_CAUGHT = register("mjolnir_caught");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HELA_DEFEAT = register("hela_defeat");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BERSERKER_RISE = register("berserker_rise");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BERSERKER_AMBIENT = register("berserker_ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BERSERKER_HURT = register("berserker_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BERSERKER_DEATH = register("berserker_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FENRIS_GROWL = register("fenris_growl");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FENRIS_HOWL = register("fenris_howl");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FENRIS_BITE = register("fenris_bite");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FENRIS_HURT = register("fenris_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FENRIS_DEATH = register("fenris_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_HELA_1 = register("music.hela_1");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_HELA_2 = register("music.hela_2");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_HELA_3 = register("music.hela_3");
+
+    // ===== asgardians (3.5: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> NPC_TALK_LOW = register("npc_talk_low");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NPC_TALK_MID = register("npc_talk_mid");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NPC_TALK_HIGH = register("npc_talk_high");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NPC_SPAR_CLASH = register("npc_spar_clash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NPC_BOW = register("npc_bow");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NPC_DOWN = register("npc_down");
+    public static final DeferredHolder<SoundEvent, SoundEvent> EINHERJAR_SUMMON = register("einherjar_summon");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

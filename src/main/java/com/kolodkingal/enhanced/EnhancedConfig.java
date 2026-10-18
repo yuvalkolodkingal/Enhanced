@@ -523,6 +523,13 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.SpeedConfig.define(BUILDER);
         // 3.3.1: the Mutant Cure (section [mutant_cure]).
         com.kolodkingal.enhanced.config.CureConfig.define(BUILDER);
+        // 3.5 (Asgard): the skeleton defines every option of the realm and its gods; the lanes read them.
+        com.kolodkingal.enhanced.config.BifrostConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.AsgardConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.HeimdallConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.OdinConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.HelaConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.HelaBossConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

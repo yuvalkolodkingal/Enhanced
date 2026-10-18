@@ -1,9 +1,11 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -108,6 +110,21 @@ public final class PlaceBook {
             kind.set(player, kind.data(player).without(index));
         }
         return place;
+    }
+
+    // ---- Asgard (3.5) ----
+
+    /**
+     * Whether the book is refused because the journey or the place touches Asgard ({@code there} is where the place is, or
+     * where the player stands when he saves): only the Bifrost reaches the Realm Eternal. The Book of the Vishanti is
+     * refused before anything is spent, operators too; the player is told.
+     */
+    public static boolean refusesAsgard(ServerPlayer player, Kind kind, ResourceKey<Level> there) {
+        if (kind == Kind.VISHANTI && (there == AsgardDimension.KEY || AsgardDimension.in(player))) {
+            player.displayClientMessage(Component.translatable("message.enhanced.vishanti.asgard"), true);
+            return true;
+        }
+        return false;
     }
 
     // ---- the cooldown ----

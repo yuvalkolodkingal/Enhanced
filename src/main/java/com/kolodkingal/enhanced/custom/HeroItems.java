@@ -42,6 +42,8 @@ public final class HeroItems {
             case ULTRON -> List.of(ModItems.ULTRON_CORE.get());
             case PROFESSOR_X -> List.of(ModItems.XAVIER_WHEELCHAIR.get());
             case AGATHA -> List.of(ModItems.DARKHOLD.get());
+            // 3.5: their weapons are bound to their owners (OWNER and BOND): lanes L2 and L3 decide what "Choose" gives.
+            case HEIMDALL, ODIN, HELA -> List.of();
             default -> List.of();
         };
     }

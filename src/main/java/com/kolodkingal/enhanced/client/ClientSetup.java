@@ -68,6 +68,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
@@ -151,6 +152,21 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), SandLanceRenderer::new);
         event.registerEntityRenderer(ModEntities.SAND_BOULDER.get(), SandBoulderRenderer::new);
         event.registerEntityRenderer(ModEntities.SAND_COCOON.get(), SandCocoonRenderer::new);
+        // The renderers (and block entity renderers) of 3.5, one region per lane: the skeleton draws its entities with
+        // nothing until their lanes give them renderers.
+        // ===== asgard (3.5) =====
+        // ===== heimdall (3.5) =====
+        // ===== odin (3.5) =====
+        // ===== hela (3.5) =====
+        event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), NoopRenderer::new);
+        // ===== asgardians (3.5) =====
+        event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), NoopRenderer::new);
+    }
+
+    /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
+    @SubscribeEvent
+    public static void onRegisterDimensionEffects(RegisterDimensionSpecialEffectsEvent event) {
+        event.register(Enhanced.id("asgard"), new com.kolodkingal.enhanced.client.asgard.AsgardSkyEffects());
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */
@@ -183,6 +199,11 @@ public final class ClientSetup {
         event.registerLayerDefinition(XavierChair.HELMET_LAYER, XavierChair::createHelmetLayer);
         // ===== agatha (3.3) =====
         event.registerLayerDefinition(AgathaHatLayer.LAYER, AgathaHatLayer::createLayer);
+        // ===== asgard (3.5) =====
+        // ===== heimdall (3.5) =====
+        // ===== odin (3.5) =====
+        // ===== hela (3.5) =====
+        // ===== asgardians (3.5) =====
     }
 
     @SubscribeEvent
@@ -215,6 +236,9 @@ public final class ClientSetup {
                         event.getContext().bakeLayer(XavierChair.HELMET_LAYER)));
                 // ===== agatha (3.3) =====
                 renderer.addLayer(new AgathaHatLayer(renderer, event.getContext().bakeLayer(AgathaHatLayer.LAYER)));
+                // ===== heimdall (3.5) =====
+                // ===== odin (3.5) =====
+                // ===== hela (3.5) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),

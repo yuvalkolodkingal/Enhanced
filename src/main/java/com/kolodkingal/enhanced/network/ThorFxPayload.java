@@ -14,7 +14,8 @@ import java.util.List;
 /**
  * Server → client: a moment of Thor's power everyone nearby should see. The client draws it for a short while.
  *
- * @param kind     what happened ({@link #ARC}, {@link #BIFROST_ARRIVAL}, {@link #BIFROST_MARK}, {@link #PIN})
+ * @param kind     what happened ({@link #ARC}, {@link #BIFROST_ARRIVAL}, {@link #BIFROST_MARK}, {@link #PIN},
+ *                 {@link #BIFROST_DEPART})
  * @param entityId Thor, or -1
  * @param points   where (the meaning depends on the kind)
  */
@@ -27,6 +28,11 @@ public record ThorFxPayload(int kind, int entityId, List<Vec3> points) implement
     public static final int BIFROST_MARK = 2;
     /** Thor brings Mjolnir down on someone and pins them, at {@code points[0]} (only his pose shows it). */
     public static final int PIN = 3;
+    /**
+     * 3.5: the Bifrost takes its traveller away from {@code points[0]} (with {@link #BIFROST_MARK} there): what the
+     * Observatory's mechanism spins up for. Draws nothing of its own.
+     */
+    public static final int BIFROST_DEPART = 4;
 
     public static final Type<ThorFxPayload> TYPE = new Type<>(Enhanced.id("thor_fx"));
 

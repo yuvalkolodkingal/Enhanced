@@ -1467,5 +1467,595 @@
         "name": "enhanced:sfx/mutant_cure"
       }
     ]
+  },
+  "music.asgard": {
+    "subtitle": "subtitles.enhanced.music.asgard",
+    "sounds": [
+      {
+        "name": "enhanced:music/asgard_realm_eternal",
+        "stream": true
+      },
+      {
+        "name": "enhanced:music/asgard_golden_halls",
+        "stream": true
+      },
+      {
+        "name": "enhanced:music/asgard_edge_of_the_realms",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.asgard.loop": {
+    "subtitle": "subtitles.enhanced.ambient.asgard.loop",
+    "sounds": [
+      {
+        "name": "enhanced:music/ambient_asgard_loop",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.asgard.additions": {
+    "subtitle": "subtitles.enhanced.ambient.asgard.additions",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ambient_asgard_additions"
+      }
+    ]
+  },
+  "asgard_falls": {
+    "subtitle": "subtitles.enhanced.asgard_falls",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/asgard_falls"
+      }
+    ]
+  },
+  "bifrost_mechanism_spin": {
+    "subtitle": "subtitles.enhanced.bifrost_mechanism_spin",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/bifrost_mechanism_spin"
+      }
+    ]
+  },
+  "rune_stone_call": {
+    "subtitle": "subtitles.enhanced.rune_stone_call",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/rune_stone_call"
+      }
+    ]
+  },
+  "throne_sit": {
+    "subtitle": "subtitles.enhanced.throne_sit",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/throne_sit"
+      }
+    ]
+  },
+  "coronation": {
+    "subtitle": "subtitles.enhanced.coronation",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/coronation"
+      }
+    ]
+  },
+  "mural_crack": {
+    "subtitle": "subtitles.enhanced.mural_crack",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mural_crack"
+      }
+    ]
+  },
+  "seal_break": {
+    "subtitle": "subtitles.enhanced.seal_break",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/seal_break"
+      }
+    ]
+  },
+  "heimdall_slash": {
+    "subtitle": "subtitles.enhanced.heimdall_slash",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_slash"
+      }
+    ]
+  },
+  "heimdall_lunge": {
+    "subtitle": "subtitles.enhanced.heimdall_lunge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_lunge"
+      }
+    ]
+  },
+  "heimdall_sight_on": {
+    "subtitle": "subtitles.enhanced.heimdall_sight_on",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_sight_on"
+      }
+    ]
+  },
+  "heimdall_sight_off": {
+    "subtitle": "subtitles.enhanced.heimdall_sight_off",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_sight_off"
+      }
+    ]
+  },
+  "heimdall_farsight": {
+    "subtitle": "subtitles.enhanced.heimdall_farsight",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_farsight"
+      }
+    ]
+  },
+  "heimdall_ward_up": {
+    "subtitle": "subtitles.enhanced.heimdall_ward_up",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_ward_up"
+      }
+    ]
+  },
+  "heimdall_ward_down": {
+    "subtitle": "subtitles.enhanced.heimdall_ward_down",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_ward_down"
+      }
+    ]
+  },
+  "heimdall_call": {
+    "subtitle": "subtitles.enhanced.heimdall_call",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/heimdall_call"
+      }
+    ]
+  },
+  "bifrost_strike": {
+    "subtitle": "subtitles.enhanced.bifrost_strike",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/bifrost_strike"
+      }
+    ]
+  },
+  "hofund_return": {
+    "subtitle": "subtitles.enhanced.hofund_return",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hofund_return"
+      }
+    ]
+  },
+  "watch_start": {
+    "subtitle": "subtitles.enhanced.watch_start",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/watch_start"
+      }
+    ]
+  },
+  "watch_win": {
+    "subtitle": "subtitles.enhanced.watch_win",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/watch_win"
+      }
+    ]
+  },
+  "watch_lose": {
+    "subtitle": "subtitles.enhanced.watch_lose",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/watch_lose"
+      }
+    ]
+  },
+  "shadow_struck": {
+    "subtitle": "subtitles.enhanced.shadow_struck",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/shadow_struck"
+      }
+    ]
+  },
+  "music.watch": {
+    "subtitle": "subtitles.enhanced.music.watch",
+    "sounds": [
+      {
+        "name": "enhanced:music/watch",
+        "stream": true
+      }
+    ]
+  },
+  "gungnir_blast": {
+    "subtitle": "subtitles.enhanced.gungnir_blast",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gungnir_blast"
+      }
+    ]
+  },
+  "gungnir_throw": {
+    "subtitle": "subtitles.enhanced.gungnir_throw",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gungnir_throw"
+      }
+    ]
+  },
+  "gungnir_catch": {
+    "subtitle": "subtitles.enhanced.gungnir_catch",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gungnir_catch"
+      }
+    ]
+  },
+  "odinforce_shield_up": {
+    "subtitle": "subtitles.enhanced.odinforce_shield_up",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/odinforce_shield_up"
+      }
+    ]
+  },
+  "odinforce_shield_down": {
+    "subtitle": "subtitles.enhanced.odinforce_shield_down",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/odinforce_shield_down"
+      }
+    ]
+  },
+  "odinforce_heal": {
+    "subtitle": "subtitles.enhanced.odinforce_heal",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/odinforce_heal"
+      }
+    ]
+  },
+  "banish": {
+    "subtitle": "subtitles.enhanced.banish",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/banish"
+      }
+    ]
+  },
+  "odinforce_wave": {
+    "subtitle": "subtitles.enhanced.odinforce_wave",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/odinforce_wave"
+      }
+    ]
+  },
+  "raven_caw": {
+    "subtitle": "subtitles.enhanced.raven_caw",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/raven_caw"
+      }
+    ]
+  },
+  "raven_flap": {
+    "subtitle": "subtitles.enhanced.raven_flap",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/raven_flap"
+      }
+    ]
+  },
+  "odin_command": {
+    "subtitle": "subtitles.enhanced.odin_command",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/odin_command"
+      }
+    ]
+  },
+  "odinsleep_start": {
+    "subtitle": "subtitles.enhanced.odinsleep_start",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/odinsleep_start"
+      }
+    ]
+  },
+  "odinsleep_end": {
+    "subtitle": "subtitles.enhanced.odinsleep_end",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/odinsleep_end"
+      }
+    ]
+  },
+  "hela_arrive": {
+    "subtitle": "subtitles.enhanced.hela_arrive",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_arrive"
+      }
+    ]
+  },
+  "hela_voice": {
+    "subtitle": "subtitles.enhanced.hela_voice",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_voice"
+      }
+    ]
+  },
+  "necrosword_throw": {
+    "subtitle": "subtitles.enhanced.necrosword_throw",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/necrosword_throw"
+      }
+    ]
+  },
+  "necrosword_hit": {
+    "subtitle": "subtitles.enhanced.necrosword_hit",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/necrosword_hit"
+      }
+    ]
+  },
+  "blade_wall": {
+    "subtitle": "subtitles.enhanced.blade_wall",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/blade_wall"
+      }
+    ]
+  },
+  "blade_rain": {
+    "subtitle": "subtitles.enhanced.blade_rain",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/blade_rain"
+      }
+    ]
+  },
+  "blade_storm": {
+    "subtitle": "subtitles.enhanced.blade_storm",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/blade_storm"
+      }
+    ]
+  },
+  "hela_shadow_step": {
+    "subtitle": "subtitles.enhanced.hela_shadow_step",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_shadow_step"
+      }
+    ]
+  },
+  "hela_channel": {
+    "subtitle": "subtitles.enhanced.hela_channel",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_channel"
+      }
+    ]
+  },
+  "hela_channel_break": {
+    "subtitle": "subtitles.enhanced.hela_channel_break",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_channel_break"
+      }
+    ]
+  },
+  "hela_form_on": {
+    "subtitle": "subtitles.enhanced.hela_form_on",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_form_on"
+      }
+    ]
+  },
+  "hela_form_off": {
+    "subtitle": "subtitles.enhanced.hela_form_off",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_form_off"
+      }
+    ]
+  },
+  "hela_grasp": {
+    "subtitle": "subtitles.enhanced.hela_grasp",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_grasp"
+      }
+    ]
+  },
+  "mjolnir_caught": {
+    "subtitle": "subtitles.enhanced.mjolnir_caught",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mjolnir_caught"
+      }
+    ]
+  },
+  "hela_defeat": {
+    "subtitle": "subtitles.enhanced.hela_defeat",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hela_defeat"
+      }
+    ]
+  },
+  "berserker_rise": {
+    "subtitle": "subtitles.enhanced.berserker_rise",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/berserker_rise"
+      }
+    ]
+  },
+  "berserker_ambient": {
+    "subtitle": "subtitles.enhanced.berserker_ambient",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/berserker_ambient"
+      }
+    ]
+  },
+  "berserker_hurt": {
+    "subtitle": "subtitles.enhanced.berserker_hurt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/berserker_hurt"
+      }
+    ]
+  },
+  "berserker_death": {
+    "subtitle": "subtitles.enhanced.berserker_death",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/berserker_death"
+      }
+    ]
+  },
+  "fenris_growl": {
+    "subtitle": "subtitles.enhanced.fenris_growl",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/fenris_growl"
+      }
+    ]
+  },
+  "fenris_howl": {
+    "subtitle": "subtitles.enhanced.fenris_howl",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/fenris_howl"
+      }
+    ]
+  },
+  "fenris_bite": {
+    "subtitle": "subtitles.enhanced.fenris_bite",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/fenris_bite"
+      }
+    ]
+  },
+  "fenris_hurt": {
+    "subtitle": "subtitles.enhanced.fenris_hurt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/fenris_hurt"
+      }
+    ]
+  },
+  "fenris_death": {
+    "subtitle": "subtitles.enhanced.fenris_death",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/fenris_death"
+      }
+    ]
+  },
+  "music.hela_1": {
+    "subtitle": "subtitles.enhanced.music.hela_1",
+    "sounds": [
+      {
+        "name": "enhanced:music/hela_1",
+        "stream": true
+      }
+    ]
+  },
+  "music.hela_2": {
+    "subtitle": "subtitles.enhanced.music.hela_2",
+    "sounds": [
+      {
+        "name": "enhanced:music/hela_2",
+        "stream": true
+      }
+    ]
+  },
+  "music.hela_3": {
+    "subtitle": "subtitles.enhanced.music.hela_3",
+    "sounds": [
+      {
+        "name": "enhanced:music/hela_3",
+        "stream": true
+      }
+    ]
+  },
+  "npc_talk_low": {
+    "subtitle": "subtitles.enhanced.npc_talk_low",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/npc_talk_low"
+      }
+    ]
+  },
+  "npc_talk_mid": {
+    "subtitle": "subtitles.enhanced.npc_talk_mid",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/npc_talk_mid"
+      }
+    ]
+  },
+  "npc_talk_high": {
+    "subtitle": "subtitles.enhanced.npc_talk_high",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/npc_talk_high"
+      }
+    ]
+  },
+  "npc_spar_clash": {
+    "subtitle": "subtitles.enhanced.npc_spar_clash",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/npc_spar_clash"
+      }
+    ]
+  },
+  "npc_bow": {
+    "subtitle": "subtitles.enhanced.npc_bow",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/npc_bow"
+      }
+    ]
+  },
+  "npc_down": {
+    "subtitle": "subtitles.enhanced.npc_down",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/npc_down"
+      }
+    ]
+  },
+  "einherjar_summon": {
+    "subtitle": "subtitles.enhanced.einherjar_summon",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/einherjar_summon"
+      }
+    ]
   }
 }

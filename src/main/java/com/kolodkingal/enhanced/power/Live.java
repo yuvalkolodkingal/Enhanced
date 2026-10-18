@@ -3,7 +3,8 @@ package com.kolodkingal.enhanced.power;
 /**
  * Momentary states of the newer heroes (and of whoever Mjolnir pins down) that clients must see (to draw effects and
  * poses, or to stop a pinned player's own movement) but that are never saved: they are recomputed by the server while
- * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (28 bits are used in 3.3).
+ * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (28 bits are used in
+ * 3.3, 42 in 3.5: at most 64).
  *
  * <p>The states of 3.0 sit in one region per hero (the {@code // =====} lines), so the five lanes that build those
  * heroes append to their own lines and never to the same one.
@@ -114,6 +115,23 @@ public enum Live {
     SURFACE_CEILING,
     /** Tommy's Sonic Boom has just broken around him (a moment, so every client acts it). */
     SONIC_BOOM,
+    // ===== heimdall (3.5) =====
+    /** Heimdall has planted Hofund: the Guardian's Ward stands round him (B held). */
+    HEIMDALL_WARD,
+    /** Heimdall looks far with Far Sight (Sneak + G held): every client draws his head tilted, his hand on the hilt. */
+    HEIMDALL_FARSIGHT,
+    /** Heimdall is in the middle of a Hofund combo (a slash or the lunge). */
+    HEIMDALL_SLASHING,
+    // ===== odin (3.5) =====
+    /** Gungnir is out of Odin's hand, thrown. (His Odinforce Shield uses the shared chaos-shield record.) */
+    ODIN_THROWN,
+    /** Huginn and Muninn are out, flying for him. */
+    ODIN_RAVENS,
+    // ===== hela (3.5) =====
+    /** Hela's Death's Grasp is held out (N held). */
+    HELA_GRASPING,
+    /** Hela raises the dead or calls Fenris (both arms rise). */
+    HELA_SUMMONING,
     ;
 
     final long bit() {

@@ -167,6 +167,13 @@ public final class GestureRoutes {
             case TOMMY_TIME -> power == Power.TOMMY && on ? GestureId.SPEED_TIME : null;
             // (Wall Run on or off: he shakes his arms out, as for his Super Speed.)
             case TOMMY_WALL_RUN_OFF -> power == Power.TOMMY ? GestureId.TOMMY_READY : null;
+            // ===== heimdall (3.5) =====
+            // (The toggles of 3.5 have no gesture until their lanes route them, for their own hero only.)
+            case HEIMDALL_SIGHT -> null;
+            // ===== odin (3.5) =====
+            case ODINSLEEP -> null;
+            // ===== hela (3.5) =====
+            case HELA_FORM -> null;
         };
     }
 
@@ -393,6 +400,12 @@ public final class GestureRoutes {
                 case 3, 5 -> "cooldown";
                 default -> "flag:CHAOS_SHIELD";
             };
+            // ===== heimdall (3.5) =====
+            case HEIMDALL -> "none: Heimdall's keys are acted by his plug-in (lane L2 of 3.5)";
+            // ===== odin (3.5) =====
+            case ODIN -> "none: Odin's keys are acted by his plug-in (lane L3 of 3.5)";
+            // ===== hela (3.5) =====
+            case HELA -> "none: Hela's keys are acted by her plug-in (lane L4 of 3.5)";
             default -> "none: no abilities";
         };
     }
@@ -435,6 +448,13 @@ public final class GestureRoutes {
             case SURFACE_WALL, SURFACE_CEILING -> "stances (SPEED_WALL, SPEED_CEILING): the body is turned to the surface he runs on, in his run"
                     + " cycle; the turn on and off is the stance's easing";
             case SONIC_BOOM -> "Tommy's (a hero of before 3.0): his live gesture TOMMY_BOOM acts it, and the shockwave is the server's particles";
+            // ===== heimdall (3.5) =====
+            // (Pending until each lane of 3.5 gives its states a gesture or a reason of their own.)
+            case HEIMDALL_WARD, HEIMDALL_FARSIGHT, HEIMDALL_SLASHING -> "pending: Heimdall's lane (L2 of 3.5) acts it";
+            // ===== odin (3.5) =====
+            case ODIN_THROWN, ODIN_RAVENS -> "pending: Odin's lane (L3 of 3.5) acts it";
+            // ===== hela (3.5) =====
+            case HELA_GRASPING, HELA_SUMMONING -> "pending: Hela's lane (L4 of 3.5) acts it";
         };
     }
 

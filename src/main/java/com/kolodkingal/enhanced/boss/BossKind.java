@@ -8,11 +8,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Locale;
 import java.util.UUID;
 
-/** The three villains who are fought as bosses, and whose defeat wins the hero (see {@link BossFights}). */
+/**
+ * The villains who are fought as bosses, and whose defeat wins the hero (see {@link BossFights}). 3.5 appends Hela (her
+ * lane, L4, registers her {@code HelaLane}; until it does, she "has no lane" and politely refuses to start).
+ */
 public enum BossKind {
     ULTRON,
     THANOS,
-    APOCALYPSE;
+    APOCALYPSE,
+    HELA;
 
     /** The name in commands and messages: {@code ultron}, {@code thanos}, {@code apocalypse}. */
     public String id() {
@@ -30,6 +34,7 @@ public enum BossKind {
             case ULTRON -> ModTicketTypes.ENHANCED_ULTRON;
             case THANOS -> ModTicketTypes.ENHANCED_THANOS;
             case APOCALYPSE -> ModTicketTypes.ENHANCED_APOCALYPSE;
+            case HELA -> ModTicketTypes.ENHANCED_HELA;
         };
     }
 

@@ -46,7 +46,13 @@ public enum Power implements StringRepresentable {
     // 3.3 (the heroes AGATHA, CYCLOPS and PROFESSOR_X of the other lanes come before it): a hero of the player's own,
     // made with the Hero Creator. Its name, powers, keys, colours and look are the player's saved definition (see
     // custom/CustomHero); these two colours are only the Hero Creator's own gold, for whatever has no definition.
-    CUSTOM(0xF5A623, 0xFFE7A8);
+    CUSTOM(0xF5A623, 0xFFE7A8),
+    // The heroes of 3.5 (Asgard), appended after CUSTOM in this order (the 3.5 skeleton adds them; each lane fills its own).
+    // Heimdall's armour and Hofund are gold, with the warm light of the Bifrost; the Allfather's Odinforce is a paler
+    // gold; Hela is the dark emerald of her headdress, with a pale green glow (her name in a brighter green).
+    HEIMDALL(0xE8B54A, 0xFFE7A3),
+    ODIN(0xD9A63A, 0xFFF0C2),
+    HELA(0x2E7D4F, 0x9CF2B5);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -81,6 +87,8 @@ public enum Power implements StringRepresentable {
             case MAGNETO -> 0xC8323C;
             case ULTRON -> 0xD8262B;
             case APOCALYPSE -> 0x4A9BC4;
+            // (3.5: her dark emerald would not read on the dark sky of a title.)
+            case HELA -> 0x3FBF6F;
             default -> color;
         };
     }
@@ -114,13 +122,14 @@ public enum Power implements StringRepresentable {
 
     /**
      * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, Loki walks, Cyclops runs and leaps
-     * on his optic blast and Professor X walks or rolls in his chair; everyone else can fly (Thor only with Mjolnir, see ThorAbilities).
+     * on his optic blast and Professor X walks or rolls in his chair; the gods of Asgard (3.5) walk, and the Bifrost carries
+     * them; everyone else can fly (Thor only with Mjolnir, see ThorAbilities).
      */
     public boolean canFly() {
         return switch (this) {
             // (A custom hero flies only if Flight is one of its powers: PowerTicker asks its definition.)
             case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, CUSTOM -> true;
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X -> false;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA -> false;
         };
     }
 
@@ -137,7 +146,7 @@ public enum Power implements StringRepresentable {
             case AGATHA -> AgathaConfig.FLIGHT_SPEED.get().floatValue();
             // (A custom hero's speed is its Flight's level: PowerTicker asks its definition.)
             case CUSTOM -> com.kolodkingal.enhanced.config.CustomHeroConfig.FLIGHT_SPEED.get().floatValue();
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X -> 0.05F;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA -> 0.05F;
         };
     }
 
@@ -147,7 +156,7 @@ public enum Power implements StringRepresentable {
             case MAGNETO -> 5;
             case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA -> 2;
             // (A custom hero's Flight is on whichever key its player put it.)
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM -> -1;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA -> -1;
         };
     }
 

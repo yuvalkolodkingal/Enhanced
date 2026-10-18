@@ -79,6 +79,22 @@ public final class ModDamageTypes {
     /** The burning of the Rune Trap on what stands bound in it. */
     public static final ResourceKey<DamageType> AGATHA_RUNES = key("agatha_runes");
 
+    // ===== asgard (3.5, the skeleton registers every one; each lane deals its own) =====
+    /** Heimdall's Hofund: the slashes of the combo and the lunge (lane L2). */
+    public static final ResourceKey<DamageType> HOFUND = key("hofund");
+    /** The column of rainbow light of Heimdall's Bifrost Strike (lane L2). */
+    public static final ResourceKey<DamageType> BIFROST_STRIKE = key("bifrost_strike");
+    /** Gungnir: Odin's blast from its tip and the thrown spear (lane L3). */
+    public static final ResourceKey<DamageType> GUNGNIR = key("gungnir");
+    /** The Odinforce: Odin's shock wave and what Banish does to those it cannot banish (lane L3). */
+    public static final ResourceKey<DamageType> ODINFORCE = key("odinforce");
+    /** Hela's thrown necroswords, the hero's and the boss's (tags dark_magic, is_projectile; lane L4). */
+    public static final ResourceKey<DamageType> NECROSWORD = key("necrosword");
+    /** The blade spikes of Hela's Blade Wall, Burst and Storm (tag dark_magic; lane L4). */
+    public static final ResourceKey<DamageType> BLADE_WALL = key("blade_wall");
+    /** The bite of Fenris (lane L4). */
+    public static final ResourceKey<DamageType> FENRIS_BITE = key("fenris_bite");
+
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }

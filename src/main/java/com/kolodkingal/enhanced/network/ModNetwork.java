@@ -16,7 +16,7 @@ public final class ModNetwork {
      * Bumped once for all of 3.1, once for 3.2 (the Witches' Road screen got a mode and the trials' progress), once for
      * all of 3.3, and once for 3.4 (a custom hero's definition, format 2, and his state's cast marker).
      */
-    public static final String PROTOCOL_VERSION = "8";
+    public static final String PROTOCOL_VERSION = "9";
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // (2.2 renumbered Thor's effects and added the Chaos Shield's state to the power data; 2.3 added the order to
@@ -68,6 +68,12 @@ public final class ModNetwork {
         registrar.playToClient(CerebroPayload.TYPE, CerebroPayload.STREAM_CODEC, CerebroPayload::handle);
         // 3.3: Agatha's effects (the Rune Trap, the Power Drain, her shield breaking).
         registrar.playToClient(AgathaFxPayload.TYPE, AgathaFxPayload.STREAM_CODEC, AgathaFxPayload::handle);
+        // 3.5 (Asgard): protocol 9. The Bifrost's actions 4 (Asgard) and 5 (Heimdall's Send) and ThorFxPayload's
+        // BIFROST_DEPART travel in the payloads above.
+        registrar.playToClient(AsgardTalkPayload.Open.TYPE, AsgardTalkPayload.Open.STREAM_CODEC, AsgardTalkPayload.Open::handle);
+        registrar.playToServer(AsgardTalkPayload.Choose.TYPE, AsgardTalkPayload.Choose.STREAM_CODEC, AsgardTalkPayload.Choose::handle);
+        registrar.playToClient(HeimdallSightPayload.TYPE, HeimdallSightPayload.STREAM_CODEC, HeimdallSightPayload::handle);
+        registrar.playToClient(AsgardFxPayload.TYPE, AsgardFxPayload.STREAM_CODEC, AsgardFxPayload::handle);
     }
 
     private ModNetwork() {

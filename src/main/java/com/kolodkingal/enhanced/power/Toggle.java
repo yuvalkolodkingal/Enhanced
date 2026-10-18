@@ -45,6 +45,15 @@ public enum Toggle {
     TOMMY_TIME,
     /** Tommy: running up walls and along ceilings is switched off (it is on unless he turns it off). */
     TOMMY_WALL_RUN_OFF,
+    // ===== heimdall (3.5) =====
+    /** Heimdall: his All-Seeing Sight is open (creatures glow through walls, far players are marked). */
+    HEIMDALL_SIGHT,
+    // ===== odin (3.5) =====
+    /** Odin: he kneels in the Odinsleep (cannot act, heals). */
+    ODINSLEEP,
+    // ===== hela (3.5) =====
+    /** Hela: the Goddess of Death's form is on (the headdress has grown). */
+    HELA_FORM,
     ;
 
     final int bit() {

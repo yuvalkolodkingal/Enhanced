@@ -147,6 +147,17 @@ public final class ModAttachments {
                     .sync(CustomState.STREAM_CODEC)
                     .build());
 
+    /**
+     * 3.5: a player's progress in Asgard (where he came from, the Watch won, Hela beaten, Gungnir taken, crowned, the
+     * Asgardians he has talked to, his weapons' bonds). Saved, kept on death, synced to that player only.
+     */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.asgard.AsgardProgress>> ASGARD = ATTACHMENTS.register("asgard",
+            () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.asgard.AsgardProgress.EMPTY)
+                    .serialize(com.kolodkingal.enhanced.asgard.AsgardProgress.CODEC)
+                    .copyOnDeath()
+                    .sync((holder, to) -> holder == to, com.kolodkingal.enhanced.asgard.AsgardProgress.STREAM_CODEC)
+                    .build());
+
     private ModAttachments() {
     }
 }

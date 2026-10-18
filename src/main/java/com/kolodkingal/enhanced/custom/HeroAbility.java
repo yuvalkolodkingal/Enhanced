@@ -199,7 +199,46 @@ public enum HeroAbility implements CatalogEntry {
     XAVIER_FREEZE_MINDS(Power.PROFESSOR_X, 4, "freeze_minds", press().cost(3).group(Group.MIND).icon("minecraft:snowball")
             .traits(Trait.TELEPATH)),
     XAVIER_CEREBRO(Power.PROFESSOR_X, 5, "cerebro", press().cost(2).group(Group.MIND).icon("minecraft:conduit")
-            .traits(Trait.TELEPATH).on(d -> d.is(Live.CEREBRO)));
+            .traits(Trait.TELEPATH).on(d -> d.is(Live.CEREBRO))),
+
+    // ===== heimdall (3.5) =====
+    // (The rows of 3.5 are written by the skeleton from the plan's table; each lane fixes its own hero's data here.)
+    HEIMDALL_HOFUND(Power.HEIMDALL, 1, "hofund", press().alt(Act.PRESS).cost(2).group(Group.BODY).icon("enhanced:hofund")
+            .on(d -> d.is(Live.HEIMDALL_SLASHING))),
+    HEIMDALL_SIGHT(Power.HEIMDALL, 2, "sight", toggle().alt(Act.HOLD).cost(2).group(Group.MIND).icon("minecraft:spyglass")
+            .on(d -> d.toggle(Toggle.HEIMDALL_SIGHT))),
+    HEIMDALL_BIFROST(Power.HEIMDALL, 3, "bifrost", press().alt(Act.PRESS).cost(2).group(Group.MOVE).icon("minecraft:beacon").world()),
+    HEIMDALL_WARD(Power.HEIMDALL, 4, "ward", hold().alt(Act.PRESS).cost(2).group(Group.ENERGY).icon("minecraft:shield")
+            .on(d -> d.is(Live.HEIMDALL_WARD))),
+    HEIMDALL_STRIKE(Power.HEIMDALL, 5, "strike", press().alt(Act.PRESS).cost(3).group(Group.ELEMENT).icon("minecraft:amethyst_shard")
+            .world()),
+    HEIMDALL_BODY(Power.HEIMDALL, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:golden_leggings").family(Family.BODY)),
+
+    // ===== odin (3.5) =====
+    ODIN_GUNGNIR(Power.ODIN, 1, "gungnir", press().alt(Act.PRESS).cost(3).group(Group.ENERGY).icon("enhanced:gungnir")
+            .res(Resource.GUNGNIR).on(d -> d.is(Live.ODIN_THROWN))),
+    ODIN_ODINFORCE(Power.ODIN, 2, "odinforce", hold().alt(Act.PRESS).cost(3).group(Group.ENERGY).icon("minecraft:golden_apple")
+            .res(Resource.SHIELD).traits(Trait.SORCERER).family(Family.SHIELD).on(PowerData::chaosShieldActive)),
+    ODIN_BANISH(Power.ODIN, 3, "banish", press().alt(Act.PRESS).cost(3).group(Group.MIND).icon("minecraft:nether_star").world()),
+    ODIN_RAVENS(Power.ODIN, 4, "ravens", press().alt(Act.PRESS).cost(2).group(Group.MIND).icon("minecraft:feather")
+            .on(d -> d.is(Live.ODIN_RAVENS))),
+    ODIN_COMMAND(Power.ODIN, 5, "command", press().alt(Act.TOGGLE).cost(3).group(Group.MIND).icon("minecraft:goat_horn").world()
+            .on(d -> d.toggle(Toggle.ODINSLEEP))),
+    ODIN_BODY(Power.ODIN, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:gold_ingot").family(Family.BODY)),
+
+    // ===== hela (3.5) =====
+    HELA_NECROSWORDS(Power.HELA, 1, "necroswords", press().alt(Act.PRESS).cost(2).group(Group.ENERGY).icon("minecraft:netherite_sword")
+            .traits(Trait.DARK_MAGIC)),
+    HELA_BLADE_WALL(Power.HELA, 2, "blade_wall", press().alt(Act.PRESS).cost(2).group(Group.ELEMENT).icon("minecraft:pointed_dripstone")
+            .traits(Trait.DARK_MAGIC)),
+    HELA_GODDESS(Power.HELA, 3, "goddess", toggle().alt(Act.PRESS).cost(2).group(Group.BODY).icon("minecraft:wither_skeleton_skull")
+            .traits(Trait.DARK_MAGIC).on(d -> d.toggle(Toggle.HELA_FORM))),
+    HELA_ARMY(Power.HELA, 4, "army", press().alt(Act.PRESS).cost(3).group(Group.MIND).icon("minecraft:bone")
+            .res(Resource.UNDEAD).traits(Trait.DARK_MAGIC).world().on(d -> d.is(Live.HELA_SUMMONING))),
+    HELA_GRASP(Power.HELA, 5, "grasp", hold().cost(2).group(Group.ENERGY).icon("minecraft:crying_obsidian")
+            .traits(Trait.DARK_MAGIC).on(d -> d.is(Live.HELA_GRASPING))),
+    HELA_BODY(Power.HELA, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:netherite_helmet")
+            .traits(Trait.DARK_MAGIC).family(Family.BODY));
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {

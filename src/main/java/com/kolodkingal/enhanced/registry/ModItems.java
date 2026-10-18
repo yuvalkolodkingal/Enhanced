@@ -2,6 +2,9 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.item.CapstoneItem;
+import com.kolodkingal.enhanced.item.GungnirItem;
+import com.kolodkingal.enhanced.item.HelaHeaddressItem;
+import com.kolodkingal.enhanced.item.HofundItem;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.item.EssenceItem;
 import com.kolodkingal.enhanced.item.HeroCreatorItem;
@@ -135,6 +138,26 @@ public final class ModItems {
     /** Crafted; hold right-click for two seconds to take your power away (or another player's: an operator, or with PvP on). */
     public static final DeferredItem<MutantCureItem> MUTANT_CURE = ITEMS.register("mutant_cure",
             () -> new MutantCureItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+
+    // ===== asgard (3.5) =====
+    // (The skeleton registers the three items other lanes need by name; lane L1 adds the realm's block items here.)
+    // ===== heimdall (3.5) =====
+    /** Heimdall's sword, the key of the Bifrost for whoever holds it (lane L2). */
+    public static final DeferredItem<HofundItem> HOFUND = ITEMS.register("hofund",
+            () -> new HofundItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                    .component(DataComponents.UNBREAKABLE, new Unbreakable(false))
+                    .attributes(HofundItem.createAttributes())));
+    // ===== odin (3.5) =====
+    /** The spear of the Allfather; its owner opens the Bifrost with it (lane L3). */
+    public static final DeferredItem<GungnirItem> GUNGNIR = ITEMS.register("gungnir",
+            () -> new GungnirItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                    .component(DataComponents.UNBREAKABLE, new Unbreakable(false))
+                    .attributes(GungnirItem.createAttributes())));
+    // ===== hela (3.5) =====
+    /** The reward of the fight against Hela; held with no power, it makes Hela (lane L4). */
+    public static final DeferredItem<HelaHeaddressItem> HELA_HEADDRESS = ITEMS.register("hela_headdress",
+            () -> new HelaHeaddressItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    // ===== asgardians (3.5) =====
 
     /** Projectile sprites only; not in the creative tab. */
     /** 3.3: the Hero Creator, a Creative-only item (the Creative tab, no recipe, no loot). */

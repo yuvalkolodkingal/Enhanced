@@ -122,6 +122,9 @@ public final class VishantiBook {
         if (!readable(player, true)) {
             return false;
         }
+        if (PlaceBook.refusesAsgard(player, PlaceBook.Kind.VISHANTI, player.level().dimension())) {
+            return false;
+        }
         if (shutIn(player.level().dimension())) {
             player.displayClientMessage(Component.translatable("message.enhanced.vishanti.shut"), true);
             return false;
@@ -162,6 +165,9 @@ public final class VishantiBook {
         ServerLevel destination = player.server.getLevel(place.dimension());
         if (destination == null) {
             player.displayClientMessage(Component.translatable("message.enhanced.vishanti.no_world"), true);
+            return;
+        }
+        if (PlaceBook.refusesAsgard(player, PlaceBook.Kind.VISHANTI, place.dimension())) {
             return;
         }
         if (shutIn(place.dimension())) {
@@ -205,6 +211,9 @@ public final class VishantiBook {
             return;
         }
         if (!readable(player, true)) {
+            return;
+        }
+        if (PlaceBook.refusesAsgard(player, PlaceBook.Kind.VISHANTI, player.level().dimension())) {
             return;
         }
         if (shutIn(player.level().dimension())) {

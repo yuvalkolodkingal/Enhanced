@@ -196,6 +196,8 @@ public final class FlightProfile {
             // ===== cyclops (3.3) =====
             case CYCLOPS -> null; // he runs, and leaps on his blast: no take-off, banking or braking
             case PROFESSOR_X -> null; // 3.3: he walks, or rolls in his chair
+            // 3.5: the gods of Asgard walk; the Bifrost carries them.
+            case HEIMDALL, ODIN, HELA -> null;
             // A custom hero flies with the profile of his flight style (3.4: of(HeroAnimState)); the plain style is the
             // game's own pose.
             case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;

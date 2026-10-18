@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.asgard.AsgardRules;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.hex.Hex;
@@ -65,7 +66,8 @@ public final class BlockRights {
      * lets him, and no listener cancels the break.
      */
     public static boolean mayBreak(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState old) {
-        if (BossFights.protects(level, pos) || behindTheWall(player, level, pos)) {
+        // (3.5: the protected city of Asgard is kept as a boss arena is.)
+        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos) || behindTheWall(player, level, pos)) {
             return false; // the arena of a boss fight stays as it is; the Hex keeps its own
         }
         return vanillaRights(player, level, pos) && postBreak(player, level, pos, old);
@@ -76,7 +78,7 @@ public final class BlockRights {
      * listener cancels the placing.
      */
     public static boolean mayPlace(ServerPlayer player, ServerLevel level, BlockPos pos) {
-        if (BossFights.protects(level, pos) || behindTheWall(player, level, pos)) {
+        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos) || behindTheWall(player, level, pos)) {
             return false;
         }
         return vanillaRights(player, level, pos) && postPlace(player, level, pos);
@@ -90,7 +92,7 @@ public final class BlockRights {
      * build_magic.hexIsAClaim}).
      */
     public static boolean massEditRefuses(ServerPlayer player, ServerLevel level, BlockPos pos) {
-        if (BossFights.protects(level, pos)) {
+        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos)) {
             return true;
         }
         if (BuildConfig.ALL_ARENAS_PROTECTED.get() && BossFights.inAnyArena(level, pos)) {

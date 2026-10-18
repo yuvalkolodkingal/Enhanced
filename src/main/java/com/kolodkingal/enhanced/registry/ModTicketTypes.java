@@ -27,6 +27,15 @@ public final class ModTicketTypes {
      */
     public static final TicketType<UUID> ENHANCED_ROAD = TicketType.create("enhanced_road", UUID::compareTo);
 
+    // ===== asgard (3.5) =====
+    /** The throne room of Asgard while Hela's fight runs (as the other bosses' arenas). */
+    public static final TicketType<UUID> ENHANCED_HELA = TicketType.create("enhanced_hela", UUID::compareTo);
+    /**
+     * Chunks of Asgard held for a while by its own code, keyed by whom they are for: a player's Guardian's Watch (lane L2),
+     * the population keeper's homes (lane L5) and the tests that generate Asgard's chunks. Released explicitly.
+     */
+    public static final TicketType<UUID> ENHANCED_ASGARD = TicketType.create("enhanced_asgard", UUID::compareTo);
+
     private ModTicketTypes() {
     }
 }

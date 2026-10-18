@@ -231,7 +231,8 @@ public final class CustomV2Tests {
                 check((row != null) != (key == p.flightAbility()), p + " key " + key + " is a row or the flight key, never both");
             }
         }
-        check(HeroAbility.values().length == 81, "71 keys + 9 bodies (L2: Vision's) + Build Magic: " + HeroAbility.values().length);
+        check(HeroAbility.values().length == 99, "71 keys + 9 bodies (L2: Vision's) + Build Magic, and 3.5's 15 keys + 3 bodies: "
+                + HeroAbility.values().length);
         check(Catalog.all().size() == PowerModule.values().length + HeroAbility.values().length, "the catalogue is both lists");
         for (CatalogEntry e : Catalog.all()) {
             check(Catalog.byId(e.id()) == e, e.id() + " is found in the catalogue");

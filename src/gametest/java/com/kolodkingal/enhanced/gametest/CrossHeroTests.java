@@ -732,9 +732,11 @@ public final class CrossHeroTests {
         MinecraftServer server = level.getServer();
         ServerPlayer starter = tank(f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z));
         ServerPlayer other = tank(f.player(4.5, FLOOR, 4.5));
-        for (BossKind running : BossKind.values()) {
+        // (The three villains of 3.0 and their rituals: Hela's lane of 3.5 tests her own start rules.)
+        List<BossKind> villains = List.of(BossKind.ULTRON, BossKind.THANOS, BossKind.APOCALYPSE);
+        for (BossKind running : villains) {
             check(BossFights.start(running, starter, true), "the " + running + " fight starts");
-            for (BossKind second : BossKind.values()) {
+            for (BossKind second : villains) {
                 if (second == running) {
                     continue;
                 }

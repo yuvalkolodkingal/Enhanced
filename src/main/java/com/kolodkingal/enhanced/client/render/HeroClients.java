@@ -28,6 +28,10 @@ public final class HeroClients {
         register(new com.kolodkingal.enhanced.client.custom.CustomClient());
         register(new XavierClient());
         register(new AgathaClient());
+        // 3.5: the heroes of Asgard.
+        register(new HeimdallClient());
+        register(new OdinClient());
+        register(new HelaClient());
     }
 
     /**

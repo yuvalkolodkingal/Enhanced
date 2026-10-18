@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.registry;
 
+import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
+import com.kolodkingal.enhanced.hela.HelaShadowEntity;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
@@ -227,6 +229,28 @@ public final class ModEntities {
                     .noSummon()
                     .build("sand_cocoon"));
 
+    // ===== asgard (3.5) =====
+    // (The skeleton registers the two entities another lane needs by name; each lane adds its own in its region below.)
+    // ===== heimdall (3.5) =====
+    // ===== odin (3.5) =====
+    // ===== hela (3.5) =====
+    /** A Shadow of Hela of the Guardian's Watch (lane L2 spawns them; lane L4 owns the entity). Never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<HelaShadowEntity>> HELA_SHADOW = ENTITIES.register("hela_shadow",
+            () -> EntityType.Builder.<HelaShadowEntity>of(HelaShadowEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.6F)
+                    .fireImmune()
+                    .clientTrackingRange(16)
+                    .noSave()
+                    .noSummon()
+                    .build("hela_shadow"));
+    // ===== asgardians (3.5) =====
+    /** An Asgardian of any role (lane L5). Saved; the keeper makes and keeps them. */
+    public static final DeferredHolder<EntityType<?>, EntityType<AsgardianEntity>> ASGARDIAN = ENTITIES.register("asgardian",
+            () -> EntityType.Builder.<AsgardianEntity>of(AsgardianEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.8F)
+                    .clientTrackingRange(10)
+                    .build("asgardian"));
+
     /** Mod bus: attributes of the mod's living entities. */
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
@@ -236,6 +260,9 @@ public final class ModEntities {
         event.put(ULTRON.get(), UltronEntity.createAttributes().build());
         event.put(ULTRON_SENTRY.get(), UltronSentryEntity.createAttributes().build());
         event.put(APOCALYPSE.get(), ApocalypseEntity.createAttributes().build());
+        // 3.5
+        event.put(HELA_SHADOW.get(), HelaShadowEntity.createAttributes().build());
+        event.put(ASGARDIAN.get(), AsgardianEntity.createAttributes().build());
     }
 
     private ModEntities() {

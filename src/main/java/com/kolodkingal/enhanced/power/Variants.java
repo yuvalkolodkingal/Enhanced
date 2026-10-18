@@ -92,6 +92,28 @@ public final class Variants {
                 new Variant("wandavision", Power.AGATHA, Variant.suit("agatha_wandavision"), null, true, 0x9A3FE0, 0xE2C2FF),
                 new Variant("all_along", Power.AGATHA, Variant.suit("agatha_all_along"), null, true, 0x8E4FD6, 0xB8E6A8),
                 own(Power.AGATHA));
+
+        // ===== heimdall (3.5) =====
+        // The Guardian of the Bifrost in his golden armour (Thor, The Dark World; the horned helmet is a layer of his lane),
+        // and the hooded cloak he wears in hiding (Ragnarok). Placeholder skins until lane L2's art lands.
+        add(Power.HEIMDALL,
+                new Variant("guardian", Power.HEIMDALL, Variant.suit("heimdall_guardian"), null, false, 0xE8B54A, 0xFFE7A3),
+                new Variant("ragnarok", Power.HEIMDALL, Variant.suit("heimdall_ragnarok"), null, false, 0xB89A52, 0xFFE7A3),
+                own(Power.HEIMDALL));
+        // ===== odin (3.5) =====
+        // The Allfather on his throne (armour, red cape, the winged helmet of his lane's layer) and the Wanderer in a long
+        // dark coat. Placeholder skins until lane L3's art lands.
+        add(Power.ODIN,
+                new Variant("allfather", Power.ODIN, Variant.suit("odin_allfather"), Variant.suit("odin_cape"), false, 0xD9A63A, 0xFFF0C2),
+                new Variant("wanderer", Power.ODIN, Variant.suit("odin_wanderer"), null, false, 0xC9A65A, 0xFFF0C2),
+                own(Power.ODIN));
+        // ===== hela (3.5) =====
+        // The Goddess of Death (the black suit with emerald lines; the antlered headdress is a layer of her lane) and her
+        // Arrival (a long black cloak). Placeholder skins until lane L4's art lands.
+        add(Power.HELA,
+                new Variant("goddess", Power.HELA, Variant.suit("hela_goddess"), null, true, 0x2E7D4F, 0x9CF2B5),
+                new Variant("arrival", Power.HELA, Variant.suit("hela_arrival"), null, true, 0x24603D, 0x9CF2B5),
+                own(Power.HELA));
     }
 
     private static void add(Power power, Variant... variants) {

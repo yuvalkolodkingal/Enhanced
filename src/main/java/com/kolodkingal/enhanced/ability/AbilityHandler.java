@@ -71,7 +71,7 @@ public final class AbilityHandler {
             case LOKI -> LokiAbilities.onKey(player, data, ability, down, alt);
             case THOR -> ThorAbilities.onKey(player, data, ability, down, alt);
             // The heroes of 3.0 are plug-ins (HeroServer): their keys are theirs.
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM ->
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA ->
                     HeroServers.onKey(hero, player, data, ability, down, alt);
             case NONE -> {
             }
