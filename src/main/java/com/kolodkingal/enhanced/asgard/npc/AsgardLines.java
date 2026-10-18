@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 /**
- * The lines of every Asgardian but the nodes the other lanes add (Heimdall's whole table: L2; Odin's nodes once awake: L3;
+ * The lines of every Asgardian but the nodes the other lanes add (Heimdall's whole table: L2; Odin's whole table: L3;
  * Hela's warnings: L4). Our own words, never the films'. The chain of hints: Frigga, Hogun, Valkyrie and the citizens
  * speak of Hela's Seal behind the throne and of her army; Sif and the Einherjar of Heimdall's Watch (and
  * Hofund); Frigga, Fandral, Hogun and the citizens of Gungnir in the vault, for the one who faces Hela.
@@ -48,7 +48,6 @@ final class AsgardLines {
 
     static void registerAll() {
         common();
-        odin();
         frigga();
         sif();
         valkyrie();
@@ -110,16 +109,6 @@ final class AsgardLines {
                 ctx.npc().openTrades(ctx.player());
             }
         });
-    }
-
-    // ---- Odin (asleep: Frigga answers for him; awake: lane L3 adds his nodes above these) ----
-
-    private static void odin() {
-        Role role = Role.ODIN;
-        List<Option> answers = List.of(Option.to("who_m", "who"), Option.close("bow_out"));
-        AsgardDialogue.node(role, "greeting").when(ctx -> ctx.state().odinAwake()).variants(2).options(answers).register();
-        AsgardDialogue.node(role, "who").option(Option.close("bow_out")).register();
-        reactions(role, answers, List.of(Power.THOR, Power.LOKI, Power.HELA));
     }
 
     // ---- Frigga ----

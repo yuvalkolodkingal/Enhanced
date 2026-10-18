@@ -595,6 +595,33 @@ public final class HeimdallTests {
         return player;
     }
 
+    /** The answers Heimdall (the city's Asgardian) offers this player now: his node and its answers. */
+    private static List<String> heimdallOffers(ServerPlayer player, List<String> node) {
+        com.kolodkingal.enhanced.asgard.npc.AsgardianEntity npc =
+                com.kolodkingal.enhanced.registry.ModEntities.ASGARDIAN.get().create(player.serverLevel());
+        npc.setRole(Role.HEIMDALL, 0);
+        npc.moveTo(player.getX() + 1.0, player.getY(), player.getZ(), 0.0F, 0.0F);
+        AsgardDialogue.Ctx ctx = com.kolodkingal.enhanced.asgard.npc.AsgardTalk.context(player, npc, Role.HEIMDALL);
+        AsgardDialogue.Node picked = AsgardDialogue.pick(ctx);
+        check(picked != null, "Heimdall has a word for him");
+        node.add(picked.key());
+        return AsgardDialogue.offered(ctx, picked).stream().map(AsgardDialogue.Option::key).toList();
+    }
+
+    /** At integration (L5's talk, L2's table): the Heimdall of the city offers the Guardian's Watch, first and after. */
+    @GameTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
+    public static void theHeimdallOfTheCityOffersTheWatch(GameTestHelper helper) {
+        TestKit.Fixture f = AsgardTestSupport.fixture(helper);
+        ServerPlayer player = inAsgard(f, helper);
+        List<String> node = new ArrayList<>();
+        List<String> first = heimdallOffers(player, node);
+        check("greeting".equals(node.get(0)) && first.contains(HeimdallTalk.WATCH), "his greeting offers the Watch: " + node + first);
+        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.MET_HEIMDALL));
+        List<String> later = heimdallOffers(player, node);
+        check("watch_offer".equals(node.get(1)) && later.contains(HeimdallTalk.WATCH), "and later too: " + node + later);
+        helper.succeed();
+    }
+
     @GameTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
     public static void theWatchIsWonByStrikingTheSevenShadows(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);

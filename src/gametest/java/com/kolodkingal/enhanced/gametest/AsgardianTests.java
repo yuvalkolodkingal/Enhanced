@@ -257,14 +257,14 @@ public final class AsgardianTests {
         check("greeting".equals(picked(player, sif)), "then the usual greeting");
         check(AsgardTalk.offered(player).containsAll(List.of("train", "trade", "ask_advice")), "training, trades, advice");
         AsgardTalk.end(player);
-        // Odin asleep: Frigga's words; awake: his own.
-        check(AsgardDialogue.pick(ctx(player, odin)) == null, "asleep, Odin has no node of his own");
+        // Odin asleep: Frigga's words; awake: his own (Odin's table is lane L3's: "asleep" says nothing, "greet").
+        check("asleep".equals(picked(player, odin)), "asleep, Odin's own node is the silent one: " + picked(player, odin));
         odin.setState(NpcState.SLEEPING, 0);
         check(AsgardTalk.begin(player, odin) && "odin_asleep".equals(AsgardTalk.currentNode(player)), "Frigga answers for him");
         AsgardTalk.end(player);
         odin.setState(NpcState.IDLE, 0);
         state.setOdinAwake(true);
-        check("greeting".equals(picked(player, odin)), "awake, he greets");
+        check("greet".equals(picked(player, odin)), "awake, he greets: " + picked(player, odin));
         // Frigga: the first talk, then after Hela the hint to Gungnir.
         check("greeting_first".equals(picked(player, frigga)), "Frigga's first greeting");
         player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.TALKED_FRIGGA));
@@ -277,6 +277,21 @@ public final class AsgardianTests {
         player.setHealth(10.0F);
         AsgardDialogue.Node greeting = AsgardDialogue.find(Role.FRIGGA, "greeting");
         check(AsgardDialogue.offered(ctx(player, frigga), greeting).stream().anyMatch(o -> o.key().equals("heal_me")), "she offers to heal");
+        helper.succeed();
+    }
+
+    /** A Bifrost opened beside them never carries the city's own Asgardians off; a summoned Einherjar goes with his master. */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theBifrostLeavesTheCitysAsgardiansAtTheirPosts(GameTestHelper helper) {
+        TestKit.Fixture fx = TestKit.fixture(helper);
+        ServerPlayer traveller = fx.player(5.5, FLOOR, 5.5);
+        AsgardianEntity heimdall = npc(fx, Role.HEIMDALL, 6.5, 5.5);
+        AsgardianEntity guard = npc(fx, Role.EINHERJAR, 5.5, 6.5);
+        AsgardianEntity summoned = npc(fx, Role.EINHERJAR, 4.5, 5.5);
+        summoned.summonFor(traveller, 200);
+        check(!com.kolodkingal.enhanced.bifrost.Bifrost.goesAlong(traveller, heimdall), "Heimdall keeps his post");
+        check(!com.kolodkingal.enhanced.bifrost.Bifrost.goesAlong(traveller, guard), "a guard of the city stays");
+        check(com.kolodkingal.enhanced.bifrost.Bifrost.goesAlong(traveller, summoned), "a summoned Einherjar goes along");
         helper.succeed();
     }
 

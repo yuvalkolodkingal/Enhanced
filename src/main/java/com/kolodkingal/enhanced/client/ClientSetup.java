@@ -268,6 +268,22 @@ public final class ClientSetup {
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
         }
+        // ===== asgardians (3.5): the Heimdall and Odin NPCs wear the heroes' helms =====
+        npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.HEIMDALL,
+                event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER),
+                com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.TEXTURE);
+        npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.ODIN,
+                event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER),
+                com.kolodkingal.enhanced.client.render.OdinHelmLayer.TEXTURE);
+    }
+
+    /** A role's NPC wears {@code helm} (a hero's helmet model, in the pixels of the head; the pose is in head space). */
+    private static void npcHelm(com.kolodkingal.enhanced.asgard.npc.Role role, net.minecraft.client.model.geom.ModelPart helm,
+                                net.minecraft.resources.ResourceLocation texture) {
+        com.kolodkingal.enhanced.client.asgard.AsgardianRenderer.registerHeadgear(role,
+                (npc, model, pose, buffers, light, partial) -> helm.render(pose,
+                        buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(texture)), light,
+                        net.minecraft.client.renderer.entity.LivingEntityRenderer.getOverlayCoords(npc, 0.0F)));
     }
 
     @SubscribeEvent
