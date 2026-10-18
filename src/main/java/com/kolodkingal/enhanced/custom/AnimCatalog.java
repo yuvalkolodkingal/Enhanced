@@ -37,7 +37,9 @@ public final class AnimCatalog {
     /** Run characters (how the walk and sprint look). */
     public static final List<String> RUN_CHARACTERS = List.of(
             "default", "magneto", "wanda", "vision", "white_vision", "billy", "loki", "thor", "phoenix", "spider", "thanos",
-            "ultron", "apocalypse", "cyclops", "xavier", "xavier_seated", "agatha");
+            "ultron", "apocalypse", "cyclops", "xavier", "xavier_seated", "agatha",
+            // 3.5
+            "heimdall");
 
     /** Speedster runs: Quicksilver in his Time, Quicksilver's Super Speed, Tommy's. */
     public static final List<String> SPEED_RUNS = List.of("qs_time", "qs_speed", "tommy");

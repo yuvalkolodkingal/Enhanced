@@ -1,13 +1,17 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.bifrost.Bifrost;
+import com.kolodkingal.enhanced.heimdall.HofundBond;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
@@ -21,11 +25,12 @@ import java.util.List;
 /**
  * Hofund, Heimdall's sword (3.5): the key of the Bifrost. Anyone who holds it can open the Bifrost (use it: the Bifrost
  * screen; Sneak + use: to where he looks), as with Mjolnir and Stormbreaker ({@code asgard.hofundOpensBifrost}); a sword
- * otherwise (9 attack damage). Bound to whom Heimdall gave it ({@code ModDataComponents.OWNER} and {@code BOND}). Never
- * breaks; fire and lava cannot hurt it.
+ * otherwise (9 attack damage, sweeping), and Heimdall deals {@code heimdall.hofundBonus} more with it. Never breaks; fire and
+ * lava cannot hurt it.
  *
- * <p>The 3.5 skeleton writes this minimal class so that the Bifrost's keys are final ({@link #isHofund}); lane L2 owns and
- * fills it (the bond, the awakening, the model).
+ * <p>Heimdall gives it to whoever wins the Guardian's Watch, bound to him ({@code ModDataComponents.OWNER} and {@code BOND},
+ * see {@link HofundBond}): a powerless owner who holds his own Hofund becomes Heimdall ({@code HeimdallServer}); a copy older
+ * than its owner's newest crumbles when it next ticks, in an inventory or on the ground.
  */
 public class HofundItem extends SwordItem {
     public HofundItem(Properties properties) {
@@ -59,10 +64,34 @@ public class HofundItem extends SwordItem {
         return false;
     }
 
+    /** A copy older than its owner's newest crumbles in whatever inventory it is. */
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity holder, int slot, boolean selected) {
+        if (level instanceof ServerLevel server && holder.tickCount % 10 == 0 && HofundBond.shouldCrumble(server.getServer(), stack)) {
+            HofundBond.dust(server, holder.getX(), holder.getY() + 1.0, holder.getZ());
+            stack.setCount(0);
+        }
+    }
+
+    /** And one lying on the ground. */
+    @Override
+    public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
+        if (entity.level() instanceof ServerLevel server && entity.tickCount % 10 == 0 && HofundBond.shouldCrumble(server.getServer(), stack)) {
+            HofundBond.dust(server, entity.getX(), entity.getY() + 0.2, entity.getZ());
+            entity.discard();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.enhanced.hofund.desc").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));
-        tooltip.add(Component.translatable("item.enhanced.thor_weapon.bifrost").withStyle(ChatFormatting.AQUA));
+        MjolnirOwner owner = stack.get(ModDataComponents.OWNER.get());
+        if (owner != null) {
+            tooltip.add(Component.translatable("item.enhanced.hofund.bound", owner.name()).withStyle(ChatFormatting.YELLOW));
+        }
+        tooltip.add(Component.translatable("item.enhanced.hofund.bifrost").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.enhanced.unbreakable").withStyle(ChatFormatting.BLUE));
     }
 }

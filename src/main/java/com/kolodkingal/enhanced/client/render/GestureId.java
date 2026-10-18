@@ -266,7 +266,30 @@ public enum GestureId {
     /** The shield is let go of: the arms fall. */
     AGATHA_SHIELD_DROP(Group.CAST, 8, 1, 4, false),
     /** The Rune Trap (N): the hand draws a circle in the air, then both palms are driven down at the ground. */
-    AGATHA_RUNES(Group.CAST, 24, 2, 8, true)
+    AGATHA_RUNES(Group.CAST, 24, 2, 8, true),
+    // ===== heimdall (3.5) =====
+    /** Hofund's first blow: a forehand cut from high on the right down across to the left. */
+    HEIMDALL_SLASH_1(Group.CAST, 12, 1, 5, true),
+    /** The second: the backhand, from the left back across to the right. */
+    HEIMDALL_SLASH_2(Group.CAST, 12, 1, 5, true),
+    /** The third: both hands on the hilt, raised overhead and brought down hard. */
+    HEIMDALL_SLASH_3(Group.CAST, 16, 2, 6, true),
+    /** The Hofund Lunge: the blade drawn back, then the whole body behind the thrust. */
+    HEIMDALL_LUNGE(Group.CAST, 14, 1, 6, true),
+    /** The Sight opens: the head lifts and the hand passes before the eyes. */
+    HEIMDALL_SIGHT_ON(Group.CAST, 16, 2, 6, false),
+    /** The Sight closes: a slow blink of a nod. */
+    HEIMDALL_SIGHT_OFF(Group.CAST, 10, 1, 5, false),
+    /** The Bifrost gathers: both hands on the hilt before him turn the sword, as Hofund turns in the Observatory's socket. */
+    HEIMDALL_BIFROST(Group.CAST, 30, 3, 6, true),
+    /** The Gatekeeper's Call: the sword raised to the sky. */
+    HEIMDALL_CALL(Group.CAST, 22, 3, 7, true),
+    /** The Bifrost Strike: the sword raised, then brought down to point where the light falls. */
+    HEIMDALL_STRIKE(Group.CAST, 20, 2, 7, true),
+    /** The Bifrost for a friend: the open hand pushed out towards him. */
+    HEIMDALL_SEND(Group.CAST, 16, 2, 6, false),
+    /** Hofund returns: the hand thrown out, and the sword caught in it. */
+    HEIMDALL_RETURN(Group.CAST, 14, 1, 6, true)
     ;
 
     /** Gestures of one group never play together. */
