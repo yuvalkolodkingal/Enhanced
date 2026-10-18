@@ -114,7 +114,7 @@ The form ("Goddess"), her risen dead and their seconds ("3 risen, 28s"), and the
 
 ### Hela in the Hero Creator
 
-Her six rows are in the [Hero Creator](Hero-Creator) (ids `hela.necroswords`, `hela.blade_wall`, `hela.goddess`, `hela.army`, `hela.grasp`, `hela.body`; see [Heroes' Abilities](Hero-Abilities#hela-6)). They need no item; Raise the Dead is a world power. The ready-made *Hela-like* hero starts with the necroswords, the walls of blades and the army of the dead. <!-- 35-CHECK: preset id hela_like or hela after the merge -->
+Her six rows are in the [Hero Creator](Hero-Creator) (ids `hela.necroswords`, `hela.blade_wall`, `hela.goddess`, `hela.army`, `hela.grasp`, `hela.body`; see [Heroes' Abilities](Hero-Abilities#hela-6)). They need no item; Raise the Dead is a world power. The ready-made *Hela-like* hero starts with the necroswords, the walls of blades and the army of the dead.
 
 ## Numbers you can change
 

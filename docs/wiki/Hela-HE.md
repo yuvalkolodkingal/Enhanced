@@ -116,7 +116,7 @@ English: [Hela](Hela)
 
 ### הלה ביוצר הגיבורים
 
-שש השורות שלה נמצאות ב[יוצר הגיבורים](Hero-Creator-HE) (מזהים `hela.necroswords`, `hela.blade_wall`, `hela.goddess`, `hela.army`, `hela.grasp`, `hela.body`; ראו [יכולות הגיבורים](Hero-Abilities-HE#הלה-6)). הן לא צריכות שום חפץ; הקמת המתים היא כוח עולם. הגיבורה המוכנה *דמוית הלה* מתחילה עם חרבות המוות, חומות הלהבים וצבא המתים. <!-- 35-CHECK: preset id hela_like or hela after the merge -->
+שש השורות שלה נמצאות ב[יוצר הגיבורים](Hero-Creator-HE) (מזהים `hela.necroswords`, `hela.blade_wall`, `hela.goddess`, `hela.army`, `hela.grasp`, `hela.body`; ראו [יכולות הגיבורים](Hero-Abilities-HE#הלה-6)). הן לא צריכות שום חפץ; הקמת המתים היא כוח עולם. הגיבורה המוכנה *דמוית הלה* מתחילה עם חרבות המוות, חומות הלהבים וצבא המתים.
 
 ## מספרים שאפשר לשנות
 

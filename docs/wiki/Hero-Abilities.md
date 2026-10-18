@@ -292,7 +292,7 @@ Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you
 
 **The Scarlet Witch's Build Magic** is a card of its own too (3.5): **Build Magic (Scarlet Witch)** `wanda.build_magic`, on **Y**, 10 points (no slider): build, copy and change the world with magic by the Scarlet Witch's rules (no meter, and her **Instant** switch). A hero may have hers or Billy's (`billy.build_magic`), not both.
 
-Heimdall's, Odin's and Hela's Sneak variants come with their abilities (the tables above). <!-- 35-CHECK: whether the 3.5 heroes' Sneak variants get cards of their own at the merge -->
+Heimdall's, Odin's and Hela's Sneak variants are not cards of their own: they come with their abilities (the tables above).
 
 ## Related
 
