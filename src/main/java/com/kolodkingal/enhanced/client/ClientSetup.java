@@ -201,6 +201,8 @@ public final class ClientSetup {
         event.registerLayerDefinition(AgathaHatLayer.LAYER, AgathaHatLayer::createLayer);
         // ===== asgard (3.5) =====
         // ===== heimdall (3.5) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER,
+                com.kolodkingal.enhanced.client.render.HeimdallHelmLayer::createLayer);
         // ===== odin (3.5) =====
         // ===== hela (3.5) =====
         // ===== asgardians (3.5) =====
@@ -237,6 +239,8 @@ public final class ClientSetup {
                 // ===== agatha (3.3) =====
                 renderer.addLayer(new AgathaHatLayer(renderer, event.getContext().bakeLayer(AgathaHatLayer.LAYER)));
                 // ===== heimdall (3.5) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.HeimdallHelmLayer(renderer,
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER)));
                 // ===== odin (3.5) =====
                 // ===== hela (3.5) =====
                 // ===== custom hero (3.4): the layers of his look =====

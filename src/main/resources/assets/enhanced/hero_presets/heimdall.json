@@ -1,0 +1,73 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#E8B54A",
+  "glow": "#FFE7A3",
+  "look": {
+    "base": "heimdall/guardian",
+    "slim": false,
+    "eyes": {
+      "style": "glow",
+      "color": "#FFBA46",
+      "when": "powers"
+    }
+  },
+  "powers": [
+    {
+      "id": "heimdall.hofund",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "heimdall.sight",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "heimdall.bifrost",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "heimdall.ward",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "heimdall.strike",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "heimdall.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "heimdall.hofund",
+    "heimdall.sight",
+    "heimdall.bifrost",
+    "heimdall.ward",
+    "heimdall.strike"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "heimdall",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "enhanced:hofund",
+    "hero": "heimdall"
+  }
+}

@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.config.AsgardConfig;
 import com.kolodkingal.enhanced.config.BifrostConfig;
 import com.kolodkingal.enhanced.config.HeimdallConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.heimdall.HeimdallFx;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.power.BifrostData;
@@ -107,6 +108,7 @@ public final class Bifrost {
         Destination LOOK = new Look();
         Destination ASGARD = new Asgard();
         Destination CAME_FROM = new CameFrom();
+        Destination OBSERVATORY = new Observatory();
 
         /** The traveller's respawn point (bed or anchor, else the world spawn), in any dimension. */
         record Home() implements Destination {
@@ -126,6 +128,14 @@ public final class Bifrost {
 
         /** Where the traveller last entered Asgard from ({@code AsgardProgress.cameFrom}). */
         record CameFrom() implements Destination {
+        }
+
+        /**
+         * Heimdall's Observatory in Asgard ({@link CityPlan#ARRIVAL}) from anywhere, Asgard itself included: Heimdall
+         * brings back the winner of his Watch, and catches who falls into the void ({@link Source#RESCUE}). From another
+         * realm, only while Asgard is open.
+         */
+        record Observatory() implements Destination {
         }
     }
 
@@ -172,6 +182,8 @@ public final class Bifrost {
     private static final Set<UUID> MOVING = new HashSet<>();
     /** Traveller -> the centre of his circle (his feet when the Bifrost began to gather). */
     private static final Map<UUID, Vec3> ORIGINS = new HashMap<>();
+    /** One Heimdall is sending -> that Heimdall: he is not held in the light, and may refuse it (Sneak, or a step out). */
+    private static final Map<UUID, UUID> SENT_BY = new HashMap<>();
 
     // ---- the keys ----
 
@@ -274,6 +286,17 @@ public final class Bifrost {
                 yield new Target(saved.dimension(), saved.pos(), saved.yaw());
             }
             case Destination.Asgard asgard -> asgard(player);
+            case Destination.Observatory observatory -> {
+                if (!AsgardDimension.in(player) && !asgardEnabled()) {
+                    player.displayClientMessage(Component.translatable("message.enhanced.bifrost.asgard_closed"), true);
+                    yield null;
+                }
+                if (AsgardDimension.level(player.server) == null) {
+                    player.displayClientMessage(Component.translatable("message.enhanced.bifrost.no_world"), true);
+                    yield null;
+                }
+                yield new Target(AsgardDimension.KEY, CityPlan.ARRIVAL, CityPlan.ARRIVAL_YAW);
+            }
             case Destination.CameFrom back -> {
                 GlobalPos from = player.getData(ModAttachments.ASGARD).cameFrom();
                 if (from == null) {
@@ -319,20 +342,21 @@ public final class Bifrost {
      * Heimdall (or a custom hero with Heimdall's Bifrost Strike) sends the player {@code targetId} (the Send mode of
      * the Bifrost screen): {@code name} is {@code "home"}, {@code "asgard"} or the name of one of Heimdall's saved
      * places. The target must be a player within {@code heimdall.sendRange}; the cooldown is Heimdall's Bifrost
-     * Strike's.
+     * Strike's ({@code heimdall.strikeCooldown}). The light gathers round the target for {@link #SEND_CHARGE} ticks
+     * without holding him: he stays if he sneaks or steps out of its circle. Returns whether it began.
      */
-    public static void send(ServerPlayer heimdall, int targetId, String name) {
+    public static boolean send(ServerPlayer heimdall, int targetId, String name) {
         PowerData data = Powers.get(heimdall);
         if (!data.has(HeroAbility.HEIMDALL_STRIKE) || heimdall.isSpectator()) {
-            return;
+            return false;
         }
         long now = heimdall.level().getGameTime();
         if (!data.isReady(HeroAbility.HEIMDALL_STRIKE, now)) {
-            return;
+            return false;
         }
         if (!(heimdall.serverLevel().getEntity(targetId) instanceof ServerPlayer target) || target == heimdall
                 || target.distanceTo(heimdall) > sendRange()) {
-            return;
+            return false;
         }
         Target where;
         if ("home".equals(name)) {
@@ -347,14 +371,51 @@ public final class Bifrost {
                     : new Target(place.dimension(), place.pos(), place.yaw());
         }
         if (where == null || target.isSpectator() || PlaceBook.travelling(target)) {
-            return;
+            return false;
         }
         begin(target, where, Source.HEIMDALL_SEND);
-        data.startCooldown(HeroAbility.HEIMDALL_STRIKE, now, cooldownTicks());
+        SENT_BY.put(target.getUUID(), heimdall.getUUID());
+        data.startCooldown(HeroAbility.HEIMDALL_STRIKE, now, sendCooldown());
+        heimdall.displayClientMessage(Component.translatable("message.enhanced.bifrost.sent", target.getDisplayName()), true);
+        target.displayClientMessage(Component.translatable("message.enhanced.bifrost.sent_to_you", heimdall.getDisplayName()), true);
+        HeimdallFx.near(heimdall.serverLevel(), heimdall.position(), HeimdallFx.SEND, heimdall, List.of(target.position()), 0);
+        return true;
     }
 
     private static double sendRange() {
         return EnhancedConfig.SPEC.isLoaded() ? HeimdallConfig.SEND_RANGE.get() : 24;
+    }
+
+    private static int sendCooldown() {
+        return EnhancedConfig.SPEC.isLoaded() ? HeimdallConfig.STRIKE_COOLDOWN.get() : 140;
+    }
+
+    /** Whether Heimdall is sending this player now (the light gathers round him, and he may still refuse it). */
+    public static boolean beingSent(Player player) {
+        return SENT_BY.containsKey(player.getUUID());
+    }
+
+    /**
+     * One Heimdall sends refuses (Sneak) or leaves the circle while the light gathers: he stays, and both are told.
+     * Returns whether he refused.
+     */
+    private static boolean refusesSend(ServerPlayer target) {
+        Vec3 origin = ORIGINS.get(target.getUUID());
+        double radius = Math.max(1.0, groupRadius());
+        boolean out = origin != null && !inCircle(target, origin, radius);
+        if (!target.isShiftKeyDown() && !out) {
+            return false;
+        }
+        UUID by = SENT_BY.remove(target.getUUID());
+        PlaceBook.cancel(target);
+        ORIGINS.remove(target.getUUID());
+        Powers.get(target).set(Live.BIFROST, false);
+        target.displayClientMessage(Component.translatable("message.enhanced.bifrost.send_stayed"), true);
+        ServerPlayer heimdall = by == null ? null : target.server.getPlayerList().getPlayer(by);
+        if (heimdall != null) {
+            heimdall.displayClientMessage(Component.translatable("message.enhanced.bifrost.send_refused", target.getDisplayName()), true);
+        }
+        return true;
     }
 
     // ---- the saved places ----
@@ -452,9 +513,15 @@ public final class Bifrost {
         if (journey == null) {
             data.set(Live.BIFROST, false);
             ORIGINS.remove(player.getUUID());
+            SENT_BY.remove(player.getUUID());
             return;
         }
         if (PlaceBook.waiting(player, journey)) {
+            if (SENT_BY.containsKey(player.getUUID())) {
+                // Sent by Heimdall: free to stay (3.5).
+                refusesSend(player);
+                return;
+            }
             // Held in the beam: rising slightly, unable to walk away.
             player.setDeltaMovement(0, 0.02, 0);
             player.hurtMarked = true;
@@ -462,6 +529,10 @@ public final class Bifrost {
             return;
         }
         data.set(Live.BIFROST, false);
+        if (SENT_BY.containsKey(player.getUUID()) && refusesSend(player)) {
+            return;
+        }
+        SENT_BY.remove(player.getUUID());
         ServerLevel from = player.serverLevel();
         Vec3 center = ORIGINS.remove(player.getUUID());
         if (center == null || center.distanceToSqr(player.position()) > 4.0) {
@@ -689,11 +760,13 @@ public final class Bifrost {
     /** The traveller logged out or died: his circle is forgotten (PlaceBook cancels the journey itself). */
     public static void forget(Player player) {
         ORIGINS.remove(player.getUUID());
+        SENT_BY.remove(player.getUUID());
     }
 
     public static void clear() {
         ORIGINS.clear();
         MOVING.clear();
+        SENT_BY.clear();
     }
 
     private Bifrost() {

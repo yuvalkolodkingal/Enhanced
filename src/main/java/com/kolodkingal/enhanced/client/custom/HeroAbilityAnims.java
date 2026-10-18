@@ -174,11 +174,15 @@ public final class HeroAbilityAnims {
         row(HeroAbility.XAVIER_CEREBRO).main(GestureId.XAVIER_CEREBRO).stances(Stance.XAVIER_CEREBRO);
         // ===== heimdall (3.5) =====
         // (The rows of 3.5 are written empty by the skeleton: each lane gives its hero's gestures and stances.)
-        row(HeroAbility.HEIMDALL_HOFUND);
-        row(HeroAbility.HEIMDALL_SIGHT);
-        row(HeroAbility.HEIMDALL_BIFROST);
-        row(HeroAbility.HEIMDALL_WARD);
-        row(HeroAbility.HEIMDALL_STRIKE);
+        // (The blows are counted by HeimdallClient's edges from live:HEIMDALL_SLASHING, on whatever key the row is; the Lunge is
+        // R's cooldown; the Call, the Strike, the Send and Hofund's return are started by the payloads of their light.)
+        row(HeroAbility.HEIMDALL_HOFUND).main(GestureId.HEIMDALL_SLASH_1).altCd(GestureId.HEIMDALL_LUNGE)
+                .also(GestureId.HEIMDALL_SLASH_2, GestureId.HEIMDALL_SLASH_3, GestureId.HEIMDALL_RETURN);
+        row(HeroAbility.HEIMDALL_SIGHT).main(GestureId.HEIMDALL_SIGHT_ON).also(GestureId.HEIMDALL_SIGHT_OFF)
+                .stances(Stance.HEIMDALL_FARSIGHT, Stance.HEIMDALL_WATCH);
+        row(HeroAbility.HEIMDALL_BIFROST).also(GestureId.HEIMDALL_BIFROST).stances(Stance.THOR_BIFROST);
+        row(HeroAbility.HEIMDALL_WARD).also(GestureId.HEIMDALL_CALL).stances(Stance.HEIMDALL_WARD);
+        row(HeroAbility.HEIMDALL_STRIKE).also(GestureId.HEIMDALL_STRIKE, GestureId.HEIMDALL_SEND);
         row(HeroAbility.HEIMDALL_BODY);
         // ===== odin (3.5) =====
         row(HeroAbility.ODIN_GUNGNIR);

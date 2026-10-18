@@ -146,7 +146,9 @@ public final class CustomLooksTests {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");
         List<String> ids = HeroPresets.ids();
-        check(ids.size() == 22 && HeroPresets.HEROES.size() == 16 && HeroPresets.ARCHETYPES.size() == 6, "22 presets: " + ids);
+        // (3.5: one more for each hero of Asgard, as its lane lands)
+        check(ids.size() == HeroPresets.HEROES.size() + 6 && HeroPresets.HEROES.size() >= 17 && HeroPresets.ARCHETYPES.size() == 6,
+                "the heroes' presets and six archetypes: " + ids);
         CustomHeroRules.Limits sixty = CustomHeroRules.Limits.DEFAULT.withBudget(HeroPresets.MAX_POINTS);
         for (String id : ids) {
             HeroPresets.Preset preset = HeroPresets.read(id, text(HeroPresets.path(id)));

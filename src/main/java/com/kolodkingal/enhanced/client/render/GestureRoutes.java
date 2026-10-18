@@ -168,8 +168,8 @@ public final class GestureRoutes {
             // (Wall Run on or off: he shakes his arms out, as for his Super Speed.)
             case TOMMY_WALL_RUN_OFF -> power == Power.TOMMY ? GestureId.TOMMY_READY : null;
             // ===== heimdall (3.5) =====
+            case HEIMDALL_SIGHT -> power == Power.HEIMDALL ? (on ? GestureId.HEIMDALL_SIGHT_ON : GestureId.HEIMDALL_SIGHT_OFF) : null;
             // (The toggles of 3.5 stand in with the pending gesture, for their own hero only, until their lanes route them.)
-            case HEIMDALL_SIGHT -> power == Power.HEIMDALL ? PENDING_GESTURE : null;
             // ===== odin (3.5) =====
             case ODINSLEEP -> power == Power.ODIN ? PENDING_GESTURE : null;
             // ===== hela (3.5) =====
@@ -401,7 +401,17 @@ public final class GestureRoutes {
                 default -> "flag:CHAOS_SHIELD";
             };
             // ===== heimdall (3.5) =====
-            case HEIMDALL -> PENDING_ACTING; // (lane L2 of 3.5)
+            // (R's cooldown is the Lunge's (the blows' are too short to tell, see HeimdallClient): the three blows are told by
+            // live:HEIMDALL_SLASHING, which his plug-in's edges count into the combo; G is the Sight's switch (Far Sight a
+            // stance); V the Bifrost's state; B held is a stance and Sneak + B, N and Sneak + N are told by the payloads of their
+            // light, which name the caster.)
+            case HEIMDALL -> switch (ability) {
+                case 1 -> "cooldown";
+                case 2 -> "toggle:HEIMDALL_SIGHT";
+                case 3 -> "live:BIFROST";
+                case 4 -> "none: the Guardian's Ward is a stance (HEIMDALL_WARD); the Gatekeeper's Call is told by the payload of its golden flash";
+                default -> "none: the Bifrost Strike and the Bifrost for a friend are told by the payloads of their light, which name the caster";
+            };
             // ===== odin (3.5) =====
             case ODIN -> PENDING_ACTING; // (lane L3 of 3.5)
             // ===== hela (3.5) =====
@@ -451,7 +461,9 @@ public final class GestureRoutes {
             // ===== heimdall (3.5) =====
             // (Until each lane of 3.5 gives its states a gesture or a reason of their own; not the 3.0 pending marker, which
             // fails a release.)
-            case HEIMDALL_WARD, HEIMDALL_FARSIGHT, HEIMDALL_SLASHING -> "no pose yet: Heimdall's lane (L2 of 3.5) gives it a gesture or a reason";
+            case HEIMDALL_WARD -> "a stance (HEIMDALL_WARD): both hands on the pommel of Hofund planted before him";
+            case HEIMDALL_FARSIGHT -> "a stance (HEIMDALL_FARSIGHT): the hand shading his eyes while he looks far";
+            case HEIMDALL_SLASHING -> "each blow of the combo: HeimdallClient's edges count the rises of the state into HEIMDALL_SLASH_1, 2 and 3";
             // ===== odin (3.5) =====
             case ODIN_THROWN, ODIN_RAVENS -> "no pose yet: Odin's lane (L3 of 3.5) gives it a gesture or a reason";
             // ===== hela (3.5) =====

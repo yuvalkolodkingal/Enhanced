@@ -88,7 +88,14 @@ public enum Stance {
     XAVIER_CEREBRO(2.0F, 4.0F, true),
     // ===== agatha (3.3) =====
     /** Agatha's Witch's Shield: both hands held out before her, fingers spread, a little apart. */
-    AGATHA_SHIELD(1.5F, 3.0F, true)
+    AGATHA_SHIELD(1.5F, 3.0F, true),
+    // ===== heimdall (3.5) =====
+    /** Heimdall's Guardian's Ward: both hands on the pommel of the blade planted before him, the head bowed a little. */
+    HEIMDALL_WARD(2.0F, 4.0F, true),
+    /** Heimdall's Far Sight: the head forward, the other hand shading the eyes as he looks to the edge of the realms. */
+    HEIMDALL_FARSIGHT(3.0F, 4.0F, true),
+    /** Heimdall at his watch (the Sight open, standing still): both hands resting on the sword, upright. */
+    HEIMDALL_WATCH(8.0F, 6.0F, false)
     ;
 
     public static final Stance[] VALUES = values();
