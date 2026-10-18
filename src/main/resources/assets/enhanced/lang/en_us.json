@@ -1233,7 +1233,7 @@
   "screen.enhanced.vishanti.save": "Save here",
   "screen.enhanced.vishanti.save.tooltip": "Saves where you stand, facing the way you face. Saving a name again moves it.",
   "screen.enhanced.vishanti.save_base": "Save as base",
-  "screen.enhanced.vishanti.save_base.tooltip": "Saves this place as a base and raises a ward round it, %s blocks wide: no monster can enter (bases: %s of %s)",
+  "screen.enhanced.vishanti.save_base.tooltip": "Saves this place as a base and raises a ward round it that reaches %s blocks: no monster can enter (bases: %s of %s)",
   "screen.enhanced.vishanti.save_base.off": "Wards are turned off",
   "screen.enhanced.vishanti.empty": "No places saved yet: name this one and save it",
   "screen.enhanced.vishanti.cooldown": "The book gathers its strength: %s s",
