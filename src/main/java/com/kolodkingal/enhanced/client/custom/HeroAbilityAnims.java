@@ -172,13 +172,35 @@ public final class HeroAbilityAnims {
         row(HeroAbility.XAVIER_TAKE_OVER).main(GestureId.XAVIER_LINK).stances(Stance.XAVIER_TRANCE);
         row(HeroAbility.XAVIER_FREEZE_MINDS).mainCd(GestureId.XAVIER_FREEZE);
         row(HeroAbility.XAVIER_CEREBRO).main(GestureId.XAVIER_CEREBRO).stances(Stance.XAVIER_CEREBRO);
+        // ===== heimdall (3.5) =====
+        // (The rows of 3.5 are written empty by the skeleton: each lane gives its hero's gestures and stances.)
+        row(HeroAbility.HEIMDALL_HOFUND);
+        row(HeroAbility.HEIMDALL_SIGHT);
+        row(HeroAbility.HEIMDALL_BIFROST);
+        row(HeroAbility.HEIMDALL_WARD);
+        row(HeroAbility.HEIMDALL_STRIKE);
+        row(HeroAbility.HEIMDALL_BODY);
+        // ===== odin (3.5) =====
+        row(HeroAbility.ODIN_GUNGNIR);
+        row(HeroAbility.ODIN_ODINFORCE);
+        row(HeroAbility.ODIN_BANISH);
+        row(HeroAbility.ODIN_RAVENS);
+        row(HeroAbility.ODIN_COMMAND);
+        row(HeroAbility.ODIN_BODY);
+        // ===== hela (3.5) =====
+        row(HeroAbility.HELA_NECROSWORDS);
+        row(HeroAbility.HELA_BLADE_WALL);
+        row(HeroAbility.HELA_GODDESS);
+        row(HeroAbility.HELA_ARMY);
+        row(HeroAbility.HELA_GRASP);
+        row(HeroAbility.HELA_BODY);
 
         // Who owns each synced bit (the first of the kit's rows in this order; the cast marker settles a shared one).
         live(Live.SPEEDING, HeroAbility.QUICKSILVER_SPEED, HeroAbility.QUICKSILVER_TIME, HeroAbility.TOMMY_SPEED);
         live(Live.WHIRLWIND, HeroAbility.TOMMY_WHIRLWIND);
         live(Live.SONIC_BOOM, HeroAbility.TOMMY_WHIRLWIND);
         live(Live.CALLING_LIGHTNING, HeroAbility.THOR_LIGHTNING);
-        live(Live.BIFROST, HeroAbility.THOR_BIFROST);
+        live(Live.BIFROST, HeroAbility.THOR_BIFROST, HeroAbility.HEIMDALL_BIFROST);
         live(Live.HIDDEN, HeroAbility.LOKI_DUPLICATES);
         live(Live.THROWING, HeroAbility.LOKI_DAGGERS);
         live(Live.CASTING, HeroAbility.LOKI_SHAPESHIFT, HeroAbility.LOKI_VANISH, HeroAbility.PHOENIX_CONTROL, HeroAbility.SPIDER_WEB,
@@ -207,6 +229,14 @@ public final class HeroAbilityAnims {
         live(Live.CEREBRO, HeroAbility.XAVIER_CEREBRO);
         live(Live.SURFACE_WALL, HeroAbility.QUICKSILVER_WALL_RUN, HeroAbility.TOMMY_TIME);
         live(Live.SURFACE_CEILING, HeroAbility.QUICKSILVER_WALL_RUN, HeroAbility.TOMMY_TIME);
+        // 3.5
+        live(Live.HEIMDALL_WARD, HeroAbility.HEIMDALL_WARD);
+        live(Live.HEIMDALL_FARSIGHT, HeroAbility.HEIMDALL_SIGHT);
+        live(Live.HEIMDALL_SLASHING, HeroAbility.HEIMDALL_HOFUND);
+        live(Live.ODIN_THROWN, HeroAbility.ODIN_GUNGNIR);
+        live(Live.ODIN_RAVENS, HeroAbility.ODIN_RAVENS);
+        live(Live.HELA_GRASPING, HeroAbility.HELA_GRASP);
+        live(Live.HELA_SUMMONING, HeroAbility.HELA_ARMY);
         // (PINNED, LIFTED and MIND_CONTROLLED are what is done to a player, not what he does: no ability owns them.)
         toggle(Toggle.FROST_GIANT, HeroAbility.LOKI_FROST_GIANT);
         toggle(Toggle.GOD_OF_THUNDER, HeroAbility.THOR_THUNDER);
@@ -220,6 +250,10 @@ public final class HeroAbilityAnims {
         toggle(Toggle.HEAR_THOUGHTS, HeroAbility.XAVIER_THOUGHTS);
         toggle(Toggle.TOMMY_TIME, HeroAbility.TOMMY_TIME);
         toggle(Toggle.TOMMY_WALL_RUN_OFF, HeroAbility.TOMMY_TIME);
+        // 3.5
+        toggle(Toggle.HEIMDALL_SIGHT, HeroAbility.HEIMDALL_SIGHT);
+        toggle(Toggle.ODINSLEEP, HeroAbility.ODIN_COMMAND);
+        toggle(Toggle.HELA_FORM, HeroAbility.HELA_GODDESS);
         flag(GestureRoutes.Flag.MAGNETIC_SHIELD, HeroAbility.MAGNETO_SHIELD);
         flag(GestureRoutes.Flag.SHRAPNEL, HeroAbility.MAGNETO_SHRAPNEL);
         flag(GestureRoutes.Flag.BEAM, HeroAbility.WANDA_CHAOS_BEAM, HeroAbility.VISION_MIND_BEAM, HeroAbility.ULTRON_REPULSOR);

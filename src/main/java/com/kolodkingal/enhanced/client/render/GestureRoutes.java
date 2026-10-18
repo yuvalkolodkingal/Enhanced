@@ -168,12 +168,12 @@ public final class GestureRoutes {
             // (Wall Run on or off: he shakes his arms out, as for his Super Speed.)
             case TOMMY_WALL_RUN_OFF -> power == Power.TOMMY ? GestureId.TOMMY_READY : null;
             // ===== heimdall (3.5) =====
-            // (The toggles of 3.5 have no gesture until their lanes route them, for their own hero only.)
-            case HEIMDALL_SIGHT -> null;
+            // (The toggles of 3.5 stand in with the pending gesture, for their own hero only, until their lanes route them.)
+            case HEIMDALL_SIGHT -> power == Power.HEIMDALL ? PENDING_GESTURE : null;
             // ===== odin (3.5) =====
-            case ODINSLEEP -> null;
+            case ODINSLEEP -> power == Power.ODIN ? PENDING_GESTURE : null;
             // ===== hela (3.5) =====
-            case HELA_FORM -> null;
+            case HELA_FORM -> power == Power.HELA ? PENDING_GESTURE : null;
         };
     }
 
@@ -401,11 +401,11 @@ public final class GestureRoutes {
                 default -> "flag:CHAOS_SHIELD";
             };
             // ===== heimdall (3.5) =====
-            case HEIMDALL -> "none: Heimdall's keys are acted by his plug-in (lane L2 of 3.5)";
+            case HEIMDALL -> PENDING_ACTING; // (lane L2 of 3.5)
             // ===== odin (3.5) =====
-            case ODIN -> "none: Odin's keys are acted by his plug-in (lane L3 of 3.5)";
+            case ODIN -> PENDING_ACTING; // (lane L3 of 3.5)
             // ===== hela (3.5) =====
-            case HELA -> "none: Hela's keys are acted by her plug-in (lane L4 of 3.5)";
+            case HELA -> PENDING_ACTING; // (lane L4 of 3.5)
             default -> "none: no abilities";
         };
     }
@@ -449,12 +449,13 @@ public final class GestureRoutes {
                     + " cycle; the turn on and off is the stance's easing";
             case SONIC_BOOM -> "Tommy's (a hero of before 3.0): his live gesture TOMMY_BOOM acts it, and the shockwave is the server's particles";
             // ===== heimdall (3.5) =====
-            // (Pending until each lane of 3.5 gives its states a gesture or a reason of their own.)
-            case HEIMDALL_WARD, HEIMDALL_FARSIGHT, HEIMDALL_SLASHING -> "pending: Heimdall's lane (L2 of 3.5) acts it";
+            // (Until each lane of 3.5 gives its states a gesture or a reason of their own; not the 3.0 pending marker, which
+            // fails a release.)
+            case HEIMDALL_WARD, HEIMDALL_FARSIGHT, HEIMDALL_SLASHING -> "no pose yet: Heimdall's lane (L2 of 3.5) gives it a gesture or a reason";
             // ===== odin (3.5) =====
-            case ODIN_THROWN, ODIN_RAVENS -> "pending: Odin's lane (L3 of 3.5) acts it";
+            case ODIN_THROWN, ODIN_RAVENS -> "no pose yet: Odin's lane (L3 of 3.5) gives it a gesture or a reason";
             // ===== hela (3.5) =====
-            case HELA_GRASPING, HELA_SUMMONING -> "pending: Hela's lane (L4 of 3.5) acts it";
+            case HELA_GRASPING, HELA_SUMMONING -> "no pose yet: Hela's lane (L4 of 3.5) gives it a gesture or a reason";
         };
     }
 
