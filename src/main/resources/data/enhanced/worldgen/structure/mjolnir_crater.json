@@ -1,0 +1,24 @@
+{
+  "type": "enhanced:crater",
+  "biomes": "#enhanced:has_structure/mjolnir_crater",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "radius": {
+    "type": "minecraft:uniform",
+    "min_inclusive": 9,
+    "max_inclusive": 12
+  },
+  "depth": {
+    "type": "minecraft:uniform",
+    "min_inclusive": 4,
+    "max_inclusive": 6
+  },
+  "max_slope": 5,
+  "core": {
+    "Name": "enhanced:mjolnir",
+    "Properties": {
+      "facing": "north"
+    }
+  }
+}

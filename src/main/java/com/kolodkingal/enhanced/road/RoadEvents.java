@@ -17,6 +17,7 @@ public final class RoadEvents {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         RoadTrials.serverTick(event.getServer());
+        RoadMusic.tick(event.getServer());
     }
 
     @SubscribeEvent
@@ -32,6 +33,7 @@ public final class RoadEvents {
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
         RoadTrials.clear();
+        RoadMusic.clear();
     }
 
     @SubscribeEvent
@@ -45,6 +47,7 @@ public final class RoadEvents {
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             RoadTrials.onLogout(player);
+            RoadMusic.forget(player.getUUID());
         }
     }
 

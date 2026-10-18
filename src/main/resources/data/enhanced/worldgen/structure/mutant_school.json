@@ -1,0 +1,11 @@
+{
+  "type": "enhanced:template_site",
+  "biomes": "#enhanced:has_structure/mutant_school",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "template": "enhanced:mutant_school/mansion",
+  "floor": 6,
+  "max_slope": 6,
+  "processors": "enhanced:mutant_school"
+}

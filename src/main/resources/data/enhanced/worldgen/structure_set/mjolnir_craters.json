@@ -1,0 +1,18 @@
+{
+  "structures": [
+    {
+      "structure": "enhanced:mjolnir_crater",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 32,
+    "separation": 10,
+    "salt": 20110506,
+    "exclusion_zone": {
+      "other_set": "enhanced:mutant_schools",
+      "chunk_count": 6
+    }
+  }
+}

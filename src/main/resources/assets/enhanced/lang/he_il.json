@@ -1411,5 +1411,12 @@
   "screen.enhanced.road.later": "עוד לא",
   "screen.enhanced.road.leave": "לעזוב את הדרך",
   "message.enhanced.road.cannot_leave": "הדרך לא הצליחה לשחרר אתכם. נסו שוב /road leave.",
-  "road.enhanced.challenge.structure_copy.short": "ההעתקה"
+  "road.enhanced.challenge.structure_copy.short": "ההעתקה",
+  "sign.enhanced.hydra.line2": "הידרה",
+  "sign.enhanced.hydra.line3": "שטח סגור",
+  "sign.enhanced.hydra.line4": "הכניסה אסורה!",
+  "sign.enhanced.school.line1": "בית הספר",
+  "sign.enhanced.school.line2": "של קסבייר",
+  "sign.enhanced.school.line3": "למחוננים",
+  "sign.enhanced.school.line4": "צעירים"
 }
