@@ -62,8 +62,20 @@ public interface ModuleLogic {
         public final PowerModule module;
         /** The key the module is on (1-5), or 0. */
         public final int slot;
+        /**
+         * 3.4: the key acts as another option of the module than the picked one (a Sneak cell's {@code <module>#<option>});
+         * {@link #pick} then carries that option.
+         */
+        public final boolean alt;
+        /** 3.4: the key was pressed with Sneak held and its Sneak cell holds this module. */
+        public final boolean sneak;
 
         public Ctx(ServerPlayer player, PowerData data, CustomHero hero, CustomState state, CustomHero.Pick pick, PowerModule module, int slot) {
+            this(player, data, hero, state, pick, module, slot, false, false);
+        }
+
+        public Ctx(ServerPlayer player, PowerData data, CustomHero hero, CustomState state, CustomHero.Pick pick, PowerModule module, int slot,
+                   boolean alt, boolean sneak) {
             this.player = player;
             this.data = data;
             this.hero = hero;
@@ -71,6 +83,8 @@ public interface ModuleLogic {
             this.pick = pick;
             this.module = module;
             this.slot = slot;
+            this.alt = alt;
+            this.sneak = sneak;
         }
 
         public ServerLevel level() {

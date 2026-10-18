@@ -55,6 +55,15 @@ public interface HeroClient {
     }
 
     /**
+     * 3.4: the shield style for this player's data: the hero's own ({@link #shieldStyle()}) unless the hero says otherwise;
+     * the custom hero answers by the shield ability his kit has.
+     */
+    @Nullable
+    default ShieldStyle shieldStyle(PowerData data) {
+        return shieldStyle();
+    }
+
+    /**
      * The mask of the glowing eyes for this player right now, or null: a texture the size of the skin (see
      * GlowingEyesLayer).
      */

@@ -1,5 +1,9 @@
 package com.kolodkingal.enhanced.power;
 
+import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.config.CustomHeroConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
@@ -7,6 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Per-player power state. Attached to every player, saved with the player, kept on death and synced to every
@@ -64,6 +69,10 @@ public final class PowerData {
     private final long[] cooldownUntil = new long[ABILITIES + 1];
 
     private boolean dirty;
+
+    // ---- transient (3.4): a custom hero's kit, installed by Powers.get from his definition ----
+    @Nullable
+    private HeroKit kit;
 
     public static final Codec<PowerData> CODEC = RecordCodecBuilder.create(i -> i.group(
             Power.CODEC.optionalFieldOf("power", Power.NONE).forGetter(d -> d.power),
@@ -193,8 +202,91 @@ public final class PowerData {
         this.shieldStrength = 0F;
         this.shrapnelActive = false;
         this.heldEntityId = -1;
+        this.kit = null;
         java.util.Arrays.fill(cooldownUntil, 0L);
         dirty = true;
+    }
+
+    // ---- the abilities of the built-in heroes, for them and for a custom hero (3.4) ----
+
+    /** A custom hero's kit (null for every other power, and before {@code Powers.get} installs it). */
+    @Nullable
+    public HeroKit kit() {
+        return kit;
+    }
+
+    /** Installs a custom hero's kit (by {@code Powers.get}, both sides; it is never saved nor synced). */
+    public void setKit(@Nullable HeroKit kit) {
+        this.kit = kit;
+    }
+
+    /**
+     * Whether this player has the hero ability: the hero himself always ({@code power == a.hero}), a custom hero when
+     * he picked it. What a hero's code asks where it used to ask "is he this hero?" about one of his abilities.
+     */
+    public boolean has(HeroAbility a) {
+        return power == a.hero || power == Power.CUSTOM && kit != null && kit.has(a);
+    }
+
+    /** Whether any of this built-in hero's upkeep runs for the player: he is the hero, or a custom hero with one of his abilities. */
+    public boolean acts(Power hero) {
+        return power == hero || power == Power.CUSTOM && kit != null && kit.acts(hero);
+    }
+
+    /** The cooldown slot (1-5) of a hero ability: its home key for the hero, its column for a custom hero, 0 for none. */
+    public int slot(HeroAbility a) {
+        if (power == a.hero) {
+            return a.home >= 1 && a.home <= ABILITIES ? a.home : 0;
+        }
+        return power == Power.CUSTOM && kit != null ? kit.column(a) : 0;
+    }
+
+    /**
+     * Starts the cooldown of a hero ability: on the hero's home key, unchanged; on a custom hero's column, times his
+     * strength's factor ({@code HeroKit.cooldownFactor}) and {@code custom_hero.cooldownScale}. Nothing when the ability
+     * is on no key.
+     */
+    public void startCooldown(HeroAbility a, long gameTime, int ticks) {
+        int slot = slot(a);
+        if (slot == 0) {
+            return;
+        }
+        if (power == Power.CUSTOM && kit != null) {
+            double scale = EnhancedConfig.SPEC.isLoaded() ? CustomHeroConfig.COOLDOWN_SCALE.get() : 1.0;
+            ticks = Math.max(0, Math.round(ticks * kit.cooldownFactor(a) * (float) scale));
+        }
+        startCooldown(slot, gameTime, ticks);
+    }
+
+    /** Whether a hero ability's cooldown has run out (an ability on no key is always ready). */
+    public boolean isReady(HeroAbility a, long gameTime) {
+        int slot = slot(a);
+        return slot == 0 || isReady(slot, gameTime);
+    }
+
+    /** How much of a hero's body (health, armour, speed...) a body ability gives: 1 for the hero, the strength's for a custom. */
+    public float bodyScale(HeroAbility a) {
+        return power == Power.CUSTOM && kit != null ? kit.bodyFactor(a) : 1.0F;
+    }
+
+    // ---- what the custom hero's key router compares before and after a key (3.4) ----
+
+    /** The toggles, as their bits. */
+    public int toggleBits() {
+        return toggles;
+    }
+
+    /** The momentary states, as their bits. */
+    public long liveBits() {
+        return live;
+    }
+
+    /** The synced on/off flags (beam, shields, shrapnel, Quicksilver's and Vision's switches...), as bits. */
+    public int flagBits() {
+        return (magneticShield ? 1 : 0) | (beamActive ? 2 : 0) | (chaosShieldActive ? 4 : 0) | (shrapnelActive ? 8 : 0)
+                | (quicksilverTime ? 32 : 0) | (wallRun ? 64 : 0) | (walkman ? 128 : 0) | (slowMo ? 256 : 0)
+                | (visionPhased ? 512 : 0) | (dense ? 1024 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0)
+                | (heldEntityId >= 0 ? 8192 : 0) | (hammerEntityId >= 0 ? 16384 : 0) | (form.isEmpty() ? 0 : 32768);
     }
 
     public boolean magneticShield() {
@@ -326,6 +418,21 @@ public final class PowerData {
 
     public void setToggle(Toggle toggle, boolean on) {
         int updated = on ? toggles | toggle.bit() : toggles & ~toggle.bit();
+        if (updated != toggles) {
+            toggles = updated;
+            dirty = true;
+        }
+    }
+
+    /**
+     * 3.4: a custom hero becomes a new definition: every toggle off, then those its kit starts with on
+     * ({@code HeroKit.defaultToggles}), as {@link Powers#setPower} starts a built-in hero with his.
+     */
+    public void resetToggles(java.util.Set<Toggle> on) {
+        int updated = 0;
+        for (Toggle t : on) {
+            updated |= t.bit();
+        }
         if (updated != toggles) {
             toggles = updated;
             dirty = true;

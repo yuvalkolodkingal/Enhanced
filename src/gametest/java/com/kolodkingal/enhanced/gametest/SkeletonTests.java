@@ -692,7 +692,9 @@ public final class SkeletonTests {
         Registry<DamageType> registry = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         Set<String> inTag = new LinkedHashSet<>();
         registry.holders().filter(h -> h.is(ModTags.MIND_POWER)).forEach(h -> inTag.add(h.key().location().toString()));
-        check(inTag.equals(Set.of("enhanced:chaos_beam", "enhanced:telekinetic_slam", "enhanced:phoenix_burst")), "mind power: " + inTag);
+        // (3.4 adds a custom hero's mind powers, enhanced:hero_mind.)
+        check(inTag.equals(Set.of("enhanced:chaos_beam", "enhanced:telekinetic_slam", "enhanced:phoenix_burst", "enhanced:hero_mind")),
+                "mind power: " + inTag);
         helper.succeed();
     }
 
@@ -1175,8 +1177,8 @@ public final class SkeletonTests {
     // The network
 
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theProtocolIsSeven(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("7"), "3.3 bumps the protocol from 6 to 7, once: " + ModNetwork.PROTOCOL_VERSION);
+    public static void theProtocolIsEight(GameTestHelper helper) {
+        check(ModNetwork.PROTOCOL_VERSION.equals("8"), "3.4 bumps the protocol from 7 to 8, once: " + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 

@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.protect;
 
+import com.kolodkingal.enhanced.custom.Trait;
+import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -18,9 +20,8 @@ public final class Sorcery {
 
     /** Whether the player is a sorcerer now: by power, or by a book of magic held in either hand. Both sides. */
     public static boolean isSorcerer(Player player) {
-        Power power = Powers.power(player);
-        return power == Power.LOKI || power == Power.BILLY || power == Power.SCARLET_WITCH || power == Power.AGATHA
-                || DarkholdBook.holds(player) || VishantiBook.holds(player);
+        // (3.4: the heroes' list is Traits': Loki, Billy, the Scarlet Witch, Agatha, and a custom hero with their magic.)
+        return Traits.has(player, Trait.SORCERER) || DarkholdBook.holds(player) || VishantiBook.holds(player);
     }
 
     private Sorcery() {

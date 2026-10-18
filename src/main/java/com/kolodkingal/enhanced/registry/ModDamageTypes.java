@@ -64,6 +64,10 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> HERO_POWER = key("hero_power");
     /** The hits of a custom hero's continuous beam (Energy Blast's beam, the flamethrower, the water jet): no damage cooldown. */
     public static final ResourceKey<DamageType> HERO_BEAM = key("hero_beam");
+    /** 3.4: a custom hero's Magic (its bolts): in {@code enhanced:magic_damage}, so the wards and the Darkhold's rules see it. */
+    public static final ResourceKey<DamageType> HERO_MAGIC = key("hero_magic");
+    /** 3.4: a custom hero's mind powers: in {@code enhanced:mind_power}. */
+    public static final ResourceKey<DamageType> HERO_MIND = key("hero_mind");
     // ===== professor_x (3.3) =====
     /** Professor X's Mental Blast (it ignores armour), and the backlash of a stronger telepath who throws him out. */
     public static final ResourceKey<DamageType> MIND_BLAST = key("mind_blast");

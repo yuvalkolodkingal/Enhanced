@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.custom.Trait;
+import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
@@ -153,7 +155,9 @@ public final class SpiderServer implements HeroServer {
 
     /** Spider-Man in the Iron Spider look: a metal suit, which Magneto can lift and whose nanites his strip scatters. */
     public static boolean isIronSpider(Entity entity) {
-        return entity instanceof Player player && isIronLook(Powers.get(player));
+        // (3.4: a custom hero with the Iron Spider's legs is one, whatever his look.)
+        return entity instanceof Player player && (isIronLook(Powers.get(player))
+                || Powers.get(player).power() == Power.CUSTOM && Traits.has(player, Trait.IRON_LEGS));
     }
 
     private static boolean isIronLook(PowerData data) {

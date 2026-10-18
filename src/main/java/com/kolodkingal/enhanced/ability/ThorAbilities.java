@@ -123,6 +123,14 @@ public final class ThorAbilities {
 
     // ---- input ----
 
+    /**
+     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
+     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
+     */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        onKey(player, data, ability, down);
+    }
+
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
         // The lightning beam is held: letting go must always get through, even for a Thor who just became a spectator.
         if (ability == 3) {

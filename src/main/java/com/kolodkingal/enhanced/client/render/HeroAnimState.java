@@ -1,9 +1,11 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.power.Power;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.EnumSet;
 import java.util.UUID;
 
 /**
@@ -54,6 +56,28 @@ public final class HeroAnimState {
      * false for the inventory's preview of the player, which the layers must draw as vanilla does: no whirl, no tracked points.
      */
     public boolean posed;
+
+    // ---- the custom hero's animation identity (3.4; L5 fills and reads these) ----
+    /** The custom hero's definition last seen (identity), to reseed when it changes; null for a built-in hero. */
+    @Nullable
+    public Object kitStamp;
+    /** The built-in heroes whose abilities the custom hero has (empty for a built-in hero). */
+    public final EnumSet<Power> kitSources = EnumSet.noneOf(Power.class);
+    /** Whose flight profile, take-off and flight effects he flies with ({@code NONE}: the plain flight); the hero for a built-in. */
+    public Power flightAs = Power.NONE;
+    /** With {@link #flightAs} VISION: White Vision's. */
+    public boolean flightWhite;
+    /** Whose run character he walks and sprints with (a {@code AnimCatalog.RUN_CHARACTERS} name; empty: the hero's own). */
+    public String runAs = "";
+    /** The speedster run style a custom hero uses while he speeds: 0 none, 1 QS_TIME, 2 QS_SPEED, 3 TOMMY. */
+    public int speedStyle;
+    /** The idle stance at rest, or null. */
+    @Nullable
+    public Stance idle;
+    /** The custom hero's cast marker last seen ({@code CustomState.castSeq}); -1 before the first. */
+    public int lastCastSeq = -1;
+    /** The custom hero's switched-on modules last seen ({@code CustomState.onBits}). */
+    public int lastCustomOn;
 
     // ---- tick samples ----
     /** Vertical motion of the last three ticks, newest first (blocks per tick) and the horizontal speed of the last four. */

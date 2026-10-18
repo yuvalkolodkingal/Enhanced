@@ -74,6 +74,14 @@ public final class WandaAbilities {
 
     // ---- input ----
 
+    /**
+     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
+     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        onKey(player, data, ability, down);
+    }
+
     static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
         switch (ability) {
             case 1 -> {

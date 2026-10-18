@@ -291,7 +291,7 @@ public final class EnergyPowers {
             Shots.line(c.level(), Shots.hand(p), end, c.color(), c.glow());
             c.level().sendParticles(ParticleTypes.ENCHANT, end.x, end.y, end.z, 16, 0.3, 0.3, 0.3, 0.5);
             if (target != null) {
-                Shots.hurt(p, target, c.v(ModuleStats.MYSTIC_DAMAGE));
+                Shots.hurt(p, target, c.v(ModuleStats.MYSTIC_DAMAGE), ModDamageTypes.HERO_MAGIC); // 3.4: magic, for the wards
             }
             c.sound(ModSounds.CUSTOM_SPELL.get(), 0.8F, 1.5F);
             c.cooldown(ModuleStats.MYSTIC_COOLDOWN);

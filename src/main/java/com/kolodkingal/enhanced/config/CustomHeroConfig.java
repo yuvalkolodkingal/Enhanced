@@ -38,6 +38,11 @@ public final class CustomHeroConfig {
     public static ModConfigSpec.IntValue SUPPRESS_SECONDS;
     public static ModConfigSpec.BooleanValue BLOCK_CHANGES;
     public static ModConfigSpec.BooleanValue WEATHER_CHANGES_WORLD;
+    // 3.4: the built-in heroes' abilities and the looks
+    public static ModConfigSpec.BooleanValue HERO_MODULES;
+    public static ModConfigSpec.BooleanValue WORLD_POWERS;
+    public static ModConfigSpec.DoubleValue HERO_STRENGTH_SPREAD;
+    public static ModConfigSpec.BooleanValue LAYERS;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.comment("The Hero Creator: a Creative-only item with which a player becomes any hero of the mod, or makes a hero",
@@ -51,14 +56,15 @@ public final class CustomHeroConfig {
                 .define("allowChooseExisting", true);
         BUDGET = builder.comment("Power points a custom hero may spend: each power costs 1 to 3 points for each point of its strength",
                         "(flight 2, durability 1, phasing 3...; strength 1 to 10). The screen shows what is left.")
-                .defineInRange("budget", 60, 1, 600);
-        MAX_POWERS = builder.comment("How many different powers a custom hero may have.")
-                .defineInRange("maxPowers", 8, 1, 30);
+                .defineInRange("budget", 90, 1, 600);
+        MAX_POWERS = builder.comment("How many different powers a custom hero may have (an ability of a hero and its Sneak variant are one).")
+                .defineInRange("maxPowers", 10, 1, 30);
         MAX_STRENGTH = builder.comment("The highest strength of a power (the editor's slider goes from 1 to this).")
                 .defineInRange("maxStrength", 10, 1, 10);
         MAX_SKIN_BYTES = builder.comment("The biggest custom skin (a 64x64 PNG) the server accepts and sends to everyone, in bytes.")
                 .defineInRange("maxSkinBytes", 16384, 1024, 24576);
-        DISABLED_POWERS = builder.comment("Powers a custom hero may not have on this server (their ids, e.g. \"time\", \"weather\").")
+        DISABLED_POWERS = builder.comment("Powers a custom hero may not have on this server (their ids, e.g. \"time\", \"weather\",",
+                        "a hero's ability \"thor.lightning\", or all of a hero's \"thor.*\").")
                 .defineListAllowEmpty("disabledPowers", List.of(), () -> "weather", element -> element instanceof String);
         APPLY_COOLDOWN = builder.comment("Ticks a player waits between two heroes made or chosen with the creator.")
                 .defineInRange("applyCooldownTicks", 40, 0, 1200);
@@ -85,6 +91,17 @@ public final class CustomHeroConfig {
                 .define("blockChanges", false);
         WEATHER_CHANGES_WORLD = builder.comment("Weather Control's \"cycle\" changes the world's weather (false: it only says it cannot).")
                 .define("weatherChangesWorld", true);
+
+        HERO_MODULES = builder.comment("A custom hero may take the abilities of the mod's own heroes (Thor's lightning, Agatha's shield...).")
+                .define("heroModules", true);
+        WORLD_POWERS = builder.comment("A custom hero may take the heroes' world-scale abilities: the Hex, the Bifrost, Thanos's Time Stone,",
+                        "Ultron's upload and army, Professor X's Take Over a Body.")
+                .define("worldPowers", true);
+        HERO_STRENGTH_SPREAD = builder.comment("How much the strength (1-10) of a hero's ability changes it: its damage and body times",
+                        "1 + spread x (strength - 5) / 5, its cooldown divided by that (0.5: strength 1 is x0.6, 10 is x1.5; 0: no change).")
+                .defineInRange("heroStrengthSpread", 0.5, 0.0, 1.0);
+        LAYERS = builder.comment("A custom hero's look may have layers: a cape, a hat, a visor or mask, glowing eyes, an aura.")
+                .define("layers", true);
         builder.pop();
     }
 

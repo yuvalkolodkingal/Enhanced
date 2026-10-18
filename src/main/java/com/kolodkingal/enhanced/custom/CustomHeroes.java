@@ -167,7 +167,11 @@ public final class CustomHeroes {
         state.reset();
         if (data.power() != Power.CUSTOM) {
             Powers.setPower(player, Power.CUSTOM);
+            data = Powers.get(player);
+            data.resetToggles(state.kitFor(hero).defaultToggles());
         } else {
+            data = Powers.get(player);
+            data.resetToggles(state.kitFor(hero).defaultToggles());
             for (int slot = 1; slot <= PowerData.ABILITIES; slot++) {
                 data.startCooldown(slot, player.serverLevel().getGameTime(), 0);
             }
@@ -227,7 +231,7 @@ public final class CustomHeroes {
     public static MutableComponent note(CustomHeroRules.Note note) {
         Object[] args = note.args().clone();
         for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof String s && s.startsWith("power_module.")) {
+            if (args[i] instanceof String s && (s.startsWith("power_module.") || s.startsWith("hero_module.") || s.startsWith("message.enhanced."))) {
                 args[i] = Component.translatable(s);
             }
         }

@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.Trait;
+import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -29,8 +31,8 @@ public final class Worthiness {
     public static final ResourceLocation HERO_OF_THE_VILLAGE = ResourceLocation.withDefaultNamespace("adventure/hero_of_the_village");
 
     public static boolean isWorthy(Player player) {
-        Power power = Powers.power(player);
-        if (power == Power.THOR || power == Power.VISION || player.isCreative() || player.isSpectator()) {
+        // (3.4: Thor, Vision, and a custom hero with Thor's hammer: Traits.)
+        if (Traits.has(player, Trait.WORTHY) || player.isCreative() || player.isSpectator()) {
             return true;
         }
         if (EnhancedConfig.MJOLNIR_ANYONE_WORTHY.get()) {

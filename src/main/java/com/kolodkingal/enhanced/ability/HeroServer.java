@@ -29,6 +29,18 @@ public interface HeroServer {
     default void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
     }
 
+    /**
+     * 3.4: the key with its Sneak variant said explicitly: {@code alt} is the player's Sneak for the hero himself, and the
+     * binding's choice for a custom hero who has this ability (Sneak + a key, or a key that holds only the variant). The
+     * shared code calls this one; a hero that honours {@code alt} overrides it (and its 4-argument form passes
+     * {@code player.isShiftKeyDown()}), the others keep reading Sneak from the player.
+     *
+     * @param ability 1-5, the ability's key for the hero himself
+     */
+    default void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        onKey(player, data, ability, down);
+    }
+
     /** Called at the end of every server tick of the hero's player (alive). */
     default void tick(ServerPlayer player, PowerData data) {
     }

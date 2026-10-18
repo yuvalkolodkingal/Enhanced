@@ -211,12 +211,14 @@ public final class CustomHeroDataTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theBudgetAndTheCountDropTheLastPicked(GameTestHelper helper) {
-        check(CustomHeroRules.Limits.DEFAULT.budget() == 60 && CustomHeroRules.Limits.DEFAULT.maxPowers() == 8, "the defaults");
+        // (3.4 raised the defaults to 90 points and 10 powers; the rules below are those of a server with 3.3's 60 and 8.)
+        check(CustomHeroRules.Limits.DEFAULT.budget() == 90 && CustomHeroRules.Limits.DEFAULT.maxPowers() == 10, "the defaults");
+        CustomHeroRules.Limits old = new CustomHeroRules.Limits(60, 8, PowerModule.MAX_STRENGTH, 16384, Set.of());
         check(PowerModule.PHASING.cost(10) == 30 && PowerModule.DURABILITY.cost(3) == 3 && PowerModule.FLIGHT.cost(5) == 10, "cost = points x strength");
         CustomHero big = only(new CustomHero.Pick("phasing", 10, "", -1), new CustomHero.Pick("time", 10, "", -1),
                 new CustomHero.Pick("flight", 10, "", -1), new CustomHero.Pick("durability", 1, "", -1));
         check(CustomHeroRules.cost(big) == 30 + 30 + 20 + 1, "cost of a list: " + CustomHeroRules.cost(big));
-        CustomHeroRules.Result r = CustomHeroRules.sanitize(big.withKeys(List.of("phasing", "time", "flight", "", "")), CustomHeroRules.Limits.DEFAULT);
+        CustomHeroRules.Result r = CustomHeroRules.sanitize(big.withKeys(List.of("phasing", "time", "flight", "", "")), old);
         check(CustomHeroRules.cost(r.hero()) <= 60, "the budget holds: " + CustomHeroRules.cost(r.hero()));
         check(r.hero().has(PowerModule.PHASING) && r.hero().has(PowerModule.TIME) && !r.hero().has(PowerModule.FLIGHT)
                 && !r.hero().has(PowerModule.DURABILITY), "the last picked go first: " + r.hero().powers());
@@ -226,7 +228,7 @@ public final class CustomHeroDataTests {
         for (PowerModule m : List.of(PowerModule.values()).subList(0, 9)) {
             nine.add(new CustomHero.Pick(m.id, 1, "", -1));
         }
-        CustomHeroRules.Result count = CustomHeroRules.sanitize(only(nine.toArray(CustomHero.Pick[]::new)), CustomHeroRules.Limits.DEFAULT);
+        CustomHeroRules.Result count = CustomHeroRules.sanitize(only(nine.toArray(CustomHero.Pick[]::new)), old);
         check(count.hero().powers().size() == 8 && !count.hero().has(List.of(PowerModule.values()).get(8)), "at most 8 powers");
         CustomHeroRules.Limits noFire = new CustomHeroRules.Limits(60, 8, 10, 16384, Set.of("fire"));
         check(!CustomHeroRules.sanitize(only(new CustomHero.Pick("fire", 3, "", -1)), noFire).hero().has(PowerModule.FIRE), "a disabled power goes");

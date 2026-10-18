@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -41,19 +42,7 @@ public final class PowerTicker {
         DarkholdBook.everyPlayerTick(player);
         HeroServers.everyPlayerTick(player, data);
         applyPassives(player, data);
-        switch (data.power()) {
-            case MAGNETO -> MagnetoAbilities.tick(player, data);
-            case SCARLET_WITCH -> WandaAbilities.tick(player, data);
-            case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
-            case VISION -> VisionAbilities.tick(player, data);
-            case BILLY -> BillyAbilities.tick(player, data);
-            case TOMMY -> TommyAbilities.tick(player, data);
-            case LOKI -> LokiAbilities.tick(player, data);
-            case THOR -> ThorAbilities.tick(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.tick(player, data);
-            case NONE -> {
-            }
-        }
+        heroTick(data.power(), player, data);
         Telekinesis.tickHolder(player, data);
         data.setFlying(player.getAbilities().flying);
         Powers.syncIfDirty(player);
@@ -64,7 +53,8 @@ public final class PowerTicker {
         Power power = data.power();
         // Vision's dense body is too heavy to fly, and Thor needs his weapon to fly.
         // (3.3: a power Agatha has drained does not fly either.)
-        boolean canFly = power.canFly() && !(power == Power.VISION && data.dense())
+        // (3.4: so is a custom hero's with Vision's density.)
+        boolean canFly = power.canFly() && !(data.has(HeroAbility.VISION_DENSITY) && data.dense())
                 && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
                 && !(power == Power.CUSTOM && !CustomHeroes.canFly(player))
                 && !HexRunes.silences(player) && !player.hasEffect(ModEffects.DRAINED); // 3.3: the Hex Runes hold a sorcerer's powers, flight too
@@ -100,16 +90,41 @@ public final class PowerTicker {
         HeroServers.applyBody(player, data);
     }
 
+    /**
+     * The tick of hero {@code hero}'s code for this player: his own power's, or (3.4) one of a custom hero's sources
+     * (each hero's tick runs only the parts of the abilities the player has).
+     */
+    public static void heroTick(Power hero, ServerPlayer player, PowerData data) {
+        switch (hero) {
+            case MAGNETO -> MagnetoAbilities.tick(player, data);
+            case SCARLET_WITCH -> WandaAbilities.tick(player, data);
+            case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
+            case VISION -> VisionAbilities.tick(player, data);
+            case BILLY -> BillyAbilities.tick(player, data);
+            case TOMMY -> TommyAbilities.tick(player, data);
+            case LOKI -> LokiAbilities.tick(player, data);
+            case THOR -> ThorAbilities.tick(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.tick(hero, player, data);
+            case NONE -> {
+            }
+        }
+    }
+
     /** The player is about to lose this power: everything it left in the world ends. */
     public static void endPower(ServerPlayer player, PowerData data) {
-        switch (data.power()) {
+        heroEnd(data.power(), player, data);
+    }
+
+    /** Everything hero {@code hero}'s code left in the world for this player ends (his power, or 3.4 a custom hero's source). */
+    public static void heroEnd(Power hero, ServerPlayer player, PowerData data) {
+        switch (hero) {
             case MAGNETO -> MagnetoAbilities.endAll(player, data);
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);
             case TOMMY -> TommyAbilities.endAll(player, data);
             case QUICKSILVER -> QuicksilverAbilities.endAll(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.endAll(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.endAll(hero, player, data);
             default -> {
             }
         }

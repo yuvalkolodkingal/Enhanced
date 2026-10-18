@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.protect;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.beam.BeamStyle;
+import com.kolodkingal.enhanced.custom.Trait;
+import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import net.minecraft.core.registries.Registries;
@@ -48,7 +50,7 @@ public final class DarkMagic {
     public static boolean casts(@Nullable Entity entity) {
         // (3.3: every power of Agatha's is the Darkhold's magic.)
         return entity instanceof Player player
-                && (DarkholdBook.firing(player) || com.kolodkingal.enhanced.power.Powers.power(player) == com.kolodkingal.enhanced.power.Power.AGATHA);
+                && (DarkholdBook.firing(player) || Traits.has(player, Trait.DARK_MAGIC)); // 3.4: Agatha, or a custom with her magic
     }
 
     private DarkMagic() {

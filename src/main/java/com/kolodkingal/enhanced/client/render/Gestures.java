@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.render.AnimMath.Ease;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -404,12 +405,33 @@ public final class Gestures {
     }
 
     private static final Map<GestureId, Def> DEFS = new EnumMap<>(GestureId.class);
+    /** 3.4: the hero plug-in that defined each gesture (its flourishes and first-person rows go with it). */
+    private static final Map<GestureId, HeroClient> OWNERS = new EnumMap<>(GestureId.class);
+    @Nullable
+    private static HeroClient defining;
 
     /** Starts the definition of a gesture. */
     public static Builder define(GestureId id) {
         Def def = new Def(id);
         DEFS.put(id, def);
+        if (defining != null) {
+            OWNERS.put(id, defining);
+        }
         return new Builder(def);
+    }
+
+    /** 3.4: the plug-in whose {@code registerGestures} is running now (null: the shared tables). */
+    static void defining(@Nullable HeroClient hero) {
+        defining = hero;
+    }
+
+    /**
+     * 3.4: the hero plug-in that defined this gesture, or null for the gestures of the shared tables (the heroes before
+     * 3.0 and the flight). A custom hero who plays a borrowed gesture lets its owner add its flourishes.
+     */
+    @Nullable
+    public static HeroClient owner(GestureId id) {
+        return OWNERS.get(id);
     }
 
     /** The keys of a gesture, or null when it has none (it then does nothing). */

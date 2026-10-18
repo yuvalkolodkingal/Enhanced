@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.vishanti;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.config.VishantiConfig;
+import com.kolodkingal.enhanced.custom.Trait;
+import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -22,12 +24,13 @@ public final class WardStrength {
      * Agatha Harkness. The one list of the sorcerers: the Darkhold, the Hex Runes and the Witches' Road ask it too.
      */
     public static boolean isSorcerer(Power power) {
-        return power == Power.LOKI || power == Power.SCARLET_WITCH || power == Power.BILLY || power == Power.AGATHA;
+        return Traits.of(power).contains(Trait.SORCERER);
     }
 
     /** Whether this player is a sorcerer. */
     public static boolean isSorcerer(Player player) {
-        return isSorcerer(Powers.power(player));
+        // (3.4: a custom hero with a sorcerer's ability is one too.)
+        return Traits.has(player, Trait.SORCERER);
     }
 
     /**

@@ -215,6 +215,8 @@ public final class ClientSetup {
                         event.getContext().bakeLayer(XavierChair.HELMET_LAYER)));
                 // ===== agatha (3.3) =====
                 renderer.addLayer(new AgathaHatLayer(renderer, event.getContext().bakeLayer(AgathaHatLayer.LAYER)));
+                // ===== custom hero (3.4): the layers of his look =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }

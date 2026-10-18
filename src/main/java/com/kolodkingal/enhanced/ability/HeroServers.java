@@ -54,16 +54,16 @@ public final class HeroServers {
         return BY_POWER.values();
     }
 
-    /** The hero's key, if the power is a plug-in (called for the player's single power only). */
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
-        HeroServer server = of(data.power());
+    /** The key of hero {@code hero}, if it is a plug-in (the player's power, or 3.4 a custom hero's source). */
+    static void onKey(Power hero, ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        HeroServer server = of(hero);
         if (server != null) {
-            server.onKey(player, data, ability, down);
+            server.onKey(player, data, ability, down, alt);
         }
     }
 
-    static void tick(ServerPlayer player, PowerData data) {
-        HeroServer server = of(data.power());
+    static void tick(Power hero, ServerPlayer player, PowerData data) {
+        HeroServer server = of(hero);
         if (server != null) {
             server.tick(player, data);
         }
@@ -81,8 +81,8 @@ public final class HeroServers {
         }
     }
 
-    static void endAll(ServerPlayer player, PowerData data) {
-        HeroServer server = of(data.power());
+    static void endAll(Power hero, ServerPlayer player, PowerData data) {
+        HeroServer server = of(hero);
         if (server != null) {
             server.endAll(player, data);
         }

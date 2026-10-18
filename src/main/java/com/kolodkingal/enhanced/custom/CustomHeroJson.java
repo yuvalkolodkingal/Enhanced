@@ -19,12 +19,22 @@ import java.util.Locale;
  * the clipboard) and imports again, on any server. Also the form a hero is saved in with the player.
  *
  * <pre>{
- *   "format": "enhanced:custom_hero", "version": 1,
+ *   "format": "enhanced:custom_hero", "version": 2,
  *   "name": "Storm Girl", "color": "#3FA9F5", "glow": "#E0F4FF",
- *   "look": {"base": "skin", "slim": true}, "skin": "&lt;base64 of a 64x64 PNG&gt;",
- *   "powers": [{"id": "flight", "strength": 5, "option": "jet"}, {"id": "energy_blast", "strength": 8, "option": "beam", "color": "#FF4040"}],
- *   "keys": ["energy_blast", "flight", "", "", ""]
+ *   "look": {"base": "skin", "slim": true, "cape": {"style": "plain", "color": "#B01E23"},
+ *            "eyes": {"style": "glow", "color": "#9FE8FF", "row": 0, "when": "always"}},
+ *   "skin": "&lt;base64 of a 64x64 PNG&gt;",
+ *   "powers": [{"id": "flight", "strength": 5, "option": "jet"}, {"id": "energy_blast", "strength": 8, "option": "beam", "color": "#FF4040"},
+ *              {"id": "thor.lightning", "strength": 6, "option": "both", "stance": "auto"}],
+ *   "keys": ["energy_blast", "flight", "thor.lightning", "", ""],
+ *   "sneakKeys": ["", "", "", "", ""],
+ *   "moves": {"r": "billy_bolt", "sneak_v": "none"},
+ *   "anim": {"flight": "thor", "run": "thor", "speedRun": "auto", "idle": "none"}
  * }</pre>
+ *
+ * <p>Version 2 (3.4) is a superset of version 1 (3.3): every field of 1 stays where it was (so 3.3 reads the core of a 3.4
+ * file and drops what it does not know), and a version-1 text (a file, the clipboard, the string saved with a player)
+ * migrates as it is read: no Sneak bindings, every move and animation automatic, no layers, version 2.
  *
  * <p>Reading is lenient, so a file from another version or written by hand still loads as far as it can: unknown fields
  * are ignored, a missing field takes its default, a power entry that is not an object is skipped, and each thing that
@@ -61,6 +71,23 @@ public final class CustomHeroJson {
         JsonObject look = new JsonObject();
         look.addProperty("base", hero.look());
         look.addProperty("slim", hero.slim());
+        for (int i = 0; i < CustomHero.Layers.KINDS.size(); i++) {
+            CustomHero.Layer layer = hero.layers().get(i);
+            if (!layer.isNone()) {
+                JsonObject l = new JsonObject();
+                l.addProperty("style", layer.style());
+                if (layer.color() >= 0) {
+                    l.addProperty("color", hex(layer.color()));
+                }
+                if (layer.row() != 0) {
+                    l.addProperty("row", layer.row());
+                }
+                if (!CustomHero.Layer.ALWAYS.equals(layer.when())) {
+                    l.addProperty("when", layer.when());
+                }
+                look.add(CustomHero.Layers.KINDS.get(i), l);
+            }
+        }
         root.add("look", look);
         if (hero.skin().length > 0) {
             root.addProperty("skin", Base64.getEncoder().encodeToString(hero.skin()));
@@ -74,6 +101,9 @@ public final class CustomHeroJson {
             if (pick.color() >= 0) {
                 p.addProperty("color", hex(pick.color()));
             }
+            if (!CustomHero.AUTO.equals(pick.stance())) {
+                p.addProperty("stance", pick.stance());
+            }
             powers.add(p);
         }
         root.add("powers", powers);
@@ -82,6 +112,27 @@ public final class CustomHeroJson {
             keys.add(key);
         }
         root.add("keys", keys);
+        JsonArray sneakKeys = new JsonArray();
+        for (String key : hero.sneakKeys()) {
+            sneakKeys.add(key);
+        }
+        root.add("sneakKeys", sneakKeys);
+        JsonObject moves = new JsonObject();
+        for (int column = 1; column <= CustomHero.KEYS; column++) {
+            for (boolean sneak : new boolean[]{false, true}) {
+                String move = hero.move(column, sneak);
+                if (!CustomHero.AUTO.equals(move)) {
+                    moves.addProperty(moveKey(column, sneak), move);
+                }
+            }
+        }
+        root.add("moves", moves);
+        JsonObject anim = new JsonObject();
+        anim.addProperty("flight", hero.anim().flight());
+        anim.addProperty("run", hero.anim().run());
+        anim.addProperty("speedRun", hero.anim().speedRun());
+        anim.addProperty("idle", hero.anim().idle());
+        root.add("anim", anim);
         return GSON.toJson(root);
     }
 
@@ -121,9 +172,17 @@ public final class CustomHeroJson {
         int glow = color(root.get("glow"), CustomHero.EMPTY.glow());
         String look = CustomHero.LOOK_OWN;
         boolean slim = false;
+        List<CustomHero.Layer> layers = new ArrayList<>(CustomHero.Layers.NONE_ALL.list());
         if (root.get("look") instanceof JsonObject l) {
             look = string(l, "base", CustomHero.LOOK_OWN);
             slim = l.get("slim") instanceof JsonPrimitive s && s.isBoolean() && s.getAsBoolean();
+            for (int i = 0; i < CustomHero.Layers.KINDS.size(); i++) {
+                if (l.get(CustomHero.Layers.KINDS.get(i)) instanceof JsonObject layer) {
+                    layers.set(i, new CustomHero.Layer(string(layer, "style", CustomHero.NONE).toLowerCase(Locale.ROOT),
+                            layer.has("color") ? color(layer.get("color"), -1) : -1, integer(layer, "row", 0),
+                            string(layer, "when", CustomHero.Layer.ALWAYS).toLowerCase(Locale.ROOT)));
+                }
+            }
         } else if (root.get("look") instanceof JsonPrimitive l && l.isString()) {
             look = l.getAsString();
         }
@@ -142,7 +201,8 @@ public final class CustomHeroJson {
             for (JsonElement e : array) {
                 if (e instanceof JsonObject p && p.get("id") instanceof JsonPrimitive id && id.isString()) {
                     picks.add(new CustomHero.Pick(id.getAsString().toLowerCase(Locale.ROOT), strength(p),
-                            string(p, "option", "").toLowerCase(Locale.ROOT), p.has("color") ? color(p.get("color"), -1) : -1));
+                            string(p, "option", "").toLowerCase(Locale.ROOT), p.has("color") ? color(p.get("color"), -1) : -1,
+                            string(p, "stance", CustomHero.AUTO).toLowerCase(Locale.ROOT)));
                 } else if (e instanceof JsonPrimitive id && id.isString()) {
                     picks.add(new CustomHero.Pick(id.getAsString().toLowerCase(Locale.ROOT), DEFAULT_STRENGTH, "", -1));
                 } else {
@@ -153,13 +213,51 @@ public final class CustomHeroJson {
                 notes.add("message.enhanced.hero_creator.import.bad_power");
             }
         }
-        List<String> keys = new ArrayList<>();
-        if (root.get("keys") instanceof JsonArray array) {
-            for (JsonElement e : array) {
-                keys.add(e instanceof JsonPrimitive p && p.isString() ? p.getAsString().toLowerCase(Locale.ROOT) : "");
+        List<String> keys = strings(root.get("keys"));
+        // 3.4: what a version-1 text lacks takes its default (no Sneak bindings, moves and animation automatic, no
+        // layers), which is the whole migration from 1 to 2.
+        List<String> sneakKeys = strings(root.get("sneakKeys"));
+        List<String> moves = new ArrayList<>();
+        for (int column = 1; column <= CustomHero.KEYS; column++) {
+            moves.add(CustomHero.AUTO);
+        }
+        for (int column = 1; column <= CustomHero.KEYS; column++) {
+            moves.add(CustomHero.AUTO);
+        }
+        if (root.get("moves") instanceof JsonObject m) {
+            for (int column = 1; column <= CustomHero.KEYS; column++) {
+                for (boolean sneak : new boolean[]{false, true}) {
+                    String move = string(m, moveKey(column, sneak), CustomHero.AUTO).toLowerCase(Locale.ROOT);
+                    moves.set(CustomHero.moveIndex(column, sneak), move);
+                }
             }
         }
-        return new Read(new CustomHero(version, name, color, glow, look, slim, skin, picks, keys), notes);
+        CustomHero.Anim anim = CustomHero.Anim.AUTO_ALL;
+        if (root.get("anim") instanceof JsonObject a) {
+            anim = new CustomHero.Anim(string(a, "flight", CustomHero.AUTO).toLowerCase(Locale.ROOT),
+                    string(a, "run", CustomHero.AUTO).toLowerCase(Locale.ROOT), string(a, "speedRun", CustomHero.AUTO).toLowerCase(Locale.ROOT),
+                    string(a, "idle", CustomHero.AUTO).toLowerCase(Locale.ROOT));
+        }
+        int read = version < CustomHero.VERSION ? CustomHero.VERSION : version;
+        return new Read(new CustomHero(read, name, color, glow, look, slim, skin, picks, keys, sneakKeys, moves, anim,
+                CustomHero.Layers.of(layers)), notes);
+    }
+
+    /** The key of a binding in {@code moves}: {@code r}, {@code g}, ... and {@code sneak_r}, ... */
+    public static String moveKey(int column, boolean sneak) {
+        String key = String.valueOf("rgvbn".charAt(column - 1));
+        return sneak ? "sneak_" + key : key;
+    }
+
+    /** An array of strings, lower case (anything that is not a string reads as empty). */
+    private static List<String> strings(@Nullable JsonElement e) {
+        List<String> out = new ArrayList<>();
+        if (e instanceof JsonArray array) {
+            for (JsonElement x : array) {
+                out.add(x instanceof JsonPrimitive p && p.isString() ? p.getAsString().toLowerCase(Locale.ROOT) : "");
+            }
+        }
+        return out;
     }
 
     /** {@code #RRGGBB}. */

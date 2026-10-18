@@ -1,9 +1,12 @@
 package com.kolodkingal.enhanced.custom;
 
+import com.kolodkingal.enhanced.power.Power;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * The Hero Creator's catalogue: the thirty most common superpowers of comics and films (the research and its sources are
@@ -11,8 +14,11 @@ import java.util.Locale;
  * strength (1 to 10, the slider of the editor: its numbers are {@link ModuleStats}), a list of sub-options (the first is the default) and, for each option, how its key acts: not at all (a passive
  * power, which needs no key), a press, a key held down, or a switch. The order is the catalogue's order on the screen and
  * is never saved (a hero names its powers by {@link #id}), so modules may be inserted anywhere.
+ *
+ * <p>3.4: a module is one kind of {@link CatalogEntry} (the built-in heroes' abilities, {@link HeroAbility}, are the
+ * other), and says which shared state it drives ({@link #resources}) and which roles it gives ({@link #traits}).
  */
-public enum PowerModule {
+public enum PowerModule implements CatalogEntry {
     SUPER_STRENGTH("super_strength", 2, Group.BODY, "minecraft:anvil", opt("punch", Act.PRESS), opt("slam", Act.PRESS), opt("leap", Act.PRESS)),
     DURABILITY("durability", 1, Group.BODY, "minecraft:iron_chestplate", opt("armor", Act.NONE), opt("health", Act.NONE)),
     SUPER_SPEED("super_speed", 2, Group.MOVE, "minecraft:sugar", opt("run", Act.TOGGLE), opt("blitz", Act.PRESS)),
@@ -96,6 +102,7 @@ public enum PowerModule {
         return new Option(id, act);
     }
 
+    @Override
     public List<Option> options() {
         return options;
     }
@@ -117,17 +124,20 @@ public enum PowerModule {
     }
 
     /** How the key acts in the option of this id (the default option's when the id is unknown). */
+    @Override
     public Act act(String option) {
         Option found = option(option);
         return (found == null ? defaultOption() : found).act();
     }
 
     /** The power points this module costs at {@code strength} (1 to 10). */
+    @Override
     public int cost(int strength) {
         return costPerPoint * Math.max(1, strength);
     }
 
     /** The lang key of the module's name ({@code power_module.enhanced.flight}); {@code .desc} is its one-line description. */
+    @Override
     public String nameKey() {
         return "power_module.enhanced." + id;
     }
@@ -135,6 +145,98 @@ public enum PowerModule {
     /** The lang key of one of its options ({@code power_module.enhanced.flight.jet}). */
     public String optionKey(String option) {
         return nameKey() + "." + option;
+    }
+
+    // ---- CatalogEntry (3.4) ----
+
+    @Override
+    public String id() {
+        return id;
+    }
+
+    @Override
+    public String descKey() {
+        return nameKey() + ".desc";
+    }
+
+    @Override
+    @Nullable
+    public Family family() {
+        return switch (this) {
+            case TELEKINESIS -> Family.TELEKINESIS;
+            case ENERGY_BLAST -> Family.BEAM;
+            case FORCE_FIELD -> Family.SHIELD;
+            case SUPER_SPEED -> Family.SPEED;
+            case TIME -> Family.TIME;
+            case PHASING -> Family.PHASE;
+            case SHAPESHIFT -> Family.SHAPE;
+            case WALL_CRAWL -> Family.WALL;
+            case TELEPATHY, MIND_CONTROL -> Family.MIND;
+            case DURABILITY -> Family.BODY;
+            default -> null;
+        };
+    }
+
+    @Override
+    public Group group() {
+        return group;
+    }
+
+    @Override
+    public String icon() {
+        return icon;
+    }
+
+    /** A module has no Sneak variant of its own (a Sneak cell may hold another press option of it). */
+    @Override
+    @Nullable
+    public Act alt() {
+        return null;
+    }
+
+    /** The shared state the module drives in {@code option}. */
+    @Override
+    public Set<Resource> resources(String option) {
+        String o = option(option) == null ? defaultOption().id() : option;
+        return switch (this) {
+            case TELEKINESIS -> EnumSet.of(Resource.GRIP);
+            case ENERGY_BLAST -> o.equals("beam") ? EnumSet.of(Resource.CONT_BEAM) : Set.of();
+            case FIRE -> o.equals("flamethrower") ? EnumSet.of(Resource.CONT_BEAM) : Set.of();
+            case WATER -> o.equals("jet") ? EnumSet.of(Resource.CONT_BEAM) : Set.of();
+            case SUPER_SPEED -> o.equals("run") ? EnumSet.of(Resource.SPEED_RUN) : Set.of();
+            case TIME -> o.equals("slow") ? EnumSet.of(Resource.SLOW_TIME) : Set.of();
+            case PHASING -> EnumSet.of(Resource.PHASE);
+            case WALL_CRAWL -> EnumSet.of(Resource.WALL);
+            case SHAPESHIFT -> o.equals("creature") ? EnumSet.of(Resource.FORM) : EnumSet.of(Resource.SCALE);
+            default -> Set.of();
+        };
+    }
+
+    @Override
+    @Nullable
+    public Power hero() {
+        return null;
+    }
+
+    @Override
+    public boolean world() {
+        return false;
+    }
+
+    @Override
+    public boolean scales() {
+        return true;
+    }
+
+    /** The roles the module gives: Magic makes a sorcerer, Telepathy and Mind Control a telepath, Fire fire-proof. */
+    @Override
+    public Set<Trait> traits() {
+        return switch (this) {
+            case MAGIC -> EnumSet.of(Trait.SORCERER);
+            case TELEPATHY, MIND_CONTROL -> EnumSet.of(Trait.TELEPATH);
+            case FIRE -> EnumSet.of(Trait.FIRE_IMMUNE);
+            default -> Set.of();
+        };
     }
 
     /** The module of this id, or null for a power this version does not know. */

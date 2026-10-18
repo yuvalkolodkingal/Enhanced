@@ -13,10 +13,10 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 public final class ModNetwork {
     /**
      * The version of the messages and synced data: a client and a server with different versions can't play together.
-     * Bumped once for all of 3.1, once for 3.2 (the Witches' Road screen got a mode and the trials' progress), and once for
-     * all of 3.3.
+     * Bumped once for all of 3.1, once for 3.2 (the Witches' Road screen got a mode and the trials' progress), once for
+     * all of 3.3, and once for 3.4 (a custom hero's definition, format 2, and his state's cast marker).
      */
-    public static final String PROTOCOL_VERSION = "7";
+    public static final String PROTOCOL_VERSION = "8";
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // (2.2 renumbered Thor's effects and added the Chaos Shield's state to the power data; 2.3 added the order to

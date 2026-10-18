@@ -849,6 +849,25 @@ public final class HeroAnimator {
     // Public API for the branches that add moves
     // ====================================================================================================================
 
+    // ---- the editor's preview puppet (3.4: stubs of S0; L5 makes them play, L6 calls them) ----
+
+    /** How the editor's preview puppet moves: what its measured motion is said to be instead of sampled from positions. */
+    public enum PreviewMotion {
+        IDLE, WALK, RUN, SPEED_RUN, FLY_HOVER, FLY_CRUISE, FLY_SPRINT
+    }
+
+    /** Sets the motion of the puppet's state for this frame (the puppet stands still; its pose moves). */
+    public static void preview(AbstractClientPlayer puppet, PreviewMotion motion, float partialTick) {
+    }
+
+    /** Plays on the puppet exactly what a cast marker of binding ({@code column} 1-5, plain or with Sneak) plays. */
+    public static void previewCast(AbstractClientPlayer puppet, int column, boolean sneak) {
+    }
+
+    /** Raises (or lowers) on the puppet the stance of a held or switched-on power. */
+    public static void previewHold(AbstractClientPlayer puppet, com.kolodkingal.enhanced.custom.CatalogEntry entry, boolean on) {
+    }
+
     /** Plays a gesture on a hero, ignoring its usual trigger (the hook of the branches that add moves). */
     public static void play(Player player, GestureId id, float param) {
         HeroAnimState s = peek(player);

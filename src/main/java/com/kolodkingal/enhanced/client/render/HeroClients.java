@@ -68,7 +68,12 @@ public final class HeroClients {
     /** Defines the gesture keys of every hero of 3.0 (called from the static block of {@link Gestures}). */
     static void registerGestures() {
         for (HeroClient hero : BY_POWER.values()) {
-            hero.registerGestures();
+            Gestures.defining(hero);
+            try {
+                hero.registerGestures();
+            } finally {
+                Gestures.defining(null);
+            }
         }
     }
 

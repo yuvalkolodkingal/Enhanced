@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.boss.BossHooks;
+import com.kolodkingal.enhanced.custom.Trait;
+import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.power.Power;
@@ -164,8 +166,8 @@ public final class Metal {
 
     /** Vision and White Vision, the Ultron hero in every look, and the Iron Spider: heroes whose body is metal (D-M 2.3). */
     private static boolean isMetalHero(Player player) {
-        Power power = Powers.get(player).power();
-        return power == Power.VISION || power == Power.ULTRON || SpiderServer.isIronSpider(player);
+        // (3.4: Vision and Ultron, and a custom hero with a metal body: Traits.)
+        return Traits.has(player, Trait.METAL_BODY) || SpiderServer.isIronSpider(player);
     }
 
     /**

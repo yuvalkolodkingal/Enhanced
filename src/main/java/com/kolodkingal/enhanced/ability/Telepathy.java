@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.custom.Trait;
+import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.world.entity.Entity;
@@ -52,7 +55,15 @@ public final class Telepathy {
 
     /** The rank of a creature's telepathy: a player's is their hero's; no other creature has any. */
     public static Rank rank(Entity entity) {
-        return entity instanceof Player player ? rank(Powers.power(player)) : Rank.NONE;
+        if (!(entity instanceof Player player)) {
+            return Rank.NONE;
+        }
+        // 3.4: a custom hero's rank is that of the telepathy he picked (Traits); a built-in hero's is his own.
+        PowerData data = Powers.get(player);
+        if (data.power() != Power.CUSTOM) {
+            return rank(data.power());
+        }
+        return Traits.has(data, Trait.TELEPATH_STRONG) ? Rank.STRONGER : Traits.has(data, Trait.TELEPATH) ? Rank.TELEPATH : Rank.NONE;
     }
 
     /** Whether this creature is a telepath at all (any rank above {@link Rank#NONE}). */

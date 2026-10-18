@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.CustomTelekinesis;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
@@ -86,27 +87,37 @@ import java.util.UUID;
 public final class Telekinesis {
 
     public enum Mode {
-        MAGNETO(Power.MAGNETO),
-        WANDA(Power.SCARLET_WITCH),
-        BILLY(Power.BILLY),
+        MAGNETO(Power.MAGNETO, HeroAbility.MAGNETO_METAL),
+        WANDA(Power.SCARLET_WITCH, HeroAbility.WANDA_TELEKINESIS),
+        BILLY(Power.BILLY, HeroAbility.BILLY_TELEKINESIS),
         /** Jean Grey: Wanda's telekinesis, in the violet of her mind. */
-        JEAN(Power.PHOENIX, PhoenixAbilities.PSY_MAIN),
+        JEAN(Power.PHOENIX, PhoenixAbilities.PSY_MAIN, HeroAbility.PHOENIX_TELEKINESIS),
         /** 3.3: a custom hero's Telekinesis ("creatures": anything loose, projectiles in flight, no blocks), in his colour. */
-        CUSTOM(Power.CUSTOM),
+        CUSTOM(Power.CUSTOM, null),
         /** 3.3: a custom hero's Telekinesis "everything": blocks too, as Wanda's. */
-        CUSTOM_BLOCKS(Power.CUSTOM);
+        CUSTOM_BLOCKS(Power.CUSTOM, null);
 
         final Power power;
         /** The colour of the particles, the tether and the block it lifts. */
         public final int color;
+        /** 3.4: the hero ability this telekinesis is (null for a custom hero's generic Telekinesis). */
+        @Nullable
+        public final HeroAbility ability;
 
-        Mode(Power power) {
-            this(power, power.color);
+        Mode(Power power, @Nullable HeroAbility ability) {
+            this(power, power.color, ability);
         }
 
-        Mode(Power power, int color) {
+        Mode(Power power, int color, @Nullable HeroAbility ability) {
             this.power = power;
             this.color = color;
+            this.ability = ability;
+        }
+
+        /** 3.4: whether the player still has this telekinesis (the hero, or a custom hero with it). */
+        public boolean heldBy(Player holder, PowerData data) {
+            return ability != null ? data.has(ability)
+                    : data.power() == Power.CUSTOM && CustomHeroes.hero(holder).has(PowerModule.TELEKINESIS);
         }
 
         /** The colour of this holder's telekinesis: the mode's, or a custom hero's own. */
@@ -573,7 +584,7 @@ public final class Telekinesis {
         ServerLevel level = player.serverLevel();
         Entity e = level.getEntity(grip.target);
         boolean lost = e == null || !e.isAlive() || e.level() != level || player.isDeadOrDying() || player.isSpectator()
-                || data.power() != grip.mode.power
+                || !grip.mode.heldBy(player, data)
                 || player.hasEffect(ModEffects.ENTOMBED)
                 || e.distanceTo(player) > BREAK_DISTANCE
                 || (grip.mode == Mode.MAGNETO && !staysHis(e))

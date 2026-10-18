@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.HexRunes;
@@ -48,21 +49,33 @@ public final class AbilityHandler {
             return;
         }
         PowerData data = Powers.get(player);
-        switch (data.power()) {
-            case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down);
-            case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down);
-            case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down);
-            case VISION -> VisionAbilities.onKey(player, data, ability, down);
-            case BILLY -> BillyAbilities.onKey(player, data, ability, down);
-            case TOMMY -> TommyAbilities.onKey(player, data, ability, down);
-            case LOKI -> LokiAbilities.onKey(player, data, ability, down);
-            case THOR -> ThorAbilities.onKey(player, data, ability, down);
+        heroKey(data.power(), player, data, ability, down, player.isShiftKeyDown());
+        Powers.syncIfDirty(player);
+    }
+
+    /**
+     * The key entry of hero {@code hero}'s code: the player's own power (with his Sneak as {@code alt}), or (3.4) one of a
+     * custom hero's sources, with the key the ability has for that hero and the binding's Sneak variant
+     * ({@code HeroKeys.press}).
+     *
+     * @param ability 1-5, the ability's key for {@code hero}
+     */
+    public static void heroKey(Power hero, ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        switch (hero) {
+            case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down, alt);
+            case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down, alt);
+            case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down, alt);
+            case VISION -> VisionAbilities.onKey(player, data, ability, down, alt);
+            case BILLY -> BillyAbilities.onKey(player, data, ability, down, alt);
+            case TOMMY -> TommyAbilities.onKey(player, data, ability, down, alt);
+            case LOKI -> LokiAbilities.onKey(player, data, ability, down, alt);
+            case THOR -> ThorAbilities.onKey(player, data, ability, down, alt);
             // The heroes of 3.0 are plug-ins (HeroServer): their keys are theirs.
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.onKey(player, data, ability, down);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM ->
+                    HeroServers.onKey(hero, player, data, ability, down, alt);
             case NONE -> {
             }
         }
-        Powers.syncIfDirty(player);
     }
 
     private AbilityHandler() {

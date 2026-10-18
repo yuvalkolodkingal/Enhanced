@@ -17,16 +17,27 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * The server side of the custom hero (3.3), the plug-in of {@code Power.CUSTOM}: its keys go to the module the player
  * put on each, every power he picked ticks, shapes his body, and ends when he loses it. The thirty modules are
  * registered once, by group ({@link BodyPowers}, {@link MovePowers}, {@link EnergyPowers}, {@link ElementPowers},
  * {@link MindPowers}).
+ *
+ * <p>3.4, the key router: each of the five keys has a plain and a Sneak binding ({@link HeroKit}); a key going down takes
+ * the Sneak one when Sneak is held and the cell is not free, and remembers it, so the release reaches the binding that
+ * went down whatever Sneak does in between. A binding of a built-in hero's ability goes to that hero's code
+ * ({@link HeroKeys#press}); a module's goes to its {@link ModuleLogic} (in the option the binding names). When a key
+ * going down changed anything of the hero (a cooldown, a switch, a state), the cast marker ({@link CustomState#cast})
+ * tells every client which binding acted. Every tick runs the upkeep of each hero he has abilities of, then his modules.
  */
 public final class CustomHeroServer implements HeroServer {
     private static final Map<PowerModule, ModuleLogic> LOGIC = new EnumMap<>(PowerModule.class);
+    /** The binding each key went down on (by key 1-5), per player, until it comes up: a release always reaches it. */
+    private static final Map<UUID, HeroKit.Binding[]> HELD = new HashMap<>();
 
     static {
         BodyPowers.register(LOGIC);
@@ -63,11 +74,31 @@ public final class CustomHeroServer implements HeroServer {
         return Power.CUSTOM;
     }
 
+    /** The custom hero's kit (the one on his power data, or built now). */
+    static HeroKit kit(ServerPlayer player, PowerData data) {
+        HeroKit kit = data.kit();
+        return kit != null ? kit : CustomHeroes.state(player).kitFor(CustomHeroes.hero(player));
+    }
+
+    /** The key router (see the class comment). {@code column} is the key, 1-5. */
     @Override
-    public void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
-        CustomHero hero = CustomHeroes.hero(player);
-        CustomHero.Pick pick = hero.onKey(ability);
-        if (pick == null || pick.module() == null) {
+    public void onKey(ServerPlayer player, PowerData data, int column, boolean down) {
+        if (column < 1 || column > CustomHero.KEYS) {
+            return;
+        }
+        HeroKit kit = kit(player, data);
+        HeroKit.Binding binding;
+        if (down) {
+            binding = kit.binding(column, player.isShiftKeyDown());
+            HELD.computeIfAbsent(player.getUUID(), u -> new HeroKit.Binding[CustomHero.KEYS + 1])[column] = binding;
+        } else {
+            HeroKit.Binding[] held = HELD.get(player.getUUID());
+            binding = held != null && held[column] != null ? held[column] : kit.plain(column);
+            if (held != null) {
+                held[column] = null;
+            }
+        }
+        if (binding == null) {
             if (down) {
                 player.displayClientMessage(Component.translatable("message.enhanced.custom.free_key").withStyle(ChatFormatting.GRAY), true);
             }
@@ -77,15 +108,66 @@ public final class CustomHeroServer implements HeroServer {
             player.displayClientMessage(Component.translatable("message.enhanced.custom.suppressed").withStyle(ChatFormatting.GRAY), true);
             return;
         }
-        PowerModule module = pick.module();
-        LOGIC.get(module).key(new ModuleLogic.Ctx(player, data, hero, CustomHeroes.state(player), pick, module, ability), down);
+        CustomHero hero = kit.hero();
+        CustomState state = CustomHeroes.state(player);
+        Snap before = down ? new Snap(data, state) : null;
+        HeroAbility ability = binding.ability();
+        if (ability != null) {
+            HeroKeys.press(player, data, ability, down, binding.isAlt());
+        } else {
+            PowerModule module = binding.module();
+            CustomHero.Pick pick = module == null ? null : hero.pick(module);
+            if (pick == null) {
+                return;
+            }
+            boolean other = !HeroKit.MAIN.equals(binding.action());
+            if (other) {
+                pick = pick.withOption(binding.action());
+            }
+            LOGIC.get(module).key(new ModuleLogic.Ctx(player, data, hero, state, pick, module, column, other, binding.sneak()), down);
+        }
+        if (before != null && before.changed(data, state)) {
+            state.cast(column, binding.sneak());
+        }
         CustomHeroes.syncState(player);
+    }
+
+    /** What a key may change of the hero, before it acts: if any of it moved, the binding acted. */
+    private static final class Snap {
+        private final long[] cooldowns = new long[PowerData.ABILITIES + 1];
+        private final int toggles;
+        private final long live;
+        private final int flags;
+        private final int on;
+        private final boolean field;
+
+        Snap(PowerData data, CustomState state) {
+            for (int i = 1; i <= PowerData.ABILITIES; i++) {
+                cooldowns[i] = data.cooldownUntil(i);
+            }
+            toggles = data.toggleBits();
+            live = data.liveBits();
+            flags = data.flagBits();
+            on = state.onBits();
+            field = state.field();
+        }
+
+        boolean changed(PowerData data, CustomState state) {
+            for (int i = 1; i <= PowerData.ABILITIES; i++) {
+                if (cooldowns[i] != data.cooldownUntil(i)) {
+                    return true;
+                }
+            }
+            return toggles != data.toggleBits() || live != data.liveBits() || flags != data.flagBits() || on != state.onBits()
+                    || field != state.field();
+        }
     }
 
     @Override
     public void tick(ServerPlayer player, PowerData data) {
         CustomHero hero = CustomHeroes.hero(player);
         CustomState state = CustomHeroes.state(player);
+        HeroKeys.tick(player, data, kit(player, data));
         for (CustomHero.Pick pick : hero.powers()) {
             PowerModule module = pick.module();
             if (module != null) {
@@ -113,6 +195,8 @@ public final class CustomHeroServer implements HeroServer {
     public static void endPowers(ServerPlayer player, PowerData data) {
         CustomHero hero = CustomHeroes.hero(player);
         CustomState state = CustomHeroes.state(player);
+        HeroKeys.endAll(player, data, state.kitFor(hero));
+        HELD.remove(player.getUUID());
         for (CustomHero.Pick pick : hero.powers()) {
             PowerModule module = pick.module();
             if (module != null) {
@@ -152,6 +236,7 @@ public final class CustomHeroServer implements HeroServer {
         for (ModuleLogic logic : LOGIC.values()) {
             logic.forget(player);
         }
+        HELD.remove(player.getUUID());
         CustomHeroes.forget(player);
     }
 
@@ -192,6 +277,7 @@ public final class CustomHeroServer implements HeroServer {
         for (ModuleLogic logic : LOGIC.values()) {
             logic.clear();
         }
+        HELD.clear();
         CustomHeroes.clear();
     }
 }

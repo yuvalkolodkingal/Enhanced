@@ -15,7 +15,9 @@ import java.util.Objects;
 /**
  * A hero of a player's own, made with the Hero Creator (3.3): what {@code Power.CUSTOM} is for that player. It is data,
  * not code: a name, two colours, a look, the powers picked from the catalogue ({@link PowerModule}) with their strength
- * and option, and which power each of the five keys (R, G, V, B, N) uses. It is saved with the player, kept on death,
+ * and option, and which power each of the five keys (R, G, V, B, N) uses. 3.4 (format 2): the catalogue holds the
+ * built-in heroes' abilities too ({@link HeroAbility}), each key has a Sneak binding, each binding a gesture, and the
+ * hero a way to move ({@link Anim}) and the layers of his look ({@link Layers}). It is saved with the player, kept on death,
  * synced to every client that sees him (his skin with it) and written to and read from a JSON file
  * ({@link CustomHeroJson}). Nothing here is trusted: the server passes every definition it gets through
  * {@link CustomHeroRules#sanitize} first.
@@ -30,11 +32,24 @@ import java.util.Objects;
  * @param skin    a 64x64 PNG (empty when there is none)
  * @param powers  the powers picked, in the order they were picked
  * @param keys    the module id each key uses, R G V B N ({@link #KEYS} entries; empty: nothing)
+ * @param sneakKeys 3.4: what each key does with Sneak held, R G V B N: {@code <hero id>#alt} (the Sneak variant of the hero
+ *                ability on the plain key), {@code <module>#<option>} (another press option of the module on the plain key),
+ *                a picked entry's id, or empty (Sneak + the key does what the key does)
+ * @param moves   3.4: the gesture of each binding ({@link #MOVES} entries: R G V B N, then Sneak + R G V B N), each
+ *                {@link #AUTO}, {@link #NONE} or a gesture of {@code AnimCatalog.GESTURES}
+ * @param anim    3.4: how the hero moves (flight style, run, speedster run, idle)
+ * @param layers  3.4: the optional layers of his look (cape, hat, visor, eyes, aura)
  */
 public record CustomHero(int version, String name, int color, int glow, String look, boolean slim, byte[] skin, List<Pick> powers,
-                         List<String> keys) {
-    /** The format this version writes. */
-    public static final int VERSION = 1;
+                         List<String> keys, List<String> sneakKeys, List<String> moves, Anim anim, Layers layers) {
+    /** The format this version writes (3.4: 2; a 3.3 file, version 1, is read and migrated by {@link CustomHeroJson}). */
+    public static final int VERSION = 2;
+    /** The value of a move, a stance or an animation choice that leaves it to the mod. */
+    public static final String AUTO = "auto";
+    /** The value of a move or a stance that plays nothing. */
+    public static final String NONE = "none";
+    /** Bindings a hero has: five keys, plain and with Sneak. */
+    public static final int MOVES = 10;
     /** Ability keys a hero has (R, G, V, B, N). */
     public static final int KEYS = 5;
     public static final int MAX_NAME = 24;
@@ -53,34 +68,142 @@ public record CustomHero(int version, String name, int color, int glow, String l
     /**
      * One power picked from the catalogue.
      *
-     * @param id     the module's id (a {@link PowerModule#id}; an id this version does not know is dropped by the rules)
+     * @param id     the entry's id: a {@link PowerModule#id} or a {@link HeroAbility#id} (an id this version does not know
+     *               is dropped by the rules)
      * @param strength 1 to {@link PowerModule#MAX_STRENGTH}: how strong it is (its numbers, {@link ModuleStats}, and its cost)
-     * @param option the id of one of the module's options
+     * @param option the id of one of the module's options; for a hero's ability {@link HeroAbility#BOTH} or
+     *               {@link HeroAbility#MAIN} (its Sneak variant off)
      * @param color  its own colour (0xRRGGBB), or -1 for the hero's
+     * @param stance 3.4: the stance while it is held or on: {@link #AUTO}, {@link #NONE} or one of {@code AnimCatalog}'s
      */
-    public record Pick(String id, int strength, String option, int color) {
-        /** The module, or null for a power this version does not know. */
+    public record Pick(String id, int strength, String option, int color, String stance) {
+        public Pick {
+            id = id == null ? "" : id;
+            option = option == null ? "" : option;
+            stance = stance == null || stance.isEmpty() ? AUTO : stance;
+        }
+
+        /** A pick as 3.3 made it (the stance automatic). */
+        public Pick(String id, int strength, String option, int color) {
+            this(id, strength, option, color, AUTO);
+        }
+
+        /** The module, or null for a hero's ability or a power this version does not know. */
         @Nullable
         public PowerModule module() {
             return PowerModule.byId(id);
         }
 
-        /** How its key acts (none for a module this version does not know). */
+        /** The hero's ability, or null for a generic module or a power this version does not know. */
+        @Nullable
+        public HeroAbility ability() {
+            return HeroAbility.byId(id);
+        }
+
+        /** The catalogue entry (a module or a hero's ability), or null. */
+        @Nullable
+        public CatalogEntry entry() {
+            return Catalog.byId(id);
+        }
+
+        /** How its key acts (none for an entry this version does not know). */
         public PowerModule.Act act() {
-            PowerModule module = module();
-            return module == null ? PowerModule.Act.NONE : module.act(option);
+            CatalogEntry entry = entry();
+            return entry == null ? PowerModule.Act.NONE : entry.act(option);
         }
 
         public Pick withStrength(int strength) {
-            return new Pick(id, strength, option, color);
+            return new Pick(id, strength, option, color, stance);
         }
 
         public Pick withOption(String option) {
-            return new Pick(id, strength, option, color);
+            return new Pick(id, strength, option, color, stance);
         }
 
         public Pick withColor(int color) {
-            return new Pick(id, strength, option, color);
+            return new Pick(id, strength, option, color, stance);
+        }
+
+        public Pick withStance(String stance) {
+            return new Pick(id, strength, option, color, stance);
+        }
+    }
+
+    /**
+     * How the hero moves (3.4), each {@link #AUTO} by default: the flight style ({@code AnimCatalog.FLIGHT_STYLES}), the run
+     * character ({@code RUN_CHARACTERS}), the speedster's run ({@code SPEED_RUNS}) and the idle stance ({@code IDLES}).
+     */
+    public record Anim(String flight, String run, String speedRun, String idle) {
+        public static final Anim AUTO_ALL = new Anim(AUTO, AUTO, AUTO, AUTO);
+
+        public Anim {
+            flight = orAuto(flight);
+            run = orAuto(run);
+            speedRun = orAuto(speedRun);
+            idle = orAuto(idle);
+        }
+    }
+
+    /**
+     * One optional layer of the look (3.4).
+     *
+     * @param style one of {@code LookCatalog}'s styles of its kind, {@link #NONE} for none
+     * @param color its tint (0xRRGGBB), or -1 for the hero's colour
+     * @param row   the glowing eyes only: the row of the face they sit on, 0-3
+     * @param when  eyes and aura: {@code always}, {@code powers} (while a power is on) or {@code flying}
+     */
+    public record Layer(String style, int color, int row, String when) {
+        public static final String ALWAYS = "always";
+        public static final Layer NONE_LAYER = new Layer(NONE, -1, 0, ALWAYS);
+
+        public Layer {
+            style = style == null || style.isEmpty() ? NONE : style;
+            when = when == null || when.isEmpty() ? ALWAYS : when;
+        }
+
+        public boolean isNone() {
+            return NONE.equals(style);
+        }
+    }
+
+    /** The five layers of the look (3.4); each {@link Layer#NONE_LAYER} unless chosen. */
+    public record Layers(Layer cape, Layer hat, Layer visor, Layer eyes, Layer aura) {
+        public static final Layers NONE_ALL = new Layers(Layer.NONE_LAYER, Layer.NONE_LAYER, Layer.NONE_LAYER, Layer.NONE_LAYER,
+                Layer.NONE_LAYER);
+        /** The names of the five kinds, in order (the JSON's keys and {@code LookCatalog}'s lists). */
+        public static final List<String> KINDS = List.of("cape", "hat", "visor", "eyes", "aura");
+
+        public Layers {
+            cape = cape == null ? Layer.NONE_LAYER : cape;
+            hat = hat == null ? Layer.NONE_LAYER : hat;
+            visor = visor == null ? Layer.NONE_LAYER : visor;
+            eyes = eyes == null ? Layer.NONE_LAYER : eyes;
+            aura = aura == null ? Layer.NONE_LAYER : aura;
+        }
+
+        /** The layers in the order of {@link #KINDS}. */
+        public List<Layer> list() {
+            return List.of(cape, hat, visor, eyes, aura);
+        }
+
+        /** The layer of kind {@code i} (the index in {@link #KINDS}). */
+        public Layer get(int i) {
+            return list().get(i);
+        }
+
+        /** These layers with kind {@code i} replaced. */
+        public Layers with(int i, Layer layer) {
+            List<Layer> l = new ArrayList<>(list());
+            l.set(i, layer);
+            return of(l);
+        }
+
+        public static Layers of(List<Layer> five) {
+            return new Layers(five.get(0), five.get(1), five.get(2), five.get(3), five.get(4));
+        }
+
+        public boolean allNone() {
+            return list().stream().allMatch(Layer::isNone);
         }
     }
 
@@ -89,11 +212,30 @@ public record CustomHero(int version, String name, int color, int glow, String l
         look = look == null ? LOOK_OWN : look;
         skin = skin == null ? new byte[0] : skin;
         powers = powers == null ? List.of() : List.copyOf(powers);
-        List<String> k = new ArrayList<>(keys == null ? List.of() : keys);
-        while (k.size() < KEYS) {
-            k.add("");
+        keys = fill(keys, KEYS, "");
+        sneakKeys = fill(sneakKeys, KEYS, "");
+        moves = fill(moves, MOVES, AUTO);
+        anim = anim == null ? Anim.AUTO_ALL : anim;
+        layers = layers == null ? Layers.NONE_ALL : layers;
+    }
+
+    /** A hero as 3.3 made it: no Sneak bindings, every move and animation automatic, no layers. */
+    public CustomHero(int version, String name, int color, int glow, String look, boolean slim, byte[] skin, List<Pick> powers,
+                      List<String> keys) {
+        this(version, name, color, glow, look, slim, skin, powers, keys, null, null, null, null);
+    }
+
+    private static List<String> fill(@Nullable List<String> in, int size, String blank) {
+        List<String> k = new ArrayList<>(in == null ? List.of() : in);
+        k.replaceAll(s -> s == null || s.isEmpty() ? blank : s);
+        while (k.size() < size) {
+            k.add(blank);
         }
-        keys = Collections.unmodifiableList(new ArrayList<>(k.subList(0, KEYS)));
+        return Collections.unmodifiableList(new ArrayList<>(k.subList(0, size)));
+    }
+
+    private static String orAuto(@Nullable String s) {
+        return s == null || s.isEmpty() ? AUTO : s;
     }
 
     // ---- reading it ----
@@ -118,6 +260,42 @@ public record CustomHero(int version, String name, int color, int glow, String l
         return pick(module) != null;
     }
 
+    /** The pick of this entry (a module or a hero's ability), or null. */
+    @Nullable
+    public Pick pick(CatalogEntry entry) {
+        for (Pick pick : powers) {
+            if (pick.id().equals(entry.id())) {
+                return pick;
+            }
+        }
+        return null;
+    }
+
+    public boolean has(CatalogEntry entry) {
+        return pick(entry) != null;
+    }
+
+    /**
+     * What a binding names (3.4): the text of key {@code column} (1-5) plain or with Sneak, as saved ({@code thor.hammer},
+     * {@code thor.hammer#alt}, {@code energy_blast#burst}, or empty). {@code HeroKit} resolves it.
+     */
+    public String binding(int column, boolean sneak) {
+        if (column < 1 || column > KEYS) {
+            return "";
+        }
+        return (sneak ? sneakKeys : keys).get(column - 1);
+    }
+
+    /** The move (gesture) of a binding: {@link #AUTO}, {@link #NONE} or a gesture id. */
+    public String move(int column, boolean sneak) {
+        return column < 1 || column > KEYS ? AUTO : moves.get((sneak ? KEYS : 0) + column - 1);
+    }
+
+    /** The index in {@link #moves} of a binding. */
+    public static int moveIndex(int column, boolean sneak) {
+        return (sneak ? KEYS : 0) + column - 1;
+    }
+
     /** The pick on key {@code slot} (1-5), or null when the key is free (or names a power that is not picked). */
     @Nullable
     public Pick onKey(int slot) {
@@ -128,10 +306,19 @@ public record CustomHero(int version, String name, int color, int glow, String l
         return module == null ? null : pick(module);
     }
 
-    /** The key (1-5) this module is on, or 0. */
+    /**
+     * The key (1-5) this module is on, or 0: its plain key, else (3.4) the key whose Sneak cell names it (alone or with
+     * one of its options).
+     */
     public int keyOf(PowerModule module) {
         for (int i = 0; i < KEYS; i++) {
             if (module.id.equals(keys.get(i))) {
+                return i + 1;
+            }
+        }
+        for (int i = 0; i < KEYS; i++) {
+            String s = sneakKeys.get(i);
+            if (module.id.equals(s) || s.startsWith(module.id + "#")) {
                 return i + 1;
             }
         }
@@ -151,27 +338,62 @@ public record CustomHero(int version, String name, int color, int glow, String l
     // ---- changing it (each returns a new definition) ----
 
     public CustomHero withName(String name) {
-        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys);
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
     }
 
     public CustomHero withColors(int color, int glow) {
-        return new CustomHero(version, name, color & 0xFFFFFF, glow & 0xFFFFFF, look, slim, skin, powers, keys);
+        return new CustomHero(version, name, color & 0xFFFFFF, glow & 0xFFFFFF, look, slim, skin, powers, keys, sneakKeys, moves,
+                anim, layers);
     }
 
     public CustomHero withLook(String look, boolean slim) {
-        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys);
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
     }
 
     public CustomHero withSkin(byte[] skin) {
-        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys);
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
     }
 
     public CustomHero withPowers(List<Pick> powers) {
-        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys);
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
     }
 
     public CustomHero withKeys(List<String> keys) {
-        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys);
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
+    }
+
+    public CustomHero withSneakKeys(List<String> sneakKeys) {
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
+    }
+
+    public CustomHero withMoves(List<String> moves) {
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
+    }
+
+    public CustomHero withAnim(Anim anim) {
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
+    }
+
+    public CustomHero withLayers(Layers layers) {
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
+    }
+
+    public CustomHero withVersion(int version) {
+        return new CustomHero(version, name, color, glow, look, slim, skin, powers, keys, sneakKeys, moves, anim, layers);
+    }
+
+    /** This definition with binding {@code column} (1-5) plain or with Sneak set to {@code text}. */
+    public CustomHero withBinding(int column, boolean sneak, String text) {
+        List<String> k = new ArrayList<>(sneak ? sneakKeys : keys);
+        k.set(column - 1, text);
+        return sneak ? withSneakKeys(k) : withKeys(k);
+    }
+
+    /** This definition with the move of a binding set. */
+    public CustomHero withMove(int column, boolean sneak, String move) {
+        List<String> m = new ArrayList<>(moves);
+        m.set(moveIndex(column, sneak), move);
+        return withMoves(m);
     }
 
     /** This definition with {@code pick} replacing the pick of its module (or added at the end). */
@@ -189,11 +411,18 @@ public record CustomHero(int version, String name, int color, int glow, String l
 
     /** This definition without the module (and off every key it was on). */
     public CustomHero without(PowerModule module) {
+        return without((CatalogEntry) module);
+    }
+
+    /** This definition without the entry (and off every key, plain or with Sneak, it was on). */
+    public CustomHero without(CatalogEntry entry) {
         List<Pick> list = new ArrayList<>(powers);
-        list.removeIf(p -> p.id().equals(module.id));
+        list.removeIf(p -> p.id().equals(entry.id()));
         List<String> k = new ArrayList<>(keys);
-        k.replaceAll(id -> id.equals(module.id) ? "" : id);
-        return withPowers(list).withKeys(k);
+        k.replaceAll(id -> id.equals(entry.id()) ? "" : id);
+        List<String> sk = new ArrayList<>(sneakKeys);
+        sk.replaceAll(id -> id.equals(entry.id()) || id.startsWith(entry.id() + "#") ? "" : id);
+        return withPowers(list).withKeys(k).withSneakKeys(sk);
     }
 
     /** This definition with the module on key {@code slot} (1-5), taken off any other key it was on. */
@@ -211,17 +440,19 @@ public record CustomHero(int version, String name, int color, int glow, String l
     @Override
     public boolean equals(Object o) {
         return this == o || o instanceof CustomHero h && version == h.version && color == h.color && glow == h.glow && slim == h.slim
-                && name.equals(h.name) && look.equals(h.look) && Arrays.equals(skin, h.skin) && powers.equals(h.powers) && keys.equals(h.keys);
+                && name.equals(h.name) && look.equals(h.look) && Arrays.equals(skin, h.skin) && powers.equals(h.powers) && keys.equals(h.keys)
+                && sneakKeys.equals(h.sneakKeys) && moves.equals(h.moves) && anim.equals(h.anim) && layers.equals(h.layers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(version, name, color, glow, look, slim, Arrays.hashCode(skin), powers, keys);
+        return Objects.hash(version, name, color, glow, look, slim, Arrays.hashCode(skin), powers, keys, sneakKeys, moves, anim, layers);
     }
 
     @Override
     public String toString() {
-        return "CustomHero[" + name + ", " + look + ", " + powers + ", keys " + keys + ", skin " + skin.length + " bytes]";
+        return "CustomHero[" + name + ", " + look + ", " + powers + ", keys " + keys + ", sneak " + sneakKeys + ", moves " + moves
+                + ", " + anim + ", " + layers + ", skin " + skin.length + " bytes]";
     }
 
     // ---- codecs ----
@@ -242,7 +473,15 @@ public record CustomHero(int version, String name, int color, int glow, String l
             ByteBufCodecs.VAR_INT, Pick::strength,
             TEXT, Pick::option,
             ByteBufCodecs.INT, Pick::color,
+            TEXT, Pick::stance,
             Pick::new);
+
+    private static final StreamCodec<ByteBuf, Layer> LAYER_CODEC = StreamCodec.composite(
+            TEXT, Layer::style,
+            ByteBufCodecs.INT, Layer::color,
+            ByteBufCodecs.VAR_INT, Layer::row,
+            TEXT, Layer::when,
+            Layer::new);
 
     /** The wire form (the skin raw): what a client sends the server, and what the server syncs to every client. */
     public static final StreamCodec<ByteBuf, CustomHero> STREAM_CODEC = StreamCodec.of(CustomHero::write, CustomHero::read);
@@ -258,10 +497,24 @@ public record CustomHero(int version, String name, int color, int glow, String l
         List<Pick> picks = hero.powers.size() <= MAX_PICKS_WIRE ? hero.powers : hero.powers.subList(0, MAX_PICKS_WIRE);
         ByteBufCodecs.VAR_INT.encode(buf, picks.size());
         for (Pick pick : picks) {
-            PICK_CODEC.encode(buf, new Pick(clip(pick.id()), pick.strength(), clip(pick.option()), pick.color()));
+            PICK_CODEC.encode(buf, new Pick(clip(pick.id()), pick.strength(), clip(pick.option()), pick.color(), clip(pick.stance())));
         }
         for (String key : hero.keys) {
             TEXT.encode(buf, clip(key));
+        }
+        // 3.4 (protocol 8): the Sneak bindings, the moves, the animation and the layers, in this order.
+        for (String key : hero.sneakKeys) {
+            TEXT.encode(buf, clip(key));
+        }
+        for (String move : hero.moves) {
+            TEXT.encode(buf, clip(move));
+        }
+        TEXT.encode(buf, clip(hero.anim.flight()));
+        TEXT.encode(buf, clip(hero.anim.run()));
+        TEXT.encode(buf, clip(hero.anim.speedRun()));
+        TEXT.encode(buf, clip(hero.anim.idle()));
+        for (Layer layer : hero.layers.list()) {
+            LAYER_CODEC.encode(buf, new Layer(clip(layer.style()), layer.color(), layer.row(), clip(layer.when())));
         }
     }
 
@@ -285,7 +538,20 @@ public record CustomHero(int version, String name, int color, int glow, String l
         for (int i = 0; i < KEYS; i++) {
             keys.add(TEXT.decode(buf));
         }
-        return new CustomHero(version, name, color, glow, look, slim, skin, picks, keys);
+        List<String> sneakKeys = new ArrayList<>(KEYS);
+        for (int i = 0; i < KEYS; i++) {
+            sneakKeys.add(TEXT.decode(buf));
+        }
+        List<String> moves = new ArrayList<>(MOVES);
+        for (int i = 0; i < MOVES; i++) {
+            moves.add(TEXT.decode(buf));
+        }
+        Anim anim = new Anim(TEXT.decode(buf), TEXT.decode(buf), TEXT.decode(buf), TEXT.decode(buf));
+        List<Layer> layers = new ArrayList<>(5);
+        for (int i = 0; i < Layers.KINDS.size(); i++) {
+            layers.add(LAYER_CODEC.decode(buf));
+        }
+        return new CustomHero(version, name, color, glow, look, slim, skin, picks, keys, sneakKeys, moves, anim, Layers.of(layers));
     }
 
     /** A string cut to what the wire carries (in characters; a long name is cut by the rules long before this). */

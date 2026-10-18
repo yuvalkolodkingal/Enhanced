@@ -21,8 +21,21 @@ import net.minecraft.world.entity.player.Player;
 /** Helpers for reading and changing a player's power. */
 public final class Powers {
 
+    /**
+     * The player's power data. For a custom hero it carries his kit (3.4): built from his definition when it changed (the
+     * definition is compared by identity, so this is cheap), kept in his {@code CustomState} and put back on a power data
+     * the client has just received. Every reader of the power data comes through here.
+     */
     public static PowerData get(Player player) {
-        return player.getData(ModAttachments.POWER);
+        PowerData data = player.getData(ModAttachments.POWER);
+        if (data.power() == Power.CUSTOM) {
+            com.kolodkingal.enhanced.custom.CustomState state = player.getData(ModAttachments.CUSTOM_STATE);
+            com.kolodkingal.enhanced.custom.HeroKit kit = state.kitFor(player.getData(ModAttachments.CUSTOM_HERO));
+            if (data.kit() != kit) {
+                data.setKit(kit);
+            }
+        }
+        return data;
     }
 
     public static Power power(Player player) {
