@@ -685,9 +685,28 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
         return talkingWith;
     }
 
-    /** The sound of his voice (a murmur, pitched by role). */
+    /**
+     * The pitch of his own voice: each Asgardian hums his role's murmur up to 10% higher or lower, the same every time
+     * (from his UUID), so two citizens never sound alike.
+     */
+    public float voicePitch() {
+        return voicePitch(getUUID());
+    }
+
+    /** The pitch of a voice for a UUID: 0.9 to 1.1. */
+    public static float voicePitch(UUID id) {
+        long h = id.getMostSignificantBits() ^ id.getLeastSignificantBits();
+        return 0.9F + Math.floorMod(h ^ (h >>> 29), 21L) / 100.0F;
+    }
+
+    /** Hums his murmur (his role's sound at his own pitch, a breath of variation). */
+    public void murmur(float volume) {
+        playSound(voice(), volume, voicePitch() * (0.98F + getRandom().nextFloat() * 0.04F));
+    }
+
+    /** The sound of his voice (a murmur, pitched by role: low, middle, high). */
     public SoundEvent voice() {
-        return switch (role().voice()) {
+        return switch (role().voice(variant())) {
             case LOW -> ModSounds.NPC_TALK_LOW.get();
             case MID -> ModSounds.NPC_TALK_MID.get();
             case HIGH -> ModSounds.NPC_TALK_HIGH.get();
@@ -757,7 +776,7 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
     public void notifyTrade(MerchantOffer offer) {
         offer.increaseUses();
         ambientSoundTime = -getAmbientSoundInterval();
-        playSound(voice(), 1.0F, 1.0F);
+        murmur(1.0F);
         if (tradingPlayer instanceof ServerPlayer player) {
             AsgardTrades.traded(this, player, offer);
         }

@@ -91,6 +91,11 @@ public enum Role {
         return voice;
     }
 
+    /** The voice of a skin variant: the citizens who are women (odd variants) hum high. */
+    public Voice voice(int variant) {
+        return this == CITIZEN && variant % 2 == 1 ? Voice.HIGH : voice;
+    }
+
     /**
      * Whether the role fights Hela's army beside the players ({@code DefendAsgardGoal}): Heimdall, Sif, Valkyrie, the
      * Warriors Three and the Einherjar. Odin, Frigga and the citizens do not (the citizens flee).

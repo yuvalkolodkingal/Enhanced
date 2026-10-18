@@ -149,7 +149,7 @@ public final class AsgardTalk {
         PacketDistributor.sendToPlayer(player, new AsgardTalkPayload.Open(speaker.getId(), role.ordinal(), line, List.copyOf(clipped),
                 List.copyOf(options)));
         if (speaker instanceof AsgardianEntity npc) {
-            npc.playSound(npc.voice(), 0.7F, 0.95F + player.getRandom().nextFloat() * 0.1F);
+            npc.murmur(0.7F);
         }
     }
 
@@ -223,7 +223,7 @@ public final class AsgardTalk {
         Role role = speaker instanceof AsgardianEntity npc ? npc.role() : Role.CITIZEN;
         player.sendSystemMessage(said(role, lineKey, args));
         if (speaker instanceof AsgardianEntity npc) {
-            npc.playSound(npc.voice(), 0.7F, 1.0F);
+            npc.murmur(0.7F);
         }
     }
 

@@ -793,7 +793,7 @@ final class AsgardianGoals {
                 npc.getNavigation().stop();
             }
             if ((npc.tickCount + npc.getId() * 7) % 50 == 0 && npc.getRandom().nextBoolean()) {
-                npc.playSound(npc.voice(), 0.35F, 0.9F + npc.getRandom().nextFloat() * 0.2F);
+                npc.murmur(0.35F);
             }
         }
     }
