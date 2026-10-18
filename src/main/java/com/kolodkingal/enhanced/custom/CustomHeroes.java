@@ -179,6 +179,8 @@ public final class CustomHeroes {
             PowerTicker.applyPassives(player, data);
         }
         CustomHeroServer.onBecome(player, hero, state);
+        // (3.5: from one custom hero to another the power stays CUSTOM: a worn item of a hero he no longer has comes off.)
+        HeroItems.takeOffForeign(player, Powers.get(player));
         syncState(player);
         Powers.syncIfDirty(player);
         announce(player, hero);

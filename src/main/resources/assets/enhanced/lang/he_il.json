@@ -2644,5 +2644,10 @@
   "commands.enhanced.structure.repair_school.done": "בית הספר למוטנטים ב-%1$s %2$s %3$s: תוקנו %4$s בלוקים סביב הדלת הראשית; %5$s בלוקים ששחקנים שינו נשארו כמו שהם",
   "commands.enhanced.structure.repair_school.nothing": "בית הספר למוטנטים ב-%1$s %2$s %3$s: לא תוקן כלום; %5$s בלוקים ששחקנים שינו נשארו כמו שהם",
   "commands.enhanced.structure.repair_school.already": "בית הספר למוטנטים ב-%1$s %2$s %3$s כבר שלם: אין מה לתקן",
-  "message.enhanced.agatha.drain_not_sorcerer": "אפשר לשאוב רק כוח של מכשפה או של מכשף: הכוח של %s הוא לא קסם"
+  "message.enhanced.agatha.drain_not_sorcerer": "אפשר לשאוב רק כוח של מכשפה או של מכשף: הכוח של %s הוא לא קסם",
+  "screen.enhanced.hero_creator.discard": "יש שינויים שלא נשמרו: לזרוק אותם?",
+  "screen.enhanced.hero_creator.discard.yes": "לזרוק",
+  "screen.enhanced.hero_creator.discard.no": "להמשיך לערוך",
+  "message.enhanced.hero_item.taken_off": "מהראש אל התיק שלכם: %s",
+  "message.enhanced.hero_item.taken_off_dropped": "מהראש אל הרצפה ליד הרגליים (התיק שלכם מלא): %s"
 }
