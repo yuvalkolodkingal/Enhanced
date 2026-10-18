@@ -22,6 +22,8 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.BooleanValue BUILD_SHOW_OTHERS;
     public static final ModConfigSpec.BooleanValue WEB_ASSIST;
     public static final ModConfigSpec.BooleanValue WEB_ASSIST_PREVIEW;
+    public static final ModConfigSpec.ConfigValue<String> QUICKSILVER_SONG;
+    public static final ModConfigSpec.BooleanValue IGNORE_SERVER_MUSIC;
 
     static {
         BUILDER.push("animation");
@@ -79,6 +81,18 @@ public final class EnhancedClientConfig {
         WEB_ASSIST_PREVIEW = BUILDER.comment("Show where Web Assist's next web would go (a small white web) while you are in the air or sneaking.")
                 .translation("config.enhanced.web_assist_preview")
                 .define("webAssistPreview", true);
+        BUILDER.pop();
+        // ===== 3.5 music =====
+        BUILDER.push("music");
+        QUICKSILVER_SONG = BUILDER.comment("What Quicksilver's Walkman plays: theme (his own song, new in 3.5) or sweet_dreams (\"Sweet Dreams",
+                        "(Are Made of This)\", as before 3.5). A song of your own in config/enhanced/music, or the world's, plays instead.")
+                .translation("config.enhanced.quicksilver_song")
+                // (A list that may be asked whether it holds null, which List.of may not: a missing value is checked that way.)
+                .defineInList("quicksilverSong", "theme", java.util.Arrays.asList("theme", "sweet_dreams"));
+        IGNORE_SERVER_MUSIC = BUILDER.comment("Don't download or play the songs a server or world puts in its music folder",
+                        "(<world>/serverconfig/enhanced/music); hear the built-in music, or your own, instead.")
+                .translation("config.enhanced.ignore_server_music")
+                .define("ignoreServerMusic", false);
         BUILDER.pop();
     }
 
@@ -153,6 +167,16 @@ public final class EnhancedClientConfig {
     /** Whether the next anchor of Web Assist is shown (true until the config has loaded). */
     public static boolean webAssistPreview() {
         return !SPEC.isLoaded() || WEB_ASSIST_PREVIEW.get();
+    }
+
+    /** Whether Quicksilver's Walkman plays "Sweet Dreams" rather than his own song (false until the config has loaded). */
+    public static boolean sweetDreams() {
+        return SPEC.isLoaded() && "sweet_dreams".equals(QUICKSILVER_SONG.get());
+    }
+
+    /** Whether the world's music is ignored (false until the config has loaded). */
+    public static boolean ignoreServerMusic() {
+        return SPEC.isLoaded() && IGNORE_SERVER_MUSIC.get();
     }
 
     private EnhancedClientConfig() {

@@ -85,18 +85,18 @@ public final class ClientEvents {
         spawnFrostParticles(mc);
         Afterimages.tick(mc.level);
         Shapeshifts.tick(mc.level);
-        QuicksilverMusic.tick(mc);
+        SpeedsterMusic.tick(mc);
         PowerLoopSounds.tick(mc);
         SlowMotionEffect.tick(mc);
         TheNoise.tick(mc);
         HeroClients.tick(mc);
     }
 
-    /** The game's own music waits while Quicksilver's song plays, and for its usual pause after the song ends. */
+    /** The game's own music waits while a speedster's Walkman song plays, and for its usual pause after the song ends. */
     @SubscribeEvent
     public static void onSelectMusic(SelectMusicEvent event) {
         Music chosen = event.getMusic();
-        if (chosen != null && QuicksilverMusic.holdsGameMusic(chosen)) {
+        if (chosen != null && SpeedsterMusic.holdsGameMusic(chosen)) {
             event.setMusic(null);
         }
     }
@@ -104,7 +104,7 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         java.util.Arrays.fill(SENT_DOWN, false);
-        QuicksilverMusic.stop();
+        SpeedsterMusic.stop();
         PowerLoopSounds.stopAll();
         Afterimages.clear();
         HeroAnimator.clear();

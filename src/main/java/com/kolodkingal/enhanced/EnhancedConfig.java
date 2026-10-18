@@ -523,6 +523,8 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.SpeedConfig.define(BUILDER);
         // 3.3.1: the Mutant Cure (section [mutant_cure]).
         com.kolodkingal.enhanced.config.CureConfig.define(BUILDER);
+        // 3.5: the world's own music (section [music]).
+        com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

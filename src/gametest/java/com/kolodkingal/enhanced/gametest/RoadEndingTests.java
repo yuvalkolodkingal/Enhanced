@@ -94,6 +94,8 @@ public final class RoadEndingTests {
     private static Runnable asked(ServerPlayer player) {
         return () -> {
             check(RoadEnding.stage(player) == RoadEnding.Stage.ASKING, "the Road has asked " + player.getGameProfile().getName() + ": " + RoadEnding.stage(player));
+            check(com.kolodkingal.enhanced.road.RoadMusic.stageOf(player).equals(com.kolodkingal.enhanced.road.RoadMusic.CHOICE),
+                    "3.5: the choice has its own version of the Road's song");
             player.hasChangedDimension();
         };
     }
@@ -225,6 +227,7 @@ public final class RoadEndingTests {
                     check(trial.challenge().isEnding() && trial.challenge() == RoadChallenges.ending() && trial.challenge() instanceof EndingHall, "he is in the hall");
                     check(RoadEnding.stage(player) == RoadEnding.Stage.ARRIVING && RoadTestSupport.road(helper).getBlockState(door[0]).is(ModBlocks.WITCHES_ROAD_DOOR.get()),
                             "the light gathers; the door lies in the floor");
+                    check(com.kolodkingal.enhanced.road.RoadMusic.stageOf(player).equals(EndingHall.ID), "the hall's music while the light gathers");
                     check(trial.layout().gate() == null && trial.layout().finish() == null, "it is no trial: no gate, no finish");
                     check(player.position().distanceTo(trial.layout().start()) < 0.01, "he stands at the start of the hall");
                     check(genes(player) == 3 && Powers.power(player) == Power.NONE, "nothing is spent before he chooses");

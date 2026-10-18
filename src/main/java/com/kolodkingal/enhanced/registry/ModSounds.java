@@ -11,8 +11,9 @@ public final class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, Enhanced.MODID);
 
     /**
-     * What Quicksilver's Walkman plays during Quicksilver Time: "Sweet Dreams (Are Made of This)". A player can play
-     * another song instead from config/enhanced/music (see CustomMusic).
+     * "Sweet Dreams (Are Made of This)", which Quicksilver's Walkman played during Quicksilver Time until 3.5; since 3.5 his
+     * own song ({@link #MUSIC_QUICKSILVER}) is the default, and this one the client option quicksilverSong = sweet_dreams. A
+     * player (config/enhanced/music) or the world (its music folder) can play another song instead (see SpeedsterMusic).
      */
     public static final DeferredHolder<SoundEvent, SoundEvent> QUICKSILVER_THEME = register("quicksilver_theme");
 
@@ -202,6 +203,10 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_COPY = register("music.road.copy");
     public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_BOAT = register("music.road.boat");
     public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_ENDING = register("music.road.ending");
+    // ===== 3.5 music: the Road's version for the choice, and the speedsters' own Walkman songs (original synth-pop) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_CHOICE = register("music.road.choice");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_QUICKSILVER = register("music.quicksilver");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_SPEED = register("music.speed");
     // ===== cyclops (3.3) =====
     public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_OPTIC_START = register("cyclops_optic_start");
     public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_OPTIC_LOOP = register("cyclops_optic_loop");

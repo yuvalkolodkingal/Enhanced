@@ -17,6 +17,12 @@ public final class ModNetwork {
      * all of 3.3, and once for 3.4 (a custom hero's definition, format 2, and his state's cast marker).
      */
     public static final String PROTOCOL_VERSION = "8";
+    /**
+     * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
+     * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
+     * sends them to a client that has the channel. Bumped only when these three messages change.
+     */
+    public static final String MUSIC_VERSION = "1";
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // (2.2 renumbered Thor's effects and added the Chaos Shield's state to the power data; 2.3 added the order to
@@ -68,6 +74,11 @@ public final class ModNetwork {
         registrar.playToClient(CerebroPayload.TYPE, CerebroPayload.STREAM_CODEC, CerebroPayload::handle);
         // 3.3: Agatha's effects (the Rune Trap, the Power Drain, her shield breaking).
         registrar.playToClient(AgathaFxPayload.TYPE, AgathaFxPayload.STREAM_CODEC, AgathaFxPayload::handle);
+        // 3.5: the world's own music (its manifest, a client's request for a song, and the song in pieces), optional.
+        PayloadRegistrar music = event.registrar(MUSIC_VERSION).optional();
+        music.playToClient(MusicManifestPayload.TYPE, MusicManifestPayload.STREAM_CODEC, MusicManifestPayload::handle);
+        music.playToServer(MusicRequestPayload.TYPE, MusicRequestPayload.STREAM_CODEC, MusicRequestPayload::handle);
+        music.playToClient(MusicChunkPayload.TYPE, MusicChunkPayload.STREAM_CODEC, MusicChunkPayload::handle);
     }
 
     private ModNetwork() {
