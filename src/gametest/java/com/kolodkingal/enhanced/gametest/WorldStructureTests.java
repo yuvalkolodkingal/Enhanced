@@ -71,7 +71,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 public final class WorldStructureTests {
     static final String BATCH = "world";
     static final ResourceLocation WHEELCHAIR = ResourceLocation.fromNamespaceAndPath(Enhanced.MODID, "professor_x_wheelchair");
-    static final ResourceLocation GLASSES = ResourceLocation.fromNamespaceAndPath(Enhanced.MODID, "cyclops_glasses");
+    static final ResourceLocation GLASSES = ResourceLocation.fromNamespaceAndPath(Enhanced.MODID, "ruby_quartz_glasses");
 
     private static ResourceKey<LootTable> loot(String path) {
         return ResourceKey.create(Registries.LOOT_TABLE, Enhanced.id("chests/" + path));
