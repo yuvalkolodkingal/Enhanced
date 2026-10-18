@@ -239,11 +239,13 @@ public final class OdinFx {
             if (!data.toggle(Toggle.ODINSLEEP) || !data.has(HeroAbility.ODIN_COMMAND) || p.isInvisible()) {
                 continue;
             }
+            // (Round the local player in first person, only the lower half: motes at the camera would fill the view.)
+            boolean own = p == Minecraft.getInstance().player && Minecraft.getInstance().options.getCameraType().isFirstPerson();
             float t = p.tickCount % 2000;
             float radius = OdinHeroMath.cocoonRadius(t);
             for (int i = 0; i < 6; i++) {
                 double a = r.nextDouble() * Math.PI * 2.0;
-                double h = r.nextDouble() * 2.0 - 1.0;
+                double h = own ? -r.nextDouble() : r.nextDouble() * 2.0 - 1.0;
                 double ring = Math.sqrt(Math.max(0.0, 1.0 - h * h)) * radius;
                 level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? Powers.glow(p) : Powers.color(p), 0.55F),
                         p.getX() + Math.cos(a) * ring, p.getY() + 0.75 + h * radius * 1.1, p.getZ() + Math.sin(a) * ring,
