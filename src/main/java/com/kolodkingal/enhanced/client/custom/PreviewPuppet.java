@@ -43,6 +43,8 @@ public final class PreviewPuppet extends RemotePlayer {
     private static boolean broken;
 
     private CustomHero hero = CustomHero.EMPTY;
+    @Nullable
+    private CustomHero worn;
     private HeroAnimator.PreviewMotion motion = HeroAnimator.PreviewMotion.IDLE;
 
     private PreviewPuppet(ClientLevel level, GameProfile profile) {
@@ -86,6 +88,10 @@ public final class PreviewPuppet extends RemotePlayer {
 
     /** Wears the draft (passed through the rules, so its kit is what the server would make of it). */
     public void wear(CustomHero draft, CustomHeroRules.Limits limits) {
+        if (draft == worn) {
+            return;
+        }
+        worn = draft;
         CustomHero ruled = CustomHeroRules.sanitize(draft, limits).hero();
         if (!ruled.equals(hero)) {
             hero = ruled;

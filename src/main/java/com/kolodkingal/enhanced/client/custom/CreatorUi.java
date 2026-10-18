@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.client.custom;
 
+import com.kolodkingal.enhanced.custom.CatalogEntry;
 import com.kolodkingal.enhanced.custom.CustomHero;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.HeroLooks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -12,6 +15,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -271,6 +275,34 @@ public final class CreatorUi {
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.blit(t, x, y, w * s, h * s, u, v, w, h, 64, 64);
         com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+    }
+
+    // ---- 3.4: the catalogue's words ----
+
+    /** The name of a catalogue entry (a hero's ability falls back to its id's last word until its words exist). */
+    public static MutableComponent name(CatalogEntry entry) {
+        return Component.translatableWithFallback(entry.nameKey(), pretty(entry.id()));
+    }
+
+    /** The name of a hero ability's Sneak variant. */
+    public static MutableComponent altName(HeroAbility a) {
+        return Component.translatableWithFallback(a.altKey(), pretty(a.id()) + " (Sneak)");
+    }
+
+    /** The one-line description of an entry. */
+    public static MutableComponent desc(CatalogEntry entry) {
+        return Component.translatableWithFallback(entry.descKey(), "");
+    }
+
+    /** {@code thor.lightning} as words: "Lightning". */
+    public static String pretty(String id) {
+        String last = id.substring(id.lastIndexOf('.') + 1).replace('_', ' ');
+        return last.isEmpty() ? id : Character.toUpperCase(last.charAt(0)) + last.substring(1);
+    }
+
+    /** The badge of how a key acts: ▶ press, ✋ hold, ⏻ on/off, ★ always. */
+    public static MutableComponent badge(PowerModule.Act act) {
+        return Component.translatable("screen.enhanced.hero_creator.badge." + act.name().toLowerCase(java.util.Locale.ROOT));
     }
 
     /** The item of a module's icon. */

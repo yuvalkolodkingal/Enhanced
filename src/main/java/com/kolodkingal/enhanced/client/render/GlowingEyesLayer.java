@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.client.SuitSkins;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -53,7 +54,9 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
         return switch (data.power()) {
             case SCARLET_WITCH -> data.beamActive() || data.chaosShieldActive() || data.heldEntityId() != -1 || building(player)
                     ? (SuitSkins.suitFor(player) != null ? WANDA_SUIT : WANDA) : null;
-            case THOR -> data.toggle(Toggle.GOD_OF_THUNDER) || data.is(Live.CALLING_LIGHTNING)
+            // (3.4) By his abilities; a custom hero with them glows on the generic eye mask of CustomLooksLayer.
+            case THOR -> data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER)
+                    || data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)
                     ? ("ragnarok".equals(Variants.current(data).id()) ? THOR_RAGNAROK : THOR) : null;
             // The heroes of 3.0 say for themselves, a mask for each look.
             default -> {

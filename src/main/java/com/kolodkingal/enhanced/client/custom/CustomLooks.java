@@ -111,11 +111,17 @@ public final class CustomLooks {
 
     // ---- the cape ----
 
+    /** Whether he wears Vision's disguise (his ability): then he shows his own skin and none of his look's layers. */
+    public static boolean disguised(Player player) {
+        PowerData data = Powers.get(player);
+        return data.has(HeroAbility.VISION_DISGUISE) && data.disguise();
+    }
+
     /** The texture of the hero's cape, or null when he has none. */
     @Nullable
     public static ResourceLocation cape(Player player) {
         CustomHero.Layer cape = of(player).cape();
-        if (cape.isNone()) {
+        if (cape.isNone() || disguised(player)) {
             return null;
         }
         if ("plain".equals(cape.style())) {

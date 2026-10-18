@@ -43,6 +43,8 @@ public final class CustomHeroConfig {
     public static ModConfigSpec.BooleanValue WORLD_POWERS;
     public static ModConfigSpec.DoubleValue HERO_STRENGTH_SPREAD;
     public static ModConfigSpec.BooleanValue LAYERS;
+    /** 3.4 (L6, R8): "Choose a hero" also gives the hero's own items. */
+    public static ModConfigSpec.BooleanValue CHOOSE_GIVES_ITEMS;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.comment("The Hero Creator: a Creative-only item with which a player becomes any hero of the mod, or makes a hero",
@@ -102,6 +104,10 @@ public final class CustomHeroConfig {
                 .defineInRange("heroStrengthSpread", 0.5, 0.0, 1.0);
         LAYERS = builder.comment("A custom hero's look may have layers: a cape, a hat, a visor or mask, glowing eyes, an aura.")
                 .define("layers", true);
+        CHOOSE_GIVES_ITEMS = builder.comment("\"Choose a hero\" also gives the hero's own items, as becoming him the usual way leaves them with him",
+                        "(Thor's Mjolnir or Stormbreaker, claimed; Magneto's helmet, Quicksilver's goggles and Cyclops's glasses, worn;",
+                        "Loki's Scepter, the Gauntlet, Ultron's Core, the wheelchair, the Darkhold). Never a second one.")
+                .define("chooseGivesItems", true);
         builder.pop();
     }
 

@@ -128,6 +128,7 @@ public final class CustomSkins {
         }
         if (!released.isEmpty()) {
             SKINS.values().removeIf(skin -> released.contains(skin.texture()));
+            com.kolodkingal.enhanced.client.FrostGiantSkins.clear();
         }
     }
 
@@ -146,6 +147,8 @@ public final class CustomSkins {
         BY_HASH.clear();
         SKINS.clear();
         CustomLooks.clear();
+        // (A frosted copy of a released skin goes too: its texture id may come back with a new picture.)
+        com.kolodkingal.enhanced.client.FrostGiantSkins.clear();
         CustomLooksLayer.clear();
     }
 

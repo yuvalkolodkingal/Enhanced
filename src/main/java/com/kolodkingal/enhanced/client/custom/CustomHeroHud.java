@@ -1,5 +1,9 @@
 package com.kolodkingal.enhanced.client.custom;
 
+import com.kolodkingal.enhanced.ability.AgathaShield;
+import com.kolodkingal.enhanced.ability.ApocalypseGuard;
+import com.kolodkingal.enhanced.ability.BillyBarrier;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.client.BossBarOverride;
 import com.kolodkingal.enhanced.client.KeyBindings;
 import com.kolodkingal.enhanced.client.PowerHud;
@@ -158,6 +162,10 @@ public class CustomHeroHud implements LayeredDraw.Layer {
     private static Component status(LocalPlayer player, PowerData data, CustomState state, CustomHero hero, HeroKit.Binding b, int column,
                                     long now, boolean keyLine) {
         if (b.entry() instanceof HeroAbility a) {
+            Component shield = shield(player, data, a, b.isAlt(), now);
+            if (shield != null) {
+                return shield;
+            }
             Component cooldown = keyLine ? PowerHud.cooldown(data, column, now) : null;
             if (cooldown != null) {
                 return cooldown;
@@ -200,6 +208,24 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         return switch (module.act(option)) {
             case TOGGLE -> onOff(state.isOn(module));
             case HOLD -> state.isOn(module) ? Component.translatable("hud.enhanced.active").withStyle(ChatFormatting.AQUA) : null;
+            default -> null;
+        };
+    }
+
+    /**
+     * The line of a borrowed shield while it is up, as its hero's HUD shows it: the Scarlet Witch's, Agatha's and
+     * Apocalypse's shields (strength and time), Billy's Hex Barrier (its health). One shield at a time (the rules).
+     */
+    @Nullable
+    private static Component shield(LocalPlayer player, PowerData data, HeroAbility a, boolean alt, long now) {
+        if (!data.chaosShieldActive()) {
+            return null;
+        }
+        return switch (a) {
+            case WANDA_CHAOS_SHIELD -> PowerHud.shield(data, now, WandaAbilities.maxShieldStrength(), WandaAbilities.maxShieldTicks());
+            case AGATHA_SHIELD -> PowerHud.shield(data, now, AgathaShield.maxStrength(), AgathaShield.maxTicks());
+            case APOCALYPSE_SHIELD -> PowerHud.shield(data, now, ApocalypseGuard.maxStrength(), ApocalypseGuard.maxTicks());
+            case BILLY_FREEZE -> alt && BillyBarrier.enabled() ? PowerHud.hexBarrier(player, data) : null;
             default -> null;
         };
     }

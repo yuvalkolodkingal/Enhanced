@@ -224,6 +224,8 @@ public final class CustomHeroes {
         }
         String id = Variants.of(power).stream().anyMatch(v -> v.id().equals(look)) ? look : "";
         Powers.awaken(player, power, id);
+        // 3.4 (R8): and the hero's own items, as becoming him the usual way leaves them with him.
+        HeroItems.give(player, power, Variants.current(Powers.get(player)).id());
         return true;
     }
 

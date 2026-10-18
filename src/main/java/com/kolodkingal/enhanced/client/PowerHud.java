@@ -257,7 +257,7 @@ public class PowerHud implements LayeredDraw.Layer {
      * The Hex Barrier's line while it is up (3.3): "forming", then its health as a bar of ten cells and in numbers ("21/30"),
      * green, then yellow below half and red below a quarter. The big bar under the crosshair is {@link BarrierHud}'s.
      */
-    private static Component hexBarrier(LocalPlayer player, PowerData data) {
+    public static Component hexBarrier(LocalPlayer player, PowerData data) {
         if (!data.chaosShieldUp(player.level().getGameTime())) {
             return Component.translatable("hud.enhanced.shield_forming").withStyle(ChatFormatting.GOLD);
         }

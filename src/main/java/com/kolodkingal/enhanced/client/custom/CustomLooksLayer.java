@@ -98,7 +98,8 @@ public final class CustomLooksLayer extends RenderLayer<AbstractClientPlayer, Pl
     public void render(PoseStack poseStack, MultiBufferSource buffers, int light, AbstractClientPlayer player, float limbSwing,
                        float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.CUSTOM || player.isInvisible()) {
+        // (In Vision's disguise, his ability, he looks like himself: no layers.)
+        if (data.power() != Power.CUSTOM || player.isInvisible() || CustomLooks.disguised(player)) {
             SHOWN.remove(player.getId());
             return;
         }
