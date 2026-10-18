@@ -19,8 +19,8 @@ import static com.kolodkingal.enhanced.client.render.Gestures.define;
 public final class HeimdallGestures {
     // ---- the stances' poses (main arm, off arm: x pitch, y yaw, z roll in degrees) ----
     /** The Ward: both hands on the pommel of the planted blade, before the chest. */
-    public static final float[] WARD_M = {-40, 28, 4};
-    public static final float[] WARD_O = {-40, -28, -4};
+    public static final float[] WARD_M = {-62, 34, 2};
+    public static final float[] WARD_O = {-62, -34, -2};
     public static final float WARD_HEAD = 6;
     /** Far Sight: the off hand shading the eyes, the sword hand low at his side. */
     public static final float[] FAR_M = {-14, 0, 6};

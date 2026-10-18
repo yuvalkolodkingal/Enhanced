@@ -71,8 +71,9 @@ public final class GuardiansWatch {
     /** One shadow of a Watch. */
     static final class Shadow {
         final BlockPos spot;
+        /** The shadow itself (held, not looked up: in a chunk whose entities are not shown yet it is still there). */
         @Nullable
-        UUID entity;
+        Entity entity;
         boolean struck;
         /** Where it hides now (its spot, or where it fled to). */
         Vec3 home;
@@ -146,9 +147,8 @@ public final class GuardiansWatch {
         }
         List<Entity> out = new ArrayList<>();
         for (Shadow s : watch.shadows) {
-            Entity e = s.entity == null ? null : level.getEntity(s.entity);
-            if (!s.struck && e != null) {
-                out.add(e);
+            if (!s.struck && s.entity != null && !s.entity.isRemoved()) {
+                out.add(s.entity);
             }
         }
         return out;
@@ -250,10 +250,6 @@ public final class GuardiansWatch {
 
     private static void spawn(ServerLevel level, Watch watch, Shadow s) {
         level.getChunk(s.spot.getX() >> 4, s.spot.getZ() >> 4);
-        com.kolodkingal.enhanced.Enhanced.LOGGER.info("DBGWATCH spot {} loaded {} hasChunk {}", s.spot, level.areEntitiesLoaded(ChunkPos.asLong(s.spot)), level.hasChunk(s.spot.getX() >> 4, s.spot.getZ() >> 4));
-        if (!level.areEntitiesLoaded(ChunkPos.asLong(s.spot))) {
-            return; // (its chunk's ticket is not yet in force: the Watch's tick hides it as soon as it is)
-        }
         Mob shadow = ModEntities.HELA_SHADOW.get().create(level);
         if (shadow == null) {
             return;
@@ -262,7 +258,7 @@ public final class GuardiansWatch {
         shadow.setPersistenceRequired();
         shadow.setSilent(true);
         if (level.addFreshEntity(shadow)) {
-            s.entity = shadow.getUUID();
+            s.entity = shadow;
             OWNERS.put(shadow.getUUID(), watch.watcher);
         }
     }
@@ -288,11 +284,12 @@ public final class GuardiansWatch {
             if (s.struck) {
                 continue;
             }
-            Entity e = s.entity == null ? null : level.getEntity(s.entity);
-            if (e == null || !e.isAlive()) {
+            Entity e = s.entity;
+            if (e == null || e.isRemoved() || !e.isAlive()) {
                 // Gone some other way (an unloaded chunk, a command): it hides again where it was.
-                if (s.entity != null) {
-                    OWNERS.remove(s.entity);
+                if (e != null) {
+                    OWNERS.remove(e.getUUID());
+                    e.discard();
                 }
                 s.entity = null;
                 spawn(level, watch, s);
@@ -346,11 +343,9 @@ public final class GuardiansWatch {
     /** His client is told where the shadows still hiding are (the gold marks, the needle) and the seconds left. */
     private static void report(ServerPlayer player, Watch watch, long now) {
         List<Vec3> left = new ArrayList<>();
-        ServerLevel level = player.serverLevel();
         for (Shadow s : watch.shadows) {
             if (!s.struck) {
-                Entity e = s.entity == null ? null : level.getEntity(s.entity);
-                left.add(e != null ? e.position() : s.home);
+                left.add(s.entity != null ? s.entity.position() : s.home);
             }
         }
         HeimdallFx.to(player, HeimdallFx.WATCH, -1, left, (int) ((Math.max(0, watch.end - now) + 19) / 20));
@@ -370,7 +365,7 @@ public final class GuardiansWatch {
             return false;
         }
         for (Shadow s : watch.shadows) {
-            if (shadow.getUUID().equals(s.entity) && !s.struck) {
+            if (s.entity != null && shadow.getUUID().equals(s.entity.getUUID()) && !s.struck) {
                 s.struck = true;
                 OWNERS.remove(shadow.getUUID());
                 ServerLevel level = (ServerLevel) shadow.level();
@@ -430,11 +425,8 @@ public final class GuardiansWatch {
         ServerLevel level = AsgardDimension.level(player.server);
         for (Shadow s : watch.shadows) {
             if (s.entity != null) {
-                OWNERS.remove(s.entity);
-                Entity e = level == null ? null : level.getEntity(s.entity);
-                if (e != null) {
-                    e.discard();
-                }
+                OWNERS.remove(s.entity.getUUID());
+                s.entity.discard();
             }
         }
         if (level != null) {

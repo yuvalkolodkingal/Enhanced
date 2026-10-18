@@ -55,18 +55,18 @@ public class HeimdallHelmLayer extends RenderLayer<AbstractClientPlayer, PlayerM
                 .texOffs(0, 12).addBox(-4.6F, -8.6F, -4.6F, 9.2F, 1.0F, 9.2F), PartPose.ZERO);
         for (int side = -1; side <= 1; side += 2) {
             String s = side < 0 ? "right" : "left";
+            // Out from the temple, tilted up a little...
             PartDefinition base = helm.addOrReplaceChild(s + "_horn", CubeListBuilder.create()
-                    .texOffs(24, 0).addBox(-1.5F, -1.5F, -1.5F, 3.0F, 3.0F, 4.0F),
-                    PartPose.offsetAndRotation(side * 4.6F, -6.4F, 0.0F, 0.0F, side * 1.05F, 0.0F));
+                    .texOffs(24, 0).addBox(side < 0 ? -4.0F : 0.0F, -1.25F, -1.25F, 4.0F, 2.5F, 2.5F),
+                    PartPose.offsetAndRotation(side * 4.2F, -6.2F, -0.5F, 0.0F, 0.0F, side * -0.45F));
+            // ...then sweeping forward and up...
             PartDefinition mid = base.addOrReplaceChild("mid", CubeListBuilder.create()
-                    .texOffs(40, 0).addBox(-1.0F, -1.0F, -4.0F, 2.0F, 2.0F, 4.0F),
-                    PartPose.offsetAndRotation(0.0F, -0.4F, -1.0F, 0.35F, side * 0.55F, 0.0F));
-            PartDefinition upper = mid.addOrReplaceChild("upper", CubeListBuilder.create()
-                    .texOffs(40, 8).addBox(-0.75F, -0.75F, -3.5F, 1.5F, 1.5F, 3.5F),
-                    PartPose.offsetAndRotation(0.0F, 0.0F, -3.6F, 0.6F, side * 0.25F, 0.0F));
-            upper.addOrReplaceChild("tip", CubeListBuilder.create()
-                    .texOffs(52, 8).addBox(-0.5F, -0.5F, -2.5F, 1.0F, 1.0F, 2.5F),
-                    PartPose.offsetAndRotation(0.0F, 0.0F, -3.2F, 0.7F, 0.0F, 0.0F));
+                    .texOffs(40, 0).addBox(-1.0F, -1.0F, -5.0F, 2.0F, 2.0F, 5.0F),
+                    PartPose.offsetAndRotation(side * 3.6F, 0.0F, 0.0F, 0.55F, side * -0.25F, 0.0F));
+            // ...to a point above the brow.
+            mid.addOrReplaceChild("tip", CubeListBuilder.create()
+                    .texOffs(40, 8).addBox(-0.6F, -0.6F, -4.0F, 1.2F, 1.2F, 4.0F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, -4.6F, 0.65F, side * -0.15F, 0.0F));
         }
         return LayerDefinition.create(mesh, 64, 32);
     }

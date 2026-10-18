@@ -203,9 +203,10 @@ final class HeimdallActing {
             m.add(w, 0.10F, -0.10F, 0.02F, -24, 16, 0);
             o.add(w, -0.10F, -0.10F, 0.02F, -24, -16, 0);
         }
+        // (Far Sight: the shading hand is left out of his own view, which the zoom fills.)
         w = s.stance(Stance.HEIMDALL_FARSIGHT);
         if (w > 0.001F) {
-            o.add(w, 0.06F, 0.30F, 0.10F, -70, 20, 0);
+            m.add(w, 0.0F, -0.06F, 0.0F, 0, 0, 0);
             FirstPersonArms.tremble(m, o, w * 0.3F, 0.002F, 0.4F, (float) s.time, EnhancedClientConfig.reducedMotion());
         }
         for (HeroAnimState.Slot slot : s.slots) {
