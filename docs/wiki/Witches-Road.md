@@ -40,6 +40,40 @@ Only people with no power walk the Road, so the rules are few:
 * **Everyone has a place of their own.** Friends cannot join your trial (the Road is solo, on purpose, to keep it simple and safe), and at most 32 players walk the Road at once (`witches_road.maxPlayers`); if it is full, wait for somebody to finish.
 * Creative and Spectator players are refused at the door ("The Road tests only those who can fall").
 
+## The Road's music
+
+In 3.3 the Road has a song, a **witchy ballad of its own**, in a different arrangement at every stage. (It is an original tune in the spirit of *Agatha All Along*, not the show's song: its first notes are the coven's tune that the Road's door has always played.)
+
+| Stage | What you hear |
+|---|---|
+| **The entrance** (from the moment you ask a door, while it opens and you are taken in) | The coven hums it over a low drone, with bells and a heartbeat drum. |
+| **The Parkour** | Lute arpeggios and a harpsichord, with a bass, a frame drum and a shaker. |
+| **Copy the Structure** | A music box over a choir; the second time round the choir sings the tune. |
+| **The Ice-Boat Race** | Fast drums, driving strings and violins, a break of low strings and toms, and horns. |
+| **The end of the Road** (the hall where you choose) | Everything at once: choir, strings, horns, harp and timpani, and the second half in a major key, triumphant. |
+
+* It plays on the **Music** volume slider (at 0 it is silent), fades in over 2 seconds, crossfades to the next stage, fades out over 3 seconds when you leave the Road, and holds the game's own music back while it plays. Each arrangement loops smoothly.
+* **Replacing it.** A resource pack (or a server resource pack) can swap any of the five for music of your own: in its `assets/enhanced/sounds.json`, define the sound event with `"replace": true` and your own `.ogg` files, and keep `"stream": true` (the game loops them). The events are:
+
+| Stage | Sound event | File in the mod |
+|---|---|---|
+| The entrance | `enhanced:music.road.entrance` | `assets/enhanced/sounds/music/road_entrance.ogg` (32 s) |
+| The Parkour | `enhanced:music.road.parkour` | `music/road_parkour.ogg` (48 s) |
+| Copy the Structure | `enhanced:music.road.copy` | `music/road_copy.ogg` (58 s) |
+| The Ice-Boat Race | `enhanced:music.road.boat` | `music/road_boat.ogg` (48 s) |
+| The end of the Road | `enhanced:music.road.ending` | `music/road_ending.ogg` (51 s) |
+
+```json
+{
+  "music.road.parkour": {
+    "replace": true,
+    "sounds": [{"name": "mypack:my_parkour_song", "stream": true}]
+  }
+}
+```
+
+(That file goes in `assets/enhanced/sounds.json` of your pack, and the song in `assets/mypack/sounds/my_parkour_song.ogg`.) A trial added later without its own arrangement plays the Parkour's.
+
 ## Trial 1: The Parkour
 
 *Cross the void to the gate.* You start on a platform with the exit door and have to jump from stone to stone, over nothing, to the finish platform with the gate. Every sixth jump there is a **checkpoint**: a platform of lit amethyst, where you are healed and put back if you fall.
@@ -129,7 +163,7 @@ Operators are free of the Road's rules (they can place blocks and teleport) unle
 
 ## For servers
 
-All the numbers are in the `[witches_road]` section of the server config (see [Server Configuration](Server-Configuration#the-witches-road)): whether the trials exist at all (`enabled`; off gives the 3.1 door), how many players may walk at once, the seed of the courses, whether players resume at their checkpoint, the chat announcement, the Voice, how a fall is measured, the Parkour's length, difficulty, checkpoints and time limit, the structure's size, supply, hints and time limit, and the boat race's length, width, difficulty, shortcuts, snow, blue ice, checkpoints, time limit, par factor and countdown. Everything is read live.
+All the numbers are in the `[witches_road]` section of the server config (see [Server Configuration](Server-Configuration#the-witches-road)): whether the trials exist at all (`enabled`; off gives the 3.1 door), how many players may walk at once, the seed of the courses, whether players resume at their checkpoint, the chat announcement, the Voice, how a fall is measured, the Parkour's length, difficulty, checkpoints and time limit, the structure's size, supply, hints and time limit, and the boat race's length, width, difficulty, shortcuts, snow, blue ice, checkpoints, time limit, par factor and countdown. Everything is read live. The music of the Road has no server option: a resource pack replaces it ([above](#the-roads-music)).
 
 Each trial is **built by code** for the player who walks it, in a private place of the dimension 2,048 blocks from the next, and **taken down again** when he leaves, so the world's save does not grow and nothing is left behind. A crash leaves nothing unaccounted: the places that were open are cleared at the next start.
 

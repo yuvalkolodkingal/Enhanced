@@ -19,14 +19,18 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Thanos](Thanos#playing-thanos) | Power Blast (Sneak: Titan Slam) | Portal Step (Sneak: Space Pull) | Transmute to stone (Sneak: Reality Veil, toggle) | Soul Drain (hold; Sneak: Soul Sight) | Rewind (Sneak: Time Lock) |
 | [Ultron](Ultron#the-hero) | Repulsor Fire (hold; Sneak: Overcharge) | Anti-Gravity Flight (toggle) | Gravity Pull (Sneak: Gravity Slam) | Upload (Sneak: Hack; Second Life) | Sentry Army (Sneak: Command) |
 | [Apocalypse](Apocalypse#becoming-apocalypse-the-hero) | Sand Control: Sand Wave (Sneak: Entomb) | Levitation (toggle) | Portal | Apocalypse's Shield (hold) | Power Bestowal (Sneak: Sandstorm) |
+| [Agatha](Agatha) | Purple Beam (hold; Sneak: Hex Mark, or the mind glimpse) | Flight (toggle) | Power Drain | Witch's Shield (hold) | Rune Trap |
+| [Cyclops](Cyclops) | Optic Blast (hold; Sneak: Ricochet Shot) | Concussion Blast | Optic Leap | Rally | Glasses on (Sneak: take them off) |
+| [Professor X](Professor-X) | Mental Blast | Hear Thoughts (toggle) | Take Over a Body (again: return) | Freeze Minds | Cerebro |
+| [A custom hero](Hero-Creator) | Whatever power you put on the key in the [Hero Creator](Hero-Creator#create-my-hero) | | | | |
 
-**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, Billy's Hex Beam and Hex Barrier, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield) work for as long as you keep the key down (the Chaos Shield never runs out in 3.2, unless a server turns that off; Billy's Hex Barrier drops by itself after a few seconds, or when it breaks, and then has to recharge). *Toggle* abilities switch on with one press and off with the next.
+**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, Billy's Hex Beam and Hex Barrier, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield, Agatha's Purple Beam and Witch's Shield, Cyclops's Optic Blast) work for as long as you keep the key down (the Chaos Shield never runs out in 3.2, unless a server turns that off; in 3.3 Billy's Hex Barrier has no time limit either, and only drops when it shatters; Agatha's shield lasts 10 seconds at most). *Toggle* abilities switch on with one press and off with the next.
 
-The abilities, their cooldowns and costs are explained on each hero's page. The Scarlet Witch and Billy also have **Y**, for [Build Magic](Build-Magic). The two [books of the sorcerers](#the-sorcerers-books-and-the-road) are used, not bound to a key.
+The abilities, their cooldowns and costs are explained on each hero's page. The Scarlet Witch and Billy also have **Y**, for [Build Magic](Build-Magic). The two [books of the sorcerers](#the-sorcerers-books-and-the-road) are used, not bound to a key. A [custom hero](Hero-Creator) has the same five keys, with the powers you chose on them.
 
 ## Change Look: H
 
-**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse. Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
+**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops and Professor X (for him it switches between the young and the old Charles). Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
 
 ## Vision, That One!: Z
 
@@ -89,7 +93,7 @@ Things you may notice:
 
 ## The sorcerers' books and the Road
 
-Two items and a place have controls of their own. None of them uses the keys R, G, V, B and N: they work by **using** the item (right-click, as for a bow or a sword), and only a sorcerer (Loki, the Scarlet Witch or Billy) can read them.
+Two items and a place have controls of their own. None of them uses the keys R, G, V, B and N: they work by **using** the item (right-click, as for a bow or a sword), and only a sorcerer (Loki, the Scarlet Witch, Billy or Agatha) can read them. (3.3: a player with **no power** who **holds use on the Darkhold for 3 seconds** becomes [Agatha](Agatha).)
 
 | Item | Input | What it does |
 |---|---|---|
@@ -99,6 +103,11 @@ Two items and a place have controls of their own. None of them uses the keys R, 
 | Darkhold | **Sneak + use** at a creature | A **hex mark** on it: it glows, is slowed and takes more of your damage. |
 | Darkhold | **Sneak + use** at nothing | A **mind glimpse**: every living thing near you glows, and the action bar names the nearest and its health. |
 | Darkhold | (nothing to press) | While you hold it, magic used on you poisons the one who used it. |
+| Darkhold, with no power | **Hold use** for 3 seconds | You become [Agatha](Agatha). |
+| [Hex Control](Scarlet-Witch#hex-control) (**N** with a Hex up) | The **Hex Runes** button | The Scarlet Witch inscribes or wipes the [Hex Runes](Scarlet-Witch#hex-runes) on the walls of her Hex. |
+| [Hero Creator](Hero-Creator) (Creative or operators) | **Use** (right-click) | Opens the Hero Creator: choose any hero, or make your own. |
+| [Professor X's Wheelchair](Professor-X), with no power | **Hold use** for 3 seconds | You become Professor X and choose the young or the old Charles. |
+| [Ruby-Quartz Glasses](Cyclops), with no power | Put them on (the head slot) | You become Cyclops. |
 | [The Witches' Road](Witches-Road) | Right-click the **exit door** on the start platform, twice | Leaves the Road (the Gene stays with you). Or type `/road leave`. |
 | Witches' Road, the Ice-Boat Race | **W** go, **A** and **D** steer, **S** back, **Shift** climb out | **Shift** also puts you back on the last checkpoint if you are stuck. |
 | Witches' Road, Copy the Structure | Right-click the **Check** and **Hint** buttons | Check counts the blocks that are right; Hint shows ghosts of the blocks that are missing. |
@@ -117,8 +126,10 @@ Flying works like Creative mode: **double-tap Space**, or press the hero's fligh
 | Phoenix | **G** (Flight) |
 | Ultron | **G** (Anti-Gravity Flight) |
 | Apocalypse | **G** (Levitation) |
+| Agatha | **G** (Flight) |
+| A custom hero | The key you gave the **Flight** power (only with that power) |
 
-Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes). Spider-Man does not fly either: he zips and swings on webs. Nor does Thanos: he steps through portals.
+Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes). Spider-Man does not fly either: he zips and swings on webs. Nor does Thanos: he steps through portals. Cyclops leaps on his own blast (**V**) and Professor X does not fly.
 
 ## Sneak changes some keys
 
@@ -156,6 +167,9 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **R** as Apocalypse | Entomb: swallows the creature you look at in a cocoon of sand, instead of the Sand Wave. |
 | Sneak + **N** as Apocalypse | The Sandstorm, instead of Power Bestowal. |
 | Sneak + right-click with the Capstone | Plants it in sand, by day under the open sky: wakes En Sabah Nur (see [Apocalypse](Apocalypse#waking-him)). |
+| Sneak + **R** as Agatha | The Darkhold's **hex mark** on the creature you look at, or its **mind glimpse** if you look at nothing, instead of the Purple Beam. |
+| Sneak + **R** as Cyclops | The **Ricochet Shot**, a bolt that bounces off blocks, instead of the Optic Blast. |
+| Sneak + **N** as Cyclops | Takes the glasses **off**: the giant beam pours out until **N** puts them back on. |
 | Sneak + **H** | Previous look. |
 
 With telekinesis, pressing the key again **launches** what you hold.
@@ -227,7 +241,7 @@ With telekinesis, pressing the key again **launches** what you hold.
 
 ## The HUD
 
-The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges. Billy's Hex Beam line shows its damage and reach (`6.0 dmg/s, 20 blocks`), and the Scarlet Witch's Chaos Shield line shows "∞ unlimited".
+The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges. Billy's Hex Beam line shows its damage and reach (`6.0 dmg/s, 20 blocks`), and the Scarlet Witch's Chaos Shield line shows "∞ unlimited". **3.3:** while Billy's Hex Barrier is up its line shows a bar and its health (`21/30`) and a big bar sits under the crosshair; a sorcerer held by the Hex Runes sees a red line at the top, "The Hex Runes hold your powers"; Professor X's screen gets blue edges and a line with whose mind he is in while he steers a body (and the one he steers gets violet edges and "Professor X controls your body!"), and Cerebro's list; a custom hero's panel is drawn in his own colours with his name.
 
 ![Magneto's HUD](images/magneto-back.png)
 

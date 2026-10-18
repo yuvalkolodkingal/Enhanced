@@ -2,7 +2,7 @@
 
 A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The one exception is Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs.)
 
-Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron and Apocalypse have several looks. Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
+Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops and Professor X have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#create-my-hero): your own skin, any look of any hero, or a skin file of your own. Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
 ## Switching looks
 
@@ -116,6 +116,36 @@ The eyes of Prime and the Sentry glow, and the flight, the Gravity Pull and the 
 | **Your own skin** | `own` | Apocalypse's powers in your own skin. |
 
 The golden shield, the violet portal and the ochre sand are the same in every look.
+
+### Agatha ([page](Agatha))
+
+| Look | Id | What it is |
+|---|---|---|
+| **WandaVision** (default) | `wandavision` | Agatha revealed at the end of *WandaVision*: a deep plum velvet dress with a high black collar and a gold brooch with an amethyst at the throat, flared black cuffs, a long skirt, dark brown waves and plum lips. |
+| **Agatha All Along (the Road)** | `all_along` | A dark green velvet coat over a black dress, a silver clasp, a black belt and her pointed witch's hat (black felt, a green band with a silver buckle, the tip bent back), which a helmet hides. |
+| **Your own skin** | `own` | Agatha's powers in your own skin. |
+
+Her magic is violet in every look, and her eyes glow violet while she casts.
+
+### Cyclops ([page](Cyclops))
+
+| Look | Id | What it is |
+|---|---|---|
+| **X-Men: Apocalypse (1983)** (default) | `apocalypse` | The navy field suit with black side panels and quilted shoulders, steel-blue piping, a silver X buckle, black gloves and boots, and a gunmetal wrap-around visor with a ruby lens. |
+| **Classic (comics)** | `classic` | The blue bodysuit with a yellow X harness, belt, gloves and boots, a blue cowl and a yellow visor band with a red lens. |
+| **Your own skin** | `own` | His powers in your own skin, with red sunglasses. |
+
+The glasses are drawn over every look while they are on; his blasts are red in every look.
+
+### Professor X ([page](Professor-X))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Young Charles (Days of Future Past)** (default) | `young` | James McAvoy's Charles, who walks. |
+| **Professor X (in his wheelchair)** | `old` | Patrick Stewart's professor, who sits in his steel and leather wheelchair at all times. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+He chooses between the two Charleses when he awakens; **H** changes it later. His powers are pale blue in every look.
 
 ### Magneto, the Scarlet Witch and Quicksilver
 

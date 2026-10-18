@@ -8,7 +8,7 @@ Wanda Maximoff. Chaos magic in a crimson tangle of energy, with hot pink highlig
 
 **Step 1: find the gene.** The **Scarlet Witch Gene** is a very rare item. On its own it does nothing at all. Where to find it is on [Items and Crafting](Items-and-Crafting).
 
-**Step 2: touch the Mind Stone.** The Mind Stone sits inside **Loki's Scepter** (the blue gem in its golden blade), a relic found in chests (also on [Items and Crafting](Items-and-Crafting)). To touch the stone, hold the scepter and **right-click**:
+**Step 2: touch the Mind Stone.** The Mind Stone sits inside **Loki's Scepter** (the blue gem in its golden blade), a relic kept in the vault of a [Hydra outpost](Structures#a-hydra-outpost) (also on [Items and Crafting](Items-and-Crafting)). To touch the stone, hold the scepter and **right-click**:
 
 * **Holding the gene** in your other hand: the gene and the stone's cosmic energy fuse. The gene is used up and you awaken as the Scarlet Witch, with all of Wanda's powers. Wanda's Crown appears in your inventory.
 * **Not holding the gene:** the Mind Stone's energy tears you apart. You **explode and die instantly** (the explosion does not break blocks).
@@ -107,7 +107,8 @@ Press **N** to raise the Hex: a **giant red energy dome**, radius 32 blocks (adj
 ![The Hex](images/hex.png)
 
 * One Hex per Wanda. It is saved with the world and collapses if Wanda dies.
-* **Only Wanda decides who may enter or leave.** Anyone she has not allowed meets the price of the wall (below).
+* **Only Wanda decides who may enter or leave.** In 3.3 her allow list is **the one rule for coming in**, for players and creatures alike: anyone she has not allowed meets the price of the wall (below), however they try to get in.
+* **No power gets through the wall from outside** (3.3): see [The wall keeps powers out](#the-wall-keeps-powers-out).
 
 #### Hex Control
 
@@ -117,6 +118,7 @@ Press **N** again, while you have a Hex, to open the **Hex Control** screen:
 * Allow or block creatures (mobs and animals).
 * Tell [your Vision](#the-vision-of-the-hex) to follow you or to hold his post.
 * Make the Hex bigger or smaller (radius 8 to 96 by default).
+* Inscribe or wipe the **Hex Runes** (3.3: the button *Hex Runes: none / glowing*), see [below](#hex-runes).
 * Dissolve the Hex (or press **Sneak + N**).
 
 The screen reminds you that anyone you have not allowed has a 95% chance to die crossing the wall.
@@ -128,17 +130,35 @@ The screen reminds you that anyone you have not allowed has a 95% chance to die 
 When any creature or player **without powers** crosses the wall without Wanda's permission:
 
 * **95%: instant death** ("was rewritten by the Hex"). Armor, Totems of Undying and effects don't help.
-* **5%: they survive.** The rare survivor simply makes it through, and nothing else happens to them.
+* **5%: they survive**, and are **thrown back out** (3.3: before, the rare survivor made it through). Only the ones she approves get in.
 
 That 95% is the `scarlet_witch.hexDeathChance` option (see [Server Configuration](Server-Configuration)).
 
 Other rules of the wall:
 
-* **Crossing includes teleporting.** Ender Pearls, Chorus Fruit, Endermen, Loki's Vanish and Tesseract, and Thor's Bifrost (arriving inside a Hex counts as crossing its wall) all face the wall's verdict: the 95% / 5% roll for someone without powers, the bounce for a hero. Tommy can't vibrate through a Hex he is not allowed into.
-* Anyone **with powers** (a hero) and bosses (the Ender Dragon, the Wither, the Warden and the Elder Guardian) can't be killed by the wall. They are thrown back as if they hit glass, unless Wanda allowed them in. Phasing doesn't get Vision through: it is a wall of reality, not of stone.
+* **Every way in is judged** (3.3). Walking, flying at any speed (Quicksilver, Thor, the Phoenix, an elytra), riding (the rider is set down), Ender Pearls, Chorus Fruit, Endermen, Loki's Vanish and Tesseract, Thor's Bifrost, Tommy's Vibrate, Quicksilver's Speed Blitz, Thanos's portal, rewind and vortex, Apocalypse's portal, Ultron's upload, the Book of the Vishanti, portals and dimension changes (the way back from the Witches' Road too) and respawning at a bed or anchor inside: arriving inside a Hex counts as crossing its wall and faces its verdict. Someone who arrives by a portal or a respawn is set down outside the wall. A creature thrown or pulled towards the wall stops at it, and a grip from outside lets go of what goes behind it. Sokovia cannot lift ground that a Hex wall cuts through.
+* Anyone **with powers** (a hero) and bosses (the Ender Dragon, the Wither, the Warden, the Elder Guardian, Thanos, Ultron and Apocalypse) can't be killed by the wall. They are thrown back as if they hit glass, unless Wanda allowed them in. **A boss or a boss's minion never gets in**, even with creatures allowed. Phasing doesn't get Vision through: it is a wall of reality, not of stone.
 * Creative and Spectator players pass through.
-* Pets owned by an allowed player pass through safely.
+* Pets owned by an allowed player pass through safely, and so does her own Vision.
+* Going **out** is as before: a hero bounces, the survivors of the wall walk out, and Vision is held (below).
 * **Vision can't leave a standing Hex**, whether or not you let him in: see below.
+
+#### The wall keeps powers out
+
+In 3.3 **no power crosses the wall from outside**: before, many did. Arrows and every other projectile (they burst into sparks at the wall), beams (the Chaos Beam of another Wanda, Vision's Mind Stone, Thor's lightning, Billy's Hex Beam, the Darkhold's, Cyclops's, the bosses'), explosions (the blocks and creatures inside are left out of them), lightning, telekinesis and Magneto's pulls and strip, Ultron's and Thanos's pulls, area attacks, effects and curses, mind powers (the Phoenix's Mind Sense, Billy's The Noise, the Darkhold's glimpse), and the Build Magic of anyone she has not allowed: everything stops at the wall. A boss never picks a target behind it.
+
+* **Who may enter may also reach in**: the powers of the players she allowed (and her own) cross the wall, and with creatures allowed, creatures' attacks do too.
+* A power that starts **inside** the Hex is never stopped by its wall.
+* Not stopped: an operator's `/tp` and `/summon`, and natural lightning.
+
+#### Hex Runes
+
+*Like the runes on the walls of Westview.* From the **Hex Control** screen (**N** with a Hex up) Wanda can **inscribe runes on the four walls of her Hex**: the button *Hex Runes: none / glowing*. Glowing red runes appear on the north, east, south and west walls, inside and outside, each rune breathing slowly.
+
+* **While the runes glow, every other sorcerer inside the Hex cannot use powers**: [Agatha](Agatha), Loki, Billy, another Scarlet Witch, and anyone who holds the **Darkhold** or the **Book of the Vishanti**. Their ability keys do nothing ("The runes of the Hex hold your magic"), and at the moment they are caught their beams stop, what they hold with telekinesis is let go, Billy's barrier falls, Loki's illusions dissolve and his Vanish, shape and Frost Giant end, and a flier comes down gently (5 seconds of Slow Falling). The books do nothing either. A red line at the top of their screen says "The Hex Runes hold your powers"; leaving the Hex, "Your magic is yours again".
+* **Wanda keeps hers.** The runes hold the others whether or not she allowed them in. A Spectator is never held.
+* **Inscribing** costs 1 food point (Creative is free) and is refused on an empty stomach, and she must wait 5 seconds before she can inscribe them again. **Wiping** them is free and at once.
+* A server can change the cost and the wait, or turn the runes off: the `hex_runes.*` options on [Server Configuration](Server-Configuration#hex-runes).
 
 #### Vision can't leave your Hex
 
@@ -173,10 +193,14 @@ Wanda can **build with her magic**: press **Y** and click two corners to fill, e
 
 **The Instant level (3.2).** In build mode, **Ctrl + I** (or the *Instant* button in the Spell Wheel, under Redo) switches Wanda to *Instant*: a gold badge "⚡ Instant" shows, and every spell, **Ctrl + Z** and **Ctrl + Y** write **all their blocks in the same moment**, with no growing, no ripple and no waiting; a flash of light and sparks on the box show that it is done. Up to 250,000 blocks a spell (`build_magic_wanda.instantMaxBlocks`; a bigger one goes at normal speed and she is told), and never for longer than 5 seconds of the server's time (`instantMaxMillis`): a spell that takes longer finishes at normal speed. The server stands still while it writes, so a big Instant spell is a moment of stillness, not a lag. Every rule is the same as for any spell: arenas, claims, Hexes, loaded chunks, the undo history. It turns itself off when she leaves build mode or changes power; Billy is told "Instant is the Scarlet Witch's magic alone". See [Build Magic](Build-Magic#the-instant-level-ctrl--i).
 
+## Chaos magic breaks the Hex Barrier
+
+Billy's [Hex Barrier](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held) stops everything from the front, but **any power of a Scarlet Witch shatters it at once**, whatever health it has left: her Chaos Beam, her telekinetic grip, what she throws.
+
 ## Critical against Apocalypse
 
 Her mind power hits the boss Apocalypse **critically**: the Chaos Beam, a telekinetic slam, a borrowed block she throws, all are twice as strong on his shield and, when his shield is down, on his body. Everyone else hits him for much less then. See [Apocalypse](Apocalypse#he-never-heals-wanda-and-the-phoenix-hit-critically).
 
 ## Numbers you can change
 
-Wanda's flight speed, the beam's damage, range and Nausea, whether the shield is unlimited (`shieldUnlimited`, on by default), and, for the old rules, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be (Wanda's and the Phoenix's; Billy and Magneto have their own), and the Hex's default, smallest and largest radius, its death chance and how hard it bites a Vision who pushes against it are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration). The Vision of the Hex (his health, punch and beam, how long you need to rebuild him, and turning him off) is the `hex_vision.*` options. The Instant level is `build_magic_wanda.instantMaxBlocks` and `instantMaxMillis`.
+Wanda's flight speed, the beam's damage, range and Nausea, whether the shield is unlimited (`shieldUnlimited`, on by default), and, for the old rules, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be (Wanda's and the Phoenix's; Billy and Magneto have their own), and the Hex's default, smallest and largest radius, its death chance and how hard it bites a Vision who pushes against it are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration). The Hex Runes are the `hex_runes.*` options. The Vision of the Hex (his health, punch and beam, how long you need to rebuild him, and turning him off) is the `hex_vision.*` options. The Instant level is `build_magic_wanda.instantMaxBlocks` and `instantMaxMillis`.
