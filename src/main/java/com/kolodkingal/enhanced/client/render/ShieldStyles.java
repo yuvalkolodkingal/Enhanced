@@ -23,6 +23,13 @@ public final class ShieldStyles {
 
     /** The style of this power's shield, or null if it raises none. */
     @Nullable
+    public static ShieldStyle of(com.kolodkingal.enhanced.power.PowerData data) {
+        // 3.4: a custom hero's shield is drawn in the style of the hero whose shield he has.
+        HeroClient hero = HeroClients.of(data.power());
+        return data.power() == Power.CUSTOM && hero != null ? hero.shieldStyle(data) : of(data.power());
+    }
+
+    /** The style of a hero's own shield, or null. */
     public static ShieldStyle of(Power power) {
         if (power == Power.SCARLET_WITCH) {
             return CHAOS_SHIELD;

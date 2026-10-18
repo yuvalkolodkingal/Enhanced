@@ -62,78 +62,23 @@ final class RunPoses {
         }
     }
 
-    /** The character of a hero's walk and sprint (see the table of the animation design). */
-    private record Character(float walkArms, float sprintArms, float sprintLegs, float lean, float twist, float bob) {
-    }
-
-    private static final Character DEFAULT = new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.015F);
-    private static final Character MAGNETO = new Character(0.85F, 1.0F, 1.0F, 4, 3, 0.015F);
-    private static final Character WANDA = new Character(0.80F, 1.10F, 1.05F, 5, 4, 0.015F);
-    private static final Character VISION = new Character(0.60F, 0.80F, 1.0F, 3, 2, 0.010F);
-    private static final Character WHITE_VISION = new Character(0.30F, 0.35F, 1.0F, 0, 0, 0.0F);
-    private static final Character BILLY = new Character(1.0F, 1.20F, 1.10F, 6, 4, 0.025F);
-    private static final Character LOKI = new Character(0.75F, 1.15F, 1.10F, 7, 5, 0.015F);
-    private static final Character THOR = new Character(1.15F, 1.30F, 1.15F, 10, 6, 0.030F);
-    /** The Phoenix: an unhurried walk with relaxed hands, a shade calmer than the default. */
-    private static final Character PHOENIX = new Character(0.90F, 1.15F, 1.05F, 5, 4, 0.015F);
-    /** Spider-Man: agile and light, between Billy and Quicksilver, with a sprint that leans into it. */
-    private static final Character SPIDER = new Character(1.05F, 1.25F, 1.20F, 9, 5, 0.020F);
-    /** Spider-Man in the Black Eyes: a predatory lope, longer in the stride and lower. */
-    private static final Character SPIDER_SURGE = new Character(1.10F, 1.40F, 1.30F, 16, 7, 0.030F);
-    /** Thanos: heavy and wide, between Thor and Magneto; the bob of a stride that shakes the ground. */
-    private static final Character THANOS = new Character(0.90F, 1.15F, 1.15F, 9, 5, 0.030F);
-
-    // ===== ultron =====
-    /** Ultron: a stiff, deliberate march, the arms hardly swinging, no lean, almost no bob. */
-    private static final Character ULTRON = new Character(0.55F, 0.70F, 1.0F, 2, 2, 0.008F);
-
-    // ===== apocalypse =====
-    /** An unhurried, upright god's walk: little arm swing and almost no bounce. */
-    private static final Character APOCALYPSE = new Character(0.55F, 0.80F, 0.90F, 3, 2, 0.008F);
-
-    // ===== cyclops (3.3) =====
-    /** Cyclops: a field leader's run, purposeful and squared, a little lean into the sprint. */
-    private static final Character CYCLOPS = new Character(0.90F, 1.15F, 1.10F, 8, 4, 0.016F);
-    // ===== professor_x =====
-    /** The young Charles: an easy, unhurried walk with a little swing. */
-    private static final Character XAVIER = new Character(0.85F, 1.10F, 1.05F, 5, 3, 0.012F);
-    /** The old professor rolls in his chair: no swing of the arms, no lean, no bob (the chair carries him). */
-    private static final Character XAVIER_SEATED = new Character(0.0F, 0.0F, 1.0F, 0, 0, 0.0F);
-    // ===== agatha (3.3) =====
-    /** Agatha: a witch's measured, self-assured stride, the hands swinging little, the sprint a hurried glide. */
-    private static final Character AGATHA = new Character(0.70F, 0.95F, 1.0F, 4, 3, 0.012F);
-
-    private static Character character(Power power, boolean whiteVision) {
-        return switch (power) {
-            case MAGNETO -> MAGNETO;
-            case SCARLET_WITCH -> WANDA;
-            case VISION -> whiteVision ? WHITE_VISION : VISION;
-            case BILLY -> BILLY;
-            case LOKI -> LOKI;
-            case THOR -> THOR;
-            // The heroes of 3.0, one line each (each lane's own): they walk and sprint as anyone does until their lane
-            // gives them a character.
-            case PHOENIX -> PHOENIX;
-            case SPIDER_MAN -> SPIDER;
-            case THANOS -> THANOS;
-            case ULTRON -> ULTRON;
-            case APOCALYPSE -> APOCALYPSE;
-            case CYCLOPS -> CYCLOPS;
-            case PROFESSOR_X -> XAVIER;
-            case AGATHA -> AGATHA;
-            default -> DEFAULT;
-        };
-    }
-
-    /** The character of the hero this state is for: Spider-Man's changes while the Black Eyes are on. */
-    private static Character character(HeroAnimState st) {
-        if (st.power == Power.SPIDER_MAN && st.stance(Stance.SPIDER_SURGE) > 0.5F) {
-            return SPIDER_SURGE;
+    /**
+     * The character of the hero this state is for: Spider-Man's changes while the Black Eyes are on. 3.4: a custom hero
+     * walks with the character his definition names ({@link HeroAnimState#runAs}, see {@code CustomAnimRoutes.run}).
+     */
+    private static RunCharacter character(HeroAnimState st) {
+        boolean spider = st.power == Power.SPIDER_MAN || st.power == Power.CUSTOM && "spider".equals(st.runAs);
+        if (spider && st.stance(Stance.SPIDER_SURGE) > 0.5F) {
+            return RunCharacter.SPIDER_SURGE;
         }
         if (st.power == Power.PROFESSOR_X && "old".equals(st.look)) {
-            return XAVIER_SEATED;
+            return RunCharacter.XAVIER_SEATED;
         }
-        return character(st.power, "white_vision".equals(st.look));
+        if (st.power == Power.CUSTOM) {
+            RunCharacter named = RunCharacter.byName(st.runAs);
+            return named != null ? named : RunCharacter.DEFAULT;
+        }
+        return RunCharacter.of(st.power, "white_vision".equals(st.look));
     }
 
     /** The run style of a speedster, or null when the hero has none. */
@@ -165,7 +110,7 @@ final class RunPoses {
             bob += st.wRun * style.bob * (Math.abs(Mth.cos(st.runPhase)) - 0.5F) * st.runAmp;
         }
         if (st.wSprint > 0.0F) {
-            Character ch = character(st);
+            RunCharacter ch = character(st);
             bob += ch.bob * (Math.abs(Mth.cos(st.limbSwing * 0.6662F)) - 0.5F) * Math.min(1.0F, st.limbAmount) * st.wSprint;
         }
         return bob;
@@ -205,14 +150,15 @@ final class RunPoses {
             float legScale = (st.wallRunning ? 1.2F : 1.0F);
             cycle(c, style, st.runPhase, st.runAmp, wRun * (1.0F - st.wAir), legsOnly, legScale);
             c.twist(-style.twist * Mth.cos(st.runPhase) * st.runAmp, wRun * (1.0F - st.wAir));
-            if (st.walkman && st.slowMo && st.power == Power.QUICKSILVER) {
+            // (The Walkman is Quicksilver's, built-in or borrowed by a custom hero.)
+            if (st.walkman && st.slowMo) {
                 model.head.xRot += 0.05F * Mth.sin(0.26F * c.age) * wRun;
             }
         }
         // Walk and sprint character: scales the vanilla swing that is already in the arms and legs.
         float free = (1.0F - st.wAir) * (1.0F - wRun);
         if (free > 0.001F) {
-            Character ch = character(st);
+            RunCharacter ch = character(st);
             float k = AnimMath.lerp(st.wSprint, ch.walkArms, ch.sprintArms);
             float swing = st.limbSwing * 0.6662F;
             float amount = st.limbAmount;

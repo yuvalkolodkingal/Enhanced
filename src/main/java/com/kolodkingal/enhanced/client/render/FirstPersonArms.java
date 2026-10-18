@@ -119,7 +119,7 @@ public final class FirstPersonArms {
             return;
         }
         float swing = event.getSwingProgress();
-        if (s.power == Power.THOR && throwing(s)) {
+        if (thor(s) && throwing(s)) {
             swing = 0.0F;
         }
         event.setCanceled(true);
@@ -145,6 +145,11 @@ public final class FirstPersonArms {
         // Where energy leaves the hand follows the hand (see WorldEffectsRenderer.handPosition). Any hand counts: Thor's weapon
         // may be in the off hand.
         s.fpAge = s.time;
+    }
+
+    /** Thor, or a custom hero with his weapon (3.4). */
+    private static boolean thor(HeroAnimState s) {
+        return s.power == Power.THOR || s.kitSources.contains(Power.THOR);
     }
 
     /** Whether a throw of the weapon is under way (it replaces the punch). */
@@ -194,7 +199,7 @@ public final class FirstPersonArms {
         boolean calm = EnhancedClientConfig.reducedMotion();
         // M is the arm of the weapon for Thor, else the main arm (as in the poses).
         HumanoidArm mArm = player.getMainArm();
-        if (s.power == Power.THOR) {
+        if (thor(s)) {
             InteractionHand weapon = ThorAbilities.weaponHand(player);
             if (weapon == InteractionHand.OFF_HAND) {
                 mArm = mArm.getOpposite();
@@ -273,7 +278,7 @@ public final class FirstPersonArms {
             float push = -0.10F * ss(1.0F, 2.0F, s.s) * s.wAir;
             RIGHT.ambient(1.0F, 0.0F, push, push);
             LEFT.ambient(1.0F, 0.0F, push, push);
-            if (s.power != Power.THOR) {
+            if (s.flightAs != Power.THOR) {
                 float breathe = 0.012F * Mth.sin(0.07F * age) * s.wAir * (1.0F - ss(0.2F, 0.8F, s.sH));
                 RIGHT.ambient(1.0F, 0.0F, breathe, 0.0F);
                 LEFT.ambient(1.0F, 0.0F, breathe, 0.0F);

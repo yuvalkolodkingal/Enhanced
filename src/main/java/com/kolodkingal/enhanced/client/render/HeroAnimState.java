@@ -78,6 +78,34 @@ public final class HeroAnimState {
     public int lastCastSeq = -1;
     /** The custom hero's switched-on modules last seen ({@code CustomState.onBits}). */
     public int lastCustomOn;
+    /**
+     * The heroes whose plug-in rows (poses, lean, dip) are drawn for a custom hero this tick: those his abilities come from,
+     * and the owners of the stances he has raised (a stance he chose of another hero's).
+     */
+    public final EnumSet<Power> rowHeroes = EnumSet.noneOf(Power.class);
+    /** A custom hero's speed in the air (his Flight's strength), in the units of {@code Power.flightSpeed}. */
+    public float customFlightSpeed = 0.05F;
+    /** The ability of the last binding the cast marker told, and the age it was told at. */
+    @Nullable
+    public com.kolodkingal.enhanced.custom.HeroAbility lastCastRow;
+    public float lastCastAge = -1000.0F;
+    /**
+     * Until when (age) each hero ability's own routes stay quiet: its binding has a move of the definition's, which the
+     * marker played instead (by {@code HeroAbility} ordinal).
+     */
+    public final float[] rowQuietUntil = new float[com.kolodkingal.enhanced.custom.HeroAbility.values().length];
+
+    // ---- the editor's preview puppet (3.4) ----
+    /** How the puppet is said to move, or null for a hero in the world. */
+    @Nullable
+    public HeroAnimator.PreviewMotion preview;
+    /** The puppet's own clock (ticks, with the fraction): it lives outside the world, so it has no game time. */
+    public double previewClock;
+    /** The nanosecond time of the last preview call (to advance the clock), and the whole tick last run. */
+    public long previewNanos;
+    public long previewTick = Long.MIN_VALUE;
+    /** The stances the preview holds up ("Try" of a held or switched-on power). */
+    public final boolean[] previewHeld = new boolean[Stance.COUNT];
 
     // ---- tick samples ----
     /** Vertical motion of the last three ticks, newest first (blocks per tick) and the horizontal speed of the last four. */
@@ -278,6 +306,9 @@ public final class HeroAnimState {
         java.util.Arrays.fill(stanceOn, false);
         table.clear();
         catchFrom = null;
+        lastCastSeq = -1;
+        lastCastRow = null;
+        java.util.Arrays.fill(rowQuietUntil, 0.0F);
         fresh = true;
         seeded = false;
         time = -1.0;

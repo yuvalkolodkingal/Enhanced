@@ -16,9 +16,12 @@ import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.MagnetStreams;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
+import com.kolodkingal.enhanced.client.render.CustomActing;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
@@ -167,10 +170,10 @@ public final class ClientEvents {
             if (player.isInvisible()) {
                 continue;
             }
-            if (data.power() == Power.TOMMY && data.is(Live.WHIRLWIND)) {
+            if (data.has(HeroAbility.TOMMY_WHIRLWIND) && data.is(Live.WHIRLWIND)) {
                 whirlwindParticles(level, player, random);
             }
-            boolean tommy = data.power() == Power.TOMMY && data.is(Live.SPEEDING);
+            boolean tommy = data.has(HeroAbility.TOMMY_SPEED) && data.is(Live.SPEEDING);
             if (!tommy && !QuicksilverAbilities.isRunning(player)) {
                 continue;
             }
@@ -187,7 +190,8 @@ public final class ClientEvents {
             if (tommy) {
                 for (int i = 0; i < 4; i++) {
                     double back = 0.8 + random.nextDouble() * 1.6;
-                    int color = i == 0 ? 0xE6FFF5 : i == 1 ? Power.TOMMY.glow : Power.TOMMY.color;
+                    int color = i == 0 ? 0xE6FFF5 : i == 1 ? CustomActing.tint(player, Power.TOMMY.glow, true)
+                            : CustomActing.tint(player, Power.TOMMY.color, false);
                     level.addParticle(new EnergyParticleOptions(color, 1.0F + random.nextFloat() * 0.4F),
                             player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.6, player.getY() - dy * back + random.nextDouble() * random.nextDouble() * 1.6,
                             player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.6, 0, 0.005, 0);
@@ -196,7 +200,9 @@ public final class ClientEvents {
             }
             for (int i = 0; i < 3; i++) {
                 double back = 1.0 + random.nextDouble();
-                level.addParticle(new EnergyParticleOptions(i == 0 ? Power.QUICKSILVER.glow : Power.QUICKSILVER.color, 1.1F),
+                int color = i == 0 ? CustomActing.tint(player, Power.QUICKSILVER.glow, true)
+                        : CustomActing.tint(player, Power.QUICKSILVER.color, false);
+                level.addParticle(new EnergyParticleOptions(color, 1.1F),
                         player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.5, player.getY() - dy * back + random.nextDouble() * 1.8,
                         player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.5, 0, 0, 0);
             }
@@ -215,7 +221,8 @@ public final class ClientEvents {
             // Moving along the ring, so the mist swirls.
             double vx = -Math.sin(angle) * 0.35;
             double vz = Math.cos(angle) * 0.35;
-            int color = random.nextInt(3) == 0 ? 0xE6FFF5 : random.nextBoolean() ? Power.TOMMY.glow : Power.TOMMY.color;
+            int color = random.nextInt(3) == 0 ? 0xE6FFF5 : random.nextBoolean() ? CustomActing.tint(player, Power.TOMMY.glow, true)
+                    : CustomActing.tint(player, Power.TOMMY.color, false);
             level.addParticle(new EnergyParticleOptions(color, 1.1F), x, player.getY() + height, z, vx, 0.02, vz);
         }
     }
@@ -265,7 +272,8 @@ public final class ClientEvents {
         while (KeyBindings.VISION_COMMAND.consumeClick()) {
             visionClicked = true;
         }
-        if (visionClicked && power == Power.SCARLET_WITCH && mc.screen == null && !player.isSpectator()) {
+        PowerData own = Powers.get(player);
+        if (visionClicked && own.has(HeroAbility.WANDA_HEX) && mc.screen == null && !player.isSpectator()) {
             sendVisionOrder(player);
         }
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
@@ -278,11 +286,13 @@ public final class ClientEvents {
             boolean usable = power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
             boolean down = usable && key.isDown();
             if (usable && clicked && !SENT_DOWN[i]) {
-                if (i == 5 && power == Power.SCARLET_WITCH && !player.isShiftKeyDown() && hasOwnHex(player)) {
+                // (3.4: on the key that holds the ability: N for the hero, any key a custom hero put it on.)
+                if (opens(own, HeroAbility.WANDA_HEX, i) && !player.isShiftKeyDown() && hasOwnHex(player)) {
                     mc.setScreen(new HexScreen());
                     continue;
                 }
-                if (i == 5 && power == Power.THOR && !player.isShiftKeyDown() && ThorAbilities.holdsWeapon(player)) {
+                if (opens(own, HeroAbility.THOR_BIFROST, i) && !player.isShiftKeyDown()
+                        && (power == Power.CUSTOM || ThorAbilities.holdsWeapon(player))) {
                     mc.setScreen(new BifrostScreen());
                     continue;
                 }
@@ -295,6 +305,19 @@ public final class ClientEvents {
                 SENT_DOWN[i] = false;
             }
         }
+    }
+
+    /**
+     * Whether key {@code key} without Sneak is this ability's main action (3.4): its hero's own key, or the key a custom
+     * hero put it on (its plain cell).
+     */
+    private static boolean opens(PowerData data, HeroAbility ability, int key) {
+        if (data.power() != Power.CUSTOM) {
+            return data.power() == ability.hero && key == ability.home;
+        }
+        HeroKit kit = data.kit();
+        HeroKit.Binding binding = kit == null ? null : kit.plain(key);
+        return binding != null && binding.ability() == ability && !binding.isAlt();
     }
 
     private static boolean hasOwnHex(LocalPlayer player) {

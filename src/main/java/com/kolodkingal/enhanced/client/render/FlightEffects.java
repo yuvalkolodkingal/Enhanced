@@ -134,12 +134,13 @@ public final class FlightEffects {
             if (st.wAir > 0.3F) {
                 flightParticles(level, player, st, fx, density, local);
             }
-            if (st.power == Power.THOR && st.wSpin > 0.3F) {
+            if (st.weaponKind > 0 && st.wSpin > 0.3F) {
                 weaponCrackle(level, player, st, fx, density);
             } else {
                 fx.spinning = false;
             }
-            if (st.power == Power.QUICKSILVER || st.power == Power.TOMMY) {
+            if (st.power == Power.QUICKSILVER || st.power == Power.TOMMY || st.kitSources.contains(Power.QUICKSILVER)
+                    || st.kitSources.contains(Power.TOMMY)) {
                 footSplashes(level, player, st, fx);
             }
         }
@@ -235,7 +236,10 @@ public final class FlightEffects {
     /** The particles of a hero in the air. */
     private static void flightParticles(ClientLevel level, AbstractClientPlayer player, HeroAnimState st, Fx fx, float density, boolean local) {
         RandomSource random = level.random;
-        Power power = st.power;
+        // 3.4: whose flight it is (a custom hero's style), in his own colours where the hero's were his.
+        Power power = st.flightAs;
+        int wandaMain = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
+        int wandaGlow = CustomActing.tint(player, Power.SCARLET_WITCH.glow, true);
         boolean moving = st.sH > 0.05F;
         boolean sprint = st.s >= 1.8F;
         int budget = sprint ? 12 : 6;
@@ -245,24 +249,24 @@ public final class FlightEffects {
                 for (int source : new int[]{HAND_R, HAND_L}) {
                     if (moving) {
                         budget -= lay(level, fx, source, 0.35, 3, 0.15, budget, density,
-                                i -> new EnergyParticleOptions(i % 3 == 2 ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 1.0F), 0.0);
+                                i -> new EnergyParticleOptions(i % 3 == 2 ? wandaGlow : wandaMain, 1.0F), 0.0);
                     } else if (now % 3 == 0 && at(fx, source, 0) != null && random.nextFloat() < density) {
                         Vec3 p = at(fx, source, 0);
-                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 1.0F),
+                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? wandaMain : wandaGlow, 1.0F),
                                 p.x + (random.nextDouble() - 0.5) * 0.15, p.y + (random.nextDouble() - 0.5) * 0.15, p.z + (random.nextDouble() - 0.5) * 0.15,
                                 0, 0.01, 0);
                     }
                 }
                 if (sprint) {
                     for (int source : new int[]{FOOT_R, FOOT_L}) {
-                        budget -= lay(level, fx, source, 0.5, 1, 0.1, budget, density, i -> new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.0F), 0.0);
+                        budget -= lay(level, fx, source, 0.5, 1, 0.1, budget, density, i -> new EnergyParticleOptions(wandaMain, 1.0F), 0.0);
                     }
                 }
             }
             case VISION -> {
-                boolean white = "white_vision".equals(st.look);
-                int main = white ? 0x8FDFFF : Power.VISION.color;
-                int accent = white ? 0xE8FBFF : Power.VISION.glow;
+                boolean white = st.flightWhite;
+                int main = white ? 0x8FDFFF : CustomActing.tint(player, Power.VISION.color, false);
+                int accent = white ? 0xE8FBFF : CustomActing.tint(player, Power.VISION.glow, true);
                 for (int source : new int[]{SHOULDER_R, SHOULDER_L}) {
                     if (moving) {
                         budget -= lay(level, fx, source, 0.8, 2, 0.12, budget, density, i -> new EnergyParticleOptions(i % 2 == 0 ? main : accent, 0.8F), 0.0);
@@ -279,14 +283,16 @@ public final class FlightEffects {
                     for (int source : new int[]{FOOT_R, FOOT_L}) {
                         Vec3 p = at(fx, source, 0);
                         if (p != null && random.nextFloat() < density) {
-                            level.addParticle(new EnergyParticleOptions(Power.MAGNETO.glow, 0.9F), p.x + (random.nextDouble() - 0.5) * 0.5,
+                            level.addParticle(new EnergyParticleOptions(CustomActing.tint(player, Power.MAGNETO.glow, true), 0.9F),
+                                    p.x + (random.nextDouble() - 0.5) * 0.5,
                                     p.y - 0.05, p.z + (random.nextDouble() - 0.5) * 0.5, 0, -0.03, 0);
                         }
                     }
                 } else {
                     for (int source : new int[]{FOOT_R, FOOT_L, HAND_R, HAND_L}) {
                         budget -= lay(level, fx, source, 0.6, 2, 0.15, budget, density,
-                                i -> new EnergyParticleOptions(i % 2 == 0 ? Power.MAGNETO.color : Power.MAGNETO.glow, 0.9F), 0.0);
+                                i -> new EnergyParticleOptions(i % 2 == 0 ? CustomActing.tint(player, Power.MAGNETO.color, false)
+                                        : CustomActing.tint(player, Power.MAGNETO.glow, true), 0.9F), 0.0);
                     }
                 }
                 if (sprint && now - fx.lastNugget >= 3 && at(fx, HAND_R, 0) != null) {
@@ -299,7 +305,7 @@ public final class FlightEffects {
             case BILLY -> {
                 for (int source : new int[]{HAND_R, HAND_L, FOOT_R, FOOT_L}) {
                     budget -= lay(level, fx, source, 0.5, 2, 0.2, budget, density, i -> new EnergyParticleOptions(
-                            i % 3 == 2 ? 0xCFEFFF : (i % 5 == 0 ? 0x2F8CFF : Power.BILLY.color), 0.8F), 0.005);
+                            i % 3 == 2 ? 0xCFEFFF : (i % 5 == 0 ? 0x2F8CFF : CustomActing.tint(player, Power.BILLY.color, false)), 0.8F), 0.005);
                 }
                 if (sprint && now - fx.lastGlint >= 5 && at(fx, HAND_L, 0) != null) {
                     fx.lastGlint = now;
@@ -472,9 +478,12 @@ public final class FlightEffects {
         }
         Vec3 feet = player.position();
         boolean thor = power == Power.THOR;
-        addRing(level, player.getId(), feet.add(0, 0.05, 0), new Vec3(0, 1, 0), 0, 9, 0.4F, thor ? 3.2F : 2.4F, 0.10F, power.color, 0.8F);
+        // (3.4: a custom hero takes off in his own colours, in the manner of his flight style.)
+        int color = CustomActing.tint(player, power.color, false);
+        int glow = CustomActing.tint(player, power.glow, true);
+        addRing(level, player.getId(), feet.add(0, 0.05, 0), new Vec3(0, 1, 0), 0, 9, 0.4F, thor ? 3.2F : 2.4F, 0.10F, color, 0.8F);
         float density = EnhancedClientConfig.flightEffects() ? 1.0F : 0.1F;
-        burst(level, feet, Math.round(12 * density), 0.16, 0.15, i -> new EnergyParticleOptions(i % 2 == 0 ? power.color : power.glow, 1.0F));
+        burst(level, feet, Math.round(12 * density), 0.16, 0.15, i -> new EnergyParticleOptions(i % 2 == 0 ? color : glow, 1.0F));
         if (thor) {
             RandomSource random = level.random;
             for (int i = 0; i < Math.round(8 * density); i++) {
@@ -487,7 +496,7 @@ public final class FlightEffects {
             }
             sound(level, feet, ModSounds.QUICKSILVER_WHOOSH.get(), 0.5F, 0.6F);
         } else if (power == Power.MAGNETO) {
-            burst(level, feet, Math.round(10 * density), 0.12, 0.05, i -> new EnergyParticleOptions(Power.MAGNETO.color, 0.9F));
+            burst(level, feet, Math.round(10 * density), 0.12, 0.05, i -> new EnergyParticleOptions(color, 0.9F));
         }
     }
 
@@ -534,7 +543,8 @@ public final class FlightEffects {
             return;
         }
         Vec3 feet = player.position();
-        addRing(level, player.getId(), feet.add(0, 0.05, 0), new Vec3(0, 1, 0), 0, 8, 0.3F, 1.4F, 0.08F, Power.VISION.color, 0.8F);
+        addRing(level, player.getId(), feet.add(0, 0.05, 0), new Vec3(0, 1, 0), 0, 8, 0.3F, 1.4F, 0.08F,
+                CustomActing.tint(player, Power.VISION.color, false), 0.8F);
         dust(level, player, feet, 6, 0.3, 0.06, 0.03);
     }
 
@@ -622,11 +632,11 @@ public final class FlightEffects {
                 if (st.s >= 1.3F && !EnhancedClientConfig.reducedMotion()) {
                     streaks(pose, vc, camera, player, st, fx);
                 }
-                if (st.power == Power.THOR && st.s >= 1.0F) {
+                if (st.flightAs == Power.THOR && st.s >= 1.0F) {
                     torsoArcs(pose, vc, camera, player, partialTick, time);
                 }
             }
-            if (st.power == Power.THOR && st.wSpin > 0.3F) {
+            if (st.weaponKind > 0 && st.wSpin > 0.3F) {
                 weaponBolt(pose, vc, camera, player, fx, time);
             }
         }
@@ -683,26 +693,30 @@ public final class FlightEffects {
     private static void ribbons(Matrix4f pose, VertexConsumer vc, Vec3 camera, AbstractClientPlayer player, HeroAnimState st, Fx fx, float time) {
         float sprint = st.s >= 1.8F ? 1.4F : 1.0F;
         long id = player.getId();
-        switch (st.power) {
+        // 3.4: whose flight it is (a custom hero's style), in his own colours where the hero's were his.
+        switch (st.flightAs) {
             case SCARLET_WITCH -> {
                 int[] hands = {HAND_R, HAND_L};
+                int wanda = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
                 for (int i = 0; i < hands.length; i++) {
-                    source(pose, vc, camera, fx, hands[i], 3.5 * sprint, 0.07F, Power.SCARLET_WITCH.color, 0.55F, 0.10F, i * 0.9F, 0, time);
+                    source(pose, vc, camera, fx, hands[i], 3.5 * sprint, 0.07F, wanda, 0.55F, 0.10F, i * 0.9F, 0, time);
                 }
             }
             case VISION -> {
-                boolean white = "white_vision".equals(st.look);
-                int color = white ? 0x8FDFFF : Power.VISION.color;
+                boolean white = st.flightWhite;
+                int color = white ? 0x8FDFFF : CustomActing.tint(player, Power.VISION.color, false);
                 source(pose, vc, camera, fx, SHOULDER_R, 3.0, 0.05F, color, 0.40F, 0.0F, 0, 0, time);
                 source(pose, vc, camera, fx, SHOULDER_L, 3.0, 0.05F, color, 0.40F, 0.0F, 0, 0, time);
                 if (st.s >= 1.8F) {
-                    source(pose, vc, camera, fx, FOREHEAD, 4.0, 0.10F, white ? 0xE8FBFF : Power.VISION.glow, 0.5F, 0.0F, 0, 0, time);
+                    source(pose, vc, camera, fx, FOREHEAD, 4.0, 0.10F, white ? 0xE8FBFF : CustomActing.tint(player, Power.VISION.glow, true), 0.5F,
+                            0.0F, 0, 0, time);
                 }
             }
             case MAGNETO -> {
                 // Field lines from the hands, in a gentle spiral.
-                source(pose, vc, camera, fx, HAND_R, 2.5, 0.03F, Power.MAGNETO.glow, 0.30F, 0.0F, 0, 0.08F, time);
-                source(pose, vc, camera, fx, HAND_L, 2.5, 0.03F, Power.MAGNETO.glow, 0.30F, 0.0F, 0, -0.08F, time);
+                int field = CustomActing.tint(player, Power.MAGNETO.glow, true);
+                source(pose, vc, camera, fx, HAND_R, 2.5, 0.03F, field, 0.30F, 0.0F, 0, 0.08F, time);
+                source(pose, vc, camera, fx, HAND_L, 2.5, 0.03F, field, 0.30F, 0.0F, 0, -0.08F, time);
             }
             case BILLY -> {
                 // A double helix around the path of each hand.
@@ -734,7 +748,7 @@ public final class FlightEffects {
                 }
             }
             default -> {
-                HeroClient hero = HeroClients.of(st.power);
+                HeroClient hero = HeroClients.of(st.flightAs);
                 if (hero != null) {
                     hero.flightRibbons(pose, vc, camera, player, st, fx, time);
                 }
@@ -834,7 +848,7 @@ public final class FlightEffects {
     private static void streaks(Matrix4f pose, VertexConsumer vc, Vec3 camera, AbstractClientPlayer player, HeroAnimState st, Fx fx) {
         double length = 1.5 + 2.5 * ss(1.3F, 2.3F, st.s);
         float alpha = 0.45F * ss(1.3F, 1.8F, st.s);
-        int glow = st.power.glow;
+        int glow = CustomActing.tint(player, st.power.glow, true);
         int rgb = ((int) (0xFF * 0.7 + ((glow >> 16) & 0xFF) * 0.3) << 16) | ((int) (0xFF * 0.7 + ((glow >> 8) & 0xFF) * 0.3) << 8)
                 | (int) (0xFF * 0.7 + (glow & 0xFF) * 0.3);
         for (int source : new int[]{HAND_R, HAND_L, FOOT_R, FOOT_L}) {

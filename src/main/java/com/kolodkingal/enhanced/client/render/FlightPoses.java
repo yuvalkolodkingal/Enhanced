@@ -20,7 +20,7 @@ final class FlightPoses {
         if (w <= 0.001F) {
             return;
         }
-        FlightProfile profile = FlightProfile.of(st.power, "white_vision".equals(st.look));
+        FlightProfile profile = FlightProfile.of(st);
         if (profile == null) {
             return;
         }
