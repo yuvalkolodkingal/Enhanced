@@ -185,7 +185,9 @@ public final class SurfaceRun {
     private static Vec3 wall(Level level, Player player, Runner r, Input in) {
         Direction normal = r.surface.normal();
         AABB box = player.getBoundingBox();
-        if (r.vertical > 0 && blockIn(level, player, ceilingSlab(box, REACH))) {
+        boolean contact = blockIn(level, player, wallSlab(box, normal.getOpposite(), REACH));
+        // (Past the top of the wall with something over his head: over the top, not onto that ceiling.)
+        if (r.vertical > 0 && (contact || r.lost < 0) && blockIn(level, player, ceilingSlab(box, REACH))) {
             if (!in.ceilings) {
                 return drop(r);
             }
@@ -203,7 +205,7 @@ public final class SurfaceRun {
             r.event = Event.TO_GROUND;
             return null;
         }
-        if (!blockIn(level, player, wallSlab(box, normal.getOpposite(), REACH))) {
+        if (!contact) {
             if (r.lost < 0) {
                 // Round the lip of an overhang: the outer face is still above his sides.
                 r.lost++;

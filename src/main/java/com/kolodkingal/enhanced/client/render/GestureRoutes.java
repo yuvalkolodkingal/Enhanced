@@ -123,7 +123,7 @@ public final class GestureRoutes {
             // Sneak + V's Pickpocket's (100); N is the Pebble Barrage.
             case QUICKSILVER -> switch (ability) {
                 case 2 -> GestureId.SPEED_DASH;
-                case 3 -> left > (QS_BLITZ_COOLDOWN + QS_PICKPOCKET_COOLDOWN) / 2 ? GestureId.QS_SNATCH : GestureId.QS_BLITZ;
+                case 3 -> left > QS_BLITZ_COOLDOWN ? GestureId.QS_SNATCH : GestureId.QS_BLITZ;
                 case 5 -> GestureId.QS_BARRAGE;
                 default -> null;
             };
@@ -131,7 +131,7 @@ public final class GestureRoutes {
             // Whirlwind and the Sonic Boom (V, Sneak + V) are acted by their momentary states.
             case TOMMY -> switch (ability) {
                 case 2 -> GestureId.SPEED_DASH;
-                case 4 -> left > (TOMMY_VIBRATE_COOLDOWN + TOMMY_BLITZ_COOLDOWN) / 2 ? GestureId.TOMMY_BLITZ : GestureId.TOMMY_VIBRATE;
+                case 4 -> left > TOMMY_VIBRATE_COOLDOWN ? GestureId.TOMMY_BLITZ : GestureId.TOMMY_VIBRATE;
                 case 5 -> GestureId.TOMMY_ACCEL;
                 default -> null;
             };

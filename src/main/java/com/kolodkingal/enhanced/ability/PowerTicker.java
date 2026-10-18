@@ -84,6 +84,8 @@ public final class PowerTicker {
         if (data.power() != Power.QUICKSILVER && data.power() != Power.TOMMY) {
             // (Tommy's slow time, 3.3, is set by his own tick, like Quicksilver Time.)
             data.setSlowMo(false);
+        }
+        if (data.power() != Power.QUICKSILVER) {
             QuicksilverAbilities.applySpeed(player, data);
         }
         TommyAbilities.applySpeed(player, data);
