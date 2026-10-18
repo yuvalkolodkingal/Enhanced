@@ -21,10 +21,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -54,6 +57,8 @@ public final class PowersTab extends EditorTab {
     private CatalogEntry selected = PowerModule.ENERGY_BLAST;
     /** Where the numbers and the colours go (worked out by {@link #init}, drawn by {@link #render}). */
     private int numbersY;
+    /** How many lines of the description the card shows (see {@link #descLines}). */
+    private int descMax = 2;
     private int coloursY = -1;
     private int detailX;
     private int detailW;
@@ -188,7 +193,12 @@ public final class PowersTab extends EditorTab {
     private void detail(int x, int y, int w, int h) {
         CatalogEntry e = selected;
         CustomHero.Pick pick = draft().pick(e);
-        int yy = y + 42;
+        // (3.5: the description wraps on as many lines as it needs, as many as the height leaves; the buttons go below it.)
+        // (room: the Add/Try buttons, the cost and about three rows of numbers below; a row of styles in a family; for a
+        // power picked, its options or Sneak move, its strength and its colours)
+        int below = 112 + (e.family() != null ? 24 : 0) + (pick == null ? 0 : 42 + (e instanceof PowerModule ? 13 : 0));
+        descMax = Mth.clamp(2 + (h - below) / 9, 2, 6);
+        int yy = y + 24 + 9 * Math.max(2, descLines(e, w).size());
         // The family's styles.
         if (e.family() != null) {
             List<Card> styles = new ArrayList<>();
@@ -398,8 +408,8 @@ public final class PowersTab extends EditorTab {
         Component who = e.hero() != null ? Component.translatable("screen.enhanced.hero_creator.of_hero", e.hero().displayName())
                 : Component.translatable("screen.enhanced.hero_creator.cat." + CATEGORIES[e.group().ordinal()]);
         text(g, who.copy().withStyle(ChatFormatting.GRAY), dx, dy + 10, dw, 0xFFFFFF);
-        List<FormattedCharSequence> desc = font().split(CreatorUi.desc(e).withStyle(ChatFormatting.WHITE), dw);
-        for (int i = 0; i < Math.min(2, desc.size()); i++) {
+        List<FormattedCharSequence> desc = descLines(e, dw);
+        for (int i = 0; i < desc.size(); i++) {
             g.drawString(font(), desc.get(i), dx, dy + 20 + i * 9, 0xFFFFFF, true);
         }
         CustomHero.Pick pick = draft().pick(e);
@@ -458,6 +468,23 @@ public final class PowersTab extends EditorTab {
             text(g, Component.translatable("screen.enhanced.hero_creator.search.none").withStyle(ChatFormatting.GRAY), x, y + 40, detailX - x - 6,
                     0xFFFFFF);
         }
+    }
+
+    /**
+     * The description of the power wrapped to the card's width, on at most {@link #descMax} lines (3.5; it was cut at
+     * two): a longer one ends in "..." and its tooltip in the list has it whole.
+     */
+    private List<FormattedCharSequence> descLines(CatalogEntry e, int w) {
+        List<FormattedText> all = font().getSplitter().splitLines(CreatorUi.desc(e).withStyle(ChatFormatting.WHITE), w, Style.EMPTY);
+        List<FormattedCharSequence> shown = new ArrayList<>();
+        for (int i = 0; i < Math.min(all.size(), descMax); i++) {
+            FormattedText line = all.get(i);
+            if (i == descMax - 1 && all.size() > descMax) {
+                line = FormattedText.composite(font().substrByWidth(line, w - font().width("...")), FormattedText.of("..."));
+            }
+            shown.add(Language.getInstance().getVisualOrder(line));
+        }
+        return shown;
     }
 
     private static String times(float f) {

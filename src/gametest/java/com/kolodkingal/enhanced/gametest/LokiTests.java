@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonObject;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -288,8 +289,10 @@ public final class LokiTests {
         ServerPlayer loki = f.player(5.5, FLOOR, 10.5, Power.LOKI);
         PowerData data = Powers.get(loki);
         PowerTicker.tick(loki);
-        assertNear(loki.getAttributeValue(Attributes.MAX_HEALTH), 24.0, 1.0E-6, "Loki is Asgardian-tough: 12 hearts");
+        assertNear(loki.getAttributeValue(Attributes.MAX_HEALTH), 30.0, 1.0E-6, "Loki is Asgardian-tough: 15 hearts (3.5)");
         double armor = loki.getAttributeValue(Attributes.ARMOR);
+        assertNear(armor, 6.0, 1.0E-6, "and his body has 6 armor");
+        assertNear(loki.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 2.0, 1.0E-6, "and 2 toughness");
 
         press(loki, 5);
         check(data.toggle(Toggle.FROST_GIANT), "N reveals his true Frost Giant form");
@@ -320,6 +323,41 @@ public final class LokiTests {
         PowerTicker.tick(loki);
         check(data.toggle(Toggle.FROST_GIANT), "changing look doesn't end the Frost Giant form");
         assertNear(loki.getAttributeValue(Attributes.ARMOR) - armor, LokiAbilities.FROST_ARMOR_BONUS, 1.0E-6, "or its armor");
+        helper.succeed();
+    }
+
+    /**
+     * 3.5: Loki's Asgardian body is set by {@code [loki]} bodyHealthBonus (10), bodyArmor (6) and bodyToughness (2): as
+     * tough as Thor's body, below the crowned Scarlet Witch; the Frost Giant's +4 armor comes on top. A change of the
+     * config takes hold on the next tick, and his health never stays above the new maximum.
+     */
+    @GameTest(template = ARENA, batch = "loki_body")
+    public static void lokisBodyFollowsTheConfig(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        check(EnhancedConfig.LOKI_BODY_HEALTH.getDefault() == 10.0 && EnhancedConfig.LOKI_BODY_ARMOR.getDefault() == 6.0
+                && EnhancedConfig.LOKI_BODY_TOUGHNESS.getDefault() == 2.0, "the defaults: +10 health, 6 armor, 2 toughness");
+        ServerPlayer loki = f.player(5.5, FLOOR, 10.5, Power.LOKI);
+        ServerPlayer thor = f.player(5.5, FLOOR, 4.5, Power.THOR);
+        PowerTicker.tick(loki);
+        PowerTicker.tick(thor);
+        assertNear(loki.getMaxHealth(), thor.getMaxHealth(), 1.0E-6, "as much health as Thor");
+        assertNear(loki.getAttributeValue(Attributes.ARMOR), thor.getAttributeValue(Attributes.ARMOR), 1.0E-6, "and as much armor");
+        press(loki, 5);
+        PowerTicker.tick(loki);
+        assertNear(loki.getAttributeValue(Attributes.ARMOR), 10.0, 1.0E-6, "the Frost Giant: 6 + 4 armor");
+        press(loki, 5);
+        loki.setHealth(loki.getMaxHealth());
+        f.config(EnhancedConfig.LOKI_BODY_HEALTH, 4.0);
+        f.config(EnhancedConfig.LOKI_BODY_ARMOR, 0.0);
+        f.config(EnhancedConfig.LOKI_BODY_TOUGHNESS, 5.0);
+        PowerTicker.tick(loki);
+        assertNear(loki.getMaxHealth(), 24.0, 1.0E-6, "the 3.4 body again: 24 health");
+        assertNear(loki.getHealth(), 24.0, 1.0E-6, "his health comes down to it");
+        assertNear(loki.getAttributeValue(Attributes.ARMOR), 0.0, 1.0E-6, "no armor");
+        assertNear(loki.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 5.0, 1.0E-6, "5 toughness");
+        Powers.setPower(loki, Power.NONE);
+        assertNear(loki.getMaxHealth(), 20.0, 1.0E-6, "an ordinary body without the power");
+        assertNear(loki.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 0.0, 1.0E-6, "and no toughness");
         helper.succeed();
     }
 
@@ -440,7 +478,7 @@ public final class LokiTests {
         check(LokiIllusionEntity.ownedBy(level, loki.getUUID()).isEmpty(), "every duplicate dissolves with the power");
         check(!loki.hasEffect(MobEffects.INVISIBILITY), "Loki is visible again");
         assertNear(loki.getAttributeValue(Attributes.MAX_HEALTH), 20.0, 1.0E-6, "an ordinary body again");
-        assertNear(loki.getAttributeValue(Attributes.ARMOR), 0.0, 1.0E-6, "with no Frost Giant armor");
+        assertNear(loki.getAttributeValue(Attributes.ARMOR), 0.0, 1.0E-6, "with no armor of his body or the Frost Giant's");
         helper.succeed();
     }
 

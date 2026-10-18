@@ -73,6 +73,7 @@ public final class SaveTab extends EditorTab {
             Path file = HeroFiles.export(hero);
             HeroFiles.copy(CustomHeroJson.write(hero));
             screen.say(Component.translatable("screen.enhanced.hero_creator.saved", "enhanced/heroes/" + file.getFileName()), true);
+            screen.markSaved();
             screen.rebuild();
         } catch (IOException e) {
             screen.say(Component.translatable("screen.enhanced.hero_creator.save_failed"), false);
@@ -87,6 +88,7 @@ public final class SaveTab extends EditorTab {
         }
         CustomHeroRules.Result result = CustomHeroRules.sanitize(read.hero(), limits());
         screen.replaceDraft(read.hero());
+        screen.markSaved();
         boolean clean = result.notes().isEmpty() && read.notes().isEmpty();
         screen.say(Component.translatable(clean ? "screen.enhanced.hero_creator.loaded" : "screen.enhanced.hero_creator.loaded_changed",
                 read.hero().name()), clean);

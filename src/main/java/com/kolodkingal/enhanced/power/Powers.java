@@ -73,6 +73,8 @@ public final class Powers {
         PowerTicker.applyPassives(player, data);
         syncIfDirty(player);
         BuildMagic.onPowerChanged(player, old, power);
+        // (3.5: another hero's helmet, goggles, glasses or crown comes off the head into the inventory.)
+        com.kolodkingal.enhanced.custom.HeroItems.takeOffForeign(player, data);
     }
 
     /**

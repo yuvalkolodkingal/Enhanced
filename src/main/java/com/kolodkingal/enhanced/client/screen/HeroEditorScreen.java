@@ -81,6 +81,8 @@ public class HeroEditorScreen extends Screen {
     private long statusUntil;
     private boolean wasOver;
     private long shakeUntil;
+    /** The JSON of the hero as it was last opened, loaded or saved (3.5: leaving with anything else asks first). */
+    private String savedJson;
 
     @Nullable
     private PreviewPuppet puppet;
@@ -103,6 +105,17 @@ public class HeroEditorScreen extends Screen {
         tabs.put(Tab.LOOK, new LookTab(this));
         tabs.put(Tab.SAVE, new SaveTab(this));
         this.wasOver = CustomHeroRules.cost(start) > limits().budget();
+        this.savedJson = json();
+    }
+
+    /** Whether the draft has changes not in a file, not sent to the server, and not as it was opened. */
+    public boolean unsaved() {
+        return !json().equals(savedJson);
+    }
+
+    /** The draft as it is now is safe (saved to a file, or just loaded from one). */
+    public void markSaved() {
+        savedJson = json();
     }
 
     // ---- what the tabs share ----
@@ -344,8 +357,19 @@ public class HeroEditorScreen extends Screen {
         if (popup != null) {
             closePopup();
         } else {
-            onClose();
+            leave();
         }
+    }
+
+    /** Back or Esc with no pop-up open (3.5): with unsaved changes, asks before they are thrown away. */
+    private void leave() {
+        if (!unsaved()) {
+            onClose();
+            return;
+        }
+        ask(new Popup(Component.translatable("screen.enhanced.hero_creator.discard"), List.of(
+                Popup.Item.of(Component.translatable("screen.enhanced.hero_creator.discard.yes"), null, 0xFF7070, false, this::onClose),
+                Popup.Item.of(Component.translatable("screen.enhanced.hero_creator.discard.no"), null, 0x7CFC7C, false, () -> { }))));
     }
 
     /** Closes every screen of the creator (the hero was sent to the server). */
@@ -364,6 +388,10 @@ public class HeroEditorScreen extends Screen {
     public boolean keyPressed(int key, int scan, int modifiers) {
         if (key == GLFW.GLFW_KEY_ESCAPE && popup != null) {
             closePopup();
+            return true;
+        }
+        if (key == GLFW.GLFW_KEY_ESCAPE) {
+            leave();
             return true;
         }
         return super.keyPressed(key, scan, modifiers);
@@ -435,7 +463,14 @@ public class HeroEditorScreen extends Screen {
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
-        g.drawCenteredString(font, title.copy().withStyle(s -> s.withColor(HeroCreatorScreen.GOLD).withBold(true)), width / 2, 4, 0xFFFFFF);
+        // (3.5: the status line ("Loaded ...", "Saved ...") takes the title's place for its few seconds: at the bottom it
+        // lay over the last row of the Moves tab's buttons.)
+        boolean saying = status != null && Util.getMillis() < statusUntil;
+        if (saying) {
+            CreatorUi.drawFitted(g, font, status, left() + 6, 4, width - 12 - left(), statusColor);
+        } else {
+            g.drawCenteredString(font, title.copy().withStyle(s -> s.withColor(HeroCreatorScreen.GOLD).withBold(true)), width / 2, 4, 0xFFFFFF);
+        }
         renderPreview(g, partialTick);
         int x0 = left() + 6;
         int right = width - 6;
@@ -446,9 +481,6 @@ public class HeroEditorScreen extends Screen {
         } else {
             renderBudget(g, x0, right);
             tabs.get(tab).render(g, x0, TOP, right - x0, height - 22 - TOP, mouseX, mouseY, partialTick);
-        }
-        if (status != null && Util.getMillis() < statusUntil) {
-            CreatorUi.drawFitted(g, font, status, x0, height - 14, right - x0, statusColor);
         }
     }
 

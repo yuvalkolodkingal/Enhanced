@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
@@ -47,6 +48,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -410,7 +412,8 @@ public final class AgathaAbilities {
 
     /**
      * Why the Power Drain cannot take this target (a translation key), or null if it can: a player only where PvP lets her
-     * hurt them and only if they have a power, a creature only if an attack of hers may hurt it, nothing inside a ward.
+     * hurt them, only if they have a power and (3.5, {@code agatha.drainOnlySorcerers}) only a witch's or sorcerer's
+     * ({@link #drainable}); a creature only if an attack of hers may hurt it; nothing inside a ward.
      */
     @Nullable
     public static String drainRefusal(ServerPlayer agatha, LivingEntity target) {
@@ -421,9 +424,37 @@ public final class AgathaAbilities {
             if (!AreaTargets.mayHurt(agatha, other, false)) {
                 return "message.enhanced.agatha.drain_refused";
             }
-            return Powers.power(other).hasPowers() ? null : "message.enhanced.agatha.no_power";
+            if (!Powers.power(other).hasPowers()) {
+                return "message.enhanced.agatha.no_power";
+            }
+            return !AgathaConfig.DRAIN_ONLY_SORCERERS.get() || drainable(Powers.get(other)) ? null
+                    : "message.enhanced.agatha.drain_not_sorcerer";
         }
         return AreaTargets.mayHurt(agatha, target, true) ? null : "message.enhanced.agatha.drain_refused";
+    }
+
+    /** The heroes whose power is a witch's or sorcerer's, which the Power Drain can take (3.5). */
+    private static final Set<Power> DRAINABLE = EnumSet.of(Power.LOKI, Power.SCARLET_WITCH, Power.BILLY, Power.AGATHA);
+
+    /**
+     * Whether the Power Drain can take this hero's power (3.5): Loki, the Scarlet Witch, Billy, Agatha (as Wanda drained
+     * her), or a custom hero with an ability of theirs. Not a hero who only holds the Darkhold: its magic is the book's,
+     * and the drain takes the hero's own power.
+     */
+    public static boolean drainable(PowerData data) {
+        if (data.power() == Power.CUSTOM) {
+            HeroKit kit = data.kit();
+            if (kit == null) {
+                return false;
+            }
+            for (HeroAbility row : HeroAbility.values()) {
+                if (DRAINABLE.contains(row.hero()) && kit.has(row)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return DRAINABLE.contains(data.power());
     }
 
     /**

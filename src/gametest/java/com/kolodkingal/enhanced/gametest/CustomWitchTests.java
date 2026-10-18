@@ -387,10 +387,10 @@ public final class CustomWitchTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
         ServerPlayer player = hero(f, 10.5, 4.5, def().pick("agatha.drain", 5).key(4, "agatha.drain"));
-        ServerPlayer tommy = f.player(10.5, FLOOR, 12.5, Power.TOMMY);
-        lookAt(player, tommy);
+        ServerPlayer billy = f.player(10.5, FLOOR, 12.5, Power.BILLY);
+        lookAt(player, billy);
         tap(player, 4, false);
-        check(tommy.hasEffect(ModEffects.DRAINED), "B: the hero's power is drawn out");
+        check(billy.hasEffect(ModEffects.DRAINED), "B: the sorcerer's power is drawn out");
         assertNear(left(helper, player, 4), AgathaConfig.DRAIN_COOLDOWN.get(), 0.0, "the recharge is on B");
         helper.succeed();
     }

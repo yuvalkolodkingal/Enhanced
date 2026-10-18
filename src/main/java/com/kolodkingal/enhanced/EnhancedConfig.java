@@ -142,6 +142,9 @@ public final class EnhancedConfig {
 
     // ---- Loki ----
     public static final ModConfigSpec.DoubleValue LOKI_DAGGER_DAMAGE;
+    public static final ModConfigSpec.DoubleValue LOKI_BODY_HEALTH;
+    public static final ModConfigSpec.DoubleValue LOKI_BODY_ARMOR;
+    public static final ModConfigSpec.DoubleValue LOKI_BODY_TOUGHNESS;
     public static final ModConfigSpec.IntValue SCEPTER_CONFUSION_TICKS;
     public static final ModConfigSpec.IntValue SCEPTER_NAUSEA_TICKS;
     public static final ModConfigSpec.IntValue SCEPTER_SLOWNESS_TICKS;
@@ -434,6 +437,12 @@ public final class EnhancedConfig {
                 .defineInRange("scepterNauseaTicks", 160, 0, 6000);
         SCEPTER_SLOWNESS_TICKS = BUILDER.comment("How long a player gets Slowness I after a melee hit with Loki's Scepter, in ticks (60 = 3 seconds).")
                 .defineInRange("scepterSlownessTicks", 60, 0, 6000);
+        LOKI_BODY_HEALTH = BUILDER.comment("Extra max health of Loki's Asgardian body (10 = 5 hearts, so 30, as Thor's).")
+                .defineInRange("bodyHealthBonus", 10.0, 0.0, 100.0);
+        LOKI_BODY_ARMOR = BUILDER.comment("Armor of Loki's Asgardian body (6, as Thor's; the Frost Giant form adds 4 more).")
+                .defineInRange("bodyArmor", 6.0, 0.0, 30.0);
+        LOKI_BODY_TOUGHNESS = BUILDER.comment("Armor toughness of Loki's Asgardian body (2, as diamond armor; Thor's God of Thunder has 6).")
+                .defineInRange("bodyToughness", 2.0, 0.0, 20.0);
         BUILDER.pop();
 
         BUILDER.push("thor");

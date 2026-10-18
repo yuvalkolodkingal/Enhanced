@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.VishantiConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
 import com.kolodkingal.enhanced.power.Live;
@@ -297,21 +298,21 @@ public final class AgathaTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
         ServerPlayer player = agatha(f, 10.5, 4.5);
-        ServerPlayer tommy = f.player(10.5, FLOOR, 12.5, Power.TOMMY);
-        lookAt(player, tommy);
+        ServerPlayer loki = f.player(10.5, FLOOR, 12.5, Power.LOKI);
+        lookAt(player, loki);
         player.setHealth(20.0F);
         long now = helper.getLevel().getGameTime();
         press(player, 3);
-        MobEffectInstance drained = tommy.getEffect(ModEffects.DRAINED);
-        check(drained != null && drained.getDuration() == AgathaConfig.DRAIN_TICKS.get(), "Tommy's power is drained for drainTicks");
+        MobEffectInstance drained = loki.getEffect(ModEffects.DRAINED);
+        check(drained != null && drained.getDuration() == AgathaConfig.DRAIN_TICKS.get(), "Loki's power is drained for drainTicks");
         assertNear(player.getHealth(), 20.0 + AgathaConfig.DRAIN_HEAL.get(), 1.0E-4, "she heals by it");
         check(!Powers.get(player).isReady(AgathaAbilities.DRAIN_SLOT, now), "and the drain recharges");
-        PowerData data = Powers.get(tommy);
-        boolean before = data.toggle(Toggle.SUPER_SPEED);
-        TestKit.sentPackets(tommy);
-        press(tommy, 1);
-        check(data.toggle(Toggle.SUPER_SPEED) == before, "no key of his works");
-        check("message.enhanced.agatha.you_are_drained".equals(lastActionBarKey(tommy)), "and he is told why");
+        PowerData data = Powers.get(loki);
+        boolean before = data.toggle(Toggle.FROST_GIANT);
+        TestKit.sentPackets(loki);
+        press(loki, 5);
+        check(data.toggle(Toggle.FROST_GIANT) == before, "no key of his works");
+        check("message.enhanced.agatha.you_are_drained".equals(lastActionBarKey(loki)), "and he is told why");
         // A flier comes down while drained, and flies again when it ends.
         ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         check(wanda.mayFly(), "the Scarlet Witch may fly");
@@ -321,6 +322,73 @@ public final class AgathaTests {
         wanda.removeEffect(ModEffects.DRAINED);
         PowerTicker.applyPassives(wanda, Powers.get(wanda));
         check(wanda.mayFly(), "the power comes back");
+        helper.succeed();
+    }
+
+    /**
+     * 3.5 ({@code agatha.drainOnlySorcerers}, on): only a witch's or sorcerer's power can be drained: Loki, the Scarlet
+     * Witch, Billy, another Agatha, and a custom hero with an ability of any of them. Tommy, Thor, a custom hero with only
+     * Tommy's speed, and Tommy holding the Darkhold are refused (with the reason), and the refusal costs nothing.
+     */
+    @GameTest(template = ARENA, batch = "agatha_pvp")
+    public static void theDrainTakesOnlyAWitchsOrSorcerersPower(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        check(AgathaConfig.DRAIN_ONLY_SORCERERS.getDefault(), "on by default");
+        ServerPlayer player = agatha(f, 10.5, 2.5);
+        record Target(String name, ServerPlayer player, boolean drained) {
+        }
+        ServerPlayer tommyWithTheBook = f.player(19.5, FLOOR, 12.5, Power.TOMMY);
+        tommyWithTheBook.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.DARKHOLD.get()));
+        List<Target> targets = List.of(
+                new Target("Loki", f.player(1.5, FLOOR, 12.5, Power.LOKI), true),
+                new Target("the Scarlet Witch", f.player(3.5, FLOOR, 12.5, Power.SCARLET_WITCH), true),
+                new Target("Billy", f.player(5.5, FLOOR, 12.5, Power.BILLY), true),
+                new Target("another Agatha", f.player(7.5, FLOOR, 12.5, Power.AGATHA), true),
+                new Target("a custom hero with Loki's daggers", CustomKitSupport.hero(f, 9.5, 12.5,
+                        CustomKitSupport.def().pick("loki.daggers", 5).build()), true),
+                new Target("a custom hero with Wanda's telekinesis", CustomKitSupport.hero(f, 11.5, 12.5,
+                        CustomKitSupport.def().pick("tommy.speed", 5).pick("wanda.telekinesis", 5).build()), true),
+                new Target("Tommy", f.player(13.5, FLOOR, 12.5, Power.TOMMY), false),
+                new Target("Thor", f.player(15.5, FLOOR, 12.5, Power.THOR), false),
+                new Target("a custom hero with Tommy's speed only", CustomKitSupport.hero(f, 17.5, 12.5,
+                        CustomKitSupport.def().pick("tommy.speed", 5).build()), false),
+                new Target("Tommy holding the Darkhold", tommyWithTheBook, false));
+        for (Target target : targets) {
+            check(AgathaAbilities.drainable(Powers.get(target.player())) == target.drained(), target.name() + " drainable: " + target.drained());
+            Powers.get(player).startCooldown(HeroAbility.AGATHA_DRAIN, helper.getLevel().getGameTime(), 0);
+            lookAt(player, target.player());
+            TestKit.sentPackets(player);
+            press(player, 3);
+            long now = helper.getLevel().getGameTime();
+            if (target.drained()) {
+                check(target.player().hasEffect(ModEffects.DRAINED), target.name() + "'s power is drained");
+                check("message.enhanced.agatha.drained".equals(lastActionBarKey(player)), "and she is told so");
+            } else {
+                check(!target.player().hasEffect(ModEffects.DRAINED), target.name() + "'s power cannot be drained");
+                check("message.enhanced.agatha.drain_not_sorcerer".equals(lastActionBarKey(player)),
+                        "she is told only a witch's or sorcerer's power can be: " + lastActionBarKey(player));
+                check(Powers.get(player).isReady(AgathaAbilities.DRAIN_SLOT, now), "and the refusal costs nothing");
+            }
+        }
+        helper.succeed();
+    }
+
+    /** 3.5: with {@code agatha.drainOnlySorcerers} off, the drain takes any hero's power again (the rule of 3.3). */
+    @GameTest(template = ARENA, batch = "agatha_drain_any")
+    public static void withDrainOnlySorcerersOffAnyHeroIsDrained(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        f.config(AgathaConfig.DRAIN_ONLY_SORCERERS, false);
+        ServerPlayer player = agatha(f, 10.5, 4.5);
+        ServerPlayer tommy = f.player(10.5, FLOOR, 12.5, Power.TOMMY);
+        lookAt(player, tommy);
+        press(player, 3);
+        check(tommy.hasEffect(ModEffects.DRAINED), "Tommy's power is drained");
+        PowerData data = Powers.get(tommy);
+        boolean before = data.toggle(Toggle.SUPER_SPEED);
+        press(tommy, 1);
+        check(data.toggle(Toggle.SUPER_SPEED) == before, "no key of his works");
         helper.succeed();
     }
 

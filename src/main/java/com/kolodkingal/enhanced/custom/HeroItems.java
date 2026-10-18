@@ -4,13 +4,16 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.CustomHeroConfig;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +88,53 @@ public final class HeroItems {
             }
         }
         return given;
+    }
+
+    /** The hero a worn hero item belongs to (Magneto's helmet, Quicksilver's goggles, Cyclops's glasses, Wanda's crown). */
+    @Nullable
+    public static Power wornItemHero(ItemStack stack) {
+        if (stack.is(ModItems.MAGNETO_HELMET.get())) {
+            return Power.MAGNETO;
+        }
+        if (stack.is(ModItems.QUICKSILVER_GOGGLES.get())) {
+            return Power.QUICKSILVER;
+        }
+        if (stack.is(ModItems.RUBY_QUARTZ_GLASSES.get())) {
+            return Power.CYCLOPS;
+        }
+        if (stack.is(ModItems.WANDA_CROWN.get())) {
+            return Power.SCARLET_WITCH;
+        }
+        return null;
+    }
+
+    /**
+     * 3.5: when the player becomes another hero, a worn item of a different hero comes off the head into the inventory
+     * (at his feet when it is full; never deleted), so it no longer hides the new hero's look (Cyclops's glasses over a
+     * custom hero's hat and visor). It stays on when the new hero is its own hero, or a custom hero with an ability of
+     * that hero, and when the power is only taken away (no new look to hide; Magneto's helmet still guards anyone's
+     * mind). He can put it back on whenever he likes. Returns the item taken off, or empty.
+     */
+    public static ItemStack takeOffForeign(ServerPlayer player, PowerData data) {
+        Power now = data.power();
+        ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
+        Power owner = wornItemHero(head);
+        if (owner == null || now == Power.NONE || now == owner) {
+            return ItemStack.EMPTY;
+        }
+        if (now == Power.CUSTOM && data.kit() != null && data.kit().acts(owner)) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack stack = head.copy();
+        player.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
+        Component name = stack.getHoverName();
+        if (!player.getInventory().add(stack)) {
+            player.drop(stack, false);
+            player.displayClientMessage(Component.translatable("message.enhanced.hero_item.taken_off_dropped", name), false);
+        } else {
+            player.displayClientMessage(Component.translatable("message.enhanced.hero_item.taken_off", name), false);
+        }
+        return head.copy();
     }
 
     /** Whether the player has an item of this kind anywhere: the inventory, the armour, the off hand. */

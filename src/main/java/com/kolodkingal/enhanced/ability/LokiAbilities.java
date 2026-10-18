@@ -64,10 +64,10 @@ import java.util.UUID;
  */
 public final class LokiAbilities {
     private static final ResourceLocation BODY_HEALTH = Enhanced.id("loki_body_health");
+    private static final ResourceLocation BODY_ARMOR = Enhanced.id("loki_body_armor");
+    private static final ResourceLocation BODY_TOUGHNESS = Enhanced.id("loki_body_toughness");
     private static final ResourceLocation FROST_ARMOR = Enhanced.id("loki_frost_armor");
 
-    /** Asgardian-tough: 24 health. */
-    public static final double BODY_HEALTH_BONUS = 4.0;
     public static final double FROST_ARMOR_BONUS = 4.0;
 
     public static final float DAGGER_SPEED = 2.5F;
@@ -154,12 +154,17 @@ public final class LokiAbilities {
         }
     }
 
-    /** Keeps Loki's body in step with his Frost Giant form and his shapeshifted form; also called when the power changes. */
+    /**
+     * Keeps Loki's body in step with his Frost Giant form and his shapeshifted form; also called when the power changes.
+     * His Asgardian body (3.5: {@code [loki]} bodyHealthBonus 10, bodyArmor 6, bodyToughness 2, so 30 health as Thor's)
+     * is his own (no Hero Creator row); a custom hero's Frost Giant form armours him too (3.4).
+     */
     public static void applyForm(ServerPlayer player, PowerData data) {
-        // (3.4: Loki's Asgardian body is his own; a custom hero's Frost Giant form armours him too.)
         boolean loki = data.power() == Power.LOKI;
         boolean frost = data.has(HeroAbility.LOKI_FROST_GIANT) && data.toggle(Toggle.FROST_GIANT);
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, BODY_HEALTH_BONUS, loki);
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, EnhancedConfig.LOKI_BODY_HEALTH.get(), loki);
+        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, EnhancedConfig.LOKI_BODY_ARMOR.get(), loki);
+        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, BODY_TOUGHNESS, EnhancedConfig.LOKI_BODY_TOUGHNESS.get(), loki);
         PowerTicker.setModifier(player, Attributes.ARMOR, FROST_ARMOR, FROST_ARMOR_BONUS, frost);
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());

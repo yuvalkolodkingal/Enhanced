@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.vishanti.WardCommands;
 import com.kolodkingal.enhanced.road.RoadCommands;
+import com.kolodkingal.enhanced.world.SchoolRepair;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -57,9 +58,11 @@ import java.util.List;
  * /enhanced ward remove &lt;player&gt;
  *
  * /enhanced road status|enter|leave|reset|skip|set|cells
+ * /enhanced structure repair_school [radius]
  *
  * <p>The {@code build} branch is {@link BuildCommands#node()} (Build Magic's operators' tools, D-B 16); the {@code road}
- * branch is {@link RoadCommands#node()} (the Witches' Road trials, 3.2), which also gives everyone {@code /road leave}.
+ * branch is {@link RoadCommands#node()} (the Witches' Road trials, 3.2), which also gives everyone {@code /road leave}; the
+ * {@code structure} branch is {@link SchoolRepair#node()} (mends a Mutant School built before 3.3.1).
  */
 public final class EnhancedCommand {
     private static final DynamicCommandExceptionType UNKNOWN_POWER =
@@ -112,7 +115,8 @@ public final class EnhancedCommand {
                                                         IntegerArgumentType.getInteger(ctx, "radius")))))))
                 .then(BuildCommands.node())
                 .then(WardCommands.node())
-                .then(RoadCommands.node()));
+                .then(RoadCommands.node())
+                .then(SchoolRepair.node()));
         RoadCommands.registerPlayerCommands(dispatcher);
     }
 

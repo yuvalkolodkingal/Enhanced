@@ -2950,5 +2950,15 @@
   "npc.enhanced.option.odin_ravens": "What do your ravens see?",
   "npc.enhanced.option.odin_vault": "Where is the vault?",
   "preset.enhanced.odin": "Odin-like",
-  "preset.enhanced.odin.desc": "Gungnir, the Odinforce and the ravens"
+  "preset.enhanced.odin.desc": "Gungnir, the Odinforce and the ravens",
+  "commands.enhanced.structure.repair_school.none": "No Mutant School within %s blocks of here",
+  "commands.enhanced.structure.repair_school.done": "Mutant School at %1$s %2$s %3$s: repaired %4$s blocks round the front door; %5$s blocks changed by players were left as they are",
+  "commands.enhanced.structure.repair_school.nothing": "Mutant School at %1$s %2$s %3$s: nothing repaired; %5$s blocks changed by players were left as they are",
+  "commands.enhanced.structure.repair_school.already": "The Mutant School at %1$s %2$s %3$s is already whole: nothing to repair",
+  "message.enhanced.agatha.drain_not_sorcerer": "Only a witch's or sorcerer's power can be drained: %s's power is no magic",
+  "screen.enhanced.hero_creator.discard": "Unsaved changes: discard them?",
+  "screen.enhanced.hero_creator.discard.yes": "Discard",
+  "screen.enhanced.hero_creator.discard.no": "Keep editing",
+  "message.enhanced.hero_item.taken_off": "%s came off: it is in your inventory",
+  "message.enhanced.hero_item.taken_off_dropped": "%s came off: your inventory is full, it is at your feet"
 }
