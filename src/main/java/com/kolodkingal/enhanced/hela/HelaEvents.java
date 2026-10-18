@@ -51,9 +51,13 @@ public final class HelaEvents {
 
     /** What a hit of {@code hela}'s is multiplied by: Asgard's strength, and her form's for her blades. */
     public static float factor(Player hela, DamageSource source) {
-        PowerData data = Powers.get(hela);
+        return factor(Powers.get(hela), AsgardDimension.in(hela), source);
+    }
+
+    /** {@link #factor(Player, DamageSource)} for her data and whether she is in Asgard (the tests ask it directly). */
+    public static float factor(PowerData data, boolean inAsgard, DamageSource source) {
         float factor = 1.0F;
-        if (data.has(HeroAbility.HELA_BODY) && AsgardDimension.in(hela)) {
+        if (data.has(HeroAbility.HELA_BODY) && inAsgard) {
             factor *= HelaConfig.ASGARD_FACTOR.get().floatValue();
         }
         boolean blade = source.is(ModDamageTypes.NECROSWORD) || source.is(ModDamageTypes.BLADE_WALL);

@@ -1485,6 +1485,10 @@ public final class SkeletonTests {
             for (Power hero : java.util.stream.Stream.concat(NEW_HEROES.stream(), V33_HEROES.stream()).toList()) {
                 acted |= GestureRoutes.live(hero, live, true) != null;
             }
+            // 3.5: the gods of Asgard route their own states too.
+            for (Power hero : List.of(Power.HEIMDALL, Power.ODIN, Power.HELA)) {
+                acted |= GestureRoutes.live(hero, live, true) != null;
+            }
             check(acted || GestureRoutes.reason(live) != null, "the state " + live + " has neither a gesture nor a reason");
         }
         helper.succeed();

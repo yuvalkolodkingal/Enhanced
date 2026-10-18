@@ -40,13 +40,13 @@ public final class HelaSetup {
     }
 
     /**
-     * Her nodes in the Asgardians' dialogue: while she fights, every guard and warrior says "Halt!" (the highest priority:
-     * nothing else matters then); to one who has beaten her, the warriors say so.
+     * Her nodes in the Asgardians' dialogue: while she fights, every guard and warrior says "Halt!" (priority 40: above the power reactions (30),
+     * below the fight line (50)); to one who has beaten her, the warriors say so.
      */
     static void registerDialogue() {
         for (Role role : List.of(Role.EINHERJAR, Role.SIF, Role.VALKYRIE, Role.VOLSTAGG, Role.FANDRAL, Role.HOGUN)) {
             AsgardDialogue.register(role, new AsgardDialogue.Node("hela_halt",
-                    ctx -> ctx.speaker().level() instanceof ServerLevel level && fightIn(level), 1000, List.of()));
+                    ctx -> ctx.speaker().level() instanceof ServerLevel level && fightIn(level), 40, List.of()));
             AsgardDialogue.register(role, new AsgardDialogue.Node("hela_fallen",
                     ctx -> ctx.progress().has(AsgardProgress.HELA_VICTOR), 30, List.of()));
         }

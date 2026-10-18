@@ -2,8 +2,6 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MjolnirShatter;
-import com.kolodkingal.enhanced.asgard.AsgardDimension;
-import com.kolodkingal.enhanced.asgard.CityPlan;
 import com.kolodkingal.enhanced.config.HelaConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
@@ -242,14 +240,12 @@ public final class HelaHeroTests {
         ServerPlayer p = hela(f, 10.5, 10.5);
         HelaAbilities.applyBody(p, Powers.get(p));
         check(Math.abs(p.getMaxHealth() - 30.0F) < 0.01F, "30 health: " + p.getMaxHealth());
-        ServerLevel asgard = AsgardTestSupport.withArrival(f.level().getServer());
-        Vec3 home = p.position();
-        ServerLevel back = f.level();
-        p.teleportTo(asgard, CityPlan.ARRIVAL.x, CityPlan.ARRIVAL.y, CityPlan.ARRIVAL.z, 0.0F, 0.0F);
-        check(AsgardDimension.in(p), "in Asgard");
-        check(Math.abs(HelaEvents.factor(p, p.damageSources().playerAttack(p)) - HelaConfig.ASGARD_FACTOR.get()) < 1.0E-4,
-                "her blows times the strength of Asgard");
-        p.teleportTo(back, home.x, home.y, home.z, 0.0F, 0.0F);
+        PowerData data = Powers.get(p);
+        check(Math.abs(HelaEvents.factor(data, true, p.damageSources().playerAttack(p)) - HelaConfig.ASGARD_FACTOR.get()) < 1.0E-4,
+                "in Asgard, her blows times the strength of Asgard");
+        check(Math.abs(HelaEvents.factor(data, false, p.damageSources().playerAttack(p)) - 1.0F) < 1.0E-4, "elsewhere not");
+        check(Math.abs(HelaEvents.factor(new PowerData(), true, p.damageSources().playerAttack(p)) - 1.0F) < 1.0E-4,
+                "and not for one without her body");
         Powers.setPower(p, Power.NONE);
         HelaAbilities.applyBody(p, Powers.get(p));
         check(Math.abs(p.getMaxHealth() - 20.0F) < 0.01F, "none of it once she is no longer Hela");
@@ -298,6 +294,7 @@ public final class HelaHeroTests {
         check(HelaRules.canHurt(p, other), "PvP: hurt");
         var board = f.level().getScoreboard();
         PlayerTeam team = board.addPlayerTeam("hela_test_team");
+        team.setAllowFriendlyFire(false);
         board.addPlayerToTeam(p.getScoreboardName(), team);
         board.addPlayerToTeam(other.getScoreboardName(), team);
         f.onClose(() -> board.removePlayerTeam(team));

@@ -188,6 +188,20 @@ public final class HelaBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // Her attacks
 
+    /** What she may hurt: a fighter yes, her own no; and her blade's damage reaches him. */
+    @GameTest(template = ARENA, batch = "hela_fight_rules")
+    public static void herBladesHurtAFighter(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        ServerPlayer a = f.player(10.5, FLOOR, 4.5);
+        HelaFight fight = fight(f, a);
+        HelaEntity hela = fight.boss();
+        check(HelaRules.canHurt(hela, a), "a fighter: yes");
+        check(!HelaRules.canHurt(hela, hela), "not herself");
+        boolean hit = HelaRules.hurt(a, com.kolodkingal.enhanced.registry.ModDamageTypes.NECROSWORD, hela, hela, 4.0F);
+        check(hit && a.getHealth() < a.getMaxHealth(), "the blade's damage reaches him: " + hit + " " + a.getHealth() + " " + f.level().getDifficulty());
+        helper.succeed();
+    }
+
     /** The volley's blades fly at the target and hurt him. */
     @GameTest(template = ARENA, batch = "hela_fight_volley", timeoutTicks = 100)
     public static void theVolleyHitsItsTarget(GameTestHelper helper) {
@@ -242,8 +256,15 @@ public final class HelaBossTests {
         HelaFight fight = fight(f, grounded);
         HelaEntity hela = fight.boss();
         hela.brain().start(HelaState.STORM, grounded);
+        helper.runAfterDelay(5, () -> check(hela.state() == HelaState.STORM && hela.stateTicks() >= 3,
+                "the storm runs: " + hela.state() + " " + hela.stateTicks() + " foes " + fight.foes().size() + " over " + fight.isOver()
+                        + " at " + hela.position().subtract(grounded.position())));
         helper.runAfterDelay(45, () -> {
-            check(hela.brain().stormHit(grounded) && grounded.getHealth() < grounded.getMaxHealth(), "the grounded one is cut");
+            check(hela.brain().stormHit(grounded) && grounded.getHealth() < grounded.getMaxHealth(), "the grounded one is cut: hit "
+                    + hela.brain().stormHit(grounded) + " health " + grounded.getHealth() + " canHurt " + HelaRules.canHurt(hela, grounded)
+                    + " d " + Math.hypot(grounded.getX() - hela.getX(), grounded.getZ() - hela.getZ()) + " dy "
+                    + (grounded.getY() - HelaRules.groundAt(f.level(), grounded.getX(), grounded.getY() + 0.5, grounded.getZ()))
+                    + " alive " + grounded.isAlive() + " over " + fight.isOver() + " state " + hela.state());
             check(!hela.brain().stormHit(flying), "the one in the air is not");
             helper.succeed();
         });

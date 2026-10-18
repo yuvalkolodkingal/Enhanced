@@ -127,7 +127,7 @@ public final class HelaFight extends BossFight {
                 .abandonBeyond(radius + 24.0)
                 .vertical(floor - 12.0, ceiling)
                 .tickets((int) Math.ceil(radius + 12.0), 2)
-                .tractorDepth(6.0)
+                .tractorDepth(0.0) // (no tractor: the hall has a floor, and its roof is no "surface" to be lifted to)
                 .keepDrops(true)
                 .pushback(1.0F, 0);
         return new HelaFight(level, arena, dais, seal);
@@ -398,6 +398,9 @@ public final class HelaFight extends BossFight {
             say("army");
             tell(Component.translatable("boss.enhanced.hela.phase2").withColor(SPEECH_COLOR), true);
         } else if (next == 3) {
+            if (hela.state() == HelaState.RISE) {
+                hela.setState(HelaState.IDLE);
+            }
             say("strength");
             tell(Component.translatable("boss.enhanced.hela.phase3").withColor(SPEECH_COLOR), true);
             hela.brain().stormSoon(now);
