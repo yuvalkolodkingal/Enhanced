@@ -146,6 +146,8 @@ public final class GestureRoutes {
             case REALITY_VEIL -> power == Power.THANOS ? (on ? GestureId.THANOS_VEIL_ON : GestureId.THANOS_VEIL_OFF) : null;
             // ===== ultron =====
             // ===== apocalypse =====
+            // ===== professor_x =====
+            case HEAR_THOUGHTS -> power == Power.PROFESSOR_X ? (on ? GestureId.XAVIER_THOUGHTS_ON : GestureId.XAVIER_THOUGHTS_OFF) : null;
         };
     }
 
@@ -346,6 +348,15 @@ public final class GestureRoutes {
             // 3.3: a custom hero's keys are whatever powers he put on them; each press that starts a cooldown is a cast
             // (CustomClient.cooldownGesture), a held beam the stance of any beam.
             case CUSTOM -> "cooldown";
+            // ===== professor_x =====
+            // (The Mental Blast and Freeze Minds play their gestures when their cooldowns start; the trance and Cerebro are
+            // stances, begun by the gestures of their states.)
+            case PROFESSOR_X -> switch (ability) {
+                case 1, 4 -> "cooldown";
+                case 2 -> "toggle:HEAR_THOUGHTS";
+                case 3 -> "live:MIND_LINKED";
+                default -> "live:CEREBRO";
+            };
             default -> "none: no abilities";
         };
     }
@@ -380,6 +391,10 @@ public final class GestureRoutes {
             // ===== cyclops (3.3) =====
             case CYCLOPS_UNLEASHED -> "a stance (CYCLOPS_UNLEASHED, both hands at his face while the giant beam pours out); the glasses"
                     + " coming off are N's gesture (its cooldown), and the beam is drawn by the shared beam renderer";
+            // ===== professor_x =====
+            case MIND_LINKED, CEREBRO -> null;
+            case MIND_CONTROLLED -> "Professor X steers the body: it walks and strikes as he makes it, so its own walk is its pose";
+            case XAVIER_FOCUS -> "the cooldowns of the Mental Blast and Freeze Minds start at the same moment and play the gesture";
         };
     }
 

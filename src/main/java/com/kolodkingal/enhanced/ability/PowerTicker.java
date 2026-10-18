@@ -49,7 +49,7 @@ public final class PowerTicker {
             case TOMMY -> TommyAbilities.tick(player, data);
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, CUSTOM -> HeroServers.tick(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.tick(player, data);
             case NONE -> {
             }
         }
@@ -103,7 +103,7 @@ public final class PowerTicker {
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);
             case TOMMY -> TommyAbilities.endAll(player, data);
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, CUSTOM -> HeroServers.endAll(player, data);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.endAll(player, data);
             default -> {
             }
         }

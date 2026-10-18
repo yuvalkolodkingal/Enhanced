@@ -27,6 +27,7 @@ public final class HeroServers {
         register(new CyclopsServer());
         // 3.3: the custom hero of the Hero Creator.
         register(new com.kolodkingal.enhanced.custom.CustomHeroServer());
+        register(new XavierServer());
     }
 
     /**

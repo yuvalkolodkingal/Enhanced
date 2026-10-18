@@ -37,6 +37,10 @@ public final class AbilityHandler {
         if (down && HexRunes.refuse(player)) {
             return;
         }
+        // 3.3: a body Professor X steers is not its own: its keys do nothing until he lets go.
+        if (down && MindLink.isHost(player)) {
+            return;
+        }
         PowerData data = Powers.get(player);
         switch (data.power()) {
             case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down);
@@ -48,7 +52,7 @@ public final class AbilityHandler {
             case LOKI -> LokiAbilities.onKey(player, data, ability, down);
             case THOR -> ThorAbilities.onKey(player, data, ability, down);
             // The heroes of 3.0 are plug-ins (HeroServer): their keys are theirs.
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, CUSTOM -> HeroServers.onKey(player, data, ability, down);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.onKey(player, data, ability, down);
             case NONE -> {
             }
         }

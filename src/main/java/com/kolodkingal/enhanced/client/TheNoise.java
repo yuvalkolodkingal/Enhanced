@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.BillyAbilities;
+import com.kolodkingal.enhanced.ability.Thoughts;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -19,7 +21,8 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 /**
  * Client side of Billy's The Noise ("it's so noisy in my head", WandaVision episode 7): every creature whose thoughts
  * he hears glows through walls, red if it means harm and blue otherwise, and their whispers fill his head (for him
- * alone), louder the more of them there are.
+ * alone), louder the more of them there are. Since 3.3 it is also Professor X's Hear Thoughts (glowing in his own
+ * colour), and the thoughts have words over the heads ({@link ThoughtBubbles}).
  */
 public final class TheNoise {
     /** The glow of a creature that means harm. */
@@ -35,7 +38,14 @@ public final class TheNoise {
             return false;
         }
         PowerData data = Powers.get(player);
-        return data.power() == Power.BILLY && data.toggle(Toggle.THE_NOISE);
+        return (data.power() == Power.BILLY && data.toggle(Toggle.THE_NOISE))
+                || (data.power() == Power.PROFESSOR_X && data.toggle(Toggle.HEAR_THOUGHTS) && !data.is(Live.MIND_LINKED));
+    }
+
+    /** How far the local listener hears (Billy: The Noise's range; Professor X: Hear Thoughts'). */
+    public static double range() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return Thoughts.range(player == null ? Power.BILLY : Powers.power(player));
     }
 
     /** Whether Billy hears this creature right now (so it glows for him). */
@@ -45,14 +55,15 @@ public final class TheNoise {
                 || !active()) {
             return false;
         }
-        double range = BillyAbilities.noiseRange();
+        double range = range();
         // (3.3: no thought is heard through the wall of a Hex that keeps him out.)
         return entity.distanceToSqr(player) < range * range && !Shelters.keepsOut(player.level(), player, player.getEyePosition(), Shelters.middle(entity), false);
     }
 
     /** The colour a creature he hears glows in: its mood. */
     public static int moodColor(Entity entity) {
-        return BillyAbilities.meansHarm(entity) ? HOSTILE : Power.BILLY.color;
+        LocalPlayer player = Minecraft.getInstance().player;
+        return BillyAbilities.meansHarm(entity) ? HOSTILE : player != null && Powers.power(player) == Power.PROFESSOR_X ? Power.PROFESSOR_X.color : Power.BILLY.color;
     }
 
     static void tick(Minecraft mc) {
@@ -63,7 +74,7 @@ public final class TheNoise {
             return;
         }
         if (player.tickCount % 10 == 0) {
-            double range = BillyAbilities.noiseRange();
+            double range = range();
             heard = mc.level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(range), TheNoise::reveals).size();
         }
         if (whispers == null || whispers.isStopped()) {

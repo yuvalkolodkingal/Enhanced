@@ -60,6 +60,12 @@ public final class ModNetwork {
         registrar.playToClient(CyclopsFxPayload.TYPE, CyclopsFxPayload.STREAM_CODEC, CyclopsFxPayload::handle);
         // 3.3: the Hero Creator's buttons (the custom hero's definition and state travel as synced attachments).
         registrar.playToServer(HeroCreatorPayload.TYPE, HeroCreatorPayload.STREAM_CODEC, HeroCreatorPayload::handle);
+        // 3.3: Professor X (his screen and his mind in another body, the thoughts he and Billy hear, Cerebro).
+        registrar.playToClient(XavierPayload.TYPE, XavierPayload.STREAM_CODEC, XavierPayload::handle);
+        registrar.playToServer(XavierInputPayload.TYPE, XavierInputPayload.STREAM_CODEC, XavierInputPayload::handle);
+        registrar.playToServer(XavierChoicePayload.TYPE, XavierChoicePayload.STREAM_CODEC, XavierChoicePayload::handle);
+        registrar.playToClient(ThoughtsPayload.TYPE, ThoughtsPayload.STREAM_CODEC, ThoughtsPayload::handle);
+        registrar.playToClient(CerebroPayload.TYPE, CerebroPayload.STREAM_CODEC, CerebroPayload::handle);
     }
 
     private ModNetwork() {

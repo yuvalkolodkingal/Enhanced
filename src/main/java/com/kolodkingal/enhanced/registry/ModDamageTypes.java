@@ -64,6 +64,9 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> HERO_POWER = key("hero_power");
     /** The hits of a custom hero's continuous beam (Energy Blast's beam, the flamethrower, the water jet): no damage cooldown. */
     public static final ResourceKey<DamageType> HERO_BEAM = key("hero_beam");
+    // ===== professor_x (3.3) =====
+    /** Professor X's Mental Blast (it ignores armour), and the backlash of a stronger telepath who throws him out. */
+    public static final ResourceKey<DamageType> MIND_BLAST = key("mind_blast");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

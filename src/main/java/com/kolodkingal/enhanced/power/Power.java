@@ -38,6 +38,8 @@ public enum Power implements StringRepresentable {
     // The heroes of 3.3, appended after Apocalypse in this order (Agatha, Cyclops, Professor X; each lane adds its own).
     // Cyclops's optic blast is ruby red with a hot pink-white core: the colour his ruby-quartz glasses give it.
     CYCLOPS(0xE8323A, 0xFFB3A8),
+    // Professor X's telepathy has the cold blue-white of Cerebro.
+    PROFESSOR_X(0x6F8CFF, 0xDCE4FF),
     // 3.3 (the heroes AGATHA, CYCLOPS and PROFESSOR_X of the other lanes come before it): a hero of the player's own,
     // made with the Hero Creator. Its name, powers, keys, colours and look are the player's saved definition (see
     // custom/CustomHero); these two colours are only the Hero Creator's own gold, for whatever has no definition.
@@ -106,14 +108,14 @@ public enum Power implements StringRepresentable {
     }
 
     /**
-     * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, Loki walks and Cyclops runs and leaps
-     * on his optic blast; everyone else can fly (Thor only with Mjolnir, see ThorAbilities).
+     * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, Loki walks, Cyclops runs and leaps
+     * on his optic blast and Professor X walks or rolls in his chair; everyone else can fly (Thor only with Mjolnir, see ThorAbilities).
      */
     public boolean canFly() {
         return switch (this) {
             // (A custom hero flies only if Flight is one of its powers: PowerTicker asks its definition.)
             case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, CUSTOM -> true;
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS -> false;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X -> false;
         };
     }
 
@@ -129,7 +131,7 @@ public enum Power implements StringRepresentable {
             case APOCALYPSE -> ApocalypseConfig.FLIGHT_SPEED.get().floatValue();
             // (A custom hero's speed is its Flight's level: PowerTicker asks its definition.)
             case CUSTOM -> com.kolodkingal.enhanced.config.CustomHeroConfig.FLIGHT_SPEED.get().floatValue();
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS -> 0.05F;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X -> 0.05F;
         };
     }
 
@@ -139,7 +141,7 @@ public enum Power implements StringRepresentable {
             case MAGNETO -> 5;
             case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE -> 2;
             // (A custom hero's Flight is on whichever key its player put it.)
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, CUSTOM -> -1;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM -> -1;
         };
     }
 

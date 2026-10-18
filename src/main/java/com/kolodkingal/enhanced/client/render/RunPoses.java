@@ -94,6 +94,11 @@ final class RunPoses {
     // ===== cyclops (3.3) =====
     /** Cyclops: a field leader's run, purposeful and squared, a little lean into the sprint. */
     private static final Character CYCLOPS = new Character(0.90F, 1.15F, 1.10F, 8, 4, 0.016F);
+    // ===== professor_x =====
+    /** The young Charles: an easy, unhurried walk with a little swing. */
+    private static final Character XAVIER = new Character(0.85F, 1.10F, 1.05F, 5, 3, 0.012F);
+    /** The old professor rolls in his chair: no swing of the arms, no lean, no bob (the chair carries him). */
+    private static final Character XAVIER_SEATED = new Character(0.0F, 0.0F, 1.0F, 0, 0, 0.0F);
 
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
@@ -111,6 +116,7 @@ final class RunPoses {
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
             case CYCLOPS -> CYCLOPS;
+            case PROFESSOR_X -> XAVIER;
             default -> DEFAULT;
         };
     }
@@ -119,6 +125,9 @@ final class RunPoses {
     private static Character character(HeroAnimState st) {
         if (st.power == Power.SPIDER_MAN && st.stance(Stance.SPIDER_SURGE) > 0.5F) {
             return SPIDER_SURGE;
+        }
+        if (st.power == Power.PROFESSOR_X && "old".equals(st.look)) {
+            return XAVIER_SEATED;
         }
         return character(st.power, "white_vision".equals(st.look));
     }

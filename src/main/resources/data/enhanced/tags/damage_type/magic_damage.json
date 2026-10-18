@@ -15,6 +15,7 @@
     "enhanced:hex_wall",
     "enhanced:entomb",
     "minecraft:magic",
-    "minecraft:indirect_magic"
+    "minecraft:indirect_magic",
+    "enhanced:mind_blast"
   ]
 }

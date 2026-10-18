@@ -70,7 +70,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 @PrefixGameTestTemplate(false)
 public final class WorldStructureTests {
     static final String BATCH = "world";
-    static final ResourceLocation WHEELCHAIR = ResourceLocation.fromNamespaceAndPath(Enhanced.MODID, "professor_x_wheelchair");
+    static final ResourceLocation WHEELCHAIR = ResourceLocation.fromNamespaceAndPath(Enhanced.MODID, "xavier_wheelchair");
     static final ResourceLocation GLASSES = ResourceLocation.fromNamespaceAndPath(Enhanced.MODID, "ruby_quartz_glasses");
 
     private static ResourceKey<LootTable> loot(String path) {

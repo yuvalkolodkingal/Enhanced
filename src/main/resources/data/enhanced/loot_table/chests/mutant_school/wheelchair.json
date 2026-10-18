@@ -2,7 +2,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:item_exists",
-      "item": "enhanced:professor_x_wheelchair"
+      "item": "enhanced:xavier_wheelchair"
     }
   ],
   "type": "minecraft:chest",
@@ -13,7 +13,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "enhanced:professor_x_wheelchair"
+          "name": "enhanced:xavier_wheelchair"
         }
       ]
     }

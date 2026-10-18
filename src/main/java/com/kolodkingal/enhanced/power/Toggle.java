@@ -36,6 +36,10 @@ public enum Toggle {
     // ===== ultron =====
 
     // ===== apocalypse =====
+
+    // ===== professor_x =====
+    /** Professor X: hearing the thoughts of the players and creatures around him (Billy's The Noise, with words). */
+    HEAR_THOUGHTS,
     ;
 
     final int bit() {

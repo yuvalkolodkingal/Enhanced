@@ -154,6 +154,8 @@ public final class SkeletonTests {
 
     /** The heroes of 3.0, in Eilon's order: the last five of {@link Power}. */
     private static final List<Power> NEW_HEROES = List.of(Power.PHOENIX, Power.SPIDER_MAN, Power.THANOS, Power.ULTRON, Power.APOCALYPSE);
+    /** The heroes of 3.3, appended after them (plug-ins too; each lane adds its own). */
+    private static final List<Power> V33_HEROES = List.of(Power.CYCLOPS, Power.PROFESSOR_X, Power.CUSTOM);
 
     /**
      * Whether the hero's lane is built: its plug-in does something with the keys, so the tests that pin a stub ("does
@@ -1477,7 +1479,7 @@ public final class SkeletonTests {
                 continue; // (the states of the heroes before them are checked by AnimationMathTests)
             }
             boolean acted = false;
-            for (Power hero : NEW_HEROES) {
+            for (Power hero : java.util.stream.Stream.concat(NEW_HEROES.stream(), V33_HEROES.stream()).toList()) {
                 acted |= GestureRoutes.live(hero, live, true) != null;
             }
             check(acted || GestureRoutes.reason(live) != null, "the state " + live + " has neither a gesture nor a reason");

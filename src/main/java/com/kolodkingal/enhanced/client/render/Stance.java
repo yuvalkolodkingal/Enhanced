@@ -78,7 +78,14 @@ public enum Stance {
     /** Cyclops's Optic Blast: two fingers held to the visor, the other arm braced, the feet planted. */
     CYCLOPS_BLAST(1.5F, 3.0F, true),
     /** The glasses are off and the giant beam pours out: both hands at his face, straining, braced against it. */
-    CYCLOPS_UNLEASHED(2.0F, 4.0F, true)
+    CYCLOPS_UNLEASHED(2.0F, 4.0F, true),
+    // ===== professor_x (3.3) =====
+    /** The old Professor X sits in his wheelchair: the legs forward on the footrest, the forearms on the armrests. */
+    XAVIER_SEATED(4.0F, 4.0F, false),
+    /** His mind is in another body: two fingers at his temple, the head bowed, still. */
+    XAVIER_TRANCE(2.0F, 4.0F, true),
+    /** Cerebro's helmet is on: both hands at its sides. */
+    XAVIER_CEREBRO(2.0F, 4.0F, true)
     ;
 
     public static final Stance[] VALUES = values();
