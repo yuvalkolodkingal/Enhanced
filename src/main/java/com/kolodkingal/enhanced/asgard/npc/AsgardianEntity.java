@@ -575,6 +575,16 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
         setState(NpcState.IDLE, 0);
     }
 
+    /** The game time at which a knocked-down Asgardian rises. */
+    public long downUntil() {
+        return downUntil;
+    }
+
+    /** Moves the time he rises (the tests do not wait 20 s). */
+    public void setDownUntil(long time) {
+        downUntil = time;
+    }
+
     /** Whether he is down (for the tests and the other lanes). */
     public boolean isDown() {
         return state() == NpcState.DOWN;

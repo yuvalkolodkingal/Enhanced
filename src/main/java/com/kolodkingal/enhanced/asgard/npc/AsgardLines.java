@@ -76,7 +76,7 @@ final class AsgardLines {
         AsgardDialogue.lines("npc.enhanced.common.manners", "npc.enhanced.common.busy", "npc.enhanced.common.down",
                 "npc.enhanced.sif.duel_score", "npc.enhanced.sif.duel_won", "npc.enhanced.sif.duel_lost", "npc.enhanced.sif.duel_draw",
                 "npc.enhanced.heimdall.arrival", "npc.enhanced.frigga.odin_asleep", "npc.enhanced.valkyrie.horse",
-                "npc.enhanced.common.bow", "npc.enhanced.screen.farewell", "item.enhanced.sif_token", "item.enhanced.asgard_mead",
+                "npc.enhanced.screen.farewell", "item.enhanced.sif_token", "item.enhanced.asgard_mead",
                 "item.enhanced.valkyrie_horse");
         AsgardDialogue.variants("npc.enhanced.heimdall.arrival", 3);
         for (Place place : PLACES) {
