@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.build;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -101,7 +102,7 @@ public final class BuildSounds {
     }
 
     private static boolean isBilly(ServerPlayer player) {
-        return Powers.is(player, Power.BILLY);
+        return Powers.get(player).has(HeroAbility.BILLY_BUILD_MAGIC); // (3.4: a custom hero with his Build Magic sounds as he does)
     }
 
     private static void play(Level level, Vec3 at, Voice sound) {

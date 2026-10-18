@@ -1,11 +1,16 @@
 package com.kolodkingal.enhanced.client.screen;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.client.KeyBindings;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.network.HexActionPayload;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,6 +21,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
@@ -39,6 +45,33 @@ public class HexScreen extends Screen {
 
     public HexScreen() {
         super(Component.translatable("screen.enhanced.hex.title"));
+    }
+
+    /**
+     * Whether a press of ability key {@code column} (1-5) opens this screen instead of going to the server: the Scarlet Witch's
+     * N without Sneak, or (3.4) a custom hero's binding of her Hex in its main action (not its Sneak variant, which dissolves it),
+     * while the player owns a Hex.
+     */
+    public static boolean opens(Player player, int column, boolean sneak) {
+        PowerData data = Powers.get(player);
+        boolean hexKey;
+        if (data.power() == Power.SCARLET_WITCH) {
+            hexKey = column == HeroAbility.WANDA_HEX.home && !sneak;
+        } else {
+            HeroKit kit = data.power() == Power.CUSTOM ? data.kit() : null;
+            HeroKit.Binding binding = kit == null ? null : kit.binding(column, sneak);
+            hexKey = binding != null && binding.ability() == HeroAbility.WANDA_HEX && !binding.isAlt();
+        }
+        return hexKey && ownsHex(player);
+    }
+
+    /** Whether the Vision key (Z) gives orders to the Vision of this player's Hex: the Scarlet Witch, or (3.4) a custom hero with her Hex. */
+    public static boolean ordersVision(Player player) {
+        return Powers.get(player).has(HeroAbility.WANDA_HEX);
+    }
+
+    private static boolean ownsHex(Player player) {
+        return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
     }
 
     private Optional<Hex> hex() {
@@ -173,7 +206,8 @@ public class HexScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
-        graphics.drawCenteredString(font, title.copy().withStyle(s -> s.withColor(Power.SCARLET_WITCH.color).withBold(true)), width / 2, 14, 0xFFFFFF);
+        int color = minecraft == null || minecraft.player == null ? Power.SCARLET_WITCH.color : WandaAbilities.color(minecraft.player);
+        graphics.drawCenteredString(font, title.copy().withStyle(s -> s.withColor(color).withBold(true)), width / 2, 14, 0xFFFFFF);
         hex().ifPresent(hex -> {
             graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.radius", hex.radius()), width / 2, 42, 0xFFFFFF);
             if (otherPlayers().isEmpty()) {

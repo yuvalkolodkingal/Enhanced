@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.XavierConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.ThoughtsPayload;
 import com.kolodkingal.enhanced.power.Power;
@@ -94,10 +95,21 @@ public final class Thoughts {
         SPECIES.put("magma_cube", "slime");
     }
 
-    /** Whether this player hears thoughts right now: Billy with The Noise on, Professor X with Hear Thoughts on (and not away in a body). */
+    /**
+     * Whether this player hears thoughts right now: Billy with The Noise on, Professor X with Hear Thoughts on (and not away in a
+     * body); 3.4: a custom hero with either ability, on.
+     */
     public static boolean listens(Player player, PowerData data) {
-        return (data.power() == Power.BILLY && data.toggle(Toggle.THE_NOISE))
-                || (data.power() == Power.PROFESSOR_X && data.toggle(Toggle.HEAR_THOUGHTS) && !MindLink.isLinked(player));
+        return (data.has(HeroAbility.BILLY_NOISE) && data.toggle(Toggle.THE_NOISE))
+                || (data.has(HeroAbility.XAVIER_THOUGHTS) && data.toggle(Toggle.HEAR_THOUGHTS) && !MindLink.isLinked(player));
+    }
+
+    /**
+     * Whose hearing a listener has, for its range: Professor X's while his Hear Thoughts is on, else Billy's (The Noise). For the
+     * two heroes their own power, as before.
+     */
+    public static Power hearsAs(PowerData data) {
+        return data.has(HeroAbility.XAVIER_THOUGHTS) && data.toggle(Toggle.HEAR_THOUGHTS) ? Power.PROFESSOR_X : Power.BILLY;
     }
 
     /** How far the listener hears (the server's config; Billy's is The Noise's range). */
@@ -113,7 +125,7 @@ public final class Thoughts {
         if (!listens(player, data) || (player.tickCount + player.getId()) % PERIOD != 0) {
             return;
         }
-        player.connection.send(new ThoughtsPayload(around(player, data.power())));
+        player.connection.send(new ThoughtsPayload(around(player, hearsAs(data))));
     }
 
     /** The thoughts of everything the listener hears, the nearest first. */

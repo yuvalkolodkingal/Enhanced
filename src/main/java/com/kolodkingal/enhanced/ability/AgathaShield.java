@@ -2,9 +2,9 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.AgathaConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -81,7 +81,7 @@ public final class AgathaShield {
     /** The shield is held and complete: only then does it stop anything. */
     public static boolean isUp(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.AGATHA && data.chaosShieldUp(player.level().getGameTime());
+        return data.has(HeroAbility.AGATHA_SHIELD) && data.chaosShieldUp(player.level().getGameTime());
     }
 
     // ---- the blows ----
@@ -152,9 +152,9 @@ public final class AgathaShield {
             return;
         }
         long now = player.level().getGameTime();
-        if (!data.isReady(SLOT, now)) {
+        if (!data.isReady(HeroAbility.AGATHA_SHIELD, now)) {
             player.displayClientMessage(Component.translatable("message.enhanced.shield.recharging",
-                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(SLOT) - now) / 20.0)), true);
+                    String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(data.slot(HeroAbility.AGATHA_SHIELD)) - now) / 20.0)), true);
             return;
         }
         if (!canAfford(player)) {
@@ -168,7 +168,7 @@ public final class AgathaShield {
     /** The shield comes down (B released, hunger, the time limit: {@code worn}) and has to recharge. */
     static void drop(ServerPlayer player, PowerData data, boolean worn) {
         data.setChaosShieldActive(false);
-        data.startCooldown(SLOT, player.level().getGameTime(), (worn ? AgathaConfig.SHIELD_BROKEN_COOLDOWN : AgathaConfig.SHIELD_COOLDOWN).get());
+        data.startCooldown(HeroAbility.AGATHA_SHIELD, player.level().getGameTime(), (worn ? AgathaConfig.SHIELD_BROKEN_COOLDOWN : AgathaConfig.SHIELD_COOLDOWN).get());
         forget(player.getUUID());
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.5F, 1.8F);
     }
@@ -178,7 +178,7 @@ public final class AgathaShield {
         data.setChaosShieldActive(false);
         data.setShieldStrength(0.0F);
         ServerLevel level = player.serverLevel();
-        data.startCooldown(SLOT, level.getGameTime(), AgathaConfig.SHIELD_BROKEN_COOLDOWN.get());
+        data.startCooldown(HeroAbility.AGATHA_SHIELD, level.getGameTime(), AgathaConfig.SHIELD_BROKEN_COOLDOWN.get());
         forget(player.getUUID());
         Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
         RandomSource random = player.getRandom();

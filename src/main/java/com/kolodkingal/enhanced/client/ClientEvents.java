@@ -265,7 +265,7 @@ public final class ClientEvents {
         while (KeyBindings.VISION_COMMAND.consumeClick()) {
             visionClicked = true;
         }
-        if (visionClicked && power == Power.SCARLET_WITCH && mc.screen == null && !player.isSpectator()) {
+        if (visionClicked && HexScreen.ordersVision(player) && mc.screen == null && !player.isSpectator()) {
             sendVisionOrder(player);
         }
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
@@ -278,7 +278,7 @@ public final class ClientEvents {
             boolean usable = power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
             boolean down = usable && key.isDown();
             if (usable && clicked && !SENT_DOWN[i]) {
-                if (i == 5 && power == Power.SCARLET_WITCH && !player.isShiftKeyDown() && hasOwnHex(player)) {
+                if (HexScreen.opens(player, i, player.isShiftKeyDown())) { // (3.4: a custom hero's Hex key too)
                     mc.setScreen(new HexScreen());
                     continue;
                 }
@@ -295,10 +295,6 @@ public final class ClientEvents {
                 SENT_DOWN[i] = false;
             }
         }
-    }
-
-    private static boolean hasOwnHex(LocalPlayer player) {
-        return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
     }
 
     /**

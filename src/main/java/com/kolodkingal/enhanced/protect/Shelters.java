@@ -259,7 +259,7 @@ public final class Shelters {
         WandaAbilities.ShieldStop chaos = WandaAbilities.chaosShieldAcross(level, firer, from, to, partialTick);
         if (chaos != null) {
             best = chaos.point().distanceTo(from);
-            nearest = new Stop(Wall.CHAOS_SHIELD, chaos.owner(), chaos.point(), Power.SCARLET_WITCH.glow, chaos.owner().getUUID());
+            nearest = new Stop(Wall.CHAOS_SHIELD, chaos.owner(), chaos.point(), WandaAbilities.glow(chaos.owner()), chaos.owner().getUUID());
         }
         AABB reach = new AABB(from, to).inflate(BillyBarrier.distance() + BillyBarrier.height());
         for (Player billy : level.getEntitiesOfClass(Player.class, reach, p -> p != firer && !p.isSpectator() && BillyBarrier.isUp(p))) {

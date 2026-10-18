@@ -1,7 +1,6 @@
 package com.kolodkingal.enhanced.client.build;
 
 import com.kolodkingal.enhanced.client.KeyBindings;
-import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -92,7 +91,7 @@ public final class BuildKeys {
             @Override
             public boolean isActive() {
                 LocalPlayer player = Minecraft.getInstance().player;
-                return KeyConflictContext.IN_GAME.isActive() && player != null && BuildClient.isBuilder(Powers.power(player));
+                return KeyConflictContext.IN_GAME.isActive() && player != null && BuildClient.isBuilder(BuildClient.hero(player));
             }
 
             @Override

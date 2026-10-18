@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.build;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.authlib.GameProfile;
@@ -231,7 +231,7 @@ public final class BuildCommands {
 
     /** Billy's rank and practice; with {@code rank} (1 to 4) sets it: the practice that rank's threshold, the meter full at its new top. */
     private static int rank(CommandSourceStack source, ServerPlayer target, int rank) {
-        if (Powers.power(target) != Power.BILLY) {
+        if (!Powers.get(target).has(HeroAbility.BILLY_BUILD_MAGIC)) { // (Billy, or 3.4 a custom hero with his Build Magic)
             source.sendFailure(Component.translatable("commands.enhanced.build.not_billy", target.getDisplayName()));
             return 0;
         }
@@ -249,7 +249,7 @@ public final class BuildCommands {
     }
 
     private static int meter(CommandSourceStack source, ServerPlayer target, int value) {
-        if (Powers.power(target) != Power.BILLY) {
+        if (!Powers.get(target).has(HeroAbility.BILLY_BUILD_MAGIC)) { // (Billy, or 3.4 a custom hero with his Build Magic)
             source.sendFailure(Component.translatable("commands.enhanced.build.not_billy", target.getDisplayName()));
             return 0;
         }

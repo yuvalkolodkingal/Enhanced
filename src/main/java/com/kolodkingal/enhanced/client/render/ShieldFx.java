@@ -5,7 +5,7 @@ import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
-import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -246,7 +246,7 @@ public final class ShieldFx {
     /** The extras of the hero's dome (the dome itself is the world renderer's): his cracks and ripples when it is complete. */
     private static Dome heroDome(AbstractClientPlayer player, Vec3 camera, float time, float partial) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.APOCALYPSE || !data.chaosShieldActive() || player.isInvisible() || player.isSpectator()) {
+        if (!data.has(HeroAbility.APOCALYPSE_SHIELD) || !data.chaosShieldActive() || player.isInvisible() || player.isSpectator()) {
             return null;
         }
         Vec3 world = player.getPosition(partial).add(0.0, player.getBbHeight() * 0.5, 0.0);

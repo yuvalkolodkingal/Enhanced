@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AgathaShield;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -74,7 +75,8 @@ public final class AgathaClient implements HeroClient {
 
     @Override
     public void stanceTargets(HeroAnimState s, AbstractClientPlayer p, PowerData data, boolean[] on, long now) {
-        on[Stance.AGATHA_SHIELD.ordinal()] = data.chaosShieldActive();
+        // (3.4: for a custom hero, only when the shield fields are her shield's: they are shared by every hero's shield.)
+        on[Stance.AGATHA_SHIELD.ordinal()] = data.chaosShieldActive() && data.has(HeroAbility.AGATHA_SHIELD);
     }
 
     @Override
