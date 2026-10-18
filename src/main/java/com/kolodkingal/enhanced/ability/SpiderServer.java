@@ -971,8 +971,9 @@ public final class SpiderServer implements HeroServer {
             swing.groundTicks = player.onGround() && age >= SWING_GRACE ? swing.groundTicks + 1 : 0;
             if (swing.groundTicks >= SWING_GROUND_TICKS) {
                 reason = 1;
-            } else if (player.getEyePosition().distanceTo(swing.anchor) > swing.rope * 1.25 + 1.5) {
-                // The web is slack no more than that: he let go and leapt.
+            } else if (player.getEyePosition().distanceTo(swing.anchor) > (swing.sky ? swing.rope * 1.6 + 4.0 : swing.rope * 1.25 + 1.5)) {
+                // The web is slack no more than that: he let go and leapt. (A sky anchor's arc is the client's to fly, and
+                // the server's copy of him lags: it is given more room, so a swing in open land is not cut short.)
                 reason = 1;
             } else {
                 spend(player, SpiderConfig.SWING_EXHAUSTION.get(), organic(player, data));
