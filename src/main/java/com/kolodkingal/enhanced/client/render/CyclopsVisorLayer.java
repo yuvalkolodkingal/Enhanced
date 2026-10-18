@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.CyclopsGlasses;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -109,7 +110,8 @@ public class CyclopsVisorLayer extends RenderLayer<AbstractClientPlayer, PlayerM
             return;
         }
         PowerData data = Powers.get(player);
-        boolean lit = data.power() == Power.CYCLOPS && !data.is(Live.CYCLOPS_UNLEASHED);
+        // (3.4) Its lens glows for whoever has the Optic Blast, Cyclops or a custom hero.
+        boolean lit = data.has(HeroAbility.CYCLOPS_OPTIC_BLAST) && !data.is(Live.CYCLOPS_UNLEASHED);
         drawVisor(poseStack, buffer, packedLight, visor, getParentModel().head, textureFor(data), lit ? lensGlow(player, data, ageInTicks) : 0.0F);
     }
 }

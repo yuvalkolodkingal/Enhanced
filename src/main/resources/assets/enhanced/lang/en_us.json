@@ -2136,6 +2136,7 @@
   "config.enhanced.web_assist_preview": "Web Assist preview",
   "config.enhanced.web_assist_preview.tooltip": "Show where the next web would go (a small white web) while you are in the air or sneaking.",
   "hud.enhanced.custom.sneak": "⇧%s",
+  "message.enhanced.hero_creator.resource.iron_charge": "iron charge",
   "screen.enhanced.hero_creator.added": "%s added!",
   "screen.enhanced.hero_creator.all_fits": "Everything fits: the server will take your hero as he is.",
   "screen.enhanced.hero_creator.all_heroes": "All heroes",

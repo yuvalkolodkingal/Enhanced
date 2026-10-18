@@ -113,7 +113,7 @@ public final class CustomLooksTests {
     public static void theLayersAreJudgedByTheRules(GameTestHelper helper) {
         CustomHero.Layers asked = CustomHero.Layers.NONE_ALL.with(0, new CustomHero.Layer("plain", 0x123456, 3, "flying"))
                 .with(1, new CustomHero.Layer("a_crown_nobody_made", -1, 0, "always"))
-                .with(3, new CustomHero.Layer("glow", 0xFF00FF00, 9, "sometimes"))
+                .with(3, new CustomHero.Layer("glow", 0x1200FF00, 9, "sometimes"))
                 .with(4, new CustomHero.Layer("flames", -1, 0, "powers"));
         CustomHero hero = CustomKitSupport.def().pick("flight", 3).build().withLayers(asked);
         CustomHeroRules.Result r = CustomHeroRules.sanitize(hero, CustomHeroRules.Limits.DEFAULT);

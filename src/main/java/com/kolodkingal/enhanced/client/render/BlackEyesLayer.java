@@ -56,6 +56,8 @@ public class BlackEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player, float limbSwing,
                        float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
+        // Spider-Man's own lenses, painted for his looks. (3.4) A custom hero with the Black Eyes or the legs' Instant Kill
+        // gets them on the generic eye mask instead: CustomLooksLayer draws them, by data.has(SPIDER_BLACK_EYES/LEGS).
         if (data.power() != Power.SPIDER_MAN || player.isInvisible()) {
             return;
         }

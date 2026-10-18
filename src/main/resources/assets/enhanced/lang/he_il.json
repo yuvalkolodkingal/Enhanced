@@ -2136,6 +2136,7 @@
   "config.enhanced.web_assist_preview": "תצוגת עזרת קורים",
   "config.enhanced.web_assist_preview.tooltip": "מראה לאן ילך הקור הבא (קור לבן קטן) כשאתם באוויר או מתכופפים.",
   "hud.enhanced.custom.sneak": "⇧%s",
+  "message.enhanced.hero_creator.resource.iron_charge": "מטען הברזל",
   "screen.enhanced.hero_creator.added": "%s נוסף!",
   "screen.enhanced.hero_creator.all_fits": "הכול מתאים: השרת יקבל את הגיבור שלך כמו שהוא.",
   "screen.enhanced.hero_creator.all_heroes": "כל הגיבורים",
