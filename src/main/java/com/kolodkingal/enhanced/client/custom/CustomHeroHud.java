@@ -91,7 +91,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         for (CustomHero.Pick pick : hero.powers()) {
             CatalogEntry entry = pick.entry();
             if (entry != null && onNoKey(kit, entry)) {
-                passive.add(Component.translatable(entry.nameKey()));
+                passive.add(CreatorUi.name(entry));
             }
         }
         if (!passive.isEmpty()) {
@@ -144,13 +144,13 @@ public class CustomHeroHud implements LayeredDraw.Layer {
     /** The name of what a binding does: a hero's ability or its Sneak variant, a power or one of its options. */
     public static MutableComponent name(HeroKit.Binding b) {
         if (b.entry() instanceof HeroAbility a) {
-            return Component.translatable(b.isAlt() ? a.altKey() : a.nameKey());
+            return b.isAlt() ? CreatorUi.altName(a) : CreatorUi.name(a);
         }
         PowerModule m = b.module();
         if (m != null && !HeroKit.MAIN.equals(b.action())) {
             return Component.translatable(m.optionKey(b.action()));
         }
-        return Component.translatable(b.entry().nameKey());
+        return CreatorUi.name(b.entry());
     }
 
     private static int colorOf(CustomHero hero, CatalogEntry entry) {

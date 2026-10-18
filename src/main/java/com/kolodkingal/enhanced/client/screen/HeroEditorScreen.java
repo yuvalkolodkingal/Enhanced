@@ -332,6 +332,13 @@ public class HeroEditorScreen extends Screen {
                 0xB0B0B0, this::closePopup));
     }
 
+    private void releasePuppet() {
+        if (puppet != null) {
+            puppet.release();
+            puppet = null;
+        }
+    }
+
     private void back() {
         if (popup != null) {
             closePopup();
@@ -340,9 +347,15 @@ public class HeroEditorScreen extends Screen {
         }
     }
 
+    /** Closes every screen of the creator (the hero was sent to the server). */
+    public void closeAll() {
+        releasePuppet();
+        Minecraft.getInstance().setScreen(null);
+    }
+
     @Override
     public void onClose() {
-        puppet = null;
+        releasePuppet();
         Minecraft.getInstance().setScreen(parent);
     }
 
@@ -425,11 +438,12 @@ public class HeroEditorScreen extends Screen {
         renderPreview(g, partialTick);
         int x0 = left() + 6;
         int right = width - 6;
-        renderBudget(g, x0, right);
         if (popup != null) {
-            CreatorUi.drawFitted(g, font, popup.title().copy().withStyle(s -> s.withColor(draft.color()).withBold(true)), x0, TOP - 12,
+            // (The pop-up's question stands where the budget bar does.)
+            CreatorUi.drawFitted(g, font, popup.title().copy().withStyle(s -> s.withColor(draft.color()).withBold(true)), x0, BUDGET_Y + 2,
                     right - x0, 0xFFFFFF);
         } else {
+            renderBudget(g, x0, right);
             tabs.get(tab).render(g, x0, TOP, right - x0, height - 22 - TOP, mouseX, mouseY, partialTick);
         }
         if (status != null && Util.getMillis() < statusUntil) {
@@ -483,7 +497,8 @@ public class HeroEditorScreen extends Screen {
         int w = Math.min(font.width(shown), l - 8);
         CreatorUi.drawFitted(g, font, shown, (l + 2) / 2 - w / 2, top + 4, l - 8, 0xFFFFFF);
         int roomH = bottom - top - 22;
-        float size = Math.min(roomH / 2.3F, (l - 8) / 1.2F);
+        // (Room above the head for a hat.)
+        float size = Math.min(roomH / 2.6F, (l - 8) / 1.2F);
         boolean drawn = false;
         if (puppet != null) {
             g.enableScissor(3, top + 1, l - 1, bottom - 1);

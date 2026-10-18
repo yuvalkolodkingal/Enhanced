@@ -64,7 +64,7 @@ public final class SaveTab extends EditorTab {
 
     private void become() {
         PacketDistributor.sendToServer(HeroCreatorPayload.apply(draft()));
-        screen.onClose();
+        screen.closeAll();
     }
 
     private void export() {

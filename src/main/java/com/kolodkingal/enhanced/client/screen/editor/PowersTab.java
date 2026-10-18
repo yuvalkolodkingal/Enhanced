@@ -97,7 +97,7 @@ public final class PowersTab extends EditorTab {
             search.setFocused(true);
             search.moveCursorToEnd(false);
         }
-        cards("powers", list(), x, y + 38, lw, h - 38, 70, 18);
+        cards("powers", list(), x, y + 38, lw, h - 38, 62, 18);
         detail(detailX, y + 20, detailW, h - 20);
     }
 

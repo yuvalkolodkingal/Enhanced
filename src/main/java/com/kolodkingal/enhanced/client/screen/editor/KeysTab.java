@@ -45,7 +45,7 @@ public final class KeysTab extends EditorTab {
         gridX = x + labelW + 2;
         gridY = y + 24;
         cellW = (w - labelW - 2 - 4 * GAP) / CustomHero.KEYS;
-        cellH = Math.min(34, (h - 24 - 50) / 2);
+        cellH = Math.min(38, (h - 24 - 50) / 2);
         CustomHero hero = draft();
         for (int row = 0; row < 2; row++) {
             boolean s = row == 1;
@@ -58,7 +58,7 @@ public final class KeysTab extends EditorTab {
                         : CreatorUi.badge(b.act());
                 int color = b == null ? 0x606060 : hero.colorOf(hero.pick(b.entry()));
                 CreatorUi.BigButton cell = add(new CreatorUi.BigButton(gridX + (c - 1) * (cellW + GAP), gridY + row * (cellH + GAP + (s ? 0 : 0)),
-                        cellW, cellH, label, sub, color, () -> click(col, s)).selected(col == column && s == sneak));
+                        cellW, cellH, label, sub, color, () -> click(col, s)).selected(col == column && s == sneak).stacked());
                 if (b != null) {
                     cell.icon(CreatorUi.icon(b.entry().icon()));
                 }

@@ -72,6 +72,14 @@ public final class CreatorUi {
             return this;
         }
 
+        protected boolean stacked;
+
+        /** (3.4) The picture on top in the middle and the words under it (a narrow box: the Keys tab's). */
+        public BigButton stacked() {
+            this.stacked = true;
+            return this;
+        }
+
         @Override
         public void onPress() {
             action.run();
@@ -87,6 +95,23 @@ public final class CreatorUi {
             g.renderOutline(x, y, width, height, 0xFF000000 | (lit || selected ? color : darken(color)));
             if (lit || selected) {
                 g.renderOutline(x + 1, y + 1, width - 2, height - 2, 0x80000000 | color);
+            }
+            if (stacked) {
+                int top = y + 2;
+                if (icon != null) {
+                    g.renderFakeItem(icon, x + (width - 16) / 2, top);
+                    top += 17;
+                }
+                int tc = active ? color : 0x707070;
+                Component l = getMessage().copy().withStyle(s -> s.withColor(tc).withBold(true));
+                int lw = Math.min(font.width(l), width - 4);
+                drawFitted(g, font, l, x + (width - lw) / 2, top, width - 4, 0xFFFFFF);
+                if (sub != null) {
+                    Component sc = sub.copy().withStyle(s -> s.withColor(active ? 0xB0B0B0 : 0x606060));
+                    int sw = Math.min(font.width(sc), width - 4);
+                    drawFitted(g, font, sc, x + (width - sw) / 2, top + 9, width - 4, 0xFFFFFF);
+                }
+                return;
             }
             int textX = x + 6;
             int picture = Math.min(height - 6, 16);

@@ -86,6 +86,15 @@ public final class PreviewPuppet extends RemotePlayer {
         }
     }
 
+    /** The editor closed: the animator forgets the puppet. */
+    public void release() {
+        try {
+            HeroAnimator.previewEnd(this);
+        } catch (RuntimeException e) {
+            fail(e);
+        }
+    }
+
     /** Wears the draft (passed through the rules, so its kit is what the server would make of it). */
     public void wear(CustomHero draft, CustomHeroRules.Limits limits) {
         if (draft == worn) {
@@ -204,6 +213,9 @@ public final class PreviewPuppet extends RemotePlayer {
             setXRot(0.0F);
             xRotO = 0.0F;
             HeroAnimator.preview(this, motion, partialTick);
+            // The animator's clock for the puppet (its own: the editor's frames are not the world's).
+            float own = HeroAnimator.previewPartialTick(this);
+            float pt = own >= 0.0F ? own : partialTick;
             g.pose().pushPose();
             pushed = true;
             g.pose().translate(x, y, 150.0F);
@@ -212,7 +224,7 @@ public final class PreviewPuppet extends RemotePlayer {
             Lighting.setupForEntityInInventory();
             EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
             dispatcher.setRenderShadow(false);
-            RenderSystem.runAsFancy(() -> dispatcher.render(this, 0.0, 0.0, 0.0, 0.0F, partialTick, g.pose(), g.bufferSource(), 0xF000F0));
+            RenderSystem.runAsFancy(() -> dispatcher.render(this, 0.0, 0.0, 0.0, 0.0F, pt, g.pose(), g.bufferSource(), 0xF000F0));
             g.flush();
             dispatcher.setRenderShadow(true);
             g.pose().popPose();

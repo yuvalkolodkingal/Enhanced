@@ -860,6 +860,18 @@ public final class HeroAnimator {
     public static void preview(AbstractClientPlayer puppet, PreviewMotion motion, float partialTick) {
     }
 
+    /**
+     * The partial tick the puppet's clock is at (draw it with this one). (L6's stub of L5's API: -1, "the frame's"; the
+     * merge takes L5's.)
+     */
+    public static float previewPartialTick(AbstractClientPlayer puppet) {
+        return -1.0F;
+    }
+
+    /** The puppet is gone (the editor closed): forget its state. (L6's stub of L5's API.) */
+    public static void previewEnd(AbstractClientPlayer puppet) {
+    }
+
     /** Plays on the puppet exactly what a cast marker of binding ({@code column} 1-5, plain or with Sneak) plays. */
     public static void previewCast(AbstractClientPlayer puppet, int column, boolean sneak) {
     }
