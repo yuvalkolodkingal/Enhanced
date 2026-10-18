@@ -6,6 +6,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.entity.player.Player;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 
 /**
@@ -37,6 +40,12 @@ public class SlowMotionOverlay implements LayeredDraw.Layer {
         int w = graphics.guiWidth();
         int h = graphics.guiHeight();
         int shade = FastColor.ARGB32.lerp(teal, QUICKSILVER_SHADE, TOMMY_SHADE) & 0xFFFFFF;
+        if (slowed) {
+            // (3.5: a custom hero's slowed time shades the screen in the colour his pick chose.)
+            Player holder = SlowMotion.zoneHolder(mc.level, mc.player.position());
+            shade = AbilityColors.shade(holder, AbilityColors.first(holder, HeroAbility.QUICKSILVER_TIME,
+                    HeroAbility.TOMMY_TIME), shade);
+        }
         int edge = (int) (0x50 * strength) << 24 | shade;
         int mid = (int) (0x10 * strength) << 24 | shade;
         graphics.fillGradient(0, 0, w, h / 3, edge, mid);

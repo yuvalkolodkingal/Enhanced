@@ -3,6 +3,9 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.SpiderMotion;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.CustomBeams;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -36,6 +39,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -88,8 +92,32 @@ public final class SpiderEffects {
     private record Burst(int player, Vec3 from, List<Vec3> ends, long seed, boolean organic, long born) {
     }
 
-    /** A flat web on a face of a block. */
-    private record Splat(Vec3 at, Vec3 normal, float size, int life, float turn, long born) {
+    /** A flat web on a face of a block (3.5: {@code tint} the colour chosen for the web that made it, or -1). */
+    private record Splat(Vec3 at, Vec3 normal, float size, int life, float turn, long born, int tint) {
+    }
+
+    /** 3.5: the colour a custom hero's pick chose for the web being drawn, or -1 (silver, cream, white). */
+    private static int tint = -1;
+
+    /** The colour chosen for a hero's web ability ({@code player} an entity id), or -1. */
+    private static int tintOf(int player, HeroAbility row) {
+        ClientLevel level = Minecraft.getInstance().level;
+        return level == null ? -1 : AbilityColors.chosen(level.getEntity(player), row);
+    }
+
+    /**
+     * One of the web's colours, or (3.5) the chosen colour: a web is near white, so it does not take the hue as the
+     * other effects do: the thread is the colour itself, its shimmer paler and its core paler still.
+     */
+    private static int web(int rgb) {
+        if (tint < 0) {
+            return rgb;
+        }
+        return switch (rgb) {
+            case SILVER, CREAM -> tint;
+            case SHIMMER, CREAM_SHIMMER -> CustomBeams.mix(tint, 0xFFFFFF, 0.2F);
+            default -> CustomBeams.mix(tint, 0xFFFFFF, 0.3F);
+        };
     }
 
     /** The line of a zip or a swing that is being held, from his hand to the anchor. */
@@ -116,7 +144,7 @@ public final class SpiderEffects {
     }
 
     /** A line that let go: the hand end flies to the anchor while it fades. */
-    private record Released(int player, Vec3 from, Vec3 anchor, boolean organic, long at) {
+    private record Released(int player, Vec3 from, Vec3 anchor, boolean organic, long at, boolean swing) {
     }
 
     /** A leg of the Iron Spider striking at a point. */
@@ -155,15 +183,19 @@ public final class SpiderEffects {
         }
         switch (payload.kind()) {
             case SHOT -> {
+                tint = tintOf(payload.player(), HeroAbility.SPIDER_WEB);
                 SHOTS.add(new Shot(payload.player(), payload.from(), payload.to(), payload.organic(), now));
                 if (payload.normal().lengthSqr() > 0.01) {
-                    SPLATS.add(new Splat(payload.to(), payload.normal(), 0.7F, WebTiming.SPLAT_TICKS, turn(payload.to()), now));
+                    SPLATS.add(new Splat(payload.to(), payload.normal(), 0.7F, WebTiming.SPLAT_TICKS, turn(payload.to()), now, tint));
                 }
                 impact(level, payload.to(), payload.arg() >= 0);
+                tint = -1;
             }
             case BURST -> {
+                tint = tintOf(payload.player(), HeroAbility.SPIDER_WEB_BURST);
                 BURSTS.add(new Burst(payload.player(), payload.from(), List.copyOf(payload.points()), payload.seed(), payload.organic(), now));
                 burstSplats(level, payload.from(), payload.points(), now);
+                tint = -1;
             }
             case ZIP_START, SWING_START -> {
                 boolean swing = payload.kind() == SpiderFxPayload.Kind.SWING_START;
@@ -180,7 +212,7 @@ public final class SpiderEffects {
             }
             case LEG_STRIKE -> {
                 STRIKES.put(strikeKey(payload.player(), payload.arg()), new Strike(payload.to(), now));
-                legSpark(level, payload.to());
+                legSpark(level, payload.to(), owner);
             }
         }
     }
@@ -206,7 +238,7 @@ public final class SpiderEffects {
         double density = EnhancedClientConfig.flightEffects() ? 1.0 : 0.25;
         for (int i = 0; i < 4; i++) {
             if (random.nextDouble() <= density) {
-                level.addParticle(new EnergyParticleOptions(SILVER, 0.6F), at.x, at.y, at.z, (random.nextDouble() - 0.5) * 0.12,
+                level.addParticle(new EnergyParticleOptions(web(SILVER), 0.6F), at.x, at.y, at.z, (random.nextDouble() - 0.5) * 0.12,
                         random.nextDouble() * 0.08, (random.nextDouble() - 0.5) * 0.12);
             }
         }
@@ -233,7 +265,7 @@ public final class SpiderEffects {
             if (hit.getType() == HitResult.Type.BLOCK && hit.getLocation().distanceToSqr(end) < 0.09) {
                 Direction face = hit.getDirection();
                 SPLATS.add(new Splat(hit.getLocation(), new Vec3(face.getStepX(), face.getStepY(), face.getStepZ()), 0.35F,
-                        WebTiming.BURST_SPLAT_TICKS, turn(hit.getLocation()), now));
+                        WebTiming.BURST_SPLAT_TICKS, turn(hit.getLocation()), now, tint));
             }
         }
     }
@@ -247,19 +279,22 @@ public final class SpiderEffects {
             return;
         }
         Vec3 anchor = anchorOf(level, web);
-        RELEASED.add(new Released(player, hand(level, web), anchor, web.organic, now));
+        RELEASED.add(new Released(player, hand(level, web), anchor, web.organic, now, web.swing));
         RandomSource random = level.random;
+        tint = tintOf(player, web.swing ? HeroAbility.SPIDER_WEB_SWING : HeroAbility.SPIDER_ZIP);
         for (int i = 0; i < 5; i++) {
-            level.addParticle(new EnergyParticleOptions(WHITE, 0.5F), anchor.x + (random.nextDouble() - 0.5) * 0.3, anchor.y,
+            level.addParticle(new EnergyParticleOptions(web(WHITE), 0.5F), anchor.x + (random.nextDouble() - 0.5) * 0.3, anchor.y,
                     anchor.z + (random.nextDouble() - 0.5) * 0.3, 0, -0.04 - random.nextDouble() * 0.04, 0);
         }
+        tint = -1;
     }
 
     /** The red-gold spark where a leg's tip strikes. */
-    private static void legSpark(ClientLevel level, Vec3 at) {
+    private static void legSpark(ClientLevel level, Vec3 at, @Nullable Entity owner) {
         RandomSource random = level.random;
         for (int i = 0; i < 3; i++) {
-            level.addParticle(new EnergyParticleOptions(i == 0 ? 0xFFC247 : 0xFF2A2A, 0.8F), at.x, at.y, at.z,
+            level.addParticle(new EnergyParticleOptions(AbilityColors.shade(owner, HeroAbility.SPIDER_LEGS, i == 0
+                    ? 0xFFC247 : 0xFF2A2A), 0.8F), at.x, at.y, at.z,
                     (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.2);
         }
     }
@@ -302,8 +337,13 @@ public final class SpiderEffects {
                 continue;
             }
             boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
+            tint = AbilityColors.chosen(player, HeroAbility.SPIDER_CRAWL);
             climb(level, player, data, density);
+            tint = AbilityColors.chosen(player, data.is(Live.SWINGING) ? HeroAbility.SPIDER_WEB_SWING
+                    : data.is(Live.ZIPPING) ? HeroAbility.SPIDER_ZIP
+                    : HeroAbility.SPIDER_CRAWL);
             streaks(level, player, data, density);
+            tint = -1;
             if (data.is(Live.BLACK_EYES) && !firstPerson) {
                 wisps(level, player, density);
             }
@@ -344,9 +384,9 @@ public final class SpiderEffects {
             at = player.position().add(0, wall ? 1.6 : 1.9, 0);
         }
         if (random.nextFloat() < density) {
-            level.addParticle(new EnergyParticleOptions(WHITE, 0.5F), at.x, at.y, at.z, 0, 0, 0);
+            level.addParticle(new EnergyParticleOptions(web(WHITE), 0.5F), at.x, at.y, at.z, 0, 0, 0);
             for (int i = 0; i < 2; i++) {
-                level.addParticle(new EnergyParticleOptions(SILVER, 0.35F), at.x + (random.nextDouble() - 0.5) * 0.15, at.y + (random.nextDouble() - 0.5) * 0.15,
+                level.addParticle(new EnergyParticleOptions(web(SILVER), 0.35F), at.x + (random.nextDouble() - 0.5) * 0.15, at.y + (random.nextDouble() - 0.5) * 0.15,
                         at.z + (random.nextDouble() - 0.5) * 0.15, 0, -0.01, 0);
             }
         }
@@ -368,7 +408,7 @@ public final class SpiderEffects {
                 continue;
             }
             double back = random.nextDouble();
-            level.addParticle(new EnergyParticleOptions(WHITE, 0.5F), player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.4,
+            level.addParticle(new EnergyParticleOptions(web(WHITE), 0.5F), player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.4,
                     player.getY() - dy * back + 0.2 + random.nextDouble() * 1.4, player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.4, 0, 0, 0);
         }
     }
@@ -388,7 +428,7 @@ public final class SpiderEffects {
                     (random.nextDouble() - 0.5) * 0.02);
         }
         if (player.tickCount % 3 == 0 && random.nextFloat() <= Math.max(density, 0.3F)) {
-            level.addParticle(new EnergyParticleOptions(GLINT, 0.5F), player.getRandomX(0.5), player.getY() + 0.8 + random.nextDouble() * 1.0, player.getRandomZ(0.5),
+            level.addParticle(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.SPIDER_BLACK_EYES, GLINT), 0.5F), player.getRandomX(0.5), player.getY() + 0.8 + random.nextDouble() * 1.0, player.getRandomZ(0.5),
                     0, 0.03, 0);
         }
     }
@@ -464,13 +504,16 @@ public final class SpiderEffects {
             RenderType decal = EnhancedRenderTypes.webDecal(SPLAT);
             VertexConsumer decals = buffers.getBuffer(decal);
             for (Splat splat : SPLATS) {
+                tint = splat.tint();
                 splat(pose, decals, splat, camera, time);
             }
+            tint = -1;
             buffers.endBatch(decal);
         }
 
         VertexConsumer vc = buffers.getBuffer(EnhancedRenderTypes.ENERGY_VEIL);
         for (Shot shot : SHOTS) {
+            tint = tintOf(shot.player(), HeroAbility.SPIDER_WEB);
             float age = time - shot.born();
             float alpha = WebTiming.shotAlpha(age);
             Vec3 a = origin(level, mc, shot.player(), shot.from(), partialTick);
@@ -478,18 +521,22 @@ public final class SpiderEffects {
             thread(pose, vc, a.subtract(camera), b.subtract(camera), shot.organic(), alpha, time, age);
         }
         for (Burst burst : BURSTS) {
+            tint = tintOf(burst.player(), HeroAbility.SPIDER_WEB_BURST);
             float age = time - burst.born();
             burst(pose, vc, burst, camera, age, time);
         }
         for (Web web : WEBS.values()) {
+            tint = tintOf(web.player, web.swing ? HeroAbility.SPIDER_WEB_SWING : HeroAbility.SPIDER_ZIP);
             Vec3 a = origin(level, mc, web.player, web.from, partialTick);
             thread(pose, vc, a.subtract(camera), anchorOf(level, web).subtract(camera), web.organic, 1.0F, time, time - web.born);
         }
         for (Released released : RELEASED) {
+            tint = tintOf(released.player(), released.swing() ? HeroAbility.SPIDER_WEB_SWING : HeroAbility.SPIDER_ZIP);
             float age = time - released.at();
             Vec3 a = released.from().lerp(released.anchor(), WebTiming.releaseFly(age));
             thread(pose, vc, a.subtract(camera), released.anchor().subtract(camera), released.organic(), WebTiming.releaseAlpha(age), time, 99.0F);
         }
+        tint = -1;
         buffers.endBatch(EnhancedRenderTypes.ENERGY_VEIL);
     }
 
@@ -512,8 +559,8 @@ public final class SpiderEffects {
             return;
         }
         float width = organic ? 0.055F : 0.03F;
-        int main = organic ? CREAM : SILVER;
-        int shimmer = organic ? CREAM_SHIMMER : SHIMMER;
+        int main = web(organic ? CREAM : SILVER);
+        int shimmer = web(organic ? CREAM_SHIMMER : SHIMMER);
         int steps = Mth.clamp((int) (length * 1.5), 2, 40);
         Vec3 dir = b.subtract(a).scale(1.0 / length);
         Vec3 side = dir.cross(UP);
@@ -531,8 +578,8 @@ public final class SpiderEffects {
                     EnergyGeometry.argb(shimmer, 0.35F * alpha));
             EnergyGeometry.ribbon(pose, vc, prev, point, width * prevNear, width * near, EnergyGeometry.argb(main, 0.9F * alpha),
                     EnergyGeometry.argb(main, 0.9F * alpha));
-            EnergyGeometry.ribbon(pose, vc, prev, point, width * 0.35F * prevNear, width * 0.35F * near, EnergyGeometry.argb(WHITE, alpha),
-                    EnergyGeometry.argb(WHITE, alpha));
+            EnergyGeometry.ribbon(pose, vc, prev, point, width * 0.35F * prevNear, width * 0.35F * near, EnergyGeometry.argb(web(WHITE), alpha),
+                    EnergyGeometry.argb(web(WHITE), alpha));
             prev = point;
             prevNear = near;
         }
@@ -570,11 +617,11 @@ public final class SpiderEffects {
             for (int s = 1; s <= segments; s++) {
                 float t = reach * s / segments;
                 Vec3 point = burst.from().add(ray.scale(t)).add(bend.scale(Mth.sin(Mth.PI * t))).subtract(camera);
-                int main = burst.organic() ? CREAM : SILVER;
+                int main = web(burst.organic() ? CREAM : SILVER);
                 EnergyGeometry.ribbon(pose, vc, prev, point, width * near(prev), width * near(point), EnergyGeometry.argb(main, 0.9F * alpha),
                         EnergyGeometry.argb(main, 0.9F * alpha));
-                EnergyGeometry.ribbon(pose, vc, prev, point, width * 0.35F * near(prev), width * 0.35F * near(point), EnergyGeometry.argb(WHITE, alpha),
-                        EnergyGeometry.argb(WHITE, alpha));
+                EnergyGeometry.ribbon(pose, vc, prev, point, width * 0.35F * near(prev), width * 0.35F * near(point), EnergyGeometry.argb(web(WHITE), alpha),
+                        EnergyGeometry.argb(web(WHITE), alpha));
                 prev = point;
             }
         }
@@ -595,7 +642,7 @@ public final class SpiderEffects {
         Vec3 a = u.scale(cos).add(v.scale(sin)).scale(splat.size() * 0.5);
         Vec3 b = v.scale(cos).subtract(u.scale(sin)).scale(splat.size() * 0.5);
         Vec3 c = splat.at().add(n.scale(0.01)).subtract(camera);
-        int color = EnergyGeometry.argb(WHITE, alpha);
+        int color = EnergyGeometry.argb(web(WHITE), alpha);
         corner(pose, vc, c.subtract(a).subtract(b), 0, 0, color);
         corner(pose, vc, c.add(a).subtract(b), 1, 0, color);
         corner(pose, vc, c.add(a).add(b), 1, 1, color);

@@ -24,6 +24,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -101,6 +102,25 @@ public final class SlowMotion {
      * Whose slow time holds this point: the power of the nearest speedster whose zone it is in (the screen shade and the
      * world's tint take his colours), or {@link Power#NONE}.
      */
+    /**
+     * 3.5: the player whose slowed time holds {@code pos} (the nearest, as {@link #zoneOwner}), or null: the overlay
+     * takes the colour his pick chose.
+     */
+    @Nullable
+    public static Player zoneHolder(Level level, Vec3 pos) {
+        double r2 = radius() * radius();
+        Player holder = null;
+        double best = Double.MAX_VALUE;
+        for (Player player : level.players()) {
+            double d = player.position().distanceToSqr(pos);
+            if (slowsTime(Powers.get(player)) && player.isAlive() && d < r2 && d < best) {
+                best = d;
+                holder = player;
+            }
+        }
+        return holder;
+    }
+
     public static Power zoneOwner(Level level, Vec3 pos) {
         double r2 = radius() * radius();
         Power owner = Power.NONE;

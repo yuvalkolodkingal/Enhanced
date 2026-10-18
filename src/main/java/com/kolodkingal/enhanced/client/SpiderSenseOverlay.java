@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -68,7 +70,9 @@ public class SpiderSenseOverlay implements LayeredDraw.Layer {
     /** A thin white-blue frame at the edge of the screen, softest towards the middle. */
     private static void frame(GuiGraphics graphics, int w, int h, float fade, boolean strong) {
         int depth = strong ? 12 : 9;
-        edges(graphics, w, h, depth, depth, RIPPLE_CORE, (strong ? 0.65F : 0.45F) * fade);
+        edges(graphics, w, h, depth, depth, AbilityColors.color(Minecraft.getInstance().player,
+                HeroAbility.SPIDER_SENSE, RIPPLE_CORE),
+                (strong ? 0.65F : 0.45F) * fade);
     }
 
     /**

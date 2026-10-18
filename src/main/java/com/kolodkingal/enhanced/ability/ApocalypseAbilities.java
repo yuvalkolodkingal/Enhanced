@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseFx;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
 import com.kolodkingal.enhanced.apocalypse.SandHazards;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -428,19 +429,19 @@ public final class ApocalypseAbilities {
         data.startCooldown(HeroAbility.APOCALYPSE_BESTOW, now, ApocalypseConfig.BESTOW_COOLDOWN.get());
         player.causeFoodExhaustion(ApocalypseConfig.BESTOW_EXHAUSTION.get().floatValue());
         player.displayClientMessage(Component.translatable("message.enhanced.bestow.done", target.getDisplayName()), true);
-        flow(level, player.getEyePosition().add(player.getLookAngle().scale(0.6)).subtract(0, 0.4, 0), target.position().add(0, target.getBbHeight() * 0.6, 0));
+        flow(level, player, player.getEyePosition().add(player.getLookAngle().scale(0.6)).subtract(0, 0.4, 0), target.position().add(0, target.getBbHeight() * 0.6, 0));
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.APOCALYPSE_BESTOW.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     /** Gold and violet light flows from his hand to the one he empowers. */
-    private static void flow(ServerLevel level, Vec3 from, Vec3 to) {
+    private static void flow(ServerLevel level, Player giver, Vec3 from, Vec3 to) {
         Vec3 path = to.subtract(from);
         int steps = Math.max(2, (int) (path.length() * 2.0));
         for (int i = 0; i <= steps; i++) {
             Vec3 at = from.add(path.scale((double) i / steps));
-            level.sendParticles(new EnergyParticleOptions(i % 2 == 0 ? ApocalypseGuard.GOLD : VIOLET, 1.1F), at.x, at.y, at.z, 1, 0.05, 0.05, 0.05, 0.01);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(giver, HeroAbility.APOCALYPSE_BESTOW, i % 2 == 0 ? ApocalypseGuard.GOLD : VIOLET), 1.1F), at.x, at.y, at.z, 1, 0.05, 0.05, 0.05, 0.01);
         }
-        level.sendParticles(new EnergyParticleOptions(ApocalypseGuard.GOLD, 1.6F), to.x, to.y, to.z, 24, 0.4, 0.6, 0.4, 0.05);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(giver, HeroAbility.APOCALYPSE_BESTOW, ApocalypseGuard.GOLD), 1.6F), to.x, to.y, to.z, 24, 0.4, 0.6, 0.4, 0.05);
     }
 
     /** Forgets those who no longer carry the effect (it ran out, or they are gone). */

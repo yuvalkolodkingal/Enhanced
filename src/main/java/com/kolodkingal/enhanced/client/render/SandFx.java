@@ -7,6 +7,8 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseState;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -14,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -29,6 +32,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,6 +113,29 @@ public final class SandFx {
     }
 
     private static final List<Fx> EFFECTS = new ArrayList<>();
+    /**
+     * 3.5: the colour a custom hero's pick chose for the effect being made, or -1 (the sand, gold and violet of
+     * Apocalypse).
+     */
+    private static int tint = -1;
+    /** 3.5: a grey copy of the sand swirl, for a storm in a chosen colour. */
+    private static final ResourceLocation SWIRL_GREY = Enhanced.id("textures/entity/custom/sand_swirl_grey.png");
+
+    /** One of Apocalypse's colours, or it recoloured to the colour chosen for the effect being made. */
+    private static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
+    /** The colour chosen for an effect a custom hero's ability made (the pick of the hero who made it), or -1. */
+    private static int tintOf(ClientLevel level, Fx fx) {
+        HeroAbility row = switch (fx.kind) {
+            case ApocalypseFxPayload.WAVE, ApocalypseFxPayload.SPIKES -> HeroAbility.APOCALYPSE_SAND;
+            case ApocalypseFxPayload.PORTAL -> HeroAbility.APOCALYPSE_PORTAL;
+            case ApocalypseFxPayload.ENTOMB -> HeroAbility.APOCALYPSE_ENTOMB;
+            default -> null;
+        };
+        return row == null ? -1 : AbilityColors.chosen(level.getEntity(fx.id), row);
+    }
     /** The tornadoes by their hazard's id: one effect each, moved by every report. */
     private static final Map<Integer, Fx> TORNADOES = new HashMap<>();
     /** The storms the heroes raise round themselves, by the hero's entity id: the tick they end at, their radius x 10, the tick they began. */
@@ -237,7 +264,7 @@ public final class SandFx {
         ShieldFx.broke(p.id(), centre, radius);
         for (int i = 0; i < 24; i++) {
             Vec3 d = new Vec3(level.random.nextDouble() - 0.5, level.random.nextDouble() - 0.3, level.random.nextDouble() - 0.5).normalize();
-            level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? SandPalette.GOLD_CORE : SandPalette.GOLD, 1.2F), centre.x + d.x * radius,
+            level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? c(SandPalette.GOLD_CORE) : c(SandPalette.GOLD), 1.2F), centre.x + d.x * radius,
                     centre.y + d.y * radius, centre.z + d.z * radius, d.x * 0.1, d.y * 0.1, d.z * 0.1);
         }
         ArenaFx.shake(0.5F, 8, centre);
@@ -303,6 +330,14 @@ public final class SandFx {
 
     private static void sand(ClientLevel level, double x, double y, double z, double vx, double vy, double vz) {
         // Half of them the sand block's own (which the game darkens), half a tinted mote, so the sand reads as sand.
+        if (tint >= 0) {
+            // (3.5: sand of a chosen colour: motes of it.)
+            int rgb = c(level.random.nextBoolean() ? SandPalette.MAIN : SandPalette.SHADE);
+            level.addParticle(new DustParticleOptions(new Vector3f(((rgb >> 16) & 0xFF) / 255.0F,
+                    ((rgb >> 8) & 0xFF) / 255.0F, (rgb & 0xFF) / 255.0F),
+                    0.9F), x, y, z, vx, vy, vz);
+            return;
+        }
         level.addParticle(level.random.nextBoolean() ? SandParticles.GRAIN : SandParticles.mote(), x, y, z, vx, vy, vz);
     }
 
@@ -326,8 +361,10 @@ public final class SandFx {
         TORNADOES.values().removeIf(fx -> now - fx.lastSeen > 10 || !fx.dimension.equals(level.dimension()));
         STORMS.values().removeIf(storm -> storm[0] < now);
         for (Fx fx : EFFECTS) {
+            tint = tintOf(level, fx);
             tick(level, fx, now, density, random);
         }
+        tint = -1;
         for (Fx fx : TORNADOES.values()) {
             tornadoParticles(level, fx, now, density, random);
         }
@@ -394,7 +431,7 @@ public final class SandFx {
                     Vec3 centre = boss.position().add(0.0, boss.getBbHeight() * 0.85, 0.0);
                     for (int i = 0; i < Math.round(8 * density); i++) {
                         double angle = random.nextDouble() * Mth.TWO_PI;
-                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? 0xF4F4F4 : SandPalette.VIOLET, 0.9F), centre.x + Math.cos(angle) * r,
+                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? 0xF4F4F4 : c(SandPalette.VIOLET), 0.9F), centre.x + Math.cos(angle) * r,
                                 centre.y, centre.z + Math.sin(angle) * r, -Math.cos(angle) * 0.1, 0.0, -Math.sin(angle) * 0.1);
                     }
                 } else if (fx.limit < 0.0 && level.getEntity(fx.id) instanceof ApocalypseEntity boss) {
@@ -423,7 +460,7 @@ public final class SandFx {
                     double radius = fx.d / 10.0;
                     for (int i = 0; i < Math.round(2 * density); i++) {
                         double angle = random.nextDouble() * Mth.TWO_PI;
-                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? SandPalette.VIOLET : SandPalette.VIOLET_CORE, 0.9F),
+                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? c(SandPalette.VIOLET) : c(SandPalette.VIOLET_CORE), 0.9F),
                                 centre.x + Math.cos(angle) * radius, centre.y + Math.sin(angle) * radius, centre.z + (random.nextDouble() - 0.5) * 0.3,
                                 -Math.cos(angle) * 0.04, -Math.sin(angle) * 0.04, 0.0);
                     }
@@ -434,7 +471,7 @@ public final class SandFx {
                     int count = Math.round((age == 0 ? 70 : 40) * density);
                     for (int i = 0; i < count; i++) {
                         Vec3 d = new Vec3(random.nextDouble() - 0.5, random.nextDouble() * 0.6, random.nextDouble() - 0.5).normalize();
-                        level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? SandPalette.VIOLET : SandPalette.GOLD, 1.3F), fx.a.x, fx.a.y + 1.4, fx.a.z,
+                        level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? c(SandPalette.VIOLET) : c(SandPalette.GOLD), 1.3F), fx.a.x, fx.a.y + 1.4, fx.a.z,
                                 d.x * 0.35, d.y * 0.3 + 0.1, d.z * 0.35);
                     }
                     if (age > 0) {
@@ -450,7 +487,7 @@ public final class SandFx {
                     double radius = 0.8 + 2.7 * grow;
                     for (int i = 0; i < Math.round((2 + 4 * grow) * density); i++) {
                         double angle = random.nextDouble() * Mth.TWO_PI;
-                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? SandPalette.VIOLET : SandPalette.VIOLET_CORE, 1.0F),
+                        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? c(SandPalette.VIOLET) : c(SandPalette.VIOLET_CORE), 1.0F),
                                 centre.x + Math.cos(angle) * radius, centre.y, centre.z + Math.sin(angle) * radius, -Math.cos(angle) * 0.08, 0.02, -Math.sin(angle) * 0.08);
                     }
                 }
@@ -490,10 +527,10 @@ public final class SandFx {
             double z = boss.getZ() + Math.sin(angle) * r;
             if (fire) {
                 int colour = switch (random.nextInt(4)) {
-                    case 0 -> SandPalette.FIRE_CORE;
-                    case 1 -> SandPalette.FIRE_GOLD;
-                    case 2 -> SandPalette.FIRE_MAIN;
-                    default -> SandPalette.FIRE_EMBER;
+                    case 0 -> c(SandPalette.FIRE_CORE);
+                    case 1 -> c(SandPalette.FIRE_GOLD);
+                    case 2 -> c(SandPalette.FIRE_MAIN);
+                    default -> c(SandPalette.FIRE_EMBER);
                 };
                 level.addParticle(new EnergyParticleOptions(colour, 1.2F), x, boss.getY() + y, z, Math.cos(angle) * 0.03, 0.06 + random.nextDouble() * 0.06,
                         Math.sin(angle) * 0.03);
@@ -529,6 +566,7 @@ public final class SandFx {
             if (hero == null) {
                 continue;
             }
+            tint = AbilityColors.chosen(hero, HeroAbility.APOCALYPSE_SANDSTORM);
             double radius = storm.getValue()[1] / 10.0;
             for (int i = 0; i < Math.round(10 * density); i++) {
                 double h = random.nextDouble() * 4.0;
@@ -537,6 +575,7 @@ public final class SandFx {
                 sand(level, hero.getX() + Math.cos(angle) * r, hero.getY() + h, hero.getZ() + Math.sin(angle) * r, -Math.sin(angle) * 0.3, 0.05, Math.cos(angle) * 0.3);
             }
         }
+        tint = -1;
     }
 
     /** A cocoon that is gone: its sand falls where it was. */
@@ -597,9 +636,11 @@ public final class SandFx {
         VertexConsumer flat = buffers.getBuffer(SandRenderTypes.FLAT);
         for (Fx fx : EFFECTS) {
             if (visible(fx.a, camera)) {
+                tint = tintOf(level, fx);
                 flatEffect(level, fx, now, partial, pose, flat, camera, time, calm);
             }
         }
+        tint = -1;
         BossTells.renderFlat(level, now, partial, pose, flat, camera, time, calm);
         buffers.endBatch(SandRenderTypes.FLAT);
 
@@ -612,19 +653,33 @@ public final class SandFx {
         }
         for (Map.Entry<Integer, long[]> storm : STORMS.entrySet()) {
             Entity hero = level.getEntity(storm.getKey());
-            if (hero != null && storm.getValue()[0] >= now && visible(hero.position(), camera)) {
+            if (hero != null && storm.getValue()[0] >= now && visible(hero.position(), camera)
+                    && AbilityColors.chosen(hero, HeroAbility.APOCALYPSE_SANDSTORM) < 0) {
                 storm(level, hero, storm.getValue(), now, partial, pose, funnels, camera, time);
             }
         }
         buffers.endBatch(SandRenderTypes.textured(SWIRL));
+        // (3.5: a storm in a chosen colour: the grey swirl tinted.)
+        VertexConsumer tinted = buffers.getBuffer(SandRenderTypes.textured(SWIRL_GREY));
+        for (Map.Entry<Integer, long[]> storm : STORMS.entrySet()) {
+            Entity hero = level.getEntity(storm.getKey());
+            tint = AbilityColors.chosen(hero, HeroAbility.APOCALYPSE_SANDSTORM);
+            if (hero != null && tint >= 0 && storm.getValue()[0] >= now && visible(hero.position(), camera)) {
+                storm(level, hero, storm.getValue(), now, partial, pose, tinted, camera, time);
+            }
+        }
+        tint = -1;
+        buffers.endBatch(SandRenderTypes.textured(SWIRL_GREY));
 
         // 3: what glows (additive): the lines of the tells, the portals, the shock, the fire.
         VertexConsumer beams = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         for (Fx fx : EFFECTS) {
             if (visible(fx.a, camera)) {
+                tint = tintOf(level, fx);
                 glowEffect(level, fx, now, partial, pose, beams, camera, time, calm);
             }
         }
+        tint = -1;
         BossTells.renderGlow(level, now, partial, pose, beams, camera, time, calm);
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
@@ -663,9 +718,9 @@ public final class SandFx {
                 double y = ground(level, fx.a.x, fx.a.y, fx.a.z) + 0.04;
                 Vec3 c = new Vec3(fx.a.x, y, fx.a.z).subtract(camera);
                 float fade = 1.0F - AnimMath.ss(fx.c, fx.c + 6, age);
-                SandShapes.flatDisc(pose, vc, c, radius, 32, argb(SandPalette.GOLD_EDGE, (0.12F + 0.16F * pulse) * fade * calm),
-                        argb(SandPalette.GOLD_EDGE, (0.20F + 0.20F * pulse) * fade * calm));
-                SandShapes.flatRing(pose, vc, c.add(0.0, 0.01, 0.0), radius, 0.22 + 0.1 * pulse, 40, argb(SandPalette.GOLD, (0.55F + 0.35F * pulse) * fade * calm));
+                SandShapes.flatDisc(pose, vc, c, radius, 32, argb(c(SandPalette.GOLD_EDGE), (0.12F + 0.16F * pulse) * fade * calm),
+                        argb(c(SandPalette.GOLD_EDGE), (0.20F + 0.20F * pulse) * fade * calm));
+                SandShapes.flatRing(pose, vc, c.add(0.0, 0.01, 0.0), radius, 0.22 + 0.1 * pulse, 40, argb(c(SandPalette.GOLD), (0.55F + 0.35F * pulse) * fade * calm));
             }
             case ApocalypseFxPayload.TORNADO_TELL -> {
                 double radius = fx.d / 10.0;
@@ -673,13 +728,13 @@ public final class SandFx {
                 double y = ground(level, fx.a.x, fx.a.y, fx.a.z) + 0.05;
                 Vec3 c = new Vec3(fx.a.x, y, fx.a.z).subtract(camera);
                 float fade = (1.0F - AnimMath.ss(fx.c, fx.c + 6, age)) * calm;
-                SandShapes.flatDisc(pose, vc, c, radius, 32, argb(SandPalette.DEEP, (0.1F + 0.3F * u) * fade), argb(SandPalette.SHADE, (0.15F + 0.3F * u) * fade));
-                SandShapes.flatRing(pose, vc, c.add(0.0, 0.01, 0.0), radius, 0.2, 40, argb(SandPalette.LIGHT, (0.4F + 0.4F * u) * fade));
+                SandShapes.flatDisc(pose, vc, c, radius, 32, argb(c(SandPalette.DEEP), (0.1F + 0.3F * u) * fade), argb(c(SandPalette.SHADE), (0.15F + 0.3F * u) * fade));
+                SandShapes.flatRing(pose, vc, c.add(0.0, 0.01, 0.0), radius, 0.2, 40, argb(c(SandPalette.LIGHT), (0.4F + 0.4F * u) * fade));
                 // Three arms of the whirl turn on the ground.
                 for (int arm = 0; arm < 3; arm++) {
                     double angle = age * 0.3 + arm * Mth.TWO_PI / 3.0;
                     SandShapes.lane(pose, vc, c.add(0.0, 0.02, 0.0), new Vec3(Math.cos(angle), 0.0, Math.sin(angle)), radius, 0.3,
-                            argb(SandPalette.LIGHT, 0.0F), argb(SandPalette.LIGHT, 0.55F * u * fade));
+                            argb(c(SandPalette.LIGHT), 0.0F), argb(c(SandPalette.LIGHT), 0.55F * u * fade));
                 }
             }
             case ApocalypseFxPayload.SPIKES -> spikes(level, fx, age, pose, vc, camera, calm);
@@ -693,7 +748,7 @@ public final class SandFx {
                             continue;
                         }
                         Vec3 c = new Vec3(boss.getX(), fx.a.y + 0.06, boss.getZ()).subtract(camera);
-                        SandShapes.flatRing(pose, vc, c, fx.d * uk, 0.5, RING_SEGMENTS, argb(SandPalette.LIGHT, 0.5F * (1.0F - uk) * calm));
+                        SandShapes.flatRing(pose, vc, c, fx.d * uk, 0.5, RING_SEGMENTS, argb(c(SandPalette.LIGHT), 0.5F * (1.0F - uk) * calm));
                     }
                 }
             }
@@ -705,8 +760,8 @@ public final class SandFx {
                 double length = flatDir.length();
                 if (length > 0.05) {
                     float fade = 1.0F - AnimMath.ss(fx.d, fx.d + 8, age);
-                    SandShapes.lane(pose, vc, fx.a.add(0.0, 0.06, 0.0).subtract(camera), flatDir.scale(1.0 / length), length, 0.6, argb(SandPalette.SHADE, 0.2F * fade),
-                            argb(SandPalette.LIGHT, 0.8F * fade));
+                    SandShapes.lane(pose, vc, fx.a.add(0.0, 0.06, 0.0).subtract(camera), flatDir.scale(1.0 / length), length, 0.6, argb(c(SandPalette.SHADE), 0.2F * fade),
+                            argb(c(SandPalette.LIGHT), 0.8F * fade));
                 }
             }
             case ApocalypseFxPayload.DEATH_SAND -> {
@@ -716,7 +771,7 @@ public final class SandFx {
                     float fade = 1.0F - AnimMath.ss(fx.c - 10, fx.c + 10, age);
                     if (p > 0.0F) {
                         Vec3 base = boss.position().add(0.0, 0.02, 0.0).subtract(camera);
-                        SandShapes.cone(pose, vc, base, 1.9 * p, 0.9 * p, 24, argb(SandPalette.SHADE, 0.85F * fade), argb(SandPalette.LIGHT, 0.9F * fade));
+                        SandShapes.cone(pose, vc, base, 1.9 * p, 0.9 * p, 24, argb(c(SandPalette.SHADE), 0.85F * fade), argb(c(SandPalette.LIGHT), 0.9F * fade));
                     }
                 }
             }
@@ -822,7 +877,7 @@ public final class SandFx {
             Vec3 at = SandMath.cone(fx.a, radius, i);
             Vec3 base = new Vec3(at.x - camera.x, gy - camera.y, at.z - camera.z);
             double height = 2.6 * SandMath.coneScale(i) * rise;
-            SandShapes.cone(pose, vc, base, radius * (i == 0 ? 0.42 : 0.3), height, 10, argb(SandPalette.SHADE, 0.9F * calm), argb(SandPalette.LIGHT, 0.95F * calm));
+            SandShapes.cone(pose, vc, base, radius * (i == 0 ? 0.42 : 0.3), height, 10, argb(c(SandPalette.SHADE), 0.9F * calm), argb(c(SandPalette.LIGHT), 0.95F * calm));
         }
     }
 
@@ -836,8 +891,8 @@ public final class SandFx {
         float fade = born * dying;
         Vec3 b = new Vec3(at.x - camera.x, base - camera.y, at.z - camera.z);
         float scroll = time * 0.045F;
-        SandShapes.funnel(pose, vc, b, 0.9, radius, FUNNEL_HEIGHT, 28, 8, 3.0F, scroll, time * 0.05F, SandPalette.LIGHT, 0.55F * fade, 0.28F * fade);
-        SandShapes.funnel(pose, vc, b, 0.6, radius * 0.7, FUNNEL_HEIGHT * 0.85, 20, 6, 2.0F, -scroll * 1.6F, -time * 0.08F, SandPalette.MAIN, 0.6F * fade, 0.3F * fade);
+        SandShapes.funnel(pose, vc, b, 0.9, radius, FUNNEL_HEIGHT, 28, 8, 3.0F, scroll, time * 0.05F, c(SandPalette.LIGHT), 0.55F * fade, 0.28F * fade);
+        SandShapes.funnel(pose, vc, b, 0.6, radius * 0.7, FUNNEL_HEIGHT * 0.85, 20, 6, 2.0F, -scroll * 1.6F, -time * 0.08F, c(SandPalette.MAIN), 0.6F * fade, 0.3F * fade);
     }
 
     /** The hero's storm: a funnel of sand round him that follows him, and a dust disc on the ground. */
@@ -848,8 +903,8 @@ public final class SandFx {
         // It rises over ten ticks and settles over the last eight.
         float fade = AnimMath.ss(0.0F, 8.0F, storm[0] - now - partial) * AnimMath.ss(0.0F, 10.0F, now + partial - storm[2]);
         float scroll = time * 0.06F;
-        SandShapes.funnel(pose, vc, b, radius * 0.45, radius, 6.0, 32, 6, 4.0F, scroll, time * 0.07F, SandPalette.LIGHT, 0.5F * fade, 0.18F * fade);
-        SandShapes.funnel(pose, vc, b, radius * 0.35, radius * 0.8, 5.0, 24, 5, 3.0F, -scroll * 1.5F, -time * 0.1F, SandPalette.MAIN, 0.55F * fade, 0.2F * fade);
+        SandShapes.funnel(pose, vc, b, radius * 0.45, radius, 6.0, 32, 6, 4.0F, scroll, time * 0.07F, c(SandPalette.LIGHT), 0.5F * fade, 0.18F * fade);
+        SandShapes.funnel(pose, vc, b, radius * 0.35, radius * 0.8, 5.0, 24, 5, 3.0F, -scroll * 1.5F, -time * 0.1F, c(SandPalette.MAIN), 0.55F * fade, 0.2F * fade);
     }
 
     private static void glowEffect(ClientLevel level, Fx fx, long now, float partial, Matrix4f pose, VertexConsumer vc, Vec3 camera, float time, float calm) {
@@ -865,9 +920,9 @@ public final class SandFx {
                     Vec3 c = boss.getPosition(partial).add(0.0, boss.getBbHeight() * 0.85, 0.0).subtract(camera);
                     float u = Mth.clamp(age / Math.max(1, fx.c), 0.0F, 1.0F);
                     float fade = (1.0F - AnimMath.ss(fx.c, fx.c + 6, age)) * calm;
-                    SandShapes.flatRing(pose, vc, c, r, 0.35 + 0.4 * u, 96, argb(SandPalette.VIOLET, (0.25F + 0.4F * u) * fade));
+                    SandShapes.flatRing(pose, vc, c, r, 0.35 + 0.4 * u, 96, argb(c(SandPalette.VIOLET), (0.25F + 0.4F * u) * fade));
                     SandShapes.flatRing(pose, vc, c.add(0.0, 0.01, 0.0), r, 0.08, 96, argb(0xF4F4F4, (0.5F + 0.4F * u) * fade));
-                    SandShapes.flatRing(pose, vc, c, Math.min(fx.d, r + 1.2), 0.12, 96, argb(SandPalette.VIOLET_CORE, 0.25F * fade));
+                    SandShapes.flatRing(pose, vc, c, Math.min(fx.d, r + 1.2), 0.12, 96, argb(c(SandPalette.VIOLET_CORE), 0.25F * fade));
                 }
             }
             case ApocalypseFxPayload.PORTAL -> portal(level, fx, age, pose, vc, camera, time, calm);
@@ -877,9 +932,9 @@ public final class SandFx {
                 Vec3 c = new Vec3(fx.a.x, fx.a.y + 0.1, fx.a.z).subtract(camera);
                 float fade = (1.0F - u) * calm;
                 if (age < 14.0F) {
-                    SandShapes.flatRing(pose, vc, c, 0.5 + 8.0 * AnimMath.easeOutCubic(u), 0.6, 64, argb(SandPalette.VIOLET, 0.55F * fade),
-                            argb(SandPalette.GOLD, 0.7F * fade));
-                    SandShapes.column(pose, vc, c, 0.9 * (1.0 - u * 0.5), 6.0, 20, argb(SandPalette.GOLD_CORE, 0.45F * fade), argb(SandPalette.VIOLET, 0.0F));
+                    SandShapes.flatRing(pose, vc, c, 0.5 + 8.0 * AnimMath.easeOutCubic(u), 0.6, 64, argb(c(SandPalette.VIOLET), 0.55F * fade),
+                            argb(c(SandPalette.GOLD), 0.7F * fade));
+                    SandShapes.column(pose, vc, c, 0.9 * (1.0 - u * 0.5), 6.0, 20, argb(c(SandPalette.GOLD_CORE), 0.45F * fade), argb(c(SandPalette.VIOLET), 0.0F));
                 }
             }
             case ApocalypseFxPayload.DEATH_PHOENIX -> firebird(level, fx, age, pose, vc, camera, time);
@@ -910,8 +965,8 @@ public final class SandFx {
         }
         Vec3 a = from.subtract(camera);
         Vec3 b = to.subtract(camera);
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.0F, 0.14F, argb(SandPalette.GOLD_EDGE, 0.0F), argb(SandPalette.GOLD_EDGE, 0.25F + 0.4F * u));
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.0F, 0.05F, argb(SandPalette.GOLD_CORE, 0.0F), argb(SandPalette.GOLD_CORE, 0.35F + 0.5F * u));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.0F, 0.14F, argb(c(SandPalette.GOLD_EDGE), 0.0F), argb(c(SandPalette.GOLD_EDGE), 0.25F + 0.4F * u));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.0F, 0.05F, argb(c(SandPalette.GOLD_CORE), 0.0F), argb(c(SandPalette.GOLD_CORE), 0.35F + 0.5F * u));
     }
 
     /** The centre of an upright portal standing on the ground near {@code at}: its lowest point is on the ground. */
@@ -939,17 +994,17 @@ public final class SandFx {
             facing = facing.lengthSqr() < 1.0E-4 ? new Vec3(0.0, 0.0, 1.0) : facing.normalize();
             double r = radius * open;
             Vec3 c = centre.subtract(camera);
-            SandShapes.portalRing(pose, vc, c, facing, r, 24, age * 0.18, time * 0.3, i -> argb(i % 3 == 0 ? SandPalette.VIOLET_CORE : SandPalette.VIOLET, 0.8F * open * calm));
-            SandShapes.portalRing(pose, vc, c, facing, r * 0.62, 16, -age * 0.27, time * 0.4 + 2.0, i -> argb(i % 2 == 0 ? SandPalette.VIOLET_BODY : SandPalette.VIOLET, 0.55F * open * calm));
+            SandShapes.portalRing(pose, vc, c, facing, r, 24, age * 0.18, time * 0.3, i -> argb(i % 3 == 0 ? c(SandPalette.VIOLET_CORE) : c(SandPalette.VIOLET), 0.8F * open * calm));
+            SandShapes.portalRing(pose, vc, c, facing, r * 0.62, 16, -age * 0.27, time * 0.4 + 2.0, i -> argb(i % 2 == 0 ? c(SandPalette.VIOLET_BODY) : c(SandPalette.VIOLET), 0.55F * open * calm));
             // The disc: a bright core fading to violet at the rim.
             Vec3 right = new Vec3(-facing.z, 0.0, facing.x);
             for (int i = 0; i < 24; i++) {
                 double t0 = Mth.TWO_PI * i / 24;
                 double t1 = Mth.TWO_PI * (i + 1) / 24;
-                vertex(pose, vc, c, argb(SandPalette.VIOLET_CORE, 0.5F * open * calm));
-                vertex(pose, vc, c, argb(SandPalette.VIOLET_CORE, 0.5F * open * calm));
-                vertex(pose, vc, c.add(right.scale(Math.cos(t1) * r * 0.95)).add(0.0, Math.sin(t1) * r * 0.95, 0.0), argb(SandPalette.VIOLET_BODY, 0.12F * open * calm));
-                vertex(pose, vc, c.add(right.scale(Math.cos(t0) * r * 0.95)).add(0.0, Math.sin(t0) * r * 0.95, 0.0), argb(SandPalette.VIOLET_BODY, 0.12F * open * calm));
+                vertex(pose, vc, c, argb(c(SandPalette.VIOLET_CORE), 0.5F * open * calm));
+                vertex(pose, vc, c, argb(c(SandPalette.VIOLET_CORE), 0.5F * open * calm));
+                vertex(pose, vc, c.add(right.scale(Math.cos(t1) * r * 0.95)).add(0.0, Math.sin(t1) * r * 0.95, 0.0), argb(c(SandPalette.VIOLET_BODY), 0.12F * open * calm));
+                vertex(pose, vc, c.add(right.scale(Math.cos(t0) * r * 0.95)).add(0.0, Math.sin(t0) * r * 0.95, 0.0), argb(c(SandPalette.VIOLET_BODY), 0.12F * open * calm));
             }
         }
     }
@@ -963,9 +1018,9 @@ public final class SandFx {
         float fade = 1.0F - AnimMath.ss(fx.c, fx.c + 12, age);
         Vec3 centre = boss.getPosition(partial).add(0.0, boss.getBbHeight() + 1.2, 0.0).subtract(camera);
         double radius = 0.8 + 2.7 * grow;
-        SandShapes.flatRing(pose, vc, centre, radius, 0.3, 48, argb(SandPalette.VIOLET, 0.8F * fade * calm));
-        SandShapes.flatRing(pose, vc, centre.add(0.0, 0.02, 0.0), radius * 0.6, 0.2, 40, argb(SandPalette.VIOLET_CORE, 0.7F * fade * calm));
-        SandShapes.flatDisc(pose, vc, centre, radius, 32, argb(SandPalette.VIOLET_CORE, 0.45F * fade * calm), argb(SandPalette.VIOLET_BODY, 0.1F * fade * calm));
+        SandShapes.flatRing(pose, vc, centre, radius, 0.3, 48, argb(c(SandPalette.VIOLET), 0.8F * fade * calm));
+        SandShapes.flatRing(pose, vc, centre.add(0.0, 0.02, 0.0), radius * 0.6, 0.2, 40, argb(c(SandPalette.VIOLET_CORE), 0.7F * fade * calm));
+        SandShapes.flatDisc(pose, vc, centre, radius, 32, argb(c(SandPalette.VIOLET_CORE), 0.45F * fade * calm), argb(c(SandPalette.VIOLET_BODY), 0.1F * fade * calm));
         for (int arm = 0; arm < 4; arm++) {
             double a0 = time * 0.2 + arm * Mth.HALF_PI;
             Vec3 previous = null;
@@ -974,12 +1029,12 @@ public final class SandFx {
                 double a = a0 + i * 0.35;
                 Vec3 p = centre.add(Math.cos(a) * r, 0.0, Math.sin(a) * r);
                 if (previous != null) {
-                    EnergyGeometry.ribbon(pose, vc, previous, p, 0.07F, argb(SandPalette.VIOLET, 0.6F * fade * calm), argb(SandPalette.VIOLET_CORE, 0.8F * fade * calm));
+                    EnergyGeometry.ribbon(pose, vc, previous, p, 0.07F, argb(c(SandPalette.VIOLET), 0.6F * fade * calm), argb(c(SandPalette.VIOLET_CORE), 0.8F * fade * calm));
                 }
                 previous = p;
             }
         }
-        SandShapes.column(pose, vc, centre, 0.3 + 0.9 * grow, 14.0, 16, argb(SandPalette.VIOLET_CORE, 0.35F * fade * calm), argb(SandPalette.VIOLET, 0.0F));
+        SandShapes.column(pose, vc, centre, 0.3 + 0.9 * grow, 14.0, 16, argb(c(SandPalette.VIOLET_CORE), 0.35F * fade * calm), argb(c(SandPalette.VIOLET), 0.0F));
     }
 
     /** The Phoenix's fire finishing him: a bird of flame rises behind him as his body burns away. */
@@ -1003,19 +1058,19 @@ public final class SandFx {
                 Vec3 p = anchor.add(right.scale(side * size * 1.7 * t * flap)).add(0.0, size * (0.9 + 0.9 * Math.sin(t * 2.2) - 0.35 * t), 0.0)
                         .add(forward.scale(-0.25 * size * t));
                 float f = fade * (1.0F - 0.35F * (float) t);
-                EnergyGeometry.ribbon(pose, vc, previous, p, (float) (0.5 * size * (1.0 - t * 0.8)), argb(SandPalette.FIRE_EMBER, 0.3F * f), argb(SandPalette.FIRE_MAIN, 0.4F * f));
-                EnergyGeometry.ribbon(pose, vc, previous, p, (float) (0.22 * size * (1.0 - t * 0.8)), argb(SandPalette.FIRE_GOLD, 0.5F * f), argb(SandPalette.FIRE_CORE, 0.6F * f));
+                EnergyGeometry.ribbon(pose, vc, previous, p, (float) (0.5 * size * (1.0 - t * 0.8)), argb(c(SandPalette.FIRE_EMBER), 0.3F * f), argb(c(SandPalette.FIRE_MAIN), 0.4F * f));
+                EnergyGeometry.ribbon(pose, vc, previous, p, (float) (0.22 * size * (1.0 - t * 0.8)), argb(c(SandPalette.FIRE_GOLD), 0.5F * f), argb(c(SandPalette.FIRE_CORE), 0.6F * f));
                 previous = p;
             }
         }
         Vec3 head = anchor.add(0.0, size * 2.4, 0.0);
         Vec3 bodyBottom = anchor.add(0.0, size * 0.2, 0.0);
-        EnergyGeometry.ribbon(pose, vc, bodyBottom, head, (float) (0.45 * size), argb(SandPalette.FIRE_MAIN, 0.35F * fade), argb(SandPalette.FIRE_GOLD, 0.5F * fade));
-        EnergyGeometry.ribbon(pose, vc, bodyBottom, head, (float) (0.18 * size), argb(SandPalette.FIRE_GOLD, 0.6F * fade), argb(SandPalette.FIRE_CORE, 0.8F * fade));
+        EnergyGeometry.ribbon(pose, vc, bodyBottom, head, (float) (0.45 * size), argb(c(SandPalette.FIRE_MAIN), 0.35F * fade), argb(c(SandPalette.FIRE_GOLD), 0.5F * fade));
+        EnergyGeometry.ribbon(pose, vc, bodyBottom, head, (float) (0.18 * size), argb(c(SandPalette.FIRE_GOLD), 0.6F * fade), argb(c(SandPalette.FIRE_CORE), 0.8F * fade));
         // The tail: three streamers.
         for (int k = -1; k <= 1; k++) {
             Vec3 tip = anchor.add(right.scale(k * size * 0.35)).add(0.0, -size * 0.9, 0.0).add(forward.scale(-0.3 * size));
-            EnergyGeometry.ribbon(pose, vc, bodyBottom, tip, (float) (0.22 * size), 0.0F, argb(SandPalette.FIRE_MAIN, 0.5F * fade), argb(SandPalette.FIRE_EMBER, 0.0F));
+            EnergyGeometry.ribbon(pose, vc, bodyBottom, tip, (float) (0.22 * size), 0.0F, argb(c(SandPalette.FIRE_MAIN), 0.5F * fade), argb(c(SandPalette.FIRE_EMBER), 0.0F));
         }
     }
 

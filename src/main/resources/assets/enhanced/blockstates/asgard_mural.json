@@ -1,0 +1,484 @@
+{
+  "variants": {
+    "conquest=false,facing=north,tile=0": {
+      "model": "enhanced:block/asgard_mural_peace_0"
+    },
+    "conquest=false,facing=east,tile=0": {
+      "model": "enhanced:block/asgard_mural_peace_0",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=0": {
+      "model": "enhanced:block/asgard_mural_peace_0",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=0": {
+      "model": "enhanced:block/asgard_mural_peace_0",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=1": {
+      "model": "enhanced:block/asgard_mural_peace_1"
+    },
+    "conquest=false,facing=east,tile=1": {
+      "model": "enhanced:block/asgard_mural_peace_1",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=1": {
+      "model": "enhanced:block/asgard_mural_peace_1",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=1": {
+      "model": "enhanced:block/asgard_mural_peace_1",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=2": {
+      "model": "enhanced:block/asgard_mural_peace_2"
+    },
+    "conquest=false,facing=east,tile=2": {
+      "model": "enhanced:block/asgard_mural_peace_2",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=2": {
+      "model": "enhanced:block/asgard_mural_peace_2",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=2": {
+      "model": "enhanced:block/asgard_mural_peace_2",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=3": {
+      "model": "enhanced:block/asgard_mural_peace_3"
+    },
+    "conquest=false,facing=east,tile=3": {
+      "model": "enhanced:block/asgard_mural_peace_3",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=3": {
+      "model": "enhanced:block/asgard_mural_peace_3",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=3": {
+      "model": "enhanced:block/asgard_mural_peace_3",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=4": {
+      "model": "enhanced:block/asgard_mural_peace_4"
+    },
+    "conquest=false,facing=east,tile=4": {
+      "model": "enhanced:block/asgard_mural_peace_4",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=4": {
+      "model": "enhanced:block/asgard_mural_peace_4",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=4": {
+      "model": "enhanced:block/asgard_mural_peace_4",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=5": {
+      "model": "enhanced:block/asgard_mural_peace_5"
+    },
+    "conquest=false,facing=east,tile=5": {
+      "model": "enhanced:block/asgard_mural_peace_5",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=5": {
+      "model": "enhanced:block/asgard_mural_peace_5",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=5": {
+      "model": "enhanced:block/asgard_mural_peace_5",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=6": {
+      "model": "enhanced:block/asgard_mural_peace_6"
+    },
+    "conquest=false,facing=east,tile=6": {
+      "model": "enhanced:block/asgard_mural_peace_6",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=6": {
+      "model": "enhanced:block/asgard_mural_peace_6",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=6": {
+      "model": "enhanced:block/asgard_mural_peace_6",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=7": {
+      "model": "enhanced:block/asgard_mural_peace_7"
+    },
+    "conquest=false,facing=east,tile=7": {
+      "model": "enhanced:block/asgard_mural_peace_7",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=7": {
+      "model": "enhanced:block/asgard_mural_peace_7",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=7": {
+      "model": "enhanced:block/asgard_mural_peace_7",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=8": {
+      "model": "enhanced:block/asgard_mural_peace_8"
+    },
+    "conquest=false,facing=east,tile=8": {
+      "model": "enhanced:block/asgard_mural_peace_8",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=8": {
+      "model": "enhanced:block/asgard_mural_peace_8",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=8": {
+      "model": "enhanced:block/asgard_mural_peace_8",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=9": {
+      "model": "enhanced:block/asgard_mural_peace_9"
+    },
+    "conquest=false,facing=east,tile=9": {
+      "model": "enhanced:block/asgard_mural_peace_9",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=9": {
+      "model": "enhanced:block/asgard_mural_peace_9",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=9": {
+      "model": "enhanced:block/asgard_mural_peace_9",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=10": {
+      "model": "enhanced:block/asgard_mural_peace_10"
+    },
+    "conquest=false,facing=east,tile=10": {
+      "model": "enhanced:block/asgard_mural_peace_10",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=10": {
+      "model": "enhanced:block/asgard_mural_peace_10",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=10": {
+      "model": "enhanced:block/asgard_mural_peace_10",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=11": {
+      "model": "enhanced:block/asgard_mural_peace_11"
+    },
+    "conquest=false,facing=east,tile=11": {
+      "model": "enhanced:block/asgard_mural_peace_11",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=11": {
+      "model": "enhanced:block/asgard_mural_peace_11",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=11": {
+      "model": "enhanced:block/asgard_mural_peace_11",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=12": {
+      "model": "enhanced:block/asgard_mural_peace_12"
+    },
+    "conquest=false,facing=east,tile=12": {
+      "model": "enhanced:block/asgard_mural_peace_12",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=12": {
+      "model": "enhanced:block/asgard_mural_peace_12",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=12": {
+      "model": "enhanced:block/asgard_mural_peace_12",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=13": {
+      "model": "enhanced:block/asgard_mural_peace_13"
+    },
+    "conquest=false,facing=east,tile=13": {
+      "model": "enhanced:block/asgard_mural_peace_13",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=13": {
+      "model": "enhanced:block/asgard_mural_peace_13",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=13": {
+      "model": "enhanced:block/asgard_mural_peace_13",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=14": {
+      "model": "enhanced:block/asgard_mural_peace_14"
+    },
+    "conquest=false,facing=east,tile=14": {
+      "model": "enhanced:block/asgard_mural_peace_14",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=14": {
+      "model": "enhanced:block/asgard_mural_peace_14",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=14": {
+      "model": "enhanced:block/asgard_mural_peace_14",
+      "y": 270
+    },
+    "conquest=false,facing=north,tile=15": {
+      "model": "enhanced:block/asgard_mural_peace_15"
+    },
+    "conquest=false,facing=east,tile=15": {
+      "model": "enhanced:block/asgard_mural_peace_15",
+      "y": 90
+    },
+    "conquest=false,facing=south,tile=15": {
+      "model": "enhanced:block/asgard_mural_peace_15",
+      "y": 180
+    },
+    "conquest=false,facing=west,tile=15": {
+      "model": "enhanced:block/asgard_mural_peace_15",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=0": {
+      "model": "enhanced:block/asgard_mural_conquest_0"
+    },
+    "conquest=true,facing=east,tile=0": {
+      "model": "enhanced:block/asgard_mural_conquest_0",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=0": {
+      "model": "enhanced:block/asgard_mural_conquest_0",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=0": {
+      "model": "enhanced:block/asgard_mural_conquest_0",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=1": {
+      "model": "enhanced:block/asgard_mural_conquest_1"
+    },
+    "conquest=true,facing=east,tile=1": {
+      "model": "enhanced:block/asgard_mural_conquest_1",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=1": {
+      "model": "enhanced:block/asgard_mural_conquest_1",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=1": {
+      "model": "enhanced:block/asgard_mural_conquest_1",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=2": {
+      "model": "enhanced:block/asgard_mural_conquest_2"
+    },
+    "conquest=true,facing=east,tile=2": {
+      "model": "enhanced:block/asgard_mural_conquest_2",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=2": {
+      "model": "enhanced:block/asgard_mural_conquest_2",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=2": {
+      "model": "enhanced:block/asgard_mural_conquest_2",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=3": {
+      "model": "enhanced:block/asgard_mural_conquest_3"
+    },
+    "conquest=true,facing=east,tile=3": {
+      "model": "enhanced:block/asgard_mural_conquest_3",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=3": {
+      "model": "enhanced:block/asgard_mural_conquest_3",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=3": {
+      "model": "enhanced:block/asgard_mural_conquest_3",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=4": {
+      "model": "enhanced:block/asgard_mural_conquest_4"
+    },
+    "conquest=true,facing=east,tile=4": {
+      "model": "enhanced:block/asgard_mural_conquest_4",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=4": {
+      "model": "enhanced:block/asgard_mural_conquest_4",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=4": {
+      "model": "enhanced:block/asgard_mural_conquest_4",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=5": {
+      "model": "enhanced:block/asgard_mural_conquest_5"
+    },
+    "conquest=true,facing=east,tile=5": {
+      "model": "enhanced:block/asgard_mural_conquest_5",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=5": {
+      "model": "enhanced:block/asgard_mural_conquest_5",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=5": {
+      "model": "enhanced:block/asgard_mural_conquest_5",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=6": {
+      "model": "enhanced:block/asgard_mural_conquest_6"
+    },
+    "conquest=true,facing=east,tile=6": {
+      "model": "enhanced:block/asgard_mural_conquest_6",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=6": {
+      "model": "enhanced:block/asgard_mural_conquest_6",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=6": {
+      "model": "enhanced:block/asgard_mural_conquest_6",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=7": {
+      "model": "enhanced:block/asgard_mural_conquest_7"
+    },
+    "conquest=true,facing=east,tile=7": {
+      "model": "enhanced:block/asgard_mural_conquest_7",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=7": {
+      "model": "enhanced:block/asgard_mural_conquest_7",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=7": {
+      "model": "enhanced:block/asgard_mural_conquest_7",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=8": {
+      "model": "enhanced:block/asgard_mural_conquest_8"
+    },
+    "conquest=true,facing=east,tile=8": {
+      "model": "enhanced:block/asgard_mural_conquest_8",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=8": {
+      "model": "enhanced:block/asgard_mural_conquest_8",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=8": {
+      "model": "enhanced:block/asgard_mural_conquest_8",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=9": {
+      "model": "enhanced:block/asgard_mural_conquest_9"
+    },
+    "conquest=true,facing=east,tile=9": {
+      "model": "enhanced:block/asgard_mural_conquest_9",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=9": {
+      "model": "enhanced:block/asgard_mural_conquest_9",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=9": {
+      "model": "enhanced:block/asgard_mural_conquest_9",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=10": {
+      "model": "enhanced:block/asgard_mural_conquest_10"
+    },
+    "conquest=true,facing=east,tile=10": {
+      "model": "enhanced:block/asgard_mural_conquest_10",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=10": {
+      "model": "enhanced:block/asgard_mural_conquest_10",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=10": {
+      "model": "enhanced:block/asgard_mural_conquest_10",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=11": {
+      "model": "enhanced:block/asgard_mural_conquest_11"
+    },
+    "conquest=true,facing=east,tile=11": {
+      "model": "enhanced:block/asgard_mural_conquest_11",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=11": {
+      "model": "enhanced:block/asgard_mural_conquest_11",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=11": {
+      "model": "enhanced:block/asgard_mural_conquest_11",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=12": {
+      "model": "enhanced:block/asgard_mural_conquest_12"
+    },
+    "conquest=true,facing=east,tile=12": {
+      "model": "enhanced:block/asgard_mural_conquest_12",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=12": {
+      "model": "enhanced:block/asgard_mural_conquest_12",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=12": {
+      "model": "enhanced:block/asgard_mural_conquest_12",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=13": {
+      "model": "enhanced:block/asgard_mural_conquest_13"
+    },
+    "conquest=true,facing=east,tile=13": {
+      "model": "enhanced:block/asgard_mural_conquest_13",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=13": {
+      "model": "enhanced:block/asgard_mural_conquest_13",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=13": {
+      "model": "enhanced:block/asgard_mural_conquest_13",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=14": {
+      "model": "enhanced:block/asgard_mural_conquest_14"
+    },
+    "conquest=true,facing=east,tile=14": {
+      "model": "enhanced:block/asgard_mural_conquest_14",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=14": {
+      "model": "enhanced:block/asgard_mural_conquest_14",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=14": {
+      "model": "enhanced:block/asgard_mural_conquest_14",
+      "y": 270
+    },
+    "conquest=true,facing=north,tile=15": {
+      "model": "enhanced:block/asgard_mural_conquest_15"
+    },
+    "conquest=true,facing=east,tile=15": {
+      "model": "enhanced:block/asgard_mural_conquest_15",
+      "y": 90
+    },
+    "conquest=true,facing=south,tile=15": {
+      "model": "enhanced:block/asgard_mural_conquest_15",
+      "y": 180
+    },
+    "conquest=true,facing=west,tile=15": {
+      "model": "enhanced:block/asgard_mural_conquest_15",
+      "y": 270
+    }
+  }
+}

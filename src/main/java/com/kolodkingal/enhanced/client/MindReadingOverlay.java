@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.client.render.PhoenixMath;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.MindReadPayload;
 import com.kolodkingal.enhanced.power.LokiForm;
@@ -123,8 +124,8 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
         graphics.pose().scale(scale, scale, 1.0F);
         // The frame: dark violet, a one pixel border, a little mark in each corner, and a scanline drifting down it.
         graphics.fill(0, 0, width, height, withAlpha(FRAME, fade));
-        graphics.renderOutline(0, 0, width, height, withAlpha(0xFF000000 | PhoenixAbilities.PSY_MAIN, fade));
-        int mark = withAlpha(0xFF000000 | PhoenixAbilities.PSY_CORE, fade);
+        graphics.renderOutline(0, 0, width, height, withAlpha(0xFF000000 | psy(PhoenixAbilities.PSY_MAIN), fade));
+        int mark = withAlpha(0xFF000000 | psy(PhoenixAbilities.PSY_CORE), fade);
         graphics.fill(0, 0, 5, 1, mark);
         graphics.fill(0, 0, 1, 5, mark);
         graphics.fill(width - 5, height - 1, width, height, mark);
@@ -135,7 +136,7 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
         graphics.pose().pushPose();
         graphics.pose().translate(0.0F, scan - Mth.floor(scan), 0.0F);
         graphics.fill(1, Mth.floor(scan), width - 1, Mth.floor(scan) + 1,
-                withAlpha(0x30000000 | PhoenixAbilities.PSY_MAIN, fade));
+                withAlpha(0x30000000 | psy(PhoenixAbilities.PSY_MAIN), fade));
         graphics.pose().popPose();
 
         Painter painter = new Painter(graphics, mc.font, PAD, PAD, fade, time);
@@ -194,7 +195,7 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
             // The title: its name in bold violet, and what it is in grey.
             Component kind = kind(p.species());
             boolean named = !p.name().isEmpty() && !p.name().equals(kind.getString());
-            MutableComponent title = (named ? Component.literal(p.name()) : kind.copy()).withStyle(s -> s.withBold(true).withColor(PhoenixAbilities.PSY_MAIN));
+            MutableComponent title = (named ? Component.literal(p.name()) : kind.copy()).withStyle(s -> s.withBold(true).withColor(psy(PhoenixAbilities.PSY_MAIN)));
             int x = text(title, 0xFFFFFFFF, 0, true);
             if (named) {
                 text(kind.copy().withStyle(ChatFormatting.GRAY), GREY, x + 4, false);
@@ -340,7 +341,7 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
             }
             if (line != null) {
                 y += 2;
-                for (var part : font.split(line.copy().withStyle(s -> s.withItalic(true).withColor(PhoenixAbilities.PSY_MAIN)), 140)) {
+                for (var part : font.split(line.copy().withStyle(s -> s.withItalic(true).withColor(psy(PhoenixAbilities.PSY_MAIN))), 140)) {
                     textLine(part, CALM);
                     y += 10;
                 }
@@ -406,5 +407,10 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
         private static String trim(float value) {
             return Math.abs(value - Math.round(value)) < 0.05F ? Integer.toString(Math.round(value)) : String.format(java.util.Locale.ROOT, "%.1f", value);
         }
+    }
+
+    /** 3.5: the Phoenix's violet, or it in the colour the local player's pick of Mind Reading chose. */
+    private static int psy(int violet) {
+        return AbilityColors.shade(Minecraft.getInstance().player, HeroAbility.PHOENIX_MIND, violet);
     }
 }

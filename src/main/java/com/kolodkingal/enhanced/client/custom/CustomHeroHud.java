@@ -68,7 +68,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
             if (plain == null) {
                 line.append(Component.translatable("hud.enhanced.custom.free").withStyle(ChatFormatting.DARK_GRAY));
             } else {
-                line.append(name(plain).withStyle(s -> s.withColor(colorOf(hero, plain.entry()))));
+                line.append(name(plain).withStyle(s -> s.withColor(colorOf(hero, plain.picked()))));
                 Component status = status(player, data, state, hero, plain, column, now, true);
                 if (status != null) {
                     line.append(Component.literal("  ")).append(status);
@@ -79,7 +79,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
             if (sneak != null) {
                 MutableComponent sub = label(Component.literal(" [").append(Component.translatable("hud.enhanced.custom.sneak", key))
                         .append("] "), hero);
-                sub.append(name(sneak).withStyle(s -> s.withColor(colorOf(hero, sneak.entry()))));
+                sub.append(name(sneak).withStyle(s -> s.withColor(colorOf(hero, sneak.picked()))));
                 Component status = status(player, data, state, hero, sneak, column, now, false);
                 if (status != null) {
                     sub.append(Component.literal("  ")).append(status);
@@ -91,7 +91,9 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         for (CustomHero.Pick pick : hero.powers()) {
             CatalogEntry entry = pick.entry();
             if (entry != null && onNoKey(kit, entry)) {
-                passive.add(CreatorUi.name(entry));
+                // (3.5: in the colour its pick chose, else the hero's glow)
+                passive.add(CreatorUi.name(entry).withStyle(s -> s.withColor(pick.color() < 0 ? hero.glow()
+                        : pick.color())));
             }
         }
         if (!passive.isEmpty()) {
@@ -100,7 +102,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                 if (i > 0) {
                     line.append(Component.literal(", ").withStyle(ChatFormatting.GRAY));
                 }
-                line.append(passive.get(i).copy().withStyle(s -> s.withColor(hero.glow())));
+                line.append(passive.get(i).copy());
             }
             lines.add(line);
         }
@@ -133,7 +135,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
     private static boolean onNoKey(HeroKit kit, CatalogEntry entry) {
         for (int column = 1; column <= CustomHero.KEYS; column++) {
             for (HeroKit.Binding b : new HeroKit.Binding[]{kit.plain(column), kit.sneak(column)}) {
-                if (b != null && b.entry() == entry) {
+                if (b != null && (b.entry() == entry || b.picked() == entry)) {
                     return false;
                 }
             }
@@ -143,6 +145,9 @@ public class CustomHeroHud implements LayeredDraw.Layer {
 
     /** The name of what a binding does: a hero's ability or its Sneak variant, a power or one of its options. */
     public static MutableComponent name(HeroKit.Binding b) {
+        if (b.picked() instanceof HeroAbility v && v.isVariant()) {
+            return CreatorUi.name(v); // (3.5: a variant row, by its own name)
+        }
         if (b.entry() instanceof HeroAbility a) {
             return b.isAlt() ? CreatorUi.altName(a) : CreatorUi.name(a);
         }
@@ -170,7 +175,12 @@ public class CustomHeroHud implements LayeredDraw.Layer {
             if (cooldown != null) {
                 return cooldown;
             }
-            if (!a.hasOnState() || b.isAlt()) {
+            if (b.picked() instanceof HeroAbility v && v.isVariant()) {
+                a = v; // (3.5: a variant row's own state)
+            } else if (!a.hasOnState() || b.isAlt()) {
+                return null;
+            }
+            if (!a.hasOnState()) {
                 return null;
             }
             boolean on = a.isOn(data);

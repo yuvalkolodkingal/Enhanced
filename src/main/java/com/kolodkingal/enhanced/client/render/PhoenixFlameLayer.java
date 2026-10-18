@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -16,6 +18,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
@@ -52,13 +55,21 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         getParentModel().copyPropertiesTo(model);
         model.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         float pulse = 0.7F + 0.3F * Mth.sin(0.5F * t);
-        drawFlames(poseStack, buffer, model, t, pulse * (bright ? 1.3F : 1.0F), FLAME, GLOW);
+        // (3.5: a custom hero's Burst burns in the colour its pick chose, on a grey copy of the flames tinted.)
+        int tint = AbilityColors.chosen(player, HeroAbility.PHOENIX_BURST);
+        if (tint < 0) {
+            drawFlames(poseStack, buffer, model, t, pulse * (bright ? 1.3F : 1.0F), FLAME, GLOW);
+        } else {
+            drawFlames(poseStack, buffer, model, t, pulse * (bright ? 1.3F : 1.0F),
+                    FLAME & 0xFF000000 | AbilityColors.recolor(FLAME & 0xFFFFFF, tint),
+                    GLOW & 0xFF000000 | AbilityColors.recolor(GLOW & 0xFFFFFF, tint), FLAME_GREY);
+        }
 
         if (data.is(Live.PHOENIX_CHARGING)) {
             VertexConsumer orbs = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
             float swell = 1.0F + 0.5F * Math.max(charge, 0.0F);
-            handOrb(poseStack, orbs, model.rightArm, -1.0F / 16.0F, t, swell);
-            handOrb(poseStack, orbs, model.leftArm, 1.0F / 16.0F, t + 20.0F, swell);
+            handOrb(poseStack, orbs, model.rightArm, -1.0F / 16.0F, t, swell, tint);
+            handOrb(poseStack, orbs, model.leftArm, 1.0F / 16.0F, t + 20.0F, swell, tint);
         }
     }
 
@@ -66,8 +77,22 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
      * The flames over a (posed) model at {@code strength} (1: as hers at rest), in two colours (ARGB, the alpha their full
      * strength): the Phoenix's, and (3.4) the flame aura of a custom hero's look, in his colours.
      */
-    public static void drawFlames(PoseStack poseStack, MultiBufferSource buffer, PlayerModel<AbstractClientPlayer> model, float t,
+    public static void drawFlames(PoseStack poseStack, MultiBufferSource buffer,
+            PlayerModel<AbstractClientPlayer> model, float t,
                                   float strength, int flameArgb, int glowArgb) {
+        drawFlames(poseStack, buffer, model, t, strength, flameArgb, glowArgb, PhoenixFx.FLAME_TEXTURE);
+    }
+
+    /** 3.5: a grey copy of the flames, for flames in another colour. */
+    public static final ResourceLocation FLAME_GREY = Enhanced.id("textures/entity/custom/phoenix_flame_grey.png");
+
+    /**
+     * {@link #drawFlames(PoseStack, MultiBufferSource, PlayerModel, float, float, int, int)} with another flame
+     * texture.
+     */
+    public static void drawFlames(PoseStack poseStack, MultiBufferSource buffer,
+            PlayerModel<AbstractClientPlayer> model, float t,
+                                  float strength, int flameArgb, int glowArgb, ResourceLocation texture) {
         model.setAllVisible(true);
         // The second layers of the skin are not part of the flame.
         model.hat.visible = false;
@@ -79,10 +104,10 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         // Fatter and slower behind, then the main tongues scrolling upward over the body.
         poseStack.pushPose();
         poseStack.scale(1.1F, 1.0F, 1.1F);
-        VertexConsumer glow = buffer.getBuffer(RenderType.energySwirl(PhoenixFx.FLAME_TEXTURE, (t * 0.004F) % 1.0F, (-t * 0.02F) % 1.0F));
+        VertexConsumer glow = buffer.getBuffer(RenderType.energySwirl(texture, (t * 0.004F) % 1.0F, (-t * 0.02F) % 1.0F));
         model.renderToBuffer(poseStack, glow, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, scaleAlpha(glowArgb, strength));
         poseStack.popPose();
-        VertexConsumer flame = buffer.getBuffer(RenderType.energySwirl(PhoenixFx.FLAME_TEXTURE, (t * 0.01F) % 1.0F, (-t * 0.04F) % 1.0F));
+        VertexConsumer flame = buffer.getBuffer(RenderType.energySwirl(texture, (t * 0.01F) % 1.0F, (-t * 0.04F) % 1.0F));
         model.renderToBuffer(poseStack, flame, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, scaleAlpha(flameArgb, strength));
     }
 
@@ -93,7 +118,8 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
     }
 
     /** A spinning ball of fire cupped in the hand: three crossed squares, gold outside and white-hot in the middle. */
-    private static void handOrb(PoseStack poseStack, VertexConsumer vc, ModelPart arm, float x, float t, float swell) {
+    private static void handOrb(PoseStack poseStack, VertexConsumer vc, ModelPart arm, float x, float t, float swell,
+            int tint) {
         poseStack.pushPose();
         arm.translateAndRotate(poseStack);
         poseStack.translate(x, 10.0F / 16.0F, 0.0F);
@@ -103,8 +129,10 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
             poseStack.mulPose(Axis.YP.rotationDegrees(t * 9.0F + i * 60.0F));
             poseStack.mulPose(Axis.XP.rotationDegrees(t * 6.0F + i * 45.0F));
             Matrix4f m = poseStack.last().pose();
-            quad(vc, m, 0.28F * pulse, 0x80000000 | PhoenixAbilities.FIRE_MAIN);
-            quad(vc, m, 0.13F * pulse, 0xC0000000 | PhoenixAbilities.FIRE_CORE);
+            quad(vc, m, 0.28F * pulse, 0x80000000 | (tint < 0 ? PhoenixAbilities.FIRE_MAIN
+                    : AbilityColors.recolor(PhoenixAbilities.FIRE_MAIN, tint)));
+            quad(vc, m, 0.13F * pulse, 0xC0000000 | (tint < 0 ? PhoenixAbilities.FIRE_CORE
+                    : AbilityColors.recolor(PhoenixAbilities.FIRE_CORE, tint)));
             poseStack.popPose();
         }
         poseStack.popPose();

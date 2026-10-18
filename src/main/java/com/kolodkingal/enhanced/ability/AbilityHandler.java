@@ -13,6 +13,27 @@ import net.minecraft.server.level.ServerPlayer;
 public final class AbilityHandler {
 
     /**
+     * A key from the client, with the client's own Sneak at the moment of the press ({@code sneak}). The server's
+     * crouch lags behind it: the client sends its Sneak once a tick, after the input is read, so a quick Sneak + key can
+     * reach the server as the plain key (3.5 QA: Heimdall's Sneak + N struck instead of sending). For the time the key is
+     * handled the player's Sneak is the client's, so every hero (and every path that reads {@code isShiftKeyDown}, a
+     * custom hero's binding included) sees the variant the player pressed; then the server's own state is put back.
+     */
+    public static void onKey(ServerPlayer player, int ability, boolean down, boolean sneak) {
+        boolean crouch = player.isShiftKeyDown();
+        if (crouch == sneak) {
+            onKey(player, ability, down);
+            return;
+        }
+        player.setShiftKeyDown(sneak);
+        try {
+            onKey(player, ability, down);
+        } finally {
+            player.setShiftKeyDown(crouch);
+        }
+    }
+
+    /**
      * @param ability 1-5
      * @param down    true when the key was pressed, false when released (hold-to-use abilities need both)
      */

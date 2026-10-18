@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.screen;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.client.KeyBindings;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.hex.Hex;
@@ -206,7 +207,8 @@ public class HexScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
-        int color = minecraft == null || minecraft.player == null ? Power.SCARLET_WITCH.color : WandaAbilities.color(minecraft.player);
+        int color = minecraft == null || minecraft.player == null ? Power.SCARLET_WITCH.color
+                : AbilityColors.color(minecraft.player, HeroAbility.WANDA_HEX, WandaAbilities.color(minecraft.player));
         graphics.drawCenteredString(font, title.copy().withStyle(s -> s.withColor(color).withBold(true)), width / 2, 14, 0xFFFFFF);
         hex().ifPresent(hex -> {
             graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.radius", hex.radius()), width / 2, 42, 0xFFFFFF);

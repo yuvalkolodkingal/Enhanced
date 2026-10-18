@@ -43,7 +43,9 @@ public enum RunCharacter {
     /** Agatha: a witch's measured, self-assured stride, the hands swinging little, the sprint a hurried glide. */
     AGATHA(0.70F, 0.95F, 1.0F, 4, 3, 0.012F),
     /** 3.5: Heimdall, the sentinel: a heavy, upright stride in his armour, the arms swinging little, a steady bob. */
-    HEIMDALL(0.65F, 0.95F, 1.05F, 3, 2, 0.020F);
+    HEIMDALL(0.65F, 0.95F, 1.05F, 3, 2, 0.020F),
+    /** Hela (3.5): an upright glide, the arms hardly swinging, the sprint long and smooth, no bounce. */
+    HELA(0.45F, 0.70F, 1.10F, 3, 2, 0.006F);
 
     public final float walkArms;
     public final float sprintArms;
@@ -80,6 +82,7 @@ public enum RunCharacter {
             case PROFESSOR_X -> XAVIER;
             case AGATHA -> AGATHA;
             case HEIMDALL -> HEIMDALL;
+            case HELA -> HELA; // (3.5)
             default -> DEFAULT;
         };
     }

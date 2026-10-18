@@ -25,7 +25,8 @@ import java.util.Set;
  * {@code heroModules} is off, the world-scale ones when {@code worldPowers} is off, and repeats are dropped; strengths
  * are kept between 1 and the server's highest (an ability with nothing to scale is always 5); an unknown option becomes
  * the default ({@link HeroAbility#BOTH} for a hero's ability); a stance its power cannot take becomes automatic; an
- * ability whose needed one is missing is dropped ({@link HeroAbility#requires}); a pick that drives a {@link Resource}
+ * ability whose needed one is missing is dropped ({@link HeroAbility#requires}); (3.5) a hero's ability picked with its
+ * variant row keeps its main action only ({@link HeroAbility#MAIN}); a pick that drives a {@link Resource}
  * another owner's pick already drives is dropped; powers past {@code maxPowers}, then past the budget (a generic Sneak
  * variant costs half its power more), are dropped from the end of the list (the last picked go first); the bindings are
  * checked (below); moves and animation choices that name nothing known become automatic; layers not allowed or not known
@@ -84,6 +85,9 @@ public final class CustomHeroRules {
         public boolean allows(CatalogEntry entry) {
             if (disabled.contains(entry.id())) {
                 return false;
+            }
+            if (entry instanceof HeroAbility a && a.parent() != null && disabled.contains(a.parent().id())) {
+                return false; // (3.5: a variant row goes with its parent)
             }
             return !(entry instanceof HeroAbility a) || !disabled.contains(a.heroId() + ".*");
         }
@@ -170,6 +174,17 @@ public final class CustomHeroRules {
                     dropped = true;
                     break;
                 }
+            }
+        }
+
+        // ---- 3.5: a variant row picked with its parent: the parent keeps its main action (the variant is the row's)
+        // ----
+        for (int i = 0; i < picks.size(); i++) {
+            CustomHero.Pick pick = picks.get(i);
+            if (pick.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option())
+                    && a.variant() != null
+                    && find(picks, a.variant().id()) != null) {
+                picks.set(i, pick.withOption(HeroAbility.MAIN));
             }
         }
 

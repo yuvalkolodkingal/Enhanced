@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
 import com.kolodkingal.enhanced.power.Live;
@@ -117,7 +118,9 @@ public final class SpiderSenseClient {
 
     /** The colour the outline of a creature is drawn in. */
     public static int color(Entity entity) {
-        return overload && entity instanceof Mob mob && mob.isAggressive() ? AGGRESSIVE_COLOR : THREAT_COLOR;
+        // (3.5: the threats of a custom hero's sense glow in the colour its pick chose.)
+        return overload && entity instanceof Mob mob && mob.isAggressive() ? AGGRESSIVE_COLOR
+                : AbilityColors.color(Minecraft.getInstance().player, HeroAbility.SPIDER_SENSE, THREAT_COLOR);
     }
 
     /** Whether the sense warned him within the last second. */

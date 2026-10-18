@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.entity;
 
 import com.kolodkingal.enhanced.ability.SlowMotion;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -9,6 +10,9 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -31,6 +35,9 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
     private double life;
 
     private float damage = 5.0F;
+    /** 3.5: the colour a custom hero's pick chose for the throw (synced: the trail is drawn by every client), or -1. */
+    private static final EntityDataAccessor<Integer> TINT = SynchedEntityData.defineId(LokiDaggerEntity.class,
+            EntityDataSerializers.INT);
 
     public LokiDaggerEntity(EntityType<? extends LokiDaggerEntity> type, Level level) {
         super(type, level);
@@ -39,6 +46,17 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
     public LokiDaggerEntity(Level level, LivingEntity thrower, float damage) {
         super(ModEntities.LOKI_DAGGER.get(), thrower, level);
         this.damage = damage;
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(TINT, -1);
+    }
+
+    /** 3.5: the throw in a chosen colour (-1: the thrower's magic). */
+    public void tint(int color) {
+        entityData.set(TINT, color);
     }
 
     @Override
@@ -53,11 +71,14 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
 
     /** The thrower's magic colour (his current look's), for the trail and the sparks. */
     public int magicColor() {
-        return getOwner() instanceof Player owner ? Powers.color(owner) : Power.LOKI.color;
+        int tint = entityData.get(TINT);
+        return tint >= 0 ? tint : getOwner() instanceof Player owner ? Powers.color(owner) : Power.LOKI.color;
     }
 
     private int magicGlow() {
-        return getOwner() instanceof Player owner ? Powers.glow(owner) : Power.LOKI.glow;
+        int tint = entityData.get(TINT);
+        return tint >= 0 ? AbilityColors.glowOf(tint) : getOwner() instanceof Player owner ? Powers.glow(owner)
+                : Power.LOKI.glow;
     }
 
     @Override

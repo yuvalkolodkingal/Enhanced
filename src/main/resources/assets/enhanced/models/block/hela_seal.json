@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "minecraft:block/crying_obsidian"
+    "north": "enhanced:block/asgard/hela_seal",
+    "south": "enhanced:block/asgard/hela_seal",
+    "east": "enhanced:block/asgard/hela_seal_side",
+    "west": "enhanced:block/asgard/hela_seal_side",
+    "up": "enhanced:block/asgard/hela_seal_side",
+    "down": "enhanced:block/asgard/hela_seal_side",
+    "particle": "enhanced:block/asgard/hela_seal"
   }
 }

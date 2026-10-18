@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:asgard_gold_plating",
+    "enhanced:asgard_gold_trim",
+    "enhanced:asgard_gold_pillar",
+    "enhanced:asgard_gold_lattice",
+    "enhanced:realm_stone",
+    "enhanced:realm_stone_bricks",
+    "enhanced:polished_realm_stone",
+    "enhanced:realm_stone_pillar",
+    "enhanced:realm_stone_brick_stairs",
+    "enhanced:realm_stone_brick_wall",
+    "enhanced:bifrost_bridge",
+    "enhanced:asgard_mural",
+    "enhanced:asgard_brazier",
+    "enhanced:asgard_bench",
+    "enhanced:realm_stone_brick_slab"
+  ]
+}

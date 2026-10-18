@@ -157,6 +157,13 @@ public final class ClientSetup {
         // The renderers (and block entity renderers) of 3.5, one region per lane: the skeleton draws its entities with
         // nothing until their lanes give them renderers.
         // ===== asgard (3.5) =====
+        event.registerEntityRenderer(ModEntities.SEAT.get(), NoopRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.BIFROST_MECHANISM.get(),
+                com.kolodkingal.enhanced.client.asgard.BifrostMechanismRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.HOFUND_SOCKET.get(),
+                com.kolodkingal.enhanced.client.asgard.HofundSocketRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.GUNGNIR_STAND.get(),
+                com.kolodkingal.enhanced.client.asgard.GungnirStandRenderer::new);
         // ===== heimdall (3.5) =====
         // ===== odin (3.5) =====
         event.registerEntityRenderer(ModEntities.GUNGNIR.get(),
@@ -164,9 +171,14 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.RAVEN.get(),
                 com.kolodkingal.enhanced.client.render.RavenRenderer::new);
         // ===== hela (3.5) =====
-        event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), com.kolodkingal.enhanced.client.render.HelaShadowRenderer::new);
+        event.registerEntityRenderer(ModEntities.HELA.get(), com.kolodkingal.enhanced.client.render.HelaRenderer::new);
+        event.registerEntityRenderer(ModEntities.BERSERKER.get(), com.kolodkingal.enhanced.client.render.BerserkerRenderer::new);
+        event.registerEntityRenderer(ModEntities.FENRIS.get(), com.kolodkingal.enhanced.client.render.FenrisRenderer::new);
+        event.registerEntityRenderer(ModEntities.NECROSWORD.get(), com.kolodkingal.enhanced.client.render.NecroswordRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLADE_SPIKE.get(), com.kolodkingal.enhanced.client.render.BladeSpikeRenderer::new);
         // ===== asgardians (3.5) =====
-        event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
     }
 
     /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
@@ -215,7 +227,19 @@ public final class ClientSetup {
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.RavenModel.LAYER,
                 com.kolodkingal.enhanced.client.render.RavenModel::createBodyLayer);
         // ===== hela (3.5) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.LAYER, com.kolodkingal.enhanced.client.render.HelaModel::createBodyLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.CLOAK,
+                com.kolodkingal.enhanced.client.render.HelaModel::createCloakLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER,
+                com.kolodkingal.enhanced.client.render.HelaHeaddressLayer::createLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER,
+                com.kolodkingal.enhanced.client.render.NecroswordModel::createBodyLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.BerserkerModel.LAYER,
+                com.kolodkingal.enhanced.client.render.BerserkerModel::createBodyLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.FenrisModel.LAYER, com.kolodkingal.enhanced.client.render.FenrisModel::createBodyLayer);
         // ===== asgardians (3.5) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel.LAYER,
+                com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel::createLayer);
     }
 
     @SubscribeEvent
@@ -255,6 +279,10 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.OdinHelmLayer(renderer,
                         event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER)));
                 // ===== hela (3.5) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.HelaHeaddressLayer(renderer,
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER)));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.HelaBladesLayer(renderer, new com.kolodkingal.enhanced.client.render.NecroswordModel(
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER))));
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
@@ -266,6 +294,22 @@ public final class ClientSetup {
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
         }
+        // ===== asgardians (3.5): the Heimdall and Odin NPCs wear the heroes' helms =====
+        npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.HEIMDALL,
+                event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER),
+                com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.TEXTURE);
+        npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.ODIN,
+                event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER),
+                com.kolodkingal.enhanced.client.render.OdinHelmLayer.TEXTURE);
+    }
+
+    /** A role's NPC wears {@code helm} (a hero's helmet model, in the pixels of the head; the pose is in head space). */
+    private static void npcHelm(com.kolodkingal.enhanced.asgard.npc.Role role, net.minecraft.client.model.geom.ModelPart helm,
+                                net.minecraft.resources.ResourceLocation texture) {
+        com.kolodkingal.enhanced.client.asgard.AsgardianRenderer.registerHeadgear(role,
+                (npc, model, pose, buffers, light, partial) -> helm.render(pose,
+                        buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(texture)), light,
+                        net.minecraft.client.renderer.entity.LivingEntityRenderer.getOverlayCoords(npc, 0.0F)));
     }
 
     @SubscribeEvent

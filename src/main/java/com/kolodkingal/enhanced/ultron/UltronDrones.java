@@ -252,12 +252,13 @@ public final class UltronDrones {
     /** The data jump: flashes at both ends, a line of data between them, the hero moved, the drone gone. */
     private static void jumpInto(ServerLevel level, ServerPlayer hero, UltronSentryEntity drone, Vec3 to) {
         Vec3 from = hero.position();
-        UltronFx.at(level, UltronFxPayload.NETWORK_FLASH, from.add(0, 1.0, 0), 2.0F, 10);
-        UltronFx.line(level, UltronFxPayload.DATA_LINE, from.add(0, 1.0, 0), to.add(0, 1.0, 0), 20);
+        // (3.5: the flashes name the hero, whose pick's colour they take.)
+        UltronFx.from(level, UltronFxPayload.NETWORK_FLASH, hero, from.add(0, 1.0, 0), Vec3.ZERO, 2.0F, 10);
+        UltronFx.from(level, UltronFxPayload.DATA_LINE, hero, from.add(0, 1.0, 0), to.add(0, 1.0, 0), 0.0F, 20);
         UltronSounds.UPLOAD.play(level, from, SoundSource.PLAYERS, 1.0F, 1.0F);
         hero.teleportTo(level, to.x, to.y, to.z, hero.getYRot(), hero.getXRot());
         hero.resetFallDistance();
-        UltronFx.at(level, UltronFxPayload.NETWORK_FLASH, to.add(0, 1.0, 0), 2.0F, 10);
+        UltronFx.from(level, UltronFxPayload.NETWORK_FLASH, hero, to.add(0, 1.0, 0), Vec3.ZERO, 2.0F, 10);
         UltronSounds.UPLOAD.play(level, to, SoundSource.PLAYERS, 1.0F, 1.3F);
         drone.dissolve();
     }
@@ -290,7 +291,8 @@ public final class UltronDrones {
         if (to != null && HexManager.onTeleport(level, hero, to)) {
             jumpInto(level, hero, drone, to);
         } else {
-            UltronFx.at(level, UltronFxPayload.NETWORK_FLASH, hero.position().add(0, 1.0, 0), 3.0F, 10);
+            UltronFx.from(level, UltronFxPayload.NETWORK_FLASH, hero, hero.position().add(0, 1.0, 0), Vec3.ZERO, 3.0F,
+                    10);
         }
         hero.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 60, 3));
         data.startCooldown(HeroAbility.ULTRON_UPLOAD, now, UltronConfig.SECOND_LIFE_COOLDOWN.get());
@@ -370,7 +372,7 @@ public final class UltronDrones {
         if (fight != null) {
             fight.refresh();
         }
-        UltronFx.at(level, UltronFxPayload.NETWORK_FLASH, drone.position().add(0, 1.0, 0), 1.5F, 10);
+        UltronFx.from(level, UltronFxPayload.NETWORK_FLASH, hero, drone.position().add(0, 1.0, 0), Vec3.ZERO, 1.5F, 10);
         UltronSounds.UPLOAD.play(level, drone.position(), SoundSource.PLAYERS, 0.8F, 1.4F);
     }
 

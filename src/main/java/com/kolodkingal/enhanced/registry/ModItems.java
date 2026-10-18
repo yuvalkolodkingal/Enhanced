@@ -35,6 +35,8 @@ import net.minecraft.world.item.component.Unbreakable;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Enhanced.MODID);
 
@@ -141,6 +143,25 @@ public final class ModItems {
 
     // ===== asgard (3.5) =====
     // (The skeleton registers the three items other lanes need by name; lane L1 adds the realm's block items here.)
+    /** The block items of the realm's decorative blocks (Creative only: the city's own, no recipes), in tab order. */
+    public static final List<DeferredItem<BlockItem>> ASGARD_BLOCK_ITEMS = List.of(
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_GOLD_PLATING),
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_GOLD_TRIM),
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_GOLD_PILLAR),
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_GOLD_LATTICE),
+            ITEMS.registerSimpleBlockItem(ModBlocks.REALM_STONE),
+            ITEMS.registerSimpleBlockItem(ModBlocks.REALM_STONE_BRICKS),
+            ITEMS.registerSimpleBlockItem(ModBlocks.POLISHED_REALM_STONE),
+            ITEMS.registerSimpleBlockItem(ModBlocks.REALM_STONE_PILLAR),
+            ITEMS.registerSimpleBlockItem(ModBlocks.REALM_STONE_BRICK_STAIRS),
+            ITEMS.registerSimpleBlockItem(ModBlocks.REALM_STONE_BRICK_SLAB),
+            ITEMS.registerSimpleBlockItem(ModBlocks.REALM_STONE_BRICK_WALL),
+            ITEMS.registerSimpleBlockItem(ModBlocks.BIFROST_BRIDGE),
+            ITEMS.registerSimpleBlockItem(ModBlocks.COSMIC_FALLS),
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_MURAL),
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_BRAZIER),
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_GOLDEN_LEAVES),
+            ITEMS.registerSimpleBlockItem(ModBlocks.ASGARD_BENCH));
     // ===== heimdall (3.5) =====
     /** Heimdall's sword, the key of the Bifrost for whoever holds it (lane L2). */
     public static final DeferredItem<HofundItem> HOFUND = ITEMS.register("hofund",

@@ -195,12 +195,35 @@ public final class HeroAbilityAnims {
                 .stances(Stance.ODIN_SLEEP);
         row(HeroAbility.ODIN_BODY).also(GestureId.ODIN_CROWN);
         // ===== hela (3.5) =====
-        row(HeroAbility.HELA_NECROSWORDS);
-        row(HeroAbility.HELA_BLADE_WALL);
-        row(HeroAbility.HELA_GODDESS);
-        row(HeroAbility.HELA_ARMY);
-        row(HeroAbility.HELA_GRASP);
+        // (Her blades, her dash and Fenris are told by the payload of their effect; the form by its toggle, the dead and the
+        // grasp by their states.)
+        row(HeroAbility.HELA_NECROSWORDS).main(GestureId.HELA_THROW).alt(GestureId.HELA_RAIN);
+        row(HeroAbility.HELA_BLADE_WALL).main(GestureId.HELA_WALL).alt(GestureId.HELA_BURST);
+        row(HeroAbility.HELA_GODDESS).main(GestureId.HELA_FORM_ON).also(GestureId.HELA_FORM_OFF).alt(GestureId.HELA_DASH)
+                .stances(Stance.HELA_BLADES);
+        row(HeroAbility.HELA_ARMY).main(GestureId.HELA_RAISE).alt(GestureId.HELA_FENRIS);
+        row(HeroAbility.HELA_GRASP).main(GestureId.HELA_GRASP).stances(Stance.HELA_GRASP);
         row(HeroAbility.HELA_BODY);
+        // ===== variants (3.5, the creator lane) =====
+        // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own
+        // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's
+        // moves.)
+        row(HeroAbility.WANDA_BUILD_MAGIC);
+        for (HeroAbility a : HeroAbility.values()) {
+            HeroAbility parent = a.parent();
+            if (parent == null || ROWS.containsKey(a)) {
+                continue;
+            }
+            Row of = ROWS.get(parent);
+            Builder b = row(a);
+            if (of != null) {
+                if (of.alt != null && of.altCd) {
+                    b.mainCd(of.alt);
+                }
+                b.row.gestures.addAll(of.gestures);
+                b.row.stances.addAll(of.stances);
+            }
+        }
 
         // Who owns each synced bit (the first of the kit's rows in this order; the cast marker settles a shared one).
         live(Live.SPEEDING, HeroAbility.QUICKSILVER_SPEED, HeroAbility.QUICKSILVER_TIME, HeroAbility.TOMMY_SPEED);

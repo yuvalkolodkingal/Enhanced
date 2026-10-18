@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
@@ -340,7 +341,7 @@ public final class MagnetoAbilities {
     static void beam(ServerLevel level, Player magneto, Vec3 from, Vec3 to) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(64, delta.length() * 2);
-        EnergyParticleOptions spark = new EnergyParticleOptions(glow(magneto), 0.9F);
+        EnergyParticleOptions spark = new EnergyParticleOptions(glow(magneto, HeroAbility.MAGNETO_DISARM), 0.9F);
         for (int i = 0; i <= steps; i++) {
             Vec3 p = from.add(delta.scale(i / (double) Math.max(1, steps)));
             level.sendParticles(spark, p.x, p.y, p.z, 1, 0.03, 0.03, 0.03, 0.0);
@@ -365,6 +366,14 @@ public final class MagnetoAbilities {
     /** The glow of Magneto's sparks as this player makes them: Magneto's, or (3.4) a custom hero's own. */
     static int glow(Player player) {
         return Powers.get(player).power() == Power.MAGNETO ? Power.MAGNETO.glow : Powers.glow(player);
+    }
+
+    /**
+     * 3.5: the glow of the sparks of one of his abilities: the colour its pick chose ({@code AbilityColors}), else
+     * {@link #glow}.
+     */
+    static int glow(Player player, HeroAbility row) {
+        return AbilityColors.color(player, row, glow(player));
     }
 
     public static boolean isMetalProjectile(Entity entity) {
@@ -429,7 +438,7 @@ public final class MagnetoAbilities {
         for (int i = 0; i < 14; i++) {
             double a = Math.PI * 2 * i / 14;
             Vec3 dir = side.scale(Math.cos(a)).add(up.scale(Math.sin(a)));
-            level.sendParticles(new EnergyParticleOptions(glow(magneto), 0.7F), pos.x + dir.x * 0.25, pos.y + dir.y * 0.25, pos.z + dir.z * 0.25,
+            level.sendParticles(new EnergyParticleOptions(glow(magneto, HeroAbility.MAGNETO_SHIELD), 0.7F), pos.x + dir.x * 0.25, pos.y + dir.y * 0.25, pos.z + dir.z * 0.25,
                     0, dir.x, dir.y, dir.z, 0.12);
         }
     }

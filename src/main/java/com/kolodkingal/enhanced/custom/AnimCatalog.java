@@ -17,18 +17,24 @@ public final class AnimCatalog {
             "thanos_step", "loki_dagger", "loki_cast", "phoenix_burst", "apoc_sand_wave", "agatha_drain", "ultron_army",
             "ultron_hack", "speed_dash", "qs_blitz", "agatha_runes", "spider_shoot", "cyclops_concussion", "cyclops_leap",
             "tommy_boom", "apoc_bestow", "phoenix_psionic_cast", "thanos_pull", "thanos_timelock", "thanos_rewind",
-            "billy_freeze_cast", "phoenix_mind_cast", "ultron_blast", "wanda_beam_kick", "agatha_hex");
+            "billy_freeze_cast", "phoenix_mind_cast", "ultron_blast", "wanda_beam_kick", "agatha_hex",
+            // 3.5 (the creator lane): the moves of the Sneak variants and the rest of the heroes' keys.
+            "mag_pull", "mag_disarm", "qs_snatch", "qs_barrage", "tommy_blitz", "tommy_vibrate", "tommy_accel",
+                    "loki_fan",
+            "thanos_blast", "thanos_warp", "thanos_sight", "apoc_entomb", "apoc_portal", "cyclops_ricochet",
+                    "xavier_freeze",
+            "xavier_cerebro", "ultron_upload", "spider_burst");
 
     /** Stances a held power may take. */
     public static final List<String> STANCES_HOLD = List.of(
             "beam_hand", "beam_wanda", "vision_beam", "thor_beam", "ultron_fire", "cyclops_blast", "thanos_drain",
             "shield_wanda", "apoc_shield", "agatha_shield", "barrier_billy", "billy_freeze", "phoenix_charge", "apoc_storm",
-            "tk_strain");
+            "tk_strain", "spider_swing", "mag_shrapnel");
 
     /** Stances a switched-on power may take. */
     public static final List<String> STANCES_TOGGLE = List.of(
             "mag_field", "vision_phased", "vision_dense", "loki_frost", "thor_unleashed", "noise", "phoenix_read",
-            "spider_surge", "spider_kill", "thanos_veil");
+            "spider_surge", "spider_kill", "thanos_veil", "cyclops_unleashed", "spider_alert", "xavier_trance");
 
     /** Flight styles: the built-in fliers' profiles, take-offs and flight effects, or the game's plain flight. */
     public static final List<String> FLIGHT_STYLES = List.of(
@@ -39,7 +45,7 @@ public final class AnimCatalog {
             "default", "magneto", "wanda", "vision", "white_vision", "billy", "loki", "thor", "phoenix", "spider", "thanos",
             "ultron", "apocalypse", "cyclops", "xavier", "xavier_seated", "agatha",
             // 3.5
-            "heimdall", "odin");
+            "heimdall", "odin", "hela");
 
     /** Speedster runs: Quicksilver in his Time, Quicksilver's Super Speed, Tommy's. */
     public static final List<String> SPEED_RUNS = List.of("qs_time", "qs_speed", "tommy");

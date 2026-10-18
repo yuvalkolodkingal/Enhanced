@@ -144,7 +144,8 @@ public final class AsgardSkeletonTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theRowsOfAsgardAreEighteenInTheirRegions(GameTestHelper helper) {
-        check(HeroAbility.values().length == 99, "81 + 18 rows: " + HeroAbility.values().length);
+        check(HeroAbility.values().length == 133, "81 + 18 rows, and the creator lane's 34 (3.5): "
+                + HeroAbility.values().length);
         Set<String> ids = new HashSet<>();
         for (HeroAbility a : HeroAbility.values()) {
             check(ids.add(a.id()), a.id() + " is unique");
@@ -221,8 +222,10 @@ public final class AsgardSkeletonTests {
         Biome biome = server.registryAccess().registryOrThrow(Registries.BIOME).get(Enhanced.id("asgard"));
         check(biome != null && biome.getMobSettings().getMobs(MobCategory.MONSTER).isEmpty() && biome.getBackgroundMusic().isPresent(),
                 "its biome: no monsters, its music");
+        // (3.5 L1: the realm's generator replaced the placeholder platform; the landing is on the Observatory's floor.)
+        BlockPos landing = BlockPos.containing(CityPlan.ARRIVAL);
+        check(!asgard.getBlockState(landing.below()).isAir() && asgard.getBlockState(landing).isAir(), "solid floor under the landing, room above it");
         BlockPos socket = CityPlan.OBSERVATORY_SOCKET;
-        check(!asgard.getBlockState(socket.below()).isAir() && asgard.getBlockState(socket).isAir(), "the placeholder platform under the landing");
         check(asgard.getBlockState(socket.offset(0, -1, AsgardChunkGenerator.PLATFORM_RADIUS + 2)).isAir(), "and nothing beyond it: the void");
         check(AsgardState.get(server) != null && !AsgardState.get(server).odinAwake(), "Odin sleeps in a new Asgard");
         helper.succeed();

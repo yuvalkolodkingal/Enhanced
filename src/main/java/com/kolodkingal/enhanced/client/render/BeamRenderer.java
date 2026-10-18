@@ -5,7 +5,10 @@ import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.BeamPayload;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.DarkMagic;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -98,6 +101,30 @@ public final class BeamRenderer {
         }
     }
 
+    /**
+     * 3.5: a hero's beam in the colour a custom hero's pick of it chose: the Darkhold's Purple Beam of Agatha's row,
+     * the Optic Blast and the giant beam of Cyclops's rows (their styles keep their ids: the same drawers, and a ward
+     * still knows the Darkhold's beam); any other beam, and a built-in hero's, as it is.
+     */
+    private static BeamStyle tinted(AbstractClientPlayer player, BeamStyle style) {
+        HeroAbility row = switch (style.id()) {
+            case "darkhold" -> Powers.get(player).has(HeroAbility.AGATHA_PURPLE_BEAM) ? HeroAbility.AGATHA_PURPLE_BEAM
+                    : null;
+            case "cyclops_optic" -> HeroAbility.CYCLOPS_OPTIC_BLAST;
+            case "cyclops_unleashed" -> HeroAbility.CYCLOPS_OPEN_EYES;
+            default -> null;
+        };
+        int chosen = row == null ? -1 : AbilityColors.chosen(player, row);
+        if (chosen < 0) {
+            return style;
+        }
+        return new BeamStyle(style.id(), style.nameKey(), AbilityColors.recolor(style.core(), chosen),
+                AbilityColors.recolor(style.inner(), chosen),
+                AbilityColors.recolor(style.main(), chosen), AbilityColors.recolor(style.body(), chosen),
+                        AbilityColors.recolor(style.fringe(), chosen),
+                style.offHand());
+    }
+
     /** Where the beam leaves: the hand of the style, drawn where the body really has it (in first person, at the screen's edge). */
     private static Vec3 origin(Minecraft mc, AbstractClientPlayer player, BeamStyle style, float partialTick) {
         Vec3 main = WorldEffectsRenderer.handPosition(mc, player, partialTick);
@@ -117,7 +144,7 @@ public final class BeamRenderer {
 
     private static void beam(Minecraft mc, AbstractClientPlayer player, Active active, Matrix4f pose, VertexConsumer vc, Vec3 camera,
                              float partialTick, float time) {
-        BeamStyle style = active.style();
+        BeamStyle style = tinted(player, active.style());
         Drawer drawer = DRAWERS.get(style.id());
         Vec3 from = drawer != null ? drawer.origin(mc, player, style, partialTick) : origin(mc, player, style, partialTick);
         Vec3 target = Raycasts.any(player, active.range(), ContinuousBeam.targets(player), partialTick).getLocation();

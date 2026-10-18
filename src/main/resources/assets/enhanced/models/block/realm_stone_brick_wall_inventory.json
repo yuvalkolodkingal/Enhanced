@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "enhanced:block/asgard/realm_stone_bricks"
+  }
+}

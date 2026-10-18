@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.ultron.UltronBoltEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -46,11 +47,16 @@ public class UltronBoltRenderer extends EntityRenderer<UltronBoltEntity> {
 
     @Override
     public void render(UltronBoltEntity bolt, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        Colors colors = switch (bolt.palette()) {
+        Colors palette = switch (bolt.palette()) {
             case SENTRY -> SENTRY;
             case HUMAN -> HUMAN;
             default -> PRIME;
         };
+        // (3.5: a custom hero's bolt in the colour his pick chose.)
+        int t = bolt.tint();
+        Colors colors = t < 0 ? palette : new Colors(AbilityColors.recolor(palette.core(), t),
+                AbilityColors.recolor(palette.main(), t),
+                AbilityColors.recolor(palette.halo(), t), AbilityColors.recolor(palette.edge(), t));
         Vec3 camera = entityRenderDispatcher.camera.getPosition();
         Vec3 centre = bolt.getPosition(partialTick).add(0, bolt.getBbHeight() * 0.5, 0).subtract(camera);
         Vec3 motion = bolt.getDeltaMovement();

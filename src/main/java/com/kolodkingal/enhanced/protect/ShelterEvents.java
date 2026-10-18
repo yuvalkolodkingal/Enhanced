@@ -5,7 +5,6 @@ import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.vishanti.Ward;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -81,7 +80,7 @@ public final class ShelterEvents {
         for (Hex hex : HexManager.data(level).hexes()) {
             if (hex.contains(at) && anyOutside(origins, hex.center(), hex.radius(), false) && !Shelters.hexTrusts(hex, cause)) {
                 event.setCanceled(true);
-                Shelters.flash(level, hex.id(), Shelters.entry(hex.center(), hex.radius(), origins.get(0), at), Power.SCARLET_WITCH.color);
+                Shelters.flash(level, hex.id(), Shelters.entry(hex.center(), hex.radius(), origins.get(0), at), HexManager.wallColor(hex));
                 return;
             }
         }

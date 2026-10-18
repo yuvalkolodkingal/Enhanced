@@ -59,6 +59,12 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
     public static final int DEFAULT_LIFE = 30;
     private static final EntityDataAccessor<Byte> DATA_PALETTE = SynchedEntityData.defineId(UltronBoltEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Boolean> DATA_HEAVY = SynchedEntityData.defineId(UltronBoltEntity.class, EntityDataSerializers.BOOLEAN);
+    /**
+     * 3.5: the colour a custom hero's pick chose for the bolt (synced: every client draws it so), or -1 for its
+     * palette.
+     */
+    private static final EntityDataAccessor<Integer> DATA_TINT = SynchedEntityData.defineId(UltronBoltEntity.class,
+            EntityDataSerializers.INT);
 
     private float damage = 4.0F;
     private float splashRadius;
@@ -118,6 +124,17 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
         return Palette.byId(entityData.get(DATA_PALETTE));
     }
 
+    /** 3.5: the bolt in a chosen colour (-1: its palette's). */
+    public UltronBoltEntity tint(int color) {
+        entityData.set(DATA_TINT, color);
+        return this;
+    }
+
+    /** 3.5: the colour chosen for the bolt, or -1. */
+    public int tint() {
+        return entityData.get(DATA_TINT);
+    }
+
     /** Whether it is the heavy blast of the Overcharge. */
     public boolean isHeavy() {
         return entityData.get(DATA_HEAVY);
@@ -127,6 +144,7 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_PALETTE, (byte) 0);
         builder.define(DATA_HEAVY, false);
+        builder.define(DATA_TINT, -1);
     }
 
     @Override
@@ -284,6 +302,9 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
             case SENTRY -> 0x45B4F5;
             case HUMAN -> 0xE23B2E;
         };
+        if (tint() >= 0) {
+            color = tint();
+        }
         server.sendParticles(new EnergyParticleOptions(color, isHeavy() ? 2.0F : 1.0F), at.x, at.y, at.z, isHeavy() ? 14 : 4, 0.1, 0.1, 0.1, 0.12);
         server.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, isHeavy() ? 10 : 2, 0.1, 0.1, 0.1, 0.2);
         UltronSounds.BOLT.play(server, at, isHeavy() ? 1.3F : 0.4F, isHeavy() ? 0.6F : 1.3F);

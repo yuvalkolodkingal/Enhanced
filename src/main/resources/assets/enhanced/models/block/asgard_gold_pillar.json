@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "enhanced:block/asgard/asgard_gold_pillar_side",
+    "end": "enhanced:block/asgard/asgard_gold_pillar_top"
+  }
+}

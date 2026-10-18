@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -45,7 +46,8 @@ public final class SoulSight {
 
     /** The colour every creature he sees glows in. */
     public static int color(Entity entity) {
-        return COLOR;
+        // (3.5: a custom hero's Soul Sight in the colour his pick chose.)
+        return AbilityColors.color(Minecraft.getInstance().player, HeroAbility.THANOS_SOUL_SIGHT, COLOR);
     }
 
     /** The Sight's range, as the server has it (the option reaches the client with the rest of the server's). */

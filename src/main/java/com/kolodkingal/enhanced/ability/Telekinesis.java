@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.CustomTelekinesis;
@@ -122,6 +123,9 @@ public final class Telekinesis {
 
         /** The colour of this holder's telekinesis: the mode's, or a custom hero's own. */
         public int colorOf(Player holder) {
+            if (ability != null) {
+                return AbilityColors.color(holder, ability, color); // (3.5: a hero's grip in the colour its pick chose)
+            }
             return power == Power.CUSTOM ? CustomHeroes.hero(holder).colorOf(CustomHeroes.hero(holder).pick(PowerModule.TELEKINESIS)) : color;
         }
     }

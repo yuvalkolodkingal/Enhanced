@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -74,7 +75,7 @@ public final class HexRunesRenderer {
                 vc = buffers.getBuffer(type);
             }
             for (int side = 0; side < 4; side++) {
-                panel(pose, vc, center, radius, side, shown, time, still, hex.id().hashCode());
+                panel(pose, vc, center, radius, side, shown, time, still, hex.id().hashCode(), hex.color());
             }
         }
         if (vc != null) {
@@ -91,7 +92,10 @@ public final class HexRunesRenderer {
 
     /** One wall's panel of runes: a grid of cells on the sphere, each a rune of the sheet, inside and outside. */
     private static void panel(Matrix4f pose, VertexConsumer vc, Vec3 center, double radius, int side, float shown, float time, boolean still,
-                              int seed) {
+                              int seed, int hexColor) {
+        // (3.5: the runes of a Hex raised in a chosen colour glow in it.)
+        int glowRgb = hexColor < 0 ? GLOW : AbilityColors.recolor(GLOW, hexColor);
+        int coreRgb = hexColor < 0 ? CORE : AbilityColors.recolor(CORE, hexColor);
         double cell = Mth.clamp(radius / 12.0, 1.2, 3.0);
         double width = Math.min(radius * 0.9, 18.0);
         double height = Math.min(radius * 0.55, 9.0);
@@ -117,8 +121,8 @@ public final class HexRunesRenderer {
                 float u1 = u0 + 1.0F / 8.0F;
                 float v1 = v0 + 0.5F;
                 for (double r : new double[]{radius - LAYER, radius + LAYER}) {
-                    int glow = EnergyGeometry.argb(GLOW, 0.85F * alpha);
-                    int core = EnergyGeometry.argb(CORE, 0.85F * alpha);
+                    int glow = EnergyGeometry.argb(glowRgb, 0.85F * alpha);
+                    int core = EnergyGeometry.argb(coreRgb, 0.85F * alpha);
                     vertex(pose, vc, center, r, a0, y0, u0, v1, glow);
                     vertex(pose, vc, center, r, a1, y0, u1, v1, glow);
                     vertex(pose, vc, center, r, a1, y1, u1, v0, core);

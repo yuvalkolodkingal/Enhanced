@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -102,10 +104,13 @@ public class GauntletLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         if (aura[1] > 0.02F) {
             int slot = (int) aura[0];
             StoneKind stone = StoneKind.granted().get(slot - 1);
+            // (3.5: a custom hero's stone flares in the colour his pick of it chose.)
+            HeroAbility row = HeroAbility.at(Power.THANOS, slot);
+            int glow = row == null ? stone.color() : AbilityColors.color(player, row, stone.color());
             gauntlet.render(poseStack, buffer.getBuffer(RenderType.eyes(ThanosGlowLayer.GLOW)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                    EnergyGeometry.argb(stone.color(), 0.4F + 0.6F * aura[1]));
+                    EnergyGeometry.argb(glow, 0.4F + 0.6F * aura[1]));
             GauntletGeometry.draw(poseStack, buffer, sockets, age);
-            GauntletGeometry.aura(poseStack, buffer, stone.color(), aura[1] * 0.8F, 6.0F);
+            GauntletGeometry.aura(poseStack, buffer, glow, aura[1] * 0.8F, 6.0F);
         } else {
             GauntletGeometry.draw(poseStack, buffer, sockets, age);
         }

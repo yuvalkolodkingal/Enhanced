@@ -3,7 +3,9 @@ package com.kolodkingal.enhanced.entity;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -118,6 +120,11 @@ public class ThrownWeaponEntity extends Projectile {
             setPos(from.add(getDeltaMovement()));
             if (random.nextInt(3) == 0) {
                 level().addParticle(ParticleTypes.ELECTRIC_SPARK, getX(), getY(), getZ(), 0, 0, 0);
+            }
+            // 3.5: a custom hero's throw trails the colour his pick of the hammer chose.
+            int tint = AbilityColors.chosen(getOwner(), HeroAbility.THOR_HAMMER);
+            if (tint >= 0) {
+                level().addParticle(new EnergyParticleOptions(tint, 0.8F), getX(), getY(), getZ(), 0, 0, 0);
             }
             return;
         }

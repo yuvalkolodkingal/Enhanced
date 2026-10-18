@@ -117,7 +117,8 @@ public final class EnhancedCommand {
                 .then(WardCommands.node())
                 .then(RoadCommands.node())
                 .then(SchoolRepair.node())
-                .then(com.kolodkingal.enhanced.music.MusicCommands.node()));
+                .then(com.kolodkingal.enhanced.music.MusicCommands.node())
+                .then(com.kolodkingal.enhanced.asgard.AsgardCommands.node()));
         RoadCommands.registerPlayerCommands(dispatcher);
     }
 

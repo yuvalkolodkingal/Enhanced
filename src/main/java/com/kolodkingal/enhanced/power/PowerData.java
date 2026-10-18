@@ -233,12 +233,35 @@ public final class PowerData {
         return power == hero || power == Power.CUSTOM && kit != null && kit.acts(hero);
     }
 
-    /** The cooldown slot (1-5) of a hero ability: its home key for the hero, its column for a custom hero, 0 for none. */
+    /**
+     * The cooldown slot (1-5) of a hero ability: its home key for the hero, its column for a custom hero, 0 for none.
+     * 3.5: while a custom hero's key is being pressed ({@link #pressing}) and that key holds the ability, that key: an
+     * ability on two keys (its main on one, its variant row on another) waits on the key that was used.
+     */
     public int slot(HeroAbility a) {
         if (power == a.hero) {
             return a.home >= 1 && a.home <= ABILITIES ? a.home : 0;
         }
-        return power == Power.CUSTOM && kit != null ? kit.column(a) : 0;
+        if (power != Power.CUSTOM || kit == null) {
+            return 0;
+        }
+        if (pressColumn > 0) {
+            HeroKit.Binding b = kit.binding(pressColumn, pressSneak);
+            if (b != null && b.ability() == a) {
+                return pressColumn;
+            }
+        }
+        return kit.column(a);
+    }
+
+    /** 3.5: the custom hero's key being pressed (1-5, with Sneak or not), or 0 when none is; never saved nor synced. */
+    private int pressColumn;
+    private boolean pressSneak;
+
+    /** 3.5: the custom hero's router says which key it is pressing ({@code column} 0: none any more). */
+    public void pressing(int column, boolean sneak) {
+        pressColumn = column;
+        pressSneak = sneak;
     }
 
     /**

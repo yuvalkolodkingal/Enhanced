@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.config.XavierConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.CerebroPayload;
@@ -285,9 +286,12 @@ public final class XavierAbilities {
         int steps = (int) Math.min(30, delta.length() * 1.5);
         for (int i = 1; i <= steps; i++) {
             Vec3 p = start.add(delta.scale(i / (double) steps));
-            level.sendParticles(new EnergyParticleOptions(i % 3 == 0 ? CORE : MAIN, 0.9F), p.x, p.y, p.z, 2, 0.08, 0.08, 0.08, 0.0);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(from, HeroAbility.XAVIER_MENTAL_BLAST, i % 3 == 0 ? CORE : MAIN), 0.9F),
+                    p.x, p.y, p.z, 2, 0.08, 0.08, 0.08, 0.0);
         }
-        level.sendParticles(new EnergyParticleOptions(CORE, 1.4F), end.x, end.y + 0.2, end.z, 14, 0.3, 0.2, 0.3, 0.08);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(from, HeroAbility.XAVIER_MENTAL_BLAST, CORE),
+                1.4F), end.x, end.y + 0.2, end.z,
+                14, 0.3, 0.2, 0.3, 0.08);
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -349,7 +353,8 @@ public final class XavierAbilities {
                 mob.setTarget(null);
                 mob.getNavigation().stop();
             }
-            level.sendParticles(new EnergyParticleOptions(CORE, 1.0F), e.getX(), e.getEyeY() + 0.3, e.getZ(), 6, 0.25, 0.15, 0.25, 0.02);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.XAVIER_FREEZE_MINDS, CORE), 1.0F), e.getX(),
+                    e.getEyeY() + 0.3, e.getZ(), 6, 0.25, 0.15, 0.25, 0.02);
         }
         if (held == 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.xavier.freeze.nothing"), true);
@@ -359,7 +364,8 @@ public final class XavierAbilities {
         focus(player, data);
         player.displayClientMessage(Component.translatable("message.enhanced.xavier.freeze", held), true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.XAVIER_FREEZE.get(), SoundSource.PLAYERS, 1.4F, 1.0F);
-        level.sendParticles(new EnergyParticleOptions(MAIN, 1.4F), player.getX(), player.getEyeY(), player.getZ(), 30, 0.6, 0.4, 0.6, 0.25);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.XAVIER_FREEZE_MINDS, MAIN), 1.4F), player.getX(),
+                player.getEyeY(), player.getZ(), 30, 0.6, 0.4, 0.6, 0.25);
         return held;
     }
 

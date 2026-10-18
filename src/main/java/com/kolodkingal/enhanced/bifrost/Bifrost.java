@@ -624,6 +624,10 @@ public final class Bifrost {
                 || BossFights.fightOf(e) != null || MjolnirPin.isPinned(e)) {
             return false;
         }
+        // The city's own Asgardians keep their posts (a summoned Einherjar goes with his master).
+        if (e instanceof com.kolodkingal.enhanced.asgard.npc.AsgardianEntity npc && !npc.summoned()) {
+            return false;
+        }
         if (e instanceof ServerPlayer p) {
             return !PlaceBook.travelling(p) && !(sneakToStay() && p.isShiftKeyDown());
         }

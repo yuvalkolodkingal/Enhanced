@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "enhanced:block/asgard/mechanism_top",
+    "bottom": "enhanced:block/asgard/asgard_gold_plating",
+    "side": "enhanced:block/asgard/asgard_gold_trim"
+  }
+}

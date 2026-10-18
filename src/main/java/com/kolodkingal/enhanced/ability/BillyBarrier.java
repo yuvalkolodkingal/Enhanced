@@ -3,7 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.build.BuildData;
-import com.kolodkingal.enhanced.custom.CustomHero;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -174,8 +174,13 @@ public final class BillyBarrier {
             return true;
         }
         HeroKit kit = data.power() == Power.CUSTOM ? data.kit() : null;
-        CustomHero.Pick pick = kit == null ? null : kit.hero().pick(HeroAbility.BILLY_FREEZE);
-        return pick != null && !HeroAbility.MAIN.equals(pick.option());
+        // (3.5: or the Hex Barrier picked as a card of its own.)
+        return kit != null && kit.has(HeroAbility.BILLY_FREEZE) && kit.hasVariant(HeroAbility.BILLY_FREEZE);
+    }
+
+    /** 3.5: one of Billy's blues of the barrier, or it in the colour a custom hero's pick of the barrier chose. */
+    static int color(Player billy, int blue) {
+        return AbilityColors.shade(billy, HeroAbility.BILLY_HEX_BARRIER, blue);
     }
 
     /** Whether a point is in the arc the barrier covers: within the half-angle of the way he looks, seen from his body. */
@@ -254,7 +259,7 @@ public final class BillyBarrier {
             // Still forming: motes gather onto the plate. It stops nothing yet.
             for (int i = 0; i < 2; i++) {
                 Vec3 at = plate.center().add(plate.right().scale((random.nextDouble() - 0.5) * width())).add(plate.up().scale((random.nextDouble() - 0.5) * height()));
-                level.sendParticles(new EnergyParticleOptions(BillyAbilities.MAIN, 0.9F), at.x, at.y, at.z, 0, 0, 0, 0, 0.0);
+                level.sendParticles(new EnergyParticleOptions(color(player, BillyAbilities.MAIN), 0.9F), at.x, at.y, at.z, 0, 0, 0, 0, 0.0);
             }
             return;
         }
@@ -288,7 +293,7 @@ public final class BillyBarrier {
     /** A projectile reaches the plate: it is neutralised in Billy's blue, and the barrier pays what it would have cost him. */
     private static void block(ServerPlayer player, PowerData data, Projectile projectile) {
         float power = WandaAbilities.projectilePower(projectile);
-        WandaAbilities.neutralize(player.serverLevel(), projectile, BillyAbilities.MAIN);
+        WandaAbilities.neutralize(player.serverLevel(), projectile, color(player, BillyAbilities.MAIN));
         wear(player, data, power, projectile);
     }
 
@@ -388,8 +393,8 @@ public final class BillyBarrier {
         double along = dir.dot(plate.forward());
         Vec3 at = along > 1.0E-3 ? body(billy).add(dir.scale(distance() / along)) : plate.center();
         ServerLevel level = billy.serverLevel();
-        level.sendParticles(new EnergyParticleOptions(BillyAbilities.MAIN, 1.2F), at.x, at.y, at.z, 8, 0.12, 0.12, 0.12, 0.12);
-        level.sendParticles(new EnergyParticleOptions(BillyAbilities.CORE, 0.9F), at.x, at.y, at.z, 4, 0.06, 0.06, 0.06, 0.06);
+        level.sendParticles(new EnergyParticleOptions(color(billy, BillyAbilities.MAIN), 1.2F), at.x, at.y, at.z, 8, 0.12, 0.12, 0.12, 0.12);
+        level.sendParticles(new EnergyParticleOptions(color(billy, BillyAbilities.CORE), 0.9F), at.x, at.y, at.z, 4, 0.06, 0.06, 0.06, 0.06);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 4, 0.12, 0.12, 0.12, 0.25);
     }
 
@@ -453,13 +458,14 @@ public final class BillyBarrier {
         data.startCooldown(HeroAbility.BILLY_FREEZE, level.getGameTime(), EnhancedConfig.BILLY_BARRIER_SHATTER_COOLDOWN.get());
         Frame plate = frame(body(billy), billy.getLookAngle());
         RandomSource random = billy.getRandom();
-        ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.LIGHT_BLUE_DYE));
+        ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM,
+                new ItemStack(AbilityColors.dye(billy, HeroAbility.BILLY_HEX_BARRIER, Items.LIGHT_BLUE_DYE)));
         for (int i = 0; i < SHATTER_SHARDS; i++) {
             Vec3 at = plate.center().add(plate.right().scale((random.nextDouble() - 0.5) * width())).add(plate.up().scale((random.nextDouble() - 0.5) * height()));
             Vec3 out = plate.forward().add(random.nextGaussian() * 0.5, random.nextGaussian() * 0.5, random.nextGaussian() * 0.5).normalize();
             level.sendParticles(shard, at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             if (i % 2 == 0) {
-                level.sendParticles(new EnergyParticleOptions(i % 4 == 0 ? BillyAbilities.CORE : BillyAbilities.MAIN, 1.4F), at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
+                level.sendParticles(new EnergyParticleOptions(color(billy, i % 4 == 0 ? BillyAbilities.CORE : BillyAbilities.MAIN), 1.4F), at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             }
         }
         Vec3 c = plate.center();
@@ -468,7 +474,7 @@ public final class BillyBarrier {
             double angle = Math.PI * 2 * i / 24;
             Vec3 dir = plate.right().scale(Math.cos(angle)).add(plate.up().scale(Math.sin(angle)));
             Vec3 at = plate.center().add(dir.scale(0.3));
-            level.sendParticles(new EnergyParticleOptions(chaos && i % 2 == 0 ? Power.SCARLET_WITCH.color : BillyAbilities.CORE, 1.1F),
+            level.sendParticles(new EnergyParticleOptions(chaos && i % 2 == 0 ? Power.SCARLET_WITCH.color : color(billy, BillyAbilities.CORE), 1.1F),
                     at.x, at.y, at.z, 0, dir.x, dir.y, dir.z, 0.35);
         }
         level.sendParticles(ParticleTypes.FLASH, plate.center().x, plate.center().y, plate.center().z, 1, 0, 0, 0, 0);

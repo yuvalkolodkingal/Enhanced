@@ -2,11 +2,13 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -38,6 +40,25 @@ public final class ShieldStyles {
             }
         }
         return null;
+    }
+
+    /**
+     * 3.5: the style of this player's shield in the colour his pick of the shield ability chose ({@link
+     * AbilityColors}), or {@link #of(PowerData)} as it is (a built-in hero, or no colour chosen).
+     */
+    @Nullable
+    public static ShieldStyle of(Player player, PowerData data) {
+        ShieldStyle style = of(data);
+        if (style == null || data.power() != Power.CUSTOM) {
+            return style;
+        }
+        for (HeroAbility row : SHIELDS) {
+            if (data.has(row)) {
+                int chosen = AbilityColors.chosen(player, row);
+                return chosen < 0 ? style : style.tinted(chosen);
+            }
+        }
+        return style;
     }
 
     /** The heroes' shield abilities that draw a dome (3.4: what a custom hero's shield looks like). */

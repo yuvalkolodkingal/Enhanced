@@ -316,7 +316,28 @@ public enum GestureId {
     /** The Bifrost for a friend: the open hand pushed out towards him. */
     HEIMDALL_SEND(Group.CAST, 16, 2, 6, false),
     /** Hofund returns: the hand thrown out, and the sword caught in it. */
-    HEIMDALL_RETURN(Group.CAST, 14, 1, 6, true)
+    HEIMDALL_RETURN(Group.CAST, 14, 1, 6, true),
+    // ===== hela (3.5) =====
+    /** The Necrosword Volley (R): both hands drawn back behind the shoulders, then flung outward at the target. */
+    HELA_THROW(Group.CAST, 16, 2, 6, true),
+    /** The Blade Rain (Sneak + R): an arm raised high, palm down, held, and brought down. */
+    HELA_RAIN(Group.CAST, 22, 2, 7, false),
+    /** The Blade Wall (G): a low sweep of the hand along the floor, the body bent into it. */
+    HELA_WALL(Group.CAST, 18, 2, 6, true),
+    /** The Blade Burst (Sneak + G): the arms flung wide and down. */
+    HELA_BURST(Group.CAST, 18, 2, 6, true),
+    /** The Goddess of Death comes on (V): both hands sweep back over the head as the headdress grows. */
+    HELA_FORM_ON(Group.CAST, 24, 3, 7, false),
+    /** And goes: the hands come down from the head. */
+    HELA_FORM_OFF(Group.CAST, 14, 2, 5, false),
+    /** The Death Dash (Sneak + V): a lunge, arms swept back. */
+    HELA_DASH(Group.CAST, 12, 1, 5, true),
+    /** Raise the Dead (B): both arms rise slowly, palms up. */
+    HELA_RAISE(Group.CAST, 26, 3, 8, false),
+    /** Fenris (Sneak + B): a point at where he comes. */
+    HELA_FENRIS(Group.CAST, 18, 2, 6, false),
+    /** Death's Grasp (N): the hand thrust out, fingers spread (the stance HELA_GRASP holds it). */
+    HELA_GRASP(Group.CAST, 8, 1, 3, true)
     ;
 
     /** Gestures of one group never play together. */

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "enhanced:block/asgard/asgard_golden_leaves"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

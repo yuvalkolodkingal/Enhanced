@@ -102,7 +102,12 @@ public enum Stance {
     /** Heimdall's Far Sight: the head forward, the other hand shading the eyes as he looks to the edge of the realms. */
     HEIMDALL_FARSIGHT(3.0F, 4.0F, true),
     /** Heimdall at his watch (the Sight open, standing still): both hands resting on the sword, upright. */
-    HEIMDALL_WATCH(8.0F, 6.0F, false)
+    HEIMDALL_WATCH(8.0F, 6.0F, false),
+    // ===== hela (3.5) =====
+    /** Hela with her form on: a necrosword in each hand, held low and out, the points turned outward. */
+    HELA_BLADES(3.0F, 5.0F, false),
+    /** Death's Grasp: one hand held out before her, fingers spread and clawed, the other drawn back. */
+    HELA_GRASP(1.5F, 3.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

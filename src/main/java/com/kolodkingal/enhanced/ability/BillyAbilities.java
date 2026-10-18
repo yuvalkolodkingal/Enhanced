@@ -2,8 +2,11 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.beam.BeamSpec;
+import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.CustomBeams;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
@@ -206,7 +209,16 @@ public final class BillyAbilities {
         int interval = EnhancedConfig.BILLY_BEAM_INTERVAL.get();
         float perHit = beamDamagePerSecond(build) * interval / 20.0F;
         float exhaustion = EnhancedConfig.BILLY_BEAM_EXHAUSTION_PER_SECOND.get().floatValue() / 20.0F;
-        return new BeamSpec(BeamStyles.BILLY, beamRange(build), perHit, interval, exhaustion, ModDamageTypes.HEX_BEAM, null);
+        return new BeamSpec(beamStyle(player), beamRange(build), perHit, interval, exhaustion, ModDamageTypes.HEX_BEAM, null);
+    }
+
+    /**
+     * The style of his beam: Billy's blue, or (3.5) a custom hero's Hex Beam in the colour his pick chose (the shared
+     * beam system makes a style of any two colours, {@link CustomBeams}).
+     */
+    public static BeamStyle beamStyle(Player player) {
+        int chosen = AbilityColors.chosen(player, HeroAbility.BILLY_HEX_BEAM);
+        return chosen < 0 ? BeamStyles.BILLY : CustomBeams.style(chosen, AbilityColors.glowOf(chosen));
     }
 
     /** With an empty hunger bar there is nothing left to fuel the beam (not in Creative). */
@@ -234,7 +246,7 @@ public final class BillyAbilities {
             return;
         }
         BuildData build = player.getData(ModAttachments.BUILD_DATA);
-        ContinuousBeam.start(player, BeamStyles.BILLY, beamRange(build));
+        ContinuousBeam.start(player, beamStyle(player), beamRange(build));
         spells(player).crown = player.level().getGameTime() + CROWN_TICKS;
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.HEX_BOLT.get(), SoundSource.PLAYERS, 0.8F, 0.8F);
     }
@@ -309,11 +321,11 @@ public final class BillyAbilities {
                 fork.hurt(source, damage * 0.5F);
                 Vec3 at = fork.position().add(0, fork.getBbHeight() * 0.5, 0);
                 forks.add(at);
-                sparks(level, at, 6);
+                sparks(level, player, at, 6);
             }
             level.playSound(null, end.x, end.y, end.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.5F, 1.8F);
         }
-        sparks(level, end, 12);
+        sparks(level, player, end, 12);
 
         Vec3 from = player.getEyePosition().add(0, -0.3, 0).add(player.getLookAngle().scale(0.75));
         PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0,
@@ -322,9 +334,13 @@ public final class BillyAbilities {
     }
 
     /** White-hot sparks where a bolt strikes. */
-    private static void sparks(ServerLevel level, Vec3 at, int count) {
-        level.sendParticles(new EnergyParticleOptions(MAIN, 1.2F), at.x, at.y, at.z, count, 0.15, 0.15, 0.15, 0.12);
-        level.sendParticles(new EnergyParticleOptions(CORE, 0.9F), at.x, at.y, at.z, count / 2, 0.08, 0.08, 0.08, 0.06);
+    private static void sparks(ServerLevel level, Player player, Vec3 at, int count) {
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.BILLY_HEX_BEAM, MAIN),
+                1.2F), at.x, at.y, at.z, count,
+                0.15, 0.15, 0.15, 0.12);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.BILLY_HEX_BEAM, CORE),
+                0.9F), at.x, at.y, at.z,
+                count / 2, 0.08, 0.08, 0.08, 0.06);
     }
 
     // ---- Ability 4: Freeze ----
@@ -355,8 +371,9 @@ public final class BillyAbilities {
                 mob.getNavigation().stop();
             }
             Vec3 head = new Vec3(e.getX(), e.getEyeY(), e.getZ());
-            level.sendParticles(new EnergyParticleOptions(MAIN, 1.2F), head.x, head.y, head.z, 10, e.getBbWidth() * 0.4, 0.3, e.getBbWidth() * 0.4, 0.02);
-            stream(level, eye.add(0, -0.3, 0).add(look.scale(0.6)), head);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.BILLY_FREEZE, MAIN), 1.2F), head.x, head.y, head.z, 10,
+                    e.getBbWidth() * 0.4, 0.3, e.getBbWidth() * 0.4, 0.02);
+            stream(level, player, eye.add(0, -0.3, 0).add(look.scale(0.6)), head);
         }
         if (frozen == 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.freeze.nothing"), true);
@@ -384,13 +401,13 @@ public final class BillyAbilities {
     }
 
     /** A thin stream of blue motes from his hands to a creature he holds. */
-    private static void stream(ServerLevel level, Vec3 from, Vec3 to) {
+    private static void stream(ServerLevel level, Player billy, Vec3 from, Vec3 to) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(40, delta.length() * 2.5);
         RandomSource random = level.getRandom();
         for (int i = 1; i <= steps; i++) {
             Vec3 p = from.add(delta.scale(i / (double) steps));
-            int color = random.nextInt(3) == 0 ? INNER : MAIN;
+            int color = AbilityColors.shade(billy, HeroAbility.BILLY_FREEZE, random.nextInt(3) == 0 ? INNER : MAIN);
             level.sendParticles(new EnergyParticleOptions(color, 0.7F), p.x, p.y, p.z, 1, 0.04, 0.04, 0.04, 0.0);
         }
     }
