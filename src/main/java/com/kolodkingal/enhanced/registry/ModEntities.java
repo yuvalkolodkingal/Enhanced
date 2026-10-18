@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.registry;
 
+import com.kolodkingal.enhanced.asgard.SeatEntity;
 import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
 import com.kolodkingal.enhanced.hela.HelaShadowEntity;
 import com.kolodkingal.enhanced.Enhanced;
@@ -231,6 +232,14 @@ public final class ModEntities {
 
     // ===== asgard (3.5) =====
     // (The skeleton registers the two entities another lane needs by name; each lane adds its own in its region below.)
+    /** The invisible seat of the throne and the benches (lane L1; Asgardians sit on it too). Never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<SeatEntity>> SEAT = ENTITIES.register("seat",
+            () -> EntityType.Builder.<SeatEntity>of(SeatEntity::new, MobCategory.MISC)
+                    .sized(0.01F, 0.01F)
+                    .clientTrackingRange(10)
+                    .noSave()
+                    .noSummon()
+                    .build("seat"));
     // ===== heimdall (3.5) =====
     // ===== odin (3.5) =====
     // ===== hela (3.5) =====

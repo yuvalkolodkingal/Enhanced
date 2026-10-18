@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=z": {
+      "model": "enhanced:block/bifrost_bridge"
+    },
+    "axis=x": {
+      "model": "enhanced:block/bifrost_bridge",
+      "y": 90
+    }
+  }
+}

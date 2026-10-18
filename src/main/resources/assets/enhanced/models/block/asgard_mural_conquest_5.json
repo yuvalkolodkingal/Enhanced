@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "enhanced:block/asgard/mural/conquest_5",
+    "particle": "enhanced:block/asgard/mural_side",
+    "south": "enhanced:block/asgard/mural_side",
+    "east": "enhanced:block/asgard/mural_side",
+    "west": "enhanced:block/asgard/mural_side",
+    "up": "enhanced:block/asgard/mural_side",
+    "down": "enhanced:block/asgard/mural_side"
+  }
+}

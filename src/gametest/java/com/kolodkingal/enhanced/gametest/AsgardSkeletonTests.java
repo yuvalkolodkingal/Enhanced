@@ -221,8 +221,10 @@ public final class AsgardSkeletonTests {
         Biome biome = server.registryAccess().registryOrThrow(Registries.BIOME).get(Enhanced.id("asgard"));
         check(biome != null && biome.getMobSettings().getMobs(MobCategory.MONSTER).isEmpty() && biome.getBackgroundMusic().isPresent(),
                 "its biome: no monsters, its music");
+        // (3.5 L1: the realm's generator replaced the placeholder platform; the landing is on the Observatory's floor.)
+        BlockPos landing = BlockPos.containing(CityPlan.ARRIVAL);
+        check(!asgard.getBlockState(landing.below()).isAir() && asgard.getBlockState(landing).isAir(), "solid floor under the landing, room above it");
         BlockPos socket = CityPlan.OBSERVATORY_SOCKET;
-        check(!asgard.getBlockState(socket.below()).isAir() && asgard.getBlockState(socket).isAir(), "the placeholder platform under the landing");
         check(asgard.getBlockState(socket.offset(0, -1, AsgardChunkGenerator.PLATFORM_RADIUS + 2)).isAir(), "and nothing beyond it: the void");
         check(AsgardState.get(server) != null && !AsgardState.get(server).odinAwake(), "Odin sleeps in a new Asgard");
         helper.succeed();

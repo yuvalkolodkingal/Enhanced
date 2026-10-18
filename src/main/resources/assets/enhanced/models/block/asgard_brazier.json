@@ -1,0 +1,179 @@
+{
+  "textures": {
+    "bowl": "enhanced:block/asgard/brazier_bowl",
+    "gold": "enhanced:block/asgard/asgard_gold_plating",
+    "fire": "minecraft:block/fire_0",
+    "particle": "enhanced:block/asgard/asgard_gold_plating"
+  },
+  "render_type": "minecraft:cutout",
+  "elements": [
+    {
+      "from": [
+        5,
+        0,
+        5
+      ],
+      "to": [
+        11,
+        2,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        2,
+        7
+      ],
+      "to": [
+        9,
+        8,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#gold"
+        },
+        "south": {
+          "texture": "#gold"
+        },
+        "east": {
+          "texture": "#gold"
+        },
+        "west": {
+          "texture": "#gold"
+        },
+        "up": {
+          "texture": "#gold"
+        },
+        "down": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        8,
+        2
+      ],
+      "to": [
+        14,
+        12,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bowl"
+        },
+        "south": {
+          "texture": "#bowl"
+        },
+        "east": {
+          "texture": "#bowl"
+        },
+        "west": {
+          "texture": "#bowl"
+        },
+        "down": {
+          "texture": "#bowl"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        11,
+        3
+      ],
+      "to": [
+        13,
+        11.5,
+        13
+      ],
+      "faces": {
+        "up": {
+          "texture": "#gold"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        11,
+        8
+      ],
+      "to": [
+        13,
+        18,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#fire"
+        },
+        "south": {
+          "texture": "#fire"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        8,
+        11,
+        3
+      ],
+      "to": [
+        8,
+        18,
+        13
+      ],
+      "faces": {
+        "east": {
+          "texture": "#fire"
+        },
+        "west": {
+          "texture": "#fire"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    }
+  ]
+}

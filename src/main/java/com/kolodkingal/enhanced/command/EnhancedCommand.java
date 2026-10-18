@@ -112,7 +112,8 @@ public final class EnhancedCommand {
                                                         IntegerArgumentType.getInteger(ctx, "radius")))))))
                 .then(BuildCommands.node())
                 .then(WardCommands.node())
-                .then(RoadCommands.node()));
+                .then(RoadCommands.node())
+                .then(com.kolodkingal.enhanced.asgard.AsgardCommands.node()));
         RoadCommands.registerPlayerCommands(dispatcher);
     }
 

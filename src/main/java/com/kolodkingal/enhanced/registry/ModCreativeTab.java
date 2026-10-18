@@ -44,6 +44,7 @@ public final class ModCreativeTab {
                         output.accept(ModItems.HOFUND.get());
                         output.accept(ModItems.GUNGNIR.get());
                         output.accept(ModItems.HELA_HEADDRESS.get());
+                        ModItems.ASGARD_BLOCK_ITEMS.forEach(item -> output.accept(item.get()));
                     })
                     .build());
 
