@@ -62,7 +62,8 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * no duplicates, a lost one made again only where its home is loaded); the dialogue (the node for each stage of a
  * player's story, the reactions to his power, answers checked: not offered or too far is refused); the trades and their
  * restock; the warriors' choice of foe; the summoned Einherjar; Odin's command and the bow; every lang key of the table in
- * EN and HE. Batches {@code asgard_npc}, {@code asgard_npc_fight} and {@code asgard_npc_closed} (config).
+ * EN and HE. Batches {@code asgard_npc}, {@code asgard_npc_fight}, {@code asgard_npc_closed} (config) and the two
+ * command batches (Odin's command reaches 64 blocks).
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -430,7 +431,7 @@ public final class AsgardianTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = FIGHT)
+    @GameTest(template = ARENA, batch = "asgard_npc_command")
     public static void theAllfathersCommandAndTheBow(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer odin = fx.player(5.5, FLOOR, 5.5);
@@ -444,7 +445,8 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = FIGHT, timeoutTicks = 220)
+    /** Odin's command reaches 64 blocks: each command test has a batch of its own (nothing else near). */
+    @GameTest(template = ARENA, batch = "asgard_npc_command_strike", timeoutTicks = 220)
     public static void theAllfathersCommandMakesTheEinherjarStrike(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer odin = fx.player(2.5, FLOOR, 2.5);
