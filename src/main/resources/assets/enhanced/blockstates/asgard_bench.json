@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "enhanced:block/asgard_bench"
+    },
+    "facing=east": {
+      "model": "enhanced:block/asgard_bench",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "enhanced:block/asgard_bench",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "enhanced:block/asgard_bench",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "enhanced:block/asgard_gold_pillar"
+    },
+    "axis=z": {
+      "model": "enhanced:block/asgard_gold_pillar_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "enhanced:block/asgard_gold_pillar_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

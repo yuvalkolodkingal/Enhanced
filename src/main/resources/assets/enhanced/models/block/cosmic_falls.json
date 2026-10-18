@@ -1,0 +1,80 @@
+{
+  "textures": {
+    "falls": "enhanced:block/asgard/cosmic_falls",
+    "particle": "enhanced:block/asgard/cosmic_falls"
+  },
+  "render_type": "minecraft:translucent",
+  "ambientocclusion": false,
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#falls",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#falls",
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#falls",
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#falls",
+          "cullface": "west"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        7.5
+      ],
+      "to": [
+        16,
+        16,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#falls"
+        },
+        "south": {
+          "texture": "#falls"
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        0,
+        0
+      ],
+      "to": [
+        8.5,
+        16,
+        16
+      ],
+      "faces": {
+        "east": {
+          "texture": "#falls"
+        },
+        "west": {
+          "texture": "#falls"
+        }
+      }
+    }
+  ]
+}

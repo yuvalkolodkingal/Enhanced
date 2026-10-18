@@ -1,0 +1,11 @@
+{
+  "type": "enhanced:template_site",
+  "biomes": "#enhanced:has_structure/bifrost_site",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "template": "enhanced:bifrost_site/site",
+  "floor": 1,
+  "max_slope": 3,
+  "processors": "enhanced:bifrost_site"
+}

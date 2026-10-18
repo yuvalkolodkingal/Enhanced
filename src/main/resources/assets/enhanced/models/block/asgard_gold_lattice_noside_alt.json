@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_glass_pane_noside_alt",
+  "textures": {
+    "pane": "enhanced:block/asgard/asgard_gold_lattice",
+    "edge": "enhanced:block/asgard/asgard_gold_lattice_edge"
+  },
+  "render_type": "minecraft:cutout"
+}

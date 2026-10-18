@@ -157,6 +157,13 @@ public final class ClientSetup {
         // The renderers (and block entity renderers) of 3.5, one region per lane: the skeleton draws its entities with
         // nothing until their lanes give them renderers.
         // ===== asgard (3.5) =====
+        event.registerEntityRenderer(ModEntities.SEAT.get(), NoopRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.BIFROST_MECHANISM.get(),
+                com.kolodkingal.enhanced.client.asgard.BifrostMechanismRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.HOFUND_SOCKET.get(),
+                com.kolodkingal.enhanced.client.asgard.HofundSocketRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.GUNGNIR_STAND.get(),
+                com.kolodkingal.enhanced.client.asgard.GungnirStandRenderer::new);
         // ===== heimdall (3.5) =====
         // ===== odin (3.5) =====
         event.registerEntityRenderer(ModEntities.GUNGNIR.get(),
