@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.Thoughts;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -65,7 +66,13 @@ public final class TheNoise {
     /** The colour a creature he hears glows in: its mood. */
     public static int moodColor(Entity entity) {
         LocalPlayer player = Minecraft.getInstance().player;
-        return BillyAbilities.meansHarm(entity) ? HOSTILE : player != null && Thoughts.hearsAs(Powers.get(player)) == Power.PROFESSOR_X ? Power.PROFESSOR_X.color : Power.BILLY.color;
+        if (BillyAbilities.meansHarm(entity)) {
+            return HOSTILE;
+        }
+        // (3.5: a custom hero's Noise or Hear Thoughts in the colour its pick chose.)
+        return player != null && Thoughts.hearsAs(Powers.get(player)) == Power.PROFESSOR_X
+                ? AbilityColors.color(player, HeroAbility.XAVIER_THOUGHTS, Power.PROFESSOR_X.color)
+                : AbilityColors.color(player, HeroAbility.BILLY_NOISE, Power.BILLY.color);
     }
 
     static void tick(Minecraft mc) {

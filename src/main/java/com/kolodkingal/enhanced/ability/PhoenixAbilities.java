@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
@@ -476,7 +477,8 @@ public final class PhoenixAbilities {
         data.set(Live.CASTING, true);
         player.displayClientMessage(Component.translatable("message.enhanced.mind_control.host", target.getName()), true);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), ModSounds.MIND_CONTROL.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
-        level.sendParticles(new EnergyParticleOptions(PSY_MAIN, 1.0F), target.getX(), target.getEyeY() + 0.3, target.getZ(), 12, 0.3, 0.2, 0.3, 0.03);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.PHOENIX_CONTROL, PSY_MAIN), 1.0F), target.getX(),
+                target.getEyeY() + 0.3, target.getZ(), 12, 0.3, 0.2, 0.3, 0.03);
         stream(level, player, target);
     }
 
@@ -749,7 +751,8 @@ public final class PhoenixAbilities {
                 mob.setTarget(null);
                 mob.getNavigation().stop();
             }
-            level.sendParticles(new EnergyParticleOptions(PSY_MAIN, 1.0F), e.getX(), e.getEyeY() + 0.3, e.getZ(), 6, 0.25, 0.15, 0.25, 0.02);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.PHOENIX_PSIONIC_FIELD, PSY_MAIN), 1.0F), e.getX(),
+                    e.getEyeY() + 0.3, e.getZ(), 6, 0.25, 0.15, 0.25, 0.02);
         }
         if (held == 0) {
             player.displayClientMessage(Component.translatable("message.enhanced.psionic_field.nothing"), true);
@@ -761,7 +764,7 @@ public final class PhoenixAbilities {
         state.psionicUntil = now + PSIONIC_POSE_TICKS;
         data.set(Live.PHOENIX_PSIONIC, true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.PSIONIC_FIELD.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-        sparksForOthers(level, player, new EnergyParticleOptions(PSY_CORE, 1.4F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
+        sparksForOthers(level, player, new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.PHOENIX_PSIONIC_FIELD, PSY_CORE), 1.4F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
                 player.getZ(), 30, 0.5, 0.6, 0.5, 0.2);
     }
 
@@ -781,7 +784,7 @@ public final class PhoenixAbilities {
         int steps = (int) Math.min(40, delta.length() * 2.5);
         for (int i = 1; i <= steps; i++) {
             Vec3 p = start.add(delta.scale(i / (double) steps));
-            int colour = level.random.nextInt(3) == 0 ? PSY_CORE : PSY_MAIN;
+            int colour = AbilityColors.shade(from, HeroAbility.PHOENIX_CONTROL, level.random.nextInt(3) == 0 ? PSY_CORE : PSY_MAIN);
             level.sendParticles(new EnergyParticleOptions(colour, 0.7F), p.x, p.y, p.z, 1, 0.04, 0.04, 0.04, 0.0);
         }
     }
@@ -911,7 +914,7 @@ public final class PhoenixAbilities {
         for (int i = 0; i < 6; i++) {
             double angle = turn + i * Mth.TWO_PI / 6.0;
             double y = player.getY() + ((now + i * 3) % 20) / 20.0 * height;
-            int colour = i % 3 == 0 ? FIRE_GOLD : (i % 3 == 1 ? FIRE_MAIN : FIRE_CORE);
+            int colour = AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, i % 3 == 0 ? FIRE_GOLD : (i % 3 == 1 ? FIRE_MAIN : FIRE_CORE));
             sparksForOthers(level, player, new EnergyParticleOptions(colour, 1.0F + f * 0.5F), player.getX() + Math.cos(angle) * radius, y,
                     player.getZ() + Math.sin(angle) * radius, 1, 0.0, 0.0, 0.0, 0.0);
         }
@@ -959,7 +962,7 @@ public final class PhoenixAbilities {
         PacketDistributor.sendToPlayersNear(level, null, centre.x, centre.y, centre.z, Math.max(64.0, radius + 32.0),
                 new PhoenixBurstPayload(player.getId(), centre, player.getYRot(), f, radius, now));
         level.playSound(null, centre.x, centre.y, centre.z, ModSounds.PHOENIX_BURST.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 8.0F), 1.0F);
-        sparksForOthers(level, player, new EnergyParticleOptions(FIRE_CORE, 2.0F), centre.x, centre.y, centre.z, 40, 0.4, 0.4, 0.4, 0.3);
+        sparksForOthers(level, player, new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, FIRE_CORE), 2.0F), centre.x, centre.y, centre.z, 40, 0.4, 0.4, 0.4, 0.3);
     }
 
     /** Stops a sound for every player near (the Burst slipped away; its gathering roar should not go on). */

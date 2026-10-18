@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -319,12 +321,14 @@ public final class MagnetStreams {
 
     /** The deep colour of a pull's field: Magneto's, or (3.4) the colour of a custom hero who pulls with his ability. */
     private static int color(@Nullable Entity magneto) {
-        return magneto instanceof Player player && Powers.get(player).power() == Power.CUSTOM ? Powers.color(player) : Power.MAGNETO.color;
+        int c = magneto instanceof Player player && Powers.get(player).power() == Power.CUSTOM ? Powers.color(player) : Power.MAGNETO.color;
+        return AbilityColors.color(magneto, HeroAbility.MAGNETO_MAGNETIC_PULL, c); // (3.5: the pull's own colour)
     }
 
     /** The glow of a pull's field (its rings and lines of force), as {@link #color}. */
     private static int glow(@Nullable Entity magneto) {
-        return magneto instanceof Player player && Powers.get(player).power() == Power.CUSTOM ? Powers.glow(player) : Power.MAGNETO.glow;
+        int c = magneto instanceof Player player && Powers.get(player).power() == Power.CUSTOM ? Powers.glow(player) : Power.MAGNETO.glow;
+        return AbilityColors.glow(magneto, HeroAbility.MAGNETO_MAGNETIC_PULL, c);
     }
 
     /** Where the streams fly: his hand (where every hero's energy leaves it), or the middle of a body that is not a player. */

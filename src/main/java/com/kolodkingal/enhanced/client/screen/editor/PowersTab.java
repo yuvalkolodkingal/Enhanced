@@ -274,8 +274,21 @@ public final class PowersTab extends EditorTab {
 
     private void add(CatalogEntry e) {
         String option = e instanceof PowerModule m ? m.defaultOption().id() : HeroAbility.BOTH;
+        // 3.5: a hero's ability and its variant row: the variant is the row's, the ability keeps its main action.
+        if (e instanceof HeroAbility a && a.variant() != null && draft().has(a.variant())) {
+            option = HeroAbility.MAIN;
+        }
         int strength = e.scales() ? CustomHeroJson.DEFAULT_STRENGTH : HeroAbility.FIXED_STRENGTH;
         CustomHero hero = draft().with(new CustomHero.Pick(e.id(), strength, option, -1));
+        if (e instanceof HeroAbility v && v.parent() != null && hero.pick(v.parent()) != null) {
+            CustomHero.Pick parent = hero.pick(v.parent());
+            hero = hero.with(parent.withOption(HeroAbility.MAIN));
+            for (int c = 1; c <= CustomHero.KEYS; c++) {
+                if ((v.parent().id() + "#" + HeroKit.ALT).equals(hero.binding(c, true))) {
+                    hero = hero.withBinding(c, true, "");
+                }
+            }
+        }
         set(autoKey(hero, e));
         screen.say(Component.translatable("screen.enhanced.hero_creator.added", CreatorUi.name(e)), true);
     }

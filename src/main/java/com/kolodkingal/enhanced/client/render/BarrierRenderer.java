@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -34,6 +36,19 @@ import java.util.Map;
 public final class BarrierRenderer {
     static final ResourceLocation PLATE = Enhanced.id("textures/entity/billy_barrier.png");
     static final ResourceLocation SEAL = Enhanced.id("textures/entity/billy_seal.png");
+    /** 3.5: grey copies of the plate and the seal, tinted to the colour a custom hero's pick chose. */
+    static final ResourceLocation PLATE_GREY = Enhanced.id("textures/entity/custom/billy_barrier_grey.png");
+    static final ResourceLocation SEAL_GREY = Enhanced.id("textures/entity/custom/billy_seal_grey.png");
+    /** The colours the plate's art averages to (what a tint replaces). */
+    private static final int PLATE_ART = 0x5BB2FF;
+    private static final int SEAL_ART = 0x6DBDFF;
+    /** 3.5: the colour chosen for the barrier being drawn, or -1 (Billy's own blues). */
+    private static int tint = -1;
+
+    /** One of Billy's blues, or it recoloured to the colour chosen for the barrier being drawn. */
+    private static int col(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
 
     private static final int COLUMNS = 14;
     private static final int ROWS = 20;
@@ -136,6 +151,7 @@ public final class BarrierRenderer {
         float see = mine ? 0.4F : 1.0F; // the plate is right in front of his own eyes: fainter there
         float alpha = (0.35F + 0.65F * grow) * (0.55F + 0.45F * fraction) * flicker * see * out;
 
+        tint = AbilityColors.chosen(player, HeroAbility.BILLY_HEX_BARRIER);
         BillyBarrier.Frame plate = BillyBarrier.frame(body, player.getViewVector(partialTick));
         double width = BillyBarrier.width() * (0.4 + 0.6 * grow);
         double height = BillyBarrier.height() * (0.3 + 0.7 * grow);
@@ -149,11 +165,11 @@ public final class BarrierRenderer {
         surface(veil, pose, c, plate, width, height, alpha * (0.16F + 0.20F * hit), false);
         buffers.endBatch(EnhancedRenderTypes.ENERGY_VEIL);
         // 2. its engraved lines
-        RenderType lines = EnhancedRenderTypes.energyField(PLATE);
+        RenderType lines = EnhancedRenderTypes.energyField(tint < 0 ? PLATE : PLATE_GREY);
         surface(buffers.getBuffer(lines), pose, c, plate, width, height, alpha * (0.85F + 0.4F * hit), true);
         buffers.endBatch(lines);
         // 3. the rune seal at the height of the hand: the teeth turn slowly, the hexagram flickers
-        RenderType seal = EnhancedRenderTypes.energyField(SEAL);
+        RenderType seal = EnhancedRenderTypes.energyField(tint < 0 ? SEAL : SEAL_GREY);
         float turn = reduced ? 0.0F : time * 0.035F;
         float pulse = reduced ? 1.0F : 0.82F + 0.18F * Mth.sin(time * 1.7F) * Mth.cos(time * 0.9F);
         sealQuad(buffers.getBuffer(seal), pose, c, plate, width, height, turn, alpha * pulse * (0.9F + 0.5F * hit));
@@ -174,7 +190,7 @@ public final class BarrierRenderer {
     /** The plate as a grid of quads, plain or textured. */
     private static void surface(VertexConsumer vc, Matrix4f pose, Vec3 c, BillyBarrier.Frame plate, double width, double height, float alpha,
                                 boolean textured) {
-        int rgb = textured ? BillyAbilities.INNER : BillyAbilities.BODY;
+        int rgb = textured ? (tint < 0 ? BillyAbilities.INNER : AbilityColors.recolor(PLATE_ART, tint)) : col(BillyAbilities.BODY);
         float r = ((rgb >> 16) & 0xFF) / 255.0F;
         float g = ((rgb >> 8) & 0xFF) / 255.0F;
         float b = (rgb & 0xFF) / 255.0F;
@@ -212,11 +228,15 @@ public final class BarrierRenderer {
         float sin = Mth.sin(turn);
         float[][] corner = {{-1, -1, 0, 1}, {1, -1, 1, 1}, {1, 1, 1, 0}, {-1, 1, 0, 0}};
         float a = Mth.clamp(alpha, 0.0F, 1.0F);
+        int rgb = tint < 0 ? 0xFFFFFF : AbilityColors.recolor(SEAL_ART, tint);
+        float r = ((rgb >> 16) & 0xFF) / 255.0F;
+        float g = ((rgb >> 8) & 0xFF) / 255.0F;
+        float b = (rgb & 0xFF) / 255.0F;
         for (float[] k : corner) {
             float x = (k[0] * cos - k[1] * sin);
             float y = (k[0] * sin + k[1] * cos);
             Vec3 p = middle.add(plate.right().scale(x * half)).add(plate.up().scale(y * half));
-            vc.addVertex(pose, (float) p.x, (float) p.y, (float) p.z).setUv(k[2], k[3]).setColor(1.0F, 1.0F, 1.0F, a);
+            vc.addVertex(pose, (float) p.x, (float) p.y, (float) p.z).setUv(k[2], k[3]).setColor(r, g, b, a);
         }
     }
 
@@ -248,9 +268,9 @@ public final class BarrierRenderer {
             float age = 1.0F - hit;
             float radius = (float) (width * 0.12 + age * width * 0.55);
             EnergyGeometry.ring(pose, vc, c.add(plate.forward().scale(0.03)), plate.forward(), radius, 0.05F + 0.04F * hit, 20,
-                    EnergyGeometry.argb(BillyAbilities.MAIN, 0.8F * hit));
+                    EnergyGeometry.argb(col(BillyAbilities.MAIN), 0.8F * hit));
             EnergyGeometry.ring(pose, vc, c.add(plate.forward().scale(0.03)), plate.forward(), radius * 0.9F, 0.03F, 16,
-                    EnergyGeometry.argb(BillyAbilities.CORE, 0.9F * hit));
+                    EnergyGeometry.argb(col(BillyAbilities.CORE), 0.9F * hit));
         }
     }
 
@@ -266,9 +286,9 @@ public final class BarrierRenderer {
         }
         List<Vec3> path = EnergyGeometry.lightningPath(from, to, Math.max(0.05, length * 0.12), random);
         float a = Mth.clamp(alpha * strength, 0.0F, 1.0F);
-        EnergyGeometry.polyline(pose, vc, path, 0.07F, EnergyGeometry.argb(BillyAbilities.BODY, 0.45F * a));
-        EnergyGeometry.polyline(pose, vc, path, 0.035F, EnergyGeometry.argb(BillyAbilities.MAIN, 0.85F * a));
-        EnergyGeometry.polyline(pose, vc, path, 0.014F, EnergyGeometry.argb(BillyAbilities.CORE, a));
+        EnergyGeometry.polyline(pose, vc, path, 0.07F, EnergyGeometry.argb(col(BillyAbilities.BODY), 0.45F * a));
+        EnergyGeometry.polyline(pose, vc, path, 0.035F, EnergyGeometry.argb(col(BillyAbilities.MAIN), 0.85F * a));
+        EnergyGeometry.polyline(pose, vc, path, 0.014F, EnergyGeometry.argb(col(BillyAbilities.CORE), a));
     }
 
     private BarrierRenderer() {

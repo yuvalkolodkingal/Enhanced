@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpeedConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
@@ -100,6 +101,7 @@ public final class TommyAbilities {
                     data.setToggle(Toggle.TOMMY_WALL_RUN_OFF, off);
                     player.displayClientMessage(Component.translatable(off
                             ? "message.enhanced.tommy_wall_run.off" : "message.enhanced.tommy_wall_run.on"), true);
+                    AbilityColors.mark(player, HeroAbility.TOMMY_WALL_RUN);
                 } else {
                     toggleTime(player, data);
                 }
@@ -163,7 +165,7 @@ public final class TommyAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
             return;
         }
-        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.TOMMY)).moved()) {
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.TOMMY, HeroAbility.TOMMY_DASH)).moved()) {
             player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
             return;
         }
@@ -176,7 +178,7 @@ public final class TommyAbilities {
         if (!data.isReady(HeroAbility.TOMMY_WHIRLWIND, now) || WHIRLWINDS.containsKey(player.getUUID())) {
             return;
         }
-        SpeedStrikes.sonicBoom(player, data, SpeedStrikes.Style.of(player, Power.TOMMY), SpeedStrikes.value(SpeedConfig.BOOM_RADIUS, 6.0),
+        SpeedStrikes.sonicBoom(player, data, SpeedStrikes.Style.of(player, Power.TOMMY, HeroAbility.TOMMY_SONIC_BOOM), SpeedStrikes.value(SpeedConfig.BOOM_RADIUS, 6.0),
                 (float) SpeedStrikes.value(SpeedConfig.BOOM_DAMAGE, 4.0));
         data.startCooldown(HeroAbility.TOMMY_WHIRLWIND, now, SpeedStrikes.value(SpeedConfig.BOOM_COOLDOWN, 160));
     }
@@ -281,11 +283,11 @@ public final class TommyAbilities {
                 }
             }
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1), player);
-            ring(level, player, target.position(), target.getBbWidth() + 0.6);
-            trail(level, player, from, target.position());
+            ring(level, player, target.position(), target.getBbWidth() + 0.6, HeroAbility.TOMMY_DISARM_BLITZ);
+            trail(level, player, from, target.position(), HeroAbility.TOMMY_DISARM_BLITZ);
             from = target.position();
         }
-        trail(level, player, from, player.position());
+        trail(level, player, from, player.position(), HeroAbility.TOMMY_DISARM_BLITZ);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_DASH.get(), SoundSource.PLAYERS, 1.0F, 1.3F);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1.0F, 1.2F);
         player.displayClientMessage(Component.translatable("message.enhanced.disarm.done", taken), true);
@@ -412,7 +414,7 @@ public final class TommyAbilities {
                 Vec3 start = player.position();
                 player.teleportTo(level, target.x, target.y, target.z, player.getYRot(), player.getXRot());
                 player.resetFallDistance();
-                trail(level, player, start, target);
+                trail(level, player, start, target, HeroAbility.TOMMY_VIBRATE);
                 level.playSound(null, start.x, start.y, start.z, ModSounds.VIBRATE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 level.playSound(null, target.x, target.y, target.z, ModSounds.VIBRATE.get(), SoundSource.PLAYERS, 0.7F, 1.2F);
                 return;
@@ -453,7 +455,7 @@ public final class TommyAbilities {
                 Vec3 push = target.position().subtract(player.position());
                 target.knockback(0.8, -push.x, -push.z); // (a wall that stopped the hit stops the push too)
             }
-            burst(level, player, entityHit.getLocation());
+            burst(level, player, entityHit.getLocation(), HeroAbility.TOMMY_ACCELERATE);
             return;
         }
         if (!(hit instanceof BlockHitResult blockHit) || blockHit.getType() != HitResult.Type.BLOCK) {
@@ -485,7 +487,7 @@ public final class TommyAbilities {
         }
         data.startCooldown(HeroAbility.TOMMY_ACCELERATE, now, ACCELERATE_COOLDOWN);
         level.destroyBlock(pos, !player.isCreative(), player);
-        burst(level, player, Vec3.atCenterOf(pos));
+        burst(level, player, Vec3.atCenterOf(pos), HeroAbility.TOMMY_ACCELERATE);
     }
 
     // ---- effects ----
@@ -494,10 +496,10 @@ public final class TommyAbilities {
      * A teal-green ghost trail between two points, low along the ground like in the Battle of Westview (3.4: a custom
      * hero's in his own colours, here and in the ring and the burst).
      */
-    private static void trail(ServerLevel level, ServerPlayer player, Vec3 from, Vec3 to) {
+    private static void trail(ServerLevel level, ServerPlayer player, Vec3 from, Vec3 to, HeroAbility row) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(80, delta.length() * 3);
-        SpeedStrikes.Style style = SpeedStrikes.Style.of(player, Power.TOMMY);
+        SpeedStrikes.Style style = SpeedStrikes.Style.of(player, Power.TOMMY, row);
         EnergyParticleOptions deep = new EnergyParticleOptions(style.color(), 1.2F);
         EnergyParticleOptions light = new EnergyParticleOptions(style.glow(), 0.9F);
         for (int i = 0; i <= steps; i++) {
@@ -507,8 +509,8 @@ public final class TommyAbilities {
     }
 
     /** A ring of trail around a disarmed creature: Tommy ran around it. */
-    private static void ring(ServerLevel level, ServerPlayer player, Vec3 center, double radius) {
-        EnergyParticleOptions light = new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.TOMMY).glow(), 1.0F);
+    private static void ring(ServerLevel level, ServerPlayer player, Vec3 center, double radius, HeroAbility row) {
+        EnergyParticleOptions light = new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.TOMMY, row).glow(), 1.0F);
         for (int i = 0; i < 20; i++) {
             double a = i * Mth.TWO_PI / 20;
             level.sendParticles(light, center.x + Math.cos(a) * radius, center.y + 0.4, center.z + Math.sin(a) * radius,
@@ -516,9 +518,9 @@ public final class TommyAbilities {
         }
     }
 
-    private static void burst(ServerLevel level, ServerPlayer player, Vec3 at) {
-        level.sendParticles(new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.TOMMY).glow(), 1.4F), at.x, at.y, at.z, 30, 0.3, 0.3, 0.3, 0.12);
-        level.sendParticles(new EnergyParticleOptions(0xE6FFF5, 1.0F), at.x, at.y, at.z, 12, 0.15, 0.15, 0.15, 0.05);
+    private static void burst(ServerLevel level, ServerPlayer player, Vec3 at, HeroAbility row) {
+        level.sendParticles(new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.TOMMY, row).glow(), 1.4F), at.x, at.y, at.z, 30, 0.3, 0.3, 0.3, 0.12);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, row, 0xE6FFF5), 1.0F), at.x, at.y, at.z, 12, 0.15, 0.15, 0.15, 0.05);
         level.playSound(null, at.x, at.y, at.z, ModSounds.MOLECULAR_BURST.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 

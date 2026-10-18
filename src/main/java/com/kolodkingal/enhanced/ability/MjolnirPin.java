@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
@@ -155,7 +157,8 @@ public final class MjolnirPin {
         level.playSound(null, at.x, at.y, at.z, ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 1.2F, 0.6F);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.8F, 0.5F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 30, 0.4, 0.3, 0.4, 0.4);
-        level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.4F), at.x, at.y, at.z, 12, 0.3, 0.2, 0.3, 0.1);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(pinner, HeroAbility.THOR_HAMMER, Power.THOR.glow), 1.4F), at.x, at.y, at.z, 12,
+                0.3, 0.2, 0.3, 0.1);
         // Everyone nearby sees him bring it down (the slam of his arm).
         PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, 64, new ThorFxPayload(ThorFxPayload.PIN, pinner.getId(), List.of(at)));
     }

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.config.SpeedConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -101,6 +102,7 @@ public final class QuicksilverAbilities {
                 data.setWallRun(!data.wallRun());
                 player.displayClientMessage(Component.translatable(data.wallRun()
                         ? "message.enhanced.wall_run.on" : "message.enhanced.wall_run.off"), true);
+                AbilityColors.mark(player, HeroAbility.QUICKSILVER_WALL_RUN);
             }
             case 5 -> barrage(player, data);
             default -> {
@@ -112,6 +114,7 @@ public final class QuicksilverAbilities {
         data.setWalkman(!data.walkman());
         player.displayClientMessage(Component.translatable(data.walkman()
                 ? "message.enhanced.walkman.on" : "message.enhanced.walkman.off"), true);
+        AbilityColors.mark(player, HeroAbility.QUICKSILVER_WALKMAN);
     }
 
     // ---- the goggles (work for whoever wears them) ----
@@ -320,7 +323,7 @@ public final class QuicksilverAbilities {
         Vec3 toTarget = target.position().subtract(spot);
         float yaw = (float) (Math.atan2(-toTarget.x, toTarget.z) * (180 / Math.PI));
         player.teleportTo(level, spot.x, spot.y, spot.z, yaw, player.getXRot());
-        streak(level, player, start, spot);
+        streak(level, player, start, spot, HeroAbility.QUICKSILVER_BLITZ);
 
         for (int i = 0; i < BLITZ_HITS && target.isAlive(); i++) {
             target.invulnerableTime = 0;
@@ -359,7 +362,7 @@ public final class QuicksilverAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
             return;
         }
-        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER)).moved()) {
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER, HeroAbility.QUICKSILVER_DASH)).moved()) {
             player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
             return;
         }
@@ -372,7 +375,7 @@ public final class QuicksilverAbilities {
         if (!data.isReady(HeroAbility.QUICKSILVER_BARRAGE, now)) {
             return;
         }
-        SpeedStrikes.barrage(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER), SpeedStrikes.value(SpeedConfig.BARRAGE_PEBBLES, 8),
+        SpeedStrikes.barrage(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER, HeroAbility.QUICKSILVER_BARRAGE), SpeedStrikes.value(SpeedConfig.BARRAGE_PEBBLES, 8),
                 (float) SpeedStrikes.value(SpeedConfig.BARRAGE_DAMAGE, 1.5), SpeedStrikes.value(SpeedConfig.BARRAGE_RANGE, 24));
         data.startCooldown(HeroAbility.QUICKSILVER_BARRAGE, now, SpeedStrikes.value(SpeedConfig.BARRAGE_COOLDOWN, 120));
     }
@@ -412,7 +415,7 @@ public final class QuicksilverAbilities {
             player.drop(stolen, false);
         }
         data.startCooldown(HeroAbility.QUICKSILVER_BLITZ, now, PICKPOCKET_COOLDOWN);
-        streak(level, player, player.getEyePosition(), target.getEyePosition());
+        streak(level, player, player.getEyePosition(), target.getEyePosition(), HeroAbility.QUICKSILVER_PICKPOCKET);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1.0F, 1.6F);
         player.displayClientMessage(Component.translatable("message.enhanced.pickpocket.stolen", stolen.getHoverName()), true);
     }
@@ -422,10 +425,10 @@ public final class QuicksilverAbilities {
     }
 
     /** A grey speed blur between two points (3.4: a custom hero's in his own glow). */
-    private static void streak(ServerLevel level, ServerPlayer player, Vec3 from, Vec3 to) {
+    private static void streak(ServerLevel level, ServerPlayer player, Vec3 from, Vec3 to, HeroAbility row) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(80, delta.length() * 3);
-        EnergyParticleOptions silver = new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.QUICKSILVER).glow(), 1.2F);
+        EnergyParticleOptions silver = new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.QUICKSILVER, row).glow(), 1.2F);
         for (int i = 0; i <= steps; i++) {
             Vec3 p = from.add(delta.scale(i / (double) Math.max(1, steps))).add(0, 1.0, 0);
             level.sendParticles(silver, p.x, p.y, p.z, 1, 0.05, 0.3, 0.05, 0.0);

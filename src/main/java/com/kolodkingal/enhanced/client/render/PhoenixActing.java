@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -126,15 +128,16 @@ final class PhoenixActing {
     /** A gesture of hers just began: the mind lights up at her forehead. */
     static void started(AbstractClientPlayer player, GestureId id) {
         switch (id) {
-            case PHOENIX_READ_ON, PHOENIX_MIND_CAST -> glint(player, 6);
-            case PHOENIX_SENSE -> glint(player, 10);
+            case PHOENIX_READ_ON -> glint(player, 6, HeroAbility.PHOENIX_MIND);
+            case PHOENIX_MIND_CAST -> glint(player, 6, HeroAbility.PHOENIX_CONTROL);
+            case PHOENIX_SENSE -> glint(player, 10, HeroAbility.PHOENIX_MIND_SENSE);
             default -> {
             }
         }
     }
 
     /** A few violet motes drifting up off her forehead (small in the local player's own first-person view). */
-    private static void glint(AbstractClientPlayer player, int count) {
+    private static void glint(AbstractClientPlayer player, int count, HeroAbility row) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         if (level == null) {
@@ -145,7 +148,7 @@ final class PhoenixActing {
         float size = firstPerson ? 0.4F : 0.9F;
         RandomSource random = level.random;
         for (int i = 0; i < count; i++) {
-            int colour = i % 3 == 0 ? PhoenixAbilities.PSY_CORE : PhoenixAbilities.PSY_MAIN;
+            int colour = AbilityColors.shade(player, row, i % 3 == 0 ? PhoenixAbilities.PSY_CORE : PhoenixAbilities.PSY_MAIN);
             level.addParticle(new EnergyParticleOptions(colour, size), head.x + (random.nextDouble() - 0.5) * 0.3, head.y + (random.nextDouble() - 0.5) * 0.2,
                     head.z + (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.03, 0.02 + random.nextDouble() * 0.03,
                     (random.nextDouble() - 0.5) * 0.03);

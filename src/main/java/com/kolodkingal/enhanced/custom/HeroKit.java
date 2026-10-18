@@ -32,8 +32,14 @@ public final class HeroKit {
      * @param action {@link #MAIN}, {@link #ALT} (a hero ability's Sneak variant) or one of a module's options
      * @param column the key, 1-5 (R G V B N)
      * @param sneak  whether it is the key's Sneak cell
+     * @param picked 3.5: the entry the definition picked for this cell: {@code entry} itself, or a variant row
+     *               ({@link HeroAbility#parent}) the binding stands for as its parent's {@link #ALT} (its colour, its name)
      */
-    public record Binding(CatalogEntry entry, String action, int column, boolean sneak) {
+    public record Binding(CatalogEntry entry, String action, int column, boolean sneak, CatalogEntry picked) {
+        public Binding(CatalogEntry entry, String action, int column, boolean sneak) {
+            this(entry, action, column, sneak, entry);
+        }
+
         public boolean isAlt() {
             return ALT.equals(action);
         }
@@ -53,6 +59,8 @@ public final class HeroKit {
 
     private final CustomHero hero;
     private final EnumSet<HeroAbility> rows = EnumSet.noneOf(HeroAbility.class);
+    /** 3.5: the parents of the variant rows picked (their code runs for the variant; {@link #has} is true for them). */
+    private final EnumSet<HeroAbility> granted = EnumSet.noneOf(HeroAbility.class);
     private final EnumSet<Power> sources = EnumSet.noneOf(Power.class);
     private final Map<HeroAbility, Integer> strengths = new EnumMap<>(HeroAbility.class);
     private final Map<PowerModule, Integer> moduleStrengths = new EnumMap<>(PowerModule.class);
@@ -70,12 +78,22 @@ public final class HeroKit {
                 rows.add(a);
                 sources.add(a.hero);
                 strengths.put(a, pick.strength());
+                if (a.parent() != null) {
+                    granted.add(a.parent());
+                }
             } else if (entry instanceof PowerModule m) {
                 moduleStrengths.put(m, pick.strength());
             } else {
                 continue;
             }
             traits.addAll(entry.traits());
+        }
+        for (HeroAbility parent : granted) {
+            // (A parent not picked itself is as strong as its variant: its code scales the variant by it.)
+            if (!strengths.containsKey(parent)) {
+                HeroAbility variant = parent.variant();
+                strengths.put(parent, variant == null ? HeroAbility.FIXED_STRENGTH : strengths.getOrDefault(variant, HeroAbility.FIXED_STRENGTH));
+            }
         }
         for (int column = 1; column <= CustomHero.KEYS; column++) {
             plain[column] = parse(hero.binding(column, false), column, false);
@@ -86,6 +104,9 @@ public final class HeroKit {
             for (Binding b : new Binding[]{sneak[column], plain[column]}) {
                 if (b != null && b.ability() != null) {
                     columns.put(b.ability(), column);
+                    if (b.picked() instanceof HeroAbility v && v != b.ability()) {
+                        columns.put(v, column);
+                    }
                 }
             }
         }
@@ -98,6 +119,9 @@ public final class HeroKit {
             if (crawl == null || !HeroAbility.MAIN.equals(crawl.option())) {
                 defaultToggles.add(Toggle.SPIDER_SENSE);
             }
+        }
+        if (rows.contains(HeroAbility.SPIDER_SENSE)) {
+            defaultToggles.add(Toggle.SPIDER_SENSE);
         }
     }
 
@@ -122,6 +146,10 @@ public final class HeroKit {
             if (a.passive() || ALT.equals(action) && !a.hasAlt() || !ALT.equals(action) && !MAIN.equals(action)) {
                 return null;
             }
+            if (a.parent() != null) {
+                // (3.5: a variant row is its parent's Sneak variant on this cell.)
+                return new Binding(a.parent(), ALT, column, onSneak, a);
+            }
         } else if (!MAIN.equals(action) && entry.options().stream().noneMatch(o -> o.id().equals(action))) {
             return null;
         }
@@ -133,9 +161,25 @@ public final class HeroKit {
         return hero;
     }
 
-    /** Whether the hero ability is picked. */
+    /**
+     * Whether the hero ability is picked, or (3.5) is the parent of a variant row picked: the parent's code runs for its
+     * variant, so it asks for the parent.
+     */
     public boolean has(HeroAbility a) {
-        return rows.contains(a);
+        return rows.contains(a) || granted.contains(a);
+    }
+
+    /**
+     * 3.5: whether the Sneak variant of {@code parent} is his: the parent picked with its variant on, or its variant row
+     * picked.
+     */
+    public boolean hasVariant(HeroAbility parent) {
+        HeroAbility variant = parent.variant();
+        if (variant != null && rows.contains(variant)) {
+            return true;
+        }
+        CustomHero.Pick pick = hero.pick(parent);
+        return pick != null && !HeroAbility.MAIN.equals(pick.option());
     }
 
     /** Whether any ability of this built-in hero is picked (his upkeep runs). */

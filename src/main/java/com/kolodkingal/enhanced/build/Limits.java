@@ -67,8 +67,8 @@ public final class Limits implements RecipeLimits {
     public static @Nullable Limits of(Player player) {
         Power power = Powers.power(player);
         BoundingBox world = world(player.level());
-        if (power == Power.SCARLET_WITCH) {
-            return wanda(world);
+        if (power == Power.SCARLET_WITCH || power == Power.CUSTOM && Powers.get(player).has(HeroAbility.WANDA_BUILD_MAGIC)) {
+            return wanda(world); // (3.5: a custom hero with the Scarlet Witch's Build Magic has her numbers and her Instant)
         }
         if (power == Power.BILLY || power == Power.CUSTOM && Powers.get(player).has(HeroAbility.BILLY_BUILD_MAGIC)) {
             int rank = BillyRanks.rank(player.getData(ModAttachments.BUILD_DATA));

@@ -4,11 +4,12 @@ import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.vishanti.Ward;
 import com.kolodkingal.enhanced.vishanti.WardManager;
@@ -202,7 +203,7 @@ public final class Shelters {
         boolean dark = DarkMagic.casts(source);
         Hex hex = hexAgainst(level, source, from, at);
         if (hex != null) {
-            flash(level, hex.id(), entry(hex.center(), hex.radius(), from, at), Power.SCARLET_WITCH.color);
+            flash(level, hex.id(), entry(hex.center(), hex.radius(), from, at), HexManager.wallColor(hex));
             return true;
         }
         Ward ward = wardAgainst(level, source, from, at, dark);
@@ -259,21 +260,23 @@ public final class Shelters {
         WandaAbilities.ShieldStop chaos = WandaAbilities.chaosShieldAcross(level, firer, from, to, partialTick);
         if (chaos != null) {
             best = chaos.point().distanceTo(from);
-            nearest = new Stop(Wall.CHAOS_SHIELD, chaos.owner(), chaos.point(), WandaAbilities.glow(chaos.owner()), chaos.owner().getUUID());
+            nearest = new Stop(Wall.CHAOS_SHIELD, chaos.owner(), chaos.point(),
+                    AbilityColors.glow(chaos.owner(), AbilityColors.shield(chaos.owner()), WandaAbilities.glow(chaos.owner())), chaos.owner().getUUID());
         }
         AABB reach = new AABB(from, to).inflate(BillyBarrier.distance() + BillyBarrier.height());
         for (Player billy : level.getEntitiesOfClass(Player.class, reach, p -> p != firer && !p.isSpectator() && BillyBarrier.isUp(p))) {
             Vec3 hit = plateCrossing(billy, from, to, partialTick);
             if (hit != null && hit.distanceTo(from) < best) {
                 best = hit.distanceTo(from);
-                nearest = new Stop(Wall.HEX_BARRIER, billy, hit, BillyAbilities.MAIN, billy.getUUID());
+                nearest = new Stop(Wall.HEX_BARRIER, billy, hit, AbilityColors.color(billy, HeroAbility.BILLY_HEX_BARRIER, BillyAbilities.MAIN),
+                        billy.getUUID());
             }
         }
         for (Hex hex : HexManager.data(level).hexes()) {
             double at = enters(hex.center(), hex.radius(), from, path, length);
             if (at >= 0 && at < best && !hexTrusts(hex, firer)) {
                 best = at;
-                nearest = new Stop(Wall.HEX, null, from.add(path.scale(at / length)), Power.SCARLET_WITCH.color, hex.id());
+                nearest = new Stop(Wall.HEX, null, from.add(path.scale(at / length)), HexManager.wallColor(hex), hex.id());
             }
         }
         if (dark || hostile(firer)) {
@@ -305,7 +308,7 @@ public final class Shelters {
             double at = enters(hex.center(), hex.radius(), from, path, length);
             if (at >= 0 && at <= best && !hexTrusts(hex, missile)) {
                 best = at;
-                nearest = new Stop(Wall.HEX, null, from.add(path.scale(at / length)), Power.SCARLET_WITCH.color, hex.id());
+                nearest = new Stop(Wall.HEX, null, from.add(path.scale(at / length)), HexManager.wallColor(hex), hex.id());
             }
         }
         if (DarkMagic.is(missile) || hostile(missile)) {

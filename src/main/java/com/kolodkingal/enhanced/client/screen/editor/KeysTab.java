@@ -273,7 +273,7 @@ public final class KeysTab extends EditorTab {
             for (int c = 1; c <= CustomHero.KEYS; c++) {
                 onKey |= ruled.binding(c, false).equals(e.id()) || ruled.binding(c, true).startsWith(e.id());
             }
-            if (e == HeroAbility.BILLY_BUILD_MAGIC) {
+            if (e == HeroAbility.BILLY_BUILD_MAGIC || e == HeroAbility.WANDA_BUILD_MAGIC) {
                 ownKey = Component.translatable("screen.enhanced.hero_creator.keys.own_key", CreatorUi.name(e).copy()
                         .withStyle(st -> st.withColor(draft().glow())), BuildKeys.MAGIC.getTranslatedKeyMessage());
             } else if (!onKey) {

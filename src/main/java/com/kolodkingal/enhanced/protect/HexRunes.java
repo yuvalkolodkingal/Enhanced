@@ -134,7 +134,7 @@ public final class HexRunes {
         for (int side = 0; side < 4; side++) {
             double angle = Math.PI * 0.5 * side;
             Vec3 at = c.add(Math.sin(angle) * hex.radius(), Math.min(4.0, hex.radius() * 0.25), Math.cos(angle) * hex.radius());
-            level.sendParticles(new EnergyParticleOptions(on ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 2.0F),
+            level.sendParticles(new EnergyParticleOptions(hex.color() >= 0 ? hex.color() : on ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 2.0F),
                     at.x, at.y, at.z, 30, 1.5, 1.5, 1.5, 0.05);
         }
         float volume = Math.max(1.0F, hex.radius() / 16.0F);

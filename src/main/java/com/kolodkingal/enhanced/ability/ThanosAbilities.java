@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -539,11 +540,11 @@ public final class ThanosAbilities {
                         StonePowers.shove(e, end, 0.8, 0.3);
                     }
                 }
-                ThanosEffects.shockRing(level, end, 2.5F, 6, StoneKind.POWER.color());
+                ThanosEffects.shockRing(level, end, 2.5F, 6, AbilityColors.color(player, HeroAbility.THANOS_POWER, StoneKind.POWER.color()));
                 level.sendParticles(ParticleTypes.EXPLOSION, end.x, end.y, end.z, 1, 0, 0, 0, 0);
             }
         }
-        ThanosEffects.beam(level, player, hand, end, 0.6F, 6, StoneKind.POWER.color());
+        ThanosEffects.beam(level, player, hand, end, 0.6F, 6, AbilityColors.color(player, HeroAbility.THANOS_POWER, StoneKind.POWER.color()));
     }
 
     /**
@@ -562,7 +563,7 @@ public final class ThanosAbilities {
         state.slam = new Slam(player.position());
         float radius = ThanosConfig.SLAM_RADIUS.get().floatValue();
         sayIfPvpSpares(player, radius);
-        ThanosEffects.shockRing(level, player.position().add(0.0, 0.1, 0.0), radius, (int) Math.ceil(radius / SLAM_SPEED), StoneKind.POWER.color());
+        ThanosEffects.shockRing(level, player.position().add(0.0, 0.1, 0.0), radius, (int) Math.ceil(radius / SLAM_SPEED), AbilityColors.color(player, HeroAbility.THANOS_TITAN_SLAM, StoneKind.POWER.color()));
         ThanosSounds.CLENCH.play(level, player.position());
         ThanosSounds.HIT.play(level, player.position(), 1.2F, 0.6F);
         StoneKind.POWER.voice().use(level, player.position(), 0.6F, 0.9F);
@@ -621,8 +622,8 @@ public final class ThanosAbilities {
         data.startCooldown(HeroAbility.THANOS_SPACE, now, ThanosConfig.SPACE_STEP_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.STEP_EXHAUSTION.get().floatValue());
         Vec3 from = player.position();
-        ThanosEffects.portal(level, from.add(0.0, 0.2, 0.0), 1.6F, 60);
-        ThanosEffects.portal(level, spot.add(0.0, 0.2, 0.0), 1.6F, 60);
+        ThanosEffects.portal(level, from.add(0.0, 0.2, 0.0), 1.6F, 60, AbilityColors.color(player, HeroAbility.THANOS_SPACE, StoneKind.SPACE.color()));
+        ThanosEffects.portal(level, spot.add(0.0, 0.2, 0.0), 1.6F, 60, AbilityColors.color(player, HeroAbility.THANOS_SPACE, StoneKind.SPACE.color()));
         ThanosSounds.PORTAL.play(level, from, 1.0F, 1.3F);
         StoneKind.SPACE.voice().use(level, from, 0.6F, 1.0F);
         moveTo(player, level, spot);
@@ -670,8 +671,8 @@ public final class ThanosAbilities {
         data.startCooldown(HeroAbility.THANOS_SPACE, now, ThanosConfig.PULL_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.PULL_EXHAUSTION.get().floatValue());
         state.vortex = new Vortex(target.getId(), now + FLIGHT_TICKS);
-        ThanosEffects.mandala(level, target.position().add(0.0, 0.05, 0.0), 1.6F, FLIGHT_TICKS, StoneKind.SPACE.color());
-        ThanosEffects.portal(level, pullSpot(player).add(0.0, 0.2, 0.0), 1.2F, FLIGHT_TICKS + 14);
+        ThanosEffects.mandala(level, target.position().add(0.0, 0.05, 0.0), 1.6F, FLIGHT_TICKS, AbilityColors.color(player, HeroAbility.THANOS_SPACE_PULL, StoneKind.SPACE.color()));
+        ThanosEffects.portal(level, pullSpot(player).add(0.0, 0.2, 0.0), 1.2F, FLIGHT_TICKS + 14, AbilityColors.color(player, HeroAbility.THANOS_SPACE_PULL, StoneKind.SPACE.color()));
         ThanosSounds.PORTAL.play(level, player.position(), 1.0F, 0.8F);
         StoneKind.SPACE.voice().use(level, player.position(), 0.6F, 0.8F);
     }
@@ -719,8 +720,8 @@ public final class ThanosAbilities {
             mob.getNavigation().stop();
         }
         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 1, false, true, true), player);
-        ThanosEffects.portal(level, from.add(0.0, 0.2, 0.0), 1.2F, 20);
-        ThanosEffects.shockRing(level, spot, 1.8F, 5, StoneKind.SPACE.color());
+        ThanosEffects.portal(level, from.add(0.0, 0.2, 0.0), 1.2F, 20, AbilityColors.color(player, HeroAbility.THANOS_SPACE_PULL, StoneKind.SPACE.color()));
+        ThanosEffects.shockRing(level, spot, 1.8F, 5, AbilityColors.color(player, HeroAbility.THANOS_SPACE_PULL, StoneKind.SPACE.color()));
         ThanosSounds.PORTAL.play(level, spot, 1.0F, 1.4F);
     }
 
@@ -749,7 +750,7 @@ public final class ThanosAbilities {
         data.startCooldown(HeroAbility.THANOS_REALITY, now, ThanosConfig.TRANSMUTE_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.TRANSMUTE_EXHAUSTION.get().floatValue());
         state.sphere = new Sphere(target.getId(), now + FLIGHT_TICKS);
-        ThanosEffects.beam(level, player, handPosition(player), chestOf(target), 0.35F, FLIGHT_TICKS, StoneKind.REALITY.color());
+        ThanosEffects.beam(level, player, handPosition(player), chestOf(target), 0.35F, FLIGHT_TICKS, AbilityColors.color(player, HeroAbility.THANOS_REALITY, StoneKind.REALITY.color()));
         ThanosSounds.CLENCH.play(level, player.position(), 0.8F, 1.2F);
         StoneKind.REALITY.voice().use(level, player.position(), 0.6F, 1.0F);
     }
@@ -772,7 +773,7 @@ public final class ThanosAbilities {
                 WandaAbilities.wear(wanda, 2.0F);
             }
             Vec3 at = shield.point();
-            level.sendParticles(new EnergyParticleOptions(StoneKind.REALITY.core(), 1.2F), at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.1);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.THANOS_REALITY, StoneKind.REALITY.core()), 1.2F), at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.1);
             return;
         }
         if (target instanceof LokiIllusionEntity illusion) {
@@ -807,7 +808,7 @@ public final class ThanosAbilities {
         if (on) {
             ThanosSounds.REALITY_POP.play(level, player.position(), 1.0F, 0.9F);
             StoneKind.REALITY.voice().use(level, player.position(), 0.6F, 1.0F);
-            level.sendParticles(new EnergyParticleOptions(StoneKind.REALITY.core(), 1.2F), player.getX(), player.getY() + 1.0, player.getZ(),
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.THANOS_REALITY_VEIL, StoneKind.REALITY.core()), 1.2F), player.getX(), player.getY() + 1.0, player.getZ(),
                     16, 0.5, 0.8, 0.5, 0.05);
         }
         player.displayClientMessage(Component.translatable(on ? "message.enhanced.thanos.veil.on" : "message.enhanced.thanos.veil.off"), true);
@@ -883,7 +884,7 @@ public final class ThanosAbilities {
         }
         state.drain = new Drain(target.getUUID(), now);
         data.set(Live.SOUL_DRAINING, true);
-        ThanosEffects.chains(level, player, List.of(chestOf(target)), DRAIN_EVERY + 2, StoneKind.SOUL.color());
+        ThanosEffects.chains(level, player, List.of(chestOf(target)), DRAIN_EVERY + 2, AbilityColors.color(player, HeroAbility.THANOS_SOUL, StoneKind.SOUL.color()));
         ThanosSounds.CLENCH.play(level, player.position(), 0.8F, 1.1F);
         StoneKind.SOUL.voice().use(level, player.position(), 0.6F, 1.0F);
     }
@@ -931,7 +932,7 @@ public final class ThanosAbilities {
             player.heal(taken * ThanosConfig.DRAIN_HEAL_FRACTION.get().floatValue());
         }
         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 0, false, false), player);
-        ThanosEffects.chains(level, player, List.of(chest), DRAIN_EVERY + 2, StoneKind.SOUL.color());
+        ThanosEffects.chains(level, player, List.of(chest), DRAIN_EVERY + 2, AbilityColors.color(player, HeroAbility.THANOS_SOUL, StoneKind.SOUL.color()));
         ThanosSounds.SOUL_DRAIN.play(level, player.position(), 0.8F, 1.0F);
     }
 
@@ -977,7 +978,7 @@ public final class ThanosAbilities {
                 e -> e != player && e.isAlive() && (e.isInvisible() || e.hasEffect(MobEffects.INVISIBILITY)) && e.distanceTo(player) <= range)) {
             e.addEffect(new MobEffectInstance(MobEffects.GLOWING, REVEAL_TICKS, 0, false, false), player);
         }
-        level.sendParticles(new EnergyParticleOptions(StoneKind.SOUL.color(), 1.4F), player.getX(), player.getY() + 1.0, player.getZ(),
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.THANOS_SOUL_SIGHT, StoneKind.SOUL.color()), 1.4F), player.getX(), player.getY() + 1.0, player.getZ(),
                 20, 0.6, 0.8, 0.6, 0.05);
         ThanosSounds.SOULWORLD.play(level, player.position(), 0.6F, 1.4F);
         StoneKind.SOUL.voice().use(level, player.position(), 0.6F, 1.2F);
@@ -1079,11 +1080,11 @@ public final class ThanosAbilities {
         player.clearFire();
         player.setAirSupply(player.getMaxAirSupply());
         player.resetFallDistance();
-        ThanosEffects.mandala(level, from, 2.4F, 30, StoneKind.TIME.color());
+        ThanosEffects.mandala(level, from, 2.4F, 30, AbilityColors.color(player, HeroAbility.THANOS_TIME, StoneKind.TIME.color()));
         if (back != null) {
             moveTo(player, level, back);
-            ThanosEffects.mandala(level, back, 2.4F, 30, StoneKind.TIME.color());
-            ThanosEffects.lineParticles(level, from.add(0.0, 1.0, 0.0), back.add(0.0, 1.0, 0.0), StoneKind.TIME.color(), 16, 0.8F);
+            ThanosEffects.mandala(level, back, 2.4F, 30, AbilityColors.color(player, HeroAbility.THANOS_TIME, StoneKind.TIME.color()));
+            ThanosEffects.lineParticles(level, from.add(0.0, 1.0, 0.0), back.add(0.0, 1.0, 0.0), AbilityColors.color(player, HeroAbility.THANOS_TIME, StoneKind.TIME.color()), 16, 0.8F);
         }
         // The history after that moment is a future that no longer happened.
         state.history.clear();
@@ -1132,8 +1133,8 @@ public final class ThanosAbilities {
         state.lock = new Lock(level.dimension(), player.position(), now + ticks);
         float radius = ThanosConfig.TIME_LOCK_RADIUS.get().floatValue();
         sayIfPvpSpares(player, radius);
-        ThanosEffects.dome(level, player.position(), radius, ticks, StoneKind.TIME.color());
-        ThanosEffects.mandala(level, player.position().add(0.0, 0.05, 0.0), radius, ticks, StoneKind.TIME.color());
+        ThanosEffects.dome(level, player.position(), radius, ticks, AbilityColors.color(player, HeroAbility.THANOS_TIME_LOCK, StoneKind.TIME.color()));
+        ThanosEffects.mandala(level, player.position().add(0.0, 0.05, 0.0), radius, ticks, AbilityColors.color(player, HeroAbility.THANOS_TIME_LOCK, StoneKind.TIME.color()));
         ThanosSounds.REWIND.play(level, player.position(), 0.8F, 1.3F);
         StoneKind.TIME.voice().use(level, player.position(), 0.6F, 0.9F);
     }
@@ -1158,7 +1159,7 @@ public final class ThanosAbilities {
                     lock.held.add(e.getUUID());
                 }
             }
-            level.sendParticles(new EnergyParticleOptions(StoneKind.TIME.color(), 1.2F), lock.centre.x, lock.centre.y + 0.1, lock.centre.z,
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.THANOS_TIME_LOCK, StoneKind.TIME.color()), 1.2F), lock.centre.x, lock.centre.y + 0.1, lock.centre.z,
                     4, radius * 0.5, 0.05, radius * 0.5, 0.0);
         }
         IntSet inside = new IntOpenHashSet();

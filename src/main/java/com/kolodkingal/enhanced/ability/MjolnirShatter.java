@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -130,7 +132,8 @@ public final class MjolnirShatter {
         level.playSound(null, thor.getX(), thor.getY(), thor.getZ(), ModSounds.MJOLNIR_THROW.get(), SoundSource.PLAYERS, 1.4F, 1.5F);
         level.playSound(null, thor.getX(), thor.getY(), thor.getZ(), ModSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 0.9F, 0.7F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, from.x, from.y, from.z, 40, 0.3, 0.3, 0.3, 0.5);
-        level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.6F), from.x, from.y, from.z, 24, 0.25, 0.25, 0.25, 0.3);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(thor, HeroAbility.THOR_SHATTER, Power.THOR.glow), 1.6F), from.x, from.y, from.z, 24,
+                0.25, 0.25, 0.25, 0.3);
     }
 
     /**
@@ -238,7 +241,8 @@ public final class MjolnirShatter {
         level.playSound(null, thor.getX(), thor.getY(), thor.getZ(), ModSounds.MJOLNIR_RETURN.get(), SoundSource.PLAYERS, 1.2F, 1.2F);
         Vec3 hand = muzzle(thor);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, hand.x, hand.y, hand.z, 24, 0.25, 0.25, 0.25, 0.3);
-        level.sendParticles(new EnergyParticleOptions(Power.THOR.glow, 1.4F), hand.x, hand.y, hand.z, 10, 0.2, 0.2, 0.2, 0.15);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(thor, HeroAbility.THOR_SHATTER, Power.THOR.glow), 1.4F), hand.x, hand.y, hand.z, 10,
+                0.2, 0.2, 0.2, 0.15);
     }
 
     /** Mjolnir back in the hand it came from, otherwise in the inventory, otherwise at his feet. */

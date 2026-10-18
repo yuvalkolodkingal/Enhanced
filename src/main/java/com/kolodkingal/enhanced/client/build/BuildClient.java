@@ -214,6 +214,9 @@ public final class BuildClient {
      */
     public static Power hero(Player player) {
         PowerData data = Powers.get(player);
+        if (data.power() == Power.CUSTOM && data.has(HeroAbility.WANDA_BUILD_MAGIC)) {
+            return Power.SCARLET_WITCH; // (3.5: the Scarlet Witch's Build Magic, her looks and her Instant)
+        }
         return data.power() == Power.CUSTOM && data.has(HeroAbility.BILLY_BUILD_MAGIC) ? Power.BILLY : data.power();
     }
 

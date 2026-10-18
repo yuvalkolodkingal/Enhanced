@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.CustomBeams;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -39,7 +42,7 @@ final class SpiderGestureFx {
     }
 
     /** An effect that runs from tick {@code from} to {@code to} of the game's clock. */
-    private record Timed(int player, long from, long to, Kind kind) {
+    private record Timed(int player, long from, long to, Kind kind, HeroAbility row) {
     }
 
     private static final int WHITE = 0xFFFFFF;
@@ -62,23 +65,36 @@ final class SpiderGestureFx {
         }
         long now = level.getGameTime();
         switch (id) {
-            case SPIDER_SHOOT, SPIDER_ZIP_START, SPIDER_SWING_START -> add(player, now + 1, now + 4, Kind.WEB_HAND);
+            case SPIDER_SHOOT -> add(player, now + 1, now + 4, Kind.WEB_HAND, HeroAbility.SPIDER_WEB);
+            case SPIDER_ZIP_START -> add(player, now + 1, now + 4, Kind.WEB_HAND, HeroAbility.SPIDER_ZIP);
+            case SPIDER_SWING_START -> add(player, now + 1, now + 4, Kind.WEB_HAND, HeroAbility.SPIDER_WEB_SWING);
             // The arms are flung wide at the twelfth tick of the burst.
-            case SPIDER_BURST -> add(player, now + 12, now + 12, Kind.BURST_RING);
-            case SPIDER_SURGE_ON -> add(player, now + 4, now + 16, Kind.SURGE_WISPS);
-            case SPIDER_LEGS_OUT -> add(player, now + 4, now + 16, Kind.LEGS_SPARKS);
-            case SPIDER_KILL_ON -> add(player, now + 4, now + 14, Kind.KILL_FLICKER);
+            case SPIDER_BURST -> add(player, now + 12, now + 12, Kind.BURST_RING, HeroAbility.SPIDER_WEB_BURST);
+            case SPIDER_SURGE_ON -> add(player, now + 4, now + 16, Kind.SURGE_WISPS, HeroAbility.SPIDER_BLACK_EYES);
+            case SPIDER_LEGS_OUT -> add(player, now + 4, now + 16, Kind.LEGS_SPARKS, HeroAbility.SPIDER_LEGS);
+            case SPIDER_KILL_ON -> add(player, now + 4, now + 14, Kind.KILL_FLICKER, HeroAbility.SPIDER_INSTANT_KILL);
             case SPIDER_ALERT_START -> {
-                add(player, now + 2, now + 2, Kind.SENSE_RING);
-                add(player, now + 6, now + 6, Kind.SENSE_RING);
+                add(player, now + 2, now + 2, Kind.SENSE_RING, HeroAbility.SPIDER_SENSE);
+                add(player, now + 6, now + 6, Kind.SENSE_RING, HeroAbility.SPIDER_SENSE);
             }
             default -> {
             }
         }
     }
 
-    private static void add(AbstractClientPlayer player, long from, long to, Kind kind) {
-        TIMED.add(new Timed(player.getId(), from, to, kind));
+    private static void add(AbstractClientPlayer player, long from, long to, Kind kind, HeroAbility row) {
+        TIMED.add(new Timed(player.getId(), from, to, kind, row));
+    }
+
+    /** 3.5: the colour a custom hero's pick chose for the effect being made, or -1. */
+    private static int tint = -1;
+
+    /** One of the effect's colours, or the chosen one (white becomes a pale tint of it, the rest take its hue). */
+    private static int c(int rgb) {
+        if (tint < 0) {
+            return rgb;
+        }
+        return rgb == WHITE ? CustomBeams.mix(tint, 0xFFFFFF, 0.45F) : AbilityColors.recolor(rgb, tint);
     }
 
     /** Runs the timed effects of this client tick. */
@@ -92,6 +108,7 @@ final class SpiderGestureFx {
             if (now < t.from() || !(level.getEntity(t.player()) instanceof AbstractClientPlayer player) || player.isInvisible()) {
                 continue;
             }
+            tint = AbilityColors.chosen(player, t.row());
             switch (t.kind()) {
                 case WEB_HAND -> webHand(level, player);
                 case BURST_RING -> burstRing(level, player);
@@ -101,6 +118,7 @@ final class SpiderGestureFx {
                 case SENSE_RING -> senseRing(level, player);
             }
         }
+        tint = -1;
     }
 
     static void clear() {
@@ -155,7 +173,7 @@ final class SpiderGestureFx {
         RandomSource random = level.random;
         Vec3 hand = hand(player);
         for (int i = 0; i < 2; i++) {
-            level.addParticle(new EnergyParticleOptions(WHITE, 0.5F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.12,
+            level.addParticle(new EnergyParticleOptions(c(WHITE), 0.5F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.12,
                     hand.y + (random.nextDouble() - 0.5) * 0.12, hand.z + (random.nextDouble() - 0.5) * 0.12, (random.nextDouble() - 0.5) * 0.04,
                     0.01 + random.nextDouble() * 0.02, (random.nextDouble() - 0.5) * 0.04);
         }
@@ -169,7 +187,7 @@ final class SpiderGestureFx {
         for (int i = 0; i < 16; i++) {
             double angle = i * Mth.TWO_PI / 16 + random.nextDouble() * 0.3;
             double speed = 0.18 + random.nextDouble() * 0.06;
-            level.addParticle(new EnergyParticleOptions(WHITE, 0.6F * size(player)), chest.x, chest.y, chest.z, Math.cos(angle) * speed,
+            level.addParticle(new EnergyParticleOptions(c(WHITE), 0.6F * size(player)), chest.x, chest.y, chest.z, Math.cos(angle) * speed,
                     (random.nextDouble() - 0.5) * 0.04, Math.sin(angle) * speed);
         }
     }
@@ -180,7 +198,7 @@ final class SpiderGestureFx {
         Vec3 head = WorldEffectsRenderer.foreheadPosition(Minecraft.getInstance(), player, 0.0F);
         for (int i = 0; i < 3; i++) {
             double angle = random.nextDouble() * Mth.TWO_PI;
-            level.addParticle(new EnergyParticleOptions(i == 0 ? GLINT : WISP, (i == 0 ? 0.5F : 1.0F) * size(player)), head.x + Math.cos(angle) * 0.3,
+            level.addParticle(new EnergyParticleOptions(i == 0 ? c(GLINT) : WISP, (i == 0 ? 0.5F : 1.0F) * size(player)), head.x + Math.cos(angle) * 0.3,
                     head.y - 0.1 + random.nextDouble() * 0.3, head.z + Math.sin(angle) * 0.3, (random.nextDouble() - 0.5) * 0.02,
                     0.04 + random.nextDouble() * 0.03, (random.nextDouble() - 0.5) * 0.02);
         }
@@ -190,7 +208,7 @@ final class SpiderGestureFx {
     private static void legSparks(ClientLevel level, AbstractClientPlayer player) {
         RandomSource random = level.random;
         for (Vec3 root : roots(player)) {
-            level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? RED : GOLD, 0.7F * size(player)), root.x, root.y, root.z,
+            level.addParticle(new EnergyParticleOptions(c(random.nextInt(3) == 0 ? RED : GOLD), 0.7F * size(player)), root.x, root.y, root.z,
                     (random.nextDouble() - 0.5) * 0.12, (random.nextDouble() - 0.3) * 0.1, (random.nextDouble() - 0.5) * 0.12);
         }
     }
@@ -206,14 +224,14 @@ final class SpiderGestureFx {
         right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
         for (int side = -1; side <= 1; side += 2) {
             Vec3 at = eyes.add(right.scale(0.12 * side));
-            level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? RED : GLINT, 0.4F * size(player)), at.x, at.y, at.z, 0.0, 0.0, 0.0);
+            level.addParticle(new EnergyParticleOptions(c(random.nextBoolean() ? RED : GLINT), 0.4F * size(player)), at.x, at.y, at.z, 0.0, 0.0, 0.0);
         }
     }
 
     /** A pale ring round his head, flat, spreading out. */
     private static void senseRing(ClientLevel level, AbstractClientPlayer player) {
         Vec3 head = WorldEffectsRenderer.foreheadPosition(Minecraft.getInstance(), player, 0.0F);
-        FlightEffects.ring(level, player.getId(), head, new Vec3(0, 1, 0), 9, 0.25F, 1.5F, 0.05F, PALE_BLUE, 0.6F);
+        FlightEffects.ring(level, player.getId(), head, new Vec3(0, 1, 0), 9, 0.25F, 1.5F, 0.05F, c(PALE_BLUE), 0.6F);
     }
 
     // ---- the landing ----

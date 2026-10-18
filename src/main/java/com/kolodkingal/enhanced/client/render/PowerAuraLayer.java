@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -80,8 +81,8 @@ public class PowerAuraLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             model.rightSleeve.visible = false;
             model.leftSleeve.visible = false;
         }
-        int rgb = body ? (data.power() == Power.CUSTOM ? Powers.color(player) : "white_vision".equals(data.variant()) ? 0xF4F8FF : 0xE3DC6E)
-                : 0xE0193F;
+        int rgb = body ? (data.power() == Power.CUSTOM ? AbilityColors.color(player, HeroAbility.VISION_PHASE, Powers.color(player))
+                : "white_vision".equals(data.variant()) ? 0xF4F8FF : 0xE3DC6E) : 0xE0193F;
         int color = Math.round(0x90 * (body ? phasedW : handsW)) << 24 | rgb;
         drawSwirl(poseStack, buffer, packedLight, model, SWIRL, t, 1.0F, color);
 

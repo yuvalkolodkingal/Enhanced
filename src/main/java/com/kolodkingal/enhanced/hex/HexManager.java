@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -150,13 +151,14 @@ public final class HexManager {
     public static Hex create(ServerPlayer wanda) {
         ServerLevel level = wanda.serverLevel();
         int radius = Mth.clamp(EnhancedConfig.HEX_DEFAULT_RADIUS.get(), EnhancedConfig.HEX_MIN_RADIUS.get(), EnhancedConfig.HEX_MAX_RADIUS.get());
+        // (3.5: a custom hero's Hex rises in the colour his pick chose.)
         Hex hex = new Hex(UUID.randomUUID(), wanda.getUUID(), wanda.getGameProfile().getName(), wanda.position(), radius,
-                Set.of(), false, level.getGameTime(), false);
+                Set.of(), false, level.getGameTime(), false, false, 0L, AbilityColors.chosen(wanda, HeroAbility.WANDA_HEX));
         save(level, data(level).with(hex));
         // Volume above 1 widens the range: everyone inside the new Hex hears it rise.
         level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), ModSounds.HEX_RISE.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 16.0F), 1.0F);
-        level.sendParticles(new EnergyParticleOptions(WandaAbilities.color(wanda), 2.0F), wanda.getX(), wanda.getY() + 1, wanda.getZ(),
-                150, 1.5, 1.5, 1.5, 0.4);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(wanda, HeroAbility.WANDA_HEX, WandaAbilities.color(wanda)), 2.0F),
+                wanda.getX(), wanda.getY() + 1, wanda.getZ(), 150, 1.5, 1.5, 1.5, 0.4);
         wanda.displayClientMessage(Component.translatable("message.enhanced.hex.created"), true);
         // "When Wanda raises the Hex, Vision appears": the one who will fight at her side while it stands.
         HexVisions.raise(wanda, hex);
@@ -459,7 +461,12 @@ public final class HexManager {
         }
         entity.setDeltaMovement(Vec3.ZERO);
         entity.resetFallDistance();
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.5F), spot.x, spot.y + 1, spot.z, 20, 0.4, 0.6, 0.4, 0.05);
+        level.sendParticles(new EnergyParticleOptions(wallColor(hex), 1.5F), spot.x, spot.y + 1, spot.z, 20, 0.4, 0.6, 0.4, 0.05);
+    }
+
+    /** 3.5: the colour of a Hex's wall: its own raspberry red, or the colour a custom hero's pick chose. */
+    public static int wallColor(Hex hex) {
+        return hex.color() < 0 ? Power.SCARLET_WITCH.color : hex.color();
     }
 
     /** What the wall makes of something crossing it into the Hex. */
@@ -551,7 +558,7 @@ public final class HexManager {
             return true;
         }
         Vec3 at = bodyCenter(entity);
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.8F), at.x, at.y, at.z, 40,
+        level.sendParticles(new EnergyParticleOptions(wallColor(hex), 1.8F), at.x, at.y, at.z, 40,
                 entity.getBbWidth() * 0.6, entity.getBbHeight() * 0.5, entity.getBbWidth() * 0.6, 0.05);
         level.playSound(null, at.x, at.y, at.z, ModSounds.HEX_CROSS.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
         entity.hurt(ModDamageTypes.source(level, ModDamageTypes.HEX_WALL), 1.0E6F);
@@ -564,7 +571,7 @@ public final class HexManager {
         if (entity instanceof ServerPlayer player) {
             player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);
         }
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.5F), entity.getX(), entity.getY() + 1, entity.getZ(),
+        level.sendParticles(new EnergyParticleOptions(wallColor(hex), 1.5F), entity.getX(), entity.getY() + 1, entity.getZ(),
                 20, 0.4, 0.6, 0.4, 0.05);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SHULKER_BULLET_HURT, SoundSource.PLAYERS, 1.0F, 0.6F);
     }

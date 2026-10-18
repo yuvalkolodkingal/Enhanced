@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpeedConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -66,6 +68,12 @@ public final class SpeedStrikes {
          */
         public static Style of(Player player, Power hero) {
             return Powers.get(player).power() == hero ? of(hero) : new Style(Powers.color(player), Powers.glow(player));
+        }
+
+        /** 3.5: the colours of one ability's strike: the colour its pick chose (and its glow), else {@link #of(Player, Power)}. */
+        public static Style of(Player player, Power hero, HeroAbility row) {
+            int chosen = AbilityColors.chosen(player, row);
+            return chosen < 0 ? of(player, hero) : new Style(chosen, AbilityColors.glowOf(chosen));
         }
     }
 

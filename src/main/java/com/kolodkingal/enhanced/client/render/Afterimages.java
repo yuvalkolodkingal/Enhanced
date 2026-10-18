@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -57,7 +58,9 @@ public final class Afterimages {
         // Tommy's trail is teal-green (WandaVision); Fox Quicksilver leaves no coloured glow, only a grey blur; 3.4: a
         // custom hero's is his glow.
         Power power = Powers.power(player);
-        return power == Power.CUSTOM ? Powers.glow(player) & 0xFFFFFF : power == Power.TOMMY ? 0x7FD8B8 : 0xC8D0D8;
+        int ghost = power == Power.CUSTOM ? Powers.glow(player) & 0xFFFFFF : power == Power.TOMMY ? 0x7FD8B8 : 0xC8D0D8;
+        // (3.5: a custom hero's ghosts in the colour his run's pick chose.)
+        return AbilityColors.color(player, AbilityColors.first(player, HeroAbility.QUICKSILVER_SPEED, HeroAbility.TOMMY_SPEED), ghost);
     }
 
     public static void render(RenderPlayerEvent.Post event) {

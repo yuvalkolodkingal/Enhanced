@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.PhoenixBurstPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -75,6 +77,21 @@ public final class PhoenixFx {
     }
 
     private static final List<Burst> BURSTS = new ArrayList<>();
+    /** 3.5: the colour a custom hero's pick chose for what is being drawn now, or -1 (the Phoenix's fire and violet). */
+    private static int tint = -1;
+    /** 3.5: a grey copy of the flame lattice, tinted to a chosen colour. */
+    private static final ResourceLocation FLAME_GREY = Enhanced.id("textures/entity/custom/phoenix_flame_grey.png");
+
+    /** One of the Phoenix's colours, or it recoloured to the colour chosen for what is being drawn. */
+    private static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
+    /** The colour chosen for a Burst (its caster's pick of the Burst), or -1. */
+    private static int tintOf(Burst burst) {
+        ClientLevel level = Minecraft.getInstance().level;
+        return level == null ? -1 : AbilityColors.chosen(level.getEntity(burst.caster()), HeroAbility.PHOENIX_BURST);
+    }
     /** Phoenixes who charge now: the game time N went down (as the client saw the bit rise). */
     private static final Map<Integer, Long> CHARGING = new HashMap<>();
     /** The Psionic Fields that closed lately: the player and the game time. */
@@ -187,24 +204,30 @@ public final class PhoenixFx {
                 continue;
             }
             if (data.is(Live.PHOENIX_CHARGING)) {
+                tint = AbilityColors.chosen(player, HeroAbility.PHOENIX_BURST);
                 chargeParticles(level, camera, player, chargeOf(player, now), thin, random);
             }
             Long dome = DOMES.get(id);
             if (dome != null && now - dome <= PhoenixMath.DOME_GROW_TICKS) {
+                tint = AbilityColors.chosen(player, HeroAbility.PHOENIX_PSIONIC_FIELD);
                 domeParticles(level, camera, player, now - dome, thin, random);
             }
             if (data.toggle(Toggle.MIND_READING) && !data.is(Live.PHOENIX_CHARGING) && player.tickCount % 7 == player.getId() % 7
                     && random.nextFloat() < thin) {
+                tint = AbilityColors.chosen(player, HeroAbility.PHOENIX_MIND);
                 readingMote(level, camera, player, random);
             }
+            tint = -1;
         }
         CHARGING.keySet().retainAll(seen);
         DOMES.keySet().retainAll(seen);
         WAS_PSIONIC.retainAll(seen);
 
         for (Burst burst : BURSTS) {
+            tint = tintOf(burst);
             burstParticles(level, burst, now - burst.start(), camera, thin, random);
         }
+        tint = -1;
     }
 
     /**
@@ -225,7 +248,7 @@ public final class PhoenixFx {
             if (PhoenixMath.tooCloseToCamera(at.distanceToSqr(camera))) {
                 continue; // her own shoulders, seen from inside her head
             }
-            int colour = random.nextInt(3) == 0 ? PhoenixMath.FIRE_CORE : random.nextBoolean() ? PhoenixMath.FIRE_GOLD : PhoenixMath.FIRE_MAIN;
+            int colour = random.nextInt(3) == 0 ? c(PhoenixMath.FIRE_CORE) : random.nextBoolean() ? c(PhoenixMath.FIRE_GOLD) : c(PhoenixMath.FIRE_MAIN);
             level.addParticle(new EnergyParticleOptions(colour, 0.9F), at.x + (random.nextDouble() - 0.5) * 0.2, at.y,
                     at.z + (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.02, 0.05 + random.nextDouble() * 0.05,
                     (random.nextDouble() - 0.5) * 0.02);
@@ -247,7 +270,7 @@ public final class PhoenixFx {
             double angle = random.nextDouble() * Mth.TWO_PI;
             double tilt = (random.nextDouble() - 0.5) * 0.6;
             double flat = Math.cos(tilt) * radius;
-            int colour = random.nextInt(3) == 0 ? PhoenixAbilities.PSY_CORE : PhoenixAbilities.PSY_MAIN;
+            int colour = random.nextInt(3) == 0 ? c(PhoenixAbilities.PSY_CORE) : c(PhoenixAbilities.PSY_MAIN);
             double x = centre.x + Math.cos(angle) * flat;
             double y = centre.y + Math.sin(tilt) * radius;
             double z = centre.z + Math.sin(angle) * flat;
@@ -266,7 +289,7 @@ public final class PhoenixFx {
         if (PhoenixMath.tooCloseToCamera(camera.distanceToSqr(x, y, z))) {
             return; // her own head, seen from inside it
         }
-        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? PhoenixAbilities.PSY_MAIN : PhoenixAbilities.PSY_CORE, 0.7F), x, y, z,
+        level.addParticle(new EnergyParticleOptions(random.nextBoolean() ? c(PhoenixAbilities.PSY_MAIN) : c(PhoenixAbilities.PSY_CORE), 0.7F), x, y, z,
                 0.0, 0.015, 0.0);
     }
 
@@ -294,7 +317,7 @@ public final class PhoenixFx {
                     continue;
                 }
                 double push = 0.3 + random.nextDouble() * 0.3;
-                int colour = random.nextInt(4) == 0 ? PhoenixMath.FIRE_CORE : random.nextBoolean() ? PhoenixMath.FIRE_GOLD : PhoenixMath.FIRE_MAIN;
+                int colour = random.nextInt(4) == 0 ? c(PhoenixMath.FIRE_CORE) : random.nextBoolean() ? c(PhoenixMath.FIRE_GOLD) : c(PhoenixMath.FIRE_MAIN);
                 level.addParticle(new EnergyParticleOptions(colour, 1.0F + random.nextFloat() * 0.6F), at.x, at.y, at.z, dir.x * push,
                         dir.y * push - 0.02, dir.z * push);
             }
@@ -404,14 +427,29 @@ public final class PhoenixFx {
             RenderType type = lines ? EnhancedRenderTypes.energyField(FLAME_TEXTURE) : EnhancedRenderTypes.ENERGY_VEIL;
             VertexConsumer vc = buffers.getBuffer(type);
             for (Burst burst : BURSTS) {
-                shell(pose, vc, camera, burst, time, lines);
+                if (tintOf(burst) < 0) {
+                    shell(pose, vc, camera, burst, time, lines);
+                }
             }
             buffers.endBatch(type);
+            // (3.5: a Burst in a chosen colour, on the grey lattice tinted.)
+            RenderType grey = lines ? EnhancedRenderTypes.energyField(FLAME_GREY) : EnhancedRenderTypes.ENERGY_VEIL;
+            VertexConsumer gc = buffers.getBuffer(grey);
+            for (Burst burst : BURSTS) {
+                tint = tintOf(burst);
+                if (tint >= 0) {
+                    shell(pose, gc, camera, burst, time, lines);
+                }
+            }
+            tint = -1;
+            buffers.endBatch(grey);
             RenderType domeType = lines ? EnhancedRenderTypes.energyField(WorldEffectsRenderer.HEX_TEXTURE) : EnhancedRenderTypes.ENERGY_VEIL;
             VertexConsumer dc = buffers.getBuffer(domeType);
             for (AbstractClientPlayer player : fields) {
+                tint = AbilityColors.chosen(player, HeroAbility.PHOENIX_PSIONIC_FIELD);
                 dome(pose, dc, camera, player, partialTick, time, lines);
             }
+            tint = -1;
             buffers.endBatch(domeType);
         }
 
@@ -423,11 +461,14 @@ public final class PhoenixFx {
             RenderType type = glow ? EnhancedRenderTypes.ENERGY_BEAM : EnhancedRenderTypes.ENERGY_VEIL;
             VertexConsumer vc = buffers.getBuffer(type);
             for (Burst burst : BURSTS) {
+                tint = tintOf(burst);
                 burstRibbons(pose, vc, glow, camera, burst, time);
             }
             for (AbstractClientPlayer player : charging) {
+                tint = AbilityColors.chosen(player, HeroAbility.PHOENIX_BURST);
                 charge(pose, vc, glow, camera, player, partialTick, time);
             }
+            tint = -1;
             buffers.endBatch(type);
         }
     }
@@ -449,9 +490,9 @@ public final class PhoenixFx {
             float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 4.0F));
             float tilesV = Math.max(3, Math.round(Mth.PI * radius / 4.0F));
             EnergyGeometry.sphere(pose, vc, centre, radius, SHELL_SEGMENTS, SHELL_SEGMENTS / 2, tilesU, tilesV, -time * 0.03F,
-                    PhoenixMath.FIRE_MAIN, 0.40F * alpha * 2.0F * grain, 0.80F * alpha * 2.0F * grain);
+                    c(PhoenixMath.FIRE_MAIN), 0.40F * alpha * 2.0F * grain, 0.80F * alpha * 2.0F * grain);
         } else {
-            EnergyGeometry.veil(pose, vc, centre, radius, SHELL_SEGMENTS, SHELL_SEGMENTS / 2, PhoenixMath.FIRE_EMBER, 0.14F * alpha * 2.0F,
+            EnergyGeometry.veil(pose, vc, centre, radius, SHELL_SEGMENTS, SHELL_SEGMENTS / 2, c(PhoenixMath.FIRE_EMBER), 0.14F * alpha * 2.0F,
                     0.70F * alpha * 2.0F);
         }
     }
@@ -485,11 +526,11 @@ public final class PhoenixFx {
                 Vec3 head = centre.add(dir.scale(reach * jitter));
                 Vec3 tail = centre.add(dir.scale(Math.max(0.0F, reach * jitter - length)));
                 if (glow) {
-                    EnergyGeometry.ribbon(pose, vc, tail, head, 0.0F, 0.04F, EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.0F),
-                            EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.6F * fade));
+                    EnergyGeometry.ribbon(pose, vc, tail, head, 0.0F, 0.04F, EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.0F),
+                            EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.6F * fade));
                 } else {
-                    int colour = PhoenixMath.mix(PhoenixMath.FIRE_MAIN, PhoenixMath.FIRE_GOLD, jitter * 2.0F - 1.0F);
-                    EnergyGeometry.ribbon(pose, vc, tail, head, 0.01F, 0.10F, EnergyGeometry.argb(PhoenixMath.FIRE_EMBER, 0.0F),
+                    int colour = PhoenixMath.mix(c(PhoenixMath.FIRE_MAIN), c(PhoenixMath.FIRE_GOLD), jitter * 2.0F - 1.0F);
+                    EnergyGeometry.ribbon(pose, vc, tail, head, 0.01F, 0.10F, EnergyGeometry.argb(c(PhoenixMath.FIRE_EMBER), 0.0F),
                             EnergyGeometry.argb(colour, 0.85F * fade));
                 }
             }
@@ -508,8 +549,8 @@ public final class PhoenixFx {
             float fade = 1.0F - age / PhoenixMath.BURST_TICKS;
             Vec3 ground = new Vec3(burst.centre().x, burst.groundY() + 0.05, burst.centre().z).subtract(camera);
             if (foot > 0.3F) {
-                EnergyGeometry.ring(pose, vc, ground, UP, foot, 0.5F, 48, EnergyGeometry.argb(PhoenixMath.FIRE_DEEP, 0.55F * fade));
-                EnergyGeometry.ring(pose, vc, ground, UP, foot * 0.65F, 0.35F, 40, EnergyGeometry.argb(PhoenixMath.FIRE_EMBER, 0.35F * fade));
+                EnergyGeometry.ring(pose, vc, ground, UP, foot, 0.5F, 48, EnergyGeometry.argb(c(PhoenixMath.FIRE_DEEP), 0.55F * fade));
+                EnergyGeometry.ring(pose, vc, ground, UP, foot * 0.65F, 0.35F, 40, EnergyGeometry.argb(c(PhoenixMath.FIRE_EMBER), 0.35F * fade));
             }
         }
     }
@@ -530,12 +571,12 @@ public final class PhoenixFx {
         Vec3 side = toCamera.cross(UP);
         side = side.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : side.normalize();
         Vec3 up = side.cross(toCamera.normalize()).normalize();
-        EnergyGeometry.ring(pose, vc, centre, toCamera, radius * 0.7F, radius * 0.9F, 16, EnergyGeometry.argb(PhoenixMath.FIRE_GOLD, 0.35F * alpha));
-        EnergyGeometry.ring(pose, vc, centre, toCamera, radius * 0.35F, radius * 0.7F, 14, EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.9F * alpha));
+        EnergyGeometry.ring(pose, vc, centre, toCamera, radius * 0.7F, radius * 0.9F, 16, EnergyGeometry.argb(c(PhoenixMath.FIRE_GOLD), 0.35F * alpha));
+        EnergyGeometry.ring(pose, vc, centre, toCamera, radius * 0.35F, radius * 0.7F, 14, EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.9F * alpha));
         EnergyGeometry.ribbon(pose, vc, centre.subtract(side.scale(radius * 1.6)), centre.add(side.scale(radius * 1.6)), radius * 0.2F,
-                EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.8F * alpha), EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.8F * alpha));
+                EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.8F * alpha), EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.8F * alpha));
         EnergyGeometry.ribbon(pose, vc, centre.subtract(up.scale(radius * 1.6)), centre.add(up.scale(radius * 1.6)), radius * 0.2F,
-                EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.8F * alpha), EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.8F * alpha));
+                EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.8F * alpha), EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.8F * alpha));
     }
 
     /**
@@ -574,11 +615,11 @@ public final class PhoenixFx {
                     // Thinner and fainter the nearer to the camera, so the spirals round her never fill her own screen.
                     float near = (float) Mth.clamp(at.length() / 3.0, 0.12, 1.0);
                     if (glow) {
-                        EnergyGeometry.ribbon(pose, vc, previous, at, 0.025F * near, 0.025F * near, EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.7F * a * near * previousFade),
-                                EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.7F * a * near * fade));
+                        EnergyGeometry.ribbon(pose, vc, previous, at, 0.025F * near, 0.025F * near, EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.7F * a * near * previousFade),
+                                EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.7F * a * near * fade));
                     } else {
-                        EnergyGeometry.ribbon(pose, vc, previous, at, 0.08F * near, 0.08F * near, EnergyGeometry.argb(PhoenixMath.FIRE_GOLD, a * near * previousFade),
-                                EnergyGeometry.argb(PhoenixMath.FIRE_MAIN, a * near * fade));
+                        EnergyGeometry.ribbon(pose, vc, previous, at, 0.08F * near, 0.08F * near, EnergyGeometry.argb(c(PhoenixMath.FIRE_GOLD), a * near * previousFade),
+                                EnergyGeometry.argb(c(PhoenixMath.FIRE_MAIN), a * near * fade));
                     }
                 }
                 previous = at;
@@ -612,8 +653,8 @@ public final class PhoenixFx {
                 float a1 = PhoenixMath.fireAlpha(t1) * alpha;
                 if (glow) {
                     EnergyGeometry.ribbon(pose, vc, a, b, w0 * 3.0F, w1 * 3.0F, EnergyGeometry.argb(c0, 0.25F * a0), EnergyGeometry.argb(c1, 0.25F * a1));
-                    EnergyGeometry.ribbon(pose, vc, a, b, w0 * 0.5F, w1 * 0.5F, EnergyGeometry.argb(PhoenixMath.FIRE_CORE, 0.7F * a0),
-                            EnergyGeometry.argb(PhoenixMath.mix(PhoenixMath.FIRE_CORE, c1, t1), 0.7F * a1));
+                    EnergyGeometry.ribbon(pose, vc, a, b, w0 * 0.5F, w1 * 0.5F, EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.7F * a0),
+                            EnergyGeometry.argb(PhoenixMath.mix(c(PhoenixMath.FIRE_CORE), c1, t1), 0.7F * a1));
                 } else {
                     EnergyGeometry.ribbon(pose, vc, a, b, w0 * 1.6F, w1 * 1.6F, EnergyGeometry.argb(c0, a0), EnergyGeometry.argb(c1, a1));
                 }
@@ -638,10 +679,10 @@ public final class PhoenixFx {
             float tilesU = Math.max(6, Math.round(Mth.TWO_PI * radius / 6.0F));
             float tilesV = Math.max(3, Math.round(Mth.PI * radius / 6.0F));
             // The lines are the deeper violet, so that added to a bright sky they do not turn white.
-            EnergyGeometry.sphere(pose, vc, centre, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F, PhoenixAbilities.PSY_BODY,
+            EnergyGeometry.sphere(pose, vc, centre, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F, c(PhoenixAbilities.PSY_BODY),
                     0.40F * alpha, 0.80F * alpha);
         } else {
-            EnergyGeometry.veil(pose, vc, centre, radius, segments, segments / 2, PhoenixAbilities.PSY_FRINGE, 0.22F * alpha, 0.50F * alpha);
+            EnergyGeometry.veil(pose, vc, centre, radius, segments, segments / 2, c(PhoenixAbilities.PSY_FRINGE), 0.22F * alpha, 0.50F * alpha);
         }
     }
 

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -82,8 +83,8 @@ public final class VisionAbilities {
                 if (down) {
                     data.setDisguise(!data.disguise());
                     player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 0.8F, 1.2F);
-                    player.serverLevel().sendParticles(new EnergyParticleOptions(Powers.glow(player), 1.4F), player.getX(), player.getY() + 1, player.getZ(),
-                            30, 0.3, 0.8, 0.3, 0.02);
+                    player.serverLevel().sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_DISGUISE, Powers.glow(player)), 1.4F),
+                            player.getX(), player.getY() + 1, player.getZ(), 30, 0.3, 0.8, 0.3, 0.02);
                     player.displayClientMessage(Component.translatable(data.disguise()
                             ? "message.enhanced.disguise.on" : "message.enhanced.disguise.off"), true);
                 }
@@ -177,7 +178,8 @@ public final class VisionAbilities {
         }
         Vec3 end = hit.getLocation();
         if (player.tickCount % 2 == 0) {
-            level.sendParticles(new EnergyParticleOptions(Powers.glow(player), 1.4F), end.x, end.y, end.z, 4, 0.12, 0.12, 0.12, 0.12);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_MIND_BEAM, Powers.glow(player)), 1.4F), end.x, end.y, end.z,
+                    4, 0.12, 0.12, 0.12, 0.12);
         }
     }
 
@@ -240,7 +242,8 @@ public final class VisionAbilities {
                     Mth.clamp(player.getZ(), border.getMinZ() + half, border.getMaxZ() - half));
         }
         if (!player.isSpectator() && player.tickCount % 4 == 0) {
-            player.serverLevel().sendParticles(new EnergyParticleOptions(Powers.glow(player), 0.9F), player.getX(), player.getY() + 1.0, player.getZ(),
+            player.serverLevel().sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_PHASE, Powers.glow(player)), 0.9F),
+                    player.getX(), player.getY() + 1.0, player.getZ(),
                     1, 0.3, 0.7, 0.3, 0.0);
         }
     }
@@ -259,6 +262,7 @@ public final class VisionAbilities {
             player.onUpdateAbilities();
         }
         player.displayClientMessage(Component.translatable(dense ? "message.enhanced.dense.on" : "message.enhanced.dense.off"), true);
+        AbilityColors.mark(player, HeroAbility.VISION_DENSITY);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 dense ? SoundEvents.ANVIL_PLACE : SoundEvents.ARMOR_EQUIP_ELYTRA.value(), SoundSource.PLAYERS, 0.7F, dense ? 0.6F : 1.4F);
     }
