@@ -149,7 +149,7 @@ Wait: a player is steered for 8 seconds at most, and only with PvP on. Hurting P
 
 ### Why did Billy's Hex Barrier break at once?
 
-Any power of a **Scarlet Witch** shatters it, whatever health it had (chaos magic). Anything else wears down its 30 health. When it shatters, wait 10 seconds; it mends while it is down. See [Billy](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held).
+Since 3.3.1 it does not: only **chaos magic** (a Scarlet Witch's powers) and **dark magic** (the Darkhold's, Agatha's) wear down its 60 health, each by its damage; nothing else wears it at all. When it shatters, wait 10 seconds; it mends while it is down. See [Billy](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held).
 
 ### Why does nothing get through Wanda's Hex wall any more?
 
