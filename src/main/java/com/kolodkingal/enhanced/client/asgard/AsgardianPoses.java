@@ -36,7 +36,7 @@ public final class AsgardianPoses {
     static float lowerOf(NpcState state) {
         return switch (state) {
             case SITTING -> 0.62F;
-            case DOWN -> 0.42F;
+            case DOWN -> 0.3F;
             default -> 0.0F;
         };
     }
@@ -237,16 +237,16 @@ public final class AsgardianPoses {
         float breath = Mth.sin(ageInTicks * 0.2F) * 0.05F;
         model.head.xRot = 0.6F + breath;
         model.head.yRot = 0.0F;
-        model.body.xRot = 0.35F + breath * 0.5F;
-        model.rightLeg.xRot = -1.45F;
-        model.rightLeg.yRot = 0.15F;
-        model.rightLeg.z = -1.5F;
-        model.leftLeg.xRot = 0.9F;
-        model.leftLeg.z = 2.5F;
-        model.rightArm.xRot = -0.45F;
-        model.rightArm.zRot = 0.2F;
-        model.leftArm.xRot = -0.7F;
-        model.leftArm.zRot = -0.15F;
+        model.body.xRot = 0.25F + breath * 0.5F;
+        // The right knee up before him, the left knee on the ground behind.
+        model.rightLeg.xRot = -1.15F;
+        model.rightLeg.yRot = 0.1F;
+        model.leftLeg.xRot = 1.05F;
+        model.leftLeg.z = 1.5F;
+        model.rightArm.xRot = -0.9F;
+        model.rightArm.zRot = 0.15F;
+        model.leftArm.xRot = -0.35F;
+        model.leftArm.zRot = -0.1F;
         model.head.y = 1.5F;
         model.rightArm.y = 3.0F;
         model.leftArm.y = 3.0F;

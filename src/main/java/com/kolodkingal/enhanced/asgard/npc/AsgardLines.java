@@ -4,7 +4,6 @@ import com.kolodkingal.enhanced.asgard.AsgardProgress;
 import com.kolodkingal.enhanced.asgard.CityPlan;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Ctx;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Option;
-import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -21,9 +20,9 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 /**
- * The lines of every Asgardian but the nodes the other lanes add (Heimdall's Watch: L2; Odin's nodes once awake: L3;
+ * The lines of every Asgardian but the nodes the other lanes add (Heimdall's whole table: L2; Odin's nodes once awake: L3;
  * Hela's warnings: L4). Our own words, never the films'. The chain of hints: Frigga, Hogun, Valkyrie and the citizens
- * speak of Hela's Seal behind the throne and of her army; Sif, Heimdall and the Einherjar of Heimdall's Watch (and
+ * speak of Hela's Seal behind the throne and of her army; Sif and the Einherjar of Heimdall's Watch (and
  * Hofund); Frigga, Fandral, Hogun and the citizens of Gungnir in the vault, for the one who faces Hela.
  */
 final class AsgardLines {
@@ -49,7 +48,6 @@ final class AsgardLines {
 
     static void registerAll() {
         common();
-        heimdall();
         odin();
         frigga();
         sif();
@@ -75,10 +73,9 @@ final class AsgardLines {
         AsgardDialogue.variants("npc.enhanced.common.manners", 4);
         AsgardDialogue.lines("npc.enhanced.common.manners", "npc.enhanced.common.busy", "npc.enhanced.common.down",
                 "npc.enhanced.sif.duel_score", "npc.enhanced.sif.duel_won", "npc.enhanced.sif.duel_lost", "npc.enhanced.sif.duel_draw",
-                "npc.enhanced.heimdall.arrival", "npc.enhanced.frigga.odin_asleep", "npc.enhanced.valkyrie.horse",
+                "npc.enhanced.frigga.odin_asleep", "npc.enhanced.valkyrie.horse",
                 "npc.enhanced.screen.farewell", "item.enhanced.sif_token", "item.enhanced.asgard_mead",
                 "item.enhanced.valkyrie_horse");
-        AsgardDialogue.variants("npc.enhanced.heimdall.arrival", 3);
         for (Place place : PLACES) {
             AsgardDialogue.lines("npc.enhanced.place." + place.id());
         }
@@ -113,24 +110,6 @@ final class AsgardLines {
                 ctx.npc().openTrades(ctx.player());
             }
         });
-    }
-
-    // ---- Heimdall (the Watch is lane L2's: it adds an answer to these greetings) ----
-
-    private static void heimdall() {
-        Role role = Role.HEIMDALL;
-        List<Option> answers = List.of(Option.to("open_bifrost", "bifrost"), Option.to("who_m", "who"));
-        AsgardDialogue.node(role, "greeting").when(AsgardDialogue.ALWAYS).variants(3).options(answers).register();
-        AsgardDialogue.node(role, "greeting_first").when(not(AsgardProgress.MET_HEIMDALL)).priority(20).options(answers).register();
-        AsgardDialogue.node(role, "bifrost")
-                .option("send_home", AsgardDialogue.ALWAYS, ctx -> Bifrost.open(ctx.player(), Bifrost.Destination.HOME, Bifrost.Source.NPC))
-                .option("came_from", ctx -> ctx.progress().cameFrom() != null,
-                        ctx -> Bifrost.open(ctx.player(), Bifrost.Destination.CAME_FROM, Bifrost.Source.NPC))
-                .option(Option.close("not_now"))
-                .register();
-        AsgardDialogue.node(role, "who").option(Option.to("hofund_how", "hofund")).option(Option.close("thanks")).register();
-        AsgardDialogue.node(role, "hofund").option(Option.close("thanks")).register();
-        reactions(role, answers, List.of(Power.THOR, Power.LOKI, Power.HELA, Power.ODIN, Power.HEIMDALL));
     }
 
     // ---- Odin (asleep: Frigga answers for him; awake: lane L3 adds his nodes above these) ----

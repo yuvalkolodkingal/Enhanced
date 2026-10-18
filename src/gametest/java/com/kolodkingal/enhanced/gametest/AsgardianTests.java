@@ -236,7 +236,7 @@ public final class AsgardianTests {
     public static void theNodeFollowsThePlayersStory(GameTestHelper helper) {
         TestKit.Fixture fx = AsgardTestSupport.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
-        AsgardianEntity heimdall = npc(fx, Role.HEIMDALL, 7.5, 5.5);
+        AsgardianEntity sif = npc(fx, Role.SIF, 7.5, 5.5);
         AsgardianEntity frigga = npc(fx, Role.FRIGGA, 5.5, 7.5);
         AsgardianEntity odin = npc(fx, Role.ODIN, 3.5, 5.5);
         AsgardState state = AsgardState.get(fx.level().getServer());
@@ -249,12 +249,12 @@ public final class AsgardianTests {
         state.setOdinAwake(false);
         state.setHelaDefeats(0);
         // First visit, then the usual greeting.
-        check("greeting_first".equals(picked(player, heimdall)), "Heimdall greets a first visitor: " + picked(player, heimdall));
-        check(AsgardTalk.begin(player, heimdall), "the talk opens");
+        check("greeting_first".equals(picked(player, sif)), "Sif greets a newcomer: " + picked(player, sif));
+        check(AsgardTalk.begin(player, sif), "the talk opens");
         check("greeting_first".equals(AsgardTalk.currentNode(player)), "with the first greeting");
-        check(player.getData(ModAttachments.ASGARD).has(AsgardProgress.MET_HEIMDALL), "and he has met Heimdall");
-        check("greeting".equals(picked(player, heimdall)), "then the usual greeting");
-        check(AsgardTalk.offered(player).containsAll(List.of("open_bifrost", "who_m")), "Bifrost and lore answers");
+        check(player.getData(ModAttachments.ASGARD).has(AsgardProgress.TALKED_SIF), "and he has talked to Sif");
+        check("greeting".equals(picked(player, sif)), "then the usual greeting");
+        check(AsgardTalk.offered(player).containsAll(List.of("train", "trade", "ask_advice")), "training, trades, advice");
         AsgardTalk.end(player);
         // Odin asleep: Frigga's words; awake: his own.
         check(AsgardDialogue.pick(ctx(player, odin)) == null, "asleep, Odin has no node of his own");
@@ -442,6 +442,20 @@ public final class AsgardianTests {
         Asgardians.bowTo(odin);
         check(citizen.state() == NpcState.BOWING, "those who see him bow");
         helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = FIGHT, timeoutTicks = 220)
+    public static void theAllfathersCommandMakesTheEinherjarStrike(GameTestHelper helper) {
+        TestKit.Fixture fx = TestKit.fixture(helper);
+        ServerPlayer odin = fx.player(2.5, FLOOR, 2.5);
+        AsgardianEntity guard = npc(fx, Role.EINHERJAR, 8.5, 8.5);
+        Zombie zombie = mob(fx, EntityType.ZOMBIE, 12.5, 12.5);
+        zombie.setNoAi(true);
+        check(Asgardians.command(odin, zombie, 400) == 1, "the guard answers the command");
+        fx.everyTick(200, tick -> {
+            check(guard.isAlive() && !guard.isDown(), "the guard stands");
+            return zombie.getLastHurtByMob() == guard || !zombie.isAlive();
+        });
     }
 
     @GameTest(template = ARENA, batch = FIGHT)

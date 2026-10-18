@@ -154,7 +154,8 @@ public class AsgardianRenderer extends LivingEntityRenderer<AsgardianEntity, Pla
     /** The named ones show their name when looked at (their custom name); the rest never. */
     @Override
     protected boolean shouldShowName(AsgardianEntity npc) {
-        return npc.role().named() && super.shouldShowName(npc);
+        return npc.role().named() && super.shouldShowName(npc)
+                && (npc.shouldShowName() || npc.hasCustomName() && npc == entityRenderDispatcher.crosshairPickEntity);
     }
 
     /** A cape swinging behind him as he walks (Odin's red, Frigga's long ivory, Valkyrie's blue, the Einherjar's red). */
