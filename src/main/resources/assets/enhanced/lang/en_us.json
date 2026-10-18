@@ -2901,6 +2901,7 @@
   "preset.enhanced.heimdall": "Heimdall-like",
   "preset.enhanced.heimdall.desc": "Hofund, the all-seeing sight and the Bifrost",
   "anim.enhanced.run.heimdall": "Heimdall",
+  "anim.enhanced.run.odin": "Odin",
   "message.enhanced.odin.asleep": "You sleep the Odinsleep. Press the key of the Odinsleep again to wake.",
   "message.enhanced.odin.sleep_start": "The Odinsleep takes you. Rest, Allfather.",
   "message.enhanced.odin.sleep_woken": "You wake from the Odinsleep.",
