@@ -1411,5 +1411,18 @@
   "screen.enhanced.road.later": "Not yet",
   "screen.enhanced.road.leave": "Leave the Road",
   "message.enhanced.road.cannot_leave": "The Road could not let you go. Try /road leave again.",
-  "road.enhanced.challenge.structure_copy.short": "The Copy"
+  "road.enhanced.challenge.structure_copy.short": "The Copy",
+  "key.enhanced.web_assist": "Web Assist (Spider-Man)",
+  "message.enhanced.web_assist.on": "Web Assist on: hold Sneak + G to swing, keep holding G to swing on",
+  "message.enhanced.web_assist.off": "Web Assist off: manual swing, aim with the crosshair",
+  "message.enhanced.web_assist.server_off": "Web Assist is switched off on this server: manual swing",
+  "hud.enhanced.web_assist": "assist",
+  "hud.enhanced.web_manual": "manual",
+  "enhanced.configuration.spider_man": "Spider-Man",
+  "enhanced.configuration.spider_man.tooltip": "Web Assist: easy swinging, and the preview of the next web.",
+  "enhanced.configuration.spider_man.button": "Edit…",
+  "config.enhanced.web_assist": "Web Assist",
+  "config.enhanced.web_assist.tooltip": "The swing chooses its own anchor ahead and above (trees count), keeps clear of the ground and the leaves, lets go at the best moment and swings on while G is held. Off: the manual swing, aimed with the crosshair. The J key switches it too.",
+  "config.enhanced.web_assist_preview": "Web Assist preview",
+  "config.enhanced.web_assist_preview.tooltip": "Show where the next web would go (a small white web) while you are in the air or sneaking."
 }

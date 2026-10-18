@@ -7,10 +7,12 @@ import com.kolodkingal.enhanced.ability.SpiderClimb;
 import com.kolodkingal.enhanced.ability.SpiderMath;
 import com.kolodkingal.enhanced.ability.SpiderServer;
 import com.kolodkingal.enhanced.ability.SpiderWebs;
+import com.kolodkingal.enhanced.ability.SwingAssist;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
+import com.kolodkingal.enhanced.network.SpiderSwingPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -25,6 +27,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -59,6 +62,13 @@ import org.lwjgl.glfw.GLFW;
  * stopped the web, a shield took it) cancels the prediction after a few ticks. A zip the server has seen to its end
  * (arrived) is finished by the client alone: the server calls it arrived a block short, to let others see him cling at
  * once.
+ *
+ * <p>Web Assist (3.3, on by default, {@link EnhancedClientConfig#webAssist}): the swing's anchor is chosen by
+ * {@link SwingAssist} when G is pressed, and told to the server at that very moment ({@link SpiderSwingPayload}, before
+ * the ability key), which checks it and confirms it like a manual swing. While it swings the rope is reeled in near the
+ * ground, the swing is pushed along and turns gently after the camera, it lets go at its best moment, and while G is
+ * still held the next web goes out as he begins to fall; between two webs the air's drag is eased so that he keeps his
+ * speed. The anchor it would take next is shown ({@link #preview}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class SpiderMotion {
@@ -154,6 +164,8 @@ public final class SpiderMotion {
 
     // ---- swing ----
     private static Vec3 swingAnchor = Vec3.ZERO;
+    /** The point he swings about: the anchor, or for Web Assist the anchor pulled towards his way (SwingAssist.pivot). */
+    private static Vec3 swingPivot = Vec3.ZERO;
     private static Direction swingFace = Direction.UP;
     private static double swingRope;
     private static double swingRopeMax;
@@ -162,6 +174,35 @@ public final class SpiderMotion {
     private static boolean swingConfirmed;
     private static Vec3 swingLast = Vec3.ZERO;
     private static Vec3 swingVelocity = Vec3.ZERO;
+
+    // ---- Web Assist ----
+    /** The steering of an assisted swing turns his motion after the camera by at most this many degrees a tick. */
+    private static final double STEER = 3.0;
+    /** Between two webs the air keeps this much of his horizontal speed a tick (vanilla's 0.91), for this many ticks. */
+    private static final double CARRY_DRAG = 0.98;
+    private static final double AIR_DRAG = 0.91;
+    private static final int CARRY_TICKS = 40;
+    /** After an assisted release with G still held, the next web goes out after this many ticks, at the latest these. */
+    private static final int CHAIN_MIN = 3;
+    private static final int CHAIN_MAX = 12;
+    /** The web boost of the open-land "zip": speed ahead, and up. */
+    private static final double BOOST_AHEAD = 1.0;
+    private static final double BOOST_UP = 0.6;
+    /** The swing he is on was begun by Web Assist (and is on a point of the sky). */
+    private static boolean assisted;
+    private static boolean swingSky;
+    /** An anchor Web Assist chose as G was pressed: the next tick begins its swing. */
+    @Nullable
+    private static SwingAssist.Anchor pendingAssist;
+    private static Vec3 pendingHeading = Vec3.ZERO;
+    /** G is held after an assisted release: the next web goes out as he begins to fall. */
+    private static boolean chain;
+    private static int chainTicks;
+    private static int carry;
+    /** The anchor Web Assist would take now (the preview), and the tick it was found. */
+    @Nullable
+    private static SwingAssist.Anchor planned;
+    private static int plannedAt;
 
     // =================================================================================================================
     // What others (the effects, the animation, the HUD) may ask
@@ -183,6 +224,17 @@ public final class SpiderMotion {
         return mode == Mode.ZIP ? zipAnchor : mode == Mode.SWING ? swingAnchor : null;
     }
 
+    /** The anchor Web Assist would take next, to be shown, or null. */
+    @Nullable
+    public static SwingAssist.Anchor preview() {
+        return planned;
+    }
+
+    /** Whether the swing the local hero is on was chosen by Web Assist. */
+    public static boolean assisted() {
+        return mode == Mode.SWING && assisted;
+    }
+
     /** Whether a second press of Sneak + B would turn Instant Kill on (the first press asked for it). */
     public static boolean confirmPending(long now) {
         return now <= confirmUntil;
@@ -200,6 +252,11 @@ public final class SpiderMotion {
         jumpWas = false;
         toldKind = -1;
         settling = false;
+        assisted = false;
+        pendingAssist = null;
+        chain = false;
+        carry = 0;
+        planned = null;
     }
 
     // =================================================================================================================
@@ -266,6 +323,7 @@ public final class SpiderMotion {
         if (ability == 2) {
             pressedG = true;
             pressedGSneaking = sneaking;
+            pressAssisted(player, data, sneaking);
         } else if (ability == 4 && sneaking && !keysIgnored(player, data)) {
             // The same asking as the server's, so that the HUD can say "confirm?" (nothing is decided here).
             if (data.is(Live.INSTANT_KILL) || !legsOut(data) || !data.isReady(4, now)) {
@@ -323,6 +381,14 @@ public final class SpiderMotion {
         jumpWas = keys.jump();
         boolean blocked = blocked(player, data);
         boolean spellbound = player.hasEffect(ModEffects.SPELLBOUND);
+        if (pendingAssist != null) {
+            SwingAssist.Anchor anchor = pendingAssist;
+            pendingAssist = null;
+            pressedG = false;
+            if (!blocked && !spellbound) {
+                beginAssisted(player, anchor, pendingHeading);
+            }
+        }
         if (pressedG) {
             pressedG = false;
             if (!blocked && !spellbound) {
@@ -348,6 +414,7 @@ public final class SpiderMotion {
                 }
             }
         }
+        assistTick(mc, player, data, blocked || spellbound);
     }
 
     /**
@@ -727,20 +794,22 @@ public final class SpiderMotion {
         mantleTicks = 0;
         mode = Mode.SWING;
         swingAnchor = anchor;
+        swingPivot = anchor;
         swingFace = face;
         swingRope = rope;
         swingRopeMax = rope * MAX_ROPE_FACTOR;
         swingAge = 0;
         swingGround = 0;
         swingConfirmed = confirmed;
+        assisted = false;
+        swingSky = false;
+        chain = false;
+        carry = 0;
         Vec3 velocity = player.getDeltaMovement();
         if (player.onGround()) {
             // A swing begun on the ground hops him off it, and towards the anchor: from rest the pendulum's way down is
             // mostly into the floor (and Sneak keeps him from stepping off a ledge), so it would never get going.
-            Vec3 toward = new Vec3(anchor.x - player.getX(), 0, anchor.z - player.getZ());
-            toward = toward.lengthSqr() < 1.0 ? new Vec3(player.getLookAngle().x, 0, player.getLookAngle().z) : toward;
-            toward = toward.lengthSqr() < 1.0E-6 ? Vec3.ZERO : toward.normalize().scale(SWING_PUSH);
-            velocity = new Vec3(velocity.x + toward.x, Math.max(velocity.y, SWING_HOP), velocity.z + toward.z);
+            velocity = SwingAssist.hop(velocity, player.position(), anchor, player.getLookAngle(), SWING_HOP, SWING_PUSH);
         }
         swingVelocity = velocity;
         swingLast = player.position();
@@ -766,7 +835,7 @@ public final class SpiderMotion {
             return;
         }
         BlockPos behind = BlockPos.containing(swingAnchor.subtract(new Vec3(swingFace.getStepX(), swingFace.getStepY(), swingFace.getStepZ()).scale(0.1)));
-        if (swingConfirmed && level.getBlockState(behind).getCollisionShape(level, behind).isEmpty()) {
+        if (swingConfirmed && !swingSky && level.getBlockState(behind).getCollisionShape(level, behind).isEmpty()) {
             stopSwing(player, ANCHOR_LOST, false);
             return;
         }
@@ -775,23 +844,38 @@ public final class SpiderMotion {
             stopSwing(player, CANCELLED, false);
             return;
         }
+        if (assisted && swingSky && swingAge >= value(SpiderConfig.SKY_ANCHOR_MAX_TICKS, 60)) {
+            autoRelease(player);
+            return;
+        }
         swingAge++;
 
-        // W reels the web in, S lets it out; the keys also push him a little, in the camera's frame.
-        swingRope = Mth.clamp(swingRope - keys.forwardAxis() * REEL, MIN_ROPE, swingRopeMax);
         float yaw = player.getYRot() * Mth.DEG_TO_RAD;
         Vec3 ahead = new Vec3(-Mth.sin(yaw), 0, Mth.cos(yaw));
         Vec3 aside = new Vec3(-ahead.z, 0, ahead.x);
-        Vec3 push = ahead.scale(keys.forwardAxis()).add(aside.scale(-keys.leftAxis()));
-        Vec3 control = push.lengthSqr() > 1.0 ? push.normalize().scale(AIR_CONTROL) : push.scale(AIR_CONTROL);
-
         Vec3 position = player.position();
         Vec3 centre = position.add(0, 0.9, 0);
         Vec3 actual = swingAge == 1 ? player.getDeltaMovement() : position.subtract(swingLast);
-        double factor = SpiderMath.speedFactor(player);
-        double maxSpeed = value(SpiderConfig.SWING_MAX_SPEED, 1.8) * Mth.clamp(Math.sqrt(factor / PLAIN_FACTOR), 0.2, 1.6);
-        SpiderMath.Swing next = SpiderMath.swingStep(centre, actual, swingAnchor, swingRope, control, value(SpiderConfig.SWING_GRAVITY, 0.06),
-                SWING_DRAG, maxSpeed);
+        double maxSpeed = maxSwingSpeed(player);
+        Vec3 control;
+        if (assisted) {
+            // Web Assist: it lets go by itself at the best moment; the rope is reeled in near the ground, W pumps and S
+            // brakes instead of reeling, A and D push a little, and the arc turns gently after the camera.
+            if (SwingAssist.releaseNow(swingPivot, centre, actual, swingAge)) {
+                autoRelease(player);
+                return;
+            }
+            swingRope = SwingAssist.reel(level, swingPivot, swingRope, centre, actual);
+            actual = SwingAssist.steer(actual, SwingAssist.heading(player.getLookAngle(), Vec3.ZERO, player.getYRot()), STEER);
+            control = SwingAssist.pump(actual, centre, swingPivot, keys.forwardAxis(), maxSpeed).add(aside.scale(-keys.leftAxis() * AIR_CONTROL));
+        } else {
+            // W reels the web in, S lets it out; the keys also push him a little, in the camera's frame.
+            swingRope = Mth.clamp(swingRope - keys.forwardAxis() * REEL, MIN_ROPE, swingRopeMax);
+            Vec3 push = ahead.scale(keys.forwardAxis()).add(aside.scale(-keys.leftAxis()));
+            control = push.lengthSqr() > 1.0 ? push.normalize().scale(AIR_CONTROL) : push.scale(AIR_CONTROL);
+        }
+        SpiderMath.Swing next = SpiderMath.swingStep(centre, actual, swingPivot, swingRope, control, value(SpiderConfig.SWING_GRAVITY, 0.06),
+                assisted ? SwingAssist.DRAG : SWING_DRAG, maxSpeed);
         swingVelocity = next.velocity();
         swingLast = position;
         player.setDeltaMovement(next.velocity());
@@ -805,8 +889,7 @@ public final class SpiderMotion {
             return;
         }
         mode = Mode.NONE;
-        double factor = SpiderMath.speedFactor(player);
-        double maxSpeed = value(SpiderConfig.SWING_MAX_SPEED, 1.8) * Mth.clamp(Math.sqrt(factor / PLAIN_FACTOR), 0.2, 1.6);
+        double maxSpeed = maxSwingSpeed(player);
         Vec3 actual = swingAge <= 1 ? player.getDeltaMovement() : player.position().subtract(swingLast);
         if (reason == BLOCKED) {
             player.setDeltaMovement(actual.scale(0.5));
@@ -825,6 +908,174 @@ public final class SpiderMotion {
             stopSwing(player, reason, false);
         } else if (mode == Mode.CLING) {
             letGo(player, null);
+        }
+    }
+
+    /** His top speed on a swing: the config's, scaled by his speed factor against a plain Spider-Man's. */
+    private static double maxSwingSpeed(LocalPlayer player) {
+        double factor = SpiderMath.speedFactor(player);
+        return value(SpiderConfig.SWING_MAX_SPEED, 1.8) * Mth.clamp(Math.sqrt(factor / PLAIN_FACTOR), 0.2, 1.6);
+    }
+
+    // =================================================================================================================
+    // Web Assist
+    // =================================================================================================================
+
+    /** Whether the local hero's swings are assisted: his own setting, and the server allows it. */
+    public static boolean assistOn() {
+        return EnhancedClientConfig.webAssist() && (!EnhancedConfig.SPEC.isLoaded() || SpiderConfig.WEB_ASSIST.get());
+    }
+
+    /** The Web Assist key: the setting switches, and he is told. */
+    public static void toggleAssist(LocalPlayer player) {
+        boolean on = !EnhancedClientConfig.webAssist();
+        EnhancedClientConfig.setWebAssist(on);
+        String key = !on ? "message.enhanced.web_assist.off"
+                : EnhancedConfig.SPEC.isLoaded() && !SpiderConfig.WEB_ASSIST.get() ? "message.enhanced.web_assist.server_off" : "message.enhanced.web_assist.on";
+        player.displayClientMessage(Component.translatable(key), true);
+        planned = null;
+    }
+
+    private static SwingAssist.Params params() {
+        double range = Math.min(value(SpiderConfig.SWING_RANGE, 40), value(SpiderConfig.WEB_ASSIST_RANGE, 30));
+        return new SwingAssist.Params(range, value(SpiderConfig.SWING_GRAVITY, 0.06), value(SpiderConfig.SWING_MAX_SPEED, 1.8));
+    }
+
+    private static SwingAssist.OpenLand openLand() {
+        return SwingAssist.OpenLand.of(EnhancedConfig.SPEC.isLoaded() ? SpiderConfig.WEB_ASSIST_OPEN_LAND.get() : "sky");
+    }
+
+    /** Whether Web Assist may send a web now (the same asking as the server's). */
+    private static boolean assistReady(LocalPlayer player, PowerData data) {
+        return assistOn() && !keysIgnored(player, data) && data.isReady(2, player.level().getGameTime())
+                && !(SpiderServer.organic(player, data) && starving(player));
+    }
+
+    /** The anchor Web Assist would take from where he is now, or null. */
+    @Nullable
+    private static SwingAssist.Anchor plan(LocalPlayer player) {
+        Vec3 velocity = player.getDeltaMovement();
+        Vec3 look = player.getLookAngle();
+        if (player.onGround()) {
+            velocity = SwingAssist.hop(velocity, player.position(), player.position().add(look.scale(10.0)), look, SWING_HOP, SWING_PUSH);
+        }
+        return SwingAssist.choose(player.level(), player, player.position(), look, velocity, params(), openLand(), null);
+    }
+
+    /**
+     * G was pressed: Sneak + G, or G in mid-air at nothing a zip could reach, is an assisted swing. Its anchor is chosen
+     * and told to the server now, before the ability key goes, so that the key finds the swing already on; the next tick
+     * begins it here.
+     */
+    private static void pressAssisted(LocalPlayer player, PowerData data, boolean sneaking) {
+        if (mode == Mode.SWING || mode == Mode.CLING || !assistReady(player, data)) {
+            return;
+        }
+        if (!sneaking) {
+            boolean inTheAir = !player.onGround() && !player.isInWaterOrBubble();
+            if (!inTheAir || Raycasts.block(player, value(SpiderConfig.ZIP_RANGE, 40), 1.0F).getType() != HitResult.Type.MISS) {
+                return; // (a zip as before)
+            }
+        }
+        SwingAssist.Anchor anchor = plan(player);
+        if (anchor != null) {
+            send(player, anchor);
+            pendingAssist = anchor;
+            pendingHeading = SwingAssist.heading(player.getLookAngle(), player.getDeltaMovement(), player.getYRot());
+        }
+    }
+
+    /** Tells the server (the rope it is told is the web's own length: it measures him against the anchor). */
+    private static void send(LocalPlayer player, SwingAssist.Anchor anchor) {
+        int action = anchor.kind() == SwingAssist.Kind.BOOST ? SpiderSwingPayload.BOOST : SpiderSwingPayload.ATTACH;
+        float web = (float) anchor.web(player.position().add(0, SwingAssist.CENTRE, 0));
+        PacketDistributor.sendToServer(new SpiderSwingPayload(action, anchor.point(), anchor.face().get3DDataValue(), web,
+                anchor.kind() == SwingAssist.Kind.SKY));
+    }
+
+    /** An assisted web goes out: a swing on its anchor, or the boost of the open land. */
+    private static void beginAssisted(LocalPlayer player, SwingAssist.Anchor anchor, Vec3 heading) {
+        if (anchor.kind() == SwingAssist.Kind.BOOST) {
+            if (mode == Mode.SWING) {
+                stopSwing(player, CANCELLED, false);
+            }
+            Vec3 v = player.getDeltaMovement();
+            double flat = Math.max(Math.hypot(v.x, v.z), BOOST_AHEAD);
+            player.setDeltaMovement(heading.x * flat, Math.max(v.y, BOOST_UP), heading.z * flat);
+            player.resetFallDistance();
+            carry = CARRY_TICKS;
+            chain = KeyBindings.ability(2).isDown();
+            chainTicks = 0;
+            return;
+        }
+        if (mode == Mode.ZIP) {
+            stopZip(player, CANCELLED);
+        }
+        boolean grounded = player.onGround();
+        Vec3 before = player.getDeltaMovement();
+        beginSwing(player, anchor.point(), anchor.face(), anchor.rope(), false);
+        swingPivot = anchor.pivot();
+        if (grounded) {
+            // (Hopped the way he looks, as the assist planned it, not straight at an anchor to his side.)
+            Vec3 look = player.getLookAngle();
+            swingVelocity = SwingAssist.hop(before, player.position(), player.position().add(look.scale(10.0)), look, SWING_HOP, SWING_PUSH);
+            player.setDeltaMovement(swingVelocity);
+        }
+        assisted = true;
+        swingSky = anchor.kind() == SwingAssist.Kind.SKY;
+        planned = null;
+    }
+
+    /** The assisted swing lets go at its best moment, with a little launch; G still held, the next web follows. */
+    private static void autoRelease(LocalPlayer player) {
+        PacketDistributor.sendToServer(new SpiderSwingPayload(SpiderSwingPayload.RELEASE, swingAnchor, 0, 0.0F, swingSky));
+        stopSwing(player, RELEASED, true);
+        carry = CARRY_TICKS;
+        chain = KeyBindings.ability(2).isDown();
+        chainTicks = 0;
+    }
+
+    /**
+     * Every tick: the speed kept between two webs, the next web of a chain, and the anchor shown. Out of a swing his
+     * horizontal speed is drawn from vanilla's air drag only as far as {@link #CARRY_DRAG} (until he lands, clings or
+     * swims, or {@link #CARRY_TICKS} pass).
+     */
+    private static void assistTick(Minecraft mc, LocalPlayer player, PowerData data, boolean held) {
+        boolean free = mode == Mode.NONE && mantleTicks <= 0 && !held;
+        boolean airborne = !player.onGround() && !player.isInWaterOrBubble() && !player.isInLava();
+        if (!free || !airborne) {
+            carry = 0;
+        }
+        if (carry > 0) {
+            carry--;
+            Vec3 v = player.getDeltaMovement();
+            double flat = Math.hypot(v.x, v.z);
+            double kept = Math.min(flat * CARRY_DRAG / AIR_DRAG, Math.max(flat, maxSwingSpeed(player)));
+            if (flat > 1.0E-3) {
+                player.setDeltaMovement(v.x * kept / flat, v.y, v.z * kept / flat);
+            }
+        }
+        if (chain && (!free || !airborne || !KeyBindings.ability(2).isDown() || mc.screen != null)) {
+            chain = false;
+        }
+        boolean show = free && assistOn() && EnhancedClientConfig.webAssistPreview() && (airborne || player.isShiftKeyDown());
+        if (chain) {
+            chainTicks++;
+            boolean falling = player.getDeltaMovement().y < 0.08;
+            if (chainTicks >= CHAIN_MIN && (falling || chainTicks >= CHAIN_MAX) && assistReady(player, data)) {
+                SwingAssist.Anchor next = plan(player);
+                if (next != null) {
+                    send(player, next);
+                    beginAssisted(player, next, SwingAssist.heading(player.getLookAngle(), player.getDeltaMovement(), player.getYRot()));
+                    return;
+                }
+            }
+        }
+        if (!show && !chain) {
+            planned = null;
+        } else if (player.tickCount - plannedAt >= 2 || chain) {
+            planned = assistReady(player, data) ? plan(player) : null;
+            plannedAt = player.tickCount;
         }
     }
 
@@ -861,6 +1112,10 @@ public final class SpiderMotion {
             }
             case SWING_START -> {
                 Direction face = Direction.getNearest(payload.normal().x, payload.normal().y, payload.normal().z);
+                if (mode == Mode.SWING && !swingConfirmed && assisted && swingAnchor.distanceToSqr(payload.to()) > 1.0) {
+                    // (The server takes an assisted anchor as it is or not at all: this one is of a web before it.)
+                    break;
+                }
                 if (mode == Mode.SWING && !swingConfirmed) {
                     swingConfirmed = true;
                     if (swingAnchor.distanceToSqr(payload.to()) > 1.0) {

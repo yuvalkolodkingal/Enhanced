@@ -1411,5 +1411,18 @@
   "screen.enhanced.road.later": "עוד לא",
   "screen.enhanced.road.leave": "לעזוב את הדרך",
   "message.enhanced.road.cannot_leave": "הדרך לא הצליחה לשחרר אתכם. נסו שוב /road leave.",
-  "road.enhanced.challenge.structure_copy.short": "ההעתקה"
+  "road.enhanced.challenge.structure_copy.short": "ההעתקה",
+  "key.enhanced.web_assist": "עזרת קורים (ספיידרמן)",
+  "message.enhanced.web_assist.on": "עזרת קורים פועלת: החזיקו התכופפות + G כדי להתנדנד, המשיכו להחזיק G כדי להמשיך",
+  "message.enhanced.web_assist.off": "עזרת קורים כבויה: התנדנדות ידנית, מכוונים עם הכוונת",
+  "message.enhanced.web_assist.server_off": "עזרת קורים כבויה בשרת הזה: התנדנדות ידנית",
+  "hud.enhanced.web_assist": "עזרה",
+  "hud.enhanced.web_manual": "ידני",
+  "enhanced.configuration.spider_man": "ספיידרמן",
+  "enhanced.configuration.spider_man.tooltip": "עזרת קורים: התנדנדות קלה, ותצוגה של הקור הבא.",
+  "enhanced.configuration.spider_man.button": "עריכה…",
+  "config.enhanced.web_assist": "עזרת קורים",
+  "config.enhanced.web_assist.tooltip": "ההתנדנדות בוחרת לבד נקודת עיגון לפנים ולמעלה (גם עצים), מתרחקת מהקרקע ומהעלים, משחררת ברגע הטוב ביותר וממשיכה להתנדנד כל עוד מחזיקים G. כבוי: התנדנדות ידנית, מכוונים עם הכוונת. גם המקש J מחליף אותה.",
+  "config.enhanced.web_assist_preview": "תצוגת עזרת קורים",
+  "config.enhanced.web_assist_preview.tooltip": "מראה לאן ילך הקור הבא (קור לבן קטן) כשאתם באוויר או מתכופפים."
 }

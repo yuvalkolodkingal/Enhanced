@@ -20,6 +20,8 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.IntValue BUILD_GHOST_DETAIL;
     public static final ModConfigSpec.BooleanValue BUILD_SEE_THROUGH;
     public static final ModConfigSpec.BooleanValue BUILD_SHOW_OTHERS;
+    public static final ModConfigSpec.BooleanValue WEB_ASSIST;
+    public static final ModConfigSpec.BooleanValue WEB_ASSIST_PREVIEW;
 
     static {
         BUILDER.push("animation");
@@ -66,6 +68,17 @@ public final class EnhancedClientConfig {
         BUILD_SHOW_OTHERS = BUILDER.comment("See the boxes of other builders near you.")
                 .translation("config.enhanced.build_show_others")
                 .define("showOthers", true);
+        BUILDER.pop();
+        // ===== 3.3 spider =====
+        BUILDER.push("spider_man");
+        WEB_ASSIST = BUILDER.comment("Web Assist: Spider-Man's swing chooses its own anchor ahead and above (trees count), keeps clear of the",
+                        "ground and the leaves, lets go at the best moment and swings on while G is held. Off: the manual swing, aimed",
+                        "with the crosshair. The Web Assist key (J) switches it too.")
+                .translation("config.enhanced.web_assist")
+                .define("webAssist", true);
+        WEB_ASSIST_PREVIEW = BUILDER.comment("Show where Web Assist's next web would go (a small white web) while you are in the air or sneaking.")
+                .translation("config.enhanced.web_assist_preview")
+                .define("webAssistPreview", true);
         BUILDER.pop();
     }
 
@@ -122,6 +135,24 @@ public final class EnhancedClientConfig {
     /** Whether the boxes of other builders near you are drawn (true until the config has loaded). */
     public static boolean buildShowOthers() {
         return !SPEC.isLoaded() || BUILD_SHOW_OTHERS.get();
+    }
+
+    /** Whether Spider-Man's own swing is assisted (true until the config has loaded). */
+    public static boolean webAssist() {
+        return !SPEC.isLoaded() || WEB_ASSIST.get();
+    }
+
+    /** Switches Web Assist and saves it (nothing before the config has loaded). */
+    public static void setWebAssist(boolean on) {
+        if (SPEC.isLoaded()) {
+            WEB_ASSIST.set(on);
+            WEB_ASSIST.save();
+        }
+    }
+
+    /** Whether the next anchor of Web Assist is shown (true until the config has loaded). */
+    public static boolean webAssistPreview() {
+        return !SPEC.isLoaded() || WEB_ASSIST_PREVIEW.get();
     }
 
     private EnhancedClientConfig() {

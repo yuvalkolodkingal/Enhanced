@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
+import com.kolodkingal.enhanced.network.SpiderSwingPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -634,6 +635,10 @@ public final class SpiderServer implements HeroServer {
         double kick = SpiderConfig.ZIP_KICK_DAMAGE.get();
         HitResult hit = kick > 0.0 ? Raycasts.any(player, range, e -> kickable(player, e), 1.0F) : Raycasts.block(player, range, 1.0F);
         if (hit.getType() == HitResult.Type.MISS) {
+            if (state.swing != null && now - state.swing.start <= 3) {
+                // (Web Assist has just turned a zip at nothing in mid-air into a swing: nothing to say.)
+                return;
+            }
             say(player, "message.enhanced.zip.no_anchor");
             refuse(player, false);
             return;
@@ -740,16 +745,129 @@ public final class SpiderServer implements HeroServer {
             return;
         }
         double rope = Mth.clamp(eye.distanceTo(anchor), 4.0, range);
+        beginSwing(player, data, state, anchor, hit.getDirection(), rope, false, organic);
+    }
+
+    /** A swing begins on {@code anchor} (a zip he was on ends): everyone sees the web, his client is told the rope. */
+    private static void beginSwing(ServerPlayer player, PowerData data, SpiderState state, Vec3 anchor, Direction face, double rope, boolean sky,
+                                   boolean organic) {
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
         if (state.zip != null) {
             endZip(player, data, state, 1);
         }
-        state.swing = new SpiderState.Line(anchor, hit.getDirection(), anchor, rope, now, null, player.position());
+        state.swing = new SpiderState.Line(anchor, face, anchor, rope, now, null, player.position());
+        state.swing.sky = sky;
         dropCling(state, data);
         data.set(Live.SWINGING, true);
         sound(level, player.position(), ModSounds.WEB_SHOT.get(), 0.9F, 0.85F);
-        Direction face = hit.getDirection();
         send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.SWING_START, player.getId(), hand(player), anchor,
                 new Vec3(face.getStepX(), face.getStepY(), face.getStepZ()), -1, (float) rope, organic, 0L, List.of()));
+    }
+
+    // ---- Web Assist (3.3) ----
+
+    /**
+     * What his client's Web Assist did ({@link SpiderSwingPayload}): it chose an anchor and began a swing on it, let go of
+     * one at its best moment, or gave him a web boost in the open. The client moves him; the server checks the anchor as
+     * it checks a swing it aimed itself, plus room for the lag of its copy of him: the assist allowed (the server's
+     * {@code webAssist}), Spider-Man, not held, a stomach for organic webs, ready; a block's anchor within range, with a
+     * solid block behind it and in sight; a sky anchor allowed by {@code webAssistOpenLand}, above him, near enough, with
+     * the sky open over it; no complete Chaos Shield in the way. A swing it refuses is told to stop at once (code 2).
+     */
+    public static void onAssist(ServerPlayer player, int action, Vec3 anchor, int faceValue, float ropeAsked, boolean sky) {
+        if (!isSpiderMan(player)) {
+            return;
+        }
+        PowerData data = Powers.get(player);
+        SpiderState state = state(player);
+        if (action == SpiderSwingPayload.RELEASE) {
+            if (state.swing != null) {
+                endSwing(player, data, state, 5);
+            }
+            return;
+        }
+        boolean boost = action == SpiderSwingPayload.BOOST;
+        if (action != SpiderSwingPayload.ATTACH && !boost) {
+            return;
+        }
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
+        SwingAssist.OpenLand openLand = SwingAssist.OpenLand.of(SpiderConfig.WEB_ASSIST_OPEN_LAND.get());
+        boolean organic = organic(player, data);
+        boolean allowed = SpiderConfig.WEB_ASSIST.get() && !blocked(player, data) && data.isReady(2, now) && !(organic && starving(player))
+                && Double.isFinite(anchor.x) && Double.isFinite(anchor.y) && Double.isFinite(anchor.z);
+        if (boost) {
+            if (allowed && openLand == SwingAssist.OpenLand.ZIP) {
+                webBoost(player, data, state, anchor, organic);
+            }
+            return;
+        }
+        Vec3 eye = player.getEyePosition();
+        Direction face = Direction.from3DDataValue(Math.floorMod(faceValue, 6));
+        double range = Math.min(SpiderConfig.SWING_RANGE.get(), SpiderConfig.WEB_ASSIST_RANGE.get());
+        boolean valid = allowed && (sky ? openLand == SwingAssist.OpenLand.SKY && validSky(player, eye, anchor)
+                : validBlock(player, eye, anchor, face, range));
+        WandaAbilities.ShieldStop shield = valid ? WandaAbilities.shieldAcross(level, player, eye, anchor, 1.0F) : null;
+        if (shield != null) {
+            payShield(player, shield, 2.0F);
+            say(player, "message.enhanced.web.shield");
+        }
+        if (!valid || shield != null) {
+            if (state.swing == null) {
+                refuse(player, true);
+            }
+            return;
+        }
+        if (state.swing != null) {
+            endSwing(player, data, state, 1);
+        }
+        double centre = player.position().add(0, SwingAssist.CENTRE, 0).distanceTo(anchor);
+        double rope = Mth.clamp(Double.isFinite(ropeAsked) ? ropeAsked : centre, SwingAssist.MIN_ROPE, Math.min(range + 3.0, centre + 3.0));
+        beginSwing(player, data, state, anchor, face, rope, sky, organic);
+    }
+
+    /** How much further than its range the server lets an anchor be, for the lag of its copy of him. */
+    private static final double ASSIST_SLACK = 4.0;
+
+    /** A block's anchor: in range, a block that holds behind it, and in sight from where the server has him. */
+    private static boolean validBlock(ServerPlayer player, Vec3 eye, Vec3 anchor, Direction face, double range) {
+        if (eye.distanceTo(anchor) > range + ASSIST_SLACK) {
+            return false;
+        }
+        ServerLevel level = player.serverLevel();
+        BlockPos behind = BlockPos.containing(anchor.subtract(new Vec3(face.getStepX(), face.getStepY(), face.getStepZ()).scale(0.1)));
+        if (level.getBlockState(behind).getCollisionShape(level, behind).isEmpty()) {
+            return false;
+        }
+        BlockHitResult sight = level.clip(new ClipContext(eye, anchor.add(anchor.subtract(eye).normalize().scale(0.2)), ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE, player));
+        return sight.getType() == HitResult.Type.MISS || sight.getBlockPos().equals(behind) || sight.getLocation().distanceTo(anchor) <= 2.0;
+    }
+
+    /** A sky anchor: above him, near enough, with the sky open over it. */
+    private static boolean validSky(ServerPlayer player, Vec3 eye, Vec3 anchor) {
+        return anchor.y >= eye.y + 2.0 && eye.distanceTo(anchor) <= 24.0 + ASSIST_SLACK && SwingAssist.openSky(player.serverLevel(), player, eye, anchor);
+    }
+
+    /**
+     * The open-land "zip" of Web Assist: a web shot ahead and up that boosts him (his client gives him the speed), on its
+     * own cooldown; it costs a zip's hunger.
+     */
+    private static void webBoost(ServerPlayer player, PowerData data, SpiderState state, Vec3 toward, boolean organic) {
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
+        Vec3 eye = player.getEyePosition();
+        Vec3 to = toward.subtract(eye);
+        to = to.lengthSqr() > 100.0 ? eye.add(to.normalize().scale(10.0)) : toward;
+        if (state.swing != null) {
+            endSwing(player, data, state, 1);
+        }
+        data.startCooldown(2, now, SpiderConfig.WEB_BOOST_COOLDOWN.get());
+        spend(player, SpiderConfig.ZIP_EXHAUSTION.get(), organic);
+        keepAloft(player);
+        sound(level, player.position(), ModSounds.WEB_ZIP.get(), 0.9F, 1.15F);
+        send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.SHOT, player.getId(), hand(player), to, Vec3.ZERO, -1, 0F, organic, 0L, List.of()));
     }
 
     /** The web is let go: the reason is one of the codes of {@link SpiderFxPayload} (0 arrived, 1 cancelled, 5 released ...). */
@@ -844,7 +962,8 @@ public final class SpiderServer implements HeroServer {
         SpiderState.Line swing = state.swing;
         Vec3 position = player.position();
         keepAloft(player);
-        int reason = lineEnd(player, swing, position, now, SpiderConfig.SWING_MAX_TICKS.get(), SpiderConfig.SWING_RANGE.get(), true);
+        int maxTicks = swing.sky ? SpiderConfig.SKY_ANCHOR_MAX_TICKS.get() : SpiderConfig.SWING_MAX_TICKS.get();
+        int reason = lineEnd(player, swing, position, now, maxTicks, SpiderConfig.SWING_RANGE.get(), !swing.sky);
         if (reason < 0) {
             long age = now - swing.start;
             swing.groundTicks = player.onGround() && age >= SWING_GRACE ? swing.groundTicks + 1 : 0;
