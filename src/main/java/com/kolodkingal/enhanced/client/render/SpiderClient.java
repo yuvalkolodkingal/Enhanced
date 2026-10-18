@@ -76,7 +76,7 @@ public final class SpiderClient implements HeroClient {
 
     /**
      * The five lines (DESIGN section 14, "HUD"): R shows the Web Burst's cooldown or that his webs are organic; G shows
-     * a zip or a swing in progress; V shows Wall Crawl on or off, clinging, the sense off, and danger; B shows what the
+     * a zip or a swing in progress (since 3.3, otherwise whether Web Assist is on); V shows Wall Crawl on or off, clinging, the sense off, and danger; B shows what the
      * Iron Spider's systems are doing; N shows the Black Eyes' seconds. His cooldowns mean the seconds a mode has left
      * for B and N while it lasts, so these lines are tried before the generic grey seconds.
      */
@@ -90,7 +90,10 @@ public final class SpiderClient implements HeroClient {
                         : SpiderServer.organic(asPlayer(player), data) ? Component.translatable("hud.enhanced.organic").withStyle(ChatFormatting.AQUA) : null;
             }
             case 2 -> data.is(Live.SWINGING) ? Component.translatable("hud.enhanced.swinging").withStyle(ChatFormatting.AQUA)
-                    : data.is(Live.ZIPPING) ? Component.translatable("hud.enhanced.zipping").withStyle(ChatFormatting.AQUA) : null;
+                    : data.is(Live.ZIPPING) ? Component.translatable("hud.enhanced.zipping").withStyle(ChatFormatting.AQUA)
+                    // 3.3: whether his swing is assisted (Web Assist, the J key) or manual.
+                    : SpiderMotion.assistOn() ? Component.translatable("hud.enhanced.web_assist").withStyle(ChatFormatting.DARK_AQUA)
+                    : Component.translatable("hud.enhanced.web_manual").withStyle(ChatFormatting.DARK_GRAY);
             case 3 -> crawl(data, now);
             case 4 -> ironSystems(player, data, now);
             case 5 -> {

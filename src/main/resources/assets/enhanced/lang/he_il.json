@@ -2092,5 +2092,18 @@
   "hud.enhanced.on_wall": "על הקיר",
   "hud.enhanced.on_ceiling": "על התקרה",
   "hud.enhanced.walls_off": "בלי קירות",
-  "hud.enhanced.walkman_note": "♪"
+  "hud.enhanced.walkman_note": "♪",
+  "key.enhanced.web_assist": "עזרת קורים (ספיידרמן)",
+  "message.enhanced.web_assist.on": "עזרת קורים פועלת: החזיקו התכופפות + G כדי להתנדנד, המשיכו להחזיק G כדי להמשיך",
+  "message.enhanced.web_assist.off": "עזרת קורים כבויה: התנדנדות ידנית, מכוונים עם הכוונת",
+  "message.enhanced.web_assist.server_off": "עזרת קורים כבויה בשרת הזה: התנדנדות ידנית",
+  "hud.enhanced.web_assist": "עזרה",
+  "hud.enhanced.web_manual": "ידני",
+  "enhanced.configuration.spider_man": "ספיידרמן",
+  "enhanced.configuration.spider_man.tooltip": "עזרת קורים: התנדנדות קלה, ותצוגה של הקור הבא.",
+  "enhanced.configuration.spider_man.button": "עריכה…",
+  "config.enhanced.web_assist": "עזרת קורים",
+  "config.enhanced.web_assist.tooltip": "ההתנדנדות בוחרת לבד נקודת עיגון לפנים ולמעלה (גם עצים), מתרחקת מהקרקע ומהעלים, משחררת ברגע הטוב ביותר וממשיכה להתנדנד כל עוד מחזיקים G. כבוי: התנדנדות ידנית, מכוונים עם הכוונת. גם המקש J מחליף אותה.",
+  "config.enhanced.web_assist_preview": "תצוגת עזרת קורים",
+  "config.enhanced.web_assist_preview.tooltip": "מראה לאן ילך הקור הבא (קור לבן קטן) כשאתם באוויר או מתכופפים."
 }

@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.List;
+
 /**
  * The balance numbers of Spider-Man (DESIGN section 14). Its options are defined in {@link #define}, which
  * {@code EnhancedConfig} calls while it builds the server config (TOML section {@code [spider_man]}). Ticks are 1/20 s;
@@ -54,6 +56,13 @@ public final class SpiderConfig {
     public static ModConfigSpec.DoubleValue SWING_MAX_SPEED;
     public static ModConfigSpec.DoubleValue SWING_GRAVITY;
     public static ModConfigSpec.DoubleValue SWING_EXHAUSTION;
+
+    // ---- Web Assist (3.3) ----
+    public static ModConfigSpec.BooleanValue WEB_ASSIST;
+    public static ModConfigSpec.ConfigValue<String> WEB_ASSIST_OPEN_LAND;
+    public static ModConfigSpec.IntValue WEB_ASSIST_RANGE;
+    public static ModConfigSpec.IntValue SKY_ANCHOR_MAX_TICKS;
+    public static ModConfigSpec.IntValue WEB_BOOST_COOLDOWN;
 
     // ---- Wall Crawl ----
     public static ModConfigSpec.DoubleValue CRAWL_SPEED;
@@ -169,6 +178,19 @@ public final class SpiderConfig {
                 .defineInRange("swingGravity", 0.06, 0.02, 0.12);
         SWING_EXHAUSTION = builder.comment("Food exhaustion per tick while he swings (4.0 = 1 food point).")
                 .defineInRange("swingExhaustion", 0.01, 0.0, 1.0);
+        WEB_ASSIST = builder.comment("Whether Web Assist may be used: the swing chooses its own anchor ahead and above (trees count), keeps",
+                        "clear of the ground and the leaves, lets go at the best moment and swings on while G is held. Each Spider-Man",
+                        "switches it with the Web Assist key (J); it is on for him from the start. Off: every swing is manual.")
+                .define("webAssist", true);
+        WEB_ASSIST_OPEN_LAND = builder.comment("What Web Assist does where there is nothing to swing from: \"sky\" (a web to the open sky ahead",
+                        "and above), \"zip\" (a short web boost forward and up) or \"none\".")
+                .define("webAssistOpenLand", "sky", value -> value instanceof String name && List.of("sky", "zip", "none").contains(name));
+        WEB_ASSIST_RANGE = builder.comment("How far (blocks) Web Assist looks for an anchor (never further than swingRange).")
+                .defineInRange("webAssistRange", 30, 8, 96);
+        SKY_ANCHOR_MAX_TICKS = builder.comment("The longest a swing on a sky anchor lasts, in ticks.")
+                .defineInRange("skyAnchorMaxTicks", 60, 10, 400);
+        WEB_BOOST_COOLDOWN = builder.comment("Ticks between two web boosts (the \"zip\" of webAssistOpenLand).")
+                .defineInRange("webBoostCooldown", 20, 0, 400);
 
         CRAWL_SPEED = builder.comment("His speed on a wall or ceiling in blocks per tick, before his speed factor.")
                 .defineInRange("crawlSpeed", 0.22, 0.05, 0.6);

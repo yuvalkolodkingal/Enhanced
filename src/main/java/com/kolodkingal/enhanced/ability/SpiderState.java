@@ -36,6 +36,8 @@ final class SpiderState {
         double lastStep;
         int stalled;
         int groundTicks;
+        /** A swing of Web Assist on a point of the open sky (no block holds it). */
+        boolean sky;
 
         Line(Vec3 anchor, Direction face, Vec3 stand, double rope, long start, @Nullable UUID kick, Vec3 at) {
             this.anchor = anchor;

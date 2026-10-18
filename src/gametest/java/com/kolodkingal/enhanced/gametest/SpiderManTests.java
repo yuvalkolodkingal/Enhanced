@@ -2727,7 +2727,8 @@ public final class SpiderManTests {
                 }
             }
         }
-        check(options == 67, "every option of the design is there: " + options);
+        // (67 of 3.0, and the five of Web Assist in 3.3.)
+        check(options == 72, "every option of the design is there: " + options);
         // The ones that must make something happen.
         check(SpiderConfig.WEB_SHOT_COOLDOWN.getDefault() > 0 && SpiderConfig.ZIP_COOLDOWN.getDefault() > 0
                 && SpiderConfig.WEB_BURST_COOLDOWN.getDefault() > 0 && SpiderConfig.BLACK_EYES_COOLDOWN.getDefault() > 0
