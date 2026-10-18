@@ -115,8 +115,8 @@ public final class SpiderEffects {
         }
         return switch (rgb) {
             case SILVER, CREAM -> tint;
-            case SHIMMER, CREAM_SHIMMER -> CustomBeams.mix(tint, 0xFFFFFF, 0.35F);
-            default -> CustomBeams.mix(tint, 0xFFFFFF, 0.6F);
+            case SHIMMER, CREAM_SHIMMER -> CustomBeams.mix(tint, 0xFFFFFF, 0.2F);
+            default -> CustomBeams.mix(tint, 0xFFFFFF, 0.3F);
         };
     }
 

@@ -227,8 +227,8 @@ public final class ColorPickerScreen extends Screen {
         g.drawString(font, what.copy().withStyle(ChatFormatting.WHITE), x + 34, sy + 2, 0xFFFFFF, true);
         List<FormattedCharSequence> hint = font.split(Component.translatable("screen.enhanced.hero_creator.color.hint")
                 .withStyle(ChatFormatting.GRAY), Math.max(40, w - 34));
-        for (int i = 0; i < Math.min(2, hint.size()); i++) {
-            g.drawString(font, hint.get(i), x + 34, sy + 12 + i * 9, 0xFFFFFF, true);
+        for (int i = 0; i < Math.min(3, hint.size()); i++) {
+            g.drawString(font, hint.get(i), x + 34, sy + 11 + i * 9, 0xFFFFFF, true);
         }
         renderPreview(g, partialTick, rgb);
     }
@@ -326,7 +326,7 @@ public final class ColorPickerScreen extends Screen {
                 }
             }
             case BURST -> {
-                float k = Math.min(1.0F, phase * 2.5F);
+                float k = Math.min(1.0F, phase * 1.4F);
                 if (k < 1.0F) {
                     int bx = cx + Math.round(size * 0.35F);
                     ring(g, bx, hand, 3 + k * size * 0.9F, 2, argb(rgb, 1.0F - k));

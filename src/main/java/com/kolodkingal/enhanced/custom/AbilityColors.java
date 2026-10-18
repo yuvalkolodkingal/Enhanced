@@ -160,7 +160,7 @@ public final class AbilityColors {
     /**
      * {@code base} in the hue and saturation of {@code target}, its lightness kept but moved as far as the target is
      * lighter or darker than a middle tone (so a near-black choice darkens the whole palette, a near-white one pales
-     * it). A white or near-white core stays as it is (the hot centre of a beam or bolt), a grey target gives greys.
+     * it), and a third of the way to the target's (so a pale palette still reads as the chosen colour). A white or near-white core stays as it is (the hot centre of a beam or bolt), a grey target gives greys.
      */
     public static int recolor(int base, int target) {
         float[] b = hsl(base);
@@ -172,6 +172,7 @@ public final class AbilityColors {
             l = l + (1.0F - l) * (t[2] - 0.5F) * 2.0F;
         }
         float white = Math.max(0.0F, Math.min(1.0F, (b[2] - 0.85F) / 0.15F)) * (1.0F - b[1]);
+        l = l + (t[2] - l) * 0.35F;
         l = l + (b[2] - l) * white;
         return rgb(t[0], t[1] * (1.0F - white), Math.max(0.0F, Math.min(1.0F, l)));
     }
