@@ -174,6 +174,8 @@ public final class HeroAnimState {
     // ---- a speedster on a wall or a ceiling (3.3, SpeedSurfacePoses) ----
     /** What he runs on this tick: 0 the ground, 1 up a wall, 2 a ceiling, 3 down a wall. */
     public int surfaceKind;
+    /** Ticks another player's surface flags have been down while he was still drawn on a surface (see SpeedSurfacePoses). */
+    public int surfaceLostTicks;
     /** The wall's normal (from the wall towards him), or the ceiling run's heading (horizontal unit vectors). */
     public net.minecraft.world.phys.Vec3 surfaceNormal = net.minecraft.world.phys.Vec3.ZERO;
     public net.minecraft.world.phys.Vec3 surfaceHeading = net.minecraft.world.phys.Vec3.ZERO;

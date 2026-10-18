@@ -18,7 +18,7 @@ import net.minecraft.util.Mth;
 /**
  * What the walls of 3.3 show the one they concern: while Billy holds his Hex Barrier, a bar of its health under the crosshair
  * (blue, then yellow below half and red below a quarter; it fills as the barrier forms, slides down as it takes hits and flashes
- * white with each); and, to a sorcerer the Hex Runes hold, a red line at the top that says so. Nothing with the GUI hidden.
+ * white with each); and, to a sorcerer the Hex Runes hold, a red line above the action bar that says so. Nothing with the GUI hidden.
  */
 public class ProtectHud implements LayeredDraw.Layer {
     private static final int WIDTH = 82;
@@ -42,9 +42,11 @@ public class ProtectHud implements LayeredDraw.Layer {
         if (HexRunes.silences(player)) {
             Component line = Component.translatable("hud.enhanced.hex_runes.silenced").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
             Font font = mc.font;
+            // Above the action bar (at the top it ran under the powers HUD's title line).
             int x = (graphics.guiWidth() - font.width(line)) / 2;
-            graphics.fill(x - 4, 4, x + font.width(line) + 4, 17, 0x90000000);
-            graphics.drawString(font, line, x, 7, 0xFFFFFF);
+            int y = graphics.guiHeight() - 96;
+            graphics.fill(x - 4, y - 3, x + font.width(line) + 4, y + 10, 0x90000000);
+            graphics.drawString(font, line, x, y, 0xFFFFFF);
         }
     }
 

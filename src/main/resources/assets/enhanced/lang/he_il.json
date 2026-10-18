@@ -1233,7 +1233,7 @@
   "screen.enhanced.vishanti.save": "שמירה כאן",
   "screen.enhanced.vishanti.save.tooltip": "שומר את המקום שבו אתם עומדים, בכיוון שאליו אתם פונים. שמירה בשם קיים מזיזה אותו.",
   "screen.enhanced.vishanti.save_base": "שמירה כבסיס",
-  "screen.enhanced.vishanti.save_base.tooltip": "שומר את המקום הזה כבסיס ומקים סביבו מגן ברוחב של %s בלוקים: אף מפלצת לא יכולה להיכנס (בסיסים: %s מתוך %s)",
+  "screen.enhanced.vishanti.save_base.tooltip": "שומר את המקום הזה כבסיס ומקים סביבו מגן שמגיע עד %s בלוקים: אף מפלצת לא יכולה להיכנס (בסיסים: %s מתוך %s)",
   "screen.enhanced.vishanti.save_base.off": "המגנים כבויים",
   "screen.enhanced.vishanti.empty": "עוד לא נשמרו מקומות: תנו שם למקום הזה ושמרו אותו",
   "screen.enhanced.vishanti.cooldown": "הספר אוסף את כוחו: %s שניות",
