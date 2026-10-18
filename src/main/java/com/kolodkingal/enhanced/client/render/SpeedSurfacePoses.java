@@ -30,6 +30,8 @@ final class SpeedSurfacePoses {
     private static final float CEILING_PIVOT = 0.9F;
     /** How high the body is lifted on a wall, so that it sticks out of the wall at the middle of his box, not at his feet. */
     private static final float WALL_LIFT = 0.55F;
+    /** How many ticks another player's pose may outlast his surface flags, while his position still touches a surface. */
+    private static final int LOST_HOLD = 4;
 
     // =================================================================================================================
     // Once per tick
@@ -56,6 +58,17 @@ final class SpeedSurfacePoses {
             float yaw = p.getYRot() * Mth.DEG_TO_RAD;
             Vec3 facing = new Vec3(-Mth.sin(yaw), 0.0, Mth.cos(yaw));
             surface = wall || ceiling ? SurfaceRun.touched(p.level(), p, ceiling, facing) : SurfaceRun.Surface.NONE;
+            if (wall || ceiling) {
+                s.surfaceLostTicks = 0;
+            } else if (s.surfaceKind != 0 && !p.onGround() && ++s.surfaceLostTicks <= LOST_HOLD) {
+                // The server's copy of him lags his own run by up to a block, so its check drops the flags for a tick or
+                // two where the run turns a corner (onto a ceiling, round an overhang's lip and up its face): take what
+                // his eased position touches here rather than stand him upright for those ticks.
+                surface = SurfaceRun.touched(p.level(), p, true, facing);
+                if (!surface.touches()) {
+                    surface = SurfaceRun.touched(p.level(), p, false, facing);
+                }
+            }
             if (!surface.touches() && (wall || ceiling)) {
                 // The flag comes a moment before his position (which is eased in on this client) reaches the surface: keep
                 // what he ran on, or take the wall he faces, rather than drop the pose for a tick or two.
