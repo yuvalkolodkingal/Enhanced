@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.road.RoadTrials;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,6 +31,10 @@ public final class AbilityHandler {
         if (down && com.kolodkingal.enhanced.custom.CustomHeroes.isSuppressed(player)) {
             player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.enhanced.custom.suppressed")
                     .withStyle(net.minecraft.ChatFormatting.GRAY), true);
+            return;
+        }
+        // 3.3: the runes on the walls of a Hex hold every other sorcerer inside it: no power answers.
+        if (down && HexRunes.refuse(player)) {
             return;
         }
         PowerData data = Powers.get(player);

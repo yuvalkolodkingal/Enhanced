@@ -12,5 +12,7 @@ public enum HexAction {
     /** Vision holds his post (1) or follows Wanda (0). */
     SET_VISION_STAYS,
     /** "Vision, that one!": he attacks the creature Wanda looks at (or, with none in view, comes back to her side). */
-    VISION_TARGET
+    VISION_TARGET,
+    /** 3.3: inscribe (1) or wipe (0) the Hex Runes on the four walls. */
+    SET_RUNES
 }

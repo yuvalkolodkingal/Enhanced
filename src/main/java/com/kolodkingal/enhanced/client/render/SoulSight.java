@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -38,7 +39,8 @@ public final class SoulSight {
             return false;
         }
         double range = range();
-        return entity.distanceToSqr(player) < range * range;
+        // (3.3: no soul is seen through the wall of a Hex that keeps him out.)
+        return entity.distanceToSqr(player) < range * range && !Shelters.keepsOut(player.level(), player, player.getEyePosition(), Shelters.middle(entity), false);
     }
 
     /** The colour every creature he sees glows in. */

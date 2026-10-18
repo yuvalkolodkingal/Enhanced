@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -61,7 +62,7 @@ public final class VishantiBook {
             if (readable(server, true) && server.isShiftKeyDown()) {
                 travelToBase(server);
             }
-        } else if (level.isClientSide && !player.isShiftKeyDown() && WardStrength.isSorcerer(player) && enabled()) {
+        } else if (level.isClientSide && !player.isShiftKeyDown() && WardStrength.isSorcerer(player) && enabled() && !HexRunes.silences(player)) {
             // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
             VishantiScreen.open();
         }
@@ -83,6 +84,11 @@ public final class VishantiBook {
         }
         if (!WardStrength.isSorcerer(player)) {
             say(player, tell, "message.enhanced.vishanti.not_sorcerer");
+            return false;
+        }
+        if (HexRunes.silences(player)) {
+            // 3.3: the runes on the walls of a Hex hold the book shut
+            say(player, tell, "message.enhanced.hex_runes.silenced");
             return false;
         }
         return true;

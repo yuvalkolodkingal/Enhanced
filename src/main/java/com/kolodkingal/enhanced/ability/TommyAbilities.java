@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -144,7 +145,7 @@ public final class TommyAbilities {
         List<LivingEntity> targets = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class,
                 player.getBoundingBox().inflate(BLITZ_RADIUS), e -> e != player && e.isAlive() && !e.isSpectator()
                         && !Metal.isConjured(e) && e.distanceToSqr(player) <= BLITZ_RADIUS * BLITZ_RADIUS
-                        && disarmableHand(e) != null));
+                        && disarmableHand(e) != null && !Shelters.shelters(player, e)));
         if (targets.isEmpty()) {
             player.displayClientMessage(Component.translatable("message.enhanced.disarm.nothing"), true);
             return;
@@ -223,7 +224,7 @@ public final class TommyAbilities {
         boolean last = left <= 1 || !player.isAlive();
         Vec3 center = player.position();
         for (Entity e : player.level().getEntities(player, player.getBoundingBox().inflate(WHIRLWIND_RADIUS, 4.0, WHIRLWIND_RADIUS),
-                TommyAbilities::caughtByWhirlwind)) {
+                e -> caughtByWhirlwind(e) && !Shelters.shelters(player, e))) {
             Vec3 flat = e.position().subtract(center).multiply(1, 0, 1);
             double dist = flat.length();
             if (dist > WHIRLWIND_RADIUS) {
@@ -339,9 +340,10 @@ public final class TommyAbilities {
         if (hit instanceof EntityHitResult entityHit) {
             LivingEntity target = (LivingEntity) entityHit.getEntity();
             data.startCooldown(5, now, ACCELERATE_COOLDOWN);
-            target.hurt(ModDamageTypes.source(level, ModDamageTypes.MOLECULAR_ACCELERATION, player, player), ACCELERATE_DAMAGE);
-            Vec3 push = target.position().subtract(player.position());
-            target.knockback(0.8, -push.x, -push.z);
+            if (target.hurt(ModDamageTypes.source(level, ModDamageTypes.MOLECULAR_ACCELERATION, player, player), ACCELERATE_DAMAGE)) {
+                Vec3 push = target.position().subtract(player.position());
+                target.knockback(0.8, -push.x, -push.z); // (a wall that stopped the hit stops the push too)
+            }
             burst(level, entityHit.getLocation());
             return;
         }
@@ -359,6 +361,11 @@ public final class TommyAbilities {
         if (BossFights.protects(level, pos)) {
             // The arena of a boss fight stays as it is.
             player.displayClientMessage(Component.translatable("message.enhanced.boss.protected"), true);
+            return;
+        }
+        if (BlockRights.behindTheWall(player, level, pos)) {
+            // 3.3: and a Hex keeps its own from outside
+            player.displayClientMessage(Component.translatable("message.enhanced.telekinesis.protected"), true);
             return;
         }
         // Breaking a block is a player action: spawn protection, claims and adventure mode all get their say.

@@ -13,6 +13,8 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.DarkMagic;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -139,6 +141,19 @@ public final class WandaAbilities {
     private static void beamTick(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         HitResult hit = Raycasts.any(player, EnhancedConfig.CHAOS_BEAM_RANGE.get(), beamTargets(player), 1.0F);
+        // 3.3: a wall in the way (another's Chaos Shield, Billy's barrier, a ward is no matter to her) ends the beam there; chaos
+        // magic shatters a Hex Barrier at once.
+        ShieldStop shield = shieldAcross(level, player, player.getEyePosition(), hit.getLocation(), 1.0F);
+        if (shield != null) {
+            if (player.tickCount % 10 == 0) {
+                pay(shield, player, EnhancedConfig.CHAOS_BEAM_DAMAGE.get().floatValue());
+            }
+            Vec3 at = shield.point();
+            if (player.tickCount % 2 == 0) {
+                level.sendParticles(new EnergyParticleOptions(shield.color(), 1.4F), at.x, at.y, at.z, 4, 0.12, 0.12, 0.12, 0.12);
+            }
+            return;
+        }
         if (hit instanceof EntityHitResult entityHit) {
             Entity target = entityHit.getEntity();
             target.hurt(ModDamageTypes.source(level, ModDamageTypes.CHAOS_BEAM, player, player),
@@ -334,7 +349,7 @@ public final class WandaAbilities {
      * speed, a trident's 8, a fireball's 6, a thrown hammer's, a hammer fragment's, a dagger's or a shard's own damage,
      * and 2 for the rest.
      */
-    static float projectilePower(Projectile projectile) {
+    public static float projectilePower(Projectile projectile) {
         if (projectile instanceof ShieldCost cost) {
             return cost.shieldCost();
         }
@@ -398,7 +413,7 @@ public final class WandaAbilities {
     /**
      * A projectile already on its way home to its owner (a weapon of Thor's, Thanos's sword): the shield lets it by.
      */
-    static boolean isHeadingHome(Projectile projectile) {
+    public static boolean isHeadingHome(Projectile projectile) {
         if (projectile instanceof ShieldCost cost && cost.oneOfAKind()) {
             return cost.returning();
         }
@@ -475,20 +490,42 @@ public final class WandaAbilities {
 
     // ---- the shield against beams ----
 
-    /** A complete Chaos Shield that a beam has run into: whose it is, and where on its surface the beam ends. */
-    public record ShieldStop(Player owner, Vec3 point) {
+    /**
+     * A wall that a beam has run into (3.3: any of them, see {@link Shelters#across}): whose it is (the Scarlet Witch's Chaos
+     * Shield, Billy's Hex Barrier; null for the wall of a Hex or a ward), where on it the beam ends, which wall it is and its
+     * colour, for the sparks.
+     */
+    public record ShieldStop(@Nullable Player owner, Vec3 point, Shelters.Wall wall, int color) {
+        /** A complete Chaos Shield of {@code owner}. */
+        public ShieldStop(Player owner, Vec3 point) {
+            this(owner, point, Shelters.Wall.CHAOS_SHIELD, Power.SCARLET_WITCH.glow);
+        }
     }
 
     /**
-     * The first complete Chaos Shield that a beam from {@code from} to {@code to} runs into from outside it, or null:
-     * the sphere is solid to a beam as it is to an arrow. A beam that starts inside the sphere (its firer stands within
-     * her shield) is not stopped here; what hits Wanda herself is stopped by the damage hook, which also wears the
-     * shield down. Shared by the server (what Thor's lightning beam hits) and the client (where it is drawn to).
+     * The first wall that a beam from {@code from} to {@code to} runs into, or null: a complete Chaos Shield (the sphere is
+     * solid to a beam as it is to an arrow; a beam that starts inside it is not stopped here, and what hits Wanda herself is
+     * stopped by the damage hook), and since 3.3 Billy's raised Hex Barrier from the front, the wall of a Hex the firer may not
+     * cross and a ward if the firer is a monster or a boss or the beam is dark magic ({@link Shelters#across}). Shared by the
+     * server (what a beam hits) and the client (where it is drawn to). A caller pays the wall with {@link #pay}.
      *
      * @param firer the one who fires the beam (never its own shield)
      */
     @Nullable
     public static ShieldStop shieldAcross(Level level, @Nullable Entity firer, Vec3 from, Vec3 to, float partialTick) {
+        return shieldAcross(level, firer, from, to, partialTick, DarkMagic.casts(firer));
+    }
+
+    /** {@link #shieldAcross(Level, Entity, Vec3, Vec3, float)} for a beam that is (or is not) dark magic, whoever fires it. */
+    @Nullable
+    public static ShieldStop shieldAcross(Level level, @Nullable Entity firer, Vec3 from, Vec3 to, float partialTick, boolean dark) {
+        Shelters.Stop stop = Shelters.across(level, firer, from, to, partialTick, dark);
+        return stop == null ? null : new ShieldStop(stop.owner(), stop.point(), stop.wall(), stop.color());
+    }
+
+    /** The first complete Chaos Shield (only) that a beam from {@code from} to {@code to} runs into from outside it, or null. */
+    @Nullable
+    public static ShieldStop chaosShieldAcross(Level level, @Nullable Entity firer, Vec3 from, Vec3 to, float partialTick) {
         Vec3 path = to.subtract(from);
         double length = path.length();
         if (length < 1.0E-6) {
@@ -520,6 +557,17 @@ public final class WandaAbilities {
     }
 
     /**
+     * A beam (or a blast) of {@code firer} spends itself on the wall {@code stop}: a Chaos Shield or a Hex Barrier pays {@code
+     * amount} (the barrier shatters at once if the firer is the Scarlet Witch); a Hex's or a ward's wall pays nothing. As
+     * before, with PvP off a hit that would not have hurt the holder costs nothing. Server.
+     */
+    public static void pay(ShieldStop stop, @Nullable Entity firer, float amount) {
+        if (stop.owner() instanceof ServerPlayer holder && (!(firer instanceof Player shooter) || shooter.canHarmPlayer(holder))) {
+            wear(holder, amount, firer);
+        }
+    }
+
+    /**
      * Wears the shield down by what it just stopped; when nothing is left it shatters.
      *
      * @return how much of {@code amount} the shield took (all of it, unless it had less strength left)
@@ -536,6 +584,9 @@ public final class WandaAbilities {
      */
     public static float wear(ServerPlayer player, float amount, @Nullable Entity cause) {
         PowerData data = Powers.get(player);
+        if (data.power() == Power.BILLY) {
+            return BillyBarrier.wear(player, data, amount, cause); // 3.3: the wall it stopped at was his Hex Barrier
+        }
         if (data.power() == Power.SCARLET_WITCH && shieldUnlimited() && (EnhancedConfig.WANDA_SHIELD_UNLIMITED_VS_BOSSES.get() || !fromBoss(cause))) {
             return amount; // 3.2: an unlimited shield stops it all and is never worn down
         }

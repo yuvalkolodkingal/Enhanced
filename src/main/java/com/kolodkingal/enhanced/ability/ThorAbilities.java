@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -433,19 +434,21 @@ public final class ThorAbilities {
         Vec3 eye = player.getEyePosition();
         AABB around = player.getBoundingBox().inflate(range);
         // Lying on the ground as an item.
+        // (3.3: nothing behind the wall of a Hex that keeps him out answers his call.)
         ItemEntity nearestItem = level.getEntitiesOfClass(ItemEntity.class, around,
-                        e -> canCall(player, e.getItem()) && e.distanceToSqr(player) <= range * range).stream()
+                        e -> canCall(player, e.getItem()) && e.distanceToSqr(player) <= range * range && !walled(player, e.position())).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
         // Resting as a block.
         BlockPos nearestBlock = findBlock(level, player, range);
         // In a creature's hands.
         LivingEntity nearestHolder = level.getEntitiesOfClass(LivingEntity.class, around,
                         e -> !(e instanceof Player) && e.isAlive() && callableHand(player, e) != null
-                                && e.distanceToSqr(player) <= range * range).stream()
+                                && e.distanceToSqr(player) <= range * range && !walled(player, e.position())).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
         // Lying on someone it pins down (never the one it pins: they cannot call it off themselves).
         MjolnirPinEntity nearestPin = level.getEntitiesOfClass(MjolnirPinEntity.class, around,
-                        p -> !p.targetUuid().equals(player.getUUID()) && canCall(player, p.hammer()) && p.distanceToSqr(player) <= range * range).stream()
+                        p -> !p.targetUuid().equals(player.getUUID()) && canCall(player, p.hammer()) && p.distanceToSqr(player) <= range * range
+                                && !walled(player, p.position())).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(player))).orElse(null);
         double toItem = nearestItem == null ? Double.MAX_VALUE : nearestItem.distanceToSqr(eye);
         double toBlock = nearestBlock == null ? Double.MAX_VALUE : nearestBlock.getCenter().distanceToSqr(eye);
@@ -479,6 +482,11 @@ public final class ThorAbilities {
         data.setHammerEntityId(returning.getId());
         level.playSound(null, from.x, from.y, from.z, SoundEvents.TRIDENT_RIPTIDE_1.value(), SoundSource.PLAYERS, 1.0F, 0.6F);
         return true;
+    }
+
+    /** Whether the wall of a Hex that keeps Thor out stands between him and {@code at} (his call does not reach in). */
+    private static boolean walled(ServerPlayer thor, Vec3 at) {
+        return Shelters.keepsOut(thor.level(), thor, thor.getEyePosition(), at, false);
     }
 
     private static int findInInventory(Player player) {
@@ -523,7 +531,8 @@ public final class ThorAbilities {
                     continue;
                 }
                 for (BlockEntity be : chunk.getBlockEntities().values()) {
-                    if (be instanceof MjolnirBlockEntity mjolnir && Worthiness.canCall(thor, mjolnir.hammer())) {
+                    if (be instanceof MjolnirBlockEntity mjolnir && Worthiness.canCall(thor, mjolnir.hammer())
+                            && !Shelters.keepsOut(level, thor, thor.getEyePosition(), be.getBlockPos().getCenter(), false)) {
                         double d = be.getBlockPos().distSqr(center);
                         if (d <= bestDist) {
                             bestDist = d;
@@ -611,13 +620,11 @@ public final class ThorAbilities {
      */
     private static void beamShielded(ServerLevel level, ServerPlayer thor, WandaAbilities.ShieldStop shield, float damage) {
         Vec3 at = shield.point();
-        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.2F), at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.12);
+        level.sendParticles(new EnergyParticleOptions(shield.color(), 1.2F), at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.12);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 6, 0.15, 0.15, 0.15, 0.3);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.25F, 1.9F);
         // (With PvP off the beam would not have hurt her: it costs the shield nothing either.)
-        if (shield.owner() instanceof ServerPlayer wanda && thor.canHarmPlayer(wanda)) {
-            WandaAbilities.wear(wanda, damage);
-        }
+        WandaAbilities.pay(shield, thor, damage);
     }
 
     private static void beamHit(ServerLevel level, ServerPlayer thor, Beam beam, EntityHitResult hit, ItemStack weapon, boolean thunder) {
@@ -722,8 +729,9 @@ public final class ThorAbilities {
                 current.hurt(ModDamageTypes.source(level, DamageTypes.LIGHTNING_BOLT, thor, thor), ARC_DAMAGE);
             }
             Entity from2 = current;
+            // (3.3: it does not leap across the wall of a Hex that keeps him out, nor through Billy's barrier from the front.)
             current = level.getEntities(thor, current.getBoundingBox().inflate(ARC_RANGE), e -> e instanceof LivingEntity && e.isAlive()
-                            && !e.isSpectator() && !struck.contains(e) && !isThor(e)).stream()
+                            && !e.isSpectator() && !struck.contains(e) && !isThor(e) && !Shelters.shelters(thor, Shelters.middle(from2), e)).stream()
                     .min(Comparator.comparingDouble(e -> e.distanceToSqr(from2))).orElse(null);
         }
         level.playSound(null, first.getX(), first.getY(), first.getZ(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 0.5F, 1.6F);

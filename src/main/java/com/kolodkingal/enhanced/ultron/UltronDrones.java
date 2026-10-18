@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -140,7 +141,8 @@ public final class UltronDrones {
         for (double up : new double[]{1.0, 2.0, 3.0}) {
             Vec3 spot = ring.add(0, up, 0);
             AABB box = new AABB(spot.x - 0.35, spot.y, spot.z - 0.35, spot.x + 0.35, spot.y + 1.7, spot.z + 0.35);
-            if (level.noCollision(box)) {
+            // (3.3: never formed behind the wall of a Hex that keeps him out)
+            if (level.noCollision(box) && !Shelters.keepsOut(level, hero, hero.getEyePosition(), spot.add(0, 0.85, 0), false)) {
                 return spot;
             }
         }
@@ -336,7 +338,7 @@ public final class UltronDrones {
         ServerLevel level = hero.serverLevel();
         Entity target = level.getEntity(hack.target());
         double reach = UltronConfig.HACK_RANGE.get() * 1.5;
-        if (!hackable(target) || target.distanceTo(hero) > reach || isCut(hero)) {
+        if (!hackable(target) || target.distanceTo(hero) > reach || isCut(hero) || Shelters.shelters(hero, target)) {
             stopHack(hero, data);
             return;
         }

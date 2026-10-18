@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -45,7 +46,8 @@ public final class TheNoise {
             return false;
         }
         double range = BillyAbilities.noiseRange();
-        return entity.distanceToSqr(player) < range * range;
+        // (3.3: no thought is heard through the wall of a Hex that keeps him out.)
+        return entity.distanceToSqr(player) < range * range && !Shelters.keepsOut(player.level(), player, player.getEyePosition(), Shelters.middle(entity), false);
     }
 
     /** The colour a creature he hears glows in: its mood. */

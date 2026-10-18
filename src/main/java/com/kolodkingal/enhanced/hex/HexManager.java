@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -41,9 +42,12 @@ import java.util.UUID;
 /**
  * Wanda's Hex: creating and controlling it, and enforcing the price of crossing its wall.
  *
- * <p>Each tick every living thing near a Hex is checked against which side of the wall it was on last tick.
- * Crossing without Wanda's permission means: bounce off (anyone with powers, and bosses), or a 95% chance of
- * instant death (the survivors simply walk on). Vision is the exception to permission: inside a standing Hex he can't
+ * <p>Each tick every living thing near a Hex (and every player of the level, wherever) is checked against which side of the
+ * wall it was on last tick. 3.3: only those Wanda lets in may enter (her list of players, their pets, creatures if she lets
+ * creatures in; never a boss or a boss's minion): anyone else crossing in bounces off (anyone with powers, and bosses), or
+ * faces a 95% chance of instant death and, surviving it, is thrown back out all the same. Going out, a creature without
+ * powers that survives the wall walks on, as before. What a power does across the wall from outside is stopped by {@link
+ * com.kolodkingal.enhanced.protect.Shelters}. Vision is the exception to permission: inside a standing Hex he can't
  * leave it (Wanda is in control, and in WandaVision he comes apart at the edge of Westview), whether or not she let him
  * in, until Wanda is badly hurt, gone from the world or dead (her death dissolves the Hex). White Vision is held the
  * same way but is simply thrown back: he doesn't come apart. The same goes for the Vision her Hex raised.
@@ -188,6 +192,7 @@ public final class HexManager {
                         ? "message.enhanced.hex_vision.stays" : "message.enhanced.hex_vision.follows"), true);
             }
             case VISION_TARGET -> HexVisions.point(wanda, hex);
+            case SET_RUNES -> HexRunes.set(wanda, hex, value != 0);
         }
     }
 
@@ -235,11 +240,11 @@ public final class HexManager {
             Map<UUID, Boolean> sides = SIDES.computeIfAbsent(hex.id(), k -> new HashMap<>());
             Set<UUID> seen = new HashSet<>();
             List<LivingEntity> near = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, hex.bounds(6.0), LivingEntity::isAlive));
-            // A Vision inside the Hex is watched wherever he is, so that even a jump clear past the edge of the box
-            // above (a lag spike, a command) is seen as leaving and he is brought back.
+            // 3.3: every player of the level is watched wherever they are, so that however fast they fly (Quicksilver, Thor,
+            // a lag spike, the Phoenix) the side they were on is known, and a jump clear past the edge of the box is still a
+            // crossing (a Vision inside is brought back the same way).
             for (ServerPlayer player : level.players()) {
-                if (player.isAlive() && Boolean.TRUE.equals(sides.get(player.getUUID())) && Powers.is(player, Power.VISION)
-                        && !near.contains(player)) {
+                if (player.isAlive() && !near.contains(player)) {
                     near.add(player);
                 }
             }
@@ -249,10 +254,13 @@ public final class HexManager {
                 boolean inside = hex.contains(bodyCenter(entity));
                 Boolean before = sides.get(id);
                 if (before == null) {
-                    // First time we see it near this Hex: if it just teleported here, judge where it came from.
+                    // First time we see it near this Hex: if it just teleported here, judge where it came from; a creature
+                    // that came so fast that last tick it was outside the box round the Hex is judged where it was then.
                     Vec3 from = TELEPORTED_FROM.get(id);
                     if (from != null) {
                         before = hex.contains(from);
+                    } else if (!(entity instanceof Player) && entity.tickCount > 1) {
+                        before = hex.contains(new Vec3(entity.xo, entity.yo + entity.getBbHeight() * 0.5, entity.zo));
                     }
                 }
                 if (before == null || before == inside) {
@@ -266,10 +274,12 @@ public final class HexManager {
                     case BLOCK -> bounce(level, hex, entity, before);
                     case HELD -> hold(level, hex, entity, true);
                     case GAMBLE -> {
-                        if (gamble(level, hex, entity)) {
-                            sides.put(id, inside);
-                        } else {
+                        if (!gamble(level, hex, entity)) {
                             sides.remove(id);
+                        } else if (inside) {
+                            bounce(level, hex, entity, false); // 3.3: surviving the wall is not being let in
+                        } else {
+                            sides.put(id, false);
                         }
                     }
                 }
@@ -355,7 +365,11 @@ public final class HexManager {
                     return false;
                 }
                 case GAMBLE -> {
-                    if (!gamble(level, hex, living)) {
+                    if (!gamble(level, hex, living) || insideAfter) {
+                        // 3.3: only those Wanda lets in come in; a survivor of the wall is not one of them.
+                        if (living.isAlive() && living instanceof Player player) {
+                            player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);
+                        }
                         return false;
                     }
                     sides.put(living.getUUID(), insideAfter);
@@ -363,6 +377,53 @@ public final class HexManager {
             }
         }
         return true;
+    }
+
+    /**
+     * 3.3: something arrived in this level from elsewhere (a portal, a respawn at a bed or an anchor): where it stands inside a
+     * Hex, the wall judges it as coming from outside. Let in, it is inside; else it is set down outside the wall (a hero, a boss,
+     * a creature: the wall's price is not asked for a respawn or a portal; it is only kept out).
+     */
+    public static void arrive(ServerLevel level, LivingEntity entity) {
+        Vec3 at = bodyCenter(entity);
+        for (Hex hex : data(level).hexes()) {
+            if (!hex.contains(at)) {
+                continue;
+            }
+            Map<UUID, Boolean> sides = SIDES.computeIfAbsent(hex.id(), k -> new HashMap<>());
+            if (judge(hex, entity, false) == Verdict.PASS) {
+                sides.put(entity.getUUID(), true);
+                continue;
+            }
+            setOutside(level, hex, entity);
+            sides.put(entity.getUUID(), false);
+            if (entity instanceof ServerPlayer player) {
+                player.displayClientMessage(Component.translatable("message.enhanced.hex.repelled"), true);
+            }
+            return;
+        }
+    }
+
+    /** Sets something down outside the wall, straight out from the middle of the Hex: on the ground there, or beside the wall. */
+    private static void setOutside(ServerLevel level, Hex hex, LivingEntity entity) {
+        Vec3 radial = bodyCenter(entity).subtract(hex.center());
+        Vec3 flat = new Vec3(radial.x, 0, radial.z);
+        flat = flat.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : flat.normalize();
+        // Out past the wall's widest ring, so the spot is outside at any height.
+        Vec3 column = hex.center().add(flat.scale(hex.radius() + 1.5));
+        Vec3 spot = com.kolodkingal.enhanced.ability.Teleports.groundAt(entity, level, (int) Math.floor(column.x), (int) Math.floor(column.z));
+        if (spot == null || hex.contains(spot.add(0, entity.getBbHeight() * 0.5, 0))) {
+            spot = column.add(0, Math.max(0.0, radial.y), 0);
+        }
+        entity.stopRiding();
+        if (entity instanceof ServerPlayer player) {
+            player.connection.teleport(spot.x, spot.y, spot.z, player.getYRot(), player.getXRot());
+        } else {
+            entity.teleportTo(spot.x, spot.y, spot.z);
+        }
+        entity.setDeltaMovement(Vec3.ZERO);
+        entity.resetFallDistance();
+        level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.color, 1.5F), spot.x, spot.y + 1, spot.z, 20, 0.4, 0.6, 0.4, 0.05);
     }
 
     /** What the wall makes of something crossing it into the Hex. */
@@ -378,10 +439,6 @@ public final class HexManager {
      *                hold him (see {@link #holdsVision})
      */
     public static Verdict judge(Hex hex, LivingEntity entity, boolean leaving) {
-        if (BossFights.isHexExempt(entity)) {
-            // A boss fight whose lift carries everyone (Ultron's) takes its members through the wall.
-            return Verdict.PASS;
-        }
         if (entity instanceof Player player) {
             if (player.isCreative() || player.isSpectator() || player.getUUID().equals(hex.owner())) {
                 return Verdict.PASS;
@@ -398,14 +455,18 @@ public final class HexManager {
         if (entity instanceof HexVisionEntity vision && hex.id().equals(vision.hexId())) {
             return leaving ? Verdict.HELD : Verdict.PASS;
         }
-        if (hex.allowCreatures()) {
-            return Verdict.PASS;
-        }
         if (entity instanceof OwnableEntity pet && pet.getOwnerUUID() != null && hex.isAllowed(pet.getOwnerUUID())) {
             return Verdict.PASS;
         }
         if (entity.getType().is(ModTags.HEX_RESISTANT)) {
             return Verdict.BLOCK;
+        }
+        if (entity.getType().is(ModTags.BOSSES) || entity.getType().is(ModTags.BOSS_MINIONS) || BossFights.fightOf(entity) != null) {
+            // 3.3: letting creatures in never lets in a boss or what a boss fight brings (Wanda cannot name them).
+            return Verdict.GAMBLE;
+        }
+        if (hex.allowCreatures()) {
+            return Verdict.PASS;
         }
         return Verdict.GAMBLE;
     }

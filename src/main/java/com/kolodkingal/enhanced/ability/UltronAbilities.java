@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -458,6 +459,9 @@ public final class UltronAbilities {
             return;
         }
         Entity target = hit.getEntity();
+        if (Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
+            return; // 3.3: Billy's Hex Barrier faces him (a Hex's wall was already in the way of his aim)
+        }
         data.startCooldown(3, now, UltronConfig.PULL_COOLDOWN.get());
         if (target instanceof Projectile projectile) {
             SlowMotion.unslow(projectile);
@@ -519,8 +523,8 @@ public final class UltronAbilities {
                 continue;
             }
             Entity target = level.getEntity(pull.target);
-            if (target == null || !target.isAlive()) {
-                it.remove();
+            if (target == null || !target.isAlive() || Shelters.shelters(hero, target)) {
+                it.remove(); // (3.3: gone behind a wall: the pull lets go)
                 continue;
             }
             Vec3 spot = pullSpot(hero, target);
@@ -584,7 +588,9 @@ public final class UltronAbilities {
         DamageSource source = ModDamageTypes.source(level, ModDamageTypes.ULTRON_SLAM, player, player);
         AABB reach = player.getBoundingBox().inflate(radius);
         for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, reach, e -> canSlam(player, e) && e.position().distanceTo(centre) <= radius)) {
-            victim.hurt(source, UltronConfig.SLAM_DAMAGE.get().floatValue());
+            if (!victim.hurt(source, UltronConfig.SLAM_DAMAGE.get().floatValue()) && Shelters.shelters(player, centre, victim)) {
+                continue; // 3.3: Billy's barrier faced the slam and stopped all of it
+            }
             Vec3 out = victim.position().subtract(centre).multiply(1.0, 0.0, 1.0);
             out = out.lengthSqr() < 1.0E-4 ? new Vec3(player.getRandom().nextDouble() - 0.5, 0.0, player.getRandom().nextDouble() - 0.5).normalize() : out.normalize();
             // What stands is thrown along the ground; what flies is slammed into it.

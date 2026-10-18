@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
@@ -341,7 +342,9 @@ public final class Horsemen {
                     if (victim.position().distanceToSqr(at) > 36.0) {
                         continue;
                     }
-                    victim.hurt(level.damageSources().mobAttack(husk), ApocalypseBossConfig.dealt(3.0));
+                    if (!victim.hurt(level.damageSources().mobAttack(husk), ApocalypseBossConfig.dealt(3.0)) && Shelters.shelters(husk, at, victim)) {
+                        continue; // 3.3: Billy's barrier faced the gust and stopped all of it
+                    }
                     Vec3 out = SandControl.flat(at, victim.position());
                     victim.knockback(1.6, -out.x, -out.z);
                     victim.hurtMarked = true;

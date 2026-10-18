@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.boss.BossFights;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +21,8 @@ import java.util.function.BiPredicate;
  * farm animals and pets round a base without a block changing, so each of them asks {@link #mayHurt} for every
  * creature in reach.
  *
- * <p>The rule: never the caster, a Creative or Spectator player, an armour stand, a teammate, the caster's own pets, an
+ * <p>The rule: never what a wall keeps out (3.3: {@link Shelters#keepsOut}), the caster, a Creative or Spectator player, an armour
+ * stand, a teammate, the caster's own pets, an
  * ally some rule names ({@link #addAllyRule}: a creature the Phoenix has taken over) or, for a boss, its own minions
  * (the creatures of one boss fight spare each other). A player only if PvP is on and the caster may harm them. Hostile
  * creatures always, and so is anything that is going after the caster or their team, and the bosses and their
@@ -47,6 +49,9 @@ public final class AreaTargets {
     public static boolean mayHurt(LivingEntity owner, LivingEntity target, boolean hurtsPassives) {
         if (target == owner || target instanceof ArmorStand) {
             return false;
+        }
+        if (Shelters.keepsOut(owner.level(), owner, Shelters.middle(owner), Shelters.middle(target), false)) {
+            return false; // 3.3: behind the wall of a Hex that keeps the caster out, or a ward against a monster's or boss's attack
         }
         if (target instanceof Player player) {
             if (player.isCreative() || player.isSpectator()) {

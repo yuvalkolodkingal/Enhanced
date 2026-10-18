@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.ChatFormatting;
@@ -98,6 +99,9 @@ public final class MjolnirPin {
     private static String refusal(ServerPlayer pinner, LivingEntity target) {
         if (target == pinner) {
             return "message.enhanced.mjolnir.cannot_pin";
+        }
+        if (Shelters.stops(pinner, pinner.getEyePosition(), target, 0.0F)) {
+            return "message.enhanced.shelter.power_stopped"; // 3.3: a Hex's wall, Billy's barrier from the front
         }
         if (target.getType().is(ModTags.PIN_IMMUNE)) {
             return "message.enhanced.mjolnir.pin_immune";

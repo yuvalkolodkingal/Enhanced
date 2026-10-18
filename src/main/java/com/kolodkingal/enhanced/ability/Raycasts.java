@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ability;
 
+import com.kolodkingal.enhanced.protect.Shelters;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -22,7 +23,8 @@ import java.util.function.Predicate;
 
 /**
  * Line-of-sight helpers shared by the server (abilities) and the client (beam rendering), so both agree on what
- * the player is looking at.
+ * the player is looking at. 3.3: every ray of a player ends at the wall of a Hex that does not let him in ({@link
+ * Shelters#hexClip}): nothing behind it is picked, grabbed, struck or seen from outside.
  */
 public final class Raycasts {
 
@@ -36,9 +38,9 @@ public final class Raycasts {
     public static EntityHitResult entity(Player player, double range, double inflate, Predicate<Entity> filter, float partialTick) {
         Vec3 eye = player.getEyePosition(partialTick);
         Vec3 look = player.getViewVector(partialTick);
-        Vec3 end = eye.add(look.scale(range));
+        Vec3 end = Shelters.hexClip(player.level(), player, eye, eye.add(look.scale(range)));
         BlockHitResult block = player.level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-        double maxDist = block.getType() == HitResult.Type.MISS ? range : block.getLocation().distanceTo(eye);
+        double maxDist = block.getType() == HitResult.Type.MISS ? end.distanceTo(eye) : block.getLocation().distanceTo(eye);
         return entityBetween(player.level(), player, eye, eye.add(look.scale(maxDist)), inflate, filter);
     }
 
@@ -75,7 +77,7 @@ public final class Raycasts {
     /** The first solid block along the player's view. */
     public static BlockHitResult block(Player player, double range, float partialTick) {
         Vec3 eye = player.getEyePosition(partialTick);
-        Vec3 end = eye.add(player.getViewVector(partialTick).scale(range));
+        Vec3 end = Shelters.hexClip(player.level(), player, eye, eye.add(player.getViewVector(partialTick).scale(range)));
         return player.level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
     }
 
@@ -86,7 +88,7 @@ public final class Raycasts {
      */
     public static BlockHitResult outline(Player player, double range, float partialTick) {
         Vec3 eye = player.getEyePosition(partialTick);
-        Vec3 end = eye.add(player.getViewVector(partialTick).scale(range));
+        Vec3 end = Shelters.hexClip(player.level(), player, eye, eye.add(player.getViewVector(partialTick).scale(range)));
         return player.level().clip(new ClipContext(eye, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 
@@ -100,7 +102,7 @@ public final class Raycasts {
      */
     public static BlockHitResult metalBlock(Player player, double range, float partialTick) {
         Vec3 eye = player.getEyePosition(partialTick);
-        Vec3 end = eye.add(player.getViewVector(partialTick).scale(range));
+        Vec3 end = Shelters.hexClip(player.level(), player, eye, eye.add(player.getViewVector(partialTick).scale(range)));
         CollisionContext context = CollisionContext.of(player);
         return BlockGetter.traverseBlocks(eye, end, player.level(), (level, cell) -> {
             BlockState state = level.getBlockState(cell);
@@ -132,6 +134,9 @@ public final class Raycasts {
 
     /** Whether the line from {@code from} to {@code to} touches the collision shape of no cell but {@code target}. */
     private static boolean clear(Player player, Vec3 from, Vec3 to, @Nullable BlockPos target) {
+        if (Shelters.hexClip(player.level(), player, from, to) != to) {
+            return false; // behind the wall of a Hex that keeps him out
+        }
         CollisionContext context = CollisionContext.of(player);
         return BlockGetter.traverseBlocks(from, to, player.level(), (level, cell) -> {
             if (cell.equals(target)) {

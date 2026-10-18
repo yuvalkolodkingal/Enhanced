@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import io.netty.buffer.Unpooled;
@@ -105,7 +106,8 @@ public final class MindReading {
     @Nullable
     public static LivingEntity target(ServerPlayer reader) {
         EntityHitResult hit = Raycasts.entity(reader, PhoenixConfig.MIND_READ_RANGE.get(), 0.3, e -> lookable(reader, e), 1.0F);
-        return hit == null ? null : (LivingEntity) hit.getEntity();
+        // (3.3: Billy's Hex Barrier facing her keeps his mind from her too.)
+        return hit == null || Shelters.shelters(reader, reader.getEyePosition(), hit.getEntity()) ? null : (LivingEntity) hit.getEntity();
     }
 
     /**
@@ -366,7 +368,7 @@ public final class MindReading {
         int hostile = 0;
         int silences = 0;
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, phoenix.getBoundingBox().inflate(range),
-                e -> e != phoenix && PhoenixAbilities.hasMind(e) && e.distanceToSqr(phoenix) <= range * range)) {
+                e -> e != phoenix && PhoenixAbilities.hasMind(e) && e.distanceToSqr(phoenix) <= range * range && !Shelters.shelters(phoenix, e))) {
             if (PhoenixAbilities.isShielded(e)) {
                 silences++;
                 continue;

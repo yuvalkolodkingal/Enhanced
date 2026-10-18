@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.network.BeamPayload;
+import com.kolodkingal.enhanced.protect.DarkMagic;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -120,8 +121,9 @@ public final class BeamRenderer {
         Drawer drawer = DRAWERS.get(style.id());
         Vec3 from = drawer != null ? drawer.origin(mc, player, style, partialTick) : origin(mc, player, style, partialTick);
         Vec3 target = Raycasts.any(player, active.range(), ContinuousBeam.targets(player), partialTick).getLocation();
-        // A Scarlet Witch's complete Chaos Shield in the way stops it at its surface (as on the server).
-        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(partialTick), target, partialTick);
+        // A wall in the way (a Chaos Shield, a Hex Barrier, a Hex's wall, a ward against dark magic) stops it there, as on the server.
+        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(partialTick), target, partialTick,
+                DarkMagic.isDark(style));
         if (shield != null) {
             target = shield.point();
         }

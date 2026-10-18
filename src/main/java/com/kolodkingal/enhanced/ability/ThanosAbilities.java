@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -638,6 +639,11 @@ public final class ThanosAbilities {
         if (pvpRefuses(player, target)) {
             return;
         }
+        if (Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
+            // 3.3: Billy's Hex Barrier faces him (a Hex's wall was already in the way of his aim)
+            player.displayClientMessage(Component.translatable("message.enhanced.shelter.power_stopped"), true);
+            return;
+        }
         data.startCooldown(2, now, ThanosConfig.PULL_COOLDOWN.get());
         player.causeFoodExhaustion(ThanosConfig.PULL_EXHAUSTION.get().floatValue());
         state.vortex = new Vortex(target.getId(), now + FLIGHT_TICKS);
@@ -669,8 +675,8 @@ public final class ThanosAbilities {
                 break;
             }
         }
-        if (spot == null || !HexManager.onTeleport(level, target, spot)) {
-            return;
+        if (spot == null || Shelters.shelters(player, target) || !HexManager.onTeleport(level, target, spot)) {
+            return; // (3.3: gone behind a wall since he reached for it: the portal does not reach in)
         }
         // A creature held by telekinesis is let go first.
         for (ServerPlayer holder : level.players()) {
@@ -802,8 +808,9 @@ public final class ThanosAbilities {
      * stones').
      */
     private static void bubble(ServerLevel level, ServerPlayer player) {
-        StonePowers.bubbleProjectiles(level, player.position().add(0.0, player.getBbHeight() * 0.5, 0.0), ThanosConfig.VEIL_RADIUS.get(),
-                projectile -> !isOwnedBy(projectile.getOwner(), player));
+        Vec3 centre = player.position().add(0.0, player.getBbHeight() * 0.5, 0.0);
+        StonePowers.bubbleProjectiles(level, centre, ThanosConfig.VEIL_RADIUS.get(),
+                projectile -> !isOwnedBy(projectile.getOwner(), player) && !Shelters.keepsOut(level, player, centre, projectile.position(), false));
     }
 
     /** Whether the entity is the player or a pet that is his. */
@@ -936,9 +943,9 @@ public final class ThanosAbilities {
         }
         player.causeFoodExhaustion(ThanosConfig.SIGHT_EXHAUSTION.get().floatValue());
         if (ThanosConfig.SIGHT_BREAKS_ILLUSIONS.get()) {
-            LokiAbilities.dissolveDuplicates(level, player.position(), range);
+            LokiAbilities.dissolveDuplicates(level, player.position(), range, player);
             for (ServerPlayer other : level.players()) {
-                if (other != player && other.isAlive() && other.distanceTo(player) <= range) {
+                if (other != player && other.isAlive() && other.distanceTo(player) <= range && !Shelters.shelters(player, other)) {
                     LokiAbilities.unmask(other);
                 }
             }
@@ -1121,7 +1128,8 @@ public final class ThanosAbilities {
         AABB box = new AABB(lock.centre, lock.centre).inflate(radius);
         if (now % LOCK_RENEW == 0) {
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> mayLock(player, e)
-                    && e.position().add(0.0, e.getBbHeight() * 0.5, 0.0).distanceTo(lock.centre) <= radius + e.getBbWidth() * 0.5)) {
+                    && e.position().add(0.0, e.getBbHeight() * 0.5, 0.0).distanceTo(lock.centre) <= radius + e.getBbWidth() * 0.5
+                    && !Shelters.shelters(player, lock.centre, e))) {
                 if (e.addEffect(new MobEffectInstance(ModEffects.TIME_LOCKED, LOCK_HOLD, 0, false, true, true), player)
                         || e.hasEffect(ModEffects.TIME_LOCKED)) {
                     lock.held.add(e.getUUID());
@@ -1133,7 +1141,7 @@ public final class ThanosAbilities {
         IntSet inside = new IntOpenHashSet();
         double drag = 1.0 - ThanosConfig.TIME_LOCK_PROJECTILE_DRAG.get();
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box, p -> !isOwnedBy(p.getOwner(), player)
-                && p.position().distanceTo(lock.centre) <= radius)) {
+                && p.position().distanceTo(lock.centre) <= radius && !Shelters.keepsOut(level, player, lock.centre, p.position(), false))) {
             if (lock.hung.contains(projectile.getId()) || !projectile.isNoGravity()) {
                 // (One that has no gravity of its own is slowed too, but is not ours to let fall again.)
                 inside.add(projectile.getId());

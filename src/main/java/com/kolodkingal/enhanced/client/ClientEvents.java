@@ -29,6 +29,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -276,7 +277,8 @@ public final class ClientEvents {
             while (key.consumeClick()) {
                 clicked = true;
             }
-            boolean usable = power.hasPowers() && mc.screen == null && !player.isSpectator();
+            // (3.3: the Hex Runes hold a sorcerer's powers: no gesture is predicted for a press the server refuses)
+            boolean usable = power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
             boolean down = usable && key.isDown();
             if (usable && clicked && !SENT_DOWN[i]) {
                 if (i == 5 && power == Power.SCARLET_WITCH && !player.isShiftKeyDown() && hasOwnHex(player)) {

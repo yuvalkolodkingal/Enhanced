@@ -469,8 +469,9 @@ public final class UltronMachineTests {
 
         // While the island rises everyone it carries passes, in both directions.
         fight.setHexExempt(true);
-        check(HexManager.judge(hex, boss, false) == HexManager.Verdict.PASS && HexManager.judge(hex, sentry, true) == HexManager.Verdict.PASS
-                && HexManager.judge(hex, member, false) == HexManager.Verdict.PASS, "the lift carries the body, the Sentries and the fighters through");
+        // 3.3: only those Wanda lets in come in: the lift no longer carries anyone through (it is refused where a Hex cuts its way)
+        check(HexManager.judge(hex, boss, false) == HexManager.Verdict.BLOCK && HexManager.judge(hex, sentry, false) == HexManager.Verdict.GAMBLE
+                && HexManager.judge(hex, member, false) != HexManager.Verdict.PASS, "the lift carries nobody through");
         check(HexManager.judge(hex, bystander, false) == HexManager.Verdict.BLOCK, "but not a bystander");
         fight.setHexExempt(false);
         check(HexManager.judge(hex, boss, false) == HexManager.Verdict.BLOCK, "and then the wall is the wall again");

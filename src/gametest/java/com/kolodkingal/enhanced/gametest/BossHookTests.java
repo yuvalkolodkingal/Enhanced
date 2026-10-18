@@ -363,9 +363,10 @@ public final class BossHookTests {
         check(!BossFights.isHexExempt(member) && HexManager.judge(hex, member, false) == HexManager.Verdict.BLOCK,
                 "a hero is bounced by the wall, a fight's member too");
         fight.setHexExempt(true);
-        check(BossFights.isHexExempt(member) && HexManager.judge(hex, member, false) == HexManager.Verdict.PASS && HexManager.judge(hex, member, true) == HexManager.Verdict.PASS,
-                "while the lane says so, its members pass in and out");
-        check(!BossFights.isHexExempt(bystander) && HexManager.judge(hex, bystander, false) == HexManager.Verdict.BLOCK, "a bystander does not");
+        // 3.3: only those Wanda lets in come in: the lane's word no longer opens the wall (the lift is refused where a Hex cuts it)
+        check(BossFights.isHexExempt(member) && HexManager.judge(hex, member, false) == HexManager.Verdict.BLOCK,
+                "even while the lane says so, its members are bounced like anyone she did not let in");
+        check(!BossFights.isHexExempt(bystander) && HexManager.judge(hex, bystander, false) == HexManager.Verdict.BLOCK, "a bystander too");
         fight.setHexExempt(false);
         check(HexManager.judge(hex, member, false) == HexManager.Verdict.BLOCK, "and then the wall is the wall again");
         helper.succeed();

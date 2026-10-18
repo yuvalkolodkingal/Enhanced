@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -259,6 +260,11 @@ public final class Telekinesis {
         if (hit != null) {
             Entity target = hit.getEntity();
             String refused = refusal(player, target, mode);
+            if (refused == null && Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
+                // 3.3: a wall in the way (Billy's Hex Barrier from the front; the Scarlet Witch's grip shatters it)
+                player.displayClientMessage(Component.translatable("message.enhanced.shelter.grip_stopped"), true);
+                return;
+            }
             if (refused == null) {
                 hold(player, target, mode);
                 return;
@@ -272,7 +278,7 @@ public final class Telekinesis {
         if (mode == Mode.BILLY || mode == Mode.JEAN || mode == Mode.MAGNETO || mode.power == Power.CUSTOM) {
             // Arrows are small and fast: aim a little more generously at them (Magneto: at the metal ones).
             hit = Raycasts.entity(player, range, 1.0, e -> e instanceof Projectile && canLift(player, e, mode), 1.0F);
-            if (hit != null) {
+            if (hit != null && !Shelters.keepsOut(player.level(), player, player.getEyePosition(), Shelters.middle(hit.getEntity()), false)) {
                 hold(player, hit.getEntity(), mode);
                 return;
             }
@@ -598,6 +604,13 @@ public final class Telekinesis {
         }
 
         Vec3 wanted = player.getEyePosition().add(player.getLookAngle().scale(grip.distance)).subtract(0, e.getBbHeight() * 0.5, 0);
+        if (Shelters.keepsOut(level, player, player.getEyePosition(), Shelters.middle(e), false)
+                || Shelters.keepsOut(level, player, player.getEyePosition(), wanted.add(0, e.getBbHeight() * 0.5, 0), false)) {
+            // 3.3: a grip from outside a Hex holds nothing inside it, and carries nothing into it: the wall takes it from him.
+            release(player, false);
+            player.displayClientMessage(Component.translatable("message.enhanced.shelter.grip_wall"), true);
+            return;
+        }
         Vec3 target = BossFights.carryLimit(e, wanted); // nothing of a fight leaves its arena in a grip
         Vec3 diff = target.subtract(e.position());
         if (e instanceof ServerPlayer held) {
@@ -886,6 +899,12 @@ public final class Telekinesis {
             }
 
             Vec3 edge = BossFights.edgeStop(e, pos.add(e.getDeltaMovement()));
+            if (edge == null) {
+                // 3.3: thrown from outside at a Hex (or by a monster's doing at a ward), it stops at the wall and crashes there.
+                Shelters.Stop wall = Shelters.wallAcross(level, thrower != null ? thrower : e, Shelters.middle(e), Shelters.middle(e).add(e.getDeltaMovement()));
+                edge = wall == null ? null : wall.point().subtract(e.getDeltaMovement().normalize().scale(e.getBbWidth() * 0.5 + 0.3))
+                        .subtract(0, e.getBbHeight() * 0.5, 0);
+            }
             if (edge != null) {
                 // It would cross the field or the wall of its arena next tick: it stops dead inside it, and crashes there.
                 e.setDeltaMovement(Vec3.ZERO);

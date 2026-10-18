@@ -190,7 +190,7 @@ public final class ThorEffects {
         Vec3 origin = beamOrigin(mc, player, weapon, partialTick);
         double range = ThorAbilities.beamRange(ThorAbilities.heldWeapon(player));
         Vec3 target = Raycasts.any(player, range, ThorAbilities.beamTargets(player), partialTick).getLocation();
-        // A Scarlet Witch's complete Chaos Shield in the way stops it at its surface (as on the server).
+        // A wall in the way (a Chaos Shield, a Hex Barrier, a Hex's wall) stops it there, as on the server.
         WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(partialTick), target, partialTick);
         if (shield != null) {
             target = shield.point();

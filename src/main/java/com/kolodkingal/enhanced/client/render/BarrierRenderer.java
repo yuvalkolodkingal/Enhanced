@@ -130,9 +130,8 @@ public final class BarrierRenderer {
         float grow = formed * formed * (3.0F - 2.0F * formed);
         float fraction = mark.peak <= 0.0F ? 1.0F : Mth.clamp(mark.strength / mark.peak, 0.0F, 1.0F);
         boolean reduced = EnhancedClientConfig.reducedMotion();
-        // It gutters as it nears breaking.
-        // (3.3) A slow throb, about twice a second: at seven times a second it was a strobe.
-        float flicker = fraction < 0.3F && !reduced ? 0.7F + 0.3F * Mth.sin(time * 0.8F) : 1.0F;
+        // It gutters as it nears breaking: a slow uneasy pulse, never a strobe.
+        float flicker = fraction < 0.3F && !reduced ? 0.82F + 0.18F * Mth.sin(time * 0.45F) : 1.0F;
         float hit = Mth.clamp(1.0F - (time - mark.hitAt) / 7.0F, 0.0F, 1.0F);
         boolean mine = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
         float see = mine ? 0.4F : 1.0F; // the plate is right in front of his own eyes: fainter there
@@ -162,7 +161,8 @@ public final class BarrierRenderer {
         buffers.endBatch(seal);
         // 4. crackle, cracks, the ring of a hit
         VertexConsumer vc = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-        crackle(vc, pose, c, plate, width, height, mark, fraction, hit, player.getId(), time, alpha, reduced);
+        // (the cracks stay plain even on his own plate, which is drawn faint: he must see it wearing)
+        crackle(vc, pose, c, plate, width, height, mark, fraction, hit, player.getId(), time, alpha, alpha / see, reduced);
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
 
@@ -223,7 +223,7 @@ public final class BarrierRenderer {
 
     /** Tesla crackle over the plate, the cracks of a weak one, and the ring that runs out from a hit. */
     private static void crackle(VertexConsumer vc, Matrix4f pose, Vec3 c, BillyBarrier.Frame plate, double width, double height, Mark mark,
-                                float fraction, float hit, int id, float time, float alpha, boolean reduced) {
+                                float fraction, float hit, int id, float time, float alpha, float crackAlpha, boolean reduced) {
         // A little lightning along the edge, more when it has been hit. (3.3) Each arc fades in and out over two ticks
         // instead of popping up somewhere new every other tick.
         int arcs = reduced ? 0 : 1 + (hit > 0.0F ? 3 : 0);
@@ -242,7 +242,7 @@ public final class BarrierRenderer {
         for (int n = 0; n < cracks; n++) {
             Vec3 from = surfacePoint(c, plate, width, height, fixed.nextFloat() * 1.6F - 0.8F, 0.25F + fixed.nextFloat() * 0.5F);
             Vec3 to = surfacePoint(c, plate, width, height, fixed.nextFloat() * 1.6F - 0.8F, fixed.nextFloat());
-            jag(vc, pose, from, to, 0.45F, alpha, fixed);
+            jag(vc, pose, from, to, 0.8F, crackAlpha, fixed);
         }
         // The ring of a hit runs out across the plate from its middle.
         if (hit > 0.0F) {

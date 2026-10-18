@@ -2,11 +2,13 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -262,6 +264,9 @@ public final class QuicksilverAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.blitz.blocked"), true);
             return;
         }
+        if (!HexManager.onTeleport(level, player, spot)) {
+            return; // 3.3: the dash is a teleport: the Hex's wall judges it (and says why)
+        }
         data.startCooldown(2, now, BLITZ_COOLDOWN);
 
         Vec3 toTarget = target.position().subtract(spot);
@@ -309,6 +314,11 @@ public final class QuicksilverAbilities {
             return;
         }
         LivingEntity target = (LivingEntity) hit.getEntity();
+        if (Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
+            // 3.3: Billy's Hex Barrier faces him
+            player.displayClientMessage(Component.translatable("message.enhanced.shelter.power_stopped"), true);
+            return;
+        }
         InteractionHand hand = snatchable(target.getMainHandItem()) ? InteractionHand.MAIN_HAND
                 : snatchable(target.getOffhandItem()) ? InteractionHand.OFF_HAND : null;
         if (hand == null) {

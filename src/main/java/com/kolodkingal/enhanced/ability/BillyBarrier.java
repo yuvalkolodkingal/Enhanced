@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -29,30 +30,45 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Billy's Hex Barrier (3.2, Sneak + B held): a plate of blue magic held in front of him that follows his look and stops
- * what comes at him <em>from the front arc only</em> ({@code billy.barrierArc}, half-angle 60 degrees): projectiles, the
- * blows of creatures and players, most of an explosion, Thor's lightning. It is his own protective magic, not a copy of the
- * Scarlet Witch's Chaos Shield: it is a plate, not a dome; it is <em>limited</em> (a strength to wear down, a time to hold,
- * a recharge after it, a slower walk while it is up and a little hunger a second) and grows with his Build Magic rank.
+ * <em>everything</em> that comes at him from the front arc ({@code billy.barrierArc}, half-angle 60 degrees), and nothing from
+ * the side or the back. 3.3: projectiles (scanned where they cross the plate), beams (any beam's line stops at the plate:
+ * {@link com.kolodkingal.enhanced.protect.Shelters#across}), blows, explosions (their damage and their push), lightning, and the
+ * powers that reach for him (a telekinetic grip, Magneto's pull, a boss's attack: {@link
+ * com.kolodkingal.enhanced.protect.Shelters#stops}). It is his own protective magic, not a copy of the Scarlet Witch's Chaos
+ * Shield: it is a plate, not a dome.
  *
- * <p>It stops exactly what the Chaos Shield stops ({@link WandaAbilities#projectilePower} for a projectile's price,
- * {@link WandaAbilities#isMeleeHit}, {@link WandaAbilities#neutralize}), and nothing a boss does that the Chaos Shield does
- * not stop (the Entomb, the Mind Crush, the Hex...): it is a damage hook, never an invulnerability. A blow from the side or
- * the back passes whole.
+ * <p>It has no time limit and costs no hunger: it stays up while B is held. It has <em>health</em> ({@code billy.barrierHealth},
+ * 30): every hit it stops takes what that hit would have done off it; at 0 it shatters (shards and a glassy crash) and cannot be
+ * raised for {@code billy.barrierShatterCooldown} ticks. Its health is kept while it is down and mends slowly ({@code
+ * billy.barrierRegenPerSecond}). Chaos magic breaks it at once: any power of the Scarlet Witch that hits it shatters it, whatever
+ * health it has ({@link #isChaos}).
  *
- * <p>State: it reuses the synced fields of the Chaos Shield in {@link PowerData} ({@code chaosShieldActive}, when it formed,
- * its strength), which no other power of Billy's uses, so the clients know it is up, how much is left and how long it
- * has held; the recharge is the cooldown of B (shared with Freeze).
+ * <p>State: it reuses the synced fields of the Chaos Shield in {@link PowerData} ({@code chaosShieldActive}, when it formed, its
+ * strength = its health), which no other power of Billy's uses, so the clients know it is up and how much is left; while it is
+ * down the server keeps its health ({@link #health}). The recharge is the cooldown of B (shared with Freeze).
  */
 public final class BillyBarrier {
     private static final ResourceLocation SLOW = Enhanced.id("billy_barrier_slow");
     /** How hard a blow that reaches the plate throws its attacker back (a sword's knockback is 0.4). */
     private static final double MELEE_KNOCKBACK = 0.6;
-    private static final int SHATTER_SHARDS = 40;
+    private static final int SHATTER_SHARDS = 64;
+
+    /** What is left of a lowered barrier, and since when it mends (server, per Billy). A Billy not in it has a whole barrier. */
+    private record Kept(float health, long since) {
+    }
+
+    private static final Map<UUID, Kept> KEPT = new HashMap<>();
+    /** When each Billy's barrier last paid for a power that reached for him (a grip, a pull): such a power costs at most twice a second. */
+    private static final Map<UUID, Long> LAST_POWER = new HashMap<>();
 
     // ---- the numbers (read on both sides: the server config is synced to the clients) ----
 
@@ -61,16 +77,39 @@ public final class BillyBarrier {
         return !EnhancedConfig.SPEC.isLoaded() || EnhancedConfig.BILLY_BARRIER.get();
     }
 
-    /** Points of damage a fresh barrier stops at this rank. */
+    /** The health of a whole barrier at this rank ({@code billy.barrierHealth}, and more with the rank if the server says so). */
     public static float maxStrength(BuildData build) {
-        return (float) (EnhancedConfig.BILLY_BARRIER_STRENGTH.get()
-                * (1.0 + EnhancedConfig.BILLY_BARRIER_RANK_STRENGTH_BONUS.get() * BillyAbilities.beamProgress(build)));
+        double health = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.BILLY_BARRIER_HEALTH.get() : 30.0;
+        double bonus = EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.BILLY_BARRIER_RANK_STRENGTH_BONUS.get() : 0.0;
+        return (float) (health * (1.0 + bonus * BillyAbilities.beamProgress(build)));
     }
 
-    /** How long (ticks) a complete barrier can be held at this rank. */
-    public static int maxTicks(BuildData build) {
-        return (int) Math.round(EnhancedConfig.BILLY_BARRIER_DURATION.get()
-                * (1.0 + EnhancedConfig.BILLY_BARRIER_RANK_DURATION_BONUS.get() * BillyAbilities.beamProgress(build)));
+    /** The health of a whole barrier of this Billy (his rank's). */
+    public static float maxHealth(Player billy) {
+        return maxStrength(billy.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY));
+    }
+
+    /**
+     * What is left of this Billy's barrier now: while it is raised, its synced strength; while it is down, what it had when it came
+     * down and what it has mended since ({@code billy.barrierRegenPerSecond}), up to whole. Server.
+     */
+    public static float health(ServerPlayer billy) {
+        PowerData data = Powers.get(billy);
+        if (data.chaosShieldActive()) {
+            return data.shieldStrength();
+        }
+        float max = maxHealth(billy);
+        Kept kept = KEPT.get(billy.getUUID());
+        if (kept == null) {
+            return max;
+        }
+        long since = Math.max(0L, billy.level().getGameTime() - kept.since());
+        return (float) Math.min(max, kept.health() + EnhancedConfig.BILLY_BARRIER_REGEN.get() * since / 20.0);
+    }
+
+    /** Sets what is left of a lowered barrier (it mends from now on). Server; tests use it too. */
+    public static void keep(ServerPlayer billy, float health) {
+        KEPT.put(billy.getUUID(), new Kept(Math.max(0.0F, health), billy.level().getGameTime()));
     }
 
     /** Half the angle of the arc it covers, in degrees. */
@@ -134,9 +173,7 @@ public final class BillyBarrier {
     /** Sneak + B went down (or B came up while it is raised): the barrier forms, or comes down. */
     static void key(ServerPlayer player, PowerData data, boolean down) {
         if (!down) {
-            if (data.chaosShieldActive()) {
-                lower(player, data, false);
-            }
+            lower(player, data);
             return;
         }
         if (player.isSpectator() || data.chaosShieldActive() || !enabled()) {
@@ -148,28 +185,24 @@ public final class BillyBarrier {
                     String.format(Locale.ROOT, "%.1f", (data.cooldownUntil(4) - now) / 20.0)), true);
             return;
         }
-        if (starving(player)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.billy_barrier.hungry"), true);
+        float health = health(player);
+        if (health < 1.0F) {
+            player.displayClientMessage(Component.translatable("message.enhanced.billy_barrier.mending"), true);
             return;
         }
-        BuildData build = player.getData(ModAttachments.BUILD_DATA);
-        data.raiseChaosShield(now, EnhancedConfig.BILLY_BARRIER_WIND_UP.get(), maxStrength(build));
+        KEPT.remove(player.getUUID());
+        data.raiseChaosShield(now, EnhancedConfig.BILLY_BARRIER_WIND_UP.get(), health);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.7F, 1.9F);
     }
 
-    /** With an empty hunger bar there is nothing left to fuel the barrier (not in Creative). */
-    private static boolean starving(Player player) {
-        return !player.getAbilities().invulnerable && player.getFoodData().getFoodLevel() <= 0;
-    }
-
-    /**
-     * It comes down (the key came up, the time ran out, hunger): the recharge starts, if it was ever complete.
-     *
-     * @param ended whether its time ran out (the same recharge; it only says so)
-     */
-    private static void lower(ServerPlayer player, PowerData data, boolean ended) {
+    /** It comes down (the key came up, or he can no longer hold it): what is left of it is kept and mends, a short recharge starts if it ever formed. */
+    public static void lower(ServerPlayer player, PowerData data) {
+        if (!data.chaosShieldActive()) {
+            return;
+        }
         long now = player.level().getGameTime();
         boolean formed = data.chaosShieldUp(now);
+        keep(player, data.shieldStrength());
         data.setChaosShieldActive(false);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         if (formed) {
@@ -180,29 +213,18 @@ public final class BillyBarrier {
 
     // ---- every tick ----
 
-    /** Keeps the barrier up while it is held: the time, the hunger, the slow walk, and the projectiles that reach the plate. */
+    /** Keeps the barrier up while it is held (no time limit, no hunger): the slow walk, and the projectiles that reach the plate. */
     static void tick(ServerPlayer player, PowerData data) {
         if (!data.chaosShieldActive()) {
             PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             return;
         }
         if (player.isSpectator() || !enabled()) {
-            lower(player, data, false);
-            return;
-        }
-        if (starving(player)) {
-            lower(player, data, false);
-            player.displayClientMessage(Component.translatable("message.enhanced.billy_barrier.hungry"), true);
+            lower(player, data);
             return;
         }
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        BuildData build = player.getData(ModAttachments.BUILD_DATA);
-        if (now >= data.shieldFormedAt() + maxTicks(build)) {
-            lower(player, data, true);
-            return;
-        }
-        player.causeFoodExhaustion(EnhancedConfig.BILLY_BARRIER_EXHAUSTION_PER_SECOND.get().floatValue() / 20.0F);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SLOW, EnhancedConfig.BILLY_BARRIER_SPEED_FACTOR.get() - 1.0, true,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
@@ -247,59 +269,76 @@ public final class BillyBarrier {
     private static void block(ServerPlayer player, PowerData data, Projectile projectile) {
         float power = WandaAbilities.projectilePower(projectile);
         WandaAbilities.neutralize(player.serverLevel(), projectile, BillyAbilities.MAIN);
-        wear(player, data, power);
+        wear(player, data, power, projectile);
     }
 
     /**
-     * An incoming blow on a Billy who holds a complete barrier: what the plate stops is cancelled (or reduced), and wears it
-     * down. Called by the damage hook before anything else of his is looked at.
+     * An incoming hit on a Billy who holds a complete barrier: whatever comes from the front (a projectile, a blow, a beam, an
+     * explosion, lightning, a curse: any harm that has a place it comes from) is stopped whole and wears the barrier down by what
+     * it would have done; a blow throws its attacker back. Harm with no place (falling, hunger, poison, fire on him) and what
+     * bypasses invulnerability are not its business. Called by the damage hook before anything else of his is looked at.
      *
-     * @return whether the blow was stopped altogether
+     * @return whether the hit was stopped
      */
     public static boolean absorb(ServerPlayer billy, LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
-        PowerData data = Powers.get(billy);
+        Entity attacker = source.getEntity();
         Entity direct = source.getDirectEntity();
-        if (source.is(DamageTypeTags.IS_PROJECTILE) && direct != null && source.getEntity() != billy) {
-            if (!covers(billy, direct.position())) {
-                return false;
-            }
-            sparks(billy, direct.position());
-            wear(billy, data, event.getAmount());
-            event.setCanceled(true);
-            return true;
+        if (attacker == billy || (attacker == null && direct == billy)) {
+            return false; // his own
         }
-        if (WandaAbilities.isMeleeHit(source) && direct instanceof LivingEntity attacker && attacker != billy) {
-            if (!covers(billy, attacker.position().add(0, attacker.getBbHeight() * 0.5, 0))) {
-                return false;
-            }
-            blockMelee(billy, data, attacker, event.getAmount());
-            event.setCanceled(true);
-            return true;
-        }
-        if (source.is(DamageTypeTags.IS_EXPLOSION)) {
-            Vec3 from = source.getSourcePosition();
-            if (from != null && covers(billy, from)) {
-                float absorbable = event.getAmount() * (1.0F - EnhancedConfig.BILLY_BARRIER_EXPLOSION_FACTOR.get().floatValue());
-                sparks(billy, from);
-                event.setAmount(event.getAmount() - wear(billy, data, absorbable));
-            }
+        Vec3 from = origin(source);
+        if (from == null || !covers(billy, from)) {
             return false;
         }
-        if (source.is(DamageTypeTags.IS_LIGHTNING) && ThorAbilities.isThor(source.getEntity())) {
-            Vec3 from = source.getEntity().position().add(0, source.getEntity().getBbHeight() * 0.5, 0);
-            if (!covers(billy, from)) {
-                return false;
-            }
-            wear(billy, data, event.getAmount());
-            event.setCanceled(true);
-            return true;
+        PowerData data = Powers.get(billy);
+        if (WandaAbilities.isMeleeHit(source) && direct instanceof LivingEntity blow) {
+            blockMelee(billy, data, blow, event.getAmount(), source);
+        } else {
+            sparks(billy, from);
+            wear(billy, data, event.getAmount(), attacker != null ? attacker : direct, source);
         }
-        return false;
+        event.setCanceled(true);
+        return true;
+    }
+
+    /**
+     * Where a hit comes from: the projectile or the striker for what has one (its middle), an explosion's centre, or whoever dealt
+     * it; null for harm that comes from nowhere.
+     */
+    @Nullable
+    static Vec3 origin(DamageSource source) {
+        Entity direct = source.getDirectEntity();
+        if (direct != null) {
+            return direct.position().add(0, direct.getBbHeight() * 0.5, 0);
+        }
+        if (source.getSourcePosition() != null) {
+            return source.getSourcePosition();
+        }
+        Entity attacker = source.getEntity();
+        return attacker == null ? null : attacker.position().add(0, attacker.getBbHeight() * 0.5, 0);
+    }
+
+    /**
+     * A power that is not a hit reaches for him from the front (a grip, a pull, a curse, a boss's spell): the plate stops it, sparks
+     * and pays {@code cost} (at most twice a second for the same Billy; the Scarlet Witch's shatters it at once). Called from
+     * {@link com.kolodkingal.enhanced.protect.Shelters#stops}.
+     */
+    public static void stopPower(ServerPlayer billy, @Nullable Entity source, Vec3 from, float cost) {
+        sparks(billy, from);
+        long now = billy.level().getGameTime();
+        Long last = LAST_POWER.get(billy.getUUID());
+        if (!isChaos(source) && last != null && now - last < 10 && now >= last) {
+            return;
+        }
+        LAST_POWER.put(billy.getUUID(), now);
+        ServerLevel level = billy.serverLevel();
+        level.playSound(null, from.x, from.y, from.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.7F);
+        wear(billy, Powers.get(billy), cost, source);
     }
 
     /** A creature's or player's blow lands on the plate: sparks and a ring of sound there, the attacker thrown back, and the price paid. */
-    private static void blockMelee(ServerPlayer billy, PowerData data, LivingEntity attacker, float amount) {
+    private static void blockMelee(ServerPlayer billy, PowerData data, LivingEntity attacker, float amount, DamageSource source) {
         ServerLevel level = billy.serverLevel();
         Vec3 center = body(billy);
         Vec3 away = attacker.position().add(0, attacker.getBbHeight() * 0.5, 0).subtract(center);
@@ -312,7 +351,7 @@ public final class BillyBarrier {
         Vec3 out = flat < 1.0E-3 ? billy.getLookAngle() : new Vec3(away.x / flat, 0, away.z / flat);
         attacker.knockback(MELEE_KNOCKBACK, -out.x, -out.z);
         attacker.hurtMarked = true;
-        wear(billy, data, amount);
+        wear(billy, data, amount, attacker, source);
     }
 
     /** Blue and white-hot sparks where something struck the plate. */
@@ -329,26 +368,52 @@ public final class BillyBarrier {
     }
 
     /**
-     * Wears the barrier down by what it just stopped; when nothing is left it breaks.
-     *
-     * @return how much of {@code amount} it took (all of it, unless it had less strength left)
+     * Whether a power is the Scarlet Witch's chaos magic: whoever is behind it (a projectile's owner, a thrown block's thrower...)
+     * is a Scarlet Witch. It shatters a Hex Barrier at once.
      */
-    static float wear(ServerPlayer billy, PowerData data, float amount) {
-        float taken = Math.min(amount, data.shieldStrength());
-        data.setShieldStrength(data.shieldStrength() - taken);
-        if (data.shieldStrength() <= 1.0E-4F) {
-            data.setShieldStrength(0F);
-            shatter(billy, data);
-        }
-        return taken;
+    public static boolean isChaos(@Nullable Entity cause) {
+        Entity maker = com.kolodkingal.enhanced.protect.Shelters.maker(cause);
+        return maker instanceof Player player && Powers.is(player, Power.SCARLET_WITCH);
     }
 
-    /** The barrier took all it could: a burst of blue shards and a glassy sound, and a long wait before the next. */
-    private static void shatter(ServerPlayer billy, PowerData data) {
+    /**
+     * Wears the barrier down by what it just stopped; when nothing is left it shatters. Chaos magic ({@link #isChaos}) shatters
+     * it whatever it had left.
+     *
+     * @param cause who or what dealt it (a projectile counts as its owner), or null if it is not known
+     * @return how much of {@code amount} it took (all of it: it stops the hit that breaks it too)
+     */
+    public static float wear(ServerPlayer billy, PowerData data, float amount, @Nullable Entity cause) {
+        return wear(billy, data, amount, cause, null);
+    }
+
+    private static float wear(ServerPlayer billy, PowerData data, float amount, @Nullable Entity cause, @Nullable DamageSource source) {
+        if (!data.chaosShieldActive()) {
+            return 0.0F;
+        }
+        if (isChaos(cause) || (source != null && source.is(ModDamageTypes.CHAOS_BEAM))) {
+            data.setShieldStrength(0F);
+            shatter(billy, data, true);
+            return amount;
+        }
+        data.setShieldStrength(Math.max(0.0F, data.shieldStrength() - amount));
+        if (data.shieldStrength() <= 1.0E-4F) {
+            data.setShieldStrength(0F);
+            shatter(billy, data, false);
+        }
+        return amount;
+    }
+
+    /**
+     * The barrier took all it could (or chaos magic hit it): it bursts into blue shards with a glassy crash that everyone near
+     * hears, its health is gone (it mends from nothing) and it cannot be raised for {@code billy.barrierShatterCooldown}.
+     */
+    private static void shatter(ServerPlayer billy, PowerData data, boolean chaos) {
         ServerLevel level = billy.serverLevel();
+        keep(billy, 0.0F);
         data.setChaosShieldActive(false);
         PowerTicker.setModifier(billy, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        data.startCooldown(4, level.getGameTime(), EnhancedConfig.BILLY_BARRIER_BROKEN_COOLDOWN.get());
+        data.startCooldown(4, level.getGameTime(), EnhancedConfig.BILLY_BARRIER_SHATTER_COOLDOWN.get());
         Frame plate = frame(body(billy), billy.getLookAngle());
         RandomSource random = billy.getRandom();
         ItemParticleOption shard = new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.LIGHT_BLUE_DYE));
@@ -361,17 +426,37 @@ public final class BillyBarrier {
             }
         }
         Vec3 c = plate.center();
-        level.playSound(null, c.x, c.y, c.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.2F, 1.4F);
-        level.playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 1.0F, 1.5F);
-        billy.displayClientMessage(Component.translatable("message.enhanced.billy_barrier.broken").withStyle(net.minecraft.ChatFormatting.AQUA), true);
+        // A ring of light runs out from the plate as it goes, and red sparks if chaos magic broke it.
+        for (int i = 0; i < 24; i++) {
+            double angle = Math.PI * 2 * i / 24;
+            Vec3 dir = plate.right().scale(Math.cos(angle)).add(plate.up().scale(Math.sin(angle)));
+            Vec3 at = plate.center().add(dir.scale(0.3));
+            level.sendParticles(new EnergyParticleOptions(chaos && i % 2 == 0 ? Power.SCARLET_WITCH.color : BillyAbilities.CORE, 1.1F),
+                    at.x, at.y, at.z, 0, dir.x, dir.y, dir.z, 0.35);
+        }
+        level.sendParticles(ParticleTypes.FLASH, plate.center().x, plate.center().y, plate.center().z, 1, 0, 0, 0, 0);
+        level.playSound(null, c.x, c.y, c.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.4F, 1.2F);
+        level.playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 1.2F, 1.4F);
+        level.playSound(null, c.x, c.y, c.z, SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.PLAYERS, 0.5F, 1.8F);
+        billy.displayClientMessage(Component.translatable(chaos ? "message.enhanced.billy_barrier.chaos" : "message.enhanced.billy_barrier.broken")
+                .withStyle(chaos ? net.minecraft.ChatFormatting.RED : net.minecraft.ChatFormatting.AQUA), true);
     }
 
     // ---- lifecycle ----
 
     /** Ends everything this hero left in the world (the power is being taken away). */
     public static void endAll(ServerPlayer player, PowerData data) {
+        if (data.chaosShieldActive()) {
+            keep(player, data.shieldStrength());
+        }
         data.setChaosShieldActive(false);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SLOW, 0.0, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    }
+
+    /** Server stop: forget what every barrier had left. */
+    public static void clear() {
+        KEPT.clear();
+        LAST_POWER.clear();
     }
 
     private BillyBarrier() {

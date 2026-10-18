@@ -139,6 +139,18 @@ public final class VisionAbilities {
     private static void beamTick(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         HitResult hit = Raycasts.any(player, EnhancedConfig.CHAOS_BEAM_RANGE.get(), WandaAbilities.BEAM_TARGET, 1.0F);
+        // 3.3: a wall in the way (a Chaos Shield, Billy's barrier from the front, a Hex that keeps him out) ends the beam there.
+        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, player, player.getEyePosition(), hit.getLocation(), 1.0F);
+        if (shield != null) {
+            if (player.tickCount % 10 == 0) {
+                WandaAbilities.pay(shield, player, EnhancedConfig.MIND_STONE_BEAM_DAMAGE.get().floatValue());
+            }
+            Vec3 at = shield.point();
+            if (player.tickCount % 2 == 0) {
+                level.sendParticles(new EnergyParticleOptions(shield.color(), 1.4F), at.x, at.y, at.z, 4, 0.12, 0.12, 0.12, 0.12);
+            }
+            return;
+        }
         if (hit instanceof EntityHitResult entityHit) {
             entityHit.getEntity().hurt(ModDamageTypes.source(level, ModDamageTypes.MIND_STONE_BEAM, player, player),
                     EnhancedConfig.MIND_STONE_BEAM_DAMAGE.get().floatValue());

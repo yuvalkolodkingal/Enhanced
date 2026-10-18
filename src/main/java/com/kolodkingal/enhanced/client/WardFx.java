@@ -5,7 +5,10 @@ import com.kolodkingal.enhanced.client.render.AnimMath;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.network.WardSyncPayload;
+import com.kolodkingal.enhanced.protect.Shelters;
+import com.kolodkingal.enhanced.vishanti.Ward;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -46,11 +49,15 @@ public final class WardFx {
     /** The server's list of the wards of a dimension (called from the payload, on the client's thread). */
     public static void accept(WardSyncPayload payload) {
         DOMES.put(payload.dimension(), payload.domes());
+        // 3.3: the walls of the common code know them too (a dark beam is drawn to where a ward stops it).
+        Shelters.acceptWards(payload.dimension(), payload.domes().stream()
+                .map(d -> new Ward(Util.NIL_UUID, "", new Vec3(d.x(), d.y(), d.z()), d.radius(), d.color())).toList());
     }
 
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         DOMES.clear();
+        Shelters.forgetWards();
     }
 
     @SubscribeEvent

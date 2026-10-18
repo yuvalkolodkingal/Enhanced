@@ -31,6 +31,7 @@ import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
 
 import java.util.Locale;
 
@@ -245,12 +246,20 @@ public class PowerHud implements LayeredDraw.Layer {
     }
 
     /**
-     * The Hex Barrier's line while it is up (3.2): "forming", then what is left of its strength and the seconds it can still
-     * be held, as the Chaos Shield's line shows them (its recharge shows instead once it has come down).
+     * The Hex Barrier's line while it is up (3.3): "forming", then its health as a bar of ten cells and in numbers ("21/30"),
+     * green, then yellow below half and red below a quarter. The big bar under the crosshair is {@link BarrierHud}'s.
      */
     private static Component hexBarrier(LocalPlayer player, PowerData data) {
-        BuildData build = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
-        return shield(data, player.level().getGameTime(), BillyBarrier.maxStrength(build), BillyBarrier.maxTicks(build));
+        if (!data.chaosShieldUp(player.level().getGameTime())) {
+            return Component.translatable("hud.enhanced.shield_forming").withStyle(ChatFormatting.GOLD);
+        }
+        float max = BillyBarrier.maxHealth(player);
+        float left = Math.min(data.shieldStrength(), max);
+        float fraction = max <= 0 ? 0 : left / max;
+        ChatFormatting color = fraction > 0.5F ? ChatFormatting.GREEN : fraction > 0.25F ? ChatFormatting.YELLOW : ChatFormatting.RED;
+        int cells = Mth.clamp(Math.round(fraction * 10), left > 0 ? 1 : 0, 10);
+        String bar = "\u25AE".repeat(cells) + "\u25AF".repeat(10 - cells);
+        return Component.translatable("hud.enhanced.barrier_health", bar, (int) Math.ceil(left), (int) Math.ceil(max)).withStyle(color);
     }
 
     /**
