@@ -25,6 +25,8 @@ H = Heavy Core
 R = Breeze Rod (the handle)
 ```
 
+**Or find it where it fell (3.3).** In deserts, badlands, savannas and plains, a [crater](Structures#mjolnirs-crater) of burnt rock and scorched earth, as in New Mexico in *Thor*, holds a Mjolnir in its middle, lying handle up, **owned by nobody**. The first worthy player who right-clicks it lifts it and claims it; anyone else gets "It won't budge". `/locate structure enhanced:mjolnir_crater` finds the nearest.
+
 Mjolnir hits hard (10 attack damage, slow like an axe), never breaks, and fire and lava can't destroy it. Speedsters can't snatch it and telekinesis can't lift it, not even Magneto's.
 
 ### The worthy

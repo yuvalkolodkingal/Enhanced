@@ -74,6 +74,10 @@ The `<power>` argument is one of:
 | `thanos` | [Thanos](Thanos) |
 | `ultron` | [Ultron](Ultron) |
 | `apocalypse` | [Apocalypse](Apocalypse) |
+| `agatha` | [Agatha](Agatha) |
+| `cyclops` | [Cyclops](Cyclops) |
+| `professor_x` | [Professor X](Professor-X) |
+| `custom` | The player's own hero from the [Hero Creator](Hero-Creator): the one they last made (an empty hero, with no powers, if they never made one) |
 
 The command suggests the names as you type. A player who is given a power awakens as that hero, with the title, the sound and the announcement to everyone, exactly as if they had earned it. If a player already has that power and you give a look, only the look changes.
 
@@ -93,8 +97,11 @@ The `[look]` or `<look>` argument is the id of a look (see [Looks](Looks)):
 | Thanos | `infinity_war`, `endgame`, `own` |
 | Ultron | `prime`, `sentry`, `human`, `own` |
 | Apocalypse | `apocalypse`, `en_sabah_nur`, `own` |
+| Agatha | `wandavision`, `all_along`, `own` |
+| Cyclops | `apocalypse`, `classic`, `own` |
+| Professor X | `young`, `old`, `own` |
 
-Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced look` skips players whose hero does not have the look, and it fails with "Unknown look" if no given player has it.
+Magneto, the Scarlet Witch and Quicksilver have no looks to choose, and a custom hero's look is chosen in the Hero Creator. Professor X given without a look is the young Charles (the screen that asks which Charles he is opens only after the wheelchair; **H** changes it). `/enhanced look` skips players whose hero does not have the look, and it fails with "Unknown look" if no given player has it.
 
 ## Examples
 
@@ -108,6 +115,9 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose. `/enhanced l
 | `/enhanced power set Steve thanos endgame` | Makes Steve Thanos, in the Endgame armour (he skips the Mad Titan and the Gauntlet). |
 | `/enhanced power set Steve ultron sentry` | Makes Steve Ultron, in the Sentry look. |
 | `/enhanced power set Steve apocalypse en_sabah_nur` | Makes Steve Apocalypse, in the 3600 BC look (he skips the boss and the Essence). |
+| `/enhanced power set Steve agatha all_along` | Makes Steve Agatha, in her outfit of the Witches' Road. |
+| `/enhanced power set Steve professor_x old` | Makes Steve Professor X, the old one in his wheelchair. |
+| `/enhanced power set Steve cyclops classic` | Makes Steve Cyclops, in the comics' suit (he still needs his glasses on his head to fire). |
 | `/enhanced power set Steve none` | Takes Steve's power away. |
 | `/enhanced look Steve white_vision` | Puts Steve, a Vision, in the White Vision look. |
 | `/enhanced hex list` | Lists the Hexes in your dimension. |

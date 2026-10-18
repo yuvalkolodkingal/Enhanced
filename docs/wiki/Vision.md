@@ -18,7 +18,7 @@ N = Netherite Ingot
 S = Nether Star
 ```
 
-Hold **Loki's Scepter** in one hand and the core in the other, and use the scepter. The Mind Stone moves into the body: the core is used up and you **become Vision** for good. Holding the core also protects you from the stone, exactly like the gene does for Wanda. (Loki's Scepter is found in chests: see [Items and Crafting](Items-and-Crafting).)
+Hold **Loki's Scepter** in one hand and the core in the other, and use the scepter. The Mind Stone moves into the body: the core is used up and you **become Vision** for good. Holding the core also protects you from the stone, exactly like the gene does for Wanda. (Loki's Scepter is kept in the vault of a [Hydra outpost](Structures#a-hydra-outpost): see [Items and Crafting](Items-and-Crafting#lokis-scepter).)
 
 ## The synthetic body
 

@@ -2,7 +2,7 @@
 
 Every balance number of the mod lives in one file, **`world/serverconfig/enhanced-server.toml`** in the world (or server) folder. The mod creates it when the world is first loaded, with every option at its default, and syncs it to the clients. It is a plain text file: open it in any editor, change a value and restart the world or the server.
 
-The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti) and the [Darkhold](#the-darkhold) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
+The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes) and the [Hero Creator](#the-hero-creator) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
 
 ```toml
 [scarlet_witch]
@@ -93,6 +93,16 @@ Section `[hex_vision]`. When Wanda raises a Hex, a Vision appears to fight at he
 | `hex_vision.beamRange` | `16` | 2 to 64 | How far (in blocks) his Mind Stone beam reaches. Up close he punches instead. |
 | `hex_vision.rebuildTicks` | `1200` | 20 to 72000 | How long, in ticks, Wanda needs to rebuild him after he falls, while the Hex stands (1200 = a minute). |
 
+## Hex Runes
+
+Section `[hex_runes]` (3.3). The page is [Scarlet Witch](Scarlet-Witch#hex-runes): from her Hex Control screen the Scarlet Witch inscribes runes on the four walls of her Hex, and while they glow every other sorcerer inside it (Agatha, Loki, Billy, another Scarlet Witch, and anyone holding the Darkhold or the Book of the Vishanti) cannot use powers.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `hex_runes.enabled` | `true` | `true` or `false` | The Hex Runes can be inscribed (false: the button does nothing and runes already up do nothing). |
+| `hex_runes.cooldown` | `100` | 0 to 72000 | Ticks after inscribing the runes before she can inscribe them again (wiping them is free and at once). |
+| `hex_runes.exhaustion` | `4.0` | 0.0 to 40.0 | Food exhaustion inscribing the runes costs (4.0 = 1 food point; Creative is free). On an empty stomach she cannot inscribe them. |
+
 ## Vision
 
 Section `[vision]`. The hero's page is [Vision](Vision).
@@ -135,21 +145,20 @@ Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road). His b
 | `billy.beamExhaustionPerSecond` | `0.8` | 0.0 to 40.0 | Food exhaustion a second of the Hex Beam costs (4.0 = 1 food point; the old bolt cost none). He cannot fire it on an empty stomach. |
 | `billy.beamRankDamageBonus` | `1.0` | 0.0 to 10.0 | How much stronger the beam is at his highest rank (`build_magic_billy.maxRank`) than at his first, as a fraction: 1.0 = twice the damage. In between it grows evenly with the rank (rank 1: none). |
 | `billy.beamRankRangeBonus` | `1.0` | 0.0 to 10.0 | The same for the range: 1.0 = twice as far at his highest rank. |
-| `billy.barrier` | `true` | `true` or `false` | 3.2: Sneak + **B**, held, raises Billy's Hex Barrier: a plate of blue magic in front of him that stops projectiles, blows and part of explosions coming from the front (see `barrierArc`), but only up to `barrierStrength`, for `barrierDuration` ticks, and then it has to recharge (B's recharge, shared with Freeze). If `false`: the key does nothing. |
-| `billy.barrierStrength` | `20.0` | 1.0 to 1000.0 | Points of damage the Hex Barrier stops before it breaks, at his first rank (20 is two thirds of what Wanda's Chaos Shield held, which a Scarlet Witch can now hold without end). Everything it stops wears it down. It grows with his Build Magic rank (`barrierRankStrengthBonus`). |
-| `billy.barrierDuration` | `100` | 10 to 6000 | How long (in ticks) a complete Hex Barrier can be held, at his first rank (100 = 5 seconds). It grows with his Build Magic rank (`barrierRankDurationBonus`). |
-| `billy.barrierRankStrengthBonus` | `2.0` | 0.0 to 20.0 | How much stronger the Hex Barrier is at his highest rank (`build_magic_billy.maxRank`) than at his first, as a fraction: 2.0 = three times the strength. In between it grows evenly with the rank. |
-| `billy.barrierRankDurationBonus` | `1.0` | 0.0 to 20.0 | The same for how long it can be held: 1.0 = twice as long at his highest rank. |
+| `billy.barrier` | `true` | `true` or `false` | Sneak + **B**, held, raises Billy's Hex Barrier: a plate of blue magic in front of him that stops everything coming from the front (see `barrierArc`): projectiles, beams, blows, explosions and their push, lightning, grips, pulls and the attacks of bosses. 3.3: it has no time limit and costs no hunger; it has `barrierHealth`. If `false`, the key does nothing. |
+| `billy.barrierHealth` | `30.0` | 1.0 to 1000.0 | 3.3: the health of the Hex Barrier. Every hit it stops takes what that hit would have done off it; at 0 it shatters and cannot be raised for `barrierShatterCooldown` ticks. Any power of the Scarlet Witch (chaos magic) that hits it shatters it at once, whatever it has left. It keeps what it has left while it is down and mends (`barrierRegenPerSecond`). |
+| `billy.barrierRankHealthBonus` | `0.0` | 0.0 to 20.0 | How much more health the Hex Barrier has at his highest rank (`build_magic_billy.maxRank`) than at his first, as a fraction: 1.0 = twice the health. In between it grows evenly with the rank. 0 = `barrierHealth` at every rank. |
+| `billy.barrierRegenPerSecond` | `1.5` | 0.0 to 100.0 | 3.3: health the Hex Barrier mends a second while it is lowered (1.5: from nothing to 30 in 20 seconds). It does not mend while it is raised. |
 | `billy.barrierWindUpTicks` | `8` | 0 to 100 | How long (in ticks) the Hex Barrier takes to form after the key goes down. It stops nothing until it is complete. |
-| `billy.barrierCooldown` | `200` | 0 to 6000 | Ticks before **B** can be used again after the barrier was lowered or ran out of time (200 = 10 seconds). |
-| `billy.barrierBrokenCooldown` | `400` | 0 to 6000 | Ticks before **B** can be used again after the barrier broke (400 = 20 seconds). |
-| `billy.barrierExhaustionPerSecond` | `0.4` | 0.0 to 40.0 | Food exhaustion a second of the Hex Barrier costs (4.0 = 1 food point). He cannot raise it on an empty stomach. |
-| `billy.barrierArc` | `60.0` | 10.0 to 90.0 | Half the angle (in degrees) of the arc in front of him that the barrier covers: a blow, a projectile or an explosion from further round than this (from the side or from behind) is not stopped at all. |
+| `billy.barrierCooldown` | `10` | 0 to 6000 | Ticks before **B** can be used again after the barrier was lowered (it was complete). **A server file written by 3.2 still says `200`** (the game never rewrites a value that is in the file): set it to 10 for the 3.3 barrier. |
+| `billy.barrierShatterCooldown` | `200` | 0 to 6000 | 3.3: ticks before the Hex Barrier (and **B**) can be used again after it shattered (200 = 10 seconds). |
+| `billy.barrierArc` | `60.0` | 10.0 to 90.0 | Half the angle (in degrees) of the arc in front of him that the barrier covers: a blow, a projectile, a beam or an explosion from further round than this (from the side or from behind) is not stopped at all. |
 | `billy.barrierWidth` | `1.4` | 0.5 to 6.0 | Width (in blocks) of the plate the barrier is drawn as. |
 | `billy.barrierHeight` | `2.4` | 0.5 to 6.0 | Height (in blocks) of the plate. |
 | `billy.barrierDistance` | `1.6` | 0.8 to 4.0 | How far (in blocks) in front of him the plate is held; projectiles are stopped when they reach it. |
 | `billy.barrierSpeedFactor` | `0.6` | 0.1 to 1.0 | How fast he walks while the barrier is raised (1.0 = as usual, 0.6 = at three fifths of the speed). |
-| `billy.barrierExplosionFactor` | `0.5` | 0.0 to 1.0 | The fraction of the damage of an explosion in front of him that still gets through the barrier (the Chaos Shield lets a quarter through). |
+
+The 3.2 options `barrierStrength`, `barrierDuration`, `barrierRankStrengthBonus`, `barrierRankDurationBonus`, `barrierBrokenCooldown`, `barrierExhaustionPerSecond` and `barrierExplosionFactor` are gone in 3.3 (the barrier has health instead of strength, no time limit and no hunger, and stops all of an explosion).
 
 ## Build Magic
 
@@ -175,7 +184,7 @@ Sections `[build_magic]`, `[build_magic_wanda]` and `[build_magic_billy]`. The p
 | `build_magic.hugeSpellBlocks` | `1000000` | 1000 to 2147483647 | A spell over this many blocks needs the longer hold. |
 | `build_magic.hugeHoldTicks` | `40` | 0 to 200 | How long that hold is. |
 | `build_magic.allArenasProtected` | `true` | `true` or `false` | No Build Magic spell and no Magnetic Pull changes a block in the arena of any running boss fight, Thanos's included. If `false`: only the protected arenas (and always the island in the sky). One switch for both, so the two never disagree about where they may change a block. |
-| `build_magic.hexIsAClaim` | `false` | `true` or `false` | Inside a Hex, only its owner and the players she allowed may build with Build Magic or pull with the Magnetic Pull. (Telekinesis on one block asks the claims as a hand does, and is not covered.) |
+| `build_magic.hexIsAClaim` | `false` | `true` or `false` | Inside a Hex, only its owner and the players she allowed may build with Build Magic or pull with the Magnetic Pull. (Telekinesis on one block asks the claims as a hand does, and is not covered.) 3.3: from **outside** a Hex, the Build Magic, block lifting and fire of anyone she has not allowed never reach inside it, whatever this says; this option extends the rule to builders who stand inside. |
 | `build_magic.fullContainers` | `SKIP` | `SKIP` or `SPILL` | A container that holds items in a spell's way: `SKIP` leaves it as it is, `SPILL` spills its items on the spot. A Move always carries it. |
 | `build_magic.liftCreatures` | `true` | `true` or `false` | Creatures inside new blocks are lifted on top (other players only with PvP on; never a creature Mjolnir pins). If `false`, their blocks stay empty. |
 | `build_magic.moveCarriesCreatures` | `true` | `true` or `false` | Move takes the creatures, frames, paintings and armor stands inside along (not one Mjolnir pins). |
@@ -887,6 +896,136 @@ Sections `[apocalypse_shield]`, `[apocalypse_boss]` and `[apocalypse]`. **3.2: t
 | `apocalypse.stormExhaustion` | `8.0` | 0.0 to 40.0 | Hunger the Sandstorm costs. |
 | `apocalypse.essenceRitualTicks` | `60` | 20 to 400 | How long the Essence must be held to awaken. |
 
+## Agatha Harkness
+
+Section `[agatha]` (3.3). The hero's page is [Agatha](Agatha). A player with no power who holds use on the Darkhold becomes her: R the Purple Beam (Sneak: the hex mark or the mind glimpse), G flight, V the Power Drain, B the Witch's Shield (hold), N the Rune Trap; magic used on her poisons whoever used it. The hex mark, the mind glimpse and the poison use the numbers of [`[darkhold]`](#the-darkhold).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `agatha.darkholdAwakens` | `true` | `true` or `false` | A player with no power who holds use on the Darkhold becomes Agatha (false: the book only refuses them, as in 3.2). |
+| `agatha.awakenTicks` | `60` | 1 to 1200 | How long use is held on the Darkhold to become Agatha, in ticks (60 = 3 seconds). The book is kept. |
+| `agatha.flightSpeed` | `0.085` | 0.01 to 0.5 | Agatha's flying speed (Creative flight is 0.05). |
+| `agatha.bodyHealthBonus` | `20.0` | 0.0 to 1000.0 | Extra maximum health while a player is Agatha (20 = ten more hearts: 40 in all). |
+| `agatha.retaliates` | `true` | `true` or `false` | Magic used on Agatha poisons whoever used it, with or without the Darkhold in hand (the numbers and the target are the [darkhold] poison options). |
+| `agatha.beamDamagePerSecond` | `8.0` | 0.0 to 200.0 | Damage a second of her Purple Beam (R, hold) does to what the crosshair is on (8 = four hearts). |
+| `agatha.beamRange` | `24` | 4 to 128 | How far (blocks) her Purple Beam reaches. |
+| `agatha.beamInterval` | `5` | 1 to 40 | Ticks between two hits of her Purple Beam (5 = four hits a second). |
+| `agatha.beamExhaustionPerSecond` | `1.0` | 0.0 to 40.0 | Food exhaustion a second of her Purple Beam costs (4.0 = 1 food point). Creative players pay nothing. |
+| `agatha.drainRange` | `16` | 2 to 64 | How far (blocks) the Power Drain (V) reaches: the creature or player under the crosshair. |
+| `agatha.drainTicks` | `200` | 20 to 72000 | How long a drained player's power is gone, in ticks (200 = 10 seconds): no ability key works and a flier falls. Players are drained only where PvP lets her hurt them. |
+| `agatha.drainDamage` | `6.0` | 0.0 to 200.0 | Damage the Power Drain does to a creature (its life is drained; a player loses their power instead). |
+| `agatha.drainHeal` | `4.0` | 0.0 to 200.0 | Health Agatha takes back from every drain (4 = two hearts). |
+| `agatha.drainCooldown` | `300` | 0 to 72000 | Cooldown of the Power Drain, in ticks. |
+| `agatha.drainExhaustion` | `2.0` | 0.0 to 40.0 | Food exhaustion of a Power Drain (4.0 = 1 food point). Creative players pay nothing. |
+| `agatha.shieldRadius` | `1.9` | 1.0 to 6.0 | The radius (blocks) of the Witch's Shield (B, hold), the purple sphere round her. |
+| `agatha.shieldWindUpTicks` | `8` | 0 to 100 | Ticks the shield takes to form after B is pressed; it stops nothing until then. |
+| `agatha.shieldMaxTicks` | `200` | 20 to 72000 | How long a complete shield can be held, in ticks (200 = 10 seconds). |
+| `agatha.shieldStrength` | `40.0` | 1.0 to 10000.0 | The shield's strength: every blow it stops takes the damage it would have done from it; at 0 it shatters. |
+| `agatha.shieldCooldown` | `40` | 0 to 72000 | Ticks before the shield can be raised again after it was let go of. |
+| `agatha.shieldBrokenCooldown` | `200` | 0 to 72000 | Ticks before the shield can be raised again after it shattered or was held to its limit. |
+| `agatha.shieldExhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion every tick the shield is held (4.0 = 1 food point). Creative players pay nothing. |
+| `agatha.runeRange` | `24` | 2 to 64 | How far (blocks) she can lay the Rune Trap (N): where she looks, or round her own feet if at nothing. |
+| `agatha.runeRadius` | `4.0` | 1.0 to 16.0 | The radius (blocks) of the circle of runes. |
+| `agatha.runeTicks` | `100` | 20 to 1200 | How long the runes burn, in ticks (100 = 5 seconds): what stands in them is bound (Spellbound) and hurt. |
+| `agatha.runeDamagePerSecond` | `2.0` | 0.0 to 200.0 | Damage a second of the runes does to every creature bound in them. |
+| `agatha.runeCooldown` | `400` | 0 to 72000 | Cooldown of the Rune Trap, in ticks. |
+| `agatha.runeExhaustion` | `3.0` | 0.0 to 40.0 | Food exhaustion of a Rune Trap (4.0 = 1 food point). Creative players pay nothing. |
+
+## Cyclops
+
+Section `[cyclops]` (3.3). The hero's page is [Cyclops](Cyclops): his body, the Optic Blast he fires through his ruby-quartz glasses, the giant beam that pours out when he takes them off, and his other abilities.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `cyclops.bodyHealthBonus` | `10.0` | 0.0 to 200.0 | Extra max health while Cyclops (10 = 5 hearts, so 30). |
+| `cyclops.armor` | `4.0` | 0.0 to 30.0 | Armour while Cyclops (his field suit). |
+| `cyclops.opticRange` | `32.0` | 4.0 to 128.0 | Optic blast (R held, glasses on): how far the beam reaches, in blocks. |
+| `cyclops.opticDamage` | `2.0` | 0.0 to 100.0 | Optic blast: the damage of one hit on what the crosshair is on. |
+| `cyclops.opticInterval` | `5` | 1 to 40 | Optic blast: ticks between two hits (2.0 every 5 ticks is 8 a second). |
+| `cyclops.opticPush` | `0.35` | 0.0 to 3.0 | Optic blast: how hard each hit pushes what it hits away (his blasts are force, not heat). |
+| `cyclops.opticExhaustionPerSecond` | `0.6` | 0.0 to 20.0 | Optic blast: food exhaustion a second of the beam costs (4 = one food point). |
+| `cyclops.unleashedRange` | `48.0` | 4.0 to 128.0 | The glasses off: how far the giant beam reaches, in blocks. It never stops until the glasses are back on, and it never hurts Cyclops himself; it ends when he dies or leaves. |
+| `cyclops.unleashedDamage` | `6.0` | 0.0 to 100.0 | The glasses off: the damage of one hit on everything in the giant beam. |
+| `cyclops.unleashedInterval` | `10` | 1 to 40 | The glasses off: ticks between two hits of the giant beam. |
+| `cyclops.unleashedRadius` | `1.2` | 0.2 to 4.0 | The glasses off: the radius of the giant beam, in blocks (what is that close to its line is hit). |
+| `cyclops.unleashedPush` | `0.9` | 0.0 to 4.0 | The glasses off: how hard each hit pushes what it hits along the beam. |
+| `cyclops.unleashedBreaksBlocks` | `false` | `true` or `false` | The glasses off: whether the giant beam breaks the blocks it strikes (off by default; never in a boss arena or where the player may not break, and never the blocks round his own feet). |
+| `cyclops.unleashedMaxHardness` | `3.0` | 0.0 to 100.0 | The glasses off, with unleashedBreaksBlocks: the hardest block it breaks (stone is 1.5, obsidian 50). |
+| `cyclops.ricochetDamage` | `7.0` | 0.0 to 100.0 | Ricochet Shot (Sneak + R): the damage to each creature the bolt hits (each once). |
+| `cyclops.ricochetBounces` | `3` | 0 to 8 | Ricochet Shot: how many times the bolt bounces off a block. |
+| `cyclops.ricochetRange` | `24.0` | 2.0 to 64.0 | Ricochet Shot: how far each stretch of the bolt flies, in blocks. |
+| `cyclops.ricochetCooldown` | `40` | 0 to 1200 | Ricochet Shot: cooldown, in ticks. |
+| `cyclops.ricochetExhaustion` | `0.5` | 0.0 to 20.0 | Ricochet Shot: food exhaustion. |
+| `cyclops.concussionRange` | `7.0` | 1.0 to 24.0 | Concussion Blast (G): how far the short, wide blast reaches, in blocks. |
+| `cyclops.concussionAngle` | `40.0` | 5.0 to 90.0 | Concussion Blast: the half-angle of its cone, in degrees. |
+| `cyclops.concussionDamage` | `6.0` | 0.0 to 100.0 | Concussion Blast: the damage to each creature in the cone. |
+| `cyclops.concussionKnockback` | `1.6` | 0.0 to 5.0 | Concussion Blast: how far it throws them back. |
+| `cyclops.concussionCooldown` | `100` | 0 to 1200 | Concussion Blast: cooldown, in ticks. |
+| `cyclops.concussionExhaustion` | `1.0` | 0.0 to 20.0 | Concussion Blast: food exhaustion. |
+| `cyclops.leapUp` | `1.1` | 0.1 to 3.0 | Optic Leap (V): a blast at the ground throws him up at this speed (blocks a tick). |
+| `cyclops.leapForward` | `0.9` | 0.0 to 3.0 | Optic Leap: and forward, the way he faces, at this speed. |
+| `cyclops.leapBlastRadius` | `2.5` | 0.0 to 8.0 | Optic Leap: the radius of the blast where he leaves the ground. |
+| `cyclops.leapBlastDamage` | `3.0` | 0.0 to 100.0 | Optic Leap: the damage of that blast to the creatures in it. |
+| `cyclops.leapCooldown` | `80` | 0 to 1200 | Optic Leap: cooldown, in ticks. He takes no fall damage from the leap he makes. |
+| `cyclops.leapExhaustion` | `0.8` | 0.0 to 20.0 | Optic Leap: food exhaustion. |
+| `cyclops.rallyRadius` | `16` | 1 to 64 | Rally (B, "To me, X-Men!"): the radius in which his allies (players, tamed pets, golems) and he are given Speed, Strength and Resistance. |
+| `cyclops.rallyTicks` | `300` | 20 to 6000 | Rally: how long the effects last, in ticks. |
+| `cyclops.rallyCooldown` | `900` | 0 to 12000 | Rally: cooldown, in ticks. |
+| `cyclops.rallyExhaustion` | `1.0` | 0.0 to 20.0 | Rally: food exhaustion. |
+
+## Professor X
+
+Section `[professor_x]` (3.3). The hero's page is [Professor X](Professor-X): the wheelchair's ritual, the Mental Blast (R), Hear Thoughts (G), Take Over a Body (V), Freeze Minds (B) and Cerebro (N).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `professor_x.wheelchairRitualTicks` | `60` | 1 to 600 | How long (ticks) right-click is held on Professor X's wheelchair to awaken as him. |
+| `professor_x.blastRange` | `24` | 4 to 64 | How far (blocks) the Mental Blast reaches (line of sight needed). |
+| `professor_x.blastDamage` | `6.0` | 0.0 to 100.0 | Damage of the Mental Blast (it ignores armour; players only with PvP on). |
+| `professor_x.blastDizzyTicks` | `60` | 0 to 600 | How long whoever the Mental Blast hits is dizzy and slowed. |
+| `professor_x.blastCooldown` | `40` | 0 to 72000 | Cooldown of the Mental Blast (ability 1), in ticks. |
+| `professor_x.thoughtsRange` | `24` | 4 to 64 | How far away (blocks) Professor X hears the thoughts of players and creatures while Hear Thoughts is on. |
+| `professor_x.linkRange` | `24` | 2 to 64 | How far (blocks) Professor X can reach a body to take it over (line of sight needed). |
+| `professor_x.linkMaxDistance` | `48` | 4 to 128 | A body he steers that goes further than this (blocks) from his own is let go. |
+| `professor_x.linkCreatureTicks` | `600` | 20 to 6000 | How long (ticks) he can stay in a creature's body (600 = 30 s). |
+| `professor_x.linkPlayerTicks` | `160` | 0 to 1200 | How long (ticks) he can steer a player's body (needs PvP). 0 turns it off for players. |
+| `professor_x.linkCooldown` | `300` | 0 to 72000 | Cooldown of Take Over a Body (ability 3) after he leaves a body or is thrown out, in ticks. |
+| `professor_x.linkBreaksOnHurt` | `true` | `true` or `false` | If true, any damage to his own body (left behind while he steers another) brings him back. |
+| `professor_x.backlashDamage` | `4.0` | 0.0 to 40.0 | Damage he takes when a stronger telepath (the Scarlet Witch, the Phoenix, Billy) throws him out. |
+| `professor_x.backlashStunTicks` | `60` | 0 to 600 | How long he is stunned (dizzy and slowed) after he is thrown out. |
+| `professor_x.freezeRadius` | `12` | 2 to 48 | Radius (blocks) of Freeze Minds. |
+| `professor_x.freezeTicks` | `100` | 10 to 1200 | How long Freeze Minds holds everyone still (players only with PvP on). |
+| `professor_x.freezeCooldown` | `600` | 0 to 72000 | Cooldown of Freeze Minds (ability 4), in ticks (600 = 30 s). |
+| `professor_x.cerebroRange` | `256` | 16 to 4096 | How far (blocks) Cerebro finds the minds of players, in his dimension. |
+| `professor_x.cerebroTicks` | `200` | 20 to 1200 | How long Cerebro shows the minds it found (200 = 10 s). |
+| `professor_x.cerebroCooldown` | `1200` | 0 to 72000 | Cooldown of Cerebro (ability 5), in ticks (1200 = 60 s). |
+
+## The Hero Creator
+
+Section `[custom_hero]` (3.3). The page is [Hero Creator](Hero-Creator): whether the creator works and for whom, the limits of a custom hero, and the balance of the thirty powers. The numbers of each power follow its strength (1 to 10); the scales below multiply them all. Every option is read when it is used; a hero already made keeps its powers and is judged by the new limits the next time it is saved. The ids for `disabledPowers` are in the table of [the thirty powers](Hero-Creator#the-thirty-powers).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `custom_hero.enabled` | `true` | `true` or `false` | The Hero Creator works (false: its screen says it is switched off, and custom heroes are judged by these limits when they are saved). |
+| `custom_hero.operatorsOnly` | `false` | `true` or `false` | Only operators may use the Hero Creator (false: any player in Creative mode, and operators). |
+| `custom_hero.allowChooseExisting` | `true` | `true` or `false` | The creator can also turn its user into any hero of the mod, in any look, at once. |
+| `custom_hero.budget` | `60` | 1 to 600 | Power points a custom hero may spend: each power costs 1 to 3 points for each point of its strength (flight 2, durability 1, phasing 3...; strength 1 to 10). The screen shows what is left. |
+| `custom_hero.maxPowers` | `8` | 1 to 30 | How many different powers a custom hero may have. |
+| `custom_hero.maxStrength` | `10` | 1 to 10 | The highest strength of a power (the editor's slider goes from 1 to this). |
+| `custom_hero.maxSkinBytes` | `16384` | 1024 to 24576 | The biggest custom skin (a 64x64 PNG) the server accepts and sends to everyone, in bytes. |
+| `custom_hero.disabledPowers` | `[]` | a list of power ids | Powers a custom hero may not have on this server (their ids, e.g. "time", "weather"). |
+| `custom_hero.applyCooldownTicks` | `40` | 0 to 1200 | Ticks a player waits between two heroes made or chosen with the creator. |
+| `custom_hero.damageScale` | `1.0` | 0.0 to 10.0 | Multiplies the damage of every custom power. |
+| `custom_hero.cooldownScale` | `1.0` | 0.1 to 10.0 | Multiplies the cooldown of every custom power. |
+| `custom_hero.exhaustionScale` | `1.0` | 0.0 to 10.0 | Multiplies the hunger every custom power costs (0: free). |
+| `custom_hero.flightSpeed` | `0.08` | 0.01 to 0.5 | Scales Flight's speed: at the default 0.08, strength 1 flies at 0.06 and strength 10 at 0.13; another value scales them all by it / 0.08 (Creative flight is 0.05). |
+| `custom_hero.forceFieldStrength` | `35.0` | 1.0 to 1000.0 | Scales the Force Field: at the default 35, it takes 10 damage before it breaks at strength 1 and 80 at strength 10; another value scales them by it / 35. |
+| `custom_hero.controlSeconds` | `20` | 1 to 600 | Scales how long Mind Control, Animal Control and Technopathy's golems hold: at the default 20, from 5 seconds (strength 1) to 30 (strength 10), golems 10 to 30; another value scales them by it / 20. |
+| `custom_hero.teleportRange` | `32` | 4 to 128 | Scales Teleportation's reach: at the default 32, Blink reaches 8 to 48 blocks and Behind You 8 to 32 (strength 1 to 10); another value scales them by it / 32. |
+| `custom_hero.suppressSeconds` | `8` | 1 to 120 | Scales how long Power Absorption takes another hero's powers away (PvP only): at the default 8, from 3 seconds (strength 1) to 12 (strength 10); another value scales them by it / 8. |
+| `custom_hero.blockChanges` | `false` | `true` or `false` | Custom powers may change blocks: the Sonic Scream shatters glass (doors, levers and frozen water are always allowed, and every change still asks the claims, spawn protection and boss arenas). |
+| `custom_hero.weatherChangesWorld` | `true` | `true` or `false` | Weather Control's "cycle" changes the world's weather (false: it only says it cannot). |
+
 ## The Witches' Road
 
 Section `[witches_road]`. The page is [The Witches' Road](Witches-Road). Every trial has its options here, with the trial's name in front of the explanation. Every value is read when it is used, so editing the file changes it live. With `witches_road.enabled` set to `false` there are no trials and the door is the instant choice of 3.1.
@@ -935,7 +1074,7 @@ The grid of places (2,048 blocks apart) and the course radius (450 blocks) are n
 
 ## The Book of the Vishanti
 
-Section `[vishanti]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-book-of-the-vishanti). The book is read by a sorcerer (Loki, the Scarlet Witch or Billy); the ward's radius follows his strength: Wanda the most, Billy by his Build Magic rank, Loki a fixed size. The ward is never bigger than 128 blocks, whatever these say.
+Section `[vishanti]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-book-of-the-vishanti). The book is read by a sorcerer (Loki, the Scarlet Witch, Billy or Agatha); the ward's radius follows his strength: Wanda the most, Billy by his Build Magic rank, Loki and Agatha a fixed size. In 3.3 a ward keeps out every monster, boss and boss minion, what they shoot, and dark magic (see [The Sorcerers' Books](Sorcerers-Books#the-ward-what-it-keeps-out)). The ward is never bigger than 128 blocks, whatever these say.
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
@@ -952,7 +1091,8 @@ Section `[vishanti]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-boo
 | `vishanti.wardRadiusBillyMin` | `12` | 4 to 128 | Radius of the ward of Billy at his first Build Magic rank (an Apprentice). |
 | `vishanti.wardRadiusBillyMax` | `40` | 4 to 128 | Radius of the ward of Billy at his highest Build Magic rank (`build_magic_billy.maxRank`); between his first and highest rank it grows evenly. |
 | `vishanti.wardRadiusLoki` | `24` | 4 to 128 | Radius of the ward of Loki. |
-| `vishanti.wardCheckTicks` | `5` | 1 to 40 | Every how many ticks a ward looks for monsters inside it and pushes them out (one spatial lookup per ward; more is cheaper, fewer keeps the edge tighter). |
+| `vishanti.wardRadiusAgatha` | `24` | 4 to 128 | 3.3: radius of the ward of Agatha Harkness. |
+| `vishanti.wardCheckTicks` | `5` | 1 to 40 | Every how many ticks a ward looks for monsters (and bosses) inside it and pushes them out (one spatial lookup per ward; more is cheaper, fewer keeps the edge tighter). |
 | `vishanti.wardPush` | `0.8` | 0.1 to 4.0 | How hard a ward throws a monster at its edge back out (blocks per tick of speed). |
 | `vishanti.wardBlocksSpawns` | `true` | `true` or `false` | No monster spawns inside a ward (natural spawns, spawners, structures). |
 
@@ -963,7 +1103,7 @@ Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-dar
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `darkhold.enabled` | `true` | `true` or `false` | The Darkhold works (`false`: it can be held but does nothing). |
-| `darkhold.anyoneCanUse` | `false` | `true` or `false` | Anyone can use the Darkhold, not only the sorcerers (Loki, the Scarlet Witch and Billy). |
+| `darkhold.anyoneCanUse` | `false` | `true` or `false` | Anyone can use the Darkhold, not only the sorcerers (Loki, the Scarlet Witch, Billy and Agatha). While `agatha.darkholdAwakens` is on, a player with no power who holds use on it still becomes Agatha. |
 | `darkhold.beamDamagePerSecond` | `8.0` | 0.0 to 200.0 | Damage a second of the purple beam does to what the crosshair is on (8 = four hearts). |
 | `darkhold.beamRange` | `24` | 4 to 128 | How far (in blocks) the purple beam reaches. |
 | `darkhold.beamInterval` | `5` | 1 to 40 | Ticks between two hits of the purple beam (5 = four hits a second). The beam ignores the creature's damage cooldown, so every hit lands. |
@@ -983,6 +1123,10 @@ Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-dar
 | `darkhold.glimpseMax` | `16` | 1 to 64 | The most creatures one mind glimpse shows (the nearest ones). |
 | `darkhold.glimpseCooldown` | `200` | 0 to 72000 | Cooldown of the mind glimpse, in ticks. |
 | `darkhold.glimpseExhaustion` | `1.0` | 0.0 to 40.0 | Food exhaustion of a mind glimpse (4.0 = 1 food point). Creative players pay nothing. |
+
+## Structures
+
+The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.
 
 ## Datapack tags
 
@@ -1006,7 +1150,7 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:pin_immune` | entity type | Creatures Mjolnir can't pin down (the Ender Dragon, the Wither, the Warden and the three bosses of 3.0). |
 | `enhanced:confused_immune` | entity type | Creatures Loki's Scepter can't confuse (the Ender Dragon, the Wither, the Warden and the three bosses of 3.0). |
 | `enhanced:shapeshift_immune` | entity type | Creatures Loki can't take the shape of. |
-| `enhanced:telepathy_immune` | entity type | Creatures too vast for a mind to be read, taken over or held by the Phoenix (the Ender Dragon, the Wither, the Warden and the 3.0 bosses). |
+| `enhanced:telepathy_immune` | entity type | Creatures too vast for a mind to be read, taken over or held by the Phoenix or by Professor X (the Ender Dragon, the Wither, the Warden and the 3.0 bosses). |
 | `enhanced:web_immune` | entity type | Creatures Spider-Man's webs can't wrap (the bosses). Spider-Man himself, Creative and Spectator players, and players when PvP is off are never wrapped, whatever this tag says. |
 | `enhanced:instant_kill_immune` | entity type | Creatures Instant Kill spares (the bosses and their minions: they take only the legs' normal damage). |
 | `enhanced:bosses` | entity type | The bosses: the Ender Dragon, the Wither, the Warden, the Elder Guardian, Thanos, Ultron and Apocalypse. Webs and the Instant Kill do not take hold of them, an area attack always counts them as enemies, and the boss fights read it (whoever kills one struck the last blow). |
@@ -1027,8 +1171,10 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:cannot_cling` | block | Blocks Spider-Man cannot stick to (empty by default; water, cobwebs, vines and ladders never hold him anyway). |
 | `enhanced:ritual_ground` | block | What the Capstone must be planted on to wake Apocalypse (sand, red sand and every sandstone), while `apocalypse_boss.ritualNeedsSand` is on. |
 | `enhanced:sokovia_liftable` | block | The natural blocks the island of Sokovia copies into the sky (stone, dirt, sand, ores, grass, leaves, logs, flowers, snow...); anything else, a house or a chest, is left out of the copy. |
-| `enhanced:ward_immune` | entity type | What the ward of the Book of the Vishanti leaves alone: the bosses and their helpers (`#enhanced:bosses` and `#enhanced:boss_minions`). Anything in a boss fight or arena, pets with an owner and riders are spared too. |
-| `enhanced:magic_damage` | damage type | What counts as magic used on the holder of the Darkhold, so that its revenge poisons the attacker: the Hex Bolt and Beam, the Chaos Beam, the telekinetic slam, the Mind Stone, the Stones' powers, the Phoenix Burst, the purple beam, Apocalypse's wall and Entomb, and the game's own `magic` and `indirect_magic`. Thor's lightning is not in it. |
+| `enhanced:ward_immune` | entity type | What the ward of the Book of the Vishanti leaves alone. **Empty in 3.3** (in 3.2 it held the bosses and their helpers, which a ward now keeps out): a data pack may add creatures. Pets with an owner, riders, named and leashed monsters and curing zombie villagers are spared anyway; bosses and fight members never are. |
+| `enhanced:dark_magic` | damage type | 3.3: what counts as dark magic, which the ward keeps out: the Darkhold's purple beam (Agatha's too), Agatha's Power Drain and her Rune Trap. |
+| `enhanced:dark_magic` | entity type | 3.3: projectiles that count as dark magic (empty by default, for data packs). |
+| `enhanced:magic_damage` | damage type | What counts as magic used on the holder of the Darkhold, so that its revenge poisons the attacker: the Hex Bolt and Beam, the Chaos Beam, the telekinetic slam, the Mind Stone, the Stones' powers, the Phoenix Burst, the purple beam, Apocalypse's wall and Entomb, Professor X's Mental Blast, Agatha's Power Drain and Rune Trap, and the game's own `magic` and `indirect_magic`. Thor's lightning and Cyclops's optic blasts are not in it. |
 | `enhanced:mind_power` | damage type | Damage that counts as a mind's power: the Chaos Beam, a telekinetic slam and the Phoenix Burst. It is what wears down Apocalypse's shield, when a hero in `apocalypse_shield.mindPowerHeroes` deals it. |
 | `enhanced:stone_born` | damage type | Damage that counts three times toward breaking the Mad Titan's clench, and that his Space Barrier lets through: the Chaos Beam, Vision's Mind Stone beam and Stormbreaker. |
 

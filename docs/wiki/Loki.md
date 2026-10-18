@@ -23,7 +23,7 @@ In *Avengers: Endgame* the 2012 Loki grabs the Tesseract and vanishes in a blue 
 
 ## Loki's Scepter
 
-Anyone can swing **Loki's Scepter** (a relic found in chests: see [Items and Crafting](Items-and-Crafting)): 8 attack damage, and it never breaks. In the films the Mind Stone in it takes over the mind of whoever it touches. That is too strong for the game, so here a melee hit **confuses**:
+Anyone can swing **Loki's Scepter** (in 3.3 it is kept in the vault of every [Hydra outpost](Structures#a-hydra-outpost), and found nowhere else: see [Items and Crafting](Items-and-Crafting#lokis-scepter)): 8 attack damage, and it never breaks. In the films the Mind Stone in it takes over the mind of whoever it touches. That is too strong for the game, so here a melee hit **confuses**:
 
 * **A player** gets **Nausea** for 8 seconds and **Slowness I** for 3. (Magneto's helmet turns the Nausea away.)
 * **Any other creature** is **Confused** for 6 seconds. It forgets its target and can't pick a new one, and it stumbles about aimlessly: it heads for random spots nearby, a little faster than it wanders when idle, and changes its mind every few ticks. Small blue-green sparks swirl round its head while it lasts.
@@ -105,7 +105,7 @@ Frost Giant is ability 5 in **every** look.
 
 ## A sorcerer
 
-Loki is a **sorcerer**, like the Scarlet Witch and Billy: he can read the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) (save places and teleport to them, and raise a ward of **24 blocks** round his base that no monster can enter) and the [Darkhold](Sorcerers-Books#the-darkhold) (the purple beam, the hex mark and the mind glimpse).
+Loki is a **sorcerer**, like the Scarlet Witch, Billy and Agatha: he can read the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) (save places and teleport to them, and raise a ward of **24 blocks** round his base that keeps out monsters, bosses and dark magic) and the [Darkhold](Sorcerers-Books#the-darkhold) (the purple beam, the hex mark and the mind glimpse). Being a sorcerer has a price in 3.3: inside a Hex whose walls carry the [Hex Runes](Scarlet-Witch#hex-runes), he has no powers (his illusions dissolve, and his Vanish, his shape and the Frost Giant end).
 
 ## Numbers you can change
 

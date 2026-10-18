@@ -4,7 +4,7 @@
 
 ### How do I become a hero?
 
-Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open (and the three trials behind it), a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, or, for Thanos, Ultron and Apocalypse, a boss to beat. See [Becoming a Hero](Becoming-a-Hero).
+Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open (and the three trials behind it), a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, a book to read (Agatha), glasses to put on (Cyclops), a wheelchair to hold (Professor X), or, for Thanos, Ultron and Apocalypse, a boss to beat. In Creative mode the Hero Creator makes any hero at once. See [Becoming a Hero](Becoming-a-Hero).
 
 ### I touched Loki's Scepter and died. Why?
 
@@ -95,11 +95,11 @@ Hold **W**. If you are stuck against a wall or in the snow, press **Shift**: it 
 
 ### Why can't I use the Book of the Vishanti or the Darkhold?
 
-Only a **sorcerer** (Loki, the Scarlet Witch or Billy) can read them. Anyone else hears the runes whisper. A server can let anyone use the Darkhold with `darkhold.anyoneCanUse`. See [The Sorcerers' Books](Sorcerers-Books).
+Only a **sorcerer** (Loki, the Scarlet Witch, Billy or Agatha) can read them. Another hero hears the runes whisper; a player with **no power** who holds use on the Darkhold for 3 seconds becomes [Agatha](Agatha). Inside a Hex with the [Hex Runes](Scarlet-Witch#hex-runes) up, the books do nothing. A server can let anyone use the Darkhold with `darkhold.anyoneCanUse`. See [The Sorcerers' Books](Sorcerers-Books).
 
 ### Do I have to be nearby for my base's ward to work?
 
-No. A ward keeps working whoever is online, as long as its land is loaded. Only raising or forgetting it needs the book. No monster can spawn or stay inside it; bosses, pets and non-monsters are not affected. An operator can list and remove wards with `/enhanced ward`.
+No. A ward keeps working whoever is online, as long as its land is loaded. Only raising or forgetting it needs the book. No monster or boss can spawn or stay inside it, and what they shoot and dark magic stop at its edge; pets, animals, villagers and players' powers are not affected. An operator can list and remove wards with `/enhanced ward`.
 
 ### Why does the Chaos Shield never run out?
 
@@ -116,6 +116,60 @@ Because 3.2 weakened him: `apocalypse_boss.powerFactor` is 0.65, so he hits for 
 ### The Darkhold poisoned me! Why?
 
 It does not poison its holder by default: it poisons whoever **used magic on the holder**. If you are the one poisoned, the person who hit you with magic was holding a Darkhold. (A server can swap this with `darkhold.poisonTarget`.) Milk cures poison.
+
+## The new heroes, the walls and the Hero Creator (3.3)
+
+### Where is Loki's Scepter now?
+
+Only in the vault of a **Hydra outpost**: a fenced Hydra base in taigas, snowy plains, forests and plains. The chest behind the iron bars in its cellar always holds one. `/locate structure enhanced:hydra_outpost` finds the nearest. It is no longer in End City, stronghold, bastion, Ancient City or woodland mansion chests. See [Structures](Structures#a-hydra-outpost).
+
+### Can I find Mjolnir instead of forging it?
+
+Yes: in a **Mjolnir's crater** (deserts, badlands, savannas, plains) it lies in the middle, owned by nobody. Only a worthy player can lift it. You can still forge one. See [Structures](Structures#mjolnirs-crater).
+
+### I can't find the new places in my old world.
+
+They are built only in **new chunks**: travel to land you have never visited. They are also rare, and only on level, dry ground in their biomes. `/locate structure enhanced:mutant_school` (or `hydra_outpost`, `mjolnir_crater`) tells you where the nearest is.
+
+### I read the Darkhold and became Agatha. Can I undo it?
+
+A power is permanent, as always: only an operator can take it away (`/enhanced power set <player> none`). Agatha is only made from a player with **no power** who holds use on the book for 3 full seconds; let go early and nothing happens. A server can turn the awakening off with `agatha.darkholdAwakens`. See [Agatha](Agatha).
+
+### Cyclops's beam will not stop!
+
+His glasses are off. Press **N** to put them back on (from your hand, inventory or off hand), or put them in your head slot. If you lost them, **N** shuts your eyes and stops it. It never hurts you, costs no food and ends if you die or log out. See [Cyclops](Cyclops#the-glasses-off-the-giant-beam).
+
+### Why can't Professor X take over the Scarlet Witch, the Phoenix or Billy?
+
+They are stronger telepaths: they throw him out, and he is hurt and stunned. Another Professor X and anyone under Magneto's Helmet are closed to him too, and players only with PvP on. See [Professor X](Professor-X#telepathy-whose-minds-are-open).
+
+### My friend is steering my body! What do I do?
+
+Wait: a player is steered for 8 seconds at most, and only with PvP on. Hurting Professor X's own body (it stands in a trance) sends him back at once, and putting on Magneto's Helmet closes your mind. See [Professor X](Professor-X#take-over-a-body).
+
+### Why did Billy's Hex Barrier break at once?
+
+Any power of a **Scarlet Witch** shatters it, whatever health it had (chaos magic). Anything else wears down its 30 health. When it shatters, wait 10 seconds; it mends while it is down. See [Billy](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held).
+
+### Why does nothing get through Wanda's Hex wall any more?
+
+In 3.3 the wall keeps every power out unless Wanda allowed its user in: arrows, beams, explosions, telekinesis, mind powers, other people's Build Magic. And it lets in only those she approves, by any way: walking, flying, portals, teleports. See [Scarlet Witch](Scarlet-Witch#the-wall-keeps-powers-out).
+
+### My powers stopped inside a Hex!
+
+You are a sorcerer (Agatha, Loki, Billy, or holding the Darkhold or the Book of the Vishanti) and the Scarlet Witch has put the **Hex Runes** on its walls. Leave the Hex, or ask her to wipe them. See [Scarlet Witch](Scarlet-Witch#hex-runes).
+
+### Can I use the Hero Creator in survival?
+
+Only as an operator. It works in Creative mode for everyone (unless the server allows operators only) and comes from the creative tab. See [Hero Creator](Hero-Creator).
+
+### Why does my custom hero look like me?
+
+The skin you chose was refused: it must be a PNG of exactly 64x64 pixels, no bigger than the server allows (16 KB by default). Pick or drop another, or use a hero's skin as the base. See [Hero Creator](Hero-Creator#your-skin-seen-by-everyone).
+
+### Some powers of my hero file were left out.
+
+The server judged the file by its own rules: its budget, how many powers, the highest strength, and the powers it does not allow. You are told what changed. See [Hero Creator](Hero-Creator#saving-sharing-and-loading-the-json-file).
 
 ## Magneto
 
@@ -336,7 +390,7 @@ Thor flies by spinning his weapon, so only with Mjolnir or Stormbreaker in hand.
 
 ### Why did I die crossing the Hex wall?
 
-When anyone without powers crosses Wanda's Hex wall without her permission, there is a 95% chance that they die: "rewritten by the Hex". The 5% who survive just keep going. Heroes can't be killed by the wall, but are thrown back. Wanda decides who may pass on the Hex Control screen. See [Scarlet Witch](Scarlet-Witch).
+When anyone without powers crosses Wanda's Hex wall without her permission, there is a 95% chance that they die: "rewritten by the Hex". The 5% who survive are thrown back out (3.3): only those she approves get in. Heroes can't be killed by the wall, but are thrown back. Wanda decides who may pass on the Hex Control screen. See [Scarlet Witch](Scarlet-Witch).
 
 ### Why can't Vision leave the Hex?
 

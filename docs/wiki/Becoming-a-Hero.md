@@ -6,7 +6,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron or Apocalypse. Powers never stack. |
+| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command removes it: `/enhanced power set <player> none` (see [Commands](Commands)). |
 | Creative and Spectator | Creative and Spectator players are never killed by the Mind Stone or the Hex wall. |
 
@@ -26,6 +26,10 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Thanos](Thanos) | Hold the **Tesseract** in one hand and **Loki's Scepter** in the other and **hold right-click for five seconds** to call the **Mad Titan**. Beat him, and hold the **Infinity Gauntlet** he rewards for three seconds with no power. |
 | [Ultron](Ultron) | Beat the **Ultron** boss (woken with the **Ultron Program** and Loki's Scepter) and take his **Core**. Hold the Core in one hand and use **Loki's Scepter** with the other. |
 | [Apocalypse](Apocalypse) | Craft a **Capstone** (a Nether Star, five Gold Blocks and a Lapis Block), plant it in sand by day with a Scarlet Witch or a Phoenix near, beat **En Sabah Nur**, and hold the **Essence** he leaves for three seconds with no power. |
+| [Agatha](Agatha) | Craft the **Darkhold** and, with no power, **hold right-click on it for 3 seconds**. You keep the book. |
+| [Cyclops](Cyclops) | Find his **Ruby-Quartz Glasses** (in Scott Summers' room of the [Mutant School](Structures#the-mutant-school), or rarely in a woodland mansion or stronghold library) and **put them on** with no power. |
+| [Professor X](Professor-X) | **Craft** his **Wheelchair** (leather, iron ingots and an Eye of Ender) or find it in the Professor's study of the Mutant School, and with no power **hold right-click on it for 3 seconds**. Then choose the young or the old Charles. |
+| [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once, or make your own. |
 
 ## Step by step
 
@@ -36,7 +40,7 @@ Craft the helmet and wear it. The first time you wear it, all of Magneto's abili
 ### Scarlet Witch
 
 1. Find a **Scarlet Witch Gene**: a very rare item in the chests of woodland mansions, strongholds, Nether fortresses, bastions, ancient cities, End cities, jungle temples and desert pyramids, and dropped by witches and evokers. On its own it does nothing at all.
-2. Find **Loki's Scepter**, a relic found in End City treasure chests, stronghold libraries, bastion treasure chests, ancient cities and woodland mansions. The Mind Stone sits in its blue gem.
+2. Find **Loki's Scepter**, a relic kept in the vault of every [Hydra outpost](Structures#a-hydra-outpost) (3.3: only there; `/locate structure enhanced:hydra_outpost`). The Mind Stone sits in its blue gem.
 3. Hold the gene in one hand and **right-click** with the scepter in the other. The gene and the stone's energy fuse, the gene is used up, and you awaken as the Scarlet Witch. Wanda's Crown appears in your inventory: wear it to transform.
 
 The **Tesseract** works too: hold the gene in one hand and **right-click** with the Tesseract in the other, instead of the scepter, and you awaken as the Scarlet Witch in exactly the same way. The gene is used up and Wanda's Crown appears, the Tesseract is not used up, and you are not taken anywhere. Without the gene the Tesseract makes you Loki, as always.
@@ -70,7 +74,7 @@ A hero who uses the Tesseract does not become anyone else: they are simply taken
 
 ### Thor
 
-1. Craft **Mjolnir**. A Mjolnir nobody has claimed yet belongs to nobody.
+1. Craft **Mjolnir**, or find one lying in the middle of a [Mjolnir's crater](Structures#mjolnirs-crater) (3.3). A Mjolnir nobody has claimed yet belongs to nobody.
 2. Be **worthy**: Thor himself, **Vision**, anyone who has proven themselves a hero by **saving a village from a raid** (the *Hero of the Village* advancement), a player in Creative or Spectator mode, or everyone, if the server option `thor.anyoneWorthy` is on.
 3. **Lift it.** The first worthy player who lifts a Mjolnir **claims it** (a worthy player who forges one claims it at once): from then on only its owner can lift it, and its tooltip says "Bound to" followed by the owner's name.
 4. If you have no other power, lightning strikes and you become **Thor**. A Vision who claims Mjolnir fights with it but stays Vision.
@@ -104,7 +108,7 @@ Once you hold the Gauntlet you are Thanos: the five stones of the Power Blast, t
 Like Thanos and Apocalypse, Ultron is a hero you cannot become without a fight: you must beat him first.
 
 1. Craft the **Ultron Program** (a Nether Star, four Blocks of Iron, two Echo Shards and two Blocks of Redstone: you need a Wither and an Ancient City). See [Items and Crafting](Items-and-Crafting#the-ultron-program).
-2. Find **Loki's Scepter** (End City treasure chests, stronghold libraries, bastion treasure chests, ancient cities and woodland mansions). Hold the Program in one hand and the Scepter in the other, look at open, level, dry ground with room above, and **Sneak + right-click**. The Program is used up, scrap rises out of the ground, and in six seconds Ultron stands there with six Sentries.
+2. Find **Loki's Scepter** (in the vault of a [Hydra outpost](Structures#a-hydra-outpost)). Hold the Program in one hand and the Scepter in the other, look at open, level, dry ground with room above, and **Sneak + right-click**. The Program is used up, scrap rises out of the ground, and in six seconds Ultron stands there with six Sentries.
 3. **Beat him**, with friends: dodge the tells, clear the Sentries, keep your feet inside the ring when Sokovia rises, and destroy his body again and again until no Sentry is left. Everyone who fought for a minute and hurt him or his Sentries gets one **Ultron's Core**, and so does whoever lands the last blow. See [Ultron](Ultron).
 4. With **no power**, hold the **Core** in one hand and use **Loki's Scepter** with the other. The Mind Stone gives the Core a mind: the Core is used up and you become Ultron for good. (With a power already, nothing is used up: keep the Core for later or give it to a friend. Holding the Core also keeps the Mind Stone from killing you, like the gene.)
 
@@ -115,3 +119,24 @@ A server can switch Ultron off. Operators can start the fight without the Progra
 Apocalypse is the end of a fight, and the only hero who needs a friend with a particular power. Craft the **Capstone** and **Sneak + right-click it on sand** (or sandstone) in daylight under the open sky: a wall of sand rises round a circle of 24 blocks, a violet portal opens and **En Sabah Nur steps out**, inside a golden shield that **stops everything except mind power**. The ritual refuses unless a **Scarlet Witch or a Phoenix** is within 64 blocks, because only they can break the shield; bring them, and bring a team for the twelve-second windows when it shatters. Beat him (three shields, three phases, his Horsemen, the fall of his armour) and **every fighter who stayed a minute and hurt him or his shield** gets the **Essence of En Sabah Nur**, and so does whoever struck the last blow. **Hold the Essence for three seconds with no power** and you become Apocalypse. The Capstone is used up when the ritual starts and given back if the fight fails for a reason that was not yours. The fight is on [Apocalypse](Apocalypse).
 
 Once you hold the Essence you are Apocalypse: **sand waves and entombing** on **R**, **levitation** on **G**, a violet **portal** on **V**, a **golden shield** that stops everything but mind power on **B**, and **power bestowal** (and, with Sneak, a **sandstorm**) on **N**. You can give the Essence to a friend who has no power. See [the hero](Apocalypse#becoming-apocalypse-the-hero).
+
+### Agatha
+
+1. Craft the **Darkhold** (netherite scrap, a wither rose, echo shards, a book and a wither skeleton skull: see [Items and Crafting](Items-and-Crafting#darkhold)).
+2. With **no power**, hold it and **hold right-click for 3 seconds**. Violet motes spiral into you and the book whispers. Let go early and nothing happens.
+3. The Darkhold opens to you and you are **Agatha Harkness**: its purple beam, hex mark and mind glimpse on your keys, flight, 40 health, the Power Drain, the Witch's Shield and the Rune Trap. The book is kept. Not on the Witches' Road. See [Agatha](Agatha).
+
+### Cyclops
+
+1. Find the **Ruby-Quartz Glasses**: always one pair in **Scott Summers' room** of the [Mutant School](Structures#the-mutant-school) (`/locate structure enhanced:mutant_school`), or rarely in a woodland mansion or stronghold library chest.
+2. With **no power**, **put them on** (the head slot). You are Cyclops. Keep them on: when they come off, a giant beam pours from your eyes until you put them back on. See [Cyclops](Cyclops).
+
+### Professor X
+
+1. Craft **Professor X's Wheelchair** (three leather, an Eye of Ender and two iron ingots: see [Items and Crafting](Items-and-Crafting#professor-xs-wheelchair)), or take the one in the Professor's study of the [Mutant School](Structures#the-mutant-school).
+2. With **no power**, **hold right-click on it for 3 seconds**. A ring of light closes round your head; let go early and nothing is used up.
+3. You are Professor X. Choose **Young Charles** (he walks) or **Professor X** (he sits in his wheelchair); **H** changes it later. See [Professor X](Professor-X).
+
+### A hero of your own
+
+In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty (each with a strength from 1 to 10, within a budget of points), your keys, your colours and your own skin, which everyone on the server sees. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).

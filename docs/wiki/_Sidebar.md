@@ -23,10 +23,15 @@
 * [Thanos](Thanos)
 * [Ultron](Ultron)
 * [Apocalypse](Apocalypse)
+* [Agatha](Agatha)
+* [Cyclops](Cyclops)
+* [Professor X](Professor-X)
+* [Hero Creator](Hero-Creator)
 
 **Reference**
 
 * [Items and Crafting](Items-and-Crafting)
+* [Structures](Structures)
 * [Commands](Commands)
 * [Server Configuration](Server-Configuration)
 * [FAQ](FAQ)
@@ -60,10 +65,15 @@
 * [תאנוס](Thanos-HE)
 * [אולטרון](Ultron-HE)
 * [אפוקליפסה](Apocalypse-HE)
+* [אגתה](Agatha-HE)
+* [סייקלופס](Cyclops-HE)
+* [פרופסור X](Professor-X-HE)
+* [יוצר הגיבורים](Hero-Creator-HE)
 
 **מידע**
 
 * [חפצים ויצירה](Items-and-Crafting-HE)
+* [מבנים בעולם](Structures-HE)
 * [פקודות](Commands-HE)
 * [הגדרות שרת](Server-Configuration-HE)
 * [שאלות נפוצות](FAQ-HE)
