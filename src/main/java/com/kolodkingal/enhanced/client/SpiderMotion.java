@@ -185,6 +185,11 @@ public final class SpiderMotion {
     /** After an assisted release with G still held, the next web goes out after this many ticks, at the latest these. */
     private static final int CHAIN_MIN = 3;
     private static final int CHAIN_MAX = 12;
+    private static final int CHAIN_GROUND = 6;
+    /** An assisted swing held still (against a trunk, a wall) this many ticks lets go. */
+    private static final double STALL_SPEED = 0.06;
+    private static final int STALL_TICKS = 4;
+    private static int swingStalled;
     /** The web boost of the open-land "zip": speed ahead, and up. */
     private static final double BOOST_AHEAD = 1.0;
     private static final double BOOST_UP = 0.6;
@@ -313,7 +318,8 @@ public final class SpiderMotion {
         }
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             if (KeyBindings.ability(i).isActiveAndMatches(key)) {
-                pressed(player, Powers.get(player), i, player.isShiftKeyDown());
+                // (Sneak as the keys are now: a press of Sneak and G together comes before the tick that crouches him.)
+                pressed(player, Powers.get(player), i, player.isShiftKeyDown() || mc.options.keyShift.isDown());
             }
         }
     }
@@ -409,7 +415,8 @@ public final class SpiderMotion {
             case NONE -> {
                 if (mantleTicks > 0) {
                     mantleTick(player);
-                } else if (!blocked && !spellbound) {
+                } else if (!blocked && !spellbound && !chain) {
+                    // (Not while G is held for the next web of Web Assist: a child holding W would stick to every trunk.)
                     tryToCling(player, data, keys);
                 }
             }
@@ -800,6 +807,7 @@ public final class SpiderMotion {
         swingRopeMax = rope * MAX_ROPE_FACTOR;
         swingAge = 0;
         swingGround = 0;
+        swingStalled = 0;
         swingConfirmed = confirmed;
         assisted = false;
         swingSky = false;
@@ -861,7 +869,9 @@ public final class SpiderMotion {
         if (assisted) {
             // Web Assist: it lets go by itself at the best moment; the rope is reeled in near the ground, W pumps and S
             // brakes instead of reeling, A and D push a little, and the arc turns gently after the camera.
-            if (SwingAssist.releaseNow(swingPivot, centre, actual, swingAge)) {
+            swingStalled = actual.lengthSqr() < STALL_SPEED * STALL_SPEED && swingAge > SWING_GRACE ? swingStalled + 1 : 0;
+            if (SwingAssist.releaseNow(swingPivot, centre, actual, swingAge) || swingStalled >= STALL_TICKS) {
+                // (Let go at the best moment, or when something has stopped him: the next web takes him on.)
                 autoRelease(player);
                 return;
             }
@@ -982,6 +992,10 @@ public final class SpiderMotion {
             send(player, anchor);
             pendingAssist = anchor;
             pendingHeading = SwingAssist.heading(player.getLookAngle(), player.getDeltaMovement(), player.getYRot());
+        } else {
+            // Nothing yet: while G is held the assist keeps looking (he may run or jump to where there is something).
+            chain = true;
+            chainTicks = 0;
         }
     }
 
@@ -1055,14 +1069,16 @@ public final class SpiderMotion {
                 player.setDeltaMovement(v.x * kept / flat, v.y, v.z * kept / flat);
             }
         }
-        if (chain && (!free || !airborne || !KeyBindings.ability(2).isDown() || mc.screen != null)) {
+        if (chain && (!free || player.isInWaterOrBubble() || player.isInLava() || !KeyBindings.ability(2).isDown() || mc.screen != null)) {
             chain = false;
         }
         boolean show = free && assistOn() && EnhancedClientConfig.webAssistPreview() && (airborne || player.isShiftKeyDown());
         if (chain) {
             chainTicks++;
+            // In the air the next web goes out as he begins to fall; on the ground (a landing, a tree top) a moment later.
             boolean falling = player.getDeltaMovement().y < 0.08;
-            if (chainTicks >= CHAIN_MIN && (falling || chainTicks >= CHAIN_MAX) && assistReady(player, data)) {
+            boolean due = airborne ? falling || chainTicks >= CHAIN_MAX : chainTicks >= CHAIN_GROUND;
+            if (chainTicks >= CHAIN_MIN && due && chainTicks % 2 == 0 && assistReady(player, data)) {
                 SwingAssist.Anchor next = plan(player);
                 if (next != null) {
                     send(player, next);

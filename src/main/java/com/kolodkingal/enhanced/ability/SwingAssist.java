@@ -81,9 +81,9 @@ public final class SwingAssist {
     /** An anchor at least this far above his eyes. */
     public static final double MIN_RISE = 2.5;
     /** The shortest rope the assist reels in to. */
-    public static final double MIN_ROPE = 3.0;
-    /** The middle of his body stays this far above the ground (his feet 0.3 above it). */
-    public static final double CLEARANCE = 1.2;
+    public static final double MIN_ROPE = 2.8;
+    /** The middle of his body stays this far above the ground (his feet 0.2 above it). */
+    public static final double CLEARANCE = 1.1;
     /** The most the rope is reeled in in one tick. */
     public static final double REEL = 0.35;
     /** The rope swings past the vertical by this many degrees before he lets go. */
@@ -435,7 +435,7 @@ public final class SwingAssist {
     // The ground
     // =================================================================================================================
 
-    /** The top of the ground under points, remembered by column and height for one choice. */
+    /** The top of the ground (a solid top, or the surface of water or lava) under points, remembered for one choice. */
     private static final class Ground {
         private final Level level;
         private final Map<Long, Double> known = new HashMap<>();
@@ -459,6 +459,14 @@ public final class SwingAssist {
             for (int cy = by; cy > by - DEPTH && cy >= level.getMinBuildHeight(); cy--) {
                 at.set(bx, cy, bz);
                 BlockState state = level.getBlockState(at);
+                if (!state.getFluidState().isEmpty()) {
+                    // (Water and lava are ground too: a swing over a river keeps out of it.)
+                    double surface = cy + state.getFluidState().getHeight(level, at);
+                    if (surface <= y + 1.0E-6) {
+                        found = surface;
+                        break;
+                    }
+                }
                 VoxelShape shape = state.getCollisionShape(level, at);
                 if (!shape.isEmpty()) {
                     double topOf = cy + shape.max(Direction.Axis.Y);

@@ -45,7 +45,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * swing it chooses never snags on a block nor comes down to the ground, its reeling, release and steering, and how the
  * server checks what a client's assist chose ({@link SpiderServer#onAssist}). The choice is the pure
  * {@link SwingAssist#choose}, the same code the client runs; it is kept to the test's own arena by its bounds, under the
- * arena's barrier ceiling (the flat land takes the ceiling away, so that the sky is open).
+ * arena's barrier ceiling (at relative y = 11; the flat land takes the ceiling away, so that the sky is open).
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -66,7 +66,7 @@ public final class SwingAssistTests {
     /** The arena's air inside its barriers: an anchor must be in it. */
     private static AABB inside(GameTestHelper helper) {
         Vec3 low = helper.absoluteVec(new Vec3(0.01, 0.0, 0.01));
-        Vec3 high = helper.absoluteVec(new Vec3(20.99, 9.99, 20.99));
+        Vec3 high = helper.absoluteVec(new Vec3(20.99, 10.99, 20.99));
         return new AABB(low, high);
     }
 
@@ -88,17 +88,8 @@ public final class SwingAssistTests {
 
     /** Takes the barrier ceiling off the arena (the sky is open), and puts it back when the test ends. */
     private static void openTheSky(GameTestHelper helper, TestKit.Fixture f) {
-        fill(helper, -1, 10, -1, 21, 10, 21, Blocks.AIR);
-        f.onClose(() -> fill(helper, -1, 10, -1, 21, 10, 21, Blocks.BARRIER));
-        for (int y = 9; y < 40; y++) {
-            for (int x = -1; x <= 21; x++) {
-                for (int z = -1; z <= 21; z++) {
-                    if (!helper.getBlockState(new BlockPos(x, y, z)).isAir()) {
-                        System.out.println("DBGSA block " + x + " " + y + " " + z + " " + helper.getBlockState(new BlockPos(x, y, z)));
-                    }
-                }
-            }
-        }
+        fill(helper, -1, 11, -1, 21, 11, 21, Blocks.AIR);
+        f.onClose(() -> fill(helper, -1, 11, -1, 21, 11, 21, Blocks.BARRIER));
     }
 
     /** He stands at the relative x, z facing +z (south), looking 20 degrees up, running. */
@@ -280,10 +271,10 @@ public final class SwingAssistTests {
         SwingAssist.Anchor boost = choose(helper, player, velocity, SwingAssist.OpenLand.ZIP);
         check(boost != null && boost.kind() == SwingAssist.Kind.BOOST && boost.point().z > player.getZ(), "or a web boost ahead: " + boost);
         check(choose(helper, player, velocity, SwingAssist.OpenLand.NONE) == null, "or nothing");
-        // Under the barrier ceiling (a roof) there is no sky.
-        helper.setBlock(new BlockPos(10, 9, 10), Blocks.STONE);
+        // Under a roof there is no sky: the roof itself is what holds the web.
         fill(helper, 0, 9, 0, 20, 9, 20, Blocks.GLASS);
-        check(choose(helper, player, velocity, SwingAssist.OpenLand.SKY) == null, "no sky under a roof");
+        SwingAssist.Anchor roofed = choose(helper, player, velocity, SwingAssist.OpenLand.SKY);
+        check(roofed == null || roofed.kind() == SwingAssist.Kind.BLOCK, "no sky under a roof: " + roofed);
         helper.succeed();
     }
 
@@ -404,7 +395,7 @@ public final class SwingAssistTests {
                 // too far
                 anchor(good.point().add(0, 0, 60), good.face(), SwingAssist.Kind.BLOCK),
                 // a point of the sky under the barrier ceiling
-                anchor(helper.absoluteVec(new Vec3(11.0, 9.0, 10.0)), Direction.DOWN, SwingAssist.Kind.SKY));
+                anchor(helper.absoluteVec(new Vec3(11.0, 10.0, 10.0)), Direction.DOWN, SwingAssist.Kind.SKY));
         for (SwingAssist.Anchor anchor : bad) {
             fx(player);
             attach(player, anchor);
