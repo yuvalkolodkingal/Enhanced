@@ -74,7 +74,7 @@ public final class SpeedConfig {
         BARRAGE_COOLDOWN = builder.comment("Cooldown of the Pebble Barrage, in ticks.")
                 .defineInRange("barrageCooldown", 120, 0, 72000);
 
-        BOOM_RADIUS = builder.comment("Radius of Tommy's Sonic Boom (Sneak + R), in blocks.")
+        BOOM_RADIUS = builder.comment("Radius of Tommy's Sonic Boom (Sneak + V), in blocks.")
                 .defineInRange("sonicBoomRadius", 6.0, 1.0, 16.0);
         BOOM_DAMAGE = builder.comment("Damage of the Sonic Boom (half as much again when he was running at super speed).")
                 .defineInRange("sonicBoomDamage", 4.0, 0.0, 100.0);
