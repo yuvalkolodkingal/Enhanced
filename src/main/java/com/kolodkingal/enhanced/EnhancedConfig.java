@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.BuildConfig;
+import com.kolodkingal.enhanced.config.CyclopsConfig;
 import com.kolodkingal.enhanced.config.DarkholdConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.config.SpiderConfig;
@@ -512,6 +513,8 @@ public final class EnhancedConfig {
         DarkholdConfig.define(BUILDER);
         // 3.2: the Witches' Road trials.
         WitchesRoadConfig.define(BUILDER);
+        // 3.3: Cyclops (section [cyclops]).
+        CyclopsConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

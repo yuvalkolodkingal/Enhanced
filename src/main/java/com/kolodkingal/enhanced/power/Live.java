@@ -3,7 +3,7 @@ package com.kolodkingal.enhanced.power;
 /**
  * Momentary states of the newer heroes (and of whoever Mjolnir pins down) that clients must see (to draw effects and
  * poses, or to stop a pinned player's own movement) but that are never saved: they are recomputed by the server while
- * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (26 bits are used).
+ * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (28 bits are used in 3.3).
  *
  * <p>The states of 3.0 sit in one region per hero (the {@code // =====} lines), so the five lanes that build those
  * heroes append to their own lines and never to the same one.
@@ -88,6 +88,13 @@ public enum Live {
      * client draws it from the {@code BeamPayload}s, holds the arm out along the look, and loops its sound.
      */
     BEAMING,
+
+    // ===== cyclops (3.3) =====
+    /**
+     * Cyclops has taken off his ruby-quartz glasses: the giant red beam pours from his eyes where he looks, and does not
+     * stop until they are back on (or he dies or leaves). Every client draws his eyes blazing and his hands at his face.
+     */
+    CYCLOPS_UNLEASHED,
     ;
 
     final long bit() {

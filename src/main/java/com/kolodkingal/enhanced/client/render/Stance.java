@@ -72,7 +72,13 @@ public enum Stance {
     /** Apocalypse's Shield: both forearms raised before the chest, palms out. */
     APOC_SHIELD(1.5F, 3.0F, true),
     /** The Sandstorm: both arms flung wide and up, the head back. */
-    APOC_STORM(3.0F, 5.0F, true)
+    APOC_STORM(3.0F, 5.0F, true),
+
+    // ===== cyclops (3.3) =====
+    /** Cyclops's Optic Blast: two fingers held to the visor, the other arm braced, the feet planted. */
+    CYCLOPS_BLAST(1.5F, 3.0F, true),
+    /** The glasses are off and the giant beam pours out: both hands at his face, straining, braced against it. */
+    CYCLOPS_UNLEASHED(2.0F, 4.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

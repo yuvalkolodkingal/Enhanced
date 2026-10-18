@@ -202,6 +202,16 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_COPY = register("music.road.copy");
     public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_BOAT = register("music.road.boat");
     public static final DeferredHolder<SoundEvent, SoundEvent> ROAD_MUSIC_ENDING = register("music.road.ending");
+    // ===== cyclops (3.3) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_OPTIC_START = register("cyclops_optic_start");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_OPTIC_LOOP = register("cyclops_optic_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_UNLEASHED_START = register("cyclops_unleashed_start");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_UNLEASHED_LOOP = register("cyclops_unleashed_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_RICOCHET = register("cyclops_ricochet");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_CONCUSSION = register("cyclops_concussion");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_LEAP = register("cyclops_leap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_RALLY = register("cyclops_rally");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CYCLOPS_VISOR = register("cyclops_visor");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));

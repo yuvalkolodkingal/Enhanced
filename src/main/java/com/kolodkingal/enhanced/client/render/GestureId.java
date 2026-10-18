@@ -214,7 +214,21 @@ public enum GestureId {
     /** The hand held out, palm up, to the ally; the other hand on the chest. */
     APOC_BESTOW(Group.CAST, 22, 2, 7, false),
     /** The arms gather, then are flung wide and up into the stance of the storm. */
-    APOC_STORM_START(Group.CAST, 18, 2, 6, true)
+    APOC_STORM_START(Group.CAST, 18, 2, 6, true),
+
+    // ===== cyclops (3.3) =====
+    /** Two fingers snap to the visor and the bolt leaves; the hand drops (the Ricochet Shot). */
+    CYCLOPS_RICOCHET(Group.CAST, 14, 1, 5, false),
+    /** Both hands to the visor, the body thrown back by the wide blast. */
+    CYCLOPS_CONCUSSION(Group.CAST, 16, 1, 6, true),
+    /** A crouch, the arms swung back, then flung up and forward as the blast at the ground throws him up. */
+    CYCLOPS_LEAP(Group.CAST, 18, 1, 7, true),
+    /** A fist raised high over his head: "To me, X-Men!" */
+    CYCLOPS_RALLY(Group.CAST, 24, 3, 8, false),
+    /** The hand to the visor, then pulled down and away with the glasses. */
+    CYCLOPS_GLASSES_OFF(Group.CAST, 24, 2, 8, false),
+    /** The hand brings the glasses up to his face and lets go. */
+    CYCLOPS_GLASSES_ON(Group.CAST, 12, 2, 5, false)
     ;
 
     /** Gestures of one group never play together. */

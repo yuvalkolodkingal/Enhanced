@@ -56,6 +56,8 @@ public final class ModNetwork {
         registrar.playToClient(BeamPayload.TYPE, BeamPayload.STREAM_CODEC, BeamPayload::handle);
         // 3.3: the music of the Witches' Road (the stage the player is at).
         registrar.playToClient(RoadMusicPayload.TYPE, RoadMusicPayload.STREAM_CODEC, RoadMusicPayload::handle);
+        // 3.3: Cyclops's blasts (his beams are BeamPayloads).
+        registrar.playToClient(CyclopsFxPayload.TYPE, CyclopsFxPayload.STREAM_CODEC, CyclopsFxPayload::handle);
     }
 
     private ModNetwork() {

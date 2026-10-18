@@ -339,6 +339,10 @@ public final class GestureRoutes {
                 case 2 -> "flight";
                 default -> "flag:CHAOS_SHIELD";
             };
+            // ===== cyclops (3.3) =====
+            // (R held, the Optic Blast, is the stance CYCLOPS_BLAST: the hand eases up to the visor with it; R's cooldown is the
+            // Ricochet's. N's cooldown tells the glasses coming off from going on by its length, see CyclopsHeroMath.)
+            case CYCLOPS -> "cooldown";
             default -> "none: no abilities";
         };
     }
@@ -370,6 +374,9 @@ public final class GestureRoutes {
             case LIFTED -> "Sokovia carries them: like a pinned player they can't move, so they have no move to make";
             // ===== apocalypse =====
             case SANDSTORM -> null;
+            // ===== cyclops (3.3) =====
+            case CYCLOPS_UNLEASHED -> "a stance (CYCLOPS_UNLEASHED, both hands at his face while the giant beam pours out); the glasses"
+                    + " coming off are N's gesture (its cooldown), and the beam is drawn by the shared beam renderer";
         };
     }
 

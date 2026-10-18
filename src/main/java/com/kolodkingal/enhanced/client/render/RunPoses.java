@@ -91,6 +91,10 @@ final class RunPoses {
     /** An unhurried, upright god's walk: little arm swing and almost no bounce. */
     private static final Character APOCALYPSE = new Character(0.55F, 0.80F, 0.90F, 3, 2, 0.008F);
 
+    // ===== cyclops (3.3) =====
+    /** Cyclops: a field leader's run, purposeful and squared, a little lean into the sprint. */
+    private static final Character CYCLOPS = new Character(0.90F, 1.15F, 1.10F, 8, 4, 0.016F);
+
     private static Character character(Power power, boolean whiteVision) {
         return switch (power) {
             case MAGNETO -> MAGNETO;
@@ -106,6 +110,7 @@ final class RunPoses {
             case THANOS -> THANOS;
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
+            case CYCLOPS -> CYCLOPS;
             default -> DEFAULT;
         };
     }

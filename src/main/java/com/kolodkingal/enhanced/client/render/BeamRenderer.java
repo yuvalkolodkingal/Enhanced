@@ -41,6 +41,27 @@ public final class BeamRenderer {
 
     private static final Map<Integer, Active> ACTIVE = new HashMap<>();
 
+    /**
+     * A beam drawn its own way instead of the jagged bolt (3.3: Cyclops's straight beams, from his eyes): where it leaves,
+     * where it ends (given where the crosshair ray ends, already stopped at a Chaos Shield) and how it is drawn between the
+     * two (camera-relative points, into the energy batch).
+     */
+    public interface Drawer {
+        Vec3 origin(Minecraft mc, AbstractClientPlayer player, BeamStyle style, float partialTick);
+
+        Vec3 end(AbstractClientPlayer player, BeamStyle style, float range, Vec3 crosshair, float partialTick);
+
+        void draw(Minecraft mc, AbstractClientPlayer player, BeamStyle style, Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, float partialTick,
+                  float time);
+    }
+
+    private static final Map<String, Drawer> DRAWERS = new HashMap<>();
+
+    /** Draws the beams of this style with {@code drawer} (once, when the client loads). */
+    public static void registerDrawer(BeamStyle style, Drawer drawer) {
+        DRAWERS.put(style.id(), drawer);
+    }
+
     /** The server says a beam burns (or has stopped). */
     public static void update(BeamPayload payload) {
         ClientLevel level = Minecraft.getInstance().level;
@@ -96,12 +117,18 @@ public final class BeamRenderer {
     private static void beam(Minecraft mc, AbstractClientPlayer player, Active active, Matrix4f pose, VertexConsumer vc, Vec3 camera,
                              float partialTick, float time) {
         BeamStyle style = active.style();
-        Vec3 from = origin(mc, player, style, partialTick);
+        Drawer drawer = DRAWERS.get(style.id());
+        Vec3 from = drawer != null ? drawer.origin(mc, player, style, partialTick) : origin(mc, player, style, partialTick);
         Vec3 target = Raycasts.any(player, active.range(), ContinuousBeam.targets(player), partialTick).getLocation();
         // A Scarlet Witch's complete Chaos Shield in the way stops it at its surface (as on the server).
         WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(partialTick), target, partialTick);
         if (shield != null) {
             target = shield.point();
+        }
+        if (drawer != null) {
+            target = drawer.end(player, style, active.range(), target, partialTick);
+            drawer.draw(mc, player, style, pose, vc, from.subtract(camera), target.subtract(camera), partialTick, time);
+            return;
         }
         Vec3 a = from.subtract(camera);
         Vec3 b = target.subtract(camera);

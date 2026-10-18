@@ -56,6 +56,10 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> APOCALYPSE_BLOW = key("apocalypse_blow");
     public static final ResourceKey<DamageType> ENTOMB = key("entomb");
 
+    // ===== cyclops (3.3) =====
+    /** Every blast of Cyclops's eyes: the optic blast, the giant beam, the ricochet, the concussion and the leap's. Not magic. */
+    public static final ResourceKey<DamageType> OPTIC_BLAST = key("optic_blast");
+
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }

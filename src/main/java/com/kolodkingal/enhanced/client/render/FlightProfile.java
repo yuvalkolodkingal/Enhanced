@@ -171,6 +171,8 @@ public final class FlightProfile {
             case THANOS -> null; // he does not fly: no take-off, banking or braking (his landings are ThanosActing's)
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;
+            // ===== cyclops (3.3) =====
+            case CYCLOPS -> null; // he runs, and leaps on his blast: no take-off, banking or braking
             case NONE, QUICKSILVER, TOMMY, LOKI -> null;
         };
     }

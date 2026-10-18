@@ -52,6 +52,18 @@ public final class StancePoses {
     public static final float APOC_STORM_HEAD = -12;
     public static final float APOC_STORM_LEAN = -3;
 
+    // ===== cyclops (3.3) =====
+    /**
+     * Cyclops's Optic Blast: two fingers at the visor (the arm raised forward and up, turned in, so the hand is just before the
+     * right lens), the other arm braced low and out.
+     */
+    public static final float[] CYCLOPS_BLAST_M = {-135, -20, 0};
+    public static final float[] CYCLOPS_BLAST_O = {-12, 12, -16};
+    /** The giant beam: both hands up at his temples, either side of the eyes, the body leaned back against it. */
+    public static final float[] CYCLOPS_UNLEASHED_M = {-150, -38, -8};
+    public static final float[] CYCLOPS_UNLEASHED_O = {-150, 38, 8};
+    public static final float CYCLOPS_UNLEASHED_LEAN = -4;
+
     private StancePoses() {
     }
 }

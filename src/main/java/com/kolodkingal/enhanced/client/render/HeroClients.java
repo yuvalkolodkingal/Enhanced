@@ -22,6 +22,8 @@ public final class HeroClients {
         register(new ThanosClient());
         register(new UltronClient());
         register(new ApocalypseClient());
+        // 3.3
+        register(new CyclopsClient());
     }
 
     /**

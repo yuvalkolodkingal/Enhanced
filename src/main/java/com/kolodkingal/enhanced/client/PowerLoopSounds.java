@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.item.DarkholdItem;
+import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -72,7 +73,14 @@ public final class PowerLoopSounds {
 
         // ===== apocalypse =====
         /** The Sandstorm: the roar of sand round him. */
-        SANDSTORM(ModSounds.SAND_STORM_LOOP, 0.9F, 1.0F, (p, d) -> d.power() == Power.APOCALYPSE && d.is(Live.SANDSTORM))
+        SANDSTORM(ModSounds.SAND_STORM_LOOP, 0.9F, 1.0F, (p, d) -> d.power() == Power.APOCALYPSE && d.is(Live.SANDSTORM)),
+
+        // ===== cyclops (3.3) =====
+        /** Cyclops's optic blast: a bright, focused hum with a pulse in it. */
+        CYCLOPS_OPTIC(ModSounds.CYCLOPS_OPTIC_LOOP, 0.8F, 1.0F,
+                (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == RubyQuartzGlassesItem.OPTIC),
+        /** The glasses off: the deep roar of the giant beam, for as long as it pours out. */
+        CYCLOPS_UNLEASHED(ModSounds.CYCLOPS_UNLEASHED_LOOP, 1.0F, 1.0F, (p, d) -> d.power() == Power.CYCLOPS && d.is(Live.CYCLOPS_UNLEASHED))
         ;
 
         final Supplier<SoundEvent> sound;

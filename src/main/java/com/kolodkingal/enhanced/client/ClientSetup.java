@@ -15,8 +15,11 @@ import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
 import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
+import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
 import com.kolodkingal.enhanced.client.render.BlackEyesLayer;
+import com.kolodkingal.enhanced.client.render.CyclopsBeamFx;
+import com.kolodkingal.enhanced.client.render.CyclopsVisorLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
@@ -44,6 +47,7 @@ import com.kolodkingal.enhanced.client.render.UltronSentryRenderer;
 import com.kolodkingal.enhanced.client.render.UltronViewer;
 import com.kolodkingal.enhanced.client.render.VibraniumKeyModel;
 import com.kolodkingal.enhanced.client.render.VibraniumKeyRenderer;
+import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModParticles;
 import net.minecraft.client.KeyMapping;
@@ -93,6 +97,9 @@ public final class ClientSetup {
             UltronViewer.register();
             // ===== apocalypse =====
             ApocalypseViewer.register();
+            // ===== cyclops (3.3) =====
+            BeamRenderer.registerDrawer(RubyQuartzGlassesItem.OPTIC, CyclopsBeamFx.OPTIC);
+            BeamRenderer.registerDrawer(RubyQuartzGlassesItem.UNLEASHED, CyclopsBeamFx.UNLEASHED);
         });
     }
 
@@ -165,6 +172,8 @@ public final class ClientSetup {
         // ===== apocalypse =====
         event.registerLayerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
         event.registerLayerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);
+        // ===== cyclops (3.3) =====
+        event.registerLayerDefinition(CyclopsVisorLayer.LAYER, CyclopsVisorLayer::createLayer);
     }
 
     @SubscribeEvent
@@ -190,6 +199,8 @@ public final class ClientSetup {
                 // ===== ultron =====
                 // ===== apocalypse =====
                 renderer.addLayer(new ApocalypseAuraLayer(renderer, energy));
+                // ===== cyclops (3.3) =====
+                renderer.addLayer(new CyclopsVisorLayer(renderer, event.getContext().bakeLayer(CyclopsVisorLayer.LAYER)));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
