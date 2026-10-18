@@ -32,10 +32,24 @@ Hebrew: [עברית, דף הבית](Home-HE)
 | [Agatha](Agatha) | Agatha Harkness, the witch of *WandaVision* | Read the **Darkhold** with no power: hold right-click on it for 3 seconds | The Darkhold's purple beam, hex mark and mind glimpse, flight, the Power Drain, the Witch's Shield, the Rune Trap |
 | [Cyclops](Cyclops) | Scott Summers, the leader of the X-Men | Find his **Ruby-Quartz Glasses** in the Mutant School and put them on | The Optic Blast, a bouncing shot, a concussion blast, a leap on his beam, the Rally; and a giant beam whenever the glasses come off |
 | [Professor X](Professor-X) | Charles Xavier, young or old | **Craft** his **Wheelchair** (or find it in the Mutant School) and hold right-click on it for 3 seconds | Hearing thoughts, taking over a body, Freeze Minds, the Mental Blast, Cerebro |
-| [A hero of your own](Hero-Creator) | Anyone you like | In Creative mode, use the **Hero Creator** | Thirty powers to choose from, each with a strength, your keys, colours and skin, saved to a file |
+| [A hero of your own](Hero-Creator) | Anyone you like | In Creative mode, use the **Hero Creator** | Thirty powers and all **81 abilities of the heroes** to mix, each with a strength, on ten keys (plain or Sneak), with the heroes' moves, your colours, skin, cape and aura, saved to a file |
 | [Apocalypse](Apocalypse) | En Sabah Nur, the first mutant (a boss) | Plant a Capstone in the sand by day with a Scarlet Witch or a Phoenix near, beat him, and hold the Essence he leaves for three seconds | A fight against a golden shield that only mind power breaks, sand, portals and his Horsemen. The reward makes you Apocalypse: sand waves, levitation, a portal, a shield of your own and power bestowal |
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops and Professor X) are on [Looks](Looks).
+
+## What's new in 3.4
+
+Eilon asked for a Hero Creator that makes heroes as good as the mod's own.
+
+* **Every hero's abilities, for your own hero.** All **81 abilities** of the sixteen heroes are powers you can pick in the [Hero Creator](Hero-Creator), each with its Sneak variant, its effects, sounds and animations, exactly as the hero has them: Thor's Lightning Beam, Quicksilver's Super Speed, Agatha's Witch's Shield and Ultron's Sentry Army on one hero, if you like. A **strength** slider makes each one weaker or stronger. The list is on [Heroes' Abilities](Hero-Abilities).
+* **Ten keys.** Put your powers on **R G V B N**, alone or with **Sneak**, like the real heroes; a hero's ability brings its Sneak variant with it.
+* **A bigger budget**: 90 points and up to 10 powers (was 60 and 8). Two powers of different heroes that drive the same thing (one shield, one grip, one beam...) cannot go together, and the editor says why.
+* **Moves as good as the heroes'.** Every power plays a gesture (the hero's own, or one you choose), held and switched-on powers have a stance, and you choose how your hero flies, runs, runs at super speed and stands. Everyone sees it, in first person too.
+* **Looks:** a cape, a hat, a mask, glowing eyes and an aura on top of the skin.
+* **A new editor** with a 3D preview that moves, 22 ready-made heroes to start from ("Thor-like", "Speedster"...), categories and a search box in English and Hebrew.
+* **Choose a Hero gives the hero's items**: Thor gets a Mjolnir that is already his, Agatha the Darkhold, Cyclops his glasses; never a second one.
+* **Hero files of 3.3 still load:** they turn into the new format by themselves.
+* **Update the server and every player together.** A 3.4 server and a 3.3 player (or the other way round) cannot play together (network protocol 8). Worlds from 3.3 open in 3.4 as they were; a custom hero saved with a player comes back as he was. A 3.3 server file keeps its Hero Creator budget of 60 and 8 powers until you change them.
 
 ## What's new in 3.3
 
@@ -122,7 +136,7 @@ Put the jar in the `mods` folder and start the game. The details are on [Install
 
 * New here? [Installation](Installation), then [Becoming a Hero](Becoming-a-Hero), then [Controls](Controls).
 * Recipes and where the rare items are found: [Items and Crafting](Items-and-Crafting). The places in the world that hold them: [Structures](Structures).
-* Making a hero of your own: [Hero Creator](Hero-Creator).
+* Making a hero of your own: [Hero Creator](Hero-Creator), and every hero's ability you can give it: [Heroes' Abilities](Hero-Abilities).
 * Becoming Billy or Tommy by walking the three trials: [The Witches' Road](Witches-Road). The two books of the sorcerers: [The Sorcerers' Books](Sorcerers-Books).
 * Running a server: [Commands](Commands) and [Server Configuration](Server-Configuration).
 * Questions and mysteries (why can't I lift Mjolnir?): [FAQ](FAQ).
