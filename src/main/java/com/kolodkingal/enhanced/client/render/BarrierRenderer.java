@@ -190,7 +190,8 @@ public final class BarrierRenderer {
     /** The plate as a grid of quads, plain or textured. */
     private static void surface(VertexConsumer vc, Matrix4f pose, Vec3 c, BillyBarrier.Frame plate, double width, double height, float alpha,
                                 boolean textured) {
-        int rgb = textured ? (tint < 0 ? BillyAbilities.INNER : AbilityColors.recolor(PLATE_ART, tint)) : col(BillyAbilities.BODY);
+        int rgb = textured ? (tint < 0 ? BillyAbilities.INNER : AbilityColors.recolor(PLATE_ART, tint))
+                : col(BillyAbilities.BODY);
         float r = ((rgb >> 16) & 0xFF) / 255.0F;
         float g = ((rgb >> 8) & 0xFF) / 255.0F;
         float b = (rgb & 0xFF) / 255.0F;

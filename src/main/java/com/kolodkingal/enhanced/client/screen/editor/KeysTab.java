@@ -58,6 +58,16 @@ public final class KeysTab extends EditorTab {
                 Component sub = b == null ? null : linked ? Component.translatable("screen.enhanced.hero_creator.key.linked")
                         : CreatorUi.badge(b.act());
                 int color = b == null ? 0x606060 : hero.colorOf(hero.pick(b.entry()));
+                int cx = gridX + (c - 1) * (cellW + GAP);
+                int cy = gridY + row * (cellH + GAP);
+                if (b != null && hero.pick(b.entry()) != null) {
+                    // 3.5: the box's colour button (added first: it is clicked before the box under it).
+                    CatalogEntry picked = b.entry();
+                    add(new CreatorUi.Swatch(cx + cellW - 10, cy + 2, 8, color, chosen
+                            -> ColorPickerScreen.open(screen, picked), () -> -2))
+                            .setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable(
+                                    "screen.enhanced.hero_creator.color.button.desc", CreatorUi.name(picked))));
+                }
                 CreatorUi.BigButton cell = add(new CreatorUi.BigButton(gridX + (c - 1) * (cellW + GAP), gridY + row * (cellH + GAP + (s ? 0 : 0)),
                         cellW, cellH, label, sub, color, () -> click(col, s)).selected(col == column && s == sneak).stacked());
                 if (b != null) {

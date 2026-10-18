@@ -153,7 +153,8 @@ public final class HexManager {
         int radius = Mth.clamp(EnhancedConfig.HEX_DEFAULT_RADIUS.get(), EnhancedConfig.HEX_MIN_RADIUS.get(), EnhancedConfig.HEX_MAX_RADIUS.get());
         // (3.5: a custom hero's Hex rises in the colour his pick chose.)
         Hex hex = new Hex(UUID.randomUUID(), wanda.getUUID(), wanda.getGameProfile().getName(), wanda.position(), radius,
-                Set.of(), false, level.getGameTime(), false, false, 0L, AbilityColors.chosen(wanda, HeroAbility.WANDA_HEX));
+                Set.of(), false, level.getGameTime(), false, false, 0L,
+                        AbilityColors.chosen(wanda, HeroAbility.WANDA_HEX));
         save(level, data(level).with(hex));
         // Volume above 1 widens the range: everyone inside the new Hex hears it rise.
         level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), ModSounds.HEX_RISE.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 16.0F), 1.0F);

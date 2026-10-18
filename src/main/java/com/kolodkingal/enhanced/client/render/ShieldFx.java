@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -208,6 +209,15 @@ public final class ShieldFx {
     }
 
     /** One dome to draw this frame. */
+    /**
+     * 3.5: one of the shield's golds, or it in the colour a custom hero's pick of the shield chose (the boss's stays
+     * gold).
+     */
+    private static int gold(int entityId, int rgb) {
+        net.minecraft.client.multiplayer.ClientLevel level = Minecraft.getInstance().level;
+        return level == null ? rgb : AbilityColors.shade(level.getEntity(entityId), HeroAbility.APOCALYPSE_SHIELD, rgb);
+    }
+
     private record Dome(int id, Vec3 centre, Vec3 world, float radius, float web, float veil, float maxLat, float strength, boolean cracked, boolean mine) {
     }
 
@@ -276,7 +286,8 @@ public final class ShieldFx {
             Vec3 start = new Vec3(random.nextDouble() - 0.5, random.nextDouble() * 1.4 - 0.5, random.nextDouble() - 0.5).normalize();
             List<Vec3> line = SandShapes.crackOnSphere(dome.centre(), dome.radius() * 1.004, start, 5 + random.nextInt(5), 0.16, seed);
             EnergyGeometry.polyline(pose, vc, line, 0.055F, argb(0x2A1C08, 0.8F * visible));
-            EnergyGeometry.polyline(pose, vc, line, 0.018F, argb(SandPalette.GOLD_CORE, 0.55F * visible));
+            EnergyGeometry.polyline(pose, vc, line, 0.018F, argb(gold(dome.id(), SandPalette.GOLD_CORE),
+                    0.55F * visible));
         }
     }
 
@@ -299,8 +310,8 @@ public final class ShieldFx {
             double arc = 0.06 + 1.25 * AnimMath.easeOutCubic(u);
             float fade = (1.0F - u) * (dome.mine() ? 0.4F : 1.0F);
             List<Vec3> ring = SandShapes.circleOnSphere(dome.centre(), dome.radius() * 1.01, direction, arc, 28);
-            EnergyGeometry.polyline(pose, vc, ring, 0.16F, argb(SandPalette.GOLD, 0.30F * fade));
-            EnergyGeometry.polyline(pose, vc, ring, 0.05F, argb(SandPalette.GOLD_CORE, 0.9F * fade));
+            EnergyGeometry.polyline(pose, vc, ring, 0.16F, argb(gold(dome.id(), SandPalette.GOLD), 0.30F * fade));
+            EnergyGeometry.polyline(pose, vc, ring, 0.05F, argb(gold(dome.id(), SandPalette.GOLD_CORE), 0.9F * fade));
         }
     }
 
@@ -318,7 +329,7 @@ public final class ShieldFx {
             double size = 0.10 + random.nextDouble() * 0.12;
             double spin = random.nextDouble() * 0.5;
             Vec3 at = shatter.centre().add(dir.scale(shatter.radius())).add(dir.scale(speed * age)).add(0.0, -0.5 * 0.035 * age * age, 0.0);
-            int color = argb(i % 3 == 0 ? SandPalette.GOLD_CORE : SandPalette.GOLD, 0.85F * fade);
+            int color = argb(gold(shatter.id(), i % 3 == 0 ? SandPalette.GOLD_CORE : SandPalette.GOLD), 0.85F * fade);
             SandShapes.hexShard(pose, vc, at.subtract(camera), dir.add(0.0, 0.2, 0.0), size, spin * age, color);
         }
     }

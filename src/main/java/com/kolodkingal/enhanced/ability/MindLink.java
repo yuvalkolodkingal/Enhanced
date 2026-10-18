@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.config.XavierConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
@@ -661,7 +662,8 @@ public final class MindLink {
         int steps = (int) Math.min(40, delta.length() * 2.5);
         for (int i = 1; i <= steps; i++) {
             Vec3 p = start.add(delta.scale(i / (double) steps));
-            int colour = level.random.nextInt(3) == 0 ? XavierAbilities.CORE : XavierAbilities.MAIN;
+            int colour = AbilityColors.shade(from, HeroAbility.XAVIER_TAKE_OVER, level.random.nextInt(3) == 0
+                    ? XavierAbilities.CORE : XavierAbilities.MAIN);
             level.sendParticles(new EnergyParticleOptions(colour, 0.7F), p.x, p.y, p.z, 1, 0.04, 0.04, 0.04, 0.0);
         }
     }

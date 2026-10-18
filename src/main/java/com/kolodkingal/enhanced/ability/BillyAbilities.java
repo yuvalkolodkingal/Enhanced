@@ -213,8 +213,8 @@ public final class BillyAbilities {
     }
 
     /**
-     * The style of his beam: Billy's blue, or (3.5) a custom hero's Hex Beam in the colour his pick chose (the shared beam
-     * system makes a style of any two colours, {@link CustomBeams}).
+     * The style of his beam: Billy's blue, or (3.5) a custom hero's Hex Beam in the colour his pick chose (the shared
+     * beam system makes a style of any two colours, {@link CustomBeams}).
      */
     public static BeamStyle beamStyle(Player player) {
         int chosen = AbilityColors.chosen(player, HeroAbility.BILLY_HEX_BEAM);
@@ -335,9 +335,11 @@ public final class BillyAbilities {
 
     /** White-hot sparks where a bolt strikes. */
     private static void sparks(ServerLevel level, Player player, Vec3 at, int count) {
-        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.BILLY_HEX_BEAM, MAIN), 1.2F), at.x, at.y, at.z, count,
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.BILLY_HEX_BEAM, MAIN),
+                1.2F), at.x, at.y, at.z, count,
                 0.15, 0.15, 0.15, 0.12);
-        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.BILLY_HEX_BEAM, CORE), 0.9F), at.x, at.y, at.z,
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.BILLY_HEX_BEAM, CORE),
+                0.9F), at.x, at.y, at.z,
                 count / 2, 0.08, 0.08, 0.08, 0.06);
     }
 

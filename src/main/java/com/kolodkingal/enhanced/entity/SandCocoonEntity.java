@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.entity;
 
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -42,6 +44,9 @@ public class SandCocoonEntity extends Entity {
     private static final EntityDataAccessor<Integer> DATA_VICTIM = SynchedEntityData.defineId(SandCocoonEntity.class, EntityDataSerializers.INT);
     /** The part of its health it has left, 0 to 1: the cracks the client draws. */
     private static final EntityDataAccessor<Float> DATA_HEALTH = SynchedEntityData.defineId(SandCocoonEntity.class, EntityDataSerializers.FLOAT);
+    /** 3.5: the colour a custom hero's pick of Entomb chose for the sand (synced), or -1 for the sand's own. */
+    private static final EntityDataAccessor<Integer> DATA_TINT = SynchedEntityData.defineId(SandCocoonEntity.class,
+            EntityDataSerializers.INT);
 
     @Nullable
     private UUID victimId;
@@ -74,6 +79,7 @@ public class SandCocoonEntity extends Entity {
         this.maxHealth = health;
         this.anchor = victim.position();
         entityData.set(DATA_VICTIM, victim.getId());
+        entityData.set(DATA_TINT, AbilityColors.chosen(caster, HeroAbility.APOCALYPSE_ENTOMB));
         moveTo(victim.getX(), victim.getY(), victim.getZ());
     }
 
@@ -81,6 +87,12 @@ public class SandCocoonEntity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_VICTIM, -1);
         builder.define(DATA_HEALTH, 1.0F);
+        builder.define(DATA_TINT, -1);
+    }
+
+    /** 3.5: the colour chosen for the cocoon's sand, or -1. */
+    public int tint() {
+        return entityData.get(DATA_TINT);
     }
 
     // ---- what it is ----

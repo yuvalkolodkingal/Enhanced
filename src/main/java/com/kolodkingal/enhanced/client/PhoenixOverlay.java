@@ -45,7 +45,8 @@ public final class PhoenixOverlay implements LayeredDraw.Layer {
                 for (int i = 0; i < VIGNETTE_DEPTH; i++) {
                     float fall = 1.0F - i / (float) VIGNETTE_DEPTH;
                     graphics.renderOutline(i, i, graphics.guiWidth() - 2 * i, graphics.guiHeight() - 2 * i,
-                            argb(AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, PhoenixMath.FIRE_GOLD), 0.45F * fall * fall * pulse * strength));
+                            argb(AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, PhoenixMath.FIRE_GOLD),
+                                    0.45F * fall * fall * pulse * strength));
                 }
             }
         }

@@ -268,7 +268,8 @@ public final class Shelters {
             Vec3 hit = plateCrossing(billy, from, to, partialTick);
             if (hit != null && hit.distanceTo(from) < best) {
                 best = hit.distanceTo(from);
-                nearest = new Stop(Wall.HEX_BARRIER, billy, hit, AbilityColors.color(billy, HeroAbility.BILLY_HEX_BARRIER, BillyAbilities.MAIN),
+                nearest = new Stop(Wall.HEX_BARRIER, billy, hit,
+                        AbilityColors.color(billy, HeroAbility.BILLY_HEX_BARRIER, BillyAbilities.MAIN),
                         billy.getUUID());
             }
         }

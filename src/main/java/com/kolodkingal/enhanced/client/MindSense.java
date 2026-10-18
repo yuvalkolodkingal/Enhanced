@@ -121,7 +121,8 @@ public final class MindSense {
      * The ring of motes at the radius the ping has reached (two blocks a tick): twenty on the horizontal ring and a few
      * on a faint vertical ring in the plane she faces. It stops when the ring has spread over the whole range.
      */
-    private static void ring(ClientLevel level, Vec3 camera, Ping ping, long age, float yaw, float thin, Player sensing) {
+    private static void ring(ClientLevel level, Vec3 camera, Ping ping, long age, float yaw, float thin,
+            Player sensing) {
         float range = PhoenixConfig.senseRange();
         if (age < 0 || age > PhoenixMath.senseRingTicks(range)) {
             return;
@@ -149,7 +150,8 @@ public final class MindSense {
             double y = ping.origin().y + Math.sin(angle) * radius;
             double z = ping.origin().z + dz * along;
             if (!PhoenixMath.tooCloseToCamera(camera.distanceToSqr(x, y, z))) {
-                level.addParticle(new EnergyParticleOptions(AbilityColors.shade(sensing, HeroAbility.PHOENIX_MIND_SENSE, PhoenixAbilities.PSY_CORE), 1.3F),
+                level.addParticle(new EnergyParticleOptions(AbilityColors.shade(sensing,
+                        HeroAbility.PHOENIX_MIND_SENSE, PhoenixAbilities.PSY_CORE), 1.3F),
                         x, y, z, 0.0, 0.0, 0.0);
             }
         }

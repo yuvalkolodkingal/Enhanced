@@ -43,7 +43,8 @@ public class SlowMotionOverlay implements LayeredDraw.Layer {
         if (slowed) {
             // (3.5: a custom hero's slowed time shades the screen in the colour his pick chose.)
             Player holder = SlowMotion.zoneHolder(mc.level, mc.player.position());
-            shade = AbilityColors.shade(holder, AbilityColors.first(holder, HeroAbility.QUICKSILVER_TIME, HeroAbility.TOMMY_TIME), shade);
+            shade = AbilityColors.shade(holder, AbilityColors.first(holder, HeroAbility.QUICKSILVER_TIME,
+                    HeroAbility.TOMMY_TIME), shade);
         }
         int edge = (int) (0x50 * strength) << 24 | shade;
         int mid = (int) (0x10 * strength) << 24 | shade;

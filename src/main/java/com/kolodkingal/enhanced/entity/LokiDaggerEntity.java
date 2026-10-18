@@ -36,7 +36,8 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
 
     private float damage = 5.0F;
     /** 3.5: the colour a custom hero's pick chose for the throw (synced: the trail is drawn by every client), or -1. */
-    private static final EntityDataAccessor<Integer> TINT = SynchedEntityData.defineId(LokiDaggerEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> TINT = SynchedEntityData.defineId(LokiDaggerEntity.class,
+            EntityDataSerializers.INT);
 
     public LokiDaggerEntity(EntityType<? extends LokiDaggerEntity> type, Level level) {
         super(type, level);
@@ -76,7 +77,8 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
 
     private int magicGlow() {
         int tint = entityData.get(TINT);
-        return tint >= 0 ? AbilityColors.glowOf(tint) : getOwner() instanceof Player owner ? Powers.glow(owner) : Power.LOKI.glow;
+        return tint >= 0 ? AbilityColors.glowOf(tint) : getOwner() instanceof Player owner ? Powers.glow(owner)
+                : Power.LOKI.glow;
     }
 
     @Override

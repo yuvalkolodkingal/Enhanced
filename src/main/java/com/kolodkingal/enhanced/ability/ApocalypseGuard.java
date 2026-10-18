@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.apocalypse.MindPower;
 import com.kolodkingal.enhanced.config.ApocalypseConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
@@ -285,7 +286,7 @@ public final class ApocalypseGuard {
         forget(player.getUUID());
         ServerLevel level = player.serverLevel();
         if (worn) {
-            level.sendParticles(new EnergyParticleOptions(GOLD, 1.2F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.APOCALYPSE_SHIELD, GOLD), 1.2F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
                     player.getZ(), 24, radius() * 0.5, 0.7, radius() * 0.5, 0.05);
         }
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.6F, 1.7F);
@@ -304,7 +305,7 @@ public final class ApocalypseGuard {
             // Out from a random spot on the sphere, along the way out.
             Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
             Vec3 at = center.add(out.scale(radius()));
-            level.sendParticles(new EnergyParticleOptions(i % 3 == 0 ? GOLD_LIGHT : GOLD, 1.5F), at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.APOCALYPSE_SHIELD, i % 3 == 0 ? GOLD_LIGHT : GOLD), 1.5F), at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
         }
         level.playSound(null, center.x, center.y, center.z, ModSounds.APOCALYPSE_SHIELD_BREAK.get(), SoundSource.PLAYERS, 1.2F, 1.0F);
         ApocalypseFx.send(level, center, ApocalypseFxPayload.SHIELD_BREAK, player.getId(), center, Vec3.ZERO, 0, ApocalypseShield.State.BROKEN.ordinal());
@@ -339,7 +340,7 @@ public final class ApocalypseGuard {
             for (int i = 0; i < 2; i++) {
                 Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
                 Vec3 at = center.add(out.scale(radius * Math.max(0.3, grown)));
-                level.sendParticles(new EnergyParticleOptions(GOLD_LIGHT, 1.0F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
+                level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.APOCALYPSE_SHIELD, GOLD_LIGHT), 1.0F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
             }
             return;
         }

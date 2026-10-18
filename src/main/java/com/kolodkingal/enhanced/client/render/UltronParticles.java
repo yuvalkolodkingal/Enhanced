@@ -99,7 +99,7 @@ final class UltronParticles {
                     Entity body = e.entityId < 0 ? null : level.getEntity(e.entityId);
                     Vec3 chest = body == null ? e.at.add(0, 1.5, 0) : UltronEffects.chestOf(body, 0.0F);
                     for (int i = 0; i < 8 * density(); i++) {
-                        mote(level, UltronEffects.PLASMA_EDGE, 1.0F, chest, random.nextGaussian() * 0.12, random.nextGaussian() * 0.12, random.nextGaussian() * 0.12);
+                        mote(level, UltronEffects.c(UltronEffects.PLASMA_EDGE), 1.0F, chest, random.nextGaussian() * 0.12, random.nextGaussian() * 0.12, random.nextGaussian() * 0.12);
                     }
                 }
             }
@@ -113,7 +113,7 @@ final class UltronParticles {
                     }
                     for (int i = 0; i < 8 * density(); i++) {
                         Vec3 v = dir.scale(0.4 + random.nextDouble() * 0.3);
-                        mote(level, UltronEffects.PLASMA_GOLD, 1.3F, e.at, v.x, v.y, v.z);
+                        mote(level, UltronEffects.c(UltronEffects.PLASMA_GOLD), 1.3F, e.at, v.x, v.y, v.z);
                     }
                 }
             }
@@ -189,7 +189,7 @@ final class UltronParticles {
             double fan = Math.toRadians(random.nextDouble() * 2.0 * UltronAttack.BEAM_FAN_DEGREES - UltronAttack.BEAM_FAN_DEGREES);
             Vec3 point = origin.add(UltronEffects.rotateY(direction, fan).scale(origin.distanceTo(end)));
             level.addParticle(ParticleTypes.ELECTRIC_SPARK, point.x, point.y, point.z, random.nextGaussian() * 0.1, 0.1 + random.nextDouble() * 0.15, random.nextGaussian() * 0.1);
-            mote(level, UltronEffects.PLASMA_MAIN, 1.0F, point, random.nextGaussian() * 0.06, 0.05, random.nextGaussian() * 0.06);
+            mote(level, UltronEffects.c(UltronEffects.PLASMA_MAIN), 1.0F, point, random.nextGaussian() * 0.06, 0.05, random.nextGaussian() * 0.06);
         }
     }
 
@@ -203,7 +203,7 @@ final class UltronParticles {
             double x = e.at.x + Math.cos(angle) * r;
             double z = e.at.z + Math.sin(angle) * r;
             double pull = 0.06 + 0.08 * u;
-            mote(level, UltronEffects.GRAV_MAIN, 1.0F, x, e.at.y + 0.15, z, -Math.cos(angle) * pull - Math.sin(angle) * 0.04, 0.02, -Math.sin(angle) * pull + Math.cos(angle) * 0.04);
+            mote(level, UltronEffects.c(UltronEffects.GRAV_MAIN), 1.0F, x, e.at.y + 0.15, z, -Math.cos(angle) * pull - Math.sin(angle) * 0.04, 0.02, -Math.sin(angle) * pull + Math.cos(angle) * 0.04);
         }
     }
 
@@ -211,7 +211,7 @@ final class UltronParticles {
     private static void spawnPillar(ClientLevel level, UltronEffects.Effect e, float u, float age, RandomSource random) {
         if (chance(random, 1.0F)) {
             double angle = random.nextDouble() * Mth.TWO_PI;
-            mote(level, UltronEffects.GRAV_MAIN, 1.1F, e.at.x + Math.cos(angle) * 0.4, e.at.y + 0.1, e.at.z + Math.sin(angle) * 0.4, 0.0, 0.18 + random.nextDouble() * 0.2, 0.0);
+            mote(level, UltronEffects.c(UltronEffects.GRAV_MAIN), 1.1F, e.at.x + Math.cos(angle) * 0.4, e.at.y + 0.1, e.at.z + Math.sin(angle) * 0.4, 0.0, 0.18 + random.nextDouble() * 0.2, 0.0);
         }
         if (random.nextInt(3) == 0) {
             level.addParticle(ParticleTypes.ELECTRIC_SPARK, e.at.x, e.at.y + random.nextDouble() * 3.0, e.at.z, random.nextGaussian() * 0.1, 0.1, random.nextGaussian() * 0.1);
@@ -266,7 +266,7 @@ final class UltronParticles {
             if (mc.player != null && mc.player.distanceToSqr(x, mc.player.getY(), z) > 40.0 * 40.0) {
                 continue;
             }
-            mote(level, UltronEffects.GRAV_MAIN, 1.0F, x, e.at.y + 0.2, z, 0.0, 0.3 + 0.5 * u * random.nextDouble(), 0.0);
+            mote(level, UltronEffects.c(UltronEffects.GRAV_MAIN), 1.0F, x, e.at.y + 0.2, z, 0.0, 0.3 + 0.5 * u * random.nextDouble(), 0.0);
         }
     }
 
@@ -300,7 +300,7 @@ final class UltronParticles {
         }
         if (u > 0.4F) {
             for (int i = 0; i < 2 * density(); i++) {
-                mote(level, UltronEffects.GRAV_MAIN, 1.3F, base.x, base.y + height * 0.62, base.z, random.nextGaussian() * 0.25, random.nextGaussian() * 0.25, random.nextGaussian() * 0.25);
+                mote(level, UltronEffects.c(UltronEffects.GRAV_MAIN), 1.3F, base.x, base.y + height * 0.62, base.z, random.nextGaussian() * 0.25, random.nextGaussian() * 0.25, random.nextGaussian() * 0.25);
             }
         }
     }
@@ -312,7 +312,7 @@ final class UltronParticles {
         int count = (int) (16 * density());
         for (int i = 0; i < count; i++) {
             double angle = random.nextDouble() * Mth.TWO_PI;
-            mote(level, i % 3 == 0 ? UltronEffects.GRAV_CORE : UltronEffects.GRAV_MAIN, 1.0F, e.at.x + Math.cos(angle) * r, e.at.y + 0.12, e.at.z + Math.sin(angle) * r,
+            mote(level, i % 3 == 0 ? UltronEffects.c(UltronEffects.GRAV_CORE) : UltronEffects.c(UltronEffects.GRAV_MAIN), 1.0F, e.at.x + Math.cos(angle) * r, e.at.y + 0.12, e.at.z + Math.sin(angle) * r,
                     Math.cos(angle) * 0.1, 0.03, Math.sin(angle) * 0.1);
         }
         if (first) {
@@ -325,7 +325,7 @@ final class UltronParticles {
 
     /** Sparks gather into the shape of a Sentry. */
     private static void droneAssemble(ClientLevel level, UltronEffects.Effect e, float u, RandomSource random) {
-        int colour = UltronEffects.blend(0x45B4F5, UltronEffects.NET_RED, u);
+        int colour = UltronEffects.blend(0x45B4F5, UltronEffects.c(UltronEffects.NET_RED), u);
         for (int i = 0; i < 3 * density(); i++) {
             Vec3 dir = new Vec3(random.nextGaussian(), random.nextGaussian() * 0.6, random.nextGaussian()).normalize().scale(1.5);
             Vec3 from = e.at.add(0, 0.85, 0).add(dir);
@@ -364,7 +364,7 @@ final class UltronParticles {
         int tick = (int) t;
         // The anti-gravity palms and soles, always: a faint pale-blue motes under his feet.
         if (boss.tickCount % 3 == 0 && chance(random, 1.0F) && boss.state() != UltronState.AWAKENING) {
-            mote(level, UltronEffects.GRAV_MAIN, 0.8F, feet.x + (random.nextDouble() - 0.5) * 0.9 * scale, feet.y + 0.1, feet.z + (random.nextDouble() - 0.5) * 0.9 * scale, 0.0, -0.03, 0.0);
+            mote(level, UltronEffects.c(UltronEffects.GRAV_MAIN), 0.8F, feet.x + (random.nextDouble() - 0.5) * 0.9 * scale, feet.y + 0.1, feet.z + (random.nextDouble() - 0.5) * 0.9 * scale, 0.0, -0.03, 0.0);
         }
         switch (boss.state()) {
             case VOLLEY -> {
@@ -376,7 +376,7 @@ final class UltronParticles {
                             Vec3 palm = UltronTracker.palm(boss, side == 0, 0.0F);
                             if (palm != null) {
                                 for (int i = 0; i < 5 * density(); i++) {
-                                    mote(level, i % 2 == 0 ? UltronEffects.PLASMA_GOLD : UltronEffects.PLASMA_MAIN, 1.1F, palm, random.nextGaussian() * 0.05, random.nextGaussian() * 0.05, random.nextGaussian() * 0.05);
+                                    mote(level, i % 2 == 0 ? UltronEffects.c(UltronEffects.PLASMA_GOLD) : UltronEffects.c(UltronEffects.PLASMA_MAIN), 1.1F, palm, random.nextGaussian() * 0.05, random.nextGaussian() * 0.05, random.nextGaussian() * 0.05);
                                 }
                             }
                         }
@@ -388,7 +388,7 @@ final class UltronParticles {
                 if (t < UltronAttack.DIVE.tell() + 12) {
                     for (int side = -1; side <= 1; side += 2) {
                         for (int i = 0; i < 2 * density(); i++) {
-                            mote(level, i == 0 ? UltronEffects.GRAV_CORE : UltronEffects.GRAV_MAIN, 1.4F, feet.x + side * 0.4 * scale, feet.y + 0.1, feet.z, random.nextGaussian() * 0.03, -0.25 - random.nextDouble() * 0.1, random.nextGaussian() * 0.03);
+                            mote(level, i == 0 ? UltronEffects.c(UltronEffects.GRAV_CORE) : UltronEffects.c(UltronEffects.GRAV_MAIN), 1.4F, feet.x + side * 0.4 * scale, feet.y + 0.1, feet.z, random.nextGaussian() * 0.03, -0.25 - random.nextDouble() * 0.1, random.nextGaussian() * 0.03);
                         }
                     }
                     double ground = feet.y;
@@ -423,7 +423,7 @@ final class UltronParticles {
                         double angle = boss.tickCount * 0.7 + i * 1.57;
                         double r = 0.55 + 0.25 * Math.sin(boss.tickCount * 0.3 + i);
                         Vec3 at = fist.add(Math.cos(angle) * r, (i % 3) * 0.12 - 0.1, Math.sin(angle) * r);
-                        mote(level, i % 2 == 0 ? UltronEffects.GRAV_CORE : UltronEffects.GRAV_MAIN, 1.0F, at, -Math.sin(angle) * 0.14, 0.03, Math.cos(angle) * 0.14);
+                        mote(level, i % 2 == 0 ? UltronEffects.c(UltronEffects.GRAV_CORE) : UltronEffects.c(UltronEffects.GRAV_MAIN), 1.0F, at, -Math.sin(angle) * 0.14, 0.03, Math.cos(angle) * 0.14);
                     }
                 }
                 if (tick == UltronAttack.PULL_PUNCH) {
@@ -434,7 +434,7 @@ final class UltronParticles {
                 // Red and white motes rise from his chest as the Core pulses.
                 if (chance(random, 1.0F)) {
                     Vec3 chest = UltronEffects.chestOf(boss, partial);
-                    mote(level, random.nextBoolean() ? UltronEffects.NET_RED : UltronEffects.NET_WHITE, 1.0F, chest, random.nextGaussian() * 0.04, 0.1, random.nextGaussian() * 0.04);
+                    mote(level, random.nextBoolean() ? UltronEffects.c(UltronEffects.NET_RED) : UltronEffects.c(UltronEffects.NET_WHITE), 1.0F, chest, random.nextGaussian() * 0.04, 0.1, random.nextGaussian() * 0.04);
                 }
             }
             case LIFT_CHANNEL -> {
@@ -442,7 +442,7 @@ final class UltronParticles {
                     Vec3 palm = UltronTracker.palm(boss, side == 0, partial);
                     if (palm != null && chance(random, 1.0F)) {
                         double angle = boss.tickCount * 0.5 + side * Math.PI;
-                        mote(level, UltronEffects.GRAV_MAIN, 1.2F, palm.add(Math.cos(angle) * 0.3, 0, Math.sin(angle) * 0.3), 0.0, 0.18, 0.0);
+                        mote(level, UltronEffects.c(UltronEffects.GRAV_MAIN), 1.2F, palm.add(Math.cos(angle) * 0.3, 0, Math.sin(angle) * 0.3), 0.0, 0.18, 0.0);
                     }
                 }
             }
@@ -453,7 +453,7 @@ final class UltronParticles {
                             random.nextGaussian() * 0.1, random.nextGaussian() * 0.1, random.nextGaussian() * 0.1);
                 }
                 if (chance(random, 1.0F)) {
-                    mote(level, random.nextBoolean() ? UltronEffects.NET_RED : UltronEffects.NET_WHITE, 0.9F, feet.x + random.nextGaussian() * 0.5, feet.y + random.nextDouble() * height, feet.z + random.nextGaussian() * 0.5, 0.0, 0.05, 0.0);
+                    mote(level, random.nextBoolean() ? UltronEffects.c(UltronEffects.NET_RED) : UltronEffects.c(UltronEffects.NET_WHITE), 0.9F, feet.x + random.nextGaussian() * 0.5, feet.y + random.nextDouble() * height, feet.z + random.nextGaussian() * 0.5, 0.0, 0.05, 0.0);
                 }
             }
             case PUNCH -> {
@@ -525,7 +525,7 @@ final class UltronParticles {
             for (int i = 0; i < 2 * density(); i++) {
                 double angle = random.nextDouble() * Mth.TWO_PI;
                 double r = random.nextDouble() * 0.5;
-                mote(level, i == 0 ? UltronEffects.GRAV_CORE : UltronEffects.GRAV_MAIN, 1.2F, at.x + Math.cos(angle) * r, at.y + 2.6, at.z + Math.sin(angle) * r, 0.0, 0.35 + random.nextDouble() * 0.2, 0.0);
+                mote(level, i == 0 ? UltronEffects.c(UltronEffects.GRAV_CORE) : UltronEffects.c(UltronEffects.GRAV_MAIN), 1.2F, at.x + Math.cos(angle) * r, at.y + 2.6, at.z + Math.sin(angle) * r, 0.0, 0.35 + random.nextDouble() * 0.2, 0.0);
             }
             if (random.nextInt(4) == 0) {
                 level.addParticle(ParticleTypes.END_ROD, at.x, at.y + 2.7, at.z, random.nextGaussian() * 0.02, 0.3 + random.nextDouble() * 0.2, random.nextGaussian() * 0.02);
@@ -557,14 +557,15 @@ final class UltronParticles {
             if (mc.player.distanceToSqr(x, mc.player.getY(), z) > 24.0 * 24.0 + Math.pow(Math.abs(mc.player.getY() - top), 2)) {
                 continue;
             }
-            mote(level, UltronEffects.GRAV_MAIN, 1.1F, x, top + 0.2, z, 0.0, 0.55 + random.nextDouble() * 0.15, 0.0);
+            mote(level, UltronEffects.c(UltronEffects.GRAV_MAIN), 1.1F, x, top + 0.2, z, 0.0, 0.55
+                    + random.nextDouble() * 0.15, 0.0);
         }
         // The pit: the hole the island left, with a column of blue-white motes rising out of it.
         if (view.up() && mc.player.distanceToSqr(cx, mc.player.getY(), cz) < 64.0 * 64.0) {
             for (int i = 0; i < 2 * density(); i++) {
                 double angle = random.nextDouble() * Mth.TWO_PI;
                 double r = random.nextDouble() * 1.2;
-                mote(level, i == 0 ? UltronEffects.GRAV_CORE : UltronEffects.GRAV_MAIN, 1.3F, cx + Math.cos(angle) * r, view.centre().getY() - spec.skin() + 0.5, cz + Math.sin(angle) * r, 0.0, 0.6 + random.nextDouble() * 0.2, 0.0);
+                mote(level, i == 0 ? UltronEffects.c(UltronEffects.GRAV_CORE) : UltronEffects.c(UltronEffects.GRAV_MAIN), 1.3F, cx + Math.cos(angle) * r, view.centre().getY() - spec.skin() + 0.5, cz + Math.sin(angle) * r, 0.0, 0.6 + random.nextDouble() * 0.2, 0.0);
             }
         }
     }

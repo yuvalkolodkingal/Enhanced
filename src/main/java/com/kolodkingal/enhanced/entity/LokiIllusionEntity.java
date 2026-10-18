@@ -205,10 +205,13 @@ public class LokiIllusionEntity extends PathfinderMob {
         }
         if (level() instanceof ServerLevel server) {
             Player owner = owner();
-            int color = AbilityColors.color(owner, HeroAbility.LOKI_DUPLICATES, owner != null ? Powers.color(owner) : Power.LOKI.color);
-            int glow = AbilityColors.glow(owner, HeroAbility.LOKI_DUPLICATES, owner != null ? Powers.glow(owner) : Power.LOKI.glow);
+            int color = AbilityColors.color(owner, HeroAbility.LOKI_DUPLICATES, owner != null ? Powers.color(owner)
+                    : Power.LOKI.color);
+            int glow = AbilityColors.glow(owner, HeroAbility.LOKI_DUPLICATES, owner != null ? Powers.glow(owner)
+                    : Power.LOKI.glow);
             AABB box = getBoundingBox();
-            EnergyParticleOptions light = new EnergyParticleOptions(AbilityColors.shade(owner, HeroAbility.LOKI_DUPLICATES, LIGHT_COLOR), 1.3F);
+            EnergyParticleOptions light = new EnergyParticleOptions(AbilityColors.shade(owner,
+                    HeroAbility.LOKI_DUPLICATES, LIGHT_COLOR), 1.3F);
             for (int i = 0; i < 36; i++) {
                 double x = box.minX + random.nextDouble() * box.getXsize();
                 double y = box.minY + random.nextDouble() * box.getYsize();

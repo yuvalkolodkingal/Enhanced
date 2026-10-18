@@ -784,7 +784,8 @@ public final class PhoenixAbilities {
         int steps = (int) Math.min(40, delta.length() * 2.5);
         for (int i = 1; i <= steps; i++) {
             Vec3 p = start.add(delta.scale(i / (double) steps));
-            int colour = AbilityColors.shade(from, HeroAbility.PHOENIX_CONTROL, level.random.nextInt(3) == 0 ? PSY_CORE : PSY_MAIN);
+            int colour = AbilityColors.shade(from, HeroAbility.PHOENIX_CONTROL, level.random.nextInt(3) == 0 ? PSY_CORE
+                    : PSY_MAIN);
             level.sendParticles(new EnergyParticleOptions(colour, 0.7F), p.x, p.y, p.z, 1, 0.04, 0.04, 0.04, 0.0);
         }
     }
@@ -914,7 +915,8 @@ public final class PhoenixAbilities {
         for (int i = 0; i < 6; i++) {
             double angle = turn + i * Mth.TWO_PI / 6.0;
             double y = player.getY() + ((now + i * 3) % 20) / 20.0 * height;
-            int colour = AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, i % 3 == 0 ? FIRE_GOLD : (i % 3 == 1 ? FIRE_MAIN : FIRE_CORE));
+            int colour = AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, i % 3 == 0 ? FIRE_GOLD
+                    : (i % 3 == 1 ? FIRE_MAIN : FIRE_CORE));
             sparksForOthers(level, player, new EnergyParticleOptions(colour, 1.0F + f * 0.5F), player.getX() + Math.cos(angle) * radius, y,
                     player.getZ() + Math.sin(angle) * radius, 1, 0.0, 0.0, 0.0, 0.0);
         }

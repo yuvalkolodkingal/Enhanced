@@ -144,7 +144,8 @@ public final class AsgardSkeletonTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theRowsOfAsgardAreEighteenInTheirRegions(GameTestHelper helper) {
-        check(HeroAbility.values().length == 99, "81 + 18 rows: " + HeroAbility.values().length);
+        check(HeroAbility.values().length == 133, "81 + 18 rows, and the creator lane's 34 (3.5): "
+                + HeroAbility.values().length);
         Set<String> ids = new HashSet<>();
         for (HeroAbility a : HeroAbility.values()) {
             check(ids.add(a.id()), a.id() + " is unique");

@@ -43,8 +43,8 @@ public final class ShieldStyles {
     }
 
     /**
-     * 3.5: the style of this player's shield in the colour his pick of the shield ability chose ({@link AbilityColors}),
-     * or {@link #of(PowerData)} as it is (a built-in hero, or no colour chosen).
+     * 3.5: the style of this player's shield in the colour his pick of the shield ability chose ({@link
+     * AbilityColors}), or {@link #of(PowerData)} as it is (a built-in hero, or no colour chosen).
      */
     @Nullable
     public static ShieldStyle of(Player player, PowerData data) {

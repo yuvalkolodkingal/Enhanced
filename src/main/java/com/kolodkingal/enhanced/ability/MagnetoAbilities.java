@@ -368,7 +368,10 @@ public final class MagnetoAbilities {
         return Powers.get(player).power() == Power.MAGNETO ? Power.MAGNETO.glow : Powers.glow(player);
     }
 
-    /** 3.5: the glow of the sparks of one of his abilities: the colour its pick chose ({@code AbilityColors}), else {@link #glow}. */
+    /**
+     * 3.5: the glow of the sparks of one of his abilities: the colour its pick chose ({@code AbilityColors}), else
+     * {@link #glow}.
+     */
     static int glow(Player player, HeroAbility row) {
         return AbilityColors.color(player, row, glow(player));
     }

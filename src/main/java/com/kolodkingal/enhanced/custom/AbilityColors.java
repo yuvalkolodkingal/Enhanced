@@ -16,23 +16,23 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The colour of each built-in hero's ability on a custom hero (3.5, the creator lane): every pick has its own colour
  * ({@link CustomHero.Pick#color}, -1 for "the hero's"), and every effect of a hero's ability (beams, bolts, shields,
- * domes, barriers, auras, particles, trails, projectiles, webs, portals, lightning, flames, glowing eyes, the HUD, the Hex)
- * asks here for the colour it is drawn in, naming the row it belongs to and the colour the built-in hero draws it in.
- * Built-in heroes, and a custom hero whose pick says "the hero's colour", keep exactly what they had: only a colour the
- * player chose changes anything. Both sides read the same synced definition, so what the server sends (particles, beam
- * styles) and what a client draws agree for every player who sees him.
+ * domes, barriers, auras, particles, trails, projectiles, webs, portals, lightning, flames, glowing eyes, the HUD, the
+ * Hex) asks here for the colour it is drawn in, naming the row it belongs to and the colour the built-in hero draws it
+ * in. Built-in heroes, and a custom hero whose pick says "the hero's colour", keep exactly what they had: only a colour
+ * the player chose changes anything. Both sides read the same synced definition, so what the server sends (particles,
+ * beam styles) and what a client draws agree for every player who sees him.
  *
  * <p>A palette of several colours (a crimson glow, a pink core, a white flare) is recoloured as a whole by
- * {@link #shade}: each colour keeps its own lightness and takes the chosen hue and saturation, so a core stays a core and
- * white stays white.
+ * {@link #shade}: each colour keeps its own lightness and takes the chosen hue and saturation, so a core stays a core
+ * and white stays white.
  */
 public final class AbilityColors {
 
     /**
-     * The colour the custom hero chose for {@code row}'s effects, or -1 when there is none: a built-in hero (or no hero), a
-     * pick at "the hero's colour", or a row he has not picked. A variant row he has not picked takes its parent's pick (the
-     * parent's card holds both halves), and a parent he has not picked its variant row's (the variant's code is the
-     * parent's).
+     * The colour the custom hero chose for {@code row}'s effects, or -1 when there is none: a built-in hero (or no
+     * hero), a pick at "the hero's colour", or a row he has not picked. A variant row he has not picked takes its
+     * parent's pick (the parent's card holds both halves), and a parent he has not picked its variant row's (the
+     * variant's code is the parent's).
      */
     public static int chosen(@Nullable Entity entity, HeroAbility row) {
         if (!(entity instanceof Player player)) {
@@ -69,7 +69,10 @@ public final class AbilityColors {
         return c < 0 ? builtIn : glowOf(c);
     }
 
-    /** One colour of a palette of {@code row}'s effect, recoloured to the chosen colour ({@link #recolor}), else as it is. */
+    /**
+     * One colour of a palette of {@code row}'s effect, recoloured to the chosen colour ({@link #recolor}), else as it
+     * is.
+     */
     public static int shade(@Nullable Entity entity, HeroAbility row, int builtIn) {
         int c = chosen(entity, row);
         return c < 0 ? builtIn : recolor(builtIn, c);
@@ -81,7 +84,10 @@ public final class AbilityColors {
         return c < 0 ? argb : argb & 0xFF000000 | recolor(argb & 0xFFFFFF, c);
     }
 
-    /** The vertex tint (0xRRGGBB, white when nothing was chosen) that turns a grey or white texture into the chosen colour. */
+    /**
+     * The vertex tint (0xRRGGBB, white when nothing was chosen) that turns a grey or white texture into the chosen
+     * colour.
+     */
     public static int tint(@Nullable Entity entity, HeroAbility row) {
         int c = chosen(entity, row);
         return c < 0 ? 0xFFFFFF : c;
@@ -100,7 +106,9 @@ public final class AbilityColors {
         return rows[rows.length - 1];
     }
 
-    /** The shield ability of a player (one at most: {@code Resource.SHIELD}), for the colour of what his shield does. */
+    /**
+     * The shield ability of a player (one at most: {@code Resource.SHIELD}), for the colour of what his shield does.
+     */
     public static HeroAbility shield(@Nullable Entity entity) {
         return first(entity, HeroAbility.AGATHA_SHIELD, HeroAbility.APOCALYPSE_SHIELD, HeroAbility.ODIN_ODINFORCE,
                 HeroAbility.BILLY_HEX_BARRIER, HeroAbility.WANDA_CHAOS_SHIELD);
@@ -131,14 +139,15 @@ public final class AbilityColors {
     }
 
     /**
-     * A row whose own effect has nothing coloured (a switch with only a stance, a message, a sound) shows the colour chosen
-     * for it as a short burst of sparks round the player when it is used; nothing at all when no colour was chosen (a
-     * built-in hero is unchanged).
+     * A row whose own effect has nothing coloured (a switch with only a stance, a message, a sound) shows the colour
+     * chosen for it as a short burst of sparks round the player when it is used; nothing at all when no colour was
+     * chosen (a built-in hero is unchanged).
      */
     public static void mark(ServerPlayer player, HeroAbility row) {
         int c = chosen(player, row);
         if (c >= 0) {
-            player.serverLevel().sendParticles(new EnergyParticleOptions(c, 1.2F), player.getX(), player.getY() + player.getBbHeight() * 0.55,
+            player.serverLevel().sendParticles(new EnergyParticleOptions(c, 1.2F), player.getX(), player.getY()
+                    + player.getBbHeight() * 0.55,
                     player.getZ(), 24, 0.35, 0.6, 0.35, 0.04);
         }
     }
@@ -150,8 +159,8 @@ public final class AbilityColors {
 
     /**
      * {@code base} in the hue and saturation of {@code target}, its lightness kept but moved as far as the target is
-     * lighter or darker than a middle tone (so a near-black choice darkens the whole palette, a near-white one pales it,
-     * and white stays white). A grey target gives greys.
+     * lighter or darker than a middle tone (so a near-black choice darkens the whole palette, a near-white one pales
+     * it). A white or near-white core stays as it is (the hot centre of a beam or bolt), a grey target gives greys.
      */
     public static int recolor(int base, int target) {
         float[] b = hsl(base);
@@ -162,7 +171,9 @@ public final class AbilityColors {
         } else {
             l = l + (1.0F - l) * (t[2] - 0.5F) * 2.0F;
         }
-        return rgb(t[0], t[1], Math.max(0.0F, Math.min(1.0F, l)));
+        float white = Math.max(0.0F, Math.min(1.0F, (b[2] - 0.85F) / 0.15F)) * (1.0F - b[1]);
+        l = l + (b[2] - l) * white;
+        return rgb(t[0], t[1] * (1.0F - white), Math.max(0.0F, Math.min(1.0F, l)));
     }
 
     /** Hue (0-1), saturation and lightness of 0xRRGGBB. */

@@ -91,7 +91,9 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         for (CustomHero.Pick pick : hero.powers()) {
             CatalogEntry entry = pick.entry();
             if (entry != null && onNoKey(kit, entry)) {
-                passive.add(CreatorUi.name(entry));
+                // (3.5: in the colour its pick chose, else the hero's glow)
+                passive.add(CreatorUi.name(entry).withStyle(s -> s.withColor(pick.color() < 0 ? hero.glow()
+                        : pick.color())));
             }
         }
         if (!passive.isEmpty()) {
@@ -100,7 +102,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                 if (i > 0) {
                     line.append(Component.literal(", ").withStyle(ChatFormatting.GRAY));
                 }
-                line.append(passive.get(i).copy().withStyle(s -> s.withColor(hero.glow())));
+                line.append(passive.get(i).copy());
             }
             lines.add(line);
         }

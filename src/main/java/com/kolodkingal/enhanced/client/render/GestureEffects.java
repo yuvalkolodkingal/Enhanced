@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -16,6 +18,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.phys.Vec3;
 
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,10 +56,14 @@ public final class GestureEffects {
         final long from;
         final long to;
         final Kind kind;
+        /** 3.5: the ability the effect is of (its colour), or null. */
+        @Nullable
+        final HeroAbility row;
         /** The data has shown the shield being raised. */
         boolean seen;
 
-        Timed(int player, long born, long from, long to, Kind kind) {
+        Timed(int player, long born, long from, long to, Kind kind, @Nullable HeroAbility row) {
+            this.row = row;
             this.player = player;
             this.born = born;
             this.from = from;
@@ -89,16 +96,20 @@ public final class GestureEffects {
                 // The motes gather while the arms do (t4 to t14 of the keys), the flash is the arms thrown open (t15):
                 // both stretched with the wind-up, so the shield is complete as they open.
                 float k = GestureRoutes.shieldRate(Math.round(param));
-                add(player, now, now + Math.round(4 / k), now + Math.max(Math.round(14 / k), Math.round(4 / k)), Kind.SHIELD_GATHER);
-                add(player, now, now + Math.round(15 / k), now + Math.round(15 / k), Kind.SHIELD_FLASH);
+                add(player, now, now + Math.round(4 / k), now + Math.max(Math.round(14 / k), Math.round(4 / k)), Kind.SHIELD_GATHER,
+                        HeroAbility.WANDA_CHAOS_SHIELD);
+                add(player, now, now + Math.round(15 / k), now + Math.round(15 / k), Kind.SHIELD_FLASH,
+                        HeroAbility.WANDA_CHAOS_SHIELD);
             }
-            case WANDA_SHIELD_SNAP -> add(player, now, now + 4, now + 4, Kind.SHIELD_FLASH);
-            case WANDA_HEX_RISE -> add(player, now, now + 8, now + 36, Kind.HEX_RISE);
-            case LOKI_CAST -> add(player, now, now + 3, now + 9, Kind.CAST_HAND);
-            case MAG_DISARM -> add(player, now, now + 5, now + 8, Kind.CAST_HAND);
-            case MAG_PULL -> add(player, now, now + 5, now + 12, Kind.CAST_HAND);
-            case BILLY_FREEZE_CAST -> add(player, now, now + 5, now + 20, Kind.CAST_BOTH);
-            case TOMMY_ACCEL -> add(player, now, now + 2, now + 7, Kind.VIBRATE_HAND);
+            case WANDA_SHIELD_SNAP -> add(player, now, now + 4, now + 4, Kind.SHIELD_FLASH,
+                    HeroAbility.WANDA_CHAOS_SHIELD);
+            case WANDA_HEX_RISE -> add(player, now, now + 8, now + 36, Kind.HEX_RISE, HeroAbility.WANDA_HEX);
+            case LOKI_CAST -> add(player, now, now + 3, now + 9, Kind.CAST_HAND,
+                    AbilityColors.first(player, HeroAbility.LOKI_SHAPESHIFT, HeroAbility.LOKI_VANISH));
+            case MAG_DISARM -> add(player, now, now + 5, now + 8, Kind.CAST_HAND, HeroAbility.MAGNETO_DISARM);
+            case MAG_PULL -> add(player, now, now + 5, now + 12, Kind.CAST_HAND, HeroAbility.MAGNETO_MAGNETIC_PULL);
+            case BILLY_FREEZE_CAST -> add(player, now, now + 5, now + 20, Kind.CAST_BOTH, HeroAbility.BILLY_FREEZE);
+            case TOMMY_ACCEL -> add(player, now, now + 2, now + 7, Kind.VIBRATE_HAND, HeroAbility.TOMMY_ACCELERATE);
             default -> {
                 // The heroes of 3.0 start the flourishes of their own gestures themselves.
                 HeroClient hero = HeroClients.of(state.power);
@@ -109,8 +120,17 @@ public final class GestureEffects {
         }
     }
 
-    private static void add(AbstractClientPlayer player, long born, long from, long to, Kind kind) {
-        TIMED.add(new Timed(player.getId(), born, from, to, kind));
+    private static void add(AbstractClientPlayer player, long born, long from, long to, Kind kind,
+            @Nullable HeroAbility row) {
+        TIMED.add(new Timed(player.getId(), born, from, to, kind, row));
+    }
+
+    /** 3.5: the colour a custom hero's pick chose for the effect being made, or -1. */
+    private static int tint = -1;
+
+    /** A colour of the effect, or it recoloured to the colour chosen for it. */
+    private static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
     }
 
     /** Runs the timed effects of this client tick. */
@@ -128,6 +148,7 @@ public final class GestureEffects {
             if (state == null) {
                 continue;
             }
+            tint = t.row == null ? -1 : AbilityColors.chosen(player, t.row);
             switch (t.kind) {
                 case SHIELD_GATHER -> gather(level, player);
                 case SHIELD_FLASH -> flash(level, player);
@@ -140,6 +161,7 @@ public final class GestureEffects {
                 case VIBRATE_HAND -> vibrate(level, player);
             }
         }
+        tint = -1;
     }
 
     /** Whether the shield that a shield effect belongs to was let go of or refused before it could be thrown open. */
@@ -188,8 +210,8 @@ public final class GestureEffects {
     private static void gather(ClientLevel level, AbstractClientPlayer player) {
         RandomSource random = level.random;
         Vec3 chest = chest(player);
-        int color = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
-        int glow = CustomActing.tint(player, Power.SCARLET_WITCH.glow, true);
+        int color = c(CustomActing.tint(player, Power.SCARLET_WITCH.color, false));
+        int glow = c(CustomActing.tint(player, Power.SCARLET_WITCH.glow, true));
         for (HumanoidArm arm : HumanoidArm.values()) {
             Vec3 hand = hand(player, arm);
             Vec3 toChest = chest.subtract(hand);
@@ -204,8 +226,8 @@ public final class GestureEffects {
     private static void flash(ClientLevel level, AbstractClientPlayer player) {
         Vec3 chest = chest(player);
         Vec3 look = player.getLookAngle();
-        int color = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
-        int glow = CustomActing.tint(player, Power.SCARLET_WITCH.glow, true);
+        int color = c(CustomActing.tint(player, Power.SCARLET_WITCH.color, false));
+        int glow = c(CustomActing.tint(player, Power.SCARLET_WITCH.glow, true));
         FlightEffects.ring(level, player.getId(), chest, look, 8, 0.3F, 2.4F, 0.12F, glow, 0.7F);
         RandomSource random = level.random;
         for (int i = 0; i < 14; i++) {
@@ -218,8 +240,8 @@ public final class GestureEffects {
 
     private static void rise(ClientLevel level, AbstractClientPlayer player) {
         RandomSource random = level.random;
-        int color = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
-        int glow = CustomActing.tint(player, Power.SCARLET_WITCH.glow, true);
+        int color = c(CustomActing.tint(player, Power.SCARLET_WITCH.color, false));
+        int glow = c(CustomActing.tint(player, Power.SCARLET_WITCH.glow, true));
         for (HumanoidArm arm : HumanoidArm.values()) {
             Vec3 hand = hand(player, arm);
             level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? glow : color, 1.0F * size(player)),
@@ -233,8 +255,8 @@ public final class GestureEffects {
         HumanoidArm arm = other ? player.getMainArm().getOpposite() : player.getMainArm();
         Vec3 hand = hand(player, arm);
         // (3.4: a custom hero's hand glows in his own colours.)
-        int color = state.power == Power.BILLY ? BillyAbilities.MAIN : CustomActing.tint(player, state.power.color, false);
-        int glow = state.power == Power.BILLY ? BillyAbilities.INNER : CustomActing.tint(player, state.power.glow, true);
+        int color = c(state.power == Power.BILLY ? BillyAbilities.MAIN : CustomActing.tint(player, state.power.color, false));
+        int glow = c(state.power == Power.BILLY ? BillyAbilities.INNER : CustomActing.tint(player, state.power.glow, true));
         for (int i = 0; i < 2; i++) {
             level.addParticle(new EnergyParticleOptions(i == 0 ? color : glow, 0.9F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.25,
                     hand.y + (random.nextDouble() - 0.5) * 0.25, hand.z + (random.nextDouble() - 0.5) * 0.25, (random.nextDouble() - 0.5) * 0.04,
@@ -245,8 +267,8 @@ public final class GestureEffects {
     private static void vibrate(ClientLevel level, AbstractClientPlayer player) {
         RandomSource random = level.random;
         Vec3 hand = hand(player, player.getMainArm());
-        int color = CustomActing.tint(player, Power.TOMMY.color, false);
-        int glow = CustomActing.tint(player, Power.TOMMY.glow, true);
+        int color = c(CustomActing.tint(player, Power.TOMMY.color, false));
+        int glow = c(CustomActing.tint(player, Power.TOMMY.glow, true));
         for (int i = 0; i < 3; i++) {
             level.addParticle(new EnergyParticleOptions(i == 0 ? glow : color, 0.7F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.2,
                     hand.y + (random.nextDouble() - 0.5) * 0.2, hand.z + (random.nextDouble() - 0.5) * 0.2, 0.0, 0.0, 0.0);

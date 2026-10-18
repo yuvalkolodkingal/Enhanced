@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.CyclopsConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.network.CyclopsFxPayload;
@@ -337,7 +338,9 @@ public final class CyclopsAbilities {
             Vec3 normal = Vec3.atLowerCornerOf(block.getDirection().getNormal());
             dir = dir.subtract(normal.scale(2.0 * dir.dot(normal))).normalize();
             from = end.add(normal.scale(0.02));
-            level.sendParticles(new EnergyParticleOptions(RED, 1.0F), end.x, end.y, end.z, 6, 0.08, 0.08, 0.08, 0.12);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.CYCLOPS_RICOCHET,
+                    RED), 1.0F), end.x, end.y, end.z, 6,
+                    0.08, 0.08, 0.08, 0.12);
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, end.x, end.y, end.z, 3, 0.1, 0.1, 0.1, 0.2);
         }
         data.startCooldown(HeroAbility.CYCLOPS_OPTIC_BLAST, now, CyclopsConfig.RICOCHET_COOLDOWN.get());

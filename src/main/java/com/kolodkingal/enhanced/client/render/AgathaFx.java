@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AgathaAbilities;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -69,10 +71,23 @@ public final class AgathaFx {
     private record Drain(int agatha, int target, Vec3 from, long start, int ticks, boolean power) {
     }
 
-    private record Shatter(Vec3 center, float radius, long start, long seed) {
+    private record Shatter(Vec3 center, float radius, long start, long seed, int owner) {
     }
 
     private static final List<Circle> CIRCLES = new ArrayList<>();
+    /** 3.5: the colour a custom hero's pick chose for the effect being made, or -1 (Agatha's violet and lilac). */
+    private static int tint = -1;
+
+    /** One of Agatha's colours, or it recoloured to the colour chosen for the effect being made. */
+    private static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
+    /** The colour a hero's pick of {@code row} chose ({@code id} his entity id), or -1. */
+    private static int tintOf(int id, HeroAbility row) {
+        ClientLevel level = Minecraft.getInstance().level;
+        return level == null ? -1 : AbilityColors.chosen(level.getEntity(id), row);
+    }
     private static final List<Drain> DRAINS = new ArrayList<>();
     private static final List<Shatter> SHATTERS = new ArrayList<>();
 
@@ -102,7 +117,7 @@ public final class AgathaFx {
                 }
             }
             case AgathaFxPayload.DRAIN -> DRAINS.add(new Drain(p.id(), p.other(), p.a(), now, p.c(), p.d() == 1));
-            case AgathaFxPayload.SHIELD_BREAK -> SHATTERS.add(new Shatter(p.a(), p.c() / 10.0F, now, level.random.nextLong()));
+            case AgathaFxPayload.SHIELD_BREAK -> SHATTERS.add(new Shatter(p.a(), p.c() / 10.0F, now, level.random.nextLong(), p.id()));
             default -> {
             }
         }
@@ -130,13 +145,15 @@ public final class AgathaFx {
         SHATTERS.removeIf(s -> now > s.start() + SHARD_TICKS);
         RandomSource r = level.random;
         for (Circle c : CIRCLES) {
+            tint = tintOf(c.owner, HeroAbility.AGATHA_RUNES);
             if (now < c.end && r.nextInt(2) == 0) {
                 double a = r.nextDouble() * Mth.TWO_PI;
                 double rr = c.radius * (0.85 + r.nextDouble() * 0.15);
-                level.addParticle(new EnergyParticleOptions(r.nextBoolean() ? AgathaAbilities.LILAC : AgathaAbilities.VIOLET, 0.6F),
+                level.addParticle(new EnergyParticleOptions(r.nextBoolean() ? c(AgathaAbilities.LILAC) : c(AgathaAbilities.VIOLET), 0.6F),
                         c.center.x + Math.cos(a) * rr, c.center.y + 0.1, c.center.z + Math.sin(a) * rr, 0.0, 0.02 + r.nextDouble() * 0.02, 0.0);
             }
         }
+        tint = -1;
     }
 
     public static void clear() {
@@ -170,12 +187,14 @@ public final class AgathaFx {
         if (!CIRCLES.isEmpty()) {
             VertexConsumer light = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
             for (Circle c : CIRCLES) {
+                tint = tintOf(c.owner, HeroAbility.AGATHA_RUNES);
                 circleLight(pose, light, c, camera, time);
             }
             buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
             RenderType glyphType = EnhancedRenderTypes.energyField(RUNES);
             VertexConsumer glyphs = buffers.getBuffer(glyphType);
             for (Circle c : CIRCLES) {
+                tint = tintOf(c.owner, HeroAbility.AGATHA_RUNES);
                 glyphs(pose, glyphs, c, camera, time);
             }
             buffers.endBatch(glyphType);
@@ -183,13 +202,16 @@ public final class AgathaFx {
         if (!DRAINS.isEmpty() || !SHATTERS.isEmpty()) {
             VertexConsumer vc = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
             for (Drain d : DRAINS) {
+                tint = tintOf(d.agatha(), HeroAbility.AGATHA_DRAIN);
                 drain(pose, vc, d, level, camera, partial, time);
             }
             for (Shatter s : SHATTERS) {
+                tint = tintOf(s.owner(), HeroAbility.AGATHA_SHIELD);
                 shards(pose, vc, s, camera, time);
             }
             buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
         }
+        tint = -1;
     }
 
     /** How bright a circle is at this moment: it fades in after it is laid and out at its end. */
@@ -210,9 +232,9 @@ public final class AgathaFx {
         Vec3 o = c.center.add(0, LIFT, 0).subtract(camera);
         float r = c.radius;
         float turn = time * 0.012F;
-        flatRing(pose, vc, o, r, 0.16F, EnergyGeometry.argb(AgathaAbilities.VIOLET, 0.85F * a * pulse));
-        flatRing(pose, vc, o, r - 0.08F, 0.05F, EnergyGeometry.argb(AgathaAbilities.LILAC, 0.6F * a));
-        flatRing(pose, vc, o, r * 0.74F, 0.08F, EnergyGeometry.argb(AgathaAbilities.VIOLET, 0.7F * a * pulse));
+        flatRing(pose, vc, o, r, 0.16F, EnergyGeometry.argb(c(AgathaAbilities.VIOLET), 0.85F * a * pulse));
+        flatRing(pose, vc, o, r - 0.08F, 0.05F, EnergyGeometry.argb(c(AgathaAbilities.LILAC), 0.6F * a));
+        flatRing(pose, vc, o, r * 0.74F, 0.08F, EnergyGeometry.argb(c(AgathaAbilities.VIOLET), 0.7F * a * pulse));
         // The sigil: a seven-pointed star drawn in one line round the inner ring, turning the other way.
         float sr = r * 0.70F;
         int points = 7;
@@ -221,16 +243,16 @@ public final class AgathaFx {
             double a1 = -turn * 1.5 + (i + 1) * 3 * Mth.TWO_PI / points;
             Vec3 p0 = o.add(Math.cos(a0) * sr, 0, Math.sin(a0) * sr);
             Vec3 p1 = o.add(Math.cos(a1) * sr, 0, Math.sin(a1) * sr);
-            flatLine(pose, vc, p0, p1, 0.06F, EnergyGeometry.argb(AgathaAbilities.VIOLET, 0.55F * a * pulse));
+            flatLine(pose, vc, p0, p1, 0.06F, EnergyGeometry.argb(c(AgathaAbilities.VIOLET), 0.55F * a * pulse));
         }
         // The curtain: a band of light rising off the edge, fading to nothing a block and a bit up.
         float height = 1.3F * a;
-        int top = EnergyGeometry.argb(AgathaAbilities.VIOLET, 0.0F);
+        int top = EnergyGeometry.argb(c(AgathaAbilities.VIOLET), 0.0F);
         for (int i = 0; i < RING_SEGMENTS; i++) {
             double t0 = i * Mth.TWO_PI / RING_SEGMENTS;
             double t1 = (i + 1) * Mth.TWO_PI / RING_SEGMENTS;
             float shimmer = 0.5F + 0.5F * Mth.sin((float) (time * 0.18F + i * 0.7F));
-            int bottom = EnergyGeometry.argb(AgathaAbilities.VIOLET, (0.10F + 0.10F * shimmer) * a);
+            int bottom = EnergyGeometry.argb(c(AgathaAbilities.VIOLET), (0.10F + 0.10F * shimmer) * a);
             Vec3 b0 = o.add(Math.cos(t0) * r, 0, Math.sin(t0) * r);
             Vec3 b1 = o.add(Math.cos(t1) * r, 0, Math.sin(t1) * r);
             vertex(pose, vc, b0, bottom);
@@ -255,7 +277,7 @@ public final class AgathaFx {
             double angle = turn + i * Mth.TWO_PI / count;
             // Each rune lights up in turn as if spoken.
             float spoken = 0.55F + 0.45F * Mth.sin(time * 0.2F - i * 0.9F);
-            int colour = EnergyGeometry.argb(AgathaAbilities.LILAC, 0.9F * a * spoken);
+            int colour = EnergyGeometry.argb(c(AgathaAbilities.LILAC), 0.9F * a * spoken);
             Vec3 at = o.add(Math.cos(angle) * r, 0, Math.sin(angle) * r);
             // The rune stands upright as read from the centre: its "up" points outward.
             Vec3 out = new Vec3(Math.cos(angle), 0, Math.sin(angle)).scale(size * 0.5);
@@ -341,7 +363,7 @@ public final class AgathaFx {
                 if (prev != null) {
                     // Beads of brightness flowing toward her.
                     float bead = 0.5F + 0.5F * Mth.sin((float) (s * 14.0 - time * 0.9F));
-                    int colour = EnergyGeometry.argb(bead > 0.8F ? AgathaAbilities.LILAC : AgathaAbilities.VIOLET, (0.35F + 0.5F * bead) * a);
+                    int colour = EnergyGeometry.argb(bead > 0.8F ? c(AgathaAbilities.LILAC) : c(AgathaAbilities.VIOLET), (0.35F + 0.5F * bead) * a);
                     EnergyGeometry.ribbon(pose, vc, prev, p, 0.07F, colour, colour);
                 }
                 prev = p;
@@ -376,7 +398,8 @@ public final class AgathaFx {
             Vec3 at = s.center().add(out.scale(s.radius() + speed * age)).add(0, -0.004 * age * age, 0).subtract(camera);
             double spin = r.nextDouble() * Mth.TWO_PI + age * (0.3 + r.nextDouble() * 0.3);
             Vec3 edge = out.cross(new Vec3(Math.cos(spin), Math.sin(spin), 0.3)).normalize().scale(0.14 + r.nextDouble() * 0.1);
-            int colour = EnergyGeometry.argb(i % 3 == 0 ? AgathaAbilities.LILAC : AgathaAbilities.VIOLET, 0.9F * a);
+            int colour = EnergyGeometry.argb(i % 3 == 0 ? c(AgathaAbilities.LILAC) : c(AgathaAbilities.VIOLET),
+                    0.9F * a);
             EnergyGeometry.ribbon(pose, vc, at.subtract(edge), at.add(edge), 0.05F, colour, colour);
         }
     }

@@ -333,7 +333,8 @@ public final class WandaAbilities {
             Vec3 at = center.add(out.scale(SHIELD_RADIUS));
             level.sendParticles(shard, at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             if (i % 2 == 0) {
-                level.sendParticles(new EnergyParticleOptions(i % 4 == 0 ? AbilityColors.glow(player, HeroAbility.WANDA_CHAOS_SHIELD, glow(player))
+                level.sendParticles(new EnergyParticleOptions(i % 4 == 0
+                        ? AbilityColors.glow(player, HeroAbility.WANDA_CHAOS_SHIELD, glow(player))
                                 : AbilityColors.color(player, HeroAbility.WANDA_CHAOS_SHIELD, color(player)), 1.5F),
                         at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             }
@@ -434,7 +435,8 @@ public final class WandaAbilities {
      */
     public static void block(ServerPlayer player, Projectile projectile) {
         float power = projectilePower(projectile);
-        neutralize(player.serverLevel(), projectile, AbilityColors.color(player, HeroAbility.WANDA_CHAOS_SHIELD, color(player)));
+        neutralize(player.serverLevel(), projectile, AbilityColors.color(player, HeroAbility.WANDA_CHAOS_SHIELD,
+                color(player)));
         wear(player, power, projectile);
     }
 

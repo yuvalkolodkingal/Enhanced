@@ -454,7 +454,8 @@ public final class ThanosFx {
         }
         float half = e.radius() * 1.25F * (0.6F + 0.4F * open);
         FxShapes.flatTexture(pose, vc, at.add(0.0, 0.02, 0.0), half, age * 0.06F, argb(space(e, 0xFFFFFF), 0.9F * open));
-        FxShapes.flatTexture(pose, vc, at.add(0.0, 0.04, 0.0), half * 0.72F, -age * 0.11F, argb(space(e, StoneKind.SPACE.core()), 0.7F * open));
+        FxShapes.flatTexture(pose, vc, at.add(0.0, 0.04, 0.0), half * 0.72F, -age * 0.11F,
+                argb(space(e, StoneKind.SPACE.core()), 0.7F * open));
     }
 
     private static void mandala(Effect e, Matrix4f pose, VertexConsumer vc, Vec3 camera, float age, boolean calm) {

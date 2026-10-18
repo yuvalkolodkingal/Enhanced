@@ -33,7 +33,7 @@ public final class HeroKit {
      * @param column the key, 1-5 (R G V B N)
      * @param sneak  whether it is the key's Sneak cell
      * @param picked 3.5: the entry the definition picked for this cell: {@code entry} itself, or a variant row
-     *               ({@link HeroAbility#parent}) the binding stands for as its parent's {@link #ALT} (its colour, its name)
+     * ({@link HeroAbility#parent}) the binding stands for as its parent's {@link #ALT} (its colour, its name)
      */
     public record Binding(CatalogEntry entry, String action, int column, boolean sneak, CatalogEntry picked) {
         public Binding(CatalogEntry entry, String action, int column, boolean sneak) {
@@ -92,7 +92,8 @@ public final class HeroKit {
             // (A parent not picked itself is as strong as its variant: its code scales the variant by it.)
             if (!strengths.containsKey(parent)) {
                 HeroAbility variant = parent.variant();
-                strengths.put(parent, variant == null ? HeroAbility.FIXED_STRENGTH : strengths.getOrDefault(variant, HeroAbility.FIXED_STRENGTH));
+                strengths.put(parent, variant == null ? HeroAbility.FIXED_STRENGTH
+                        : strengths.getOrDefault(variant, HeroAbility.FIXED_STRENGTH));
             }
         }
         for (int column = 1; column <= CustomHero.KEYS; column++) {
@@ -162,16 +163,16 @@ public final class HeroKit {
     }
 
     /**
-     * Whether the hero ability is picked, or (3.5) is the parent of a variant row picked: the parent's code runs for its
-     * variant, so it asks for the parent.
+     * Whether the hero ability is picked, or (3.5) is the parent of a variant row picked: the parent's code runs for
+     * its variant, so it asks for the parent.
      */
     public boolean has(HeroAbility a) {
         return rows.contains(a) || granted.contains(a);
     }
 
     /**
-     * 3.5: whether the Sneak variant of {@code parent} is his: the parent picked with its variant on, or its variant row
-     * picked.
+     * 3.5: whether the Sneak variant of {@code parent} is his: the parent picked with its variant on, or its variant
+     * row picked.
      */
     public boolean hasVariant(HeroAbility parent) {
         HeroAbility variant = parent.variant();

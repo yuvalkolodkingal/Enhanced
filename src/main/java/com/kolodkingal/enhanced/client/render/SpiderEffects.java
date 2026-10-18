@@ -106,8 +106,8 @@ public final class SpiderEffects {
     }
 
     /**
-     * One of the web's colours, or (3.5) the chosen colour: a web is near white, so it does not take the hue as the other
-     * effects do: the thread is the colour itself, its shimmer paler and its core paler still.
+     * One of the web's colours, or (3.5) the chosen colour: a web is near white, so it does not take the hue as the
+     * other effects do: the thread is the colour itself, its shimmer paler and its core paler still.
      */
     private static int web(int rgb) {
         if (tint < 0) {
@@ -293,7 +293,8 @@ public final class SpiderEffects {
     private static void legSpark(ClientLevel level, Vec3 at, @Nullable Entity owner) {
         RandomSource random = level.random;
         for (int i = 0; i < 3; i++) {
-            level.addParticle(new EnergyParticleOptions(AbilityColors.shade(owner, HeroAbility.SPIDER_LEGS, i == 0 ? 0xFFC247 : 0xFF2A2A), 0.8F), at.x, at.y, at.z,
+            level.addParticle(new EnergyParticleOptions(AbilityColors.shade(owner, HeroAbility.SPIDER_LEGS, i == 0
+                    ? 0xFFC247 : 0xFF2A2A), 0.8F), at.x, at.y, at.z,
                     (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.2);
         }
     }
@@ -338,7 +339,8 @@ public final class SpiderEffects {
             boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
             tint = AbilityColors.chosen(player, HeroAbility.SPIDER_CRAWL);
             climb(level, player, data, density);
-            tint = AbilityColors.chosen(player, data.is(Live.SWINGING) ? HeroAbility.SPIDER_WEB_SWING : data.is(Live.ZIPPING) ? HeroAbility.SPIDER_ZIP
+            tint = AbilityColors.chosen(player, data.is(Live.SWINGING) ? HeroAbility.SPIDER_WEB_SWING
+                    : data.is(Live.ZIPPING) ? HeroAbility.SPIDER_ZIP
                     : HeroAbility.SPIDER_CRAWL);
             streaks(level, player, data, density);
             tint = -1;

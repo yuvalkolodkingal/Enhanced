@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -26,6 +27,8 @@ import net.minecraft.util.Mth;
 public class SandCocoonRenderer extends EntityRenderer<SandCocoonEntity> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Enhanced.id("sand_cocoon"), "main");
     public static final ResourceLocation TEXTURE = Enhanced.id("textures/entity/sand_cocoon.png");
+    /** 3.5: a grey copy of the cocoon, tinted for a custom hero. */
+    public static final ResourceLocation GREY = Enhanced.id("textures/entity/custom/sand_cocoon_grey.png");
     public static final ResourceLocation CRACKS = Enhanced.id("textures/entity/sand_cocoon_cracks.png");
     /** The box in model pixels: 16 by 32 by 16, drawn at 1.1 times that (1.1 by 2.2 blocks). */
     private static final float SIZE = 1.1F;
@@ -56,8 +59,15 @@ public class SandCocoonRenderer extends EntityRenderer<SandCocoonEntity> {
         poseStack.scale(SIZE, SIZE * (0.35F + 0.65F * form), SIZE);
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         // (The box is built on the usual flipped model space: its feet are at y = 0, its top 32 pixels above them.)
-        VertexConsumer vc = buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURE));
-        box.render(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY);
+        // (3.5: a custom hero's cocoon in the colour his pick of Entomb chose: a grey copy of the sand, tinted.)
+        int tint = cocoon.tint();
+        VertexConsumer vc = buffer.getBuffer(RenderType.entityCutoutNoCull(tint < 0 ? TEXTURE : GREY));
+        if (tint < 0) {
+            box.render(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY);
+        } else {
+            box.render(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY,
+                    0xFF000000 | AbilityColors.recolor(0xD8B76A, tint));
+        }
         float broken = 1.0F - Mth.clamp(cocoon.healthFraction(), 0.0F, 1.0F);
         if (broken > 0.02F) {
             int alpha = (int) (Mth.clamp(broken * 1.15F, 0.0F, 1.0F) * 255.0F);

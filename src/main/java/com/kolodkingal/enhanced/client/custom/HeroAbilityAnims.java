@@ -195,8 +195,9 @@ public final class HeroAbilityAnims {
         row(HeroAbility.HELA_GRASP);
         row(HeroAbility.HELA_BODY);
         // ===== variants (3.5, the creator lane) =====
-        // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own row
-        // plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's moves.)
+        // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own
+        // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's
+        // moves.)
         row(HeroAbility.WANDA_BUILD_MAGIC);
         for (HeroAbility a : HeroAbility.values()) {
             HeroAbility parent = a.parent();

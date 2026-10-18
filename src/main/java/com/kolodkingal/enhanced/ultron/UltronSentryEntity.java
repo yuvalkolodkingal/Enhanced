@@ -9,6 +9,8 @@ import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -733,6 +735,8 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         float damage = isDrone() ? UltronConfig.DRONE_DAMAGE.get().floatValue()
                 : (float) (UltronBossConfig.SENTRY_BOLT_DAMAGE.get() * BossConfig.DIFFICULTY_SCALE.get());
         UltronBoltEntity bolt = UltronBoltEntity.create(server, this, from, direction.normalize().scale(BOLT_SPEED), damage, UltronBoltEntity.Palette.SENTRY);
+        bolt.tint(AbilityColors.chosen(getOwner(),
+                HeroAbility.ULTRON_ARMY)); // (3.5: a custom hero's drones fire his army's colour)
         BossFight fight = BossFights.fightOf(this);
         if (fight != null) {
             fight.spawn(bolt);

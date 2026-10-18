@@ -362,7 +362,8 @@ public final class QuicksilverAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
             return;
         }
-        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER, HeroAbility.QUICKSILVER_DASH)).moved()) {
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER,
+                HeroAbility.QUICKSILVER_DASH)).moved()) {
             player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
             return;
         }

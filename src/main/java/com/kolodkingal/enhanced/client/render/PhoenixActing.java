@@ -148,7 +148,8 @@ final class PhoenixActing {
         float size = firstPerson ? 0.4F : 0.9F;
         RandomSource random = level.random;
         for (int i = 0; i < count; i++) {
-            int colour = AbilityColors.shade(player, row, i % 3 == 0 ? PhoenixAbilities.PSY_CORE : PhoenixAbilities.PSY_MAIN);
+            int colour = AbilityColors.shade(player, row, i % 3 == 0 ? PhoenixAbilities.PSY_CORE
+                    : PhoenixAbilities.PSY_MAIN);
             level.addParticle(new EnergyParticleOptions(colour, size), head.x + (random.nextDouble() - 0.5) * 0.3, head.y + (random.nextDouble() - 0.5) * 0.2,
                     head.z + (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.03, 0.02 + random.nextDouble() * 0.03,
                     (random.nextDouble() - 0.5) * 0.03);

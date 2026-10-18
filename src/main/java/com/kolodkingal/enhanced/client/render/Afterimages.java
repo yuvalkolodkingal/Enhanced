@@ -60,7 +60,8 @@ public final class Afterimages {
         Power power = Powers.power(player);
         int ghost = power == Power.CUSTOM ? Powers.glow(player) & 0xFFFFFF : power == Power.TOMMY ? 0x7FD8B8 : 0xC8D0D8;
         // (3.5: a custom hero's ghosts in the colour his run's pick chose.)
-        return AbilityColors.color(player, AbilityColors.first(player, HeroAbility.QUICKSILVER_SPEED, HeroAbility.TOMMY_SPEED), ghost);
+        return AbilityColors.color(player, AbilityColors.first(player, HeroAbility.QUICKSILVER_SPEED,
+                HeroAbility.TOMMY_SPEED), ghost);
     }
 
     public static void render(RenderPlayerEvent.Post event) {

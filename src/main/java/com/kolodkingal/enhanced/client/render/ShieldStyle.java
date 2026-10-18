@@ -27,7 +27,8 @@ public record ShieldStyle(int veil, int lines, ResourceLocation texture, float r
 
     /** 3.5: this style in another colour (its veil and its lines recoloured, {@code AbilityColors.recolor}). */
     public ShieldStyle tinted(int color) {
-        return new ShieldStyle(AbilityColors.recolor(veil, color), AbilityColors.recolor(lines, color), texture, radius, maxStrength, maxTicks);
+        return new ShieldStyle(AbilityColors.recolor(veil, color), AbilityColors.recolor(lines, color), texture,
+                radius, maxStrength, maxTicks);
     }
 
     /** What one frame of the shield looks like. */

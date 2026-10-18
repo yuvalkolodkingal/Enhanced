@@ -77,7 +77,9 @@ public final class PhoenixFx {
     }
 
     private static final List<Burst> BURSTS = new ArrayList<>();
-    /** 3.5: the colour a custom hero's pick chose for what is being drawn now, or -1 (the Phoenix's fire and violet). */
+    /**
+     * 3.5: the colour a custom hero's pick chose for what is being drawn now, or -1 (the Phoenix's fire and violet).
+     */
     private static int tint = -1;
     /** 3.5: a grey copy of the flame lattice, tinted to a chosen colour. */
     private static final ResourceLocation FLAME_GREY = Enhanced.id("textures/entity/custom/phoenix_flame_grey.png");
@@ -530,7 +532,8 @@ public final class PhoenixFx {
                             EnergyGeometry.argb(c(PhoenixMath.FIRE_CORE), 0.6F * fade));
                 } else {
                     int colour = PhoenixMath.mix(c(PhoenixMath.FIRE_MAIN), c(PhoenixMath.FIRE_GOLD), jitter * 2.0F - 1.0F);
-                    EnergyGeometry.ribbon(pose, vc, tail, head, 0.01F, 0.10F, EnergyGeometry.argb(c(PhoenixMath.FIRE_EMBER), 0.0F),
+                    EnergyGeometry.ribbon(pose, vc, tail, head, 0.01F, 0.10F,
+                            EnergyGeometry.argb(c(PhoenixMath.FIRE_EMBER), 0.0F),
                             EnergyGeometry.argb(colour, 0.85F * fade));
                 }
             }

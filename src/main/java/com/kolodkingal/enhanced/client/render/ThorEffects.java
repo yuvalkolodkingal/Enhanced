@@ -146,7 +146,8 @@ public final class ThorEffects {
             switch (e.kind()) {
                 case ThorFxPayload.ARC -> {
                     Entity thor = level.getEntity(e.entityId());
-                    tint = AbilityColors.chosen(thor, AbilityColors.first(thor, HeroAbility.THOR_THUNDER, HeroAbility.THOR_LIGHTNING));
+                    tint = AbilityColors.chosen(thor, AbilityColors.first(thor, HeroAbility.THOR_THUNDER,
+                            HeroAbility.THOR_LIGHTNING));
                     float fade = 1.0F - age / ARC_TICKS;
                     long seed = e.start() * 104729L;
                     for (int i = 0; i + 1 < e.points().size(); i++) {
@@ -157,7 +158,8 @@ public final class ThorEffects {
                 }
                 case ThorFxPayload.BIFROST_ARRIVAL -> {
                     Entity traveller = level.getEntity(e.entityId());
-                    tint = AbilityColors.chosen(traveller, AbilityColors.first(traveller, HeroAbility.THOR_BIFROST, HeroAbility.HEIMDALL_BIFROST));
+                    tint = AbilityColors.chosen(traveller, AbilityColors.first(traveller, HeroAbility.THOR_BIFROST,
+                            HeroAbility.HEIMDALL_BIFROST));
                     float fade = 1.0F - age / ARRIVAL_TICKS;
                     rainbowBeam(pose, vc, e.points().get(0).subtract(camera), 1.6F + 0.8F * fade, time, fade);
                 }
@@ -169,7 +171,8 @@ public final class ThorEffects {
             PowerData data = Powers.get(player);
             tint = -1;
             if (data.is(Live.BIFROST)) {
-                tint = AbilityColors.chosen(player, AbilityColors.first(player, HeroAbility.THOR_BIFROST, HeroAbility.HEIMDALL_BIFROST));
+                tint = AbilityColors.chosen(player, AbilityColors.first(player, HeroAbility.THOR_BIFROST,
+                        HeroAbility.HEIMDALL_BIFROST));
                 Vec3 feet = player.getPosition(partialTick).subtract(camera);
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.9F);
                 rainbowBeam(pose, vc, feet, 1.3F * pulse, time, 1.0F);
@@ -381,14 +384,17 @@ public final class ThorEffects {
             return;
         }
         float jitter = (float) Math.min(1.6, a.distanceTo(b) * 0.06 + 0.2);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(col(HALO), 0.3F * fade), seed, phase);
-        EnergyGeometry.bolt(pose, vc, a, b, width * 0.7F, jitter, EnergyGeometry.argb(col(BLUE), 0.75F * fade), seed, phase);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 1.6F, jitter, EnergyGeometry.argb(col(HALO), 0.3F * fade), seed,
+                phase);
+        EnergyGeometry.bolt(pose, vc, a, b, width * 0.7F, jitter, EnergyGeometry.argb(col(BLUE), 0.75F * fade), seed,
+                phase);
         EnergyGeometry.bolt(pose, vc, a, b, width * 0.25F, jitter, EnergyGeometry.argb(col(CORE), 0.95F * fade), seed,
                 phase);
         // A forked branch.
         Vec3 mid = a.lerp(b, 0.45);
         Vec3 fork = mid.add(new Vec3((seed % 7) - 3, -Math.abs(seed % 5), (seed % 3) - 1).normalize().scale(a.distanceTo(b) * 0.15));
-        EnergyGeometry.bolt(pose, vc, mid, fork, width * 0.35F, jitter * 0.6F, EnergyGeometry.argb(col(BLUE), 0.5F * fade),
+        EnergyGeometry.bolt(pose, vc, mid, fork, width * 0.35F, jitter * 0.6F,
+                EnergyGeometry.argb(col(BLUE), 0.5F * fade),
                 seed + 5, phase);
     }
 
@@ -425,7 +431,8 @@ public final class ThorEffects {
             float a0 = Mth.TWO_PI * k / sides + time * 0.05F;
             float a1 = Mth.TWO_PI * (k + 1) / sides + time * 0.05F;
             int color = tint < 0 ? hue((float) k / sides + time * 0.01F)
-                    : AbilityColors.recolor(hue((float) k / sides + time * 0.01F), tint); // (3.5: a beam of one chosen colour)
+                    : AbilityColors.recolor(hue((float) k / sides + time * 0.01F),
+                            tint); // (3.5: a beam of one chosen colour)
             Vec3 p0 = feet.add(Math.cos(a0) * radius, 0, Math.sin(a0) * radius);
             Vec3 p1 = feet.add(Math.cos(a1) * radius, 0, Math.sin(a1) * radius);
             quad(pose, vc, p0, p1, height, EnergyGeometry.argb(color, 0.42F * fade), EnergyGeometry.argb(color, 0.0F));

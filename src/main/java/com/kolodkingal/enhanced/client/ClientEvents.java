@@ -192,7 +192,8 @@ public final class ClientEvents {
             if (tommy) {
                 for (int i = 0; i < 4; i++) {
                     double back = 0.8 + random.nextDouble() * 1.6;
-                    int color = AbilityColors.shade(player, HeroAbility.TOMMY_SPEED, i == 0 ? 0xE6FFF5 : i == 1 ? CustomActing.tint(player, Power.TOMMY.glow, true)
+                    int color = AbilityColors.shade(player, HeroAbility.TOMMY_SPEED, i == 0 ? 0xE6FFF5 : i == 1
+                            ? CustomActing.tint(player, Power.TOMMY.glow, true)
                             : CustomActing.tint(player, Power.TOMMY.color, false));
                     level.addParticle(new EnergyParticleOptions(color, 1.0F + random.nextFloat() * 0.4F),
                             player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.6, player.getY() - dy * back + random.nextDouble() * random.nextDouble() * 1.6,
@@ -202,7 +203,8 @@ public final class ClientEvents {
             }
             for (int i = 0; i < 3; i++) {
                 double back = 1.0 + random.nextDouble();
-                int color = AbilityColors.color(player, HeroAbility.QUICKSILVER_SPEED, i == 0 ? CustomActing.tint(player, Power.QUICKSILVER.glow, true)
+                int color = AbilityColors.color(player, HeroAbility.QUICKSILVER_SPEED, i == 0
+                        ? CustomActing.tint(player, Power.QUICKSILVER.glow, true)
                         : CustomActing.tint(player, Power.QUICKSILVER.color, false));
                 level.addParticle(new EnergyParticleOptions(color, 1.1F),
                         player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.5, player.getY() - dy * back + random.nextDouble() * 1.8,
@@ -224,7 +226,8 @@ public final class ClientEvents {
             double vx = -Math.sin(angle) * 0.35;
             double vz = Math.cos(angle) * 0.35;
             int color = AbilityColors.shade(player, HeroAbility.TOMMY_WHIRLWIND, random.nextInt(3) == 0 ? 0xE6FFF5 : random.nextBoolean()
-                    ? CustomActing.tint(player, Power.TOMMY.glow, true) : CustomActing.tint(player, Power.TOMMY.color, false));
+                    ? CustomActing.tint(player, Power.TOMMY.glow, true) : CustomActing.tint(player, Power.TOMMY.color,
+                            false));
             level.addParticle(new EnergyParticleOptions(color, 1.1F), x, player.getY() + height, z, vx, 0.02, vz);
         }
     }

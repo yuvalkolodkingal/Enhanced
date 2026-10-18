@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.AgathaConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -185,7 +186,8 @@ public final class AgathaShield {
         for (int i = 0; i < SHATTER_SHARDS; i++) {
             Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
             Vec3 at = center.add(out.scale(radius()));
-            level.sendParticles(new EnergyParticleOptions(i % 3 == 0 ? AgathaAbilities.LILAC : AgathaAbilities.VIOLET, 1.4F), at.x, at.y, at.z,
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.AGATHA_SHIELD,
+                    i % 3 == 0 ? AgathaAbilities.LILAC : AgathaAbilities.VIOLET), 1.4F), at.x, at.y, at.z,
                     0, out.x, out.y, out.z, 0.3);
         }
         level.playSound(null, center.x, center.y, center.z, ModSounds.AGATHA_SHIELD_BREAK.get(), SoundSource.PLAYERS, 1.1F, 1.0F);
@@ -222,7 +224,7 @@ public final class AgathaShield {
             RandomSource random = player.getRandom();
             Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
             Vec3 at = center.add(out.scale(radius * Math.max(0.3, grown)));
-            level.sendParticles(new EnergyParticleOptions(AgathaAbilities.LILAC, 0.9F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.AGATHA_SHIELD, AgathaAbilities.LILAC), 0.9F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
             return;
         }
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(radius + 4.0),

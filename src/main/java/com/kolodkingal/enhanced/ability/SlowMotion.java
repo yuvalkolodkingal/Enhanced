@@ -103,8 +103,8 @@ public final class SlowMotion {
      * world's tint take his colours), or {@link Power#NONE}.
      */
     /**
-     * 3.5: the player whose slowed time holds {@code pos} (the nearest, as {@link #zoneOwner}), or null: the overlay takes
-     * the colour his pick chose.
+     * 3.5: the player whose slowed time holds {@code pos} (the nearest, as {@link #zoneOwner}), or null: the overlay
+     * takes the colour his pick chose.
      */
     @Nullable
     public static Player zoneHolder(Level level, Vec3 pos) {

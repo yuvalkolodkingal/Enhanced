@@ -1447,7 +1447,8 @@ public final class SpiderServer implements HeroServer {
         target.hurt(source, (float) damage);
         sound(level, middle, ModSounds.LEG_STRIKE.get(), 0.6F, 0.9F + player.getRandom().nextFloat() * 0.2F);
         level.sendParticles(new EnergyParticleOptions(kill ? AbilityColors.shade(player, HeroAbility.SPIDER_INSTANT_KILL, 0xFF2A2A)
-                : AbilityColors.shade(player, HeroAbility.SPIDER_LEGS, 0xC9A66B), 0.8F), middle.x, middle.y, middle.z, 5, 0.2, 0.2, 0.2, 0.08);
+                : AbilityColors.shade(player, HeroAbility.SPIDER_LEGS, 0xC9A66B), 0.8F), middle.x, middle.y, middle.z,
+                        5, 0.2, 0.2, 0.2, 0.08);
         send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.LEG_STRIKE, player.getId(), from, middle, Vec3.ZERO, leg, 0F, false, 0L, List.of()));
     }
 

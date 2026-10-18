@@ -90,7 +90,8 @@ public final class WorldEffectsRenderer {
             Set<RenderType> drawn = new HashSet<>();
             for (AbstractClientPlayer player : level.players()) {
                 PowerData data = Powers.get(player);
-                ShieldStyle style = ShieldStyles.of(player, data); // (3.4: a custom hero's shield too; 3.5: in its colour)
+                ShieldStyle style =
+                        ShieldStyles.of(player, data); // (3.4: a custom hero's shield too; 3.5: in its colour)
                 if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
                     RenderType type = lines ? EnhancedRenderTypes.energyField(style.texture()) : EnhancedRenderTypes.ENERGY_VEIL;
                     VertexConsumer vc = buffers.getBuffer(type);
@@ -293,7 +294,8 @@ public final class WorldEffectsRenderer {
                 float tilesU = Math.max(6, Math.round(Mth.TWO_PI * hex.radius() / 6F));
                 float tilesV = Math.max(3, Math.round(Mth.PI * hex.radius() / 6F));
                 EnergyGeometry.sphere(pose, vc, center, radius, segments, segments / 2, tilesU, tilesV, time * 0.0015F,
-                        hex.color() < 0 ? HEX_LINES : AbilityColors.recolor(HEX_LINES, hex.color()), 0.32F * pulse * rising,
+                        hex.color() < 0 ? HEX_LINES : AbilityColors.recolor(HEX_LINES, hex.color()),
+                                0.32F * pulse * rising,
                         0.68F * pulse * rising);
             } else {
                 // Dense enough to tint the sky behind it raspberry red, as in the show.
@@ -308,7 +310,9 @@ public final class WorldEffectsRenderer {
 
     /** Colours of a beam: wide glow, inner glow, hot core, crackling bolts, impact flare. */
     private record Palette(int glow, int core, int bolt) {
-        /** 3.5: this palette recoloured to the colour the player's pick of {@code row} chose (as it is when none was). */
+        /**
+         * 3.5: this palette recoloured to the colour the player's pick of {@code row} chose (as it is when none was).
+         */
         Palette of(AbstractClientPlayer player, HeroAbility row) {
             if (AbilityColors.chosen(player, row) < 0) {
                 return this;
@@ -389,7 +393,8 @@ public final class WorldEffectsRenderer {
         int lines = 7;
         int steps = 28;
         float[] shells = {2.4F, (float) MagnetoAbilities.SHIELD_RADIUS};
-        int fieldGlow = AbilityColors.color(player, HeroAbility.MAGNETO_SHIELD, Power.MAGNETO.glow); // (3.5: its pick's colour)
+        int fieldGlow = AbilityColors.color(player, HeroAbility.MAGNETO_SHIELD,
+                Power.MAGNETO.glow); // (3.5: its pick's colour)
         for (int shell = 0; shell < shells.length; shell++) {
             float l = shells[shell];
             for (int k = 0; k < lines; k++) {
@@ -461,7 +466,8 @@ public final class WorldEffectsRenderer {
             float age = Math.max(0.0F, time - bolt.born());
             float fade = 1.0F - age / HEX_BOLT_TICKS;
             Entity caster = level.getEntity(bolt.caster());
-            boltTint = AbilityColors.chosen(caster, HeroAbility.BILLY_HEX_BEAM); // (3.5: the bolt in the colour its pick chose)
+            boltTint = AbilityColors.chosen(caster,
+                    HeroAbility.BILLY_HEX_BEAM); // (3.5: the bolt in the colour its pick chose)
             Vec3 from = (caster instanceof AbstractClientPlayer player ? handPosition(mc, player, partialTick) : bolt.from()).subtract(camera);
             Vec3 to = bolt.to().subtract(camera);
             RandomSource random = RandomSource.create(bolt.seed() + (long) (age / 2) * 7919L);
@@ -506,9 +512,12 @@ public final class WorldEffectsRenderer {
     /** Billy's magic in layers: the dark blue fringe outside, then blue, light blue, and a white-hot core. */
     private static void boltLayers(Matrix4f pose, VertexConsumer vc, List<Vec3> path, float scale, float fade) {
         EnergyGeometry.polyline(pose, vc, path, 0.34F * scale, EnergyGeometry.argb(bolt(BillyAbilities.FRINGE), 0.22F * fade));
-        EnergyGeometry.polyline(pose, vc, path, 0.18F * scale, EnergyGeometry.argb(bolt(BillyAbilities.BODY), 0.45F * fade));
-        EnergyGeometry.polyline(pose, vc, path, 0.09F * scale, EnergyGeometry.argb(bolt(BillyAbilities.MAIN), 0.8F * fade));
-        EnergyGeometry.polyline(pose, vc, path, 0.045F * scale, EnergyGeometry.argb(bolt(BillyAbilities.INNER), 0.9F * fade));
+        EnergyGeometry.polyline(pose, vc, path, 0.18F * scale, EnergyGeometry.argb(bolt(BillyAbilities.BODY),
+                0.45F * fade));
+        EnergyGeometry.polyline(pose, vc, path, 0.09F * scale, EnergyGeometry.argb(bolt(BillyAbilities.MAIN),
+                0.8F * fade));
+        EnergyGeometry.polyline(pose, vc, path, 0.045F * scale, EnergyGeometry.argb(bolt(BillyAbilities.INNER),
+                0.9F * fade));
         EnergyGeometry.polyline(pose, vc, path, 0.02F * scale, EnergyGeometry.argb(bolt(BillyAbilities.CORE), fade));
     }
 
@@ -539,7 +548,8 @@ public final class WorldEffectsRenderer {
     }
 
     /** The heroes' telekinesis abilities (one at most per custom hero: {@code Resource.GRIP}). */
-    private static final HeroAbility[] GRIPS = {HeroAbility.MAGNETO_METAL, HeroAbility.WANDA_TELEKINESIS, HeroAbility.BILLY_TELEKINESIS,
+    private static final HeroAbility[] GRIPS = {HeroAbility.MAGNETO_METAL, HeroAbility.WANDA_TELEKINESIS,
+            HeroAbility.BILLY_TELEKINESIS,
             HeroAbility.PHOENIX_TELEKINESIS};
 
     /** Vision's Mind Stone, in the middle of his forehead (just above the screen centre in first person). */

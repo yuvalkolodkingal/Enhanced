@@ -165,7 +165,8 @@ public final class TommyAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
             return;
         }
-        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.TOMMY, HeroAbility.TOMMY_DASH)).moved()) {
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.TOMMY,
+                HeroAbility.TOMMY_DASH)).moved()) {
             player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
             return;
         }
@@ -520,7 +521,8 @@ public final class TommyAbilities {
 
     private static void burst(ServerLevel level, ServerPlayer player, Vec3 at, HeroAbility row) {
         level.sendParticles(new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.TOMMY, row).glow(), 1.4F), at.x, at.y, at.z, 30, 0.3, 0.3, 0.3, 0.12);
-        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, row, 0xE6FFF5), 1.0F), at.x, at.y, at.z, 12, 0.15, 0.15, 0.15, 0.05);
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, row, 0xE6FFF5), 1.0F), at.x, at.y,
+                at.z, 12, 0.15, 0.15, 0.15, 0.05);
         level.playSound(null, at.x, at.y, at.z, ModSounds.MOLECULAR_BURST.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 

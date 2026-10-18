@@ -177,10 +177,12 @@ public final class CustomHeroRules {
             }
         }
 
-        // ---- 3.5: a variant row picked with its parent: the parent keeps its main action (the variant is the row's) ----
+        // ---- 3.5: a variant row picked with its parent: the parent keeps its main action (the variant is the row's)
+        // ----
         for (int i = 0; i < picks.size(); i++) {
             CustomHero.Pick pick = picks.get(i);
-            if (pick.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option()) && a.variant() != null
+            if (pick.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option())
+                    && a.variant() != null
                     && find(picks, a.variant().id()) != null) {
                 picks.set(i, pick.withOption(HeroAbility.MAIN));
             }

@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.entity;
 
 import com.kolodkingal.enhanced.ability.SlowMotion;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -62,6 +65,13 @@ public class IronShrapnelEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         super.tick();
+        // 3.5: a custom hero's shards trail the colour his pick of the Shrapnel chose.
+        if (level().isClientSide) {
+            int tint = AbilityColors.chosen(getOwner(), HeroAbility.MAGNETO_SHRAPNEL);
+            if (tint >= 0) {
+                level().addParticle(new EnergyParticleOptions(tint, 0.5F), getX(), getY(), getZ(), 0, 0, 0);
+            }
+        }
         // Counted in the shard's own time, so Quicksilver Time doesn't cut its flight short.
         if (!level().isClientSide && (life += SlowMotion.timeScale(this)) > MAX_LIFE) {
             discard();

@@ -23,20 +23,22 @@ import java.util.UUID;
  * @param visionStays    Wanda's order to the Vision her Hex raised: he holds his post instead of following her
  * @param runes          3.3: the Hex Runes are inscribed on its four walls (every other sorcerer inside is powerless)
  * @param runesAt        game time the runes were inscribed or wiped (for their glow fading in and out)
- * @param color          3.5: the colour its walls take (0xRRGGBB: a custom hero's Hex in the colour his pick chose), or -1
- *                       for the Hex's own raspberry red
+ * @param color          3.5: the colour its walls take (0xRRGGBB: a custom hero's Hex in the colour his pick chose), or
+ * -1                       for the Hex's own raspberry red
  */
 public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius, Set<UUID> allowed,
                   boolean allowCreatures, long createdAt, boolean visionStays, boolean runes, long runesAt, int color) {
 
     /** A Hex in its own colours (as every Hex before 3.5). */
-    public Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius, Set<UUID> allowed, boolean allowCreatures,
+    public Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius, Set<UUID> allowed,
+            boolean allowCreatures,
                long createdAt, boolean visionStays, boolean runes, long runesAt) {
         this(id, owner, ownerName, center, radius, allowed, allowCreatures, createdAt, visionStays, runes, runesAt, -1);
     }
 
     /** A Hex without runes (as every Hex before 3.3). */
-    public Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius, Set<UUID> allowed, boolean allowCreatures,
+    public Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius, Set<UUID> allowed,
+            boolean allowCreatures,
                long createdAt, boolean visionStays) {
         this(id, owner, ownerName, center, radius, allowed, allowCreatures, createdAt, visionStays, false, 0L);
     }
@@ -55,7 +57,8 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
             Codec.LONG.optionalFieldOf("runes_at", 0L).forGetter(Hex::runesAt),
             Codec.INT.optionalFieldOf("color", -1).forGetter(Hex::color)
     ).apply(i, (id, owner, name, center, radius, allowed, creatures, created, stays, runes, runesAt, color) ->
-            new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created, stays, runes, runesAt, color)));
+            new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created, stays, runes, runesAt,
+                    color)));
 
     public static final StreamCodec<ByteBuf, Hex> STREAM_CODEC = StreamCodec.of((buf, h) -> {
         UUIDUtil.STREAM_CODEC.encode(buf, h.id);
@@ -92,7 +95,8 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
         boolean runes = buf.readBoolean();
         long runesAt = ByteBufCodecs.VAR_LONG.decode(buf);
         int color = buf.readInt();
-        return new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created, stays, runes, runesAt, color);
+        return new Hex(id, owner, name, center, radius, Set.copyOf(allowed), creatures, created, stays, runes, runesAt,
+                color);
     });
 
     /** Whether a point is inside the wall. */
@@ -119,7 +123,8 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
     }
 
     public Hex withAllowCreatures(boolean allow) {
-        return new Hex(id, owner, ownerName, center, radius, allowed, allow, createdAt, visionStays, runes, runesAt, color);
+        return new Hex(id, owner, ownerName, center, radius, allowed, allow, createdAt, visionStays, runes, runesAt,
+                color);
     }
 
     public Hex withRadius(int newRadius) {
@@ -127,11 +132,13 @@ public record Hex(UUID id, UUID owner, String ownerName, Vec3 center, int radius
     }
 
     public Hex withVisionStays(boolean stays) {
-        return new Hex(id, owner, ownerName, center, radius, allowed, allowCreatures, createdAt, stays, runes, runesAt, color);
+        return new Hex(id, owner, ownerName, center, radius, allowed, allowCreatures, createdAt, stays, runes, runesAt,
+                color);
     }
 
     /** The same Hex with its runes inscribed (or wiped) at game time {@code at}. */
     public Hex withRunes(boolean on, long at) {
-        return new Hex(id, owner, ownerName, center, radius, allowed, allowCreatures, createdAt, visionStays, on, at, color);
+        return new Hex(id, owner, ownerName, center, radius, allowed, allowCreatures, createdAt, visionStays, on, at,
+                color);
     }
 }
