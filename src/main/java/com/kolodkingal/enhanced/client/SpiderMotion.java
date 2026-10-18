@@ -200,6 +200,11 @@ public final class SpiderMotion {
     @Nullable
     private static SwingAssist.Anchor pendingAssist;
     private static Vec3 pendingHeading = Vec3.ZERO;
+    /** The climb out of a forest (3.3.1): the foot of the gap he dashes to, the speed of his leap up it, its ticks. */
+    @Nullable
+    private static Vec3 climbSpot;
+    private static double climbUp;
+    private static int climbTicks;
     /** G is held after an assisted release: the next web goes out as he begins to fall. */
     private static boolean chain;
     private static int chainTicks;
@@ -262,6 +267,7 @@ public final class SpiderMotion {
         chain = false;
         carry = 0;
         planned = null;
+        climbSpot = null;
     }
 
     // =================================================================================================================
@@ -408,12 +414,17 @@ public final class SpiderMotion {
         if (blocked && mode != Mode.NONE) {
             stop(player, BLOCKED);
         }
+        if (climbSpot != null && (blocked || spellbound || mode != Mode.NONE || player.isInWaterOrBubble())) {
+            climbSpot = null;
+        }
         switch (mode) {
             case ZIP -> zipTick(player, data, pressedJump);
             case SWING -> swingTick(mc, player, data, keys, pressedJump);
             case CLING -> clingTick(mc, player, data, keys, pressedJump, spellbound);
             case NONE -> {
-                if (mantleTicks > 0) {
+                if (climbSpot != null) {
+                    climbTick(player);
+                } else if (mantleTicks > 0) {
                     mantleTick(player);
                 } else if (!blocked && !spellbound && !chain) {
                     // (Not while G is held for the next web of Web Assist: a child holding W would stick to every trunk.)
@@ -899,6 +910,12 @@ public final class SpiderMotion {
             return;
         }
         mode = Mode.NONE;
+        if (assisted && !jumped && reason != BLOCKED && reason != REFUSED && KeyBindings.ability(2).isDown()) {
+            // (3.3.1) However an assisted swing ends (it landed, met a trunk, the server ended it), while G is held the next
+            // web follows: he does not cling to the trunk he came down by, and the chain goes on.
+            chain = true;
+            chainTicks = 0;
+        }
         double maxSpeed = maxSwingSpeed(player);
         Vec3 actual = swingAge <= 1 ? player.getDeltaMovement() : player.position().subtract(swingLast);
         if (reason == BLOCKED) {
@@ -1001,13 +1018,14 @@ public final class SpiderMotion {
 
     /** Tells the server (the rope it is told is the web's own length: it measures him against the anchor). */
     private static void send(LocalPlayer player, SwingAssist.Anchor anchor) {
-        int action = anchor.kind() == SwingAssist.Kind.BOOST ? SpiderSwingPayload.BOOST : SpiderSwingPayload.ATTACH;
+        int action = anchor.kind() == SwingAssist.Kind.BOOST ? SpiderSwingPayload.BOOST
+                : anchor.kind() == SwingAssist.Kind.CLIMB ? SpiderSwingPayload.CLIMB : SpiderSwingPayload.ATTACH;
         float web = (float) anchor.web(player.position().add(0, SwingAssist.CENTRE, 0));
         PacketDistributor.sendToServer(new SpiderSwingPayload(action, anchor.point(), anchor.face().get3DDataValue(), web,
                 anchor.kind() == SwingAssist.Kind.SKY));
     }
 
-    /** An assisted web goes out: a swing on its anchor, or the boost of the open land. */
+    /** An assisted web goes out: a swing on its anchor, the boost of the open land, or the leap out of a forest. */
     private static void beginAssisted(LocalPlayer player, SwingAssist.Anchor anchor, Vec3 heading) {
         if (anchor.kind() == SwingAssist.Kind.BOOST) {
             if (mode == Mode.SWING) {
@@ -1020,6 +1038,23 @@ public final class SpiderMotion {
             carry = CARRY_TICKS;
             chain = KeyBindings.ability(2).isDown();
             chainTicks = 0;
+            return;
+        }
+        if (anchor.kind() == SwingAssist.Kind.CLIMB) {
+            // (3.3.1) A dash to the foot of the gap in the canopy and a leap up it (climbTick); at the top of the leap the
+            // next web swings him over the trees.
+            if (mode == Mode.SWING) {
+                stopSwing(player, CANCELLED, false);
+            } else if (mode == Mode.ZIP) {
+                stopZip(player, CANCELLED);
+            } else if (mode == Mode.CLING) {
+                letGo(player, null);
+            }
+            climbSpot = anchor.pivot();
+            climbUp = SwingAssist.leapUp(anchor);
+            climbTicks = 0;
+            chain = false;
+            planned = null;
             return;
         }
         if (mode == Mode.ZIP) {
@@ -1038,6 +1073,29 @@ public final class SpiderMotion {
         assisted = true;
         swingSky = anchor.kind() == SwingAssist.Kind.SKY;
         planned = null;
+    }
+
+    /**
+     * The climb out of a forest (3.3.1): he dashes along the floor to the foot of the gap, then leaps straight up it; the
+     * speed is kept as between two webs, and while G is held the next web goes out at the top of the leap.
+     */
+    private static void climbTick(LocalPlayer player) {
+        climbTicks++;
+        Vec3 to = new Vec3(climbSpot.x - player.getX(), 0, climbSpot.z - player.getZ());
+        double distance = to.length();
+        if (distance > 0.2 && climbTicks <= SwingAssist.CLIMB_DASH_TICKS) {
+            Vec3 dash = to.scale(Math.min(SwingAssist.CLIMB_DASH, distance) / distance);
+            // (A step of the floor on the way is hopped over.)
+            double up = player.horizontalCollision && player.onGround() ? 0.42 : player.getDeltaMovement().y;
+            player.setDeltaMovement(dash.x, up, dash.z);
+            return;
+        }
+        player.setDeltaMovement(to.x * 0.5, climbUp, to.z * 0.5);
+        player.resetFallDistance();
+        climbSpot = null;
+        carry = CARRY_TICKS;
+        chain = KeyBindings.ability(2).isDown();
+        chainTicks = 0;
     }
 
     /** The assisted swing lets go at its best moment, with a little launch; G still held, the next web follows. */
