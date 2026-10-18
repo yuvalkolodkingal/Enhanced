@@ -123,6 +123,8 @@ public final class AgathaAnimationTests {
         check(key(ShieldStyles.hudLine(data, 120L, 40.0F, 200)).equals("hud.enhanced.shield_strength"), "then its strength");
         data.setChaosShieldActive(false);
         check(ShieldStyles.hudLine(data, 130L, 40.0F, 200) == null, "and nothing once it is down");
+        check(ShieldStyles.of(Power.AGATHA) != null && ShieldStyles.of(Power.AGATHA).veil() != ShieldStyles.CHAOS_SHIELD.veil(),
+                "her shield is drawn in a style of its own");
         helper.succeed();
     }
 }

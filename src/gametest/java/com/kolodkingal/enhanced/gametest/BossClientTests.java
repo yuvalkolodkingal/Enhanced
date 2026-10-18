@@ -50,8 +50,9 @@ public final class BossClientTests {
     public static void theGenericShieldDrawsWandasChaosShieldWithWandasNumbers(GameTestHelper helper) {
         check(ShieldStyles.of(Power.SCARLET_WITCH) == ShieldStyles.CHAOS_SHIELD, "the Scarlet Witch has the Chaos Shield");
         for (Power power : Power.values()) {
-            // (Apocalypse's lane has said one, the gold web: ApocalypseClientTests checks it.)
-            check(power == Power.SCARLET_WITCH || power == Power.APOCALYPSE || ShieldStyles.of(power) == null,
+            // (Apocalypse's lane has said one, the gold web: ApocalypseClientTests checks it; 3.3: Agatha's violet runes,
+            // AgathaAnimationTests.)
+            check(power == Power.SCARLET_WITCH || power == Power.APOCALYPSE || power == Power.AGATHA || ShieldStyles.of(power) == null,
                     power + " has none until its lane says one");
         }
         check(((HeroClient) () -> Power.NONE).shieldStyle() == null, "a hero's client says no style by default");
