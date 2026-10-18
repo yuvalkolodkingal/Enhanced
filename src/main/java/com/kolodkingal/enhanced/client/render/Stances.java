@@ -84,9 +84,11 @@ final class Stances {
             c.arm(false, -55, 0, -55, w);
             c.head(-18, 0, 0, w);
         }
-        // The heroes of 3.0, last.
+        // The heroes of 3.0, last (3.4: for a custom hero, those whose rows he needs).
         HeroClient hero = HeroClients.of(st.power);
-        if (hero != null) {
+        if (st.power == Power.CUSTOM) {
+            CustomActing.ambient(c);
+        } else if (hero != null) {
             hero.ambient(c);
         }
     }
@@ -103,7 +105,7 @@ final class Stances {
             c.occupy(true, w);
         }
         if ((w = st.stance(Stance.TK_HOLD)) > 0.001F) {
-            telekinesis(c, st.power, w);
+            telekinesis(c, gripStyle(st), w);
         }
         if ((w = st.stance(Stance.TK_STRAIN)) > 0.001F) {
             // Both arms at the thing, trembling with the effort.
@@ -228,11 +230,21 @@ final class Stances {
             c.occupy(true, w);
             c.occupy(false, w);
         }
-        // The heroes of 3.0, last.
+        // The heroes of 3.0, last (3.4: for a custom hero, those whose rows he needs).
         HeroClient hero = HeroClients.of(st.power);
-        if (hero != null) {
+        if (st.power == Power.CUSTOM) {
+            CustomActing.aimed(c);
+        } else if (hero != null) {
             hero.aimed(c);
         }
+    }
+
+    /** Whose way of holding the hero holds with (3.4: a custom hero with Magneto's or Billy's grip holds as they do). */
+    private static Power gripStyle(HeroAnimState st) {
+        if (st.power != Power.CUSTOM) {
+            return st.power;
+        }
+        return st.kitSources.contains(Power.MAGNETO) ? Power.MAGNETO : st.kitSources.contains(Power.BILLY) ? Power.BILLY : st.power;
     }
 
     /** The hand that holds something: a style per hero. */

@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.CustomState;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -211,6 +213,31 @@ public final class AnimationSignalTests {
         check(data.cooldownUntil(1) - now == com.kolodkingal.enhanced.ability.LokiAbilities.FAN_COOLDOWN, "a fan: the long one");
         check(com.kolodkingal.enhanced.ability.LokiAbilities.DAGGER_COOLDOWN <= 15 && com.kolodkingal.enhanced.ability.LokiAbilities.FAN_COOLDOWN > 15,
                 "the animation tells them apart at 15 ticks");
+        helper.succeed();
+    }
+
+    /**
+     * 3.4: a custom hero's key that acts moves his cast marker and names its binding (the key and the Sneak cell), so every
+     * client plays the gesture of that binding whatever the strength did to the cooldown's length; a press that does
+     * nothing (the key cooling down) does not move it.
+     */
+    @GameTest(template = ARENA)
+    public static void aCustomHerosKeyNamesItsBindingInTheCastMarker(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer hero = CustomKitSupport.hero(f, 10.5, 10.5, CustomKitSupport.def()
+                .pick("energy_blast", 5, "bolts").key(1, "energy_blast").sneak(1, "energy_blast#burst")
+                .pick("thanos.power", 5).key(2, "thanos.power")
+                .build());
+        look(hero, 0.0F, -90.0F);
+        CustomState state = CustomHeroes.state(hero);
+        int seq = state.castSeq();
+        CustomKitSupport.tap(hero, 1, false);
+        check(state.castSeq() == ((seq + 1) & 0xFF) && state.castColumn() == 1 && !state.castSneak(), "R's bolts named R");
+        CustomKitSupport.tap(hero, 1, true);
+        check(state.castSeq() == ((seq + 1) & 0xFF), "Sneak + R while R cools down does nothing and tells nothing");
+        Powers.get(hero).startCooldown(1, 0L, 0);
+        CustomKitSupport.tap(hero, 1, true);
+        check(state.castSeq() == ((seq + 2) & 0xFF) && state.castColumn() == 1 && state.castSneak(), "Sneak + R's burst named its Sneak cell");
         helper.succeed();
     }
 

@@ -119,7 +119,7 @@ public final class FirstPersonArms {
             return;
         }
         float swing = event.getSwingProgress();
-        if (s.power == Power.THOR && throwing(s)) {
+        if (thor(s) && throwing(s)) {
             swing = 0.0F;
         }
         event.setCanceled(true);
@@ -145,6 +145,11 @@ public final class FirstPersonArms {
         // Where energy leaves the hand follows the hand (see WorldEffectsRenderer.handPosition). Any hand counts: Thor's weapon
         // may be in the off hand.
         s.fpAge = s.time;
+    }
+
+    /** Thor, or a custom hero with his weapon (3.4). */
+    private static boolean thor(HeroAnimState s) {
+        return s.power == Power.THOR || s.kitSources.contains(Power.THOR);
     }
 
     /** Whether a throw of the weapon is under way (it replaces the punch). */
@@ -194,7 +199,7 @@ public final class FirstPersonArms {
         boolean calm = EnhancedClientConfig.reducedMotion();
         // M is the arm of the weapon for Thor, else the main arm (as in the poses).
         HumanoidArm mArm = player.getMainArm();
-        if (s.power == Power.THOR) {
+        if (thor(s)) {
             InteractionHand weapon = ThorAbilities.weaponHand(player);
             if (weapon == InteractionHand.OFF_HAND) {
                 mArm = mArm.getOpposite();
@@ -252,10 +257,17 @@ public final class FirstPersonArms {
         }
 
         // ---- gestures ----
+        boolean custom = s.power == Power.CUSTOM;
         for (HeroAnimState.Slot slot : s.slots) {
             if (slot.active && slot.weight > 0.001F) {
                 gesture(slot, m, o, age, calm);
+                if (custom && borrowed(s, slot.id)) {
+                    catalogue(slot.id, slot.weight, slot.t, m, o, age, calm);
+                }
             }
+        }
+        if (custom) {
+            customStances(s, m, o, age, calm);
         }
 
         // ---- the heroes of 3.0 ----
@@ -273,7 +285,7 @@ public final class FirstPersonArms {
             float push = -0.10F * ss(1.0F, 2.0F, s.s) * s.wAir;
             RIGHT.ambient(1.0F, 0.0F, push, push);
             LEFT.ambient(1.0F, 0.0F, push, push);
-            if (s.power != Power.THOR) {
+            if (s.flightAs != Power.THOR) {
                 float breathe = 0.012F * Mth.sin(0.07F * age) * s.wAir * (1.0F - ss(0.2F, 0.8F, s.sH));
                 RIGHT.ambient(1.0F, 0.0F, breathe, 0.0F);
                 LEFT.ambient(1.0F, 0.0F, breathe, 0.0F);
@@ -341,6 +353,130 @@ public final class FirstPersonArms {
             default -> {
             }
         }
+    }
+
+    // ====================================================================================================================
+    // 3.4: the custom hero's rows for the moves of the catalogue
+    // ====================================================================================================================
+
+    /** Whether a gesture moves the hands in first person, for any hero who plays it (see {@link FirstPersonMoves}). */
+    public static boolean covers(GestureId id) {
+        return FirstPersonMoves.covers(id);
+    }
+
+    /**
+     * Whether a custom hero's gesture needs the row of the catalogue: its hero's plug-in draws it only for the heroes his
+     * abilities come from (and the heroes before 3.0 have none for the moves borrowed here).
+     */
+    private static boolean borrowed(HeroAnimState s, GestureId id) {
+        if (FirstPersonMoves.row(id) == null) {
+            return false;
+        }
+        HeroClient owner = Gestures.owner(id);
+        return owner == null || !s.kitSources.contains(owner.power());
+    }
+
+    /** The row of a move of the catalogue, at weight {@code w} and {@code t} ticks into it. */
+    private static void catalogue(GestureId id, float w, float t, Offset m, Offset o, float age, boolean calm) {
+        switch (FirstPersonMoves.row(id)) {
+            case POINT -> {
+                float u = ss(0.0F, 3.0F, t);
+                m.add(w, -0.10F, lerp(u, 0.24F, 0.16F), lerp(u, 0.0F, 0.36F), lerp(u, -46, -30), 5, 0);
+                if (id == GestureId.ULTRON_HACK) {
+                    tremble(m, null, w * ss(3.0F, 5.0F, t), 0.010F, 2.1F, age, calm);
+                }
+            }
+            case TEMPLE -> m.add(w, -0.12F, 0.30F, 0.10F, -52, 8, 0);
+            case TEMPLES -> {
+                m.add(w, 0.08F, 0.42F, 0.0F, -66, 16, 8);
+                o.add(w, 0.08F, 0.42F, 0.0F, -66, 16, 8);
+            }
+            case RAISE -> {
+                float u = ss(0.0F, 4.0F, t);
+                m.add(w, -0.04F, 0.50F * u, 0.10F, -80 * u, 0, 0);
+            }
+            case RAISE_BOTH -> {
+                float up = ss(0.0F, 7.0F, t);
+                both(w, 0.0F, 0.32F * up, 0.0F, -42 * up, 0, 0);
+            }
+            case PUSH -> {
+                float u = ss(0.0F, 4.0F, t);
+                both(w, -0.10F * u, 0.16F + 0.06F * u, 0.32F * u, -26 - 12 * u, 6, 0);
+            }
+            case SLAM -> {
+                float up = ss(0.0F, 6.0F, t) * (1.0F - ss(7.0F, 11.0F, t));
+                float down = ss(7.0F, 11.0F, t);
+                both(w, 0.0F, 0.30F * up - 0.22F * down, 0.0F, -40 * up + 20 * down, 0, 0);
+            }
+            case CIRCLE -> {
+                float u = ss(0.0F, 3.0F, t);
+                double turn = Math.max(0.0F, Math.min(1.0F, (t - 3.0F) / 8.0F)) * Math.PI * 2.0;
+                m.add(w * u, -0.08F + 0.06F * (float) Math.cos(turn), 0.24F + 0.06F * (float) Math.sin(turn), 0.20F, -46, 4, 0);
+            }
+            case PULL -> {
+                float out = ss(0.0F, 3.0F, t) * (1.0F - ss(5.0F, 10.0F, t));
+                m.add(w, lerp(out, 0.0F, -0.16F), lerp(out, 0.30F, 0.14F), lerp(out, 0.0F, 0.44F), lerp(out, -20, -34), 4, 0);
+            }
+            case DRAG -> {
+                float u = ss(0.0F, 4.0F, t);
+                float back = ss(10.0F, 16.0F, t);
+                both(w, lerp(back, lerp(u, -0.10F, -0.16F), -0.04F), lerp(back, lerp(u, 0.08F, 0.20F), -0.02F),
+                        lerp(back, lerp(u, 0.0F, 0.34F), -0.10F), lerp(back, lerp(u, -10, -50), -14), lerp(back, 6, 24), 0);
+            }
+            case WIDE -> {
+                float u = ss(0.0F, 2.0F, t);
+                both(w, lerp(u, -0.14F, -0.30F), lerp(u, 0.34F, 0.10F), lerp(u, 0.14F, 0.40F), lerp(u, -46, -20), lerp(u, 10, 30), 0);
+            }
+            case SWEEP -> {
+                float u = ss(0.0F, 4.0F, t);
+                both(w, lerp(u, -0.10F, -0.14F), lerp(u, 0.10F, 0.04F), lerp(u, 0.0F, 0.26F), lerp(u, -10, -58), 6, 0);
+            }
+            case OFFER -> m.add(w, -0.12F, 0.20F, 0.24F, -34, 6, 0);
+            case LEAP -> {
+                float back = ss(0.0F, 3.0F, t) * (1.0F - ss(4.0F, 6.0F, t));
+                float up = ss(4.0F, 7.0F, t);
+                both(w, 0.0F, -0.18F * back + 0.20F * up, -0.10F * back + 0.10F * up, 25 * back - 40 * up, 0, 0);
+            }
+        }
+    }
+
+    /**
+     * The held stances a custom hero chose of another hero's (a beam, a shield, a charge), whose plug-in draws its hands
+     * only for the heroes his abilities come from; Vision's beam, which has no hands in first person for Vision himself
+     * (it leaves his forehead), holds them a little back for a custom hero.
+     */
+    private static void customStances(HeroAnimState s, Offset m, Offset o, float age, boolean calm) {
+        float w;
+        if ((w = s.stance(Stance.VISION_BEAM)) > 0.001F) {
+            both(w, 0.04F, -0.06F, -0.04F, 12, 0, 0);
+        }
+        if ((w = stranger(s, Stance.ULTRON_FIRE)) > 0.001F) {
+            both(w, -0.20F, 0.16F, 0.30F, -22, 6, 0);
+            tremble(m, o, w, 0.006F, 1.9F, age, calm);
+        }
+        if ((w = stranger(s, Stance.CYCLOPS_BLAST)) > 0.001F) {
+            m.add(w, 0.06F, 0.40F, 0.02F, -62, 14, 6);
+        }
+        if ((w = stranger(s, Stance.THANOS_DRAIN)) > 0.001F) {
+            m.add(w, -0.10F, 0.12F, 0.30F, -20, 6, 0);
+            tremble(m, null, w, 0.010F, 1.9F, age, calm);
+        }
+        if ((w = stranger(s, Stance.APOC_SHIELD) + stranger(s, Stance.AGATHA_SHIELD)) > 0.001F) {
+            both(Math.min(1.0F, w), -0.12F, 0.30F, 0.12F, -44, 8, 0);
+        }
+        if ((w = stranger(s, Stance.PHOENIX_CHARGE)) > 0.001F) {
+            both(w, -0.14F, 0.34F, 0.14F, -46, 10, 0);
+            tremble(m, o, w, 0.012F, 1.9F, age, calm);
+        }
+        if ((w = stranger(s, Stance.APOC_STORM)) > 0.001F) {
+            both(w, 0.20F, 0.18F, 0.02F, -22, -20, -16);
+        }
+    }
+
+    /** The weight of a stance of a hero of 3.0 whose plug-in does not draw for this custom hero (0 if it does). */
+    private static float stranger(HeroAnimState s, Stance stance) {
+        Power owner = CustomActing.owner(stance);
+        return owner == null || s.kitSources.contains(owner) ? 0.0F : s.stance(stance);
     }
 
     static void both(float w, float dx, float dy, float dz, float rx, float ry, float rz) {

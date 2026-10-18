@@ -188,12 +188,14 @@ public final class GestureEffects {
     private static void gather(ClientLevel level, AbstractClientPlayer player) {
         RandomSource random = level.random;
         Vec3 chest = chest(player);
+        int color = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
+        int glow = CustomActing.tint(player, Power.SCARLET_WITCH.glow, true);
         for (HumanoidArm arm : HumanoidArm.values()) {
             Vec3 hand = hand(player, arm);
             Vec3 toChest = chest.subtract(hand);
             for (int i = 0; i < 2; i++) {
                 Vec3 at = hand.add((random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3);
-                level.addParticle(new EnergyParticleOptions(i == 0 ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 0.9F * size(player)), at.x, at.y, at.z,
+                level.addParticle(new EnergyParticleOptions(i == 0 ? color : glow, 0.9F * size(player)), at.x, at.y, at.z,
                         toChest.x * 0.12, toChest.y * 0.12, toChest.z * 0.12);
             }
         }
@@ -202,21 +204,25 @@ public final class GestureEffects {
     private static void flash(ClientLevel level, AbstractClientPlayer player) {
         Vec3 chest = chest(player);
         Vec3 look = player.getLookAngle();
-        FlightEffects.ring(level, player.getId(), chest, look, 8, 0.3F, 2.4F, 0.12F, Power.SCARLET_WITCH.glow, 0.7F);
+        int color = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
+        int glow = CustomActing.tint(player, Power.SCARLET_WITCH.glow, true);
+        FlightEffects.ring(level, player.getId(), chest, look, 8, 0.3F, 2.4F, 0.12F, glow, 0.7F);
         RandomSource random = level.random;
         for (int i = 0; i < 14; i++) {
             double angle = random.nextDouble() * Mth.TWO_PI;
             Vec3 out = new Vec3(Math.cos(angle), (random.nextDouble() - 0.5) * 0.8, Math.sin(angle)).normalize().scale(0.18);
-            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? Power.SCARLET_WITCH.color : Power.SCARLET_WITCH.glow, 1.1F * size(player)), chest.x, chest.y, chest.z,
+            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? color : glow, 1.1F * size(player)), chest.x, chest.y, chest.z,
                     out.x, out.y, out.z);
         }
     }
 
     private static void rise(ClientLevel level, AbstractClientPlayer player) {
         RandomSource random = level.random;
+        int color = CustomActing.tint(player, Power.SCARLET_WITCH.color, false);
+        int glow = CustomActing.tint(player, Power.SCARLET_WITCH.glow, true);
         for (HumanoidArm arm : HumanoidArm.values()) {
             Vec3 hand = hand(player, arm);
-            level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 1.0F * size(player)),
+            level.addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? glow : color, 1.0F * size(player)),
                     hand.x + (random.nextDouble() - 0.5) * 0.2, hand.y, hand.z + (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * 0.02,
                     0.05 + random.nextDouble() * 0.03, (random.nextDouble() - 0.5) * 0.02);
         }
@@ -226,8 +232,9 @@ public final class GestureEffects {
         RandomSource random = level.random;
         HumanoidArm arm = other ? player.getMainArm().getOpposite() : player.getMainArm();
         Vec3 hand = hand(player, arm);
-        int color = state.power == Power.BILLY ? BillyAbilities.MAIN : state.power.color;
-        int glow = state.power == Power.BILLY ? BillyAbilities.INNER : state.power.glow;
+        // (3.4: a custom hero's hand glows in his own colours.)
+        int color = state.power == Power.BILLY ? BillyAbilities.MAIN : CustomActing.tint(player, state.power.color, false);
+        int glow = state.power == Power.BILLY ? BillyAbilities.INNER : CustomActing.tint(player, state.power.glow, true);
         for (int i = 0; i < 2; i++) {
             level.addParticle(new EnergyParticleOptions(i == 0 ? color : glow, 0.9F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.25,
                     hand.y + (random.nextDouble() - 0.5) * 0.25, hand.z + (random.nextDouble() - 0.5) * 0.25, (random.nextDouble() - 0.5) * 0.04,
@@ -238,8 +245,10 @@ public final class GestureEffects {
     private static void vibrate(ClientLevel level, AbstractClientPlayer player) {
         RandomSource random = level.random;
         Vec3 hand = hand(player, player.getMainArm());
+        int color = CustomActing.tint(player, Power.TOMMY.color, false);
+        int glow = CustomActing.tint(player, Power.TOMMY.glow, true);
         for (int i = 0; i < 3; i++) {
-            level.addParticle(new EnergyParticleOptions(i == 0 ? Power.TOMMY.glow : Power.TOMMY.color, 0.7F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.2,
+            level.addParticle(new EnergyParticleOptions(i == 0 ? glow : color, 0.7F * size(player)), hand.x + (random.nextDouble() - 0.5) * 0.2,
                     hand.y + (random.nextDouble() - 0.5) * 0.2, hand.z + (random.nextDouble() - 0.5) * 0.2, 0.0, 0.0, 0.0);
         }
     }

@@ -74,7 +74,8 @@ public class PowerHud implements LayeredDraw.Layer {
                     .append(look.displayName().copy().withStyle(s -> s.withBold(false).withColor(ChatFormatting.GRAY)));
         }
 
-        Component[] lines = new Component[PowerData.ABILITIES + extraLines(power)];
+        Power builder = BuildClient.hero(player); // (3.4: whose Build Magic he has, the line's owner)
+        Component[] lines = new Component[PowerData.ABILITIES + extraLines(builder)];
         int width = font.width(title) + 4;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
@@ -87,8 +88,8 @@ public class PowerHud implements LayeredDraw.Layer {
             lines[i - 1] = line;
             width = Math.max(width, font.width(line));
         }
-        if (extraLines(power) > 0) {
-            Component line = buildLine(player, power, now);
+        if (extraLines(builder) > 0) {
+            Component line = buildLine(player, builder, now);
             lines[PowerData.ABILITIES] = line;
             width = Math.max(width, font.width(line));
         }

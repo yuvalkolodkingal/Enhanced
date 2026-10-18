@@ -71,7 +71,8 @@ final class PoseContext {
         this.pt = pt;
         this.bodyYaw = st.bodyYaw;
         HumanoidArm weaponArm = null;
-        if (st.power == com.kolodkingal.enhanced.power.Power.THOR) {
+        // (3.4: a custom hero with Thor's weapon acts with the arm that holds it, too.)
+        if (st.power == com.kolodkingal.enhanced.power.Power.THOR || st.kitSources.contains(com.kolodkingal.enhanced.power.Power.THOR)) {
             var hand = com.kolodkingal.enhanced.ability.ThorAbilities.weaponHand(player);
             if (hand != null) {
                 weaponArm = hand == net.minecraft.world.InteractionHand.MAIN_HAND ? player.getMainArm() : player.getMainArm().getOpposite();

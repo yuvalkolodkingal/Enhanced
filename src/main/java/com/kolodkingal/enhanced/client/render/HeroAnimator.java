@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
@@ -65,6 +66,13 @@ public final class HeroAnimator {
     private static final float SPIN_RATE = 54.0F;
 
     private static final Map<UUID, HeroAnimState> STATES = new HashMap<>();
+    /** 3.4: the states of the editor's preview puppets (they live outside the world, so the tick never prunes them). */
+    private static final Map<UUID, HeroAnimState> PREVIEWS = new HashMap<>();
+    /**
+     * 3.4: while a hero's plug-in runs for a custom hero (its edges), the kit every gesture it starts must belong to
+     * ({@code HeroAbilityAnims.allows}); null otherwise.
+     */
+    static com.kolodkingal.enhanced.custom.HeroKit startFilter;
 
     // The debugging tools of /enhanced_anim: pretended motion for the local player, and a freeze.
     /** Whether the overlay of the numbers is on. */
@@ -81,11 +89,13 @@ public final class HeroAnimator {
 
     /** The state of a player, or null when the animation does not run for them. */
     public static HeroAnimState peek(Player player) {
-        return STATES.get(player.getUUID());
+        HeroAnimState s = STATES.get(player.getUUID());
+        return s != null || PREVIEWS.isEmpty() ? s : PREVIEWS.get(player.getUUID());
     }
 
     public static void clear() {
         STATES.clear();
+        PREVIEWS.clear();
     }
 
     // ====================================================================================================================
@@ -122,6 +132,7 @@ public final class HeroAnimator {
                 s.reseed(data.power());
             }
             s.entityId = player.getId();
+            CustomActing.identity(s, player, data);
             boolean remember = !s.seeded;
             sample(s, player, data, now);
             worldReferences(s, player, data, level, now);
@@ -173,10 +184,12 @@ public final class HeroAnimator {
         s.styleKind = switch (data.power()) {
             case QUICKSILVER -> s.speeding ? (data.slowMo() ? 1 : 2) : 0;
             case TOMMY -> s.speeding ? 3 : 0;
+            // 3.4: a custom hero speeds with the run his definition names (or the one of his speed).
+            case CUSTOM -> CustomActing.styleKind(s, p, data);
             default -> 0;
         };
-        // 3.3: a speedster on a wall or a ceiling.
-        if (data.power() == Power.QUICKSILVER || data.power() == Power.TOMMY) {
+        // 3.3: a speedster on a wall or a ceiling (3.4: also a custom hero with a speedster's abilities).
+        if (data.acts(Power.QUICKSILVER) || data.acts(Power.TOMMY)) {
             SpeedSurfacePoses.sample(s, p, data);
         } else {
             s.surfaceKind = 0;
@@ -209,7 +222,7 @@ public final class HeroAnimator {
             java.util.Arrays.fill(s.weaponTrail, null);
         }
         s.weaponKind = 0;
-        if (data.power() == Power.THOR) {
+        if (data.has(com.kolodkingal.enhanced.custom.HeroAbility.THOR_HAMMER)) {
             InteractionHand hand = ThorAbilities.weaponHand(p);
             if (hand != null) {
                 ItemStack stack = p.getItemInHand(hand);
@@ -219,7 +232,7 @@ public final class HeroAnimator {
             }
         }
         s.caughtCount = 0;
-        if (data.power() == Power.MAGNETO && data.magneticShield()) {
+        if (data.has(com.kolodkingal.enhanced.custom.HeroAbility.MAGNETO_SHIELD) && data.magneticShield()) {
             AABB box = p.getBoundingBox().inflate(MagnetoAbilities.SHIELD_RADIUS + 2.0);
             Vec3 eye = p.getEyePosition();
             Vec3[] sorted = new Vec3[s.caught.length];
@@ -250,41 +263,44 @@ public final class HeroAnimator {
     /** The edges of this tick: a take-off, a landing, braking, the start and the end of a run. */
     private static void edges(HeroAnimState s, AbstractClientPlayer p, PowerData data, long now) {
         Power power = data.power();
-        FlightProfile profile = FlightProfile.of(power, "white_vision".equals(data.variant()));
+        // 3.4: whose flight it is (a custom hero flies with the style of his definition).
+        Power flier = s.flightAs;
+        FlightProfile profile = FlightProfile.of(s);
         float age = p.tickCount;
         // 2: take-off.
         if (profile != null && !s.prevFlyingEff && s.flyingEff && power.canFly() && (s.onGround || s.airTicks <= 8)) {
-            GestureId id = switch (power) {
+            GestureId id = switch (flier) {
                 case MAGNETO -> GestureId.TAKEOFF_MAGNETO;
                 case SCARLET_WITCH -> GestureId.TAKEOFF_WANDA;
                 case VISION -> GestureId.TAKEOFF_VISION;
                 case BILLY -> GestureId.TAKEOFF_BILLY;
                 default -> {
                     // (Thor's take-off is the default; a hero of 3.0 may have one of its own.)
-                    HeroClient hero = HeroClients.of(power);
+                    HeroClient hero = HeroClients.of(flier);
                     GestureId own = hero == null ? null : hero.takeoffGesture();
                     yield own != null ? own : GestureId.TAKEOFF_THOR;
                 }
             };
             start(s, id, 0.0F, age);
-            FlightEffects.takeoff(p, s, power);
+            FlightEffects.takeoff(p, s, flier);
         }
         // 3: landing.
         if (!s.wasOnGround && s.onGround && s.prevAirTicks >= 3 && s.sinceFlying <= 8 && profile != null
                 && !data.is(Live.BIFROST)) {
             float fall = -Math.min(s.dy[0], Math.min(s.dy[1], s.dy[2]));
             float horiz = s.hv[1];
-            float fs = flightSpeed(power, profile);
+            float fs = flightSpeed(s, profile);
             boolean hard = fall >= 0.70F || (fall >= 0.6F * FlightProfile.vyRef(fs) && horiz >= 0.8F * FlightProfile.vRef(fs));
             float soft = 0.4F;
-            if (power == Power.THOR && hard && s.weaponKind > 0) {
+            if (flier == Power.THOR && hard && (s.weaponKind > 0 || power == Power.CUSTOM)) {
+                // (A custom hero who flies like Thor lands like him, weapon or not: the fists go to the ground.)
                 start(s, GestureId.LAND_HERO, 0.0F, age);
                 soft = 1.4F;
                 FlightEffects.impact(p, s, s.weaponKind == 2 ? 1.1F : 1.0F);
-            } else if (power == Power.THOR) {
+            } else if (flier == Power.THOR) {
                 start(s, GestureId.LAND_SOFT, 0.0F, age);
                 soft = 1.4F;
-            } else if (power == Power.VISION && data.dense()) {
+            } else if (data.has(com.kolodkingal.enhanced.custom.HeroAbility.VISION_DENSITY) && data.dense()) {
                 soft = 1.8F;
                 FlightEffects.denseLanding(p, s);
             } else {
@@ -309,16 +325,16 @@ public final class HeroAnimator {
         if (profile != null && !profile.noBrake && s.flyingEff && s.sRing[3] >= 0.8F && s.s <= s.sRing[3] - 0.45F
                 && now - s.lastBrakeAt > 15) {
             s.lastBrakeAt = now;
-            start(s, power == Power.THOR ? GestureId.BRAKE_THOR : GestureId.BRAKE, 0.0F, age);
+            start(s, flier == Power.THOR ? GestureId.BRAKE_THOR : GestureId.BRAKE, 0.0F, age);
         }
         // The sonic boom: the flight speed crosses 1.85 after being below 1.5 within the last 40 ticks.
-        if (profile != null && (power == Power.THOR || power == Power.VISION) && s.flyingEff) {
+        if (profile != null && (flier == Power.THOR || flier == Power.VISION) && s.flyingEff) {
             if (s.s < 1.5F) {
                 s.lastWasFast = false;
                 s.lastFastAt = now;
             } else if (s.s >= 1.85F && now - s.lastFastAt <= 40 && now - s.lastBoomAt >= 60) {
                 s.lastBoomAt = now;
-                FlightEffects.boom(p, s, power);
+                FlightEffects.boom(p, s, flier);
             }
         }
         // A new look: a quick turn as the new suit shimmers in.
@@ -353,34 +369,36 @@ public final class HeroAnimator {
         boolean[] on = s.stanceOn;
         java.util.Arrays.fill(on, false);
         Power power = data.power();
-        on[Stance.MAG_FIELD.ordinal()] = power == Power.MAGNETO && data.magneticShield();
-        on[Stance.VISION_PHASED.ordinal()] = power == Power.VISION && data.visionPhased();
-        on[Stance.VISION_DENSE.ordinal()] = power == Power.VISION && data.dense();
-        on[Stance.LOKI_FROST.ordinal()] = power == Power.LOKI && data.toggle(Toggle.FROST_GIANT);
-        on[Stance.THOR_UNLEASHED.ordinal()] = power == Power.THOR && data.toggle(Toggle.GOD_OF_THUNDER);
-        on[Stance.NOISE.ordinal()] = power == Power.BILLY && data.toggle(Toggle.THE_NOISE);
-        on[Stance.WANDA_READY.ordinal()] = power == Power.SCARLET_WITCH && now - s.spellEndedAt <= 60;
-        on[Stance.WANDA_HEX_CONTROL.ordinal()] = power == Power.SCARLET_WITCH && p == mc.player && mc.screen instanceof HexScreen;
+        // (3.4: each by the ability, so a custom hero who has it stands as its hero does; for the hero it is the same.)
+        on[Stance.MAG_FIELD.ordinal()] = data.has(HeroAbility.MAGNETO_SHIELD) && data.magneticShield();
+        on[Stance.VISION_PHASED.ordinal()] = data.has(HeroAbility.VISION_PHASE) && data.visionPhased();
+        on[Stance.VISION_DENSE.ordinal()] = data.has(HeroAbility.VISION_DENSITY) && data.dense();
+        on[Stance.LOKI_FROST.ordinal()] = data.has(HeroAbility.LOKI_FROST_GIANT) && data.toggle(Toggle.FROST_GIANT);
+        on[Stance.THOR_UNLEASHED.ordinal()] = data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER);
+        on[Stance.NOISE.ordinal()] = data.has(HeroAbility.BILLY_NOISE) && data.toggle(Toggle.THE_NOISE);
+        on[Stance.WANDA_READY.ordinal()] = data.acts(Power.SCARLET_WITCH) && now - s.spellEndedAt <= 60;
+        on[Stance.WANDA_HEX_CONTROL.ordinal()] = data.has(HeroAbility.WANDA_HEX) && p == mc.player && mc.screen instanceof HexScreen;
         on[Stance.THOR_BIFROST.ordinal()] = data.is(Live.BIFROST);
-        on[Stance.THOR_WAIT.ordinal()] = power == Power.THOR && s.thrownWeapon instanceof ThrownWeaponEntity flying && flying.isReturning()
-                && flying.distanceToSqr(p) < 20 * 20;
+        on[Stance.THOR_WAIT.ordinal()] = data.has(HeroAbility.THOR_HAMMER) && s.thrownWeapon instanceof ThrownWeaponEntity flying
+                && flying.isReturning() && flying.distanceToSqr(p) < 20 * 20;
         boolean holding = data.heldEntityId() != -1 && s.heldEntity != null && power.hasPowers();
         on[Stance.TK_HOLD.ordinal()] = holding;
         on[Stance.TK_STRAIN.ordinal()] = holding && s.heldMass > 0.5F;
-        on[Stance.MAG_SHRAPNEL.ordinal()] = power == Power.MAGNETO && data.shrapnelActive();
-        on[Stance.MAG_CATCH.ordinal()] = power == Power.MAGNETO && data.magneticShield() && s.caughtCount > 0 && !holding && !data.shrapnelActive();
-        on[Stance.BILLY_FREEZE.ordinal()] = power == Power.BILLY && data.is(Live.FREEZING);
-        on[Stance.VISION_BEAM.ordinal()] = power == Power.VISION && data.beamActive();
-        on[Stance.BEAM_WANDA.ordinal()] = power == Power.SCARLET_WITCH && data.beamActive();
-        on[Stance.SHIELD_WANDA.ordinal()] = power == Power.SCARLET_WITCH && data.chaosShieldActive();
-        on[Stance.THOR_BEAM.ordinal()] = power == Power.THOR && data.is(Live.CALLING_LIGHTNING);
+        on[Stance.MAG_SHRAPNEL.ordinal()] = data.has(HeroAbility.MAGNETO_SHRAPNEL) && data.shrapnelActive();
+        on[Stance.MAG_CATCH.ordinal()] = data.has(HeroAbility.MAGNETO_SHIELD) && data.magneticShield() && s.caughtCount > 0 && !holding
+                && !data.shrapnelActive();
+        on[Stance.BILLY_FREEZE.ordinal()] = data.has(HeroAbility.BILLY_FREEZE) && data.is(Live.FREEZING);
+        on[Stance.VISION_BEAM.ordinal()] = data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive();
+        on[Stance.BEAM_WANDA.ordinal()] = data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive();
+        on[Stance.SHIELD_WANDA.ordinal()] = data.has(HeroAbility.WANDA_CHAOS_SHIELD) && data.chaosShieldActive();
+        on[Stance.THOR_BEAM.ordinal()] = data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING);
         on[Stance.BEAM_HAND.ordinal()] = data.is(Live.BEAMING);
-        on[Stance.BARRIER_BILLY.ordinal()] = power == Power.BILLY && data.chaosShieldActive();
+        on[Stance.BARRIER_BILLY.ordinal()] = data.has(HeroAbility.BILLY_FREEZE) && data.chaosShieldActive();
         if (on[Stance.BEAM_HAND.ordinal()]) {
             BeamStyle beam = BeamRenderer.styleOf(p.getId());
             s.beamOffHand = beam != null && beam.offHand();
         }
-        on[Stance.TOMMY_WHIRL.ordinal()] = power == Power.TOMMY && data.is(Live.WHIRLWIND);
+        on[Stance.TOMMY_WHIRL.ordinal()] = data.has(HeroAbility.TOMMY_WHIRLWIND) && data.is(Live.WHIRLWIND);
         HeroClient hero = HeroClients.of(power);
         if (hero != null) {
             hero.stanceTargets(s, p, data, on, now);
@@ -404,11 +422,15 @@ public final class HeroAnimator {
      */
     public static HeroAnimState frame(AbstractClientPlayer player, float yBodyRot, float pt) {
         HeroAnimState s = STATES.get(player.getUUID());
+        if (s == null && !PREVIEWS.isEmpty() && (s = PREVIEWS.get(player.getUUID())) != null) {
+            // The editor's puppet runs on its own clock, whatever partial tick it is drawn with.
+            pt = s.previewPt;
+        }
         // The inventory preview draws the player with a partial tick of 1 and its own made-up turn.
         if (s == null || pt >= 1.0F || !EnhancedClientConfig.animations()) {
             return null;
         }
-        double time = player.tickCount + pt;
+        double time = s.preview != null ? s.previewClock : player.tickCount + pt;
         if (debugFrozen && isDebugTarget(player) && !s.fresh) {
             // A frozen frame: keep every weight and spring, but stay current.
             s.time = time;
@@ -425,7 +447,7 @@ public final class HeroAnimator {
         s.bodyYaw = yBodyRot;
         float age = (float) time;
         PowerData data = Powers.get(player);
-        FlightProfile profile = FlightProfile.of(s.power, "white_vision".equals(s.look));
+        FlightProfile profile = FlightProfile.of(s);
 
         if (vanillaOwnsBody(player, pt)) {
             s.wVanilla = 1.0F;
@@ -477,7 +499,7 @@ public final class HeroAnimator {
         // ---- the speedster's run cycle (on a wall or a ceiling too, 3.3) ----
         SpeedSurfacePoses.advance(s, player, dt, snap);
         RunPoses.advance(s, dt, snap);
-        if (s.power == Power.SPIDER_MAN) {
+        if (s.power == Power.SPIDER_MAN || s.kitSources.contains(Power.SPIDER_MAN)) {
             SpiderPoses.advance(s, player, dt, snap);
         }
         RunPoses.Style style = RunPoses.style(s);
@@ -570,13 +592,21 @@ public final class HeroAnimator {
             dz = 0.0;
         }
         float yaw = yBodyRot * Mth.DEG_TO_RAD;
-        s.fwd = smooth(s.fwd, (float) (-dx * Mth.sin(yaw) + dz * Mth.cos(yaw)), dt, TAU_MOTION);
-        s.side = smooth(s.side, (float) (-dx * Mth.cos(yaw) - dz * Mth.sin(yaw)), dt, TAU_MOTION);
+        float forward = (float) (-dx * Mth.sin(yaw) + dz * Mth.cos(yaw));
+        float sideways = (float) (-dx * Mth.cos(yaw) - dz * Mth.sin(yaw));
+        if (s.preview != null) {
+            // The puppet stands still: it moves as it is said to.
+            forward = previewSpeed(s, profile);
+            sideways = 0.0F;
+            dy = 0.0;
+        }
+        s.fwd = smooth(s.fwd, forward, dt, TAU_MOTION);
+        s.side = smooth(s.side, sideways, dt, TAU_MOTION);
         s.climb = smooth(s.climb, (float) dy, dt, TAU_MOTION);
-        s.turn = smooth(s.turn, Mth.wrapDegrees(p.yBodyRot - p.yBodyRotO), dt, TAU_MOTION);
+        s.turn = s.preview != null ? 0.0F : smooth(s.turn, Mth.wrapDegrees(p.yBodyRot - p.yBodyRotO), dt, TAU_MOTION);
         s.speed = Mth.sqrt(s.fwd * s.fwd + s.side * s.side);
         if (profile != null) {
-            float fs = flightSpeed(s.power, profile);
+            float fs = flightSpeed(s, profile);
             float vRef = FlightProfile.vRef(fs);
             s.s = FlightProfile.normalised(s.fwd, fs);
             s.sSide = s.side / vRef;
@@ -589,7 +619,7 @@ public final class HeroAnimator {
             s.u = 0.0F;
         }
         if (debugFly && isDebugTarget(p) && profile != null) {
-            float vRef = FlightProfile.vRef(flightSpeed(s.power, profile));
+            float vRef = FlightProfile.vRef(flightSpeed(s, profile));
             s.s = debugS;
             s.sSide = 0.0F;
             s.sH = Math.abs(debugS);
@@ -605,9 +635,12 @@ public final class HeroAnimator {
         }
     }
 
-    /** The hero's configured flight speed (the fallback until the config has loaded). */
-    static float flightSpeed(Power power, FlightProfile profile) {
-        return EnhancedConfig.SPEC.isLoaded() ? power.flightSpeed() : profile.defaultSpeed;
+    /** The hero's configured flight speed (the fallback until the config has loaded); a custom hero's is his Flight's. */
+    static float flightSpeed(HeroAnimState s, FlightProfile profile) {
+        if (!EnhancedConfig.SPEC.isLoaded()) {
+            return profile.defaultSpeed;
+        }
+        return s.power == Power.CUSTOM ? s.customFlightSpeed : s.power.flightSpeed();
     }
 
     private static float smooth(float current, float measured, float dt, float tau) {
@@ -629,7 +662,7 @@ public final class HeroAnimator {
     /** Thor's weapon whirls while he hovers or flies slowly, leads at speed; the spin eases up and winds down. */
     private static void advanceWeapon(HeroAnimState s, float dt, boolean snap) {
         float spinTarget = 0.0F;
-        if (s.power == Power.THOR && s.weaponKind > 0) {
+        if (s.weaponKind > 0) {
             float calmSpeed = (1.0F - ss(0.35F, 0.80F, s.s)) * (1.0F - s.stance(Stance.THOR_BEAM)) * (1.0F - s.stance(Stance.THOR_BIFROST));
             if (s.wAir > 0.3F) {
                 spinTarget = calmSpeed;
@@ -670,7 +703,7 @@ public final class HeroAnimator {
      */
     static void start(HeroAnimState s, GestureId id, float param, float age) {
         Gestures.Def def = Gestures.get(id);
-        if (def == null) {
+        if (def == null || startFilter != null && !com.kolodkingal.enhanced.client.custom.HeroAbilityAnims.allows(startFilter, id)) {
             return;
         }
         for (HeroAnimState.Slot slot : s.slots) {
@@ -856,16 +889,172 @@ public final class HeroAnimator {
         IDLE, WALK, RUN, SPEED_RUN, FLY_HOVER, FLY_CRUISE, FLY_SPRINT
     }
 
-    /** Sets the motion of the puppet's state for this frame (the puppet stands still; its pose moves). */
+    /**
+     * Sets the motion of the puppet's state for this frame (the puppet stands still; its pose moves), and moves its own clock
+     * on: call it once every frame the puppet is drawn, before it is drawn. The puppet is a player outside the world (the
+     * editor's), whose attachments say what it is: its power data, and for a custom hero his definition and state. Its
+     * {@code tickCount} and walk are set here from the clock; draw it with {@link #previewPartialTick} (a partial tick of 1,
+     * as the inventory's preview passes, works too: the animation then takes its own).
+     */
     public static void preview(AbstractClientPlayer puppet, PreviewMotion motion, float partialTick) {
+        if (!EnhancedClientConfig.animations()) {
+            PREVIEWS.remove(puppet.getUUID());
+            return;
+        }
+        PowerData data = Powers.get(puppet);
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        long nanos = System.nanoTime();
+        if (s == null || s.power != data.power()) {
+            s = new HeroAnimState(puppet.getUUID());
+            s.reseed(data.power());
+            s.previewNanos = nanos;
+            s.previewClock = puppet.tickCount;
+            PREVIEWS.put(puppet.getUUID(), s);
+        }
+        s.entityId = puppet.getId();
+        s.preview = motion;
+        // 20 ticks a second of real time (at most 4 at once, after a pause).
+        s.previewClock += Mth.clamp((nanos - s.previewNanos) / 5.0E7, 0.0, 4.0);
+        s.previewNanos = nanos;
+        long tick = (long) Math.floor(s.previewClock);
+        s.previewPt = (float) (s.previewClock - tick);
+        if (s.previewTick == Long.MIN_VALUE || tick - s.previewTick > 4) {
+            s.previewTick = tick - 1;
+        }
+        while (s.previewTick < tick) {
+            s.previewTick++;
+            puppet.tickCount = (int) s.previewTick;
+            previewTick(s, puppet, data);
+        }
     }
 
-    /** Plays on the puppet exactly what a cast marker of binding ({@code column} 1-5, plain or with Sneak) plays. */
+    /** The partial tick the puppet's clock is at (draw it with this one). */
+    public static float previewPartialTick(AbstractClientPlayer puppet) {
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        return s == null ? 0.0F : s.previewPt;
+    }
+
+    /** The puppet is gone (the editor closed): forget its state. */
+    public static void previewEnd(AbstractClientPlayer puppet) {
+        PREVIEWS.remove(puppet.getUUID());
+    }
+
+    /**
+     * Plays on the puppet exactly what a cast marker of binding ({@code column} 1-5, plain or with Sneak) plays; where its
+     * hero ability is acted by a route of its hero (a toggle, a state), the gesture that route plays.
+     */
     public static void previewCast(AbstractClientPlayer puppet, int column, boolean sneak) {
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        PowerData data = Powers.get(puppet);
+        if (s == null || data.power() != Power.CUSTOM) {
+            return;
+        }
+        com.kolodkingal.enhanced.custom.HeroKit kit = CustomActing.kit(puppet, data);
+        com.kolodkingal.enhanced.custom.CustomHero hero = kit.hero();
+        com.kolodkingal.enhanced.custom.HeroKit.Binding binding = sneak ? kit.sneak(column) : kit.plain(column);
+        if (binding == null && sneak) {
+            binding = kit.plain(column);
+            sneak = false;
+        }
+        if (binding == null) {
+            return;
+        }
+        GestureId id = com.kolodkingal.enhanced.client.custom.CustomAnimRoutes.cast(hero, kit, column, sneak, true);
+        HeroAbility row = binding.ability();
+        if (id == null && row != null && !com.kolodkingal.enhanced.client.custom.CustomAnimRoutes.chosen(hero, column, sneak)) {
+            id = com.kolodkingal.enhanced.client.custom.HeroAbilityAnims.shown(row, binding.isAlt());
+        }
+        if (id != null) {
+            start(s, id, id == GestureId.WANDA_SHIELD_RAISE ? GestureRoutes.SHIELD_KEYED_WIND_UP : 0.0F, (float) s.previewClock);
+        }
     }
 
     /** Raises (or lowers) on the puppet the stance of a held or switched-on power. */
     public static void previewHold(AbstractClientPlayer puppet, com.kolodkingal.enhanced.custom.CatalogEntry entry, boolean on) {
+        HeroAnimState s = PREVIEWS.get(puppet.getUUID());
+        PowerData data = Powers.get(puppet);
+        if (s == null || data.power() != Power.CUSTOM) {
+            return;
+        }
+        Stance stance = com.kolodkingal.enhanced.client.custom.CustomAnimRoutes.previewStance(CustomActing.kit(puppet, data).hero(), entry);
+        if (stance != null) {
+            s.previewHeld[stance.ordinal()] = on;
+        }
+    }
+
+    /** One tick of the puppet: what the tick samples for a hero in the world, made up from the motion it is said to have. */
+    private static void previewTick(HeroAnimState s, AbstractClientPlayer puppet, PowerData data) {
+        PreviewMotion m = s.preview;
+        CustomActing.identity(s, puppet, data);
+        boolean fly = m == PreviewMotion.FLY_HOVER || m == PreviewMotion.FLY_CRUISE || m == PreviewMotion.FLY_SPRINT;
+        FlightProfile profile = FlightProfile.of(s);
+        float speed = previewSpeed(s, profile);
+        shift(s.dy, 0.0F);
+        shift(s.hv, speed);
+        shift(s.sRing, s.s);
+        s.prevAirTicks = s.airTicks;
+        s.wasOnGround = s.onGround;
+        s.onGround = !fly;
+        s.airTicks = fly ? s.airTicks + 1 : 0;
+        s.groundTicks = fly ? 0 : s.groundTicks + 1;
+        s.prevFlyingEff = s.flyingEff;
+        s.flyingEff = fly;
+        s.sinceFlying = fly ? 0 : Math.min(100, s.sinceFlying + 1);
+        s.sprinting = m == PreviewMotion.RUN;
+        s.crouching = false;
+        s.speeding = m == PreviewMotion.SPEED_RUN;
+        s.slowMo = false;
+        s.walkman = false;
+        s.wallRunning = false;
+        s.surfaceKind = 0;
+        if (s.speeding) {
+            s.styleKind = data.power() == Power.CUSTOM ? CustomActing.styleKind(s, puppet, data)
+                    : data.power() == Power.TOMMY ? 3 : 2;
+        } else {
+            s.styleKind = 0;
+        }
+        if (s.seeded && profile != null && s.flyingEff && !s.prevFlyingEff) {
+            // The take-off of the flight style (without its effects: the puppet is not in the world).
+            HeroClient hero = HeroClients.of(s.flightAs);
+            GestureId own = switch (s.flightAs) {
+                case MAGNETO -> GestureId.TAKEOFF_MAGNETO;
+                case SCARLET_WITCH -> GestureId.TAKEOFF_WANDA;
+                case VISION -> GestureId.TAKEOFF_VISION;
+                case BILLY -> GestureId.TAKEOFF_BILLY;
+                default -> hero == null || hero.takeoffGesture() == null ? GestureId.TAKEOFF_THOR : hero.takeoffGesture();
+            };
+            start(s, own, 0.0F, (float) s.previewClock);
+        }
+        boolean[] on = s.stanceOn;
+        java.util.Arrays.fill(on, false);
+        for (int i = 0; i < on.length; i++) {
+            on[i] = s.previewHeld[i];
+        }
+        if (m == PreviewMotion.IDLE) {
+            CustomActing.idle(s, on);
+        }
+        CustomActing.rowHeroes(s, on);
+        // The walk of the model (vanilla's swing of the arms and legs), as a walking player's.
+        float walk = switch (m) {
+            case WALK -> 0.8F;
+            case RUN, SPEED_RUN -> 1.0F;
+            default -> 0.0F;
+        };
+        puppet.walkAnimation.update(walk, 0.4F);
+        s.seeded = true;
+    }
+
+    /** How fast (blocks a tick, forward) the puppet is said to move. */
+    private static float previewSpeed(HeroAnimState s, FlightProfile profile) {
+        float vRef = profile == null ? 1.0F : FlightProfile.vRef(flightSpeed(s, profile));
+        return switch (s.preview) {
+            case WALK -> 0.215F;
+            case RUN -> 0.28F;
+            case SPEED_RUN -> 1.2F;
+            case FLY_CRUISE -> 1.0F * vRef;
+            case FLY_SPRINT -> 2.0F * vRef;
+            default -> 0.0F;
+        };
     }
 
     /** Plays a gesture on a hero, ignoring its usual trigger (the hook of the branches that add moves). */

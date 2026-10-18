@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
+import com.kolodkingal.enhanced.client.render.HeroAnimState;
+import com.kolodkingal.enhanced.client.render.HeroAnimator;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.item.DarkholdItem;
@@ -38,10 +40,10 @@ import java.util.function.Supplier;
 public final class PowerLoopSounds {
 
     private enum Kind {
-        CHAOS_BEAM(ModSounds.CHAOS_BEAM, 0.9F, 1.0F, (p, d) -> d.power() == Power.SCARLET_WITCH && d.beamActive()),
-        MIND_STONE_BEAM(ModSounds.MIND_STONE_BEAM, 0.8F, 1.0F, (p, d) -> d.power() == Power.VISION && d.beamActive()),
-        MAGNET_HUM(ModSounds.MAGNET_HUM, 0.6F, 1.0F, (p, d) -> d.power() == Power.MAGNETO && d.heldEntityId() != -1),
-        WHIRLWIND(ModSounds.WHIRLWIND, 0.9F, 1.0F, (p, d) -> d.power() == Power.TOMMY && d.is(Live.WHIRLWIND)),
+        CHAOS_BEAM(ModSounds.CHAOS_BEAM, 0.9F, 1.0F, (p, d) -> d.has(HeroAbility.WANDA_CHAOS_BEAM) && d.beamActive()),
+        MIND_STONE_BEAM(ModSounds.MIND_STONE_BEAM, 0.8F, 1.0F, (p, d) -> d.has(HeroAbility.VISION_MIND_BEAM) && d.beamActive()),
+        MAGNET_HUM(ModSounds.MAGNET_HUM, 0.6F, 1.0F, (p, d) -> d.has(HeroAbility.MAGNETO_METAL) && d.heldEntityId() != -1),
+        WHIRLWIND(ModSounds.WHIRLWIND, 0.9F, 1.0F, (p, d) -> d.has(HeroAbility.TOMMY_WHIRLWIND) && d.is(Live.WHIRLWIND)),
         /** Thor's lightning beam: the same crackle as the Chaos Beam, higher and sharper. */
         LIGHTNING_BEAM(ModSounds.CHAOS_BEAM, 0.8F, 1.45F, (p, d) -> d.has(HeroAbility.THOR_LIGHTNING) && d.is(Live.CALLING_LIGHTNING)),
         /** Billy's Hex Beam: the Chaos Beam's crackle, higher and thinner (3.2). Another source of a beam adds its own line. */
@@ -62,7 +64,7 @@ public final class PowerLoopSounds {
 
         // ===== spider =====
         /** The creak of the taut web while Spider-Man swings. */
-        WEB_SWING(ModSounds.WEB_SWING, 0.35F, 1.0F, (p, d) -> d.power() == Power.SPIDER_MAN && d.is(Live.SWINGING)),
+        WEB_SWING(ModSounds.WEB_SWING, 0.35F, 1.0F, (p, d) -> d.has(HeroAbility.SPIDER_ZIP) && d.is(Live.SWINGING)),
 
         // ===== thanos =====
         /** The Soul Drain's chains: a choir shimmer with the click of chain links. */
@@ -70,18 +72,19 @@ public final class PowerLoopSounds {
 
         // ===== ultron =====
         /** Ultron's anti-gravity flight: the thrusters' hiss of the Sentries, low and soft (it has no jets and no flame). */
-        ULTRON_FLIGHT(ModSounds.SENTRY_HOVER, 0.5F, 0.7F, (p, d) -> d.power() == Power.ULTRON && d.flying()),
+        ULTRON_FLIGHT(ModSounds.SENTRY_HOVER, 0.5F, 0.7F, (p, d) -> d.flying() && (d.power() == Power.ULTRON || fliesAs(p, d, Power.ULTRON))),
 
         // ===== apocalypse =====
         /** The Sandstorm: the roar of sand round him. */
-        SANDSTORM(ModSounds.SAND_STORM_LOOP, 0.9F, 1.0F, (p, d) -> d.power() == Power.APOCALYPSE && d.is(Live.SANDSTORM)),
+        SANDSTORM(ModSounds.SAND_STORM_LOOP, 0.9F, 1.0F, (p, d) -> d.has(HeroAbility.APOCALYPSE_BESTOW) && d.is(Live.SANDSTORM)),
 
         // ===== cyclops (3.3) =====
         /** Cyclops's optic blast: a bright, focused hum with a pulse in it. */
         CYCLOPS_OPTIC(ModSounds.CYCLOPS_OPTIC_LOOP, 0.8F, 1.0F,
                 (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == RubyQuartzGlassesItem.OPTIC),
         /** The glasses off: the deep roar of the giant beam, for as long as it pours out. */
-        CYCLOPS_UNLEASHED(ModSounds.CYCLOPS_UNLEASHED_LOOP, 1.0F, 1.0F, (p, d) -> d.power() == Power.CYCLOPS && d.is(Live.CYCLOPS_UNLEASHED))
+        CYCLOPS_UNLEASHED(ModSounds.CYCLOPS_UNLEASHED_LOOP, 1.0F, 1.0F,
+                (p, d) -> d.has(HeroAbility.CYCLOPS_GLASSES) && d.is(Live.CYCLOPS_UNLEASHED))
         ;
 
         final Supplier<SoundEvent> sound;
@@ -101,6 +104,12 @@ public final class PowerLoopSounds {
 
     /** How loud a stone's hum is: well under the beams (which are mastered louder to begin with). */
     private static final float STONE_HUM_VOLUME = 0.5F;
+
+    /** Whether a custom hero flies in the style of this hero (3.4: the flight's loop goes with its style). */
+    private static boolean fliesAs(Player player, PowerData data, Power hero) {
+        HeroAnimState st = data.power() == Power.CUSTOM ? HeroAnimator.peek(player) : null;
+        return st != null && st.flightAs == hero;
+    }
 
     /** Whether the player has {@code item} in either hand (not a spectator, who is only watching). */
     private static boolean holds(Player player, Item item) {

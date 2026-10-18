@@ -32,6 +32,7 @@ import java.util.Arrays;
  * /enhanced_anim hold &lt;ticks&gt;         jump every playing gesture to this tick and freeze the animation of the local player
  * /enhanced_anim release              let it run again
  * /enhanced_anim state                toggle the overlay of the numbers
+ * /enhanced_anim become &lt;file&gt;        become the custom hero of enhanced/heroes/&lt;file&gt;.json
  * </pre>
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
@@ -81,6 +82,9 @@ public final class AnimDebugCommands {
                             HeroAnimator.debugHold(IntegerArgumentType.getInteger(ctx, "ticks"));
                             return say(ctx.getSource(), "held");
                         })))
+                .then(Commands.literal("become")
+                        .then(Commands.argument("file", StringArgumentType.word())
+                                .executes(ctx -> become(ctx.getSource(), StringArgumentType.getString(ctx, "file")))))
                 .then(Commands.literal("release").executes(ctx -> {
                     HeroAnimator.debugRelease();
                     return say(ctx.getSource(), "released");
@@ -112,6 +116,20 @@ public final class AnimDebugCommands {
             return say(source, "no stance " + name);
         }
         return say(source, name + (on == null ? ": from the data" : on ? ": forced on" : ": forced off"));
+    }
+
+    /**
+     * 3.4: becomes the custom hero of {@code enhanced/heroes/<file>.json} at once (as the creator's "Become this hero!"
+     * does: the server judges it and may refuse), to look at a custom hero's animation without clicking through the editor.
+     */
+    private static int become(CommandSourceStack source, String file) {
+        java.nio.file.Path path = com.kolodkingal.enhanced.client.custom.HeroFiles.heroesDir().resolve(file + ".json");
+        com.kolodkingal.enhanced.custom.CustomHeroJson.Read read = com.kolodkingal.enhanced.client.custom.HeroFiles.read(path);
+        if (!read.ok()) {
+            return say(source, "cannot read " + path + ": " + read.notes());
+        }
+        net.neoforged.neoforge.network.PacketDistributor.sendToServer(com.kolodkingal.enhanced.network.HeroCreatorPayload.apply(read.hero()));
+        return say(source, "becoming " + read.hero().name());
     }
 
     private static int say(CommandSourceStack source, String text) {
