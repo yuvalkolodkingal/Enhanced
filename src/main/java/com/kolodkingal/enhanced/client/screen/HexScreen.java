@@ -182,8 +182,12 @@ public class HexScreen extends Screen {
             }
         });
         long deathPercent = EnhancedConfig.SPEC.isLoaded() ? Math.round(EnhancedConfig.HEX_DEATH_CHANCE.get() * 100) : 95;
-        graphics.drawCenteredString(font, Component.translatable("screen.enhanced.hex.hint", deathPercent).withStyle(ChatFormatting.DARK_GRAY),
-                width / 2, height - 72, 0xFFFFFF);
+        var hint = font.split(Component.translatable("screen.enhanced.hex.hint", deathPercent).withStyle(ChatFormatting.DARK_GRAY),
+                Math.min(width - 20, 300));
+        int hintY = height - 72 - (hint.size() - 1) * 5;
+        for (int i = 0; i < hint.size(); i++) {
+            graphics.drawCenteredString(font, hint.get(i), width / 2, hintY + i * 10, 0xFFFFFF);
+        }
     }
 
     @Override
