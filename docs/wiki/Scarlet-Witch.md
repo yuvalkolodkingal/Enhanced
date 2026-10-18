@@ -195,7 +195,7 @@ Wanda can **build with her magic**: press **Y** and click two corners to fill, e
 
 ## Chaos magic breaks the Hex Barrier
 
-Billy's [Hex Barrier](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held) stops everything from the front, but **any power of a Scarlet Witch shatters it at once**, whatever health it has left: her Chaos Beam, her telekinetic grip, what she throws.
+Billy's [Hex Barrier](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held) stops everything from the front, but **the powers of a Scarlet Witch wear it down** (chaos magic; only dark magic does too), each by its damage, until it shatters: her Chaos Beam, her telekinetic grip, what she throws. (Before 3.3.1 they shattered it at once.)
 
 ## Critical against Apocalypse
 

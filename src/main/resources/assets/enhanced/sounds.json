@@ -1459,5 +1459,13 @@
         "name": "enhanced:agatha_shield_break"
       }
     ]
+  },
+  "mutant_cure": {
+    "subtitle": "subtitles.enhanced.mutant_cure",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mutant_cure"
+      }
+    ]
   }
 }

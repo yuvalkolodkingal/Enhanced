@@ -2334,5 +2334,16 @@
   "message.enhanced.cyclops.eyes_opened": "Your eyes open wide! Shut them to stop the beam",
   "message.enhanced.cyclops.eyes_already_open": "Your eyes are already open",
   "message.enhanced.cyclops.eyes_already_shut": "Your eyes are already shut",
-  "message.enhanced.hero_creator.resource.iron_charge": "metal charge"
+  "message.enhanced.hero_creator.resource.iron_charge": "metal charge",
+  "item.enhanced.mutant_cure": "Mutant Cure",
+  "item.enhanced.mutant_cure.desc": "An injector of the cure. There is no going back",
+  "item.enhanced.mutant_cure.desc2": "Hold right-click for two seconds to take your power away for good. On another player: an operator, or with PvP on",
+  "message.enhanced.mutant_cure.no_power": "You have no power to cure",
+  "message.enhanced.mutant_cure.no_power_other": "%s has no power to cure",
+  "message.enhanced.mutant_cure.not_allowed": "Only an operator may cure another player, or anyone while PvP is on",
+  "message.enhanced.mutant_cure.disabled": "The Mutant Cure does not work on this server",
+  "message.enhanced.mutant_cure.too_far": "Too far away: the cure did not go in",
+  "message.enhanced.mutant_cure.cured": "The cure takes hold. You are no longer %s",
+  "message.enhanced.mutant_cure.cured_other": "%s is cured: no longer %s",
+  "subtitles.enhanced.mutant_cure": "The cure is injected"
 }

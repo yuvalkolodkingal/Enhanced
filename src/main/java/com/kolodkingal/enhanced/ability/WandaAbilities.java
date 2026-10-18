@@ -184,7 +184,7 @@ public final class WandaAbilities {
         ServerLevel level = player.serverLevel();
         HitResult hit = Raycasts.any(player, EnhancedConfig.CHAOS_BEAM_RANGE.get(), beamTargets(player), 1.0F);
         // 3.3: a wall in the way (another's Chaos Shield, Billy's barrier, a ward is no matter to her) ends the beam there; chaos
-        // magic shatters a Hex Barrier at once.
+        // magic wears a Hex Barrier down (3.3.1: by its damage, no longer at once).
         ShieldStop shield = shieldAcross(level, player, player.getEyePosition(), hit.getLocation(), 1.0F);
         if (shield != null) {
             if (player.tickCount % 10 == 0) {

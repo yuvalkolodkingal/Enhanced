@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,8 +39,9 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 /**
  * Billy's Hex Barrier (Sneak + B held; {@code billy.barrier*}): a directional plate of blue magic that stops everything coming
  * from the front arc ({@code barrierArc}, 60 degrees either side of his look) and nothing from the sides or the back. 3.3: no
- * time limit and no hunger, {@code barrierHealth} (30) worn down by what it stops, a shatter and {@code barrierShatterCooldown}
- * (10 s) at 0, health that mends while it is lowered, and the Scarlet Witch's chaos magic shatters it at once. Billy stands at
+ * time limit and no hunger, {@code barrierHealth} (60), a shatter and {@code barrierShatterCooldown} (10 s) at 0, health that
+ * mends while it is lowered. 3.3.1: only chaos and dark magic wear it down ({@link BarrierMagicTests}); the arrows, blows and
+ * explosions here are stopped whole and cost it nothing. Billy stands at
  * (10.5, 8.5) looking south (+z): "in front" is z greater than his.
  */
 @GameTestHolder(Enhanced.MODID)
@@ -94,17 +96,17 @@ public final class AbwBarrierTests {
         ServerPlayer billy = billy(f);
         raise(f, billy, () -> {
             float full = strength(billy);
-            assertNear(full, 30.0, 1.0E-3, "a fresh barrier has its whole health, 30");
+            assertNear(full, 60.0, 1.0E-3, "a fresh barrier has its whole health, 60");
             // an arrow from the front
             arrowBlow(helper, billy, at(helper, 10.5, FLOOR + 1.0, 14.5), 5.0F);
             assertNear(20.0F - billy.getHealth(), 0.0, 1.0E-4, "an arrow from the front is stopped");
-            assertNear(full - strength(billy), 5.0, 1.0E-3, "and the barrier pays what it would have done");
+            assertNear(full - strength(billy), 0.0, 1.0E-3, "and an arrow does not wear the barrier (3.3.1)");
             // from the back, and from the side: whole
             arrowBlow(helper, billy, at(helper, 10.5, FLOOR + 1.0, 2.5), 3.0F);
             assertNear(20.0F - billy.getHealth(), 3.0, 1.0E-4, "an arrow from behind goes through");
             arrowBlow(helper, billy, at(helper, 16.5, FLOOR + 1.0, 8.5), 2.0F);
             assertNear(20.0F - billy.getHealth(), 5.0, 1.0E-4, "and one from the side");
-            assertNear(full - strength(billy), 5.0, 1.0E-3, "which did not wear it");
+            assertNear(full - strength(billy), 0.0, 1.0E-3, "which did not wear it");
             // the edge of the arc: 59 degrees from his look is covered, 61 is not
             double r = 5.0;
             arrowBlow(helper, billy, at(helper, 10.5 + r * Math.sin(Math.toRadians(59.0)), FLOOR + 1.0, 8.5 + r * Math.cos(Math.toRadians(59.0))), 1.0F);
@@ -128,12 +130,12 @@ public final class AbwBarrierTests {
             billy.invulnerableTime = 0;
             check(!billy.hurt(helper.getLevel().damageSources().mobAttack(front), 6.0F), "the blow from the front does not land");
             assertNear(20.0F - billy.getHealth(), 0.0, 1.0E-4, "he is not touched");
-            assertNear(full - strength(billy), 6.0, 1.0E-3, "the barrier paid for it");
+            assertNear(full - strength(billy), 0.0, 1.0E-3, "a blow does not wear the barrier (3.3.1)");
             check(front.getDeltaMovement().z > 0.2, "and the attacker is thrown back, away from him: " + front.getDeltaMovement());
             billy.invulnerableTime = 0;
             billy.hurt(helper.getLevel().damageSources().mobAttack(back), 4.0F);
             assertNear(20.0F - billy.getHealth(), 4.0, 1.0E-4, "a blow from behind lands whole");
-            assertNear(full - strength(billy), 6.0, 1.0E-3, "and costs the barrier nothing");
+            assertNear(full - strength(billy), 0.0, 1.0E-3, "and costs the barrier nothing");
             helper.succeed();
         });
     }
@@ -150,7 +152,7 @@ public final class AbwBarrierTests {
             billy.invulnerableTime = 0;
             billy.hurt(helper.getLevel().damageSources().explosion(front, null), 8.0F);
             assertNear(20.0F - billy.getHealth(), 0.0, 1.0E-3, "an explosion in front does not get through");
-            assertNear(full - strength(billy), 8.0, 1.0E-3, "and costs the barrier what it would have done");
+            assertNear(full - strength(billy), 0.0, 1.0E-3, "and an explosion does not wear the barrier (3.3.1)");
             billy.invulnerableTime = 0;
             float before = billy.getHealth();
             billy.hurt(helper.getLevel().damageSources().explosion(back, null), 6.0F);
@@ -166,8 +168,10 @@ public final class AbwBarrierTests {
         ServerPlayer billy = billy(f);
         PowerData data = Powers.get(billy);
         raise(f, billy, () -> {
-            arrowBlow(helper, billy, at(helper, 10.5, FLOOR + 1.0, 14.5), 40.0F);
-            assertNear(20.0F - billy.getHealth(), 0.0, 1.0E-4, "the arrow that breaks it is stopped too");
+            Husk front = husk(helper, 10.5, 13.0);
+            billy.invulnerableTime = 0;
+            billy.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.DARKHOLD_BEAM, front, front), 70.0F);
+            assertNear(20.0F - billy.getHealth(), 0.0, 1.0E-4, "the dark magic that breaks it is stopped too");
             check(!data.chaosShieldActive() && !BillyBarrier.isUp(billy), "the barrier shattered");
             long left = data.cooldownUntil(4) - helper.getLevel().getGameTime();
             check(left >= 195 && left <= 200, "and it cannot be raised for 10 seconds: " + left);
@@ -205,10 +209,16 @@ public final class AbwBarrierTests {
                 if (now - raisedAt < 300) {
                     return false;
                 }
+                // (an arrow costs nothing; chaos and dark magic wear it: 3 + 4)
                 arrowBlow(helper, billy, at(helper, 10.5, FLOOR + 1.0, 14.5), 7.0F);
+                Husk caster = husk(helper, 10.5, 13.0);
+                billy.invulnerableTime = 0;
+                billy.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.CHAOS_BEAM, caster, caster), 3.0F);
+                billy.invulnerableTime = 0;
+                billy.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.DARKHOLD_BEAM, caster, caster), 4.0F);
                 AbilityHandler.onKey(billy, 4, false);
                 check(!data.chaosShieldActive(), "letting go lowers it at once");
-                assertNear(BillyBarrier.health(billy), 23.0, 1.0E-3, "and what is left of it is kept");
+                assertNear(BillyBarrier.health(billy), 53.0, 1.0E-3, "and what is left of it is kept");
                 long left = data.cooldownUntil(4) - now;
                 check(left > 0 && left <= EnhancedConfig.BILLY_BARRIER_COOLDOWN.get(), "a short recharge: " + left);
                 return true;
@@ -239,17 +249,17 @@ public final class AbwBarrierTests {
         });
     }
 
-    /** 30 at every rank by default; with barrierRankHealthBonus it grows evenly to the highest rank. */
+    /** 60 at every rank by default (3.3.1); with barrierRankHealthBonus it grows evenly to the highest rank. */
     @GameTest(template = ARENA, batch = "abw_barrier_rank")
     public static void barrierHealthAndRank(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(BuildConfig.BILLY_MAX_RANK, 4);
         for (int rank = 1; rank <= 4; rank++) {
-            assertNear(BillyBarrier.maxStrength(BuildData.EMPTY.withRank(rank)), 30.0, 1.0E-3, "30 at rank " + rank);
+            assertNear(BillyBarrier.maxStrength(BuildData.EMPTY.withRank(rank)), 60.0, 1.0E-3, "60 at rank " + rank);
         }
         f.config(EnhancedConfig.BILLY_BARRIER_RANK_STRENGTH_BONUS, 1.0);
         for (int rank = 1; rank <= 4; rank++) {
-            assertNear(BillyBarrier.maxStrength(BuildData.EMPTY.withRank(rank)), 30.0 * (1.0 + (rank - 1) / 3.0), 1.0E-3, "with the bonus, rank " + rank);
+            assertNear(BillyBarrier.maxStrength(BuildData.EMPTY.withRank(rank)), 60.0 * (1.0 + (rank - 1) / 3.0), 1.0E-3, "with the bonus, rank " + rank);
         }
         helper.succeed();
     }
@@ -261,7 +271,7 @@ public final class AbwBarrierTests {
         ServerPlayer billy = billy(f);
         raise(f, billy, () -> {
             PowerData data = Powers.get(billy);
-            assertNear(BillyBarrier.maxHealth(billy), 30.0, 1.0E-3, "the bar shows it out of 30");
+            assertNear(BillyBarrier.maxHealth(billy), 60.0, 1.0E-3, "the bar shows it out of 60");
             AbilityHandler.onKey(billy, 4, false);
             f.config(EnhancedConfig.BILLY_BARRIER, false);
             billy.setShiftKeyDown(true);
@@ -303,7 +313,7 @@ public final class AbwBarrierTests {
             check(boss.brain().force(boss, d.fight(), ApocalypseAttack.BACKHAND), "he swings");
             helper.runAfterDelay(ApocalypseAttack.BACKHAND.tellTicks() + 3, () -> {
                 assertNear(health - billy.getHealth(), 0.0, 1.0E-3, "his fist from the front is stopped by the plate");
-                check(strength(billy) < 30.0F, "and it paid for it: " + strength(billy));
+                assertNear(strength(billy), 60.0, 1.0E-3, "and it cost the barrier nothing (3.3.1)");
                 check(boss.brain().force(boss, d.fight(), ApocalypseAttack.MIND_CRUSH), "the Mind Crush");
                 helper.runAfterDelay(ApocalypseAttack.MIND_CRUSH.tellTicks() + 3, () -> {
                     check(!billy.hasEffect(MobEffects.CONFUSION), "is stopped by the barrier too");

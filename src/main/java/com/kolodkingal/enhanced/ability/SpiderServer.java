@@ -126,6 +126,9 @@ public final class SpiderServer implements HeroServer {
      */
     private static final double HITCH_STEP = 1.6;
     private static final int HITCH_TICKS = 12;
+    /** 3.3.1: the room a fresh assisted swing gives the server's copy of him to catch up (blocks), for its first ticks. */
+    private static final double ASSIST_FRESH_STEP = 6.0;
+    private static final int ASSIST_FRESH_TICKS = 4;
     /** What the cling's flag outlives the contact by. */
     private static final int CLING_HYSTERESIS = 4;
     /** What his client says he clings to counts for this many ticks (it says it again every few). */
@@ -297,6 +300,10 @@ public final class SpiderServer implements HeroServer {
         }
         SpiderState state = state(player);
         boolean sneak = alt;
+        if (ability == 2 && player.serverLevel().getGameTime() - state.climbAt <= 3) {
+            // (Web Assist has just leapt him up out of a forest: the key that came with it is not a swing nor a zip.)
+            return;
+        }
         switch (ability) {
             case 1 -> {
                 if (sneak) {
@@ -827,7 +834,8 @@ public final class SpiderServer implements HeroServer {
             return;
         }
         boolean boost = action == SpiderSwingPayload.BOOST;
-        if (action != SpiderSwingPayload.ATTACH && !boost) {
+        boolean climb = action == SpiderSwingPayload.CLIMB;
+        if (action != SpiderSwingPayload.ATTACH && !boost && !climb) {
             return;
         }
         ServerLevel level = player.serverLevel();
@@ -839,6 +847,14 @@ public final class SpiderServer implements HeroServer {
         if (boost) {
             if (allowed && openLand == SwingAssist.OpenLand.ZIP) {
                 webBoost(player, data, state, anchor, organic);
+            }
+            return;
+        }
+        if (climb) {
+            if (allowed && validClimb(player, anchor)) {
+                webClimb(player, data, state, anchor, organic);
+            } else if (state.swing == null) {
+                refuse(player, true);
             }
             return;
         }
@@ -864,6 +880,9 @@ public final class SpiderServer implements HeroServer {
         double centre = player.position().add(0, SwingAssist.CENTRE, 0).distanceTo(anchor);
         double rope = Mth.clamp(Double.isFinite(ropeAsked) ? ropeAsked : centre, SwingAssist.MIN_ROPE, Math.min(range + 3.0, centre + 3.0));
         beginSwing(player, data, state, anchor, face, rope, sky, organic);
+        if (state.swing != null) {
+            state.swing.assisted = true;
+        }
     }
 
     /** How much further than its range the server lets an anchor be, for the lag of its copy of him. */
@@ -887,6 +906,42 @@ public final class SpiderServer implements HeroServer {
     /** A sky anchor: above him, near enough, with the sky open over it. */
     private static boolean validSky(ServerPlayer player, Vec3 eye, Vec3 anchor) {
         return anchor.y >= eye.y + 2.0 && eye.distanceTo(anchor) <= 24.0 + ASSIST_SLACK && SwingAssist.openSky(player.serverLevel(), player, eye, anchor);
+    }
+
+    /** How long after a climb out of a forest the next web may go (the next web goes at the top of the leap). */
+    private static final int CLIMB_COOLDOWN = 8;
+
+    /**
+     * A climb out of a forest (3.3.1): he is near the ground, the top of the gap is above him, not far to the side, no
+     * higher than a canopy, and its column is open to the sky (with room for the lag of the server's copy of him).
+     */
+    private static boolean validClimb(ServerPlayer player, Vec3 top) {
+        ServerLevel level = player.serverLevel();
+        Vec3 feet = player.position();
+        double flat = Math.hypot(top.x - feet.x, top.z - feet.z);
+        double near = feet.y - SwingAssist.groundBelow(level, feet.add(0, 0.01, 0));
+        return near <= SwingAssist.CLIMB_NEAR_GROUND + 1.5 && flat <= SwingAssist.CLIMB_AHEAD + 2.5 + ASSIST_SLACK
+                && top.y > player.getEyeY() && top.y - feet.y <= SwingAssist.CLIMB_HEIGHT + 4.0
+                && SwingAssist.open(level, feet.add(0, 1.0, 0), top);
+    }
+
+    /**
+     * Web Assist's climb out of a forest (3.3.1): a web shot up through the gap, and he leaps after it (his client gives
+     * him the speed); a short cooldown, a zip's hunger. The key that follows it is not a swing nor a zip of its own.
+     */
+    private static void webClimb(ServerPlayer player, PowerData data, SpiderState state, Vec3 top, boolean organic) {
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
+        if (state.swing != null) {
+            endSwing(player, data, state, 1);
+        }
+        dropCling(state, data);
+        state.climbAt = now;
+        data.startCooldown(HeroAbility.SPIDER_ZIP, now, CLIMB_COOLDOWN);
+        spend(player, SpiderConfig.ZIP_EXHAUSTION.get(), organic);
+        keepAloft(player);
+        sound(level, player.position(), ModSounds.WEB_ZIP.get(), 0.9F, 1.1F);
+        send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.SHOT, player.getId(), hand(player), top, Vec3.ZERO, -1, 0F, organic, 0L, List.of()));
     }
 
     /**
@@ -1035,7 +1090,10 @@ public final class SpiderServer implements HeroServer {
         // gives his position in steps of several ticks at once: a step is a jump only beyond what the ticks it was held
         // could hold, and twice the step before it.
         double step = position.distanceTo(line.last);
-        if (step > 3.0 + HITCH_STEP * Math.min(line.still, HITCH_TICKS) + 2.0 * line.lastStep) {
+        // (3.3.1) An assisted web goes out while he flies fast, chained from the last one: in its first ticks the server's
+        // copy of him catches up with where his client already is, a step of several blocks that is no jump.
+        double fresh = line.assisted && now - line.start <= ASSIST_FRESH_TICKS ? ASSIST_FRESH_STEP : 0.0;
+        if (step > 3.0 + fresh + HITCH_STEP * Math.min(line.still, HITCH_TICKS) + 2.0 * line.lastStep) {
             return 1;
         }
         boolean held = Math.hypot(position.x - line.last.x, position.z - line.last.z) < 0.05
