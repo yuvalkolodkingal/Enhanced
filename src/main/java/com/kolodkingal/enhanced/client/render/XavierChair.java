@@ -172,7 +172,8 @@ public final class XavierChair extends RenderLayer<AbstractClientPlayer, PlayerM
             return;
         }
         PowerData data = Powers.get(player);
-        if (data.power() != Power.PROFESSOR_X) {
+        // (3.4: a custom hero with Cerebro wears its helmet too; the chair is the old professor's alone, see sits.)
+        if (!data.acts(Power.PROFESSOR_X)) {
             return;
         }
         if (sits(player)) {

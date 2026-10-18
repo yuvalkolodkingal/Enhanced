@@ -1,12 +1,12 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.config.XavierConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
 import com.kolodkingal.enhanced.network.XavierPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -290,7 +290,7 @@ public final class MindLink {
             xavier.hurtMarked = true;
         }
         PowerData data = Powers.get(xavier);
-        data.startCooldown(3, level.getGameTime(), XavierConfig.LINK_COOLDOWN.get());
+        data.startCooldown(HeroAbility.XAVIER_TAKE_OVER, level.getGameTime(), XavierConfig.LINK_COOLDOWN.get());
         Powers.syncIfDirty(xavier);
         xavier.connection.send(XavierPayload.of(XavierPayload.THROWN_OUT));
         xavier.displayClientMessage(Component.translatable("message.enhanced.xavier.thrown_out", telepath.getDisplayName()), true);
@@ -332,8 +332,8 @@ public final class MindLink {
         if (xavier != null) {
             PowerData data = Powers.get(xavier);
             data.set(Live.MIND_LINKED, false);
-            if (data.power() == Power.PROFESSOR_X) {
-                data.startCooldown(3, xavier.serverLevel().getGameTime(), XavierConfig.LINK_COOLDOWN.get());
+            if (data.has(HeroAbility.XAVIER_TAKE_OVER)) {
+                data.startCooldown(HeroAbility.XAVIER_TAKE_OVER, xavier.serverLevel().getGameTime(), XavierConfig.LINK_COOLDOWN.get());
             }
             Powers.syncIfDirty(xavier);
             xavier.connection.send(XavierPayload.of(XavierPayload.LINK_END));
@@ -438,8 +438,8 @@ public final class MindLink {
     /** Why the link must end now, or null. */
     @Nullable
     private static End check(ServerPlayer xavier, Link link) {
-        if (Powers.power(xavier) != Power.PROFESSOR_X) {
-            return End.POWER_LOST;
+        if (!Powers.get(xavier).has(HeroAbility.XAVIER_TAKE_OVER)) {
+            return End.POWER_LOST; // (3.4: or a custom hero who no longer has the ability)
         }
         if (xavier.serverLevel().getGameTime() >= link.until) {
             return End.TIME;

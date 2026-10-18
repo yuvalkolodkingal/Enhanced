@@ -159,7 +159,8 @@ public final class SpiderClient implements HeroClient {
     public void stanceTargets(HeroAnimState s, AbstractClientPlayer p, PowerData data, boolean[] on, long now) {
         // The local hero's own movement knows at once what he is doing (the server's flags come a tick or two later and
         // outlast a cling by a few ticks); everyone else's is read from the synced data.
-        boolean local = p == Minecraft.getInstance().player;
+        // (3.4: a custom hero's generic Wall Crawl, which SpiderMotion does not move, is read from the data like anyone's.)
+        boolean local = p == Minecraft.getInstance().player && data.acts(Power.SPIDER_MAN);
         SpiderMotion.Mode mode = SpiderMotion.mode();
         SpiderClimb.Kind surface = SpiderMotion.surface().kind();
         on[Stance.SPIDER_CLING_WALL.ordinal()] = local ? surface == SpiderClimb.Kind.WALL : data.is(Live.CLINGING_WALL);

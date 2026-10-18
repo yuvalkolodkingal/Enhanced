@@ -4,8 +4,6 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
-import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -62,7 +60,7 @@ public final class SpiderWebs {
             return false;
         }
         if (living instanceof Player player) {
-            return !player.isCreative() && !player.isSpectator() && !Powers.is(player, Power.SPIDER_MAN) && spider.canHarmPlayer(player);
+            return !player.isCreative() && !player.isSpectator() && !SpiderServer.isSpiderMan(player) && spider.canHarmPlayer(player);
         }
         return true;
     }

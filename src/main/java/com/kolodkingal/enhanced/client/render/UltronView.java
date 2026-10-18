@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.client.PowerHud;
 import com.kolodkingal.enhanced.client.UltronLoops;
 import com.kolodkingal.enhanced.client.UltronMusic;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -123,7 +124,7 @@ final class UltronView {
         UltronMusic.tick(mc);
         UltronLoops.tick(mc);
         for (Player player : level.players()) {
-            if (player instanceof AbstractClientPlayer client && player.isAlive() && Powers.get(player).power() == Power.ULTRON
+            if (player instanceof AbstractClientPlayer client && player.isAlive() && Powers.get(player).has(HeroAbility.ULTRON_REPULSOR)
                     && Powers.get(player).is(Live.ULTRON_CHARGING)) {
                 gather(level, mc, client);
             }

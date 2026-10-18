@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -120,6 +122,14 @@ public final class UltronAbilities {
     // ---- input ----
 
     static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
+    }
+
+    /**
+     * A key of his, with its Sneak variant said explicitly ({@code alt}): the Sneak of Ultron himself, or the binding of a
+     * custom hero with his abilities (3.4).
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         // Letting go of R must always get through, so that a stream can't get stuck on.
         if (!down) {
             if (ability == 1) {
@@ -131,7 +141,7 @@ public final class UltronAbilities {
         if (player.isSpectator() || player.hasEffect(ModEffects.SPELLBOUND)) {
             return;
         }
-        boolean sneak = player.isShiftKeyDown();
+        boolean sneak = alt;
         switch (ability) {
             case 1 -> {
                 if (sneak) {
@@ -170,14 +180,29 @@ public final class UltronAbilities {
     // ---- every tick ----
 
     static void tick(ServerPlayer player, PowerData data) {
-        // A machine: never hungry, never out of breath, and no poison runs in it.
-        if (player.getFoodData().getFoodLevel() < 20) {
-            player.getFoodData().setFoodLevel(20);
+        // (3.4: each part for the ability it belongs to: a custom hero ticks here with any of Ultron's abilities.)
+        if (data.has(HeroAbility.ULTRON_BODY)) {
+            // A machine: never hungry, never out of breath, and no poison runs in it.
+            if (player.getFoodData().getFoodLevel() < 20) {
+                player.getFoodData().setFoodLevel(20);
+            }
+            player.setAirSupply(player.getMaxAirSupply());
+            player.removeEffect(MobEffects.POISON);
+            player.removeEffect(MobEffects.WITHER);
         }
-        player.setAirSupply(player.getMaxAirSupply());
-        player.removeEffect(MobEffects.POISON);
-        player.removeEffect(MobEffects.WITHER);
+        if (data.has(HeroAbility.ULTRON_REPULSOR)) {
+            plasmaTick(player, data);
+        }
+        if (data.has(HeroAbility.ULTRON_GRAVITY)) {
+            pulls(player, player.serverLevel());
+        }
+        if (data.has(HeroAbility.ULTRON_UPLOAD)) {
+            UltronDrones.tickHack(player, data);
+        }
+    }
 
+    /** The plasma's step: the pool refills, R held fires, the Overcharge builds and flies. */
+    private static void plasmaTick(ServerPlayer player, PowerData data) {
         Plasma plasma = plasma(player, data);
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
@@ -200,8 +225,6 @@ public final class UltronAbilities {
         } else {
             stream(player, data, plasma, now);
         }
-        pulls(player, level);
-        UltronDrones.tickHack(player, data);
     }
 
     /**
@@ -209,17 +232,21 @@ public final class UltronAbilities {
      * builds.
      */
     static void applyBody(ServerPlayer player, PowerData data) {
-        boolean ultron = data.power() == Power.ULTRON;
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, UltronConfig.BODY_HEALTH.get(), ultron);
-        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, UltronConfig.BODY_ARMOR.get(), ultron);
-        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, BODY_KNOCKBACK, UltronConfig.KNOCKBACK_RESISTANCE.get(), ultron);
-        boolean charging = ultron && data.is(Live.ULTRON_CHARGING);
+        // (3.4: and a custom hero with his body, its amounts times the strength's factor; the Overcharge's slowness with it.)
+        boolean ultron = data.has(HeroAbility.ULTRON_BODY);
+        double scale = data.bodyScale(HeroAbility.ULTRON_BODY);
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, UltronConfig.BODY_HEALTH.get() * scale, ultron);
+        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, UltronConfig.BODY_ARMOR.get() * scale, ultron);
+        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, BODY_KNOCKBACK,
+                Math.min(1.0, UltronConfig.KNOCKBACK_RESISTANCE.get() * scale), ultron);
+        boolean charging = data.has(HeroAbility.ULTRON_REPULSOR) && data.is(Live.ULTRON_CHARGING);
         double slow = UltronConfig.OVERCHARGE_SLOW.get();
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, CHARGE_SLOW, -slow, charging, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         Abilities abilities = player.getAbilities();
         if (charging && abilities.flying && !player.isCreative() && !player.isSpectator()) {
             // In the air it is his flying speed that is slowed (the passives put it back as soon as the charge ends).
-            float slowed = (float) (Power.ULTRON.flightSpeed() * (1.0 - slow));
+            float speed = data.power() == Power.CUSTOM ? CustomHeroes.flightSpeed(player) : Power.ULTRON.flightSpeed();
+            float slowed = (float) (speed * (1.0 - slow));
             if (Math.abs(abilities.getFlyingSpeed() - slowed) > 1.0E-4F) {
                 abilities.setFlyingSpeed(slowed);
                 player.onUpdateAbilities();
@@ -232,7 +259,7 @@ public final class UltronAbilities {
 
     /** The key of a held ability is let go of, or the body it belonged to is dead: the stream and the charge stop. */
     static void stopHold(PowerData data) {
-        if (data.power() == Power.ULTRON) {
+        if (data.has(HeroAbility.ULTRON_REPULSOR)) {
             data.set(Live.ULTRON_CHARGING, false);
             data.set(Live.CASTING, false);
         }
@@ -401,7 +428,7 @@ public final class UltronAbilities {
     private static void overcharge(ServerPlayer player, PowerData data) {
         Plasma plasma = plasma(player, data);
         long now = player.serverLevel().getGameTime();
-        if (plasma.chargeEnds != 0 || !data.isReady(1, now)) {
+        if (plasma.chargeEnds != 0 || !data.isReady(HeroAbility.ULTRON_REPULSOR, now)) {
             return;
         }
         boolean creative = player.getAbilities().instabuild;
@@ -426,7 +453,7 @@ public final class UltronAbilities {
         plasma.chargeEnds = 0;
         plasma.lastFired = now;
         data.set(Live.ULTRON_CHARGING, false);
-        data.startCooldown(1, now, UltronConfig.OVERCHARGE_COOLDOWN.get());
+        data.startCooldown(HeroAbility.ULTRON_REPULSOR, now, UltronConfig.OVERCHARGE_COOLDOWN.get());
         Vec3 look = player.getLookAngle();
         Vec3 from = fingertip(player, 1.0);
         UltronBoltEntity blast = UltronBoltEntity.create(level, player, from, look.scale(BLAST_SPEED), UltronConfig.OVERCHARGE_DAMAGE.get().floatValue(),
@@ -446,7 +473,7 @@ public final class UltronAbilities {
     private static void pull(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(3, now)) {
+        if (!data.isReady(HeroAbility.ULTRON_GRAVITY, now)) {
             return;
         }
         double range = UltronConfig.PULL_RANGE.get();
@@ -462,7 +489,7 @@ public final class UltronAbilities {
         if (Shelters.stops(player, player.getEyePosition(), target, 0.0F)) {
             return; // 3.3: Billy's Hex Barrier faces him (a Hex's wall was already in the way of his aim)
         }
-        data.startCooldown(3, now, UltronConfig.PULL_COOLDOWN.get());
+        data.startCooldown(HeroAbility.ULTRON_GRAVITY, now, UltronConfig.PULL_COOLDOWN.get());
         if (target instanceof Projectile projectile) {
             SlowMotion.unslow(projectile);
         }
@@ -579,10 +606,10 @@ public final class UltronAbilities {
     private static void slam(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(3, now)) {
+        if (!data.isReady(HeroAbility.ULTRON_GRAVITY, now)) {
             return;
         }
-        data.startCooldown(3, now, UltronConfig.SLAM_COOLDOWN.get());
+        data.startCooldown(HeroAbility.ULTRON_GRAVITY, now, UltronConfig.SLAM_COOLDOWN.get());
         double radius = UltronConfig.SLAM_RADIUS.get();
         Vec3 centre = player.position();
         DamageSource source = ModDamageTypes.source(level, ModDamageTypes.ULTRON_SLAM, player, player);

@@ -41,7 +41,7 @@ public class SpiderSenseOverlay implements LayeredDraw.Layer {
             return;
         }
         PowerData data = Powers.get(player);
-        if (data.power() != Power.SPIDER_MAN) {
+        if (!data.acts(Power.SPIDER_MAN)) {
             return;
         }
         float time = mc.level.getGameTime() + deltaTracker.getGameTimeDeltaPartialTick(false);

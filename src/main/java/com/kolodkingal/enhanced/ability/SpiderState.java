@@ -54,6 +54,8 @@ final class SpiderState {
     long shotReadyAt;
     /** Until when the hand pose of a Web Shot shows ({@code Live.CASTING}). */
     long castUntil;
+    /** Whether the web shot's cast flag was up at the last tick (3.4: a custom hero's flag is only changed on its edges). */
+    boolean casting;
     /** Until when the spider-sense pose shows ({@code Live.SENSING}). */
     long senseUntil;
     @Nullable

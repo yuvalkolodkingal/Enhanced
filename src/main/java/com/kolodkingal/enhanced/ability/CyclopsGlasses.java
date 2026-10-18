@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.CyclopsConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -87,8 +88,19 @@ public final class CyclopsGlasses {
         state.wore = wearing;
     }
 
-    /** Sneak + N: he takes the glasses off (into his hand, else his inventory, else the off hand, else at his feet). */
+    /**
+     * Sneak + N: he takes the glasses off (into his hand, else his inventory, else the off hand, else at his feet). A custom
+     * hero with the key (3.4) wears no glasses: he opens his eyes wide, and the giant beam pours out.
+     */
     static void takeOff(ServerPlayer player, PowerData data) {
+        if (!CyclopsAbilities.needsGlasses(data)) {
+            if (data.is(Live.CYCLOPS_UNLEASHED)) {
+                player.displayClientMessage(Component.translatable("message.enhanced.cyclops.eyes_already_open"), true);
+            } else {
+                cameOff(player, data);
+            }
+            return;
+        }
         if (!wears(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.cyclops.not_wearing"), true);
             return;
@@ -118,6 +130,16 @@ public final class CyclopsGlasses {
      * place). With none left anywhere on him and the beam pouring out, he shuts his eyes and it ends.
      */
     static void putOn(ServerPlayer player, PowerData data) {
+        if (!CyclopsAbilities.needsGlasses(data)) {
+            // (A custom hero's key: he shuts his eyes, with the gesture of the glasses going on.)
+            if (data.is(Live.CYCLOPS_UNLEASHED)) {
+                end(player, data, true);
+                data.startCooldown(HeroAbility.CYCLOPS_GLASSES, player.level().getGameTime(), ON_TICKS);
+            } else {
+                player.displayClientMessage(Component.translatable("message.enhanced.cyclops.eyes_already_shut"), true);
+            }
+            return;
+        }
         if (wears(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.cyclops.already_on"), true);
             return;
@@ -171,9 +193,10 @@ public final class CyclopsGlasses {
             ContinuousBeam.stop(player); // (the optic blast he was holding)
         }
         data.set(Live.CYCLOPS_UNLEASHED, true);
-        data.startCooldown(CyclopsAbilities.GLASSES_SLOT, level.getGameTime(), OFF_TICKS);
+        data.startCooldown(HeroAbility.CYCLOPS_GLASSES, level.getGameTime(), OFF_TICKS);
         ContinuousBeam.start(player, RubyQuartzGlassesItem.UNLEASHED, CyclopsConfig.UNLEASHED_RANGE.get());
-        player.displayClientMessage(Component.translatable("message.enhanced.cyclops.unleashed"), true);
+        player.displayClientMessage(Component.translatable(CyclopsAbilities.needsGlasses(data) ? "message.enhanced.cyclops.unleashed"
+                : "message.enhanced.cyclops.eyes_opened"), true);
         level.playSound(null, player.getX(), player.getEyeY(), player.getZ(), ModSounds.CYCLOPS_UNLEASHED_START.get(), SoundSource.PLAYERS,
                 1.4F, 1.0F);
     }
@@ -183,7 +206,7 @@ public final class CyclopsGlasses {
         boolean pouring = data.is(Live.CYCLOPS_UNLEASHED);
         end(player, data, false);
         ServerLevel level = player.serverLevel();
-        data.startCooldown(CyclopsAbilities.GLASSES_SLOT, level.getGameTime(), ON_TICKS);
+        data.startCooldown(HeroAbility.CYCLOPS_GLASSES, level.getGameTime(), ON_TICKS);
         level.playSound(null, player.getX(), player.getEyeY(), player.getZ(), ModSounds.CYCLOPS_VISOR.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
         if (pouring) {
             player.displayClientMessage(Component.translatable("message.enhanced.cyclops.glasses_on"), true);

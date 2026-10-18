@@ -1,8 +1,7 @@
 package com.kolodkingal.enhanced.block;
 
+import com.kolodkingal.enhanced.ability.SpiderServer;
 import com.kolodkingal.enhanced.config.SpiderConfig;
-import com.kolodkingal.enhanced.power.Power;
-import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -31,7 +30,7 @@ public class SpiderWebBlock extends WebBlock {
 
     /** Spider-Man is never held by a web, nor is a Creative player who flies. */
     public static boolean spares(Entity entity) {
-        return entity instanceof Player player && (Powers.is(player, Power.SPIDER_MAN) || player.getAbilities().flying);
+        return entity instanceof Player player && (SpiderServer.isSpiderMan(player) || player.getAbilities().flying);
     }
 
     @Override

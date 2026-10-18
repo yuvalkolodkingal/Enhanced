@@ -2,9 +2,9 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -84,7 +84,7 @@ public final class SpiderSenseClient {
             return;
         }
         PowerData data = Powers.get(player);
-        active = data.power() == Power.SPIDER_MAN && data.toggle(Toggle.SPIDER_SENSE);
+        active = data.has(HeroAbility.SPIDER_CRAWL) && data.toggle(Toggle.SPIDER_SENSE); // (3.4: a custom with the sense too)
         overload = active && data.is(Live.BLACK_EYES);
         if (overload) {
             double range = EnhancedConfig.SPEC.isLoaded() ? SpiderConfig.SPIDER_SENSE_RANGE.get() * SpiderConfig.BLACK_EYES_SENSE_FACTOR.get() : 24.0;

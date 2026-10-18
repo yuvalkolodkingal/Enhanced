@@ -512,7 +512,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
     @Nullable
     private ServerPlayer master(ServerLevel server) {
         UUID id = getOwnerUUID();
-        return id != null && server.getPlayerByUUID(id) instanceof ServerPlayer player && player.isAlive() && Powers.is(player, Power.ULTRON)
+        return id != null && server.getPlayerByUUID(id) instanceof ServerPlayer player && player.isAlive() && Powers.get(player).acts(Power.ULTRON)
                 ? player : null;
     }
 

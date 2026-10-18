@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -51,9 +52,11 @@ public final class UltronClient implements HeroClient {
 
     @Override
     public void stanceTargets(HeroAnimState s, AbstractClientPlayer p, PowerData data, boolean[] on, long now) {
-        boolean charging = data.is(Live.ULTRON_CHARGING);
+        // (3.4: a custom hero's beam flag is Ultron's fire only with Ultron's repulsors.)
+        boolean repulsor = data.power() != Power.CUSTOM || data.has(HeroAbility.ULTRON_REPULSOR);
+        boolean charging = repulsor && data.is(Live.ULTRON_CHARGING);
         on[Stance.ULTRON_CHARGE.ordinal()] = charging;
-        on[Stance.ULTRON_FIRE.ordinal()] = data.beamActive() && !charging;
+        on[Stance.ULTRON_FIRE.ordinal()] = repulsor && data.beamActive() && !charging;
     }
 
     @Override
