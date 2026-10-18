@@ -166,7 +166,7 @@ public final class ClientSetup {
         // ===== hela (3.5) =====
         event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), NoopRenderer::new);
         // ===== asgardians (3.5) =====
-        event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
     }
 
     /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
@@ -216,6 +216,8 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.render.RavenModel::createBodyLayer);
         // ===== hela (3.5) =====
         // ===== asgardians (3.5) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel.LAYER,
+                com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel::createLayer);
     }
 
     @SubscribeEvent
