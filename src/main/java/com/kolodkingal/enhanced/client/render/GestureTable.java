@@ -6,7 +6,6 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
-import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
@@ -335,7 +334,7 @@ public final class GestureTable {
      * kit (3.4): he acts only what his abilities, his modules and his chosen moves do.
      */
     static void fire(HeroAnimState s, AbstractClientPlayer p, GestureId id, float param, float age) {
-        if (id == null || s.power == Power.CUSTOM && !CustomActing.allowed(p, Powers.get(p), id)) {
+        if (id == null || s.power == Power.CUSTOM && !CustomActing.allowed(p, id)) {
             return;
         }
         for (HeroAnimState.Slot slot : s.slots) {

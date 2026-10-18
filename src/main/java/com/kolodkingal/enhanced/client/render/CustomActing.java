@@ -16,7 +16,6 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -52,7 +51,7 @@ public final class CustomActing {
     private static final boolean[] SCRATCH = new boolean[Stance.COUNT];
 
     /** The kit of a custom hero (the one on his data, or built from his definition). */
-    static HeroKit kit(Player player, PowerData data) {
+    static HeroKit kit(AbstractClientPlayer player, PowerData data) {
         HeroKit kit = data.kit();
         return kit != null ? kit : CustomHeroes.state(player).kitFor(CustomHeroes.hero(player));
     }
@@ -156,7 +155,7 @@ public final class CustomActing {
     }
 
     /** The marker's binding is remembered for the next tick. */
-    static void remember(HeroAnimState s, Player p) {
+    static void remember(HeroAnimState s, AbstractClientPlayer p) {
         s.lastCastSeq = CustomHeroes.state(p).castSeq();
     }
 
@@ -225,8 +224,8 @@ public final class CustomActing {
     }
 
     /** Whether a gesture belongs to his kit (the filter every gesture the table starts for him passes). */
-    static boolean allowed(Player p, PowerData data, GestureId id) {
-        return HeroAbilityAnims.allows(kit(p, data), id);
+    static boolean allowed(AbstractClientPlayer p, GestureId id) {
+        return HeroAbilityAnims.allows(kit(p, Powers.get(p)), id);
     }
 
     /** The edges of the plug-ins his abilities come from, each gesture they start passing the kit filter. */
@@ -454,7 +453,7 @@ public final class CustomActing {
      * The colour of an effect of a borrowed ability: the built-in hero's own colour for him, the custom hero's own colours
      * for a custom hero ({@code glow}: his second colour), so a power he borrowed glows in his colours.
      */
-    public static int tint(Player player, int builtIn, boolean glow) {
+    public static int tint(AbstractClientPlayer player, int builtIn, boolean glow) {
         if (Powers.get(player).power() != Power.CUSTOM) {
             return builtIn;
         }

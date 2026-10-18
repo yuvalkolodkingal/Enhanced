@@ -67,7 +67,8 @@ final class RunPoses {
      * walks with the character his definition names ({@link HeroAnimState#runAs}, see {@code CustomAnimRoutes.run}).
      */
     private static RunCharacter character(HeroAnimState st) {
-        boolean spider = st.power == Power.SPIDER_MAN || st.power == Power.CUSTOM && "spider".equals(st.runAs);
+        boolean spider = st.power == Power.SPIDER_MAN || st.power == Power.CUSTOM && ("spider".equals(st.runAs)
+                || st.kitSources.contains(Power.SPIDER_MAN));
         if (spider && st.stance(Stance.SPIDER_SURGE) > 0.5F) {
             return RunCharacter.SPIDER_SURGE;
         }
