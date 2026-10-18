@@ -353,6 +353,11 @@ public enum HeroAbility implements CatalogEntry {
         return alt != null;
     }
 
+    /** Whether it goes on one of the five key boxes: a body needs no key, and Billy's Build Magic has its own Y key. */
+    public boolean takesBox() {
+        return home >= 1 && home <= CustomHero.KEYS;
+    }
+
     /** The resources its main action drives, and its Sneak variant's when {@code option} is {@link #BOTH}. */
     @Override
     public Set<Resource> resources(String option) {

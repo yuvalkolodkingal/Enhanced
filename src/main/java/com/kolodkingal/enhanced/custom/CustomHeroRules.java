@@ -313,7 +313,7 @@ public final class CustomHeroRules {
         for (int column = 1; column <= CustomHero.KEYS; column++) {
             String id = in.binding(column, false).trim().toLowerCase(Locale.ROOT);
             CustomHero.Pick pick = id.contains("#") ? null : find(picks, id);
-            if (pick == null || pick.act() == PowerModule.Act.NONE || !actions.add(pick.id() + "#" + HeroKit.MAIN)) {
+            if (pick == null || !takesKey(pick) || !actions.add(pick.id() + "#" + HeroKit.MAIN)) {
                 if (notes != null && !id.isEmpty()) {
                     notes.add(new Note("message.enhanced.hero_creator.rule.key", column));
                 }
@@ -374,13 +374,18 @@ public final class CustomHeroRules {
             return actions.add(asked) ? asked : null;
         }
         CustomHero.Pick pick = find(picks, asked);
-        if (pick == null || pick.act() == PowerModule.Act.NONE) {
+        if (pick == null || !takesKey(pick)) {
             return null;
         }
         if (pick.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option())) {
             return null; // (its Sneak variant could go nowhere: it belongs on the Sneak cell of its own plain key)
         }
         return actions.add(pick.id() + "#" + HeroKit.MAIN) ? pick.id() : null;
+    }
+
+    /** Whether a pick may sit on a key box: it has an action, and is no hero's ability with a key of its own (Build Magic's Y). */
+    private static boolean takesKey(CustomHero.Pick pick) {
+        return pick.act() != PowerModule.Act.NONE && !(pick.entry() instanceof HeroAbility a && !a.takesBox());
     }
 
     @Nullable

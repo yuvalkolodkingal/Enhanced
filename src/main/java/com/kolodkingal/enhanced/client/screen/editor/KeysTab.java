@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.screen.editor;
 
 import com.kolodkingal.enhanced.client.KeyBindings;
+import com.kolodkingal.enhanced.client.build.BuildKeys;
 import com.kolodkingal.enhanced.client.custom.CreatorUi;
 import com.kolodkingal.enhanced.client.screen.HeroEditorScreen;
 import com.kolodkingal.enhanced.custom.CatalogEntry;
@@ -261,6 +262,7 @@ public final class KeysTab extends EditorTab {
         }
         // The powers that need no key.
         List<Component> passive = new ArrayList<>();
+        Component ownKey = null;
         CustomHero ruled = ruled(hero);
         for (CustomHero.Pick p : hero.powers()) {
             CatalogEntry e = p.entry();
@@ -271,16 +273,19 @@ public final class KeysTab extends EditorTab {
             for (int c = 1; c <= CustomHero.KEYS; c++) {
                 onKey |= ruled.binding(c, false).equals(e.id()) || ruled.binding(c, true).startsWith(e.id());
             }
-            if (!onKey) {
+            if (e == HeroAbility.BILLY_BUILD_MAGIC) {
+                ownKey = Component.translatable("screen.enhanced.hero_creator.keys.own_key", CreatorUi.name(e).copy()
+                        .withStyle(st -> st.withColor(draft().glow())), BuildKeys.MAGIC.getTranslatedKeyMessage());
+            } else if (!onKey) {
                 passive.add(CreatorUi.name(e));
             }
         }
+        int ly = gridY + 2 * (cellH + GAP) + 26;
         if (!passive.isEmpty()) {
             MutableComponent line = Component.translatable("screen.enhanced.hero_creator.keys.no_key").withStyle(ChatFormatting.GRAY).append(" ");
             for (int i = 0; i < passive.size(); i++) {
                 line.append(i == 0 ? Component.empty() : Component.literal(", ")).append(passive.get(i).copy().withStyle(s -> s.withColor(draft().glow())));
             }
-            int ly = gridY + 2 * (cellH + GAP) + 26;
             for (var l : font().split(line, w)) {
                 if (ly > y + h - 9) {
                     break;
@@ -288,6 +293,10 @@ public final class KeysTab extends EditorTab {
                 g.drawString(font(), l, x, ly, 0xFFFFFF, true);
                 ly += 10;
             }
+        }
+        if (ownKey != null && ly <= y + h - 9) {
+            // (Build Magic: its own key, no box)
+            g.drawString(font(), Component.empty().append(ownKey).withStyle(ChatFormatting.GRAY).getVisualOrderText(), x, ly, 0xFFFFFF, true);
         }
     }
 }
