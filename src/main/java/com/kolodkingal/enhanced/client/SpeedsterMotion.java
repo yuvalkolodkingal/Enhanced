@@ -86,7 +86,7 @@ public final class SpeedsterMotion {
             owner = player;
         }
         PowerData data = Powers.get(player);
-        if (!SpeedSurfaces.isSpeedster(data.power())) {
+        if (!SpeedSurfaces.isSpeedster(data)) {
             if (RUNNER.active()) {
                 RUNNER.reset();
             }
@@ -142,7 +142,7 @@ public final class SpeedsterMotion {
 
     /** Tells the server what he runs on when that changes, and again every few ticks while he runs on it. */
     private static void tellTheServer(LocalPlayer player) {
-        if (!SpeedSurfaces.isSpeedster(Powers.get(player).power()) || player.connection == null) {
+        if (!SpeedSurfaces.isSpeedster(Powers.get(player)) || player.connection == null) {
             toldKind = -1;
             return;
         }

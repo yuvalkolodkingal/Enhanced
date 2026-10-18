@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossHooks;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.SlowedProjectilePayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -83,9 +84,17 @@ public final class SlowMotion {
         return centers;
     }
 
-    /** Whether this hero's slow time is running: Quicksilver Time, or (3.3) Tommy's slow time. */
+    /**
+     * Whether this hero's slow time is running: Quicksilver Time, or (3.3) Tommy's slow time; 3.4: or a custom hero's with
+     * one of the two.
+     */
     public static boolean slowsTime(PowerData data) {
-        return (data.power() == Power.QUICKSILVER || data.power() == Power.TOMMY) && data.slowMo();
+        return slowTimeOf(data) != Power.NONE && data.slowMo();
+    }
+
+    /** Whose slow time this player has: Quicksilver's, Tommy's (3.4: a custom hero's with it too), or {@link Power#NONE}. */
+    public static Power slowTimeOf(PowerData data) {
+        return data.has(HeroAbility.QUICKSILVER_TIME) ? Power.QUICKSILVER : data.has(HeroAbility.TOMMY_TIME) ? Power.TOMMY : Power.NONE;
     }
 
     /**
@@ -101,7 +110,7 @@ public final class SlowMotion {
             double d = player.position().distanceToSqr(pos);
             if (slowsTime(data) && player.isAlive() && d < r2 && d < best) {
                 best = d;
-                owner = data.power();
+                owner = slowTimeOf(data);
             }
         }
         return owner;

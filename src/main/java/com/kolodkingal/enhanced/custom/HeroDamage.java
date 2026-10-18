@@ -48,7 +48,9 @@ public final class HeroDamage {
                 HeroAbility.PHOENIX_TELEKINESIS);
         first(ModDamageTypes.MIND_STONE, HeroAbility.VISION_MIND_BEAM);
         first(ModDamageTypes.MIND_STONE_BEAM, HeroAbility.VISION_MIND_BEAM);
-        first(ModDamageTypes.SPEED_BLITZ, HeroAbility.QUICKSILVER_BLITZ, HeroAbility.TOMMY_VIBRATE);
+        // (L2: every speed strike deals it, the blitzes, the dashes, the barrage, the Whirlwind and the Sonic Boom: the strongest.)
+        TYPES.put(ModDamageTypes.SPEED_BLITZ, new Rule(List.of(HeroAbility.QUICKSILVER_BLITZ, HeroAbility.QUICKSILVER_SPEED,
+                HeroAbility.QUICKSILVER_BARRAGE, HeroAbility.TOMMY_SPEED, HeroAbility.TOMMY_WHIRLWIND, HeroAbility.TOMMY_VIBRATE), true));
         first(ModDamageTypes.MOLECULAR_ACCELERATION, HeroAbility.TOMMY_ACCELERATE);
         first(ModDamageTypes.MJOLNIR, HeroAbility.THOR_HAMMER);
         first(ModDamageTypes.STORMBREAKER, HeroAbility.THOR_HAMMER);

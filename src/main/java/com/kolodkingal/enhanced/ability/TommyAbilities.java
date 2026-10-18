@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpeedConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -79,22 +80,22 @@ public final class TommyAbilities {
 
     // ---- input ----
 
-    /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
-     */
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    /** His own key: the Sneak variant is Sneak held. */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * Key {@code ability} (his home key of the ability) went down or up; {@code alt}: its Sneak variant (3.4: said
+     * explicitly, as a custom hero's key router calls it for the binding that went down).
+     */
+    public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (!down || player.isSpectator()) {
             return;
         }
-        boolean sneaking = player.isShiftKeyDown();
         switch (ability) {
             case 1 -> {
-                if (sneaking) {
+                if (alt) {
                     boolean off = !data.toggle(Toggle.TOMMY_WALL_RUN_OFF);
                     data.setToggle(Toggle.TOMMY_WALL_RUN_OFF, off);
                     player.displayClientMessage(Component.translatable(off
@@ -104,7 +105,7 @@ public final class TommyAbilities {
                 }
             }
             case 2 -> {
-                if (sneaking) {
+                if (alt) {
                     dash(player, data);
                 } else {
                     data.setToggle(Toggle.SUPER_SPEED, !data.toggle(Toggle.SUPER_SPEED));
@@ -113,14 +114,14 @@ public final class TommyAbilities {
                 }
             }
             case 3 -> {
-                if (sneaking) {
+                if (alt) {
                     sonicBoom(player, data);
                 } else {
                     whirlwind(player, data);
                 }
             }
             case 4 -> {
-                if (sneaking) {
+                if (alt) {
                     disarmBlitz(player, data);
                 } else {
                     vibrate(player, data);
@@ -155,46 +156,56 @@ public final class TommyAbilities {
     /** Sneak + G: the Dash Strike, in his teal and green (the cooldown of G). */
     private static void dash(ServerPlayer player, PowerData data) {
         long now = player.serverLevel().getGameTime();
-        if (!data.isReady(2, now)) {
+        if (!data.isReady(HeroAbility.TOMMY_SPEED, now)) {
             return;
         }
         if (MjolnirPin.isPinned(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
             return;
         }
-        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(Power.TOMMY)).moved()) {
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.TOMMY)).moved()) {
             player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
             return;
         }
-        data.startCooldown(2, now, SpeedStrikes.value(SpeedConfig.DASH_COOLDOWN, 100));
+        data.startCooldown(HeroAbility.TOMMY_SPEED, now, SpeedStrikes.value(SpeedConfig.DASH_COOLDOWN, 100));
     }
 
     /** Sneak + V: the Sonic Boom (on the Whirlwind's cooldown: both are his storms). */
     private static void sonicBoom(ServerPlayer player, PowerData data) {
         long now = player.serverLevel().getGameTime();
-        if (!data.isReady(3, now) || WHIRLWINDS.containsKey(player.getUUID())) {
+        if (!data.isReady(HeroAbility.TOMMY_WHIRLWIND, now) || WHIRLWINDS.containsKey(player.getUUID())) {
             return;
         }
-        SpeedStrikes.sonicBoom(player, data, SpeedStrikes.Style.of(Power.TOMMY), SpeedStrikes.value(SpeedConfig.BOOM_RADIUS, 6.0),
+        SpeedStrikes.sonicBoom(player, data, SpeedStrikes.Style.of(player, Power.TOMMY), SpeedStrikes.value(SpeedConfig.BOOM_RADIUS, 6.0),
                 (float) SpeedStrikes.value(SpeedConfig.BOOM_DAMAGE, 4.0));
-        data.startCooldown(3, now, SpeedStrikes.value(SpeedConfig.BOOM_COOLDOWN, 160));
+        data.startCooldown(HeroAbility.TOMMY_WHIRLWIND, now, SpeedStrikes.value(SpeedConfig.BOOM_COOLDOWN, 160));
     }
 
     // ---- Ability 1: Super Speed ----
 
+    /**
+     * His upkeep, every tick; 3.4: also a custom hero's with any of his abilities, each part only for the ability it is
+     * (Super Speed's run, the slow time, the Whirlwind).
+     */
     public static void tick(ServerPlayer player, PowerData data) {
         boolean fed = fed(player);
-        boolean canRun = data.toggle(Toggle.SUPER_SPEED) && player.isSprinting() && !player.isPassenger()
-                && !player.getAbilities().flying && fed;
+        boolean canRun = false;
         boolean was = data.is(Live.SPEEDING);
-        data.set(Live.SPEEDING, canRun);
-        if (data.toggle(Toggle.TOMMY_TIME) && !fed) {
-            // Starving: his slow time runs out of strength and stops by itself.
-            data.setToggle(Toggle.TOMMY_TIME, false);
-            player.displayClientMessage(Component.translatable("message.enhanced.tommy_time.starving"), true);
+        if (data.has(HeroAbility.TOMMY_SPEED)) {
+            canRun = data.toggle(Toggle.SUPER_SPEED) && player.isSprinting() && !player.isPassenger()
+                    && !player.getAbilities().flying && fed;
+            data.set(Live.SPEEDING, canRun);
         }
-        boolean slowing = data.toggle(Toggle.TOMMY_TIME) && !player.isSpectator();
-        data.setSlowMo(slowing);
+        boolean slowing = false;
+        if (data.has(HeroAbility.TOMMY_TIME)) {
+            if (data.toggle(Toggle.TOMMY_TIME) && !fed) {
+                // Starving: his slow time runs out of strength and stops by itself.
+                data.setToggle(Toggle.TOMMY_TIME, false);
+                player.displayClientMessage(Component.translatable("message.enhanced.tommy_time.starving"), true);
+            }
+            slowing = data.toggle(Toggle.TOMMY_TIME) && !player.isSpectator();
+            data.setSlowMo(slowing);
+        }
         if (canRun) {
             player.causeFoodExhaustion(EnhancedConfig.TOMMY_EXHAUSTION.get().floatValue());
             player.resetFallDistance();
@@ -205,15 +216,18 @@ public final class TommyAbilities {
         } else if (slowing) {
             player.causeFoodExhaustion((float) SpeedStrikes.value(SpeedConfig.TOMMY_TIME_EXHAUSTION, 0.01));
         }
-        SpeedSurfaces.tick(player, data);
-        SpeedStrikes.tick(player, data);
+        if (!data.acts(Power.QUICKSILVER)) {
+            // (3.4: a custom hero with abilities of both speedsters has this upkeep once, from Quicksilver's tick.)
+            SpeedSurfaces.tick(player, data);
+            SpeedStrikes.tick(player, data);
+        }
         applySpeed(player, data);
         whirlwindTick(player, data);
     }
 
     /** Super speed and step-up while Tommy runs; also called when the power changes. */
     public static void applySpeed(ServerPlayer player, PowerData data) {
-        boolean running = data.power() == Power.TOMMY && data.is(Live.SPEEDING);
+        boolean running = data.has(HeroAbility.TOMMY_SPEED) && data.is(Live.SPEEDING);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SPEED_ID, EnhancedConfig.TOMMY_SPEED_BONUS.get(), running,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         PowerTicker.setModifier(player, Attributes.STEP_HEIGHT, STEP_ID, 0.65, running);
@@ -221,7 +235,7 @@ public final class TommyAbilities {
 
     public static boolean isRunning(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.TOMMY && data.is(Live.SPEEDING);
+        return data.has(HeroAbility.TOMMY_SPEED) && data.is(Live.SPEEDING);
     }
 
     // ---- Ability 4 (Sneak): Disarm Blitz ----
@@ -233,7 +247,7 @@ public final class TommyAbilities {
     private static void disarmBlitz(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.TOMMY_VIBRATE, now)) {
             return;
         }
         // A conjured body (a Loki illusion) is passed by: what it holds is a copy of Loki's, and snatching it would make one.
@@ -246,7 +260,7 @@ public final class TommyAbilities {
             return;
         }
         targets.sort((a, b) -> Double.compare(a.distanceToSqr(player), b.distanceToSqr(player)));
-        data.startCooldown(4, now, BLITZ_COOLDOWN);
+        data.startCooldown(HeroAbility.TOMMY_VIBRATE, now, BLITZ_COOLDOWN);
         Vec3 from = player.position();
         int taken = 0;
         for (LivingEntity target : targets.subList(0, Math.min(BLITZ_MAX_TARGETS, targets.size()))) {
@@ -267,11 +281,11 @@ public final class TommyAbilities {
                 }
             }
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1), player);
-            ring(level, target.position(), target.getBbWidth() + 0.6);
-            trail(level, from, target.position());
+            ring(level, player, target.position(), target.getBbWidth() + 0.6);
+            trail(level, player, from, target.position());
             from = target.position();
         }
-        trail(level, from, player.position());
+        trail(level, player, from, player.position());
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_DASH.get(), SoundSource.PLAYERS, 1.0F, 1.3F);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1.0F, 1.2F);
         player.displayClientMessage(Component.translatable("message.enhanced.disarm.done", taken), true);
@@ -300,10 +314,10 @@ public final class TommyAbilities {
     private static void whirlwind(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(3, now) || WHIRLWINDS.containsKey(player.getUUID())) {
+        if (!data.isReady(HeroAbility.TOMMY_WHIRLWIND, now) || WHIRLWINDS.containsKey(player.getUUID())) {
             return;
         }
-        data.startCooldown(3, now, WHIRLWIND_COOLDOWN);
+        data.startCooldown(HeroAbility.TOMMY_WHIRLWIND, now, WHIRLWIND_COOLDOWN);
         WHIRLWINDS.put(player.getUUID(), WHIRLWIND_TICKS);
         data.set(Live.WHIRLWIND, true);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_WHOOSH.get(), SoundSource.PLAYERS, 1.2F, 0.8F);
@@ -370,7 +384,7 @@ public final class TommyAbilities {
     private static void vibrate(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(4, now)) {
+        if (!data.isReady(HeroAbility.TOMMY_VIBRATE, now)) {
             return;
         }
         SandCocoonEntity.freeFrom(player); // his molecules slip out of a cocoon of Apocalypse's sand
@@ -394,11 +408,11 @@ public final class TommyAbilities {
                 if (!HexManager.onTeleport(level, player, target)) {
                     return;
                 }
-                data.startCooldown(4, now, VIBRATE_COOLDOWN);
+                data.startCooldown(HeroAbility.TOMMY_VIBRATE, now, VIBRATE_COOLDOWN);
                 Vec3 start = player.position();
                 player.teleportTo(level, target.x, target.y, target.z, player.getYRot(), player.getXRot());
                 player.resetFallDistance();
-                trail(level, start, target);
+                trail(level, player, start, target);
                 level.playSound(null, start.x, start.y, start.z, ModSounds.VIBRATE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 level.playSound(null, target.x, target.y, target.z, ModSounds.VIBRATE.get(), SoundSource.PLAYERS, 0.7F, 1.2F);
                 return;
@@ -427,19 +441,19 @@ public final class TommyAbilities {
     private static void accelerate(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(5, now)) {
+        if (!data.isReady(HeroAbility.TOMMY_ACCELERATE, now)) {
             return;
         }
         HitResult hit = Raycasts.any(player, ACCELERATE_RANGE,
                 e -> e instanceof LivingEntity living && living.isAlive() && e != player && !e.isSpectator(), 1.0F);
         if (hit instanceof EntityHitResult entityHit) {
             LivingEntity target = (LivingEntity) entityHit.getEntity();
-            data.startCooldown(5, now, ACCELERATE_COOLDOWN);
+            data.startCooldown(HeroAbility.TOMMY_ACCELERATE, now, ACCELERATE_COOLDOWN);
             if (target.hurt(ModDamageTypes.source(level, ModDamageTypes.MOLECULAR_ACCELERATION, player, player), ACCELERATE_DAMAGE)) {
                 Vec3 push = target.position().subtract(player.position());
                 target.knockback(0.8, -push.x, -push.z); // (a wall that stopped the hit stops the push too)
             }
-            burst(level, entityHit.getLocation());
+            burst(level, player, entityHit.getLocation());
             return;
         }
         if (!(hit instanceof BlockHitResult blockHit) || blockHit.getType() != HitResult.Type.BLOCK) {
@@ -469,19 +483,23 @@ public final class TommyAbilities {
                 || CommonHooks.fireBlockBreak(level, mode, player, pos, state).isCanceled()) {
             return;
         }
-        data.startCooldown(5, now, ACCELERATE_COOLDOWN);
+        data.startCooldown(HeroAbility.TOMMY_ACCELERATE, now, ACCELERATE_COOLDOWN);
         level.destroyBlock(pos, !player.isCreative(), player);
-        burst(level, Vec3.atCenterOf(pos));
+        burst(level, player, Vec3.atCenterOf(pos));
     }
 
     // ---- effects ----
 
-    /** A teal-green ghost trail between two points, low along the ground like in the Battle of Westview. */
-    private static void trail(ServerLevel level, Vec3 from, Vec3 to) {
+    /**
+     * A teal-green ghost trail between two points, low along the ground like in the Battle of Westview (3.4: a custom
+     * hero's in his own colours, here and in the ring and the burst).
+     */
+    private static void trail(ServerLevel level, ServerPlayer player, Vec3 from, Vec3 to) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(80, delta.length() * 3);
-        EnergyParticleOptions deep = new EnergyParticleOptions(Power.TOMMY.color, 1.2F);
-        EnergyParticleOptions light = new EnergyParticleOptions(Power.TOMMY.glow, 0.9F);
+        SpeedStrikes.Style style = SpeedStrikes.Style.of(player, Power.TOMMY);
+        EnergyParticleOptions deep = new EnergyParticleOptions(style.color(), 1.2F);
+        EnergyParticleOptions light = new EnergyParticleOptions(style.glow(), 0.9F);
         for (int i = 0; i <= steps; i++) {
             Vec3 p = from.add(delta.scale(i / (double) Math.max(1, steps)));
             level.sendParticles(i % 2 == 0 ? deep : light, p.x, p.y + 0.6, p.z, 1, 0.1, 0.4, 0.1, 0.0);
@@ -489,8 +507,8 @@ public final class TommyAbilities {
     }
 
     /** A ring of trail around a disarmed creature: Tommy ran around it. */
-    private static void ring(ServerLevel level, Vec3 center, double radius) {
-        EnergyParticleOptions light = new EnergyParticleOptions(Power.TOMMY.glow, 1.0F);
+    private static void ring(ServerLevel level, ServerPlayer player, Vec3 center, double radius) {
+        EnergyParticleOptions light = new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.TOMMY).glow(), 1.0F);
         for (int i = 0; i < 20; i++) {
             double a = i * Mth.TWO_PI / 20;
             level.sendParticles(light, center.x + Math.cos(a) * radius, center.y + 0.4, center.z + Math.sin(a) * radius,
@@ -498,8 +516,8 @@ public final class TommyAbilities {
         }
     }
 
-    private static void burst(ServerLevel level, Vec3 at) {
-        level.sendParticles(new EnergyParticleOptions(Power.TOMMY.glow, 1.4F), at.x, at.y, at.z, 30, 0.3, 0.3, 0.3, 0.12);
+    private static void burst(ServerLevel level, ServerPlayer player, Vec3 at) {
+        level.sendParticles(new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.TOMMY).glow(), 1.4F), at.x, at.y, at.z, 30, 0.3, 0.3, 0.3, 0.12);
         level.sendParticles(new EnergyParticleOptions(0xE6FFF5, 1.0F), at.x, at.y, at.z, 12, 0.15, 0.15, 0.15, 0.05);
         level.playSound(null, at.x, at.y, at.z, ModSounds.MOLECULAR_BURST.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
