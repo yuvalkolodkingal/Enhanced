@@ -1,8 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -41,7 +41,7 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.PHOENIX || !data.is(Live.PHOENIX_BLAZE) || player.isInvisible()) {
+        if (!data.has(HeroAbility.PHOENIX_BURST) || !data.is(Live.PHOENIX_BLAZE) || player.isInvisible()) {
             return;
         }
         float t = player.tickCount + partialTicks;

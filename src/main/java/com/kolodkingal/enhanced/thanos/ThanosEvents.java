@@ -60,7 +60,7 @@ public final class ThanosEvents {
     /** Thanos the hero was hurt: his healing factor waits a while, and a hard enough blow tears a chain. */
     @SubscribeEvent
     public static void onHeroHurt(LivingDamageEvent.Post event) {
-        if (event.getEntity() instanceof ServerPlayer player && Powers.is(player, Power.THANOS)) {
+        if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).acts(Power.THANOS)) {
             ThanosAbilities.hurt(player, event.getNewDamage());
         }
     }

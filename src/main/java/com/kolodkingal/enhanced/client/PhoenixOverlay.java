@@ -2,8 +2,8 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.client.render.PhoenixFx;
 import com.kolodkingal.enhanced.client.render.PhoenixMath;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.client.DeltaTracker;
@@ -36,7 +36,7 @@ public final class PhoenixOverlay implements LayeredDraw.Layer {
             graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), argb(PhoenixMath.FIRE_CORE, 0.15F * flash));
         }
         PowerData data = Powers.get(player);
-        if (data.power() == Power.PHOENIX && data.is(Live.PHOENIX_CHARGING) && !mc.options.hideGui) {
+        if (data.has(HeroAbility.PHOENIX_BURST) && data.is(Live.PHOENIX_CHARGING) && !mc.options.hideGui) {
             float charge = PhoenixFx.chargeOf(player, time);
             if (charge >= PhoenixMath.BRIGHT_CHARGE) {
                 float pulse = EnhancedClientConfig.reducedMotion() ? 0.8F : 0.75F + 0.25F * Mth.sin(time * 0.6F);

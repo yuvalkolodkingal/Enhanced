@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.client.render.PhoenixMath;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.MindReadPayload;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
@@ -92,7 +93,7 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
             return false;
         }
         PowerData data = Powers.get(player);
-        return data.power() == Power.PHOENIX && data.toggle(Toggle.MIND_READING) && PhoenixMath.panelFresh(mc.level.getGameTime(), receivedAt);
+        return data.has(HeroAbility.PHOENIX_MIND) && data.toggle(Toggle.MIND_READING) && PhoenixMath.panelFresh(mc.level.getGameTime(), receivedAt);
     }
 
     @Override

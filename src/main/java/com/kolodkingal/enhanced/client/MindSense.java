@@ -3,9 +3,9 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.client.render.PhoenixMath;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
@@ -62,7 +62,7 @@ public final class MindSense {
             return false;
         }
         PowerData data = Powers.get(me);
-        if (data.power() != Power.PHOENIX || !data.is(Live.MIND_SENSING)) {
+        if (!data.has(HeroAbility.PHOENIX_MIND) || !data.is(Live.MIND_SENSING)) {
             return false;
         }
         if (!PhoenixAbilities.hasMind(entity) || PhoenixAbilities.isShielded(entity)
@@ -91,7 +91,7 @@ public final class MindSense {
         Set<Integer> seen = new HashSet<>();
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            if (data.power() != Power.PHOENIX) {
+            if (!data.has(HeroAbility.PHOENIX_MIND)) {
                 continue;
             }
             int id = player.getId();

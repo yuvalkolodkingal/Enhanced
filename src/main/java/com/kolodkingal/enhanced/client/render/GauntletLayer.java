@@ -64,9 +64,12 @@ public class GauntletLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         return LayerDefinition.create(mesh, ThanosModel.TEXTURE, ThanosModel.TEXTURE);
     }
 
-    /** Whether this player wears the Gauntlet right now: a Thanos who is not invisible or hidden. */
+    /**
+     * Whether this player wears the Gauntlet right now: a Thanos (3.4: or a custom hero with any of his stones) who is
+     * not invisible or hidden.
+     */
     static boolean wears(AbstractClientPlayer player, PowerData data) {
-        return data.power() == Power.THANOS && !player.isInvisible() && !data.is(Live.HIDDEN);
+        return data.acts(Power.THANOS) && !player.isInvisible() && !data.is(Live.HIDDEN);
     }
 
     /** The arm of the off hand. */

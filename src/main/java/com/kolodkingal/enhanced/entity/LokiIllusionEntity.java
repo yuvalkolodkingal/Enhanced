@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.entity;
 
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
@@ -172,7 +173,7 @@ public class LokiIllusionEntity extends PathfinderMob {
         if (tickCount % 10 == 0) {
             // Without its caster (gone, dead, or no longer Loki, or a custom hero who duplicates) the spell breaks.
             Player owner = owner();
-            if (owner == null || !owner.isAlive() || !Powers.is(owner, Power.LOKI)
+            if (owner == null || !owner.isAlive() || !Powers.get(owner).has(HeroAbility.LOKI_DUPLICATES)
                     && CustomHeroes.pick(owner, PowerModule.DUPLICATION) == null) {
                 dissolve(null);
                 return;

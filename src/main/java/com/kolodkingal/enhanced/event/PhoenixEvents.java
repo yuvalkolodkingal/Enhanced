@@ -5,6 +5,8 @@ import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.ability.PhoenixBurst;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -73,7 +75,8 @@ public final class PhoenixEvents {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onSlam(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
-        if (source.is(ModDamageTypes.TELEKINETIC_SLAM) && source.getEntity() instanceof ServerPlayer phoenix && PhoenixPower.isPhoenix(phoenix)) {
+        if (source.is(ModDamageTypes.TELEKINETIC_SLAM) && source.getEntity() instanceof ServerPlayer phoenix
+                && Powers.get(phoenix).has(HeroAbility.PHOENIX_TELEKINESIS)) {
             PhoenixPower.touched(phoenix, event.getEntity(), PhoenixPower.Kind.SLAM, event.getAmount());
         }
     }

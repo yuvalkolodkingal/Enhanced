@@ -46,7 +46,7 @@ public final class SuitSkins {
     public static PlayerSkin skinFor(AbstractClientPlayer player, PlayerSkin own) {
         PlayerSkin suit = suitFor(player);
         PlayerSkin skin = suit != null ? suit : own;
-        if (Powers.power(player) == Power.LOKI) {
+        if (Shapeshifts.changesSkin(player)) {
             PlayerSkin copied = Shapeshifts.copiedSkin(player);
             if (copied != null) {
                 return copied;

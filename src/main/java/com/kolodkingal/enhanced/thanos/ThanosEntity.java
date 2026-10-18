@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -1884,7 +1885,8 @@ public class ThanosEntity extends Monster implements BossHooks {
         }
         for (ServerPlayer player : level.players()) {
             if (player.isAlive() && !player.isSpectator() && distanceToSqr(player) <= radius * radius
-                    && (player.isInvisible() || LokiAbilities.isHidden(player) || Powers.is(player, Power.LOKI) && !Powers.get(player).form().isEmpty())) {
+                    && (player.isInvisible() || LokiAbilities.isHidden(player)
+                    || Powers.get(player).has(HeroAbility.LOKI_SHAPESHIFT) && !Powers.get(player).form().isEmpty())) {
                 return true;
             }
         }
