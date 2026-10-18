@@ -296,8 +296,6 @@ public final class AsgardRules {
 
     /** Heimdall catches a player who fell into the void: the Bifrost sets him down in the Observatory, unhurt. */
     public static void catchFall(ServerPlayer player) {
-        // TODO(integration): with lane L2's Bifrost.Destination.OBSERVATORY merged, this body becomes
-        // Bifrost.open(player, Bifrost.Destination.OBSERVATORY, Bifrost.Source.RESCUE) (same landing, same effects).
         ServerLevel level = player.serverLevel();
         Vec3 at = CityPlan.ARRIVAL;
         player.stopRiding();
