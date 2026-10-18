@@ -283,6 +283,17 @@ public final class CityPlan {
         return true;
     }
 
+    /** Whether every corner of the box stands on a pad at {@code top}. */
+    private static boolean onPad(BoundingBox box, int top) {
+        for (int[] c : new int[][]{{box.minX(), box.minZ()}, {box.maxX(), box.minZ()}, {box.minX(), box.maxZ()}, {box.maxX(), box.maxZ()}}) {
+            Pad pad = padAt(c[0], c[1]);
+            if (pad == null || pad.top() != top) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /** The streets of the houses' district (east-west), and its one north-south street. */
     public static final int[] STREETS_Z = {60, 100, 140, 180};
     public static final int STREET_X = -84;
@@ -369,7 +380,7 @@ public final class CityPlan {
                     int depth = TEMPLATE_SIZES.get(template).getZ();
                     int cz = north ? street - STREET_HALF_WIDTH - 1 - depth / 2 : street + STREET_HALF_WIDTH + 1 + depth / 2;
                     Piece house = centredPiece(template, cx, low ? 67 : 70, cz, north ? Direction.SOUTH : Direction.NORTH);
-                    if (free(house.box())) {
+                    if (free(house.box()) && onPad(house.box(), low ? 67 : 70)) {
                         PIECES.add(house);
                         HOUSES.add(house);
                     }
@@ -494,15 +505,15 @@ public final class CityPlan {
         homes.add(new Home(Role.FANDRAL, 0, TRAINING_RING.offset(4, 0, 0), 10));
         homes.add(new Home(Role.HOGUN, 0, TRAINING_RING.offset(0, 0, 4), 10));
         BlockPos[] guards = {
-                new BlockPos(-8, 73, 192), new BlockPos(8, 73, 192),            // the gate of the bridge head
+                new BlockPos(-8, 73, 192), new BlockPos(8, 73, 192),            // #0-1 the gate of the bridge head
+                new BlockPos(-6, 82, -70), new BlockPos(6, 82, -70),            // #2-3 inside the throne room's doors
                 new BlockPos(0, 73, 300), new BlockPos(0, 73, 390),             // on the bridge
                 new BlockPos(-3, 74, 430),                                      // the Observatory's door
                 new BlockPos(-8, 80, -58), new BlockPos(8, 80, -58),            // the courtyard
-                new BlockPos(-6, 82, -70), new BlockPos(6, 82, -70),            // inside the throne room's doors
                 new BlockPos(150, 68, 158), new BlockPos(142, 68, 172),         // the barracks
                 new BlockPos(0, 78, 30)};                                       // the plaza
         for (int i = 0; i < EINHERJAR_COUNT; i++) {
-            homes.add(new Home(Role.EINHERJAR, i, guards[i], i == 4 ? 4 : 12));
+            homes.add(new Home(Role.EINHERJAR, i, guards[i], i == 6 ? 4 : 12));
         }
         for (int i = 0; i < CITIZEN_COUNT; i++) {
             // in front of a house's door, every second house of the district

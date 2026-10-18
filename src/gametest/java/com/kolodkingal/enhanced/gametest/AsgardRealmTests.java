@@ -162,7 +162,8 @@ public final class AsgardRealmTests {
             check(at(asgard, new BlockPos(0, CityPlan.BRIDGE_Y, z)).is(ModBlocks.BIFROST_BRIDGE.get()), "the bridge at z " + z);
         }
         check(at(asgard, new BlockPos(0, 50, -382)).is(ModBlocks.COSMIC_FALLS.get()), "the falls at r 381");
-        check(at(asgard, CityPlan.THRONE_ROOM_CENTER).isAir() && !at(asgard, CityPlan.THRONE_ROOM_CENTER.below()).isAir(),
+        check(at(asgard, CityPlan.THRONE_ROOM_CENTER).getCollisionShape(asgard, CityPlan.THRONE_ROOM_CENTER).max(Direction.Axis.Y) < 0.1
+                && at(asgard, CityPlan.THRONE_ROOM_CENTER.above()).isAir() && !at(asgard, CityPlan.THRONE_ROOM_CENTER.below()).isAir(),
                 "the throne room's floor at 82");
         BifrostMechanismBlockEntity mechanism = (BifrostMechanismBlockEntity) asgard.getBlockEntity(CityPlan.MECHANISM);
         check(AsgardRules.spinNear(asgard, CityPlan.ARRIVAL) && mechanism.spinStart() == asgard.getGameTime(), "the Bifrost spins the mechanism");
