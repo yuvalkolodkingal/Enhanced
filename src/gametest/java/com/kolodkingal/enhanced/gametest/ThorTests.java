@@ -481,11 +481,15 @@ public final class ThorTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 12.5, 10.5);
         ServerPlayer tommy = f.player(9.5, FLOOR, 10.5, Power.TOMMY);
-        press(tommy, 2);
+        tommy.setShiftKeyDown(true);
+        press(tommy, 4); // (3.3: Sneak + B)
+        tommy.setShiftKeyDown(false);
         check(holdsMjolnir(thor), "Tommy's Disarm Blitz leaves Mjolnir alone");
         ServerPlayer peter = f.player(9.5, FLOOR, 8.5, Power.QUICKSILVER);
         lookAt(peter, thor);
-        press(peter, 3);
+        peter.setShiftKeyDown(true);
+        press(peter, 3); // (3.3: Sneak + V)
+        peter.setShiftKeyDown(false);
         check(holdsMjolnir(thor), "and so does Quicksilver's Pickpocket");
         check(TommyAbilities.BLITZ_RADIUS > 3, "sanity");
         helper.succeed();
@@ -1395,7 +1399,7 @@ public final class ThorTests {
         lookAt(peter, victim);
         // Free, he blitzes (a control for the rest).
         Vec3 start = peter.position();
-        press(peter, 2);
+        press(peter, 3);
         check(drift(peter, start) > 1.0 && victim.getHealth() < victim.getMaxHealth(), "free, Quicksilver blitzes the zombie");
         check(rightClick(thor, peter, true) && MjolnirPin.isPinned(peter), "pinned");
         PowerTicker.tick(peter);
@@ -1403,11 +1407,11 @@ public final class ThorTests {
         Vec3 pinnedAt = peter.position();
         victim.setPos(pinnedAt.x, pinnedAt.y, pinnedAt.z - 8.0);
         victim.setHealth(victim.getMaxHealth());
-        Powers.get(peter).startCooldown(2, 0L, 0);
+        Powers.get(peter).startCooldown(3, 0L, 0);
         lookAt(peter, victim);
-        press(peter, 2);
+        press(peter, 3);
         check(drift(peter, pinnedAt) < 0.01 && victim.getHealth() == victim.getMaxHealth(), "pinned, he does not blitz");
-        check(Powers.get(peter).isReady(2, helper.getLevel().getGameTime()), "and the blitz does not cool down for it");
+        check(Powers.get(peter).isReady(3, helper.getLevel().getGameTime()), "and the blitz does not cool down for it");
 
         // Someone with no power, pinned, touches the Tesseract: no escape, and no power.
         ServerPlayer nobody = f.player(14.5, FLOOR, 6.5);

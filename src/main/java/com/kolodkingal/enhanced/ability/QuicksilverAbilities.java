@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.config.SpeedConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -33,12 +34,15 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
 
 /**
- * Quicksilver (Peter Maximoff): the fastest man alive. He has two ways to be fast, and only one is on at a time:
+ * Quicksilver (Peter Maximoff): the fastest man alive. Since 3.3 his two powers are two abilities, each on its own key,
+ * each on or off by itself (alone or together):
  * <ul>
  *     <li><b>Quicksilver Time</b> (R): everything around him is slowed, whether he runs or not.</li>
- *     <li><b>Super Speed</b> (Sneak + R): only he is fast, the world runs at its normal pace.</li>
+ *     <li><b>Super Speed</b> (G): he runs at super speed while he sprints (and up walls and along ceilings, see
+ *     {@link SurfaceRun}).</li>
  * </ul>
- * In either mode he does everything faster (see {@link #actionSpeed()}), and he runs at super speed while he sprints.
+ * With either on he does everything faster (see {@link #actionSpeed()}). Sneak + R is the Walkman, Sneak + G the Dash
+ * Strike, V the Speed Blitz (Sneak: Pickpocket, on the same cooldown), B Wall &amp; Water Run and N the Pebble Barrage.
  */
 public final class QuicksilverAbilities {
     private static final ResourceLocation SPEED_ID = Enhanced.id("quicksilver_speed");
@@ -61,29 +65,44 @@ public final class QuicksilverAbilities {
         if (!down || player.isSpectator()) {
             return;
         }
+        boolean sneaking = player.isShiftKeyDown();
         switch (ability) {
             case 1 -> {
-                if (player.isShiftKeyDown()) {
-                    toggleSuperSpeed(player, data);
+                if (sneaking) {
+                    toggleWalkman(player, data);
                 } else {
                     toggleTime(player, data);
                 }
             }
-            case 2 -> blitz(player, data);
-            case 3 -> pickpocket(player, data);
+            case 2 -> {
+                if (sneaking) {
+                    dash(player, data);
+                } else {
+                    toggleSuperSpeed(player, data);
+                }
+            }
+            case 3 -> {
+                if (sneaking) {
+                    pickpocket(player, data);
+                } else {
+                    blitz(player, data);
+                }
+            }
             case 4 -> {
                 data.setWallRun(!data.wallRun());
                 player.displayClientMessage(Component.translatable(data.wallRun()
                         ? "message.enhanced.wall_run.on" : "message.enhanced.wall_run.off"), true);
             }
-            case 5 -> {
-                data.setWalkman(!data.walkman());
-                player.displayClientMessage(Component.translatable(data.walkman()
-                        ? "message.enhanced.walkman.on" : "message.enhanced.walkman.off"), true);
-            }
+            case 5 -> barrage(player, data);
             default -> {
             }
         }
+    }
+
+    private static void toggleWalkman(ServerPlayer player, PowerData data) {
+        data.setWalkman(!data.walkman());
+        player.displayClientMessage(Component.translatable(data.walkman()
+                ? "message.enhanced.walkman.on" : "message.enhanced.walkman.off"), true);
     }
 
     // ---- the goggles (work for whoever wears them) ----
@@ -100,7 +119,7 @@ public final class QuicksilverAbilities {
 
     // ---- Ability 1: Quicksilver Time (R) and Super Speed (Sneak + R) ----
 
-    /** R: Quicksilver Time on or off. Turning it on turns Super Speed off. */
+    /** R: Quicksilver Time on or off (Super Speed is left as it is). */
     private static void toggleTime(ServerPlayer player, PowerData data) {
         boolean on = !data.quicksilverTime();
         if (on && !isFed(player)) {
@@ -108,21 +127,29 @@ public final class QuicksilverAbilities {
             return;
         }
         data.setQuicksilverTime(on);
-        data.setSuperSpeed(false);
         player.displayClientMessage(Component.translatable(on
                 ? "message.enhanced.quicksilver_time.on" : "message.enhanced.quicksilver_time.off"), true);
+        timeSound(player, on, 0.75F);
+    }
+
+    /** G: Super Speed on or off (Quicksilver Time is left as it is). */
+    private static void toggleSuperSpeed(ServerPlayer player, PowerData data) {
+        boolean on = !data.superSpeed();
+        data.setSuperSpeed(on);
+        player.displayClientMessage(Component.translatable(on
+                ? "message.enhanced.quicksilver_speed.on" : "message.enhanced.quicksilver_speed.off"), true);
         if (on) {
             whoosh(player);
         }
     }
 
-    /** Sneak + R: Super Speed on or off. Turning it on turns Quicksilver Time off. */
-    private static void toggleSuperSpeed(ServerPlayer player, PowerData data) {
-        boolean on = !data.superSpeed();
-        data.setSuperSpeed(on);
-        data.setQuicksilverTime(false);
-        player.displayClientMessage(Component.translatable(on
-                ? "message.enhanced.quicksilver_speed.on" : "message.enhanced.quicksilver_speed.off"), true);
+    /**
+     * The sound of slow time going on (a deep, slowing hum) or off (the world rushing back), for a speedster's slow
+     * time ({@code pitch}: Quicksilver's lower than Tommy's).
+     */
+    static void timeSound(ServerPlayer player, boolean on, float pitch) {
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), on ? SoundEvents.BEACON_ACTIVATE : SoundEvents.BEACON_DEACTIVATE,
+                SoundSource.PLAYERS, 0.9F, on ? pitch : pitch * 1.4F);
     }
 
     private static void whoosh(ServerPlayer player) {
@@ -146,20 +173,23 @@ public final class QuicksilverAbilities {
         boolean slowing = data.quicksilverTime() && !player.isSpectator();
         data.setSlowMo(slowing);
 
-        boolean running = (data.quicksilverTime() || data.superSpeed()) && player.isSprinting() && !player.isSpectator()
-                && !player.isPassenger() && fed;
+        // Running is Super Speed's alone (since 3.3): Quicksilver Time slows the world, and he walks in it.
+        boolean running = data.superSpeed() && player.isSprinting() && !player.isSpectator() && !player.isPassenger() && fed;
         boolean wasRunning = data.is(Live.SPEEDING);
         data.set(Live.SPEEDING, running);
         float exhaustion = EnhancedConfig.QUICKSILVER_EXHAUSTION.get().floatValue();
         if (running) {
+            // (Running in Quicksilver Time costs what it did in 3.2: the full rate, not the full rate and the idle.)
             player.causeFoodExhaustion(exhaustion);
             player.resetFallDistance();
-            if (!wasRunning && data.superSpeed()) {
+            if (!wasRunning) {
                 whoosh(player);
             }
         } else if (slowing) {
             player.causeFoodExhaustion(exhaustion * IDLE_EXHAUSTION);
         }
+        SpeedSurfaces.tick(player, data);
+        SpeedStrikes.tick(player, data);
         applySpeed(player, data);
     }
 
@@ -238,12 +268,12 @@ public final class QuicksilverAbilities {
         };
     }
 
-    // ---- Ability 2: Speed Blitz ----
+    // ---- Ability 3: Speed Blitz ----
 
     private static void blitz(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(2, now)) {
+        if (!data.isReady(3, now)) {
             return;
         }
         if (MjolnirPin.isPinned(player)) {
@@ -267,7 +297,7 @@ public final class QuicksilverAbilities {
         if (!HexManager.onTeleport(level, player, spot)) {
             return; // 3.3: the dash is a teleport: the Hex's wall judges it (and says why)
         }
-        data.startCooldown(2, now, BLITZ_COOLDOWN);
+        data.startCooldown(3, now, BLITZ_COOLDOWN);
 
         Vec3 toTarget = target.position().subtract(spot);
         float yaw = (float) (Math.atan2(-toTarget.x, toTarget.z) * (180 / Math.PI));
@@ -299,7 +329,37 @@ public final class QuicksilverAbilities {
         return null;
     }
 
-    // ---- Ability 3: Pickpocket ----
+    // ---- Ability 2 (Sneak): Dash Strike; Ability 5: Pebble Barrage ----
+
+    /** Sneak + G: the Dash Strike, in his silver and grey (the cooldown of G). */
+    private static void dash(ServerPlayer player, PowerData data) {
+        long now = player.serverLevel().getGameTime();
+        if (!data.isReady(2, now)) {
+            return;
+        }
+        if (MjolnirPin.isPinned(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
+            return;
+        }
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(Power.QUICKSILVER)).moved()) {
+            player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
+            return;
+        }
+        data.startCooldown(2, now, SpeedStrikes.value(SpeedConfig.DASH_COOLDOWN, 100));
+    }
+
+    /** N: the Pebble Barrage. */
+    private static void barrage(ServerPlayer player, PowerData data) {
+        long now = player.serverLevel().getGameTime();
+        if (!data.isReady(5, now)) {
+            return;
+        }
+        SpeedStrikes.barrage(player, SpeedStrikes.Style.of(Power.QUICKSILVER), SpeedStrikes.value(SpeedConfig.BARRAGE_PEBBLES, 8),
+                (float) SpeedStrikes.value(SpeedConfig.BARRAGE_DAMAGE, 1.5), SpeedStrikes.value(SpeedConfig.BARRAGE_RANGE, 24));
+        data.startCooldown(5, now, SpeedStrikes.value(SpeedConfig.BARRAGE_COOLDOWN, 120));
+    }
+
+    // ---- Ability 3 (Sneak): Pickpocket ----
 
     private static void pickpocket(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
@@ -352,6 +412,12 @@ public final class QuicksilverAbilities {
             Vec3 p = from.add(delta.scale(i / (double) Math.max(1, steps))).add(0, 1.0, 0);
             level.sendParticles(silver, p.x, p.y, p.z, 1, 0.05, 0.3, 0.05, 0.0);
         }
+    }
+
+    /** Ends what this hero left running (the power is being taken away): a run on a wall, a Sonic Boom's flag. */
+    public static void endAll(ServerPlayer player, PowerData data) {
+        SpeedSurfaces.end(player, data);
+        SpeedStrikes.end(player, data);
     }
 
     private QuicksilverAbilities() {

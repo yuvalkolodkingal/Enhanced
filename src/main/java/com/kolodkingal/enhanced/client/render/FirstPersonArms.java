@@ -316,6 +316,23 @@ public final class FirstPersonArms {
                 m.add(w, -0.16F, 0.16F, 0.34F, -30, 6, 0);
                 tremble(m, null, w, 0.015F, 2.2F, age, calm);
             }
+            // ===== speed (3.3) =====
+            case SPEED_DASH -> {
+                // The main fist driven forward with the shoulder, the off fist pulled back out of sight.
+                float u = ss(1.0F, 4.0F, t);
+                m.add(w, -0.06F, lerp(u, 0.0F, 0.10F), lerp(u, -0.10F, 0.36F), lerp(u, 20, -30), 0, 0);
+                o.add(w, 0.0F, -0.20F * u, -0.20F * u, 20, 0, 0);
+            }
+            case QS_BARRAGE -> {
+                // The hand flicks along the look three times, a blur.
+                float flick = Math.max(0.0F, Mth.sin(Mth.PI * Math.max(0.0F, t - 3.0F) / 2.0F));
+                m.add(w, -0.06F, 0.06F, 0.36F * flick, -20, 8, 0);
+            }
+            case TOMMY_BOOM, SPEED_TIME -> {
+                // Both hands pushed out (and, for the boom, thrown wide).
+                float u = ss(0.0F, 3.0F, t);
+                both(w, slot.id == GestureId.TOMMY_BOOM ? 0.10F * u : -0.08F * u, 0.18F * u, 0.30F * u, -30, 0, 0);
+            }
             case THOR_THROW -> {
                 // Over two ticks the hand swings back and forward: the throw replaces the punch.
                 float u = ss(0.0F, 2.0F, t);

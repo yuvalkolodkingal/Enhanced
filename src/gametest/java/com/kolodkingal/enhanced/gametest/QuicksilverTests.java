@@ -51,7 +51,7 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /**
- * Quicksilver. Tests that start Quicksilver Time get their own batch and a small slow-motion radius, because the
+ * Quicksilver (since 3.3: R is Quicksilver Time, G Super Speed). Tests that start Quicksilver Time get their own batch and a small slow-motion radius, because the
  * slow motion would otherwise reach into the neighbouring test arenas. (Super Speed slows nothing, so a test that
  * only uses Super Speed needs no small radius.)
  */
@@ -96,13 +96,9 @@ public final class QuicksilverTests {
         player.setShiftKeyDown(false);
     }
 
-    /** Turns Quicksilver Time (R) or Super Speed (Sneak + R) on or off. */
+    /** Turns Quicksilver Time (R) or Super Speed (G, since 3.3) on or off. */
     private static void toggle(ServerPlayer player, boolean time) {
-        if (time) {
-            press(player, 1);
-        } else {
-            pressSneaking(player, 1);
-        }
+        press(player, time ? 1 : 2);
     }
 
     /** A zombie that stands still with a long effect on it: the effect only runs down while the zombie really ticks. */
@@ -120,7 +116,7 @@ public final class QuicksilverTests {
     private static final int EFFECT_TICKS = 400;
 
     @GameTest(template = ARENA, batch = "quicksilver_speed")
-    public static void sprintingInQuicksilverTimeIsSuperSpeed(GameTestHelper helper) {
+    public static void sprintingWithSuperSpeedIsRunningAndTimeIsApart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
         ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -137,7 +133,13 @@ public final class QuicksilverTests {
         check(data.quicksilverTime(), "R turns Quicksilver Time on");
         run(peter, true);
         check(data.slowMo(), "Quicksilver Time slows the world");
-        check(data.is(Live.SPEEDING) && QuicksilverAbilities.isRunning(peter), "sprinting in Quicksilver Time is running");
+        // 3.3: slow time and running are two abilities: Quicksilver Time alone does not make him run.
+        check(!data.is(Live.SPEEDING), "sprinting in Quicksilver Time alone is only sprinting (3.3)");
+        assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking * 1.3, 1.0E-4, "just a sprint, in slowed time");
+        press(peter, 2);
+        check(data.superSpeed() && data.quicksilverTime(), "G turns Super Speed on, and Quicksilver Time stays on");
+        run(peter, true);
+        check(data.is(Live.SPEEDING) && QuicksilverAbilities.isRunning(peter), "sprinting with Super Speed is running");
         double bonus = EnhancedConfig.QUICKSILVER_SPEED_BONUS.get();
         // Sprinting itself multiplies speed by 1.3; running multiplies it again by (1 + bonus).
         assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking * 1.3 * (1 + bonus), 1.0E-4, "super speed");
@@ -154,11 +156,14 @@ public final class QuicksilverTests {
         check(data.slowMo() && data.quicksilverTime(), "but Quicksilver Time stays on");
         assertNear(peter.getAttributeValue(Attributes.MOVEMENT_SPEED), walking, 1.0E-4, "normal speed again");
 
-        // Ability 1 again turns it off, so he can sprint normally.
+        // Ability 1 again turns Quicksilver Time off: he still runs; G turns the running off.
         press(peter, 1);
         run(peter, true);
         check(!data.quicksilverTime() && !data.slowMo(), "Quicksilver Time can be switched off");
-        check(!data.is(Live.SPEEDING), "and then sprinting is just sprinting");
+        check(data.is(Live.SPEEDING), "and he still runs (Super Speed is apart)");
+        press(peter, 2);
+        run(peter, true);
+        check(!data.is(Live.SPEEDING), "with both off sprinting is just sprinting");
         helper.succeed();
     }
 
@@ -195,8 +200,8 @@ public final class QuicksilverTests {
         Zombie far = timedZombie(helper, 19.5);
         PowerData data = Powers.get(peter);
         double walking = peter.getAttributeValue(Attributes.MOVEMENT_SPEED);
-        pressSneaking(peter, 1);
-        check(data.superSpeed() && !data.quicksilverTime(), "Sneak + R turns Super Speed on");
+        press(peter, 2);
+        check(data.superSpeed() && !data.quicksilverTime(), "G turns Super Speed on (3.3)");
         float exhaustion = peter.getFoodData().getExhaustionLevel();
 
         f.everyTick(30, tick -> {
@@ -225,20 +230,23 @@ public final class QuicksilverTests {
     }
 
     @GameTest(template = ARENA)
-    public static void theTwoModesExcludeEachOther(GameTestHelper helper) {
+    public static void slowTimeAndRunningAreTwoKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
         PowerData data = Powers.get(peter);
 
+        // 3.3 (H3): R is slow time, G is running; each on and off by itself, alone or together.
         press(peter, 1);
-        check(data.quicksilverTime() && !data.superSpeed(), "R: Quicksilver Time");
-        pressSneaking(peter, 1);
-        check(data.superSpeed() && !data.quicksilverTime(), "Sneak + R: Super Speed instead");
+        check(data.quicksilverTime() && !data.superSpeed(), "R: Quicksilver Time alone");
+        press(peter, 2);
+        check(data.superSpeed() && data.quicksilverTime(), "G: Super Speed too, both on together");
         press(peter, 1);
-        check(data.quicksilverTime() && !data.superSpeed(), "R again: back to Quicksilver Time");
+        check(data.superSpeed() && !data.quicksilverTime(), "R again: Super Speed alone");
+        press(peter, 2);
+        check(!data.superSpeed() && !data.quicksilverTime(), "G again: both off");
+        boolean walkman = data.walkman();
         pressSneaking(peter, 1);
-        pressSneaking(peter, 1);
-        check(!data.superSpeed() && !data.quicksilverTime(), "Sneak + R twice leaves both modes off");
+        check(data.walkman() != walkman && !data.quicksilverTime(), "Sneak + R is the Walkman, not Quicksilver Time");
         helper.succeed();
     }
 
@@ -276,6 +284,8 @@ public final class QuicksilverTests {
             run(peter, false);
         }
         assertNear(peter.getFoodData().getExhaustionLevel() - before, cost * 20 * 0.5, 0.005, "standing in Quicksilver Time is half price");
+        // Running (Super Speed) in Quicksilver Time is the full price, as in 3.2: not the full price and the half.
+        press(peter, 2);
         before = peter.getFoodData().getExhaustionLevel();
         for (int i = 0; i < 20; i++) {
             run(peter, true);
@@ -297,7 +307,6 @@ public final class QuicksilverTests {
         peter.getAbilities().invulnerable = false;
 
         // Super Speed doesn't switch off, but a starving Quicksilver can't run.
-        pressSneaking(peter, 1);
         run(peter, true);
         check(data.superSpeed() && !data.is(Live.SPEEDING), "starving, Super Speed stays chosen but he can't run");
         helper.succeed();
@@ -643,10 +652,9 @@ public final class QuicksilverTests {
         ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
         PowerData data = Powers.get(peter);
         check(data.walkman(), "the Walkman is on from the start");
-        AbilityHandler.onKey(peter, 5, true);
-        AbilityHandler.onKey(peter, 5, false);
-        check(!data.walkman(), "N turns the song off");
-        AbilityHandler.onKey(peter, 5, true);
+        pressSneaking(peter, 1);
+        check(!data.walkman(), "Sneak + R turns the song off (3.3)");
+        pressSneaking(peter, 1);
         check(data.walkman(), "and on again");
         helper.succeed();
     }
@@ -660,17 +668,20 @@ public final class QuicksilverTests {
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
         lookAt(peter, zombie);
 
-        // Ability 3: the sword is in his hands before the zombie knows it.
-        AbilityHandler.onKey(peter, 3, true);
+        // Sneak + V (3.3): the sword is in his hands before the zombie knows it.
+        pressSneaking(peter, 3);
         check(zombie.getMainHandItem().isEmpty(), "Pickpocket empties the zombie's hand");
         check(peter.getInventory().contains(new ItemStack(Items.IRON_SWORD)), "and the sword is in Quicksilver's inventory");
+        long now = helper.getLevel().getGameTime();
+        check(!Powers.get(peter).isReady(3, now), "V's cooldown runs (the Blitz and the Pickpocket share it)");
+        Powers.get(peter).startCooldown(3, now, 0);
 
-        // Ability 2: next to the zombie in an instant, six fast punches.
+        // V: next to the zombie in an instant, six fast punches.
         float health = zombie.getHealth();
-        AbilityHandler.onKey(peter, 2, true);
+        AbilityHandler.onKey(peter, 3, true);
         check(peter.distanceTo(zombie) < 2.5, "Speed Blitz puts him right next to the target (" + peter.distanceTo(zombie) + ")");
         check(health - zombie.getHealth() > 9.0F, "and lands every punch (took " + (health - zombie.getHealth()) + ")");
-        check(!Powers.get(peter).isReady(2, helper.getLevel().getGameTime()), "then it needs to cool down");
+        check(!Powers.get(peter).isReady(3, helper.getLevel().getGameTime()), "then it needs to cool down");
         helper.succeed();
     }
 }

@@ -109,6 +109,8 @@ public final class CommonEvents {
         SlowMotion.clear();
         MagnetoAbilities.clearHeld();
         TommyAbilities.clear();
+        com.kolodkingal.enhanced.ability.SpeedSurfaces.clear();
+        com.kolodkingal.enhanced.ability.SpeedStrikes.clear();
         ThorAbilities.clear();
         LokiAbilities.clear();
         BillyAbilities.clear();

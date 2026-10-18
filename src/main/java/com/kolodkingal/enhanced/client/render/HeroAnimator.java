@@ -175,6 +175,12 @@ public final class HeroAnimator {
             case TOMMY -> s.speeding ? 3 : 0;
             default -> 0;
         };
+        // 3.3: a speedster on a wall or a ceiling.
+        if (data.power() == Power.QUICKSILVER || data.power() == Power.TOMMY) {
+            SpeedSurfacePoses.sample(s, p, data);
+        } else {
+            s.surfaceKind = 0;
+        }
     }
 
     private static void shift(float[] ring, float value) {
@@ -455,7 +461,7 @@ public final class HeroAnimator {
         float tauAirOut = s.onGround ? 1.5F : 3.0F;
         s.wAir = snap ? (air ? 1.0F : 0.0F) : AnimMath.ease(s.wAir, air ? 1.0F : 0.0F, dt, 2.0F, tauAirOut);
         boolean inWater = player.isInWater();
-        boolean run = s.speeding && (s.onGround || s.airTicks < 8) && !inWater;
+        boolean run = s.speeding && (s.onGround || s.airTicks < 8 || s.surfaceKind != 0) && !inWater;
         boolean sprint = s.sprinting && s.onGround && !s.speeding && !s.crouching && !inWater;
         s.wRun = snap ? (run ? 1.0F : 0.0F) : AnimMath.ease(s.wRun, run ? 1.0F : 0.0F, dt, 2.0F, 3.5F);
         s.wSprint = snap ? (sprint ? 1.0F : 0.0F) : AnimMath.ease(s.wSprint, sprint ? 1.0F : 0.0F, dt, 3.0F, 4.0F);
@@ -468,7 +474,8 @@ public final class HeroAnimator {
         // ---- gestures ----
         sampleSlots(s, age, dt);
 
-        // ---- the speedster's run cycle ----
+        // ---- the speedster's run cycle (on a wall or a ceiling too, 3.3) ----
+        SpeedSurfacePoses.advance(s, player, dt, snap);
         RunPoses.advance(s, dt, snap);
         if (s.power == Power.SPIDER_MAN) {
             SpiderPoses.advance(s, player, dt, snap);
@@ -534,11 +541,16 @@ public final class HeroAnimator {
         float addDrop = s.addDrop + Stances.drop(s);
         s.addDrop = addDrop;
         float bifrost = s.stance(Stance.THOR_BIFROST);
-        s.renderPitch = (s.pitch.x + addPitch) * (1.0F - bifrost);
+        s.renderPitch = (s.pitch.x + addPitch + s.surfacePitch) * (1.0F - bifrost);
         s.renderRoll = (s.roll + s.addRoll + s.ceilingRoll) * (1.0F - bifrost);
         s.pivot = AnimMath.lerp(s.landWeight, AnimMath.lerp(s.wAir, 0.40F, 0.90F), 0.40F);
         // Hanging from a ceiling the body is flipped over about its middle.
         s.pivot = AnimMath.lerp(Math.min(1.0F, Math.abs(s.ceilingRoll) / 180.0F), s.pivot, 0.90F);
+        // A speedster turned onto a wall or a ceiling: about the pivot that keeps his feet on it, lifted on a wall.
+        if (s.surfacePitch != 0.0F) {
+            s.pivot = AnimMath.lerp(Math.min(1.0F, Math.abs(s.surfacePitch) / 20.0F), s.pivot, s.surfacePivot);
+            s.bob += s.surfaceLift;
+        }
     }
 
     /** Vanilla already turns the body of a dying, sleeping, gliding, swimming or riding player (and a spectator floats). */

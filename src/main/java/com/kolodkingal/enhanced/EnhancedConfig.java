@@ -518,6 +518,8 @@ public final class EnhancedConfig {
         XavierConfig.define(BUILDER);
         // 3.3: Agatha Harkness (section [agatha]).
         AgathaConfig.define(BUILDER);
+        // 3.3: the speedsters' walls and ceilings, Tommy's slow time and the speed strikes (section [speedsters]).
+        com.kolodkingal.enhanced.config.SpeedConfig.define(BUILDER);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

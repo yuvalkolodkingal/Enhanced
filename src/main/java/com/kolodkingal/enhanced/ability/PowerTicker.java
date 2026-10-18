@@ -87,8 +87,11 @@ public final class PowerTicker {
         }
         WandaAbilities.applyCrown(player, data);
         VisionAbilities.applyBody(player, data);
-        if (data.power() != Power.QUICKSILVER) {
+        if (data.power() != Power.QUICKSILVER && data.power() != Power.TOMMY) {
+            // (Tommy's slow time, 3.3, is set by his own tick, like Quicksilver Time.)
             data.setSlowMo(false);
+        }
+        if (data.power() != Power.QUICKSILVER) {
             QuicksilverAbilities.applySpeed(player, data);
         }
         TommyAbilities.applySpeed(player, data);
@@ -105,6 +108,7 @@ public final class PowerTicker {
             case THOR -> ThorAbilities.endAll(player, data);
             case BILLY -> BillyAbilities.endAll(player, data);
             case TOMMY -> TommyAbilities.endAll(player, data);
+            case QUICKSILVER -> QuicksilverAbilities.endAll(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM -> HeroServers.endAll(player, data);
             default -> {
             }

@@ -230,6 +230,8 @@ public final class ClientSetup {
     public static void onRegisterGui(RegisterGuiLayersEvent event) {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("powers"), new PowerHud());
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("slow_motion"), new SlowMotionOverlay());
+        // 3.3: the speed lines of a speedster running on a wall or a ceiling.
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("speed_lines"), new SpeedSurfaceFx.SpeedLines());
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("anim_state"), new AnimStateOverlay());
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====

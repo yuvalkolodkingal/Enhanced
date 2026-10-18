@@ -107,6 +107,13 @@ public enum Live {
     XAVIER_FOCUS,
     /** Professor X wears Cerebro's helmet and searches every mind far around him. */
     CEREBRO,
+    // ===== speed (3.3) =====
+    /** A speedster (Quicksilver or Tommy) runs on a wall (up it, or down it). */
+    SURFACE_WALL,
+    /** A speedster runs along a ceiling, upside down. */
+    SURFACE_CEILING,
+    /** Tommy's Sonic Boom has just broken around him (a moment, so every client acts it). */
+    SONIC_BOOM,
     ;
 
     final long bit() {

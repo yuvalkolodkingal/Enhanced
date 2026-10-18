@@ -171,6 +171,23 @@ public final class HeroAnimState {
     public float clingOffX;
     public float clingOffZ;
 
+    // ---- a speedster on a wall or a ceiling (3.3, SpeedSurfacePoses) ----
+    /** What he runs on this tick: 0 the ground, 1 up a wall, 2 a ceiling, 3 down a wall. */
+    public int surfaceKind;
+    /** The wall's normal (from the wall towards him), or the ceiling run's heading (horizontal unit vectors). */
+    public net.minecraft.world.phys.Vec3 surfaceNormal = net.minecraft.world.phys.Vec3.ZERO;
+    public net.minecraft.world.phys.Vec3 surfaceHeading = net.minecraft.world.phys.Vec3.ZERO;
+    /** His speed along the surface (blocks per tick, this tick). */
+    public float surfaceSpeed;
+    /** The eased pitch (degrees) that turns the body onto the surface: -90 up a wall, -180 on a ceiling, +90 down a wall. */
+    public float surfacePitch;
+    /** How much the body faces {@link #surfaceYaw} (eased), and that yaw. */
+    public float surfaceFace;
+    public float surfaceYaw;
+    /** The lift (blocks) and the pivot of the turn onto the surface, so the feet are on it. */
+    public float surfaceLift;
+    public float surfacePivot;
+
     // ---- gestures ----
     public final Slot[] slots = new Slot[SLOTS];
 
