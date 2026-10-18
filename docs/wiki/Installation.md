@@ -29,17 +29,18 @@ Put the same jar in the `mods` folder of a NeoForge 21.1 server and start it. Pl
 
 | What | Where | Why |
 |---|---|---|
-| Music folder | `config/enhanced/music/` in the Minecraft folder (with a short `README.txt`) | Put a song here to replace *Sweet Dreams* as Quicksilver's music. See [Quicksilver](Quicksilver). |
+| Music folder | `config/enhanced/music/` in the Minecraft folder (with a short `README.txt`) | Put a song here to replace Quicksilver's or Speed's Walkman song or the Witches' Road's music, in your own game. See [Music](Music). |
+| The world's music folder (3.5) | `<world>/serverconfig/enhanced/music/` (with a `README.txt`), made when the server starts | Songs here replace the Walkman songs and the Road's music for every player, who download them by themselves. See [Music](Music#a-worlds-own-music-servers). |
 | Server settings | `world/serverconfig/enhanced-server.toml`, created when the world is first loaded | Every balance number of the mod. See [Server Configuration](Server-Configuration). |
 | Key bindings | *Options, Controls, Enhanced Powers* | The five ability keys and the Change Look key. See [Controls](Controls). |
 
 ## Updating
 
-Replace the old jar in the `mods` folder with the new one (on the client and on the server). Your hero, your look and your saved Bifrost places are saved with the player.
+Replace the old jar in the `mods` folder with the new one (on the client and on the server). Your hero, your look and your saved Bifrost places are saved with the player. **3.5 needs the server and every player updated together** (network protocol 9): a 3.4 player cannot join a 3.5 server, or the other way round.
 
 ## Personal use only
 
-Quicksilver's Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, and the recording is built into the jar. It is copyrighted, so the repository and the jars built from it are for personal use only. Keep the repository private and do not share the jar publicly.
+Quicksilver's Walkman can play *Sweet Dreams (Are Made of This)* by Eurythmics (since 3.5 only if you choose it; his own theme plays by default), and the recording is built into the jar. It is copyrighted, so the repository and the jars built from it are for personal use only. Keep the repository private and do not share the jar publicly.
 
 ## Troubleshooting
 
@@ -49,4 +50,4 @@ Quicksilver's Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, and
 | The game says NeoForge is too old | Update NeoForge to 21.1.256 or newer. |
 | The keys do nothing | Keys work only for a hero, with no screen open. See [Becoming a Hero](Becoming-a-Hero), and check the bindings under *Options, Controls, Enhanced Powers*. |
 | I cannot lift Mjolnir | See the [FAQ](FAQ) and [Thor](Thor). |
-| Quicksilver's song does not play | The song plays for as long as Quicksilver Time is on (press R), whether Quicksilver runs or not, and the Walkman key (N) turns it on and off. Super Speed (Sneak + R) plays no song. A song of your own must be an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/`. |
+| Quicksilver's song does not play | The song plays for as long as Quicksilver Time is on (press R), whether Quicksilver runs or not, and **Sneak + R** turns the Walkman on and off. Super Speed (G) alone plays no song. A song of your own must be an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/`. See [Music](Music). |

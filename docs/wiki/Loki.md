@@ -33,7 +33,7 @@ Touching the stone itself is another matter: see [Scarlet Witch](Scarlet-Witch).
 
 ## His body
 
-* **24 health** (12 hearts): an Asgardian is tougher than a human.
+* **30 health** (15 hearts), **6 armour** and **2 armour toughness** (3.5; it was 24 health and no armour): an Asgardian is tougher than a human, as tough in body as Thor, though he takes knockback and has none of Thor's thunder. A trickster's real defence is his illusions and his Vanish.
 * He does not fly. He vanishes instead (ability 4).
 
 ## Looks
@@ -96,7 +96,7 @@ Loki has four looks, and **H** switches between them (**Sneak + H** goes back). 
 Loki's true Jotun form, from his birth. Toggle it with **N**.
 
 * His skin turns the blue-grey of a Frost Giant, and snowflakes and a faint icy shimmer drift off him.
-* **+4 armor** while in this form.
+* **+4 armor** while in this form, on top of his own 6 (10 in all).
 * A Frost Giant is made of the cold: he **never freezes** (freezing damage and powder snow do nothing to him).
 * **Still water freezes over where he walks**, in a circle of 3 blocks round him, like Frost Walker.
 * **His blows freeze.** A creature he hits is slowed (Slowness II for 3 seconds) and frosts over, shivering as in powder snow.
@@ -105,8 +105,8 @@ Frost Giant is ability 5 in **every** look.
 
 ## A sorcerer
 
-Loki is a **sorcerer**, like the Scarlet Witch, Billy and Agatha: he can read the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) (save places and teleport to them, and raise a ward of **24 blocks** round his base that keeps out monsters, bosses and dark magic) and the [Darkhold](Sorcerers-Books#the-darkhold) (the purple beam, the hex mark and the mind glimpse). Being a sorcerer has a price in 3.3: inside a Hex whose walls carry the [Hex Runes](Scarlet-Witch#hex-runes), he has no powers (his illusions dissolve, and his Vanish, his shape and the Frost Giant end).
+Loki is a **sorcerer**, like the Scarlet Witch, Billy and Agatha: he can read the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) (save places and teleport to them, and raise a ward of **24 blocks** round his base that keeps out monsters, bosses and dark magic) and the [Darkhold](Sorcerers-Books#the-darkhold) (the purple beam, the hex mark and the mind glimpse). Being a sorcerer has a price: since 3.5 [Agatha's Power Drain](Agatha) can take his power (it takes only a witch's or a sorcerer's), and since 3.3, inside a Hex whose walls carry the [Hex Runes](Scarlet-Witch#hex-runes), he has no powers (his illusions dissolve, and his Vanish, his shape and the Frost Giant end).
 
 ## Numbers you can change
 
-The dagger's damage and how long the Scepter confuses are the Loki options: `loki.daggerDamage`, `loki.scepterConfusionTicks`, `loki.scepterNauseaTicks` and `loki.scepterSlownessTicks` on [Server Configuration](Server-Configuration). The Tesseract's chances are in the loot modifiers (datapacks can change them), listed on [Items and Crafting](Items-and-Crafting).
+The dagger's damage, how long the Scepter confuses, and (3.5) his body are the Loki options: `loki.daggerDamage`, `loki.scepterConfusionTicks`, `loki.scepterNauseaTicks`, `loki.scepterSlownessTicks`, `loki.bodyHealthBonus` (10: 30 health in all), `loki.bodyArmor` (6) and `loki.bodyToughness` (2) on [Server Configuration](Server-Configuration#loki). The Tesseract's chances are in the loot modifiers (datapacks can change them), listed on [Items and Crafting](Items-and-Crafting).

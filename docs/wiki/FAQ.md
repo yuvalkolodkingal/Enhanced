@@ -225,6 +225,64 @@ The flight style is only how your hero looks in the air. To fly, your hero needs
 
 The server file was written by 3.3, and the game never rewrites a value already in the file. Set `custom_hero.budget = 90` and `maxPowers = 10`, or delete the two lines. See [Server Configuration](Server-Configuration#the-hero-creator).
 
+## Asgard and its heroes (3.5)
+
+### How do I get to Asgard?
+
+Only by the Bifrost: with Mjolnir, Stormbreaker or a Hofund in your hand, or your own Gungnir, use it (right-click) and choose **Asgard** at the top of the Bifrost screen; Thor presses **N**, Heimdall **V**. With no power and none of those, find a **Bifrost Rune Stone** (`/locate structure enhanced:bifrost_site`) and right-click it. See [Asgard](Asgard).
+
+### My Nether portal won't light in Asgard. The Book of the Vishanti won't take me there.
+
+Asgard can be reached only by the Bifrost: no portal, book, Tesseract or other mod's teleport goes in or out ("Only the Bifrost reaches Asgard."). To leave, use the Bifrost (Home) or ask Heimdall in the Observatory to send you home.
+
+### I fell off the edge of Asgard!
+
+Heimdall catches you: below height −56 the Bifrost sets you down in the Observatory, unhurt ("Heimdall caught you."). And if you die in Asgard, you keep your things.
+
+### Why can't I break anything in the city?
+
+The city of Asgard is protected (`asgard.protectCity`): nobody can break or build there, and explosions and fire do nothing. The wild land and the sea round the city are free.
+
+### My friend came with me on the Bifrost without asking!
+
+Since 3.5 the Bifrost takes **everyone in its circle** of runes, Thor's too: friends, pets, horses, dropped items. To stay behind, step out of the circle before the light takes you (sneaking doesn't keep you out, unless the server sets `bifrost.sneakToStay`). A server can make the circle smaller, or 0 for the old way (`bifrost.groupRadius`). See [Asgard](Asgard#the-bifrost-takes-everyone-in-its-circle).
+
+### How do I become Heimdall, Odin or Hela?
+
+* **Heimdall:** win the Guardian's Watch in the Observatory (strike seven shadows in three minutes), then hold your own Hofund with no power. See [Heimdall](Heimdall).
+* **Hela:** break Hela's Seal behind the Throne of Asgard, beat her, and hold her Headdress for 3 seconds with no power. See [Hela](Hela).
+* **Odin:** beat Hela, take Gungnir from the vault under the throne room, and sit on the Throne of Asgard with it in your hand, with no power. See [Odin](Odin).
+
+### The vault is closed and Odin is asleep. Why?
+
+Odin sleeps the Odinsleep until Hela is beaten for the first time on the server. Then he wakes and his vault opens, for everyone, for good.
+
+### I hit an Asgardian and nothing happened.
+
+Nobody can hurt the people of Asgard: they step back and tell you to mind your manners. Hela's army can knock them down, but they get up again after 20 seconds. See [Asgardians](Asgardians).
+
+### Hela caught my Mjolnir!
+
+From her second phase she catches a thrown Mjolnir (once a minute) and it shatters, as in *Ragnarok*; the pieces strike your enemies and come back together in your hand. Throw Stormbreaker: she can't catch it.
+
+## The fixes of 3.5
+
+### My Mutant School still has a hole round the door.
+
+A school built before 3.3.1 keeps it. An operator can mend it: stand near it and run `/enhanced structure repair_school`. Only the 76 blocks of the door and the tower change, and anything a player built there stays. See [Structures](Structures#the-mutant-school).
+
+### Agatha's Power Drain does nothing to me.
+
+Since 3.5 it takes only a witch's or a sorcerer's power: Loki, the Scarlet Witch, Billy, Agatha, or a custom hero with their abilities. Other heroes are refused, and it costs her nothing. A server can change it back (`agatha.drainOnlySorcerers`). See [Agatha](Agatha).
+
+### Loki got tougher!
+
+Yes: 30 health, 6 armour and 2 armour toughness since 3.5 (`loki.bodyHealthBonus`, `loki.bodyArmor`, `loki.bodyToughness`). See [Loki](Loki#his-body).
+
+### I became another hero and my helmet went into my bag.
+
+Since 3.5, becoming another hero takes the old hero's helmet, goggles, glasses or crown off your head and puts it in your inventory (at your feet if it is full; a line in the chat says where). Your new hero keeps it only if it is his own. See [Hero Creator](Hero-Creator).
+
 ## Magneto
 
 ### How do I mine with Magneto?
@@ -458,11 +516,19 @@ When you raise a Hex as the Scarlet Witch, a Vision appears at your side. Look a
 
 ### Why is the mod for personal use only?
 
-Quicksilver's Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, and the recording is built into the mod. It is copyrighted, so the repository and the jars built from it are for personal use only. Keep the repository private and do not share the jar publicly.
+Quicksilver's Walkman can play *Sweet Dreams (Are Made of This)* by Eurythmics (since 3.5 only if you choose it), and the recording is built into the mod. It is copyrighted, so the repository and the jars built from it are for personal use only. Keep the repository private and do not share the jar publicly.
 
 ### Can I change Quicksilver's song?
 
-Yes. Put an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/` in your Minecraft folder (the mod creates the folder the first time it starts). The first file in alphabetical order is played, and removing it brings back *Sweet Dreams*. See [Quicksilver](Quicksilver).
+Yes. Since 3.5 he plays his own theme, *Silver Hours*; the client option `quicksilverSong = "sweet_dreams"` brings *Sweet Dreams* back. For a song of your own, put an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/` in your Minecraft folder (the mod creates the folder the first time it starts): `quicksilver.mp3`, or any name (the first in alphabetical order). See [Music](Music).
+
+### Can my server give everyone the same song?
+
+Yes (3.5). Put an Ogg Vorbis file in `<world>/serverconfig/enhanced/music/`, named `quicksilver.ogg`, `speed.ogg`, `witches_road.ogg` (or one part of the Road), or `music.ogg` for all of them, and run `/enhanced music reload`. Every player downloads it once, by himself. A player who doesn't want it sets `ignoreServerMusic = true`. See [Music](Music#a-worlds-own-music-servers).
+
+### Why does Speed's music stop a moment after he stops?
+
+It is meant to: his song keeps going for 2 seconds so it doesn't stutter when he slows down, then fades. Run again within 10 seconds and it carries on where it was. See [Tommy](Tommy).
 
 ### Why does my Tesseract (or Loki's Scepter) hum? Can I turn it down?
 
@@ -472,7 +538,7 @@ Every Infinity Stone has a voice of its own. The Space Stone in the Tesseract an
 
 ### Do players need the mod too?
 
-Yes. The server and every player who joins need the same jar. See [Installation](Installation).
+Yes. The server and every player who joins need the same jar: since 3.5 (network protocol 9) a 3.4 player can't join a 3.5 server, or the other way round. See [Installation](Installation).
 
 ### Where are the balance numbers?
 

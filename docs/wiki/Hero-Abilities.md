@@ -1,6 +1,6 @@
 # Heroes' Abilities
 
-Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes. This page lists them all, hero by hero.
+Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes, and since 3.5 **99** of nineteen (Heimdall, Odin and Hela added), with every Sneak variant also [a card of its own](#the-sneak-variants-cards-of-their-own-35): **133 cards** in all. This page lists them all, hero by hero.
 
 Hebrew: [עברית](Hero-Abilities-HE)
 
@@ -14,7 +14,7 @@ Hebrew: [עברית](Hero-Abilities-HE)
 * A **world power** may be switched off by a server (`custom_hero.worldPowers`).
 * Two abilities of **different heroes** that drive the same thing (one grip, one shield, one beam...) cannot be on the same hero; see [Powers that cannot go together](Hero-Creator#5-powers-that-cannot-go-together).
 
-The flying keys of the fliers (Magneto's, the Scarlet Witch's, Vision's, Billy's, Thor's, the Phoenix's, Ultron's, Apocalypse's and Agatha's) are not abilities here: your hero flies with the **Flight** power, and flies **like** one of them with the [flight style](Hero-Creator#7-animations-how-your-hero-moves). Wanda's and Billy's Build Magic is here once, as Billy's (his rules).
+The flying keys of the fliers (Magneto's, the Scarlet Witch's, Vision's, Billy's, Thor's, the Phoenix's, Ultron's, Apocalypse's and Agatha's) are not abilities here: your hero flies with the **Flight** power, and flies **like** one of them with the [flight style](Hero-Creator#7-animations-how-your-hero-moves). Billy's Build Magic is here as his (his rules); since 3.5 the Scarlet Witch's, with her rules, is [a card of its own](#the-sneak-variants-cards-of-their-own-35).
 
 ## The abilities
 
@@ -210,6 +210,89 @@ See [Professor X](Professor-X) for the full story of each ability.
 | **Take Over a Body** `xavier.take_over` | **V** (press) | — | 3 a point | Your mind goes into the creature you look at and steers it; press again to come back. A world power. |
 | **Freeze Minds** `xavier.freeze_minds` | **B** (press) | — | 3 a point | Everyone with an open mind around you stands still for a few seconds. |
 | **Cerebro** `xavier.cerebro` | **N** (press) | — | 2 a point | Put on Cerebro's helmet and find the minds of the players far around you. |
+
+### Heimdall (6)
+
+New in 3.5. See [Heimdall](Heimdall) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Hofund** `heimdall.hofund` | **R** (press) | Lunge (press) | 2 a point | A three-blow golden sword combo (any sword for a custom hero; Hofund hits 30% harder). Sneak: a dash and a thrust. |
+| **All-Seeing Sight** `heimdall.sight` | **G** (on/off) | Far Sight (hold) | 2 a point | Creatures glow through walls and far players are marked. Sneak, held: zoom far. |
+| **Bifrost** `heimdall.bifrost` | **V** (press) | Bifrost where you look (press) | 2 a point | Opens the Bifrost with no item: home, saved places, Asgard. A world power. |
+| **Guardian's Ward** `heimdall.ward` | **B** (hold) | Gatekeeper's Call (press) | 2 a point | Hold: a golden dome that stops projectiles and keeps monsters out. Sneak: Einherjar come to your side. |
+| **Bifrost Strike** `heimdall.strike` | **N** (press) | Bifrost for a friend (press) | 3 a point | A column of rainbow light strikes where you look. Sneak: send the player you look at. A world power. |
+| **Heimdall's body** `heimdall.body` | no key (always on) | — | 1 a point | More health and armour, steady footing, no damage from short falls. |
+
+### Odin (6)
+
+New in 3.5. See [Odin](Odin) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Gungnir** `odin.gungnir` | **R** (press) | Throw (press) | 3 a point | A golden bolt from the spear (or the hand). Sneak: throw Gungnir (in your hand), which returns. |
+| **Odinforce** `odin.odinforce` | **G** (hold) | Heal (press) | 3 a point | Hold: a golden dome shield (the one shield). Sneak: heal yourself and your allies. |
+| **Banish** `odin.banish` | **V** (press) | Odinforce Wave (press) | 3 a point | Banishes the creature you look at. Sneak: a golden shock wave. A world power. |
+| **Huginn and Muninn** `odin.ravens` | **B** (press) | Ravens' Report (press) | 2 a point | Two ravens circle where you look and show every creature near them. |
+| **Allfather's Command** `odin.command` | **N** (press) | Odinsleep (on/off) | 3 a point | Warriors fight your target. Sneak: the Odinsleep heals you while you kneel. A world power. |
+| **Odin's body** `odin.body` | no key (always on) | — | 1 a point | More health and armour, steady footing, regeneration when hurt. |
+
+### Hela (6)
+
+New in 3.5. See [Hela](Hela#becoming-hela-the-hero) for the full story of each ability. Her abilities are dark magic.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Necroswords** `hela.necroswords` | **R** (press) | Blade Rain (press) | 2 a point | Throws a fan of black blades. Sneak: blades rain on a circle. |
+| **Blade Wall** `hela.blade_wall` | **G** (press) | Blade Burst (press) | 2 a point | A line of spikes erupts from the ground. Sneak: a ring of spikes round you. |
+| **Goddess of Death** `hela.goddess` | **V** (on/off) | Death Dash (press) | 2 a point | The headdress grows: strength and stronger blades. Sneak: a smoke dash. |
+| **Raise the Dead** `hela.army` | **B** (press) | Fenris (press) | 3 a point | Berserkers rise to fight for you. Sneak: Fenris the wolf. A world power. |
+| **Death's Grasp** `hela.grasp` | **N** (hold) | — | 2 a point | Hold: projectiles crumble before your hand; a thrown Mjolnir is caught. |
+| **Hela's body** `hela.body` | no key (always on) | — | 1 a point | More health and armour; in Asgard, regeneration and stronger blows. |
+
+## The Sneak variants: cards of their own (3.5)
+
+Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you can pick it without its ability ("all the abilities, like Billy's shield", as Eilon asked). Picked alone, it works on **any** key, plain or Sneak (it presses its ability's Sneak half for you). Picked with its ability, that ability keeps only its main action. It costs what its ability costs (and the two together count as one power), shares its colour, and is a world power when its ability is one. **Needs**: the ability it can't work without.
+
+| Card (id) | The ability it belongs to | Needs | Points | What it does |
+|---|---|---|---|---|
+| **Magnetic Pull (Magneto)** `magneto.magnetic_pull` | `magneto.metal` | — | 2 a point | Pull every loose bit of metal around you to your hand, all at once. |
+| **Dissolve the Hex (Scarlet Witch)** `wanda.hex_dissolve` | `wanda.hex` | `wanda.hex` | 3 a point | Bring your Hex down: the red dome melts away. A world power. |
+| **Walkman (Quicksilver)** `quicksilver.walkman` | `quicksilver.time` | `quicksilver.time` | 15 (no slider) | A switch: Quicksilver's music plays while his slowed time is on. |
+| **Dash Strike (Quicksilver)** `quicksilver.dash` | `quicksilver.speed` | — | 2 a point | Dash straight ahead in a silver blur, hitting every enemy in the way. |
+| **Pickpocket (Quicksilver)** `quicksilver.pickpocket` | `quicksilver.blitz` | — | 2 a point | Zip to the creature you look at and snatch what it holds. |
+| **Hex Barrier (Billy)** `billy.hex_barrier` | `billy.freeze` | — | 3 a point | Hold: a blue plate of magic in front of you stops everything that comes from the front. Shares the one shield. |
+| **Wall Run (Tommy)** `tommy.wall_run` | `tommy.time` | one of the speedsters' speeds or slow times | 15 (no slider) | A switch: run up walls and along ceilings while you run at super speed. |
+| **Dash Strike (Tommy)** `tommy.dash` | `tommy.speed` | — | 2 a point | Dash straight ahead in a white-green blur, hitting every enemy in the way. |
+| **Sonic Boom (Tommy)** `tommy.sonic_boom` | `tommy.whirlwind` | — | 2 a point | Stop dead from top speed: a shockwave throws everything near you back. |
+| **Disarm Blitz (Tommy)** `tommy.disarm_blitz` | `tommy.vibrate` | — | 2 a point | In a blink, take the weapons out of the hands of everyone around you. |
+| **Dagger Fan (Loki)** `loki.dagger_fan` | `loki.daggers` | — | 2 a point | Throw a fan of conjured daggers at once. |
+| **Shatter Mjolnir (Thor)** `thor.shatter` | `thor.hammer` | — | 2 a point | With Mjolnir in hand: it bursts into flying shards that strike around you, then comes together again. |
+| **Bifrost to Where You Look (Thor)** `thor.bifrost_look` | `thor.bifrost` | — | 2 a point | The rainbow bridge carries you to the place you look at. A world power. |
+| **Mind Sense (Jean Grey)** `phoenix.mind_sense` | `phoenix.mind` | — | 1 a point | Feel every mind around you for a moment, even through walls. |
+| **Psionic Field (Jean Grey)** `phoenix.psionic_field` | `phoenix.control` | — | 3 a point | A burst of mind power pushes and stuns everything around you. |
+| **Web Burst (Spider-Man)** `spider.web_burst` | `spider.web` | — | 2 a point | Webs fly out all around you and wrap everyone near. |
+| **Web Swing (Spider-Man)** `spider.web_swing` | `spider.zip` | — | 2 a point | Hold to swing on a web from the block above you, let go to fly on (J switches Web Assist). |
+| **Spider-Sense (Spider-Man)** `spider.sense` | `spider.crawl` | — | 5 (no slider) | A switch, on from the start: a tingle warns you of danger coming. |
+| **Instant Kill (Spider-Man)** `spider.instant_kill` | `spider.legs` | `spider.legs` | 2 a point | Press twice with the spider legs out: they strike with all their force. |
+| **Titan Slam (Thanos)** `thanos.titan_slam` | `thanos.power` | — | 3 a point | Punch the ground: a ring of violet force throws everything near you. |
+| **Space Pull (Thanos)** `thanos.space_pull` | `thanos.space` | — | 2 a point | A blue portal pulls the creature you look at to you. |
+| **Reality Veil (Thanos)** `thanos.reality_veil` | `thanos.reality` | — | 2 a point | A switch: a red veil of reality hides you from those around you. |
+| **Soul Sight (Thanos)** `thanos.soul_sight` | `thanos.soul` | — | 3 a point | See every living soul around you glow, even through walls. |
+| **Time Lock (Thanos)** `thanos.time_lock` | `thanos.time` | — | 3 a point | Freeze the creatures in front of you in time for a moment. A world power. |
+| **Overcharge (Ultron)** `ultron.overcharge` | `ultron.repulsor` | — | 2 a point | Charge one heavy plasma blast in your palm, then let it fly. |
+| **Gravity Slam (Ultron)** `ultron.slam` | `ultron.gravity` | — | 2 a point | Slam everything near you down into the ground. |
+| **Hack (Ultron)** `ultron.hack` | `ultron.upload` | — | 3 a point | Hack the enemy Sentry you look at: it fights for you now. A world power. |
+| **Command (Ultron)** `ultron.command` | `ultron.army` | `ultron.army` | 3 a point | Send your Sentries at what you look at. A world power. |
+| **Entomb (Apocalypse)** `apocalypse.entomb` | `apocalypse.sand` | — | 2 a point | Swallow the creature you look at in a cocoon of sand. |
+| **Sandstorm (Apocalypse)** `apocalypse.sandstorm` | `apocalypse.bestow` | — | 2 a point | A storm of sand rises round you and blinds your enemies. |
+| **Hex Mark (Agatha)** `agatha.hex_mark` | `agatha.purple_beam` | — | 2 a point | Mark the creature you look at with a purple rune, or glimpse a mind. |
+| **Ricochet Shot (Cyclops)** `cyclops.ricochet` | `cyclops.optic_blast` | — | 2 a point | A red bolt from your eyes that bounces off blocks to hit around corners. |
+| **Open Eyes (Cyclops)** `cyclops.open_eyes` | `cyclops.glasses` | `cyclops.glasses` | 3 a point | Open your eyes wide: a giant beam pours out until you shut them. Shares the continuous beam. |
+
+**The Scarlet Witch's Build Magic** is a card of its own too (3.5): **Build Magic (Scarlet Witch)** `wanda.build_magic`, on **Y**, 10 points (no slider): build, copy and change the world with magic by the Scarlet Witch's rules (no meter, and her **Instant** switch). A hero may have hers or Billy's (`billy.build_magic`), not both.
+
+Heimdall's, Odin's and Hela's Sneak variants come with their abilities (the tables above). <!-- 35-CHECK: whether the 3.5 heroes' Sneak variants get cards of their own at the merge -->
 
 ## Related
 

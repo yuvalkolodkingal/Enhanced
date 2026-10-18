@@ -12,6 +12,7 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/enhanced boss start thanos [force]` | Calls the Mad Titan where you stand, as the Tesseract and Loki's Scepter do: a portal opens and six seconds later he lands 14 to 20 blocks from you. `force` skips the site check, the Overworld rule, the server's `summonEnabled` switch and the rest (Peaceful and one fight at a time still apply; given in the air, the fight is made on the ground under you). See [Thanos](Thanos). |
 | `/enhanced boss start ultron [force]` | Without `force` it is the ritual without the Scepter: you need the Ultron Program in your hand (it is used up), Ultron wakes on the block you look at, and every check is made. With `force` he wakes at your feet with no Program, and the checks of the ground are skipped (not the open sky, and never when he is switched off, in Peaceful or while another boss fight runs). See [Ultron](Ultron). |
 | `/enhanced boss start apocalypse [force]` | With `force`, wakes En Sabah Nur at your feet, with no Capstone, and skips the checks of the ground, the sky and the need for a Scarlet Witch or a Phoenix (not Peaceful, not the switch that turns him off, not the one-fight-at-a-time rule). Without it the command is the ritual itself: it needs a Capstone in your hand and a block in sight, and every check. See [Apocalypse](Apocalypse). |
+| `/enhanced boss start hela [force]` | (3.5) Starts the fight with [Hela](Hela) in Asgard's throne room. Without `force` the seal's rules apply: you must be in Asgard, not in Creative or Spectator, the server's `summonEnabled` must be on and the seal must have healed. With `force` you may be anywhere and in any mode: only an Asgard is needed (its chunks are loaded; you are not moved). Never in Peaceful, and one fight at a time. |
 | `/enhanced boss stop` | Ends the running boss fight. A used Ultron Program or Capstone is given back, and the island of Sokovia is put back. A second `stop` while a boss is still leaving ends it at once. |
 | `/enhanced boss list` | Lists the running boss fights. |
 | `/enhanced boss cleanup <center> <radius>` | Removes every creature and projectile of a boss's kind within that radius, whether a fight owns it or not: Thanos, his sword, meteors, orbs and illusions; Ultron, the Sentries (a hero Ultron's too), his bolts and the Vibranium Key; Apocalypse, his lances, boulders and cocoons. It removes no blocks. |
@@ -35,6 +36,33 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/road leave` | **Anyone** may use it: leaves the Witches' Road, keeping the Gene and the progress. |
 | `/road status` | **Anyone** may use it: how many trials you have won. |
 | `/road choose` | **Anyone** may use it, at the end of the Road: the choice of Billy or Tommy is asked again. |
+
+## Asgard: /enhanced asgard
+
+(3.5) For [Asgard](Asgard):
+
+| Command | Effect |
+|---|---|
+| `/enhanced asgard tp [players]` | Takes you (or the players) to Heimdall's Observatory in Asgard at once. An operator's teleport passes Asgard's gate. |
+| `/enhanced asgard state` | Asgard's saved state: whether Odin is awake, how often Hela was beaten, the murals, the residents, when the seal is ready, and how long the city's chunks took to build. |
+| `/enhanced asgard genbench` | For testing: builds a block of 9 × 9 chunks of the city (and one of the sea) in memory, throws them away, and prints how many milliseconds a chunk took. The world is not touched. |
+
+Asgard has no portal: an operator can also use `/tp` or `/execute in enhanced:asgard`. Every other way in or out is the Bifrost's.
+
+## Music: /enhanced music
+
+(3.5) For [a world's own music](Music#a-worlds-own-music-servers), the songs in `<world>/serverconfig/enhanced/music/`:
+
+| Command | Effect |
+|---|---|
+| `/enhanced music reload` | Reads the folder again (as `/reload` does) and sends the players the new list of songs: "The world's music: 3 song(s) ready, 1 file(s) left out". |
+| `/enhanced music list` | Shows the folder, each song (its size and the start of its hash) and every file that was left out, with the reason (not Ogg Vorbis, too big, an unknown name, empty). |
+
+## Structures: /enhanced structure
+
+| Command | Effect |
+|---|---|
+| `/enhanced structure repair_school [radius]` | (3.5) Mends a [Mutant School](Structures#the-mutant-school) built before 3.3.1, the hole round its front door: only the 76 blocks of the door and the tower that 3.3.1 changed, in the school's own stone. It looks for the school nearest to you within 128 blocks (or `radius`, 16 to 256). A block a player has changed there is left alone and counted ("kept"); run it again any time, and it says when the school is whole. |
 
 ## Build Magic: /enhanced build
 

@@ -13,7 +13,7 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Tommy](Tommy) | Slow Time on/off (Sneak: Wall Run on/off) | Super Speed on/off (Sneak: Dash Strike) | Whirlwind (Sneak: Sonic Boom) | Vibrate Through Walls (Sneak: Disarm Blitz) | Molecular Acceleration |
 | [Billy](Billy-and-the-Witches-Road) | Hex Beam (hold) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Freeze (Sneak, hold: Hex Barrier) | The Noise (toggle) |
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |
-| [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
+| [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: Asgard (3.5), home, saved places, save this one (Sneak: where you look) |
 | [Phoenix](Phoenix) | Mind Reading on/off (Sneak: Mind Sense) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Mind Control (Sneak: Psionic Field) | Phoenix Burst (hold to charge, let go to unleash) |
 | [Spider-Man](Spider-Man) | Web Shot (Sneak: Web Burst) | Web Zip (Sneak, hold: Web Swing) | Wall Crawl (toggle; Sneak: Spider-Sense on/off) | Spider Legs (toggle; Sneak, twice: Instant Kill); Iron Spider only | Black Eyes (toggle) |
 | [Thanos](Thanos#playing-thanos) | Power Blast (Sneak: Titan Slam) | Portal Step (Sneak: Space Pull) | Transmute to stone (Sneak: Reality Veil, toggle) | Soul Drain (hold; Sneak: Soul Sight) | Rewind (Sneak: Time Lock) |
@@ -22,9 +22,12 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Agatha](Agatha) | Purple Beam (hold; Sneak: Hex Mark, or the mind glimpse) | Flight (toggle) | Power Drain | Witch's Shield (hold) | Rune Trap |
 | [Cyclops](Cyclops) | Optic Blast (hold; Sneak: Ricochet Shot) | Concussion Blast | Optic Leap | Rally | Glasses on (Sneak: take them off) |
 | [Professor X](Professor-X) | Mental Blast | Hear Thoughts (toggle) | Take Over a Body (again: return) | Freeze Minds | Cerebro |
+| [Heimdall](Heimdall) (3.5) | Hofund Slash, three blows (Sneak: Lunge) | All-Seeing Sight (toggle; Sneak, hold: Far Sight) | Bifrost screen, no item needed (Sneak: where you look) | Guardian's Ward (hold; Sneak: Gatekeeper's Call) | Bifrost Strike (Sneak: Bifrost for a friend) |
+| [Odin](Odin) (3.5) | Gungnir Blast (Sneak: Gungnir Throw; R again calls it back) | Odinforce Shield (hold; Sneak: Odinforce Heal) | Banish (Sneak: Odinforce Wave) | Huginn and Muninn (Sneak: Ravens' Report) | Allfather's Command (Sneak: Odinsleep, toggle) |
+| [Hela](Hela#becoming-hela-the-hero) (3.5) | Necrosword Volley (Sneak: Blade Rain) | Blade Wall (Sneak: Blade Burst) | Goddess of Death (toggle; Sneak: Death Dash) | Raise the Dead (Sneak: Fenris) | Death's Grasp (hold) |
 | [A custom hero](Hero-Creator) | Whatever power you put on the key in the [Hero Creator](Hero-Creator#6-put-them-on-the-keys-plain-or-sneak), and on **Sneak +** the key (3.4) | | | | |
 
-**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, Billy's Hex Beam and Hex Barrier, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield, Agatha's Purple Beam and Witch's Shield, Cyclops's Optic Blast) work for as long as you keep the key down (the Chaos Shield never runs out in 3.2, unless a server turns that off; in 3.3 Billy's Hex Barrier has no time limit either, and only drops when it shatters; Agatha's shield lasts 10 seconds at most). *Toggle* abilities switch on with one press and off with the next.
+**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, Billy's Hex Beam and Hex Barrier, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield, Agatha's Purple Beam and Witch's Shield, Cyclops's Optic Blast, and in 3.5 Heimdall's Guardian's Ward and Far Sight, Odin's Odinforce Shield and Hela's Death's Grasp) work for as long as you keep the key down (the Chaos Shield never runs out in 3.2, unless a server turns that off; in 3.3 Billy's Hex Barrier has no time limit either, and only drops when it shatters; Agatha's shield lasts 10 seconds at most). *Toggle* abilities switch on with one press and off with the next.
 
 The abilities, their cooldowns and costs are explained on each hero's page. The Scarlet Witch and Billy also have **Y**, for [Build Magic](Build-Magic). The two [books of the sorcerers](#the-sorcerers-books-and-the-road) are used, not bound to a key. A [custom hero](Hero-Creator) has the same five keys, with the powers you chose on them; since 3.4 each key also has a **Sneak +** box, a hero's ability brings its Sneak variant with it (Thor's Mjolnir Throw on **R** puts Shatter Mjolnir on **Sneak + R**), and a custom hero with Billy's Build Magic uses **Y** for it. Sneak + a key whose Sneak box is empty does what the key does. See [Hero Creator](Hero-Creator#6-put-them-on-the-keys-plain-or-sneak).
 
@@ -152,6 +155,7 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **R** as Thor, with Mjolnir in hand | Shatters Mjolnir into fragments that strike his enemies (with Stormbreaker it throws it, as R does). |
 | Sneak + right-click on a creature or player, with Mjolnir in hand | Pins them down under Mjolnir. Right-click them again, without Sneak, to lift it (only its owner can). |
 | Sneak + **N** as Thor | Opens the Bifrost to the spot you look at. |
+| Right-click with Mjolnir, Stormbreaker, Hofund (anyone's) or your own Gungnir (3.5) | Opens the Bifrost screen; with Sneak, the Bifrost to the spot you look at. Since 3.5 the screen has **Asgard** at the top, and the Bifrost takes everyone in its circle (see [Asgard](Asgard#the-bifrost-takes-everyone-in-its-circle)). |
 | Sneak + **R** as the Phoenix | **Mind Sense**: a ring of violet light finds every mind within 48 blocks through the walls and they glow on your screen for 6 seconds. |
 | Sneak + **V** as the Phoenix | Sets what you hold with telekinesis down gently. **When V isn't holding anything: tears out the block you look at**, even past a creature or a boss. |
 | Sneak + **B** as the Phoenix | The **Psionic Field**: everything living within 16 blocks, through walls, is held still for 3 seconds. |
@@ -175,6 +179,20 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **R** as Agatha | The Darkhold's **hex mark** on the creature you look at, or its **mind glimpse** if you look at nothing, instead of the Purple Beam. |
 | Sneak + **R** as Cyclops | The **Ricochet Shot**, a bolt that bounces off blocks, instead of the Optic Blast. |
 | Sneak + **N** as Cyclops | Takes the glasses **off**: the giant beam pours out until **N** puts them back on. |
+| Sneak + **R** as Heimdall | The **Lunge**: a 6-block dash and a thrust, instead of the Hofund Slash. |
+| Sneak + **G** as Heimdall, held | **Far Sight**: zoom ×6; the mouse wheel zooms to ×10. |
+| Sneak + **V** as Heimdall | The Bifrost to the spot you look at. |
+| Sneak + **B** as Heimdall | The **Gatekeeper's Call**: three Einherjar (four in Asgard), instead of the Ward. |
+| Sneak + **N** as Heimdall, looking at a player | **Bifrost for a friend**: the Bifrost screen in Send mode, to send him home, to Asgard or to a saved place. (Hold Sneak a moment before you press **N**.) |
+| Sneak + **R** as Odin | Throws Gungnir, instead of the blast. |
+| Sneak + **G** as Odin | The **Odinforce Heal** for you and your allies, instead of the shield. |
+| Sneak + **V** as Odin | The **Odinforce Wave**, instead of Banish. |
+| Sneak + **B** as Odin | The **Ravens' Report**: the ravens circle you, instead of flying where you look. |
+| Sneak + **N** as Odin | The **Odinsleep** (on/off), instead of the Allfather's Command. |
+| Sneak + **R** as Hela | The **Blade Rain**, instead of the volley. |
+| Sneak + **G** as Hela | The **Blade Burst**, a ring of spikes round you, instead of the Blade Wall. |
+| Sneak + **V** as Hela | The **Death Dash**, instead of the Goddess of Death. |
+| Sneak + **B** as Hela | **Fenris**, instead of Raise the Dead. |
 | Sneak + **H** | Previous look. |
 
 With telekinesis, pressing the key again **launches** what you hold.
@@ -246,7 +264,7 @@ With telekinesis, pressing the key again **launches** what you hold.
 
 ## The HUD
 
-The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges. Billy's Hex Beam line shows its damage and reach (`6.0 dmg/s, 20 blocks`), and the Scarlet Witch's Chaos Shield line shows "∞ unlimited". **3.3:** while Billy's Hex Barrier is up its line shows a bar and its health (`41/60`) and a big bar sits under the crosshair; a sorcerer held by the Hex Runes sees a red line above the action bar, "The Hex Runes hold your powers"; Professor X's screen gets blue edges and a line with whose mind he is in while he steers a body (and the one he steers gets violet edges and "Professor X controls your body!"), and Cerebro's list; a custom hero's panel is drawn in his own colours with his name. **3.4:** a custom hero's panel also has a `[⇧R]` line under a key for its Sneak box, and shows whether each of his heroes' switches is on and his shields' strength.
+The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges. Billy's Hex Beam line shows its damage and reach (`6.0 dmg/s, 20 blocks`), and the Scarlet Witch's Chaos Shield line shows "∞ unlimited". **3.3:** while Billy's Hex Barrier is up its line shows a bar and its health (`41/60`) and a big bar sits under the crosshair; a sorcerer held by the Hex Runes sees a red line above the action bar, "The Hex Runes hold your powers"; Professor X's screen gets blue edges and a line with whose mind he is in while he steers a body (and the one he steers gets violet edges and "Professor X controls your body!"), and Cerebro's list; a custom hero's panel is drawn in his own colours with his name. **3.4:** a custom hero's panel also has a `[⇧R]` line under a key for its Sneak box, and shows whether each of his heroes' switches is on and his shields' strength. **3.5:** Heimdall's panel shows the Sight (and how many players are far away), the blow of his combo and the Ward's seconds, and lists the players of the other worlds while the Sight is on; Odin's shows Gungnir in flight, his ravens and the Odinsleep; Hela's shows her form, her risen dead and the Grasp.
 
 ![Magneto's HUD](images/magneto-back.png)
 

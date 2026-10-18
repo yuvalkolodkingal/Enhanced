@@ -1,6 +1,6 @@
 # Quicksilver
 
-Peter Maximoff, the fastest man alive, as in the X-Men films: everything around him slows down, he speeds up, and the world starts playing *Sweet Dreams (Are Made of This)*. Or he can just be fast himself, and leave the world alone.
+Peter Maximoff, the fastest man alive, as in the X-Men films: everything around him slows down, he speeds up, and the world starts playing his song (since 3.5 his own theme, *Silver Hours*; *Sweet Dreams (Are Made of This)* if you like). Or he can just be fast himself, and leave the world alone.
 
 ![Quicksilver](images/quicksilver.png)
 
@@ -26,7 +26,7 @@ In 3.3 Quicksilver's two powers are **separate**: **R** slows time, **G** makes 
 
 | You want | Press |
 |---|---|
-| The world slowed, *Sweet Dreams* playing, and you at your normal pace | **R** (Quicksilver Time) |
+| The world slowed, his song playing, and you at your normal pace | **R** (Quicksilver Time) |
 | Only you fast, the world as usual | **G** (Super Speed), then sprint |
 | The X-Men kitchen scene: the world slowed **and** you running through it | **R** and **G**, then sprint |
 
@@ -36,7 +36,7 @@ In 3.3 Quicksilver's two powers are **separate**: **R** slows time, **G** makes 
 
 * Everything within **32 blocks** runs **5 times slower**: monsters, animals, villagers, falling blocks, TNT fuses, dropped items, smoke, sparks and splashes, and **arrows and thrown things, which hang in the air** and crawl forward. An arrow that finally lands still hits as hard as it would have.
 * Other players in range are slowed down heavily (a strong Slowness).
-* **The world starts playing his song.** Everyone near him hears the theme from his Walkman for as long as Quicksilver Time is on (if his Walkman is on: **Sneak + R**). It fades in when he turns Quicksilver Time on, keeps playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
+* **The world starts playing his song.** Everyone near him hears his theme, *Silver Hours* (3.5; or *Sweet Dreams*, see [below](#the-song-and-your-own-music)), from his Walkman for as long as Quicksilver Time is on (if his Walkman is on: **Sneak + R**). It fades in when he turns Quicksilver Time on, keeps playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
 * A cool grey-blue shade at the edges of the screen, and a tint of the world, show that time is slowed; everyone inside his zone sees it. (Inside [Tommy](Tommy)'s slow time it is teal.)
 * **Cost:** hunger, at half the rate of running while he does not run. When the hunger bar is empty, Quicksilver Time switches itself off (with a message) and can't be switched on again until he has eaten. Creative players never run out.
 
@@ -92,16 +92,14 @@ The Dash Strike and the Pebble Barrage hurt players only with PvP on, and do not
 
 ## The song and your own music
 
-The Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, which is built into the mod. The recording is copyrighted, so the mod is for personal use only: do not share the jar publicly (see the [FAQ](FAQ)).
+**Since 3.5 the Walkman plays his own theme, *Silver Hours***: an original 80s synth-pop song written for the mod, in the spirit of songs like *Sweet Dreams (Are Made of This)* (the style only: no melody, bass line or chords are taken from it).
 
-**To play a different song:**
+* **Want *Sweet Dreams* back?** Set the client option `quicksilverSong` to `sweet_dreams` (in `config/enhanced-client.toml`, section `[music]`, or in **Mods → Enhanced → Config**). It changes only your own game. *Sweet Dreams (Are Made of This)* by Eurythmics is still built into the mod; the recording is copyrighted, so the mod is for personal use only: do not share the jar publicly (see the [FAQ](FAQ)).
+* **Your own song:** put an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/` in your Minecraft folder (the mod makes the folder, with a short `README.txt`). A file named `quicksilver.*` is his; otherwise any song there is his, the first in alphabetical order. Your own song is played only by your own game. Remove it to go back.
+* **A server's song:** a server can give every player another song for him, `quicksilver.ogg` in the world's music folder, and players download it by themselves (3.5).
+* Which one plays: your own song first, then the world's, then the mod's (his theme, or *Sweet Dreams* if you chose it).
 
-1. Start the game once. The mod creates the folder `config/enhanced/music/` in your Minecraft folder, with a short `README.txt`.
-2. Put an `.mp3`, `.ogg` or `.wav` file in that folder.
-3. If there is more than one file, the first one in alphabetical order is played. Changes are picked up the next time the music starts.
-4. Remove the file to go back to *Sweet Dreams*.
-
-The song is played by each player's own game, from that player's own folder: whoever should hear your song needs it in their `config/enhanced/music/` folder. The mod does not download anything.
+All of it, and Speed's Walkman, is on [Music](Music).
 
 ## Numbers you can change
 

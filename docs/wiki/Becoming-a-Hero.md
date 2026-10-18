@@ -6,7 +6,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
+| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command removes it: `/enhanced power set <player> none` (see [Commands](Commands)). |
 | Creative and Spectator | Creative and Spectator players are never killed by the Mind Stone or the Hex wall. |
 
@@ -29,6 +29,9 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Agatha](Agatha) | Craft the **Darkhold** and, with no power, **hold right-click on it for 3 seconds**. You keep the book. |
 | [Cyclops](Cyclops) | Find his **Ruby-Quartz Glasses** (in Scott Summers' room of the [Mutant School](Structures#the-mutant-school), or rarely in a woodland mansion or stronghold library) and **put them on** with no power. |
 | [Professor X](Professor-X) | **Craft** his **Wheelchair** (leather, iron ingots and an Eye of Ender) or find it in the Professor's study of the Mutant School, and with no power **hold right-click on it for 3 seconds**. Then choose the young or the old Charles. |
+| [Heimdall](Heimdall) (3.5) | In [Asgard](Asgard), win Heimdall's **Guardian's Watch** in the Observatory (strike seven Shadows of Hela in three minutes) and get **Hofund**; with no power, **hold your own Hofund**. |
+| [Hela](Hela) (3.5) | In Asgard, break **Hela's Seal** behind the Throne of Asgard and beat her; with no power, **hold her Headdress** for 3 seconds. |
+| [Odin](Odin) (3.5) | Beat Hela, take **Gungnir** from its stand in Odin's vault under the throne room, and with no power **sit on the Throne of Asgard** holding your Gungnir. |
 | [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once (since 3.4 with that hero's items), or make your own. |
 
 ## Step by step
@@ -136,6 +139,30 @@ Once you hold the Essence you are Apocalypse: **sand waves and entombing** on **
 1. Craft **Professor X's Wheelchair** (three leather, an Eye of Ender and two iron ingots: see [Items and Crafting](Items-and-Crafting#professor-xs-wheelchair)), or take the one in the Professor's study of the [Mutant School](Structures#the-mutant-school).
 2. With **no power**, **hold right-click on it for 3 seconds**. A ring of light closes round your head; let go early and nothing is used up.
 3. You are Professor X. Choose **Young Charles** (he walks) or **Professor X** (he sits in his wheelchair); **H** changes it later. See [Professor X](Professor-X).
+
+### Heimdall, Hela and Odin (3.5)
+
+All three are won in [Asgard](Asgard). Get there first: open the **Bifrost** (Mjolnir, Stormbreaker, a Hofund or your own Gungnir, right-click, and choose **Asgard**), or, with no power, right-click a **Bifrost Rune Stone** in the Overworld (`/locate structure enhanced:bifrost_site`). You land in Heimdall's Observatory.
+
+**Heimdall**
+
+1. Talk to **Heimdall** in the Observatory (right-click him) and choose **Take the Watch**.
+2. In **3 minutes**, find and strike the **seven Shadows of Hela** hidden in the city. You see them glow gold through walls, and a needle points to the nearest.
+3. Win, and Heimdall gives you **Hofund**, bound to you. With **no power**, hold it: you are Heimdall. Lose, and try again after a minute. See [Heimdall](Heimdall).
+
+**Hela**
+
+1. In the throne room, right-click **Hela's Seal** behind the throne, and again within 5 seconds. Bring friends: the warriors of Asgard will help.
+2. Beat her three phases. Everyone who did 2% of her health (or struck the last blow) gets **Hela's Headdress** and the right to Gungnir.
+3. With **no power**, hold right-click with the Headdress for **3 seconds**: you are Hela. See [Hela](Hela).
+
+**Odin**
+
+1. Beat Hela (above). Her first defeat wakes Odin and opens his **vault** under the throne room.
+2. Right-click **Gungnir's Stand** in the vault: Gungnir is yours.
+3. With **no power**, sit on the **Throne of Asgard** (right-click it) holding your Gungnir, and stay for 3 seconds of golden light: you are crowned Odin. See [Odin](Odin).
+
+A player with no power who beat Hela chooses: the Headdress makes him Hela, Gungnir and the throne make him Odin.
 
 ### A hero of your own
 

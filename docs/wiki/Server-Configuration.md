@@ -2,7 +2,7 @@
 
 Every balance number of the mod lives in one file, **`world/serverconfig/enhanced-server.toml`** in the world (or server) folder. The mod creates it when the world is first loaded, with every option at its default, and syncs it to the clients. It is a plain text file: open it in any editor, change a value and restart the world or the server.
 
-The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes) and the [Hero Creator](#the-hero-creator) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
+The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes), the [Hero Creator](#the-hero-creator), and since 3.5 [Asgard](#asgard), [the Bifrost](#the-bifrost) and the [world's music](#music) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
 
 ```toml
 [scarlet_witch]
@@ -269,6 +269,9 @@ Section `[loki]`. The hero's page is [Loki](Loki).
 | `loki.scepterConfusionTicks` | `120` | 0 to 6000 | How long a creature stays confused after a melee hit with Loki's Scepter, in ticks (120 = 6 seconds). 0 turns it off. |
 | `loki.scepterNauseaTicks` | `160` | 0 to 6000 | How long a player gets Nausea after a melee hit with Loki's Scepter, in ticks (160 = 8 seconds). 0 turns it off. |
 | `loki.scepterSlownessTicks` | `60` | 0 to 6000 | How long a player gets Slowness I after a melee hit with Loki's Scepter, in ticks (60 = 3 seconds). 0 turns it off. |
+| `loki.bodyHealthBonus` | `10.0` | 0.0 to 100.0 | 3.5: extra maximum health while a player is Loki (10 = five more hearts: 30 in all). |
+| `loki.bodyArmor` | `6.0` | 0.0 to 30.0 | 3.5: Loki's armour points (the Frost Giant adds 4 on top). |
+| `loki.bodyToughness` | `2.0` | 0.0 to 20.0 | 3.5: Loki's armour toughness. |
 
 ## Thor (Mjolnir, Stormbreaker and the Bifrost)
 
@@ -293,7 +296,7 @@ Section `[thor]`. The hero's page is [Thor](Thor).
 | `thor.godOfThunderBeamMultiplier` | `1.5` | 1.0 to 20.0 | What the God of Thunder multiplies the beam's damage by. Every hit also arcs to the next two creatures nearby. |
 | `thor.beamExhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion per tick while the lightning beam is fired (4.0 = 1 food point). |
 | `thor.godOfThunderExhaustion` | `0.04` | 0.0 to 4.0 | Food exhaustion per tick while the God of Thunder is unleashed (4.0 = 1 food point). |
-| `thor.bifrostCooldown` | `1200` | 0 to 72000 | Cooldown of the Bifrost, Thor's or anyone's who wields Stormbreaker or Mjolnir, in ticks (1200 = 60 seconds). |
+| `thor.bifrostCooldown` | `1200` | 0 to 72000 | Cooldown of the Bifrost opened with a key (Thor's, Heimdall's, or anyone's who wields Mjolnir, Stormbreaker, a Hofund or his own Gungnir), in ticks (1200 = 60 seconds). Only the one who opened it pays it. Who travels along is the [`[bifrost]`](#the-bifrost) section (3.5). |
 | `thor.shatterCooldown` | `300` | 0 to 72000 | Cooldown of shattering Mjolnir (Sneak + R), in ticks, from the moment it shatters (300 = 15 seconds). |
 | `thor.shatterDamage` | `6.0` | 0.0 to 100.0 | Damage of each fragment of a shattered Mjolnir to the enemy it strikes. |
 | `thor.pinDuration` | `1200` | 20 to 72000 | How long (in ticks) Mjolnir pins someone down before it lets go by itself (1200 = a minute). |
@@ -692,7 +695,7 @@ Two more options are about your own game only (they are not synced, and a server
 
 | Option | Setting in the file | Default | What it does |
 |---|---|---|---|
-| Boss music | `bossMusic` | `true` | The music of the fight while a Thanos is near: five layers in D minor that play together, one for each stone he has (a drone and a heartbeat, then low strings, a high choir, a driving ostinato and bells), while the game's own music waits (it follows the music volume). Off: silence (the sounds of his moves stay). |
+| Boss music | `bossMusic` | `true` | The music of the fight while a Thanos is near: five layers in D minor that play together, one for each stone he has (a drone and a heartbeat, then low strings, a high choir, a driving ostinato and bells), while the game's own music waits (it follows the music volume). Off: silence (the sounds of his moves stay). Since 3.5 it turns off [Hela's](Hela#the-music) music too. |
 | Boss atmosphere | `bossAtmosphere` | `true` | The violet fog, the dark edges of the screen and the far thunder while a Thanos is near, and the violet haze of the call that wakes him. Off: the sky stays as it is. The grey of stone, the green of the Time Lock, the Soul World and the white flashes are what he does to you, so they always show. |
 
 ## The Ultron boss
@@ -945,6 +948,7 @@ Section `[agatha]` (3.3). The hero's page is [Agatha](Agatha). A player with no 
 | `agatha.drainHeal` | `4.0` | 0.0 to 200.0 | Health Agatha takes back from every drain (4 = two hearts). |
 | `agatha.drainCooldown` | `300` | 0 to 72000 | Cooldown of the Power Drain, in ticks. |
 | `agatha.drainExhaustion` | `2.0` | 0.0 to 40.0 | Food exhaustion of a Power Drain (4.0 = 1 food point). Creative players pay nothing. |
+| `agatha.drainOnlySorcerers` | `true` | `true` or `false` | 3.5: the Power Drain takes only a witch's or sorcerer's power: Loki, the Scarlet Witch, Billy, Agatha, or a custom hero with any of their abilities. Other heroes are refused, and a refusal costs nothing. False: any hero's power, as before 3.5. (A creature always loses life.) |
 | `agatha.shieldRadius` | `1.9` | 1.0 to 6.0 | The radius (blocks) of the Witch's Shield (B, hold), the purple sphere round her. |
 | `agatha.shieldWindUpTicks` | `8` | 0 to 100 | Ticks the shield takes to form after B is pressed; it stops nothing until then. |
 | `agatha.shieldMaxTicks` | `200` | 20 to 72000 | How long a complete shield can be held, in ticks (200 = 10 seconds). |
@@ -1027,6 +1031,140 @@ Section `[professor_x]` (3.3). The hero's page is [Professor X](Professor-X): th
 | `professor_x.cerebroRange` | `256` | 16 to 4096 | How far (blocks) Cerebro finds the minds of players, in his dimension. |
 | `professor_x.cerebroTicks` | `200` | 20 to 1200 | How long Cerebro shows the minds it found (200 = 10 s). |
 | `professor_x.cerebroCooldown` | `1200` | 0 to 72000 | Cooldown of Cerebro (ability 5), in ticks (1200 = 60 s). |
+
+## Asgard
+
+Section `[asgard]` (3.5). The pages are [Asgard](Asgard) and [Asgardians](Asgardians): whether the realm can be reached, its rules, the rune stones, Hofund as a key, and its people.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `asgard.enabled` | `true` | `true` or `false` | Asgard can be reached. False: the Bifrost doesn't offer it, the rune stones fizzle, nobody can go in (operators may still `/tp`), and a player who logs in there is sent to his respawn point. Leaving is always allowed. |
+| `asgard.protectCity` | `true` | `true` or `false` | The city of Asgard (its districts, the palace, the bridge, the Observatory) can't be broken, built on, burnt or blown up. The wild land and the sea are free; operators in Creative may edit. |
+| `asgard.keepInventory` | `true` | `true` or `false` | A player who dies in Asgard keeps his inventory and experience. False: he drops them as anywhere, except Mjolnir, Stormbreaker, Hofund, Gungnir and Hela's Headdress, which are always kept. |
+| `asgard.hofundOpensBifrost` | `true` | `true` or `false` | Anyone holding a Hofund (anyone's) can open the Bifrost, as with Mjolnir and Stormbreaker. False: only Heimdall's own key opens it. |
+| `asgard.runeStoneCooldown` | `1200` | 20 to 72000 | Ticks a Bifrost Rune Stone rests after each journey (1200 = 60 seconds). It is the stone's own time, not the player's. |
+| `asgard.voidCatchY` | `-56` | -64 to 0 | A player who falls below this height in Asgard is caught by Heimdall and set down in the Observatory, unhurt. |
+| `asgard.edgeRadius` | `640` | 400 to 2000 | How far (blocks) from the centre of Asgard a player may go before he is pushed back toward the city. |
+| `asgard.npcs` | `true` | `true` or `false` | The [Asgardians](Asgardians) live in the city. False: none at all (the city removes its own). |
+| `asgard.talkDistance` | `6.0` | 2.0 to 16.0 | How far (blocks) a player may be from an Asgardian to talk to him. |
+
+## The Bifrost
+
+Section `[bifrost]` (3.5): who the Bifrost takes along, for **every** Bifrost (Thor's, Heimdall's, Hofund's, Gungnir's, a rune stone's, Heimdall sending a friend). See [Asgard](Asgard#the-bifrost-takes-everyone-in-its-circle). The Bifrost's cooldown is still `thor.bifrostCooldown`.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `bifrost.groupRadius` | `3.2` | 0.0 to 16.0 | The radius (blocks) of the Bifrost's circle: every player and creature whose feet are inside it (and no more than 3 blocks above or below) travels with the one who opened it. The default is the circle of runes it burns. **0**: only the one who opened it goes, as before 3.5. Heimdall's friend may step this far (at least 1 block) before he stays. |
+| `bifrost.sneakToStay` | `false` | `true` or `false` | A player inside the circle who is sneaking stays behind. False (the default): everyone inside goes; step out of the circle to stay. |
+
+## Heimdall
+
+Section `[heimdall]` (3.5). The hero's page is [Heimdall](Heimdall), with the Guardian's Watch.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `heimdall.sightRange` | `96` | 16 to 256 | How far (blocks) the All-Seeing Sight shows creatures through walls. (Players in the same world are marked at any distance.) |
+| `heimdall.seeOtherRealms` | `true` | `true` or `false` | The Sight lists the players of other worlds on Heimdall's HUD. |
+| `heimdall.slashDamage1` | `9.0` | 0.0 to 100.0 | Damage of the first blow of the Hofund Slash. |
+| `heimdall.slashDamage2` | `11.0` | 0.0 to 100.0 | Damage of the second blow. |
+| `heimdall.slashDamage3` | `14.0` | 0.0 to 100.0 | Damage of the third blow (it knocks back). |
+| `heimdall.lungeDamage` | `12.0` | 0.0 to 100.0 | Damage of the Lunge (Sneak + R) to the first creature in the way. |
+| `heimdall.lungeCooldown` | `80` | 0 to 72000 | Cooldown of the Lunge, in ticks (80 = 4 seconds). |
+| `heimdall.wardSeconds` | `10` | 1 to 120 | How long the Guardian's Ward (B, hold) can be held, in seconds. |
+| `heimdall.wardCooldown` | `160` | 0 to 72000 | Cooldown of the Ward, in ticks (160 = 8 seconds). |
+| `heimdall.callCooldown` | `900` | 0 to 72000 | Cooldown of the Gatekeeper's Call (Sneak + B), in ticks (900 = 45 seconds). |
+| `heimdall.callSeconds` | `40` | 1 to 600 | How long the Einherjar of the Call stay, in seconds. |
+| `heimdall.strikeDamage` | `14.0` | 0.0 to 100.0 | Damage of the Bifrost Strike (N), within 3 blocks of where it falls. |
+| `heimdall.strikeCooldown` | `140` | 0 to 72000 | Cooldown of the Bifrost Strike, in ticks (140 = 7 seconds). Sending a friend (Sneak + N) uses it too. |
+| `heimdall.sendRange` | `24` | 1 to 128 | How far (blocks) the player Heimdall sends with the Bifrost may be. |
+| `heimdall.watchSeconds` | `180` | 30 to 1200 | How long the Guardian's Watch lasts, in seconds (180 = 3 minutes). |
+| `heimdall.watchRetry` | `1200` | 0 to 72000 | Ticks before a player who lost the Watch may take it again (1200 = 60 seconds). |
+| `heimdall.hofundBonus` | `0.3` | 0.0 to 5.0 | How much more damage Heimdall deals with Hofund (0.3 = 30% more). |
+
+## Odin
+
+Section `[odin]` (3.5). The hero's page is [Odin](Odin).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `odin.blastDamage` | `12.0` | 0.0 to 100.0 | Damage of the Gungnir Blast (R) to the first creature (half to those beside it). |
+| `odin.blastCooldown` | `25` | 0 to 72000 | Cooldown of the Gungnir Blast, in ticks. |
+| `odin.throwDamage` | `16.0` | 0.0 to 100.0 | Damage of the thrown Gungnir (Sneak + R) to each creature it passes. |
+| `odin.throwCooldown` | `60` | 0 to 72000 | Cooldown of the Gungnir Throw, in ticks (60 = 3 seconds). |
+| `odin.shieldSeconds` | `12` | 1 to 120 | How long the Odinforce Shield (G, hold) can be held, in seconds. |
+| `odin.shieldCooldown` | `200` | 0 to 72000 | Cooldown of the shield, in ticks (half again after it was worn out or broken). |
+| `odin.heal` | `8.0` | 0.0 to 100.0 | Health the Odinforce Heal (Sneak + G) gives Odin and each ally within 8 blocks. |
+| `odin.healCooldown` | `600` | 0 to 72000 | Cooldown of the Heal, in ticks (600 = 30 seconds). |
+| `odin.banishCooldown` | `400` | 0 to 72000 | Cooldown of Banish (V), in ticks (400 = 20 seconds). A creature that is spared costs nothing. |
+| `odin.banishPlayers` | `true` | `true` or `false` | Banish sends a player home by the Bifrost (only where PvP is on). False: players are spared. |
+| `odin.waveDamage` | `10.0` | 0.0 to 100.0 | Damage of the Odinforce Wave (Sneak + V). |
+| `odin.waveCooldown` | `220` | 0 to 72000 | Cooldown of the Wave, in ticks. |
+| `odin.ravensSeconds` | `20` | 1 to 600 | How long Huginn and Muninn (B) fly, in seconds. |
+| `odin.ravensCooldown` | `600` | 0 to 72000 | Cooldown of the ravens, in ticks (600 = 30 seconds). |
+| `odin.commandCooldown` | `1200` | 0 to 72000 | Cooldown of the Allfather's Command (N), in ticks (1200 = 60 seconds). |
+| `odin.odinsleepMaxSeconds` | `30` | 1 to 600 | The longest the Odinsleep (Sneak + N) lasts, in seconds. |
+| `odin.odinsleepCooldown` | `1800` | 0 to 72000 | Cooldown of the Odinsleep after it ends, in ticks (1800 = 90 seconds). |
+
+## Hela
+
+Two sections (3.5): `[hela_boss]` for the fight in Asgard's throne room and `[hela]` for the hero. The page is [Hela](Hela).
+
+### `[hela_boss]`: the fight
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `hela_boss.summonEnabled` | `true` | `true` or `false` | Breaking Hela's Seal calls her. False: the seal refuses (an operator's `/enhanced boss start hela force` still works). |
+| `hela_boss.health` | `600.0` | 1.0 to 100000.0 | Hela's health with one fighter. |
+| `hela_boss.healthPerExtraFighter` | `0.35` | 0.0 to 10.0 | Extra health for each fighter after the first (0.35 = 35% more each), counted while fighters join in the first 20 seconds. |
+| `hela_boss.armor` | `10.0` | 0.0 to 30.0 | Hela's armour. |
+| `hela_boss.phase2At` | `0.7` | 0.0 to 1.0 | The share of her health at which the Army of the Dead begins. |
+| `hela_boss.phase3At` | `0.35` | 0.0 to 1.0 | The share of her health at which the Strength of Asgard begins. |
+| `hela_boss.volleyDamage` | `7.0` | 0.0 to 100.0 | Damage of each necrosword of her volleys. |
+| `hela_boss.wallDamage` | `8.0` | 0.0 to 100.0 | Damage of each spike of her Blade Wall. |
+| `hela_boss.rainDamage` | `6.0` | 0.0 to 100.0 | Damage of each blade of her Blade Rain. |
+| `hela_boss.meleeDamage` | `9.0` | 0.0 to 100.0 | Damage of each blow of her blade combo. |
+| `hela_boss.stormDamage` | `10.0` | 0.0 to 100.0 | Damage of her Blade Storm. |
+| `hela_boss.channelSeconds` | `4` | 1 to 30 | How long she channels the Strength of Asgard, in seconds. |
+| `hela_boss.channelEvery` | `20` | 5 to 600 | How often she channels in the third phase, in seconds. |
+| `hela_boss.channelBreakFraction` | `0.06` | 0.0 to 1.0 | The share of her health the fighters must deal during a channel to break it (0.06 = 6%). |
+| `hela_boss.channelHeal` | `0.1` | 0.0 to 1.0 | The share of her health a channel that is not broken heals. |
+| `hela_boss.berserkerWave` | `4` | 1 to 20 | Berserkers in a wave with one fighter. |
+| `hela_boss.berserkerPerFighter` | `2` | 0 to 10 | Extra berserkers in a wave for each fighter after the first. |
+| `hela_boss.berserkerMax` | `10` | 1 to 40 | The most berserkers standing at once. |
+| `hela_boss.fenrisHealth` | `140.0` | 1.0 to 10000.0 | The health of Fenris. |
+| `hela_boss.restTicks` | `24000` | 0 to 720000 | Ticks before Hela's Seal can be broken again after she was beaten (24000 = 20 minutes); half of it after a fight that ended any other way. |
+| `hela_boss.catchMjolnir` | `true` | `true` or `false` | Hela catches a thrown Mjolnir and shatters it (at most once a minute, from the second phase). |
+
+### `[hela]`: the hero
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `hela.volleyDamage` | `7.0` | 0.0 to 100.0 | Damage of each necrosword of her Necrosword Volley (R). |
+| `hela.volleyCooldown` | `30` | 0 to 72000 | Cooldown of the volley, in ticks. |
+| `hela.rainCooldown` | `160` | 0 to 72000 | Cooldown of the Blade Rain (Sneak + R), in ticks. |
+| `hela.wallDamage` | `8.0` | 0.0 to 100.0 | Damage of each spike of her Blade Wall (G). |
+| `hela.wallCooldown` | `140` | 0 to 72000 | Cooldown of the Blade Wall, in ticks. |
+| `hela.burstCooldown` | `120` | 0 to 72000 | Cooldown of the Blade Burst (Sneak + G), in ticks. |
+| `hela.formStrength` | `2` | 1 to 5 | The level of Strength the Goddess of Death (V) gives. |
+| `hela.dashCooldown` | `100` | 0 to 72000 | Cooldown of the Death Dash (Sneak + V), in ticks. |
+| `hela.raiseCount` | `3` | 1 to 10 | How many berserkers Raise the Dead (B) calls. |
+| `hela.raiseCountAsgard` | `5` | 1 to 10 | How many it calls in Asgard. |
+| `hela.raiseCooldown` | `1200` | 0 to 72000 | Cooldown of Raise the Dead, in ticks (1200 = 60 seconds). |
+| `hela.fenrisCooldown` | `1800` | 0 to 72000 | Cooldown of calling Fenris (Sneak + B), in ticks (1800 = 90 seconds). |
+| `hela.graspSeconds` | `6` | 1 to 60 | How long Death's Grasp (N, hold) can be held, in seconds. |
+| `hela.graspCooldown` | `100` | 0 to 72000 | Cooldown of Death's Grasp, in ticks. |
+| `hela.asgardFactor` | `1.25` | 1.0 to 5.0 | Hela's strength from Asgard: her damage is multiplied by this in Asgard. |
+| `hela.shatterMjolnir` | `true` | `true` or `false` | Death's Grasp catches and shatters a thrown Mjolnir. |
+
+## Music
+
+Section `[music]` (3.5): [a world's own music](Music#a-worlds-own-music-servers), the songs a server owner puts in `<world>/serverconfig/enhanced/music/` to replace the Walkman songs and the Witches' Road for every player.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `music.enabled` | `true` | `true` or `false` | Send the songs of the world's music folder to the players. False: everyone hears the built-in music (or his own). |
+| `music.maxFileKB` | `8192` | 16 to 65536 | The biggest song file the server sends, in KB (8192 = 8 MB); a bigger one is left out, and the log says so. |
+| `music.chunksPerTick` | `2` | 1 to 16 | How many pieces of a song (30 KB each) a downloading player is sent each tick (2 = about 1.2 MB a second). |
 
 ## The Hero Creator
 
@@ -1217,7 +1355,7 @@ The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_
 
 ## Client options: animations, effects and looks
 
-Eleven options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]` and `[spider_man]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
+Thirteen options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]`, `[spider_man]` and (3.5) `[music]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
 
 ```toml
 [animation]
@@ -1238,6 +1376,10 @@ Eleven options are about your own game only. They are not synced, and a server c
 [spider_man]
     webAssist = true
     webAssistPreview = true
+
+[music]
+    quicksilverSong = "theme"
+    ignoreServerMusic = false
 ```
 
 | Option | Setting in the file | Default | What it does |
@@ -1253,6 +1395,8 @@ Eleven options are about your own game only. They are not synced, and a server c
 | Other builders | `showOthers` | `true` | See the boxes of other builders near you. |
 | Web Assist | `webAssist` | `true` | 3.3: Spider-Man's [Web Assist](Spider-Man#web-assist-easy-swinging-33): the swing chooses its own anchor ahead and above (trees count), keeps clear of the ground and the leaves, lets go at the best moment and swings on while G is held. Off: the manual swing, aimed with the crosshair. The **J** key switches it too. |
 | Web Assist preview | `webAssistPreview` | `true` | Show where Web Assist's next web would go (a small white web) while you are in the air or sneaking. |
+| Quicksilver's song | `quicksilverSong` | `theme` | 3.5: what Quicksilver's Walkman plays: `theme` (his own song, "Silver Hours") or `sweet_dreams` (*Sweet Dreams (Are Made of This)*, as before 3.5). A song of your own, or the world's, plays instead of either. See [Music](Music). |
+| Ignore the world's music | `ignoreServerMusic` | `false` | 3.5: don't download or play the songs a server or world puts in its music folder; hear the built-in music, or your own. |
 
 Two more client options, for the music and the air of the Thanos fight, are in a `[thanos]` section of the same file: see [above](#your-own-game-the-music-and-the-atmosphere-of-the-fight).
 

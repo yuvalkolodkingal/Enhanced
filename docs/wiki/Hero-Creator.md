@@ -4,6 +4,16 @@ The **Hero Creator** is a Creative-mode item that opens a screen where you can *
 
 Hebrew: [עברית](Hero-Creator-HE)
 
+## What's new in 3.5
+
+* **Every ability in its own colour.** Every power card has a **Colour** button, and every key box a little swatch, that opens a **colour picker**: swatches, a hue and a brightness slider, a colour code, and a preview of your hero casting the power in that colour. Everything the power draws takes it: beams, shields, sparks, bolts, auras and glow. See [Colours](#colours-every-power-in-its-own-colour-35).
+* **Every ability is a card of its own.** Every **Sneak variant** of the heroes is now a card you can pick by itself and put on any key: Billy's **Hex Barrier**, Thor's **Shatter Mjolnir**, Spider-Man's **Spider-Sense**, Thanos's **Time Lock**, Cyclops's **Ricochet Shot** and 28 more; and the **Scarlet Witch's Build Magic** is a card beside Billy's. See [Heroes' Abilities](Hero-Abilities#the-sneak-variants-cards-of-their-own-35).
+* **Heimdall, Odin and Hela**: their eighteen abilities are cards too, and they have ready-made heroes (*Heimdall-like*, *Odin-like*, *Hela-like*).
+* **Unsaved changes are kept safe**: Esc or Back with changes you have not saved asks "Unsaved changes: discard them?" (**Discard** / **Keep editing**).
+* **The old hero's hat comes off**: becoming another hero puts the old hero's helmet, goggles, glasses or crown in your inventory (see [below](#changing-hero-the-old-heros-headgear-35)).
+* A power card's description now shows in full (up to six lines), and the status line ("Saved...", "Loaded...") shows at the top, where it covers no button.
+* **Update the server and every player together:** 3.5 speaks network protocol **9**.
+
 ## What's new in 3.4
 
 * **Every hero's abilities.** All **81 abilities** of the mod's sixteen heroes are powers you can pick, each with its **Sneak variant**, its look, its sounds and its animations, the same as the hero's own (it is the hero's own code). Mix them: Thor's lightning, Quicksilver's speed and Agatha's shield on one hero. The full list is on [Heroes' Abilities](Hero-Abilities).
@@ -25,6 +35,10 @@ Hebrew: [עברית](Hero-Creator-HE)
 ## Choose a Hero
 
 A card for every hero of the mod, with the hero's face drawn from its skin (scroll for more). Click a hero to see its looks, pick one and press **Become!**: you are that hero at once, with the title and the announcement, as if you had earned it. A server can turn this page off (`custom_hero.allowChooseExisting`). Between two heroes made or chosen you wait 2 seconds (`custom_hero.applyCooldownTicks`).
+
+### Changing hero: the old hero's headgear (3.5)
+
+When you become another hero (here, by a command, by an awakening item or by the cure), a worn item of **another** hero, **Magneto's Helmet**, **Quicksilver's Goggles**, **Cyclops's Ruby-Quartz Glasses** or **Wanda's Crown**, comes off your head and goes into your inventory (at your feet if it is full; a line in the chat says where). It stays on if it belongs to your new hero, or if your custom hero has an ability of that hero, and nothing comes off when your power is only taken away. Nothing is lost, and nothing keeps working unseen on your head.
 
 ### The hero's items come with him (3.4)
 
@@ -57,7 +71,7 @@ Your hero is saved with your player: it survives death and logging out, and if y
 
 The **Start** tab has ready-made heroes to begin with. Pick one and change anything you like; your hero is replaced only after you say yes.
 
-* **"Like" a hero** (16): *Magneto-like*, *Scarlet Witch-like*, *Quicksilver-like*, *Vision-like*, *Wiccan-like*, *Tommy-like*, *Loki-like*, *Thor-like*, *Phoenix-like*, *Spider-Man-like*, *Thanos-like*, *Ultron-like*, *Apocalypse-like*, *Agatha-like*, *Cyclops-like* and *Professor X-like*: that hero's own abilities at strengths that fit, his colours, his look, his way of flying and running, and a fitting cape, hat, mask or aura (Thor-like has Thor's cape).
+* **"Like" a hero** (19): *Magneto-like*, *Scarlet Witch-like*, *Quicksilver-like*, *Vision-like*, *Wiccan-like*, *Tommy-like*, *Loki-like*, *Thor-like*, *Phoenix-like*, *Spider-Man-like*, *Thanos-like*, *Ultron-like*, *Apocalypse-like*, *Agatha-like*, *Cyclops-like*, *Professor X-like* and (3.5) *Heimdall-like*, *Odin-like* and *Hela-like*: that hero's own abilities at strengths that fit, his colours, his look, his way of flying and running, and a fitting cape, hat, mask or aura (Thor-like has Thor's cape).
 * **A kind of hero** (6): *Speedster*, *Flyer-Blaster*, *Tank*, *Mage*, *Mind Master* and *Elemental*, built from a mix of powers.
 * **Empty Hero**: start with nothing and pick every power yourself.
 
@@ -70,13 +84,26 @@ This is not the same as **Choose a Hero** on the first page: *Choose a Hero* mak
 The **Powers** tab lists everything you can pick:
 
 * the **thirty powers** of the catalogue ([table below](#the-thirty-powers)), and
-* the **81 abilities of the heroes** ([Heroes' Abilities](Hero-Abilities)).
+* the **abilities of the heroes** ([Heroes' Abilities](Hero-Abilities)): 81 in 3.4, and since 3.5 Heimdall's, Odin's and Hela's eighteen, and **every Sneak variant as a card of its own** (33 of them, and the Scarlet Witch's Build Magic): 133 in all.
 
 Chips at the top filter them: **Body**, **Move**, **Energy**, **Elements**, **Mind** and **Heroes** (a face for each hero: click one to see only his abilities). The **search box** finds a power by its name, its description, its id or its hero's name, in English or in Hebrew. Powers that do the same kind of thing are stacked on one card (all the beams, all the shields, all the telekinesis...) with a switch to pick which one.
 
-Click a card to see it: its name, what it does, how its key acts (▶ press, ✋ hold, ⏻ on / off, ★ always on), **Add** / **Remove** and **Try**. A power of the thirty has **options** (for example a beam, bolts or a burst) and can have **its own colour**. A hero's ability has instead a switch for its **Sneak variant**, "Sneak: Shatter Mjolnir ✔": switch it off (✖) and the Sneak box of its key is free for something else. If a card cannot be added, it says why: the server switched it off, you have too many powers, it needs another power first, or it uses the same thing as a power you already have (see [step 5](#5-powers-that-cannot-go-together)).
+Click a card to see it: its name, what it does, how its key acts (▶ press, ✋ hold, ⏻ on / off, ★ always on), **Add** / **Remove** and **Try**. A power of the thirty has **options** (for example a beam, bolts or a burst). Every power has a **Colour** button (3.5, [below](#colours-every-power-in-its-own-colour-35)). A hero's ability has a switch for its **Sneak variant**, "Sneak: Shatter Mjolnir ✔": switch it off (✖) and the Sneak box of its key is free for something else. If a card cannot be added, it says why: the server switched it off, you have too many powers, it needs another power first, or it uses the same thing as a power you already have (see [step 5](#5-powers-that-cannot-go-together)).
 
-A hero's ability in your hero **is that hero's ability**: the same code, effects, sounds and rules, in your colours where the hero's own colours were his (Thor's blue lightning, Wanda's Hex and other fixed looks stay as they are). A few have rules of their own for a custom hero: see [the item rules](#abilities-and-items).
+A hero's ability in your hero **is that hero's ability**: the same code, effects, sounds and rules, in your colours where the hero's own colours were his (Thor's blue lightning, Wanda's Hex and other fixed looks stay as they are, unless you give the power a colour of its own). A few have rules of their own for a custom hero: see [the item rules](#abilities-and-items).
+
+**A Sneak variant as a card (3.5).** Every Sneak variant of the heroes is also a card of its own, named "*ability* (*hero*)", for example **Hex Barrier (Billy)** or **Shatter Mjolnir (Thor)**. Picked **alone**, it works on **any** key, plain or Sneak: Billy's Hex Barrier on **B** with no Freeze at all. Picked **with the ability it belongs to**, that ability keeps only its main action, and the variant goes on the box you give it. It costs what its ability costs, and the two together count as **one** power. A few need their ability, as the hero does: Dissolve the Hex needs the Hex, the Walkman needs Quicksilver Time, Instant Kill needs the Iron Spider Legs, Command needs the Sentry Army, Open Eyes needs Shut Eyes. The full list is on [Heroes' Abilities](Hero-Abilities#the-sneak-variants-cards-of-their-own-35).
+
+#### Colours: every power in its own colour (3.5)
+
+Every power card has a **Colour** button, and on the **Keys** tab every filled box has a small swatch of its colour; both open the colour picker, "Colour of *power*":
+
+* the editor's **16 swatches**, a **Hue** slider, a **Brightness** slider and a **Colour code** box (`#RRGGBB`);
+* **Hero colour**: back to no colour of its own (the power's own colours, or your hero's);
+* a **Cast preview** on the left: your hero casts the power every two and a half seconds, in the chosen colour;
+* **Done** (Enter) and **Cancel** (Esc).
+
+Everything that power draws takes the colour: its beams, bolts, shields and barriers, sparks and particles, auras and glow, the colour of its line on the HUD. A power and its Sneak variant share one colour. Colours a power cannot take: a body (more health, armour) has nothing to draw, so only its HUD line shows it; Loki's Frost Giant skin stays Jotun blue; the Infinity Gauntlet's stones keep their own colours (the fist's flare takes yours); webs, the Iron Spider's legs, the Sentries' eyes, Billy's crown and the Vision of the Hex keep their look, because they are things, not effects. Where an ability uses the game's own sparks or flames, which can't be coloured, a burst of energy in your colour is added. The built-in heroes themselves never change: only a custom hero's chosen colours do. <!-- 35-CHECK: whether Heimdall's, Odin's and Hela's rows take a chosen colour after the merge -->
 
 ### 3. Strength
 
@@ -99,7 +126,7 @@ Some powers drive the same thing inside your hero: there is only one telekinetic
 | What they share | Who drives it |
 |---|---|
 | **Telekinetic grip** (one thing held) | Magneto's Metal Telekinesis, Wanda's Chaos Telekinesis, Billy's Hex Telekinesis, the Phoenix's Telekinesis, the Telekinesis power |
-| **Shield** | Wanda's Chaos Shield, Billy's Freeze (only with its Sneak variant, the Hex Barrier), Apocalypse's Golden Shield, Agatha's Witch's Shield |
+| **Shield** | Wanda's Chaos Shield, Billy's Freeze (only with its Sneak variant, the Hex Barrier) and the Hex Barrier card, Apocalypse's Golden Shield, Agatha's Witch's Shield, Odin's Odinforce (3.5) |
 | **Beam** (the hero beam) | Wanda's Chaos Beam, Vision's Mind Stone Beam, Ultron's Repulsor Fire |
 | **Beam** (the continuous beam) | Billy's Hex Beam, Agatha's Purple Beam, Cyclops's Optic Blast and Shut / Open Eyes, Energy Blast's Beam, Fire's Flamethrower, Water's Water Jet |
 | **Metal charge** | Magneto's Iron Shrapnel Storm and Ultron's Repulsor Fire (Magneto's shrapnel charge is Ultron's plasma pool) |
@@ -109,14 +136,15 @@ Some powers drive the same thing inside your hero: there is only one telekinetic
 | **Slow time** | Quicksilver Time, Tommy's Slow Time, Time's Slow Time |
 | **Phasing** | Vision's Phase, the Phasing power |
 | **Wall-crawling** | Spider-Man's Wall Crawl, the Wall-Crawling power |
-| **Weapon, Hex, drones** | Thor's Mjolnir Throw; Wanda's Hex; Ultron's Upload and Sentry Army (each only one hero, so they never clash) |
+| **Weapon, Hex, drones, spear, the dead** | Thor's Mjolnir Throw; Wanda's Hex; Ultron's Upload and Sentry Army; Odin's Gungnir; Hela's Raise the Dead (each only one hero, so they never clash) |
+| **Build Magic** (3.5) | Billy's Build Magic, the Scarlet Witch's Build Magic: only one of the two |
 
 So Magneto's Iron Shrapnel Storm and Ultron's Repulsor Fire cannot be on the same hero, and neither can Quicksilver's Super Speed and Tommy's; Billy's Hex Beam and Agatha's Purple Beam cannot either. But Wanda's Chaos Beam with Billy's Hex Beam can: they are different beams.
 
 Two more rules:
 
-* **Some abilities need another.** Quicksilver's Wall & Water Run needs his Super Speed or Quicksilver Time.
-* **World powers.** Six abilities change the world around you: Wanda's **Hex**, Thor's **Bifrost**, Thanos's **Time Stone**, Ultron's **Upload** and **Sentry Army**, and Professor X's **Take Over a Body**. A server can switch them off for custom heroes (`custom_hero.worldPowers`), or switch off all the heroes' abilities (`custom_hero.heroModules`), or single ones (`custom_hero.disabledPowers`, for example `thor.lightning`, or `thor.*` for all of Thor's).
+* **Some abilities need another.** Quicksilver's Wall & Water Run needs his Super Speed or Quicksilver Time; some Sneak-variant cards need their ability (above).
+* **World powers.** Eleven abilities change the world around you: Wanda's **Hex**, Thor's **Bifrost**, Thanos's **Time Stone**, Ultron's **Upload** and **Sentry Army**, Professor X's **Take Over a Body**, and since 3.5 Heimdall's **Bifrost** and **Bifrost Strike**, Odin's **Banish** and **Allfather's Command**, and Hela's **Raise the Dead**. A server can switch them off for custom heroes (`custom_hero.worldPowers`), or switch off all the heroes' abilities (`custom_hero.heroModules`), or single ones (`custom_hero.disabledPowers`, for example `thor.lightning`, or `thor.*` for all of Thor's).
 
 ### 6. Put them on the keys: plain or Sneak
 
@@ -127,7 +155,8 @@ The **Keys** tab has **ten boxes**: the five keys **R G V B N** (with the names 
 * **A power of the thirty** with several *press* options can have one option on the plain box and **another on its Sneak box** (for example Energy Blast's Bolts on **B** and its Burst on **Sneak + B**). That costs half the power again in points.
 * **Sneak + a key whose Sneak box is empty** does what the key does alone.
 * **One cooldown per key**, shared by its two boxes, as for every hero.
-* **Always-on powers** (the bodies, Durability, Night Vision...) need no box: they are listed under *With no key*. **Build Magic** is used with **Y**, as Billy's, and needs no box either.
+* **Always-on powers** (the bodies, Durability, Night Vision...) need no box: they are listed under *With no key*. **Build Magic** (Billy's, or since 3.5 the Scarlet Witch's) is used with **Y** and needs no box either.
+* **A Sneak-variant card** (3.5) goes on any box, plain or Sneak; when its ability is on the same hero, that ability's own Sneak box is freed for it.
 * **Auto** lays out every power like a hero's: the heroes' abilities on the keys they have for their own hero (Thor's Lightning Beam on **V**...), the rest by kind (energy and elements on **R**, movement on **G**, mind on **V**, body on **B**), and what finds no key on a free Sneak box.
 * What you hold goes to the box that went down: let go of Sneak while holding a beam and the beam keeps going until you let go of the key.
 * Some abilities use Sneak for a small extra of their own while you use them (setting a telekinetic grip down, Magneto's pull with nothing held): that works only while the Sneak box of their key is empty.
@@ -168,6 +197,8 @@ The **Look** tab has seven parts: **Skin**, **Name** and colours, **Cape**, **Ha
 
 ### 9. Become, save, share
 
+Since 3.5, leaving the editor (Esc or Back) with changes you have not saved or become asks first: "Unsaved changes: discard them?" **Discard** goes back to the Hero Creator, **Keep editing** stays. **Become this hero!** never asks: your hero is sent, not lost.
+
 The **Save** tab has **Become this hero!**, **Save to File** (also copies it), **Copy**, **Import from Clipboard**, and the list of your saved heroes in `enhanced/heroes/` (click one to load it; **Open Heroes Folder** opens the folder). You can also drop a hero `.json` file on the window. Before you become your hero it tells you what the server would change ("The server will change this: ..."), or that everything fits.
 
 ## Abilities and items
@@ -176,13 +207,14 @@ Most of the heroes' abilities need nothing but the ability. A few follow the rul
 
 * **Thor's Mjolnir Throw needs Mjolnir or Stormbreaker in your hand** to throw, call back or shatter, as for Thor. The ability also makes you **worthy**: you can lift Mjolnir (unless someone else owns it). Stormbreaker can be crafted by anyone.
 * **Thor's Lightning Beam works bare-handed**; with Mjolnir or Stormbreaker in hand it reaches further and hits harder, as Thor's does. With Mjolnir Throw, the Lightning Beam, the God of Thunder or the Asgardian Body, lightning cannot hurt you, as it cannot hurt Thor.
-* **Thor's Bifrost works without a weapon** for a custom hero: the key opens the Bifrost screen (home, your saved places, save this one) and **Sneak** takes you where you look. Its wait follows its strength.
+* **Thor's Bifrost works without a weapon** for a custom hero: the key opens the Bifrost screen (Asgard since 3.5, home, your saved places, save this one) and **Sneak** takes you where you look. Its wait follows its strength. **Heimdall's Bifrost** (3.5) does the same. Either one takes everyone in its circle, as every Bifrost does.
+* **Heimdall's Hofund Slash works with any sword** (3.5), and 30% harder with a Hofund. **Odin's Gungnir Blast** fires from your bare hand; his Throw needs a Gungnir in your hand. **Hela's** abilities need no item.
 * **Cyclops's abilities need no glasses** for a custom hero. *Shut Eyes* / *Open Eyes* does what taking the glasses off and putting them back on does for Cyclops: **Sneak** opens your eyes and the giant beam pours out; the key without Sneak shuts them.
 * **Spider-Man's Iron Spider Legs work in any look**, not only in the Iron Spider suit, and they make you an Iron Spider (metal) for Magneto. **J** switches Web Assist when you have his Web Zip.
 * **Wanda's Hex**: pressing its key again opens Hex Control, **Sneak** dissolves it, and **Z** gives orders to its Vision. It dissolves when you die, lose the power or remake your hero without it.
-* **Billy's Build Magic** is used with **Y**, by Billy's rules (the meter and the rank), without Wanda's Instant.
+* **Billy's Build Magic** is used with **Y**, by Billy's rules (the meter and the rank), without Wanda's Instant. **The Scarlet Witch's Build Magic** (3.5) is used with **Y** by hers: no meter, and her **Instant** switch. A hero may have only one of the two.
 
-**Roles come with the abilities.** A custom hero with an ability of the Scarlet Witch, Billy, Loki or Agatha (or the Magic power) is a **sorcerer**: he may read the Book of the Vishanti and the Darkhold, and a Hex's Runes hold him. Professor X's abilities (and the Telepathy and Mind Control powers) make him a **telepath** of the Professor's rank; any ability of Wanda or Billy, and the Phoenix's Mind Reading and Mind Control, a stronger one. Vision's Density and body and Ultron's body make him **metal** for Magneto. Agatha's abilities are **dark magic**. The Phoenix's Body of Fire (and the Fire power) keep fire off him.
+**Roles come with the abilities.** A custom hero with an ability of the Scarlet Witch, Billy, Loki or Agatha (or the Magic power) is a **sorcerer**: he may read the Book of the Vishanti and the Darkhold, and a Hex's Runes hold him. Professor X's abilities (and the Telepathy and Mind Control powers) make him a **telepath** of the Professor's rank; any ability of Wanda or Billy, and the Phoenix's Mind Reading and Mind Control, a stronger one. Vision's Density and body and Ultron's body make him **metal** for Magneto. Agatha's and (3.5) Hela's abilities are **dark magic**; Odin's Odinforce makes him a **sorcerer**. The Phoenix's Body of Fire (and the Fire power) keep fire off him.
 
 **When the power ends.** When your hero dies, logs out, loses his power or is remade, every ability ends cleanly: beams, shields, switches, drones, the Hex.
 
@@ -269,7 +301,7 @@ Since 3.4 the file is **version 2**:
 | `color`, `glow` | The main and glow colours, as `#RRGGBB`. |
 | `look` | `base` is `own` (your own skin), `skin` (the skin in the file) or a hero's look as `<hero>/<look>`, for example `thor/ragnarok` or `agatha/all_along` (Magneto, the Scarlet Witch and Quicksilver: `magneto/suit`). `slim` is the arm width. Then, only when they are not none: `cape`, `hat`, `visor` (the mask), `eyes` and `aura`, each with a `style` (the ids below), a `color` (`#RRGGBB`; left out: the hero's colour), for the eyes a `row` (0 to 3), and for the eyes and the aura a `when` (`always`, `powers` or `flying`). |
 | `skin` | Only with `"base": "skin"`: the 64x64 PNG, written as base64. |
-| `powers` | Each power: its `id` (a power of the thirty, such as `flight`, or a hero's ability, such as `thor.lightning`: [the list](Hero-Abilities)), its `strength` (1 to 10; a hand-written `"level": 1`, `2` or `3` reads as 3, 6 or 10; none at all reads as 5), its `option` (a power of the thirty: one of its options; a hero's ability: `both`, or `main` to switch its Sneak variant off), an optional `color` of its own, and an optional `stance` for a held or switched-on power (`auto`, `none` or a stance id). |
+| `powers` | Each power: its `id` (a power of the thirty, such as `flight`, or a hero's ability, such as `thor.lightning`: [the list](Hero-Abilities)), its `strength` (1 to 10; a hand-written `"level": 1`, `2` or `3` reads as 3, 6 or 10; none at all reads as 5), its `option` (a power of the thirty: one of its options; a hero's ability: `both`, or `main` to switch its Sneak variant off), an optional `color` of its own (`#RRGGBB`; since 3.5 any power may have one, left out for the hero colour), and an optional `stance` for a held or switched-on power (`auto`, `none` or a stance id). |
 | `keys` | Five ids, for **R G V B N** in that order; `""` leaves a key empty. |
 | `sneakKeys` | The five **Sneak +** boxes, in the same order: `"<id>#alt"` is a hero's ability's Sneak variant (put there by itself), `"<id>"` a power on its own, `"<power>#<option>"` another press option of the power on the plain key. |
 | `moves` | The move of each box that is not automatic: keys `r`, `g`, `v`, `b`, `n` and `sneak_r` ... `sneak_n`; values `none` or a move id (`billy_bolt`, `thor_summon`, `thanos_slam`...). |
@@ -298,7 +330,7 @@ Unknown fields are ignored, so a hand-written file loads as far as it can. The e
 ## Playing your hero
 
 * Your keys do what you put on them; each key has its own cooldown, shared by its plain and Sneak boxes. The top-left panel shows your hero's name in your colours, each key's power, a `[⇧R]` line under a key for its Sneak box, whether each switch is on, your shields' strength, and an *Always on* line for the powers that need no key.
-* Beams, particles and the HUD use your colours, or a power's own colour if you gave it one; the heroes' abilities use your colours where the hero used his own.
+* Beams, particles and the HUD use your colours, or a power's own colour if you gave it one (since 3.5 any power, a hero's ability too); the heroes' abilities use your colours where the hero used his own.
 * A custom hero flies only with the **Flight** power (on its key, or double-tap **Space**). Vision's **Phase** also lets you float while it is on, and Vision's **Density** stops you flying while it is on.
 * **Stop Being a Hero** takes your power away; your hero stays saved for later.
 * An operator can also give it with `/enhanced power set <player> custom`: the player becomes the hero they last made (an empty hero if they never made one). See [Commands](Commands).

@@ -2,7 +2,7 @@
 
 A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The one exception is Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs.)
 
-Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops and Professor X have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
+Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X and, since 3.5, Heimdall, Odin and Hela have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
 ## Switching looks
 
@@ -81,7 +81,7 @@ Her eyes glow **violet** while she reads minds, senses them, takes one over or f
 |---|---|---|
 | **Homemade Suit (Homecoming)** (default) | `homemade` | The suit Peter makes himself: a red knit mask with round goggles, a red hooded vest with a hand-painted black spider and a brass zipper pull, a blue-grey sweatshirt, fingerless gloves with brass web-shooters on the wrists, baggy sweatpants and red socks. No protection. |
 | **Iron Spider** | `iron_spider` | Tony's nanotech suit: crimson mesh, big white lenses, black armoured bands from the shoulders into a gold hexagon on the chest, gold trim, and a gold circle on the back where four mechanical legs unfold. Armor 14. Magneto can lift it. |
-| **Brand New Day** | `brand_new_day` | The suit Peter sews himself: orange-red and blue, raised silver web lines on the arms and legs, and a big black spider with long thin legs. Armor 8. His webs are organic. |
+| **Brand New Day** | `brand_new_day` | The suit Peter sews himself, redrawn in 3.5 to match the film: a **red** head, shoulders and chest covered in dark raised web lines, a long, slender **black spider** from the collar to below the chest (and a red one on the back), **deep blue** panels under the arms and down the flanks, blue legs, the inside of the arms blue, red gloves, red boots, a thin red belt, silver web-shooters on the outside of the forearms, and big white lenses in thick black frames. Armor 8. His webs are organic. |
 | **Your own skin** | `own` | Spider-Man's powers in your own skin (the legs, the eyes and the webs still show). |
 
 The webs are always silver-white, in every look; the look gives the colour of the title and the look-change burst (the Iron Spider's is gold). In every suit the lenses **go black with a dark red glint** while the Black Eyes last, and in the Iron Spider they close to **two red slits** in Instant Kill. Spider-Man is the one hero whose looks differ in **protection**: it comes with the suit and works at once when you change it, even in the air.
@@ -146,6 +146,36 @@ The glasses are drawn over every look while they are on; his blasts are red in e
 | **Your own skin** | `own` | His powers in your own skin. |
 
 He chooses between the two Charleses when he awakens; **H** changes it later. His powers are pale blue in every look.
+
+### Heimdall ([page](Heimdall))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Guardian of the Bifrost** (default) | `guardian` | His golden plated armour and the great gold helmet with two horns sweeping forward and up. |
+| **Ragnarok (hooded cloak)** | `ragnarok` | The brown-green hooded cloak over leather he wore in hiding in *Thor: Ragnarok*; no helmet. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+His eyes glow amber while the All-Seeing Sight is open; his effects are gold, and the Bifrost's are rainbow.
+
+### Odin ([page](Odin))
+
+| Look | Id | What it is |
+|---|---|---|
+| **The Allfather** (default) | `allfather` | Gold and copper armour, a great red cape, the gold winged helmet and his gold eyepatch. |
+| **The Wanderer** | `wanderer` | A long dark coat, no helmet, the eyepatch. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+The Odinforce is gold in every look.
+
+### Hela ([page](Hela#becoming-hela-the-hero))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Goddess of Death** (default) | `goddess` | Her flat black suit with dark emerald lines and the black-green hood; the antlered headdress grows from it while her form is on. |
+| **Arrival (black cloak)** | `arrival` | The long black cloak and swept-back hair of her arrival in *Ragnarok*; the headdress only while the form is on. |
+| **Your own skin** | `own` | Her powers in your own skin. |
+
+Her blades are black with green edges, and her smoke black-green, in every look.
 
 ### Magneto, the Scarlet Witch and Quicksilver
 

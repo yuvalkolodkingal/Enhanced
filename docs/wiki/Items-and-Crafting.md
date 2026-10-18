@@ -281,13 +281,14 @@ The **Radioactive Spider** ([above](#radioactive-spider)) is found too, in five 
 
 ## Rewards of the bosses
 
-These three are never crafted and never found in a chest: each is the reward of a boss fight, and the only way in to its hero.
+These four are never crafted and never found in a chest: each is the reward of a boss fight, and the only way in to its hero.
 
 | Item | Becomes | Where it comes from |
 |---|---|---|
 | [Infinity Gauntlet](Thanos#the-infinity-gauntlet) | [Thanos](Thanos) (hold right-click for three seconds with no power) | The reward for beating the Mad Titan: one for each fighter who did 3 percent of his health, and one for whoever struck the last blow. Held with no power it lights its five stones in turn and makes you [Thanos](Thanos#playing-thanos); it can be given to a friend |
 | [Ultron's Core](#ultrons-core) | [Ultron](Ultron) (with Loki's Scepter, with no power) | The reward for beating Ultron: one for each fighter who was there for a minute and hurt him or his Sentries, and one for whoever struck the last blow |
 | [Essence of En Sabah Nur](#essence-of-en-sabah-nur) | [Apocalypse](Apocalypse#becoming-apocalypse-the-hero) (hold right-click for three seconds with no power) | The reward for beating Apocalypse: one for each fighter who was there for a minute and hurt him or his shield, and one for whoever struck the last blow |
+| [Hela's Headdress](#helas-headdress) (3.5) | [Hela](Hela#becoming-hela-the-hero) (hold right-click for three seconds with no power) | The reward for beating Hela in Asgard: one for each fighter who did 2 percent of her health, and one for whoever struck the last blow. It also gives its winner the right to take Gungnir |
 
 ### Ultron's Core
 
@@ -296,6 +297,32 @@ The heart Wanda tore out, in a cage of three gunmetal bars: a glowing red-orange
 ### Essence of En Sabah Nur
 
 "A sapphire soul in gold veins. It looks for a body." A pale-blue wisp swirling in a gold-veined crystal. It is the reward of the Apocalypse fight: every fighter who was there for a minute and hurt him **or his shield** gets one, and so does whoever lands the last blow; it is never crafted and never found in a chest. A player with **no power** who **holds right-click for three seconds** with it is moved into the Essence and becomes [Apocalypse](Apocalypse#becoming-apocalypse-the-hero) (the Essence is used up; let go early and nothing is). Someone who already has a power is told "Your body already holds a power", and nothing is used up: they can keep it or give it to a friend. Fireproof, does not stack.
+
+### Hela's Headdress
+
+"Hold it with no power to become Hela." The antlered headdress of the Goddess of Death, dark green and shining. It is the reward of the [Hela](Hela#rewards) fight; it is never crafted and never found in a chest. A player with **no power** who **holds right-click for three seconds** with it becomes [Hela](Hela#becoming-hela-the-hero) (the Headdress is used up; let go early and nothing is). A Headdress of the reward remembers whom it was given to, and gives him the right to take [Gungnir](#gungnir) when it reaches him. Fireproof, does not stack, and never lost in Asgard.
+
+## The items of Asgard (3.5)
+
+None of these can be crafted. [Asgard](Asgard) keeps all three weapons for you if you die there.
+
+### Hofund
+
+Heimdall's sword, a long golden broadsword: 10 attack damage, sweeps, never breaks, fireproof. **Whoever holds a Hofund, anyone's, can open the Bifrost** (right-click: the Bifrost screen; Sneak + right-click: to where you look), unless the server turns that off (`asgard.hofundOpensBifrost`). It is won in [Heimdall's](Heimdall#becoming-heimdall-the-guardians-watch) **Guardian's Watch**, bound to the winner ("Bound to" on the tooltip), and with no power **your own Hofund in your hand makes you Heimdall**. A lost one is replaced (Heimdall calls it back; the old copy crumbles to golden dust).
+
+### Gungnir
+
+The spear of the Allfather: 9 attack damage, a block more reach, never breaks, fireproof. Anyone can fight with it, but **only its owner opens the Bifrost** with it (right-click; Sneak: to where you look). Each player who beat [Hela](Hela) takes **his own** from Gungnir's Stand in Odin's vault; with no power, **sitting on the Throne of Asgard with your own Gungnir in your hand makes you [Odin](Odin)**. A lost one is replaced at the stand (or by Odin's R); the old copy crumbles.
+
+### Sif's Token, Asgardian Mead and Valkyrie's horse
+
+* **Sif's Token**: a shining gold nugget, the prize for beating Sif in her training duel ([Asgardians](Asgardians#training-with-sif)).
+* **Asgardian Mead**: honey, from Volstagg's trades.
+* **Valkyrie's Horse**: a lead from Valkyrie's trades; a tamed, saddled horse waits beside her.
+
+### The blocks of Asgard
+
+Asgardian Gold Plating, Gold Trim, Gold Pillar and Gold Lattice; Realm Stone, Realm Stone Bricks (with stairs, slab and wall), Polished Realm Stone and Realm Stone Pillar; the Rainbow Bridge; the Cosmic Falls; the Mural of Asgard; the Asgardian Brazier; Golden Leaves of Asgard; the Asgardian Bench. They are in the Creative tab, with no recipe. In Asgard's wild land the stone and the leaves can be mined like any block; the city itself can't be broken ([Asgard](Asgard#the-rules-of-asgard)). The Throne of Asgard, Hela's Seal, Gungnir's Stand, Hofund's Socket, the Bifrost Mechanism and the Bifrost Rune Stone are the city's own: they can't be broken and have no item.
 
 ## Hero Creator
 

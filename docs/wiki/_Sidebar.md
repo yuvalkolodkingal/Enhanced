@@ -29,10 +29,19 @@
 * [Hero Creator](Hero-Creator)
 * [Heroes' Abilities](Hero-Abilities)
 
+**Asgard**
+
+* [Asgard](Asgard)
+* [The Asgardians](Asgardians)
+* [Heimdall](Heimdall)
+* [Odin](Odin)
+* [Hela](Hela)
+
 **Reference**
 
 * [Items and Crafting](Items-and-Crafting)
 * [Structures](Structures)
+* [Music](Music)
 * [Commands](Commands)
 * [Server Configuration](Server-Configuration)
 * [FAQ](FAQ)
@@ -72,10 +81,19 @@
 * [יוצר הגיבורים](Hero-Creator-HE)
 * [יכולות הגיבורים](Hero-Abilities-HE)
 
+**אסגרד**
+
+* [אסגרד](Asgard-HE)
+* [האסגרדים](Asgardians-HE)
+* [היימדל](Heimdall-HE)
+* [אודין](Odin-HE)
+* [הלה](Hela-HE)
+
 **מידע**
 
 * [חפצים ויצירה](Items-and-Crafting-HE)
 * [מבנים בעולם](Structures-HE)
+* [מוזיקה](Music-HE)
 * [פקודות](Commands-HE)
 * [הגדרות שרת](Server-Configuration-HE)
 * [שאלות נפוצות](FAQ-HE)

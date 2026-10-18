@@ -42,7 +42,7 @@ Only people with no power walk the Road, so the rules are few:
 
 ## The Road's music
 
-In 3.3 the Road has a song, a **witchy ballad of its own**, in a different arrangement at every stage. (It is an original tune in the spirit of *Agatha All Along*, not the show's song: its first notes are the coven's tune that the Road's door has always played.)
+In 3.3 the Road has a song, a **witchy ballad of its own**, in a different arrangement at every stage, as the show's ballad has many versions; 3.5 adds a sixth, for the moment you choose. (It is an original tune in the spirit of *Agatha All Along*, not the show's song: its first notes are the coven's tune that the Road's door has always played.)
 
 | Stage | What you hear |
 |---|---|
@@ -50,10 +50,12 @@ In 3.3 the Road has a song, a **witchy ballad of its own**, in a different arran
 | **The Parkour** | Lute arpeggios and a harpsichord, with a bass, a frame drum and a shaker. |
 | **Copy the Structure** | A music box over a choir; the second time round the choir sings the tune. |
 | **The Ice-Boat Race** | Fast drums, driving strings and violins, a break of low strings and toms, and horns. |
-| **The end of the Road** (the hall where you choose) | Everything at once: choir, strings, horns, harp and timpani, and the second half in a major key, triumphant. |
+| **The choice** (3.5: in the hall at the end, while the Road waits for you to choose Billy or Tommy) | A solo cello over a low humming choir and a slow tick; then the harp turns the tune to E major. |
+| **The end of the Road** (in the hall, while the light gathers, and in the farewell) | Everything at once: choir, strings, horns, harp and timpani, and the second half in a major key, triumphant. |
 
 * It plays on the **Music** volume slider (at 0 it is silent), fades in over 2 seconds, crossfades to the next stage, fades out over 3 seconds when you leave the Road, and holds the game's own music back while it plays. Each arrangement loops smoothly.
-* **Replacing it.** A resource pack (or a server resource pack) can swap any of the five for music of your own: in its `assets/enhanced/sounds.json`, define the sound event with `"replace": true` and your own `.ogg` files, and keep `"stream": true` (the game loops them). The events are:
+* **A server's own music (3.5).** A server can replace the Road's music for every player with no resource pack: put `witches_road.ogg` (every part) or `witches_road_<part>.ogg` (`entrance`, `parkour`, `structure_copy`, `ice_boat`, `choice`, `ending`) in `<world>/serverconfig/enhanced/music/`, and the players download it by themselves. A player can also put his own `witches_road.mp3` (or one part's) in `config/enhanced/music/`. See [Music](Music).
+* **Replacing it with a resource pack.** A resource pack (or a server resource pack) can swap any of the six for music of your own: in its `assets/enhanced/sounds.json`, define the sound event with `"replace": true` and your own `.ogg` files, and keep `"stream": true` (the game loops them). The events are:
 
 | Stage | Sound event | File in the mod |
 |---|---|---|
@@ -61,6 +63,7 @@ In 3.3 the Road has a song, a **witchy ballad of its own**, in a different arran
 | The Parkour | `enhanced:music.road.parkour` | `music/road_parkour.ogg` (48 s) |
 | Copy the Structure | `enhanced:music.road.copy` | `music/road_copy.ogg` (58 s) |
 | The Ice-Boat Race | `enhanced:music.road.boat` | `music/road_boat.ogg` (48 s) |
+| The choice (3.5) | `enhanced:music.road.choice` | `music/road_choice.ogg` (32 s) |
 | The end of the Road | `enhanced:music.road.ending` | `music/road_ending.ogg` (51 s) |
 
 ```json

@@ -1,14 +1,14 @@
 # Structures
 
-Three places of the films are built into the world in 3.3, each with the item of a hero inside: a **Hydra outpost**, where **Loki's Scepter** is kept; **Mjolnir's crater**, where the hammer lies where it fell from the sky; and the **Mutant School**, Xavier's School for Gifted Youngsters, with **Professor X's wheelchair** and **Cyclops's glasses**.
+Three places of the films are built into the world in 3.3, each with the item of a hero inside: a **Hydra outpost**, where **Loki's Scepter** is kept; **Mjolnir's crater**, where the hammer lies where it fell from the sky; and the **Mutant School**, Xavier's School for Gifted Youngsters, with **Professor X's wheelchair** and **Cyclops's glasses**. In 3.5 a fourth joins them: the **Bifrost sites**, whose **rune stone** calls the Bifrost to [Asgard](Asgard) for a player with no power.
 
 Hebrew: [עברית](Structures-HE)
 
 ## Finding them
 
 * They are in the **Overworld** only, in the biomes listed below, and only on fairly **level, dry ground** (a site on a slope, or over water, is skipped). So they are rarer than their spacing alone says: in test worlds the nearest outpost was about 870 and 1,470 blocks from the spawn, and the nearest school about 2,000.
-* **`/locate structure`** finds them (operators, or anyone in a world with cheats): `/locate structure enhanced:hydra_outpost`, `/locate structure enhanced:mjolnir_crater` and `/locate structure enhanced:mutant_school`.
-* **Old worlds get them too**: they generate in every **new chunk** of a world made before 3.3. Explore land you have not been to yet.
+* **`/locate structure`** finds them (operators, or anyone in a world with cheats): `/locate structure enhanced:hydra_outpost`, `/locate structure enhanced:mjolnir_crater`, `/locate structure enhanced:mutant_school` and (3.5) `/locate structure enhanced:bifrost_site`.
+* **Old worlds get them too**: they generate in every **new chunk** of a world made before 3.3 (the Bifrost sites, before 3.5). Explore land you have not been to yet.
 * Outposts and craters keep at least 6 chunks away from a school.
 
 | Structure | Where | Spacing / separation (chunks) |
@@ -16,6 +16,7 @@ Hebrew: [עברית](Structures-HE)
 | Hydra outpost | Taigas (every kind), snowy plains, grove, forest, birch forests, plains, meadow, windswept forest | 36 / 12 |
 | Mjolnir's crater | Desert, badlands (every kind), savannas (every kind), plains, sunflower plains | 32 / 10 |
 | Mutant School | Plains, sunflower plains, meadow | 40 / 14 |
+| Bifrost site (3.5) | Plains, meadow, snowy plains, taiga, windswept hills, badlands | 48 / 16 |
 
 ## A Hydra outpost
 
@@ -44,10 +45,22 @@ Inside are the entrance hall (double height, a red carpet, a grand staircase, a 
 * **Scott Summers' room** (red and blue, with ruby-red windows). Its chest **always holds [Cyclops's Ruby-Quartz Glasses](Cyclops)**.
 * **Cerebro**, below the house: white light panels and a walkway to the console, and a chest of redstone, quartz and a diamond.
 
+**A school built before 3.3.1** still has a hole round its front door (3.3.1 fixed the door for new schools). An operator can mend it in place: stand near the school and run **`/enhanced structure repair_school`** (3.5). It changes only the 76 blocks of the door and the tower that 3.3.1 changed, in the school's own stone (mossy and cracked bricks too, as in a new school); a block a player has changed there is left alone and counted. It finds the nearest school within 128 blocks (or the radius you give, 16 to 256), and you can run it again any time: it says when the school is whole. See [Commands](Commands#structures-enhanced-structure).
+
+## The Bifrost Rune Stones
+
+A **Bifrost site** (3.5) is a place where the Bifrost has touched the ground many times: a ring of standing stones round a circle of Bifrost runes burned into the earth, and in the middle the **Bifrost Rune Stone**, which can't be broken.
+
+* **Right-click the rune stone** with no power, no key, nothing: you call "Heimdall! Open the Bifrost!", the Bifrost gathers round you for 3 seconds, and takes you, and everyone in its circle, to Heimdall's Observatory in [Asgard](Asgard).
+* The stone then rests for **60 seconds** (`asgard.runeStoneCooldown`): "The stone is resting." If Asgard is closed on the server, its runes flicker and go dark.
+* Heimdall remembers that you came from this stone, and can send you back to it.
+
+See [Asgard](Asgard#the-bifrost-rune-stones-for-players-with-no-power).
+
 ## For servers and data packs
 
-The structures are data: their sets (spacing, separation, salt), the biome tags that say where they may stand (`enhanced:has_structure/hydra_outpost`, `mjolnir_crater` and `mutant_school`), the buildings themselves (structure templates) and their loot tables (`enhanced:chests/hydra_outpost/vault`, `lab`, `barracks`, `supply`; `enhanced:chests/mutant_school/study`, `cyclops`, `cerebro`, `dormitory`, `library`, `kitchen`) are all in the mod's data, so a data pack can make them rarer or more common, move them to other biomes, rebuild them or change what is in the chests. They have no server config options. See [Server Configuration](Server-Configuration#structures).
+The structures are data: their sets (spacing, separation, salt), the biome tags that say where they may stand (`enhanced:has_structure/hydra_outpost`, `mjolnir_crater`, `mutant_school` and `bifrost_site`), the buildings themselves (structure templates) and their loot tables (`enhanced:chests/hydra_outpost/vault`, `lab`, `barracks`, `supply`; `enhanced:chests/mutant_school/study`, `cyclops`, `cerebro`, `dormitory`, `library`, `kitchen`) are all in the mod's data, so a data pack can make them rarer or more common, move them to other biomes, rebuild them or change what is in the chests. They have no server config options (only the rune stone's rest, `asgard.runeStoneCooldown`). See [Server Configuration](Server-Configuration#structures).
 
 ## Related
 
-[Loki](Loki) · [Thor](Thor) · [Professor X](Professor-X) · [Cyclops](Cyclops) · [Items and Crafting](Items-and-Crafting)
+[Loki](Loki) · [Thor](Thor) · [Professor X](Professor-X) · [Cyclops](Cyclops) · [Asgard](Asgard) · [Items and Crafting](Items-and-Crafting)

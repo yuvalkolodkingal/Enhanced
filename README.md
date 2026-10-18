@@ -19,6 +19,8 @@ Every power's look and colour follows the MCU films and shows, and Vision, Tommy
 (in his Asgardian clothes, the TVA's or the God of Stories'), Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops and Professor X each have several looks
 (press **H**).
 
+**New in 3.5:** [Asgard](docs/wiki/Asgard.md), the Realm Eternal: a golden city floating over a sea of stars (Odin's palace and throne room, the Rainbow Bridge, Heimdall's Observatory, gardens, halls, training grounds, waterfalls off the edge into space), a world of its own that **only the Bifrost reaches** (the Bifrost answers Mjolnir, Stormbreaker, Hofund, your own Gungnir, Heimdall and Odin; with no power, a **Bifrost Rune Stone** in the Overworld), safe to explore. Every Bifrost, Thor's too, now **takes everyone in its circle** (`bifrost.groupRadius`, `bifrost.sneakToStay`). Three new heroes: [Heimdall](docs/wiki/Heimdall.md) (win his Guardian's Watch and hold Hofund), [Hela](docs/wiki/Hela.md) (a boss in the throne room: three phases, berserkers and Fenris; wear her Headdress) and [Odin](docs/wiki/Odin.md) (take Gungnir from his vault and sit on the Throne of Asgard); [the Asgardians](docs/wiki/Asgardians.md) talk (English and Hebrew), trade, train and fight beside you. [Music](docs/wiki/Music.md): Quicksilver's own theme *Silver Hours* (*Sweet Dreams* is a client option), Speed's Walkman with *Westview Blur*, a new version of the Road's ballad for the choice, and a world music folder whose songs every player downloads. The Hero Creator: every ability in its own colour (a colour picker), and every Sneak variant a card of its own. Fixes: `/enhanced structure repair_school`, a tougher Loki, Agatha's drain only on sorcerers, the *Brand New Day* suit redrawn, the unsaved-changes prompt, and the old hero's headgear into your bag on a hero change. The server and every player need 3.5 (network protocol 9).
+
 **New in 3.4:** the [Hero Creator](docs/wiki/Hero-Creator.md) makes heroes as good as the mod's own: **all 81 abilities of the sixteen heroes** are powers a custom hero can pick (each the hero's own code, with its Sneak variant, effects, sounds and moves; the list is on [Heroes' Abilities](docs/wiki/Hero-Abilities.md)), mixed with the thirty powers, each with a strength slider, on **R G V B N** alone or with **Sneak**, within a budget of 90 points and 10 powers; powers of different heroes that drive the same thing (one shield, one grip, one beam...) cannot go together; every power plays a gesture and a stance, and you choose how your hero flies, runs and stands; a cape, a hat, a mask, glowing eyes and an aura go on top of the skin; a new editor with a moving 3D preview, ready-made heroes, categories and search in English and Hebrew; **Choose a Hero** gives the hero's own items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice; hero files of 3.3 load and turn into the new format (version 2) by themselves. The server and every player need 3.4 (network protocol 8).
 
 **New in 3.3:** three new heroes: [Agatha](docs/wiki/Agatha.md) (read the Darkhold with no power: its purple beam, flight, the Power Drain, a witch's shield and a Rune Trap), [Cyclops](docs/wiki/Cyclops.md) (put on his ruby-quartz glasses: the Optic Blast, and a giant beam whenever they come off) and [Professor X](docs/wiki/Professor-X.md) (craft his wheelchair: hear thoughts, take over bodies, Cerebro; young or old); the [Hero Creator](docs/wiki/Hero-Creator.md) (Creative: become any hero, or make your own from thirty powers with a strength each, your keys, colours and skin, saved as JSON); [Hydra outposts, Mjolnir's craters and the Mutant School](docs/wiki/Structures.md) in the world (Loki's Scepter is now found only in the outposts' vaults); Billy's Hex Barrier stops everything from the front, with 30 health and no time limit, and chaos magic shatters it; Wanda's Hex lets in only those she approves and no power crosses its wall, and her **Hex Runes** silence every other sorcerer inside; the ward of the Book of the Vishanti keeps out monsters, bosses, what they shoot and dark magic; the Witches' Road plays an original ballad in a new arrangement at each stage; Quicksilver and Tommy each get separate **slow time** (R) and **super speed** (G) keys, **run up walls and along ceilings**, and new attacks (Dash Strike, Pebble Barrage, Sonic Boom); Spider-Man's **Web Assist** makes swinging easy in forests and open land (J switches it); and smoother animations everywhere.
@@ -69,6 +71,9 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 | **Agatha** | Craft the **Darkhold** (netherite scrap, a wither rose, echo shards, a book, a wither skeleton skull) and, with no power, **hold right-click on it for 3 seconds**: the book's purple beam (**R**; Sneak: hex mark or mind glimpse), flight, 40 health, the **Power Drain** (**V**: a hero's powers gone for 10 seconds), the **Witch's Shield** (**B**, hold) and the **Rune Trap** (**N**). Magic used on her poisons whoever used it. |
 | **Cyclops** | Find his **Ruby-Quartz Glasses** (Scott Summers' room in the **Mutant School**; rarely woodland mansions and stronghold libraries) and **put them on** with no power: the **Optic Blast** (hold **R**; Sneak: Ricochet Shot), Concussion Blast, Optic Leap, Rally. Take them off (**Sneak + N**) and a giant beam pours out until you put them back on (**N**). |
 | **Professor X** | **Craft his Wheelchair** (3 leather, an Eye of Ender, 2 iron ingots) or find it in the **Mutant School**, and with no power **hold right-click on it for 3 seconds**; choose the young or the old Charles (who sits in the chair): the Mental Blast, **Hear Thoughts**, **Take Over a Body** (not a telepath: the Scarlet Witch, the Phoenix and Billy throw him out), Freeze Minds and **Cerebro**. |
+| **Heimdall** | In **Asgard**, talk to Heimdall in the Observatory and win the **Guardian's Watch** (strike seven Shadows of Hela in three minutes): he gives you **Hofund**; with no power, hold it: **Hofund Slash** (Sneak: Lunge), the **All-Seeing Sight** (Sneak: Far Sight), the **Bifrost** with no item, the **Guardian's Ward** (Sneak: the Einherjar), the **Bifrost Strike** (Sneak: send a friend). |
+| **Hela** | Break **Hela's Seal** behind the Throne of Asgard, beat the **Goddess of Death** (three phases, berserkers, Fenris, the Strength of Asgard) and hold her **Headdress** for 3 seconds with no power: necrosword volleys, blade walls, the Goddess of Death form, the risen dead and Fenris, Death's Grasp. |
+| **Odin** | Beat Hela, take **Gungnir** from its stand in Odin's vault, and with no power **sit on the Throne of Asgard** holding it: the Gungnir Blast and Throw, the Odinforce Shield and Heal, Banish, the ravens Huginn and Muninn, the Allfather's Command and the Odinsleep. |
 | **Your own hero** | In Creative mode (or as an operator), use the **Hero Creator**: become any hero at once (with his items), or make your own from a catalogue of thirty powers and the 81 abilities of the mod's heroes, each with a strength from 1 to 10 within a budget, on the keys you choose (plain or Sneak), with the heroes' moves, in your colours and your own 64x64 skin with a cape, hat, mask, eyes and aura (everyone sees it). Save it to `enhanced/heroes/<name>.json` and load it anywhere. |
 
 **Loki's Scepter** is a weapon too (8 damage), and a hit confuses whoever it lands on: a creature forgets its
@@ -109,7 +114,7 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 | **G** | Super Speed on/off (Sneak: Dash Strike) | Flight | Duplicates | Flight (weapon in hand) |
 | **V** | Whirlwind (Sneak: Sonic Boom) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Shapeshift | Lightning beam (hold) |
 | **B** | Vibrate Through Walls (Sneak: Disarm Blitz) | Freeze (Sneak, hold: Hex Barrier) | Vanish | God of Thunder (toggle) |
-| **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: home, saved places, save this one (Sneak: where you look) |
+| **N** | Molecular Acceleration | The Noise (toggle) | Frost Giant | Bifrost screen: Asgard, home, saved places, save this one (Sneak: where you look) |
 | **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel) | | |
 | **H** | Change look | Change look | Change look | Change look |
 
@@ -148,6 +153,15 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 | **B** | Witch's Shield (hold) | Rally | Freeze Minds |
 | **N** | Rune Trap | Glasses on (Sneak: take them off) | Cerebro |
 | **H** | Change look | Change look | Young or old Charles |
+
+| Key | Heimdall | Odin | Hela |
+|---|---|---|---|
+| **R** | Hofund Slash (Sneak: Lunge) | Gungnir Blast (Sneak: Throw) | Necrosword Volley (Sneak: Blade Rain) |
+| **G** | All-Seeing Sight (toggle; Sneak, hold: Far Sight) | Odinforce Shield (hold; Sneak: Heal) | Blade Wall (Sneak: Blade Burst) |
+| **V** | Bifrost (Sneak: where you look) | Banish (Sneak: Odinforce Wave) | Goddess of Death (toggle; Sneak: Death Dash) |
+| **B** | Guardian's Ward (hold; Sneak: Gatekeeper's Call) | Huginn and Muninn (Sneak: Ravens' Report) | Raise the Dead (Sneak: Fenris) |
+| **N** | Bifrost Strike (Sneak: Bifrost for a friend) | Allfather's Command (Sneak: Odinsleep) | Death's Grasp (hold) |
+| **H** | Change look | Change look | Change look |
 
 A custom hero of the Hero Creator has the powers you chose on **R G V B N** and on **Sneak +** each of them (a hero's ability brings its Sneak variant with it; Billy's Build Magic uses **Y**).
 
@@ -193,15 +207,18 @@ without their armour, which still protects them).
 
 ## Quicksilver's song
 
-Quicksilver's Walkman plays *Sweet Dreams (Are Made of This)* by Eurythmics, which is built into
-the mod (`src/main/resources/assets/enhanced/sounds/quicksilver/sweet_dreams.ogg`).
+Since 3.5 Quicksilver's Walkman plays his own original theme, *Silver Hours*, and Speed's plays
+*Westview Blur*. *Sweet Dreams (Are Made of This)* by Eurythmics is still built into the mod
+(`src/main/resources/assets/enhanced/sounds/quicksilver/sweet_dreams.ogg`) and plays when a player sets the
+client option `quicksilverSong = "sweet_dreams"`.
 
 The recording is copyrighted, so this repository and the mods built from it are for personal use
 only. Keep the repository private and don't share the built jar publicly.
 
 To play a different song, start the game once (this creates the folder `config/enhanced/music/` in
-your Minecraft folder) and put an `.mp3`, `.ogg` or `.wav` file there. The first file in
-alphabetical order is played; remove it to go back to *Sweet Dreams*.
+your Minecraft folder) and put an `.mp3`, `.ogg` or `.wav` file there (`quicksilver.*`, `speed.*`,
+`witches_road.*`, or any name for Quicksilver). A server can give every player its own songs from
+`<world>/serverconfig/enhanced/music/` (`/enhanced music reload|list`). See [Music](docs/wiki/Music.md).
 
 ## Building
 
@@ -232,12 +249,12 @@ boss framework and its rules) is in [docs/HEROES-AND-BOSSES.md](docs/HEROES-AND-
 ## For server owners
 
 * `/enhanced power get|set …` (`none`, `magneto`, `scarlet_witch`, `quicksilver`,
-  `vision`, `tommy`, `billy`, `loki`, `thor`, `phoenix`, `spider_man`, `thanos`, `ultron`, `apocalypse`, `agatha`, `cyclops`, `professor_x`, `custom`, optionally followed by a look), `/enhanced look <players> <look>`
-  (for example `/enhanced look @a tva`), `/enhanced hex list|clear` and `/enhanced boss start <thanos|ultron|apocalypse> [force]`,
+  `vision`, `tommy`, `billy`, `loki`, `thor`, `phoenix`, `spider_man`, `thanos`, `ultron`, `apocalypse`, `agatha`, `cyclops`, `professor_x`, `custom`, `heimdall`, `odin`, `hela`, optionally followed by a look), `/enhanced look <players> <look>`
+  (for example `/enhanced look @a tva`), `/enhanced hex list|clear` and `/enhanced boss start <thanos|ultron|apocalypse|hela> [force]`,
   `/enhanced boss stop`, `/enhanced boss list` and `/enhanced boss cleanup <center> <radius>`, which start, end, list and clean up
-  boss fights, `/enhanced ward list|remove <player>` for the wards of the Book of the Vishanti, and `/enhanced road status|enter|leave|reset|skip|set|layout|cells` for the Witches' Road (operators only; everyone can type `/road leave` and `/road status`).
+  boss fights, `/enhanced ward list|remove <player>` for the wards of the Book of the Vishanti, `/enhanced road status|enter|leave|reset|skip|set|layout|cells` for the Witches' Road, and since 3.5 `/enhanced asgard tp|state`, `/enhanced music reload|list` and `/enhanced structure repair_school` (operators only; everyone can type `/road leave` and `/road status`).
 * Balance numbers (beam damage, Hex death chance and radius, the Vision of the Hex, flight speeds, shrapnel,
-  how much Quicksilver Time slows the world, the Phoenix's Mind Reading, Mind Control and Burst, Spider-Man's webs, zip, swing, crawl, suits, legs, Instant Kill and Black Eyes, the rules every boss fight shares (`[boss]`), the Mad Titan's clock of stones and every move, Ultron's bodies, Sentries and the Sokovia lift, Apocalypse's shield, attacks and Horsemen and his master factor, and the three bosses' heroes, Billy's Hex Beam and Hex Barrier, the ten Build Magic ranks and Wanda's Instant level, the Book of the Vishanti and its wards, the Darkhold, the Witches' Road trials, and in 3.3 Agatha, Cyclops, Professor X, the Hex Runes and the Hero Creator's budget and limits, and in 3.4 whether a custom hero may take the heroes' abilities, world powers and look extras, how much strength changes them, and whether Choose a Hero gives items…) are in `world/serverconfig/enhanced-server.toml`. The three structures of 3.3 are tuned by data packs (structure sets and biome tags).
+  how much Quicksilver Time slows the world, the Phoenix's Mind Reading, Mind Control and Burst, Spider-Man's webs, zip, swing, crawl, suits, legs, Instant Kill and Black Eyes, the rules every boss fight shares (`[boss]`), the Mad Titan's clock of stones and every move, Ultron's bodies, Sentries and the Sokovia lift, Apocalypse's shield, attacks and Horsemen and his master factor, and the three bosses' heroes, Billy's Hex Beam and Hex Barrier, the ten Build Magic ranks and Wanda's Instant level, the Book of the Vishanti and its wards, the Darkhold, the Witches' Road trials, and in 3.3 Agatha, Cyclops, Professor X, the Hex Runes and the Hero Creator's budget and limits, and in 3.4 whether a custom hero may take the heroes' abilities, world powers and look extras, how much strength changes them, and whether Choose a Hero gives items, and in 3.5 Asgard (`[asgard]`), who the Bifrost takes along (`[bifrost]`), Heimdall, Odin, Hela and her fight, the world's music, Loki's body and whether Agatha drains only sorcerers…) are in `world/serverconfig/enhanced-server.toml`. The three structures of 3.3 are tuned by data packs (structure sets and biome tags).
 * Item, block and entity tags under `data/enhanced/tags/` decide what counts as
   metal, what can be lifted, what the shield repels and which bosses resist the Hex,
   so datapacks can change them.
