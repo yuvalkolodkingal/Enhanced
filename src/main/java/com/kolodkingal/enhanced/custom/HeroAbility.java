@@ -35,7 +35,7 @@ public enum HeroAbility implements CatalogEntry {
             .on(PowerData::shrapnelActive)),
     MAGNETO_DISARM(Power.MAGNETO, 3, "disarm", press().cost(2).group(Group.MIND).icon("minecraft:iron_sword")),
     MAGNETO_SHIELD(Power.MAGNETO, 4, "shield", toggle().cost(2).group(Group.ENERGY).icon("minecraft:lodestone")
-            .on(PowerData::magneticShield)),
+            .fixed().on(PowerData::magneticShield)),
 
     // ===== scarlet_witch =====
     WANDA_CHAOS_BEAM(Power.SCARLET_WITCH, 1, "chaos_beam", hold().cost(2).group(Group.ENERGY).icon("minecraft:redstone")
@@ -49,7 +49,7 @@ public enum HeroAbility implements CatalogEntry {
 
     // ===== quicksilver =====
     QUICKSILVER_TIME(Power.QUICKSILVER, 1, "time", toggle().alt(Act.TOGGLE).cost(3).group(Group.MOVE).icon("minecraft:recovery_compass")
-            .res(Resource.SLOW_TIME, Resource.SPEED_RUN).family(Family.TIME).on(PowerData::quicksilverTime)),
+            .fixed().res(Resource.SLOW_TIME, Resource.SPEED_RUN).family(Family.TIME).on(PowerData::quicksilverTime)),
     QUICKSILVER_SPEED(Power.QUICKSILVER, 2, "speed", toggle().alt(Act.PRESS).cost(2).group(Group.MOVE).icon("minecraft:rabbit_foot")
             .res(Resource.SPEED_RUN).family(Family.SPEED).on(PowerData::superSpeed)),
     QUICKSILVER_BLITZ(Power.QUICKSILVER, 3, "blitz", press().alt(Act.PRESS).cost(2).group(Group.BODY).icon("minecraft:stone_sword")),
@@ -61,11 +61,14 @@ public enum HeroAbility implements CatalogEntry {
     VISION_MIND_BEAM(Power.VISION, 1, "mind_beam", hold().cost(2).group(Group.ENERGY).icon("minecraft:glowstone_dust")
             .res(Resource.BEAM_FLAG).family(Family.BEAM).on(PowerData::beamActive)),
     VISION_PHASE(Power.VISION, 3, "phase", toggle().cost(3).group(Group.BODY).icon("minecraft:phantom_membrane")
-            .res(Resource.PHASE).family(Family.PHASE).on(PowerData::visionPhased)),
+            .fixed().res(Resource.PHASE).family(Family.PHASE).on(PowerData::visionPhased)),
     VISION_DENSITY(Power.VISION, 4, "density", toggle().cost(1).group(Group.BODY).icon("minecraft:iron_block")
-            .traits(Trait.METAL_BODY).on(PowerData::dense)),
+            .fixed().traits(Trait.METAL_BODY).on(PowerData::dense)),
     VISION_DISGUISE(Power.VISION, 5, "disguise", toggle().cost(1).group(Group.BODY).icon("minecraft:leather_chestplate")
             .fixed().on(PowerData::disguise)),
+    /** Vision's synthetic body (L2): more health and armour, never hungry nor out of breath, metal (Magneto may lift it). */
+    VISION_BODY(Power.VISION, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:copper_ingot")
+            .traits(Trait.METAL_BODY).family(Family.BODY)),
 
     // ===== billy =====
     BILLY_HEX_BEAM(Power.BILLY, 1, "hex_beam", hold().cost(2).group(Group.ENERGY).icon("minecraft:light_blue_dye")
@@ -82,7 +85,7 @@ public enum HeroAbility implements CatalogEntry {
 
     // ===== tommy =====
     TOMMY_TIME(Power.TOMMY, 1, "time", toggle().alt(Act.TOGGLE).cost(3).group(Group.MOVE).icon("minecraft:clock")
-            .res(Resource.SLOW_TIME).family(Family.TIME).on(d -> d.toggle(Toggle.TOMMY_TIME))),
+            .fixed().res(Resource.SLOW_TIME).family(Family.TIME).on(d -> d.toggle(Toggle.TOMMY_TIME))),
     TOMMY_SPEED(Power.TOMMY, 2, "speed", toggle().alt(Act.PRESS).cost(2).group(Group.MOVE).icon("minecraft:sugar")
             .res(Resource.SPEED_RUN).family(Family.SPEED).on(d -> d.toggle(Toggle.SUPER_SPEED))),
     TOMMY_WHIRLWIND(Power.TOMMY, 3, "whirlwind", press().alt(Act.PRESS).cost(2).group(Group.ELEMENT).icon("minecraft:breeze_rod")),

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -62,19 +63,21 @@ public final class MagnetoAbilities {
 
     // ---- input ----
 
-    /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
-     */
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    /** His own key: the Sneak variant is Sneak held. */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * Key {@code ability} (his home key of the ability) went down or up; {@code alt}: its Sneak variant (3.4: said
+     * explicitly, as a custom hero's key router calls it). R's variant is the Magnetic Pull (with nothing held); while
+     * he holds something, Sneak + R sets it down, and that Sneak is the real one (a modifier of the grip, R3).
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         switch (ability) {
             case 1 -> {
                 if (down) {
-                    Telekinesis.press(player, Telekinesis.Mode.MAGNETO);
+                    Telekinesis.press(player, Telekinesis.Mode.MAGNETO, alt);
                 }
             }
             case 2 -> data.setShrapnelActive(down && !player.isSpectator());
@@ -98,12 +101,16 @@ public final class MagnetoAbilities {
         }
     }
 
+    /**
+     * His upkeep, every tick; 3.4: also a custom hero's with any of his abilities, each part only for the ability it is
+     * (a Magnetic Pull runs only for whoever pressed one).
+     */
     static void tick(ServerPlayer player, PowerData data) {
         MagnetPull.tick(player);
-        if (data.shrapnelActive()) {
+        if (data.shrapnelActive() && data.has(HeroAbility.MAGNETO_SHRAPNEL)) {
             shrapnelTick(player, data);
         }
-        if (data.magneticShield() && !player.isSpectator()) {
+        if (data.magneticShield() && data.has(HeroAbility.MAGNETO_SHIELD) && !player.isSpectator()) {
             shieldTick(player);
         }
     }
@@ -245,7 +252,7 @@ public final class MagnetoAbilities {
     private static void disarm(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(3, now)) {
+        if (!data.isReady(HeroAbility.MAGNETO_DISARM, now)) {
             return;
         }
         EntityHitResult hit = Raycasts.entity(player, EnhancedConfig.DISARM_RANGE.get(), 0.2,
@@ -268,10 +275,10 @@ public final class MagnetoAbilities {
         }
         if (Metal.isConjured(target)) {
             // Magnetism sees through Loki's trick: the copy dissolves, and nothing of what it wore is made real.
-            beam(level, player.getEyePosition(), hit.getLocation());
+            beam(level, player, player.getEyePosition(), hit.getLocation());
             Metal.dissolve(target, hit.getLocation());
             player.displayClientMessage(Component.translatable("message.enhanced.disarm.illusion"), true);
-            data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
+            data.startCooldown(HeroAbility.MAGNETO_DISARM, now, EnhancedConfig.DISARM_COOLDOWN.get());
             return;
         }
         if (ownedByAnother(player, target) && !AreaTargets.mayHurt(player, target, false)) {
@@ -283,7 +290,7 @@ public final class MagnetoAbilities {
         }
         if (target instanceof BossHooks boss && boss.onMagnetoStrip(player)) {
             // A boss has its own answer to the strip (it cuts its armour, it laughs): nothing else is taken.
-            data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
+            data.startCooldown(HeroAbility.MAGNETO_DISARM, now, EnhancedConfig.DISARM_COOLDOWN.get());
             return;
         }
         RandomSource random = player.getRandom();
@@ -318,8 +325,8 @@ public final class MagnetoAbilities {
                     ? "message.enhanced.disarm.metal_body" : "message.enhanced.disarm.no_metal"), true);
             return;
         }
-        data.startCooldown(3, now, EnhancedConfig.DISARM_COOLDOWN.get());
-        beam(level, player.getEyePosition(), target.position().add(0, target.getBbHeight() * 0.6, 0));
+        data.startCooldown(HeroAbility.MAGNETO_DISARM, now, EnhancedConfig.DISARM_COOLDOWN.get());
+        beam(level, player, player.getEyePosition(), target.position().add(0, target.getBbHeight() * 0.6, 0));
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1.0F, 0.6F);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 1.0F, 0.8F);
     }
@@ -329,11 +336,11 @@ public final class MagnetoAbilities {
         return target instanceof OwnableEntity pet && pet.getOwnerUUID() != null && !pet.getOwnerUUID().equals(player.getUUID());
     }
 
-    /** A line of magnetic sparks between two points. */
-    static void beam(ServerLevel level, Vec3 from, Vec3 to) {
+    /** A line of magnetic sparks between two points (3.4: a custom hero's in his glow, {@link #glow}). */
+    static void beam(ServerLevel level, Player magneto, Vec3 from, Vec3 to) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(64, delta.length() * 2);
-        EnergyParticleOptions spark = new EnergyParticleOptions(Power.MAGNETO.glow, 0.9F);
+        EnergyParticleOptions spark = new EnergyParticleOptions(glow(magneto), 0.9F);
         for (int i = 0; i <= steps; i++) {
             Vec3 p = from.add(delta.scale(i / (double) Math.max(1, steps)));
             level.sendParticles(spark, p.x, p.y, p.z, 1, 0.03, 0.03, 0.03, 0.0);
@@ -352,7 +359,12 @@ public final class MagnetoAbilities {
 
     public static boolean hasShieldUp(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.MAGNETO && data.magneticShield() && !player.isSpectator();
+        return data.has(HeroAbility.MAGNETO_SHIELD) && data.magneticShield() && !player.isSpectator();
+    }
+
+    /** The glow of Magneto's sparks as this player makes them: Magneto's, or (3.4) a custom hero's own. */
+    static int glow(Player player) {
+        return Powers.get(player).power() == Power.MAGNETO ? Power.MAGNETO.glow : Powers.glow(player);
     }
 
     public static boolean isMetalProjectile(Entity entity) {
@@ -417,7 +429,7 @@ public final class MagnetoAbilities {
         for (int i = 0; i < 14; i++) {
             double a = Math.PI * 2 * i / 14;
             Vec3 dir = side.scale(Math.cos(a)).add(up.scale(Math.sin(a)));
-            level.sendParticles(new EnergyParticleOptions(Power.MAGNETO.glow, 0.7F), pos.x + dir.x * 0.25, pos.y + dir.y * 0.25, pos.z + dir.z * 0.25,
+            level.sendParticles(new EnergyParticleOptions(glow(magneto), 0.7F), pos.x + dir.x * 0.25, pos.y + dir.y * 0.25, pos.z + dir.z * 0.25,
                     0, dir.x, dir.y, dir.z, 0.12);
         }
     }

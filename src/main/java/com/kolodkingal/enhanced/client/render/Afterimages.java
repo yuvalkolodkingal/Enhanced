@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -47,14 +48,16 @@ public final class Afterimages {
 
     private static boolean running(AbstractClientPlayer player) {
         PowerData data = Powers.get(player);
-        return (data.power() == Power.QUICKSILVER || data.power() == Power.TOMMY) && data.is(Live.SPEEDING)
+        return (data.has(HeroAbility.QUICKSILVER_SPEED) || data.has(HeroAbility.TOMMY_SPEED)) && data.is(Live.SPEEDING)
                 && !player.isInvisible();
     }
 
     /** Ghost colour (RGB) of each speedster. */
     private static int ghostColor(AbstractClientPlayer player) {
-        // Tommy's trail is teal-green (WandaVision); Fox Quicksilver leaves no coloured glow, only a grey blur.
-        return Powers.power(player) == Power.TOMMY ? 0x7FD8B8 : 0xC8D0D8;
+        // Tommy's trail is teal-green (WandaVision); Fox Quicksilver leaves no coloured glow, only a grey blur; 3.4: a
+        // custom hero's is his glow.
+        Power power = Powers.power(player);
+        return power == Power.CUSTOM ? Powers.glow(player) & 0xFFFFFF : power == Power.TOMMY ? 0x7FD8B8 : 0xC8D0D8;
     }
 
     public static void render(RenderPlayerEvent.Post event) {
@@ -62,7 +65,7 @@ public final class Afterimages {
             return;
         }
         PowerData data = Powers.get(player);
-        if (data.power() == Power.TOMMY && data.is(Live.WHIRLWIND) && !player.isInvisible()) {
+        if (data.has(HeroAbility.TOMMY_WHIRLWIND) && data.is(Live.WHIRLWIND) && !player.isInvisible()) {
             renderWhirlwind(event, player);
         }
         Deque<Vec3> trail = HISTORY.get(player.getId());

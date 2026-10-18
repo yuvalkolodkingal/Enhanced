@@ -2,6 +2,9 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpeedConfig;
+import com.kolodkingal.enhanced.custom.CustomHero;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -59,11 +62,33 @@ public final class SpeedSurfaces {
         return power == Power.QUICKSILVER || power == Power.TOMMY;
     }
 
+    /**
+     * 3.4: whether this player runs on walls as a speedster: Quicksilver or Tommy, or a custom hero with Quicksilver's
+     * Wall &amp; Water Run or Tommy's Wall Run (the Sneak variant of his slow time, so not when that is switched off).
+     */
+    public static boolean isSpeedster(PowerData data) {
+        return isSpeedster(data.power()) || quicksilverWalls(data) || tommyWalls(data);
+    }
+
+    private static boolean quicksilverWalls(PowerData data) {
+        return data.power() == Power.CUSTOM && data.has(HeroAbility.QUICKSILVER_WALL_RUN);
+    }
+
+    private static boolean tommyWalls(PowerData data) {
+        HeroKit kit = data.kit();
+        if (data.power() != Power.CUSTOM || kit == null || !kit.has(HeroAbility.TOMMY_TIME)) {
+            return false;
+        }
+        CustomHero.Pick pick = kit.hero().pick(HeroAbility.TOMMY_TIME);
+        return pick != null && !HeroAbility.MAIN.equals(pick.option());
+    }
+
     /** Whether his toggle for running on walls is on: Quicksilver's Wall &amp; Water Run, Tommy's Wall Run. */
     public static boolean toggleOn(PowerData data) {
         return switch (data.power()) {
             case QUICKSILVER -> data.wallRun();
             case TOMMY -> !data.toggle(Toggle.TOMMY_WALL_RUN_OFF);
+            case CUSTOM -> quicksilverWalls(data) && data.wallRun() || tommyWalls(data) && !data.toggle(Toggle.TOMMY_WALL_RUN_OFF);
             default -> false;
         };
     }
@@ -84,7 +109,7 @@ public final class SpeedSurfaces {
      * client's to keep (below the minimum he drops off by the rule); the server does not need it to check a claim.
      */
     public static boolean mayRun(Player player, PowerData data) {
-        return isSpeedster(data.power()) && toggleOn(data) && enabled() && !player.isSpectator() && !player.isPassenger()
+        return isSpeedster(data) && toggleOn(data) && enabled() && !player.isSpectator() && !player.isPassenger()
                 && !player.getAbilities().flying && !player.isFallFlying() && !data.is(Live.PINNED) && !data.is(Live.LIFTED)
                 && !player.isInWaterOrBubble() && !player.isInLava();
     }
@@ -106,7 +131,7 @@ public final class SpeedSurfaces {
      * direction the surface faces). Only a speedster's is heard.
      */
     public static void onReport(ServerPlayer player, int kind, int normal) {
-        if (!isSpeedster(Powers.get(player).power())) {
+        if (!isSpeedster(Powers.get(player))) {
             return;
         }
         State state = state(player);

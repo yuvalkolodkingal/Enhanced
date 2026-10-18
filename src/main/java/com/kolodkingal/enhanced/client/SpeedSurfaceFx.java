@@ -43,6 +43,8 @@ public final class SpeedSurfaceFx {
             return false;
         }
         boolean tommy = data.power() == Power.TOMMY;
+        // (3.4: a custom hero's blur is in his own colours.)
+        boolean custom = data.power() == Power.CUSTOM;
         // The body's axis from the feet: out of the wall, or down from the ceiling.
         Vec3 axis = s.surfaceKind == 2 ? new Vec3(0, -1, 0) : s.surfaceNormal;
         Vec3 feet = s.surfaceKind == 2 ? player.position().add(0, player.getBbHeight(), 0) : player.position().add(axis.scale(-0.3)).add(0, 0.85, 0);
@@ -50,7 +52,8 @@ public final class SpeedSurfaceFx {
         for (int i = 0; i < count; i++) {
             double back = 0.8 + random.nextDouble() * 1.4;
             double along = random.nextDouble() * (tommy ? random.nextDouble() : 1.0) * 1.7;
-            int color = tommy ? (i == 0 ? 0xE6FFF5 : i == 1 ? Power.TOMMY.glow : Power.TOMMY.color)
+            int color = custom ? (i == 0 ? Powers.glow(player) : Powers.color(player))
+                    : tommy ? (i == 0 ? 0xE6FFF5 : i == 1 ? Power.TOMMY.glow : Power.TOMMY.color)
                     : (i == 0 ? Power.QUICKSILVER.glow : Power.QUICKSILVER.color);
             level.addParticle(new EnergyParticleOptions(color, 1.0F + random.nextFloat() * 0.3F),
                     feet.x - dx * back + axis.x * along + (random.nextDouble() - 0.5) * 0.4,
@@ -70,13 +73,13 @@ public final class SpeedSurfaceFx {
             Minecraft mc = Minecraft.getInstance();
             LocalPlayer player = mc.player;
             PowerData data = player == null ? null : Powers.get(player);
-            boolean on = data != null && SpeedSurfaces.isSpeedster(data.power()) && SpeedsterMotion.runner().surface.touches()
+            boolean on = data != null && SpeedSurfaces.isSpeedster(data) && SpeedsterMotion.runner().surface.touches()
                     && EnhancedClientConfig.flightEffects();
             strength += ((on ? 1.0F : 0.0F) - strength) * Math.min(1.0F, deltaTracker.getRealtimeDeltaTicks() * 0.2F);
             if (strength < 0.01F || mc.options.hideGui || player == null) {
                 return;
             }
-            int rgb = data.power() == Power.TOMMY ? Power.TOMMY.glow : Power.QUICKSILVER.glow;
+            int rgb = data.power() == Power.CUSTOM ? Powers.glow(player) : data.power() == Power.TOMMY ? Power.TOMMY.glow : Power.QUICKSILVER.glow;
             float time = player.tickCount + deltaTracker.getGameTimeDeltaPartialTick(false);
             int w = graphics.guiWidth();
             int h = graphics.guiHeight();

@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossHooks;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -163,7 +164,7 @@ public final class MagnetPull {
         }
         HELD_LINES.remove(id); // this press answers for itself: the last pull's end line is not put over its answer
         PowerData data = Powers.get(player);
-        if (!data.isReady(1, now)) {
+        if (!data.isReady(HeroAbility.MAGNETO_METAL, now)) {
             player.displayClientMessage(Component.translatable("message.enhanced.pull.recharging"), true);
             return true;
         }
@@ -1131,7 +1132,7 @@ public final class MagnetPull {
             if (!job.paid) {
                 // The first thing the pull affects starts its recharge and costs its hunger (an invulnerable player none).
                 job.paid = true;
-                Powers.get(player).startCooldown(1, job.level.getGameTime(), EnhancedConfig.PULL_COOLDOWN.get());
+                Powers.get(player).startCooldown(HeroAbility.MAGNETO_METAL, job.level.getGameTime(), EnhancedConfig.PULL_COOLDOWN.get());
                 player.causeFoodExhaustion(EnhancedConfig.PULL_EXHAUSTION.get().floatValue());
             }
             give(job, player, taken.toGive);

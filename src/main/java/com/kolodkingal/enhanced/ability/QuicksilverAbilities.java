@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.config.SpeedConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -61,36 +62,36 @@ public final class QuicksilverAbilities {
 
     // ---- input ----
 
-    /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
-     */
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    /** His own key: the Sneak variant is Sneak held. */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * Key {@code ability} (his home key of the ability) went down or up; {@code alt}: its Sneak variant (3.4: said
+     * explicitly, as a custom hero's key router calls it for the binding that went down).
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         if (!down || player.isSpectator()) {
             return;
         }
-        boolean sneaking = player.isShiftKeyDown();
         switch (ability) {
             case 1 -> {
-                if (sneaking) {
+                if (alt) {
                     toggleWalkman(player, data);
                 } else {
                     toggleTime(player, data);
                 }
             }
             case 2 -> {
-                if (sneaking) {
+                if (alt) {
                     dash(player, data);
                 } else {
                     toggleSuperSpeed(player, data);
                 }
             }
             case 3 -> {
-                if (sneaking) {
+                if (alt) {
                     pickpocket(player, data);
                 } else {
                     blitz(player, data);
@@ -170,21 +171,31 @@ public final class QuicksilverAbilities {
         return player.getAbilities().invulnerable || player.getFoodData().getFoodLevel() > 0;
     }
 
+    /**
+     * His upkeep, every tick; 3.4: also a custom hero's with any of his abilities, each part only for the ability it is
+     * (Quicksilver Time's slowing, Super Speed's run).
+     */
     static void tick(ServerPlayer player, PowerData data) {
         boolean fed = isFed(player);
-        if (data.quicksilverTime() && !fed) {
-            // Starving: Quicksilver Time runs out of strength and stops by itself.
-            data.setQuicksilverTime(false);
-            player.displayClientMessage(Component.translatable("message.enhanced.quicksilver_time.starving"), true);
+        boolean slowing = false;
+        if (data.has(HeroAbility.QUICKSILVER_TIME)) {
+            if (data.quicksilverTime() && !fed) {
+                // Starving: Quicksilver Time runs out of strength and stops by itself.
+                data.setQuicksilverTime(false);
+                player.displayClientMessage(Component.translatable("message.enhanced.quicksilver_time.starving"), true);
+            }
+            // Quicksilver Time slows the world whether he runs or not; Super Speed never does.
+            slowing = data.quicksilverTime() && !player.isSpectator();
+            data.setSlowMo(slowing);
         }
-        // Quicksilver Time slows the world whether he runs or not; Super Speed never does.
-        boolean slowing = data.quicksilverTime() && !player.isSpectator();
-        data.setSlowMo(slowing);
 
         // Running is Super Speed's alone (since 3.3): Quicksilver Time slows the world, and he walks in it.
-        boolean running = data.superSpeed() && player.isSprinting() && !player.isSpectator() && !player.isPassenger() && fed;
+        boolean running = false;
         boolean wasRunning = data.is(Live.SPEEDING);
-        data.set(Live.SPEEDING, running);
+        if (data.has(HeroAbility.QUICKSILVER_SPEED)) {
+            running = data.superSpeed() && player.isSprinting() && !player.isSpectator() && !player.isPassenger() && fed;
+            data.set(Live.SPEEDING, running);
+        }
         float exhaustion = EnhancedConfig.QUICKSILVER_EXHAUSTION.get().floatValue();
         if (running) {
             // (Running in Quicksilver Time costs what it did in 3.2: the full rate, not the full rate and the idle.)
@@ -206,9 +217,8 @@ public final class QuicksilverAbilities {
      * called when the power changes, to take it all away again.
      */
     static void applySpeed(ServerPlayer player, PowerData data) {
-        boolean quicksilver = data.power() == Power.QUICKSILVER;
-        boolean running = quicksilver && data.is(Live.SPEEDING);
-        boolean quick = quicksilver && isQuick(data);
+        boolean running = data.has(HeroAbility.QUICKSILVER_SPEED) && data.is(Live.SPEEDING);
+        boolean quick = isQuick(data);
         double faster = actionSpeed() - 1.0;
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SPEED_ID, EnhancedConfig.QUICKSILVER_SPEED_BONUS.get(), running,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -228,7 +238,7 @@ public final class QuicksilverAbilities {
      */
     public static boolean isRunning(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.QUICKSILVER && data.is(Live.SPEEDING);
+        return data.has(HeroAbility.QUICKSILVER_SPEED) && data.is(Live.SPEEDING);
     }
 
     /** Whether a mode (Quicksilver Time or Super Speed) is on: he does everything faster. */
@@ -237,7 +247,7 @@ public final class QuicksilverAbilities {
     }
 
     private static boolean isQuick(PowerData data) {
-        return data.power() == Power.QUICKSILVER && (data.quicksilverTime() || data.superSpeed());
+        return data.has(HeroAbility.QUICKSILVER_TIME) && data.quicksilverTime() || data.has(HeroAbility.QUICKSILVER_SPEED) && data.superSpeed();
     }
 
     /** How many times as fast he does everything while a mode is on (the config's {@code actionSpeed}). */
@@ -281,7 +291,7 @@ public final class QuicksilverAbilities {
     private static void blitz(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(3, now)) {
+        if (!data.isReady(HeroAbility.QUICKSILVER_BLITZ, now)) {
             return;
         }
         if (MjolnirPin.isPinned(player)) {
@@ -305,12 +315,12 @@ public final class QuicksilverAbilities {
         if (!HexManager.onTeleport(level, player, spot)) {
             return; // 3.3: the dash is a teleport: the Hex's wall judges it (and says why)
         }
-        data.startCooldown(3, now, BLITZ_COOLDOWN);
+        data.startCooldown(HeroAbility.QUICKSILVER_BLITZ, now, BLITZ_COOLDOWN);
 
         Vec3 toTarget = target.position().subtract(spot);
         float yaw = (float) (Math.atan2(-toTarget.x, toTarget.z) * (180 / Math.PI));
         player.teleportTo(level, spot.x, spot.y, spot.z, yaw, player.getXRot());
-        streak(level, start, spot);
+        streak(level, player, start, spot);
 
         for (int i = 0; i < BLITZ_HITS && target.isAlive(); i++) {
             target.invulnerableTime = 0;
@@ -342,29 +352,29 @@ public final class QuicksilverAbilities {
     /** Sneak + G: the Dash Strike, in his silver and grey (the cooldown of G). */
     private static void dash(ServerPlayer player, PowerData data) {
         long now = player.serverLevel().getGameTime();
-        if (!data.isReady(2, now)) {
+        if (!data.isReady(HeroAbility.QUICKSILVER_SPEED, now)) {
             return;
         }
         if (MjolnirPin.isPinned(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
             return;
         }
-        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(Power.QUICKSILVER)).moved()) {
+        if (!SpeedStrikes.configuredDash(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER)).moved()) {
             player.displayClientMessage(Component.translatable("message.enhanced.dash.blocked"), true);
             return;
         }
-        data.startCooldown(2, now, SpeedStrikes.value(SpeedConfig.DASH_COOLDOWN, 100));
+        data.startCooldown(HeroAbility.QUICKSILVER_SPEED, now, SpeedStrikes.value(SpeedConfig.DASH_COOLDOWN, 100));
     }
 
     /** N: the Pebble Barrage. */
     private static void barrage(ServerPlayer player, PowerData data) {
         long now = player.serverLevel().getGameTime();
-        if (!data.isReady(5, now)) {
+        if (!data.isReady(HeroAbility.QUICKSILVER_BARRAGE, now)) {
             return;
         }
-        SpeedStrikes.barrage(player, SpeedStrikes.Style.of(Power.QUICKSILVER), SpeedStrikes.value(SpeedConfig.BARRAGE_PEBBLES, 8),
+        SpeedStrikes.barrage(player, SpeedStrikes.Style.of(player, Power.QUICKSILVER), SpeedStrikes.value(SpeedConfig.BARRAGE_PEBBLES, 8),
                 (float) SpeedStrikes.value(SpeedConfig.BARRAGE_DAMAGE, 1.5), SpeedStrikes.value(SpeedConfig.BARRAGE_RANGE, 24));
-        data.startCooldown(5, now, SpeedStrikes.value(SpeedConfig.BARRAGE_COOLDOWN, 120));
+        data.startCooldown(HeroAbility.QUICKSILVER_BARRAGE, now, SpeedStrikes.value(SpeedConfig.BARRAGE_COOLDOWN, 120));
     }
 
     // ---- Ability 3 (Sneak): Pickpocket ----
@@ -372,7 +382,7 @@ public final class QuicksilverAbilities {
     private static void pickpocket(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (!data.isReady(3, now)) {
+        if (!data.isReady(HeroAbility.QUICKSILVER_BLITZ, now)) {
             return;
         }
         EntityHitResult hit = Raycasts.entity(player, PICKPOCKET_RANGE, 0.3,
@@ -401,8 +411,8 @@ public final class QuicksilverAbilities {
         if (!player.getInventory().add(stolen)) {
             player.drop(stolen, false);
         }
-        data.startCooldown(3, now, PICKPOCKET_COOLDOWN);
-        streak(level, player.getEyePosition(), target.getEyePosition());
+        data.startCooldown(HeroAbility.QUICKSILVER_BLITZ, now, PICKPOCKET_COOLDOWN);
+        streak(level, player, player.getEyePosition(), target.getEyePosition());
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1.0F, 1.6F);
         player.displayClientMessage(Component.translatable("message.enhanced.pickpocket.stolen", stolen.getHoverName()), true);
     }
@@ -411,11 +421,11 @@ public final class QuicksilverAbilities {
         return !stack.isEmpty() && !stack.is(ModTags.CANNOT_BE_SNATCHED);
     }
 
-    /** A grey speed blur between two points. */
-    private static void streak(ServerLevel level, Vec3 from, Vec3 to) {
+    /** A grey speed blur between two points (3.4: a custom hero's in his own glow). */
+    private static void streak(ServerLevel level, ServerPlayer player, Vec3 from, Vec3 to) {
         Vec3 delta = to.subtract(from);
         int steps = (int) Math.min(80, delta.length() * 3);
-        EnergyParticleOptions silver = new EnergyParticleOptions(Power.QUICKSILVER.glow, 1.2F);
+        EnergyParticleOptions silver = new EnergyParticleOptions(SpeedStrikes.Style.of(player, Power.QUICKSILVER).glow(), 1.2F);
         for (int i = 0; i <= steps; i++) {
             Vec3 p = from.add(delta.scale(i / (double) Math.max(1, steps))).add(0, 1.0, 0);
             level.sendParticles(silver, p.x, p.y, p.z, 1, 0.05, 0.3, 0.05, 0.0);

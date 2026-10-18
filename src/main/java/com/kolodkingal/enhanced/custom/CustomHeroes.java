@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.custom;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.config.CustomHeroConfig;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -77,9 +78,9 @@ public final class CustomHeroes {
         return isOn(player, PowerModule.PHASING) && has(player, PowerModule.PHASING, "phase");
     }
 
-    /** Whether a custom hero may fly: he has Flight, or floats while he phases. */
+    /** Whether a custom hero may fly: he has Flight, or floats while he phases (3.4: Vision's Phase too). */
     public static boolean canFly(Player player) {
-        return pick(player, PowerModule.FLIGHT) != null || isPhased(player);
+        return pick(player, PowerModule.FLIGHT) != null || isPhased(player) || VisionAbilities.isPhased(player);
     }
 
     /** His speed in the air: Flight's at its strength (a phasing hero without Flight drifts at the speed of strength 1). */

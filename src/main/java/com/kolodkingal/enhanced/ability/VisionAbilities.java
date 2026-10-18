@@ -2,9 +2,9 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
-import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -43,15 +43,16 @@ public final class VisionAbilities {
 
     // ---- input ----
 
-    /**
-     * 3.4: the key with its Sneak variant said explicitly ({@code alt}), as a custom hero's key router calls it
-     * ({@code HeroKeys.press}). For now it is the key of old, which reads Sneak from the player.
-     */
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
-        onKey(player, data, ability, down);
+    /** His own key: the Sneak variant is Sneak held. */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+        onKey(player, data, ability, down, player.isShiftKeyDown());
     }
 
-    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {
+    /**
+     * Key {@code ability} (his home key of the ability) went down or up; {@code alt}: its Sneak variant (3.4: said
+     * explicitly, as a custom hero's key router calls it). None of Vision's keys has one.
+     */
+    static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         switch (ability) {
             case 1 -> {
                 boolean start = down && !player.isSpectator() && !data.visionPhased();
@@ -92,34 +93,45 @@ public final class VisionAbilities {
         }
     }
 
+    /**
+     * His upkeep, every tick; 3.4: also a custom hero's with any of his abilities, each part only for the ability it is
+     * (the synthetic body, the phasing, the beam, the density).
+     */
     static void tick(ServerPlayer player, PowerData data) {
-        // A synthetic body: never hungry, never out of breath.
-        if (player.getFoodData().getFoodLevel() < 20) {
-            player.getFoodData().setFoodLevel(20);
+        if (data.has(HeroAbility.VISION_BODY)) {
+            // A synthetic body: never hungry, never out of breath.
+            if (player.getFoodData().getFoodLevel() < 20) {
+                player.getFoodData().setFoodLevel(20);
+            }
+            player.setAirSupply(player.getMaxAirSupply());
         }
-        player.setAirSupply(player.getMaxAirSupply());
 
-        if (data.visionPhased()) {
+        boolean phased = data.has(HeroAbility.VISION_PHASE) && data.visionPhased();
+        if (phased) {
             phaseTick(player, data);
         }
-        if (data.beamActive()) {
-            if (data.visionPhased()) {
+        if (data.beamActive() && data.has(HeroAbility.VISION_MIND_BEAM)) {
+            if (phased) {
                 data.setBeamActive(false);
             } else {
                 beamTick(player);
             }
         }
-        if (data.dense() && !player.isSpectator() && player.tickCount % 5 == 0) {
+        if (data.has(HeroAbility.VISION_DENSITY) && data.dense() && !player.isSpectator() && player.tickCount % 5 == 0) {
             player.serverLevel().sendParticles(ParticleTypes.CRIT, player.getX(), player.getY() + 0.1, player.getZ(), 1, 0.3, 0, 0.3, 0);
         }
     }
 
-    /** The synthetic body's stats and the dense mode's, kept in sync with the player's state. */
+    /**
+     * The synthetic body's stats and the dense mode's, kept in sync with the player's state (3.4: a custom hero's by his
+     * body and density rows, the body's amounts by its strength).
+     */
     static void applyBody(ServerPlayer player, PowerData data) {
-        boolean vision = data.power() == Power.VISION;
-        boolean dense = vision && data.dense();
-        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, 10.0, vision);
-        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, 8.0, vision);
+        boolean vision = data.has(HeroAbility.VISION_BODY);
+        boolean dense = data.has(HeroAbility.VISION_DENSITY) && data.dense();
+        float scale = data.bodyScale(HeroAbility.VISION_BODY);
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, 10.0 * scale, vision);
+        PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, 8.0 * scale, vision);
         PowerTicker.setModifier(player, Attributes.ARMOR, DENSE_ARMOR, 12.0, dense);
         PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, DENSE_KNOCKBACK, 1.0, dense);
         PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, DENSE_DAMAGE, 6.0, dense);
@@ -134,12 +146,12 @@ public final class VisionAbilities {
     /** Vision phasing, or (3.3) a custom hero whose Phasing passes through walls: the same rules for both. */
     public static boolean isPhased(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.VISION && data.visionPhased() || com.kolodkingal.enhanced.custom.CustomHeroes.isPhased(player);
+        return data.has(HeroAbility.VISION_PHASE) && data.visionPhased() || com.kolodkingal.enhanced.custom.CustomHeroes.isPhased(player);
     }
 
     public static boolean isDense(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.VISION && data.dense();
+        return data.has(HeroAbility.VISION_DENSITY) && data.dense();
     }
 
     // ---- Ability 1: Mind Stone beam ----
