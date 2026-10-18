@@ -64,11 +64,11 @@ public class XavierOverlay implements LayeredDraw.Layer {
             if (host != null && XavierControl.inBody()) {
                 Component line = Component.translatable("hud.enhanced.xavier.in_body", host.getDisplayName(),
                         String.format(Locale.ROOT, "%.0f", XavierControl.ticksLeft() / 20.0), KeyBindings.ability(3).getTranslatedKeyMessage());
-                graphics.drawCenteredString(font, line.copy().withStyle(s -> s.withColor(Power.PROFESSOR_X.glow)), w / 2, h - 72, 0xFFFFFF);
+                graphics.drawCenteredString(font, line.copy().withStyle(s -> s.withColor(Power.PROFESSOR_X.glow)), w / 2, h - 96, 0xFFFFFF);
                 if (host instanceof LivingEntity living) {
                     Component hp = Component.translatable("hud.enhanced.xavier.body_health",
                             String.format(Locale.ROOT, "%.0f", living.getHealth()), String.format(Locale.ROOT, "%.0f", living.getMaxHealth()));
-                    graphics.drawCenteredString(font, hp.copy().withStyle(ChatFormatting.RED), w / 2, h - 62, 0xFFFFFF);
+                    graphics.drawCenteredString(font, hp.copy().withStyle(ChatFormatting.RED), w / 2, h - 86, 0xFFFFFF);
                 }
             }
         }

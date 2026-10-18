@@ -24,9 +24,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * "Later" closes the screen and keeps the young one (the Change Look key changes it at any time).
  */
 public class XavierChoiceScreen extends Screen {
-    private static final int CARD_WIDTH = 170;
+    private static final int CARD_WIDTH = 200;
     private static final int CARD_HEIGHT = 62;
-    private static final int GAP = 10;
+    private static final int GAP = 8;
 
     public XavierChoiceScreen() {
         super(Component.translatable("screen.enhanced.xavier.title"));

@@ -92,10 +92,10 @@ public final class ThoughtBubbles {
         long now = mc.level.getGameTime();
         Camera view = event.getCamera();
         Vec3 camera = view.getPosition();
-        int listener = Powers.color(mc.player);
+        int listener = Powers.glow(mc.player);
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         Font font = mc.font;
-        int background = (int) (mc.options.getBackgroundOpacity(0.25F) * 255.0F) << 24;
+        int background = (int) (mc.options.getBackgroundOpacity(0.35F) * 255.0F) << 24;
         Iterator<Map.Entry<Integer, Heard>> it = HEARD.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Integer, Heard> e = it.next();
@@ -118,7 +118,8 @@ public final class ThoughtBubbles {
             PoseStack stack = new PoseStack();
             stack.translate(at.x, at.y, at.z);
             stack.mulPose(view.rotation());
-            float scale = 0.022F;
+            // As a name tag, but it grows past 6 blocks, so a thought far off is still read.
+            float scale = 0.025F * (float) Math.max(1.0, at.length() / 6.0);
             stack.scale(scale, -scale, scale);
             Matrix4f matrix = stack.last().pose();
             Component text = heard.text().copy().withStyle(s -> s.withItalic(true));
@@ -126,7 +127,7 @@ public final class ThoughtBubbles {
             int rgb = colour(heard.mood(), listener) & 0xFFFFFF;
             int alpha = Math.max(5, Math.round(a * 255.0F));
             int faint = Math.max(5, Math.round(a * 96.0F));
-            int back = (int) (((background >>> 24) & 0xFF) * a) << 24;
+            int back = (int) (Math.max(0x50, (background >>> 24) & 0xFF) * a) << 24;
             font.drawInBatch(text, x, 0.0F, faint << 24 | rgb, false, matrix, buffers, Font.DisplayMode.SEE_THROUGH, back,
                     LightTexture.FULL_BRIGHT);
             font.drawInBatch(text, x, 0.0F, alpha << 24 | rgb, false, matrix, buffers, Font.DisplayMode.NORMAL, 0,
