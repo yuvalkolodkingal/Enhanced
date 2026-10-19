@@ -13,5 +13,6 @@
   "floor": 3,
   "max_slope": 4,
   "processors": "enhanced:agatha_cottage",
-  "enabled_by": "agatha_cottage.enabled"
+  "enabled_by": "agatha_cottage.enabled",
+  "ground": "highest"
 }

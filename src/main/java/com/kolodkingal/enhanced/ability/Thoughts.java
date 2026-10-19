@@ -234,6 +234,8 @@ public final class Thoughts {
         } else if (e instanceof TamableAnimal pet && pet.isTame() && pet.getOwner() != null) {
             kind = "pet";
             arg = pet.getOwner().getDisplayName();
+        } else if (e instanceof com.kolodkingal.enhanced.asgard.npc.AsgardianEntity npc && npc.role().cottage()) {
+            kind = npc.role().id(); // (3.7: the family of Agatha's Cottage thinks its own thoughts)
         } else if (species != null) {
             kind = species;
         } else {

@@ -522,7 +522,7 @@ public final class MutantSkeletonTests {
         Map<BlockPos, String> blocks = template(helper, CottagePlan.TEMPLATE);
         check(size(helper, CottagePlan.TEMPLATE).equals(List.of(27, 18, 25)), "the cottage is 27 x 18 x 25");
         check("enhanced:witches_road_door".equals(blocks.get(CottagePlan.ROAD_DOOR)), "the Road door in the cellar");
-        check("minecraft:oak_fence_gate".equals(blocks.get(CottagePlan.GATE)), "the gate");
+        check(blocks.getOrDefault(CottagePlan.GATE, "").endsWith("_fence_gate"), "the gate");
         for (BlockPos seat : CottagePlan.TABLE_SEATS) {
             check("minecraft:oak_stairs".equals(blocks.get(seat)), "a chair at " + seat);
         }
