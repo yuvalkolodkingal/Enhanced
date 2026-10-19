@@ -1488,8 +1488,9 @@ public final class SkeletonTests {
             for (Power hero : java.util.stream.Stream.concat(NEW_HEROES.stream(), V33_HEROES.stream()).toList()) {
                 acted |= GestureRoutes.live(hero, live, true) != null;
             }
-            // 3.5: the gods of Asgard route their own states too.
-            for (Power hero : List.of(Power.HEIMDALL, Power.ODIN, Power.HELA, Power.DOCTOR_STRANGE, Power.HULK)) {
+            // 3.5: the gods of Asgard route their own states too (3.6: Strange, the Hulk; 3.7: Wolverine, Deadpool).
+            for (Power hero : List.of(Power.HEIMDALL, Power.ODIN, Power.HELA, Power.DOCTOR_STRANGE, Power.HULK,
+                    Power.WOLVERINE, Power.DEADPOOL)) {
                 acted |= GestureRoutes.live(hero, live, true) != null;
             }
             check(acted || GestureRoutes.reason(live) != null, "the state " + live + " has neither a gesture nor a reason");

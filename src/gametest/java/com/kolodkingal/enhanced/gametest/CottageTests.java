@@ -105,13 +105,37 @@ public final class CottageTests {
 
     // ---- a cottage drawn small in the arena ----
 
+    /** How many running tests hold the day ({@link #holdDay}), and the level's time before the first of them. */
+    private static int dayHolds;
+    private static long dayBefore;
+
+    /**
+     * Holds the level at noon while the test runs: a resident made at night goes straight to bed (CottageKeeper), so a
+     * test that meets the family where they stand by day would fail whenever a long run reached the evening. The last
+     * test of a batch to end puts the time back.
+     */
+    static void holdDay(TestKit.Fixture fx) {
+        ServerLevel level = fx.level();
+        if (dayHolds++ == 0) {
+            dayBefore = level.getDayTime();
+            level.setDayTime(Math.floorDiv(dayBefore, 24000L) * 24000L + 6000L);
+        }
+        fx.onClose(() -> {
+            if (--dayHolds == 0) {
+                level.setDayTime(dayBefore);
+            }
+        });
+    }
+
     /**
      * A fake cottage in the arena (its record removed when the test ends): the table's four chairs, three beds, the
-     * porch and the bench (stairs), the pot (a cauldron), the Road door, and the homes on the arena's floor.
+     * porch and the bench (stairs), the pot (a cauldron), the Road door, and the homes on the arena's floor. The day
+     * is held at noon ({@link #holdDay}).
      */
     static Cottages.Cottage cottage(TestKit.Fixture fx) {
         GameTestHelper h = fx.helper();
         ServerLevel level = fx.level();
+        holdDay(fx);
         int y = (int) FLOOR;
         BlockPos o = h.absolutePos(BlockPos.ZERO);
         java.util.function.BiFunction<Integer, Integer, BlockPos> at = (x, z) -> o.offset(x, y, z);
