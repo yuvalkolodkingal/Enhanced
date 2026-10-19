@@ -29,15 +29,9 @@ public final class KeyBindings {
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY);
 
     /**
-     * 3.6: the Stone Wheel (default J): a tap picks the next stone of the Infinity Gauntlet in the hand, a hold opens
-     * the wheel of its stones (lane L1 reads it). J is also Spider-Man's Web Assist: the wheel's context, {@link
-     * #STONES}, conflicts with nothing, so both mappings hear the key and each acts only for its own player (a Gauntlet
-     * in the hand, Spider-Man's swing).
+     * 3.6: in game, like {@code IN_GAME}, but in conflict with no other context (see {@link #STONE_WHEEL}). Declared
+     * before it: a static field is set in the order of the class, and the wheel's mapping needs its context.
      */
-    public static final KeyMapping STONE_WHEEL = new KeyMapping("key.enhanced.stone_wheel", KeyBindings.STONES,
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
-
-    /** 3.6: in game, like {@code IN_GAME}, but in conflict with no other context (see {@link #STONE_WHEEL}). */
     public static final IKeyConflictContext STONES = new IKeyConflictContext() {
         @Override
         public boolean isActive() {
@@ -49,6 +43,15 @@ public final class KeyBindings {
             return other == this;
         }
     };
+
+    /**
+     * 3.6: the Stone Wheel (default J): a tap picks the next stone of the Infinity Gauntlet in the hand, a hold opens
+     * the wheel of its stones (lane L1 reads it). J is also Spider-Man's Web Assist: the wheel's context, {@link
+     * #STONES}, conflicts with nothing, so both mappings hear the key and each acts only for its own player (a Gauntlet
+     * in the hand, Spider-Man's swing).
+     */
+    public static final KeyMapping STONE_WHEEL = new KeyMapping("key.enhanced.stone_wheel", KeyBindings.STONES,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
 
     private static KeyMapping create(int ability, int key) {
         return new KeyMapping("key.enhanced.ability_" + ability, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, key, CATEGORY);
