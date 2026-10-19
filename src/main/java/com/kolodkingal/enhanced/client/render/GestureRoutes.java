@@ -183,7 +183,8 @@ public final class GestureRoutes {
             // (Slow Time: Doctor Strange's Y; the stones' own gesture is lane L2's StoneGestures.)
             case TIME_SLOW -> power == Power.DOCTOR_STRANGE ? PENDING_GESTURE : null;
             // ===== hulk (3.6) =====
-            case HUMAN_FORM -> power == Power.HULK ? PENDING_GESTURE : null;
+            // (A custom hero's Human Form: he calms down into it, and Hulks out of it.)
+            case HUMAN_FORM -> power == Power.HULK ? (on ? GestureId.HULK_CALM : GestureId.HULK_OUT) : null;
         };
     }
 
@@ -445,7 +446,11 @@ public final class GestureRoutes {
             // ===== doctor_strange (3.6) =====
             case DOCTOR_STRANGE -> "none: Doctor Strange's keys are acted by his plug-in (lane L3 of 3.6)";
             // ===== hulk (3.6) =====
-            case HULK -> "none: the Hulk's keys are acted by his plug-in (lane L7 of 3.6)";
+            // (Every move of his is told by the payload of its effect, which names him: the Smash and the Grab Smash,
+            // the Clap and the Roar, the leap, its landing and the Bound, the boulder torn up and thrown, the charge,
+            // the transformation and the switch. See HulkActing.gestureOf.)
+            case HULK -> "none: every move of the Hulk is told by the payload of its effect, which names him"
+                    + " (HulkGestures.gestureOf)";
             default -> "none: no abilities";
         };
     }
@@ -512,8 +517,13 @@ public final class GestureRoutes {
             case POWER_VEINS -> "drawn, not acted: violet veins crawl up the stone's arm (StoneArmLayer) while the"
                     + " Purple Beam's own stance (BEAM_HAND, from BEAMING) holds the arm out";
             // ===== hulk (3.6) =====
-            case HULK_TRANSFORMING, HULK_LEAPING, HULK_GRABBING, HULK_CHARGING,
-                    HULK_ENRAGED -> "pending: the Hulk's lane (L7 of 3.6) acts it";
+            case HULK_TRANSFORMING -> "the transformation's payload plays HULK_OUT, HULK_CALM or HULK_SWITCH (it names"
+                    + " the Hulk)";
+            case HULK_LEAPING -> "the leap's payload plays HULK_LEAP_CROUCH or HULK_BOUND; in the air the stance"
+                    + " HULK_AIR holds him";
+            case HULK_GRABBING -> "the grab's payload plays HULK_GRAB_SMASH, timed to the three slams";
+            case HULK_CHARGING -> "the charge's payload plays HULK_CHARGE";
+            case HULK_ENRAGED -> "a stance (HULK_ENRAGED), and his eyes glow on GlowingEyesLayer";
         };
     }
 

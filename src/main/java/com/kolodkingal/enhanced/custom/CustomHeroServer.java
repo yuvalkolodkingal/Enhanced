@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -184,7 +185,8 @@ public final class CustomHeroServer implements HeroServer {
         CustomHero hero = CustomHeroes.hero(player);
         CustomState state = CustomHeroes.state(player);
         HeroKeys.tick(player, data, kit(player, data));
-        for (CustomHero.Pick pick : hero.powers()) {
+        // 3.6: in the Hulk's Human Form his modules rest (their ends ran when it began).
+        for (CustomHero.Pick pick : data.toggle(Toggle.HUMAN_FORM) ? List.<CustomHero.Pick>of() : hero.powers()) {
             PowerModule module = pick.module();
             if (module != null) {
                 LOGIC.get(module).tick(new ModuleLogic.Ctx(player, data, hero, state, pick, module, hero.keyOf(module)));
@@ -196,7 +198,9 @@ public final class CustomHeroServer implements HeroServer {
 
     @Override
     public void applyBody(ServerPlayer player, PowerData data) {
-        CustomHero hero = data.power() == Power.CUSTOM ? CustomHeroes.hero(player) : null;
+        // (3.6: in the Hulk's Human Form no module gives anything.)
+        CustomHero hero = data.power() == Power.CUSTOM && !data.toggle(Toggle.HUMAN_FORM) ? CustomHeroes.hero(player)
+                : null;
         for (Map.Entry<PowerModule, ModuleLogic> entry : LOGIC.entrySet()) {
             entry.getValue().body(player, hero == null ? null : hero.pick(entry.getKey()));
         }

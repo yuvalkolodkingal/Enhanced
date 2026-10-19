@@ -112,6 +112,7 @@ public final class ClientSetup {
             // ===== vormir (3.6) =====
             com.kolodkingal.enhanced.client.vormir.VormirClient.setup();
             // ===== hulk (3.6) =====
+            com.kolodkingal.enhanced.client.hulk.HulkEffects.register();
             // ===== hydra (3.6) =====
             com.kolodkingal.enhanced.client.hydra.HydraClient.setup();
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
@@ -205,7 +206,10 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.STONEKEEPER.get(),
                 com.kolodkingal.enhanced.client.vormir.StonekeeperRenderer::new);
         // ===== hulk (3.6) =====
-        event.registerEntityRenderer(ModEntities.HULK_BOULDER.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.HULK_BOULDER.get(),
+                com.kolodkingal.enhanced.client.hulk.HulkBoulderRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.GAMMA_EMITTER.get(),
+                com.kolodkingal.enhanced.client.hulk.GammaEmitterRenderer::new);
         // ===== hydra (3.6) =====
         event.registerEntityRenderer(ModEntities.HYDRA_SOLDIER.get(),
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
@@ -280,6 +284,10 @@ public final class ClientSetup {
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.vormir.StonekeeperModel.LAYER,
                 com.kolodkingal.enhanced.client.vormir.StonekeeperModel::createBodyLayer);
         // ===== hulk (3.6) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.hulk.HulkModel.LAYER,
+                () -> com.kolodkingal.enhanced.client.hulk.HulkModel.createLayer(0.0F));
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.hulk.HulkModel.ENERGY,
+                () -> com.kolodkingal.enhanced.client.hulk.HulkModel.createLayer(0.35F));
         // ===== hydra (3.6) =====
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.hydra.HydraGearModel.LAYER,
                 com.kolodkingal.enhanced.client.hydra.HydraGearModel::createLayer);
@@ -329,6 +337,7 @@ public final class ClientSetup {
                 // ===== stones (3.6) =====
                 // ===== strange (3.6) =====
                 // ===== hulk (3.6) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.hulk.HulkLayers.InhibitorBand(renderer));
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
@@ -340,6 +349,11 @@ public final class ClientSetup {
                 renderer.addLayer(new HandTrackerLayer(renderer));
             }
         }
+        // ===== hulk (3.6): the Hulk's own body, a renderer of its own with the layers that fit him =====
+        com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer hulk =
+                new com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer(event.getContext());
+        com.kolodkingal.enhanced.client.hulk.HulkLayers.addTo(hulk, event.getContext());
+        com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer.set(hulk);
         // ===== asgardians (3.5): the Heimdall and Odin NPCs wear the heroes' helms =====
         npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.HEIMDALL,
                 event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER),
@@ -393,6 +407,9 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("protect"), new ProtectHud());
         // ===== stones (3.6) =====
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("stones"), new StoneHud());
+        // 3.6, lane L7: the Hulk's rage bar, Banner's heart rate, the gamma flash.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("hulk"),
+                new com.kolodkingal.enhanced.client.hulk.HulkHud());
     }
 
     private ClientSetup() {

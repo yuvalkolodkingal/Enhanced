@@ -3751,5 +3751,21 @@
   "item.enhanced.hydra_intel": "Hydra Intel",
   "message.enhanced.hydra.turned": "The Hydra soldier fights for you now!",
   "message.enhanced.hydra.blaster_off": "The blaster is dead: this server switched it off.",
-  "message.enhanced.hydra.console": "Switching the alarm off... %s"
+  "message.enhanced.hydra.console": "Switching the alarm off... %s",
+  "message.enhanced.hulk.too_angry": "Hulk too angry.",
+  "message.enhanced.hulk.arm_burned": "The Snap burned the Hulk's arm.",
+  "message.enhanced.gamma.resting": "The Gamma Emitter is cooling down (%s s).",
+  "hud.enhanced.hulk.bpm": "♥ %s bpm",
+  "hud.enhanced.hulk.hulk_out": "%s: Hulk out",
+  "hud.enhanced.hulk.enraged": "Enraged",
+  "hud.enhanced.hulk.arm": "Burned arm %s",
+  "hud.enhanced.hulk.bruce": "Bruce can't",
+  "hud.enhanced.hulk.changing": "Changing…",
+  "hud.enhanced.hulk.inhibited": "Inhibitor on",
+  "preset.enhanced.hulk": "Hulk-like",
+  "preset.enhanced.hulk.desc": "Smash, clap, leap and throw boulders, and a human form",
+  "anim.enhanced.run.hulk": "The Hulk",
+  "enhanced.configuration.hulk": "The Hulk",
+  "enhanced.configuration.hulk.tooltip": "How the Hulk's giant body is drawn.",
+  "enhanced.configuration.hulk.button": "Edit…"
 }

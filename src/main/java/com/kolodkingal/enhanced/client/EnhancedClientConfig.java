@@ -24,6 +24,7 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.BooleanValue WEB_ASSIST_PREVIEW;
     public static final ModConfigSpec.ConfigValue<String> QUICKSILVER_SONG;
     public static final ModConfigSpec.BooleanValue IGNORE_SERVER_MUSIC;
+    public static final ModConfigSpec.BooleanValue HULK_MODEL;
 
     static {
         BUILDER.push("animation");
@@ -93,6 +94,13 @@ public final class EnhancedClientConfig {
                         "(<world>/serverconfig/enhanced/music); hear the built-in music, or your own, instead.")
                 .translation("config.enhanced.ignore_server_music")
                 .define("ignoreServerMusic", false);
+        BUILDER.pop();
+
+        // 3.6 (lane L7): the Hulk's own body.
+        BUILDER.push("hulk");
+        HULK_MODEL = BUILDER.comment("Whether the Hulk is drawn with his own giant body (false: the player model",
+                "wearing his skin, if another mod's model clashes with it).")
+                .define("hulkModel", true);
         BUILDER.pop();
     }
 
@@ -177,6 +185,11 @@ public final class EnhancedClientConfig {
     /** Whether the world's music is ignored (false until the config has loaded). */
     public static boolean ignoreServerMusic() {
         return SPEC.isLoaded() && IGNORE_SERVER_MUSIC.get();
+    }
+
+    /** Whether the Hulk is drawn with his own body (true until the config has loaded). */
+    public static boolean hulkModel() {
+        return !SPEC.isLoaded() || HULK_MODEL.get();
     }
 
     private EnhancedClientConfig() {

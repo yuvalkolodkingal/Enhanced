@@ -27,6 +27,12 @@ public final class ModRecipes {
             GAUNTLET_SHAPED = SERIALIZERS.register("gauntlet_shaped",
             com.kolodkingal.enhanced.stones.GauntletRecipe.Serializer::new);
 
+    // ===== hulk (3.6) =====
+    /** The Gamma Emitter's shaped recipe, matched only while {@code [gamma] emitterCraftable} is on (lane L7). */
+    public static final DeferredHolder<RecipeSerializer<?>, com.kolodkingal.enhanced.hulk.GammaEmitterRecipe.Serializer>
+            GAMMA_EMITTER = SERIALIZERS.register("gamma_emitter",
+            com.kolodkingal.enhanced.hulk.GammaEmitterRecipe.Serializer::new);
+
     private ModRecipes() {
     }
 }

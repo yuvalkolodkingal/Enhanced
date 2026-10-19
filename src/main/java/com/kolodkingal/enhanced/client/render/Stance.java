@@ -107,7 +107,14 @@ public enum Stance {
     /** Hela with her form on: a necrosword in each hand, held low and out, the points turned outward. */
     HELA_BLADES(3.0F, 5.0F, false),
     /** Death's Grasp: one hand held out before her, fingers spread and clawed, the other drawn back. */
-    HELA_GRASP(1.5F, 3.0F, true)
+    HELA_GRASP(1.5F, 3.0F, true),
+    // ===== hulk (3.6) =====
+    /** The Hulk at rest: hunched, the shoulders up, the arms hanging wide, the knuckles low; a slow heavy breath. */
+    HULK_IDLE(5.0F, 4.0F, false),
+    /** The Hulk enraged: the arms out and forward, the fists clenched, the chest heaving. */
+    HULK_ENRAGED(3.0F, 6.0F, false),
+    /** In the air on a leap: the knees tucked, the arms up. */
+    HULK_AIR(2.0F, 3.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

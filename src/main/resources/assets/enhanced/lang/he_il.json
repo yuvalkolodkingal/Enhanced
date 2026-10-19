@@ -3751,5 +3751,21 @@
   "item.enhanced.hydra_intel": "מודיעין הידרה",
   "message.enhanced.hydra.turned": "חייל הידרה נלחם בשבילך עכשיו!",
   "message.enhanced.hydra.blaster_off": "הרובה כבוי: השרת הזה כיבה אותו.",
-  "message.enhanced.hydra.console": "מכבים את האזעקה... %s"
+  "message.enhanced.hydra.console": "מכבים את האזעקה... %s",
+  "message.enhanced.hulk.too_angry": "האלק כועס מדי.",
+  "message.enhanced.hulk.arm_burned": "הנקישה שרפה את היד של האלק.",
+  "message.enhanced.gamma.resting": "פולט קרני הגמא מתקרר (%s שנ').",
+  "hud.enhanced.hulk.bpm": "♥ %s פעימות בדקה",
+  "hud.enhanced.hulk.hulk_out": "%s: להפוך להאלק",
+  "hud.enhanced.hulk.enraged": "זועם",
+  "hud.enhanced.hulk.arm": "יד שרופה %s",
+  "hud.enhanced.hulk.bruce": "ברוס לא יכול",
+  "hud.enhanced.hulk.changing": "משתנה…",
+  "hud.enhanced.hulk.inhibited": "המעכב פועל",
+  "preset.enhanced.hulk": "דמוי האלק",
+  "preset.enhanced.hulk.desc": "ריסוק, מחיאת רעם, קפיצות וזריקת סלעים, וצורת אדם",
+  "anim.enhanced.run.hulk": "האלק",
+  "enhanced.configuration.hulk": "האלק",
+  "enhanced.configuration.hulk.tooltip": "איך מצויר הגוף הענק של האלק.",
+  "enhanced.configuration.hulk.button": "עריכה…"
 }
