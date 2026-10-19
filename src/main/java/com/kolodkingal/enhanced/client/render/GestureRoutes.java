@@ -191,7 +191,11 @@ public final class GestureRoutes {
             // them.)
             // ===== healing (3.7) =====
             // ===== wolverine (3.7) =====
-            case CLAWS_OUT, CLAW_CLIMB, SCENT_TRACK -> power == Power.WOLVERINE ? PENDING_GESTURE : null;
+            // (The claws out and in; Claw Climb hooks a claw high; Track's head goes down to the scent.)
+            case CLAWS_OUT -> power == Power.WOLVERINE ? (on ? GestureId.WOLVERINE_SNIKT : GestureId.WOLVERINE_SHINK)
+                    : null;
+            case CLAW_CLIMB -> power == Power.WOLVERINE && on ? GestureId.WOLVERINE_CLIMB : null;
+            case SCENT_TRACK -> power == Power.WOLVERINE && on ? GestureId.WOLVERINE_TRACK : null;
             // ===== deadpool (3.7) =====
         };
     }
@@ -469,7 +473,17 @@ public final class GestureRoutes {
             case HULK -> "none: every move of the Hulk is told by the payload of its effect, which names him"
                     + " (HulkGestures.gestureOf)";
             // ===== wolverine (3.7) =====
-            case WOLVERINE -> "none: Wolverine's keys are acted by his plug-in (lane L2 of 3.7)";
+            // (R's three slashes and Sneak + R's spin, Sneak + V's Feral Leap and N's Sniff are told by the payloads of
+            // their effects, which name him; G is the claws' switch (Sneak + G the climb's); V and B are his states,
+            // whose gestures his plug-in gives (WolverineClient.liveGesture); Sneak + N, Track, is toggle:SCENT_TRACK.)
+            case WOLVERINE -> switch (ability) {
+                case 1 -> "none: the slashes and the spin are told by the payload of their claws, which names him"
+                        + " (WolverineGestures.gestureOf)";
+                case 2 -> "toggle:CLAWS_OUT";
+                case 3 -> "live:WOLVERINE_POUNCING";
+                case 4 -> "live:WOLVERINE_BERSERK";
+                default -> "none: the Sniff is told by its payload (WOLVERINE_SNIFF); Track is toggle:SCENT_TRACK";
+            };
             // ===== deadpool (3.7) =====
             case DEADPOOL -> "none: Deadpool's keys are acted by his plug-in (lane L3 of 3.7)";
             default -> "none: no abilities";
@@ -552,7 +566,8 @@ public final class GestureRoutes {
             // which fails a release.)
             case HEALING_DOWN -> "pending: the healing lane (L1 of 3.7) acts it (the shared HEALING_DOWN pose)";
             // ===== wolverine (3.7) =====
-            case WOLVERINE_BERSERK, WOLVERINE_POUNCING -> "pending: Wolverine's lane (L2 of 3.7) acts it";
+            // (Both have gestures of his own, from his plug-in: WolverineClient.liveGesture.)
+            case WOLVERINE_BERSERK, WOLVERINE_POUNCING -> null;
             // ===== deadpool (3.7) =====
             case DEADPOOL_PARRYING, DEADPOOL_AIMING -> "pending: Deadpool's lane (L3 of 3.7) acts it";
         };

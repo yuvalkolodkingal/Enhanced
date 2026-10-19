@@ -129,6 +129,8 @@ public final class ClientSetup {
             // LabFx; StoneFx's LOCATOR_TRAIL) =====
             // ===== healing (3.7) =====
             // ===== wolverine (3.7) =====
+            com.kolodkingal.enhanced.client.wolverine.WolverineEffects.register();
+            com.kolodkingal.enhanced.client.wolverine.ScentView.register();
             // ===== deadpool (3.7) =====
             // ===== school_lab (3.7) =====
             // ===== finders (3.7) =====
@@ -381,6 +383,8 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.hulk.HulkLayers.InhibitorBand(renderer));
                 // ===== healing (3.7) =====
                 // ===== wolverine (3.7) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.wolverine.ClawLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.WolverineCowlLayer(renderer));
                 // ===== deadpool (3.7) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
@@ -456,6 +460,9 @@ public final class ClientSetup {
                 new com.kolodkingal.enhanced.client.hulk.HulkHud());
         // ===== healing (3.7) =====
         // ===== wolverine (3.7) =====
+        // (The Rage's red edge and the injection's silver flash.)
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("wolverine"),
+                new com.kolodkingal.enhanced.client.wolverine.WolverineHud());
         // ===== deadpool (3.7) =====
         // ===== school_lab (3.7) =====
         // ===== finders (3.7) =====

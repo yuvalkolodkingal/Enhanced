@@ -195,6 +195,9 @@ public final class ModTags {
     public static final TagKey<net.minecraft.world.effect.MobEffect> STOPS_HEALING =
             TagKey.create(Registries.MOB_EFFECT, Enhanced.id("stops_healing"));
     // ===== wolverine (3.7) =====
+    /** What Wolverine's claws cannot bite into for Claw Climb: glass, ice, slime, honey (lane L2). */
+    public static final TagKey<Block> CLAW_SLIPPERY = TagKey.create(
+            Registries.BLOCK, Enhanced.id("claw_slippery"));
     // ===== deadpool (3.7) =====
     /** What fills a chimichanga besides the bread and the carrot: cooked beef, porkchop or chicken (lane L3). */
     public static final TagKey<Item> CHIMICHANGA_FILLINGS = TagKey.create(Registries.ITEM,

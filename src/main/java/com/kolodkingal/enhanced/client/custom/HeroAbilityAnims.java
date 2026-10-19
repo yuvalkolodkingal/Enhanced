@@ -231,11 +231,15 @@ public final class HeroAbilityAnims {
         row(HeroAbility.HULK_BODY).stances(Stance.HULK_IDLE, Stance.HULK_ENRAGED);
         // ===== wolverine (3.7) =====
         // (The skeleton's rows have no moves yet: lane L2 gives them their gestures and stances.)
-        row(HeroAbility.WOLVERINE_SLASH);
-        row(HeroAbility.WOLVERINE_CLAWS);
-        row(HeroAbility.WOLVERINE_POUNCE);
-        row(HeroAbility.WOLVERINE_BERSERKER);
-        row(HeroAbility.WOLVERINE_SENSES);
+        row(HeroAbility.WOLVERINE_SLASH).main(GestureId.WOLVERINE_SLASH_1).alt(GestureId.WOLVERINE_SPIN)
+                .also(GestureId.WOLVERINE_SLASH_2, GestureId.WOLVERINE_SLASH_3);
+        row(HeroAbility.WOLVERINE_CLAWS).main(GestureId.WOLVERINE_SNIKT).alt(GestureId.WOLVERINE_CLIMB)
+                .also(GestureId.WOLVERINE_SHINK).stances(Stance.WOLVERINE_CLAWS, Stance.WOLVERINE_CLIMBING);
+        row(HeroAbility.WOLVERINE_POUNCE).main(GestureId.WOLVERINE_POUNCE_CROUCH).alt(GestureId.WOLVERINE_FERAL_LEAP)
+                .also(GestureId.WOLVERINE_POUNCE_AIR, GestureId.WOLVERINE_POUNCE_STAB);
+        row(HeroAbility.WOLVERINE_BERSERKER).main(GestureId.WOLVERINE_BERSERK_ROAR)
+                .stances(Stance.WOLVERINE_BERSERK);
+        row(HeroAbility.WOLVERINE_SENSES).main(GestureId.WOLVERINE_SNIFF).alt(GestureId.WOLVERINE_TRACK);
         row(HeroAbility.WOLVERINE_BODY);
         // ===== deadpool (3.7) =====
         // (Lane L3 gives them their gestures and stances.)
@@ -318,6 +322,9 @@ public final class HeroAbilityAnims {
         live(Live.HULK_GRABBING, HeroAbility.HULK_SMASH);
         live(Live.HULK_CHARGING, HeroAbility.HULK_BOULDER);
         live(Live.HULK_ENRAGED, HeroAbility.HULK_BODY);
+        // 3.7 (lane L2: Wolverine's)
+        live(Live.WOLVERINE_POUNCING, HeroAbility.WOLVERINE_POUNCE);
+        live(Live.WOLVERINE_BERSERK, HeroAbility.WOLVERINE_BERSERKER);
         // (PINNED, LIFTED and MIND_CONTROLLED are what is done to a player, not what he does: no ability owns them.)
         toggle(Toggle.FROST_GIANT, HeroAbility.LOKI_FROST_GIANT);
         toggle(Toggle.GOD_OF_THUNDER, HeroAbility.THOR_THUNDER);
