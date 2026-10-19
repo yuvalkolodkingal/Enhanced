@@ -82,7 +82,7 @@ public class StoneArmLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
     }
 
     /** The arm that holds the stone (bare, in a Gauntlet or in a vessel): the off arm if only it holds one. */
-    static HumanoidArm stoneArm(AbstractClientPlayer player) {
+    public static HumanoidArm stoneArm(AbstractClientPlayer player) {
         boolean main = holdsStone(player.getMainHandItem());
         boolean off = holdsStone(player.getOffhandItem());
         return off && !main ? player.getMainArm().getOpposite() : player.getMainArm();

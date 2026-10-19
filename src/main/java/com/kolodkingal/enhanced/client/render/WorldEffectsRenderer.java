@@ -138,15 +138,8 @@ public final class WorldEffectsRenderer {
         VertexConsumer beams = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            // (3.4: by the ability, so a custom hero who has it fires it too.)
-            if (data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive()) {
-                renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS.of(player, HeroAbility.WANDA_CHAOS_BEAM),
-                        WandaAbilities.beamTargets(player), pose, beams, camera, partialTick, time);
-            }
-            if (data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive()) {
-                Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION : MIND_STONE;
-                renderBeam(mc, player, foreheadPosition(mc, player, partialTick), palette.of(player, HeroAbility.VISION_MIND_BEAM),
-                        WandaAbilities.BEAM_TARGET, pose, beams, camera, partialTick, time);
+            if (!OwnBeams.behind(mc, player)) {
+                heroBeams(mc, player, data, pose, beams, camera, partialTick, time);
             }
             if (data.heldEntityId() != -1) {
                 Entity held = level.getEntity(data.heldEntityId());
@@ -166,9 +159,31 @@ public final class WorldEffectsRenderer {
         renderHexBolts(mc, level, pose, beams, camera, partialTick, time);
         BeamRenderer.render(mc, level, pose, beams, camera, partialTick, time);
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
+        // 3.6: the camera's own beams seen from behind him, over his body (OwnBeams).
+        if (mc.getCameraEntity() instanceof AbstractClientPlayer self && OwnBeams.behind(mc, self)) {
+            VertexConsumer over = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM_OVER);
+            heroBeams(mc, self, Powers.get(self), pose, over, camera, partialTick, time);
+            BeamRenderer.renderOwn(mc, self, pose, over, camera, partialTick, time);
+            buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM_OVER);
+        }
         BarrierRenderer.render(mc, level, buffers, pose, camera, partialTick, time);
         // The Magnetic Pull: its pulse and lines of force, then the items flying to his hand (it ends its own batches).
         MagnetStreams.render(mc, level, buffers, camera, partialTick, level.getGameTime());
+    }
+
+    /** The Chaos Beam and Vision's Mind Beam of one player (3.4: by the ability, so a custom hero who has it fires it too). */
+    private static void heroBeams(Minecraft mc, AbstractClientPlayer player, PowerData data, Matrix4f pose,
+                                  VertexConsumer beams, Vec3 camera, float partialTick, float time) {
+        if (data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive()) {
+            renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS.of(player, HeroAbility.WANDA_CHAOS_BEAM),
+                    WandaAbilities.beamTargets(player), pose, beams, camera, partialTick, time);
+        }
+        if (data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive()) {
+            Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION : MIND_STONE;
+            renderBeam(mc, player, foreheadPosition(mc, player, partialTick),
+                    palette.of(player, HeroAbility.VISION_MIND_BEAM), WandaAbilities.BEAM_TARGET, pose, beams, camera,
+                    partialTick, time);
+        }
     }
 
     // ---- Shields going down ----

@@ -2,13 +2,20 @@ package com.kolodkingal.enhanced.client.hulk;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
+import com.kolodkingal.enhanced.hulk.HulkAbilities;
+import com.kolodkingal.enhanced.power.Live;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent;
 import net.neoforged.neoforge.client.event.RenderArmEvent;
 import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 
@@ -45,6 +52,27 @@ public final class HulkRenderEvents {
             return;
         }
         event.setCanceled(true);
+    }
+
+    /**
+     * The third-person camera of one growing into the Hulk (3.6, integration): vanilla keeps it 4 x his scale away, and
+     * his scale is still Banner's when the hunched change begins, so in the front view the camera sat inside the
+     * hunched body for the first half second. While he changes, it stays as far as for the Hulk he is becoming.
+     */
+    @SubscribeEvent
+    public static void onCameraDistance(CalculateDetachedCameraDistanceEvent event) {
+        if (!(event.getCamera().getEntity() instanceof Player player)) {
+            return;
+        }
+        PowerData data = Powers.get(player);
+        if (data.power() != Power.HULK || !data.is(Live.HULK_TRANSFORMING)) {
+            return;
+        }
+        float full = (float) (1.0 + HulkAbilities.scaleOf(HulkAbilities.look(data)));
+        float now = event.getEntityScalingFactor();
+        if (now > 0.0F && full > now) {
+            event.setDistance(event.getDistance() * full / now);
+        }
     }
 
     @SubscribeEvent

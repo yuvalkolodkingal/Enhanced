@@ -148,7 +148,10 @@ public final class HeroPoses {
         return twist;
     }
 
-    /** Arms that hold a pose of their own (a bow, a shield, a spyglass) or an item in use are left to vanilla. */
+    /**
+     * Arms that hold a pose of their own (a bow, a shield, a spyglass) or an item in use are left to vanilla (but for
+     * a stone's beam, 3.6).
+     */
     private static void yields(PoseContext c) {
         PlayerModel<?> m = c.model;
         Player p = c.player;
@@ -159,7 +162,8 @@ public final class HeroPoses {
             right = true;
             left = true;
         }
-        if (p.isUsingItem()) {
+        // (3.6: a stone's beam held through the item in use raises that arm as every beam does.)
+        if (p.isUsingItem() && !HeroAnimator.stoneBeam(p)) {
             HumanoidArm using = p.getUsedItemHand() == InteractionHand.MAIN_HAND ? p.getMainArm() : p.getMainArm().getOpposite();
             if (using == HumanoidArm.RIGHT) {
                 right = true;

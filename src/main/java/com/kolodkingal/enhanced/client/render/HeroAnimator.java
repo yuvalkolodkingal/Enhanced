@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
+import com.kolodkingal.enhanced.client.stones.StoneArmLayer;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
@@ -16,6 +17,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.stones.StoneBeams;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -116,7 +118,8 @@ public final class HeroAnimator {
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
             // Anyone holding Thor's weapon can ride the Bifrost, so that state exists for everyone.
-            boolean tracked = data.power().hasPowers() || data.is(Live.BIFROST);
+            // (3.6: so does anyone firing a beam: the Scepter's Mind Beam is anyone's, and raises his arm.)
+            boolean tracked = data.power().hasPowers() || data.is(Live.BIFROST) || data.is(Live.BEAMING);
             HeroAnimState s = STATES.get(player.getUUID());
             if (!tracked) {
                 if (s != null) {
@@ -396,7 +399,9 @@ public final class HeroAnimator {
         on[Stance.BARRIER_BILLY.ordinal()] = data.has(HeroAbility.BILLY_FREEZE) && data.chaosShieldActive();
         if (on[Stance.BEAM_HAND.ordinal()]) {
             BeamStyle beam = BeamRenderer.styleOf(p.getId());
-            s.beamOffHand = beam != null && beam.offHand();
+            // (3.6: a stone's beam leaves the hand that holds the stone, the Gauntlet or the Scepter.)
+            s.beamOffHand = stoneBeam(p) ? StoneArmLayer.stoneArm(p) != p.getMainArm()
+                    : beam != null && beam.offHand();
         }
         on[Stance.TOMMY_WHIRL.ordinal()] = data.has(HeroAbility.TOMMY_WHIRLWIND) && data.is(Live.WHIRLWIND);
         HeroClient hero = HeroClients.of(power);
@@ -410,6 +415,15 @@ public final class HeroAnimator {
                 }
             }
         }
+    }
+
+    /**
+     * Whether this player fires a stone's beam (3.6, the Mind or the Power Stone's): held through an item in use, whose
+     * arm the beam's stance raises instead of leaving it to vanilla's pose of an item in use ({@code HeroPoses}).
+     */
+    static boolean stoneBeam(Player p) {
+        BeamStyle beam = BeamRenderer.styleOf(p.getId());
+        return (beam == StoneBeams.MIND || beam == StoneBeams.POWER) && Powers.get(p).is(Live.BEAMING);
     }
 
     // ====================================================================================================================

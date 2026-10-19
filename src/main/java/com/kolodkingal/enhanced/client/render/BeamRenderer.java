@@ -91,13 +91,22 @@ public final class BeamRenderer {
         ACTIVE.clear();
     }
 
-    /** Draws the beams into the energy batch. */
+    /** Draws the beams into the energy batch (but the camera's own seen from behind him: {@link #renderOwn}). */
     static void render(Minecraft mc, ClientLevel level, Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick, float time) {
         ACTIVE.values().removeIf(a -> time - a.seen() > LAPSE_TICKS || time < a.seen() - 1);
         for (Map.Entry<Integer, Active> entry : ACTIVE.entrySet()) {
-            if (level.getEntity(entry.getKey()) instanceof AbstractClientPlayer shooter) {
+            if (level.getEntity(entry.getKey()) instanceof AbstractClientPlayer shooter && !OwnBeams.behind(mc, shooter)) {
                 beam(mc, shooter, entry.getValue(), pose, vc, camera, partialTick, time);
             }
+        }
+    }
+
+    /** 3.6: the beam of the camera's own player seen from behind him, into the batch over everything ({@link OwnBeams}). */
+    static void renderOwn(Minecraft mc, AbstractClientPlayer self, Matrix4f pose, VertexConsumer vc, Vec3 camera,
+                          float partialTick, float time) {
+        Active active = ACTIVE.get(self.getId());
+        if (active != null) {
+            beam(mc, self, active, pose, vc, camera, partialTick, time);
         }
     }
 

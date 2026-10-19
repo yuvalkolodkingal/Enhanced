@@ -23,6 +23,21 @@ public final class EnhancedRenderTypes {
                     .setCullState(RenderStateShard.NO_CULL)
                     .createCompositeState(false));
 
+    /**
+     * {@link #ENERGY_BEAM} drawn over everything (no depth test): the camera's own beam in the third-person back view
+     * (3.6), which runs from his hand to the middle of the screen, straight behind his own head and arm ({@link
+     * OwnBeams}).
+     */
+    public static final RenderType ENERGY_BEAM_OVER = RenderType.create("enhanced_energy_beam_over",
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 4096, false, true,
+            RenderType.CompositeState.builder()
+                    .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
+                    .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                    .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .createCompositeState(false));
+
     /** Untextured, see-through (normal alpha blending), double-sided tint: the red veil of the Hex wall and Chaos Shield. */
     public static final RenderType ENERGY_VEIL = RenderType.create("enhanced_energy_veil",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 16384, false, true,

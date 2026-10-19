@@ -186,7 +186,8 @@ public final class ThorEffects {
             }
             tint = AbilityColors.chosen(player, HeroAbility.THOR_LIGHTNING);
             // The beam is drawn even for an invisible Thor: it hurts all the same.
-            if (data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
+            // (3.6: his own seen from behind him is drawn over his body, after the batch: OwnBeams.)
+            if (data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING) && !OwnBeams.behind(mc, player)) {
                 beam(mc, player, ThorAbilities.holdsWeapon(player), data.toggle(Toggle.GOD_OF_THUNDER), pose, vc, camera, partialTick, time);
             }
         }
@@ -198,6 +199,17 @@ public final class ThorEffects {
         }
         tint = -1;
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
+        if (mc.getCameraEntity() instanceof AbstractClientPlayer self && OwnBeams.behind(mc, self)) {
+            PowerData data = Powers.get(self);
+            if (data.acts(Power.THOR) && data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
+                VertexConsumer over = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM_OVER);
+                tint = AbilityColors.chosen(self, HeroAbility.THOR_LIGHTNING);
+                beam(mc, self, ThorAbilities.holdsWeapon(self), data.toggle(Toggle.GOD_OF_THUNDER), pose, over, camera,
+                        partialTick, time);
+                tint = -1;
+                buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM_OVER);
+            }
+        }
     }
 
     // ---- the lightning beam ----
