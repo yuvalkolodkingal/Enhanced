@@ -126,8 +126,9 @@ public class InfinityStoneItem extends Item {
         tooltip.add(Component.translatable(key + ".desc2").withStyle(ChatFormatting.DARK_GRAY));
     }
 
+    /** No enchantment glint: the gem glows by itself (its model is full bright), and the glint would tint it. */
     @Override
     public boolean isFoil(ItemStack stack) {
-        return true;
+        return false;
     }
 }

@@ -30,6 +30,8 @@ import java.util.UUID;
 public class StonePedestalRenderer implements BlockEntityRenderer<StonePedestalBlockEntity> {
     /** Where the stone floats (blocks above the pedestal's foot). */
     private static final double HEIGHT = 1.35;
+    /** A gem's model stands a little above its origin, so it is put lower. */
+    private static final double GEM_HEIGHT = 1.12;
     private static final float ORB = 0.24F;
     private static final int LAT = 8;
     private static final int LON = 14;
@@ -51,8 +53,9 @@ public class StonePedestalRenderer implements BlockEntityRenderer<StonePedestalB
         }
         float time = (pedestal.getLevel().getGameTime() % 24000L) + partialTick;
         pose.pushPose();
-        pose.translate(0.5, HEIGHT + Mth.sin(time * 0.06F) * 0.05, 0.5);
-        if (kind == StoneKind.REALITY) {
+        boolean aether = kind == StoneKind.REALITY;
+        pose.translate(0.5, (aether ? HEIGHT : GEM_HEIGHT) + Mth.sin(time * 0.06F) * 0.05, 0.5);
+        if (aether) {
             aether(pose, buffers, time);
         } else {
             pose.mulPose(Axis.YP.rotationDegrees(time * 2.0F));

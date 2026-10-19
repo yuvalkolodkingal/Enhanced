@@ -144,7 +144,7 @@ public final class Snap {
             StoneKind kind = StoneKind.values()[used / step];
             Vec3 hand = hand(player);
             kind.voice().use(player.level(), hand, 0.5F, 1.0F);
-            player.serverLevel().sendParticles(new EnergyParticleOptions(kind.color(), 1.0F), hand.x, hand.y, hand.z,
+            player.serverLevel().sendParticles(new EnergyParticleOptions(kind.color(), 0.5F), hand.x, hand.y, hand.z,
                     8, 0.15, 0.15, 0.15, 0.04);
         }
         if (used < hold) {

@@ -206,7 +206,8 @@ public class StoneHud implements LayeredDraw.Layer {
         }
         for (Component line : lines) {
             ty -= 9;
-            graphics.drawString(font, line, x, ty, 0xFFFFFF);
+            int lx = Math.max(2, Math.min(x, w - font.width(line) - 4));
+            graphics.drawString(font, line, lx, ty, 0xFFFFFF);
         }
     }
 

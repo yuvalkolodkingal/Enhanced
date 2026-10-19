@@ -383,9 +383,9 @@ public class InfinityGauntletItem extends AwakeningItem {
                 : "item.enhanced.infinity_gauntlet.wield").withStyle(ChatFormatting.DARK_PURPLE));
     }
 
+    /** Thanos's Gauntlet glints as before; a crafted one does not (its sockets glow by themselves). */
     @Override
     public boolean isFoil(ItemStack stack) {
-        GauntletContents contents = contents(stack);
-        return contents.titan() || contents.count() > 0;
+        return contents(stack).titan();
     }
 }
