@@ -792,6 +792,42 @@ public final class HydraTests {
     }
 
     @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
+    public static void aSoldierWhoCannotReachAConsoleCallsOnHisOwnRadio(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        HydraOutposts.Outpost outpost = outpost(f);
+        HydraOfficerEntity officer = posted(outpost, Post.OFFICER.ordinal(), officer(f, 1.5, 19.5, 0.0F));
+        officer.setNoAi(true);
+        // a glass cage round him: no way to any console
+        for (int x = 1; x <= 5; x++) {
+            for (int z = 1; z <= 5; z++) {
+                for (int y = 2; y <= 4; y++) {
+                    if (x == 1 || x == 5 || z == 1 || z == 5 || y == 4) {
+                        helper.setBlock(new BlockPos(x, y, z), Blocks.GLASS);
+                    }
+                }
+            }
+        }
+        HydraSoldierEntity rifleman = posted(outpost, Post.GATE_WEST.ordinal(),
+                soldier(f, Rank.RIFLEMAN, 3.5, 3.5, 0.0F));
+        ServerPlayer player = intruder(f, 15.5, 15.5);
+        AtomicLong radioFrom = new AtomicLong(-1);
+        f.everyTick(250, tick -> {
+            rifleman.setTarget(player);
+            if (radioFrom.get() < 0 && rifleman.act() == HydraSoldierEntity.Act.RADIO) {
+                radioFrom.set(tick);
+            }
+            if (!outpost.alarmOn(level.getGameTime())) {
+                return false;
+            }
+            check(radioFrom.get() >= 60, "he called after 3 s of fighting: " + radioFrom.get());
+            check(tick - radioFrom.get() >= HydraAlarm.CALL_TICKS - 4,
+                    "and the call took 3 s: " + (tick - radioFrom.get()));
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
     public static void fourReinforcementsComeAfterTwoHundredTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

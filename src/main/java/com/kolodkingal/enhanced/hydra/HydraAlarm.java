@@ -66,8 +66,10 @@ public final class HydraAlarm {
     public static final double REACH = 48.0;
     /** How near a runner must come to a console's spot. */
     public static final double CONSOLE_REACH = 2.5;
-    /** How long a runner tries to reach a console before he gives up. */
+    /** How long a runner tries to reach a console before he calls on his own radio instead. */
     public static final int RUN_TICKS = 300;
+    /** How long a soldier's call on his own radio takes (3 s: the time to stop him). */
+    public static final int CALL_TICKS = 60;
     /** How far out on the road the reinforcements who come by the gate appear. */
     public static final int ROAD = 32;
 
@@ -77,6 +79,8 @@ public final class HydraAlarm {
     private static final Map<UUID, Long> RUN_SINCE = new HashMap<>();
     /** Where each runner goes. */
     private static final Map<UUID, BlockPos> RUN_SPOT = new HashMap<>();
+    /** The runners who call the officer on their own radio, and since when. */
+    private static final Map<UUID, Long> CALLING = new HashMap<>();
 
     // ---- the numbers ----
 
@@ -108,7 +112,8 @@ public final class HydraAlarm {
     /**
      * A soldier of an outpost fights {@code target} (every tick of the fight): the officer raises the alarm at once
      * for an intruder; any other soldier, after 3 s, becomes the outpost's runner (one at a time) if its officer
-     * lives.
+     * lives: he runs to a radio console he can walk to, or, with none in reach, calls the officer on his own radio
+     * ({@link #CALL_TICKS}, standing, a hand at his ear). Killing or freezing him meanwhile stops it.
      */
     static void fighting(ServerLevel level, HydraSoldierEntity soldier, LivingEntity target, long now) {
         HydraOutposts.Outpost outpost = soldier.outpost();
@@ -123,6 +128,10 @@ public final class HydraAlarm {
             raise(level, outpost, soldier, target);
             return;
         }
+        if (outpost.runner != null && !(level.getEntity(outpost.runner) instanceof HydraSoldierEntity runner
+                && runner.isAlive())) {
+            outpost.runner = null; // the runner is gone (unloaded, taken away)
+        }
         if (soldier.fightingFor() < HydraSoldierEntity.ALARM_AFTER || soldier.alarmTried() || outpost.runner != null) {
             return;
         }
@@ -130,13 +139,14 @@ public final class HydraAlarm {
         if (officer(level, outpost) == null) {
             return; // nobody answers the radio
         }
-        BlockPos spot = reachableConsoleSpot(outpost, soldier);
-        if (spot == null) {
-            return; // he cannot reach a radio
-        }
         outpost.runner = soldier.getUUID();
         RUN_SINCE.put(soldier.getUUID(), now);
-        RUN_SPOT.put(soldier.getUUID(), spot);
+        BlockPos spot = reachableConsoleSpot(outpost, soldier);
+        if (spot != null) {
+            RUN_SPOT.put(soldier.getUUID(), spot);
+        } else {
+            CALLING.put(soldier.getUUID(), now);
+        }
     }
 
     /**
@@ -169,6 +179,12 @@ public final class HydraAlarm {
         return spot != null ? spot : nearestConsoleSpot(outpost, soldier.position());
     }
 
+    /** Since when the runner {@code soldier} calls on his own radio, or -1 if he runs to a console. */
+    static long callingSince(HydraSoldierEntity soldier) {
+        Long since = CALLING.get(soldier.getUUID());
+        return since == null ? -1L : since;
+    }
+
     /** Whether {@code soldier} is his outpost's runner now (and may still be). */
     static boolean isRunner(HydraSoldierEntity soldier) {
         HydraOutposts.Outpost outpost = soldier.outpost();
@@ -176,31 +192,39 @@ public final class HydraAlarm {
             return false;
         }
         long now = soldier.level().getGameTime();
-        Long since = RUN_SINCE.get(soldier.getUUID());
-        if (!soldier.mayRaiseAlarm() || outpost.alarmOn(now) || (since != null && now - since > RUN_TICKS)) {
-            outpost.runner = null;
-            RUN_SINCE.remove(soldier.getUUID());
-            RUN_SPOT.remove(soldier.getUUID());
+        if (!soldier.mayRaiseAlarm() || outpost.alarmOn(now)
+                || officer((ServerLevel) soldier.level(), outpost) == null) {
+            forgetRunner(outpost, soldier);
             return false;
+        }
+        Long since = RUN_SINCE.get(soldier.getUUID());
+        if (since != null && now - since > RUN_TICKS && callingSince(soldier) < 0) {
+            runnerFailed(outpost, soldier); // stuck on his way: he calls instead
         }
         return true;
     }
 
-    /** The runner reached a console: the alarm (if the officer still lives). */
+    private static void forgetRunner(HydraOutposts.Outpost outpost, HydraSoldierEntity soldier) {
+        if (soldier.getUUID().equals(outpost.runner)) {
+            outpost.runner = null;
+        }
+        RUN_SINCE.remove(soldier.getUUID());
+        RUN_SPOT.remove(soldier.getUUID());
+        CALLING.remove(soldier.getUUID());
+    }
+
+    /** The runner reached a console, or his call went through: the alarm (if the officer still lives). */
     static void runnerArrived(ServerLevel level, HydraOutposts.Outpost outpost, HydraSoldierEntity runner) {
-        outpost.runner = null;
-        RUN_SINCE.remove(runner.getUUID());
-        RUN_SPOT.remove(runner.getUUID());
+        forgetRunner(outpost, runner);
         if (officer(level, outpost) != null && runner.mayRaiseAlarm()) {
             raise(level, outpost, runner, runner.getTarget());
         }
     }
 
-    /** The runner found no way to a console: nobody raises it this time. */
+    /** The runner found no way to a console (or got stuck): he calls the officer on his own radio instead. */
     static void runnerFailed(HydraOutposts.Outpost outpost, HydraSoldierEntity runner) {
-        outpost.runner = null;
-        RUN_SINCE.remove(runner.getUUID());
         RUN_SPOT.remove(runner.getUUID());
+        CALLING.put(runner.getUUID(), runner.level().getGameTime());
     }
 
     /** The spot in front of the console nearest {@code from}. */
@@ -574,6 +598,7 @@ public final class HydraAlarm {
         HOLDS.clear();
         RUN_SINCE.clear();
         RUN_SPOT.clear();
+        CALLING.clear();
     }
 
     /** The surface y at a point (for the road). */

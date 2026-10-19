@@ -208,6 +208,15 @@ public final class HydraGoals {
             if (outpost == null || !(soldier.level() instanceof ServerLevel level)) {
                 return;
             }
+            long calling = HydraAlarm.callingSince(soldier);
+            if (calling >= 0) {
+                soldier.getNavigation().stop();
+                soldier.setAct(HydraSoldierEntity.Act.RADIO);
+                if (soldier.level().getGameTime() - calling >= HydraAlarm.CALL_TICKS) {
+                    HydraAlarm.runnerArrived(level, outpost, soldier);
+                }
+                return;
+            }
             BlockPos spot = HydraAlarm.runSpot(outpost, soldier);
             soldier.setAct(HydraSoldierEntity.Act.RUN);
             if (soldier.distanceToSqr(Vec3.atBottomCenterOf(spot)) <= HydraAlarm.CONSOLE_REACH
