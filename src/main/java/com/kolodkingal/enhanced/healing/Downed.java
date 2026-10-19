@@ -122,6 +122,7 @@ public final class Downed {
         PowerTicker.stopHoldAbilities(data);
         Powers.syncIfDirty(player);
         player.stopUsingItem();
+        player.stopFallFlying();
         player.setSprinting(false);
         if (player.getAbilities().flying) {
             player.getAbilities().flying = false;

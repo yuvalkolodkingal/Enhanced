@@ -418,7 +418,7 @@ public final class HealingTests {
 
     /**
      * 1.0 health a second after a blow, 3.0 once he has had 60 ticks out of harm (to the tick); food pays 0.05 for each
-     * health; at food 0 a quarter.
+     * health; twice as fast in Wolverine's Berserker Rage; at food 0 a quarter.
      */
     @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 160)
     public static void regenerationOneThenThree(GameTestHelper helper) {
@@ -440,6 +440,9 @@ public final class HealingTests {
                     assertNear(logan.getHealth() - h59, 6.0, 1.0E-4, "3.0 a second out of harm");
                     long now = helper.getLevel().getGameTime();
                     double full = Regeneration.rate(logan, now);
+                    Powers.get(logan).set(Live.WOLVERINE_BERSERK, true);
+                    assertNear(Regeneration.rate(logan, now), full * 2.0, 1.0E-9, "twice in the Berserker Rage");
+                    Powers.get(logan).set(Live.WOLVERINE_BERSERK, false);
                     logan.getFoodData().setFoodLevel(0);
                     assertNear(Regeneration.rate(logan, now), full * Regeneration.STARVING, 1.0E-9,
                             "a quarter when starving, never nothing");
