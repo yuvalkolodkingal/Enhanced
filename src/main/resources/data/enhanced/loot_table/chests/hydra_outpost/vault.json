@@ -7,7 +7,13 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "enhanced:lokis_scepter"
+          "name": "enhanced:lokis_scepter",
+          "functions": [
+            {
+              "function": "enhanced:mark_spent",
+              "stone": "mind"
+            }
+          ]
         }
       ]
     },

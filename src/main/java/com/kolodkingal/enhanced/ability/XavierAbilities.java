@@ -395,6 +395,9 @@ public final class XavierAbilities {
         if (!data.isReady(HeroAbility.XAVIER_CEREBRO, now)) {
             return;
         }
+        if (com.kolodkingal.enhanced.finders.CerebroRoom.amplify(player)) {
+            return; // (3.7: at the lab's console the room amplifies Cerebro: lane L5's, cooldown and all)
+        }
         int ticks = XavierConfig.CEREBRO_TICKS.get();
         State state = state(player);
         state.cerebroUntil = now + ticks;

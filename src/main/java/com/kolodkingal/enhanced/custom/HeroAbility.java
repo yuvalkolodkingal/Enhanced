@@ -287,6 +287,41 @@ public enum HeroAbility implements CatalogEntry {
     HULK_BODY(Power.HULK, 0, "body", body().cost(2).group(Group.BODY).icon("minecraft:emerald")
             .res(Resource.SCALE).family(Family.BODY)),
 
+    // ===== wolverine (3.7) =====
+    // (The rows of 3.7, written by the skeleton from the plan's tables (10.1) and fixed by lane L2. His healing factor
+    // is his body's: a custom hero with wolverine.body has it if healing_factor.customHeroes.)
+    WOLVERINE_SLASH(Power.WOLVERINE, 1, "slash", press().alt(Act.PRESS).cost(2).group(Group.BODY)
+            .icon("minecraft:shears")),
+    WOLVERINE_CLAWS(Power.WOLVERINE, 2, "claws", toggle().alt(Act.TOGGLE).cost(1).group(Group.BODY)
+            .icon("minecraft:tripwire_hook").on(d -> d.toggle(Toggle.CLAWS_OUT))),
+    WOLVERINE_POUNCE(Power.WOLVERINE, 3, "pounce", press().alt(Act.PRESS).cost(2).group(Group.MOVE)
+            .icon("minecraft:rabbit_foot").on(d -> d.is(Live.WOLVERINE_POUNCING))),
+    /** The Berserker Rage; its Sneak variant is the Healing Burst. */
+    WOLVERINE_BERSERKER(Power.WOLVERINE, 4, "berserker", press().alt(Act.PRESS).cost(3).group(Group.BODY)
+            .icon("minecraft:blaze_powder").on(d -> d.is(Live.WOLVERINE_BERSERK))),
+    WOLVERINE_SENSES(Power.WOLVERINE, 5, "senses", press().alt(Act.TOGGLE).cost(2).group(Group.MIND)
+            .icon("minecraft:spider_eye").on(d -> d.toggle(Toggle.SCENT_TRACK))),
+    /** Adamantium bones and the healing factor: more health, armour and speed, heavy in water, metal for Magneto. */
+    WOLVERINE_BODY(Power.WOLVERINE, 0, "body", body().cost(3).group(Group.BODY).icon("minecraft:iron_block")
+            .traits(Trait.HEALING_FACTOR, Trait.METAL_BODY).family(Family.BODY)),
+
+    // ===== deadpool (3.7) =====
+    // (Fixed by lane L3. The Parry is his one shield: Resource.SHIELD.)
+    DEADPOOL_KATANAS(Power.DEADPOOL, 1, "katanas", press().alt(Act.HOLD).cost(2).group(Group.BODY)
+            .icon("minecraft:iron_sword").altRes(Resource.SHIELD).on(d -> d.is(Live.DEADPOOL_PARRYING))),
+    DEADPOOL_PISTOLS(Power.DEADPOOL, 2, "pistols", press().alt(Act.PRESS).cost(2).group(Group.ENERGY)
+            .icon("minecraft:crossbow").on(d -> d.is(Live.DEADPOOL_AIMING))),
+    DEADPOOL_BELT(Power.DEADPOOL, 3, "belt", press().alt(Act.PRESS).cost(2).group(Group.MOVE)
+            .icon("minecraft:ender_pearl")),
+    /** The Taunt; its Sneak variant is the Chimichanga Break (the Healing Burst). */
+    DEADPOOL_TAUNT(Power.DEADPOOL, 4, "taunt", press().alt(Act.PRESS).cost(1).group(Group.MIND)
+            .icon("minecraft:cookie")),
+    /** Dogpool (one per player); its Sneak variant is the Smoke Vanish. */
+    DEADPOOL_DOGPOOL(Power.DEADPOOL, 5, "dogpool", press().alt(Act.PRESS).cost(3).group(Group.MIND)
+            .icon("minecraft:bone")),
+    DEADPOOL_BODY(Power.DEADPOOL, 0, "body", body().cost(3).group(Group.BODY).icon("minecraft:red_concrete")
+            .traits(Trait.HEALING_FACTOR).family(Family.BODY)),
+
     // ===== variants (3.5, the creator lane) =====
     // Every Sneak variant of a built-in hero's key as a card of its own (the user: "all abilities listed, like Billy's
     // shield"). A variant row is its parent's Sneak half: picked alone it sits on any key (plain or Sneak) and presses
@@ -365,7 +400,26 @@ public enum HeroAbility implements CatalogEntry {
     HULK_ROAR(HULK_CLAP, "roar", variant(HULK_CLAP).icon("minecraft:goat_horn")),
     HULK_BOUND(HULK_LEAP, "bound", variant(HULK_LEAP).icon("minecraft:feather").on(d -> d.is(Live.HULK_LEAPING))),
     HULK_GAMMA_CHARGE(HULK_BOULDER, "gamma_charge", variant(HULK_BOULDER).icon("minecraft:lime_stained_glass")
-            .on(d -> d.is(Live.HULK_CHARGING)));
+            .on(d -> d.is(Live.HULK_CHARGING))),
+
+    // ===== variants (3.7) =====
+    // (The Sneak variants of Wolverine and Deadpool: data only, lanes L2 and L3 fix them. The two Healing Bursts work
+    // for a custom hero without the healing factor too: a plain heal.)
+    WOLVERINE_SPIN_SLASH(WOLVERINE_SLASH, "spin_slash", variant(WOLVERINE_SLASH).icon("minecraft:iron_axe")),
+    /** Claw Climb needs the claws. */
+    WOLVERINE_CLAW_CLIMB(WOLVERINE_CLAWS, "claw_climb", variant(WOLVERINE_CLAWS).icon("minecraft:ladder")
+            .requires("wolverine.claws").on(d -> d.toggle(Toggle.CLAW_CLIMB))),
+    WOLVERINE_FERAL_LEAP(WOLVERINE_POUNCE, "feral_leap", variant(WOLVERINE_POUNCE).icon("minecraft:feather")),
+    WOLVERINE_HEALING_BURST(WOLVERINE_BERSERKER, "healing_burst", variant(WOLVERINE_BERSERKER)
+            .icon("minecraft:golden_apple")),
+    WOLVERINE_TRACK(WOLVERINE_SENSES, "track", variant(WOLVERINE_SENSES).icon("minecraft:compass")
+            .on(d -> d.toggle(Toggle.SCENT_TRACK))),
+    DEADPOOL_PARRY(DEADPOOL_KATANAS, "parry", variant(DEADPOOL_KATANAS).icon("minecraft:shield")
+            .family(Family.SHIELD).on(d -> d.is(Live.DEADPOOL_PARRYING))),
+    DEADPOOL_TRICK_SHOT(DEADPOOL_PISTOLS, "trick_shot", variant(DEADPOOL_PISTOLS).icon("minecraft:arrow")),
+    DEADPOOL_DROP_IN(DEADPOOL_BELT, "drop_in", variant(DEADPOOL_BELT).icon("minecraft:pointed_dripstone")),
+    DEADPOOL_CHIMICHANGA(DEADPOOL_TAUNT, "chimichanga", variant(DEADPOOL_TAUNT).icon("minecraft:bread")),
+    DEADPOOL_SMOKE(DEADPOOL_DOGPOOL, "smoke", variant(DEADPOOL_DOGPOOL).icon("minecraft:gunpowder"));
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {

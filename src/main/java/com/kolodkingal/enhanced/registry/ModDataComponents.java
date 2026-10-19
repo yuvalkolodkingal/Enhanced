@@ -39,6 +39,16 @@ public final class ModDataComponents {
                     .persistent(com.kolodkingal.enhanced.stones.GauntletContents.CODEC)
                     .networkSynchronized(com.kolodkingal.enhanced.stones.GauntletContents.STREAM_CODEC));
 
+    /**
+     * 3.7: what a Stone Locator knows ({@link com.kolodkingal.enhanced.finders.LocatorState}): the stone it was tuned
+     * to, its filter, its target, what its HUD says. Saved with the item, sent to clients (the needle reads it).
+     */
+    public static final DeferredHolder<DataComponentType<?>,
+            DataComponentType<com.kolodkingal.enhanced.finders.LocatorState>> LOCATOR =
+            DATA_COMPONENTS.registerComponentType("locator", builder -> builder
+                    .persistent(com.kolodkingal.enhanced.finders.LocatorState.CODEC)
+                    .networkSynchronized(com.kolodkingal.enhanced.finders.LocatorState.STREAM_CODEC));
+
     private ModDataComponents() {
     }
 }

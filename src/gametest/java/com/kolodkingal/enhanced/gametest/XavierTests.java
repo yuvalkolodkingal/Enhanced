@@ -658,7 +658,8 @@ public final class XavierTests {
 
     @GameTest(template = ARENA, batch = QUICK)
     public static void theMessagesOfProfessorXRoundTrip(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("10"), "3.6 bumps the protocol to 10 (3.3 had 7, 3.4 8, 3.5 9)");
+        check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10,
+                "3.6 bumps the protocol to 10 (3.3 had 7, 3.4 8, 3.5 9; 3.7 11, pinned by MutantSkeletonTests)");
         RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());
         XavierInputPayload input = new XavierInputPayload(0.5F, -1.0F, true, false, 12.5F, -30.0F, true);
         XavierInputPayload.STREAM_CODEC.encode(buf, input);

@@ -408,6 +408,45 @@ public final class ModEntities {
                     .noSummon()
                     .build("hydra_bolt"));
 
+    // ===== healing (3.7) =====
+    // ===== wolverine (3.7) =====
+    // ===== deadpool (3.7) =====
+    // (The skeleton registers every entity of 3.7, drawn as nothing or as a placeholder; each lane owns its classes.)
+    /** One of Deadpool's bullets (lane L3). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.deadpool.DeadpoolBulletEntity>> DEADPOOL_BULLET =
+            ENTITIES.register("deadpool_bullet",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.deadpool.DeadpoolBulletEntity>of(
+                            com.kolodkingal.enhanced.deadpool.DeadpoolBulletEntity::new, MobCategory.MISC)
+                    .sized(0.2F, 0.2F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("deadpool_bullet"));
+    /** Dogpool, Deadpool's dog (lane L3). Not saved for long: he goes home after his time. */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.deadpool.DogpoolEntity>> DOGPOOL =
+            ENTITIES.register("dogpool",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.deadpool.DogpoolEntity>of(
+                            com.kolodkingal.enhanced.deadpool.DogpoolEntity::new, MobCategory.CREATURE)
+                    .sized(0.6F, 0.85F)
+                    .clientTrackingRange(10)
+                    .build("dogpool"));
+    // ===== school_lab (3.7) =====
+    // ===== finders (3.7) =====
+    // ===== cottage (3.7) =====
+    /**
+     * Agatha, Nicky and Rio of Agatha's Cottage (lane L6): a second entity type of the Asgardians' class (its roles
+     * AGATHA, NICKY, RIO), so the cottage has their talk, trades, DOWN rule and voices. Saved; the cottage's keeper
+     * makes and keeps them.
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<AsgardianEntity>> COTTAGE_RESIDENT =
+            ENTITIES.register("cottage_resident",
+                    () -> EntityType.Builder.<AsgardianEntity>of(AsgardianEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.8F)
+                    .clientTrackingRange(10)
+                    .build("cottage_resident"));
+
     /** Mod bus: attributes of the mod's living entities. */
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
@@ -430,6 +469,9 @@ public final class ModEntities {
         event.put(STONEKEEPER.get(), com.kolodkingal.enhanced.vormir.StonekeeperEntity.createAttributes().build());
         event.put(HYDRA_SOLDIER.get(), com.kolodkingal.enhanced.hydra.HydraSoldierEntity.createAttributes().build());
         event.put(HYDRA_OFFICER.get(), com.kolodkingal.enhanced.hydra.HydraOfficerEntity.createAttributes().build());
+        // 3.7
+        event.put(DOGPOOL.get(), com.kolodkingal.enhanced.deadpool.DogpoolEntity.createAttributes().build());
+        event.put(COTTAGE_RESIDENT.get(), AsgardianEntity.createAttributes().build());
     }
 
     private ModEntities() {

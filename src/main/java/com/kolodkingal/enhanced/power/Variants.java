@@ -138,6 +138,29 @@ public final class Variants {
                         0xB6F27A),
                 new Variant("banner", Power.HULK, Variant.suit("hulk_banner"), null, false, 0x5BA33A, 0xB6F27A),
                 own(Power.HULK));
+
+        // ===== wolverine (3.7) =====
+        // The classic yellow-and-blue suit (Deadpool & Wolverine, 2024: the comics' colours on screen at last) with the
+        // cowl, and the black leather of X-Men (2000) with its orange-yellow piping; our own drawings by lane L2
+        // (SCRATCH/v37/art/l2). Placeholder skins until then.
+        add(Power.WOLVERINE,
+                new Variant("classic", Power.WOLVERINE, Variant.suit("wolverine_classic"), null, false, 0xF2C230,
+                        0xD9DEE3),
+                new Variant("x_men_2000", Power.WOLVERINE, Variant.suit("wolverine_x_men_2000"), null, false, 0x2A2A2E,
+                        0xD9DEE3),
+                own(Power.WOLVERINE));
+        // ===== deadpool (3.7) =====
+        // The red-and-black suit, the X-Men trainee's yellow-and-black with his red mask, and Kidpool (smaller, a short
+        // red cape); our own drawings by lane L3 (SCRATCH/v37/art/l3), no logo of the films. Placeholder skins until
+        // then.
+        add(Power.DEADPOOL,
+                new Variant("classic", Power.DEADPOOL, Variant.suit("deadpool_classic"), null, false, 0xC8102E,
+                        0xFF8A8A),
+                new Variant("trainee", Power.DEADPOOL, Variant.suit("deadpool_trainee"), null, false, 0xE8C21E,
+                        0xFF8A8A),
+                new Variant("kidpool", Power.DEADPOOL, Variant.suit("deadpool_kidpool"), null, false, 0xC8102E,
+                        0xFF8A8A),
+                own(Power.DEADPOOL));
     }
 
     private static void add(Power power, Variant... variants) {

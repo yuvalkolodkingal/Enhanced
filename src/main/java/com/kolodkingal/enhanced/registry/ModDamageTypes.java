@@ -126,6 +126,16 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> HYDRA_BOLT = key("hydra_bolt");
     /** The enforcer's stun baton (lane L8). */
     public static final ResourceKey<DamageType> HYDRA_BATON = key("hydra_baton");
+    // ===== wolverine (3.7) =====
+    /** Wolverine's claws: the Claw Slash combo, the Spin Slash and his claws-out empty hand (melee_blows; lane L2). */
+    public static final ResourceKey<DamageType> WOLVERINE_CLAWS = key("wolverine_claws");
+    /** Wolverine's Pounce landing on its prey (lane L2). */
+    public static final ResourceKey<DamageType> WOLVERINE_POUNCE = key("wolverine_pounce");
+    // ===== deadpool (3.7) =====
+    /** Deadpool's katanas: the combo and the Drop-In (melee_blows; lane L3). */
+    public static final ResourceKey<DamageType> DEADPOOL_KATANA = key("deadpool_katana");
+    /** Deadpool's cartoon bullets: the pistols and the Trick Shot (is_projectile; lane L3). */
+    public static final ResourceKey<DamageType> DEADPOOL_BULLET = key("deadpool_bullet");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

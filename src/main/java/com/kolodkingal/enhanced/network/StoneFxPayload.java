@@ -38,6 +38,11 @@ public record StoneFxPayload(int kind, int entityId, List<Vec3> points, int arg)
     public static final int PEDESTAL_TAKE = 11;
     /** The site ambience to loop for this player (arg: {@code SiteAmbience.NONE|SANCTUM_LOOP|END_TUNNEL_LOOP}). */
     public static final int SITE_AMBIENCE = 12;
+    /**
+     * 3.7: the Stone Locator's spark trail (lane L5): points from the holder toward the site (at most 16), arg the
+     * stone's kind (a {@code StoneKind} ordinal).
+     */
+    public static final int LOCATOR_TRAIL = 13;
 
     public static final Type<StoneFxPayload> TYPE = new Type<>(Enhanced.id("stone_fx"));
 

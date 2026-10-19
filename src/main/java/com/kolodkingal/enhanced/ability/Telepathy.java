@@ -50,7 +50,8 @@ public final class Telepathy {
             case PROFESSOR_X -> Rank.TELEPATH;
             case SCARLET_WITCH, PHOENIX, BILLY -> Rank.STRONGER;
             // (3.6: Doctor Strange and the Hulk are no telepaths: their minds are open, the Hulk's as in Age of
-            // Ultron.)
+            // Ultron. 3.7: nor are Wolverine, whose mind Xavier reads (X-Men, 2000), and Deadpool, whose thoughts are
+            // silly.)
             default -> Rank.NONE;
         };
     }

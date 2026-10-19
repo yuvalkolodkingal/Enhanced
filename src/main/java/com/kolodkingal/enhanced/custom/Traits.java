@@ -35,6 +35,8 @@ public final class Traits {
      * and Ultron metal; Agatha's magic dark; the Phoenix fire-proof. (The Iron Spider's legs go with his look, not his
      * power: {@code SpiderServer.isIronSpider}.) 3.6: Doctor Strange is a sorcerer; the gods of Asgard, Loki, the
      * Scarlet Witch and the Phoenix may hold a bare Infinity Stone ({@link Trait#STONE_BEARER}); the Hulk has no role.
+     * 3.7: Wolverine and Deadpool have the healing factor ({@link Trait#HEALING_FACTOR}), and Wolverine's adamantium
+     * bones are metal for Magneto.
      */
     public static Set<Trait> of(Power power) {
         EnumSet<Trait> traits = EnumSet.noneOf(Trait.class);
@@ -56,6 +58,9 @@ public final class Traits {
             // 3.6: the Hulk has no role: not a sorcerer, not a Bearer, his mind open to Xavier and Wanda.
             case HULK -> {
             }
+            // 3.7: the healers; Wolverine's adamantium skeleton is metal (X-Men, 2000: Magneto holds him by it).
+            case WOLVERINE -> traits.addAll(Set.of(Trait.HEALING_FACTOR, Trait.METAL_BODY));
+            case DEADPOOL -> traits.add(Trait.HEALING_FACTOR);
             default -> {
             }
         }

@@ -48,6 +48,12 @@ public final class XavierConfig {
     public static ModConfigSpec.IntValue CEREBRO_RANGE;
     public static ModConfigSpec.IntValue CEREBRO_TICKS;
     public static ModConfigSpec.IntValue CEREBRO_COOLDOWN;
+    /** 3.7: the lab's Cerebro (lane L5 reads them). */
+    public static ModConfigSpec.IntValue CEREBRO_AMPLIFIED_TICKS;
+    public static ModConfigSpec.BooleanValue CEREBRO_AMPLIFIED_ALL_DIMENSIONS;
+    public static ModConfigSpec.BooleanValue CEREBRO_SHOWS_STONE_SITES;
+    public static ModConfigSpec.IntValue CEREBRO_CONSOLE_REACH;
+    public static ModConfigSpec.BooleanValue CEREBRO_CONSOLE_TELEPATHS_ONLY;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
@@ -96,6 +102,21 @@ public final class XavierConfig {
                 .defineInRange("cerebroTicks", 200, 20, 1200);
         CEREBRO_COOLDOWN = builder.comment("Cooldown of Cerebro (ability 5), in ticks (1200 = 60 s).")
                 .defineInRange("cerebroCooldown", 1200, 0, 72000);
+        // 3.7: the Cerebro console in the X-Men lower lab amplifies Cerebro.
+        CEREBRO_AMPLIFIED_TICKS = builder.comment("How long (ticks) Cerebro searches when amplified",
+                "at the lab's console.")
+                .defineInRange("cerebroAmplifiedTicks", 600, 20, 6000);
+        CEREBRO_AMPLIFIED_ALL_DIMENSIONS = builder.comment("Whether the amplified Cerebro finds minds in every",
+                "dimension, with no range limit.")
+                .define("cerebroAmplifiedAllDimensions", true);
+        CEREBRO_SHOWS_STONE_SITES = builder.comment("Whether the amplified Cerebro marks the nearest",
+                "Infinity Stone sites of the telepath's dimension.")
+                .define("cerebroShowsStoneSites", true);
+        CEREBRO_CONSOLE_REACH = builder.comment("How near (blocks) to the Cerebro console a telepath",
+                "must be to use it.")
+                .defineInRange("cerebroConsoleReach", 4, 1, 16);
+        CEREBRO_CONSOLE_TELEPATHS_ONLY = builder.comment("Whether only telepaths may use the Cerebro console.")
+                .define("cerebroConsoleTelepathsOnly", true);
         builder.pop();
     }
 

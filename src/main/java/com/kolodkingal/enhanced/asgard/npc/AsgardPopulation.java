@@ -249,6 +249,9 @@ public final class AsgardPopulation {
      * someone else. One of a slot nobody has is adopted (recorded).
      */
     public static boolean refuses(ServerLevel level, Entity entity) {
+        if (entity.getType() == com.kolodkingal.enhanced.registry.ModEntities.COTTAGE_RESIDENT.get()) {
+            return false; // (3.7: a cottage's residents are judged by their own keeper, CottageKeeper)
+        }
         String slot = entity instanceof AsgardianEntity npc && !npc.summoned() ? npc.slot()
                 : entity instanceof Horse ? entity.getPersistentData().getString(SLOT_TAG) : "";
         if (slot.isEmpty()) {

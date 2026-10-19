@@ -251,6 +251,81 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> 4));
 
+    // ===== healing (3.7) =====
+    // ===== wolverine (3.7) =====
+    // ===== deadpool (3.7) =====
+    // ===== school_lab (3.7) =====
+    // (The skeleton registers every block of the X-Men lower lab with a placeholder look; lane L4 owns the classes,
+    // lane L3 the pod's treatment, lane L5 the console's Cerebro. Breakable in Creative; L4 decides what a built lab's
+    // are.)
+    /** A secret bookshelf of the study (lane L4). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.SecretBookshelfBlock> SECRET_BOOKSHELF =
+            BLOCKS.registerBlock("secret_bookshelf", com.kolodkingal.enhanced.block.SecretBookshelfBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOD)
+                    .strength(1.5F)
+                    .sound(SoundType.WOOD));
+    /** An elevator pad (lane L4). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.ElevatorPadBlock> ELEVATOR_PAD =
+            BLOCKS.registerBlock("elevator_pad", com.kolodkingal.enhanced.block.ElevatorPadBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion());
+    /** An X-door half (lane L4). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.XDoorBlock> X_DOOR =
+            BLOCKS.registerBlock("x_door", com.kolodkingal.enhanced.block.XDoorBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion());
+    /** A part of Cerebro's round X-door (lane L4). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.XDoorRoundBlock> X_DOOR_ROUND =
+            BLOCKS.registerBlock("x_door_round", com.kolodkingal.enhanced.block.XDoorRoundBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion());
+    /** The Weapon X rack of the Adamantium Injections (lane L4). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.AdamantiumRackBlock> ADAMANTIUM_RACK =
+            BLOCKS.registerBlock("adamantium_rack", com.kolodkingal.enhanced.block.AdamantiumRackBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion());
+    /** The Weapon X Pod (lane L4; its treatment lane L3). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.WeaponXPodBlock> WEAPON_X_POD =
+            BLOCKS.registerBlock("weapon_x_pod", com.kolodkingal.enhanced.block.WeaponXPodBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .lightLevel(state -> 6));
+    /** Hank's Cure Station (lane L4). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.CureStationBlock> CURE_STATION =
+            BLOCKS.registerBlock("cure_station", com.kolodkingal.enhanced.block.CureStationBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion());
+    /** The Cerebro console (lane L4; its Cerebro lane L5). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.CerebroConsoleBlock> CEREBRO_CONSOLE =
+            BLOCKS.registerBlock("cerebro_console", com.kolodkingal.enhanced.block.CerebroConsoleBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .lightLevel(state -> 4));
+    // ===== finders (3.7) =====
+    // ===== cottage (3.7) =====
+
     private ModBlocks() {
     }
 }

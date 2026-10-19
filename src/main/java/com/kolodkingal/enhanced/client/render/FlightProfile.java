@@ -214,6 +214,8 @@ public final class FlightProfile {
             // 3.6: Doctor Strange flies on his Cloak of Levitation; the Hulk leaps.
             case DOCTOR_STRANGE -> STRANGE;
             case HULK -> null;
+            // 3.7: Wolverine pounces and leaps, Deadpool teleports: neither flies.
+            case WOLVERINE, DEADPOOL -> null;
             // A custom hero flies with the profile of his flight style (3.4: of(HeroAnimState)); the plain style is the
             // game's own pose.
             case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;

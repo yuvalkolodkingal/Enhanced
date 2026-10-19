@@ -50,6 +50,12 @@ public class SiteStoneLootFunction extends LootItemConditionalFunction {
 
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
+        // (3.7: the chest is spent whatever it gives, the stone or the note: the Stone Locator skips its site.)
+        net.minecraft.world.phys.Vec3 origin = context.getParamOrNull(LootContextParams.ORIGIN);
+        if (origin != null) {
+            com.kolodkingal.enhanced.finders.SpentSites.mark(context.getLevel(), stone,
+                    net.minecraft.core.BlockPos.containing(origin));
+        }
         Entity opener = context.getParamOrNull(LootContextParams.THIS_ENTITY);
         if (opener instanceof ServerPlayer player && StoneLedger.mayTake(player, stone)) {
             StoneLedger.taken(player, stone);

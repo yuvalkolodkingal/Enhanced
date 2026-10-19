@@ -1,0 +1,29 @@
+{
+  "parent": "enhanced:mutants/root",
+  "display": {
+    "icon": {
+      "id": "enhanced:stone_locator"
+    },
+    "title": {
+      "translate": "advancements.enhanced.mutants.similar_energies.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.mutants.similar_energies.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "crafted": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "enhanced:stone_locator"
+          }
+        ]
+      }
+    }
+  }
+}

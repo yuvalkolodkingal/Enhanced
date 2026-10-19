@@ -7,7 +7,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The mod's own kinds of recipe (3.6). */
+/** The mod's own kinds of recipe (3.6, 3.7). */
 public final class ModRecipes {
     public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, Enhanced.MODID);
@@ -32,6 +32,12 @@ public final class ModRecipes {
     public static final DeferredHolder<RecipeSerializer<?>, com.kolodkingal.enhanced.hulk.GammaEmitterRecipe.Serializer>
             GAMMA_EMITTER = SERIALIZERS.register("gamma_emitter",
             com.kolodkingal.enhanced.hulk.GammaEmitterRecipe.Serializer::new);
+
+    // ===== finders (3.7) =====
+    /** The Stone Locator's shaped recipe, the core given back ({@code enhanced:stone_locator}; lane L5). */
+    public static final DeferredHolder<RecipeSerializer<?>, com.kolodkingal.enhanced.finders.LocatorRecipe.Serializer>
+            STONE_LOCATOR = SERIALIZERS.register("stone_locator",
+            com.kolodkingal.enhanced.finders.LocatorRecipe.Serializer::new);
 
     private ModRecipes() {
     }

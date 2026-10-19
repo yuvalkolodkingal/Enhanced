@@ -26,5 +26,11 @@ public enum Trait {
      * 3.6: he may hold a bare Infinity Stone (a god's nature: {@code StoneRules.isBearer}). The gods, the Scarlet Witch
      * and the Phoenix have it; a custom hero by a god's row ({@code stones.customBearers}).
      */
-    STONE_BEARER
+    STONE_BEARER,
+    /**
+     * 3.7: the healing factor ({@code healing/HealingFactor}): blows that would kill him leave him DOWN, and he rises;
+     * only the Infinity Stones, chaos magic, the Allfather's power, the Phoenix or poison defeat him. Wolverine and
+     * Deadpool have it; a custom hero by their body rows ({@code healing_factor.customHeroes}).
+     */
+    HEALING_FACTOR
 }

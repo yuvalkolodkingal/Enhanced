@@ -179,6 +179,43 @@ public final class ModTags {
     // ===== hydra (3.6) =====
     /** The Hydra soldiers and officers: they never hurt one another (lane L8's ally rule). */
     public static final TagKey<EntityType<?>> HYDRA = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("hydra"));
+    // ===== healing (3.7) =====
+    /**
+     * The damage types that defeat a healer (Wolverine, Deadpool) while his healing factor is on, one tag per group of
+     * the plan's rule (2.3), each switched by its {@code [healing_factor]} option: the Infinity Stones, chaos magic
+     * (the Scarlet Witch, Billy), the Allfather's power (the Odinforce, Gungnir), the Phoenix, and the Darkhold (off by
+     * default). Data packs may add to them ({@code healing/HealingFactor} reads them).
+     */
+    public static final TagKey<DamageType> DEFEATS_HEALING_STONES = damage("defeats_healing/stones");
+    public static final TagKey<DamageType> DEFEATS_HEALING_CHAOS = damage("defeats_healing/chaos");
+    public static final TagKey<DamageType> DEFEATS_HEALING_ODIN = damage("defeats_healing/odin");
+    public static final TagKey<DamageType> DEFEATS_HEALING_PHOENIX = damage("defeats_healing/phoenix");
+    public static final TagKey<DamageType> DEFEATS_HEALING_DARKHOLD = damage("defeats_healing/darkhold");
+    /** The effects that switch a healer's healing off while they last: Poison (The Wolverine, 2013: Viper's poison). */
+    public static final TagKey<net.minecraft.world.effect.MobEffect> STOPS_HEALING =
+            TagKey.create(Registries.MOB_EFFECT, Enhanced.id("stops_healing"));
+    // ===== wolverine (3.7) =====
+    // ===== deadpool (3.7) =====
+    /** What fills a chimichanga besides the bread and the carrot: cooked beef, porkchop or chicken (lane L3). */
+    public static final TagKey<Item> CHIMICHANGA_FILLINGS = TagKey.create(Registries.ITEM,
+            Enhanced.id("chimichanga_fillings"));
+    // ===== school_lab (3.7) =====
+    // ===== finders (3.7) =====
+    /**
+     * What may sit in the centre of the Stone Locator's recipe: the six stones and their vessels (the Scepter, the
+     * Tesseract, the Eye of Agamotto, the Orb) and the Infinity Gauntlet (one with a stone in it: the recipe checks).
+     */
+    public static final TagKey<Item> LOCATOR_CORES = TagKey.create(Registries.ITEM, Enhanced.id("locator_cores"));
+    /** The sites of each stone the Locator looks for (8.4): one tag per kind, named by the kind. */
+    public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> STONE_SITE_MIND = site("mind");
+    public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> STONE_SITE_TIME = site("time");
+    public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> STONE_SITE_SPACE = site("space");
+    public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> STONE_SITE_POWER = site("power");
+    public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> STONE_SITE_SOUL = site("soul");
+    /** The Bifrost sites of the Overworld: the way to Asgard the Locator points to for the Reality Stone. */
+    public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> BIFROST_SITES =
+            TagKey.create(Registries.STRUCTURE, Enhanced.id("bifrost_sites"));
+    // ===== cottage (3.7) =====
 
     // ===== 3.1 build =====
     /**
@@ -210,6 +247,14 @@ public final class ModTags {
      * inside while build_magic_wanda.copiesContents is on.
      */
     public static final TagKey<BlockEntityType<?>> BUILD_HOLDS_ITEMS = TagKey.create(Registries.BLOCK_ENTITY_TYPE, Enhanced.id("build_holds_items"));
+
+    private static TagKey<DamageType> damage(String name) {
+        return TagKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
+    }
+
+    private static TagKey<net.minecraft.world.level.levelgen.structure.Structure> site(String kind) {
+        return TagKey.create(Registries.STRUCTURE, Enhanced.id("stone_site/" + kind));
+    }
 
     private ModTags() {
     }

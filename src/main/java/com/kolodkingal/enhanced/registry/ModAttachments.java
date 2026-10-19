@@ -192,6 +192,46 @@ public final class ModAttachments {
                     .sync((holder, to) -> holder == to, HulkState.STREAM_CODEC)
                     .build());
 
+    // ===== healing (3.7) =====
+    /**
+     * 3.7: a healer's state ({@link com.kolodkingal.enhanced.healing.HealingState}: when he rises, when he was last
+     * hurt, the one-time tip). Saved, not kept on death, synced to everyone who sees him (lane L1).
+     */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.healing.HealingState>> HEALING =
+            ATTACHMENTS.register("healing",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.healing.HealingState.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.healing.HealingState.CODEC)
+                            .sync(com.kolodkingal.enhanced.healing.HealingState.STREAM_CODEC)
+                            .build());
+    // ===== wolverine (3.7) =====
+    /** 3.7: Wolverine's Rage (lane L2). Saved, not kept on death, synced to him. */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.wolverine.WolverineState>> WOLVERINE =
+            ATTACHMENTS.register("wolverine",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.wolverine.WolverineState.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.wolverine.WolverineState.CODEC)
+                            .sync((holder, to) -> holder == to,
+                                    com.kolodkingal.enhanced.wolverine.WolverineState.STREAM_CODEC)
+                            .build());
+    // ===== deadpool (3.7) =====
+    /** 3.7: Deadpool's magazine, reload and Dogpool (lane L3). Saved, not kept on death, synced to him. */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.deadpool.DeadpoolState>> DEADPOOL =
+            ATTACHMENTS.register("deadpool",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.deadpool.DeadpoolState.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.deadpool.DeadpoolState.CODEC)
+                            .sync((holder, to) -> holder == to,
+                                    com.kolodkingal.enhanced.deadpool.DeadpoolState.STREAM_CODEC)
+                            .build());
+    // ===== cottage (3.7) =====
+    /** 3.7: a player's progress at Agatha's Cottages (lane L6). Saved, kept on death, synced to him. */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.cottage.CottageProgress>> COTTAGE =
+            ATTACHMENTS.register("cottage",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.cottage.CottageProgress.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.cottage.CottageProgress.CODEC)
+                            .copyOnDeath()
+                            .sync((holder, to) -> holder == to,
+                                    com.kolodkingal.enhanced.cottage.CottageProgress.STREAM_CODEC)
+                            .build());
+
     private ModAttachments() {
     }
 }

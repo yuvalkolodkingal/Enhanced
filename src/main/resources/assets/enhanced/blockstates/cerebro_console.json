@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "enhanced:block/cerebro_console"
+    }
+  }
+}

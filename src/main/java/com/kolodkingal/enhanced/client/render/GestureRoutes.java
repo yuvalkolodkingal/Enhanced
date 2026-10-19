@@ -187,6 +187,12 @@ public final class GestureRoutes {
             // ===== hulk (3.6) =====
             // (A custom hero's Human Form: he calms down into it, and Hulks out of it.)
             case HUMAN_FORM -> power == Power.HULK ? (on ? GestureId.HULK_CALM : GestureId.HULK_OUT) : null;
+            // (The toggles of 3.7 stand in with the pending gesture, for their own hero only, until their lanes route
+            // them.)
+            // ===== healing (3.7) =====
+            // ===== wolverine (3.7) =====
+            case CLAWS_OUT, CLAW_CLIMB, SCENT_TRACK -> power == Power.WOLVERINE ? PENDING_GESTURE : null;
+            // ===== deadpool (3.7) =====
         };
     }
 
@@ -462,6 +468,10 @@ public final class GestureRoutes {
             // the transformation and the switch. See HulkActing.gestureOf.)
             case HULK -> "none: every move of the Hulk is told by the payload of its effect, which names him"
                     + " (HulkGestures.gestureOf)";
+            // ===== wolverine (3.7) =====
+            case WOLVERINE -> "none: Wolverine's keys are acted by his plug-in (lane L2 of 3.7)";
+            // ===== deadpool (3.7) =====
+            case DEADPOOL -> "none: Deadpool's keys are acted by his plug-in (lane L3 of 3.7)";
             default -> "none: no abilities";
         };
     }
@@ -537,6 +547,14 @@ public final class GestureRoutes {
             case HULK_GRABBING -> "the grab's payload plays HULK_GRAB_SMASH, timed to the three slams";
             case HULK_CHARGING -> "the charge's payload plays HULK_CHARGE";
             case HULK_ENRAGED -> "a stance (HULK_ENRAGED), and his eyes glow on GlowingEyesLayer";
+            // ===== healing (3.7) =====
+            // (Until each lane of 3.7 gives its states a gesture or a reason of their own; not the 3.0 pending marker,
+            // which fails a release.)
+            case HEALING_DOWN -> "pending: the healing lane (L1 of 3.7) acts it (the shared HEALING_DOWN pose)";
+            // ===== wolverine (3.7) =====
+            case WOLVERINE_BERSERK, WOLVERINE_POUNCING -> "pending: Wolverine's lane (L2 of 3.7) acts it";
+            // ===== deadpool (3.7) =====
+            case DEADPOOL_PARRYING, DEADPOOL_AIMING -> "pending: Deadpool's lane (L3 of 3.7) acts it";
         };
     }
 

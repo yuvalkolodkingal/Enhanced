@@ -395,6 +395,11 @@ public enum GestureId {
     HULK_CALM(Group.CAST, 40, 3, 8, true),
     /** Switch Hulk (Sneak + N): a flex in a green shimmer. */
     HULK_SWITCH(Group.CAST, 20, 2, 6, true)
+    // ===== healing (3.7) =====
+    // ===== wolverine (3.7) =====
+    // ===== deadpool (3.7) =====
+    // (3.7: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
+    // AnimationMathTests wants keys for every gesture.)
     ;
 
     /** Gestures of one group never play together. */

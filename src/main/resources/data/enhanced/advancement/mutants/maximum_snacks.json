@@ -1,0 +1,27 @@
+{
+  "parent": "enhanced:mutants/root",
+  "display": {
+    "icon": {
+      "id": "enhanced:chimichanga"
+    },
+    "title": {
+      "translate": "advancements.enhanced.mutants.maximum_snacks.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.mutants.maximum_snacks.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "ate": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": "enhanced:chimichanga"
+        }
+      }
+    }
+  }
+}

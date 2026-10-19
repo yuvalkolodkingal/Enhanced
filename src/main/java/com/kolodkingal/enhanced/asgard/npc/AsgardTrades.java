@@ -56,6 +56,8 @@ public final class AsgardTrades {
                 offers.add(offer(Items.GOLD_INGOT, 3, null, 0, new ItemStack(Items.CAKE), USES));
                 offers.add(offer(Items.EMERALD, 2, null, 0, mead(), USES));
             }
+            // (3.7: Agatha and Rio of the cottage, lane L6's.)
+            case AGATHA, RIO -> offers.addAll(com.kolodkingal.enhanced.cottage.CottageTrades.offers(role));
             default -> {
             }
         }

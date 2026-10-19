@@ -65,6 +65,18 @@ public final class ModCreativeTab {
                         output.accept(ModItems.HYDRA_BLASTER.get());
                         output.accept(ModItems.HYDRA_SOLDIER_SPAWN_EGG.get());
                         output.accept(ModItems.HYDRA_OFFICER_SPAWN_EGG.get());
+                        // 3.7
+                        output.accept(ModItems.ADAMANTIUM_INJECTION.get());
+                        output.accept(ModItems.CHIMICHANGA.get());
+                        output.accept(ModItems.STONE_LOCATOR.get());
+                        output.accept(ModItems.SECRET_BOOKSHELF.get());
+                        output.accept(ModItems.ELEVATOR_PAD.get());
+                        output.accept(ModItems.X_DOOR.get());
+                        output.accept(ModItems.X_DOOR_ROUND.get());
+                        output.accept(ModItems.ADAMANTIUM_RACK.get());
+                        output.accept(ModItems.WEAPON_X_POD.get());
+                        output.accept(ModItems.CURE_STATION.get());
+                        output.accept(ModItems.CEREBRO_CONSOLE.get());
                     })
                     .build());
 

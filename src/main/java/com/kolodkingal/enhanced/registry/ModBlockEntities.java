@@ -58,6 +58,26 @@ public final class ModBlockEntities {
                     () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.GammaEmitterBlockEntity::new,
                     ModBlocks.GAMMA_EMITTER.get()).build(null));
 
+    // ===== school_lab (3.7) =====
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.AdamantiumRackBlockEntity>> ADAMANTIUM_RACK =
+            BLOCK_ENTITIES.register("adamantium_rack",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.AdamantiumRackBlockEntity::new,
+                    ModBlocks.ADAMANTIUM_RACK.get()).build(null));
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.WeaponXPodBlockEntity>> WEAPON_X_POD =
+            BLOCK_ENTITIES.register("weapon_x_pod",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.WeaponXPodBlockEntity::new,
+                    ModBlocks.WEAPON_X_POD.get()).build(null));
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.CerebroConsoleBlockEntity>> CEREBRO_CONSOLE =
+            BLOCK_ENTITIES.register("cerebro_console",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.CerebroConsoleBlockEntity::new,
+                    ModBlocks.CEREBRO_CONSOLE.get()).build(null));
+
     private ModBlockEntities() {
     }
 }

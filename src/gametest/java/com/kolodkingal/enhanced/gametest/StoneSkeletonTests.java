@@ -100,8 +100,8 @@ public final class StoneSkeletonTests {
     public static void strangeAndTheHulkComeAfterHela(GameTestHelper helper) {
         Power[] all = Power.values();
         check(all[Power.HELA.ordinal() + 1] == Power.DOCTOR_STRANGE && all[Power.HELA.ordinal() + 2] == Power.HULK
-                && all.length == Power.HELA.ordinal() + 3,
-                        "…HELA, DOCTOR_STRANGE, HULK (the stream sends the ordinal)");
+                && all.length >= Power.HELA.ordinal() + 3,
+                        "…HELA, DOCTOR_STRANGE, HULK (the stream sends the ordinal; 3.7 appends after them)");
         check(Power.HELA.ordinal() == 20, "nobody before them moved");
         check(Power.DOCTOR_STRANGE.color == 0xF29A2E && Power.DOCTOR_STRANGE.glow == 0xFFE0A8
                 && Power.DOCTOR_STRANGE.titleColor() == 0xC2302E, "Strange's colours");
@@ -123,10 +123,11 @@ public final class StoneSkeletonTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTen(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("10"), "protocol 10");
-        check(Live.values().length == 53 && Live.values().length <= 63, "Live: 42 + 6 + 5 = 53: "
+        // (3.7: at least 3.6's numbers; MutantSkeletonTests pins 3.7's.)
+        check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10, "protocol 10 or later");
+        check(Live.values().length >= 53 && Live.values().length <= 63, "Live: 42 + 6 + 5 = 53 or more: "
                 + Live.values().length);
-        check(Toggle.values().length == 19 && Toggle.values().length <= 32, "Toggle: 15 + 3 + 1 = 19: "
+        check(Toggle.values().length >= 19 && Toggle.values().length <= 32, "Toggle: 15 + 3 + 1 = 19 or more: "
                 + Toggle.values().length);
         check(Live.STRANGE_SHIELD.ordinal() == 42 && Live.HULK_ENRAGED.ordinal() == 52,
                 "the states of 3.6 are appended");
@@ -171,7 +172,7 @@ public final class StoneSkeletonTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theRowsAre154AndTheStoneRowsSix(GameTestHelper helper) {
-        check(HeroAbility.values().length == 154, "133 + 12 + 9 rows: " + HeroAbility.values().length);
+        check(HeroAbility.values().length >= 154, "133 + 12 + 9 rows or more: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.STRANGE_WHIP.ordinal() - 1] == HeroAbility.HELA_BODY,
                 "Strange after Hela");
         check(HeroAbility.values()[HeroAbility.HULK_SMASH.ordinal() - 1] == HeroAbility.STRANGE_BODY,

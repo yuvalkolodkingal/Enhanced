@@ -51,6 +51,9 @@ public final class HeroItems {
             // none.
             case DOCTOR_STRANGE -> List.of(ModItems.EYE_OF_AGAMOTTO.get(), ModItems.SLING_RING.get());
             case HULK -> List.of();
+            // 3.7: Wolverine needs nothing; Deadpool gets his snacks (three chimichangas, lane L3's Chimichanga Break).
+            case WOLVERINE -> List.of();
+            case DEADPOOL -> List.of(ModItems.CHIMICHANGA.get());
             default -> List.of();
         };
     }
@@ -79,7 +82,8 @@ public final class HeroItems {
             if (has(player, item)) {
                 continue;
             }
-            ItemStack stack = new ItemStack(item);
+            // (3.7: Deadpool's chimichangas come three at a time.)
+            ItemStack stack = new ItemStack(item, item == ModItems.CHIMICHANGA.get() ? 3 : 1);
             if (item == ModItems.MJOLNIR.get()) {
                 // Claimed, as the worthy one who lifted it to awaken.
                 stack.set(ModDataComponents.OWNER.get(), MjolnirOwner.of(player));

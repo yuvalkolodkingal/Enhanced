@@ -37,6 +37,28 @@ public final class CerebroView {
     private static long receivedAt;
     private static long until;
 
+    /** 3.7: whether the last report was the lab's amplified Cerebro (lane L5 draws the sphere of stars from it). */
+    private static boolean amplified;
+    /** 3.7: the stone sites of the last report (lane L5's diamonds on the sphere and in the list). */
+    private static List<CerebroPayload.Site> sites = List.of();
+
+    /** A report of Cerebro (3.7: with the amplified flag and the stone sites, which only lane L5 shows). */
+    public static void accept(CerebroPayload payload) {
+        amplified = payload.amplified();
+        sites = List.copyOf(payload.sites());
+        accept(payload.minds(), payload.ticksLeft());
+    }
+
+    /** Whether the search is the lab's amplified Cerebro (3.7), as his client last heard. */
+    public static boolean amplified() {
+        return active() && amplified;
+    }
+
+    /** The stone sites the amplified Cerebro marks (3.7), or none. */
+    public static List<CerebroPayload.Site> sites() {
+        return active() ? sites : List.of();
+    }
+
     public static void accept(List<CerebroPayload.Mind> found, int ticksLeft) {
         Minecraft mc = Minecraft.getInstance();
         long now = mc.level == null ? 0 : mc.level.getGameTime();

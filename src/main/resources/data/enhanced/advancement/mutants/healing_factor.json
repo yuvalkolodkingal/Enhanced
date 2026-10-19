@@ -1,0 +1,22 @@
+{
+  "parent": "enhanced:mutants/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:golden_apple"
+    },
+    "title": {
+      "translate": "advancements.enhanced.mutants.healing_factor.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.mutants.healing_factor.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "rose": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

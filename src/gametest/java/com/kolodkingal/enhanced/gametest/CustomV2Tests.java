@@ -236,10 +236,10 @@ public final class CustomV2Tests {
                 check((row != null) != (key == p.flightAbility()), p + " key " + key + " is a row or the flight key, never both");
             }
         }
-        check(HeroAbility.values().length == 154,
+        check(HeroAbility.values().length == 176,
                 "71 keys + 9 bodies (L2: Vision's) + Build Magic, 3.5's 15 keys + 3 bodies, the creator lane's 33 "
-                + "variant rows + the Scarlet Witch's Build Magic, and 3.6's 10 keys + 2 bodies + 9 variant rows: "
-                + HeroAbility.values().length);
+                + "variant rows + the Scarlet Witch's Build Magic, 3.6's 10 keys + 2 bodies + 9 variant rows, and "
+                + "3.7's 10 keys + 2 bodies + 10 variant rows (Wolverine, Deadpool): " + HeroAbility.values().length);
         check(Catalog.all().size()
                 == PowerModule.values().length + HeroAbility.values().length + StoneRow.values().length,
                 "the catalogue is the three lists (3.6: the stone rows)");
@@ -496,7 +496,9 @@ public final class CustomV2Tests {
             check(Traits.has(data, Trait.TELEPATH_STRONG) == (rank == Telepathy.Rank.STRONGER) && strong.contains(p) == (rank == Telepathy.Rank.STRONGER)
                     && Traits.has(data, Trait.TELEPATH) == (rank == Telepathy.Rank.TELEPATH), p + " telepath");
             check(Traits.has(data, Trait.WORTHY) == (p == Power.THOR || p == Power.VISION), p + " worthy");
-            check(Traits.has(data, Trait.METAL_BODY) == (p == Power.VISION || p == Power.ULTRON), p + " metal");
+            // (3.7: Wolverine's adamantium bones are metal for Magneto.)
+            check(Traits.has(data, Trait.METAL_BODY) == (p == Power.VISION || p == Power.ULTRON
+                    || p == Power.WOLVERINE), p + " metal");
             check(Traits.has(data, Trait.DARK_MAGIC) == (p == Power.AGATHA), p + " dark magic");
             check(!Traits.has(data, Trait.IRON_LEGS), p + ": the Iron Spider's legs go with his look");
         }

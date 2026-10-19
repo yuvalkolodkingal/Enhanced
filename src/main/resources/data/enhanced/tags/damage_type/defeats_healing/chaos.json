@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:chaos_beam",
+    "enhanced:hex_wall",
+    "enhanced:hex_bolt",
+    "enhanced:hex_beam"
+  ]
+}

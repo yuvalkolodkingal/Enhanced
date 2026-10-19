@@ -51,7 +51,10 @@ public enum RunCharacter {
     /**
      * The Hulk (3.6): a heavy lope, the arms swinging wide, a deep lean into the sprint, a bob that shakes the ground.
      */
-    HULK(1.15F, 1.50F, 1.15F, 12, 7, 0.040F);
+    HULK(1.15F, 1.50F, 1.15F, 12, 7, 0.040F)
+    // ===== wolverine (3.7) =====
+    // ===== deadpool (3.7) =====
+    ;
 
     public final float walkArms;
     public final float sprintArms;

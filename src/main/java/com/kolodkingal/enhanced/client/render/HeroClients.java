@@ -35,6 +35,9 @@ public final class HeroClients {
         // 3.6: Doctor Strange and the Hulk.
         register(new StrangeClient());
         register(new HulkClient());
+        // 3.7: Wolverine and Deadpool.
+        register(new WolverineClient());
+        register(new DeadpoolClient());
     }
 
     /**

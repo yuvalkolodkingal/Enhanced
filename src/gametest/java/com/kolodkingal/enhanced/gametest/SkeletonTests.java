@@ -1178,7 +1178,8 @@ public final class SkeletonTests {
 
     @GameTest(template = ARENA, batch = SKELETON)
     public static void theProtocolIsTen(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("10"), "3.6 bumps the protocol from 9 to 10, once: "
+        // (3.7: at least 10; MutantSkeletonTests pins 3.7's "11".)
+        check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10, "3.6 bumps the protocol from 9 to 10, once: "
                 + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }

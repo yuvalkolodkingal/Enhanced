@@ -125,6 +125,14 @@ public final class ClientSetup {
             com.kolodkingal.enhanced.client.hulk.HulkEffects.register();
             // ===== hydra (3.6) =====
             com.kolodkingal.enhanced.client.hydra.HydraClient.setup();
+            // ===== 3.7: each lane registers its effects' drawers here (HealingFx, WolverineFx, Scents, DeadpoolFx,
+            // LabFx; StoneFx's LOCATOR_TRAIL) =====
+            // ===== healing (3.7) =====
+            // ===== wolverine (3.7) =====
+            // ===== deadpool (3.7) =====
+            // ===== school_lab (3.7) =====
+            // ===== finders (3.7) =====
+            // ===== cottage (3.7) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
         });
@@ -229,6 +237,18 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
         event.registerEntityRenderer(ModEntities.HYDRA_BOLT.get(),
                 com.kolodkingal.enhanced.client.hydra.HydraBoltRenderer::new);
+        // The renderers of 3.7, one region per lane (the skeleton's stand-ins until the lanes draw their own).
+        // ===== healing (3.7) =====
+        // ===== wolverine (3.7) =====
+        // ===== deadpool (3.7) =====
+        event.registerEntityRenderer(ModEntities.DEADPOOL_BULLET.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.DOGPOOL.get(),
+                com.kolodkingal.enhanced.client.deadpool.DogpoolRenderer::new);
+        // ===== school_lab (3.7) =====
+        // ===== finders (3.7) =====
+        // ===== cottage (3.7) =====
+        event.registerEntityRenderer(ModEntities.COTTAGE_RESIDENT.get(),
+                com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
     }
 
     /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
@@ -303,6 +323,12 @@ public final class ClientSetup {
         // ===== hydra (3.6) =====
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.hydra.HydraGearModel.LAYER,
                 com.kolodkingal.enhanced.client.hydra.HydraGearModel::createLayer);
+        // ===== healing (3.7) =====
+        // ===== wolverine (3.7) =====
+        // ===== deadpool (3.7) =====
+        // ===== school_lab (3.7) =====
+        // ===== finders (3.7) =====
+        // ===== cottage (3.7) =====
     }
 
     @SubscribeEvent
@@ -353,6 +379,9 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.AstralLayer(renderer));
                 // ===== hulk (3.6) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.hulk.HulkLayers.InhibitorBand(renderer));
+                // ===== healing (3.7) =====
+                // ===== wolverine (3.7) =====
+                // ===== deadpool (3.7) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
@@ -425,6 +454,12 @@ public final class ClientSetup {
         // 3.6, lane L7: the Hulk's rage bar, Banner's heart rate, the gamma flash.
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("hulk"),
                 new com.kolodkingal.enhanced.client.hulk.HulkHud());
+        // ===== healing (3.7) =====
+        // ===== wolverine (3.7) =====
+        // ===== deadpool (3.7) =====
+        // ===== school_lab (3.7) =====
+        // ===== finders (3.7) =====
+        // ===== cottage (3.7) =====
     }
 
     private ClientSetup() {

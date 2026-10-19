@@ -113,6 +113,8 @@ public class TesseractCradleBlock extends BaseEntityBlock {
             player.drop(tesseract, false);
         }
         set(level, pos, state, false, player);
+        // (3.7: the tower has given its Tesseract away: the Stone Locator skips it.)
+        com.kolodkingal.enhanced.finders.SpentSites.mark(level, com.kolodkingal.enhanced.thanos.StoneKind.SPACE, pos);
         return true;
     }
 

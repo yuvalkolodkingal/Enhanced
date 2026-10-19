@@ -547,6 +547,14 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.StoneSitesConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HulkConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HydraConfig.define(BUILDER);
+        // 3.7 (Wolverine, Deadpool, the X-Men lower lab, the Stone Locator and Agatha's Cottage): the skeleton defines
+        // every option; the lanes read them. (Cerebro's console: [professor_x], XavierConfig.)
+        com.kolodkingal.enhanced.config.HealingConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.WolverineConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.DeadpoolConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.SchoolLabConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.LocatorConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.CottageConfig.define(BUILDER);
         // 3.5: the world's own music (section [music]).
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }

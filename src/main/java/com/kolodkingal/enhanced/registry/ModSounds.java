@@ -434,6 +434,82 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_DEATH = register("hydra_death");
     public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_BLASTER = register("hydra_blaster");
 
+    // ===== healing (3.7: registered by the skeleton with placeholder files; lane L7 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEALING_DOWN = register("healing_down");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEALING_RISE = register("healing_rise");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEALING_BURST = register("healing_burst");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEALING_OFF = register("healing_off");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEALING_ON = register("healing_on");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEALING_CUT = register("healing_cut");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEALING_RESCUE = register("healing_rescue");
+
+    // ===== wolverine (3.7: registered by the skeleton with placeholder files; lane L7 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_SNIKT = register("wolverine_snikt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_SHINK = register("wolverine_shink");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_SLASH = register("wolverine_slash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_SLASH_HIT_METAL =
+            register("wolverine_slash_hit_metal");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_SPIN = register("wolverine_spin");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_POUNCE = register("wolverine_pounce");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_LAND = register("wolverine_land");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_BERSERK = register("wolverine_berserk");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_GROWL = register("wolverine_growl");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_SNIFF = register("wolverine_sniff");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_TRACK = register("wolverine_track");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_CLIMB = register("wolverine_climb");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ADAMANTIUM_CLANK = register("adamantium_clank");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ADAMANTIUM_INJECTION = register("adamantium_injection");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WOLVERINE_AWAKEN = register("wolverine_awaken");
+
+    // ===== deadpool (3.7: registered by the skeleton with placeholder files; lane L7 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_KATANA = register("deadpool_katana");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_PARRY = register("deadpool_parry");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_DEFLECT = register("deadpool_deflect");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_SHOT = register("deadpool_shot");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_RELOAD = register("deadpool_reload");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_RICOCHET = register("deadpool_ricochet");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_BLINK = register("deadpool_blink");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_GLITCH = register("deadpool_glitch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_DROP_IN = register("deadpool_drop_in");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_TAUNT = register("deadpool_taunt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_WHISTLE = register("deadpool_whistle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_SMOKE = register("deadpool_smoke");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEADPOOL_AWAKEN = register("deadpool_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DOGPOOL_BARK = register("dogpool_bark");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DOGPOOL_WHINE = register("dogpool_whine");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DOGPOOL_POOF = register("dogpool_poof");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CHIMICHANGA_MUNCH = register("chimichanga_munch");
+
+    // ===== school_lab (3.7: registered by the skeleton with placeholder files; lane L7 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCHOOL_LAB_READY = register("school_lab_ready");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SECRET_SHELF_OPEN = register("secret_shelf_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SECRET_SHELF_CLOSE = register("secret_shelf_close");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LIFT_RIDE = register("lift_ride");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LIFT_DING = register("lift_ding");
+    public static final DeferredHolder<SoundEvent, SoundEvent> X_DOOR_OPEN = register("x_door_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> X_DOOR_CLOSE = register("x_door_close");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEAPON_X_POD_HUM = register("weapon_x_pod_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WEAPON_X_POD_DONE = register("weapon_x_pod_done");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ADAMANTIUM_RACK_TAKE = register("adamantium_rack_take");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CURE_STATION = register("cure_station");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_SCHOOL_LAB = register("ambient.school_lab");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CEREBRO_CONSOLE_ON = register("cerebro_console_on");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CEREBRO_AMPLIFIED = register("cerebro_amplified");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CEREBRO_CONSOLE_OFF = register("cerebro_console_off");
+
+    // ===== finders (3.7: registered by the skeleton with placeholder files; lane L7 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOCATOR_PULSE = register("locator_pulse");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOCATOR_TICK = register("locator_tick");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOCATOR_FOUND = register("locator_found");
+
+    // ===== cottage (3.7: registered by the skeleton with placeholder files; lane L7 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_COTTAGE = register("ambient.cottage");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COTTAGE_POT = register("cottage_pot");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCRATCHY_FOUND = register("scratchy_found");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RIO_BLESSING = register("rio_blessing");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NICKY_CHEER = register("nicky_cheer");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_AWAY = register("agatha_away");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

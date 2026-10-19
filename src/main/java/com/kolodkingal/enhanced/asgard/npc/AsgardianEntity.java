@@ -425,6 +425,8 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
                 goalSelector.addGoal(4, new AsgardianGoals.KeepPost(this, false));
                 goalSelector.addGoal(5, new AsgardianGoals.Patrol(this));
             }
+            // (3.7: the family of Agatha's Cottage lives by its own day, lane L6's.)
+            case AGATHA, NICKY, RIO -> com.kolodkingal.enhanced.cottage.CottageGoals.add(this);
             default -> goalSelector.addGoal(5, new AsgardianGoals.Sit(this));
         }
         goalSelector.addGoal(6, new AsgardianGoals.TalkInPairs(this));

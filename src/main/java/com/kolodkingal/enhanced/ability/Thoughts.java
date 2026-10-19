@@ -98,6 +98,14 @@ public final class Thoughts {
         SPECIES.put("hydra_soldier", "hydra_soldier");
         KINDS.put("hydra_officer", 3);
         SPECIES.put("hydra_officer", "hydra_officer");
+        // 3.7: Deadpool's silly thoughts (a player who is Deadpool: lane L3 picks them), Dogpool's, and the family of
+        // Agatha's Cottage (by role: lane L6 picks them).
+        KINDS.put("deadpool", 6);
+        KINDS.put("dogpool", 3);
+        SPECIES.put("dogpool", "dogpool");
+        KINDS.put("agatha", 3);
+        KINDS.put("nicky", 3);
+        KINDS.put("rio", 3);
     }
 
     /**

@@ -68,6 +68,15 @@ public enum Toggle {
     // ===== hulk (3.6) =====
     /** A custom hero with {@code hulk.transform}: his human form is on (every power off, his own skin). */
     HUMAN_FORM,
+    // ===== healing (3.7) =====
+    // ===== wolverine (3.7) =====
+    /** Wolverine: his claws are out (G). */
+    CLAWS_OUT,
+    /** Wolverine: he climbs walls by his claws (Sneak + G, the claws out). */
+    CLAW_CLIMB,
+    /** Wolverine: he follows one scent trail (Sneak + N, Track). */
+    SCENT_TRACK,
+    // ===== deadpool (3.7) =====
     ;
 
     final int bit() {

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:stone_power",
+    "enhanced:stone_blast",
+    "enhanced:stone_soul",
+    "enhanced:mind_stone",
+    "enhanced:mind_stone_beam",
+    "enhanced:power_stone_beam",
+    "enhanced:power_stone_explosion",
+    "enhanced:snap_dust"
+  ]
+}

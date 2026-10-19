@@ -2747,5 +2747,509 @@
         "name": "enhanced:sfx/hydra_blaster"
       }
     ]
+  },
+  "healing_down": {
+    "subtitle": "subtitles.enhanced.healing_down",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/healing_down"
+      }
+    ]
+  },
+  "healing_rise": {
+    "subtitle": "subtitles.enhanced.healing_rise",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/healing_rise"
+      }
+    ]
+  },
+  "healing_burst": {
+    "subtitle": "subtitles.enhanced.healing_burst",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/healing_burst"
+      }
+    ]
+  },
+  "healing_off": {
+    "subtitle": "subtitles.enhanced.healing_off",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/healing_off"
+      }
+    ]
+  },
+  "healing_on": {
+    "subtitle": "subtitles.enhanced.healing_on",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/healing_on"
+      }
+    ]
+  },
+  "healing_cut": {
+    "subtitle": "subtitles.enhanced.healing_cut",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/healing_cut"
+      }
+    ]
+  },
+  "healing_rescue": {
+    "subtitle": "subtitles.enhanced.healing_rescue",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/healing_rescue"
+      }
+    ]
+  },
+  "wolverine_snikt": {
+    "subtitle": "subtitles.enhanced.wolverine_snikt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_snikt"
+      }
+    ]
+  },
+  "wolverine_shink": {
+    "subtitle": "subtitles.enhanced.wolverine_shink",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_shink"
+      }
+    ]
+  },
+  "wolverine_slash": {
+    "subtitle": "subtitles.enhanced.wolverine_slash",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_slash"
+      }
+    ]
+  },
+  "wolverine_slash_hit_metal": {
+    "subtitle": "subtitles.enhanced.wolverine_slash_hit_metal",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_slash_hit_metal"
+      }
+    ]
+  },
+  "wolverine_spin": {
+    "subtitle": "subtitles.enhanced.wolverine_spin",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_spin"
+      }
+    ]
+  },
+  "wolverine_pounce": {
+    "subtitle": "subtitles.enhanced.wolverine_pounce",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_pounce"
+      }
+    ]
+  },
+  "wolverine_land": {
+    "subtitle": "subtitles.enhanced.wolverine_land",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_land"
+      }
+    ]
+  },
+  "wolverine_berserk": {
+    "subtitle": "subtitles.enhanced.wolverine_berserk",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_berserk"
+      }
+    ]
+  },
+  "wolverine_growl": {
+    "subtitle": "subtitles.enhanced.wolverine_growl",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_growl"
+      }
+    ]
+  },
+  "wolverine_sniff": {
+    "subtitle": "subtitles.enhanced.wolverine_sniff",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_sniff"
+      }
+    ]
+  },
+  "wolverine_track": {
+    "subtitle": "subtitles.enhanced.wolverine_track",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_track"
+      }
+    ]
+  },
+  "wolverine_climb": {
+    "subtitle": "subtitles.enhanced.wolverine_climb",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_climb"
+      }
+    ]
+  },
+  "adamantium_clank": {
+    "subtitle": "subtitles.enhanced.adamantium_clank",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/adamantium_clank"
+      }
+    ]
+  },
+  "adamantium_injection": {
+    "subtitle": "subtitles.enhanced.adamantium_injection",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/adamantium_injection"
+      }
+    ]
+  },
+  "wolverine_awaken": {
+    "subtitle": "subtitles.enhanced.wolverine_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/wolverine_awaken"
+      }
+    ]
+  },
+  "deadpool_katana": {
+    "subtitle": "subtitles.enhanced.deadpool_katana",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_katana"
+      }
+    ]
+  },
+  "deadpool_parry": {
+    "subtitle": "subtitles.enhanced.deadpool_parry",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_parry"
+      }
+    ]
+  },
+  "deadpool_deflect": {
+    "subtitle": "subtitles.enhanced.deadpool_deflect",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_deflect"
+      }
+    ]
+  },
+  "deadpool_shot": {
+    "subtitle": "subtitles.enhanced.deadpool_shot",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_shot"
+      }
+    ]
+  },
+  "deadpool_reload": {
+    "subtitle": "subtitles.enhanced.deadpool_reload",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_reload"
+      }
+    ]
+  },
+  "deadpool_ricochet": {
+    "subtitle": "subtitles.enhanced.deadpool_ricochet",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_ricochet"
+      }
+    ]
+  },
+  "deadpool_blink": {
+    "subtitle": "subtitles.enhanced.deadpool_blink",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_blink"
+      }
+    ]
+  },
+  "deadpool_glitch": {
+    "subtitle": "subtitles.enhanced.deadpool_glitch",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_glitch"
+      }
+    ]
+  },
+  "deadpool_drop_in": {
+    "subtitle": "subtitles.enhanced.deadpool_drop_in",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_drop_in"
+      }
+    ]
+  },
+  "deadpool_taunt": {
+    "subtitle": "subtitles.enhanced.deadpool_taunt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_taunt"
+      }
+    ]
+  },
+  "deadpool_whistle": {
+    "subtitle": "subtitles.enhanced.deadpool_whistle",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_whistle"
+      }
+    ]
+  },
+  "deadpool_smoke": {
+    "subtitle": "subtitles.enhanced.deadpool_smoke",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_smoke"
+      }
+    ]
+  },
+  "deadpool_awaken": {
+    "subtitle": "subtitles.enhanced.deadpool_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/deadpool_awaken"
+      }
+    ]
+  },
+  "dogpool_bark": {
+    "subtitle": "subtitles.enhanced.dogpool_bark",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/dogpool_bark"
+      }
+    ]
+  },
+  "dogpool_whine": {
+    "subtitle": "subtitles.enhanced.dogpool_whine",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/dogpool_whine"
+      }
+    ]
+  },
+  "dogpool_poof": {
+    "subtitle": "subtitles.enhanced.dogpool_poof",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/dogpool_poof"
+      }
+    ]
+  },
+  "chimichanga_munch": {
+    "subtitle": "subtitles.enhanced.chimichanga_munch",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/chimichanga_munch"
+      }
+    ]
+  },
+  "school_lab_ready": {
+    "subtitle": "subtitles.enhanced.school_lab_ready",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/school_lab_ready"
+      }
+    ]
+  },
+  "secret_shelf_open": {
+    "subtitle": "subtitles.enhanced.secret_shelf_open",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/secret_shelf_open"
+      }
+    ]
+  },
+  "secret_shelf_close": {
+    "subtitle": "subtitles.enhanced.secret_shelf_close",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/secret_shelf_close"
+      }
+    ]
+  },
+  "lift_ride": {
+    "subtitle": "subtitles.enhanced.lift_ride",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/lift_ride"
+      }
+    ]
+  },
+  "lift_ding": {
+    "subtitle": "subtitles.enhanced.lift_ding",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/lift_ding"
+      }
+    ]
+  },
+  "x_door_open": {
+    "subtitle": "subtitles.enhanced.x_door_open",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/x_door_open"
+      }
+    ]
+  },
+  "x_door_close": {
+    "subtitle": "subtitles.enhanced.x_door_close",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/x_door_close"
+      }
+    ]
+  },
+  "weapon_x_pod_hum": {
+    "subtitle": "subtitles.enhanced.weapon_x_pod_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/weapon_x_pod_hum"
+      }
+    ]
+  },
+  "weapon_x_pod_done": {
+    "subtitle": "subtitles.enhanced.weapon_x_pod_done",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/weapon_x_pod_done"
+      }
+    ]
+  },
+  "adamantium_rack_take": {
+    "subtitle": "subtitles.enhanced.adamantium_rack_take",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/adamantium_rack_take"
+      }
+    ]
+  },
+  "cure_station": {
+    "subtitle": "subtitles.enhanced.cure_station",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/cure_station"
+      }
+    ]
+  },
+  "ambient.school_lab": {
+    "subtitle": "subtitles.enhanced.ambient.school_lab",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ambient_school_lab"
+      }
+    ]
+  },
+  "cerebro_console_on": {
+    "subtitle": "subtitles.enhanced.cerebro_console_on",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/cerebro_console_on"
+      }
+    ]
+  },
+  "cerebro_amplified": {
+    "subtitle": "subtitles.enhanced.cerebro_amplified",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/cerebro_amplified"
+      }
+    ]
+  },
+  "cerebro_console_off": {
+    "subtitle": "subtitles.enhanced.cerebro_console_off",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/cerebro_console_off"
+      }
+    ]
+  },
+  "locator_pulse": {
+    "subtitle": "subtitles.enhanced.locator_pulse",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/locator_pulse"
+      }
+    ]
+  },
+  "locator_tick": {
+    "subtitle": "subtitles.enhanced.locator_tick",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/locator_tick"
+      }
+    ]
+  },
+  "locator_found": {
+    "subtitle": "subtitles.enhanced.locator_found",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/locator_found"
+      }
+    ]
+  },
+  "ambient.cottage": {
+    "subtitle": "subtitles.enhanced.ambient.cottage",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ambient_cottage"
+      }
+    ]
+  },
+  "cottage_pot": {
+    "subtitle": "subtitles.enhanced.cottage_pot",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/cottage_pot"
+      }
+    ]
+  },
+  "scratchy_found": {
+    "subtitle": "subtitles.enhanced.scratchy_found",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/scratchy_found"
+      }
+    ]
+  },
+  "rio_blessing": {
+    "subtitle": "subtitles.enhanced.rio_blessing",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/rio_blessing"
+      }
+    ]
+  },
+  "nicky_cheer": {
+    "subtitle": "subtitles.enhanced.nicky_cheer",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/nicky_cheer"
+      }
+    ]
+  },
+  "agatha_away": {
+    "subtitle": "subtitles.enhanced.agatha_away",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/agatha_away"
+      }
+    ]
   }
 }

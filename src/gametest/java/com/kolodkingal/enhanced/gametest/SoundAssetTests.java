@@ -47,6 +47,24 @@ public final class SoundAssetTests {
      * again.
      */
     static final Set<String> SKELETON_36 = Set.of();
+    /**
+     * The 3.7 skeleton's placeholder files ({@code sfx/<name>.ogg}, the same 0.2-second file): every sound event of 3.7
+     * (PLAN Appendix C) until the sound lane (L7 of 3.7) makes it. L7 empties this list and extends the tests to the
+     * 3.7 events.
+     */
+    static final Set<String> SKELETON_37 = Set.of(
+            "healing_down", "healing_rise", "healing_burst", "healing_off", "healing_on", "healing_cut",
+            "healing_rescue", "wolverine_snikt", "wolverine_shink", "wolverine_slash", "wolverine_slash_hit_metal",
+            "wolverine_spin", "wolverine_pounce", "wolverine_land", "wolverine_berserk", "wolverine_growl",
+            "wolverine_sniff", "wolverine_track", "wolverine_climb", "adamantium_clank", "adamantium_injection",
+            "wolverine_awaken", "deadpool_katana", "deadpool_parry", "deadpool_deflect", "deadpool_shot",
+            "deadpool_reload", "deadpool_ricochet", "deadpool_blink", "deadpool_glitch", "deadpool_drop_in",
+            "deadpool_taunt", "deadpool_whistle", "deadpool_smoke", "deadpool_awaken", "dogpool_bark", "dogpool_whine",
+            "dogpool_poof", "chimichanga_munch", "school_lab_ready", "secret_shelf_open", "secret_shelf_close",
+            "lift_ride", "lift_ding", "x_door_open", "x_door_close", "weapon_x_pod_hum", "weapon_x_pod_done",
+            "adamantium_rack_take", "cure_station", "ambient_school_lab", "cerebro_console_on", "cerebro_amplified",
+            "cerebro_console_off", "locator_pulse", "locator_tick", "locator_found", "ambient_cottage", "cottage_pot",
+            "scratchy_found", "rio_blessing", "nicky_cheer", "agatha_away");
     /** The sound events of PLAN Appendix C (72; {@code music.asgard} plays three files). */
     static final List<String> ASGARD_EVENTS = List.of(
             // Asgard
@@ -254,7 +272,8 @@ public final class SoundAssetTests {
                 count++;
                 String name = root.relativize(path).toString();
                 if (md5(Files.readAllBytes(path)).equals(PLACEHOLDER_MD5)
-                        && !SKELETON_36.contains(name.replace("sfx/", "").replace(".ogg", ""))) {
+                        && !SKELETON_36.contains(name.replace("sfx/", "").replace(".ogg", ""))
+                        && !SKELETON_37.contains(name.replace("sfx/", "").replace(".ogg", ""))) {
                     placeholders.add(name);
                 }
             }

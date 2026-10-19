@@ -122,6 +122,9 @@ public enum Stance {
     HULK_ENRAGED(3.0F, 6.0F, false),
     /** In the air on a leap: the knees tucked, the arms up. */
     HULK_AIR(2.0F, 3.0F, true)
+    // ===== healing (3.7) =====
+    // ===== wolverine (3.7) =====
+    // ===== deadpool (3.7) =====
     ;
 
     public static final Stance[] VALUES = values();

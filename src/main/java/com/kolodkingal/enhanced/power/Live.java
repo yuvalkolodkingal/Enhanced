@@ -4,7 +4,7 @@ package com.kolodkingal.enhanced.power;
  * Momentary states of the newer heroes (and of whoever Mjolnir pins down) that clients must see (to draw effects and
  * poses, or to stop a pinned player's own movement) but that are never saved: they are recomputed by the server while
  * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (28 bits are used in
- * 3.3, 42 in 3.5, 53 in 3.6: at most 64).
+ * 3.3, 42 in 3.5, 53 in 3.6, 58 in 3.7: at most 64).
  *
  * <p>The states of 3.0 sit in one region per hero (the {@code // =====} lines), so the five lanes that build those
  * heroes append to their own lines and never to the same one.
@@ -165,6 +165,22 @@ public enum Live {
     HULK_CHARGING,
     /** The Hulk's rage is at half or more: his eyes glow gamma green. */
     HULK_ENRAGED,
+    // ===== healing (3.7) =====
+    /**
+     * A healer (Wolverine, Deadpool, a custom hero with the healing factor) is DOWN: a blow that would have killed him
+     * left him at 1 health, kneeling, untouchable, until he rises ({@code healing/Downed}).
+     */
+    HEALING_DOWN,
+    // ===== wolverine (3.7) =====
+    /** Wolverine's Berserker Rage is on: hunched, claws wide, faster and stronger. */
+    WOLVERINE_BERSERK,
+    /** Wolverine is in the air on a Pounce, claws forward. */
+    WOLVERINE_POUNCING,
+    // ===== deadpool (3.7) =====
+    /** Deadpool parries (Sneak + R held): his katanas spin in front of him. */
+    DEADPOOL_PARRYING,
+    /** Deadpool's pistols are drawn (for two seconds after a shot). */
+    DEADPOOL_AIMING,
     ;
 
     final long bit() {

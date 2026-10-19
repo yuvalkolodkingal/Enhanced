@@ -219,13 +219,15 @@ public final class SchoolRepair {
         return new Result(placed.size(), already, skipped);
     }
 
-    /** {@code structure repair_school [radius]} under {@code /enhanced} (operators). */
+    /** {@code structure repair_school [radius]} (and 3.7's {@code school_lab}) under {@code /enhanced} (operators). */
     public static LiteralArgumentBuilder<CommandSourceStack> node() {
         return Commands.literal("structure")
                 .then(Commands.literal("repair_school")
                         .executes(ctx -> run(ctx.getSource(), DEFAULT_RADIUS))
                         .then(Commands.argument("radius", IntegerArgumentType.integer(16, MAX_RADIUS))
-                                .executes(ctx -> run(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "radius")))));
+                                .executes(ctx -> run(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "radius")))))
+                // (3.7: the X-Men lower lab, lane L4's.)
+                .then(com.kolodkingal.enhanced.school.LabCommand.node());
     }
 
     private static int run(CommandSourceStack source, int radius) {

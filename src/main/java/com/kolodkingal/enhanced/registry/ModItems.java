@@ -251,6 +251,40 @@ public final class ModItems {
             "hydra_officer_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.HYDRA_OFFICER, 0x2A2A2E, 0xD8B23A, new Item.Properties()));
 
+    // ===== wolverine (3.7) =====
+    // (The skeleton registers every item of 3.7; each lane owns its classes.)
+    /** The Adamantium Injection: Wolverine's awakening (lane L2). From the lab's rack; not crafted by default. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.AdamantiumInjectionItem> ADAMANTIUM_INJECTION =
+            ITEMS.register("adamantium_injection", () -> new com.kolodkingal.enhanced.item.AdamantiumInjectionItem(
+                    new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
+    // ===== deadpool (3.7) =====
+    /** A chimichanga: food for anyone, Deadpool's favourite (lane L3). */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.ChimichangaItem> CHIMICHANGA =
+            ITEMS.register("chimichanga", () -> new com.kolodkingal.enhanced.item.ChimichangaItem(new Item.Properties()
+                    .food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(8).saturationModifier(0.8F)
+                            .build())));
+    // ===== school_lab (3.7) =====
+    /** The lab's blocks, for builders (Creative; lane L4). */
+    public static final DeferredItem<BlockItem> SECRET_BOOKSHELF =
+            ITEMS.registerSimpleBlockItem(ModBlocks.SECRET_BOOKSHELF);
+    public static final DeferredItem<BlockItem> ELEVATOR_PAD = ITEMS.registerSimpleBlockItem(ModBlocks.ELEVATOR_PAD);
+    public static final DeferredItem<BlockItem> X_DOOR = ITEMS.registerSimpleBlockItem(ModBlocks.X_DOOR);
+    public static final DeferredItem<BlockItem> X_DOOR_ROUND = ITEMS.registerSimpleBlockItem(ModBlocks.X_DOOR_ROUND);
+    public static final DeferredItem<BlockItem> ADAMANTIUM_RACK =
+            ITEMS.registerSimpleBlockItem(ModBlocks.ADAMANTIUM_RACK);
+    public static final DeferredItem<BlockItem> WEAPON_X_POD = ITEMS.registerSimpleBlockItem(ModBlocks.WEAPON_X_POD);
+    public static final DeferredItem<BlockItem> CURE_STATION = ITEMS.registerSimpleBlockItem(ModBlocks.CURE_STATION);
+    public static final DeferredItem<BlockItem> CEREBRO_CONSOLE =
+            ITEMS.registerSimpleBlockItem(ModBlocks.CEREBRO_CONSOLE);
+    // ===== finders (3.7) =====
+    /** The Stone Locator (lane L5). */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.StoneLocatorItem> STONE_LOCATOR =
+            ITEMS.register("stone_locator", () -> new com.kolodkingal.enhanced.item.StoneLocatorItem(
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                            .component(ModDataComponents.LOCATOR.get(),
+                                    com.kolodkingal.enhanced.finders.LocatorState.EMPTY)));
+    // ===== cottage (3.7) =====
+
     /** 3.6: an Infinity Stone's item. */
     private static DeferredItem<InfinityStoneItem> stone(String name, StoneKind kind) {
         return ITEMS.register(name, () -> new InfinityStoneItem(kind, new Item.Properties().stacksTo(1).fireResistant()

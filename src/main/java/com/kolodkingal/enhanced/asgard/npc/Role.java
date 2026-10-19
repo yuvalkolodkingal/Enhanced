@@ -7,7 +7,9 @@ import java.util.Locale;
 
 /**
  * The roles of the Asgardians (3.5), the one entity {@code enhanced:asgardian}: the eight named gods and warriors (one
- * each in the city, the "fixtures"), the Einherjar guards and the citizens. Saved by name: append only.
+ * each in the city, the "fixtures"), the Einherjar guards and the citizens. Saved by name: append only. 3.7: the three
+ * of Agatha's Cottage ({@link #cottage()}: Agatha, her son Nicky and Rio Vidal), of the second entity type {@code
+ * enhanced:cottage_resident}.
  *
  * <p>Each role carries what makes it itself on the server: its health, armour and blow, its size (Volstagg is big), the
  * colour of its name on the talk screen, the pitch of its murmur, whether it fights beside the players, whether it trades,
@@ -23,7 +25,12 @@ public enum Role {
     FANDRAL(40, 6, 7, 1.0F, 0x9AD86E, Voice.MID, true, false, 1, false),
     HOGUN(40, 7, 8, 1.0F, 0x9FB3D9, Voice.LOW, true, false, 1, false),
     EINHERJAR(30, 6, 6, 1.0F, 0xE8C26A, Voice.MID, true, false, 4, false),
-    CITIZEN(30, 0, 2, 1.0F, 0xE6D8B8, Voice.MID, false, false, 8, false);
+    CITIZEN(30, 0, 2, 1.0F, 0xE6D8B8, Voice.MID, false, false, 8, false),
+    // 3.7: the family of Agatha's Cottage (the entity enhanced:cottage_resident, the same class; lane L6). Appended:
+    // the roles above keep their ordinals.
+    AGATHA(30, 2, 2, 1.0F, 0x9A3FE0, Voice.HIGH, false, true, 1, true),
+    NICKY(20, 0, 1, 0.75F, 0x7FD8B8, Voice.HIGH, false, false, 1, false),
+    RIO(30, 2, 2, 1.0F, 0x4FA35A, Voice.MID, false, true, 1, true);
 
     /** The pitch of a role's murmur ({@code npc_talk_low|mid|high}). */
     public enum Voice { LOW, MID, HIGH }
@@ -131,6 +138,8 @@ public enum Role {
         return switch (this) {
             case HEIMDALL -> Power.HEIMDALL;
             case ODIN -> Power.ODIN;
+            // (3.7: the cottage's Agatha is away while a player is Agatha.)
+            case AGATHA -> Power.AGATHA;
             default -> null;
         };
     }
@@ -142,6 +151,11 @@ public enum Role {
      */
     public boolean yieldsToHero() {
         return hero() != null && this != HEIMDALL;
+    }
+
+    /** Whether the role lives in Agatha's Cottage (3.7: Agatha, Nicky, Rio), not in Asgard. */
+    public boolean cottage() {
+        return this == AGATHA || this == NICKY || this == RIO;
     }
 
     /** The Warriors Three. */

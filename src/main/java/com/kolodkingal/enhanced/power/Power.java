@@ -57,7 +57,12 @@ public enum Power implements StringRepresentable {
     // Doctor Strange's spells are the orange-gold of the mystic arts' sparks, with a warm pale glow (his name in the
     // cloak's red); the Hulk is Hulk green with a gamma-green glow (his name a lighter green).
     DOCTOR_STRANGE(0xF29A2E, 0xFFE0A8),
-    HULK(0x5BA33A, 0xB6F27A);
+    HULK(0x5BA33A, 0xB6F27A),
+    // The heroes of 3.7, appended after HULK in this order (the 3.7 skeleton adds them; each lane fills its own).
+    // Wolverine is the yellow of the classic suit with the silver of adamantium; Deadpool the red of his suit with a
+    // pale pink glow (his name in a deeper red).
+    WOLVERINE(0xF2C230, 0xD9DEE3),
+    DEADPOOL(0xC8102E, 0xFF8A8A);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -97,6 +102,9 @@ public enum Power implements StringRepresentable {
             // (3.6: Doctor Strange is named in the red of his Cloak of Levitation, the Hulk in a lighter green.)
             case DOCTOR_STRANGE -> 0xC2302E;
             case HULK -> 0x6CC04A;
+            // (3.7: Wolverine is named in his suit's yellow, Deadpool in a red that reads on the dark sky.)
+            case WOLVERINE -> 0xF2C230;
+            case DEADPOOL -> 0xD6262E;
             default -> color;
         };
     }
@@ -133,7 +141,7 @@ public enum Power implements StringRepresentable {
      * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, Loki walks, Cyclops runs and leaps
      * on his optic blast and Professor X walks or rolls in his chair; the gods of Asgard (3.5) walk, and the Bifrost
      * carries them; the Hulk (3.6) leaps; everyone else can fly (Thor only with Mjolnir, see ThorAbilities; Doctor
-     * Strange on his Cloak of Levitation).
+     * Strange on his Cloak of Levitation); Wolverine and Deadpool (3.7) leap, pounce and teleport.
      */
     public boolean canFly() {
         return switch (this) {
@@ -141,7 +149,7 @@ public enum Power implements StringRepresentable {
             case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, CUSTOM,
                     DOCTOR_STRANGE -> true;
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
-                    HULK -> false;
+                    HULK, WOLVERINE, DEADPOOL -> false;
         };
     }
 
@@ -161,7 +169,7 @@ public enum Power implements StringRepresentable {
             // (3.6: the Cloak of Levitation is graceful, slower than Thor.)
             case DOCTOR_STRANGE -> com.kolodkingal.enhanced.config.StrangeConfig.FLIGHT_SPEED.get().floatValue();
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
-                    HULK -> 0.05F;
+                    HULK, WOLVERINE, DEADPOOL -> 0.05F;
         };
     }
 
@@ -171,9 +179,9 @@ public enum Power implements StringRepresentable {
             case MAGNETO -> 5;
             case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, DOCTOR_STRANGE -> 2;
             // (A custom hero's Flight is on whichever key its player put it; 3.6: all five of the Hulk's keys are
-            // rows.)
+            // rows; 3.7: and Wolverine's and Deadpool's.)
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA,
-                    HULK -> -1;
+                    HULK, WOLVERINE, DEADPOOL -> -1;
         };
     }
 

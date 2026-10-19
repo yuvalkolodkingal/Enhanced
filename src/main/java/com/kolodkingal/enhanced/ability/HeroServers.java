@@ -36,6 +36,9 @@ public final class HeroServers {
         // 3.6: Doctor Strange and the Hulk (each in its own package, filled by its lane).
         register(new com.kolodkingal.enhanced.strange.StrangeServer());
         register(new com.kolodkingal.enhanced.hulk.HulkServer());
+        // 3.7: Wolverine and Deadpool (each in its own package, filled by its lane).
+        register(new com.kolodkingal.enhanced.wolverine.WolverineServer());
+        register(new com.kolodkingal.enhanced.deadpool.DeadpoolServer());
     }
 
     /**
