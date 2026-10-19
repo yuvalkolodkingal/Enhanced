@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "enhanced:block/cerebro_console"
+    },
+    "facing=east": {
+      "model": "enhanced:block/cerebro_console",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "enhanced:block/cerebro_console",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "enhanced:block/cerebro_console",
+      "y": 270
     }
   }
 }

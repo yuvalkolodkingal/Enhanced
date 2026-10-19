@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "enhanced:block/elevator_pad"
+    },
+    "facing=east": {
+      "model": "enhanced:block/elevator_pad",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "enhanced:block/elevator_pad",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "enhanced:block/elevator_pad",
+      "y": 270
     }
   }
 }

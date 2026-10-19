@@ -1,7 +1,124 @@
 {
   "variants": {
-    "": {
-      "model": "enhanced:block/x_door"
+    "facing=north,half=lower,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_lower"
+    },
+    "facing=north,half=lower,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_lower_open"
+    },
+    "facing=north,half=lower,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_lower"
+    },
+    "facing=north,half=lower,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_lower_open"
+    },
+    "facing=north,half=upper,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_upper"
+    },
+    "facing=north,half=upper,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_upper_open"
+    },
+    "facing=north,half=upper,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_upper"
+    },
+    "facing=north,half=upper,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_upper_open"
+    },
+    "facing=east,half=lower,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_lower_open",
+      "y": 90
+    },
+    "facing=east,half=lower,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_lower",
+      "y": 90
+    },
+    "facing=east,half=lower,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_lower_open",
+      "y": 90
+    },
+    "facing=east,half=upper,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_upper_open",
+      "y": 90
+    },
+    "facing=east,half=upper,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_upper",
+      "y": 90
+    },
+    "facing=east,half=upper,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_upper_open",
+      "y": 90
+    },
+    "facing=south,half=lower,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_lower_open",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_lower",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_lower_open",
+      "y": 180
+    },
+    "facing=south,half=upper,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_upper_open",
+      "y": 180
+    },
+    "facing=south,half=upper,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_upper",
+      "y": 180
+    },
+    "facing=south,half=upper,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_upper_open",
+      "y": 180
+    },
+    "facing=west,half=lower,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_lower_open",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_lower",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_lower_open",
+      "y": 270
+    },
+    "facing=west,half=upper,hinge=left,open=false": {
+      "model": "enhanced:block/x_door_left_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,hinge=left,open=true": {
+      "model": "enhanced:block/x_door_left_upper_open",
+      "y": 270
+    },
+    "facing=west,half=upper,hinge=right,open=false": {
+      "model": "enhanced:block/x_door_right_upper",
+      "y": 270
+    },
+    "facing=west,half=upper,hinge=right,open=true": {
+      "model": "enhanced:block/x_door_right_upper_open",
+      "y": 270
     }
   }
 }

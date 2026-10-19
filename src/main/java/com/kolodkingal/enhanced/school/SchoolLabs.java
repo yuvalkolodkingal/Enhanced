@@ -1,11 +1,13 @@
 package com.kolodkingal.enhanced.school;
 
 import com.kolodkingal.enhanced.world.SchoolLabPlan;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,8 +46,28 @@ public final class SchoolLabs extends SavedData {
      * @param step    the next step while {@link State#BUILDING}
      * @param version the template's version it was built from ({@link SchoolLabPlan#VERSION})
      * @param reason  why it is blocked, or ""
+     * @param origin  (lane L4) where the school's template was put: its piece's template position
+     * @param turn    (lane L4) how the school was turned (the lab is turned the same way)
+     * @param pivot   (lane L4) the school's turning pivot (template-relative)
+     * @param cursor  (lane L4) how far the current step is (a face block, a layer; a crash resumes there)
      */
-    public record Lab(long key, State state, int step, int version, String reason) {
+    public record Lab(long key, State state, int step, int version, String reason, BlockPos origin, Rotation turn,
+                      BlockPos pivot, int cursor) {
+        /** The skeleton's record (no placement yet). */
+        public Lab(long key, State state, int step, int version, String reason) {
+            this(key, state, step, version, reason, BlockPos.ZERO, Rotation.NONE, BlockPos.ZERO, 0);
+        }
+
+        /** Where the school (and so its lab) lies in the world. */
+        public LabSite site() {
+            return new LabSite(origin, turn, pivot);
+        }
+
+        /** The same lab at another state, step and cursor (the reason kept unless a new one is given). */
+        public Lab at(State newState, int newStep, int newCursor, String newReason) {
+            return new Lab(key, newState, newStep, version, newReason, origin, turn, pivot, newCursor);
+        }
+
         CompoundTag write() {
             CompoundTag tag = new CompoundTag();
             tag.putLong("key", key);
@@ -53,6 +75,10 @@ public final class SchoolLabs extends SavedData {
             tag.putInt("step", step);
             tag.putInt("version", version);
             tag.putString("reason", reason);
+            tag.putIntArray("origin", new int[]{origin.getX(), origin.getY(), origin.getZ()});
+            tag.putString("turn", turn.name());
+            tag.putIntArray("pivot", new int[]{pivot.getX(), pivot.getY(), pivot.getZ()});
+            tag.putInt("cursor", cursor);
             return tag;
         }
 
@@ -63,8 +89,19 @@ public final class SchoolLabs extends SavedData {
             } catch (IllegalArgumentException e) {
                 state = State.NONE;
             }
+            Rotation turn;
+            try {
+                turn = Rotation.valueOf(tag.getString("turn"));
+            } catch (IllegalArgumentException e) {
+                turn = Rotation.NONE;
+            }
             return new Lab(tag.getLong("key"), state, tag.getInt("step"), tag.getInt("version"),
-                    tag.getString("reason"));
+                    tag.getString("reason"), pos(tag.getIntArray("origin")), turn, pos(tag.getIntArray("pivot")),
+                    tag.getInt("cursor"));
+        }
+
+        private static BlockPos pos(int[] xyz) {
+            return xyz.length == 3 ? new BlockPos(xyz[0], xyz[1], xyz[2]) : BlockPos.ZERO;
         }
     }
 
@@ -108,6 +145,13 @@ public final class SchoolLabs extends SavedData {
     public void put(Lab lab) {
         labs.put(lab.key(), lab);
         setDirty();
+    }
+
+    /** Forgets the lab of the school whose start is in chunk {@code key} (the tests' fake schools). */
+    public void remove(long key) {
+        if (labs.remove(key) != null) {
+            setDirty();
+        }
     }
 
     public Collection<Lab> all() {
