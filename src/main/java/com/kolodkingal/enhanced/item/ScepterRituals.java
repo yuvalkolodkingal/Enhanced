@@ -341,23 +341,31 @@ public final class ScepterRituals {
 
     // ---- the hold: what the two items delegate ----
 
+    /**
+     * 3.6: whether the item held is the Mind Beam's (the {@code MIND_BEAM} row), not the call to the Mad Titan: the
+     * stone runs that hold itself ({@code StoneUse}), so none of these goes to the summoning.
+     */
+    public static boolean mindBeamHold(LivingEntity user) {
+        return StoneUse.holding(user, StoneKind.MIND);
+    }
+
     public static void holdTick(LivingEntity user, ItemStack stack, int remaining) {
         Hold hold = thanos();
-        if (hold != null && user instanceof ServerPlayer player) {
+        if (hold != null && user instanceof ServerPlayer player && !mindBeamHold(player)) {
             hold.tick(player, stack, remaining);
         }
     }
 
     public static void holdReleased(LivingEntity user, ItemStack stack) {
         Hold hold = thanos();
-        if (hold != null && user instanceof ServerPlayer player) {
+        if (hold != null && user instanceof ServerPlayer player && !mindBeamHold(player)) {
             hold.release(player, stack);
         }
     }
 
     public static void holdFinished(LivingEntity user, ItemStack stack) {
         Hold hold = thanos();
-        if (hold != null && user instanceof ServerPlayer player) {
+        if (hold != null && user instanceof ServerPlayer player && !mindBeamHold(player)) {
             hold.finish(player, stack);
         }
     }

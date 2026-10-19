@@ -190,7 +190,9 @@ public final class SlowMotion {
      * says otherwise ({@link BossHooks#slowFactor}: Ultron's bodies are not slowed at all, Thanos's half).
      */
     private static int factorOf(Entity entity) {
-        return entity instanceof BossHooks boss ? boss.slowFactor(factor()) : factor();
+        // 3.6: a Time Stone's zone (and no speedster's) has its own factor (lane L2's StoneZones).
+        int zone = StoneZones.factorFor(entity, factor());
+        return entity instanceof BossHooks boss ? boss.slowFactor(zone) : zone;
     }
 
     /** Whether this entity is slowed by Quicksilver Time at all (players and things they ride are never tick-skipped). */

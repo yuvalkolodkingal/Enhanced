@@ -30,7 +30,8 @@ public final class SoulSight {
             return false;
         }
         PowerData data = Powers.get(player);
-        return data.has(HeroAbility.THANOS_SOUL) && data.is(Live.SOUL_SIGHT);
+        // (3.6: or anyone's Soul Stone: the flag is only ever set by a Soul Sight.)
+        return data.is(Live.SOUL_SIGHT);
     }
 
     /** Whether the local Thanos sees this entity glow right now. */
