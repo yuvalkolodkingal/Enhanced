@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.stones.StoneLedger;
 import com.kolodkingal.enhanced.strange.EyeOfAgamotto;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -46,6 +48,13 @@ public class EyeOfAgamottoItem extends Item {
             EyeOfAgamotto.use(server, stack, server.isShiftKeyDown());
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+    }
+
+    /** Set round a site's Time Stone, the Eye carries who took that stone (3.6, integration: the stones' ledger). */
+    @Override
+    public void onCraftedBy(ItemStack stack, Level level, Player player) {
+        super.onCraftedBy(stack, level, player);
+        StoneLedger.carryTaker(stack, player, s -> s.is(ModItems.TIME_STONE.get()));
     }
 
     @Override

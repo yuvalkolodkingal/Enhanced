@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.stones;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.item.InfinityStoneItem;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.thanos.StoneKind;
@@ -45,13 +46,20 @@ public final class StoneEvents {
     }
 
     /**
-     * The stone a use of this stack would be: a bare stone, or the selected stone of a crafted Gauntlet (not the
-     * Titan's, not empty, and not the Snap: Sneak with all six). Null for anything else.
+     * The stone a use of this stack would be: a bare stone, the selected stone of a crafted Gauntlet (not the
+     * Titan's, not empty, and not the Snap: Sneak with all six), or the Eye of Agamotto's Time Stone in a hero's hand.
+     * Null for anything else.
      */
     @Nullable
-    private static InHand stoneOf(ItemStack stack, boolean sneaking) {
+    private static InHand stoneOf(ItemStack stack, Player player) {
+        boolean sneaking = player.isShiftKeyDown();
         if (stack.getItem() instanceof InfinityStoneItem stone) {
             return new InHand(stone.kind, StoneUse.Source.BARE);
+        }
+        // (3.6, integration: the Eye of Agamotto is the Time Stone's vessel for a hero, a sorcerer's to use; in a
+        // powerless player's hand it is held for the awakening.)
+        if (stack.is(ModItems.EYE_OF_AGAMOTTO.get())) {
+            return Powers.power(player).hasPowers() ? new InHand(StoneKind.TIME, StoneUse.Source.VESSEL) : null;
         }
         if (!stack.is(ModItems.INFINITY_GAUNTLET.get())) {
             return null;
@@ -82,7 +90,7 @@ public final class StoneEvents {
     @SubscribeEvent
     public static void onUseOnBlock(PlayerInteractEvent.RightClickBlock event) {
         Player player = event.getEntity();
-        InHand stone = stoneOf(event.getItemStack(), player.isShiftKeyDown());
+        InHand stone = stoneOf(event.getItemStack(), player);
         if (stone == null || stone.kind() != StoneKind.TIME
                 || !TimeStonePowers.isCropTarget(event.getLevel().getBlockState(event.getPos()),
                 player.isShiftKeyDown())) {
@@ -100,7 +108,7 @@ public final class StoneEvents {
     @SubscribeEvent
     public static void onUseOnEntity(PlayerInteractEvent.EntityInteract event) {
         Player player = event.getEntity();
-        InHand stone = stoneOf(event.getItemStack(), player.isShiftKeyDown());
+        InHand stone = stoneOf(event.getItemStack(), player);
         if (stone == null || stone.kind() != StoneKind.TIME || player.isShiftKeyDown()
                 || !(event.getTarget() instanceof AgeableMob mob) || !mob.isBaby()) {
             return;

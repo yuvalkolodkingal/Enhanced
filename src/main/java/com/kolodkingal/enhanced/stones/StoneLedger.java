@@ -14,6 +14,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.CustomData;
@@ -28,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * How many stones there are (3.6, the plan's 1.4): the four site stones (Reality, Time, Power, Soul) are counted by
@@ -136,6 +140,10 @@ public final class StoneLedger {
             put(takers, found, stone.kind, taker(stack));
         } else if (stack.is(ModItems.THE_ORB.get())) {
             put(takers, found, StoneKind.POWER, taker(stack));
+        } else if (stack.is(ModItems.EYE_OF_AGAMOTTO.get()) && taker(stack) != null) {
+            // (3.6, integration: an Eye crafted round a site's Time Stone carries its taker; an Eye that never held a
+            // site's stone, such as the one a new Doctor Strange is given, frees nothing.)
+            put(takers, found, StoneKind.TIME, taker(stack));
         } else if (stack.is(ModItems.INFINITY_GAUNTLET.get())) {
             GauntletContents contents = stack.get(ModDataComponents.GAUNTLET.get());
             if (contents != null && !contents.titan()) {
@@ -227,6 +235,27 @@ public final class StoneLedger {
     /** Writes on a site stone (or the Orb) who took it from its site. */
     public static void stamp(ItemStack stack, UUID taker) {
         CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putUUID(TAKER, taker));
+    }
+
+    /**
+     * A crafted stack takes the taker written on the ingredient it was made from (3.6: the Time Stone set in the Eye of
+     * Agamotto, and back out of it): looks in the crafting grid of the menu the player has open for a stack {@code from}
+     * accepts that carries a taker. Called from the items' {@code onCraftedBy} (both on a click and a Shift-click, while
+     * the grid still holds the ingredients).
+     */
+    public static void carryTaker(ItemStack crafted, Player player, Predicate<ItemStack> from) {
+        if (player.level().isClientSide || crafted.isEmpty()) {
+            return;
+        }
+        for (Slot slot : player.containerMenu.slots) {
+            if (slot.container instanceof CraftingContainer && from.test(slot.getItem())) {
+                UUID taker = taker(slot.getItem());
+                if (taker != null) {
+                    stamp(crafted, taker);
+                    return;
+                }
+            }
+        }
     }
 
     /** Who took this stone (or the Orb) from its site, or null. */

@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.stones.StoneLedger;
 import com.kolodkingal.enhanced.stones.StoneRules;
 import com.kolodkingal.enhanced.stones.StoneUse;
 import com.kolodkingal.enhanced.thanos.StoneKind;
@@ -49,6 +51,15 @@ public class InfinityStoneItem extends Item {
     public InfinityStoneItem(StoneKind kind, Properties properties) {
         super(properties);
         this.kind = kind;
+    }
+
+    /** The Time Stone taken back out of the Eye of Agamotto keeps who took it from its site (3.6, integration). */
+    @Override
+    public void onCraftedBy(ItemStack stack, Level level, Player player) {
+        super.onCraftedBy(stack, level, player);
+        if (kind == StoneKind.TIME) {
+            StoneLedger.carryTaker(stack, player, s -> s.is(ModItems.EYE_OF_AGAMOTTO.get()));
+        }
     }
 
     @Override

@@ -42,6 +42,15 @@ public final class StoneCooldowns {
         } else {
             player.getCooldowns().removeCooldown(ModItems.stone(kind));
         }
+        // (3.6, integration: the Eye of Agamotto is nothing but the Time Stone's vessel for a hero: it recharges with
+        // the stone, so Strange and the sorcerers see its sweep. The other vessels keep their own uses unblocked.)
+        if (kind == StoneKind.TIME) {
+            if (ticks > 0) {
+                player.getCooldowns().addCooldown(ModItems.EYE_OF_AGAMOTTO.get(), ticks);
+            } else {
+                player.getCooldowns().removeCooldown(ModItems.EYE_OF_AGAMOTTO.get());
+            }
+        }
     }
 
     /** His cooldowns are forgotten (he logged out). */

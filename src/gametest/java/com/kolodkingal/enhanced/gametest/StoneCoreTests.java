@@ -468,6 +468,37 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
+    /**
+     * 3.6 integration (L1 x L3 x L5): an Eye of Agamotto crafted round a site's Time Stone carries its taker (and gives
+     * it back to the stone taken out of it); a destroyed Eye (a sacrificed Doctor Strange's) frees the Time Stone, an
+     * Eye that never held a site's stone frees nothing.
+     */
+    @GameTest(template = ARENA, batch = LEDGER)
+    public static void theEyeOfAgamottoCarriesItsTimeStonesTaker(GameTestHelper helper) {
+        TestKit.Fixture f = fixture(helper);
+        ServerLevel level = helper.getLevel();
+        BlockPos pos = pedestal(helper, 10, 10, StoneKind.TIME);
+        ServerPlayer loki = f.player(9.5, FLOOR, 9.5, Power.LOKI);
+        check(take(helper, loki, pos) && carries(loki, StoneKind.TIME), "Loki takes the Time Stone");
+        ItemStack stone = find(loki, StoneKind.TIME).copy();
+        loki.getInventory().clearContent();
+        loki.inventoryMenu.getCraftSlots().setItem(0, stone);
+        loki.containerMenu = loki.inventoryMenu;
+        ItemStack eye = new ItemStack(ModItems.EYE_OF_AGAMOTTO.get());
+        eye.getItem().onCraftedBy(eye, level, loki);
+        check(loki.getUUID().equals(StoneLedger.taker(eye)), "the crafted Eye carries Loki's name");
+        loki.inventoryMenu.getCraftSlots().setItem(0, eye.copy());
+        ItemStack back = stone(StoneKind.TIME);
+        back.getItem().onCraftedBy(back, level, loki);
+        check(loki.getUUID().equals(StoneLedger.taker(back)), "so does the stone taken back out of it");
+        loki.inventoryMenu.getCraftSlots().clearContent();
+        StoneLedger.destroyed(new ItemStack(ModItems.EYE_OF_AGAMOTTO.get()));
+        check(loki.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "an Eye that held no site stone: nothing");
+        StoneLedger.destroyed(eye);
+        check(!loki.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "the destroyed Eye frees the Time Stone");
+        helper.succeed();
+    }
+
     @GameTest(template = ARENA, batch = LEDGER)
     public static void theVaultChestGivesTheOrbOncePerPlayer(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
