@@ -471,7 +471,9 @@ public final class GestureRoutes {
             // ===== wolverine (3.7) =====
             case WOLVERINE -> "none: Wolverine's keys are acted by his plug-in (lane L2 of 3.7)";
             // ===== deadpool (3.7) =====
-            case DEADPOOL -> "none: Deadpool's keys are acted by his plug-in (lane L3 of 3.7)";
+            case DEADPOOL -> "none: Deadpool's keys are acted by the effects of his moves, which name him"
+                    + " (DeadpoolActing: the cuts, the Parry, the shots and the reload, the belt, the Drop-In, the"
+                    + " Taunt's three poses, the whistle, the smoke, the chimichanga)";
             default -> "none: no abilities";
         };
     }
@@ -554,7 +556,10 @@ public final class GestureRoutes {
             // ===== wolverine (3.7) =====
             case WOLVERINE_BERSERK, WOLVERINE_POUNCING -> "pending: Wolverine's lane (L2 of 3.7) acts it";
             // ===== deadpool (3.7) =====
-            case DEADPOOL_PARRYING, DEADPOOL_AIMING -> "pending: Deadpool's lane (L3 of 3.7) acts it";
+            case DEADPOOL_PARRYING -> "a stance (DEADPOOL_SWORDS): both swords spinning before him while he holds"
+                    + " it; the effect PARRY_ON plays DEADPOOL_PARRY";
+            case DEADPOOL_AIMING -> "a stance (DEADPOOL_GUNS): both pistols up along his look while they are drawn;"
+                    + " each shot's effect plays DEADPOOL_SHOOT_L or _R";
         };
     }
 

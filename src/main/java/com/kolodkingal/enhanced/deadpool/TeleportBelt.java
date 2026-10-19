@@ -203,12 +203,13 @@ public final class TeleportBelt {
 
     /** Sneak + V: the Drop-In. */
     static void dropIn(ServerPlayer player, PowerData data) {
-        if (!data.has(HeroAbility.DEADPOOL_DROP_IN)) {
+        if (!DeadpoolAbilities.hasVariant(data, HeroAbility.DEADPOOL_DROP_IN)) {
             return;
         }
         long now = player.level().getGameTime();
         DeadpoolAbilities.State state = DeadpoolAbilities.state(player.getUUID());
-        if (!data.isReady(HeroAbility.DEADPOOL_DROP_IN, now) || state.drop != null) {
+        HeroAbility slot = DeadpoolAbilities.slotRow(data, HeroAbility.DEADPOOL_DROP_IN);
+        if (!data.isReady(slot, now) || state.drop != null) {
             return;
         }
         EntityHitResult hit = Raycasts.entity(player, DeadpoolAbilities.cfg(DeadpoolConfig.DROP_IN_RANGE, 32), 0.3,
@@ -226,7 +227,7 @@ public final class TeleportBelt {
         }
         state.drop = new Drop(target.getId(), now);
         state.fallGuardUntil = now + DROP_MAX_TICKS + FALL_GUARD;
-        data.startCooldown(HeroAbility.DEADPOOL_DROP_IN, now, DeadpoolAbilities.cfg(DeadpoolConfig.DROP_IN_COOLDOWN,
+        data.startCooldown(slot, now, DeadpoolAbilities.cfg(DeadpoolConfig.DROP_IN_COOLDOWN,
                 160));
         DeadpoolAbilities.send(player.serverLevel(), player, DeadpoolFxPayload.DROP_IN, List.of(above), 0);
     }

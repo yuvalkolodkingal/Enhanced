@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.deadpool;
 
+import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.config.DeadpoolConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.DeadpoolFxPayload;
@@ -10,6 +11,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -70,10 +73,10 @@ public final class Pistols {
         }
         ServerLevel level = player.serverLevel();
         Vec3 from = muzzle(player, left);
-        Vec3 look = player.getLookAngle();
+        int range = DeadpoolAbilities.cfg(DeadpoolConfig.PISTOL_RANGE, 48);
+        Vec3 look = aim(player, from, range);
         DeadpoolBulletEntity bullet = DeadpoolBulletEntity.create(level, player, from, look, SPEED,
-                (float) DeadpoolAbilities.cfg(DeadpoolConfig.PISTOL_DAMAGE, 4.0),
-                DeadpoolAbilities.cfg(DeadpoolConfig.PISTOL_RANGE, 48), false);
+                (float) DeadpoolAbilities.cfg(DeadpoolConfig.PISTOL_DAMAGE, 4.0), range, false);
         level.addFreshEntity(bullet);
         state.aimUntil = now + DeadpoolAbilities.AIM_TICKS;
         data.set(Live.DEADPOOL_AIMING, true);
@@ -102,24 +105,25 @@ public final class Pistols {
 
     /** Sneak + G: the Trick Shot (G's slot rested). */
     static void trickShot(ServerPlayer player, PowerData data) {
-        if (!data.has(HeroAbility.DEADPOOL_TRICK_SHOT)) {
+        if (!DeadpoolAbilities.hasVariant(data, HeroAbility.DEADPOOL_TRICK_SHOT)) {
             return;
         }
         long now = player.level().getGameTime();
-        if (!data.isReady(HeroAbility.DEADPOOL_TRICK_SHOT, now)) {
+        HeroAbility slot = DeadpoolAbilities.slotRow(data, HeroAbility.DEADPOOL_TRICK_SHOT);
+        if (!data.isReady(slot, now)) {
             return;
         }
         ServerLevel level = player.serverLevel();
         Vec3 from = muzzle(player, false);
-        Vec3 look = player.getLookAngle();
+        int range = DeadpoolAbilities.cfg(DeadpoolConfig.PISTOL_RANGE, 48);
+        Vec3 look = aim(player, from, range);
         DeadpoolBulletEntity bullet = DeadpoolBulletEntity.create(level, player, from, look, SPEED,
-                (float) DeadpoolAbilities.cfg(DeadpoolConfig.TRICK_SHOT_DAMAGE, 8.0),
-                DeadpoolAbilities.cfg(DeadpoolConfig.PISTOL_RANGE, 48), true);
+                (float) DeadpoolAbilities.cfg(DeadpoolConfig.TRICK_SHOT_DAMAGE, 8.0), range, true);
         level.addFreshEntity(bullet);
         DeadpoolAbilities.State state = DeadpoolAbilities.state(player.getUUID());
         state.aimUntil = now + DeadpoolAbilities.AIM_TICKS;
         data.set(Live.DEADPOOL_AIMING, true);
-        data.startCooldown(HeroAbility.DEADPOOL_TRICK_SHOT, now,
+        data.startCooldown(slot, now,
                 DeadpoolAbilities.cfg(DeadpoolConfig.TRICK_SHOT_COOLDOWN, 80));
         DeadpoolAbilities.send(level, player, DeadpoolFxPayload.SHOT, List.of(from, from.add(look.scale(2.0))), 2);
         DeadpoolAbilities.sound(level, from, ModSounds.DEADPOOL_SHOT.get(), 0.9F, 0.85F);
@@ -137,6 +141,21 @@ public final class Pistols {
             DeadpoolAbilities.setData(player, ammo.withAmmo(magazine())); // (the server's magazine got smaller)
         }
         data.set(Live.DEADPOOL_AIMING, now < state.aimUntil);
+    }
+
+    /**
+     * The way a round from {@code muzzle} flies: to what his crosshair is on (the first creature or block along his look
+     * within {@code range}), so both pistols' rounds meet where he aims.
+     */
+    static Vec3 aim(ServerPlayer player, Vec3 muzzle, double range) {
+        HitResult hit = Raycasts.any(player, range, e -> e instanceof LivingEntity && e != player && e.isPickable(),
+                1.0F);
+        Vec3 at = hit.getLocation();
+        Vec3 way = at.subtract(muzzle);
+        if (way.lengthSqr() < 1.0 || way.normalize().dot(player.getLookAngle()) < 0.5) {
+            return player.getLookAngle();
+        }
+        return way.normalize();
     }
 
     /** Where a round leaves his left or right pistol: a little below and to the side of his eyes, ahead of him. */

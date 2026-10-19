@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#C8102E",
+  "glow": "#FF8A8A",
+  "look": {
+    "base": "deadpool/classic",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "deadpool.katanas",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "deadpool.pistols",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "deadpool.belt",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "deadpool.taunt",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "deadpool.dogpool",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "deadpool.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "deadpool.katanas",
+    "deadpool.pistols",
+    "deadpool.belt",
+    "deadpool.taunt",
+    "deadpool.dogpool"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "deadpool",
+    "speedRun": "auto",
+    "idle": "ready"
+  },
+  "preset": {
+    "icon": "minecraft:red_concrete",
+    "hero": "deadpool"
+  }
+}

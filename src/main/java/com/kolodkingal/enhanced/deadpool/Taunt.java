@@ -96,7 +96,7 @@ public final class Taunt {
 
     /** Sneak + B: the Chimichanga Break. */
     static boolean chimichangaBreak(ServerPlayer player, PowerData data) {
-        if (!data.has(HeroAbility.DEADPOOL_CHIMICHANGA)) {
+        if (!DeadpoolAbilities.hasVariant(data, HeroAbility.DEADPOOL_CHIMICHANGA)) {
             return false;
         }
         long now = player.level().getGameTime();
@@ -147,7 +147,7 @@ public final class Taunt {
 
     /** Sneak + N: the Smoke Vanish. */
     static boolean smoke(ServerPlayer player, PowerData data) {
-        if (!data.has(HeroAbility.DEADPOOL_SMOKE)) {
+        if (!DeadpoolAbilities.hasVariant(data, HeroAbility.DEADPOOL_SMOKE)) {
             return false;
         }
         long now = player.level().getGameTime();

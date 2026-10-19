@@ -154,6 +154,25 @@ public final class DeadpoolAbilities {
         return Math.max(0, Math.round(ticks * data.kit().cooldownFactor(row) * scale));
     }
 
+    /**
+     * Whether the Sneak variant {@code variant} is his: Deadpool's always; a custom hero's when he has its parent (the
+     * key router passes {@code alt} only where the binding holds the variant: the parent picked with its variant on, or
+     * the variant's own card).
+     */
+    static boolean hasVariant(PowerData data, HeroAbility variant) {
+        HeroAbility parent = variant.parent();
+        return data.has(variant) || parent != null && data.has(parent);
+    }
+
+    /**
+     * The row whose key slot a Sneak variant waits on: its own card's key when it has one, else its parent's (the
+     * parent picked with its variant on: one key, one slot).
+     */
+    static HeroAbility slotRow(PowerData data, HeroAbility variant) {
+        HeroAbility parent = variant.parent();
+        return data.slot(variant) != 0 || parent == null ? variant : parent;
+    }
+
     // ---- who he is ----
 
     /** The id of the player's look ({@code classic} for the default). */

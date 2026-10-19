@@ -400,6 +400,40 @@ public enum GestureId {
     // ===== deadpool (3.7) =====
     // (3.7: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
     // AnimationMathTests wants keys for every gesture.)
+    // (Deadpool's, lane L3: started by the payloads of his moves, which name him: DeadpoolClient.startedElsewhere. The
+    // leading comma keeps the line above each region untouched.)
+    /** The katanas' first cut (R): the right sword from high on the right down across to the left. */
+    , DEADPOOL_SLASH_1(Group.CAST, 10, 1, 4, true),
+    /** The second cut: the left sword, the mirror of the first. */
+    DEADPOOL_SLASH_2(Group.CAST, 10, 1, 4, true),
+    /** The X-cut: both swords crossed high, then down and out together. */
+    DEADPOOL_SLASH_3(Group.CAST, 14, 2, 5, true),
+    /** The Parry begins (Sneak + R held): both swords brought up before him, into the spinning stance. */
+    DEADPOOL_PARRY(Group.CAST, 8, 2, 3, true),
+    /** A shot of the left pistol (G): a small kick of the left arm. */
+    DEADPOOL_SHOOT_L(Group.CAST, 6, 1, 3, false),
+    /** A shot of the right pistol. */
+    DEADPOOL_SHOOT_R(Group.CAST, 6, 1, 3, false),
+    /** The reload: the pistols twirled round the fingers, the head down to watch. */
+    DEADPOOL_RELOAD(Group.CAST, 20, 2, 5, true),
+    /** The Trick Shot (Sneak + G): one arm out along the look, the other hand on the hip, the head tilted. */
+    DEADPOOL_TRICK_SHOT(Group.CAST, 16, 2, 5, true),
+    /** The Teleport Belt (V): a slap of the belt's buckle, the head down. */
+    DEADPOOL_BLINK(Group.CAST, 8, 1, 3, true),
+    /** The Drop-In (Sneak + V): both hands high on the sword's grip, point down, then the plunge. */
+    DEADPOOL_DROP_IN(Group.CAST, 16, 2, 5, true),
+    /** The Taunt's wave: the right hand high and waving, the left on the hip. */
+    DEADPOOL_TAUNT_WAVE(Group.CAST, 30, 3, 6, true),
+    /** The Taunt's finger guns: both hands forward, two little pretend shots. */
+    DEADPOOL_TAUNT_GUNS(Group.CAST, 26, 3, 6, true),
+    /** The Taunt's heart: both hands make a heart before the chest, the head tilted. */
+    DEADPOOL_TAUNT_HEART(Group.CAST, 30, 3, 6, true),
+    /** Dogpool's whistle (N): two fingers to the mask's mouth. */
+    DEADPOOL_WHISTLE(Group.CAST, 16, 2, 5, true),
+    /** The Smoke Vanish (Sneak + N): the smoke bomb thrown down at his feet. */
+    DEADPOOL_SMOKE(Group.CAST, 12, 1, 4, true),
+    /** The Chimichanga Break (Sneak + B): the snack to the mouth, three happy bites. */
+    DEADPOOL_EAT(Group.CAST, 24, 2, 6, true)
     ;
 
     /** Gestures of one group never play together. */

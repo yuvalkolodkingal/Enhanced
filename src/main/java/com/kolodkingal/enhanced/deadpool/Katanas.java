@@ -80,11 +80,11 @@ public final class Katanas {
 
     /** Sneak + R, held: the swords spin up (if R's slot is rested). */
     static void parry(ServerPlayer player, PowerData data) {
-        if (!data.has(HeroAbility.DEADPOOL_PARRY) || data.is(Live.DEADPOOL_PARRYING)) {
+        if (!DeadpoolAbilities.hasVariant(data, HeroAbility.DEADPOOL_PARRY) || data.is(Live.DEADPOOL_PARRYING)) {
             return;
         }
         long now = player.level().getGameTime();
-        if (!data.isReady(HeroAbility.DEADPOOL_PARRY, now)) {
+        if (!data.isReady(DeadpoolAbilities.slotRow(data, HeroAbility.DEADPOOL_PARRY), now)) {
             return;
         }
         DeadpoolAbilities.state(player.getUUID()).parryStart = now;
@@ -112,7 +112,7 @@ public final class Katanas {
         }
         data.set(Live.DEADPOOL_PARRYING, false);
         if (rest) {
-            data.startCooldown(HeroAbility.DEADPOOL_PARRY, player.level().getGameTime(),
+            data.startCooldown(DeadpoolAbilities.slotRow(data, HeroAbility.DEADPOOL_PARRY), player.level().getGameTime(),
                     DeadpoolAbilities.cfg(DeadpoolConfig.PARRY_COOLDOWN, 60));
         }
         DeadpoolAbilities.send(player.serverLevel(), player, DeadpoolFxPayload.PARRY_OFF, List.of(player.position()),
