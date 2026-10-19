@@ -179,6 +179,10 @@ public final class Thoughts {
 
     private static ThoughtsPayload.Thought playerThought(Player p, long time) {
         PowerData data = Powers.get(p);
+        if (data.power() == Power.DEADPOOL) {
+            // 3.7: a Deadpool's mind is open, and silly whatever he does (lane L3).
+            return new ThoughtsPayload.Thought(p.getId(), line("deadpool", p, time, null), ThoughtsPayload.CALM);
+        }
         ItemStack held = p.getMainHandItem();
         String kind;
         Object arg = null;
@@ -225,6 +229,8 @@ public final class Thoughts {
             mood = ThoughtsPayload.HOSTILE;
         } else if (e instanceof AgeableMob ageable && ageable.isBaby()) {
             kind = "baby";
+        } else if ("dogpool".equals(species)) {
+            kind = species; // 3.7: Dogpool thinks his own thoughts, though he is a pet (lane L3)
         } else if (e instanceof TamableAnimal pet && pet.isTame() && pet.getOwner() != null) {
             kind = "pet";
             arg = pet.getOwner().getDisplayName();

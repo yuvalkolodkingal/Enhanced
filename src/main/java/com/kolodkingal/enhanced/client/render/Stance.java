@@ -131,6 +131,10 @@ public enum Stance {
     /** Claw Climb on a wall: the claws hooking in turn above his head. */
     WOLVERINE_CLIMBING(2.0F, 3.0F, true),
     // ===== deadpool (3.7) =====
+    /** Deadpool's Parry: both arms forward, the two swords spinning before him (DeadpoolGearLayer spins them). */
+    DEADPOOL_SWORDS(1.5F, 3.0F, true),
+    /** Deadpool with his pistols drawn: both arms up along the look. */
+    DEADPOOL_GUNS(1.5F, 4.0F, true)
     ;
 
     public static final Stance[] VALUES = values();

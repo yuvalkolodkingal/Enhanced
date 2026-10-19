@@ -151,14 +151,14 @@ public final class Variants {
                 own(Power.WOLVERINE));
         // ===== deadpool (3.7) =====
         // The red-and-black suit, the X-Men trainee's yellow-and-black with his red mask, and Kidpool (smaller, a short
-        // red cape); our own drawings by lane L3 (SCRATCH/v37/art/l3), no logo of the films. Placeholder skins until
-        // then.
+        // red cape); our own drawings by lane L3 (SCRATCH/v37/art/l3/gen_deadpool.py), no logo of the films.
         add(Power.DEADPOOL,
                 new Variant("classic", Power.DEADPOOL, Variant.suit("deadpool_classic"), null, false, 0xC8102E,
                         0xFF8A8A),
                 new Variant("trainee", Power.DEADPOOL, Variant.suit("deadpool_trainee"), null, false, 0xE8C21E,
                         0xFF8A8A),
-                new Variant("kidpool", Power.DEADPOOL, Variant.suit("deadpool_kidpool"), null, false, 0xC8102E,
+                new Variant("kidpool", Power.DEADPOOL, Variant.suit("deadpool_kidpool"),
+                        Variant.suit("deadpool_kidpool_cape"), false, 0xC8102E,
                         0xFF8A8A),
                 own(Power.DEADPOOL));
     }

@@ -242,13 +242,19 @@ public final class HeroAbilityAnims {
         row(HeroAbility.WOLVERINE_SENSES).main(GestureId.WOLVERINE_SNIFF).alt(GestureId.WOLVERINE_TRACK);
         row(HeroAbility.WOLVERINE_BODY);
         // ===== deadpool (3.7) =====
-        // (Lane L3 gives them their gestures and stances.)
-        row(HeroAbility.DEADPOOL_KATANAS);
-        row(HeroAbility.DEADPOOL_PISTOLS);
-        row(HeroAbility.DEADPOOL_BELT);
-        row(HeroAbility.DEADPOOL_TAUNT);
-        row(HeroAbility.DEADPOOL_DOGPOOL);
+        // (Every move of his is told by the effect of his move, which names him; the Parry and the drawn pistols by
+        // their states' stances.)
+        row(HeroAbility.DEADPOOL_KATANAS).main(GestureId.DEADPOOL_SLASH_1).alt(GestureId.DEADPOOL_PARRY)
+                .also(GestureId.DEADPOOL_SLASH_2, GestureId.DEADPOOL_SLASH_3).stances(Stance.DEADPOOL_SWORDS);
+        row(HeroAbility.DEADPOOL_PISTOLS).main(GestureId.DEADPOOL_SHOOT_R).alt(GestureId.DEADPOOL_TRICK_SHOT)
+                .also(GestureId.DEADPOOL_SHOOT_L, GestureId.DEADPOOL_RELOAD).stances(Stance.DEADPOOL_GUNS);
+        row(HeroAbility.DEADPOOL_BELT).main(GestureId.DEADPOOL_BLINK).alt(GestureId.DEADPOOL_DROP_IN);
+        row(HeroAbility.DEADPOOL_TAUNT).main(GestureId.DEADPOOL_TAUNT_WAVE).alt(GestureId.DEADPOOL_EAT)
+                .also(GestureId.DEADPOOL_TAUNT_GUNS, GestureId.DEADPOOL_TAUNT_HEART);
+        row(HeroAbility.DEADPOOL_DOGPOOL).main(GestureId.DEADPOOL_WHISTLE).alt(GestureId.DEADPOOL_SMOKE);
         row(HeroAbility.DEADPOOL_BODY);
+        live(Live.DEADPOOL_PARRYING, HeroAbility.DEADPOOL_KATANAS);
+        live(Live.DEADPOOL_AIMING, HeroAbility.DEADPOOL_PISTOLS);
         // ===== variants (3.5, the creator lane) =====
         // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own
         // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's

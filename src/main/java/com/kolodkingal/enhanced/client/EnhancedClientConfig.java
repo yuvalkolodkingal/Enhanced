@@ -25,6 +25,7 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.ConfigValue<String> QUICKSILVER_SONG;
     public static final ModConfigSpec.BooleanValue IGNORE_SERVER_MUSIC;
     public static final ModConfigSpec.BooleanValue HULK_MODEL;
+    public static final ModConfigSpec.BooleanValue DEADPOOL_LINES;
 
     static {
         BUILDER.push("animation");
@@ -101,6 +102,13 @@ public final class EnhancedClientConfig {
         HULK_MODEL = BUILDER.comment("Whether the Hulk is drawn with his own giant body (false: the player model",
                 "wearing his skin, if another mod's model clashes with it).")
                 .define("hulkModel", true);
+        BUILDER.pop();
+
+        // 3.7 (lane L3): Deadpool's jokes.
+        BUILDER.push("deadpool");
+        DEADPOOL_LINES = BUILDER.comment("Whether Deadpool's joke lines are shown (the speech bubbles over his head",
+                "and, when you are Deadpool, the action bar).")
+                .define("deadpoolLines", true);
         BUILDER.pop();
     }
 
@@ -190,6 +198,11 @@ public final class EnhancedClientConfig {
     /** Whether the Hulk is drawn with his own body (true until the config has loaded). */
     public static boolean hulkModel() {
         return !SPEC.isLoaded() || HULK_MODEL.get();
+    }
+
+    /** Whether Deadpool's joke lines are shown (true until the config has loaded). */
+    public static boolean deadpoolLines() {
+        return !SPEC.isLoaded() || DEADPOOL_LINES.get();
     }
 
     private EnhancedClientConfig() {

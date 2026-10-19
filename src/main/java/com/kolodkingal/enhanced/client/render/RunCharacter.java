@@ -56,6 +56,8 @@ public enum RunCharacter {
     /** Wolverine (3.7): a low, forward-leaning sprint, the arms held back, a quick hard bob. */
     WOLVERINE(1.0F, 0.75F, 1.30F, 16, 5, 0.025F),
     // ===== deadpool (3.7) =====
+    /** Deadpool (3.7): a jaunty jog, the arms swinging loose, a bounce in the step and a swagger of the shoulders. */
+    DEADPOOL(1.10F, 1.30F, 1.15F, 7, 7, 0.030F)
     ;
 
     public final float walkArms;
@@ -97,6 +99,7 @@ public enum RunCharacter {
             case DOCTOR_STRANGE -> DOCTOR_STRANGE; // (3.6)
             case HULK -> HULK; // (3.6; Bruce Banner walks as anyone: RunPoses)
             case WOLVERINE -> WOLVERINE; // (3.7)
+            case DEADPOOL -> DEADPOOL; // (3.7)
             default -> DEFAULT;
         };
     }

@@ -133,6 +133,7 @@ public final class ClientSetup {
             com.kolodkingal.enhanced.client.wolverine.WolverineEffects.register();
             com.kolodkingal.enhanced.client.wolverine.ScentView.register();
             // ===== deadpool (3.7) =====
+            com.kolodkingal.enhanced.client.deadpool.DeadpoolEffects.register();
             // ===== school_lab (3.7) =====
             com.kolodkingal.enhanced.client.school.LabClient.setup();
             // ===== finders (3.7) =====
@@ -249,7 +250,8 @@ public final class ClientSetup {
         // ===== healing (3.7) =====
         // ===== wolverine (3.7) =====
         // ===== deadpool (3.7) =====
-        event.registerEntityRenderer(ModEntities.DEADPOOL_BULLET.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.DEADPOOL_BULLET.get(),
+                com.kolodkingal.enhanced.client.deadpool.DeadpoolBulletRenderer::new);
         event.registerEntityRenderer(ModEntities.DOGPOOL.get(),
                 com.kolodkingal.enhanced.client.deadpool.DogpoolRenderer::new);
         // ===== school_lab (3.7) =====
@@ -340,6 +342,10 @@ public final class ClientSetup {
         // ===== healing (3.7) =====
         // ===== wolverine (3.7) =====
         // ===== deadpool (3.7) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.deadpool.KatanaModel.LAYER,
+                com.kolodkingal.enhanced.client.deadpool.KatanaModel::createLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.deadpool.PistolModel.LAYER,
+                com.kolodkingal.enhanced.client.deadpool.PistolModel::createLayer);
         // ===== school_lab (3.7) =====
         // ===== finders (3.7) =====
         // ===== cottage (3.7) =====
@@ -398,6 +404,11 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.wolverine.ClawLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.WolverineCowlLayer(renderer));
                 // ===== deadpool (3.7) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.DeadpoolGearLayer(renderer,
+                        new com.kolodkingal.enhanced.client.deadpool.KatanaModel(event.getContext().bakeLayer(
+                                com.kolodkingal.enhanced.client.deadpool.KatanaModel.LAYER)),
+                        new com.kolodkingal.enhanced.client.deadpool.PistolModel(event.getContext().bakeLayer(
+                                com.kolodkingal.enhanced.client.deadpool.PistolModel.LAYER))));
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
