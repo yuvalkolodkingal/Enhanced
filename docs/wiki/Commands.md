@@ -64,6 +64,8 @@ Asgard has no portal: an operator can also use `/tp` or `/execute in enhanced:as
 |---|---|
 | `/enhanced structure repair_school [radius]` | (3.5) Mends a [Mutant School](Structures#the-mutant-school) built before 3.3.1, the hole round its front door: only the 76 blocks of the door and the tower that 3.3.1 changed, in the school's own stone. It looks for the school nearest to you within 128 blocks (or `radius`, 16 to 256). A block a player has changed there is left alone and counted ("kept"); run it again any time, and it says when the school is whole. |
 
+To **find** a structure, use the game's own `/locate structure <id>`: `enhanced:hydra_outpost`, `enhanced:mjolnir_crater`, `enhanced:mutant_school`, `enhanced:bifrost_site`, and since 3.6 `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (run it in the End) and `enhanced:vormir_cliff` (run it in the Nether). See [Structures](Structures#the-stone-sites-36).
+
 ## Build Magic: /enhanced build
 
 The `build` commands are for the operator who looks after the builders: they use the same safe rules as the heroes' own Ctrl + Z. `rank`, `meter`, `forget` and `stop <player>` name a player who is **online** (as in `/tp`). `undo` and `history` also take a player who is **offline**: give a name the server has seen (it is in its `usercache.json`) or paste his UUID; anything else is refused. His history is read from the disk the first time it is asked for, and his profile acts for him, so he need not be there. The history itself is on the disk, and a step that is no longer in memory is read back as needed.
@@ -105,6 +107,11 @@ The `<power>` argument is one of:
 | `agatha` | [Agatha](Agatha) |
 | `cyclops` | [Cyclops](Cyclops) |
 | `professor_x` | [Professor X](Professor-X) |
+| `heimdall` | [Heimdall](Heimdall) (3.5) |
+| `odin` | [Odin](Odin) (3.5) |
+| `hela` | [Hela](Hela#becoming-hela-the-hero) (3.5) |
+| `doctor_strange` | [Doctor Strange](Doctor-Strange) (3.6) |
+| `hulk` | [Hulk](Hulk) (3.6) |
 | `custom` | The player's own hero from the [Hero Creator](Hero-Creator): the one they last made (an empty hero, with no powers, if they never made one) |
 
 The command suggests the names as you type. A player who is given a power awakens as that hero, with the title, the sound and the announcement to everyone, exactly as if they had earned it. If a player already has that power and you give a look, only the look changes.
@@ -128,6 +135,11 @@ The `[look]` or `<look>` argument is the id of a look (see [Looks](Looks)):
 | Agatha | `wandavision`, `all_along`, `own` |
 | Cyclops | `apocalypse`, `classic`, `own` |
 | Professor X | `young`, `old`, `own` |
+| Heimdall | `guardian`, `ragnarok`, `own` |
+| Odin | `allfather`, `wanderer`, `own` |
+| Hela | `goddess`, `arrival`, `own` |
+| Doctor Strange | `sorcerer_supreme`, `multiverse`, `defender`, `own` |
+| Hulk | `ragnarok`, `brand_new_day`, `banner`, `own` (`banner` and `own` are Bruce Banner, with no powers) |
 
 Magneto, the Scarlet Witch and Quicksilver have no looks to choose, and a custom hero's look is chosen in the Hero Creator. Professor X given without a look is the young Charles (the screen that asks which Charles he is opens only after the wheelchair; **H** changes it). `/enhanced look` skips players whose hero does not have the look, and it fails with "Unknown look" if no given player has it.
 
@@ -147,6 +159,8 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose, and a custom
 | `/enhanced power set Steve professor_x old` | Makes Steve Professor X, the old one in his wheelchair. |
 | `/enhanced power set Steve cyclops classic` | Makes Steve Cyclops, in the comics' suit (he still needs his glasses on his head to fire). |
 | `/enhanced power set Steve none` | Takes Steve's power away. |
+| `/enhanced power set Steve doctor_strange` | Makes Steve Doctor Strange (he gets no Eye this way: give him one, or use Choose a Hero). |
+| `/enhanced power set Steve hulk brand_new_day` | Makes Steve the Hulk, the Brand New Day Hulk at once. |
 | `/enhanced look Steve white_vision` | Puts Steve, a Vision, in the White Vision look. |
 | `/enhanced hex list` | Lists the Hexes in your dimension. |
 | `/enhanced hex clear` | Dissolves them all. |

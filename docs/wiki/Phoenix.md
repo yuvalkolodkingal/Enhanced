@@ -151,6 +151,10 @@ Press **H** to change look (**Sneak + H** goes back). The abilities are the same
 | **Spider-Man: Brand New Day** | `brand_new_day` | The hooded telepath of the film: an olive hood with a mustard lining, a mustard hoodie and a dark leather jacket with an orange topstitch, copper hair in a ragged fringe, freckles and silver rings. The generic energy (the awakening burst, the look change) is gold with a pale green. |
 | **Your own skin** | `own` | Her powers in your own skin. |
 
+## The Infinity Stones (3.6)
+
+The Phoenix may hold every [Infinity Stone](Infinity-Stones) bare and use them, wield a crafted Infinity Gauntlet and Snap, and seek the Soul Stone at [Vormir](Vormir). Only the **Time Stone** stays quiet in her hand: it answers only a sorcerer.
+
 ## Numbers you can change
 
 How fast she flies, whether fire hurts her, how far Mind Reading, Mind Sense and Mind Control reach and what they cost, how many creatures she can hold and for how long, the Psionic Field's radius, length and recharge, and every number of the Burst (charge time, radius, damage, how much a player takes, how fast the wave spreads, fire, knockback, whether it sets fires or hurts villagers and animals, hunger cost, cooldowns and the drain afterwards), and how long the Ember must be held, are the `phoenix.*` options on [Server Configuration](Server-Configuration#phoenix-jean-grey).

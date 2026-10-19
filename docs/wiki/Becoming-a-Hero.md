@@ -6,7 +6,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
+| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command removes it: `/enhanced power set <player> none` (see [Commands](Commands)). |
 | Creative and Spectator | Creative and Spectator players are never killed by the Mind Stone or the Hex wall. |
 
@@ -32,6 +32,8 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Heimdall](Heimdall) (3.5) | In [Asgard](Asgard), win Heimdall's **Guardian's Watch** in the Observatory (strike seven Shadows of Hela in three minutes) and get **Hofund**; with no power, **hold your own Hofund**. |
 | [Hela](Hela) (3.5) | In Asgard, break **Hela's Seal** behind the Throne of Asgard and beat her; with no power, **hold her Headdress** for 3 seconds. |
 | [Odin](Odin) (3.5) | Beat Hela, take **Gungnir** from its stand in Odin's vault under the throne room, and with no power **sit on the Throne of Asgard** holding your Gungnir. |
+| [Doctor Strange](Doctor-Strange) (3.6) | Craft the **Eye of Agamotto** (8 gold blocks round the **Time Stone** of a Sanctum Sanctorum) and, with no power, **hold right-click on it for 3 seconds**. You keep the Eye. |
+| [Hulk](Hulk) (3.6) | Craft a **Gamma Emitter** (iron blocks, lime stained glass, an emerald block and a redstone block), place it and right-click it; with no power, **stand in its green beam for 3 seconds**. |
 | [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once (since 3.4 with that hero's items), or make your own. |
 
 ## Step by step
@@ -164,6 +166,19 @@ All three are won in [Asgard](Asgard). Get there first: open the **Bifrost** (Mj
 
 A player with no power who beat Hela chooses: the Headdress makes him Hela, Gungnir and the throne make him Odin.
 
+### Doctor Strange (3.6)
+
+1. Find a **Sanctum Sanctorum** in the Overworld (`/locate structure enhanced:sanctum`). The **Time Stone** floats on a pedestal on its top floor, under a green light.
+2. Someone who may hold the Time Stone takes it (right-click the pedestal): a god (Thor, Loki, Heimdall, Odin, Hela), the Scarlet Witch, the Phoenix or a sorcerer (Billy, Agatha). A player with no power can't: the stone slips away from him.
+3. **Craft the Eye of Agamotto**: 8 gold blocks round the Time Stone. Give it to the friend who will be Strange.
+4. With **no power**, **hold right-click on the Eye for 3 seconds**: it opens, and you are Doctor Strange. The Eye is yours now. See [Doctor Strange](Doctor-Strange).
+
+### The Hulk (3.6)
+
+1. Craft a **Gamma Emitter**: iron blocks in the corners, lime stained glass at the sides, an emerald block in the middle, a redstone block at the bottom (see [Items and Crafting](Items-and-Crafting#gamma-emitter-36)).
+2. Place it, and **right-click it** (or power it with redstone). It warms up for 3 seconds, then a green beam 6 blocks long shines for 3 seconds.
+3. With **no power**, **stand in the beam** the whole time: you become Bruce Banner, and Hulk out at once. **N** changes you back and forth. See [Hulk](Hulk).
+
 ### A hero of your own
 
-In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty and, since 3.4, any of the 81 abilities of the mod's heroes (each with a strength from 1 to 10, within a budget of points), on your keys plain or with Sneak, with the heroes' moves, your colours, your own skin and extras like a cape, which everyone on the server sees. Since 3.4, **Choose a Hero** also gives you that hero's items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).
+In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty and, since 3.4, any of the abilities of the mod's heroes (111 since 3.6) and the six Infinity Stones (each with a strength from 1 to 10, within a budget of points), on your keys plain or with Sneak, with the heroes' moves, your colours, your own skin and extras like a cape, which everyone on the server sees. Since 3.4, **Choose a Hero** also gives you that hero's items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).

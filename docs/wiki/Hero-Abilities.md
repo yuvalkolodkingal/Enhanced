@@ -1,6 +1,6 @@
 # Heroes' Abilities
 
-Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes, and since 3.5 **99** of nineteen (Heimdall, Odin and Hela added), with every Sneak variant also [a card of its own](#the-sneak-variants-cards-of-their-own-35): **133 cards** in all. This page lists them all, hero by hero.
+Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes, since 3.5 **99** of nineteen (Heimdall, Odin and Hela added), and since 3.6 **111** of twenty-one (Doctor Strange and the Hulk added), with every Sneak variant also [a card of its own](#the-sneak-variants-cards-of-their-own-35): **154 cards** in all. Since 3.6 there are also six [stone rows](#the-infinity-stones-36), one for each Infinity Stone. This page lists them all, hero by hero.
 
 Hebrew: [עברית](Hero-Abilities-HE)
 
@@ -14,7 +14,7 @@ Hebrew: [עברית](Hero-Abilities-HE)
 * A **world power** may be switched off by a server (`custom_hero.worldPowers`).
 * Two abilities of **different heroes** that drive the same thing (one grip, one shield, one beam...) cannot be on the same hero; see [Powers that cannot go together](Hero-Creator#5-powers-that-cannot-go-together).
 
-The flying keys of the fliers (Magneto's, the Scarlet Witch's, Vision's, Billy's, Thor's, the Phoenix's, Ultron's, Apocalypse's and Agatha's) are not abilities here: your hero flies with the **Flight** power, and flies **like** one of them with the [flight style](Hero-Creator#7-animations-how-your-hero-moves). Billy's Build Magic is here as his (his rules); since 3.5 the Scarlet Witch's, with her rules, is [a card of its own](#the-sneak-variants-cards-of-their-own-35).
+The flying keys of the fliers (Magneto's, the Scarlet Witch's, Vision's, Billy's, Thor's, the Phoenix's, Ultron's, Apocalypse's and Agatha's) are not abilities here: your hero flies with the **Flight** power, and flies **like** one of them with the [flight style](Hero-Creator#7-animations-how-your-hero-moves). Billy's Build Magic is here as his (his rules); since 3.5 the Scarlet Witch's, with her rules, is [a card of its own](#the-sneak-variants-cards-of-their-own-35). Doctor Strange's Cloak of Levitation is not an ability either: a custom hero flies with **Flight**, in the flight style *Doctor Strange (the Cloak)*.
 
 ## The abilities
 
@@ -250,6 +250,45 @@ New in 3.5. See [Hela](Hela#becoming-hela-the-hero) for the full story of each a
 | **Death's Grasp** `hela.grasp` | **N** (hold) | — | 2 a point | Hold: projectiles crumble before your hand; a thrown Mjolnir is caught. |
 | **Hela's body** `hela.body` | no key (always on) | — | 1 a point | More health and armour; in Asgard, regeneration and stronger blows. |
 
+### Doctor Strange (6)
+
+New in 3.6. See [Doctor Strange](Doctor-Strange) for the full story of each ability. They make a hero a **sorcerer**.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Eldritch Whip** `strange.whip` | **R** (press) | Whip Grapple (press) | 2 a point | A whip of orange sparks lashes the creature in front and pulls it near: three lashes, the third lifts. Sneak: it pulls you to a block. |
+| **Shield of the Seraphim** `strange.shields` | **V** (hold) | Seraphim Dome (press) | 2 a point | Hold: a round mandala shield in front of you stops shots and beams. Sneak: a dome of mandalas round you and your friends. Shares the one shield. |
+| **Crimson Bands of Cyttorak** `strange.bands` | **B** (press) | Astral Projection (on/off) | 3 a point | Red bands bind the creature you look at. Sneak: your spirit steps out of your body and passes through walls. |
+| **Sling-Ring Portal** `strange.portal` | **N** (press) | Mirror Dimension (on/off) | 3 a point | A ring of sparks opens a portal here and its twin where you look. Sneak: the Mirror Dimension, where nothing breaks. A world power. |
+| **The Eye: Slow Time** `strange.eye` | **Y** (on/off) | The Eye: Rewind (press) | 3 a point | On **Y**, with the Eye of Agamotto in your inventory: time slows round you. Sneak: turn your own time back. Shares the slow time. |
+| **Strange's body** `strange.body` | no key (always on) | — | 1 a point | More health and armour; the Cloak catches your falls; spells cost less hunger. |
+
+### The Hulk (6)
+
+New in 3.6. See [Hulk](Hulk) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Hulk Smash** `hulk.smash` | **R** (press) | Grab Smash (press) | 2 a point | Both fists into the ground: a ring hurts everyone on the ground near you. Sneak: grab one and slam it left, right, left. |
+| **Thunder Clap** `hulk.clap` | **G** (press) | Roar (press) | 2 a point | A clap sends a shockwave that throws creatures far and puts out fire. Sneak: a roar that frightens them. |
+| **Super Leap** `hulk.leap` | **V** (press) | Bound (press) | 2 a point | A giant leap to where you look, landing with a blow. Sneak: a long low bound. |
+| **Boulder Throw** `hulk.boulder` | **B** (press) | Gamma Charge (press) | 2 a point | Tear up a boulder and hurl it. Sneak: charge shoulder first through everything in your way. |
+| **Human Form** `hulk.transform` | **N** (press) | Switch Hulk (press; the Hulk's own) | 5 (no slider) | For a custom hero: **N** turns every power off and shows your own skin, until **N** again. (The Hulk himself changes between Bruce Banner and the Hulk, and Sneak switches his two Hulks.) Shares the one shape. |
+| **The Hulk's body** `hulk.body` | no key (always on) | — | 2 a point | Huge (it changes your size), strong and hard to hurt; Rage makes the blows stronger. Shares the size. |
+
+## The Infinity Stones (3.6)
+
+Each Infinity Stone is a **stone row**: put it on any key, and Sneak + that key is its second power. A stone row works **only while your hero carries that stone and may use it**: the stone itself (only a god's ability lets a hero hold the Reality, Power and Soul Stones: see [Infinity Stones](Infinity-Stones#who-may-hold-a-stone)), a Gauntlet with it that he may wield, or its vessel (Loki's Scepter, the Tesseract, the Eye of Agamotto). Without it the key says "You do not carry the Mind Stone." The Time Stone answers only a sorcerer. The card shows **Needs the stone**. The numbers follow the stone's own (`[mind_stone]`...), its strength and `custom_hero.cooldownScale`. A server can switch them off (`custom_hero.stoneRows`).
+
+| Stone row (id) | Press | Sneak | Points | What it does |
+|---|---|---|---|---|
+| **Reality Stone** `stone.reality` | on/off | Transmute (press) | 2 a point | A switch: shots at you turn into bubbles. Sneak: the creature you look at turns to stone. |
+| **Mind Stone** `stone.mind` | hold | Mind Command (press) | 2 a point | Hold: the Mind Beam. Sneak: the creature you look at fights for you. Shares the continuous beam. |
+| **Time Stone** `stone.time` | on/off | Rewind (press) | 2 a point | Sorcerers only: time slows round you. Sneak: back 5 seconds. Shares the slow time. |
+| **Power Stone** `stone.power` | hold | Power Bolt (press) | 3 a point | Hold: the Purple Beam, with explosions. Sneak: a bolt that explodes. Shares the continuous beam. |
+| **Space Stone** `stone.space` | press | Realm Picker (press) | 2 a point | Step through a portal to where you look. Sneak: choose a world. A world power. |
+| **Soul Stone** `stone.soul` | hold | Soul Sight (press) | 2 a point | Hold: drain a soul. Sneak: see every soul near you. Shares the soul chain with Thanos's Soul Stone. |
+
 ## The Sneak variants: cards of their own (3.5)
 
 Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you can pick it without its ability ("all the abilities, like Billy's shield", as Eilon asked). Picked alone, it works on **any** key, plain or Sneak (it presses its ability's Sneak half for you). Picked with its ability, that ability keeps only its main action. It costs what its ability costs (and the two together count as one power), shares its colour, and is a world power when its ability is one. **Needs**: the ability it can't work without.
@@ -289,10 +328,19 @@ Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you
 | **Hex Mark (Agatha)** `agatha.hex_mark` | `agatha.purple_beam` | — | 2 a point | Mark the creature you look at with a purple rune, or glimpse a mind. |
 | **Ricochet Shot (Cyclops)** `cyclops.ricochet` | `cyclops.optic_blast` | — | 2 a point | A red bolt from your eyes that bounces off blocks to hit around corners. |
 | **Open Eyes (Cyclops)** `cyclops.open_eyes` | `cyclops.glasses` | `cyclops.glasses` | 3 a point | Open your eyes wide: a giant beam pours out until you shut them. Shares the continuous beam. |
+| **Whip Grapple (Doctor Strange)** `strange.whip_grapple` | `strange.whip` | — | 2 a point | The Eldritch Whip catches the block you look at and pulls you there. (3.6) |
+| **Seraphim Dome (Doctor Strange)** `strange.seraphim_dome` | `strange.shields` | — | 2 a point | A sphere of mandalas guards you and everyone near you. Shares the one shield. (3.6) |
+| **Astral Projection (Doctor Strange)** `strange.astral` | `strange.bands` | — | 3 a point | Your spirit leaves the body and passes through walls; press again to return. Shares the phasing. (3.6) |
+| **Mirror Dimension (Doctor Strange)** `strange.mirror` | `strange.portal` | — | 3 a point | A bubble where nothing in the real world breaks and your foes cannot leave. A world power. (3.6) |
+| **The Eye: Rewind (Doctor Strange)** `strange.eye_rewind` | `strange.eye` | — | 3 a point | With the Eye of Agamotto: turn your own time back a few seconds. (3.6) |
+| **Grab Smash (the Hulk)** `hulk.grab_smash` | `hulk.smash` | — | 2 a point | Grab the creature in front by the legs and slam it left, right, left. (3.6) |
+| **Roar (the Hulk)** `hulk.roar` | `hulk.clap` | — | 2 a point | A roar that frightens and weakens the creatures round you. (3.6) |
+| **Bound (the Hulk)** `hulk.bound` | `hulk.leap` | — | 2 a point | A long low leap forward, again and again. (3.6) |
+| **Gamma Charge (the Hulk)** `hulk.gamma_charge` | `hulk.boulder` | — | 2 a point | Charge shoulder first and throw aside everything in your path. (3.6) |
 
 **The Scarlet Witch's Build Magic** is a card of its own too (3.5): **Build Magic (Scarlet Witch)** `wanda.build_magic`, on **Y**, 10 points (no slider): build, copy and change the world with magic by the Scarlet Witch's rules (no meter, and her **Instant** switch). A hero may have hers or Billy's (`billy.build_magic`), not both.
 
-Heimdall's, Odin's and Hela's Sneak variants are not cards of their own: they come with their abilities (the tables above).
+Heimdall's, Odin's and Hela's Sneak variants are not cards of their own: they come with their abilities (the tables above). Doctor Strange's and the Hulk's are (3.6), except the Hulk's **Switch Hulk**, which is only the real Hulk's.
 
 ## Related
 

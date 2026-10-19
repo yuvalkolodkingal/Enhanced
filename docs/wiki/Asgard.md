@@ -1,6 +1,6 @@
 # Asgard
 
-**Asgard, the Realm Eternal** (3.5): a whole new world of gold, floating over a sea of stars, as in *Thor*, *The Dark World* and *Ragnarok*. Odin's palace with its spires, the throne room, the Rainbow Bridge and Heimdall's Observatory at its end, gardens, halls, houses, training grounds and waterfalls that pour off the edge of the world into space. It is a dimension of its own, and **only the Bifrost goes there**.
+**Asgard, the Realm Eternal** (3.5): a whole new world of gold, floating over a sea of stars, as in *Thor*, *The Dark World* and *Ragnarok*. Odin's palace with its spires, the throne room, the Rainbow Bridge and Heimdall's Observatory at its end, gardens, halls, houses, training grounds and waterfalls that pour off the edge of the world into space. It is a dimension of its own, and **only the Bifrost goes there** (and, since 3.6, the Space Stone).
 
 Hebrew: [עברית](Asgard-HE)
 
@@ -14,7 +14,9 @@ Hebrew: [עברית](Asgard-HE)
 
 ## Only the Bifrost
 
-No portal leads to Asgard or out of it. A Nether portal cannot be lit there, the [Book of the Vishanti](Sorcerers-Books) can neither save a place in Asgard nor travel to or from it ("The Vishanti cannot reach the Realm Eternal."), and the Tesseract and other mods' teleports are turned back: "Only the Bifrost reaches Asgard." (An operator's `/tp` and `/execute in` still work.)
+No portal leads to Asgard or out of it. A Nether portal cannot be lit there, the [Book of the Vishanti](Sorcerers-Books) can neither save a place in Asgard nor travel to or from it ("The Vishanti cannot reach the Realm Eternal."), and the Tesseract's own jump, a Sling Ring and other mods' teleports are turned back: "Only the Bifrost reaches Asgard." (An operator's `/tp` and `/execute in` still work.)
+
+**The one exception** (3.6) is the **Space Stone**: its **Realm Picker** (Sneak + right-click the stone, or the Tesseract) takes you to Heimdall's Observatory, and back out to the Overworld, the Nether or the End. A server can turn that off (`space_stone.reachesAsgard`). The Snap and the Mirror Dimension don't work in Asgard. See [Infinity Stones](Infinity-Stones#the-space-stone-blue).
 
 ### The keys of the Bifrost
 
@@ -75,7 +77,7 @@ You arrive facing north, toward the city. The map, from the edge of the world to
 | **The plaza** | A fountain, two shrines, market stalls and wells, at the foot of the palace steps. |
 | **Odin's palace** | Its golden spires (the tallest rises to about height 200), the east and west wings, the palace library and **Odin's chamber**, where Odin sleeps the Odinsleep. |
 | **The throne room** | A long hall of gold pillars with a seashell floor, the **Throne of Asgard** on its dais at the north end, **Hela's Seal** in the wall behind it, and murals of Asgard's peace on the ceiling that crack to show Hela's conquests when she comes. |
-| **Odin's vault** | Under the throne room, closed by a wall of gold until Hela first falls. **Gungnir's Stand** is inside. |
+| **Odin's vault** | Under the throne room, closed by a wall of gold until Hela first falls. **Gungnir's Stand** is inside, and since 3.6 the **Reality Stone** on its pedestal (the Aether, a red swirling orb). |
 | **Frigga's gardens** | West of the palace: pavilions, fountains, little bridges, golden-leaf and blossom trees, and waterways that fall into a deep chasm. |
 | **The training grounds** | East of the palace: the round sparring ring, weapon racks and a pavilion. Sif and the Warriors Three train here. |
 | **The Hall of Feasts** | East of the Golden Road, with its kitchen. Volstagg is usually eating. |

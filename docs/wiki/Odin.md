@@ -67,11 +67,15 @@ As long as he sleeps, Odin lies in his chamber; once Hela has fallen he is awake
 
 **There is only one Odin** (3.5.1): while any player online is Odin, the Odin of the city is away. When you are crowned he leaves in a shimmer of gold, and he comes back the same way once nobody is Odin. The Asgardians speak of you instead: Frigga, asked where Odin is, says "The Allfather has woken: Eilon sits the throne now", and Hogun, Fandral, the Einherjar and the citizens name you too. See [One of each character](Asgardians#one-of-each-character).
 
-The vault also keeps an empty place for something still to come.
+Since 3.6 the vault also holds the **Reality Stone**, a red swirling orb on a pedestal beside Gungnir's stand, set there when the vault opens (in an Asgard of 3.5 too). Only a god, the Scarlet Witch or the Phoenix can take it; see [Infinity Stones](Infinity-Stones).
 
 ## Odin in the Hero Creator
 
 His six rows are in the [Hero Creator](Hero-Creator) (ids `odin.gungnir`, `odin.odinforce`, `odin.banish`, `odin.ravens`, `odin.command`, `odin.body`; see [Heroes' Abilities](Hero-Abilities#odin-6)). A custom hero fires the Gungnir Blast from his bare hand; his Odinforce shares the one shield with the other heroes' shields; Banish and the Command are world powers. The ready-made *Odin-like* hero starts with Gungnir, the Odinforce and the ravens.
+
+## The Infinity Stones (3.6)
+
+Odin is a god: he may hold every [Infinity Stone](Infinity-Stones) bare and use it, wield a crafted Infinity Gauntlet and Snap, and seek the Soul Stone at [Vormir](Vormir). Only the **Time Stone** stays quiet in his hand: it answers only a sorcerer. The **Reality Stone** waits in his own vault, beside Gungnir's stand.
 
 ## Numbers you can change
 

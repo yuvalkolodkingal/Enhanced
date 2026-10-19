@@ -48,7 +48,7 @@ The same rule holds for any Asgardian whose hero can be played. Today that is Od
 | Valkyrie | *Tell me about Hela's army.* / *Who is Hela?* / *Can we trade?* | Bring friends to fight Hela; her trades |
 | Volstagg | *Tell me a joke!* / *Who are you three?* / *Can we trade?* | Six jokes; the Warriors Three; his trades |
 | Fandral | *Tell me about the city.* / *What is the Rainbow Bridge?* / *What is Gungnir?* | The city and its places |
-| Hogun | *What is in the vault?* / *Why is it sealed?* / *Who is Hela?* | The vault opens after Hela falls |
+| Hogun | *What is in the vault?* / *Why is it sealed?* / *Who is Hela?*; once Odin is awake, *And the red light by the wall?* (3.6): "Beside the spear sleeps the Aether, red as blood. Do not wake it. Leave it be." | The vault opens after Hela falls; the Reality Stone is in it |
 | Odin (awake) | *Tell me of Gungnir.* / *What do your ravens see?* / *Where is the vault?* | Gungnir and the throne |
 | Einherjar | *Which way should I go?* / *Any news?* | Directions to the places of the city; news |
 | Citizens | *Heard any rumours?* | Twenty rumours of the city |

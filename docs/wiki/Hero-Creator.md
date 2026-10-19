@@ -4,6 +4,16 @@ The **Hero Creator** is a Creative-mode item that opens a screen where you can *
 
 Hebrew: [עברית](Hero-Creator-HE)
 
+## What's new in 3.6
+
+* **Doctor Strange and the Hulk**: their twelve abilities are cards, and so are their Sneak variants (Whip Grapple, Seraphim Dome, Astral Projection, Mirror Dimension, the Eye's Rewind; Grab Smash, Roar, Bound, Gamma Charge). Ready-made heroes: *Doctor Strange-like* and *Hulk-like*.
+* **The stone rows**: each [Infinity Stone](Infinity-Stones) is a card of its own, `stone.reality` to `stone.soul`, that works while your hero carries that stone. See [below](#the-stone-rows-36).
+* **The Y key for the Eye**: Doctor Strange's Eye goes on **Y**, as Build Magic does. A hero may have one thing on **Y**: the Eye, or a Build Magic.
+* **The Human Form**: with the Hulk's `hulk.transform`, **N** turns all your powers off and shows your own skin until you press it again.
+* **Moves**: the flight style *Doctor Strange (the Cloak)* (and the Flight power's new option, **Cloak**), and the runs *Doctor Strange* and *The Hulk*.
+* **Roles**: Doctor Strange's abilities make a hero a **sorcerer**; a god's ability (the Scarlet Witch's Hex, Loki's Frost Giant, Thor's, the Phoenix's, Heimdall's, Odin's or Hela's body) lets him **hold the Infinity Stones**.
+* **Update the server and every player together:** 3.6 speaks network protocol **10**.
+
 ## What's new in 3.5
 
 * **Every ability in its own colour.** Every power card has a **Colour** button, and every key box a little swatch, that opens a **colour picker**: swatches, a hue and a brightness slider, a colour code, and a preview of your hero casting the power in that colour. Everything the power draws takes it: beams, shields, sparks, bolts, auras and glow. See [Colours](#colours-every-power-in-its-own-colour-35).
@@ -51,7 +61,8 @@ Choosing a hero also gives you **the items that becoming him the usual way leave
 | Cyclops | **Ruby-Quartz Glasses**, put on (they hold his eyes back, as for the real Cyclops) |
 | Thor | **Mjolnir**, already **claimed by you**; in the looks *Ragnarok*, *Love and Thunder* and *Love and Thunder, helmet* **Stormbreaker** instead |
 | Loki | **Loki's Scepter** |
-| Thanos | The **Infinity Gauntlet** |
+| Thanos | **Thanos's Gauntlet** (the Titan's Infinity Gauntlet) |
+| Doctor Strange (3.6) | An **Eye of Agamotto**, already **his**, and a **Sling Ring** |
 | Ultron | **Ultron's Core** |
 | Professor X | **Professor X's Wheelchair** |
 | Agatha | The **Darkhold** |
@@ -71,7 +82,7 @@ Your hero is saved with your player: it survives death and logging out, and if y
 
 The **Start** tab has ready-made heroes to begin with. Pick one and change anything you like; your hero is replaced only after you say yes.
 
-* **"Like" a hero** (19): *Magneto-like*, *Scarlet Witch-like*, *Quicksilver-like*, *Vision-like*, *Wiccan-like*, *Tommy-like*, *Loki-like*, *Thor-like*, *Phoenix-like*, *Spider-Man-like*, *Thanos-like*, *Ultron-like*, *Apocalypse-like*, *Agatha-like*, *Cyclops-like*, *Professor X-like* and (3.5) *Heimdall-like*, *Odin-like* and *Hela-like*: that hero's own abilities at strengths that fit, his colours, his look, his way of flying and running, and a fitting cape, hat, mask or aura (Thor-like has Thor's cape).
+* **"Like" a hero** (21): *Magneto-like*, *Scarlet Witch-like*, *Quicksilver-like*, *Vision-like*, *Wiccan-like*, *Tommy-like*, *Loki-like*, *Thor-like*, *Phoenix-like*, *Spider-Man-like*, *Thanos-like*, *Ultron-like*, *Apocalypse-like*, *Agatha-like*, *Cyclops-like*, *Professor X-like* (3.5) *Heimdall-like*, *Odin-like* and *Hela-like*, and (3.6) *Doctor Strange-like* and *Hulk-like*: that hero's own abilities at strengths that fit, his colours, his look, his way of flying and running, and a fitting cape, hat, mask or aura (Thor-like has Thor's cape).
 * **A kind of hero** (6): *Speedster*, *Flyer-Blaster*, *Tank*, *Mage*, *Mind Master* and *Elemental*, built from a mix of powers.
 * **Empty Hero**: start with nothing and pick every power yourself.
 
@@ -84,7 +95,8 @@ This is not the same as **Choose a Hero** on the first page: *Choose a Hero* mak
 The **Powers** tab lists everything you can pick:
 
 * the **thirty powers** of the catalogue ([table below](#the-thirty-powers)), and
-* the **abilities of the heroes** ([Heroes' Abilities](Hero-Abilities)): 81 in 3.4, and since 3.5 Heimdall's, Odin's and Hela's eighteen, and **every Sneak variant as a card of its own** (33 of them, and the Scarlet Witch's Build Magic): 133 in all.
+* the **abilities of the heroes** ([Heroes' Abilities](Hero-Abilities)): 81 in 3.4, and since 3.5 Heimdall's, Odin's and Hela's eighteen, and **every Sneak variant as a card of its own** (33 of them, and the Scarlet Witch's Build Magic): 133 in all; and since 3.6 Doctor Strange's and the Hulk's twelve, with nine more Sneak-variant cards: **154**.
+* the six **stone rows** (3.6), one for each Infinity Stone ([below](#the-stone-rows-36)).
 
 Chips at the top filter them: **Body**, **Move**, **Energy**, **Elements**, **Mind** and **Heroes** (a face for each hero: click one to see only his abilities). The **search box** finds a power by its name, its description, its id or its hero's name, in English or in Hebrew. Powers that do the same kind of thing are stacked on one card (all the beams, all the shields, all the telekinesis...) with a switch to pick which one.
 
@@ -126,25 +138,27 @@ Some powers drive the same thing inside your hero: there is only one telekinetic
 | What they share | Who drives it |
 |---|---|
 | **Telekinetic grip** (one thing held) | Magneto's Metal Telekinesis, Wanda's Chaos Telekinesis, Billy's Hex Telekinesis, the Phoenix's Telekinesis, the Telekinesis power |
-| **Shield** | Wanda's Chaos Shield, Billy's Freeze (only with its Sneak variant, the Hex Barrier) and the Hex Barrier card, Apocalypse's Golden Shield, Agatha's Witch's Shield, Odin's Odinforce (3.5) |
+| **Shield** | Wanda's Chaos Shield, Billy's Freeze (only with its Sneak variant, the Hex Barrier) and the Hex Barrier card, Apocalypse's Golden Shield, Agatha's Witch's Shield, Odin's Odinforce (3.5), Doctor Strange's Shield of the Seraphim (3.6) |
 | **Beam** (the hero beam) | Wanda's Chaos Beam, Vision's Mind Stone Beam, Ultron's Repulsor Fire |
-| **Beam** (the continuous beam) | Billy's Hex Beam, Agatha's Purple Beam, Cyclops's Optic Blast and Shut / Open Eyes, Energy Blast's Beam, Fire's Flamethrower, Water's Water Jet |
+| **Beam** (the continuous beam) | Billy's Hex Beam, Agatha's Purple Beam, Cyclops's Optic Blast and Shut / Open Eyes, Energy Blast's Beam, Fire's Flamethrower, Water's Water Jet, the Mind Stone's and the Power Stone's rows (3.6) |
 | **Metal charge** | Magneto's Iron Shrapnel Storm and Ultron's Repulsor Fire (Magneto's shrapnel charge is Ultron's plasma pool) |
-| **Shape** | Loki's Shapeshift, Shapeshifting's Creature |
-| **Size** | Shapeshifting's Grow and Shrink (no hero's ability changes your size any more, so today nothing clashes with them) |
+| **Shape** | Loki's Shapeshift, Shapeshifting's Creature, the Hulk's Human Form (3.6) |
+| **Size** | Shapeshifting's Grow and Shrink, the Hulk's body (3.6) |
 | **Super speed** | Quicksilver Time, Quicksilver's and Tommy's Super Speed, Super Speed's Super Run |
-| **Slow time** | Quicksilver Time, Tommy's Slow Time, Time's Slow Time |
-| **Phasing** | Vision's Phase, the Phasing power |
+| **Slow time** | Quicksilver Time, Tommy's Slow Time, Time's Slow Time, Doctor Strange's Eye, the Time Stone's row (3.6) |
+| **Phasing** | Vision's Phase, the Phasing power, Doctor Strange's Astral Projection (3.6) |
 | **Wall-crawling** | Spider-Man's Wall Crawl, the Wall-Crawling power |
 | **Weapon, Hex, drones, spear, the dead** | Thor's Mjolnir Throw; Wanda's Hex; Ultron's Upload and Sentry Army; Odin's Gungnir; Hela's Raise the Dead (each only one hero, so they never clash) |
 | **Build Magic** (3.5) | Billy's Build Magic, the Scarlet Witch's Build Magic: only one of the two |
+| **Soul chain** (3.6) | Thanos's Soul Stone (his Soul Drain) and the Soul Stone's row |
+| **The Y key** (3.6) | Billy's Build Magic, the Scarlet Witch's Build Magic, Doctor Strange's Eye: one thing on **Y** |
 
 So Magneto's Iron Shrapnel Storm and Ultron's Repulsor Fire cannot be on the same hero, and neither can Quicksilver's Super Speed and Tommy's; Billy's Hex Beam and Agatha's Purple Beam cannot either. But Wanda's Chaos Beam with Billy's Hex Beam can: they are different beams.
 
 Two more rules:
 
 * **Some abilities need another.** Quicksilver's Wall & Water Run needs his Super Speed or Quicksilver Time; some Sneak-variant cards need their ability (above).
-* **World powers.** Eleven abilities change the world around you: Wanda's **Hex**, Thor's **Bifrost**, Thanos's **Time Stone**, Ultron's **Upload** and **Sentry Army**, Professor X's **Take Over a Body**, and since 3.5 Heimdall's **Bifrost** and **Bifrost Strike**, Odin's **Banish** and **Allfather's Command**, and Hela's **Raise the Dead**. A server can switch them off for custom heroes (`custom_hero.worldPowers`), or switch off all the heroes' abilities (`custom_hero.heroModules`), or single ones (`custom_hero.disabledPowers`, for example `thor.lightning`, or `thor.*` for all of Thor's).
+* **World powers.** Thirteen abilities change the world around you: Wanda's **Hex**, Thor's **Bifrost**, Thanos's **Time Stone**, Ultron's **Upload** and **Sentry Army**, Professor X's **Take Over a Body**, since 3.5 Heimdall's **Bifrost** and **Bifrost Strike**, Odin's **Banish** and **Allfather's Command**, and Hela's **Raise the Dead**, and since 3.6 Doctor Strange's **Sling-Ring Portal** and the **Space Stone**'s row. A server can switch them off for custom heroes (`custom_hero.worldPowers`), or switch off all the heroes' abilities (`custom_hero.heroModules`), or single ones (`custom_hero.disabledPowers`, for example `thor.lightning`, or `thor.*` for all of Thor's).
 
 ### 6. Put them on the keys: plain or Sneak
 
@@ -155,7 +169,7 @@ The **Keys** tab has **ten boxes**: the five keys **R G V B N** (with the names 
 * **A power of the thirty** with several *press* options can have one option on the plain box and **another on its Sneak box** (for example Energy Blast's Bolts on **B** and its Burst on **Sneak + B**). That costs half the power again in points.
 * **Sneak + a key whose Sneak box is empty** does what the key does alone.
 * **One cooldown per key**, shared by its two boxes, as for every hero.
-* **Always-on powers** (the bodies, Durability, Night Vision...) need no box: they are listed under *With no key*. **Build Magic** (Billy's, or since 3.5 the Scarlet Witch's) is used with **Y** and needs no box either.
+* **Always-on powers** (the bodies, Durability, Night Vision...) need no box: they are listed under *With no key*. **Build Magic** (Billy's, or since 3.5 the Scarlet Witch's) is used with **Y** and needs no box either, and so is Doctor Strange's **Eye** (3.6; its Sneak variant, the Rewind, is **Sneak + Y**).
 * **A Sneak-variant card** (3.5) goes on any box, plain or Sneak; when its ability is on the same hero, that ability's own Sneak box is freed for it.
 * **Auto** lays out every power like a hero's: the heroes' abilities on the keys they have for their own hero (Thor's Lightning Beam on **V**...), the rest by kind (energy and elements on **R**, movement on **G**, mind on **V**, body on **B**), and what finds no key on a free Sneak box.
 * What you hold goes to the box that went down: let go of Sneak while holding a beam and the beam keeps going until you let go of the key.
@@ -167,8 +181,8 @@ The **Moves** tab chooses how your hero moves. **Automatic** is always there and
 
 * **Gestures.** Every power plays a move when you use it. A hero's ability plays **the hero's own move** (Thor's arm to the sky, Agatha's claw and pull, Cyclops's hand at the visor...); a power of the thirty plays a fitting one (Energy Blast's Bolts a hand blast, Earth's Tremor a two-fist stamp). For each of your ten boxes you can choose another one from the list, or **No move**: *Hand blast*, *Both palms push*, *Arm to the sky*, *Fist raised*, *Ground slam*, *Two-fist stamp*, *Fingers to the temple*, *Circle in the air*, *Flick*, *Spell hand*, *Scream*, *Wave of the arms*, *Claw and pull*, *Conductor*, *Trembling hand*, *Shoulder dash*, *Jabs*, *Rune circle*, *Thwip*, *Eye blast*, *Leap*, *Sonic boom*, *Gift*, *Psionic push*, *Pull back*, *Stamp of time*, *Rewind*, *Freeze*, *Mind grip*, *Overcharge*, *Push* and *Hex flick*. A borrowed move keeps its flourish: Thor's sparks, the Phoenix's motes, Thanos's ground ring.
 * **Stances.** While a power is **held** (a beam, a shield) or **switched on** (Density, the God of Thunder), your hero stands like the hero it comes from. You can choose another: while held, *Hand forward*, *Wanda's two hands*, *Vision's brow*, *Thor's call*, *Repulsor palm*, *Hand at the visor*, *Drain grip*, *Wanda's shield*, *Apocalypse's guard*, *Agatha's shield*, *Billy's barrier*, *Freezing hands*, *Gathering fire*, *Storm arms* or *Straining*; while on, *Regal field*, *Floating ghost*, *Heavy*, *Frost giant*, *Crackling*, *Listening*, *Reading minds*, *Spider surge*, *Menacing* or *Reality veil*; or **No stance**.
-* **Flight style**: *Plain* (the game's own flying), or the way a hero flies, with his take-off and his flight effects in your colours: *Magneto*, *Scarlet Witch*, *Vision*, *White Vision*, *Wiccan*, *Thor*, *Phoenix*, *Ultron*, *Apocalypse* or *Agatha*. Automatic takes the style of a flier whose ability you have (Thor, Wanda, Vision, Magneto, Billy, the Phoenix, Ultron, Apocalypse, Agatha, in that order), or else follows Flight's option (Hover flies like Vision, Jet like Ultron, Wings like the Phoenix). The style only changes how you look: your hero still flies only with the **Flight** power.
-* **Run**: how your hero walks and sprints: *Ordinary*, *Magneto*, *Scarlet Witch*, *Vision*, *White Vision*, *Wiccan*, *Loki*, *Thor*, *Phoenix*, *Spider-Man*, *Thanos*, *Ultron*, *Apocalypse*, *Cyclops*, *Professor X*, *In a wheelchair* or *Agatha*. Automatic takes the run of a hero whose ability you have (the speedsters have no run of their own here: their running is the *Super run*).
+* **Flight style**: *Plain* (the game's own flying), or the way a hero flies, with his take-off and his flight effects in your colours: *Magneto*, *Scarlet Witch*, *Vision*, *White Vision*, *Wiccan*, *Thor*, *Phoenix*, *Ultron*, *Apocalypse*, *Agatha* or (3.6) *Doctor Strange (the Cloak)*. Automatic takes the style of a flier whose ability you have (Thor, Wanda, Vision, Magneto, Billy, the Phoenix, Ultron, Apocalypse, Agatha, in that order), or else follows Flight's option (Hover flies like Vision, Jet like Ultron, Wings like the Phoenix, and since 3.6 Cloak like Doctor Strange). The style only changes how you look: your hero still flies only with the **Flight** power.
+* **Run**: how your hero walks and sprints: *Ordinary*, *Magneto*, *Scarlet Witch*, *Vision*, *White Vision*, *Wiccan*, *Loki*, *Thor*, *Phoenix*, *Spider-Man*, *Thanos*, *Ultron*, *Apocalypse*, *Cyclops*, *Professor X*, *In a wheelchair*, *Agatha*, or (3.6) *Doctor Strange* or *The Hulk*. Automatic takes the run of a hero whose ability you have (the speedsters have no run of their own here: their running is the *Super run*).
 * **Super run**: how your hero runs at super speed: *Quicksilver's Time*, *Quicksilver* or *Tommy*. Automatic runs like Tommy with Tommy's Super Speed, like Quicksilver in his Time while time is slowed, and like Quicksilver otherwise.
 * **Standing**: a stance for when your hero stands still on the ground: *Ordinary*, *Calm*, *Ready*, *Regal*, *Heavy*, *Giant*, *Crackling* or *Menacing*.
 * **First person.** You see your own hands do the moves too, in first person, even the moves you borrowed.
@@ -212,9 +226,21 @@ Most of the heroes' abilities need nothing but the ability. A few follow the rul
 * **Cyclops's abilities need no glasses** for a custom hero. *Shut Eyes* / *Open Eyes* does what taking the glasses off and putting them back on does for Cyclops: **Sneak** opens your eyes and the giant beam pours out; the key without Sneak shuts them.
 * **Spider-Man's Iron Spider Legs work in any look**, not only in the Iron Spider suit, and they make you an Iron Spider (metal) for Magneto. **J** switches Web Assist when you have his Web Zip.
 * **Wanda's Hex**: pressing its key again opens Hex Control, **Sneak** dissolves it, and **Z** gives orders to its Vision. It dissolves when you die, lose the power or remake your hero without it.
+* **Doctor Strange's abilities** (3.6) need nothing but **the Eye**: his Eye (on **Y**) works only with an **Eye of Agamotto** in your inventory, and shares the Time Stone's numbers. His Sling-Ring Portal (**N**) needs no ring. Choosing Doctor Strange gives you an Eye of your own and a Sling Ring.
+* **The Hulk's abilities** (3.6) work in any look. His **Human Form** (`hulk.transform`) is your **N**: every power off and your own skin, until **N** again (a custom hero has no Bruce Banner and no second Hulk). His body makes you bigger.
 * **Billy's Build Magic** is used with **Y**, by Billy's rules (the meter and the rank), without Wanda's Instant. **The Scarlet Witch's Build Magic** (3.5) is used with **Y** by hers: no meter, and her **Instant** switch. A hero may have only one of the two.
 
-**Roles come with the abilities.** A custom hero with an ability of the Scarlet Witch, Billy, Loki or Agatha (or the Magic power) is a **sorcerer**: he may read the Book of the Vishanti and the Darkhold, and a Hex's Runes hold him. Professor X's abilities (and the Telepathy and Mind Control powers) make him a **telepath** of the Professor's rank; any ability of Wanda or Billy, and the Phoenix's Mind Reading and Mind Control, a stronger one. Vision's Density and body and Ultron's body make him **metal** for Magneto. Agatha's and (3.5) Hela's abilities are **dark magic**; Odin's Odinforce makes him a **sorcerer**. The Phoenix's Body of Fire (and the Fire power) keep fire off him.
+**Roles come with the abilities.** A custom hero with an ability of the Scarlet Witch, Billy, Loki or Agatha (or the Magic power) is a **sorcerer**: he may read the Book of the Vishanti and the Darkhold, and a Hex's Runes hold him. Professor X's abilities (and the Telepathy and Mind Control powers) make him a **telepath** of the Professor's rank; any ability of Wanda or Billy, and the Phoenix's Mind Reading and Mind Control, a stronger one. Vision's Density and body and Ultron's body make him **metal** for Magneto. Agatha's and (3.5) Hela's abilities are **dark magic**; Odin's Odinforce makes him a **sorcerer**, and so (3.6) do Doctor Strange's abilities. A god's ability (3.6: the Scarlet Witch's Hex, Loki's Frost Giant, or Thor's, the Phoenix's, Heimdall's, Odin's or Hela's body) makes him a **Bearer** of the [Infinity Stones](Infinity-Stones#who-may-hold-a-stone): he may hold them bare (a server can switch that off: `stones.customBearers`). The Phoenix's Body of Fire (and the Fire power) keep fire off him.
+
+### The stone rows (3.6)
+
+Each Infinity Stone is a card on the Powers tab: **Reality Stone** `stone.reality`, **Mind Stone** `stone.mind`, **Time Stone** `stone.time`, **Power Stone** `stone.power`, **Space Stone** `stone.space` and **Soul Stone** `stone.soul` (the full table is on [Heroes' Abilities](Hero-Abilities#the-infinity-stones-36)). Put one on a key: the key is its first power, **Sneak +** the key its second, as the bare stone's right-click and Sneak + right-click.
+
+* **It works only while your hero carries that stone** and may use it: the stone itself in his inventory (a god's ability lets him hold the Reality, Power and Soul Stones; a sorcerer may hold the Time Stone), a Gauntlet with it that he may wield, or its vessel (Loki's Scepter for the Mind Stone, the Tesseract for the Space Stone, the Eye of Agamotto for the Time Stone). Otherwise: "You do not carry the Mind Stone." The card shows **Needs the stone**.
+* **The Time Stone answers only a sorcerer**, as always.
+* Its numbers are the stone's (the `[mind_stone]`... sections), changed by its strength and the server's `custom_hero.cooldownScale`. Its cooldown is the stone's own: the bare stone and the row share it.
+* The Space Stone's row is a world power. The Mind and Power Stones' beams share the continuous beam, the Time Stone the slow time, and the Soul Stone Thanos's soul chain ([step 5](#5-powers-that-cannot-go-together)).
+* A server can switch the stone rows off: `custom_hero.stoneRows`.
 
 **When the power ends.** When your hero dies, logs out, loses his power or is remade, every ability ends cleanly: beams, shields, switches, drones, the Hex.
 

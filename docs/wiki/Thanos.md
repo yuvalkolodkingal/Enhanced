@@ -101,9 +101,11 @@ Every move has a **tell**: a ring on the ground, a line from his hand, a glow. W
 
 The reward. **Hold right-click for three seconds with no power** to become Thanos. It is used up; a hero who tries is told that their body already holds a power, and nothing is used up. In Creative it is kept. Playing Thanos has its own section below.
 
+**Since 3.6** this reward is called **Thanos's Gauntlet**, and it is unchanged: its five stones are the Titan's own and can't be taken out. Every Gauntlet from an older world is one too. The **crafted Infinity Gauntlet** is another thing: six empty sockets for the real [Infinity Stones](Infinity-Stones#the-infinity-gauntlet), the Stone Wheel and the Snap.
+
 ## Playing Thanos
 
-Hold the Gauntlet for three seconds with no power: the five stones light on your left hand one after the other, each with its voice, a bolt of light (it hurts nobody) strikes where you stand, and you are **Thanos**. You keep the five stones the Mad Titan held, one on each key, and **never the Mind Stone and never the Snap**: it is in Loki's Scepter and in Vision's forehead, and the sixth socket of your Gauntlet stays dark for good. You do not fly. The Space Stone is how you move. You are a tank with a toolbox.
+Hold the Gauntlet for three seconds with no power: the five stones light on your left hand one after the other, each with its voice, a bolt of light (it hurts nobody) strikes where you stand, and you are **Thanos**. You keep the five stones the Mad Titan held, one on each key, and never the Mind Stone: it is in Loki's Scepter and in Vision's forehead, and the sixth socket of your Gauntlet stays dark for good. (Since 3.6 you may also wield a **crafted** [Infinity Gauntlet](Infinity-Stones#the-infinity-gauntlet) with real stones in it: with the Mind Stone in it you get its beam and its Command, and with all six you can **Snap**, at no cost to you. You can't hold a bare stone: you are not a god.) You do not fly. The Space Stone is how you move. You are a tank with a toolbox.
 
 ### The quick version
 
@@ -171,3 +173,4 @@ He walks heavily, and the ground shakes with the stride; he does not fly, so he 
 * **With PvP off** your Blast, Slam, Pull, Transmute, Drain and Lock do nothing to players ("PvP is off"); creatures are always valid.
 * **The Mad Titan** treats you as the nearest player. Your damage counts in his ledger. He is immune to your Transmute, Pull and Lock (bosses cannot be held), but your Blast and your Drain hurt him.
 * You never break a block, whatever the game rules say.
+* **The Mad Titan wants the stones** (3.6): from his second stone on he goes first for a fighter who carries a real Infinity Stone: "You carry something that is mine."

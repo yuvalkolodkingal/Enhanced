@@ -160,6 +160,10 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue and a deep
 
 *Thor* (2011 and *The Avengers*: black and silver armour with the six chest discs, red cape), *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder* (navy, gold and black armour, bare arms, long ash-blond hair swept back, a full beard, red cape), *Love and Thunder, helmet* (the same suit with the winged helmet of the New Asgard fight), *Mighty Thor* (Jane Foster), and *Your own skin*. Press **H** to switch. See [Looks](Looks).
 
+## The Infinity Stones (3.6)
+
+Thor is a god: he may hold every [Infinity Stone](Infinity-Stones) bare, take them from their pedestals, open the Orb, and use them (right-click; Sneak + right-click for the second power). He may wield a crafted Infinity Gauntlet with stones in it, and Snap. Only the **Time Stone** stays quiet in his hand: it answers only a sorcerer. As a god he may also seek the Soul Stone at [Vormir](Vormir).
+
 ## Numbers you can change
 
 Thor's flight speed, who is worthy of Mjolnir, whether Mjolnir is bound to its owner, the throw damage (Mjolnir and Stormbreaker), the throw range and recall range, the lightning beam's damage, range, how often it hits and hunger cost (and how much stronger it is with each weapon and as the God of Thunder), the cooldown of shattering Mjolnir and the damage of its fragments, how long Mjolnir pins someone down, the hunger cost of the God of Thunder and the Bifrost's cooldown are the `thor.*` options on [Server Configuration](Server-Configuration). Who travels with the Bifrost (3.5) is `bifrost.groupRadius` and `bifrost.sneakToStay`: see [the Bifrost](Server-Configuration#the-bifrost).

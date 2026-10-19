@@ -53,6 +53,10 @@ Her beam, her Drain and her runes are **dark magic** (the datapack tag `enhanced
 
 Press **H** to switch. See [Looks](Looks).
 
+## The Infinity Stones (3.6)
+
+Agatha is a sorceress: she may hold and use the **Time Stone** (Slow Time; Sneak: Rewind; on a crop it grows), and the **Eye of Agamotto** gives her the same powers. The other stones are too strong for her. The **Sling Ring** answers her too. See [Infinity Stones](Infinity-Stones) and [Doctor Strange](Doctor-Strange#the-eye-for-everyone-else).
+
 ## Numbers you can change
 
 Everything above is in the `[agatha]` section: the awakening (on or off, how long), her flight and health, the revenge, the beam (damage, range, rate, food), the Drain (reach, how long a hero is drained, damage, healing, cooldown, food, and since 3.5 whether only sorcerers can be drained), the shield (size, wind-up, time, strength, recharges, food) and the Rune Trap (reach, size, time, damage, cooldown, food). The hex mark, the mind glimpse and the poison use the `[darkhold]` numbers. See [Server Configuration](Server-Configuration#agatha-harkness).

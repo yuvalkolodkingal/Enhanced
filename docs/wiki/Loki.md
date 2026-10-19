@@ -107,6 +107,12 @@ Frost Giant is ability 5 in **every** look.
 
 Loki is a **sorcerer**, like the Scarlet Witch, Billy and Agatha: he can read the [Book of the Vishanti](Sorcerers-Books#the-book-of-the-vishanti) (save places and teleport to them, and raise a ward of **24 blocks** round his base that keeps out monsters, bosses and dark magic) and the [Darkhold](Sorcerers-Books#the-darkhold) (the purple beam, the hex mark and the mind glimpse). Being a sorcerer has a price: since 3.5 [Agatha's Power Drain](Agatha) can take his power (it takes only a witch's or a sorcerer's), and since 3.3, inside a Hex whose walls carry the [Hex Runes](Scarlet-Witch#hex-runes), he has no powers (his illusions dissolve, and his Vanish, his shape and the Frost Giant end).
 
+## The Infinity Stones (3.6)
+
+Loki is a god **and** a sorcerer: he may hold and use **all six** [Infinity Stones](Infinity-Stones), the Time Stone too, wield a crafted Infinity Gauntlet and Snap. The Eye of Agamotto and the Sling Ring answer him.
+
+**Loki's Scepter** is the Mind Stone's vessel (3.6): **Sneak + hold right-click** with nothing in the other hand fires the Mind Stone's **Mind Beam**, whoever holds it; **crafted alone** it gives the Mind Stone and an **Empty Scepter** (crafted together again, they make the Scepter); and a hit with it **turns a [Hydra soldier](Hydra-Soldiers)** to your side for a minute. Hydra soldiers never see Loki's illusions.
+
 ## Numbers you can change
 
 The dagger's damage, how long the Scepter confuses, and (3.5) his body are the Loki options: `loki.daggerDamage`, `loki.scepterConfusionTicks`, `loki.scepterNauseaTicks`, `loki.scepterSlownessTicks`, `loki.bodyHealthBonus` (10: 30 health in all), `loki.bodyArmor` (6) and `loki.bodyToughness` (2) on [Server Configuration](Server-Configuration#loki). The Tesseract's chances are in the loot modifiers (datapacks can change them), listed on [Items and Crafting](Items-and-Crafting).

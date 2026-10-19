@@ -2,7 +2,7 @@
 
 Every balance number of the mod lives in one file, **`world/serverconfig/enhanced-server.toml`** in the world (or server) folder. The mod creates it when the world is first loaded, with every option at its default, and syncs it to the clients. It is a plain text file: open it in any editor, change a value and restart the world or the server.
 
-The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes), the [Hero Creator](#the-hero-creator), and since 3.5 [Asgard](#asgard), [the Bifrost](#the-bifrost) and the [world's music](#music) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
+The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes), the [Hero Creator](#the-hero-creator), since 3.5 [Asgard](#asgard), [the Bifrost](#the-bifrost) and the [world's music](#music), and since 3.6 [the Infinity Stones](#the-infinity-stones-36), [the Soul Stone](#the-soul-stone-and-vormir), [the stone sites](#the-stone-sites), [Doctor Strange](#doctor-strange-the-eye-of-agamotto-and-the-sling-ring), [the Hulk](#the-hulk-and-the-gamma-emitter) and [the Hydra soldiers](#hydra-soldiers) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
 
 ```toml
 [scarlet_witch]
@@ -1157,6 +1157,312 @@ Two sections (3.5): `[hela_boss]` for the fight in Asgard's throne room and `[he
 | `hela.asgardFactor` | `1.25` | 1.0 to 5.0 | Hela's strength from Asgard: her damage is multiplied by this in Asgard. |
 | `hela.shatterMjolnir` | `true` | `true` or `false` | Death's Grasp catches and shatters a thrown Mjolnir. |
 
+## The Infinity Stones (3.6)
+
+Seven sections for the [Infinity Stones](Infinity-Stones): who may hold them, the Infinity Gauntlet and the Snap, and the numbers of each stone (the Soul Stone's are in [its own section](#the-soul-stone-and-vormir)). Every value is read when it is used.
+
+### `[stones]`: who may hold them, the burn and the ledger
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `stones.uniqueness` | `PLAYER` | `PLAYER`, `WORLD` or `UNLIMITED` | How many of each stone found in a place (the Reality, Time, Power and Soul Stones) there are: `PLAYER` (each player may take each once), `WORLD` (one of each in the whole world) or `UNLIMITED` (every place gives its stone every time). See [the ledger](Infinity-Stones#how-many-stones-the-ledger). |
+| `stones.graceSeconds` | `10` | 3 to 60 | Seconds a stone may stay in the inventory of one who may not hold it before it burns him and jumps out. |
+| `stones.handGraceFactor` | `3` | 1 to 10 | How many times faster the grace runs while the stone is held in a hand. |
+| `stones.rejectDamage` | `2.0` | 0.0 to 20.0 | Damage of a stone's burn when the grace runs out. It never kills: it leaves at least half a heart. |
+| `stones.customBearers` | `true` | `true` or `false` | A custom hero with a god's ability (the Scarlet Witch's Hex, Loki's Frost Giant, or Thor's, the Phoenix's, Heimdall's, Odin's or Hela's body) may hold the stones as a god does. |
+| `stones.visionHoldsMind` | `true` | `true` or `false` | Whether Vision may hold the Mind Stone (it is his own). |
+| `stones.sorcerersHoldTime` | `true` | `true` or `false` | Whether a sorcerer may hold the Time Stone. |
+| `stones.returnLost` | `true` | `true` or `false` | A lost stone (in the void, killed with `/kill`, lost with a sacrificed player's things) can be taken again: in `PLAYER` mode by the one who lost it, in `WORLD` mode from its places. |
+
+### `[gauntlet]`: the Infinity Gauntlet and the Snap
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `gauntlet.craftable` | `true` | `true` or `false` | Whether the empty Infinity Gauntlet can be crafted. |
+| `gauntlet.snapEnabled` | `true` | `true` or `false` | Whether the Snap works (all six stones in a Gauntlet): half of the hostile creatures near turn to dust. |
+| `gauntlet.snapRadius` | `64` | 8 to 256 | Radius (blocks) of the Snap. |
+| `gauntlet.snapFraction` | `0.5` | 0.0 to 1.0 | Fraction of the hostile creatures the Snap turns to dust. |
+| `gauntlet.snapCooldownTicks` | `24000` | 0 to 720000 | Ticks before a Gauntlet can snap again (24000 = 20 minutes). |
+| `gauntlet.snapHoldTicks` | `60` | 10 to 400 | Ticks the use is held (sneaking) for the Snap (60 = 3 seconds). |
+| `gauntlet.snapInAsgard` | `false` | `true` or `false` | Whether the Snap works in Asgard. |
+| `gauntlet.snapCostHealth` | `2.0` | 1.0 to 20.0 | Health a wielder other than Thanos is left with after the Snap. |
+| `gauntlet.mindForThanos` | `true` | `true` or `false` | Whether the hero Thanos gets the Mind Stone's powers from a Gauntlet he holds with it. |
+
+### `[reality_stone]`
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `reality_stone.radius` | `4.0` | 1.0 to 16.0 | Radius (blocks) in which projectiles heading for the holder turn to bubbles. |
+| `reality_stone.exhaustionPerBubble` | `0.5` | 0.0 to 10.0 | Food exhaustion each bubble costs. |
+| `reality_stone.bossRate` | `10` | 1 to 200 | In a boss arena, at most one bubble per this many ticks (10 = 0.5 seconds). |
+| `reality_stone.bossCost` | `3.0` | 1.0 to 20.0 | How many times the hunger a bubble costs in a boss arena. |
+| `reality_stone.transmuteRange` | `20` | 4 to 64 | Range (blocks) of the Transmute. |
+| `reality_stone.transmuteTicks` | `60` | 10 to 600 | Ticks a creature stays stone after the Transmute (60 = 3 seconds). |
+| `reality_stone.transmuteCooldown` | `240` | 0 to 72000 | Cooldown (ticks) of the Transmute (240 = 12 seconds). |
+| `reality_stone.illusionTicks` | `120` | 20 to 1200 | Ticks the Illusion lasts (120 = 6 seconds). |
+| `reality_stone.illusionCooldown` | `400` | 0 to 72000 | Cooldown (ticks) of the Illusion (400 = 20 seconds). |
+
+### `[mind_stone]`
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `mind_stone.beamDamage` | `4.0` | 0.0 to 100.0 | Damage of each hit of the Mind Beam (twice a second). |
+| `mind_stone.beamRange` | `32` | 4 to 128 | Range (blocks) of the Mind Beam. |
+| `mind_stone.beamMaxTicks` | `120` | 10 to 1200 | Longest (ticks) the Mind Beam can be held (120 = 6 seconds). |
+| `mind_stone.beamCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Mind Beam after it was held to the end (60 = 3 seconds). |
+| `mind_stone.confuseEvery` | `40` | 1 to 400 | The Mind Beam confuses the same target at most once per this many ticks (40 = 2 seconds). |
+| `mind_stone.commandRange` | `16` | 4 to 64 | Range (blocks) of the Mind Command. |
+| `mind_stone.commandTicks` | `400` | 20 to 6000 | Ticks a commanded creature fights for the holder (400 = 20 seconds). |
+| `mind_stone.commandCooldown` | `600` | 0 to 72000 | Cooldown (ticks) of the Mind Command (600 = 30 seconds). |
+| `mind_stone.exhaustionPerTick` | `0.03` | 0.0 to 1.0 | Food exhaustion per tick of the Mind Beam. |
+
+### `[time_stone]`
+
+These numbers are also those of the **Eye of Agamotto** and of Doctor Strange's **Y**.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `time_stone.slowRadius` | `12` | 2 to 64 | Radius (blocks) of the Slow Time zone round the holder. |
+| `time_stone.slowFactor` | `3` | 2 to 20 | How many times slower time runs in the zone. |
+| `time_stone.slowMaxTicks` | `200` | 20 to 2400 | Longest (ticks) Slow Time stays on (200 = 10 seconds). |
+| `time_stone.slowCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of Slow Time (200 = 10 seconds). |
+| `time_stone.bossFactorHalf` | `true` | `true` or `false` | Whether bosses are slowed at half the factor. |
+| `time_stone.rewindSeconds` | `5` | 2 to 30 | How far back (seconds) the Rewind goes. |
+| `time_stone.rewindCooldown` | `600` | 0 to 72000 | Cooldown (ticks) of the Rewind (600 = 30 seconds). |
+| `time_stone.cropMagic` | `true` | `true` or `false` | Whether the Time Stone grows (or, sneaking, un-grows) a crop, a sapling or a baby animal. |
+| `time_stone.cropCooldown` | `10` | 0 to 72000 | Cooldown (ticks) of the crop magic (10 = 0.5 seconds). |
+
+### `[power_stone]`
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `power_stone.beamDamage` | `4.0` | 0.0 to 100.0 | Damage per hit (every 10 ticks) of the Purple Beam. |
+| `power_stone.beamRange` | `32` | 4 to 128 | Range (blocks) of the Purple Beam. |
+| `power_stone.explodeEvery` | `10` | 1 to 200 | Ticks between two explosions at the end of the Purple Beam (10 = 0.5 seconds). |
+| `power_stone.explosionDamage` | `6.0` | 0.0 to 100.0 | Damage of each explosion at the end of the Purple Beam. |
+| `power_stone.explosionRadius` | `2.5` | 0.5 to 8.0 | Radius (blocks) of each explosion. |
+| `power_stone.terrainDamage` | `false` | `true` or `false` | Whether the explosions break blocks (also needs the gamerule mobGriefing, never in protected places). |
+| `power_stone.craterRadius` | `1.5` | 0.5 to 4.0 | Radius (blocks) of a crater when terrainDamage is on. |
+| `power_stone.beamMaxTicks` | `60` | 10 to 600 | Longest (ticks) the Purple Beam can be held before it overheats (60 = 3 seconds). |
+| `power_stone.overheatCooldown` | `140` | 0 to 72000 | Cooldown (ticks) after the Purple Beam overheats (140 = 7 seconds). |
+| `power_stone.releaseCooldown` | `60` | 0 to 72000 | Cooldown (ticks) after the Purple Beam is let go of early (60 = 3 seconds). |
+| `power_stone.boltDamage` | `12.0` | 0.0 to 100.0 | Damage of the Power Bolt. |
+| `power_stone.boltSplash` | `6.0` | 0.0 to 100.0 | Splash damage of the Power Bolt. |
+| `power_stone.boltRange` | `28` | 4 to 128 | Range (blocks) of the Power Bolt. |
+| `power_stone.boltCooldown` | `70` | 0 to 72000 | Cooldown (ticks) of the Power Bolt (70 = 3.5 seconds). |
+
+### `[space_stone]`
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `space_stone.stepRange` | `64` | 4 to 256 | Range (blocks) of the Portal Step. |
+| `space_stone.stepCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Portal Step (60 = 3 seconds). |
+| `space_stone.realmCooldown` | `600` | 0 to 72000 | Cooldown (ticks) of the Realm Picker (600 = 30 seconds). |
+| `space_stone.reachesAsgard` | `true` | `true` or `false` | Whether the Space Stone reaches Asgard (the one exception to "only the Bifrost"). |
+| `space_stone.netherSearch` | `32` | 4 to 128 | Radius (blocks) searched for safe ground on arriving in the Nether. |
+| `space_stone.endArrivalX` | `100` | 0 to 1000 | X of the arrival on the End's main island (Z 0). |
+| `space_stone.arrivalResistanceTicks` | `40` | 0 to 600 | Ticks of Resistance V on arriving in a realm (40 = 2 seconds). |
+
+## The Soul Stone and Vormir
+
+Section `[soul_stone]` (3.6): the sacrifice at the Vormir Cliff (see [Vormir](Vormir)) and the Soul Stone's powers.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `soul_stone.enabled` | `true` | `true` or `false` | Whether the Vormir Cliff gives the Soul Stone for a sacrifice. |
+| `soul_stone.playerSacrifice` | `true` | `true` or `false` | Whether a player can be the sacrifice (works only where PvP is on). |
+| `soul_stone.petSacrifice` | `true` | `true` or `false` | Whether the seeker's own pet can be the sacrifice. |
+| `soul_stone.destroyItems` | `true` | `true` or `false` | Whether a sacrificed player loses all his items (his ender chest is never touched). |
+| `soul_stone.removePower` | `true` | `true` or `false` | Whether a sacrificed player loses his power. |
+| `soul_stone.friendRule` | `ANY` | `ANY` or `TEAM` | Who is a friend: `ANY` other player (the default: PvP and the cliff's edge make it deliberate) or only a `TEAM` mate (the same scoreboard team). |
+| `soul_stone.onePer` | `PLAYER` | `PLAYER`, `WORLD` or `UNLIMITED` | How many Soul Stones: `PLAYER` (each player once), `WORLD` (one in the whole world) or `UNLIMITED`. |
+| `soul_stone.pushWindowTicks` | `100` | 20 to 400 | Ticks before the victim left the edge in which the seeker's push counts (100 = 5 seconds). |
+| `soul_stone.minFall` | `30` | 10 to 100 | The shortest fall (blocks) that counts. |
+| `soul_stone.deathWindowTicks` | `200` | 20 to 1200 | Ticks after leaving the edge in which the death must come (200 = 10 seconds). |
+| `soul_stone.drainDamagePerSecond` | `6.0` | 0.0 to 100.0 | Damage per second of the Soul Drain. |
+| `soul_stone.drainRange` | `16` | 4 to 64 | Range (blocks) of the Soul Drain. |
+| `soul_stone.drainHealFraction` | `0.5` | 0.0 to 1.0 | Fraction of the drained health the holder gets back. |
+| `soul_stone.drainCooldown` | `40` | 0 to 72000 | Cooldown (ticks) after the Soul Drain ends (40 = 2 seconds). |
+| `soul_stone.sightRange` | `32` | 4 to 128 | Range (blocks) of the Soul Sight. |
+| `soul_stone.sightTicks` | `160` | 20 to 1200 | Ticks the Soul Sight lasts (160 = 8 seconds). |
+| `soul_stone.sightCooldown` | `400` | 0 to 72000 | Cooldown (ticks) of the Soul Sight (400 = 20 seconds). |
+
+## The stone sites
+
+Section `[stone_sites]` (3.6): the four new structures of the stones ([Structures](Structures#the-stone-sites-36)). Each one only stops **new** sites: those already built stay.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `stone_sites.sanctums` | `true` | `true` or `false` | Whether new Sanctums Sanctorum generate (the Time Stone's site). |
+| `stone_sites.avengersTowers` | `true` | `true` or `false` | Whether new Avengers Towers generate (the Tesseract's site). |
+| `stone_sites.endTunnels` | `true` | `true` or `false` | Whether new End tunnels generate (the Power Stone's site). |
+| `stone_sites.vormirCliffs` | `true` | `true` or `false` | Whether new Vormir Cliffs generate in the Nether (the Soul Stone's site). |
+
+## Doctor Strange, the Eye of Agamotto and the Sling Ring
+
+Sections `[doctor_strange]`, `[eye_of_agamotto]` and `[sling_ring]` (3.6). The page is [Doctor Strange](Doctor-Strange). The Eye's Slow Time and Rewind use the Time Stone's numbers (`[time_stone]`, [above](#the-infinity-stones-36)).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `doctor_strange.flightSpeed` | `0.06` | 0.01 to 0.5 | Flight speed on the Cloak of Levitation (Creative flight is 0.05). |
+| `doctor_strange.whipDamage1` | `7.0` | 0.0 to 100.0 | Damage of the first lash of the Eldritch Whip. |
+| `doctor_strange.whipDamage2` | `7.0` | 0.0 to 100.0 | Damage of the second lash. |
+| `doctor_strange.whipDamage3` | `10.0` | 0.0 to 100.0 | Damage of the third lash (it wraps and lifts). |
+| `doctor_strange.whipReach` | `8.0` | 2.0 to 32.0 | Reach (blocks) of the Eldritch Whip. |
+| `doctor_strange.grappleRange` | `24` | 4 to 64 | Range (blocks) of the Whip Grapple. |
+| `doctor_strange.grappleCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Whip Grapple (60 = 3 seconds). |
+| `doctor_strange.shieldSeconds` | `10` | 1 to 120 | Longest (seconds) the Shield of the Seraphim is held. |
+| `doctor_strange.shieldCooldown` | `120` | 0 to 72000 | Cooldown (ticks) of the Shield of the Seraphim (120 = 6 seconds). |
+| `doctor_strange.domeSeconds` | `6` | 1 to 60 | Seconds the Seraphim Dome stands. |
+| `doctor_strange.domeRadius` | `4.0` | 1.0 to 16.0 | Radius (blocks) of the Seraphim Dome. |
+| `doctor_strange.domeCooldown` | `400` | 0 to 72000 | Cooldown (ticks) of the Seraphim Dome (400 = 20 seconds). |
+| `doctor_strange.bandsRange` | `20` | 4 to 64 | Range (blocks) of the Crimson Bands of Cyttorak. |
+| `doctor_strange.bandsTicks` | `80` | 10 to 600 | Ticks the Crimson Bands hold a creature (80 = 4 seconds). |
+| `doctor_strange.bandsBossTicks` | `20` | 0 to 600 | Ticks the Crimson Bands hold a boss (20 = 1 second). |
+| `doctor_strange.bandsCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of the Crimson Bands (200 = 10 seconds). |
+| `doctor_strange.astralSeconds` | `30` | 5 to 300 | Longest (seconds) the Astral Projection lasts. |
+| `doctor_strange.astralRange` | `64` | 8 to 256 | How far (blocks) the spirit may go from the body. |
+| `doctor_strange.astralCooldown` | `300` | 0 to 72000 | Cooldown (ticks) of the Astral Projection (300 = 15 seconds). |
+| `doctor_strange.portalRange` | `64` | 4 to 256 | Range (blocks) of the Sling-Ring Portal's far side. |
+| `doctor_strange.portalSeconds` | `8` | 1 to 60 | Seconds a pair of portals stays open. |
+| `doctor_strange.portalCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Sling-Ring Portal (100 = 5 seconds). |
+| `doctor_strange.mirrorRadius` | `14` | 4 to 48 | Radius (blocks) of the Mirror Dimension. |
+| `doctor_strange.mirrorSeconds` | `20` | 5 to 120 | Seconds the Mirror Dimension lasts. |
+| `doctor_strange.mirrorCooldown` | `1200` | 0 to 72000 | Cooldown (ticks) of the Mirror Dimension (1200 = 1 minute). |
+| `doctor_strange.mirrorDamageBonus` | `0.2` | 0.0 to 2.0 | How much more his spells hurt inside the Mirror Dimension (0.2: +20%). |
+| `doctor_strange.healthBonus` | `6.0` | 0.0 to 40.0 | Health his body adds. |
+| `doctor_strange.armorBonus` | `2.0` | 0.0 to 20.0 | Armour his body adds. |
+| `doctor_strange.safeFall` | `12.0` | 0.0 to 64.0 | Falls (blocks) the Cloak catches without damage. |
+| `doctor_strange.wardRadius` | `32` | 0 to 128 | Radius of the ward he raises with the Book of the Vishanti (he is a sorcerer; the Scarlet Witch's number). |
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `eye_of_agamotto.awakenTicks` | `60` | 10 to 400 | Ticks a powerless player holds the Eye to become Doctor Strange (60 = 3 seconds). |
+| `eye_of_agamotto.ownerOnly` | `true` | `true` or `false` | Whether an Eye bound to a Doctor Strange awakens nobody else while he is one. |
+| `eye_of_agamotto.nonSorcererMessage` | `true` | `true` or `false` | Whether a non-sorcerer is told that the Eye stays closed. |
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `sling_ring.places` | `8` | 1 to 16 | How many places a Sling Ring keeps. |
+| `sling_ring.cooldown` | `200` | 0 to 72000 | Cooldown (ticks) of the Sling Ring's portal to a place (200 = 10 seconds). |
+| `sling_ring.crossDimension` | `true` | `true` or `false` | Whether the Sling Ring opens a portal to a place in another dimension (never Asgard). |
+
+## The Hulk and the Gamma Emitter
+
+Sections `[hulk]` and `[gamma]` (3.6). The page is [Hulk](Hulk). Every damage of the Brand New Day Hulk is multiplied by `hulk.bndDamageFactor`, and his rage adds up to `hulk.rageDamageBonus` more.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `hulk.blockBreaking` | `SOFT` | `NONE`, `SOFT` or `ALL` | What the Hulk breaks: `NONE`, `SOFT` (glass, leaves, snow, ice, flowers, grass, vines, cobwebs; never doors, crops or beds) or `ALL` (also small craters in dirt, sand, stone and wood). |
+| `hulk.needsMobGriefing` | `true` | `true` or `false` | Whether every block the Hulk breaks also needs the gamerule mobGriefing. |
+| `hulk.healthBonus` | `20.0` | 0.0 to 200.0 | Health the Hulk's body adds. |
+| `hulk.armorBonus` | `8.0` | 0.0 to 30.0 | Armour the Hulk's body adds. |
+| `hulk.toughnessBonus` | `4.0` | 0.0 to 20.0 | Armour toughness the Hulk's body adds. |
+| `hulk.knockbackResistance` | `0.9` | 0.0 to 1.0 | Knockback resistance of the Hulk. |
+| `hulk.attackBonus` | `7.0` | 0.0 to 100.0 | Attack damage the Hulk's fists add. |
+| `hulk.attackKnockback` | `1.5` | 0.0 to 10.0 | Attack knockback the Hulk's fists add. |
+| `hulk.scaleRagnarok` | `0.5` | 0.0 to 1.5 | How much bigger the Ragnarok Hulk is (0.5: x1.5). |
+| `hulk.scaleBrandNewDay` | `0.75` | 0.0 to 1.5 | How much bigger the Brand New Day Hulk is (0.75: x1.75). |
+| `hulk.bndDamageFactor` | `1.15` | 1.0 to 2.0 | Every damage of the Brand New Day Hulk is multiplied by this. |
+| `hulk.reachRagnarok` | `1.5` | 0.0 to 6.0 | Reach the Ragnarok Hulk's long arms add. |
+| `hulk.reachBrandNewDay` | `2.0` | 0.0 to 6.0 | Reach the Brand New Day Hulk's long arms add. |
+| `hulk.jumpBonus` | `0.5` | 0.0 to 2.0 | Jump strength the Hulk adds (his giant jumps). |
+| `hulk.safeFall` | `24.0` | 0.0 to 256.0 | Safe fall distance the Hulk adds. |
+| `hulk.stepBonus` | `0.6` | 0.0 to 2.0 | Step height the Hulk adds. |
+| `hulk.speedBonus` | `0.15` | 0.0 to 1.0 | Movement speed the Hulk adds (0.15: +15%). |
+| `hulk.breakSpeedFactor` | `4.0` | 1.0 to 20.0 | How many times faster the Hulk breaks blocks by hand. |
+| `hulk.regenPerSecond` | `0.35` | 0.0 to 10.0 | Health the Hulk heals per second when not hurt for 5 seconds. |
+| `hulk.exhaustionFactor` | `1.5` | 1.0 to 5.0 | How many times hungrier the Hulk gets. |
+| `hulk.smashDamage` | `7.0` | 0.0 to 100.0 | Damage of Hulk Smash to everyone on the ground near. |
+| `hulk.smashRadius` | `6` | 1 to 32 | Radius (blocks) of Hulk Smash. |
+| `hulk.smashCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of Hulk Smash (60 = 3 seconds). |
+| `hulk.grabDamage1` | `4.0` | 0.0 to 100.0 | Damage of the first slam of the Grab Smash. |
+| `hulk.grabDamage2` | `4.0` | 0.0 to 100.0 | Damage of the second slam. |
+| `hulk.grabDamage3` | `6.0` | 0.0 to 100.0 | Damage of the third slam. |
+| `hulk.grabBossPunch` | `8.0` | 0.0 to 100.0 | Damage of the one heavy punch a boss or a grab-immune creature gets instead. |
+| `hulk.grabCooldown` | `160` | 0 to 72000 | Cooldown (ticks) of the Grab Smash (160 = 8 seconds). |
+| `hulk.clapDamage` | `6.0` | 0.0 to 100.0 | Damage of the Thunder Clap. |
+| `hulk.clapLength` | `14` | 2 to 64 | Length (blocks) of the Thunder Clap's shockwave. |
+| `hulk.clapAngle` | `50` | 10 to 180 | Width (degrees) of the Thunder Clap's cone. |
+| `hulk.clapKnockback` | `3.0` | 0.0 to 10.0 | How far the Thunder Clap throws. |
+| `hulk.clapExtinguishes` | `true` | `true` or `false` | Whether the Thunder Clap puts out fire. |
+| `hulk.clapCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Thunder Clap (100 = 5 seconds). |
+| `hulk.roarRadius` | `12` | 2 to 64 | Radius (blocks) of the Roar. |
+| `hulk.roarFrightTicks` | `80` | 0 to 1200 | Ticks hostile creatures stay frightened by the Roar (80 = 4 seconds). |
+| `hulk.roarWeaknessTicks` | `160` | 0 to 1200 | Ticks of Weakness the Roar gives (160 = 8 seconds). |
+| `hulk.roarCooldown` | `300` | 0 to 72000 | Cooldown (ticks) of the Roar (300 = 15 seconds). |
+| `hulk.leapDamage` | `6.0` | 0.0 to 100.0 | Damage where the Super Leap lands. |
+| `hulk.leapRadius` | `4` | 1 to 16 | Radius (blocks) of the Super Leap's landing. |
+| `hulk.leapRange` | `48` | 8 to 128 | Range (blocks) of the Super Leap. |
+| `hulk.leapCooldown` | `120` | 0 to 72000 | Cooldown (ticks) of the Super Leap (120 = 6 seconds). |
+| `hulk.boundDistance` | `24` | 4 to 64 | Distance (blocks) of the Bound. |
+| `hulk.boundCooldown` | `30` | 0 to 72000 | Cooldown (ticks) of the Bound (30 = 1.5 seconds). |
+| `hulk.boulderDamage` | `8.0` | 0.0 to 100.0 | Damage of the boulder to the creature it hits. |
+| `hulk.boulderSplash` | `4.0` | 0.0 to 100.0 | Splash damage of the boulder. |
+| `hulk.boulderCooldown` | `80` | 0 to 72000 | Cooldown (ticks) of the Boulder Throw (80 = 4 seconds). |
+| `hulk.chargeDamage` | `6.0` | 0.0 to 100.0 | Damage of the Gamma Charge. |
+| `hulk.chargeDistance` | `12` | 2 to 48 | Distance (blocks) of the Gamma Charge. |
+| `hulk.chargeCooldown` | `140` | 0 to 72000 | Cooldown (ticks) of the Gamma Charge (140 = 7 seconds). |
+| `hulk.transformTicks` | `40` | 1 to 200 | Ticks the change between Bruce Banner and the Hulk takes (40 = 2 seconds). |
+| `hulk.transformCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Transform (100 = 5 seconds). |
+| `hulk.switchCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of Switch Hulk (40 = 2 seconds). |
+| `hulk.rage` | `true` | `true` or `false` | Whether the Hulk has his Rage meter. |
+| `hulk.rageDamageBonus` | `0.3` | 0.0 to 2.0 | The most the Rage adds to his damage (0.3: +30%). |
+| `hulk.bannerAngerTransform` | `true` | `true` or `false` | Whether Bruce Banner Hulks out by himself when angry. |
+| `hulk.bannerAngerPerHeart` | `10` | 0 to 100 | Anger Banner gains per heart of damage. |
+| `hulk.bannerLowHealthTransform` | `true` | `true` or `false` | Whether Banner gets much angrier below 4 health (the Hulk protects Banner). |
+| `hulk.wieldsGauntlet` | `true` | `true` or `false` | Whether the Hulk may wield a filled Infinity Gauntlet and Snap (Endgame). |
+| `hulk.armBurnedSeconds` | `600` | 0 to 7200 | Seconds the Hulk's arm stays burned after his Snap. |
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `gamma.emitterCraftable` | `true` | `true` or `false` | Whether the Gamma Emitter can be crafted. |
+| `gamma.warmupTicks` | `60` | 0 to 400 | Ticks the Gamma Emitter warms up before its beam (60 = 3 seconds). |
+| `gamma.exposureTicks` | `60` | 1 to 400 | Ticks a powerless player stands in the beam to become the Hulk (60 = 3 seconds). |
+| `gamma.beamTicks` | `60` | 1 to 400 | Ticks the beam lasts (60 = 3 seconds). |
+| `gamma.beamLength` | `6` | 1 to 16 | Length (blocks) of the beam. |
+| `gamma.emitterCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of the Gamma Emitter (200 = 10 seconds). |
+| `gamma.healsHulk` | `true` | `true` or `false` | Whether the beam heals a Hulk in it. |
+| `gamma.healPerSecond` | `2.0` | 0.0 to 20.0 | Health per second the beam gives a Hulk. |
+
+## Hydra soldiers
+
+Section `[hydra]` (3.6). The page is [Hydra Soldiers](Hydra-Soldiers).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `hydra.enabled` | `true` | `true` or `false` | Whether Hydra soldiers guard the Hydra outposts (false stops new ones; those there stay). |
+| `hydra.garrisonSize` | `9` | 0 to 14 | Posts of an outpost's garrison. |
+| `hydra.respawn` | `DAYS` | `NEVER`, `DAYS` or `ALWAYS` | When a beaten garrison comes back: `NEVER`, `DAYS` (after `respawnDays`, while nobody is near) or `ALWAYS`. |
+| `hydra.respawnDays` | `3` | 1 to 100 | Minecraft days before a dead soldier's post fills again (with `respawn` = `DAYS`). |
+| `hydra.activateRadius` | `64` | 16 to 256 | A garrison is filled while a player is within this many blocks. |
+| `hydra.leashRadius` | `48` | 8 to 128 | The farthest (blocks) a soldier goes from his outpost. |
+| `hydra.maxPerOutpost` | `14` | 0 to 64 | The most Hydra alive at one outpost (posts and reinforcements). |
+| `hydra.maxLoaded` | `80` | 0 to 1000 | The most Hydra in one dimension. |
+| `hydra.alarm` | `true` | `true` or `false` | Whether Hydra raises the alarm and calls reinforcements. |
+| `hydra.alarmTicks` | `600` | 20 to 12000 | Ticks the alarm sounds (600 = 30 seconds). |
+| `hydra.reinforcements` | `4` | 0 to 8 | Soldiers each wave of reinforcements brings. |
+| `hydra.maxAlarmsPerDay` | `2` | 0 to 24 | The most waves of reinforcements per outpost per in-game day. |
+| `hydra.sightRange` | `24` | 4 to 64 | How far (blocks) a soldier sees. |
+| `hydra.sneakFactor` | `0.5` | 0.0 to 1.0 | How much of his sight a sneaking intruder leaves him. |
+| `hydra.rifleDamage` | `4.0` | 0.0 to 100.0 | Damage of each bolt of a rifleman's burst. |
+| `hydra.burstShots` | `3` | 1 to 10 | Bolts in a burst. |
+| `hydra.burstCooldown` | `50` | 5 to 400 | Ticks between two bursts (50 = 2.5 seconds). |
+| `hydra.sniperDamage` | `8.0` | 0.0 to 100.0 | Damage of the sniper's bolt. |
+| `hydra.sniperRange` | `40` | 8 to 128 | Range (blocks) of the sniper. |
+| `hydra.sniperAimTicks` | `30` | 0 to 200 | Ticks the sniper aims (his red laser shows) before he fires (30 = 1.5 seconds). |
+| `hydra.batonDamage` | `6.0` | 0.0 to 100.0 | Damage of the enforcer's stun baton. |
+| `hydra.pistolDamage` | `3.0` | 0.0 to 100.0 | Damage of the officer's energy pistol. |
+| `hydra.boltSpeed` | `2.2` | 0.2 to 8.0 | Speed (blocks per tick) of a Hydra bolt. |
+| `hydra.scepterTurns` | `true` | `true` or `false` | Whether a hit of Loki's Scepter turns a Hydra soldier to the hitter's side. |
+| `hydra.scepterTurnTicks` | `1200` | 20 to 24000 | Ticks a turned soldier fights for the hitter (an officer half) (1200 = 1 minute). |
+| `hydra.blasterEnabled` | `true` | `true` or `false` | Whether players can use the Hydra blaster. |
+| `hydra.blasterDamage` | `5.0` | 0.0 to 100.0 | Damage of the Hydra blaster's bolt. |
+| `hydra.blasterCooldown` | `20` | 0 to 1200 | Cooldown (ticks) of the Hydra blaster (20 = 1 second). |
+| `hydra.blasterDrop` | `0.1` | 0.0 to 1.0 | Chance an officer drops a Hydra blaster. |
+| `hydra.intelMapDrop` | `0.25` | 0.0 to 1.0 | Chance an officer drops Hydra intel (a map to an Avengers Tower). |
+| `hydra.energyCellDrop` | `0.2` | 0.0 to 1.0 | Chance a rifleman drops an energy cell. |
+
 ## Music
 
 Section `[music]` (3.5): [a world's own music](Music#a-worlds-own-music-servers), the songs a server owner puts in `<world>/serverconfig/enhanced/music/` to replace the Walkman songs and the Witches' Road for every player.
@@ -1194,11 +1500,12 @@ Section `[custom_hero]` (3.3; five options added in 3.4). The page is [Hero Crea
 | `custom_hero.suppressSeconds` | `8` | 1 to 120 | Scales how long Power Absorption takes another hero's powers away (PvP only): at the default 8, from 3 seconds (strength 1) to 12 (strength 10); another value scales them by it / 8. |
 | `custom_hero.blockChanges` | `false` | `true` or `false` | Custom powers may change blocks: the Sonic Scream shatters glass (doors, levers and frozen water are always allowed, and every change still asks the claims, spawn protection and boss arenas). |
 | `custom_hero.weatherChangesWorld` | `true` | `true` or `false` | Weather Control's "cycle" changes the world's weather (false: it only says it cannot). |
-| `custom_hero.heroModules` | `true` | `true` or `false` | 3.4: a custom hero may take the abilities of the mod's own heroes (Thor's lightning, Agatha's shield...; the [81 abilities](Hero-Abilities)). False: only the thirty powers, and a hero file's abilities are left out with a note. |
-| `custom_hero.worldPowers` | `true` | `true` or `false` | 3.4: a custom hero may take the heroes' world-scale abilities: the Hex, the Bifrost, Thanos's Time Stone, Ultron's Upload and Sentry Army, Professor X's Take Over a Body. |
+| `custom_hero.heroModules` | `true` | `true` or `false` | 3.4: a custom hero may take the abilities of the mod's own heroes (Thor's lightning, Agatha's shield...; the [abilities of the heroes](Hero-Abilities), 111 since 3.6). False: only the thirty powers, and a hero file's abilities are left out with a note. |
+| `custom_hero.worldPowers` | `true` | `true` or `false` | 3.4: a custom hero may take the heroes' world-scale abilities: the Hex, the Bifrost, Thanos's Time Stone, Ultron's Upload and Sentry Army, Professor X's Take Over a Body, and the others marked "a world power" on [Heroes' Abilities](Hero-Abilities) (since 3.6 Doctor Strange's Sling-Ring Portal and the Space Stone's row). |
 | `custom_hero.heroStrengthSpread` | `0.5` | 0.0 to 1.0 | 3.4: how much the strength (1 to 10) of a hero's ability changes it: its damage and its body times 1 + spread × (strength − 5) / 5, its cooldown divided by that. At 0.5, strength 1 is ×0.6 and strength 10 is ×1.5; at 0 strength changes nothing (every ability is the hero's own). Strength 5 is always the hero himself. |
 | `custom_hero.layers` | `true` | `true` or `false` | 3.4: a custom hero's look may have extras: a cape, a hat, a visor or mask, glowing eyes, an aura (false: they are taken off, with a note). |
-| `custom_hero.chooseGivesItems` | `true` | `true` or `false` | 3.4: "Choose a Hero" also gives the hero's own items, as becoming him the usual way leaves them with him (Thor's Mjolnir or Stormbreaker, claimed; Magneto's helmet, Quicksilver's goggles and Cyclops's glasses, worn; Loki's Scepter, the Gauntlet, Ultron's Core, the wheelchair, the Darkhold). Never a second one. |
+| `custom_hero.stoneRows` | `true` | `true` or `false` | 3.6: a custom hero may put an Infinity Stone on a key (a [stone row](Hero-Creator#the-stone-rows-36)); it works only while he carries that stone and may use it. False: the stone rows can't be picked ("Stone rows are off on this server."). |
+| `custom_hero.chooseGivesItems` | `true` | `true` or `false` | 3.4: "Choose a Hero" also gives the hero's own items, as becoming him the usual way leaves them with him (Thor's Mjolnir or Stormbreaker, claimed; Magneto's helmet, Quicksilver's goggles and Cyclops's glasses, worn; Loki's Scepter, the Gauntlet, Ultron's Core, the wheelchair, the Darkhold, and since 3.6 Doctor Strange's Eye of Agamotto and Sling Ring). Never a second one. |
 
 ## The Witches' Road
 
@@ -1300,7 +1607,7 @@ Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-dar
 
 ## Structures
 
-The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.
+The four stone sites of 3.6 can each be switched off: see [The stone sites](#the-stone-sites). The garrison of the Hydra outposts is the section [`[hydra]`](#hydra-soldiers). The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.
 
 ## Datapack tags
 
@@ -1330,7 +1637,14 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:bosses` | entity type | The bosses: the Ender Dragon, the Wither, the Warden, the Elder Guardian, Thanos, Ultron and Apocalypse. Webs and the Instant Kill do not take hold of them, an area attack always counts them as enemies, and the boss fights read it (whoever kills one struck the last blow). |
 | `enhanced:boss_minions` | entity type | What the boss fights bring with them (Ultron's Sentries; Thanos's illusions, sword, meteors and orbs): the Instant Kill spares them, and an area attack always counts them as enemies. |
 | `enhanced:entomb_immune` | entity type | Creatures Apocalypse's sand can't swallow in a cocoon (the Ender Dragon, the Wither, the Warden, the Elder Guardian and Apocalypse himself); a creature in `enhanced:spellbound_immune` slips out of it too. |
-| `enhanced:reality_proof` | entity type | Projectiles the Reality Veil (the Mad Titan's and a Thanos player's) does not turn into bubbles: a thrown Mjolnir or Stormbreaker, Mjolnir's fragments, and the Mad Titan's own sword, meteors and orbs. |
+| `enhanced:reality_proof` | entity type | Projectiles the Reality Veil (the Mad Titan's and a Thanos player's) and, since 3.6, the [Reality Stone](Infinity-Stones#the-reality-stone-red)'s bubbles do not turn into bubbles: a thrown Mjolnir or Stormbreaker, Mjolnir's fragments, a thrown Gungnir, and the Mad Titan's own sword, meteors and orbs. (A Hydra bolt is not in it: the stone bubbles it.) |
+| `enhanced:infinity_stones` | item | 3.6: the six Infinity Stones. |
+| `enhanced:hydra` | entity type | 3.6: the Hydra soldier and the Hydra officer: they never hit each other, and an area attack of theirs spares their side. |
+| `enhanced:grab_immune` | entity type | 3.6: what the Hulk's Grab Smash can't pick up (it gets one heavy punch instead): the bosses, the Stonekeeper and the Asgardians. |
+| `enhanced:hulk_soft` | block | 3.6: what the Hulk breaks with `hulk.blockBreaking` = `SOFT`: glass and panes, leaves, snow, ice, small flowers, grass and ferns, vines, cobwebs, dead bushes. |
+| `enhanced:hulk_smashable` | block | 3.6: what he also breaks with `ALL`: dirt, sand, gravel, stone and cobblestone, planks and logs, bricks, clay, netherrack, end stone... |
+| `enhanced:hulk_unbreakable` | block | 3.6: what he never breaks: everything Build Magic never touches, obsidian, end portal frames, spawners, reinforced deepslate, the stone pedestals, the Tesseract's cradle, Hela's Seal and the Gamma Emitter. |
+| `enhanced:on_avengers_tower_maps` | structure | 3.6: where the Hydra Intel map leads (Avengers Tower). |
 | `enhanced:ultron_robots` | entity type | Ultron and his Sentries: lightning does `ultron.lightningFactor` (1.25) times to them, and the Mind Stone beam `ultron_boss.visionBeamBonus` (1.5) times. |
 | `enhanced:telekinesis_immovable` | block | Blocks no telekinesis can tear out of the ground. |
 | `enhanced:magnetic_blocks` | block | Metal blocks: what Magneto's R tears out and his Magnetic Pull takes whole (it holds `magnetic_ores`, the storage blocks, anvils, rails, chains, bars, doors, lanterns, hoppers, pistons, copper blocks and more; other mods' metals are optional entries). |
@@ -1345,7 +1659,7 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:cannot_cling` | block | Blocks Spider-Man cannot stick to (empty by default; water, cobwebs, vines and ladders never hold him anyway). |
 | `enhanced:ritual_ground` | block | What the Capstone must be planted on to wake Apocalypse (sand, red sand and every sandstone), while `apocalypse_boss.ritualNeedsSand` is on. |
 | `enhanced:sokovia_liftable` | block | The natural blocks the island of Sokovia copies into the sky (stone, dirt, sand, ores, grass, leaves, logs, flowers, snow...); anything else, a house or a chest, is left out of the copy. |
-| `enhanced:ward_immune` | entity type | What the ward of the Book of the Vishanti leaves alone. **Empty in 3.3** (in 3.2 it held the bosses and their helpers, which a ward now keeps out): a data pack may add creatures. Pets with an owner, riders, named and leashed monsters and curing zombie villagers are spared anyway; bosses and fight members never are. |
+| `enhanced:ward_immune` | entity type | What the ward of the Book of the Vishanti leaves alone: since 3.6 the Stonekeeper of Vormir (he is also in `telekinesis_immune`, `pull_immune` and `confused_immune`). **Empty in 3.3** (in 3.2 it held the bosses and their helpers, which a ward now keeps out): a data pack may add creatures. Pets with an owner, riders, named and leashed monsters and curing zombie villagers are spared anyway; bosses and fight members never are. |
 | `enhanced:dark_magic` | damage type | 3.3: what counts as dark magic, which the ward keeps out: the Darkhold's purple beam (Agatha's too), Agatha's Power Drain and her Rune Trap. |
 | `enhanced:dark_magic` | entity type | 3.3: projectiles that count as dark magic (empty by default, for data packs). |
 | `enhanced:magic_damage` | damage type | What counts as magic used on the holder of the Darkhold, so that its revenge poisons the attacker: the Hex Bolt and Beam, the Chaos Beam, the telekinetic slam, the Mind Stone, the Stones' powers, the Phoenix Burst, the purple beam, Apocalypse's wall and Entomb, Professor X's Mental Blast, Agatha's Power Drain and Rune Trap, and the game's own `magic` and `indirect_magic`. Thor's lightning and Cyclops's optic blasts are not in it. |
@@ -1356,7 +1670,7 @@ The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_
 
 ## Client options: animations, effects and looks
 
-Thirteen options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]`, `[spider_man]` and (3.5) `[music]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
+Fourteen options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]`, `[spider_man]`, (3.5) `[music]` and (3.6) `[hulk]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
 
 ```toml
 [animation]
@@ -1381,6 +1695,9 @@ Thirteen options are about your own game only. They are not synced, and a server
 [music]
     quicksilverSong = "theme"
     ignoreServerMusic = false
+
+[hulk]
+    hulkModel = true
 ```
 
 | Option | Setting in the file | Default | What it does |
@@ -1397,6 +1714,7 @@ Thirteen options are about your own game only. They are not synced, and a server
 | Web Assist | `webAssist` | `true` | 3.3: Spider-Man's [Web Assist](Spider-Man#web-assist-easy-swinging-33): the swing chooses its own anchor ahead and above (trees count), keeps clear of the ground and the leaves, lets go at the best moment and swings on while G is held. Off: the manual swing, aimed with the crosshair. The **J** key switches it too. |
 | Web Assist preview | `webAssistPreview` | `true` | Show where Web Assist's next web would go (a small white web) while you are in the air or sneaking. |
 | Quicksilver's song | `quicksilverSong` | `theme` | 3.5: what Quicksilver's Walkman plays: `theme` (his own song, "Silver Hours") or `sweet_dreams` (*Sweet Dreams (Are Made of This)*, as before 3.5). A song of your own, or the world's, plays instead of either. See [Music](Music). |
+| The Hulk's body | `hulkModel` | `true` | 3.6: the Hulk is drawn with his own giant body. Off: the normal player model wearing his skin, made bigger (if another mod's player model clashes with his). See [Hulk](Hulk#looks-and-how-he-moves). |
 | Ignore the world's music | `ignoreServerMusic` | `false` | 3.5: don't download or play the songs a server or world puts in its music folder; hear the built-in music, or your own. |
 
 Two more client options, for the music and the air of the Thanos fight, are in a `[thanos]` section of the same file: see [above](#your-own-game-the-music-and-the-atmosphere-of-the-fight).

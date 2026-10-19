@@ -84,6 +84,10 @@ Next to the usual panel: the Sight (on, and how many players are far away), the 
 
 His six rows are in the [Hero Creator](Hero-Creator) (ids `heimdall.hofund`, `heimdall.sight`, `heimdall.bifrost`, `heimdall.ward`, `heimdall.strike`, `heimdall.body`; see [Heroes' Abilities](Hero-Abilities#heimdall-6)). A custom hero's Hofund Slash works with **any sword** (with Hofund, 30% more); his Bifrost (a world power) opens the Bifrost with no item, Asgard included. The ready-made *Heimdall-like* hero starts with Hofund, the Sight and the Bifrost.
 
+## The Infinity Stones (3.6)
+
+Heimdall is a god: he may hold every [Infinity Stone](Infinity-Stones) bare and use it, wield a crafted Infinity Gauntlet and Snap, and seek the Soul Stone at [Vormir](Vormir). Only the **Time Stone** stays quiet in his hand: it answers only a sorcerer.
+
 ## Numbers you can change
 
 The Sight's range and whether it lists other worlds, the three blows and the Lunge, the Ward's time and cooldown, the Call's time and cooldown, the Strike's damage and cooldown, how far a friend may be sent from, the Watch's time and how long to wait after losing it, and Hofund's bonus are the `heimdall.*` options on [Server Configuration](Server-Configuration#heimdall). Whether Hofund opens the Bifrost for anyone is `asgard.hofundOpensBifrost`.

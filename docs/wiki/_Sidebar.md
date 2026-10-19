@@ -26,6 +26,8 @@
 * [Agatha](Agatha)
 * [Cyclops](Cyclops)
 * [Professor X](Professor-X)
+* [Doctor Strange](Doctor-Strange)
+* [Hulk](Hulk)
 * [Hero Creator](Hero-Creator)
 * [Heroes' Abilities](Hero-Abilities)
 
@@ -37,10 +39,16 @@
 * [Odin](Odin)
 * [Hela](Hela)
 
+**The Infinity Stones**
+
+* [Infinity Stones](Infinity-Stones)
+* [Vormir and the Soul Stone](Vormir)
+
 **Reference**
 
 * [Items and Crafting](Items-and-Crafting)
 * [Structures](Structures)
+* [Hydra Soldiers](Hydra-Soldiers)
 * [Music](Music)
 * [Commands](Commands)
 * [Server Configuration](Server-Configuration)
@@ -78,6 +86,8 @@
 * [אגתה](Agatha-HE)
 * [סייקלופס](Cyclops-HE)
 * [פרופסור X](Professor-X-HE)
+* [דוקטור סטריינג'](Doctor-Strange-HE)
+* [האלק](Hulk-HE)
 * [יוצר הגיבורים](Hero-Creator-HE)
 * [יכולות הגיבורים](Hero-Abilities-HE)
 
@@ -89,10 +99,16 @@
 * [אודין](Odin-HE)
 * [הלה](Hela-HE)
 
+**אבני האינסוף**
+
+* [אבני האינסוף](Infinity-Stones-HE)
+* [וורמיר ואבן הנשמה](Vormir-HE)
+
 **מידע**
 
 * [חפצים ויצירה](Items-and-Crafting-HE)
 * [מבנים בעולם](Structures-HE)
+* [חיילי הידרה](Hydra-Soldiers-HE)
 * [מוזיקה](Music-HE)
 * [פקודות](Commands-HE)
 * [הגדרות שרת](Server-Configuration-HE)

@@ -36,7 +36,7 @@ Put the same jar in the `mods` folder of a NeoForge 21.1 server and start it. Pl
 
 ## Updating
 
-Replace the old jar in the `mods` folder with the new one (on the client and on the server). Your hero, your look and your saved Bifrost places are saved with the player. **3.5 needs the server and every player updated together** (network protocol 9): a 3.4 player cannot join a 3.5 server, or the other way round.
+Replace the old jar in the `mods` folder with the new one (on the client and on the server). Your hero, your look and your saved Bifrost places are saved with the player. **3.6 needs the server and every player updated together** (network protocol 10): a 3.5 player cannot join a 3.6 server, or the other way round. (3.5 was protocol 9.) Worlds of 3.5 open in 3.6: the new places appear in land not explored yet, and every Infinity Gauntlet already in the world stays Thanos's Gauntlet.
 
 ## Personal use only
 

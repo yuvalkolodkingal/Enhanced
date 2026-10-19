@@ -1,8 +1,8 @@
 # Looks
 
-A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The one exception is Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs.)
+A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The exceptions are Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs; and since 3.6 the Hulk, whose Bruce Banner has no powers and whose Brand New Day Hulk is bigger and hits harder.)
 
-Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X and, since 3.5, Heimdall, Odin and Hela have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
+Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, and since 3.6 Doctor Strange and the Hulk have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
 ## Switching looks
 
@@ -176,6 +176,28 @@ The Odinforce is gold in every look.
 | **Your own skin** | `own` | Her powers in your own skin. |
 
 Her blades are black with green edges, and her smoke black-green, in every look.
+
+### Doctor Strange ([page](Doctor-Strange))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Sorcerer Supreme** (default) | `sorcerer_supreme` | *Doctor Strange* and *Infinity War*: a dark blue layered tunic, a wrapped belt, grey-brown leggings and boots, the red **Cloak of Levitation** with its high collar, the Eye of Agamotto on his chest, grey temples and a goatee. |
+| **Multiverse of Madness** | `multiverse` | The same red Cloak with a navy patch on it, over a tighter, tailored tunic. |
+| **Defender Strange** | `defender` | Our own Strange of another universe: a tied-back ponytail, a darker tunic and a dark red Cloak. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+The Cloak moves by itself in every look (it billows in flight and catches his falls), and the Eye on his chest glows green while time is slowed. His spells are orange and gold mandalas, and the Crimson Bands red.
+
+### The Hulk ([page](Hulk))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Ragnarok Hulk** | `ragnarok` | The gladiator of *Thor: Ragnarok*: ×1.5 as big as a player, with a belt, a kilt, bracers and a pauldron. |
+| **Brand New Day Hulk** | `brand_new_day` | The savage Hulk of *Spider-Man: Brand New Day*: ×1.75 as big, in torn trousers, and his blows 15% harder. |
+| **Bruce Banner** | `banner` | The human: a purple shirt, a brown jacket, khaki trousers. No powers at all. |
+| **Your own skin** | `own` | You, as Bruce Banner: human, no powers. |
+
+For the Hulk, **H** moving from Banner to a Hulk (or back) is a whole transformation, as **N** is. The two Hulks have a giant body of their own, not a stretched player; the client option `hulk.hulkModel` draws them as a big player in their skin instead.
 
 ### Magneto, the Scarlet Witch and Quicksilver
 

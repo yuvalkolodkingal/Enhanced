@@ -229,11 +229,11 @@ The server file was written by 3.3, and the game never rewrites a value already 
 
 ### How do I get to Asgard?
 
-Only by the Bifrost: with Mjolnir, Stormbreaker or a Hofund in your hand, or your own Gungnir, use it (right-click) and choose **Asgard** at the top of the Bifrost screen; Thor presses **N**, Heimdall **V**. With no power and none of those, find a **Bifrost Rune Stone** (`/locate structure enhanced:bifrost_site`) and right-click it. See [Asgard](Asgard).
+By the Bifrost (or, since 3.6, the Space Stone's Realm Picker): with Mjolnir, Stormbreaker or a Hofund in your hand, or your own Gungnir, use it (right-click) and choose **Asgard** at the top of the Bifrost screen; Thor presses **N**, Heimdall **V**. With no power and none of those, find a **Bifrost Rune Stone** (`/locate structure enhanced:bifrost_site`) and right-click it. See [Asgard](Asgard).
 
 ### My Nether portal won't light in Asgard. The Book of the Vishanti won't take me there.
 
-Asgard can be reached only by the Bifrost: no portal, book, Tesseract or other mod's teleport goes in or out ("Only the Bifrost reaches Asgard."). To leave, use the Bifrost (Home) or ask Heimdall in the Observatory to send you home.
+Asgard can be reached only by the Bifrost: no portal, book, Sling Ring or other mod's teleport goes in or out ("Only the Bifrost reaches Asgard."). The one exception (3.6) is the **Space Stone**'s Realm Picker, also from the Tesseract (Sneak + right-click), unless the server turns it off. To leave, use the Bifrost (Home) or ask Heimdall in the Observatory to send you home.
 
 ### I fell off the edge of Asgard!
 
@@ -264,6 +264,102 @@ Nobody can hurt the people of Asgard: they step back and tell you to mind your m
 ### Hela caught my Mjolnir!
 
 From her second phase she catches a thrown Mjolnir (once a minute) and it shatters, as in *Ragnarok*; the pieces strike your enemies and come back together in your hand. Throw Stormbreaker: she can't catch it.
+
+## The Infinity Stones (3.6)
+
+### Where are the Infinity Stones?
+
+The Reality Stone in Odin's vault in Asgard (after Hela's first defeat); the Mind Stone inside Loki's Scepter and the Space Stone inside the Tesseract (craft either alone to take it out); the Time Stone on the top floor of a Sanctum Sanctorum; the Power Stone in the Orb, in the vault of an End tunnel; the Soul Stone at the Vormir Cliff in the Nether, for a sacrifice. `/locate structure enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (in the End) and `enhanced:vormir_cliff` (in the Nether) find the places. See [Infinity Stones](Infinity-Stones).
+
+### I can't pick up the stone! It jumped away.
+
+Only the gods (Thor, Loki, Heimdall, Odin, Hela), the Scarlet Witch and the Phoenix may hold a bare stone; a sorcerer may hold the Time Stone, and Vision the Mind Stone. Ask one of them to carry it, or put it in a Gauntlet, a chest or a shulker box, which hold it safely.
+
+### A stone burned me and jumped out of my bag!
+
+It was too strong for you: after 10 seconds in your inventory (three times faster in your hand) it zaps you for 2 damage (it never kills you) and jumps out. Put it in a chest, a shulker box or a Gauntlet, or give it to someone who may hold it.
+
+### Thor has the Time Stone, but it does nothing.
+
+The Time Stone answers only a **sorcerer**: Loki, the Scarlet Witch, Billy, Agatha, Doctor Strange. Thor, Heimdall, Odin, Hela and the Phoenix may hold it, but it stays quiet ("You are no sorcerer: the Time Stone will not answer you.").
+
+### Can a player with no power use a stone?
+
+Only through a vessel: **Loki's Scepter** (Sneak + hold right-click, the other hand empty: the Mind Beam) and the **Tesseract** (Sneak + right-click: the Realm Picker). The Eye of Agamotto opens only for a sorcerer (or, held 3 seconds with no power, makes you Doctor Strange). The Reality, Power and Soul Stones have no vessel: someone who isn't a god can't use them at all.
+
+### The pedestal is empty, or the chest has a note: "The Time Stone is gone."
+
+On this server the stones are **once per world**, and someone has it. Or, in the default mode, **once per player**: you have taken this stone already ("You have already taken the Time Stone from a place like this."). If a stone is lost in the void it comes back.
+
+### The Gauntlet is too heavy for me.
+
+A Gauntlet with stones in it can be wielded only by a god, the Scarlet Witch, the Phoenix, Thanos, or the Hulk (as a Hulk). Anyone may carry it, and put stones in it.
+
+### Can I get the Snap?
+
+Yes, since 3.6: craft an **Infinity Gauntlet**, set all six stones in it, and wield it (a god, the Scarlet Witch, the Phoenix, Thanos or the Hulk). Sneak and hold right-click for 3 seconds. Half of the hostile monsters near you turn to dust (never players, pets, villagers or animals), and you are left at 2 health. Once a day. See [The Snap](Infinity-Stones#the-snap).
+
+### How do I get the Soul Stone? Do I have to lose a friend?
+
+Push a friend (with PvP on, and he knows!) or your own pet off the edge of the Vormir Cliff, as a god, the Scarlet Witch or the Phoenix. The friend comes back, but without his things and his power (his ender chest is safe: put your best things there first). A pet is gone. A fall by accident never counts. See [Vormir](Vormir).
+
+### I fell off the Vormir Cliff and nothing happened.
+
+Good: a solo fall is just a fall. Only a push by a seeker who may hold the stone counts, and only into the chasm from the edge strip.
+
+## Doctor Strange and the Hulk (3.6)
+
+### I held the Eye of Agamotto and nothing happened.
+
+You need **no power**, and to hold right-click for 3 whole seconds. If the Eye belongs to another Doctor Strange who is still Strange, it won't open for you ("This Eye already has a Sorcerer Supreme"). A hero who is a sorcerer gets the Time Stone's powers from it instead; anyone else: "The Eye stays closed."
+
+### Doctor Strange's Y does nothing.
+
+**Y** needs the **Eye of Agamotto** with you ("The Eye of Agamotto is not with you."). If you lost it, craft a new one, or ask an operator.
+
+### The Sling Ring won't open a portal.
+
+Only a sorcerer can use it; it needs a saved place (Sneak + right-click to save where you stand), it rests 10 seconds after each portal, and it never goes to or from Asgard or the Witches' Road.
+
+### I stood in the Gamma Emitter's beam and didn't become the Hulk.
+
+You must have **no power**, and stand in the beam for the whole 3 seconds (the beam lasts 3 seconds, after a 3-second warm-up). A hero is told "The gamma does nothing to you."
+
+### "No room to Hulk out here."
+
+The Hulk is much bigger than you. Step outside, or away from the low ceiling: Banner Hulks out as soon as there is room.
+
+### Bruce Banner turned into the Hulk by himself!
+
+His heart rate hit 200: he was hurt too much. Carry a **Gamma Inhibitor** (Creative menu) to keep him human, or ask the server to switch `hulk.bannerAngerTransform` off.
+
+### The Hulk breaks my windows!
+
+By default he breaks only soft things (glass, leaves, snow, flowers), and only where the game rule `mobGriefing` is on and the place is not protected. A server can set `hulk.blockBreaking` to `NONE`.
+
+## Hydra soldiers (3.6)
+
+### Hydra soldiers keep shooting me at the outpost.
+
+They guard every Hydra outpost now. Sneak (they see half as far), come at night, take out the officer first (he raises the alarm the moment he sees you), or switch the alarm off at a console in the radio room on the roof (hold right-click 3 seconds). See [Hydra Soldiers](Hydra-Soldiers).
+
+### Will the Hydra soldiers come back?
+
+Yes: three Minecraft days after you beat them, while nobody is within 64 blocks. A server can choose `hydra.respawn` = `NEVER`.
+
+### Where do I find Avengers Tower?
+
+`/locate structure enhanced:avengers_tower`, or take **Hydra Intel** from a Hydra officer: a map with a red X on the nearest tower.
+
+## The fixes of 3.6
+
+### My beam doesn't show when the camera is behind me.
+
+Fixed in 3.6: in the third-person back view every beam (Thor's Lightning Beam, the stones', the Chaos Beam, Cyclops's...) is drawn over your own head and body, which used to hide it. The arm that fires a stone's beam is raised too.
+
+### My friend cannot join my server (3.6).
+
+3.6 speaks network protocol **10**: the server and every player need 3.6. Worlds of 3.5 open in 3.6.
 
 ## The fixes of 3.5
 
@@ -389,9 +485,9 @@ No. He never breaks or places a block, unless the server turned `blockDamage` on
 
 No. He steps through portals (the Space Stone), turns things to stone (the Reality Stone), drains souls, rewinds himself and locks time in a dome, but he walks. See [Playing Thanos](Thanos#playing-thanos).
 
-### Can I get the Snap?
+### Can Thanos snap?
 
-No, and never the sixth stone. Thanos the hero has the five stones the Mad Titan held; the Mind Stone belongs to Vision and to Loki's Scepter.
+Not with his five built-in stones: Thanos the hero has the five stones the Mad Titan held, never the Mind Stone. But since 3.6 he may wield a crafted **Infinity Gauntlet** with real stones in it: with the Mind Stone in it he gets its powers too, and with all six he can Snap, at no cost. See [Infinity Stones](Infinity-Stones#the-snap).
 
 ### Why do none of the stones answer me?
 

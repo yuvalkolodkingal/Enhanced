@@ -1,6 +1,6 @@
 # Controls
 
-Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in that order: ability 1 is **R**, ability 2 is **G**, ability 3 is **V**, ability 4 is **B** and ability 5 is **N**. The same keys work for every hero, and each key triggers the ability with the same number in that hero's list. Keys work only when you are a hero, no screen is open and you are not a Spectator.
+Every hero has five abilities (Doctor Strange has a sixth, on **Y**). They are bound to the keys **R, G, V, B, N**, in that order: ability 1 is **R**, ability 2 is **G**, ability 3 is **V**, ability 4 is **B** and ability 5 is **N**. The same keys work for every hero, and each key triggers the ability with the same number in that hero's list. Keys work only when you are a hero, no screen is open and you are not a Spectator.
 
 ## All keys, per hero
 
@@ -25,15 +25,17 @@ Every hero has five abilities. They are bound to the keys **R, G, V, B, N**, in 
 | [Heimdall](Heimdall) (3.5) | Hofund Slash, three blows (Sneak: Lunge) | All-Seeing Sight (toggle; Sneak, hold: Far Sight) | Bifrost screen, no item needed (Sneak: where you look) | Guardian's Ward (hold; Sneak: Gatekeeper's Call) | Bifrost Strike (Sneak: Bifrost for a friend) |
 | [Odin](Odin) (3.5) | Gungnir Blast (Sneak: Gungnir Throw; R again calls it back) | Odinforce Shield (hold; Sneak: Odinforce Heal) | Banish (Sneak: Odinforce Wave) | Huginn and Muninn (Sneak: Ravens' Report) | Allfather's Command (Sneak: Odinsleep, toggle) |
 | [Hela](Hela#becoming-hela-the-hero) (3.5) | Necrosword Volley (Sneak: Blade Rain) | Blade Wall (Sneak: Blade Burst) | Goddess of Death (toggle; Sneak: Death Dash) | Raise the Dead (Sneak: Fenris) | Death's Grasp (hold) |
+| [Doctor Strange](Doctor-Strange) (3.6) | Eldritch Whip, three lashes (Sneak: Whip Grapple) | Cloak of Levitation (flight, toggle) | Shield of the Seraphim (hold; Sneak: Seraphim Dome) | Crimson Bands of Cyttorak (Sneak: Astral Projection, toggle) | Sling-Ring Portal (Sneak: Mirror Dimension, toggle) |
+| [Hulk](Hulk) (3.6) | Hulk Smash (Sneak: Grab Smash) | Thunder Clap (Sneak: Roar) | Super Leap (Sneak: Bound) | Boulder Throw (Sneak: Gamma Charge) | Transform: Banner ↔ Hulk (Sneak: Switch Hulk) |
 | [A custom hero](Hero-Creator) | Whatever power you put on the key in the [Hero Creator](Hero-Creator#6-put-them-on-the-keys-plain-or-sneak), and on **Sneak +** the key (3.4) | | | | |
 
-**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, Billy's Hex Beam and Hex Barrier, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield, Agatha's Purple Beam and Witch's Shield, Cyclops's Optic Blast, and in 3.5 Heimdall's Guardian's Ward and Far Sight, Odin's Odinforce Shield and Hela's Death's Grasp) work for as long as you keep the key down (the Chaos Shield never runs out in 3.2, unless a server turns that off; in 3.3 Billy's Hex Barrier has no time limit either, and only drops when it shatters; Agatha's shield lasts 10 seconds at most). *Toggle* abilities switch on with one press and off with the next.
+**Press, hold, toggle.** *Press* abilities fire once per key press. *Hold* abilities (the Chaos Beam, the Shrapnel Storm, the Chaos Shield, Billy's Hex Beam and Hex Barrier, the Mind Stone Beam, Thor's Lightning Beam, the Phoenix Burst, Spider-Man's Web Swing, Thanos's Soul Drain, Ultron's Repulsor Fire, Apocalypse's Shield, Agatha's Purple Beam and Witch's Shield, Cyclops's Optic Blast, and in 3.5 Heimdall's Guardian's Ward and Far Sight, Odin's Odinforce Shield and Hela's Death's Grasp, and in 3.6 Doctor Strange's Shield of the Seraphim) work for as long as you keep the key down (the Chaos Shield never runs out in 3.2, unless a server turns that off; in 3.3 Billy's Hex Barrier has no time limit either, and only drops when it shatters; Agatha's shield lasts 10 seconds at most). *Toggle* abilities switch on with one press and off with the next.
 
-The abilities, their cooldowns and costs are explained on each hero's page. The Scarlet Witch and Billy also have **Y**, for [Build Magic](Build-Magic). The two [books of the sorcerers](#the-sorcerers-books-and-the-road) are used, not bound to a key. A [custom hero](Hero-Creator) has the same five keys, with the powers you chose on them; since 3.4 each key also has a **Sneak +** box, a hero's ability brings its Sneak variant with it (Thor's Mjolnir Throw on **R** puts Shatter Mjolnir on **Sneak + R**), and a custom hero with Billy's Build Magic uses **Y** for it. Sneak + a key whose Sneak box is empty does what the key does. See [Hero Creator](Hero-Creator#6-put-them-on-the-keys-plain-or-sneak).
+The abilities, their cooldowns and costs are explained on each hero's page. The Scarlet Witch and Billy also have **Y**, for [Build Magic](Build-Magic), and Doctor Strange has **Y** for [the Eye of Agamotto](#doctor-stranges-eye-y-36). The two [books of the sorcerers](#the-sorcerers-books-and-the-road) are used, not bound to a key. A [custom hero](Hero-Creator) has the same five keys, with the powers you chose on them; since 3.4 each key also has a **Sneak +** box, a hero's ability brings its Sneak variant with it (Thor's Mjolnir Throw on **R** puts Shatter Mjolnir on **Sneak + R**), and a custom hero with Billy's Build Magic uses **Y** for it. Sneak + a key whose Sneak box is empty does what the key does. See [Hero Creator](Hero-Creator#6-put-them-on-the-keys-plain-or-sneak).
 
 ## Change Look: H
 
-**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops and Professor X (for him it switches between the young and the old Charles). Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
+**H** changes your look, if your hero has several (**Sneak + H** goes back). It is bound as *Change Look* and works for Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X (for him it switches between the young and the old Charles), Heimdall, Odin, Hela, Doctor Strange and the Hulk (for him a change between Bruce Banner and a Hulk is a whole transformation). Magneto, the Scarlet Witch and Quicksilver have one suit each, and the key tells you "This hero has only one look". The looks of every hero are on [Looks](Looks).
 
 ## Vision, That One!: Z
 
@@ -42,6 +44,25 @@ The Scarlet Witch has one more key. **Z** is her order to the Vision her Hex rai
 * **Look at a creature and press Z**: Vision goes for that one.
 * **Look at nothing and press Z**: he comes back to your side.
 * **Sneak + Z**: he holds his post where he is, or follows you again. The Hex Control screen (**N**) has the same choice as a button.
+
+## Doctor Strange's Eye: Y (3.6)
+
+Doctor Strange's sixth key is **Y**, the same key as Build Magic: **the Eye of Agamotto**. It needs the Eye with him.
+
+* **Y**: **Slow Time** on or off (the Time Stone's: creatures round him move three times slower, up to 10 seconds).
+* **Sneak + Y**: **Rewind**, back to where he was 5 seconds ago.
+
+Its line on the HUD is `[Y]`: `no Eye`, `time slowed 7s`, `recharging 40%` or `ready`. A custom hero with the Eye's ability uses **Y** for it; a hero has at most one **Y** (the Eye or a Build Magic). See [Doctor Strange](Doctor-Strange).
+
+## The Infinity Gauntlet: J (3.6)
+
+With a crafted **Infinity Gauntlet** in your hand:
+
+* **Tap J**: the next stone in the Gauntlet.
+* **Hold J**: the **Stone Wheel**, a ring of its stones round the crosshair; let go on one, or click it, to choose it.
+* **Right-click**: the chosen stone's power; **Sneak + right-click**: its second power. With all six stones and the Snap ready, **Sneak + hold right-click for 3 seconds**: the **Snap**.
+
+The same goes for a bare stone in your hand (no J needed). **J** is also Spider-Man's Web Assist: each answers only for its own player. See [Infinity Stones](Infinity-Stones#the-infinity-gauntlet).
 
 ## Build Magic: Y
 
@@ -130,9 +151,10 @@ Flying works like Creative mode: **double-tap Space**, or press the hero's fligh
 | Ultron | **G** (Anti-Gravity Flight) |
 | Apocalypse | **G** (Levitation) |
 | Agatha | **G** (Flight) |
+| Doctor Strange | **G** (Cloak of Levitation) |
 | A custom hero | The key you gave the **Flight** power (only with that power) |
 
-Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes). Spider-Man does not fly either: he zips and swings on webs. Nor does Thanos: he steps through portals. Cyclops leaps on his own blast (**V**) and Professor X does not fly.
+Quicksilver, Tommy and Loki do not fly: Quicksilver and Tommy run, and Loki walks (and vanishes). Spider-Man does not fly either: he zips and swings on webs. Nor does Thanos: he steps through portals. Cyclops leaps on his own blast (**V**) and Professor X does not fly. The Hulk leaps (**V**) instead of flying.
 
 ## Sneak changes some keys
 
@@ -193,6 +215,20 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **G** as Hela | The **Blade Burst**, a ring of spikes round you, instead of the Blade Wall. |
 | Sneak + **V** as Hela | The **Death Dash**, instead of the Goddess of Death. |
 | Sneak + **B** as Hela | **Fenris**, instead of Raise the Dead. |
+| Sneak + **R** as Doctor Strange | The **Whip Grapple**: the whip pulls you to the block you look at. |
+| Sneak + **V** as Doctor Strange | The **Seraphim Dome** round you and your friends, instead of the Shield. |
+| Sneak + **B** as Doctor Strange | **Astral Projection** (on/off): your spirit leaves your body. |
+| Sneak + **N** as Doctor Strange | The **Mirror Dimension** (on/off). |
+| Sneak + **Y** as Doctor Strange | The Eye's **Rewind**. |
+| Sneak + **R** as the Hulk | The **Grab Smash**: grab the creature in front and slam it three times. |
+| Sneak + **G** as the Hulk | The **Roar**: monsters near you run away. |
+| Sneak + **V** as the Hulk | The **Bound**: a long, low leap forward. |
+| Sneak + **B** as the Hulk | The **Gamma Charge**. |
+| Sneak + **N** as the Hulk | **Switch Hulk**: Ragnarok ↔ Brand New Day. |
+| Sneak + right-click with an Infinity Stone, or a Gauntlet with stones (3.6) | The stone's second power (see [Infinity Stones](Infinity-Stones#the-six-stones)). |
+| Sneak + hold right-click with Loki's Scepter, the other hand empty (3.6) | The Mind Stone's **Mind Beam**, for anyone. |
+| Sneak + right-click with the Tesseract (3.6) | The Space Stone's **Realm Picker**, for anyone. |
+| Sneak + right-click with a Sling Ring (3.6) | A sorcerer remembers this place. |
 | Sneak + **H** | Previous look. |
 
 With telekinesis, pressing the key again **launches** what you hold.
@@ -264,13 +300,13 @@ With telekinesis, pressing the key again **launches** what you hold.
 
 ## The HUD
 
-The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges. Billy's Hex Beam line shows its damage and reach (`6.0 dmg/s, 20 blocks`), and the Scarlet Witch's Chaos Shield line shows "∞ unlimited". **3.3:** while Billy's Hex Barrier is up its line shows a bar and its health (`41/60`) and a big bar sits under the crosshair; a sorcerer held by the Hex Runes sees a red line above the action bar, "The Hex Runes hold your powers"; Professor X's screen gets blue edges and a line with whose mind he is in while he steers a body (and the one he steers gets violet edges and "Professor X controls your body!"), and Cerebro's list; a custom hero's panel is drawn in his own colours with his name. **3.4:** a custom hero's panel also has a `[⇧R]` line under a key for its Sneak box, and shows whether each of his heroes' switches is on and his shields' strength. **3.5:** Heimdall's panel shows the Sight (and how many players are far away), the blow of his combo and the Ward's seconds, and lists the players of the other worlds while the Sight is on; Odin's shows Gungnir in flight, his ravens and the Odinsleep; Hela's shows her form, her risen dead and the Grasp.
+The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges. Billy's Hex Beam line shows its damage and reach (`6.0 dmg/s, 20 blocks`), and the Scarlet Witch's Chaos Shield line shows "∞ unlimited". **3.3:** while Billy's Hex Barrier is up its line shows a bar and its health (`41/60`) and a big bar sits under the crosshair; a sorcerer held by the Hex Runes sees a red line above the action bar, "The Hex Runes hold your powers"; Professor X's screen gets blue edges and a line with whose mind he is in while he steers a body (and the one he steers gets violet edges and "Professor X controls your body!"), and Cerebro's list; a custom hero's panel is drawn in his own colours with his name. **3.4:** a custom hero's panel also has a `[⇧R]` line under a key for its Sneak box, and shows whether each of his heroes' switches is on and his shields' strength. **3.5:** Heimdall's panel shows the Sight (and how many players are far away), the blow of his combo and the Ward's seconds, and lists the players of the other worlds while the Sight is on; Odin's shows Gungnir in flight, his ravens and the Odinsleep; Hela's shows her form, her risen dead and the Grasp. **3.6:** Doctor Strange's shows his whip's lash, his Shield and Dome, the spirit's time, the Mirror and the portals, and a sixth line `[Y]` for the Eye; the Hulk's shows his **rage bar**, or Banner's **heart rate**; and anyone who carries Infinity Stones sees a little gem for each **right of the hotbar**, with its cooldown, and the red countdown of a stone that burns.
 
 ![Magneto's HUD](images/magneto-back.png)
 
 ## Rebinding keys
 
-All nineteen keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look*, *Vision, That One! (Scarlet Witch)*, *Web Assist (Spider-Man)* (**J**, 3.3) and eleven *Build Magic* keys (the first is *Build Magic (Scarlet Witch, Billy)*, which is **Y**; the last is *Build Magic: Instant (Scarlet Witch)*, **Ctrl + I**). Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
+All twenty keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look*, *Vision, That One! (Scarlet Witch)*, *Web Assist (Spider-Man)* (**J**, 3.3), *Stone Wheel (Infinity Gauntlet)* (**J**, 3.6) and eleven *Build Magic* keys (the first is *Build Magic (Scarlet Witch, Billy, a hero you made with it)*, which is **Y**, and is Doctor Strange's Eye too; the last is *Build Magic: Instant (Scarlet Witch)*, **Ctrl + I**). Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.
 
 ## Sprinting heroes
 

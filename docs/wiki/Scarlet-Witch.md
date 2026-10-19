@@ -201,6 +201,10 @@ Billy's [Hex Barrier](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held) 
 
 Her mind power hits the boss Apocalypse **critically**: the Chaos Beam, a telekinetic slam, a borrowed block she throws, all are twice as strong on his shield and, when his shield is down, on his body. Everyone else hits him for much less then. See [Apocalypse](Apocalypse#he-never-heals-wanda-and-the-phoenix-hit-critically).
 
+## The Infinity Stones (3.6)
+
+The Scarlet Witch may hold and use **all six** [Infinity Stones](Infinity-Stones) (she is no god, but her power over reality is enough), the Time Stone too, for she is a sorceress. She may wield a crafted Infinity Gauntlet and Snap, and seek the Soul Stone at [Vormir](Vormir). The Eye of Agamotto and the Sling Ring answer her too.
+
 ## Numbers you can change
 
 Wanda's flight speed, the beam's damage, range and Nausea, whether the shield is unlimited (`shieldUnlimited`, on by default), and, for the old rules, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be (Wanda's and the Phoenix's; Billy and Magneto have their own), and the Hex's default, smallest and largest radius, its death chance and how hard it bites a Vision who pushes against it are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration). The Hex Runes are the `hex_runes.*` options. The Vision of the Hex (his health, punch and beam, how long you need to rebuild him, and turning him off) is the `hex_vision.*` options. The Instant level is `build_magic_wanda.instantMaxBlocks` and `instantMaxMillis`.

@@ -118,6 +118,10 @@ The form ("Goddess"), her risen dead and their seconds ("3 risen, 28s"), and the
 
 Her six rows are in the [Hero Creator](Hero-Creator) (ids `hela.necroswords`, `hela.blade_wall`, `hela.goddess`, `hela.army`, `hela.grasp`, `hela.body`; see [Heroes' Abilities](Hero-Abilities#hela-6)). They need no item; Raise the Dead is a world power. The ready-made *Hela-like* hero starts with the necroswords, the walls of blades and the army of the dead.
 
+## The Infinity Stones (3.6)
+
+Hela is a god: she may hold every [Infinity Stone](Infinity-Stones) bare and use it, wield a crafted Infinity Gauntlet and Snap, and seek the Soul Stone at [Vormir](Vormir). Only the **Time Stone** stays quiet in her hand: it answers only a sorcerer.
+
 ## Numbers you can change
 
 The fight is the `hela_boss.*` options (whether the seal calls her, her health and armour, the phases, every damage, the channel, the berserkers, Fenris's health, how long the seal heals, the Mjolnir catch); the hero is the `hela.*` options (damages, cooldowns, the form's strength, how many dead rise, the Grasp, Asgard's factor, and whether the Grasp breaks Mjolnir). See [Server Configuration](Server-Configuration#hela).

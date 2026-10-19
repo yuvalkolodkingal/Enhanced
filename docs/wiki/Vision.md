@@ -50,6 +50,10 @@ Inside a standing Hex, Vision **can't leave it**, in either look, whether or not
 
 ![Vision coming apart at the wall of Wanda's Hex](images/vision-held.png)
 
+## The Infinity Stones (3.6)
+
+Vision may hold the **Mind Stone** bare, and use it (the Mind Beam; Sneak: the Mind Command): it is his own. The other five are too strong for him, as for anyone who is not a god. See [Infinity Stones](Infinity-Stones).
+
 ## Numbers you can change
 
 Vision's flight speed (0.08) and the Mind Stone Beam's damage (6) are the `vision.*` options. The beam's range is the same option as the Chaos Beam's, `scarlet_witch.chaosBeamRange`. See [Server Configuration](Server-Configuration).

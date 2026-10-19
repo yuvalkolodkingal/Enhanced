@@ -83,6 +83,10 @@ Nobody stays stuck: every link is undone when the server stops, and a player who
 
 Press **H** to switch. See [Looks](Looks).
 
+## Hydra soldiers (3.6)
+
+The [Hydra soldiers](Hydra-Soldiers) of the outposts have open minds. **Hear Thoughts** gives them thoughts of their own ("My boots hurt.", "Who left the gate open?"). **Take Over a Body** steers a soldier: your click fires his rifle, and his friends shoot back at the traitor. **Freeze Minds** freezes them, and a frozen soldier can't raise the alarm.
+
 ## Numbers you can change
 
 How long the wheelchair is held, the Mental Blast (range, damage, how long it dizzies, cooldown), how far he hears thoughts, Take Over a Body (reach, how far the body may go, how long for a creature and for a player, or never for players, cooldown, whether a hurt breaks it, and the backlash of a stronger telepath), Freeze Minds (radius, time, cooldown) and Cerebro (range, time, cooldown) are the `professor_x.*` options. See [Server Configuration](Server-Configuration#professor-x).
