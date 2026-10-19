@@ -27,12 +27,12 @@ import java.util.stream.Stream;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /**
- * The sounds of 3.5 and 3.6, read from the files the mod ships (3.5 PLAN 12, L6; 3.6 PLAN 10/17.3): every sound event
- * of Asgard, Heimdall, Odin, Hela and the Asgardians (3.5 Appendix C), the music lane's three songs, and every sound
- * event of 3.6 (with its subtitle in English and Hebrew) is registered, listed in sounds.json and plays files that are
- * real sounds: not the skeleton's 0.2-second placeholder, longer than half a second, Ogg Vorbis, mono at 44.1 kHz. The
- * format is read from the Vorbis identification header and the length from the last page's granule position, as {@code
- * ThanosAssetsTests} does. Nothing here names a client class.
+ * The sounds of 3.5, 3.6 and 3.7, read from the files the mod ships (3.5 PLAN 12, L6; 3.6 PLAN 10/17.3; 3.7 PLAN 13,
+ * L7): every sound event of Asgard, Heimdall, Odin, Hela and the Asgardians (3.5 Appendix C), the music lane's three
+ * songs, and every sound event of 3.6 and of 3.7 (with its subtitle in English and Hebrew) is registered, listed in
+ * sounds.json and plays files that are real sounds: not the skeleton's 0.2-second placeholder, longer than half a
+ * second, Ogg Vorbis, mono at 44.1 kHz. The format is read from the Vorbis identification header and the length from
+ * the last page's granule position, as {@code ThanosAssetsTests} does. Nothing here names a client class.
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -49,22 +49,10 @@ public final class SoundAssetTests {
     static final Set<String> SKELETON_36 = Set.of();
     /**
      * The 3.7 skeleton's placeholder files ({@code sfx/<name>.ogg}, the same 0.2-second file): every sound event of 3.7
-     * (PLAN Appendix C) until the sound lane (L7 of 3.7) makes it. L7 empties this list and extends the tests to the
-     * 3.7 events.
+     * (PLAN Appendix C) until the sound lane (L7 of 3.7) made it. L7 emptied this list; {@link #MUTANT_EVENTS} holds
+     * the 3.7 events.
      */
-    static final Set<String> SKELETON_37 = Set.of(
-            "healing_down", "healing_rise", "healing_burst", "healing_off", "healing_on", "healing_cut",
-            "healing_rescue", "wolverine_snikt", "wolverine_shink", "wolverine_slash", "wolverine_slash_hit_metal",
-            "wolverine_spin", "wolverine_pounce", "wolverine_land", "wolverine_berserk", "wolverine_growl",
-            "wolverine_sniff", "wolverine_track", "wolverine_climb", "adamantium_clank", "adamantium_injection",
-            "wolverine_awaken", "deadpool_katana", "deadpool_parry", "deadpool_deflect", "deadpool_shot",
-            "deadpool_reload", "deadpool_ricochet", "deadpool_blink", "deadpool_glitch", "deadpool_drop_in",
-            "deadpool_taunt", "deadpool_whistle", "deadpool_smoke", "deadpool_awaken", "dogpool_bark", "dogpool_whine",
-            "dogpool_poof", "chimichanga_munch", "school_lab_ready", "secret_shelf_open", "secret_shelf_close",
-            "lift_ride", "lift_ding", "x_door_open", "x_door_close", "weapon_x_pod_hum", "weapon_x_pod_done",
-            "adamantium_rack_take", "cure_station", "ambient_school_lab", "cerebro_console_on", "cerebro_amplified",
-            "cerebro_console_off", "locator_pulse", "locator_tick", "locator_found", "ambient_cottage", "cottage_pot",
-            "scratchy_found", "rio_blessing", "nicky_cheer", "agatha_away");
+    static final Set<String> SKELETON_37 = Set.of();
     /** The sound events of PLAN Appendix C (72; {@code music.asgard} plays three files). */
     static final List<String> ASGARD_EVENTS = List.of(
             // Asgard
@@ -122,6 +110,37 @@ public final class SoundAssetTests {
             "hydra_hurt", "hydra_death", "hydra_blaster");
     /** The 3.6 ambience loops (played as looping sounds while one is there): long, seamless. */
     static final List<String> AMBIENCE_LOOPS_36 = List.of("ambient.sanctum", "end_tunnel_hum", "vormir_wind");
+
+    /**
+     * The sound events of 3.7 (63, PLAN Appendix C): the healing factor, Wolverine, Deadpool and Dogpool, the X-Men
+     * lower lab and Cerebro, the Stone Locator and Agatha's Cottage.
+     */
+    static final List<String> MUTANT_EVENTS = List.of(
+            // the healing factor
+            "healing_down", "healing_rise", "healing_burst", "healing_off", "healing_on", "healing_cut",
+            "healing_rescue",
+            // Wolverine
+            "wolverine_snikt", "wolverine_shink", "wolverine_slash", "wolverine_slash_hit_metal", "wolverine_spin",
+            "wolverine_pounce", "wolverine_land", "wolverine_berserk", "wolverine_growl", "wolverine_sniff",
+            "wolverine_track", "wolverine_climb", "adamantium_clank", "adamantium_injection", "wolverine_awaken",
+            // Deadpool and Dogpool
+            "deadpool_katana", "deadpool_parry", "deadpool_deflect", "deadpool_shot", "deadpool_reload",
+            "deadpool_ricochet", "deadpool_blink", "deadpool_glitch", "deadpool_drop_in", "deadpool_taunt",
+            "deadpool_whistle", "deadpool_smoke", "deadpool_awaken", "dogpool_bark", "dogpool_whine", "dogpool_poof",
+            "chimichanga_munch",
+            // the lower lab and Cerebro
+            "school_lab_ready", "secret_shelf_open", "secret_shelf_close", "lift_ride", "lift_ding", "x_door_open",
+            "x_door_close", "weapon_x_pod_hum", "weapon_x_pod_done", "adamantium_rack_take", "cure_station",
+            "ambient.school_lab", "cerebro_console_on", "cerebro_amplified", "cerebro_console_off",
+            // the Stone Locator
+            "locator_pulse", "locator_tick", "locator_found",
+            // Agatha's Cottage
+            "ambient.cottage", "cottage_pot", "scratchy_found", "rio_blessing", "nicky_cheer", "agatha_away");
+    /** The 3.7 loops (seamless; the pod's hum and the amplified Cerebro while they run, the two ambiences). */
+    static final List<String> LOOPS_37 = List.of("weapon_x_pod_hum", "cerebro_amplified", "ambient.school_lab",
+            "ambient.cottage");
+    /** The 3.7 ambience loops (played while one is there): long. */
+    static final List<String> AMBIENCE_LOOPS_37 = List.of("ambient.school_lab", "ambient.cottage");
 
     private static IModFile mod() {
         return ModList.get().getModFileById(Enhanced.MODID).getFile();
@@ -258,6 +277,47 @@ public final class SoundAssetTests {
             }
         }
         check(count == 83, "one file for each 3.6 event: " + count);
+        helper.succeed();
+    }
+
+    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    public static void everySoundOf37IsARealMonoSoundWithItsSubtitles(GameTestHelper helper) throws IOException {
+        check(MUTANT_EVENTS.size() == 63 && Set.copyOf(MUTANT_EVENTS).size() == 63,
+                "3.7 has 63 sound events: " + MUTANT_EVENTS.size());
+        check(MUTANT_EVENTS.containsAll(LOOPS_37) && LOOPS_37.containsAll(AMBIENCE_LOOPS_37),
+                "the 3.7 loops are 3.7 events");
+        JsonObject sounds = json("sounds.json");
+        JsonObject en = json("lang/en_us.json");
+        JsonObject he = json("lang/he_il.json");
+        int count = 0;
+        for (String event : MUTANT_EVENTS) {
+            check(BuiltInRegistries.SOUND_EVENT.containsKey(Enhanced.id(event)),
+                    event + " is a registered sound event");
+            String subtitle = "subtitles.enhanced." + event;
+            JsonElement own = sounds.getAsJsonObject(event) == null ? null
+                    : sounds.getAsJsonObject(event).get("subtitle");
+            check(own != null && own.getAsString().equals(subtitle), event + " has its own subtitle key");
+            check(en.has(subtitle) && !en.get(subtitle).getAsString().isBlank(), event + " has an English subtitle");
+            check(he.has(subtitle) && he.get(subtitle).getAsString().chars().anyMatch(c -> c >= 0x05D0 && c <= 0x05EA),
+                    event + " has a Hebrew subtitle");
+            for (String path : files(sounds, event)) {
+                byte[] data = Files.readAllBytes(file(path));
+                check(!md5(data).equals(PLACEHOLDER_MD5), path + " is not the skeleton's placeholder");
+                check(!SKELETON_37.contains(path.replace("sounds/sfx/", "").replace(".ogg", "")),
+                        path + " is not on the skeleton's list any more");
+                Ogg ogg = ogg(path, data);
+                check(ogg.channels() == 1 && ogg.rate() == 44100, path + " is mono at 44.1 kHz: " + ogg);
+                check(ogg.seconds() > 0.5, path + " is longer than half a second: " + ogg.seconds());
+                if (LOOPS_37.contains(event)) {
+                    check(ogg.seconds() >= 2.0, path + " is a loop of at least 2 seconds: " + ogg.seconds());
+                }
+                if (AMBIENCE_LOOPS_37.contains(event)) {
+                    check(ogg.seconds() >= 15.0, path + " is a long ambience loop: " + ogg.seconds());
+                }
+                count++;
+            }
+        }
+        check(count == 63, "one file for each 3.7 event: " + count);
         helper.succeed();
     }
 
