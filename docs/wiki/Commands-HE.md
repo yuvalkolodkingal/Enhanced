@@ -64,9 +64,12 @@
 
 | פקודה | מה היא עושה |
 |---|---|
+| `/enhanced structure school_lab [radius]` | (3.7) בונה עכשיו את [המעבדה התחתונה של האקס-מן](Mutant-School-Lab-HE) של בית הספר למוטנטים הקרוב אליכם (עד 128 בלוקים, או `radius`, 16 עד 256), או מסיימת מעבדה שבבנייה: "המעבדה התחתונה בנויה. המעלית שלה יוצאת מחדר העבודה ב-…", או "המעבדה של בית הספר הזה כבר בנויה." חוץ מזה המעבדה נבנית לבד כששחקן מתקרב (`school_lab.autoBuild`). |
+| `/enhanced structure school_lab force` | (3.7) אותו דבר, ושמה את הכניסה הסודית בחדר העבודה גם מעל בלוקים של שחקן (בלי `force`, בלוק ששחקן שם שם משאיר את הכניסה בחוץ: "בלוק של שחקן עומד במקום הכניסה"). |
+| `/enhanced structure school_lab status` | (3.7) המעבדה של בית הספר הקרוב: עוד לא התחילה, בבנייה, בנויה או חסומה (ולמה), איפה המשטחים של חדר העבודה ושל המעבדה, איך היא מסובבת, ובמעבדה בנויה החורים שלה, מים או לבה תועים בפנים, ודלתות בלי משקוף (0, 0 ו-0 במעבדה שלמה). |
 | `/enhanced structure repair_school [radius]` | (3.5) מתקנת [בית ספר למוטנטים](Structures-HE#בית-הספר-למוטנטים) שנבנה לפני 3.3.1, את החור סביב הדלת הראשית: רק 76 הבלוקים של הדלת והמגדל ש-3.3.1 שינה, באבן של בית הספר עצמו. היא מחפשת את בית הספר הקרוב אליכם בטווח 128 בלוקים (או `radius`, 16 עד 256). בלוק ששחקן שינה שם נשאר ונספר ("נשמר"); אפשר להריץ אותה שוב מתי שרוצים, והיא אומרת כשבית הספר שלם. |
 
-כדי **למצוא** מבנה, משתמשים בפקודה של המשחק עצמו, `/locate structure <id>`: `enhanced:hydra_outpost`, `enhanced:mjolnir_crater`, `enhanced:mutant_school`, `enhanced:bifrost_site`, ומאז 3.6 `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (מריצים אותה בסוף) ו-`enhanced:vormir_cliff` (מריצים אותה בנד'ר). ראו [מבנים בעולם](Structures-HE#אתרי-האבנים-36).
+כדי **למצוא** מבנה, משתמשים בפקודה של המשחק עצמו, `/locate structure <id>`: `enhanced:hydra_outpost`, `enhanced:mjolnir_crater`, `enhanced:mutant_school`, `enhanced:bifrost_site`, ומאז 3.6 `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (מריצים אותה בסוף) ו-`enhanced:vormir_cliff` (מריצים אותה בנד'ר), ומאז 3.7 `enhanced:agatha_cottage`. ראו [מבנים בעולם](Structures-HE#אתרי-האבנים-36). המעבדות התחתונות של בתי הספר הן לא מבנים בפני עצמם: הן מתחת לבתי הספר.
 
 ## קסם בנייה: /enhanced build
 
@@ -114,6 +117,8 @@
 | `hela` | [הלה](Hela-HE#להפוך-להלה-הגיבורה) (3.5) |
 | `doctor_strange` | [דוקטור סטריינג'](Doctor-Strange-HE) (3.6) |
 | `hulk` | [האלק](Hulk-HE) (3.6) |
+| `wolverine` | [וולברין](Wolverine-HE) (3.7) |
+| `deadpool` | [דדפול](Deadpool-HE) (3.7) |
 | `custom` | הגיבור של השחקן מ[יוצר הגיבורים](Hero-Creator-HE): זה שהוא יצר אחרון (גיבור ריק, בלי כוחות, אם הוא אף פעם לא יצר אחד) |
 
 הפקודה מציעה את השמות בזמן ההקלדה. שחקן שמקבל כוח מתעורר בתור הגיבור, עם הכותרת, הצליל וההודעה לכולם, בדיוק כאילו הרוויח אותו. אם לשחקן כבר יש את הכוח הזה ונותנים מראה, רק המראה משתנה.
@@ -142,6 +147,8 @@
 | הלה | `goddess`, `arrival`, `own` |
 | דוקטור סטריינג' | `sorcerer_supreme`, `multiverse`, `defender`, `own` |
 | האלק | `ragnarok`, `brand_new_day`, `banner`, `own` (`banner` ו-`own` הם ברוס באנר, בלי כוחות) |
+| וולברין | `classic`, `x_men_2000`, `own` |
+| דדפול | `classic`, `trainee`, `kidpool`, `own` |
 
 למגנטו, למכשפת השני ולקוויקסילבר אין מראות לבחור, ואת המראה של גיבור משלכם בוחרים ביוצר הגיבורים. פרופסור X שניתן בלי מראה הוא צ'ארלס הצעיר (המסך ששואל איזה צ'ארלס הוא נפתח רק אחרי כיסא הגלגלים; **H** משנה את זה). `/enhanced look` מדלגת על שחקנים שלגיבור שלהם אין את המראה, והיא נכשלת עם "מראה לא מוכר" אם לאף שחקן מהרשימה אין אותו.
 
@@ -163,6 +170,9 @@
 | `/enhanced power set Steve none` | מורידה מסטיב את הכוח. |
 | `/enhanced power set Steve doctor_strange` | הופכת את סטיב לדוקטור סטריינג' (ככה הוא לא מקבל עין: תנו לו אחת, או השתמשו בבחרו גיבור). |
 | `/enhanced power set Steve hulk brand_new_day` | הופכת את סטיב להאלק, מיד להאלק של יום חדש לגמרי. |
+| `/enhanced power set Steve wolverine x_men_2000` | הופכת את סטיב לוולברין, בעור השחור של *אקס-מן* (2000) (בלי הזריקה). |
+| `/enhanced power set Steve deadpool kidpool` | הופכת את סטיב לדדפול, בתור קידפול. |
+| `/enhanced structure school_lab status` | מספרת על המעבדה של בית הספר הקרוב. |
 | `/enhanced look Steve white_vision` | מעבירה את סטיב, שהוא ויז'ן, למראה של ויז'ן הלבן. |
 | `/enhanced hex list` | מציגה את ההקסים במימד שלכם. |
 | `/enhanced hex clear` | מפרקת את כולם. |
