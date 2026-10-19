@@ -28,9 +28,11 @@ import java.util.function.Predicate;
  * no cooldown: {@link Bifrost.Source#NPC}). Each node offers at most three answers. Lines: {@code npc.enhanced.heimdall.<node>};
  * answers: {@code npc.enhanced.option.heimdall_<key>}.
  *
- * <p>The nodes, highest priority first: {@code watch_running} (his Watch runs), {@code greeting} (first meeting),
- * {@code hold_hofund} (he won the Watch and has no power yet), {@code fellow} (he is Heimdall), {@code watch_offer} (he may
- * take the Watch), {@code watch_rest} (he lost it and must rest), {@code watch_done} (won, and another power), and
+ * <p>The nodes, highest priority first: {@code watch_running} (his Watch runs), {@code post_kept} (3.5.1: he keeps
+ * Heimdall's post, {@link HeimdallPost}), {@code handover} (he is Heimdall: the post is handed to him), {@code greeting}
+ * (first meeting), {@code hold_hofund} (he won the Watch and has no power yet), {@code fellow} (he is Heimdall),
+ * {@code keeper_away} (another player keeps the post: still the Watch, home and back), {@code watch_offer} (he may
+ * take the Watch), {@code watch_rest} (he lost it and must rest), {@code watch_done} (won, and another power) and
  * {@code idle} (always).
  */
 @EventBusSubscriber(modid = Enhanced.MODID, bus = EventBusSubscriber.Bus.MOD)
@@ -51,6 +53,10 @@ public final class HeimdallTalk {
     public static final String WHO = "heimdall_who";
     public static final String GIVE_UP = "heimdall_give_up";
     public static final String HOFUND = "heimdall_hofund";
+    /** 3.5.1, Heimdall's post: the keeper's answers. */
+    public static final String POST_THANKS = "heimdall_post_thanks";
+    public static final String POST_RETURN = "heimdall_post_return";
+    public static final String POST_KEEP = "heimdall_post_keep";
 
     private static boolean progress(Ctx c, int flag) {
         return c.progress().has(flag);
@@ -112,6 +118,21 @@ public final class HeimdallTalk {
         }
         registered = true;
         node("watch_running", RUNNING, 100, giveUp());
+        // 3.5.1, Heimdall's post: the keeper may give it back; a player who is Heimdall is handed it (the line says
+        // "We are both guardians of Asgard"); others hear who keeps it.
+        node("post_kept", c -> HeimdallPost.keeps(c.player()), 95,
+                new Option(POST_RETURN, ALWAYS, c -> HeimdallPost.end(c.player(), true)), Option.close(POST_KEEP));
+        node("handover", c -> c.npc() != null && !c.npc().summoned() && HeimdallPost.mayHandOver(c.player()), 85,
+                Option.close(POST_THANKS));
+        AsgardDialogue.onShow(Role.HEIMDALL, "handover", c -> {
+            if (c.npc() != null) {
+                HeimdallPost.handOver(c.player(), c.npc());
+            }
+        });
+        node("keeper_away", c -> HeimdallPost.keptByAnother(c.player()), 55, watch(), home(), back());
+        AsgardDialogue.args(Role.HEIMDALL, "keeper_away", c -> List.of(HeimdallPost.keeperName(c.player().server)));
+        AsgardDialogue.lines("npc.enhanced.heimdall.post_return", "boss.enhanced.post", "boss.enhanced.post.time",
+                "message.enhanced.post.begins", "message.enhanced.post.socket_nobody");
         node("greeting", c -> !progress(c, AsgardProgress.MET_HEIMDALL), 80, watch(), who(), home());
         node("hold_hofund", c -> progress(c, AsgardProgress.WATCH_WON) && Powers.get(c.player()).power() == Power.NONE, 70,
                 hofund(), home(), back());

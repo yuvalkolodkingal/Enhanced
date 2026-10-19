@@ -351,7 +351,9 @@ public final class Bifrost {
             return false;
         }
         long now = heimdall.level().getGameTime();
-        if (!data.isReady(HeroAbility.HEIMDALL_STRIKE, now)) {
+        // 3.5.1: the keeper of Heimdall's post sends from the Observatory as the city's Heimdall does, with no cooldown.
+        boolean keeper = com.kolodkingal.enhanced.heimdall.HeimdallPost.sendsFreely(heimdall);
+        if (!keeper && !data.isReady(HeroAbility.HEIMDALL_STRIKE, now)) {
             return false;
         }
         if (!(heimdall.serverLevel().getEntity(targetId) instanceof ServerPlayer target) || target == heimdall
@@ -375,7 +377,9 @@ public final class Bifrost {
         }
         begin(target, where, Source.HEIMDALL_SEND);
         SENT_BY.put(target.getUUID(), heimdall.getUUID());
-        data.startCooldown(HeroAbility.HEIMDALL_STRIKE, now, sendCooldown());
+        if (!keeper) {
+            data.startCooldown(HeroAbility.HEIMDALL_STRIKE, now, sendCooldown());
+        }
         heimdall.displayClientMessage(Component.translatable("message.enhanced.bifrost.sent", target.getDisplayName()), true);
         target.displayClientMessage(Component.translatable("message.enhanced.bifrost.sent_to_you", heimdall.getDisplayName()), true);
         HeimdallFx.near(heimdall.serverLevel(), heimdall.position(), HeimdallFx.SEND, heimdall, List.of(target.position()), 0);

@@ -56,6 +56,39 @@ final class AsgardLines {
         hogun();
         einherjar();
         citizen();
+        oneOfEach();
+    }
+
+    // ---- one of each character (3.5.1) ----
+
+    /** Whether a player online is Odin now (the Odin of the city is away). */
+    static boolean odinPlayed(Ctx ctx) {
+        return !Asgardians.heroesPlaying(ctx.player().server, Power.ODIN).isEmpty();
+    }
+
+    /** The names of the players who are Odin. */
+    static List<String> odinNames(Ctx ctx) {
+        return List.of(Asgardians.heroNames(ctx.player().server, Power.ODIN));
+    }
+
+    /**
+     * While a player is Odin, the Asgardian Odin is away (the keeper's rule), so every line that speaks of the Allfather
+     * asleep or in his chamber names the player instead: "the Allfather has woken: <name> sits the throne".
+     */
+    private static void oneOfEach() {
+        String odinPlayer = "npc.enhanced.frigga.odin_player";
+        for (String line : List.of("npc.enhanced.frigga.odin_sleeps", "npc.enhanced.frigga.odin_awake", "npc.enhanced.frigga.odin_asleep")) {
+            AsgardDialogue.swap(line, AsgardLines::odinPlayed, odinPlayer, AsgardLines::odinNames);
+        }
+        AsgardDialogue.swap("npc.enhanced.hogun.vault", AsgardLines::odinPlayed, "npc.enhanced.hogun.vault_player", AsgardLines::odinNames);
+        AsgardDialogue.swap("npc.enhanced.hogun.vault_more", AsgardLines::odinPlayed, "npc.enhanced.hogun.vault_more_player",
+                AsgardLines::odinNames);
+        AsgardDialogue.swap("npc.enhanced.fandral.gungnir", AsgardLines::odinPlayed, "npc.enhanced.fandral.gungnir_player",
+                AsgardLines::odinNames);
+        AsgardDialogue.swap("npc.enhanced.einherjar.news.3", AsgardLines::odinPlayed, "npc.enhanced.einherjar.news_odin_player",
+                AsgardLines::odinNames);
+        AsgardDialogue.swap("npc.enhanced.citizen.rumour.14", AsgardLines::odinPlayed, "npc.enhanced.citizen.rumour_odin_player",
+                AsgardLines::odinNames);
     }
 
     // ---- shared ----

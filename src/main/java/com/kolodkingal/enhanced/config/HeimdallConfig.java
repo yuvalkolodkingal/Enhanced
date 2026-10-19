@@ -30,6 +30,8 @@ public final class HeimdallConfig {
     public static ModConfigSpec.IntValue WATCH_SECONDS;
     public static ModConfigSpec.IntValue WATCH_RETRY;
     public static ModConfigSpec.DoubleValue HOFUND_BONUS;
+    /** 3.5.1: how long the Heimdall of the city leaves his post to a player who is Heimdall. */
+    public static ModConfigSpec.IntValue POST_SECONDS;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.push(SECTION);
@@ -67,6 +69,9 @@ public final class HeimdallConfig {
                 .defineInRange("watchRetry", 1200, 0, 72000);
         HOFUND_BONUS = builder.comment("How much more damage Heimdall deals with Hofund (0.3: 30% more).")
                 .defineInRange("hofundBonus", 0.3, 0.0, 5.0);
+        POST_SECONDS = builder.comment("How long (seconds) the Heimdall of the city hands his post (the Observatory and the",
+                        "Bifrost) to a player who is Heimdall, while he rests nearby.")
+                .defineInRange("postSeconds", 600, 1, 7200);
         builder.pop();
     }
 

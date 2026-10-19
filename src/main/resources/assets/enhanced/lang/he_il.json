@@ -3337,5 +3337,22 @@
   "hud.enhanced.hela.allies": "%s קמים, %s שנ׳",
   "hud.enhanced.hela.grasp": "אחיזה %s שנ׳",
   "preset.enhanced.hela": "דמוית הלה",
-  "preset.enhanced.hela.desc": "חרבות מוות, חומות להבים וצבא המתים"
+  "preset.enhanced.hela.desc": "חרבות מוות, חומות להבים וצבא המתים",
+  "npc.enhanced.frigga.odin_player": "אבי-כל התעורר: %s יושב עכשיו על הכס. תהיו טובים אליו, כתר כבד יותר ממה שהוא נראה.",
+  "npc.enhanced.hogun.vault_player": "הכספת נמצאת מתחת לאולם הכס. אבי-כל התעורר: המפתח שלה אצל %s עכשיו.",
+  "npc.enhanced.hogun.vault_more_player": "אודין כבר התעורר. עכשיו %s נושא את השם שלו. תשאל אותו, לא אותי.",
+  "npc.enhanced.fandral.gungnir_player": "גונגניר מצאה שוב יד: %s, אבי-כל שלנו! ובכל זאת אומרים שהכספת שומרת חנית לכל גיבור שעומד מול הלה.",
+  "npc.enhanced.einherjar.news_odin_player": "אבי-כל התעורר! %s יושב על הכס. תעמדו ישר כשהוא עובר.",
+  "npc.enhanced.citizen.rumour_odin_player": "שמעת? אבי-כל התעורר: %s יושב על הכס, וכל הארמון מזמזם!",
+  "npc.enhanced.heimdall.handover": "שנינו שומרי אסגרד. תשמור לי על הביפרוסט לזמן מה: השקע של הופונד עונה לך עכשיו. אני אנוח שם, קרוב.",
+  "npc.enhanced.heimdall.post_kept": "הביפרוסט בידיים טובות. שאחזור לעמדה שלי?",
+  "npc.enhanced.heimdall.keeper_away": "%s שומר לי עכשיו על הביפרוסט. שנינו שומרי אסגרד. אני עדיין יכול לשלוח אותך הביתה.",
+  "npc.enhanced.heimdall.post_return": "תודה, שומר. אני חוזר לעמדה שלי. שנינו שומרי אסגרד.",
+  "npc.enhanced.option.heimdall_post_thanks": "אשמור עליו היטב.",
+  "npc.enhanced.option.heimdall_post_return": "תחזור לעמדה שלך.",
+  "npc.enhanced.option.heimdall_post_keep": "אשמור עוד קצת.",
+  "boss.enhanced.post": "שומר הביפרוסט",
+  "boss.enhanced.post.time": "שומר הביפרוסט — %s",
+  "message.enhanced.post.begins": "העמדה של היימדל שלך ל-%s. השקע והביפרוסט עונים לך.",
+  "message.enhanced.post.socket_nobody": "הביפרוסט עונה לשומר שלו. אף אחד במצפה לא מחכה שישלחו אותו."
 }

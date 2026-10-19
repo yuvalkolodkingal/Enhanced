@@ -114,6 +114,17 @@ public final class AsgardDialogue {
         }
     }
 
+    /**
+     * Another line said in place of {@code line} (one variant of it) while {@code when} holds, with its own arguments
+     * (3.5.1: "the Allfather sleeps" becomes "the Allfather has woken: <player>" while a player is Odin).
+     */
+    public record Swap(String line, Predicate<Ctx> when, String instead, Function<Ctx, List<String>> args) {
+    }
+
+    /** A line as it is said: its lang key and its arguments. */
+    public record Said(String line, List<String> args) {
+    }
+
     /** A line of a role: said when {@code when} holds and no node of a higher priority does. */
     public record Node(String key, Predicate<Ctx> when, int priority, List<Option> options) {
     }
@@ -122,6 +133,8 @@ public final class AsgardDialogue {
     private static final Map<String, List<Option>> EXTRA = new HashMap<>();
     private static final Map<String, Integer> VARIANTS = new HashMap<>();
     private static final Map<String, Function<Ctx, List<String>>> ARGS = new HashMap<>();
+    private static final Map<String, List<Swap>> SWAPS = new HashMap<>();
+    private static final Map<String, Action> ON_SHOW = new HashMap<>();
     /** Lang keys said outside nodes ({@link AsgardTalk#speak}): checked by the tests like the nodes' lines. */
     private static final Set<String> LINES = new LinkedHashSet<>();
 
@@ -175,6 +188,43 @@ public final class AsgardDialogue {
     /** The arguments of a node's line (its {@code %s}), worked out when it is said. */
     public static synchronized void args(Role role, String node, Function<Ctx, List<String>> args) {
         ARGS.put(role.name() + "/" + node, args);
+    }
+
+    /**
+     * Says {@code instead} (with {@code args}) in place of the line {@code line} (a full lang key, a variant's included)
+     * whenever {@code when} holds. The first swap that holds wins.
+     */
+    public static synchronized void swap(String line, Predicate<Ctx> when, String instead, Function<Ctx, List<String>> args) {
+        SWAPS.computeIfAbsent(line, k -> new ArrayList<>()).add(new Swap(line, when, instead, args));
+        LINES.add(instead);
+    }
+
+    /** The swaps of every line (for the tests). */
+    public static synchronized List<Swap> swaps() {
+        List<Swap> all = new ArrayList<>();
+        SWAPS.values().forEach(all::addAll);
+        return all;
+    }
+
+    /** What is said for {@code line} (with {@code args}) in this talk: the line itself, or the swap that holds. */
+    public static synchronized Said said(Ctx ctx, String line, List<String> args) {
+        for (Swap swap : SWAPS.getOrDefault(line, List.of())) {
+            if (swap.when().test(ctx)) {
+                return new Said(swap.instead(), swap.args().apply(ctx));
+            }
+        }
+        return new Said(line, args);
+    }
+
+    /** Runs {@code action} each time the node {@code node} of {@code role} is shown (before its line is sent). */
+    public static synchronized void onShow(Role role, String node, Action action) {
+        ON_SHOW.put(role.name() + "/" + node, action);
+    }
+
+    /** The action run when the node is shown, or null. */
+    @Nullable
+    public static synchronized Action onShowOf(Role role, String node) {
+        return ON_SHOW.get(role.name() + "/" + node);
     }
 
     /** Notes lang keys said outside the nodes (for the tests' scan). */
@@ -296,6 +346,12 @@ public final class AsgardDialogue {
 
         public Builder args(Function<Ctx, List<String>> args) {
             AsgardDialogue.args(role, key, args);
+            return this;
+        }
+
+        /** What happens each time the node is shown ({@link AsgardDialogue#onShow}). */
+        public Builder onShow(Action action) {
+            AsgardDialogue.onShow(role, key, action);
             return this;
         }
 

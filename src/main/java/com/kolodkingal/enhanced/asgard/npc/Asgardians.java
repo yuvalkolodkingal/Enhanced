@@ -1,10 +1,13 @@
 package com.kolodkingal.enhanced.asgard.npc;
 
 import com.kolodkingal.enhanced.asgard.AsgardState;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -67,7 +70,7 @@ public final class Asgardians {
 
     /** The nearest place within 3 blocks up or down where a body of two blocks stands on something, or null. */
     @Nullable
-    static BlockPos standOn(ServerLevel level, BlockPos at) {
+    public static BlockPos standOn(ServerLevel level, BlockPos at) {
         for (int dy = 0; dy <= 3; dy++) {
             for (int sign : new int[]{1, -1}) {
                 BlockPos p = at.above(dy * sign);
@@ -143,6 +146,36 @@ public final class Asgardians {
     /** Every Asgardian within {@code range} of {@code at}. */
     public static List<AsgardianEntity> near(ServerLevel level, Vec3 at, double range) {
         return level.getEntitiesOfClass(AsgardianEntity.class, new AABB(at, at).inflate(range), Entity::isAlive);
+    }
+
+    // ---- one of each character (3.5.1) ----
+
+    /** The players online who are {@code power} now (by their power, not a custom hero's rows), in the server's order. */
+    public static List<ServerPlayer> heroesPlaying(MinecraftServer server, Power power) {
+        List<ServerPlayer> out = new ArrayList<>();
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            if (Powers.power(player) == power) {
+                out.add(player);
+            }
+        }
+        return out;
+    }
+
+    /** Their names, joined ("Eilon" or "Eilon, Peter"), or "" when nobody is {@code power}. */
+    public static String heroNames(MinecraftServer server, Power power) {
+        StringBuilder names = new StringBuilder();
+        for (ServerPlayer player : heroesPlaying(server, power)) {
+            if (!names.isEmpty()) {
+                names.append(", ");
+            }
+            names.append(player.getGameProfile().getName());
+        }
+        return names.toString();
+    }
+
+    /** Whether the Asgardian of {@code role} is away now: a player online is its hero ({@link Role#yieldsToHero()}). */
+    public static boolean yields(MinecraftServer server, Role role) {
+        return role.yieldsToHero() && !heroesPlaying(server, role.hero()).isEmpty();
     }
 
     /** Whether Odin is awake (Hela has fallen once): his NPC stands in the throne room. */

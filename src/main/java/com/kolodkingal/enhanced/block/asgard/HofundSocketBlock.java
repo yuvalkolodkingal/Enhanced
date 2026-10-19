@@ -23,7 +23,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The Hofund socket (3.5), in the middle of Heimdall's Observatory ({@code CityPlan.OBSERVATORY_SOCKET}): a gold drum
  * in which the client shows Hofund (when no player near it holds one). A player with no Hofund who touches it is told
- * that the sword is Heimdall's to give, unless Heimdall stands near enough to talk: then his talk opens.
+ * that the sword is Heimdall's to give, unless Heimdall stands near enough to talk: then his talk opens. While a player
+ * keeps Heimdall's post (3.5.1, {@code HeimdallPost}), the socket answers to him instead.
  */
 public class HofundSocketBlock extends BaseEntityBlock {
     public static final MapCodec<HofundSocketBlock> CODEC = simpleCodec(HofundSocketBlock::new);
@@ -50,6 +51,11 @@ public class HofundSocketBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer server
+                && com.kolodkingal.enhanced.heimdall.HeimdallPost.touchSocket(server)) {
+            // 3.5.1: it answers to the keeper of Heimdall's post (the mechanism spins, he may send a traveller).
+            return InteractionResult.sidedSuccess(false);
+        }
         if (!level.isClientSide && !HofundItem.isHofund(player.getMainHandItem())
                 && !HofundItem.isHofund(player.getOffhandItem()) && !heimdallAnswers(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.asgard.socket").withStyle(ChatFormatting.GOLD), true);
