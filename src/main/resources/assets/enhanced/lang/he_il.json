@@ -4200,6 +4200,8 @@
   "commands.enhanced.structure.school_lab.state.blocked": "חסומה",
   "commands.enhanced.structure.school_lab.whole": "חורים בקירות: %s. מים או לבה תועים בפנים: %s. דלתות בלי משקוף: %s.",
   "item.enhanced.school_lab.trainee_banner": "דגל חניכי האקס-מן",
+  "anim.enhanced.run.wolverine": "וולברין",
+  "anim.enhanced.run.deadpool": "דדפול",
   "item.enhanced.school_lab.adamantium_shavings": "שבבי אדמנטיום",
   "message.enhanced.locator.not_here": "לא בעולם הזה.",
   "message.enhanced.locator.not_asgard": "לא באסגרד.",

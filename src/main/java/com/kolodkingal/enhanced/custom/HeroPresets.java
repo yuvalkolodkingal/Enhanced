@@ -22,7 +22,9 @@ public final class HeroPresets {
             // 3.5 (one per lane: the heroes of Asgard)
             "heimdall", "odin", "hela",
             // 3.6 (lanes L3, L7)
-            "strange", "hulk");
+            "strange", "hulk",
+            // 3.7 (lanes L2, L3)
+            "wolverine", "deadpool");
     /** The archetypes. */
     public static final List<String> ARCHETYPES = List.of("speedster", "flyer_blaster", "tank", "mage", "mind_master", "elemental");
     /** The most points a preset may cost. */

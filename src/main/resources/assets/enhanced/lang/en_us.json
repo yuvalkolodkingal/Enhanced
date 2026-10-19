@@ -4200,6 +4200,8 @@
   "commands.enhanced.structure.school_lab.state.blocked": "blocked",
   "commands.enhanced.structure.school_lab.whole": "Holes in its walls: %s. Stray water or lava inside: %s. Doors without a frame: %s.",
   "item.enhanced.school_lab.trainee_banner": "X-Men Trainee Banner",
+  "anim.enhanced.run.wolverine": "Wolverine",
+  "anim.enhanced.run.deadpool": "Deadpool",
   "item.enhanced.school_lab.adamantium_shavings": "Adamantium Shavings",
   "message.enhanced.locator.not_here": "Not in this realm.",
   "message.enhanced.locator.not_asgard": "Not in Asgard.",

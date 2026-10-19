@@ -57,7 +57,7 @@
   "moves": {},
   "anim": {
     "flight": "auto",
-    "run": "auto",
+    "run": "wolverine",
     "speedRun": "auto",
     "idle": "ready"
   },

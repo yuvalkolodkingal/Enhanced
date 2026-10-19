@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.deadpool;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.block.WeaponXPodBlock;
+import com.kolodkingal.enhanced.block.WeaponXPodBlockEntity;
 import com.kolodkingal.enhanced.config.DeadpoolConfig;
 import com.kolodkingal.enhanced.network.LabFxPayload;
 import com.kolodkingal.enhanced.power.Power;
@@ -91,7 +92,7 @@ public final class PodTreatment {
         hold(player, true);
         PacketDistributor.sendToPlayersNear(level, null, pod.getX() + 0.5, pod.getY(), pod.getZ() + 0.5, 64.0,
                 new LabFxPayload(LabFxPayload.POD_START, pod));
-        level.playSound(null, pod, ModSounds.WEAPON_X_POD_HUM.get(), SoundSource.BLOCKS, 1.0F, 0.8F);
+        running(level, pod, true);
         tell(player, "message.enhanced.deadpool.pod_start");
         return InteractionResult.CONSUME;
     }
@@ -163,6 +164,7 @@ public final class PodTreatment {
         Powers.awaken(player, Power.DEADPOOL, DeadpoolAbilities.CLASSIC);
         PacketDistributor.sendToPlayersNear(level, null, pod.getX() + 0.5, pod.getY(), pod.getZ() + 0.5, 64.0,
                 new LabFxPayload(LabFxPayload.POD_DONE, pod));
+        running(level, pod, false);
         Vec3 at = player.position();
         level.sendParticles(new DustParticleOptions(new Vector3f(0.95F, 0.12F, 0.2F), 2.0F), at.x, at.y + 1.0, at.z,
                 60, 0.5, 0.8, 0.5, 0.0);
@@ -181,8 +183,19 @@ public final class PodTreatment {
         ServerLevel level = player.serverLevel();
         PacketDistributor.sendToPlayersNear(level, null, treatment.pod().getX() + 0.5, treatment.pod().getY(),
                 treatment.pod().getZ() + 0.5, 64.0, new LabFxPayload(LabFxPayload.POD_DONE, treatment.pod()));
+        running(level, treatment.pod(), false);
         if (tell && player.isAlive()) {
             tell(player, "message.enhanced.deadpool.pod_cancel");
+        }
+    }
+
+    /**
+     * The pod's look (lane L4's block entity, synced): the hatch shut, the light quick, the bubbles and the hum while a
+     * treatment runs; open and idle again when it ends.
+     */
+    private static void running(ServerLevel level, BlockPos pod, boolean on) {
+        if (level.getBlockEntity(pod) instanceof WeaponXPodBlockEntity entity) {
+            entity.setRunning(on);
         }
     }
 

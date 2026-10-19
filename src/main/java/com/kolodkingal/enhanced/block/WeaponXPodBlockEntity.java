@@ -52,11 +52,13 @@ public class WeaponXPodBlockEntity extends BlockEntity {
         }
     }
 
+    /**
+     * Nothing of a treatment is saved with the world: a treatment lives in the server's memory ({@code PodTreatment})
+     * and never outlasts a restart, so a pod loaded from disk is always idle (its hatch open, no hum).
+     */
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putBoolean("running", running);
-        tag.putLong("since", since);
     }
 
     @Override
@@ -66,9 +68,13 @@ public class WeaponXPodBlockEntity extends BlockEntity {
         since = tag.getLong("since");
     }
 
+    /** What the clients are told: whether a treatment runs, and since when. */
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
+        CompoundTag tag = saveWithoutMetadata(registries);
+        tag.putBoolean("running", running);
+        tag.putLong("since", since);
+        return tag;
     }
 
     @Override

@@ -50,8 +50,8 @@ public final class AnimCatalog {
             "heimdall", "odin", "hela",
             // 3.6
             "doctor_strange", "hulk",
-            // 3.7 (lane L3)
-            "deadpool");
+            // 3.7 (lanes L2, L3)
+            "wolverine", "deadpool");
 
     /** Speedster runs: Quicksilver in his Time, Quicksilver's Super Speed, Tommy's. */
     public static final List<String> SPEED_RUNS = List.of("qs_time", "qs_speed", "tommy");

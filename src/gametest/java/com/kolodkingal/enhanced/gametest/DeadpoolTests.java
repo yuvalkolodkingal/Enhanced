@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.block.WeaponXPodBlock;
+import com.kolodkingal.enhanced.block.WeaponXPodBlockEntity;
 import com.kolodkingal.enhanced.config.DeadpoolConfig;
 import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -778,6 +779,11 @@ public final class DeadpoolTests {
         return helper.absolutePos(rel);
     }
 
+    /** Whether the pod's block entity (lane L4's: the hatch, light and hum) says a treatment runs. */
+    static boolean podRunning(GameTestHelper helper, BlockPos pod) {
+        return helper.getLevel().getBlockEntity(pod) instanceof WeaponXPodBlockEntity entity && entity.running();
+    }
+
     /** A powerless player in the pod is Deadpool after 100 ticks of treatment, not 99. */
     @GameTest(template = ARENA, batch = POD, timeoutTicks = 200)
     public static void thePodMakesDeadpoolAfterAHundredTicks(GameTestHelper helper) {
@@ -788,6 +794,7 @@ public final class DeadpoolTests {
         check(PodTreatment.inside(wade, pod), "he stands in the pod");
         PodTreatment.use(wade, pod.above());
         check(PodTreatment.underWay(wade), "the treatment begins (the upper half answers too)");
+        check(podRunning(helper, pod), "the pod's hatch shuts and it hums (its block entity runs)");
         long start = helper.getLevel().getGameTime();
         int[] lastNone = {-1};
         until(helper, 160, () -> {
@@ -801,6 +808,7 @@ public final class DeadpoolTests {
             check(lastNone[0] == 99, "Deadpool on the 100th tick, after " + lastNone[0]);
             check(Powers.power(wade) == Power.DEADPOOL, "Deadpool");
             check(!PodTreatment.underWay(wade), "the treatment is over");
+            check(!podRunning(helper, pod), "the pod opens again");
             assertNear(wade.getAttributeValue(Attributes.MOVEMENT_SPEED), wade.getAttributeBaseValue(
                     Attributes.MOVEMENT_SPEED) * 1.15, 1.0E-4, "the hatch let him go (and his speed is his)");
             helper.succeed();
@@ -828,6 +836,7 @@ public final class DeadpoolTests {
             step(helper, 2, () -> {
                 wade.setShiftKeyDown(false);
                 check(!PodTreatment.underWay(wade), "sneaking cancels it");
+                check(!podRunning(helper, pod), "the pod opens again");
                 check(Powers.power(wade) == Power.NONE, "still powerless");
                 check(wade.getAttributeValue(Attributes.MOVEMENT_SPEED) > 0.05, "and free to walk");
                 helper.succeed();
