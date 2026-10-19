@@ -1,7 +1,34 @@
 {
   "variants": {
-    "": {
+    "facing=north,full=false": {
       "model": "enhanced:block/tesseract_cradle"
+    },
+    "facing=east,full=false": {
+      "model": "enhanced:block/tesseract_cradle",
+      "y": 90
+    },
+    "facing=south,full=false": {
+      "model": "enhanced:block/tesseract_cradle",
+      "y": 180
+    },
+    "facing=west,full=false": {
+      "model": "enhanced:block/tesseract_cradle",
+      "y": 270
+    },
+    "facing=north,full=true": {
+      "model": "enhanced:block/tesseract_cradle"
+    },
+    "facing=east,full=true": {
+      "model": "enhanced:block/tesseract_cradle",
+      "y": 90
+    },
+    "facing=south,full=true": {
+      "model": "enhanced:block/tesseract_cradle",
+      "y": 180
+    },
+    "facing=west,full=true": {
+      "model": "enhanced:block/tesseract_cradle",
+      "y": 270
     }
   }
 }

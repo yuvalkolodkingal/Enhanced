@@ -19,6 +19,12 @@
       ]
     },
     {
+      "processor_type": "enhanced:seal",
+      "block": {
+        "Name": "minecraft:stone_bricks"
+      }
+    },
+    {
       "processor_type": "enhanced:foundation",
       "block": {
         "Name": "minecraft:stone_bricks"

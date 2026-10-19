@@ -239,6 +239,7 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .noOcclusion()
                     .pushReaction(PushReaction.BLOCK)
+                    .lightLevel(state -> state.getValue(TesseractCradleBlock.FULL) ? 11 : 0)
                     .noLootTable());
     // ===== hulk (3.6) =====
     /** The Gamma Emitter: a crafted lab device; it drops itself (lane L7). */

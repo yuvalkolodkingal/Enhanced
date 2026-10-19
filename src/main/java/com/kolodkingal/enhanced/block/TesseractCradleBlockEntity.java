@@ -6,8 +6,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * The Tesseract's cradle's block entity (3.6): whether its Tesseract was taken. Registered by the 3.6 skeleton empty;
- * lane L4 owns the class.
+ * The Tesseract's cradle's block entity (3.6): it holds nothing of its own (whether the cradle is full is its block's
+ * state); it is there so the client can draw the Tesseract turning over it ({@code TesseractCradleRenderer}).
  */
 public class TesseractCradleBlockEntity extends BlockEntity {
     public TesseractCradleBlockEntity(BlockPos pos, BlockState state) {

@@ -12,5 +12,7 @@
   "template": "enhanced:sanctum/house",
   "floor": 3,
   "max_slope": 4,
-  "processors": "enhanced:sanctum"
+  "processors": "enhanced:sanctum",
+  "enabled_by": "sanctums",
+  "ground": "highest"
 }

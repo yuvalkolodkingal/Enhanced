@@ -54,6 +54,12 @@ public final class ModStructures {
     public static final DeferredHolder<StructurePieceType, StructurePieceType> CRATER_PIECE =
             STRUCTURE_PIECES.register("crater", () -> (StructurePieceType.ContextlessType) CraterPiece::new);
 
+    // ===== stone_sites (3.6): the seal against fluids =====
+    /** Seals a template's carved air against the world's lava and water (see {@code world.SealProcessor}). */
+    public static final DeferredHolder<StructureProcessorType<?>,
+            StructureProcessorType<com.kolodkingal.enhanced.world.SealProcessor>> SEAL =
+            PROCESSORS.register("seal", () -> () -> com.kolodkingal.enhanced.world.SealProcessor.CODEC);
+
     /** Fills the ground in under a template where it falls away (see {@link FoundationProcessor}). */
     public static final DeferredHolder<StructureProcessorType<?>, StructureProcessorType<FoundationProcessor>> FOUNDATION =
             PROCESSORS.register("foundation", () -> () -> FoundationProcessor.CODEC);
