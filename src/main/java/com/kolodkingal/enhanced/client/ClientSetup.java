@@ -135,6 +135,9 @@ public final class ClientSetup {
             com.kolodkingal.enhanced.client.school.LabClient.setup();
             // ===== finders (3.7) =====
             com.kolodkingal.enhanced.client.finders.LocatorClient.setup();
+            // The lab's console (L4) lifts its helmet off the stand while its Cerebro is on (L5).
+            com.kolodkingal.enhanced.client.school.LabRenderers.Console.helmetOff =
+                    com.kolodkingal.enhanced.client.finders.CerebroSphere::consoleOn;
             // ===== cottage (3.7) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
