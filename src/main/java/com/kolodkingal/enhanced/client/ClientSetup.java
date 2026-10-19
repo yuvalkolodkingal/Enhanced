@@ -108,6 +108,14 @@ public final class ClientSetup {
             // ===== 3.6: each lane registers its effects' drawers here (StoneFx, StrangeFx, HulkFx, HydraFx) =====
             // ===== stones (3.6) =====
             // ===== strange (3.6) =====
+            com.kolodkingal.enhanced.client.render.StrangeSpellFx.register();
+            // The Eye of Agamotto opens (its model's predicate) while held for the awakening or its holder's time runs.
+            net.minecraft.client.renderer.item.ItemProperties.register(
+                    com.kolodkingal.enhanced.registry.ModItems.EYE_OF_AGAMOTTO.get(),
+                    com.kolodkingal.enhanced.Enhanced.id("open"), (stack, level, holder, seed) -> holder != null
+                            && (holder.getUseItem() == stack || holder instanceof net.minecraft.world.entity.player.Player p
+                            && com.kolodkingal.enhanced.power.Powers.get(p).toggle(
+                                    com.kolodkingal.enhanced.power.Toggle.TIME_SLOW)) ? 1.0F : 0.0F);
             // ===== vormir (3.6) =====
             // ===== hulk (3.6) =====
             // ===== hydra (3.6) =====
@@ -191,8 +199,10 @@ public final class ClientSetup {
         // nothing (or a stand-in) until their lanes give them renderers; the blocks are plain models until then.
         // ===== stones (3.6) =====
         // ===== strange (3.6) =====
-        event.registerEntityRenderer(ModEntities.SLING_PORTAL.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.ASTRAL_BODY.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.SLING_PORTAL.get(),
+                com.kolodkingal.enhanced.client.render.SlingPortalRenderer::new);
+        event.registerEntityRenderer(ModEntities.ASTRAL_BODY.get(),
+                com.kolodkingal.enhanced.client.render.AstralBodyRenderer::new);
         // ===== stone_sites (3.6) =====
         // ===== vormir (3.6) =====
         event.registerEntityRenderer(ModEntities.STONEKEEPER.get(), NoopRenderer::new);
@@ -315,6 +325,9 @@ public final class ClientSetup {
                         event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER))));
                 // ===== stones (3.6) =====
                 // ===== strange (3.6) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.CloakLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.EyeAmuletLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.AstralLayer(renderer));
                 // ===== hulk (3.6) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,

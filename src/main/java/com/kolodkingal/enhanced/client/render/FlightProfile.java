@@ -170,6 +170,19 @@ public final class FlightProfile {
             pose(-4, 0, 30, -4, 0, -30, 6, 1, 4, -1),      // cruise: the arms drift back a little
             pose(18, 0, 40, 18, 0, -40, 10, 1, 8, -1)});   // sprint: the arms trail behind, open
 
+    // ===== doctor_strange (3.6) =====
+    /**
+     * Doctor Strange on the Cloak of Levitation: graceful and slow, upright, the legs together and the knees a little
+     * bent, the hands relaxed and a little open; he leans little into a cruise, the arms trail back at a sprint, and he
+     * sways gently as he hovers (the Cloak holds him).
+     */
+    private static final FlightProfile STRANGE = new FlightProfile(
+            new float[]{18, 40, -6}, 0.35F, 18, 12, 3.0F, 8, 5, false, new float[]{4.5F, 3.0F}, new float[]{0.05F, 90},
+            1.8F, 0.6F, 0.4F, 1.2F, false, 0.06F, false, new float[][]{
+            pose(-12, 0, 18, -12, 0, -18, 3, 1, 3, -1),    // hover: the hands relaxed, the legs together
+            pose(-6, 0, 24, -6, 0, -24, 6, 1, 5, -1),      // cruise: the arms drift back a little
+            pose(16, 0, 34, 16, 0, -34, 9, 1, 8, -1)});    // sprint: the arms trail behind, the cloak streaming
+
     /**
      * The profile a hero flies with: his own for a built-in hero, the one of his flight style for a custom hero (3.4,
      * {@link HeroAnimState#flightAs}), or null.
@@ -198,9 +211,9 @@ public final class FlightProfile {
             case PROFESSOR_X -> null; // 3.3: he walks, or rolls in his chair
             // 3.5: the gods of Asgard walk; the Bifrost carries them.
             case HEIMDALL, ODIN, HELA -> null;
-            // 3.6: Doctor Strange flies on his Cloak of Levitation: the game's own pose until lane L3 gives him a
-            // profile; the Hulk leaps.
-            case DOCTOR_STRANGE, HULK -> null;
+            // 3.6: Doctor Strange flies on his Cloak of Levitation; the Hulk leaps.
+            case DOCTOR_STRANGE -> STRANGE;
+            case HULK -> null;
             // A custom hero flies with the profile of his flight style (3.4: of(HeroAnimState)); the plain style is the
             // game's own pose.
             case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;

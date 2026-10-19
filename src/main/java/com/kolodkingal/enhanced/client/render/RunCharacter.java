@@ -45,7 +45,9 @@ public enum RunCharacter {
     /** 3.5: Heimdall, the sentinel: a heavy, upright stride in his armour, the arms swinging little, a steady bob. */
     HEIMDALL(0.65F, 0.95F, 1.05F, 3, 2, 0.020F),
     /** Hela (3.5): an upright glide, the arms hardly swinging, the sprint long and smooth, no bounce. */
-    HELA(0.45F, 0.70F, 1.10F, 3, 2, 0.006F);
+    HELA(0.45F, 0.70F, 1.10F, 3, 2, 0.006F),
+    /** Doctor Strange (3.6): upright and quick, the arms swinging little, the cloak doing the rest. */
+    DOCTOR_STRANGE(0.70F, 1.00F, 1.15F, 4, 3, 0.012F);
 
     public final float walkArms;
     public final float sprintArms;
@@ -83,6 +85,7 @@ public enum RunCharacter {
             case AGATHA -> AGATHA;
             case HEIMDALL -> HEIMDALL;
             case HELA -> HELA; // (3.5)
+            case DOCTOR_STRANGE -> DOCTOR_STRANGE; // (3.6)
             default -> DEFAULT;
         };
     }

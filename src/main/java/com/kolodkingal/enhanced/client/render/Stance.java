@@ -107,7 +107,14 @@ public enum Stance {
     /** Hela with her form on: a necrosword in each hand, held low and out, the points turned outward. */
     HELA_BLADES(3.0F, 5.0F, false),
     /** Death's Grasp: one hand held out before her, fingers spread and clawed, the other drawn back. */
-    HELA_GRASP(1.5F, 3.0F, true)
+    HELA_GRASP(1.5F, 3.0F, true),
+    // ===== strange (3.6) =====
+    /** Doctor Strange while a spell lasts: both hands up before him, the fingers in the spell mudra. */
+    STRANGE_CASTING(2.0F, 4.0F, true),
+    /** The Shield of the Seraphim held: the off palm out along the look, the other hand circling beside it. */
+    STRANGE_SHIELD(1.5F, 3.0F, true),
+    /** Hovering on the Cloak of Levitation: the legs together, a slight crouch, the hands relaxed and a little open. */
+    STRANGE_LEVITATE(4.0F, 4.0F, false)
     ;
 
     public static final Stance[] VALUES = values();

@@ -204,7 +204,7 @@ public final class CustomAnimRoutes {
 
     /** The heroes whose flight a custom hero with one of their abilities flies with when his style is {@code auto}. */
     private static final List<Power> FLIERS = List.of(Power.THOR, Power.SCARLET_WITCH, Power.VISION, Power.MAGNETO, Power.BILLY,
-            Power.PHOENIX, Power.ULTRON, Power.APOCALYPSE, Power.AGATHA);
+            Power.PHOENIX, Power.ULTRON, Power.APOCALYPSE, Power.AGATHA, Power.DOCTOR_STRANGE);
 
     /**
      * His flight style ({@code AnimCatalog.FLIGHT_STYLES}): his choice; on {@code auto} the flier one of his abilities
@@ -225,6 +225,7 @@ public final class CustomAnimRoutes {
             return switch (flight.option()) {
                 case "jet" -> "ultron";
                 case "wings" -> "phoenix";
+                case "cloak" -> "doctor_strange"; // (3.6: the Cloak of Levitation)
                 default -> "vision";
             };
         }
@@ -252,6 +253,7 @@ public final class CustomAnimRoutes {
             case "ultron" -> Power.ULTRON;
             case "apocalypse" -> Power.APOCALYPSE;
             case "agatha" -> Power.AGATHA;
+            case "doctor_strange" -> Power.DOCTOR_STRANGE;
             default -> Power.NONE;
         };
     }

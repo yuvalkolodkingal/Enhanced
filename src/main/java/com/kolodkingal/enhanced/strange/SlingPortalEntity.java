@@ -93,6 +93,24 @@ public class SlingPortalEntity extends Entity {
         super.tick();
         if (level() instanceof ServerLevel level) {
             SlingPortals.ringTick(level, this);
+        } else if (tickCount > 2 && tickCount < life() - 4) {
+            sparks();
+        }
+    }
+
+    /** Client: sparks flung off the rim, along it and a little out (the film's dripping embers). */
+    private void sparks() {
+        Vec3 c = center();
+        Vec3 n = normal();
+        Vec3 side = new Vec3(n.z, 0, -n.x);
+        for (int i = 0; i < 3; i++) {
+            double a = random.nextDouble() * Math.PI * 2;
+            Vec3 radial = side.scale(Math.cos(a)).add(0, Math.sin(a), 0);
+            Vec3 at = c.add(radial.scale(RADIUS));
+            Vec3 tangent = side.scale(-Math.sin(a)).add(0, Math.cos(a), 0);
+            Vec3 v = tangent.scale(0.12).add(radial.scale(0.05)).add(0, -0.02, 0);
+            level().addParticle(new com.kolodkingal.enhanced.particle.EnergyParticleOptions(i == 0 ? 0xFFE0A8 : 0xF29A2E,
+                    0.35F), at.x, at.y, at.z, v.x, v.y, v.z);
         }
     }
 

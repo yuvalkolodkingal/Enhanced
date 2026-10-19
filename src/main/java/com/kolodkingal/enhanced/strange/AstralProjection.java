@@ -135,7 +135,7 @@ public final class AstralProjection {
         data.setToggle(Toggle.STRANGE_ASTRAL, true);
         data.set(Live.STRANGE_ASTRAL, true);
         loseHim(player);
-        if (player.getAbilities().mayfly) {
+        if (player.mayFly()) {
             player.getAbilities().flying = true;
             player.onUpdateAbilities();
         }
@@ -177,6 +177,11 @@ public final class AstralProjection {
         if (there != null && player.isAlive()) {
             player.teleportTo(there, back.x, back.y, back.z, yaw, player.getXRot());
             player.resetFallDistance();
+            // Back in the body that knelt on the ground: standing, not floating.
+            if (player.getAbilities().flying && !player.isCreative() && !player.isSpectator()) {
+                player.getAbilities().flying = false;
+                player.onUpdateAbilities();
+            }
         }
         long now = player.level().getGameTime();
         if (was) {
@@ -237,6 +242,12 @@ public final class AstralProjection {
             Vec3 edge = from.add(off.normalize().scale(range - 1.0));
             player.teleportTo(player.serverLevel(), edge.x, edge.y, edge.z, player.getYRot(), player.getXRot());
             StrangeAbilities.say(player, "message.enhanced.strange.astral_edge");
+        }
+        // The spirit floats: it never stands on (and so never sinks through) a floor it passes through. A client that
+        // lands ends its flight; it is given back.
+        if (player.mayFly() && !player.getAbilities().flying) {
+            player.getAbilities().flying = true;
+            player.onUpdateAbilities();
         }
         if (player.tickCount % 10 == 0) {
             loseHim(player);

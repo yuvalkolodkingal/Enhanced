@@ -165,13 +165,7 @@ public final class EyeOfAgamotto {
     public static boolean use(ServerPlayer player, ItemStack stack, boolean alt) {
         PowerData data = Powers.get(player);
         switch (use(player, stack)) {
-            case STRANGE -> {
-                if (alt) {
-                    EyeTime.rewind(player, data, HeroAbility.STRANGE_EYE, true);
-                } else {
-                    EyeTime.toggleSlow(player, data, HeroAbility.STRANGE_EYE, true);
-                }
-            }
+            case STRANGE -> EyeTime.strangeUse(player, data, HeroAbility.STRANGE_EYE, alt);
             case SORCERER -> {
                 if (!StoneUse.use(player, StoneKind.TIME, StoneUse.Source.VESSEL, alt, true)) {
                     if (alt) {
@@ -185,7 +179,7 @@ public final class EyeOfAgamotto {
             case TAKEN -> StrangeAbilities.say(player, "message.enhanced.eye.taken");
             case CLOSED -> {
                 if (nonSorcererMessage()) {
-                    player.displayClientMessage(Component.translatable("message.enhanced.eye.closed")
+                    player.displayClientMessage(Component.translatable("message.enhanced.stones.use.eye_closed")
                             .withStyle(ChatFormatting.GRAY), true);
                 }
             }

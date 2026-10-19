@@ -178,10 +178,12 @@ public final class GestureRoutes {
             // (The toggles of 3.6 stand in with the pending gesture, for their own hero only, until their lanes route
             // them.)
             // ===== strange (3.6) =====
-            case STRANGE_ASTRAL, STRANGE_MIRROR -> power == Power.DOCTOR_STRANGE ? PENDING_GESTURE : null;
+            case STRANGE_ASTRAL -> power == Power.DOCTOR_STRANGE ? (on ? GestureId.STRANGE_ASTRAL
+                    : GestureId.STRANGE_ASTRAL_IN) : null;
+            case STRANGE_MIRROR -> power == Power.DOCTOR_STRANGE && on ? GestureId.STRANGE_MIRROR : null;
             // ===== stones (3.6) =====
             // (Slow Time: Doctor Strange's Y; the stones' own gesture is lane L2's StoneGestures.)
-            case TIME_SLOW -> power == Power.DOCTOR_STRANGE ? PENDING_GESTURE : null;
+            case TIME_SLOW -> power == Power.DOCTOR_STRANGE && on ? GestureId.STRANGE_EYE_OPEN : null;
             // ===== hulk (3.6) =====
             case HUMAN_FORM -> power == Power.HULK ? PENDING_GESTURE : null;
         };
@@ -443,7 +445,16 @@ public final class GestureRoutes {
                 default -> "live:HELA_GRASPING";
             };
             // ===== doctor_strange (3.6) =====
-            case DOCTOR_STRANGE -> "none: Doctor Strange's keys are acted by his plug-in (lane L3 of 3.6)";
+            // (R's lashes and grapple, Sneak + V's Dome, B's bands and N's portals are told by the payloads of their
+            // sparks, which name the caster; V held is the Shield's state; Sneak + B, the Astral Projection, and
+            // Sneak + N, the Mirror Dimension, are their switches; his Y, the Eye, is toggle:TIME_SLOW.)
+            case DOCTOR_STRANGE -> switch (ability) {
+                case 1 -> "none: the lashes and the Whip Grapple are told by the payload of the whip, which names the caster";
+                case 2 -> "flight";
+                case 3 -> "live:STRANGE_SHIELD";
+                case 4 -> "none: the Crimson Bands are told by their payload; the Astral Projection is toggle:STRANGE_ASTRAL";
+                default -> "none: the portals are told by their payload; the Mirror Dimension is toggle:STRANGE_MIRROR";
+            };
             // ===== hulk (3.6) =====
             case HULK -> "none: the Hulk's keys are acted by his plug-in (lane L7 of 3.6)";
             default -> "none: no abilities";
@@ -504,8 +515,10 @@ public final class GestureRoutes {
             // ===== strange (3.6) =====
             // (Until each lane of 3.6 gives its states a gesture or a reason of their own; not the 3.0 pending marker,
             // which fails a release.)
-            case STRANGE_SHIELD, STRANGE_ASTRAL, STRANGE_MIRROR,
-                    STRANGE_CASTING -> "pending: Doctor Strange's lane (L3 of 3.6) acts it";
+            case STRANGE_SHIELD -> null;
+            case STRANGE_ASTRAL -> "the switch STRANGE_ASTRAL plays its gestures; the spirit is AstralLayer's glow";
+            case STRANGE_MIRROR -> "the switch STRANGE_MIRROR plays its gesture; the sphere is MirrorView's";
+            case STRANGE_CASTING -> "a stance (STRANGE_CASTING): his hands up in the mudra while a spell lasts";
             // ===== stones (3.6) =====
             case TIME_SLOWING, POWER_VEINS -> "pending: the stone powers' lane (L2 of 3.6) acts it";
             // ===== hulk (3.6) =====

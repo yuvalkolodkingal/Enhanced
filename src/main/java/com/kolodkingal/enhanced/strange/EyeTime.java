@@ -10,7 +10,9 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
+import com.kolodkingal.enhanced.stones.StoneUse;
 import com.kolodkingal.enhanced.stones.TimeRewind;
+import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -119,6 +121,29 @@ public final class EyeTime {
         return ticks;
     }
 
+    /**
+     * Doctor Strange's Y (or his use of the Eye; {@code row} his Eye row): the Eye's time as its vessel through the
+     * stones' single entry ({@code StoneUse.use(TIME, VESSEL)}); while that entry does not take it (or for a slowing
+     * this class started), the Eye's own Slow Time ({@code alt}: Rewind). Without the Eye, or under the Hex Runes, a
+     * refusal.
+     */
+    public static void strangeUse(ServerPlayer player, PowerData data, @Nullable HeroAbility row, boolean alt) {
+        String refusal = refusal(player);
+        if (refusal != null) {
+            StrangeAbilities.say(player, refusal);
+            return;
+        }
+        if (!SLOWING.containsKey(player.getUUID())
+                && StoneUse.use(player, StoneKind.TIME, StoneUse.Source.VESSEL, alt, true)) {
+            return;
+        }
+        if (alt) {
+            rewind(player, data, row, true);
+        } else {
+            toggleSlow(player, data, row, true);
+        }
+    }
+
     // ---- Slow Time ----
 
     /**
@@ -187,6 +212,9 @@ public final class EyeTime {
         if (works) {
             player.getCooldowns().addCooldown(eye(), cooldown);
             StrangeAbilities.sound(player, ModSounds.EYE_OPEN.get(), 0.8F, 0.8F);
+            StrangeSignals.near(player.serverLevel(), player.position(),
+                    com.kolodkingal.enhanced.network.StrangeFxPayload.SHIELD, player,
+                    java.util.List.of(player.position().add(0, 1.0, 0)), StrangeSignals.EYE_REWIND);
         }
     }
 

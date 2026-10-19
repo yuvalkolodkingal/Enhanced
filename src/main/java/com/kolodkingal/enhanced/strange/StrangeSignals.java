@@ -16,7 +16,8 @@ import java.util.List;
  * <li>{@link StrangeFxPayload#WHIP}: points [where the lash ends]; arg the lash of the combo (1-3), or {@link #GRAPPLE}
  * for the Whip Grapple.</li>
  * <li>{@link StrangeFxPayload#BANDS}: points [the bound one]; arg the bound one's entity id (the ribbons follow it).</li>
- * <li>{@link StrangeFxPayload#SHIELD}: arg 1 raised, 0 lowered.</li>
+ * <li>{@link StrangeFxPayload#SHIELD}: arg 1 raised, 0 lowered; {@link #EYE_REWIND}: the Eye's Rewind (points [where he
+ * stands after it]).</li>
  * <li>{@link StrangeFxPayload#DOME}: points [the centre, (its radius in tenths, 0, 0)]; arg its life in ticks. A
  * negative arg is the Eye of Agamotto opening at an awakening: green rings for {@code -arg} ticks.</li>
  * <li>{@link StrangeFxPayload#PORTAL_OPEN}: points [the near ring, the far ring]; {@link StrangeFxPayload#PORTAL_CLOSE}:
@@ -31,6 +32,8 @@ public final class StrangeSignals {
     public static final int GRAPPLE = 4;
     /** How long the Eye's green rings of an awakening turn (ticks). */
     public static final int AWAKEN_TICKS = 30;
+    /** The arg of a {@link StrangeFxPayload#SHIELD} that is the Eye's Rewind (its green rings run backward). */
+    public static final int EYE_REWIND = 2;
     /** How far away the spells are seen (a Mirror Dimension's warp needs only its own sphere). */
     public static final double RANGE = 96.0;
 

@@ -140,6 +140,12 @@ public final class StrangeAbilities {
             return;
         }
         switch (ability) {
+            // G: the Cloak of Levitation lifts him, or sets him down (a custom hero flies by his Flight row instead).
+            case 2 -> {
+                if (data.power() == com.kolodkingal.enhanced.power.Power.DOCTOR_STRANGE) {
+                    com.kolodkingal.enhanced.ability.PowerTicker.toggleFlight(player);
+                }
+            }
             case 1 -> {
                 if (alt) {
                     EldritchWhip.grapple(player, data);
@@ -168,13 +174,7 @@ public final class StrangeAbilities {
                     SlingPortals.openByKey(player, data);
                 }
             }
-            case HeroKeys.Y -> {
-                if (alt) {
-                    EyeTime.rewind(player, data, HeroAbility.STRANGE_EYE, true);
-                } else {
-                    EyeTime.toggleSlow(player, data, HeroAbility.STRANGE_EYE, true);
-                }
-            }
+            case HeroKeys.Y -> EyeTime.strangeUse(player, data, HeroAbility.STRANGE_EYE, alt);
             default -> {
             }
         }
@@ -191,6 +191,11 @@ public final class StrangeAbilities {
         AstralProjection.tick(player, data, now);
         MirrorDimension.tick(player, data, now);
         EyeTime.tick(player, data, now);
+        // His hands up in the mudra while a spell lasts (the Dome, the Mirror, the Eye's time, a swing).
+        boolean casting = data.acts(com.kolodkingal.enhanced.power.Power.DOCTOR_STRANGE)
+                && (SeraphimShield.domeUp(player.getUUID(), now) || MirrorDimension.of(player.getUUID()) != null
+                || EyeTime.slowing(player.getUUID()) || EldritchWhip.swinging(player.getUUID()));
+        data.set(com.kolodkingal.enhanced.power.Live.STRANGE_CASTING, casting);
     }
 
     /**

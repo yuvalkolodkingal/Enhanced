@@ -206,11 +206,18 @@ public final class HeroAbilityAnims {
         row(HeroAbility.HELA_BODY);
         // ===== doctor_strange (3.6) =====
         // (The skeleton's rows have no moves yet: lane L3 gives them their gestures and stances.)
-        row(HeroAbility.STRANGE_WHIP);
-        row(HeroAbility.STRANGE_SHIELDS);
-        row(HeroAbility.STRANGE_BANDS);
-        row(HeroAbility.STRANGE_PORTAL);
-        row(HeroAbility.STRANGE_EYE);
+        // (Every gesture of his is started by a payload of its sparks, a switch or the Shield's state, never by a
+        // cooldown: the cast marker plays none of them.)
+        row(HeroAbility.STRANGE_WHIP).main(GestureId.STRANGE_WHIP_1).alt(GestureId.STRANGE_GRAPPLE)
+                .also(GestureId.STRANGE_WHIP_2, GestureId.STRANGE_WHIP_3);
+        row(HeroAbility.STRANGE_SHIELDS).main(GestureId.STRANGE_SHIELD_UP).alt(GestureId.STRANGE_DOME)
+                .stances(Stance.STRANGE_SHIELD, Stance.STRANGE_CASTING);
+        row(HeroAbility.STRANGE_BANDS).main(GestureId.STRANGE_BANDS).alt(GestureId.STRANGE_ASTRAL)
+                .also(GestureId.STRANGE_ASTRAL_IN);
+        row(HeroAbility.STRANGE_PORTAL).main(GestureId.STRANGE_SLING).alt(GestureId.STRANGE_MIRROR)
+                .stances(Stance.STRANGE_CASTING);
+        row(HeroAbility.STRANGE_EYE).main(GestureId.STRANGE_EYE_OPEN).alt(GestureId.STRANGE_REWIND)
+                .stances(Stance.STRANGE_CASTING);
         row(HeroAbility.STRANGE_BODY);
         // ===== hulk (3.6) =====
         // (The skeleton's rows have no moves yet: lane L7 gives them their gestures and stances.)
@@ -283,6 +290,10 @@ public final class HeroAbilityAnims {
         live(Live.ODIN_RAVENS, HeroAbility.ODIN_RAVENS);
         live(Live.HELA_GRASPING, HeroAbility.HELA_GRASP);
         live(Live.HELA_SUMMONING, HeroAbility.HELA_ARMY);
+        // 3.6
+        live(Live.STRANGE_SHIELD, HeroAbility.STRANGE_SHIELDS);
+        live(Live.STRANGE_ASTRAL, HeroAbility.STRANGE_BANDS);
+        live(Live.STRANGE_MIRROR, HeroAbility.STRANGE_PORTAL);
         // (PINNED, LIFTED and MIND_CONTROLLED are what is done to a player, not what he does: no ability owns them.)
         toggle(Toggle.FROST_GIANT, HeroAbility.LOKI_FROST_GIANT);
         toggle(Toggle.GOD_OF_THUNDER, HeroAbility.THOR_THUNDER);

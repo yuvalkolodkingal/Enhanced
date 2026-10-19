@@ -1,0 +1,73 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#F29A2E",
+  "glow": "#FFE0A8",
+  "look": {
+    "base": "doctor_strange/sorcerer_supreme",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "strange.whip",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 4,
+      "option": "cloak"
+    },
+    {
+      "id": "strange.shields",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "strange.bands",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "strange.portal",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "strange.eye",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "strange.body",
+      "strength": 3,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "strange.whip",
+    "flight",
+    "strange.shields",
+    "strange.bands",
+    "strange.portal"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "doctor_strange",
+    "run": "doctor_strange",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "enhanced:eye_of_agamotto",
+    "hero": "doctor_strange"
+  }
+}

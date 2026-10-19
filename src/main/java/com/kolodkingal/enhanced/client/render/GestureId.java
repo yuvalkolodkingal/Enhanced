@@ -337,7 +337,36 @@ public enum GestureId {
     /** Fenris (Sneak + B): a point at where he comes. */
     HELA_FENRIS(Group.CAST, 18, 2, 6, false),
     /** Death's Grasp (N): the hand thrust out, fingers spread (the stance HELA_GRASP holds it). */
-    HELA_GRASP(Group.CAST, 8, 1, 3, true)
+    HELA_GRASP(Group.CAST, 8, 1, 3, true),
+    // ===== strange (3.6) =====
+    /** Doctor Strange's take-off: the Cloak of Levitation lifts him, the arms float open, the legs together. */
+    TAKEOFF_STRANGE(Group.TAKEOFF, 18, 2, 7, true),
+    /** The Eldritch Whip, first lash: from the hip, flung out along the look. */
+    STRANGE_WHIP_1(Group.CAST, 10, 1, 4, true),
+    /** The second lash: a backhand from the far shoulder out to his side. */
+    STRANGE_WHIP_2(Group.CAST, 10, 1, 4, true),
+    /** The third lash: raised overhead and brought down, the whip wrapping its creature. */
+    STRANGE_WHIP_3(Group.CAST, 14, 2, 5, true),
+    /** The Whip Grapple: the whip cast at the anchor, then the arm hauling him toward it. */
+    STRANGE_GRAPPLE(Group.CAST, 16, 2, 6, true),
+    /** The Shield of the Seraphim rises: the off palm pushed out, the other hand circling (the stance holds it). */
+    STRANGE_SHIELD_UP(Group.CAST, 8, 1, 3, true),
+    /** The Seraphim Dome: both arms swept open and up as the sphere of mandalas closes round him. */
+    STRANGE_DOME(Group.CAST, 22, 3, 7, true),
+    /** The Crimson Bands: both hands thrown forward, the fingers spread. */
+    STRANGE_BANDS(Group.CAST, 14, 1, 5, true),
+    /** The Astral Projection: the spirit rises out of the body, the arms floating open and the head thrown back. */
+    STRANGE_ASTRAL(Group.CAST, 20, 3, 7, true),
+    /** The spirit returns to the body: the arms drawn in. */
+    STRANGE_ASTRAL_IN(Group.CAST, 12, 1, 5, true),
+    /** The Sling Ring's circle: the hand sweeps a ring of sparks in the air before him. */
+    STRANGE_SLING(Group.CAST, 18, 2, 6, true),
+    /** The Mirror Dimension: both palms pressed together, then pulled apart, the world bending with them. */
+    STRANGE_MIRROR(Group.CAST, 22, 3, 7, true),
+    /** The Eye of Agamotto opens: the hands frame it before the chest, the forearms turning in the mudra. */
+    STRANGE_EYE_OPEN(Group.CAST, 24, 3, 7, false),
+    /** The Eye's Rewind: the forearm turns back, the green rings running backward. */
+    STRANGE_REWIND(Group.CAST, 20, 2, 6, true)
     ;
 
     /** Gestures of one group never play together. */
