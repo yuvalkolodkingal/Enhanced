@@ -23,8 +23,8 @@ import org.joml.Matrix4f;
 
 /**
  * What the stones draw on the arm that holds them (3.6, lane L2), in third person: the <b>Power Stone's veins</b>
- * ({@link Live#POWER_VEINS}: violet veins crawl up from the hand while the Purple Beam pours, as on Peter Quill's arm on
- * Xandar) and the <b>Time Stone's mandala</b> ({@link Live#TIME_SLOWING}: two rings of green light turn round the
+ * ({@link Live#POWER_VEINS}: violet veins crawl up from the hand while the Purple Beam pours, as on Peter Quill's arm
+ * on Xandar) and the <b>Time Stone's mandala</b> ({@link Live#TIME_SLOWING}: two rings of green light turn round the
  * wrist, one each way, with the ticks of a clock on them, while Slow Time runs). Both are light (additive, no
  * texture), drawn on the arm's own model part, so they follow every pose; they grow and turn with the frame's time.
  */
@@ -105,7 +105,8 @@ public class StoneArmLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
      * The veins: on each of the arm's four faces two branching lines rise from the hand to {@code grown} of the way
      * up, a deeper violet with a pale core, flickering a little as the energy runs in them.
      */
-    private static void veins(VertexConsumer vc, Matrix4f m, float minX, float maxX, float grown, float time, int seed) {
+    private static void veins(VertexConsumer vc, Matrix4f m, float minX, float maxX, float grown, float time,
+                              int seed) {
         float top = 10.0F - 12.0F * grown;
         float flicker = 0.75F + 0.25F * Mth.sin(time * 0.9F + seed);
         for (int face = 0; face < 4; face++) {

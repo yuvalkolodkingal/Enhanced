@@ -27,6 +27,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -106,12 +107,18 @@ public final class PowerLoopSounds {
         STONE_SOUL_DRAIN(ModSounds.SOUL_DRAIN_LOOP, 0.8F, 1.0F,
                 (p, d) -> d.is(Live.SOUL_DRAINING) && !d.has(HeroAbility.THANOS_SOUL)),
         /** The six stones' hums, for as long as someone holds one bare (or selected in a Gauntlet). */
-        REALITY_STONE_HUM(ModSounds.REALITY_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.REALITY)),
-        POWER_STONE_HUM(ModSounds.POWER_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.POWER)),
-        TIME_STONE_HUM(ModSounds.TIME_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.TIME)),
-        SOUL_STONE_HUM(ModSounds.SOUL_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.SOUL)),
-        BARE_SPACE_STONE_HUM(ModSounds.SPACE_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.SPACE)),
-        BARE_MIND_STONE_HUM(ModSounds.MIND_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.MIND))
+        REALITY_STONE_HUM(ModSounds.REALITY_STONE_HUM, STONE_HUM_VOLUME, 1.0F, 
+                (p, d) -> holdsStone(p, StoneKind.REALITY)),
+        POWER_STONE_HUM(ModSounds.POWER_STONE_HUM, STONE_HUM_VOLUME, 1.0F, 
+                (p, d) -> holdsStone(p, StoneKind.POWER)),
+        TIME_STONE_HUM(ModSounds.TIME_STONE_HUM, STONE_HUM_VOLUME, 1.0F, 
+                (p, d) -> holdsStone(p, StoneKind.TIME)),
+        SOUL_STONE_HUM(ModSounds.SOUL_STONE_HUM, STONE_HUM_VOLUME, 1.0F, 
+                (p, d) -> holdsStone(p, StoneKind.SOUL)),
+        BARE_SPACE_STONE_HUM(ModSounds.SPACE_STONE_HUM, STONE_HUM_VOLUME, 1.0F, 
+                (p, d) -> holdsStone(p, StoneKind.SPACE)),
+        BARE_MIND_STONE_HUM(ModSounds.MIND_STONE_HUM, STONE_HUM_VOLUME, 1.0F, 
+                (p, d) -> holdsStone(p, StoneKind.MIND))
         ;
 
         final Supplier<SoundEvent> sound;
@@ -143,8 +150,7 @@ public final class PowerLoopSounds {
         if (player.isSpectator()) {
             return false;
         }
-        for (net.minecraft.world.item.ItemStack stack : new net.minecraft.world.item.ItemStack[]{player.getMainHandItem(),
-                player.getOffhandItem()}) {
+        for (ItemStack stack : new ItemStack[]{player.getMainHandItem(), player.getOffhandItem()}) {
             if (stack.is(ModItems.stone(kind))) {
                 return true;
             }

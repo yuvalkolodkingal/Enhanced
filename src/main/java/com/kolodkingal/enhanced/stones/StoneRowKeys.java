@@ -9,8 +9,8 @@ import net.minecraft.server.level.ServerPlayer;
  * to a hero's code. The row works only while he carries the stone and may use it ({@link StoneUse#carried}); the key
  * is the stone's use ({@link StoneUse#use} with {@link StoneUse.Source#ROW}): its main action on the key, its Sneak use
  * on the Sneak binding. A held main action (the Mind Beam, the Purple Beam, the Soul Drain) lasts while the key is
- * down; the Reality Stone's main action is a switch (its bubbles), the Time Stone's too (Slow Time). The cooldown is the
- * stone's ({@link StoneCooldowns}), stretched by the row's strength, and shown on the key.
+ * down; the Reality Stone's main action is a switch (its bubbles), the Time Stone's too (Slow Time). The cooldown is
+ * the stone's ({@link StoneCooldowns}), stretched by the row's strength, and shown on the key.
  */
 public final class StoneRowKeys {
 

@@ -122,6 +122,21 @@ public final class StonePowerTests {
         }
     }
 
+    /**
+     * The player's stones run for {@code n} real server ticks (the game time moves on, as the beams' and the drain's
+     * rhythm need), then {@code then} runs. Nothing ticks a player without a client, so the test ticks his stones.
+     */
+    static void ticking(GameTestHelper helper, ServerPlayer player, int n, Runnable then) {
+        helper.runAfterDelay(1, () -> {
+            tick(player, 1);
+            if (n <= 1) {
+                then.run();
+            } else {
+                ticking(helper, player, n - 1, then);
+            }
+        });
+    }
+
     /** A projectile at {@code from} flying at the player's chest. */
     static void aim(Projectile projectile, Vec3 from, ServerPlayer target, double speed) {
         projectile.setPos(from.x, from.y, from.z);
@@ -144,7 +159,10 @@ public final class StonePowerTests {
         aim(arrow, at.add(3.0, 1.0, 0.0), thor, 1.5);
         LargeFireball fireball = new LargeFireball(EntityType.FIREBALL, level);
         aim(fireball, at.add(-3.0, 1.0, 0.0), thor, 0.5);
+        // (A bolt with no fight and no player behind it is swept as an orphan: a hero Ultron shoots this one.)
+        ServerPlayer ultron = f.player(10.5, FLOOR, 16.5);
         Projectile bolt = ModEntities.ULTRON_BOLT.get().create(level);
+        bolt.setOwner(ultron);
         aim(bolt, at.add(0.0, 1.0, 3.0), thor, 1.0);
         Arrow own = new Arrow(EntityType.ARROW, level);
         own.setOwner(thor);
@@ -153,7 +171,9 @@ public final class StonePowerTests {
         aim(hammer, at.add(2.5, 1.0, 2.5), thor, 0.6);
         check(RealityBubbles.active(thor, Powers.get(thor)), "the stone in Thor's hand is awake");
         tick(thor, 1);
-        check(arrow.isRemoved() && fireball.isRemoved() && bolt.isRemoved(), "the arrow, the fireball and the bolt pop");
+        check(arrow.isRemoved(), "the arrow pops");
+        check(fireball.isRemoved(), "the fireball pops");
+        check(bolt.isRemoved(), "the bolt pops");
         check(!own.isRemoved(), "his own arrow flies on");
         check(!hammer.isRemoved(), "a thrown Mjolnir is reality-proof");
         check(RealityBubbles.count(thor) == 3, "three bubbles counted: " + RealityBubbles.count(thor));
@@ -209,7 +229,8 @@ public final class StonePowerTests {
         use(thor, StoneKind.REALITY, true);
         check(thor.hasEffect(MobEffects.INVISIBILITY), "Thor is invisible");
         check(husk.getTarget() instanceof LokiIllusionEntity copy && RealityBubbles.isStoneIllusion(copy)
-                && copy.mode() == LokiIllusionEntity.Mode.REALITY, "the husk hunts the stone's copy: " + husk.getTarget());
+                && copy.mode() == LokiIllusionEntity.Mode.REALITY,
+                "the husk hunts the stone's copy: " + husk.getTarget());
         helper.succeed();
     }
 
@@ -226,17 +247,21 @@ public final class StonePowerTests {
         use(thor, StoneKind.MIND, false);
         check(StoneUse.holding(thor, StoneKind.MIND) && thor.isUsingItem(), "the beam is held");
         check(ContinuousBeam.isFiring(thor), "and burns");
-        tick(thor, 12);
-        assertNear(lost(husk), 2 * StonesConfig.MIND_BEAM_DAMAGE.get(), 0.01, "two hits");
-        check(husk.hasEffect(ModEffects.CONFUSED), "the husk is confused");
-        thor.stopUsingItem();
-        tick(thor, 1);
-        check(!StoneUse.holding(thor) && !ContinuousBeam.isFiring(thor), "letting go ends it");
-        check(StoneCooldowns.remaining(thor, StoneKind.MIND, f.level().getGameTime()) == 20, "a short cooldown");
-        helper.succeed();
+        ticking(helper, thor, 12, () -> {
+            assertNear(lost(husk), 2 * StonesConfig.MIND_BEAM_DAMAGE.get(), 0.01, "two hits");
+            check(husk.hasEffect(ModEffects.CONFUSED), "the husk is confused");
+            thor.stopUsingItem();
+            tick(thor, 1);
+            check(!StoneUse.holding(thor) && !ContinuousBeam.isFiring(thor), "letting go ends it");
+            check(StoneCooldowns.remaining(thor, StoneKind.MIND, f.level().getGameTime()) == 20, "a short cooldown");
+            helper.succeed();
+        });
     }
 
-    /** A powerless player fires the beam through Loki's Scepter with Sneak and an empty other hand; it does not explode. */
+    /**
+     * A powerless player fires the beam through Loki's Scepter with Sneak and an empty other hand; it does not
+     * explode.
+     */
     @GameTest(template = ARENA, batch = "stones_mind")
     public static void theScepterFiresTheMindBeamForAMortal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
@@ -319,16 +344,18 @@ public final class StonePowerTests {
         Zombie husk = husk(helper, 10.5, 10.5);
         use(billy, StoneKind.TIME, false);
         check(TimeStonePowers.slowing(billy) && Powers.get(billy).is(Live.TIME_SLOWING), "time slows");
-        check(SlowMotion.isInZone(f.level(), husk.position()), "the husk is in the zone");
-        check(StoneZones.factorFor(husk, SlowMotion.factor()) == StonesConfig.TIME_SLOW_FACTOR.get(),
-                "at the Time Stone's factor");
-        check(!SlowMotion.skipTick(billy), "Billy himself is not slowed");
-        tick(billy, 5);
-        use(billy, StoneKind.TIME, false);
-        check(!TimeStonePowers.slowing(billy) && !Powers.get(billy).is(Live.TIME_SLOWING), "again: time runs on");
-        long left = StoneCooldowns.remaining(billy, StoneKind.TIME, f.level().getGameTime());
-        check(left == StonesConfig.TIME_SLOW_COOLDOWN.get(), "and the cooldown runs: " + left);
-        helper.succeed();
+        // (SlowMotion keeps the zones of a tick: the new one counts from the next.)
+        ticking(helper, billy, 5, () -> {
+            check(SlowMotion.isInZone(f.level(), husk.position()), "the husk is in the zone");
+            check(StoneZones.factorFor(husk, SlowMotion.factor()) == StonesConfig.TIME_SLOW_FACTOR.get(),
+                    "at the Time Stone's factor");
+            check(!SlowMotion.skipTick(billy), "Billy himself is not slowed");
+            use(billy, StoneKind.TIME, false);
+            check(!TimeStonePowers.slowing(billy) && !Powers.get(billy).is(Live.TIME_SLOWING), "again: time runs on");
+            long left = StoneCooldowns.remaining(billy, StoneKind.TIME, f.level().getGameTime());
+            check(left == StonesConfig.TIME_SLOW_COOLDOWN.get(), "and the cooldown runs: " + left);
+            helper.succeed();
+        });
     }
 
     /** Slow Time ends by itself at its limit. */
@@ -398,7 +425,9 @@ public final class StonePowerTests {
     // ============================================================================================================
     // The Power Stone
 
-    /** The Purple Beam burns the husk it is on and bursts where it ends: the husk beside it is hurt, no block breaks. */
+    /**
+     * The Purple Beam burns the husk it is on and bursts where it ends: the husk beside it is hurt, no block breaks.
+     */
     @GameTest(template = ARENA, batch = "stones_power")
     public static void thePurpleBeamHurtsAndExplodes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
@@ -567,16 +596,18 @@ public final class StonePowerTests {
         lookAt(thor, husk);
         use(thor, StoneKind.SOUL, false);
         check(StoneUse.holding(thor, StoneKind.SOUL) && SoulDrain.draining(thor), "the chain is on");
-        tick(thor, 11);
-        double bite = SoulStoneConfig.DRAIN_DAMAGE_PER_SECOND.get() * SoulDrain.DRAIN_EVERY / 20.0;
-        assertNear(lost(husk), bite, 0.01, "one bite");
-        assertNear(thor.getHealth(), 10.0 + bite * SoulStoneConfig.DRAIN_HEAL_FRACTION.get(), 0.01, "half heals him");
-        check(Powers.power(thor) == Power.THOR, "he does not become Thanos");
-        StoneUse.use(thor, StoneKind.SOUL, StoneUse.Source.BARE, false, false);
-        check(!StoneUse.holding(thor) && !SoulDrain.draining(thor), "letting go ends it");
-        long left = StoneCooldowns.remaining(thor, StoneKind.SOUL, f.level().getGameTime());
-        check(left == SoulStoneConfig.DRAIN_COOLDOWN.get(), "the cooldown: " + left);
-        helper.succeed();
+        ticking(helper, thor, SoulDrain.DRAIN_EVERY + 1, () -> {
+            double bite = SoulStoneConfig.DRAIN_DAMAGE_PER_SECOND.get() * SoulDrain.DRAIN_EVERY / 20.0;
+            assertNear(lost(husk), bite, 0.01, "one bite");
+            assertNear(thor.getHealth(), 10.0 + bite * SoulStoneConfig.DRAIN_HEAL_FRACTION.get(), 0.01,
+                    "half heals him");
+            check(Powers.power(thor) == Power.THOR, "he does not become Thanos");
+            StoneUse.use(thor, StoneKind.SOUL, StoneUse.Source.BARE, false, false);
+            check(!StoneUse.holding(thor) && !SoulDrain.draining(thor), "letting go ends it");
+            long left = StoneCooldowns.remaining(thor, StoneKind.SOUL, f.level().getGameTime());
+            check(left == SoulStoneConfig.DRAIN_COOLDOWN.get(), "the cooldown: " + left);
+            helper.succeed();
+        });
     }
 
     /** A hard blow tears the chain. */

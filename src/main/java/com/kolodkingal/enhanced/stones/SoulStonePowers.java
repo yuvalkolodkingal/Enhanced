@@ -93,7 +93,8 @@ public final class SoulStonePowers {
         LivingEntity target = aim.creature();
         if (target == null) {
             StoneAim.Aim any = StoneAim.aim(player, range, 0.3, t -> t instanceof Player);
-            boolean spared = any.creature() instanceof Player other && !other.isCreative() && !player.canHarmPlayer(other);
+            boolean spared = any.creature() instanceof Player other && !other.isCreative()
+                    && !player.canHarmPlayer(other);
             player.displayClientMessage(Component.translatable(spared ? "message.enhanced.thanos.pvp_off"
                     : "message.enhanced.thanos.no_target"), true);
             return;

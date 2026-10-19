@@ -507,10 +507,10 @@ public final class GestureRoutes {
             case STRANGE_SHIELD, STRANGE_ASTRAL, STRANGE_MIRROR,
                     STRANGE_CASTING -> "pending: Doctor Strange's lane (L3 of 3.6) acts it";
             // ===== stones (3.6) =====
-            case TIME_SLOWING -> "drawn, not acted: the Time Stone's two green rings turn round the wrist of the stone's"
-                    + " arm (StoneArmLayer) and the zone's edge glows; the body goes on as it was";
-            case POWER_VEINS -> "drawn, not acted: violet veins crawl up the stone's arm (StoneArmLayer) while the Purple"
-                    + " Beam's own stance (BEAM_HAND, from BEAMING) holds the arm out";
+            case TIME_SLOWING -> "drawn, not acted: the Time Stone's two green rings turn round the wrist of the"
+                    + " stone's arm (StoneArmLayer) and the zone's edge glows; the body goes on as it was";
+            case POWER_VEINS -> "drawn, not acted: violet veins crawl up the stone's arm (StoneArmLayer) while the"
+                    + " Purple Beam's own stance (BEAM_HAND, from BEAMING) holds the arm out";
             // ===== hulk (3.6) =====
             case HULK_TRANSFORMING, HULK_LEAPING, HULK_GRABBING, HULK_CHARGING,
                     HULK_ENRAGED -> "pending: the Hulk's lane (L7 of 3.6) acts it";

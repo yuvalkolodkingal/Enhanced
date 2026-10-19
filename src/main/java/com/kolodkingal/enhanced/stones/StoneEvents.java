@@ -118,7 +118,8 @@ public final class StoneEvents {
         Player player = event.getEntity();
         InHand stone = stoneOf(event.getItemStack(), player.isShiftKeyDown());
         if (stone == null || stone.kind() != StoneKind.TIME
-                || !TimeStonePowers.isCropTarget(event.getLevel().getBlockState(event.getPos()), player.isShiftKeyDown())) {
+                || !TimeStonePowers.isCropTarget(event.getLevel().getBlockState(event.getPos()),
+                player.isShiftKeyDown())) {
             return;
         }
         if (player instanceof ServerPlayer server

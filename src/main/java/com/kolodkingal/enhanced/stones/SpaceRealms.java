@@ -156,7 +156,8 @@ public final class SpaceRealms {
         List<RealmScreenPayload.RealmOption> options = new ArrayList<>();
         for (int i = 0; i < REALMS.size(); i++) {
             String reason = reasonAgainst(player, i);
-            options.add(new RealmScreenPayload.RealmOption(REALMS.get(i), reason == null, reason == null ? "" : reason));
+            options.add(new RealmScreenPayload.RealmOption(REALMS.get(i), reason == null,
+                    reason == null ? "" : reason));
         }
         return options;
     }
@@ -226,7 +227,8 @@ public final class SpaceRealms {
             player.displayClientMessage(stone, true);
             return;
         }
-        if (StoneUse.restrained(player) || player.isSpectator() || !StoneCooldowns.ready(player, StoneKind.SPACE, now)) {
+        if (StoneUse.restrained(player) || player.isSpectator()
+                || !StoneCooldowns.ready(player, StoneKind.SPACE, now)) {
             return;
         }
         Component here = refusalHere(player);
@@ -265,8 +267,8 @@ public final class SpaceRealms {
         cast.startCooldown(StonesConfig.SPACE_REALM_COOLDOWN.get());
         player.causeFoodExhaustion(REALM_EXHAUSTION);
         swirl(from, origin);
-        from.playSound(null, origin.x, origin.y, origin.z, ModSounds.SPACE_REALM_DEPART.get(), SoundSource.PLAYERS, 1.0F,
-                1.0F);
+        from.playSound(null, origin.x, origin.y, origin.z, ModSounds.SPACE_REALM_DEPART.get(), SoundSource.PLAYERS,
+                1.0F, 1.0F);
         StoneKind.SPACE.voice().use(from, origin, 0.6F, 1.0F);
         PacketDistributor.sendToPlayersNear(from, null, origin.x, origin.y, origin.z, 64,
                 new StoneFxPayload(StoneFxPayload.REALM_DEPART, player.getId(), List.of(origin), realm));
@@ -303,7 +305,8 @@ public final class SpaceRealms {
     static Arrival overworld(ServerPlayer player) {
         ServerLevel overworld = player.server.overworld();
         DimensionTransition spawn = player.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING);
-        BlockPos around = spawn.newLevel() == overworld ? BlockPos.containing(spawn.pos()) : overworld.getSharedSpawnPos();
+        BlockPos around = spawn.newLevel() == overworld ? BlockPos.containing(spawn.pos())
+                : overworld.getSharedSpawnPos();
         if (spawn.newLevel() == overworld && standsAt(overworld, player, spawn.pos())) {
             return new Arrival(overworld, spawn.pos(), player.getYRot());
         }
@@ -400,7 +403,7 @@ public final class SpaceRealms {
     }
 
     /** Solid, harmless ground under {@code feet}; air at the feet and the head; no lava there. */
-    static boolean safe(ServerLevel level, BlockPos feet) {
+    public static boolean safe(ServerLevel level, BlockPos feet) {
         BlockPos below = feet.below();
         BlockState ground = level.getBlockState(below);
         if (!ground.isFaceSturdy(level, below, Direction.UP) || !ground.getFluidState().isEmpty() || harmful(ground)) {

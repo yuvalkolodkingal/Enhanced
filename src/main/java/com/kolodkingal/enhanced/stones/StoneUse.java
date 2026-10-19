@@ -242,7 +242,8 @@ public final class StoneUse {
                 if (kind == StoneKind.TIME && !sorcerer) {
                     yield Component.translatable("message.enhanced.stones.use.no_sorcerer");
                 }
-                yield carried(player, kind) ? null : Component.translatable("message.enhanced.stones.not_carried", name);
+                yield carried(player, kind) ? null
+                        : Component.translatable("message.enhanced.stones.not_carried", name);
             }
         };
     }
@@ -366,7 +367,7 @@ public final class StoneUse {
         SpaceRealms.tick(player);
     }
 
-    /** Everything the player's stones keep is forgotten (he logged out, died, changed dimension or the server stops). */
+    /** Everything the player's stones keep is forgotten (he logged out, died or the server stops). */
     public static void forget(ServerPlayer player) {
         Hold hold = HOLDS.remove(player.getUUID());
         if (hold != null && hold.kind() == StoneKind.SOUL) {

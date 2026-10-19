@@ -47,21 +47,22 @@ public final class StoneBeamFx {
             }
 
             @Override
-            public Vec3 end(AbstractClientPlayer player, BeamStyle style, float range, Vec3 crosshair, float partialTick) {
+            public Vec3 end(AbstractClientPlayer player, BeamStyle style, float range, Vec3 crosshair,
+                            float partialTick) {
                 return crosshair;
             }
 
             @Override
-            public void draw(Minecraft mc, AbstractClientPlayer player, BeamStyle style, Matrix4f pose, VertexConsumer vc,
-                             Vec3 a, Vec3 b, float partialTick, float time) {
+            public void draw(Minecraft mc, AbstractClientPlayer player, BeamStyle style, Matrix4f pose,
+                             VertexConsumer vc, Vec3 a, Vec3 b, float partialTick, float time) {
                 beam(pose, vc, a, b, style, time, power, player.getId());
             }
         };
     }
 
     /** A straight beam in layers, cut into short pieces whose widths swell with pulses running out from the hand. */
-    private static void beam(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, BeamStyle style, float time, boolean power,
-                             int seed) {
+    private static void beam(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, BeamStyle style, float time,
+                             boolean power, int seed) {
         Vec3 path = b.subtract(a);
         double length = path.length();
         if (length < 0.05) {
@@ -116,7 +117,8 @@ public final class StoneBeamFx {
                 double s = length * i / pieces;
                 double radius = Math.min(0.32, 0.06 + s * 0.12);
                 double angle = phase0 + s * 1.4;
-                Vec3 at = a.add(dir.scale(s)).add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
+                Vec3 at = a.add(dir.scale(s)).add(u.scale(Math.cos(angle) * radius))
+                        .add(v.scale(Math.sin(angle) * radius));
                 if (prev != null) {
                     int c = EnergyGeometry.argb(style.inner(), 0.45F);
                     EnergyGeometry.ribbon(pose, vc, prev, at, 0.05F, 0.05F, c, c);

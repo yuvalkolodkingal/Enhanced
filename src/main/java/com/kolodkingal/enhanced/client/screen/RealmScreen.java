@@ -205,8 +205,8 @@ public class RealmScreen extends Screen {
     }
 
     /** A row of rolling hills up from {@code level} (a fraction of the height), {@code swing} high (below: hanging). */
-    private static void hills(GuiGraphics g, int x, int y, int w, int h, float level, float swing, float waves, int color,
-                              float phase) {
+    private static void hills(GuiGraphics g, int x, int y, int w, int h, float level, float swing, float waves,
+                              int color, float phase) {
         for (int i = 0; i < w; i++) {
             float t = (float) i / w;
             int top = y + (int) (h * (level - swing * 0.5F * (1.0F + Mth.sin(t * waves * Mth.TWO_PI + phase))));
