@@ -64,8 +64,8 @@ public final class HealingGestures {
         // through him, then down.
         define(GestureId.HEALING_BURST)
                 .key(0, S).m(REST_M).o(REST_O).lean(0).head(0, 0, 0)
-                .key(4, O).m(-34, 0, 96).o(-34, 0, -96).lean(-8).head(-18, 0, 0)
-                .key(11, S).m(-30, 0, 92).o(-30, 0, -92).lean(-7).head(-16, 0, 0)
+                .key(4, O).m(-22, 0, 122).o(-22, 0, -122).lean(-8).head(-18, 0, 0)
+                .key(11, S).m(-20, 0, 116).o(-20, 0, -116).lean(-7).head(-16, 0, 0)
                 .key(18, I).m(REST_M).o(REST_O).lean(0).head(0, 0, 0);
     }
 }

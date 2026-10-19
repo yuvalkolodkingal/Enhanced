@@ -136,7 +136,7 @@ public final class HealingHud implements LayeredDraw.Layer {
         return (int) Math.max(1, (until - now + 19) / 20);
     }
 
-    /** DOWN: the edges darken (a slow breath), a ring fills in the middle with "Healing… 3" under it. */
+    /** DOWN: the edges darken (a slow breath), a ring fills over the crosshair with "Healing… 3" under it. */
     private static void drawDown(GuiGraphics g, Minecraft mc, LocalPlayer player, long now, float pt) {
         int w = g.guiWidth();
         int h = g.guiHeight();
@@ -158,7 +158,7 @@ public final class HealingHud implements LayeredDraw.Layer {
         float total = Math.max(1, Downed.downTicks());
         float done = Mth.clamp(1.0F - (until - now - pt) / total, 0.0F, 1.0F);
         int cx = w / 2;
-        int cy = h / 2 + 34;
+        int cy = h / 2 - 44; // (above the crosshair: the chat and the hotbar are below it)
         int radius = 12;
         for (int i = 0; i < 48; i++) {
             float a = Mth.TWO_PI * i / 48 - Mth.HALF_PI;
