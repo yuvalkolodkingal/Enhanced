@@ -146,6 +146,22 @@
           "name": "minecraft:black_banner"
         }
       ]
+    },
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.2
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "enhanced:hydra_energy_cell"
+        }
+      ]
     }
   ],
   "random_sequence": "enhanced:chests/hydra_outpost/barracks"

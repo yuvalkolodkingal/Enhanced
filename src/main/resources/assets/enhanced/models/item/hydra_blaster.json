@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "minecraft:item/crossbow_standby"
+    "layer0": "enhanced:item/hydra_blaster"
   }
 }
