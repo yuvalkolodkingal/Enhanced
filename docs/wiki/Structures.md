@@ -1,13 +1,13 @@
 # Structures
 
-Three places of the films are built into the world in 3.3, each with the item of a hero inside: a **Hydra outpost**, where **Loki's Scepter** is kept; **Mjolnir's crater**, where the hammer lies where it fell from the sky; and the **Mutant School**, Xavier's School for Gifted Youngsters, with **Professor X's wheelchair** and **Cyclops's glasses**. In 3.5 a fourth joins them: the **Bifrost sites**, whose **rune stone** calls the Bifrost to [Asgard](Asgard) for a player with no power. In 3.6 come [the stone sites](#the-stone-sites-36), the homes of the [Infinity Stones](Infinity-Stones): the **Sanctum Sanctorum** (the Time Stone), **Avengers Tower** (the Tesseract), the **End tunnels** (the Power Stone) and the **Vormir Cliffs** in the Nether (the Soul Stone), and every Hydra outpost gets its [Hydra soldiers](Hydra-Soldiers).
+Three places of the films are built into the world in 3.3, each with the item of a hero inside: a **Hydra outpost**, where **Loki's Scepter** is kept; **Mjolnir's crater**, where the hammer lies where it fell from the sky; and the **Mutant School**, Xavier's School for Gifted Youngsters, with **Professor X's wheelchair** and **Cyclops's glasses**. In 3.5 a fourth joins them: the **Bifrost sites**, whose **rune stone** calls the Bifrost to [Asgard](Asgard) for a player with no power. In 3.6 come [the stone sites](#the-stone-sites-36), the homes of the [Infinity Stones](Infinity-Stones): the **Sanctum Sanctorum** (the Time Stone), **Avengers Tower** (the Tesseract), the **End tunnels** (the Power Stone) and the **Vormir Cliffs** in the Nether (the Soul Stone), and every Hydra outpost gets its [Hydra soldiers](Hydra-Soldiers). In 3.7 every Mutant School gets [the X-Men lower lab](Mutant-School-Lab) under it, and the forests get [Agatha's Cottage](#agathas-cottage-37), where Agatha, Nicky and Rio live.
 
 Hebrew: [עברית](Structures-HE)
 
 ## Finding them
 
 * The structures of 3.3 and 3.5 are in the **Overworld** only, in the biomes listed below, and only on fairly **level, dry ground** (a site on a slope, or over water, is skipped). So they are rarer than their spacing alone says: in test worlds the nearest outpost was about 870 and 1,470 blocks from the spawn, and the nearest school about 2,000.
-* **`/locate structure`** finds them (operators, or anyone in a world with cheats): `/locate structure enhanced:hydra_outpost`, `/locate structure enhanced:mjolnir_crater`, `/locate structure enhanced:mutant_school` (3.5) `/locate structure enhanced:bifrost_site`, and (3.6) `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (in the End) and `enhanced:vormir_cliff` (in the Nether).
+* **`/locate structure`** finds them (operators, or anyone in a world with cheats): `/locate structure enhanced:hydra_outpost`, `/locate structure enhanced:mjolnir_crater`, `/locate structure enhanced:mutant_school` (3.5) `/locate structure enhanced:bifrost_site`, and (3.6) `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (in the End) and `enhanced:vormir_cliff` (in the Nether), and (3.7) `enhanced:agatha_cottage`. The [Stone Locator](Stone-Locator) (3.7) points to the stone sites without a command.
 * **Old worlds get them too**: they generate in every **new chunk** of a world made before 3.3 (the Bifrost sites, before 3.5). Explore land you have not been to yet.
 * Outposts and craters keep at least 6 chunks away from a school.
 
@@ -19,6 +19,7 @@ Hebrew: [עברית](Structures-HE)
 | Bifrost site (3.5) | Plains, meadow, snowy plains, taiga, windswept hills, badlands | 48 / 16 |
 | Sanctum Sanctorum (3.6) | Plains, sunflower plains, meadow, forest, birch forest, cherry grove, taiga | 48 / 16 (6 chunks from a Hydra outpost) |
 | Avengers Tower (3.6) | Plains, sunflower plains, forest, birch forest, meadow | 64 / 24 (8 chunks from a Sanctum) |
+| Agatha's Cottage (3.7) | Forest, birch forest, old growth birch forest, flower forest, dark forest | 40 / 14 (6 chunks from a school) |
 | End tunnel (3.6) | **The End**: the outer islands' highlands and midlands, 1,000 blocks or more from the middle | 28 / 10 |
 | Vormir Cliff (3.6) | **The Nether**: soul sand valley, basalt deltas, in a great cavern | 20 / 8 |
 
@@ -49,8 +50,11 @@ Inside are the entrance hall (double height, a red carpet, a grand staircase, a 
 * **The Professor's study** (in the west wing: bookshelves, a fireplace, a desk and a chess table). Its chest **always holds [Professor X's Wheelchair](Professor-X)**, with books and maps.
 * **Scott Summers' room** (red and blue, with ruby-red windows). Its chest **always holds [Cyclops's Ruby-Quartz Glasses](Cyclops)**.
 * **Cerebro**, below the house: white light panels and a walkway to the console, and a chest of redstone, quartz and a diamond.
+* **The lower lab** (3.7), far below the cellar: a secret the Professor's study keeps. Two of its bookshelves swing open onto a lift down to the X-Men's lower levels: the medical bay with the Cure Station, the Weapon X lab (where [Wolverine](Wolverine) and [Deadpool](Deadpool) are made) and the great sphere of the new **Cerebro**. Every school gets it, old ones too, when a player first comes near. See [The X-Men lower lab](Mutant-School-Lab).
 
 **A school built before 3.3.1** still has a hole round its front door (3.3.1 fixed the door for new schools). An operator can mend it in place: stand near the school and run **`/enhanced structure repair_school`** (3.5). It changes only the 76 blocks of the door and the tower that 3.3.1 changed, in the school's own stone (mossy and cracked bricks too, as in a new school); a block a player has changed there is left alone and counted. It finds the nearest school within 128 blocks (or the radius you give, 16 to 256), and you can run it again any time: it says when the school is whole. See [Commands](Commands#structures-enhanced-structure).
+
+An operator can also build or check a school's lower lab: **`/enhanced structure school_lab`** (`force`, `status`), see [The X-Men lower lab](Mutant-School-Lab#for-operators).
 
 ## The Bifrost Rune Stones
 
@@ -112,10 +116,14 @@ Four new places hold the [Infinity Stones](Infinity-Stones) (or their vessels). 
 
 The fifth home is not a structure: **the Reality Stone** floats on a pedestal in Odin's vault under Asgard's throne room, a red swirling orb (the Aether), placed when the vault opens after [Hela](Hela)'s first defeat (so an Asgard of 3.5 gets it too). Hogun warns you: "Beside the spear sleeps the Aether, red as blood. Do not wake it."
 
+## Agatha's Cottage (3.7)
+
+`/locate structure enhanced:agatha_cottage`. A crooked two-storey cottage in the woods, with a purple door, a leaning chimney, a porch with rocking chairs and a picket fence: the home of **Agatha Harkness**, her son **Nicky** and **Rio Vidal, the Green Witch**, living happily together (the happy ending Eilon's mom asked for). Inside: the kitchen and the family table, the living room, three bedrooms and Agatha's study (its chest always holds the **Darkhold** and enchanted books), a cosy cellar with a working **Witches' Road door**, and at the back Rio's garden, a greenhouse and **Señor Scratchy**'s hutch. The family talk to you, trade, give gifts and blessings, and ask you to find the rabbit when he runs off. See [Agatha's Cottage](Agathas-Cottage).
+
 ## For servers and data packs
 
-The structures are data: their sets (spacing, separation, salt), the biome tags that say where they may stand (`enhanced:has_structure/hydra_outpost`, `mjolnir_crater`, `mutant_school`, `bifrost_site`, and since 3.6 `sanctum`, `avengers_tower`, `end_tunnel` and `vormir_cliff`), the buildings themselves (structure templates) and their loot tables (`enhanced:chests/hydra_outpost/vault`, `lab`, `barracks`, `supply`; `enhanced:chests/mutant_school/study`, `cyclops`, `cerebro`, `dormitory`, `library`, `kitchen`) are all in the mod's data, so a data pack can make them rarer or more common, move them to other biomes, rebuild them or change what is in the chests. The structures of 3.3 have no server config options (only the rune stone's rest, `asgard.runeStoneCooldown`); the four stone sites can each be switched off for new chunks (`stone_sites.sanctums`, `avengersTowers`, `endTunnels`, `vormirCliffs`), and the Hydra soldiers have their own section, `[hydra]`. See [Server Configuration](Server-Configuration#structures).
+The structures are data: their sets (spacing, separation, salt), the biome tags that say where they may stand (`enhanced:has_structure/hydra_outpost`, `mjolnir_crater`, `mutant_school`, `bifrost_site`, and since 3.6 `sanctum`, `avengers_tower`, `end_tunnel` and `vormir_cliff`, and since 3.7 `agatha_cottage`), the buildings themselves (structure templates) and their loot tables (`enhanced:chests/hydra_outpost/vault`, `lab`, `barracks`, `supply`; `enhanced:chests/mutant_school/study`, `cyclops`, `cerebro`, `dormitory`, `library`, `kitchen`) are all in the mod's data, so a data pack can make them rarer or more common, move them to other biomes, rebuild them or change what is in the chests. The structures of 3.3 have no server config options (only the rune stone's rest, `asgard.runeStoneCooldown`); the four stone sites can each be switched off for new chunks (`stone_sites.sanctums`, `avengersTowers`, `endTunnels`, `vormirCliffs`), and the Hydra soldiers have their own section, `[hydra]`. Since 3.7 the schools' lower labs are `[school_lab]` (they are built at run time, not by world generation), and the cottages `[agatha_cottage]` (`agatha_cottage.enabled` for new chunks, and the family, the rabbit and the Road door). See [Server Configuration](Server-Configuration#structures).
 
 ## Related
 
-[Loki](Loki) · [Thor](Thor) · [Infinity Stones](Infinity-Stones) · [Vormir](Vormir) · [Hydra Soldiers](Hydra-Soldiers) · [Professor X](Professor-X) · [Cyclops](Cyclops) · [Asgard](Asgard) · [Items and Crafting](Items-and-Crafting)
+[Loki](Loki) · [Thor](Thor) · [The X-Men lower lab](Mutant-School-Lab) · [Agatha's Cottage](Agathas-Cottage) · [Stone Locator](Stone-Locator) · [Infinity Stones](Infinity-Stones) · [Vormir](Vormir) · [Hydra Soldiers](Hydra-Soldiers) · [Professor X](Professor-X) · [Cyclops](Cyclops) · [Asgard](Asgard) · [Items and Crafting](Items-and-Crafting)

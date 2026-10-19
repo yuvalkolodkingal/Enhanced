@@ -100,6 +100,10 @@ He has all eleven spells from the first minute; what grows is how big. Ranks 1 t
 
 Billy is a sorcerer: he may hold and use the **Time Stone** (Slow Time; Sneak: Rewind; on a crop it grows), and the **Eye of Agamotto** gives him the same powers. The other stones are too strong for him. The **Sling Ring** answers him too. See [Infinity Stones](Infinity-Stones) and [Doctor Strange](Doctor-Strange#the-eye-for-everyone-else).
 
+## Against Wolverine and Deadpool (3.7)
+
+Billy's **chaos magic** (the Hex Bolt and the Hex Beam) is one of the few things a [healing factor](Healing-Factor) can't stop: it defeats Wolverine and Deadpool, where anything else only knocks them down. He may use the [Cerebro console](Mutant-School-Lab#cerebro) too. At [Agatha's Cottage](Agathas-Cottage), Agatha calls him "Teen", and Nicky wants a spell.
+
 ## Numbers you can change
 
 Billy's flight speed, the Hex Beam (whether it is a beam at all, its damage, range, hit rate, hunger and how much it grows with his rank), the Hex Bolt's damage (when the beam is off), the Hex Barrier (its health, how fast it mends, the wait after it shattered, its arc, size, walking speed and rank growth), how long Freeze holds (5 seconds), how far The Noise reaches (32 blocks), whether he tears blocks out at all, how far and how hard a block, and his recharge between blocks are the `billy.*` options on [Server Configuration](Server-Configuration#billy-wiccan). His Build Magic numbers (the meter, the refill, the ten ranks and their practice, his reach and side, Mom's help) are the `build_magic_billy.*` options.

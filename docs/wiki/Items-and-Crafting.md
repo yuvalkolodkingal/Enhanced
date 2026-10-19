@@ -1,6 +1,6 @@
 # Items and Crafting
 
-Every item you can use is in the **Enhanced** creative tab. Thirteen are crafted, five more are found in chests (or dropped), three more are the rewards of the bosses, and one, the [Hero Creator](#hero-creator), is for Creative mode only. The Radioactive Spider and Professor X's Wheelchair are both: you can craft them and find them. Since 3.6 there are also [the Infinity Stones and their vessels](#the-infinity-stones-and-their-vessels-36), Doctor Strange's [Eye of Agamotto](#eye-of-agamotto-36) and [Sling Ring](#sling-ring-36), the Hulk's [Gamma Emitter](#gamma-emitter-36) and [Hydra's gear](#hydras-gear-36). In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
+Every item you can use is in the **Enhanced** creative tab. Thirteen are crafted, five more are found in chests (or dropped), three more are the rewards of the bosses, and one, the [Hero Creator](#hero-creator), is for Creative mode only. The Radioactive Spider and Professor X's Wheelchair are both: you can craft them and find them. Since 3.6 there are also [the Infinity Stones and their vessels](#the-infinity-stones-and-their-vessels-36), Doctor Strange's [Eye of Agamotto](#eye-of-agamotto-36) and [Sling Ring](#sling-ring-36), the Hulk's [Gamma Emitter](#gamma-emitter-36) and [Hydra's gear](#hydras-gear-36). Since 3.7: the [Mutant Cure](#mutant-cure-331) (it is older, from 3.3.1, but now has a home), Deadpool's [chimichanga](#chimichanga-37), the [Stone Locator](#stone-locator-37), and the [Adamantium Injection](#adamantium-injection-37), found in the X-Men's lab. In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
 
 ## Crafted items
 
@@ -23,6 +23,9 @@ Every item you can use is in the **Enhanced** creative tab. Thirteen are crafted
 | [Eye of Agamotto](#eye-of-agamotto-36) (3.6) | [Doctor Strange](Doctor-Strange) (hold right-click for three seconds with no power) | Picking up the Time Stone |
 | [Sling Ring](#sling-ring-36) (3.6) | Nothing: a sorcerer's portals to saved places | Picking up an Amethyst Shard |
 | [Gamma Emitter](#gamma-emitter-36) (3.6) | [The Hulk](Hulk) (stand in its beam with no power) | Picking up a Block of Emerald |
+| [Mutant Cure](#mutant-cure-331) (3.3.1) | Takes a hero's power away for good | Picking up an Echo Shard |
+| [Chimichanga](#chimichanga-37) (3.7) | Food, and Deadpool's bigger [Chimichanga Break](Deadpool) | Picking up Bread |
+| [Stone Locator](#stone-locator-37) (3.7) | A compass to the nearest [Infinity Stone](Infinity-Stones) you lack | Picking up an Infinity Stone or a stone's vessel |
 
 ### Magneto's Helmet
 
@@ -273,9 +276,44 @@ A lab block, not an item you hold. Place it, then right-click it or give it a re
 
 **The Gamma Inhibitor** (3.6) is Bruce Banner's wrist band: while it is in his inventory, his anger never turns him into the Hulk. It has no recipe and is never found: it is in the creative tab.
 
+### Mutant Cure (3.3.1)
+
+Shapeless: the four in any order.
+
+```
+Glass Bottle + Milk Bucket + Echo Shard + Iron Nugget
+```
+
+"An injector of the cure. There is no going back." **Hold right-click for 2 seconds** and your power is gone for good, exactly as an operator's `/enhanced power set <player> none` (your items, Mjolnir too, stay items). On **another player**: right-click him and hold, while he stays near: an operator always, anyone else only while PvP is on (`mutant_cure.onOthers`). Someone with no power is turned away and nothing is used. Also found: the **Cure Station** of the [X-Men lower lab](Mutant-School-Lab#the-cure-station) fills one for each glass bottle (one a minute per player), the lab's medical chest (30%), and rarely a Hydra outpost's lab chest. It is how a hero clears the way for the [Adamantium Injection](#adamantium-injection-37). Section `[mutant_cure]`.
+
+### Chimichanga (3.7)
+
+Shapeless: the three in any order. It makes **two**.
+
+```
+Bread + Cooked Beef (or Cooked Porkchop, or Cooked Chicken) + Carrot
+```
+
+"Crunchy, warm, and Deadpool's favourite." Anyone can eat it: 4 drumsticks of food. [Deadpool](Deadpool)'s **Chimichanga Break** (Sneak + B) eats one from his bag for a bigger heal (all his health, and Absorption II for 30 seconds). Also in the kitchen chest of [Agatha's Cottage](Agathas-Cottage) (10%). **Choose a Hero → Deadpool** gives three. The advancement *Maximum Snacks* is for eating one.
+
+### Stone Locator (3.7)
+
+```
+N K N
+D S D
+N D N
+
+N = Block of Netherite
+K = Wither Skeleton Skull
+D = Block of Diamond
+S = an Infinity Stone, or a stone's vessel
+```
+
+The middle takes **any Infinity Stone** or a vessel of one (Loki's Scepter, the Tesseract, the Eye of Agamotto, the Orb, a crafted Infinity Gauntlet with a stone; never Thanos's Gauntlet). **The stone comes back**: it stays in the middle slot, exactly as it was. The Locator is tuned to it ("It hums with the Time Stone's energy") and glows in its colour. Hold it: its needle and a line over the hotbar point to the nearest site of a stone you haven't got; use it for a spark trail, Sneak + use to choose the stone. Anyone may use it. Epic, doesn't stack, fireproof. See [Stone Locator](Stone-Locator). A server can switch the recipe off (`stone_locator.craftable`).
+
 ## Items found in the world
 
-These five are never crafted. Each chance is **per chest generated** (or per kill, for the mobs): a chest of that kind has that chance to hold the item.
+These six are never crafted (the Adamantium Injection, only on a server that switches its recipe on). Each chance is **per chest generated** (or per kill, for the mobs): a chest of that kind has that chance to hold the item.
 
 ### Scarlet Witch Gene
 
@@ -328,6 +366,16 @@ A spark of the cosmic fire that remembers a host, very rare. It has no recipe an
 | Stronghold library chest | 3% |
 | Nether Fortress chest | 3% |
 | Woodland Mansion chest | 3% |
+
+### Adamantium Injection (3.7)
+
+"Makes the Wolverine of whoever is powerless. Healing factor; only the Infinity Stones, chaos magic, the Allfather's power, the Phoenix or poison can defeat him." A thick steel syringe of silver liquid. With **no power**, **hold right-click for 3 seconds**: you become [Wolverine](Wolverine). A hero is refused, and nothing is used ("Take the Mutant Cure first"). Only on yourself. Epic, doesn't stack.
+
+| Source | Chance |
+|---|---|
+| The **Weapon X rack** in the [X-Men lower lab](Mutant-School-Lab#the-weapon-x-rack-and-pod) | One for each player, from each rack |
+
+It has no recipe, unless a server switches one on for worlds without schools (`adamantium_injection.craftable`): `I N I / N E N / I N I`, with I a Block of Iron, N a Netherite Ingot and E an Echo Shard.
 
 ### Ruby-Quartz Glasses
 
@@ -413,7 +461,7 @@ Asgardian Gold Plating, Gold Trim, Gold Pillar and Gold Lattice; Realm Stone, Re
 
 ## Hero Creator
 
-"Become any hero, or make your own." A gold medallion, only in the **creative tab**: it has no recipe and is never found. It works for a player in Creative mode or an operator. Use it to open the Hero Creator: become any hero of the mod in any look, or make a hero of your own with powers from a catalogue of thirty and (since 3.4) the abilities of the heroes (111 since 3.6) and the six Infinity Stones, your keys, your moves, your colours, your skin and its extras, and save it to a file. Since 3.4, choosing a hero also gives you his items: Magneto's Helmet, Quicksilver's Goggles, the Ruby-Quartz Glasses, Mjolnir (claimed by you) or Stormbreaker, Loki's Scepter, Thanos's Gauntlet, Ultron's Core, the wheelchair, the Darkhold, or (3.6) Doctor Strange's Eye of Agamotto and Sling Ring, never a second one (`custom_hero.chooseGivesItems`). See [Hero Creator](Hero-Creator).
+"Become any hero, or make your own." A gold medallion, only in the **creative tab**: it has no recipe and is never found. It works for a player in Creative mode or an operator. Use it to open the Hero Creator: become any hero of the mod in any look, or make a hero of your own with powers from a catalogue of thirty and (since 3.4) the abilities of the heroes (123 since 3.7) and the six Infinity Stones, your keys, your moves, your colours, your skin and its extras, and save it to a file. Since 3.4, choosing a hero also gives you his items: Magneto's Helmet, Quicksilver's Goggles, the Ruby-Quartz Glasses, Mjolnir (claimed by you) or Stormbreaker, Loki's Scepter, Thanos's Gauntlet, Ultron's Core, the wheelchair, the Darkhold, or (3.6) Doctor Strange's Eye of Agamotto and Sling Ring, or (3.7) Deadpool's three chimichangas, never a second one (`custom_hero.chooseGivesItems`). See [Hero Creator](Hero-Creator).
 
 ## Spider Web (a block, not an item)
 
@@ -421,4 +469,4 @@ The webs that [Spider-Man](Spider-Man) shoots leave temporary **Spider Web** blo
 
 ## Changing the loot
 
-The chances above are NeoForge *global loot modifiers* in the mod's data (`data/enhanced/loot_modifiers/`), so a datapack can change them. The chests of the [structures](Structures) of 3.3 are ordinary loot tables (`data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/`), and so are those of 3.6 (`chests/sanctum/`, `chests/avengers_tower/`, `chests/end_tunnel/`, `chests/vormir/`) and what the Hydra soldiers drop (`entities/hydra_soldier`, `hydra_soldier_enforcer`, `hydra_soldier_sniper`, `hydra_officer`). The recipes are ordinary recipe files (`data/enhanced/recipe/`).
+The chances above are NeoForge *global loot modifiers* in the mod's data (`data/enhanced/loot_modifiers/`), so a datapack can change them. The chests of the [structures](Structures) of 3.3 are ordinary loot tables (`data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/`), and so are those of 3.6 (`chests/sanctum/`, `chests/avengers_tower/`, `chests/end_tunnel/`, `chests/vormir/`) and what the Hydra soldiers drop (`entities/hydra_soldier`, `hydra_soldier_enforcer`, `hydra_soldier_sniper`, `hydra_officer`), and those of 3.7 (`chests/school_lab/medical`, `lockers`, `weapon_x`; `chests/agatha_cottage/kitchen`, `cellar`, `nicky`, `study`). The recipes are ordinary recipe files (`data/enhanced/recipe/`).

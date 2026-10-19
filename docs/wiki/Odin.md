@@ -79,6 +79,10 @@ His six rows are in the [Hero Creator](Hero-Creator) (ids `odin.gungnir`, `odin.
 
 Odin is a god: he may hold every [Infinity Stone](Infinity-Stones) bare and use it, wield a crafted Infinity Gauntlet and Snap, and seek the Soul Stone at [Vormir](Vormir). Only the **Time Stone** stays quiet in his hand: it answers only a sorcerer. The **Reality Stone** waits in his own vault, beside Gungnir's stand.
 
+## Against Wolverine and Deadpool (3.7)
+
+The **Allfather's power**, the Odinforce and Gungnir, is one of the few things a [healing factor](Healing-Factor) can't stop: it defeats Wolverine and Deadpool, where anything else only knocks them down.
+
 ## Numbers you can change
 
 Every damage, cooldown and time of his abilities (the blast, the throw, the shield, the heal, Banish and whether it sends players home, the wave, the ravens, the Command, the Odinsleep) are the `odin.*` options on [Server Configuration](Server-Configuration#odin). Whether only one player in the world takes Gungnir from its stand is `gungnir.onePerWorld` (on by default).

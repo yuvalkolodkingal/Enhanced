@@ -4,6 +4,7 @@
 * [Becoming a Hero](Becoming-a-Hero)
 * [Controls](Controls)
 * [Looks](Looks)
+* [Meeting Death](Meeting-Death)
 
 **Heroes**
 
@@ -28,6 +29,9 @@
 * [Professor X](Professor-X)
 * [Doctor Strange](Doctor-Strange)
 * [Hulk](Hulk)
+* [Wolverine](Wolverine)
+* [Deadpool](Deadpool)
+* [The Healing Factor](Healing-Factor)
 * [Hero Creator](Hero-Creator)
 * [Heroes' Abilities](Hero-Abilities)
 
@@ -43,6 +47,12 @@
 
 * [Infinity Stones](Infinity-Stones)
 * [Vormir and the Soul Stone](Vormir)
+* [The Stone Locator](Stone-Locator)
+
+**Places**
+
+* [The X-Men lower lab](Mutant-School-Lab)
+* [Agatha's Cottage](Agathas-Cottage)
 
 **Reference**
 
@@ -64,6 +74,7 @@
 * [איך הופכים לגיבור](Becoming-a-Hero-HE)
 * [שליטה ומקשים](Controls-HE)
 * [מראות](Looks-HE)
+* [הפגישה עם המוות](Meeting-Death-HE)
 
 **הגיבורים**
 
@@ -88,6 +99,9 @@
 * [פרופסור X](Professor-X-HE)
 * [דוקטור סטריינג'](Doctor-Strange-HE)
 * [האלק](Hulk-HE)
+* [וולברין](Wolverine-HE)
+* [דדפול](Deadpool-HE)
+* [גורם הריפוי](Healing-Factor-HE)
 * [יוצר הגיבורים](Hero-Creator-HE)
 * [יכולות הגיבורים](Hero-Abilities-HE)
 
@@ -103,6 +117,12 @@
 
 * [אבני האינסוף](Infinity-Stones-HE)
 * [וורמיר ואבן הנשמה](Vormir-HE)
+* [מאתר האבנים](Stone-Locator-HE)
+
+**מקומות**
+
+* [המעבדה התחתונה של האקס-מן](Mutant-School-Lab-HE)
+* [הבקתה של אגתה](Agathas-Cottage-HE)
 
 **מידע**
 

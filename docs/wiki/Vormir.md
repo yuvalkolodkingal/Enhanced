@@ -85,6 +85,10 @@ The stone is never given by accident. **Nothing happens** (it is just a fall) fo
 * "It didn't count: the one you pushed survived the fall." (a totem)
 * and for Creative, a server with the stone switched off, a server that allows only pets or only players, a team rule, or a stone you already have.
 
+## Wolverine and Deadpool (3.7)
+
+The Soul Stone's own magic is stronger than a [healing factor](Healing-Factor): a Wolverine or a Deadpool **pushed** off the edge by a seeker (with PvP on) and given to the fall **dies**, as anyone would, and the seeker gets the stone. One who **jumps or falls alone** only goes down for 5 seconds on the pit's floor, rises, and walks out through the tunnel. A server can spare them (`healing_factor.vormirDefeats`).
+
 ## Rules for servers
 
 Section `[soul_stone]` on [Server Configuration](Server-Configuration#the-soul-stone-and-vormir):

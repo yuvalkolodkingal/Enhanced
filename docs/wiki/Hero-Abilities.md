@@ -1,6 +1,6 @@
 # Heroes' Abilities
 
-Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes, since 3.5 **99** of nineteen (Heimdall, Odin and Hela added), and since 3.6 **111** of twenty-one (Doctor Strange and the Hulk added), with every Sneak variant also [a card of its own](#the-sneak-variants-cards-of-their-own-35): **154 cards** in all. Since 3.6 there are also six [stone rows](#the-infinity-stones-36), one for each Infinity Stone. This page lists them all, hero by hero.
+Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes, since 3.5 **99** of nineteen (Heimdall, Odin and Hela added), since 3.6 **111** of twenty-one (Doctor Strange and the Hulk added), and since 3.7 **123** of twenty-three (Wolverine and Deadpool added), with every Sneak variant also [a card of its own](#the-sneak-variants-cards-of-their-own-35): **176 cards** in all. Since 3.6 there are also six [stone rows](#the-infinity-stones-36), one for each Infinity Stone. This page lists them all, hero by hero.
 
 Hebrew: [עברית](Hero-Abilities-HE)
 
@@ -276,6 +276,32 @@ New in 3.6. See [Hulk](Hulk) for the full story of each ability.
 | **Human Form** `hulk.transform` | **N** (press) | Switch Hulk (press; the Hulk's own) | 5 (no slider) | For a custom hero: **N** turns every power off and shows your own skin, until **N** again. (The Hulk himself changes between Bruce Banner and the Hulk, and Sneak switches his two Hulks.) Shares the one shape. |
 | **The Hulk's body** `hulk.body` | no key (always on) | — | 2 a point | Huge (it changes your size), strong and hard to hurt; Rage makes the blows stronger. Shares the size. |
 
+### Wolverine (6)
+
+New in 3.7. See [Wolverine](Wolverine) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Claw Slash** `wolverine.slash` | **R** (press) | Spin Slash (press) | 2 a point | Three quick slashes of adamantium claws, the third a cross-slash. Sneak: a full turn that slashes everyone round you. |
+| **Claws** `wolverine.claws` | **G** (on/off) | Claw Climb (on/off) | 1 a point | Snikt! The claws come out (your empty hand hits harder) or go back in. Sneak: climb walls by your claws. |
+| **Pounce** `wolverine.pounce` | **V** (press) | Feral Leap (press) | 2 a point | Leap onto the creature you look at and stab it, pinning it for a moment. Sneak: a long low running leap. |
+| **Berserker Rage** `wolverine.berserker` | **B** (press) | Healing Burst (press) | 3 a point | Ten seconds of rage: stronger, faster, healing twice as fast, but too angry to use items. Sneak: heal half your health at once. |
+| **Sniff** `wolverine.senses` | **N** (press) | Track (on/off) | 2 a point | Smell every creature near you through walls, and their scent trails. Sneak: follow one scent for a minute. |
+| **Wolverine's body** `wolverine.body` | no key (always on) | — | 3 a point | Adamantium bones: more health and armour, faster and stronger; you sink in water and Magneto can lift you. The [healing factor](Healing-Factor): only the Infinity Stones, chaos magic, the Allfather's power, the Phoenix or poison defeat you. |
+
+### Deadpool (6)
+
+New in 3.7. See [Deadpool](Deadpool) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Katanas** `deadpool.katanas` | **R** (press) | Parry (hold) | 2 a point | Three quick cuts of two swords. Sneak, held: the swords spin in front of you and bounce arrows back. The Parry shares the one shield. |
+| **Pistols** `deadpool.pistols` | **G** (press) | Trick Shot (press) | 2 a point | Two cartoon pistols fire bright shots, then reload. Sneak: a shot that bounces off a wall at a foe. |
+| **Teleport Belt** `deadpool.belt` | **V** (press) | Drop-In (press) | 2 a point | Blink to where you look (the belt sometimes lands you a little off). Sneak: drop onto a foe from above. |
+| **Taunt** `deadpool.taunt` | **B** (press) | Chimichanga Break (press) | 1 a point | A joke and a pose: monsters near turn on you instead of your friends. Sneak: a healing break, better with a chimichanga. |
+| **Dogpool** `deadpool.dogpool` | **N** (press) | Smoke Vanish (press) | 3 a point | Whistle for Dogpool, who fights beside you for two minutes. Sneak: vanish in a puff of smoke. |
+| **Deadpool's body** `deadpool.body` | no key (always on) | — | 3 a point | More health, faster and stronger. The [healing factor](Healing-Factor). |
+
 ## The Infinity Stones (3.6)
 
 Each Infinity Stone is a **stone row**: put it on any key, and Sneak + that key is its second power. A stone row works **only while your hero carries that stone and may use it**: the stone itself (only a god's ability lets a hero hold the Reality, Power and Soul Stones: see [Infinity Stones](Infinity-Stones#who-may-hold-a-stone)), a Gauntlet with it that he may wield, or its vessel (Loki's Scepter, the Tesseract, the Eye of Agamotto). Without it the key says "You do not carry the Mind Stone." The Time Stone answers only a sorcerer. The card shows **Needs the stone**. The numbers follow the stone's own (`[mind_stone]`...), its strength and `custom_hero.cooldownScale`. A server can switch them off (`custom_hero.stoneRows`).
@@ -337,10 +363,20 @@ Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you
 | **Roar (the Hulk)** `hulk.roar` | `hulk.clap` | — | 2 a point | A roar that frightens and weakens the creatures round you. (3.6) |
 | **Bound (the Hulk)** `hulk.bound` | `hulk.leap` | — | 2 a point | A long low leap forward, again and again. (3.6) |
 | **Gamma Charge (the Hulk)** `hulk.gamma_charge` | `hulk.boulder` | — | 2 a point | Charge shoulder first and throw aside everything in your path. (3.6) |
+| **Spin Slash (Wolverine)** `wolverine.spin_slash` | `wolverine.slash` | — | 2 a point | A full turn, both claws out: every creature round you is slashed. (3.7) |
+| **Claw Climb (Wolverine)** `wolverine.claw_climb` | `wolverine.claws` | `wolverine.claws` | 1 a point | Climb walls by your claws (needs the Claws). (3.7) |
+| **Feral Leap (Wolverine)** `wolverine.feral_leap` | `wolverine.pounce` | — | 2 a point | A long, low running leap. (3.7) |
+| **Healing Burst (Wolverine)** `wolverine.healing_burst` | `wolverine.berserker` | — | 3 a point | Heal half your health at once and shake off bad effects (not poison). Works without the healing factor too. (3.7) |
+| **Track (Wolverine)** `wolverine.track` | `wolverine.senses` | — | 2 a point | Follow the scent of the creature you look at for a minute. (3.7) |
+| **Parry (Deadpool)** `deadpool.parry` | `deadpool.katanas` | — | 2 a point | Held: two spinning swords bounce arrows back and soften blows from the front. Shares the one shield. (3.7) |
+| **Trick Shot (Deadpool)** `deadpool.trick_shot` | `deadpool.pistols` | — | 2 a point | A shot that bounces off a wall at the nearest foe. (3.7) |
+| **Drop-In (Deadpool)** `deadpool.drop_in` | `deadpool.belt` | — | 2 a point | Teleport above a foe and drop onto it sword first. (3.7) |
+| **Chimichanga Break (Deadpool)** `deadpool.chimichanga` | `deadpool.taunt` | — | 1 a point | A healing break; with a chimichanga in your bag, a bigger one. Works without the healing factor too. (3.7) |
+| **Smoke Vanish (Deadpool)** `deadpool.smoke` | `deadpool.dogpool` | — | 3 a point | A smoke bomb: you turn invisible and monsters lose you. (3.7) |
 
 **The Scarlet Witch's Build Magic** is a card of its own too (3.5): **Build Magic (Scarlet Witch)** `wanda.build_magic`, on **Y**, 10 points (no slider): build, copy and change the world with magic by the Scarlet Witch's rules (no meter, and her **Instant** switch). A hero may have hers or Billy's (`billy.build_magic`), not both.
 
-Heimdall's, Odin's and Hela's Sneak variants are not cards of their own: they come with their abilities (the tables above). Doctor Strange's and the Hulk's are (3.6), except the Hulk's **Switch Hulk**, which is only the real Hulk's.
+Heimdall's, Odin's and Hela's Sneak variants are not cards of their own: they come with their abilities (the tables above). Doctor Strange's and the Hulk's are (3.6), except the Hulk's **Switch Hulk**, which is only the real Hulk's; and so are all of Wolverine's and Deadpool's (3.7).
 
 ## Related
 

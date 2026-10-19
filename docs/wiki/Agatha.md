@@ -57,6 +57,12 @@ Press **H** to switch. See [Looks](Looks).
 
 Agatha is a sorceress: she may hold and use the **Time Stone** (Slow Time; Sneak: Rewind; on a crop it grows), and the **Eye of Agamotto** gives her the same powers. The other stones are too strong for her. The **Sling Ring** answers her too. See [Infinity Stones](Infinity-Stones) and [Doctor Strange](Doctor-Strange#the-eye-for-everyone-else).
 
+## Agatha's Cottage (3.7)
+
+In the woods stands [Agatha's Cottage](Agathas-Cottage), where Agatha lives happily with her son **Nicky** and **Rio, the Green Witch**. There is only one Agatha: **while you are Agatha**, the cottage's Agatha is away on the Road, and Nicky runs to you: "Mom! You're home!" The cottage's cellar has a Witches' Road door, and Agatha's study chest always holds a Darkhold.
+
+Her dark magic is **not** strong enough to defeat Wolverine or Deadpool (it lost to chaos magic in *WandaVision*), unless the server says so (`healing_factor.darkholdDefeats`). Her Power Drain does nothing to them: they are no sorcerers. See [Healing Factor](Healing-Factor).
+
 ## Numbers you can change
 
 Everything above is in the `[agatha]` section: the awakening (on or off, how long), her flight and health, the revenge, the beam (damage, range, rate, food), the Drain (reach, how long a hero is drained, damage, healing, cooldown, food, and since 3.5 whether only sorcerers can be drained), the shield (size, wind-up, time, strength, recharges, food) and the Rune Trap (reach, size, time, damage, cooldown, food). The hex mark, the mind glimpse and the poison use the `[darkhold]` numbers. See [Server Configuration](Server-Configuration#agatha-harkness).

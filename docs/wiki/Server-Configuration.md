@@ -2,7 +2,7 @@
 
 Every balance number of the mod lives in one file, **`world/serverconfig/enhanced-server.toml`** in the world (or server) folder. The mod creates it when the world is first loaded, with every option at its default, and syncs it to the clients. It is a plain text file: open it in any editor, change a value and restart the world or the server.
 
-The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes), the [Hero Creator](#the-hero-creator), since 3.5 [Asgard](#asgard), [the Bifrost](#the-bifrost) and the [world's music](#music), and since 3.6 [the Infinity Stones](#the-infinity-stones-36), [the Soul Stone](#the-soul-stone-and-vormir), [the stone sites](#the-stone-sites), [Doctor Strange](#doctor-strange-the-eye-of-agamotto-and-the-sling-ring), [the Hulk](#the-hulk-and-the-gamma-emitter) and [the Hydra soldiers](#hydra-soldiers) have their own), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
+The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes), the [Hero Creator](#the-hero-creator), since 3.5 [Asgard](#asgard), [the Bifrost](#the-bifrost) and the [world's music](#music), and since 3.6 [the Infinity Stones](#the-infinity-stones-36), [the Soul Stone](#the-soul-stone-and-vormir), [the stone sites](#the-stone-sites), [Doctor Strange](#doctor-strange-the-eye-of-agamotto-and-the-sling-ring), [the Hulk](#the-hulk-and-the-gamma-emitter) and [the Hydra soldiers](#hydra-soldiers), and since 3.7 [the healing factor](#the-healing-factor), [Wolverine](#wolverine-and-the-adamantium-injection), [Deadpool](#deadpool-and-dogpool), [the X-Men lower lab](#the-x-men-lower-lab), [the Stone Locator](#the-stone-locator), [Agatha's Cottage](#agathas-cottage) and [meeting Death](#meeting-death) have their own; the [Mutant Cure](#the-mutant-cure) has had one since 3.3.1), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
 
 ```toml
 [scarlet_witch]
@@ -1007,7 +1007,7 @@ Section `[cyclops]` (3.3). The hero's page is [Cyclops](Cyclops): his body, the 
 
 ## Professor X
 
-Section `[professor_x]` (3.3). The hero's page is [Professor X](Professor-X): the wheelchair's ritual, the Mental Blast (R), Hear Thoughts (G), Take Over a Body (V), Freeze Minds (B) and Cerebro (N).
+Section `[professor_x]` (3.3). The hero's page is [Professor X](Professor-X): the wheelchair's ritual, the Mental Blast (R), Hear Thoughts (G), Take Over a Body (V), Freeze Minds (B) and Cerebro (N). The last five options (3.7) are the amplified Cerebro at the console of the [X-Men lower lab](Mutant-School-Lab#cerebro); it shares `cerebroCooldown`.
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
@@ -1031,6 +1031,21 @@ Section `[professor_x]` (3.3). The hero's page is [Professor X](Professor-X): th
 | `professor_x.cerebroRange` | `256` | 16 to 4096 | How far (blocks) Cerebro finds the minds of players, in his dimension. |
 | `professor_x.cerebroTicks` | `200` | 20 to 1200 | How long Cerebro shows the minds it found (200 = 10 s). |
 | `professor_x.cerebroCooldown` | `1200` | 0 to 72000 | Cooldown of Cerebro (ability 5), in ticks (1200 = 60 s). |
+| `professor_x.cerebroAmplifiedTicks` | `600` | 20 to 6000 | How long (ticks) Cerebro searches when amplified at the lab's console (600 = 30 seconds). |
+| `professor_x.cerebroAmplifiedAllDimensions` | `true` | `true` or `false` | Whether the amplified Cerebro finds minds in every dimension, with no range limit. |
+| `professor_x.cerebroShowsStoneSites` | `true` | `true` or `false` | Whether the amplified Cerebro marks the nearest Infinity Stone sites of the telepath's dimension. |
+| `professor_x.cerebroConsoleReach` | `4` | 1 to 16 | How near (blocks) to the Cerebro console a telepath must be to use it. |
+| `professor_x.cerebroConsoleTelepathsOnly` | `true` | `true` or `false` | Whether only telepaths may use the Cerebro console. |
+
+## The Mutant Cure
+
+Section `[mutant_cure]` (3.3.1). The injector that takes a hero's power away for good (see [Items and Crafting](Items-and-Crafting#mutant-cure-331)); since 3.7 the lab's [Cure Station](Mutant-School-Lab#the-cure-station) fills one for a glass bottle (`school_lab.cureStation`, `school_lab.cureStationCooldown`, and only while the Cure is enabled). The recipe is data (`data/enhanced/recipe/mutant_cure.json`).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `mutant_cure.enabled` | `true` | `true` or `false` | Whether the Mutant Cure works (false: using it does nothing and nothing is used up). |
+| `mutant_cure.holdTicks` | `40` | 1 to 600 | How long (ticks) right-click is held to inject the Mutant Cure (40 = 2 seconds). |
+| `mutant_cure.onOthers` | `true` | `true` or `false` | Whether a player may inject another player (right-click on them and hold): an operator always,  anyone else only while PvP is on. False: only on yourself. |
 
 ## Asgard
 
@@ -1469,6 +1484,202 @@ Section `[hydra]` (3.6). The page is [Hydra Soldiers](Hydra-Soldiers).
 | `hydra.intelMapDrop` | `0.25` | 0.0 to 1.0 | Chance an officer drops Hydra intel (a map to an Avengers Tower). |
 | `hydra.energyCellDrop` | `0.2` | 0.0 to 1.0 | Chance a rifleman drops an energy cell. |
 
+## The healing factor
+
+Section `[healing_factor]` (3.7). The page is [Healing Factor](Healing-Factor): the regeneration of [Wolverine](Wolverine) and [Deadpool](Deadpool) (and a custom hero with one of their bodies), the DOWN that replaces a death, the rise, and what defeats a healer. Which damage types defeat him is decided by the tags `enhanced:defeats_healing/stones`, `chaos`, `odin`, `phoenix` and `darkhold`; the options below switch each group on or off. The void and `/kill` always defeat him.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `healing_factor.enabled` | `true` | `true` or `false` | Whether the healing factor works at all (off: Wolverine and Deadpool die as anyone). |
+| `healing_factor.customHeroes` | `true` | `true` or `false` | Whether a custom hero with Wolverine's or Deadpool's body row has the healing factor. |
+| `healing_factor.regenPerSecond` | `1.0` | 0.0 to 20.0 | Health healed per second, always (also in a fight). |
+| `healing_factor.regenOutOfCombat` | `3.0` | 0.0 to 20.0 | Health healed per second after outOfCombatTicks without taking damage. |
+| `healing_factor.outOfCombatTicks` | `60` | 0 to 1200 | Ticks without damage before the faster regeneration (60 = 3 seconds). |
+| `healing_factor.exhaustionPerHealth` | `0.05` | 0.0 to 4.0 | Food exhaustion per health healed (at food 0 the regeneration is a quarter, never zero). |
+| `healing_factor.shrugFactor` | `0.5` | 0.0 to 1.0 | Harmful effects (not Poison, not the mod's spells) last this fraction of their time on a healer. |
+| `healing_factor.downTicks` | `100` | 20 to 600 | Ticks a healer stays DOWN (kneeling, untouchable) after a blow that would have killed him (100 = 5 seconds). |
+| `healing_factor.riseHealth` | `8.0` | 1.0 to 40.0 | Health he rises with. |
+| `healing_factor.riseResistanceTicks` | `60` | 0 to 600 | Ticks of Resistance I after he rises (60 = 3 seconds). |
+| `healing_factor.downMobsForget` | `true` | `true` or `false` | Whether monsters lose interest in a healer who is DOWN. |
+| `healing_factor.rescueRadius` | `32` | 4 to 128 | Radius (blocks) searched for dry, safe ground when he rises in water, lava, fire or a wall. |
+| `healing_factor.stonesDefeat` | `true` | `true` or `false` | Whether the Infinity Stones defeat a healer (damage types in #enhanced:defeats_healing/stones). |
+| `healing_factor.chaosDefeats` | `true` | `true` or `false` | Whether chaos magic (the Scarlet Witch, Billy) defeats a healer (#enhanced:defeats_healing/chaos). |
+| `healing_factor.odinDefeats` | `true` | `true` or `false` | Whether the Allfather's power (the Odinforce, Gungnir) defeats a healer (#enhanced:defeats_healing/odin). |
+| `healing_factor.phoenixDefeats` | `true` | `true` or `false` | Whether the Phoenix defeats a healer (#enhanced:defeats_healing/phoenix). |
+| `healing_factor.darkholdDefeats` | `false` | `true` or `false` | Whether the Darkhold's dark magic (Agatha) defeats a healer (#enhanced:defeats_healing/darkhold). |
+| `healing_factor.vormirDefeats` | `true` | `true` or `false` | Whether a healer pushed off the Vormir Cliff and sacrificed dies (the Soul Stone's own magic). |
+| `healing_factor.poisonStopsHealing` | `true` | `true` or `false` | Whether Poison (the effects in #enhanced:stops_healing) switches the healing off while it lasts. |
+| `healing_factor.burstFraction` | `0.5` | 0.0 to 1.0 | Fraction of his max health the Healing Burst heals at once. |
+| `healing_factor.burstCooldown` | `400` | 0 to 72000 | Cooldown (ticks) of the Healing Burst (400 = 20 seconds). |
+| `healing_factor.tipOnce` | `true` | `true` or `false` | Whether the chat tip about the healing factor is shown only at a player's first DOWN. |
+
+## Wolverine and the Adamantium Injection
+
+Sections `[wolverine]` and `[adamantium_injection]` (3.7). The page is [Wolverine](Wolverine). His healing is `[healing_factor]`'s.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `wolverine.healthBonus` | `10.0` | 0.0 to 100.0 | Max health added to his 20. |
+| `wolverine.armorBonus` | `4.0` | 0.0 to 30.0 | Armour of his adamantium bones. |
+| `wolverine.toughnessBonus` | `2.0` | 0.0 to 20.0 | Armour toughness of his adamantium bones. |
+| `wolverine.knockbackResistance` | `0.4` | 0.0 to 1.0 | Knockback resistance (he is heavy). |
+| `wolverine.speedBonus` | `0.2` | 0.0 to 2.0 | Movement speed added, as a fraction (0.2 = 20 %). |
+| `wolverine.attackBonus` | `2.0` | 0.0 to 40.0 | Attack damage added to every blow. |
+| `wolverine.attackSpeedBonus` | `0.6` | 0.0 to 4.0 | Attack speed added. |
+| `wolverine.jumpBonus` | `0.15` | 0.0 to 2.0 | Jump strength added. |
+| `wolverine.safeFall` | `4.0` | 0.0 to 64.0 | Safe fall distance added (blocks). |
+| `wolverine.clawBonus` | `4.0` | 0.0 to 40.0 | Damage the claws add to a blow of his empty main hand. |
+| `wolverine.heavy` | `true` | `true` or `false` | Whether his adamantium makes him sink in water and lava. |
+| `wolverine.sinkSpeed` | `0.03` | 0.0 to 0.5 | How fast (blocks per tick, added each tick) he sinks in a fluid. |
+| `wolverine.maxSwimUp` | `0.02` | 0.0 to 1.0 | The fastest (blocks per tick) he can swim up. |
+| `wolverine.slashDamage1` | `6.0` | 0.0 to 100.0 | Damage of the first hit of the Claw Slash combo. |
+| `wolverine.slashDamage2` | `6.0` | 0.0 to 100.0 | Damage of the second hit. |
+| `wolverine.slashDamage3` | `9.0` | 0.0 to 100.0 | Damage of the third hit (the cross-slash). |
+| `wolverine.slashReach` | `3.5` | 1.0 to 8.0 | Reach (blocks) of the Claw Slash. |
+| `wolverine.slashGap` | `10` | 1 to 100 | Ticks between two hits of the combo (10 = 0.5 seconds). |
+| `wolverine.comboReset` | `30` | 5 to 200 | Ticks after which the combo starts again from the first hit (30 = 1.5 seconds). |
+| `wolverine.spinDamage` | `7.0` | 0.0 to 100.0 | Damage of the Spin Slash. |
+| `wolverine.spinRadius` | `3.0` | 1.0 to 8.0 | Radius (blocks) of the Spin Slash. |
+| `wolverine.spinCooldown` | `80` | 0 to 72000 | Cooldown (ticks) of the Spin Slash (80 = 4 seconds). |
+| `wolverine.pounceRange` | `16` | 4 to 64 | Range (blocks) of the Pounce. |
+| `wolverine.pounceDamage` | `12.0` | 0.0 to 100.0 | Damage of the Pounce's stab. |
+| `wolverine.pouncePinTicks` | `20` | 0 to 200 | Ticks the prey is pinned after the Pounce (20 = 1 second). |
+| `wolverine.pounceCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Pounce (100 = 5 seconds). |
+| `wolverine.feralLeapCooldown` | `30` | 0 to 72000 | Cooldown (ticks) of the Feral Leap (30 = 1.5 seconds). |
+| `wolverine.berserkTicks` | `200` | 20 to 1200 | Ticks the Berserker Rage lasts (200 = 10 seconds). |
+| `wolverine.berserkDamage` | `0.4` | 0.0 to 4.0 | Damage added by the Rage, as a fraction (0.4 = 40 %). |
+| `wolverine.berserkSpeed` | `0.25` | 0.0 to 2.0 | Speed added by the Rage, as a fraction. |
+| `wolverine.berserkRegenFactor` | `2.0` | 1.0 to 10.0 | How many times faster he heals in the Rage. |
+| `wolverine.berserkTiredTicks` | `100` | 0 to 1200 | Ticks of Weakness I after the Rage (100 = 5 seconds). |
+| `wolverine.berserkCooldown` | `900` | 0 to 72000 | Cooldown (ticks) of the Berserker Rage (900 = 45 seconds). |
+| `wolverine.sniffRadius` | `48` | 8 to 128 | Radius (blocks) of the Sniff. |
+| `wolverine.sniffTicks` | `200` | 20 to 1200 | Ticks the creatures he sniffed glow for him (200 = 10 seconds). |
+| `wolverine.sniffCooldown` | `300` | 0 to 72000 | Cooldown (ticks) of the Sniff (300 = 15 seconds). |
+| `wolverine.trailSeconds` | `60` | 5 to 300 | Seconds of scent trail kept for each player and monster. |
+| `wolverine.trackRange` | `256` | 16 to 4096 | The farthest (blocks) Track follows a scent. |
+| `wolverine.trackTicks` | `1200` | 100 to 12000 | Ticks Track lasts (1200 = 1 minute). |
+| `wolverine.trackCooldown` | `300` | 0 to 72000 | Cooldown (ticks) of Track, after it ends (300 = 15 seconds). |
+| `wolverine.trackTellsTarget` | `true` | `true` or `false` | Whether a tracked player is told that Wolverine has his scent. |
+| `wolverine.climbSpeed` | `0.12` | 0.01 to 1.0 | How fast (blocks per tick) Claw Climb takes him up a wall. |
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `adamantium_injection.holdTicks` | `60` | 10 to 400 | Ticks the Adamantium Injection is held to use it (60 = 3 seconds). |
+| `adamantium_injection.heroesRefused` | `true` | `true` or `false` | Whether a hero is refused the injection (false: it replaces his power with Wolverine's). |
+| `adamantium_injection.craftable` | `false` | `true` or `false` | Whether the Adamantium Injection can be crafted (for servers without labs). |
+
+## Deadpool and Dogpool
+
+Sections `[deadpool]` and `[dogpool]` (3.7). The page is [Deadpool](Deadpool). His healing is `[healing_factor]`'s; the Chimichanga Break without a chimichanga heals `healing_factor.burstFraction`. A player can hide his jokes with the client option `deadpoolLines`.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `deadpool.healthBonus` | `10.0` | 0.0 to 100.0 | Max health added to his 20. |
+| `deadpool.speedBonus` | `0.15` | 0.0 to 2.0 | Movement speed added, as a fraction. |
+| `deadpool.attackBonus` | `2.0` | 0.0 to 40.0 | Attack damage added to every blow. |
+| `deadpool.attackSpeedBonus` | `0.4` | 0.0 to 4.0 | Attack speed added. |
+| `deadpool.jumpBonus` | `0.1` | 0.0 to 2.0 | Jump strength added. |
+| `deadpool.safeFall` | `3.0` | 0.0 to 64.0 | Safe fall distance added (blocks). |
+| `deadpool.katanaDamage1` | `5.0` | 0.0 to 100.0 | Damage of the first hit of the katana combo. |
+| `deadpool.katanaDamage2` | `5.0` | 0.0 to 100.0 | Damage of the second hit. |
+| `deadpool.katanaDamage3` | `8.0` | 0.0 to 100.0 | Damage of the third hit (the X-cut). |
+| `deadpool.katanaReach` | `3.5` | 1.0 to 8.0 | Reach (blocks) of the katanas. |
+| `deadpool.katanaGap` | `8` | 1 to 100 | Ticks between two hits of the combo (8 = 0.4 seconds). |
+| `deadpool.parryMaxTicks` | `80` | 10 to 600 | The longest (ticks) the Parry can be held (80 = 4 seconds). |
+| `deadpool.parryMeleeReduction` | `0.6` | 0.0 to 1.0 | How much of a blow from the front the Parry takes away. |
+| `deadpool.parryCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Parry (60 = 3 seconds). |
+| `deadpool.pistolDamage` | `4.0` | 0.0 to 100.0 | Damage of each pistol shot. |
+| `deadpool.pistolRange` | `48` | 4 to 128 | Range (blocks) of a shot. |
+| `deadpool.magazine` | `16` | 1 to 128 | Shots before the pistols reload. |
+| `deadpool.reloadTicks` | `40` | 0 to 400 | Ticks the reload takes (40 = 2 seconds). |
+| `deadpool.shotGap` | `6` | 1 to 100 | Ticks between two pairs of shots (6 = 0.3 seconds). |
+| `deadpool.trickShotDamage` | `8.0` | 0.0 to 100.0 | Damage of the Trick Shot. |
+| `deadpool.trickShotSeek` | `12` | 2 to 48 | Radius (blocks) round the bounce in which the Trick Shot finds its target. |
+| `deadpool.trickShotCooldown` | `80` | 0 to 72000 | Cooldown (ticks) of the Trick Shot (80 = 4 seconds). |
+| `deadpool.blinkRange` | `24` | 4 to 128 | Range (blocks) of the Teleport Belt. |
+| `deadpool.blinkCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of the Teleport Belt (40 = 2 seconds). |
+| `deadpool.glitchChance` | `0.1` | 0.0 to 1.0 | Chance that the belt glitches and he lands a few blocks off (always on a safe spot). |
+| `deadpool.dropInRange` | `32` | 4 to 128 | Range (blocks) of the Drop-In. |
+| `deadpool.dropInHeight` | `8` | 2 to 32 | How high (blocks) above the foe the Drop-In teleports him. |
+| `deadpool.dropInDamage` | `8.0` | 0.0 to 100.0 | Damage of the Drop-In's landing. |
+| `deadpool.dropInCooldown` | `160` | 0 to 72000 | Cooldown (ticks) of the Drop-In (160 = 8 seconds). |
+| `deadpool.tauntRadius` | `16` | 2 to 64 | Radius (blocks) in which monsters turn on him when he taunts. |
+| `deadpool.tauntTicks` | `100` | 10 to 1200 | Ticks the taunted monsters keep at him (100 = 5 seconds). |
+| `deadpool.tauntCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of the Taunt (200 = 10 seconds). |
+| `deadpool.smokeTicks` | `80` | 10 to 1200 | Ticks of Invisibility after the Smoke Vanish (80 = 4 seconds). |
+| `deadpool.smokeCooldown` | `400` | 0 to 72000 | Cooldown (ticks) of the Smoke Vanish (400 = 20 seconds). |
+| `deadpool.chimichangaFraction` | `1.0` | 0.0 to 1.0 | Fraction of his max health the Chimichanga Break heals when he eats a chimichanga. |
+| `deadpool.podAwakens` | `true` | `true` or `false` | Whether the Weapon X Pod makes a powerless player Deadpool. |
+| `deadpool.podTicks` | `100` | 20 to 1200 | Ticks of the pod's treatment (100 = 5 seconds). |
+| `deadpool.linesEnabled` | `true` | `true` or `false` | Whether Deadpool says his joke lines. |
+| `deadpool.lineGapTicks` | `200` | 0 to 12000 | The fewest ticks between two of his lines (200 = 10 seconds). |
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `dogpool.enabled` | `true` | `true` or `false` | Whether Deadpool can call Dogpool. |
+| `dogpool.seconds` | `120` | 10 to 1200 | Seconds Dogpool stays. |
+| `dogpool.health` | `20.0` | 1.0 to 200.0 | Dogpool's health. |
+| `dogpool.biteDamage` | `4.0` | 0.0 to 100.0 | Damage of Dogpool's bite. |
+| `dogpool.cooldown` | `1200` | 0 to 72000 | Cooldown (ticks) of Dogpool, from the call (1200 = 1 minute). |
+
+## The X-Men lower lab
+
+Section `[school_lab]` (3.7). The page is [The X-Men lower lab](Mutant-School-Lab). The lab is built at run time under every Mutant School (old ones too), never by world generation, so `enabled` works in any world. Its Cerebro console's options are in [`[professor_x]`](#professor-x). The operators' command is `/enhanced structure school_lab` (see [Commands](Commands#structures-enhanced-structure)).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `school_lab.enabled` | `true` | `true` or `false` | Whether the schools get their lower lab (off: no labs are built and no entrance appears; built ones stay). |
+| `school_lab.autoBuild` | `true` | `true` or `false` | Whether a school's lab is built by itself when a player comes near (off: only the command builds one). |
+| `school_lab.buildRadius` | `96` | 16 to 256 | Radius (blocks) round a player in which schools get their lab. |
+| `school_lab.layersPerTick` | `2` | 1 to 28 | Layers of the lab built per tick. |
+| `school_lab.openToAll` | `true` | `true` or `false` | Whether anyone may open the secret bookshelves (false: only the X-Men heroes and operators). |
+| `school_lab.liftSneakTicks` | `20` | 1 to 200 | Ticks of Sneak on an elevator pad before the lift rides (20 = 1 second). |
+| `school_lab.lecternHint` | `true` | `true` or `false` | Whether the Professor's notes are put on the study's empty lectern. |
+| `school_lab.injectionsPerPlayer` | `1` | 0 to 64 | Adamantium Injections each player may take from one rack. |
+| `school_lab.cureStation` | `true` | `true` or `false` | Whether the Cure Station gives Mutant Cures. |
+| `school_lab.cureStationCooldown` | `1200` | 0 to 72000 | Ticks before the same player gets another cure from a station (1200 = 1 minute). |
+
+## The Stone Locator
+
+Section `[stone_locator]` (3.7). The page is [Stone Locator](Stone-Locator). The cores the recipe takes are the item tag `enhanced:locator_cores`; the sites it looks for are the structure tags `enhanced:stone_site/mind`, `time`, `space`, `power`, `soul` and `enhanced:bifrost_sites`.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `stone_locator.craftable` | `true` | `true` or `false` | Whether the Stone Locator can be crafted. |
+| `stone_locator.returnsCore` | `true` | `true` or `false` | Whether the stone (or vessel) in the recipe's centre is given back. |
+| `stone_locator.searchRadius` | `4096` | 256 to 30000 | The farthest (blocks) it searches in the Overworld and the End. |
+| `stone_locator.netherSearchRadius` | `1024` | 128 to 30000 | The farthest (blocks) it searches in the Nether. |
+| `stone_locator.startChecksPerTick` | `2` | 1 to 32 | Structure starts loaded per tick for the search, on the whole server. |
+| `stone_locator.recheckTicks` | `600` | 20 to 72000 | Ticks a search's answer is kept (600 = 30 seconds). |
+| `stone_locator.moveRecheck` | `64` | 8 to 1024 | Blocks the holder may move before the search runs again. |
+| `stone_locator.pulseCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the spark trail (100 = 5 seconds). |
+| `stone_locator.pointsToGateways` | `true` | `true` or `false` | Whether, in the wrong realm, it points to the way there (a stronghold for the End, a Bifrost site for Asgard). |
+
+## Agatha's Cottage
+
+Section `[agatha_cottage]` (3.7). The page is [Agatha's Cottage](Agathas-Cottage). Where cottages stand is the biome tag `enhanced:has_structure/agatha_cottage`, and how far apart the structure set `enhanced:agatha_cottages` (40 / 14 chunks).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `agatha_cottage.enabled` | `true` | `true` or `false` | Whether Agatha's Cottage generates in new chunks (existing cottages stay). |
+| `agatha_cottage.residents` | `true` | `true` or `false` | Whether Agatha, Nicky and Rio live in the cottages. |
+| `agatha_cottage.agathaYields` | `true` | `true` or `false` | Whether the cottage's Agatha is away while a player is Agatha (one of each). |
+| `agatha_cottage.scratchyRunsOff` | `0.3` | 0.0 to 1.0 | Chance each morning that Señor Scratchy runs off. |
+| `agatha_cottage.giftsPerDay` | `1` | 0 to 16 | Gifts Nicky gives each player per day. |
+| `agatha_cottage.blessingTicks` | `600` | 0 to 12000 | Ticks of Regeneration I in Rio's blessing (600 = 30 seconds). |
+| `agatha_cottage.trades` | `true` | `true` or `false` | Whether Agatha and Rio trade. |
+| `agatha_cottage.roadDoor` | `true` | `true` or `false` | Whether the cellar's door opens onto the Witches' Road (false: decor only). |
+
+## Meeting Death
+
+Section `[death_meeting]` (3.7). The page is [Meeting Death](Meeting-Death): Rio, the Green Witch, and the two roads when a player dies. A hardcore world and the game rule `doImmediateRespawn` always keep the game's own way. A player can switch the screen off for himself with the client option `showDeathMeeting`.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `death_meeting.enabled` | `true` | `true` or `false` | Whether a player who dies meets Death (Rio, the Green Witch) instead of the plain death screen. Off: the vanilla screen. Hardcore worlds and doImmediateRespawn always keep vanilla's way. |
+| `death_meeting.allowNether` | `true` | `true` or `false` | Whether Death offers "Start again in the Nether" (a safe spot near the player's spawn point divided by 8, or a small platform built for him). |
+| `death_meeting.fireResistanceSeconds` | `10` | 0 to 600 | Seconds of Fire Resistance a player who starts again in the Nether gets (0: none). |
+
 ## Music
 
 Section `[music]` (3.5): [a world's own music](Music#a-worlds-own-music-servers), the songs a server owner puts in `<world>/serverconfig/enhanced/music/` to replace the Walkman songs and the Witches' Road for every player.
@@ -1506,7 +1717,7 @@ Section `[custom_hero]` (3.3; five options added in 3.4). The page is [Hero Crea
 | `custom_hero.suppressSeconds` | `8` | 1 to 120 | Scales how long Power Absorption takes another hero's powers away (PvP only): at the default 8, from 3 seconds (strength 1) to 12 (strength 10); another value scales them by it / 8. |
 | `custom_hero.blockChanges` | `false` | `true` or `false` | Custom powers may change blocks: the Sonic Scream shatters glass (doors, levers and frozen water are always allowed, and every change still asks the claims, spawn protection and boss arenas). |
 | `custom_hero.weatherChangesWorld` | `true` | `true` or `false` | Weather Control's "cycle" changes the world's weather (false: it only says it cannot). |
-| `custom_hero.heroModules` | `true` | `true` or `false` | 3.4: a custom hero may take the abilities of the mod's own heroes (Thor's lightning, Agatha's shield...; the [abilities of the heroes](Hero-Abilities), 111 since 3.6). False: only the thirty powers, and a hero file's abilities are left out with a note. |
+| `custom_hero.heroModules` | `true` | `true` or `false` | 3.4: a custom hero may take the abilities of the mod's own heroes (Thor's lightning, Agatha's shield...; the [abilities of the heroes](Hero-Abilities), 111 since 3.6, 123 since 3.7). False: only the thirty powers, and a hero file's abilities are left out with a note. |
 | `custom_hero.worldPowers` | `true` | `true` or `false` | 3.4: a custom hero may take the heroes' world-scale abilities: the Hex, the Bifrost, Thanos's Time Stone, Ultron's Upload and Sentry Army, Professor X's Take Over a Body, and the others marked "a world power" on [Heroes' Abilities](Hero-Abilities) (since 3.6 Doctor Strange's Sling-Ring Portal and the Space Stone's row). |
 | `custom_hero.heroStrengthSpread` | `0.5` | 0.0 to 1.0 | 3.4: how much the strength (1 to 10) of a hero's ability changes it: its damage and its body times 1 + spread × (strength − 5) / 5, its cooldown divided by that. At 0.5, strength 1 is ×0.6 and strength 10 is ×1.5; at 0 strength changes nothing (every ability is the hero's own). Strength 5 is always the hero himself. |
 | `custom_hero.layers` | `true` | `true` or `false` | 3.4: a custom hero's look may have extras: a cape, a hat, a visor or mask, glowing eyes, an aura (false: they are taken off, with a note). |
@@ -1613,7 +1824,7 @@ Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-dar
 
 ## Structures
 
-The four stone sites of 3.6 can each be switched off: see [The stone sites](#the-stone-sites). The garrison of the Hydra outposts is the section [`[hydra]`](#hydra-soldiers). The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.
+The four stone sites of 3.6 can each be switched off: see [The stone sites](#the-stone-sites). Since 3.7 the schools' lower labs are [`[school_lab]`](#the-x-men-lower-lab) and Agatha's Cottages [`[agatha_cottage]`](#agathas-cottage). The garrison of the Hydra outposts is the section [`[hydra]`](#hydra-soldiers). The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.
 
 ## Datapack tags
 
@@ -1652,6 +1863,17 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:hulk_unbreakable` | block | 3.6: what he never breaks: everything Build Magic never touches, obsidian, end portal frames, spawners, reinforced deepslate, the stone pedestals, the Tesseract's cradle, Hela's Seal and the Gamma Emitter. |
 | `enhanced:on_avengers_tower_maps` | structure | 3.6: where the Hydra Intel map leads (Avengers Tower). |
 | `enhanced:ultron_robots` | entity type | Ultron and his Sentries: lightning does `ultron.lightningFactor` (1.25) times to them, and the Mind Stone beam `ultron_boss.visionBeamBonus` (1.5) times. |
+| `enhanced:defeats_healing/stones` | damage type | 3.7: what the [healing factor](Healing-Factor#what-defeats-him) can't stop, while `healing_factor.stonesDefeat`: every power of the Infinity Stones (`stone_power`, `stone_blast`, `stone_soul`, `mind_stone`, `mind_stone_beam`, `power_stone_beam`, `power_stone_explosion`, `snap_dust`). |
+| `enhanced:defeats_healing/chaos` | damage type | 3.7: chaos magic (`chaos_beam`, `hex_wall`, `hex_bolt`, `hex_beam`), while `healing_factor.chaosDefeats`. |
+| `enhanced:defeats_healing/odin` | damage type | 3.7: the Allfather's power (`odinforce`, `gungnir`), while `healing_factor.odinDefeats`. |
+| `enhanced:defeats_healing/phoenix` | damage type | 3.7: the Phoenix Burst (`phoenix_burst`), while `healing_factor.phoenixDefeats`. |
+| `enhanced:defeats_healing/darkhold` | damage type | 3.7: the Darkhold's dark magic (`darkhold_beam`, `agatha_drain`, `agatha_runes`), only while `healing_factor.darkholdDefeats` (off by default). |
+| `enhanced:stops_healing` | mob effect | 3.7: effects that switch a healing factor off while they last: Poison. |
+| `enhanced:claw_slippery` | block | 3.7: what Wolverine's Claw Climb can't bite into: glass and glass panes, ice, slime, honey, tinted glass. |
+| `enhanced:locator_cores` | item | 3.7: what goes in the middle of the [Stone Locator](Stone-Locator)'s recipe: the six stones, Loki's Scepter, the Tesseract, the Eye of Agamotto, the Orb and the Infinity Gauntlet (a crafted one with a stone; the recipe refuses Thanos's). |
+| `enhanced:chimichanga_fillings` | item | 3.7: what goes in a chimichanga: cooked beef, porkchop or chicken. |
+| `enhanced:stone_site/mind`, `time`, `space`, `power`, `soul` | structure | 3.7: the sites the Stone Locator looks for: the Hydra outpost, the Sanctum, Avengers Tower, the End tunnel, the Vormir Cliff. |
+| `enhanced:bifrost_sites` | structure | 3.7: where the Stone Locator points for the Reality Stone in the Overworld (the Bifrost sites). |
 | `enhanced:telekinesis_immovable` | block | Blocks no telekinesis can tear out of the ground. |
 | `enhanced:magnetic_blocks` | block | Metal blocks: what Magneto's R tears out and his Magnetic Pull takes whole (it holds `magnetic_ores`, the storage blocks, anvils, rails, chains, bars, doors, lanterns, hoppers, pistons, copper blocks and more; other mods' metals are optional entries). |
 | `enhanced:magnetic_ores` | block | Ores whose metal the Magnetic Pull takes out (the ore turns into its stone). Iron, gold, copper, nether gold, ancient debris and gilded blackstone, and other mods' tin, lead, silver and so on. |
@@ -1676,7 +1898,7 @@ The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_
 
 ## Client options: animations, effects and looks
 
-Fourteen options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]`, `[spider_man]`, (3.5) `[music]` and (3.6) `[hulk]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
+Sixteen options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]`, `[spider_man]`, (3.5) `[music]`, (3.6) `[hulk]` and (3.7) `[deadpool]` and `[death_meeting]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
 
 ```toml
 [animation]
@@ -1704,6 +1926,12 @@ Fourteen options are about your own game only. They are not synced, and a server
 
 [hulk]
     hulkModel = true
+
+[deadpool]
+    deadpoolLines = true
+
+[death_meeting]
+    showDeathMeeting = true
 ```
 
 | Option | Setting in the file | Default | What it does |
@@ -1721,6 +1949,8 @@ Fourteen options are about your own game only. They are not synced, and a server
 | Web Assist preview | `webAssistPreview` | `true` | Show where Web Assist's next web would go (a small white web) while you are in the air or sneaking. |
 | Quicksilver's song | `quicksilverSong` | `theme` | 3.5: what Quicksilver's Walkman plays: `theme` (his own song, "Silver Hours") or `sweet_dreams` (*Sweet Dreams (Are Made of This)*, as before 3.5). A song of your own, or the world's, plays instead of either. See [Music](Music). |
 | The Hulk's body | `hulkModel` | `true` | 3.6: the Hulk is drawn with his own giant body. Off: the normal player model wearing his skin, made bigger (if another mod's player model clashes with his). See [Hulk](Hulk#looks-and-how-he-moves). |
+| Deadpool's jokes | `deadpoolLines` | `true` | 3.7: [Deadpool](Deadpool#his-jokes)'s joke lines in speech bubbles over his head (and, when you are Deadpool, in the action bar). Off: you see none. |
+| Meet Death when you die | `showDeathMeeting` | `true` | 3.7: when you die, [meet Death](Meeting-Death) (Rio, the Green Witch) and choose where to start again. Off: the plain death screen. |
 | Ignore the world's music | `ignoreServerMusic` | `false` | 3.5: don't download or play the songs a server or world puts in its music folder; hear the built-in music, or your own. |
 
 Two more client options, for the music and the air of the Thanos fight, are in a `[thanos]` section of the same file: see [above](#your-own-game-the-music-and-the-atmosphere-of-the-fight).

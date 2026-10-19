@@ -2,7 +2,7 @@
 
 A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The exceptions are Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs; and since 3.6 the Hulk, whose Bruce Banner has no powers and whose Brand New Day Hulk is bigger and hits harder.)
 
-Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, and since 3.6 Doctor Strange and the Hulk have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
+Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, since 3.6 Doctor Strange and the Hulk, and since 3.7 Wolverine and Deadpool have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
 ## Switching looks
 
@@ -198,6 +198,27 @@ The Cloak moves by itself in every look (it billows in flight and catches his fa
 | **Your own skin** | `own` | You, as Bruce Banner: human, no powers. |
 
 For the Hulk, **H** moving from Banner to a Hulk (or back) is a whole transformation, as **N** is. The two Hulks have a giant body of their own, not a stretched player; the client option `hulk.hulkModel` draws them as a big player in their skin instead.
+
+### Wolverine ([page](Wolverine))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Classic suit** (default) | `classic` | The yellow-and-blue suit of *Deadpool & Wolverine* (2024), the comics' colours on screen at last: yellow, blue shoulders and sides with black stripes, long blue gloves, blue boots, a black belt with a round red-and-silver buckle, and the yellow cowl with its two black fins. |
+| **X-Men (2000) leather** | `x_men_2000` | The black quilted leather of the first *X-Men* film, an orange-yellow piping V down from the shoulders and along the arms and legs, black gloves and boots, no mask: his hair swept up into two points and long sideburns. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+His adamantium claws slide out of his fists in every look, in first and third person.
+
+### Deadpool ([page](Deadpool))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Classic suit** (default) | `classic` | The red-and-black suit of *Deadpool & Wolverine*: big black eye patches with white eyes, black side panels, a grey harness and our own red-and-black buckle. |
+| **X-Men trainee** | `trainee` | The school's yellow-and-black trainee uniform, with his red mask. |
+| **Kidpool** | `kidpool` | A kid Deadpool of the Deadpool Corps: smaller (four-fifths of a player), brighter red, a bigger mask and a short red cape. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+His two katanas are crossed on his back and his pistols at his hips in every look.
 
 ### Magneto, the Scarlet Witch and Quicksilver
 

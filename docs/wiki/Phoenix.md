@@ -155,6 +155,10 @@ Press **H** to change look (**Sneak + H** goes back). The abilities are the same
 
 The Phoenix may hold every [Infinity Stone](Infinity-Stones) bare and use them, wield a crafted Infinity Gauntlet and Snap, and seek the Soul Stone at [Vormir](Vormir). Only the **Time Stone** stays quiet in her hand: it answers only a sorcerer.
 
+## Against Wolverine and Deadpool (3.7)
+
+The **Phoenix Burst** is one of the few things a [healing factor](Healing-Factor) can't stop (in *X-Men: The Last Stand* she tears Logan apart almost faster than he heals): it defeats Wolverine and Deadpool. Jean may also use the [Cerebro console](Mutant-School-Lab#cerebro), as she did in *X2*.
+
 ## Numbers you can change
 
 How fast she flies, whether fire hurts her, how far Mind Reading, Mind Sense and Mind Control reach and what they cost, how many creatures she can hold and for how long, the Psionic Field's radius, length and recharge, and every number of the Burst (charge time, radius, damage, how much a player takes, how fast the wave spreads, fire, knockback, whether it sets fires or hurts villagers and animals, hunger cost, cooldowns and the drain afterwards), and how long the Ember must be held, are the `phoenix.*` options on [Server Configuration](Server-Configuration#phoenix-jean-grey).

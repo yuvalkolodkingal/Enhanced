@@ -62,9 +62,12 @@ Asgard has no portal: an operator can also use `/tp` or `/execute in enhanced:as
 
 | Command | Effect |
 |---|---|
+| `/enhanced structure school_lab [radius]` | (3.7) Builds the [X-Men lower lab](Mutant-School-Lab) of the Mutant School nearest to you (within 128 blocks, or `radius`, 16 to 256) now, or finishes one being built: "The lower lab is built. Its lift starts in the study at …", or "This school's lab is already built." The lab is otherwise built by itself when a player comes near (`school_lab.autoBuild`). |
+| `/enhanced structure school_lab force` | (3.7) The same, and puts the secret entrance in the study even over a player's blocks (without `force`, a block a player put there keeps the entrance out: "a player's block stands where the entrance goes"). |
+| `/enhanced structure school_lab status` | (3.7) The nearest school's lab: not begun, being built, built or blocked (and why), where the study's and the lab's pads are, how it is turned, and for a built lab its holes, stray water or lava inside, and doors without a frame (0, 0 and 0 in a whole lab). |
 | `/enhanced structure repair_school [radius]` | (3.5) Mends a [Mutant School](Structures#the-mutant-school) built before 3.3.1, the hole round its front door: only the 76 blocks of the door and the tower that 3.3.1 changed, in the school's own stone. It looks for the school nearest to you within 128 blocks (or `radius`, 16 to 256). A block a player has changed there is left alone and counted ("kept"); run it again any time, and it says when the school is whole. |
 
-To **find** a structure, use the game's own `/locate structure <id>`: `enhanced:hydra_outpost`, `enhanced:mjolnir_crater`, `enhanced:mutant_school`, `enhanced:bifrost_site`, and since 3.6 `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (run it in the End) and `enhanced:vormir_cliff` (run it in the Nether). See [Structures](Structures#the-stone-sites-36).
+To **find** a structure, use the game's own `/locate structure <id>`: `enhanced:hydra_outpost`, `enhanced:mjolnir_crater`, `enhanced:mutant_school`, `enhanced:bifrost_site`, and since 3.6 `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (run it in the End) and `enhanced:vormir_cliff` (run it in the Nether), and since 3.7 `enhanced:agatha_cottage`. See [Structures](Structures#the-stone-sites-36). The schools' lower labs are not structures of their own: they are under the schools.
 
 ## Build Magic: /enhanced build
 
@@ -112,6 +115,8 @@ The `<power>` argument is one of:
 | `hela` | [Hela](Hela#becoming-hela-the-hero) (3.5) |
 | `doctor_strange` | [Doctor Strange](Doctor-Strange) (3.6) |
 | `hulk` | [Hulk](Hulk) (3.6) |
+| `wolverine` | [Wolverine](Wolverine) (3.7) |
+| `deadpool` | [Deadpool](Deadpool) (3.7) |
 | `custom` | The player's own hero from the [Hero Creator](Hero-Creator): the one they last made (an empty hero, with no powers, if they never made one) |
 
 The command suggests the names as you type. A player who is given a power awakens as that hero, with the title, the sound and the announcement to everyone, exactly as if they had earned it. If a player already has that power and you give a look, only the look changes.
@@ -140,6 +145,8 @@ The `[look]` or `<look>` argument is the id of a look (see [Looks](Looks)):
 | Hela | `goddess`, `arrival`, `own` |
 | Doctor Strange | `sorcerer_supreme`, `multiverse`, `defender`, `own` |
 | Hulk | `ragnarok`, `brand_new_day`, `banner`, `own` (`banner` and `own` are Bruce Banner, with no powers) |
+| Wolverine | `classic`, `x_men_2000`, `own` |
+| Deadpool | `classic`, `trainee`, `kidpool`, `own` |
 
 Magneto, the Scarlet Witch and Quicksilver have no looks to choose, and a custom hero's look is chosen in the Hero Creator. Professor X given without a look is the young Charles (the screen that asks which Charles he is opens only after the wheelchair; **H** changes it). `/enhanced look` skips players whose hero does not have the look, and it fails with "Unknown look" if no given player has it.
 
@@ -161,6 +168,9 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose, and a custom
 | `/enhanced power set Steve none` | Takes Steve's power away. |
 | `/enhanced power set Steve doctor_strange` | Makes Steve Doctor Strange (he gets no Eye this way: give him one, or use Choose a Hero). |
 | `/enhanced power set Steve hulk brand_new_day` | Makes Steve the Hulk, the Brand New Day Hulk at once. |
+| `/enhanced power set Steve wolverine x_men_2000` | Makes Steve Wolverine, in the *X-Men* (2000) leather (he skips the injection). |
+| `/enhanced power set Steve deadpool kidpool` | Makes Steve Deadpool, as Kidpool. |
+| `/enhanced structure school_lab status` | Tells you about the lab of the nearest school. |
 | `/enhanced look Steve white_vision` | Puts Steve, a Vision, in the White Vision look. |
 | `/enhanced hex list` | Lists the Hexes in your dimension. |
 | `/enhanced hex clear` | Dissolves them all. |

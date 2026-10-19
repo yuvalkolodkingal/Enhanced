@@ -6,7 +6,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
+| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command removes it: `/enhanced power set <player> none` (see [Commands](Commands)). |
 | Creative and Spectator | Creative and Spectator players are never killed by the Mind Stone or the Hex wall. |
 
@@ -34,6 +34,8 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Odin](Odin) (3.5) | Beat Hela, take **Gungnir** from its stand in Odin's vault under the throne room, and with no power **sit on the Throne of Asgard** holding your Gungnir. |
 | [Doctor Strange](Doctor-Strange) (3.6) | Craft the **Eye of Agamotto** (8 gold blocks round the **Time Stone** of a Sanctum Sanctorum) and, with no power, **hold right-click on it for 3 seconds**. You keep the Eye. |
 | [Hulk](Hulk) (3.6) | Craft a **Gamma Emitter** (iron blocks, lime stained glass, an emerald block and a redstone block), place it and right-click it; with no power, **stand in its green beam for 3 seconds**. |
+| [Wolverine](Wolverine) (3.7) | In the [X-Men lower lab](Mutant-School-Lab) under a Mutant School, take an **Adamantium Injection** from the **Weapon X rack** (one per player per rack) and, with no power, **hold right-click on it for 3 seconds**. A hero is refused: take the **Mutant Cure** first (the lab's **Cure Station** fills one for a glass bottle). |
+| [Deadpool](Deadpool) (3.7) | In the same lab, with no power, **step into the Weapon X Pod** and right-click it: 5 seconds of "treatment". |
 | [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once (since 3.4 with that hero's items), or make your own. |
 
 ## Step by step
@@ -179,6 +181,21 @@ A player with no power who beat Hela chooses: the Headdress makes him Hela, Gung
 2. Place it, and **right-click it** (or power it with redstone). It warms up for 3 seconds, then a green beam 6 blocks long shines for 3 seconds.
 3. With **no power**, **stand in the beam** the whole time: you become Bruce Banner, and Hulk out at once. **N** changes you back and forth. See [Hulk](Hulk).
 
+### Wolverine (3.7)
+
+1. Find a **Mutant School** (`/locate structure enhanced:mutant_school`). Its **lower lab** is built under it when you come near.
+2. In the **Professor's study** (the west wing), right-click a bookshelf of the west wall north of the fireplace: two shelves swing open. **Stand on the X** behind them and **hold Sneak**: the lift takes you down. See [The X-Men lower lab](Mutant-School-Lab).
+3. Take the **stair tunnel** to the lower level, and the X-door under the sign "Weapon X" into the **Weapon X lab**. Right-click the **Weapon X rack**: an **Adamantium Injection** (one for each player from each rack).
+4. With **no power**, **hold right-click** with it for **3 seconds**: silver light, a *snikt*, and you are Wolverine. See [Wolverine](Wolverine).
+
+Already a hero? "The adamantium needs a body that can heal. Take the Mutant Cure first." Go back to the **medical bay** on the upper level, right-click the **Cure Station** with a **glass bottle** to fill a Mutant Cure, hold right-click with it for 2 seconds (your power is gone), and then the injection.
+
+### Deadpool (3.7)
+
+1. Go down to the X-Men lower lab, as for Wolverine, to the **Weapon X lab**.
+2. With **no power**, **step into the Weapon X Pod** (the steel pod with a glass front and a green light, at the end of the room) and **right-click it**.
+3. Stand still for **5 seconds** of treatment (Sneak stops it). A red flash, and you are Deadpool. See [Deadpool](Deadpool).
+
 ### A hero of your own
 
-In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty and, since 3.4, any of the abilities of the mod's heroes (111 since 3.6) and the six Infinity Stones (each with a strength from 1 to 10, within a budget of points), on your keys plain or with Sneak, with the heroes' moves, your colours, your own skin and extras like a cape, which everyone on the server sees. Since 3.4, **Choose a Hero** also gives you that hero's items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).
+In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty and, since 3.4, any of the abilities of the mod's heroes (123 since 3.7) and the six Infinity Stones (each with a strength from 1 to 10, within a budget of points), on your keys plain or with Sneak, with the heroes' moves, your colours, your own skin and extras like a cape, which everyone on the server sees. Since 3.4, **Choose a Hero** also gives you that hero's items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).

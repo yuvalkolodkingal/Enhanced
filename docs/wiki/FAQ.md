@@ -4,7 +4,7 @@
 
 ### How do I become a hero?
 
-Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open (and the three trials behind it), a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, a book to read (Agatha), glasses to put on (Cyclops), a wheelchair to hold (Professor X), or, for Thanos, Ultron and Apocalypse, a boss to beat. In Creative mode the Hero Creator makes any hero at once. See [Becoming a Hero](Becoming-a-Hero).
+Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open (and the three trials behind it), a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, a book to read (Agatha), glasses to put on (Cyclops), a wheelchair to hold (Professor X), an injection or a pod in the X-Men's lab (Wolverine, Deadpool), or, for Thanos, Ultron and Apocalypse, a boss to beat. In Creative mode the Hero Creator makes any hero at once. See [Becoming a Hero](Becoming-a-Hero).
 
 ### I touched Loki's Scepter and died. Why?
 
@@ -16,7 +16,7 @@ No. A player has exactly one power, and powers never stack. A hero who touches t
 
 ### How do I get rid of my power, or switch hero?
 
-A power is permanent: it survives death, logging out and changing dimension. Only an operator can change it, with `/enhanced power set <player> none` (or straight to another hero). See [Commands](Commands).
+A power is permanent: it survives death, logging out and changing dimension. The **Mutant Cure** takes it away for good: hold right-click with it for 2 seconds (craft it from a glass bottle, a milk bucket, an echo shard and an iron nugget, or fill one at the Cure Station of the [X-Men lower lab](Mutant-School-Lab#the-cure-station)). An operator can also change it, with `/enhanced power set <player> none` (or straight to another hero). See [Commands](Commands).
 
 ### I used the Tesseract and I am not Loki. Why?
 
@@ -351,6 +351,62 @@ Yes: three Minecraft days after you beat them, while nobody is within 64 blocks.
 
 `/locate structure enhanced:avengers_tower`, or take **Hydra Intel** from a Hydra officer: a map with a red X on the nearest tower.
 
+## Wolverine, Deadpool and the X-Men's lab (3.7)
+
+### Why won't Wolverine die?
+
+His **[healing factor](Healing-Factor)** (Deadpool's too). A blow that would kill him only knocks him **down for 5 seconds**, and he gets back up with 8 health. **Only these defeat him:** the **Infinity Stones** (Thanos, Vision's beam, a stone's power), **chaos magic** (the Scarlet Witch, Billy), the **Allfather's power** (Odin's Odinforce and Gungnir), the **Phoenix**, being sacrificed at **Vormir**, the void and `/kill`. And **poison**: while he is poisoned his healing is off, and then anything can defeat him. A splash potion of Poison is the trick. See [Healing Factor](Healing-Factor#what-defeats-him).
+
+### Wolverine and Deadpool fight, and nobody wins!
+
+Right: claws and katanas are not on the list, so neither can finish the other. "Good news: nobody loses. Bad news: nobody wins." Poison one of them first.
+
+### Wolverine sinks like a stone!
+
+His bones are adamantium: he walks along the bottom of lakes. Take a boat, or let a bubble column lift him. If he runs out of air he goes down, and his healing factor drags him to the shore.
+
+### Where is the lab's door?
+
+There is no door outside: the way in is **secret**. Go into the **Professor's study** of the [Mutant School](Structures#the-mutant-school) (the room with the fireplace, the desk and the chess table) and **right-click a bookshelf of the wall north of the fireplace**: two shelves swing open. **Stand on the X** behind them and **hold Sneak**: the lift takes you down. The book on the study's lectern, *The Professor's notes*, says the same. See [The X-Men lower lab](Mutant-School-Lab#the-secret-entrance).
+
+### The shelves don't open, or there is no lab under my school.
+
+* The lab is built the first time a player comes **within 96 blocks** of the school, while nobody stands down where it goes: walk round the school and come back.
+* If you put a block where the entrance goes, the lab is built but the entrance waits: an operator runs `/enhanced structure school_lab force`. `/enhanced structure school_lab status` says what happened.
+* On some servers only the X-Men may open the shelves: "The shelf does not move. Only the X-Men know the way." (`school_lab.openToAll`.)
+
+### The Adamantium Injection does nothing for me.
+
+You already have a power: "The adamantium needs a body that can heal. Take the Mutant Cure first." In the lab's **medical bay**, right-click the **Cure Station** with a **glass bottle**, use the Mutant Cure on yourself, then the injection. Each rack gives each player one injection; another school's lab has another rack.
+
+### Why is my Locator spinning?
+
+What you look for isn't in this world. The **Soul Stone** is in the Nether (take your Locator there); the **Power Stone** is in the End (in the Overworld it points to a stronghold, the way there); the **Reality Stone** is in Asgard (it points to a Bifrost site). In the Nether only the Soul Stone points, in the End only the Power Stone, in Asgard only the Reality Stone, and on the Witches' Road nothing. "Searching…" means it is still looking; "Too far" means nothing within 4096 blocks (1024 in the Nether). With all six it points north. **Sneak + use** chooses another stone. See [Stone Locator](Stone-Locator#why-is-it-spinning).
+
+### Did I lose my stone in the Locator's recipe?
+
+No: it stays in the middle of the crafting grid when you take the Locator. Take it back out.
+
+### How do I start again in the Nether?
+
+Die (in a fight, not on purpose!), and on **Death's screen** press **Start again in the Nether**. [Rio](Meeting-Death) opens a road: you wake on a safe spot in the Nether near the place that matches your home (your spawn point's x and z divided by 8), with 10 seconds of Fire Resistance. The button isn't there in a hardcore world, with `doImmediateRespawn` on, or when the server switched it off (`death_meeting.allowNether`). See [Meeting Death](Meeting-Death).
+
+### I don't want the green Death screen.
+
+Switch the client option *Meet Death when you die* off (**Mods → Enhanced → Config → Meeting Death**): you get the plain death screen. "Start again" is the same as the plain screen's *Respawn*.
+
+### Agatha isn't at her cottage.
+
+Is a player [Agatha](Agatha) right now? There is only one Agatha: while a player is Agatha, the cottage's Agatha is **away on the Road**, and Nicky runs to the player: "Mom! You're home!" She comes back when nobody is Agatha. At night they are all asleep in their beds. See [Agatha's Cottage](Agathas-Cottage#one-of-each-when-you-are-agatha).
+
+### Where is Señor Scratchy?
+
+He ran off (some mornings he does). Ask Agatha, say "I'll find him!", and look for a little **green glow** within 24 blocks. Hold a carrot and he follows you back to his hutch. See [Agatha's Cottage](Agathas-Cottage#señor-scratchy-runs-off).
+
+### My friend cannot join my server (3.7).
+
+3.7 speaks network protocol **11**: the server and every player need 3.7. Worlds of 3.6 open in 3.7: every school gets its lab when a player comes near, and cottages appear in land not explored yet.
+
 ## The fixes of 3.6
 
 ### My beam doesn't show when the camera is behind me.
@@ -634,7 +690,7 @@ Every Infinity Stone has a voice of its own. The Space Stone in the Tesseract an
 
 ### Do players need the mod too?
 
-Yes. The server and every player who joins need the same jar: since 3.5 (network protocol 9) a 3.4 player can't join a 3.5 server, or the other way round. See [Installation](Installation).
+Yes. The server and every player who joins need the same jar: a player of another version can't join (3.7 is network protocol 11). See [Installation](Installation).
 
 ### Where are the balance numbers?
 

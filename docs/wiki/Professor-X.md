@@ -87,10 +87,26 @@ Press **H** to switch. See [Looks](Looks).
 
 The [Hydra soldiers](Hydra-Soldiers) of the outposts have open minds. **Hear Thoughts** gives them thoughts of their own ("My boots hurt.", "Who left the gate open?"). **Take Over a Body** steers a soldier: your click fires his rifle, and his friends shoot back at the traitor. **Freeze Minds** freezes them, and a frozen soldier can't raise the alarm.
 
+## Cerebro at the lab (3.7)
+
+Under every Mutant School is the [X-Men lower lab](Mutant-School-Lab), and on its lower level the great **Cerebro**: a sphere of light panels with a walkway to a platform and the **Cerebro console**. **N** everywhere else is the same Cerebro as above; **at the console it is amplified**:
+
+* Stand **within 4 blocks of the console** and press **N** (or right-click the console). The helmet lifts off its stand onto your head, and the room hums.
+* For **30 seconds** Cerebro finds **every player in every dimension**, with **no limit** on how far (not one under Magneto's Helmet): "Cerebro amplified: 5 minds in every world". Each one is told "Cerebro has found you", and your list shows each far mind with its world ("Peter · The Nether").
+* **The room shows the minds** as **stars on the sphere**, in the direction where each one is, in its hero's colour; the players of another world gather low on the sphere under its name. Everyone standing in the sphere sees them.
+* **The stone sites:** the nearest Hydra outpost (the Mind Stone), Sanctum Sanctorum (Time) and Avengers Tower (Space) are diamonds on the sphere in the stone's colour, with their distance ("Time Stone 810m").
+* It ends after 30 seconds, when you walk away, or when you right-click the console again. The cooldown is Cerebro's, 60 seconds.
+
+**Other telepaths** may use the console too, by right-clicking it: the Scarlet Witch, the Phoenix (Jean did, in *X2*), Billy, a custom telepath. Anyone else: "Cerebro needs a telepath's mind." With Magneto's Helmet on: "The helmet blocks Cerebro." See [The X-Men lower lab](Mutant-School-Lab#cerebro).
+
+## Wolverine and Deadpool (3.7)
+
+Both minds are open to him: he hears them, freezes them and takes over their bodies like anyone's. [Deadpool](Deadpool)'s thoughts are silly ("Did I leave the oven on?", "Is somebody reading this?"), and so are Dogpool's ("Ball? BALL?"). Agatha, Nicky and Rio of [Agatha's Cottage](Agathas-Cottage) think about soup, brooms and tomatoes.
+
 ## Numbers you can change
 
-How long the wheelchair is held, the Mental Blast (range, damage, how long it dizzies, cooldown), how far he hears thoughts, Take Over a Body (reach, how far the body may go, how long for a creature and for a player, or never for players, cooldown, whether a hurt breaks it, and the backlash of a stronger telepath), Freeze Minds (radius, time, cooldown) and Cerebro (range, time, cooldown) are the `professor_x.*` options. See [Server Configuration](Server-Configuration#professor-x).
+How long the wheelchair is held, the Mental Blast (range, damage, how long it dizzies, cooldown), how far he hears thoughts, Take Over a Body (reach, how far the body may go, how long for a creature and for a player, or never for players, cooldown, whether a hurt breaks it, and the backlash of a stronger telepath), Freeze Minds (radius, time, cooldown) and Cerebro (range, time, cooldown; since 3.7 the amplified Cerebro's time, whether it reaches every world and marks the stone sites, how near the console you must stand, and whether only telepaths may use it) are the `professor_x.*` options. See [Server Configuration](Server-Configuration#professor-x).
 
 ## Related
 
-[Cyclops](Cyclops) · [The Mutant School](Structures#the-mutant-school) · [Billy](Billy-and-the-Witches-Road) · [Phoenix](Phoenix) · [Controls](Controls)
+[Cyclops](Cyclops) · [The Mutant School](Structures#the-mutant-school) · [The X-Men lower lab](Mutant-School-Lab) · [Billy](Billy-and-the-Witches-Road) · [Phoenix](Phoenix) · [Controls](Controls)

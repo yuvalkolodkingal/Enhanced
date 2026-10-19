@@ -114,6 +114,10 @@ While the helmet is worn by Magneto:
 * Survival flight, steady and fully controllable. You can also double-tap **Space**.
 * Flying speed is **0.075** (Creative is 0.05), a bit slower than Wanda's 0.09.
 
+## Magneto and Wolverine (3.7)
+
+[Wolverine](Wolverine)'s bones are adamantium: Magneto's **Metal Telekinesis** and **Magnetic Pull** take hold of him as they would of any metal (as in *X-Men*, 2000), so Magneto can lift him, hold him and throw him (a player only with PvP on). His claws are his bones, not gear: Armor & Weapon Strip can't take them.
+
 ## Numbers you can change
 
 Server owners can change Magneto's flight speed, telekinesis range, throw speed, shrapnel damage, piercing and fire rate, the strip's range and cooldown, the shield's reflect chance, how far and how hard a metal block R tears out, and every number of the Magnetic Pull: its radius, how many things it takes and how fast, its recharge and hunger, the cone, and whether it takes from storage and from players. They are the `magneto.*` options on [Server Configuration](Server-Configuration). Which items and blocks count as metal is decided by datapack tags, described there too. Build Magic's `build_magic.allArenasProtected` and `build_magic.hexIsAClaim` also decide where the pull may work.
