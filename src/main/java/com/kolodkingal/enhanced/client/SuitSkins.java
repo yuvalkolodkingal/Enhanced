@@ -86,6 +86,10 @@ public final class SuitSkins {
             if (Powers.get(player).has(HeroAbility.VISION_DISGUISE) && Powers.get(player).disguise()) {
                 return null;
             }
+            // 3.6: in the Hulk's Human Form he is himself: the player's own skin.
+            if (Powers.get(player).toggle(com.kolodkingal.enhanced.power.Toggle.HUMAN_FORM)) {
+                return null;
+            }
             return com.kolodkingal.enhanced.client.custom.CustomSkins.suitFor(player);
         }
         // Vision's body is synthetic, so he is always in his look; the newer heroes always wear theirs too.

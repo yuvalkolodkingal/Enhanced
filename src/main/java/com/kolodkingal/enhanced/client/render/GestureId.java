@@ -337,7 +337,35 @@ public enum GestureId {
     /** Fenris (Sneak + B): a point at where he comes. */
     HELA_FENRIS(Group.CAST, 18, 2, 6, false),
     /** Death's Grasp (N): the hand thrust out, fingers spread (the stance HELA_GRASP holds it). */
-    HELA_GRASP(Group.CAST, 8, 1, 3, true)
+    HELA_GRASP(Group.CAST, 8, 1, 3, true),
+    // ===== hulk (3.6) =====
+    // (Started by the payloads of his moves, which name him: HulkClient.startedElsewhere.)
+    /** Hulk Smash (R): both fists high over his head, then down into the ground, the knees giving. */
+    HULK_SMASH(Group.CAST, 16, 2, 5, true),
+    /** The Grab Smash (Sneak + R): the grab by the legs, then the swing left, right, left with the slams. */
+    HULK_GRAB_SMASH(Group.CAST, 32, 2, 6, true),
+    /** The Thunder Clap (G): the arms flung wide, then the hands slammed together in front, the shoulders forward. */
+    HULK_CLAP(Group.CAST, 14, 2, 5, true),
+    /** The Roar (Sneak + G): the chest out, the arms back and down, the head thrown up. */
+    HULK_ROAR(Group.CAST, 30, 3, 8, true),
+    /** The Super Leap's crouch and launch (V). */
+    HULK_LEAP_CROUCH(Group.CAST, 6, 1, 2, true),
+    /** The landing: the three-point landing, a fist in the ground. */
+    HULK_LAND(Group.CAST, 14, 1, 6, true),
+    /** The Bound (Sneak + V): a quick crouch and a long stride into the air. */
+    HULK_BOUND(Group.CAST, 10, 1, 4, true),
+    /** The Boulder Throw (B): both hands down to the ground, the boulder torn up and lifted overhead... */
+    HULK_RIP(Group.CAST, 10, 2, 3, true),
+    /** ...and hurled from overhead with both hands. */
+    HULK_THROW(Group.CAST, 10, 1, 5, true),
+    /** The Gamma Charge (Sneak + B): the shoulder down and forward, the body leaning into it. */
+    HULK_CHARGE(Group.CAST, 14, 2, 4, true),
+    /** Banner Hulks out (N): he hunches, clenches, grows and roars (40 ticks, as the transformation). */
+    HULK_OUT(Group.CAST, 40, 3, 8, true),
+    /** The Hulk calms down (N): he shrinks, kneels, the hands on his knees. */
+    HULK_CALM(Group.CAST, 40, 3, 8, true),
+    /** Switch Hulk (Sneak + N): a flex in a green shimmer. */
+    HULK_SWITCH(Group.CAST, 20, 2, 6, true)
     ;
 
     /** Gestures of one group never play together. */

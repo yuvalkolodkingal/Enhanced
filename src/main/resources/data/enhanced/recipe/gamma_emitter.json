@@ -1,0 +1,27 @@
+{
+  "type": "enhanced:gamma_emitter",
+  "category": "misc",
+  "pattern": [
+    "IGI",
+    "GEG",
+    "IRI"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "G": {
+      "item": "minecraft:lime_stained_glass"
+    },
+    "E": {
+      "item": "minecraft:emerald_block"
+    },
+    "R": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "result": {
+    "id": "enhanced:gamma_emitter",
+    "count": 1
+  }
+}

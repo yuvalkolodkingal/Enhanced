@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#5BA33A",
+  "glow": "#B6F27A",
+  "look": {
+    "base": "hulk/ragnarok",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "hulk.smash",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "hulk.clap",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "hulk.leap",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "hulk.boulder",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "hulk.transform",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "hulk.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "hulk.smash",
+    "hulk.clap",
+    "hulk.leap",
+    "hulk.boulder",
+    "hulk.transform"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "hulk",
+    "speedRun": "auto",
+    "idle": "heavy"
+  },
+  "preset": {
+    "icon": "minecraft:lime_dye",
+    "hero": "hulk"
+  }
+}

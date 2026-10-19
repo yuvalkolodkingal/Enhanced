@@ -213,13 +213,15 @@ public final class HeroAbilityAnims {
         row(HeroAbility.STRANGE_EYE);
         row(HeroAbility.STRANGE_BODY);
         // ===== hulk (3.6) =====
-        // (The skeleton's rows have no moves yet: lane L7 gives them their gestures and stances.)
-        row(HeroAbility.HULK_SMASH);
-        row(HeroAbility.HULK_CLAP);
-        row(HeroAbility.HULK_LEAP);
-        row(HeroAbility.HULK_BOULDER);
-        row(HeroAbility.HULK_TRANSFORM);
-        row(HeroAbility.HULK_BODY);
+        // (Every move of his is told by the payload of its effect; the Human Form by its toggle, the rest by his
+        // stances.)
+        row(HeroAbility.HULK_SMASH).main(GestureId.HULK_SMASH).alt(GestureId.HULK_GRAB_SMASH);
+        row(HeroAbility.HULK_CLAP).main(GestureId.HULK_CLAP).alt(GestureId.HULK_ROAR);
+        row(HeroAbility.HULK_LEAP).main(GestureId.HULK_LEAP_CROUCH).alt(GestureId.HULK_BOUND).also(GestureId.HULK_LAND)
+                .stances(Stance.HULK_AIR);
+        row(HeroAbility.HULK_BOULDER).main(GestureId.HULK_RIP).alt(GestureId.HULK_CHARGE).also(GestureId.HULK_THROW);
+        row(HeroAbility.HULK_TRANSFORM).main(GestureId.HULK_CALM).also(GestureId.HULK_OUT, GestureId.HULK_SWITCH);
+        row(HeroAbility.HULK_BODY).stances(Stance.HULK_IDLE, Stance.HULK_ENRAGED);
         // ===== variants (3.5, the creator lane) =====
         // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own
         // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's
@@ -283,6 +285,12 @@ public final class HeroAbilityAnims {
         live(Live.ODIN_RAVENS, HeroAbility.ODIN_RAVENS);
         live(Live.HELA_GRASPING, HeroAbility.HELA_GRASP);
         live(Live.HELA_SUMMONING, HeroAbility.HELA_ARMY);
+        // 3.6 (lane L7: the Hulk's)
+        live(Live.HULK_TRANSFORMING, HeroAbility.HULK_TRANSFORM);
+        live(Live.HULK_LEAPING, HeroAbility.HULK_LEAP);
+        live(Live.HULK_GRABBING, HeroAbility.HULK_SMASH);
+        live(Live.HULK_CHARGING, HeroAbility.HULK_BOULDER);
+        live(Live.HULK_ENRAGED, HeroAbility.HULK_BODY);
         // (PINNED, LIFTED and MIND_CONTROLLED are what is done to a player, not what he does: no ability owns them.)
         toggle(Toggle.FROST_GIANT, HeroAbility.LOKI_FROST_GIANT);
         toggle(Toggle.GOD_OF_THUNDER, HeroAbility.THOR_THUNDER);

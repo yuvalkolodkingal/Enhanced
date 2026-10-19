@@ -79,6 +79,9 @@ final class RunPoses {
             RunCharacter named = RunCharacter.byName(st.runAs);
             return named != null ? named : RunCharacter.DEFAULT;
         }
+        if (st.power == Power.HULK && ("banner".equals(st.look) || "own".equals(st.look))) {
+            return RunCharacter.DEFAULT; // (3.6: Bruce Banner walks as anyone)
+        }
         return RunCharacter.of(st.power, "white_vision".equals(st.look));
     }
 
