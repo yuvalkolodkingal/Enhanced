@@ -62,6 +62,11 @@ import java.util.function.IntPredicate;
  * barrier ceiling around it).
  */
 public final class TestKit {
+    /** A test's hold on the chunks of an area ({@link Fixture#loadChunksAround}), as a forced chunk loads them. */
+    static final net.minecraft.server.level.TicketType<net.minecraft.world.level.ChunkPos> AREA_TICKET =
+            net.minecraft.server.level.TicketType.create("enhanced_test_area",
+                    java.util.Comparator.comparingLong(net.minecraft.world.level.ChunkPos::toLong));
+
     public static final String ARENA = "arena";
     /** Relative height of the top of the arena floor. */
     public static final double FLOOR = 2.0;
@@ -241,6 +246,27 @@ public final class TestKit {
         /** Runs {@code action} when the test ends, pass or fail (before what was registered earlier is undone). */
         public void onClose(Runnable action) {
             undo.add(action);
+        }
+
+        /**
+         * Keeps the chunks within {@code radius} chunks of {@code center} loaded until the test closes, as a player
+         * standing there would (the test server loads only the chunks of the test structures, so an area reaching past
+         * an arena at the edge of a big run may never load by itself). A ticket of its own ({@link #AREA_TICKET}), not
+         * a forced chunk: letting it go never unloads a chunk another test (or its structure) forced.
+         */
+        public void loadChunksAround(net.minecraft.core.BlockPos center, int radius) {
+            ServerLevel level = helper.getLevel();
+            net.minecraft.world.level.ChunkPos middle = new net.minecraft.world.level.ChunkPos(center);
+            List<net.minecraft.world.level.ChunkPos> held = new ArrayList<>();
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    net.minecraft.world.level.ChunkPos pos = new net.minecraft.world.level.ChunkPos(middle.x + dx,
+                            middle.z + dz);
+                    level.getChunkSource().addRegionTicket(AREA_TICKET, pos, 2, pos);
+                    held.add(pos);
+                }
+            }
+            onClose(() -> held.forEach(c -> level.getChunkSource().removeRegionTicket(AREA_TICKET, c, 2, c)));
         }
 
         /** Runs {@code step} once per tick for ticks 1..{@code lastTick}. Returning true ends the test successfully. */

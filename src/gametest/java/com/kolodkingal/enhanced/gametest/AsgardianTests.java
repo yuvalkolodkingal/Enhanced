@@ -181,6 +181,18 @@ public final class AsgardianTests {
     }
 
     /** Whether the entities round a home are loaded, as the keeper asks (its {@code AREA} chunks each way). */
+    /**
+     * How many ticks a test waits for the keeper's area to load (the test server runs its ticks as fast as it can, and
+     * in a big run the chunks of 5 x 5 areas are made and their entities read behind many others: 80 ticks were not
+     * always enough). A test ends as soon as the area is there.
+     */
+    static final int AREA_WAIT = 600;
+
+    /** Keeps the keeper's area round a home loaded for the test, as a player standing there would. */
+    static void loadArea(TestKit.Fixture fx, BlockPos home) {
+        fx.loadChunksAround(home, AsgardPopulation.AREA);
+    }
+
     static boolean areaLoaded(ServerLevel level, BlockPos home) {
         net.minecraft.world.level.ChunkPos center = new net.minecraft.world.level.ChunkPos(home);
         for (int dx = -AsgardPopulation.AREA; dx <= AsgardPopulation.AREA; dx++) {
@@ -193,7 +205,7 @@ public final class AsgardianTests {
         return true;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = AREA_WAIT + 20)
     public static void theKeeperMakesEachSlotOnceAndNeverTwice(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Map<String, UUID> table = records(fx);
@@ -202,7 +214,9 @@ public final class AsgardianTests {
                 new CityPlan.Home(Role.CITIZEN, 3, floor.east(6), 4));
         // The keeper makes nobody where the entities round a home are not loaded yet (a fresh arena loads them in a
         // tick or two): wait for them, as the keeper would.
-        fx.everyTick(80, tick -> {
+        loadArea(fx, floor);
+        loadArea(fx, floor.east(6));
+        fx.everyTick(AREA_WAIT, tick -> {
             if (!areaLoaded(fx.level(), floor) || !areaLoaded(fx.level(), floor.east(6))) {
                 return false;
             }
@@ -240,13 +254,14 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "asgard_npc_closed")
+    @GameTest(template = ARENA, batch = "asgard_npc_closed", timeoutTicks = AREA_WAIT + 20)
     public static void withoutNpcsTheKeeperRemovesItsOwn(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Map<String, UUID> table = records(fx);
         BlockPos floor = helper.absolutePos(new BlockPos(5, 2, 5));
         List<CityPlan.Home> homes = List.of(new CityPlan.Home(Role.HOGUN, 0, floor, 4));
-        fx.everyTick(80, tick -> {
+        loadArea(fx, floor);
+        fx.everyTick(AREA_WAIT, tick -> {
             if (!areaLoaded(fx.level(), floor)) {
                 return false;
             }

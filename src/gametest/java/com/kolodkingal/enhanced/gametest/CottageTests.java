@@ -145,6 +145,9 @@ public final class CottageTests {
         long key = KEYS.getAndDecrement();
         Cottages store = Cottages.get(level);
         Cottages.Cottage cottage = store.register(key, points);
+        for (BlockPos p : List.of(points.agathaHome(), points.nickyHome(), points.rioHome(), points.hutch())) {
+            fx.loadChunksAround(p, CottageKeeper.AREA); // (the keeper waits for its area, as the tests do)
+        }
         fx.onClose(() -> {
             for (Role role : Cottages.ROLES) {
                 UUID id = cottage.resident(role);

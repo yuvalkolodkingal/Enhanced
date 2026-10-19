@@ -77,7 +77,7 @@ public final class OneOfEachTests {
 
     // ---- one of each character: Odin ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = AsgardianTests.AREA_WAIT + 20)
     public static void theOdinOfTheCityIsAwayWhileAPlayerIsOdin(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Map<String, UUID> table = AsgardianTests.records(fx);
@@ -86,7 +86,9 @@ public final class OneOfEachTests {
                 new CityPlan.Home(Role.FRIGGA, 0, floor.east(6), 4));
         check(Role.ODIN.yieldsToHero() && !Role.HEIMDALL.yieldsToHero() && Role.HEIMDALL.hero() == Power.HEIMDALL
                 && Role.FRIGGA.hero() == null, "Odin yields to his hero; Heimdall stays; Frigga has no hero");
-        fx.everyTick(100, tick -> {
+        AsgardianTests.loadArea(fx, floor);
+        AsgardianTests.loadArea(fx, floor.east(6));
+        fx.everyTick(AsgardianTests.AREA_WAIT, tick -> {
             if (!AsgardianTests.areaLoaded(fx.level(), floor) || !AsgardianTests.areaLoaded(fx.level(), floor.east(6))) {
                 return false;
             }
@@ -272,7 +274,9 @@ public final class OneOfEachTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = POST, timeoutTicks = 120)
+    // (A batch of its own: both tests stand their Heimdalls by the Observatory's socket, and the first meeting of the
+    // other test would take whichever Heimdall the level lists first.)
+    @GameTest(template = ARENA, batch = POST + "_end", timeoutTicks = 120)
     public static void thePostEndsWhenTheKeeperIsNoLongerHeimdall(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerPlayer player = inAsgard(f, helper, Power.HEIMDALL);
