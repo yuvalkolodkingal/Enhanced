@@ -103,7 +103,7 @@ public final class VormirTests {
     }
 
     private static boolean hasStone(ServerPlayer player) {
-        return player.getInventory().contains(new ItemStack(ModItems.SOUL_STONE.get()));
+        return player.getInventory().contains(s -> s.is(ModItems.SOUL_STONE.get()));
     }
 
     private static ServerPlayer friend(TestKit.Fixture f, Power power) {
@@ -157,6 +157,7 @@ public final class VormirTests {
             check(Powers.power(friend) == Power.NONE, "his power is gone");
             check(friend.getData(ModAttachments.STONES).has(StoneProgress.WAS_SACRIFICED), "he was given");
             check(thor.getMainHandItem().is(ModItems.SOUL_STONE.get()), "Thor holds the Soul Stone");
+            check(thor.getUUID().equals(StoneLedger.taker(thor.getMainHandItem())), "the stone is stamped as Thor's");
             check(thor.position().distanceTo(cliff.pool()) < 0.6, "Thor wakes in the pool");
             StoneProgress progress = thor.getData(ModAttachments.STONES);
             check(progress.has(StoneProgress.SACRIFICED_FOR) && progress.hasTaken(StoneKind.SOUL),
@@ -634,6 +635,9 @@ public final class VormirTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
         f.config(SoulStoneConfig.ONE_PER, SoulStoneConfig.OnePer.WORLD);
+        // The world mode's holder lives in the Overworld's ledger: start and end with a clean one.
+        StoneLedger.reset(helper.getLevel().getServer());
+        f.onClose(() -> StoneLedger.reset(helper.getLevel().getServer()));
         VormirTestSite cliff = VormirTestSite.build(f);
         VormirTestSite second = VormirTestSite.build(f, 11);
         ServerPlayer thor = thor(f);
@@ -653,12 +657,7 @@ public final class VormirTests {
             if (tick == 4) {
                 VormirTestSite.fallDie(first);
                 check(hasStone(thor), "Thor takes the world's stone");
-                if (StoneLedger.mayTake(loki, StoneKind.SOUL)) {
-                    // (A ledger that holds nothing: the second cliff gives too.)
-                    VormirTestSite.fallDie(other);
-                    check(hasStone(loki), "with no holder in the ledger, the second cliff gives its stone");
-                    return true;
-                }
+                check(!StoneLedger.mayTake(loki, StoneKind.SOUL), "the ledger holds Thor as the world's holder");
                 VormirTestSite.fallDie(other);
                 check(!hasStone(loki) && Powers.power(other) == Power.SPIDER_MAN, "at the second cliff: nothing");
                 check(VormirTestSite.keeperLines(loki).contains("npc.enhanced.stonekeeper.taken"),

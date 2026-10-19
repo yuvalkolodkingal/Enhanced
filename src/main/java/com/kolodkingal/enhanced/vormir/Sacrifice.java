@@ -212,7 +212,7 @@ public final class Sacrifice {
             case UNLIMITED -> null;
             case WORLD -> ledger ? null : Outcome.TAKEN;
             case PLAYER -> !ledger || seeker.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL)
-                    || seeker.getInventory().contains(new ItemStack(ModItems.SOUL_STONE.get()))
+                    || seeker.getInventory().contains(s -> s.is(ModItems.SOUL_STONE.get()))
                     ? Outcome.ALREADY_HAS : null;
         };
     }
@@ -328,6 +328,7 @@ public final class Sacrifice {
             seeker.resetFallDistance();
         }
         ItemStack stone = new ItemStack(ModItems.SOUL_STONE.get());
+        StoneLedger.stamp(stone, seeker.getUUID());
         if (seeker.getMainHandItem().isEmpty()) {
             seeker.setItemInHand(InteractionHand.MAIN_HAND, stone);
         } else if (!seeker.getInventory().add(stone)) {
