@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "enhanced:item/stone_locator",
+    "layer1": "enhanced:item/stone_locator_socket",
+    "layer2": "enhanced:item/stone_locator_needle_22"
+  }
+}

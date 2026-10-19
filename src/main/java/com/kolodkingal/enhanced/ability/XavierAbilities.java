@@ -171,7 +171,8 @@ public final class XavierAbilities {
         if (data.is(Live.XAVIER_FOCUS) && now >= state.focusUntil) {
             data.set(Live.XAVIER_FOCUS, false);
         }
-        if (data.is(Live.CEREBRO)) {
+        // (3.7: the lab's amplified Cerebro keeps its own clock: lane L5's CerebroRoom.)
+        if (data.is(Live.CEREBRO) && !com.kolodkingal.enhanced.finders.CerebroRoom.amplifying(player)) {
             if (now >= state.cerebroUntil) {
                 data.set(Live.CEREBRO, false);
                 player.connection.send(new CerebroPayload(List.of(), 0));

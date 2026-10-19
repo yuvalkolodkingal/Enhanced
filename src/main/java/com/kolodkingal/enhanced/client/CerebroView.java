@@ -105,7 +105,9 @@ public final class CerebroView {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !active()) {
+        // 3.7: inside the lab's sphere the amplified Cerebro draws its stars instead (lane L5's CerebroSphere).
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !active()
+                || com.kolodkingal.enhanced.client.finders.CerebroSphere.inside()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -121,6 +123,9 @@ public final class CerebroView {
         Font font = mc.font;
         Power[] powers = Power.values();
         for (CerebroPayload.Mind mind : minds) {
+            if (!mind.dimension().isEmpty()) {
+                continue; // 3.7: a mind in another dimension has no place in this world (the list names its realm)
+            }
             Vec3 where = position(mind, since).add(0.0, 1.0, 0.0);
             Vec3 at = marker(camera, where).subtract(camera);
             double distance = where.distanceTo(camera);

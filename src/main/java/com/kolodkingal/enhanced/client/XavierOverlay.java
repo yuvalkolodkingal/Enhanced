@@ -109,7 +109,13 @@ public class XavierOverlay implements LayeredDraw.Layer {
             Vec3 d = mind.pos().subtract(eye);
             double angle = Mth.wrapDegrees(Math.toDegrees(Math.atan2(-d.x, d.z)) - mc.player.getYRot());
             String arrow = arrow(angle);
-            Component line = Component.literal(arrow + " ").append(power.hasPowers()
+            // 3.7: the amplified Cerebro's minds of another dimension are named with their realm (lane L5).
+            Component realm = com.kolodkingal.enhanced.client.finders.CerebroSphere.dimensionName(mind.dimension());
+            Component line = !mind.dimension().isEmpty() ? Component.literal("◇ ").append(power.hasPowers()
+                    ? Component.translatable("hud.enhanced.cerebro.far_mind_hero", mind.name(), power.displayName(),
+                    realm)
+                    : Component.translatable("hud.enhanced.cerebro.far_mind", mind.name(), realm))
+                    : Component.literal(arrow + " ").append(power.hasPowers()
                     ? Component.translatable("hud.enhanced.xavier.cerebro.mind_hero", mind.name(), power.displayName(), Math.round(d.length()))
                     : Component.translatable("hud.enhanced.xavier.cerebro.mind", mind.name(), Math.round(d.length())));
             int rgb = power.hasPowers() ? power.titleColor() : 0xE8EEFF;

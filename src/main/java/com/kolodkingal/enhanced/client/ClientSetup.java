@@ -134,6 +134,7 @@ public final class ClientSetup {
             // ===== school_lab (3.7) =====
             com.kolodkingal.enhanced.client.school.LabClient.setup();
             // ===== finders (3.7) =====
+            com.kolodkingal.enhanced.client.finders.LocatorClient.setup();
             // ===== cottage (3.7) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
@@ -473,6 +474,9 @@ public final class ClientSetup {
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("lab_lift"),
                 new com.kolodkingal.enhanced.client.school.LabClient.FadeLayer());
         // ===== finders (3.7) =====
+        // The Stone Locator's line over the hotbar and the amplified Cerebro's stone sites.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("finders"),
+                new com.kolodkingal.enhanced.client.finders.FindersHud());
         // ===== cottage (3.7) =====
     }
 
