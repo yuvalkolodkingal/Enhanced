@@ -107,6 +107,7 @@ public final class ClientSetup {
             com.kolodkingal.enhanced.client.render.OdinClient.setup();
             // ===== 3.6: each lane registers its effects' drawers here (StoneFx, StrangeFx, HulkFx, HydraFx) =====
             // ===== stones (3.6) =====
+            StoneCoreClient.setup();
             // ===== strange (3.6) =====
             // ===== vormir (3.6) =====
             // ===== hulk (3.6) =====
@@ -190,6 +191,8 @@ public final class ClientSetup {
         // The renderers (and block entity renderers) of 3.6, one region per lane: the skeleton draws its entities with
         // nothing (or a stand-in) until their lanes give them renderers; the blocks are plain models until then.
         // ===== stones (3.6) =====
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.STONE_PEDESTAL.get(),
+                com.kolodkingal.enhanced.client.render.StonePedestalRenderer::new);
         // ===== strange (3.6) =====
         event.registerEntityRenderer(ModEntities.SLING_PORTAL.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.ASTRAL_BODY.get(), NoopRenderer::new);
@@ -378,6 +381,8 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("custom_hero"), new com.kolodkingal.enhanced.client.custom.CustomHeroHud());
         // 3.3, lane PROT: the Hex Barrier's health bar and the Hex Runes' line.
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("protect"), new ProtectHud());
+        // ===== stones (3.6) =====
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("stones"), new StoneHud());
     }
 
     private ClientSetup() {

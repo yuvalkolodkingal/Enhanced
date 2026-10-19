@@ -1,0 +1,29 @@
+{
+  "display": {
+    "icon": {
+      "id": "enhanced:time_stone"
+    },
+    "title": {
+      "translate": "advancements.enhanced.stones.root.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.stones.root.description"
+    },
+    "background": "minecraft:textures/block/purpur_block.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "has_stone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#enhanced:infinity_stones"
+          }
+        ]
+      }
+    }
+  }
+}

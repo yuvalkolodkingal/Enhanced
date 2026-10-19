@@ -1,0 +1,62 @@
+{
+  "parent": "minecraft:item/generated",
+  "loader": "neoforge:item_layers",
+  "textures": {
+    "layer0": "enhanced:item/gauntlet/base",
+    "layer1": "enhanced:item/gauntlet/socket_reality",
+    "layer2": "enhanced:item/gauntlet/socket_soul",
+    "layer3": "enhanced:item/gauntlet/socket_time"
+  },
+  "neoforge_data": {
+    "layers": {
+      "1": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "2": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "3": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    }
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0,
+        0,
+        0
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

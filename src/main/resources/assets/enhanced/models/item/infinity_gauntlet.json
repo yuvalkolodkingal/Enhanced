@@ -1,6 +1,422 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "enhanced:item/infinity_gauntlet"
-  }
+    "layer0": "enhanced:item/gauntlet/base"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0,
+        0,
+        0
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "enhanced:stones": 0.015625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_01"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.03125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_02"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.046875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_03"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.0625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_04"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.078125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_05"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.09375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_06"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.109375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_07"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_08"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.140625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_09"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.15625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_10"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.171875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_11"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.1875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_12"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.203125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_13"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.21875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_14"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.234375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_15"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.25
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_16"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.265625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_17"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.28125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_18"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.296875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_19"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.3125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_20"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.328125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_21"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.34375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_22"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.359375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_23"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_24"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.390625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_25"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.40625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_26"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.421875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_27"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.4375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_28"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.453125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_29"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.46875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_30"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.484375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_31"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.5
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_32"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.515625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_33"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.53125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_34"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.546875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_35"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.5625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_36"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.578125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_37"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.59375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_38"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.609375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_39"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_40"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.640625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_41"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.65625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_42"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.671875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_43"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.6875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_44"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.703125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_45"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.71875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_46"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.734375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_47"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.75
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_48"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.765625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_49"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.78125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_50"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.796875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_51"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.8125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_52"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.828125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_53"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.84375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_54"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.859375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_55"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_56"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.890625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_57"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.90625
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_58"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.921875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_59"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.9375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_60"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.953125
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_61"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.96875
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_62"
+    },
+    {
+      "predicate": {
+        "enhanced:stones": 0.984375
+      },
+      "model": "enhanced:item/gauntlet/infinity_gauntlet_63"
+    }
+  ]
 }
