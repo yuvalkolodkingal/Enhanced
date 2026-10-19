@@ -65,6 +65,12 @@ public final class LabBuilder {
     public static final int PERIOD = 40;
     /** The time the builder may take a tick, all labs together (the plan's budget is 3 ms of CPU: room for the last few blocks). */
     public static final long BUDGET_NANOS = 1_500_000L;
+    /**
+     * How many cells between two looks at the clock. A cell with a block entity (a chest and its loot, a sign, a lectern)
+     * costs far more than a plain one, and a busy server (a big heap, its collector at work) makes each dearer still: 32
+     * such cells between two looks ran a tick to 4 ms. A look costs a few dozen nanoseconds.
+     */
+    static final int CHECK_EVERY = 4;
     /** How long a chunk's list of schools near it is kept (ticks). */
     static final int CACHE_TICKS = 600;
     /** The lab's lowest block must be at least this far above the world's bottom. */
@@ -311,7 +317,7 @@ public final class LabBuilder {
                         }
                         place(level, site, template, x, y, z, pos);
                         worked = true;
-                        if (++since >= 32) {
+                        if (++since >= CHECK_EVERY) {
                             since = 0;
                             if (System.nanoTime() >= deadline) {
                                 return lab.at(SchoolLabs.State.BUILDING, SHELL, i, "");
@@ -336,7 +342,7 @@ public final class LabBuilder {
                                 1 + within / (template.sx - 2), pos);
                         worked = true;
                         i++;
-                        if (++since >= 32) {
+                        if (++since >= CHECK_EVERY) {
                             since = 0;
                             if (System.nanoTime() >= deadline) {
                                 break;
