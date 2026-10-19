@@ -1,0 +1,23 @@
+{
+  "parent": "minecraft:nether/root",
+  "display": {
+    "icon": {
+      "id": "enhanced:soul_stone"
+    },
+    "title": {
+      "translate": "advancement.enhanced.vormir.a_soul_for_a_soul"
+    },
+    "description": {
+      "translate": "advancement.enhanced.vormir.a_soul_for_a_soul.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "sacrifice": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

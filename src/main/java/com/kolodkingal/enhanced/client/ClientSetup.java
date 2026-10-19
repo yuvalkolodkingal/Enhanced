@@ -110,6 +110,7 @@ public final class ClientSetup {
             StoneCoreClient.setup();
             // ===== strange (3.6) =====
             // ===== vormir (3.6) =====
+            com.kolodkingal.enhanced.client.vormir.VormirClient.setup();
             // ===== hulk (3.6) =====
             // ===== hydra (3.6) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
@@ -200,7 +201,8 @@ public final class ClientSetup {
         event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TESSERACT_CRADLE.get(),
                 com.kolodkingal.enhanced.client.render.TesseractCradleRenderer::new);
         // ===== vormir (3.6) =====
-        event.registerEntityRenderer(ModEntities.STONEKEEPER.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.STONEKEEPER.get(),
+                com.kolodkingal.enhanced.client.vormir.StonekeeperRenderer::new);
         // ===== hulk (3.6) =====
         event.registerEntityRenderer(ModEntities.HULK_BOULDER.get(), NoopRenderer::new);
         // ===== hydra (3.6) =====
@@ -273,6 +275,8 @@ public final class ClientSetup {
         // ===== stones (3.6) =====
         // ===== strange (3.6) =====
         // ===== vormir (3.6) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.vormir.StonekeeperModel.LAYER,
+                com.kolodkingal.enhanced.client.vormir.StonekeeperModel::createBodyLayer);
         // ===== hulk (3.6) =====
         // ===== hydra (3.6) =====
     }
