@@ -78,12 +78,21 @@ Four new places hold the [Infinity Stones](Infinity-Stones) (or their vessels). 
 
 ### Avengers Tower
 
-`/locate structure enhanced:avengers_tower`. **The Tesseract.** A skyscraper 92 blocks high in the Overworld, of light blue and grey glass in quartz and iron frames, with **AVENGERS TOWER** over its doors (and no logo anywhere).
+`/locate structure enhanced:avengers_tower`. **The Tesseract.** The tower from the films (3.6.1), 114 blocks high in the Overworld: a tall shard of dark blue-grey glass and steel with lit bands of windows. Near the top its side curves out in a long sweep of glass into a **landing deck** hanging out over the drop, a white line running down that curve to the ground. Over the deck a glass box carries a big **glowing ring with an "A"** on the tower's front, and a thin fin rises behind it to the top. **AVENGERS TOWER** is over the doors.
 
-* **Below and round its foot:** a garage under the plaza, then the podium: the lobby and its reception desk, offices, and the **armory** (chainmail on stands, targets; chests: arrows, iron, a bow, a crossbow, an iron sword), and a roof terrace.
-* **The tower:** a meeting room, **the lab** (armour stands in iron and gold, crafting and smithing tables, a brewing stand, a blast furnace; chest: iron, redstone, gold, copper, sometimes diamonds, an iron chestplate, a shield, rarely a Mutant Cure), **the lounge** with its bar (chest: food and drinks, a cake), quarters with beds, a training room and a workshop.
-* **The top:** the penthouse and the **landing pad**, six blocks out over the drop, with a white H; and on the roof, **Selvig's device**: an iron frame round the **Tesseract's cradle**, where a glowing blue cube turns in the air. **Right-click it** with an empty hand and the Tesseract is yours; the cradle stays empty for good.
-* A ladder runs inside from the garage to the roof, with a doorway on every floor; the iron doors open with the buttons beside them.
+* **Inside**, a ladder runs up the core from the lobby to the roof. On every floor it opens onto a small landing with the room's door and its name over it; the iron doors open with the buttons beside them.
+* **A room for each of the first six Avengers**, and a few more:
+  * **Hawkeye**: an archery range with targets in a bank of hay, a shooting counter, bows and arrows on the wall, his suit on a stand (chest: arrows, iron, a bow, a crossbow, an iron sword).
+  * **Black Widow**: a training room with black mats and a red hourglass, punching bags, a dummy and a wall of weapons.
+  * **Hulk**: two floors high and reinforced, with iron bars inside the windows, posts of reinforced deepslate and smashed furniture all round a Hulk-size green chair.
+  * **Thor**: Asgardian gold, a throne at the end of a red runner, and **Mjolnir** lying on its stand (it stays there).
+  * **Spider-Man** (webs in the corners, a desk and a computer, the spider in a jar) and **the Scarlet Witch** (a red circle of candles, her crown on a stand).
+  * **The lab** (an iron workbench, brewing stands, a containment tube; chest: iron, redstone, gold, copper, sometimes diamonds, an iron chestplate, a shield, rarely a Mutant Cure).
+  * **Iron Man**: his workshop, two floors high, with five suits in red and gold (and a silver and a dark one), the desk with its screens and an arc reactor, the benches, a robot arm and a hot rod (a lab chest too).
+  * **The meeting room**, high under the curving glass, with a round table.
+  * **The penthouse** with its bar (chest: food and drinks, a cake) and the door out to the deck. In its corner is **Captain America's room**: a closet two blocks square and two high, with a bed he can barely fit in and his shield on the wall.
+  * **The observation room** behind the ring.
+* **On the roof** of the glass box, under the fin: **Selvig's device**, an iron frame round the **Tesseract's cradle**, where a glowing blue cube turns in the air. **Right-click it** with an empty hand and the Tesseract is yours; the cradle stays empty for good.
 * An officer of the [Hydra soldiers](Hydra-Soldiers) may drop **Hydra Intel**: a map to the nearest tower.
 
 ### The End tunnel
