@@ -165,7 +165,13 @@ public final class StoneSiteTests {
         }
     }
 
-    /** The whole tower in the base's frame: the mid and the top centred on it, 32 and 64 layers up. */
+    /** How far the tower's top part reaches out past its base on each side (3.6.1: 4). */
+    static final int TOWER_PAD = (StoneSitePlans.Tower.TOP_SIZE.getX() - StoneSitePlans.Tower.BASE_SIZE.getX()) / 2;
+
+    /**
+     * The whole tower in the top part's frame (33 x 114 x 33): the base and the mid centred in it, 32 layers apart, 4
+     * in from its sides; {@link #inTower} turns a point of the base's frame into it.
+     */
     static Raw tower(MinecraftServer server) {
         Map<BlockPos, BlockState> blocks = new HashMap<>();
         Map<BlockPos, CompoundTag> data = new HashMap<>();
@@ -173,14 +179,33 @@ public final class StoneSiteTests {
         int bytes = 0;
         for (int i = 0; i < 3; i++) {
             Raw part = raw(server, StoneSitePlans.Tower.PARTS.get(i));
-            int off = (StoneSitePlans.Tower.BASE_SIZE.getX() - part.size().getX()) / 2;
+            int off = (StoneSitePlans.Tower.TOP_SIZE.getX() - part.size().getX()) / 2;
             BlockPos shift = new BlockPos(off, StoneSitePlans.Tower.PART_Y[i], off);
             part.blocks().forEach((p, s) -> blocks.put(p.offset(shift), s));
             part.data().forEach((p, d) -> data.put(p.offset(shift), d));
             entities.addAll(part.entities());
             bytes += part.bytes();
         }
-        return new Raw(new Vec3i(25, 92, 25), blocks, data, entities, List.of(), bytes);
+        Vec3i top = StoneSitePlans.Tower.TOP_SIZE;
+        return new Raw(new Vec3i(top.getX(), StoneSitePlans.Tower.PART_Y[2] + top.getY(), top.getZ()), blocks, data,
+                entities, List.of(), bytes);
+    }
+
+    /** The ladder's column in the tower's base frame, and its first layer (over the lobby's floor). */
+    static final BlockPos TOWER_LADDER = new BlockPos(3, 0, 12);
+    static final int TOWER_LADDER_FROM = 3;
+    /** A place to stand in each of the tower's rooms, in its whole frame (3.6.1). */
+    static final Map<String, BlockPos> TOWER_ROOMS = Map.ofEntries(Map.entry("lobby", new BlockPos(12, 3, 20)),
+            Map.entry("Hawkeye", new BlockPos(12, 14, 20)), Map.entry("Black Widow", new BlockPos(12, 20, 17)),
+            Map.entry("Hulk", new BlockPos(12, 26, 19)), Map.entry("Thor", new BlockPos(12, 38, 15)),
+            Map.entry("Spider-Man", new BlockPos(12, 44, 16)), Map.entry("Scarlet Witch", new BlockPos(12, 50, 17)),
+            Map.entry("lab", new BlockPos(12, 56, 17)), Map.entry("Iron Man", new BlockPos(12, 62, 10)),
+            Map.entry("meeting room", new BlockPos(12, 74, 22)), Map.entry("penthouse", new BlockPos(16, 83, 15)),
+            Map.entry("Captain America", new BlockPos(7, 83, 9)), Map.entry("observation", new BlockPos(14, 90, 19)));
+
+    /** A point of the tower's base frame in the whole tower's frame ({@link #tower}). */
+    static BlockPos inTower(BlockPos base) {
+        return base.offset(TOWER_PAD, 0, TOWER_PAD);
     }
 
     /** What a flood from outside goes through: void, air, anything with no collision, and the small things. */
@@ -388,10 +413,9 @@ public final class StoneSiteTests {
                 new BlockPos(11, 16, 8), new BlockPos(11, 20, 6));
         check(openRooms(raw(server, StoneSitePlans.Sanctum.TEMPLATE), sanctum, Set.of()).isEmpty(),
                 "the Sanctum is shut: " + openRooms(raw(server, StoneSitePlans.Sanctum.TEMPLATE), sanctum, Set.of()));
-        List<BlockPos> tower = List.of(new BlockPos(5, 1, 8), new BlockPos(6, 4, 6), new BlockPos(6, 13, 10),
-                new BlockPos(8, 21, 14), new BlockPos(8, 29, 14), new BlockPos(8, 37, 14), new BlockPos(8, 45, 12),
-                new BlockPos(8, 53, 12), new BlockPos(8, 61, 14), new BlockPos(8, 69, 12), new BlockPos(8, 77, 15),
-                new BlockPos(12, 50, 15));
+        // the tower (its whole frame): the lobby, the rooms of the six and the others, Cap's closet, the core, the fin
+        List<BlockPos> tower = new ArrayList<>(TOWER_ROOMS.values());
+        tower.addAll(List.of(new BlockPos(7, 50, 16), new BlockPos(10, 97, 16), new BlockPos(7, 38, 19)));
         check(openRooms(tower(server), tower, Set.of()).isEmpty(),
                 "the tower is shut: " + openRooms(tower(server), tower, Set.of()));
         // the End tunnel: shut but for its arch
@@ -469,20 +493,20 @@ public final class StoneSiteTests {
                         && cradle.getValue(TesseractCradleBlock.FULL),
                 "the full cradle is at " + StoneSitePlans.Tower.CRADLE_IN_TOP + " of the top: " + cradle);
         Raw whole = tower(server);
-        check(whole.at(StoneSitePlans.Tower.CRADLE) == cradle,
-                "and at " + StoneSitePlans.Tower.CRADLE + " of the tower");
+        BlockPos at = inTower(StoneSitePlans.Tower.CRADLE);
+        check(whole.at(at) == cradle, "and at " + StoneSitePlans.Tower.CRADLE + " of the tower");
         check(whole.blocks().values().stream().filter(s -> s.is(ModBlocks.TESSERACT_CRADLE.get())).count() == 1,
                 "one cradle");
-        check(passes(whole.at(StoneSitePlans.Tower.CRADLE.north())) && !passes(whole.at(StoneSitePlans.Tower.CRADLE
-                .below())), "it can be reached on the roof");
-        // the core's ladder goes on from the garage to the roof across the three parts
-        for (int y = 1; y <= 88; y++) {
-            BlockState s = whole.at(12, y, 15);
+        check(passes(whole.at(at.north())) && !passes(whole.at(at.below())), "it can be reached on the roof");
+        // the core's ladder goes on from the lobby to the roof across the three parts
+        for (int y = TOWER_LADDER_FROM; y <= StoneSitePlans.Tower.CRADLE.getY(); y++) {
+            BlockState s = whole.at(inTower(TOWER_LADDER).atY(y));
             check(s != null && s.is(Blocks.LADDER), "the ladder at layer " + y + ": " + s);
         }
-        // the floors meet: each part's walls stand on the one below
-        check(!passes(whole.at(5, 31, 5)) && !passes(whole.at(5, 32, 5)) && !passes(whole.at(5, 63, 5))
-                && !passes(whole.at(5, 64, 5)), "the corners run on through the joints");
+        // the floors meet: each part's west wall stands on the one below
+        for (int y : new int[]{31, 32, 63, 64}) {
+            check(!passes(whole.at(5, y, 16)), "the west wall runs on through the joint at " + y);
+        }
         List<String> tables = chestTables(whole);
         for (String t : List.of("lab", "lounge", "armory")) {
             check(count(tables, "enhanced:chests/avengers_tower/" + t) >= 1, "a chest " + t + ": " + tables);
@@ -491,6 +515,55 @@ public final class StoneSiteTests {
                 "all its chests: " + tables);
         check(whole.data().values().stream().anyMatch(d -> d.toString().contains("sign.enhanced.avengers_tower")),
                 "the sign with the tower's name");
+        helper.succeed();
+    }
+
+    /**
+     * 3.6.1: a room for each of the first six Avengers, its door with the hero's name over it, and Captain America's
+     * is a closet: a bed and room to stand beside it, no more.
+     */
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    public static void theTowerHasARoomForEachOfTheSixAndCapsIsTiny(GameTestHelper helper) {
+        Raw whole = tower(helper.getLevel().getServer());
+        Map<BlockPos, String> signs = new HashMap<>();
+        whole.data().forEach((p, d) -> {
+            if (d.contains("front_text")) {
+                ListTag lines = d.getCompound("front_text").getList("messages", Tag.TAG_STRING);
+                StringBuilder text = new StringBuilder();
+                for (int i = 0; i < lines.size(); i++) {
+                    text.append(lines.getString(i));
+                }
+                signs.put(p, text.toString());
+            }
+        });
+        for (String name : List.of("IRON MAN", "Cap's room", "THOR", "HULK", "BLACK WIDOW", "HAWKEYE")) {
+            BlockPos sign = signs.entrySet().stream().filter(e -> e.getValue().contains(name)).map(Map.Entry::getKey)
+                    .findFirst().orElse(null);
+            check(sign != null, "a sign with " + name + ": " + signs.values());
+            boolean door = false;
+            for (BlockPos p : BlockPos.betweenClosed(sign.offset(-2, -3, -2), sign.offset(2, 0, 2))) {
+                door |= whole.at(p) != null && whole.at(p).getBlock() instanceof DoorBlock;
+            }
+            check(door, name + "'s sign is by a door: " + sign);
+        }
+        // Cap's room: what can be walked into from its middle without opening its door
+        Set<BlockPos> closet = new HashSet<>();
+        ArrayDeque<BlockPos> queue = new ArrayDeque<>(List.of(TOWER_ROOMS.get("Captain America")));
+        boolean bed = false;
+        while (!queue.isEmpty() && closet.size() < 50) {
+            BlockPos p = queue.poll();
+            if (!closet.add(p)) {
+                continue;
+            }
+            for (Direction d : Direction.values()) {
+                BlockState n = whole.at(p.relative(d));
+                bed |= n != null && n.is(BlockTags.BEDS);
+                if (passes(n) && !closet.contains(p.relative(d))) {
+                    queue.add(p.relative(d));
+                }
+            }
+        }
+        check(closet.size() <= 8 && bed, "Cap's room is a closet with a bed (2 x 2 x 2 at most): " + closet.size());
         helper.succeed();
     }
 
@@ -842,9 +915,10 @@ public final class StoneSiteTests {
         BlockState cradle = level.getBlockState(byTop);
         check(cradle.is(ModBlocks.TESSERACT_CRADLE.get()) && cradle.getValue(TesseractCradleBlock.FULL),
                 "the Tesseract's cradle on the roof: " + cradle);
-        check(byTop.getY() == center.getY() - StoneSitePlans.Tower.FLOOR + 88, "88 over the base's floor: " + byTop);
-        for (int y = 1; y <= 88; y++) {
-            BlockPos p = SitePoints.toWorld(pieces.get(0), new BlockPos(12, y, 15));
+        check(byTop.getY() == center.getY() - StoneSitePlans.Tower.FLOOR + StoneSitePlans.Tower.CRADLE.getY(),
+                StoneSitePlans.Tower.CRADLE.getY() + " over the base's layer 0: " + byTop);
+        for (int y = TOWER_LADDER_FROM; y <= StoneSitePlans.Tower.CRADLE.getY(); y++) {
+            BlockPos p = SitePoints.toWorld(pieces.get(0), TOWER_LADDER.atY(y));
             check(level.getBlockState(p).is(Blocks.LADDER),
                     "the ladder goes on at " + y + ": " + level.getBlockState(p));
         }
