@@ -75,7 +75,9 @@ public class PowerHud implements LayeredDraw.Layer {
         }
 
         Power builder = BuildClient.hero(player); // (3.4: whose Build Magic he has, the line's owner)
-        Component[] lines = new Component[PowerData.ABILITIES + extraLines(builder)];
+        // (3.6: a hero whose Y is not Build Magic, Doctor Strange's Eye, has a sixth line of his own: yLine.)
+        boolean yLine = extraLines(builder) == 0 && com.kolodkingal.enhanced.custom.HeroKeys.yRow(data) != null;
+        Component[] lines = new Component[PowerData.ABILITIES + extraLines(builder) + (yLine ? 1 : 0)];
         int width = font.width(title) + 4;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
@@ -90,6 +92,18 @@ public class PowerHud implements LayeredDraw.Layer {
         }
         if (extraLines(builder) > 0) {
             Component line = buildLine(player, builder, now);
+            lines[PowerData.ABILITIES] = line;
+            width = Math.max(width, font.width(line));
+        }
+        if (yLine) {
+            MutableComponent line = Component.literal("[").append(BuildKeys.MAGIC.getTranslatedKeyMessage()).append("] ")
+                    .withStyle(ChatFormatting.YELLOW)
+                    .append(Component.translatable(power.abilityKey(com.kolodkingal.enhanced.custom.HeroKeys.Y))
+                            .withStyle(ChatFormatting.WHITE));
+            Component status = status(player, data, com.kolodkingal.enhanced.custom.HeroKeys.Y, now);
+            if (status != null) {
+                line.append(Component.literal("  ")).append(status);
+            }
             lines[PowerData.ABILITIES] = line;
             width = Math.max(width, font.width(line));
         }

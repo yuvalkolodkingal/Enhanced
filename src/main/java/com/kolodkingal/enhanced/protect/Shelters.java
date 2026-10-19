@@ -263,6 +263,14 @@ public final class Shelters {
             nearest = new Stop(Wall.CHAOS_SHIELD, chaos.owner(), chaos.point(),
                     AbilityColors.glow(chaos.owner(), AbilityColors.shield(chaos.owner()), WandaAbilities.glow(chaos.owner())), chaos.owner().getUUID());
         }
+        // 3.6: a Shield of the Seraphim (Doctor Strange's, lane L3) ends the beam at its disc; it pays nothing.
+        com.kolodkingal.enhanced.strange.SeraphimShield.Crossing seraphim =
+                com.kolodkingal.enhanced.strange.SeraphimShield.across(level, firer, from, to, partialTick);
+        if (seraphim != null && seraphim.at() < best) {
+            best = seraphim.at();
+            nearest = new Stop(Wall.CHAOS_SHIELD, null, seraphim.point(),
+                    com.kolodkingal.enhanced.strange.StrangeAbilities.ORANGE, seraphim.owner().getUUID());
+        }
         AABB reach = new AABB(from, to).inflate(BillyBarrier.distance() + BillyBarrier.height());
         for (Player billy : level.getEntitiesOfClass(Player.class, reach, p -> p != firer && !p.isSpectator() && BillyBarrier.isUp(p))) {
             Vec3 hit = plateCrossing(billy, from, to, partialTick);

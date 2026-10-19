@@ -247,15 +247,15 @@ public enum HeroAbility implements CatalogEntry {
             .traits(Trait.DARK_MAGIC, Trait.STONE_BEARER).family(Family.BODY)),
 
     // ===== doctor_strange (3.6) =====
-    // (The rows of 3.6 are written by the skeleton from the plan's tables; each lane fixes its own hero's data here. G
-    // is his flight key, not a row: the Flight module's style "cloak". Y is the Eye: at most one Y row per custom
-    // hero.)
+    // (The rows of 3.6, written by the skeleton from the plan's tables and fixed by lane L3. G is his flight key, not a
+    // row: the Flight module's style "cloak". Y is the Eye: at most one Y row per custom hero. The Shield of the
+    // Seraphim is its own state, Live.STRANGE_SHIELD, not the Chaos Shield's record: Resource.SHIELD keeps one shield.)
     STRANGE_WHIP(Power.DOCTOR_STRANGE, 1, "whip", press().alt(Act.PRESS).cost(2).group(Group.ENERGY)
             .icon("minecraft:blaze_rod")
             .traits(Trait.SORCERER)),
     STRANGE_SHIELDS(Power.DOCTOR_STRANGE, 3, "shields", hold().alt(Act.PRESS).cost(2).group(Group.ENERGY)
             .icon("minecraft:orange_stained_glass").res(Resource.SHIELD).traits(Trait.SORCERER).family(Family.SHIELD)
-            .on(PowerData::chaosShieldActive)),
+            .on(d -> d.is(Live.STRANGE_SHIELD))),
     STRANGE_BANDS(Power.DOCTOR_STRANGE, 4, "bands", press().alt(Act.TOGGLE).cost(3).group(Group.MIND)
             .icon("minecraft:red_wool")
             .altRes(Resource.PHASE).traits(Trait.SORCERER)),

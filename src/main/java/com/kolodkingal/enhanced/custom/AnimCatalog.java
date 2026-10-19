@@ -38,7 +38,9 @@ public final class AnimCatalog {
 
     /** Flight styles: the built-in fliers' profiles, take-offs and flight effects, or the game's plain flight. */
     public static final List<String> FLIGHT_STYLES = List.of(
-            "plain", "magneto", "wanda", "vision", "white_vision", "billy", "thor", "phoenix", "ultron", "apocalypse", "agatha");
+            "plain", "magneto", "wanda", "vision", "white_vision", "billy", "thor", "phoenix", "ultron", "apocalypse", "agatha",
+            // 3.6
+            "doctor_strange");
 
     /** Run characters (how the walk and sprint look). */
     public static final List<String> RUN_CHARACTERS = List.of(
@@ -47,7 +49,7 @@ public final class AnimCatalog {
             // 3.5
             "heimdall", "odin", "hela",
             // 3.6
-            "hulk");
+            "doctor_strange", "hulk");
 
     /** Speedster runs: Quicksilver in his Time, Quicksilver's Super Speed, Tommy's. */
     public static final List<String> SPEED_RUNS = List.of("qs_time", "qs_speed", "tommy");

@@ -22,7 +22,7 @@ public enum PowerModule implements CatalogEntry {
     SUPER_STRENGTH("super_strength", 2, Group.BODY, "minecraft:anvil", opt("punch", Act.PRESS), opt("slam", Act.PRESS), opt("leap", Act.PRESS)),
     DURABILITY("durability", 1, Group.BODY, "minecraft:iron_chestplate", opt("armor", Act.NONE), opt("health", Act.NONE)),
     SUPER_SPEED("super_speed", 2, Group.MOVE, "minecraft:sugar", opt("run", Act.TOGGLE), opt("blitz", Act.PRESS)),
-    // (3.6: the style "cloak" is Doctor Strange's Cloak of Levitation, lane L3's look; until then it flies as "hover".)
+    // (3.6: the style "cloak" is Doctor Strange's Cloak of Levitation: his flight and the cloak on the back.)
     FLIGHT("flight", 2, Group.MOVE, "minecraft:feather", opt("hover", Act.TOGGLE), opt("jet", Act.TOGGLE),
             opt("wings", Act.TOGGLE), opt("cloak", Act.TOGGLE)),
     HEALING("healing", 2, Group.BODY, "minecraft:golden_apple", opt("steady", Act.NONE), opt("burst", Act.PRESS)),

@@ -147,7 +147,9 @@ public final class VisionAbilities {
     /** Vision phasing, or (3.3) a custom hero whose Phasing passes through walls: the same rules for both. */
     public static boolean isPhased(Player player) {
         PowerData data = Powers.get(player);
-        return data.has(HeroAbility.VISION_PHASE) && data.visionPhased() || com.kolodkingal.enhanced.custom.CustomHeroes.isPhased(player);
+        return data.has(HeroAbility.VISION_PHASE) && data.visionPhased() || com.kolodkingal.enhanced.custom.CustomHeroes.isPhased(player)
+                // (3.6: Doctor Strange's spirit out of his body passes through walls as Vision does: lane L3.)
+                || com.kolodkingal.enhanced.strange.AstralProjection.isAstral(player);
     }
 
     public static boolean isDense(Player player) {

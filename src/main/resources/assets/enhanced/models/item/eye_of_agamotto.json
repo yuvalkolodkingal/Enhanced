@@ -1,6 +1,14 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/ender_eye"
-  }
+    "layer0": "enhanced:item/eye_of_agamotto"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "enhanced:open": 1
+      },
+      "model": "enhanced:item/eye_of_agamotto_open"
+    }
+  ]
 }
