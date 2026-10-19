@@ -133,6 +133,7 @@ public final class ClientSetup {
             // ===== school_lab (3.7) =====
             // ===== finders (3.7) =====
             // ===== cottage (3.7) =====
+            com.kolodkingal.enhanced.client.cottage.CottageClient.setup();
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
         });
