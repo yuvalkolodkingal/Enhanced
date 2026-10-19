@@ -724,7 +724,12 @@ public final class StoneSiteTests {
     record Timing(int chunks, double averageMs, double worstMs) {
     }
 
-    /** Builds a piece chunk by chunk, as the world's generation does, timing each chunk's part. */
+    /**
+     * Builds a piece chunk by chunk, as the world's generation does, timing each chunk's part. The time is the server
+     * thread's own CPU time (where the JVM measures it): a wall clock also counted the garbage collector's pauses and
+     * the other threads of a loaded machine (3.6 integration: one full run had a chunk of the End tunnel at 557 ms
+     * against its usual 20-60).
+     */
     static Timing build(ServerLevel level, List<? extends StructurePiece> pieces) {
         BoundingBox all = null;
         for (StructurePiece p : pieces) {
@@ -741,20 +746,26 @@ public final class StoneSiteTests {
                 level.getChunk(cx, cz);
                 BoundingBox box = new BoundingBox(chunk.getMinBlockX(), level.getMinBuildHeight(), chunk.getMinBlockZ(),
                         chunk.getMaxBlockX(), level.getMaxBuildHeight(), chunk.getMaxBlockZ());
-                long start = System.nanoTime();
+                long start = cpuNanos();
                 for (StructurePiece piece : pieces) {
                     if (piece.getBoundingBox().intersects(box)) {
                         piece.postProcess(level, level.structureManager(), generator,
                                 RandomSource.create(cx * 31L + cz), box, chunk, all.getCenter());
                     }
                 }
-                double ms = (System.nanoTime() - start) / 1e6;
+                double ms = (cpuNanos() - start) / 1e6;
                 total += ms;
                 worst = Math.max(worst, ms);
                 n++;
             }
         }
         return new Timing(n, total / n, worst);
+    }
+
+    /** The current thread's CPU time (ns), or the wall clock where the JVM does not measure it. */
+    static long cpuNanos() {
+        java.lang.management.ThreadMXBean threads = java.lang.management.ManagementFactory.getThreadMXBean();
+        return threads.isCurrentThreadCpuTimeSupported() ? threads.getCurrentThreadCpuTime() : System.nanoTime();
     }
 
     static void withinBudget(String site, Timing t) {
