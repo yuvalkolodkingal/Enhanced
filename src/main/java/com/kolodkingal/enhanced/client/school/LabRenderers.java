@@ -67,7 +67,7 @@ public final class LabRenderers {
             for (int i = 0; i < 3; i++) {
                 pose.pushPose();
                 pose.translate((3.5 + i * 4.5) / 16.0, 7.5 / 16.0, 8.0 / 16.0);
-                pose.mulPose(Axis.ZP.rotationDegrees(45.0F));
+                pose.mulPose(Axis.ZP.rotationDegrees(-45.0F));
                 pose.scale(0.42F, 0.42F, 0.42F);
                 Minecraft.getInstance().getItemRenderer().renderStatic(injection, ItemDisplayContext.FIXED, light,
                         OverlayTexture.NO_OVERLAY, pose, buffers, be.getLevel(), i);
