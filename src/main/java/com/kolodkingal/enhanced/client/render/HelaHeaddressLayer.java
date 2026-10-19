@@ -31,12 +31,13 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Hela's headdress (3.5, PLAN 7.3): eight antler tines of shiny dark green that grow out of the back of her cowl and sweep
- * back and up, the two in the middle tallest, each side fanning out lower, every tine three tapering segments curling
- * back. A model of its own on the head ({@link #createLayer}, drawn by {@link #draw} with the head's every turn), used by
- * the hero (this layer: while her form is on, and in the look {@code goddess} always) and by the boss's renderer. It grows
- * from nothing in {@link #GROW_TICKS} ticks when the form comes on and shrinks back when it goes, eased with the partial
- * tick, from a time kept per player on the client.
+ * Hela's headdress (3.5, PLAN 7.3; redrawn in 3.5.1, it looked like a pineapple): her horned crown of the films, a fan of
+ * long antler tines growing from the ridge of her cowl round the back of her head, spreading out like a dark halo and
+ * sweeping back, each of three tapering segments that bend further back and out, the inner pairs with a short prong;
+ * glossy black with a dark green sheen. One model of its own on the head ({@link #createLayer}, drawn by {@link #draw}
+ * with the head's every turn), used by the hero (this layer: while her form is on, and in the look {@code goddess}
+ * always), by the boss's renderer and by her shadows'. It grows from nothing in {@link #GROW_TICKS} ticks when the form
+ * comes on and shrinks back when it goes, eased with the partial tick, from a time kept per player on the client.
  */
 public class HelaHeaddressLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Enhanced.id("hela"), "headdress");
@@ -57,30 +58,61 @@ public class HelaHeaddressLayer extends RenderLayer<AbstractClientPlayer, Player
         this.headdress = headdress;
     }
 
-    /** The cowl band round the back of the head, and four tines a side. */
+    /**
+     * The tines of one side, from the middle out: roll (degrees, out from the top round the back of the head), pitch
+     * (degrees back), the three segments' lengths, the base thickness, and 1 for a side prong. Mirrored on the other side.
+     */
+    static final float[][] TINES = {
+            {9.0F, 32.0F, 6.4F, 5.8F, 4.2F, 1.7F, 0},
+            {28.0F, 30.0F, 6.2F, 5.4F, 3.9F, 1.6F, 1},
+            {49.0F, 26.0F, 5.8F, 5.0F, 3.6F, 1.5F, 1},
+            {70.0F, 20.0F, 5.0F, 4.2F, 3.0F, 1.3F, 0},
+    };
+    /** How much further back the second and third segments bend, and how they turn up toward the middle (degrees). */
+    static final float[] BEND_PITCH = {12.0F, 14.0F};
+    static final float[] BEND_ROLL = {-3.0F, -4.0F};
+    /** The arc the tines grow from: its radius round the head's middle, behind it (pixels). */
+    static final float ARC_R = 3.7F;
+    static final float ARC_Z = 1.2F;
+    static final float PRONG = 2.6F;
+
+    /** The cowl's ridge round the top and back of the head, its keel, and four tines a side. */
     public static LayerDefinition createLayer() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
         PartDefinition crown = root.addOrReplaceChild("crown", CubeListBuilder.create()
-                .texOffs(0, 20).addBox(-4.6F, -8.6F, -1.2F, 9.2F, 2.0F, 5.8F)
-                .texOffs(0, 28).addBox(-1.0F, -9.4F, -0.6F, 2.0F, 1.0F, 4.0F), PartPose.ZERO);
+                .texOffs(0, 20).addBox(-4.45F, -8.55F, -0.6F, 8.9F, 1.3F, 5.2F)
+                .texOffs(0, 27).addBox(-1.0F, -9.3F, 0.0F, 2.0F, 1.0F, 3.6F), PartPose.ZERO);
+        float rad = Mth.DEG_TO_RAD;
         for (int side = -1; side <= 1; side += 2) {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < TINES.length; i++) {
+                float[] t = TINES[i];
                 String name = (side < 0 ? "r" : "l") + i;
-                float x = side * (0.8F + 0.95F * i);
-                float z = BASE_Z + 0.55F * i;
-                float l1 = 6.5F - 1.1F * i;
-                float l2 = 5.5F - 0.9F * i;
-                float l3 = 3.2F - 0.4F * i;
+                float roll = t[0] * rad;
+                float x = side * ARC_R * Mth.sin(roll);
+                float y = -8.0F + 2.9F * (1.0F - Mth.cos(roll));
+                float z = ARC_Z + 0.6F * (1.0F - Mth.cos(roll));
+                float l1 = t[2];
+                float l2 = t[3];
+                float l3 = t[4];
+                float w1 = t[5];
+                float w2 = w1 * 0.72F;
+                float w3 = w1 * 0.45F;
                 PartDefinition seg1 = crown.addOrReplaceChild(name, CubeListBuilder.create().texOffs(0, 0)
-                        .addBox(-0.8F, -l1, -0.8F, 1.6F, l1, 1.6F), PartPose.offsetAndRotation(x, BASE_Y, z,
-                        -0.22F - 0.13F * i, 0.0F, -side * (0.10F + 0.32F * i)));
+                        .addBox(-w1 / 2, -l1, -w1 / 2, w1, l1, w1), PartPose.offsetAndRotation(x, y, z,
+                        -t[1] * rad, 0.0F, side * roll));
                 PartDefinition seg2 = seg1.addOrReplaceChild("mid", CubeListBuilder.create().texOffs(8, 0)
-                        .addBox(-0.55F, -l2, -0.55F, 1.1F, l2, 1.1F), PartPose.offsetAndRotation(0.0F, -l1 + 0.3F, 0.0F,
-                        -0.24F, 0.0F, -side * 0.14F));
+                        .addBox(-w2 / 2, -l2, -w2 / 2, w2, l2, w2), PartPose.offsetAndRotation(0.0F, -l1 + 0.25F, 0.0F,
+                        -BEND_PITCH[0] * rad, 0.0F, side * BEND_ROLL[0] * rad));
                 seg2.addOrReplaceChild("tip", CubeListBuilder.create().texOffs(16, 0)
-                        .addBox(-0.3F, -l3, -0.3F, 0.6F, l3, 0.6F), PartPose.offsetAndRotation(0.0F, -l2 + 0.2F, 0.0F,
-                        -0.3F, 0.0F, -side * 0.16F));
+                        .addBox(-w3 / 2, -l3, -w3 / 2, w3, l3, w3), PartPose.offsetAndRotation(0.0F, -l2 + 0.2F, 0.0F,
+                        -BEND_PITCH[1] * rad, 0.0F, side * BEND_ROLL[1] * rad));
+                if (t[6] > 0) {
+                    // An antler's prong: from high on the first segment, out and a little forward.
+                    seg1.addOrReplaceChild("prong", CubeListBuilder.create().texOffs(24, 0)
+                            .addBox(-w3 / 2, -PRONG, -w3 / 2, w3, PRONG, w3), PartPose.offsetAndRotation(0.0F, -l1 * 0.75F, 0.0F,
+                            20.0F * rad, 0.0F, side * 42.0F * rad));
+                }
             }
         }
         return LayerDefinition.create(mesh, 32, 32);
