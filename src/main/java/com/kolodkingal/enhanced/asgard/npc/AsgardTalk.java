@@ -77,7 +77,8 @@ public final class AsgardTalk {
         if (state == NpcState.SLEEPING) {
             // Odin sleeps: Frigga's words beside him.
             SESSIONS.put(player.getUUID(), new Session(npc.getId(), Role.FRIGGA, "odin_asleep", List.of()));
-            send(player, npc, Role.FRIGGA, "npc.enhanced.frigga.odin_asleep", List.of(), List.of());
+            AsgardDialogue.Said said = AsgardDialogue.said(context(player, npc, Role.FRIGGA), "npc.enhanced.frigga.odin_asleep", List.of());
+            send(player, npc, Role.FRIGGA, said.line(), said.args(), List.of());
             return true;
         }
         AsgardDialogue.Ctx ctx = context(player, npc, npc.role());
@@ -141,7 +142,12 @@ public final class AsgardTalk {
         if (ctx.speaker() instanceof AsgardianEntity npc) {
             npc.startTalk(player);
         }
-        send(player, ctx.speaker(), ctx.role(), line, AsgardDialogue.argsOf(ctx, node.key()), keys);
+        AsgardDialogue.Action onShow = AsgardDialogue.onShowOf(ctx.role(), node.key());
+        if (onShow != null) {
+            onShow.run(ctx);
+        }
+        AsgardDialogue.Said said = AsgardDialogue.said(ctx, line, AsgardDialogue.argsOf(ctx, node.key()));
+        send(player, ctx.speaker(), ctx.role(), said.line(), said.args(), keys);
     }
 
     private static void send(ServerPlayer player, Entity speaker, Role role, String line, List<String> args, List<String> options) {

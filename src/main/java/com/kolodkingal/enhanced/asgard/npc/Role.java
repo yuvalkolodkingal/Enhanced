@@ -1,5 +1,8 @@
 package com.kolodkingal.enhanced.asgard.npc;
 
+import com.kolodkingal.enhanced.power.Power;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Locale;
 
 /**
@@ -117,6 +120,28 @@ public enum Role {
     /** Whether this role's skin {@code variant} has slim (3-pixel) arms: Frigga, Sif, Valkyrie and the odd citizens. */
     public boolean slim(int variant) {
         return this == CITIZEN ? variant % 2 == 1 : slim;
+    }
+
+    /**
+     * The playable hero this role is (3.5.1): Heimdall and Odin are both, else null. There is one of each character: while
+     * a player is the role's hero, the role's Asgardian {@link #yieldsToHero() yields} to him.
+     */
+    @Nullable
+    public Power hero() {
+        return switch (this) {
+            case HEIMDALL -> Power.HEIMDALL;
+            case ODIN -> Power.ODIN;
+            default -> null;
+        };
+    }
+
+    /**
+     * Whether the role's Asgardian leaves the city while any player online is its {@link #hero()} (the keeper sends him
+     * away in a gold shimmer and brings him back when nobody is): every role with a hero but Heimdall, who stays and hands
+     * his post to the player for a while instead.
+     */
+    public boolean yieldsToHero() {
+        return hero() != null && this != HEIMDALL;
     }
 
     /** The Warriors Three. */

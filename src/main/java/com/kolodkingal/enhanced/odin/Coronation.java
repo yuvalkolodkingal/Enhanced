@@ -140,6 +140,10 @@ public final class Coronation {
         ServerLevel level = player.serverLevel();
         OdinAbilities.send(level, player, OdinAbilities.FX_CROWNED, List.of(player.position()), 0);
         Asgardians.bowTo(player);
+        if (com.kolodkingal.enhanced.asgard.AsgardDimension.is(level)) {
+            // One of each character (3.5.1): the Allfather of the hall leaves in gold as the new one is crowned.
+            com.kolodkingal.enhanced.asgard.npc.AsgardPopulation.yieldToHeroes(level);
+        }
         player.displayClientMessage(Component.translatable("message.enhanced.odin.crowned").withStyle(ChatFormatting.GOLD), false);
     }
 

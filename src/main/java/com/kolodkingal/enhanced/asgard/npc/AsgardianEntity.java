@@ -94,6 +94,9 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
     @Nullable
     private BlockPos home;
     private int homeRadius = 16;
+    /** Where Heimdall rests while a player keeps his post (3.5.1), or null: at his post. Not saved. */
+    @Nullable
+    private BlockPos restAt;
     private long downUntil;
     private long stateUntil;
     private long summonUntil;
@@ -242,6 +245,22 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
 
     public int homeRadius() {
         return homeRadius;
+    }
+
+    /** Where he stands his post now: his rest spot while a player keeps it for him (3.5.1), else his home. */
+    @Nullable
+    public BlockPos post() {
+        return restAt != null ? restAt : home;
+    }
+
+    /** Sends him to rest at {@code spot} (a player keeps his post), or back to his post (null). */
+    public void setRestAt(@Nullable BlockPos spot) {
+        this.restAt = spot == null ? null : spot.immutable();
+    }
+
+    @Nullable
+    public BlockPos restAt() {
+        return restAt;
     }
 
     /** Odin lives in his chamber while he sleeps and walks the throne room once he wakes. */
@@ -468,6 +487,25 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
         if (tradingPlayer != null && (!tradingPlayer.isAlive() || tradingPlayer.distanceTo(this) > 12)) {
             setTradingPlayer(null);
         }
+    }
+
+    /**
+     * A gold shimmer round him (3.5.1): a named Asgardian leaving the city because a player is his hero, or coming back
+     * when nobody is. A rising column of gold dust and sparks, and the Einherjar's call, softer.
+     */
+    public void shimmer() {
+        if (level() instanceof ServerLevel server) {
+            server.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(1.0F, 0.85F, 0.35F), 1.6F),
+                    getX(), getY() + 1.0, getZ(), 48, 0.4, 1.0, 0.4, 0.0);
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, getX(), getY() + 1.0, getZ(), 16, 0.3, 0.9, 0.3, 0.04);
+            server.playSound(null, getX(), getY(), getZ(), ModSounds.EINHERJAR_SUMMON.get(), getSoundSource(), 0.8F, 1.2F);
+        }
+    }
+
+    /** He leaves in a gold shimmer (a player is his hero: there is one of each character). */
+    public void leaveInGold() {
+        shimmer();
+        discard();
     }
 
     /** Summoned Einherjar leave in a flash of gold. */

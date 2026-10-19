@@ -65,6 +65,8 @@ Gungnir in flight, or "no Gungnir: press to call it"; the ravens (how many they 
 
 As long as he sleeps, Odin lies in his chamber; once Hela has fallen he is awake and stands in the throne room. You can talk to him: he tells you of Gungnir and his ravens, and where the vault is. See [Asgardians](Asgardians).
 
+**There is only one Odin** (3.5.1): while any player online is Odin, the Odin of the city is away. When you are crowned he leaves in a shimmer of gold, and he comes back the same way once nobody is Odin. The Asgardians speak of you instead: Frigga, asked where Odin is, says "The Allfather has woken: Eilon sits the throne now", and Hogun, Fandral, the Einherjar and the citizens name you too. See [One of each character](Asgardians#one-of-each-character).
+
 The vault also keeps an empty place for something still to come.
 
 ## Odin in the Hero Creator

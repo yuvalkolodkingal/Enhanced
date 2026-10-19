@@ -3645,5 +3645,22 @@
   "hud.enhanced.hela.allies": "%s risen, %ss",
   "hud.enhanced.hela.grasp": "Grasp %ss",
   "preset.enhanced.hela": "Hela-like",
-  "preset.enhanced.hela.desc": "Necroswords, walls of blades and the army of the dead"
+  "preset.enhanced.hela.desc": "Necroswords, walls of blades and the army of the dead",
+  "npc.enhanced.frigga.odin_player": "The Allfather has woken: %s sits the throne now. Be kind to them; a crown is heavier than it looks.",
+  "npc.enhanced.hogun.vault_player": "The vault lies under the throne room. The Allfather has woken: %s holds its key now.",
+  "npc.enhanced.hogun.vault_more_player": "Odin has woken. %s carries his name now. Ask them, not me.",
+  "npc.enhanced.fandral.gungnir_player": "Gungnir has found its hand again: %s, our Allfather! Still, they say the vault keeps a spear for every hero who faces Hela.",
+  "npc.enhanced.einherjar.news_odin_player": "The Allfather has woken! %s sits the throne. Stand straight when they pass.",
+  "npc.enhanced.citizen.rumour_odin_player": "Did you hear? The Allfather has woken: %s sits the throne, and the whole palace is buzzing!",
+  "npc.enhanced.heimdall.handover": "We are both guardians of Asgard. Keep the Bifrost for me a while: my socket answers to you now. I will rest my eyes over there.",
+  "npc.enhanced.heimdall.post_kept": "The Bifrost is in good hands. Shall I take my post back?",
+  "npc.enhanced.heimdall.keeper_away": "%s keeps the Bifrost for me now. We are both guardians of Asgard. I can still send you home.",
+  "npc.enhanced.heimdall.post_return": "Thank you, guardian. I take my post again. We are both guardians of Asgard.",
+  "npc.enhanced.option.heimdall_post_thanks": "I will guard it well.",
+  "npc.enhanced.option.heimdall_post_return": "Take your post back.",
+  "npc.enhanced.option.heimdall_post_keep": "I'll keep watch a little longer.",
+  "boss.enhanced.post": "Keeper of the Bifrost",
+  "boss.enhanced.post.time": "Keeper of the Bifrost — %s",
+  "message.enhanced.post.begins": "Heimdall's post is yours for %s. The socket and the Bifrost answer to you.",
+  "message.enhanced.post.socket_nobody": "The Bifrost answers its keeper. Nobody in the Observatory is waiting to be sent."
 }

@@ -33,6 +33,9 @@ import java.util.WeakHashMap;
  *   duplicates, ever (one that walked off into an unloaded chunk and comes back after its replacement is gone).</li>
  *   <li>With {@code asgard.npcs} off the keeper removes its own and makes none.</li>
  *   <li>Odin's slot is made asleep in his chamber until Hela first falls.</li>
+ *   <li>One of each character (3.5.1): while any player online is a role's hero ({@link Role#yieldsToHero()}: Odin),
+ *   that role's Asgardian is away. The keeper sends him off in a gold shimmer wherever he is, makes none and refuses one
+ *   joining; once nobody is the hero, he is made again at his home, in the same shimmer.</li>
  * </ul>
  * The keeper runs by itself in Asgard on a real server; the GameTests drive it ({@link #tickNow}, {@link #keep}).
  */
@@ -109,11 +112,21 @@ public final class AsgardPopulation {
             return made;
         }
         for (CityPlan.Home home : homes) {
+            UUID id = residents.resident(home.slot());
+            Entity present = id == null ? null : level.getEntity(id);
+            if (Asgardians.yields(level.getServer(), home.role())) {
+                // One of each character (3.5.1): a player is his hero, so he is away (wherever he stands now).
+                if (present instanceof AsgardianEntity npc) {
+                    npc.leaveInGold();
+                }
+                if (id != null && (present != null || loaded(level, home.pos()))) {
+                    residents.setResident(home.slot(), null);
+                }
+                continue;
+            }
             if (!loaded(level, home.pos())) {
                 continue;
             }
-            UUID id = residents.resident(home.slot());
-            Entity present = id == null ? null : level.getEntity(id);
             if (present instanceof AsgardianEntity npc && npc.isAlive()) {
                 continue;
             }
@@ -124,11 +137,34 @@ public final class AsgardPopulation {
             residents.setResident(home.slot(), npc.getUUID());
             if (level.addFreshEntity(npc)) {
                 made.add(npc);
+                if (home.role().yieldsToHero()) {
+                    npc.shimmer(); // he comes back as he left
+                }
             } else {
                 residents.setResident(home.slot(), id);
             }
         }
         return made;
+    }
+
+    /**
+     * Sends away at once the named Asgardians whose hero a player has become (the keeper would within {@link #PERIOD}
+     * ticks): the coronation calls it, so the Allfather of the hall leaves as the new one sits down.
+     */
+    public static void yieldToHeroes(ServerLevel level) {
+        Residents residents = residents(level);
+        if (residents == null || !AsgardConfig.NPCS.get()) {
+            return;
+        }
+        List<CityPlan.Home> yielding = new ArrayList<>();
+        for (CityPlan.Home home : CityPlan.homes()) {
+            if (Asgardians.yields(level.getServer(), home.role())) {
+                yielding.add(home);
+            }
+        }
+        if (!yielding.isEmpty()) {
+            keep(level, yielding, residents);
+        }
     }
 
     /** A new Asgardian for a home (not yet in the level), or null if the home has nowhere to stand. */
@@ -224,6 +260,9 @@ public final class AsgardPopulation {
         }
         if (!AsgardConfig.NPCS.get() && entity instanceof AsgardianEntity) {
             return true;
+        }
+        if (entity instanceof AsgardianEntity npc && Asgardians.yields(level.getServer(), npc.role())) {
+            return true; // away while a player is his hero (one saved in a chunk loading now, too)
         }
         UUID recorded = residents.resident(slot);
         if (recorded == null) {

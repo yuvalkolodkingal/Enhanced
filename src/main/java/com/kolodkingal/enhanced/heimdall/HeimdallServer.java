@@ -52,6 +52,7 @@ public final class HeimdallServer implements HeroServer {
     @Override
     public void everyPlayerTick(ServerPlayer player, PowerData data) {
         GuardiansWatch.tick(player);
+        HeimdallPost.tick(player, data);
         if (!player.isSpectator() && player.isAlive() && awakens(player, data)) {
             awaken(player);
         }
@@ -94,6 +95,7 @@ public final class HeimdallServer implements HeroServer {
     @Override
     public void onLogout(ServerPlayer player) {
         GuardiansWatch.lose(player, "message.enhanced.watch.lost");
+        HeimdallPost.onGone(player);
         HeimdallAbilities.onGone(player);
     }
 
@@ -112,6 +114,7 @@ public final class HeimdallServer implements HeroServer {
     @Override
     public void onServerStopped() {
         GuardiansWatch.clear();
+        HeimdallPost.clear();
         HeimdallAbilities.clear();
     }
 }

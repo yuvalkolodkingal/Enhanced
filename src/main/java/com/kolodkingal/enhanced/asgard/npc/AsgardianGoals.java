@@ -365,7 +365,7 @@ final class AsgardianGoals {
 
         @Override
         public boolean canUse() {
-            return (heimdall || guard(npc)) && npc.free() && npc.home() != null;
+            return (heimdall || guard(npc)) && npc.free() && npc.post() != null;
         }
 
         @Override
@@ -380,7 +380,8 @@ final class AsgardianGoals {
 
         @Override
         public void tick() {
-            BlockPos post = npc.home();
+            // (3.5.1) While a player keeps Heimdall's post, his post is his rest spot nearby; he walks back after.
+            BlockPos post = npc.post();
             if (post == null || --repath > 0) {
                 return;
             }
@@ -388,6 +389,9 @@ final class AsgardianGoals {
             Vec3 at = Vec3.atBottomCenterOf(post);
             if (npc.distanceToSqr(at) > 2.25) {
                 npc.getNavigation().moveTo(at.x, at.y, at.z, 0.7);
+            } else if (npc.getNavigation().isDone() && npc.restAt() != null && npc.home() != null) {
+                // Resting, he watches his post (and whoever keeps it).
+                face(npc, Vec3.atBottomCenterOf(npc.home()));
             } else if (npc.getNavigation().isDone() && npc.level().getNearestPlayer(npc, 8.0) == null) {
                 // Heimdall looks out of the Observatory to the stars, a guard out of his gate or door (both south).
                 face(npc, at.add(0, 0, 8));
