@@ -8,8 +8,8 @@ Hebrew: [עברית](Asgardians-HE)
 
 | Who | Where | What they do |
 |---|---|---|
-| **Heimdall** | The Observatory | Keeps watch at his post. Offers the **Guardian's Watch**, and sends anyone home or back where they came from. See [Heimdall](Heimdall). |
-| **Odin** | Asleep in his chamber in the palace's east wing until [Hela](Hela) first falls; then awake, in the throne room | Asleep, Frigga answers for him. Awake, he speaks of Gungnir, his ravens and the vault. See [Odin](Odin). |
+| **Heimdall** | The Observatory | Keeps watch at his post. Offers the **Guardian's Watch**, and sends anyone home or back where they came from. A player who is Heimdall is handed his post for a while ([Heimdall's post](Heimdall#two-guardians-heimdalls-post-351)). See [Heimdall](Heimdall). |
+| **Odin** | Asleep in his chamber in the palace's east wing until [Hela](Hela) first falls; then awake, in the throne room. **Away while a player is Odin** (below) | Asleep, Frigga answers for him. Awake, he speaks of Gungnir, his ravens and the vault. See [Odin](Odin). |
 | **Frigga** | Her gardens | The queen. Tells you about Odin and the seal behind the throne, and **heals you** if you are hurt. |
 | **Sif** | The training grounds | Trains with you, trades weapons, and tells you about Heimdall's Watch. |
 | **Fandral**, **Hogun** | The training grounds | Fandral knows the city, the Rainbow Bridge and Gungnir; Hogun knows the vault and why it is sealed. They spar with each other and with Sif. |
@@ -20,6 +20,19 @@ Hebrew: [עברית](Asgardians-HE)
 
 Each named Asgardian is there **exactly once**: the city brings back anyone who is missing, at his home, when nobody is looking. They live their days: Heimdall and the guards keep their posts, the Einherjar walk their rounds, Sif, Fandral, Hogun and Volstagg spar in the ring (with sparks and the clash of blades), Volstagg feasts, Frigga and the citizens sit on the benches, two Asgardians who meet stop and talk a while. Look at one to see his name.
 
+## One of each character
+
+There can't be two Odins (3.5.1). **While any player online is [Odin](Odin)**, the Odin of the city is **away**: he leaves in a shimmer of gold wherever he is (when someone is crowned on the throne, at once; otherwise within 5 seconds), and the city makes none while a player is Odin. When **nobody is Odin any more**, he comes back to his chamber (or the throne room, once awake) in the same gold shimmer.
+
+The Asgardians' words follow. Where they used to say the Allfather sleeps, they now name the player:
+
+* **Frigga**, asked *Where is Odin?*: "The Allfather has woken: Eilon sits the throne now. Be kind to them; a crown is heavier than it looks."
+* **Hogun** on the vault: "The Allfather has woken: Eilon holds its key now." / "Odin has woken. Eilon carries his name now. Ask them, not me."
+* **Fandral** on Gungnir: "Gungnir has found its hand again: Eilon, our Allfather!"
+* **The Einherjar**'s news and **the citizens**' rumours: "The Allfather has woken! Eilon sits the throne."
+
+The same rule holds for any Asgardian whose hero can be played. Today that is Odin only: **Heimdall is the exception**, he stays and shares his post with a player who is Heimdall ([Heimdall's post](Heimdall#two-guardians-heimdalls-post-351)). If two players are Odin, the lines name both.
+
 ## Talking
 
 * **Right-click** an Asgardian (within 6 blocks) to talk. A screen shows who speaks, his line, and up to **three answers**: click one, or press **1**, **2** or **3**. **Farewell** or **Esc** ends the talk. In Hebrew everything reads right to left.
@@ -29,8 +42,8 @@ Each named Asgardian is there **exactly once**: the city brings back anyone who 
 
 | Who | Ask | You learn |
 |---|---|---|
-| Heimdall | *Take the Watch* / *Send me home* / *Take me back where I came from* / *I lost Hofund* | The Guardian's Watch; the Bifrost home or back to where you came from (no key needed); a new Hofund after you have won the Watch |
-| Frigga | *Where is Odin?* / *What is behind the throne?* / *What is Gungnir?* / *I'm hurt. Can you help me?* | Odin sleeps until Hela falls; **Hela's Seal** is behind the throne; Gungnir is for those who face Hela; she heals you (Regeneration II for 10 seconds, once every 5 minutes) |
+| Heimdall | *Take the Watch* / *Send me home* / *Take me back where I came from* / *I lost Hofund* | The Guardian's Watch; the Bifrost home or back to where you came from (no key needed); a new Hofund after you have won the Watch. To a player who is Heimdall: his post (*I will guard it well* / *Take your post back*) |
+| Frigga | *Where is Odin?* / *What is behind the throne?* / *What is Gungnir?* / *I'm hurt. Can you help me?* | Odin sleeps until Hela falls (or which player is Odin now); **Hela's Seal** is behind the throne; Gungnir is for those who face Hela; she heals you (Regeneration II for 10 seconds, once every 5 minutes) |
 | Sif | *Can I train with you?* / *Can we trade?* / *Any advice for me?* | Her training duel; her trades; Heimdall's Watch |
 | Valkyrie | *Tell me about Hela's army.* / *Who is Hela?* / *Can we trade?* | Bring friends to fight Hela; her trades |
 | Volstagg | *Tell me a joke!* / *Who are you three?* / *Can we trade?* | Six jokes; the Warriors Three; his trades |

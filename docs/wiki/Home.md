@@ -40,6 +40,15 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin and Hela) are on [Looks](Looks).
 
+## What's new in 3.5.1
+
+Eilon's requests:
+
+* **Hela's headdress** is redrawn as her horned crown from the film: long black horns with a dark green sheen fanning out round her head and sweeping back (the hero, the boss, her shadows and the item).
+* **One of each character:** while a player is [Odin](Odin), the Odin of the city leaves in a shimmer of gold and comes back when nobody is Odin; the Asgardians say "The Allfather has woken" and name the player. See [Asgardians](Asgardians#one-of-each-character).
+* **Heimdall stays**, and hands a player who is Heimdall his post for 10 minutes: "We are both guardians of Asgard." The socket and the Bifrost answer to the keeper. See [Heimdall](Heimdall#two-guardians-heimdalls-post-351).
+* The network protocol stays 9; update the server and every player together.
+
 ## What's new in 3.5
 
 Eilon asked for Asgard.

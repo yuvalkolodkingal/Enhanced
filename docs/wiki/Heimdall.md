@@ -21,6 +21,20 @@ Hebrew: [עברית](Heimdall-HE)
 
 **Lose** (the time runs out, you die, you leave Asgard or log out, or you tell Heimdall "I give up the Watch") and the shadows slip away: "Try again when you are ready." You may take the Watch again after **60 seconds**. You keep the Watch only once: after you have won, Heimdall gives you a new Hofund if you lose yours ("I lost Hofund").
 
+## Two guardians: Heimdall's post (3.5.1)
+
+There is one of each character in Asgard (see [Asgardians](Asgardians#one-of-each-character)), but **Heimdall is the exception**: when you are Heimdall, the Heimdall of the Observatory **stays**, and shares his watch with you.
+
+* **When:** the first time you come near him as Heimdall (within 6 blocks), and again whenever you talk to him after that, he **hands you his post**: "We are both guardians of Asgard. Keep the Bifrost for me a while: my socket answers to you now. I will rest my eyes over there."
+* **For how long:** **10 minutes** (`heimdall.postSeconds`). A gold bar at the top of the screen counts it down: "Keeper of the Bifrost — 9:41".
+* **He steps aside** to a spot a few blocks from his post and watches it while you keep it.
+* **While you keep it:**
+  * **Hofund's socket answers to you:** right-click it and the Bifrost mechanism spins up; if another player is in the Observatory, Heimdall's Bifrost screen opens to **send the nearest one** wherever you choose (home, Asgard, your places).
+  * **You send others with no cooldown** from the Observatory (your Bifrost for a friend, Sneak + N, as the Heimdall of the city does it).
+  * Others who talk to him hear who keeps the Bifrost ("Eilon keeps the Bifrost for me now"), and he can still send them home.
+* **It ends** when the time is up, when you give it back (talk to him: **Take your post back**), or when you stop being Heimdall, leave Asgard, die or log out. He walks back to his post: "Thank you, guardian. I take my post again. We are both guardians of Asgard."
+* One keeper at a time: a second Heimdall waits until the post is free.
+
 ## Hofund
 
 Heimdall's sword: a long golden broadsword.

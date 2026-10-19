@@ -1080,6 +1080,7 @@ Section `[heimdall]` (3.5). The hero's page is [Heimdall](Heimdall), with the Gu
 | `heimdall.watchSeconds` | `180` | 30 to 1200 | How long the Guardian's Watch lasts, in seconds (180 = 3 minutes). |
 | `heimdall.watchRetry` | `1200` | 0 to 72000 | Ticks before a player who lost the Watch may take it again (1200 = 60 seconds). |
 | `heimdall.hofundBonus` | `0.3` | 0.0 to 5.0 | How much more damage Heimdall deals with Hofund (0.3 = 30% more). |
+| `heimdall.postSeconds` | `600` | 1 to 7200 | How long (seconds) the Heimdall of the city hands his post (the Observatory and the Bifrost) to a player who is Heimdall, while he rests nearby (3.5.1; see [Heimdall's post](Heimdall#two-guardians-heimdalls-post-351)). |
 
 ## Odin
 

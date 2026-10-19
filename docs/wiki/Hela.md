@@ -102,11 +102,13 @@ Press **H** to switch. See [Looks](Looks).
 
 | Look | Id | What it is |
 |---|---|---|
-| **Goddess of Death** (default) | `goddess` | Her flat black suit with dark emerald lines and the black-green hood; with the form on, the **antlered headdress** (eight dark green tines). |
+| **Goddess of Death** (default) | `goddess` | Her flat black suit with dark emerald lines and the black-green hood; with the form on, the **antlered headdress**: eight long black horns with a dark green sheen that fan out round her head and sweep back, the inner ones with a short prong (redrawn in 3.5.1). |
 | **Arrival** | `arrival` | The long black cloak and swept-back hair of her arrival; the headdress only while the form is on. |
 | **Your own skin** | `own` | Her powers in your own skin. |
 
 With the form on she holds a black blade in each hand. Everyone sees the blades, the spikes, the smoke and the risen dead.
+
+The same horned crown is worn by the boss (it grows during her arrival) and by her Shadows in [Heimdall's Watch](Heimdall#becoming-heimdall-the-guardians-watch); the Headdress item shows it from the front.
 
 ### The HUD
 
