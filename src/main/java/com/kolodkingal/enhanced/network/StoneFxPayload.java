@@ -13,8 +13,8 @@ import java.util.List;
 
 /**
  * Server → client (3.6): a moment of the Infinity Stones everyone near should see. The kinds are listed here (lane
- * L1's: the rejection, the slip, the pedestal, the Snap; lane L2's: the powers; lane L5's: the soul given); the client
- * hands each kind to the drawer its lane registered ({@code StoneFx.register}).
+ * L1's: the rejection, the slip, the pedestal, the Snap; lane L2's: the powers; lane L5's: the soul given; lane L4's:
+ * the site ambience); the client hands each kind to the drawer its lane registered ({@code StoneFx.register}).
  *
  * @param kind     what happened (a constant of this record)
  * @param entityId the stone, its holder or its pedestal (the meaning depends on the kind), or -1
@@ -36,6 +36,8 @@ public record StoneFxPayload(int kind, int entityId, List<Vec3> points, int arg)
     public static final int SOUL_GIVEN = 9;
     public static final int SNAP = 10;
     public static final int PEDESTAL_TAKE = 11;
+    /** The site ambience to loop for this player (arg: {@code SiteAmbience.NONE|SANCTUM_LOOP|END_TUNNEL_LOOP}). */
+    public static final int SITE_AMBIENCE = 12;
 
     public static final Type<StoneFxPayload> TYPE = new Type<>(Enhanced.id("stone_fx"));
 

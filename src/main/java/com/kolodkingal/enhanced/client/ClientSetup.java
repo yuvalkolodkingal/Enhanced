@@ -109,6 +109,8 @@ public final class ClientSetup {
             // ===== stones (3.6) =====
             StoneCoreClient.setup();
             // ===== strange (3.6) =====
+            // ===== stone_sites (3.6) =====
+            com.kolodkingal.enhanced.client.world.SiteAmbienceClient.setup();
             // ===== vormir (3.6) =====
             com.kolodkingal.enhanced.client.vormir.VormirClient.setup();
             // ===== hulk (3.6) =====
