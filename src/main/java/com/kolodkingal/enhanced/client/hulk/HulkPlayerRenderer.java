@@ -86,8 +86,11 @@ public class HulkPlayerRenderer extends PlayerRenderer {
         ModelPart arm = right ? hulk.rightArm : hulk.leftArm;
         ModelPart sleeve = right ? hulk.rightSleeve : hulk.leftSleeve;
         poseStack.pushPose();
-        // (The shoulder is 3.5 pixels further out than a player's and the arm a third longer: back into view.)
-        poseStack.translate((right ? 1.0F : -1.0F) * 3.0F / 16.0F, -0.14F, 0.0F);
+        // (The view's arm hangs where a player's would: the Hulk's shoulder stands 3.5 pixels further out, which would
+        // take his huge forearm out of view.)
+        arm.x = right ? -5.0F : 5.0F;
+        arm.z = 0.0F;
+        sleeve.copyFrom(arm);
         arm.xRot = 0.0F;
         sleeve.xRot = 0.0F;
         ResourceLocation texture = getTextureLocation(player);

@@ -102,7 +102,7 @@ public class HulkModel extends PlayerModel<AbstractClientPlayer> {
         leftArm.x *= k;
         leftArm.z *= k;
         head.y += HEAD_DY;
-        head.z += HEAD_DZ;
+        head.z = HEAD_DZ; // (the vanilla animation never sets the head's z: set, not added, or it would run away)
         rightLeg.y += LEG_DY;
         leftLeg.y += LEG_DY;
         rightLeg.x = Math.signum(rightLeg.x) * Math.max(Math.abs(rightLeg.x), HIP_X);
