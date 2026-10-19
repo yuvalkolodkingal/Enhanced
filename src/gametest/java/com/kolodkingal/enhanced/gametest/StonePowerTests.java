@@ -306,6 +306,36 @@ public final class StonePowerTests {
         helper.succeed();
     }
 
+    /**
+     * Through the stone's own item (lane L1's): a use starts the Mind Beam and holds the stone; letting go of it ends
+     * the beam with the short cooldown.
+     */
+    @GameTest(template = ARENA, batch = "stones_mind")
+    public static void theStoneItemsUseHoldsAndReleasesTheBeam(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = holder(f, 3.5, 16.5, Power.THOR, StoneKind.MIND);
+        Zombie husk = husk(helper, 8.5, 16.5);
+        lookAt(thor, husk);
+        thor.getMainHandItem().use(f.level(), thor, InteractionHand.MAIN_HAND);
+        check(StoneUse.holding(thor, StoneKind.MIND) && thor.isUsingItem(), "the item's use holds the beam");
+        thor.releaseUsingItem();
+        check(!StoneUse.holding(thor) && !ContinuousBeam.isFiring(thor), "letting go of the item ends it");
+        check(StoneCooldowns.remaining(thor, StoneKind.MIND, f.level().getGameTime()) == 20, "a short cooldown");
+        helper.succeed();
+    }
+
+    /** The Titan's Mind Stone in a Gauntlet answers him unless {@code mindForThanos} is off. */
+    @GameTest(template = ARENA, batch = "stones_mind_cfg")
+    public static void theTitansMindStoneFollowsTheConfig(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thanos = f.player(5.5, FLOOR, 5.5, Power.THANOS);
+        check(StoneUse.refusal(thanos, StoneKind.MIND, StoneUse.Source.GAUNTLET) == null, "by default it answers him");
+        f.config(StonesConfig.MIND_FOR_THANOS, false);
+        Component no = StoneUse.refusal(thanos, StoneKind.MIND, StoneUse.Source.GAUNTLET);
+        check(no != null && key(no).equals("message.enhanced.stones.use.mind_for_thanos"), "off, it does not: " + no);
+        helper.succeed();
+    }
+
     /** A player is never commanded: with PvP on he is only confused. */
     @GameTest(template = ARENA, batch = "stones_mind_pvp")
     public static void theMindCommandOnlyConfusesAPlayer(GameTestHelper helper) {
@@ -419,6 +449,22 @@ public final class StonePowerTests {
         StoneCooldowns.start(billy, StoneKind.TIME, 0);
         check(TimeStonePowers.cropMagic(billy, StoneUse.Source.BARE, at, true), "and back");
         check(f.level().getBlockState(at).getValue(CropBlock.AGE) == 3, "one stage down");
+        helper.succeed();
+    }
+
+    /** The Time Stone's use, looking at wheat, grows it (the item's use reaches StoneUse, which finds the crop). */
+    @GameTest(template = ARENA, batch = "stones_time")
+    public static void theTimeStonesUseOnACropGrowsIt(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer billy = holder(f, 12.5, 4.5, Power.BILLY, StoneKind.TIME);
+        BlockPos crop = new BlockPos(14, 2, 4);
+        helper.setBlock(crop.below(), Blocks.FARMLAND);
+        helper.setBlock(crop, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 2));
+        BlockPos at = helper.absolutePos(crop);
+        lookAt(billy, Vec3.atBottomCenterOf(at).add(0.0, 0.1, 0.0));
+        use(billy, StoneKind.TIME, false);
+        check(f.level().getBlockState(at).getValue(CropBlock.AGE) == 3, "one stage up");
+        check(!TimeStonePowers.slowing(billy), "and time is not slowed");
         helper.succeed();
     }
 

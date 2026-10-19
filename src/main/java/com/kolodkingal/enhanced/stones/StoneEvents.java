@@ -20,7 +20,6 @@ import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -28,18 +27,14 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Where the stones' powers meet the game (3.6, lane L2): the use of a bare stone or of a filled Gauntlet's selected
- * stone (right-click, Sneak + right-click, held for the beams and the drain), the Time Stone on a crop or a baby
- * animal, every player's tick ({@link StoneUse#tick}), a projectile about to hit a Reality Stone's holder, the blows
- * that tear a Soul Drain, the Mind Command's allies who never turn on their commander, and what is forgotten when a
- * player leaves. The Gauntlet's Snap (Sneak + hold with all six) stays the Gauntlet's own (lane L1); the vessels call
- * {@link StoneUse} themselves ({@code ScepterRituals}, the Eye of Agamotto).
+ * Where the stones' powers meet the game (3.6, lane L2): the Time Stone on a crop or a baby animal (a bare stone's and
+ * a Gauntlet's own uses are their items', lane L1's, which call {@link StoneUse}), every player's tick
+ * ({@link StoneUse#tick}), a projectile about to hit a Reality Stone's holder, the blows that tear a Soul Drain, the
+ * Mind Command's allies who never turn on their commander, and what is forgotten when a player leaves. The vessels
+ * call {@link StoneUse} themselves ({@code ScepterRituals}, the Eye of Agamotto).
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class StoneEvents {
-    /** How long a held stone use may last as an item use (the stone ends it long before). */
-    static final int HOLD_DURATION = 72000;
-
     static {
         StoneBeams.init();
         AreaTargets.addAllyRule(MindStonePowers::isCommandedBy);
@@ -68,28 +63,10 @@ public final class StoneEvents {
         return new InHand(gauntlet.selectedStone(), StoneUse.Source.GAUNTLET);
     }
 
-    /** Whether this use of the stone is held (a beam, a drain): the item is then used until it is let go of. */
-    public static boolean held(StoneKind kind, boolean alt) {
-        return !alt && (kind == StoneKind.MIND || kind == StoneKind.POWER || kind == StoneKind.SOUL);
-    }
-
-    @SubscribeEvent
-    public static void onUseItem(PlayerInteractEvent.RightClickItem event) {
-        Player player = event.getEntity();
-        InHand stone = stoneOf(event.getItemStack(), player.isShiftKeyDown());
-        if (stone == null) {
-            return;
-        }
-        boolean alt = player.isShiftKeyDown();
-        boolean held = held(stone.kind(), alt);
-        event.setCanceled(true);
-        event.setCancellationResult(held ? InteractionResult.CONSUME : InteractionResult.SUCCESS);
-        if (player instanceof ServerPlayer server) {
-            useInHand(server, event.getHand(), stone.kind(), stone.source(), alt);
-        }
-    }
-
-    /** A stone in {@code hand} is used (the server's half of a right-click; the tests call it too). */
+    /**
+     * A stone in {@code hand} is used as its item does it (lane L1's {@code InfinityStoneItem} and
+     * {@code InfinityGauntletItem} call {@link StoneUse#use} on the press and on the release): for the tests.
+     */
     public static void useInHand(ServerPlayer player, InteractionHand hand, StoneKind kind, StoneUse.Source source,
                                  boolean alt) {
         if (StoneUse.holding(player)) {
@@ -98,17 +75,6 @@ public final class StoneEvents {
         StoneUse.use(player, kind, source, alt, true);
         if (StoneUse.holding(player, kind) && !player.isUsingItem()) {
             player.startUsingItem(hand);
-        }
-    }
-
-    /** A stone or a crafted Gauntlet used as a hold lasts until it is let go of (the item has no length of its own). */
-    @SubscribeEvent
-    public static void onUseStart(LivingEntityUseItemEvent.Start event) {
-        if (event.getDuration() > 0) {
-            return;
-        }
-        if (stoneOf(event.getItem(), false) != null) {
-            event.setDuration(HOLD_DURATION);
         }
     }
 

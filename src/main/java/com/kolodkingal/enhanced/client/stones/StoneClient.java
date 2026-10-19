@@ -69,11 +69,13 @@ public final class StoneClient {
 
     static void register() {
         StoneBeams.init();
+        StoneHudFeed.register();
         BeamRenderer.registerDrawer(StoneBeams.MIND, StoneBeamFx.MIND);
         BeamRenderer.registerDrawer(StoneBeams.POWER, StoneBeamFx.POWER);
         StoneFx.register(StoneFxPayload.BUBBLE, p -> {
             if (local(p.entityId())) {
                 bubbleAt = now();
+                StoneHudFeed.bubbles(p.arg());
             }
         });
         StoneFx.register(StoneFxPayload.REWIND, p -> {

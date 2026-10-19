@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.ThanosAbilities;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.CustomHeroConfig;
+import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.custom.StoneRow;
 import com.kolodkingal.enhanced.custom.Trait;
@@ -25,6 +26,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -148,6 +151,11 @@ public final class StoneUse {
         if (HOLDS.containsKey(player.getUUID())) {
             return true; // (one held use at a time: a second key while a beam burns does nothing)
         }
+        // The Time Stone used on a crop or a sapling it looks at works on that (a click on a block reaches the item's
+        // use when nothing else took it).
+        if (kind == StoneKind.TIME && source != Source.ROW && cropMagic(player, source, alt)) {
+            return true;
+        }
         if (!StoneCooldowns.ready(player, kind, cast.now())) {
             return true;
         }
@@ -232,6 +240,9 @@ public final class StoneUse {
             case GAUNTLET -> {
                 if (!StoneRules.mayWield(player)) {
                     yield Component.translatable("message.enhanced.gauntlet.not_yours");
+                }
+                if (kind == StoneKind.MIND && isThanos(player) && !StonesConfig.MIND_FOR_THANOS.get()) {
+                    yield Component.translatable("message.enhanced.stones.use.mind_for_thanos");
                 }
                 yield kind != StoneKind.TIME || sorcerer ? null
                         : Component.translatable("message.enhanced.stones.use.no_sorcerer");
@@ -483,6 +494,16 @@ public final class StoneUse {
             case TIME -> ModItems.EYE_OF_AGAMOTTO.get();
             default -> null;
         };
+    }
+
+    /** The Time Stone's crop magic on the block the player looks at, if it is a crop or a sapling (true: it acted). */
+    private static boolean cropMagic(ServerPlayer player, Source source, boolean sneaking) {
+        HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
+        if (!(hit instanceof BlockHitResult block) || hit.getType() != HitResult.Type.BLOCK
+                || !TimeStonePowers.isCropTarget(player.level().getBlockState(block.getBlockPos()), sneaking)) {
+            return false;
+        }
+        return TimeStonePowers.cropMagic(player, source, block.getBlockPos(), sneaking);
     }
 
     /** Whether the player is the hero Thanos (or a custom hero with his stones), whose own tick runs a Soul Drain. */
