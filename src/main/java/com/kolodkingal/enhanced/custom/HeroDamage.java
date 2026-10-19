@@ -102,6 +102,13 @@ public final class HeroDamage {
         first(ModDamageTypes.HULK_LEAP, HeroAbility.HULK_LEAP);
         first(ModDamageTypes.HULK_BOULDER, HeroAbility.HULK_BOULDER);
         first(ModDamageTypes.HULK_CHARGE, HeroAbility.HULK_GAMMA_CHARGE, HeroAbility.HULK_BOULDER);
+        // 3.7 (the skeleton): Wolverine and Deadpool (the Spin Slash is the claws' too, the Drop-In the katanas', the
+        // Trick Shot the pistols').
+        first(ModDamageTypes.WOLVERINE_CLAWS, HeroAbility.WOLVERINE_SLASH, HeroAbility.WOLVERINE_SPIN_SLASH,
+                HeroAbility.WOLVERINE_CLAWS);
+        first(ModDamageTypes.WOLVERINE_POUNCE, HeroAbility.WOLVERINE_POUNCE);
+        first(ModDamageTypes.DEADPOOL_KATANA, HeroAbility.DEADPOOL_KATANAS, HeroAbility.DEADPOOL_DROP_IN);
+        first(ModDamageTypes.DEADPOOL_BULLET, HeroAbility.DEADPOOL_PISTOLS, HeroAbility.DEADPOOL_TRICK_SHOT);
     }
 
     private static void first(ResourceKey<DamageType> type, CatalogEntry... rows) {
