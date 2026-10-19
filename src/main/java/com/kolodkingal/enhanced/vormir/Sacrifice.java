@@ -201,13 +201,17 @@ public final class Sacrifice {
 
     /**
      * Why {@code onePer} gives the seeker no stone now ({@link Outcome#ALREADY_HAS}, {@link Outcome#TAKEN}), or null.
+     * The stones' ledger counts the Soul Stone by {@code [soul_stone] onePer} ({@link StoneLedger#mayTake}): in {@code
+     * player} mode one who has taken his (the bit of his progress) or carries one has it already; in {@code world}
+     * mode the world's stone has a holder until it is lost.
      */
     @Nullable
     public static Outcome refusal(ServerPlayer seeker) {
+        boolean ledger = StoneLedger.mayTake(seeker, StoneKind.SOUL);
         return switch (onePer()) {
             case UNLIMITED -> null;
-            case WORLD -> VormirRecord.get(seeker.server).taken() ? Outcome.TAKEN : null;
-            case PLAYER -> seeker.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL)
+            case WORLD -> ledger ? null : Outcome.TAKEN;
+            case PLAYER -> !ledger || seeker.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL)
                     || seeker.getInventory().contains(new ItemStack(ModItems.SOUL_STONE.get()))
                     ? Outcome.ALREADY_HAS : null;
         };
@@ -329,12 +333,11 @@ public final class Sacrifice {
         } else if (!seeker.getInventory().add(stone)) {
             seeker.drop(stone, false);
         }
-        seeker.setData(ModAttachments.STONES, seeker.getData(ModAttachments.STONES).withTaken(StoneKind.SOUL, true)
-                .with(StoneProgress.SACRIFICED_FOR));
+        StoneProgress progress = seeker.getData(ModAttachments.STONES).with(StoneProgress.SACRIFICED_FOR);
+        // (The ledger's player mode keeps the same bit: set here too, so it holds whatever the ledger's state.)
+        seeker.setData(ModAttachments.STONES, onePer() == SoulStoneConfig.OnePer.PLAYER
+                ? progress.withTaken(StoneKind.SOUL, true) : progress);
         StoneLedger.taken(seeker, StoneKind.SOUL);
-        if (onePer() == SoulStoneConfig.OnePer.WORLD) {
-            VormirRecord.get(server).take(seeker.getUUID());
-        }
         Stonekeeper.say(seeker, Outcome.SACRIFICE.line());
         seeker.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 20));
         seeker.connection.send(new ClientboundSetTitleTextPacket(

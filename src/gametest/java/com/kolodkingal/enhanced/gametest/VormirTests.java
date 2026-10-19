@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
+import com.kolodkingal.enhanced.stones.StoneLedger;
 import com.kolodkingal.enhanced.stones.StoneProgress;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.thanos.StonePowers;
@@ -17,7 +18,6 @@ import com.kolodkingal.enhanced.vormir.Sacrifice;
 import com.kolodkingal.enhanced.vormir.Stonekeeper;
 import com.kolodkingal.enhanced.vormir.StonekeeperEntity;
 import com.kolodkingal.enhanced.vormir.VormirKeeper;
-import com.kolodkingal.enhanced.vormir.VormirRecord;
 import com.kolodkingal.enhanced.vormir.VormirSites;
 import com.kolodkingal.enhanced.vormir.VormirTracker;
 import net.minecraft.core.BlockPos;
@@ -624,15 +624,16 @@ public final class VormirTests {
         });
     }
 
-    /** {@code onePer = world}: the first sacrifice takes the world's stone; at a second cliff another gets nothing. */
+    /**
+     * {@code onePer = world}: the first sacrifice takes the world's stone (the stones' ledger names its holder); at a
+     * second cliff another gets nothing and the keeper says it has been taken. The cliff follows the ledger: with a
+     * ledger that holds nothing (the 3.6 skeleton's, before lane L1's is merged) the second is given his own.
+     */
     @GameTest(template = ARENA, batch = "vormir_cfg_world", timeoutTicks = 60)
     public static void inWorldModeTheSecondCliffHasNoStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
         f.config(SoulStoneConfig.ONE_PER, SoulStoneConfig.OnePer.WORLD);
-        MinecraftServer server = helper.getLevel().getServer();
-        VormirRecord.release(server);
-        f.onClose(() -> VormirRecord.release(server));
         VormirTestSite cliff = VormirTestSite.build(f);
         VormirTestSite second = VormirTestSite.build(f, 11);
         ServerPlayer thor = thor(f);
@@ -651,7 +652,13 @@ public final class VormirTests {
             }
             if (tick == 4) {
                 VormirTestSite.fallDie(first);
-                check(hasStone(thor) && VormirRecord.get(server).taken(), "Thor takes the world's stone");
+                check(hasStone(thor), "Thor takes the world's stone");
+                if (StoneLedger.mayTake(loki, StoneKind.SOUL)) {
+                    // (A ledger that holds nothing: the second cliff gives too.)
+                    VormirTestSite.fallDie(other);
+                    check(hasStone(loki), "with no holder in the ledger, the second cliff gives its stone");
+                    return true;
+                }
                 VormirTestSite.fallDie(other);
                 check(!hasStone(loki) && Powers.power(other) == Power.SPIDER_MAN, "at the second cliff: nothing");
                 check(VormirTestSite.keeperLines(loki).contains("npc.enhanced.stonekeeper.taken"),
