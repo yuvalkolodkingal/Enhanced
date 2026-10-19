@@ -26,6 +26,7 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.BooleanValue IGNORE_SERVER_MUSIC;
     public static final ModConfigSpec.BooleanValue HULK_MODEL;
     public static final ModConfigSpec.BooleanValue DEADPOOL_LINES;
+    public static final ModConfigSpec.BooleanValue SHOW_DEATH_MEETING;
 
     static {
         BUILDER.push("animation");
@@ -109,6 +110,13 @@ public final class EnhancedClientConfig {
         DEADPOOL_LINES = BUILDER.comment("Whether Deadpool's joke lines are shown (the speech bubbles over his head",
                 "and, when you are Deadpool, the action bar).")
                 .define("deadpoolLines", true);
+        BUILDER.pop();
+        // 3.7 (lane L8): the meeting with Death.
+        BUILDER.push("death_meeting");
+        SHOW_DEATH_MEETING = BUILDER.comment("When you die, meet Death (Rio, the Green Witch) and choose where to",
+                        "start again. Off: the plain vanilla death screen.")
+                .translation("config.enhanced.show_death_meeting")
+                .define("showDeathMeeting", true);
         BUILDER.pop();
     }
 
@@ -203,6 +211,11 @@ public final class EnhancedClientConfig {
     /** Whether Deadpool's joke lines are shown (true until the config has loaded). */
     public static boolean deadpoolLines() {
         return !SPEC.isLoaded() || DEADPOOL_LINES.get();
+    }
+
+    /** Whether a death shows the meeting with Death (true until the config has loaded). */
+    public static boolean showDeathMeeting() {
+        return !SPEC.isLoaded() || SHOW_DEATH_MEETING.get();
     }
 
     private EnhancedClientConfig() {
