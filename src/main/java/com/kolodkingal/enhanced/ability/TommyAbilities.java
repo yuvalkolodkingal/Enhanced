@@ -47,6 +47,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,11 +57,13 @@ import java.util.UUID;
 
 /**
  * Tommy Maximoff (Speed): Wanda's son, a speedster like his uncle Pietro. His speed doesn't slow the world down (that is
- * Quicksilver's trick); he leaves a teal-green ghost trail instead, as in the Battle of Westview.
+ * Quicksilver's trick); he leaves a teal-green ghost trail instead, as in the Battle of Westview. 3.6.1: he runs as his
+ * uncle does: on walls, ceilings and water (his Wall &amp; Water Run, Sneak + R, {@link WaterRun}), and swims faster.
  */
 public final class TommyAbilities {
     private static final ResourceLocation SPEED_ID = Enhanced.id("tommy_speed");
     private static final ResourceLocation STEP_ID = Enhanced.id("tommy_step");
+    private static final ResourceLocation SWIM_ID = Enhanced.id("tommy_swim");
 
     public static final int BLITZ_RADIUS = 12;
     public static final int BLITZ_MAX_TARGETS = 8;
@@ -228,12 +231,19 @@ public final class TommyAbilities {
         whirlwindTick(player, data);
     }
 
-    /** Super speed and step-up while Tommy runs; also called when the power changes. */
+    /**
+     * Super speed and step-up while Tommy runs, and (3.6.1, as his uncle) faster swimming while his Super Speed or his
+     * slow time is on; also called when the power changes.
+     */
     public static void applySpeed(ServerPlayer player, PowerData data) {
         boolean running = data.has(HeroAbility.TOMMY_SPEED) && data.is(Live.SPEEDING);
+        boolean quick = data.has(HeroAbility.TOMMY_SPEED) && data.toggle(Toggle.SUPER_SPEED)
+                || data.has(HeroAbility.TOMMY_TIME) && data.toggle(Toggle.TOMMY_TIME);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SPEED_ID, EnhancedConfig.TOMMY_SPEED_BONUS.get(), running,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         PowerTicker.setModifier(player, Attributes.STEP_HEIGHT, STEP_ID, 0.65, running);
+        PowerTicker.setModifier(player, NeoForgeMod.SWIM_SPEED, SWIM_ID, QuicksilverAbilities.actionSpeed() - 1.0, quick,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
     public static boolean isRunning(Player player) {

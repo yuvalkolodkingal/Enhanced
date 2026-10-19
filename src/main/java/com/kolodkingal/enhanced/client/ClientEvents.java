@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.bifrost.BifrostKeys;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
+import com.kolodkingal.enhanced.ability.WaterRun;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.client.render.Afterimages;
@@ -41,13 +42,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.Music;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -265,28 +263,13 @@ public final class ClientEvents {
     }
 
     /**
-     * Quicksilver's footwork on water, done on the client because players move themselves: while he runs at super speed
-     * with Wall &amp; Water Run on, he runs across water as long as he keeps running. (Walls and ceilings are
-     * {@link SpeedsterMotion}'s, since 3.3.)
+     * The speedsters' footwork on water, done on the client because players move themselves ({@link WaterRun}: 3.3
+     * Quicksilver's Wall &amp; Water Run; 3.6.1 Tommy's Wall Run too). Walls and ceilings are {@link SpeedsterMotion}'s.
      */
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
-        if (!(event.getEntity() instanceof LocalPlayer player)) {
-            return;
-        }
-        PowerData data = Powers.get(player);
-        // (3.4: a custom hero runs on water only with Quicksilver's Wall & Water Run, not with his speed alone)
-        if (!QuicksilverAbilities.isRunning(player) || !data.has(HeroAbility.QUICKSILVER_WALL_RUN) || !data.wallRun()
-                || player.getAbilities().flying || SpeedsterMotion.runner().active()) {
-            return;
-        }
-        Vec3 motion = player.getDeltaMovement();
-        BlockPos below = BlockPos.containing(player.getX(), player.getY() - 0.05, player.getZ());
-        if (!player.isInWater() && motion.y <= 0 && player.level().getFluidState(below).is(FluidTags.WATER)
-                && player.level().getBlockState(below.above()).isAir()) {
-            player.setDeltaMovement(motion.x, 0.0, motion.z);
-            player.setOnGround(true);
-            player.resetFallDistance();
+        if (event.getEntity() instanceof LocalPlayer player && !SpeedsterMotion.runner().active()) {
+            WaterRun.hold(player);
         }
     }
 

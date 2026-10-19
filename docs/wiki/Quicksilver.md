@@ -84,7 +84,7 @@ The Dash Strike and the Pebble Barrage hurt players only with PvP on, and do not
 
 *The speedster way, not the spider's: he does not cling, he runs, and only as long as he is fast.* (3.3, Quicksilver and Tommy.)
 
-* **Start:** with super speed on, **sprint into a wall** (holding **W** towards it). He runs **straight up** it. Quicksilver needs **Wall & Water Run** on (**B**); Tommy's **Wall Run** is on from the start (**Sneak + R** switches it).
+* **Start:** with super speed on, **sprint into a wall** (holding **W** towards it). He runs **straight up** it. Quicksilver needs **Wall & Water Run** on (**B**); Tommy's **Wall & Water Run** is on from the start (**Sneak + R** switches it; since 3.6.1 it takes him across water too).
 * **At the top** he hops over onto the roof. **Under a ceiling or an overhang** he runs on **along the ceiling**, upside down, the way he looks; a wall ahead turns him **down** it to the floor, and the edge of an overhang takes him round its lip and up its outer face. The camera turns round smoothly so that **W** keeps meaning "on".
 * **Keep going:** hold **W** and keep sprinting. On a wall or a ceiling he runs at four fifths of his ground speed. Let go of **W**, lose the sprint or run out of food and he slows down; too slow, he **drops off** (pushed a little away from the surface). A hole in the ceiling or the end of a wall in mid-air drops him too. **Space** leaps off.
 * **Safe:** he never goes inside a block (his body keeps its size and every move is checked like a normal one), and he **takes no fall damage** after a wall or ceiling run until he lands. The server keeps him from being kicked for flying.
