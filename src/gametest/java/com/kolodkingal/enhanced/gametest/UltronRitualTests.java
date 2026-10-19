@@ -223,6 +223,8 @@ public final class UltronRitualTests {
         check(!BossFights.anyActive(level.getServer()) && program.getCount() == 1, "no fight, nothing used up");
 
         // The old use() runs unchanged: with nothing in the other hand the stone kills an unprotected player; a Creative one is told.
+        // (3.6: Sneak with nothing in the other hand is now the Mind Stone's beam, so this use is a plain one.)
+        player.setShiftKeyDown(false);
         ScepterRituals.useScepter(player, InteractionHand.MAIN_HAND, false);
         check(!player.isAlive(), "the stone still kills a player it does not know");
         ServerPlayer creative = f.player(4.5, FLOOR, 4.5, GameType.CREATIVE);
