@@ -394,16 +394,25 @@ public enum GestureId {
     /** The Hulk calms down (N): he shrinks, kneels, the hands on his knees. */
     HULK_CALM(Group.CAST, 40, 3, 8, true),
     /** Switch Hulk (Sneak + N): a flex in a green shimmer. */
-    HULK_SWITCH(Group.CAST, 20, 2, 6, true)
+    HULK_SWITCH(Group.CAST, 20, 2, 6, true),
     // ===== healing (3.7) =====
+    /**
+     * A healer goes DOWN: to one knee, a hand to the ground, then onto his side; held there while he is DOWN (the
+     * client holds it, {@code client/healing/HealingClient}), then he pushes himself up and stands. Its own group (the
+     * landings'), so the CAST gestures of his keys never cut it short.
+     */
+    HEALING_DOWN(Group.LAND, 44, 2, 20, true),
+    /** Up again: a shake of the head, the shoulders rolled back. */
+    HEALING_RISE(Group.CAST, 18, 3, 6, false),
+    /** The Healing Burst: the arms flung wide, the chest up, the head back, as the shimmer runs through him. */
+    HEALING_BURST(Group.CAST, 18, 2, 6, true),
     // ===== wolverine (3.7) =====
     // ===== deadpool (3.7) =====
     // (3.7: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
     // AnimationMathTests wants keys for every gesture.)
-    // (Deadpool's, lane L3: started by the payloads of his moves, which name him: DeadpoolClient.startedElsewhere. The
-    // leading comma keeps the line above each region untouched.)
+    // (Deadpool's, lane L3: started by the payloads of his moves, which name him: DeadpoolClient.startedElsewhere.)
     /** The katanas' first cut (R): the right sword from high on the right down across to the left. */
-    , DEADPOOL_SLASH_1(Group.CAST, 10, 1, 4, true),
+    DEADPOOL_SLASH_1(Group.CAST, 10, 1, 4, true),
     /** The second cut: the left sword, the mirror of the first. */
     DEADPOOL_SLASH_2(Group.CAST, 10, 1, 4, true),
     /** The X-cut: both swords crossed high, then down and out together. */

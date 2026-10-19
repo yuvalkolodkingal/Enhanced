@@ -128,6 +128,7 @@ public final class ClientSetup {
             // ===== 3.7: each lane registers its effects' drawers here (HealingFx, WolverineFx, Scents, DeadpoolFx,
             // LabFx; StoneFx's LOCATOR_TRAIL) =====
             // ===== healing (3.7) =====
+            com.kolodkingal.enhanced.client.healing.HealingClient.setup();
             // ===== wolverine (3.7) =====
             // ===== deadpool (3.7) =====
             com.kolodkingal.enhanced.client.deadpool.DeadpoolEffects.register();
@@ -466,6 +467,9 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("hulk"),
                 new com.kolodkingal.enhanced.client.hulk.HulkHud());
         // ===== healing (3.7) =====
+        // 3.7, lane L1: the healing factor's line under the powers' panel; DOWN, the dark edges and the countdown.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("healing"),
+                new com.kolodkingal.enhanced.client.healing.HealingHud());
         // ===== wolverine (3.7) =====
         // ===== deadpool (3.7) =====
         // ===== school_lab (3.7) =====
