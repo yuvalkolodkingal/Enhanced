@@ -258,6 +258,12 @@ public final class HydraOutposts extends SavedData {
             return -1;
         }
 
+        /** The soldier running to a console to raise the alarm, or null. */
+        @Nullable
+        public UUID runner() {
+            return runner;
+        }
+
         /** Whether the alarm sounds now. */
         public boolean alarmOn(long now) {
             return alarmUntil > now;

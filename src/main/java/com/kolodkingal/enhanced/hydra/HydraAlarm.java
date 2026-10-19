@@ -96,7 +96,7 @@ public final class HydraAlarm {
     }
 
     /** The in-game day of {@code level} for the waves' count (by its clock of day, so {@code /time add} counts). */
-    static long day(ServerLevel level) {
+    public static long day(ServerLevel level) {
         return Math.floorDiv(level.getDayTime(), 24000L);
     }
 
@@ -287,6 +287,16 @@ public final class HydraAlarm {
         if (was) {
             send(level, outpost, HydraFxPayload.ALARM_OFF);
         }
+    }
+
+    /** Ends a sounding alarm (its time is up): the lamps go dark; a wave not yet come does not come. */
+    public static void end(ServerLevel level, HydraOutposts.Outpost outpost) {
+        outpost.alarmUntil = -1L;
+        outpost.waveAt = -1L;
+        outpost.runner = null;
+        outpost.changed();
+        lamps(level, outpost, false);
+        send(level, outpost, HydraFxPayload.ALARM_OFF);
     }
 
     /** The officer fell: before the reinforcements came, the alarm stops and they do not come. */

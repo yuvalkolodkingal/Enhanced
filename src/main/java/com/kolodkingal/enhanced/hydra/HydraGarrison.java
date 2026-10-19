@@ -251,7 +251,7 @@ public final class HydraGarrison {
     }
 
     /** Whether post {@code i}, empty, is due a soldier now. */
-    static boolean due(ServerLevel level, HydraOutposts.Outpost outpost, int i, long game, long day) {
+    public static boolean due(ServerLevel level, HydraOutposts.Outpost outpost, int i, long game, long day) {
         if (outpost.diedGame(i) == HydraOutposts.NEVER) {
             return outpost.soldier(i) == null;
         }
@@ -267,7 +267,7 @@ public final class HydraGarrison {
     }
 
     /** Whether a player (not a spectator) is within {@code radius} of the outpost's centre. */
-    static boolean playerNear(ServerLevel level, HydraOutposts.Outpost outpost, double radius) {
+    public static boolean playerNear(ServerLevel level, HydraOutposts.Outpost outpost, double radius) {
         Vec3 centre = Vec3.atCenterOf(outpost.centre());
         for (Player player : level.players()) {
             if (!player.isSpectator() && player.distanceToSqr(centre) <= radius * radius) {
@@ -278,7 +278,7 @@ public final class HydraGarrison {
     }
 
     /** Where post {@code post}'s soldier appears: his point, or his patrol's first corner (on the ground outside). */
-    static BlockPos spawnPos(ServerLevel level, HydraOutposts.Outpost outpost, Post post) {
+    public static BlockPos spawnPos(ServerLevel level, HydraOutposts.Outpost outpost, Post post) {
         BlockPos at = outpost.where(post.isOfficer() && !level.isDay() ? HydraOutpostPlan.RADIO_POST
                 : post.spawnPoint());
         if (post.route() != null && post.route().onSurface() && outpost.real() && level.isLoaded(at)) {
@@ -312,7 +312,7 @@ public final class HydraGarrison {
 
     /** Makes the soldier of post {@code index} at {@code at}. */
     @Nullable
-    static HydraSoldierEntity spawn(ServerLevel level, HydraOutposts.Outpost outpost, int index, BlockPos at) {
+    public static HydraSoldierEntity spawn(ServerLevel level, HydraOutposts.Outpost outpost, int index, BlockPos at) {
         Post post = Post.byIndex(index);
         EntityType<? extends HydraSoldierEntity> type = post.isOfficer() ? ModEntities.HYDRA_OFFICER.get()
                 : ModEntities.HYDRA_SOLDIER.get();
@@ -360,7 +360,7 @@ public final class HydraGarrison {
     }
 
     /** The 3.3 stand-ins: pillagers in the compound (not in a raid) are sent away. */
-    static int sendPillagersAway(ServerLevel level, HydraOutposts.Outpost outpost) {
+    public static int sendPillagersAway(ServerLevel level, HydraOutposts.Outpost outpost) {
         List<Pillager> stand = level.getEntitiesOfClass(Pillager.class, outpost.box().inflate(2.0, 4.0, 2.0),
                 p -> p.getCurrentRaid() == null && !p.hasCustomName() && !p.isPatrolLeader());
         for (Pillager pillager : stand) {
