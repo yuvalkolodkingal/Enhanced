@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
@@ -7,6 +8,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 import java.util.function.Function;
 
@@ -23,9 +25,25 @@ public final class EnhancedRenderTypes {
                     .setCullState(RenderStateShard.NO_CULL)
                     .createCompositeState(false));
 
+    /** Whether the depth test was on before {@link #DEPTH_OFF} turned it off (it is put back as it was). */
+    private static boolean depthWasOn;
     /**
-     * {@link #ENERGY_BEAM} drawn over everything (no depth test): the camera's own beam in the third-person back view
-     * (3.6), which runs from his hand to the middle of the screen, straight behind his own head and arm ({@link
+     * The depth test really off: vanilla's {@code NO_DEPTH_TEST} ("always") only leaves the test as it finds it, and
+     * after the particles it is on (3.6: the camera's own beam was still hidden behind his head).
+     */
+    private static final RenderStateShard.LayeringStateShard DEPTH_OFF = new RenderStateShard.LayeringStateShard(
+            "enhanced_depth_off", () -> {
+                depthWasOn = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+                RenderSystem.disableDepthTest();
+            }, () -> {
+                if (depthWasOn) {
+                    RenderSystem.enableDepthTest();
+                }
+            });
+
+    /**
+     * {@link #ENERGY_BEAM} drawn over everything (the depth test off): the camera's own beam in the third-person back
+     * view (3.6), which runs from his hand to the middle of the screen, straight behind his own head and arm ({@link
      * OwnBeams}).
      */
     public static final RenderType ENERGY_BEAM_OVER = RenderType.create("enhanced_energy_beam_over",
@@ -35,6 +53,7 @@ public final class EnhancedRenderTypes {
                     .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
                     .setWriteMaskState(RenderStateShard.COLOR_WRITE)
                     .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+                    .setLayeringState(DEPTH_OFF)
                     .setCullState(RenderStateShard.NO_CULL)
                     .createCompositeState(false));
 

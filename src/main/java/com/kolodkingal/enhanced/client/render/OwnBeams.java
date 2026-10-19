@@ -9,8 +9,10 @@ import net.minecraft.world.entity.Entity;
  * along, so what he looks at is in the middle of the screen, behind his own head: a beam from his hand to it runs along
  * the line of sight, a few degrees from the middle at most, and the depth test hid all of it behind his head, shoulder
  * and raised arm (no beam was seen at all, while the front view and first person, with no body in the way, drew it).
- * Those beams are drawn in a pass of their own over everything ({@link EnhancedRenderTypes#ENERGY_BEAM_OVER}); a beam
- * always stops at the first solid block, so nothing but his body and what the beam passes through lies in front of it.
+ * Those beams are drawn in a pass of their own over everything ({@link EnhancedRenderTypes#ENERGY_BEAM_OVER}, with the
+ * depth test really off: vanilla's "always" depth state only leaves the test as it finds it, on after the particles); a
+ * beam always stops at the first solid block, so nothing but his body and what the beam passes through lies in front
+ * of it. On screen it is short (from his hand to the middle), as the camera looks along it.
  */
 public final class OwnBeams {
     /** Whether {@code shooter}'s beams are drawn in the pass over everything (he is the camera, seen from behind). */
