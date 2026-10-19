@@ -111,6 +111,7 @@ public final class ClientSetup {
             // ===== vormir (3.6) =====
             // ===== hulk (3.6) =====
             // ===== hydra (3.6) =====
+            com.kolodkingal.enhanced.client.hydra.HydraClient.setup();
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
         });
@@ -200,10 +201,11 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.HULK_BOULDER.get(), NoopRenderer::new);
         // ===== hydra (3.6) =====
         event.registerEntityRenderer(ModEntities.HYDRA_SOLDIER.get(),
-                com.kolodkingal.enhanced.client.hydra.HydraPlaceholderRenderer::new);
+                com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
         event.registerEntityRenderer(ModEntities.HYDRA_OFFICER.get(),
-                com.kolodkingal.enhanced.client.hydra.HydraPlaceholderRenderer::new);
-        event.registerEntityRenderer(ModEntities.HYDRA_BOLT.get(), NoopRenderer::new);
+                com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
+        event.registerEntityRenderer(ModEntities.HYDRA_BOLT.get(),
+                com.kolodkingal.enhanced.client.hydra.HydraBoltRenderer::new);
     }
 
     /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
@@ -270,6 +272,8 @@ public final class ClientSetup {
         // ===== vormir (3.6) =====
         // ===== hulk (3.6) =====
         // ===== hydra (3.6) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.hydra.HydraGearModel.LAYER,
+                com.kolodkingal.enhanced.client.hydra.HydraGearModel::createLayer);
     }
 
     @SubscribeEvent
