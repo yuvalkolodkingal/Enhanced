@@ -57,8 +57,16 @@ public class RealmScreen extends Screen {
         return Math.min(4, realms.size());
     }
 
+    /** Room above the windows for the title, under each window for its name, between the rows, and for the hint. */
+    private static final int TITLE_SPACE = 24;
+    private static final int LABEL_SPACE = 16;
+    private static final int ROW_GAP = 6;
+    private static final int HINT_SPACE = 16;
+
+    /** The windows' width: as wide as the screen allows, but low enough that both rows, names and hint fit. */
     private int windowWidth() {
-        return Mth.clamp((width - 48) / 2, 80, 150);
+        int byHeight = (height - TITLE_SPACE - HINT_SPACE - 2 * LABEL_SPACE - ROW_GAP - 8) / 2 * 5 / 3;
+        return Mth.clamp(Math.min((width - 48) / 2, byHeight), 60, 150);
     }
 
     private int windowHeight() {
@@ -72,8 +80,9 @@ public class RealmScreen extends Screen {
     }
 
     private int top(int index) {
-        int h = windowHeight() + 34;
-        return Math.max(28, (height - 2 * h) / 2 + 16) + (index / 2) * h;
+        int row = windowHeight() + LABEL_SPACE + ROW_GAP;
+        int block = TITLE_SPACE + 2 * row - ROW_GAP + HINT_SPACE;
+        return Math.max(0, (height - block) / 2) + TITLE_SPACE + (index / 2) * row;
     }
 
     private int at(double mouseX, double mouseY) {
@@ -108,7 +117,7 @@ public class RealmScreen extends Screen {
         super.render(g, mouseX, mouseY, partialTick);
         float time = time(partialTick);
         hovered = at(mouseX, mouseY);
-        g.drawCenteredString(font, title.copy().withStyle(ChatFormatting.BOLD), width / 2, Math.max(8, top(0) - 22),
+        g.drawCenteredString(font, title.copy().withStyle(ChatFormatting.BOLD), width / 2, Math.max(4, top(0) - 18),
                 PALE);
         for (int i = 0; i < count(); i++) {
             RealmScreenPayload.RealmOption realm = realms.get(i);
@@ -138,7 +147,7 @@ public class RealmScreen extends Screen {
             }
         }
         g.drawCenteredString(font, Component.translatable("screen.enhanced.realms.hint"), width / 2,
-                Math.min(height - 12, top(2) + windowHeight() + 22), 0x8AA0C0);
+                Math.min(height - 10, top(2) + windowHeight() + LABEL_SPACE + 2), 0x8AA0C0);
     }
 
     /** The realm's picture, in its window. */
