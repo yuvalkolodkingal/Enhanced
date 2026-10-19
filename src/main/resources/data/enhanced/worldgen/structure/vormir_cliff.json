@@ -9,5 +9,7 @@
       "spawns": []
     }
   },
-  "template": "enhanced:vormir/cliff"
+  "template": "enhanced:vormir/cliff",
+  "processors": "enhanced:vormir_cliff",
+  "enabled_by": "vormirCliffs"
 }

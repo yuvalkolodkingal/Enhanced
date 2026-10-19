@@ -1,0 +1,11 @@
+{
+  "processors": [
+    {
+      "processor_type": "enhanced:foundation",
+      "block": {
+        "Name": "minecraft:stone"
+      },
+      "max_depth": 16
+    }
+  ]
+}

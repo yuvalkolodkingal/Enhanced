@@ -25,7 +25,8 @@ import java.util.Optional;
  * layers below it are cellars, sunk into the ground), how uneven the ground under it may be ({@code max_slope}: the
  * highest and lowest of nine points of its footprint at most this far apart, or it is not built there; all nine on dry land), and the
  * processors its blocks go through (the last one is usually {@code enhanced:foundation}, the footing where the ground
- * falls away). Never on water.
+ * falls away). Never on water. 3.6: {@code enabled_by} (optional) names the {@code [stone_sites]} option that stops it
+ * generating (the Sanctum's {@code sanctums}, see {@link SiteSwitch}).
  */
 public class TemplateSiteStructure extends Structure {
     public static final MapCodec<TemplateSiteStructure> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -33,21 +34,29 @@ public class TemplateSiteStructure extends Structure {
             ResourceLocation.CODEC.fieldOf("template").forGetter(s -> s.template),
             Codec.intRange(0, 64).fieldOf("floor").forGetter(s -> s.floor),
             Codec.intRange(0, 32).optionalFieldOf("max_slope", 4).forGetter(s -> s.maxSlope),
-            StructureProcessorType.LIST_CODEC.fieldOf("processors").forGetter(s -> s.processors)
+            StructureProcessorType.LIST_CODEC.fieldOf("processors").forGetter(s -> s.processors),
+            SiteSwitch.OPTION.optionalFieldOf("enabled_by").forGetter(s -> s.enabledBy)
     ).apply(instance, TemplateSiteStructure::new));
 
     private final ResourceLocation template;
     private final int floor;
     private final int maxSlope;
     private final Holder<StructureProcessorList> processors;
+    private final Optional<String> enabledBy;
 
     public TemplateSiteStructure(StructureSettings settings, ResourceLocation template, int floor, int maxSlope,
             Holder<StructureProcessorList> processors) {
+        this(settings, template, floor, maxSlope, processors, Optional.empty());
+    }
+
+    public TemplateSiteStructure(StructureSettings settings, ResourceLocation template, int floor, int maxSlope,
+            Holder<StructureProcessorList> processors, Optional<String> enabledBy) {
         super(settings);
         this.template = template;
         this.floor = floor;
         this.maxSlope = maxSlope;
         this.processors = processors;
+        this.enabledBy = enabledBy;
     }
 
     public ResourceLocation template() {
@@ -60,6 +69,9 @@ public class TemplateSiteStructure extends Structure {
 
     @Override
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
+        if (!SiteSwitch.enabled(enabledBy)) {
+            return Optional.empty();
+        }
         StructureTemplate built = context.structureTemplateManager().getOrCreate(template);
         Vec3i size = built.getSize();
         if (size.getX() == 0 || size.getZ() == 0) {

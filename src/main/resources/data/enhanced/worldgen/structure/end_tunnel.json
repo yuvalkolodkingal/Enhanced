@@ -4,5 +4,8 @@
   "step": "underground_structures",
   "terrain_adaptation": "none",
   "spawn_overrides": {},
-  "template": "enhanced:end_tunnel/vault"
+  "template": "enhanced:end_tunnel/vault",
+  "enabled_by": "endTunnels",
+  "reach": 40,
+  "min_surface": 45
 }

@@ -1,0 +1,14 @@
+{
+  "processors": [
+    {
+      "processor_type": "enhanced:foundation",
+      "block": {
+        "Name": "minecraft:basalt",
+        "Properties": {
+          "axis": "y"
+        }
+      },
+      "max_depth": 24
+    }
+  ]
+}

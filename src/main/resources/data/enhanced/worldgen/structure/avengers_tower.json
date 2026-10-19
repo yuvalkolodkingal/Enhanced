@@ -14,5 +14,9 @@
     "enhanced:avengers_tower/mid",
     "enhanced:avengers_tower/top"
   ],
-  "part_height": 32
+  "part_height": 32,
+  "floor": 2,
+  "max_slope": 3,
+  "processors": "enhanced:avengers_tower",
+  "enabled_by": "avengersTowers"
 }

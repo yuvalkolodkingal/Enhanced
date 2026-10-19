@@ -194,6 +194,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.SLING_PORTAL.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.ASTRAL_BODY.get(), NoopRenderer::new);
         // ===== stone_sites (3.6) =====
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TESSERACT_CRADLE.get(),
+                com.kolodkingal.enhanced.client.render.TesseractCradleRenderer::new);
         // ===== vormir (3.6) =====
         event.registerEntityRenderer(ModEntities.STONEKEEPER.get(), NoopRenderer::new);
         // ===== hulk (3.6) =====
