@@ -1,0 +1,18 @@
+{
+  "structures": [
+    {
+      "structure": "enhanced:sanctum",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 48,
+    "separation": 16,
+    "salt": 20161104,
+    "exclusion_zone": {
+      "other_set": "enhanced:hydra_outposts",
+      "chunk_count": 6
+    }
+  }
+}

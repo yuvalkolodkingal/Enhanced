@@ -1177,8 +1177,9 @@ public final class SkeletonTests {
     // The network
 
     @GameTest(template = ARENA, batch = SKELETON)
-    public static void theProtocolIsNine(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("9"), "3.5 bumps the protocol from 8 to 9, once: " + ModNetwork.PROTOCOL_VERSION);
+    public static void theProtocolIsTen(GameTestHelper helper) {
+        check(ModNetwork.PROTOCOL_VERSION.equals("10"), "3.6 bumps the protocol from 9 to 10, once: "
+                + ModNetwork.PROTOCOL_VERSION);
         helper.succeed();
     }
 
@@ -1486,7 +1487,7 @@ public final class SkeletonTests {
                 acted |= GestureRoutes.live(hero, live, true) != null;
             }
             // 3.5: the gods of Asgard route their own states too.
-            for (Power hero : List.of(Power.HEIMDALL, Power.ODIN, Power.HELA)) {
+            for (Power hero : List.of(Power.HEIMDALL, Power.ODIN, Power.HELA, Power.DOCTOR_STRANGE, Power.HULK)) {
                 acted |= GestureRoutes.live(hero, live, true) != null;
             }
             check(acted || GestureRoutes.reason(live) != null, "the state " + live + " has neither a gesture nor a reason");

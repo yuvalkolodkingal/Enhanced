@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "enhanced:eye_of_agamotto"
+    }
+  ],
+  "result": {
+    "id": "enhanced:time_stone",
+    "count": 1
+  }
+}

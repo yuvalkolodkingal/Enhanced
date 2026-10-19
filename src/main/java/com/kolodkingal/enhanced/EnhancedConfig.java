@@ -539,6 +539,14 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.OdinConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HelaConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HelaBossConfig.define(BUILDER);
+        // 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra): the skeleton defines every option; the lanes
+        // read them.
+        com.kolodkingal.enhanced.config.StonesConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.SoulStoneConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.StrangeConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.StoneSitesConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.HulkConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.HydraConfig.define(BUILDER);
         // 3.5: the world's own music (section [music]).
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }

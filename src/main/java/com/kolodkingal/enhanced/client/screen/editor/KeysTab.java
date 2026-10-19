@@ -110,6 +110,12 @@ public final class KeysTab extends EditorTab {
             boolean alt = HeroKit.ALT.equals(action);
             return new Bound(entry, action, alt, alt ? a.alt() : a.act(), alt ? CreatorUi.altName(a) : CreatorUi.name(a));
         }
+        if (entry instanceof com.kolodkingal.enhanced.custom.StoneRow row) {
+            // (3.6: a stone row's use, or its Sneak use.)
+            boolean alt = HeroKit.ALT.equals(action);
+            return new Bound(entry, action, alt, alt ? row.alt() : row.act(), alt ? CreatorUi.altName(row)
+                    : CreatorUi.name(row));
+        }
         PowerModule m = (PowerModule) entry;
         CustomHero.Pick pick = hero.pick(m);
         String option = HeroKit.MAIN.equals(action) ? (pick == null ? m.defaultOption().id() : pick.option()) : action;
@@ -146,8 +152,10 @@ public final class KeysTab extends EditorTab {
             return;
         }
         Bound plain = bound(hero, c, false);
-        if (s && plain != null && plain.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(hero.pick(a).option())) {
-            screen.say(Component.translatable("screen.enhanced.hero_creator.key.linked.desc", CreatorUi.name(a)), true);
+        if (s && plain != null && hero.pick(plain.entry()) != null
+                && com.kolodkingal.enhanced.custom.CustomHeroRules.pairs(hero.pick(plain.entry()))) {
+            screen.say(Component.translatable("screen.enhanced.hero_creator.key.linked.desc",
+                    CreatorUi.name(plain.entry())), true);
             screen.rebuild();
             return;
         }
@@ -220,8 +228,8 @@ public final class KeysTab extends EditorTab {
             // Whatever was on the box goes; its Sneak move with it, and a hero's ability brings its own.
             CatalogEntry entry = com.kolodkingal.enhanced.custom.Catalog.byId(text);
             CustomHero.Pick pick = entry == null ? null : out.pick(entry);
-            if (entry instanceof HeroAbility a && a.hasAlt() && pick != null && HeroAbility.BOTH.equals(pick.option())) {
-                out = out.withBinding(c, true, a.id() + "#" + HeroKit.ALT);
+            if (pick != null && com.kolodkingal.enhanced.custom.CustomHeroRules.pairs(pick)) {
+                out = out.withBinding(c, true, entry.id() + "#" + HeroKit.ALT);
             } else if (out.binding(c, true).endsWith("#" + HeroKit.ALT) || out.binding(c, true).contains("#")) {
                 out = out.withBinding(c, true, "");
             }

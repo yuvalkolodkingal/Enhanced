@@ -49,6 +49,8 @@ public final class Telepathy {
         return switch (power) {
             case PROFESSOR_X -> Rank.TELEPATH;
             case SCARLET_WITCH, PHOENIX, BILLY -> Rank.STRONGER;
+            // (3.6: Doctor Strange and the Hulk are no telepaths: their minds are open, the Hulk's as in Age of
+            // Ultron.)
             default -> Rank.NONE;
         };
     }

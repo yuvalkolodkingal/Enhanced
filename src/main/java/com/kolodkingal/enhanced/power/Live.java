@@ -4,7 +4,7 @@ package com.kolodkingal.enhanced.power;
  * Momentary states of the newer heroes (and of whoever Mjolnir pins down) that clients must see (to draw effects and
  * poses, or to stop a pinned player's own movement) but that are never saved: they are recomputed by the server while
  * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (28 bits are used in
- * 3.3, 42 in 3.5: at most 64).
+ * 3.3, 42 in 3.5, 53 in 3.6: at most 64).
  *
  * <p>The states of 3.0 sit in one region per hero (the {@code // =====} lines), so the five lanes that build those
  * heroes append to their own lines and never to the same one.
@@ -132,6 +132,39 @@ public enum Live {
     HELA_GRASPING,
     /** Hela raises the dead or calls Fenris (both arms rise). */
     HELA_SUMMONING,
+    // ===== strange (3.6) =====
+    /**
+     * Doctor Strange holds up the Shield of the Seraphim (V held): its own bit for the pose; the shield is the shared
+     * record.
+     */
+    STRANGE_SHIELD,
+    /** Doctor Strange's spirit is out of his body (the Astral Projection): he is drawn as a pale-blue ghost. */
+    STRANGE_ASTRAL,
+    /** Doctor Strange's Mirror Dimension stands round him: every client inside sees the world bend. */
+    STRANGE_MIRROR,
+    /** Doctor Strange is casting (any spell that lasts): his hands up, the fingers in the spell mudra. */
+    STRANGE_CASTING,
+    // ===== stones (3.6) =====
+    /**
+     * The Time Stone (or the Eye of Agamotto) slows time round this player: {@code SlowMotion} reads it ({@code
+     * StoneZones}).
+     */
+    TIME_SLOWING,
+    /** The Power Stone's beam pours from this player's hand: purple veins crawl up his arm. */
+    POWER_VEINS,
+    // ===== hulk (3.6) =====
+    /**
+     * The Hulk is changing (Banner to the Hulk or back, or one Hulk to the other): he cannot be pushed, his keys wait.
+     */
+    HULK_TRANSFORMING,
+    /** The Hulk is in the air on a Super Leap or a Bound. */
+    HULK_LEAPING,
+    /** The Hulk holds a creature by the legs for the Grab Smash. */
+    HULK_GRABBING,
+    /** The Hulk charges shoulder first (the Gamma Charge). */
+    HULK_CHARGING,
+    /** The Hulk's rage is at half or more: his eyes glow gamma green. */
+    HULK_ENRAGED,
     ;
 
     final long bit() {

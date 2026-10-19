@@ -54,6 +54,20 @@ public enum Toggle {
     // ===== hela (3.5) =====
     /** Hela: the Goddess of Death's form is on (the headdress has grown). */
     HELA_FORM,
+    // ===== strange (3.6) =====
+    /** Doctor Strange: his spirit is out (the Astral Projection, Sneak + B): pressed again, it returns to his body. */
+    STRANGE_ASTRAL,
+    /** Doctor Strange: the Mirror Dimension is open round him (Sneak + N). */
+    STRANGE_MIRROR,
+    // ===== stones (3.6) =====
+    /**
+     * The Time Stone's Slow Time is on (the stone, the Eye of Agamotto, Doctor Strange's Y or a custom hero's stone
+     * row).
+     */
+    TIME_SLOW,
+    // ===== hulk (3.6) =====
+    /** A custom hero with {@code hulk.transform}: his human form is on (every power off, his own skin). */
+    HUMAN_FORM,
     ;
 
     final int bit() {

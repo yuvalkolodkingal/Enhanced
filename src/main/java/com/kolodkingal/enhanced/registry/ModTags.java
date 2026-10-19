@@ -151,6 +151,35 @@ public final class ModTags {
     /** The people of Asgard: the Asgardians (lane L5). */
     public static final TagKey<EntityType<?>> ASGARDIANS = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("asgardians"));
 
+    // ===== stones (3.6) =====
+    /** The six Infinity Stones' items (lane L1: what the Gauntlet takes, what a chest of a site never holds). */
+    public static final TagKey<Item> INFINITY_STONES = TagKey.create(Registries.ITEM, Enhanced.id("infinity_stones"));
+    /**
+     * The structures Hydra's intel map leads to: Avengers Tower (lane L4 builds it; lane L8's officer drops the map).
+     */
+    public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> ON_AVENGERS_TOWER_MAPS =
+            TagKey.create(Registries.STRUCTURE, Enhanced.id("on_avengers_tower_maps"));
+    // ===== hulk (3.6) =====
+    /**
+     * What the Hulk breaks with {@code [hulk] blockBreaking soft}: glass and panes, leaves, snow, ice, flowers, grass,
+     * vines, cobwebs.
+     */
+    public static final TagKey<Block> HULK_SOFT = TagKey.create(Registries.BLOCK, Enhanced.id("hulk_soft"));
+    /** What he breaks too with {@code all}: hardness 3 or less (dirt, sand, gravel, stone, wood, bricks...). */
+    public static final TagKey<Block> HULK_SMASHABLE = TagKey.create(Registries.BLOCK, Enhanced.id("hulk_smashable"));
+    /**
+     * What he never breaks: bedrock, obsidian, end portal frames, barriers, spawners, the mod's pedestals, cradle and
+     * seals.
+     */
+    public static final TagKey<Block> HULK_UNBREAKABLE = TagKey.create(Registries.BLOCK,
+            Enhanced.id("hulk_unbreakable"));
+    /** What the Grab Smash cannot grab (one heavy punch instead): the bosses, the Stonekeeper, the Asgardians. */
+    public static final TagKey<EntityType<?>> GRAB_IMMUNE = TagKey.create(Registries.ENTITY_TYPE,
+            Enhanced.id("grab_immune"));
+    // ===== hydra (3.6) =====
+    /** The Hydra soldiers and officers: they never hurt one another (lane L8's ally rule). */
+    public static final TagKey<EntityType<?>> HYDRA = TagKey.create(Registries.ENTITY_TYPE, Enhanced.id("hydra"));
+
     // ===== 3.1 build =====
     /**
      * Blocks no Build Magic spell changes, vanishes or moves, and a copy leaves out: what the Wither cannot break

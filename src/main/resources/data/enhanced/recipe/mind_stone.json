@@ -1,0 +1,15 @@
+{
+  "type": "enhanced:stone_extraction",
+  "group": "enhanced_stones",
+  "ingredient": {
+    "item": "enhanced:lokis_scepter"
+  },
+  "result": {
+    "id": "enhanced:mind_stone",
+    "count": 1
+  },
+  "remainder": {
+    "id": "enhanced:empty_scepter",
+    "count": 1
+  }
+}

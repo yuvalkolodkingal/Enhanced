@@ -33,6 +33,9 @@ public final class HeroServers {
         register(new com.kolodkingal.enhanced.heimdall.HeimdallServer());
         register(new com.kolodkingal.enhanced.odin.OdinServer());
         register(new com.kolodkingal.enhanced.hela.HelaServer());
+        // 3.6: Doctor Strange and the Hulk (each in its own package, filled by its lane).
+        register(new com.kolodkingal.enhanced.strange.StrangeServer());
+        register(new com.kolodkingal.enhanced.hulk.HulkServer());
     }
 
     /**

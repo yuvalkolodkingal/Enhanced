@@ -600,6 +600,12 @@ public final class MindLink {
             creeper.ignite();
             return;
         }
+        // 3.6: a creature with a weapon of its own fires it (a Hydra soldier's rifle, lane L8).
+        if (body instanceof com.kolodkingal.enhanced.hydra.SteeredShooter shooter) {
+            link.lastAttack = now;
+            shooter.steeredAttack(xavier);
+            return;
+        }
         boolean ranged = body instanceof RangedAttackMob;
         double reach = ranged ? RANGED_REACH : REACH + body.getBbWidth() * 0.5;
         EntityHitResult hit = Raycasts.entityBetween(body.level(), body, eye, eye.add(look.scale(reach)), 0.3,

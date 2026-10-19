@@ -314,6 +314,19 @@ public final class CreatorUi {
         return Component.translatableWithFallback(a.altKey(), pretty(a.id()) + " (Sneak)");
     }
 
+    /**
+     * 3.6: the name of any entry's Sneak variant: a hero ability's, a stone row's Sneak use, or the entry's own name.
+     */
+    public static MutableComponent altName(com.kolodkingal.enhanced.custom.CatalogEntry entry) {
+        if (entry instanceof HeroAbility a) {
+            return altName(a);
+        }
+        if (entry instanceof com.kolodkingal.enhanced.custom.StoneRow row) {
+            return Component.translatableWithFallback(row.altKey(), pretty(row.id()) + " (Sneak)");
+        }
+        return name(entry);
+    }
+
     /** The one-line description of an entry. */
     public static MutableComponent desc(CatalogEntry entry) {
         return Component.translatableWithFallback(entry.descKey(), "");

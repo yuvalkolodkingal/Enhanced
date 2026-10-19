@@ -47,5 +47,8 @@ public enum Resource {
     UNDEAD,
     // (3.5, the creator lane) ----
     /** Build Magic (the Y key, its mode and its numbers): Billy's or the Scarlet Witch's, one of the two. */
-    BUILD
+    BUILD,
+    // (3.6, the skeleton) ----
+    /** The Soul Drain's lock on one creature (Thanos's Soul Stone and the Soul Stone's row: the same state). */
+    SOUL_CHAIN
 }

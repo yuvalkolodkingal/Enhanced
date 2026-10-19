@@ -106,10 +106,15 @@ public class LokisScepterItem extends Item {
         return stack;
     }
 
-    /** A melee hit that landed: whoever it hit is left confused. */
+    /**
+     * A melee hit that landed: whoever it hit is left confused; 3.6: unless the hit turned a Hydra soldier to the
+     * hitter's side ({@code HydraLoyalty}, lane L8), which the Scepter does instead.
+     */
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        confuse(target, attacker);
+        if (!com.kolodkingal.enhanced.hydra.HydraLoyalty.onScepterHit(target, attacker)) {
+            confuse(target, attacker);
+        }
         return true;
     }
 

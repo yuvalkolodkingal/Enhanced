@@ -100,8 +100,8 @@ public final class AsgardSkeletonTests {
     public static void theGodsOfAsgardComeAfterCustomInOrder(GameTestHelper helper) throws IOException {
         Power[] all = Power.values();
         check(all[Power.CUSTOM.ordinal() + 1] == Power.HEIMDALL && all[Power.CUSTOM.ordinal() + 2] == Power.ODIN
-                && all[Power.CUSTOM.ordinal() + 3] == Power.HELA && all.length == Power.CUSTOM.ordinal() + 4,
-                "…CUSTOM, HEIMDALL, ODIN, HELA (the stream sends the ordinal)");
+                && all[Power.CUSTOM.ordinal() + 3] == Power.HELA && all.length >= Power.CUSTOM.ordinal() + 4,
+                "…CUSTOM, HEIMDALL, ODIN, HELA (the stream sends the ordinal; 3.6 appends after them)");
         check(Power.AGATHA.ordinal() == 14 && Power.CUSTOM.ordinal() == 17, "nobody before them moved");
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String name : List.of("en_us", "he_il")) {
@@ -131,10 +131,13 @@ public final class AsgardSkeletonTests {
     }
 
     @GameTest(template = ARENA, batch = BATCH)
-    public static void theBitsFitAndTheProtocolIsNine(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("9"), "protocol 9");
-        check(Live.values().length <= 64 && Live.values().length == 42, "Live: 42 of 64 bits: " + Live.values().length);
-        check(Toggle.values().length <= 32 && Toggle.values().length == 15, "Toggle: 15 of 32 bits: " + Toggle.values().length);
+    public static void theBitsFitAndTheProtocolMovedOnFromNine(GameTestHelper helper) {
+        // (3.6 bumps the protocol to 10 and appends its own states: StoneSkeletonTests counts them exactly.)
+        check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 9, "protocol 9 or later");
+        check(Live.values().length <= 64 && Live.values().length >= 42, "Live: 42 of 64 bits or more: "
+                + Live.values().length);
+        check(Toggle.values().length <= 32 && Toggle.values().length >= 15, "Toggle: 15 of 32 bits or more: "
+                + Toggle.values().length);
         check(Live.HEIMDALL_WARD.ordinal() == 35 && Live.HELA_SUMMONING.ordinal() == 41, "the states of 3.5 are appended");
         check(Toggle.HEIMDALL_SIGHT.ordinal() == 12 && Toggle.ODINSLEEP.ordinal() == 13 && Toggle.HELA_FORM.ordinal() == 14,
                 "and the toggles");
@@ -144,7 +147,7 @@ public final class AsgardSkeletonTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theRowsOfAsgardAreEighteenInTheirRegions(GameTestHelper helper) {
-        check(HeroAbility.values().length == 133, "81 + 18 rows, and the creator lane's 34 (3.5): "
+        check(HeroAbility.values().length >= 133, "81 + 18 rows, and the creator lane's 34 (3.5; 3.6 appends): "
                 + HeroAbility.values().length);
         Set<String> ids = new HashSet<>();
         for (HeroAbility a : HeroAbility.values()) {

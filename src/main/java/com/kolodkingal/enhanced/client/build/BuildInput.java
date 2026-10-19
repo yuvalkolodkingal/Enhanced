@@ -94,6 +94,8 @@ public final class BuildInput {
         BuildClient.tick(mc, player);
         BuildHud.tick(player);
         BuildFx.tick(mc, mc.level);
+        // 3.6: the Y key of a hero whose Y row is not Build Magic (Doctor Strange's Eye).
+        com.kolodkingal.enhanced.client.YRowKey.tick(mc, player, tapped);
         boolean usable = mc.screen == null && !player.isSpectator() && BuildClient.isBuilder(BuildClient.hero(player));
         if (!usable) {
             magicHeld = 0;

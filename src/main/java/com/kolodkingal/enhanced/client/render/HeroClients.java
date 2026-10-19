@@ -32,6 +32,9 @@ public final class HeroClients {
         register(new HeimdallClient());
         register(new OdinClient());
         register(new HelaClient());
+        // 3.6: Doctor Strange and the Hulk.
+        register(new StrangeClient());
+        register(new HulkClient());
     }
 
     /**

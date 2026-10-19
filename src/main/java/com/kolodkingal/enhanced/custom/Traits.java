@@ -31,23 +31,30 @@ public final class Traits {
 
     /**
      * The roles of a built-in hero, as the lists of 3.3 said: Loki, Billy, the Scarlet Witch and Agatha are sorcerers;
-     * Professor X a telepath, the Scarlet Witch, the Phoenix and Billy stronger ones; Thor and Vision worthy; Vision and
-     * Ultron metal; Agatha's magic dark; the Phoenix fire-proof. (The Iron Spider's legs go with his look, not his power:
-     * {@code SpiderServer.isIronSpider}.)
+     * Professor X a telepath, the Scarlet Witch, the Phoenix and Billy stronger ones; Thor and Vision worthy; Vision
+     * and Ultron metal; Agatha's magic dark; the Phoenix fire-proof. (The Iron Spider's legs go with his look, not his
+     * power: {@code SpiderServer.isIronSpider}.) 3.6: Doctor Strange is a sorcerer; the gods of Asgard, Loki, the
+     * Scarlet Witch and the Phoenix may hold a bare Infinity Stone ({@link Trait#STONE_BEARER}); the Hulk has no role.
      */
     public static Set<Trait> of(Power power) {
         EnumSet<Trait> traits = EnumSet.noneOf(Trait.class);
         switch (power) {
-            case LOKI -> traits.add(Trait.SORCERER);
-            case BILLY, SCARLET_WITCH -> traits.addAll(Set.of(Trait.SORCERER, Trait.TELEPATH_STRONG));
+            case LOKI -> traits.addAll(Set.of(Trait.SORCERER, Trait.STONE_BEARER));
+            case BILLY -> traits.addAll(Set.of(Trait.SORCERER, Trait.TELEPATH_STRONG));
+            case SCARLET_WITCH -> traits.addAll(Set.of(Trait.SORCERER, Trait.TELEPATH_STRONG, Trait.STONE_BEARER));
             case AGATHA -> traits.addAll(Set.of(Trait.SORCERER, Trait.DARK_MAGIC));
-            case PHOENIX -> traits.addAll(Set.of(Trait.TELEPATH_STRONG, Trait.FIRE_IMMUNE));
+            case PHOENIX -> traits.addAll(Set.of(Trait.TELEPATH_STRONG, Trait.FIRE_IMMUNE, Trait.STONE_BEARER));
             case PROFESSOR_X -> traits.add(Trait.TELEPATH);
-            case THOR -> traits.add(Trait.WORTHY);
+            case THOR -> traits.addAll(Set.of(Trait.WORTHY, Trait.STONE_BEARER));
             case VISION -> traits.addAll(Set.of(Trait.WORTHY, Trait.METAL_BODY));
             case ULTRON -> traits.add(Trait.METAL_BODY);
-            // 3.5: none yet (their lanes say: Hela's rows are dark magic, Odin's Odinforce a sorcerer's, see HeroAbility).
-            case HEIMDALL, ODIN, HELA -> {
+            // 3.5: no other role (their lanes say: Hela's rows are dark magic, Odin's Odinforce a sorcerer's, see
+            // HeroAbility); 3.6: the gods may hold a bare stone.
+            case HEIMDALL, ODIN, HELA -> traits.add(Trait.STONE_BEARER);
+            // 3.6: the Sorcerer Supreme (the Hex Runes hold him, he reads the Vishanti and the Darkhold as a sorcerer).
+            case DOCTOR_STRANGE -> traits.add(Trait.SORCERER);
+            // 3.6: the Hulk has no role: not a sorcerer, not a Bearer, his mind open to Xavier and Wanda.
+            case HULK -> {
             }
             default -> {
             }

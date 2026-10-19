@@ -44,8 +44,9 @@ public enum HeroAbility implements CatalogEntry {
             .res(Resource.GRIP).traits(Trait.SORCERER, Trait.TELEPATH_STRONG).family(Family.TELEKINESIS)),
     WANDA_CHAOS_SHIELD(Power.SCARLET_WITCH, 4, "chaos_shield", hold().cost(2).group(Group.ENERGY).icon("minecraft:red_stained_glass")
             .res(Resource.SHIELD).traits(Trait.SORCERER, Trait.TELEPATH_STRONG).family(Family.SHIELD).on(PowerData::chaosShieldActive)),
+    // (3.6: her reality-warping makes a custom hero a Bearer of the Infinity Stones.)
     WANDA_HEX(Power.SCARLET_WITCH, 5, "hex", press().alt(Act.PRESS).cost(3).group(Group.MIND).icon("minecraft:crying_obsidian")
-            .res(Resource.HEX).traits(Trait.SORCERER, Trait.TELEPATH_STRONG).world()),
+            .res(Resource.HEX).traits(Trait.SORCERER, Trait.TELEPATH_STRONG, Trait.STONE_BEARER).world()),
 
     // ===== quicksilver =====
     QUICKSILVER_TIME(Power.QUICKSILVER, 1, "time", toggle().alt(Act.TOGGLE).cost(3).group(Group.MOVE).icon("minecraft:recovery_compass")
@@ -100,8 +101,10 @@ public enum HeroAbility implements CatalogEntry {
     LOKI_SHAPESHIFT(Power.LOKI, 3, "shapeshift", press().cost(1).group(Group.BODY).icon("minecraft:slime_ball")
             .fixed().res(Resource.FORM).traits(Trait.SORCERER).family(Family.SHAPE)),
     LOKI_VANISH(Power.LOKI, 4, "vanish", press().cost(2).group(Group.MOVE).icon("minecraft:ender_pearl").traits(Trait.SORCERER)),
+    // (3.6: his Jotun-god nature makes a custom hero a Bearer of the Infinity Stones.)
     LOKI_FROST_GIANT(Power.LOKI, 5, "frost_giant", toggle().cost(1).group(Group.BODY).icon("minecraft:packed_ice")
-            .fixed().traits(Trait.SORCERER).family(Family.SHAPE).on(d -> d.toggle(Toggle.FROST_GIANT))),
+            .fixed().traits(Trait.SORCERER, Trait.STONE_BEARER).family(Family.SHAPE)
+                    .on(d -> d.toggle(Toggle.FROST_GIANT))),
 
     // ===== thor =====
     THOR_HAMMER(Power.THOR, 1, "hammer", press().alt(Act.PRESS).cost(2).group(Group.BODY).icon("minecraft:mace")
@@ -111,7 +114,8 @@ public enum HeroAbility implements CatalogEntry {
     THOR_THUNDER(Power.THOR, 4, "thunder", toggle().cost(2).group(Group.ELEMENT).icon("minecraft:trident")
             .on(d -> d.toggle(Toggle.GOD_OF_THUNDER))),
     THOR_BIFROST(Power.THOR, 5, "bifrost", press().alt(Act.PRESS).cost(2).group(Group.MOVE).icon("minecraft:end_crystal").world()),
-    THOR_BODY(Power.THOR, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:netherite_chestplate").family(Family.BODY)),
+    THOR_BODY(Power.THOR, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:netherite_chestplate")
+            .traits(Trait.STONE_BEARER).family(Family.BODY)),
 
     // ===== phoenix =====
     PHOENIX_MIND(Power.PHOENIX, 1, "mind", toggle().alt(Act.PRESS).cost(1).group(Group.MIND).icon("minecraft:ender_eye")
@@ -123,7 +127,7 @@ public enum HeroAbility implements CatalogEntry {
     PHOENIX_BURST(Power.PHOENIX, 5, "burst", hold().cost(3).group(Group.ENERGY).icon("minecraft:blaze_powder")
             .on(d -> d.is(Live.PHOENIX_CHARGING))),
     PHOENIX_BODY(Power.PHOENIX, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:blaze_rod")
-            .fixed().traits(Trait.FIRE_IMMUNE).family(Family.BODY)),
+            .fixed().traits(Trait.FIRE_IMMUNE, Trait.STONE_BEARER).family(Family.BODY)),
 
     // ===== spider_man =====
     SPIDER_WEB(Power.SPIDER_MAN, 1, "web", press().alt(Act.PRESS).cost(2).group(Group.ENERGY).icon("minecraft:cobweb")),
@@ -142,7 +146,7 @@ public enum HeroAbility implements CatalogEntry {
     THANOS_REALITY(Power.THANOS, 3, "reality", press().alt(Act.TOGGLE).cost(2).group(Group.MIND).icon("minecraft:red_dye")
             .on(d -> d.toggle(Toggle.REALITY_VEIL))),
     THANOS_SOUL(Power.THANOS, 4, "soul", hold().alt(Act.PRESS).cost(3).group(Group.MIND).icon("minecraft:orange_dye")
-            .on(d -> d.is(Live.SOUL_DRAINING))),
+            .res(Resource.SOUL_CHAIN).on(d -> d.is(Live.SOUL_DRAINING))),
     THANOS_TIME(Power.THANOS, 5, "time", press().alt(Act.PRESS).cost(3).group(Group.MIND).icon("minecraft:emerald")
             .family(Family.TIME).world()),
     THANOS_BODY(Power.THANOS, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:golden_chestplate").family(Family.BODY)),
@@ -212,7 +216,8 @@ public enum HeroAbility implements CatalogEntry {
             .on(d -> d.is(Live.HEIMDALL_WARD))),
     HEIMDALL_STRIKE(Power.HEIMDALL, 5, "strike", press().alt(Act.PRESS).cost(3).group(Group.ELEMENT).icon("minecraft:amethyst_shard")
             .world()),
-    HEIMDALL_BODY(Power.HEIMDALL, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:golden_leggings").family(Family.BODY)),
+    HEIMDALL_BODY(Power.HEIMDALL, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:golden_leggings")
+            .traits(Trait.STONE_BEARER).family(Family.BODY)),
 
     // ===== odin (3.5) =====
     ODIN_GUNGNIR(Power.ODIN, 1, "gungnir", press().alt(Act.PRESS).cost(3).group(Group.ENERGY).icon("enhanced:gungnir")
@@ -224,7 +229,8 @@ public enum HeroAbility implements CatalogEntry {
             .on(d -> d.is(Live.ODIN_RAVENS))),
     ODIN_COMMAND(Power.ODIN, 5, "command", press().alt(Act.TOGGLE).cost(3).group(Group.MIND).icon("minecraft:goat_horn").world()
             .on(d -> d.toggle(Toggle.ODINSLEEP))),
-    ODIN_BODY(Power.ODIN, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:gold_ingot").family(Family.BODY)),
+    ODIN_BODY(Power.ODIN, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:gold_ingot")
+            .traits(Trait.STONE_BEARER).family(Family.BODY)),
 
     // ===== hela (3.5) =====
     HELA_NECROSWORDS(Power.HELA, 1, "necroswords", press().alt(Act.PRESS).cost(2).group(Group.ENERGY).icon("minecraft:netherite_sword")
@@ -238,7 +244,48 @@ public enum HeroAbility implements CatalogEntry {
     HELA_GRASP(Power.HELA, 5, "grasp", hold().cost(2).group(Group.ENERGY).icon("minecraft:crying_obsidian")
             .traits(Trait.DARK_MAGIC).on(d -> d.is(Live.HELA_GRASPING))),
     HELA_BODY(Power.HELA, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:netherite_helmet")
-            .traits(Trait.DARK_MAGIC).family(Family.BODY)),
+            .traits(Trait.DARK_MAGIC, Trait.STONE_BEARER).family(Family.BODY)),
+
+    // ===== doctor_strange (3.6) =====
+    // (The rows of 3.6 are written by the skeleton from the plan's tables; each lane fixes its own hero's data here. G
+    // is his flight key, not a row: the Flight module's style "cloak". Y is the Eye: at most one Y row per custom
+    // hero.)
+    STRANGE_WHIP(Power.DOCTOR_STRANGE, 1, "whip", press().alt(Act.PRESS).cost(2).group(Group.ENERGY)
+            .icon("minecraft:blaze_rod")
+            .traits(Trait.SORCERER)),
+    STRANGE_SHIELDS(Power.DOCTOR_STRANGE, 3, "shields", hold().alt(Act.PRESS).cost(2).group(Group.ENERGY)
+            .icon("minecraft:orange_stained_glass").res(Resource.SHIELD).traits(Trait.SORCERER).family(Family.SHIELD)
+            .on(PowerData::chaosShieldActive)),
+    STRANGE_BANDS(Power.DOCTOR_STRANGE, 4, "bands", press().alt(Act.TOGGLE).cost(3).group(Group.MIND)
+            .icon("minecraft:red_wool")
+            .altRes(Resource.PHASE).traits(Trait.SORCERER)),
+    STRANGE_PORTAL(Power.DOCTOR_STRANGE, 5, "portal", press().alt(Act.TOGGLE).cost(3).group(Group.MOVE)
+            .icon("enhanced:sling_ring")
+            .traits(Trait.SORCERER).world()),
+    /** The Eye of Agamotto on the Y key: it works only with an Eye in the inventory. */
+    STRANGE_EYE(Power.DOCTOR_STRANGE, 6, "eye", toggle().alt(Act.PRESS).cost(3).group(Group.MIND)
+            .icon("enhanced:eye_of_agamotto")
+            .res(Resource.SLOW_TIME).traits(Trait.SORCERER).family(Family.TIME).on(d -> d.toggle(Toggle.TIME_SLOW))),
+    STRANGE_BODY(Power.DOCTOR_STRANGE, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:red_banner")
+            .traits(Trait.SORCERER).family(Family.BODY)),
+
+    // ===== hulk (3.6) =====
+    HULK_SMASH(Power.HULK, 1, "smash", press().alt(Act.PRESS).cost(2).group(Group.BODY)
+            .icon("minecraft:cracked_stone_bricks")),
+    HULK_CLAP(Power.HULK, 2, "clap", press().alt(Act.PRESS).cost(2).group(Group.BODY).icon("minecraft:bell")),
+    HULK_LEAP(Power.HULK, 3, "leap", press().alt(Act.PRESS).cost(2).group(Group.MOVE).icon("minecraft:piston")
+            .on(d -> d.is(Live.HULK_LEAPING))),
+    HULK_BOULDER(Power.HULK, 4, "boulder", press().alt(Act.PRESS).cost(2).group(Group.ELEMENT)
+            .icon("minecraft:mossy_cobblestone")),
+    /**
+     * The Transform: Bruce Banner and the Hulk (for a custom hero, the Human Form: every power off until N again); its
+     * Sneak variant, Switch Hulk, is the built-in Hulk's only.
+     */
+    HULK_TRANSFORM(Power.HULK, 5, "transform", press().alt(Act.PRESS).cost(1).group(Group.BODY)
+            .icon("minecraft:lime_dye")
+            .fixed().res(Resource.FORM).on(d -> d.toggle(Toggle.HUMAN_FORM))),
+    HULK_BODY(Power.HULK, 0, "body", body().cost(2).group(Group.BODY).icon("minecraft:emerald")
+            .res(Resource.SCALE).family(Family.BODY)),
 
     // ===== variants (3.5, the creator lane) =====
     // Every Sneak variant of a built-in hero's key as a card of its own (the user: "all abilities listed, like Billy's
@@ -298,7 +345,27 @@ public enum HeroAbility implements CatalogEntry {
     CYCLOPS_RICOCHET(CYCLOPS_OPTIC_BLAST, "ricochet",
             variant(CYCLOPS_OPTIC_BLAST).icon("minecraft:prismarine_crystals")),
     CYCLOPS_OPEN_EYES(CYCLOPS_GLASSES, "open_eyes", variant(CYCLOPS_GLASSES).icon("minecraft:red_stained_glass")
-            .family(Family.BEAM).requires("cyclops.glasses").on(d -> d.is(Live.CYCLOPS_UNLEASHED)));
+            .family(Family.BEAM).requires("cyclops.glasses").on(d -> d.is(Live.CYCLOPS_UNLEASHED))),
+
+    // ===== variants (3.6) =====
+    // (The Sneak variants of the heroes of 3.6, as the creator lane of 3.5 made them: data only, their lanes fix them.
+    // The Hulk's Switch Hulk has none: it is the built-in Hulk's own.)
+    STRANGE_WHIP_GRAPPLE(STRANGE_WHIP, "whip_grapple", variant(STRANGE_WHIP).icon("minecraft:fishing_rod")),
+    STRANGE_SERAPHIM_DOME(STRANGE_SHIELDS, "seraphim_dome", variant(STRANGE_SHIELDS)
+            .icon("minecraft:orange_stained_glass_pane")
+            .family(Family.SHIELD)),
+    STRANGE_ASTRAL(STRANGE_BANDS, "astral", variant(STRANGE_BANDS).icon("minecraft:ghast_tear")
+            .on(d -> d.toggle(Toggle.STRANGE_ASTRAL))),
+    STRANGE_MIRROR(STRANGE_PORTAL, "mirror", variant(STRANGE_PORTAL).icon("minecraft:glass")
+            .on(d -> d.toggle(Toggle.STRANGE_MIRROR))),
+    /** The Eye's Rewind: needs the Eye too. */
+    STRANGE_EYE_REWIND(STRANGE_EYE, "eye_rewind", variant(STRANGE_EYE).icon("minecraft:clock")),
+    HULK_GRAB_SMASH(HULK_SMASH, "grab_smash", variant(HULK_SMASH).icon("minecraft:lead")
+            .on(d -> d.is(Live.HULK_GRABBING))),
+    HULK_ROAR(HULK_CLAP, "roar", variant(HULK_CLAP).icon("minecraft:goat_horn")),
+    HULK_BOUND(HULK_LEAP, "bound", variant(HULK_LEAP).icon("minecraft:feather").on(d -> d.is(Live.HULK_LEAPING))),
+    HULK_GAMMA_CHARGE(HULK_BOULDER, "gamma_charge", variant(HULK_BOULDER).icon("minecraft:lime_stained_glass")
+            .on(d -> d.is(Live.HULK_CHARGING)));
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {
@@ -329,7 +396,10 @@ public enum HeroAbility implements CatalogEntry {
 
     /** The hero whose ability it is. */
     public final Power hero;
-    /** The key it is on for the hero himself (1-5, R G V B N), 0 for a body (a passive), 6 for Billy's Y key. */
+    /**
+     * The key it is on for the hero himself (1-5, R G V B N), 0 for a body (a passive), 6 for the Y key (Billy's and
+     * the Scarlet Witch's Build Magic, 3.6: Doctor Strange's Eye).
+     */
     public final int home;
     /** Its name within the hero ({@code lightning}). */
     public final String name;
@@ -365,7 +435,7 @@ public enum HeroAbility implements CatalogEntry {
         this.home = home;
         this.name = name;
         this.id = hero.getSerializedName().replace("scarlet_witch", "wanda").replace("spider_man", "spider")
-                .replace("professor_x", "xavier") + "." + name;
+                .replace("professor_x", "xavier").replace("doctor_strange", "strange") + "." + name;
         this.act = spec.act;
         this.alt = spec.alt;
         this.costPerPoint = spec.cost;
@@ -391,7 +461,9 @@ public enum HeroAbility implements CatalogEntry {
         return id;
     }
 
-    /** The id of its hero in ids ({@code thor}, {@code wanda}, {@code spider}, {@code xavier}...). */
+    /**
+     * The id of its hero in ids ({@code thor}, {@code wanda}, {@code spider}, {@code xavier}, 3.6: {@code strange}...).
+     */
     public String heroId() {
         return id.substring(0, id.indexOf('.'));
     }

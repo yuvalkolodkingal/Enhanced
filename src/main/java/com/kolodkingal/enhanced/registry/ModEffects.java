@@ -53,6 +53,12 @@ public final class ModEffects {
     /** A hero whose power Agatha has drained: no ability, no flight, for a while. */
     public static final DeferredHolder<MobEffect, DrainedEffect> DRAINED = EFFECTS.register("drained", DrainedEffect::new);
 
+    // ===== hulk (3.6) =====
+    /** What the Hulk's Roar does to a hostile creature: it runs from him (lane L7). */
+    public static final DeferredHolder<MobEffect,
+            com.kolodkingal.enhanced.effect.FrightenedEffect> FRIGHTENED = EFFECTS.register(
+            "frightened", com.kolodkingal.enhanced.effect.FrightenedEffect::new);
+
     private ModEffects() {
     }
 }

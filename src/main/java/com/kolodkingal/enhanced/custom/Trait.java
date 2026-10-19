@@ -21,5 +21,10 @@ public enum Trait {
     /** Every power of his is the Darkhold's dark magic (Agatha). */
     DARK_MAGIC,
     /** Fire does not burn him. */
-    FIRE_IMMUNE
+    FIRE_IMMUNE,
+    /**
+     * 3.6: he may hold a bare Infinity Stone (a god's nature: {@code StoneRules.isBearer}). The gods, the Scarlet Witch
+     * and the Phoenix have it; a custom hero by a god's row ({@code stones.customBearers}).
+     */
+    STONE_BEARER
 }

@@ -47,6 +47,9 @@ public class Enhanced {
         // 3.5: the chunk generator of Asgard.
         com.kolodkingal.enhanced.registry.ModChunkGenerators.CHUNK_GENERATORS.register(modBus);
         ModStructures.PROCESSORS.register(modBus);
+        // 3.6: the stones' recipe (a stone out of its vessel) and loot function (a site stone in a chest).
+        com.kolodkingal.enhanced.registry.ModRecipes.SERIALIZERS.register(modBus);
+        com.kolodkingal.enhanced.registry.ModLootFunctions.FUNCTIONS.register(modBus);
         ModCreativeTab.TABS.register(modBus);
         modBus.addListener(ModNetwork::register);
         modBus.addListener(ModEntities::registerAttributes);

@@ -67,6 +67,10 @@ public class TesseractItem extends Item {
                 player.startUsingItem(hand);
                 return InteractionResultHolder.consume(stack);
             }
+            // 3.6: Sneak + use is the Space Stone's Realm Picker, when a stone power answers (lane L2).
+            if (ScepterRituals.useTesseractRealms(serverPlayer, hand)) {
+                return InteractionResultHolder.consume(stack);
+            }
             if (Powers.power(serverPlayer).hasPowers()) {
                 if (!jump(serverPlayer)) {
                     return InteractionResultHolder.fail(stack);

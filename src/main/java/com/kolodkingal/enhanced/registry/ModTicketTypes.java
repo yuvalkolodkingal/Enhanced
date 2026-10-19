@@ -36,6 +36,12 @@ public final class ModTicketTypes {
      */
     public static final TicketType<UUID> ENHANCED_ASGARD = TicketType.create("enhanced_asgard", UUID::compareTo);
 
+    // ===== strange (3.6) =====
+    /**
+     * The far ring of a pair of Sling-Ring portals, kept loaded while the pair lives (8 s; lane L3), keyed by the pair.
+     */
+    public static final TicketType<UUID> ENHANCED_SLING = TicketType.create("enhanced_sling", UUID::compareTo);
+
     private ModTicketTypes() {
     }
 }

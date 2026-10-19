@@ -14,10 +14,10 @@ public final class ModNetwork {
     /**
      * The version of the messages and synced data: a client and a server with different versions can't play together.
      * Bumped once for all of 3.1, once for 3.2 (the Witches' Road screen got a mode and the trials' progress), once for
-     * all of 3.3, once for 3.4 (a custom hero's definition, format 2, and his state's cast marker), and once for 3.5
-     * (Asgard).
+     * all of 3.3, once for 3.4 (a custom hero's definition, format 2, and his state's cast marker), once for 3.5
+     * (Asgard), and once for 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra).
      */
-    public static final String PROTOCOL_VERSION = "9";
+    public static final String PROTOCOL_VERSION = "10";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -81,6 +81,16 @@ public final class ModNetwork {
         registrar.playToServer(AsgardTalkPayload.Choose.TYPE, AsgardTalkPayload.Choose.STREAM_CODEC, AsgardTalkPayload.Choose::handle);
         registrar.playToClient(HeimdallSightPayload.TYPE, HeimdallSightPayload.STREAM_CODEC, HeimdallSightPayload::handle);
         registrar.playToClient(AsgardFxPayload.TYPE, AsgardFxPayload.STREAM_CODEC, AsgardFxPayload::handle);
+        // 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra): protocol 10. The handlers call the lanes'
+        // hooks.
+        registrar.playToServer(StoneActionPayload.TYPE, StoneActionPayload.STREAM_CODEC, StoneActionPayload::handle);
+        registrar.playToClient(RealmScreenPayload.TYPE, RealmScreenPayload.STREAM_CODEC, RealmScreenPayload::handle);
+        registrar.playToClient(StoneFxPayload.TYPE, StoneFxPayload.STREAM_CODEC, StoneFxPayload::handle);
+        registrar.playToClient(StrangeFxPayload.TYPE, StrangeFxPayload.STREAM_CODEC, StrangeFxPayload::handle);
+        registrar.playToServer(SlingRingActionPayload.TYPE, SlingRingActionPayload.STREAM_CODEC,
+                SlingRingActionPayload::handle);
+        registrar.playToClient(HulkFxPayload.TYPE, HulkFxPayload.STREAM_CODEC, HulkFxPayload::handle);
+        registrar.playToClient(HydraFxPayload.TYPE, HydraFxPayload.STREAM_CODEC, HydraFxPayload::handle);
         // 3.5: the world's own music (its manifest, a client's request for a song, and the song in pieces), optional.
         PayloadRegistrar music = event.registrar(MUSIC_VERSION).optional();
         music.playToClient(MusicManifestPayload.TYPE, MusicManifestPayload.STREAM_CODEC, MusicManifestPayload::handle);

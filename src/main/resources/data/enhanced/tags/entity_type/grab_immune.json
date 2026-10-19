@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#enhanced:bosses",
+    "enhanced:stonekeeper",
+    "#enhanced:asgardians"
+  ]
+}

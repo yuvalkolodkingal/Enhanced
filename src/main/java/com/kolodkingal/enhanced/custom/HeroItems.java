@@ -47,6 +47,10 @@ public final class HeroItems {
             case AGATHA -> List.of(ModItems.DARKHOLD.get());
             // 3.5: their weapons are bound to their owners (OWNER and BOND): lanes L2 and L3 decide what "Choose" gives.
             case HEIMDALL, ODIN, HELA -> List.of();
+            // 3.6: Doctor Strange's Eye of Agamotto and Sling Ring (lane L3 binds the Eye to him: OWNER); the Hulk has
+            // none.
+            case DOCTOR_STRANGE -> List.of(ModItems.EYE_OF_AGAMOTTO.get(), ModItems.SLING_RING.get());
+            case HULK -> List.of();
             default -> List.of();
         };
     }

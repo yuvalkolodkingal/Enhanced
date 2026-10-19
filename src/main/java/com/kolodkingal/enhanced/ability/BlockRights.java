@@ -5,10 +5,12 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.strange.MirrorDimension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
@@ -66,11 +68,23 @@ public final class BlockRights {
      * lets him, and no listener cancels the break.
      */
     public static boolean mayBreak(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState old) {
-        // (3.5: the protected city of Asgard is kept as a boss arena is.)
-        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos) || behindTheWall(player, level, pos)) {
+        // (3.5: the protected city of Asgard is kept as a boss arena is; 3.6: so is what a Mirror Dimension holds.)
+        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos)
+                || behindTheWall(player, level, pos) || MirrorDimension.protects(player, level, pos)) {
             return false; // the arena of a boss fight stays as it is; the Hex keeps its own
         }
         return vanillaRights(player, level, pos) && postBreak(player, level, pos, old);
+    }
+
+    /**
+     * 3.6: whether a power's blast may break the block at {@code pos} in the player's name: the Power Stone's craters
+     * ({@code [power_stone] terrainDamage}) and the blocks the Hulk breaks. It needs the gamerule {@code mobGriefing}
+     * on and everything {@link #mayBreak} asks (a boss arena, the city of Asgard, a Hex, a Mirror Dimension, spawn
+     * protection, claims). The caller's own config (on or off) comes first.
+     */
+    public static boolean mayBlast(ServerPlayer player, ServerLevel level, BlockPos pos) {
+        return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && mayBreak(player, level, pos,
+                level.getBlockState(pos));
     }
 
     /**
@@ -78,7 +92,8 @@ public final class BlockRights {
      * listener cancels the placing.
      */
     public static boolean mayPlace(ServerPlayer player, ServerLevel level, BlockPos pos) {
-        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos) || behindTheWall(player, level, pos)) {
+        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos)
+                || behindTheWall(player, level, pos) || MirrorDimension.protects(player, level, pos)) {
             return false;
         }
         return vanillaRights(player, level, pos) && postPlace(player, level, pos);
@@ -92,7 +107,8 @@ public final class BlockRights {
      * build_magic.hexIsAClaim}).
      */
     public static boolean massEditRefuses(ServerPlayer player, ServerLevel level, BlockPos pos) {
-        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos)) {
+        if (BossFights.protects(level, pos) || AsgardRules.protectsCity(player, level, pos)
+                || MirrorDimension.protects(player, level, pos)) {
             return true;
         }
         if (BuildConfig.ALL_ARENAS_PROTECTED.get() && BossFights.inAnyArena(level, pos)) {

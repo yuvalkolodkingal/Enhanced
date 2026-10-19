@@ -26,6 +26,7 @@ import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.custom.LookCatalog;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.Resource;
+import com.kolodkingal.enhanced.custom.StoneRow;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
@@ -235,10 +236,13 @@ public final class CustomV2Tests {
                 check((row != null) != (key == p.flightAbility()), p + " key " + key + " is a row or the flight key, never both");
             }
         }
-        check(HeroAbility.values().length == 133, "71 keys + 9 bodies (L2: Vision's) + Build Magic, 3.5's 15 keys + 3 bodies, and the "
-                + "creator lane's 33 variant rows + the Scarlet Witch's Build Magic: "
+        check(HeroAbility.values().length == 154,
+                "71 keys + 9 bodies (L2: Vision's) + Build Magic, 3.5's 15 keys + 3 bodies, the creator lane's 33 "
+                + "variant rows + the Scarlet Witch's Build Magic, and 3.6's 10 keys + 2 bodies + 9 variant rows: "
                 + HeroAbility.values().length);
-        check(Catalog.all().size() == PowerModule.values().length + HeroAbility.values().length, "the catalogue is both lists");
+        check(Catalog.all().size()
+                == PowerModule.values().length + HeroAbility.values().length + StoneRow.values().length,
+                "the catalogue is the three lists (3.6: the stone rows)");
         for (CatalogEntry e : Catalog.all()) {
             check(Catalog.byId(e.id()) == e, e.id() + " is found in the catalogue");
         }

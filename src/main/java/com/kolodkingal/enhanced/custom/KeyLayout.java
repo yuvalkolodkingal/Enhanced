@@ -46,7 +46,7 @@ public final class KeyLayout {
             }
         }
         for (CustomHero.Pick pick : homeless) {
-            if (pick.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option())) {
+            if (CustomHeroRules.pairs(pick)) {
                 continue; // (its variant needs the Sneak cell of its own plain key)
             }
             for (int column = 1; column <= CustomHero.KEYS; column++) {
@@ -107,7 +107,7 @@ public final class KeyLayout {
                 pick = p;
             }
         }
-        return pick != null && pick.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option());
+        return pick != null && CustomHeroRules.pairs(pick);
     }
 
     private KeyLayout() {

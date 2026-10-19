@@ -15,14 +15,14 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
-import com.kolodkingal.enhanced.registry.ModTags;
+import com.kolodkingal.enhanced.stones.SoulDrain;
+import com.kolodkingal.enhanced.stones.TimeRewind;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.thanos.StonePowers;
 import com.kolodkingal.enhanced.thanos.ThanosEffects;
 import com.kolodkingal.enhanced.thanos.ThanosSounds;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import net.minecraft.core.Holder;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -31,10 +31,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -59,11 +56,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -97,20 +92,10 @@ public final class ThanosAbilities {
     private static final ResourceLocation BODY_STEP = Enhanced.id("thanos_step");
     private static final ResourceLocation BODY_FALL = Enhanced.id("thanos_fall");
 
-    /** A snapshot of him is kept this often (ticks): the Rewind goes back to the oldest one the window holds. */
-    private static final int SNAPSHOT_EVERY = 5;
-    /** The Rewind needs at least this much history (ticks), two seconds, or there is nothing to undo. */
-    private static final int MIN_HISTORY = 40;
     /** How long the sphere of the Transmute and the vortex of the Space Pull take to arrive. */
     private static final int FLIGHT_TICKS = 6;
     /** How far the Titan Slam's ring runs each tick (blocks). */
     private static final double SLAM_SPEED = 0.9;
-    /** The Soul Drain takes its toll this often (ticks). */
-    private static final int DRAIN_EVERY = 10;
-    /** A drain is torn by this much damage taken within one second. */
-    private static final float TEAR_DAMAGE = 60.0F;
-    /** The chain holds past the range he locked it at, up to this many blocks more. */
-    private static final double DRAIN_SLACK = 4.0;
     /** The Time Lock keeps its creatures locked by renewing the effect this often (ticks). */
     private static final int LOCK_RENEW = 4;
     /**
@@ -120,23 +105,46 @@ public final class ThanosAbilities {
     /** What the Soul Sight makes glow, and for how long (5 seconds). */
     private static final int REVEAL_TICKS = 100;
 
-    /** The harmful effects the Rewind takes off him if they began in the window. */
-    private static final List<Holder<MobEffect>> UNDONE = List.of(MobEffects.POISON, MobEffects.WITHER, MobEffects.MOVEMENT_SLOWDOWN,
-            MobEffects.WEAKNESS, MobEffects.CONFUSION, MobEffects.BLINDNESS, MobEffects.DARKNESS, MobEffects.HUNGER,
-            MobEffects.DIG_SLOWDOWN, MobEffects.LEVITATION, ModEffects.PETRIFIED, ModEffects.TIME_LOCKED, ModEffects.SOULWORLD);
+    /**
+     * 3.6: the numbers of his Soul Drain (the drain itself is {@link SoulDrain}'s, shared with the Soul Stone), read
+     * when used.
+     */
+    private static final SoulDrain.Numbers DRAIN = new SoulDrain.Numbers() {
+        @Override
+        public HeroAbility row() {
+            return HeroAbility.THANOS_SOUL;
+        }
+
+        @Override
+        public double range() {
+            return ThanosConfig.DRAIN_RANGE.get();
+        }
+
+        @Override
+        public double damagePerSecond() {
+            return ThanosConfig.DRAIN_DAMAGE_PER_SECOND.get();
+        }
+
+        @Override
+        public float healFraction() {
+            return ThanosConfig.DRAIN_HEAL_FRACTION.get().floatValue();
+        }
+
+        @Override
+        public float exhaustion() {
+            return ThanosConfig.DRAIN_EXHAUSTION.get().floatValue();
+        }
+
+        @Override
+        public int cooldown() {
+            return ThanosConfig.DRAIN_COOLDOWN.get();
+        }
+    };
 
     // ---- what lasts from tick to tick (server only, per Thanos) ----
 
-    /** Where he was: a point of the history the Rewind goes back into. */
-    private record Snapshot(long time, ResourceKey<Level> dimension, Vec3 position, float health, Set<Holder<MobEffect>> effects) {
-    }
-
     /** Damage he took, for the healing factor's pause and the chain a hard blow tears. */
     private record Hurt(long time, float amount) {
-    }
-
-    /** The Soul Drain: whom it holds and since when. */
-    private record Drain(UUID target, long start) {
     }
 
     /** The Transmute's sphere in flight. */
@@ -173,14 +181,14 @@ public final class ThanosAbilities {
         }
     }
 
+    // (3.6: the history the Rewind goes back into is TimeRewind's, the Soul Drain SoulDrain's: the Time and Soul Stones
+    // share them.)
     private static final class State {
-        final Deque<Snapshot> history = new ArrayDeque<>();
         final Deque<Hurt> taken = new ArrayDeque<>();
         /** The creatures he turned to stone and the game time each is stone until. */
         final Map<UUID, Long> stoned = new HashMap<>();
         long lastHurt = Long.MIN_VALUE / 2;
         long sightEnds;
-        @Nullable Drain drain;
         @Nullable Sphere sphere;
         @Nullable Vortex vortex;
         @Nullable Slam slam;
@@ -344,7 +352,7 @@ public final class ThanosAbilities {
         long now = level.getGameTime();
         State state = state(player);
         if (data.has(HeroAbility.THANOS_TIME)) {
-            remember(player, state, now);
+            TimeRewind.remember(player, now, ThanosConfig.REWIND_SECONDS.get() * 20L);
         }
         if (data.has(HeroAbility.THANOS_BODY)) {
             healingFactor(player, state, now, data.bodyScale(HeroAbility.THANOS_BODY));
@@ -355,7 +363,7 @@ public final class ThanosAbilities {
         slamTick(player, state, level);
         sphereTick(player, state, level, now);
         vortexTick(player, state, level, now);
-        drainTick(player, data, state, level, now);
+        SoulDrain.tick(player, data, held(player) || starving(player), takenLastSecond(state, now), now);
         if (data.is(Live.SOUL_SIGHT) && now >= state.sightEnds) {
             data.set(Live.SOUL_SIGHT, false);
         }
@@ -856,16 +864,11 @@ public final class ThanosAbilities {
      * @return whether the Veil took it
      */
     public static boolean veilTakes(ServerPlayer thanos, Projectile projectile) {
-        if (!Powers.get(thanos).has(HeroAbility.THANOS_REALITY) || !Powers.get(thanos).toggle(Toggle.REALITY_VEIL)
-                || projectile.getType().is(ModTags.REALITY_PROOF) || isOwnedBy(projectile.getOwner(), thanos)) {
+        if (!Powers.get(thanos).has(HeroAbility.THANOS_REALITY) || !Powers.get(thanos).toggle(Toggle.REALITY_VEIL)) {
             return false;
         }
-        ServerLevel level = thanos.serverLevel();
-        Vec3 at = projectile.position();
-        level.sendParticles(ParticleTypes.BUBBLE_POP, at.x, at.y, at.z, 10, 0.2, 0.2, 0.2, 0.02);
-        ThanosSounds.REALITY_POP.play(level, at);
-        projectile.discard();
-        return true;
+        // (3.6: the catch itself is the Reality Stone's, StonePowers.realityCatches, shared with the stone.)
+        return StonePowers.realityCatches(thanos, projectile);
     }
 
     // ---- B, the Soul Stone ----
@@ -877,8 +880,7 @@ public final class ThanosAbilities {
     private static void soulDrain(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        State state = state(player);
-        if (!mayStart(player, data, HeroAbility.THANOS_SOUL, now) || state.drain != null) {
+        if (!mayStart(player, data, HeroAbility.THANOS_SOUL, now) || SoulDrain.draining(player)) {
             return;
         }
         double range = ThanosConfig.DRAIN_RANGE.get();
@@ -889,70 +891,12 @@ public final class ThanosAbilities {
             player.displayClientMessage(Component.translatable(spared ? "message.enhanced.thanos.pvp_off" : "message.enhanced.thanos.no_target"), true);
             return;
         }
-        state.drain = new Drain(target.getUUID(), now);
-        data.set(Live.SOUL_DRAINING, true);
-        ThanosEffects.chains(level, player, List.of(chestOf(target)), DRAIN_EVERY + 2,
-                AbilityColors.color(player, HeroAbility.THANOS_SOUL, StoneKind.SOUL.color()));
-        ThanosSounds.CLENCH.play(level, player.position(), 0.8F, 1.1F);
-        StoneKind.SOUL.voice().use(level, player.position(), 0.6F, 1.0F);
-    }
-
-    private static void drainTick(ServerPlayer player, PowerData data, State state, ServerLevel level, long now) {
-        Drain drain = state.drain;
-        if (drain == null) {
-            data.set(Live.SOUL_DRAINING, false);
-            return;
-        }
-        LivingEntity target = level.getEntity(drain.target()) instanceof LivingEntity living ? living : null;
-        // The key was let go of (or the hold was released for him), he is held or starving, or the chain cannot hold.
-        if (!data.is(Live.SOUL_DRAINING) || player.isSpectator() || held(player) || starving(player) || target == null || !target.isAlive()
-                || StonePowers.untouchable(target) || player.distanceTo(target) > ThanosConfig.DRAIN_RANGE.get() + DRAIN_SLACK
-                || !player.hasLineOfSight(target)) {
-            endDrain(player, data);
-            return;
-        }
-        if (takenLastSecond(state, now) >= TEAR_DAMAGE) {
-            // A hard enough blow tears the chain: a flinch, and the cooldown.
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 1.0F, 0.8F);
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 1, false, false, false));
-            endDrain(player, data);
-            return;
-        }
-        player.causeFoodExhaustion(ThanosConfig.DRAIN_EXHAUSTION.get().floatValue());
-        long age = now - drain.start();
-        if (age == 0 || age % DRAIN_EVERY != 0) {
-            return;
-        }
-        Vec3 chest = chestOf(target);
-        WandaAbilities.ShieldStop shield = WandaAbilities.shieldAcross(level, player, handPosition(player), chest, 1.0F);
-        if (shield != null) {
-            // The chain stops at the surface of a Chaos Shield, and costs it.
-            if (shield.owner() instanceof ServerPlayer wanda && player.canHarmPlayer(wanda)) {
-                WandaAbilities.wear(wanda, 12.0F);
-            }
-            endDrain(player, data);
-            return;
-        }
-        float before = target.getHealth();
-        float damage = (float) (ThanosConfig.DRAIN_DAMAGE_PER_SECOND.get() * DRAIN_EVERY / 20.0);
-        if (StonePowers.hurt(level, player, target, ModDamageTypes.STONE_SOUL, damage, player)) {
-            float taken = Math.max(0.0F, before - Math.max(0.0F, target.getHealth()));
-            player.heal(taken * ThanosConfig.DRAIN_HEAL_FRACTION.get().floatValue());
-        }
-        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 0, false, false), player);
-        ThanosEffects.chains(level, player, List.of(chest), DRAIN_EVERY + 2,
-                AbilityColors.color(player, HeroAbility.THANOS_SOUL, StoneKind.SOUL.color()));
-        ThanosSounds.SOUL_DRAIN.play(level, player.position(), 0.8F, 1.0F);
+        SoulDrain.start(player, data, target, DRAIN);
     }
 
     /** Ends the Soul Drain, if there is one, and starts its cooldown. */
     private static void endDrain(ServerPlayer player, PowerData data) {
-        State state = stateOf(player);
-        data.set(Live.SOUL_DRAINING, false);
-        if (state != null && state.drain != null) {
-            state.drain = null;
-            data.startCooldown(HeroAbility.THANOS_SOUL, player.level().getGameTime(), ThanosConfig.DRAIN_COOLDOWN.get());
-        }
+        SoulDrain.end(player, data);
     }
 
     /**
@@ -995,37 +939,12 @@ public final class ThanosAbilities {
 
     // ---- N, the Time Stone ----
 
-    /** Keeps the history the Rewind goes back into: a snapshot every few ticks, for as long as the window. */
-    private static void remember(ServerPlayer player, State state, long now) {
-        Snapshot last = state.history.peekLast();
-        if (last != null && now - last.time() < SNAPSHOT_EVERY) {
-            return;
-        }
-        state.history.addLast(snapshot(player, now));
-        long window = ThanosConfig.REWIND_SECONDS.get() * 20L;
-        while (state.history.size() > 1 && now - state.history.peekFirst().time() > window + SNAPSHOT_EVERY) {
-            state.history.removeFirst();
-        }
-    }
-
-    private static Snapshot snapshot(ServerPlayer player, long time) {
-        Set<Holder<MobEffect>> had = new HashSet<>();
-        for (Holder<MobEffect> effect : UNDONE) {
-            if (player.hasEffect(effect)) {
-                had.add(effect);
-            }
-        }
-        return new Snapshot(time, player.level().dimension(), player.position(), player.getHealth(), had);
-    }
-
     /**
      * How much history the Rewind has to go back into, in ticks (0 if none): the age of the oldest snapshot kept. (The
      * HUD of a client cannot see this; it counts for itself.)
      */
     public static int historyTicks(ServerPlayer thanos) {
-        State state = stateOf(thanos);
-        Snapshot oldest = state == null ? null : state.history.peekFirst();
-        return oldest == null ? 0 : (int) (thanos.level().getGameTime() - oldest.time());
+        return TimeRewind.historyTicks(thanos);
     }
 
     /**
@@ -1034,14 +953,7 @@ public final class ThanosAbilities {
      */
     @VisibleForTesting
     public static void remember(ServerPlayer thanos, int ago) {
-        State state = state(thanos);
-        long time = thanos.level().getGameTime() - ago;
-        Snapshot snapshot = snapshot(thanos, time);
-        List<Snapshot> all = new ArrayList<>(state.history);
-        all.add(snapshot);
-        all.sort((a, b) -> Long.compare(a.time(), b.time()));
-        state.history.clear();
-        state.history.addAll(all);
+        TimeRewind.rememberAgo(thanos, ago);
     }
 
     /**
@@ -1051,80 +963,12 @@ public final class ThanosAbilities {
      * refuses the place (the rest still happens); Mjolnir's pin refuses all of it.
      */
     private static void rewind(ServerPlayer player, PowerData data) {
-        ServerLevel level = player.serverLevel();
-        long now = level.getGameTime();
-        if (!mayStart(player, data, HeroAbility.THANOS_TIME, now)) {
+        if (!mayStart(player, data, HeroAbility.THANOS_TIME, player.serverLevel().getGameTime())) {
             return;
         }
-        if (MjolnirPin.isPinned(player)) {
-            // The pin is not rewound away: a hero Mjolnir lies on goes nowhere, and the whole Rewind is refused.
-            player.displayClientMessage(Component.translatable("message.enhanced.mjolnir.pinned_cannot"), true);
-            return;
-        }
-        State state = state(player);
-        Snapshot past = state.history.peekFirst();
-        if (past == null || now - past.time() < MIN_HISTORY) {
-            player.displayClientMessage(Component.translatable("message.enhanced.thanos.nothing_to_rewind"), true);
-            return;
-        }
-        Vec3 from = player.position();
-        Vec3 back = null;
-        if (past.dimension() == level.dimension() && from.distanceToSqr(past.position()) > 1.0) {
-            back = freeSpotNear(player, past.position());
-        }
-        if (back != null && !HexManager.onTeleport(level, player, back)) {
-            back = null; // (a Hex wall or the arena of a boss refuses the place; the rest of the Rewind still happens)
-        }
-        data.startCooldown(HeroAbility.THANOS_TIME, now, ThanosConfig.REWIND_COOLDOWN.get());
-        player.causeFoodExhaustion(ThanosConfig.REWIND_EXHAUSTION.get().floatValue());
-        if (past.health() > player.getHealth()) {
-            float most = ThanosConfig.REWIND_MAX_HEAL.get().floatValue();
-            player.setHealth(Math.min(Math.min(past.health(), player.getHealth() + most), player.getMaxHealth()));
-        }
-        for (Holder<MobEffect> effect : UNDONE) {
-            if (player.hasEffect(effect) && !past.effects().contains(effect)) {
-                player.removeEffect(effect);
-            }
-        }
-        player.clearFire();
-        player.setAirSupply(player.getMaxAirSupply());
-        player.resetFallDistance();
-        ThanosEffects.mandala(level, from, 2.4F, 30, AbilityColors.color(player, HeroAbility.THANOS_TIME,
-                StoneKind.TIME.color()));
-        if (back != null) {
-            moveTo(player, level, back);
-            ThanosEffects.mandala(level, back, 2.4F, 30, AbilityColors.color(player, HeroAbility.THANOS_TIME, StoneKind.TIME.color()));
-            ThanosEffects.lineParticles(level, from.add(0.0, 1.0, 0.0), back.add(0.0, 1.0, 0.0),
-                    AbilityColors.color(player, HeroAbility.THANOS_TIME, StoneKind.TIME.color()), 16, 0.8F);
-        }
-        // The history after that moment is a future that no longer happened.
-        state.history.clear();
-        state.history.addLast(snapshot(player, now));
-        ThanosSounds.REWIND.play(level, player.position());
-        StoneKind.TIME.voice().use(level, player.position(), 0.6F, 1.0F);
-    }
-
-    /** The spot he fell from, or the nearest free spot within three blocks of it; null if there is none. */
-    @Nullable
-    private static Vec3 freeSpotNear(ServerPlayer player, Vec3 wanted) {
-        if (Teleports.fits(player, wanted) && !wet(player.serverLevel(), player, wanted)) {
-            return wanted;
-        }
-        Vec3 best = null;
-        double bestDistance = Double.MAX_VALUE;
-        for (int dx = -3; dx <= 3; dx++) {
-            for (int dy = -3; dy <= 3; dy++) {
-                for (int dz = -3; dz <= 3; dz++) {
-                    Vec3 candidate = wanted.add(dx, dy, dz);
-                    double distance = candidate.distanceToSqr(wanted);
-                    if (distance < bestDistance && distance <= 9.0 && Teleports.fits(player, candidate) && !wet(player.serverLevel(), player, candidate)) {
-                        best = candidate;
-                        bestDistance = distance;
-                    }
-                }
-            }
-        }
-        return best;
+        TimeRewind.rewind(player, data, new TimeRewind.Cost(HeroAbility.THANOS_TIME, ThanosConfig.REWIND_COOLDOWN.get(),
+                ThanosConfig.REWIND_EXHAUSTION.get().floatValue(), ThanosConfig.REWIND_MAX_HEAL.get().floatValue(),
+                AbilityColors.color(player, HeroAbility.THANOS_TIME, StoneKind.TIME.color())));
     }
 
     /**
@@ -1250,6 +1094,9 @@ public final class ThanosAbilities {
     public static void gone(ServerPlayer player, PowerData data) {
         data.set(Live.SOUL_DRAINING, false);
         data.set(Live.SOUL_SIGHT, false);
+        // (3.6: the drain and the history live in the stones' classes; they end with the rest of him.)
+        SoulDrain.forget(player);
+        TimeRewind.forget(player);
         State state = STATES.remove(player.getUUID());
         if (state == null) {
             return;
@@ -1282,6 +1129,8 @@ public final class ThanosAbilities {
     /** The server stopped: nobody is anything any more. */
     public static void clear() {
         STATES.clear();
+        SoulDrain.clear();
+        TimeRewind.clear();
     }
 
     private ThanosAbilities() {

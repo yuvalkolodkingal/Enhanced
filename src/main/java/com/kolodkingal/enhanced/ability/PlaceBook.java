@@ -39,7 +39,9 @@ public final class PlaceBook {
     /** The books that keep places. */
     public enum Kind {
         BIFROST(ModAttachments.BIFROST, "bifrost"),
-        VISHANTI(ModAttachments.VISHANTI, "vishanti");
+        VISHANTI(ModAttachments.VISHANTI, "vishanti"),
+        /** 3.6: a sorcerer's Sling Ring (lane L3): its places, and a portal pair to one of them. */
+        SLING_RING(ModAttachments.SLING_RING, "sling_ring");
 
         private final Supplier<AttachmentType<BifrostData>> attachment;
         private final String id;
@@ -115,13 +117,13 @@ public final class PlaceBook {
     // ---- Asgard (3.5) ----
 
     /**
-     * Whether the book is refused because the journey or the place touches Asgard ({@code there} is where the place is, or
-     * where the player stands when he saves): only the Bifrost reaches the Realm Eternal. The Book of the Vishanti is
-     * refused before anything is spent, operators too; the player is told.
+     * Whether the book is refused because the journey or the place touches Asgard ({@code there} is where the place is,
+     * or where the player stands when he saves): only the Bifrost reaches the Realm Eternal. The Book of the Vishanti
+     * (3.6: and the Sling Ring) is refused before anything is spent, operators too; the player is told.
      */
     public static boolean refusesAsgard(ServerPlayer player, Kind kind, ResourceKey<Level> there) {
-        if (kind == Kind.VISHANTI && (there == AsgardDimension.KEY || AsgardDimension.in(player))) {
-            player.displayClientMessage(Component.translatable("message.enhanced.vishanti.asgard"), true);
+        if (kind != Kind.BIFROST && (there == AsgardDimension.KEY || AsgardDimension.in(player))) {
+            player.displayClientMessage(Component.translatable(kind.message("asgard")), true);
             return true;
         }
         return false;

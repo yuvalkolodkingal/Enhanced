@@ -6,6 +6,8 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.stones.StoneUse;
+import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -28,27 +30,29 @@ import java.util.Map;
  * the other hand: one table for both, read in order, so that the five behaviours the heroes of 3.0 hang on them never
  * become separate {@code if} chains in separate files.
  *
- * <pre>
- *  Scepter hand | other hand       | gesture                   | ritual
- *  Scepter      | Ultron's Core    | use                       | ULTRON_CORE   (a powerless player becomes Ultron)
- *  Scepter      | Ultron Program   | Sneak + use on a block    | ULTRON_FIGHT  (the Ultron boss wakes)
- *  Scepter      | Ultron Program   | use                       | ULTRON_HINT   ("aim at the ground", nothing else)
- *  Scepter      | Tesseract        | hold use (5 s)            | THANOS        (the Mad Titan is called)
- *  Scepter      | Wanda, Vision or Ultron | use                | RECOGNISES    (the stone knows its own)
- *  Scepter      | Scarlet W. Gene  | use                       | WANDA_GENE    (the Scarlet Witch awakens)
- *  Scepter      | Synthezoid Core  | use                       | VISION_CORE   (Vision awakens)
- *  Scepter      | anything else    | use                       | EXPLODES      (the stone's energy tears you apart)
- *  Tesseract    | Scepter          | hold use (5 s)            | THANOS
- *  Tesseract    | any, a hero      | use                       | JUMP          (to the block you look at)
- *  Tesseract    | Scarlet W. Gene  | use                       | WANDA_GENE
- *  Tesseract    | anything else    | use                       | ESCAPE        (Loki's escape, in 2012)
- * </pre>
+ * <pre> Scepter hand | other hand       | gesture                   | ritual Scepter      | Ultron's Core    | use
+ * | ULTRON_CORE   (a powerless player becomes Ultron) Scepter      | Ultron Program   | Sneak + use on a block    |
+ * ULTRON_FIGHT  (the Ultron boss wakes) Scepter      | Ultron Program   | use                       | ULTRON_HINT
+ * ("aim at the ground", nothing else) Scepter      | Tesseract        | hold use (5 s)            | THANOS        (the
+ * Mad Titan is called) Scepter      | Wanda, Vision or Ultron | use                | RECOGNISES    (the stone knows its
+ * own) Scepter      | Scarlet W. Gene  | use                       | WANDA_GENE    (the Scarlet Witch awakens) Scepter
+ * | Synthezoid Core  | use                       | VISION_CORE   (Vision awakens) Scepter      | nothing          |
+ * Sneak + hold use          | MIND_BEAM     (3.6: the vessel, the Mind Stone's beam) Scepter      | anything else    |
+ * use                       | EXPLODES      (the stone's energy tears you apart) Tesseract    | Scepter          | hold
+ * use (5 s)            | THANOS Tesseract    | any              | Sneak + use               | REALMS        (3.6: the
+ * vessel, the Realm Picker) Tesseract    | any, a hero      | use                       | JUMP          (to the block
+ * you look at) Tesseract    | Scarlet W. Gene  | use                       | WANDA_GENE Tesseract    | anything else
+ * | use                       | ESCAPE        (Loki's escape, in 2012) </pre>
  *
  * The rows are chosen by the pure functions {@link #scepter} and {@link #tesseract} (checked row by row by the game
  * tests); {@link #useScepter} and {@link #useTesseract} carry them out. The rows before 3.0 do exactly what the items
  * did before. The rows of the villains need their lanes: the Ultron fight is started through {@link BossFights}, which
  * declines until the Ultron lane registers its fight, and the Thanos summoning is declined until the Thanos lane
  * registers its hold ({@link #registerThanosHold}); the Scepter and Tesseract then do what they always did.
+ *
+ * <p>3.6: the two vessel rows go to the stones ({@code StoneUse}, lane L2), inserted before the old fallbacks, so every
+ * old row is unchanged for the same inputs (a plain use with nothing in the other hand still {@code EXPLODES}). While
+ * no stone power answers (the skeleton), a vessel row does what its old row did.
  */
 public final class ScepterRituals {
     /** How long the Scepter and the Tesseract are held to call the Mad Titan: five seconds. */
@@ -56,7 +60,13 @@ public final class ScepterRituals {
 
     /** The rows of the table. */
     public enum Ritual {
-        RECOGNISES, WANDA_GENE, VISION_CORE, ULTRON_CORE, ULTRON_FIGHT, ULTRON_HINT, THANOS, EXPLODES, JUMP, ESCAPE
+        RECOGNISES, WANDA_GENE, VISION_CORE, ULTRON_CORE, ULTRON_FIGHT, ULTRON_HINT, THANOS, EXPLODES, JUMP, ESCAPE,
+        /**
+         * 3.6: the Scepter as the Mind Stone's vessel: Sneak + hold use with an empty other hand fires the Mind Beam.
+         */
+        MIND_BEAM,
+        /** 3.6: the Tesseract as the Space Stone's vessel: Sneak + use opens the Realm Picker. */
+        REALMS
     }
 
     /**
@@ -126,6 +136,10 @@ public final class ScepterRituals {
         if (other.is(ModItems.TESSERACT.get())) {
             return Ritual.THANOS;
         }
+        // 3.6: the vessel (before the old fallbacks: a plain use with nothing in the other hand still explodes).
+        if (sneaking && other.isEmpty()) {
+            return Ritual.MIND_BEAM;
+        }
         return beforeTheVillains(power, other);
     }
 
@@ -143,10 +157,21 @@ public final class ScepterRituals {
         return Ritual.EXPLODES;
     }
 
-    /** The row for a Tesseract used by a player with {@code power}, with {@code other} in the other hand. */
+    /**
+     * The row for a Tesseract used (not sneaking) by a player with {@code power}, with {@code other} in the other hand.
+     */
     public static Ritual tesseract(Power power, ItemStack other) {
+        return tesseract(power, other, false);
+    }
+
+    /** 3.6: the row for a Tesseract used by a player with {@code power}, with {@code other} in the other hand. */
+    public static Ritual tesseract(Power power, ItemStack other, boolean sneaking) {
         if (other.is(ModItems.LOKIS_SCEPTER.get())) {
             return Ritual.THANOS;
+        }
+        // 3.6: the vessel (before the old fallbacks).
+        if (sneaking) {
+            return Ritual.REALMS;
         }
         if (power.hasPowers()) {
             return Ritual.JUMP;
@@ -176,6 +201,13 @@ public final class ScepterRituals {
                 return hold.begin(player, scepterHand);
             }
             // The Mad Titan cannot be called yet: the Scepter does what it always did with a Tesseract.
+            ritual = beforeTheVillains(power, other);
+        }
+        if (ritual == Ritual.MIND_BEAM) {
+            // 3.6: the Mind Stone's beam, held (the stones answer, lane L2); while nothing answers, the old row.
+            if (StoneUse.use(player, StoneKind.MIND, StoneUse.Source.VESSEL, true, true)) {
+                return true;
+            }
             ritual = beforeTheVillains(power, other);
         }
         switch (ritual) {
@@ -276,6 +308,21 @@ public final class ScepterRituals {
      */
     public static boolean callsThanos(ServerPlayer player, InteractionHand hand) {
         return thanos() != null && tesseract(Powers.power(player), player.getItemInHand(other(hand))) == Ritual.THANOS;
+    }
+
+    /**
+     * 3.6: a Sneak + use of the Tesseract is the Space Stone's Realm Picker (the stones answer, lane L2), unless the
+     * Scepter is in the other hand (the call to the Mad Titan).
+     *
+     * @return whether the stone took the use (then the Tesseract does nothing else); false while nothing answers (the
+     * skeleton: the Tesseract does what it always did)
+     */
+    public static boolean useTesseractRealms(ServerPlayer player, InteractionHand hand) {
+        if (tesseract(Powers.power(player), player.getItemInHand(other(hand)),
+                player.isShiftKeyDown()) != Ritual.REALMS) {
+            return false;
+        }
+        return StoneUse.use(player, StoneKind.SPACE, StoneUse.Source.VESSEL, true, true);
     }
 
     /**

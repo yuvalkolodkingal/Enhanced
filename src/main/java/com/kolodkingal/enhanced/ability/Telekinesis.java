@@ -683,6 +683,10 @@ public final class Telekinesis {
         if (e == null) {
             return;
         }
+        // (3.6: a creature dropped from the grip is his push, for the Soul Stone's sacrifice.)
+        if (e instanceof LivingEntity living) {
+            com.kolodkingal.enhanced.vormir.VormirTracker.credit(living, player);
+        }
         e.resetFallDistance();
         letGo(e);
         if (e instanceof TelekineticBlockEntity block) {
@@ -713,6 +717,10 @@ public final class Telekinesis {
         gripEnded(player, e);
         if (e == null) {
             return;
+        }
+        // (3.6: a creature thrown from the grip is his push, for the Soul Stone's sacrifice.)
+        if (e instanceof LivingEntity living) {
+            com.kolodkingal.enhanced.vormir.VormirTracker.credit(living, player);
         }
         double speed = EnhancedConfig.THROW_SPEED.get() * (grip.mode.power == Power.CUSTOM ? CustomTelekinesis.throwFactor(player) : 1.0);
         Vec3 vel = player.getLookAngle().scale(speed);

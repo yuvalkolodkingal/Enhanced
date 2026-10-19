@@ -2,6 +2,17 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.item.CapstoneItem;
+import com.kolodkingal.enhanced.item.EmptyScepterItem;
+import com.kolodkingal.enhanced.item.EmptyTesseractItem;
+import com.kolodkingal.enhanced.item.EyeOfAgamottoItem;
+import com.kolodkingal.enhanced.item.GammaInhibitorItem;
+import com.kolodkingal.enhanced.item.InfinityStoneItem;
+import com.kolodkingal.enhanced.item.SlingRingItem;
+import com.kolodkingal.enhanced.item.TheOrbItem;
+import com.kolodkingal.enhanced.hydra.HydraBlasterItem;
+import com.kolodkingal.enhanced.hydra.HydraEnergyCellItem;
+import com.kolodkingal.enhanced.stones.GauntletContents;
+import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.item.HelaHeaddressItem;
 import com.kolodkingal.enhanced.item.HofundItem;
@@ -32,6 +43,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.Unbreakable;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -100,9 +112,14 @@ public final class ModItems {
             () -> new RadioactiveSpiderItem(new Item.Properties().stacksTo(16).fireResistant().rarity(Rarity.EPIC)));
 
     // ===== thanos =====
-    /** The reward of the Thanos fight; hold right-click for three seconds with no power to become Thanos. */
+    /**
+     * The reward of the Thanos fight; hold right-click for three seconds with no power to become Thanos. 3.6: its
+     * default {@code enhanced:gauntlet} is the Titan's Gauntlet (every old one, and the boss's reward, is it); a
+     * crafted one is empty.
+     */
     public static final DeferredItem<InfinityGauntletItem> INFINITY_GAUNTLET = ITEMS.register("infinity_gauntlet",
-            () -> new InfinityGauntletItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+            () -> new InfinityGauntletItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                    .component(ModDataComponents.GAUNTLET.get(), GauntletContents.TITAN)));
 
     // ===== ultron =====
     /** Starts the Ultron fight, with Loki's Scepter (see ScepterRituals). */
@@ -179,6 +196,78 @@ public final class ModItems {
     public static final DeferredItem<HelaHeaddressItem> HELA_HEADDRESS = ITEMS.register("hela_headdress",
             () -> new HelaHeaddressItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     // ===== asgardians (3.5) =====
+
+    // ===== stones (3.6) =====
+    // (The skeleton registers every item of 3.6; each lane owns its classes.)
+    /** The six Infinity Stones (lane L1 owns them; lane L2 their powers). Stack to one, epic, fire-proof. */
+    public static final DeferredItem<InfinityStoneItem> SPACE_STONE = stone("space_stone", StoneKind.SPACE);
+    public static final DeferredItem<InfinityStoneItem> MIND_STONE = stone("mind_stone", StoneKind.MIND);
+    public static final DeferredItem<InfinityStoneItem> REALITY_STONE = stone("reality_stone", StoneKind.REALITY);
+    public static final DeferredItem<InfinityStoneItem> POWER_STONE = stone("power_stone", StoneKind.POWER);
+    public static final DeferredItem<InfinityStoneItem> TIME_STONE = stone("time_stone", StoneKind.TIME);
+    public static final DeferredItem<InfinityStoneItem> SOUL_STONE = stone("soul_stone", StoneKind.SOUL);
+    /** The Orb, the Power Stone's casing from the End tunnel (lane L1). */
+    public static final DeferredItem<TheOrbItem> THE_ORB = ITEMS.register("the_orb",
+            () -> new TheOrbItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** Loki's Scepter without the Mind Stone: a plain weapon (lane L1). */
+    public static final DeferredItem<EmptyScepterItem> EMPTY_SCEPTER = ITEMS.register("empty_scepter",
+            () -> new EmptyScepterItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)
+                    .attributes(com.kolodkingal.enhanced.item.LokisScepterItem.createAttributes())));
+    /** The Tesseract without the Space Stone: decoration (lane L1). */
+    public static final DeferredItem<EmptyTesseractItem> EMPTY_TESSERACT = ITEMS.register("empty_tesseract",
+            () -> new EmptyTesseractItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    /** The stone pedestal of a site (Creative pick: an empty one; lane L1). */
+    public static final DeferredItem<BlockItem> STONE_PEDESTAL =
+            ITEMS.registerSimpleBlockItem(ModBlocks.STONE_PEDESTAL);
+    // ===== strange (3.6) =====
+    /** The Eye of Agamotto, the Time Stone's vessel; Doctor Strange's awakening (lane L3). */
+    public static final DeferredItem<EyeOfAgamottoItem> EYE_OF_AGAMOTTO = ITEMS.register("eye_of_agamotto",
+            () -> new EyeOfAgamottoItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** A sorcerer's Sling Ring (lane L3). */
+    public static final DeferredItem<SlingRingItem> SLING_RING = ITEMS.register("sling_ring",
+            () -> new SlingRingItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    // ===== stone_sites (3.6) =====
+    /** The Tesseract's cradle on Avengers Tower (lane L4). */
+    public static final DeferredItem<BlockItem> TESSERACT_CRADLE =
+            ITEMS.registerSimpleBlockItem(ModBlocks.TESSERACT_CRADLE);
+    // ===== vormir (3.6) =====
+    // ===== hulk (3.6) =====
+    /** The Gamma Emitter (lane L7). */
+    public static final DeferredItem<BlockItem> GAMMA_EMITTER = ITEMS.registerSimpleBlockItem(ModBlocks.GAMMA_EMITTER);
+    /** Bruce Banner's Gamma Inhibitor (lane L7, P2). */
+    public static final DeferredItem<GammaInhibitorItem> GAMMA_INHIBITOR = ITEMS.register("gamma_inhibitor",
+            () -> new GammaInhibitorItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    // ===== hydra (3.6) =====
+    /** A Hydra energy cell (lane L8). */
+    public static final DeferredItem<HydraEnergyCellItem> HYDRA_ENERGY_CELL = ITEMS.register("hydra_energy_cell",
+            () -> new HydraEnergyCellItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    /** The Hydra blaster (lane L8): 96 uses. */
+    public static final DeferredItem<HydraBlasterItem> HYDRA_BLASTER = ITEMS.register("hydra_blaster",
+            () -> new HydraBlasterItem(new Item.Properties().stacksTo(1).durability(96).rarity(Rarity.RARE)));
+    public static final DeferredItem<DeferredSpawnEggItem> HYDRA_SOLDIER_SPAWN_EGG = ITEMS.register(
+            "hydra_soldier_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.HYDRA_SOLDIER, 0x1C1C1E, 0xB3161C, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> HYDRA_OFFICER_SPAWN_EGG = ITEMS.register(
+            "hydra_officer_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.HYDRA_OFFICER, 0x2A2A2E, 0xD8B23A, new Item.Properties()));
+
+    /** 3.6: an Infinity Stone's item. */
+    private static DeferredItem<InfinityStoneItem> stone(String name, StoneKind kind) {
+        return ITEMS.register(name, () -> new InfinityStoneItem(kind, new Item.Properties().stacksTo(1).fireResistant()
+                .rarity(Rarity.EPIC)));
+    }
+
+    /** 3.6: the item of a stone. */
+    public static Item stone(StoneKind kind) {
+        return switch (kind) {
+            case SPACE -> SPACE_STONE.get();
+            case MIND -> MIND_STONE.get();
+            case REALITY -> REALITY_STONE.get();
+            case POWER -> POWER_STONE.get();
+            case TIME -> TIME_STONE.get();
+            case SOUL -> SOUL_STONE.get();
+        };
+    }
 
     /** Projectile sprites only; not in the creative tab. */
     /** 3.3: the Hero Creator, a Creative-only item (the Creative tab, no recipe, no loot). */

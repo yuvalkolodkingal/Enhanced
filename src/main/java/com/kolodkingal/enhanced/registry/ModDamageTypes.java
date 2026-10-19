@@ -95,6 +95,38 @@ public final class ModDamageTypes {
     /** The bite of Fenris (lane L4). */
     public static final ResourceKey<DamageType> FENRIS_BITE = key("fenris_bite");
 
+    // ===== stones and strange (3.6, the skeleton registers every one; each lane deals its own) =====
+    /** Doctor Strange's Eldritch Whip (lane L3). */
+    public static final ResourceKey<DamageType> ELDRITCH_WHIP = key("eldritch_whip");
+    /** The Crimson Bands of Cyttorak binding a creature (lane L3). */
+    public static final ResourceKey<DamageType> CRIMSON_BANDS = key("crimson_bands");
+    /** The Power Stone's Purple Beam (lane L2). */
+    public static final ResourceKey<DamageType> POWER_STONE_BEAM = key("power_stone_beam");
+    /** The explosions at the end of the Purple Beam (tag is_explosion; lane L2). */
+    public static final ResourceKey<DamageType> POWER_STONE_EXPLOSION = key("power_stone_explosion");
+    /** A stone burning the hand of one who may not hold it (never kills: the amount is capped; lane L1). */
+    public static final ResourceKey<DamageType> STONE_REJECT = key("stone_reject");
+    /** The Snap's dust (never on players; for the logs; lane L1). */
+    public static final ResourceKey<DamageType> SNAP_DUST = key("snap_dust");
+    // ===== hulk (3.6) =====
+    /** Hulk Smash (lane L7). */
+    public static final ResourceKey<DamageType> HULK_SMASH = key("hulk_smash");
+    /** The Grab Smash's slams (lane L7). */
+    public static final ResourceKey<DamageType> HULK_GRAB = key("hulk_grab");
+    /** The Thunder Clap's shockwave (lane L7). */
+    public static final ResourceKey<DamageType> HULK_CLAP = key("hulk_clap");
+    /** The Super Leap's landing (lane L7). */
+    public static final ResourceKey<DamageType> HULK_LEAP = key("hulk_leap");
+    /** The thrown boulder (tag is_projectile; lane L7). */
+    public static final ResourceKey<DamageType> HULK_BOULDER = key("hulk_boulder");
+    /** The Gamma Charge (lane L7). */
+    public static final ResourceKey<DamageType> HULK_CHARGE = key("hulk_charge");
+    // ===== hydra (3.6) =====
+    /** A Hydra energy bolt: the rifles, the sniper, the officer's pistol, the blaster (tag is_projectile; lane L8). */
+    public static final ResourceKey<DamageType> HYDRA_BOLT = key("hydra_bolt");
+    /** The enforcer's stun baton (lane L8). */
+    public static final ResourceKey<DamageType> HYDRA_BATON = key("hydra_baton");
+
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }

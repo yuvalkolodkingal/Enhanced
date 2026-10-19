@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.vishanti;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.build.BillyRanks;
+import com.kolodkingal.enhanced.config.StrangeConfig;
 import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
@@ -60,6 +61,7 @@ public final class WardStrength {
             }
             case LOKI -> VishantiConfig.WARD_RADIUS_LOKI.get();
             case AGATHA -> VishantiConfig.WARD_RADIUS_AGATHA.get();
+            case DOCTOR_STRANGE -> StrangeConfig.WARD_RADIUS.get();
             default -> 0;
         };
         return radius <= 0 ? 0 : Mth.clamp((int) Math.round(radius), 1, VishantiConfig.MAX_RADIUS);

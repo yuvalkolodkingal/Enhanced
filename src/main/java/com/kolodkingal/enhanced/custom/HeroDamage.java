@@ -35,8 +35,11 @@ import java.util.Map;
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class HeroDamage {
-    /** How the ability of a damage type is found in a kit: the first of the list it has, or the strongest of them. */
-    private record Rule(List<HeroAbility> rows, boolean strongest) {
+    /**
+     * How the ability of a damage type is found in a kit: the first of the list it has, or the strongest of them. (3.6:
+     * a row may be a stone's, {@link StoneRow}.)
+     */
+    private record Rule(List<CatalogEntry> rows, boolean strongest) {
     }
 
     private static final Map<ResourceKey<DamageType>, Rule> TYPES = new LinkedHashMap<>();
@@ -47,10 +50,12 @@ public final class HeroDamage {
         first(ModDamageTypes.TELEKINETIC_SLAM, HeroAbility.MAGNETO_METAL, HeroAbility.WANDA_TELEKINESIS, HeroAbility.BILLY_TELEKINESIS,
                 HeroAbility.PHOENIX_TELEKINESIS);
         first(ModDamageTypes.MIND_STONE, HeroAbility.VISION_MIND_BEAM);
-        first(ModDamageTypes.MIND_STONE_BEAM, HeroAbility.VISION_MIND_BEAM);
+        // (3.6: Vision's row first, then the Mind Stone's.)
+        first(ModDamageTypes.MIND_STONE_BEAM, HeroAbility.VISION_MIND_BEAM, StoneRow.MIND);
         // (L2: every speed strike deals it, the blitzes, the dashes, the barrage, the Whirlwind and the Sonic Boom: the strongest.)
-        TYPES.put(ModDamageTypes.SPEED_BLITZ, new Rule(List.of(HeroAbility.QUICKSILVER_BLITZ, HeroAbility.QUICKSILVER_SPEED,
-                HeroAbility.QUICKSILVER_BARRAGE, HeroAbility.TOMMY_SPEED, HeroAbility.TOMMY_WHIRLWIND, HeroAbility.TOMMY_VIBRATE), true));
+        TYPES.put(ModDamageTypes.SPEED_BLITZ, new Rule(List.<CatalogEntry>of(HeroAbility.QUICKSILVER_BLITZ,
+                HeroAbility.QUICKSILVER_SPEED, HeroAbility.QUICKSILVER_BARRAGE, HeroAbility.TOMMY_SPEED,
+                HeroAbility.TOMMY_WHIRLWIND, HeroAbility.TOMMY_VIBRATE), true));
         first(ModDamageTypes.MOLECULAR_ACCELERATION, HeroAbility.TOMMY_ACCELERATE);
         first(ModDamageTypes.MJOLNIR, HeroAbility.THOR_HAMMER);
         first(ModDamageTypes.STORMBREAKER, HeroAbility.THOR_HAMMER);
@@ -62,17 +67,21 @@ public final class HeroDamage {
         first(ModDamageTypes.PHOENIX_BURST, HeroAbility.PHOENIX_BURST);
         first(ModDamageTypes.WEB_KICK, HeroAbility.SPIDER_BODY);
         first(ModDamageTypes.SPIDER_LEGS, HeroAbility.SPIDER_LEGS);
-        List<HeroAbility> thanos = HeroAbility.of(Power.THANOS);
+        List<CatalogEntry> thanos = List.copyOf(HeroAbility.of(Power.THANOS));
         for (ResourceKey<DamageType> type : List.of(ModDamageTypes.THANOS_BLOW, ModDamageTypes.THANOS_SWORD, ModDamageTypes.STONE_POWER,
-                ModDamageTypes.STONE_BLAST, ModDamageTypes.STONE_SOUL)) {
+                ModDamageTypes.STONE_BLAST)) {
             TYPES.put(type, new Rule(thanos, true));
         }
+        // (3.6: the Soul Stone's own row deals it too.)
+        List<CatalogEntry> soul = new java.util.ArrayList<>(thanos);
+        soul.add(StoneRow.SOUL);
+        TYPES.put(ModDamageTypes.STONE_SOUL, new Rule(List.copyOf(soul), true));
         first(ModDamageTypes.ULTRON_BOLT, HeroAbility.ULTRON_REPULSOR);
         first(ModDamageTypes.ULTRON_BEAM, HeroAbility.ULTRON_REPULSOR);
         first(ModDamageTypes.ULTRON_SLAM, HeroAbility.ULTRON_GRAVITY);
         first(ModDamageTypes.SAND, HeroAbility.APOCALYPSE_SAND);
         first(ModDamageTypes.ENTOMB, HeroAbility.APOCALYPSE_SAND);
-        TYPES.put(ModDamageTypes.OPTIC_BLAST, new Rule(HeroAbility.of(Power.CYCLOPS), true));
+        TYPES.put(ModDamageTypes.OPTIC_BLAST, new Rule(List.copyOf(HeroAbility.of(Power.CYCLOPS)), true));
         first(ModDamageTypes.MIND_BLAST, HeroAbility.XAVIER_MENTAL_BLAST);
         first(ModDamageTypes.AGATHA_DRAIN, HeroAbility.AGATHA_DRAIN);
         first(ModDamageTypes.AGATHA_RUNES, HeroAbility.AGATHA_RUNES);
@@ -83,22 +92,35 @@ public final class HeroDamage {
         first(ModDamageTypes.ODINFORCE, HeroAbility.ODIN_BANISH);
         first(ModDamageTypes.NECROSWORD, HeroAbility.HELA_NECROSWORDS);
         first(ModDamageTypes.BLADE_WALL, HeroAbility.HELA_BLADE_WALL);
+        // 3.6 (the skeleton): Doctor Strange, the Hulk and the stones.
+        first(ModDamageTypes.ELDRITCH_WHIP, HeroAbility.STRANGE_WHIP);
+        first(ModDamageTypes.CRIMSON_BANDS, HeroAbility.STRANGE_BANDS);
+        first(ModDamageTypes.POWER_STONE_BEAM, StoneRow.POWER);
+        first(ModDamageTypes.HULK_SMASH, HeroAbility.HULK_SMASH);
+        first(ModDamageTypes.HULK_GRAB, HeroAbility.HULK_GRAB_SMASH, HeroAbility.HULK_SMASH);
+        first(ModDamageTypes.HULK_CLAP, HeroAbility.HULK_CLAP);
+        first(ModDamageTypes.HULK_LEAP, HeroAbility.HULK_LEAP);
+        first(ModDamageTypes.HULK_BOULDER, HeroAbility.HULK_BOULDER);
+        first(ModDamageTypes.HULK_CHARGE, HeroAbility.HULK_GAMMA_CHARGE, HeroAbility.HULK_BOULDER);
     }
 
-    private static void first(ResourceKey<DamageType> type, HeroAbility... rows) {
+    private static void first(ResourceKey<DamageType> type, CatalogEntry... rows) {
         TYPES.put(type, new Rule(List.of(rows), false));
     }
 
-    /** The hero ability of {@code kit} that deals damage of {@code type}, or null (not a hero's type, or not in the kit). */
+    /**
+     * The hero ability (3.6: or stone row) of {@code kit} that deals damage of {@code type}, or null (not a hero's
+     * type, or not in the kit).
+     */
     @Nullable
-    public static HeroAbility abilityOf(ResourceKey<DamageType> type, HeroKit kit) {
+    public static CatalogEntry abilityOf(ResourceKey<DamageType> type, HeroKit kit) {
         Rule rule = TYPES.get(type);
         if (rule == null) {
             return null;
         }
-        HeroAbility best = null;
-        for (HeroAbility a : rule.rows) {
-            if (kit.has(a)) {
+        CatalogEntry best = null;
+        for (CatalogEntry a : rule.rows) {
+            if (has(kit, a)) {
                 if (!rule.strongest) {
                     return a;
                 }
@@ -110,14 +132,19 @@ public final class HeroDamage {
         return best;
     }
 
+    private static boolean has(HeroKit kit, CatalogEntry e) {
+        return e instanceof HeroAbility a ? kit.has(a) : e instanceof StoneRow r && kit.has(r);
+    }
+
     /** The factor a hit of {@code type} by a custom hero with {@code kit} is multiplied by (1 when it is none of his). */
     public static float factor(ResourceKey<DamageType> type, HeroKit kit) {
-        HeroAbility a = abilityOf(type, kit);
+        CatalogEntry a = abilityOf(type, kit);
         if (a == null) {
             return 1.0F;
         }
         double scale = EnhancedConfig.SPEC.isLoaded() ? CustomHeroConfig.DAMAGE_SCALE.get() : 1.0;
-        return kit.damageFactor(a) * (float) scale;
+        float factor = a instanceof HeroAbility row ? kit.damageFactor(row) : kit.damageFactor((StoneRow) a);
+        return factor * (float) scale;
     }
 
     /** The player behind a hit: its causing entity, the owner of a thrown thing, of an illusion or of a drone. */

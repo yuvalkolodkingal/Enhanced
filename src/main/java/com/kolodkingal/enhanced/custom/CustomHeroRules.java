@@ -134,6 +134,10 @@ public final class CustomHeroRules {
                 notes.add(new Note("message.enhanced.hero_creator.rule.hero_modules", entry.nameKey()));
                 continue;
             }
+            if (entry instanceof StoneRow && !stoneRowsAllowed()) {
+                notes.add(new Note("message.enhanced.hero_creator.rule.stone_rows", entry.nameKey()));
+                continue;
+            }
             if (entry.world() && !limits.worldPowers()) {
                 notes.add(new Note("message.enhanced.hero_creator.rule.world", entry.nameKey()));
                 continue;
@@ -151,6 +155,9 @@ public final class CustomHeroRules {
             String option;
             if (entry instanceof HeroAbility a) {
                 option = a.hasAlt() && HeroAbility.MAIN.equals(pick.option()) ? HeroAbility.MAIN : HeroAbility.BOTH;
+            } else if (entry instanceof StoneRow) {
+                // (3.6: a stone row has its Sneak use, as a hero's ability has its variant.)
+                option = HeroAbility.MAIN.equals(pick.option()) ? HeroAbility.MAIN : HeroAbility.BOTH;
             } else {
                 PowerModule module = (PowerModule) entry;
                 option = module.option(pick.option()) == null ? module.defaultOption().id() : pick.option();
@@ -186,6 +193,23 @@ public final class CustomHeroRules {
                     && find(picks, a.variant().id()) != null) {
                 picks.set(i, pick.withOption(HeroAbility.MAIN));
             }
+        }
+
+        // ---- 3.6: one Y key: Build Magic (Billy's or the Scarlet Witch's) or Doctor Strange's Eye, not both ----
+        boolean yTaken = false;
+        boolean buildTaken = false;
+        for (int i = 0; i < picks.size(); i++) {
+            if (!(picks.get(i).entry() instanceof HeroAbility a) || a.home != HeroKeys.Y) {
+                continue;
+            }
+            boolean build = a.resources(HeroAbility.BOTH).contains(Resource.BUILD);
+            if (build ? yTaken && !buildTaken : buildTaken) {
+                notes.add(new Note("message.enhanced.hero_creator.rule.y_key", a.nameKey()));
+                picks.remove(i--);
+                continue;
+            }
+            yTaken = true;
+            buildTaken |= build;
         }
 
         // ---- the resources: one owner each ----
@@ -340,8 +364,8 @@ public final class CustomHeroRules {
         for (int column = 1; column <= CustomHero.KEYS; column++) {
             String asked = in.binding(column, true).trim().toLowerCase(Locale.ROOT);
             CustomHero.Pick onPlain = find(picks, plain.get(column - 1));
-            if (onPlain != null && onPlain.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(onPlain.option())) {
-                String forced = a.id() + "#" + HeroKit.ALT;
+            if (onPlain != null && pairs(onPlain)) {
+                String forced = onPlain.id() + "#" + HeroKit.ALT;
                 actions.add(forced);
                 if (notes != null && !asked.isEmpty() && !asked.equals(forced)) {
                     notes.add(new Note("message.enhanced.hero_creator.rule.key", column));
@@ -392,10 +416,25 @@ public final class CustomHeroRules {
         if (pick == null || !takesKey(pick)) {
             return null;
         }
-        if (pick.entry() instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option())) {
+        if (pairs(pick)) {
             return null; // (its Sneak variant could go nowhere: it belongs on the Sneak cell of its own plain key)
         }
         return actions.add(pick.id() + "#" + HeroKit.MAIN) ? pick.id() : null;
+    }
+
+    /**
+     * Whether the pick's Sneak variant goes with it, on the Sneak cell of its own plain key: a hero's ability with a
+     * variant, or (3.6) a stone row with its Sneak use, picked with both.
+     */
+    public static boolean pairs(CustomHero.Pick pick) {
+        CatalogEntry entry = pick.entry();
+        return (entry instanceof HeroAbility a && a.hasAlt() || entry instanceof StoneRow)
+                && HeroAbility.BOTH.equals(pick.option());
+    }
+
+    /** 3.6: whether the server lets a custom hero put the stones on his keys ({@code custom_hero.stoneRows}). */
+    public static boolean stoneRowsAllowed() {
+        return !EnhancedConfig.SPEC.isLoaded() || CustomHeroConfig.STONE_ROWS.get();
     }
 
     /** Whether a pick may sit on a key box: it has an action, and is no hero's ability with a key of its own (Build Magic's Y). */

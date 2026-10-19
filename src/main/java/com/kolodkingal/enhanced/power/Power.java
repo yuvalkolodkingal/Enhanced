@@ -52,7 +52,12 @@ public enum Power implements StringRepresentable {
     // gold; Hela is the dark emerald of her headdress, with a pale green glow (her name in a brighter green).
     HEIMDALL(0xE8B54A, 0xFFE7A3),
     ODIN(0xD9A63A, 0xFFF0C2),
-    HELA(0x2E7D4F, 0x9CF2B5);
+    HELA(0x2E7D4F, 0x9CF2B5),
+    // The heroes of 3.6, appended after HELA in this order (the 3.6 skeleton adds them; each lane fills its own).
+    // Doctor Strange's spells are the orange-gold of the mystic arts' sparks, with a warm pale glow (his name in the
+    // cloak's red); the Hulk is Hulk green with a gamma-green glow (his name a lighter green).
+    DOCTOR_STRANGE(0xF29A2E, 0xFFE0A8),
+    HULK(0x5BA33A, 0xB6F27A);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -89,6 +94,9 @@ public enum Power implements StringRepresentable {
             case APOCALYPSE -> 0x4A9BC4;
             // (3.5: her dark emerald would not read on the dark sky of a title.)
             case HELA -> 0x3FBF6F;
+            // (3.6: Doctor Strange is named in the red of his Cloak of Levitation, the Hulk in a lighter green.)
+            case DOCTOR_STRANGE -> 0xC2302E;
+            case HULK -> 0x6CC04A;
             default -> color;
         };
     }
@@ -107,9 +115,10 @@ public enum Power implements StringRepresentable {
      * wide (the default 854x480 window 427): "Jean Grey (Phoenix)" was cut at both ends, so the Phoenix wakes as "The Phoenix".
      */
     public Component awakeningTitle() {
-        // (3.3: "Agatha Harkness" is one character too wide: she wakes as "Agatha".)
-        return this == PHOENIX || this == AGATHA ? Component.translatable("power.enhanced." + getSerializedName() + ".title")
-                : displayName();
+        // (3.3: "Agatha Harkness" is one character too wide: she wakes as "Agatha". 3.6: Doctor Strange's Hebrew name
+        // is one too wide: he wakes as "ד"ר סטריינג'".)
+        return this == PHOENIX || this == AGATHA || this == DOCTOR_STRANGE
+                ? Component.translatable("power.enhanced." + getSerializedName() + ".title") : displayName();
     }
 
     /** Translation key for the given ability (1-5). */
@@ -122,14 +131,17 @@ public enum Power implements StringRepresentable {
 
     /**
      * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, Loki walks, Cyclops runs and leaps
-     * on his optic blast and Professor X walks or rolls in his chair; the gods of Asgard (3.5) walk, and the Bifrost carries
-     * them; everyone else can fly (Thor only with Mjolnir, see ThorAbilities).
+     * on his optic blast and Professor X walks or rolls in his chair; the gods of Asgard (3.5) walk, and the Bifrost
+     * carries them; the Hulk (3.6) leaps; everyone else can fly (Thor only with Mjolnir, see ThorAbilities; Doctor
+     * Strange on his Cloak of Levitation).
      */
     public boolean canFly() {
         return switch (this) {
             // (A custom hero flies only if Flight is one of its powers: PowerTicker asks its definition.)
-            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, CUSTOM -> true;
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA -> false;
+            case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, CUSTOM,
+                    DOCTOR_STRANGE -> true;
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
+                    HULK -> false;
         };
     }
 
@@ -146,7 +158,10 @@ public enum Power implements StringRepresentable {
             case AGATHA -> AgathaConfig.FLIGHT_SPEED.get().floatValue();
             // (A custom hero's speed is its Flight's level: PowerTicker asks its definition.)
             case CUSTOM -> com.kolodkingal.enhanced.config.CustomHeroConfig.FLIGHT_SPEED.get().floatValue();
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA -> 0.05F;
+            // (3.6: the Cloak of Levitation is graceful, slower than Thor.)
+            case DOCTOR_STRANGE -> com.kolodkingal.enhanced.config.StrangeConfig.FLIGHT_SPEED.get().floatValue();
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
+                    HULK -> 0.05F;
         };
     }
 
@@ -154,9 +169,11 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA -> 2;
-            // (A custom hero's Flight is on whichever key its player put it.)
-            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA -> -1;
+            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, DOCTOR_STRANGE -> 2;
+            // (A custom hero's Flight is on whichever key its player put it; 3.6: all five of the Hulk's keys are
+            // rows.)
+            case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA,
+                    HULK -> -1;
         };
     }
 

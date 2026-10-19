@@ -93,6 +93,11 @@ public final class Thoughts {
         SPECIES.put("mooshroom", "cow");
         SPECIES.put("wandering_trader", "villager");
         SPECIES.put("magma_cube", "slime");
+        // 3.6: the Hydra soldiers and their officer (lane L8's).
+        KINDS.put("hydra_soldier", 4);
+        SPECIES.put("hydra_soldier", "hydra_soldier");
+        KINDS.put("hydra_officer", 3);
+        SPECIES.put("hydra_officer", "hydra_officer");
     }
 
     /**

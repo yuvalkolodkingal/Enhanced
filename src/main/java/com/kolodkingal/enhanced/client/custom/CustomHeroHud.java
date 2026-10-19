@@ -151,6 +151,9 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         if (b.entry() instanceof HeroAbility a) {
             return b.isAlt() ? CreatorUi.altName(a) : CreatorUi.name(a);
         }
+        if (b.stone() != null) {
+            return b.isAlt() ? CreatorUi.altName(b.stone()) : CreatorUi.name(b.stone()); // (3.6: a stone row)
+        }
         PowerModule m = b.module();
         if (m != null && !HeroKit.MAIN.equals(b.action())) {
             return Component.translatable(m.optionKey(b.action()));
@@ -188,6 +191,10 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                     : on ? Component.translatable("hud.enhanced.active").withStyle(ChatFormatting.AQUA) : null;
         }
         PowerModule module = b.module();
+        if (module == null) {
+            // (3.6: a stone row: its key's cooldown; its state is lane L2's StoneHud.)
+            return keyLine ? PowerHud.cooldown(data, column, now) : null;
+        }
         CustomHero.Pick pick = hero.pick(module);
         if (pick == null) {
             return null;

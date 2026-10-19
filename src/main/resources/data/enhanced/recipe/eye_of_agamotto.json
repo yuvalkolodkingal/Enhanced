@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "GTG",
+    "GGG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:gold_block"
+    },
+    "T": {
+      "item": "enhanced:time_stone"
+    }
+  },
+  "result": {
+    "id": "enhanced:eye_of_agamotto",
+    "count": 1
+  }
+}

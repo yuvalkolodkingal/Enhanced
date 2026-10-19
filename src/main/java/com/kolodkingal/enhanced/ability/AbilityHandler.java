@@ -39,7 +39,8 @@ public final class AbilityHandler {
      */
     public static void onKey(ServerPlayer player, int ability, boolean down) {
         // Releases always go through, so a hold ability can't get stuck on (e.g. when the player died holding the key).
-        if (ability < 1 || ability > PowerData.ABILITIES || (down && !player.isAlive())) {
+        // (3.6: key 6 is the Y key of a hero whose Y row is not Build Magic: HeroKeys.pressY.)
+        if (ability < 1 || ability > com.kolodkingal.enhanced.custom.HeroKeys.Y || (down && !player.isAlive())) {
             return;
         }
         // In a trial of the Witches' Road no power works (and only one without powers is let in).
@@ -70,7 +71,11 @@ public final class AbilityHandler {
             return;
         }
         PowerData data = Powers.get(player);
-        heroKey(data.power(), player, data, ability, down, player.isShiftKeyDown());
+        if (ability == com.kolodkingal.enhanced.custom.HeroKeys.Y) {
+            com.kolodkingal.enhanced.custom.HeroKeys.pressY(player, data, down, player.isShiftKeyDown());
+        } else {
+            heroKey(data.power(), player, data, ability, down, player.isShiftKeyDown());
+        }
         Powers.syncIfDirty(player);
     }
 
@@ -79,7 +84,7 @@ public final class AbilityHandler {
      * custom hero's sources, with the key the ability has for that hero and the binding's Sneak variant
      * ({@code HeroKeys.press}).
      *
-     * @param ability 1-5, the ability's key for {@code hero}
+     * @param ability 1-5, the ability's key for {@code hero} (3.6: or 6, the Y key, {@code HeroKeys.Y})
      */
     public static void heroKey(Power hero, ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         switch (hero) {
@@ -92,8 +97,8 @@ public final class AbilityHandler {
             case LOKI -> LokiAbilities.onKey(player, data, ability, down, alt);
             case THOR -> ThorAbilities.onKey(player, data, ability, down, alt);
             // The heroes of 3.0 are plug-ins (HeroServer): their keys are theirs.
-            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA ->
-                    HeroServers.onKey(hero, player, data, ability, down, alt);
+            case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,
+                    HELA, DOCTOR_STRANGE, HULK -> HeroServers.onKey(hero, player, data, ability, down, alt);
             case NONE -> {
             }
         }

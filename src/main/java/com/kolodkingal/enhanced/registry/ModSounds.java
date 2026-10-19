@@ -336,6 +336,104 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> NPC_DOWN = register("npc_down");
     public static final DeferredHolder<SoundEvent, SoundEvent> EINHERJAR_SUMMON = register("einherjar_summon");
 
+    // ===== stones (3.6: registered by the skeleton with placeholder files; lane L6 makes them; the six voices and
+    // hums, time_rewind and reality_pop exist) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> STONE_REJECT = register("stone_reject");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STONE_SLIP = register("stone_slip");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STONE_GRACE_TICK = register("stone_grace_tick");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REALITY_ILLUSION = register("reality_illusion");
+    /** An alias of an existing sound (enhanced:sfx/mind_stone_beam_loop): The Mind Stone's beam hums. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> MIND_BEAM_LOOP = register("mind_beam_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MIND_COMMAND = register("mind_command");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_SLOW_ON = register("time_slow_on");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_SLOW_OFF = register("time_slow_off");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_SLOW_LOOP = register("time_slow_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIME_CROP = register("time_crop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> POWER_BEAM_LOOP = register("power_beam_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> POWER_EXPLOSION = register("power_explosion");
+    public static final DeferredHolder<SoundEvent, SoundEvent> POWER_BOLT = register("power_bolt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPACE_STEP = register("space_step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPACE_REALM_DEPART = register("space_realm_depart");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPACE_REALM_ARRIVE = register("space_realm_arrive");
+    /** An alias of an existing sound (enhanced:sfx/soul_drain_loop): A soul is drained. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_DRAIN_LOOP = register("soul_drain_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_SIGHT = register("soul_sight");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ORB_OPEN = register("orb_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PEDESTAL_TAKE = register("pedestal_take");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAUNTLET_INSERT = register("gauntlet_insert");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAUNTLET_SELECT = register("gauntlet_select");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNAP_CHARGE = register("snap_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNAP = register("snap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNAP_DUST = register("snap_dust");
+
+    // ===== strange (3.6: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_AWAKEN = register("strange_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_WHIP = register("strange_whip");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_GRAPPLE = register("strange_grapple");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_SHIELD_UP = register("strange_shield_up");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_SHIELD_DOWN = register("strange_shield_down");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_DOME = register("strange_dome");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_BANDS = register("strange_bands");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_ASTRAL_OUT = register("strange_astral_out");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_ASTRAL_IN = register("strange_astral_in");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_PORTAL_OPEN = register("strange_portal_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_PORTAL_CLOSE = register("strange_portal_close");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_PORTAL_PASS = register("strange_portal_pass");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_MIRROR_IN = register("strange_mirror_in");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_MIRROR_OUT = register("strange_mirror_out");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STRANGE_MIRROR_LOOP = register("strange_mirror_loop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> EYE_OPEN = register("eye_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> EYE_CLOSE = register("eye_close");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CLOAK_FLAP = register("cloak_flap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SLING_RING_SAVE = register("sling_ring_save");
+
+    // ===== stone_sites (3.6: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_SANCTUM = register("ambient.sanctum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> END_TUNNEL_HUM = register("end_tunnel_hum");
+
+    // ===== vormir (3.6: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> VORMIR_WIND = register("vormir_wind");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_SACRIFICE = register("soul_sacrifice");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STONEKEEPER_VOICE = register("stonekeeper_voice");
+
+    // ===== hulk (3.6: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_TRANSFORM_OUT = register("hulk_transform_out");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_TRANSFORM_IN = register("hulk_transform_in");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_SWITCH = register("hulk_switch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_ROAR = register("hulk_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_SMASH = register("hulk_smash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_GRAB = register("hulk_grab");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_SLAM = register("hulk_slam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_CLAP = register("hulk_clap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_LEAP = register("hulk_leap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_LAND = register("hulk_land");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_RIP = register("hulk_rip");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_THROW = register("hulk_throw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BOULDER_HIT = register("boulder_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_CHARGE = register("hulk_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_STEP = register("hulk_step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULK_HURT = register("hulk_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BANNER_HEARTBEAT = register("banner_heartbeat");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAMMA_EMITTER_WARMUP = register("gamma_emitter_warmup");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAMMA_EMITTER_BEAM = register("gamma_emitter_beam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAMMA_EXPOSURE = register("gamma_exposure");
+
+    // ===== hydra (3.6: registered by the skeleton with placeholder files; lane L6 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_RIFLE_BURST = register("hydra_rifle_burst");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_BOLT_HIT = register("hydra_bolt_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_SNIPER_AIM = register("hydra_sniper_aim");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_SNIPER_SHOT = register("hydra_sniper_shot");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_PISTOL = register("hydra_pistol");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_BATON = register("hydra_baton");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_SHIELD_BLOCK = register("hydra_shield_block");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_BARK = register("hydra_bark");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_RADIO = register("hydra_radio");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_ALARM = register("hydra_alarm");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_RELOAD = register("hydra_reload");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_HURT = register("hydra_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_DEATH = register("hydra_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRA_BLASTER = register("hydra_blaster");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

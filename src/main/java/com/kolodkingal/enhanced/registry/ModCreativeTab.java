@@ -45,6 +45,26 @@ public final class ModCreativeTab {
                         output.accept(ModItems.GUNGNIR.get());
                         output.accept(ModItems.HELA_HEADDRESS.get());
                         ModItems.ASGARD_BLOCK_ITEMS.forEach(item -> output.accept(item.get()));
+                        // 3.6
+                        output.accept(ModItems.SPACE_STONE.get());
+                        output.accept(ModItems.MIND_STONE.get());
+                        output.accept(ModItems.REALITY_STONE.get());
+                        output.accept(ModItems.POWER_STONE.get());
+                        output.accept(ModItems.TIME_STONE.get());
+                        output.accept(ModItems.SOUL_STONE.get());
+                        output.accept(ModItems.THE_ORB.get());
+                        output.accept(ModItems.EMPTY_SCEPTER.get());
+                        output.accept(ModItems.EMPTY_TESSERACT.get());
+                        output.accept(ModItems.STONE_PEDESTAL.get());
+                        output.accept(ModItems.EYE_OF_AGAMOTTO.get());
+                        output.accept(ModItems.SLING_RING.get());
+                        output.accept(ModItems.TESSERACT_CRADLE.get());
+                        output.accept(ModItems.GAMMA_EMITTER.get());
+                        output.accept(ModItems.GAMMA_INHIBITOR.get());
+                        output.accept(ModItems.HYDRA_ENERGY_CELL.get());
+                        output.accept(ModItems.HYDRA_BLASTER.get());
+                        output.accept(ModItems.HYDRA_SOLDIER_SPAWN_EGG.get());
+                        output.accept(ModItems.HYDRA_OFFICER_SPAWN_EGG.get());
                     })
                     .build());
 

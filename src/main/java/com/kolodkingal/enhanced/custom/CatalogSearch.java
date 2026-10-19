@@ -43,6 +43,11 @@ public final class CatalogSearch {
                 words.add(text(lang, m.optionKey(o.id())));
             }
         }
+        if (entry instanceof StoneRow row) {
+            // (3.6: a stone row is found by its Sneak use and by the word "stone".)
+            words.add(text(lang, row.altKey()));
+            words.add("stone");
+        }
         if (entry instanceof HeroAbility a) {
             if (a.hasAlt()) {
                 words.add(text(lang, a.altKey()));

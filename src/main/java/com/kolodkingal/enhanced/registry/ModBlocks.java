@@ -12,8 +12,11 @@ import com.kolodkingal.enhanced.block.asgard.GungnirStandBlock;
 import com.kolodkingal.enhanced.block.asgard.HofundSocketBlock;
 import com.kolodkingal.enhanced.block.asgard.HelaSealBlock;
 import com.kolodkingal.enhanced.block.asgard.OdinThroneBlock;
+import com.kolodkingal.enhanced.block.GammaEmitterBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.SpiderWebBlock;
+import com.kolodkingal.enhanced.block.StonePedestalBlock;
+import com.kolodkingal.enhanced.block.TesseractCradleBlock;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -213,6 +216,39 @@ public final class ModBlocks {
     // ===== odin (3.5) =====
     // ===== hela (3.5) =====
     // ===== asgardians (3.5) =====
+
+    // ===== stones (3.6) =====
+    // (The skeleton registers every block of 3.6, with placeholder looks; each lane owns its classes.)
+    /** The stone pedestal of a site: unbreakable, no loot (lane L1). */
+    public static final DeferredBlock<StonePedestalBlock> STONE_PEDESTAL = BLOCKS.registerBlock(
+            "stone_pedestal", StonePedestalBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE)
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .lightLevel(state -> state.getValue(StonePedestalBlock.STONE)
+                            == StonePedestalBlock.Stone.NONE ? 0 : 10)
+                    .pushReaction(PushReaction.BLOCK)
+                    .noLootTable());
+    // ===== stone_sites (3.6) =====
+    /** The Tesseract's cradle on Avengers Tower: unbreakable, no loot (lane L4). */
+    public static final DeferredBlock<TesseractCradleBlock> TESSERACT_CRADLE = BLOCKS.registerBlock(
+            "tesseract_cradle", TesseractCradleBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .noLootTable());
+    // ===== hulk (3.6) =====
+    /** The Gamma Emitter: a crafted lab device; it drops itself (lane L7). */
+    public static final DeferredBlock<GammaEmitterBlock> GAMMA_EMITTER = BLOCKS.registerBlock(
+            "gamma_emitter", GammaEmitterBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .lightLevel(state -> 4));
 
     private ModBlocks() {
     }

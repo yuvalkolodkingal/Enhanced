@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
+import com.kolodkingal.enhanced.stones.StoneZones;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,7 +51,10 @@ import java.util.WeakHashMap;
 public final class SlowMotion {
     private static final String SLOWED_TAG = "enhanced:slowed";
 
-    private record Zones(long gameTime, List<Vec3> centers, List<Player> speedsters) {
+    /**
+     * The zones of one tick: their centres, whose they are, and (3.6) their radii (a speedster's, or a Time Stone's).
+     */
+    private record Zones(long gameTime, List<Vec3> centers, List<Player> speedsters, List<Double> radii) {
     }
 
     private static final Map<Level, Zones> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
@@ -65,24 +69,47 @@ public final class SlowMotion {
         return EnhancedConfig.SPEC.isLoaded() ? EnhancedConfig.SLOW_MOTION_RADIUS.get() : 32;
     }
 
-    /** Positions of every Quicksilver in this level whose Quicksilver Time is running (cached per tick). */
+    /**
+     * Positions of every Quicksilver in this level whose Quicksilver Time is running (cached per tick); 3.6: and of
+     * every player whose Time Stone slows time round him ({@link StoneZones}), with its own radius.
+     */
     public static List<Vec3> zones(Level level) {
+        return zonesOf(level).centers;
+    }
+
+    private static Zones zonesOf(Level level) {
         long time = level.getGameTime();
         Zones cached = CACHE.get(level);
         if (cached != null && cached.gameTime == time) {
-            return cached.centers;
+            return cached;
         }
         List<Vec3> centers = new ArrayList<>(1);
         List<Player> speedsters = new ArrayList<>(1);
+        List<Double> radii = new ArrayList<>(1);
         for (Player player : level.players()) {
             PowerData data = Powers.get(player);
-            if (slowsTime(data) && player.isAlive()) {
+            if (!player.isAlive()) {
+                continue;
+            }
+            if (slowsTime(data)) {
                 centers.add(player.position());
                 speedsters.add(player);
+                radii.add(radius());
+            } else if (StoneZones.slows(data)) {
+                // 3.6: the Time Stone's zone (lane L2 sets the bit; the seam is here).
+                centers.add(player.position());
+                speedsters.add(player);
+                radii.add(StoneZones.radius());
             }
         }
-        CACHE.put(level, new Zones(time, centers, speedsters));
-        return centers;
+        Zones zones = new Zones(time, centers, speedsters, radii);
+        CACHE.put(level, zones);
+        return zones;
+    }
+
+    /** 3.6: whether this player's own time runs on while the world round him is slowed (a speedster, a Time Stone). */
+    private static boolean holdsZone(PowerData data) {
+        return slowsTime(data) || StoneZones.slows(data);
     }
 
     /**
@@ -141,15 +168,17 @@ public final class SlowMotion {
      * the wall of a Hex that keeps that Quicksilver out.
      */
     public static boolean isInZone(Level level, Vec3 pos) {
-        List<Vec3> zones = zones(level);
+        Zones all = zonesOf(level);
+        List<Vec3> zones = all.centers();
         if (zones.isEmpty()) {
             return false;
         }
-        double r2 = radius() * radius();
-        List<Player> speedsters = CACHE.get(level).speedsters();
+        List<Player> speedsters = all.speedsters();
         for (int i = 0; i < zones.size(); i++) {
             Vec3 center = zones.get(i);
-            if (center.distanceToSqr(pos) < r2 && !Shelters.keepsOut(level, speedsters.get(i), center.add(0, 1, 0), pos, false)) {
+            double r = all.radii().get(i);
+            if (center.distanceToSqr(pos) < r * r && !Shelters.keepsOut(level, speedsters.get(i), center.add(0, 1, 0),
+                    pos, false)) {
                 return true;
             }
         }
@@ -207,9 +236,11 @@ public final class SlowMotion {
 
     /** Server, once per level tick: slow down projectiles entering the zones, restore the ones that left, slow players. */
     public static void serverTick(ServerLevel level) {
-        List<Vec3> zones = zones(level);
-        double radius = radius();
-        for (Vec3 center : zones) {
+        Zones all = zonesOf(level);
+        List<Vec3> zones = all.centers();
+        for (int z = 0; z < zones.size(); z++) {
+            Vec3 center = zones.get(z);
+            double radius = all.radii().get(z);
             AABB box = new AABB(center, center).inflate(radius);
             for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box,
                     p -> slowedBySpeed(p) && !returning(p) && !p.getPersistentData().contains(SLOWED_TAG) && !MagnetoAbilities.isHeld(p)
@@ -218,7 +249,7 @@ public final class SlowMotion {
             }
             for (Player player : level.players()) {
                 PowerData data = Powers.get(player);
-                boolean speedster = slowsTime(data);
+                boolean speedster = holdsZone(data);
                 if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius
                         && isInZone(level, player.position())) {
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 3, true, false, false));

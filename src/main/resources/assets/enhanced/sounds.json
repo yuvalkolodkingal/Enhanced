@@ -2083,5 +2083,669 @@
         "name": "enhanced:sfx/einherjar_summon"
       }
     ]
+  },
+  "stone_reject": {
+    "subtitle": "subtitles.enhanced.stone_reject",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/stone_reject"
+      }
+    ]
+  },
+  "stone_slip": {
+    "subtitle": "subtitles.enhanced.stone_slip",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/stone_slip"
+      }
+    ]
+  },
+  "stone_grace_tick": {
+    "subtitle": "subtitles.enhanced.stone_grace_tick",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/stone_grace_tick"
+      }
+    ]
+  },
+  "reality_illusion": {
+    "subtitle": "subtitles.enhanced.reality_illusion",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/reality_illusion"
+      }
+    ]
+  },
+  "mind_beam_loop": {
+    "subtitle": "subtitles.enhanced.mind_beam_loop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_stone_beam_loop"
+      }
+    ]
+  },
+  "mind_command": {
+    "subtitle": "subtitles.enhanced.mind_command",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/mind_command"
+      }
+    ]
+  },
+  "time_slow_on": {
+    "subtitle": "subtitles.enhanced.time_slow_on",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_slow_on"
+      }
+    ]
+  },
+  "time_slow_off": {
+    "subtitle": "subtitles.enhanced.time_slow_off",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_slow_off"
+      }
+    ]
+  },
+  "time_slow_loop": {
+    "subtitle": "subtitles.enhanced.time_slow_loop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_slow_loop"
+      }
+    ]
+  },
+  "time_crop": {
+    "subtitle": "subtitles.enhanced.time_crop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/time_crop"
+      }
+    ]
+  },
+  "power_beam_loop": {
+    "subtitle": "subtitles.enhanced.power_beam_loop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/power_beam_loop"
+      }
+    ]
+  },
+  "power_explosion": {
+    "subtitle": "subtitles.enhanced.power_explosion",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/power_explosion"
+      }
+    ]
+  },
+  "power_bolt": {
+    "subtitle": "subtitles.enhanced.power_bolt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/power_bolt"
+      }
+    ]
+  },
+  "space_step": {
+    "subtitle": "subtitles.enhanced.space_step",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/space_step"
+      }
+    ]
+  },
+  "space_realm_depart": {
+    "subtitle": "subtitles.enhanced.space_realm_depart",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/space_realm_depart"
+      }
+    ]
+  },
+  "space_realm_arrive": {
+    "subtitle": "subtitles.enhanced.space_realm_arrive",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/space_realm_arrive"
+      }
+    ]
+  },
+  "soul_drain_loop": {
+    "subtitle": "subtitles.enhanced.soul_drain_loop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/soul_drain_loop"
+      }
+    ]
+  },
+  "soul_sight": {
+    "subtitle": "subtitles.enhanced.soul_sight",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/soul_sight"
+      }
+    ]
+  },
+  "orb_open": {
+    "subtitle": "subtitles.enhanced.orb_open",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/orb_open"
+      }
+    ]
+  },
+  "pedestal_take": {
+    "subtitle": "subtitles.enhanced.pedestal_take",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/pedestal_take"
+      }
+    ]
+  },
+  "gauntlet_insert": {
+    "subtitle": "subtitles.enhanced.gauntlet_insert",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gauntlet_insert"
+      }
+    ]
+  },
+  "gauntlet_select": {
+    "subtitle": "subtitles.enhanced.gauntlet_select",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gauntlet_select"
+      }
+    ]
+  },
+  "snap_charge": {
+    "subtitle": "subtitles.enhanced.snap_charge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/snap_charge"
+      }
+    ]
+  },
+  "snap": {
+    "subtitle": "subtitles.enhanced.snap",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/snap"
+      }
+    ]
+  },
+  "snap_dust": {
+    "subtitle": "subtitles.enhanced.snap_dust",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/snap_dust"
+      }
+    ]
+  },
+  "strange_awaken": {
+    "subtitle": "subtitles.enhanced.strange_awaken",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_awaken"
+      }
+    ]
+  },
+  "strange_whip": {
+    "subtitle": "subtitles.enhanced.strange_whip",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_whip"
+      }
+    ]
+  },
+  "strange_grapple": {
+    "subtitle": "subtitles.enhanced.strange_grapple",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_grapple"
+      }
+    ]
+  },
+  "strange_shield_up": {
+    "subtitle": "subtitles.enhanced.strange_shield_up",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_shield_up"
+      }
+    ]
+  },
+  "strange_shield_down": {
+    "subtitle": "subtitles.enhanced.strange_shield_down",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_shield_down"
+      }
+    ]
+  },
+  "strange_dome": {
+    "subtitle": "subtitles.enhanced.strange_dome",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_dome"
+      }
+    ]
+  },
+  "strange_bands": {
+    "subtitle": "subtitles.enhanced.strange_bands",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_bands"
+      }
+    ]
+  },
+  "strange_astral_out": {
+    "subtitle": "subtitles.enhanced.strange_astral_out",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_astral_out"
+      }
+    ]
+  },
+  "strange_astral_in": {
+    "subtitle": "subtitles.enhanced.strange_astral_in",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_astral_in"
+      }
+    ]
+  },
+  "strange_portal_open": {
+    "subtitle": "subtitles.enhanced.strange_portal_open",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_portal_open"
+      }
+    ]
+  },
+  "strange_portal_close": {
+    "subtitle": "subtitles.enhanced.strange_portal_close",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_portal_close"
+      }
+    ]
+  },
+  "strange_portal_pass": {
+    "subtitle": "subtitles.enhanced.strange_portal_pass",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_portal_pass"
+      }
+    ]
+  },
+  "strange_mirror_in": {
+    "subtitle": "subtitles.enhanced.strange_mirror_in",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_mirror_in"
+      }
+    ]
+  },
+  "strange_mirror_out": {
+    "subtitle": "subtitles.enhanced.strange_mirror_out",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_mirror_out"
+      }
+    ]
+  },
+  "strange_mirror_loop": {
+    "subtitle": "subtitles.enhanced.strange_mirror_loop",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/strange_mirror_loop"
+      }
+    ]
+  },
+  "eye_open": {
+    "subtitle": "subtitles.enhanced.eye_open",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/eye_open"
+      }
+    ]
+  },
+  "eye_close": {
+    "subtitle": "subtitles.enhanced.eye_close",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/eye_close"
+      }
+    ]
+  },
+  "cloak_flap": {
+    "subtitle": "subtitles.enhanced.cloak_flap",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/cloak_flap"
+      }
+    ]
+  },
+  "sling_ring_save": {
+    "subtitle": "subtitles.enhanced.sling_ring_save",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/sling_ring_save"
+      }
+    ]
+  },
+  "ambient.sanctum": {
+    "subtitle": "subtitles.enhanced.ambient.sanctum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/ambient_sanctum"
+      }
+    ]
+  },
+  "end_tunnel_hum": {
+    "subtitle": "subtitles.enhanced.end_tunnel_hum",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/end_tunnel_hum"
+      }
+    ]
+  },
+  "vormir_wind": {
+    "subtitle": "subtitles.enhanced.vormir_wind",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/vormir_wind"
+      }
+    ]
+  },
+  "soul_sacrifice": {
+    "subtitle": "subtitles.enhanced.soul_sacrifice",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/soul_sacrifice"
+      }
+    ]
+  },
+  "stonekeeper_voice": {
+    "subtitle": "subtitles.enhanced.stonekeeper_voice",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/stonekeeper_voice"
+      }
+    ]
+  },
+  "hulk_transform_out": {
+    "subtitle": "subtitles.enhanced.hulk_transform_out",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_transform_out"
+      }
+    ]
+  },
+  "hulk_transform_in": {
+    "subtitle": "subtitles.enhanced.hulk_transform_in",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_transform_in"
+      }
+    ]
+  },
+  "hulk_switch": {
+    "subtitle": "subtitles.enhanced.hulk_switch",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_switch"
+      }
+    ]
+  },
+  "hulk_roar": {
+    "subtitle": "subtitles.enhanced.hulk_roar",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_roar"
+      }
+    ]
+  },
+  "hulk_smash": {
+    "subtitle": "subtitles.enhanced.hulk_smash",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_smash"
+      }
+    ]
+  },
+  "hulk_grab": {
+    "subtitle": "subtitles.enhanced.hulk_grab",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_grab"
+      }
+    ]
+  },
+  "hulk_slam": {
+    "subtitle": "subtitles.enhanced.hulk_slam",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_slam"
+      }
+    ]
+  },
+  "hulk_clap": {
+    "subtitle": "subtitles.enhanced.hulk_clap",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_clap"
+      }
+    ]
+  },
+  "hulk_leap": {
+    "subtitle": "subtitles.enhanced.hulk_leap",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_leap"
+      }
+    ]
+  },
+  "hulk_land": {
+    "subtitle": "subtitles.enhanced.hulk_land",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_land"
+      }
+    ]
+  },
+  "hulk_rip": {
+    "subtitle": "subtitles.enhanced.hulk_rip",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_rip"
+      }
+    ]
+  },
+  "hulk_throw": {
+    "subtitle": "subtitles.enhanced.hulk_throw",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_throw"
+      }
+    ]
+  },
+  "boulder_hit": {
+    "subtitle": "subtitles.enhanced.boulder_hit",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/boulder_hit"
+      }
+    ]
+  },
+  "hulk_charge": {
+    "subtitle": "subtitles.enhanced.hulk_charge",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_charge"
+      }
+    ]
+  },
+  "hulk_step": {
+    "subtitle": "subtitles.enhanced.hulk_step",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_step"
+      }
+    ]
+  },
+  "hulk_hurt": {
+    "subtitle": "subtitles.enhanced.hulk_hurt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hulk_hurt"
+      }
+    ]
+  },
+  "banner_heartbeat": {
+    "subtitle": "subtitles.enhanced.banner_heartbeat",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/banner_heartbeat"
+      }
+    ]
+  },
+  "gamma_emitter_warmup": {
+    "subtitle": "subtitles.enhanced.gamma_emitter_warmup",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gamma_emitter_warmup"
+      }
+    ]
+  },
+  "gamma_emitter_beam": {
+    "subtitle": "subtitles.enhanced.gamma_emitter_beam",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gamma_emitter_beam"
+      }
+    ]
+  },
+  "gamma_exposure": {
+    "subtitle": "subtitles.enhanced.gamma_exposure",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/gamma_exposure"
+      }
+    ]
+  },
+  "hydra_rifle_burst": {
+    "subtitle": "subtitles.enhanced.hydra_rifle_burst",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_rifle_burst"
+      }
+    ]
+  },
+  "hydra_bolt_hit": {
+    "subtitle": "subtitles.enhanced.hydra_bolt_hit",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_bolt_hit"
+      }
+    ]
+  },
+  "hydra_sniper_aim": {
+    "subtitle": "subtitles.enhanced.hydra_sniper_aim",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_sniper_aim"
+      }
+    ]
+  },
+  "hydra_sniper_shot": {
+    "subtitle": "subtitles.enhanced.hydra_sniper_shot",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_sniper_shot"
+      }
+    ]
+  },
+  "hydra_pistol": {
+    "subtitle": "subtitles.enhanced.hydra_pistol",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_pistol"
+      }
+    ]
+  },
+  "hydra_baton": {
+    "subtitle": "subtitles.enhanced.hydra_baton",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_baton"
+      }
+    ]
+  },
+  "hydra_shield_block": {
+    "subtitle": "subtitles.enhanced.hydra_shield_block",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_shield_block"
+      }
+    ]
+  },
+  "hydra_bark": {
+    "subtitle": "subtitles.enhanced.hydra_bark",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_bark"
+      }
+    ]
+  },
+  "hydra_radio": {
+    "subtitle": "subtitles.enhanced.hydra_radio",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_radio"
+      }
+    ]
+  },
+  "hydra_alarm": {
+    "subtitle": "subtitles.enhanced.hydra_alarm",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_alarm"
+      }
+    ]
+  },
+  "hydra_reload": {
+    "subtitle": "subtitles.enhanced.hydra_reload",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_reload"
+      }
+    ]
+  },
+  "hydra_hurt": {
+    "subtitle": "subtitles.enhanced.hydra_hurt",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_hurt"
+      }
+    ]
+  },
+  "hydra_death": {
+    "subtitle": "subtitles.enhanced.hydra_death",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_death"
+      }
+    ]
+  },
+  "hydra_blaster": {
+    "subtitle": "subtitles.enhanced.hydra_blaster",
+    "sounds": [
+      {
+        "name": "enhanced:sfx/hydra_blaster"
+      }
+    ]
   }
 }

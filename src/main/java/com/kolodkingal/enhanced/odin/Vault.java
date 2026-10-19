@@ -63,6 +63,8 @@ public final class Vault {
         for (Consumer<ServerLevel> listener : OPENED) {
             listener.accept(level);
         }
+        // 3.6: the Reality Stone's pedestal (lane L1).
+        com.kolodkingal.enhanced.stones.StoneSites.placeAsgardPedestal(level);
     }
 
     /** Whether the door is open: every loaded block of it is air (a door in unloaded chunks counts as shut). */

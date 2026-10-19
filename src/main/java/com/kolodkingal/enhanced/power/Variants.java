@@ -114,6 +114,30 @@ public final class Variants {
                 new Variant("goddess", Power.HELA, Variant.suit("hela_goddess"), null, true, 0x2E7D4F, 0x9CF2B5),
                 new Variant("arrival", Power.HELA, Variant.suit("hela_arrival"), null, true, 0x24603D, 0x9CF2B5),
                 own(Power.HELA));
+
+        // ===== doctor_strange (3.6) =====
+        // The Sorcerer Supreme of 2016 and Infinity War (navy tunic, the red Cloak of Levitation, the Eye on his
+        // chest), the Multiverse of Madness look (the cloak with a navy patch) and the Defender, our own "other
+        // universe" take. The Cloak and the Eye are layers of his lane. Placeholder skins until lane L3's art lands.
+        add(Power.DOCTOR_STRANGE,
+                new Variant("sorcerer_supreme", Power.DOCTOR_STRANGE, Variant.suit("strange_sorcerer_supreme"), null,
+                        false, 0xF29A2E, 0xFFE0A8),
+                new Variant("multiverse", Power.DOCTOR_STRANGE, Variant.suit("strange_multiverse"), null, false,
+                        0xF29A2E, 0xFFE0A8),
+                new Variant("defender", Power.DOCTOR_STRANGE, Variant.suit("strange_defender"), null, false, 0xE0802A,
+                        0xFFD8A0),
+                own(Power.DOCTOR_STRANGE));
+        // ===== hulk (3.6) =====
+        // The Hulk of Thor: Ragnarok (the gladiator, the default after the awakening), the bigger savage Hulk of
+        // Spider-Man: Brand New Day, and two human looks: Bruce Banner, and the player's own skin as Banner
+        // (HulkForms.isHuman). Lane L7 draws the Hulks with a model of their own (128 x 128 skins); these are
+        // placeholder skins on the player model.
+        add(Power.HULK,
+                new Variant("ragnarok", Power.HULK, Variant.suit("hulk_ragnarok"), null, false, 0x5BA33A, 0xB6F27A),
+                new Variant("brand_new_day", Power.HULK, Variant.suit("hulk_brand_new_day"), null, false, 0x4A8A2E,
+                        0xB6F27A),
+                new Variant("banner", Power.HULK, Variant.suit("hulk_banner"), null, false, 0x5BA33A, 0xB6F27A),
+                own(Power.HULK));
     }
 
     private static void add(Power power, Variant... variants) {

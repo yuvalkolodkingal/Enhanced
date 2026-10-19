@@ -575,6 +575,15 @@ public final class CityPlan {
         return HIDING_SPOTS;
     }
 
+    // 3.6 stones
+    /**
+     * The stone pedestal of the Reality Stone in the vault (3.6), put at run time when the vault opens ({@code
+     * StoneSites.placeAsgardPedestal}), never in chunk generation, so {@link #VERSION} does not change. It is the place
+     * 3.5 kept empty for it ({@code Vault.RESERVED_PEDESTAL}: the vault's floor opposite Gungnir's stand, air with the
+     * two blocks above it).
+     */
+    public static final BlockPos REALITY_PEDESTAL = new BlockPos(-6, 71, -122);
+
     private CityPlan() {
     }
 }

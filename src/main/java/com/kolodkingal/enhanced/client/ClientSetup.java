@@ -105,6 +105,12 @@ public final class ClientSetup {
             BeamRenderer.registerDrawer(RubyQuartzGlassesItem.UNLEASHED, CyclopsBeamFx.UNLEASHED);
             // ===== odin (3.5) =====
             com.kolodkingal.enhanced.client.render.OdinClient.setup();
+            // ===== 3.6: each lane registers its effects' drawers here (StoneFx, StrangeFx, HulkFx, HydraFx) =====
+            // ===== stones (3.6) =====
+            // ===== strange (3.6) =====
+            // ===== vormir (3.6) =====
+            // ===== hulk (3.6) =====
+            // ===== hydra (3.6) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
         });
@@ -117,6 +123,8 @@ public final class ClientSetup {
         }
         event.register(KeyBindings.CHANGE_LOOK);
         event.register(KeyBindings.VISION_COMMAND);
+        // 3.6: the Stone Wheel (J).
+        event.register(KeyBindings.STONE_WHEEL);
         // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).
         for (KeyMapping key : BuildKeys.ALL) {
             event.register(key);
@@ -179,6 +187,23 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BLADE_SPIKE.get(), com.kolodkingal.enhanced.client.render.BladeSpikeRenderer::new);
         // ===== asgardians (3.5) =====
         event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
+        // The renderers (and block entity renderers) of 3.6, one region per lane: the skeleton draws its entities with
+        // nothing (or a stand-in) until their lanes give them renderers; the blocks are plain models until then.
+        // ===== stones (3.6) =====
+        // ===== strange (3.6) =====
+        event.registerEntityRenderer(ModEntities.SLING_PORTAL.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.ASTRAL_BODY.get(), NoopRenderer::new);
+        // ===== stone_sites (3.6) =====
+        // ===== vormir (3.6) =====
+        event.registerEntityRenderer(ModEntities.STONEKEEPER.get(), NoopRenderer::new);
+        // ===== hulk (3.6) =====
+        event.registerEntityRenderer(ModEntities.HULK_BOULDER.get(), NoopRenderer::new);
+        // ===== hydra (3.6) =====
+        event.registerEntityRenderer(ModEntities.HYDRA_SOLDIER.get(),
+                com.kolodkingal.enhanced.client.hydra.HydraPlaceholderRenderer::new);
+        event.registerEntityRenderer(ModEntities.HYDRA_OFFICER.get(),
+                com.kolodkingal.enhanced.client.hydra.HydraPlaceholderRenderer::new);
+        event.registerEntityRenderer(ModEntities.HYDRA_BOLT.get(), NoopRenderer::new);
     }
 
     /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
@@ -240,6 +265,11 @@ public final class ClientSetup {
         // ===== asgardians (3.5) =====
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel.LAYER,
                 com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel::createLayer);
+        // ===== stones (3.6) =====
+        // ===== strange (3.6) =====
+        // ===== vormir (3.6) =====
+        // ===== hulk (3.6) =====
+        // ===== hydra (3.6) =====
     }
 
     @SubscribeEvent
@@ -283,6 +313,9 @@ public final class ClientSetup {
                         event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER)));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.HelaBladesLayer(renderer, new com.kolodkingal.enhanced.client.render.NecroswordModel(
                         event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER))));
+                // ===== stones (3.6) =====
+                // ===== strange (3.6) =====
+                // ===== hulk (3.6) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),

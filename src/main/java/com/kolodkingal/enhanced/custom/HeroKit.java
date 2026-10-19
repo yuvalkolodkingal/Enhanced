@@ -50,10 +50,16 @@ public final class HeroKit {
             return entry instanceof HeroAbility a ? a : null;
         }
 
-        /** The module, or null for a hero ability. */
+        /** The module, or null for a hero ability or a stone row. */
         @Nullable
         public PowerModule module() {
             return entry instanceof PowerModule m ? m : null;
+        }
+
+        /** 3.6: the stone row, or null for a module or a hero ability. */
+        @Nullable
+        public StoneRow stone() {
+            return entry instanceof StoneRow r ? r : null;
         }
     }
 
@@ -64,6 +70,8 @@ public final class HeroKit {
     private final EnumSet<Power> sources = EnumSet.noneOf(Power.class);
     private final Map<HeroAbility, Integer> strengths = new EnumMap<>(HeroAbility.class);
     private final Map<PowerModule, Integer> moduleStrengths = new EnumMap<>(PowerModule.class);
+    /** 3.6: the stone rows picked, and their strengths. */
+    private final Map<StoneRow, Integer> stoneStrengths = new EnumMap<>(StoneRow.class);
     private final Binding[] plain = new Binding[CustomHero.KEYS + 1];
     private final Binding[] sneak = new Binding[CustomHero.KEYS + 1];
     private final Map<HeroAbility, Integer> columns = new EnumMap<>(HeroAbility.class);
@@ -83,6 +91,8 @@ public final class HeroKit {
                 }
             } else if (entry instanceof PowerModule m) {
                 moduleStrengths.put(m, pick.strength());
+            } else if (entry instanceof StoneRow r) {
+                stoneStrengths.put(r, pick.strength());
             } else {
                 continue;
             }
@@ -143,6 +153,10 @@ public final class HeroKit {
         if (entry == null || hero.pick(entry) == null) {
             return null;
         }
+        if (entry instanceof StoneRow) {
+            // (3.6: a stone row's use, or its Sneak use.)
+            return ALT.equals(action) || MAIN.equals(action) ? new Binding(entry, action, column, onSneak) : null;
+        }
         if (entry instanceof HeroAbility a) {
             if (a.passive() || ALT.equals(action) && !a.hasAlt() || !ALT.equals(action) && !MAIN.equals(action)) {
                 return null;
@@ -181,6 +195,16 @@ public final class HeroKit {
         }
         CustomHero.Pick pick = hero.pick(parent);
         return pick != null && !HeroAbility.MAIN.equals(pick.option());
+    }
+
+    /** 3.6: whether the stone row is picked (its key works while he carries the stone and may use it). */
+    public boolean has(StoneRow row) {
+        return stoneStrengths.containsKey(row);
+    }
+
+    /** 3.6: the stone rows picked. */
+    public Set<StoneRow> stones() {
+        return Collections.unmodifiableSet(stoneStrengths.keySet());
     }
 
     /** Whether any ability of this built-in hero is picked (his upkeep runs). */
@@ -225,13 +249,24 @@ public final class HeroKit {
 
     /** The strength (1-10) of a picked entry, or 0. */
     public int strength(CatalogEntry e) {
-        Integer s = e instanceof HeroAbility a ? strengths.get(a) : e instanceof PowerModule m ? moduleStrengths.get(m) : null;
+        Integer s = e instanceof HeroAbility a ? strengths.get(a) : e instanceof PowerModule m ? moduleStrengths.get(m)
+                : e instanceof StoneRow r ? stoneStrengths.get(r) : null;
         return s == null ? 0 : s;
     }
 
     /** How much more a hero ability does at its strength: {@link #factor} if it scales its damage, else 1. */
     public float damageFactor(HeroAbility a) {
         return a.scales(HeroAbility.Scales.DAMAGE) && has(a) ? factor(strength(a)) : 1.0F;
+    }
+
+    /** 3.6: how much more a stone row does at its strength (every stone row scales its damage). */
+    public float damageFactor(StoneRow row) {
+        return has(row) ? factor(strength(row)) : 1.0F;
+    }
+
+    /** 3.6: how much longer a stone row's cooldown is at its strength. */
+    public float cooldownFactor(StoneRow row) {
+        return has(row) ? 1.0F / factor(strength(row)) : 1.0F;
     }
 
     /** How much longer its cooldown is: 1 / {@link #factor} if it scales its cooldown, else 1. */

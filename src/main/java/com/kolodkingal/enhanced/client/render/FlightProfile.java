@@ -198,6 +198,9 @@ public final class FlightProfile {
             case PROFESSOR_X -> null; // 3.3: he walks, or rolls in his chair
             // 3.5: the gods of Asgard walk; the Bifrost carries them.
             case HEIMDALL, ODIN, HELA -> null;
+            // 3.6: Doctor Strange flies on his Cloak of Levitation: the game's own pose until lane L3 gives him a
+            // profile; the Hulk leaps.
+            case DOCTOR_STRANGE, HULK -> null;
             // A custom hero flies with the profile of his flight style (3.4: of(HeroAnimState)); the plain style is the
             // game's own pose.
             case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;

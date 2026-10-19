@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
+import com.kolodkingal.enhanced.vormir.VormirTracker;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +22,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Items;
@@ -78,6 +80,16 @@ public final class StonePowers {
             living.invulnerableTime = 0;
         }
         return victim.hurt(source, amount);
+    }
+
+    /**
+     * {@link #shove(LivingEntity, Vec3, double, double)} by {@code pusher} (3.6): the push is credited to him for the
+     * Soul Stone's sacrifice ({@link VormirTracker#credit}). Every shared push of the stones' code goes through here
+     * with its caster.
+     */
+    public static void shove(LivingEntity target, Vec3 from, double strength, double lift, @Nullable Entity pusher) {
+        shove(target, from, strength, lift);
+        VormirTracker.credit(target, pusher);
     }
 
     /** Throws the creature away from {@code from} by {@code strength} (what its knockback resistance leaves), lifting it by {@code lift};
@@ -161,7 +173,7 @@ public final class StonePowers {
             }
             hit.add(e);
             if (hurt(level, caster, e, type, damage, caster) && push > 0.0) {
-                shove(e, start, push, 0.2);
+                shove(e, start, push, 0.2, caster);
             }
         }
         return new BeamHit(end, shield, block, hit);
@@ -195,7 +207,7 @@ public final class StonePowers {
         List<LivingEntity> hit = new ArrayList<>();
         for (LivingEntity e : around(level, caster, center, radius, e -> !groundedOnly || e.getY() - center.y <= 0.5)) {
             if (hurt(level, caster, e, type, damage, direct)) {
-                shove(e, center, push, lift);
+                shove(e, center, push, lift, caster);
                 hit.add(e);
             }
         }
@@ -218,7 +230,7 @@ public final class StonePowers {
                 continue;
             }
             if (hurt(level, caster, e, type, damage, direct)) {
-                shove(e, base, push, lift);
+                shove(e, base, push, lift, caster);
                 hit.add(e);
             }
         }
@@ -243,7 +255,7 @@ public final class StonePowers {
             }
             alreadyHit.add(e.getId());
             if (hurt(level, caster, e, type, damage, caster)) {
-                shove(e, center, push, lift);
+                shove(e, center, push, lift, caster);
                 hit.add(e);
             }
         }
@@ -312,6 +324,31 @@ public final class StonePowers {
             turned++;
         }
         return turned;
+    }
+
+    /**
+     * 3.6: a projectile is about to hit {@code holder}, who holds the Reality Stone (the hero Thanos's Veil, or a bare
+     * stone, a Gauntlet or a stone row: lane L2): it is a bubble that pops instead, unless it is {@code reality_proof}
+     * (Mjolnir, Stormbreaker, Gungnir, the Titan's own) or his own or his pet's. (The tick turns the ones it sees
+     * coming, {@link #bubbleProjectiles}; this catches the one that was too fast for it.)
+     *
+     * @return whether it was taken
+     */
+    public static boolean realityCatches(LivingEntity holder, Projectile projectile) {
+        if (projectile.getType().is(ModTags.REALITY_PROOF) || ownedBy(projectile.getOwner(), holder)
+                || !(holder.level() instanceof ServerLevel level)) {
+            return false;
+        }
+        Vec3 at = projectile.position();
+        level.sendParticles(ParticleTypes.BUBBLE_POP, at.x, at.y, at.z, 10, 0.2, 0.2, 0.2, 0.02);
+        ThanosSounds.REALITY_POP.play(level, at);
+        projectile.discard();
+        return true;
+    }
+
+    /** Whether {@code entity} is {@code holder} or a pet of his. */
+    private static boolean ownedBy(@Nullable Entity entity, LivingEntity holder) {
+        return entity == holder || entity instanceof TamableAnimal pet && pet.isOwnedBy(holder);
     }
 
     private StonePowers() {

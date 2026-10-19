@@ -175,6 +175,15 @@ public final class GestureRoutes {
             case ODINSLEEP -> power == Power.ODIN ? (on ? GestureId.ODIN_KNEEL : GestureId.ODIN_RISE) : null;
             // ===== hela (3.5) =====
             case HELA_FORM -> power == Power.HELA ? (on ? GestureId.HELA_FORM_ON : GestureId.HELA_FORM_OFF) : null;
+            // (The toggles of 3.6 stand in with the pending gesture, for their own hero only, until their lanes route
+            // them.)
+            // ===== strange (3.6) =====
+            case STRANGE_ASTRAL, STRANGE_MIRROR -> power == Power.DOCTOR_STRANGE ? PENDING_GESTURE : null;
+            // ===== stones (3.6) =====
+            // (Slow Time: Doctor Strange's Y; the stones' own gesture is lane L2's StoneGestures.)
+            case TIME_SLOW -> power == Power.DOCTOR_STRANGE ? PENDING_GESTURE : null;
+            // ===== hulk (3.6) =====
+            case HUMAN_FORM -> power == Power.HULK ? PENDING_GESTURE : null;
         };
     }
 
@@ -433,6 +442,10 @@ public final class GestureRoutes {
                 case 4 -> "live:HELA_SUMMONING";
                 default -> "live:HELA_GRASPING";
             };
+            // ===== doctor_strange (3.6) =====
+            case DOCTOR_STRANGE -> "none: Doctor Strange's keys are acted by his plug-in (lane L3 of 3.6)";
+            // ===== hulk (3.6) =====
+            case HULK -> "none: the Hulk's keys are acted by his plug-in (lane L7 of 3.6)";
             default -> "none: no abilities";
         };
     }
@@ -488,6 +501,16 @@ public final class GestureRoutes {
             case ODIN_RAVENS -> "Odin's own gesture ODIN_RAVENS, from his plug-in (OdinClient.liveGesture)";
             // ===== hela (3.5) =====
             case HELA_GRASPING, HELA_SUMMONING -> null;
+            // ===== strange (3.6) =====
+            // (Until each lane of 3.6 gives its states a gesture or a reason of their own; not the 3.0 pending marker,
+            // which fails a release.)
+            case STRANGE_SHIELD, STRANGE_ASTRAL, STRANGE_MIRROR,
+                    STRANGE_CASTING -> "pending: Doctor Strange's lane (L3 of 3.6) acts it";
+            // ===== stones (3.6) =====
+            case TIME_SLOWING, POWER_VEINS -> "pending: the stone powers' lane (L2 of 3.6) acts it";
+            // ===== hulk (3.6) =====
+            case HULK_TRANSFORMING, HULK_LEAPING, HULK_GRABBING, HULK_CHARGING,
+                    HULK_ENRAGED -> "pending: the Hulk's lane (L7 of 3.6) acts it";
         };
     }
 

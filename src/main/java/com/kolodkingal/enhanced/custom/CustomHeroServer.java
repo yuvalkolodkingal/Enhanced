@@ -10,6 +10,8 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.power.Toggle;
+import com.kolodkingal.enhanced.stones.StoneRowKeys;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -108,6 +110,12 @@ public final class CustomHeroServer implements HeroServer {
             player.displayClientMessage(Component.translatable("message.enhanced.custom.suppressed").withStyle(ChatFormatting.GRAY), true);
             return;
         }
+        // 3.6: in his human form (the Hulk's Transform) every key but the Transform itself is refused.
+        if (down && data.toggle(Toggle.HUMAN_FORM) && binding.ability() != HeroAbility.HULK_TRANSFORM) {
+            player.displayClientMessage(Component.translatable("message.enhanced.hulk.human_form")
+                    .withStyle(ChatFormatting.GRAY), true);
+            return;
+        }
         CustomHero hero = kit.hero();
         CustomState state = CustomHeroes.state(player);
         Snap before = down ? new Snap(data, state) : null;
@@ -119,6 +127,9 @@ public final class CustomHeroServer implements HeroServer {
             } finally {
                 data.pressing(0, false);
             }
+        } else if (binding.stone() != null) {
+            // 3.6: a stone row: its key is the stone's (lane L2), never a hero's.
+            StoneRowKeys.press(player, data, binding.stone(), column, down, binding.isAlt());
         } else {
             PowerModule module = binding.module();
             CustomHero.Pick pick = module == null ? null : hero.pick(module);

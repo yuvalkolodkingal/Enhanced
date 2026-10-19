@@ -7,9 +7,11 @@ import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.CustomState;
 import com.kolodkingal.enhanced.hex.HexData;
+import com.kolodkingal.enhanced.hulk.HulkState;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.road.RoadDoors;
+import com.kolodkingal.enhanced.stones.StoneProgress;
 import com.kolodkingal.enhanced.ultron.SokoviaRelocations;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -156,6 +158,38 @@ public final class ModAttachments {
                     .serialize(com.kolodkingal.enhanced.asgard.AsgardProgress.CODEC)
                     .copyOnDeath()
                     .sync((holder, to) -> holder == to, com.kolodkingal.enhanced.asgard.AsgardProgress.STREAM_CODEC)
+                    .build());
+
+    /**
+     * 3.6: a player's progress with the Infinity Stones (the site stones he took, the Stonekeeper, the sacrifice, the
+     * Snap's cooldown). Saved, kept on death, synced to that player only.
+     */
+    public static final Supplier<AttachmentType<StoneProgress>> STONES = ATTACHMENTS.register("stones",
+            () -> AttachmentType.builder(() -> StoneProgress.EMPTY)
+                    .serialize(StoneProgress.CODEC)
+                    .copyOnDeath()
+                    .sync((holder, to) -> holder == to, StoneProgress.STREAM_CODEC)
+                    .build());
+
+    /**
+     * 3.6: a sorcerer's Sling Ring: its places and cooldown (as the Book of the Vishanti's). Saved, kept on death,
+     * synced to him.
+     */
+    public static final Supplier<AttachmentType<BifrostData>> SLING_RING = ATTACHMENTS.register("sling_ring",
+            () -> AttachmentType.builder(() -> BifrostData.EMPTY)
+                    .serialize(BifrostData.CODEC)
+                    .copyOnDeath()
+                    .sync((holder, to) -> holder == to, BifrostData.STREAM_CODEC)
+                    .build());
+
+    /**
+     * 3.6: the Hulk's rage, Banner's anger, the last Hulk look, the burned arm. Saved, kept on death, synced to him.
+     */
+    public static final Supplier<AttachmentType<HulkState>> HULK = ATTACHMENTS.register("hulk",
+            () -> AttachmentType.builder(() -> HulkState.EMPTY)
+                    .serialize(HulkState.CODEC)
+                    .copyOnDeath()
+                    .sync((holder, to) -> holder == to, HulkState.STREAM_CODEC)
                     .build());
 
     private ModAttachments() {

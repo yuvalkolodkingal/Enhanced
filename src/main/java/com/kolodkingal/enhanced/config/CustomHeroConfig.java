@@ -45,6 +45,8 @@ public final class CustomHeroConfig {
     public static ModConfigSpec.BooleanValue LAYERS;
     /** 3.4 (L6, R8): "Choose a hero" also gives the hero's own items. */
     public static ModConfigSpec.BooleanValue CHOOSE_GIVES_ITEMS;
+    /** 3.6: a custom hero may put the Infinity Stones he carries on his keys (the stone rows). */
+    public static ModConfigSpec.BooleanValue STONE_ROWS;
 
     public static void define(ModConfigSpec.Builder builder) {
         builder.comment("The Hero Creator: a Creative-only item with which a player becomes any hero of the mod, or makes a hero",
@@ -108,6 +110,9 @@ public final class CustomHeroConfig {
                         "(Thor's Mjolnir or Stormbreaker, claimed; Magneto's helmet, Quicksilver's goggles and Cyclops's glasses, worn;",
                         "Loki's Scepter, the Gauntlet, Ultron's Core, the wheelchair, the Darkhold). Never a second one.")
                 .define("chooseGivesItems", true);
+        STONE_ROWS = builder.comment("3.6: a custom hero may put an Infinity Stone on a key (a stone row); it works",
+                        "only while he carries that stone and may use it.")
+                .define("stoneRows", true);
         builder.pop();
     }
 

@@ -34,10 +34,11 @@ public final class HeroArmour {
         return !isHeroGear(entity.getItemBySlot(slot));
     }
 
-    /** Whether the entity is a hero, or an illusion of one (Loki's). */
+    /** Whether the entity is a hero, or an illusion of one (Loki's); 3.6: not the Hulk while he is Bruce Banner. */
     private static boolean isHero(LivingEntity entity) {
         return entity instanceof LokiIllusionEntity
-                || (entity instanceof AbstractClientPlayer player && Powers.power(player) != Power.NONE);
+                || (entity instanceof AbstractClientPlayer player && Powers.power(player) != Power.NONE
+                && !com.kolodkingal.enhanced.hulk.HulkForms.isHuman(player));
     }
 
     /** What this mod makes to be worn by its heroes: the helmet, the crown and the goggles. */

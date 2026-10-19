@@ -1,0 +1,15 @@
+{
+  "type": "enhanced:stone_extraction",
+  "group": "enhanced_stones",
+  "ingredient": {
+    "item": "enhanced:tesseract"
+  },
+  "result": {
+    "id": "enhanced:space_stone",
+    "count": 1
+  },
+  "remainder": {
+    "id": "enhanced:empty_tesseract",
+    "count": 1
+  }
+}

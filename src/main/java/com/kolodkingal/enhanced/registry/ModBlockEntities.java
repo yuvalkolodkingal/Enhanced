@@ -36,6 +36,28 @@ public final class ModBlockEntities {
             BLOCK_ENTITIES.register("bifrost_rune_stone", () -> BlockEntityType.Builder.of(BifrostRuneStoneBlockEntity::new,
                     ModBlocks.BIFROST_RUNE_STONE.get()).build(null));
 
+    // ===== stones (3.6) =====
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.StonePedestalBlockEntity>> STONE_PEDESTAL =
+            BLOCK_ENTITIES.register("stone_pedestal",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.StonePedestalBlockEntity::new,
+                    ModBlocks.STONE_PEDESTAL.get()).build(null));
+    // ===== stone_sites (3.6) =====
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.TesseractCradleBlockEntity>> TESSERACT_CRADLE =
+            BLOCK_ENTITIES.register("tesseract_cradle",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.TesseractCradleBlockEntity::new,
+                    ModBlocks.TESSERACT_CRADLE.get()).build(null));
+    // ===== hulk (3.6) =====
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.GammaEmitterBlockEntity>> GAMMA_EMITTER =
+            BLOCK_ENTITIES.register("gamma_emitter",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.GammaEmitterBlockEntity::new,
+                    ModBlocks.GAMMA_EMITTER.get()).build(null));
+
     private ModBlockEntities() {
     }
 }

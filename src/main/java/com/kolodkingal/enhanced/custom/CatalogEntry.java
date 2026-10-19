@@ -1,14 +1,16 @@
 package com.kolodkingal.enhanced.custom;
 
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.thanos.StoneKind;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * One entry of the Hero Creator's catalogue (3.4): a generic {@link PowerModule} or a built-in hero's
- * {@link HeroAbility}, behind one face, so the rules, the kit, the editor and the HUD read them alike ({@link Catalog}).
+ * One entry of the Hero Creator's catalogue (3.4): a generic {@link PowerModule} or a built-in hero's {@link
+ * HeroAbility}, behind one face, so the rules, the kit, the editor and the HUD read them alike ({@link Catalog}); 3.6:
+ * or an Infinity Stone's {@link StoneRow}.
  */
 public interface CatalogEntry {
     /** The editor's cards that stack several entries of one kind (a card with a style switcher). */
@@ -60,4 +62,10 @@ public interface CatalogEntry {
 
     /** The roles it gives a custom hero ({@link Traits}). */
     Set<Trait> traits();
+
+    /** 3.6: the Infinity Stone a stone row puts on a key ({@link StoneRow}), or null for any other entry. */
+    @Nullable
+    default StoneKind stone() {
+        return null;
+    }
 }

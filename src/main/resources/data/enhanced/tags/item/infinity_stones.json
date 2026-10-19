@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:space_stone",
+    "enhanced:mind_stone",
+    "enhanced:reality_stone",
+    "enhanced:power_stone",
+    "enhanced:time_stone",
+    "enhanced:soul_stone"
+  ]
+}

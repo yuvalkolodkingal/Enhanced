@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.asgard;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
+import com.kolodkingal.enhanced.stones.SpaceStone;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -15,11 +16,12 @@ import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 /**
- * The only door of Asgard (3.5): nothing travels into or out of Asgard but by the Bifrost ({@link Bifrost#isMoving}).
- * Portals, the Book of the Vishanti, the Tesseract and other mods' teleports are refused; an operator's {@code /tp} and
- * {@code /execute in} stay free (a player with permission level 2). With {@code asgard.enabled} off the gate refuses
- * every way in, the Bifrost too (operators still may), and lets everyone out. A Nether portal cannot be lit in Asgard.
- * The Book of the Vishanti is refused before anything is spent ({@code PlaceBook.refusesAsgard}).
+ * The only door of Asgard (3.5): nothing travels into or out of Asgard but by the Bifrost ({@link Bifrost#isMoving}),
+ * and (3.6) the Space Stone's Realm Picker ({@link SpaceStone#isMoving}, unless {@code [space_stone] reachesAsgard} is
+ * off). Portals, the Book of the Vishanti, the Tesseract and other mods' teleports are refused; an operator's {@code
+ * /tp} and {@code /execute in} stay free (a player with permission level 2). With {@code asgard.enabled} off the gate
+ * refuses every way in, the Bifrost too (operators still may), and lets everyone out. A Nether portal cannot be lit in
+ * Asgard. The Book of the Vishanti is refused before anything is spent ({@code PlaceBook.refusesAsgard}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class AsgardGate {
@@ -31,6 +33,10 @@ public final class AsgardGate {
             return true;
         }
         if (entity instanceof ServerPlayer player && player.hasPermissions(2)) {
+            return true;
+        }
+        // 3.6: the one exception to "only the Bifrost": the Space Stone (both ways; never into a closed Asgard).
+        if (SpaceStone.isMoving(entity) && SpaceStone.reachesAsgard() && (!in || Bifrost.asgardEnabled())) {
             return true;
         }
         return Bifrost.isMoving(entity) && (!in || Bifrost.asgardEnabled());

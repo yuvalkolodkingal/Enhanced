@@ -327,8 +327,8 @@ public final class PowersTab extends EditorTab {
             int c = (first - 1 + i) % CustomHero.KEYS + 1;
             if (hero.binding(c, false).isEmpty()) {
                 CustomHero laid = hero.withKey(c, e.id());
-                if (e instanceof HeroAbility a && a.hasAlt() && HeroAbility.BOTH.equals(pick.option())) {
-                    laid = laid.withBinding(c, true, a.id() + "#" + HeroKit.ALT);
+                if (com.kolodkingal.enhanced.custom.CustomHeroRules.pairs(pick)) {
+                    laid = laid.withBinding(c, true, e.id() + "#" + HeroKit.ALT);
                 }
                 return laid;
             }

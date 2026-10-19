@@ -331,6 +331,83 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .build("asgardian"));
 
+    // ===== strange (3.6) =====
+    // (The skeleton registers every entity of 3.6, drawn as nothing or as a placeholder; each lane owns its classes.)
+    /** One ring of a pair of Sling-Ring portals (lane L3). Never saved. */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.strange.SlingPortalEntity>> SLING_PORTAL =
+            ENTITIES.register("sling_portal",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.strange.SlingPortalEntity>of(
+                            com.kolodkingal.enhanced.strange.SlingPortalEntity::new, MobCategory.MISC)
+                    .sized(2.4F, 2.4F)
+                    .clientTrackingRange(10)
+                    .noSave()
+                    .noSummon()
+                    .build("sling_portal"));
+    /** Doctor Strange's kneeling body while his spirit is out (lane L3). Never saved. */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.strange.AstralBodyEntity>> ASTRAL_BODY =
+            ENTITIES.register("astral_body",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.strange.AstralBodyEntity>of(
+                            com.kolodkingal.enhanced.strange.AstralBodyEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.3F)
+                    .clientTrackingRange(10)
+                    .noSave()
+                    .noSummon()
+                    .build("astral_body"));
+    // ===== vormir (3.6) =====
+    /** The Stonekeeper of the Vormir Cliff (lane L5). Saved (the cliff's template places him). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.vormir.StonekeeperEntity>> STONEKEEPER =
+            ENTITIES.register("stonekeeper",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.vormir.StonekeeperEntity>of(
+                            com.kolodkingal.enhanced.vormir.StonekeeperEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.95F)
+                    .fireImmune()
+                    .clientTrackingRange(10)
+                    .build("stonekeeper"));
+    // ===== hulk (3.6) =====
+    /** The boulder the Hulk throws (lane L7). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.hulk.HulkBoulderEntity>> HULK_BOULDER =
+            ENTITIES.register("hulk_boulder",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.hulk.HulkBoulderEntity>of(
+                            com.kolodkingal.enhanced.hulk.HulkBoulderEntity::new, MobCategory.MISC)
+                    .sized(1.0F, 1.0F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("hulk_boulder"));
+    // ===== hydra (3.6) =====
+    /** A Hydra soldier: a rifleman, an enforcer or a sniper (lane L8). A monster; saved. */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.hydra.HydraSoldierEntity>> HYDRA_SOLDIER =
+            ENTITIES.register("hydra_soldier",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.hydra.HydraSoldierEntity>of(
+                            com.kolodkingal.enhanced.hydra.HydraSoldierEntity::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(10)
+                    .build("hydra_soldier"));
+    /** A Hydra officer (lane L8). A monster; saved. */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.hydra.HydraOfficerEntity>> HYDRA_OFFICER =
+            ENTITIES.register("hydra_officer",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.hydra.HydraOfficerEntity>of(
+                            com.kolodkingal.enhanced.hydra.HydraOfficerEntity::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(10)
+                    .build("hydra_officer"));
+    /** A Hydra energy bolt (lane L8). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.hydra.HydraBoltEntity>> HYDRA_BOLT =
+            ENTITIES.register("hydra_bolt", () -> EntityType.Builder.<com.kolodkingal.enhanced.hydra.HydraBoltEntity>of(
+                            com.kolodkingal.enhanced.hydra.HydraBoltEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("hydra_bolt"));
+
     /** Mod bus: attributes of the mod's living entities. */
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
@@ -348,6 +425,11 @@ public final class ModEntities {
         event.put(BERSERKER.get(), BerserkerEntity.createAttributes().build());
         event.put(FENRIS.get(), FenrisEntity.createAttributes().build());
         event.put(ASGARDIAN.get(), AsgardianEntity.createAttributes().build());
+        // 3.6
+        event.put(ASTRAL_BODY.get(), com.kolodkingal.enhanced.strange.AstralBodyEntity.createAttributes().build());
+        event.put(STONEKEEPER.get(), com.kolodkingal.enhanced.vormir.StonekeeperEntity.createAttributes().build());
+        event.put(HYDRA_SOLDIER.get(), com.kolodkingal.enhanced.hydra.HydraSoldierEntity.createAttributes().build());
+        event.put(HYDRA_OFFICER.get(), com.kolodkingal.enhanced.hydra.HydraOfficerEntity.createAttributes().build());
     }
 
     private ModEntities() {

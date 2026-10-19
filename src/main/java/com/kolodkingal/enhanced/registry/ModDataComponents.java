@@ -28,6 +28,17 @@ public final class ModDataComponents {
                     .persistent(com.mojang.serialization.Codec.INT)
                     .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT));
 
+    /**
+     * 3.6: what an Infinity Gauntlet holds ({@link com.kolodkingal.enhanced.stones.GauntletContents}): the item's
+     * default is the Titan's Gauntlet, so every Gauntlet saved before 3.6 reads as it. Saved with the item, sent to
+     * clients.
+     */
+    public static final DeferredHolder<DataComponentType<?>,
+            DataComponentType<com.kolodkingal.enhanced.stones.GauntletContents>> GAUNTLET =
+            DATA_COMPONENTS.registerComponentType("gauntlet", builder -> builder
+                    .persistent(com.kolodkingal.enhanced.stones.GauntletContents.CODEC)
+                    .networkSynchronized(com.kolodkingal.enhanced.stones.GauntletContents.STREAM_CODEC));
+
     private ModDataComponents() {
     }
 }
