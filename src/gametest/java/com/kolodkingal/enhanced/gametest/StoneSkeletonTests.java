@@ -27,6 +27,7 @@ import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.network.StrangeFxPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -52,6 +53,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -299,6 +302,14 @@ public final class StoneSkeletonTests {
                         + gauntlet.get(ModDataComponents.GAUNTLET.get()));
         check(GauntletContents.TITAN.titan() && Integer.bitCount(GauntletContents.TITAN.stones()) == 5,
                 "five stones, not Soul");
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(5.5, FLOOR, 5.5);
+        ItemStack crafted = new ItemStack(ModItems.INFINITY_GAUNTLET.get());
+        crafted.set(ModDataComponents.GAUNTLET.get(), GauntletContents.EMPTY);
+        player.setItemInHand(InteractionHand.MAIN_HAND, crafted);
+        check(crafted.use(helper.getLevel(), player, InteractionHand.MAIN_HAND).getResult() == InteractionResult.PASS
+                && !player.isUsingItem() && Powers.power(player) == Power.NONE,
+                        "a crafted, empty Gauntlet awakens nobody");
         for (StoneKind kind : StoneKind.values()) {
             String id = kind.name().toLowerCase(java.util.Locale.ROOT) + "_stone";
             ItemStack stone = new ItemStack(BuiltInRegistries.ITEM.get(Enhanced.id(id)));

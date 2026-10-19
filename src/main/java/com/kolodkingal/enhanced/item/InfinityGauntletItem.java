@@ -3,14 +3,19 @@ package com.kolodkingal.enhanced.item;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModDataComponents;
+import com.kolodkingal.enhanced.stones.GauntletContents;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -36,6 +41,19 @@ public class InfinityGauntletItem extends AwakeningItem {
     @Override
     protected Component alreadyPowered() {
         return Component.translatable("message.enhanced.thanos.already_powered");
+    }
+
+    /**
+     * 3.6: only the Titan's Gauntlet (every old one and the boss's reward: the item's default component) awakens
+     * Thanos; a crafted one, empty or filled, does not (lane L1 gives it its uses).
+     */
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        GauntletContents contents = player.getItemInHand(hand).get(ModDataComponents.GAUNTLET.get());
+        if (contents != null && !contents.titan()) {
+            return InteractionResultHolder.pass(player.getItemInHand(hand));
+        }
+        return super.use(level, player, hand);
     }
 
     /** Three seconds by default; {@code gauntletRitualTicks} in the {@code [thanos_boss]} config. */

@@ -23,9 +23,11 @@ import com.kolodkingal.enhanced.item.ScepterRituals.Ritual;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
+import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.stones.GauntletContents;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosFight;
@@ -374,7 +376,12 @@ public final class CrossHeroTests {
         for (RecipeHolder<?> recipe : level.getRecipeManager().getRecipes()) {
             ItemStack result = recipe.value().getResultItem(level.registryAccess());
             for (Item reward : rewards) {
-                check(!result.is(reward), "the recipe " + recipe.id() + " does not make " + BuiltInRegistries.ITEM.getKey(reward));
+                // (3.6: the empty Infinity Gauntlet is crafted; the Titan's, with its five stones, is still the
+                // boss's alone.)
+                boolean empty = result.is(ModItems.INFINITY_GAUNTLET.get())
+                        && GauntletContents.EMPTY.equals(result.get(ModDataComponents.GAUNTLET.get()));
+                check(!result.is(reward) || empty, "the recipe " + recipe.id() + " does not make "
+                        + BuiltInRegistries.ITEM.getKey(reward));
             }
         }
         List<String> ids = rewards.stream().map(item -> BuiltInRegistries.ITEM.getKey(item).toString()).toList();

@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
@@ -39,6 +40,26 @@ public final class SoundAssetTests {
     /** The md5 of the placeholder file the 3.5 skeleton gave every new sound event. */
     static final String PLACEHOLDER_MD5 = "4397d2524960e0ff29ed281d13d82f90";
 
+    /**
+     * The 3.6 skeleton's placeholder files ({@code sfx/<name>.ogg}, the same 0.2-second file as 3.5's): every sound
+     * event of 3.6 until the sound lane (L6 of 3.6) makes it. L6 empties this list; the test then holds for every file
+     * again.
+     */
+    static final Set<String> SKELETON_36 = Set.of(
+            "stone_reject", "stone_slip", "stone_grace_tick", "reality_illusion", "mind_command", "time_slow_on",
+            "time_slow_off", "time_slow_loop", "time_crop", "power_beam_loop", "power_explosion", "power_bolt",
+            "space_step", "space_realm_depart", "space_realm_arrive", "soul_sight", "orb_open", "pedestal_take",
+            "gauntlet_insert", "gauntlet_select", "snap_charge", "snap", "snap_dust", "strange_awaken", "strange_whip",
+            "strange_grapple", "strange_shield_up", "strange_shield_down", "strange_dome", "strange_bands",
+            "strange_astral_out", "strange_astral_in", "strange_portal_open", "strange_portal_close",
+            "strange_portal_pass", "strange_mirror_in", "strange_mirror_out", "strange_mirror_loop", "eye_open",
+            "eye_close", "cloak_flap", "sling_ring_save", "ambient_sanctum", "end_tunnel_hum", "vormir_wind",
+            "soul_sacrifice", "stonekeeper_voice", "hulk_transform_out", "hulk_transform_in", "hulk_switch",
+            "hulk_roar", "hulk_smash", "hulk_grab", "hulk_slam", "hulk_clap", "hulk_leap", "hulk_land", "hulk_rip",
+            "hulk_throw", "boulder_hit", "hulk_charge", "hulk_step", "hulk_hurt", "banner_heartbeat",
+            "gamma_emitter_warmup", "gamma_emitter_beam", "gamma_exposure", "hydra_rifle_burst", "hydra_bolt_hit",
+            "hydra_sniper_aim", "hydra_sniper_shot", "hydra_pistol", "hydra_baton", "hydra_shield_block", "hydra_bark",
+            "hydra_radio", "hydra_alarm", "hydra_reload", "hydra_hurt", "hydra_death", "hydra_blaster");
     /** The sound events of PLAN Appendix C (72; {@code music.asgard} plays three files). */
     static final List<String> ASGARD_EVENTS = List.of(
             // Asgard
@@ -178,8 +199,10 @@ public final class SoundAssetTests {
         try (Stream<Path> walk = Files.walk(root)) {
             for (Path path : walk.filter(p -> p.getFileName().toString().endsWith(".ogg")).toList()) {
                 count++;
-                if (md5(Files.readAllBytes(path)).equals(PLACEHOLDER_MD5)) {
-                    placeholders.add(root.relativize(path).toString());
+                String name = root.relativize(path).toString();
+                if (md5(Files.readAllBytes(path)).equals(PLACEHOLDER_MD5)
+                        && !SKELETON_36.contains(name.replace("sfx/", "").replace(".ogg", ""))) {
+                    placeholders.add(name);
                 }
             }
         }

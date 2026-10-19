@@ -484,7 +484,9 @@ public final class CustomV2Tests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theRolesOfTheHeroesAreTheOldListsAndAKitsArePicked(GameTestHelper helper) {
-        Set<Power> sorcerers = EnumSet.of(Power.LOKI, Power.BILLY, Power.SCARLET_WITCH, Power.AGATHA);
+        // (3.6: Doctor Strange is a sorcerer too.)
+        Set<Power> sorcerers = EnumSet.of(Power.LOKI, Power.BILLY, Power.SCARLET_WITCH, Power.AGATHA,
+                Power.DOCTOR_STRANGE);
         Set<Power> strong = EnumSet.of(Power.SCARLET_WITCH, Power.PHOENIX, Power.BILLY);
         for (Power p : Power.values()) {
             PowerData data = CustomKitSupport.data(p);

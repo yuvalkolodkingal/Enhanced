@@ -204,6 +204,22 @@ public final class HeroAbilityAnims {
         row(HeroAbility.HELA_ARMY).main(GestureId.HELA_RAISE).alt(GestureId.HELA_FENRIS);
         row(HeroAbility.HELA_GRASP).main(GestureId.HELA_GRASP).stances(Stance.HELA_GRASP);
         row(HeroAbility.HELA_BODY);
+        // ===== doctor_strange (3.6) =====
+        // (The skeleton's rows have no moves yet: lane L3 gives them their gestures and stances.)
+        row(HeroAbility.STRANGE_WHIP);
+        row(HeroAbility.STRANGE_SHIELDS);
+        row(HeroAbility.STRANGE_BANDS);
+        row(HeroAbility.STRANGE_PORTAL);
+        row(HeroAbility.STRANGE_EYE);
+        row(HeroAbility.STRANGE_BODY);
+        // ===== hulk (3.6) =====
+        // (The skeleton's rows have no moves yet: lane L7 gives them their gestures and stances.)
+        row(HeroAbility.HULK_SMASH);
+        row(HeroAbility.HULK_CLAP);
+        row(HeroAbility.HULK_LEAP);
+        row(HeroAbility.HULK_BOULDER);
+        row(HeroAbility.HULK_TRANSFORM);
+        row(HeroAbility.HULK_BODY);
         // ===== variants (3.5, the creator lane) =====
         // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own
         // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's
@@ -284,6 +300,11 @@ public final class HeroAbilityAnims {
         toggle(Toggle.HEIMDALL_SIGHT, HeroAbility.HEIMDALL_SIGHT);
         toggle(Toggle.ODINSLEEP, HeroAbility.ODIN_COMMAND);
         toggle(Toggle.HELA_FORM, HeroAbility.HELA_GODDESS);
+        // 3.6 (the Astral Projection and the Mirror Dimension are the Sneak variants of the bands and the portal)
+        toggle(Toggle.STRANGE_ASTRAL, HeroAbility.STRANGE_BANDS);
+        toggle(Toggle.STRANGE_MIRROR, HeroAbility.STRANGE_PORTAL);
+        toggle(Toggle.TIME_SLOW, HeroAbility.STRANGE_EYE);
+        toggle(Toggle.HUMAN_FORM, HeroAbility.HULK_TRANSFORM);
         flag(GestureRoutes.Flag.MAGNETIC_SHIELD, HeroAbility.MAGNETO_SHIELD);
         flag(GestureRoutes.Flag.SHRAPNEL, HeroAbility.MAGNETO_SHRAPNEL);
         flag(GestureRoutes.Flag.BEAM, HeroAbility.WANDA_CHAOS_BEAM, HeroAbility.VISION_MIND_BEAM, HeroAbility.ULTRON_REPULSOR);
