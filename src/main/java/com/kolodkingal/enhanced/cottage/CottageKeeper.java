@@ -292,6 +292,12 @@ public final class CottageKeeper {
             return null;
         }
         npc.setRole(role, 0);
+        // a long way round inside the house (the stairs, the doors): they plan further than the Asgardians
+        net.minecraft.world.entity.ai.attributes.AttributeInstance range = npc.getAttribute(
+                net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE);
+        if (range != null) {
+            range.setBaseValue(48.0);
+        }
         npc.moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5, level.getRandom().nextFloat() * 360.0F, 0.0F);
         npc.setHome(Cottages.slot(cottage.key(), role), home, HOME_RADIUS);
         if (CottageGoals.Phase.at(level.getDayTime()) == CottageGoals.Phase.NIGHT) {

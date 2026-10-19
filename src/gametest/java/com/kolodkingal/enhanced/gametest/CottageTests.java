@@ -658,6 +658,7 @@ public final class CottageTests {
             if (!loaded(level, cottage)) {
                 return false;
             }
+            cottage.setRollDay(Math.floorDiv(level.getDayTime(), 24000L)); // (today's morning is asked below)
             CottageKeeper.keep(level, cottage);
             Rabbit scratchy = Scratchy.find(level, cottage);
             check(scratchy != null && scratchy.distanceToSqr(Vec3.atBottomCenterOf(hutch)) < 4.0, "at his hutch");

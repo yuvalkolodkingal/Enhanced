@@ -295,7 +295,8 @@ public final class CottageGoals {
 
     /**
      * The clock (no controls, so it never stops another goal): every second, a sleeper wakes when the night is over,
-     * the table has hearts now and then at dinner, and Nicky lets go of Rio's flower after a while.
+     * diners stand at night, the table has hearts now and then at dinner, one who strayed out of the grounds goes
+     * home, and Nicky lets go of Rio's flower after a while.
      */
     static final class Clock extends Goal {
         private final AsgardianEntity npc;
@@ -306,7 +307,8 @@ public final class CottageGoals {
 
         @Override
         public boolean canUse() {
-            if ((npc.tickCount + npc.getId()) % 20 != 0 || !(npc.level() instanceof ServerLevel level)) {
+            // (new goals are asked every other tick: every 20 ticks, whatever his id)
+            if (((npc.tickCount >> 1) + npc.getId()) % 10 != 0 || !(npc.level() instanceof ServerLevel level)) {
                 return false;
             }
             Cottages.Cottage cottage = cottage(npc);
@@ -317,11 +319,24 @@ public final class CottageGoals {
             NpcState state = npc.state();
             if (state == NpcState.SLEEPING && phase != Phase.NIGHT) {
                 npc.setState(NpcState.IDLE, 0);
+            } else if (state == NpcState.SITTING && phase == Phase.NIGHT) {
+                npc.setState(NpcState.IDLE, 0); // dinner is over: off to bed
             } else if (state == NpcState.SITTING && phase == Phase.DUSK && npc.getRandom().nextInt(4) == 0) {
                 level.sendParticles(ParticleTypes.HEART, npc.getX(), npc.getY() + 1.6, npc.getZ(), 1, 0.2, 0.1, 0.2,
                         0.0);
                 if (npc.getRandom().nextBoolean()) {
                     npc.murmur(0.4F);
+                }
+            }
+            if (!state.still() && cottage.distance(npc.position()) > 1.0) {
+                // Out of the grounds (over a fence from a tree that grew by it, down a slope): home again.
+                BlockPos home = cottage.points().home(npc.role());
+                Vec3 at = Vec3.atBottomCenterOf(home);
+                if (HydraGarrison.unseen(level, npc.position(), 16.0) && HydraGarrison.unseen(level, at, 16.0)) {
+                    npc.getNavigation().stop();
+                    npc.moveTo(at.x, at.y, at.z, npc.getYRot(), 0.0F);
+                } else {
+                    npc.getNavigation().moveTo(at.x, at.y, at.z, 0.8);
                 }
             }
             long until = npc.getPersistentData().getLong(FLOWER_UNTIL);
@@ -387,6 +402,13 @@ public final class CottageGoals {
         }
     }
 
+    /** A monster (any, not only one after a player): the family runs from it. */
+    static boolean monster(LivingEntity e) {
+        return e instanceof net.minecraft.world.entity.monster.Enemy
+                && e.getType().getCategory() == net.minecraft.world.entity.MobCategory.MONSTER
+                || DefendAsgardGoal.hostileMonster(e);
+    }
+
     /** From monsters they run home and inside (Nicky to his room; Agatha and Rio to the kitchen). */
     static final class Shelter extends Goal {
         private final AsgardianEntity npc;
@@ -401,13 +423,12 @@ public final class CottageGoals {
 
         @Override
         public boolean canUse() {
-            if (npc.tickCount % 10 != 0 || npc.state().still() || npc.talkingWith() != null) {
+            if ((npc.tickCount + npc.getId()) % 10 != 0 || npc.state().still() || npc.talkingWith() != null) {
                 return false;
             }
             Cottages.Cottage cottage = cottage(npc);
             if (cottage == null || npc.level().getEntitiesOfClass(LivingEntity.class,
-                    npc.getBoundingBox().inflate(10.0), e -> e.isAlive() && DefendAsgardGoal.hostileMonster(e))
-                    .isEmpty()) {
+                    npc.getBoundingBox().inflate(10.0), e -> e.isAlive() && monster(e)).isEmpty()) {
                 return false;
             }
             safe = npc.role() == Role.NICKY ? cottage.points().nickyHome() : cottage.points().agathaHome();
@@ -457,6 +478,7 @@ public final class CottageGoals {
         private int doing;
         private int repath;
         private int hops;
+        private int lost;
         private long nextPick;
         @Nullable
         private Phase phase;
@@ -468,8 +490,9 @@ public final class CottageGoals {
 
         @Override
         public boolean canUse() {
-            if (!npc.free() || npc.tickCount % 10 != 0 || !(npc.level() instanceof ServerLevel level)
-                    || level.getGameTime() < nextPick) {
+            // (a mob asks its new goals on the ticks where tickCount + id is even)
+            if (!npc.free() || (npc.tickCount + npc.getId()) % 10 != 0
+                    || !(npc.level() instanceof ServerLevel level) || level.getGameTime() < nextPick) {
                 return false;
             }
             Cottages.Cottage cottage = cottage(npc);
@@ -495,6 +518,7 @@ public final class CottageGoals {
             ticks = 0;
             repath = 0;
             hops = 0;
+            lost = 0;
             Activity a = activity == null ? Activity.INDOORS : activity;
             doing = switch (a) {
                 case STIR, GREENHOUSE -> 300 + npc.getRandom().nextInt(300);
@@ -582,7 +606,9 @@ public final class CottageGoals {
                 }
                 return;
             }
-            if (ticks > 300 && ticks % 20 == 0 && HydraGarrison.unseen(level, npc.position(), 16.0)
+            // No way there (a long way round, a door in the way, out over a fence): his path ends short of the spot.
+            lost = npc.getNavigation().isDone() && ticks > 20 ? lost + 1 : 0;
+            if ((ticks > 300 || lost > 60) && ticks % 20 == 0 && HydraGarrison.unseen(level, npc.position(), 16.0)
                     && HydraGarrison.unseen(level, to, 16.0)) {
                 npc.moveTo(to.x, to.y, to.z, npc.getYRot(), 0.0F); // stuck: set down there while nobody looks
                 return;
