@@ -100,6 +100,11 @@ public final class ModNetwork {
         registrar.playToClient(ScentPayload.TYPE, ScentPayload.STREAM_CODEC, ScentPayload::handle);
         registrar.playToClient(DeadpoolFxPayload.TYPE, DeadpoolFxPayload.STREAM_CODEC, DeadpoolFxPayload::handle);
         registrar.playToClient(LabFxPayload.TYPE, LabFxPayload.STREAM_CODEC, LabFxPayload::handle);
+        // 3.7 (lane L8): the meeting with Death (Rio's offer, and the dead player's choice of road).
+        registrar.playToClient(DeathMeetingPayload.Offer.TYPE, DeathMeetingPayload.Offer.STREAM_CODEC,
+                DeathMeetingPayload.Offer::handle);
+        registrar.playToServer(DeathMeetingPayload.Choose.TYPE, DeathMeetingPayload.Choose.STREAM_CODEC,
+                DeathMeetingPayload.Choose::handle);
         // 3.5: the world's own music (its manifest, a client's request for a song, and the song in pieces), optional.
         PayloadRegistrar music = event.registrar(MUSIC_VERSION).optional();
         music.playToClient(MusicManifestPayload.TYPE, MusicManifestPayload.STREAM_CODEC, MusicManifestPayload::handle);

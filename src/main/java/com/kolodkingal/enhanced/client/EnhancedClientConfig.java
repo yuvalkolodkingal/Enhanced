@@ -25,6 +25,7 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.ConfigValue<String> QUICKSILVER_SONG;
     public static final ModConfigSpec.BooleanValue IGNORE_SERVER_MUSIC;
     public static final ModConfigSpec.BooleanValue HULK_MODEL;
+    public static final ModConfigSpec.BooleanValue SHOW_DEATH_MEETING;
 
     static {
         BUILDER.push("animation");
@@ -101,6 +102,14 @@ public final class EnhancedClientConfig {
         HULK_MODEL = BUILDER.comment("Whether the Hulk is drawn with his own giant body (false: the player model",
                 "wearing his skin, if another mod's model clashes with it).")
                 .define("hulkModel", true);
+        BUILDER.pop();
+
+        // 3.7 (lane L8): the meeting with Death.
+        BUILDER.push("death_meeting");
+        SHOW_DEATH_MEETING = BUILDER.comment("When you die, meet Death (Rio, the Green Witch) and choose where to",
+                        "start again. Off: the plain vanilla death screen.")
+                .translation("config.enhanced.show_death_meeting")
+                .define("showDeathMeeting", true);
         BUILDER.pop();
     }
 
@@ -190,6 +199,11 @@ public final class EnhancedClientConfig {
     /** Whether the Hulk is drawn with his own body (true until the config has loaded). */
     public static boolean hulkModel() {
         return !SPEC.isLoaded() || HULK_MODEL.get();
+    }
+
+    /** Whether a death shows the meeting with Death (true until the config has loaded). */
+    public static boolean showDeathMeeting() {
+        return !SPEC.isLoaded() || SHOW_DEATH_MEETING.get();
     }
 
     private EnhancedClientConfig() {

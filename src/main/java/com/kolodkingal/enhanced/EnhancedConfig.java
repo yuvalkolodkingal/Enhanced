@@ -557,6 +557,8 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.SchoolLabConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.LocatorConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.CottageConfig.define(BUILDER);
+        // 3.7 (Eilon's request, lane L8): the meeting with Death, Rio the Green Witch ([death_meeting]).
+        com.kolodkingal.enhanced.config.DeathMeetingConfig.define(BUILDER);
         // 3.5: the world's own music (section [music]).
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }
