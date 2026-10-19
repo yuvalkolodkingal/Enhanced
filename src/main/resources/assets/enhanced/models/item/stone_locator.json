@@ -1,6 +1,208 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/compass_00"
-  }
+    "layer0": "enhanced:item/stone_locator",
+    "layer1": "enhanced:item/stone_locator_socket",
+    "layer2": "enhanced:item/stone_locator_needle_00"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "enhanced:angle": 0.0
+      },
+      "model": "enhanced:item/stone_locator_00"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.015625
+      },
+      "model": "enhanced:item/stone_locator_01"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.046875
+      },
+      "model": "enhanced:item/stone_locator_02"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.078125
+      },
+      "model": "enhanced:item/stone_locator_03"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.109375
+      },
+      "model": "enhanced:item/stone_locator_04"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.140625
+      },
+      "model": "enhanced:item/stone_locator_05"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.171875
+      },
+      "model": "enhanced:item/stone_locator_06"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.203125
+      },
+      "model": "enhanced:item/stone_locator_07"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.234375
+      },
+      "model": "enhanced:item/stone_locator_08"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.265625
+      },
+      "model": "enhanced:item/stone_locator_09"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.296875
+      },
+      "model": "enhanced:item/stone_locator_10"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.328125
+      },
+      "model": "enhanced:item/stone_locator_11"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.359375
+      },
+      "model": "enhanced:item/stone_locator_12"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.390625
+      },
+      "model": "enhanced:item/stone_locator_13"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.421875
+      },
+      "model": "enhanced:item/stone_locator_14"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.453125
+      },
+      "model": "enhanced:item/stone_locator_15"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.484375
+      },
+      "model": "enhanced:item/stone_locator_16"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.515625
+      },
+      "model": "enhanced:item/stone_locator_17"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.546875
+      },
+      "model": "enhanced:item/stone_locator_18"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.578125
+      },
+      "model": "enhanced:item/stone_locator_19"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.609375
+      },
+      "model": "enhanced:item/stone_locator_20"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.640625
+      },
+      "model": "enhanced:item/stone_locator_21"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.671875
+      },
+      "model": "enhanced:item/stone_locator_22"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.703125
+      },
+      "model": "enhanced:item/stone_locator_23"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.734375
+      },
+      "model": "enhanced:item/stone_locator_24"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.765625
+      },
+      "model": "enhanced:item/stone_locator_25"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.796875
+      },
+      "model": "enhanced:item/stone_locator_26"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.828125
+      },
+      "model": "enhanced:item/stone_locator_27"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.859375
+      },
+      "model": "enhanced:item/stone_locator_28"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.890625
+      },
+      "model": "enhanced:item/stone_locator_29"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.921875
+      },
+      "model": "enhanced:item/stone_locator_30"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.953125
+      },
+      "model": "enhanced:item/stone_locator_31"
+    },
+    {
+      "predicate": {
+        "enhanced:angle": 0.984375
+      },
+      "model": "enhanced:item/stone_locator_00"
+    }
+  ]
 }

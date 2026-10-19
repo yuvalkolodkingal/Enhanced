@@ -132,6 +132,7 @@ public final class ClientSetup {
             // ===== deadpool (3.7) =====
             // ===== school_lab (3.7) =====
             // ===== finders (3.7) =====
+            com.kolodkingal.enhanced.client.finders.LocatorClient.setup();
             // ===== cottage (3.7) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
@@ -459,6 +460,9 @@ public final class ClientSetup {
         // ===== deadpool (3.7) =====
         // ===== school_lab (3.7) =====
         // ===== finders (3.7) =====
+        // The Stone Locator's line over the hotbar and the amplified Cerebro's stone sites.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("finders"),
+                new com.kolodkingal.enhanced.client.finders.FindersHud());
         // ===== cottage (3.7) =====
     }
 
