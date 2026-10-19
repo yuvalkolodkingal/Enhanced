@@ -19,7 +19,8 @@ import java.util.UUID;
  * population keeper made (slot to UUID) and when Hela's Seal can be broken again.
  *
  * <p>The skeleton writes the shell (the fields and their accessors); the lanes use them: L1 the plan version and the
- * murals, L3 Odin, L4 Hela's defeats and the seal, L5 the population. Every setter marks the state dirty.
+ * murals, L3 Odin, L4 Hela's defeats and the seal, L5 the population; 3.6.1 the one player who took Gungnir. Every
+ * setter marks the state dirty.
  */
 public final class AsgardState extends SavedData {
     public static final String NAME = "asgard_state";
@@ -30,6 +31,9 @@ public final class AsgardState extends SavedData {
     private boolean muralsConquest;
     private final Map<String, UUID> population = new LinkedHashMap<>();
     private long sealReadyAt;
+    /** 3.6.1: the one player who took Gungnir from its stand ({@code [gungnir] onePerWorld}), or null. */
+    @Nullable
+    private UUID gungnirOwner;
 
     public static SavedData.Factory<AsgardState> factory() {
         return new SavedData.Factory<>(AsgardState::new, AsgardState::load, null);
@@ -57,6 +61,9 @@ public final class AsgardState extends SavedData {
             }
         }
         state.sealReadyAt = tag.getLong("seal_ready_at");
+        if (tag.hasUUID("gungnir_owner")) {
+            state.gungnirOwner = tag.getUUID("gungnir_owner");
+        }
         return state;
     }
 
@@ -70,6 +77,9 @@ public final class AsgardState extends SavedData {
         population.forEach(people::putUUID);
         tag.put("population", people);
         tag.putLong("seal_ready_at", sealReadyAt);
+        if (gungnirOwner != null) {
+            tag.putUUID("gungnir_owner", gungnirOwner);
+        }
         return tag;
     }
 
@@ -141,6 +151,18 @@ public final class AsgardState extends SavedData {
 
     public void setSealReadyAt(long time) {
         sealReadyAt = time;
+        setDirty();
+    }
+
+    /** The one player who took Gungnir from its stand (3.6.1, {@code [gungnir] onePerWorld}), or null. */
+    @Nullable
+    public UUID gungnirOwner() {
+        return gungnirOwner;
+    }
+
+    /** Records (or, with null, forgets) the world's Gungnir owner. */
+    public void setGungnirOwner(@Nullable UUID owner) {
+        gungnirOwner = owner;
         setDirty();
     }
 }

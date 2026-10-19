@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * What the Stonekeeper says (3.6, the plan's 6.3): his lines in chat, in his orange name colour, each with his breathy
  * voice. Right-clicked, he speaks three lines in turn ({@link #lines}): the welcome, the price, and a third for the one
- * who asks (no Bearer: go home; one who carries a soul already; a world whose stone has been taken; a server that gives
- * only pets, or none); after a death at his cliff that gave nothing he tells the seeker why ({@link
- * Sacrifice.Outcome#line}).
+ * who asks (one who carries a soul already; a world whose stone has been taken; a server that gives only pets, or
+ * none; 3.6.1, no Bearer: it will wait for you on the pedestal); after a death at his cliff that gave nothing he tells
+ * the seeker why ({@link Sacrifice.Outcome#line}, and 3.6.1's plain line, {@link Sacrifice#tell}).
  */
 public final class Stonekeeper {
     /** His name's colour: the stone's orange, a shade darker. */
@@ -44,7 +44,9 @@ public final class Stonekeeper {
 
     /**
      * Why this player could not be given the stone today whoever he pushed, or null (he could): the stone sleeps, he is
-     * in Creative, no Bearer, already has one, the world's has been taken, or no creature he could push would count.
+     * in Creative, already has one, the world's has been taken, or no creature he could push would count; last, 3.6.1,
+     * {@code NOT_BEARER} for one who could, but may not hold it bare (only the keeper's third line: it will wait for
+     * him).
      */
     @Nullable
     static Sacrifice.Outcome refusal(ServerPlayer player) {
@@ -57,9 +59,6 @@ public final class Stonekeeper {
         if (player.isCreative() || player.isSpectator()) {
             return Sacrifice.Outcome.CREATIVE;
         }
-        if (!StoneRules.mayHold(player, StoneKind.SOUL)) {
-            return Sacrifice.Outcome.NOT_BEARER;
-        }
         Sacrifice.Outcome owed = Sacrifice.refusal(player);
         if (owed != null) {
             return owed;
@@ -68,7 +67,11 @@ public final class Stonekeeper {
         if (!friends && !Sacrifice.petSacrifice()) {
             return Sacrifice.Outcome.DISABLED;
         }
-        return friends ? null : Sacrifice.Outcome.PLAYERS_OFF;
+        if (!friends) {
+            return Sacrifice.Outcome.PLAYERS_OFF;
+        }
+        // (3.6.1: no refusal: one who may not hold the stone bare is told it will wait for him on the pedestal.)
+        return StoneRules.mayHold(player, StoneKind.SOUL) ? null : Sacrifice.Outcome.NOT_BEARER;
     }
 
     /** He says the line ({@code key}; nothing for null) to the player. */

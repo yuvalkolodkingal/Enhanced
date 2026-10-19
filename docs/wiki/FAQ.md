@@ -301,11 +301,11 @@ Yes, since 3.6: craft an **Infinity Gauntlet**, set all six stones in it, and wi
 
 ### How do I get the Soul Stone? Do I have to lose a friend?
 
-Push a friend (with PvP on, and he knows!) or your own pet off the edge of the Vormir Cliff, as a god, the Scarlet Witch or the Phoenix. The friend comes back, but without his things and his power (his ender chest is safe: put your best things there first). A pet is gone. A fall by accident never counts. See [Vormir](Vormir).
+Push a friend (with PvP on, and he knows!) or your own tamed pet off the edge of the Vormir Cliff. Anyone can earn it (3.6.1): a god, the Scarlet Witch or the Phoenix wakes holding it; anyone else finds it on a pedestal by the pool, held for him, to take into an Infinity Gauntlet or a shulker box. The friend comes back, but without his things and his power (his ender chest is safe: put your best things there first). A pet is gone. A fall by accident never counts. See [Vormir](Vormir).
 
 ### I fell off the Vormir Cliff and nothing happened.
 
-Good: a solo fall is just a fall. Only a push by a seeker who may hold the stone counts, and only into the chasm from the edge strip.
+Good: a solo fall is just a fall. Only a push by a seeker counts, and only into the chasm from the edge (the low lip or the strip behind it). When someone pushed and it didn't count, he is told why in plain words (3.6.1): "It didn't count: PvP is off here...", "...it isn't your own tamed pet", "...the fall must start from the edge..."
 
 ## Doctor Strange and the Hulk (3.6)
 

@@ -86,7 +86,7 @@ public final class CreatorCatalogTests {
         hero(Power.BILLY, "Hex Beam (or Hex Bolt)", "billy.hex_beam", "telekinesis", "billy.telekinesis",
                 "Freeze", "billy.freeze", "Hex Barrier", "billy.hex_barrier", "The Noise", "billy.noise",
                 "Build Magic (Y)", "billy.build_magic", "flight", "flight");
-        hero(Power.TOMMY, "Slow Time", "tommy.time", "wall and ceiling running", "tommy.wall_run",
+        hero(Power.TOMMY, "Slow Time", "tommy.time", "wall, ceiling and water running", "tommy.wall_run",
                 "Super Speed", "tommy.speed", "Dash Strike", "tommy.dash", "Whirlwind", "tommy.whirlwind",
                 "Sonic Boom", "tommy.sonic_boom", "Vibrate", "tommy.vibrate", "Disarm Blitz", "tommy.disarm_blitz",
                 "Accelerate", "tommy.accelerate");

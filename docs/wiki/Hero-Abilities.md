@@ -82,7 +82,7 @@ See [Tommy](Tommy) for the full story of each ability.
 
 | Ability (id) | Hero's key | Sneak variant | Points | What it does |
 |---|---|---|---|---|
-| **Slow Time** `tommy.time` | **R** (on/off) | Wall Run on/off (on/off) | 15 (no slider) | A switch: the world around you slows down, and you run up walls. Sneak switches the wall run off and on. |
+| **Slow Time** `tommy.time` | **R** (on/off) | Wall & Water Run on/off (on/off) | 15 (no slider) | A switch: the world around you slows down, and you run up walls and over water. Sneak switches the wall and water run off and on. |
 | **Super Speed (Tommy)** `tommy.speed` | **G** (on/off) | Dash Strike (press) | 2 a point | A switch, on from the start: sprint at Tommy's speed. Sneak: dash through enemies. |
 | **Whirlwind** `tommy.whirlwind` | **V** (press) | Sonic Boom (press) | 2 a point | Run in circles until everything near spins in the air. Sneak: stop dead with a shockwave. |
 | **Vibrate Through Walls** `tommy.vibrate` | **B** (press) | Disarm Blitz (press) | 2 a point | Pass through the wall in front of you. Sneak: take the weapons of everyone around. |
@@ -301,7 +301,7 @@ Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you
 | **Dash Strike (Quicksilver)** `quicksilver.dash` | `quicksilver.speed` | — | 2 a point | Dash straight ahead in a silver blur, hitting every enemy in the way. |
 | **Pickpocket (Quicksilver)** `quicksilver.pickpocket` | `quicksilver.blitz` | — | 2 a point | Zip to the creature you look at and snatch what it holds. |
 | **Hex Barrier (Billy)** `billy.hex_barrier` | `billy.freeze` | — | 3 a point | Hold: a blue plate of magic in front of you stops everything that comes from the front. Shares the one shield. |
-| **Wall Run (Tommy)** `tommy.wall_run` | `tommy.time` | one of the speedsters' speeds or slow times | 15 (no slider) | A switch: run up walls and along ceilings while you run at super speed. |
+| **Wall & Water Run (Tommy)** `tommy.wall_run` | `tommy.time` | one of the speedsters' speeds or slow times | 15 (no slider) | A switch: run up walls, along ceilings and over water while you run at super speed. |
 | **Dash Strike (Tommy)** `tommy.dash` | `tommy.speed` | — | 2 a point | Dash straight ahead in a white-green blur, hitting every enemy in the way. |
 | **Sonic Boom (Tommy)** `tommy.sonic_boom` | `tommy.whirlwind` | — | 2 a point | Stop dead from top speed: a shockwave throws everything near you back. |
 | **Disarm Blitz (Tommy)** `tommy.disarm_blitz` | `tommy.vibrate` | — | 2 a point | In a blink, take the weapons out of the hands of everyone around you. |

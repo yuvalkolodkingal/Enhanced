@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModItems;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.Registries;
@@ -348,7 +349,12 @@ public final class QuicksilverTests {
         Powers.setPower(peter, Power.TOMMY);
         assertNear(peter.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "a hero who is no longer Quicksilver attacks normally");
         assertNear(peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "and mines normally");
-        assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "and swims normally");
+        // (3.6.1: Tommy swims faster with his own Super Speed on, as his uncle does; with it off, normally.)
+        assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming * speed, 1.0E-6,
+                "Tommy swims faster with his own Super Speed on");
+        Powers.get(peter).setToggle(Toggle.SUPER_SPEED, false);
+        run(peter, false);
+        assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "and swims normally with it off");
         helper.succeed();
     }
 

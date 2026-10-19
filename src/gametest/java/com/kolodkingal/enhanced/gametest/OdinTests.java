@@ -23,6 +23,8 @@ import com.kolodkingal.enhanced.client.render.OdinHeroMath;
 import com.kolodkingal.enhanced.client.render.RunCharacter;
 import com.kolodkingal.enhanced.client.render.ShieldStyles;
 import com.kolodkingal.enhanced.client.render.Stance;
+import com.kolodkingal.enhanced.block.asgard.GungnirStandBlockEntity;
+import com.kolodkingal.enhanced.config.GungnirConfig;
 import com.kolodkingal.enhanced.config.OdinConfig;
 import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -41,6 +43,7 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -48,6 +51,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -63,6 +67,7 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -158,6 +163,7 @@ public final class OdinTests {
     @GameTest(template = ARENA, batch = "odin")
     public static void theStandGivesGungnirOnlyToAHelaVictorOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
+        freeGungnir(f);
         BlockPos stand = helper.absolutePos(new BlockPos(10, 2, 10));
         ServerPlayer nobody = f.player(9.5, FLOOR, 9.5);
         check(GungnirStand.take(nobody, stand) == GungnirStand.Taken.UNWORTHY, "one who did not stand against Hela is refused");
@@ -179,6 +185,65 @@ public final class OdinTests {
                 "having lost it, its owner takes a new one");
         check(progress(victor).gungnirBond() == 2 && GungnirItem.stale(lost, f.level()), "and the lost one's bond is broken");
         helper.succeed();
+    }
+
+    /** The world's Gungnir has no owner now and when the test ends (3.6.1: it is kept in Asgard's state). */
+    private static void freeGungnir(TestKit.Fixture f) {
+        MinecraftServer server = f.level().getServer();
+        AsgardState.get(server).setGungnirOwner(null);
+        f.onClose(() -> AsgardState.get(server).setGungnirOwner(null));
+    }
+
+    /**
+     * 3.6.1, {@code [gungnir] onePerWorld} (on): the first victor over Hela who takes Gungnir is its one owner in the
+     * world; the stand is empty for another victor (refused, told whose it is, and drawn empty for him), still gives
+     * its owner a new one when he lost his, and gives one to a player in Creative without making him the owner. Off:
+     * every victor takes his own.
+     */
+    @GameTest(template = ARENA, batch = "odin_gungnir")
+    public static void onlyOnePlayerInTheWorldTakesGungnir(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        freeGungnir(f);
+        MinecraftServer server = f.level().getServer();
+        BlockPos stand = helper.absolutePos(new BlockPos(10, 2, 10));
+        helper.setBlock(new BlockPos(10, 2, 10), ModBlocks.GUNGNIR_STAND.get());
+        GungnirStandBlockEntity block = (GungnirStandBlockEntity) f.level().getBlockEntity(stand);
+        ServerPlayer first = f.player(9.5, FLOOR, 9.5);
+        ServerPlayer second = f.player(11.5, FLOOR, 9.5);
+        ServerPlayer builder = f.player(10.5, FLOOR, 11.5, GameType.CREATIVE);
+        for (ServerPlayer victor : List.of(first, second, builder)) {
+            flag(victor, AsgardProgress.HELA_VICTOR);
+        }
+        check(GungnirStand.onePerWorld(), "one per world is the default");
+        check(viewOf(block, f).shows(second) && viewOf(block, f).shows(first), "before: the stand shows it to all");
+
+        check(GungnirStand.take(first, stand) == GungnirStand.Taken.TAKEN, "the first victor takes it");
+        check(first.getUUID().equals(AsgardState.get(server).gungnirOwner()), "and is the world's owner");
+        check(GungnirStand.take(second, stand) == GungnirStand.Taken.CLAIMED
+                && second.getInventory().countItem(ModItems.GUNGNIR.get()) == 0
+                && !progress(second).has(AsgardProgress.GUNGNIR_TAKEN), "another victor gets nothing");
+        GungnirStandBlockEntity view = viewOf(block, f);
+        check(!view.shows(second) && view.shows(first) && view.shows(builder),
+                "the stand is drawn empty for him (not for its owner, nor for Creative)");
+
+        first.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        check(GungnirStand.take(first, stand) == GungnirStand.Taken.RETURNED && GungnirItem.isOwnGungnir(first,
+                first.getMainHandItem()), "its owner, having lost it, takes a new one (the bond rule)");
+        check(GungnirStand.take(builder, stand) == GungnirStand.Taken.TAKEN
+                && builder.getInventory().countItem(ModItems.GUNGNIR.get()) == 1, "Creative is exempt");
+        check(first.getUUID().equals(AsgardState.get(server).gungnirOwner()), "and changes nothing of the owner");
+
+        f.config(GungnirConfig.ONE_PER_WORLD, false);
+        check(GungnirStand.take(second, stand) == GungnirStand.Taken.TAKEN, "off: every victor takes his own");
+        check(viewOf(block, f).shows(second), "and the stand shows it to all");
+        helper.succeed();
+    }
+
+    /** What a client is told of the stand: a copy made from the update tag the server sends. */
+    private static GungnirStandBlockEntity viewOf(GungnirStandBlockEntity stand, TestKit.Fixture f) {
+        GungnirStandBlockEntity view = new GungnirStandBlockEntity(stand.getBlockPos(), stand.getBlockState());
+        view.handleUpdateTag(stand.getUpdateTag(f.level().registryAccess()), f.level().registryAccess());
+        return view;
     }
 
     /** A copy whose bond is broken crumbles in an inventory and where it lies; the newest and an unowned one never do. */

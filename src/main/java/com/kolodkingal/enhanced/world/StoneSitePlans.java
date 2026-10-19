@@ -29,26 +29,28 @@ public final class StoneSitePlans {
         }
     }
 
-    /** Avengers Tower (the Tesseract): three templates stacked, the base 25 wide, the mid and top 21 wide, centred. */
+    /**
+     * Avengers Tower (the Tesseract): three templates stacked, the base and the mid 25 wide, the top 33 wide (its deck
+     * and its glass box reach out over the base's east side), all centred on one column; 114 high (3.6.1: the films'
+     * tower, a glass shard flaring out into a landing deck, a ring with an "A", a fin on top).
+     */
     public static final class Tower {
         public static final ResourceLocation BASE = Enhanced.id("avengers_tower/base");
         public static final ResourceLocation MID = Enhanced.id("avengers_tower/mid");
         public static final ResourceLocation TOP = Enhanced.id("avengers_tower/top");
         public static final List<ResourceLocation> PARTS = List.of(BASE, MID, TOP);
         public static final Vec3i BASE_SIZE = new Vec3i(25, 32, 25);
-        public static final Vec3i MID_SIZE = new Vec3i(21, 32, 21);
-        public static final Vec3i TOP_SIZE = new Vec3i(21, 28, 21);
-        /** The y of each part above the base's layer 0 (the tower is 92 tall). */
+        public static final Vec3i MID_SIZE = new Vec3i(25, 32, 25);
+        public static final Vec3i TOP_SIZE = new Vec3i(33, 50, 33);
+        /** The y of each part above the base's layer 0. */
         public static final int[] PART_Y = {0, 32, 64};
-        /** The layers of the base below the ground (the garage). */
+        /** The layers of the base below the ground (its footing). */
         public static final int FLOOR = 2;
+        /** The Tesseract's cradle on the roof of the glass box (Selvig's device), in the {@code top} template. */
+        public static final BlockPos CRADLE_IN_TOP = new BlockPos(21, 33, 16);
         /**
-         * The Tesseract's cradle on the roof (Selvig's device), in the {@code top} template (the skeleton's choice: the
-         * roof's middle; the plan names the point, not its place).
-         */
-        public static final BlockPos CRADLE_IN_TOP = new BlockPos(10, 24, 10);
-        /**
-         * The cradle in the whole tower's frame (the base's): the top part is centred on the base, 2 in from its edges.
+         * The cradle in the whole tower's frame (the base's): the top part is centred on the base, so it reaches 4 out
+         * past each of the base's edges (and the cradle's x and z there are 4 less).
          */
         public static final BlockPos CRADLE = CRADLE_IN_TOP.offset((BASE_SIZE.getX() - TOP_SIZE.getX()) / 2, PART_Y[2],
                 (BASE_SIZE.getZ() - TOP_SIZE.getZ()) / 2);
@@ -79,15 +81,21 @@ public final class StoneSitePlans {
         /**
          * The strip at the chasm's lip where a fall must begin: 9 x 2 x 2, on the summit's south side, between the
          * chasm and the pool (the skeleton's reading of the plan's "the 9 x 2 x 2 strip on the summit at the chasm's
-         * lip").
+         * lip"). Feet on the strip are at layer 67; the lip (z 21) is a top slab at layer 67, so feet standing on it
+         * are at layer 68 (3.6.1: the box reaches it; before, one who stood on the lip itself was never on the edge).
          */
-        public static final BoundingBox EDGE_BOX = new BoundingBox(12, 66, 21, 20, 67, 22);
+        public static final BoundingBox EDGE_BOX = new BoundingBox(12, 66, 21, 20, 68, 22);
         /** The shaft of the chasm, from just over the pit's floor up through the pinnacle. */
         public static final BoundingBox PIT_BOX = new BoundingBox(12, 3, 12, 20, 62, 20);
         /** The layer of the pit's floor. */
         public static final int PIT_FLOOR = 4;
         /** The shallow pool where the stone is given. */
         public static final BlockPos POOL = new BlockPos(16, 66, 25);
+        /**
+         * Where the Soul Stone waits on a pedestal for a seeker who may not hold it bare (3.6.1): on the summit floor
+         * beside the pool's west side.
+         */
+        public static final BlockPos PEDESTAL = new BlockPos(13, 67, 25);
         /** Where the Stonekeeper stands. */
         public static final BlockPos STONEKEEPER_HOME = new BlockPos(16, 67, 9);
 

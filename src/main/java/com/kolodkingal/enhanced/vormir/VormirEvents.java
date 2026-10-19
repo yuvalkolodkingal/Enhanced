@@ -10,6 +10,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -48,6 +49,17 @@ public final class VormirEvents {
         Entity by = event.getSource().getEntity();
         if (by != null && !event.getEntity().level().isClientSide) {
             VormirTracker.credit(event.getEntity(), by);
+        }
+    }
+
+    /**
+     * A player attacks a creature (before the game decides whether the blow lands: with PvP off it does not): kept, so
+     * that a seeker whose blow did not land is told why his sacrifice did not count (3.6.1).
+     */
+    @SubscribeEvent
+    public static void onAttack(AttackEntityEvent event) {
+        if (event.getTarget() instanceof LivingEntity victim) {
+            VormirTracker.attempt(victim, event.getEntity());
         }
     }
 

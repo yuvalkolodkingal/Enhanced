@@ -14,9 +14,11 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -38,6 +40,12 @@ import java.util.UUID;
  * the tick, the height and the cliff, with the credit he carried then if it is no older than {@code pushWindowTicks}
  * (what hits him in the air afterwards changes nothing). {@link Sacrifice} reads it when he dies.</li>
  * </ul>
+ *
+ * <p>3.6.1: also the deepest fall each departed creature has taken (its fall distance is reset when it lands), the
+ * blows that did not land (a player's attack on a player where PvP is off: no credit, but the seeker is told why), and
+ * the landing: one who left the edge with a push and lands alive on the pit's floor (a cat never takes fall damage, a
+ * horse takes half, a hero may take none) is judged there ({@link Sacrifice#onLanding}). While a pet falls from the
+ * edge it does not teleport to its owner ({@link #falling}, asked by {@code TamableAnimalMixin}).
  */
 public final class VormirTracker {
     /** How often (ticks) the cliff each player is in is looked up again. */
@@ -52,6 +60,10 @@ public final class VormirTracker {
     }
 
     private static final Map<UUID, Credit> CREDITS = new HashMap<>();
+    /** A player's attack that may not have landed (PvP off): who tried, and when (3.6.1). */
+    private static final Map<UUID, Credit> ATTEMPTS = new HashMap<>();
+    /** The deepest fall distance a departed creature has had in the air (3.6.1). */
+    private static final Map<UUID, Float> FALLEN = new HashMap<>();
     private static final Map<ResourceKey<Level>, Map<UUID, VormirSite>> ON_EDGE = new HashMap<>();
     private static final Map<UUID, Departure> DEPARTURES = new HashMap<>();
     /** The cliff each player is in (looked up every {@link #SITE_PERIOD} ticks). */
@@ -101,6 +113,48 @@ public final class VormirTracker {
             who = who instanceof Projectile shot ? shot.getOwner() : null;
         }
         return null;
+    }
+
+    /**
+     * A player attacked the creature (read before the game decides whether the blow lands: with PvP off it does not,
+     * and no credit is given; the seeker is still told why his sacrifice did not count).
+     */
+    public static void attempt(LivingEntity victim, Player attacker) {
+        if (!victim.level().isClientSide && victim != attacker) {
+            ATTEMPTS.put(victim.getUUID(), new Credit(attacker.getUUID(), victim.level().getGameTime()));
+        }
+    }
+
+    /** The last attack a player tried on the creature (landed or not), or null. */
+    @Nullable
+    public static Credit lastAttempt(LivingEntity victim) {
+        return ATTEMPTS.get(victim.getUUID());
+    }
+
+    /**
+     * How far the creature fell since it left the edge: the most of its fall distance in the air (it is reset when it
+     * lands), its fall distance now, and the height it lost.
+     */
+    public static double fallOf(LivingEntity victim, Departure departure) {
+        return Math.max(Math.max(victim.fallDistance, FALLEN.getOrDefault(victim.getUUID(), 0.0F)),
+                departure.y() - victim.getY());
+    }
+
+    /**
+     * Whether the creature is falling from a cliff's edge into its chasm now (it left the edge lately and is in the air
+     * or down in the pit): a pet does not teleport to its owner then.
+     */
+    public static boolean falling(Entity entity) {
+        if (!(entity instanceof LivingEntity living) || entity.level().isClientSide) {
+            return false;
+        }
+        Departure gone = DEPARTURES.get(entity.getUUID());
+        if (gone == null || gone.site().dimension() != entity.level().dimension()) {
+            return false;
+        }
+        long now = entity.level().getGameTime();
+        return now >= gone.tick() && now - gone.tick() <= deathWindowTicks()
+                && (!living.onGround() || gone.site().inPit(living));
     }
 
     /** The last push the creature took, or null. */
@@ -180,8 +234,33 @@ public final class VormirTracker {
                 gone.setValue(new Departure(d.site(), now, Math.max(d.y(), held.getY()), d.credit()));
             }
         }
+        landings(level, now);
         if (now % 20 == 0) {
             expire(now);
+        }
+    }
+
+    /**
+     * Every departed creature of this level: the deepest fall it has had in the air; one that has landed alive on the
+     * pit's floor from the chasm's height, within the time of a death, is judged there (once).
+     */
+    private static void landings(ServerLevel level, long now) {
+        List<LivingEntity> landed = new ArrayList<>();
+        for (Map.Entry<UUID, Departure> gone : DEPARTURES.entrySet()) {
+            Departure d = gone.getValue();
+            if (d.site().dimension() != level.dimension()
+                    || !(level.getEntity(gone.getKey()) instanceof LivingEntity entity) || !entity.isAlive()) {
+                continue;
+            }
+            if (!entity.onGround()) {
+                FALLEN.merge(gone.getKey(), entity.fallDistance, Math::max);
+            } else if (d.site().inPit(entity) && now >= d.tick() && now - d.tick() <= deathWindowTicks()
+                    && fallOf(entity, d) >= Sacrifice.minFall()) {
+                landed.add(entity);
+            }
+        }
+        for (LivingEntity entity : landed) {
+            Sacrifice.onLanding(entity);
         }
     }
 
@@ -192,13 +271,16 @@ public final class VormirTracker {
             credit = null;
         }
         DEPARTURES.put(entity.getUUID(), new Departure(site, now, entity.getY(), credit));
+        FALLEN.remove(entity.getUUID());
     }
 
     private static void expire(long now) {
         long keepCredits = Math.max(400, pushWindowTicks()) + 20;
         CREDITS.values().removeIf(c -> now - c.tick() > keepCredits || c.tick() > now);
+        ATTEMPTS.values().removeIf(c -> now - c.tick() > keepCredits || c.tick() > now);
         long keepDepartures = deathWindowTicks() + 20;
         DEPARTURES.values().removeIf(d -> now - d.tick() > keepDepartures || d.tick() > now);
+        FALLEN.keySet().retainAll(DEPARTURES.keySet());
     }
 
     // ---- forgetting ----
@@ -206,6 +288,8 @@ public final class VormirTracker {
     /** The creature is gone (a logout, another level, its death has been judged): every record of it. */
     public static void forget(UUID id) {
         CREDITS.remove(id);
+        ATTEMPTS.remove(id);
+        FALLEN.remove(id);
         DEPARTURES.remove(id);
         PLAYER_SITES.remove(id);
         for (Iterator<Map<UUID, VormirSite>> it = ON_EDGE.values().iterator(); it.hasNext(); ) {
@@ -217,9 +301,17 @@ public final class VormirTracker {
         }
     }
 
+    /** The creature's landing in the pit has been judged: its fall is over (3.6.1). */
+    static void landed(UUID id) {
+        DEPARTURES.remove(id);
+        FALLEN.remove(id);
+    }
+
     /** The server stopped: everything. */
     public static void clear() {
         CREDITS.clear();
+        ATTEMPTS.clear();
+        FALLEN.clear();
         DEPARTURES.clear();
         PLAYER_SITES.clear();
         ON_EDGE.clear();
@@ -227,11 +319,11 @@ public final class VormirTracker {
 
     // ---- the config (read when asked; its defaults where it is not loaded) ----
 
-    static int pushWindowTicks() {
+    public static int pushWindowTicks() {
         return EnhancedConfig.SPEC.isLoaded() ? SoulStoneConfig.PUSH_WINDOW_TICKS.get() : 100;
     }
 
-    static int deathWindowTicks() {
+    public static int deathWindowTicks() {
         return EnhancedConfig.SPEC.isLoaded() ? SoulStoneConfig.DEATH_WINDOW_TICKS.get() : 200;
     }
 

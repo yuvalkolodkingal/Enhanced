@@ -1,20 +1,28 @@
 package com.kolodkingal.enhanced.odin;
 
+import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.asgard.AsgardProgress;
+import com.kolodkingal.enhanced.asgard.AsgardState;
+import com.kolodkingal.enhanced.block.asgard.GungnirStandBlockEntity;
+import com.kolodkingal.enhanced.config.GungnirConfig;
 import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModSounds;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Gungnir's stand in the vault (3.5): the block is lane L1's ({@code gungnir_stand}, which shows the spear), what it does is
@@ -22,6 +30,13 @@ import java.util.List;
  * him (its bond is his {@code gungnirBond} + 1, so any older copy of his crumbles), and is marked {@code GUNGNIR_TAKEN}; the
  * stand keeps showing the spear, one for each worthy player. Once taken, the stand gives it again only to its owner who has
  * lost his (a new bond: the lost one crumbles if it is ever found). Everyone else is refused.
+ *
+ * <p>3.6.1 ({@code [gungnir] onePerWorld}, on by default): only ONE player in the world ever takes Gungnir from the
+ * stand. The first who takes it (not in Creative) is the world's owner ({@code AsgardState.gungnirOwner}); after him
+ * the stand is empty for everyone else, even other victors over Hela ({@link Taken#CLAIMED}); the owner still takes a
+ * new one there if he loses his (the bond rule as before). Creative players are not counted: they may take one, and
+ * it makes nobody the owner. The stand's block entity tells the clients whose it is, so it shows the spear only to
+ * those who could take it.
  */
 public final class GungnirStand {
 
@@ -34,7 +49,9 @@ public final class GungnirStand {
         /** He already has his. */
         ALREADY,
         /** He did not stand against Hela. */
-        UNWORTHY
+        UNWORTHY,
+        /** 3.6.1: Gungnir is another player's: the stand is empty for him. */
+        CLAIMED
     }
 
     /** A player right-clicks the stand at {@code pos} (both sides; the server decides). */
@@ -52,10 +69,23 @@ public final class GungnirStand {
             player.displayClientMessage(Component.translatable("message.enhanced.odin.stand_unworthy").withStyle(ChatFormatting.GOLD), true);
             return Taken.UNWORTHY;
         }
+        UUID owner = owner(player.server);
+        boolean counted = onePerWorld() && !player.isCreative();
+        if (counted && owner != null && !owner.equals(player.getUUID())) {
+            player.displayClientMessage(Component.translatable("message.enhanced.odin.stand_claimed", ownerName(player.server, owner))
+                    .withStyle(ChatFormatting.GOLD), true);
+            return Taken.CLAIMED;
+        }
         boolean again = progress.has(AsgardProgress.GUNGNIR_TAKEN);
         if (again && OdinAbilities.hasOwnGungnir(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.odin.stand_already"), true);
             return Taken.ALREADY;
+        }
+        if (counted && owner == null) {
+            AsgardState.get(player.server).setGungnirOwner(player.getUUID());
+            if (player.serverLevel().getBlockEntity(pos) instanceof GungnirStandBlockEntity stand) {
+                stand.ownerChanged();
+            }
         }
         int bond = OdinAbilities.nextBond(player);
         player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.GUNGNIR_TAKEN));
@@ -67,6 +97,27 @@ public final class GungnirStand {
         player.displayClientMessage(Component.translatable(again ? "message.enhanced.odin.stand_returned" : "message.enhanced.odin.stand_taken")
                 .withStyle(ChatFormatting.GOLD), false);
         return again ? Taken.RETURNED : Taken.TAKEN;
+    }
+
+    /** The world's Gungnir owner while {@code onePerWorld} is on, or null (none yet, or every victor may take one). */
+    @Nullable
+    public static UUID owner(MinecraftServer server) {
+        return onePerWorld() ? AsgardState.get(server).gungnirOwner() : null;
+    }
+
+    /** The owner's name (online, or as the server last knew him). */
+    private static String ownerName(MinecraftServer server, UUID owner) {
+        ServerPlayer online = server.getPlayerList().getPlayer(owner);
+        if (online != null) {
+            return online.getGameProfile().getName();
+        }
+        var cache = server.getProfileCache();
+        return cache == null ? "?" : cache.get(owner).map(GameProfile::getName).orElse("?");
+    }
+
+    /** {@code [gungnir] onePerWorld} (true where the config is not loaded). */
+    public static boolean onePerWorld() {
+        return !EnhancedConfig.SPEC.isLoaded() || GungnirConfig.ONE_PER_WORLD.get();
     }
 
     private GungnirStand() {

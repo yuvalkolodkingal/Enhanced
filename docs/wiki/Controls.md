@@ -10,7 +10,7 @@ Every hero has five abilities (Doctor Strange has a sixth, on **Y**). They are b
 | [Scarlet Witch](Scarlet-Witch) | Chaos Energy Beam (hold) | Enhanced Flight (toggle) | Telekinesis (creatures, items, blocks; Sneak: a block) | Chaos Shield (hold) | The Hex (again: Hex Control; Sneak: dissolve) |
 | [Quicksilver](Quicksilver) | Quicksilver Time on/off (Sneak: Walkman on/off) | Super Speed on/off (Sneak: Dash Strike) | Speed Blitz (Sneak: Pickpocket) | Wall & Water Run (toggle) | Pebble Barrage |
 | [Vision](Vision) | Mind Stone Beam (hold) | Flight (toggle) | Phase through walls (toggle) | Density (toggle) | Human Disguise (toggle) |
-| [Tommy](Tommy) | Slow Time on/off (Sneak: Wall Run on/off) | Super Speed on/off (Sneak: Dash Strike) | Whirlwind (Sneak: Sonic Boom) | Vibrate Through Walls (Sneak: Disarm Blitz) | Molecular Acceleration |
+| [Tommy](Tommy) | Slow Time on/off (Sneak: Wall & Water Run on/off) | Super Speed on/off (Sneak: Dash Strike) | Whirlwind (Sneak: Sonic Boom) | Vibrate Through Walls (Sneak: Disarm Blitz) | Molecular Acceleration |
 | [Billy](Billy-and-the-Witches-Road) | Hex Beam (hold) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Freeze (Sneak, hold: Hex Barrier) | The Noise (toggle) |
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |
 | [Thor](Thor) | Throw Mjolnir or Stormbreaker, or call it back (Sneak: shatter Mjolnir) | Flight (toggle, weapon in hand) | Lightning Beam (hold) | God of Thunder (toggle) | Bifrost screen: Asgard (3.5), home, saved places, save this one (Sneak: where you look) |
@@ -170,7 +170,7 @@ Sneak is the usual Minecraft sneak key (Shift by default).
 | Sneak + **R** as Quicksilver | Turns the Walkman (his music) on or off, instead of Quicksilver Time. |
 | Sneak + **G** as Quicksilver or Tommy | The **Dash Strike**: a 12-block dash along your look that hits everything in the path, instead of switching Super Speed. |
 | Sneak + **V** as Quicksilver | The **Pickpocket**, instead of the Speed Blitz. |
-| Sneak + **R** as Tommy | Turns Wall Run on or off, instead of Slow Time. |
+| Sneak + **R** as Tommy | Turns Wall & Water Run on or off, instead of Slow Time. |
 | Sneak + **V** as Tommy | The **Sonic Boom**, a shockwave round you, instead of the Whirlwind. |
 | Sneak + **B** as Tommy | The **Disarm Blitz**, instead of Vibrate Through Walls. |
 | Sneak + **R** as Loki | Throws a fan of three daggers. |
@@ -312,4 +312,4 @@ All twenty keys are in the game's key settings: **Options, Controls, Key Binds, 
 
 Quicksilver and Tommy each have two separate powers in 3.3. **G** turns **Super Speed** on or off: with it on, **sprinting** is super speed (Tommy's is on from the start). **R** turns the slowing of time on or off (**Quicksilver Time**, **Tommy's Slow Time**): the world slows down around him whether he sprints or not. Use one, or both. While either is on, Quicksilver also mines, attacks, swims and uses items faster without sprinting; only the running speed and the step-up need a sprint.
 
-**Running up walls:** with super speed on, sprint into a wall (holding **W**) and he runs up it, along a ceiling, round an overhang and down the far wall; keep **W** held and keep sprinting, or he slows and drops off; **Space** leaps off. Quicksilver needs **Wall & Water Run** on (**B**); Tommy's **Wall Run** is on unless **Sneak + R** turns it off. See [Quicksilver](Quicksilver#running-up-walls-and-across-ceilings).
+**Running up walls:** with super speed on, sprint into a wall (holding **W**) and he runs up it, along a ceiling, round an overhang and down the far wall; keep **W** held and keep sprinting, or he slows and drops off; **Space** leaps off. Quicksilver needs **Wall & Water Run** on (**B**); Tommy's **Wall & Water Run** is on unless **Sneak + R** turns it off (both run across water too while they keep running). See [Quicksilver](Quicksilver#running-up-walls-and-across-ceilings).
