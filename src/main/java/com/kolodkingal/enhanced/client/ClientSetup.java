@@ -132,6 +132,7 @@ public final class ClientSetup {
             // ===== wolverine (3.7) =====
             // ===== deadpool (3.7) =====
             // ===== school_lab (3.7) =====
+            com.kolodkingal.enhanced.client.school.LabClient.setup();
             // ===== finders (3.7) =====
             // ===== cottage (3.7) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
@@ -246,6 +247,12 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.DOGPOOL.get(),
                 com.kolodkingal.enhanced.client.deadpool.DogpoolRenderer::new);
         // ===== school_lab (3.7) =====
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.ADAMANTIUM_RACK.get(),
+                com.kolodkingal.enhanced.client.school.LabRenderers.Rack::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.WEAPON_X_POD.get(),
+                com.kolodkingal.enhanced.client.school.LabRenderers.Pod::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.CEREBRO_CONSOLE.get(),
+                com.kolodkingal.enhanced.client.school.LabRenderers.Console::new);
         // ===== finders (3.7) =====
         // ===== cottage (3.7) =====
         event.registerEntityRenderer(ModEntities.COTTAGE_RESIDENT.get(),
@@ -462,6 +469,9 @@ public final class ClientSetup {
         // ===== wolverine (3.7) =====
         // ===== deadpool (3.7) =====
         // ===== school_lab (3.7) =====
+        // the lift's doors closing and opening on the rider's screen
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("lab_lift"),
+                new com.kolodkingal.enhanced.client.school.LabClient.FadeLayer());
         // ===== finders (3.7) =====
         // ===== cottage (3.7) =====
     }

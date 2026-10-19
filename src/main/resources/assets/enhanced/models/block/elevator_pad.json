@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "minecraft:block/iron_block"
+    "particle": "enhanced:block/lab_steel",
+    "up": "enhanced:block/elevator_pad_top",
+    "down": "enhanced:block/lab_steel",
+    "north": "enhanced:block/lab_steel",
+    "south": "enhanced:block/lab_steel",
+    "east": "enhanced:block/lab_steel",
+    "west": "enhanced:block/lab_steel"
   }
 }

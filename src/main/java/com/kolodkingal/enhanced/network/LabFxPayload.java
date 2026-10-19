@@ -12,8 +12,8 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 /**
  * Server → client (3.7): a moment of the X-Men lower lab (lane L4's; the pod's lane L3's, the console's lane L5's): the
  * lift's fade down or up (to its rider), a secret bookshelf swinging open or shut, the Weapon X Pod starting and done,
- * an injection taken from the rack, the Cerebro console on and off. The client hands each kind to the drawer its lane
- * registered ({@code LabFx.register}).
+ * an injection taken from the rack, the Cerebro console on and off; and (lane L4) whether the player is inside a lab
+ * (its ambience). The client hands each kind to the drawer its lane registered ({@code LabFx.register}).
  *
  * @param kind what happened (a constant of this record)
  * @param pos  the block it happened at
@@ -28,6 +28,8 @@ public record LabFxPayload(int kind, BlockPos pos) implements CustomPacketPayloa
     public static final int RACK_TAKE = 6;
     public static final int CONSOLE_ON = 7;
     public static final int CONSOLE_OFF = 8;
+    /** (Lane L4) The lab's ambience for the player told: {@code pos} (0, 1, 0) he is inside a lab, (0, 0, 0) not. */
+    public static final int AMBIENCE = 9;
 
     public static final Type<LabFxPayload> TYPE = new Type<>(Enhanced.id("lab_fx"));
 

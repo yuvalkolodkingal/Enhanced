@@ -1,0 +1,78 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "enhanced:block/lab_steel",
+    "leaf": "enhanced:block/x_door_upper",
+    "steel": "enhanced:block/lab_steel"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        6
+      ],
+      "to": [
+        2,
+        16,
+        10
+      ],
+      "faces": {
+        "south": {
+          "texture": "#leaf",
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ]
+        },
+        "north": {
+          "texture": "#leaf",
+          "uv": [
+            16,
+            0,
+            14,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#steel",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#steel",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#steel",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#steel",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "enhanced:block/lab_steel",
+    "door": "enhanced:block/x_door_round_open_6",
+    "steel": "enhanced:block/lab_steel"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        6
+      ],
+      "to": [
+        16,
+        16,
+        10
+      ],
+      "faces": {
+        "south": {
+          "texture": "#door",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "north": {
+          "texture": "#door",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ]
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}
