@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.healing;
 
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.HealingConfig;
 import com.kolodkingal.enhanced.config.SoulStoneConfig;
@@ -9,6 +10,7 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.vormir.VormirTracker;
 import net.minecraft.core.Holder;
@@ -33,13 +35,17 @@ import java.util.function.Predicate;
  * regeneration, the shrug, the rescue, the Healing Burst: {@code Downed}, {@code Regeneration}, {@code Suppression},
  * {@code Rescue}, {@link HealingBurst}). Both sides; the config is read when asked (defaults before it is loaded).
  *
- * <pre> has(player)        = healing_factor.enabled &amp;&amp; Traits.has(player, HEALING_FACTOR) &amp;&amp; (not a
- * custom hero || healing_factor.customHeroes) suppressed(entity) = healing_factor.poisonStopsHealing &amp;&amp; it has
- * an effect of #enhanced:stops_healing active(player)     = has(player) &amp;&amp; !suppressed(player)
- * lethalForHealer(source, victim) = the void or /kill (#minecraft:bypasses_invulnerability), always || !active(victim)
- * (poisoned: anything can kill him) || one of the five groups' tags, if its option is on (stones, chaos, odin, phoenix;
- * darkhold off by default) || a fall into the Vormir chasm with a credited push  (vormirDefeats: the Soul Stone's own
- * magic) </pre>
+ * <pre>
+ * has(player)        = healing_factor.enabled &amp;&amp; Traits.has(player, HEALING_FACTOR)
+ *                      &amp;&amp; (not a custom hero || healing_factor.customHeroes)
+ * suppressed(entity) = healing_factor.poisonStopsHealing &amp;&amp; it has an effect of #enhanced:stops_healing
+ * active(player)     = has(player) &amp;&amp; !suppressed(player)
+ * lethalForHealer(source, victim) =
+ *        the void or /kill (#minecraft:bypasses_invulnerability, not the mod's own types), always
+ *     || !active(victim)                                   (poisoned: anything can kill him)
+ *     || one of the five groups' tags, if its option is on (stones, chaos, odin, phoenix; darkhold off by default)
+ *     || a fall into the Vormir chasm with a credited push  (vormirDefeats: the Soul Stone's own magic)
+ * </pre>
  */
 public final class HealingFactor {
 
@@ -136,7 +142,7 @@ public final class HealingFactor {
         if (!has(victim)) {
             return Defeat.ALWAYS;
         }
-        return defeat(source::is, source.is(DamageTypeTags.BYPASSES_INVULNERABILITY), active(victim), config(),
+        return defeat(source::is, isVoidOrKill(source.typeHolder()), active(victim), config(),
                 isSacrificeFall(victim, source));
     }
 
@@ -176,16 +182,25 @@ public final class HealingFactor {
     }
 
     /**
+     * Whether a damage type is "the void or {@code /kill}": in {@code #minecraft:bypasses_invulnerability} and not one
+     * of the mod's own (the mod puts the Hex Wall and Vision's Mind Stone there to reach Creative players; they are a
+     * group of the rule, switched by their option, not "always").
+     */
+    public static boolean isVoidOrKill(Holder<DamageType> type) {
+        return type.is(DamageTypeTags.BYPASSES_INVULNERABILITY)
+                && !type.unwrapKey().map(k -> k.location().getNamespace().equals(Enhanced.MODID)).orElse(false);
+    }
+
+    /**
      * Whether {@code source} is the fall of one pushed off a Vormir Cliff and given to its chasm: he left the edge with
      * a push credited to a player, within the time of a death, and the fall ends in the pit (the Soul Stone's own magic
      * takes him, healer or not). Asks {@link VormirTracker}'s public record of departures only (not the sacrifice's
-     * internals), so 3.6.1's changes to the sacrifice keep it true; the chasm's own damage of 3.6.1 ({@code
-     * enhanced:vormir_fall}) counts as the fall. A healer who jumps or falls alone is not taken (no credit).
+     * internals), so 3.6.1's changes to the sacrifice keep it true; the chasm's own damage of 3.6.1 ({@link
+     * ModDamageTypes#VORMIR_FALL}) counts as the fall. A healer who jumps or falls alone is not taken (no credit).
      */
     public static boolean isSacrificeFall(LivingEntity victim, DamageSource source) {
         boolean fall = source.is(DamageTypes.FALL) || source.is(DamageTypes.FLY_INTO_WALL)
-                || source.typeHolder().unwrapKey().map(k -> k.location().toString().equals("enhanced:vormir_fall"))
-                .orElse(false);
+                || source.is(ModDamageTypes.VORMIR_FALL);
         if (!fall || victim.level().isClientSide) {
             return false;
         }

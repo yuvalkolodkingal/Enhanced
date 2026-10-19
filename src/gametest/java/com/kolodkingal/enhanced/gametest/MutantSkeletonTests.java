@@ -346,7 +346,8 @@ public final class MutantSkeletonTests {
         for (Holder.Reference<DamageType> type : types.holders().toList()) {
             String name = type.key().location().getNamespace().equals(Enhanced.MODID)
                     ? type.key().location().getPath() : "";
-            boolean bypasses = type.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
+            boolean bypasses = type.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && name.isEmpty();
+            check(HealingFactor.isVoidOrKill(type) == bypasses, type.key().location() + ": the void or /kill?");
             Predicate<TagKey<DamageType>> is = type::is;
             for (HealingFactor.Rules r : rules) {
                 for (boolean active : new boolean[]{true, false}) {
