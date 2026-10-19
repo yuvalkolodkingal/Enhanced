@@ -19,8 +19,8 @@ public class GungnirStandRenderer implements BlockEntityRenderer<GungnirStandBlo
 
     @Override
     public void render(GungnirStandBlockEntity be, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
-        if (be.getLevel() == null) {
-            return;
+        if (be.getLevel() == null || !be.shows(Minecraft.getInstance().player)) {
+            return; // (3.6.1: the spear is another player's: the stand is empty for this one)
         }
         float time = be.getLevel().getGameTime() + partialTick;
         pose.pushPose();

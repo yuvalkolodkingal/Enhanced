@@ -3712,7 +3712,7 @@
   "npc.enhanced.frigga.odin_player": "אבי-כל התעורר: %s יושב עכשיו על הכס. תהיו טובים אליו, כתר כבד יותר ממה שהוא נראה.",
   "npc.enhanced.hogun.vault_player": "הכספת נמצאת מתחת לאולם הכס. אבי-כל התעורר: המפתח שלה אצל %s עכשיו.",
   "npc.enhanced.hogun.vault_more_player": "אודין כבר התעורר. עכשיו %s נושא את השם שלו. תשאל אותו, לא אותי.",
-  "npc.enhanced.fandral.gungnir_player": "גונגניר מצאה שוב יד: %s, אבי-כל שלנו! ובכל זאת אומרים שהכספת שומרת חנית לכל גיבור שעומד מול הלה.",
+  "npc.enhanced.fandral.gungnir_player": "גונגניר מצאה שוב יד: %s, אבי-כל שלנו! החנית בוחרת יד אחת בכל העולמות, ורק אחת.",
   "npc.enhanced.einherjar.news_odin_player": "אבי-כל התעורר! %s יושב על הכס. תעמדו ישר כשהוא עובר.",
   "npc.enhanced.citizen.rumour_odin_player": "שמעת? אבי-כל התעורר: %s יושב על הכס, וכל הארמון מזמזם!",
   "npc.enhanced.heimdall.handover": "שנינו שומרי אסגרד. תשמור לי על הביפרוסט לזמן מה: השקע של הופונד עונה לך עכשיו. אני אנוח שם, קרוב.",
@@ -3840,5 +3840,6 @@
   "message.enhanced.vormir.why.survived": "זה לא נחשב: מי שדחפת שרד את הנפילה.",
   "death.attack.enhanced.vormir_fall": "%1$s ניתן לנפילה בוורמיר",
   "death.attack.enhanced.vormir_fall.player": "%1$s ניתן לנפילה בוורמיר על ידי %2$s",
-  "death.attack.enhanced.vormir_fall.item": "%1$s ניתן לנפילה בוורמיר על ידי %2$s"
+  "death.attack.enhanced.vormir_fall.item": "%1$s ניתן לנפילה בוורמיר על ידי %2$s",
+  "message.enhanced.odin.stand_claimed": "המעמד ריק: גונגניר בחר את נושאו היחיד, %s."
 }

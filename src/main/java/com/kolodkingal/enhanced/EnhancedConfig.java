@@ -537,6 +537,8 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.AsgardConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HeimdallConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.OdinConfig.define(BUILDER);
+        // 3.6.1: Gungnir, one per world (section [gungnir]).
+        com.kolodkingal.enhanced.config.GungnirConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HelaConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.HelaBossConfig.define(BUILDER);
         // 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra): the skeleton defines every option; the lanes

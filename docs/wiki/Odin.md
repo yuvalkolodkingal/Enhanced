@@ -14,7 +14,9 @@ Hebrew: [עברית](Odin-HE)
 
 1. **Odin sleeps.** Until Hela is beaten the first time, Odin lies in the Odinsleep in his chamber in the palace's east wing. You can't talk to him: Frigga answers for him. The **vault** under the throne room is closed by a wall of gold.
 2. **Beat Hela.** Everyone rewarded in the fight (see [Hela](Hela#rewards)) gets the right to Gungnir. Her **first** defeat wakes Odin ("Odin wakes: the Allfather rises from the Odinsleep") and **opens the vault**.
-3. **Take Gungnir.** Go down to the vault and right-click **Gungnir's Stand**: "You take Gungnir from its stand. It answers to you alone." Each worthy player takes **his own** Gungnir (the stand keeps showing one for the next). Without the right: "Only one who stood against Hela may take Gungnir."
+3. **Take Gungnir.** Go down to the vault and right-click **Gungnir's Stand**: "You take Gungnir from its stand. It answers to you alone." Without the right: "Only one who stood against Hela may take Gungnir."
+
+   **Only one player in the world** ever takes Gungnir from the stand (3.6.1). After the first, the stand is **empty for everyone else**, even other victors over Hela: "The stand is empty: Gungnir has chosen its one bearer, Eilon." Its owner can still take a new one there if he loses his (the old one crumbles). Players in **Creative** are not counted: they can take one, and it makes nobody the owner. A server can give every victor his own again with `gungnir.onePerWorld = false` (then the stand keeps showing one for the next).
 4. **Sit on the Throne of Asgard** (right-click it) with **no power** and **your own Gungnir** in your hand. "Golden light pours from the throne. Stay, and hold Gungnir." Stay seated for **3 seconds** of golden light, and you are crowned: "You are crowned on the Throne of Asgard. Long may you reign, Allfather." The Asgardians in the hall bow to you. (With another power the throne refuses: "The throne will not crown one who bears another power." Sitting on it without Gungnir is just sitting.)
 
 ## Gungnir
@@ -23,7 +25,7 @@ The spear of the Allfather: long, gold, with a winged blade.
 
 * **For anyone:** a spear that hits for **9**, reaches **one block further** than your arm, and never breaks or burns. Anyone can fight with somebody else's Gungnir.
 * **Its owner opens the Bifrost with it:** right-click for the Bifrost screen, Sneak + right-click to where you look (any power, or none). Somebody else's Gungnir doesn't open it.
-* **Bound to its owner**, like Hofund. If you lose yours, take a new one from the stand (or, as Odin, press **R** with none of your own anywhere): the old one crumbles to dust ("This Gungnir crumbles to dust: its bond is broken").
+* **Bound to its owner**, like Hofund. There is only one owner in the world (see above). If you lose yours, take a new one from the stand (or, as Odin, press **R** with none of your own anywhere): the old one crumbles to dust ("This Gungnir crumbles to dust: its bond is broken").
 * It is in Asgard's never-lost list.
 
 ## The body
@@ -79,7 +81,7 @@ Odin is a god: he may hold every [Infinity Stone](Infinity-Stones) bare and use 
 
 ## Numbers you can change
 
-Every damage, cooldown and time of his abilities (the blast, the throw, the shield, the heal, Banish and whether it sends players home, the wave, the ravens, the Command, the Odinsleep) are the `odin.*` options on [Server Configuration](Server-Configuration#odin).
+Every damage, cooldown and time of his abilities (the blast, the throw, the shield, the heal, Banish and whether it sends players home, the wave, the ravens, the Command, the Odinsleep) are the `odin.*` options on [Server Configuration](Server-Configuration#odin). Whether only one player in the world takes Gungnir from its stand is `gungnir.onePerWorld` (on by default).
 
 ## Related
 

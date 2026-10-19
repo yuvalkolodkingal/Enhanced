@@ -1106,6 +1106,12 @@ Section `[odin]` (3.5). The hero's page is [Odin](Odin).
 | `odin.odinsleepMaxSeconds` | `30` | 1 to 600 | The longest the Odinsleep (Sneak + N) lasts, in seconds. |
 | `odin.odinsleepCooldown` | `1800` | 0 to 72000 | Cooldown of the Odinsleep after it ends, in ticks (1800 = 90 seconds). |
 
+### `[gungnir]`: one per world (3.6.1)
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `gungnir.onePerWorld` | `true` | `true` or `false` | Only one player in the world ever takes Gungnir from its stand in Odin's vault: after him the stand is empty for everyone else, even other victors over Hela. He may take a new one there if he loses his. Players in Creative are not counted. False: every victor over Hela takes his own (as in 3.5). |
+
 ## Hela
 
 Two sections (3.5): `[hela_boss]` for the fight in Asgard's throne room and `[hela]` for the hero. The page is [Hela](Hela).

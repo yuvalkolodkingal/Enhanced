@@ -3712,7 +3712,7 @@
   "npc.enhanced.frigga.odin_player": "The Allfather has woken: %s sits the throne now. Be kind to them; a crown is heavier than it looks.",
   "npc.enhanced.hogun.vault_player": "The vault lies under the throne room. The Allfather has woken: %s holds its key now.",
   "npc.enhanced.hogun.vault_more_player": "Odin has woken. %s carries his name now. Ask them, not me.",
-  "npc.enhanced.fandral.gungnir_player": "Gungnir has found its hand again: %s, our Allfather! Still, they say the vault keeps a spear for every hero who faces Hela.",
+  "npc.enhanced.fandral.gungnir_player": "Gungnir has found its hand again: %s, our Allfather! The spear chooses one hand in all the realms, and only one.",
   "npc.enhanced.einherjar.news_odin_player": "The Allfather has woken! %s sits the throne. Stand straight when they pass.",
   "npc.enhanced.citizen.rumour_odin_player": "Did you hear? The Allfather has woken: %s sits the throne, and the whole palace is buzzing!",
   "npc.enhanced.heimdall.handover": "We are both guardians of Asgard. Keep the Bifrost for me a while: my socket answers to you now. I will rest my eyes over there.",
@@ -3840,5 +3840,6 @@
   "message.enhanced.vormir.why.survived": "It didn't count: the one you pushed survived the fall.",
   "death.attack.enhanced.vormir_fall": "%1$s was given to the fall on Vormir",
   "death.attack.enhanced.vormir_fall.player": "%1$s was given to the fall on Vormir by %2$s",
-  "death.attack.enhanced.vormir_fall.item": "%1$s was given to the fall on Vormir by %2$s"
+  "death.attack.enhanced.vormir_fall.item": "%1$s was given to the fall on Vormir by %2$s",
+  "message.enhanced.odin.stand_claimed": "The stand is empty: Gungnir has chosen its one bearer, %s."
 }
