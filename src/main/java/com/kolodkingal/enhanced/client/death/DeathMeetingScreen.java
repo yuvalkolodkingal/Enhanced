@@ -134,7 +134,7 @@ public class DeathMeetingScreen extends DeathScreen {
         int centre = columnX + columnWidth / 2;
         rioX = Math.max(30, columnX / 2);
         rioFeet = height - 16;
-        int tallest = Math.min((int) (height * 0.72F), (int) (columnX * 1.5F));
+        int tallest = Math.min((int) (height * 0.62F), (int) (columnX * 1.3F));
         rioScale = Math.max(20, (int) (tallest / 1.8F));
 
         titleY = Math.max(8, (int) (height * 0.06F));

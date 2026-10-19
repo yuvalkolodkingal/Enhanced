@@ -129,13 +129,15 @@ public final class DeathMeeting {
     // ---- the choice ----
 
     /**
-     * A player's answer: only a dead player is heard (a living one, or a body already respawned, is refused and nothing
-     * happens). He starts again through vanilla's own respawn; in the Nether when he chose it and the road is open
-     * (Death on, the Nether allowed and existing, not hardcore, no {@code doImmediateRespawn}), else as vanilla starts
-     * him, so a stale screen never leaves him dead.
+     * A player's answer: only a dead player is heard (a living one, or an old body after a respawn, is refused and
+     * nothing happens). He starts again through vanilla's own respawn; in the Nether when he chose it and the road is
+     * open (Death on, the Nether allowed and existing, not hardcore, no {@code doImmediateRespawn}), else as vanilla
+     * starts him, so a stale screen never leaves him dead. (A dead body is "removed" from its level a second after the
+     * fall, yet stays the server's player until he respawns: so the test is the player list, not {@code isRemoved}.)
      */
     public static Result choose(ServerPlayer player, int choice) {
-        if (!player.isDeadOrDying() || player.isRemoved() || player.wonGame) {
+        if (!player.isDeadOrDying() || player.wonGame
+                || player.server.getPlayerList().getPlayer(player.getUUID()) != player) {
             return Result.REFUSED;
         }
         boolean nether = choice == NETHER && enabled() && !vanillaWay(player) && netherOpen(player.server);

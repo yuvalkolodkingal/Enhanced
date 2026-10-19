@@ -146,12 +146,18 @@ public final class DeathMeetingTests {
         helper.succeed();
     }
 
-    /** "Start again" respawns him as vanilla does (the Overworld), and the dead body's second answer is refused. */
+    /** "Start again" respawns him as vanilla does (the Overworld), even after his body's fall (removed from the
+     * level, as in a real game), and the old body's second answer is refused. */
     @GameTest(template = ARENA, batch = BATCH)
     public static void startAgainRespawnsHimAsVanillaAndASecondAnswerIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
         check(die(player) != null, "Death is offered");
+        for (int i = 0; i < 25; i++) {
+            // His client's ticks: after the fall the dead body is "removed", as on a real server, and still answers.
+            player.doTick();
+        }
+        check(player.isRemoved(), "the fallen body is removed from the level, as in a real game");
         check(DeathMeeting.choose(player, DeathMeeting.AGAIN) == DeathMeeting.Result.AGAIN, "he starts again");
         ServerPlayer reborn = now(f, player.getUUID());
         check(reborn != player && reborn.isAlive(), "a new, living body");
