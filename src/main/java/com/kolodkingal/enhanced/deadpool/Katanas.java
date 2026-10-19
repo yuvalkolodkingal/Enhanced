@@ -112,7 +112,8 @@ public final class Katanas {
         }
         data.set(Live.DEADPOOL_PARRYING, false);
         if (rest) {
-            data.startCooldown(DeadpoolAbilities.slotRow(data, HeroAbility.DEADPOOL_PARRY), player.level().getGameTime(),
+            long now = player.level().getGameTime();
+            data.startCooldown(DeadpoolAbilities.slotRow(data, HeroAbility.DEADPOOL_PARRY), now,
                     DeadpoolAbilities.cfg(DeadpoolConfig.PARRY_COOLDOWN, 60));
         }
         DeadpoolAbilities.send(player.serverLevel(), player, DeadpoolFxPayload.PARRY_OFF, List.of(player.position()),

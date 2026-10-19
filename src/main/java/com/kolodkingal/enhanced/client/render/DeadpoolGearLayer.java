@@ -31,8 +31,8 @@ import net.neoforged.neoforge.client.event.RenderArmEvent;
  * Deadpool's weapons on his body (3.7, PLAN 5.2): two katanas in black scabbards crossed on his back (their hilts over
  * his shoulders) and two chunky cartoon pistols in holsters at his hips, always drawn while he has them; in his empty
  * hands when he uses them ({@link DeadpoolActing#swordsOut}, {@link DeadpoolActing#pistolsOut}): then the scabbards and
- * holsters are empty. While he parries, the swords spin before him round his fists. An item in a hand takes the weapon's
- * place; an elytra hides the scabbards (as capes are hidden). His first-person hands hold them too ({@link
+ * holsters are empty. While he parries, the swords spin before him round his fists. An item in a hand takes the
+ * weapon's place; an elytra hides the scabbards (as capes are hidden). His first-person hands hold them too ({@link
  * #onRenderArm}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)

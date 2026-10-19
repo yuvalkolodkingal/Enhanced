@@ -66,12 +66,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Deadpool (3.7, lane L3): his body and Kidpool's size; the katana combo 5/5/8 (and the X-cut's sweep, the reset); the
  * Parry (an arrow bounced back his way, a blow from the front cut by 60 %, its 80 ticks); the pistols (16 rounds of 4,
  * the 40-tick reload) and the Trick Shot round a corner; the Teleport Belt (a safe spot, never in a wall, never through
- * a Hex's wall, the glitch 3-6 off) and the Drop-In (8, no fall damage); the Taunt (five zombies off a villager, never a
- * boss); the Chimichanga Break; Dogpool (out, biting, following, a nap at 0 health and when his time is up, one at a
+ * a Hex's wall, the glitch 3-6 off) and the Drop-In (8, no fall damage); the Taunt (five zombies off a villager, never
+ * a boss); the Chimichanga Break; Dogpool (out, biting, following, a nap at 0 health and when his time is up, one at a
  * time, never a player without PvP); the Smoke Vanish; the chimichanga's recipe; his lines' gap; a custom hero's rows;
  * two healers who cannot finish each other; the Weapon X Pod (Deadpool after 100 ticks inside, not 99; leaving cancels;
- * a hero refused). Batches {@code deadpool}, {@code deadpool_cfg} (the belt's glitch, Dogpool's time, the Hex),
- * {@code deadpool_pvp} and {@code deadpool_pod}.
+ * a hero refused). Batches {@code deadpool}, {@code deadpool_cfg} (the belt's glitch, Dogpool's time, the Hex), {@code
+ * deadpool_pvp} and {@code deadpool_pod}.
  *
  * <p>The Healing Burst and the healing factor's DOWN are lane L1's: while their stubs stand (the burst heals nothing),
  * the Chimichanga Break's test checks the refused path (nothing eaten, nothing waits) and the two healers' test the
@@ -478,8 +478,8 @@ public final class DeadpoolTests {
     }
 
     /**
-     * Sneak + B: with a chimichanga, +100 % and Absorption II, the chimichanga eaten; without, +50 %. While the burst is
-     * still lane L1's stub (it heals nobody), the refused path: nothing eaten, nothing waits.
+     * Sneak + B: with a chimichanga, +100 % and Absorption II, the chimichanga eaten; without, +50 %. While the burst
+     * is still lane L1's stub (it heals nobody), the refused path: nothing eaten, nothing waits.
      */
     @GameTest(template = ARENA, batch = BATCH)
     public static void theChimichangaBreak(GameTestHelper helper) {
@@ -665,7 +665,9 @@ public final class DeadpoolTests {
         helper.succeed();
     }
 
-    /** His gestures' keys and routes, his run, his rows' moves, his lines' effects, and his preset (60 points at most). */
+    /**
+     * His gestures' keys and routes, his run, his rows' moves, his lines' effects, and his preset (60 points at most).
+     */
     @GameTest(template = ARENA, batch = BATCH)
     public static void theAnimationTablesAndThePreset(GameTestHelper helper) throws java.io.IOException {
         int count = 0;

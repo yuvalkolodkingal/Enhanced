@@ -27,9 +27,9 @@ import java.util.Map;
 
 /**
  * Deadpool's speech bubbles (3.7): a line of his is written over his head, comic-style, black words on a white bubble
- * with a little tail, facing the camera like a name tag, in the language of the client that reads
- * it; it pops in, stays three seconds and fades. One bubble per Deadpool (a new line replaces the old). Long lines wrap.
- * The client's {@code deadpoolLines} option hides them. (The way {@code ThoughtBubbles} writes thoughts over heads.)
+ * with a little tail, facing the camera like a name tag, in the language of the client that reads it; it pops in, stays
+ * three seconds and fades. One bubble per Deadpool (a new line replaces the old). Long lines wrap. The client's {@code
+ * deadpoolLines} option hides them. (The way {@code ThoughtBubbles} writes thoughts over heads.)
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class LineBubbles {

@@ -28,8 +28,8 @@ import java.util.UUID;
  *
  * <p>When he speaks: the Taunt (always, its own cooldown), when he goes DOWN and rises (the healing factor's {@link
  * HealingHooks}; both of two healers down near each other: "two_healers"), when the belt glitches, when Dogpool comes,
- * when he eats a chimichanga, when the poison switches his healing off, near a Wolverine (once in a while), now and then
- * to the "reader", and once when the Weapon X Pod makes him. Every line but the Taunt's is at most one per {@code
+ * when he eats a chimichanga, when the poison switches his healing off, near a Wolverine (once in a while), now and
+ * then to the "reader", and once when the Weapon X Pod makes him. Every line but the Taunt's is at most one per {@code
  * lineGapTicks} ({@code linesEnabled} off: none at all).
  */
 public final class DeadpoolLines {

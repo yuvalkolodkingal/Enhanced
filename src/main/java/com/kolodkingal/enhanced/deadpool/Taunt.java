@@ -34,11 +34,11 @@ import java.util.UUID;
  *
  * <p>The Taunt: a pose (a wave, the finger guns or a heart with both hands) and a joke over his head (a bubble every
  * client within {@link DeadpoolLines#BUBBLE_RANGE} reads in its own language); every hostile creature within {@code
- * tauntRadius} that is no boss turns on him and keeps at him for {@code tauntTicks} (so his friends are spared). Sneak +
- * B: the Chimichanga Break, the Healing Burst of the healing factor; with a chimichanga in his bag he eats it (a munch,
- * a happy sigh): {@code chimichangaFraction} of his health instead of the burst's share, and Absorption II for 30
- * seconds. Refused while poisoned (the burst says so): nothing is eaten, nothing waits. Sneak + N: the Smoke Vanish, a
- * grey-red puff, Invisibility for {@code smokeTicks}, and every monster within {@link #SMOKE_RADIUS} loses him for as
+ * tauntRadius} that is no boss turns on him and keeps at him for {@code tauntTicks} (so his friends are spared). Sneak
+ * + B: the Chimichanga Break, the Healing Burst of the healing factor; with a chimichanga in his bag he eats it (a
+ * munch, a happy sigh): {@code chimichangaFraction} of his health instead of the burst's share, and Absorption II for
+ * 30 seconds. Refused while poisoned (the burst says so): nothing is eaten, nothing waits. Sneak + N: the Smoke Vanish,
+ * a grey-red puff, Invisibility for {@code smokeTicks}, and every monster within {@link #SMOKE_RADIUS} loses him for as
  * long. The keeping and the losing are {@link DeadpoolEvents}' (the creatures' change of target).
  */
 public final class Taunt {
@@ -182,8 +182,8 @@ public final class Taunt {
     }
 
     /**
-     * Whether a creature's change of target to {@code next} must not happen: a taunted one keeps at its taunter (no other
-     * target while the taunt lasts and he is there), and one the smoke blinded does not find him again.
+     * Whether a creature's change of target to {@code next} must not happen: a taunted one keeps at its taunter (no
+     * other target while the taunt lasts and he is there), and one the smoke blinded does not find him again.
      */
     static boolean keepsOff(Mob mob, LivingEntity next, long now) {
         Held lost = LOST.get(mob.getUUID());

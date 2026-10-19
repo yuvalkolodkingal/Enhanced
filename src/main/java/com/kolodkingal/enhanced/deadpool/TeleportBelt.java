@@ -38,9 +38,9 @@ import java.util.List;
 /**
  * V: the Teleport Belt (3.7). He blinks to the block he looks at ({@code blinkRange} 24): onto a safe two-high spot on
  * top of it, else the nearest within {@link #SEARCH} (never into a wall or a fluid, never across a Hex's wall, a boss
- * arena's edge or a Road trial's: {@link HexManager#onTeleport}); a red-black flicker and a "zzt". The belt <b>glitches</b>
- * now and then ({@code glitchChance}): he lands {@link #GLITCH_MIN}-{@link #GLITCH_MAX} blocks off (still on a safe
- * spot), with a joke. Nowhere to land: nothing happens and V waits for nothing.
+ * arena's edge or a Road trial's: {@link HexManager#onTeleport}); a red-black flicker and a "zzt". The belt
+ * <b>glitches</b> now and then ({@code glitchChance}): he lands {@link #GLITCH_MIN}-{@link #GLITCH_MAX} blocks off
+ * (still on a safe spot), with a joke. Nowhere to land: nothing happens and V waits for nothing.
  *
  * <p>Sneak + V: the Drop-In. He teleports {@code dropInHeight} above the creature he looks at ({@code dropInRange}, in
  * sight, with room above) and plunges sword first, the server carrying him down {@link #PLUNGE} blocks a tick: {@code
@@ -161,8 +161,8 @@ public final class TeleportBelt {
     }
 
     /**
-     * Where a glitch lands him instead of {@code spot}: a safe spot {@link #GLITCH_MIN}-{@link #GLITCH_MAX} blocks off it
-     * (horizontally), tried at random; null when there is none.
+     * Where a glitch lands him instead of {@code spot}: a safe spot {@link #GLITCH_MIN}-{@link #GLITCH_MAX} blocks off
+     * it (horizontally), tried at random; null when there is none.
      */
     @Nullable
     static BlockPos glitch(ServerLevel level, ServerPlayer player, BlockPos spot, RandomSource random) {

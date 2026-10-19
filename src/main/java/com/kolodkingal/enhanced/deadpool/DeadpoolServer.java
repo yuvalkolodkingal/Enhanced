@@ -7,10 +7,11 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * The server side of Deadpool (3.7), as a {@link HeroServer} plug-in: his keys, his body and his tick are {@link
- * DeadpoolAbilities} (with the moves {@link Katanas}, {@link Pistols} and their {@link DeadpoolBulletEntity}, the {@link
- * TeleportBelt}, the {@link Taunt} and its tricks, {@link DogpoolEntity Dogpool}); his lines {@link DeadpoolLines}; his
- * event hooks {@link DeadpoolEvents}; how he is made, the Weapon X Pod's {@link PodTreatment} (it ticks for every
- * player: a powerless one is in the pod). His healing factor is the shared one ({@code healing/}, lane L1).
+ * DeadpoolAbilities} (with the moves {@link Katanas}, {@link Pistols} and their {@link DeadpoolBulletEntity}, the
+ * {@link TeleportBelt}, the {@link Taunt} and its tricks, {@link DogpoolEntity Dogpool}); his lines {@link
+ * DeadpoolLines}; his event hooks {@link DeadpoolEvents}; how he is made, the Weapon X Pod's {@link PodTreatment} (it
+ * ticks for every player: a powerless one is in the pod). His healing factor is the shared one ({@code healing/}, lane
+ * L1).
  */
 public final class DeadpoolServer implements HeroServer {
     static {

@@ -11,12 +11,12 @@ import static com.kolodkingal.enhanced.client.render.AnimMath.Ease.S;
 import static com.kolodkingal.enhanced.client.render.Gestures.define;
 
 /**
- * The keys of Deadpool's gestures (3.7): quick, loose and showy, a mercenary who enjoys the audience. The keys are timed
- * to the server's moves: a cut falls at tick 4-7 of its gesture (the blow is dealt as the key is pressed, so the swing
- * is the follow-through), the right pistol fires 3 ticks after the left ({@code Pistols.PAIR_GAP}), the reload's twirl
- * lasts the default {@code reloadTicks} 40 as two twirls. Pure data (no Minecraft client classes), so the game tests can
- * check it. The main arm's {@code +z} swings it outward and {@code -y} turns it in; the off arm's signs are mirrored by
- * hand, as in the other heroes' tables.
+ * The keys of Deadpool's gestures (3.7): quick, loose and showy, a mercenary who enjoys the audience. The keys are
+ * timed to the server's moves: a cut falls at tick 4-7 of its gesture (the blow is dealt as the key is pressed, so the
+ * swing is the follow-through), the right pistol fires 3 ticks after the left ({@code Pistols.PAIR_GAP}), the reload's
+ * twirl lasts the default {@code reloadTicks} 40 as two twirls. Pure data (no Minecraft client classes), so the game
+ * tests can check it. The main arm's {@code +z} swings it outward and {@code -y} turns it in; the off arm's signs are
+ * mirrored by hand, as in the other heroes' tables.
  */
 public final class DeadpoolGestures {
     /** The Parry's stance: both arms forward, a little in, the swords spinning before the chest. */

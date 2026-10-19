@@ -10,12 +10,12 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
- * The client side of Deadpool (3.7), as a {@link HeroClient} plug-in: his HUD lines (the magazine "16/16" and its reload,
- * the Parry's time, the chimichangas in his bag, Dogpool's time and health), his sixteen gestures ({@link
- * DeadpoolGestures}, started by the effects of his moves, {@link DeadpoolActing}), his two stances (the spinning swords,
- * the drawn pistols), his hands in first person, and his jaunty jog ({@link RunCharacter#DEADPOOL}). His swords and
- * pistols are {@link DeadpoolGearLayer}'s, his jokes' bubbles {@code client/deadpool/LineBubbles}', his effects {@code
- * client/deadpool/DeadpoolEffects}'.
+ * The client side of Deadpool (3.7), as a {@link HeroClient} plug-in: his HUD lines (the magazine "16/16" and its
+ * reload, the Parry's time, the chimichangas in his bag, Dogpool's time and health), his sixteen gestures ({@link
+ * DeadpoolGestures}, started by the effects of his moves, {@link DeadpoolActing}), his two stances (the spinning
+ * swords, the drawn pistols), his hands in first person, and his jaunty jog ({@link RunCharacter#DEADPOOL}). His swords
+ * and pistols are {@link DeadpoolGearLayer}'s, his jokes' bubbles {@code client/deadpool/LineBubbles}', his effects
+ * {@code client/deadpool/DeadpoolEffects}'.
  *
  * <p>The plug-in is built when {@link HeroClients} loads, which the game tests do on a server: nothing here names a
  * client class except in a signature of {@link HeroClient}.

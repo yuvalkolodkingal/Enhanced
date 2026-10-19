@@ -17,10 +17,10 @@ import java.util.Map;
 
 /**
  * How Deadpool acts what he does (3.7): his two stances (the swords spinning before him while he parries, the pistols
- * up along his look while they are drawn), what they and his gestures add to his hands in first person, the gestures his
- * moves' effects start (each names him), and what his weapons are doing for {@link DeadpoolGearLayer}: the swords are in
- * his hands while he parries and for a moment after a cut or a Drop-In, the pistols while they are drawn or reloading;
- * otherwise both are sheathed (the swords crossed on his back, the pistols at his hips).
+ * up along his look while they are drawn), what they and his gestures add to his hands in first person, the gestures
+ * his moves' effects start (each names him), and what his weapons are doing for {@link DeadpoolGearLayer}: the swords
+ * are in his hands while he parries and for a moment after a cut or a Drop-In, the pistols while they are drawn or
+ * reloading; otherwise both are sheathed (the swords crossed on his back, the pistols at his hips).
  */
 public final class DeadpoolActing {
     /** How long (ticks) the swords stay in his hands after a cut or a Drop-In. */

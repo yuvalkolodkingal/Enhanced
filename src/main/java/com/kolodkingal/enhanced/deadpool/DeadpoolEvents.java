@@ -29,12 +29,11 @@ import java.util.List;
  * Deadpool's event hooks (3.7). Priorities as {@code docs/HEROES-AND-BOSSES.md} lists them:
  * <ul> <li>{@link ProjectileImpactEvent}: while he parries, what flies at him from the front does not hit him: it
  * bounces back the way he looks, his now (arrows, bolts, fireballs; a beam is no projectile);</li>
- * <li>{@link LivingIncomingDamageEvent}, HIGH: no fall damage from his own Drop-In; Dogpool's bite never reaches whom the
- * heroes' rule spares (a player without PvP); NORMAL: while he parries, a blow from the front loses {@code
+ * <li>{@link LivingIncomingDamageEvent}, HIGH: no fall damage from his own Drop-In; Dogpool's bite never reaches whom
+ * the heroes' rule spares (a player without PvP); NORMAL: while he parries, a blow from the front loses {@code
  * parryMeleeReduction};</li> <li>{@link LivingChangeTargetEvent}, NORMAL: a creature he taunted keeps at him, one his
- * smoke blinded does not find him ({@link Taunt#keepsOff}).</li> </ul>
- * (The healing factor's own rules are lane L1's, in {@code healing/}: a creature that loses a downed healer is let go of
- * by the taunt.)
+ * smoke blinded does not find him ({@link Taunt#keepsOff}).</li> </ul> (The healing factor's own rules are lane L1's,
+ * in {@code healing/}: a creature that loses a downed healer is let go of by the taunt.)
  */
 @EventBusSubscriber(modid = Enhanced.MODID)
 public final class DeadpoolEvents {

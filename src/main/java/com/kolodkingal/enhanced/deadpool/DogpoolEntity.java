@@ -43,10 +43,10 @@ import java.util.UUID;
 /**
  * Dogpool (3.7): Deadpool's dog in a red-and-black hood and goggles (Deadpool &amp; Wolverine), on the vanilla wolf's
  * body and goals. N whistles him out of a puff of red smoke beside Deadpool ({@link #whistle}): 20 health, a bite of 4,
- * fast; he follows him, bites what Deadpool hits and what attacks him (the wolf's own goals, his owner's), never a player
- * without PvP and never what the heroes' rule spares ({@link AreaTargets#mayHurt}). He stays {@code dogpool.seconds}
- * or until N again, one at a time; at 0 health he "needs a nap" and poofs (he never dies on screen); he poofs too when
- * Deadpool leaves, changes dimension or loses the power. Nobody can sit, feed, breed or lead him.
+ * fast; he follows him, bites what Deadpool hits and what attacks him (the wolf's own goals, his owner's), never a
+ * player without PvP and never what the heroes' rule spares ({@link AreaTargets#mayHurt}). He stays {@code
+ * dogpool.seconds} or until N again, one at a time; at 0 health he "needs a nap" and poofs (he never dies on screen);
+ * he poofs too when Deadpool leaves, changes dimension or loses the power. Nobody can sit, feed, breed or lead him.
  */
 public class DogpoolEntity extends Wolf {
     /** The game time he goes home at. */

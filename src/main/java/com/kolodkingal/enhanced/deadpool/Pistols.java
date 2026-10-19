@@ -144,8 +144,8 @@ public final class Pistols {
     }
 
     /**
-     * The way a round from {@code muzzle} flies: to what his crosshair is on (the first creature or block along his look
-     * within {@code range}), so both pistols' rounds meet where he aims.
+     * The way a round from {@code muzzle} flies: to what his crosshair is on (the first creature or block along his
+     * look within {@code range}), so both pistols' rounds meet where he aims.
      */
     static Vec3 aim(ServerPlayer player, Vec3 muzzle, double range) {
         HitResult hit = Raycasts.any(player, range, e -> e instanceof LivingEntity && e != player && e.isPickable(),

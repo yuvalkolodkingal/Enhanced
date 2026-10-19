@@ -32,13 +32,13 @@ import java.util.UUID;
 
 /**
  * The Weapon X Pod's treatment (3.7, PLAN 5.5): how Deadpool is made, in the X-Men lower lab (the default of open
- * question 1). A <b>powerless</b> player who stands in the pod (within {@link #INSIDE} of the middle of its lower block,
- * his feet at its floor: the pod's open inside, or pressed to its glass) right-clicks it: the hatch closes (he cannot
- * walk or jump), {@code podTicks} of "treatment" (bubbles, a rising hum, a heartbeat, the action bar counting "Treatment…
- * 5… 4…"), then a red flash: <b>Deadpool</b> (the title, the first joke). Sneaking, stepping out, or anything that takes
- * him out of the pod cancels it; a hero is refused ("this one already has powers"); it works for anyone any number of
- * times ({@code podAwakens} off: it hums and does nothing). MCU: the Workshop's chamber that forced his mutation awake
- * (Deadpool, 2016), as a kid-friendly machine (no pain, no suffocation shown).
+ * question 1). A <b>powerless</b> player who stands in the pod (within {@link #INSIDE} of the middle of its lower
+ * block, his feet at its floor: the pod's open inside, or pressed to its glass) right-clicks it: the hatch closes (he
+ * cannot walk or jump), {@code podTicks} of "treatment" (bubbles, a rising hum, a heartbeat, the action bar counting
+ * "Treatment… 5… 4…"), then a red flash: <b>Deadpool</b> (the title, the first joke). Sneaking, stepping out, or
+ * anything that takes him out of the pod cancels it; a hero is refused ("this one already has powers"); it works for
+ * anyone any number of times ({@code podAwakens} off: it hums and does nothing). MCU: the Workshop's chamber that
+ * forced his mutation awake (Deadpool, 2016), as a kid-friendly machine (no pain, no suffocation shown).
  *
  * <p>The pod block (lane L4) hands its right-click here ({@link #use}); the treatment ticks from every player's tick
  * ({@link DeadpoolServer#everyPlayerTick}). The pod's look while it works is the lab's: {@link LabFxPayload#POD_START}

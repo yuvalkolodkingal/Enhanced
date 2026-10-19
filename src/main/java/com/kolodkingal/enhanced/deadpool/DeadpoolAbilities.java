@@ -48,18 +48,18 @@ import java.util.UUID;
  * holding the mouse. The plug-in is {@link DeadpoolServer}; his healing factor is the shared one of {@code healing/}.
  *
  * <p>R: the {@link Katanas} (a 3-hit combo), Sneak + R held: the Parry. G: the {@link Pistols} (pairs of cartoon shots
- * from a magazine), Sneak + G: the Trick Shot. V: the {@link TeleportBelt} (a blink that sometimes glitches), Sneak + V:
- * the Drop-In. B: the {@link Taunt} (a joke over his head; monsters near turn on him), Sneak + B: the Chimichanga Break
- * (the Healing Burst). N: {@link DogpoolEntity Dogpool}, Sneak + N: the Smoke Vanish. His lines are {@link
+ * from a magazine), Sneak + G: the Trick Shot. V: the {@link TeleportBelt} (a blink that sometimes glitches), Sneak +
+ * V: the Drop-In. B: the {@link Taunt} (a joke over his head; monsters near turn on him), Sneak + B: the Chimichanga
+ * Break (the Healing Burst). N: {@link DogpoolEntity Dogpool}, Sneak + N: the Smoke Vanish. His lines are {@link
  * DeadpoolLines}; how he is made, the Weapon X Pod's {@link PodTreatment}.
  *
  * <p>3.4's rules from birth: every cooldown is by its row, the Sneak variant is {@code alt}, the tick's parts are
  * guarded by {@code data.has(row)}, his body is by {@link HeroAbility#DEADPOOL_BODY} and its {@code bodyScale}, the
  * colours of an ability's effects are {@link Powers#color}/{@link Powers#glow} of the player. Two keys keep a variant's
- * wait apart from the key's (the decision of the lane, in its notes): the Chimichanga Break and the Smoke Vanish wait on
- * their own clocks, so a joke never keeps him from healing and Dogpool never keeps him from vanishing; the swords and
- * the pistols fire on their own gaps, so a Parry's or a Trick Shot's wait (on R's and G's slot) never stops a cut or a
- * shot.
+ * wait apart from the key's (the decision of the lane, in its notes): the Chimichanga Break and the Smoke Vanish wait
+ * on their own clocks, so a joke never keeps him from healing and Dogpool never keeps him from vanishing; the swords
+ * and the pistols fire on their own gaps, so a Parry's or a Trick Shot's wait (on R's and G's slot) never stops a cut
+ * or a shot.
  */
 public final class DeadpoolAbilities {
     // The body's modifiers (permanent: right when a player logs in).
