@@ -124,7 +124,7 @@ public class HydraBoltEntity extends ThrowableProjectile implements ShieldCost {
         }
     }
 
-    /** Whether it starts this tick already inside something it can hit (a creature that walked into it), and hits it. */
+    /** Whether it starts this tick inside something it can hit (a creature that walked into it), and hits it. */
     private boolean overlapping() {
         AABB probe = getBoundingBox().inflate(0.2);
         for (Entity target : level().getEntities(this, probe, this::canHitEntity)) {

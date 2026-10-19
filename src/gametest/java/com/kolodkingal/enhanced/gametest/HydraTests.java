@@ -217,7 +217,8 @@ public final class HydraTests {
         check(sniper.getMaxHealth() == 20.0F && sniper.getArmorValue() == 4, "sniper 20 / 4");
         check(officer.getMaxHealth() == 36.0F && officer.getArmorValue() == 8, "officer 36 / 8");
         check(rifleman.arms() == HydraSoldierEntity.Arms.RIFLE && enforcer.arms() == HydraSoldierEntity.Arms.BATON
-                && sniper.arms() == HydraSoldierEntity.Arms.LONG_RIFLE && officer.arms() == HydraSoldierEntity.Arms.PISTOL,
+                && sniper.arms() == HydraSoldierEntity.Arms.LONG_RIFLE
+                && officer.arms() == HydraSoldierEntity.Arms.PISTOL,
                 "their weapons");
         check(Rank.RIFLEMAN.xp() == 5 && Rank.ENFORCER.xp() == 5 && Rank.SNIPER.xp() == 8, "experience 5 / 5 / 8");
         check(rifleman.getType().is(ModTags.HYDRA) && officer.getType().is(ModTags.HYDRA), "#enhanced:hydra");
@@ -267,6 +268,27 @@ public final class HydraTests {
         helper.succeed();
     }
 
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 40)
+    public static void everySoldierSpotsAnIntruderInFrontOfHim(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        // several in a row: their entity ids are odd and even (the sight check must reach both)
+        List<HydraSoldierEntity> row = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            row.add(soldier(f, Rank.RIFLEMAN, 4.5 + i * 4, 3.5, 0.0F));
+        }
+        ServerPlayer player = intruder(f, 10.5, 15.5);
+        f.everyTick(30, tick -> {
+            for (HydraSoldierEntity s : row) {
+                if (s.getTarget() != player) {
+                    return false;
+                }
+            }
+            check(row.stream().map(Entity::getId).anyMatch(id -> id % 2 == 0)
+                    && row.stream().map(Entity::getId).anyMatch(id -> id % 2 != 0), "odd and even ids");
+            return true;
+        });
+    }
+
     @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 140)
     public static void aRiflemanFiresBurstsOfThreeAndReloadsEverySix(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
@@ -289,7 +311,8 @@ public final class HydraTests {
             List<Long> times = new ArrayList<>(seen.values());
             times.sort(Long::compare);
             check(times.size() >= 6, "two bursts by now: " + times);
-            check(times.get(1) - times.get(0) == 5 && times.get(2) - times.get(1) == 5, "three bolts 5 apart: " + times);
+            check(times.get(1) - times.get(0) == 5 && times.get(2) - times.get(1) == 5,
+                    "three bolts 5 apart: " + times);
             check(times.get(3) - times.get(0) >= 50, "the next burst 50 later: " + times);
             if (times.size() > 6) {
                 check(times.get(6) - times.get(5) >= 30, "a reload after six bolts: " + times);
@@ -495,6 +518,81 @@ public final class HydraTests {
             check(thought.text().getContents() instanceof TranslatableContents t && t.getKey().startsWith(prefix),
                     "an open mind with its own thoughts: " + thought.text());
         }
+        helper.succeed();
+    }
+
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    public static void theOfficerSteadiesHisMenWithResistance(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        HydraOfficerEntity officer = officer(f, 10.5, 10.5, 0.0F);
+        officer.setNoAi(true);
+        HydraSoldierEntity near = soldier(f, Rank.RIFLEMAN, 14.5, 10.5, 0.0F);
+        near.setNoAi(true);
+        f.everyTick(50, tick -> {
+            MobEffectInstance resistance = near.getEffect(MobEffects.DAMAGE_RESISTANCE);
+            return resistance != null && resistance.getAmplifier() == 0;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    public static void aSoldierHearsABlockBrokenNearHimAndGoesToLook(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        HydraSoldierEntity soldier = soldier(f, Rank.RIFLEMAN, 5.5, 5.5, 0.0F);
+        HydraSoldierEntity far = soldier(f, Rank.RIFLEMAN, 18.5, 18.5, 0.0F);
+        far.setNoAi(true);
+        Vec3 noise = helper.absoluteVec(new Vec3(9.5, FLOOR, 5.5));
+        HydraSenses.heard(helper.getLevel(), noise);
+        double before = soldier.distanceToSqr(noise);
+        f.everyTick(50, tick -> {
+            check(far.act() != HydraSoldierEntity.Act.ALERT, "one 18 blocks off heard nothing");
+            return soldier.distanceToSqr(noise) < before - 4.0;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    public static void aTurnedSoldierIsHydraAgainWhenTheHoldFades(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer loki = f.player(3.5, FLOOR, 3.5, Power.LOKI);
+        HydraSoldierEntity soldier = soldier(f, Rank.RIFLEMAN, 6.5, 3.5, 0.0F);
+        soldier.setNoAi(true);
+        check(HydraLoyalty.turn(soldier, loki, 20) && soldier.isTurned(), "turned for 20 ticks");
+        f.everyTick(50, tick -> {
+            if (tick < 25) {
+                return false;
+            }
+            check(!soldier.isTurned() && !HydraLoyalty.isTraitor(soldier) && soldier.mayRaiseAlarm(),
+                    "Hydra again");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    public static void aRiflemanButtStrikesWhoComesTooClose(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        HydraSoldierEntity rifleman = soldier(f, Rank.RIFLEMAN, 10.5, 10.5, -90.0F);
+        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.0, FLOOR, 10.5));
+        f.everyTick(50, tick -> {
+            rifleman.setTarget(target);
+            if (target.getHealth() >= target.getMaxHealth()) {
+                return false;
+            }
+            float lost = target.getMaxHealth() - target.getHealth();
+            check(Math.abs(lost - 4.0F) < 0.01F || bolts(helper, rifleman).size() > 0, "the butt: 4 (" + lost + ")");
+            return true;
+        });
+    }
+
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theOfficersPostIsTheCommandRoomByDayTheRadioRoomByNight(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        HydraOutposts.Outpost outpost = outpost(f);
+        HydraOfficerEntity officer = posted(outpost, Post.OFFICER.ordinal(), officer(f, 10.5, 10.5, 0.0F));
+        officer.setNoAi(true);
+        BlockPos expected = outpost.where(helper.getLevel().isDay() ? HydraOutpostPlan.COMMAND_POST
+                : HydraOutpostPlan.RADIO_POST);
+        check(officer.postPos().equals(expected), "his post now: " + officer.postPos() + " not " + expected);
+        check(HydraGarrison.spawnPos(helper.getLevel(), outpost, Post.OFFICER).equals(expected), "where he appears");
+        check(Post.OFFICER.isOfficer() && Post.values().length == 14 && Post.CONSOLES.size() == 4, "the table");
         helper.succeed();
     }
 

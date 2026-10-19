@@ -64,7 +64,7 @@ public class HydraBoltRenderer extends EntityRenderer<HydraBoltEntity> {
         EnergyGeometry.ribbon(pose, vc, tail, centre, 0.0F, 0.055F * size, EnergyGeometry.argb(CORE, 0.0F),
                 EnergyGeometry.argb(CORE, 0.95F));
         Vec3 toCamera = centre.scale(-1.0);
-        EnergyGeometry.ring(pose, vc, centre, toCamera, 0.17F * size, 0.13F * size, 12,
+        EnergyGeometry.ring(pose, vc, centre, toCamera, 0.13F * size, 0.1F * size, 12,
                 EnergyGeometry.argb(HALO, 0.45F * flicker));
         EnergyGeometry.ring(pose, vc, centre, toCamera, 0.1F * size, 0.1F * size, 10, EnergyGeometry.argb(MAIN, 0.9F));
         EnergyGeometry.ring(pose, vc, centre, toCamera, 0.045F * size, 0.06F * size, 8,

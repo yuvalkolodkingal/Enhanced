@@ -26,7 +26,7 @@ import java.util.List;
  * in sight; a turned soldier, the Hydra near his leader and whatever his leader fights.
  */
 public final class HydraGoals {
-    /** How often (ticks) a soldier looks for someone to fight. */
+    /** How often (ticks) a soldier looks for someone to fight (a goal is asked every other tick). */
     public static final int SIGHT_PERIOD = 4;
     /** How near a traitor must be for the others to see him for what he is. */
     public static final double TRAITOR_RANGE = 16.0;
@@ -90,6 +90,8 @@ public final class HydraGoals {
         private final HydraSoldierEntity soldier;
         @Nullable
         private LivingEntity found;
+        /** How often canUse was asked (the selector asks every other tick): it looks every other time. */
+        private int asked;
 
         Spot(HydraSoldierEntity soldier) {
             this.soldier = soldier;
@@ -98,7 +100,7 @@ public final class HydraGoals {
 
         @Override
         public boolean canUse() {
-            if ((soldier.tickCount + soldier.getId()) % SIGHT_PERIOD != 0 || soldier.getTarget() != null
+            if ((++asked + soldier.getId()) % (SIGHT_PERIOD / 2) != 0 || soldier.getTarget() != null
                     || soldier.isLeaving() || soldier.isFrozen() || PhoenixAbilities.isHost(soldier)
                     || soldier.steered()) {
                 return false;
@@ -206,7 +208,7 @@ public final class HydraGoals {
             if (outpost == null || !(soldier.level() instanceof ServerLevel level)) {
                 return;
             }
-            BlockPos spot = HydraAlarm.nearestConsoleSpot(outpost, soldier.position());
+            BlockPos spot = HydraAlarm.runSpot(outpost, soldier);
             soldier.setAct(HydraSoldierEntity.Act.RUN);
             if (soldier.distanceToSqr(Vec3.atBottomCenterOf(spot)) <= HydraAlarm.CONSOLE_REACH
                     * HydraAlarm.CONSOLE_REACH) {
@@ -217,7 +219,8 @@ public final class HydraGoals {
             }
             if (--repath <= 0) {
                 repath = 10;
-                if (!soldier.getNavigation().moveTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5, 1.25)) {
+                net.minecraft.world.level.pathfinder.Path path = soldier.getNavigation().createPath(spot, 1);
+                if (path == null || !path.canReach() || !soldier.getNavigation().moveTo(path, 1.25)) {
                     HydraAlarm.runnerFailed(outpost, soldier);
                 }
             }

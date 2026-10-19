@@ -28,12 +28,12 @@ public final class HydraLoyalty {
      * anything else
      */
     public static boolean onScepterHit(LivingEntity target, LivingEntity attacker) {
-        if (!(target instanceof HydraSoldierEntity soldier) || !(attacker instanceof Player player) || !soldier.isAlive()
+        if (!(target instanceof HydraSoldierEntity soldier) || !(attacker instanceof Player) || !soldier.isAlive()
                 || !scepterTurns()) {
             return false;
         }
         int ticks = turnTicks();
-        return soldier.turnTo(player, soldier instanceof HydraOfficerEntity ? ticks / 2 : ticks);
+        return soldier.turnTo(attacker, soldier instanceof HydraOfficerEntity ? ticks / 2 : ticks);
     }
 
     /**

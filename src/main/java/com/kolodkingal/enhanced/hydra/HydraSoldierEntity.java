@@ -871,7 +871,8 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
      * (within 60 degrees of where his body faces), while he is not frozen.
      */
     public boolean blocksWithShield(DamageSource source) {
-        if (rank() != Rank.ENFORCER || isOfficer() || isFrozen() || !(source.getDirectEntity() instanceof Projectile p)) {
+        if (rank() != Rank.ENFORCER || isOfficer() || isFrozen()
+                || !(source.getDirectEntity() instanceof Projectile p)) {
             return false;
         }
         Vec3 from = p.position().subtract(position());

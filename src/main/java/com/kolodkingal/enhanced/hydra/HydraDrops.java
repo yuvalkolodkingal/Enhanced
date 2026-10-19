@@ -20,8 +20,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * entities/hydra_soldier} for a rifleman, {@code hydra_soldier_enforcer}, {@code hydra_soldier_sniper}, {@code
  * hydra_officer}): iron nuggets and gunpowder, an iron ingot, emeralds. The rare ones need a player's kill (Looting
  * adds 5 % to each chance a level) and never come from reinforcements (no farm): a Hydra energy cell ({@code [hydra]
- * energyCellDrop} 20 % for a rifleman, three quarters of it for an enforcer, half as much again for a sniper, always one
- * from the officer), the sniper's spyglass (10 %), the officer's blaster ({@code blasterDrop} 10 %, when {@code
+ * energyCellDrop} 20 % for a rifleman, three quarters of it for an enforcer, half as much again for a sniper, always
+ * one from the officer), the sniper's spyglass (10 %), the officer's blaster ({@code blasterDrop} 10 %, when {@code
  * blasterEnabled}) and his Hydra intel ({@code intelMapDrop} 25 %: a map to the nearest Avengers Tower, {@link
  * HydraIntel}).
  */

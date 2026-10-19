@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneLampBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -74,6 +75,8 @@ public final class HydraAlarm {
     private static final Map<UUID, long[]> HOLDS = new HashMap<>();
     /** When each runner started running (game time). */
     private static final Map<UUID, Long> RUN_SINCE = new HashMap<>();
+    /** Where each runner goes. */
+    private static final Map<UUID, BlockPos> RUN_SPOT = new HashMap<>();
 
     // ---- the numbers ----
 
@@ -127,8 +130,43 @@ public final class HydraAlarm {
         if (officer(level, outpost) == null) {
             return; // nobody answers the radio
         }
+        BlockPos spot = reachableConsoleSpot(outpost, soldier);
+        if (spot == null) {
+            return; // he cannot reach a radio
+        }
         outpost.runner = soldier.getUUID();
         RUN_SINCE.put(soldier.getUUID(), now);
+        RUN_SPOT.put(soldier.getUUID(), spot);
+    }
+
+    /**
+     * The spot in front of the console nearest {@code soldier} that he can walk to (the radio room's need the ladder,
+     * which no soldier climbs; the command room's are behind the bunker's iron door, which they open), or null.
+     */
+    @Nullable
+    static BlockPos reachableConsoleSpot(HydraOutposts.Outpost outpost, HydraSoldierEntity soldier) {
+        List<BlockPos> spots = new ArrayList<>();
+        for (BlockPos local : Post.CONSOLE_SPOTS) {
+            spots.add(outpost.where(local));
+        }
+        spots.sort(java.util.Comparator.comparingDouble(
+                p -> Vec3.atBottomCenterOf(p).distanceToSqr(soldier.position())));
+        for (BlockPos spot : spots) {
+            if (soldier.distanceToSqr(Vec3.atBottomCenterOf(spot)) <= CONSOLE_REACH * CONSOLE_REACH) {
+                return spot;
+            }
+            Path path = soldier.getNavigation().createPath(spot, 1);
+            if (path != null && path.canReach()) {
+                return spot;
+            }
+        }
+        return null;
+    }
+
+    /** The console spot the runner {@code soldier} goes to (chosen when he set off), or the nearest. */
+    static BlockPos runSpot(HydraOutposts.Outpost outpost, HydraSoldierEntity soldier) {
+        BlockPos spot = RUN_SPOT.get(soldier.getUUID());
+        return spot != null ? spot : nearestConsoleSpot(outpost, soldier.position());
     }
 
     /** Whether {@code soldier} is his outpost's runner now (and may still be). */
@@ -142,6 +180,7 @@ public final class HydraAlarm {
         if (!soldier.mayRaiseAlarm() || outpost.alarmOn(now) || (since != null && now - since > RUN_TICKS)) {
             outpost.runner = null;
             RUN_SINCE.remove(soldier.getUUID());
+            RUN_SPOT.remove(soldier.getUUID());
             return false;
         }
         return true;
@@ -151,6 +190,7 @@ public final class HydraAlarm {
     static void runnerArrived(ServerLevel level, HydraOutposts.Outpost outpost, HydraSoldierEntity runner) {
         outpost.runner = null;
         RUN_SINCE.remove(runner.getUUID());
+        RUN_SPOT.remove(runner.getUUID());
         if (officer(level, outpost) != null && runner.mayRaiseAlarm()) {
             raise(level, outpost, runner, runner.getTarget());
         }
@@ -160,6 +200,7 @@ public final class HydraAlarm {
     static void runnerFailed(HydraOutposts.Outpost outpost, HydraSoldierEntity runner) {
         outpost.runner = null;
         RUN_SINCE.remove(runner.getUUID());
+        RUN_SPOT.remove(runner.getUUID());
     }
 
     /** The spot in front of the console nearest {@code from}. */
@@ -395,8 +436,8 @@ public final class HydraAlarm {
             }
             soldier.setRank(rank, level.random.nextInt(rank.skins()));
             soldier.belongTo(outpost, -1, true);
-            soldier.moveTo(at.getX() + 0.5 + (i % 2) * 0.3, at.getY(), at.getZ() + 0.5, level.random.nextFloat() * 360.0F,
-                    0.0F);
+            soldier.moveTo(at.getX() + 0.5 + (i % 2) * 0.3, at.getY(), at.getZ() + 0.5,
+                    level.random.nextFloat() * 360.0F, 0.0F);
             level.addFreshEntity(soldier);
             outpost.reinforcements.add(soldier.getUUID());
             if (intruder != null) {
@@ -532,6 +573,7 @@ public final class HydraAlarm {
     public static void clear() {
         HOLDS.clear();
         RUN_SINCE.clear();
+        RUN_SPOT.clear();
     }
 
     /** The surface y at a point (for the road). */
