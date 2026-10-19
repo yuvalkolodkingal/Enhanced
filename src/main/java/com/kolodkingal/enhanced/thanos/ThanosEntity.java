@@ -1112,6 +1112,8 @@ public class ThanosEntity extends Monster implements BossHooks {
                 score += 1000.0;
             }
             score += 10.0 * recentDamageFrom(player.getUUID());
+            // 3.6: from his second stone on, he goes after whoever carries a real stone (lane L2).
+            score += com.kolodkingal.enhanced.stones.ThanosWants.preference(this, player);
             if (score > bestScore) {
                 bestScore = score;
                 best = player;

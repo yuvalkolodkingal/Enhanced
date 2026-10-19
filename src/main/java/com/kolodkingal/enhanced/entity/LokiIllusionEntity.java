@@ -62,7 +62,12 @@ public class LokiIllusionEntity extends PathfinderMob {
          * 3.3: a custom hero's Duplication ("clones"): it fights for its caster, the creatures that hurt him or that he hurt,
          * else the nearest monster (one hit still makes it dissolve).
          */
-        FIGHTER
+        FIGHTER,
+        /**
+         * 3.6: the Reality Stone's Illusion: a decoy that walks off while its caster is invisible, whoever its caster
+         * is (it lasts while he lives).
+         */
+        REALITY
     }
 
     /** The warm-white light an illusion dissolves into (Thor, 2011). */
@@ -174,7 +179,8 @@ public class LokiIllusionEntity extends PathfinderMob {
         if (tickCount % 10 == 0) {
             // Without its caster (gone, dead, or no longer Loki, or a custom hero who duplicates) the spell breaks.
             Player owner = owner();
-            if (owner == null || !owner.isAlive() || !Powers.get(owner).has(HeroAbility.LOKI_DUPLICATES)
+            if (owner == null || !owner.isAlive() || mode() != Mode.REALITY
+                    && !Powers.get(owner).has(HeroAbility.LOKI_DUPLICATES)
                     && CustomHeroes.pick(owner, PowerModule.DUPLICATION) == null) {
                 dissolve(null);
                 return;
@@ -253,8 +259,8 @@ public class LokiIllusionEntity extends PathfinderMob {
 
     @Override
     public boolean doHurtTarget(Entity target) {
-        // A decoy can't hurt anyone.
-        return mode() != Mode.DECOY && super.doHurtTarget(target);
+        // A decoy can't hurt anyone (3.6: nor can the Reality Stone's).
+        return mode() == Mode.FIGHTER && super.doHurtTarget(target);
     }
 
     /** A fighter's foe: whoever hurt its caster, or whom he hurt, or the nearest monster; never its caster or his friends. */
@@ -308,7 +314,7 @@ public class LokiIllusionEntity extends PathfinderMob {
 
         @Override
         public boolean canUse() {
-            return destination != null && mode() == Mode.DECOY;
+            return destination != null && mode() != Mode.FIGHTER;
         }
 
         @Override

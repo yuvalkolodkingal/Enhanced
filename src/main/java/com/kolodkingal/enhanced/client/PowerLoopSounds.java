@@ -13,8 +13,12 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
+import com.kolodkingal.enhanced.stones.GauntletContents;
+import com.kolodkingal.enhanced.stones.StoneBeams;
+import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -87,7 +91,27 @@ public final class PowerLoopSounds {
                 (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == RubyQuartzGlassesItem.OPTIC),
         /** The glasses off: the deep roar of the giant beam, for as long as it pours out. */
         CYCLOPS_UNLEASHED(ModSounds.CYCLOPS_UNLEASHED_LOOP, 1.0F, 1.0F,
-                (p, d) -> d.has(HeroAbility.CYCLOPS_GLASSES) && d.is(Live.CYCLOPS_UNLEASHED))
+                (p, d) -> d.has(HeroAbility.CYCLOPS_GLASSES) && d.is(Live.CYCLOPS_UNLEASHED)),
+
+        // ===== stones (3.6) =====
+        /** The Mind Stone's beam, whoever fires it (the stone, the Scepter, a row): Vision's hum. */
+        STONE_MIND_BEAM(ModSounds.MIND_BEAM_LOOP, 0.8F, 1.0F,
+                (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == StoneBeams.MIND),
+        /** The Power Stone's Purple Beam: a deep roar. */
+        STONE_POWER_BEAM(ModSounds.POWER_BEAM_LOOP, 0.9F, 1.0F,
+                (p, d) -> d.is(Live.BEAMING) && BeamRenderer.styleOf(p.getId()) == StoneBeams.POWER),
+        /** The low ticking under everything while a Time Stone slows time. */
+        STONE_TIME_SLOW(ModSounds.TIME_SLOW_LOOP, 0.7F, 1.0F, (p, d) -> d.is(Live.TIME_SLOWING)),
+        /** The Soul Stone's drain of anyone who is not Thanos (his has its own loop above). */
+        STONE_SOUL_DRAIN(ModSounds.SOUL_DRAIN_LOOP, 0.8F, 1.0F,
+                (p, d) -> d.is(Live.SOUL_DRAINING) && !d.has(HeroAbility.THANOS_SOUL)),
+        /** The six stones' hums, for as long as someone holds one bare (or selected in a Gauntlet). */
+        REALITY_STONE_HUM(ModSounds.REALITY_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.REALITY)),
+        POWER_STONE_HUM(ModSounds.POWER_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.POWER)),
+        TIME_STONE_HUM(ModSounds.TIME_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.TIME)),
+        SOUL_STONE_HUM(ModSounds.SOUL_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.SOUL)),
+        BARE_SPACE_STONE_HUM(ModSounds.SPACE_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.SPACE)),
+        BARE_MIND_STONE_HUM(ModSounds.MIND_STONE_HUM, STONE_HUM_VOLUME, 1.0F, (p, d) -> holdsStone(p, StoneKind.MIND))
         ;
 
         final Supplier<SoundEvent> sound;
@@ -112,6 +136,25 @@ public final class PowerLoopSounds {
     private static boolean fliesAs(Player player, PowerData data, Power hero) {
         HeroAnimState st = data.power() == Power.CUSTOM ? HeroAnimator.peek(player) : null;
         return st != null && st.flightAs == hero;
+    }
+
+    /** 3.6: whether the player holds the stone bare, or selected in a crafted Gauntlet, in either hand. */
+    private static boolean holdsStone(Player player, StoneKind kind) {
+        if (player.isSpectator()) {
+            return false;
+        }
+        for (net.minecraft.world.item.ItemStack stack : new net.minecraft.world.item.ItemStack[]{player.getMainHandItem(),
+                player.getOffhandItem()}) {
+            if (stack.is(ModItems.stone(kind))) {
+                return true;
+            }
+            GauntletContents gauntlet = stack.get(ModDataComponents.GAUNTLET.get());
+            if (stack.is(ModItems.INFINITY_GAUNTLET.get()) && gauntlet != null && !gauntlet.titan()
+                    && gauntlet.selectedStone() == kind) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Whether the player has {@code item} in either hand (not a spectator, who is only watching). */

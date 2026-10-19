@@ -85,9 +85,10 @@ public class LokisScepterItem extends Item {
 
     // The five seconds that call the Mad Titan (with the Tesseract in the other hand): see ScepterRituals.
 
+    /** (3.6: the Mind Beam's hold lasts until it is let go of; the stone ends it.) */
     @Override
     public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return ScepterRituals.HOLD_TICKS;
+        return ScepterRituals.mindBeamHold(entity) ? 72000 : ScepterRituals.HOLD_TICKS;
     }
 
     @Override
