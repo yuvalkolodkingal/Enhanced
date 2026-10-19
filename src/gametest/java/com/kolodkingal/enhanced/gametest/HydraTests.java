@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.MindLink;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Thoughts;
 import com.kolodkingal.enhanced.config.HydraConfig;
+import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.hydra.HydraAlarm;
 import com.kolodkingal.enhanced.hydra.HydraBlasterItem;
 import com.kolodkingal.enhanced.hydra.HydraBoltEntity;
@@ -27,6 +28,8 @@ import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
+import com.kolodkingal.enhanced.stones.MindStonePowers;
+import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.thanos.StonePowers;
 import com.kolodkingal.enhanced.world.HydraOutpostPlan;
 import net.minecraft.core.BlockPos;
@@ -1020,6 +1023,25 @@ public final class HydraTests {
         check(!HydraLoyalty.turn(helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 3.5)), phoenix,
                 100), "the seam turns only Hydra");
         check(HydraLoyalty.turn(b, phoenix, 100) && b.turnedTicksLeft() == 100, "the Mind Stone's command turns him");
+        helper.succeed();
+    }
+
+    /** The Mind Stone's own Command (lane L2's) turns a soldier for the command's time, as the seam above. */
+    @GameTest(template = ARENA, batch = MINDS)
+    public static void theMindStonesCommandTurnsASoldier(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer thor = StonePowerTests.holder(f, 3.5, 10.5, Power.THOR, StoneKind.MIND);
+        HydraSoldierEntity soldier = soldier(f, Rank.RIFLEMAN, 8.5, 10.5, 90.0F);
+        HydraSoldierEntity other = soldier(f, Rank.RIFLEMAN, 14.5, 10.5, 90.0F);
+        soldier.setNoAi(true);
+        other.setNoAi(true);
+        TestKit.lookAt(thor, soldier);
+        StonePowerTests.use(thor, StoneKind.MIND, true);
+        check(thor.getUUID().equals(MindStonePowers.commanderOf(soldier)), "the soldier is commanded");
+        check(HydraLoyalty.isTraitor(soldier) && soldier.turnedBy(thor), "and turned traitor for Thor");
+        check(soldier.turnedTicksLeft() == StonesConfig.MIND_COMMAND_TICKS.get(), "for the command's time");
+        check(!HydraLoyalty.sameSide(soldier, other) && AreaTargets.mayHurt(other, soldier, false),
+                "Hydra's own now count him an enemy");
         helper.succeed();
     }
 

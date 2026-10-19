@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.effect.ConfusedEffect;
+import com.kolodkingal.enhanced.hydra.HydraLoyalty;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -158,6 +159,8 @@ public final class MindStonePowers {
         player.causeFoodExhaustion(COMMAND_EXHAUSTION);
         COMMANDED.put(mob.getUUID(), new Command(player.getUUID(),
                 level.getGameTime() + StonesConfig.MIND_COMMAND_TICKS.get()));
+        // A Hydra soldier turns traitor for as long (blue eyes; Hydra's bolts and targets reach him, his reach them).
+        HydraLoyalty.turn(mob, player, StonesConfig.MIND_COMMAND_TICKS.get());
         mob.setTarget(null);
         mob.getNavigation().stop();
         ConfusedEffect.burst(level, mob);
