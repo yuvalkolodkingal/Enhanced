@@ -26,7 +26,8 @@ import java.util.Optional;
  * highest and lowest of nine points of its footprint at most this far apart, or it is not built there; all nine on dry land), and the
  * processors its blocks go through (the last one is usually {@code enhanced:foundation}, the footing where the ground
  * falls away). Never on water. 3.6: {@code enabled_by} (optional) names the {@code [stone_sites]} option that stops it
- * generating (the Sanctum's {@code sanctums}, see {@link SiteSwitch}).
+ * generating (the Sanctum's {@code sanctums}, see {@link SiteSwitch}); {@code ground} (optional, {@code median})
+ * how its ground level is taken from the nine heights ({@code highest}: the Sanctum's).
  */
 public class TemplateSiteStructure extends Structure {
     public static final MapCodec<TemplateSiteStructure> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -35,7 +36,8 @@ public class TemplateSiteStructure extends Structure {
             Codec.intRange(0, 64).fieldOf("floor").forGetter(s -> s.floor),
             Codec.intRange(0, 32).optionalFieldOf("max_slope", 4).forGetter(s -> s.maxSlope),
             StructureProcessorType.LIST_CODEC.fieldOf("processors").forGetter(s -> s.processors),
-            SiteSwitch.OPTION.optionalFieldOf("enabled_by").forGetter(s -> s.enabledBy)
+            SiteSwitch.OPTION.optionalFieldOf("enabled_by").forGetter(s -> s.enabledBy),
+            SiteSwitch.GROUND.optionalFieldOf("ground", "median").forGetter(s -> s.ground)
     ).apply(instance, TemplateSiteStructure::new));
 
     private final ResourceLocation template;
@@ -43,20 +45,22 @@ public class TemplateSiteStructure extends Structure {
     private final int maxSlope;
     private final Holder<StructureProcessorList> processors;
     private final Optional<String> enabledBy;
+    private final String ground;
 
     public TemplateSiteStructure(StructureSettings settings, ResourceLocation template, int floor, int maxSlope,
             Holder<StructureProcessorList> processors) {
-        this(settings, template, floor, maxSlope, processors, Optional.empty());
+        this(settings, template, floor, maxSlope, processors, Optional.empty(), "median");
     }
 
     public TemplateSiteStructure(StructureSettings settings, ResourceLocation template, int floor, int maxSlope,
-            Holder<StructureProcessorList> processors, Optional<String> enabledBy) {
+            Holder<StructureProcessorList> processors, Optional<String> enabledBy, String ground) {
         super(settings);
         this.template = template;
         this.floor = floor;
         this.maxSlope = maxSlope;
         this.processors = processors;
         this.enabledBy = enabledBy;
+        this.ground = ground;
     }
 
     public ResourceLocation template() {
@@ -65,6 +69,11 @@ public class TemplateSiteStructure extends Structure {
 
     public int floor() {
         return floor;
+    }
+
+    /** How its ground level is taken from the nine heights of its footprint ({@code median}, {@code highest}). */
+    public String ground() {
+        return ground;
     }
 
     @Override
@@ -104,8 +113,7 @@ public class TemplateSiteStructure extends Structure {
                 }
             }
         }
-        int ground = sorted[4];
-        BlockPos center = new BlockPos(centerX, ground, centerZ);
+        BlockPos center = new BlockPos(centerX, SiteSwitch.ground(ground, sorted), centerZ);
         return Optional.of(new GenerationStub(center.above(), builder -> builder.addPiece(
                 new TemplateSitePiece(context.structureTemplateManager(), template, processors, rotation, center, size, floor))));
     }

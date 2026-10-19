@@ -18,5 +18,6 @@
   "floor": 2,
   "max_slope": 3,
   "processors": "enhanced:avengers_tower",
-  "enabled_by": "avengersTowers"
+  "enabled_by": "avengersTowers",
+  "ground": "highest"
 }

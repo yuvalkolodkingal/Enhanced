@@ -20,6 +20,19 @@ public final class SiteSwitch {
     public static final Codec<String> OPTION = Codec.STRING.validate(name -> known(name)
             ? DataResult.success(name) : DataResult.error(() -> "no stone_sites option " + name));
 
+    /**
+     * How a site's ground level is taken from the nine heights of its footprint ({@code ground}): {@code median}
+     * (3.3's) or {@code highest} (3.6's Sanctum and tower: nothing round the building stands higher than its door; the
+     * footing fills in where the ground falls away).
+     */
+    public static final Codec<String> GROUND = Codec.STRING.validate(name -> name.equals("median")
+            || name.equals("highest") ? DataResult.success(name) : DataResult.error(() -> "no ground rule " + name));
+
+    /** The ground level of a footprint by the rule {@code ground}, from its nine heights in order. */
+    public static int ground(String rule, int[] sorted) {
+        return rule.equals("highest") ? sorted[sorted.length - 1] : sorted[sorted.length / 2];
+    }
+
     /** Whether a structure switched by {@code option} may generate now (empty: not switched, always). */
     public static boolean enabled(Optional<String> option) {
         if (option.isEmpty() || !EnhancedConfig.SPEC.isLoaded()) {

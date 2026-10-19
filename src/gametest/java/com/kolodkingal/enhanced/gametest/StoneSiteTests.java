@@ -9,7 +9,9 @@ import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.world.CarvedSiteStructure;
 import com.kolodkingal.enhanced.world.NetherSiteStructure;
+import com.kolodkingal.enhanced.world.SealProcessor;
 import com.kolodkingal.enhanced.world.SitePoints;
+import com.kolodkingal.enhanced.world.SiteSwitch;
 import com.kolodkingal.enhanced.world.StoneSitePlans;
 import com.kolodkingal.enhanced.world.TemplateSitePiece;
 import com.kolodkingal.enhanced.world.TemplateSiteStructure;
@@ -60,6 +62,7 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
@@ -266,11 +269,18 @@ public final class StoneSiteTests {
         var structures = access.registryOrThrow(Registries.STRUCTURE);
         var sets = access.registryOrThrow(Registries.STRUCTURE_SET);
         check(structures.get(Enhanced.id("sanctum")) instanceof TemplateSiteStructure s
-                && s.template().equals(StoneSitePlans.Sanctum.TEMPLATE) && s.floor() == StoneSitePlans.Sanctum.FLOOR,
-                "the Sanctum is a template site on its floor 3");
+                && s.template().equals(StoneSitePlans.Sanctum.TEMPLATE) && s.floor() == StoneSitePlans.Sanctum.FLOOR
+                && s.ground().equals("highest"),
+                "the Sanctum is a template site on its floor 3, on its highest ground");
+        check(structures.get(Enhanced.id("mutant_school")) instanceof TemplateSiteStructure school
+                && school.ground().equals("median"), "3.3's sites keep the median");
         check(structures.get(Enhanced.id("avengers_tower")) instanceof TowerSiteStructure t
                 && t.parts().equals(StoneSitePlans.Tower.PARTS) && t.partHeight() == StoneSitePlans.Tower.PART_Y[1]
-                && t.floor() == StoneSitePlans.Tower.FLOOR, "the tower stacks its three parts 32 apart, floor 2");
+                && t.floor() == StoneSitePlans.Tower.FLOOR && t.ground().equals("highest"),
+                "the tower stacks its three parts 32 apart, floor 2, on its highest ground");
+        check(SiteSwitch.ground("highest", new int[]{60, 61, 61, 62, 62, 62, 63, 63, 64}) == 64
+                && SiteSwitch.ground("median", new int[]{60, 61, 61, 62, 62, 62, 63, 63, 64}) == 62,
+                "highest: no ground round the door stands over it; median: 3.3's rule");
         check(structures.get(Enhanced.id("end_tunnel")) instanceof CarvedSiteStructure c
                 && c.template().equals(StoneSitePlans.EndTunnel.TEMPLATE), "the End tunnel is carved");
         check(structures.get(Enhanced.id("vormir_cliff")) instanceof NetherSiteStructure n
@@ -279,7 +289,7 @@ public final class StoneSiteTests {
         }
         for (Spread spread : List.of(new Spread("sanctums", 48, 16, 20161104),
                 new Spread("avengers_towers", 64, 24, 20120504), new Spread("end_tunnels", 28, 10, 20140801),
-                new Spread("vormir_cliffs", 32, 12, 20180427))) {
+                new Spread("vormir_cliffs", 20, 8, 20180427))) {
             StructureSet set = sets.get(Enhanced.id(spread.set()));
             check(set != null && set.placement() instanceof RandomSpreadStructurePlacement r
                     && r.spacing() == spread.spacing() && r.separation() == spread.separation(),
@@ -620,9 +630,15 @@ public final class StoneSiteTests {
         // lava is no floor, and no air
         check(NetherSiteStructure.floor(y -> y <= 36 ? rack : y <= 38 ? lava : y >= 127 ? rack : air, 33, 120, 8,
                 height).isEmpty(), "a lava lake over the rock is no floor");
-        // a cavern only 20 high anywhere: refused
-        check(NetherSiteStructure.floor(y -> y <= 40 || y >= 61 ? rack : air, 33, 120, 8, height).orElse(-1) == 40,
-                "(the scan stops at the first floor with headroom; the template carves the rest)");
+        // a cavern 20 high over the floor: with 20 of headroom it is taken, with 24 the next floor up is looked for
+        check(NetherSiteStructure.floor(y -> y <= 40 || y >= 61 ? rack : air, 33, 120, 20, height).orElse(-1) == 40,
+                "twenty of air over the floor is enough for headroom 20");
+        check(NetherSiteStructure.floor(y -> y <= 40 || y >= 61 ? rack : air, 33, 120, 24, height).isEmpty(),
+                "not for 24");
+        // the side room: open air round the site, no fluid
+        check(NetherSiteStructure.open(y -> y <= 41 ? rack : air, 43, 52), "open round about");
+        check(!NetherSiteStructure.open(y -> y <= 41 || y >= 50 ? rack : air, 43, 52), "a wall of rock round about");
+        check(!NetherSiteStructure.open(y -> y <= 41 ? rack : y <= 44 ? lava : air, 43, 52), "a lava lake round about");
         helper.succeed();
     }
 
@@ -648,6 +664,57 @@ public final class StoneSiteTests {
         double thin = CarvedSiteStructure.islandShare(vault, p -> p.offset(1000, 50, 1000),
                 (x, z) -> y -> y >= 54 && y <= 70 ? stone : air);
         check(thin < 0.9, "nor a thin one: " + thin);
+        helper.succeed();
+    }
+
+    /** The cradle: an empty hand takes the Tesseract (once: the cradle is empty after), a Tesseract puts it back. */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theCradleGivesItsTesseractOnce(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerLevel level = helper.getLevel();
+        BlockPos at = helper.absolutePos(new BlockPos(10, 2, 10));
+        level.setBlock(at, ModBlocks.TESSERACT_CRADLE.get().defaultBlockState().setValue(TesseractCradleBlock.FULL,
+                true), 3);
+        net.minecraft.server.level.ServerPlayer player = f.player(10.5, 2, 9.5);
+        net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(
+                net.minecraft.world.phys.Vec3.atCenterOf(at), Direction.UP, at, false);
+        level.getBlockState(at).useWithoutItem(level, player, hit);
+        check(player.getMainHandItem().is(ModItems.TESSERACT.get()), "the Tesseract is in his hand");
+        check(!level.getBlockState(at).getValue(TesseractCradleBlock.FULL), "the cradle is empty");
+        level.getBlockState(at).useWithoutItem(level, player, hit);
+        check(player.getInventory().countItem(ModItems.TESSERACT.get()) == 1, "an empty cradle gives nothing more");
+        level.getBlockState(at).useItemOn(player.getMainHandItem(), level, player,
+                net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+        check(level.getBlockState(at).getValue(TesseractCradleBlock.FULL) && player.getMainHandItem().isEmpty(),
+                "held to the empty cradle, the Tesseract is set back in it");
+        check(ModBlocks.TESSERACT_CRADLE.get().defaultBlockState().getDestroySpeed(level, at) < 0,
+                "the cradle cannot be broken");
+        helper.succeed();
+    }
+
+    /** The seal: lava beside or over a template's air becomes stone; lava under it, or beside its rock, is left. */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theSealWallsTheWorldsLavaOffTheSitesAir(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos air = helper.absolutePos(new BlockPos(10, 4, 10));
+        BlockPos rock = helper.absolutePos(new BlockPos(14, 4, 10));
+        for (BlockPos p : List.of(air.east(), air.above(), air.below(), rock.east())) {
+            level.setBlock(p, Blocks.LAVA.defaultBlockState(), 2);
+        }
+        List<StructureTemplate.StructureBlockInfo> blocks = List.of(
+                new StructureTemplate.StructureBlockInfo(air, Blocks.AIR.defaultBlockState(), null),
+                new StructureTemplate.StructureBlockInfo(rock, Blocks.BLACKSTONE.defaultBlockState(), null));
+        StructurePlaceSettings settings = new StructurePlaceSettings().setBoundingBox(
+                BoundingBox.fromCorners(air.offset(-3, -3, -3), rock.offset(3, 3, 3)));
+        List<StructureTemplate.StructureBlockInfo> out = new SealProcessor(Blocks.BLACKSTONE.defaultBlockState())
+                .finalizeProcessing(level, BlockPos.ZERO, BlockPos.ZERO, blocks, blocks, settings);
+        Set<BlockPos> sealed = new HashSet<>();
+        out.stream().skip(2).forEach(i -> sealed.add(i.pos()));
+        check(sealed.equals(Set.of(air.east(), air.above())), "the lava beside and over the air is sealed, no more: "
+                + sealed);
+        for (BlockPos p : List.of(air.east(), air.above(), air.below(), rock.east())) {
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        }
         helper.succeed();
     }
 

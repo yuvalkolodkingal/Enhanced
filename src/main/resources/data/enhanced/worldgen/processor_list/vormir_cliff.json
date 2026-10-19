@@ -1,6 +1,12 @@
 {
   "processors": [
     {
+      "processor_type": "enhanced:seal",
+      "block": {
+        "Name": "minecraft:blackstone"
+      }
+    },
+    {
       "processor_type": "enhanced:foundation",
       "block": {
         "Name": "minecraft:basalt",

@@ -28,7 +28,8 @@ import java.util.Optional;
  * part_height} the layers between two of them; each part is centred on the one under it and all are turned the same
  * way about the same column. The ground under the base is asked as for a {@link TemplateSiteStructure}: {@code floor}
  * (the base's layer at ground level: the layers under it are a cellar), {@code max_slope} (nine points of the base's
- * footprint at most this far apart, all on dry land), {@code processors} (for the base only: its footing). {@code
+ * footprint at most this far apart, all on dry land), {@code ground} (how the ground level is taken from those nine
+ * heights: {@code median} or {@code highest}), {@code processors} (for the base only: its footing). {@code
  * enabled_by}: the {@code [stone_sites]} option that stops it ({@link SiteSwitch}). One {@link TemplateSitePiece} a
  * part: the game clips each to the chunk being generated.
  */
@@ -42,7 +43,8 @@ public class TowerSiteStructure extends Structure {
             Codec.intRange(0, 64).optionalFieldOf("floor", 0).forGetter(s -> s.floor),
             Codec.intRange(0, 32).optionalFieldOf("max_slope", 4).forGetter(s -> s.maxSlope),
             StructureProcessorType.LIST_CODEC.optionalFieldOf("processors", NONE).forGetter(s -> s.processors),
-            SiteSwitch.OPTION.optionalFieldOf("enabled_by").forGetter(s -> s.enabledBy)
+            SiteSwitch.OPTION.optionalFieldOf("enabled_by").forGetter(s -> s.enabledBy),
+            SiteSwitch.GROUND.optionalFieldOf("ground", "median").forGetter(s -> s.ground)
     ).apply(instance, TowerSiteStructure::new));
 
     private final List<ResourceLocation> parts;
@@ -51,13 +53,14 @@ public class TowerSiteStructure extends Structure {
     private final int maxSlope;
     private final Holder<StructureProcessorList> processors;
     private final Optional<String> enabledBy;
+    private final String ground;
 
     public TowerSiteStructure(StructureSettings settings, List<ResourceLocation> parts, int partHeight) {
-        this(settings, parts, partHeight, 0, 4, NONE, Optional.empty());
+        this(settings, parts, partHeight, 0, 4, NONE, Optional.empty(), "median");
     }
 
     public TowerSiteStructure(StructureSettings settings, List<ResourceLocation> parts, int partHeight, int floor,
-            int maxSlope, Holder<StructureProcessorList> processors, Optional<String> enabledBy) {
+            int maxSlope, Holder<StructureProcessorList> processors, Optional<String> enabledBy, String ground) {
         super(settings);
         this.parts = List.copyOf(parts);
         this.partHeight = partHeight;
@@ -65,6 +68,7 @@ public class TowerSiteStructure extends Structure {
         this.maxSlope = maxSlope;
         this.processors = processors;
         this.enabledBy = enabledBy;
+        this.ground = ground;
     }
 
     public List<ResourceLocation> parts() {
@@ -77,6 +81,11 @@ public class TowerSiteStructure extends Structure {
 
     public int floor() {
         return floor;
+    }
+
+    /** How its ground level is taken from the nine heights of its footprint ({@code median}, {@code highest}). */
+    public String ground() {
+        return ground;
     }
 
     @Override
@@ -121,11 +130,12 @@ public class TowerSiteStructure extends Structure {
                 }
             }
         }
-        int top = sorted[4] - floor + partHeight * (parts.size() - 1) + sizes.get(sizes.size() - 1).getY();
+        int level = SiteSwitch.ground(ground, sorted);
+        int top = level - floor + partHeight * (parts.size() - 1) + sizes.get(sizes.size() - 1).getY();
         if (top > context.heightAccessor().getMaxBuildHeight()) {
             return Optional.empty();
         }
-        BlockPos center = new BlockPos(centerX, sorted[4], centerZ);
+        BlockPos center = new BlockPos(centerX, level, centerZ);
         return Optional.of(new GenerationStub(center.above(), builder -> {
             for (TemplateSitePiece piece : pieces(manager, rotation, center)) {
                 builder.addPiece(piece);

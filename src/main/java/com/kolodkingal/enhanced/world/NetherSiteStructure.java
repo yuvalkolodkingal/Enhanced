@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +28,8 @@ import java.util.function.IntFunction;
 /**
  * A site set on the floor of a tall Nether cavern (3.6, {@code enhanced:nether_site}): the Vormir Cliff. The chunk's
  * middle column is scanned from {@code from} (33: over the lava sea) upward for the first solid floor, not lava, with
- * {@code headroom} (8) layers of air over it; the template's layer 0 is set on it, unturned and centred on the column
+ * {@code headroom} (8) layers of air over it, and, with {@code side_room}, open air round it that far out on all
+ * four sides (from 3 to 8 over the floor); the template's layer 0 is set on it, unturned and centred on the column
  * (so its fixed points are its corner plus the plan's offsets). If its top would pass {@code roof} (120, under the
  * bedrock) the chunk is refused: it fits only where the floor is low. The template brings its own rock and its own air
  * (outside the rock it is void: the cavern stays); {@code processors} (its footing, where the floor falls away). {@code
@@ -43,6 +45,7 @@ public class NetherSiteStructure extends Structure {
             Codec.intRange(0, 256).optionalFieldOf("from", 33).forGetter(s -> s.from),
             Codec.intRange(0, 256).optionalFieldOf("roof", 120).forGetter(s -> s.roof),
             Codec.intRange(1, 64).optionalFieldOf("headroom", 8).forGetter(s -> s.headroom),
+            Codec.intRange(0, 64).optionalFieldOf("side_room", 0).forGetter(s -> s.sideRoom),
             SiteSwitch.OPTION.optionalFieldOf("enabled_by").forGetter(s -> s.enabledBy)
     ).apply(instance, NetherSiteStructure::new));
 
@@ -51,20 +54,23 @@ public class NetherSiteStructure extends Structure {
     private final int from;
     private final int roof;
     private final int headroom;
+    private final int sideRoom;
     private final Optional<String> enabledBy;
 
     public NetherSiteStructure(StructureSettings settings, ResourceLocation template) {
-        this(settings, template, NONE, 33, 120, 8, Optional.empty());
+        this(settings, template, NONE, 33, 120, 8, 0, Optional.empty());
     }
 
     public NetherSiteStructure(StructureSettings settings, ResourceLocation template,
-            Holder<StructureProcessorList> processors, int from, int roof, int headroom, Optional<String> enabledBy) {
+            Holder<StructureProcessorList> processors, int from, int roof, int headroom, int sideRoom,
+            Optional<String> enabledBy) {
         super(settings);
         this.template = template;
         this.processors = processors;
         this.from = from;
         this.roof = roof;
         this.headroom = headroom;
+        this.sideRoom = sideRoom;
         this.enabledBy = enabledBy;
     }
 
@@ -88,6 +94,17 @@ public class NetherSiteStructure extends Structure {
         OptionalInt floor = floor(column::getBlock, from, roof, headroom, size.getY());
         if (floor.isEmpty()) {
             return Optional.empty();
+        }
+        if (sideRoom > 0) {
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                NoiseColumn around = context.chunkGenerator().getBaseColumn(
+                        chunk.getMiddleBlockX() + side.getStepX() * sideRoom,
+                        chunk.getMiddleBlockZ() + side.getStepZ() * sideRoom, context.heightAccessor(),
+                        context.randomState());
+                if (!open(around::getBlock, floor.getAsInt() + 3, floor.getAsInt() + 8)) {
+                    return Optional.empty();
+                }
+            }
         }
         BlockPos center = new BlockPos(chunk.getMiddleBlockX(), floor.getAsInt() + 1, chunk.getMiddleBlockZ());
         return Optional.of(new GenerationStub(center, builder -> builder.addPiece(
@@ -120,6 +137,17 @@ public class NetherSiteStructure extends Structure {
             }
         }
         return OptionalInt.empty();
+    }
+
+    /** Whether a column is open air (no fluid) from {@code from} to {@code to}: the cavern goes on round the site. */
+    public static boolean open(IntFunction<BlockState> column, int from, int to) {
+        for (int y = from; y <= to; y++) {
+            BlockState state = column.apply(y);
+            if (!state.isAir() || !state.getFluidState().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

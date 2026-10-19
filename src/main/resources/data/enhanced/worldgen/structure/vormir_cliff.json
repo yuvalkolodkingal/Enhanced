@@ -11,5 +11,7 @@
   },
   "template": "enhanced:vormir/cliff",
   "processors": "enhanced:vormir_cliff",
-  "enabled_by": "vormirCliffs"
+  "enabled_by": "vormirCliffs",
+  "headroom": 12,
+  "side_room": 12
 }
