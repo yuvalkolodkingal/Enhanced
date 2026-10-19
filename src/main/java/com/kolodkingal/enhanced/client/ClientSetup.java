@@ -130,6 +130,8 @@ public final class ClientSetup {
             // ===== healing (3.7) =====
             com.kolodkingal.enhanced.client.healing.HealingClient.setup();
             // ===== wolverine (3.7) =====
+            com.kolodkingal.enhanced.client.wolverine.WolverineEffects.register();
+            com.kolodkingal.enhanced.client.wolverine.ScentView.register();
             // ===== deadpool (3.7) =====
             // ===== school_lab (3.7) =====
             com.kolodkingal.enhanced.client.school.LabClient.setup();
@@ -393,6 +395,8 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.hulk.HulkLayers.InhibitorBand(renderer));
                 // ===== healing (3.7) =====
                 // ===== wolverine (3.7) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.wolverine.ClawLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.WolverineCowlLayer(renderer));
                 // ===== deadpool (3.7) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
@@ -471,6 +475,9 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("healing"),
                 new com.kolodkingal.enhanced.client.healing.HealingHud());
         // ===== wolverine (3.7) =====
+        // (The Rage's red edge and the injection's silver flash.)
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("wolverine"),
+                new com.kolodkingal.enhanced.client.wolverine.WolverineHud());
         // ===== deadpool (3.7) =====
         // ===== school_lab (3.7) =====
         // the lift's doors closing and opening on the rider's screen

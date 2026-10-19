@@ -51,8 +51,10 @@ public enum RunCharacter {
     /**
      * The Hulk (3.6): a heavy lope, the arms swinging wide, a deep lean into the sprint, a bob that shakes the ground.
      */
-    HULK(1.15F, 1.50F, 1.15F, 12, 7, 0.040F)
+    HULK(1.15F, 1.50F, 1.15F, 12, 7, 0.040F),
     // ===== wolverine (3.7) =====
+    /** Wolverine (3.7): a low, forward-leaning sprint, the arms held back, a quick hard bob. */
+    WOLVERINE(1.0F, 0.75F, 1.30F, 16, 5, 0.025F),
     // ===== deadpool (3.7) =====
     ;
 
@@ -94,6 +96,7 @@ public enum RunCharacter {
             case HELA -> HELA; // (3.5)
             case DOCTOR_STRANGE -> DOCTOR_STRANGE; // (3.6)
             case HULK -> HULK; // (3.6; Bruce Banner walks as anyone: RunPoses)
+            case WOLVERINE -> WOLVERINE; // (3.7)
             default -> DEFAULT;
         };
     }

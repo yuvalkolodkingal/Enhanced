@@ -405,8 +405,38 @@ public enum GestureId {
     /** Up again: a shake of the head, the shoulders rolled back. */
     HEALING_RISE(Group.CAST, 18, 3, 6, false),
     /** The Healing Burst: the arms flung wide, the chest up, the head back, as the shimmer runs through him. */
-    HEALING_BURST(Group.CAST, 18, 2, 6, true)
+    HEALING_BURST(Group.CAST, 18, 2, 6, true),
     // ===== wolverine (3.7) =====
+    // (The claws' out and in are the toggle's routes; the rest are started by the payloads of his moves, which name
+    // him, and his two states by his plug-in's liveGesture: WolverineClient.)
+    /** The claws come out (G): the fists brought up before the chest, a jolt as the blades shoot. */
+    WOLVERINE_SNIKT(Group.CAST, 12, 1, 5, false),
+    /** The claws go back in: the fists lowered, a short shake of the hands. */
+    WOLVERINE_SHINK(Group.CAST, 10, 1, 5, false),
+    /** The Claw Slash's first hit (R): the main hand high, then down and across. */
+    WOLVERINE_SLASH_1(Group.CAST, 10, 1, 5, true),
+    /** The second hit: the other hand, the mirror of the first. */
+    WOLVERINE_SLASH_2(Group.CAST, 10, 1, 5, true),
+    /** The third hit: both hands crossed high, then torn apart: the cross-slash. */
+    WOLVERINE_SLASH_3(Group.CAST, 14, 1, 6, true),
+    /** The Spin Slash (Sneak + R): both arms out, one full turn. */
+    WOLVERINE_SPIN(Group.CAST, 14, 1, 4, true),
+    /** The Pounce's crouch (V): low, the arms drawn back, the weight on the toes. */
+    WOLVERINE_POUNCE_CROUCH(Group.CAST, 6, 1, 2, true),
+    /** In the air: the claws forward, the knees tucked. */
+    WOLVERINE_POUNCE_AIR(Group.CAST, 14, 1, 3, true),
+    /** The stab: both claws driven down into the prey, a crouched landing. */
+    WOLVERINE_POUNCE_STAB(Group.CAST, 14, 1, 6, true),
+    /** The Feral Leap (Sneak + V): a long running stride into the air, one arm forward. */
+    WOLVERINE_FERAL_LEAP(Group.CAST, 14, 1, 5, true),
+    /** The Berserker Rage (B): the head thrown back, the arms wide, a roar. */
+    WOLVERINE_BERSERK_ROAR(Group.CAST, 30, 3, 8, true),
+    /** The Sniff (N): the chin up, the head turning one way and the other. */
+    WOLVERINE_SNIFF(Group.CAST, 30, 3, 6, false),
+    /** Track (Sneak + N): the head down a moment, then the hand points the way. */
+    WOLVERINE_TRACK(Group.CAST, 16, 2, 5, false),
+    /** Claw Climb on (Sneak + G): a claw hooked high, then the other. */
+    WOLVERINE_CLIMB(Group.CAST, 12, 1, 4, false),
     // ===== deadpool (3.7) =====
     // (3.7: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
     // AnimationMathTests wants keys for every gesture.)

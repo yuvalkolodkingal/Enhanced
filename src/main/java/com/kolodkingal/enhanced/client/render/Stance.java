@@ -121,9 +121,15 @@ public enum Stance {
     /** The Hulk enraged: the arms out and forward, the fists clenched, the chest heaving. */
     HULK_ENRAGED(3.0F, 6.0F, false),
     /** In the air on a leap: the knees tucked, the arms up. */
-    HULK_AIR(2.0F, 3.0F, true)
+    HULK_AIR(2.0F, 3.0F, true),
     // ===== healing (3.7) =====
     // ===== wolverine (3.7) =====
+    /** Wolverine with the claws out: a low guard, the fists a little forward and out. */
+    WOLVERINE_CLAWS(3.0F, 4.0F, false),
+    /** In the Berserker Rage: hunched, the claws wide, the chest heaving. */
+    WOLVERINE_BERSERK(3.0F, 6.0F, false),
+    /** Claw Climb on a wall: the claws hooking in turn above his head. */
+    WOLVERINE_CLIMBING(2.0F, 3.0F, true),
     // ===== deadpool (3.7) =====
     ;
 

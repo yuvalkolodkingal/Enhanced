@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#F2C230",
+  "glow": "#D9DEE3",
+  "look": {
+    "base": "wolverine/classic",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "wolverine.slash",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "wolverine.claws",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "wolverine.pounce",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "wolverine.berserker",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "wolverine.senses",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "wolverine.body",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "wolverine.slash",
+    "wolverine.claws",
+    "wolverine.pounce",
+    "wolverine.berserker",
+    "wolverine.senses"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "auto",
+    "idle": "ready"
+  },
+  "preset": {
+    "icon": "minecraft:iron_sword",
+    "hero": "wolverine"
+  }
+}
