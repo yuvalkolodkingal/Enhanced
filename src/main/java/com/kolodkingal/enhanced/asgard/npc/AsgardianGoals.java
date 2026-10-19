@@ -40,7 +40,11 @@ import java.util.UUID;
  * both states, and the other follows by his own goal of the same kind.
  */
 final class AsgardianGoals {
-    /** How many ticks at least between two path computations of an idle goal. */
+    /**
+     * How many ticks at least between two path computations of an idle goal. Every "every N ticks" gate here counts
+     * {@code tickCount + id}: a mob asks its goals (and ticks most running ones) only on ticks where that sum is even
+     * ({@code Mob.serverAiStep}), so a gate on {@code tickCount} alone never opens for half of the residents.
+     */
     static final int REPATH = 20;
 
     private AsgardianGoals() {
@@ -188,7 +192,7 @@ final class AsgardianGoals {
 
         @Override
         public boolean canUse() {
-            if (npc.role() != Role.CITIZEN || npc.state().still() || npc.tickCount % 10 != 0) {
+            if (npc.role() != Role.CITIZEN || npc.state().still() || (npc.tickCount + npc.getId()) % 10 != 0) {
                 return false;
             }
             LivingEntity danger = danger();
@@ -292,7 +296,7 @@ final class AsgardianGoals {
         public boolean canUse() {
             BlockPos home = npc.activeHome();
             if (home == null || npc.leader() != null || patroller(npc) || npc.getTarget() != null || npc.state().still()
-                    || npc.state() == NpcState.TALKING || npc.tickCount % 20 != 0) {
+                    || npc.state() == NpcState.TALKING || (npc.tickCount + npc.getId()) % 20 != 0) {
                 return false;
             }
             double far = npc.homeRadius() + 8.0;
@@ -475,7 +479,7 @@ final class AsgardianGoals {
 
         @Override
         public boolean canUse() {
-            if (npc.tickCount % 20 != 0) {
+            if ((npc.tickCount + npc.getId()) % 20 != 0) {
                 return npc.state() == NpcState.SLEEPING;
             }
             if (awake(npc) || npc.home() == null) {
@@ -790,7 +794,7 @@ final class AsgardianGoals {
             }
             npc.getLookControl().setLookAt(other, 30.0F, 30.0F);
             if (npc.distanceToSqr(other) > 6.0) {
-                if (npc.tickCount % REPATH == 0) {
+                if ((npc.tickCount + npc.getId()) % REPATH == 0) {
                     npc.getNavigation().moveTo(other, 0.5);
                 }
             } else {
