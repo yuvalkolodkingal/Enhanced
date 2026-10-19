@@ -51,6 +51,8 @@ import java.util.UUID;
 public class DogpoolEntity extends Wolf {
     /** The game time he goes home at. */
     private long until = Long.MAX_VALUE;
+    /** He is going home by his own rules (a poof): the one discard he takes on a server without animals. */
+    private boolean leaving;
 
     public DogpoolEntity(EntityType<? extends Wolf> type, Level level) {
         super(type, level);
@@ -121,6 +123,7 @@ public class DogpoolEntity extends Wolf {
                 at.z, 12, 0.35, 0.3, 0.35, 0.0);
         server.playSound(null, at.x, at.y, at.z, ModSounds.DOGPOOL_POOF.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
         DeadpoolAbilities.send(server, this, DeadpoolFxPayload.DOGPOOL_OUT, List.of(at), 0);
+        leaving = true;
         if (getOwner() instanceof ServerPlayer owner) {
             DeadpoolState state = DeadpoolAbilities.data(owner);
             if (state.dogpool().isPresent() && state.dogpool().get().equals(getUUID())) {
@@ -132,6 +135,20 @@ public class DogpoolEntity extends Wolf {
             }
         }
         discard();
+    }
+
+    /**
+     * A server with {@code spawn-animals=false} discards every animal each tick (vanilla's {@code
+     * ServerLevel.shouldDiscardEntity}); Dogpool is a summoned companion, not a spawned animal, so there he is discarded
+     * only when he poofs. (Unloading, {@code /kill} and death are other removals and go through.)
+     */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (reason == RemovalReason.DISCARDED && !leaving && level() instanceof ServerLevel server
+                && !server.getServer().isSpawningAnimals()) {
+            return;
+        }
+        super.remove(reason);
     }
 
     // ---- what he is not: a pet anyone may sit, feed, breed or lead ----

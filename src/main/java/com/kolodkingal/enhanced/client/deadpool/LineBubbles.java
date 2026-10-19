@@ -107,20 +107,24 @@ public final class LineBubbles {
             Matrix4f matrix = stack.last().pose();
             int paper = Math.round(a * 235.0F) << 24 | PAPER;
             int ink = Math.max(5, Math.round(a * 255.0F)) << 24 | INK;
+            int faint = Math.max(5, Math.round(a * 90.0F)) << 24 | INK;
             int lineHeight = font.lineHeight + 1;
             float top = -lineHeight * lines.size();
             for (int i = 0; i < lines.size(); i++) {
                 FormattedCharSequence line = lines.get(i);
                 float x = -font.width(line) / 2.0F;
                 float y = top + i * lineHeight;
-                // The bubble: a white band behind each line (wide enough for the widest), the words on it.
-                font.drawInBatch(line, x, y, ink, false, matrix, buffers, Font.DisplayMode.NORMAL, paper,
+                // The bubble as a name tag is drawn: the white band (and faint words) seen through everything, which
+                // writes no depth, then the words on it.
+                font.drawInBatch(line, x, y, faint, false, matrix, buffers, Font.DisplayMode.SEE_THROUGH, paper,
+                        LightTexture.FULL_BRIGHT);
+                font.drawInBatch(line, x, y, ink, false, matrix, buffers, Font.DisplayMode.NORMAL, 0,
                         LightTexture.FULL_BRIGHT);
             }
             // The tail, pointing down at his head.
             FormattedCharSequence tail = Component.literal("▼").getVisualOrderText();
             font.drawInBatch(tail, -font.width(tail) / 2.0F, 0.0F, Math.round(a * 235.0F) << 24 | PAPER, false,
-                    matrix, buffers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                    matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
         }
         buffers.endBatch();
     }
