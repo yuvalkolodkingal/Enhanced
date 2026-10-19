@@ -1,7 +1,6 @@
 package com.kolodkingal.enhanced.deadpool;
 
 import com.kolodkingal.enhanced.config.DeadpoolConfig;
-import com.kolodkingal.enhanced.config.HealingConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingBurst;
 import com.kolodkingal.enhanced.network.DeadpoolFxPayload;
@@ -109,7 +108,7 @@ public final class Taunt {
         ItemStack snack = chimichanga(player);
         boolean eats = !snack.isEmpty();
         double fraction = eats ? DeadpoolAbilities.cfg(DeadpoolConfig.CHIMICHANGA_FRACTION, 1.0)
-                : DeadpoolAbilities.cfg(HealingConfig.BURST_FRACTION, 0.5);
+                : HealingBurst.fraction();
         if (!HealingBurst.burst(player, fraction)) {
             return false; // (refused, poisoned: the burst said so; nothing eaten, nothing waits)
         }
@@ -126,7 +125,7 @@ public final class Taunt {
             DeadpoolAbilities.send(level, player, DeadpoolFxPayload.EAT, List.of(player.position()), 0);
         }
         state.breakReadyAt = now + DeadpoolAbilities.scaled(data, HeroAbility.DEADPOOL_CHIMICHANGA,
-                DeadpoolAbilities.cfg(HealingConfig.BURST_COOLDOWN, 400));
+                HealingBurst.cooldown());
         return true;
     }
 
