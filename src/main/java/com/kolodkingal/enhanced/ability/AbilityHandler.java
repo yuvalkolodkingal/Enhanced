@@ -65,6 +65,10 @@ public final class AbilityHandler {
         if (down && MindLink.isHost(player)) {
             return;
         }
+        // 3.7: a healer who is DOWN (healing/Downed) does nothing until he rises. (A release still goes through.)
+        if (down && com.kolodkingal.enhanced.healing.HealingFactor.isDown(player)) {
+            return;
+        }
         // Drained by Agatha (3.3): the power is hers for a while. (A release still goes through.)
         if (down && player.hasEffect(ModEffects.DRAINED)) {
             player.displayClientMessage(Component.translatable("message.enhanced.agatha.you_are_drained"), true);
