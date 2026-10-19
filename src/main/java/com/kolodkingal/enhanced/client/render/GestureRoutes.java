@@ -564,7 +564,9 @@ public final class GestureRoutes {
             // ===== healing (3.7) =====
             // (Until each lane of 3.7 gives its states a gesture or a reason of their own; not the 3.0 pending marker,
             // which fails a release.)
-            case HEALING_DOWN -> "pending: the healing lane (L1 of 3.7) acts it (the shared HEALING_DOWN pose)";
+            case HEALING_DOWN -> "the healing factor's payload plays HEALING_DOWN for every healer (to one knee,"
+                    + " onto his side), held while the state lasts; when it ends he gets up and HEALING_RISE follows"
+                    + " (client/healing/HealingClient)";
             // ===== wolverine (3.7) =====
             // (Both have gestures of his own, from his plug-in: WolverineClient.liveGesture.)
             case WOLVERINE_BERSERK, WOLVERINE_POUNCING -> null;
@@ -586,6 +588,10 @@ public final class GestureRoutes {
             // Let go of what telekinesis held; the snap of a shield that comes up at once; Thor setting Mjolnir down on
             // someone (a payload: nothing in his data changes but his empty hand).
             case TK_RELEASE, WANDA_SHIELD_SNAP, THOR_PIN -> true;
+            // ===== healing (3.7) =====
+            // (Every healer's: the healing factor's payloads and the end of the DOWN state start them,
+            // client/healing/HealingClient.)
+            case HEALING_DOWN, HEALING_RISE, HEALING_BURST -> true;
             default -> false;
         };
     }

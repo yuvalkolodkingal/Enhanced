@@ -396,6 +396,16 @@ public enum GestureId {
     /** Switch Hulk (Sneak + N): a flex in a green shimmer. */
     HULK_SWITCH(Group.CAST, 20, 2, 6, true),
     // ===== healing (3.7) =====
+    /**
+     * A healer goes DOWN: to one knee, a hand to the ground, then onto his side; held there while he is DOWN (the
+     * client holds it, {@code client/healing/HealingClient}), then he pushes himself up and stands. Its own group (the
+     * landings'), so the CAST gestures of his keys never cut it short.
+     */
+    HEALING_DOWN(Group.LAND, 44, 2, 20, true),
+    /** Up again: a shake of the head, the shoulders rolled back. */
+    HEALING_RISE(Group.CAST, 18, 3, 6, false),
+    /** The Healing Burst: the arms flung wide, the chest up, the head back, as the shimmer runs through him. */
+    HEALING_BURST(Group.CAST, 18, 2, 6, true),
     // ===== wolverine (3.7) =====
     // (The claws' out and in are the toggle's routes; the rest are started by the payloads of his moves, which name
     // him, and his two states by his plug-in's liveGesture: WolverineClient.)

@@ -33,13 +33,13 @@ import java.util.List;
  * The Adamantium Injection (3.7): a thick steel syringe of liquid adamantium from the lab's Weapon X rack. Hold
  * right-click for {@code [adamantium_injection] holdTicks} (three seconds, the arm held out as for the Mutant Cure):
  * silver motes are drawn into the arm, and at the end the injection is used up (kept in Creative) and a powerless
- * player is Wolverine: the screen flashes silver, a deep "snikt", the title, and he wakes with the claws out for two seconds.
- * Letting go early, swapping slots or dying changes nothing.
+ * player is Wolverine: the screen flashes silver, a deep "snikt", the title, and he wakes with the claws out for two
+ * seconds. Letting go early, swapping slots or dying changes nothing.
  *
  * <p>A hero is refused at the first click, with nothing used up ({@code heroesRefused}, the default: "The
  * adamantium needs a body that can heal. Take the Mutant Cure first."; Deadpool hears a word of his own); with {@code
- * heroesRefused} off the injection replaces his power, as {@code /enhanced power set} would. Only on yourself: never on another
- * player.
+ * heroesRefused} off the injection replaces his power, as {@code /enhanced power set} would. Only on yourself: never
+ * on another player.
  */
 public class AdamantiumInjectionItem extends Item {
     /** The silver of the motes, and the liquid's highlight. */

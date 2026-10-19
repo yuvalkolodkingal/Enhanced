@@ -39,9 +39,9 @@ import java.util.UUID;
  * Leap is the long low running leap: {@link #FERAL_DISTANCE} ahead, {@link #FERAL_HEIGHT} up. No fall damage from
  * either.
  *
- * <p>His flight follows a path: every tick his motion is set to carry him to the path's next point (the server's word on
- * a player's motion, as the Hulk's leap), so he lands where it was aimed whatever the client, the load or a test does;
- * a wall stops him and he drops from there.
+ * <p>His flight follows a path: every tick his motion is set to carry him to the path's next point (the server's word
+ * on a player's motion, as the Hulk's leap), so he lands where it was aimed whatever the client, the load or a test
+ * does; a wall stops him and he drops from there.
  */
 public final class Pounce {
     /** The crouch before the pounce (ticks), and its flight. */

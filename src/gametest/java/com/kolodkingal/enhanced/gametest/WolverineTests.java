@@ -324,7 +324,7 @@ public final class WolverineTests {
         Husk first = husk(helper, 5.0, 10.5);
         Husk second = husk(helper, 5.8, 11.3);
         Husk third = husk(helper, 5.8, 9.7);
-        Husk fourth = husk(helper, 6.0, 11.0);
+        Husk fourth = husk(helper, 6.6, 10.5);
         ClawSlash.slash(logan, data(logan));
         step(helper, 10, () -> {
             ClawSlash.slash(logan, data(logan));

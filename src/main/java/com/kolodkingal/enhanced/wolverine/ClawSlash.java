@@ -52,8 +52,8 @@ public final class ClawSlash {
         int hit = state.combo < 0 || now - state.lastSlash > reset ? 0 : (state.combo + 1) % 3;
         state.combo = hit;
         state.lastSlash = now;
-        int gap = Berserker.raging(player) ? Berserker.RAGE_SLASH_GAP : WolverineAbilities.cfg(WolverineConfig.SLASH_GAP,
-                10);
+        int gap = Berserker.raging(player) ? Berserker.RAGE_SLASH_GAP
+                : WolverineAbilities.cfg(WolverineConfig.SLASH_GAP, 10);
         state.nextSlash = now + gap;
         Claws.popOut(player, data);
         ServerLevel level = player.serverLevel();

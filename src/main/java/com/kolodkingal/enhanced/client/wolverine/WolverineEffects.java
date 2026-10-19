@@ -106,7 +106,8 @@ public final class WolverineEffects {
                 if (!wall.isAir()) {
                     for (int i = 0; i < 6; i++) {
                         level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, wall), face.x, him.y + 1.4
-                                + r.nextDouble() * 0.4, face.z, r.nextGaussian() * 0.05, -0.05, r.nextGaussian() * 0.05);
+                                + r.nextDouble() * 0.4, face.z, r.nextGaussian() * 0.05, -0.05,
+                                r.nextGaussian() * 0.05);
                     }
                 }
                 level.addParticle(ParticleTypes.CRIT, face.x, him.y + 1.6, face.z, 0, 0, 0);

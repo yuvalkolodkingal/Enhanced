@@ -1,9 +1,7 @@
 package com.kolodkingal.enhanced.wolverine;
 
-import com.kolodkingal.enhanced.config.HealingConfig;
 import com.kolodkingal.enhanced.config.WolverineConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
-import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -26,9 +24,8 @@ import java.util.List;
  * berserkTiredTicks} 100. Its cooldown is {@code berserkCooldown} 900. The state is {@link WolverineState#berserkUntil}
  * (synced to him, saved, not kept on death); others see {@code Live.WOLVERINE_BERSERK}.
  *
- * <p>The doubled healing: the healing factor's own regeneration is lane L1's; the Rage adds once more the factor's
- * always-on rate ({@code regenPerSecond}) for each step of {@code berserkRegenFactor} above 1, while the factor is
- * active (never while poisoned).
+ * <p>The doubled healing is the healing factor's own ({@code healing/Regeneration} reads {@code
+ * Live.WOLVERINE_BERSERK} and {@code berserkRegenFactor}).
  */
 public final class Berserker {
     /** The gap between two slashes in the Rage (ticks). */
@@ -79,7 +76,6 @@ public final class Berserker {
         boolean raging = raging(player);
         modifiers(player, raging);
         if (raging) {
-            regenerate(player, now);
             if (now % 60 == 0) {
                 ServerLevel level = player.serverLevel();
                 WolverineAbilities.sound(level, player.position(), ModSounds.WOLVERINE_GROWL.get(), 0.7F,
@@ -99,19 +95,6 @@ public final class Berserker {
         }
         WolverineAbilities.send(player.serverLevel(), player, WolverineFxPayload.BERSERK_OFF,
                 List.of(player.position()), 0);
-    }
-
-    /** The Rage's extra healing: once more the factor's always-on rate per step of the factor above 1. */
-    private static void regenerate(ServerPlayer player, long now) {
-        if (now % 10 != 0 || !HealingFactor.active(player) || player.getHealth() >= player.getMaxHealth()) {
-            return;
-        }
-        double factor = WolverineAbilities.cfg(WolverineConfig.BERSERK_REGEN_FACTOR, 2.0);
-        double perSecond = WolverineAbilities.loaded() ? HealingConfig.REGEN_PER_SECOND.get() : 1.0;
-        float amount = (float) (perSecond * (factor - 1.0) / 2.0);
-        if (amount > 0.0F) {
-            player.heal(amount);
-        }
     }
 
     /** The Rage's speed, strength and weight on him, or none of them. */

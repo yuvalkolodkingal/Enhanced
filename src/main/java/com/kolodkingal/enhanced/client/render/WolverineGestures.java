@@ -10,10 +10,10 @@ import static com.kolodkingal.enhanced.client.render.AnimMath.Ease.S;
 import static com.kolodkingal.enhanced.client.render.Gestures.define;
 
 /**
- * The keys of Wolverine's gestures (3.7): quick and low, a brawler's weight on the balls of his feet. The keys are timed
- * to the server's moves: a slash strikes at once (its keys cut across at tick 3), the spin turns once over 10 ticks,
- * the Pounce crouches {@code Pounce.CROUCH} 4 ticks before it flies {@code Pounce.FLIGHT} 12, the claws come out over
- * {@code Claws.OUT_TICKS} 3. Pure data (no Minecraft client classes), so the game tests can check it.
+ * The keys of Wolverine's gestures (3.7): quick and low, a brawler's weight on the balls of his feet. The keys are
+ * timed to the server's moves: a slash strikes at once (its keys cut across at tick 3), the spin turns once over 10
+ * ticks, the Pounce crouches {@code Pounce.CROUCH} 4 ticks before it flies {@code Pounce.FLIGHT} 12, the claws come out
+ * over {@code Claws.OUT_TICKS} 3. Pure data (no Minecraft client classes), so the game tests can check it.
  */
 public final class WolverineGestures {
     /** The arms at rest: {@code M}, then {@code O}. */
@@ -141,7 +141,8 @@ public final class WolverineGestures {
             case WolverineFxPayload.SLASH -> arg == 0 ? GestureId.WOLVERINE_SLASH_1 : arg == 1
                     ? GestureId.WOLVERINE_SLASH_2 : GestureId.WOLVERINE_SLASH_3;
             case WolverineFxPayload.SPIN -> GestureId.WOLVERINE_SPIN;
-            case WolverineFxPayload.POUNCE -> arg == 0 ? GestureId.WOLVERINE_POUNCE_AIR : GestureId.WOLVERINE_FERAL_LEAP;
+            case WolverineFxPayload.POUNCE -> arg == 0 ? GestureId.WOLVERINE_POUNCE_AIR
+                    : GestureId.WOLVERINE_FERAL_LEAP;
             case WolverineFxPayload.POUNCE_HIT -> arg > 0 ? GestureId.WOLVERINE_POUNCE_STAB : null;
             case WolverineFxPayload.SNIFF -> GestureId.WOLVERINE_SNIFF;
             default -> null;

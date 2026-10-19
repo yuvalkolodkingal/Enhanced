@@ -3,7 +3,6 @@ package com.kolodkingal.enhanced.wolverine;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
-import com.kolodkingal.enhanced.config.HealingConfig;
 import com.kolodkingal.enhanced.config.WolverineConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingBurst;
@@ -43,11 +42,12 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Wolverine (3.7): Logan, the mutant whose healing factor let Weapon X bond adamantium to his bones and his claws. The
- * plug-in is {@link WolverineServer}; his claws are {@link Claws}, the R combo and the spin {@link ClawSlash}, the leaps
- * {@link Pounce}, the Rage {@link Berserker}, the nose {@link Senses}, the climb {@link ClawClimb}, the weight of his
- * bones in water {@link Adamantium}; the damage, item and fall hooks {@link WolverineEvents}. His healing factor is the
- * shared one of {@code healing/} (lane L1): this hero only calls its Healing Burst and doubles it in the Rage.
+ * Wolverine (3.7): Logan, the mutant whose healing factor let Weapon X bond adamantium to his bones and his claws.
+ * The plug-in is {@link WolverineServer}; his claws are {@link Claws}, the R combo and the spin {@link ClawSlash}, the
+ * leaps {@link Pounce}, the Rage {@link Berserker}, the nose {@link Senses}, the climb {@link ClawClimb}, the weight of
+ * his bones in water {@link Adamantium}; the damage, item and fall hooks {@link WolverineEvents}. His healing factor is
+ * the shared one of {@code healing/} (lane L1): this hero calls its Healing Burst; its
+ * regeneration reads the Rage's bit.
  *
  * <p>R is the Claw Slash (Sneak: the Spin Slash), G the Claws out and in (Sneak: Claw Climb), V the Pounce (Sneak: the
  * Feral Leap), B the Berserker Rage (Sneak: the Healing Burst), N the Sniff (Sneak: Track). 3.4's rules from birth:
@@ -203,12 +203,10 @@ public final class WolverineAbilities {
         if (!data.has(HeroAbility.WOLVERINE_HEALING_BURST) || !data.isReady(HeroAbility.WOLVERINE_HEALING_BURST, now)) {
             return false;
         }
-        double fraction = loaded() ? HealingConfig.BURST_FRACTION.get() : 0.5;
-        if (!HealingBurst.burst(player, fraction)) {
+        if (!HealingBurst.burst(player, HealingBurst.fraction())) {
             return false;
         }
-        data.startCooldown(HeroAbility.WOLVERINE_HEALING_BURST, now, loaded() ? HealingConfig.BURST_COOLDOWN.get()
-                : 400);
+        data.startCooldown(HeroAbility.WOLVERINE_HEALING_BURST, now, HealingBurst.cooldown());
         return true;
     }
 

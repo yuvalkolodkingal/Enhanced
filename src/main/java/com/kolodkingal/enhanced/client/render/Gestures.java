@@ -449,6 +449,8 @@ public final class Gestures {
         WitchGestures.register();
         SpeedGestures.register();
         AsgardGestures.register();
+        // ===== healing (3.7): the healing factor's gestures, shared by every healer =====
+        com.kolodkingal.enhanced.client.healing.HealingGestures.register();
         HeroClients.registerGestures();
     }
 

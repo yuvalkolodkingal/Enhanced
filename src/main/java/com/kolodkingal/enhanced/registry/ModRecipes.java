@@ -39,8 +39,9 @@ public final class ModRecipes {
      * ({@code enhanced:adamantium_injection}; lane L2).
      */
     public static final DeferredHolder<RecipeSerializer<?>,
-            com.kolodkingal.enhanced.wolverine.InjectionRecipe.Serializer> ADAMANTIUM_INJECTION = SERIALIZERS.register("adamantium_injection",
-            com.kolodkingal.enhanced.wolverine.InjectionRecipe.Serializer::new);
+            com.kolodkingal.enhanced.wolverine.InjectionRecipe.Serializer> ADAMANTIUM_INJECTION =
+            SERIALIZERS.register("adamantium_injection",
+                    com.kolodkingal.enhanced.wolverine.InjectionRecipe.Serializer::new);
 
     // ===== finders (3.7) =====
     /** The Stone Locator's shaped recipe, the core given back ({@code enhanced:stone_locator}; lane L5). */
