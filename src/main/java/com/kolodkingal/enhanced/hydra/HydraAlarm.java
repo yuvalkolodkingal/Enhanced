@@ -308,6 +308,12 @@ public final class HydraAlarm {
             return false;
         }
         long now = level.getGameTime();
+        if (outpost.silenced(now)) {
+            // already off (a held button keeps clicking after it went off): say so, start nothing
+            HOLDS.remove(player.getUUID());
+            player.displayClientMessage(Component.translatable("message.enhanced.hydra.alarm_off"), true);
+            return true;
+        }
         long[] hold = HOLDS.get(player.getUUID());
         if (hold == null || hold[0] != outpost.key() || now - hold[2] > 10) {
             hold = new long[]{outpost.key(), now, now};
