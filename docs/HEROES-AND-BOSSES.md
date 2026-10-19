@@ -13,7 +13,7 @@ the order of Eilon's list.
 
 Each hero has its wiki pages (`docs/wiki/<Hero>.md` and `<Hero>-HE.md`) and a section of `docs/DESIGN.md` and
 `docs/DESIGN.he.md`: **13 Phoenix, 14 Spider-Man, 15 Thanos, 16 Ultron, 17 Apocalypse** (12 is 2.3's voices of the
-Infinity Stones), since 3.1 **18 Build Magic**, since 3.2 **19 the Witches' Road trials, 20 the sorcerers' books, 21 the beam system, 22 the rest of 3.2** (with Billy's Hex Beam and Barrier in 6.4 and 6.5), and since 3.3 **23 the walls (Billy's barrier, the ward, the Hex and its runes), 24 Agatha, 25 Cyclops, 26 Professor X, 27 the Hero Creator, 28 the structures and the Road's music, 29 the animations, 30 how 3.3 was put together, 31 the speedsters, 32 Web Assist**, since 3.4 **33 the Hero Creator as good as the heroes, 34 how 3.4 was put together**, since 3.5 **35 Asgard and its heroes, 36 how 3.5 was put together**, and since 3.6 **37 the Infinity Stones, Doctor Strange, the Hulk and Hydra, 38 how 3.6 was put together**. The wiki pages of 3.3 are `Agatha`, `Cyclops`, `Professor-X`, `Hero-Creator` and `Structures` (each with its `-HE` twin); 3.4 added `Hero-Abilities` (the 81 rows, generated from `HeroAbility` and the lang files); 3.5 added `Asgard`, `Asgardians`, `Heimdall`, `Odin`, `Hela` and `Music`; 3.6 added `Infinity-Stones`, `Vormir`, `Doctor-Strange`, `Hulk` and `Hydra-Soldiers`. Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
+Infinity Stones), since 3.1 **18 Build Magic**, since 3.2 **19 the Witches' Road trials, 20 the sorcerers' books, 21 the beam system, 22 the rest of 3.2** (with Billy's Hex Beam and Barrier in 6.4 and 6.5), and since 3.3 **23 the walls (Billy's barrier, the ward, the Hex and its runes), 24 Agatha, 25 Cyclops, 26 Professor X, 27 the Hero Creator, 28 the structures and the Road's music, 29 the animations, 30 how 3.3 was put together, 31 the speedsters, 32 Web Assist**, since 3.4 **33 the Hero Creator as good as the heroes, 34 how 3.4 was put together**, since 3.5 **35 Asgard and its heroes, 36 how 3.5 was put together**, since 3.6 **37 the Infinity Stones, Doctor Strange, the Hulk and Hydra, 38 how 3.6 was put together**, and since 3.7 **39 the healing factor, 40 Wolverine and Deadpool, 41 the lower lab and Cerebro, 42 the Stone Locator, 43 Agatha's Cottage, 44 meeting Death, 45 how 3.7 was put together**. The wiki pages of 3.3 are `Agatha`, `Cyclops`, `Professor-X`, `Hero-Creator` and `Structures` (each with its `-HE` twin); 3.4 added `Hero-Abilities` (the 81 rows, generated from `HeroAbility` and the lang files); 3.5 added `Asgard`, `Asgardians`, `Heimdall`, `Odin`, `Hela` and `Music`; 3.6 added `Infinity-Stones`, `Vormir`, `Doctor-Strange`, `Hulk` and `Hydra-Soldiers`; 3.7 added `Healing-Factor`, `Wolverine`, `Deadpool`, `Mutant-School-Lab`, `Stone-Locator`, `Agathas-Cottage` and `Meeting-Death`. Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
 Configuration, FAQ, Becoming a Hero, Credits, the sidebar) and in the README, in both languages. While 3.0 was built
 each lane wrote these as fragments that were stitched in at the end; a change now goes straight into the pages, English
 and Hebrew together.
@@ -68,17 +68,20 @@ half is `client/build/`; design in `DESIGN.md` section 18).
 * **Events** live in your own `@EventBusSubscriber` class (`PhoenixEvents`, `SpiderEvents`, ...). The priorities that
   make independent subscribers compose (NeoForge: `HIGHEST` runs first):
 
-| Event | HIGHEST | HIGH | NORMAL | LOW |
-|---|---|---|---|---|
-| `LivingIncomingDamageEvent` | Ultron: a carried player is immune except `BYPASSES_INVULNERABILITY`; Apocalypse: the hero's shield `guard` (before Wanda's branch) | Phoenix: fire damage cancelled; Ultron: lightning factor, Vision bonus; boss damage runs inside the boss's own `hurt` | the existing chain of `CommonEvents` | Thor's melee arcs (so a stopped blow lands nothing); Thanos stone effects (petrify factor); 3.4 `HeroDamage`: a custom hero's damage by a hero's ability × the row's strength factor × `custom_hero.damageScale` |
-| `LivingDeathEvent` | | Ultron: Second Life (after vanilla's totem, which runs inside `hurt`) | `CommonEvents.onDeath` releases (and `HeroLifecycle.onDeath`) | |
-| `ProjectileImpactEvent` | `SlowMotion.unslow` (existing) | Apocalypse boss: neutralise before impact | Wanda, Magneto, Vision (existing) | |
-| `MobEffectEvent.Applicable` | | boss tags refuse effects | existing | |
-| `LivingChangeTargetEvent` | | Phoenix: possessed creatures never target Jean's side | existing | |
-| `EntityJoinLevelEvent` | one orphan sweep in `BossFights` for all marked entities | | | |
-| `PlayerLoggedIn / Respawn / ChangedDimension` | | | `BossGifts.deliver`, existing calls, `HeroLifecycle` | |
-| `ServerStoppingEvent` / `ServerStartingEvent` | `BossFights.stopAll` (restores any island) / Sokovia recovery | | | |
-| `LevelTickEvent.Post` | | | `BossFights.tickLevel`, `SandHazards`, `PhoenixBurst`, existing | |
+| Event | HIGHEST | HIGH | NORMAL | LOW | LOWEST |
+|---|---|---|---|---|---|
+| `LivingIncomingDamageEvent` | Ultron: a carried player is immune except `BYPASSES_INVULNERABILITY`; Apocalypse: the hero's shield `guard` (before Wanda's branch); 3.7 the healing factor: a DOWN healer's blows cancelled unless they defeat him (after the Road trial's own rule, which it steps aside for) | Phoenix: fire damage cancelled; Ultron: lightning factor, Vision bonus; boss damage runs inside the boss's own `hurt`; 3.7 the fall guards of Wolverine's leaps and climb and of Deadpool's Drop-In, and Dogpool's bite refused where `AreaTargets.mayHurt` spares | the existing chain of `CommonEvents`; 3.7 Deadpool's Parry cuts a blow from the front | Thor's melee arcs (so a stopped blow lands nothing); Thanos stone effects (petrify factor); 3.4 `HeroDamage`: a custom hero's damage by a hero's ability × the row's strength factor × `custom_hero.damageScale`; 3.7 Wolverine's claws: an empty-hand blow with the claws out + `clawBonus` | |
+| `LivingDeathEvent` | 3.7 the healing factor's net: a death without damage cancelled to health 1 and DOWN unless a defeat | Ultron: Second Life (after vanilla's totem, which runs inside `hurt`) | `CommonEvents.onDeath` releases (and `HeroLifecycle.onDeath`) | | 3.6 the Vormir sacrifice; 3.7 the healing factor's defeat line (`receiveCanceled`), then `DeathMeeting`'s offer (only an uncancelled death) |
+| `ProjectileImpactEvent` | `SlowMotion.unslow` (existing) | Apocalypse boss: neutralise before impact | Wanda, Magneto, Vision (existing); 3.7 Deadpool's Parry bounces it | | |
+| `MobEffectEvent.Applicable` | | boss tags refuse effects | existing | | |
+| `LivingChangeTargetEvent` | | Phoenix: possessed creatures never target Jean's side; 3.7 monsters may not target a DOWN healer | existing; 3.7 Deadpool's Taunt keeps the taunted at him | | |
+| `EntityJoinLevelEvent` | one orphan sweep in `BossFights` for all marked entities | | | | |
+| `PlayerLoggedIn / Respawn / ChangedDimension` | | | `BossGifts.deliver`, existing calls, `HeroLifecycle` | | |
+| `ServerStoppingEvent` / `ServerStartingEvent` | `BossFights.stopAll` (restores any island) / Sokovia recovery | | | | |
+| `LevelTickEvent.Post` | | | `BossFights.tickLevel`, `SandHazards`, `PhoenixBurst`, existing | | |
+| `LivingDamageEvent.Pre` | | | | | 3.7 the healing factor's cut: a blow that would kill a healer (after armour and absorption) is cut to health − 1 and he goes DOWN, unless it defeats him |
+| `MobEffectEvent.Added` | | | 3.7 the healing factor's shrug: a vanilla harmful effect (not `#enhanced:stops_healing`) on an active healer × `shrugFactor` | | |
+| `PlayerRespawnPositionEvent` / `PlayerRespawnEvent` | | 3.7 `DeathMeeting`'s Nether welcome (Fire Resistance, Rio's line) | | 3.7 `DeathMeeting` redirects a chosen Nether respawn, unless another handler changed it | |
 
 ## 4. Lang, sounds, art
 
@@ -400,3 +403,46 @@ branch (`v32`). The player-facing description of every rule is in `DESIGN.md` **
 * **Lanes and shared files**: S0 made a region per lane in every shared file (`// ===== stones|strange|stone_sites|vormir|hulk|hydra (3.6) =====`, and `doctor_strange (3.6)`, `hulk (3.6)`, `variants (3.6)` in `HeroAbility`) and one FX payload per family (`StoneFxPayload`, `StrangeFxPayload`, `HulkFxPayload`, `HydraFxPayload`). Lang blocks were added 30 keys before the end of the files (`add_lang36.py`) and merged by union.
 * **Protocol "10"** (`StoneSkeletonTests.theBitsFitAndTheProtocolIsTen`): a 3.5 client cannot join a 3.6 server.
 * **Tests**: `StoneCoreTests`, `StonePowerTests`, `StrangeTests`, `StoneSiteTests` (each site built for real within a chunk budget, timed in the server thread's CPU time), `VormirTests` (with small test cliffs, `VormirSites.add`), `HulkTests`, `HydraTests`, and `SoundAssetTests` for every 3.6 sound. `TestKit.bossFixture` calls every plug-in's `onServerStopped` when it closes: a test that keeps state in a hero's statics uses `TestKit.fixture`. Delete `run/world` and `run/config/enhanced-server.toml` before a full run. Full run at 3.6.0, twice: `All 2221 required tests passed`.
+
+## 15. How 3.7 was put together: the healing factor, two heroes, the lab, the Locator and Agatha's family
+
+3.7 (Eilon's W1 Wolverine, D1 Deadpool, C1 Cerebro in the school, L1 the Stone Locator; his mom's A1 Agatha's house; and his
+late request, meeting Death) began with a skeleton step, **S0** (from 3.6.0 with the 3.6.1 hotfix merged in), then eight
+lanes: L1 the healing factor, L2 Wolverine, L3 Deadpool, L4 the lower lab, L5 the finders (the Stone Locator and the lab's
+Cerebro), L6 Agatha's Cottage, L7 sound, L8 meeting Death; the integrator merged them into `v37` (S0, L1, L4, L5, L2, L3,
+L8, L7, L6). The design is `DESIGN.md` **39 to 45**.
+
+* **A rule several heroes share is one package and a trait.** The healing factor is `healing/`, asked through
+  `HealingFactor.has/active/defeat`; a hero gets it by the trait `HEALING_FACTOR` (`Traits.of`, or a row's `traits`), never
+  by a list of heroes. What defeats a healer is data: five damage-type tags `#enhanced:defeats_healing/<group>` and the
+  effect tag `#enhanced:stops_healing`. A new damage type that should go through a healing factor joins a tag; a new
+  way to save a dying player must cancel the death before `LivingDeathEvent` LOWEST (where the Death meeting is offered).
+* **Down, not dead.** A healer's would-be death is cut at `LivingDamageEvent.Pre` LOWEST (so a totem is never used up),
+  with a net at `LivingDeathEvent` HIGHEST; while `Live.HEALING_DOWN` every key, click and interaction is refused on both
+  sides and `LivingIncomingDamageEvent` HIGHEST cancels all but a defeat. Hooks for the heroes' lines are
+  `HealingHooks.register`; the heal any hero may call is `HealingBurst.burst(player, fraction)`.
+* **Building into an old world at run time** (the lab): find the parent structure by its start (cached per chunk), record
+  it in a SavedData keyed by the start chunk with a resumable step, build only when every chunk is FULL and nobody stands
+  in the box, close the shell before opening the inside, touch above ground only the template's own blocks, and keep a
+  wall-time budget per tick (`LabBuilder`, 1.5 ms). Every school of every version gets it; the command builds or reports.
+* **People of a structure outside Asgard** (the cottage): a second `EntityType` of the Asgardians' class with appended
+  `Role`s, so talk, trades, voices and the never-killed rule come for free; Asgard-only checks are keyed on the type.
+  A goal gated by `tickCount % N` must count `tickCount + id` (a mob asks its goals only on even `tickCount + id`).
+* **Looking far without lag** (the Locator, Cerebro's sites): `SiteSearch` is incremental, budgeted server-wide
+  (`startChecksPerTick` structure-start loads), cached and shared; anything that empties a site calls `SpentSites.mark`.
+* **Replacing a vanilla screen** (Death): swap it at `ScreenEvent.Opening` with a subclass of the vanilla screen, so
+  vanilla's own flow (the respawn) still closes it, and keep the decision on the server (`DeathMeeting.choose` through
+  vanilla's respawn command).
+* **Lanes and shared files**: S0 made a region per lane in every shared file
+  (`// ===== healing|wolverine|deadpool|school_lab|finders|cottage (3.7) =====`, and `wolverine (3.7)`, `deadpool (3.7)`,
+  `variants (3.7)` in `HeroAbility`) and one FX payload per family (`HealingFxPayload`, `WolverineFxPayload`,
+  `DeadpoolFxPayload`, `LabFxPayload`, and `ScentPayload`); lang blocks were added 30 keys before the end of the files
+  (`add_lang37.py`) and merged by union. Every visual was checked in a real client, English and Hebrew.
+* **Protocol "11"** (`MutantSkeletonTests.theBitsFitAndTheProtocolIsEleven`): a 3.6 client cannot join a 3.7 server.
+  `Live` 58, `Toggle` 22, 176 rows.
+* **Tests**: `HealingTests` (with a boss fixture and the Vormir cases), `WolverineTests`, `DeadpoolTests`, `LabTests` (a
+  real school timed, the four turns, a crash resumed, water across the wall), `LocatorTests`, `CerebroRoomTests`,
+  `CottageTests` (a player who is Agatha in a batch of its own), `DeathMeetingTests` (a fake Nether), and
+  `SoundAssetTests` for the 63 sounds. `TestKit.Fixture.loadChunksAround` holds an area loaded with a ticket of its own
+  for the keepers' tests. Delete `run/world` and `run/config/enhanced-server.toml` before a full run.
+
