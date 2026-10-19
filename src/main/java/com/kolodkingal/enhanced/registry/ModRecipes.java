@@ -19,6 +19,13 @@ public final class ModRecipes {
      */
     public static final DeferredHolder<RecipeSerializer<?>, StoneExtractionRecipe.Serializer> STONE_EXTRACTION =
             SERIALIZERS.register("stone_extraction", StoneExtractionRecipe.Serializer::new);
+    /**
+     * The empty Infinity Gauntlet's shaped recipe, off with {@code [gauntlet] craftable} ({@code
+     * enhanced:gauntlet_shaped}; lane L1).
+     */
+    public static final DeferredHolder<RecipeSerializer<?>, com.kolodkingal.enhanced.stones.GauntletRecipe.Serializer>
+            GAUNTLET_SHAPED = SERIALIZERS.register("gauntlet_shaped",
+            com.kolodkingal.enhanced.stones.GauntletRecipe.Serializer::new);
 
     private ModRecipes() {
     }

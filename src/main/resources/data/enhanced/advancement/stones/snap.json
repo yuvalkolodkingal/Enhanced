@@ -1,0 +1,22 @@
+{
+  "parent": "enhanced:stones/root",
+  "display": {
+    "icon": {
+      "id": "enhanced:infinity_gauntlet"
+    },
+    "title": {
+      "translate": "advancements.enhanced.stones.snap.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.stones.snap.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "snap": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

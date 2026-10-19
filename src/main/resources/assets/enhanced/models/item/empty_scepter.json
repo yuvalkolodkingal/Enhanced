@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "enhanced:item/lokis_scepter"
+    "layer0": "enhanced:item/empty_scepter"
   }
 }

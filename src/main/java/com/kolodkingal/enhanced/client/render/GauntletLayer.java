@@ -27,7 +27,13 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import com.kolodkingal.enhanced.item.InfinityGauntletItem;
+import com.kolodkingal.enhanced.registry.ModItems;
+import com.kolodkingal.enhanced.stones.GauntletContents;
+import com.kolodkingal.enhanced.stones.Snap;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -36,6 +42,10 @@ import org.jetbrains.annotations.Nullable;
  * ThanosHeroGlow} says. It is on the off-hand arm (the left, for a right-handed player, as in the film), over the skin,
  * so it is on every look, "your own skin" too. In first person the same cuboids are put on the hand by an injection
  * into the renderer of the hand ({@link #renderFirstPerson}), since layers do not run there.
+ *
+ * <p>3.6: anyone who holds an Infinity Gauntlet (Thanos's or a crafted one) wears it on that hand in third person, with
+ * the stones that are in it lit (the item's own model is not drawn in a hand in third person: its display there is
+ * empty).
  */
 public class GauntletLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Enhanced.id("thanos"), "gauntlet");
@@ -83,12 +93,70 @@ public class GauntletLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player, float limbSwing, float limbSwingAmount,
                        float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
-        if (!wears(player, data)) {
+        if (wears(player, data)) {
+            poseStack.pushPose();
+            offArm(getParentModel(), player).translateAndRotate(poseStack);
+            draw(poseStack, buffer, packedLight, gauntlet, player, data, ageInTicks, player.level().getGameTime()
+                    + partialTicks);
+            poseStack.popPose();
+        }
+        // 3.6: a Gauntlet in either hand is worn on that hand, its own stones lit (the item model is not drawn there).
+        if (player.isInvisible()) {
             return;
         }
+        for (InteractionHand hand : InteractionHand.values()) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (!stack.is(ModItems.INFINITY_GAUNTLET.get())) {
+                continue;
+            }
+            HumanoidArm side = hand == InteractionHand.MAIN_HAND ? player.getMainArm() : player.getMainArm()
+                    .getOpposite();
+            poseStack.pushPose();
+            (side == HumanoidArm.LEFT ? getParentModel().leftArm : getParentModel().rightArm)
+                    .translateAndRotate(poseStack);
+            drawHeld(poseStack, buffer, packedLight, gauntlet, player, stack, ageInTicks);
+            poseStack.popPose();
+        }
+    }
+
+    /**
+     * 3.6: a Gauntlet held in a hand, drawn on that arm: its stones lit (Thanos's: his five; a crafted one: the stones
+     * in it), the selected one brighter; while a Snap is charged (Sneak + hold use with all six) the six light in turn
+     * and the fist glows white.
+     */
+    private static void drawHeld(PoseStack poseStack, MultiBufferSource buffer, int packedLight, ModelPart gauntlet,
+                                 AbstractClientPlayer player, ItemStack stack, float age) {
+        GauntletContents contents = InfinityGauntletItem.contents(stack);
+        StoneKind selected = contents.titan() ? null : InfinityGauntletItem.selectedOrFirst(contents);
+        float[] sockets = new float[ThanosGlow.SOCKETS];
+        float charge = 0.0F;
+        if (!contents.titan() && contents.full() && player.isUsingItem() && player.getUseItem() == stack
+                && player.isCrouching()) {
+            charge = Math.min(1.0F, player.getTicksUsingItem() / (float) Math.max(1, Snap.holdTicks()));
+        }
+        for (StoneKind kind : StoneKind.values()) {
+            if (kind.ordinal() >= sockets.length || !contents.has(kind)) {
+                continue;
+            }
+            float lit = 0.75F + 0.1F * net.minecraft.util.Mth.sin(age * 0.15F + kind.ordinal());
+            if (kind == selected) {
+                lit = 1.0F;
+            }
+            if (charge > 0.0F) {
+                lit = charge * StoneKind.values().length >= kind.ordinal() + 1 ? 1.0F : 0.25F;
+            }
+            sockets[kind.ordinal()] = lit;
+        }
         poseStack.pushPose();
-        offArm(getParentModel(), player).translateAndRotate(poseStack);
-        draw(poseStack, buffer, packedLight, gauntlet, player, data, ageInTicks, player.level().getGameTime() + partialTicks);
+        poseStack.scale(SCALE, SCALE, SCALE);
+        gauntlet.render(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(ThanosRenderer.TEXTURE)), packedLight,
+                OverlayTexture.NO_OVERLAY);
+        GauntletGeometry.draw(poseStack, buffer, sockets, age);
+        if (charge > 0.0F) {
+            GauntletGeometry.aura(poseStack, buffer, 0xFFFFFF, charge * 0.9F, 4.0F + 4.0F * charge);
+        } else if (selected != null && player.isUsingItem() && player.getUseItem() == stack) {
+            GauntletGeometry.aura(poseStack, buffer, selected.color(), 0.6F, 5.0F);
+        }
         poseStack.popPose();
     }
 
