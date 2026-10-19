@@ -141,12 +141,12 @@ public final class Variants {
 
         // ===== wolverine (3.7) =====
         // The classic yellow-and-blue suit (Deadpool & Wolverine, 2024: the comics' colours on screen at last) with the
-        // cowl, and the black leather of X-Men (2000) with its orange-yellow piping; our own drawings by lane L2
-        // (SCRATCH/v37/art/l2). Placeholder skins until then.
+        // cowl, and the black leather of X-Men (2000) with its orange-yellow piping (its colour, as black would not read
+        // on the HUD); our own drawings by lane L2 (SCRATCH/v37/art/l2). Placeholder skins until then.
         add(Power.WOLVERINE,
                 new Variant("classic", Power.WOLVERINE, Variant.suit("wolverine_classic"), null, false, 0xF2C230,
                         0xD9DEE3),
-                new Variant("x_men_2000", Power.WOLVERINE, Variant.suit("wolverine_x_men_2000"), null, false, 0x2A2A2E,
+                new Variant("x_men_2000", Power.WOLVERINE, Variant.suit("wolverine_x_men_2000"), null, false, 0xE8A33A,
                         0xD9DEE3),
                 own(Power.WOLVERINE));
         // ===== deadpool (3.7) =====
