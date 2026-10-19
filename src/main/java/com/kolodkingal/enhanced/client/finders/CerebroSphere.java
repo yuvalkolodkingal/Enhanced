@@ -34,6 +34,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ import java.util.Map;
  * reports to this client ({@link CerebroView#amplified()}) and the player stands inside the sphere of a Cerebro
  * console, each mind it found is a glowing star on the sphere's inner surface in the direction of where that player
  * stands (the nearer, the higher; the far ones low over the walkway's level), in the hero's colour (a pale white for
- * the powerless), with the name; the minds of another dimension are a cluster on the sphere's floor under its name; the
+ * the powerless), with the name; the minds of another dimension are a cluster low on the sphere under its name; the
  * stone sites are diamonds in their stone's colour; the sphere's bands of light pulse. Quads only: the world is not
  * changed. Outside the sphere the plain markers of {@link CerebroView} stay.
  *
@@ -156,17 +157,18 @@ public final class CerebroSphere {
     }
 
     /**
-     * The direction of the cluster of another dimension's minds: low on the sphere's floor, round it by the
-     * dimension's name, each mind a little apart by its own name.
+     * The direction of the cluster of another dimension's minds: low on the sphere, under the walkway's level (14
+     * degrees down: seen over the platform's edge), round it by the dimension's name, each mind a little apart by its
+     * own name.
      */
     public static Vec3 clusterDirection(String dimension, String name) {
         RandomSource random = RandomSource.create(dimension.hashCode());
         double azimuth = random.nextDouble() * Math.PI * 2.0;
-        double elevation = Math.toRadians(-38.0);
+        double elevation = Math.toRadians(-14.0);
         if (!name.isEmpty()) {
             RandomSource own = RandomSource.create(name.hashCode() * 31L + dimension.hashCode());
             azimuth += (own.nextDouble() - 0.5) * 0.45;
-            elevation += Math.toRadians((own.nextDouble() - 0.5) * 18.0);
+            elevation += Math.toRadians((own.nextDouble() - 0.5) * 12.0);
         }
         return new Vec3(Math.cos(elevation) * Math.cos(azimuth), Math.sin(elevation),
                 Math.cos(elevation) * Math.sin(azimuth));
@@ -200,15 +202,15 @@ public final class CerebroSphere {
         Vec3 middle = center;
         double radius = SchoolLabPlan.CEREBRO_RADIUS - INSET;
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        VertexConsumer glow = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-        bands(glow, middle.subtract(camera), radius + 0.4, time, fade);
         Power[] powers = Power.values();
-        List<CerebroPayload.Mind> minds = CerebroView.minds();
-        Map<String, Vec3> clusters = new LinkedHashMap<>();
+        record Mark(Vec3 at, float size, int rgb, boolean diamond, float phase) {
+        }
         record Label(Vec3 at, Component text, int rgb) {
         }
-        java.util.List<Label> labels = new java.util.ArrayList<>();
-        for (CerebroPayload.Mind mind : minds) {
+        List<Mark> marks = new ArrayList<>();
+        List<Label> labels = new ArrayList<>();
+        Map<String, Vec3> clusters = new LinkedHashMap<>();
+        for (CerebroPayload.Mind mind : CerebroView.minds()) {
             Power power = mind.power() >= 0 && mind.power() < powers.length ? powers[mind.power()] : Power.NONE;
             int rgb = power.hasPowers() ? power.titleColor() : 0xE8EEFF;
             Vec3 dir;
@@ -219,13 +221,11 @@ public final class CerebroSphere {
                 clusters.putIfAbsent(mind.dimension(), clusterDirection(mind.dimension(), ""));
             }
             Vec3 at = middle.add(dir.scale(radius));
-            float twinkle = 1.0F + 0.18F * Mth.sin(time * 0.21F + mind.name().hashCode());
-            star(glow, view, at.subtract(camera), 0.22F * twinkle, rgb, 0.95F * fade, false);
-            star(glow, view, at.subtract(camera), 0.6F * twinkle, rgb, 0.28F * fade, false);
-            labels.add(new Label(at.add(0.0, -0.45, 0.0), Component.literal(mind.name()), rgb));
+            marks.add(new Mark(at, 0.26F, rgb, false, mind.name().hashCode()));
+            labels.add(new Label(at.add(0.0, -0.75, 0.0), Component.literal(mind.name()), rgb));
         }
         for (Map.Entry<String, Vec3> cluster : clusters.entrySet()) {
-            Vec3 at = middle.add(cluster.getValue().scale(radius)).add(0.0, 1.1, 0.0);
+            Vec3 at = middle.add(cluster.getValue().scale(radius)).add(0.0, 1.4, 0.0);
             labels.add(new Label(at, dimensionName(cluster.getKey()), 0xC8D4FF));
         }
         StoneKind[] kinds = StoneKind.values();
@@ -233,21 +233,39 @@ public final class CerebroSphere {
             StoneKind kind = kinds[Math.floorMod(site.kind(), kinds.length)];
             Vec3 offset = Vec3.atCenterOf(site.pos()).subtract(middle);
             Vec3 at = middle.add(starDirection(offset).scale(radius - 0.2));
-            float pulse = 1.0F + 0.25F * Mth.sin(time * 0.15F + kind.ordinal());
-            star(glow, view, at.subtract(camera), 0.34F * pulse, kind.color(), 0.95F * fade, true);
-            star(glow, view, at.subtract(camera), 0.8F * pulse, kind.color(), 0.25F * fade, true);
+            marks.add(new Mark(at, 0.36F, kind.color(), true, kind.ordinal() * 7.0F));
             double dist = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
-            labels.add(new Label(at.add(0.0, -0.55, 0.0), Component.translatable("hud.enhanced.cerebro.site",
+            labels.add(new Label(at.add(0.0, -0.85, 0.0), Component.translatable("hud.enhanced.cerebro.site",
                     kind.displayName(), Math.round(dist)), kind.color()));
         }
-        buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
+        // A dark halo behind each mark and each name, so they read on the sphere's light panels (no depth written:
+        // nothing fights the glyphs); then the light itself, then the names.
         Font font = mc.font;
+        float scale = 0.045F;
+        VertexConsumer shade = buffers.getBuffer(EnhancedRenderTypes.ENERGY_VEIL);
+        for (Mark mark : marks) {
+            star(shade, view, mark.at().subtract(camera), mark.size() * 1.9F, 0x0A0C18, 0.55F * fade, true);
+        }
+        for (Label label : labels) {
+            float half = font.width(label.text()) * scale / 2.0F + 0.08F;
+            backing(shade, view, label.at().subtract(camera), half, 9.0F * scale + 0.06F, 0.06F, 0.5F * fade);
+        }
+        buffers.endBatch(EnhancedRenderTypes.ENERGY_VEIL);
+        VertexConsumer glow = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
+        bands(glow, middle.subtract(camera), radius + 0.4, time, fade);
+        for (Mark mark : marks) {
+            float pulse = 1.0F + (mark.diamond() ? 0.25F : 0.18F) * Mth.sin(time * (mark.diamond() ? 0.15F : 0.21F)
+                    + mark.phase());
+            Vec3 at = mark.at().subtract(camera);
+            star(glow, view, at, mark.size() * pulse, mark.rgb(), 0.95F * fade, mark.diamond());
+            star(glow, view, at, mark.size() * 2.3F * pulse, mark.rgb(), 0.3F * fade, mark.diamond());
+        }
+        buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
         for (Label label : labels) {
             Vec3 at = label.at().subtract(camera);
             PoseStack stack = new PoseStack();
             stack.translate(at.x, at.y, at.z);
             stack.mulPose(view.rotation());
-            float scale = 0.016F;
             stack.scale(scale, -scale, scale);
             Matrix4f matrix = stack.last().pose();
             int a = Math.max(5, Math.round(235 * fade)) << 24;
@@ -277,6 +295,16 @@ public final class CerebroSphere {
         quad(out, m, -thin, -size, thin, -size, thin, size, -thin, size, r, g, b, a);
         quad(out, m, -thin * 1.6F, -thin * 1.6F, thin * 1.6F, -thin * 1.6F, thin * 1.6F, thin * 1.6F,
                 -thin * 1.6F, thin * 1.6F, Math.min(255, r + 60), Math.min(255, g + 60), Math.min(255, b + 60), a);
+    }
+
+    /** A dark backing under a name, facing the camera: {@code half} wide each way, {@code down} below the top. */
+    private static void backing(VertexConsumer out, Camera view, Vec3 at, float half, float down, float up,
+                                float alpha) {
+        PoseStack stack = new PoseStack();
+        stack.translate(at.x, at.y, at.z);
+        stack.mulPose(view.rotation());
+        int a = Mth.clamp(Math.round(alpha * 255), 0, 255);
+        quad(out, stack.last().pose(), -half, -down, half, -down, half, up, -half, up, 0x06, 0x08, 0x12, a);
     }
 
     private static void quad(VertexConsumer out, Matrix4f m, float x0, float y0, float x1, float y1, float x2,

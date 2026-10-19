@@ -32,8 +32,8 @@ import java.util.List;
  * spins. While the amplified Cerebro reports, the stone sites it marks are listed under the minds (top right).
  */
 public class FindersHud implements LayeredDraw.Layer {
-    /** The line's height over the bottom of the screen (above the stones' red grace lines and the action bar). */
-    static final int LINE_Y = 100;
+    /** The bottom of the line's box over the bottom of the screen (just above the action bar). */
+    static final int BOTTOM = 76;
 
     @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
@@ -84,8 +84,8 @@ public class FindersHud implements LayeredDraw.Layer {
         int h = graphics.guiHeight();
         int width = Math.max(font.width(line), words == null ? 0 : font.width(words)) + 22;
         int x = (w - width) / 2;
-        int y = h - LINE_Y;
         int height = words == null ? 17 : 27;
+        int y = h - BOTTOM - height + 3;
         graphics.fill(x - 3, y - 3, x + width + 3, y + height - 3, 0x90000000);
         graphics.renderOutline(x - 3, y - 3, width + 6, height, 0xA0000000 | rgb);
         ItemStack icon = kind != null ? new ItemStack(ModItems.stone(kind))
