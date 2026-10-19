@@ -3,10 +3,15 @@ package com.kolodkingal.enhanced.gametest;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.block.StonePedestalBlock;
+import com.kolodkingal.enhanced.block.StonePedestalBlockEntity;
 import com.kolodkingal.enhanced.config.SoulStoneConfig;
+import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModBlocks;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -21,21 +26,29 @@ import com.kolodkingal.enhanced.vormir.VormirKeeper;
 import com.kolodkingal.enhanced.vormir.VormirSites;
 import com.kolodkingal.enhanced.vormir.VormirTracker;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Cat;
 import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
@@ -45,6 +58,7 @@ import net.minecraft.world.scores.Scoreboard;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -57,10 +71,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * over the chasm and lands from its height. The full sacrifice (a Thor seeker, a friend with PvP on: his items gone
  * even under {@code keepInventory}, his ender chest kept, his power gone; the seeker in the pool with the stone) and
  * the seeker's own wolf; every accident of 6.5 is an ordinary death: a solo fall, a creature's push, another cliff, PvP
- * off, a totem, a fall survived, a Creative seeker, a non-Bearer, someone else's dog, one who has his stone already,
+ * off, a totem, a Creative seeker, someone else's dog, one who has his stone already,
  * the world's stone taken, the push too old, a logout in the air; the configs ({@code destroyItems}, {@code
  * playerSacrifice}, {@code friendRule}, {@code onePer}) each in a batch of its own; the Stonekeeper's lines and that
- * nothing moves him.
+ * nothing moves him. 3.6.1: a cat and a horse that land alive and are taken by the fall, a dog that does not teleport
+ * to its master as it falls, a friend who lands alive, a seeker who is no Bearer earning the stone on a pedestal (and a
+ * Bearer or his Gauntlet taking it), and the plain lines that tell a seeker why it did not count.
  */
 @GameTestHolder(Enhanced.MODID)
 @PrefixGameTestTemplate(false)
@@ -174,13 +190,24 @@ public final class VormirTests {
         });
     }
 
-    /** The translation keys of the chat lines (not the action bar) the player was sent since the last look. */
+    /**
+     * The translation keys of the chat lines (not the action bar) the player was sent since the last look; a line of
+     * the Stonekeeper's is there as its own key too (3.6.1).
+     */
     private static List<String> messages(ServerPlayer player) {
-        return TestKit.sentPackets(player).stream()
-                .filter(p -> p instanceof ClientboundSystemChatPacket chat && !chat.overlay()
-                        && chat.content().getContents() instanceof TranslatableContents)
-                .map(p -> ((TranslatableContents) ((ClientboundSystemChatPacket) p).content().getContents()).getKey())
-                .toList();
+        List<String> keys = new ArrayList<>();
+        for (Object packet : TestKit.sentPackets(player)) {
+            if (packet instanceof ClientboundSystemChatPacket chat && !chat.overlay()
+                    && chat.content().getContents() instanceof TranslatableContents said) {
+                keys.add(said.getKey());
+                if (said.getKey().equals("npc.enhanced.stonekeeper.say") && said.getArgs().length == 2
+                        && said.getArgs()[1] instanceof Component line
+                        && line.getContents() instanceof TranslatableContents key) {
+                    keys.add(key.getKey());
+                }
+            }
+        }
+        return keys;
     }
 
     /**
@@ -230,6 +257,148 @@ public final class VormirTests {
         });
     }
 
+    /**
+     * 3.6.1: his own tamed cat pushed off the edge. A cat never takes fall damage: it lands alive on the pit's floor,
+     * and the fall takes it there; Thor wakes with the stone.
+     */
+    @GameTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
+    public static void hisOwnCatLandsAliveAndTheFallTakesIt(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        VormirTestSite cliff = VormirTestSite.build(f);
+        ServerPlayer thor = thor(f);
+        Cat cat = helper.spawn(EntityType.CAT, new BlockPos(16, 2, 16));
+        cat.tame(thor);
+        cat.setOrderedToSit(true);
+        landsAndIsTaken(f, cliff, thor, cat, "the cat");
+    }
+
+    /**
+     * 3.6.1: his own tamed horse (30 health) pushed off the edge. A horse takes half the fall's damage and lives: the
+     * fall takes it on the pit's floor.
+     */
+    @GameTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
+    public static void hisOwnHorseLandsAliveAndTheFallTakesIt(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        VormirTestSite cliff = VormirTestSite.build(f, 11);
+        ServerPlayer thor = f.player(16.5, 6.0, 12.5, Power.THOR);
+        Horse horse = helper.spawn(EntityType.HORSE, new BlockPos(5, 2, 18));
+        horse.getAttribute(Attributes.MAX_HEALTH).setBaseValue(30.0);
+        horse.setHealth(30.0F);
+        horse.tameWithName(thor);
+        check(Sacrifice.isPetOf(horse, thor), "a tamed horse is his pet");
+        landsAndIsTaken(f, cliff, thor, horse, "the horse");
+    }
+
+    /**
+     * The pet stands on the edge, is hit by its master and goes over the chasm from its height; it lands alive on the
+     * pit's floor (as a cat or a horse does), then the fall takes it: the master has the stone, and it left nothing.
+     */
+    private static void landsAndIsTaken(TestKit.Fixture f, VormirTestSite cliff, ServerPlayer master, LivingEntity pet,
+            String what) {
+        cliff.standOnEdge(pet, 3);
+        f.everyTick(60, tick -> {
+            if (tick == 2) {
+                check(VormirTracker.onEdge(pet), what + " stands on the edge");
+                check(hit(master, pet), "his blow reaches " + what);
+                cliff.overThePit(pet, 1.0);
+                pet.fallDistance = 40.0F; // (the chasm's height, in the air)
+            }
+            if (tick > 2 && pet.isAlive() && pet.onGround() && !cliff.site().inPit(pet)) {
+                throw new GameTestAssertException(what + " landed outside the pit");
+            }
+            if (tick > 2 && !pet.isAlive()) {
+                check(pet.getLastDamageSource() != null && pet.getLastDamageSource().is(ModDamageTypes.VORMIR_FALL),
+                        what + " landed alive and the fall took it: " + pet.getLastDamageSource());
+                check(hasStone(master) && master.position().distanceTo(cliff.pool()) < 0.6,
+                        "its master wakes in the pool with the stone");
+                check(cliff.items().isEmpty(), what + " leaves nothing");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * 3.6.1: a dog pushed off the edge falling into the chasm does not teleport to its master (12 blocks away and more:
+     * its follow goal would bring it back to his side, alive); it lands, and is taken.
+     */
+    @GameTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
+    public static void aFallingDogDoesNotTeleportToItsMaster(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        VormirTestSite cliff = VormirTestSite.build(f);
+        ServerPlayer thor = thor(f);
+        Wolf wolf = helper.spawn(EntityType.WOLF, new BlockPos(16, 2, 16));
+        wolf.tame(thor);
+        wolf.setOrderedToSit(true);
+        Vec3 far = helper.absoluteVec(new Vec3(19.5, TestKit.FLOOR, 19.5));
+        cliff.standOnEdge(wolf, 3);
+        f.everyTick(60, tick -> {
+            if (tick == 2) {
+                check(hit(thor, wolf), "Thor's blow reaches his wolf");
+                cliff.overThePit(wolf, 1.0);
+                wolf.fallDistance = 40.0F;
+            }
+            if (tick == 3) {
+                check(VormirTracker.falling(wolf), "it falls into the chasm");
+                thor.teleportTo(far.x, far.y, far.z); // (its master is far away now: the follow goal would teleport it)
+                check(wolf.distanceToSqr(thor) >= 144.0 && wolf.shouldTryTeleportToOwner(), "far enough to teleport");
+                wolf.tryToTeleportToOwner();
+                check(cliff.site().pit().isInside(wolf.blockPosition()) || !wolf.onGround(),
+                        "it does not teleport to its master: " + wolf.position());
+                check(wolf.distanceToSqr(thor) >= 144.0, "it is still far from him");
+            }
+            if (tick > 3 && !wolf.isAlive()) {
+                check(hasStone(thor), "it was given: Thor has the stone");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /** 3.6.1: with PvP off Thor's blow never lands, and nothing is given; he is told it was the PvP. */
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    public static void withPvpOffTheSeekerIsToldWhy(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        VormirTestSite cliff = VormirTestSite.build(f);
+        ServerPlayer thor = thor(f);
+        ServerPlayer friend = friend(f, Power.SPIDER_MAN);
+        fall(f, cliff, friend, () -> {
+            lookAt(thor, friend);
+            thor.attack(friend); // (his real attack: the game asks, and refuses it with PvP off)
+            check(VormirTracker.lastCredit(friend) == null, "no credit: the blow did not land");
+        }, () -> {
+            ordinary(cliff, thor, friend, Power.SPIDER_MAN, "PvP off");
+            List<String> told = messages(thor);
+            check(told.contains("npc.enhanced.stonekeeper.no_harm"), "the keeper's line");
+            check(told.contains("message.enhanced.vormir.why.pvp_off"), "and the plain reason: PvP is off");
+        });
+    }
+
+    /** 3.6.1: Thor knocks his friend into the chasm from elsewhere than the edge: he is told it must be the edge. */
+    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    public static void notFromTheEdgeTheSeekerIsToldWhy(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        VormirTestSite cliff = VormirTestSite.build(f);
+        ServerPlayer thor = thor(f);
+        ServerPlayer friend = friend(f, Power.SPIDER_MAN);
+        f.everyTick(12, tick -> {
+            if (tick == 2) {
+                check(hit(thor, friend), "Thor's blow lands (not on the edge)");
+                cliff.overThePit(friend, 2.0);
+            }
+            if (tick == 4) {
+                check(VormirTracker.departure(friend) == null, "he never stood on the edge");
+                VormirTestSite.fallDie(friend);
+                ordinary(cliff, thor, friend, Power.SPIDER_MAN, "not from the edge");
+                check(messages(thor).contains("message.enhanced.vormir.why.not_from_edge"),
+                        "Thor is told the fall must start from the edge");
+                return true;
+            }
+            return false;
+        });
+    }
+
     /** Someone else's dog pushed off: not his to give: an ordinary death, and the keeper says so. */
     @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void someoneElsesDogIsNotHisToGive(GameTestHelper helper) {
@@ -243,8 +412,10 @@ public final class VormirTests {
         fall(f, cliff, wolf, () -> hit(thor, wolf), () -> {
             check(!wolf.isAlive(), "the dog died");
             check(!hasStone(thor), "Thor gets nothing");
-            check(VormirTestSite.keeperLines(thor).contains("npc.enhanced.stonekeeper.not_loved"),
-                    "the keeper: that soul was never his to give");
+            List<String> told = messages(thor);
+            check(told.contains("npc.enhanced.stonekeeper.not_loved"), "the keeper: that soul was never his to give");
+            check(told.contains("message.enhanced.vormir.why.not_your_pet"),
+                    "and he is told plainly why (3.6.1): it isn't his pet");
         });
     }
 
@@ -350,30 +521,76 @@ public final class VormirTests {
         });
     }
 
-    /** The friend survives the fall (slow falling, Feather Falling: a fall that does not kill): nothing happens. */
+    /**
+     * 3.6.1: the friend lands alive on the pit's floor (good armour, Feather Falling, a hero who takes no fall damage):
+     * the fall takes him all the same ({@code enhanced:vormir_fall}, which nothing softens), and he is given.
+     */
     @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
-    public static void aFriendWhoSurvivesTheFallGivesNothing(GameTestHelper helper) {
+    public static void aFriendWhoLandsAliveIsTakenByTheFall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer thor = thor(f);
         ServerPlayer friend = friend(f, Power.SPIDER_MAN);
         cliff.standOnEdge(friend, 3);
-        f.everyTick(12, tick -> {
+        f.everyTick(20, tick -> {
             if (tick == 2) {
-                hit(thor, friend);
+                check(hit(thor, friend), "Thor's blow lands");
                 cliff.overThePit(friend, 2.0);
+                friend.fallDistance = 40.0F; // (the chasm's height, in the air)
             }
-            if (tick == 4) {
-                friend.fallDistance = 40.0F;
-                friend.invulnerableTime = 0;
-                friend.hurt(friend.damageSources().fall(), 2.0F);
-                check(friend.isAlive(), "a gentle landing: he lives");
-                check(!hasStone(thor) && Powers.power(friend) == Power.SPIDER_MAN, "no stone, nothing lost");
+            if (tick == 5) {
+                // (His client lands him on the pit's floor and he takes no harm from it.)
+                landOnThePitFloor(cliff, friend);
+            }
+            if (tick == 8) {
+                check(friend.isDeadOrDying(), "the fall takes him");
+                check(friend.getLastDamageSource() != null
+                        && friend.getLastDamageSource().is(ModDamageTypes.VORMIR_FALL), "by the Vormir fall");
+                check(hasStone(thor) && Powers.power(friend) == Power.NONE, "he was given: Thor has the stone");
                 return true;
             }
             return false;
         });
+    }
+
+    /** A totem of undying saves a friend from the fall's taking too: he lives, and Thor is told why nothing came. */
+    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    public static void aTotemSavesALandedFriendAndTheSeekerIsTold(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        VormirTestSite cliff = VormirTestSite.build(f);
+        ServerPlayer thor = thor(f);
+        ServerPlayer friend = friend(f, Power.SPIDER_MAN);
+        friend.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.TOTEM_OF_UNDYING));
+        cliff.standOnEdge(friend, 3);
+        f.everyTick(20, tick -> {
+            if (tick == 2) {
+                hit(thor, friend);
+                cliff.overThePit(friend, 2.0);
+                friend.fallDistance = 40.0F;
+            }
+            if (tick == 5) {
+                landOnThePitFloor(cliff, friend);
+            }
+            if (tick == 8) {
+                check(friend.isAlive() && !friend.isDeadOrDying(), "the totem saves him");
+                check(!hasStone(thor) && Powers.power(friend) == Power.SPIDER_MAN, "no stone, nothing lost");
+                check(messages(thor).contains("message.enhanced.vormir.why.survived"), "Thor is told he survived");
+                check(VormirTracker.departure(friend) == null, "his fall is over: judged once");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /** Puts a creature on the pit's floor, standing (where his client, or the game, lands it). */
+    private static void landOnThePitFloor(VormirTestSite cliff, LivingEntity entity) {
+        Vec3 floor = Vec3.atBottomCenterOf(new BlockPos(cliff.site().pit().getCenter().getX(), cliff.site().pit().minY(),
+                cliff.site().pit().getCenter().getZ()));
+        entity.teleportTo(floor.x, floor.y, floor.z);
+        entity.setDeltaMovement(Vec3.ZERO);
+        entity.setOnGround(true);
     }
 
     /** A Creative seeker never counts. */
@@ -392,19 +609,106 @@ public final class VormirTests {
         });
     }
 
-    /** A seeker who is no Bearer pushes his friend: an ordinary death, and the keeper had said so. */
+    /**
+     * 3.6.1 (the user's call: anyone may earn the stone): a seeker who is no Bearer (Spider-Man) pushes his friend: the
+     * sacrifice counts; he wakes in the pool and the stone waits on a pedestal by it, held for him, and he is told so;
+     * the ledger has it as his. Another who is no Bearer is refused it; he takes it himself, with a shulker box in his
+     * inventory: it goes into the box, stamped as his, and the pedestal goes.
+     */
     @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
-    public static void aNonBearersPushIsAnOrdinaryDeath(GameTestHelper helper) {
+    public static void aNonBearerEarnsTheStoneOnAPedestal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer seeker = f.player(5.5, 6.0, 12.5, Power.SPIDER_MAN);
         ServerPlayer friend = friend(f, Power.SPIDER_MAN);
-        fall(f, cliff, friend, () -> hit(seeker, friend), () -> {
-            ordinary(cliff, seeker, friend, Power.SPIDER_MAN, "a non-Bearer's push");
-            check(VormirTestSite.keeperLines(seeker).contains("npc.enhanced.stonekeeper.not_bearer"),
-                    "the keeper: go home");
+        ServerPlayer stranger = f.player(16.5, TestKit.FLOOR, 16.5, Power.HULK);
+        fall(f, cliff, friend, () -> check(hit(seeker, friend), "Spider-Man's blow lands"), () -> {
+            check(friend.isDeadOrDying() && Powers.power(friend) == Power.NONE && friend.getInventory().isEmpty(),
+                    "the friend was given");
+            check(!hasStone(seeker), "he does not hold it bare");
+            check(seeker.position().distanceTo(cliff.pool()) < 0.6, "he wakes in the pool");
+            BlockPos at = cliff.site().pedestal();
+            StonePedestalBlockEntity pedestal = heldPedestal(helper, at);
+            check(pedestal.isHeldFor(seeker.getUUID()), "the stone is held for him");
+            check(!StoneLedger.mayTake(seeker, StoneKind.SOUL)
+                    && seeker.getData(ModAttachments.STONES).has(StoneProgress.SACRIFICED_FOR),
+                    "the ledger and his progress have it as his");
+            List<String> told = messages(seeker);
+            check(told.contains("message.enhanced.vormir.held") && told.contains("message.enhanced.vormir.held_how"),
+                    "he is told where it is and how to carry it");
+            ServerLevel level = helper.getLevel();
+            check(!StonePedestalBlock.take(stranger, level, at, level.getBlockState(at), StoneKind.SOUL)
+                    && pedestal.isHeldFor(seeker.getUUID()), "the Hulk (no Bearer) is refused it");
+            seeker.getInventory().setItem(5, new ItemStack(Items.SHULKER_BOX));
+            ItemStack box = seeker.getInventory().getItem(5);
+            check(StonePedestalBlock.take(seeker, level, at, level.getBlockState(at), StoneKind.SOUL),
+                    "he takes it himself");
+            ItemStack inBox = box.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+                    .nonEmptyItems().iterator().next();
+            check(inBox.is(ModItems.SOUL_STONE.get()) && seeker.getUUID().equals(StoneLedger.taker(inBox)),
+                    "into his shulker box, stamped as his");
+            check(!hasStone(seeker) && messages(seeker).contains("message.enhanced.vormir.stowed_box"),
+                    "not bare in his inventory, and he is told");
+            check(level.getBlockState(at).isAir(), "the pedestal goes with its stone");
         });
+    }
+
+    /**
+     * A Bearer may take a stone held for another (to carry it to him): it stays stamped as the seeker's. A seeker with
+     * a crafted Infinity Gauntlet takes his straight into it.
+     */
+    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    public static void aBearerOrTheSeekersGauntletTakesAHeldStone(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        VormirTestSite cliff = VormirTestSite.build(f);
+        VormirTestSite second = VormirTestSite.build(f, 11);
+        ServerPlayer seeker = f.player(5.5, 6.0, 12.5, Power.SPIDER_MAN);
+        ServerPlayer other = f.player(16.5, 6.0, 12.5, Power.CYCLOPS);
+        ServerPlayer friend = friend(f, Power.SPIDER_MAN);
+        ServerPlayer mate = friend(f, Power.SPIDER_MAN);
+        ServerPlayer loki = f.player(9.5, TestKit.FLOOR, 18.5, Power.LOKI);
+        other.getInventory().setItem(5, InfinityGauntletItem.empty());
+        ItemStack gauntlet = other.getInventory().getItem(5);
+        cliff.standOnEdge(friend, 3);
+        second.standOnEdge(mate, 3);
+        f.everyTick(12, tick -> {
+            if (tick == 2) {
+                check(hit(seeker, friend) && hit(other, mate), "both blows land");
+                cliff.overThePit(friend, 2.0);
+                second.overThePit(mate, 2.0);
+            }
+            if (tick == 4) {
+                VormirTestSite.fallDie(friend);
+                VormirTestSite.fallDie(mate);
+                ServerLevel level = helper.getLevel();
+                BlockPos first = cliff.site().pedestal();
+                BlockPos next = second.site().pedestal();
+                check(heldPedestal(helper, first).isHeldFor(seeker.getUUID())
+                        && heldPedestal(helper, next).isHeldFor(other.getUUID()), "a stone held for each");
+                check(StonePedestalBlock.take(loki, level, first, level.getBlockState(first), StoneKind.SOUL),
+                        "Loki, a Bearer, takes the one held for Spider-Man");
+                check(loki.getMainHandItem().is(ModItems.SOUL_STONE.get())
+                        && seeker.getUUID().equals(StoneLedger.taker(loki.getMainHandItem())),
+                        "in his hand, still stamped as Spider-Man's");
+                check(StonePedestalBlock.take(other, level, next, level.getBlockState(next), StoneKind.SOUL),
+                        "Cyclops takes his own");
+                check(InfinityGauntletItem.contents(gauntlet).has(StoneKind.SOUL)
+                        && other.getUUID().equals(StoneLedger.gauntletTakerOf(gauntlet, StoneKind.SOUL)),
+                        "straight into his Gauntlet, as his");
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private static StonePedestalBlockEntity heldPedestal(GameTestHelper helper, BlockPos at) {
+        check(helper.getLevel().getBlockState(at).is(ModBlocks.STONE_PEDESTAL.get())
+                && StonePedestalBlock.kind(helper.getLevel().getBlockState(at)) == StoneKind.SOUL,
+                "a Soul Stone pedestal by the pool at " + at);
+        check(helper.getLevel().getBlockEntity(at) instanceof StonePedestalBlockEntity, "its block entity");
+        return (StonePedestalBlockEntity) helper.getLevel().getBlockEntity(at);
     }
 
     /** {@code onePer = player}: one who has had his Soul Stone gets no second one. */
@@ -448,6 +752,8 @@ public final class VormirTests {
                 check(gone != null && gone.credit() == null, "he left the edge with no push to his name");
                 VormirTestSite.fallDie(friend);
                 ordinary(cliff, thor, friend, Power.SPIDER_MAN, "a push 101 ticks old");
+                check(messages(thor).contains("message.enhanced.vormir.why.too_old"),
+                        "Thor is told his push came too long before the fall (3.6.1)");
                 return true;
             }
             return false;
@@ -686,7 +992,8 @@ public final class VormirTests {
         had.setData(ModAttachments.STONES, had.getData(ModAttachments.STONES).withTaken(StoneKind.SOUL, true));
         check(Stonekeeper.lines(thor).equals(List.of(Stonekeeper.WELCOME, Stonekeeper.PRICE, Stonekeeper.CHOOSE)),
                 "to Thor: welcome, the price, choose well");
-        check(Stonekeeper.lines(plain).get(2).equals("npc.enhanced.stonekeeper.not_bearer"), "no Bearer: go home");
+        check(Stonekeeper.lines(plain).get(2).equals("npc.enhanced.stonekeeper.held"),
+                "no Bearer: it will wait for you (3.6.1)");
         check(Stonekeeper.lines(creative).get(2).equals("npc.enhanced.stonekeeper.creative"), "Creative");
         check(Stonekeeper.lines(had).get(2).equals("npc.enhanced.stonekeeper.has_one"), "one who has his stone");
         VormirTestSite.keeperLines(thor);

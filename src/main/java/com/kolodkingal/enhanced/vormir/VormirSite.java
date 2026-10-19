@@ -23,9 +23,10 @@ import net.minecraft.world.phys.AABB;
  * @param pit        the shaft of the chasm where the fall must end ({@code PIT_BOX})
  * @param pool       the shallow pool where the stone is given ({@code POOL})
  * @param keeperHome where the Stonekeeper stands ({@code STONEKEEPER_HOME})
+ * @param pedestal   where the stone waits for a seeker who may not hold it bare ({@code PEDESTAL}, 3.6.1)
  */
 public record VormirSite(ResourceKey<Level> dimension, BoundingBox bounds, BoundingBox edge, BoundingBox pit,
-        BlockPos pool, BlockPos keeperHome) {
+        BlockPos pool, BlockPos keeperHome, BlockPos pedestal) {
 
     /** The site of a cliff's template placed at {@code corner} with the given turn ({@code pivot}: its pivot). */
     public static VormirSite of(ResourceKey<Level> dimension, BlockPos corner, Mirror mirror, Rotation rotation,
@@ -35,7 +36,8 @@ public record VormirSite(ResourceKey<Level> dimension, BoundingBox bounds, Bound
                 StoneSitePlans.Vormir.SIZE.getZ() - 1);
         return new VormirSite(dimension, BoundingBox.fromCorners(at.world(BlockPos.ZERO), at.world(far)),
                 box(at, StoneSitePlans.Vormir.EDGE_BOX), box(at, StoneSitePlans.Vormir.PIT_BOX),
-                at.world(StoneSitePlans.Vormir.POOL), at.world(StoneSitePlans.Vormir.STONEKEEPER_HOME));
+                at.world(StoneSitePlans.Vormir.POOL), at.world(StoneSitePlans.Vormir.STONEKEEPER_HOME),
+                at.world(StoneSitePlans.Vormir.PEDESTAL));
     }
 
     /** The site of an unturned template at {@code corner}. */

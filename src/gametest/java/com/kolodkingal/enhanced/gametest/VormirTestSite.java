@@ -23,8 +23,9 @@ import java.util.List;
  * A small Vormir Cliff in a GameTest's arena (3.6, lane L5; the plan's 10: not L4's 74-high template, the same parts):
  * in the half of the arena from {@code x0} to {@code x0 + 9}, a stone ledge 4 blocks up whose edge strip ({@code
  * EDGE_BOX}) is 7 x 2 x 2 at relative (x0 + 2..8, 6..7, 10..11), the chasm's shaft ({@code PIT_BOX}) on the floor in
- * front of it at (x0 + 2..8, 2..4, 2..8), the pool on the floor at (x0 + 5, 2, 15) and the keeper's place at (x0 + 5,
- * 2, 18). The site is known to {@link VormirSites} until the test ends. A fall in the arena is a few blocks: the tests
+ * front of it at (x0 + 2..8, 2..4, 2..8), the pool on the floor at (x0 + 5, 2, 15), the keeper's place at (x0 + 5, 2,
+ * 18) and the pedestal's place (3.6.1: the stone of a seeker who may not hold it bare) at (x0 + 3, 2, 15). The site is
+ * known to {@link VormirSites} until the test ends. A fall in the arena is a few blocks: the tests
  * give a falling creature the fall distance of the real chasm ({@link #fallDie}).
  */
 public final class VormirTestSite {
@@ -49,7 +50,7 @@ public final class VormirTestSite {
         VormirSite site = new VormirSite(helper.getLevel().dimension(),
                 box(helper, x0, 1, 0, x0 + 9, 10, 20), box(helper, x0 + 2, 6, 10, x0 + 8, 7, 11),
                 box(helper, x0 + 2, 2, 2, x0 + 8, 4, 8), helper.absolutePos(new BlockPos(x0 + 5, 2, 15)),
-                helper.absolutePos(new BlockPos(x0 + 5, 2, 18)));
+                helper.absolutePos(new BlockPos(x0 + 5, 2, 18)), helper.absolutePos(new BlockPos(x0 + 3, 2, 15)));
         VormirSites.add(site);
         f.onClose(() -> VormirSites.remove(site));
         return new VormirTestSite(helper, x0, site);

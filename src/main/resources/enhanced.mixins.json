@@ -4,7 +4,8 @@
   "package": "com.kolodkingal.enhanced.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PlayerMixin"
+    "PlayerMixin",
+    "TamableAnimalMixin"
   ],
   "client": [
     "client.AbstractClientPlayerMixin",

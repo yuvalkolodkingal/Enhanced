@@ -552,6 +552,12 @@ public final class StoneSiteTests {
                 && t.at(pool.below(2)).is(Blocks.SHROOMLIGHT), "the pool: orange glass over shroomlight");
         BlockPos home = StoneSitePlans.Vormir.STONEKEEPER_HOME;
         check(passes(t.at(home)) && passes(t.at(home.above())) && !passes(t.at(home.below())), "the keeper's place");
+        // 3.6.1: the edge's box holds feet standing on the lip (a top slab), and the held stone's pedestal has a place
+        check(edge.maxY() >= floor + 2, "feet on the lip's top are on the edge");
+        BlockPos pedestal = StoneSitePlans.Vormir.PEDESTAL;
+        check(t.at(pedestal) == null || t.at(pedestal).isAir(), "the pedestal's place is free: " + t.at(pedestal));
+        check(!passes(t.at(pedestal.below())) && Math.abs(pedestal.getX() - pool.getX()) <= 3
+                && Math.abs(pedestal.getZ() - pool.getZ()) <= 3, "on the summit's floor, by the pool");
         check(t.entities().stream().filter(e -> e.getString("id").equals("enhanced:stonekeeper")).count() == 1,
                 "the Stonekeeper stands there");
         check(count(chestTables(t), "enhanced:chests/vormir/pit") == 1, "the pit's chest");

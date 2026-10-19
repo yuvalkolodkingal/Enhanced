@@ -6,7 +6,7 @@ Hebrew: [עברית](Infinity-Stones-HE)
 
 ## The quick version
 
-* **Where:** Reality in [Asgard](Asgard)'s vault; Mind inside **Loki's Scepter** (from a Hydra outpost); Space inside the **Tesseract** (Avengers Tower); Time in the **Sanctum Sanctorum**; Power in **the Orb**, in an **End tunnel**; Soul at the **Vormir Cliff** in the Nether, for a sacrifice ([Vormir](Vormir)).
+* **Where:** Reality in [Asgard](Asgard)'s vault; Mind inside **Loki's Scepter** (from a Hydra outpost); Space inside the **Tesseract** (Avengers Tower); Time in the **Sanctum Sanctorum**; Power in **the Orb**, in an **End tunnel**; Soul at the **Vormir Cliff** in the Nether, for a sacrifice ([Vormir](Vormir)): anyone can earn it there (3.6.1); one who may not hold it bare finds it on a pedestal by the pool, held for him.
 * **Who:** only the gods (**Thor, Loki, Heimdall, Odin, Hela**), the **Scarlet Witch** and the **Phoenix** may hold a bare stone. A sorcerer may hold the Time Stone, and Vision the Mind Stone. Anyone else can't pick a stone up, and one in his bag **burns** him after 10 seconds.
 * **Vessels:** **Loki's Scepter** (Mind), the **Tesseract** (Space) and the **Eye of Agamotto** (Time) give their stone's power to others. The Reality, Power and Soul Stones have **no vessel**: someone who is not a god can't use them at all.
 * **Use** = right-click the stone; **Sneak + right-click** = its second power. Hold for the beams and the drain.
@@ -168,7 +168,7 @@ The four stones found in places (Reality, Time, Power and Soul) are counted. A s
 * **Once per world** (`WORLD`): one of each in the whole world. When someone has taken it, every other place is empty: the pedestal is bare, the chest holds a note, "The Time Stone is gone."
 * **Unlimited** (`UNLIMITED`): every place gives its stone every time (for Creative servers).
 
-The Soul Stone has its own choice, `soul_stone.onePer`, with the same three answers. The Mind and Space Stones are not counted: they are as rare as Loki's Scepter and the Tesseract.
+The Soul Stone has its own choice, `soul_stone.onePer`, with the same three answers. A Soul Stone earned by one who may not hold it bare (3.6.1) counts as his from the moment it appears on the pedestal by the pool: it is stamped with his name when it is taken, whoever takes it (he, or a Bearer for him). The Mind and Space Stones are not counted: they are as rare as Loki's Scepter and the Tesseract.
 
 **A lost stone comes back** (`stones.returnLost`): a stone that falls into the void, is destroyed by `/kill`, or is lost with a sacrificed player's things can be taken again (in player mode by the one who lost it; in world mode its places fill again).
 

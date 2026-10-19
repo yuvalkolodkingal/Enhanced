@@ -126,6 +126,12 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> HYDRA_BOLT = key("hydra_bolt");
     /** The enforcer's stun baton (lane L8). */
     public static final ResourceKey<DamageType> HYDRA_BATON = key("hydra_baton");
+    // ===== vormir (3.6.1) =====
+    /**
+     * The Vormir chasm taking one who was given to it and landed alive (a cat, a horse, a hero who takes no fall damage):
+     * not softened by armour, enchantments or effects; a totem of undying still saves.
+     */
+    public static final ResourceKey<DamageType> VORMIR_FALL = key("vormir_fall");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

@@ -20,7 +20,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,6 +38,11 @@ public class StonePedestalBlockEntity extends BlockEntity {
 
     private final Set<UUID> takers = new LinkedHashSet<>();
     private boolean gone;
+    /**
+     * 3.6.1: the seekers this pedestal's stone is held for (the Soul Stone earned at Vormir by one who may not hold it
+     * bare), oldest first, with their names; while it holds one, only he or a Bearer may take it.
+     */
+    private final Map<UUID, String> heldFor = new LinkedHashMap<>();
 
     public StonePedestalBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.STONE_PEDESTAL.get(), pos, state);
@@ -60,8 +67,45 @@ public class StonePedestalBlockEntity extends BlockEntity {
         changed();
     }
 
+    /** The stone is held for this seeker too (3.6.1). */
+    public void holdFor(UUID seeker, String name) {
+        heldFor.put(seeker, name);
+        gone = false;
+        changed();
+    }
+
+    /** Whether the stone is held for someone (3.6.1). */
+    public boolean isHeld() {
+        return !heldFor.isEmpty();
+    }
+
+    /** Whether the stone is held for this player (3.6.1). */
+    public boolean isHeldFor(UUID player) {
+        return heldFor.containsKey(player);
+    }
+
+    /** The one the stone has been held for longest, or null (3.6.1). */
+    @Nullable
+    public UUID firstHeldFor() {
+        return heldFor.isEmpty() ? null : heldFor.keySet().iterator().next();
+    }
+
+    /** The name of one it is held for (as he was called when he earned it). */
+    public String heldName(UUID seeker) {
+        return heldFor.getOrDefault(seeker, "?");
+    }
+
+    /** His stone has been taken (3.6.1). */
+    public void release(UUID seeker) {
+        heldFor.remove(seeker);
+        changed();
+    }
+
     /** Whether the pedestal shows its stone to this player (on the client: to the one who looks). */
     public boolean shows(@Nullable UUID viewer, StoneKind kind) {
+        if (isHeld()) {
+            return true;
+        }
         if (gone) {
             return false;
         }
@@ -74,7 +118,7 @@ public class StonePedestalBlockEntity extends BlockEntity {
             return;
         }
         StoneKind kind = StonePedestalBlock.kind(state);
-        boolean now = kind != null && StoneLedger.mode(kind) == Uniqueness.WORLD
+        boolean now = !pedestal.isHeld() && kind != null && StoneLedger.mode(kind) == Uniqueness.WORLD
                 && StoneLedger.holder(server.getServer(), kind) != null;
         if (now != pedestal.gone) {
             pedestal.gone = now;
@@ -98,6 +142,14 @@ public class StonePedestalBlockEntity extends BlockEntity {
         }
         tag.put("takers", list);
         tag.putBoolean("gone", gone);
+        ListTag held = new ListTag();
+        heldFor.forEach((uuid, name) -> {
+            CompoundTag one = new CompoundTag();
+            one.putUUID("id", uuid);
+            one.putString("name", name);
+            held.add(one);
+        });
+        tag.put("held_for", held);
     }
 
     @Override
@@ -108,6 +160,13 @@ public class StonePedestalBlockEntity extends BlockEntity {
             takers.add(NbtUtils.loadUUID(uuid));
         }
         gone = tag.getBoolean("gone");
+        heldFor.clear();
+        for (Tag one : tag.getList("held_for", Tag.TAG_COMPOUND)) {
+            CompoundTag held = (CompoundTag) one;
+            if (held.hasUUID("id")) {
+                heldFor.put(held.getUUID("id"), held.getString("name"));
+            }
+        }
     }
 
     @Override

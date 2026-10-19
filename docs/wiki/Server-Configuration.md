@@ -1265,7 +1265,7 @@ These numbers are also those of the **Eye of Agamotto** and of Doctor Strange's 
 
 ## The Soul Stone and Vormir
 
-Section `[soul_stone]` (3.6): the sacrifice at the Vormir Cliff (see [Vormir](Vormir)) and the Soul Stone's powers.
+Section `[soul_stone]` (3.6): the sacrifice at the Vormir Cliff (see [Vormir](Vormir)) and the Soul Stone's powers. Since 3.6.1 anyone can earn the stone there: one who may not hold it bare (`stones.*`) finds it on a pedestal by the pool, held for him.
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
@@ -1277,7 +1277,7 @@ Section `[soul_stone]` (3.6): the sacrifice at the Vormir Cliff (see [Vormir](Vo
 | `soul_stone.friendRule` | `ANY` | `ANY` or `TEAM` | Who is a friend: `ANY` other player (the default: PvP and the cliff's edge make it deliberate) or only a `TEAM` mate (the same scoreboard team). |
 | `soul_stone.onePer` | `PLAYER` | `PLAYER`, `WORLD` or `UNLIMITED` | How many Soul Stones: `PLAYER` (each player once), `WORLD` (one in the whole world) or `UNLIMITED`. |
 | `soul_stone.pushWindowTicks` | `100` | 20 to 400 | Ticks before the victim left the edge in which the seeker's push counts (100 = 5 seconds). |
-| `soul_stone.minFall` | `30` | 10 to 100 | The shortest fall (blocks) that counts. |
+| `soul_stone.minFall` | `30` | 10 to 100 | The shortest fall (blocks) that counts. One pushed off the edge who lands alive on the pit's floor from at least this high is taken by the fall all the same (3.6.1: a cat, a horse, a hero who takes no fall damage; a totem of undying still saves). |
 | `soul_stone.deathWindowTicks` | `200` | 20 to 1200 | Ticks after leaving the edge in which the death must come (200 = 10 seconds). |
 | `soul_stone.drainDamagePerSecond` | `6.0` | 0.0 to 100.0 | Damage per second of the Soul Drain. |
 | `soul_stone.drainRange` | `16` | 4 to 64 | Range (blocks) of the Soul Drain. |

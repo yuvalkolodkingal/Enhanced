@@ -79,15 +79,21 @@ public final class StoneSitePlans {
         /**
          * The strip at the chasm's lip where a fall must begin: 9 x 2 x 2, on the summit's south side, between the
          * chasm and the pool (the skeleton's reading of the plan's "the 9 x 2 x 2 strip on the summit at the chasm's
-         * lip").
+         * lip"). Feet on the strip are at layer 67; the lip (z 21) is a top slab at layer 67, so feet standing on it
+         * are at layer 68 (3.6.1: the box reaches it; before, one who stood on the lip itself was never on the edge).
          */
-        public static final BoundingBox EDGE_BOX = new BoundingBox(12, 66, 21, 20, 67, 22);
+        public static final BoundingBox EDGE_BOX = new BoundingBox(12, 66, 21, 20, 68, 22);
         /** The shaft of the chasm, from just over the pit's floor up through the pinnacle. */
         public static final BoundingBox PIT_BOX = new BoundingBox(12, 3, 12, 20, 62, 20);
         /** The layer of the pit's floor. */
         public static final int PIT_FLOOR = 4;
         /** The shallow pool where the stone is given. */
         public static final BlockPos POOL = new BlockPos(16, 66, 25);
+        /**
+         * Where the Soul Stone waits on a pedestal for a seeker who may not hold it bare (3.6.1): on the summit floor
+         * beside the pool's west side.
+         */
+        public static final BlockPos PEDESTAL = new BlockPos(13, 67, 25);
         /** Where the Stonekeeper stands. */
         public static final BlockPos STONEKEEPER_HOME = new BlockPos(16, 67, 9);
 

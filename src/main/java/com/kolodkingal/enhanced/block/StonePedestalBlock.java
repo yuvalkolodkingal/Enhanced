@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.stones.StoneLedger;
 import com.kolodkingal.enhanced.stones.StoneRules;
 import com.kolodkingal.enhanced.thanos.StoneKind;
+import com.kolodkingal.enhanced.vormir.HeldSoulStone;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -62,7 +63,9 @@ import java.util.Locale;
  * who has taken the same stone before ({@code player} mode): "You have already taken the Time Stone from a place like
  * this."; in {@code world} mode, while someone has it: "This stone is already in someone's hands."</li> </ul>
  *
- * A Creative player puts a stone on an empty pedestal by using the stone on it (map makers).
+ * A Creative player puts a stone on an empty pedestal by using the stone on it (map makers). 3.6.1: a pedestal that
+ * holds a stone for someone (the Soul Stone earned at Vormir by one who may not hold it bare) gives it only to him or
+ * to a Bearer ({@link HeldSoulStone}).
  */
 public class StonePedestalBlock extends BaseEntityBlock {
     public static final MapCodec<StonePedestalBlock> CODEC = simpleCodec(StonePedestalBlock::new);
@@ -180,6 +183,9 @@ public class StonePedestalBlock extends BaseEntityBlock {
         if (!(level.getBlockEntity(pos) instanceof StonePedestalBlockEntity pedestal)) {
             return false;
         }
+        if (pedestal.isHeld()) {
+            return HeldSoulStone.take(player, level, pos, pedestal, kind);
+        }
         if (!StoneRules.mayHold(player, kind)) {
             String key = kind == StoneKind.TIME ? "message.enhanced.stones.pedestal_refuse_time"
                     : "message.enhanced.stones.pedestal_refuse";
@@ -205,6 +211,12 @@ public class StonePedestalBlock extends BaseEntityBlock {
         } else if (!player.getInventory().add(stone)) {
             player.drop(stone, false);
         }
+        takenEffects(player, level, pos, kind);
+        return true;
+    }
+
+    /** The sound, the stone's voice, the burst and the line of a stone taken from the pedestal at {@code pos}. */
+    public static void takenEffects(ServerPlayer player, ServerLevel level, BlockPos pos, StoneKind kind) {
         Vec3 at = Vec3.atCenterOf(pos).add(0.0, 0.95, 0.0);
         level.playSound(null, at.x, at.y, at.z, ModSounds.PEDESTAL_TAKE.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         kind.voice().use(level, at, InfinityStone.UNDER, 1.0F);
@@ -213,6 +225,5 @@ public class StonePedestalBlock extends BaseEntityBlock {
                 new StoneFxPayload(StoneFxPayload.PEDESTAL_TAKE, player.getId(), List.of(at), kind.ordinal()));
         player.displayClientMessage(Component.translatable("message.enhanced.stones.taken", kind.displayName())
                 .withStyle(s -> s.withColor(kind.color())), true);
-        return true;
     }
 }
