@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "enhanced:block/tech_case"
+    },
+    "facing=east": {
+      "model": "enhanced:block/tech_case",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "enhanced:block/tech_case",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "enhanced:block/tech_case",
+      "y": 270
     }
   }
 }

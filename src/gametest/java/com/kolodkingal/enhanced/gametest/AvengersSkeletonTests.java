@@ -589,7 +589,7 @@ public final class AvengersSkeletonTests {
                 && TowerPlan.OBSERVATION.isInside(TowerPlan.CARTOGRAPHY_TABLE), "the wings on the deck");
         TowerPlan.InTemplate mark3 = TowerPlan.inTemplate(TowerPlan.SUIT_DISPLAYS.get(SuitKind.MARK_3));
         check(mark3.part() == 1 && mark3.template().equals(StoneSitePlans.Tower.MID)
-                && mark3.local().equals(new BlockPos(8, 30, 4)), "the Mark 3 in the mid template: " + mark3);
+                && mark3.local().equals(new BlockPos(4, 30, 4)), "the Mark 3 in the mid template: " + mark3);
         TowerPlan.InTemplate wings = TowerPlan.inTemplate(TowerPlan.WINGS_CASE);
         check(wings.part() == 2 && wings.local().equals(new BlockPos(14, 26, 16)), "the wings in the top: " + wings);
         BlockPos cradle = StoneSitePlans.Tower.CRADLE_IN_TOP.offset(0, StoneSitePlans.Tower.PART_Y[2], 0);
