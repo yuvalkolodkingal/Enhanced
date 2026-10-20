@@ -4881,5 +4881,8 @@
   "hud.enhanced.love.needs_axe": "needs the axe",
   "hud.enhanced.love.eyes": "%ss",
   "preset.enhanced.love": "Love-like",
-  "preset.enhanced.love.desc": "Thor's daughter: the axe, lightning, a purple eye laser, the Bifrost and sixteen hearts"
+  "preset.enhanced.love.desc": "Thor's daughter: the axe, lightning, a purple eye laser, the Bifrost and sixteen hearts",
+  "hud.enhanced.red_hulk.changing": "Changing…",
+  "hud.enhanced.red_hulk.ross_hint": "Ross: %s to become Red Hulk",
+  "hud.enhanced.red_hulk.absorb": "Absorbing"
 }

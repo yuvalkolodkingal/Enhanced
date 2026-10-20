@@ -142,6 +142,15 @@ public enum Stance {
      */
     CAP_GUARD(2.0F, 3.0F, false),
     // ===== red_hulk (3.8) =====
+    // (Every entry of a 3.8 region ends with a comma: see GestureId.)
+    /** Red Hulk steaming hot (anger 75 and up): hunched lower, the shoulders heaving, the fists clenched, shaking. */
+    RED_HULK_HEATED(3.0F, 6.0F, false),
+    /** The Energy Absorb held: the feet planted wide, the fists drawn in before the chest, the head down. */
+    RED_HULK_ABSORBING(2.0F, 3.0F, true),
+    /** The Super Jump charging: deep on his haunches, the knuckles on the ground, sinking lower as the charge grows. */
+    RED_HULK_CHARGING(2.0F, 3.0F, true),
+    /** In the air on a Super Jump: the knees tucked, the arms up and wide. */
+    RED_HULK_AIR(2.0F, 3.0F, true),
     // ===== iron_man (3.8) =====
     // (Lane L3. Each constant ends in a comma, so the regions of 3.8 join in any order.)
     /** A suit goes on or comes off: the arms held a little out, still (the suit assembles round him). */

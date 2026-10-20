@@ -500,7 +500,9 @@ public final class AvengersSkeletonTests {
                 "falcon_dart", "suit_display_take", "eternity_ambient", "love_eye_laser")) {
             check(BuiltInRegistries.SOUND_EVENT.containsKey(Enhanced.id(sound)), "the sound " + sound);
         }
-        check(SoundAssetTests.SKELETON_38.size() == 109, "109 sound events wait for the sound lane");
+        // (3.8 L2, the sound lane, made the 109 files: SoundAssetTests.AVENGERS_EVENTS holds them, no placeholder left.)
+        check(SoundAssetTests.SKELETON_38.isEmpty() && SoundAssetTests.AVENGERS_EVENTS.size() == 109,
+                "the 109 sound events are made");
         for (String beam : List.of("unibeam", "chest_laser", "hulkbuster_unibeam", "drone_laser", "love_eyes",
                 "flamethrower")) {
             check(BeamStyles.byId(beam) != null, "the beam style " + beam);

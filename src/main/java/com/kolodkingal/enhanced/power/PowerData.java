@@ -230,9 +230,11 @@ public final class PowerData {
      * he picked it. What a hero's code asks where it used to ask "is he this hero?" about one of his abilities.
      */
     public boolean has(HeroAbility a) {
-        // (3.6: a custom hero in the Hulk's Human Form has none of his rows but the Transform that ends it.)
+        // (3.6: a custom hero in the Hulk's Human Form has none of his rows but the Transform that ends it; 3.8: Red
+        // Hulk's Transform ends it too.)
         return power == a.hero || power == Power.CUSTOM && kit != null && kit.has(a)
-                && (a == HeroAbility.HULK_TRANSFORM || !toggle(Toggle.HUMAN_FORM));
+                && (a == HeroAbility.HULK_TRANSFORM || a == HeroAbility.RED_HULK_TRANSFORM
+                || !toggle(Toggle.HUMAN_FORM));
     }
 
     /** Whether any of this built-in hero's upkeep runs for the player: he is the hero, or a custom hero with one of his abilities. */

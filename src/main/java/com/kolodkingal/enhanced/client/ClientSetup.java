@@ -155,6 +155,7 @@ public final class ClientSetup {
                     (stack, level, holder, seed) -> holder != null && holder.isUsingItem()
                             && holder.getUseItem() == stack ? 1.0F : 0.0F);
             // ===== red_hulk (3.8) =====
+            com.kolodkingal.enhanced.client.redhulk.RedHulkEffects.register();
             // ===== iron_man (3.8) =====
             // The classic suits' and the suit-up's effects, the Unibeam's beam from the chest.
             com.kolodkingal.enhanced.client.ironman.IronClientFx.setup();
@@ -499,7 +500,8 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.captain.CapShieldLayer(renderer));
                 // ===== red_hulk (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.HeatLayer(renderer));
-                renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.RossSuitLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.RossSuitLayer(renderer,
+                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
                 // ===== iron_man (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.SuitLayer(renderer));
                 // ===== nanotech (3.8) =====
@@ -531,6 +533,8 @@ public final class ClientSetup {
         com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer hulk =
                 new com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer(event.getContext());
         com.kolodkingal.enhanced.client.hulk.HulkLayers.addTo(hulk, event.getContext());
+        // ===== red_hulk (3.8): Red Hulk is drawn on the Hulk's body; his heat glows on it =====
+        hulk.addLayer(new com.kolodkingal.enhanced.client.redhulk.HeatLayer(hulk));
         com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer.set(hulk);
         // ===== asgardians (3.5): the Heimdall and Odin NPCs wear the heroes' helms =====
         npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.HEIMDALL,
@@ -616,6 +620,9 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("captain"),
                 new com.kolodkingal.enhanced.client.captain.CaptainHud());
         // ===== red_hulk (3.8) =====
+        // The Anger bar, Ross's line, the jump's charge ring, the absorb's time, the burst's flash.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("red_hulk"),
+                new com.kolodkingal.enhanced.client.redhulk.RedHulkHud());
         // ===== iron_man (3.8) =====
         // 3.8, lane L3: the suit's panel (name, energy, durability), the helmet frame and the faceplate.
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("iron_man"),

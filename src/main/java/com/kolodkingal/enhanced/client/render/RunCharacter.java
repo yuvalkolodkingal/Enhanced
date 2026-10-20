@@ -62,6 +62,9 @@ public enum RunCharacter {
     /** Captain America (3.8): a soldier's straight, strong sprint, the arms pumping, a firm lean. Ends in a comma. */
     CAPTAIN(1.0F, 1.30F, 1.20F, 9, 3, 0.022F),
     // ===== red_hulk (3.8) =====
+    // (Every entry of a 3.8 region ends with a comma: see GestureId.)
+    /** Red Hulk (3.8): heavier than the Hulk, slower, a deep lean, the ground shaking at every stride. */
+    RED_HULK(1.10F, 1.40F, 1.05F, 13, 6, 0.045F),
     // ===== iron_man (3.8) =====
     // (Lane L3. Each constant ends in a comma, so the regions of 3.8 join in any order.)
     /** Iron Man (3.8): heavy, metallic steps in a suit; a short arm swing, a firm bob (lighter in the Mark 5). */
@@ -116,6 +119,7 @@ public enum RunCharacter {
             case DEADPOOL -> DEADPOOL; // (3.7)
             // ===== captain (3.8) =====
             case CAPTAIN_AMERICA -> CAPTAIN;
+            case RED_HULK -> RED_HULK; // (3.8, lane L2)
             case IRON_MAN -> IRON_MAN; // (3.8)
             case FALCON -> FALCON; // (3.8)
             default -> DEFAULT;

@@ -200,7 +200,9 @@ public final class GestureRoutes {
             // (The toggles of 3.8 stand in with the pending gesture, for their own hero only, until their lanes route
             // them.)
             // ===== red_hulk (3.8) =====
-            case ROSS_FORM -> power == Power.RED_HULK ? PENDING_GESTURE : null;
+            // (Ross again at the end of the shrink: he straightens his jacket. The change itself is told by its
+            // payloads, RED_HULK_TRANSFORM_IN and _OUT, as a new Red Hulk's growth has no switch to flip.)
+            case ROSS_FORM -> power == Power.RED_HULK && on ? GestureId.RED_HULK_ROSS : null;
             // ===== falcon (3.8) =====
             // (Redwing out of the pack: the flick of the hand that launches it; home again, nothing.)
             case REDWING_OUT -> power == Power.FALCON && on ? GestureId.FALCON_REDWING_LAUNCH : null;
@@ -502,7 +504,12 @@ public final class GestureRoutes {
             case CAPTAIN_AMERICA -> "none: every move of Captain America is told by the payload of its effect, which"
                     + " names him (CaptainGestures.gestureOf)";
             // ===== red_hulk (3.8) =====
-            case RED_HULK -> "none: Red Hulk's keys are acted by his plug-in (lane L2 of 3.8)";
+            // (The Smash, the Heat Wave, the Roar, the jump's launch and landing, the burst, the grab and the Bound
+            // are told by the payloads of their effects, which name him (the grab's and the Bound's are the Hulk's);
+            // the jump's charge and the absorb are his states, whose gestures his plug-in gives; N's change is told by
+            // its payloads and Ross's return by toggle:ROSS_FORM.)
+            case RED_HULK -> "none: Red Hulk's keys are acted by the payloads of his moves, which name him"
+                    + " (RedHulkGestures.gestureOf), and by his states (RedHulkClient.liveGesture)";
             // ===== iron_man (3.8) =====
             // (Lane L3: every suit move is told by the payload of its effect, which names him; G is flight, or the
             // Mark 1's Rocket Boost, whose effect BOOST plays IRON_BOOST. The nanotech suits' and the Hulkbuster's
@@ -622,8 +629,14 @@ public final class GestureRoutes {
                     + " run";
             case CAP_SLAMMING -> "the slam's payloads play CAP_SLAM_LEAP at the hop and CAP_SLAM_DOWN at the landing";
             // ===== red_hulk (3.8) =====
-            case RED_HULK_TRANSFORMING, RED_HULK_JUMP_CHARGING, RED_HULK_LEAPING, RED_HULK_HEATED, RED_HULK_ABSORBING,
-                    RED_HULK_GRABBING -> "pending: Red Hulk's lane (L2 of 3.8) acts it";
+            // (The charge and the absorb have gestures of his own, from his plug-in: RedHulkClient.liveGesture.)
+            case RED_HULK_JUMP_CHARGING, RED_HULK_ABSORBING -> null;
+            case RED_HULK_TRANSFORMING -> "the change's payloads play RED_HULK_TRANSFORM_OUT or _IN";
+            case RED_HULK_LEAPING -> "the jump's payload plays RED_HULK_JUMP (the Bound's the Hulk's HULK_BOUND); in"
+                    + " the air the stance RED_HULK_AIR holds him";
+            case RED_HULK_HEATED -> "a stance (RED_HULK_HEATED); the heat is HeatLayer's glow and the steam his"
+                    + " effects'";
+            case RED_HULK_GRABBING -> "the Hulk's grab: its payload plays HULK_GRAB_SMASH, timed to the three slams";
             // ===== iron_man (3.8) =====
             case IRON_SUITING -> "a stance (IRON_SUITING) while a suit goes on or comes off; the effects SUIT_UP and"
                     + " SUIT_DOWN play IRON_SUIT_UP, IRON_STEP_IN and IRON_SUIT_DOWN (IronManActing)";

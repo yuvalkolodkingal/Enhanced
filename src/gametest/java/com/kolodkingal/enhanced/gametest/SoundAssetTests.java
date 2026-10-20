@@ -55,30 +55,10 @@ public final class SoundAssetTests {
     static final Set<String> SKELETON_37 = Set.of();
     /**
      * The 3.8 skeleton's placeholder files ({@code sfx/<name>.ogg}, the same 0.2-second file): every sound event of 3.8
-     * (PLAN Appendix C) until the sound lane (L2 of 3.8) makes it. L2 empties this list and extends the tests to the
-     * 3.8 events.
+     * (PLAN Appendix C) until the sound lane (L2 of 3.8) made it. L2 emptied this list; {@link #AVENGERS_EVENTS} holds
+     * the 3.8 events.
      */
-    static final Set<String> SKELETON_38 = Set.of(
-            "serum_open", "serum_choose", "serum_locked", "shield_throw", "shield_ricochet", "shield_catch",
-            "shield_block", "shield_reflect", "shield_slam", "shield_charge", "shield_bash", "cap_assemble",
-            "cap_inspire", "cap_punch", "cap_flip", "captain_awaken", "red_hulk_roar", "red_hulk_smash",
-            "red_hulk_heat_wave", "red_hulk_jump_charge", "red_hulk_jump", "red_hulk_land", "red_hulk_burst",
-            "red_hulk_steam", "red_hulk_absorb", "red_hulk_transform", "red_hulk_awaken", "arc_reactor_insert",
-            "arc_reactor_hum", "iron_man_awaken", "suit_energy_low", "suit_energy_empty", "repulsor_charge",
-            "repulsor_blast", "double_blast", "unibeam_start", "unibeam", "flares", "mini_missile_launch",
-            "mini_missile_boom", "iron_thrusters", "iron_boost", "iron_crash", "mark1_flamethrower", "mark1_arm_rocket",
-            "mark1_clank", "mark3_gantry", "mark5_suitcase_open", "mark5_suitcase_close", "dash_punch", "laser_burst",
-            "iron_hud_boot", "suit_up_generic", "suit_down_generic", "nano_flow", "nano_retract", "nano_blade_out",
-            "nano_blade_in", "nano_shield", "nano_cannon_charge", "nano_cannon_fire", "energy_blade_swing",
-            "energy_shield_hit", "lightning_refocuser", "homing_lock", "nano_drones_deploy", "drone_laser",
-            "chest_laser", "hulkbuster_drop", "hulkbuster_open", "hulkbuster_close", "hulkbuster_step",
-            "hulkbuster_punch", "hulkbuster_grab", "hulkbuster_throw", "veronica_arm", "falcon_wings_open",
-            "falcon_wings_close", "falcon_thrust", "falcon_dive", "falcon_dive_hit", "falcon_climb", "falcon_dart",
-            "falcon_rocket", "wing_shield_up", "wing_shield_deflect", "wing_slash", "redwing_launch", "redwing_buzz",
-            "redwing_zap", "redwing_strike", "redwing_return", "falcon_awaken", "suit_display_take", "tech_case_open",
-            "tech_case_take", "display_refuse", "shrine_hum", "altar_place", "altar_rise", "eternity_arrive",
-            "eternity_ambient", "eternity_voice", "wish_granted", "eternity_leave", "love_awaken",
-            "love_eye_laser_start", "love_eye_laser", "love_thunder_strike");
+    static final Set<String> SKELETON_38 = Set.of();
     /** The sound events of PLAN Appendix C (72; {@code music.asgard} plays three files). */
     static final List<String> ASGARD_EVENTS = List.of(
             // Asgard
@@ -167,6 +147,40 @@ public final class SoundAssetTests {
             "ambient.cottage");
     /** The 3.7 ambience loops (played while one is there): long. */
     static final List<String> AMBIENCE_LOOPS_37 = List.of("ambient.school_lab", "ambient.cottage");
+
+    /**
+     * The sound events of 3.8 (109, PLAN Appendix C, in its order): the Super Soldier Serum, Captain America, Red
+     * Hulk, Iron Man and his suits, the nanotech and the Hulkbuster, Falcon and Redwing, the Avengers Tower's armoury,
+     * Eternity and Love.
+     */
+    static final List<String> AVENGERS_EVENTS = List.of(
+            "serum_open", "serum_choose", "serum_locked", "shield_throw", "shield_ricochet", "shield_catch",
+            "shield_block", "shield_reflect", "shield_slam", "shield_charge", "shield_bash", "cap_assemble",
+            "cap_inspire", "cap_punch", "cap_flip", "captain_awaken", "red_hulk_roar", "red_hulk_smash",
+            "red_hulk_heat_wave", "red_hulk_jump_charge", "red_hulk_jump", "red_hulk_land", "red_hulk_burst",
+            "red_hulk_steam", "red_hulk_absorb", "red_hulk_transform", "red_hulk_awaken", "arc_reactor_insert",
+            "arc_reactor_hum", "iron_man_awaken", "suit_energy_low", "suit_energy_empty", "repulsor_charge",
+            "repulsor_blast", "double_blast", "unibeam_start", "unibeam", "flares", "mini_missile_launch",
+            "mini_missile_boom", "iron_thrusters", "iron_boost", "iron_crash", "mark1_flamethrower", "mark1_arm_rocket",
+            "mark1_clank", "mark3_gantry", "mark5_suitcase_open", "mark5_suitcase_close", "dash_punch", "laser_burst",
+            "iron_hud_boot", "suit_up_generic", "suit_down_generic", "nano_flow", "nano_retract", "nano_blade_out",
+            "nano_blade_in", "nano_shield", "nano_cannon_charge", "nano_cannon_fire", "energy_blade_swing",
+            "energy_shield_hit", "lightning_refocuser", "homing_lock", "nano_drones_deploy", "drone_laser",
+            "chest_laser", "hulkbuster_drop", "hulkbuster_open", "hulkbuster_close", "hulkbuster_step",
+            "hulkbuster_punch", "hulkbuster_grab", "hulkbuster_throw", "veronica_arm", "falcon_wings_open",
+            "falcon_wings_close", "falcon_thrust", "falcon_dive", "falcon_dive_hit", "falcon_climb", "falcon_dart",
+            "falcon_rocket", "wing_shield_up", "wing_shield_deflect", "wing_slash", "redwing_launch", "redwing_buzz",
+            "redwing_zap", "redwing_strike", "redwing_return", "falcon_awaken", "suit_display_take", "tech_case_open",
+            "tech_case_take", "display_refuse", "shrine_hum", "altar_place", "altar_rise", "eternity_arrive",
+            "eternity_ambient", "eternity_voice", "wish_granted", "eternity_leave", "love_awaken",
+            "love_eye_laser_start", "love_eye_laser", "love_thunder_strike");
+    /** The 3.8 loops (seamless; played while their state lasts). */
+    static final List<String> LOOPS_38 = List.of(
+            "red_hulk_steam", "red_hulk_absorb", "arc_reactor_hum", "unibeam", "iron_thrusters", "mark1_flamethrower",
+            "nano_shield", "chest_laser", "falcon_thrust", "redwing_buzz", "shrine_hum", "eternity_ambient",
+            "love_eye_laser");
+    /** The 3.8 ambience loop (Eternity's realm): long. */
+    static final List<String> AMBIENCE_LOOPS_38 = List.of("eternity_ambient");
 
     private static IModFile mod() {
         return ModList.get().getModFileById(Enhanced.MODID).getFile();
@@ -344,6 +358,46 @@ public final class SoundAssetTests {
             }
         }
         check(count == 63, "one file for each 3.7 event: " + count);
+        helper.succeed();
+    }
+
+    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    public static void everySoundOf38IsARealMonoSoundWithItsSubtitles(GameTestHelper helper) throws IOException {
+        check(AVENGERS_EVENTS.size() == 109 && Set.copyOf(AVENGERS_EVENTS).size() == 109,
+                "3.8 has 109 sound events: " + AVENGERS_EVENTS.size());
+        check(AVENGERS_EVENTS.containsAll(LOOPS_38) && LOOPS_38.containsAll(AMBIENCE_LOOPS_38),
+                "the 3.8 loops are 3.8 events");
+        check(SKELETON_38.isEmpty(), "no 3.8 placeholder is left");
+        JsonObject sounds = json("sounds.json");
+        JsonObject en = json("lang/en_us.json");
+        JsonObject he = json("lang/he_il.json");
+        int count = 0;
+        for (String event : AVENGERS_EVENTS) {
+            check(BuiltInRegistries.SOUND_EVENT.containsKey(Enhanced.id(event)),
+                    event + " is a registered sound event");
+            String subtitle = "subtitles.enhanced." + event;
+            JsonElement own = sounds.getAsJsonObject(event) == null ? null
+                    : sounds.getAsJsonObject(event).get("subtitle");
+            check(own != null && own.getAsString().equals(subtitle), event + " has its own subtitle key");
+            check(en.has(subtitle) && !en.get(subtitle).getAsString().isBlank(), event + " has an English subtitle");
+            check(he.has(subtitle) && he.get(subtitle).getAsString().chars().anyMatch(c -> c >= 0x05D0 && c <= 0x05EA),
+                    event + " has a Hebrew subtitle");
+            for (String path : files(sounds, event)) {
+                byte[] data = Files.readAllBytes(file(path));
+                check(!md5(data).equals(PLACEHOLDER_MD5), path + " is not the skeleton's placeholder");
+                Ogg ogg = ogg(path, data);
+                check(ogg.channels() == 1 && ogg.rate() == 44100, path + " is mono at 44.1 kHz: " + ogg);
+                check(ogg.seconds() > 0.5, path + " is longer than half a second: " + ogg.seconds());
+                if (LOOPS_38.contains(event)) {
+                    check(ogg.seconds() >= 2.0, path + " is a loop of at least 2 seconds: " + ogg.seconds());
+                }
+                if (AMBIENCE_LOOPS_38.contains(event)) {
+                    check(ogg.seconds() >= 15.0, path + " is a long ambience loop: " + ogg.seconds());
+                }
+                count++;
+            }
+        }
+        check(count == 109, "one file for each 3.8 event: " + count);
         helper.succeed();
     }
 

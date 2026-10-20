@@ -271,12 +271,18 @@ public final class HeroAbilityAnims {
         live(Live.CAP_CHARGING, HeroAbility.CAPTAIN_SHIELD_CHARGE);
         live(Live.CAP_SLAMMING, HeroAbility.CAPTAIN_SHIELD_SLAM);
         // ===== red_hulk (3.8) =====
-        row(HeroAbility.RED_HULK_SMASH);
-        row(HeroAbility.RED_HULK_HEAT_WAVE);
-        row(HeroAbility.RED_HULK_SUPER_JUMP);
-        row(HeroAbility.RED_HULK_BURST);
-        row(HeroAbility.RED_HULK_TRANSFORM);
-        row(HeroAbility.RED_HULK_BODY);
+        // (Lane L2. What he shares with the Hulk plays the Hulk's gestures: the Smash, the Grab, the Roar, the Bound,
+        // the landing.)
+        row(HeroAbility.RED_HULK_SMASH).main(GestureId.HULK_SMASH).alt(GestureId.HULK_GRAB_SMASH);
+        row(HeroAbility.RED_HULK_HEAT_WAVE).main(GestureId.RED_HULK_HEAT_WAVE).alt(GestureId.HULK_ROAR);
+        row(HeroAbility.RED_HULK_SUPER_JUMP).main(GestureId.RED_HULK_JUMP_CROUCH).alt(GestureId.HULK_BOUND)
+                .also(GestureId.RED_HULK_JUMP, GestureId.HULK_LAND)
+                .stances(Stance.RED_HULK_CHARGING, Stance.RED_HULK_AIR);
+        row(HeroAbility.RED_HULK_BURST).main(GestureId.RED_HULK_BURST).alt(GestureId.RED_HULK_ABSORB)
+                .stances(Stance.RED_HULK_ABSORBING);
+        row(HeroAbility.RED_HULK_TRANSFORM).main(GestureId.RED_HULK_TRANSFORM_IN)
+                .also(GestureId.RED_HULK_TRANSFORM_OUT, GestureId.RED_HULK_ROSS);
+        row(HeroAbility.RED_HULK_BODY).stances(Stance.HULK_IDLE, Stance.RED_HULK_HEATED);
         // ===== iron_man (3.8) =====
         // (Lane L3's gestures for the core moves; the Mark 85's own (the blades, the shield, the Refocuser, the
         // drones) are lane L4's to add as alts.)
@@ -384,6 +390,13 @@ public final class HeroAbilityAnims {
         // 3.7 (lane L2: Wolverine's)
         live(Live.WOLVERINE_POUNCING, HeroAbility.WOLVERINE_POUNCE);
         live(Live.WOLVERINE_BERSERK, HeroAbility.WOLVERINE_BERSERKER);
+        // 3.8 (lane L2: Red Hulk's)
+        live(Live.RED_HULK_TRANSFORMING, HeroAbility.RED_HULK_TRANSFORM);
+        live(Live.RED_HULK_JUMP_CHARGING, HeroAbility.RED_HULK_SUPER_JUMP);
+        live(Live.RED_HULK_LEAPING, HeroAbility.RED_HULK_SUPER_JUMP);
+        live(Live.RED_HULK_HEATED, HeroAbility.RED_HULK_BODY);
+        live(Live.RED_HULK_ABSORBING, HeroAbility.RED_HULK_BURST);
+        live(Live.RED_HULK_GRABBING, HeroAbility.RED_HULK_SMASH);
         // (PINNED, LIFTED and MIND_CONTROLLED are what is done to a player, not what he does: no ability owns them.)
         toggle(Toggle.FROST_GIANT, HeroAbility.LOKI_FROST_GIANT);
         toggle(Toggle.GOD_OF_THUNDER, HeroAbility.THOR_THUNDER);

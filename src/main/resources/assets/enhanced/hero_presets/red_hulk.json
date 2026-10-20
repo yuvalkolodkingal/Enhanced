@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#C4231B",
+  "glow": "#FF7A3A",
+  "look": {
+    "base": "red_hulk/red_hulk",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "red_hulk.smash",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "red_hulk.heat_wave",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "red_hulk.super_jump",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "red_hulk.burst",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "red_hulk.transform",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "red_hulk.body",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "red_hulk.smash",
+    "red_hulk.heat_wave",
+    "red_hulk.super_jump",
+    "red_hulk.burst",
+    "red_hulk.transform"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "hulk",
+    "speedRun": "auto",
+    "idle": "heavy"
+  },
+  "preset": {
+    "icon": "minecraft:red_dye",
+    "hero": "red_hulk"
+  }
+}
