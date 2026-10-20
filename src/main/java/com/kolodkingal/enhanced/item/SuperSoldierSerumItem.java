@@ -15,10 +15,9 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * The Super Soldier Serum (3.8, PLAN 2.1): a glass vial of glowing blue liquid in a steel cage. Used, it opens the
- * choice of Captain America, Red Hulk or Falcon ({@link SerumServer#open}); it is used up only by a choice, never by
- * opening. Registered by the 3.8 skeleton (the use opens the screen, every choice answers "not yet"); lane L1 owns the
- * class.
+ * The Super Soldier Serum (3.8, PLAN 2.1): a glass vial of glowing blue liquid in a steel cage. Used (either hand), it
+ * opens the choice of Captain America, Red Hulk or Falcon ({@link SerumServer#open}); it is used up only by a choice,
+ * never by opening, and the server checks the choice again ({@link SerumServer#choose}).
  */
 public class SuperSoldierSerumItem extends Item {
     public SuperSoldierSerumItem(Properties properties) {

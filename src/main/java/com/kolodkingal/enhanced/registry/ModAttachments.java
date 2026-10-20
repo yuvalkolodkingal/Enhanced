@@ -233,13 +233,15 @@ public final class ModAttachments {
                             .build());
 
     // ===== captain (3.8) =====
-    /** 3.8: Captain America's thrown shield and combo (lane L1). Saved, not kept on death, synced to him. */
+    /**
+     * 3.8: Captain America's thrown shield and combo (lane L1). Saved, not kept on death, synced to everyone who sees
+     * him (lane L1: the others draw his Vibranium Shield on his back by its flag).
+     */
     public static final Supplier<AttachmentType<com.kolodkingal.enhanced.captain.CaptainState>> CAPTAIN =
             ATTACHMENTS.register("captain",
                     () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.captain.CaptainState.EMPTY)
                             .serialize(com.kolodkingal.enhanced.captain.CaptainState.CODEC)
-                            .sync((holder, to) -> holder == to,
-                                    com.kolodkingal.enhanced.captain.CaptainState.STREAM_CODEC)
+                            .sync(com.kolodkingal.enhanced.captain.CaptainState.STREAM_CODEC)
                             .build());
     // ===== red_hulk (3.8) =====
     /** 3.8: Red Hulk's anger (lane L2). Saved, not kept on death, synced to everyone who sees him (his heat glow). */

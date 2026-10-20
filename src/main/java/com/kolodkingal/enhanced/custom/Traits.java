@@ -69,6 +69,10 @@ public final class Traits {
             default -> {
             }
         }
+        // 3.8 (lane L1): [captain_america] worthy false takes Mjolnir from him.
+        if (power == Power.CAPTAIN_AMERICA && !com.kolodkingal.enhanced.captain.CaptainAbilities.worthy()) {
+            traits.remove(Trait.WORTHY);
+        }
         return traits;
     }
 
