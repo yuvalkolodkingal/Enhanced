@@ -164,14 +164,13 @@ public enum Stance {
     HULKBUSTER_GRAB(1.5F, 3.0F, true),
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
-    // (Lane L5. Each starts with a comma, so the regions of 3.8 join in any order.)
-    ,
+    // (Lane L5. Each constant ends in a comma, so the regions of 3.8 join in any order.)
     /** Falcon gliding: the arms a little out from his sides and back, along the wings, the legs together. */
     FALCON_GLIDE(3.0F, 4.0F, false),
     /** Behind the Wing Shield: the forearms crossed before the chest, the head down a little. */
     FALCON_SHIELDING(1.5F, 3.0F, true),
     /** In the Dive: the body tipped head first, the arms tight along his sides, the legs together. */
-    FALCON_DIVING(2.0F, 4.0F, true)
+    FALCON_DIVING(2.0F, 4.0F, true),
     // ===== love (3.8) =====
     ;
 

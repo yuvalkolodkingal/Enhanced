@@ -547,8 +547,7 @@ public enum GestureId {
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
     // (Falcon's, lane L5: started by the payloads of his moves, which name him: FalconClient.startedElsewhere.)
-    // (Lane L5. Each starts with a comma, so the regions of 3.8 join in any order.)
-    ,
+    // (Lane L5. Each constant ends in a comma, so the regions of 3.8 join in any order.)
     /** A dart from the left wrist (R): the off arm up along the look, a small kick. */
     FALCON_BLAST_L(Group.CAST, 8, 1, 3, false),
     /** A dart from the right wrist, 3 ticks later. */
@@ -568,7 +567,7 @@ public enum GestureId {
     /** Redwing launches (N): a flick of the right hand up over the shoulder. */
     FALCON_REDWING_LAUNCH(Group.CAST, 10, 1, 4, true),
     /** Redwing Strike (Sneak + N): the right arm points at the foe. */
-    FALCON_REDWING_POINT(Group.CAST, 16, 2, 5, true)
+    FALCON_REDWING_POINT(Group.CAST, 16, 2, 5, true),
     // ===== love (3.8) =====
     // (3.8: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
     // AnimationMathTests wants keys for every gesture.)

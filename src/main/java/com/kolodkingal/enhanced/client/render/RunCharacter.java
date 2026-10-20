@@ -67,10 +67,9 @@ public enum RunCharacter {
     /** Iron Man (3.8): heavy, metallic steps in a suit; a short arm swing, a firm bob (lighter in the Mark 5). */
     IRON_MAN(0.80F, 1.05F, 1.05F, 9, 3, 0.032F),
     // ===== falcon (3.8) =====
-    // (Lane L5. Each starts with a comma, so the regions of 3.8 join in any order.)
-    ,
+    // (Lane L5. Each constant ends in a comma, so the regions of 3.8 join in any order.)
     /** Falcon (3.8): a light, quick run, a soldier's, the arms swinging easily, a little lean, a light bob. */
-    FALCON(0.95F, 1.20F, 1.20F, 8, 4, 0.018F)
+    FALCON(0.95F, 1.20F, 1.20F, 8, 4, 0.018F),
     // ===== love (3.8) =====
     // (3.8: each lane appends its hero's run here and routes it in of(); until then they run as anyone.)
     ;
