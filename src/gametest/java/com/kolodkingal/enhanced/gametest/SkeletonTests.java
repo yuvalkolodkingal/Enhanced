@@ -664,7 +664,9 @@ public final class SkeletonTests {
                 "enhanced:speed_blitz");
         // (3.7: Wolverine's claws and Deadpool's katanas are blows of a hand too.)
         Set<String> added = Set.of("enhanced:thanos_blow", "enhanced:thanos_sword", "enhanced:apocalypse_blow", "enhanced:spider_legs",
-                "enhanced:web_kick", "enhanced:wolverine_claws", "enhanced:deadpool_katana");
+                "enhanced:web_kick", "enhanced:wolverine_claws", "enhanced:deadpool_katana",
+                // (3.8: Red Hulk's Ground Smash, Iron Man's energy blades and the Hulkbuster's punch.)
+                "enhanced:red_hulk_smash", "enhanced:iron_blade", "enhanced:hulkbuster_punch");
         Zombie attacker = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
         Set<String> inTag = new LinkedHashSet<>();
         for (Holder.Reference<DamageType> holder : registry.holders().toList()) {
