@@ -1720,7 +1720,11 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    /**
+     * (A batch of its own: his call reaches every unclaimed Mjolnir and Stormbreaker within the recall range, and the
+     * tests of a batch run side by side, so a neighbour's hammer could answer it.)
+     */
+    @GameTest(template = ARENA, batch = "thor_calls_only_his")
     public static void aCreativeThorCanMoveAnyMjolnirButStillCallsOnlyHis(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

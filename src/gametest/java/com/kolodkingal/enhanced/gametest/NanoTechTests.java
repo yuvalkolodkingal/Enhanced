@@ -402,8 +402,10 @@ public final class NanoTechTests {
         look(tony, EAST, 0.0F);
         Husk first = husk(helper, 16.5, 10.5);
         Husk second = husk(helper, 16.5, 14.5);
+        // (Already near the two: the nearest other hostile is the second husk, not one of a neighbouring test's.)
         IronMissileEntity missile = IronMissileEntity.create(helper.getLevel(), tony, IronMissileEntity.HOMING,
-                tony.getEyePosition(), new Vec3(1, 0, 0), HomingMissiles.SPEED, 4.0F, 0.6F, 239.0);
+                helper.absoluteVec(new Vec3(12.5, FLOOR + 1.5, 10.5)), new Vec3(1, 0, 0), HomingMissiles.SPEED, 4.0F,
+                0.6F, 239.0);
         MissileGuidance.guide(missile, tony, first, 200, 12.0, HomingMissiles.SPEED);
         helper.getLevel().addFreshEntity(missile);
         first.discard();
