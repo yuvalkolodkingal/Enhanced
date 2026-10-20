@@ -61,6 +61,10 @@ public enum RunCharacter {
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
+    // (Lane L3. Each starts with a comma, so the regions of 3.8 join in any order.)
+    ,
+    /** Iron Man (3.8): heavy, metallic steps in a suit; a short arm swing, a firm bob (lighter in the Mark 5). */
+    IRON_MAN(0.80F, 1.05F, 1.05F, 9, 3, 0.032F)
     // ===== falcon (3.8) =====
     // ===== love (3.8) =====
     // (3.8: each lane appends its hero's run here and routes it in of(); until then they run as anyone.)
@@ -106,6 +110,7 @@ public enum RunCharacter {
             case HULK -> HULK; // (3.6; Bruce Banner walks as anyone: RunPoses)
             case WOLVERINE -> WOLVERINE; // (3.7)
             case DEADPOOL -> DEADPOOL; // (3.7)
+            case IRON_MAN -> IRON_MAN; // (3.8)
             default -> DEFAULT;
         };
     }

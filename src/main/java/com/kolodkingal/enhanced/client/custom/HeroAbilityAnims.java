@@ -271,10 +271,13 @@ public final class HeroAbilityAnims {
         row(HeroAbility.RED_HULK_TRANSFORM);
         row(HeroAbility.RED_HULK_BODY);
         // ===== iron_man (3.8) =====
-        row(HeroAbility.IRON_MAN_REPULSOR);
-        row(HeroAbility.IRON_MAN_UNIBEAM);
+        // (Lane L3's gestures for the core moves; the Mark 85's own (the blades, the shield, the Refocuser, the
+        // drones) are lane L4's to add as alts.)
+        row(HeroAbility.IRON_MAN_REPULSOR).main(GestureId.IRON_REPULSOR_R)
+                .also(GestureId.IRON_REPULSOR_L, GestureId.IRON_DOUBLE_BLAST);
+        row(HeroAbility.IRON_MAN_UNIBEAM).main(GestureId.IRON_UNIBEAM).stances(Stance.IRON_UNIBEAM);
         row(HeroAbility.IRON_MAN_SHIELD);
-        row(HeroAbility.IRON_MAN_MISSILES);
+        row(HeroAbility.IRON_MAN_MISSILES).main(GestureId.IRON_MISSILES);
         row(HeroAbility.IRON_MAN_SUIT);
         // ===== falcon (3.8) =====
         row(HeroAbility.FALCON_BLASTERS);

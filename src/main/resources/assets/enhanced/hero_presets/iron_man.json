@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#B3121B",
+  "glow": "#9FE8FF",
+  "look": {
+    "base": "iron_man/tony",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "iron_man.repulsor",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 4,
+      "option": "jet"
+    },
+    {
+      "id": "iron_man.unibeam",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "iron_man.shield",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "iron_man.missiles",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "iron_man.suit",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "iron_man.repulsor",
+    "flight",
+    "iron_man.unibeam",
+    "iron_man.shield",
+    "iron_man.missiles"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "auto",
+    "speedRun": "auto",
+    "idle": "ready"
+  },
+  "preset": {
+    "icon": "minecraft:red_concrete",
+    "hero": "iron_man"
+  }
+}
