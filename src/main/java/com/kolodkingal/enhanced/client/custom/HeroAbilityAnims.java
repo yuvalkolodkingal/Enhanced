@@ -256,13 +256,20 @@ public final class HeroAbilityAnims {
         live(Live.DEADPOOL_PARRYING, HeroAbility.DEADPOOL_KATANAS);
         live(Live.DEADPOOL_AIMING, HeroAbility.DEADPOOL_PISTOLS);
         // ===== captain (3.8) =====
-        // (The skeleton's rows have no moves yet: each lane gives its own their gestures and stances.)
-        row(HeroAbility.CAPTAIN_SHIELD_THROW);
-        row(HeroAbility.CAPTAIN_SHIELD_SLAM);
-        row(HeroAbility.CAPTAIN_SHIELD_CHARGE);
-        row(HeroAbility.CAPTAIN_ASSEMBLE);
-        row(HeroAbility.CAPTAIN_COMBO);
+        // (Lane L1: every move of his is told by the effect of his move, which names him; the guard behind the raised
+        // shield is the throw's stance.)
+        row(HeroAbility.CAPTAIN_SHIELD_THROW).main(GestureId.CAP_THROW).alt(GestureId.CAP_THROW)
+                .also(GestureId.CAP_THROW_OFF, GestureId.CAP_CATCH, GestureId.CAP_CATCH_MAIN)
+                .stances(Stance.CAP_GUARD);
+        row(HeroAbility.CAPTAIN_SHIELD_SLAM).main(GestureId.CAP_SLAM_LEAP).alt(GestureId.CAP_LEAP)
+                .also(GestureId.CAP_SLAM_DOWN);
+        row(HeroAbility.CAPTAIN_SHIELD_CHARGE).main(GestureId.CAP_CHARGE).alt(GestureId.CAP_BASH);
+        row(HeroAbility.CAPTAIN_ASSEMBLE).main(GestureId.CAP_ASSEMBLE).alt(GestureId.CAP_INSPIRE);
+        row(HeroAbility.CAPTAIN_COMBO).main(GestureId.CAP_PUNCH_1).alt(GestureId.CAP_FLIP_KICK)
+                .also(GestureId.CAP_PUNCH_2, GestureId.CAP_KICK);
         row(HeroAbility.CAPTAIN_BODY);
+        live(Live.CAP_CHARGING, HeroAbility.CAPTAIN_SHIELD_CHARGE);
+        live(Live.CAP_SLAMMING, HeroAbility.CAPTAIN_SHIELD_SLAM);
         // ===== red_hulk (3.8) =====
         row(HeroAbility.RED_HULK_SMASH);
         row(HeroAbility.RED_HULK_HEAT_WAVE);

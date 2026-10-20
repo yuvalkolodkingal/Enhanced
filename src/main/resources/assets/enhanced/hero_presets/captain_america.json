@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#2A4BA0",
+  "glow": "#E8EEF5",
+  "look": {
+    "base": "captain_america/classic",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "captain.shield_throw",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "captain.shield_slam",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "captain.shield_charge",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "captain.assemble",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "captain.combo",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "captain.body",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "captain.shield_throw",
+    "captain.shield_slam",
+    "captain.shield_charge",
+    "captain.assemble",
+    "captain.combo"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "cyclops",
+    "speedRun": "auto",
+    "idle": "ready"
+  },
+  "preset": {
+    "icon": "minecraft:shield",
+    "hero": "captain_america"
+  }
+}

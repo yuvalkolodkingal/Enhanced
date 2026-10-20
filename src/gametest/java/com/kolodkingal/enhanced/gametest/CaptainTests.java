@@ -632,6 +632,62 @@ public final class CaptainTests {
         }, cap);
     }
 
+    // ------------------------------------------------------------------------------------------------------------
+    // The pure tables
+
+    /** His gestures' keys and routes, his states' reasons, his rows' moves, his run, his payloads' gestures. */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theAnimationTables(GameTestHelper helper) {
+        int count = 0;
+        for (com.kolodkingal.enhanced.client.render.GestureId id
+                : com.kolodkingal.enhanced.client.render.GestureId.values()) {
+            if (id.name().startsWith("CAP_")) {
+                count++;
+                var def = com.kolodkingal.enhanced.client.render.Gestures.get(id);
+                check(def != null && def.problems().isEmpty(), id + " is well keyed");
+                check(com.kolodkingal.enhanced.client.render.GestureRoutes.startedElsewhere(id),
+                        id + " is started by his payloads");
+            }
+        }
+        check(count == 15, "fifteen gestures: " + count);
+        for (Live live : List.of(Live.CAP_CHARGING, Live.CAP_SLAMMING)) {
+            String reason = com.kolodkingal.enhanced.client.render.GestureRoutes.reason(live);
+            check(reason != null && !reason.startsWith("pending"), live + " is no longer pending: " + reason);
+        }
+        check(com.kolodkingal.enhanced.client.render.CaptainGestures.gestureOf(
+                com.kolodkingal.enhanced.network.CaptainFxPayload.THROW, 1)
+                == com.kolodkingal.enhanced.client.render.GestureId.CAP_THROW_OFF
+                && com.kolodkingal.enhanced.client.render.CaptainGestures.gestureOf(
+                com.kolodkingal.enhanced.network.CaptainFxPayload.SLAM, 2)
+                == com.kolodkingal.enhanced.client.render.GestureId.CAP_SLAM_DOWN
+                && com.kolodkingal.enhanced.client.render.CaptainGestures.gestureOf(
+                com.kolodkingal.enhanced.network.CaptainFxPayload.BLOCK, 0) == null, "the payloads' gestures");
+        check(com.kolodkingal.enhanced.client.custom.HeroAbilityAnims.shown(HeroAbility.CAPTAIN_COMBO, true)
+                == com.kolodkingal.enhanced.client.render.GestureId.CAP_FLIP_KICK, "the variant");
+        check(com.kolodkingal.enhanced.client.render.RunCharacter.of(Power.CAPTAIN_AMERICA, false)
+                == com.kolodkingal.enhanced.client.render.RunCharacter.CAPTAIN, "his run");
+        helper.succeed();
+    }
+
+    /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
+        java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
+                .findResource("assets", Enhanced.MODID, "hero_presets", "captain_america.json");
+        String json = java.nio.file.Files.readString(file, java.nio.charset.StandardCharsets.UTF_8);
+        com.kolodkingal.enhanced.custom.HeroPresets.Preset preset =
+                com.kolodkingal.enhanced.custom.HeroPresets.read("captain_america", json);
+        check(preset != null && preset.like() == Power.CAPTAIN_AMERICA, "the preset reads, like Captain America");
+        com.kolodkingal.enhanced.custom.CustomHeroRules.Result r = com.kolodkingal.enhanced.custom.CustomHeroRules
+                .sanitize(preset.hero(), com.kolodkingal.enhanced.custom.CustomHeroRules.Limits.DEFAULT.withBudget(
+                        com.kolodkingal.enhanced.custom.HeroPresets.MAX_POINTS));
+        check(r.notes().isEmpty(), "no note: " + r.notes());
+        check(com.kolodkingal.enhanced.custom.CustomHeroRules.cost(r.hero())
+                <= com.kolodkingal.enhanced.custom.HeroPresets.MAX_POINTS, "60 points at most: "
+                + com.kolodkingal.enhanced.custom.CustomHeroRules.cost(r.hero()));
+        helper.succeed();
+    }
+
     private CaptainTests() {
     }
 }

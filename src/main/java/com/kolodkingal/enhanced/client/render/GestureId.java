@@ -472,8 +472,40 @@ public enum GestureId {
     /** The Smoke Vanish (Sneak + N): the smoke bomb thrown down at his feet. */
     DEADPOOL_SMOKE(Group.CAST, 12, 1, 4, true),
     /** The Chimichanga Break (Sneak + B): the snack to the mouth, three happy bites. */
-    DEADPOOL_EAT(Group.CAST, 24, 2, 6, true)
+    DEADPOOL_EAT(Group.CAST, 24, 2, 6, true),
     // ===== captain (3.8) =====
+    // (Captain America's, lane L1: every one is started by the payload of his move, which names him
+    // (CaptainGestures.gestureOf, CaptainClient.startedElsewhere). Each ends in a comma: a region may follow.)
+    /** The Shield Throw from the main hand (R): the shield drawn back across the chest, then flung flat. */
+    CAP_THROW(Group.CAST, 12, 1, 4, true),
+    /** The throw from the off hand: the mirror. */
+    CAP_THROW_OFF(Group.CAST, 12, 1, 4, true),
+    /** The catch into the off hand: the arm out, the shield slaps onto it, a little give. */
+    CAP_CATCH(Group.CAST, 10, 1, 4, false),
+    /** The catch into the main hand. */
+    CAP_CATCH_MAIN(Group.CAST, 10, 1, 4, false),
+    /** The Shield Slam's hop (G): crouch and spring, the shield lifted over the head. */
+    CAP_SLAM_LEAP(Group.CAST, 8, 1, 2, true),
+    /** The slam's landing: the shield driven down into the ground, a deep crouch. */
+    CAP_SLAM_DOWN(Group.CAST, 14, 1, 6, true),
+    /** The Super-Soldier Leap (Sneak + G): a long running bound, one knee up, the arms swinging. */
+    CAP_LEAP(Group.CAST, 14, 1, 5, true),
+    /** The Shield Charge (V): his shoulder behind the shield before him, leaning in, the head down. */
+    CAP_CHARGE(Group.CAST, 16, 2, 4, true),
+    /** The Shield Bash (Sneak + V): the shield punched out from the shoulder. */
+    CAP_BASH(Group.CAST, 10, 1, 4, true),
+    /** Assemble (B): the shield raised high, the other hand waving them on. */
+    CAP_ASSEMBLE(Group.CAST, 30, 3, 8, true),
+    /** Inspire (Sneak + B): the arms opened wide, the chest up, the head lifted. */
+    CAP_INSPIRE(Group.CAST, 24, 3, 6, false),
+    /** The combo's first punch (N): a straight jab of the main hand. */
+    CAP_PUNCH_1(Group.CAST, 8, 1, 3, true),
+    /** The second: a hook of the off hand. */
+    CAP_PUNCH_2(Group.CAST, 8, 1, 3, true),
+    /** The third: a spinning kick, a whole turn, the leg out. */
+    CAP_KICK(Group.CAST, 14, 1, 5, true),
+    /** The Flip Kick (Sneak + N): thrown back, the leg kicking high, the arms flung back. */
+    CAP_FLIP_KICK(Group.CAST, 16, 1, 5, true),
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
     // ===== nanotech (3.8) =====

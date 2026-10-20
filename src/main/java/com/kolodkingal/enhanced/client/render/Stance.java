@@ -134,8 +134,13 @@ public enum Stance {
     /** Deadpool's Parry: both arms forward, the two swords spinning before him (DeadpoolGearLayer spins them). */
     DEADPOOL_SWORDS(1.5F, 3.0F, true),
     /** Deadpool with his pistols drawn: both arms up along the look. */
-    DEADPOOL_GUNS(1.5F, 4.0F, true)
+    DEADPOOL_GUNS(1.5F, 4.0F, true),
     // ===== captain (3.8) =====
+    /**
+     * Captain America behind his raised Vibranium Shield: a little crouched and leaning into it, the head low (the arm is
+     * vanilla's blocking pose). Ends in a comma: a region may follow.
+     */
+    CAP_GUARD(2.0F, 3.0F, false),
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
     // ===== nanotech (3.8) =====

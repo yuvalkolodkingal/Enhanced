@@ -495,7 +495,11 @@ public final class GestureRoutes {
                     + " (DeadpoolActing: the cuts, the Parry, the shots and the reload, the belt, the Drop-In, the"
                     + " Taunt's three poses, the whistle, the smoke, the chimichanga)";
             // ===== captain (3.8) =====
-            case CAPTAIN_AMERICA -> "none: Captain America's keys are acted by his plug-in (lane L1 of 3.8)";
+            // (Every move of his is told by the payload of its effect, which names him: the throw and the catch, the
+            // slam's hop and landing, the leap, the charge, the bash, Assemble, Inspire, the punches, the kick and the
+            // flip. See CaptainGestures.gestureOf.)
+            case CAPTAIN_AMERICA -> "none: every move of Captain America is told by the payload of its effect, which"
+                    + " names him (CaptainGestures.gestureOf)";
             // ===== red_hulk (3.8) =====
             case RED_HULK -> "none: Red Hulk's keys are acted by his plug-in (lane L2 of 3.8)";
             // ===== iron_man (3.8) =====
@@ -597,7 +601,9 @@ public final class GestureRoutes {
             // (Until each lane of 3.8 gives its states a gesture or a reason of their own; not the 3.0 pending marker,
             // which fails a release.)
             // ===== captain (3.8) =====
-            case CAP_CHARGING, CAP_SLAMMING -> "pending: Captain America's lane (L1 of 3.8) acts it";
+            case CAP_CHARGING -> "the charge's payload plays CAP_CHARGE, which holds him behind his shield for the"
+                    + " run";
+            case CAP_SLAMMING -> "the slam's payloads play CAP_SLAM_LEAP at the hop and CAP_SLAM_DOWN at the landing";
             // ===== red_hulk (3.8) =====
             case RED_HULK_TRANSFORMING, RED_HULK_JUMP_CHARGING, RED_HULK_LEAPING, RED_HULK_HEATED, RED_HULK_ABSORBING,
                     RED_HULK_GRABBING -> "pending: Red Hulk's lane (L2 of 3.8) acts it";
