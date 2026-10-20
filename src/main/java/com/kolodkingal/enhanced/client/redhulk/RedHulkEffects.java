@@ -270,8 +270,8 @@ public final class RedHulkEffects {
                         level.addParticle(new EnergyParticleOptions(i % 4 == 0 ? EMBER : FLAME, 0.9F), x, y + 0.4,
                                 z, Math.cos(a) * 0.05, 0.08, Math.sin(a) * 0.05);
                     }
-                    if (i % 5 == 0) {
-                        level.addParticle(ParticleTypes.LARGE_SMOKE, x, y + 0.6, z, 0, 0.05, 0);
+                    if (i % 12 == 0) {
+                        level.addParticle(ParticleTypes.SMOKE, x, y + 0.6, z, 0, 0.04, 0);
                     }
                 } else {
                     BlockState block = under(level, x, ring.center().y, z);

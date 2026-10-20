@@ -34,11 +34,11 @@ import java.util.List;
  * The Anger Burst (3.8, PLAN 4.3): at 100 anger by itself, or with B from {@code earlyBurstMin} (then scaled by
  * anger/100). A ring of fire and heat runs out from his body over {@link #TICKS} ticks to {@code burstRadius}: {@code
  * burstDamage} ({@code red_hulk_burst}, a fire damage) to every creature he may hurt, falling off to half at the edge,
- * each set burning {@code burstFireSeconds} and pushed out {@code burstPush}. The ring lights the ground (fire on the
- * air over a solid or flammable block, one spot in three) <b>only</b> when the game rule {@code mobGriefing} and {@code
- * [red_hulk] burstSetsFire} are both on, and never where a hand could not build ({@code BlockRights.mayPlace}: a boss's
- * arena, Asgard's city, a Hex, spawn protection, claims) nor in the arena of any running fight. His anger is spent at
- * once.
+ * each set burning {@code burstFireSeconds} and pushed out {@code burstPush}. The ring's edge lights the ground (fire
+ * on the air over a solid or flammable block, one spot in three) <b>only</b> when the game rule {@code mobGriefing}
+ * and {@code [red_hulk] burstSetsFire} are both on, and never where a hand could not build ({@code
+ * BlockRights.mayPlace}: a boss's arena, Asgard's city, a Hex, spawn protection, claims) nor in the arena of any
+ * running fight. His anger is spent at once.
  */
 public final class RedHulkBurst {
     /** The ticks the ring takes to reach its edge. */
@@ -104,8 +104,8 @@ public final class RedHulkBurst {
         double from = radius * t / TICKS;
         double to = radius * (t + 1) / TICKS;
         ring(player, from, to);
-        if (setsFire(player.serverLevel())) {
-            fire(player, to, t);
+        if (t + 1 >= TICKS && setsFire(player.serverLevel())) {
+            fire(player, to);
         }
         return t + 1 >= TICKS;
     }
@@ -136,15 +136,15 @@ public final class RedHulkBurst {
                 && RedHulkAbilities.cfg(RedHulkConfig.BURST_SETS_FIRE, true);
     }
 
-    /** The ring's spots at {@code r}: one in three catches fire (a third of them each tick, in turn). */
-    private void fire(ServerPlayer player, double r, int t) {
+    /** The ring's spots at its edge {@code r}: one in three catches fire. */
+    private void fire(ServerPlayer player, double r) {
         if (r < 1.5) {
             return;
         }
         ServerLevel level = player.serverLevel();
         int n = (int) Math.ceil(2.0 * Math.PI * r);
         for (int i = 0; i < n; i++) {
-            if ((i + t) % 3 != 0) {
+            if (i % 3 != 0) {
                 continue;
             }
             double a = i * 2.0 * Math.PI / n;
