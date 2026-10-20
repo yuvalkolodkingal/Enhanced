@@ -39,6 +39,8 @@ import net.neoforged.neoforge.client.event.RenderHandEvent;
 public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     /** The sweep (degrees, forward negative) of the wings as his own eyes see them. */
     static final float FIRST_PERSON_SWEEP = -28.0F;
+    /** How big the wings look from his eyes (smaller than they are, so they stay at the edges of his view). */
+    static final float FIRST_PERSON_SCALE = 0.55F;
     /** The model the first-person view draws with (any player renderer's: they are all the same). */
     private static FalconWingsModel firstPersonModel;
 
@@ -104,7 +106,7 @@ public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
         }
         float partialTick = event.getPartialTick();
         float[] p = new float[FalconWingsState.SIZE];
-        float flap = FalconWingsState.pose(player, partialTick, p);
+        float flap = 0.4F * FalconWingsState.pose(player, partialTick, p);
         if (p[FalconWingsState.EXTEND] < 0.3F || p[FalconWingsState.TOP] < -45.0F
                 || Math.abs(p[FalconWingsState.SWEEP]) > 70.0F) {
             return; // (folded, swept back or wrapped: nothing at the edges of his view)
@@ -114,14 +116,17 @@ public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
         // view instead of lying beside the camera.)
         p[FalconWingsState.SWEEP] = FIRST_PERSON_SWEEP;
         p[FalconWingsState.HZ] = 0.0F;
+        // (Low in his view: the feathers only peek in at the lower edges, whatever the beat.)
+        p[FalconWingsState.TOP] = Math.min(p[FalconWingsState.TOP], 4.0F);
+        p[FalconWingsState.STEP] = Math.min(p[FalconWingsState.STEP], 6.0F);
         model.pose(p, flap, age, 0.0F);
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
         // From the camera to his back, then into the body's model space (x to his left, y down, z behind him).
-        poseStack.translate(0.0F, -0.30F, -0.55F);
+        poseStack.translate(0.0F, -0.36F, -0.62F);
         poseStack.mulPose(Axis.XP.rotationDegrees(player.isFallFlying() ? -12.0F : 4.0F));
         // (A model part's own numbers are pixels: it divides them by 16 itself; only the axes turn here.)
-        poseStack.scale(-1.0F, -1.0F, 1.0F);
+        poseStack.scale(-FIRST_PERSON_SCALE, -FIRST_PERSON_SCALE, FIRST_PERSON_SCALE);
         var buffer = event.getMultiBufferSource().getBuffer(RenderType.entityCutoutNoCull(texture(player)));
         int light = event.getPackedLight();
         model.renderTips(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, 0, 3);
