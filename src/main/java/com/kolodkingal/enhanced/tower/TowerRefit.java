@@ -62,8 +62,8 @@ import java.util.Set;
  * chunk generation never builds an old tower again, so the armoury is set down in it here. Every {@code
  * [avengers_tower] refitIntervalTicks} (100) per player in the Overworld, the towers within {@code refitRadius} (96)
  * are found by their structure starts (cached per chunk 600 ticks); one the refit has not been to ({@link TowerRefits})
- * whose armoury's chunks and entities are loaded is refitted <b>once</b>, a step a tick within {@link #STEP_NANOS}
- * ({@link Job}, {@link #work}; {@link #refit} at once for the command): each block of {@link
+ * whose armoury's chunks and entities are loaded is refitted <b>once</b>, a step a tick ({@link Job}, {@link #work},
+ * {@link #STEP_NANOS}, {@link #STEP_BLOCKS}; {@link #refit} at once for the command): each block of {@link
  * TowerRefitTable} is set down <b>only where the 3.6.1 template's own block still stands</b> (turned as the tower was;
  * {@link #same}): a player's block is left as it is and counted; the five decorative armour stands go only if each
  * still stands on its spot with its 3.6.1 armour (else it stays, and so does the floor where its display would go),
@@ -231,8 +231,13 @@ public final class TowerRefit {
 
     /** The refits under way (the Overworld's), by start chunk: each goes on a step a tick ({@link #work}). */
     private static final Map<Long, Running> RUNNING = new HashMap<>();
-    /** The time all the refits under way may take in one tick (the plan's budget is 2 ms). */
-    public static final long STEP_NANOS = 1_000_000L;
+    /**
+     * The time all the refits under way may take in one tick (the plan's budget is 2 ms: a step stops once this has
+     * gone by, so its last block may take it a little over).
+     */
+    public static final long STEP_NANOS = 500_000L;
+    /** At most this many blocks a step, however fast they go. */
+    public static final int STEP_BLOCKS = 6;
 
     private record Running(Tower tower, Job job) {
     }
@@ -545,9 +550,11 @@ public final class TowerRefit {
                 entities(level);
                 next = 0;
             }
+            int blocks = 0;
             while (next < changes.size()) {
                 block(level, changes.get(next++));
-                if (System.nanoTime() - start >= budgetNanos) {
+                if (System.nanoTime() - start >= budgetNanos || (budgetNanos != Long.MAX_VALUE
+                        && ++blocks >= STEP_BLOCKS)) {
                     break;
                 }
             }
