@@ -147,6 +147,13 @@ public final class ClientSetup {
             // TowerFx, EternityFx and its wish screen; SuitModels and SuitAssembly's registry for the suits) =====
             // ===== serum (3.8) =====
             // ===== captain (3.8) =====
+            com.kolodkingal.enhanced.client.captain.CaptainEffects.register();
+            // The Vibranium Shield's raised model (vanilla's "blocking" predicate, which vanilla gives its own shield).
+            net.minecraft.client.renderer.item.ItemProperties.register(
+                    com.kolodkingal.enhanced.registry.ModItems.VIBRANIUM_SHIELD.get(),
+                    net.minecraft.resources.ResourceLocation.withDefaultNamespace("blocking"),
+                    (stack, level, holder, seed) -> holder != null && holder.isUsingItem()
+                            && holder.getUseItem() == stack ? 1.0F : 0.0F);
             // ===== red_hulk (3.8) =====
             // ===== iron_man (3.8) =====
             // The classic suits' and the suit-up's effects, the Unibeam's beam from the chest.
@@ -286,7 +293,8 @@ public final class ClientSetup {
         // The renderers of 3.8, one region per lane (the skeleton's stand-ins: nothing, or a box's outline, until the
         // lanes draw their own).
         // ===== captain (3.8) =====
-        event.registerEntityRenderer(ModEntities.THROWN_SHIELD.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.THROWN_SHIELD.get(),
+                com.kolodkingal.enhanced.client.captain.ThrownShieldRenderer::new);
         // ===== iron_man (3.8) =====
         event.registerEntityRenderer(ModEntities.IRON_MISSILE.get(),
                 com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
@@ -400,6 +408,8 @@ public final class ClientSetup {
         // ===== finders (3.7) =====
         // ===== cottage (3.7) =====
         // ===== captain (3.8) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.captain.ShieldModel.LAYER,
+                com.kolodkingal.enhanced.client.captain.ShieldModel::createLayer);
         // ===== red_hulk (3.8) =====
         // ===== iron_man (3.8) =====
         // ===== nanotech (3.8) =====
@@ -586,6 +596,9 @@ public final class ClientSetup {
         // ===== cottage (3.7) =====
         // ===== serum (3.8) =====
         // ===== captain (3.8) =====
+        // (The super-soldier's line under the powers' panel.)
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("captain"),
+                new com.kolodkingal.enhanced.client.captain.CaptainHud());
         // ===== red_hulk (3.8) =====
         // ===== iron_man (3.8) =====
         // 3.8, lane L3: the suit's panel (name, energy, durability), the helmet frame and the faceplate.
@@ -608,6 +621,10 @@ public final class ClientSetup {
             net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
         // ===== captain (3.8) =====
         event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+            @Override
+            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return com.kolodkingal.enhanced.client.captain.ShieldItemRenderer.get();
+            }
         }, com.kolodkingal.enhanced.registry.ModItems.VIBRANIUM_SHIELD.get());
         // ===== iron_man (3.8) =====
         event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {

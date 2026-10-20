@@ -4839,5 +4839,17 @@
   "commands.enhanced.structure.refit_tower.nothing": "Avengers Tower at %1$s %2$s %3$s: nothing refitted; %6$s blocks and %7$s stands changed by players were left as they are ('refit_tower force' puts the blocks anyway).",
   "commands.enhanced.structure.refit_tower.already": "The Avengers Tower at %1$s %2$s %3$s already has its armoury: nothing to do.",
   "commands.enhanced.structure.refit_tower.status": "Avengers Tower at %1$s %2$s %3$s: armoury version %4$s; its refit set down %5$s blocks, took away %6$s stands and frames, and left %7$s blocks and %8$s stands of players.",
-  "commands.enhanced.structure.refit_tower.status.none": "Avengers Tower at %s %s %s: not refitted yet (it will be when a player comes near, or use 'refit_tower')."
+  "commands.enhanced.structure.refit_tower.status.none": "Avengers Tower at %s %s %s: not refitted yet (it will be when a player comes near, or use 'refit_tower').",
+  "message.enhanced.serum.disabled": "The serum does nothing on this server.",
+  "message.enhanced.serum.no_choice": "Use the serum first.",
+  "message.enhanced.serum.expired": "You waited too long. Use the serum again.",
+  "message.enhanced.serum.moved": "Keep the serum in the same hand to choose.",
+  "commands.enhanced.serum.opened": "Opened the serum's choice for %s.",
+  "screen.enhanced.serum.choose": "Choose",
+  "hud.enhanced.captain.slam": "Slam!",
+  "hud.enhanced.captain.charging": "Charging!",
+  "hud.enhanced.captain.rally": "Assembled: %ss",
+  "hud.enhanced.captain.combo": "Combo %s/3",
+  "hud.enhanced.captain.shield_none": "Shield: none",
+  "hud.enhanced.captain.shield_ricochets": "Shield: flying (%s bounces left)"
 }

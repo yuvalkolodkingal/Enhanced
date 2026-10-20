@@ -4839,5 +4839,17 @@
   "commands.enhanced.structure.refit_tower.nothing": "מגדל הנוקמים ב-%1$s %2$s %3$s: שום דבר לא שודרג; %6$s בלוקים ו-%7$s מעמדים ששחקנים שינו נשארו כמו שהם ('refit_tower force' מניח את הבלוקים בכל זאת).",
   "commands.enhanced.structure.refit_tower.already": "במגדל הנוקמים ב-%1$s %2$s %3$s כבר יש חדר נשק: אין מה לעשות.",
   "commands.enhanced.structure.refit_tower.status": "מגדל הנוקמים ב-%1$s %2$s %3$s: גרסת חדר הנשק %4$s; השדרוג הניח %5$s בלוקים, הסיר %6$s מעמדים ומסגרות, והשאיר %7$s בלוקים ו-%8$s מעמדים של שחקנים.",
-  "commands.enhanced.structure.refit_tower.status.none": "מגדל הנוקמים ב-%s %s %s: עוד לא שודרג (זה יקרה כששחקן יתקרב, או עם 'refit_tower')."
+  "commands.enhanced.structure.refit_tower.status.none": "מגדל הנוקמים ב-%s %s %s: עוד לא שודרג (זה יקרה כששחקן יתקרב, או עם 'refit_tower').",
+  "message.enhanced.serum.disabled": "הסרום לא עובד בשרת הזה.",
+  "message.enhanced.serum.no_choice": "קודם תשתמש בסרום.",
+  "message.enhanced.serum.expired": "חיכית יותר מדי. תשתמש בסרום שוב.",
+  "message.enhanced.serum.moved": "תשאיר את הסרום באותה יד כדי לבחור.",
+  "commands.enhanced.serum.opened": "נפתחה בחירת הסרום בשביל %s.",
+  "screen.enhanced.serum.choose": "בחר",
+  "hud.enhanced.captain.slam": "הלמות!",
+  "hud.enhanced.captain.charging": "מסתער!",
+  "hud.enhanced.captain.rally": "מתאספים: %s שנ׳",
+  "hud.enhanced.captain.combo": "קומבו %s/3",
+  "hud.enhanced.captain.shield_none": "מגן: אין",
+  "hud.enhanced.captain.shield_ricochets": "מגן: באוויר (עוד %s קפיצות)"
 }

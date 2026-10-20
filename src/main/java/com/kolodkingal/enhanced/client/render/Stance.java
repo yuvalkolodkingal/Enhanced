@@ -134,12 +134,16 @@ public enum Stance {
     /** Deadpool's Parry: both arms forward, the two swords spinning before him (DeadpoolGearLayer spins them). */
     DEADPOOL_SWORDS(1.5F, 3.0F, true),
     /** Deadpool with his pistols drawn: both arms up along the look. */
-    DEADPOOL_GUNS(1.5F, 4.0F, true)
+    DEADPOOL_GUNS(1.5F, 4.0F, true),
     // ===== captain (3.8) =====
+    /**
+     * Captain America behind his raised Vibranium Shield: a little crouched and leaning into it, the head low (the arm
+     * is vanilla's blocking pose). Ends in a comma: a region may follow.
+     */
+    CAP_GUARD(2.0F, 3.0F, false),
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
-    // (Lane L3. Each starts with a comma, so the regions of 3.8 join in any order.)
-    ,
+    // (Lane L3. Each constant ends in a comma, so the regions of 3.8 join in any order.)
     /** A suit goes on or comes off: the arms held a little out, still (the suit assembles round him). */
     IRON_SUITING(2.0F, 3.0F, true),
     /** The Unibeam burns: the chest out, the arms back. */
@@ -147,10 +151,9 @@ public enum Stance {
     /** The Mark 1's Flamethrower burns: both forearms forward. */
     IRON_FLAME(1.5F, 3.0F, true),
     /** The Mark 1's Brace: arms crossed before the chest, knees bent. */
-    IRON_BRACING(1.5F, 3.0F, true)
+    IRON_BRACING(1.5F, 3.0F, true),
     // ===== nanotech (3.8) =====
     // (Lane L4, after lane L3's; NanoActing.)
-    ,
     /** A nanotech shield is up: the left arm before him behind it. */
     NANO_SHIELD(1.5F, 3.0F, true),
     /** The nano blade or the energy blades are out: a low guard, the fists out. */
@@ -158,7 +161,7 @@ public enum Stance {
     /** The Mark 50's nano cannon charges: both forearms forward, merged. */
     NANO_CANNON(1.5F, 3.0F, true),
     /** The Hulkbuster holds what he grabbed up in his right fist. */
-    HULKBUSTER_GRAB(1.5F, 3.0F, true)
+    HULKBUSTER_GRAB(1.5F, 3.0F, true),
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
     // ===== love (3.8) =====

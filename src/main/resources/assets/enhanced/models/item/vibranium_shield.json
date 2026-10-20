@@ -1,6 +1,19 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "enhanced:item/vibranium_shield"
-  }
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "enhanced:item/vibranium_shield_held"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "enhanced:item/vibranium_shield_icon"
+    }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "blocking": 1
+      },
+      "model": "enhanced:item/vibranium_shield_blocking"
+    }
+  ]
 }
