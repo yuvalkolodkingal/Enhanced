@@ -111,8 +111,10 @@ public final class CustomHeroServer implements HeroServer {
             player.displayClientMessage(Component.translatable("message.enhanced.custom.suppressed").withStyle(ChatFormatting.GRAY), true);
             return;
         }
-        // 3.6: in his human form (the Hulk's Transform) every key but the Transform itself is refused.
-        if (down && data.toggle(Toggle.HUMAN_FORM) && binding.ability() != HeroAbility.HULK_TRANSFORM) {
+        // 3.6: in his human form (the Hulk's Transform) every key but the Transform itself is refused (3.8: or Red
+        // Hulk's, whose Ross is the same Human Form).
+        if (down && data.toggle(Toggle.HUMAN_FORM) && binding.ability() != HeroAbility.HULK_TRANSFORM
+                && binding.ability() != HeroAbility.RED_HULK_TRANSFORM) {
             player.displayClientMessage(Component.translatable("message.enhanced.hulk.human_form")
                     .withStyle(ChatFormatting.GRAY), true);
             return;

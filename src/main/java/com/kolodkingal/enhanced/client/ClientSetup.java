@@ -148,6 +148,7 @@ public final class ClientSetup {
             // ===== serum (3.8) =====
             // ===== captain (3.8) =====
             // ===== red_hulk (3.8) =====
+            com.kolodkingal.enhanced.client.redhulk.RedHulkEffects.register();
             // ===== iron_man (3.8) =====
             // ===== nanotech (3.8) =====
             // ===== suit_art (3.8) =====
@@ -458,7 +459,8 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.captain.CapShieldLayer(renderer));
                 // ===== red_hulk (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.HeatLayer(renderer));
-                renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.RossSuitLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.RossSuitLayer(renderer,
+                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
                 // ===== iron_man (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.SuitLayer(renderer));
                 // ===== nanotech (3.8) =====
@@ -481,6 +483,8 @@ public final class ClientSetup {
         com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer hulk =
                 new com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer(event.getContext());
         com.kolodkingal.enhanced.client.hulk.HulkLayers.addTo(hulk, event.getContext());
+        // ===== red_hulk (3.8): Red Hulk is drawn on the Hulk's body; his heat glows on it =====
+        hulk.addLayer(new com.kolodkingal.enhanced.client.redhulk.HeatLayer(hulk));
         com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer.set(hulk);
         // ===== asgardians (3.5): the Heimdall and Odin NPCs wear the heroes' helms =====
         npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.HEIMDALL,
@@ -563,6 +567,9 @@ public final class ClientSetup {
         // ===== serum (3.8) =====
         // ===== captain (3.8) =====
         // ===== red_hulk (3.8) =====
+        // The Anger bar, Ross's line, the jump's charge ring, the absorb's time, the burst's flash.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("red_hulk"),
+                new com.kolodkingal.enhanced.client.redhulk.RedHulkHud());
         // ===== iron_man (3.8) =====
         // ===== nanotech (3.8) =====
         // ===== falcon (3.8) =====

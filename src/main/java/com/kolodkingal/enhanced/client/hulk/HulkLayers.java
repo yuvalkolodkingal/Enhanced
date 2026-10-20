@@ -60,6 +60,8 @@ public final class HulkLayers {
             arm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(BURNED)), light,
                     OverlayTexture.NO_OVERLAY);
         }
+        // (3.8, lane L2: Red Hulk's heat on his forearm.)
+        com.kolodkingal.enhanced.client.redhulk.HeatLayer.firstPerson(poseStack, buffer, player, arm);
     }
 
     /** The Hulk's own details over his skin. */

@@ -134,9 +134,18 @@ public enum Stance {
     /** Deadpool's Parry: both arms forward, the two swords spinning before him (DeadpoolGearLayer spins them). */
     DEADPOOL_SWORDS(1.5F, 3.0F, true),
     /** Deadpool with his pistols drawn: both arms up along the look. */
-    DEADPOOL_GUNS(1.5F, 4.0F, true)
+    DEADPOOL_GUNS(1.5F, 4.0F, true),
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
+    // (Every entry of a 3.8 region ends with a comma: see GestureId.)
+    /** Red Hulk steaming hot (anger 75 and up): hunched lower, the shoulders heaving, the fists clenched, shaking. */
+    RED_HULK_HEATED(3.0F, 6.0F, false),
+    /** The Energy Absorb held: the feet planted wide, the fists drawn in before the chest, the head down. */
+    RED_HULK_ABSORBING(2.0F, 3.0F, true),
+    /** The Super Jump charging: deep on his haunches, the knuckles on the ground, sinking lower as the charge grows. */
+    RED_HULK_CHARGING(2.0F, 3.0F, true),
+    /** In the air on a Super Jump: the knees tucked, the arms up and wide. */
+    RED_HULK_AIR(2.0F, 3.0F, true),
     // ===== iron_man (3.8) =====
     // ===== nanotech (3.8) =====
     // ===== suit_art (3.8) =====

@@ -472,9 +472,29 @@ public enum GestureId {
     /** The Smoke Vanish (Sneak + N): the smoke bomb thrown down at his feet. */
     DEADPOOL_SMOKE(Group.CAST, 12, 1, 4, true),
     /** The Chimichanga Break (Sneak + B): the snack to the mouth, three happy bites. */
-    DEADPOOL_EAT(Group.CAST, 24, 2, 6, true)
+    DEADPOOL_EAT(Group.CAST, 24, 2, 6, true),
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
+    // (Red Hulk's, lane L2: started by the payloads of his moves and by his states, which name him:
+    // RedHulkClient.startedElsewhere. What he shares with the Hulk (the Smash, the Roar, the grab, the Bound, the
+    // landing) plays the Hulk's own gestures. Every entry of a 3.8 region ends with a comma: the list's ';' after a
+    // trailing comma is legal Java, so the lanes' regions merge in any order.)
+    /** The Heat Wave (G): the arms flung wide, the chest pushed out, then both palms driven forward. */
+    RED_HULK_HEAT_WAVE(Group.CAST, 20, 2, 6, true),
+    /** The Super Jump's crouch (V held): down on his haunches, the knuckles to the ground (RED_HULK_CHARGING holds). */
+    RED_HULK_JUMP_CROUCH(Group.CAST, 8, 2, 3, true),
+    /** The Super Jump's launch: up out of the crouch, the arms thrown high (RED_HULK_AIR takes over). */
+    RED_HULK_JUMP(Group.CAST, 10, 1, 4, true),
+    /** The Anger Burst: the head thrown back, the arms flung out and down, the whole body shaking as the ring goes. */
+    RED_HULK_BURST(Group.CAST, 24, 2, 6, true),
+    /** The Energy Absorb begins (Sneak + B held): the feet planted, the fists drawn in to the chest. */
+    RED_HULK_ABSORB(Group.CAST, 10, 2, 3, true),
+    /** Ross grows into Red Hulk: he doubles over, clenches, trembles as he grows, and stands up roaring. */
+    RED_HULK_TRANSFORM_OUT(Group.CAST, 30, 2, 5, true),
+    /** Red Hulk shrinks into Ross: he sinks to one knee, the heat going out of him, the head bowed. */
+    RED_HULK_TRANSFORM_IN(Group.CAST, 30, 2, 5, true),
+    /** Ross again: he straightens his jacket and his tie (the switch ROSS_FORM coming on). */
+    RED_HULK_ROSS(Group.CAST, 16, 2, 5, true),
     // ===== iron_man (3.8) =====
     // ===== nanotech (3.8) =====
     // ===== suit_art (3.8) =====

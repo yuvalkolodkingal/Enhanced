@@ -57,9 +57,12 @@ public enum RunCharacter {
     WOLVERINE(1.0F, 0.75F, 1.30F, 16, 5, 0.025F),
     // ===== deadpool (3.7) =====
     /** Deadpool (3.7): a jaunty jog, the arms swinging loose, a bounce in the step and a swagger of the shoulders. */
-    DEADPOOL(1.10F, 1.30F, 1.15F, 7, 7, 0.030F)
+    DEADPOOL(1.10F, 1.30F, 1.15F, 7, 7, 0.030F),
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
+    // (Every entry of a 3.8 region ends with a comma: see GestureId.)
+    /** Red Hulk (3.8): heavier than the Hulk, slower, a deep lean, the ground shaking at every stride. */
+    RED_HULK(1.10F, 1.40F, 1.05F, 13, 6, 0.045F),
     // ===== iron_man (3.8) =====
     // ===== falcon (3.8) =====
     // ===== love (3.8) =====
@@ -106,6 +109,7 @@ public enum RunCharacter {
             case HULK -> HULK; // (3.6; Bruce Banner walks as anyone: RunPoses)
             case WOLVERINE -> WOLVERINE; // (3.7)
             case DEADPOOL -> DEADPOOL; // (3.7)
+            case RED_HULK -> RED_HULK; // (3.8, lane L2)
             default -> DEFAULT;
         };
     }
