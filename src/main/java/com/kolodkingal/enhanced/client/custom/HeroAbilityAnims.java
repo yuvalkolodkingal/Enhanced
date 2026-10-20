@@ -277,11 +277,19 @@ public final class HeroAbilityAnims {
         row(HeroAbility.IRON_MAN_MISSILES);
         row(HeroAbility.IRON_MAN_SUIT);
         // ===== falcon (3.8) =====
-        row(HeroAbility.FALCON_BLASTERS);
-        row(HeroAbility.FALCON_DIVE);
-        row(HeroAbility.FALCON_WING_SHIELD);
-        row(HeroAbility.FALCON_REDWING);
-        row(HeroAbility.FALCON_BODY);
+        // (Every move of his is told by the effect of his move, which names him; the Dive and the Wing Shield by
+        // their states' stances, the glide by the body's; Redwing's launch by its toggle.)
+        row(HeroAbility.FALCON_BLASTERS).main(GestureId.FALCON_BLAST_L).alt(GestureId.FALCON_ROCKET)
+                .also(GestureId.FALCON_BLAST_R);
+        row(HeroAbility.FALCON_DIVE).main(GestureId.FALCON_DIVE).alt(GestureId.FALCON_CLIMB)
+                .also(GestureId.FALCON_DIVE_HIT).stances(Stance.FALCON_DIVING);
+        row(HeroAbility.FALCON_WING_SHIELD).main(GestureId.FALCON_SHIELD).alt(GestureId.FALCON_SLASH)
+                .stances(Stance.FALCON_SHIELDING);
+        row(HeroAbility.FALCON_REDWING).main(GestureId.FALCON_REDWING_LAUNCH).alt(GestureId.FALCON_REDWING_POINT);
+        row(HeroAbility.FALCON_BODY).stances(Stance.FALCON_GLIDE);
+        live(Live.FALCON_DIVING, HeroAbility.FALCON_DIVE);
+        live(Live.FALCON_WING_SHIELD, HeroAbility.FALCON_WING_SHIELD);
+        live(Live.FALCON_GLIDING, HeroAbility.FALCON_BODY);
         // ===== love (3.8) =====
         row(HeroAbility.LOVE_AXE);
         row(HeroAbility.LOVE_LIGHTNING);

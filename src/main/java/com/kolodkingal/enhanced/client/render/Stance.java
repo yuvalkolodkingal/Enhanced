@@ -134,13 +134,19 @@ public enum Stance {
     /** Deadpool's Parry: both arms forward, the two swords spinning before him (DeadpoolGearLayer spins them). */
     DEADPOOL_SWORDS(1.5F, 3.0F, true),
     /** Deadpool with his pistols drawn: both arms up along the look. */
-    DEADPOOL_GUNS(1.5F, 4.0F, true)
+    DEADPOOL_GUNS(1.5F, 4.0F, true),
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
     // ===== nanotech (3.8) =====
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
+    /** Falcon gliding: the arms a little out from his sides and back, along the wings, the legs together. */
+    FALCON_GLIDE(3.0F, 4.0F, false),
+    /** Behind the Wing Shield: the forearms crossed before the chest, the head down a little. */
+    FALCON_SHIELDING(1.5F, 3.0F, true),
+    /** In the Dive: the body tipped head first, the arms tight along his sides, the legs together. */
+    FALCON_DIVING(2.0F, 4.0F, true),
     // ===== love (3.8) =====
     ;
 

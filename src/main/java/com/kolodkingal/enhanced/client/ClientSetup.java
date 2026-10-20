@@ -152,6 +152,8 @@ public final class ClientSetup {
             // ===== nanotech (3.8) =====
             // ===== suit_art (3.8) =====
             // ===== falcon (3.8) =====
+            // (Falcon's effects, his gestures' payloads, and Redwing's marks glowing for him.)
+            com.kolodkingal.enhanced.client.falcon.FalconEffects.setup();
             // ===== tower (3.8) =====
             // ===== eternity (3.8) =====
             // ===== love (3.8) =====
@@ -291,10 +293,12 @@ public final class ClientSetup {
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
         // ===== suit_art (3.8) =====
         // ===== falcon (3.8) =====
-        event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.FALCON_DART.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(),
+                com.kolodkingal.enhanced.client.falcon.FalconRocketRenderer::new);
+        event.registerEntityRenderer(ModEntities.FALCON_DART.get(),
+                com.kolodkingal.enhanced.client.falcon.FalconDartRenderer::new);
         event.registerEntityRenderer(ModEntities.REDWING.get(),
-                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xD8323C));
+                com.kolodkingal.enhanced.client.falcon.RedwingRenderer::new);
         // ===== tower (3.8) =====
         // ===== eternity (3.8) =====
         event.registerEntityRenderer(ModEntities.ETERNITY.get(),
@@ -392,6 +396,12 @@ public final class ClientSetup {
         // ===== nanotech (3.8) =====
         // ===== suit_art (3.8) =====
         // ===== falcon (3.8) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER,
+                com.kolodkingal.enhanced.client.falcon.FalconWingsModel::createLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.RedwingModel.LAYER,
+                com.kolodkingal.enhanced.client.falcon.RedwingModel::createLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.FalconRocketRenderer.LAYER,
+                com.kolodkingal.enhanced.client.falcon.FalconRocketRenderer::createLayer);
         // ===== eternity (3.8) =====
         // ===== love (3.8) =====
     }
@@ -464,7 +474,8 @@ public final class ClientSetup {
                 // ===== nanotech (3.8) =====
                 // ===== suit_art (3.8) =====
                 // ===== falcon (3.8) =====
-                renderer.addLayer(new com.kolodkingal.enhanced.client.falcon.FalconWingsLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.falcon.FalconWingsLayer(renderer,
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER)));
                 // ===== love (3.8) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,

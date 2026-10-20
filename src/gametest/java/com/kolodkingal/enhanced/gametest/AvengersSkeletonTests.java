@@ -629,11 +629,12 @@ public final class AvengersSkeletonTests {
         check(!IronSuits.mayWear(plain) && !Metal.isMagnetic(plain), "a powerless player may not wear a suit");
         plain.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
         check(Metal.isMagnetic(plain), "but iron armour is metal, as before");
-        // Falcon and Love do not fly yet; the serum and the realm answer "not yet".
+        // Love does not fly yet; the serum and the realm answer "not yet". (Falcon flies with his wings on since lane
+        // L5 filled FalconWings.canFly.)
         ServerPlayer sam = f.player(9.5, FLOOR, 3.5, Power.FALCON);
         HeroItems.give(sam, Power.FALCON, "endgame");
         check(FalconWings.carries(sam) && FalconWings.worn(sam), "Choose a hero puts the wings on his back");
-        check(!FalconWings.canFly(sam), "no flight yet");
+        check(FalconWings.canFly(sam), "with them on his back he flies (lane L5)");
         ServerPlayer love = f.player(12.5, FLOOR, 3.5, Power.LOVE);
         love.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         check(LoveAbilities.holdsStormbreaker(love) && !LoveAbilities.canFly(love), "Love holds the axe; no flight");
