@@ -56,7 +56,7 @@
   ],
   "moves": {},
   "anim": {
-    "flight": "auto",
+    "flight": "falcon",
     "run": "falcon",
     "speedRun": "auto",
     "idle": "ready"

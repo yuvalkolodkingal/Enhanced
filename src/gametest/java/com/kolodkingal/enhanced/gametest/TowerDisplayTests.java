@@ -472,7 +472,7 @@ public final class TowerDisplayTests {
             TowerRefits.get(level).forget(middle.toLong());
             TowerRefit.clearCache();
         });
-        helper.runAfterDelay(10, () -> {
+        whenLoaded(helper, level, pieces, 10, () -> {
             check(TowerRefits.get(level).get(middle.toLong()) == null, "not refitted yet");
             List<Component> said = new ArrayList<>();
             run(server, level, center, "enhanced structure refit_tower status", said);
@@ -498,6 +498,21 @@ public final class TowerDisplayTests {
             run(server, level, center.offset(400, 0, 0), "enhanced structure refit_tower 16", said);
             check(says(said, "commands.enhanced.structure.refit_tower.none"), "no tower out there: " + said);
             helper.succeed();
+        });
+    }
+
+    /**
+     * Runs {@code body} from tick {@code first} on, once the tower's armoury chunks and their entities are loaded (the
+     * refit waits for both; the entities come a few ticks after the chunks, later on a busy machine).
+     */
+    private static void whenLoaded(GameTestHelper helper, ServerLevel level, List<TemplateSitePiece> pieces, int first,
+                                   Runnable body) {
+        helper.runAfterDelay(first, () -> {
+            if (TowerRefit.loaded(level, pieces)) {
+                body.run();
+            } else {
+                whenLoaded(helper, level, pieces, 1, body);
+            }
         });
     }
 

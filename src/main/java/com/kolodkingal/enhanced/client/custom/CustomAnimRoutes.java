@@ -204,7 +204,8 @@ public final class CustomAnimRoutes {
 
     /** The heroes whose flight a custom hero with one of their abilities flies with when his style is {@code auto}. */
     private static final List<Power> FLIERS = List.of(Power.THOR, Power.SCARLET_WITCH, Power.VISION, Power.MAGNETO, Power.BILLY,
-            Power.PHOENIX, Power.ULTRON, Power.APOCALYPSE, Power.AGATHA, Power.DOCTOR_STRANGE);
+            Power.PHOENIX, Power.ULTRON, Power.APOCALYPSE, Power.AGATHA, Power.DOCTOR_STRANGE,
+            Power.IRON_MAN, Power.FALCON); // (3.8)
 
     /**
      * His flight style ({@code AnimCatalog.FLIGHT_STYLES}): his choice; on {@code auto} the flier one of his abilities
@@ -254,6 +255,8 @@ public final class CustomAnimRoutes {
             case "apocalypse" -> Power.APOCALYPSE;
             case "agatha" -> Power.AGATHA;
             case "doctor_strange" -> Power.DOCTOR_STRANGE;
+            case "iron_man" -> Power.IRON_MAN; // (3.8)
+            case "falcon" -> Power.FALCON; // (3.8)
             default -> Power.NONE;
         };
     }

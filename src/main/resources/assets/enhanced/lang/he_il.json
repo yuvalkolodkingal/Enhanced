@@ -4866,6 +4866,8 @@
   "preset.enhanced.iron_man.desc": "ריפולסורים, תעופה, היוניבים, מגן אנרגיה ומיני-טילים מונחים",
   "preset.enhanced.falcon": "דמוי פלקון",
   "preset.enhanced.falcon.desc": "מפוצצי פרק כף היד, כנפיים לעוף, צלילה מהשמיים, מגן כנפיים והרחפן רדווינג",
+  "anim.enhanced.flight.iron_man": "איירון מן (המדחפים)",
+  "anim.enhanced.flight.falcon": "פלקון (הכנפיים)",
   "hud.enhanced.captain.charging": "מסתער!",
   "hud.enhanced.captain.rally": "מתאספים: %s שנ׳",
   "hud.enhanced.captain.combo": "קומבו %s/3",

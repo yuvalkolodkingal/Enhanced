@@ -40,7 +40,9 @@ public final class AnimCatalog {
     public static final List<String> FLIGHT_STYLES = List.of(
             "plain", "magneto", "wanda", "vision", "white_vision", "billy", "thor", "phoenix", "ultron", "apocalypse", "agatha",
             // 3.6
-            "doctor_strange");
+            "doctor_strange",
+            // 3.8 (lanes L3, L5)
+            "iron_man", "falcon");
 
     /** Run characters (how the walk and sprint look). */
     public static final List<String> RUN_CHARACTERS = List.of(

@@ -56,7 +56,7 @@
   ],
   "moves": {},
   "anim": {
-    "flight": "auto",
+    "flight": "iron_man",
     "run": "auto",
     "speedRun": "auto",
     "idle": "ready"
