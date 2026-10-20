@@ -77,7 +77,7 @@ public class SerumScreen extends Screen {
         int panelW = 3 * cardW + 2 * GAP;
         int available = height - TITLE_H - 34;
         cardH = Mth.clamp(available, 96, 200);
-        portraitH = Math.max(36, cardH - 64);
+        portraitH = Math.max(36, cardH - 76);
         left = (width - panelW) / 2;
         top = Math.max(4, (height - (TITLE_H + cardH + 30)) / 2);
         for (int i = 0; i < HEROES.length; i++) {
@@ -238,13 +238,16 @@ public class SerumScreen extends Screen {
                 : Component.translatable("screen.enhanced.serum.falcon_locked");
         List<FormattedCharSequence> lines = font.split(line, cardW - 8);
         int ly = ty + 12;
-        for (int k = 0; k < Math.min(lines.size(), Math.max(1, (cardH - portraitH - 46) / 9)); k++) {
+        for (int k = 0; k < Math.min(lines.size(), Math.max(1, (cardH - portraitH - 44) / 9)); k++) {
             g.drawCenteredString(font, lines.get(k), x + cardW / 2, ly + k * 9, open ? 0xFFD8E0EE : 0xFFE0A050);
         }
         if (!open) {
-            // Locked: greyed, a padlock over the portrait.
+            // Locked: greyed, a padlock over the portrait (in front of the puppet, which is drawn deep).
+            g.pose().pushPose();
+            g.pose().translate(0.0F, 0.0F, 400.0F);
             g.fill(x + 2, y + 2, x + cardW - 2, y + 2 + portraitH, 0xA0202020);
             padlock(g, x + cardW / 2, y + 2 + portraitH / 2);
+            g.pose().popPose();
         }
     }
 

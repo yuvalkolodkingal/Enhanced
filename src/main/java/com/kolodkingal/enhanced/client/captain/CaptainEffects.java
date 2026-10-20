@@ -210,7 +210,6 @@ public final class CaptainEffects {
                         * 0.6, cos * 0.05, 0.02, sin * 0.05);
             }
         }
-        level.addParticle(ParticleTypes.EXPLOSION, at.x, at.y + 0.3, at.z, 0, 0, 0);
         for (int i = 0; i < 8; i++) {
             level.addParticle(ParticleTypes.CRIT, at.x, at.y + 0.3, at.z, r.nextGaussian() * 0.4, 0.3,
                     r.nextGaussian() * 0.4);

@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.captain;
 import com.kolodkingal.enhanced.config.CaptainConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.CaptainFxPayload;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -157,8 +158,10 @@ public class ThrownShieldEntity extends Projectile {
         super.tick();
         Vec3 from = position();
         if (level().isClientSide) {
-            // The server sends the real position every tick; meanwhile keep it moving smoothly.
+            // The server sends the real position every tick; meanwhile keep it moving smoothly, a faint trail behind.
             setPos(from.add(getDeltaMovement()));
+            level().addParticle(new EnergyParticleOptions(tickCount % 2 == 0 ? 0xE8EEF5 : 0x6FA0FF, 0.45F),
+                    from.x, from.y, from.z, 0.0, 0.0, 0.0);
             return;
         }
         ServerLevel level = (ServerLevel) level();

@@ -33,6 +33,12 @@ public class SuperSoldierSerumItem extends Item {
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 
+    /** The Vita-Ray blue liquid glows. */
+    @Override
+    public boolean isFoil(ItemStack stack) {
+        return true;
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
         lines.add(Component.translatable("item.enhanced.special_soldier_serum.tooltip").withStyle(ChatFormatting.GRAY));
