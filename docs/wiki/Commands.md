@@ -45,6 +45,7 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 |---|---|
 | `/enhanced asgard tp [players]` | Takes you (or the players) to Heimdall's Observatory in Asgard at once. An operator's teleport passes Asgard's gate. |
 | `/enhanced asgard state` | Asgard's saved state: whether Odin is awake, how often Hela was beaten, the murals, the residents, when the seal is ready, and how long the city's chunks took to build. |
+| `/enhanced asgard mendhall` | (3.7.2) Mends the Hall of Feasts now: a hall built before 3.7.2 gets its new tables, seats, lanterns and kitchen doors; a block a player changed there is left alone. It is done by itself once, the first time the hall is loaded; the hall must be loaded (go near it). |
 | `/enhanced asgard genbench` | For testing: builds a block of 9 × 9 chunks of the city (and one of the sea) in memory, throws them away, and prints how many milliseconds a chunk took. The world is not touched. |
 
 Asgard has no portal: an operator can also use `/tp` or `/execute in enhanced:asgard`. Every other way in or out is the Bifrost's.

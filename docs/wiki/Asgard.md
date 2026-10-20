@@ -80,7 +80,7 @@ You arrive facing north, toward the city. The map, from the edge of the world to
 | **Odin's vault** | Under the throne room, closed by a wall of gold until Hela first falls. **Gungnir's Stand** is inside, and since 3.6 the **Reality Stone** on its pedestal (the Aether, a red swirling orb). |
 | **Frigga's gardens** | West of the palace: pavilions, fountains, little bridges, golden-leaf and blossom trees, and waterways that fall into a deep chasm. |
 | **The training grounds** | East of the palace: the round sparring ring, weapon racks and a pavilion. Sif and the Warriors Three train here. |
-| **The Hall of Feasts** | East of the Golden Road, with its kitchen. Volstagg is usually eating. |
+| **The Hall of Feasts** | East of the Golden Road, with its kitchen behind it. Long tables with a cross aisle from the middle door to the high table. Volstagg is usually eating at his place at the high table, and at dusk the Warriors Three and Sif come to feast with him (3.7.2). |
 | **The barracks** | Far to the south-east: the Einherjar's hall, their yard and two watchtowers. |
 | **The east district** | The Hall of Healing, the Hall of Craft, the forge, the granary and the bathhouse. |
 | **The houses** | West of the Golden Road: streets of houses where the citizens live, the Hall of Scribes, the Hall of Valor and the scribes' tower. |

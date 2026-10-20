@@ -6,10 +6,10 @@ Hebrew: [עברית](Meeting-Death-HE)
 
 ## The screen
 
-When you die, the screen fades into a **green clearing**: vines overhead, grass and little flowers underfoot, mist drifting by, leaves and petals falling. **Rio** stands on the left, tall and calm, her eyes following your mouse. On the right:
+When you die, the screen fades into a **green clearing**: vines overhead, grass and little flowers underfoot, mist drifting by, leaves and petals falling. **Rio** stands on the left, tall and calm, her eyes following your mouse, **in her Death look** (3.7.2): a dark green-black gown with leaves and veins of decay in the cloth and a ragged hem of dead leaves, a long hood that frames her pale face and dark lips and falls down her back, and over the hood a **crown of thin dark branches** with pale tips and little leaves, as the Green Witch is when she is Death. At home in [Agatha's Cottage](Agathas-Cottage) she keeps her gardener's clothes. On the right:
 
 * **"You met Death"** and her name, **Rio Vidal, the Green Witch**;
-* one short line of hers, a different one each time: "Not today. Choose your road.", "Every road leads back to the garden. Which one is yours?", "Rest is over, little hero. Up you get.", "I only came to say hello. Where to now?", "Even flowers grow back. So will you.", "The forest isn't ready for you yet. Off you go.";
+* one short line of hers, a different one each time: "Not today. Choose your road.", "All roads lead to me." (her own words in *Agatha All Along*), "Rest is over, little hero. Up you get.", "I only came to say hello. Where to now?", "Even flowers grow back. So will you.", "The forest isn't ready for you yet. Off you go.";
 * how you died, and your score, as on the usual screen;
 * **your two roads**, and the small **Title screen** button under them.
 
