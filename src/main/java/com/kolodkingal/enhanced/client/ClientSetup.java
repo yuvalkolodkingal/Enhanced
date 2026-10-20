@@ -152,6 +152,7 @@ public final class ClientSetup {
             // The classic suits' and the suit-up's effects, the Unibeam's beam from the chest.
             com.kolodkingal.enhanced.client.ironman.IronClientFx.setup();
             // ===== nanotech (3.8) =====
+            com.kolodkingal.enhanced.client.ironman.nano.NanoClient.setup();
             // ===== suit_art (3.8) =====
             com.kolodkingal.enhanced.client.ironman.suits.SuitArt.register();
             // ===== falcon (3.8) =====
@@ -290,7 +291,7 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
         // ===== nanotech (3.8) =====
         event.registerEntityRenderer(ModEntities.NANO_DRONE.get(),
-                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
+                com.kolodkingal.enhanced.client.ironman.nano.NanoDroneRenderer::new);
         event.registerEntityRenderer(ModEntities.HULKBUSTER_FRAME.get(),
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
         // ===== suit_art (3.8) =====
@@ -398,6 +399,8 @@ public final class ClientSetup {
         // ===== red_hulk (3.8) =====
         // ===== iron_man (3.8) =====
         // ===== nanotech (3.8) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.ironman.nano.NanoDroneModel.LAYER,
+                com.kolodkingal.enhanced.client.ironman.nano.NanoDroneModel::createLayer);
         // ===== suit_art (3.8) =====
         com.kolodkingal.enhanced.client.ironman.suits.SuitArt.registerLayers(event);
         // ===== falcon (3.8) =====
@@ -471,6 +474,12 @@ public final class ClientSetup {
                 // ===== iron_man (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.SuitLayer(renderer));
                 // ===== nanotech (3.8) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.nano.NanoGearLayer(renderer));
+                if (!slim) {
+                    // The Hulkbuster's renderer swap (one renderer: the suit covers the arms of both skins).
+                    com.kolodkingal.enhanced.client.ironman.HulkbusterRenderer.set(
+                            new com.kolodkingal.enhanced.client.ironman.HulkbusterRenderer(event.getContext()));
+                }
                 // ===== suit_art (3.8) =====
                 com.kolodkingal.enhanced.client.ironman.suits.SuitArt.bake(event.getEntityModels());
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.suits.SuitExtrasLayer(renderer));
