@@ -13,7 +13,7 @@ public enum NpcState {
     SPARRING,
     /** Sitting on a bench (or on the throne). */
     SITTING,
-    /** Eating at the Hall of Feasts (Volstagg). */
+    /** Eating standing (Volstagg before 3.7.2; now he sits at the table: {@link #DINING}). */
     FEASTING,
     /** Asleep: Odin's Odinsleep in his chamber. */
     SLEEPING,
@@ -22,7 +22,9 @@ public enum NpcState {
     /** Knocked down by Hela's army: kneeling, untouchable, rising after a while. */
     DOWN,
     /** Fighting Hela's army (or what his master commands). */
-    FIGHTING;
+    FIGHTING,
+    /** Sitting at a table, eating (3.7.2: Volstagg at the Hall of Feasts' high table, and his friends at the feast). */
+    DINING;
 
     /** Whether the Asgardian may not walk, turn by himself or be talked to in this state. */
     public boolean still() {

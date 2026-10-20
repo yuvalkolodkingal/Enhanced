@@ -35,7 +35,7 @@ public final class AsgardianPoses {
     /** Whether a state's pose sits the body lower (sitting, kneeling), and by how much (blocks, before the body's scale). */
     static float lowerOf(NpcState state) {
         return switch (state) {
-            case SITTING -> 0.62F;
+            case SITTING, DINING -> 0.62F;
             case DOWN -> 0.3F;
             default -> 0.0F;
         };
@@ -50,7 +50,7 @@ public final class AsgardianPoses {
     /** The vanilla parts the poses change, before {@code setupAnim} runs: sitting is the riding pose, bowing a crouch. */
     static void before(PlayerModel<AsgardianEntity> model, AsgardianEntity npc, float partialTick) {
         NpcState state = npc.state();
-        model.riding = state == NpcState.SITTING;
+        model.riding = state == NpcState.SITTING || state == NpcState.DINING;
         model.crouching = state == NpcState.BOWING && weight(npc, partialTick) > 0.5F;
     }
 
@@ -121,6 +121,7 @@ public final class AsgardianPoses {
                 }
             }
             case FEASTING -> feast(model, ageInTicks);
+            case DINING -> dine(model, ageInTicks);
             case SLEEPING -> {
                 model.head.xRot = 0.0F;
                 model.head.yRot = 0.0F;
@@ -230,6 +231,22 @@ public final class AsgardianPoses {
         model.head.xRot = -0.1F + bite * 0.15F;
         model.leftArm.xRot = -0.3F;
         model.body.zRot = Mth.sin(ageInTicks * 0.1F) * 0.04F;
+    }
+
+    /**
+     * Dining (3.7.2): seated at the table, the left forearm on it, the right hand bringing the food to the mouth every
+     * three seconds (as the server's bites), the head dipping to meet it.
+     */
+    private static void dine(PlayerModel<AsgardianEntity> model, float ageInTicks) {
+        float cycle = (ageInTicks % 60.0F) / 60.0F;
+        float bite = cycle < 0.3F ? Mth.sin(cycle / 0.3F * Mth.PI) : 0.0F;
+        model.rightArm.xRot = -0.75F - bite * 0.95F;
+        model.rightArm.yRot = -0.2F - bite * 0.35F;
+        model.rightArm.zRot = 0.05F;
+        model.leftArm.xRot = -0.75F + Mth.sin(ageInTicks * 0.05F) * 0.03F;
+        model.leftArm.yRot = 0.3F;
+        model.leftArm.zRot = -0.05F;
+        model.head.xRot += bite * 0.12F;
     }
 
     /** Down: on one knee, head bowed, a hand on the ground; breathing hard. */

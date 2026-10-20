@@ -175,7 +175,7 @@ public class AsgardianRenderer extends LivingEntityRenderer<AsgardianEntity, Pla
             float swing = Math.min(limbSwingAmount, 1.0F);
             float sway = Mth.sin(ageInTicks * 0.067F) * 1.5F;
             float lift = 6.0F + swing * 40.0F + Mth.sin(limbSwing * 0.6662F) * 6.0F * swing + sway;
-            if (npc.state() == NpcState.SITTING) {
+            if (npc.state() == NpcState.SITTING || npc.state() == NpcState.DINING) {
                 lift = 2.0F;
             } else if (model.crouching) {
                 lift += 25.0F;

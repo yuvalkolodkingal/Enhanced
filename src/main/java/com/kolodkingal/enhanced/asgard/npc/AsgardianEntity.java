@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.asgard.npc;
 
 import com.kolodkingal.enhanced.asgard.AsgardState;
 import com.kolodkingal.enhanced.asgard.CityPlan;
+import com.kolodkingal.enhanced.asgard.FeastHall;
 import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -40,6 +41,7 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.OpenDoorGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -134,6 +136,12 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
         }
     }
 
+    /** A walker's navigation that never goes over a table of the Hall of Feasts (3.7.2). */
+    @Override
+    protected PathNavigation createNavigation(Level level) {
+        return new AsgardianNavigation(this, level);
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 40.0).add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.ATTACK_DAMAGE, 6.0).add(Attributes.ARMOR, 4.0).add(Attributes.FOLLOW_RANGE, 32.0)
@@ -214,6 +222,17 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
             default -> {
             }
         }
+        if (state() == NpcState.DINING) {
+            // At the table: something to eat in hand, the weapons put by.
+            main = new ItemStack(switch (role()) {
+                case VOLSTAGG -> Items.COOKED_CHICKEN;
+                case SIF -> Items.BREAD;
+                case FANDRAL -> Items.APPLE;
+                case HOGUN -> Items.COOKED_MUTTON;
+                default -> Items.BREAD;
+            });
+            off = ItemStack.EMPTY;
+        }
         setItemSlot(EquipmentSlot.MAINHAND, main);
         setItemSlot(EquipmentSlot.OFFHAND, off);
     }
@@ -263,10 +282,16 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
         return restAt;
     }
 
-    /** Odin lives in his chamber while he sleeps and walks the throne room once he wakes. */
+    /**
+     * Odin lives in his chamber while he sleeps and walks the throne room once he wakes; the guests of the feast go to
+     * the Hall of Feasts at dusk (3.7.2).
+     */
     BlockPos activeHome() {
         if (role() == Role.ODIN && home != null && level() instanceof ServerLevel server && AsgardState.get(server.getServer()).odinAwake()) {
             return CityPlan.THRONE_ROOM_CENTER;
+        }
+        if (home != null && com.kolodkingal.enhanced.asgard.AsgardDimension.is(level())) {
+            return FeastHall.homeAt(role(), home, level().getDayTime());
         }
         return home;
     }
@@ -286,7 +311,8 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
             if (state != NpcState.TALKING && state != NpcState.SPARRING) {
                 setPartner(null);
             }
-            if (role() == Role.VOLSTAGG || role() == Role.ODIN) {
+            if (role() == Role.VOLSTAGG || role() == Role.ODIN || state == NpcState.DINING
+                    || before == NpcState.DINING) {
                 arm();
             }
         }
@@ -414,13 +440,19 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
         }
         goalSelector.addGoal(2, new AsgardianGoals.FollowOwner(this));
         goalSelector.addGoal(2, new OpenDoorGoal(this, true));
+        if (!role.cottage()) {
+            goalSelector.addGoal(2, new AsgardianGoals.Seated(this));
+        }
         goalSelector.addGoal(3, new AsgardianGoals.ReturnHome(this));
         goalSelector.addGoal(3, new AsgardianGoals.SparPlayer(this));
         switch (role) {
             case HEIMDALL -> goalSelector.addGoal(4, new AsgardianGoals.KeepPost(this, true));
             case ODIN -> goalSelector.addGoal(4, new AsgardianGoals.Sleep(this));
-            case SIF, FANDRAL, HOGUN -> goalSelector.addGoal(4, new AsgardianGoals.Spar(this));
-            case VOLSTAGG -> goalSelector.addGoal(4, new AsgardianGoals.Feast(this));
+            case SIF, FANDRAL, HOGUN -> {
+                goalSelector.addGoal(4, new AsgardianGoals.Dine(this));
+                goalSelector.addGoal(5, new AsgardianGoals.Spar(this));
+            }
+            case VOLSTAGG -> goalSelector.addGoal(4, new AsgardianGoals.Dine(this));
             case EINHERJAR -> {
                 goalSelector.addGoal(4, new AsgardianGoals.KeepPost(this, false));
                 goalSelector.addGoal(5, new AsgardianGoals.Patrol(this));
@@ -632,7 +664,9 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
 
     @Override
     public boolean isPushable() {
-        return state() != NpcState.DOWN && state() != NpcState.SLEEPING && super.isPushable();
+        // (3.7.2: nor one sitting on a bench or at a table: those who pass slip by)
+        return state() != NpcState.DOWN && state() != NpcState.SLEEPING && state() != NpcState.SITTING
+                && state() != NpcState.DINING && super.isPushable();
     }
 
     @Override
