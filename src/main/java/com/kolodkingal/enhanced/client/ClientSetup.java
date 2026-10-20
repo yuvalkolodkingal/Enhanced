@@ -433,6 +433,10 @@ public final class ClientSetup {
         npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.ODIN,
                 event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER),
                 com.kolodkingal.enhanced.client.render.OdinHelmLayer.TEXTURE);
+        // 3.7.2: the Rio of Death's screen wears Death's crown of branches over her hood
+        com.kolodkingal.enhanced.client.asgard.AsgardianRenderer.registerHeadgear(
+                com.kolodkingal.enhanced.asgard.npc.Role.RIO,
+                        com.kolodkingal.enhanced.client.death.DeathLook::headgear);
     }
 
     /** A role's NPC wears {@code helm} (a hero's helmet model, in the pixels of the head; the pose is in head space). */

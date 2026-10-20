@@ -86,7 +86,10 @@ public class AsgardianRenderer extends LivingEntityRenderer<AsgardianEntity, Pla
 
     @Override
     public ResourceLocation getTextureLocation(AsgardianEntity npc) {
-        return texture(npc.role(), npc.variant());
+        // (3.7.2: the Rio of Death's screen wears her Death look)
+        return com.kolodkingal.enhanced.client.death.DeathLook.wears(npc)
+                ? com.kolodkingal.enhanced.client.death.DeathLook.SKIN
+                : texture(npc.role(), npc.variant());
     }
 
     @Override

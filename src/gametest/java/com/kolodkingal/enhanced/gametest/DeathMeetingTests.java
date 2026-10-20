@@ -343,4 +343,61 @@ public final class DeathMeetingTests {
                 && fire.getDuration() > 40, "3 seconds of Fire Resistance: " + fire);
         helper.succeed();
     }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // 3.7.2: Death's line and Rio's Death look
+
+    private static java.awt.image.BufferedImage skin(net.neoforged.neoforgespi.locating.IModFile mod, String name)
+            throws java.io.IOException {
+        try (java.io.InputStream in = java.nio.file.Files.newInputStream(mod.findResource("assets", Enhanced.MODID,
+                "textures",
+                "entity", "asgardian", name))) {
+            return javax.imageio.ImageIO.read(in);
+        }
+    }
+
+    /**
+     * Death's second line is hers from Agatha All Along, "All roads lead to me.", in both languages; her six lines are
+     * there in both, each its own, and none still sends the roads "back to the garden". Rio wears her Death look only
+     * on Death's screen: its skin (64 x 64) and crown are there, and differ from her cottage skin.
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void deathsLinesAndRiosDeathLook(GameTestHelper helper) throws java.io.IOException {
+        net.neoforged.neoforgespi.locating.IModFile mod =
+                net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile();
+        java.util.Map<String, String> one = java.util.Map.of("en_us", "All roads lead to me.", "he_il",
+                "כל הדרכים מובילות אליי.");
+        for (String name : List.of("en_us", "he_il")) {
+            com.google.gson.JsonObject lang = com.google.gson.JsonParser.parseString(java.nio.file.Files.readString(
+                    mod.findResource("assets", Enhanced.MODID, "lang", name + ".json"),
+                            java.nio.charset.StandardCharsets.UTF_8))
+                    .getAsJsonObject();
+            java.util.Set<String> lines = new java.util.HashSet<>();
+            for (int i = 0; i < 6; i++) {
+                String key = "screen.enhanced.death_meeting.line." + i;
+                check(lang.has(key), name + " has " + key);
+                String line = lang.get(key).getAsString();
+                check(lines.add(line), name + ": each line its own: " + line);
+                check(!line.toLowerCase(java.util.Locale.ROOT).contains("garden") && !line.contains("גינה"), name
+                        + ": " + line);
+            }
+            check(one.get(name).equals(lang.get("screen.enhanced.death_meeting.line.1").getAsString()),
+                    name + ": Death's line: " + lang.get("screen.enhanced.death_meeting.line.1"));
+        }
+        java.awt.image.BufferedImage death = skin(mod, "rio_death.png");
+        java.awt.image.BufferedImage home = skin(mod, "rio.png");
+        java.awt.image.BufferedImage crown = skin(mod, "rio_death_crown.png");
+        check(death.getWidth() == 64 && death.getHeight() == 64 && crown.getWidth() == 32 && crown.getHeight() == 16,
+                "the Death skin and its crown");
+        int differ = 0;
+        for (int y = 0; y < 64; y++) {
+            for (int x = 0; x < 64; x++) {
+                if (death.getRGB(x, y) != home.getRGB(x, y)) {
+                    differ++;
+                }
+            }
+        }
+        check(differ > 1000, "Death's look is not her cottage skin: " + differ);
+        helper.succeed();
+    }
 }

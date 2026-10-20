@@ -3,7 +3,6 @@ package com.kolodkingal.enhanced.client.death;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
 import com.kolodkingal.enhanced.asgard.npc.Role;
-import com.kolodkingal.enhanced.client.asgard.AsgardianRenderer;
 import com.kolodkingal.enhanced.death.DeathMeeting;
 import com.kolodkingal.enhanced.network.DeathMeetingPayload;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -36,12 +35,13 @@ import java.util.List;
 /**
  * Death's screen (3.7, Eilon's request): in place of the plain death screen, the player meets Rio Vidal, the Green
  * Witch, in a misty green clearing: vines overhead, grass and small flowers underfoot, mist drifting by and leaves and
- * petals falling. She stands large on the left in her cottage skin (the {@code cottage_resident} entity as Rio, drawn
- * by its own renderer, her eyes following the mouse); on the right, the title, one short line of hers (a few, EN/HE),
- * how he died and his score, and his choice: <b>Start again</b> (vanilla's respawn) and <b>Start again in the
- * Nether</b> (when the server offers it), with vanilla's small <b>Title screen</b> under them. As vanilla's, its
- * buttons wake after a second, Esc does not close it, and it is a {@link DeathScreen} (so a respawn closes it as
- * vanilla's). Gentle and calm: nothing scary, nothing gory.
+ * petals falling. She stands large on the left (the {@code cottage_resident} entity as Rio, drawn by its own renderer,
+ * her eyes following the mouse), in her Death look (3.7.2, {@link DeathLook}: the dark gown and hood, the crown of
+ * branches; at home she keeps her cottage skin); on the right, the title, one short line of hers (a few, EN/HE), how he
+ * died and his score, and his choice: <b>Start again</b> (vanilla's respawn) and <b>Start again in the Nether</b> (when
+ * the server offers it), with vanilla's small <b>Title screen</b> under them. As vanilla's, its buttons wake after a
+ * second, Esc does not close it, and it is a {@link DeathScreen} (so a respawn closes it as vanilla's). Gentle and
+ * calm: nothing scary, nothing gory.
  */
 public class DeathMeetingScreen extends DeathScreen {
     /** How many lines Rio has ({@code screen.enhanced.death_meeting.line.<n>}). */
@@ -367,14 +367,15 @@ public class DeathMeetingScreen extends DeathScreen {
     }
 
     /**
-     * Rio herself: the cottage's Rio (the {@code cottage_resident} entity as {@link Role#RIO}) drawn large, standing,
-     * breathing, turning a little toward the mouse. Without a level to make her in, her face from her skin.
+     * Rio herself: the cottage's Rio (the {@code cottage_resident} entity as {@link Role#RIO}) in her Death look, drawn
+     * large, standing, breathing, turning a little toward the mouse. Without a level to make her in, her face from her
+     * Death skin.
      */
     private void drawRio(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         AsgardianEntity npc = rio();
         if (npc == null) {
             int size = rioScale;
-            graphics.blit(AsgardianRenderer.texture(Role.RIO, 0), rioX - size / 2, rioFeet - size * 2, size, size,
+            graphics.blit(DeathLook.SKIN, rioX - size / 2, rioFeet - size * 2, size, size,
                     8.0F, 8.0F, 8, 8, 64, 64);
             return;
         }
@@ -420,6 +421,7 @@ public class DeathMeetingScreen extends DeathScreen {
                     rio = ModEntities.COTTAGE_RESIDENT.get().create(minecraft.level);
                     if (rio != null) {
                         rio.setRole(Role.RIO, 0);
+                        DeathLook.wear(rio);
                     }
                 }
             } catch (RuntimeException e) {
