@@ -255,6 +255,39 @@ public final class HeroAbilityAnims {
         row(HeroAbility.DEADPOOL_BODY);
         live(Live.DEADPOOL_PARRYING, HeroAbility.DEADPOOL_KATANAS);
         live(Live.DEADPOOL_AIMING, HeroAbility.DEADPOOL_PISTOLS);
+        // ===== captain (3.8) =====
+        // (The skeleton's rows have no moves yet: each lane gives its own their gestures and stances.)
+        row(HeroAbility.CAPTAIN_SHIELD_THROW);
+        row(HeroAbility.CAPTAIN_SHIELD_SLAM);
+        row(HeroAbility.CAPTAIN_SHIELD_CHARGE);
+        row(HeroAbility.CAPTAIN_ASSEMBLE);
+        row(HeroAbility.CAPTAIN_COMBO);
+        row(HeroAbility.CAPTAIN_BODY);
+        // ===== red_hulk (3.8) =====
+        row(HeroAbility.RED_HULK_SMASH);
+        row(HeroAbility.RED_HULK_HEAT_WAVE);
+        row(HeroAbility.RED_HULK_SUPER_JUMP);
+        row(HeroAbility.RED_HULK_BURST);
+        row(HeroAbility.RED_HULK_TRANSFORM);
+        row(HeroAbility.RED_HULK_BODY);
+        // ===== iron_man (3.8) =====
+        row(HeroAbility.IRON_MAN_REPULSOR);
+        row(HeroAbility.IRON_MAN_UNIBEAM);
+        row(HeroAbility.IRON_MAN_SHIELD);
+        row(HeroAbility.IRON_MAN_MISSILES);
+        row(HeroAbility.IRON_MAN_SUIT);
+        // ===== falcon (3.8) =====
+        row(HeroAbility.FALCON_BLASTERS);
+        row(HeroAbility.FALCON_DIVE);
+        row(HeroAbility.FALCON_WING_SHIELD);
+        row(HeroAbility.FALCON_REDWING);
+        row(HeroAbility.FALCON_BODY);
+        // ===== love (3.8) =====
+        row(HeroAbility.LOVE_AXE);
+        row(HeroAbility.LOVE_LIGHTNING);
+        row(HeroAbility.LOVE_EYE_LASER);
+        row(HeroAbility.LOVE_BIFROST);
+        row(HeroAbility.LOVE_BODY);
         // ===== variants (3.5, the creator lane) =====
         // (A variant row is bound as its parent's Sneak variant, so the parent's routes and cast marker act it. Its own
         // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's
@@ -357,6 +390,9 @@ public final class HeroAbilityAnims {
         toggle(Toggle.CLAWS_OUT, HeroAbility.WOLVERINE_CLAWS);
         toggle(Toggle.CLAW_CLIMB, HeroAbility.WOLVERINE_CLAWS);
         toggle(Toggle.SCENT_TRACK, HeroAbility.WOLVERINE_SENSES);
+        // 3.8 (Ross's form and Redwing; lanes L2 and L5 give them gestures of their own)
+        toggle(Toggle.ROSS_FORM, HeroAbility.RED_HULK_TRANSFORM);
+        toggle(Toggle.REDWING_OUT, HeroAbility.FALCON_REDWING);
         flag(GestureRoutes.Flag.MAGNETIC_SHIELD, HeroAbility.MAGNETO_SHIELD);
         flag(GestureRoutes.Flag.SHRAPNEL, HeroAbility.MAGNETO_SHRAPNEL);
         flag(GestureRoutes.Flag.BEAM, HeroAbility.WANDA_CHAOS_BEAM, HeroAbility.VISION_MIND_BEAM, HeroAbility.ULTRON_REPULSOR);

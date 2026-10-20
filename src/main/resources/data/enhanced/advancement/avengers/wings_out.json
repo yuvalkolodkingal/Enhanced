@@ -1,0 +1,29 @@
+{
+  "parent": "enhanced:avengers/super_soldier",
+  "display": {
+    "icon": {
+      "id": "enhanced:falcon_exo_wings"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.wings_out.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.wings_out.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "wings": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "enhanced:falcon_exo_wings"
+          }
+        ]
+      }
+    }
+  }
+}

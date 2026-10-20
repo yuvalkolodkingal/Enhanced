@@ -121,6 +121,9 @@ public final class ThorAbilities {
     private static final class Beam {
         long nextHit;
         final IntSet struck = new IntOpenHashSet();
+        /** 3.8: the beam's colours (Thor's, or Love's gold and lilac: {@link #lightningBeamFor}). */
+        int colour = Power.THOR.color;
+        int glow = Power.THOR.glow;
     }
 
     // ---- input ----
@@ -579,6 +582,15 @@ public final class ThorAbilities {
      * it (see {@link #beamTick}); V up: it stops. {@link Live#CALLING_LIGHTNING} is what every client draws it from.
      */
     private static void lightningBeam(ServerPlayer player, PowerData data, boolean down) {
+        lightningBeamFor(player, data, down, Power.THOR.color, Power.THOR.glow);
+    }
+
+    /**
+     * 3.8: Thor's lightning beam for anyone whose code calls it (Love's V, lane L8), in the given colours: V down
+     * starts it ({@link Live#CALLING_LIGHTNING}), V up stops it; {@link #lightningBeamTick} fires it each tick. Thor's
+     * own beam is this with his colours.
+     */
+    public static void lightningBeamFor(ServerPlayer player, PowerData data, boolean down, int colour, int glow) {
         if (!down || player.isSpectator()) {
             data.set(Live.CALLING_LIGHTNING, false);
             return;
@@ -590,7 +602,10 @@ public final class ThorAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.thor.too_hungry"), true);
             return;
         }
-        BEAMS.computeIfAbsent(player.getUUID(), id -> new Beam()).struck.clear();
+        Beam beam = BEAMS.computeIfAbsent(player.getUUID(), id -> new Beam());
+        beam.struck.clear();
+        beam.colour = colour;
+        beam.glow = glow;
         data.set(Live.CALLING_LIGHTNING, true);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 0.8F, 1.3F);
     }
@@ -603,6 +618,19 @@ public final class ThorAbilities {
      * usual effects of lightning on it (creepers charge, pigs turn into zombified piglins). It burns a little hunger;
      * where it ends, sparks fly, but nothing burns.
      */
+    /**
+     * 3.8: one tick of the lightning beam while {@link Live#CALLING_LIGHTNING} is on (Thor's tick calls it for him).
+     */
+    public static void lightningBeamTick(ServerPlayer player, PowerData data) {
+        beamTick(player, data);
+    }
+
+    /** 3.8: the colours of the player's lightning beam ({@code [colour, glow]}; Thor's when he has none). */
+    public static int[] lightningBeamColours(ServerPlayer player) {
+        Beam beam = BEAMS.get(player.getUUID());
+        return beam == null ? new int[]{Power.THOR.color, Power.THOR.glow} : new int[]{beam.colour, beam.glow};
+    }
+
     private static void beamTick(ServerPlayer thor, PowerData data) {
         if (thor.isSpectator() || starving(thor)) {
             data.set(Live.CALLING_LIGHTNING, false);

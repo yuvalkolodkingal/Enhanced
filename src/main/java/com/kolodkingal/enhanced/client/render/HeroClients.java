@@ -38,6 +38,12 @@ public final class HeroClients {
         // 3.7: Wolverine and Deadpool.
         register(new WolverineClient());
         register(new DeadpoolClient());
+        // 3.8: Captain America, Red Hulk, Iron Man, Falcon and Love.
+        register(new CaptainClient());
+        register(new RedHulkClient());
+        register(new IronManClient());
+        register(new FalconClient());
+        register(new LoveClient());
     }
 
     /**

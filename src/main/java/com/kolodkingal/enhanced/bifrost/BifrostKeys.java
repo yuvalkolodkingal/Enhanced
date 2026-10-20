@@ -79,6 +79,11 @@ public final class BifrostKeys {
         if (data.power() == Power.HEIMDALL) {
             return column == HeroAbility.HEIMDALL_BIFROST.home && !sneak;
         }
+        // (3.8: Love's N without Sneak while she holds Stormbreaker, as Thor's; Sneak + N goes to the server.)
+        if (data.power() == Power.LOVE) {
+            return column == HeroAbility.LOVE_BIFROST.home && !sneak
+                    && com.kolodkingal.enhanced.love.LoveAbilities.holdsStormbreaker(player);
+        }
         HeroKit kit = data.kit();
         if (data.power() != Power.CUSTOM || kit == null) {
             return false;

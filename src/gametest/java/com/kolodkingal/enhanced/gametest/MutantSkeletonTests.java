@@ -140,7 +140,7 @@ public final class MutantSkeletonTests {
     public static void wolverineAndDeadpoolComeAfterTheHulk(GameTestHelper helper) {
         Power[] all = Power.values();
         check(all[Power.HULK.ordinal() + 1] == Power.WOLVERINE && all[Power.HULK.ordinal() + 2] == Power.DEADPOOL
-                && all.length == Power.HULK.ordinal() + 3, "…HULK, WOLVERINE, DEADPOOL (the stream sends the ordinal)");
+                && all.length >= Power.HULK.ordinal() + 3, "…HULK, WOLVERINE, DEADPOOL (the stream sends the ordinal)");
         check(Power.HULK.ordinal() == 22, "nobody before them moved");
         check(Power.WOLVERINE.color == 0xF2C230 && Power.WOLVERINE.glow == 0xD9DEE3
                 && Power.WOLVERINE.titleColor() == 0xF2C230, "Wolverine's colours");
@@ -172,10 +172,11 @@ public final class MutantSkeletonTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsEleven(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("11"), "protocol 11");
-        check(Live.values().length == 58 && Live.values().length <= 63, "Live: 53 + 1 + 2 + 2 = 58: "
+        // (3.8: at least 3.7's numbers; AvengersSkeletonTests pins 3.8's.)
+        check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 11, "protocol 11 or later");
+        check(Live.values().length >= 58 && Live.values().length <= 127, "Live: 53 + 1 + 2 + 2 = 58 or more: "
                 + Live.values().length);
-        check(Toggle.values().length == 22 && Toggle.values().length <= 32, "Toggle: 19 + 3 = 22: "
+        check(Toggle.values().length >= 22 && Toggle.values().length <= 32, "Toggle: 19 + 3 = 22 or more: "
                 + Toggle.values().length);
         check(Live.HEALING_DOWN.ordinal() == 53 && Live.WOLVERINE_BERSERK.ordinal() == 54
                 && Live.DEADPOOL_AIMING.ordinal() == 57, "the states of 3.7 are appended");
@@ -241,13 +242,14 @@ public final class MutantSkeletonTests {
 
     @GameTest(template = ARENA, batch = BATCH)
     public static void theRowsAre176(GameTestHelper helper) throws IOException {
-        check(HeroAbility.values().length == 176, "154 + 12 + 10 rows: " + HeroAbility.values().length);
+        check(HeroAbility.values().length >= 176, "154 + 12 + 10 rows or more: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.WOLVERINE_SLASH.ordinal() - 1] == HeroAbility.HULK_BODY,
                 "Wolverine after the Hulk");
         check(HeroAbility.values()[HeroAbility.DEADPOOL_KATANAS.ordinal() - 1] == HeroAbility.WOLVERINE_BODY,
                 "Deadpool after Wolverine");
-        check(HeroAbility.values()[HeroAbility.values().length - 1] == HeroAbility.DEADPOOL_SMOKE,
-                "their variants come last");
+        check(HeroAbility.values()[HeroAbility.DEADPOOL_SMOKE.ordinal() - 9] == HeroAbility.WOLVERINE_SPIN_SLASH
+                && HeroAbility.DEADPOOL_SMOKE.ordinal() > HeroAbility.DEADPOOL_BODY.ordinal(),
+                "their variants come after every hero's rows (3.8's rows sit between, its variants after)");
         for (Power hero : List.of(Power.WOLVERINE, Power.DEADPOOL)) {
             List<HeroAbility> rows = HeroAbility.of(hero).stream().filter(a -> !a.isVariant()).toList();
             List<HeroAbility> variants = HeroAbility.of(hero).stream().filter(HeroAbility::isVariant).toList();

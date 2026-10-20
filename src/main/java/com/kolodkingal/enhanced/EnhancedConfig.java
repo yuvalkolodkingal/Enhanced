@@ -559,6 +559,15 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.CottageConfig.define(BUILDER);
         // 3.7 (Eilon's request, lane L8): the meeting with Death, Rio the Green Witch ([death_meeting]).
         com.kolodkingal.enhanced.config.DeathMeetingConfig.define(BUILDER);
+        // 3.8 (the Super Soldier Serum, Captain America, Red Hulk, Iron Man and his suits, Falcon, the tower's armoury,
+        // Eternity and Love): the skeleton defines every option of Appendix B; the lanes read them.
+        com.kolodkingal.enhanced.config.SerumConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.CaptainConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.RedHulkConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.IronManConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.FalconConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.TowerConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.EternityConfig.define(BUILDER);
         // 3.5: the world's own music (section [music]).
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }

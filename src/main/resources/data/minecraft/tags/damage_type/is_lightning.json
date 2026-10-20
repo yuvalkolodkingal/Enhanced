@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "enhanced:lightning_beam"
+    "enhanced:lightning_beam",
+    "enhanced:refocuser_lightning",
+    "enhanced:love_lightning"
   ]
 }

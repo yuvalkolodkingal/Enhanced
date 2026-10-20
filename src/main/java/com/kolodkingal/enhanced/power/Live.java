@@ -3,8 +3,9 @@ package com.kolodkingal.enhanced.power;
 /**
  * Momentary states of the newer heroes (and of whoever Mjolnir pins down) that clients must see (to draw effects and
  * poses, or to stop a pinned player's own movement) but that are never saved: they are recomputed by the server while
- * the power is in use. Kept together as one bit set in {@link PowerData}, a {@code long} since 3.0 (28 bits are used in
- * 3.3, 42 in 3.5, 53 in 3.6, 58 in 3.7: at most 64).
+ * the power is in use. Kept together as a bit set in {@link PowerData}, a {@code long} since 3.0 (28 bits are used in
+ * 3.3, 42 in 3.5, 53 in 3.6, 58 in 3.7) and two {@code long}s since 3.8 (75 states: at most 128). A state's word and
+ * mask come from its ordinal ({@link #word}, {@link #mask}); code only ever asks {@code PowerData.is} and {@code set}.
  *
  * <p>The states of 3.0 sit in one region per hero (the {@code // =====} lines), so the five lanes that build those
  * heroes append to their own lines and never to the same one.
@@ -181,9 +182,56 @@ public enum Live {
     DEADPOOL_PARRYING,
     /** Deadpool's pistols are drawn (for two seconds after a shot). */
     DEADPOOL_AIMING,
+    // ===== captain (3.8) =====
+    /** Captain America charges behind his raised shield (V). */
+    CAP_CHARGING,
+    /** Captain America is in the air on the Shield Slam's leap, the shield about to come down (G). */
+    CAP_SLAMMING,
+    // ===== red_hulk (3.8) =====
+    /** Red Hulk is changing (Ross to Red Hulk or back): he cannot be pushed, his keys wait. */
+    RED_HULK_TRANSFORMING,
+    /** Red Hulk crouches and charges his Super Jump (V held). */
+    RED_HULK_JUMP_CHARGING,
+    /** Red Hulk is in the air on a Super Jump or a Bound. */
+    RED_HULK_LEAPING,
+    /** Red Hulk's anger is at 75 or more: he steams and glows like embers. */
+    RED_HULK_HEATED,
+    /** Red Hulk absorbs energy (Sneak + B held): fire, lightning, explosions and beams feed his anger. */
+    RED_HULK_ABSORBING,
+    /** Red Hulk holds a creature for Grab & Slam. */
+    RED_HULK_GRABBING,
+    // ===== iron_man (3.8) =====
+    /** A suit goes on or comes off (the suit-up's phase plays: rooted, the suit assembling or opening). */
+    IRON_SUITING,
+    /** Iron Man's shield is up: the Mark 50's nano shield or the Mark 85's giant energy shield. */
+    IRON_SHIELD,
+    /** Iron Man's blades are out: the Mark 50's nano blade or the Mark 85's energy blades. */
+    IRON_BLADES,
+    /** The Hulkbuster holds a creature for Grab & Throw. */
+    IRON_GRABBING,
+    /** Iron Man dashes (the Mark 5's Dash Punch, the Mark 1's Rocket Boost). */
+    IRON_DASHING,
+    /** Iron Man charges the Mark 50's Nano Cannon (N held). */
+    IRON_CHARGING,
+    // ===== falcon (3.8) =====
+    /** Falcon dives at a foe, wings folded. */
+    FALCON_DIVING,
+    /** Falcon's wings are wrapped in front of him (B held). */
+    FALCON_WING_SHIELD,
+    /** Falcon glides on his wings (Sneak + G: the elytra's flight). */
+    FALCON_GLIDING,
     ;
 
-    final long bit() {
-        return 1L << ordinal();
+    /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */
+    static final int WORD = 64;
+
+    /** 3.8: which of the two words of {@link PowerData} holds this state (0 for the first 64, 1 after). */
+    public int word() {
+        return ordinal() / WORD;
+    }
+
+    /** 3.8: the state's bit within its word. */
+    public long mask() {
+        return 1L << (ordinal() % WORD);
     }
 }

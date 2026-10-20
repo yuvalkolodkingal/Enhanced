@@ -1,0 +1,29 @@
+{
+  "parent": "enhanced:avengers/suit_up",
+  "display": {
+    "icon": {
+      "id": "enhanced:iron_man_mark_85"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.mark_85.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.mark_85.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "mark_85": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "enhanced:iron_man_mark_85"
+          }
+        ]
+      }
+    }
+  }
+}

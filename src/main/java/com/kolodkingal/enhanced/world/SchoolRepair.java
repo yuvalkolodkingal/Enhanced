@@ -219,7 +219,10 @@ public final class SchoolRepair {
         return new Result(placed.size(), already, skipped);
     }
 
-    /** {@code structure repair_school [radius]} (and 3.7's {@code school_lab}) under {@code /enhanced} (operators). */
+    /**
+     * {@code structure repair_school [radius]} (and 3.7's {@code school_lab}, 3.8's {@code refit_tower}) under {@code
+     * /enhanced} (operators).
+     */
     public static LiteralArgumentBuilder<CommandSourceStack> node() {
         return Commands.literal("structure")
                 .then(Commands.literal("repair_school")
@@ -227,7 +230,9 @@ public final class SchoolRepair {
                         .then(Commands.argument("radius", IntegerArgumentType.integer(16, MAX_RADIUS))
                                 .executes(ctx -> run(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "radius")))))
                 // (3.7: the X-Men lower lab, lane L4's.)
-                .then(com.kolodkingal.enhanced.school.LabCommand.node());
+                .then(com.kolodkingal.enhanced.school.LabCommand.node())
+                // (3.8: the Avengers Tower's armoury, lane L6's.)
+                .then(com.kolodkingal.enhanced.tower.TowerCommand.node());
     }
 
     private static int run(CommandSourceStack source, int radius) {

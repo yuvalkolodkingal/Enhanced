@@ -473,6 +473,15 @@ public enum GestureId {
     DEADPOOL_SMOKE(Group.CAST, 12, 1, 4, true),
     /** The Chimichanga Break (Sneak + B): the snack to the mouth, three happy bites. */
     DEADPOOL_EAT(Group.CAST, 24, 2, 6, true)
+    // ===== captain (3.8) =====
+    // ===== red_hulk (3.8) =====
+    // ===== iron_man (3.8) =====
+    // ===== nanotech (3.8) =====
+    // ===== suit_art (3.8) =====
+    // ===== falcon (3.8) =====
+    // ===== love (3.8) =====
+    // (3.8: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
+    // AnimationMathTests wants keys for every gesture.)
     ;
 
     /** Gestures of one group never play together. */

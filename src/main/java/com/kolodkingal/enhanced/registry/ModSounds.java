@@ -510,6 +510,133 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> NICKY_CHEER = register("nicky_cheer");
     public static final DeferredHolder<SoundEvent, SoundEvent> AGATHA_AWAY = register("agatha_away");
 
+    // ===== serum (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> SERUM_OPEN = register("serum_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SERUM_CHOOSE = register("serum_choose");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SERUM_LOCKED = register("serum_locked");
+
+    // ===== captain (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_THROW = register("shield_throw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_RICOCHET = register("shield_ricochet");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_CATCH = register("shield_catch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_BLOCK = register("shield_block");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_REFLECT = register("shield_reflect");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_SLAM = register("shield_slam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_CHARGE = register("shield_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_BASH = register("shield_bash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAP_ASSEMBLE = register("cap_assemble");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAP_INSPIRE = register("cap_inspire");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAP_PUNCH = register("cap_punch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAP_FLIP = register("cap_flip");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAPTAIN_AWAKEN = register("captain_awaken");
+
+    // ===== red_hulk (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_ROAR = register("red_hulk_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_SMASH = register("red_hulk_smash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_HEAT_WAVE = register("red_hulk_heat_wave");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_JUMP_CHARGE = register("red_hulk_jump_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_JUMP = register("red_hulk_jump");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_LAND = register("red_hulk_land");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_BURST = register("red_hulk_burst");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_STEAM = register("red_hulk_steam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_ABSORB = register("red_hulk_absorb");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_TRANSFORM = register("red_hulk_transform");
+    public static final DeferredHolder<SoundEvent, SoundEvent> RED_HULK_AWAKEN = register("red_hulk_awaken");
+
+    // ===== iron_man (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARC_REACTOR_INSERT = register("arc_reactor_insert");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARC_REACTOR_HUM = register("arc_reactor_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> IRON_MAN_AWAKEN = register("iron_man_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SUIT_ENERGY_LOW = register("suit_energy_low");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SUIT_ENERGY_EMPTY = register("suit_energy_empty");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REPULSOR_CHARGE = register("repulsor_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REPULSOR_BLAST = register("repulsor_blast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DOUBLE_BLAST = register("double_blast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNIBEAM_START = register("unibeam_start");
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNIBEAM = register("unibeam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FLARES = register("flares");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MINI_MISSILE_LAUNCH = register("mini_missile_launch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MINI_MISSILE_BOOM = register("mini_missile_boom");
+    public static final DeferredHolder<SoundEvent, SoundEvent> IRON_THRUSTERS = register("iron_thrusters");
+    public static final DeferredHolder<SoundEvent, SoundEvent> IRON_BOOST = register("iron_boost");
+    public static final DeferredHolder<SoundEvent, SoundEvent> IRON_CRASH = register("iron_crash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MARK1_FLAMETHROWER = register("mark1_flamethrower");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MARK1_ARM_ROCKET = register("mark1_arm_rocket");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MARK1_CLANK = register("mark1_clank");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MARK3_GANTRY = register("mark3_gantry");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MARK5_SUITCASE_OPEN = register("mark5_suitcase_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MARK5_SUITCASE_CLOSE = register("mark5_suitcase_close");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DASH_PUNCH = register("dash_punch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LASER_BURST = register("laser_burst");
+    public static final DeferredHolder<SoundEvent, SoundEvent> IRON_HUD_BOOT = register("iron_hud_boot");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SUIT_UP_GENERIC = register("suit_up_generic");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SUIT_DOWN_GENERIC = register("suit_down_generic");
+
+    // ===== nanotech (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_FLOW = register("nano_flow");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_RETRACT = register("nano_retract");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_BLADE_OUT = register("nano_blade_out");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_BLADE_IN = register("nano_blade_in");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_SHIELD = register("nano_shield");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_CANNON_CHARGE = register("nano_cannon_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_CANNON_FIRE = register("nano_cannon_fire");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ENERGY_BLADE_SWING = register("energy_blade_swing");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ENERGY_SHIELD_HIT = register("energy_shield_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LIGHTNING_REFOCUSER = register("lightning_refocuser");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HOMING_LOCK = register("homing_lock");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NANO_DRONES_DEPLOY = register("nano_drones_deploy");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRONE_LASER = register("drone_laser");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CHEST_LASER = register("chest_laser");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULKBUSTER_DROP = register("hulkbuster_drop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULKBUSTER_OPEN = register("hulkbuster_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULKBUSTER_CLOSE = register("hulkbuster_close");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULKBUSTER_STEP = register("hulkbuster_step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULKBUSTER_PUNCH = register("hulkbuster_punch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULKBUSTER_GRAB = register("hulkbuster_grab");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HULKBUSTER_THROW = register("hulkbuster_throw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> VERONICA_ARM = register("veronica_arm");
+
+    // ===== falcon (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_WINGS_OPEN = register("falcon_wings_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_WINGS_CLOSE = register("falcon_wings_close");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_THRUST = register("falcon_thrust");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_DIVE = register("falcon_dive");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_DIVE_HIT = register("falcon_dive_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_CLIMB = register("falcon_climb");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_DART = register("falcon_dart");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_ROCKET = register("falcon_rocket");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WING_SHIELD_UP = register("wing_shield_up");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WING_SHIELD_DEFLECT = register("wing_shield_deflect");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WING_SLASH = register("wing_slash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REDWING_LAUNCH = register("redwing_launch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REDWING_BUZZ = register("redwing_buzz");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REDWING_ZAP = register("redwing_zap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REDWING_STRIKE = register("redwing_strike");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REDWING_RETURN = register("redwing_return");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FALCON_AWAKEN = register("falcon_awaken");
+
+    // ===== tower (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> SUIT_DISPLAY_TAKE = register("suit_display_take");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TECH_CASE_OPEN = register("tech_case_open");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TECH_CASE_TAKE = register("tech_case_take");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DISPLAY_REFUSE = register("display_refuse");
+
+    // ===== eternity (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHRINE_HUM = register("shrine_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ALTAR_PLACE = register("altar_place");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ALTAR_RISE = register("altar_rise");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ETERNITY_ARRIVE = register("eternity_arrive");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ETERNITY_AMBIENT = register("eternity_ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ETERNITY_VOICE = register("eternity_voice");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WISH_GRANTED = register("wish_granted");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ETERNITY_LEAVE = register("eternity_leave");
+
+    // ===== love (3.8: registered by the skeleton with placeholder files; lane L2 makes them) =====
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOVE_AWAKEN = register("love_awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOVE_EYE_LASER_START = register("love_eye_laser_start");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOVE_EYE_LASER = register("love_eye_laser");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOVE_THUNDER_STRIKE = register("love_thunder_strike");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Enhanced.id(name)));
     }

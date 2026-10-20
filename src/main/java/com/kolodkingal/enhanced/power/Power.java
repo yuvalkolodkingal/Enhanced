@@ -62,7 +62,16 @@ public enum Power implements StringRepresentable {
     // Wolverine is the yellow of the classic suit with the silver of adamantium; Deadpool the red of his suit with a
     // pale pink glow (his name in a deeper red).
     WOLVERINE(0xF2C230, 0xD9DEE3),
-    DEADPOOL(0xC8102E, 0xFF8A8A);
+    DEADPOOL(0xC8102E, 0xFF8A8A),
+    // The heroes of 3.8, appended after DEADPOOL in this order (the 3.8 skeleton adds them; each lane fills its own).
+    // Captain America is the suit's blue with the star's silver-white (his name a brighter blue); Red Hulk a deep red
+    // with a hot orange glow; Iron Man the suit's red with the arc reactor's blue; Falcon the wings' steel with his red
+    // accents (his name red); Love the purple of her eyes with Asgard's gold.
+    CAPTAIN_AMERICA(0x2A4BA0, 0xE8EEF5),
+    RED_HULK(0xC4231B, 0xFF7A3A),
+    IRON_MAN(0xB3121B, 0x9FE8FF),
+    FALCON(0x8A8F98, 0xE0313A),
+    LOVE(0xB57BFF, 0xFFE59A);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -105,6 +114,12 @@ public enum Power implements StringRepresentable {
             // (3.7: Wolverine is named in his suit's yellow, Deadpool in a red that reads on the dark sky.)
             case WOLVERINE -> 0xF2C230;
             case DEADPOOL -> 0xD6262E;
+            // (3.8: each named so that he reads on the dark sky of a title.)
+            case CAPTAIN_AMERICA -> 0x3D6FD6;
+            case RED_HULK -> 0xE0352A;
+            case IRON_MAN -> 0xD62A2A;
+            case FALCON -> 0xD8323C;
+            case LOVE -> 0xC08CFF;
             default -> color;
         };
     }
@@ -124,8 +139,9 @@ public enum Power implements StringRepresentable {
      */
     public Component awakeningTitle() {
         // (3.3: "Agatha Harkness" is one character too wide: she wakes as "Agatha". 3.6: Doctor Strange's Hebrew name
-        // is one too wide: he wakes as "ד"ר סטריינג'".)
-        return this == PHOENIX || this == AGATHA || this == DOCTOR_STRANGE
+        // is one too wide: he wakes as "ד"ר סטריינג'". 3.8: "Captain America" is one too wide: he wakes as "The
+        // Captain".)
+        return this == PHOENIX || this == AGATHA || this == DOCTOR_STRANGE || this == CAPTAIN_AMERICA
                 ? Component.translatable("power.enhanced." + getSerializedName() + ".title") : displayName();
     }
 
@@ -141,15 +157,17 @@ public enum Power implements StringRepresentable {
      * Quicksilver, Tommy, Spider-Man and Thanos run, swing or step through portals, Loki walks, Cyclops runs and leaps
      * on his optic blast and Professor X walks or rolls in his chair; the gods of Asgard (3.5) walk, and the Bifrost
      * carries them; the Hulk (3.6) leaps; everyone else can fly (Thor only with Mjolnir, see ThorAbilities; Doctor
-     * Strange on his Cloak of Levitation); Wolverine and Deadpool (3.7) leap, pounce and teleport.
+     * Strange on his Cloak of Levitation); Wolverine and Deadpool (3.7) leap, pounce and teleport. 3.8: Iron Man flies
+     * in a suit that flies, Falcon with his Exo-Wings on and Love while she holds Stormbreaker ({@code PowerTicker}
+     * asks each one's gate); Captain America and Red Hulk run and leap.
      */
     public boolean canFly() {
         return switch (this) {
             // (A custom hero flies only if Flight is one of its powers: PowerTicker asks its definition.)
             case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, CUSTOM,
-                    DOCTOR_STRANGE -> true;
+                    DOCTOR_STRANGE, IRON_MAN, FALCON, LOVE -> true;
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
-                    HULK, WOLVERINE, DEADPOOL -> false;
+                    HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK -> false;
         };
     }
 
@@ -168,8 +186,12 @@ public enum Power implements StringRepresentable {
             case CUSTOM -> com.kolodkingal.enhanced.config.CustomHeroConfig.FLIGHT_SPEED.get().floatValue();
             // (3.6: the Cloak of Levitation is graceful, slower than Thor.)
             case DOCTOR_STRANGE -> com.kolodkingal.enhanced.config.StrangeConfig.FLIGHT_SPEED.get().floatValue();
+            // (3.8: Iron Man's speed is his worn suit's, PowerTicker asks IronSuits.flightSpeed; this is the Mark 3's.)
+            case IRON_MAN -> com.kolodkingal.enhanced.config.IronManConfig.MARK3_FLIGHT_SPEED.get().floatValue();
+            case FALCON -> com.kolodkingal.enhanced.config.FalconConfig.FLIGHT_SPEED.get().floatValue();
+            case LOVE -> com.kolodkingal.enhanced.config.EternityConfig.LOVE_FLIGHT_SPEED.get().floatValue();
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
-                    HULK, WOLVERINE, DEADPOOL -> 0.05F;
+                    HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK -> 0.05F;
         };
     }
 
@@ -177,11 +199,12 @@ public enum Power implements StringRepresentable {
     public int flightAbility() {
         return switch (this) {
             case MAGNETO -> 5;
-            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, DOCTOR_STRANGE -> 2;
+            case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, DOCTOR_STRANGE, IRON_MAN,
+                    FALCON, LOVE -> 2;
             // (A custom hero's Flight is on whichever key its player put it; 3.6: all five of the Hulk's keys are
-            // rows; 3.7: and Wolverine's and Deadpool's.)
+            // rows; 3.7: and Wolverine's and Deadpool's; 3.8: and Captain America's and Red Hulk's.)
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA,
-                    HULK, WOLVERINE, DEADPOOL -> -1;
+                    HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK -> -1;
         };
     }
 

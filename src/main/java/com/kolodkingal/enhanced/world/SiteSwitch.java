@@ -13,8 +13,9 @@ import java.util.Optional;
  * The server options that stop a kind of structure from generating in new chunks (3.6, {@code [stone_sites]}): a
  * structure names its option in the optional field {@code enabled_by} (the option's name: {@code sanctums}, {@code
  * avengersTowers}, {@code endTunnels}, {@code vormirCliffs}; 3.7: {@code agatha_cottage.enabled}, {@code
- * [agatha_cottage] enabled}); with the option off it finds no place to stand, so it is neither built nor located.
- * Existing sites stay. Before the server config is loaded every option is on.
+ * [agatha_cottage] enabled}; 3.8: {@code eternity_shrine.enabled}, {@code [eternity] enabled}); with the option off it
+ * finds no place to stand, so it is neither built nor located. Existing sites stay. Before the server config is loaded
+ * every option is on.
  */
 public final class SiteSwitch {
     /** The field's codec: an option's name, checked when the structure is read. */
@@ -45,7 +46,8 @@ public final class SiteSwitch {
 
     private static boolean known(String name) {
         return switch (name.toLowerCase(Locale.ROOT)) {
-            case "sanctums", "avengerstowers", "endtunnels", "vormircliffs", "agatha_cottage.enabled" -> true;
+            case "sanctums", "avengerstowers", "endtunnels", "vormircliffs", "agatha_cottage.enabled",
+                    "eternity_shrine.enabled" -> true;
             default -> false;
         };
     }
@@ -58,6 +60,8 @@ public final class SiteSwitch {
             case "vormircliffs" -> StoneSitesConfig.VORMIR_CLIFFS;
             // (3.7: Agatha's Cottage.)
             case "agatha_cottage.enabled" -> com.kolodkingal.enhanced.config.CottageConfig.ENABLED;
+            // (3.8: the Shrine of the Cosmic Entities.)
+            case "eternity_shrine.enabled" -> com.kolodkingal.enhanced.config.EternityConfig.ENABLED;
             default -> null;
         };
     }

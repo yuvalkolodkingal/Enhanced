@@ -83,6 +83,46 @@ public final class ModArmorMaterials {
             0.0F,
             0.0F));
 
+    // ===== iron_man (3.8) =====
+    // (Iron Man's classic suits: one chest item is the whole suit, so its chest value is the set's (PLAN 5.3). Their
+    // armour textures are empty: SuitLayer draws the suit. Lane L3 owns them.)
+    /** The Mark 1: 18 armour, 3 toughness, knockback resistance 0.5 (heavy and crude). */
+    public static final Holder<ArmorMaterial> IRON_MARK_1 = ARMOR_MATERIALS.register("iron_mark_1",
+            () -> suit("iron_mark_1", 18, 9, SoundEvents.ARMOR_EQUIP_IRON, Items.IRON_INGOT, 3.0F, 0.5F));
+    /** The Mark 3: 16 armour, 2 toughness, knockback resistance 0.2. */
+    public static final Holder<ArmorMaterial> IRON_MARK_3 = ARMOR_MATERIALS.register("iron_mark_3",
+            () -> suit("iron_mark_3", 16, 12, SoundEvents.ARMOR_EQUIP_IRON, Items.IRON_INGOT, 2.0F, 0.2F));
+    /** The Mark 5 (the suitcase suit, light): 12 armour, 1 toughness, knockback resistance 0.1. */
+    public static final Holder<ArmorMaterial> IRON_MARK_5 = ARMOR_MATERIALS.register("iron_mark_5",
+            () -> suit("iron_mark_5", 12, 12, SoundEvents.ARMOR_EQUIP_IRON, Items.IRON_INGOT, 1.0F, 0.1F));
+    /** The Hulkbuster: 20 armour, 12 toughness, full knockback resistance. */
+    public static final Holder<ArmorMaterial> HULKBUSTER = ARMOR_MATERIALS.register("hulkbuster",
+            () -> suit("hulkbuster", 20, 9, SoundEvents.ARMOR_EQUIP_NETHERITE, Items.IRON_BLOCK, 12.0F, 1.0F));
+    /**
+     * The Nano Arc Reactor and the nanotech housings: no armour of their own (a deployed nanotech suit's armour is
+     * applied by {@code IronSuits} while it is out, PLAN 5.3).
+     */
+    public static final Holder<ArmorMaterial> NANO_REACTOR = ARMOR_MATERIALS.register("nano_reactor",
+            () -> suit("nano_reactor", 0, 15, SoundEvents.ARMOR_EQUIP_NETHERITE, Items.DIAMOND, 0.0F, 0.0F));
+    // ===== falcon (3.8) =====
+    /**
+     * Falcon's Exo-Wings: an iron chestplate's armour and a bit (6, toughness 1). Drawn by their own layer (lane L5).
+     */
+    public static final Holder<ArmorMaterial> FALCON_WINGS = ARMOR_MATERIALS.register("falcon_wings",
+            () -> suit("falcon_wings", 6, 12, SoundEvents.ARMOR_EQUIP_ELYTRA, Items.IRON_INGOT, 1.0F, 0.0F));
+
+    /** 3.8: a material whose one item (a chest item) is the whole set: {@code defense} for every slot. */
+    private static ArmorMaterial suit(String name, int defense, int enchantment,
+            Holder<net.minecraft.sounds.SoundEvent> sound, net.minecraft.world.item.Item repair, float toughness,
+            float knockback) {
+        return new ArmorMaterial(Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+            for (ArmorItem.Type type : ArmorItem.Type.values()) {
+                map.put(type, defense);
+            }
+        }), enchantment, sound, () -> Ingredient.of(repair), List.of(new ArmorMaterial.Layer(Enhanced.id(name))),
+                toughness, knockback);
+    }
+
     private ModArmorMaterials() {
     }
 }

@@ -1,0 +1,12 @@
+{
+  "type": "enhanced:template_site",
+  "biomes": "#enhanced:has_structure/eternity_shrine",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "template": "enhanced:eternity_shrine/shrine",
+  "floor": 2,
+  "max_slope": 6,
+  "processors": "enhanced:eternity_shrine",
+  "enabled_by": "eternity_shrine.enabled"
+}

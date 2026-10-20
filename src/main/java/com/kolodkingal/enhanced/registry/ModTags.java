@@ -219,6 +219,34 @@ public final class ModTags {
     public static final TagKey<net.minecraft.world.level.levelgen.structure.Structure> BIFROST_SITES =
             TagKey.create(Registries.STRUCTURE, Enhanced.id("bifrost_sites"));
     // ===== cottage (3.7) =====
+    // ===== captain (3.8) =====
+    // ===== red_hulk (3.8) =====
+    /**
+     * The energy that Red Hulk's Energy Absorb takes in (with fire, lightning and explosions): every beam of the mod,
+     * the repulsors, the lasers and the bolts.
+     */
+    public static final TagKey<DamageType> ENERGY_DAMAGE = damage("energy_damage");
+    // ===== iron_man (3.8) =====
+    /** Iron Man's suits as items (the six): the displays' and the HUD's. */
+    public static final TagKey<Item> IRON_SUITS = TagKey.create(Registries.ITEM, Enhanced.id("iron_suits"));
+    /** The nanotech housings (Mark 50, Mark 85). */
+    public static final TagKey<Item> NANO_SUITS = TagKey.create(Registries.ITEM, Enhanced.id("nano_suits"));
+    /** The Arc Reactor and the Nano Arc Reactor: either, carried, powers a classic suit. */
+    public static final TagKey<Item> ARC_REACTORS = TagKey.create(Registries.ITEM, Enhanced.id("arc_reactors"));
+    // ===== falcon (3.8) =====
+    // ===== tower (3.8) =====
+    // ===== eternity (3.8) =====
+    /** The keys of the Bifrost that open Eternity's altar: Mjolnir, Stormbreaker, Hofund, Gungnir (one's own). */
+    public static final TagKey<Item> BIFROST_KEYS = TagKey.create(Registries.ITEM, Enhanced.id("bifrost_keys"));
+    /**
+     * What Eternity never grants (hidden from the picker, refused by the server): the operators' blocks and items, and
+     * the unbreakable or unobtainable ones.
+     */
+    public static final TagKey<Item> WISH_FORBIDDEN = TagKey.create(Registries.ITEM, Enhanced.id("wish_forbidden"));
+    /** The biomes of the Shrine of the Cosmic Entities: the End's outer islands. */
+    public static final TagKey<net.minecraft.world.level.biome.Biome> HAS_ETERNITY_SHRINE =
+            TagKey.create(Registries.BIOME, Enhanced.id("has_structure/eternity_shrine"));
+    // ===== love (3.8) =====
 
     // ===== 3.1 build =====
     /**

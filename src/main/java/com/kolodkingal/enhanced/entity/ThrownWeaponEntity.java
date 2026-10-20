@@ -206,8 +206,10 @@ public class ThrownWeaponEntity extends Projectile {
 
     /** Thor, if he can still catch it: alive, in this dimension, still Thor (3.4: or a custom hero with Thor's hammer). */
     private ServerPlayer thor() {
+        // (3.8: Love's axe throw is this entity too: it flies home to her as to Thor.)
         return getOwner() instanceof ServerPlayer player && player.isAlive() && !player.isRemoved() && player.level() == level()
-                && Powers.get(player).has(HeroAbility.THOR_HAMMER) ? player : null;
+                && (Powers.get(player).has(HeroAbility.THOR_HAMMER) || Powers.get(player).has(HeroAbility.LOVE_AXE))
+                ? player : null;
     }
 
     /** Back in Thor's hand (or his inventory, if his hand is full). A Mjolnir nobody owned yet is his from now on. */

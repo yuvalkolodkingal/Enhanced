@@ -1,0 +1,22 @@
+{
+  "parent": "enhanced:avengers/gates_of_eternity",
+  "display": {
+    "icon": {
+      "id": "minecraft:nether_star"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.careful_what_you_wish_for.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.careful_what_you_wish_for.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -49,6 +49,18 @@ public final class ModRecipes {
             STONE_LOCATOR = SERIALIZERS.register("stone_locator",
             com.kolodkingal.enhanced.finders.LocatorRecipe.Serializer::new);
 
+    // ===== serum (3.8) =====
+    /** The serum's shaped recipe, matched only while {@code [super_soldier_serum] craftable} is on (lane L1). */
+    public static final DeferredHolder<RecipeSerializer<?>, com.kolodkingal.enhanced.item.SwitchedRecipe.Serializer>
+            SERUM = SERIALIZERS.register("serum", () -> new com.kolodkingal.enhanced.item.SwitchedRecipe.Serializer(
+                    com.kolodkingal.enhanced.item.SwitchedRecipe.Switch.SERUM));
+    // ===== iron_man (3.8) =====
+    /** The Arc Reactors' shaped recipes, matched only while {@code [iron_man] reactorsCraftable} is on (lane L3). */
+    public static final DeferredHolder<RecipeSerializer<?>, com.kolodkingal.enhanced.item.SwitchedRecipe.Serializer>
+            ARC_REACTOR = SERIALIZERS.register("arc_reactor",
+                    () -> new com.kolodkingal.enhanced.item.SwitchedRecipe.Serializer(
+                            com.kolodkingal.enhanced.item.SwitchedRecipe.Switch.ARC_REACTOR));
+
     private ModRecipes() {
     }
 }

@@ -125,7 +125,8 @@ public final class StoneSkeletonTests {
     public static void theBitsFitAndTheProtocolIsTen(GameTestHelper helper) {
         // (3.7: at least 3.6's numbers; MutantSkeletonTests pins 3.7's.)
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10, "protocol 10 or later");
-        check(Live.values().length >= 53 && Live.values().length <= 63, "Live: 42 + 6 + 5 = 53 or more: "
+        // (3.8: the states are two words, room for 128.)
+        check(Live.values().length >= 53 && Live.values().length <= 127, "Live: 42 + 6 + 5 = 53 or more: "
                 + Live.values().length);
         check(Toggle.values().length >= 19 && Toggle.values().length <= 32, "Toggle: 15 + 3 + 1 = 19 or more: "
                 + Toggle.values().length);

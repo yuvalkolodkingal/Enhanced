@@ -285,6 +285,86 @@ public final class ModItems {
                                     com.kolodkingal.enhanced.finders.LocatorState.EMPTY)));
     // ===== cottage (3.7) =====
 
+    // ===== serum (3.8) =====
+    // (The skeleton registers every item of 3.8; each lane owns its classes. Plain looks until lane L7's icons.)
+    /** The Super Soldier Serum (lane L1): the tower lab's "Project Rebirth" case; not crafted by default. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.SuperSoldierSerumItem> SPECIAL_SOLDIER_SERUM =
+            ITEMS.register("special_soldier_serum", () -> new com.kolodkingal.enhanced.item.SuperSoldierSerumItem(
+                    new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
+    // ===== captain (3.8) =====
+    /** The Vibranium Shield (lane L1): a shield that never wears out (the Unbreakable component). */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.VibraniumShieldItem> VIBRANIUM_SHIELD =
+            ITEMS.register("vibranium_shield", () -> new com.kolodkingal.enhanced.item.VibraniumShieldItem(
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                            .component(DataComponents.UNBREAKABLE, new Unbreakable(false))));
+    // ===== iron_man (3.8) =====
+    /** The Arc Reactor (lane L3): Tony's desk in the tower; it makes you Iron Man and powers the classic suits. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.ArcReactorItem> ARC_REACTOR =
+            ITEMS.register("arc_reactor", () -> new com.kolodkingal.enhanced.item.ArcReactorItem(
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
+    /** The Nano Arc Reactor (lane L3): a chest item, the nanotech suits' home. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.NanoArcReactorItem> NANO_ARC_REACTOR =
+            ITEMS.register("nano_arc_reactor", () -> new com.kolodkingal.enhanced.item.NanoArcReactorItem(
+                    ModArmorMaterials.NANO_REACTOR, new Item.Properties().stacksTo(1).fireResistant()
+                            .rarity(Rarity.EPIC)));
+    /** The Mark 1 (lane L3): the cave suit, worn on the chest. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.IronSuitItem> IRON_MAN_MARK_1 =
+            suit("iron_man_mark_1", com.kolodkingal.enhanced.ironman.SuitKind.MARK_1, ModArmorMaterials.IRON_MARK_1,
+                    825, Rarity.RARE);
+    /** The Mark 3 (lane L3): red and gold, worn on the chest. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.IronSuitItem> IRON_MAN_MARK_3 =
+            suit("iron_man_mark_3", com.kolodkingal.enhanced.ironman.SuitKind.MARK_3, ModArmorMaterials.IRON_MARK_3,
+                    1100, Rarity.EPIC);
+    /** The Mark 5 (lane L3): the suitcase suit; folded in the hand ({@code enhanced:suit}), unfolded on the chest. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.IronSuitItem> IRON_MAN_MARK_5 =
+            ITEMS.register("iron_man_mark_5", () -> new com.kolodkingal.enhanced.item.IronSuitItem(
+                    com.kolodkingal.enhanced.ironman.SuitKind.MARK_5, ModArmorMaterials.IRON_MARK_5,
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC).durability(600)
+                            .component(ModDataComponents.SUIT.get(),
+                                    com.kolodkingal.enhanced.ironman.SuitItemState.FOLDED)));
+    // ===== nanotech (3.8) =====
+    /** The Mark 50's nanotech housing (lanes L3 and L4): carried; the Nano Arc Reactor deploys it. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.IronSuitItem> IRON_MAN_MARK_50 =
+            suit("iron_man_mark_50", com.kolodkingal.enhanced.ironman.SuitKind.MARK_50, ModArmorMaterials.NANO_REACTOR,
+                    1815, Rarity.EPIC);
+    /** The Mark 85's nanotech housing (lanes L3 and L4). */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.IronSuitItem> IRON_MAN_MARK_85 =
+            suit("iron_man_mark_85", com.kolodkingal.enhanced.ironman.SuitKind.MARK_85, ModArmorMaterials.NANO_REACTOR,
+                    2035, Rarity.EPIC);
+    /** The Hulkbuster (lane L4): used, Veronica drops its frame; or worn on the chest. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.IronSuitItem> IRON_MAN_HULKBUSTER =
+            suit("iron_man_hulkbuster", com.kolodkingal.enhanced.ironman.SuitKind.HULKBUSTER,
+                    ModArmorMaterials.HULKBUSTER, 3000, Rarity.EPIC);
+    // ===== falcon (3.8) =====
+    /** Falcon's Exo-Wings (lane L5): the top of the tower; not crafted. */
+    public static final DeferredItem<com.kolodkingal.enhanced.item.FalconWingsItem> FALCON_EXO_WINGS =
+            ITEMS.register("falcon_exo_wings", () -> new com.kolodkingal.enhanced.item.FalconWingsItem(
+                    ModArmorMaterials.FALCON_WINGS, new Item.Properties().stacksTo(1).fireResistant()
+                            .rarity(Rarity.EPIC).durability(900)));
+    // ===== tower (3.8) =====
+    /** The tower's suit display and tech case, for builders (Creative; lane L6). */
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> SUIT_DISPLAY =
+            ITEMS.register("suit_display", () -> new net.minecraft.world.item.DoubleHighBlockItem(
+                    ModBlocks.SUIT_DISPLAY.get(), new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<BlockItem> TECH_CASE = ITEMS.registerSimpleBlockItem(ModBlocks.TECH_CASE,
+            new Item.Properties().rarity(Rarity.RARE));
+    // ===== eternity (3.8) =====
+    /** Eternity's altar and the realm's mirror, for builders (Creative only; lane L8). */
+    public static final DeferredItem<BlockItem> ETERNITY_ALTAR = ITEMS.registerSimpleBlockItem(ModBlocks.ETERNITY_ALTAR,
+            new Item.Properties().rarity(Rarity.EPIC));
+    public static final DeferredItem<BlockItem> ETERNITY_MIRROR =
+            ITEMS.registerSimpleBlockItem(ModBlocks.ETERNITY_MIRROR, new Item.Properties().rarity(Rarity.EPIC));
+    // ===== love (3.8) =====
+
+    /** 3.8: a suit of Iron Man's as a chest item, with its durability (the plan's numbers). */
+    private static DeferredItem<com.kolodkingal.enhanced.item.IronSuitItem> suit(String name,
+            com.kolodkingal.enhanced.ironman.SuitKind kind,
+                    net.minecraft.core.Holder<net.minecraft.world.item.ArmorMaterial>
+                    material, int durability, Rarity rarity) {
+        return ITEMS.register(name, () -> new com.kolodkingal.enhanced.item.IronSuitItem(kind, material,
+                new Item.Properties().stacksTo(1).fireResistant().rarity(rarity).durability(durability)));
+    }
+
     /** 3.6: an Infinity Stone's item. */
     private static DeferredItem<InfinityStoneItem> stone(String name, StoneKind kind) {
         return ITEMS.register(name, () -> new InfinityStoneItem(kind, new Item.Properties().stacksTo(1).fireResistant()

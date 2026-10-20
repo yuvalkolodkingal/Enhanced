@@ -511,7 +511,9 @@ public final class SkeletonTests {
      */
     @GameTest(template = ARENA, batch = SKELETON)
     public static void theLiveStatesFitInALongAndSurviveTheSync(GameTestHelper helper) {
-        check(Live.values().length >= 26 && Live.values().length <= 63, "26 states or more, and room to grow: " + Live.values().length);
+        // (3.8: two words of states, room for 128.)
+        check(Live.values().length >= 26 && Live.values().length <= 127, "26 states or more, and room to grow: "
+                + Live.values().length);
         PowerData data = new PowerData();
         for (Live live : Live.values()) {
             data.set(live, true);

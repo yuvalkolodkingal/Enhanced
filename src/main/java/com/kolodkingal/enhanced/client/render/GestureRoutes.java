@@ -197,6 +197,12 @@ public final class GestureRoutes {
             case CLAW_CLIMB -> power == Power.WOLVERINE && on ? GestureId.WOLVERINE_CLIMB : null;
             case SCENT_TRACK -> power == Power.WOLVERINE && on ? GestureId.WOLVERINE_TRACK : null;
             // ===== deadpool (3.7) =====
+            // (The toggles of 3.8 stand in with the pending gesture, for their own hero only, until their lanes route
+            // them.)
+            // ===== red_hulk (3.8) =====
+            case ROSS_FORM -> power == Power.RED_HULK ? PENDING_GESTURE : null;
+            // ===== falcon (3.8) =====
+            case REDWING_OUT -> power == Power.FALCON ? PENDING_GESTURE : null;
         };
     }
 
@@ -488,6 +494,17 @@ public final class GestureRoutes {
             case DEADPOOL -> "none: Deadpool's keys are acted by the effects of his moves, which name him"
                     + " (DeadpoolActing: the cuts, the Parry, the shots and the reload, the belt, the Drop-In, the"
                     + " Taunt's three poses, the whistle, the smoke, the chimichanga)";
+            // ===== captain (3.8) =====
+            case CAPTAIN_AMERICA -> "none: Captain America's keys are acted by his plug-in (lane L1 of 3.8)";
+            // ===== red_hulk (3.8) =====
+            case RED_HULK -> "none: Red Hulk's keys are acted by his plug-in (lane L2 of 3.8)";
+            // ===== iron_man (3.8) =====
+            case IRON_MAN -> ability == 2 ? "flight" : "none: Iron Man's keys are acted by his plug-in (lanes L3 and L4"
+                    + " of 3.8)";
+            // ===== falcon (3.8) =====
+            case FALCON -> ability == 2 ? "flight" : "none: Falcon's keys are acted by his plug-in (lane L5 of 3.8)";
+            // ===== love (3.8) =====
+            case LOVE -> ability == 2 ? "flight" : "none: Love's keys are acted by her plug-in (lane L8 of 3.8)";
             default -> "none: no abilities";
         };
     }
@@ -577,6 +594,18 @@ public final class GestureRoutes {
                     + " it; the effect PARRY_ON plays DEADPOOL_PARRY";
             case DEADPOOL_AIMING -> "a stance (DEADPOOL_GUNS): both pistols up along his look while they are drawn;"
                     + " each shot's effect plays DEADPOOL_SHOOT_L or _R";
+            // (Until each lane of 3.8 gives its states a gesture or a reason of their own; not the 3.0 pending marker,
+            // which fails a release.)
+            // ===== captain (3.8) =====
+            case CAP_CHARGING, CAP_SLAMMING -> "pending: Captain America's lane (L1 of 3.8) acts it";
+            // ===== red_hulk (3.8) =====
+            case RED_HULK_TRANSFORMING, RED_HULK_JUMP_CHARGING, RED_HULK_LEAPING, RED_HULK_HEATED, RED_HULK_ABSORBING,
+                    RED_HULK_GRABBING -> "pending: Red Hulk's lane (L2 of 3.8) acts it";
+            // ===== iron_man (3.8) =====
+            case IRON_SUITING, IRON_SHIELD, IRON_BLADES, IRON_GRABBING, IRON_DASHING, IRON_CHARGING ->
+                    "pending: Iron Man's lanes (L3, L4 of 3.8) act it";
+            // ===== falcon (3.8) =====
+            case FALCON_DIVING, FALCON_WING_SHIELD, FALCON_GLIDING -> "pending: Falcon's lane (L5 of 3.8) acts it";
         };
     }
 

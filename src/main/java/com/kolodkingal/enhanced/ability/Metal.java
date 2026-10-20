@@ -164,10 +164,14 @@ public final class Metal {
         return e instanceof Player player && !VisionAbilities.isPhased(player) && isMetalHero(player);
     }
 
-    /** Vision and White Vision, the Ultron hero in every look, and the Iron Spider: heroes whose body is metal (D-M 2.3). */
+    /**
+     * Vision and White Vision, the Ultron hero in every look, and the Iron Spider: heroes whose body is metal (D-M
+     * 2.3); 3.8: Iron Man in a powered classic suit ({@code IronSuits.isMetal}: lane L3's rule).
+     */
     private static boolean isMetalHero(Player player) {
         // (3.4: Vision and Ultron, and a custom hero with a metal body: Traits.)
-        return Traits.has(player, Trait.METAL_BODY) || SpiderServer.isIronSpider(player);
+        return Traits.has(player, Trait.METAL_BODY) || SpiderServer.isIronSpider(player)
+                || com.kolodkingal.enhanced.ironman.IronSuits.isMetal(player);
     }
 
     /**

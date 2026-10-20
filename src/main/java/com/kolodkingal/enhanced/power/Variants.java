@@ -161,6 +161,39 @@ public final class Variants {
                         Variant.suit("deadpool_kidpool_cape"), false, 0xC8102E,
                         0xFF8A8A),
                 own(Power.DEADPOOL));
+
+        // ===== captain (3.8) =====
+        // The Avengers suit (Endgame) and the Winter Soldier's stealth suit; our own drawings by lane L1
+        // (SCRATCH/v38/art/l1). Placeholder skins until then.
+        add(Power.CAPTAIN_AMERICA,
+                new Variant("classic", Power.CAPTAIN_AMERICA, Variant.suit("captain_america_classic"), null, false,
+                        0x2A4BA0, 0xE8EEF5),
+                new Variant("stealth", Power.CAPTAIN_AMERICA, Variant.suit("captain_america_stealth"), null, false,
+                        0x4A5C80, 0xE8EEF5),
+                own(Power.CAPTAIN_AMERICA));
+        // ===== red_hulk (3.8) =====
+        // Red Hulk (drawn by the Hulk's renderer, lane L2's seam); Ross's own form is the player's skin with his suit.
+        add(Power.RED_HULK,
+                new Variant("red_hulk", Power.RED_HULK, Variant.suit("red_hulk"), null, false, 0xC4231B, 0xFF7A3A),
+                own(Power.RED_HULK));
+        // ===== iron_man (3.8) =====
+        // Tony under the suit (his look is his suit, drawn by SuitLayer over this skin; lane L3).
+        add(Power.IRON_MAN,
+                new Variant("tony", Power.IRON_MAN, Variant.suit("iron_man_tony"), null, false, 0xB3121B, 0x9FE8FF),
+                own(Power.IRON_MAN));
+        // ===== falcon (3.8) =====
+        // Endgame's suit and the Winter Soldier's flight suit; our own drawings by lane L5 (SCRATCH/v38/art/l5).
+        add(Power.FALCON,
+                new Variant("endgame", Power.FALCON, Variant.suit("falcon_endgame"), null, false, 0x8A8F98, 0xE0313A),
+                new Variant("winter_soldier", Power.FALCON, Variant.suit("falcon_winter_soldier"), null, false,
+                        0x5A4E44,
+                        0xE0313A),
+                own(Power.FALCON));
+        // ===== love (3.8) =====
+        // Love's golden tunic and lilac cape (our own design by lane L8, SCRATCH/v38/art/l8).
+        add(Power.LOVE,
+                new Variant("love", Power.LOVE, Variant.suit("love"), null, false, 0xB57BFF, 0xFFE59A),
+                own(Power.LOVE));
     }
 
     private static void add(Power power, Variant... variants) {

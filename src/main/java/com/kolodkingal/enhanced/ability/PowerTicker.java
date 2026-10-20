@@ -57,12 +57,19 @@ public final class PowerTicker {
         boolean canFly = power.canFly() && !(data.has(HeroAbility.VISION_DENSITY) && data.dense())
                 && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
                 && !(power == Power.CUSTOM && !CustomHeroes.canFly(player))
+                // (3.8: Iron Man flies in a powered suit that flies, Falcon with his Exo-Wings on, Love with her axe.)
+                && !(power == Power.IRON_MAN && !com.kolodkingal.enhanced.ironman.IronSuits.canFly(player))
+                && !(power == Power.FALCON && !com.kolodkingal.enhanced.falcon.FalconWings.canFly(player))
+                && !(power == Power.LOVE && !com.kolodkingal.enhanced.love.LoveAbilities.canFly(player))
                 && !HexRunes.silences(player) && !player.hasEffect(ModEffects.DRAINED); // 3.3: the Hex Runes hold a sorcerer's powers, flight too
         setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
         boolean survivalLike = !player.isCreative() && !player.isSpectator();
-        float speed = survivalLike && canFly ? (power == Power.CUSTOM ? CustomHeroes.flightSpeed(player) : power.flightSpeed()) : 0.05F;
+        // (3.8: Iron Man's speed is his suit's.)
+        float speed = !survivalLike || !canFly ? 0.05F : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
+                : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
+                : power.flightSpeed();
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);
@@ -105,7 +112,8 @@ public final class PowerTicker {
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,
-                    HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL -> HeroServers.tick(hero, player, data);
+                    HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK, IRON_MAN, FALCON,
+                    LOVE -> HeroServers.tick(hero, player, data);
             case NONE -> {
             }
         }
@@ -127,7 +135,8 @@ public final class PowerTicker {
             case TOMMY -> TommyAbilities.endAll(player, data);
             case QUICKSILVER -> QuicksilverAbilities.endAll(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,
-                    HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL -> HeroServers.endAll(hero, player, data);
+                    HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK, IRON_MAN, FALCON,
+                    LOVE -> HeroServers.endAll(hero, player, data);
             default -> {
             }
         }

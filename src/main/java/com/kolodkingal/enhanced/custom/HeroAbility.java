@@ -322,6 +322,90 @@ public enum HeroAbility implements CatalogEntry {
     DEADPOOL_BODY(Power.DEADPOOL, 0, "body", body().cost(3).group(Group.BODY).icon("minecraft:red_concrete")
             .traits(Trait.HEALING_FACTOR).family(Family.BODY)),
 
+    // ===== captain_america (3.8) =====
+    // (The rows of 3.8, written by the skeleton from the plan's table (11.1) and fixed by each hero's lane: lane L1
+    // here. The shield's throw needs a shield in hand: for a custom hero any shield flies and returns, only the
+    // Vibranium Shield ricochets.)
+    CAPTAIN_SHIELD_THROW(Power.CAPTAIN_AMERICA, 1, "shield_throw", press().alt(Act.PRESS).cost(2).group(Group.BODY)
+            .icon("minecraft:shield")),
+    CAPTAIN_SHIELD_SLAM(Power.CAPTAIN_AMERICA, 2, "shield_slam", press().alt(Act.PRESS).cost(2).group(Group.BODY)
+            .icon("minecraft:anvil").on(d -> d.is(Live.CAP_SLAMMING))),
+    CAPTAIN_SHIELD_CHARGE(Power.CAPTAIN_AMERICA, 3, "shield_charge", press().alt(Act.PRESS).cost(2).group(Group.MOVE)
+            .icon("minecraft:iron_boots").on(d -> d.is(Live.CAP_CHARGING))),
+    /** Assemble; its Sneak variant is Inspire. */
+    CAPTAIN_ASSEMBLE(Power.CAPTAIN_AMERICA, 4, "assemble", press().alt(Act.PRESS).cost(2).group(Group.MIND)
+            .icon("minecraft:white_banner")),
+    CAPTAIN_COMBO(Power.CAPTAIN_AMERICA, 5, "combo", press().alt(Act.PRESS).cost(1).group(Group.BODY)
+            .icon("minecraft:leather_boots")),
+    /** The super-soldier: Speed II, Strength II, Resistance I the mod's way; worthy of Mjolnir. */
+    CAPTAIN_BODY(Power.CAPTAIN_AMERICA, 0, "body", body().cost(2).group(Group.BODY).icon("minecraft:blue_banner")
+            .traits(Trait.WORTHY).family(Family.BODY)),
+
+    // ===== red_hulk (3.8) =====
+    // (Lane L2. The Energy Absorb is his one shield: Resource.SHIELD; Ross's form is his FORM.)
+    RED_HULK_SMASH(Power.RED_HULK, 1, "smash", press().alt(Act.PRESS).cost(2).group(Group.BODY)
+            .icon("minecraft:cracked_deepslate_bricks").on(d -> d.is(Live.RED_HULK_GRABBING))),
+    RED_HULK_HEAT_WAVE(Power.RED_HULK, 2, "heat_wave", press().alt(Act.PRESS).cost(2).group(Group.ELEMENT)
+            .icon("minecraft:magma_block")),
+    RED_HULK_SUPER_JUMP(Power.RED_HULK, 3, "super_jump", hold().alt(Act.PRESS).cost(2).group(Group.MOVE)
+            .icon("minecraft:slime_block").on(d -> d.is(Live.RED_HULK_LEAPING))),
+    /** The Anger Burst; its Sneak variant is the Energy Absorb (held). */
+    RED_HULK_BURST(Power.RED_HULK, 4, "burst", press().alt(Act.HOLD).cost(3).group(Group.ELEMENT)
+            .icon("minecraft:fire_charge").altRes(Resource.SHIELD).on(d -> d.is(Live.RED_HULK_ABSORBING))),
+    /** The Transform: Ross and Red Hulk (for a custom hero: every power off until N again, as hulk.transform). */
+    RED_HULK_TRANSFORM(Power.RED_HULK, 5, "transform", press().cost(1).group(Group.BODY).icon("minecraft:red_dye")
+            .fixed().res(Resource.FORM).on(d -> d.toggle(Toggle.ROSS_FORM))),
+    /** 1.5 times his size, Strength IV, Slowness I, fire-proof, and the anger meter. */
+    RED_HULK_BODY(Power.RED_HULK, 0, "body", body().cost(3).group(Group.BODY).icon("minecraft:redstone_block")
+            .res(Resource.SCALE).family(Family.BODY)),
+
+    // ===== iron_man (3.8) =====
+    // (Lanes L3 and L4. A custom hero wears no suit item: these rows give him the Mark 85's core set, and the body row
+    // is his "suit" (armour and the suit energy meter). G is flight, not a row.)
+    /** Boosted repulsors; its Sneak variant is the Energy Blades (on and off). */
+    IRON_MAN_REPULSOR(Power.IRON_MAN, 1, "repulsor", press().alt(Act.TOGGLE).cost(2).group(Group.ENERGY)
+            .icon("minecraft:glowstone_dust").on(d -> d.is(Live.IRON_BLADES))),
+    /** The Unibeam (for a custom hero, the Mark 85's giant chest laser). */
+    IRON_MAN_UNIBEAM(Power.IRON_MAN, 3, "unibeam", hold().cost(2).group(Group.ENERGY).icon("minecraft:beacon")),
+    /** The giant energy shield (held); its Sneak variant is the Lightning Refocuser. */
+    IRON_MAN_SHIELD(Power.IRON_MAN, 4, "shield", hold().alt(Act.PRESS).cost(2).group(Group.ENERGY)
+            .icon("minecraft:light_blue_stained_glass").res(Resource.SHIELD).on(d -> d.is(Live.IRON_SHIELD))),
+    /** Homing mini-missiles; its Sneak variant is the nanotech drones. */
+    IRON_MAN_MISSILES(Power.IRON_MAN, 5, "missiles", press().alt(Act.PRESS).cost(2).group(Group.ENERGY)
+            .icon("minecraft:firework_rocket")),
+    /** A custom hero's suit: +8 armour, +4 toughness and the suit energy meter (no item). */
+    IRON_MAN_SUIT(Power.IRON_MAN, 0, "suit", body().cost(3).group(Group.BODY).icon("minecraft:netherite_chestplate")
+            .res(Resource.SUIT_ENERGY).family(Family.BODY)),
+
+    // ===== falcon (3.8) =====
+    // (Lane L5. G is flight with the wings, not a row; a custom hero with these rows has Falcon's wings drawn.)
+    FALCON_BLASTERS(Power.FALCON, 1, "blasters", press().alt(Act.PRESS).cost(2).group(Group.ENERGY)
+            .icon("minecraft:redstone_torch")),
+    FALCON_DIVE(Power.FALCON, 3, "dive", press().alt(Act.PRESS).cost(2).group(Group.MOVE).icon("minecraft:feather")
+            .on(d -> d.is(Live.FALCON_DIVING))),
+    /** The Wing Shield (held): his one shield. */
+    FALCON_WING_SHIELD(Power.FALCON, 4, "wing_shield", hold().alt(Act.PRESS).cost(2).group(Group.BODY)
+            .icon("minecraft:elytra").res(Resource.SHIELD).on(d -> d.is(Live.FALCON_WING_SHIELD))),
+    /** Redwing, his drone; its Sneak variant is Redwing Strike. */
+    FALCON_REDWING(Power.FALCON, 5, "redwing", press().alt(Act.PRESS).cost(2).group(Group.MIND)
+            .icon("minecraft:red_stained_glass").on(d -> d.toggle(Toggle.REDWING_OUT))),
+    FALCON_BODY(Power.FALCON, 0, "body", body().cost(2).group(Group.BODY).icon("minecraft:gray_banner")
+            .family(Family.BODY)),
+
+    // ===== love (3.8) =====
+    // (Lane L8. Her axe is Thor's thrown weapon: Resource.WEAPON. G is flight while she holds Stormbreaker.)
+    LOVE_AXE(Power.LOVE, 1, "axe", press().alt(Act.PRESS).cost(2).group(Group.BODY).icon("enhanced:stormbreaker")
+            .res(Resource.WEAPON)),
+    LOVE_LIGHTNING(Power.LOVE, 3, "lightning", hold().cost(3).group(Group.ELEMENT).icon("minecraft:lightning_rod")),
+    /** The purple eye laser (held). */
+    LOVE_EYE_LASER(Power.LOVE, 4, "eye_laser", hold().cost(2).group(Group.ENERGY).icon("minecraft:amethyst_shard")
+            .on(d -> d.is(Live.BEAMING))),
+    LOVE_BIFROST(Power.LOVE, 5, "bifrost", press().alt(Act.PRESS).cost(2).group(Group.MOVE)
+            .icon("minecraft:end_crystal").world()),
+    /** Thor's daughter: 32 health, worthy of Mjolnir. */
+    LOVE_BODY(Power.LOVE, 0, "body", body().cost(2).group(Group.BODY).icon("minecraft:golden_chestplate")
+            .traits(Trait.WORTHY).family(Family.BODY)),
+
     // ===== variants (3.5, the creator lane) =====
     // Every Sneak variant of a built-in hero's key as a card of its own (the user: "all abilities listed, like Billy's
     // shield"). A variant row is its parent's Sneak half: picked alone it sits on any key (plain or Sneak) and presses
@@ -419,7 +503,35 @@ public enum HeroAbility implements CatalogEntry {
     DEADPOOL_TRICK_SHOT(DEADPOOL_PISTOLS, "trick_shot", variant(DEADPOOL_PISTOLS).icon("minecraft:arrow")),
     DEADPOOL_DROP_IN(DEADPOOL_BELT, "drop_in", variant(DEADPOOL_BELT).icon("minecraft:pointed_dripstone")),
     DEADPOOL_CHIMICHANGA(DEADPOOL_TAUNT, "chimichanga", variant(DEADPOOL_TAUNT).icon("minecraft:bread")),
-    DEADPOOL_SMOKE(DEADPOOL_DOGPOOL, "smoke", variant(DEADPOOL_DOGPOOL).icon("minecraft:gunpowder"));
+    DEADPOOL_SMOKE(DEADPOOL_DOGPOOL, "smoke", variant(DEADPOOL_DOGPOOL).icon("minecraft:gunpowder")),
+
+    // ===== variants (3.8) =====
+    // (The Sneak variants of the heroes of 3.8: data only, their lanes fix them.)
+    CAPTAIN_RICOCHET(CAPTAIN_SHIELD_THROW, "ricochet", variant(CAPTAIN_SHIELD_THROW).icon("minecraft:target")),
+    CAPTAIN_SUPER_LEAP(CAPTAIN_SHIELD_SLAM, "super_leap", variant(CAPTAIN_SHIELD_SLAM).icon("minecraft:rabbit_foot")),
+    CAPTAIN_SHIELD_BASH(CAPTAIN_SHIELD_CHARGE, "shield_bash", variant(CAPTAIN_SHIELD_CHARGE)
+            .icon("minecraft:iron_door")),
+    CAPTAIN_INSPIRE(CAPTAIN_ASSEMBLE, "inspire", variant(CAPTAIN_ASSEMBLE).icon("minecraft:golden_apple")),
+    CAPTAIN_FLIP_KICK(CAPTAIN_COMBO, "flip_kick", variant(CAPTAIN_COMBO).icon("minecraft:chainmail_boots")),
+    RED_HULK_GRAB_SLAM(RED_HULK_SMASH, "grab_slam", variant(RED_HULK_SMASH).icon("minecraft:lead")
+            .on(d -> d.is(Live.RED_HULK_GRABBING))),
+    RED_HULK_ROAR(RED_HULK_HEAT_WAVE, "roar", variant(RED_HULK_HEAT_WAVE).icon("minecraft:goat_horn")),
+    RED_HULK_BOUND(RED_HULK_SUPER_JUMP, "bound", variant(RED_HULK_SUPER_JUMP).icon("minecraft:piston")
+            .on(d -> d.is(Live.RED_HULK_LEAPING))),
+    /** The Energy Absorb (held): his one shield. */
+    RED_HULK_ABSORB(RED_HULK_BURST, "absorb", variant(RED_HULK_BURST).icon("minecraft:respawn_anchor")
+            .res(Resource.SHIELD).family(Family.SHIELD).on(d -> d.is(Live.RED_HULK_ABSORBING))),
+    IRON_MAN_ENERGY_BLADES(IRON_MAN_REPULSOR, "energy_blades", variant(IRON_MAN_REPULSOR).icon("minecraft:echo_shard")
+            .on(d -> d.is(Live.IRON_BLADES))),
+    IRON_MAN_LIGHTNING_REFOCUSER(IRON_MAN_SHIELD, "lightning_refocuser", variant(IRON_MAN_SHIELD)
+            .icon("minecraft:lightning_rod")),
+    IRON_MAN_DRONES(IRON_MAN_MISSILES, "drones", variant(IRON_MAN_MISSILES).icon("minecraft:phantom_membrane")),
+    FALCON_WRIST_ROCKET(FALCON_BLASTERS, "wrist_rocket", variant(FALCON_BLASTERS).icon("minecraft:firework_star")),
+    FALCON_BOOST_CLIMB(FALCON_DIVE, "boost_climb", variant(FALCON_DIVE).icon("minecraft:wind_charge")),
+    FALCON_WING_SLASH(FALCON_WING_SHIELD, "wing_slash", variant(FALCON_WING_SHIELD).icon("minecraft:iron_sword")),
+    FALCON_REDWING_STRIKE(FALCON_REDWING, "redwing_strike", variant(FALCON_REDWING).icon("minecraft:arrow")),
+    LOVE_THUNDER_STRIKE(LOVE_AXE, "thunder_strike", variant(LOVE_AXE).icon("minecraft:trident")),
+    LOVE_BIFROST_LOOK(LOVE_BIFROST, "bifrost_look", variant(LOVE_BIFROST).icon("minecraft:spyglass"));
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {
@@ -489,7 +601,8 @@ public enum HeroAbility implements CatalogEntry {
         this.home = home;
         this.name = name;
         this.id = hero.getSerializedName().replace("scarlet_witch", "wanda").replace("spider_man", "spider")
-                .replace("professor_x", "xavier").replace("doctor_strange", "strange") + "." + name;
+                .replace("professor_x", "xavier").replace("doctor_strange", "strange")
+                .replace("captain_america", "captain") + "." + name;
         this.act = spec.act;
         this.alt = spec.alt;
         this.costPerPoint = spec.cost;
@@ -516,7 +629,8 @@ public enum HeroAbility implements CatalogEntry {
     }
 
     /**
-     * The id of its hero in ids ({@code thor}, {@code wanda}, {@code spider}, {@code xavier}, 3.6: {@code strange}...).
+     * The id of its hero in ids ({@code thor}, {@code wanda}, {@code spider}, {@code xavier}, 3.6: {@code strange},
+     * 3.8: {@code captain}...).
      */
     public String heroId() {
         return id.substring(0, id.indexOf('.'));

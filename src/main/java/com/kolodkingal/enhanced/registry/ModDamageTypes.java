@@ -142,6 +142,46 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> DEADPOOL_KATANA = key("deadpool_katana");
     /** Deadpool's cartoon bullets: the pistols and the Trick Shot (is_projectile; lane L3). */
     public static final ResourceKey<DamageType> DEADPOOL_BULLET = key("deadpool_bullet");
+    // ===== captain (3.8) =====
+    /** The thrown Vibranium Shield and its ricochets (is_projectile; lane L1). */
+    public static final ResourceKey<DamageType> CAP_SHIELD = key("cap_shield");
+    /** The Shield Slam's shockwave and the Shield Charge (lane L1). */
+    public static final ResourceKey<DamageType> CAP_SLAM = key("cap_slam");
+    // ===== red_hulk (3.8) =====
+    /** Red Hulk's Ground Smash (melee_blows; lane L2). */
+    public static final ResourceKey<DamageType> RED_HULK_SMASH = key("red_hulk_smash");
+    /** Red Hulk's Anger Burst and Heat Wave (is_fire; lane L2). */
+    public static final ResourceKey<DamageType> RED_HULK_BURST = key("red_hulk_burst");
+    // ===== iron_man (3.8) =====
+    /** A repulsor blast (energy_damage; lane L3, the nanotech's lane L4). */
+    public static final ResourceKey<DamageType> REPULSOR = key("repulsor");
+    /** The Unibeam and the chest lasers (energy_damage; lanes L3 and L4). */
+    public static final ResourceKey<DamageType> UNIBEAM = key("unibeam");
+    /** A rocket or mini-missile and its small boom (is_explosion; lanes L3 and L4). */
+    public static final ResourceKey<DamageType> IRON_MISSILE = key("iron_missile");
+    /** The Mark 1's flamethrower (is_fire; lane L3). */
+    public static final ResourceKey<DamageType> IRON_FLAME = key("iron_flame");
+    // ===== nanotech (3.8) =====
+    /** The nano blade and the Mark 85's energy blades (melee_blows; lane L4). */
+    public static final ResourceKey<DamageType> IRON_BLADE = key("iron_blade");
+    /** The Lightning Refocuser's chain lightning (is_lightning; lane L4). */
+    public static final ResourceKey<DamageType> REFOCUSER_LIGHTNING = key("refocuser_lightning");
+    /** A nanotech drone's laser (energy_damage; lane L4). */
+    public static final ResourceKey<DamageType> DRONE_LASER = key("drone_laser");
+    /** The Hulkbuster's punches and throw (melee_blows; lane L4). */
+    public static final ResourceKey<DamageType> HULKBUSTER_PUNCH = key("hulkbuster_punch");
+    // ===== falcon (3.8) =====
+    /** Falcon's energy darts (is_projectile; lane L5). */
+    public static final ResourceKey<DamageType> FALCON_DART = key("falcon_dart");
+    /** Falcon's Dive and the Wing Slash (lane L5). */
+    public static final ResourceKey<DamageType> FALCON_DIVE = key("falcon_dive");
+    /** Redwing's zap and its Strike (energy_damage; lane L5). */
+    public static final ResourceKey<DamageType> REDWING_LASER = key("redwing_laser");
+    // ===== love (3.8) =====
+    /** Love's purple eye laser (energy_damage; lane L8). */
+    public static final ResourceKey<DamageType> LOVE_EYE_LASER = key("love_eye_laser");
+    /** Love's Thunder Strike (is_lightning; lane L8). */
+    public static final ResourceKey<DamageType> LOVE_LIGHTNING = key("love_lightning");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

@@ -1,0 +1,29 @@
+{
+  "parent": "enhanced:avengers/super_soldier",
+  "display": {
+    "icon": {
+      "id": "enhanced:vibranium_shield"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.shield_up.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.shield_up.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "shield": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "enhanced:vibranium_shield"
+          }
+        ]
+      }
+    }
+  }
+}

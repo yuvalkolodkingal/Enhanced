@@ -54,6 +54,14 @@ public final class HeroItems {
             // 3.7: Wolverine needs nothing; Deadpool gets his snacks (three chimichangas, lane L3's Chimichanga Break).
             case WOLVERINE -> List.of();
             case DEADPOOL -> List.of(ModItems.CHIMICHANGA.get());
+            // 3.8: Captain America's shield; Iron Man's Arc Reactor and a Mark 3 (the creator's path; the reactor is
+            // his awakening); Falcon's Exo-Wings (put on the chest when it is free); Love's Stormbreaker; Red Hulk
+            // needs nothing.
+            case CAPTAIN_AMERICA -> List.of(ModItems.VIBRANIUM_SHIELD.get());
+            case RED_HULK -> List.of();
+            case IRON_MAN -> List.of(ModItems.ARC_REACTOR.get(), ModItems.IRON_MAN_MARK_3.get());
+            case FALCON -> List.of(ModItems.FALCON_EXO_WINGS.get());
+            case LOVE -> List.of(ModItems.STORMBREAKER.get());
             default -> List.of();
         };
     }
@@ -91,6 +99,9 @@ public final class HeroItems {
             given.add(stack.copy());
             if (worn(item) && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
                 player.setItemSlot(EquipmentSlot.HEAD, stack);
+            } else if (item == ModItems.FALCON_EXO_WINGS.get() && player.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
+                // (3.8: Falcon's wings go on his back when it is free.)
+                player.setItemSlot(EquipmentSlot.CHEST, stack);
             } else if (!player.getInventory().add(stack)) {
                 player.drop(stack, false);
             }

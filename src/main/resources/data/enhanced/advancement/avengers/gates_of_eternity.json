@@ -1,0 +1,25 @@
+{
+  "parent": "enhanced:avengers/super_soldier",
+  "display": {
+    "icon": {
+      "id": "enhanced:eternity_altar"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.gates_of_eternity.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.gates_of_eternity.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "arrived": {
+      "trigger": "minecraft:changed_dimension",
+      "conditions": {
+        "to": "enhanced:eternity"
+      }
+    }
+  }
+}

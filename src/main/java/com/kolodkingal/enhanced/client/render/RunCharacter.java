@@ -58,6 +58,12 @@ public enum RunCharacter {
     // ===== deadpool (3.7) =====
     /** Deadpool (3.7): a jaunty jog, the arms swinging loose, a bounce in the step and a swagger of the shoulders. */
     DEADPOOL(1.10F, 1.30F, 1.15F, 7, 7, 0.030F)
+    // ===== captain (3.8) =====
+    // ===== red_hulk (3.8) =====
+    // ===== iron_man (3.8) =====
+    // ===== falcon (3.8) =====
+    // ===== love (3.8) =====
+    // (3.8: each lane appends its hero's run here and routes it in of(); until then they run as anyone.)
     ;
 
     public final float walkArms;

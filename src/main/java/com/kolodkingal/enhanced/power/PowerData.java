@@ -63,8 +63,10 @@ public final class PowerData {
     private int heldEntityId = -1;
     /** Thor: Mjolnir while it is thrown and flying, or -1. */
     private int hammerEntityId = -1;
-    /** Momentary states, one bit per {@link Live}. */
+    /** Momentary states, one bit per {@link Live}: the first 64 states (3.0-3.7). */
     private long live;
+    /** 3.8: the momentary states from the 65th on ({@link Live#word} 1): two words since 3.8, room for 128. */
+    private long liveHigh;
     /** Game time at which each ability (index 1-5) is ready again. */
     private final long[] cooldownUntil = new long[ABILITIES + 1];
 
@@ -128,6 +130,7 @@ public final class PowerData {
         ByteBufCodecs.stringUtf8(64).encode(buf, variant);
         ByteBufCodecs.VAR_INT.encode(buf, toggles);
         ByteBufCodecs.VAR_LONG.encode(buf, live);
+        ByteBufCodecs.VAR_LONG.encode(buf, liveHigh);
         ByteBufCodecs.stringUtf8(256).encode(buf, form);
         for (int i = 1; i <= ABILITIES; i++) {
             ByteBufCodecs.VAR_LONG.encode(buf, cooldownUntil[i]);
@@ -164,6 +167,7 @@ public final class PowerData {
         d.variant = ByteBufCodecs.stringUtf8(64).decode(buf);
         d.toggles = ByteBufCodecs.VAR_INT.decode(buf);
         d.live = ByteBufCodecs.VAR_LONG.decode(buf);
+        d.liveHigh = ByteBufCodecs.VAR_LONG.decode(buf);
         d.form = ByteBufCodecs.stringUtf8(256).decode(buf);
         for (int i = 1; i <= ABILITIES; i++) {
             d.cooldownUntil[i] = ByteBufCodecs.VAR_LONG.decode(buf);
@@ -193,6 +197,7 @@ public final class PowerData {
         this.variant = "";
         this.toggles = Toggle.defaults(power);
         this.live = 0;
+        this.liveHigh = 0;
         this.form = "";
         this.hammerEntityId = -1;
         this.beamActive = false;
@@ -301,9 +306,17 @@ public final class PowerData {
         return toggles;
     }
 
-    /** The momentary states, as their bits. */
+    /**
+     * The momentary states, as their bits: the low word (the first 64 states). Since 3.8 the states fill two words:
+     * compare {@link #liveBitsHigh} too, and use {@link #is}/{@link #set} for one state.
+     */
     public long liveBits() {
         return live;
+    }
+
+    /** 3.8: the high word of the momentary states (the 65th state on). */
+    public long liveBitsHigh() {
+        return liveHigh;
     }
 
     /** The synced on/off flags (beam, shields, shrapnel, Quicksilver's and Vision's switches...), as bits. */
@@ -465,13 +478,19 @@ public final class PowerData {
     }
 
     public boolean is(Live state) {
-        return (live & state.bit()) != 0;
+        return ((state.word() == 0 ? live : liveHigh) & state.mask()) != 0;
     }
 
+    /** Sets or clears one momentary state, in whichever of the two words it sits (3.8). */
     public void set(Live state, boolean on) {
-        long updated = on ? live | state.bit() : live & ~state.bit();
-        if (updated != live) {
-            live = updated;
+        long word = state.word() == 0 ? live : liveHigh;
+        long updated = on ? word | state.mask() : word & ~state.mask();
+        if (updated != word) {
+            if (state.word() == 0) {
+                live = updated;
+            } else {
+                liveHigh = updated;
+            }
             dirty = true;
         }
     }

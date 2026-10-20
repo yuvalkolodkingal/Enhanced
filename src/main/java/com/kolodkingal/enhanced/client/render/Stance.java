@@ -135,6 +135,13 @@ public enum Stance {
     DEADPOOL_SWORDS(1.5F, 3.0F, true),
     /** Deadpool with his pistols drawn: both arms up along the look. */
     DEADPOOL_GUNS(1.5F, 4.0F, true)
+    // ===== captain (3.8) =====
+    // ===== red_hulk (3.8) =====
+    // ===== iron_man (3.8) =====
+    // ===== nanotech (3.8) =====
+    // ===== suit_art (3.8) =====
+    // ===== falcon (3.8) =====
+    // ===== love (3.8) =====
     ;
 
     public static final Stance[] VALUES = values();

@@ -62,12 +62,16 @@ public class HulkPlayerRenderer extends PlayerRenderer {
             return false;
         }
         PowerData data = Powers.get(player);
-        return data.power() == Power.HULK && HulkAbilities.isHulkLook(HulkAbilities.look(data));
+        // (3.8: Red Hulk is drawn by this renderer too, lane L2's RedHulkLooks.)
+        return data.power() == Power.HULK && HulkAbilities.isHulkLook(HulkAbilities.look(data))
+                || com.kolodkingal.enhanced.client.redhulk.RedHulkLooks.drawsAsHulk(data);
     }
 
     @Override
     public ResourceLocation getTextureLocation(AbstractClientPlayer player) {
-        return skin(HulkAbilities.look(Powers.get(player)));
+        // (3.8: Red Hulk's skin first, when lane L2's RedHulkLooks gives one.)
+        ResourceLocation red = com.kolodkingal.enhanced.client.redhulk.RedHulkLooks.texture(player);
+        return red != null ? red : skin(HulkAbilities.look(Powers.get(player)));
     }
 
     /**

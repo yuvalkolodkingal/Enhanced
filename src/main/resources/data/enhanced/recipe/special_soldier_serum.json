@@ -1,0 +1,36 @@
+{
+  "type": "enhanced:serum",
+  "category": "misc",
+  "pattern": [
+    "BGB",
+    "DWD",
+    "BNB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:blue_stained_glass_pane"
+    },
+    "G": {
+      "item": "minecraft:golden_apple"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "N": {
+      "item": "minecraft:nether_star"
+    },
+    "W": {
+      "type": "neoforge:components",
+      "items": "minecraft:potion",
+      "components": {
+        "minecraft:potion_contents": {
+          "potion": "minecraft:water"
+        }
+      }
+    }
+  },
+  "result": {
+    "id": "enhanced:special_soldier_serum",
+    "count": 1
+  }
+}

@@ -51,11 +51,16 @@ public final class SuperLeap implements HulkAbilities.Move {
     /** The landing's throw. */
     static final double LAND_PUSH = 1.0;
     static final double LAND_LIFT = 0.4;
+    /** 3.8: the reach of a Bound's landing blow (another hero's, {@link #landingDamage}). */
+    static final double BOUND_LANDING_RADIUS = 3.0;
     /** He is given this many ticks past the path to touch the ground before he is landed wherever he is. */
     static final int GRACE = 40;
 
     private final boolean bound;
     private final Vec3 target;
+    /** 3.8: the blow of a Bound's landing (the Hulk's: none; another hero's through {@link #bound(ServerPlayer,
+     * PowerData, double, float)}). */
+    private float landingDamage;
     private Vec3 start = Vec3.ZERO;
     private int flight;
     private boolean landed;
@@ -128,13 +133,25 @@ public final class SuperLeap implements HulkAbilities.Move {
         if (!data.isReady(HeroAbility.HULK_BOUND, now)) {
             return false;
         }
+        data.startCooldown(HeroAbility.HULK_BOUND, now, HulkAbilities.cfg(HulkConfig.BOUND_COOLDOWN, 30));
+        return bound(player, data, HulkAbilities.cfg(HulkConfig.BOUND_DISTANCE, 24), 0.0F);
+    }
+
+    /**
+     * 3.8: the Bound with the numbers given (Red Hulk's, lane L2): {@code distance} blocks along his look, and a blow
+     * of {@code landingDamage} to the creatures within 3 where he lands (0: none, the Hulk's). No cooldown is asked or
+     * started (the caller's own); the move is the Hulk's ({@link HulkAbilities#driveMove} flies it for a hero who is
+     * not the Hulk).
+     */
+    public static boolean bound(ServerPlayer player, PowerData data, double distance, float landingDamage) {
         Vec3 look = player.getLookAngle();
         Vec3 flat = new Vec3(look.x, 0, look.z);
         flat = flat.lengthSqr() < 1.0E-6 ? new Vec3(0, 0, 1) : flat.normalize();
-        Vec3 ahead = player.position().add(flat.scale(HulkAbilities.cfg(HulkConfig.BOUND_DISTANCE, 24)));
+        Vec3 ahead = player.position().add(flat.scale(distance));
         Vec3 target = ground(player.level(), BlockPos.containing(ahead.x, player.getY() + 2, ahead.z), 16);
-        data.startCooldown(HeroAbility.HULK_BOUND, now, HulkAbilities.cfg(HulkConfig.BOUND_COOLDOWN, 30));
-        begin(player, new SuperLeap(true, target));
+        SuperLeap leap = new SuperLeap(true, target);
+        leap.landingDamage = landingDamage;
+        begin(player, leap);
         HulkAbilities.send(player.serverLevel(), player, HulkFxPayload.BOUND, List.of(player.position(), target), 0);
         return true;
     }
@@ -243,6 +260,14 @@ public final class SuperLeap implements HulkAbilities.Move {
         if (bound) {
             HulkAbilities.sound(level, at, ModSounds.HULK_LAND.get(), 0.9F, 1.2F);
             HulkAbilities.send(level, player, HulkFxPayload.LAND, List.of(at), 0);
+            // (3.8: another hero's Bound may land with a blow; the Hulk's never does.)
+            if (landingDamage > 0.0F) {
+                for (LivingEntity e : around(player, at, BOUND_LANDING_RADIUS)) {
+                    if (HulkAbilities.hurt(player, e, ModDamageTypes.HULK_LEAP, landingDamage, player)) {
+                        HulkAbilities.push(e, at, LAND_PUSH * 0.5, LAND_LIFT * 0.5, player);
+                    }
+                }
+            }
             return;
         }
         int radius = HulkAbilities.cfg(HulkConfig.LEAP_RADIUS, 4);

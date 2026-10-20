@@ -62,13 +62,44 @@ public final class GrabSmash implements HulkAbilities.Move {
         return grab(player, data, target);
     }
 
+    /**
+     * 3.8: the Grab Smash with the numbers given (Red Hulk's Grab & Slam, lane L2): the three slams' {@code damages}
+     * (the last throws) and the one heavy punch {@code punchDamage} for what cannot be grabbed, taken as they are (not
+     * the Hulk's look or rage factors). No cooldown is asked or started (the caller's own); the move is the Hulk's
+     * ({@link HulkAbilities#driveMove} plays it for a hero who is not the Hulk).
+     *
+     * @return the creature grabbed or punched, or null when nothing was in front of him
+     */
+    @Nullable
+    public static LivingEntity start(ServerPlayer player, PowerData data, double[] damages, double punchDamage) {
+        LivingEntity target = HulkAbilities.inFront(player, 1.0);
+        if (target == null || !HulkAbilities.mayHurt(player, target)) {
+            return null;
+        }
+        float[] slams = new float[3];
+        for (int i = 0; i < slams.length; i++) {
+            slams[i] = (float) damages[Math.min(i, damages.length - 1)];
+        }
+        return grab(player, target, slams, (float) punchDamage);
+    }
+
     /** Grabs (or punches) this creature. */
     public static LivingEntity grab(ServerPlayer player, PowerData data, LivingEntity target) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         data.startCooldown(HeroAbility.HULK_GRAB_SMASH, now, HulkAbilities.cfg(HulkConfig.GRAB_COOLDOWN, 160));
+        return grab(player, target, new float[]{
+                HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_DAMAGE1, 4.0)),
+                HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_DAMAGE2, 4.0)),
+                HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_DAMAGE3, 6.0))},
+                HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_BOSS_PUNCH, 8.0)));
+    }
+
+    /** The grab with its numbers fixed: the three slams', and the punch for what cannot be grabbed. */
+    private static LivingEntity grab(ServerPlayer player, LivingEntity target, float[] slams, float punch) {
+        ServerLevel level = player.serverLevel();
         if (HulkAbilities.grabImmune(target)) {
-            float amount = HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_BOSS_PUNCH, 8.0));
+            float amount = punch;
             if (HulkAbilities.hurt(player, target, ModDamageTypes.HULK_GRAB, amount, player)) {
                 HulkAbilities.push(target, player.position(), 0.6, 0.1, player);
             }
@@ -78,10 +109,7 @@ public final class GrabSmash implements HulkAbilities.Move {
             return target;
         }
         GrabSmash grab = new GrabSmash(target);
-        grab.slams = new float[]{
-                HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_DAMAGE1, 4.0)),
-                HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_DAMAGE2, 4.0)),
-                HulkAbilities.damage(player, data, HulkAbilities.cfg(HulkConfig.GRAB_DAMAGE3, 6.0))};
+        grab.slams = slams;
         HulkAbilities.startMove(player, HulkAbilities.state(player.getUUID()), grab);
         if (target instanceof Mob mob) {
             mob.setNoAi(true);

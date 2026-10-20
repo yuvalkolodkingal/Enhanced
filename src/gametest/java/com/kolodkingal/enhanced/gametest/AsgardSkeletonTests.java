@@ -134,7 +134,8 @@ public final class AsgardSkeletonTests {
     public static void theBitsFitAndTheProtocolMovedOnFromNine(GameTestHelper helper) {
         // (3.6 bumps the protocol to 10 and appends its own states: StoneSkeletonTests counts them exactly.)
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 9, "protocol 9 or later");
-        check(Live.values().length <= 64 && Live.values().length >= 42, "Live: 42 of 64 bits or more: "
+        // (3.8: the states are two words, room for 128.)
+        check(Live.values().length <= 128 && Live.values().length >= 42, "Live: 42 of 128 bits or more: "
                 + Live.values().length);
         check(Toggle.values().length <= 32 && Toggle.values().length >= 15, "Toggle: 15 of 32 bits or more: "
                 + Toggle.values().length);

@@ -1,0 +1,29 @@
+{
+  "display": {
+    "icon": {
+      "id": "enhanced:special_soldier_serum"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.super_soldier.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.super_soldier.description"
+    },
+    "background": "minecraft:textures/block/blue_concrete.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "serum": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "enhanced:special_soldier_serum"
+          }
+        ]
+      }
+    }
+  }
+}

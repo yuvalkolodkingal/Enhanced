@@ -109,6 +109,23 @@ public final class HeroDamage {
         first(ModDamageTypes.WOLVERINE_POUNCE, HeroAbility.WOLVERINE_POUNCE);
         first(ModDamageTypes.DEADPOOL_KATANA, HeroAbility.DEADPOOL_KATANAS, HeroAbility.DEADPOOL_DROP_IN);
         first(ModDamageTypes.DEADPOOL_BULLET, HeroAbility.DEADPOOL_PISTOLS, HeroAbility.DEADPOOL_TRICK_SHOT);
+        // 3.8 (the skeleton): Captain America, Red Hulk, Iron Man, Falcon and Love (the suits' own moves, the Mark 1's
+        // flame and the Hulkbuster's punches, are no rows: PLAN 11.1).
+        first(ModDamageTypes.CAP_SHIELD, HeroAbility.CAPTAIN_SHIELD_THROW, HeroAbility.CAPTAIN_RICOCHET);
+        first(ModDamageTypes.CAP_SLAM, HeroAbility.CAPTAIN_SHIELD_SLAM, HeroAbility.CAPTAIN_SHIELD_CHARGE);
+        first(ModDamageTypes.RED_HULK_SMASH, HeroAbility.RED_HULK_SMASH);
+        first(ModDamageTypes.RED_HULK_BURST, HeroAbility.RED_HULK_BURST, HeroAbility.RED_HULK_HEAT_WAVE);
+        first(ModDamageTypes.REPULSOR, HeroAbility.IRON_MAN_REPULSOR);
+        first(ModDamageTypes.IRON_BLADE, HeroAbility.IRON_MAN_ENERGY_BLADES);
+        first(ModDamageTypes.UNIBEAM, HeroAbility.IRON_MAN_UNIBEAM);
+        first(ModDamageTypes.IRON_MISSILE, HeroAbility.IRON_MAN_MISSILES);
+        first(ModDamageTypes.REFOCUSER_LIGHTNING, HeroAbility.IRON_MAN_LIGHTNING_REFOCUSER);
+        first(ModDamageTypes.DRONE_LASER, HeroAbility.IRON_MAN_DRONES);
+        first(ModDamageTypes.FALCON_DART, HeroAbility.FALCON_BLASTERS);
+        first(ModDamageTypes.FALCON_DIVE, HeroAbility.FALCON_DIVE);
+        first(ModDamageTypes.REDWING_LASER, HeroAbility.FALCON_REDWING);
+        first(ModDamageTypes.LOVE_EYE_LASER, HeroAbility.LOVE_EYE_LASER);
+        first(ModDamageTypes.LOVE_LIGHTNING, HeroAbility.LOVE_THUNDER_STRIKE);
     }
 
     private static void first(ResourceKey<DamageType> type, CatalogEntry... rows) {

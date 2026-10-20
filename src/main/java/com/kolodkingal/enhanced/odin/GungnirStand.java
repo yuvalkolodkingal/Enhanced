@@ -81,22 +81,35 @@ public final class GungnirStand {
             player.displayClientMessage(Component.translatable("message.enhanced.odin.stand_already"), true);
             return Taken.ALREADY;
         }
-        if (counted && owner == null) {
-            AsgardState.get(player.server).setGungnirOwner(player.getUUID());
-            if (player.serverLevel().getBlockEntity(pos) instanceof GungnirStandBlockEntity stand) {
-                stand.ownerChanged();
-            }
+        if (giveTo(player) && player.serverLevel().getBlockEntity(pos) instanceof GungnirStandBlockEntity stand) {
+            stand.ownerChanged();
         }
-        int bond = OdinAbilities.nextBond(player);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.GUNGNIR_TAKEN));
-        ItemStack spear = GungnirItem.bound(player, bond);
-        OdinAbilities.give(player, spear);
         Vec3 at = Vec3.atCenterOf(pos).add(0, 1.0, 0);
         player.serverLevel().playSound(null, at.x, at.y, at.z, ModSounds.GUNGNIR_CATCH.get(), SoundSource.PLAYERS, 1.3F, 0.8F);
         OdinAbilities.send(player.serverLevel(), player, OdinAbilities.FX_GUNGNIR_GIVEN, List.of(at, player.position().add(0, 1.0, 0)), 1);
         player.displayClientMessage(Component.translatable(again ? "message.enhanced.odin.stand_returned" : "message.enhanced.odin.stand_taken")
                 .withStyle(ChatFormatting.GOLD), false);
         return again ? Taken.RETURNED : Taken.TAKEN;
+    }
+
+    /**
+     * 3.8: gives the player his own Gungnir, bound to him (its bond his next: any older copy of his crumbles), marks
+     * him {@code GUNGNIR_TAKEN}, and records him as the world's bearer when {@code onePerWorld} is on, he is not in
+     * Creative and nobody is yet ({@code AsgardState.setGungnirOwner}): what the stand does after its checks, and what
+     * Eternity's wish does (lane L8, after its own check of {@link #owner}). The checks are the caller's.
+     *
+     * @return whether he became the world's bearer just now
+     */
+    public static boolean giveTo(ServerPlayer player) {
+        boolean bearer = onePerWorld() && !player.isCreative() && owner(player.server) == null;
+        if (bearer) {
+            AsgardState.get(player.server).setGungnirOwner(player.getUUID());
+        }
+        int bond = OdinAbilities.nextBond(player);
+        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.GUNGNIR_TAKEN));
+        ItemStack spear = GungnirItem.bound(player, bond);
+        OdinAbilities.give(player, spear);
+        return bearer;
     }
 
     /** The world's Gungnir owner while {@code onePerWorld} is on, or null (none yet, or every victor may take one). */

@@ -447,6 +447,100 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .build("cottage_resident"));
 
+    // ===== captain (3.8) =====
+    // (The skeleton registers every entity of 3.8, drawn as nothing or as a placeholder box; each lane owns its
+    // classes.)
+    /** Captain America's thrown shield (lane L1). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.captain.ThrownShieldEntity>> THROWN_SHIELD =
+            ENTITIES.register("thrown_shield",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.captain.ThrownShieldEntity>of(
+                            com.kolodkingal.enhanced.captain.ThrownShieldEntity::new, MobCategory.MISC)
+                    .sized(0.8F, 0.25F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("thrown_shield"));
+    // ===== iron_man (3.8) =====
+    /** A rocket or mini-missile of Iron Man's suits (lane L3; the homing lane L4). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.ironman.IronMissileEntity>> IRON_MISSILE =
+            ENTITIES.register("iron_missile",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.IronMissileEntity>of(
+                            com.kolodkingal.enhanced.ironman.IronMissileEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("iron_missile"));
+    // ===== nanotech (3.8) =====
+    /** A nanotech drone of the Mark 85 (lane L4). Not saved for long: it ends with its Iron Man. */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity>> NANO_DRONE =
+            ENTITIES.register("nano_drone",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity>of(
+                            com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.4F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("nano_drone"));
+    /** The Hulkbuster's frame that Veronica drops (lane L4). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterFrameEntity>> HULKBUSTER_FRAME =
+            ENTITIES.register("hulkbuster_frame",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterFrameEntity>of(
+                            com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterFrameEntity::new, MobCategory.MISC)
+                    .sized(2.0F, 4.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("hulkbuster_frame"));
+    // ===== falcon (3.8) =====
+    /** Falcon's Wrist Rocket (lane L5): the class of Iron Man's missiles, a type of its own. */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.ironman.IronMissileEntity>> FALCON_ROCKET =
+            ENTITIES.register("falcon_rocket",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.IronMissileEntity>of(
+                            com.kolodkingal.enhanced.ironman.IronMissileEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("falcon_rocket"));
+    /** One of Falcon's energy darts (lane L5). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.falcon.FalconDartEntity>> FALCON_DART =
+            ENTITIES.register("falcon_dart",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.falcon.FalconDartEntity>of(
+                            com.kolodkingal.enhanced.falcon.FalconDartEntity::new, MobCategory.MISC)
+                    .sized(0.2F, 0.2F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSummon()
+                    .build("falcon_dart"));
+    /** Redwing, Falcon's drone (lane L5). */
+    public static final DeferredHolder<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.falcon.RedwingEntity>> REDWING =
+            ENTITIES.register("redwing",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.falcon.RedwingEntity>of(
+                            com.kolodkingal.enhanced.falcon.RedwingEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 0.35F)
+                    .clientTrackingRange(10)
+                    .build("redwing"));
+    // ===== eternity (3.8) =====
+    /** Eternity, in his realm (lane L8): one per realm, kept by {@code EternityRealm}. */
+    public static final DeferredHolder<EntityType<?>, EntityType<com.kolodkingal.enhanced.eternity.EternityEntity>>
+            ETERNITY = ENTITIES.register("eternity",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.eternity.EternityEntity>of(
+                            com.kolodkingal.enhanced.eternity.EternityEntity::new, MobCategory.MISC)
+                    .sized(16.0F, 44.0F)
+                    .clientTrackingRange(32)
+                    .fireImmune()
+                    .noSummon()
+                    .build("eternity"));
+    // ===== love (3.8) =====
+
     /** Mod bus: attributes of the mod's living entities. */
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
@@ -472,6 +566,8 @@ public final class ModEntities {
         // 3.7
         event.put(DOGPOOL.get(), com.kolodkingal.enhanced.deadpool.DogpoolEntity.createAttributes().build());
         event.put(COTTAGE_RESIDENT.get(), AsgardianEntity.createAttributes().build());
+        // 3.8
+        event.put(REDWING.get(), com.kolodkingal.enhanced.falcon.RedwingEntity.createAttributes().build());
     }
 
     private ModEntities() {

@@ -39,6 +39,12 @@ public final class HeroServers {
         // 3.7: Wolverine and Deadpool (each in its own package, filled by its lane).
         register(new com.kolodkingal.enhanced.wolverine.WolverineServer());
         register(new com.kolodkingal.enhanced.deadpool.DeadpoolServer());
+        // 3.8: Captain America, Red Hulk, Iron Man, Falcon and Love (each in its own package, filled by its lane).
+        register(new com.kolodkingal.enhanced.captain.CaptainServer());
+        register(new com.kolodkingal.enhanced.redhulk.RedHulkServer());
+        register(new com.kolodkingal.enhanced.ironman.IronManServer());
+        register(new com.kolodkingal.enhanced.falcon.FalconServer());
+        register(new com.kolodkingal.enhanced.love.LoveServer());
     }
 
     /**

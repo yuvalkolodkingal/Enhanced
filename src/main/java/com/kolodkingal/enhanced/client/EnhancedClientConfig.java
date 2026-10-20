@@ -27,6 +27,10 @@ public final class EnhancedClientConfig {
     public static final ModConfigSpec.BooleanValue HULK_MODEL;
     public static final ModConfigSpec.BooleanValue DEADPOOL_LINES;
     public static final ModConfigSpec.BooleanValue SHOW_DEATH_MEETING;
+    public static final ModConfigSpec.BooleanValue SUIT_UP_OVERLAY;
+    public static final ModConfigSpec.BooleanValue IRON_HELMET_HUD;
+    public static final ModConfigSpec.BooleanValue ETERNITY_REFLECTIONS;
+    public static final ModConfigSpec.BooleanValue ETERNITY_FOG;
 
     static {
         BUILDER.push("animation");
@@ -117,6 +121,22 @@ public final class EnhancedClientConfig {
                         "start again. Off: the plain vanilla death screen.")
                 .translation("config.enhanced.show_death_meeting")
                 .define("showDeathMeeting", true);
+        BUILDER.pop();
+        // 3.8 (lanes L3 and L8): Iron Man's suit-up and helmet, Eternity's realm.
+        BUILDER.push("iron_man");
+        SUIT_UP_OVERLAY = BUILDER.comment("Whether the faceplate closes over the screen's edges when your suit goes on",
+                        "(with reduced motion: a short fade).")
+                .define("suitUpOverlay", true);
+        IRON_HELMET_HUD = BUILDER.comment("Whether a suited Iron Man sees the helmet's frame in first person",
+                        "(blue arcs, altitude and speed in flight).")
+                .define("ironHelmetHud", true);
+        BUILDER.pop();
+        BUILDER.push("eternity");
+        ETERNITY_REFLECTIONS = BUILDER.comment("Whether Eternity and the players are mirrored in the realm's",
+                        "still water (off for slow computers).")
+                .define("eternityReflections", true);
+        ETERNITY_FOG = BUILDER.comment("Whether the white mist lies on the horizon of Eternity's realm.")
+                .define("eternityFog", true);
         BUILDER.pop();
     }
 
@@ -216,6 +236,26 @@ public final class EnhancedClientConfig {
     /** Whether a death shows the meeting with Death (true until the config has loaded). */
     public static boolean showDeathMeeting() {
         return !SPEC.isLoaded() || SHOW_DEATH_MEETING.get();
+    }
+
+    /** Whether the faceplate overlay plays when a suit goes on (true until the config has loaded). */
+    public static boolean suitUpOverlay() {
+        return !SPEC.isLoaded() || SUIT_UP_OVERLAY.get();
+    }
+
+    /** Whether a suited Iron Man sees the helmet's frame in first person (true until the config has loaded). */
+    public static boolean ironHelmetHud() {
+        return !SPEC.isLoaded() || IRON_HELMET_HUD.get();
+    }
+
+    /** Whether the realm of Eternity draws its reflections (true until the config has loaded). */
+    public static boolean eternityReflections() {
+        return !SPEC.isLoaded() || ETERNITY_REFLECTIONS.get();
+    }
+
+    /** Whether the realm of Eternity has its white mist (true until the config has loaded). */
+    public static boolean eternityFog() {
+        return !SPEC.isLoaded() || ETERNITY_FOG.get();
     }
 
     private EnhancedClientConfig() {

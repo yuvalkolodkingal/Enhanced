@@ -92,6 +92,10 @@ public final class SuitSkins {
             }
             return com.kolodkingal.enhanced.client.custom.CustomSkins.suitFor(player);
         }
+        // (3.8: Red Hulk as Ross is himself, in his own skin; RossSuitLayer dresses him.)
+        if (power == Power.RED_HULK && Powers.get(player).toggle(com.kolodkingal.enhanced.power.Toggle.ROSS_FORM)) {
+            return null;
+        }
         // Vision's body is synthetic, so he is always in his look; the newer heroes always wear theirs too.
         Variant look = Powers.variant(player);
         return look.ownSkin() ? null : skinOf(look);

@@ -61,6 +61,11 @@ public final class Traits {
             // 3.7: the healers; Wolverine's adamantium skeleton is metal (X-Men, 2000: Magneto holds him by it).
             case WOLVERINE -> traits.addAll(Set.of(Trait.HEALING_FACTOR, Trait.METAL_BODY));
             case DEADPOOL -> traits.add(Trait.HEALING_FACTOR);
+            // 3.8: Captain America lifted Mjolnir in Endgame; Love is Thor's daughter. Red Hulk, Iron Man and Falcon
+            // have no role (Iron Man's worn classic suit is metal by the suit: IronSuits.isMetal).
+            case CAPTAIN_AMERICA, LOVE -> traits.add(Trait.WORTHY);
+            case RED_HULK, IRON_MAN, FALCON -> {
+            }
             default -> {
             }
         }

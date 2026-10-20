@@ -118,7 +118,10 @@ public final class EnhancedCommand {
                 .then(RoadCommands.node())
                 .then(SchoolRepair.node())
                 .then(com.kolodkingal.enhanced.music.MusicCommands.node())
-                .then(com.kolodkingal.enhanced.asgard.AsgardCommands.node()));
+                .then(com.kolodkingal.enhanced.asgard.AsgardCommands.node())
+                // 3.8: the serum's screen (lane L1) and Eternity's wish and journey (lane L8), for operators.
+                .then(com.kolodkingal.enhanced.serum.SerumCommand.node())
+                .then(com.kolodkingal.enhanced.eternity.EternityCommand.node()));
         RoadCommands.registerPlayerCommands(dispatcher);
     }
 

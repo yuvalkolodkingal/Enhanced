@@ -53,6 +53,32 @@ public final class SoundAssetTests {
      * the 3.7 events.
      */
     static final Set<String> SKELETON_37 = Set.of();
+    /**
+     * The 3.8 skeleton's placeholder files ({@code sfx/<name>.ogg}, the same 0.2-second file): every sound event of 3.8
+     * (PLAN Appendix C) until the sound lane (L2 of 3.8) makes it. L2 empties this list and extends the tests to the
+     * 3.8 events.
+     */
+    static final Set<String> SKELETON_38 = Set.of(
+            "serum_open", "serum_choose", "serum_locked", "shield_throw", "shield_ricochet", "shield_catch",
+            "shield_block", "shield_reflect", "shield_slam", "shield_charge", "shield_bash", "cap_assemble",
+            "cap_inspire", "cap_punch", "cap_flip", "captain_awaken", "red_hulk_roar", "red_hulk_smash",
+            "red_hulk_heat_wave", "red_hulk_jump_charge", "red_hulk_jump", "red_hulk_land", "red_hulk_burst",
+            "red_hulk_steam", "red_hulk_absorb", "red_hulk_transform", "red_hulk_awaken", "arc_reactor_insert",
+            "arc_reactor_hum", "iron_man_awaken", "suit_energy_low", "suit_energy_empty", "repulsor_charge",
+            "repulsor_blast", "double_blast", "unibeam_start", "unibeam", "flares", "mini_missile_launch",
+            "mini_missile_boom", "iron_thrusters", "iron_boost", "iron_crash", "mark1_flamethrower", "mark1_arm_rocket",
+            "mark1_clank", "mark3_gantry", "mark5_suitcase_open", "mark5_suitcase_close", "dash_punch", "laser_burst",
+            "iron_hud_boot", "suit_up_generic", "suit_down_generic", "nano_flow", "nano_retract", "nano_blade_out",
+            "nano_blade_in", "nano_shield", "nano_cannon_charge", "nano_cannon_fire", "energy_blade_swing",
+            "energy_shield_hit", "lightning_refocuser", "homing_lock", "nano_drones_deploy", "drone_laser",
+            "chest_laser", "hulkbuster_drop", "hulkbuster_open", "hulkbuster_close", "hulkbuster_step",
+            "hulkbuster_punch", "hulkbuster_grab", "hulkbuster_throw", "veronica_arm", "falcon_wings_open",
+            "falcon_wings_close", "falcon_thrust", "falcon_dive", "falcon_dive_hit", "falcon_climb", "falcon_dart",
+            "falcon_rocket", "wing_shield_up", "wing_shield_deflect", "wing_slash", "redwing_launch", "redwing_buzz",
+            "redwing_zap", "redwing_strike", "redwing_return", "falcon_awaken", "suit_display_take", "tech_case_open",
+            "tech_case_take", "display_refuse", "shrine_hum", "altar_place", "altar_rise", "eternity_arrive",
+            "eternity_ambient", "eternity_voice", "wish_granted", "eternity_leave", "love_awaken",
+            "love_eye_laser_start", "love_eye_laser", "love_thunder_strike");
     /** The sound events of PLAN Appendix C (72; {@code music.asgard} plays three files). */
     static final List<String> ASGARD_EVENTS = List.of(
             // Asgard
@@ -333,7 +359,8 @@ public final class SoundAssetTests {
                 String name = root.relativize(path).toString();
                 if (md5(Files.readAllBytes(path)).equals(PLACEHOLDER_MD5)
                         && !SKELETON_36.contains(name.replace("sfx/", "").replace(".ogg", ""))
-                        && !SKELETON_37.contains(name.replace("sfx/", "").replace(".ogg", ""))) {
+                        && !SKELETON_37.contains(name.replace("sfx/", "").replace(".ogg", ""))
+                        && !SKELETON_38.contains(name.replace("sfx/", "").replace(".ogg", ""))) {
                     placeholders.add(name);
                 }
             }

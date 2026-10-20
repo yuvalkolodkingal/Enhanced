@@ -143,6 +143,18 @@ public final class ClientSetup {
                     com.kolodkingal.enhanced.client.finders.CerebroSphere::consoleOn;
             // ===== cottage (3.7) =====
             com.kolodkingal.enhanced.client.cottage.CottageClient.setup();
+            // ===== 3.8: each lane registers its effects' drawers here (CaptainFx, RedHulkFx, IronFx, FalconFx,
+            // TowerFx, EternityFx and its wish screen; SuitModels and SuitAssembly's registry for the suits) =====
+            // ===== serum (3.8) =====
+            // ===== captain (3.8) =====
+            // ===== red_hulk (3.8) =====
+            // ===== iron_man (3.8) =====
+            // ===== nanotech (3.8) =====
+            // ===== suit_art (3.8) =====
+            // ===== falcon (3.8) =====
+            // ===== tower (3.8) =====
+            // ===== eternity (3.8) =====
+            // ===== love (3.8) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
         });
@@ -266,12 +278,36 @@ public final class ClientSetup {
         // ===== cottage (3.7) =====
         event.registerEntityRenderer(ModEntities.COTTAGE_RESIDENT.get(),
                 com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
+        // The renderers of 3.8, one region per lane (the skeleton's stand-ins: nothing, or a box's outline, until the
+        // lanes draw their own).
+        // ===== captain (3.8) =====
+        event.registerEntityRenderer(ModEntities.THROWN_SHIELD.get(), NoopRenderer::new);
+        // ===== iron_man (3.8) =====
+        event.registerEntityRenderer(ModEntities.IRON_MISSILE.get(), NoopRenderer::new);
+        // ===== nanotech (3.8) =====
+        event.registerEntityRenderer(ModEntities.NANO_DRONE.get(),
+                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
+        event.registerEntityRenderer(ModEntities.HULKBUSTER_FRAME.get(),
+                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
+        // ===== suit_art (3.8) =====
+        // ===== falcon (3.8) =====
+        event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.FALCON_DART.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.REDWING.get(),
+                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xD8323C));
+        // ===== tower (3.8) =====
+        // ===== eternity (3.8) =====
+        event.registerEntityRenderer(ModEntities.ETERNITY.get(),
+                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0x2A1F4A));
+        // ===== love (3.8) =====
     }
 
     /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
     @SubscribeEvent
     public static void onRegisterDimensionEffects(RegisterDimensionSpecialEffectsEvent event) {
         event.register(Enhanced.id("asgard"), new com.kolodkingal.enhanced.client.asgard.AsgardSkyEffects());
+        // ===== eternity (3.8) =====
+        event.register(Enhanced.id("eternity"), new com.kolodkingal.enhanced.client.eternity.EternitySkyEffects());
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */
@@ -350,6 +386,14 @@ public final class ClientSetup {
         // ===== school_lab (3.7) =====
         // ===== finders (3.7) =====
         // ===== cottage (3.7) =====
+        // ===== captain (3.8) =====
+        // ===== red_hulk (3.8) =====
+        // ===== iron_man (3.8) =====
+        // ===== nanotech (3.8) =====
+        // ===== suit_art (3.8) =====
+        // ===== falcon (3.8) =====
+        // ===== eternity (3.8) =====
+        // ===== love (3.8) =====
     }
 
     @SubscribeEvent
@@ -410,6 +454,18 @@ public final class ClientSetup {
                                 com.kolodkingal.enhanced.client.deadpool.KatanaModel.LAYER)),
                         new com.kolodkingal.enhanced.client.deadpool.PistolModel(event.getContext().bakeLayer(
                                 com.kolodkingal.enhanced.client.deadpool.PistolModel.LAYER))));
+                // ===== captain (3.8) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.captain.CapShieldLayer(renderer));
+                // ===== red_hulk (3.8) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.HeatLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.RossSuitLayer(renderer));
+                // ===== iron_man (3.8) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.SuitLayer(renderer));
+                // ===== nanotech (3.8) =====
+                // ===== suit_art (3.8) =====
+                // ===== falcon (3.8) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.falcon.FalconWingsLayer(renderer));
+                // ===== love (3.8) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
                         new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
@@ -500,6 +556,43 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("finders"),
                 new com.kolodkingal.enhanced.client.finders.FindersHud());
         // ===== cottage (3.7) =====
+        // ===== serum (3.8) =====
+        // ===== captain (3.8) =====
+        // ===== red_hulk (3.8) =====
+        // ===== iron_man (3.8) =====
+        // ===== nanotech (3.8) =====
+        // ===== falcon (3.8) =====
+        // ===== tower (3.8) =====
+        // ===== eternity (3.8) =====
+        // ===== love (3.8) =====
+    }
+
+    /**
+     * 3.8: the items drawn by the mod's own models ({@code IClientItemExtensions}): the Vibranium Shield (its round
+     * model), the Exo-Wings, the suits and the reactors (their worn models are the mod's layers; their armour textures
+     * are empty). The skeleton registers the plain extensions; each lane gives its item its model in its region.
+     */
+    @SubscribeEvent
+    public static void onRegisterClientExtensions(
+            net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        // ===== captain (3.8) =====
+        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+        }, com.kolodkingal.enhanced.registry.ModItems.VIBRANIUM_SHIELD.get());
+        // ===== iron_man (3.8) =====
+        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+        }, com.kolodkingal.enhanced.registry.ModItems.ARC_REACTOR.get(),
+                com.kolodkingal.enhanced.registry.ModItems.NANO_ARC_REACTOR.get(),
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_1.get(),
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_3.get(),
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_5.get(),
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_50.get(),
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_85.get(),
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_HULKBUSTER.get());
+        // ===== nanotech (3.8) =====
+        // ===== suit_art (3.8) =====
+        // ===== falcon (3.8) =====
+        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+        }, com.kolodkingal.enhanced.registry.ModItems.FALCON_EXO_WINGS.get());
     }
 
     private ClientSetup() {

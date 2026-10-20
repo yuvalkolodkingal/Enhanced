@@ -15,10 +15,12 @@ public final class ModNetwork {
      * The version of the messages and synced data: a client and a server with different versions can't play together.
      * Bumped once for all of 3.1, once for 3.2 (the Witches' Road screen got a mode and the trials' progress), once for
      * all of 3.3, once for 3.4 (a custom hero's definition, format 2, and his state's cast marker), once for 3.5
-     * (Asgard), once for 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra), and once for 3.7 (Wolverine,
-     * Deadpool, the healing factor, the X-Men lower lab, the amplified Cerebro and the Stone Locator).
+     * (Asgard), once for 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra), once for 3.7 (Wolverine,
+     * Deadpool, the healing factor, the X-Men lower lab, the amplified Cerebro and the Stone Locator), and once for 3.8
+     * (the serum, Captain America, Red Hulk, Iron Man, Falcon, the tower's armoury, Eternity and Love; the momentary
+     * states in two words).
      */
-    public static final String PROTOCOL_VERSION = "11";
+    public static final String PROTOCOL_VERSION = "12";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -105,6 +107,19 @@ public final class ModNetwork {
                 DeathMeetingPayload.Offer::handle);
         registrar.playToServer(DeathMeetingPayload.Choose.TYPE, DeathMeetingPayload.Choose.STREAM_CODEC,
                 DeathMeetingPayload.Choose::handle);
+        // 3.8 (the serum, Captain America, Red Hulk, Iron Man, Falcon, the tower, Eternity and Love): protocol 12. The
+        // power data's momentary states travel in two words. The handlers call the lanes' hooks.
+        registrar.playToClient(SerumScreenPayload.TYPE, SerumScreenPayload.STREAM_CODEC, SerumScreenPayload::handle);
+        registrar.playToServer(SerumChoicePayload.TYPE, SerumChoicePayload.STREAM_CODEC, SerumChoicePayload::handle);
+        registrar.playToClient(CaptainFxPayload.TYPE, CaptainFxPayload.STREAM_CODEC, CaptainFxPayload::handle);
+        registrar.playToClient(RedHulkFxPayload.TYPE, RedHulkFxPayload.STREAM_CODEC, RedHulkFxPayload::handle);
+        registrar.playToClient(IronFxPayload.TYPE, IronFxPayload.STREAM_CODEC, IronFxPayload::handle);
+        registrar.playToClient(FalconFxPayload.TYPE, FalconFxPayload.STREAM_CODEC, FalconFxPayload::handle);
+        registrar.playToClient(TowerFxPayload.TYPE, TowerFxPayload.STREAM_CODEC, TowerFxPayload::handle);
+        registrar.playToClient(EternityScreenPayload.TYPE, EternityScreenPayload.STREAM_CODEC,
+                EternityScreenPayload::handle);
+        registrar.playToServer(EternityWishPayload.TYPE, EternityWishPayload.STREAM_CODEC, EternityWishPayload::handle);
+        registrar.playToClient(EternityFxPayload.TYPE, EternityFxPayload.STREAM_CODEC, EternityFxPayload::handle);
         // 3.5: the world's own music (its manifest, a client's request for a song, and the song in pieces), optional.
         PayloadRegistrar music = event.registrar(MUSIC_VERSION).optional();
         music.playToClient(MusicManifestPayload.TYPE, MusicManifestPayload.STREAM_CODEC, MusicManifestPayload::handle);

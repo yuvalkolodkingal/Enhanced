@@ -232,6 +232,55 @@ public final class ModAttachments {
                                     com.kolodkingal.enhanced.cottage.CottageProgress.STREAM_CODEC)
                             .build());
 
+    // ===== captain (3.8) =====
+    /** 3.8: Captain America's thrown shield and combo (lane L1). Saved, not kept on death, synced to him. */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.captain.CaptainState>> CAPTAIN =
+            ATTACHMENTS.register("captain",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.captain.CaptainState.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.captain.CaptainState.CODEC)
+                            .sync((holder, to) -> holder == to,
+                                    com.kolodkingal.enhanced.captain.CaptainState.STREAM_CODEC)
+                            .build());
+    // ===== red_hulk (3.8) =====
+    /** 3.8: Red Hulk's anger (lane L2). Saved, not kept on death, synced to everyone who sees him (his heat glow). */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.redhulk.RedHulkState>> RED_HULK =
+            ATTACHMENTS.register("red_hulk",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.redhulk.RedHulkState.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.redhulk.RedHulkState.CODEC)
+                            .sync(com.kolodkingal.enhanced.redhulk.RedHulkState.STREAM_CODEC)
+                            .build());
+    // ===== iron_man (3.8) =====
+    /**
+     * 3.8: Iron Man's suit, energy and suit-up (lanes L3 and L4). Saved without the phase, kept on death (his chosen
+     * suits), synced to everyone who sees him (the suit-up and a deployed nanotech suit are drawn from it).
+     */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.ironman.IronManState>> IRON_MAN =
+            ATTACHMENTS.register("iron_man",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.ironman.IronManState.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.ironman.IronManState.CODEC)
+                            .copyOnDeath()
+                            .sync(com.kolodkingal.enhanced.ironman.IronManState.STREAM_CODEC)
+                            .build());
+    // ===== falcon (3.8) =====
+    /** 3.8: Falcon's Redwing (lane L5). Saved, not kept on death, synced to him. */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.falcon.FalconState>> FALCON =
+            ATTACHMENTS.register("falcon",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.falcon.FalconState.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.falcon.FalconState.CODEC)
+                            .sync((holder, to) -> holder == to,
+                                    com.kolodkingal.enhanced.falcon.FalconState.STREAM_CODEC)
+                            .build());
+    // ===== eternity (3.8) =====
+    /** 3.8: a player's journey to Eternity and his wish (lane L8). Saved, kept on death, synced to him. */
+    public static final Supplier<AttachmentType<com.kolodkingal.enhanced.eternity.EternityProgress>> ETERNITY =
+            ATTACHMENTS.register("eternity",
+                    () -> AttachmentType.builder(() -> com.kolodkingal.enhanced.eternity.EternityProgress.EMPTY)
+                            .serialize(com.kolodkingal.enhanced.eternity.EternityProgress.CODEC)
+                            .copyOnDeath()
+                            .sync((holder, to) -> holder == to,
+                                    com.kolodkingal.enhanced.eternity.EternityProgress.STREAM_CODEC)
+                            .build());
+
     private ModAttachments() {
     }
 }

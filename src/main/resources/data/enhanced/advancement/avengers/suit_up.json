@@ -1,0 +1,22 @@
+{
+  "parent": "enhanced:avengers/super_soldier",
+  "display": {
+    "icon": {
+      "id": "enhanced:iron_man_mark_3"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.suit_up.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.suit_up.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

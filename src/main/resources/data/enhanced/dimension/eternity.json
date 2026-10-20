@@ -1,0 +1,22 @@
+{
+  "type": "enhanced:eternity",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "enhanced:eternity",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:air",
+          "height": 63
+        },
+        {
+          "block": "enhanced:eternity_mirror",
+          "height": 1
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

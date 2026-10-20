@@ -154,6 +154,8 @@ public final class CustomHeroServer implements HeroServer {
         private final long[] cooldowns = new long[PowerData.ABILITIES + 1];
         private final int toggles;
         private final long live;
+        /** 3.8: the momentary states' second word. */
+        private final long liveHigh;
         private final int flags;
         private final int on;
         private final boolean field;
@@ -164,6 +166,7 @@ public final class CustomHeroServer implements HeroServer {
             }
             toggles = data.toggleBits();
             live = data.liveBits();
+            liveHigh = data.liveBitsHigh();
             flags = data.flagBits();
             on = state.onBits();
             field = state.field();
@@ -175,8 +178,8 @@ public final class CustomHeroServer implements HeroServer {
                     return true;
                 }
             }
-            return toggles != data.toggleBits() || live != data.liveBits() || flags != data.flagBits() || on != state.onBits()
-                    || field != state.field();
+            return toggles != data.toggleBits() || live != data.liveBits() || liveHigh != data.liveBitsHigh()
+                    || flags != data.flagBits() || on != state.onBits() || field != state.field();
         }
     }
 

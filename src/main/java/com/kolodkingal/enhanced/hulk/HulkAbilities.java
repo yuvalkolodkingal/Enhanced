@@ -432,19 +432,7 @@ public final class HulkAbilities {
         if (data.power() == Power.HULK) {
             HulkForms.tick(player, data, state, now);
         }
-        if (state.move != null) {
-            Move move = state.move;
-            boolean over;
-            try {
-                over = move.tick(player, data, (int) (now - state.moveStart));
-            } catch (RuntimeException e) {
-                over = true;
-                Enhanced.LOGGER.warn("A move of the Hulk failed", e);
-            }
-            if (over && state.move == move) {
-                finishMove(player, data, state);
-            }
-        }
+        tickMove(player, data, state);
         if (data.has(HeroAbility.HULK_BODY)) {
             HulkRage.tick(player, data, state, now);
             if (hasBody(data)) {
@@ -492,6 +480,43 @@ public final class HulkAbilities {
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         setModifier(player, Attributes.KNOCKBACK_RESISTANCE, HOLD_KNOCKBACK, 1.0, unpushable,
                 AttributeModifier.Operation.ADD_VALUE);
+    }
+
+    /** One tick of the move he is making (a leap, a grab, a charge), if any; it ends itself when it is over. */
+    private static void tickMove(ServerPlayer player, PowerData data, State state) {
+        if (state.move != null) {
+            Move move = state.move;
+            boolean over;
+            try {
+                over = move.tick(player, data, (int) (player.level().getGameTime() - state.moveStart));
+            } catch (RuntimeException e) {
+                over = true;
+                Enhanced.LOGGER.warn("A move of the Hulk failed", e);
+            }
+            if (over && state.move == move) {
+                finishMove(player, data, state);
+            }
+        }
+    }
+
+    /**
+     * 3.8: one tick of a Hulk's move started by a hero who is not the Hulk (Red Hulk's Bound and Grab & Slam through
+     * {@code SuperLeap.bound}'s and {@code GrabSmash.start}'s overloads, lane L2): his own tick calls it, once a game
+     * tick. (The Hulk's tick plays his own moves; nothing else of the Hulk's tick runs here.)
+     */
+    public static void driveMove(ServerPlayer player, PowerData data) {
+        State state = state(player.getUUID());
+        long now = player.level().getGameTime();
+        if (state.lastTick == now) {
+            return;
+        }
+        state.lastTick = now;
+        tickMove(player, data, state);
+    }
+
+    /** 3.8: whether he is in the middle of a Hulk's move (a leap, a grab, a charge). */
+    public static boolean moving(Player player) {
+        return move(player) != null;
     }
 
     static void startMove(ServerPlayer player, State state, Move move) {

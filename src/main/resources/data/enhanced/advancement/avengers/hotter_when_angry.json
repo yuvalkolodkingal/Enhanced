@@ -1,0 +1,22 @@
+{
+  "parent": "enhanced:avengers/super_soldier",
+  "display": {
+    "icon": {
+      "id": "minecraft:fire_charge"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.hotter_when_angry.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.hotter_when_angry.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

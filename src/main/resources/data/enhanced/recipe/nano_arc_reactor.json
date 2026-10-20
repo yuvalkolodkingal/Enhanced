@@ -1,0 +1,24 @@
+{
+  "type": "enhanced:arc_reactor",
+  "category": "equipment",
+  "pattern": [
+    " N ",
+    "NAN",
+    " NE"
+  ],
+  "key": {
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "A": {
+      "item": "enhanced:arc_reactor"
+    },
+    "E": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "result": {
+    "id": "enhanced:nano_arc_reactor",
+    "count": 1
+  }
+}

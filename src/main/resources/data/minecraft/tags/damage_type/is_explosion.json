@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "enhanced:stone_blast",
-    "enhanced:power_stone_explosion"
+    "enhanced:power_stone_explosion",
+    "enhanced:iron_missile"
   ]
 }

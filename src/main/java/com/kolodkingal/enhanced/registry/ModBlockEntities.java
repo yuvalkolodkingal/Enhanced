@@ -78,6 +78,27 @@ public final class ModBlockEntities {
                     () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.CerebroConsoleBlockEntity::new,
                     ModBlocks.CEREBRO_CONSOLE.get()).build(null));
 
+    // ===== tower (3.8) =====
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.SuitDisplayBlockEntity>> SUIT_DISPLAY =
+            BLOCK_ENTITIES.register("suit_display",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.SuitDisplayBlockEntity::new,
+                    ModBlocks.SUIT_DISPLAY.get()).build(null));
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.TechCaseBlockEntity>> TECH_CASE =
+            BLOCK_ENTITIES.register("tech_case",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.TechCaseBlockEntity::new,
+                    ModBlocks.TECH_CASE.get()).build(null));
+    // ===== eternity (3.8) =====
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.EternityAltarBlockEntity>> ETERNITY_ALTAR =
+            BLOCK_ENTITIES.register("eternity_altar",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.EternityAltarBlockEntity::new,
+                    ModBlocks.ETERNITY_ALTAR.get()).build(null));
+
     private ModBlockEntities() {
     }
 }

@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:repulsor",
+    "enhanced:unibeam",
+    "enhanced:drone_laser",
+    "enhanced:redwing_laser",
+    "enhanced:love_eye_laser",
+    "enhanced:chaos_beam",
+    "enhanced:mind_stone_beam",
+    "enhanced:lightning_beam",
+    "enhanced:hex_beam",
+    "enhanced:darkhold_beam",
+    "enhanced:ultron_beam",
+    "enhanced:optic_blast",
+    "enhanced:hero_beam",
+    "enhanced:power_stone_beam",
+    "enhanced:hex_bolt",
+    "enhanced:ultron_bolt",
+    "enhanced:hydra_bolt"
+  ]
+}

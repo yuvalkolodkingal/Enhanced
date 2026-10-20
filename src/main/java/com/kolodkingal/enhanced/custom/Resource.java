@@ -50,5 +50,8 @@ public enum Resource {
     BUILD,
     // (3.6, the skeleton) ----
     /** The Soul Drain's lock on one creature (Thanos's Soul Stone and the Soul Stone's row: the same state). */
-    SOUL_CHAIN
+    SOUL_CHAIN,
+    // (3.8, the skeleton) ----
+    /** Iron Man's suit energy ({@code IronManState.energy}): one meter, one owner. */
+    SUIT_ENERGY
 }

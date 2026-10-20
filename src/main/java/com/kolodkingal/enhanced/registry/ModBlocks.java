@@ -331,6 +331,56 @@ public final class ModBlocks {
                     .lightLevel(state -> 4));
     // ===== finders (3.7) =====
     // ===== cottage (3.7) =====
+    // ===== tower (3.8) =====
+    // (Lane L6 owns the classes, lane L7 the display's renderer. A generated one (state generated=true) does not break
+    // in Survival; a placed one breaks as a metal block.)
+    /** Iron Man's suit display (lane L6): two high. */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.SuitDisplayBlock> SUIT_DISPLAY =
+            BLOCKS.registerBlock("suit_display", com.kolodkingal.enhanced.block.SuitDisplayBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 1200.0F)
+                    .requiresCorrectToolForDrops()
+                    .pushReaction(PushReaction.BLOCK)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .lightLevel(state -> 3));
+    /** A tech case (lane L6). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.TechCaseBlock> TECH_CASE =
+            BLOCKS.registerBlock("tech_case", com.kolodkingal.enhanced.block.TechCaseBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(5.0F, 1200.0F)
+                    .requiresCorrectToolForDrops()
+                    .pushReaction(PushReaction.BLOCK)
+                    .sound(SoundType.GLASS)
+                    .noOcclusion()
+                    .lightLevel(state -> 6));
+    // ===== eternity (3.8) =====
+    /** Eternity's altar (lane L8). */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.EternityAltarBlock> ETERNITY_ALTAR =
+            BLOCKS.registerBlock("eternity_altar", com.kolodkingal.enhanced.block.EternityAltarBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(50.0F, 1200.0F)
+                    .requiresCorrectToolForDrops()
+                    .pushReaction(PushReaction.BLOCK)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
+                    .lightLevel(state -> 10));
+    /** The still mirror of Eternity's realm (lane L8): translucent, unbreakable in Survival. */
+    public static final DeferredBlock<com.kolodkingal.enhanced.block.EternityMirrorBlock> ETERNITY_MIRROR =
+            BLOCKS.registerBlock("eternity_mirror", com.kolodkingal.enhanced.block.EternityMirrorBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.SNOW)
+                    .strength(-1.0F, 3600000.0F)
+                    .pushReaction(PushReaction.BLOCK)
+                    .sound(SoundType.GLASS)
+                    .noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false));
 
     private ModBlocks() {
     }

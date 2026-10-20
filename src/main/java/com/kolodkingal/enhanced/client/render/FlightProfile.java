@@ -126,6 +126,36 @@ public final class FlightProfile {
      * The Phoenix: a calm telekinetic flier whose arms spread like wings as she speeds up, neither the Scarlet Witch's
      * forward thrust nor Vision's stiffness.
      */
+    // ===== iron_man (3.8) =====
+    /**
+     * Iron Man (3.8): Thor's numbers until lane L3 tunes them (palms down and back hovering, arms along him flying).
+     */
+    private static final FlightProfile IRON_MAN = new FlightProfile(
+            new float[]{72, 88, -6}, 0.35F, 40, 25, 5.0F, 8, 3.5F, true, new float[]{0.42F, 0.56F}, new float[]{0.04F,
+                    60}, 2.3F, 6.0F, 1.5F, 0.0F,
+            false, 0.11F, true, new float[][]{
+            pose(158, 0, 0, -8, 0, -30, 0, 2, 0, -2),
+            pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),
+            pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
+    // ===== falcon (3.8) =====
+    /** Falcon (3.8): Thor's numbers until lane L5 tunes them (arms slightly out with the wings, body forward). */
+    private static final FlightProfile FALCON = new FlightProfile(
+            new float[]{72, 88, -6}, 0.35F, 40, 25, 5.0F, 8, 3.5F, true, new float[]{0.42F, 0.56F}, new float[]{0.04F,
+                    60}, 2.3F, 6.0F, 1.5F, 0.0F,
+            false, 0.11F, true, new float[][]{
+            pose(158, 0, 0, -8, 0, -30, 0, 2, 0, -2),
+            pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),
+            pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
+    // ===== love (3.8) =====
+    /** Love (3.8): Thor's, as she flies by her axe (lane L8 tunes them for her height). */
+    private static final FlightProfile LOVE = new FlightProfile(
+            new float[]{72, 88, -6}, 0.35F, 40, 25, 5.0F, 8, 3.5F, true, new float[]{0.42F, 0.56F}, new float[]{0.04F,
+                    60}, 2.3F, 6.0F, 1.5F, 0.0F,
+            false, 0.11F, true, new float[][]{
+            pose(158, 0, 0, -8, 0, -30, 0, 2, 0, -2),
+            pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),
+            pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
+
     private static final FlightProfile PHOENIX = new FlightProfile(
             new float[]{30, 58, -8}, 0.45F, 16, 14, 3.5F, 10, 5, false, new float[]{4.5F, 4.5F}, new float[]{0.05F, 76}, 3.5F, 3.0F, 2.0F, 0.0F,
             false, 0.09F, false, new float[][]{
@@ -216,6 +246,15 @@ public final class FlightProfile {
             case HULK -> null;
             // 3.7: Wolverine pounces and leaps, Deadpool teleports: neither flies.
             case WOLVERINE, DEADPOOL -> null;
+            // 3.8: Captain America and Red Hulk leap; Iron Man, Falcon and Love fly (placeholders copied from Thor's
+            // until their lanes tune them).
+            case CAPTAIN_AMERICA, RED_HULK -> null;
+            // ===== iron_man (3.8) =====
+            case IRON_MAN -> IRON_MAN;
+            // ===== falcon (3.8) =====
+            case FALCON -> FALCON;
+            // ===== love (3.8) =====
+            case LOVE -> LOVE;
             // A custom hero flies with the profile of his flight style (3.4: of(HeroAnimState)); the plain style is the
             // game's own pose.
             case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;

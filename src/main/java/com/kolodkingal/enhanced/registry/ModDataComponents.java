@@ -49,6 +49,16 @@ public final class ModDataComponents {
                     .persistent(com.kolodkingal.enhanced.finders.LocatorState.CODEC)
                     .networkSynchronized(com.kolodkingal.enhanced.finders.LocatorState.STREAM_CODEC));
 
+    /**
+     * 3.8: a suit item's own state ({@link com.kolodkingal.enhanced.ironman.SuitItemState}: the Mark 5 folded into its
+     * suitcase or not). Saved with the item, sent to clients (the item property {@code enhanced:folded} reads it).
+     */
+    public static final DeferredHolder<DataComponentType<?>,
+            DataComponentType<com.kolodkingal.enhanced.ironman.SuitItemState>> SUIT =
+            DATA_COMPONENTS.registerComponentType("suit", builder -> builder
+                    .persistent(com.kolodkingal.enhanced.ironman.SuitItemState.CODEC)
+                    .networkSynchronized(com.kolodkingal.enhanced.ironman.SuitItemState.STREAM_CODEC));
+
     private ModDataComponents() {
     }
 }

@@ -1,0 +1,22 @@
+{
+  "parent": "enhanced:avengers/gates_of_eternity",
+  "display": {
+    "icon": {
+      "id": "enhanced:stormbreaker"
+    },
+    "title": {
+      "translate": "advancements.enhanced.avengers.thunder_runs_in_the_family.title"
+    },
+    "description": {
+      "translate": "advancements.enhanced.avengers.thunder_runs_in_the_family.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

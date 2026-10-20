@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "enhanced:block/suit_display"
+    }
+  }
+}

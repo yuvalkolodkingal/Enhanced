@@ -77,6 +77,22 @@ public final class ModCreativeTab {
                         output.accept(ModItems.WEAPON_X_POD.get());
                         output.accept(ModItems.CURE_STATION.get());
                         output.accept(ModItems.CEREBRO_CONSOLE.get());
+                        // 3.8
+                        output.accept(ModItems.SPECIAL_SOLDIER_SERUM.get());
+                        output.accept(ModItems.VIBRANIUM_SHIELD.get());
+                        output.accept(ModItems.ARC_REACTOR.get());
+                        output.accept(ModItems.NANO_ARC_REACTOR.get());
+                        output.accept(ModItems.IRON_MAN_MARK_1.get());
+                        output.accept(ModItems.IRON_MAN_MARK_3.get());
+                        output.accept(ModItems.IRON_MAN_MARK_5.get());
+                        output.accept(ModItems.IRON_MAN_MARK_50.get());
+                        output.accept(ModItems.IRON_MAN_MARK_85.get());
+                        output.accept(ModItems.IRON_MAN_HULKBUSTER.get());
+                        output.accept(ModItems.FALCON_EXO_WINGS.get());
+                        output.accept(ModItems.SUIT_DISPLAY.get());
+                        output.accept(ModItems.TECH_CASE.get());
+                        output.accept(ModItems.ETERNITY_ALTAR.get());
+                        output.accept(ModItems.ETERNITY_MIRROR.get());
                     })
                     .build());
 

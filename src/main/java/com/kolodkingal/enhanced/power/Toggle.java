@@ -77,6 +77,12 @@ public enum Toggle {
     /** Wolverine: he follows one scent trail (Sneak + N, Track). */
     SCENT_TRACK,
     // ===== deadpool (3.7) =====
+    // ===== red_hulk (3.8) =====
+    /** Red Hulk is Thaddeus Ross (N: his human form; every key but N refused, anger fills at half rate). */
+    ROSS_FORM,
+    // ===== falcon (3.8) =====
+    /** Falcon's drone Redwing is out (N): it marks monsters and zaps them. */
+    REDWING_OUT,
     ;
 
     final int bit() {
