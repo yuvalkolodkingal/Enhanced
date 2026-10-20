@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.world.CarvedSiteStructure;
+import com.kolodkingal.enhanced.world.HangingEntityProcessor;
 import com.kolodkingal.enhanced.world.NetherSiteStructure;
 import com.kolodkingal.enhanced.world.SealProcessor;
 import com.kolodkingal.enhanced.world.SitePoints;
@@ -25,6 +26,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -37,6 +39,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -923,6 +928,58 @@ public final class StoneSiteTests {
                     "the ladder goes on at " + y + ": " + level.getBlockState(p));
         }
         withinBudget("Avengers Tower", t);
+        helper.succeed();
+    }
+
+    /**
+     * 3.7.1: the tower's 13 item frames are read where they are put (no "Block-attached entity at invalid position" in
+     * the log): every part is placed with {@link HangingEntityProcessor}, which writes each frame's block into it, turned
+     * as the part is turned.
+     */
+    @GameTest(template = ARENA, batch = "stone_sites_frames")
+    public static void theTowersItemFramesHangWhereTheyArePut(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        TowerSiteStructure tower = (TowerSiteStructure) level.registryAccess().registryOrThrow(Registries.STRUCTURE)
+                .get(Enhanced.id("avengers_tower"));
+        BlockPos center = new BlockPos(300_008, 70, 100_408);
+        List<TemplateSitePiece> pieces = tower.pieces(level.getStructureManager(), Rotation.CLOCKWISE_90, center);
+        int frames = 0;
+        for (int i = 0; i < pieces.size(); i++) {
+            TemplateSitePiece piece = pieces.get(i);
+            StructurePlaceSettings settings = piece.placeSettings();
+            check(settings.getProcessors().contains(HangingEntityProcessor.INSTANCE), "the part hangs its frames");
+            StructureTemplate template = level.getStructureManager().getOrCreate(StoneSitePlans.Tower.PARTS.get(i));
+            List<StructureTemplate.StructureEntityInfo> raw = new ArrayList<>();
+            for (Tag t : template.save(new CompoundTag()).getList("entities", Tag.TAG_COMPOUND)) {
+                CompoundTag e = (CompoundTag) t;
+                ListTag pos = e.getList("pos", Tag.TAG_DOUBLE);
+                ListTag block = e.getList("blockPos", Tag.TAG_INT);
+                raw.add(new StructureTemplate.StructureEntityInfo(new Vec3(pos.getDouble(0), pos.getDouble(1),
+                        pos.getDouble(2)), new BlockPos(block.getInt(0), block.getInt(1), block.getInt(2)),
+                        e.getCompound("nbt")));
+            }
+            for (StructureTemplate.StructureEntityInfo info : StructureTemplate.processEntityInfos(template, level,
+                    piece.templatePosition(), settings, raw)) {
+                if (!info.nbt.getString("id").equals("minecraft:item_frame")) {
+                    continue;
+                }
+                frames++;
+                BlockPos at = BlockPos.containing(info.pos);
+                check(info.nbt.getInt("TileX") == at.getX() && info.nbt.getInt("TileY") == at.getY()
+                        && info.nbt.getInt("TileZ") == at.getZ(), "a frame's block is written in: " + info.nbt);
+                CompoundTag nbt = info.nbt.copy();
+                ListTag pos = new ListTag();
+                pos.add(DoubleTag.valueOf(info.pos.x));
+                pos.add(DoubleTag.valueOf(info.pos.y));
+                pos.add(DoubleTag.valueOf(info.pos.z));
+                nbt.put("Pos", pos);
+                nbt.remove("UUID");
+                Entity entity = EntityType.create(nbt, level).orElseThrow();
+                check(entity instanceof ItemFrame frame && at.equals(frame.getPos()),
+                        "the frame is read where it is put, " + at + ": " + entity);
+            }
+        }
+        check(frames == 13, "the tower's 13 frames: " + frames);
         helper.succeed();
     }
 

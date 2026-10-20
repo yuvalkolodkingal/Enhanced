@@ -64,6 +64,12 @@ public final class ModStructures {
     public static final DeferredHolder<StructureProcessorType<?>, StructureProcessorType<FoundationProcessor>> FOUNDATION =
             PROCESSORS.register("foundation", () -> () -> FoundationProcessor.CODEC);
 
+    // ===== 3.7.1: item frames and paintings hung where they are put =====
+    /** Writes a template's item frames' and paintings' block into them (see {@code world.HangingEntityProcessor}). */
+    public static final DeferredHolder<StructureProcessorType<?>,
+            StructureProcessorType<com.kolodkingal.enhanced.world.HangingEntityProcessor>> HANGING_ENTITIES =
+            PROCESSORS.register("hanging_entities", () -> () -> com.kolodkingal.enhanced.world.HangingEntityProcessor.CODEC);
+
     private ModStructures() {
     }
 }

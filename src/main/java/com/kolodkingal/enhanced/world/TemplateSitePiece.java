@@ -57,7 +57,8 @@ public class TemplateSitePiece extends TemplateStructurePiece {
 
     private static StructurePlaceSettings settings(Rotation rotation, BlockPos pivot, StructureProcessorList processors) {
         StructurePlaceSettings settings = new StructurePlaceSettings().setRotation(rotation).setMirror(Mirror.NONE).setRotationPivot(pivot)
-                .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK).setLiquidSettings(LiquidSettings.IGNORE_WATERLOGGING);
+                .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK).setLiquidSettings(LiquidSettings.IGNORE_WATERLOGGING)
+                .addProcessor(HangingEntityProcessor.INSTANCE); // (3.7.1: its item frames hung where they are put)
         processors.list().forEach(settings::addProcessor);
         return settings;
     }
